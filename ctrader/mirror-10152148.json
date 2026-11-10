@@ -1171,6 +1171,33 @@
     ],
     "stopCheckedAt": "2026-11-10T11:47:20.000Z",
     "brokerStop": 1.41231
+   },
+   "usdchf-replica-1794312562-s": {
+    "positionId": "48023665",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T12:11:14.000Z",
+    "councilEntry": 0.82134,
+    "stop": 0.821882,
+    "t1": 0.820255,
+    "riskCash": 2,
+    "margin": 6,
+    "shadow": true,
+    "mark": 0.82134,
+    "levelsFrom": "mark",
+    "fillPrice": 0.82067,
+    "slipR": 1.236,
+    "lagSec": 112,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T12:11:14.000Z",
+    "brokerStop": 0.82121
    }
   },
   "day": {
@@ -1178,7 +1205,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9980.87 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9980.87 · 11 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794243038-s": "none of XRPUSD found at the broker",
@@ -1193,7 +1220,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9980.87,
-  "lastRun": "2026-11-10T12:07:59.000Z"
+  "lastRun": "2026-11-10T12:11:14.000Z"
  },
  "log": [
   {
@@ -1648,6 +1675,11 @@
    "at": "2026-11-10T11:47:20.000Z",
    "msg": "opened buy USDCAD 0.03 lot (council replica)",
    "trade": "usdcad-replica-1794311168-b"
+  },
+  {
+   "at": "2026-11-10T12:11:14.000Z",
+   "msg": "opened sell USDCHF 0.03 lot (council replica)",
+   "trade": "usdchf-replica-1794312562-s"
   }
  ],
  "limits": {
@@ -1726,11 +1758,11 @@
   ]
  },
  "execution": {
-  "n": 41,
-  "meanSlipR": 0.078,
-  "medianSlipR": 0.042,
-  "worstSlipR": 0.765,
-  "medianLagSec": 2751,
+  "n": 42,
+  "meanSlipR": 0.106,
+  "medianSlipR": 0.045,
+  "worstSlipR": 1.236,
+  "medianLagSec": 1918.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 7,
@@ -1761,8 +1793,8 @@
     "meanSlipR": 0.174
    },
    "USDCHF": {
-    "n": 1,
-    "meanSlipR": 0.157
+    "n": 2,
+    "meanSlipR": 0.697
    },
    "EURUSD": {
     "n": 2,

@@ -225,8 +225,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0797995,
-    "t1": 1.16346,
+    "stop": 1.0794795,
+    "t1": 1.16314,
     "riskCash": 34.14,
     "margin": 2.23,
     "minLot": true,
@@ -243,8 +243,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.96,
-    "amended": 6,
-    "amendedAt": "2026-11-10T11:09:11.000Z"
+    "amended": 7,
+    "amendedAt": "2026-11-10T12:11:10.000Z"
    },
    "gbpusd-scalp-1793626672": {
     "positionId": "47373485",
@@ -321,8 +321,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0804847,
-    "t1": 1.133315,
+    "stop": 1.0801647,
+    "t1": 1.132995,
     "riskCash": 33.46,
     "margin": 2.23,
     "minLot": true,
@@ -339,8 +339,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.26,
-    "amended": 6,
-    "amendedAt": "2026-11-10T11:09:11.000Z"
+    "amended": 7,
+    "amendedAt": "2026-11-10T12:11:10.000Z"
    },
    "usdchf-swing-1793762425": {
     "positionId": "47373488",
@@ -4057,8 +4057,8 @@
     "setup": "swing",
     "openedAt": "2026-11-10T08:33:52.000Z",
     "councilEntry": 1.12442,
-    "stop": 1.113017,
-    "t1": 1.147316,
+    "stop": 1.112697,
+    "t1": 1.146996,
     "adopted": false,
     "alerted": [
      "open",
@@ -4079,8 +4079,8 @@
     "volume": 100000,
     "status": "open",
     "rr": 2,
-    "amended": 2,
-    "amendedAt": "2026-11-10T11:09:11.000Z"
+    "amended": 3,
+    "amendedAt": "2026-11-10T12:11:10.000Z"
    },
    "audusd-scalp-1794299718": {
     "symbol": "AUDUSD",
@@ -4644,7 +4644,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9906.89 · 25 open",
+  "status": "ok · demo Fusion Markets · balance 9906.89 · 25 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4663,32 +4663,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eurusd-intraday-1794312562": {
+    "orderId": "33862897",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 1.12159,
+    "stop": 1.12252,
+    "t1": 1.11287,
+    "placedAt": "2026-11-10T12:11:10.000Z",
+    "expires": "2026-11-11T00:09:22.000Z",
+    "riskCash": 1.98,
+    "margin": 4.49,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9906.89,
-  "lastRun": "2026-11-10T12:07:56.000Z"
+  "lastRun": "2026-11-10T12:11:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T16:14:46.000Z",
-   "msg": "placed buy limit GBPUSD 0.01 lot at 1.3411 (council scalp, valid to 2026-11-09T19:13Z)",
-   "trade": "gbpusd-scalp-1794240823"
-  },
-  {
-   "at": "2026-11-09T16:17:22.000Z",
-   "msg": "placed buy limit EURUSD 0.01 lot at 1.12028 (council rintra, valid to 2026-11-10T04:16Z)",
-   "trade": "eurusd-rintra-1794240969"
-  },
-  {
-   "at": "2026-11-09T16:18:50.000Z",
-   "msg": "limit filled: EURUSD position 47714303 at the broker",
-   "trade": "eurusd-rintra-1794240969"
-  },
-  {
-   "at": "2026-11-09T16:18:50.000Z",
-   "msg": "USDCHF position 47689319 closed at the broker",
-   "trade": "usdchf-scalp-1794236710"
-  },
   {
    "at": "2026-11-09T16:18:50.000Z",
    "msg": "USDCHF position 47690552 closed at the broker",
@@ -6168,6 +6169,26 @@
    "at": "2026-11-10T12:07:56.000Z",
    "msg": "moved USDCHF 47954198 protection: stop 0.81741 -> 0.81801, target 0.82267 -> 0.82327 (council scalp)",
    "trade": "usdchf-scalp-1794297299"
+  },
+  {
+   "at": "2026-11-10T12:11:10.000Z",
+   "msg": "moved EURUSD 47373484 protection: stop 1.0797995 -> 1.0794795, target 1.16346 -> 1.16314 (council rswing)",
+   "trade": "eurusd-rswing-1793610380"
+  },
+  {
+   "at": "2026-11-10T12:11:10.000Z",
+   "msg": "moved EURUSD 47373487 protection: stop 1.0804847 -> 1.0801647, target 1.133315 -> 1.132995 (council rswing)",
+   "trade": "eurusd-rswing-1793754423"
+  },
+  {
+   "at": "2026-11-10T12:11:10.000Z",
+   "msg": "moved EURUSD 47964428 protection: stop 1.113017 -> 1.112697, target 1.147316 -> 1.146996 (council swing)",
+   "trade": "eurusd-swing-1794299390"
+  },
+  {
+   "at": "2026-11-10T12:11:10.000Z",
+   "msg": "placed sell limit EURUSD 0.02 lot at 1.12159 (council intraday, valid to 2026-11-11T00:09Z)",
+   "trade": "eurusd-intraday-1794312562"
   }
  ],
  "limits": {
