@@ -53,6 +53,7 @@
   <p class="ac-wait" id="ac-wait" role="status">Checking who is signed in…</p>
 
   <div id="ac-app" hidden>
+    <p class="ac-net" id="ac-net" role="status" aria-live="polite" hidden></p>
     <div class="ac-tabs" id="ac-tabs" role="tablist" aria-label="Academy sections"></div>
 
     <!-- ============================== Train ============================== -->
@@ -194,7 +195,7 @@
       </div>
     </section>
 
-    <!-- Filled by the next build step through window.MXAC.registerTab(id, { title, render }) -->
+    <!-- Filled by assets/academy-tabs.js through window.MXAC.registerTab(id, { title, render }) -->
     <section id="ac-session" role="tabpanel" aria-labelledby="tab-session" tabindex="-1" hidden></section>
     <section id="ac-blind" role="tabpanel" aria-labelledby="tab-blind" tabindex="-1" hidden></section>
     <section id="ac-progress" role="tabpanel" aria-labelledby="tab-progress" tabindex="-1" hidden></section>
@@ -213,5 +214,6 @@
 <script src="/assets/academy-risk.js"></script>
 <script src="/assets/mx-nav.js"></script>
 <script src="/assets/academy-ui.js"></script>
+<script src="/assets/academy-tabs.js"></script>
 </body>
 </html>

@@ -11,6 +11,11 @@
 //   without lessons → after a reload the lesson, the attempts and the saved session are still there → the paper account
 //   opens and closes a trade from its stored outcome → no future bar ever reached a decision → phone layout, text size,
 //   contrast in the three themes, keyboard, no page errors.
+// Then the other sections, on the rows that loop stored: Lessons (record, revise with the diff, switch off and on, a research
+// draft saved inactive) → Progress (counts, agreement, recall beside new setups, mistakes, the spaced-repetition queue and
+// "Replay this setup") → Research (studies, a study in full, the policy table, a notebook note) → Models → Costs → Audit →
+// Blind arena (the engine's answer stays hidden until the mentor's is stored; the outcome is read last) → Session (notes on a
+// missed opportunity and a right wait, verdicts, save, resume, end) → the rate limit (calls counted, a 429 waited out).
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
@@ -22,7 +27,9 @@ const EDGE = M.edge, iso = (t) => new Date(t * 1000).toISOString().slice(0, 10),
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 200) }); if (!ok) console.log('  FAIL ' + name + (info ? ' :: ' + String(info).slice(0, 200) : '')); };
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent.trim()).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!e.getClientRects().length && !e.hidden).catch(() => false);
-const api = (p, q) => p.evaluate(async (qs) => (await fetch('/api/academy?' + qs, { cache: 'no-store' })).json(), q);
+const calls = (reqs, from, tag) => reqs.slice(from).filter((r) => r.path === '/api/academy' && !r.q._audit && (!tag || r.tag === tag));   // the page's own Academy calls
+const what = (r) => (r.body ? r.body.action : 'get=' + r.q.get);
+const api = (p, q) => p.evaluate(async (qs) => (await fetch('/api/academy?' + qs + '&_audit=1', { cache: 'no-store' })).json(), q);   // _audit marks the audit's own reads
 
 // WCAG contrast of every visible text node's element against the background painted behind it (alpha blended up the tree)
 const CONTRAST = String.raw`(() => {
@@ -49,6 +56,9 @@ const SMALL = String.raw`(() => { const out = [], seen = new Set(), w = document
 const TAPS = String.raw`(() => [...document.querySelectorAll('main button, main select, main input:not([type=radio]):not([type=checkbox]), main textarea, main a.btn, main .seg label span, main summary')].filter((e) => e.getClientRects().length).map((e) => [Math.round(e.getBoundingClientRect().height), e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + ' ' + (e.textContent || '').trim().slice(0, 16)]).filter((x) => x[0] < 44).map((x) => x.join(' ')))()`;
 const ENDLESS = String.raw`(() => document.getAnimations().filter((a) => { try { return a.effect.getComputedTiming().iterations === Infinity && a.playState === 'running' && a.effect.target && a.effect.target.getClientRects().length; } catch (e) { return false; } }).map((a) => a.animationName || 'animation'))()`;
 
+// The page keeps itself under 24 Academy calls a minute (the site's firewall allows 30). The dev server has no firewall, so
+// the audit lifts that pace to finish in minutes; it counts the calls instead, and one check runs with the pace on.
+const NO_PACE = 'window.MXAC_PACE = 0;';
 async function startServer() {
   const store = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-audit-'));
   const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs')], { env: { ...process.env, PORT: String(PORT), ACADEMY_STORE_DIR: store }, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -92,14 +102,16 @@ async function startServer() {
     }
 
     // ---- 2. the owner: shell, tabs, setup ----
-    const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); let p = await ctx.newPage(); watch(p, 'owner');
+    const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await ctx.addInitScript(NO_PACE); let p = await ctx.newPage(); watch(p, 'owner');
     await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, null, null);
     check('title and heading are "MeridianX Academy"', (await p.title()) === 'MeridianX Academy' && (await txt(p, 'h1')) === 'MeridianX Academy', await p.title());
     const tabs = await p.$$eval('#ac-tabs [role=tab]', (l) => l.map((x) => x.textContent.trim()));
     check('nine sections as tabs, Train first', tabs.length === 9 && /^Train$/.test(tabs[0]) && ['Session', 'Blind arena', 'Progress', 'Lessons', 'Research', 'Models', 'Costs', 'Audit'].every((t, i) => tabs[i + 1].startsWith(t)), tabs.join(' | '));
-    await p.click('#tab-progress'); check('a section that is not built says so and shows nothing else', /Coming in the next build step/.test(await txt(p, '#ac-progress')) && !(await vis(p, '#setup')), await txt(p, '#ac-progress'));
-    await p.evaluate(() => window.MXAC.registerTab('progress', { title: 'Progress', render: (sec, ctx) => { sec.textContent = 'registered:' + typeof ctx.api.get + ':' + ctx.edge(); } }));
-    check('MXAC.registerTab fills a section without touching the page code', (await txt(p, '#ac-progress')) === 'registered:function:' + EDGE && !/next step/.test(await txt(p, '#tab-progress')), await txt(p, '#ac-progress'));
+    check('no tab is a placeholder any more', !tabs.some((t) => /next step/.test(t)) && !/Coming in the next build step/.test(await txt(p, '#ac-app')), tabs.join(' | '));
+    await p.click('#tab-progress'); await p.waitForSelector('#pg-counts', { timeout: 15000 }).catch(() => {});
+    check('a fresh store: Progress shows an honest empty state that says what to do, and hides the Train tab', /Nothing is stored for this edge yet\. Run a replay in the Train tab/.test(await txt(p, '#pg-counts')) && (await txt(p, '#pg-n-attempts')).startsWith('0') && /Nothing is queued/.test(await txt(p, '#pg-queue')) && !(await vis(p, '#setup')), await txt(p, '#pg-counts'));
+    await p.evaluate(() => window.MXAC.registerTab('extra', { title: 'Extra', render: (sec, ctx) => { sec.textContent = 'registered:' + typeof ctx.api.get + ':' + ctx.edge() + ':' + typeof ctx.kit.newChart; } }));
+    await p.click('#tab-extra'); check('MXAC.registerTab adds a section and hands it the API, the edge and the shared kit', (await txt(p, '#ac-extra')) === 'registered:function:' + EDGE + ':function', await txt(p, '#ac-extra'));
     await p.click('#tab-train');
     const edges = await p.$$eval('#f-edge option', (l) => l.map((o) => o.value));
     check('the seven real edges are offered', edges.length === 7 && ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open'].every((e) => edges.includes(e)), edges.join(','));
@@ -128,7 +140,9 @@ async function startServer() {
     await p.click('#c-speed [data-speed="100"]');
 
     // ---- 4. the clock pauses on a real candidate; a decision with evidence is shown and stored ----
-    await p.click('#c-play'); await nextPoint(p);
+    const m4 = reqs.length; await p.click('#c-play'); await nextPoint(p);
+    const first4 = calls(reqs, m4, 'owner').map(what);
+    check('the first train decision costs two Academy calls: the session saved once, and the attempt', first4.join() === 'session.save,attempt', first4.join());
     const c1 = cands[0], snap1 = await p.evaluate(() => { const s = window.MXAC.lastSnapshot, sec = { '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400 }; return { t: s.t, cand: s.cand && s.cand.id, candKeys: s.cand ? Object.keys(s.cand) : [], n: Object.fromEntries(Object.keys(s.bars).map((k) => [k, s.bars[k].length])), late: Object.keys(s.bars).reduce((a, k) => a + s.bars[k].filter((b) => b.time + sec[k] > s.t).length, 0) }; });
     check('the clock pauses exactly on the first real train candidate', (await txt(p, '#clock-time')) === stamp(c1.t) && snap1.cand === c1.id && snap1.t === c1.t, `${await txt(p, '#clock-time')} ${snap1.cand}`);
     check('the snapshot holds only bars closed at the decision time, 300 a timeframe, and no outcome field', snap1.late === 0 && ['5m', '15m', '1h', '4h', '1d'].every((k) => snap1.n[k] >= 100 && snap1.n[k] <= 300) && !snap1.candKeys.some((k) => ['R', 'netR', 'exitT', 'exit', 'mfeR', 'maeR'].includes(k)), JSON.stringify(snap1.n));
@@ -150,8 +164,11 @@ async function startServer() {
 
     // ---- 5. the next setup the engine takes: correct it to WAIT ----
     let cur = null, first = null, eventWait = '';
-    for (let i = 1; i < cands.length; i++) { await nextPoint(p); first = await txt(p, '#dec-action'); const now = await txt(p, '#clock-time'); cur = cands.find((c) => stamp(c.t) === now); if (first !== 'WAIT') break; const d = await txt(p, '#decision'); if (/event risk: /.test(d)) eventWait = d.match(/event risk: [^.]{0,80}/)[0]; await goOn(p); }
+    const perSetup = [];
+    for (let i = 1; i < cands.length; i++) { const m5 = reqs.length; await nextPoint(p); perSetup.push(calls(reqs, m5, 'owner').map(what).filter((x) => x !== 'get=outcome')); first = await txt(p, '#dec-action'); const now = await txt(p, '#clock-time'); cur = cands.find((c) => stamp(c.t) === now); if (first !== 'WAIT') break; const d = await txt(p, '#decision'); if (/event risk: /.test(d)) eventWait = d.match(/event risk: [^.]{0,80}/)[0]; await goOn(p); }
     check('a setup hours before a scheduled release waits on event risk and names the release', /Non-Farm Payrolls/.test(eventWait), eventWait);
+    check('every later train decision costs ONE Academy call (the attempt): lessons, past cases and calendar were read once for the run', perSetup.length >= 1 && perSetup.every((x) => x.join() === 'attempt'), `calls per setup: ${perSetup.map((x) => x.length).join(',')} (${perSetup[0] && perSetup[0].join('+')})`);
+    check('the run read its lists once: one history read with before = the end of the range, none per setup', reqs.filter((r) => r.tag === 'owner' && r.q.get === 'history').length === 1 && reqs.filter((r) => r.tag === 'owner' && r.q.get === 'history')[0].q.before != null && !reqs.some((r) => r.q.get === 'history' && r.q.cand), JSON.stringify(reqs.filter((r) => r.q.get === 'history').map((r) => r.q)));
     check('the engine takes a later real setup (BUY or SELL), so there is something to correct', (first === 'BUY' || first === 'SELL') && !!cur, `${first} at ${await txt(p, '#clock-time')}`);
     // mentor lines: change to the same action, drag the stop line, see the field follow
     await p.click(`#mentor [data-choice="${first}"]`);
@@ -229,6 +246,9 @@ async function startServer() {
     const exAtt = (await api(p, `get=attempts&edge=${EDGE}&limit=2000`)).attempts.filter((a) => a.mode === 'exam');
     check('each exam setup has exactly one attempt, mode exam', exAtt.length === want && new Set(exAtt.map((a) => a.candidateId)).size === want && exAtt.every((a) => a.n === 1));
     const after = reqs.slice(mark), lastResult = after.map((r) => !!(r.body && r.body.action === 'exam.result')).lastIndexOf(true), firstRead = after.findIndex((r) => r.q.get === 'exams');
+    const examCalls = calls(after, 0, 'owner').map(what), perExam = examCalls.filter((x) => x === 'attempt' || x === 'exam.result').length / want;
+    check(`a test on new setups costs two calls a setup and a handful around them (${want} setups: ${examCalls.length} calls)`, perExam === 2 && examCalls.filter((x) => x === 'get=history').length <= 1 && examCalls.length <= 2 * want + 6, examCalls.join(' '));
+    check('the test names its progress, setup by setup', /^\d+ new setups? tested and stored/.test(await txt(p, '#exam-msg')), await txt(p, '#exam-msg'));
     check('no outcome is read before its attempt is stored', lastResult >= 0 && firstRead > lastResult && !after.some((r) => r.q.get === 'outcome') && after.filter((r) => r.body && r.body.action === 'attempt').every((r) => r.body.attempt.mode === 'exam'), `last result #${lastResult}, first read #${firstRead}`);
     const sum = await txt(p, '#exam-summary'), changed = ex.filter((e) => e.withLessons.action !== e.withoutLessons.action).length, matched = ex.filter((e) => e.lessonIds.length).length;
     check('the new-setup panel shows matched, changed and net R with / without, with n', await vis(p, '#exam-out') && (await txt(p, '#exam-n')).startsWith(String(want)) && (await txt(p, '#exam-matched')).startsWith(`${matched} of ${want}`) && (await txt(p, '#exam-changed')).startsWith(`${changed} of ${want}`) && /R/.test(await txt(p, '#exam-with')) && /n = \d+ graded/.test(sum), sum);
@@ -264,6 +284,190 @@ async function startServer() {
     check('no endless animation', (await p.evaluate(ENDLESS)).length === 0);
     await p.screenshot({ path: OUT + 'academy-4-account.png', fullPage: true });
 
+    // ---- 11b. Lessons: the stored lesson with its record; revise (diff), switch off and on; a research draft saved inactive ----
+    const tab = async (id, sel) => { await p.click('#tab-' + id); await p.waitForSelector(sel, { timeout: 20000 }); };
+    const sayAll = async (sel) => (await p.$$eval(sel, (l) => l.map((x) => x.textContent.trim()))).join(' || ');
+    await tab('lessons', '#ls-list li[data-lesson]');
+    let ltxt = await txt(p, '#ls-list li[data-lesson]');
+    check('Lessons: the saved lesson with its sentence, version, state and where it came from', (await p.$$('#ls-list > li')).length === 1 && /Audit lesson/.test(ltxt) && /version 1/.test(ltxt) && /in force/.test(ltxt) && /When: session = \w+ → Then: WAIT/.test(ltxt) && /mentor correction/.test(ltxt), ltxt.slice(0, 200));
+    check('Lessons: recall and new-setup records are shown apart, each with its n', /Recall on the same trade: passed 2, failed 0 \(n = 2\)\./.test(ltxt) && /New setups it matched: n = \d+, same answer as without it on \d+; net [+-]?\d+\.\d\dR with lessons against [+-]?\d+\.\d\dR without\. Too few to judge\./.test(ltxt), ltxt.slice(150, 420));
+    check('Lessons: an edge without a research draft says so and why', /No draft for Gold momentum pullback\. A draft is offered only when a pre-registered condition/.test(await txt(p, '#ls-drafts-card')), await txt(p, '#ls-drafts-card'));
+    await p.click('#ls-list [data-act="revise"]'); await p.waitForSelector('#lr-title');
+    check('Lessons: revising starts with nothing changed and cannot be saved yet', await p.isDisabled('#lr-save') && /Nothing is changed yet/.test(await txt(p, '#lr-diff')));
+    await p.fill('#lr-title', 'Audit lesson, revised'); await p.selectOption('#lr-action', 'SKIP');
+    const diff = await sayAll('#lr-diff li');
+    check('Lessons: the diff names what changes, old → new', /Title: Audit lesson: wait in this session → Audit lesson, revised/.test(diff) && /Then: WAIT → REFUSE the setup \(wait\)/.test(diff) && !(await p.isDisabled('#lr-save')), diff);
+    await p.selectOption('#lr-action', 'WAIT'); await p.click('#lr-save'); await p.waitForSelector('#ls-list li[data-version="2"]', { timeout: 15000 });
+    let allL = (await api(p, `get=lessons&edge=${EDGE}`)).lessons;
+    check('Lessons: the revision is a new version; the old one is kept, switched off', allL.length === 2 && allL[0].version === 2 && allL[0].active && allL[0].title === 'Audit lesson, revised' && allL[0].supersedes === allL[1].id && !allL[1].active && allL[1].supersededBy === allL[0].id && allL[0].then.action === 'WAIT', JSON.stringify(allL.map((l) => [l.version, l.active])));
+    ltxt = await txt(p, '#ls-list li[data-lesson]');
+    check('Lessons: the chain shows the earlier version and what changed; the new version starts its own record', (await p.$$('#ls-list > li')).length === 1 && /Earlier versions \(1\) and what changed/.test(ltxt) && /Version 1 → version 2/.test(ltxt) && /not replayed yet/.test(ltxt), ltxt.slice(0, 160));
+    await p.click('#ls-list [data-act="off"]'); await p.waitForSelector('#ls-list li[data-active="no"]', { timeout: 15000 });
+    check('Lessons: switching off takes it out of force (and says so in words)', (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 0 && /switched off/.test(await txt(p, '#ls-list li[data-lesson] .lsn-head')) && /Switched off by the mentor/.test(await txt(p, '#ls-list li[data-lesson]')));
+    await p.click('#ls-list [data-act="on"]'); await p.waitForSelector('#ls-list li[data-active="yes"]', { timeout: 15000 });
+    check('Lessons: and back on', (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 1);
+    await p.selectOption('#ls-edge', 'gtl'); await p.waitForSelector('#ls-drafts li[data-draft]', { timeout: 15000 });
+    const dtxt = await txt(p, '#ls-drafts li[data-draft]');
+    check('Lessons: a research draft shows its evidence with n and t in both parts, and its status', /Discovery \(.+\): n \d+ at .+R a trade against n \d+ at .+R, t \d\.\d\d\. Confirmation \(.+\): n \d+ .+ t \d\.\d\d\. Status: out-of-sample only, did not survive the correction for 121 tests/.test(dtxt) && /draft, not in force/.test(dtxt) && /Not saved\. It is a proposal only\./.test(dtxt), dtxt.slice(0, 260));
+    await p.click('#ls-drafts [data-act="draft-save"]'); await p.waitForSelector('#ls-drafts li[data-state="saved"]', { timeout: 15000 });
+    const gtl = (await api(p, 'get=lessons&edge=gtl')).lessons;
+    check('Lessons: a saved research draft stays inactive and remembers its study', gtl.length === 1 && gtl[0].active === false && gtl[0].source.kind === 'research' && /^cond:gtl:/.test(gtl[0].source.studyId) && (await api(p, 'get=lessons&edge=gtl&active=1')).lessons.length === 0 && /Saved as an inactive lesson/.test(await txt(p, '#ls-drafts li[data-draft]')) && (await p.$$('#ls-drafts [data-act="draft-save"]')).length === 0, JSON.stringify(gtl.map((l) => [l.active, l.source])));
+    check('Lessons: the saved draft is in the list above, switched off, from its research study', /switched off/.test(await txt(p, '#ls-list li[data-lesson]')) && /research study cond:gtl:/.test(await txt(p, '#ls-list li[data-lesson]')));
+    await p.screenshot({ path: OUT + 'academy-6-lessons.png', fullPage: true });
+    await p.selectOption('#ls-edge', EDGE); await p.waitForSelector('#ls-list li[data-version="2"]', { timeout: 15000 });
+
+    // ---- 11c. Progress and mistakes ----
+    await tab('progress', '#pg-queue');
+    const prog = await api(p, `get=progress&edge=${EDGE}`);
+    check('Progress: attempts, corrections and lessons are the stored counts', (await txt(p, '#pg-n-attempts')).startsWith(String(prog.counts.attempts)) && (await txt(p, '#pg-n-corrections')).startsWith(String(prog.counts.corrections)) && (await txt(p, '#pg-n-lessons')).startsWith(String(prog.counts.lessons)) && prog.counts.attempts >= 8 && /same-trade replays/.test(await txt(p, '#pg-counts')), `${await txt(p, '#pg-n-attempts')} / ${prog.counts.attempts}`);
+    check('Progress: agreement with the mentor by week, with n and "too few to judge"', /Overall you approved \d+ of \d+ \(too few to judge\) of the decisions you judged \(n = \d+\)\./.test(await txt(p, '#pg-agree-all')) && /\d{4}-W\d\d/.test(await txt(p, '#pg-agree-table')) && /too few to judge \(n = \d+\)/.test(await txt(p, '#pg-agree-table')), await txt(p, '#pg-agree-all'));
+    const boxes = await p.evaluate(() => ['pg-recall', 'pg-fresh'].map((id) => { const r = document.getElementById(id).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top)]; }));
+    check('Progress: recall and new setups sit side by side and are never added', boxes[0][1] === boxes[1][1] && boxes[0][0] < boxes[1][0] && /recall, never generalisation/.test(await txt(p, '#pg-recall')) && new RegExp(`n = ${ex.length} graded`).test(await txt(p, '#pg-fresh')) && /Too few to judge/.test(await txt(p, '#pg-fresh')) && /never added together/.test(await txt(p, '#pg-rvn')), `${JSON.stringify(boxes)} ${(await txt(p, '#pg-fresh')).slice(0, 120)}`);
+    check('Progress: recall counts the same-trade replays that gave the answer asked for', new RegExp(`Passed${prog.replaySame.pass} of ${prog.replaySame.graded}`).test((await txt(p, '#pg-recall')).replace(/\s+/g, ' ').replace('Passed ', 'Passed')) && prog.replaySame.pass >= 2, await txt(p, '#pg-recall'));
+    const mis = await txt(p, '#pg-mistakes');
+    check('Progress: mistakes by class with a count and the latest example, which can be opened', (await p.$$('#pg-mistakes ul[data-class] li [data-open]')).length >= 1 && /n = 1/.test(mis) && /the engine said (BUY|SELL), you asked for WAIT \(session, wrong-structure\)/.test(mis) && /Reasons you gave: .*session 1/.test(await txt(p, '#pg-reasons')), mis.slice(0, 240));
+    let qrow = await txt(p, `#pg-upcoming li[data-cand="${cur.id}"]`);
+    check('Progress: the corrected setup is queued for spaced repetition (two passes so far: due in 7 days)', /you asked for WAIT \(the engine said (BUY|SELL)\)/.test(qrow) && /2 passes in a row/.test(qrow) && /due in 7 days \(\d{4}-\d\d-\d\d\)/.test(qrow) && /Nothing is due today/.test(await txt(p, '#pg-due')) && /1, 3, 7 and 21 days/.test(await txt(p, '#pg-queue')), qrow);
+    check('Progress: the latest attempts name their kind in words', /same-trade replay \(recall\)/.test(await txt(p, '#pg-attempts-table')) && /test on a new setup/.test(await txt(p, '#pg-attempts-table')));
+    await p.screenshot({ path: OUT + 'academy-7-progress.png', fullPage: true });
+    const mq = reqs.length; await p.click(`#pg-upcoming li[data-cand="${cur.id}"] [data-open]`); await nextPoint(p);
+    att = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(cur.id)}`)).attempts;
+    check('"Replay this setup" opens the Train tab and runs the clock onto that setup', await vis(p, '#ac-train') && (await txt(p, '#clock-time')) === stamp(cur.t) && (await p.getAttribute('#tab-train', 'aria-selected')) === 'true', await txt(p, '#clock-time'));
+    check('that sitting is stored as a same-trade replay (recall), and says so', att.length === 4 && att[3].mode === 'replay-same' && att[3].decision.action === 'WAIT' && (await p.$$eval('#log li', (l) => l.some((x) => /stored as a same-trade replay \(recall, not a new setup\)/.test(x.textContent)))), JSON.stringify(att.map((a) => [a.n, a.mode])));
+    check('no outcome was asked for on the way to that setup before its attempt', calls(reqs, mq, 'owner').filter((r) => r.q.get === 'outcome').every((r) => r.q.id !== cur.id));
+    await tab('progress', `#pg-upcoming li[data-cand="${cur.id}"]`); qrow = await txt(p, `#pg-upcoming li[data-cand="${cur.id}"]`);
+    check('after that review the setup moves one step on (three passes: due in 21 days)', /3 passes in a row/.test(qrow) && /due in 21 days/.test(qrow), qrow);
+
+    // ---- 11d. Research lab and notebook ----
+    await tab('research', '#rs-table');
+    check('Research: the counts come with what chance alone would give, and nothing is called validated', /121 of 420 registered conditions had enough trades to test\. 7 passed discovery; about 5\.8 would pass by chance alone\. 0 survived the correction/.test(await txt(p, '#rs-chance')) && /Nothing is validated\. No condition here may be called an edge\./.test(await txt(p, '#rs-summary')), await txt(p, '#rs-chance'));
+    check('Research: the pre-registration is on the page', /fixed in the code before any condition result was computed/.test(await p.$eval('#rs-prereg', (e) => e.textContent)) && /Market regime/.test(await p.$eval('#rs-prereg', (e) => e.textContent)));
+    const nStudies = (await api(p, 'get=research')).studies.length;
+    check('Research: every generated study is listed', (await txt(p, '#rs-count')).startsWith(`${nStudies} of ${nStudies} studies`) && (await p.$$('#rs-table tbody tr')).length === Math.min(150, nStudies), await txt(p, '#rs-count'));
+    await p.selectOption('#rs-edge', 'gtl'); await p.selectOption('#rs-kind', 'condition'); await p.selectOption('#rs-validation', 'out-of-sample');
+    check('Research: filters by edge, kind and where it stands', (await p.$$('#rs-table tbody tr')).length === 1 && (await txt(p, '#rs-count')).startsWith(`1 of ${nStudies} studies`) && /out-of-sample only/.test(await txt(p, '#rs-table tbody tr')), await txt(p, '#rs-count'));
+    await p.click('#rs-table tbody tr button'); await p.waitForSelector('#rs-detail-table', { timeout: 15000 });
+    const sd = await txt(p, '#rs-detail');
+    check('Research: a study opens in full with hypothesis, dataset, n, method, results, limits and its table', ['Hypothesis', 'Dataset', 'Method', 'Results', 'Limits', 'To reproduce', 'discovery', 'confirmation', 'n = '].every((x) => sd.includes(x)) && /adjusted p|Adjusted p/.test(sd) && (await p.$$('#rs-detail-table .kv dt')).length >= 8, sd.slice(0, 140));
+    const pol = await sayAll('#rs-policy-table tbody tr');
+    check('Research: the policy against taking every setup, an edge a row, with n, t and the plain verdict', (await p.$$('#rs-policy-table tbody tr')).length === 8 && /Gold replica303\+0\.428R2\.34153\+0\.209R150\+0\.652R-1\.21no measurable difference/.test(pol) && /All seven1421/.test(pol) && /Overall: no measurable difference/.test(await txt(p, '#rs-policy-verdict')), pol.slice(0, 200));
+    check('Research: an empty notebook says what a note is for', /No note yet\. Write down a hypothesis below before you test it/.test(await txt(p, '#nb-list')));
+    await p.fill('#nb-title', 'Audit note: Asia waits'); await p.fill('#nb-hypothesis', 'Waiting in Asia costs nothing on gmp.'); await p.fill('#nb-dataset', 'gmp train pool, 2020 to now'); await p.fill('#nb-method', 'Net R a trade, Welch t, first 70 % against last 30 %.');
+    await p.selectOption('#nb-validation', 'out-of-sample'); await p.click('#nb-save');
+    check('Research: an out-of-sample note without a sample size is refused before it is sent', await vis(p, '#nb-err') && /never an edge without n/.test(await txt(p, '#nb-err')) && (await api(p, 'get=notebook')).notes.length === 0, await txt(p, '#nb-err'));
+    await p.fill('#nb-sampleSize', '42'); await p.fill('#nb-tags', 'audit, asia'); await p.click('#nb-save'); await p.waitForSelector('#nb-list li[data-note]', { timeout: 15000 });
+    const notes = (await api(p, 'get=notebook')).notes;
+    check('Research: the note is stored with its required fields and shown', notes.length === 1 && notes[0].sampleSize === 42 && notes[0].validation === 'out-of-sample' && notes[0].tags.join() === 'audit,asia' && /Audit note: Asia waits/.test(await txt(p, '#nb-list')) && /n = 42/.test(await txt(p, '#nb-list')), JSON.stringify(notes.map((n) => [n.title, n.sampleSize])));
+
+    // ---- 11e. Models, Costs, Audit ----
+    await tab('models', '#md-training-table');
+    check('Models: nothing is promoted, the registry is honestly empty, and promotion is a documented manual step', /^No champion\. Nothing is promoted/.test(await txt(p, '#md-champion')) && /The registry is empty: no scorer has been registered/.test(await txt(p, '#md-registry')) && /model\.register/.test(await txt(p, '#md-manual')) && /model\.promote/.test(await txt(p, '#md-manual')) && (await p.$$eval('#ac-models button', (l) => l.length)) === 0, await txt(p, '#md-champion'));
+    const mrows = await p.$$eval('#md-training-table tbody tr', (l) => l.map((r) => r.textContent));
+    check('Models: each scorer with its walk-forward numbers and verdict; the exam block apart; the skipped edges', mrows.length === 5 && mrows.every((r) => /rejected challenger/.test(r) && /not promoted/.test(r)) && /^replica303/.test(mrows[0]) && /None of the 5 scorers beat taking every setup/.test(await txt(p, '#md-verdict')) && (await p.$$('#md-exam-table tbody tr')).length === 5 && (await p.$$('#md-skipped li')).length === 3 && /150 are needed to fit/.test(await txt(p, '#md-skipped')), mrows[0]);
+    check('Models: scores are never offered as probabilities', /they are not probabilities/.test(await txt(p, '#md-training')));
+    await tab('costs', '#co-head');
+    check('Costs: off, no key, nothing spent, and an honest empty ledger', (await txt(p, '#co-head')) === 'Off. No key is set. Spent: $0.00' && /^\$0\.00/.test(await txt(p, '#co-today')) && /of \$0\.50/.test(await txt(p, '#co-today')) && /The ledger is empty: the adapter is off/.test(await txt(p, '#co-card')), await txt(p, '#co-head'));
+    await tab('audit', '#au-table');
+    const arows = (await api(p, 'get=audit')).rows;
+    check('Audit: every write of the month, newest first, with who, action, ids and summary', (await p.$$('#au-table tbody tr')).length === Math.min(500, arows.length) && (await txt(p, '#au-count')).startsWith(`${arows.length} of ${arows.length} writes in ${new Date().toISOString().slice(0, 7)}`) && /owner/.test(await txt(p, '#au-table tbody tr')) && (await p.$$eval('#au-month option', (l) => l.length)) === 12, await txt(p, '#au-count'));
+    await p.selectOption('#au-action', 'lesson.revise');
+    check('Audit: filtered by action', (await p.$$eval('#au-table tbody tr', (l) => l.length === 1 && l.every((r) => r.dataset.action === 'lesson.revise'))) && /v2 replaces v1: Audit lesson, revised/.test(await txt(p, '#au-table tbody tr')), await txt(p, '#au-count'));
+
+    // ---- 11f. Blind arena: the mentor answers before the engine's answer is shown; the outcome is read last ----
+    await tab('blind', '#bl-start'); await p.waitForFunction(() => /train setups? in this range/.test(document.getElementById('bl-count').textContent), null, { timeout: 15000 });
+    check('Blind arena: an honest empty table before the first answer', /No blind answer yet/.test(await txt(p, '#bl-table')));
+    await p.fill('#bl-from', iso(cands[0].t)); await p.dispatchEvent('#bl-from', 'change');
+    check('Blind arena: train-pool setups only, none answered yet', (await txt(p, '#bl-count')).startsWith(`${cands.length} train setups in this range without a blind answer yet`), await txt(p, '#bl-count'));
+    const mb = reqs.length; await p.click('#bl-start'); await p.waitForSelector('#bl-save', { timeout: 60000 });
+    const bAtt = calls(reqs, mb, 'owner').filter((r) => r.body && r.body.action === 'attempt');
+    const hid = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.pop();
+    check('Blind arena: the replay stops on the first train setup and the engine\'s answer is stored hidden', (await txt(p, '#bl-time')) === stamp(c1.t) && bAtt.length === 1 && bAtt[0].body.attempt.mode === 'blind' && bAtt[0].body.attempt.candidateId === c1.id && hid.mode === 'blind' && hid.hidden === true && hid.decision === null, `${await txt(p, '#bl-time')} ${JSON.stringify([hid.mode, hid.hidden])}`);
+    check('Blind arena: nothing of the engine\'s answer is on the page, and no outcome has been asked for', await vis(p, '#bl-hidden') && !(await vis(p, '#bl-reveal')) && (await p.$$('#bl-engine, #bl-compare')).length === 0 && !calls(reqs, mb, 'owner').some((r) => r.q.get === 'outcome') && (await api(p, `get=blind&edge=${EDGE}`)).blind.length === 0);
+    check('Blind arena: a setup trained on before is labelled recall', /recall, not a fresh decision/.test(await txt(p, '#bl-recall')));
+    await p.click('#bl-answer [data-choice="WAIT"]');
+    check('Blind arena: an answer without a reason cannot be stored', await p.isDisabled('#bl-save') && /Say why in a line/.test(await txt(p, '#bl-err')));
+    await p.fill('#bl-text', 'Audit: I would wait here.'); await p.click('#bl-save'); await p.waitForSelector('#bl-compare', { timeout: 20000 });
+    const bc = calls(reqs, mb, 'owner').map(what), eng1 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.pop();
+    check('Blind arena: order of calls: the hidden attempt, the mentor\'s answer, and only then the outcome (three calls a setup)', bc.slice(-3).join() === 'attempt,blind.submit,get=outcome' && bc.filter((x) => x === 'attempt' || x === 'blind.submit' || x === 'get=outcome').length === 3, bc.join(' '));
+    check('Blind arena: both answers side by side, the engine\'s now revealed', (await txt(p, '#bl-you')) === 'WAIT' && (await txt(p, '#bl-engine')) === eng1.decision.action && eng1.hidden !== true && /^\|You\|The engine$/.test(await p.$eval('#bl-compare thead tr', (r) => [...r.cells].map((c) => c.textContent).join('|'))), `${await txt(p, '#bl-you')} / ${await txt(p, '#bl-engine')}`);
+    check('Blind arena: the result is read after both answers and says who was closer', /Result, read after both answers were stored: /.test(await txt(p, '#bl-outcome')) && ['mentor', 'engine', 'tie', 'none'].includes(await p.getAttribute('#bl-closer', 'data-closer')) && /(closer to the outcome|A tie|cannot be judged)/.test(await txt(p, '#bl-closer')), `${await txt(p, '#bl-outcome')} | ${await txt(p, '#bl-closer')}`);
+    check('Blind arena: the running table carries its n and says "too few to judge"', (await txt(p, '#bl-n')).startsWith('1') && /n = \d graded/.test(await txt(p, '#bl-mentor-r')) && /Too few to judge/.test(await txt(p, '#bl-table-note')) && (await p.$$('#bl-rows tbody tr')).length === 1, await txt(p, '#bl-table'));
+    await p.click('#bl-next'); await p.waitForSelector('#bl-save', { timeout: 60000 }); await p.waitForFunction(() => /your answer first/.test(document.getElementById('bl-state').textContent), null, { timeout: 20000 });
+    const c2 = cands[1], own = c2.side === 'buy' ? 'BUY' : 'SELL'; await p.click(`#bl-answer [data-choice="${own}"]`);
+    check('Blind arena: a BUY / SELL answer starts from the setup\'s own levels, stop included', +(await p.inputValue('#bl-entry')) === c2.entry && +(await p.inputValue('#bl-stop')) === c2.stop, `${await p.inputValue('#bl-entry')} / ${await p.inputValue('#bl-stop')}`);
+    await p.fill('#bl-stop', String(c2.side === 'buy' ? c2.entry + 1 : c2.entry - 1)); check('Blind arena: a stop on the wrong side is refused', await p.isDisabled('#bl-save') && /The stop must be/.test(await txt(p, '#bl-err')), await txt(p, '#bl-err'));
+    await p.fill('#bl-stop', String(c2.stop)); await p.fill('#bl-text', 'Audit: I take the setup.'); await p.click('#bl-save'); await p.waitForSelector('#bl-compare', { timeout: 20000 });
+    const brows = (await api(p, `get=blind&edge=${EDGE}`)).blind;
+    check('Blind arena: stored rows match the page; a trade on the setup\'s own side is graded with the setup\'s net R', brows.length === 2 && brows[0].candidateId === c2.id && brows[0].mentor.action === own && brows[0].mentor.stop === c2.stop && brows[0].engine && typeof brows[0].rMentor === 'number' && (await txt(p, '#bl-n')).startsWith('2') && (await p.$$('#bl-rows tbody tr')).length === 2, JSON.stringify(brows.map((b) => [b.mentor.action, b.rMentor, b.rEngine])));
+    check('Blind arena: the engine\'s reasoning can be opened after the reveal', (await p.$$('#bl-why #bl-dec-action')).length === 1);
+    await p.screenshot({ path: OUT + 'academy-8-blind.png', fullPage: true });
+
+    // ---- 11g. Session training: notes on a missed opportunity and a right wait, verdicts, save, resume, end ----
+    const ms0 = reqs.length; await tab('session', '#ss-start'); await p.waitForFunction(() => /train setups? in this range/.test(document.getElementById('ss-count').textContent), null, { timeout: 15000 });
+    const lastDay = iso(cands[cands.length - 1].t), dayCands = cands.filter((c) => iso(c.t) === lastDay);
+    check('Session: the default range is the day of the latest setup; an empty list of saved sessions says when one appears', (await p.inputValue('#ss-from')) === lastDay && (await p.inputValue('#ss-to')) === lastDay && (await txt(p, '#ss-count')).startsWith(`${dayCands.length} train setup`) && /No saved session yet/.test(await txt(p, '#ss-saved')), `${await p.inputValue('#ss-from')} ${await txt(p, '#ss-count')}`);
+    await p.selectOption('#ss-speed', '100'); await p.click('#ss-start'); await p.waitForSelector('#ss-live:not([hidden])', { timeout: 60000 });
+    check('Session: the replay is ready, paused at the start, with the running thesis', await vis(p, '#ss-chart canvas') && (await txt(p, '#ss-state')) === 'paused' && /^Bias \w+\. Expecting /.test(await txt(p, '#ss-thesis-line')) && /0 decisions/.test(await txt(p, '#ss-summary-text')), await txt(p, '#ss-thesis-line'));
+    await p.click('#ss-step'); await p.click('#ss-step'); await p.click('#ss-right'); await p.waitForFunction(() => /Stored ✓/.test((document.getElementById('ss-right-msg') || {}).textContent || ''), null, { timeout: 15000 });
+    check('Session: "the engine was right to wait" is stored at the replay time', /the engine said WAIT and you agree that waiting was right/.test(await txt(p, '#ss-right-msg')) && (await txt(p, '#ss-n-right')).startsWith('1'), await txt(p, '#ss-right-msg'));
+    await p.click('#ss-step'); await p.click('#ss-missed'); await p.waitForSelector('#ss-m-save');
+    check('Session: a missed opportunity shows the engine\'s own read of that moment first', /No setup of Gold momentum pullback was on the table at this moment, and the engine said WAIT/.test(await txt(p, '#ss-engine-read')), await txt(p, '#ss-engine-read'));
+    await p.click('#ss-note [data-choice="BUY"]'); const mEntry = +(await p.inputValue('#ss-m-entry'));
+    check('Session: the note starts at the last closed price and needs a stop and a reason', mEntry > 1000 && await p.isDisabled('#ss-m-save') && /every trade has a stop/.test(await txt(p, '#ss-m-err')), `${mEntry} ${await txt(p, '#ss-m-err')}`);
+    await p.fill('#ss-m-stop', (mEntry - 6).toFixed(2)); await p.fill('#ss-m-target', (mEntry + 12).toFixed(2)); await p.fill('#ss-m-text', 'Audit: swept the low and closed back above it.'); await p.click('#ss-m-save'); await p.waitForSelector('#ss-draft-save', { timeout: 15000 });
+    const misses = (await api(p, `get=misses&edge=${EDGE}`)).misses, ssId = misses[0] && misses[0].sessionId;
+    check('Session: both notes are stored with the session, the engine\'s answer and its class beside the mentor\'s', misses.length === 2 && misses[0].kind === 'missed' && misses[0].action === 'BUY' && misses[0].entry === mEntry && misses[0].stop === +(mEntry - 6).toFixed(2) && misses[0].engine.action === 'WAIT' && typeof misses[0].cls === 'string' && /^se_/.test(ssId) && misses[1].kind === 'right-wait' && misses[1].sessionId === ssId && /^[0-9a-f]{16}$/.test(misses[0].snapshotHash), JSON.stringify(misses.map((m) => [m.kind, m.action, m.cls])));
+    check('Session: a note never carries an outcome, and none was asked for', !JSON.stringify(misses).includes('netR') && !calls(reqs, ms0, 'owner').some((r) => r.q.get === 'outcome'), calls(reqs, ms0, 'owner').map(what).join(' '));
+    check('Session: the note offers a lesson draft in plain English, to be saved switched off', /^When: .+ → Then: TAKE the edge's trade/.test(await txt(p, '#ss-draft-plain')) && /cannot make a trade where the edge was silent/.test(await txt(p, '#ss-note')), await txt(p, '#ss-draft-plain'));
+    await p.click('#ss-draft-save'); await p.waitForFunction(() => /Draft saved ✓/.test(document.getElementById('ss-note').textContent), null, { timeout: 15000 });
+    const drafts = (await api(p, `get=lessons&edge=${EDGE}`)).lessons.filter((l) => l.source && l.source.sessionId === ssId);
+    check('Session: the draft is saved inactive, linked to the session', drafts.length === 1 && drafts[0].active === false && drafts[0].then.action === 'TAKE' && (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 1, JSON.stringify(drafts.map((l) => [l.active, l.then.action])));
+    const ms1 = reqs.length; await p.click('#ss-play'); await p.waitForSelector('#ss-dec-stored', { timeout: 60000 }); await p.waitForFunction(() => document.getElementById('ss-state').textContent === 'paused on a setup', null, { timeout: 20000 });
+    const sAtt = calls(reqs, ms1, 'owner').map(what), d1 = dayCands[0], sRows = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(d1.id)}`)).attempts, sLast = sRows[sRows.length - 1];
+    check('Session: the clock stops on the first setup of the day and its decision is stored at once, with the session id (one call)', (await txt(p, '#ss-time')) === stamp(d1.t) && sAtt.join() === 'attempt' && sLast.sessionId === ssId && ['train', 'replay-same'].includes(sLast.mode) && (await txt(p, '#ss-dec-action')) === sLast.decision.action && /Attempt \d+ stored ✓/.test(await txt(p, '#ss-dec-stored')), `${await txt(p, '#ss-time')} ${sAtt.join()} ${sLast.mode}`);
+    check('Session: the note buttons are off while the clock is on a setup', await p.isDisabled('#ss-missed') && await p.isDisabled('#ss-right'));
+    await p.click('#ss-point [data-choice="approve"]'); await p.click('#ss-v-save'); await p.waitForFunction(() => /Verdict stored ✓/.test(document.getElementById('ss-v-msg').textContent), null, { timeout: 15000 });
+    check('Session: an approval is stored and counted, with its n', (await txt(p, '#ss-n-agree')).startsWith('1 of 1 (too few to judge)') && (await txt(p, '#ss-n-dec')).startsWith('1'), await txt(p, '#ss-n-agree'));
+    if (dayCands.length > 1) {
+      await p.click('#ss-continue'); await p.waitForFunction((t) => document.getElementById('ss-time').textContent === t && document.getElementById('ss-state').textContent === 'paused on a setup', stamp(dayCands[1].t), { timeout: 60000 });
+      const other = await p.$eval('#ss-point [data-choice]:not([data-choice="approve"])', (b) => b.dataset.choice); await p.click(`#ss-point [data-choice="${other}"]`);
+      check('Session: a disagreeing verdict needs a reason', await p.isDisabled('#ss-v-save') && /Say why in a line/.test(await txt(p, '#ss-v-err')), await txt(p, '#ss-v-err'));
+      await p.fill('#ss-v-text', 'Audit: I read this one differently.'); await p.click('#ss-v-save'); await p.waitForSelector('#ss-lesson-plain', { timeout: 15000 });
+      check('Session: the disagreement is stored as a correction and a lesson draft is offered', (await txt(p, '#ss-n-agree')).startsWith('1 of 2 (too few to judge)') && /^When: .+ → Then: /.test(await txt(p, '#ss-lesson-plain')) && (await api(p, `get=corrections&edge=${EDGE}&cand=${encodeURIComponent(dayCands[1].id)}`)).corrections.some((c) => c.verdict === 'change' && c.action === other), await txt(p, '#ss-lesson-plain'));
+    }
+    await p.click('#ss-save'); await p.waitForFunction(() => /Session saved at/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 15000 });
+    let sessS = (await api(p, 'get=sessions')).sessions.filter((s) => s.kind === 'session');
+    check('Session: saved through the session route, with its summary', sessS.length === 1 && sessS[0].id === ssId && sessS[0].status === 'paused' && /missed opportunity/.test(sessS[0].summary) && (await p.$$('#ss-saved li[data-session]')).length === 1, JSON.stringify(sessS.map((s) => [s.status, s.summary])));
+    const nDec = (await txt(p, '#ss-summary-text')).match(/^(\d+) decision/)[1];
+    await p.click('#ss-saved li[data-session] button'); await p.waitForFunction(() => /Session resumed at/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 60000 });
+    check('Session: resuming brings back the clock, the notes and the counts', +nDec === Math.min(2, dayCands.length) && (await txt(p, '#ss-summary-text')).startsWith(nDec + ' decision') && (await txt(p, '#ss-n-missed')).startsWith('1') && (await p.$$('#ss-notes-list li[data-kind]')).length === 2 && /swept the low/.test(await txt(p, '#ss-notes-list')), await txt(p, '#ss-summary-text'));
+    await p.click('#ss-end'); await p.waitForFunction(() => /Session ended and saved/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 15000 });
+    sessS = (await api(p, 'get=sessions')).sessions.filter((s) => s.kind === 'session');
+    const sumTxt = await txt(p, '#ss-summary-text');
+    check('Session: the end-of-session summary gives decisions, agreement, misses and lessons, each with its n', new RegExp(`^${nDec} decisions? \\(\\d taken, \\d waited\\) · you agreed with 1 of \\d \\(too few to judge\\) · 1 missed opportunity · 1 right wait · 0 lessons saved, 1 draft`).test(sumTxt) , sumTxt);
+    check('Session: ended means stored as done, the clock stopped for good, and the summary named as final', sessS[0].status === 'done' && (await txt(p, '#ss-state')) === 'session ended' && await p.isDisabled('#ss-play') && /Session summary/.test(await txt(p, '#ss-summary')), `${sessS[0].status} / ${await txt(p, '#ss-state')} / ${await p.isDisabled('#ss-play')} / ${(await txt(p, '#ss-summary')).slice(0, 30)}`);
+    await p.screenshot({ path: OUT + 'academy-9-session.png', fullPage: true });
+    const ck2 = await p.evaluate(() => window.MXAC.checks);
+    check('no future bar reached a decision in the blind arena or the session either', ck2.future === 0 && ck2.snapshots > ck.snapshots, JSON.stringify(ck2));
+    const audit2 = [...new Set((await api(p, 'get=audit')).rows.map((r) => r.action))];
+    check('the new writes are in the audit trail too', ['lesson.revise', 'lesson.deactivate', 'notebook.add', 'blind.submit', 'miss'].every((a) => audit2.includes(a)), audit2.join(','));
+
+    // ---- 11h. the rate limit: a 429 is waited out calmly and the call carries on ----
+    {
+      let hits = 0; await p.route(/\/api\/academy\?get=cost/, (r) => (hits++ === 0 ? r.fulfill({ status: 429, headers: { 'Retry-After': '1' }, contentType: 'application/json', body: '{"error":"rate limited"}' }) : r.continue()));
+      await p.click('#tab-costs'); await p.waitForFunction(() => !document.getElementById('ac-net').hidden, null, { timeout: 5000 }).catch(() => {});
+      const waiting = await txt(p, '#ac-net'); await p.waitForSelector('#co-head', { timeout: 15000 });
+      check('a 429 shows a calm waiting line, not an error, and the section then loads', /^Waiting for the server's rate limit… about 1 s\. Nothing is lost/.test(waiting) && hits === 2 && (await txt(p, '#co-head')) === 'Off. No key is set. Spent: $0.00' && !(await vis(p, '#ac-net')) && (await p.$$('#ac-costs .ac-err')).length === 0, `${waiting} (${hits} requests)`);
+      await p.unroute(/\/api\/academy\?get=cost/); errs.splice(0, errs.length, ...errs.filter((e) => !/429/.test(e)));   // the browser logs the 429 itself
+    }
+    for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['blind', '#bl-compare'], ['session', '#ss-summary']]) {
+      await tab(id, sel);
+      for (const theme of ['dark', 'light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    }
+    check('no endless animation in the other sections', (await p.evaluate(ENDLESS)).length === 0);
+    await p.click('#tab-train');
+
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
     for (const theme of ['dark', 'light', 'midnight']) {
       await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(450);   // colour transitions are 150 ms
@@ -274,8 +478,9 @@ async function startServer() {
 
     // ---- 13. phone, 390 px: panels stack with the chart first, no sideways scroll, text 12 px or more, 44 px targets ----
     {
-      const ph = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce' }); p = await ph.newPage(); watch(p, 'phone');
+      const ph = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce' }); await ph.addInitScript(NO_PACE); p = await ph.newPage(); watch(p, 'phone');
       await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, iso(cands[0].t), '100');
+      const n0 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.length;
       let w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on the setup', w <= 390, w);
       let small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (setup)', small.length === 0, small.slice(0, 4).join(' ; '));
       let taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (setup)', taps.length === 0, taps.slice(0, 5).join(' ; '));
@@ -289,9 +494,30 @@ async function startServer() {
       const order = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
       check('390 px: the panels stack and the chart stays first', order[0] < order[1] && order[1] < order[2] && order[2] < order[3], order.join(' < '));
       check('reduced motion is respected (no transition left running)', await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.btn')).transitionDuration) <= 0.001));
-      check('a second sitting on the same setup stores the next attempt number', (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.map((a) => a.n).join(',') === '1,2');
-      await p.screenshot({ path: OUT + 'academy-5-phone.png', fullPage: true });
+      { const a2 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts; check('another sitting on the same setup stores the next attempt number, as a same-trade replay', a2.length === n0 + 1 && a2[n0].n === n0 + 1 && a2[n0].mode === 'replay-same', JSON.stringify(a2.map((a) => [a.n, a.mode]))); }
+      await p.screenshot({ path: OUT + 'academy-5-phone.png' });   // not a full-page shot: that would reset the touch emulation for the checks below
+      for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['research', '#rs-table'], ['blind', '#bl-rows'], ['session', '#ss-saved li']]) {
+        await p.tap('#tab-' + id); await p.waitForSelector(sel, { timeout: 20000 }); if (id === 'lessons') { await p.tap('#ls-list [data-act="revise"]'); await p.waitForSelector('#lr-title'); }
+        w = await p.evaluate(() => document.documentElement.scrollWidth); check(`390 px: no sideways scroll (${id})`, w <= 390, w);
+        small = await p.evaluate(SMALL); check(`390 px: every text is 12 px or more (${id})`, small.length === 0, small.slice(0, 4).join(' ; '));
+        taps = await p.evaluate(TAPS); check(`390 px, touch: every control is at least 44 px tall (${id})`, taps.length === 0, taps.slice(0, 5).join(' ; '));
+        if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await p.evaluate(CONTRAST); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        await p.evaluate(() => { delete document.documentElement.dataset.theme; });
+      }
+      const two = await p.evaluate(() => { document.getElementById('tab-progress').click(); return null; }); await p.waitForSelector('#pg-recall');
+      const stack = await p.evaluate(() => ['pg-recall', 'pg-fresh'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top)));
+      check('390 px: recall and new setups stack, still as two separate blocks', stack[0] < stack[1] && two === null, stack.join(' < '));
+      await p.screenshot({ path: OUT + 'academy-10-phone-progress.png', fullPage: true });
       await ph.close();
+    }
+    // ---- 14. the pace switched on, as on the live site: the page holds itself under the firewall's limit ----
+    {
+      const pc = await b.newContext({ viewport: { width: 1100, height: 800 }, serviceWorkers: 'block' }); await pc.addInitScript('window.MXAC_PACE = 3;'); p = await pc.newPage(); watch(p, 'paced');
+      const t0 = Date.now(); await p.goto(H + '/academy', { waitUntil: 'load' }); await p.waitForFunction(() => { const n = document.getElementById('ac-net'); return n && !n.hidden; }, null, { timeout: 15000 }).catch(() => {});
+      const line = await txt(p, '#ac-net'), sent = calls(reqs, 0, 'paced').length;
+      check('with a pace of 3 a minute the fourth call waits its turn and the page says so calmly', /^Waiting for the server's rate limit… about \d+ s\. Nothing is lost: the page carries on by itself\.$/.test(line) && sent === 3 && Date.now() - t0 < 15000, `${sent} calls sent; "${line}"`);
+      check('the default pace is 24 Academy calls a minute, under the firewall\'s 30', await p.evaluate(() => window.MXAC.PACE === 24 && window.MXAC.TRIES === 4));
+      await pc.close();
     }
     check('no page errors and no console errors anywhere', errs.length === 0, errs.slice(0, 3).join(' | '));
   } catch (e) { check('the audit ran to the end', false, e.message.split('\n')[0]); }

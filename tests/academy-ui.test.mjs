@@ -150,17 +150,64 @@ test('registerTab: the hook for the sections built next', () => {
   assert.deepEqual(MXAC.TABS.map((t) => t[0]), ['train', 'session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']);
 });
 
+// ---- the API wrapper: the site's firewall allows 30 requests a minute on /api --------------------------------------------------
+const fakeNet = (answers, calls = []) => async (url, init) => { calls.push({ url, method: (init && init.method) || 'GET', body: init && init.body }); const a = answers.length > 1 ? answers.shift() : answers[0]; return { status: a.status, ok: a.status >= 200 && a.status < 300, headers: { get: (k) => (k === 'Retry-After' && a.ra != null ? a.ra : null) }, json: async () => a.body || { error: 'limited' } }; };
+test('the API wrapper waits out a 429 (Retry-After, else 5 s doubling) and sends the same write again: nothing is dropped', async () => {
+  const calls = [], sleeps = [], waits = [];
+  const api = MXAC.makeApi({ fetch: fakeNet([{ status: 429, ra: '2' }, { status: 429 }, { status: 429 }, { status: 200, body: { ok: true, n: 1 } }], calls), sleep: async (ms) => { sleeps.push(ms); }, now: () => 0, perMinute: 0, onWait: (k, sec) => waits.push([k, sec]) });
+  assert.deepEqual(await api.post({ action: 'attempt', x: 1 }), { ok: true, n: 1 });
+  assert.equal(calls.length, 4); assert.ok(calls.every((c) => c.method === 'POST' && c.body === '{"action":"attempt","x":1}' && c.url === '/api/academy'), 'the same write, four times');
+  assert.deepEqual(sleeps, [2000, 5000, 10000]); assert.deepEqual(waits, [['limit', 2], [null, 0], ['limit', 5], [null, 0], ['limit', 10], [null, 0]], 'a calm wait is announced and cleared, never an error');
+  assert.deepEqual(api.stats, { calls: 4, paced: 0, retries: 3 });
+  // still limited after the last try: the call fails with the status, so the caller can say so (reported, not lost)
+  const c2 = [], s2 = [], api2 = MXAC.makeApi({ fetch: fakeNet([{ status: 429 }], c2), sleep: async (ms) => { s2.push(ms); }, now: () => 0, perMinute: 0 });
+  await assert.rejects(() => api2.post({ action: 'correct' }), (e) => e.status === 429 && /still limiting requests after 4 tries/.test(e.message));
+  assert.equal(c2.length, MXAC.TRIES); assert.deepEqual(s2, [5000, 10000, 20000]);
+  // other failures are not retried and keep the server's words
+  const c3 = [], api3 = MXAC.makeApi({ fetch: fakeNet([{ status: 403, body: { error: 'decide first' } }], c3), sleep: async () => {}, perMinute: 0 });
+  await assert.rejects(() => api3.get({ get: 'outcome', id: 'x' }), (e) => e.status === 403 && e.message === 'decide first'); assert.equal(c3.length, 1); assert.equal(c3[0].url, '/api/academy?get=outcome&id=x');
+  await assert.rejects(() => MXAC.makeApi({ fetch: async () => { throw new Error('offline'); }, perMinute: 0 }).get({ get: 'edges' }), (e) => e.status === 0 && /could not be reached/.test(e.message));
+});
+test('the API wrapper paces itself: never more than 24 calls in any minute, in order; writes go one at a time', async () => {
+  assert.equal(MXAC.PACE, 24);
+  let T = 0; const at = [], waits = [];
+  const api = MXAC.makeApi({ fetch: async (url) => { at.push([T, url]); return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({}) }; }, sleep: async (ms) => { T += ms; }, now: () => T, perMinute: MXAC.PACE, onWait: (k) => { if (k) waits.push(k); } });
+  await Promise.all(Array.from({ length: 60 }, (_, i) => api.get({ get: 'attempts', i })));
+  assert.equal(at.length, 60); assert.deepEqual(at.map((x) => +new URL(x[1], 'http://x').searchParams.get('i')), Array.from({ length: 60 }, (_, i) => i), 'in the order asked');
+  for (let i = 0; i < at.length; i++) assert.ok(at.filter((x) => x[0] > at[i][0] - 60000 && x[0] <= at[i][0]).length <= 24, `call ${i}: more than 24 in a minute`);
+  assert.ok(at[23][0] === 0 && at[24][0] >= 60000 && at[48][0] >= 120000, 'the first 24 go at once, the next wait for the window'); assert.ok(waits.length >= 2 && waits.every((k) => k === 'pace')); assert.ok(api.stats.paced >= 2);
+  // POSTs are serial even when the network answers out of order
+  const order = [], slow = MXAC.makeApi({ perMinute: 0, fetch: async (url, init) => { const b = JSON.parse(init.body); order.push('start ' + b.n); await new Promise((r) => setTimeout(r, b.n === 1 ? 20 : 1)); order.push('end ' + b.n); return { status: 200, ok: true, headers: { get: () => null }, json: async () => b }; } });
+  await Promise.all([slow.post({ n: 1 }), slow.post({ n: 2 }), slow.post({ n: 3 })]); assert.deepEqual(order, ['start 1', 'end 1', 'start 2', 'end 2', 'start 3', 'end 3']);
+});
+test('past cases read once for a run are cut per decision exactly as the API cuts them for one setup', async () => {
+  const api = mkApi(), all = await api.get({ get: 'history', edge: EDGE.id, before: String(MAN.to) });   // the page sends it as a query string
+  assert.ok(all.rows.length > 100);
+  for (const c of [TRAIN[0], TRAIN[TRAIN.length - 1], EXAM[0]]) { const one = await api.get({ get: 'history', edge: EDGE.id, cand: c.id }); assert.deepEqual(MXAC.historyAt(all.rows, c.t), one.rows, c.id); assert.ok(MXAC.historyAt(all.rows, c.t).every((r) => r.t < c.t && r.exitT < c.t)); }
+  assert.ok(all.rows.every((r) => Object.keys(r).sort().join() === 'exitT,features,netR,t'), 'no id and no price in a past case');
+  assert.deepEqual(MXAC.historyAt(null, 5), []); assert.deepEqual(MXAC.historyAt([{ t: 1, exitT: 9 }, { t: 1, exitT: 3 }], 5), [{ t: 1, exitT: 3 }]);
+  const c = { side: 'sell', entry: 100, stop: 104, target: 90 };
+  assert.deepEqual(MXAC.mentorLevelsOf(c, 'SELL'), { entry: 100, stop: 104, target: 90 }); assert.deepEqual(MXAC.mentorLevelsOf(c, 'BUY'), { entry: 100, stop: 96, target: 110 }, 'the other side mirrors the levels'); assert.deepEqual(MXAC.mentorLevelsOf(c, 'WAIT'), { entry: null, stop: null, target: null });
+});
+test('a replay run reads its lists once: one stored attempt is the only call of a train decision', () => {
+  const ui = src('assets/academy-ui.js'), body = (name) => { const a = ui.indexOf(`async function ${name}(`); return ui.slice(a, ui.indexOf('\n  }\n', a)); };
+  assert.equal((body('openPoint').match(/api\.(get|post)\(/g) || []).length, 1, 'openPoint: the attempt, nothing else (the session is saved once, in saveSession)');
+  assert.deepEqual(body('examOne').match(/api\.(get|post)\(/g), ['api.post(', 'api.post('], 'a test on a new setup: the attempt and the result');
+  assert.ok(!/get: 'history', edge: [^}]*cand:/.test(ui), 'no per-setup history read');
+  assert.match(ui, /historyFor\(st\.edge\.id, st\.to\)/); assert.match(ui, /lessonsFor\(st\.edge\.id, true\)/);
+});
+
 // ---- the page's static promises ---------------------------------------------------------------------------------------------
 test('academy.html: owner card, the nine sections, the scripts in order, built by the build script', () => {
   const html = src('academy.html'), ui = src('assets/academy-ui.js');
   assert.match(html, /<title>MeridianX Academy<\/title>/); assert.match(html, /<h1>MeridianX Academy<\/h1>/);
   assert.match(html, /The Academy is for the desk owner\. Sign in on the desk\./);
   for (const [id] of MXAC.TABS) assert.match(html, new RegExp(`<section id="ac-${id}" role="tabpanel"`), id);
-  for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty: nothing that looks as if it worked`);
+  for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js fills it from stored data`);
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js']);
+  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js', '/assets/academy-tabs.js']);
   assert.ok(!/\son[a-z]+="/.test(html), 'no inline event handlers');
-  assert.match(ui, /Coming in the next build step\./);
+  assert.ok(!/Coming in the next build step|\(next step\)/.test(ui + src('assets/academy-tabs.js') + html), 'no placeholder is left: a section works or says honestly what is missing');
   assert.match(ui, /if \(!me \|\| me\.u !== 'owner'\) \{ \$\('ac-gate'\)\.hidden = false; return; \}/, 'anyone but the owner gets the card and the page stops there');
   assert.match(ui, /Passing the same trade shows recall, not generalisation\./);
   assert.match(src('scripts/build.sh'), /^cp .*\bacademy\.html\b.* out\/$/m);
@@ -179,7 +226,7 @@ test('the page talks to the Academy API and the candle proxy only: no broker, no
 });
 
 test('rule 6: no model names in the Academy page files', () => {
-  for (const f of ['academy.html', 'assets/academy.css', 'assets/academy-ui.js', 'scripts/academy-dev.mjs', 'scripts/audit/academy.cjs', 'tests/academy-ui.test.mjs', 'tests/fixtures/academy/manifest.json'])
+  for (const f of ['academy.html', 'assets/academy.css', 'assets/academy-ui.js', 'assets/academy-tabs.js', 'tests/academy-tabs.test.mjs', 'scripts/academy-dev.mjs', 'scripts/audit/academy.cjs', 'tests/academy-ui.test.mjs', 'tests/fixtures/academy/manifest.json'])
     assert.ok(!new RegExp(['clau' + 'de', 'anthro' + 'pic', 'open' + 'ai', 'gp' + 't-', 'gem' + 'ini', 'son' + 'net', 'op' + 'us\\b', 'hai' + 'ku'].join('|'), 'i').test(src(f)), f);
 });
 
