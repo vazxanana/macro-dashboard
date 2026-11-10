@@ -3390,6 +3390,34 @@
     "positionId": "47889587",
     "volume": 200000,
     "status": "open"
+   },
+   "btc-rscalp-1794283012": {
+    "positionId": "47891861",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-10T03:57:54.000Z",
+    "councilEntry": 74465.7,
+    "stop": 74263.20686,
+    "t1": 74795.6,
+    "riskCash": 2.02,
+    "margin": 74.46,
+    "minLot": true,
+    "shadow": true,
+    "mark": 74465.7,
+    "levelsFrom": "mark",
+    "fillPrice": 74467.25,
+    "slipR": 0.008,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T03:57:54.000Z",
+    "brokerStop": 74264.76
    }
   },
   "day": {
@@ -3397,7 +3425,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9971.1 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9971.1 · 25 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3413,14 +3441,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9971.1,
-  "lastRun": "2026-11-10T03:55:09.000Z"
+  "lastRun": "2026-11-10T03:57:54.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T10:11:44.000Z",
-   "msg": "not mirrored xrp-rscalp-1794219027: none of XRPUSD found at the broker",
-   "trade": "xrp-rscalp-1794219027"
-  },
   {
    "at": "2026-11-09T10:18:03.000Z",
    "msg": "opened buy EURUSD 0.04 lot (council scalp)",
@@ -4915,6 +4938,11 @@
    "at": "2026-11-10T03:51:15.000Z",
    "msg": "limit filled: EURUSD position 47889587 at the broker",
    "trade": "eurusd-scalp-1794282311"
+  },
+  {
+   "at": "2026-11-10T03:57:54.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council rscalp)",
+   "trade": "btc-rscalp-1794283012"
   }
  ],
  "limits": {
@@ -4993,19 +5021,19 @@
   ]
  },
  "execution": {
-  "n": 114,
+  "n": 115,
   "meanSlipR": 0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161.5,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 10,
     "meanSlipR": 0.053
    },
    "BTCUSD": {
-    "n": 9,
-    "meanSlipR": -0.086
+    "n": 10,
+    "meanSlipR": -0.077
    },
    "ETHUSD": {
     "n": 4,
