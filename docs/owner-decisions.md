@@ -429,7 +429,55 @@ conditions is what makes your trades win.
 - **Your step, once:** the desk's assistant reads the lessons with a key that only you can see. On the Mosha desk, in the
   Lessons card, press "Show the assistant's key", copy it, and paste it into the secure form the assistant opens for
   meridianx.dev (never into a chat). Until then the lessons arrive and are stored, but nobody reads them.
+- **"The functionality is only to work for" Luxus, "the key is his password" (10 Nov):** done. Only Luxus's account can
+  teach: send lessons, say right or not right, decide the book, teach from ChronosTrade. His password is all he needs.
+  You and the other members who may open the desk read it; you can also remove a lesson or a picture, and switch his
+  access on the Users page. Giving "teaches" to anyone else has no effect.
+- **Update, 10 Nov ("No need for key u can read and do whaeva"):** you no longer have to copy anything. The assistant
+  makes its own key and saves it in the site's settings on Vercel (`MOSHA_ASSISTANT_KEY`). It opens only the lessons
+  (read, answer, propose book lines). The one cost: that key is visible in the assistant's private session log, where
+  the hand-copied one would not have been. To end it, delete that variable on Vercel, or set `MOSHA_READER=off`.
 - **To change or stop it:** Users → Luxus → Permissions → "Mosha desk" (no access / read only / may send lessons). On Vercel,
   `MOSHA_READER=off` switches the assistant's key off; `MOSHA_READER_SALT=<anything>` replaces it.
+- **"He needs to be 100% teachable" (10 Nov, built the same day):** Luxus can teach in pictures or in words alone, give the
+  trade's levels, and talk back under each lesson: "right", or "not right" and why, until the desk has it. The desk can show
+  its reading of a lesson on the chart with the replay. "What the desk knows" is the whole of what it holds, line by line:
+  twelve lines of its own to start with, each marked as its reading until Luxus (or you) confirms, corrects or erases it.
+  The Lessons card counts how often the desk was right first time.
+- **"And do backtest with him, he will teach you" (10 Nov):** Luxus can backtest in ChronosTrade and teach from there.
+  Every closed trade in his journal has a "Teach" button: it sends the trade to the desk with its chart picture, exact
+  entry, stop, target, exit and result, and his note. A second button sends the chart as it stands, with no trade, for
+  "look at this moment". On the desk such a lesson is marked "from a ChronosTrade replay" and opens on the replay chart.
+  These are practice trades on past candles: they teach the desk how he trades and are never counted as a record.
+- **"Do better and easier for" Luxus "to work with" (10 Nov):** teaching now takes fewer steps. On the desk he drops,
+  pastes or chooses screenshots, taps a caption, writes a few words and presses Send; a name and the levels are optional.
+  A strip at the top says what waits on him ("2 answers to check", "11 lines of the book to check") and takes him there.
+  "Not right" is typed right under the desk's answer. What he types is kept on his device until sent. In ChronosTrade a
+  "Teach this trade" button appears on the chart the moment a trade closes (or key T), and a number on the teach button
+  shows how many of the desk's answers wait for him.
+- **The tutorial (10 Nov, your words: "a tutorial to help him understand how to use the teaching and what he needs to
+  do"):** the first thing on his page is "How to teach the desk": five steps in plain words, each with a "Show me" button
+  that takes him to that part of the page. Steps tick themselves as he really does them, and the one that is his to do
+  next is marked "Next". He can hide it and bring it back with "How to teach". ChronosTrade shows a one-time hint the
+  first time a trade of his closes.
+- **The full tutorial, in English or French (10 Nov, your words: "a proper tutorial because the better he knows how to
+  work with you he would do better", "give him choice to choose french instead but the trading terms leave it as
+  english"):** "How to work with the desk" is a nine-chapter course opened from the top of his page. Each chapter has a
+  picture of what to press, a weak example beside a good one where that helps, and one question with the answer
+  explained. It covers what makes a lesson easy to learn from, what the desk can and cannot read on a screenshot, how to
+  correct it, the book, teaching from a replay, and the habits that help. He chooses English or Français at the top of
+  his page; the choice also covers his teaching buttons and messages, ChronosTrade's teach dialog, and the language the
+  desk answers him in. The words of the method (trade, sell, buy, entry, stop, target, level, sweep, VR, CF, BO…) stay in
+  English in both. The rest of the site (menus, charts, other desks) is still English only: say if you want more of it
+  in French. The French was written by the assistant and checked by tests for the method's words, not by a French
+  speaker: a read-through by Luxus is the real check.
+- **"Remember he is the one teaching you mosha strategy" (10 Nov):** written in as a standing rule. Luxus is the
+  teacher and the desk is his student; Mosha is his method. The desk restates what he shows, in his terms, and asks where
+  it is unclear. It never teaches the method back to him, never judges a trade, and never treats its own first lines of
+  the book or the earlier studies' wording as his method. The tutorial opens by telling him so, and shows only how to
+  teach, never what Mosha is.
+- **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
+  is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
+  (it uses your plan's usage each time, so it is your call how often).
 - **What the lessons are not:** proof. They are the teacher's picks, so they show the pattern, not how often it wins. A rule
   drawn from them gets its own pre-registered test before it is called an edge, and nothing live changes without you.

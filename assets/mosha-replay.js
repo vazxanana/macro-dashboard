@@ -176,6 +176,17 @@
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
       steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before your entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
   }
+  // A lesson as a chart: the desk's own reading when it has drawn one (its marks and steps, checked by the server), else the
+  // teacher's levels alone. null when the lesson has neither. H4 candles start at 17:00 New York (21:00 or 22:00 UTC).
+  function usSummer(t) { var d = new Date(t * 1000), y = d.getUTCFullYear(), nth = function (m, n) { var f = new Date(Date.UTC(y, m, 1)).getUTCDay(); return Date.UTC(y, m, 1 + ((7 - f) % 7) + 7 * (n - 1), 7) / 1000; }; return t >= nth(2, 2) && t < nth(10, 1); }
+  function specOfLesson(l, now) {
+    var c = l && l.chart, t = l && l.trade;
+    if (c) return { id: 'lesson-' + l.id, lesson: true, title: l.title, label: 'The desk\'s reading of this lesson', market: c.market, side: c.side || (t && t.side) || 'sell', entry: c.entry, stop: c.stop, target: c.target,
+      base: c.base, tfs: c.base === '15m' ? [900, 3600, 14400] : [300, 900, 3600], h4off: usSummer(c.from) ? 3600 : 7200, from: c.from, to: c.to, fillFrom: c.fillFrom != null ? c.fillFrom : c.from, yours: 'the levels as the desk read them', marks: c.marks || [], steps: c.steps || [] };
+    if (!t) return null;
+    var s = specOfTrade({ id: l.id, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, status: t.exit != null ? 'closed' : 'open', exit: t.exit != null ? t.exit : null, exitAt: t.exitAt || null, R: t.R != null ? t.R : null }, now);
+    s.id = 'lesson-' + l.id; s.lesson = true; s.title = l.title; s.label = t.src === 'replay' ? 'A trade from a ChronosTrade replay' : 'The levels of this lesson'; s.yours = t.exit != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'the levels you gave'; return s;
+  }
   // the hand-over to ChronosTrade: the same market from the moment before the entry forms, with the marks already known then
   function handoff(spec, now) {
     var vr = (spec.marks || []).filter(function (m) { return m.kind === 'vr' || m.kind === 'bvr'; })[0], start = spec.handFrom || (vr ? (vr.at || vr.a) : spec.fillFrom - 3600), draw = [];
@@ -183,7 +194,7 @@
       if (m.kind === 'level') draw.push({ type: 't', t1: a, p1: m.p, t2: b, p2: m.p }); else draw.push({ type: 'r', t1: a, p1: m.top, t2: b, p2: m.bot }); });
     return { made: now, sym: spec.market, tf: '5m', start: start, days: 3, name: 'Mosha ' + spec.title + (spec.entry != null ? ' · ' + spec.entry + ' / ' + spec.stop + (spec.target != null ? ' / ' + spec.target : '') : ''), draw: draw };
   }
-  var API = { EXAMPLES: EXAMPLES, STUDIES: STUDIES, tfsOf: tfsOf, follow: follow, aggBars: aggBars, barAt: barAt, outcome: outcome, stepsOf: stepsOf, stepAt: stepAt, marksAt: marksAt, specOfTrade: specOfTrade, handoff: handoff };
+  var API = { EXAMPLES: EXAMPLES, STUDIES: STUDIES, tfsOf: tfsOf, follow: follow, specOfLesson: specOfLesson, usSummer: usSummer, aggBars: aggBars, barAt: barAt, outcome: outcome, stepsOf: stepsOf, stepAt: stepAt, marksAt: marksAt, specOfTrade: specOfTrade, handoff: handoff };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_RP = API;
   if (typeof document === 'undefined') return;
@@ -266,11 +277,12 @@
   }
   function result() {
     var el = $('mo-rp-res'), oc = R.oc, sp = R.spec; if (!el) return;
+    if (sp.entry == null && !sp.watch) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · marks only, no position<small>' + esc(sp.label || '') + '.</small>'; return; }   // a lesson the desk marked without a trade
     if (sp.entry == null) { var f = follow(sp, R.base), dn = sp.side === 'sell';   // a picture without a position
       el.innerHTML = '<b>' + esc(sp.title) + '</b> · no position is drawn on this screenshot<small>On our candles: ' + esc(!f ? 'the candle it points at is not in the feed' : 'the ' + utc(f.t) + ' candle closed at ' + f.px.toFixed(1) + '. After it price went ' + f.worst.toFixed(1) + ' ' + (dn ? 'up' : 'down') + ' at most, then ' + f.best.toFixed(1) + ' ' + (dn ? 'down' : 'up') + ', to ' + f.bestPx.toFixed(1) + ' at ' + utc(f.bestT)) + '.</small>'; return; }
     var ours = !oc || oc.fill == null ? 'the entry price was not traded on our candles at that time' : oc.kind === 'target' ? 'filled ' + utc(oc.fill) + ', target reached ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against'
       : oc.kind === 'stop' ? 'filled ' + utc(oc.fill) + ', stopped ' + utc(oc.exit) : oc.kind === 'hand' ? 'filled ' + utc(oc.fill) + ', closed ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against' : 'filled ' + utc(oc.fill) + ', neither stop nor target by the end of the window';
-    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>You: ' + esc(sp.yours || '—') + '. On our candles: ' + esc(ours) + '.</small>';
+    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? 'The lesson: ' : 'You: ') + esc(sp.yours || '—') + '. On our candles: ' + esc(ours) + '.</small>';
   }
   function open(spec, scroll) {
     var card = $('mo-replay'); if (!card) return; stop(); R.spec = spec; var tk = ++R.token, msg = $('mo-rp-msg');
@@ -284,10 +296,11 @@
       $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
       $('mo-rp-steps').innerHTML = R.steps.map(function (s, i) { return '<button type="button" data-step="' + i + '" title="' + esc(s.text) + '">' + (i + 1) + '</button>'; }).join('');
       result(); setTf(R.tf); };
-    if (R.cache[spec.id]) return done(R.cache[spec.id]);
+    var ck = spec.id + ':' + spec.from + ':' + spec.to + ':' + (spec.base || '5m');   // a lesson's chart can change: the candles are kept per window
+    if (R.cache[ck]) return done(R.cache[ck]);
     msg.hidden = false; msg.textContent = 'Loading the candles…';
     fetch('/md/bars?sym=' + encodeURIComponent(spec.market) + '&tf=' + (BASE[spec.base] ? spec.base : '5m') + '&from=' + spec.from + '&to=' + spec.to, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { var bars = j && Array.isArray(j.bars) ? j.bars.filter(function (b) { return !b.live; }).map(function (b) { return { time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; }) : null; if (bars && bars.length >= 20) R.cache[spec.id] = bars; done(bars); })
+      .then(function (j) { var bars = j && Array.isArray(j.bars) ? j.bars.filter(function (b) { return !b.live; }).map(function (b) { return { time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; }) : null; if (bars && bars.length >= 20) R.cache[ck] = bars; done(bars); })
       .catch(function () { done(null); });
   }
   function wire() {
@@ -313,6 +326,7 @@
   }
   root.msMoshaReplay = function () { wire(); if (!R.spec) open(EXAMPLES[0]); else requestAnimationFrame(paint); };
   root.msMoshaReplayTrade = function (t) { wire(); open(specOfTrade(t, Math.floor(Date.now() / 1000)), true); };
+  root.msMoshaReplayLesson = function (l) { var sp = specOfLesson(l, Math.floor(Date.now() / 1000)); if (!sp) return false; wire(); open(sp, true); return true; };
   root.msMoshaReplayStop = stop;
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.msMoshaReplay(); }   // the desk was already open when this file ran
 })(typeof window !== 'undefined' ? window : globalThis);

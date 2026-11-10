@@ -1592,6 +1592,19 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     from the session secret (`readerKey`; `MOSHA_READER=off`, `MOSHA_READER_SALT` rotates it), shown to the owner's session
     only (Lessons card, "Show the assistant's key"), and can read the lessons and write a reply, nothing else; a wrong key
     counts in `api/_guard.js` like a wrong password. Never widen it, never write it in a file or a chat.
+  - **Only Luxus teaches** (owner, 10 Nov: "The functionality is only to work for" Luxus, "the key is his password").
+    `TEACHER = 'luxus'` in `api/mosha.js`: `moshaLevel` gives 'teach' to that account alone (a stored `perms.mosha:
+    'teach'` on any other account counts as 'read', the owner reads too), and the page's `msPerms`, ChronosTrade's
+    `TEACH` and the Users page (the "Teaches the desk" option is offered for Luxus only) follow the same rule. His
+    sign-in is all he needs: no key, no setup. Sending lessons, "right / not right", every change to the book and
+    teaching from ChronosTrade are his; the owner reads the lessons and the book, may remove a lesson or a picture, and
+    may still switch Luxus's access (none / read / teaches). Never give teaching to another account without the owner.
+  - **The key the assistant sets for itself** (owner, 10 Nov, asked to copy the key by hand: "No need for key u can read
+    and do whaeva"). The server also accepts `MOSHA_ASSISTANT_KEY` (`ownKey`: 32-128 plain characters, else ignored): the
+    assistant makes a random one, saves it as that Vercel environment variable (Production) and uses it as
+    `MOSHA_READER_KEY` for the script. It opens exactly what the derived key opens, nothing more, and `MOSHA_READER=off`
+    shuts both. A later session reads the value back from the Vercel project (the owner asked for this); it never goes
+    into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
   - **Reading the lessons in a session** (the "learn" part): `node --use-env-proxy scripts/mosha-lessons.mjs pull <dir>` saves
     `lessons.json` and the pictures of the lessons not read yet (2.5 s apart: the firewall allows 30 API calls a minute); look
     at each picture with its caption and note, then `… reply <lesson id> <file>` writes back what was understood (levels read
@@ -1604,5 +1617,109 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     `#mo-lessons` (a lesson unfolds to its note, pictures and "What the desk understood"; pictures load only when unfolded).
     For a teacher who is not the owner the two cards come first and the heading speaks to him (`.mo-own` / `.mo-tch` /
     `.mo-rdr`). Tests: `tests/mosha-lessons.test.mjs`.
+- **100 % teachable** (same day, owner: "He needs to be 100% teachable"): the desk takes every way of teaching, keeps what it
+  is taught, and shows back what it understood so the teacher can check it. This replaces the single reply of the first version.
+  - **A lesson** may be words only (title + note, no picture) and may carry the trade's own levels (`trade`: market, side, at,
+    entry, stop, target; `tradeOf`: no stop on the losing side, no record). "Give / Change the levels" edits them later.
+  - **The conversation** (`thread`): the desk's answer (`{ reply }`, assistant or owner), then the teacher's `{ say: { id, text?,
+    verdict? } }`: "right", or "wrong" with the why (required). `stateOf` (the same function on the server and the page, a
+    test compares them): new → read ("The desk answered: is it right?") → agreed ("Understood"), or more ("Waiting for the
+    desk": new pictures, "not right", or words after the answer). `score`: of the lessons whose FIRST answer was judged, how
+    many were right first time.
+  - **The desk's reading on the chart**: a reply may carry `chart` (market, base 5m / 15m, window, marks, steps, and a
+    position only with its stop on the losing side; `chartOf` checks every field and keeps only known ones). "See the desk's
+    reading on the chart" opens it in the replay (`MS_MOSHA_RP.specOfLesson`, `msMoshaReplayLesson`); a lesson with levels but
+    no chart opens with the levels alone. Never draw a position the teacher did not give.
+  - **The book**, card `#mo-book` "What the desk knows" (private Blob `mosha/book.json`, 400 lines; kinds term / step / rule /
+    avoid). The assistant only PROPOSES (`{ learn }` with the key → `proposed`, shown as "The desk's reading, not confirmed");
+    a teacher confirms, corrects (the desk's first wording is kept in `was`) or erases (`{ book }`), or teaches a line directly
+    (`{ learn }` → `confirmed`). The key cannot confirm, change or erase any line. `SEED` = the desk's own first twelve lines,
+    all `proposed`, shown until the first change stores the book.
+  - **Who teaches whom** (owner, 10 Nov: "Remember he is the one teaching you mosha strategy"). Luxus teaches the Mosha
+    method and the desk's assistant is his student. Mosha is HIS method, not the desk's and not the studies'. In every
+    answer, book line and page text: restate what he showed in his own terms, read the levels off his pictures, ask
+    where something is unclear. Never teach the method back to him, never tell him what a term "should" mean, never judge
+    whether a trade was good, never quote the five studies or their mechanical readings at him as if they were his
+    method (they were the desk's attempts to write it down, and they failed), and never treat the desk's own twelve
+    first lines or the examples in `assets/mosha-replay.js` as settled: they are guesses from a few screenshots until he
+    confirms them. Where the desk's reading differs from his, his is right. The tutorial says this to him in its first
+    chapter, and `BOOK.md` opens with it (`WHO` in `scripts/mosha-lessons.mjs`). The tutorial may show him HOW to
+    teach (the form of a lesson); it must never tell him WHAT Mosha is.
+  - **How the assistant learns, every time** (`scripts/mosha-lessons.mjs`): `pull <dir>` writes `BOOK.md` (the teacher's word
+    first, the unconfirmed readings last and marked) and a folder per lesson that waits for the desk (`lesson.txt` with the
+    note, levels, captions and the whole conversation; the pictures). Read `BOOK.md` FIRST: a confirmed or corrected line is
+    the teacher's word and overrides the studies' wording, the examples in `assets/mosha-replay.js` and anything the desk
+    wrote before. Then answer each lesson in the teacher's own terms (`reply <id> <file> [chart.json]`: what is seen, the
+    levels read off the picture, what is unclear, and the chart when times and levels can be placed on our candles), and
+    propose only what is new (`learn <kind> <file> [lesson ids]`). When told "not right", restate the correction, do not
+    argue it, and propose the corrected line. Never present a taught line as tested: it is how the teacher trades.
+  - **Backtesting with the teacher** (same day, owner: "And do backtest with him, he will teach you"): a member who may
+    teach (`TEACH` in backtest.html: the owner, or effective `mosha === 'teach'` from `/api/me`) teaches from ChronosTrade.
+    Each closed trade's journal row has "Teach" (`[data-teach]`, "Taught" once sent; the records keep `taught` = the lesson
+    id): `teachTrade` frames the trade on the chart, takes a picture of chart + overlay (`teachShot`, up to 1600 px JPEG)
+    and opens `#teachd` with a title and a note prefilled from the trade's own note, tags, mistakes and ticked rules; the
+    toolbar's `#tch-btn` ("Send this moment to the Mosha desk", `teachMoment`) sends the chart as it stands, with no trade.
+    Both post `{ add }` to `/api/mosha-lessons` like the desk's own form. The trade travels as the lesson's levels with
+    what a replay knows: `market` (the lesson `MARKETS` list is wider than the log's), `exit` + `exitAt` (both or neither;
+    `R` computed on the server), `tf`, `src: 'replay'`. The stop sent is the stop the trade was OPENED with (`stop0` from
+    `r0`), never a trailed or break-even one, and `tradeOf` still refuses a stop on the wrong side. The desk shows "from a
+    ChronosTrade replay" on the lesson and opens it on the replay chart with its exit. A replay trade is practice on past
+    candles: never count it in the Mosha record, never as evidence of an edge. The teach card links to `/backtest`.
+  - **Easier for the teacher** (same day, owner: "Do better and easier for" Luxus "to work with"). Keep it this simple:
+    the teach form is pictures, then words, then Send; the name, the levels and "goes with" sit in the fold `#mo-t-more`.
+    A lesson needs no name (`nameOf` on the server: the first caption, else the first words of the note) and a lesson in
+    words needs only the note. `#mo-todo` "Your turn" (`MS_MOSHA_TEACH.todo`: the desk's answers to his own lessons, the
+    book's unconfirmed lines; first for a teacher) jumps to the first answer to check or shows only the book lines left
+    (`T.bookOnly`). Captions are tapped (`captionIdeas`: his own most used, then the usual ones; `addCaption` joins them).
+    A screenshot dropped or pasted anywhere on the desk lands in the form; "Add pictures" opens the picker and
+    `#mo-t-to` says which lesson they go to. The note and name are kept in localStorage `msMoDraft:<account>` until sent.
+    "Not right…" is typed under the desk's answer (no dialog; `T.wrong`); Ctrl / Cmd + Enter sends. From four lessons
+    on, `#mo-l-flt` filters them (All / Your turn / Waiting for the desk / Understood) and the lesson that waits on him
+    opens first. In ChronosTrade: `#tchip` offers "Teach this trade" on the chart right after a close (only trades closed
+    in this visit, `TCH.old`; × dismisses), T or `#tch-btn` teaches the trade just closed, else the moment (`teachNow`),
+    Ctrl + Enter sends, a cleared name falls back to the suggested one, and `#tch-n` counts the desk's answers that wait
+    for him (one read of `/api/mosha-lessons` on load). None of this runs for a member who may not teach.
+  - **The tutorial** (same day, owner: "a tutorial to help him understand how to use the teaching and what he needs to
+    do"): card `#mo-guide` "How to teach the desk", first on a teacher's page. Five steps (`MS_MOSHA_TEACH.STEPS`: send
+    a trade, the desk answers, say right or not right, check what the desk knows, backtest and teach from the replay),
+    each with one plain paragraph and "Show me" (`showPart`: scrolls to that part and outlines it for two seconds; the
+    last step links to `/backtest`). `guide(lessons, book, who)` ticks a step from what he has really done (his lessons,
+    the desk's answers, his verdicts, the book, a replay lesson), so it is right on every device, and names the `next`
+    step that is his to do. Shown by itself until he hides it (localStorage `msMoGuide:<account>`) or has done all five
+    (then done steps fold to one line); "How to teach" (`#mo-guide-open`, teach card) brings it back in full, for the
+    owner too. Never shown to a reader. ChronosTrade shows one hint toast the first time the chip appears
+    (`btLab:teachTip:<account>`); the chip itself is for a teacher who is not the owner (the owner keeps T and the
+    button). Keep the steps' words free of any promise: it is a tutorial for teaching, not a claim that the trades win.
+  - **The full tutorial, and French** (same day, owner: "a proper tutorial because the better he knows how to work with
+    you he would do better", "the more the quality of the tutorial the better for him", "give him choice to choose french
+    instead but the trading terms leave it as english").
+    - `assets/mosha-tutor.js` (`MS_MOSHA_TUTOR`): "How to work with the desk", nine chapters in a `<dialog id="mo-tut">`
+      opened from the guide card ("Start / Continue / Read the tutorial again"): what the desk is, a good lesson, sending
+      it, what the desk can and cannot read on a screenshot, checking and correcting its answer, the book, teaching from
+      a ChronosTrade replay, the habits that help, a first session. A chapter = a lead, blocks (`p`, `h`, `ul`, `ol`,
+      `tip`, `warn`, `fig`, `cmp` weak against good, `dd` do / avoid), one question with every answer explained, and
+      sometimes a button to that part of the page. The pictures are drawn in code (`FIGS`: the loop, the order of
+      pictures, the annotated chart, mock-ups of the form, an answer, a book line, the replay chip): no image files.
+      Chapter list at the side (hidden on phones), arrows and Escape, progress kept in localStorage `msMoTut:<account>`.
+      It teaches TEACHING: it must keep saying that the desk never places a trade, does not answer at once, and that
+      whether a rule makes money is tested separately; it never promises a result (a test bans those words).
+    - `assets/mosha-i18n.js` (`MS_MOSHA_I18N`): English is the source, `FR` is looked up by the English phrase, a phrase
+      with no entry stays English. `tr`, `fill`, `apply(el)` for fixed page text (`data-tr`, `data-tr-ph`,
+      `data-tr-aria`, `data-tr-title`), `seed(b)` (a book line still in the desk's own words is shown translated; a
+      corrected line is the teacher's). In `mosha-teach.js` every word goes through `L('…')`, in `backtest.html`
+      through `ML('…')`, in the tutorial through `T('…')`; the tutorial's chapters are written out in both languages
+      (`TUT.en` / `TUT.fr`). **The words of the method are never translated** (`TERMS`: trade, sell, buy, entry, stop,
+      target, level, sweep, VR, CF, BO, zone of the break, barrier, pullback, swing, high, low, timeframe, top-down,
+      H4 … M5, backtest, replay); "the levels" of a trade (its prices) is "niveaux de prix", the method's "level" stays.
+    - The choice (`.mo-lang`: top of a teacher's page, the guide card, the tutorial) is kept per account on the device
+      (localStorage `msMoLang:<account>`; a new device takes the language of his last lesson) and travels with each
+      lesson and reply (`lang` on `add` / `say`, stored on the lesson, `langOf`). `scripts/mosha-lessons.mjs` prints
+      "Answer in FRENCH … keep the words of the method in English" in `lesson.txt`: answer a lesson, and propose its
+      book lines, in the lesson's language. Only the teaching surfaces are translated (the desk's teacher cards, the
+      tutorial, ChronosTrade's teach chip, dialog and messages); the rest of the site stays English.
+    - Adding a phrase: write it in English through `L` / `ML` / `T` or `data-tr`, add its French line to `FR`.
+      `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
+      translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
+      answer, and a French button name the page does not show.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
