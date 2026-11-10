@@ -3452,7 +3452,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9971.1 · 26 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9971.1 · 26 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3486,18 +3486,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "eurusd-scalp-1794285436": {
+    "orderId": "33843339",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.1224,
+    "stop": 1.1219000000000001,
+    "t1": 1.1234,
+    "placedAt": "2026-11-10T04:38:11.000Z",
+    "expires": "2026-11-10T07:37:16.000Z",
+    "riskCash": 1.99,
+    "margin": 6.73,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9971.1,
-  "lastRun": "2026-11-10T04:35:59.000Z"
+  "lastRun": "2026-11-10T04:38:11.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T10:20:56.000Z",
-   "msg": "placed sell limit EURUSD 0.04 lot at 1.11937 (council rscalp, valid to 2026-11-09T13:19Z)",
-   "trade": "eurusd-rscalp-1794219587"
-  },
   {
    "at": "2026-11-09T10:23:17.000Z",
    "msg": "limit filled: EURUSD position 47592201 at the broker",
@@ -4992,6 +5007,11 @@
    "at": "2026-11-10T04:17:15.000Z",
    "msg": "opened buy EURUSD 0.04 lot (council scalp)",
    "trade": "eurusd-scalp-1794284173"
+  },
+  {
+   "at": "2026-11-10T04:38:11.000Z",
+   "msg": "placed buy limit EURUSD 0.03 lot at 1.1224 (council scalp, valid to 2026-11-10T07:37Z)",
+   "trade": "eurusd-scalp-1794285436"
   }
  ],
  "limits": {
