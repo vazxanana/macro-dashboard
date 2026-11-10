@@ -1,0 +1,96 @@
+name: Academy training (manual)
+
+# Rebuilds the Academy's feature files from the research candles, measures the decision policy against taking every
+# setup, trains the offline scorer and checks that the exported models score the same in the page's scorer.
+# Manual only: it never runs on a push or on a schedule. It commits nothing, pushes nothing, promotes nothing and needs
+# no secret. The results are uploaded as an artifact for the owner to read. Free runner (public repo).
+# Paper research only. See docs/academy/TRAINING.md.
+on:
+  workflow_dispatch:
+    inputs:
+      edge:
+        description: "Edge to train (an edge id, 'pooled' or 'all')"
+        required: false
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: academy-train
+  cancel-in-progress: false
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      # The candles live on the council-data branch and are never copied into the code checkout: the feature export
+      # refuses a candle folder inside the repository.
+      - name: Checkout the research candles (council-data, two folders only)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: candles
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/candles/xau-histdata/
+            /research/candles/nsxusd-histdata/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install the pinned Python packages
+        working-directory: repo
+        run: python -m pip install --quiet -r ml/requirements.txt
+
+      - name: Feature export (one row per candidate, closed bars only)
+        working-directory: repo
+        env:
+          ACADEMY_CANDLES: ${{ github.workspace }}/candles
+        run: node academy/gen/features.mjs
+
+      - name: Decision policy against taking every setup
+        working-directory: repo
+        env:
+          ACADEMY_CANDLES: ${{ github.workspace }}/candles
+        run: node academy/gen/evaluate.mjs
+
+      - name: Train (walk-forward; no model is promoted)
+        working-directory: repo
+        env:
+          EDGE: ${{ inputs.edge }}
+        run: python ml/train.py --edge "${EDGE:-all}"
+
+      - name: Parity (the exported models against the page's scorer)
+        working-directory: repo
+        run: node ml/parity.mjs
+
+      - name: Tests of the dataset and the models
+        working-directory: repo
+        run: node --test tests/academy-ml.test.mjs
+
+      - name: Differences from the committed files (information only)
+        working-directory: repo
+        run: git status --short -- academy/data ml || true
+
+      - name: Upload the models and the report
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-training
+          retention-days: 30
+          path: |
+            repo/ml/models/
+            repo/ml/data/matrix.json.gz
+            repo/academy/data/feat-*.json
+            repo/academy/data/eval.json
