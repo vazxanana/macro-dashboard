@@ -734,6 +734,59 @@
     ],
     "stopCheckedAt": "2026-11-10T08:05:39.000Z",
     "brokerStop": 0.81753
+   },
+   "btc-replica-1794298204-s": {
+    "positionId": "47958423",
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T08:11:16.000Z",
+    "councilEntry": 74704.5,
+    "stop": 74902.54,
+    "t1": 74308.42,
+    "riskCash": 2,
+    "margin": 74.71,
+    "mark": 74704.5,
+    "levelsFrom": "mark",
+    "fillPrice": 74725.65,
+    "slipR": -0.107,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T08:11:16.000Z",
+    "brokerStop": 74923.69
+   },
+   "sol-replica-1794298204-s": {
+    "positionId": "47958434",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T08:11:16.000Z",
+    "councilEntry": 85.87,
+    "stop": 86.419,
+    "t1": 84.772,
+    "riskCash": 5.49,
+    "margin": 85.94,
+    "minLot": true,
+    "mark": 85.87,
+    "levelsFrom": "mark",
+    "fillPrice": 85.781,
+    "slipR": 0.162,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T08:11:16.000Z",
+    "brokerStop": 86.33
    }
   },
   "day": {
@@ -741,7 +794,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9993.1 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9993.1 · 26 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -759,7 +812,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9993.1,
-  "lastRun": "2026-11-10T08:08:42.000Z"
+  "lastRun": "2026-11-10T08:11:16.000Z"
  },
  "log": [
   {
@@ -984,6 +1037,16 @@
    "at": "2026-11-10T08:05:39.000Z",
    "msg": "opened buy USDCHF 0.01 lot (council replica)",
    "trade": "usdchf-replica-1794297871-b"
+  },
+  {
+   "at": "2026-11-10T08:11:16.000Z",
+   "msg": "opened sell BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794298204-s"
+  },
+  {
+   "at": "2026-11-10T08:11:16.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council replica)",
+   "trade": "sol-replica-1794298204-s"
   }
  ],
  "limits": {
@@ -1062,15 +1125,15 @@
   ]
  },
  "execution": {
-  "n": 27,
-  "meanSlipR": 0.106,
+  "n": 29,
+  "meanSlipR": 0.101,
   "medianSlipR": 0.048,
   "worstSlipR": 0.765,
-  "medianLagSec": 10639,
+  "medianLagSec": 9195,
   "bySymbol": {
    "SOLUSD": {
-    "n": 4,
-    "meanSlipR": 0.025
+    "n": 5,
+    "meanSlipR": 0.053
    },
    "ETHUSD": {
     "n": 5,
@@ -1081,8 +1144,8 @@
     "meanSlipR": 0.179
    },
    "BTCUSD": {
-    "n": 4,
-    "meanSlipR": -0.046
+    "n": 5,
+    "meanSlipR": -0.058
    },
    "USDCAD": {
     "n": 1,
