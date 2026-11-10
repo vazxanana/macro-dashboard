@@ -4,9 +4,6 @@
 // store in a temp folder (ACADEMY_STORE_DIR), on the recorded real candles of tests/fixtures/academy/ and the real
 // candidates, outcomes and past cases of academy/data/. Nothing is mocked: a "world" below is one fresh load of every
 // module and every candle file, so two worlds share no object in memory.
-//
-// One test is marked `todo`: it states a defect in a module this file's owner does not edit (assets/academy-core.js) with
-// the exact fix. It fails today on purpose and does not fail the run.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -258,15 +255,10 @@ test('5b. a lesson can never override the gates that are not the mentor\'s to pa
   assert.equal((await decideFresh(W, api, A, flip, { history, risk: { allowed: false, blocks: ['max positions'], riskPct: 0.25 } })).decision.action, 'WAIT'); assert.equal((await decideFresh(W, api, A, flip, { snap: W.snapOf(A, noM5), history })).decision.action, 'WAIT');
 });
 
-// DEFECT in assets/academy-core.js (not this file's to edit), decide(), the block "final geometry, the reward-to-risk gate
-// again … then the risk engine" (the two `action = 'WAIT'` lines after the lessons were recorded): when the final
-// reward-to-risk gate or the risk engine forces WAIT, a TAKE / FLIP lesson already written to d.lessonsApplied keeps
-// `applied: true` and an effect such as "TAKE: changed WAIT to SELL", although the answer is WAIT. The gate holds (5b proves
-// it); only the RECORD is wrong, so MXA.compare() and the lesson's "applied" counter over-count.
-// FIX: in both branches, after `action = 'WAIT'`, add
-//   for (const l of d.lessonsApplied) if (l.applied && (l.action === 'TAKE' || l.action === 'FLIP')) { l.applied = false; l.effect = `${l.action} not applied: blocked by ${code} (a lesson cannot override it)`; }
-// with code = 'rr' / 'risk', and set lessonLed = false so the thesis text does not say "on the mentor's lesson".
-test('5c. a TAKE lesson overruled by the reward-to-risk gate or by the risk engine is recorded as NOT applied', { todo: 'assets/academy-core.js decide(): mark TAKE / FLIP lessons applied: false when the final rr gate or the risk block forces WAIT (see the comment above this test)' }, async () => {
+// When the final reward-to-risk gate or the risk engine forces WAIT after the lessons were recorded, a TAKE / FLIP lesson did
+// not decide anything: decide() records it as `applied: false` ("… not applied: blocked by rr / risk"), so MXA.compare() and
+// the lesson's "applied" counter do not count it, and the thesis does not say "on the mentor's lesson".
+test('5c. a TAKE lesson overruled by the reward-to-risk gate or by the risk engine is recorded as NOT applied', async () => {
   const api = mkApi(W, tmp()); await saveLesson(api, { edge: EDGE.id, title: 'take sells', when: [{ f: 'side', op: 'eq', v: 'sell' }], then: { action: 'TAKE' } });
   const lessons = await inForce(api), history = [];
   const thin = (await decideFresh(W, api, A, lessons, { snap: W.snapOf({ ...A, target: A.entry - Math.abs(A.entry - A.stop) * 0.5 }), history })).decision;

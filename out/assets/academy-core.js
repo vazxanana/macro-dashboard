@@ -73,7 +73,7 @@
   // snapshot.schedule is the public calendar of releases still to come: "CPI is due in 3 hours" is knowledge a trader has
   // at t, so those items may be later than t. Their results are not knowledge at t, which is why only the three plain keys
   // are let through.
-  const OUTCOME_KEYS = ['R', 'netR', 'exitT', 'exit', 'mfeR', 'maeR', 'outcome', 'result'];
+  const OUTCOME_KEYS = ['R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR', 'unitR', 'add', 'fillT', 'outcome', 'result'];
   const SCHEDULE_KEYS = ['t', 'title', 'impact'];
   function assertNoFuture(snapshot) {
     const s = snapshot;
@@ -928,13 +928,15 @@
     }
 
     // ---- final geometry, the reward-to-risk gate again (a lesson may have moved the levels), then the risk engine ----
+    // a "take it" / "flip it" lesson that one of these two gates overrules did not decide anything: the record says so
+    const overruled = (code) => { for (const l of d.lessonsApplied || []) if (l.applied && (l.action === 'TAKE' || l.action === 'FLIP')) { l.applied = false; l.effect = `${l.action} not applied: blocked by ${code} (a lesson cannot override it)`; } lessonLed = false; };
     const riskDist = fin(entry) && fin(stop) ? Math.abs(entry - stop) : null;
     rr = fin(target) && riskDist > 0 ? rd(Math.abs(target - entry) / riskDist) : null; rrNet = rrNetOf(entry, stop, target, edgeDef);
     stopAtr = riskDist !== null && f.atr ? rd(riskDist / f.atr) : null;
-    if (fin(rrNet) && rrNet < lim.minRrNet) { const text = `reward to risk after costs is ${fmt(rrNet)}, below ${lim.minRrNet}`; d.gates.push({ code: 'rr', hard: true, overridable: false, text }); d.uncertainty.push(text); action = 'WAIT'; d.waitReasons.unshift('uncertainty: ' + text); }
+    if (fin(rrNet) && rrNet < lim.minRrNet) { const text = `reward to risk after costs is ${fmt(rrNet)}, below ${lim.minRrNet}`; d.gates.push({ code: 'rr', hard: true, overridable: false, text }); d.uncertainty.push(text); action = 'WAIT'; d.waitReasons.unshift('uncertainty: ' + text); overruled('rr'); }
     if (opts.risk && opts.risk.allowed === false) {
       action = 'WAIT'; const text = `risk engine: ${d.risk.blocks.length ? d.risk.blocks.join('; ') : 'order not allowed'}`;
-      d.gates.push({ code: 'risk', hard: true, overridable: false, text }); d.waitReasons.unshift(text);
+      d.gates.push({ code: 'risk', hard: true, overridable: false, text }); d.waitReasons.unshift(text); overruled('risk');
     }
     d.action = action; d.side = side; d.entry = entry; d.stop = stop; d.target = target;
     d.risk.rr = rr; d.risk.rrNet = rd(rrNet); d.risk.stopAtr = stopAtr;
@@ -1117,7 +1119,7 @@
   function matches(lesson, f) {
     if (!lesson || !Array.isArray(lesson.when) || !f) return false;
     for (const c of lesson.when) {
-      const x = f[c.f];
+      const x = Object.prototype.hasOwnProperty.call(f, c.f) ? f[c.f] : null;   // a feature is a value of its own, never a member every object inherits
       if (x === null || x === undefined) { if (c.op === 'eq' && c.v === null) continue; return false; }      // a missing feature never matches
       if (c.op === 'eq') { if (x !== c.v) return false; }
       else if (c.op === 'ne') { if (x === c.v) return false; }

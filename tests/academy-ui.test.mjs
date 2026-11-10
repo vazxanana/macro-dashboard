@@ -3,9 +3,6 @@
 // tests/fixtures/academy/manifest.json) and the whole learning loop run the way the page runs it: the real modules
 // (MXR / MXA / MXK), the real API handler on an in-memory store, real candidates and outcomes. The browser side of the same
 // loop is scripts/audit/academy.cjs (Playwright).
-//
-// Two tests are marked `todo`: they describe bugs found in OTHER modules while building the page (the page works around
-// both). They fail today on purpose and do not fail the run; whoever fixes the module drops the `todo`.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

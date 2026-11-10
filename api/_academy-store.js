@@ -67,7 +67,10 @@ function make(backend, tails = new Map()) {
     // Several files as one step. spec: { name: [key, fallback, cap?] }. fn(values by name) -> { write: { name: value }, result }.
     // Every file is read first (a failed read: nothing written); row files past their cap are rolled into an archive.
     tx: (spec, fn) => locked(Object.values(spec).map((s) => s[0]), async () => {
-      const names = Object.keys(spec), got = await Promise.all(names.map((n) => read(spec[n][0], spec[n][1]))), vals = {}; names.forEach((n, i) => { vals[n] = got[i]; });
+      // what each file held before the step (as text, so nothing fn does to a value can change it): undefined = no file
+      const names = Object.keys(spec), before = new Map(), vals = {};
+      const got = await Promise.all(names.map(async (n) => { const k = checkKey(spec[n][0]); let v; try { v = await backend.read(k); } catch (e) { throw e && e.store ? e : fail(`read ${k}`, e); } const none = v === undefined || v === null; before.set(k, none ? undefined : JSON.stringify(v)); return none ? clone(spec[n][1]) : v; }));
+      names.forEach((n, i) => { vals[n] = got[i]; });
       const out = (await fn(vals)) || {}, w = out.write || {}, steps = [];
       for (const name of Object.keys(w)) {
         const s = spec[name]; if (!s) throw new Error(`tx: ${name} was not declared`);
@@ -75,7 +78,13 @@ function make(backend, tails = new Map()) {
         if (r.archive) steps.unshift([r.archive.key, r.archive.value]);   // archives first: a crash in between duplicates rows, it never loses them
         steps.push([s[0], r.doc]);
       }
-      for (const [k, v] of steps) await write(k, v);
+      // all or nothing: when a later write fails, the files already written are put back (a file the step created is removed).
+      // The undo is best effort; the audit file is the last write of every step, so a step that did not finish has no audit row.
+      const done = [];
+      try { for (const [k, v] of steps) { await write(k, v); done.push(k); } } catch (e) {
+        for (const k of done.reverse()) { try { const old = before.get(k); if (old !== undefined) await backend.write(k, JSON.parse(old)); else if (backend.remove) await backend.remove(k); } catch (e2) { /* the failure itself is what is reported */ } }
+        throw e;
+      }
       return out.result;
     }),
     // append rows to a row file (with its cap)
@@ -94,7 +103,7 @@ function make(backend, tails = new Map()) {
 // In memory (tests): raw is the Map of key -> JSON text. Patch store.backend.read / .write to simulate failures.
 function memoryStore(seed = {}) {
   const raw = new Map(Object.entries(seed).map(([k, v]) => [checkKey(k), JSON.stringify(v)]));
-  const backend = { read: async (k) => (raw.has(k) ? JSON.parse(raw.get(k)) : undefined), write: async (k, v) => { raw.set(k, JSON.stringify(v)); } };
+  const backend = { read: async (k) => (raw.has(k) ? JSON.parse(raw.get(k)) : undefined), write: async (k, v) => { raw.set(k, JSON.stringify(v)); }, remove: async (k) => { raw.delete(k); } };
   return Object.assign(make(backend), { raw, keys: () => [...raw.keys()].sort(), peek: (k) => (raw.has(k) ? JSON.parse(raw.get(k)) : undefined) });
 }
 // A folder of JSON files (local runs: env ACADEMY_STORE_DIR). A file that exists but cannot be read or parsed throws.
@@ -103,6 +112,7 @@ function fileStore(dir) {
   const backend = {
     async read(k) { let txt; try { txt = await fs.promises.readFile(at(k), 'utf8'); } catch (e) { if (e && e.code === 'ENOENT') return undefined; throw e; } return JSON.parse(txt); },
     async write(k, v) { const f = at(k), tmp = `${f}.${process.pid}.tmp`; await fs.promises.mkdir(path.dirname(f), { recursive: true }); await fs.promises.writeFile(tmp, JSON.stringify(v)); await fs.promises.rename(tmp, f); },
+    async remove(k) { try { await fs.promises.unlink(at(k)); } catch (e) { if (!e || e.code !== 'ENOENT') throw e; } },
   };
   return Object.assign(make(backend), { dir });
 }
@@ -126,6 +136,8 @@ function blobBackend(env, io = {}) {
       await B().put(P, json, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token });
       recent.set(P, { json, at: now() }); if (recent.size > 200) recent.delete(recent.keys().next().value);
     },
+    // only ever a file this same step created a moment ago (the undo of a write step that failed half way)
+    async remove(k) { const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); recent.delete(P); if (b) await B().del(b.url, { token }); },
   };
 }
 const blobStore = (env, io = {}) => make(blobBackend(env, io), io.tails || BLOB_TAILS);

@@ -2,9 +2,6 @@
 // Access (every route, enumerated from the handler's own tables so a new route cannot be forgotten), request validation,
 // storage (persistence, separation by edge, a failing store, the namespace), look-ahead, isolation from every trading and
 // order path, and the pacing of the page's API wrapper.
-//
-// Tests marked `todo` state a defect in a file this test's owner does not edit, with the exact fix. They fail today on
-// purpose and do not fail the run.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -76,6 +73,7 @@ const validBodies = (ids) => ({
   'blind.submit': { action: 'blind.submit', blind: { edge: 'gmp', candidateId: 'gmp-1715694000b', action: 'WAIT', text: 'x' } }, miss: { action: 'miss', miss: { edge: 'gmp', t: T0, kind: 'right-wait' } },
   'notebook.add': { action: 'notebook.add', note: { title: 'n2', hypothesis: 'h', dataset: 'd', method: 'm', validation: 'hypothesis' } }, 'model.register': { action: 'model.register', model: { name: 'scorer', version: '2' } },
   'model.promote': { action: 'model.promote', id: ids.model, confirm: true }, 'model.rollback': { action: 'model.rollback', confirm: true }, explain: { action: 'explain', question: 'why?' },
+  analyse: { action: 'analyse', edge: 'gmp', candidateId: 'gmp-1715009700s', attemptId: ids.attempt, snapshot: { t: T0, hash: 'h', bars: {} }, features: { session: 'overlap' }, deterministic: { action: 'WAIT', gates: [] } },
 });
 const getQuery = (name, ids) => ({ get: name, edge: 'gmp', id: name === 'session' ? ids.session : name === 'research' ? '' : CAND.id, cand: CAND.id, t: String(T0), month: '2026-11' });
 // no stack, no file path, no module name in anything the API says
@@ -213,25 +211,20 @@ test('request validation: __proto__ / constructor / prototype keys and control c
   assert.ok(!/\\u00(0[0-8bcef]|1[0-9a-f]|7f)/i.test([...store.raw.values()].join('')), 'no control character anywhere in the store, the audit trail included');
 });
 
-// DEFECT in api/academy.js (only small route additions are this test's owner's to make there): whenOf() and featuresOf() take any
-// name that matches KEY_NAME, and KEY_NAME matches the names every object inherits ("constructor", "toString", "valueOf",
-// "hasOwnProperty" …). MXA.lessons.matches reads f[c.f], which for such a name is the inherited function, never null: a lesson
-// `when: [{ f: 'constructor', op: 'ne', v: 'x' }]` therefore matches EVERY setup of its edge, i.e. it is a lesson with no
-// condition, which the page's own validation forbids (the page refuses unknown feature keys; a direct API call does not).
-// Owner-only, so not an access hole; it is a way to store a lesson that fires on everything.
-// FIX: in api/academy.js, next to KEY_NAME: `const keyName = (k) => typeof k === 'string' && KEY_NAME.test(k) && !(k in Object.prototype);`
-// and use it in whenOf (c.f), featuresOf (k) and the model metrics loop. Belt and braces in assets/academy-core.js matches():
-// `const x = Object.prototype.hasOwnProperty.call(f, c.f) ? f[c.f] : null;`.
-test('a lesson condition or a feature named like an inherited object member ("constructor", "toString") is refused', { todo: 'api/academy.js whenOf / featuresOf: refuse keys that are `in Object.prototype` (see the comment above this test)' }, async () => {
+// KEY_NAME matches the names every object inherits ("constructor", "toString", "valueOf", "hasOwnProperty" …). A lesson
+// `when: [{ f: 'constructor', op: 'ne', v: 'x' }]` would read the inherited function and so match EVERY setup of its edge: a
+// lesson with no condition, which the page's own validation forbids. The API refuses such a key in a lesson condition, a
+// feature object and a model's metrics, and the matcher (assets/academy-core.js matches()) reads own properties only.
+test('a lesson condition or a feature named like an inherited object member ("constructor", "toString") is refused', async () => {
   const store = ST.memoryStore(), own = { who: OWNER, store };
   for (const f of ['constructor', 'toString', 'valueOf', 'hasOwnProperty']) {
     const r = await call('POST', { action: 'lesson.save', lesson: { ...LESSON, when: [{ f, op: 'ne', v: 'x' }] } }, own); assert.ok(r.code >= 400 && r.code < 500, `condition on "${f}": ${r.code}`);
     const a = await call('POST', { ...attempt(), features: { [f]: 1 } }, own); assert.ok(a.code >= 400 && a.code < 500, `feature "${f}": ${a.code}`);
   }
 });
-test('what that defect means, and that the page is not open to it: such a lesson would match every setup; the page\'s validation refuses the key', () => {
+test('such a key cannot match anything: the matcher reads own properties only, and the page\'s validation refuses the key before a save', () => {
   const always = { id: 'x', edge: 'gmp', version: 1, active: true, when: [{ f: 'constructor', op: 'ne', v: 'x' }], then: { action: 'WAIT' } };
-  assert.equal(MXA.lessons.matches(always, { session: 'asia' }), true, 'the core reads the inherited member (reported with the fix above)');
+  assert.equal(MXA.lessons.matches(always, { session: 'asia' }), false, 'the matcher reads own properties only: an inherited member is a missing feature');
   assert.ok(MXA.lessons.validate(always).some((e) => /unknown feature key "constructor"/.test(e)), 'the page validates a lesson before it is saved and refuses this one');
   assert.match(src('assets/academy-ui.js'), /const errs = MXA\.lessons\.validate\(L\)/);
 });
@@ -294,7 +287,7 @@ function failingStore(seed, failAt) {
 const seedOf = async () => { const s = ST.memoryStore(), f = await fill(s); return { seed: Object.fromEntries([...s.raw.entries()].map(([k, v]) => [k, JSON.parse(v)])), ids: f.ids }; };
 test('storage: a failed store write answers 503 in plain words and leaves the earlier state intact (the write that fails is the first of the call)', async () => {
   const { seed, ids } = await seedOf(), bodies = validBodies(ids);
-  for (const name of POSTS.filter((n) => n !== 'explain')) {   // explain writes nothing while the adapter is off
+  for (const name of POSTS.filter((n) => n !== 'explain' && n !== 'analyse')) {   // explain and analyse write nothing while the adapter is off
     const f = failingStore(seed, 1), before = snapStore(f.store), r = await call('POST', bodies[name], { who: OWNER, store: f.store });
     assert.equal(r.code, 503, `${name}: ${JSON.stringify(r.body)}`); assert.deepEqual(r.body, { error: 'the Academy store is unavailable: nothing was saved' }, 'no token, no key, no file name in the answer'); assert.equal(snapStore(f.store), before, `${name}: the earlier state is intact`); assert.equal(f.writes(), 1);
     // and the same call succeeds once the store works again: nothing was half done
@@ -302,21 +295,14 @@ test('storage: a failed store write answers 503 in plain words and leaves the ea
   }
   // a failed READ is a 503 too and writes nothing (a missing file is the only thing read as empty)
   const s2 = ST.memoryStore(seed), before = snapStore(s2); s2.backend.read = async () => { throw new Error('blob read 500'); };
-  for (const name of POSTS.filter((n) => n !== 'explain')) { const r = await call('POST', bodies[name], { who: OWNER, store: s2 }); assert.equal(r.code, 503, name); } assert.equal(snapStore(s2), before);
+  for (const name of POSTS.filter((n) => n !== 'explain' && n !== 'analyse')) { const r = await call('POST', bodies[name], { who: OWNER, store: s2 }); assert.equal(r.code, 503, name); } assert.equal(snapStore(s2), before);
 });
 
-// DEFECT in api/_academy-store.js (not this test's owner's to edit), make() → tx(): the files of one write step are written
-// one after the other (`for (const [k, v] of steps) await write(k, v);`). When a LATER write fails the earlier ones stay:
-// the call answers 503 "nothing was saved" although part of it was. For `attempt` (attempts → seen → dataset → audit): the
-// attempt row is stored without its seen entry or its audit row; the page offers "Try again", and the retry stores the same
-// decision a second time as attempt n + 1.
-// FIX: in tx(), remember what each file held before the step and put it back when a write fails:
-//   const undo = []; try { for (const [k, v] of steps) { undo.push([k, await backend.read(k)]); await write(k, v); } }
-//   catch (e) { for (const [k, old] of undo.reverse()) { try { if (old !== undefined) await backend.write(k, old); else if (backend.remove) await backend.remove(k); } catch (e2) { /* best effort */ } } throw e; }
-// (reads of every file were already made before the first write, so `got` can be reused instead of reading again; a file that
-// did not exist before needs a `remove` on each backend, or an empty row file written back.) The audit file is last in every
-// step, so "no audit row" stays the mark of a step that did not complete.
-test('storage: a store write that fails in the middle of a several-file step leaves the earlier state intact', { todo: 'api/_academy-store.js tx(): roll back the files already written when a later write of the same step fails (see the comment above this test)' }, async () => {
+// One write step is all or nothing (api/_academy-store.js tx()): the files are written one after the other, and when a LATER
+// write fails the ones already written are put back (a file the step created is removed), so a 503 "nothing was saved" is
+// true and a retry cannot store the same decision twice. The audit file is last in every step, so "no audit row" stays the
+// mark of a step that did not complete even if the undo itself could not run.
+test('storage: a store write that fails in the middle of a several-file step leaves the earlier state intact', async () => {
   const { seed, ids } = await seedOf(), bodies = validBodies(ids);
   for (const name of ['attempt', 'correct', 'exam.result', 'blind.submit', 'session.save']) for (const at of [2, 3]) {
     const f = failingStore(seed, at), before = snapStore(f.store), r = await call('POST', bodies[name], { who: OWNER, store: f.store });
@@ -324,7 +310,7 @@ test('storage: a store write that fails in the middle of a several-file step lea
     assert.equal(r.code, 503, name); assert.equal(snapStore(f.store), before, `${name}, write ${at} failed: the files written before it are still changed`);
   }
 });
-test('what that defect means today: after a mid-step failure the audit trail has no row for the half-written step, so it can be found', async () => {
+test('after a mid-step failure the audit trail has no row for the unfinished step', async () => {
   const { seed, ids } = await seedOf(), f = failingStore(seed, 2), auditBefore = f.store.raw.get('audit/2026-11.json');
   const r = await call('POST', validBodies(ids).attempt, { who: OWNER, store: f.store }); assert.equal(r.code, 503);
   assert.equal(f.store.raw.get('audit/2026-11.json'), auditBefore, 'the audit file is the last write of every step: a step that did not finish is not in it');
@@ -381,13 +367,10 @@ test('look-ahead: a snapshot never holds a bar that closes after its time, a can
   // the API: a candidate never carries an outcome field, and an outcome is refused until the attempt for that setup is stored
   for (const f of ['R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR']) assert.ok(!(f in CAND), `cand-gmp.json has no ${f}`);
 });
-// GAP in assets/academy-replay.js and assets/academy-core.js (not this test's owner's to edit): the outcome file's fields are
-// id, R, netR, exitT, exit, reason, mfeR, maeR (api/academy.js OUT_FIELDS). Both guards list the others; neither lists `reason`
-// (how the trade ended: "stop", "target", "trail"), and MXR.guard does not list `result`. No candidate can carry them today (the
-// API hands out candidates through a whitelist of fields, tested above), so nothing leaks; the guards are the second lock and
-// should know every outcome field.
-// FIX: assets/academy-replay.js line "const OUTCOME_KEYS = [...]": add 'reason', 'result'; assets/academy-core.js OUTCOME_KEYS: add 'reason'.
-test('look-ahead: both guards refuse EVERY field of the outcome file on a candidate, `reason` and `result` included', { todo: "assets/academy-replay.js and assets/academy-core.js OUTCOME_KEYS: add 'reason' (and 'result' in the replay module)" }, () => {
+// The outcome file's fields are id, R, netR, exitT, exit, reason, mfeR, maeR and, on some edges, unitR, add, fillT (api/academy.js
+// OUT_FIELDS). No candidate can carry them (the API hands out candidates through a whitelist of fields, tested above); the two
+// guards are the second lock and know every one of them, `reason` (how the trade ended) and `result` included.
+test('look-ahead: both guards refuse EVERY field of the outcome file on a candidate, `reason` and `result` included', () => {
   const snap = MXR.snapshot({ edge: 'gmp', market: 'xau', t: CAND.t, cand: CAND, series: { '5m': [] }, dataVersion: 'x' });
   for (const k of ['R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR', 'outcome', 'result']) { assert.throws(() => MXR.guard({ ...snap, cand: { ...CAND, [k]: 'stop' } }), (e) => e.code === 'LOOKAHEAD', `MXR.guard: ${k}`); assert.throws(() => MXA.assertNoFuture({ ...snap, cand: { ...CAND, [k]: 'stop' } }), /./, `MXA.assertNoFuture: ${k}`); }
 });
@@ -411,7 +394,7 @@ test('look-ahead: the API hands out no outcome before the attempt, hides a blind
 
 // ==== isolation ==============================================================================================================
 const walk = (d, ok) => (fs.existsSync(path.join(ROOT, d)) ? fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? (e.name === '__pycache__' || e.name === 'node_modules' ? [] : walk(d + '/' + e.name, ok)) : ok.test(e.name) ? [d + '/' + e.name] : [])) : []);
-const RUNTIME = ['academy.html', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js', 'scripts/academy-dev.mjs', ...walk('assets', /^academy[\w-]*\.(js|css)$/), ...walk('ml', /\.(py|mjs|js|sh|toml|txt|cfg|ya?ml)$/)];
+const RUNTIME = ['academy.html', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js', 'api/_academy-analyst.js', 'scripts/academy-dev.mjs', 'scripts/academy-fake-llm.cjs', ...walk('assets', /^academy[\w-]*\.(js|css)$/), ...walk('ml', /\.(py|mjs|js|sh|toml|txt|cfg|ya?ml)$/)];
 const GENERATORS = walk('academy', /\.(mjs|js)$/);
 const ACADEMY_FILES = [...RUNTIME, ...GENERATORS];
 test('isolation: no file of the Academy references the trader, the mirror, a broker, an order call, the council-data writer or a production write token', () => {
@@ -443,7 +426,9 @@ test('isolation: no file of the Academy references the trader, the mirror, a bro
   const blob = ACADEMY_FILES.filter((f) => /BLOB_READ_WRITE_TOKEN/.test(src(f))); assert.deepEqual(blob.sort(), ['api/_academy-store.js', 'api/academy.js']);
   // the session module is read for the owner check and for nothing else
   assert.deepEqual([...src('api/academy.js').matchAll(/\bS\.(\w+)/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort(), ['defaultDeps', 'fromRequest', 'sameOrigin']);
-  assert.deepEqual([...src('api/academy.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:fs', 'node:path', 'node:crypto', 'node:url', './_session.js', './_academy-store.js', './_academy-llm.js']);
+  assert.deepEqual([...src('api/academy.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:fs', 'node:path', 'node:crypto', 'node:url', './_session.js', './_academy-store.js', './_academy-llm.js', './_academy-analyst.js']);
+  // the analyst module reads the decision core (the hard gates it holds an answer to) and nothing else; the adapter reads nothing
+  assert.deepEqual([...src('api/_academy-analyst.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['../assets/academy-core.js']); assert.deepEqual([...src('api/_academy-llm.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:crypto']);
   // the network: the page talks to its own API and the candle proxy; the API talks to the Blob store and, only when the owner sets a key, to the language-model address
   for (const f of ['assets/academy-ui.js', 'assets/academy-tabs.js', 'assets/academy-core.js', 'assets/academy-risk.js']) assert.ok(!/https?:\/\/(?!www\.w3\.org)/.test(src(f)), `${f} names no outside address`);
   assert.deepEqual([...new Set([...(src('assets/academy-ui.js') + src('assets/academy-tabs.js') + src('assets/academy-replay.js')).matchAll(/['"`](\/(?:api|md|cdata)\/[a-z-]+)/g)].map((m) => m[1]))].sort(), ['/api/academy', '/md/bars']);

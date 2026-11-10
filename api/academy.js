@@ -99,7 +99,7 @@ function featuresOf(v, name) {
   if (v == null) return null; obj(v, name); const ks = Object.keys(v); if (ks.length > 200) bad(`${name}: 200 features at most`);
   const o = {};
   for (const k of ks) {
-    if (!KEY_NAME.test(k)) bad(`${name}: "${k.slice(0, 40).replace(CTRL, '')}" is not a feature key`);
+    if (!KEY_NAME.test(k) || k in Object.prototype) bad(`${name}: "${k.slice(0, 40).replace(CTRL, '')}" is not a feature key`);
     const x = v[k]; o[k] = x == null ? null : typeof x === 'boolean' ? x : typeof x === 'number' ? numOrNull(x, `${name}.${k}`) : typeof x === 'string' ? text(x, 120, `${name}.${k}`) : bad(`${name}.${k} must be a number or a short text`);
   }
   return o;
@@ -137,7 +137,7 @@ function decisionOf(v, name, X, edge, candidateId) {
 }
 function whenOf(v, name) {
   return list(v, 20, name, (c, n) => {
-    obj(c, n); const f = typeof c.f === 'string' && KEY_NAME.test(c.f) ? c.f : bad(`${n}.f is not a feature key`), op = oneOf(c.op, OPS, `${n}.op`), val = c.v;
+    obj(c, n); const f = typeof c.f === 'string' && KEY_NAME.test(c.f) && !(c.f in Object.prototype) ? c.f : bad(`${n}.f is not a feature key`), op = oneOf(c.op, OPS, `${n}.op`), val = c.v;
     const scalar = (x, m) => (typeof x === 'number' ? numOrNull(x, m) : typeof x === 'string' ? text(x, 120, m) : typeof x === 'boolean' ? x : bad(`${m} must be a number, a short text or true / false`));
     if (op === 'in') return { f, op, v: Array.isArray(val) && val.length && val.length <= 20 ? val.map((x, i) => scalar(x, `${n}.v[${i}]`)) : bad(`${n}.v must be a list of 1 to 20 values for "in"`) };
     if (op === 'between') return { f, op, v: Array.isArray(val) && val.length === 2 && val.every((x) => typeof x === 'number' && Number.isFinite(x)) && val[0] <= val[1] ? [val[0], val[1]] : bad(`${n}.v must be [low, high] for "between"`) };
@@ -661,7 +661,7 @@ const POST = {
   // A registry only. Nothing is ever promoted here: a model becomes champion only through model.promote, by the owner.
   async 'model.register'(X, b) {
     const m = obj(b.model, 'model'); if (m.status === 'champion') bad('a model becomes champion only through model.promote');
-    const metrics = {}; if (m.metrics != null) { obj(m.metrics, 'model.metrics'); const ks = Object.keys(m.metrics); if (ks.length > 60) bad('model.metrics: 60 values at most'); for (const k of ks) { if (!KEY_NAME.test(k)) bad(`model.metrics: "${k.slice(0, 40).replace(CTRL, '')}" is not a metric name`); metrics[k] = typeof m.metrics[k] === 'string' ? text(m.metrics[k], 80, `model.metrics.${k}`) : numOrNull(m.metrics[k], `model.metrics.${k}`); } }
+    const metrics = {}; if (m.metrics != null) { obj(m.metrics, 'model.metrics'); const ks = Object.keys(m.metrics); if (ks.length > 60) bad('model.metrics: 60 values at most'); for (const k of ks) { if (!KEY_NAME.test(k) || k in Object.prototype) bad(`model.metrics: "${k.slice(0, 40).replace(CTRL, '')}" is not a metric name`); metrics[k] = typeof m.metrics[k] === 'string' ? text(m.metrics[k], 80, `model.metrics.${k}`) : numOrNull(m.metrics[k], `model.metrics.${k}`); } }
     const model = { name: text(m.name, 80, 'model.name', true), version: text(m.version, 40, 'model.version', true), kind: text(m.kind, 40, 'model.kind'), edge: m.edge == null || m.edge === '' ? null : await X.edge(m.edge, 'model.edge', true),
       status: m.status == null ? 'challenger' : oneOf(m.status, MODEL_STATUS, 'model.status'), metrics, datasetVersion: textOrNull(m.datasetVersion, 40, 'model.datasetVersion'), trainedOn: m.trainedOn == null ? null : safe(obj(m.trainedOn, 'model.trainedOn'), 'model.trainedOn', 7),
       artifact: textOrNull(m.artifact, 200, 'model.artifact'), hash: textOrNull(m.hash, 80, 'model.hash'), notes: text(m.notes, 2000, 'model.notes') };

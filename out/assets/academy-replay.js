@@ -229,7 +229,7 @@
   }
 
   // ---- snapshot, guard, hash --------------------------------------------------------------------------------------
-  const OUTCOME_KEYS = ['R', 'netR', 'exitT', 'exit', 'mfeR', 'maeR', 'outcome'];   // never on a Candidate (contract, section 5)
+  const OUTCOME_KEYS = ['R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR', 'unitR', 'add', 'fillT', 'outcome', 'result'];   // never on a Candidate (contract, section 5)
   const tfOrder = (keys) => keys.slice().sort((x, y) => secOf(x) - secOf(y));
 
   // MXR.snapshot({ edge, market, t, cand, series, inter, events, schedule, dataVersion, keep })
