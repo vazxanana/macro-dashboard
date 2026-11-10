@@ -313,7 +313,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "gtl",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T20:02:12.000Z",
     "councilEntry": 4138.15,
     "stop": 4051.6,
@@ -328,13 +328,15 @@
     "lagSec": 78,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T20:02:12.000Z",
     "brokerStop": 4055.22,
     "rr": 10,
     "amended": 4,
-    "amendedAt": "2026-11-10T13:22:38.000Z"
+    "amendedAt": "2026-11-10T13:22:38.000Z",
+    "closedAt": "2026-11-10T13:33:11.000Z"
    },
    "xau-geg-1794096000": {
     "symbol": "XAUUSD",
@@ -347,7 +349,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4073.45,
@@ -361,10 +364,11 @@
     "lagSec": 37590,
     "positionId": "47826388",
     "volume": 100,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 10,
     "amended": 4,
-    "amendedAt": "2026-11-10T13:22:38.000Z"
+    "amendedAt": "2026-11-10T13:22:38.000Z",
+    "closedAt": "2026-11-10T13:33:11.000Z"
    }
   },
   "day": {
@@ -372,9 +376,9 @@
    "startBalance": 9967.42
   },
   "startedAt": "2026-11-07T19:38:16.000Z",
-  "status": "ok · demo Fusion Markets · balance 9967.42 · 5 open · 1 resting",
-  "balance": 9967.42,
-  "lastRun": "2026-11-10T13:29:52.000Z",
+  "status": "ok · demo Fusion Markets · balance 9855.97 · 3 open · 1 resting",
+  "balance": 9855.97,
+  "lastRun": "2026-11-10T13:33:11.000Z",
   "catchUpAt": "2026-11-08T09:14:33.000Z",
   "wait": {
    "eurusd-rswing-1793610380": {
@@ -429,28 +433,27 @@
    }
   },
   "skipped": {
-   "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
-   "xrp-rswing-1793942619": "none of XRPUSD found at the broker"
+   "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T09:39:48.000Z",
   "orders": {
    "xau-geg-1793664000": {
-    "orderId": "33866658",
+    "orderId": "33868822",
     "symbol": "XAUUSD",
     "side": "buy",
     "volume": 100,
     "lots": 0.01,
     "digits": 2,
     "setup": "geg",
-    "limitPrice": 3971.36,
-    "stop": 3895.27,
-    "t1": 4732.26,
-    "placedAt": "2026-11-10T13:22:38.000Z",
+    "limitPrice": 3981.87,
+    "stop": 3910.13,
+    "t1": 4699.27,
+    "placedAt": "2026-11-10T13:33:11.000Z",
     "expires": "2026-11-26T09:15:28.000Z",
-    "riskCash": 76.09,
-    "margin": 8.15,
+    "riskCash": 71.74,
+    "margin": 8.14,
     "minLot": true,
     "alerted": [
      "pending"
@@ -459,26 +462,6 @@
   }
  },
  "log": [
-  {
-   "at": "2026-11-08T09:50:24.000Z",
-   "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 10:00 UTC) (will retry)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-08T09:50:24.000Z",
-   "msg": "not mirrored yet usdcad-swing-1793949081: USDCAD market closed (paused until 10:00 UTC) (will retry)",
-   "trade": "usdcad-swing-1793949081"
-  },
-  {
-   "at": "2026-11-08T09:50:24.000Z",
-   "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "audusd-scalp-1793949425"
-  },
-  {
-   "at": "2026-11-08T09:50:24.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 10:00 UTC) (will retry)",
-   "trade": "audusd-intraday-1793949765"
-  },
   {
    "at": "2026-11-08T09:50:24.000Z",
    "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 10:00 UTC) (will retry)",
@@ -1957,6 +1940,26 @@
   {
    "at": "2026-11-10T13:22:38.000Z",
    "msg": "placed buy limit XAUUSD 0.01 lot at 3971.36 (council geg, valid to 2026-11-26T09:15Z)",
+   "trade": "xau-geg-1793664000"
+  },
+  {
+   "at": "2026-11-10T13:33:11.000Z",
+   "msg": "cancelled XAUUSD limit order 33866658 for xau-geg-1793664000: the council re-quoted the order (entry 3971.36 -> 3981.87)",
+   "trade": "xau-geg-1793664000"
+  },
+  {
+   "at": "2026-11-10T13:33:11.000Z",
+   "msg": "XAUUSD position 47783577 closed at the broker",
+   "trade": "xau-gtl-1793836800-1794182400"
+  },
+  {
+   "at": "2026-11-10T13:33:11.000Z",
+   "msg": "XAUUSD position 47826388 closed at the broker",
+   "trade": "xau-geg-1794096000"
+  },
+  {
+   "at": "2026-11-10T13:33:11.000Z",
+   "msg": "placed buy limit XAUUSD 0.01 lot at 3981.87 (council geg, valid to 2026-11-26T09:15Z)",
    "trade": "xau-geg-1793664000"
   }
  ],
