@@ -7,7 +7,8 @@ modules is `docs/academy/ARCHITECTURE.md`.
 
 - **Branch:** `claude/website-display-xoyadz` (development; a draft PR, never merged to `main` without the owner: `main`
   auto-deploys to production).
-- **Current phase:** 1 (audit and foundation) done; 2 (first complete learning loop): modules done and integrated, the page in progress.
+- **Current phase:** 1 to 7 built and verified on the development branch (see "Next (not done)" for the gaps); 8 (preview and
+  production) waits for the owner.
 
 ## Previous work stopped or preserved (10 Nov)
 
@@ -75,16 +76,35 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - [x] API reads for the page: corrections, research, evaluation, training report; module bugs found by the page work fixed
   (a stored decision keeps whether a lesson was applied; evidence text gives dates).
 
+- [x] **All page sections** (`assets/academy-tabs.js`): Lessons (revise with a diff, switch off / on, research drafts with
+  their evidence), Progress and mistakes (recall and new-setup records side by side, error classes, a 1 / 3 / 7 / 21-day
+  review queue), Research lab and the owner's notebook, Models (training report and registry; promotion is a manual owner
+  step), Costs, Audit trail, Blind arena (the mentor answers before the engine's stored answer is shown; the result is read
+  last), Session training with missed opportunities and "right to wait" notes. API additions: `get=blind`, `get=misses`,
+  `action: miss`.
+- [x] **Inside the production firewall limit** (30 requests a minute on /api): the page paces itself to 24 Academy calls a
+  minute, waits out a 429, never drops a write. Measured: 1 call a train decision, 2 a test setup, 3 a blind setup.
+- [x] Owner-only link to `/academy` in the Desk's account menu (checked by the lead: owner sees it; reviewer, viewer and
+  guest do not).
+
 ## In progress
 
-- [ ] Remaining tabs on the page (session training, blind arena, progress and mistakes, lessons manager, research lab and
-  notebook, model registry, costs, audit trail) through `MXAC.registerTab`, and an owner-only way into `/academy` from the Desk.
+Nothing is running. All module, page, dataset, training and research branches are merged into the development branch.
 
-## Next
+## Next (not done)
 
-- [ ] Missed-opportunity learning and whole-session training flows; spaced repetition of mistakes.
-- [ ] Security and cost review of the Academy API; a full live-candle run of the loop on each edge.
-- [ ] Preview (needs the owner's say-so: branch previews are skipped by `scripts/vercel-ignore.sh`).
+- [ ] **Preview / production**: nothing is deployed. `main` and production are untouched; branch previews are skipped by
+  `scripts/vercel-ignore.sh`. Merging PR #1 is the owner's decision.
+- [ ] First real use: the store is empty in production until the owner trains. Every number on the page comes from the
+  owner's own stored attempts; the audit's rows live only in temporary test stores.
+- [ ] The policy does not beat taking every setup yet (table above): improving it is what the mentor's lessons and the
+  research drafts are for; it was deliberately not tuned on the training results.
+- [ ] Not built: automatic promotion (by design), a browser upload of model files (promotion is documented as a manual API
+  step), a dollar-index series for gold decisions (no candles for it), live-candle runs of the Blind and Session tabs
+  (recorded candles only), four difficulty levels beyond the filter the Train tab has, alternative-decision simulation in
+  the page (the core function `MXA.simulate` exists and is tested; no panel uses it yet).
+- [ ] Owner decisions: the research-candle clock fix and study re-runs; whether `/api/academy` should get a higher firewall
+  limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption.
 
 ## Architecture decisions
 
@@ -93,17 +113,24 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **882 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
+- Whole suite on the development branch: **909 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
   before the Academy). Academy files: `tests/academy-replay.test.mjs` (23), `academy-core` (37), `academy-api` (21),
   `academy-risk` (8), `academy-edges` (20), `academy-ml` (13), `academy-research` (19), `academy-ui`. Model parity:
   `node ml/parity.mjs`.
-- `node scripts/audit/academy.cjs`: **88 of 88** (run by the lead, twice): the clock pauses on a real setup, the decision and
+- `node scripts/audit/academy.cjs`: **202 of 202** (run by the lead after the last merge; 88 of 88 before the sections were
+  added). The loop part: the clock pauses on a real setup, the decision and
   its evidence are stored, a SELL corrected to WAIT becomes a lesson, the same-trade replay gives WAIT with the lesson applied
   ("learned"), the test on 3 unseen setups stores both answers (with lessons 0.00R against +1.42R without, n = 3, "too few to
   judge": this lesson passes recall and does not help on new setups, which is exactly what the split is for), a reload keeps
   everything, no snapshot held a future bar, no outcome was asked for before its attempt.
-- Live candles (page agent's run, all seven edges reached a stored decision); the full correct → lesson → exam loop was
-  walked on recorded candles only.
+- Live candles: all seven edges reached a stored decision (page agent's run). The lead walked the whole loop on live
+  NAS100 candles for nq-open (30 Jul to 28 Sep 2026, pacing on): SELL with low confidence (25 similar past cases, 28 % winners,
+  −0.19R) → corrected to WAIT → lesson "session = overlap → WAIT" saved → same-trade replay "Learned" → 10 new setups tested
+  and stored → 27 audit rows, no page error.
+- Desk link by role (lead's Playwright check): owner visible; reviewer, viewer, guest hidden.
+- API review by the lead: method, same-origin, session and owner checks run before any work; ids, edges, months and session
+  ids are validated by pattern; bodies are capped at 256 KB; errors are generic; the language-model key is read from the
+  environment only and never returned.
 - `sh scripts/build.sh` leaves `out/` unchanged (CI "build" check).
 - Replay + core on real gold candles from the live candle proxy (12 Mar 2025): regime read, WAIT with reasons.
 - Candidates against the live candle proxy (30 usable setups an edge, entry price against the 5m candles within 10 minutes
@@ -129,5 +156,6 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Next executable step
 
-Build the remaining tabs on `MXAC.registerTab` (branch `academy-ui2`), merge, rerun the suite and the audit, then the
-security and cost review.
+Owner review of draft PR #1 (`claude/website-display-xoyadz`). To see it locally: `sh scripts/build.sh && node
+scripts/academy-dev.mjs` then open `http://127.0.0.1:8770/academy` (recorded candles; add `--live` and
+`node --use-env-proxy` for live ones).
