@@ -485,3 +485,51 @@ test('the generated files are read from academy/data (edges.json fallback, cand-
     assert.deepEqual((await get(mk({ data: fileData(root) }), { get: 'edges' })).body.edges.map((e) => e.id), ['replica', 'gtl']);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
+
+test('flagged setups (clock-shifted week, before 2020) are left out, never a test; history gives only finished train cases before t', async () => {
+  const cands = CANDS.concat([
+    { id: 'replica:c1', edge: 'replica', market: 'xau', t: T0 + 600, side: 'buy', entry: 2001, stop: 1996, target: 2011, tf: '15m', rule: { clockShift: true }, edgeVersion: 'ev1', pool: 'train' },
+    { id: 'replica:p1', edge: 'replica', market: 'xau', t: T0 - 9e7, side: 'buy', entry: 1500, stop: 1495, target: 1510, tf: '15m', rule: { pre2020: true }, edgeVersion: 'ev1', pool: 'train' },
+    { id: 'replica:xc', edge: 'replica', market: 'xau', t: T0 + 20000, side: 'buy', entry: 2050, stop: 2045, target: 2060, tf: '15m', rule: { clockShift: true }, edgeVersion: 'ev1', pool: 'exam' },
+    { id: 'replica:3', edge: 'replica', market: 'xau', t: T0 + 30000, side: 'buy', entry: 2050, stop: 2045, target: 2060, tf: '15m', rule: {}, edgeVersion: 'ev1', pool: 'train' },
+  ]);
+  const outs = { ...OUTS, 'replica:c1': { id: 'replica:c1', R: 1, netR: 0.9, exitT: T0 + 700, exit: 2011, reason: 'target' }, 'replica:p1': { id: 'replica:p1', R: 1, netR: 0.9, exitT: T0 - 8e7, exit: 1510, reason: 'target' } };
+  const lite = (regime) => ({ regime, biasAlign: 'with' });
+  const feats = { version: 'f1', features: { 'replica:1': lite('trend'), 'replica:2': lite('range'), 'replica:x1': lite('trend'), 'replica:c1': lite('trend'), 'replica:p1': lite('trend') } };
+  const data = { ...DATA, candidates: async (e) => (e === 'replica' ? cands : null), outcomes: async (e) => (e === 'replica' ? { outcomes: outs } : null), features: async (e) => (e === 'replica' ? feats : null) };
+  const c = mk({ data });
+  const tr = (await get(c, { get: 'candidates', edge: 'replica' })).body;
+  assert.deepEqual(tr.candidates.map((x) => x.id), ['replica:1', 'replica:2', 'replica:3']); assert.deepEqual(tr.excluded, { clockShift: 1, pre2020: 1 });
+  assert.deepEqual((await get(c, { get: 'candidates', edge: 'replica', flagged: '1' })).body.candidates.map((x) => x.id), ['replica:p1', 'replica:1', 'replica:c1', 'replica:2', 'replica:3']);
+  const ex = (await get(c, { get: 'candidates', edge: 'replica', pool: 'exam', flagged: '1' })).body;
+  assert.ok(!ex.candidates.some((x) => x.id === 'replica:xc'), 'a flagged setup is never offered as a test, whatever is asked'); assert.equal(ex.excluded.clockShift, 1);
+  // a flagged setup may be studied in training, but never scored as a test or a blind comparison
+  assert.equal((await post(c, attempt({ candidateId: 'replica:c1' }, { candidateId: 'replica:c1' }))).code, 200);
+  for (const mode of ['exam', 'blind']) { const r = await post(c, attempt({ candidateId: 'replica:xc', mode }, { candidateId: 'replica:xc' })); assert.equal(r.code, 400); assert.match(r.body.error, /flagged clockShift/); }
+
+  // history: train pool, not flagged, trade finished before the moment asked about; no ids, no prices
+  const h = (await get(c, { get: 'history', edge: 'replica', cand: 'replica:3' })).body;
+  assert.equal(h.available, true); assert.equal(h.before, T0 + 30000); assert.equal(h.version, 'f1');
+  assert.deepEqual(h.rows, [{ t: T0, exitT: T0 + 900, netR: -1.05, features: lite('trend') }, { t: T0 + 3600, exitT: T0 + 5000, netR: 1.9, features: lite('range') }]);
+  assert.ok(!JSON.stringify(h).includes('replica:'), 'no candidate id leaves through history');
+  // a case still open at that moment is not history yet (replica:2 exits at T0 + 5000)
+  assert.deepEqual((await get(c, { get: 'history', edge: 'replica', before: String(T0 + 4000) })).body.rows.map((r) => r.t), [T0]);
+  assert.deepEqual((await get(c, { get: 'history', edge: 'replica', cand: 'replica:1' })).body.rows, [], 'nothing comes before the first setup');
+  // far in the future: still no exam-pool or flagged result
+  const far = (await get(c, { get: 'history', edge: 'replica', before: String(T0 + 9e8) })).body; assert.equal(far.total, 2);
+  assert.equal((await get(c, { get: 'history', edge: 'replica' })).code, 400); assert.equal((await get(c, { get: 'history', edge: 'replica', cand: 'replica:nope' })).code, 404);
+  // no feature file yet: an honest empty answer, not an error
+  const none = (await get(mk(), { get: 'history', edge: 'replica', cand: 'replica:2' })).body; assert.equal(none.available, false); assert.deepEqual(none.rows, []);
+});
+
+test('the generated files of the seven edges load through the API as they are', async () => {
+  const c = mk({ data: undefined });
+  const eg = (await get(c, { get: 'edges' })).body.edges; assert.deepEqual(eg.map((e) => e.id), ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open']);
+  for (const e of eg) {
+    const tr = (await get(c, { get: 'candidates', edge: e.id, limit: '5000' })).body, ex = (await get(c, { get: 'candidates', edge: e.id, pool: 'exam', limit: '5000' })).body;
+    assert.ok(tr.total > 10 && ex.total > 5, `${e.id}: ${tr.total} train, ${ex.total} exam`);
+    for (const x of tr.candidates.concat(ex.candidates)) { assert.ok(x.t >= Date.UTC(2020, 0, 1) / 1000, `${x.id} is inside the evaluation window`); assert.ok(!x.rule || (!x.rule.clockShift && !x.rule.pre2020)); assert.ok(Number.isFinite(x.stop), `${x.id} has a stop`); for (const k of ['R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR']) assert.ok(!(k in x), `${x.id} carries no ${k}`); }
+    // the outcome stays shut until a decision is stored
+    assert.equal((await get(c, { get: 'outcome', edge: e.id, id: tr.candidates[0].id })).code, 403);
+  }
+});

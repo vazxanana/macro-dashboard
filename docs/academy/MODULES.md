@@ -58,6 +58,11 @@ tested). Full signatures are in each file's header comments and its tests.
   correction: {…} }`, `{ action: 'lesson.save', lesson: {…} }`, `session`, `result`, `blind`, `note`, `model`.
 - Ids are made by the server; a revised lesson gets a **new id** (`supersedes` = the old id, `root` = the first), and the
   old version is kept with `active: false`. Feed `MXA.lessons.retrieve` the list from `GET ?get=lessons&edge=&active=1`.
+- `GET ?get=candidates` leaves out setups flagged `rule.clockShift` / `rule.pre2020` (counts in `excluded`); `flagged=1`
+  lists them in the train pool for study. A flagged setup is refused as an `exam` or `blind` attempt.
+- `GET ?get=history&edge=&cand=<id>` (or `&before=<t>`) → `{ available, rows: [{ t, exitT, netR, features }] }` for
+  `MXA.decide(…, { history })`: train pool, not flagged, trade finished before that time, no ids. `available: false` until
+  `academy/data/feat-<edge>.json` (`{ version, features: { <candidateId>: MXA.lite(features) } }`) exists.
 - `GET ?get=outcome&id=` answers 403 until an attempt for that candidate is stored (and while a blind answer is pending).
 - `pool=exam` candidates refuse `train` / `replay-same` attempts; an exam candidate can be decided once.
 - Blind flow: post the engine's attempt with `mode: 'blind'` (kept hidden), then `blind.submit` with the mentor's answer
@@ -65,3 +70,12 @@ tested). Full signatures are in each file's header comments and its tests.
 - Extras: `GET ?get=dataset&edge=` (Layer B rows, mentor label and outcome kept apart), `errorClass` on corrections.
 - Local runs: set `ACADEMY_STORE_DIR` to use a file store instead of the Blob.
 - The language-model adapter is off without `ACADEMY_LLM_KEY`; `explain` then answers `{ available: false }`.
+
+## Edges · `academy/edges.mjs`, `academy/data/` (tests: `tests/academy-edges.test.mjs`)
+
+- `EDGES` (registry: definition, `signalTf`, `costPerRoundTrip`, `study`, `version`), `poolOf`, `EVAL_FROM`.
+- `cand-<edge>.json` is an array of candidates; `out-<edge>.json` is a map by candidate id. Outcome extras: `unitR`, `add`,
+  `fillT`; an order that never filled has `R = netR = 0` and reason `missed` / `expired` / `cancelled`.
+- `nq-open` candidates carry `tf: '1m'`; the core judges that edge on 5m bars.
+- Regenerate (about 40 s, deterministic): `ACADEMY_CANDLES=<dir outside the repo> node academy/gen/run.mjs`. The candles are
+  the council-data `research/candles/` HistData files.

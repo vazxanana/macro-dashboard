@@ -13,6 +13,8 @@
 // GET  /api/academy?get=
 //   edges                                   the registry (academy/edges.mjs, else academy/data/edges.json, else 503)
 //   candidates&edge=&pool=train|exam&from=&to=&limit=&offset=     no outcome fields, ever; pool=exam: only ids never marked seen
+//                                           flagged setups (rule.clockShift, rule.pre2020) are left out; flagged=1 lists them (train only)
+//   history&edge=&cand=|before=             past train-pool cases finished before that time: { t, exitT, netR, features }, no ids
 //   outcome&id=&edge=                       403 "decide first" until an attempt for that candidate is stored (no peeking)
 //   lessons&edge=&active=1                  all versions, newest first, with stats
 //   attempts&edge=&cand=&limit=             oldest first; a blind attempt hides its decision until the mentor has answered
@@ -150,6 +152,7 @@ function fileData(root) {
     },
     async candidates(edge) { return json(path.join(dir, 'data', `cand-${edge}.json`)); },
     async outcomes(edge) { return json(path.join(dir, 'data', `out-${edge}.json`)); },
+    async features(edge) { return json(path.join(dir, 'data', `feat-${edge}.json`)); },
   };
 }
 const DATA = new Map();
@@ -185,9 +188,13 @@ function gradeR(dec, side, out) {
   if ((dec.action === 'BUY' && side === 'buy') || (dec.action === 'SELL' && side === 'sell')) { const r = typeof out.netR === 'number' ? out.netR : out.R; return typeof r === 'number' && Number.isFinite(r) ? r : null; }
   return null;
 }
+// candidates the Edges module flags: `clockShift` (the research candles are stamped an hour early in that week, so the setup
+// cannot be replayed on another feed) and `pre2020` (outside the 2020 -> now evaluation window). Left out by default; never a test.
+const flagOf = (c) => (isObj(c.rule) && c.rule.clockShift ? 'clockShift' : isObj(c.rule) && c.rule.pre2020 ? 'pre2020' : null);
 // exam candidates are only for tests, and a test is only on an exam candidate
 function poolRule(cand, mode, what) {
   if (!cand) return;
+  if (flagOf(cand) && (mode === 'exam' || mode === 'blind')) bad(`${what}: this setup is flagged ${flagOf(cand)} and is never scored as a test`);
   if (cand.pool === 'exam' && (mode === 'train' || mode === 'replay-same')) bad(`${what}: an exam candidate is only for tests on new setups`);
   if (cand.pool !== 'exam' && mode === 'exam') bad(`${what}: a test on a new setup needs an exam-pool candidate`);
 }
@@ -233,11 +240,37 @@ const GET = {
     const from = qNum(q.from, 'from'), to = qNum(q.to, 'to'), limit = qInt(q.limit, 'limit', 500, 1, 5000), offset = qInt(q.offset, 'offset', 0, 0, 1e7);
     const seen = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids;
     let rows = candList(raw).filter((c) => (pool === 'exam' ? c.pool === 'exam' : c.pool !== 'exam') && (from == null || c.t >= from) && (to == null || c.t <= to));
+    // flagged setups (clock-shifted week, before 2020) are left out; flagged=1 lists them for study in the train pool, never in a test
+    const flagged = pool === 'train' && (q.flagged === '1' || q.flagged === 'true'), excluded = { clockShift: 0, pre2020: 0 };
+    rows = rows.filter((c) => { const f = flagOf(c); if (!f) return true; excluded[f]++; return flagged; });
     if (pool === 'exam') rows = rows.filter((c) => !Object.prototype.hasOwnProperty.call(seen, c.id));   // a test is only ever on a setup never shown before
     rows.sort((a, b) => a.t - b.t);
-    const page = rows.slice(offset, offset + limit).map(candView), out = { edge, pool, total: rows.length, count: page.length, candidates: page };
+    const page = rows.slice(offset, offset + limit).map(candView), out = { edge, pool, total: rows.length, count: page.length, excluded: flagged ? { clockShift: 0, pre2020: 0 } : excluded, candidates: page };
     if (pool === 'train') { out.seen = {}; for (const c of page) if (seen[c.id]) out.seen[c.id] = { mode: seen[c.id].mode, attempts: seen[c.id].attempts || 0, last: seen[c.id].last }; }
     return out;
+  },
+
+  // Past cases for "similar history": train-pool setups of this edge whose trade had FINISHED before the moment asked about
+  // (cand = that candidate's own signal time, or before = a replay time). Rows carry no id and no price: only the time, the
+  // net result and the small feature set (academy/data/feat-<edge>.json, written by the dataset step). Exam-pool and flagged
+  // setups are never in it, so a test setup's result cannot be read here.
+  async history(X, q) {
+    const edge = await X.edge(q.edge), raw = await X.data.candidates(edge); if (raw == null) bad(`candidates not generated yet for ${edge}`, 503);
+    const all = candList(raw); let before = qNum(q.before, 'before');
+    if (q.cand != null && q.cand !== '') { const c = all.find((x) => x.id === idOf(q.cand, 'cand')); if (!c) bad('no such candidate', 404); before = c.t; }
+    if (before == null) bad('history needs cand or before');
+    const outs = await X.data.outcomes(edge), feats = typeof X.data.features === 'function' ? await X.data.features(edge) : null;
+    if (outs == null || !isObj(feats)) return { edge, before, available: false, total: 0, rows: [], note: 'past-case features are not generated yet for this edge' };
+    const F = isObj(feats.features) ? feats.features : isObj(feats.rows) ? feats.rows : feats, rows = [];
+    for (const c of all) {
+      if (c.pool === 'exam' || flagOf(c) || !(c.t < before)) continue;
+      const o = outcomeOf(outs, c.id), f = Object.prototype.hasOwnProperty.call(F, c.id) ? F[c.id] : null;
+      if (!o || typeof o.netR !== 'number' || !Number.isFinite(o.netR) || !(o.exitT < before) || !isObj(f)) continue;
+      if (o.reason === 'missed' || o.reason === 'expired' || o.reason === 'cancelled') continue;   // an order that never filled is not a past trade
+      rows.push({ t: c.t, exitT: o.exitT, netR: o.netR, features: f });
+    }
+    rows.sort((a, b) => a.t - b.t);
+    return { edge, before, available: true, version: feats.version || null, total: rows.length, rows };
   },
 
   async outcome(X, q) {
