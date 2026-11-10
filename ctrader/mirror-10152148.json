@@ -1265,6 +1265,32 @@
     "stopCheckedAt": "2026-11-10T13:22:52.000Z",
     "brokerStop": 84.797,
     "closedAt": "2026-11-10T13:25:44.000Z"
+   },
+   "audusd-replica-1794317224-b": {
+    "positionId": "48047226",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T13:28:12.000Z",
+    "councilEntry": 0.69048,
+    "stop": 0.690088,
+    "t1": 0.691264,
+    "riskCash": 2,
+    "margin": 6.9,
+    "mark": 0.69048,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69064,
+    "slipR": 0.408,
+    "lagSec": 68,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T13:28:12.000Z",
+    "brokerStop": 0.69025
    }
   },
   "day": {
@@ -1272,7 +1298,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9978.77 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9978.77 · 11 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794243038-s": "none of XRPUSD found at the broker",
@@ -1287,7 +1313,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9978.77,
-  "lastRun": "2026-11-10T13:25:44.000Z"
+  "lastRun": "2026-11-10T13:28:12.000Z"
  },
  "log": [
   {
@@ -1772,6 +1798,11 @@
    "at": "2026-11-10T13:25:44.000Z",
    "msg": "SOLUSD position 48045459 closed at the broker",
    "trade": "sol-replica-1794316864-s"
+  },
+  {
+   "at": "2026-11-10T13:28:12.000Z",
+   "msg": "opened buy AUDUSD 0.05 lot (council replica)",
+   "trade": "audusd-replica-1794317224-b"
   }
  ],
  "limits": {
@@ -1850,11 +1881,11 @@
   ]
  },
  "execution": {
-  "n": 44,
-  "meanSlipR": 0.112,
-  "medianSlipR": 0.045,
+  "n": 45,
+  "meanSlipR": 0.119,
+  "medianSlipR": 0.048,
   "worstSlipR": 1.236,
-  "medianLagSec": 599,
+  "medianLagSec": 112,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -1877,8 +1908,8 @@
     "meanSlipR": 0.119
    },
    "AUDUSD": {
-    "n": 7,
-    "meanSlipR": 0.005
+    "n": 8,
+    "meanSlipR": 0.055
    },
    "GBPUSD": {
     "n": 1,
