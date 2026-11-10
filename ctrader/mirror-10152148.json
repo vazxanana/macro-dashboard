@@ -813,7 +813,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T08:11:16.000Z",
     "councilEntry": 85.87,
     "stop": 86.419,
@@ -827,10 +827,12 @@
     "slipR": 0.162,
     "lagSec": 72,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T08:11:16.000Z",
-    "brokerStop": 86.33
+    "brokerStop": 86.33,
+    "closedAt": "2026-11-10T10:34:08.000Z"
    },
    "xau-replica-1794298519-b": {
     "positionId": "47960895",
@@ -978,7 +980,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9977.25 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 9988.37 · 8 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -993,8 +995,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9977.25,
-  "lastRun": "2026-11-10T10:31:29.000Z"
+  "balance": 9988.37,
+  "lastRun": "2026-11-10T10:34:08.000Z"
  },
  "log": [
   {
@@ -1374,6 +1376,11 @@
    "at": "2026-11-10T10:26:06.000Z",
    "msg": "opened sell SOLUSD 0.01 lot (council replica)",
    "trade": "sol-replica-1794306294-s"
+  },
+  {
+   "at": "2026-11-10T10:34:08.000Z",
+   "msg": "SOLUSD position 47958434 closed at the broker",
+   "trade": "sol-replica-1794298204-s"
   }
  ],
  "limits": {
