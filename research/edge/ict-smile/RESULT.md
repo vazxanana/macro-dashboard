@@ -1,5 +1,7 @@
 # ICT A-setups x Dollar Smile: out-of-sample test of the #507 lead
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Verdict: FAIL. Null result. The lead is closed.**
 
 Out of sample (2018 to July 2025), the A-setups taken when the Smile was on its left or right side did not lose money. They
@@ -109,3 +111,9 @@ sample has no YM or RTY.
 - `result.json`: the full output, including each trade's phase (`perTrade`).
 - `.github/workflows/ict-smile.yml`: the one-shot job. Now that a complete result exists, every later run skips unless
   dispatched with `force`.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: `analyse.mjs` downloads 16 FRED series and FRED could not be reached from the machine that did the clock work. `build.mjs` now converts with the shared clock, so the next run of the study's workflow rebuilds `trades.json` and `fx-daily.json` correctly; until then every number on this page is an old-clock number (the ICT trades it uses were an hour late in Europe's summer). The pre-registration is unchanged.
