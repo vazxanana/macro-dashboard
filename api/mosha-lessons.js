@@ -74,6 +74,10 @@ function blobStore(env, io = {}) {
   };
 }
 
+// A second key, for when the owner does not want to copy one by hand (owner, 10 Nov 2026: "No need for key u can read and do
+// whaeva"): the assistant sets MOSHA_ASSISTANT_KEY in the site's settings for itself. 32+ plain characters or it does not count.
+// It opens exactly what the derived key opens (read the lessons, answer, propose book lines) and MOSHA_READER=off shuts both.
+const ownKey = (env = process.env) => { const k = String((env && env.MOSHA_ASSISTANT_KEY) || '').trim(); return !off(env) && /^[A-Za-z0-9_-]{32,128}$/.test(k) ? k : null; };
 // the assistant's key, or null when the server has no session secret or the key is switched off
 const off = (env) => /^(off|0|false|no)$/i.test(String((env && env.MOSHA_READER) || '').trim());
 function readerKey(env = process.env) {
@@ -193,7 +197,7 @@ async function handle(req, res, d = {}) {
     const auth = req.headers && req.headers.authorization; let acct = null, bot = false;
     if (auth) {
       const secs = G.wait(req, now); if (secs) return G.tooMany(res, secs);
-      if (!G.bearerOk(auth, readerKey(env))) { G.failed(req, now); return res.status(401).json({ error: 'key not accepted' }); }
+      if (!G.bearerOk(auth, readerKey(env)) && !G.bearerOk(auth, ownKey(env))) { G.failed(req, now); return res.status(401).json({ error: 'key not accepted' }); }
       acct = READER; bot = true;
     } else {
       if (req.method === 'POST' && !(d.sameOrigin || S.sameOrigin)(req)) return res.status(403).json({ error: 'not allowed' });
@@ -308,4 +312,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha lessons are unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, stateOf, scoreOf, nameOf, langOf, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP });
+Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP });

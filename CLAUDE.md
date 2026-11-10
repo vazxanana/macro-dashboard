@@ -1592,6 +1592,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     from the session secret (`readerKey`; `MOSHA_READER=off`, `MOSHA_READER_SALT` rotates it), shown to the owner's session
     only (Lessons card, "Show the assistant's key"), and can read the lessons and write a reply, nothing else; a wrong key
     counts in `api/_guard.js` like a wrong password. Never widen it, never write it in a file or a chat.
+  - **The key the assistant sets for itself** (owner, 10 Nov, asked to copy the key by hand: "No need for key u can read
+    and do whaeva"). The server also accepts `MOSHA_ASSISTANT_KEY` (`ownKey`: 32-128 plain characters, else ignored): the
+    assistant makes a random one, saves it as that Vercel environment variable (Production) and uses it as
+    `MOSHA_READER_KEY` for the script. It opens exactly what the derived key opens, nothing more, and `MOSHA_READER=off`
+    shuts both. A later session reads the value back from the Vercel project (the owner asked for this); it never goes
+    into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
   - **Reading the lessons in a session** (the "learn" part): `node --use-env-proxy scripts/mosha-lessons.mjs pull <dir>` saves
     `lessons.json` and the pictures of the lessons not read yet (2.5 s apart: the firewall allows 30 API calls a minute); look
     at each picture with its caption and note, then `… reply <lesson id> <file>` writes back what was understood (levels read

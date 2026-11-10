@@ -327,3 +327,16 @@ test('the tutorial: five steps in the teacher\'s order, ticked from what he has 
   const BT = rd('../backtest.html'); assert.match(BT, /'btLab:teachTip:' \+ me\.u/, 'the hint in ChronosTrade is shown once'); assert.match(BT, /const t = me\.u === 'owner' \? null : lastNew\(\)/);
 });
 
+test('the key the assistant sets for itself: the same narrow door, and the same switch shuts it', async () => {
+  const s = mk(), OWN = 'k'.repeat(40), env = { ...ENV, MOSHA_ASSISTANT_KEY: OWN }, hdr = (k) => ({ authorization: `Bearer ${k}` });
+  const go = async (e, method, body, k) => { const out = {}; const res = { setHeader() {}, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; }, send: () => out };
+    await L.handle({ method, body, query: {}, headers: hdr(k) }, res, { env: e, store: s, who: async () => null, sameOrigin: () => true, now: NOW + 1000 * ++tick }); return out; };
+  const a = await call(s, 'POST', LUXUS, { add: { note: 'Never sell before the M5 CF closes.' } }), id = a.body.lesson.id;
+  assert.equal(L.ownKey(env), OWN); assert.equal(L.ownKey(ENV), null); assert.equal(L.ownKey({ ...ENV, MOSHA_ASSISTANT_KEY: 'short' }), null, 'a short key does not count'); assert.equal(L.ownKey({ ...ENV, MOSHA_ASSISTANT_KEY: 'x y'.repeat(20) }), null);
+  assert.equal((await go(env, 'GET', null, OWN)).code, 200); assert.equal((await go(env, 'GET', null, L.readerKey(ENV))).code, 200, 'the owner\'s own key still works');
+  assert.equal((await go(ENV, 'GET', null, OWN)).code, 401, 'without the setting it opens nothing'); assert.equal((await go(env, 'GET', null, OWN + 'x')).code, 401);
+  assert.equal((await go(env, 'POST', { reply: { id, text: 'No sell before the CF candle closes.' } }, OWN)).code, 200); assert.equal((await go(env, 'POST', { learn: { kind: 'avoid', text: 'Selling before the M5 CF closes.' } }, OWN)).body.item.status, 'proposed');
+  for (const body of [{ add: { note: 'a lesson of its own' } }, { remove: { id } }, { book: { id: 'seed-01', confirm: true } }, { say: { id, verdict: 'right' } }, { edit: { id, note: 'changed' } }]) assert.ok((await go(env, 'POST', body, OWN)).code >= 400, 'it cannot ' + Object.keys(body)[0]);
+  assert.equal((await go({ ...env, MOSHA_READER: 'off' }, 'GET', null, OWN)).code, 401, 'the off switch shuts both keys');
+});
+

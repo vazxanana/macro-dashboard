@@ -429,6 +429,10 @@ conditions is what makes your trades win.
 - **Your step, once:** the desk's assistant reads the lessons with a key that only you can see. On the Mosha desk, in the
   Lessons card, press "Show the assistant's key", copy it, and paste it into the secure form the assistant opens for
   meridianx.dev (never into a chat). Until then the lessons arrive and are stored, but nobody reads them.
+- **Update, 10 Nov ("No need for key u can read and do whaeva"):** you no longer have to copy anything. The assistant
+  makes its own key and saves it in the site's settings on Vercel (`MOSHA_ASSISTANT_KEY`). It opens only the lessons
+  (read, answer, propose book lines). The one cost: that key is visible in the assistant's private session log, where
+  the hand-copied one would not have been. To end it, delete that variable on Vercel, or set `MOSHA_READER=off`.
 - **To change or stop it:** Users → Luxus → Permissions → "Mosha desk" (no access / read only / may send lessons). On Vercel,
   `MOSHA_READER=off` switches the assistant's key off; `MOSHA_READER_SALT=<anything>` replaces it.
 - **"He needs to be 100% teachable" (10 Nov, built the same day):** Luxus can teach in pictures or in words alone, give the
