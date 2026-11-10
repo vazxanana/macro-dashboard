@@ -36,6 +36,7 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <script src="/assets/lightweight-charts-4.1.3.js?v=0c146b9bfb"></script>
 <script src="/assets/ms-dialog.js?v=9d6241afda"></script>
+<script src="/assets/mosha-desk.js?v=79e49fb9ef" defer></script>
 <script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
@@ -3294,7 +3295,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </div>
   </section>
   <section class="view adm" id="v-crypto" aria-label="Crypto desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">Crypto desk</h1><p class="ms-note">Bitcoin, Ether, Solana and XRP for scalping: M15 → M1 and H1 → M5 setups, open trades and how the scalps have done. Crypto trades around the clock. <span id="cx-src"></span></p></div>
       <div class="cx-seg" role="group" aria-label="Trades counted"><button type="button" data-cx="all" class="on" aria-pressed="true">All incl. shadow</button><button type="button" data-cx="live" aria-pressed="false">Live only</button></div>
@@ -3322,7 +3323,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="card"><div class="cx-card-h"><h2>Latest closed scalps</h2><span class="ms-note">newest first</span></div><div class="t-scroll cx-last-w"><table class="cx-tb cx-last" id="cx-last"></table></div></div>
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head ict-head">
       <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
@@ -3424,9 +3425,64 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </form>
     </dialog>
   </section>
+  <!-- Mosha desk (10 Nov, owner: "And a place to mosha"): the owner's own Mosha trades, written down with their stop and measured.
+       Five pre-registered studies found no fixed rule of it that makes money, so the desk measures the owner's selection instead. -->
+  <section class="view adm" id="v-mosha" aria-label="Mosha desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <div class="v-head cx-head">
+      <div><h1 class="h-head">Mosha desk <span class="mo-tag">Your own trades</span></h1><p class="ms-note">Your Mosha trading, measured the only way left: the trades you choose, written down with their stop while they are still open. Tested as fixed rules it is not an edge (five studies, below), so this desk counts what the rules cannot see, your selection. A log only: nothing here places, copies or changes a trade.</p></div>
+    </div>
+    <div class="mo-grid">
+      <div class="card" id="mo-rec"><div class="ms-k"><span>Your record</span></div><div class="ct-empty">Loading the log…</div></div>
+      <div class="card" id="mo-cycle"><div class="ms-k"><span>The cycle</span><small>as you described it</small></div>
+        <ol class="mo-steps">
+          <li><b>Top-down order.</b> H4 first, then H1 shows when the pullback starts, then M15 or M5 gives the trade.</li>
+          <li><b>The sweep.</b> A prior high or low is taken at a higher-timeframe point.</li>
+          <li><b>The VR and its CF.</b> The M5 VR runs from the extreme to the last swing before it. A close out of it is the CF.</li>
+          <li><b>The entry.</b> At the CF with the stop past the extreme, or on the return to the zone of the next break with a tight stop.</li>
+          <li><b>The target.</b> The next H4 zone or H4 swing. At the barrier: close, then trade with the H4. That is the main trade.</li>
+        </ol>
+        <p class="ms-note">Every trade has a stop. The log refuses one without it.</p></div>
+      <div class="card mo-wide" id="mo-form-card" hidden>
+        <div class="ms-k"><span id="mo-form-h">Log a trade</span><small>write it down as you take it</small></div>
+        <form id="mo-form" class="mo-form" autocomplete="off" novalidate>
+          <fieldset class="mo-seg"><legend>Side</legend><label><input type="radio" name="side" value="sell" checked><span>Sell</span></label><label><input type="radio" name="side" value="buy"><span>Buy</span></label></fieldset>
+          <label class="mo-f"><span>Market</span><select name="market"><option value="xau">XAU/USD</option><option value="xag">XAG/USD</option><option value="eurusd">EUR/USD</option><option value="gbpusd">GBP/USD</option><option value="nas100">NAS100</option></select></label>
+          <label class="mo-f"><span>Entry time <small>your local time</small></span><input type="datetime-local" name="at" required></label>
+          <label class="mo-f"><span>Entry</span><input type="number" name="entry" inputmode="decimal" step="any" min="0" required placeholder="4120.42"></label>
+          <label class="mo-f"><span>Stop <small>required</small></span><input type="number" name="stop" inputmode="decimal" step="any" min="0" required placeholder="4128.92"></label>
+          <label class="mo-f"><span>Target <small>optional</small></span><input type="number" name="target" inputmode="decimal" step="any" min="0" placeholder="4072.84"></label>
+          <label class="mo-f"><span>Entry type</span><select name="how"><option value="cf">At the CF</option><option value="zone">Zone of the break</option><option value="retest">Retest of the level</option><option value="other">Other</option></select></label>
+          <label class="mo-f"><span>Read on</span><select name="tf"><option>M1</option><option selected>M5</option><option>M15</option><option>M30</option><option>H1</option></select></label>
+          <label class="mo-f"><span>H4 direction</span><select name="h4"><option value="">Not noted</option><option value="with">With the H4</option><option value="against">Against the H4</option></select></label>
+          <label class="mo-f mo-f2"><span>What was swept <small>optional</small></span><input type="text" name="swept" maxlength="80" placeholder="H4 high 4146.9"></label>
+          <label class="mo-f mo-f3"><span>Note <small>optional</small></span><textarea name="note" rows="2" maxlength="1000" placeholder="Why this one and not the others?"></textarea></label>
+          <fieldset class="mo-seg"><legend>Status</legend><label><input type="radio" name="status" value="open" checked><span>Open</span></label><label><input type="radio" name="status" value="closed"><span>Closed</span></label></fieldset>
+          <div class="mo-exit" id="mo-exit-row" hidden>
+            <label class="mo-f"><span>Exit price</span><input type="number" name="exit" inputmode="decimal" step="any" min="0" placeholder="4072.84"></label>
+            <label class="mo-f"><span>Exit time <small>your local time</small></span><input type="datetime-local" name="exitAt"></label>
+          </div>
+          <div class="mo-bar"><span class="mo-calc" id="mo-calc" aria-live="polite"></span><span class="ms-note" id="mo-msg" role="status"></span><button type="button" class="ms-tbtn" id="mo-cancel" hidden>Cancel</button><button type="submit" class="u-btn" id="mo-save">Save the trade</button></div>
+        </form>
+        <p class="ms-note">Log a trade while it is open and it counts in the record. One added after it closed is kept apart: its result was already known. A closed trade keeps its side, entry, stop and target.</p>
+      </div>
+      <div class="card mo-wide" id="mo-list"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">Loading the log…</div></div>
+      <div class="card mo-wide" id="mo-rules"><div class="ms-k"><span>What the fixed rules said</span><small>spot gold, after costs · 10 Nov 2026</small></div>
+        <div class="ct-tw"><table class="ct-t"><thead><tr><th>Reading, taken every time</th><th>Data</th><th class="n">Trades</th><th class="n">R a trade</th><th class="n">t</th><th>Verdict</th></tr></thead><tbody>
+          <tr><td><a href="/edge-lab.html#mosha-level">Tap of an H4 level, M5 breaks, limit at the zone</a></td><td>2020 to Oct 2026</td><td class="n">365</td><td class="n"><b class="neg">−0.35R</b></td><td class="n">−3.10</td><td>Fail</td></tr>
+          <tr><td><a href="/edge-lab.html#mosha-retrace">H4 BO, first H1 BO against it: the retracement</a></td><td>2020 to Oct 2026</td><td class="n">445</td><td class="n"><b>+0.02R</b></td><td class="n">0.17</td><td>Break-even</td></tr>
+          <tr><td><a href="/edge-lab.html#mosha-cycle">At the barrier, back with the H4: the main trade</a></td><td>2020 to Oct 2026</td><td class="n">132</td><td class="n"><b class="neg">−0.22R</b></td><td class="n">−0.99</td><td>Fail</td></tr>
+          <tr><td><a href="/edge-lab.html#mosha-sweep">Sweep, M5 VR, CF: entry at the CF</a></td><td>2006 to Nov 2026</td><td class="n">6,260</td><td class="n"><b class="neg">−0.11R</b></td><td class="n">−4.62</td><td>Fail</td></tr>
+          <tr><td><a href="/edge-lab.html#mosha-sweep">Sweep, M5 VR, CF: entry at the zone of the break</a></td><td>2006 to Nov 2026</td><td class="n">6,478</td><td class="n"><b class="neg">−0.21R</b></td><td class="n">−7.36</td><td>Fail</td></tr>
+          <tr><td><a href="/edge-lab.html#mosha-select">The same sweeps, filtered by H4 direction, level, session or room</a></td><td>2006 to Nov 2026</td><td class="n">18 versions</td><td class="n"><b class="neg">all negative</b></td><td class="n">n/a</td><td>Fail</td></tr>
+        </tbody></table></div>
+        <p class="ms-note">The pattern prints about five times a trading day, and taken every time it loses. Your example trades were winners picked from thousands of look-alikes, so the open question is your choice of which ones to take. That is what the record above measures. It needs 20 closed trades before it says anything, and a t of 2 or more before it is called more than luck.</p>
+      </div>
+    </div>
+  </section>
   <!-- LIT desk (8 Nov, owner: "on the desk should show LIT"): the paper shadow stream from council/lit.mjs, its funnel and its orders -->
   <section class="view adm" id="v-lit" aria-label="LIT desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">LIT desk <span class="ict-tag">Paper shadow</span></h1><p class="ms-note">Liquidity Inducement Theory on gold: an M15 false break of a session, previous-day, previous-week or equal-highs level in London or the New York morning, an M5 real break by wick, a limit at the order block, R:R above 3. Pre-registered study: inconclusive at the skill's defaults, so it runs as a paper shadow until the live record says otherwise. <span id="lit-at"></span></p></div>
     </div>
@@ -3434,7 +3490,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   </section>
   <!-- NQ SDV (8 Nov, owner: "the next coming edge"): a placeholder desk until the study is pre-registered and run -->
   <section class="view adm" id="v-sdv" aria-label="NQ SDV desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">NQ SDV <span class="ict-tag">Coming</span></h1><p class="ms-note">The next edge in the queue, on Nasdaq futures. The desk opens once the rule is pre-registered, the backtest (2020 to now) is run and the verdict is recorded, the same way every other edge here earned its place.</p></div>
     </div>
@@ -3446,7 +3502,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <p class="ms-note">Nothing here is a signal yet.</p></div>
   </section>
   <section class="view adm" id="v-gold" aria-label="Gold playbook" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head gp-head">
       <div><h1 class="h-head">Gold playbook</h1><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk. <span id="gp-src"></span></p></div>
       <div class="gp-seg" role="group" aria-label="Variant">
@@ -7885,7 +7941,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile', 'lit', 'sdv'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile', 'lit', 'sdv', 'mosha'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov) · This week (8 Nov); deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro', 'week'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -7917,13 +7973,14 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
-  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', ict: 'ict' };
+  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', mosha: 'desks', ict: 'ict' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
   function showView() {
     const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
+    if (v === 'mosha' && window.renderMosha) setTimeout(window.renderMosha, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
@@ -7934,7 +7991,7 @@ function msNextSetup(bars, A) {
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     // ICT, Gold and Crypto share one entry (8 Nov, owner: "all in the same page, just a switch"): it lights for any of them and
     // opens the desk used last; the switch at the top of each desk marks the current one
-    { const DESKS = ['ict', 'gold', 'crypto', 'lit', 'sdv'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
+    { const DESKS = ['ict', 'gold', 'mosha', 'crypto', 'lit', 'sdv'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
       let last = 'ict'; try { last = localStorage.getItem('ms-desk') || 'ict'; } catch (e) {}
       const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !VIEWER), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
       document.querySelectorAll('[data-desks]').forEach((a) => { a.setAttribute('href', '#' + pick); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
@@ -10850,6 +10907,54 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-lit .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #00bcd4 14%, var(--panel)); box-shadow: inset 0 0 0 1px #00a3b8; }
 #v-sdv .desk-sw a[aria-current="page"] { background: color-mix(in srgb, var(--ink) 8%, var(--panel)); box-shadow: inset 0 0 0 1px var(--ink-dim); }
 @media (max-width: 900px) { #v-lit .lit-grid { grid-template-columns: 1fr; } }
+</style>
+<style id="ms-mosha-css">
+/* Mosha desk (10 Nov 2026): the owner's own trades, logged and measured */
+.desk-sw { overflow-x: auto; scrollbar-width: none; } .desk-sw::-webkit-scrollbar { display: none; } .desk-sw a { flex: none; white-space: nowrap; }
+#v-mosha .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #e0a526 16%, var(--panel)); box-shadow: inset 0 0 0 1px #c98f12; }
+#v-mosha .mo-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; } #v-mosha .mo-wide { grid-column: 1 / -1; }
+#v-mosha .ms-k small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; } #v-mosha .ms-k .ms-tbtn { margin-left: auto; }
+#v-mosha .mo-verdict { margin: 4px 0 12px; font: 600 15px/1.4 var(--sans); color: var(--ink); } #v-mosha .mo-verdict.mo-pos { color: var(--buy); } #v-mosha .mo-verdict.mo-neg { color: var(--sell); } #v-mosha .mo-verdict.mo-few, #v-mosha .mo-verdict.mo-none { color: var(--ink-dim); }
+#v-mosha .ct-stats b.ct-pos, #v-mosha b.pos { color: var(--buy); } #v-mosha .ct-stats b.ct-neg, #v-mosha b.neg { color: var(--sell); } #v-mosha td.n, #v-mosha th.n { text-align: right; font-variant-numeric: tabular-nums; }
+#v-mosha { --mo-gold: #e3b341; } :root[data-theme="light"] #v-mosha { --mo-gold: #8a5a00; }
+#v-mosha .mo-tag { display: inline-block; vertical-align: 4px; margin-left: 8px; padding: 2px 9px; border-radius: 999px; font: 600 12px/1.4 var(--sans); letter-spacing: 0; color: var(--mo-gold); background: var(--gold-soft, color-mix(in srgb, #e0a526 14%, transparent)); border: 1px solid var(--gold-line, #c98f12); white-space: nowrap; }
+#v-mosha .ct-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-mosha .mo-f small { font-size: 12px; }
+#v-mosha .mo-t .chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font: 700 12px/1.4 var(--sans); letter-spacing: .02em; }
+#v-mosha .mo-foot { margin: 12px 0 0; } #v-mosha .mo-steps { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 8px; line-height: 1.5; font-size: 14px; }
+#v-mosha .mo-curve { margin: 14px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; } #v-mosha .mo-curve svg { width: 100%; height: 120px; display: block; }
+#v-mosha .mo-curve-y { display: flex; flex-direction: column; justify-content: space-between; font: 500 12px var(--mono); color: var(--ink-faint); text-align: right; }
+#v-mosha .mo-curve figcaption { grid-column: 2; font-size: 12px; color: var(--ink-faint); } #v-mosha .mo-zero { stroke: var(--line); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+#v-mosha .mo-line { fill: none; stroke-width: 2; stroke-linejoin: round; } #v-mosha .mo-line.up { stroke: var(--buy); } #v-mosha .mo-line.dn { stroke: var(--sell); }
+#v-mosha .mo-fold { margin-top: 14px; border-top: 1px solid var(--line); } #v-mosha .mo-fold summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font: 600 13px var(--sans); color: var(--ink-dim); } #v-mosha .mo-fold summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#v-mosha tr.mo-thin td { color: var(--ink-faint); }
+#v-mosha .mo-form { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 14px; align-items: end; margin-bottom: 12px; }
+#v-mosha .mo-f { display: grid; gap: 5px; grid-column: span 2; min-width: 0; } #v-mosha .mo-f2 { grid-column: span 3; } #v-mosha .mo-f3 { grid-column: 1 / -1; }
+#v-mosha .mo-f > span, #v-mosha .mo-seg legend { font: 600 12px var(--sans); color: var(--ink-dim); padding: 0; } #v-mosha .mo-f small { font-weight: 500; color: var(--ink-faint); margin-left: 4px; }
+#v-mosha .mo-f input, #v-mosha .mo-f select, #v-mosha .mo-f textarea { width: 100%; box-sizing: border-box; min-height: 40px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-raised, transparent); color: var(--ink); font: 500 15px var(--sans); }
+#v-mosha .mo-f input[type="number"] { font-family: var(--mono); font-variant-numeric: tabular-nums; } #v-mosha .mo-f textarea { resize: vertical; line-height: 1.45; }
+#v-mosha .mo-f input:focus-visible, #v-mosha .mo-f select:focus-visible, #v-mosha .mo-f textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; } #v-mosha .mo-f :disabled { opacity: .55; cursor: not-allowed; }
+#v-mosha .mo-seg { grid-column: span 2; border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 5px; } #v-mosha .mo-seg label { display: inline-flex; }
+#v-mosha .mo-seg { grid-template-columns: 1fr 1fr; column-gap: 0; } #v-mosha .mo-seg legend { grid-column: 1 / -1; margin-bottom: 5px; }
+#v-mosha .mo-seg input { position: absolute; opacity: 0; width: 1px; height: 1px; } #v-mosha .mo-seg span { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 40px; border: 1px solid var(--line); font: 600 14px var(--sans); color: var(--ink-dim); cursor: pointer; }
+#v-mosha .mo-seg label:first-of-type span { border-radius: 8px 0 0 8px; } #v-mosha .mo-seg label:last-of-type span { border-radius: 0 8px 8px 0; border-left: 0; }
+#v-mosha .mo-seg input:checked + span { background: color-mix(in srgb, var(--accent) 16%, var(--panel)); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); }
+#v-mosha .mo-seg input[value="sell"]:checked + span { background: var(--sell-soft, color-mix(in srgb, var(--sell) 14%, transparent)); color: var(--sell); box-shadow: inset 0 0 0 1px var(--sell); }
+#v-mosha .mo-seg input[value="buy"]:checked + span { background: var(--buy-soft, color-mix(in srgb, var(--buy) 14%, transparent)); color: var(--buy); box-shadow: inset 0 0 0 1px var(--buy); }
+#v-mosha .mo-seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; } #v-mosha .mo-seg input:disabled + span { opacity: .55; cursor: not-allowed; }
+#v-mosha .mo-exit { grid-column: span 4; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; } #v-mosha .mo-exit[hidden] { display: none; } #v-mosha .mo-exit .mo-f { grid-column: auto; }
+#v-mosha .mo-bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; } #v-mosha .mo-calc { font: 600 13px var(--mono); color: var(--ink); margin-right: auto; } #v-mosha .mo-bar .ms-note { margin: 0; }
+#v-mosha .mo-t td { vertical-align: top; white-space: normal; } #v-mosha .mo-t td small { display: block; color: var(--ink-faint); font-size: 12px; margin-top: 2px; } #v-mosha .mo-tags { min-width: 180px; max-width: 420px; }
+#v-mosha .mo-acts { white-space: nowrap; text-align: right; } #v-mosha .mo-acts .ms-tbtn { margin: 0 0 0 4px; } #v-mosha .mo-acts .mo-go { border-color: var(--gold-line, #c98f12); color: var(--mo-gold); font-weight: 600; } #v-mosha .mo-when { white-space: nowrap; } #v-mosha .mo-check { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: var(--well, color-mix(in srgb, var(--ink) 6%, transparent)); font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
+#v-mosha .mo-err { margin: 0 0 10px; color: var(--sell); font-weight: 600; font-size: 13px; } #v-mosha #mo-rules a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong, var(--line)); text-underline-offset: 3px; } #v-mosha #mo-rules a:hover { text-decoration-color: currentColor; }
+@media (max-width: 900px) { #v-mosha .mo-grid { grid-template-columns: 1fr; } #v-mosha .mo-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } #v-mosha .mo-f, #v-mosha .mo-seg { grid-column: span 1; } #v-mosha .mo-f2, #v-mosha .mo-f3, #v-mosha .mo-exit { grid-column: 1 / -1; }
+  #v-mosha .mo-acts { white-space: normal; } #v-mosha .mo-bar .u-btn { flex: 1 1 100%; } }
+@media (max-width: 760px) { #v-mosha .mo-t thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } #v-mosha .mo-t, #v-mosha .mo-t tbody { display: block; }
+  #v-mosha .mo-t tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 10px; padding: 12px; border-bottom: 1px solid var(--line); } #v-mosha .mo-t tr:last-child { border-bottom: 0; }
+  #v-mosha .mo-t td { display: block; padding: 0; border: 0; text-align: left; min-width: 0; max-width: none; } #v-mosha .mo-t td.n { text-align: left; }
+  #v-mosha .mo-t td[data-l]::before { content: attr(data-l); display: block; font: 500 12px var(--sans); color: var(--ink-faint); margin-bottom: 2px; }
+  #v-mosha .mo-t .mo-c-time { grid-column: span 3; font-weight: 600; } #v-mosha .mo-t .mo-c-side { text-align: right; } #v-mosha .mo-t .mo-c-res, #v-mosha .mo-t .mo-tags, #v-mosha .mo-t .mo-acts { grid-column: 1 / -1; }
+  #v-mosha .mo-t .mo-tags:empty { display: none; } #v-mosha .mo-t .mo-acts { display: flex; flex-wrap: wrap; gap: 8px; } #v-mosha .mo-acts .ms-tbtn { margin: 0; flex: 1 1 auto; } }
+@media (pointer: coarse) { #v-mosha .mo-f input, #v-mosha .mo-f select, #v-mosha .mo-seg span { min-height: 44px; } #v-mosha .mo-f input, #v-mosha .mo-f select, #v-mosha .mo-f textarea { font-size: 16px; } #v-mosha .mo-acts .ms-tbtn { min-height: 40px; } }
 </style>
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
