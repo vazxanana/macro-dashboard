@@ -4502,7 +4502,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9911.47 · 21 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9911.47 · 21 open · 4 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4581,18 +4581,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "sol-rscalp-1794309133": {
+    "orderId": "33860559",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "rscalp",
+    "limitPrice": 84.62,
+    "stop": 84.153068,
+    "t1": 85,
+    "placedAt": "2026-11-10T11:13:16.000Z",
+    "expires": "2026-11-10T14:12:13.000Z",
+    "riskCash": 4.67,
+    "margin": 84.35,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9911.47,
-  "lastRun": "2026-11-10T11:11:46.000Z"
+  "lastRun": "2026-11-10T11:13:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T16:06:50.000Z",
-   "msg": "moved AUDUSD 47373491 protection: stop 0.6921306 -> 0.6920906, target 0.6797687 -> 0.6797287 (council scalp)",
-   "trade": "audusd-scalp-1793949425"
-  },
   {
    "at": "2026-11-09T16:06:50.000Z",
    "msg": "moved AUDUSD 47373492 protection: stop 0.6922472 -> 0.6922072, target 0.6795356 -> 0.6794956 (council intraday)",
@@ -6087,6 +6103,11 @@
    "at": "2026-11-10T11:11:46.000Z",
    "msg": "not mirrored xrp-rscalp-1794309037: none of XRPUSD found at the broker",
    "trade": "xrp-rscalp-1794309037"
+  },
+  {
+   "at": "2026-11-10T11:13:16.000Z",
+   "msg": "placed buy limit SOLUSD 0.01 lot at 84.62 (council rscalp, valid to 2026-11-10T14:12Z)",
+   "trade": "sol-rscalp-1794309133"
   }
  ],
  "limits": {
