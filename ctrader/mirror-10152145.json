@@ -257,8 +257,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.34226,
-    "stop": 1.32889,
-    "t1": 1.36897,
+    "stop": 1.32856,
+    "t1": 1.36864,
     "riskCash": 6.36,
     "margin": 2.67,
     "minLot": true,
@@ -275,8 +275,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 2,
-    "amended": 2,
-    "amendedAt": "2026-11-10T12:17:01.000Z"
+    "amended": 3,
+    "amendedAt": "2026-11-10T13:04:55.000Z"
    },
    "usdcad-scalp-1793689919": {
     "positionId": "47373486",
@@ -4745,8 +4745,8 @@
     "status": "open",
     "openedAt": "2026-11-10T12:59:29.000Z",
     "councilEntry": 1.34234,
-    "stop": 1.34316,
-    "t1": 1.3404000000000005,
+    "stop": 1.34283,
+    "t1": 1.34007,
     "riskCash": 1.98,
     "margin": 5.37,
     "shadow": true,
@@ -4756,10 +4756,14 @@
     "slipR": 0.134,
     "lagSec": 77,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "stopCheckedAt": "2026-11-10T12:59:29.000Z",
-    "brokerStop": 1.34305
+    "brokerStop": 1.34305,
+    "rr": 2.37,
+    "amended": 1,
+    "amendedAt": "2026-11-10T13:04:55.000Z"
    }
   },
   "day": {
@@ -4767,7 +4771,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9902.52 · 26 open",
+  "status": "ok · demo Fusion Markets · balance 9902.52 · 26 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4786,32 +4790,54 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-scalp-1794315817": {
+    "orderId": "33865489",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "limitPrice": 4075.61,
+    "stop": 4080.0514285714285,
+    "t1": 4068.715,
+    "placedAt": "2026-11-10T13:04:55.000Z",
+    "expires": "2026-11-10T16:03:37.000Z",
+    "riskCash": 4.44,
+    "margin": 8.15,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "gbpusd-intraday-1794315817": {
+    "orderId": "33865491",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 1.34208,
+    "stop": 1.34276,
+    "t1": 1.32747,
+    "placedAt": "2026-11-10T13:04:55.000Z",
+    "expires": "2026-11-11T01:03:37.000Z",
+    "riskCash": 1.98,
+    "margin": 5.37,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9902.52,
-  "lastRun": "2026-11-10T13:02:12.000Z"
+  "lastRun": "2026-11-10T13:04:55.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T18:04:20.000Z",
-   "msg": "not mirrored xrp-scalp-1794247379: none of XRPUSD found at the broker",
-   "trade": "xrp-scalp-1794247379"
-  },
-  {
-   "at": "2026-11-09T18:07:24.000Z",
-   "msg": "cancelled XAUUSD limit order 33817909 for xau-rscalp-1794242893: the council ended it: cancelled",
-   "trade": "xau-rscalp-1794242893"
-  },
-  {
-   "at": "2026-11-09T18:07:24.000Z",
-   "msg": "cancelled AUDUSD limit order 33818485 for audusd-rintra-1794243191: the council ended it: cancelled",
-   "trade": "audusd-rintra-1794243191"
-  },
-  {
-   "at": "2026-11-09T18:07:24.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.45095 -> 1.45017, target 1.29255 -> 1.29177 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-09T18:07:24.000Z",
    "msg": "moved USDCAD 47373489 protection: stop 1.3814874 -> 1.3807074, target 1.48056 -> 1.47978 (council position)",
@@ -6291,6 +6317,26 @@
    "at": "2026-11-10T12:59:29.000Z",
    "msg": "opened sell GBPUSD 0.02 lot (council scalp)",
    "trade": "gbpusd-scalp-1794315492"
+  },
+  {
+   "at": "2026-11-10T13:04:55.000Z",
+   "msg": "moved GBPUSD 47373485 protection: stop 1.32889 -> 1.32856, target 1.36897 -> 1.36864 (council scalp)",
+   "trade": "gbpusd-scalp-1793626672"
+  },
+  {
+   "at": "2026-11-10T13:04:55.000Z",
+   "msg": "moved GBPUSD 48035675 protection: stop 1.34316 -> 1.34283, target 1.3404000000000005 -> 1.34007 (council scalp)",
+   "trade": "gbpusd-scalp-1794315492"
+  },
+  {
+   "at": "2026-11-10T13:04:55.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 4075.61 (council scalp, valid to 2026-11-10T16:03Z)",
+   "trade": "xau-scalp-1794315817"
+  },
+  {
+   "at": "2026-11-10T13:04:55.000Z",
+   "msg": "placed sell limit GBPUSD 0.02 lot at 1.34208 (council intraday, valid to 2026-11-11T01:03Z)",
+   "trade": "gbpusd-intraday-1794315817"
   }
  ],
  "limits": {

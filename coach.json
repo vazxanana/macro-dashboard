@@ -1,10 +1,29 @@
 {
- "proposals": [],
- "proposalsKey": "v5|2026-11-10T11:28:53.547Z|2026-11-10T11:29:01.462Z|2026-11-08T13:49:48.826Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposals": [
+  {
+   "setup": "all",
+   "kind": "dataSource",
+   "value": "oanda:gbpusd",
+   "markets": [
+    "gbpusd"
+   ],
+   "label": "manage GBP/USD trades on OANDA spot candles",
+   "n": 45,
+   "liveR": -11.75,
+   "spotR": -26.85,
+   "exp": 0.34,
+   "why": "The same closed live trades re-judged on OANDA spot candles: −11.8R on Kraken candles vs −26.9R on spot over 45 trades (GBP/USD −0.26R live vs −0.60R spot (45)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
+   "spotAt": "2026-11-10T11:29:01.462Z",
+   "at": "2026-11-10T13:03:37.000Z"
+  }
+ ],
+ "proposalsKey": "v5|2026-11-10T11:28:53.547Z|2026-11-10T11:29:01.462Z|2026-11-08T13:49:48.826Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"Kraken\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsSent": {
-  "key": "",
-  "at": "2026-11-10T12:15:41.000Z",
-  "items": []
+  "key": "all:dataSource:oanda:gbpusd",
+  "at": "2026-11-10T13:03:37.000Z",
+  "items": [
+   "Manage GBP/USD trades on OANDA spot candles — live −0.26R vs spot −0.60R a trade over 45 trades"
+  ]
  },
  "ictWatch": [
   {
@@ -29,7 +48,7 @@
    "keptExp": 0.33,
    "flag": false,
    "why": "ICT A-setups: skip Fridays: the 34 A-setups it drops made −0.18R a trade (t -0.89; halves −0.01R / −0.35R); the 220 it keeps +0.33R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-10T12:20:44.000Z"
+   "at": "2026-11-10T13:03:37.000Z"
   },
   {
    "setup": "ICT A",
@@ -53,7 +72,7 @@
    "keptExp": 0.31,
    "flag": false,
    "why": "ICT A-setups: only trades against or without H1 structure: the 78 A-setups it drops made +0.17R a trade (t 0.98; halves +0.41R / −0.08R); the 176 it keeps +0.31R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-10T12:20:44.000Z"
+   "at": "2026-11-10T13:03:37.000Z"
   }
  ],
  "decay": {
