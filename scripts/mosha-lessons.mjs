@@ -18,6 +18,8 @@ const BASE = (process.env.MOSHA_BASE || 'https://meridianx.dev').replace(/\/+$/,
 const headers = (extra = {}) => ({ ...(process.env.MOSHA_READER_KEY ? { Authorization: `Bearer ${process.env.MOSHA_READER_KEY}` } : {}), ...extra });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }, KIND = { term: 'Terms', step: 'Steps', rule: 'Rules', avoid: 'What to avoid' };
+// Who teaches whom. The assistant reads this at the top of the book, before every lesson.
+const WHO = 'The teacher teaches the Mosha method; the desk is the student. Mosha is the teacher\'s method, not the desk\'s. Restate what he showed in his own terms, read the levels off his pictures, and ask where something is unclear. Never teach the method back to him, never tell him what a term "should" mean, never judge whether a trade was good, and never bring the wording of the studies or of the desk\'s own first lines to a lesson as if it were his. Where the desk\'s reading differs from his, his is right.';
 // the language the teacher works in: the desk answers in it, and proposes its book lines in it
 const LANG = { en: 'Answer in English.', fr: 'Answer in FRENCH (the teacher works in French). Keep the words of the method in English, exactly as the teacher writes them: trade, sell, buy, entry, stop, target, level, sweep, VR, CF, BO, zone of the break, barrier, pullback, swing, high, low, timeframe, H4 / H1 / M30 / M15 / M5, backtest, replay.' };
 export const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'lesson';
@@ -27,7 +29,7 @@ export const waiting = (l) => l.state === 'new' || l.state === 'more';
 export function bookText(book) {
   const line = (b) => `- ${b.text}${b.status === 'corrected' && b.was ? `  (the desk had: ${b.was})` : ''}`;
   const part = (title, items) => (items.length ? [`## ${title}`, ...Object.keys(KIND).flatMap((k) => { const xs = items.filter((b) => b.kind === k); return xs.length ? [`### ${KIND[k]}`, ...xs.map(line), ''] : []; })] : []);
-  return ['# What the desk knows about Mosha', '', ...part('The teacher\'s word (confirmed, corrected or taught): this overrides everything else', book.filter((b) => b.status !== 'proposed')),
+  return ['# What the desk knows about Mosha', '', WHO, '', ...part('The teacher\'s word (confirmed, corrected or taught): this overrides everything else', book.filter((b) => b.status !== 'proposed')),
     ...part('The desk\'s own reading, NOT confirmed: do not treat as the teacher\'s', book.filter((b) => b.status === 'proposed'))].join('\n');
 }
 export function lessonText(l) {

@@ -463,6 +463,11 @@ conditions is what makes your trades win.
   English in both. The rest of the site (menus, charts, other desks) is still English only: say if you want more of it
   in French. The French was written by the assistant and checked by tests for the method's words, not by a French
   speaker: a read-through by Luxus is the real check.
+- **"Remember he is the one teaching you mosha strategy" (10 Nov):** written in as a standing rule. Luxus is the
+  teacher and the desk is his student; Mosha is his method. The desk restates what he shows, in his terms, and asks where
+  it is unclear. It never teaches the method back to him, never judges a trade, and never treats its own first lines of
+  the book or the earlier studies' wording as his method. The tutorial opens by telling him so, and shows only how to
+  teach, never what Mosha is.
 - **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
   is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
   (it uses your plan's usage each time, so it is your call how often).

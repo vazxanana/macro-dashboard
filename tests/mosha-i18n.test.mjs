@@ -60,6 +60,10 @@ test('the tutorial: nine chapters, the same in both languages, with a picture, a
   });
   assert.ok(en.filter((c) => c.body.some((b) => b.fig)).length >= 7, 'a picture in most chapters'); assert.ok(en.filter((c) => c.body.some((b) => b.cmp || b.dd)).length >= 3, 'weak against good, shown');
   for (const fig of en.flatMap((c) => c.body.filter((b) => b.fig).map((b) => b.fig))) assert.match(TUT, new RegExp('\\b' + fig + ': function'), fig);
+  // he is the teacher, the desk is the student: the tutorial shows how to teach, never what Mosha is
+  assert.match(en[0].body[1].p, /^You are the teacher here, and the desk is the student\. Mosha is your method/); assert.match(nb(fr[0].body[1].p), /^Ici, c'est vous l'enseignant, et le desk est l'élève\. Mosha est votre méthode/);
+  assert.match(flat(en).join(' '), /only an example of the form\. What the words mean, and what the rules are, is yours to teach/); assert.match(flat(en).join(' '), /only what the desk guessed from a few of your screenshots\. They are not your method until you say so/);
+  assert.match(TOOLS.bookText([]), /The teacher teaches the Mosha method; the desk is the student\./); assert.match(TOOLS.bookText([]), /Never teach the method back to him/); assert.match(TOOLS.bookText([]), /Where the desk's reading differs from his, his is right\./);
   // it says what the desk cannot do, in both languages
   assert.match(flat(en).join(' '), /never places, copies or changes a trade/); assert.match(nb(flat(fr).join(' ')), /ne place, ne copie et ne modifie jamais un trade/);
   assert.match(flat(en).join(' '), /does not answer the second you send/); assert.match(flat(en).join(' '), /tested separately, on years of data/);

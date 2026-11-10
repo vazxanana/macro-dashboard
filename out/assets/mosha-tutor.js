@@ -15,6 +15,7 @@
   var EN = [
     { k: 'start', t: 'What you are doing here', lead: 'You are teaching the desk to read a chart the way you do. It knows nothing about your method until you show it.',
       body: [{ fig: 'loop' },
+        { p: 'You are the teacher here, and the desk is the student. Mosha is your method: the desk has no opinion of its own on it. Wherever its reading differs from yours, yours is right.' },
         { p: 'The desk is an assistant. It learns from two things only: the lessons you send, and the lines of its book that you confirm. Nothing else.' },
         { p: 'Teaching goes round in a circle. You send a trade. The desk writes what it understood. You say right, or not right and why. What is right goes into the book, and the desk reads the book before every new lesson.' },
         { tip: 'It never places, copies or changes a trade. Everything on this desk is teaching.' },
@@ -32,6 +33,7 @@
           'Give the levels when you can: sell or buy, entry, stop, target, time. With them the desk puts the trade on its own chart and replays it.'] },
         { cmp: { bad: { pics: 'one picture, no caption', words: '"sell"', why: 'The desk sees a chart and a word. It has to guess the level, the VR and the reason.' },
           good: { pics: 'H4 BO sell · M30 sweep high · M5 vr + M5 cf', words: 'H4 broke down. I waited for the pullback to sweep the M30 high. The M5 VR formed and the CF closed below it. Sell after the CF, stop above the VR, target the H4 low.', why: 'The desk knows the order, the levels and the reason, in your words.' } } },
+        { p: 'This is only an example of the form. What the words mean, and what the rules are, is yours to teach.' },
         { tip: 'A trade you skipped, or one that lost, is a lesson too. Say what was missing or what went wrong.' }],
       quiz: { q: 'Which lesson teaches the desk most?', o: [
         { t: 'Five pictures, no captions, no words', why: 'The desk would have to guess what each picture is for.' },
@@ -80,6 +82,7 @@
           'A line marked "the desk\'s reading, not confirmed" is its own guess. It is not yours until you press Right.',
           'Correct rewrites the line in your words. Erase removes it.',
           'Teach a line yourself when you have a rule to give: short, one idea, the way you would say it.'] },
+        { p: 'The first lines in the book are only what the desk guessed from a few of your screenshots. They are not your method until you say so: correct them freely, in your own words.' },
         { warn: 'Do not leave a wrong line in the book. The desk will keep using it.' },
         { tip: 'Use the same word for the same thing every time. If you use a new word, teach it as a Term first.' }],
       quiz: { q: 'A line in the book is almost right, but one word is wrong. What do you press?', o: [
@@ -123,6 +126,7 @@
   var FR = [
     { k: 'start', t: 'Ce que vous faites ici', lead: 'Vous apprenez au desk à lire un graphique comme vous le lisez. Il ne sait rien de votre méthode tant que vous ne la lui montrez pas.',
       body: [{ fig: 'loop' },
+        { p: 'Ici, c\'est vous l\'enseignant, et le desk est l\'élève. Mosha est votre méthode : le desk n\'a aucun avis propre sur elle. Partout où sa lecture diffère de la vôtre, c\'est la vôtre qui est juste.' },
         { p: 'Le desk est un assistant. Il apprend de deux choses seulement : les leçons que vous envoyez, et les lignes de son livre que vous confirmez. Rien d\'autre.' },
         { p: 'L\'enseignement tourne en boucle. Vous envoyez un trade. Le desk écrit ce qu\'il a compris. Vous dites si c\'est juste, ou pas juste et pourquoi. Ce qui est juste entre dans le livre, et le desk relit le livre avant chaque nouvelle leçon.' },
         { tip: 'Il ne place, ne copie et ne modifie jamais un trade. Tout ce qui se passe sur ce desk est de l\'enseignement.' },
@@ -140,6 +144,7 @@
           'Donnez les niveaux de prix quand vous le pouvez : sell ou buy, entry, stop, target, heure. Avec eux, le desk place le trade sur son propre graphique et le rejoue.'] },
         { cmp: { bad: { pics: 'une image, sans légende', words: '« sell »', why: 'Le desk voit un graphique et un mot. Il doit deviner le level, le VR et la raison.' },
           good: { pics: 'H4 BO sell · M30 sweep high · M5 vr + M5 cf', words: 'H4 a cassé à la baisse. J\'ai attendu que le pullback fasse le sweep du high M30. Le VR M5 s\'est formé et le CF a clôturé en dessous. Sell après le CF, stop au-dessus du VR, target le low H4.', why: 'Le desk connaît l\'ordre, les niveaux de prix et la raison, avec vos mots.' } } },
+        { p: 'Ce n\'est qu\'un exemple de forme. Ce que les mots veulent dire, et quelles sont les règles, c\'est à vous de l\'enseigner.' },
         { tip: 'Un trade que vous n\'avez pas pris, ou un trade perdant, est aussi une leçon. Dites ce qui manquait ou ce qui n\'a pas marché.' }],
       quiz: { q: 'Quelle leçon apprend le plus au desk ?', o: [
         { t: 'Cinq images, sans légende, sans mots', why: 'Le desk devrait deviner à quoi sert chaque image.' },
@@ -188,6 +193,7 @@
           'Une ligne marquée « Lecture du desk, non confirmée » est sa propre supposition. Elle n\'est pas la vôtre tant que vous n\'avez pas appuyé sur Juste.',
           'Corriger réécrit la ligne avec vos mots. Effacer la supprime.',
           'Enseignez vous-même une ligne quand vous avez une règle à donner : courte, une seule idée, comme vous la diriez.'] },
+        { p: 'Les premières lignes du livre ne sont que ce que le desk a deviné à partir de quelques-unes de vos captures. Elles ne sont pas votre méthode tant que vous ne le dites pas : corrigez-les librement, avec vos mots.' },
         { warn: 'Ne laissez pas une ligne fausse dans le livre. Le desk continuera à s\'en servir.' },
         { tip: 'Utilisez toujours le même mot pour la même chose. Si vous employez un mot nouveau, enseignez-le d\'abord comme Terme.' }],
       quiz: { q: 'Une ligne du livre est presque juste, mais un mot est faux. Sur quoi appuyez-vous ?', o: [

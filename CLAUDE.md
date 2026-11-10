@@ -1622,6 +1622,16 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     a teacher confirms, corrects (the desk's first wording is kept in `was`) or erases (`{ book }`), or teaches a line directly
     (`{ learn }` → `confirmed`). The key cannot confirm, change or erase any line. `SEED` = the desk's own first twelve lines,
     all `proposed`, shown until the first change stores the book.
+  - **Who teaches whom** (owner, 10 Nov: "Remember he is the one teaching you mosha strategy"). Luxus teaches the Mosha
+    method and the desk's assistant is his student. Mosha is HIS method, not the desk's and not the studies'. In every
+    answer, book line and page text: restate what he showed in his own terms, read the levels off his pictures, ask
+    where something is unclear. Never teach the method back to him, never tell him what a term "should" mean, never judge
+    whether a trade was good, never quote the five studies or their mechanical readings at him as if they were his
+    method (they were the desk's attempts to write it down, and they failed), and never treat the desk's own twelve
+    first lines or the examples in `assets/mosha-replay.js` as settled: they are guesses from a few screenshots until he
+    confirms them. Where the desk's reading differs from his, his is right. The tutorial says this to him in its first
+    chapter, and `BOOK.md` opens with it (`WHO` in `scripts/mosha-lessons.mjs`). The tutorial may show him HOW to
+    teach (the form of a lesson); it must never tell him WHAT Mosha is.
   - **How the assistant learns, every time** (`scripts/mosha-lessons.mjs`): `pull <dir>` writes `BOOK.md` (the teacher's word
     first, the unconfirmed readings last and marked) and a folder per lesson that waits for the desk (`lesson.txt` with the
     note, levels, captions and the whole conversation; the pictures). Read `BOOK.md` FIRST: a confirmed or corrected line is
