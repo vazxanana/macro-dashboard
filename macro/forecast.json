@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-10T15:55:09.000Z",
+ "at": "2026-11-10T16:42:51.000Z",
  "target": "2026-11-11",
  "targetEvent": null,
  "paperOnly": true,
@@ -20,21 +20,21 @@
    "chg": 0.03,
    "bias": "bear"
   },
-  "dxyProxy": 102.33,
-  "dxy5d": 0.51,
+  "dxyProxy": 102.46,
+  "dxy5d": 0.64,
   "broadUsd20dPct": -0.1,
   "sofrEffrBps": 0,
   "curve10y3m": 0.64,
   "us2y": 4.51,
-  "eu2y": 2.9391258274,
-  "usEu2ySpread": 1.57
+  "eu2y": null,
+  "usEu2ySpread": null
  },
  "assets": {
   "gold": {
    "label": "Gold",
-   "pUp": 0.507,
-   "score": -0.563,
-   "last": 4044.69,
+   "pUp": 0.504,
+   "score": -0.625,
+   "last": 4020.08,
    "expMovePct": 1.09,
    "naiveMovePct": 1.09,
    "volModel": "naive",
@@ -42,7 +42,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.1423,
-    "b": 0.2031,
+    "b": 0.2034,
     "n": 1000,
     "base": 0.536
    },
@@ -80,7 +80,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 1,
-     "detail": "+0.51 pts in 5 sessions"
+     "detail": "+0.64 pts in 5 sessions"
     },
     {
      "k": "cot",
@@ -88,6 +88,13 @@
      "dir": "down",
      "w": 1,
      "detail": "104k net, −7k in 4 weeks, 34th pct, week of 2026-11-03"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "down",
+     "w": 1,
+     "detail": "3.34%, −9 bp a week"
     },
     {
      "k": "smile",
@@ -108,8 +115,8 @@
   "eurusd": {
    "label": "EUR/USD",
    "pUp": 0.49,
-   "score": -0.571,
-   "last": 1.1162,
+   "score": -0.5,
+   "last": 1.11474,
    "expMovePct": 0.26,
    "naiveMovePct": 0.26,
    "volModel": "naive",
@@ -148,7 +155,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 1,
-     "detail": "+0.51 pts in 5 sessions"
+     "detail": "+0.64 pts in 5 sessions"
     },
     {
      "k": "smile",
@@ -163,14 +170,21 @@
      "dir": "down",
      "w": 1,
      "detail": "Gold below, EUR/USD below, USD/JPY above, NQ below, ES below"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "up",
+     "w": 0.5,
+     "detail": "3.34%, −9 bp a week"
     }
    ]
   },
   "usdjpy": {
    "label": "USD/JPY",
-   "pUp": 0.571,
-   "score": 0.316,
-   "last": 158.662,
+   "pUp": 0.574,
+   "score": 0.421,
+   "last": 158.83,
    "expMovePct": 0.27,
    "naiveMovePct": 0.27,
    "volModel": "naive",
@@ -178,7 +192,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.242,
-    "b": 0.1337,
+    "b": 0.1345,
     "n": 999,
     "base": 0.564
    },
@@ -216,7 +230,14 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "up",
      "w": 1,
-     "detail": "+0.51 pts in 5 sessions"
+     "detail": "+0.64 pts in 5 sessions"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "up",
+     "w": 1,
+     "detail": "3.34%, −9 bp a week"
     },
     {
      "k": "smile",
@@ -236,9 +257,9 @@
   },
   "nq": {
    "label": "NQ (Nasdaq 100)",
-   "pUp": 0.535,
-   "score": -0.467,
-   "last": 27663.2,
+   "pUp": 0.542,
+   "score": -0.333,
+   "last": 27613.6,
    "expMovePct": 1.58,
    "naiveMovePct": 1.58,
    "volModel": "naive",
@@ -246,7 +267,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.2444,
-    "b": 0.2248,
+    "b": 0.2246,
     "n": 999,
     "base": 0.561
    },
@@ -266,6 +287,13 @@
      "detail": "+3 bp a week"
     },
     {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "up",
+     "w": 1,
+     "detail": "3.34%, −9 bp a week"
+    },
+    {
      "k": "trend",
      "name": "Own price trend (close vs 20-day mean)",
      "dir": "down",
@@ -284,15 +312,15 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 0.5,
-     "detail": "+0.51 pts in 5 sessions"
+     "detail": "+0.64 pts in 5 sessions"
     }
    ]
   },
   "es": {
    "label": "ES (S&P 500)",
-   "pUp": 0.51,
-   "score": -0.385,
-   "last": 7496,
+   "pUp": 0.521,
+   "score": -0.231,
+   "last": 7493.8,
    "expMovePct": 0.92,
    "naiveMovePct": 0.92,
    "volModel": "naive",
@@ -300,7 +328,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.1531,
-    "b": 0.2947,
+    "b": 0.2944,
     "n": 997,
     "base": 0.54
    },
@@ -311,6 +339,13 @@
      "dir": "down",
      "w": 1,
      "detail": "10Y TIPS 2.63%, rising"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "up",
+     "w": 1,
+     "detail": "3.34%, −9 bp a week"
     },
     {
      "k": "trend",
@@ -338,7 +373,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 0.5,
-     "detail": "+0.51 pts in 5 sessions"
+     "detail": "+0.64 pts in 5 sessions"
     }
    ]
   }
@@ -367,7 +402,7 @@
    "name": "Macro composite (TIPS, DXY, seasonal, CB buying, VIX)",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "60% gold-supportive, DXY ≈ 102.3",
+   "detail": "60% gold-supportive, DXY ≈ 102.5",
    "weights": {
     "gold": 2
    }
@@ -439,7 +474,7 @@
    "name": "USD 5-day momentum (ICE DXY on OANDA)",
    "cluster": "dollar",
    "vote": -1,
-   "detail": "+0.51 pts in 5 sessions",
+   "detail": "+0.64 pts in 5 sessions",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -472,8 +507,8 @@
    "k": "hy",
    "name": "Credit stress (HY spreads)",
    "cluster": "risk",
-   "vote": 0,
-   "detail": "3.42%, −2 bp a week",
+   "vote": -1,
+   "detail": "3.34%, −9 bp a week",
    "weights": {
     "gold": 1,
     "eurusd": -0.5,
@@ -519,7 +554,7 @@
    "name": "Yen carry-unwind risk (BoJ / VIX)",
    "cluster": "risk",
    "vote": null,
-   "detail": "USD/JPY +0.1% in 5 days: calm",
+   "detail": "USD/JPY +0.2% in 5 days: calm",
    "weights": {}
   },
   {
@@ -609,7 +644,7 @@
    "name": "Veteran: dollar (DXY), 4-week change",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "DXY +0.13% in 4 weeks",
+   "detail": "DXY +0.26% in 4 weeks",
    "weights": {},
    "challenger": true,
    "vs": "dxymom",
@@ -679,136 +714,6 @@
   }
  },
  "playbook": [
-  {
-   "at": "2026-11-10T13:30:00.000Z",
-   "country": "USD",
-   "title": "Core CPI m/m",
-   "type": "Inflation",
-   "consensus": "0.2%",
-   "previous": "0.3%",
-   "actual": null,
-   "outcome": null,
-   "rule": "hot if ≥ 0.3%, cool if ≤ 0.1%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
-   "expMovePct": {
-    "gold": 1.09,
-    "eurusd": 0.26,
-    "usdjpy": 0.27,
-    "nq": 1.58,
-    "es": 0.92
-   },
-   "expBasis": {
-    "gold": "naive: mean absolute move of the last 20 days",
-    "eurusd": "naive: mean absolute move of the last 20 days",
-    "usdjpy": "naive: mean absolute move of the last 20 days",
-    "nq": "naive: mean absolute move of the last 20 days",
-    "es": "naive: mean absolute move of the last 20 days"
-   },
-   "scenarios": [
-    {
-     "name": "hot",
-     "odds": 0.25,
-     "when": "above consensus",
-     "moves": {
-      "gold": "down",
-      "eurusd": "down",
-      "usdjpy": "up",
-      "nq": "down",
-      "es": "down"
-     }
-    },
-    {
-     "name": "in line",
-     "odds": 0.5,
-     "when": "near consensus",
-     "moves": {
-      "gold": "little; the prevailing trend resumes",
-      "eurusd": "little; the prevailing trend resumes",
-      "usdjpy": "little; the prevailing trend resumes",
-      "nq": "little; the prevailing trend resumes",
-      "es": "little; the prevailing trend resumes"
-     }
-    },
-    {
-     "name": "cool",
-     "odds": 0.25,
-     "when": "below consensus",
-     "moves": {
-      "gold": "up",
-      "eurusd": "up",
-      "usdjpy": "down",
-      "nq": "up",
-      "es": "up"
-     }
-    }
-   ],
-   "oddsBasis": "prior (no surprise history yet)",
-   "note": "Gold trades this through real yields: watch the TIPS reaction, not the headline."
-  },
-  {
-   "at": "2026-11-10T13:30:00.000Z",
-   "country": "USD",
-   "title": "CPI m/m",
-   "type": "Inflation",
-   "consensus": "0.3%",
-   "previous": "0.6%",
-   "actual": null,
-   "outcome": null,
-   "rule": "hot if ≥ 0.4%, cool if ≤ 0.2%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
-   "expMovePct": {
-    "gold": 1.09,
-    "eurusd": 0.26,
-    "usdjpy": 0.27,
-    "nq": 1.58,
-    "es": 0.92
-   },
-   "expBasis": {
-    "gold": "naive: mean absolute move of the last 20 days",
-    "eurusd": "naive: mean absolute move of the last 20 days",
-    "usdjpy": "naive: mean absolute move of the last 20 days",
-    "nq": "naive: mean absolute move of the last 20 days",
-    "es": "naive: mean absolute move of the last 20 days"
-   },
-   "scenarios": [
-    {
-     "name": "hot",
-     "odds": 0.25,
-     "when": "above consensus",
-     "moves": {
-      "gold": "down",
-      "eurusd": "down",
-      "usdjpy": "up",
-      "nq": "down",
-      "es": "down"
-     }
-    },
-    {
-     "name": "in line",
-     "odds": 0.5,
-     "when": "near consensus",
-     "moves": {
-      "gold": "little; the prevailing trend resumes",
-      "eurusd": "little; the prevailing trend resumes",
-      "usdjpy": "little; the prevailing trend resumes",
-      "nq": "little; the prevailing trend resumes",
-      "es": "little; the prevailing trend resumes"
-     }
-    },
-    {
-     "name": "cool",
-     "odds": 0.25,
-     "when": "below consensus",
-     "moves": {
-      "gold": "up",
-      "eurusd": "up",
-      "usdjpy": "down",
-      "nq": "up",
-      "es": "up"
-     }
-    }
-   ],
-   "oddsBasis": "prior (no surprise history yet)",
-   "note": "Gold trades this through real yields: watch the TIPS reaction, not the headline."
-  },
   {
    "at": "2026-11-12T07:00:00.000Z",
    "country": "GBP",
@@ -1076,7 +981,7 @@
     "brier": 0.249,
     "brierRW": 0.25,
     "brierClim": 0.2485,
-    "skillRW": 0.0041,
+    "skillRW": 0.0042,
     "skillClim": -0.0018,
     "logLoss": 0.6911,
     "ece": 0.034,
@@ -1377,15 +1282,15 @@
      },
      {
       "bin": "52-55%",
-      "n": 351,
+      "n": 349,
       "p": 0.535,
       "obs": 0.521
      },
      {
       "bin": "55-60%",
-      "n": 293,
+      "n": 295,
       "p": 0.567,
-      "obs": 0.57
+      "obs": 0.569
      },
      {
       "bin": "60-100%",
@@ -3663,31 +3568,31 @@
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
-  "fred:DFII10": "ok, last 2026-11-06",
-  "fred:DGS10": "ok, last 2026-11-06",
-  "fred:T10YIE": "ok, last 2026-11-09",
   "fred:DGS2": "ok, last 2026-11-06",
-  "fred:BAMLH0A0HYM2": "ok, last 2026-11-06",
+  "fred:DGS10": "ok, last 2026-11-06",
+  "fred:DFII10": "ok, last 2026-11-06",
+  "fred:T10YIE": "ok, last 2026-11-09",
   "fred:T10Y3M": "ok, last 2026-11-09",
+  "fred:VIXCLS": "ok, last 2026-11-09",
   "fred:DTWEXBGS": "ok, last 2026-11-06",
   "fred:WALCL": "ok, last 2026-11-04",
   "fred:WTREGEN": "ok, last 2026-11-04",
   "fred:VXVCLS": "ok, last 2026-11-09",
-  "fred:VIXCLS": "ok, last 2026-11-09",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-09",
   "fred:RRPONTSYD": "ok, last 2026-11-09",
   "fred:SWPT": "ok, last 2026-11-04",
-  "fred:EFFR": "ok, last 2026-11-09",
   "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
+  "fred:EFFR": "ok, last 2026-11-09",
   "fred:SOFR": "ok, last 2026-11-09",
-  "ecb:2y": "ok, last 2026-11-09",
-  "bars:gold": "OANDA ok (1400 days)",
+  "ecb:2y": "failed (The operation was aborted due to timeout)",
   "bars:eurusd": "OANDA ok (1400 days)",
-  "bars:usdchf": "OANDA ok (1400 days)",
   "bars:nq": "OANDA ok (1400 days)",
-  "bars:es": "OANDA ok (1400 days)",
+  "bars:usdchf": "OANDA ok (1400 days)",
+  "bars:gold": "OANDA ok (1400 days)",
   "bars:usdcad": "OANDA ok (1400 days)",
-  "bars:gbpusd": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
   "bars:usdjpy": "OANDA ok (1400 days)",
+  "bars:gbpusd": "OANDA ok (1400 days)",
   "calendar:thisweek": "ok (105 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "rss:Fed": "ok (20 items)",
@@ -3842,5 +3747,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Tue 10 Nov 15:55 UTC, for Wed 11 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility. Gold: 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±1.09% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.26% (20-day average). USD/JPY: 57% up (base rate 56%; base rate, no macro tilt). Drivers lean up: real yields, real-yield 1-week momentum; against: us 10y yield trend. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 54% up (base rate 56%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±1.58% (20-day average). ES (S&P 500): 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, own price trend; against: fed expectations. Expected move ±0.92% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.18 → AUCTION (no macro edge) (real yield 4w z +0.51, DXY 4w z +0.05, 2Y 13w z -0.74, curve 13w z -0.53; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.18; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: USD Core CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.2%, previous 0.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.09%; USD CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.3%, previous 0.6%): if hot, gold down, USD up, NQ down; gold usually moves ±1.09%; GBP GDP m/m Thu 12 Nov 07:00 UTC (consensus 0.0%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.09%; USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.09%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.27): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.862% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Tue 10 Nov 16:42 UTC, for Wed 11 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility. Gold: 50% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±1.09% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.26% (20-day average). USD/JPY: 57% up (base rate 56%; macro tilt up 1 pt). Drivers lean up: real yields, real-yield 1-week momentum; against: us 10y yield trend. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 54% up (base rate 56%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.58% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.92% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.18 → AUCTION (no macro edge) (real yield 4w z +0.51, DXY 4w z +0.05, 2Y 13w z -0.74, curve 13w z -0.53; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.18; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: GBP GDP m/m Thu 12 Nov 07:00 UTC (consensus 0.0%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.09%; USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.09%; USD PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.4%, previous 1.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.09%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.27): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.862% on other days, but no model turned that into a better forecast."
 }
