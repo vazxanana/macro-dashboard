@@ -111,7 +111,7 @@
   }
   function drawRecord() {
     var box = $('mo-rec'); if (!box) return; var S = summary(M.trades), v = verdict(S.pre);
-    box.innerHTML = '<div class="ms-k"><span>Your record</span><small>trades written down before their result</small></div>' +
+    box.innerHTML = '<div class="ms-k"><span>' + (M.canWrite ? 'Your record' : 'The logged trades') + '</span><small>' + (M.canWrite ? '' : 'the owner\'s log · ') + 'trades written down before their result</small></div>' +
       '<p class="mo-verdict mo-' + v.key + '">' + esc(v.text) + '</p>' + tiles(S.pre) + curveSvg(S.curve) +
       '<p class="ms-note mo-foot">' + S.open + ' open now. ' + (S.post.n ? 'Added afterwards, kept apart: ' + S.post.n + ' trade' + (S.post.n > 1 ? 's' : '') + ', ' + fR(S.post.total) + ' in total. A trade logged once its result is known cannot measure how you choose, so it is not in the numbers above.' : 'A trade counts here when you log it while it is still open; one added after it closed is listed below but kept out of these numbers.') + '</p>' + splits(S);
   }
@@ -197,6 +197,6 @@
       else if (b.id === 'mo-csv') { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv(M.trades)], { type: 'text/csv' })); a.download = 'mosha-trades.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
     });
   }
-  root.renderMosha = function () { wire(); if (!M.trades) draw(); load(); if (root.msMoshaReplay) root.msMoshaReplay(); };
+  root.renderMosha = function () { wire(); if (!M.trades) draw(); load(); if (root.msMoshaReplay) root.msMoshaReplay(); if (root.msMoshaTeach) root.msMoshaTeach(); };
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.renderMosha(); }   // opened straight on #mosha before this file ran
 })(typeof window !== 'undefined' ? window : globalThis);

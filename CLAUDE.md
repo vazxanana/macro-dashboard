@@ -31,7 +31,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
@@ -63,7 +63,7 @@ while Actions saved in the last 10 min, and both only commit when `RUN_MODE` / E
 owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `watchdog.yml` pages when the loop stops.
 
 **Sections below, by topic** (each is dated; later sections win where two disagree):
-- Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions,
+- Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
   Server-side sign-in, API hardening, Profile photo and name on the server.
 - The Desk page: Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
@@ -141,7 +141,7 @@ Built-in members live in `api/_accounts.js` `BUILT_IN` (server only: `{ <key>: {
 a reviewer session gets the admin view
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
 settings) and can write loss reviews, which carry `by: <name>`. The footer is hidden; log in / log out live in the account menu (`#ms-me`), which clicks the hidden `#ms-admin-link` (log out = `msSignOut()`). Add members on the Users page (or a `BUILT_IN` entry with the SHA-256 of their password).
-Viewers (`role: 'viewer'`, currently **Luxus** and **Carlos**; Orlando became a reviewer on 8 Nov, see "Accounts, desks";
+Viewers (`role: 'viewer'`, currently **Luxus** (who also teaches on the Mosha desk, his main page since 10 Nov: see "Mosha desk") and **Carlos**; Orlando became a reviewer on 8 Nov, see "Accounts, desks";
 `VIEWER` in the main script) are read-only with a reduced site (the role defaults; per-member permissions since 8 Nov): Home
 (Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
 scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
@@ -1574,5 +1574,35 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   "BO sell" only when the break is in (`relabel`). Never give a picture a position its screenshot does not show.
 - A log only: nothing under it places, copies or changes a trade, and no council member reads it. A study of the logged trades
   needs its own pre-registration (n and t, the `pre` trades only).
+- **Luxus's main page, and the lessons** (same day, owner: "This will be main page of LEXUS (one of the users, he will train
+  u, allow him to send you trades images so u can learn"; the account is Luxus, whose screenshots the examples came from).
+  - Permission `mosha`: false | 'read' | 'teach' (`MS_PERM_KEYS`, `cleanPerms`; `api/mosha.js` `moshaLevel` and the page's
+    `msPerms` give the same answer, a test compares them). A stored `perms.mosha` (Users page → Permissions → "Mosha desk")
+    wins; then the account's own flag; then the member reads the desk when the other desks are open to them. Luxus's built-in
+    record carries `mosha: 'teach', home: 'mosha'`, applied by key in `api/_session.js` `account()` so a stored copy of his
+    record (a new password) keeps them. `home: 'mosha'` = he lands on `#mosha` when the address has no view; `html[data-mosha]`
+    opens the Desks entry and the Mosha link of the desk switch on their own. He stays a viewer everywhere else, and the
+    trade log stays the owner's (he reads it, cannot write it).
+  - `api/mosha-lessons.js` (private Blob `mosha/lessons.json`, 300 kept, + `mosha/shots/<id>.<ext>`): a lesson = title, note
+    and up to 12 screenshots, each with its caption. GET list / `?img=<id>` for readers; POST `{ add }` (one picture a
+    request: a new lesson, or one more picture on the teacher's own), `{ edit }`, `{ remove }` for the lesson's teacher or the
+    owner; `{ reply }` = what the desk understood. A picture must really be a JPEG, PNG or WebP (first bytes checked) of at
+    most 1.5 MB, is stored under the checked type and served with it and `nosniff`; 80 pictures a day per teacher.
+  - **The assistant's key**: the desk's assistant has no account. It sends `Authorization: Bearer <key>`; the key is derived
+    from the session secret (`readerKey`; `MOSHA_READER=off`, `MOSHA_READER_SALT` rotates it), shown to the owner's session
+    only (Lessons card, "Show the assistant's key"), and can read the lessons and write a reply, nothing else; a wrong key
+    counts in `api/_guard.js` like a wrong password. Never widen it, never write it in a file or a chat.
+  - **Reading the lessons in a session** (the "learn" part): `node --use-env-proxy scripts/mosha-lessons.mjs pull <dir>` saves
+    `lessons.json` and the pictures of the lessons not read yet (2.5 s apart: the firewall allows 30 API calls a minute); look
+    at each picture with its caption and note, then `… reply <lesson id> <file>` writes back what was understood (levels read
+    off the picture, the steps in the teacher's words, what is unclear). The key comes from the session's environment (a
+    network secret for meridianx.dev, saved by the owner in the secure form) or `MOSHA_READER_KEY` locally. A lesson is the
+    teacher's pick, like the examples: it shows the pattern, not how often it wins. A rule drawn from lessons is tested with
+    its own pre-registration before anyone calls it an edge, and no live rule changes without the owner.
+  - Page: `assets/mosha-teach.js` (`window.MS_MOSHA_TEACH` pure pieces, `msMoshaTeach`), cards `#mo-teach` (shown on the
+    server's `canTeach`; choose, drop or paste up to 8 screenshots, a caption each, resized in the browser to 1800 px JPEG) and
+    `#mo-lessons` (a lesson unfolds to its note, pictures and "What the desk understood"; pictures load only when unfolded).
+    For a teacher who is not the owner the two cards come first and the heading speaks to him (`.mo-own` / `.mo-tch` /
+    `.mo-rdr`). Tests: `tests/mosha-lessons.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

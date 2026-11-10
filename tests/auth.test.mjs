@@ -76,9 +76,9 @@ test('tokens: tampered, re-signed with another key, expired or malformed tokens 
 test('/api/me re-reads the user list: new role and perms show up, removal or a new password ends the session', async () => {
   let list = {}; const deps = { builtIns, blobUsers: async () => ({ users: list }) };
   const c = cookieFrom(await signIn('lx-pw', deps));
-  assert.deepEqual((await run(me, { method: 'GET', headers: { cookie: c } }, { env: ENV, deps })).body.account, { u: 'luxus', name: 'Luxus', role: 'viewer' });
+  assert.deepEqual((await run(me, { method: 'GET', headers: { cookie: c } }, { env: ENV, deps })).body.account, { u: 'luxus', name: 'Luxus', role: 'viewer', mosha: 'teach', home: 'mosha' });   // Luxus's built-in defaults (10 Nov: the Mosha desk is his main page, and he teaches there), applied by key
   list = { luxus: { ...builtIns.luxus, role: 'reviewer', perms: { scanner: false }, ct: true } };
-  assert.deepEqual((await run(me, { method: 'GET', headers: { cookie: c } }, { env: ENV, deps })).body.account, { u: 'luxus', name: 'Luxus', role: 'reviewer', ct: true, perms: { scanner: false } });
+  assert.deepEqual((await run(me, { method: 'GET', headers: { cookie: c } }, { env: ENV, deps })).body.account, { u: 'luxus', name: 'Luxus', role: 'reviewer', ct: true, perms: { scanner: false }, mosha: 'teach', home: 'mosha' });
   list = { luxus: { ...builtIns.luxus, hash: sha('new-pw') } };
   const r = await run(me, { method: 'GET', headers: { cookie: c } }, { env: ENV, deps }); assert.equal(r.body.account, null); assert.match(r.headers['set-cookie'], /Max-Age=0/);
   list = { luxus: { ...builtIns.luxus, disabled: true } };

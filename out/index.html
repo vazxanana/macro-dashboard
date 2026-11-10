@@ -36,8 +36,9 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <script src="/assets/lightweight-charts-4.1.3.js?v=0c146b9bfb"></script>
 <script src="/assets/ms-dialog.js?v=9d6241afda"></script>
-<script src="/assets/mosha-desk.js?v=fe715743dd" defer></script>
+<script src="/assets/mosha-desk.js?v=65e64faaf0" defer></script>
 <script src="/assets/mosha-replay.js?v=6bd65bba0d" defer></script>
+<script src="/assets/mosha-teach.js?v=ddd61960b6" defer></script>
 <script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
@@ -1290,15 +1291,19 @@ window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(lo
 window.MS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/' : null;   // sign-in and accounts: the Vercel site only
 // permission keys: what a member can see or do. Role defaults below; `perms` on a user record overrides key by key.
 //   charts, scanner, journal, desks (Gold / Crypto / LIT / NQ SDV), council (every council tab; off = overview only), macro (the
-//   Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict: false | 'read' | 'write'
-window.MS_PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict'];
-window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: false, desks: false, council: false, macro: true, ct: false, mcp: false, ict: false },
-  reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false } };
+//   Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict: false | 'read' | 'write',
+//   mosha: false | 'read' | 'teach' (the Mosha desk alone; 'teach' = may send lessons there). Without a mosha value of its own a
+//   member reads the Mosha desk when the other desks are open to them (the same rule as api/mosha.js moshaLevel).
+window.MS_PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict', 'mosha'];
+window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: false, desks: false, council: false, macro: true, ct: false, mcp: false, ict: false, mosha: false },
+  reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false, mosha: false } };
 window.msPerms = function (R, owner) {
   var E = {}, k, d = window.MS_PERM_DEFAULTS[R && R.role] || window.MS_PERM_DEFAULTS.viewer;
-  for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : true) : d[k];
+  for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : k === 'mosha' ? 'teach' : true) : d[k];
   if (!owner && R) { if (R.ict) E.ict = R.ict === 'read' ? 'read' : 'write'; if (R.ct) E.ct = true; if (R.mcp) E.mcp = true;
-    var P = R.perms || {}; for (k in P) if (window.MS_PERM_KEYS.indexOf(k) >= 0) E[k] = k === 'ict' ? (P[k] === 'read' || P[k] === 'write' ? P[k] : P[k] === true ? 'write' : false) : !!P[k]; }
+    var P = R.perms || {}; for (k in P) if (window.MS_PERM_KEYS.indexOf(k) >= 0 && k !== 'mosha') E[k] = k === 'ict' ? (P[k] === 'read' || P[k] === 'write' ? P[k] : P[k] === true ? 'write' : false) : !!P[k];
+    var m = P.mosha === false || P.mosha === 'read' || P.mosha === 'teach' ? P.mosha : R.mosha === 'teach' || R.mosha === 'read' ? R.mosha : null;
+    E.mosha = m != null ? m : E.desks ? 'read' : false; }
   return E;
 };
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
@@ -1330,6 +1335,7 @@ window.msFetchUsers = function () {
   if (!owner && E.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
   if (E.ct) document.documentElement.dataset.ct = owner ? 'owner' : '1';   // the demo accounts' results on the profile; non-owners see edge labels, never account numbers (8 Nov)
   if (E.mcp) document.documentElement.dataset.mcp = '1';
+  if (E.mosha) document.documentElement.dataset.mosha = E.mosha;   // the Mosha desk is open to this account ('teach' = may send lessons)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // signing out forgets the cTrader view-only session (and account choice) kept in this browser, so the next person on a shared
@@ -1357,7 +1363,7 @@ document.addEventListener('DOMContentLoaded', function () {
   fetch(window.MS_API + 'me', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
     if (!j) return;   // offline, or the user list is unreadable (503): keep the view; the server still checks every data call
     var A = j.account || null, cur = window.MS_ACCT || null;
-    var sig = function (x) { return x ? JSON.stringify([x.u, x.role, x.name, x.ict || false, x.ct || false, x.mcp || false, x.perms || null]) : 'null'; };
+    var sig = function (x) { return x ? JSON.stringify([x.u, x.role, x.name, x.ict || false, x.ct || false, x.mcp || false, x.perms || null, x.mosha || false, x.home || false]) : 'null'; };
     if (sig(A) === sig(cur)) return;
     var want = A ? JSON.stringify(A) : null, got;
     try { if (A) { localStorage.setItem('ms-acct', want); localStorage.removeItem('ms-guest'); } else localStorage.removeItem('ms-acct'); } catch (e) {}
@@ -2156,9 +2162,9 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
 @media (max-width: 700px) { .a-tap { display: none; } .c-act > li:not(.empty) { padding-left: 4px !important; padding-right: 4px !important; } }
 
 /* ═══ CRYPTO DESK (#crypto) ═══ */
-html[data-deny~="desks"] [data-go="crypto"], html[data-deny~="desks"] [data-go="gold"], html[data-deny~="desks"] .desk-sw a:not(.ictx) { display: none !important; }
-/* the Desks entry shows when at least one desk is open to this account */
-html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not([data-ict]) .dsk { display: none !important; }
+html[data-deny~="desks"] [data-go="crypto"], html[data-deny~="desks"] [data-go="gold"], html[data-deny~="desks"] .desk-sw a:not(.ictx):not([data-dsw="mosha"]), html:not([data-mosha]) .desk-sw a[data-dsw="mosha"] { display: none !important; }
+/* the Desks entry shows when at least one desk is open to this account (the Mosha desk can be open on its own) */
+html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not([data-ict]):not([data-mosha]) .dsk { display: none !important; }
 .desk-sw { display: inline-flex; width: max-content; max-width: 100%; gap: 2px; padding: 3px; margin: 0 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
 .desk-sw a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 16px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 600 13px var(--sans); }
 .desk-sw a:hover { color: var(--ink); } .desk-sw a[aria-current="page"] { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -3431,7 +3437,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <section class="view adm" id="v-mosha" aria-label="Mosha desk" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
-      <div><h1 class="h-head">Mosha desk <span class="mo-tag">Your own trades</span></h1><p class="ms-note">Your Mosha trading, measured the only way left: the trades you choose, written down with their stop while they are still open. Tested as fixed rules it is not an edge (five studies, below), so this desk counts what the rules cannot see, your selection. A log only: nothing here places, copies or changes a trade.</p></div>
+      <div><h1 class="h-head">Mosha desk <span class="mo-tag mo-own">Your own trades</span><span class="mo-tag mo-tch">You teach here</span><span class="mo-tag mo-rdr">Read only</span></h1>
+        <p class="ms-note mo-own">Your Mosha trading, measured the only way left: the trades you choose, written down with their stop while they are still open. Tested as fixed rules it is not an edge (five studies, below), so this desk counts what the rules cannot see, your selection. A log only: nothing here places, copies or changes a trade.</p>
+        <p class="ms-note mo-tch">Send the desk your trades: the screenshots, and in your own words what you saw and why you took it. The desk reads each lesson and writes back what it understood, so you can correct it. Under the lessons are the trades it has learned so far, on the chart with a replay. Lessons only: nothing here places, copies or changes a trade.</p>
+        <p class="ms-note mo-rdr">The teacher's lessons, the example trades on the chart with a replay, and the logged trades. Tested as fixed rules Mosha is not an edge (five studies, below). Nothing here places, copies or changes a trade.</p></div>
     </div>
     <div class="mo-grid">
       <div class="card" id="mo-rec"><div class="ms-k"><span>Your record</span></div><div class="ct-empty">Loading the log…</div></div>
@@ -3463,6 +3472,25 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         </div>
         <ul class="mo-rp-leg" aria-label="What the marks mean"><li><i class="lv"></i>Level</li><li><i class="vr"></i>M5 VR, your "5 mn" box</li><li><i class="bv"></i>A range, your green box</li><li><i class="zn"></i>Zone of the break</li><li><i class="st"></i>Stop</li><li><i class="tg"></i>Target</li></ul>
         <p class="ms-note">These are the trades from your screenshots, redrawn on our own candles from what the charts show. They are examples you picked, so they show the pattern, not how often it wins. "The bigger picture" holds the higher-timeframe views from the same screenshots: the H4 BO sell, the M15 VR and the pullback the trades came from. "Replay" on a logged trade opens it here too.</p>
+      </div>
+      <div class="card mo-wide" id="mo-teach" hidden>
+        <div class="ms-k"><span>Teach the desk: send a trade</span><small>your screenshots, in your own words</small></div>
+        <form id="mo-t-form" class="mo-tc" autocomplete="off" novalidate>
+          <label class="mo-f"><span>Which trade <small>a few words</small></span><input type="text" name="title" maxlength="80" placeholder="2 Nov sell, gold"></label>
+          <label class="mo-f"><span>Goes with</span><select name="lesson"><option value="">A new lesson</option></select></label>
+          <label class="mo-f mo-f3"><span>What should the desk learn from it <small>optional</small></span><textarea name="note" rows="3" maxlength="2000" placeholder="Why you took it, what you waited for, where the stop goes and why."></textarea></label>
+          <div class="mo-tc-drop" id="mo-t-drop"><input type="file" id="mo-t-file" accept="image/png,image/jpeg,image/webp" multiple><label for="mo-t-file" class="ms-tbtn">Choose screenshots</label><span>or drop them here, or paste one · up to 8 at a time · each gets its own caption</span></div>
+          <ol class="mo-tc-picks" id="mo-t-picks"></ol>
+          <div class="mo-bar"><span class="ms-note" id="mo-t-msg" role="status" aria-live="polite"></span><button type="submit" class="u-btn" id="mo-t-send" disabled>Send to the desk</button></div>
+        </form>
+        <p class="ms-note">Send a trade the way you would explain it: the higher timeframe first, then the entry, one caption per picture ("M30 sweep high", "M5 vr", "entry after BO sell"). The desk reads each lesson and writes under it what it understood, so you can correct it. The pictures stay private to the desk's members.</p>
+      </div>
+      <div class="card mo-wide" id="mo-lessons">
+        <div class="ms-k"><span>Lessons</span><small id="mo-l-sub"></small></div>
+        <div id="mo-l-body"><div class="ct-empty">Loading the lessons…</div></div>
+        <div class="mo-l-key" id="mo-l-key" hidden><button type="button" class="ms-tbtn" id="mo-l-keybtn">Show the assistant's key</button>
+          <div id="mo-l-keyout" hidden><input type="text" readonly aria-label="The assistant's key" spellcheck="false"><button type="button" class="ms-tbtn" id="mo-l-keycopy">Copy</button><small></small></div>
+          <p class="ms-note">The desk's assistant reads the lessons with this key. Only you see it.</p></div>
       </div>
       <div class="card mo-wide" id="mo-form-card" hidden>
         <div class="ms-k"><span id="mo-form-h">Log a trade</span><small>write it down as you take it</small></div>
@@ -7775,8 +7803,12 @@ function msNextSetup(bars, A) {
   // A stored perms.ictApply (true or false) decides; without one the built-in record's default counts (on for Fred, by the
   // owner's decision of 10 Nov; off for everyone else), exactly as api/mcp.js applyFlag.
   const applyOn = (u, k) => (u && u.perms && typeof u.perms.ictApply === 'boolean' ? u.perms.ictApply : !!((k && window.MS_USERS && window.MS_USERS[k] && window.MS_USERS[k].ictApply === true) || (u && u.ictApply === true)));
+  // The Mosha desk level of a member on this page: a stored perms.mosha, else the record's own flag, else the built-in default
+  // by key (Luxus teaches), else read with the other desks. `own` = only what was set for this member (null = the default).
+  const moshaOwn = (u) => (u && u.perms && (u.perms.mosha === false || u.perms.mosha === 'read' || u.perms.mosha === 'teach') ? u.perms.mosha : null);
+  const moshaOf = (u, k) => { const own = moshaOwn(u), b = k && window.MS_USERS && window.MS_USERS[k]; return window.msPerms({ ...u, mosha: (u && u.mosha) || (b && b.mosha) || null, perms: { ...((u && u.perms) || {}), ...(own != null ? { mosha: own } : {}) } }, false).mosha; };
   const permChips = (u, k) => { const E = window.msPerms(u, false); const on = Object.keys(PERM_LABEL).filter((k) => E[k]).map((k) => PERM_LABEL[k].split(' ')[0].replace(/[:']/g, ''));
-    if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); if (E.ict === 'write' && applyOn(u, k)) on.push('ICT apply'); return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
+    if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); if (E.ict === 'write' && applyOn(u, k)) on.push('ICT apply'); { const m = moshaOf(u, k); if (m && !E.desks) on.push(m === 'teach' ? 'Mosha teacher' : 'Mosha desk'); else if (m === 'teach') on.push('Mosha teacher'); } return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
   function permDialog(k, cur) {
     let d = document.getElementById('ms-perm-dlg');
     if (!d) { d = document.createElement('dialog'); d.id = 'ms-perm-dlg'; d.className = 'own-dlg perm-dlg'; document.body.appendChild(d); }
@@ -7786,10 +7818,12 @@ function msNextSetup(bars, A) {
       <fieldset class="perm-ict"><legend>ICT desk</legend><label><input type="radio" name="ict" value=""${!E.ict ? ' checked' : ''}> No access</label><label><input type="radio" name="ict" value="read"${E.ict === 'read' ? ' checked' : ''}> Read only</label><label><input type="radio" name="ict" value="write"${E.ict === 'write' ? ' checked' : ''}> Review and trade (marks, grades, notes)</label>
         <div class="perm-apply" id="ms-perm-apply"${E.ict === 'write' ? '' : ' hidden'}><label><input type="checkbox" name="ictApply"${applyOn(cur, k) ? ' checked' : ''}> ICT: may apply changes to the ICT edge without my review</label>
           <p class="ms-note">On for Fred since 10 Nov 2026 (your decision); off for everyone else. It takes two things: this box ticked, and the member's name in council/ict-apply.json (it lists Fred; change it through a normal reviewed pull request). With both, ${esc(cur.name || k)} can change the ICT edge's own files (tracker, replay, rule book, ICT tests and research) from the ChatGPT connector without your review. Each change must still pass the automatic checks: ICT files only, the tests, and every trade keeps its stop. Each one is a merged pull request you can revert. Unticking this stops it at once. Removing the name from council/ict-apply.json is the hard off-switch.</p></div></fieldset>
+      <fieldset class="perm-ict"><legend>Mosha desk</legend>${(() => { const own = moshaOwn(cur), def = moshaOf({ ...cur, perms: { ...(cur.perms || {}), mosha: undefined } }, k); const r = (v, l) => `<label><input type="radio" name="mosha" value="${v}"${(own == null ? '' : own === false ? 'off' : own) === v ? ' checked' : ''}> ${l}</label>`;
+        return r('', `Default for ${esc(cur.name || k)}: ${def === 'teach' ? 'may send lessons' : def === 'read' ? 'read only' : 'no access'}`) + r('off', 'No access') + r('read', 'Read only') + r('teach', 'May send lessons (trade screenshots and notes for the desk to learn from)'); })()}</fieldset>
       <div class="own-acts"><button type="button" value="reset" id="ms-perm-reset">Back to role defaults</button><button type="button" value="cancel" id="ms-perm-cancel">Cancel</button><button type="submit" value="ok" class="pri">Save</button></div></form>`;
     const f = d.querySelector('form');
     f.onchange = () => { d.querySelector('#ms-perm-apply').hidden = f.elements.ict.value !== 'write'; };   // the apply box only makes sense with ICT write
-    f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false; perms.ictApply = ict === 'write' && f.elements.ictApply.checked;
+    f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false; perms.ictApply = ict === 'write' && f.elements.ictApply.checked; { const m = f.elements.mosha.value; if (m) perms.mosha = m === 'off' ? false : m; }
       d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
     d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
     d.querySelector('#ms-perm-cancel').onclick = () => d.close();
@@ -7994,10 +8028,10 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
-  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', mosha: 'desks', ict: 'ict' };
+  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', mosha: 'mosha', ict: 'ict' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
@@ -8014,7 +8048,7 @@ function msNextSetup(bars, A) {
     // opens the desk used last; the switch at the top of each desk marks the current one
     { const DESKS = ['ict', 'gold', 'mosha', 'crypto', 'lit', 'sdv'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
       let last = 'ict'; try { last = localStorage.getItem('ms-desk') || 'ict'; } catch (e) {}
-      const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !VIEWER), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
+      const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !msDenied(k)), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
       document.querySelectorAll('[data-desks]').forEach((a) => { a.setAttribute('href', '#' + pick); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
       document.querySelectorAll('[data-dsw]').forEach((a) => { if (a.dataset.dsw === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); }
     if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
@@ -10966,6 +11000,27 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-mosha .mo-bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; } #v-mosha .mo-calc { font: 600 13px var(--mono); color: var(--ink); margin-right: auto; } #v-mosha .mo-bar .ms-note { margin: 0; }
 #v-mosha .mo-t td { vertical-align: top; white-space: normal; } #v-mosha .mo-t td small { display: block; color: var(--ink-faint); font-size: 12px; margin-top: 2px; } #v-mosha .mo-tags { min-width: 180px; max-width: 420px; }
 #v-mosha .mo-acts { white-space: nowrap; text-align: right; } #v-mosha .mo-acts .ms-tbtn { margin: 0 0 0 4px; } #v-mosha .mo-acts .mo-go { border-color: var(--gold-line, #c98f12); color: var(--mo-gold); font-weight: 600; } #v-mosha .mo-when { white-space: nowrap; } #v-mosha .mo-check { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: var(--well, color-mix(in srgb, var(--ink) 6%, transparent)); font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
+/* who is looking: the owner (the log is theirs), a teacher (the lessons come first on their page), a reader */
+html:not([data-role="owner"]) #v-mosha .mo-own, html[data-role="owner"] #v-mosha .mo-tch, html:not([data-mosha="teach"]) #v-mosha .mo-tch, html[data-role="owner"] #v-mosha .mo-rdr, html[data-mosha="teach"] #v-mosha .mo-rdr { display: none; }
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-teach { order: -2; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lessons { order: -1; }
+#v-mosha .mo-tc { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 14px; align-items: end; margin-bottom: 12px; } #v-mosha .mo-tc > .mo-f { grid-column: span 3; } #v-mosha .mo-tc > .mo-f3 { grid-column: 1 / -1; }
+#v-mosha .mo-tc-drop { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px; border: 1px dashed var(--line-strong, var(--line)); border-radius: 10px; color: var(--ink-dim); font-size: 13px; } #v-mosha .mo-tc-drop.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+#v-mosha .mo-tc-drop input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; } #v-mosha .mo-tc-drop label { cursor: pointer; min-height: 40px; display: inline-flex; align-items: center; } #v-mosha .mo-tc-drop input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+#v-mosha .mo-tc-picks { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; } #v-mosha .mo-tc-picks:empty { display: none; } #v-mosha .mo-tc-picks li { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+#v-mosha .mo-tc-picks img { width: 96px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-raised, transparent); } #v-mosha .mo-tc-picks .mo-f { grid-column: auto; } #v-mosha .mo-err-t { color: var(--sell); font-weight: 600; } #v-mosha .mo-tc[aria-busy="true"] { opacity: .8; }
+#v-mosha .mo-l { border-top: 1px solid var(--line); } #v-mosha .mo-l:first-child { border-top: 0; } #v-mosha .mo-l > summary { min-height: 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 6px 0; cursor: pointer; } #v-mosha .mo-l > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#v-mosha .mo-l-t { font: 600 15px var(--sans); color: var(--ink); } #v-mosha .mo-l-m { font-size: 13px; color: var(--ink-dim); } #v-mosha .mo-l-st { margin-left: auto; padding: 2px 9px; border-radius: 999px; font: 600 12px/1.5 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); white-space: nowrap; }
+#v-mosha .mo-l-read { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 50%, transparent); } #v-mosha .mo-l-new, #v-mosha .mo-l-more { color: var(--mo-gold); border-color: var(--gold-line, #c98f12); }
+#v-mosha .mo-l-b { padding: 4px 0 16px; display: grid; gap: 12px; } #v-mosha .mo-l-note { margin: 0; white-space: pre-wrap; line-height: 1.55; font-size: 14px; max-width: 80ch; }
+#v-mosha .mo-l-shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; } #v-mosha .mo-l-shots figure { margin: 0; display: grid; gap: 6px; align-content: start; } #v-mosha .mo-l-shots figcaption { font-size: 13px; line-height: 1.4; color: var(--ink); }
+#v-mosha .mo-l-img { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel-raised, transparent); cursor: zoom-in; } #v-mosha .mo-l-img:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } #v-mosha .mo-l-img img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+#v-mosha .mo-l-x { margin-left: 8px; padding: 0; border: 0; background: none; color: var(--ink-faint); font: 500 12px var(--sans); text-decoration: underline; cursor: pointer; min-height: 24px; } #v-mosha .mo-l-x:hover { color: var(--ink); }
+#v-mosha .mo-l-reply { padding: 12px 14px; border-radius: 10px; background: var(--panel-raised, color-mix(in srgb, var(--ink) 4%, transparent)); display: grid; gap: 6px; } #v-mosha .mo-l-reply b { font: 600 12px var(--sans); color: var(--ink-dim); } #v-mosha .mo-l-reply p { margin: 0; white-space: pre-wrap; line-height: 1.55; font-size: 14px; max-width: 80ch; } #v-mosha .mo-l-reply small { color: var(--ink-faint); font-size: 12px; } #v-mosha .mo-l-wait { color: var(--ink-dim); }
+#v-mosha .mo-l-acts { display: flex; flex-wrap: wrap; gap: 8px; } #v-mosha .mo-l-key { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; justify-items: start; } #v-mosha .mo-l-key[hidden], #v-mosha #mo-l-keyout[hidden] { display: none; }
+#v-mosha #mo-l-keyout { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; } #v-mosha #mo-l-keyout input { flex: 1 1 260px; min-height: 40px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 500 13px var(--mono); } #v-mosha #mo-l-keyout small { flex: 1 1 100%; color: var(--ink-dim); font-size: 12px; line-height: 1.5; }
+.mo-l-dlg { max-width: min(96vw, 1500px); max-height: 94vh; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); } .mo-l-dlg::backdrop { background: rgba(0, 0, 0, .7); } .mo-l-dlg form { display: flex; justify-content: flex-end; margin-bottom: 8px; } .mo-l-dlg img { display: block; max-width: 100%; max-height: 78vh; margin: 0 auto; border-radius: 6px; } .mo-l-dlg p { margin: 8px 0 0; font-size: 14px; text-align: center; }
+@media (max-width: 760px) { #v-mosha .mo-tc > .mo-f { grid-column: 1 / -1; } #v-mosha .mo-tc-picks li { grid-template-columns: 72px minmax(0, 1fr); } #v-mosha .mo-tc-picks li .ms-tbtn { grid-column: 1 / -1; justify-self: start; } #v-mosha .mo-tc-picks img { width: 72px; height: 46px; } #v-mosha .mo-l-st { margin-left: 0; } }
+@media (pointer: coarse) { #v-mosha .mo-l-x { min-height: 44px; padding: 0 6px; } #v-mosha .mo-tc-drop label { min-height: 44px; } }
 #v-mosha .mo-err { margin: 0 0 10px; color: var(--sell); font-weight: 600; font-size: 13px; } #v-mosha #mo-rules a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong, var(--line)); text-underline-offset: 3px; } #v-mosha #mo-rules a:hover { text-decoration-color: currentColor; }
 #v-mosha .mo-rp-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 8px; } #v-mosha .mo-rp-label { color: var(--ink-faint); font-size: 13px; font-style: italic; }
 #v-mosha .mo-rp-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; } #v-mosha .mo-rp-seg button { min-height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--ink-dim); font: 600 13px var(--sans); cursor: pointer; }

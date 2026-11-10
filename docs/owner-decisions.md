@@ -419,3 +419,17 @@ conditions is what makes your trades win.
   it (side, entry, stop, target; a trade without a stop is refused) and close it there when it is over. Only trades logged while
   still open count in the record; it says "too few to judge" until 20 are closed and calls nothing more than luck below a t of
   2. Reviewers can read it; only you can write it.
+
+### [ ] 28. Luxus teaches on the Mosha desk: one step is yours (the assistant's key)
+
+- **What is built (10 Nov, your words: the Mosha desk "will be main page of" Luxus, "he will train u, allow him to send you
+  trades images so u can learn"):** Luxus signs in and lands on the Mosha desk. There he sends a trade as screenshots, each
+  with a caption, and a note on what the desk should learn. Under each lesson the desk writes what it understood, so he can
+  correct it. He stays a viewer everywhere else; your trade log stays yours.
+- **Your step, once:** the desk's assistant reads the lessons with a key that only you can see. On the Mosha desk, in the
+  Lessons card, press "Show the assistant's key", copy it, and paste it into the secure form the assistant opens for
+  meridianx.dev (never into a chat). Until then the lessons arrive and are stored, but nobody reads them.
+- **To change or stop it:** Users → Luxus → Permissions → "Mosha desk" (no access / read only / may send lessons). On Vercel,
+  `MOSHA_READER=off` switches the assistant's key off; `MOSHA_READER_SALT=<anything>` replaces it.
+- **What the lessons are not:** proof. They are the teacher's picks, so they show the pattern, not how often it wins. A rule
+  drawn from them gets its own pre-registered test before it is called an edge, and nothing live changes without you.

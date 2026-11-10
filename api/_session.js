@@ -35,7 +35,9 @@ function verify(env, tok, now = Date.now()) {
 // the account as the page may see it (no hash)
 function account(u, R) {
   if (u === 'owner') return { u: 'owner', name: 'Owner', role: 'owner' };
-  const P = A.publicRecord(R); return { u, ...P, name: P.name || u };
+  const P = A.publicRecord(R), B = A.BUILT_IN[u];
+  if (B) { if (B.mosha && !P.mosha) P.mosha = B.mosha; if (B.home && !P.home) P.home = B.home; }   // built-in defaults by key: a stored copy of the record (a new password) does not lose them
+  return { u, ...P, name: P.name || u };
 }
 function issue(env, u, h, acct, now = Date.now()) {
   const key = secret(env); if (!key) throw Object.assign(new Error('sessions are not set up'), { status: 503 });

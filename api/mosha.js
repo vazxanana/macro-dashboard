@@ -1,7 +1,7 @@
 // The Mosha desk's trade log (owner, 10 Nov 2026: "And a place to mosha"). Five pre-registered studies found no fixed rule of the
 // owner's Mosha trading that makes money, so what is left to measure is the owner's own selection: the trades the owner takes,
 // written down with their stop before the result is known. This endpoint keeps that log.
-//   GET  /api/mosha                     owner, or a member who may open the desks -> { trades, canWrite }
+//   GET  /api/mosha                     owner, or a member who may open the desks or the Mosha desk -> { trades, canWrite }
 //   POST /api/mosha { save: {...} }     owner session only: a new trade, or changes to one (by id)
 //   POST /api/mosha { remove: id }      owner session only
 // Rules kept on the server (the page cannot bend them):
@@ -24,8 +24,15 @@ function blobStore(env, io = {}) {
 const clean = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').trim().slice(0, n);
 const px = (v) => { const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN; return Number.isFinite(n) && n > 0 && n < 1e7 ? +n.toFixed(5) : null; };
 const pick = (v, list, d) => (list.includes(v) ? v : d);
-// who may read the log: the owner, and a member who may open the desks (an explicit permission wins over the role's default)
-function canRead(acct) { if (!acct) return false; if (acct.u === 'owner') return true; const p = acct.perms && typeof acct.perms.desks === 'boolean' ? acct.perms.desks : null; return p != null ? p : acct.role === 'reviewer'; }
+// What an account may do on the Mosha desk: 'teach' (the owner, and a member allowed to send lessons), 'read', or false.
+// A stored perms.mosha (the Users page) wins; then the account's own mosha flag (Luxus's built-in default); then the desks
+// permission, which opens every desk to read (an explicit one wins over the role's default).
+function moshaLevel(acct) {
+  if (!acct) return false; if (acct.u === 'owner') return 'teach';
+  const P = acct.perms || {}, m = P.mosha === false || P.mosha === 'read' || P.mosha === 'teach' ? P.mosha : acct.mosha === 'teach' || acct.mosha === 'read' ? acct.mosha : null;
+  if (m != null) return m; const d = typeof P.desks === 'boolean' ? P.desks : acct.role === 'reviewer'; return d ? 'read' : false;
+}
+const canRead = (acct) => !!moshaLevel(acct);
 // R of a closed trade: the exit against the entry, in units of the stop distance
 function rOf(t) { const s = t.side === 'sell' ? -1 : 1, r0 = Math.abs(t.entry - t.stop); return r0 > 0 && t.exit != null ? +((s * (t.exit - t.entry)) / r0).toFixed(3) : null; }
 // Checks one trade as sent by the page against the stored one (null for a new trade). Returns { trade } or { error }.
@@ -66,7 +73,7 @@ async function handle(req, res, d = {}) {
     if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     if (req.method === 'POST' && !(d.sameOrigin || S.sameOrigin)(req)) return res.status(403).json({ error: 'not allowed' });
     const acct = await who(req); if (!acct) return res.status(401).json({ error: 'sign in first' });
-    if (!canRead(acct)) return res.status(403).json({ error: 'the desks are not open to this account' });
+    if (!canRead(acct)) return res.status(403).json({ error: 'the Mosha desk is not open to this account' });
     const list = await store.get();
     if (req.method === 'GET') return res.status(200).json({ trades: list.slice().sort((a, b) => b.at - a.at), canWrite: acct.u === 'owner' });
     if (acct.u !== 'owner') return res.status(403).json({ error: 'only the owner writes the Mosha log' });
@@ -82,4 +89,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha log is unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, build, rOf, canRead, KEEP });
+Object.assign(module.exports, { handle, blobStore, build, rOf, canRead, moshaLevel, KEEP });
