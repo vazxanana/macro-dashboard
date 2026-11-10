@@ -300,7 +300,7 @@ test('the learning loop on real data: decide, store, correct, save the lesson, r
 // api/academy.js decisionOf() keeps only { id, version, effect } of decision.lessonsApplied, so a STORED decision no longer
 // says whether a lesson was applied. MXA.compare() reads `applied !== false`, so on stored attempts a lesson that matched but
 // was NOT applied counts as applied. Work-around on the page: MXAC.restoreApplied() reads it back from the effect text.
-test('module bug (api/academy.js): a stored decision loses lessonsApplied[].applied, so compare() on stored attempts over-counts', { todo: 'api/academy.js decisionOf should keep applied (and correctionId, title)' }, async () => {
+test('a stored decision keeps lessonsApplied[].applied, so compare() on stored attempts does not over-count (fixed in api/academy.js)', async () => {
   const api = mkApi(), c = TRAIN[0], s = snapOf(c), d = { ...decideOn(s, []).decision, action: 'WAIT' };
   const notApplied = { ...d, action: 'WAIT', lessonsApplied: [{ id: 'ls_x1', version: 1, effect: 'TAKE not applied: blocked by rr (a lesson cannot override it)', applied: false, correctionId: 'co_1', title: 'x' }] };
   await api.post(attemptBody(c, 'train', { ...d, action: 'WAIT' }, [], MXR.hash(s), null)); await api.post(attemptBody(c, 'replay-same', notApplied, [], MXR.hash(s), null));
@@ -318,7 +318,7 @@ test('the work-around: restoreApplied reads "applied" back from the engine\'s ef
 });
 // assets/academy-core.js evidenceOf() writes the thesis start as raw epoch seconds into text the mentor reads
 // ("In line with the running thesis (bias down since 1714608000)."). The page shows it as a date; the stored text keeps the number.
-test('module bug (assets/academy-core.js): evidence text prints the thesis start as raw epoch seconds', { todo: 'academy-core.js evidenceOf: format th.startedAt as a UTC date' }, () => {
+test('evidence text gives the thesis start as a UTC date, never raw epoch seconds (fixed in assets/academy-core.js)', () => {
   const c = TRAIN.find((x) => decideOn(snapOf(x), []).decision.action !== 'WAIT'), d = decideOn(snapOf(c), []).decision;
   const texts = d.supporting.concat(d.contradicting).map((x) => x.text).filter((t) => /running thesis/.test(t));
   assert.ok(texts.length > 0); for (const t of texts) assert.doesNotMatch(t, /since \d{9,}/, t);

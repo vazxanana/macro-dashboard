@@ -660,6 +660,13 @@
   const ZH = { up: 'up (HH/HL)', down: 'down (LH/LL)', mixed: 'mixed' };
   const SIDE_WORD = { buy: 'buy', sell: 'sell' };
 
+  // epoch seconds as 'YYYY-MM-DD HH:MM UTC', by arithmetic (this file reads no clock and builds no date object)
+  function utcText(t) {
+    const p2 = (n) => (n < 10 ? '0' : '') + n, days = Math.floor(t / 86400), rem = t - days * 86400;
+    const z = days + 719468, era = Math.floor(z / 146097), doe = z - era * 146097, yoe = Math.floor((doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365);
+    const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100)), mp = Math.floor((5 * doy + 2) / 153), d = doy - Math.floor((153 * mp + 2) / 5) + 1, m = mp < 10 ? mp + 3 : mp - 9, y = yoe + era * 400 + (m <= 2 ? 1 : 0);
+    return `${y}-${p2(m)}-${p2(d)} ${p2(Math.floor(rem / 3600))}:${p2(Math.floor((rem % 3600) / 60))} UTC`;
+  }
   // similar past cases: from opts.history only, and only entries that were finished before t
   function similarOf(history, f, t, lim) {
     if (!Array.isArray(history)) return { n: 0, winRate: null, avgR: null, note: 'no history was supplied: there is no sample to lean on', level: null, total: 0, regimeN: 0, undated: 0 };
@@ -721,7 +728,7 @@
     if (fin(x.rr)) { if (x.rr >= 2) S('rr', w.rr[0], `Reward to risk ${fmt(x.rr)} (${fmt(x.rrNet)} after costs).`); else if (x.rr < 1.5) C('rr', w.rr[1], `Thin reward to risk: ${fmt(x.rr)} (${fmt(x.rrNet)} after costs).`); }
     if (fin(x.stopAtr)) { if (x.stopAtr < 0.5) C('stop', w.stop[1], `The stop is inside normal noise: ${fmt(x.stopAtr)} ATR from the entry.`); else if (x.stopAtr > 4) C('stop', w.stop[1], `The stop is very wide: ${fmt(x.stopAtr)} ATR from the entry.`); }
     if (f.oppLiq !== null) { if (f.oppLiq === 0) S('oppLiq', w.oppLiq[0], 'No resting level between the entry and the target.'); else if (f.oppLiqFrac !== null && f.oppLiqFrac <= 0.6) C('oppLiq', w.oppLiq[1], `${f.oppLiq} resting level${f.oppLiq === 1 ? '' : 's'} between the entry and the target, the first only ${fmt(f.oppLiqFrac * 100, 0)} % of the way.`); }
-    if (f.volState === 'high') C('volatility', w.vol[1], `Volatility is high: ATR in the top ${fmt((1 - f.atrPctile) * 100, 0)} % of its last 100 values (${fmt(f.volRatio)} times its median).`);
+    if (f.volState === 'high') C('volatility', w.vol[1], `Volatility is high: ATR in the top ${fmt(Math.max(1, (1 - f.atrPctile) * 100), 0)} % of its last 100 values (${fmt(f.volRatio)} times its median).`);
     if (f.session && P.sessions.indexOf(f.session) >= 0) S('session', w.session[0], `The ${f.session} session is one this edge is meant to trade.`);
     else if (f.session && P.badSessions.indexOf(f.session) >= 0) C('session', w.session[1], `The ${f.session} session is outside this edge's hours.`);
     if (f.regime && P.regimes.good.indexOf(f.regime) >= 0) S('regime', w.regime[0], `Regime ${f.regime} suits a ${P.kind} edge (trend strength ${fmt(f.trendStrength)}, efficiency ${fmt(f.effRatio)}).`);
@@ -732,7 +739,7 @@
     const sm = x.similar;
     if (sm && sm.n >= x.lim.similarMin) { if (sm.avgR >= 0.1) S('similar', w.similar[0], `${sm.n} similar past cases averaged ${fmt(sm.avgR)} R net (${fmt(sm.winRate * 100, 0)} % winners).`); else if (sm.avgR <= -0.1) C('similar', w.similar[1], `${sm.n} similar past cases averaged ${fmt(sm.avgR)} R net (${fmt(sm.winRate * 100, 0)} % winners).`); }
     const th = x.thesis;
-    if (th && (th.bias === 'up' || th.bias === 'down') && f.side) { if ((th.bias === 'up') === (f.side === 'buy')) S('thesis', w.thesis[0], `In line with the running thesis (bias ${th.bias} since ${th.startedAt}).`); else C('thesis', w.thesis[1], `Against the running thesis (bias ${th.bias} since ${th.startedAt}).`); }
+    if (th && (th.bias === 'up' || th.bias === 'down') && f.side) { const since = fin(th.startedAt) ? utcText(th.startedAt) : 'it began'; if ((th.bias === 'up') === (f.side === 'buy')) S('thesis', w.thesis[0], `In line with the running thesis (bias ${th.bias} since ${since}).`); else C('thesis', w.thesis[1], `Against the running thesis (bias ${th.bias} since ${since}).`); }
     if (x.modelScore && fin(x.modelScore.p)) { const p = x.modelScore.p; if (p >= 0.55) S('model', Math.min(w.model[0], (p - 0.5) * 10 * w.model[0]), `The promoted scorer gives ${fmt(p * 100, 0)} % (calibrated).`); else if (p <= 0.45) C('model', Math.min(w.model[1], (0.5 - p) * 10 * w.model[1]), `The promoted scorer gives ${fmt(p * 100, 0)} % (calibrated).`); }
     const byW = (a, b) => b.weight - a.weight || (a.factor < b.factor ? -1 : a.factor > b.factor ? 1 : 0);
     return { sup: sup.sort(byW), con: con.sort(byW) };
