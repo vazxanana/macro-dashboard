@@ -1066,7 +1066,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T11:16:15.000Z",
     "councilEntry": 74275.7,
     "stop": 74000.36,
@@ -1080,10 +1080,12 @@
     "slipR": 0.12,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T11:16:15.000Z",
-    "brokerStop": 74033.31
+    "brokerStop": 74033.31,
+    "closedAt": "2026-11-10T11:32:17.000Z"
    },
    "sol-replica-1794309302-b": {
     "positionId": "48013408",
@@ -1148,7 +1150,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9985.85 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 9983.01 · 10 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -1163,8 +1165,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9985.85,
-  "lastRun": "2026-11-10T11:29:21.000Z"
+  "balance": 9983.01,
+  "lastRun": "2026-11-10T11:32:17.000Z"
  },
  "log": [
   {
@@ -1599,6 +1601,11 @@
    "at": "2026-11-10T11:24:06.000Z",
    "msg": "SOLUSD position 48013408 closed at the broker",
    "trade": "sol-replica-1794309302-b"
+  },
+  {
+   "at": "2026-11-10T11:32:17.000Z",
+   "msg": "BTCUSD position 48013404 closed at the broker",
+   "trade": "btc-replica-1794309302-b"
   }
  ],
  "limits": {
