@@ -122,9 +122,9 @@ export function build(opts = {}) {
     }
     c.verdict = candidateVerdict(c.scopes);
     c.acceptedScopes = c.scopes.filter((s) => s.verdict === 'accepted').map((s) => s.scope);
-    // the two lines the Edge lab page reads: the pooled take-set on discovery (in sample) and validation (out of sample)
-    const p = c.scopes.find((s) => s.scope === 'pooled'), lab = (b) => ({ n: b.take.n, exp: b.take.avg, R: b.take.total, wr: b.take.win, maxDD: b.take.maxDD, t: b.take.t });
-    c.rule = `${c.id} ${c.name}`; c.is = lab(p.discovery); c.oos = lab(p.validation);
+    // `rule` is the name the Edge lab page lists. No per-candidate R / trade is handed to that page on purpose: a take-set
+    // of profitable edges has a positive t of its own, which says nothing about the candidate against the baseline.
+    c.rule = `${c.id} ${c.name}`;
   }
   const accepted = cands.filter((c) => c.verdict === 'accepted');
 
@@ -142,7 +142,9 @@ export function build(opts = {}) {
     H.H2 = { claim: 'gmp: trades the volatility gate holds back are not worse than the rest', lines: [a, b], holdsDiscovery: notWorse(vote('gmp', 'discovery', 'gate:volatility')), holdsValidation: notWorse(vote('gmp', 'validation', 'gate:volatility')) }; }
   { const a = line('replica', 'con:location'), top = diagnosis.replica.discovery.waits.topContradiction[0] || null;
     H.H3 = { claim: 'replica: poor location is the leading wait reason and trades carrying it are not worse than the rest', lines: [a], leadingTopContradictionDiscovery: top ? top.k : null,
-      holdsDiscovery: !!top && top.k === 'location' && notWorse(vote('replica', 'discovery', 'con:location')) === true, notWorseValidation: notWorse(vote('replica', 'validation', 'con:location')) }; }
+      holdsDiscovery: !!top && top.k === 'location' && notWorse(vote('replica', 'discovery', 'con:location')) === true, notWorseValidation: notWorse(vote('replica', 'validation', 'con:location')),
+      // "not worse" above means: not worse at the t line. The plain direction is reported too, because the prediction was that the vote is misplaced.
+      pointEstimate: { discovery: a.discovery.diff, validation: a.validation.diff, lowerWithTheVoteInBothParts: a.discovery.diff < 0 && a.validation.diff < 0 } }; }
   { const m = (id, part) => diagnosis[id][part].margin.spearman, notPos = (s) => (s.t === null ? null : !(s.rho > 0 && s.t >= T_LINE));
     H.H4 = { claim: 'the evidence margin does not rank trades: its rank correlation with net R is not positive on replica and gmp', replica: { discovery: m('replica', 'discovery'), validation: m('replica', 'validation') }, gmp: { discovery: m('gmp', 'discovery'), validation: m('gmp', 'validation') },
       holdsDiscovery: notPos(m('replica', 'discovery')) && notPos(m('gmp', 'discovery')), holdsValidation: notPos(m('replica', 'validation')) && notPos(m('gmp', 'validation')),
@@ -173,7 +175,7 @@ export function build(opts = {}) {
     null: 'mechanical = take every setup, on the same trades',
     incumbent, diagnosis, hypotheses: H, c4Drops: drops,
     holm: { tests: tested, family: family.map((x) => `${x.c.id}:${x.s.scope}`), tNeededForTheSmallestP: barT, note: 'one-sided p of every candidate x scope test that differs from policy-1.0 and has 20 trades on each side on validation' },
-    candidates: cands, baseline: { is: labStat(blockOf(inPart(all, 'discovery'), 'C1', ctx).mechanical), oos: labStat(blockOf(inPart(all, 'validation'), 'C1', ctx).mechanical) },
+    candidates: cands,
     power: { note: 'smallest take-minus-wait difference that reaches the t line on validation, from the discovery SD; "even split" is the best case', scopes: power },
     exam: { reads: 0, ledger: 'academy/data/exam-ledger.json', note: accepted.length ? 'a candidate passed validation: the exam read is logged in the ledger before it is made' : 'no candidate passed validation, so the exam pool was not read' },
     counts: { candidates: CANDIDATES.length, tests: tested, accepted: nAccepted, rejected: cands.filter((c) => c.verdict === 'rejected').length, inconclusive: cands.filter((c) => c.verdict === 'inconclusive').length },
@@ -181,13 +183,15 @@ export function build(opts = {}) {
   };
   return result;
 }
-function labStat(s) { return { n: s.n, exp: s.avg, R: s.total, wr: s.win, maxDD: s.maxDD, t: s.t }; }
 export const render = (result) => JSON.stringify(result, null, 1) + '\n';
 
 // ---- markdown tables for RESULT.md -----------------------------------------------------------------------------------------
 const sg = (x, d = 2) => (x === null || x === undefined ? 'n/a' : (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(d));
 const nf = (x, d = 2) => (x === null || x === undefined ? 'n/a' : (x < 0 ? '−' : '') + Math.abs(x).toFixed(d));
-const set = (s) => (s.n ? `${s.n}, ${sg(s.avg)}, ${nf(s.t)}, ${s.win === null ? 'n/a' : Math.round(s.win * 100) + ' %'}, ${nf(s.maxDD)}` : '0');
+const tt = (s) => (s.n >= 10 ? nf(s.t) : 'n/a');   // a t on a handful of trades is not shown (a few near-identical losers give an absurd figure)
+const set = (s) => (s.n ? `${s.n}, ${sg(s.avg)}, ${tt(s)}, ${s.win === null ? 'n/a' : Math.round(s.win * 100) + ' %'}, ${nf(s.maxDD)}` : '0');
+const dif = (b, pooled) => (pooled ? `${sg(b.diff)} (plain net R ${sg(b.diffNetR)})` : sg(b.diff));
+const tw = (b, pooled) => (pooled ? `${nf(b.t)} (plain ${nf(b.tNetR)})` : nf(b.t));
 export function markdown(R) {
   const o = [], P = (s) => o.push(s);
   P('### Splits\n'); P('| Edge | Cut (UTC) | Discovery setups / trades | Validation setups / trades |'); P('|---|---|---|---|');
@@ -195,17 +199,17 @@ export function markdown(R) {
   for (const part of ['discovery', 'validation', 'all']) {
     P(`\n### policy-1.0 against taking every setup: ${part}\n`); P('Each set: n, net R a trade, t, win rate, max drawdown in R.\n');
     P('| Scope | Every setup | Policy takes | Policy waits | Take minus wait | Welch t |' + (part === 'validation' ? ' Harm check (two-sided, Holm) |' : '')); P('|---|---|---|---|---|---|' + (part === 'validation' ? '---|' : ''));
-    for (const [id, x] of Object.entries(R.incumbent)) { const b = x[part]; P(`| ${id} | ${set(b.mechanical)} | ${set(b.take)} | ${set(b.wait)} | ${sg(b.diff)} | ${nf(b.t)} |` + (part === 'validation' ? ` ${b.harm}${b.pTwoHolm !== null ? ' (adjusted p ' + nf(b.pTwoHolm, 3) + ')' : ''} |` : '')); }
+    for (const [id, x] of Object.entries(R.incumbent)) { const b = x[part]; P(`| ${id} | ${set(b.mechanical)} | ${set(b.take)} | ${set(b.wait)} | ${dif(b, id === 'pooled')} | ${tw(b, id === 'pooled')} |` + (part === 'validation' ? ` ${b.harm}${b.pTwoHolm !== null ? ' (adjusted p ' + nf(b.pTwoHolm, 3) + ')' : ''} |` : '')); }
   }
   for (const id of ['replica', 'gmp', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'nq-open']) {
     const D = R.diagnosis[id];
     P(`\n### Diagnosis: ${id}\n`);
     for (const part of ['discovery', 'validation']) {
       const w = D[part].waits;
-      P(`**${part}**: ${D[part].setups} setups, ${D[part].trades} trades; policy-1.0 waited on ${w.orders} (${Math.round(w.shareOfSetups * 100)} %), and those trades made ${sg(w.avg)} R a trade (n ${w.n}, t ${nf(w.t)}).`);
+      P(`**${part}**: ${D[part].setups} setups, ${D[part].trades} trades; policy-1.0 waited on ${w.orders} (${Math.round(w.shareOfSetups * 100)} %), and those trades made ${sg(w.avg)} R a trade (n ${w.n}, t ${tt(w)}).`);
       P(`Decided by: ${w.decidedBy.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n})`).join('; ') || 'n/a'}. Evidence short on: ${w.evidenceShort.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n})`).join('; ') || 'n/a'}.`);
-      P(`Top contradiction of a wait: ${w.topContradiction.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n}, t ${nf(x.t)})`).join('; ') || 'n/a'}.`);
-      P(`Gates among waits: ${w.gates.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n}, t ${nf(x.t)})`).join('; ') || 'none'}.`);
+      P(`Top contradiction of a wait: ${w.topContradiction.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n}, t ${tt(x)})`).join('; ') || 'n/a'}.`);
+      P(`Gates among waits: ${w.gates.map((x) => `${x.k} ${x.orders} (${sg(x.avg)} R, n ${x.n}, t ${tt(x)})`).join('; ') || 'none'}.`);
       const m = D[part].margin; P(`Margin against net R: Spearman ${nf(m.spearman.rho, 3)} (t ${nf(m.spearman.t)}, n ${m.spearman.n}); ${m.bands.map((b) => `${b.band}: n ${b.n}, ${sg(b.avg)} R`).join('; ')}.\n`);
     }
     P('| Vote | Kind | Discovery: n with / without | R with | R without | Diff | t | Wrong-signed | Validation: n with / without | Diff | t | Wrong-signed | Dropped by C4 |'); P('|---|---|---|---|---|---|---|---|---|---|---|---|---|');
@@ -219,8 +223,9 @@ export function markdown(R) {
     for (const s of c.scopes) {
       if (s.changedSetups === 0) { P(`| ${s.scope} | both | | | | | | | | | | | identical to policy-1.0 |`); continue; }
       const d = s.discovery, v = s.validation;
-      P(`| ${s.scope} | discovery | ${set(d.mechanical)} | ${set(d.take)} | ${set(d.wait)} | ${sg(d.diff)} | ${nf(d.t)} | ${nf(d.pOne, 3)} | | | | | (information) |`);
-      P(`| ${s.scope} | validation | ${set(v.mechanical)} | ${set(v.take)} | ${set(v.wait)} | ${sg(v.diff)} | ${nf(v.t)} | ${nf(v.pOne, 3)} | ${s.pHolm === null ? 'not tested' : nf(s.pHolm, 3)} | ${v.aboveMechanical === null ? 'n/a' : v.aboveMechanical ? 'yes' : 'no'} | ${v.drawdownNotWorse === null ? 'n/a' : v.drawdownNotWorse ? 'yes' : 'no'} | ${nf(s.power.mdeAtT2)} / ${nf(s.power.mdeAfterHolm)} | ${s.verdict} |`);
+      const pl = s.scope === 'pooled';
+      P(`| ${s.scope} | discovery | ${set(d.mechanical)} | ${set(d.take)} | ${set(d.wait)} | ${dif(d, pl)} | ${tw(d, pl)} | ${nf(d.pOne, 3)} | | | | | (information) |`);
+      P(`| ${s.scope} | validation | ${set(v.mechanical)} | ${set(v.take)} | ${set(v.wait)} | ${dif(v, pl)} | ${tw(v, pl)} | ${nf(v.pOne, 3)} | ${s.pHolm === null ? 'not tested' : nf(s.pHolm, 3)} | ${v.aboveMechanical === null ? 'n/a' : v.aboveMechanical ? 'yes' : 'no'} | ${v.drawdownNotWorse === null ? 'n/a' : v.drawdownNotWorse ? 'yes' : 'no'} | ${nf(s.power.mdeAtT2)} / ${nf(s.power.mdeAfterHolm)} | ${s.verdict} |`);
     }
   }
   P('\n### Power\n'); P('| Scope | SD of net R on discovery | Validation trades | Smallest difference at t = 2, even split | After Holm | The edge\'s own mean (whole train pool) |'); P('|---|---|---|---|---|---|');

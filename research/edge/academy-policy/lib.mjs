@@ -125,7 +125,7 @@ export function actionOf(policy, r, ctx = {}) {
   if (policy === 'C4') {
     const d = (ctx.drops && ctx.drops[r.edge]) || []; if (!d.length) return actionOf('C0', r);
     const of = (p) => d.filter((k) => k.startsWith(p + ':')).map((k) => k.slice(p.length + 1));
-    return T(evidenceRule(r, { dropSup: of('sup'), dropCon: of('con'), gates: r.gates.filter((g) => !of('gate').includes(g)) }).take);
+    return T(evidenceRule(r, { dropSup: of('sup'), dropCon: of('con'), gates: r.gates.filter((g) => !(JUDGEMENT_GATES.includes(g) && of('gate').includes(g))) }).take);   // a non-overridable gate is never dropped
   }
   if (policy === 'C5') return T(actionOf('C0', r) === 'TAKE' && (r.confidence === 'medium' || r.confidence === 'high'));
   throw new Error('unknown policy ' + policy);
@@ -151,10 +151,11 @@ export function auditVotes(rows) {
 // uses adj (net R with the edge's discovery mean taken out) for the test and the mean condition, raw net R for drawdown.
 export function testOf({ take, wait, pooled = false }) {
   const v = (a) => a.map((x) => (pooled ? x.adj : x.netR)), mech = take.concat(wait), testable = take.length >= MIN_SIDE && wait.length >= MIN_SIDE;
-  const w = welch(v(take), v(wait)), ms = setStat(mech), ts = setStat(take), ws = setStat(wait);
+  const w = welch(v(take), v(wait)), ms = setStat(mech), ts = setStat(take), ws = setStat(wait), raw = welch(take.map((x) => x.netR), wait.map((x) => x.netR));
   const takeAvg = take.length ? mean(v(take)) : null, mechAvg = mech.length ? mean(v(mech)) : null;
   return { testable, on: pooled ? 'net R with each edge\'s discovery mean taken out' : 'net R', mechanical: ms, take: ts, wait: ws,
     takeShare: mech.length ? rd(take.length / mech.length) : null, diff: w.diff, t: w.t, df: w.df, pOne: w.pOne, pTwo: w.pTwo,
+    diffNetR: raw.diff, tNetR: raw.t,   // the same difference on plain net R (equal to diff / t except on the pooled scope); shown, never tested
     takeAvgTested: rd(takeAvg), mechAvgTested: rd(mechAvg), aboveMechanical: fin(takeAvg) && fin(mechAvg) ? takeAvg > mechAvg : null,
     drawdownNotWorse: ts.maxDD !== null && ms.maxDD !== null ? ts.maxDD <= ms.maxDD : null };
 }

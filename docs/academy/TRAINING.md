@@ -90,6 +90,27 @@ Each edge block in `eval.json` also has: the same split into the first 70 % and 
 (705 of 966). The most frequent top reason is a resting level in the way of the target (`oppLiq`, 342), then the
 higher-timeframe bias (185). The policy was measured, not tuned: nothing in the core was changed.
 
+Since the policy investigation of 10 Nov 2026 each edge block and `overall` also carry `drawdown`: the maximum drawdown
+in R of the mechanical set, the take-set and the wait-set (closed trades in exit order, equity from zero, the largest
+fall from a running peak; the research baselines use the same definition and give the same mechanical numbers).
+
+| Edge | Every setup: trades, max drawdown | Policy takes: trades, max drawdown |
+|---|---|---|
+| replica | 325, 26.63 R | 169, 17.13 R |
+| mosha-bo | 28, 4.57 R | 15, 3.11 R |
+| gtrend | 18, 5.26 R | 18, 5.26 R |
+| gtl | 166, 13.48 R | 59, 5.47 R |
+| geg | 82, 7.33 R | 54, 7.64 R |
+| gmp | 513, 16.06 R | 120, 11.88 R |
+| nq-open | 344, 16.29 R | 87, 4.94 R |
+| all seven, one sequence | 1,476, 32.45 R | 522, 24.07 R |
+
+A take-set holds about a third of the trades, and a subset usually falls less in R, so a smaller figure here is not
+evidence of selection (on geg it is larger). `academy/data/eval-trades.json` lists the policy's action on every usable
+train setup (`id`, `t`, `action`; no outcome field, no exam setup), so these figures can be recomputed from the outcome
+files without this script. The investigation itself (why the policy does not beat taking every setup, five
+pre-registered candidates, none accepted) is `research/edge/academy-policy/RESULT.md`; see `RESEARCH.md`, section 7.
+
 ## 4. The offline scorer (`ml/`)
 
 ```sh
