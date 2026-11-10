@@ -463,7 +463,7 @@ test('isolation: the Academy API and risk engine hold no reference to the counci
   for (const f of ['assets/academy-risk.js', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js']) assert.ok(!/\bimport\s*\(\s*['"]|^\s*import\s/m.test(src(f)), `${f}: no static or literal dynamic import`);
   // vercel.json: the function ships the generated data and /academy is routed like the other pages
   const v = JSON.parse(src('vercel.json'));
-  assert.deepEqual(v.functions['api/academy.js'], { maxDuration: 30, includeFiles: 'academy/{edges.mjs,data/**}' });
+  assert.deepEqual(v.functions['api/academy.js'], { maxDuration: 30, includeFiles: '{academy/edges.mjs,academy/data/**,ml/models/index.json}' });
   assert.ok(v.rewrites.some((r) => r.source === '/academy' && r.destination === '/academy.html'));
 });
 
@@ -546,4 +546,29 @@ test('calendar: the dataset\'s release list, cut for a snapshot at t exactly as 
     if (a.schedule) for (const e of a.schedule) assert.ok(e.t > t && e.t <= t + 72 * 3600); if (a.events) for (const e of a.events) assert.ok(e.t <= t);
   }
   assert.equal((await get(mk(), { get: 'calendar' })).body.available, false);
+});
+
+test('corrections, research, evaluation and training are readable; a research draft keeps where it came from when saved', async () => {
+  const c = mk({ data: undefined });
+  await post(c, attempt()); const a = (await get(c, { get: 'attempts', edge: 'replica', cand: 'replica:1' })).body.attempts;
+  // (the generated replica file has no 'replica:1': use the fixture data for the correction round trip)
+  const f = mk(); await post(f, attempt()); const att = (await get(f, { get: 'attempts', edge: 'replica', cand: 'replica:1' })).body.attempts[0];
+  const co = await post(f, { action: 'correct', edge: 'replica', correction: { attemptId: att.id, verdict: 'reject', reasons: ['session'], text: 'not in this session' } }); assert.equal(co.code, 200);
+  const back = (await get(f, { get: 'corrections', edge: 'replica', cand: 'replica:1' })).body.corrections; assert.equal(back.length, 1); assert.equal(back[0].id, co.body.correction.id); assert.equal(back[0].text, 'not in this session');
+  assert.deepEqual((await get(f, { get: 'corrections', edge: 'replica', cand: 'replica:2' })).body.corrections, []); assert.equal(a.length >= 0, true);
+
+  const r = (await get(c, { get: 'research' })).body; assert.equal(r.available, true); assert.ok(r.studies.length > 100); assert.ok(r.preregistration && r.counts);
+  assert.ok(r.studies.every((x) => x.table === undefined && x.title && x.validation), 'the list carries no tables');
+  assert.ok(r.proposedLessons.every((l) => l.active === false), 'a draft lesson is never active');
+  const one = (await get(c, { get: 'research', id: r.studies[0].id })).body.study; assert.ok(one.table !== undefined || one.results);
+  assert.equal((await get(c, { get: 'research', id: 'nope' })).code, 404);
+  const gtl = (await get(c, { get: 'research', edge: 'gtl' })).body; assert.ok(gtl.studies.length < r.studies.length && gtl.studies.every((x) => x.edge === 'gtl' || x.edge === '*' || x.edge == null));
+  const ev = (await get(c, { get: 'evaluation' })).body; assert.equal(ev.available, true); assert.ok(ev.evaluation);
+  const tr = (await get(c, { get: 'training' })).body; assert.equal(tr.available, true); assert.ok(tr.models.length >= 1); assert.ok(tr.models.every((m) => m.promoted === false), 'no shipped scorer is promoted');
+  assert.equal((await get(mk(), { get: 'research' })).body.available, false); assert.equal((await get(mk(), { get: 'training' })).body.available, false);
+
+  // saving a research draft: it stays inactive and remembers its study
+  const d = r.proposedLessons[0];
+  if (d) { const sv = await post(c, { action: 'lesson.save', lesson: { edge: d.edge, title: d.title, text: d.text, when: d.when, then: d.then, source: d.source, active: false } }); assert.equal(sv.code, 200, JSON.stringify(sv.body)); assert.equal(sv.body.lesson.active, false); assert.equal(sv.body.lesson.source.kind, 'research'); assert.equal(sv.body.lesson.source.studyId, d.source.studyId); }
+  assert.equal((await post(c, { action: 'lesson.save', lesson: { edge: 'replica', title: 'x', when: [{ f: 'session', op: 'eq', v: 'london' }], then: { action: 'WAIT' }, source: { kind: 'robot' } } })).code, 400);
 });

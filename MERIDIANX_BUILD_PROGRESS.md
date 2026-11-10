@@ -63,19 +63,28 @@ modules is `docs/academy/ARCHITECTURE.md`.
   pooled 0.602 (0.545 within edge); none with t ≥ 2. All five are stored as rejected challengers (`promoted: false`);
   mosha-bo, gtrend and geg have too few trades to fit. Nothing is promoted automatically, and nothing was promoted.
 
+- [x] **The Academy page, Phase 2 loop** (`academy.html`, `assets/academy-ui.js`, `assets/academy.css`): select an edge → replay
+  real candles → decision with evidence (stored at once) → mentor correction → lesson saved → replay the same trade → compare
+  attempts → test on new setups (unseen exam pool, with and without lessons, kept apart) → paper account under the risk engine.
+  Local server `scripts/academy-dev.mjs`, end-to-end audit `scripts/audit/academy.cjs` (88 checks, in CI), page tests.
+- [x] **Research engine** (`academy/gen/research.mjs` → `academy/data/research.json`, `docs/academy/RESEARCH.md`): 145 notebook
+  entries from pre-registered studies on the train pool (baselines, 420 registered conditions of which 121 had enough trades,
+  regimes, the book, the policy). **Nothing validated**: 0 conditions survive the multiple-comparison correction; 1 is
+  out-of-sample only (gtl, lower-timeframe structure neutral: discovery t 2.10, confirmation t 2.10, adjusted p 0.79) and is
+  offered as one inactive draft lesson; 2 flipped sign and are rejected. About 5.8 of 121 would pass discovery by chance; 7 did.
+- [x] API reads for the page: corrections, research, evaluation, training report; module bugs found by the page work fixed
+  (a stored decision keeps whether a lesson was applied; evidence text gives dates).
+
 ## In progress
 
-- [ ] Academy page (`academy.html`, `assets/academy.css`, `assets/academy-ui.js`) wired to the modules: the Phase 2 loop
-  end to end (replay → decision → correction → lesson → replay the same trade → compare → test on a new setup), with a
-  local dev server and a Playwright audit.
+- [ ] Remaining tabs on the page (session training, blind arena, progress and mistakes, lessons manager, research lab and
+  notebook, model registry, costs, audit trail) through `MXAC.registerTab`, and an owner-only way into `/academy` from the Desk.
 
 ## Next
 
-- [ ] Lead verification of the loop with Playwright on real candles and the store.
-- [ ] Remaining tabs: session training, missed opportunities, blind arena, progress, mistakes, lessons manager, research
-  lab and notebook, model registry, cost, audit trail.
-- [ ] Research engine and regime studies, discretionary-vs-mechanical measurement, security and cost review, the Academy
-  audit in CI, preview (needs the owner's say-so).
+- [ ] Missed-opportunity learning and whole-session training flows; spaced repetition of mistakes.
+- [ ] Security and cost review of the Academy API; a full live-candle run of the loop on each edge.
+- [ ] Preview (needs the owner's say-so: branch previews are skipped by `scripts/vercel-ignore.sh`).
 
 ## Architecture decisions
 
@@ -84,9 +93,17 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **841 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
+- Whole suite on the development branch: **882 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
   before the Academy). Academy files: `tests/academy-replay.test.mjs` (23), `academy-core` (37), `academy-api` (21),
-  `academy-risk` (8), `academy-edges` (20), `academy-ml` (13). Model parity: `node ml/parity.mjs`.
+  `academy-risk` (8), `academy-edges` (20), `academy-ml` (13), `academy-research` (19), `academy-ui`. Model parity:
+  `node ml/parity.mjs`.
+- `node scripts/audit/academy.cjs`: **88 of 88** (run by the lead, twice): the clock pauses on a real setup, the decision and
+  its evidence are stored, a SELL corrected to WAIT becomes a lesson, the same-trade replay gives WAIT with the lesson applied
+  ("learned"), the test on 3 unseen setups stores both answers (with lessons 0.00R against +1.42R without, n = 3, "too few to
+  judge": this lesson passes recall and does not help on new setups, which is exactly what the split is for), a reload keeps
+  everything, no snapshot held a future bar, no outcome was asked for before its attempt.
+- Live candles (page agent's run, all seven edges reached a stored decision); the full correct → lesson → exam loop was
+  walked on recorded candles only.
 - `sh scripts/build.sh` leaves `out/` unchanged (CI "build" check).
 - Replay + core on real gold candles from the live candle proxy (12 Mar 2025): regime read, WAIT with reasons.
 - Candidates against the live candle proxy (30 usable setups an edge, entry price against the 5m candles within 10 minutes
@@ -112,5 +129,5 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Next executable step
 
-Review and merge the `academy-ui` branch when its agent reports, rebuild `out/`, run the suite and the Academy audit
-myself, then start the dataset / training-service work.
+Build the remaining tabs on `MXAC.registerTab` (branch `academy-ui2`), merge, rerun the suite and the audit, then the
+security and cost review.

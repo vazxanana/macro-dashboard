@@ -90,3 +90,14 @@ tested). Full signatures are in each file's header comments and its tests.
   `GET ?get=calendar&t=<t>` → `{ events, schedule }` (both null outside the calendar's span) and passes them to `MXR.snapshot`.
 - `MXA.decide` hands the snapshot's edge id to the scorer (a pooled model uses it as a feature). A model is used only when
   `promoted` and `calibrated` are both true; every model in `ml/models/` is a rejected challenger.
+
+## The page · `academy.html`, `assets/academy-ui.js` (`window.MXAC`), `assets/academy.css` (tests: `tests/academy-ui.test.mjs`, audit: `scripts/audit/academy.cjs`)
+
+- Train tab = the whole loop: setup → replay → decision (stored as an attempt at once) → mentor controls → lesson draft → replay the
+  same trade → comparison → test on new setups (exam pool, with and without lessons, results kept apart) → paper account.
+- Other tabs are filled with `MXAC.registerTab(id, { title, render(section, ctx) })`, `ctx = { api: { get, post }, edge(), edges(), me }`.
+  Tab ids: `session`, `blind`, `progress`, `lessons`, `research`, `models`, `costs`, `audit`.
+- `scripts/academy-dev.mjs`: out/ + the real API handler on a file store + `/md/bars` from `tests/fixtures/academy/` (real OANDA gold
+  candles, 26 Apr to 17 May 2024, 10 train and 3 exam gmp setups) or `--live`.
+- More API reads added for the page: `corrections&edge=[&cand=]`, `research[&edge=&kind=]` / `research&id=`, `evaluation`, `training`.
+  A saved lesson keeps `source.kind` (`mentor` | `research`) and `source.studyId`.

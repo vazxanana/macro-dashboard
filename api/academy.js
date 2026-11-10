@@ -14,6 +14,9 @@
 //   edges                                   the registry (academy/edges.mjs, else academy/data/edges.json, else 503)
 //   candidates&edge=&pool=train|exam&from=&to=&limit=&offset=     no outcome fields, ever; pool=exam: only ids never marked seen
 //                                           flagged setups (rule.clockShift, rule.pre2020) are left out; flagged=1 lists them (train only)
+//   corrections&edge=[&cand=]               the mentor's stored corrections
+//   research[&edge=&kind=] | research&id=   generated studies (no tables in the list) and draft lessons; one study in full
+//   evaluation                              the policy against taking every setup; training: the offline scorers' report
 //   calendar[&t=]                           scheduled release times (the dataset's list); with t: { events, schedule } for a snapshot at t
 //   history&edge=&cand=|before=             past train-pool cases finished before that time: { t, exitT, netR, features }, no ids
 //   outcome&id=&edge=                       403 "decide first" until an attempt for that candidate is stored (no peeking)
@@ -138,7 +141,7 @@ function thenOf(v, name) {
   if (t.adjust != null) { obj(t.adjust, `${name}.adjust`); for (const k of ['entry', 'stop', 'target']) { const x = t.adjust[k]; if (x != null) adjust[k] = typeof x === 'number' ? numOrNull(x, `${name}.adjust.${k}`) : typeof x === 'string' ? text(x, 160, `${name}.adjust.${k}`) : safe(x, `${name}.adjust.${k}`, 7); } }
   return { action: oneOfOrNull(t.action, THEN, `${name}.action`), adjust, note: text(t.note, 1000, `${name}.note`) };
 }
-const sourceOf = (v, name) => { const s = v == null ? {} : obj(v, name); return { attemptId: idOrNull(s.attemptId, `${name}.attemptId`), correctionId: idOrNull(s.correctionId, `${name}.correctionId`), candidateId: idOrNull(s.candidateId, `${name}.candidateId`), sessionId: idOrNull(s.sessionId, `${name}.sessionId`) }; };
+const sourceOf = (v, name) => { const s = v == null ? {} : obj(v, name); return { ...(s.kind != null ? { kind: oneOf(s.kind, ['mentor', 'research'], `${name}.kind`) } : {}), ...(s.studyId != null ? { studyId: text(s.studyId, 160, `${name}.studyId`) } : {}), attemptId: idOrNull(s.attemptId, `${name}.attemptId`), correctionId: idOrNull(s.correctionId, `${name}.correctionId`), candidateId: idOrNull(s.candidateId, `${name}.candidateId`), sessionId: idOrNull(s.sessionId, `${name}.sessionId`) }; };
 const zeroStats = () => ({ applied: 0, replayPass: 0, replayFail: 0, examN: 0, examAgree: 0, examNetWith: 0, examNetWithout: 0 });
 
 // ---- the generated files (candidates, outcomes, registry): read-only ---------------------------------------------------------
@@ -155,6 +158,9 @@ function fileData(root) {
     async outcomes(edge) { return json(path.join(dir, 'data', `out-${edge}.json`)); },
     async features(edge) { return json(path.join(dir, 'data', `feat-${edge}.json`)); },
     async calendar() { return json(path.join(dir, 'data', 'calendar.json')); },
+    async research() { return json(path.join(dir, 'data', 'research.json')); },
+    async evaluation() { return json(path.join(dir, 'data', 'eval.json')); },
+    async training() { return json(path.join(root, 'ml', 'models', 'index.json')); },
   };
 }
 const DATA = new Map();
@@ -367,6 +373,37 @@ const GET = {
   async dataset(X, q) {
     const edge = await X.edge(q.edge), rows = await X.store.rows(K.dataset(edge), true), seen = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids, outRaw = await X.data.outcomes(edge);
     return { edge, datasetVersion: DATASET_VERSION, rows: rows.filter((r) => !(seen[r.candidateId] && seen[r.candidateId].blindPending)).map((r) => { const o = outRaw == null ? null : outcomeOf(outRaw, r.candidateId); return { ...r, outcome: o ? { R: o.R, netR: o.netR, reason: o.reason } : null }; }) };
+  },
+
+  // the mentor's corrections for one edge (cand= narrows to one setup): what the page needs to show a correction again after a reload
+  async corrections(X, q) {
+    const edge = await X.edge(q.edge), cand = q.cand == null || q.cand === '' ? null : idOf(q.cand, 'cand'), limit = qInt(q.limit, 'limit', 200, 1, 2000);
+    let rows = await X.store.rows(K.corrections(edge), !!cand); rows = cand ? rows.filter((c) => c.candidateId === cand) : rows.slice(-limit);
+    return { edge, corrections: rows };
+  },
+
+  // Generated research (academy/gen/research.mjs): pre-registered studies on the train pool. A list without the tables, or one
+  // study in full with id=. Draft lessons are proposals only: nothing here is active until the mentor saves it.
+  async research(X, q) {
+    const r = typeof X.data.research === 'function' ? await X.data.research() : null;
+    if (!isObj(r) || !Array.isArray(r.studies)) return { available: false, studies: [], proposedLessons: [], note: 'research is not generated yet' };
+    if (q.id != null && q.id !== '') { const st = r.studies.find((x) => x.id === q.id); return st ? { available: true, version: r.version, study: st } : bad('no such study', 404); }
+    const edge = q.edge == null || q.edge === '' ? null : await X.edge(q.edge, 'edge', true), kind = q.kind == null || q.kind === '' ? null : String(q.kind).slice(0, 40);
+    const rows = r.studies.filter((x) => (!edge || edge === '*' || x.edge === edge || x.edge === '*' || x.edge == null) && (!kind || x.kind === kind)).map((x) => { const o = { ...x }; delete o.table; return o; });
+    return { available: true, version: r.version, generated: r.generated, what: r.what || null, preregistration: r.preregistration, counts: r.counts, summary: r.summary || null, studies: rows,
+      proposedLessons: (r.proposedLessons || []).filter((l) => !edge || edge === '*' || l.edge === edge || l.edge === '*'), proposedLessonsNote: r.proposedLessonsNote || null };
+  },
+
+  // The decision policy measured against taking every setup (the generated eval.json), train pool only
+  async evaluation(X) { const e = typeof X.data.evaluation === 'function' ? await X.data.evaluation() : null; return isObj(e) ? { available: true, evaluation: e } : { available: false, note: 'the evaluation is not generated yet' }; },
+
+  // What the offline training service produced (ml/models/index.json): every scorer with its walk-forward numbers and verdict.
+  // These are files, not the registry: a scorer is only ever used after the owner registers and promotes it (get=models).
+  async training(X) {
+    const t = typeof X.data.training === 'function' ? await X.data.training() : null; if (!isObj(t) || !Array.isArray(t.models)) return { available: false, models: [], skipped: [], note: 'no training report is shipped with this build' };
+    const slim = (m) => ({ id: m.id, edge: m.edge, scope: m.scope, status: m.status, verdict: m.verdict, beatsBaseline: m.beatsBaseline, promoted: m.promoted, calibrated: m.calibrated, trainRows: m.trainRows, from: m.from, to: m.to, winRate: m.winRate, netRPerTrade: m.netRPerTrade,
+      features: Array.isArray(m.featureNames) ? m.featureNames.length : null, validation: m.validation, outOfFold: m.outOfFold, exam: m.exam, hash: m.hash });
+    return { available: true, generated: t.generated, trainer: t.trainer, data: t.data, target: t.target, verdictRule: t.verdictRule, promotion: t.promotion, models: t.models.map(slim), skipped: t.skipped || [] };
   },
 
   async notebook(X) { return { notes: (await X.store.rows(K.notebook, true)).slice().reverse() }; },

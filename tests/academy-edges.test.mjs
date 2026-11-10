@@ -179,7 +179,7 @@ test('meta.json agrees with the files', () => {
 });
 test('academy/data holds only the generated JSON, small enough to serve, and no candles', () => {
   const files = fs.readdirSync(path.join(ROOT, 'academy/data')).sort();
-  assert.deepEqual(files, [...SEVEN.flatMap((id) => [`cand-${id}.json`, `out-${id}.json`, `feat-${id}.json`]), 'calendar.json', 'clock-check.json', 'eval.json', 'meta.json', 'quality.json'].sort());
+  assert.deepEqual(files, [...SEVEN.flatMap((id) => [`cand-${id}.json`, `out-${id}.json`, `feat-${id}.json`]), 'calendar.json', 'clock-check.json', 'eval.json', 'meta.json', 'quality.json', 'research.json'].sort());
   for (const f of files) assert.ok(fs.statSync(path.join(ROOT, 'academy/data', f)).size < 600e3, `${f} stays under 600 kB`);
 });
 
