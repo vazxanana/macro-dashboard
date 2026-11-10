@@ -410,7 +410,35 @@
   function setupErr(msg) { const n = $('setup-err'); n.hidden = !msg; n.textContent = msg || ''; if (msg) n.scrollIntoView({ block: 'nearest' }); }
   function readRange() { const from = dayToSec($('f-from').value), to = dayToSec($('f-to').value); return from == null || to == null || to < from ? null : { from, to: to + DAY }; }
 
+  // The edges as cards over the select, which stays the value the page reads and sets: built once, and the selection follows
+  // every renderEdgeInfo (so a resumed session or "Replay this setup" moves the card too).
+  function renderEdgeCards() {
+    const box = $('edge-cards'), sel = $('f-edge'); if (!box || !sel) return;
+    if (!box.childElementCount && S.edges.length) {
+      for (const e of S.edges) box.appendChild(el('button', { type: 'button', class: 'ecard', 'data-edge': e.id, 'aria-pressed': 'false', onclick: () => { if (sel.disabled || sel.value === e.id) return; sel.value = e.id; sel.dispatchEvent(new Event('change', { bubbles: true })); } },
+        el('b', { text: e.name || e.id }), el('span', { class: 'ecard-m', text: e.marketLabel || e.market || '' }),
+        el('small', { text: [e.signalTf ? e.signalTf + ' signal' : '', e.sides === 'long' ? 'buys only' : e.sides === 'short' ? 'sells only' : 'buys and sells'].filter(Boolean).join(' · ') })));
+      sel.closest('.f').classList.add('has-cards'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
+    }
+    box.querySelectorAll('.ecard').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.edge === sel.value)));
+  }
+  // A look at the market before the replay starts: one-hour candles of the two weeks BEFORE the From date. Nothing at or after
+  // the first replay day is asked for or drawn, and no decision ever reads this chart.
+  let PV = null, pvTok = 0, pvTimer = null;
+  function previewSoon() { clearTimeout(pvTimer); pvTimer = setTimeout(preview, 350); }
+  async function preview() {
+    const box = $('preview'); if (!box) return; const e = edgeSel(), r = readRange(), tok = ++pvTok; if (!e || !r) { box.hidden = true; return; }
+    try {
+      const got = await MXR.load({ sym: e.market, tf: '1h', from: r.from - 14 * DAY, to: r.from }); if (tok !== pvTok) return;
+      const rows = (Array.isArray(got) ? got : got.bars || []).filter((b) => b.time < r.from).map((b) => ({ time: b.time, open: b.open, high: b.high, low: b.low, close: b.close }));
+      if (rows.length < 5) { box.hidden = true; return; }
+      box.hidden = false; if (!PV) PV = newChart($('preview-chart')); PV.setBars(rows); PV.fit();
+      say('preview-note', `${e.marketLabel || e.market} · 1h candles up to ${isoDay(r.from)} 00:00 UTC`);
+    } catch (err) { if (tok === pvTok) box.hidden = true; }
+  }
+
   function renderEdgeInfo() {
+    renderEdgeCards();
     const e = edgeSel(), box = clear($('edge-info')); if (!e) return;
     const def = e.definition || {}, st = e.study || {};
     box.appendChild(el('div', { class: 'pills' },
@@ -469,6 +497,7 @@
         if (!r) { note.textContent = pool === 'exam' ? 'No unseen exam setup is left for this edge.' : 'No train setup is available for this edge.'; return; }
       }
       const r = readRange(); if (!r) { note.textContent = 'Pick a start and an end date (the end on or after the start).'; return; }
+      previewSoon();
       const rows = (all.candidates || []).filter((c) => c.t >= r.from && c.t < r.to), total = rows.length, seen = rows.filter((c) => seenBefore(all, c.id)).length, ex = all.excluded || {}, left = (ex.clockShift || 0) + (ex.pre2020 || 0);
       note.textContent = `${total} ${pool} setup${total === 1 ? '' : 's'} in this range` + (pool === 'train' && seen ? ` (${seen} already decided before)` : '') + (pool === 'exam' ? ' (unseen only)' : '') + '.'
         + (left ? ` ${left} setup${left === 1 ? '' : 's'} of this edge ${left === 1 ? 'is' : 'are'} left out of every list: ${[ex.clockShift ? ex.clockShift + ' in weeks whose research clock could not be checked' : '', ex.pre2020 ? ex.pre2020 + ' before 2020' : ''].filter(Boolean).join(', ')}.` : '')
@@ -656,7 +685,7 @@
 
   // ---- charts ---------------------------------------------------------------------------------------------------------
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const look = () => ({ layout: { background: { type: 'solid', color: css('--panel') || '#0f1116' }, textColor: css('--ink-dim') || '#a4abb8', fontSize: 12 }, grid: { vertLines: { color: css('--line-soft') }, horzLines: { color: css('--line-soft') } },
+  const look = () => ({ layout: { background: { type: 'solid', color: 'transparent' }, textColor: css('--ink-dim') || '#a4abb8', fontSize: 12, fontFamily: 'JetBrains Mono, ui-monospace, monospace' }, grid: { vertLines: { color: css('--line-soft') }, horzLines: { color: css('--line-soft') } },
     rightPriceScale: { borderColor: css('--line') }, timeScale: { borderColor: css('--line'), timeVisible: true, secondsVisible: false, rightOffset: 6 } });
   const candleLook = () => ({ upColor: css('--buy'), downColor: css('--sell'), wickUpColor: css('--buy'), wickDownColor: css('--sell'), borderVisible: false, priceLineVisible: false, priceFormat: { type: 'price', precision: 2, minMove: 0.01 } });
   // Every chart on the page comes from here, so they share one look and a theme change reaches all of them.

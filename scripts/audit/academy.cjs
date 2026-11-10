@@ -92,7 +92,8 @@ async function startServer(port = PORT, flags = []) {
     await p.waitForSelector('#f-edge option', { state: 'attached', timeout: 15000 }); await p.selectOption('#f-edge', EDGE);
     await p.waitForFunction(() => /setups? in this range/.test(document.getElementById('f-count').textContent), null, { timeout: 15000 });
     if (from) { await p.fill('#f-from', from); await p.dispatchEvent('#f-from', 'change'); await p.waitForTimeout(300); }
-    if (speed) await p.check(`input[name=speed][value="${speed}"]`, { force: true });
+    if (speed) { await p.evaluate(() => { const d = document.getElementById('setup-opts'); if (d) d.open = true; });   // the speed sits behind "More options" since the look pass
+      await p.check(`input[name=speed][value="${speed}"]`, { force: true }); }
   };
   try {
     // ---- 1. a visitor who is not the owner: the card, and nothing is loaded ----
