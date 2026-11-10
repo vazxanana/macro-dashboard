@@ -191,7 +191,8 @@ export function verdictOf(S) {
 }
 
 // ─── modes ───
-const MODE = process.argv[2], HERE = path.dirname(fileURLToPath(import.meta.url));
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const MODE = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) ? process.argv[2] : null;   // modes run only when this file is the script (mosha-retrace imports it)
 const iso = (t) => new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ');
 if (MODE === 'example') {
   const BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
