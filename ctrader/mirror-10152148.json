@@ -388,7 +388,7 @@
     "lots": 0.15,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T07:03:26.000Z",
     "councilEntry": 2121.28,
     "stop": 2105.147,
@@ -401,10 +401,12 @@
     "slipR": -0.086,
     "lagSec": 9195,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T07:03:26.000Z",
-    "brokerStop": 2106.98
+    "brokerStop": 2106.98,
+    "closedAt": "2026-11-10T08:01:30.000Z"
    },
    "audusd-replica-1794285683-b": {
     "positionId": "47940917",
@@ -603,7 +605,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-10T07:22:10.000Z",
     "councilEntry": 0.69236,
     "stop": 0.691812,
@@ -616,10 +618,15 @@
     "slipR": -0.219,
     "lagSec": 69,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T07:22:10.000Z",
-    "brokerStop": 0.69169
+    "brokerStop": 0.69169,
+    "closedAt": "2026-11-10T08:01:30.000Z",
+    "exitPrice": 0.69195,
+    "councilExit": null,
+    "councilR": -1
    },
    "xau-replica-1794296125-s": {
     "positionId": "47949796",
@@ -674,6 +681,32 @@
     ],
     "stopCheckedAt": "2026-11-10T07:56:13.000Z",
     "brokerStop": 1.34576
+   },
+   "audusd-replica-1794297606-s": {
+    "positionId": "47955397",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T08:01:30.000Z",
+    "councilEntry": 0.69183,
+    "stop": 0.692594,
+    "t1": 0.690302,
+    "riskCash": 2,
+    "margin": 2.77,
+    "mark": 0.69183,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69194,
+    "slipR": -0.144,
+    "lagSec": 84,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T08:01:30.000Z",
+    "brokerStop": 0.6927
    }
   },
   "day": {
@@ -681,7 +714,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9996.02 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9994.07 · 23 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -698,8 +731,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9996.02,
-  "lastRun": "2026-11-10T07:58:44.000Z"
+  "balance": 9994.07,
+  "lastRun": "2026-11-10T08:01:30.000Z"
  },
  "log": [
   {
@@ -904,6 +937,21 @@
    "at": "2026-11-10T07:56:13.000Z",
    "msg": "opened sell GBPUSD 0.02 lot (council replica)",
    "trade": "gbpusd-replica-1794297299-s"
+  },
+  {
+   "at": "2026-11-10T08:01:30.000Z",
+   "msg": "ETHUSD position 47940907 closed at the broker",
+   "trade": "eth-replica-1794285011-b"
+  },
+  {
+   "at": "2026-11-10T08:01:30.000Z",
+   "msg": "closed AUDUSD position 47946705 (council: loss)",
+   "trade": "audusd-replica-1794295261-b"
+  },
+  {
+   "at": "2026-11-10T08:01:30.000Z",
+   "msg": "opened sell AUDUSD 0.02 lot (council replica)",
+   "trade": "audusd-replica-1794297606-s"
   }
  ],
  "limits": {
@@ -982,11 +1030,11 @@
   ]
  },
  "execution": {
-  "n": 25,
-  "meanSlipR": 0.114,
-  "medianSlipR": 0.048,
+  "n": 26,
+  "meanSlipR": 0.104,
+  "medianSlipR": 0.039,
   "worstSlipR": 0.765,
-  "medianLagSec": 18736,
+  "medianLagSec": 14687.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 4,
@@ -1009,8 +1057,8 @@
     "meanSlipR": 0.497
    },
    "AUDUSD": {
-    "n": 5,
-    "meanSlipR": 0.038
+    "n": 6,
+    "meanSlipR": 0.008
    },
    "GBPUSD": {
     "n": 1,
