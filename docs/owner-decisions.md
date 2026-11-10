@@ -337,3 +337,81 @@ or config was changed. The items below are what that work leaves for the owner.
   (unverified; it also changed `council/veteran.mjs` staleness and added tests). This is not the HistData clock and it
   changes what a live member computes, so it was left for the owner.
 - **Recommended: yes, as its own reviewed change with tests.** Paper only either way.
+
+## Mosha as you expected it (10 Nov 2026)
+
+### [ ] 27. Your Mosha trading, tested as fixed rules in five studies: no edge. Log your own trades of it?
+
+- **What you told me.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
+  "This is how I was expecting Mosha to work." The method is top-down order only: after an H4 BO, H1 shows when the
+  retracement starts, M15 or M5 gives the entry at the zone of the break, the target is the H4 barrier; at the barrier you
+  close and buy with the H4, and that buy is the main trade.
+- **What the live Mosha BO does instead.** Same first two steps, then it trades back with the H4 without waiting for the
+  barrier, on M15, in the weekly direction only. It could not have taken your sell and has placed no live trade since 4 Nov.
+- **Three pre-registered tests on gold, 2020 to October 2026, after costs:**
+  - `research/edge/mosha-level/` (my first, wrong reading: a tap of an H4 level, then M5 breaks): 365 trades, −0.35R a
+    trade, t −3.10.
+  - `research/edge/mosha-retrace/` (your first half, the retracement trade; it finds your own trade): 445 trades, +0.02R a
+    trade, t 0.17. Break-even.
+  - `research/edge/mosha-cycle/` (your main trade, the buy at the barrier): 132 trades, −0.22R a trade, t −0.99.
+  - Both halves together: 577 trades, −0.03R a trade, t −0.29.
+- **What that means.** Taken every time by fixed rules, the cycle does not make money: about one trade in six reaches its
+  target and the 5R winners only just pay for the losers. It says nothing about the trades YOU pick; the rules cannot see
+  why you take one cycle and skip another.
+#### Your own example trades, checked on our candles (added 10 Nov, after "check the trades I sent you")
+
+The screenshots you sent on 2 Nov ("Some marking examples", "More examples", "Learn this and let it be your new guide",
+"Study this scenario") and on 10 Nov, read off the charts and replayed on OANDA 5-minute gold candles:
+
+| Trade (your label) | Entry / stop / target | Plan | On our candles |
+|---|---|---|---|
+| 28 Oct sell ("M5 cf for sell", "2000 pips") | 4048.59 / 4076.69 / 3971.09 | 2.8R | Filled 29 Oct 02:25 UTC, target 30 Oct 07:50: +2.8R. Worst point 0.18R against. |
+| 29 Oct sell (the zone after the break) | 4035.72 / 4045.96 / 3988.44 | 4.6R | Filled 11:05 UTC, target 30 Oct 04:05: +4.6R. Worst point 0.36R against. |
+| 2 Nov sell ("M30 sweep high", "i just took entry after bo sell") | 3908.27 / 3916.10 / first 3878.42, then 3891.46 | 3.8R, taken 2.1R | Reached 2.2R in favour (08:20 UTC), never the first target; price later went through the stop. Closing at 3891.46 is what made it a winner. |
+| 2 Nov buy ("Learn this") | 3900.71 / 3896.79 / 3965.08 | 16.4R | Target reached 14:35 UTC. Our feed's lows at 13:00 and 13:15 UTC were 3896.47 and 3896.53, $0.30 under your stop: on our prices it survives only if entered after 13:20. |
+| 10 Nov sell | 4120.42 / 4128.92 / 4072.84 | 5.6R | Filled 05:20 UTC, target 10:55: +5.6R. Worst point 0.89R against. |
+
+Five trades, five winners, about +31R as you took them. They are examples you picked, so they show the pattern, not the
+win rate.
+
+What they show that my three tests did not hold:
+
+- **The trigger is the VR and its CF, on M5 or M15** (your red "5 mn" box: from the extreme to the last swing inside it; a
+  close out of the box is the CF). It comes before the H1 break, at a better price. Two of my tests waited for the H1 break.
+- **Every sell starts from a swept high**: 28 Oct the spike to 4082 over the earlier 4070 highs, 2 Nov the M30 high 3913
+  taken to 3918, 10 Nov the H4 high 4147 taken to 4148.7. I tested touches of H4 levels, not sweeps of an earlier high.
+- **The main trade is entered where the pullback ends, by the same VR and CF**: on 28 Oct the H4 was a sell (BO sell
+  22 Oct), price pulled back up to the broken level (about 4068) and the M5 CF there was the sell with the H4. My test of the
+  main trade used an H4 engulf zone as the barrier and an H1 break as the trigger.
+- **You manage the exit** (the 2 Nov sell was closed at 2.1R, not held for 3.8R), and the stops are a few dollars, so the
+  price feed matters ($0.30 decided the 2 Nov buy on our feed).
+
+**That reading, tested** (you: "Test both"; `research/edge/mosha-sweep/`, pre-registered, OANDA gold from 2006 so that
+2006-19 is data none of the earlier tests had read):
+
+| Entry | Trades | Win rate | R a trade after costs | t | 2006-19 | 2020 to now |
+|---|---|---|---|---|---|---|
+| At the CF, stop above the high | 6,260 | 25.7 % | −0.11 | −4.62 | −0.10 | −0.12 |
+| On the return to the zone, tight stop | 6,478 | 18.0 % | −0.21 | −7.36 | −0.23 | −0.18 |
+
+Both fail, in both windows. The detector finds your 28 Oct and 10 Nov sells; your 2 Nov trades were read on M1 and M30 and
+are outside it. A swept H1 high or low with an M5 CF happens about five times a trading day, so your five winners are
+five out of thousands of look-alikes, and what sets them apart is not in any rule written so far.
+
+**Is there a simple way to pick the good ones?** (you: "Keep going"; `research/edge/mosha-select/`, pre-registered.) The same
+setups, split by four things you can see when the order is placed, each tried on 2006-12, then 2013-19, then 2020 to now:
+
+| Condition | What happened |
+|---|---|
+| With the last H4 BO, or against it | Both lose in all three periods (at the CF, with the H4: −0.07R, −0.07R, −0.16R a trade). |
+| The sweep also took an H4 swing, or only an H1 swing | Both lose; they swap places from period to period. |
+| Asia, London or New York | All three lose; no session stays best. |
+| Target 4R or more away, or nearer | Both lose; the far targets lose more (12 to 19 % winners). |
+
+Eighteen filtered versions, three periods each: 54 results, all negative, the best −0.05R a trade. None of these simple
+conditions is what makes your trades win.
+
+- **Options.** (a) Log your own trades of this pattern for a few weeks (ChronosTrade or the Academy keep entry, stop,
+  target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a setup, and I test
+  that one filter. (c) Leave it. Five studies and thirty-three tests are enough; I do not recommend another mechanical one.
+- **Recommended: (a).** Nothing live changes on any option; the live Mosha BO is untouched.

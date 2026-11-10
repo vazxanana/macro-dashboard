@@ -1467,3 +1467,63 @@ UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 3
 - **Academy**: `docs/academy/DATA-CLOCK.md`. **Baselines** `council/decay-base.json`, `council/expect-base.json`,
   `council/event-base.json` were rebuilt with their own scripts in one commit (owner item 19). Stale caches (`*-m1.bin`,
   `xau_m1.bin`) made before 10 Nov hold old times: delete them before any re-run.
+
+## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
+The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
+Mosha BO (H4 BO, H1 BO against, M15 BO back, weekly direction) is a different trade: it could not have taken it (wrong side, M15
+not M5, weekly filter against) and has placed no live trade since 4 Nov. `research/edge/mosha-level/` (PREREGISTRATION.md
+committed first, then `run.mjs`, RESULT.md, result.json) writes the owner's trade down as one rule in the direction rule book's
+words: tap of a live H4 swing high or low, M5 close through the last three-candle swing made before the tap (external BO), the
+next M5 swing broken by a close, limit at that broken level, stop $0.30 past the break candle's base, target the nearest live H4
+engulf zone (the barrier, at least 2R away), one at a time, $0.30 cost, fills on M1. The detector finds the owner's own trade on the
+council's candles (`node run.mjs example`). **Verdict: FAIL**: 365 trades 2020 to October 2026, -0.35R a trade after costs, t -3.10,
+win rate 14.5 % (in sample -0.50R, out of sample -0.12R; 312 of 365 stopped, median stop $2.77); the three labelled variants lose
+too. Nothing live changed; the live Mosha BO is untouched. Tests: `tests/mosha-level.test.mjs`.
+**The owner's correction, same day** ("after a H4 we can look for H1 to know when the retracement or pullback starts, then we use
+M15 or M5 to trade that retracement"): `research/edge/mosha-retrace/` (its own PREREGISTRATION.md first; imports the shared pieces
+of mosha-level). The chain: H4 BO (close beyond the last 3-a-side H4 swing), the FIRST H1 BO the other way after it (close beyond
+the last three-candle H1 swing), sell or buy limit at the broken H1 level, zone = the M5 candle that broke it and the 3 before, stop
+$0.30 past, target the H4 engulf barrier (2R or more), one signal per H4 BO, one at a time. The live Mosha BO shares the first two
+steps and then trades the END of the retracement (an M15 BO back with the H4); this trades the retracement itself. It reads the
+owner's own trade (`node run.mjs example`). **Verdict: FAIL on the pre-registered bar, in substance break-even**: 445 trades,
++0.02R a trade after costs, t 0.17 (in sample +0.07R, out of sample -0.03R; before costs +0.13R, median stop $3.21). Variants,
+reported only: zone on M15 +0.10R (t 0.81, positive in both halves: a hypothesis, Holm p 1.00 over the day's nine tests), weekly
+direction only -0.11R, H4 key level only -0.04R, fixed 3R 0.00R. Not an edge, never call it one; any follow-up (M15 zone, buy
+side) needs its own pre-registration on other data (OANDA 2006-17 as mosha-oos used). Tests: `tests/mosha-retrace.test.mjs`.
+**The owner's three answers, same day** (asked what "high time frame aligned" means, what happens at the barrier, how the entry zone
+is picked): top-down order only (H4, then H1, then M15 or M5; no Daily / Weekly condition, no level requirement); the zone of the
+break; and at the barrier "close, then buy with H4": the buy is the MAIN trade, the retracement sell is the first half. So
+mosha-retrace is the owner's first half read correctly. `research/edge/mosha-cycle/` (own PREREGISTRATION.md first) tests the second
+half: after the H4 BO and the H1 retracement, price reaches the H4 engulf barrier; the first H1 BO back with the H4 within 72 h of
+the tap; limit at the broken H1 level, zone = the M5 break candle and the 3 before, stop $0.30 past, target the high the retracement
+came from (2R or more). **Verdict: FAIL**: 132 trades, -0.22R a trade after costs, t -0.99 (in sample -0.12R, out of sample -0.35R);
+variants (stop under the barrier, M15 zone, fixed 3R) all negative. The whole cycle, both halves on one timeline (descriptive):
+577 trades, -0.03R, t -0.29. Thirteen tests in the three Mosha studies of the day, none positive after Holm: no mechanical version
+of the owner's Mosha cycle is an edge on gold 2020-26. What the rules cannot hold is the owner's own selection, so the open step is
+the owner's own logged trades (docs/owner-decisions.md item 27). Tests: `tests/mosha-cycle.test.mjs`.
+**The owner's own examples, checked** (same day, "check the trades I sent you": the 2 Nov screenshots, labelled "M5 vr", "M5 cf
+for sell", "M30 sweep high", "i just took entry after bo sell", and the 10 Nov sell): five trades, five winners on OANDA M5 (+2.8R,
++4.6R, +2.1R as closed, +16.4R, +5.6R; table in owner decision 27). They show what the three tests did not hold: the trigger is the
+VR and its CF on M5 / M15 (the red "5 mn" box = from the extreme to the last swing inside it; a close out of it = CF), earlier than
+the H1 BO; every sell starts from a SWEPT prior high at a higher-timeframe point; the main trade (28 Oct, with the H4 BO sell) is
+entered where the pullback ends, at the retest of the H4 BO level, by that same M5 CF; exits are managed by hand and stops are a
+few dollars (a $0.30 feed difference decided the 2 Nov buy).
+**That reading tested** (owner: "Test both", the two ways of entering): `research/edge/mosha-sweep/` (own PREREGISTRATION.md first;
+OANDA gold M5 from June 2006 through the candle proxy, `node run.mjs fetch <dir>`, 18 MB kept out of git; window A 2006-19 untouched
+by the day's other tests, window B 2020 to now; fills on M5). A swept H1 swing (2 a side, live 10 days), the M5 VR (the extreme to
+the last three-candle swing before it), the CF (a close out of it within 12 h), then entry CF (at the CF close, stop $0.30 past the
+extreme) or entry ZONE (limit at the next M5 swing broken after the CF, stop $0.30 past that break's base); target the nearest H4
+engulf zone or H4 swing 2R or more away; one at a time per entry. It finds the owner's 28 Oct and 10 Nov sells (the 2 Nov trades
+were read on M1 / M30). **Verdict: FAIL, both entries**: at the CF 6,260 trades -0.11R a trade after costs (t -4.62; 2006-19 -0.10R,
+2020 on -0.12R; before costs -0.03R); at the zone 6,478 trades -0.21R (t -7.36; -0.23R and -0.18R); 2 and 1 of 21 years positive.
+The pattern prints about five times a trading day, so the owner's five winning examples are picked from thousands of look-alikes:
+the selection is not in any rule. Fifteen tests in four Mosha studies on 10 Nov, none an edge (the retracement chain breaks even,
+the rest lose). Tests: `tests/mosha-sweep.test.mjs`.
+**Which sweeps are worth taking?** (owner: "Keep going"; `research/edge/mosha-select/`, own PREREGISTRATION.md first): the same
+mosha-sweep candidates split by four conditions known when the order is placed (with / against the last H4 BO; the sweep also took a
+live H4 swing or an H1 swing only; session Asia / London / New York; target 4R or more away or nearer), nine cells per entry, each
+its own one-at-a-time stream; a cell had to be positive on 2006-12 (100+ trades), hold on 2013-19 after Holm, and stay positive on
+2020 on. **Verdict: FAIL**: 0 of 18 cells positive on discovery; all 54 cell-period results negative (best -0.05R; with the H4 at
+the CF -0.07R / -0.07R / -0.16R; a far target is worse than a near one in every period). So neither the pattern nor one of these
+simple conditions holds the owner's selection. Five Mosha studies, thirty-three tests on 10 Nov, none an edge. Do not write another
+mechanical reading or filter; the open step is the owner's own logged trades (owner decision 27). Tests: `tests/mosha-select.test.mjs`.
