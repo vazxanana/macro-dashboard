@@ -1150,6 +1150,13 @@ are written atomically. The Trader writes with `writeAtomic` and stops (writes n
 coach.json exists but does not parse (it used to write trades.json out empty). Tests: `tests/ctrader-mirror.test.mjs` ("bug hunt"),
 `tests/trader-state-guard.test.mjs`.
 
+Limit read-back (10 Nov 2026): an AUD/USD buy limit was placed a minute after the price had fallen through its entry and its
+stop; it filled at once, the broker dropped the stop (above the fill) and the position sat without one for three minutes until
+the next round's guard closed it. Now every round that places a limit reads the account back before it ends (`limitsPlaced`,
+after `slWaitMs`): a limit that already became a position is adopted in the same round; without a stop it gets the council's
+stop by amend, or is closed at once when the stop is on the wrong side of the fill or the broker refuses it. A failed read-back
+leaves the next round's guard in charge. Tests: `tests/ctrader-mirror.test.mjs` ("a limit that fills at once").
+
 ## Veteran's calls: track record and COT calls (9 Nov 2026, owner: "keep improving our veteran macro")
 Every dated call now carries structured fields (`asset`, `kind`: closeAbove / touchUp / touchDown / range / bigMove / pairUp /
 pairDown, levels, `by`). `callsLedger` (council/outlook.mjs, run from veteran.mjs) records each call once in

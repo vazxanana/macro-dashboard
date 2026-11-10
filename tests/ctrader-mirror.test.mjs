@@ -49,6 +49,11 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
             if (o.rejectPending) return r(PT.ORDER_ERROR_EVENT, { errorCode: o.rejectPending, description: 'no' });
             const id = ++pid, od = { orderId: id, orderStatus: 1, orderType: 2, limitPrice: p.limitPrice, stopLoss: p.stopLoss, takeProfit: p.takeProfit, timeInForce: p.timeInForce, expirationTimestamp: p.expirationTimestamp,
               tradeData: { symbolId: p.symbolId, volume: p.volume, tradeSide: p.tradeSide, label: p.label, comment: p.comment } };
+            // o.limitFillsAt: the broker's price is already through the limit, so it fills at once at that price. A real broker drops an
+            // absolute stop on the wrong side of the fill; o.limitDropsStop drops it in any case
+            if (o.limitFillsAt) { const fid = ++pid, wrong = p.stopLoss == null || (p.tradeSide === 1 ? p.stopLoss >= o.limitFillsAt : p.stopLoss <= o.limitFillsAt);
+              positions.set(String(fid), { positionId: fid, positionStatus: 1, price: o.limitFillsAt, tradeData: { ...od.tradeData }, ...(!wrong && !o.limitDropsStop ? { stopLoss: p.stopLoss } : {}), ...(p.takeProfit != null ? { takeProfit: p.takeProfit } : {}) });
+              return r(PT.EXECUTION_EVENT, { executionType: 2, order: od }); }
             orders.set(String(id), od); return r(PT.EXECUTION_EVENT, { executionType: 2, order: od });
           }
           if (o.reject) return r(PT.ORDER_ERROR_EVENT, { errorCode: o.reject, description: 'no' });
@@ -557,6 +562,39 @@ test('pending council trade -> one resting LIMIT at the council entry with absol
   // a trailing system (rr >= 50): no take profit on the limit either
   const b2 = broker(); await mirrorRound({ env: ENV, trades: [pend({ rr: 99, t1: 2 })], state: started, WS: b2.WS, now: NOW, marks: MK });
   assert.equal('takeProfit' in limits(b2)[0], false); assert.equal(limits(b2)[0].stopLoss, 1.098);
+});
+
+// 10 Nov 2026: an AUD/USD buy limit was placed a minute after the price had fallen through the entry AND the stop. It filled at once,
+// the broker dropped the stop (above the fill) and the position sat without one for three minutes, until the next round closed it.
+test('a limit that fills at once is read back in the same round: no stop and the stop on the wrong side of the fill -> closed now; a dropped stop that is still valid -> set now', async () => {
+  // the fill is below the council's stop (entry 1.1, stop 1.098, fill 1.0975): closed in the round that placed it, no amend tried
+  let b = broker(); b.o.limitFillsAt = 1.0975;
+  let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK, slWaitMs: 0 });
+  assert.equal(limits(b).length, 1); assert.equal(b.o.closes, 1, 'closed in the same round'); assert.equal(b.positions.size, 0, 'nothing is left open without a stop'); assert.equal(b.amends.length, 0);
+  let m = r.state.map['eurusd-scalp-9']; assert.equal(m.status, 'closed by mirror'); assert.match(m.closedWhy, /no stop at the broker/); assert.equal(m.viaLimit, true); assert.equal(r.state.orders['eurusd-scalp-9'], undefined);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['pending', 'open', 'close']);
+  // and it is never placed or opened again while the council trade lives
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: r.state, WS: b.WS, now: NOW + 240, marks: MK, slWaitMs: 0 }); assert.equal(limits(b).length, 1); assert.equal(markets(b).length, 0); assert.equal(b.positions.size, 0);
+  // filled at once inside the levels with its stop: adopted in the same round, nothing else sent
+  b = broker(); b.o.limitFillsAt = 1.0995;
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK, slWaitMs: 0 });
+  m = r.state.map['eurusd-scalp-9']; assert.equal(m.status, 'open'); assert.equal(m.brokerStop, 1.098); assert.equal(m.fillPrice, 1.0995); assert.equal(b.o.closes, 0); assert.equal(b.amends.length, 0); assert.equal(b.positions.size, 1);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['pending', 'open']);
+  // filled at once inside the levels but the broker opened it without the stop: the council's stop is set in the same round
+  b = broker(); b.o.limitFillsAt = 1.0995; b.o.limitDropsStop = true;
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK, slWaitMs: 0 });
+  m = r.state.map['eurusd-scalp-9']; assert.equal(m.status, 'open'); assert.equal(m.stopSetBy, 'guard'); assert.equal(b.amends.length, 1); assert.equal(b.amends[0].stopLoss, 1.098); assert.equal([...b.positions.values()][0].stopLoss, 1.098); assert.equal(b.o.closes, 0);
+  // ...and closed at once when the broker refuses that stop
+  b = broker(); b.o.limitFillsAt = 1.0995; b.o.limitDropsStop = true; b.o.amendReject = 'TRADING_BAD_STOPS';
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK, slWaitMs: 0 });
+  assert.equal(b.o.closes, 1); assert.equal(b.positions.size, 0); assert.equal(r.state.map['eurusd-scalp-9'].status, 'closed by mirror');
+  // a sell the other way round: fill above the stop -> closed now
+  b = broker(); b.o.limitFillsAt = 1.1030;
+  r = await mirrorRound({ env: ENV, trades: [pend({ side: 'sell', entry: 1.1, stop: 1.102, t1: 1.095 })], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.098 }, slWaitMs: 0 });
+  assert.equal(b.o.closes, 1); assert.equal(b.positions.size, 0); assert.equal(r.state.map['eurusd-scalp-9'].status, 'closed by mirror');
+  // a failed read-back changes nothing: the order stays recorded and the next round's guard has it
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK, slWaitMs: 0 });
+  assert.equal(r.state.orders['eurusd-scalp-9'].orderId, '901'); assert.equal(b.orders.size, 1); assert.equal(b.o.closes, 0);
 });
 
 test('the broker fills the limit first -> the position is adopted (limit filled), the order record goes, one open alert', async () => {
