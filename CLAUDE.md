@@ -1592,6 +1592,13 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     from the session secret (`readerKey`; `MOSHA_READER=off`, `MOSHA_READER_SALT` rotates it), shown to the owner's session
     only (Lessons card, "Show the assistant's key"), and can read the lessons and write a reply, nothing else; a wrong key
     counts in `api/_guard.js` like a wrong password. Never widen it, never write it in a file or a chat.
+  - **Only Luxus teaches** (owner, 10 Nov: "The functionality is only to work for" Luxus, "the key is his password").
+    `TEACHER = 'luxus'` in `api/mosha.js`: `moshaLevel` gives 'teach' to that account alone (a stored `perms.mosha:
+    'teach'` on any other account counts as 'read', the owner reads too), and the page's `msPerms`, ChronosTrade's
+    `TEACH` and the Users page (the "Teaches the desk" option is offered for Luxus only) follow the same rule. His
+    sign-in is all he needs: no key, no setup. Sending lessons, "right / not right", every change to the book and
+    teaching from ChronosTrade are his; the owner reads the lessons and the book, may remove a lesson or a picture, and
+    may still switch Luxus's access (none / read / teaches). Never give teaching to another account without the owner.
   - **The key the assistant sets for itself** (owner, 10 Nov, asked to copy the key by hand: "No need for key u can read
     and do whaeva"). The server also accepts `MOSHA_ASSISTANT_KEY` (`ownKey`: 32-128 plain characters, else ignored): the
     assistant makes a random one, saves it as that Vercel environment variable (Production) and uses it as

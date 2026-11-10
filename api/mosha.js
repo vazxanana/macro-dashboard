@@ -27,10 +27,14 @@ const pick = (v, list, d) => (list.includes(v) ? v : d);
 // What an account may do on the Mosha desk: 'teach' (the owner, and a member allowed to send lessons), 'read', or false.
 // A stored perms.mosha (the Users page) wins; then the account's own mosha flag (Luxus's built-in default); then the desks
 // permission, which opens every desk to read (an explicit one wins over the role's default).
+// Teaching is for ONE account (owner, 10 Nov 2026: "The functionality is only to work for" Luxus, "the key is his password"):
+// only TEACHER may send lessons, judge the desk's answers and decide the book. His sign-in is all he needs. The owner and every
+// other member who may open the desk read it; a stored 'teach' on any other account counts as 'read'.
+const TEACHER = 'luxus';
 function moshaLevel(acct) {
-  if (!acct) return false; if (acct.u === 'owner') return 'teach';
+  if (!acct) return false; if (acct.u === 'owner') return 'read';
   const P = acct.perms || {}, m = P.mosha === false || P.mosha === 'read' || P.mosha === 'teach' ? P.mosha : acct.mosha === 'teach' || acct.mosha === 'read' ? acct.mosha : null;
-  if (m != null) return m; const d = typeof P.desks === 'boolean' ? P.desks : acct.role === 'reviewer'; return d ? 'read' : false;
+  if (m != null) return m === 'teach' && acct.u !== TEACHER ? 'read' : m; const d = typeof P.desks === 'boolean' ? P.desks : acct.role === 'reviewer'; return d ? 'read' : false;
 }
 const canRead = (acct) => !!moshaLevel(acct);
 // R of a closed trade: the exit against the entry, in units of the stop distance
@@ -89,4 +93,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha log is unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, build, rOf, canRead, moshaLevel, KEEP });
+Object.assign(module.exports, { handle, blobStore, build, rOf, canRead, moshaLevel, TEACHER, KEEP });

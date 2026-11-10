@@ -225,7 +225,7 @@ async function handle(req, res, d = {}) {
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (!isObj(b)) return res.status(400).json({ error: 'bad request' });
     const stamp = new Date(now).toISOString();
-    const mine = (l) => owner || (teach && l.by === acct.u);   // a teacher changes only their own lessons
+    const mine = (l) => teach && l.by === acct.u;   // the teacher changes only his own lessons; the owner may only remove one
     const find = (id) => list.find((x) => x.id === String(id));
 
     if (isObj(b.reply)) {   // what the assistant understood, and its marks for the chart (the owner may write it too)
@@ -246,7 +246,7 @@ async function handle(req, res, d = {}) {
       book.push(item); await store.putBook(book); return res.status(200).json({ ok: true, item, book });
     }
     if (bot) return res.status(403).json({ error: 'the assistant\'s key reads, answers and proposes lines, nothing else' });
-    if (!teach) return res.status(403).json({ error: 'this account cannot teach the desk' });
+    if (!teach && !(owner && isObj(b.remove))) return res.status(403).json({ error: 'this account cannot teach the desk' });
 
     if (isObj(b.book)) {   // the teacher's word on a line: confirm it, correct it, or erase it
       const id = String(b.book.id), i = BOOK_ID.test(id) ? book.findIndex((x) => x.id === id) : -1; if (i < 0) return res.status(404).json({ error: 'no such line' });
@@ -299,7 +299,7 @@ async function handle(req, res, d = {}) {
     }
     if (isObj(b.remove)) {
       const l = find(b.remove.id); if (!l) return res.status(404).json({ error: 'no such lesson' });
-      if (!mine(l)) return res.status(403).json({ error: 'that lesson belongs to someone else' });
+      if (!mine(l) && !owner) return res.status(403).json({ error: 'that lesson belongs to someone else' });
       const gone = b.remove.img != null ? l.shots.filter((s) => s.img === String(b.remove.img)) : l.shots.slice();
       if (b.remove.img != null && !gone.length) return res.status(404).json({ error: 'no such picture' });
       const next = b.remove.img != null ? list : list.filter((x) => x !== l);

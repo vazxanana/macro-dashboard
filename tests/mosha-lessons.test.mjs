@@ -40,10 +40,10 @@ test('Luxus: the Mosha desk is his main page and he may teach; the defaults surv
 });
 
 test('who may open the Mosha desk and who may teach: a stored choice wins, then the member\'s own flag, then the other desks', () => {
-  assert.equal(moshaLevel(null), false); assert.equal(moshaLevel(OWNER), 'teach'); assert.equal(moshaLevel(LUXUS), 'teach'); assert.equal(moshaLevel(CARLOS), false);
+  assert.equal(moshaLevel(null), false); assert.equal(moshaLevel(OWNER), 'read', 'the owner reads: teaching is Luxus\'s alone'); assert.equal(moshaLevel(LUXUS), 'teach'); assert.equal(moshaLevel(CARLOS), false);
   assert.equal(moshaLevel(FRED), 'read', 'a reviewer reads it with the other desks'); assert.equal(moshaLevel({ ...FRED, perms: { desks: false } }), false); assert.equal(moshaLevel({ ...CARLOS, perms: { desks: true } }), 'read');
   assert.equal(moshaLevel({ ...LUXUS, perms: { mosha: false } }), false, 'the owner can switch it off on the Users page'); assert.equal(moshaLevel({ ...LUXUS, perms: { mosha: 'read' } }), 'read');
-  assert.equal(moshaLevel({ ...FRED, perms: { mosha: 'teach' } }), 'teach'); assert.equal(moshaLevel({ ...FRED, perms: { mosha: false } }), false); assert.equal(moshaLevel({ ...CARLOS, perms: { mosha: 'yes' } }), false, 'an unknown value gives nothing');
+  assert.equal(moshaLevel({ ...FRED, perms: { mosha: 'teach' } }), 'read', 'a stored "teach" on any other account only reads'); assert.equal(moshaLevel({ ...FRED, perms: { mosha: false } }), false); assert.equal(moshaLevel({ ...CARLOS, perms: { mosha: 'yes' } }), false, 'an unknown value gives nothing');
   assert.equal(canRead(LUXUS), true); assert.equal(canRead(CARLOS), false);
   assert.deepEqual(cleanPerms({ mosha: 'teach' }), { mosha: 'teach' }); assert.deepEqual(cleanPerms({ mosha: false, desks: true }), { mosha: false, desks: true }); assert.equal(cleanPerms({ mosha: true }), null); assert.equal(cleanPerms({ mosha: 'write' }), null);
   assert.deepEqual(clean({ luxus: { name: 'Luxus', role: 'viewer', hash: 'a'.repeat(64), mosha: 'teach', home: 'mosha', perms: { mosha: 'read' } } }).luxus, { name: 'Luxus', role: 'viewer', hash: 'a'.repeat(64), perms: { mosha: 'read' } }, 'only perms.mosha is stored: the built-in default is applied by key');
@@ -79,7 +79,7 @@ test('sending: a teacher starts a lesson and adds pictures to their own; readers
   assert.equal((await call(s, 'POST', LUXUS, { add: { title: 'x', image: url('image/png', JPG) } })).code, 400); assert.equal((await call(s, 'POST', LUXUS, { add: { title: 'x' } })).code, 400); assert.equal((await call(s, 'POST', LUXUS, { add: { lesson: '20260101000000000zzzz', image: url('image/png', PNG) } })).code, 404);
   const other = { u: 'mira', name: 'Mira', role: 'viewer', mosha: 'teach' };
   assert.equal((await call(s, 'POST', other, { add: { lesson: id, image: url('image/png', PNG) } })).code, 403); assert.equal((await call(s, 'POST', other, { edit: { id, note: 'mine now' } })).code, 403); assert.equal((await call(s, 'POST', other, { remove: { id } })).code, 403);
-  assert.equal((await call(s, 'POST', OWNER, { add: { lesson: id, caption: 'from the owner', image: url('image/png', PNG) } })).code, 200, 'the owner may add to any lesson');
+  assert.equal((await call(s, 'POST', OWNER, { add: { lesson: id, caption: 'from the owner', image: url('image/png', PNG) } })).code, 403, 'the owner reads: only Luxus teaches'); assert.equal((await call(s, 'POST', OWNER, { add: { note: 'A lesson of the owner.' } })).code, 403); assert.equal((await call(s, 'POST', { ...FRED, perms: { mosha: 'teach' } }, { add: { note: 'A lesson of another member.' } })).code, 403); assert.equal((await call(s, 'POST', LUXUS, { add: { lesson: id, caption: 'a third picture', image: url('image/png', PNG) } })).code, 200);
   assert.equal(s.img.size, 4); assert.equal((await call(s, 'POST', LUXUS, {})).code, 400); assert.equal((await call(s, 'POST', LUXUS, 'not json')).code, 400);
   // a lesson holds 12 pictures
   for (let i = 0; i < L.MAX_SHOTS - 3; i++) assert.equal((await call(s, 'POST', LUXUS, { add: { lesson: id, image: url('image/png', PNG) } })).code, 200);
@@ -142,7 +142,7 @@ test('page wiring: Luxus lands on the Mosha desk, the desk opens on its own, the
   // the page's own permission function, lifted out of the page
   const code = PAGE.slice(PAGE.indexOf('window.MS_PERM_KEYS = ['), PAGE.indexOf('window.msMergeUsers')), w = {}; new Function('window', code)(w);
   assert.ok(w.MS_PERM_KEYS.includes('mosha')); const P = (R, owner) => w.msPerms(R, owner).mosha;
-  assert.equal(P(null, true), 'teach'); assert.equal(P(LUXUS), 'teach'); assert.equal(P(CARLOS), false); assert.equal(P(FRED), 'read'); assert.equal(P({ ...LUXUS, perms: { mosha: false } }), false); assert.equal(P({ ...FRED, perms: { desks: false } }), false); assert.equal(P({ ...FRED, perms: { mosha: 'teach' } }), 'teach');
+  assert.equal(P(null, true), 'read'); assert.equal(P(LUXUS), 'teach'); assert.equal(P(CARLOS), false); assert.equal(P(FRED), 'read'); assert.equal(P({ ...LUXUS, perms: { mosha: false } }), false); assert.equal(P({ ...FRED, perms: { desks: false } }), false); assert.equal(P({ ...FRED, perms: { mosha: 'teach' } }), 'read');
   for (const R of [LUXUS, CARLOS, FRED, { ...LUXUS, perms: { mosha: 'read' } }, { ...FRED, perms: { mosha: false } }, { ...CARLOS, perms: { desks: true } }]) assert.equal(P(R), moshaLevel(R), 'the page and the server agree: ' + JSON.stringify(R));
   assert.equal(w.msPerms(LUXUS).desks, false, 'the other desks stay closed to him'); assert.equal(w.msPerms(LUXUS).charts, false);
   assert.match(PAGE, /mosha: 'mosha', ict: 'ict' \}/); assert.match(PAGE, /!h0 && window\.MS_ACCT && window\.MS_ACCT\.home === 'mosha' && !msDenied\('mosha'\) \? 'mosha'/);
@@ -193,7 +193,7 @@ test('the conversation: the desk answers, the teacher says right or not right an
   const yes = await call(s, 'POST', LUXUS, { say: { id, verdict: 'right', text: 'Yes.' } }); assert.deepEqual([yes.body.lesson.state, yes.body.lesson.thread.at(-2).verdict], ['agreed', 'right']);
   assert.equal((await call(s, 'POST', LUXUS, { say: { id, text: 'One more thing: the stop goes above the VR.' } })).body.lesson.state, 'more', 'later words reopen the lesson');
   // only the lesson's teacher or the owner talks in it; a reader cannot
-  assert.equal((await call(s, 'POST', { u: 'mira', name: 'Mira', role: 'viewer', mosha: 'teach' }, { say: { id, text: 'x' } })).code, 403); assert.equal((await call(s, 'POST', FRED, { say: { id, text: 'x' } })).code, 403); assert.equal((await call(s, 'POST', OWNER, { say: { id, text: 'The owner adds a word.' } })).code, 200);
+  assert.equal((await call(s, 'POST', { u: 'mira', name: 'Mira', role: 'viewer', mosha: 'teach' }, { say: { id, text: 'x' } })).code, 403); assert.equal((await call(s, 'POST', FRED, { say: { id, text: 'x' } })).code, 403); assert.equal((await call(s, 'POST', OWNER, { say: { id, text: 'The owner adds a word.' } })).code, 403, 'only the teacher talks back'); assert.equal((await call(s, 'POST', OWNER, { say: { id, verdict: 'right' } })).code, 403); assert.equal((await call(s, 'POST', OWNER, { learn: { kind: 'rule', text: 'A rule of the owner.' } })).code, 403); assert.equal((await call(s, 'POST', OWNER, { book: { id: 'seed-01', confirm: true } })).code, 403, 'only the teacher decides the book');
   assert.equal((await call(s, 'POST', LUXUS, { say: { id: '20260101000000000abcd', text: 'x' } })).code, 404);
   // the score: judged on the desk's FIRST answer to each lesson
   const b = await call(s, 'POST', LUXUS, { add: { title: 'second', note: 'words' } }); await call(s, 'POST', null, { reply: { id: b.body.lesson.id, text: 'Understood as …' } }, key()); await call(s, 'POST', LUXUS, { say: { id: b.body.lesson.id, verdict: 'right' } });
@@ -266,7 +266,7 @@ test('backtest with him: a trade taken in a ChronosTrade replay goes to the desk
   const sp = RP.specOfLesson(a.body.lesson, NOW / 1000); assert.deepEqual([sp.market, sp.entry, sp.stop, sp.exit, sp.label, sp.yours], ['nas100', 25010.5, 24980.5, { p: 25070.5, t: at + 5400 }, 'A trade from a ChronosTrade replay', '+2.00R, closed at 25070.5']);
   assert.match(TOOLS.lessonText(a.body.lesson), /Levels: buy 25010\.5, stop 24980\.5, target 25070\.5, nas100 5m, entry at 2026-11-02T07:00:00\.000Z, closed 25070\.5 at 2026-11-02T08:30:00\.000Z = \+2R  \(taken in a ChronosTrade replay: practice on past candles, not a live trade\)/);
   // ChronosTrade: the button and the send, for a member who may teach; the server decides again
-  assert.match(BT, /const TEACH = me\.u === 'owner' \|\| \(\(me\.perms && \(me\.perms\.mosha === false \|\| me\.perms\.mosha === 'read' \|\| me\.perms\.mosha === 'teach'\) \? me\.perms\.mosha : me\.mosha\) === 'teach'\);/);
+  assert.match(BT, /const TEACH = me\.u === 'luxus' && \(\(me\.perms && \(me\.perms\.mosha === false \|\| me\.perms\.mosha === 'read' \|\| me\.perms\.mosha === 'teach'\) \? me\.perms\.mosha : me\.mosha\) === 'teach'\);/);
   assert.match(BT, /\$\{TEACH \? `<button class="shot-add tch/); assert.match(BT, /data-teach="\$\{t\.id\}"/); assert.match(BT, /\$\('tch-btn'\)\.hidden = !TEACH;/); assert.match(BT, /<dialog id="teachd" class="hkd teachd"/); assert.match(BT, /id="tch-btn"[^>]* hidden>/);
   assert.match(BT, /const stop0 = \(t\) => \(t\.r0 > 0 \? \+\(t\.side === 'buy' \? t\.entry - t\.r0 : t\.entry \+ t\.r0\)/, 'the stop the trade was opened with');
   assert.match(BT, /trade: \{ market: S\.sym, side: t\.side, at: t\.openedAt, entry: t\.entry, stop: stop0\(t\), target: t\.target == null \? '' : t\.target, exit: t\.exit, exitAt: t\.closedAt, tf: S\.tf, src: 'replay' \}/);
@@ -286,11 +286,10 @@ test('easier for the teacher: no name needed, his turn said at the top, captions
   assert.equal(L.nameOf('2 Nov sell', 'M5 vr', 'x'), '2 Nov sell'); const long = L.nameOf('', '', 'A very long first sentence that keeps going on and on about the sweep of the high and the range under it'); assert.ok(long.length <= 61 && long.endsWith('…') && !/\s…$/.test(long));
   // what waits on him: the desk's answers to his own lessons and the unconfirmed lines of the book
   await call(s, 'POST', null, { reply: { id: w.body.lesson.id, text: 'Understood: no sell before the CF candle closes.' } }, key());
-  await call(s, 'POST', OWNER, { add: { note: 'The owner writes one too.' } });
   const g = (await call(s, 'GET', LUXUS)).body, td = TEACH.todo(g.lessons, g.book, 'luxus', true);
-  assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length); assert.equal(td.waiting, 2, 'his two pictures; the owner\'s lesson is not his');
-  assert.equal(TEACH.todo(g.lessons, g.book, 'owner', true).waiting, 3); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], book: 0, waiting: 0 }, 'a reader has no turn');
-  assert.deepEqual(Object.keys(TEACH.FLT), ['all', 'turn', 'wait', 'done']); assert.deepEqual([TEACH.filterLessons(g.lessons, 'all').length, TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length, TEACH.filterLessons(g.lessons, 'done').length], [4, 1, 3, 0]);
+  assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length); assert.equal(td.waiting, 2, 'his two pictures');
+  assert.equal(TEACH.todo(g.lessons, g.book, 'carlos', true).waiting, 0, 'another member\'s lessons are not his'); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], book: 0, waiting: 0 }, 'a reader has no turn');
+  assert.deepEqual(Object.keys(TEACH.FLT), ['all', 'turn', 'wait', 'done']); assert.deepEqual([TEACH.filterLessons(g.lessons, 'all').length, TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length, TEACH.filterLessons(g.lessons, 'done').length], [3, 1, 2, 0]);
   await call(s, 'POST', LUXUS, { say: { id: w.body.lesson.id, verdict: 'right' } }); assert.equal(TEACH.filterLessons((await call(s, 'GET', LUXUS)).body.lessons, 'done').length, 1);
   // captions to tap: his own first, then the usual ones; a replay's automatic caption is not one of his
   const ideas = TEACH.captionIdeas([{ by: 'luxus', shots: [{ caption: 'Janda' }, { caption: 'm5 vr' }, { caption: 'M5 vr, Janda' }, { caption: 'ChronosTrade replay · Gold 5m' }] }, { by: 'owner', shots: [{ caption: 'Mine' }] }], 'luxus');

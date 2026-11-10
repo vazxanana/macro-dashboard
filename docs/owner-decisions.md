@@ -429,6 +429,10 @@ conditions is what makes your trades win.
 - **Your step, once:** the desk's assistant reads the lessons with a key that only you can see. On the Mosha desk, in the
   Lessons card, press "Show the assistant's key", copy it, and paste it into the secure form the assistant opens for
   meridianx.dev (never into a chat). Until then the lessons arrive and are stored, but nobody reads them.
+- **"The functionality is only to work for" Luxus, "the key is his password" (10 Nov):** done. Only Luxus's account can
+  teach: send lessons, say right or not right, decide the book, teach from ChronosTrade. His password is all he needs.
+  You and the other members who may open the desk read it; you can also remove a lesson or a picture, and switch his
+  access on the Users page. Giving "teaches" to anyone else has no effect.
 - **Update, 10 Nov ("No need for key u can read and do whaeva"):** you no longer have to copy anything. The assistant
   makes its own key and saves it in the site's settings on Vercel (`MOSHA_ASSISTANT_KEY`). It opens only the lessons
   (read, answer, propose book lines). The one cost: that key is visible in the assistant's private session log, where

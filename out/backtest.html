@@ -400,7 +400,7 @@
   // desk: a stored choice wins, then the member's own flag. The server decides again on every send.
   // the Mosha teacher's words here follow the language chosen on the desk (assets/mosha-i18n.js); trading terms stay English
   const MI = window.MS_MOSHA_I18N || null; if (MI) MI.who(me.u); const ML = (s, v) => (MI ? MI.fill(MI.tr(s), v) : String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : m)));
-  const TEACH = me.u === 'owner' || ((me.perms && (me.perms.mosha === false || me.perms.mosha === 'read' || me.perms.mosha === 'teach') ? me.perms.mosha : me.mosha) === 'teach');
+  const TEACH = me.u === 'luxus' && ((me.perms && (me.perms.mosha === false || me.perms.mosha === 'read' || me.perms.mosha === 'teach') ? me.perms.mosha : me.mosha) === 'teach');
   const MARKETS = [['xau', 'Gold XAU/USD', 2], ['xag', 'Silver XAG/USD', 3], ['nas100', 'Nasdaq 100', 1], ['spx500', 'S&P 500', 1], ['us30', 'Dow 30', 1], ['de40', 'DAX 40', 1], ['eurusd', 'EUR/USD', 5], ['gbpusd', 'GBP/USD', 5], ['usdjpy', 'USD/JPY', 3], ['audusd', 'AUD/USD', 5], ['usdcad', 'USD/CAD', 5], ['usdchf', 'USD/CHF', 5], ['nzdusd', 'NZD/USD', 5], ['gbpjpy', 'GBP/JPY', 3], ['bco', 'Brent oil', 2], ['wtico', 'WTI oil', 2]];
   const TFS = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400 };
   $('sym').innerHTML = MARKETS.map((m) => `<option value="${m[0]}">${m[1]}</option>`).join('');

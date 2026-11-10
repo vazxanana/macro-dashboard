@@ -1296,11 +1296,11 @@ window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: fa
   reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false, mosha: false } };
 window.msPerms = function (R, owner) {
   var E = {}, k, d = window.MS_PERM_DEFAULTS[R && R.role] || window.MS_PERM_DEFAULTS.viewer;
-  for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : k === 'mosha' ? 'teach' : true) : d[k];
+  for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : k === 'mosha' ? 'read' : true) : d[k];   // teaching the Mosha desk is Luxus's alone: the owner reads it
   if (!owner && R) { if (R.ict) E.ict = R.ict === 'read' ? 'read' : 'write'; if (R.ct) E.ct = true; if (R.mcp) E.mcp = true;
     var P = R.perms || {}; for (k in P) if (window.MS_PERM_KEYS.indexOf(k) >= 0 && k !== 'mosha') E[k] = k === 'ict' ? (P[k] === 'read' || P[k] === 'write' ? P[k] : P[k] === true ? 'write' : false) : !!P[k];
     var m = P.mosha === false || P.mosha === 'read' || P.mosha === 'teach' ? P.mosha : R.mosha === 'teach' || R.mosha === 'read' ? R.mosha : null;
-    E.mosha = m != null ? m : E.desks ? 'read' : false; }
+    E.mosha = m != null ? (m === 'teach' && R.u !== 'luxus' ? 'read' : m) : E.desks ? 'read' : false; }
   return E;
 };
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
@@ -7816,7 +7816,7 @@ function msNextSetup(bars, A) {
   // The Mosha desk level of a member on this page: a stored perms.mosha, else the record's own flag, else the built-in default
   // by key (Luxus teaches), else read with the other desks. `own` = only what was set for this member (null = the default).
   const moshaOwn = (u) => (u && u.perms && (u.perms.mosha === false || u.perms.mosha === 'read' || u.perms.mosha === 'teach') ? u.perms.mosha : null);
-  const moshaOf = (u, k) => { const own = moshaOwn(u), b = k && window.MS_USERS && window.MS_USERS[k]; return window.msPerms({ ...u, mosha: (u && u.mosha) || (b && b.mosha) || null, perms: { ...((u && u.perms) || {}), ...(own != null ? { mosha: own } : {}) } }, false).mosha; };
+  const moshaOf = (u, k) => { const own = moshaOwn(u), b = k && window.MS_USERS && window.MS_USERS[k]; return window.msPerms({ ...u, u: k, mosha: (u && u.mosha) || (b && b.mosha) || null, perms: { ...((u && u.perms) || {}), ...(own != null ? { mosha: own } : {}) } }, false).mosha; };
   const permChips = (u, k) => { const E = window.msPerms(u, false); const on = Object.keys(PERM_LABEL).filter((k) => E[k]).map((k) => PERM_LABEL[k].split(' ')[0].replace(/[:']/g, ''));
     if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); if (E.ict === 'write' && applyOn(u, k)) on.push('ICT apply'); { const m = moshaOf(u, k); if (m && !E.desks) on.push(m === 'teach' ? 'Mosha teacher' : 'Mosha desk'); else if (m === 'teach') on.push('Mosha teacher'); } return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
   function permDialog(k, cur) {
@@ -7829,7 +7829,7 @@ function msNextSetup(bars, A) {
         <div class="perm-apply" id="ms-perm-apply"${E.ict === 'write' ? '' : ' hidden'}><label><input type="checkbox" name="ictApply"${applyOn(cur, k) ? ' checked' : ''}> ICT: may apply changes to the ICT edge without my review</label>
           <p class="ms-note">On for Fred since 10 Nov 2026 (your decision); off for everyone else. It takes two things: this box ticked, and the member's name in council/ict-apply.json (it lists Fred; change it through a normal reviewed pull request). With both, ${esc(cur.name || k)} can change the ICT edge's own files (tracker, replay, rule book, ICT tests and research) from the ChatGPT connector without your review. Each change must still pass the automatic checks: ICT files only, the tests, and every trade keeps its stop. Each one is a merged pull request you can revert. Unticking this stops it at once. Removing the name from council/ict-apply.json is the hard off-switch.</p></div></fieldset>
       <fieldset class="perm-ict"><legend>Mosha desk</legend>${(() => { const own = moshaOwn(cur), def = moshaOf({ ...cur, perms: { ...(cur.perms || {}), mosha: undefined } }, k); const r = (v, l) => `<label><input type="radio" name="mosha" value="${v}"${(own == null ? '' : own === false ? 'off' : own) === v ? ' checked' : ''}> ${l}</label>`;
-        return r('', `Default for ${esc(cur.name || k)}: ${def === 'teach' ? 'may send lessons' : def === 'read' ? 'read only' : 'no access'}`) + r('off', 'No access') + r('read', 'Read only') + r('teach', 'May send lessons (trade screenshots and notes for the desk to learn from)'); })()}</fieldset>
+        return r('', `Default for ${esc(cur.name || k)}: ${def === 'teach' ? 'may send lessons' : def === 'read' ? 'read only' : 'no access'}`) + r('off', 'No access') + r('read', 'Read only') + (k === 'luxus' ? r('teach', 'Teaches the desk (sends lessons, checks its answers, decides the book)') : ''); })()}</fieldset>
       <div class="own-acts"><button type="button" value="reset" id="ms-perm-reset">Back to role defaults</button><button type="button" value="cancel" id="ms-perm-cancel">Cancel</button><button type="submit" value="ok" class="pri">Save</button></div></form>`;
     const f = d.querySelector('form');
     f.onchange = () => { d.querySelector('#ms-perm-apply').hidden = f.elements.ict.value !== 'write'; };   // the apply box only makes sense with ICT write
