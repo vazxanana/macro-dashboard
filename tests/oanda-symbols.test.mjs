@@ -12,6 +12,7 @@ import { windows, merge, refresh, main, CAP, DAY, START, COLS } from '../scripts
 
 const require = createRequire(import.meta.url);
 const { SYM, DEC, GROUP, LIST } = require('../api/_oanda.js');
+const BARS = require('../api/bars.js');
 const ROOT = new URL('..', import.meta.url).pathname;
 
 // what the breadth studies (ict-breadth, open-run-breadth), the live page and the alerts need
@@ -63,6 +64,24 @@ test('/md/bars accepts D and W next to the page timeframes; the alias maps are n
   const src = fs.readFileSync(path.join(ROOT, 'api/bars.js'), 'utf8');
   for (const tf of ["'1m'", "'5m'", "'15m'", "'1h'", "'4h'", "'1d'", 'D:', "'1w'", 'W:']) assert.ok(src.includes(tf), `tf ${tf}`);
   assert.match(src, /D: \['D', 86400/); assert.match(src, /W: \['W', 604800/);
+});
+
+test('/md/bars: ChronosTrade timeframes map to OANDA granularities with the right seconds', async () => {
+  const want = { '1m': ['M1', 60], '2m': ['M2', 120], '5m': ['M5', 300], '10m': ['M10', 600], '15m': ['M15', 900], '30m': ['M30', 1800], '1h': ['H1', 3600], '2h': ['H2', 7200], '4h': ['H4', 14400], '1d': ['D', 86400], '1w': ['W', 604800] };
+  const page = fs.readFileSync(path.join(ROOT, 'backtest.html'), 'utf8'), m = /const TFS = (\{[^}]+\});/.exec(page); assert.ok(m, 'the page lists its timeframes');
+  const TFS = Function('return ' + m[1])(); assert.deepEqual(TFS, Object.fromEntries(Object.entries(want).map(([k, v]) => [k, v[1]])), 'page seconds');
+  const opts = [...page.matchAll(/<option value="(\d+[mhd])"(?: selected)?>/g)].map((x) => x[1]); assert.deepEqual(opts, ['1m', '2m', '5m', '10m', '15m', '30m', '1h', '2h', '4h', '1d'], 'replay timeframes in the session form');
+  const handler = BARS, realFetch = globalThis.fetch, had = Object.prototype.hasOwnProperty.call(process.env, 'OANDA_TOKEN'), tok = process.env.OANDA_TOKEN; process.env.OANDA_TOKEN = 'test-token';
+  const mk = () => { const out = {}; const res = { setHeader() {}, status(c) { out.code = c; return res; }, json(j) { out.json = j; return res; } }; return [out, res]; };
+  try {
+    for (const [tf, [gran, sec]] of Object.entries(want)) {
+      let url = ''; globalThis.fetch = async (u) => { url = String(u); return { ok: true, json: async () => ({ candles: [{ time: '1000', complete: true, volume: 1, mid: { o: '1', h: '2', l: '0.5', c: '1.5' } }] }) }; };
+      const n = sec >= 604800 ? 2000 : 6000, to = 1700000000, [out, res] = mk(); await handler({ query: { sym: 'xau', tf, from: String(to - n * sec), to: String(to) } }, res);   // a window that ended in the past
+      assert.equal(out.code, 200, tf); const q = new URL(url).searchParams; assert.equal(q.get('granularity'), gran, tf + ' -> ' + gran);
+      assert.equal(+q.get('to') - +q.get('from'), Math.min(n, 4999) * sec, tf + ': the window is capped at 4999 candles');
+    }
+    const [out, res] = mk(); await handler({ query: { sym: 'xau', tf: '3m' } }, res); assert.equal(out.code, 400, 'an unknown timeframe is refused');
+  } finally { globalThis.fetch = realFetch; if (had) process.env.OANDA_TOKEN = tok; else Reflect.deleteProperty(process.env, 'OANDA_TOKEN'); }
 });
 
 test('daily cache workflow: weekly, free, writes research/daily to council-data through the script', () => {
