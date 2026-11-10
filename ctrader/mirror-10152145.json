@@ -4177,7 +4177,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9919.91 · 23 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9919.91 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4193,26 +4193,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "audusd-rscalp-1794301325": {
-    "orderId": "33853254",
-    "symbol": "AUDUSD",
-    "side": "sell",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "rscalp",
-    "limitPrice": 0.69244,
-    "stop": 0.69313,
-    "t1": 0.69211,
-    "placedAt": "2026-11-10T09:03:22.000Z",
-    "expires": "2026-11-10T12:02:05.000Z",
-    "riskCash": 1.98,
-    "margin": 2.77,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "gbpusd-intraday-1794301485": {
     "orderId": "33853458",
     "symbol": "GBPUSD",
@@ -4236,14 +4216,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9919.91,
-  "lastRun": "2026-11-10T09:06:01.000Z"
+  "lastRun": "2026-11-10T09:08:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:03:27.000Z",
-   "msg": "limit filled: AUDUSD position 47677136 at the broker",
-   "trade": "audusd-scalp-1794235225"
-  },
   {
    "at": "2026-11-09T15:03:27.000Z",
    "msg": "moved USDCHF 47373488 protection: stop 0.8226523928571428 -> 0.8229724, target 0.8001752142857145 -> 0.8004952 (council swing)",
@@ -5738,6 +5713,11 @@
    "at": "2026-11-10T09:06:01.000Z",
    "msg": "placed sell limit GBPUSD 0.01 lot at 1.34462 (council intraday, valid to 2026-11-10T21:04Z)",
    "trade": "gbpusd-intraday-1794301485"
+  },
+  {
+   "at": "2026-11-10T09:08:33.000Z",
+   "msg": "cancelled AUDUSD limit order 33853254 for audusd-rscalp-1794301325: the council ended it: missed",
+   "trade": "audusd-rscalp-1794301325"
   }
  ],
  "limits": {
