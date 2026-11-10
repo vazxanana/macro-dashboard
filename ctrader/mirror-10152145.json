@@ -5455,7 +5455,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.92 · 20 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9962.92 · 20 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5508,18 +5508,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdchf-scalp-1794324815": {
+    "orderId": "33880333",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.8245,
+    "stop": 0.8236,
+    "t1": 0.8263,
+    "placedAt": "2026-11-10T15:34:43.000Z",
+    "expires": "2026-11-10T18:33:35.000Z",
+    "riskCash": 1.99,
+    "margin": 2,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9962.92,
-  "lastRun": "2026-11-10T15:32:10.000Z"
+  "lastRun": "2026-11-10T15:34:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T08:31:02.000Z",
-   "msg": "placed buy limit EURUSD 0.01 lot at 1.12442 (council swing, valid to 2026-11-12T08:29Z)",
-   "trade": "eurusd-swing-1794299390"
-  },
   {
    "at": "2026-11-10T08:33:52.000Z",
    "msg": "limit filled: EURUSD position 47964428 at the broker",
@@ -7014,6 +7029,11 @@
    "at": "2026-11-10T15:32:10.000Z",
    "msg": "placed sell limit EURUSD 0.03 lot at 1.11772 (council scalp, valid to 2026-11-10T18:31Z)",
    "trade": "eurusd-scalp-1794324661"
+  },
+  {
+   "at": "2026-11-10T15:34:43.000Z",
+   "msg": "placed buy limit USDCHF 0.01 lot at 0.8245 (council scalp, valid to 2026-11-10T18:33Z)",
+   "trade": "usdchf-scalp-1794324815"
   }
  ],
  "limits": {
