@@ -613,7 +613,7 @@
     const time = el('b', { class: 'num', id: idp + '-time', text: '—' }), state = el('span', { class: 'pill', id: idp + '-state', text: 'not started' }), host = el('div', { class: 'chart', id: idp + '-chart', role: 'img', 'aria-label': label }), meta = el('div', { class: 'chart-meta', id: idp + '-meta' });
     let ch = null; const chart = () => (ch = ch || K.newChart(host));
     return { node: el('div', { class: 'card chart-card' }, el('div', { class: 'chart-head' }, el('div', {}, time, ' ', state), meta), host), state, meta, chart,
-      draw(series, tf, t) { chart().setBars(K.viewBarsOf(series, tf, t, 400)); time.textContent = fmtTime(t); },
+      draw(series, tf, t, later) { const shown = K.viewBarsOf(series, tf, t, 400); chart().setBars(later && later.length ? shown.filter((b) => b.time < later[0].time).concat(later) : shown); chart().series.setMarkers(later && later.length ? [{ time: later[0].time, position: 'aboveBar', color: K.css('--gold'), shape: 'arrowDown', text: 'after the decision' }] : []); time.textContent = fmtTime(t); },
       levels(c) { const x = chart(); x.clearLines(); if (!c) return; x.line(c.entry, 'Edge entry', K.css('--accent')); x.line(c.stop, 'Edge stop', K.css('--sell')); x.line(c.target, 'Edge target', K.css('--buy')); } };
   }
   // A trade answer: the action buttons, the levels of a BUY / SELL, a reason. o = { idp, actions: [[value, label]], levels(value) → { entry, stop, target },
@@ -732,6 +732,10 @@
       reveal.appendChild(el('p', { class: 'verdict ' + (who === 'mentor' ? 'learned' : who === 'engine' ? 'not-learned' : 'partly'), id: 'bl-closer', 'data-closer': who || 'none' }, el('b', { text: who ? CLOSER_WORD[who] : 'Who was closer cannot be judged here.' }), who ? '' : ' An answer on the other side than the setup, or a missing result, cannot be graded.', eng ? ` You and the engine gave ${eng.action === m.action ? 'the same answer' : 'different answers'}.` : ''));
       if (recall) reveal.appendChild(el('p', { class: 'note', text: 'The engine had seen this setup in training: its answer is recall.' }));
       if (eng) { const det = el('div', {}); K.decisionView(det, { idp: 'bl-dec', edge: B.edge, cand: c, d: Object.assign({ t: c.t }, MXAC.restoreApplied(eng)), lessons: B.lessons, title: 'The engine\'s reasoning' }); reveal.appendChild(el('details', { class: 'more', id: 'bl-why' }, el('summary', { text: 'The engine\'s evidence and reasons' }), det)); }
+      // both answers are stored: the candles after the decision may be read for study (the same card as in the Train tab)
+      const wbox = el('div', { class: 'sub', id: 'bl-whatif-box' }), cost = fin(B.edge.costPerRoundTrip) ? B.edge.costPerRoundTrip : 0; reveal.appendChild(wbox);
+      K.whatIfCard(wbox, { idp: 'bl-whatif', edge: B.edge, cand: c, attemptId: row.attemptId, mode: 'blind', blindId: row.id, engine: lite(eng), mentor: { action: m.action, entry: m.entry, stop: m.stop, target: m.target }, mentorLabel: 'Your answer', costs: { spread: cost, commission: 0, slippage: 0 }, outcome: out || null,
+        chart: { tf: B.tf, show: (bars) => st.draw(B.series, B.tf, c.t, bars), clear: () => st.draw(B.series, B.tf, c.t) } });
       const more = B.i + 1 < B.queue.length;
       reveal.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'bl-next', text: more ? 'Next setup' : 'Finish the round', onclick: () => { B.i++; next(); } })));
       reveal.scrollIntoView({ block: 'nearest' });

@@ -374,3 +374,71 @@ test('the work-around: the page shows that time as a UTC date', () => {
   assert.equal(MXAC.humanize('In line with the running thesis (bias down since 1714608000).'), 'In line with the running thesis (bias down since 2024-05-02 00:00 UTC).');
   assert.equal(MXAC.humanize('a wick through the swing level 2286.185 7 bars ago'), 'a wick through the swing level 2286.185 7 bars ago'); assert.equal(MXAC.humanize(null), '');
 });
+
+// ---- "What if": alternatives on the candles after a stored decision --------------------------------------------------------------
+test('what if: allowed only once the attempt is stored (a test: its result too; the blind arena: the mentor\'s answer too)', () => {
+  const base = { edge: EDGE, cand: TRAIN[0] };
+  assert.equal(MXAC.whatIfAllowed(base), false, 'no attempt, no card'); assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1' }), true); assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1', mode: 'replay-same' }), true);
+  assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1', mode: 'exam' }), false, 'a test: not before both answers are stored'); assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1', mode: 'exam', resultId: 'ex_1' }), true);
+  assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1', mode: 'blind' }), false, 'blind: not before the mentor has answered'); assert.equal(MXAC.whatIfAllowed({ ...base, attemptId: 'at_1', mode: 'blind', blindId: 'bl_1' }), true);
+  assert.equal(MXAC.whatIfAllowed(null), false); assert.equal(MXAC.whatIfAllowed({ attemptId: 'at_1', edge: EDGE, cand: {} }), false);
+  // in the page: the card draws nothing before that, the later candles are loaded only inside the button's click, and no snapshot is made there
+  const ui = src('assets/academy-ui.js'), a = ui.indexOf('function whatIfCard('), card = ui.slice(a, ui.indexOf('\n  }\n', a));
+  assert.match(card, /clear\(box\); if \(!whatIfAllowed\(o\)\) \{ box\.hidden = true; return null; \}/, 'not allowed: no card and no button at all');
+  assert.ok(card.indexOf('MXR.load(') > card.indexOf('onclick: async () => {'), 'the candles after the decision are asked for only on the click');
+  assert.ok(!/snapOf\(|MXR\.snapshot\(|lastSnapshot|MXA\.decide\(|api\.post\(/.test(card), 'the card builds no snapshot, makes no decision and stores nothing');
+  assert.match(ui, /if \(!cur \|\| cur\.closed \|\| !cur\.first \|\| !cur\.first\.row\) \{ box\.hidden = true; clear\(box\); return; \}/, 'the Train card needs the stored attempt row');
+  const tabs = src('assets/academy-tabs.js'); assert.ok(tabs.indexOf('K.whatIfCard(') > tabs.indexOf("action: 'blind.submit'") && (tabs.match(/K\.whatIfCard\(/g) || []).length === 1, 'the blind arena offers it only in the view shown after blind.submit');
+});
+test('what if: the candles read start at the decision and run for the edge\'s maximum hold, else a cap', () => {
+  const t = Date.UTC(2024, 4, 2, 14, 30) / 1000, by = Object.fromEntries(EDGES.map((e) => [e.id, MXAC.whatIfWindow(e, t)]));
+  assert.deepEqual(Object.fromEntries(EDGES.map((e) => [e.id, [by[e.id].tf, by[e.id].bars]])), { replica: ['5m', 577], 'mosha-bo': ['15m', 385], gtrend: ['1d', 96], gtl: ['4h', 25], geg: ['1d', 31], gmp: ['5m', 97], 'nq-open': ['5m', 96] });
+  assert.equal(by.gmp.from, t, 'a decision on a candle boundary: that candle is the first'); assert.equal(by.gmp.to, t + 97 * 300); assert.match(by.gmp.why, /maximum hold \(8 hours\)/); assert.match(by.gtrend.why, /a cap of 96 candles/); assert.match(by.geg.why, /720 hours, the life of its resting order included/);
+  assert.equal(MXAC.whatIfWindow(EDGE, t + 120).from, t + 300, 'a decision inside a candle: the next candle is the first (the one it sits in is not read)');
+  const day = Date.UTC(2024, 4, 2) / 1000; assert.equal(MXAC.whatIfWindow(EDGES.find((e) => e.id === 'geg'), day + 240).from, day, 'a daily signal stamped 00:04 reads that day\'s candle'); assert.equal(MXAC.whatIfWindow(EDGES.find((e) => e.id === 'geg'), day + 7200).from, day + 86400);
+  for (const e of EDGES) assert.ok(by[e.id].from >= t && by[e.id].to > by[e.id].from && by[e.id].bars <= 2000, e.id);
+});
+test('what if: the rows are the setup, the engine and the mentor where they differ, then fixed variants from the setup\'s own risk', () => {
+  const c = { id: 'x', t: 1, side: 'sell', entry: 100, stop: 104, target: 90 }, keys = (o) => MXAC.whatIfAlternatives(o).map((a) => a.key);
+  const VAR = ['stop-half', 'stop-wide', 'target-1r', 'target-2r', 'target-3r', 'late'];
+  assert.deepEqual(keys({ cand: c }), ['setup', ...VAR]);
+  assert.deepEqual(keys({ cand: c, engine: { action: 'SELL', entry: 100, stop: 104, target: 90 } }), ['setup', ...VAR], 'the engine took the setup as proposed: no second row');
+  assert.deepEqual(keys({ cand: c, engine: { action: 'WAIT', entry: 100, stop: 104, target: 90 }, mentor: { action: 'WAIT' } }), ['setup', 'engine', ...VAR], 'one WAIT row is enough');
+  const all = MXAC.whatIfAlternatives({ cand: c, engine: { action: 'SELL', entry: 100, stop: 103, target: 90 }, mentor: { action: 'BUY', entry: 100, stop: 96, target: 110 } }), by = Object.fromEntries(all.map((a) => [a.key, a]));
+  assert.deepEqual(all.map((a) => a.key), ['setup', 'engine', 'mentor', ...VAR]); assert.equal(by.engine.label, 'The engine\'s answer: SELL on other levels'); assert.equal(by.mentor.label, 'Your correction: BUY, the other side'); assert.equal(by.mentor.side, 'buy');
+  assert.deepEqual([by['stop-half'].stop, by['stop-wide'].stop, by['target-1r'].target, by['target-2r'].target, by['target-3r'].target], [102, 106, 96, 92, 88], 'a sell: stops above, targets below, in units of the setup\'s own risk');
+  assert.deepEqual([by.late.entry, by.late.type, by.late.afterBars, by.late.stop], [null, 'market', 1, 104]); assert.ok(all.every((a) => a.wait || a.afterBars === (a.key === 'late' ? 1 : 0)));
+  const buy = Object.fromEntries(MXAC.whatIfAlternatives({ cand: { side: 'buy', entry: 2300, stop: 2295, target: null } }).map((a) => [a.key, a]));
+  assert.deepEqual([buy['stop-half'].stop, buy['stop-wide'].stop, buy['target-2r'].target, buy.setup.target], [2297.5, 2292.5, 2310, null]);
+  assert.deepEqual(MXAC.whatIfAlternatives({ cand: { side: 'buy', entry: 100, stop: 101 } }), [], 'a setup without a stop on the losing side builds nothing'); assert.deepEqual(MXAC.whatIfAlternatives({}), []); assert.deepEqual(MXAC.whatIfAlternatives({ cand: c, mentor: { action: 'SELL', entry: 100 } }).map((a) => a.key), ['setup', ...VAR], 'a correction without a stop is not a row');
+  assert.equal(MXAC.whatIfAlternatives({ cand: c, mentor: { action: 'SELL', entry: 101, stop: 105, target: 91 }, mentorLabel: 'Your answer' })[1].label, 'Your answer: SELL on other levels');
+});
+test('what if: the simulation is conservative, charges the run\'s costs, and a WAIT is 0R; the later candles never touch a snapshot', () => {
+  const bar = (i, o, h, l, c) => ({ time: 1000 + i * 300, open: o, high: h, low: l, close: c }), c = { id: 'x', t: 1000, side: 'buy', entry: 100, stop: 98, target: 104 };
+  // one candle touches both the stop and the target: the stop is taken
+  let rows = MXAC.whatIfRun(MXAC.whatIfAlternatives({ cand: c, engine: { action: 'WAIT' } }), [bar(0, 100, 105, 97, 101)], { spread: 0, commission: 0, slippage: 0 }), by = Object.fromEntries(rows.map((r) => [r.key, r.result]));
+  assert.deepEqual([by.setup.filled, by.setup.reason, by.setup.netR], [true, 'stop', -1]); assert.deepEqual(by.engine, { filled: false, R: 0, netR: 0, exitT: null, reason: 'wait', mfeR: 0, maeR: 0, entryT: null, fill: null }); assert.equal(by.late.reason, 'no-fill', 'one candle later there is no candle left');
+  assert.equal(rows.length, 8); assert.ok(rows.every((r) => r.result && typeof r.result.reason === 'string'));
+  // a clean run to the target, with costs: 0.2 a round trip on a risk of 2 is 0.1R
+  rows = MXAC.whatIfRun(MXAC.whatIfAlternatives({ cand: c }), [bar(0, 100, 101, 98.9, 100.8), bar(1, 100.8, 102.5, 100.5, 102.2), bar(2, 102.2, 106.5, 102, 106)], { spread: 0, commission: 0.2, slippage: 0 }); by = Object.fromEntries(rows.map((r) => [r.key, r.result]));
+  assert.deepEqual([by.setup.reason, by.setup.R, by.setup.netR, by.setup.exitT], ['target', 2, 1.9, 1600]); assert.deepEqual([by['target-1r'].reason, by['target-1r'].R, by['target-1r'].exitT], ['target', 1, 1300]); assert.deepEqual([by['target-3r'].reason, by['target-3r'].R], ['target', 3]);
+  assert.equal(by['stop-half'].reason, 'stop', 'half the stop distance (99) was hit on the first candle (low 98.9), the full stop (98) was not'); assert.equal(by['stop-wide'].reason, 'target'); assert.ok(by['stop-wide'].R < 2, 'a wider stop makes the same target fewer R');
+  assert.deepEqual([by.late.filled, by.late.fill, by.late.reason], [true, 100.8, 'target']); assert.ok(by.setup.mfeR >= 2 && by.setup.maeR <= 0);
+  assert.equal(MXAC.whatIfRun(MXAC.whatIfAlternatives({ cand: c }), [bar(0, 100, 101, 99.5, 100.8)], {})[0].result.reason, 'open', 'neither level reached: still open at the last candle read');
+  // on the recorded candles: a real setup, its later candles on the signal timeframe; the snapshot of that setup is the same before and after
+  const cand = TRAIN[0], before = MXR.hash(snapOf(cand)), w = MXAC.whatIfWindow(EDGE, cand.t), later = SERIES[w.tf].filter((b) => b.time >= w.from && b.time < w.to);
+  assert.ok(later.length > 50 && later.every((b) => b.time >= cand.t), `${later.length} candles, all after the decision`);
+  const real = MXAC.whatIfRun(MXAC.whatIfAlternatives({ cand, engine: { action: 'WAIT' } }), later, { spread: EDGE.costPerRoundTrip, commission: 0, slippage: 0 });
+  assert.equal(real.length, 8); for (const r of real) { assert.ok(Number.isFinite(r.result.netR), r.key); if (r.result.filled) { assert.ok(r.result.exitT >= w.from && r.result.maeR <= 0 && r.result.mfeR >= 0, r.key); assert.ok(r.result.netR < r.result.R, 'costs are charged'); } }
+  const again = snapOf(cand); assert.equal(MXR.hash(again), before); assert.ok(MXAC.snapshotClean(again)); assert.ok(!again.bars[w.tf].some((b) => later.includes(b)), 'no later candle is in the snapshot');
+});
+test('what if: the simulated setup is compared with the stored result, and a difference is said, not hidden', () => {
+  const row = (o) => ({ key: 'setup', result: { filled: true, R: 1, netR: 0.95, reason: 'target', ...o } });
+  assert.match(MXAC.whatIfNote(row(), { R: 1, netR: 0.9, reason: 'target' }), /^The first row agrees with the stored result of this setup within 0\.15R: simulated \+0\.95R, exit by target; stored \+0\.90R after costs, exit by target\.$/);
+  const diff = MXAC.whatIfNote(row({ netR: -1.02, reason: 'stop' }), { R: 2.4, netR: 2.3, reason: 'trail' });
+  assert.match(diff, /^The first row does NOT match the stored result of this setup: simulated -1\.02R, exit by stop; stored \+2\.30R after costs, exit by trail \(a difference of -3\.32R\)\./); assert.match(diff, /the candles differ/); assert.match(diff, /pyramid adds/); assert.match(diff, /study's research candles/);
+  assert.match(MXAC.whatIfNote(row({ filled: false, reason: 'no-fill', netR: 0 }), { R: 0, netR: 0, reason: 'expired' }), /^The first row agrees with the stored result: the order did not fill in either \(stored: expired\)\.$/);
+  assert.match(MXAC.whatIfNote(row(), { R: 0, netR: 0, reason: 'missed' }), /does NOT match.*stored: the order never filled \(missed\)/); assert.match(MXAC.whatIfNote(row({ filled: false, reason: 'no-fill' }), { R: 1, netR: 0.9, reason: 'target' }), /does NOT match.*simulated never filled/);
+  assert.match(MXAC.whatIfNote(row(), null), /^No stored result is on file/); assert.equal(MXAC.whatIfNote(null, {}), 'Nothing was simulated.');
+  assert.deepEqual(Object.keys(MXAC.WHATIF_REASON).sort(), ['bad-stop', 'no-fill', 'no-trade', 'open', 'stop', 'target', 'wait']);
+});

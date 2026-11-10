@@ -210,3 +210,7 @@ td b { color: var(--ink); }
 .f-all { grid-column: 1 / -1; margin-top: var(--s2); }
 .ac-chart-col2 { min-width: 0; }
 .ctl + .ctl { margin-top: var(--s2); }
+
+/* the "What if" table: the name of each alternative keeps a readable width; the table scrolls inside its box on narrow columns */
+.wi td:first-child { min-width: 170px; }
+.wi td { white-space: nowrap; } .wi td:first-child { white-space: normal; }

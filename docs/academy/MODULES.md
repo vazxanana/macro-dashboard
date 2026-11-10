@@ -121,6 +121,15 @@ tested). Full signatures are in each file's header comments and its tests.
   attempt), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
   calls instead).
 - A setup decided in an earlier sitting is stored as `replay-same` when the Train or Session clock stops on it again (recall).
+- **What if** (`kit.whatIfCard`, pure parts `MXAC.whatIfAllowed / whatIfWindow / whatIfAlternatives / whatIfRun / whatIfNote`): the
+  one user of `MXA.simulate`. The card is absent until the attempt is stored (a test: its result too; the blind arena: the
+  mentor's answer too). On the click it asks `MXR.load` for the candles from the decision time on the edge's signal timeframe
+  (`exit.maxHoldH` + `orderValidH`, else 96 candles), simulates the setup, the engine's and the mentor's answers where they
+  differ, and fixed variants (stop at 0.5x and 1.5x, target at 1R / 2R / 3R, entry one candle later) at the run's costs, and
+  compares the first row with the stored outcome. It builds no snapshot and stores nothing (no existing route writes only an
+  audit row); `MXAC.whatIfLoads` lists every such read. Showing the later candles on the chart is a separate step, undone on
+  Continue. Note: `MXR.load` fetches whole grid chunks from `/md/bars`, so the network always carries candles after a setup;
+  the page-level rule is what is asked of `MXR.load` and what reaches a snapshot.
 - `scripts/academy-dev.mjs`: out/ + the real API handler on a file store + `/md/bars` from `tests/fixtures/academy/` (real OANDA gold
   candles, 26 Apr to 17 May 2024, 10 train and 3 exam gmp setups) or `--live`.
 - More API reads added for the page: `corrections&edge=[&cand=]`, `research[&edge=&kind=]` / `research&id=`, `evaluation`, `training`.

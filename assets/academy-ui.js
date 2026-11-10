@@ -255,13 +255,72 @@
     return { entry: c.entry, stop: +(c.entry + (c.entry - c.stop)).toFixed(2), target: fin(c.target) ? +(c.entry - (c.target - c.entry)).toFixed(2) : null };
   }
 
+  // ---- "What if": alternatives on the candles AFTER a stored decision (study only) -------------------------------------
+  // Nothing here is part of a decision. The card exists only once the attempt for the setup is stored (whatIfAllowed), the
+  // candles it loads never enter a snapshot, and its numbers are not stored anywhere.
+  const WHATIF_CAP_BARS = 96, WHATIF_MAX_BARS = 2000, WHATIF_TOL = 0.15;
+  // may the candles after this decision be read yet? train / same-trade replay: the attempt is stored; a test on a new setup:
+  // the attempt AND its result (both answers) are stored; the blind arena: the attempt AND the mentor's answer are stored
+  function whatIfAllowed(o) {
+    const x = o || {}, c = x.cand || {}; if (!x.attemptId || !x.edge || !fin(c.t)) return false;
+    if (x.mode === 'exam') return !!x.resultId; if (x.mode === 'blind') return !!x.blindId;
+    return true;
+  }
+  // The candles to read: the edge's signal timeframe (5m when the page has no such series), from the candle that opens at
+  // the decision time (or within 2 % of a candle before it: daily signals are stamped a few minutes after the open) for the
+  // edge's maximum hold (plus the life of its resting order), else WHATIF_CAP_BARS candles.
+  function whatIfWindow(edge, t) {
+    const tf = chartTfOf(edge), sec = MXR.TF[tf], ex = (edge && edge.exit) || {}, hold = fin(ex.maxHoldH) && ex.maxHoldH > 0 ? ex.maxHoldH + (fin(ex.orderValidH) && ex.orderValidH > 0 ? ex.orderValidH : 0) : null;
+    const floor = Math.floor(t / sec) * sec, from = t - floor <= sec * 0.02 ? floor : floor + sec, bars = Math.min(WHATIF_MAX_BARS, hold ? Math.ceil(hold * 3600 / sec) + 1 : WHATIF_CAP_BARS);
+    return { tf, sec, from, to: from + bars * sec, bars, hold, why: hold ? `the edge's maximum hold (${hold} hours` + (fin(ex.orderValidH) && ex.orderValidH > 0 ? ', the life of its resting order included)' : ')') : `a cap of ${WHATIF_CAP_BARS} candles (the registry gives this edge no maximum hold)` };
+  }
+  const sameLevels = (a, b) => !!a && !!b && a.side === b.side && a.entry === b.entry && a.stop === b.stop && (a.target == null ? null : a.target) === (b.target == null ? null : b.target);
+  // The rows of the table. o = { cand, engine: { action, entry, stop, target } | null, mentor: the same shape | null, mentorLabel }
+  // → [{ key, label, side, entry, stop, target, afterBars, type?, wait? }]; a WAIT is a row that trades nothing (0R).
+  function whatIfAlternatives(o) {
+    const c = (o && o.cand) || {}, out = [], r2 = (v) => Math.round(v * 100) / 100, dir = c.side === 'buy' ? 1 : c.side === 'sell' ? -1 : 0;
+    if (!dir || !fin(c.entry) || !fin(c.stop) || !((c.entry - c.stop) * dir > 0)) return out;
+    const base = { side: c.side, entry: c.entry, stop: c.stop, target: fin(c.target) ? c.target : null, afterBars: 0 }, risk = Math.abs(c.entry - c.stop);
+    out.push(Object.assign({ key: 'setup', label: 'The setup as the edge proposed it' }, base));
+    const answer = (key, who, a) => {
+      if (!a || !a.action) return;
+      if (a.action === 'WAIT') { if (!out.some((x) => x.wait)) out.push({ key, label: `${who}: WAIT`, wait: true, side: null, entry: null, stop: null, target: null, afterBars: 0 }); return; }
+      if (!isTake(a.action) || !fin(a.entry) || !fin(a.stop)) return;
+      const row = { side: a.action === 'BUY' ? 'buy' : 'sell', entry: a.entry, stop: a.stop, target: fin(a.target) ? a.target : null, afterBars: 0 };
+      if (!out.some((x) => sameLevels(x, row))) out.push(Object.assign({ key, label: `${who}: ${a.action}` + (row.side !== c.side ? ', the other side' : ' on other levels') }, row));
+    };
+    answer('engine', 'The engine\'s answer', o.engine); answer('mentor', o.mentorLabel || 'Your correction', o.mentor);
+    out.push(Object.assign({}, base, { key: 'stop-half', label: 'Stop at half the distance', stop: r2(c.entry - dir * risk * 0.5) }));
+    out.push(Object.assign({}, base, { key: 'stop-wide', label: 'Stop at one and a half times the distance', stop: r2(c.entry - dir * risk * 1.5) }));
+    for (const k of [1, 2, 3]) out.push(Object.assign({}, base, { key: 'target-' + k + 'r', label: `Target at ${k}R`, target: r2(c.entry + dir * risk * k) }));
+    out.push(Object.assign({}, base, { key: 'late', label: 'Entry one candle later, at its open', entry: null, type: 'market', afterBars: 1 }));
+    return out;
+  }
+  // run the rows through MXA.simulate (evaluation only). costs = { spread, commission, slippage } in price units a round trip.
+  function whatIfRun(alts, futureBars, costs) {
+    const live = (alts || []).filter((a) => !a.wait), res = MXA.simulate(live.map((a) => ({ label: a.key, side: a.side, entry: a.entry, stop: a.stop, target: a.target, afterBars: a.afterBars, type: a.type })), futureBars, costs); let i = 0;
+    return (alts || []).map((a) => Object.assign({}, a, { result: a.wait ? { filled: false, R: 0, netR: 0, exitT: null, reason: 'wait', mfeR: 0, maeR: 0, entryT: null, fill: null } : res[i++] }));
+  }
+  const WHATIF_REASON = { stop: 'stop', target: 'target', open: 'still open at the last candle read', 'no-fill': 'never filled', 'no-trade': 'no trade', 'bad-stop': 'not valid: the stop is not on the losing side of the fill', wait: 'no trade (a WAIT is 0R)' };
+  // the simulated "setup as proposed" beside the stored outcome of the same setup: said plainly when they differ
+  function whatIfNote(row, outcome) {
+    const r = row && row.result, why = ' They can differ because the candles differ (these are the candle feed\'s, the stored result was made on the study\'s research candles) and because the study manages the trade its own way (break-even, trailed stop, pyramid adds, time exit), which a fixed stop and target does not copy.';
+    if (!r) return 'Nothing was simulated.'; if (!outcome) return 'No stored result is on file for this setup, so there is nothing to compare the first row with.';
+    const stored = unfilled(outcome) ? `the order never filled (${outcome.reason})` : `${fmtR(outcome.netR)} after costs, exit by ${outcome.reason || 'rule'}`, sim = r.filled ? `${fmtR(r.netR)}, exit by ${WHATIF_REASON[r.reason] || r.reason}` : WHATIF_REASON[r.reason] || 'never filled';
+    if (unfilled(outcome) !== !r.filled) return `The first row does NOT match the stored result of this setup: simulated ${sim}; stored: ${stored}.` + why;
+    if (!r.filled) return `The first row agrees with the stored result: the order did not fill in either (stored: ${outcome.reason}).`;
+    const d = Math.round((r.netR - outcome.netR) * 100) / 100;
+    return Math.abs(d) <= WHATIF_TOL ? `The first row agrees with the stored result of this setup within ${WHATIF_TOL}R: simulated ${sim}; stored ${stored}.`
+      : `The first row does NOT match the stored result of this setup: simulated ${sim}; stored ${stored} (a difference of ${fmtR(d)}).` + why;
+  }
+
   const REG = {};        // tabs registered by other files: id → { title, render }
   let onRegister = null;
   const MXAC = {
-    VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
+    VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
     condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize,
-    lastSnapshot: null, checks: { snapshots: 0, future: 0 },
+    lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
       REG[id] = { title: def.title ? String(def.title) : null, render: def.render };
@@ -296,7 +355,7 @@
   MXAC.api = api;
 
   const S = { me: null, edges: [], setup: null, cands: [], series: null, clock: null, account: null, thesis: null, lessons: [], cur: null, done: new Set(), open: [], closed: [], fromT: 0, sinceThesis: 0,
-    pending: null, busy: false, loading: false, wasPlaying: false, sessionId: null, htf: '1h', dataVersion: null, poolToken: 0, lastBlock: null, exams: null, calendar: undefined };
+    pending: null, busy: false, loading: false, wasPlaying: false, future: null, sessionId: null, htf: '1h', dataVersion: null, poolToken: 0, lastBlock: null, exams: null, calendar: undefined };
   const CH = { main: null, series: null, htf: null, htfSeries: null, edgeLines: [], mentorLines: {}, annLines: [] };
   const M = { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null };   // the mentor's form
 
@@ -619,7 +678,9 @@
   const viewBars = (tf, t, keep) => viewBarsOf(S.series, tf, t, keep);
   function draw() {
     if (!CH.main || !S.clock) return; const st = S.clock.state();
-    CH.series.setData(viewBars(S.setup.tf, st.t, 500)); CH.htfSeries.setData(viewBars(S.htf, st.t, 240));
+    const fut = S.future && S.cur && !S.cur.closed ? S.future : null, shown = viewBars(S.setup.tf, st.t, 500);   // fut: candles AFTER the decision, shown only on request, for study
+    CH.series.setData(fut ? shown.filter((b) => b.time < fut.bars[0].time).concat(fut.bars) : shown); CH.htfSeries.setData(viewBars(S.htf, st.t, 240));
+    if (fut || CH.marked) { CH.series.setMarkers(fut ? [{ time: fut.bars[0].time, position: 'aboveBar', color: css('--gold'), shape: 'arrowDown', text: 'after the decision' }] : []); CH.marked = !!fut; }
     say('clock-time', fmtTime(st.t));
     const pill = $('clock-state'); pill.textContent = st.done ? 'end of range' : S.cur && !S.cur.closed ? 'paused on a setup' : S.busy ? 'working…' : st.playing ? `playing ${st.speed}×` : 'paused';
     $('c-play').textContent = st.playing ? 'Pause' : S.cur && !S.cur.closed ? 'Continue replay' : st.steps > 0 || st.t > st.from ? 'Resume' : 'Play';
@@ -685,6 +746,8 @@
   }
   // for the end-to-end check: where a price sits on the main chart, in page coordinates
   MXAC.chartPoint = (price, frac) => { if (!CH.series) return null; const r = $('chart').getBoundingClientRect(), y = CH.series.priceToCoordinate(price); return y == null ? null : { x: r.left + CH.main.timeScale().width() * (frac == null ? 0.5 : frac), y: r.top + y }; };
+
+  MXAC.laterShown = () => (S.future ? S.future.bars.length : 0);   // for the end-to-end check: candles after the decision on the main chart right now
 
   // ---- controls -------------------------------------------------------------------------------------------------------
   function markSpeed() { const sp = S.clock ? S.clock.state().speed : 0; document.querySelectorAll('#c-speed [data-speed]').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.speed === sp ? 'true' : 'false')); }
@@ -754,7 +817,8 @@
 
   // ---- a decision point -----------------------------------------------------------------------------------------------
   function hidePoint() {
-    for (const id of ['decision', 'mentor', 'lesson', 'prove']) { $(id).hidden = true; clear($(id)); }
+    for (const id of ['decision', 'mentor', 'lesson', 'prove', 'whatif']) { $(id).hidden = true; clear($(id)); }
+    S.future = null; if (CH.series && CH.marked) { CH.series.setMarkers([]); CH.marked = false; }
     if (CH.series) { clearLines(CH.edgeLines); clearMentorLines(); clearLines(CH.annLines); }
     Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null }); clear($('zones'));
   }
@@ -801,7 +865,7 @@
       log(`Back on the setup at ${fmtTime(c.t)}: ${rows.length} stored attempt${rows.length === 1 ? '' : 's'}.`);
     } catch (e) { log(`The decision point of ${candId} could not be shown again: ${e.message}`); }
   }
-  function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); draw(); }
+  function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); renderWhatIf(); draw(); }
 
   const txtList = (items, none) => listOr(el('ul', { class: 'txt-list' }), items || [], none, (x) => el('li', { text: humanize(x) }));
   // The decision panel. o = { idp (id prefix), edge, cand, d, risk, diff, stored (text), firstAction, hash, historyAvailable, lessons, title }
@@ -898,7 +962,7 @@
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);
-      cur.lesson = draft; cur.savedLesson = null; renderLesson(); renderProve();
+      cur.lesson = draft; cur.savedLesson = null; renderLesson(); renderProve(); renderWhatIf();
       $('lesson').scrollIntoView({ block: 'nearest' });
     } catch (e) { say('m-msg', ''); const n = $('m-err'); n.hidden = false; n.textContent = 'The correction was not saved: ' + e.message + '.'; }
     finally { S.busy = false; if ($('m-save')) $('m-save').disabled = false; }
@@ -1006,7 +1070,7 @@
       const ids = cur.cmp.lessonIds.length ? cur.cmp.lessonIds : cur.savedLesson ? [cur.savedLesson.id] : [];
       for (const id of ids) { const inc = cur.cmp.verdict === 'learned' ? { replayPass: 1 } : { replayFail: 1 }; if (cur.cmp.lessonIds.indexOf(id) >= 0) inc.applied = 1; try { const sr = await api.post({ action: 'lesson.stats', id, inc }), L = S.lessons.find((x) => x.id === id); if (L && sr.stats) L.stats = sr.stats; } catch (e) { log('A lesson counter could not be updated: ' + e.message); } }
       log(`Attempt ${res.n} (same trade): ${d.action}. Verdict: ${VERDICT_WORD[cur.cmp.verdict] || cur.cmp.verdict}.`, 'Replay.');
-      renderDecision(); drawEdgeLines(d); renderProve(); renderLessonsList(); $('prove').scrollIntoView({ block: 'nearest' });
+      renderDecision(); drawEdgeLines(d); renderProve(); renderWhatIf(); renderLessonsList(); $('prove').scrollIntoView({ block: 'nearest' });
     } catch (e) { perr.hidden = false; perr.textContent = e.message.charAt(0).toUpperCase() + e.message.slice(1) + '.'; say('prove-msg', ''); if ($('prove-run')) $('prove-run').disabled = false; }
     finally { S.busy = false; draw(); }
   }
@@ -1031,6 +1095,62 @@
       }
     } finally { S.busy = false; }
     S.cur = null; hidePoint(); renderAccount();
+  }
+
+  // ---- what if ------------------------------------------------------------------------------------------------------------
+  const greyBars = (bars) => { const g = css('--ink-faint'); return bars.map((b) => ({ time: b.time, open: b.open, high: b.high, low: b.low, close: b.close, color: g, wickColor: g, borderColor: g })); };
+  // The card. o = { idp, edge, cand, attemptId, mode, resultId | blindId, engine, mentor, mentorLabel, costs, outcome (undefined = read
+  // it from the API, which allows it once the attempt is stored), judged (false = no verdict yet), chart: { tf, show(bars), clear() } | null }
+  // Before the attempt is stored it draws nothing at all: no card, no button.
+  function whatIfCard(box, o) {
+    clear(box); if (!whatIfAllowed(o)) { box.hidden = true; return null; }
+    box.hidden = false; const idp = o.idp || 'whatif', w = whatIfWindow(o.edge, o.cand.t), alts = whatIfAlternatives(o), costs = o.costs || { spread: 0, commission: 0, slippage: 0 }, total = costTotal(costs);
+    const msg = el('span', { class: 'ac-status', id: idp + '-msg', role: 'status', 'aria-live': 'polite' }), out = el('div', { id: idp + '-out' });
+    box.appendChild(el('h2', { class: 'c-h' }, 'What if', el('small', { text: 'other ways to have played this setup, on the candles that came after it' })));
+    box.appendChild(el('p', { text: 'The attempt for this setup is stored, so the candles after the decision may now be read. One setup is one sample: hindsight is for study, not evidence. Nothing here changes a lesson or a score, and nothing here is stored.' }));
+    if (o.judged === false) box.appendChild(el('p', { class: 'ac-warn', id: idp + '-hindsight', text: 'You have not judged this decision yet. If you look now, your verdict will be made with hindsight.' }));
+    if (!alts.length) { box.appendChild(el('p', { class: 'note', text: 'This setup has no entry and stop to build alternatives from.' })); return box; }
+    const run = el('button', { type: 'button', class: 'btn', id: idp + '-run', text: 'Simulate the alternatives', onclick: async () => {
+      run.disabled = true; msg.textContent = `Loading ${w.tf} candles after the decision…`; if (o.chart) o.chart.clear();
+      try {
+        MXAC.whatIfLoads.push({ candidateId: o.cand.id, attemptId: o.attemptId, from: w.from, to: w.to, tf: w.tf });   // every read of later candles is listed (the audit checks each came after its attempt)
+        const bars = await MXR.load({ sym: o.edge.market, tf: w.tf, from: w.from, to: w.to });
+        if (!bars.length) { msg.textContent = ''; clear(out).appendChild(el('p', { class: 'note', id: idp + '-none', text: `No ${w.tf} candle after ${fmtTime(o.cand.t)} could be loaded, so nothing can be simulated here.` })); return; }
+        let outcome = o.outcome; if (outcome === undefined) { try { outcome = (await api.get({ get: 'outcome', id: o.cand.id, edge: o.edge.id })).outcome; } catch (e) { outcome = null; } }
+        const rows = whatIfRun(alts, bars, costs), last = bars[bars.length - 1], n2 = (v) => (fin(v) ? (v > 0 ? '+' : '') + v.toFixed(2) + 'R' : 'n/a');
+        clear(out); msg.textContent = '';
+        out.appendChild(el('div', { class: 'tbl' }, el('table', { class: 'wi', id: idp + '-table' }, el('thead', {}, el('tr', {}, ['Alternative', 'Levels', 'Filled', 'Net R after costs', 'Exit', 'Best', 'Worst', 'Exit time (UTC)'].map((h) => el('th', { text: h })))),
+          el('tbody', {}, rows.map((r) => { const x = r.result; return el('tr', { 'data-alt': r.key, 'data-filled': x.filled ? 'yes' : 'no' }, el('td', {}, el('b', { text: r.label })), el('td', { class: 'num', text: r.wait ? 'none' : `${r.side} ${r.entry == null ? 'at the open' : fmtPrice(r.entry)}, stop ${fmtPrice(r.stop)}, target ${r.target == null ? 'none' : fmtPrice(r.target)}` }),
+            el('td', { text: r.wait ? 'no trade' : x.filled ? 'filled at ' + fmtPrice(x.fill) : 'not filled' }), el('td', { class: 'num', text: x.filled || r.wait ? n2(x.netR) : 'n/a' }), el('td', { text: WHATIF_REASON[x.reason] || x.reason }), el('td', { class: 'num', text: x.filled ? n2(x.mfeR) : 'n/a' }), el('td', { class: 'num', text: x.filled ? n2(x.maeR) : 'n/a' }), el('td', { class: 'num', text: x.filled && fin(x.exitT) ? fmtTime(x.exitT).replace(' UTC', '') : 'n/a' })); })))));
+        out.appendChild(el('p', { class: 'note', id: idp + '-rules', text: `Conservative rules: candles are read as bid prices and the spread is paid; when one candle touches both the stop and the target, the stop is taken; a stop that gaps is filled at the open (worse); a resting entry never fills better than its price, and on the candle that fills it only the stop can be hit. Costs: ${total.toFixed(2)} a round trip. Best and worst are the furthest the trade went for and against it, in R.` }));
+        out.appendChild(el('p', { class: 'note', id: idp + '-window', text: `Candles: ${bars.length} of ${w.tf} from ${fmtTime(bars[0].time)} to ${fmtTime(last.time)} (${bars.src || 'candle feed'}), read for ${w.why}. A row "still open" had not reached its stop or target by the last candle read.` }));
+        out.appendChild(el('p', { id: idp + '-compare', 'data-match': /does NOT match/.test(whatIfNote(rows[0], outcome)) ? 'no' : outcome ? 'yes' : 'none', text: whatIfNote(rows[0], outcome) }));
+        if (o.chart) {
+          const note = el('span', { class: 'ac-status', id: idp + '-shown', role: 'status' });
+          const show = el('button', { type: 'button', class: 'btn', id: idp + '-show', 'aria-pressed': 'false', text: 'Show these candles on the chart', onclick: async () => {
+            if (show.getAttribute('aria-pressed') === 'true') { o.chart.clear(); show.setAttribute('aria-pressed', 'false'); show.textContent = 'Show these candles on the chart'; note.textContent = ''; return; }
+            try {
+              const cb = o.chart.tf === w.tf ? bars : await MXR.load({ sym: o.edge.market, tf: o.chart.tf, from: Math.floor(w.from / MXR.TF[o.chart.tf]) * MXR.TF[o.chart.tf], to: w.to }); if (!cb.length) { note.textContent = 'No candle to show on this chart timeframe.'; return; }
+              o.chart.show(greyBars(cb)); show.setAttribute('aria-pressed', 'true'); show.textContent = 'Hide the later candles'; note.textContent = 'Grey candles from the "after the decision" mark came AFTER the decision. They go away when you continue.';
+            } catch (e) { note.textContent = 'The candles could not be shown: ' + ((e && e.message) || e) + '.'; }
+          } });
+          out.appendChild(el('div', { class: 'f-actions' }, show, note));
+        }
+        run.textContent = 'Simulate again';
+      } catch (e) { msg.textContent = ''; clear(out).appendChild(el('p', { class: 'ac-err', text: e && e.code ? candleError(e) : 'The alternatives could not be simulated: ' + ((e && e.message) || e) + '.' })); }
+      finally { run.disabled = false; }
+    } });
+    box.appendChild(el('div', { class: 'f-actions' }, run, msg)); box.appendChild(out);
+    return box;
+  }
+  // the Train tab's card: for the decision point the clock is on, once its attempt is stored
+  function renderWhatIf() {
+    const cur = S.cur, box = $('whatif'); if (!cur || cur.closed || !cur.first || !cur.first.row) { box.hidden = true; clear(box); return; }
+    const lv = (d) => (d ? { action: d.action, entry: d.entry, stop: d.stop, target: d.target } : null), k = cur.correction;
+    if (S.future) { S.future = null; draw(); }   // the card is drawn afresh: later candles leave the chart until asked for again
+    whatIfCard(box, { idp: 'whatif', edge: S.setup.edge, cand: cur.cand, attemptId: cur.first.row.id, mode: cur.exam ? 'exam' : 'train', resultId: cur.exam && cur.exam.row ? cur.exam.row.id : null,
+      engine: lv(cur.latest.decision), mentor: k && k.verdict !== 'approve' && k.action ? lv(k) : null, costs: S.setup.costs, outcome: cur.exam ? (cur.exam.row && cur.exam.row.outcome) || null : undefined, judged: cur.exam ? undefined : !!k,
+      chart: { tf: S.setup.tf, show: (bars) => { S.future = { bars }; draw(); }, clear: () => { S.future = null; draw(); } } });
   }
 
   // ---- tests on new setups ----------------------------------------------------------------------------------------------
@@ -1064,7 +1184,18 @@
     say('exam-note', (s.tooFew ? `Too few to judge: ${s.graded} graded setup${s.graded === 1 ? '' : 's'}, and 20 is the least this page reads anything into. ` : '') + (j.graded === false ? 'The outcome file is missing, so nothing is graded. ' : '') + (s.n - s.graded ? `${s.n - s.graded} not graded (an answer on other levels than the setup's own cannot be read off the outcome file). ` : '') + (s.neverFilled ? `${s.neverFilled} order${s.neverFilled === 1 ? '' : 's'} never filled (no result, counted as 0R). ` : '') + 'A WAIT counts as 0R. These numbers are separate from same-trade replays.');
     const tb = clear($('exam-table').tBodies[0]);
     for (const r of rows.slice(0, 200)) { const nf = unfilled(r.outcome), rr = (v) => (fin(v) ? fmtR(v) : 'not graded'); tb.appendChild(el('tr', { 'data-cand': r.candidateId, 'data-changed': sameAnswer(r.withLessons, r.withoutLessons) ? 'no' : 'yes' }, el('td', { class: 'num', text: fmtTime(r.t) }), el('td', { text: r.side || 'n/a' }), el('td', {}, actBadge(r.withoutLessons.action, true)), el('td', {}, actBadge(r.withLessons.action, true), sameAnswer(r.withLessons, r.withoutLessons) ? null : ' changed'),
-      el('td', { class: 'num', text: (r.lessonIds || []).length }), el('td', { class: 'num', text: nf && isTake(r.withoutLessons.action) ? 'never filled' : rr(r.rWithout) }), el('td', { class: 'num', text: nf && isTake(r.withLessons.action) ? 'never filled' : rr(r.rWith) }))); }
+      el('td', { class: 'num', text: (r.lessonIds || []).length }), el('td', { class: 'num', text: nf && isTake(r.withoutLessons.action) ? 'never filled' : rr(r.rWithout) }), el('td', { class: 'num', text: nf && isTake(r.withLessons.action) ? 'never filled' : rr(r.rWith) }),
+      el('td', {}, el('button', { type: 'button', class: 'btn sm', 'data-whatif': r.candidateId, text: 'What if', onclick: () => examWhatIf(edge, r) })))); }
+    clear($('exam-whatif')).hidden = true;
+  }
+  // a tested setup's alternatives: both answers and the result are stored, so its later candles may be read. The setup's own
+  // levels are the ones the answer without lessons carries (a WAIT keeps the levels of the setup it did not take).
+  function examWhatIf(edge, r) {
+    const wo = r.withoutLessons || {}, st = S.setup && S.setup.edge.id === edge.id ? S.setup : null;
+    whatIfCard($('exam-whatif'), { idp: 'xwhatif', edge, cand: { id: r.candidateId, t: r.t, side: r.side, entry: wo.entry, stop: wo.stop, target: wo.target }, attemptId: r.attemptId, mode: 'exam', resultId: r.id,
+      engine: r.withLessons, mentor: null, costs: st ? st.costs : { spread: fin(edge.costPerRoundTrip) ? edge.costPerRoundTrip : 0, commission: 0, slippage: 0 }, outcome: r.outcome || null, chart: null });
+    const h = $('exam-whatif').querySelector('h2 small'); if (h) h.textContent = `the setup of ${fmtTime(r.t)}, tested with and without lessons`;
+    $('exam-whatif').scrollIntoView({ block: 'nearest' });
   }
   async function runExamBatch() {
     const edge = S.setup ? S.setup.edge : edgeSel(); if (!edge || S.busy || S.loading) return;
@@ -1127,7 +1258,7 @@
     $('f-from').value = isoDay(t); $('f-to').value = isoDay(t); refreshPool(false);
     await startReplay(null, { at: t }); return true;
   }
-  MXAC.kit = { el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain,
+  MXAC.kit = { el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
     decided: (id) => DECIDED.add(id), calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
