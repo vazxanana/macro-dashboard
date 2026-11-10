@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-10 12:20 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-10 12:23 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **overlap** — the rule skips it, so no live Scalp until it ends.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 240 trades, −0.12R a trade (−29.
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-10 12:20 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-10 12:23 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -52,14 +52,14 @@ Built by the Trader at 2026-11-10 12:20 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-10 12:20 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-10 12:23 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 1 signal (1 open, 0 closed); 3 other signals tracked, not A-setups.
 - open: ES buy from 7423.25, stop 7510.25 (H1 iFVG reversal, A+)
 
 **Dip-buy candidate (NQ/ES, paper only):** 2 signals in 7 days, 1 closed −1.00R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 5 open · 1 resting (checked 2026-11-10 12:18 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 5 open · 1 resting (checked 2026-11-10 12:22 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: BTCUSD sell scalp (btc-scalp-1793919871) · fill 75841.41 vs council 75500 (−0.36R slippage)
@@ -69,17 +69,17 @@ Built by the Trader at 2026-11-10 12:20 UTC. ICT desk: the last 7 days; mirror: 
 **Execution vs paper:** 13 demo fills; slippage against the council entry −0.01R on average (median +0.01R, worst +0.86R; positive = worse than paper), median 46368s from council fill to demo order.
 
 Last mirror events:
+- 11-10 12:22 placed buy limit XAUUSD 0.01 lot at 3971.36 (council geg, valid to 2026-11-26T09:15Z)
+- 11-10 12:22 moved XAUUSD 47826388 protection: stop 4052.935 -> 4052.335, target 4265.895 -> 4265.295 (council geg)
+- 11-10 12:22 moved XAUUSD 47783577 protection: stop 4053.565 -> 4052.965, target 4971.295 -> 4970.695 (council gtl)
+- 11-10 12:22 cancelled XAUUSD limit order 33863208 for xau-geg-1793664000: the council re-quoted the order (entry 3981.87 -> 3971.36)
 - 11-10 12:18 placed buy limit XAUUSD 0.01 lot at 3981.87 (council geg, valid to 2026-11-26T09:15Z)
-- 11-10 12:18 moved XAUUSD 47826388 protection: stop 4054.09 -> 4052.935, target 4267.05 -> 4265.895 (council geg)
-- 11-10 12:18 moved XAUUSD 47783577 protection: stop 4054.72 -> 4053.565, target 4972.45 -> 4971.295 (council gtl)
-- 11-10 12:18 cancelled XAUUSD limit order 33821456 for xau-geg-1793664000: the council re-quoted the order (entry 3971.36 -> 3981.87)
-- 11-10 10:31 limit filled: XAUUSD position 47826388 at the broker
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-10 12:20 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-10 12:23 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -194,7 +194,7 @@ Checked 2026-11-10 11:28 UTC; live signals 2026-11-01 to 2026-11-10.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-10 12:20 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-10 12:23 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
