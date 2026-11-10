@@ -5238,6 +5238,35 @@
     ],
     "stopCheckedAt": "2026-11-10T14:44:50.000Z",
     "brokerStop": 4068.38
+   },
+   "xau-m30m1-1794322403": {
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "setup": "m30m1",
+    "openedAt": "2026-11-10T14:54:24.000Z",
+    "councilEntry": 4033.915,
+    "stop": 4047.4650535714286,
+    "t1": 4006.8148928571427,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 4033.91,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 13.55,
+    "margin": 8.08,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 4037.99,
+    "slipR": -0.301,
+    "lagSec": 61,
+    "positionId": "48101772",
+    "volume": 100,
+    "status": "open",
+    "stopCheckedAt": "2026-11-10T14:54:24.000Z",
+    "brokerStop": 4047.47
    }
   },
   "day": {
@@ -5245,7 +5274,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9984.43 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9984.43 · 24 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5282,19 +5311,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9984.43,
-  "lastRun": "2026-11-10T14:51:59.000Z"
+  "lastRun": "2026-11-10T14:54:24.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T07:36:32.000Z",
-   "msg": "limit filled: EURUSD position 47946686 at the broker",
-   "trade": "eurusd-scalp-1794295261"
-  },
-  {
-   "at": "2026-11-10T07:43:50.000Z",
-   "msg": "placed buy limit EURUSD 0.02 lot at 1.12386 (council scalp, valid to 2026-11-10T10:42Z)",
-   "trade": "eurusd-scalp-1794296570"
-  },
   {
    "at": "2026-11-10T07:43:50.000Z",
    "msg": "opened buy GBPUSD 0.03 lot (council scalp)",
@@ -6784,6 +6803,16 @@
    "at": "2026-11-10T14:51:59.000Z",
    "msg": "cancelled XAUUSD limit order 33876075 for xau-rintra-1794322093: the council ended it: missed",
    "trade": "xau-rintra-1794322093"
+  },
+  {
+   "at": "2026-11-10T14:54:24.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 4033.91 (council m30m1, valid to 2026-11-10T20:53Z)",
+   "trade": "xau-m30m1-1794322403"
+  },
+  {
+   "at": "2026-11-10T14:54:24.000Z",
+   "msg": "limit filled at once: XAUUSD position 48101772 at the broker at 4037.99",
+   "trade": "xau-m30m1-1794322403"
   }
  ],
  "limits": {
@@ -6862,11 +6891,11 @@
   ]
  },
  "execution": {
-  "n": 176,
-  "meanSlipR": -0.018,
+  "n": 177,
+  "meanSlipR": -0.019,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 176.5,
+  "medianLagSec": 176,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -6901,8 +6930,8 @@
     "meanSlipR": -0.05
    },
    "XAUUSD": {
-    "n": 20,
-    "meanSlipR": -0.052
+    "n": 21,
+    "meanSlipR": -0.064
    }
   }
  }
