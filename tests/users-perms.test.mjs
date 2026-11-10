@@ -15,3 +15,10 @@ test('a record keeps ict / ct / mcp flags and perms; a bad perms object rejects 
   assert.equal(clean({ carlos: { name: 'Carlos', role: 'viewer', hash: H, perms: { nope: true } } }), null);
   assert.deepEqual(clean({ luxus: { name: 'Luxus', role: 'viewer', hash: H } }).luxus, { name: 'Luxus', role: 'viewer', hash: H });
 });
+test('perms.ictApply (10 Nov): a boolean in perms only; no record flag is stored; off unless the owner saves true', () => {
+  assert.deepEqual(cleanPerms({ ict: 'write', ictApply: true }), { ict: 'write', ictApply: true }); assert.deepEqual(cleanPerms({ ictApply: false }), { ictApply: false });
+  assert.equal(cleanPerms({ ictApply: 'yes' }), null); assert.equal(cleanPerms({ ictApply: 1 }), null);
+  const u = clean({ fred: { name: 'Fred', role: 'reviewer', hash: H, ict: true, mcp: true, ictApply: true } });
+  assert.deepEqual(u.fred, { name: 'Fred', role: 'reviewer', hash: H, ict: true, mcp: true }, 'a record-level flag is dropped: only perms.ictApply counts');
+  assert.deepEqual(clean({ fred: { name: 'Fred', role: 'reviewer', hash: H, ict: true, perms: { ict: 'write', ictApply: true } } }).fred.perms, { ict: 'write', ictApply: true });
+});

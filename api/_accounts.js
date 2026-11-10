@@ -10,8 +10,12 @@ const crypto = require('node:crypto');
 const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';   // sha256 of the owner's password
 // Built-in members (moved here from the page's window.MS_USERS). role: viewer | reviewer; ict: true (write) | 'read'; ct: demo
 // accounts' results (labels only); mcp: ChatGPT connector on the profile. The Users page can override any field or disable one.
+// ictApply: the member may apply changes to the ICT edge through the connector without the owner's review (api/mcp.js
+// canApply). Owner, 10 Nov 2026: on for Fred ("let fred have 100% control of ict"), off for everyone else. A stored
+// perms.ictApply (the Users page checkbox, true or false) wins over this default, and council/ict-apply.json on main must
+// list the name too. tests/mcp-apply.test.mjs pins who has it.
 const BUILT_IN = Object.freeze({
-  fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true, mcp: true },
+  fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true, mcp: true, ictApply: true },
   orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'reviewer', ict: 'read', ct: true },
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
   carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer', ct: true },
@@ -51,7 +55,7 @@ async function userList(deps) {
 function publicRecord(R) {
   if (!R) return null;
   const out = { name: String(R.name || ''), role: R.role };
-  if (R.ict) out.ict = R.ict === 'read' ? 'read' : true; if (R.ct) out.ct = true; if (R.mcp) out.mcp = true;
+  if (R.ict) out.ict = R.ict === 'read' ? 'read' : true; if (R.ct) out.ct = true; if (R.mcp) out.mcp = true; if (R.ictApply === true) out.ictApply = true;
   if (R.perms && typeof R.perms === 'object') out.perms = R.perms; if (R.disabled) out.disabled = true;
   return out;
 }

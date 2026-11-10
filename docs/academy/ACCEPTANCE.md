@@ -5,8 +5,10 @@ order: the Academy is replay and paper only.
 
 ## 0. Start it
 
-Either of these:
+Any of these:
 
+- **Production (since 10 Nov 2026):** sign in to the desk at `https://meridianx.dev` as the owner, then open `/academy`
+  (account menu → "MeridianX Academy"). Live candles; the store starts empty and is yours alone.
 - **Local (always works, no deployment):**
   `sh scripts/build.sh && node --use-env-proxy scripts/academy-dev.mjs --live` then open `http://127.0.0.1:8770/academy`.
   This serves the built site with the real Academy API on a file store on your machine and live candles from the site's
@@ -78,7 +80,8 @@ Open `MERIDIANX_BUILD_PROGRESS.md` and check that these are stated plainly, with
 - [ ] `node --use-env-proxy scripts/audit/academy-review.mjs` (live candles: timestamps, no look-ahead, lessons across a
       restart, unseen setups kept apart, costs, the risk engine, all seven edges, no order path) ends with all checks passed.
 
-## 7. Before it goes to production
+## 7. Production
 
 - [ ] You have read "Known problems" and "Owner decisions" in the progress file.
-- [ ] Draft pull request #1 is still a draft and `main` has none of the Academy: merging it is your decision.
+- [ ] The Academy is on `main` since 10 Nov 2026 (your "Deploy everything"): on production, `/academy` opens for the owner only
+      and its store starts empty. To take it off again, revert the merge commit of pull request #1 on `main`.

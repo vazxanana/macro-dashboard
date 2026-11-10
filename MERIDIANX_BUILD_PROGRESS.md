@@ -5,10 +5,9 @@ modules is `docs/academy/ARCHITECTURE.md`.
 
 ## Where things stand
 
-- **Branch:** `claude/website-display-xoyadz` (development; a draft PR, never merged to `main` without the owner: `main`
-  auto-deploys to production).
-- **Current phase:** 1 to 8 built and verified on the development branch; phase 9 (finish, validate, improve) in progress,
-  see its section below. Preview and production wait for the owner.
+- **Deployed.** The owner said "Deploy everything" on 10 Nov 2026: the development branch `claude/website-display-xoyadz`
+  (PR #1) is merged to `main`, which deploys to production (`/academy`, owner only). Fred's connector (#710) went first.
+- **Current phase:** 1 to 9 built and verified. What the owner still has to do is under "Next (not done)".
 
 ## Previous work stopped or preserved (10 Nov)
 
@@ -140,18 +139,21 @@ Merged into the development branch and verified by the lead (suite, browser audi
   holds about a third of the trades, so a smaller drawdown is not evidence of selection). The lead recomputed the
   discovery / validation figures and both drawdowns from the outcome files: they match.
 
-Running:
-
-- **Model-training review** (`research/edge/academy-ml-review/`: features, labels, leakage, sample size, overfitting,
-  calibration, regimes; walk-forward only; nothing promoted; zero exam reads).
+- **Model-training review: no scorer passes, none promoted** (`research/edge/academy-ml-review/`, pre-registered). 20 scorers
+  walk-forward (the reference trees and four low-capacity configurations): best own-test t 0.95, 12 of 20 negative, 0 beat the
+  prior rate on calibration. Three trainer defects fixed (the embargo ended at the first unit's exit; the keep threshold was
+  chosen on trades not yet closed; the unseen pool was read by default: the trainer now cannot read it). Leakage checks:
+  shuffled labels give AUC 0.50; a planted outcome column jumps to 0.91, no real feature behaves like it. mosha-bo, gtrend and
+  geg are too small to fit. Smallest kept-minus-skipped difference that could reach t 2: 0.29R (gmp) to 0.90R (replica).
 
 Outside the Academy, same day: the mirror's replica book (PR #709, on `main`), the reconciliation tool, and Fred's connector
-(draft PR #710, applying ICT changes built and switched OFF behind two owner locks; not merged; CI green).
+(#710, merged to `main` on the owner's word: Fred has full control of the ICT edge; the stop guard, paper / demo only and the
+ICT file allowlist still bind him).
 
 ## Next (not done)
 
-- [ ] **Preview / production**: nothing is deployed. `main` and production are untouched; branch previews are skipped by
-  `scripts/vercel-ignore.sh`. Merging PR #1 is the owner's decision.
+- [x] **Production**: merged to `main` on 10 Nov 2026 (owner: "Deploy everything"). A preview is still possible with
+  `MX_PREVIEW_BRANCH` (`docs/academy/PREVIEW.md`).
 - [ ] First real use: the store is empty in production until the owner trains. Every number on the page comes from the
   owner's own stored attempts; the audit's rows live only in temporary test stores.
 - [ ] The policy does not beat taking every setup yet (table above): improving it is what the mentor's lessons and the
@@ -171,7 +173,7 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **1,016 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
+- Whole suite on the development branch: **1,062 passing, 0 failing, 0 todo** (with the connector's tests from `main`) (`node --test tests/*.test.mjs tests/*.test.js`;
   914 at the end of phase 8, 719 before the Academy). Model parity: `node ml/parity.mjs`.
 - `node scripts/audit/academy.cjs`: **270 of 270**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
   scripts/audit/academy-review.mjs` (live candles): **41 of 41**. The paragraph below describes the 225-check stage.
@@ -217,6 +219,6 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Next executable step
 
-Owner review of draft PR #1 (`claude/website-display-xoyadz`). To see it locally: `sh scripts/build.sh && node
-scripts/academy-dev.mjs` then open `http://127.0.0.1:8770/academy` (recorded candles; add `--live` and
-`node --use-env-proxy` for live ones).
+The owner's acceptance walk on production: `docs/academy/ACCEPTANCE.md` (sign in as the owner, open `/academy`). Then the
+open owner items: `docs/owner-decisions.md` 19 to 25 (the monitoring baselines rebuilt on the corrected clock are live with
+this merge: confirm or revert), a language-model key and budget if written analysis is wanted (`docs/academy/LLM.md`).

@@ -1,0 +1,130 @@
+name: ICT apply
+
+# Checks an APPLIED change to the ICT edge (owner, 10 Nov 2026). ON FOR FRED: council/ict-apply.json lists fred; the first step
+# refuses a branch of anyone else. Two things decide it per member (the Users page box, and the name in that file).
+#
+# What it is for: the connector's ict_apply_change (api/mcp.js) opens a pull request from mcp/<member>/apply-… that changes the
+# ICT edge's own files. This workflow checks that pull request again, without trusting it. It never merges: a second workflow,
+# ict-apply-merge.yml, does that from main's own definition once these checks passed.
+#
+# Why two workflows. A pull_request run uses the workflow file of the pull request itself, so a job in THIS file can never be
+# trusted with a write token: a branch could rewrite it. Here the token only reads and there are no secrets, so the worst a
+# hostile branch can do is fail or fake its own checks. ict-apply-merge.yml runs on workflow_run, which always takes the file
+# from main, and it refuses a pull request that touches anything outside the ICT allowlist (this file included).
+# Why not pull_request_target: it would run the branch's test code with main's cache scope, where it could poison caches other
+# workflows read. pull_request keeps that code in the pull request's own scope.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    # only pull requests that touch the ICT edge start this workflow at all (the allowlist of api/_ictrules.js, as globs;
+    # tests/apply-workflow.test.mjs keeps the two in step). A filter only: the locks are the steps below.
+    paths:
+      - 'ict/**'
+      - '.claude/skills/ICT/**'
+      - 'tests/ict-*'
+      - 'tests/fixtures/ict/**'
+      - 'research/ict/**'
+      - 'research/edge/ict-*/**'
+
+# read only, for every job in this file; no secret is used anywhere in it
+permissions:
+  contents: read
+
+# a newer commit on the same pull request replaces its older checks
+concurrency:
+  group: ict-apply-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    # the name the connector's ict_my_proposals looks for (api/mcp.js APPLY_CHECK)
+    name: ICT apply checks
+    # Only a branch of THIS repository (never a fork), named mcp/<member>/apply-…, onto main. Other ICT pull requests (the
+    # owner's, or a draft proposal from mcp/<member>/…) skip the job. The exact branch pattern is checked by the verifier.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'mcp/') &&
+      contains(github.event.pull_request.head.ref, '/apply-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      # Main's files, in their own folder: the verifier, its rules (api/_ictrules.js), the members list (council/ict-apply.json)
+      # and the stop guard are taken from here and never from the pull request. No credentials are left on disk.
+      - name: Check out main (trusted copy)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+
+      # The pull request, as data. Its code only runs in the test steps further down, after the verifier has passed.
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Lock: main's verifier reads the diff (merge base ... head) before any pull request code has run. It refuses a member who
+      # is not in council/ict-apply.json, any path outside the ICT allowlist (workflows, scripts, api/, council/, package.json,
+      # pages, tests other than tests/ict-*), a file over the size limits, a symlink, and new network / environment / process
+      # access. Branch name and commit ids travel through env: never write a pull request's text into a script.
+      - name: Verify the change (main's verifier, before any pull request code runs)
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node base/scripts/ict-apply-check.mjs --repo pr --base "$(git -C base rev-parse HEAD)" --head "$HEAD_SHA" --branch "$HEAD_REF"
+
+      # The tests below run on the change joined with the main it was opened against: what the merge will produce.
+      - name: Join the change with main
+        run: git -C pr -c user.name=ict-apply -c user.email=ict-apply@users.noreply.github.com merge -q --no-ff --no-edit "$(git -C base rev-parse HEAD)"
+
+      # Lock: the stop guard, from main's copy (its name is outside tests/ict-*, so a change cannot edit it; and this copy is not
+      # the pull request's anyway). Every signal and every simulated trade of the changed ICT code keeps a stop on the right
+      # side of its entry; ICT imports nothing from the council, the API or the mirror and sends no order.
+      - name: Stop guard (main's copy, against the changed ICT code)
+        env:
+          ICT_GUARD_ROOT: ${{ github.workspace }}/pr
+        run: node --test base/tests/desk-ict-guard.test.mjs
+
+      # Lock: the same suite tests.yml runs, on the joined tree.
+      - name: Syntax check (council, ICT desk, Vercel functions)
+        working-directory: pr
+        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs academy/*.mjs academy/gen/*.mjs ml/*.mjs assets/academy-*.js; do node --check "$f" || exit 1; done
+
+      - name: Unit tests (tests/)
+        working-directory: pr
+        run: node --test tests/*.test.mjs tests/*.test.js
+
+      - name: ICT desk audit (pinned council-data ict/ copy)
+        working-directory: pr
+        run: node ict/audit-test.mjs
+
+      - name: Phone alerts on real trades (pinned council-data copy)
+        working-directory: pr
+        run: node council/alerts-test.mjs > alerts-test.log && tail -1 alerts-test.log || { cat alerts-test.log; exit 1; }
+
+      - name: Coach data-source proposal
+        working-directory: pr
+        run: node council/proposals-test.mjs
+
+      # Lock: out/ (the built site) is outside the allowlist, so a change that alters a published study would leave main with a
+      # stale build and fail everyone's CI. Such a change goes to the owner as a proposal.
+      - name: The built site still matches
+        working-directory: pr
+        run: |
+          sh scripts/build.sh
+          if [ -n "$(git status --porcelain -- out/)" ]; then
+            git status --short -- out/
+            echo "::error::this change alters the built site (out/), which an applied change may not touch: send it as a proposal"
+            exit 1
+          fi

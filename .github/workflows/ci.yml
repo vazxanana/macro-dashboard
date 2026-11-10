@@ -102,6 +102,8 @@ jobs:
           ACADEMY_PORT: 8770
         run: |
           mkdir -p "$AUDIT_OUT"
+          node scripts/audit/academy.cjs && exit 0
+          echo "::warning::Academy audit failed once; retrying (a browser timing wait can miss on a busy runner; a real failure fails twice)"
           node scripts/audit/academy.cjs
 
       - name: Audit screenshots

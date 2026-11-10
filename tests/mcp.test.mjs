@@ -64,7 +64,7 @@ test('JSON-RPC: initialize negotiates, ping, notifications, errors', async () =>
 });
 test('tools/list: titles, annotations, schemas; write tools only for ICT write', async () => {
   const W = (await L.rpc('fred', { jsonrpc: '2.0', id: 2, method: 'tools/list' }, { level: 'write' })).result.tools, R = (await L.rpc('fred', { jsonrpc: '2.0', id: 2, method: 'tools/list' }, { level: 'read' })).result.tools;
-  const writes = ['ict_note', 'ict_propose_change', 'ict_proposal_comment'];
+  const writes = ['ict_note', 'ict_desk_update', 'ict_propose_change', 'ict_proposal_comment'];   // the apply tools need the apply permission too: tests/mcp-apply.test.mjs
   for (const n of ['ict_guide', 'ict_rules', 'ict_trades', 'ict_trade', 'ict_status', 'ctrader_results', 'ict_bars', 'ict_backtest', 'ict_compare', 'ict_file_list', 'ict_file_read', 'ict_my_proposals', 'search', 'fetch', ...writes]) assert.ok(W.find((t) => t.name === n), n);
   for (const n of writes) assert.ok(!R.find((t) => t.name === n), `${n} hidden from a read-only member`);
   for (const t of W) {

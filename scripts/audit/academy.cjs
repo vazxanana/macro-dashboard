@@ -562,6 +562,8 @@ async function startServer(port = PORT, flags = []) {
         await v.click('#c-speed [data-speed="1"]'); await v.click('#c-play'); await until(/^playing 1×$/);
         const seen = []; for (const sp of [1, 5, 10, 50, 100]) { await v.click(`#c-speed [data-speed="${sp}"]`); seen.push([sp, await state(), await v.$$eval('#c-speed [aria-pressed="true"]', (l) => l.map((x) => x.dataset.speed).join())]); }
         check('controls: each speed (1, 5, 10, 50, 100) takes effect while playing and is the only one marked', seen.every(([sp, st, on]) => st === `playing ${sp}×` && on === String(sp)) && (await txt(v, '#c-play')) === 'Pause' && (await v.getAttribute('#c-play', 'aria-pressed')) === 'true', JSON.stringify(seen));
+        // let the clock tick at least once before pausing: the clicks above can all land inside one tick of the replay timer
+        { const from = Date.parse(jumped.replace(' UTC', 'Z')); for (let i = 0; i < 80 && !((await clockMs()) > from); i++) await v.waitForTimeout(100); }
         await v.click('#c-speed [data-speed="1"]'); await v.click('#c-play'); const tA = await clockMs();
         check('controls: Pause stops the clock; the button then says Resume', (await state()) === 'paused' && (await txt(v, '#c-play')) === 'Resume' && (await v.getAttribute('#c-play', 'aria-pressed')) === 'false' && tA > Date.parse(jumped.replace(' UTC', 'Z')), `${await state()} / ${await txt(v, '#c-play')}`);
         await v.waitForTimeout(400); check('controls: while paused the clock does not move', (await clockMs()) === tA);
