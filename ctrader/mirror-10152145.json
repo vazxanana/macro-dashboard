@@ -3596,7 +3596,8 @@
     "t1": 75100,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 74807.9,
@@ -3610,7 +3611,8 @@
     "lagSec": 190,
     "positionId": "47918888",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T06:03:17.000Z"
    }
   },
   "day": {
@@ -3618,7 +3620,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.55 · 29 open",
+  "status": "ok · demo Fusion Markets · balance 9973.28 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3633,15 +3635,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9975.55,
-  "lastRun": "2026-11-10T06:00:53.000Z"
+  "balance": 9973.28,
+  "lastRun": "2026-11-10T06:03:17.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T11:18:52.000Z",
-   "msg": "BTCUSD position 47578090 closed at the broker",
-   "trade": "btc-scalp-1794216563"
-  },
   {
    "at": "2026-11-09T11:18:52.000Z",
    "msg": "placed buy limit BTCUSD 0.01 lot at 74244.6 (council rscalp, valid to 2026-11-09T14:17Z)",
@@ -5135,6 +5132,11 @@
   {
    "at": "2026-11-10T05:56:10.000Z",
    "msg": "limit filled: BTCUSD position 47918888 at the broker",
+   "trade": "btc-rscalp-1794289641"
+  },
+  {
+   "at": "2026-11-10T06:03:17.000Z",
+   "msg": "BTCUSD position 47918888 closed at the broker",
    "trade": "btc-rscalp-1794289641"
   }
  ],
