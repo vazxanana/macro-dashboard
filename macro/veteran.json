@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-10T14:34:36.000Z",
+ "at": "2026-11-10T15:49:37.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-10T14:34:19.000Z",
+ "strategistAt": "2026-11-10T15:49:13.000Z",
  "shock": {
   "shock": "Mixed / no dominant shock",
   "clues": [
@@ -11,7 +11,7 @@
    "breakeven −7 bp",
    "DXY +0.27%",
    "HY −2 bp",
-   "VIX 25.6"
+   "VIX 19.9"
   ],
   "goldTest": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
   "competing": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
@@ -57,9 +57,9 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 0 bp",
+   "obs": "VIX 19.9 (VIX/VIX3M 0.95) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 0 bp",
    "lean": 0,
-   "asOf": "2026-11-06",
+   "asOf": "2026-11-09",
    "stale": false,
    "cannot": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
   },
@@ -117,7 +117,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.30 pts in 5 sessions (vote down); score z (4-week fall) +0.05",
+   "macro": "+0.46 pts in 5 sessions (vote down); score z (4-week fall) +0.05",
    "veteran": "DXY 102.36, +0.27% on the week, +0.13% over 4 weeks · broad USD +0.36% over 4 weeks",
    "stance": "qualify",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -144,8 +144,8 @@
   },
   {
    "topic": "Regime",
-   "macro": "transitional dollar · dollar liquidity draining · VIX curve inverted (stress)",
-   "veteran": "Mixed / no dominant shock (low confidence) · clues: 2Y −5 bp, 10Y real +3 bp, breakeven −7 bp, DXY +0.27%, HY −2 bp, VIX 25.6",
+   "macro": "Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility",
+   "veteran": "Mixed / no dominant shock (low confidence) · clues: 2Y −5 bp, 10Y real +3 bp, breakeven −7 bp, DXY +0.27%, HY −2 bp, VIX 19.9",
    "stance": "qualify",
    "why": "Strongest competing explanation: Several small shocks offsetting each other, or the week's moves are inside normal noise.",
    "m": null,
@@ -175,7 +175,7 @@
   "claimType": "descriptive association",
   "shock": "Mixed / no dominant shock",
   "surprise": "Pending: GDP m/m at 2026-11-12 07:00 UTC against the calendar expectation captured before it (0.0%); print minus previous is not a surprise",
-  "observed": "2Y −5 bp · 10Y real +3 bp · breakeven −7 bp · DXY +0.27% · HY −2 bp · VIX 25.6",
+  "observed": "2Y −5 bp · 10Y real +3 bp · breakeven −7 bp · DXY +0.27% · HY −2 bp · VIX 19.9",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
   "alternative": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
@@ -643,7 +643,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 0 bp (as of 2026-11-06)",
+     "read": "VIX 19.9 (VIX/VIX3M 0.95) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 0 bp (as of 2026-11-09)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -835,7 +835,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall."
  },
  "briefing": {
-  "at": "2026-11-10T14:34:36.000Z",
+  "at": "2026-11-10T15:49:37.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -843,7 +843,7 @@
     "lean": 0,
     "fx": "Hot → EUR/USD mixed (DXY down), USD/JPY mixed; cool the reverse.",
     "k": "event",
-    "score": 2.78,
+    "score": 2.79,
     "event": {
      "title": "GDP m/m",
      "country": "GBP",
@@ -875,33 +875,6 @@
    },
    {
     "rank": 2,
-    "lean": 0,
-    "fx": null,
-    "k": "stress",
-    "score": 2.2,
-    "title": "Stress gauges are lit (VIX 26, curve inverted), funding still calm",
-    "evidence": [
-     {
-      "text": "VIX 25.6, VIX/VIX3M 1.04 (inverted)",
-      "asOf": "2026-11-06",
-      "source": "Cboe via FRED VIXCLS / VXVCLS"
-     },
-     {
-      "text": "HY OAS 3.42%, −2 bp on the week",
-      "asOf": "2026-11-06",
-      "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
-     },
-     {
-      "text": "SOFR − EFFR 0 bp",
-      "asOf": "2026-11-09",
-      "source": "NY Fed SOFR / EFFR via FRED"
-     }
-    ],
-    "why": "In stress gold is often sold first for cash (margin calls), then bought as a haven: expect wider swings both ways, not a direction. Calm funding (SOFR − EFFR small) means a dash for cash is less likely.",
-    "change": "VIX/VIX3M back below 1 ends the stress read; SOFR − EFFR above 15 bp would make it a funding squeeze (gold sold for cash)"
-   },
-   {
-    "rank": 3,
     "lean": 1,
     "fx": "Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.",
     "k": "real",
@@ -918,7 +891,7 @@
     "change": "10Y TIPS back above 2.78% (+15 bp)"
    },
    {
-    "rank": 4,
+    "rank": 3,
     "lean": 1,
     "fx": "A falling US 2Y against a steady EA 2Y narrows the rate gap: EUR/USD support.",
     "k": "policy",
@@ -935,7 +908,7 @@
     "change": "the 2Y back up 15 bp"
    },
    {
-    "rank": 5,
+    "rank": 4,
     "lean": 0,
     "fx": null,
     "k": "pos",
@@ -952,7 +925,7 @@
     "change": "the next COT (Friday) moving net length into the top or bottom 20% of its 3-year range"
    },
    {
-    "rank": 6,
+    "rank": 5,
     "lean": -1,
     "fx": null,
     "k": "price",
@@ -972,6 +945,33 @@
     ],
     "why": "The tested score shows no edge (auction): price location is a tiebreaker, never the direction.",
     "change": "a weekly close above the 10-week average 4160, or the score crossing +0.25"
+   },
+   {
+    "rank": 6,
+    "lean": 0,
+    "fx": null,
+    "k": "stress",
+    "score": 0.4,
+    "title": "Stress gauges calm (VIX 20)",
+    "evidence": [
+     {
+      "text": "VIX 19.9, VIX/VIX3M 0.96 (normal)",
+      "asOf": "2026-11-09",
+      "source": "Cboe via FRED VIXCLS / VXVCLS"
+     },
+     {
+      "text": "HY OAS 3.42%, −2 bp on the week",
+      "asOf": "2026-11-06",
+      "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
+     },
+     {
+      "text": "SOFR − EFFR 0 bp",
+      "asOf": "2026-11-09",
+      "source": "NY Fed SOFR / EFFR via FRED"
+     }
+    ],
+    "why": "No stress premium: gold trades on rates and the dollar.",
+    "change": "VIX above 25 or an inverted VIX curve"
    }
   ],
   "hypotheses": [],
@@ -3901,7 +3901,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-10 14:34 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 2 agree, 3 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning, Regime. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (GDP m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.78% (+15 bp from 2.63%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.65. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP GDP m/m on Thu, 12 Nov is the week's pivot | 2. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 3. Real yields fell 28 bp in 4 weeks (10Y TIPS 2.63%) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). GBP GDP m/m (Thu 12 Nov, 07:00 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: GBP GDP m/m 2026-11-12 07:00 UTC: consensus 0.0% (previous 0.1%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-10 15:49 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 2 agree, 3 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning, Regime. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (GDP m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.78% (+15 bp from 2.63%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.65. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP GDP m/m on Thu, 12 Nov is the week's pivot | 2. Real yields fell 28 bp in 4 weeks (10Y TIPS 2.63%) | 3. Policy path: the 2Y fell 29 bp in 4 weeks (4.51%) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). GBP GDP m/m (Thu 12 Nov, 07:00 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: GBP GDP m/m 2026-11-12 07:00 UTC: consensus 0.0% (previous 0.1%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "eventsRecord": {
   "n": 0,
   "open": 1
