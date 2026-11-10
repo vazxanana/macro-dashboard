@@ -3418,6 +3418,33 @@
     ],
     "stopCheckedAt": "2026-11-10T03:57:54.000Z",
     "brokerStop": 74264.76
+   },
+   "eurusd-scalp-1794284173": {
+    "positionId": "47896646",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-10T04:17:15.000Z",
+    "councilEntry": 1.1223,
+    "stop": 1.12186,
+    "t1": 1.12336,
+    "riskCash": 1.99,
+    "margin": 8.98,
+    "shadow": true,
+    "mark": 1.1223,
+    "levelsFrom": "mark",
+    "fillPrice": 1.12222,
+    "slipR": -0.182,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T04:17:15.000Z",
+    "brokerStop": 1.12178
    }
   },
   "day": {
@@ -3425,7 +3452,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9971.1 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9971.1 · 26 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3463,14 +3490,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9971.1,
-  "lastRun": "2026-11-10T04:14:55.000Z"
+  "lastRun": "2026-11-10T04:17:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T10:18:03.000Z",
-   "msg": "opened buy GBPUSD 0.04 lot (council scalp)",
-   "trade": "gbpusd-scalp-1794219424"
-  },
   {
    "at": "2026-11-09T10:20:56.000Z",
    "msg": "placed sell limit EURUSD 0.04 lot at 1.11937 (council rscalp, valid to 2026-11-09T13:19Z)",
@@ -4965,6 +4987,11 @@
    "at": "2026-11-10T04:05:21.000Z",
    "msg": "placed buy limit SOLUSD 0.01 lot at 85.7 (council rscalp, valid to 2026-11-10T07:04Z)",
    "trade": "sol-rscalp-1794283456"
+  },
+  {
+   "at": "2026-11-10T04:17:15.000Z",
+   "msg": "opened buy EURUSD 0.04 lot (council scalp)",
+   "trade": "eurusd-scalp-1794284173"
   }
  ],
  "limits": {
@@ -5043,8 +5070,8 @@
   ]
  },
  "execution": {
-  "n": 115,
-  "meanSlipR": 0.011,
+  "n": 116,
+  "meanSlipR": 0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
   "medianLagSec": 161,
@@ -5062,8 +5089,8 @@
     "meanSlipR": -0.087
    },
    "EURUSD": {
-    "n": 19,
-    "meanSlipR": -0.032
+    "n": 20,
+    "meanSlipR": -0.039
    },
    "GBPUSD": {
     "n": 18,
