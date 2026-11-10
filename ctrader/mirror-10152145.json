@@ -4243,7 +4243,8 @@
     "t1": 74795.6,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 74363.1,
@@ -4257,7 +4258,8 @@
     "lagSec": 176,
     "positionId": "47983029",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T09:37:03.000Z"
    }
   },
   "day": {
@@ -4265,7 +4267,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9915.87 · 22 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9914.27 · 21 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4303,15 +4305,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9915.87,
-  "lastRun": "2026-11-10T09:34:17.000Z"
+  "balance": 9914.27,
+  "lastRun": "2026-11-10T09:37:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:09:31.000Z",
-   "msg": "moved USDCHF 47373488 protection: stop 0.8229724 -> 0.8224924, target 0.8004952 -> 0.8000152 (council swing)",
-   "trade": "usdchf-swing-1793762425"
-  },
   {
    "at": "2026-11-09T15:09:31.000Z",
    "msg": "moved USDCHF 47373493 protection: stop 0.81762 -> 0.81714, target 0.82293 -> 0.82245 (council scalp)",
@@ -5805,6 +5802,11 @@
   {
    "at": "2026-11-10T09:32:56.000Z",
    "msg": "limit filled: BTCUSD position 47983029 at the broker",
+   "trade": "btc-rscalp-1794302960"
+  },
+  {
+   "at": "2026-11-10T09:37:03.000Z",
+   "msg": "BTCUSD position 47983029 closed at the broker",
    "trade": "btc-rscalp-1794302960"
   }
  ],
