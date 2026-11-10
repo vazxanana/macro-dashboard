@@ -131,8 +131,17 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 9. layers and context
   await p.click('#laydd summary'); for (const l of ['ema20', 'ema50', 'vol', 'sess', 'pdhl', 'anim']) await p.click(`.ddp [data-l=${l}]`).catch(() => {}); await p.keyboard.press('Escape');
   check('layer toggles flip state', await p.evaluate(() => JSON.parse(localStorage.getItem('btLab:layers') || '{}').ema20 === true));
-  await p.click('#ctxdd summary'); await p.click('[data-htf="4h"]'); await p.waitForFunction(() => /context ·|failed/.test(document.getElementById('htf-title').textContent), null, { timeout: 60000 }).catch(() => {});
-  check('H4 context chart loads', /4H context/.test(await txt(p, '#htf-title')), await txt(p, '#htf-title'));
+  // split view (10 Nov): Layout puts up to four charts side by side, each on its own timeframe, all at the replay's moment
+  const paneWait = () => p.waitForFunction(() => [...document.querySelectorAll('.xp-t')].every((e) => !/Loading/.test(e.textContent)), null, { timeout: 60000 }).catch(() => {});
+  check('session form: ten timeframes, 1 minute to 1 day', (await p.$$eval('#tfchips button', (e) => e.map((x) => x.textContent))).join(' ') === '1m 2m 5m 10m 15m 30m 1h 2h 4h D' && await p.$eval('#tfchips [aria-pressed="true"]', (e) => e.dataset.tf) === '15m');
+  await p.click('#splitdd summary'); await p.click('#splitdd [data-split="2"]'); await p.waitForSelector('.xp'); await p.selectOption('.xp .xp-tf', '4h'); await paneWait();
+  check('H4 chart loads beside the replay, its last candle forming', await p.$eval('#panes', (e) => e.dataset.n) === '2' && /forming/.test(await txt(p, '.xp .xp-t')), await txt(p, '.xp .xp-t'));
+  await p.click('#splitdd summary'); await p.click('#splitdd [data-split="4"]'); await p.waitForFunction(() => document.querySelectorAll('.xp').length === 3); await p.selectOption('.xp:last-child .xp-tf', '5m'); await paneWait(); await p.waitForTimeout(300);
+  { const sp = await p.evaluate(() => { const s = ctSplit(); return { n: s.n, panes: s.panes.map((P) => ({ tf: P.tf, rel: P.rel, n: P.n, ok: !!P.last && P.last.close === s.close && (P.rel === 'lower' ? P.last.time + P.sec <= s.now + 900 : P.last.time <= s.now) && (P.rel !== 'higher' || (Math.abs(P.last.high - P.hi) < 1e-9 && Math.abs(P.last.low - P.lo) < 1e-9)) })) }; });
+    check('four charts: every pane ends at the replay moment (no candle from the future)', sp.n === 4 && sp.panes.length === 3 && sp.panes.every((x) => x.ok && x.n > 20) && sp.panes.some((x) => x.rel === 'lower') && sp.panes.some((x) => x.rel === 'higher'), JSON.stringify(sp));
+    const g = await p.evaluate(() => { const r = (id) => document.getElementById(id).getBoundingClientRect(), c = r('chart'), q = r('qtr'); return q.left >= c.left - 1 && q.right <= c.right + 1 && document.documentElement.scrollWidth <= innerWidth; }); check('four charts: quick Buy / Sell stays on the first chart, no sideways scroll', g); await p.screenshot({ path: OUT + 'ct-split4.png' }); }
+  await p.click('#splitdd summary'); await p.click('#splitdd [data-split="1"]'); await p.waitForTimeout(250);
+  check('back to one chart: the panes are gone', (await p.$$('.xp')).length === 0 && await p.$eval('#panes', (e) => getComputedStyle(e).display) === 'contents');
   // 10. drawings
   const box = await p.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
   await p.click('#drawdd summary'); await p.click('[data-dt=h]'); await p.mouse.click(box.x + box.w * 0.5, box.y + box.h * 0.25);
@@ -276,8 +285,8 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     } else {
       check('390×844: one toolbar row; replay, speed, jump, More and Buy / Sell in sight without scrolling', L.tb.h <= 64 && Math.abs(L.more.t - L.play.t) < 8 && ['play', 'sp', 'jump', 'more', 'buy', 'sell'].every(inView) && !inView('draw') && L.sw <= L.vw + 1, JSON.stringify(L));
 await q.click('#tb-more'); await q.waitForTimeout(120);
-      const o = await q.evaluate(() => ['#laydd > summary', '#ctxdd > summary', '#drawdd > summary', '#snd-btn', '#fs-btn', '#tb-dock'].map((s) => { const b = document.querySelector(s).getBoundingClientRect(); return b.width > 0 && b.left >= 0 && b.right <= innerWidth && b.top >= 0 && b.bottom <= innerHeight; }));
-      check('phone: More shows Layers, Context, Draw, sound, full screen and toolbar position on screen', o.every(Boolean), JSON.stringify(o)); await q.screenshot({ path: OUT + 'ct-phone-more.png' });
+      const o = await q.evaluate(() => ['#laydd > summary', '#splitdd > summary', '#drawdd > summary', '#snd-btn', '#fs-btn', '#tb-dock'].map((s) => { const b = document.querySelector(s).getBoundingClientRect(); return b.width > 0 && b.left >= 0 && b.right <= innerWidth && b.top >= 0 && b.bottom <= innerHeight; }));
+      check('phone: More shows Layers, Layout, Draw, sound, full screen and toolbar position on screen', o.every(Boolean), JSON.stringify(o)); await q.screenshot({ path: OUT + 'ct-phone-more.png' });
       await q.click('#drawdd > summary'); check('phone: the Draw menu opens from More', await q.$eval('#drawdd', (e) => e.open));
       await q.mouse.click(8, 140); await q.waitForTimeout(80); check('phone: More closes on an outside tap', !(await q.$eval('#tb', (e) => e.classList.contains('more-open'))));
     }

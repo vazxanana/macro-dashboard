@@ -1039,6 +1039,26 @@ picker. "How it works" (`#how`) rewritten as six plain lines matching the curren
 (`pointer: coarse`); one 180 ms fade, none with reduced motion. No engine or stop logic changed. Audit: 148 checks (four steps, non-modal,
 Esc / Skip remembered, no return after a reload, per member, Surprise me, the flow done by doing it, defaults, empty states, AA dark /
 light, no infinite animation, reduced motion, 44 px at 390 touch).
+Split view and more timeframes (10 Nov, owner: "more timeframes, option to split chart max 4, timeframes", "improve the design buttons
+layout"): the replay timeframes are 1m, 2m, 5m, 10m, 15m, 30m, 1h, 2h, 4h and 1d (`TFS`; `api/bars.js` `TF` gained OANDA's M2, M10, M30
+and H2; `1w` is in `TFS` for the extra charts only). In the session form they are chips (`#tfchips`, built from the options of `#tf`,
+which stays in the page as the value the code reads and sets: its `value` setter moves the chip). **Layout** (`#splitdd`, in Chart
+tools, replaces the single "Context" chart; a saved `btLab:htf` becomes a two-chart layout) shows 1 to 4 charts in `#panes`: 2 = side
+by side, 3 = the main chart and two stacked beside it, 4 = two by two, stacked under 700 px of card width; one chart is
+`display: contents`, so the single layout is the page as it was. The extra charts are view panes (`XP`, `xpMake` / `xpLoad` /
+`xpDraw`; localStorage `btLab:split` `{ n, tfs }`): the same market at the replay's moment, each with its own timeframe select and a
+close button. **No look-ahead, in either direction**: a higher timeframe shows the fetched candles that ended before the cursor and
+builds its last candle from the replayed bars (`xpForm`, "last candle still forming"; the fetched candle that contains the cursor is
+never drawn); a lower timeframe shows only candles that closed by the end of the last replayed bar (refused above `XMAX` 40,000
+candles: "load fewer days"); the same timeframe mirrors the main chart. Panes redraw from `renderHtf()` (the name the page already
+called, in `panels()`), so they follow play, step, undo and jump; open trades and resting orders show on every pane as read-only
+price lines (`xpLines`); one crosshair moves across all charts (`xpCross`). Orders, drafts, drag lines and drawings stay on the first
+chart: `xpGeom` keeps the quick Buy / Sell bar and the legend on it (`--mr`, `.chartc.mnarrow` under 640 px). The toolbar starts with
+the market and timeframe as a button (`#tb-sess`, opens the session form). `window.ctSplit()` is the audit's read-only summary.
+Not done: changing the replay's own timeframe in the middle of a session (the engine steps on the loaded candles). Audit: 152 checks
+(the chips, a 4h pane, four charts with every pane ending at the replay moment, back to one chart); the audit reads the live candle
+proxy, so it only uses timeframes the live site already serves. Test: `tests/oanda-symbols.test.mjs` (page list = proxy list, each
+timeframe's OANDA granularity and the 4999-candle window).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
