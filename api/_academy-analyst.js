@@ -357,4 +357,4 @@ function digest(snapshot, n) {
   return { t: s.t, hash: MXA.hash(s), cand: s.cand || null, bars, dataVersion: s.dataVersion == null ? null : s.dataVersion };
 }
 
-module.exports = { PROMPT_VERSION, ACTIONS, CONFIDENCE, ADVICE, OUTCOME_KEYS, CONTEXT_FACTORS, ANSWER_KEYS, SCHEMA, SYSTEM, LIMITS, buildRequest, parseAnswer, record, digest, _t: { outcomeKeys, jsonOf, tradeOptions, near } };
+module.exports = { PROMPT_VERSION, ACTIONS, CONFIDENCE, ADVICE, OUTCOME_KEYS, CONTEXT_FACTORS, ANSWER_KEYS, SCHEMA, SHAPE, SYSTEM, LIMITS, buildRequest, parseAnswer, record, digest, _t: { outcomeKeys, jsonOf, tradeOptions, near } };

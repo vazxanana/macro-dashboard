@@ -788,7 +788,7 @@ async function analystAudit() {
   const nextPoint = async (p) => { await p.waitForSelector('#dec-stored', { timeout: 60000 }); await p.waitForFunction(() => /stored/.test(document.getElementById('dec-stored').textContent) && /paused on a setup/.test(document.getElementById('clock-state').textContent), null, { timeout: 60000 }); await p.waitForSelector('#an-block', { timeout: 10000 }); };
   const goOn = async (p) => { await p.click('#continue'); await p.waitForSelector('#dec-action', { state: 'detached', timeout: 20000 }); };
   const candNow = (p) => p.evaluate(() => { const x = window.MXAC.point(); return x ? { id: x.cur.cand.id, t: x.cur.cand.t, engine: x.cur.latest.decision.action } : null; });
-  let off = null, fake = null, b = null;
+  let off = null, fake = null, con = null, b = null;
   try {
     b = await chromium.launch();
     const P = Number(PORT);
@@ -875,10 +875,48 @@ async function analystAudit() {
       ok('390 px: the fake banner is still on screen with the answer', await vis(p, '#an-fake') && errs.length === 0, errs.slice(0, 2).join(' | '));
       await ctx.close();
     }
+    // ---- D. the connector: no provider key, the owner's own assistant answers through /api/academy-mcp ----
+    con = await start(P + 13, ['--connector']);
+    {
+      const { ctx, p, reqs, errs } = await open(b, con.base); await p.goto(con.base + '/academy', { waitUntil: 'load' }); await run(p, null);
+      await p.click('#c-play'); await nextPoint(p);
+      ok('connector: with no key the block says your own assistant answers, at no cost, and nothing waits', (await txt(p, '#an-via')) === 'Answered by your own assistant through the connector: no provider key, no cost. No question waits.' && (await p.getAttribute('#an-block', 'data-state')) === 'connector' && (await p.$$('#an-off, #an-auto')).length === 0, await txt(p, '#an-block'));
+      const m = reqs.length; await p.click('#an-ask'); await p.waitForSelector('#an-queued', { timeout: 20000 });
+      ok('connector: asking queues the question; the page says nothing was sent and nothing was charged', /^Waiting for your assistant: this question is number 1 of 1 in the queue\. Nothing was sent to a provider and nothing was charged\.$/.test(await txt(p, '#an-queued')) && /1 question waits for it\.$/.test(await txt(p, '#an-via')) && await p.isDisabled('#an-ask') && reqs.slice(m).join() === 'analyse', (await txt(p, '#an-queued')) + ' | ' + reqs.slice(m).join(' '));
+      await p.click('#an-connector'); await p.waitForSelector('#an-connector-url', { timeout: 10000 });
+      const url = await p.inputValue('#an-connector-url'), route = new URL(url).pathname;
+      ok('connector: "Set up the connector" shows the address and the five steps, and says what the assistant cannot do', /^https:\/\/[^/]+\/api\/academy-mcp\/[0-9a-f]{40}$/.test(url) && (await p.$$('#an-connector-steps li')).length === 5 && /never shown how a trade ended/.test(await txt(p, '#an-connector-box')), url.replace(/[0-9a-f]{40}$/, '<key>'));
+      // the assistant's side, the way its app calls the connector
+      const rpc = async (pathname, msg) => { const r = await fetch(con.base + pathname, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(msg) }); return { code: r.status, body: r.status === 202 ? null : await r.json() }; };
+      const tool = async (name, args = {}) => (await rpc(route, { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } })).body.result;
+      const wrong = await rpc('/api/academy-mcp/' + '0'.repeat(40), { jsonrpc: '2.0', id: 1, method: 'tools/list' });
+      const tools = (await rpc(route, { jsonrpc: '2.0', id: 2, method: 'tools/list' })).body.result.tools.map((t) => t.name);
+      ok('connector: a wrong key is refused; the right one lists four tools and nothing else', wrong.code === 401 && tools.join() === 'academy_guide,academy_pending,academy_question,academy_answer', wrong.code + ' ' + tools.join());
+      const pend = (await tool('academy_pending')).structuredContent, one = (await tool('academy_question', { id: pend.questions[0].id })).structuredContent;
+      const facts = JSON.parse(/<facts>\n([\s\S]*?)\n<\/facts>/.exec(one.question)[1]), ans = require(path.join(ROOT, 'scripts/academy-fake-llm.cjs')).answerFor(facts);
+      const refused = await tool('academy_answer', { id: pend.questions[0].id, answer: { ...ans, probability: 0.8 } });
+      const sent = (await tool('academy_answer', { id: pend.questions[0].id, answer: ans, by: 'audit assistant' })).structuredContent;
+      ok('connector: the assistant reads the waiting question (no result in it); an answer with a probability is refused, a clean one is stored', pend.pending === 1 && !/"(netR|exitT|mfeR|maeR)"/.test(one.question) && refused.isError === true && /probab|key/i.test(refused.content[0].text) && sent && sent.stored === true, JSON.stringify(sent || refused).slice(0, 200));
+      await p.click('#an-check'); await p.waitForSelector('#an-label', { timeout: 20000 });
+      ok('connector: "Check for the answer" shows it beside the engine\'s, said to come from your own assistant, stored apart, at no cost', /From your own assistant, through the connector\. It signed as: audit assistant\./.test(await txt(p, '#an-label')) && /no provider call, no cost/i.test(await txt(p, '#an-label')) && /^Analyst attempt 1 stored apart/.test(await txt(p, '#an-stored')) && (await p.getAttribute('#an-answer', 'data-action')) === ans.action && (await p.$$('#an-queued')).length === 0, await txt(p, '#an-label'));
+      const cost = await api(p, 'get=cost'), an = (await api(p, `get=attempts&edge=${EDGE}&engine=language-model`)).attempts;
+      ok('connector: nothing waits afterwards, the ledger is at zero and the answer is in the analyst\'s own file', /No question waits\.$/.test(await txt(p, '#an-via')) && cost.connector.pending === 0 && cost.total.usd === 0 && an.length === 1 && an[0].llm.provider === 'connector' && an[0].llm.costUsd === 0, JSON.stringify(cost.connector));
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); ok(`connector: AA contrast with the box and the answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      await p.evaluate(() => { delete document.documentElement.dataset.theme; });
+      ok('connector flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
+      await ctx.close();
+    }
+    {
+      const { ctx, p, errs } = await open(b, con.base, { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }); await p.goto(con.base + '/academy', { waitUntil: 'load' }); await run(p, null);
+      await p.tap('#c-play'); await nextPoint(p); await p.tap('#an-connector'); await p.waitForSelector('#an-connector-url', { timeout: 10000 }); await p.evaluate(() => document.getElementById('an-block').scrollIntoView());
+      const w = await p.evaluate(() => document.documentElement.scrollWidth), small = await p.evaluate(SMALL), taps = await p.evaluate(TAPS);
+      ok('connector, 390 px: no sideways scroll, every text 12 px or more, every control 44 px tall', w <= 390 && small.length === 0 && taps.length === 0 && errs.length === 0, [w, small.slice(0, 3).join(' ; '), taps.slice(0, 3).join(' ; '), errs.slice(0, 1).join()].join(' | '));
+      await ctx.close();
+    }
   } catch (e) { ok('the analyst audit ran to the end', false, e.message.split('\n')[0]); }
-  finally { if (b) await b.close().catch(() => {}); stop(off); stop(fake); }
+  finally { if (b) await b.close().catch(() => {}); stop(off); stop(fake); stop(con); }
   const bad = A.filter((r) => !r.ok);
   for (const r of A) console.log((r.ok ? 'ok   ' : 'FAIL ') + r.name + (r.ok || !r.info ? '' : ' :: ' + r.info));
-  console.log(`\nAcademy analyst audit: ${A.length - bad.length} of ${A.length} checks passed` + (bad.length ? `, ${bad.length} FAILED` : '') + ' (fake provider only: no real language-model call is ever made here)');
+  console.log(`\nAcademy analyst audit: ${A.length - bad.length} of ${A.length} checks passed` + (bad.length ? `, ${bad.length} FAILED` : '') + ' (a fake provider and a scripted assistant only: no real language-model call is ever made here)');
   return bad.length;
 }

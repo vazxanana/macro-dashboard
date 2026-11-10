@@ -24,6 +24,7 @@
 //   attempts&edge=&cand=&limit=             oldest first; a blind attempt hides its decision until the mentor has answered
 //   sessions · session&id=                  replay session index / one session with its state
 //   progress&edge= · mistakes&edge= · exams&edge= · dataset&edge= · notebook · models · cost · audit&month=YYYY-MM
+//   connector                               the address of the owner's assistant connector (api/academy-mcp.js) and how many questions wait
 //   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded;
 //                                           recall: true when the engine had decided that setup before (memory, not a fresh read)
 //   misses&edge=[&session=]                 the mentor's session notes: "the engine should have acted here" / "right to wait"
@@ -41,6 +42,7 @@ const { pathToFileURL } = require('node:url');
 const S = require('./_session.js');
 const ST = require('./_academy-store.js');
 const LLM = require('./_academy-llm.js');
+const CN = require('./_academy-connector.js');
 
 const MAX_BODY = 256 * 1024, DATASET_VERSION = 'layer-b-1';
 const CAPS = { attempts: 2000, corrections: 4000, exams: 4000, dataset: 4000, blind: 2000, misses: 2000, notebook: 1000, audit: 5000, lessons: 5000, sessions: 500 };
@@ -55,7 +57,7 @@ const MODEL_STATUS = ['baseline', 'challenger'], MISS_KINDS = ['missed', 'right-
 const STAT_KEYS = ['applied', 'replayPass', 'replayFail', 'examN', 'examAgree', 'examNetWith', 'examNetWithout'];
 // The analyst (the optional language model, docs/academy/LLM.md) answers apart from the deterministic engine: its attempts, the
 // corrections of them and their dataset rows live in their own files, so no statistic of the engine ever counts them.
-const ENGINES = ['deterministic', 'language-model'], ANALYST_CACHE_MAX = 150;
+const ENGINES = ['deterministic', 'language-model'], ANALYST_CACHE_MAX = 150, QUEUE_MAX = 25, QUEUE_TRIES = 3;
 const CAND_FIELDS = ['id', 'edge', 'market', 't', 'side', 'entry', 'stop', 'target', 'tf', 'rule', 'edgeVersion', 'pool'];   // a candidate never carries an outcome
 const OUT_FIELDS = ['id', 'R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR'];
 
@@ -185,7 +187,7 @@ function outcomeOf(raw, id) {
 // ---- small helpers ------------------------------------------------------------------------------------------------------
 const K = { lessons: 'lessons.json', attempts: (e) => `attempts/${e}.json`, corrections: (e) => `corrections/${e}.json`, sessions: 'sessions/index.json', session: (id) => `sessions/${id}.json`,
   seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', misses: (e) => `misses/${e}.json`, dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json` };
-const AK = { attempts: (e) => `analyst/attempts/${e}.json`, corrections: (e) => `analyst/corrections/${e}.json`, dataset: (e) => `analyst/dataset/${e}.json`, cache: 'analyst/cache.json' };
+const AK = { attempts: (e) => `analyst/attempts/${e}.json`, corrections: (e) => `analyst/corrections/${e}.json`, dataset: (e) => `analyst/dataset/${e}.json`, cache: 'analyst/cache.json', queue: 'analyst/queue.json' };
 const engineOf = (v, name = 'engine') => (v == null || v === '' ? 'deterministic' : oneOf(v, ENGINES, name));
 const keysFor = (engine) => (engine === 'language-model' ? AK : K);
 const emptySeen = () => ({ v: 1, ids: {} });
@@ -458,7 +460,20 @@ const GET = {
 
   async notebook(X) { return { notes: (await X.store.rows(K.notebook, true)).slice().reverse() }; },
   async models(X) { const m = await X.store.get(K.models, emptyModels()); return { models: m.models || [], championId: m.championId || null, history: (m.history || []).slice().reverse() }; },
-  async cost(X, q, d) { return LLM.status({ env: X.env, store: X.store, now: X.now, provider: d && d.provider }); },
+  // the language-model ledger; while no provider key is set, also the state of the owner's assistant connector (the questions
+  // waiting for it). `connector.on` = a question asked on the page is queued for the assistant instead of a provider call.
+  async cost(X, q, d) {
+    const st = await LLM.status({ env: X.env, store: X.store, now: X.now, provider: d && d.provider });
+    if (st.enabled) return st;
+    const why = CN.unavailable(X.env); if (why) return { ...st, connector: { on: false, reason: why } };
+    const rows = queueRows(await X.store.get(AK.queue, null));
+    return { ...st, connector: { on: true, pending: rows.length, max: QUEUE_MAX, oldest: rows.length ? rows[0].at : null } };
+  },
+  // the connector's address for the owner's assistant app. Owner session only (every route here is); the key is in the URL.
+  async connector(X, q, d) {
+    const why = CN.unavailable(X.env); if (why) return { available: false, reason: why };
+    return { available: true, url: CN.urlOf(X.env, d && d.host), pending: queueRows(await X.store.get(AK.queue, null)).length };
+  },
   async audit(X, q) {
     const month = q.month == null || q.month === '' ? X.iso().slice(0, 7) : /^\d{4}-(0[1-9]|1[0-2])$/.test(q.month) ? q.month : bad('month must be YYYY-MM');
     return { month, rows: (await X.store.rows(K.audit(month), true)).slice().reverse() };
@@ -719,9 +734,10 @@ const POST = {
   //   dryRun: true  -> the estimate only (no call, no ledger, no audit row)
   //   retry: true   -> ask again when the cached answer for this question was refused (a new, billed call)
   async analyse(X, b, d) {
-    const C = LLM.config(X.env), why = LLM.unavailable(C);
-    if (why) return { ok: true, available: false, reason: why };
-    let AN; try { AN = require('./_academy-analyst.js'); } catch (e) { return { ok: true, available: false, reason: 'the analyst module is not part of this build' }; }
+    // no provider key: the question waits for the owner's own assistant (the connector, api/academy-mcp.js) and no call is made
+    const C = LLM.config(X.env), why = LLM.unavailable(C), via = why && !CN.unavailable(X.env) ? CN.NAME : null;
+    if (why && !via) return { ok: true, available: false, reason: why };
+    const AN = analystModule(); if (!AN) return { ok: true, available: false, reason: 'the analyst module is not part of this build' };
     const edge = await X.edge(b.edge), candidateId = idOf(b.candidateId, 'candidateId'), ask = b.ask == null || b.ask === '' ? 'setup' : oneOf(b.ask, ['setup', 'position'], 'ask');
     const sn = obj(b.snapshot, 'snapshot'), t = num(sn.t, 'snapshot.t (the decision time)'), snapshotHash = text(sn.hash, 80, 'snapshot.hash', true), bars = safe(obj(sn.bars, 'snapshot.bars'), 'snapshot.bars');
     const features = featuresOf(b.features, 'features') || bad('features is required'), det = b.deterministic == null ? (ask === 'setup' ? bad('deterministic (the engine\'s answer) is required') : null) : safe(obj(b.deterministic, 'deterministic'), 'deterministic');
@@ -752,42 +768,119 @@ const POST = {
     const rq = AN.buildRequest({ edge: edgeDef, features, snapshotDigest: { t, hash: snapshotHash, cand: ask === 'setup' ? cand : null, bars, dataVersion: textOrNull(sn.dataVersion, 80, 'snapshot.dataVersion') }, deterministic: det, lessons, thesis,
       position: position ? { ...position, candidateId: ask === 'position' ? candidateId : idOrNull(position.candidateId, 'position.candidateId') } : null, calendar, ask, cost, examDecided: cand.pool === 'exam' && prior.length > 0 });
     if (!rq.ok) bad(`the request was refused before any call: ${rq.refusals.join('; ')}`, cand.pool === 'exam' && prior.length > 0 ? 409 : 400, { refusals: rq.refusals });
-    const provider = LLM.providerOf(C, d), fake = provider === LLM.FAKE_PROVIDER, mode = cand.pool === 'exam' ? 'exam' : prior.length ? 'replay-same' : 'train';
+    const provider = via || LLM.providerOf(C, d), fake = provider === LLM.FAKE_PROVIDER, mode = cand.pool === 'exam' ? 'exam' : prior.length ? 'replay-same' : 'train';
     const askKey = crypto.createHash('sha256').update(JSON.stringify([AN.PROMPT_VERSION, edge, candidateId, ask, snapshotHash, rq.context.lessonSignature, rq.context.thesisHash, rq.context.factsHash, C.url, C.model, C.format, C.analystMaxOut, provider])).digest('hex').slice(0, 40);
     const cacheDoc = await X.store.get(AK.cache, { v: 1, rows: [] }), hit0 = (cacheDoc && Array.isArray(cacheDoc.rows) ? cacheDoc.rows : []).find((r) => r && r.k === askKey) || null, redo = retry && !!hit0 && hit0.valid === false, hit = redo ? null : hit0;
-    const est = LLM.estimate(C, rq.system, rq.prompt, C.analystMaxOut);
+    const est = via ? { tokensIn: 0, maxTokensOut: 0, usd: 0 } : LLM.estimate(C, rq.system, rq.prompt, C.analystMaxOut);
     // what the page shows after an ask without reading the ledger again: today's spend, what is left, the calls left today
-    const budget = async () => { const s = await LLM.status({ env: X.env, store: X.store, now: X.now, provider: d.provider }); return { today: s.today, total: s.total, remaining: s.remaining, calls: s.calls }; };
+    const budget = async () => { if (via) return null; const s = await LLM.status({ env: X.env, store: X.store, now: X.now, provider: d.provider }); return { today: s.today, total: s.total, remaining: s.remaining, calls: s.calls }; };
     if (dryRun) return { ok: true, available: true, dryRun: true, engine: 'language-model', provider, fake, mode, promptVersion: AN.PROMPT_VERSION, cached: !!hit, estimate: hit ? { tokensIn: 0, maxTokensOut: 0, usd: 0 } : est, fresh: est, hardGates: rq.context.gates.map((g) => g.code), budget: await budget() };
+    const head = { ok: true, available: true, engine: 'language-model', provider, fake, model: null, promptVersion: AN.PROMPT_VERSION, mode };
+    if (via && !hit) {
+      // queued, not sent: one row per question (the same question asked again is the same row). The row holds the request the
+      // server built and checked (no result, no later bar) and what is needed to check and store the answer when it comes.
+      const queue = await X.write({ q: [AK.queue, { v: 1, rows: [] }], cache: [AK.cache, { v: 1, rows: [] }] }, ({ q, cache }, at) => {
+        const rows = queueRows(q), same = rows.find((r) => r.k === askKey), w = {};
+        if (redo) w.cache = { v: 1, rows: (cache && Array.isArray(cache.rows) ? cache.rows : []).filter((r) => r && r.k !== askKey) };   // asked again after a refused answer: that answer is forgotten
+        if (same) return { write: w, result: { id: same.id, at: same.at, position: rows.indexOf(same) + 1, pending: rows.length, fresh: false, tries: same.tries || 0, lastRefusal: same.lastRefusal || null } };
+        if (rows.length >= QUEUE_MAX) bad(`${QUEUE_MAX} questions already wait for your assistant: let it answer them first`, 409);
+        const row = { id: X.id('aq'), k: askKey, at, edge, candidateId, ask, pool: cand.pool, mode, t, snapshotHash, sessionId, engineAttemptId, detAction: det ? det.action : null, market: cand.market || null, side: cand.side || null,
+          features, prompt: rq.prompt, context: rq.context, tries: 0 };
+        w.q = { v: 1, rows: rows.concat(row) };
+        return { write: w, result: { id: row.id, at, position: rows.length + 1, pending: rows.length + 1, fresh: true, tries: 0, lastRefusal: null },
+          audit: { action: 'analyse', ids: [row.id, candidateId, engineAttemptId], summary: `${edge} ${mode}: question queued for the owner's assistant (the connector); no provider call, no cost` } };
+      });
+      return { ...head, queued: true, queue, cached: false, costUsd: 0, decision: null, refusals: [], attempt: null, budget: null };
+    }
     const out = hit ? { available: true, text: hit.text, stop: hit.stop || null, usage: hit.usage || null, costUsd: 0, provider: hit.provider || provider, model: hit.model || null, cached: true }
       : await LLM.complete({ system: rq.system, prompt: rq.prompt, cap: 'analyst', long: true, schema: rq.schema, schemaName: 'analyst_answer', fresh: redo }, { env: X.env, store: X.store, fetch: d.fetch, now: X.now, sleep: d.sleep, provider: d.provider });
-    const head = { ok: true, available: true, engine: 'language-model', provider: out.provider || provider, fake, model: out.model || null, promptVersion: AN.PROMPT_VERSION, mode };
+    head.provider = out.provider || provider; head.model = out.model || null;
     if (out.text == null) {   // over a budget or the call cap, or the call failed: said plainly, nothing stored as an answer
       await X.write({}, () => ({ audit: { action: 'analyse', ids: [candidateId, engineAttemptId], summary: `${edge} ${mode}: no analyst answer (${out.skipped ? `not sent: ${out.skipped}${out.scope ? `, ${out.scope}` : ''}` : out.error || 'the call failed'})` } }));
       return { ...head, ...out, provider: head.provider, decision: null, refusals: [], attempt: null, budget: await budget() };
     }
-    const pa = AN.parseAnswer(out.text, rq.context), refusals = pa.ok ? [] : pa.refusals.slice();
-    if (!pa.ok && out.stop === 'length') refusals.unshift('the answer was cut off at the output cap (ACADEMY_LLM_ANALYST_MAX_TOKENS): raise the cap, or lower the model\'s reasoning effort');
-    if (!pa.ok && out.stop === 'refusal') refusals.unshift('the provider declined to answer');
-    const usage = out.usage || { tokensIn: 0, tokensOut: 0, estimated: true }, costUsd = out.cached ? 0 : out.costUsd || 0;
-    const res = await X.write({ att: [kA, ST.emptyRows(), CAPS.attempts], ds: [kD, ST.emptyRows(), CAPS.dataset], cache: [AK.cache, { v: 1, rows: [] }] }, async ({ att, ds, cache }, at) => {
-      const A = R(att, kA), D = R(ds, kD), w = {};
-      if (!hit) { const rows = (cache && Array.isArray(cache.rows) ? cache.rows : []).filter((r) => r && r.k !== askKey).concat({ k: askKey, at, edge, candidateId, text: out.text, stop: out.stop || null, usage, provider: head.provider, model: head.model, valid: pa.ok }); w.cache = { v: 1, rows: rows.slice(-ANALYST_CACHE_MAX) }; }
-      const cents = `${usage.tokensIn} tokens in, ${usage.tokensOut} out, ${out.cached ? 'from the cache (no cost)' : `cost $${costUsd.toFixed(4)}`}`;
-      if (!pa.ok) return { write: w, result: { decision: null, attempt: null }, audit: { action: 'analyse', ids: [candidateId, engineAttemptId], summary: `${edge} ${mode}: analyst answer refused (${refusals[0]}); ${head.provider}, ${cents}` } };
-      const mine = (A.archives ? await X.store.rows(kA, true) : A.rows).filter((r) => r.candidateId === candidateId), same = mine.find((r) => r.askKey === askKey) || null;
-      if (same) return { write: w, result: { decision: same.decision, attempt: { id: same.id, n: same.n, mode: same.mode, stored: false } }, audit: { action: 'analyse', ids: [same.id, candidateId, engineAttemptId], summary: `${edge} ${same.mode}: analyst ${same.decision.action}, the same question as attempt ${same.n}; ${head.provider}, ${cents}` } };
-      if (cand.pool === 'exam' && mine.length) bad('this exam setup has already been decided by the analyst: a test setup is decided once', 409);
-      const n = mine.length + 1, m = cand.pool === 'exam' ? 'exam' : n > 1 ? 'replay-same' : 'train', decision = { id: X.id('dc'), ...AN.record(pa.decision, rq.context, { provider: head.provider }) };
-      const row = { id: X.id('an'), candidateId, edge, sessionId, n, at, mode: m, engine: 'language-model', decision, lessonsAvailable: rq.context.lessonIds, snapshotHash, engineAttemptId, askKey, ask,
-        llm: { provider: head.provider, model: head.model, promptVersion: AN.PROMPT_VERSION, tokensIn: usage.tokensIn, tokensOut: usage.tokensOut, estimated: !!usage.estimated, costUsd, cached: !!out.cached, stop: out.stop || null } };
-      const dsRow = { id: row.id, candidateId, snapshotHash, t, edge, edgeVersion: decision.edgeVersion, features, decision: { action: decision.action, entry: decision.entry, stop: decision.stop, target: decision.target, confidence: decision.confidence },
-        modelVersion: null, datasetVersion: DATASET_VERSION, mode: m, n, at, engine: 'language-model', mentor: null, outcome: null };
-      w.att = { ...A, rows: A.rows.concat(row) }; w.ds = { ...D, rows: D.rows.concat(dsRow) };
-      return { write: w, result: { decision, attempt: { id: row.id, n, mode: m, stored: true } },
-        audit: { action: 'analyse', ids: [row.id, candidateId, engineAttemptId], summary: `${edge} ${m}: analyst ${decision.action}${decision.forced ? ` (wanted ${decision.wanted.action}, held by ${decision.gates.map((g) => g.code).join(', ')})` : ''}, engine ${det ? det.action : 'n/a'}; ${head.provider}, ${cents}` } };
-    });
-    return { ...head, mode: res.attempt ? res.attempt.mode : mode, cached: !!out.cached, costUsd, usage, stop: out.stop || null, decision: res.decision, wanted: res.decision ? res.decision.wanted : null, forced: !!(res.decision && res.decision.forced), refusals, notes: pa.ok ? pa.notes : [], attempt: res.attempt, budget: await budget() };
+    const done = await analystStore(X, AN, { edge, candidateId, pool: cand.pool, mode, t, snapshotHash, features, sessionId, engineAttemptId, ask, askKey, context: rq.context, detAction: det ? det.action : null, out, head, hit: !!hit });
+    return { ...head, mode: done.res.attempt ? done.res.attempt.mode : mode, cached: !!out.cached, costUsd: done.costUsd, usage: done.usage, stop: out.stop || null, decision: done.res.decision, wanted: done.res.decision ? done.res.decision.wanted : null,
+      forced: !!(done.res.decision && done.res.decision.forced), refusals: done.refusals, notes: done.pa.ok ? done.pa.notes : [], attempt: done.res.attempt, budget: await budget() };
+  },
+};
+
+// ---- the analyst's answer: checked, then stored ------------------------------------------------------------------------------
+// loaded on first use: a build without the analyst module still serves everything else
+function analystModule() { try { return require('./_academy-analyst.js'); } catch (e) { return null; } }
+const queueRows = (doc) => (doc && Array.isArray(doc.rows) ? doc.rows.filter(isObj) : []);
+// One answer text for one question, from a provider call, the cache or the owner's assistant (o.queueId): the same check
+// (AN.parseAnswer) and the same write step for all three. A refused answer is never stored as an answer.
+// o: { edge, candidateId, pool, mode, t, snapshotHash, features, sessionId, engineAttemptId, ask, askKey, context, detAction,
+//      out: { text, stop, usage, costUsd, cached }, head: { provider, model }, hit, queueId? }
+async function analystStore(X, AN, o) {
+  const { edge, candidateId, askKey, out, head } = o, kA = AK.attempts(edge), kD = AK.dataset(edge);
+  const pa = AN.parseAnswer(out.text, o.context), refusals = pa.ok ? [] : pa.refusals.slice();
+  if (!pa.ok && out.stop === 'length') refusals.unshift('the answer was cut off at the output cap (ACADEMY_LLM_ANALYST_MAX_TOKENS): raise the cap, or lower the model\'s reasoning effort');
+  if (!pa.ok && out.stop === 'refusal') refusals.unshift('the provider declined to answer');
+  const usage = out.usage || { tokensIn: 0, tokensOut: 0, estimated: true }, costUsd = out.cached ? 0 : out.costUsd || 0;
+  const spec = { att: [kA, ST.emptyRows(), CAPS.attempts], ds: [kD, ST.emptyRows(), CAPS.dataset], cache: [AK.cache, { v: 1, rows: [] }] }; if (o.queueId) spec.q = [AK.queue, { v: 1, rows: [] }];
+  let triesLeft = null;
+  const res = await X.write(spec, async ({ att, ds, cache, q }, at) => {
+    const A = R(att, kA), D = R(ds, kD), w = {};
+    // the queued question: gone once it is answered; a refused answer may be sent again, QUEUE_TRIES times in all
+    let final = true;
+    if (o.queueId) { const rows = queueRows(q), i = rows.findIndex((r) => r.id === o.queueId);
+      if (i >= 0) { const tries = (rows[i].tries || 0) + 1; final = pa.ok || tries >= QUEUE_TRIES; triesLeft = final ? 0 : QUEUE_TRIES - tries;
+        w.q = { v: 1, rows: final ? rows.filter((r, k) => k !== i) : rows.map((r, k) => (k === i ? { ...r, tries, lastRefusal: String(refusals[0] || '').slice(0, 300), lastAt: at } : r)) }; } }
+    if (!o.hit && final) { const rows = (cache && Array.isArray(cache.rows) ? cache.rows : []).filter((r) => r && r.k !== askKey).concat({ k: askKey, at, edge, candidateId, text: out.text, stop: out.stop || null, usage, provider: head.provider, model: head.model, valid: pa.ok }); w.cache = { v: 1, rows: rows.slice(-ANALYST_CACHE_MAX) }; }
+    const cents = o.queueId ? 'through the connector, no provider call, no cost' : `${usage.tokensIn} tokens in, ${usage.tokensOut} out, ${out.cached ? 'from the cache (no cost)' : `cost $${costUsd.toFixed(4)}`}`;
+    if (!pa.ok) return { write: w, result: { decision: null, attempt: null }, audit: { action: 'analyse', ids: [candidateId, o.engineAttemptId], summary: `${edge} ${o.mode}: analyst answer refused (${refusals[0]}); ${head.provider}, ${cents}` } };
+    const mine = (A.archives ? await X.store.rows(kA, true) : A.rows).filter((r) => r.candidateId === candidateId), same = mine.find((r) => r.askKey === askKey) || null;
+    if (same) return { write: w, result: { decision: same.decision, attempt: { id: same.id, n: same.n, mode: same.mode, stored: false } }, audit: { action: 'analyse', ids: [same.id, candidateId, o.engineAttemptId], summary: `${edge} ${same.mode}: analyst ${same.decision.action}, the same question as attempt ${same.n}; ${head.provider}, ${cents}` } };
+    if (o.pool === 'exam' && mine.length) bad('this exam setup has already been decided by the analyst: a test setup is decided once', 409);
+    const n = mine.length + 1, m = o.pool === 'exam' ? 'exam' : n > 1 ? 'replay-same' : 'train', decision = { id: X.id('dc'), ...AN.record(pa.decision, o.context, { provider: head.provider }) };
+    const row = { id: X.id('an'), candidateId, edge, sessionId: o.sessionId, n, at, mode: m, engine: 'language-model', decision, lessonsAvailable: o.context.lessonIds, snapshotHash: o.snapshotHash, engineAttemptId: o.engineAttemptId, askKey, ask: o.ask,
+      llm: { provider: head.provider, model: head.model, promptVersion: AN.PROMPT_VERSION, tokensIn: usage.tokensIn, tokensOut: usage.tokensOut, estimated: !!usage.estimated, costUsd, cached: !!out.cached, stop: out.stop || null } };
+    const dsRow = { id: row.id, candidateId, snapshotHash: o.snapshotHash, t: o.t, edge, edgeVersion: decision.edgeVersion, features: o.features, decision: { action: decision.action, entry: decision.entry, stop: decision.stop, target: decision.target, confidence: decision.confidence },
+      modelVersion: null, datasetVersion: DATASET_VERSION, mode: m, n, at, engine: 'language-model', mentor: null, outcome: null };
+    w.att = { ...A, rows: A.rows.concat(row) }; w.ds = { ...D, rows: D.rows.concat(dsRow) };
+    return { write: w, result: { decision, attempt: { id: row.id, n, mode: m, stored: true } },
+      audit: { action: 'analyse', ids: [row.id, candidateId, o.engineAttemptId], summary: `${edge} ${m}: analyst ${decision.action}${decision.forced ? ` (wanted ${decision.wanted.action}, held by ${decision.gates.map((g) => g.code).join(', ')})` : ''}, engine ${o.detAction || 'n/a'}; ${head.provider}, ${cents}` } };
+  });
+  return { res, pa, refusals, usage, costUsd, triesLeft };
+}
+
+// ---- the owner's assistant connector (api/academy-mcp.js calls these; the page never does) -----------------------------------
+// It can list the queued questions, read one, and send one answer. A question is the request text the server built and checked
+// when the owner asked on the page: it never holds a result or a bar after the decision. An answer goes through analystStore.
+const CONNECTOR = {
+  // deps: { env, store?, data?, now? } -> the same request context the page's calls get, as the owner
+  context: (d = {}, env = process.env) => context({}, d, env, { u: 'owner' }),
+  async pending(X) {
+    return queueRows(await X.store.get(AK.queue, null)).map((r, i) => ({ id: r.id, position: i + 1, askedAt: r.at, edge: r.edge, market: r.market || null, side: r.side || null, ask: r.ask, kind: r.pool === 'exam' ? 'unseen setup (decided once)' : r.mode === 'replay-same' ? 'same trade again' : 'training setup',
+      tries: r.tries || 0, lastRefusal: r.lastRefusal || null }));
+  },
+  async question(X, id) {
+    const AN = analystModule() || bad('the analyst module is not part of this build', 503);
+    const r = queueRows(await X.store.get(AK.queue, null)).find((x) => x.id === id) || bad('no such question in the queue (it may have been answered already)', 404);
+    return { id: r.id, askedAt: r.at, edge: r.edge, ask: r.ask, tries: r.tries || 0, triesLeft: QUEUE_TRIES - (r.tries || 0), lastRefusal: r.lastRefusal || null, rules: AN.SYSTEM, question: r.prompt };
+  },
+  // text: the answer as the assistant wrote it (one JSON object). by: a short label the assistant gives itself, kept with the row.
+  async answer(X, id, text, by) {
+    const AN = analystModule() || bad('the analyst module is not part of this build', 503);
+    const r = queueRows(await X.store.get(AK.queue, null)).find((x) => x.id === id) || bad('no such question in the queue (it may have been answered already)', 404);
+    if (typeof text !== 'string' || !text.trim()) bad('the answer is empty');
+    if (text.length > 20000) bad('the answer is too long');
+    const label = typeof by === 'string' ? by.replace(CTRL, '').replace(/[^\w .:()\-/]/g, '').trim().slice(0, 60) : '';
+    const head = { provider: CN.NAME, model: label || null };
+    try {
+      const done = await analystStore(X, AN, { edge: r.edge, candidateId: r.candidateId, pool: r.pool, mode: r.mode, t: r.t, snapshotHash: r.snapshotHash, features: r.features, sessionId: r.sessionId || null, engineAttemptId: r.engineAttemptId || null, ask: r.ask, askKey: r.k,
+        context: r.context, detAction: r.detAction || null, out: { text, stop: null, usage: { tokensIn: 0, tokensOut: 0, estimated: true }, costUsd: 0, cached: false }, head, hit: false, queueId: r.id });
+      const d = done.res.decision;
+      return done.pa.ok ? { stored: true, action: d.action, wanted: d.forced && d.wanted ? d.wanted.action : null, forced: !!d.forced, heldBy: d.forced ? (d.gates || []).map((g) => g.code) : [], attempt: done.res.attempt, notes: done.pa.notes || [] }
+        : { stored: false, refusals: done.refusals, triesLeft: done.triesLeft, note: done.triesLeft ? 'Fix what the checks name and send the answer again.' : 'No try is left: the question left the queue. The owner can queue it again on the page.' };
+    } catch (e) {
+      if (!(e instanceof Bad) || e.status !== 409) throw e;
+      // it can never be stored (a test setup already decided): the question leaves the queue
+      await X.write({ q: [AK.queue, { v: 1, rows: [] }] }, ({ q }) => ({ write: { q: { v: 1, rows: queueRows(q).filter((x) => x.id !== id) } }, audit: { action: 'analyse', ids: [id, r.candidateId], summary: `${r.edge}: queued question dropped (${e.message})` } }));
+      return { stored: false, refusals: [e.message], triesLeft: 0, note: 'The question left the queue.' };
+    }
   },
 };
 
@@ -816,7 +909,7 @@ async function handle(req, res, d = {}) {
     if (req.method === 'GET') {
       const q = queryOf(req), fn = Object.prototype.hasOwnProperty.call(GET, q.get || '') ? GET[q.get] : null;
       if (!fn) bad(`unknown get: use one of ${Object.keys(GET).join(', ')}`);
-      return res.status(200).json(await fn(X, q, d));
+      return res.status(200).json(await fn(X, q, d.host ? d : { ...d, host: String((req.headers && (req.headers['x-forwarded-host'] || req.headers.host)) || '') }));
     }
     const b = bodyOf(req), fn = typeof b.action === 'string' && Object.prototype.hasOwnProperty.call(POST, b.action) ? POST[b.action] : null;
     if (!fn) bad(`unknown action: use one of ${Object.keys(POST).join(', ')}`);
@@ -829,4 +922,5 @@ async function handle(req, res, d = {}) {
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
-module.exports._t = { GET, POST, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite };
+module.exports.connector = CONNECTOR;
+module.exports._t = { GET, POST, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite, QUEUE_MAX, QUEUE_TRIES, Bad };

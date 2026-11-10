@@ -12,10 +12,16 @@
 // output with its provider and cost. A provider called "fake-test" is the local test double: the block then carries a banner
 // that says so. Every call goes through the page's paced wrapper (MXAC.api: at most 24 Academy calls a minute).
 // No key, no provider address and no model name ever reach the browser.
+//
+// The connector (10 Nov 2026): with no provider key on the server, the question is QUEUED instead of sent, and the owner's own
+// assistant answers it through the connector (api/academy-mcp.js): no key, no cost. The block then says how many questions wait,
+// offers "Check for the answer", and shows the answer exactly as a provider's (the server checks it the same way). The connector's
+// address carries its key: it is read only when the owner opens "Set up the connector", shown once, and kept in no storage.
 (function (root) {
   'use strict';
   const NODE = typeof module !== 'undefined' && module.exports;
   const FAKE = 'fake-test', DOC = 'docs/academy/LLM.md', FAKE_BANNER = 'FAKE PROVIDER: test answers, not a language model';
+  const CONNECTOR = 'connector';   // the provider label of an answer that came from the owner's assistant
   const REASONS = [['missing-confirmation', 'Missing confirmation'], ['wrong-structure', 'Wrong structure'], ['liquidity', 'Liquidity'], ['htf-bias', 'Higher-timeframe bias'], ['session', 'Session'], ['volatility', 'Volatility'], ['rr', 'Reward to risk'], ['news', 'News'], ['late', 'Late'], ['early', 'Early'], ['other', 'Other']];
   const fin = (x) => typeof x === 'number' && isFinite(x);
   const usd = (v) => '$' + (fin(v) && v > 0 ? (v < 0.01 ? v.toFixed(4) : v.toFixed(2)) : '0.00');
@@ -73,7 +79,8 @@
   }
   // what the answer cost, in words
   function costText(res) {
-    const u = res.usage || {}; if (res.cached) return 'answered from the cache: no call, no cost';
+    const u = res.usage || {}; if (res.provider === CONNECTOR) return 'answered by your own assistant through the connector: no provider call, no cost';
+    if (res.cached) return 'answered from the cache: no call, no cost';
     return `cost ${usd(res.costUsd)}${u.estimated ? ' (estimated: the provider reported no usage)' : ''}, ${fin(u.tokensIn) ? u.tokensIn.toLocaleString('en-US') : 'n/a'} tokens in, ${fin(u.tokensOut) ? u.tokensOut.toLocaleString('en-US') : 'n/a'} out`;
   }
   // what to say when no answer came back
@@ -84,14 +91,29 @@
     return 'No answer came back.';
   }
 
-  const MXAN = { FAKE, DOC, FAKE_BANNER, REASONS, usd, digestOf, positionOf, blocked, payloadOf, offText, budgetText, runEstimate, setupsLeft, costText, failText };
+  // the connector: is it the analyst's way here, what waits, what a queued question says, how to set it up
+  const viaConnector = (cost) => !!(cost && !cost.enabled && cost.connector && cost.connector.on);
+  function connectorText(cost) {
+    const n = cost && cost.connector && fin(cost.connector.pending) ? cost.connector.pending : 0;
+    return `Answered by your own assistant through the connector: no provider key, no cost. ${n ? `${count(n, 'question')} ${n === 1 ? 'waits' : 'wait'} for it.` : 'No question waits.'}`;
+  }
+  function queuedText(res) {
+    const q = (res && res.queue) || {}, n = fin(q.pending) ? q.pending : 1;
+    return `Waiting for your assistant: this question is number ${fin(q.position) ? q.position : 1} of ${n} in the queue. Nothing was sent to a provider and nothing was charged.`
+      + (q.lastRefusal ? ` Its last answer was refused by the checks (${q.lastRefusal}); it can send another.` : '');
+  }
+  const SAY = 'Answer my Academy questions';
+  const connectorSteps = () => ['Copy the address below. It carries the key: treat it like a password and do not share it.', 'In your assistant app, add a custom connector and paste the address.', 'Ask the analyst on a decision here: the question is queued.',
+    `In the assistant, say: "${SAY}". It reads each question and sends its answer back; the site checks every answer before it counts.`, 'Come back here and press "Check for the answer".'];
+
+  const MXAN = { FAKE, CONNECTOR, DOC, FAKE_BANNER, REASONS, SAY, usd, digestOf, positionOf, blocked, payloadOf, offText, budgetText, runEstimate, setupsLeft, costText, failText, viaConnector, connectorText, queuedText, connectorSteps };
   if (NODE) { module.exports = MXAN; return; }
   root.MXAN = MXAN;
   if (typeof document === 'undefined' || !root.MXAC || !root.MXAC.kit || !root.MXAC.api) return;
 
   // ---- the page -----------------------------------------------------------------------------------------------------
   const A = root.MXAC, K = A.kit, api = A.api, MXA = root.MXA, el = K.el, clear = K.clear, $ = (id) => document.getElementById(id);
-  const ST = { cost: undefined, costErr: '', loading: null, by: {}, auto: false, autoNote: '', plan: null, planFor: null };
+  const ST = { cost: undefined, costErr: '', loading: null, by: {}, auto: false, autoNote: '', plan: null, planFor: null, setup: null };   // setup: the connector box (never stored)
   const point = () => (typeof A.point === 'function' ? A.point() : null);
   const state = (id) => (ST.by[id] = ST.by[id] || { asking: false, res: null, err: '', first: null, correction: null, form: { choice: null, reasons: [], text: '' }, lesson: null, savedLesson: null, cmp: null, note: '' });
   const price = (v) => (fin(v) ? A.fmtPrice(v) : 'none');
@@ -114,7 +136,8 @@
       else {
         if (res.decision && !s.first) s.first = res; else if (res.decision && s.correction) s.cmp = MXA.compare(s.first.decision, res.decision, s.correction);
         if (res.decision && s.first && s.first !== res && res.attempt && res.attempt.stored === false) s.note = 'Nothing has changed since the last answer (the same lessons, the same thesis), so it came from the cache at no cost. Save a lesson first, then ask again.';
-        s.res = res;
+        { const was = s.res, cn = ST.cost && ST.cost.connector; s.res = res;   // the connector's count: what the server says while it waits, one less once it has been answered
+          if (cn && cn.on) { if (res.queued && res.queue && fin(res.queue.pending)) cn.pending = res.queue.pending; else if (was && was.queued) cn.pending = Math.max(0, (cn.pending || 0) - 1); } }
         if (!res.decision && ST.auto && (res.skipped === 'budget' || res.error)) { ST.auto = false; ST.autoNote = res.skipped === 'budget' ? 'Asking on every setup stopped: ' + failText(res).replace(/^Not sent: /, '') + ' Nothing more was sent.' : 'Asking on every setup stopped: the last call failed. Nothing more is sent until you switch it on again.'; }
       }
     } catch (e) { s.err = e.message; if (ST.auto) { ST.auto = false; ST.autoNote = 'Asking on every setup stopped: the last request was refused.'; } }
@@ -130,6 +153,15 @@
       if (dry.available === false) { ST.cost = Object.assign({}, ST.cost || {}, { enabled: false, reason: dry.reason }); ST.plan = null; }
       else ST.plan = runEstimate(dry.fresh ? dry.fresh.usd : dry.estimate.usd, setupsLeft(pt, !!(s.res && s.res.decision)), ST.cost);   // `fresh`: what one new ask costs at most, even when this setup's own answer is already cached
     } catch (e) { ST.plan = { error: e.message }; }
+    draw();
+  }
+
+  // the connector's address, read only when the owner asks for it
+  async function openSetup() {
+    if (ST.setup && !ST.setup.error) { ST.setup = null; draw(); return; }
+    ST.setup = { loading: true }; draw();
+    try { const j = await api.get({ get: 'connector' }); ST.setup = j.available ? { url: j.url } : { error: cap(j.reason || 'the connector is not available') + '.' }; }
+    catch (e) { ST.setup = { error: `The address could not be read: ${e.message}.` }; }
     draw();
   }
 
@@ -160,15 +192,21 @@
   const evidence = (items, cls, none, id) => K.listOr(el('ul', { class: 'ev-list ' + cls, id }), items || [], none, (x) => el('li', {}, el('span', { text: x.text }), el('span', { class: 'w', title: 'the factor this item names', text: A.featLabel ? A.featLabel(x.factor) : x.factor })));
   function answerView(box, pt, s) {
     const res = s.res, eng = pt.cur.latest.decision, exam = !!pt.cur.exam;
+    if (res.queued) {
+      box.appendChild(el('p', { class: 'note', id: 'an-queued', role: 'status', text: queuedText(res) }));
+      box.appendChild(el('p', { id: 'an-say' }, 'In your assistant, say: ', el('b', { text: `"${SAY}"` }), '. Then:'));
+      box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'an-check', disabled: !!s.asking, text: s.asking ? 'Checking…' : 'Check for the answer', onclick: () => ask() })));
+      return;
+    }
     if (!res.decision) {
       if (res.refusals && res.refusals.length) {
-        box.appendChild(el('div', { class: 'ac-err', id: 'an-refused', role: 'alert' }, 'The analyst\'s answer was refused by the checks and nothing was stored as an answer. ', el('span', { text: `It was a call to ${res.provider || 'the provider'}: ${costText(res)}.` }), list(res.refusals, '', 'an-refusals')));
-        if (!exam) box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn', id: 'an-retry', text: 'Ask again (a new, billed call)', onclick: () => ask({ retry: true }) })));
+        box.appendChild(el('div', { class: 'ac-err', id: 'an-refused', role: 'alert' }, 'The analyst\'s answer was refused by the checks and nothing was stored as an answer. ', el('span', { text: res.provider === CONNECTOR ? 'It came from your assistant through the connector: nothing was charged.' : `It was a call to ${res.provider || 'the provider'}: ${costText(res)}.` }), list(res.refusals, '', 'an-refusals')));
+        if (!exam) box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn', id: 'an-retry', text: res.provider === CONNECTOR ? 'Queue the question again' : 'Ask again (a new, billed call)', onclick: () => ask({ retry: true }) })));
       } else box.appendChild(el('p', { class: 'ac-warn', id: 'an-none', role: 'status', text: failText(res) }));
       return;
     }
     const d = res.decision, at = res.attempt || {}, row = (label, a, b) => el('tr', {}, el('td', { text: label }), el('td', {}, a), el('td', {}, b));
-    box.appendChild(el('p', { class: 'an-label', id: 'an-label' }, el('b', { text: 'Language-model output. ' }), `Provider: ${res.provider || 'not named'}. `, res.model && res.model !== res.provider ? `Model as the provider reported it: ${res.model}. ` : '', `${cap(costText(res))}. `,
+    box.appendChild(el('p', { class: 'an-label', id: 'an-label' }, el('b', { text: 'Language-model output. ' }), res.provider === CONNECTOR ? 'From your own assistant, through the connector. ' : `Provider: ${res.provider || 'not named'}. `, res.model && res.model !== res.provider ? (res.provider === CONNECTOR ? `It signed as: ${res.model}. ` : `Model as the provider reported it: ${res.model}. `) : '', `${cap(costText(res))}. `,
       el('span', { class: 'ac-ok', id: 'an-stored', text: at.id ? `Analyst attempt ${at.n} stored apart ✓` : '' })));
     box.appendChild(el('div', { class: 'tbl' }, el('table', { class: 'cmp', id: 'an-cmp' }, el('thead', {}, el('tr', {}, el('th', { text: '' }), el('th', { text: 'Engine' }), el('th', { text: 'Analyst' }))),
       el('tbody', {}, row('Action', K.actBadge(eng.action, true, 'an-eng-action'), K.actBadge(d.action, true, 'an-action')), row('Confidence', eng.confidence || 'n/a', el('span', { id: 'an-conf', text: d.confidence || 'n/a' })),
@@ -223,10 +261,38 @@
     host.appendChild(el('h3', { id: 'an-title' }, 'Analyst (language model)', el('small', { text: 'optional · asked only when you ask · its answers are stored apart from the engine\'s' })));
     if (cost === undefined) { host.appendChild(el('p', { class: 'note', id: 'an-wait', role: 'status', text: 'Checking whether the analyst is switched on…' })); loadCost(); return; }
     if (cost === null) { host.appendChild(el('p', { class: 'ac-err', id: 'an-cost-err', text: `Whether the analyst is switched on could not be read: ${ST.costErr}. Nothing was sent.` })); host.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn', id: 'an-reload', text: 'Try again', onclick: () => loadCost(true) }))); return; }
+    if (viaConnector(cost)) {
+      host.dataset.state = 'connector';
+      const answered = !!(s.res && s.res.decision), waiting = !!(s.res && s.res.queued), once = exam && answered;
+      host.appendChild(el('p', { id: 'an-via', text: connectorText(cost) }));
+      host.appendChild(el('div', { class: 'f-actions' },
+        el('button', { type: 'button', class: 'btn' + (answered || waiting ? '' : ' primary'), id: 'an-ask', disabled: !!why || s.asking || once || waiting || !!s.correction, text: s.asking ? 'One moment…' : answered ? 'Ask again' : waiting ? 'Queued' : 'Ask the analyst', onclick: () => ask() }),
+        el('button', { type: 'button', class: 'btn', id: 'an-connector', 'aria-expanded': ST.setup ? 'true' : 'false', text: ST.setup && !ST.setup.error ? 'Hide the connector' : 'Set up the connector', onclick: openSetup }),
+        el('span', { class: 'ac-status', id: 'an-msg', role: 'status', text: s.asking ? 'Asking the Academy…' : '' })));
+      if (ST.setup) {
+        const P = ST.setup, box = el('div', { class: 'an-plan', id: 'an-connector-box', role: 'group', 'aria-label': 'Set up the connector' });
+        if (P.loading) box.appendChild(el('p', { class: 'note', text: 'Reading the address…' }));
+        else if (P.error) box.appendChild(el('p', { class: 'ac-err', id: 'an-connector-err', text: P.error }));
+        else {
+          box.appendChild(el('ol', { class: 'txt-list', id: 'an-connector-steps' }, connectorSteps().map((t) => el('li', { text: t }))));
+          const inp = el('input', { type: 'text', id: 'an-connector-url', readonly: 'readonly', value: P.url, 'aria-label': 'The connector address', onfocus: (e) => e.target.select() });
+          box.appendChild(el('label', { class: 'f' }, el('span', { text: 'Connector address' }), inp));
+          box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn', id: 'an-connector-copy', text: P.copied ? 'Copied ✓' : 'Copy the address', onclick: () => { const done = () => { P.copied = true; draw(); }; if (root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText) root.navigator.clipboard.writeText(P.url).then(done, () => { inp.focus(); inp.select(); }); else { inp.focus(); inp.select(); } } })));
+          box.appendChild(el('p', { class: 'note', text: 'The assistant can only read the queued questions and send answers. It is never shown how a trade ended, it cannot change a lesson, and nothing here places an order.' }));
+        }
+        host.appendChild(box);
+      }
+      if (why) host.appendChild(el('p', { class: 'note', id: 'an-blocked', text: cap(why) + '.' }));
+      if (once) host.appendChild(el('p', { class: 'note', id: 'an-once', text: 'A test setup is decided once by each engine: the analyst is not asked again on it.' }));
+      if (s.err) host.appendChild(el('p', { class: 'ac-err', id: 'an-err', role: 'alert', text: s.err + (/[.!?]$/.test(s.err) ? '' : '.') + ' Nothing was stored.' }));
+      if (s.res) { const ans = el('div', { class: 'an-ans', id: 'an-answer', 'data-provider': s.res.provider || '', 'data-action': s.res.decision ? s.res.decision.action : '', 'data-queued': s.res.queued ? 'yes' : 'no' }); answerView(ans, pt, s); host.appendChild(ans); }
+      if (s.first && s.first.decision && s.first.attempt && !exam) { const m = el('div', { class: 'an-mentor', id: 'an-mentor' }); mentorView(m, pt, s); host.appendChild(m); }
+      return;
+    }
     if (!cost.enabled) {
       host.dataset.state = 'off';
       host.appendChild(el('p', { id: 'an-off', text: offText(cost) }));
-      host.appendChild(el('p', { class: 'note', id: 'an-howto', text: `To switch it on, set the key and the other variables on the server as ${DOC} describes (names, meanings, budgets, the first-run checklist). Until then every decision here is the deterministic engine's.` }));
+      host.appendChild(el('p', { class: 'note', id: 'an-howto', text: `To switch it on, set the key and the other variables on the server as ${DOC} describes (names, meanings, budgets, the first-run checklist)${cost.connector && cost.connector.reason ? `, or use your own assistant through the connector (not available here: ${cost.connector.reason})` : ''}. Until then every decision here is the deterministic engine's.` }));
       return;
     }
     host.dataset.state = 'on';

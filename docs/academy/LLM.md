@@ -10,6 +10,18 @@ until the owner sets a key. While it is off the page says so, nothing is sent an
 project has no key.** The request and response shapes were checked against the providers' public API documentation on
 10 Nov 2026. The first real call is the owner's (see the first-run checklist).
 
+## 0. Two ways to get the analyst's answer
+
+| | A provider key (sections 3 to 8) | Your own assistant, through the connector (section 9) |
+|---|---|---|
+| What you set up | A paid API key and a budget in Vercel | One address pasted into your assistant app |
+| Cost | Billed per answer by the provider | None from this site: it runs on your own assistant subscription |
+| When the answer comes | A few seconds after "Ask the analyst" | When you tell your assistant to answer the queue |
+| Checks on the answer | The same code for both (`parseAnswer`): section 2 | The same |
+
+With no provider key set, the connector is the analyst's way (owner, 10 Nov 2026). With a key set, the key is used and the
+connector is not.
+
 ## 1. What the analyst sees, and what it never sees
 
 It sees only what was known at the decision time. The server builds the request (`api/_academy-analyst.js` `buildRequest`):
@@ -207,3 +219,62 @@ The deployed function takes no injected dependency, so no environment variable a
 6. If the call failed, the card says why (status and the provider's message, with the key cut out). A 401 or 403 is the
    key or the header; a 404 is the address or the model id; a 400 names the field the provider refused.
 7. Only then consider "Ask on every setup of this run". Read its estimate first.
+
+## 9. The connector: your own assistant as the analyst (no key, no bill)
+
+Owner, 10 Nov 2026: the second opinion should come from the owner's own assistant, with no API key. So with no provider key
+on the server, "Ask the analyst" on the Academy page **queues** the question instead of sending it anywhere, and your
+assistant answers the queue when you ask it to.
+
+**Set it up once**
+
+1. On the Academy page, open a stored decision and press **Set up the connector**. Copy the address. It carries the key:
+   treat it like a password.
+2. In your assistant app, add a custom connector and paste the address.
+
+**Use it**
+
+1. On a stored decision press **Ask the analyst**. The block says the question waits, and how many wait.
+2. In your assistant say: *Answer my Academy questions*. It reads each question and sends its answer back.
+3. Back on the page press **Check for the answer**. It is shown beside the engine's, marked as from your own assistant.
+
+**What the assistant can do, and cannot** (`api/academy-mcp.js`)
+
+| Tool | What it does |
+|---|---|
+| `academy_guide` | The workflow, the rules and the answer shape |
+| `academy_pending` | The questions that wait, oldest first |
+| `academy_question` | One question: the rules and the facts, exactly the text a paid provider would have been sent |
+| `academy_answer` | One answer, checked in code before it counts; a refusal names each check that failed |
+
+- It never sees a result. A question is built and checked by the server when you ask on the page (section 1); nothing is
+  added later.
+- It cannot read the store, a lesson file or any other route, cannot change a lesson or a setting, and nothing here places
+  an order.
+- Its answer goes through the same checks as a provider's (section 2). The engine's hard gates and the risk engine still
+  decide: a trade wanted through a gate is stored as WAIT with what it wanted beside it.
+- A refused answer stores nothing. The assistant may fix it and send it again, three tries per question in all; after the
+  last one the question leaves the queue and the page shows why, with "Queue the question again".
+- A test (unseen) setup is decided once, as with a provider.
+- Answers are stored apart, labelled `connector`, at cost 0, and never counted with the engine's numbers.
+- At most 25 questions wait at a time.
+
+**The key**
+
+The key is derived from the server's session secret, so there is nothing to set. It is shown to the owner's session only and
+is never logged. Optional variables:
+
+| Variable | Meaning |
+|---|---|
+| `ACADEMY_CONNECTOR` | `off` switches the connector off: the address answers 401 and nothing is queued. |
+| `ACADEMY_CONNECTOR_SALT` | Any value: the key changes and the old address stops working. Use it if the address was shared by mistake. |
+| `ACADEMY_CONNECTOR_SECRET` | 16 or more characters: a secret of the connector's own, used instead of the session secret. |
+
+A wrong key counts against the site's shared limit on guessed passwords.
+
+**What has been tested**
+
+Everything ran offline: `tests/academy-connector.test.mjs` plays the assistant, and the browser audit
+(`scripts/audit/academy.cjs`, section D) walks the page with a scripted assistant on the local server
+(`node scripts/academy-dev.mjs --connector`). **No real assistant app has called the connector yet: the first real run is the
+owner's.**
