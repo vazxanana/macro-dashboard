@@ -61,7 +61,12 @@ test('agreement by week: the share of verdicts that were approvals, with n, and 
   const rows = [cor('a', T0, { verdict: 'approve' }), cor('b', T0 + 1, { verdict: 'approve' }), cor('c', T0 + 2), cor('d', T0 + 8 * DAY, { verdict: 'reject' })], a = T.agreementByWeek(rows);
   assert.deepEqual([a.n, a.approve, a.rate, a.tooFew], [4, 2, 0.5, true]); assert.deepEqual(a.weeks.map((w) => [w.week, w.n, w.approve, w.rate, w.tooFew]), [['2026-W45', 3, 2, 0.667, true], ['2026-W46', 1, 0, 0, true]]);
   const many = T.agreementByWeek(Array.from({ length: 20 }, (_, i) => cor('m' + i, T0 + i, { verdict: i < 15 ? 'approve' : 'change' }))); assert.equal(many.tooFew, false); assert.equal(many.rate, 0.75);
-  assert.deepEqual(T.agreementByWeek(null), { n: 0, approve: 0, rate: null, tooFew: true, weeks: [] });
+  assert.deepEqual(T.agreementByWeek(null), { n: 0, approve: 0, rate: null, tooFew: true, weeks: [], recallN: 0, recallApprove: 0, unknownN: 0 });
+  // only verdicts on a FIRST decision are agreement: a verdict on a same-trade replay judges a remembered answer (recall)
+  const atts = [{ id: 'at-a', mode: 'train', n: 1 }, { id: 'at-b', mode: 'replay-same', n: 2 }, { id: 'at-c', mode: 'train', n: 1 }], on = (id, attemptId, verdict) => ({ ...cor(id, T0, { verdict }), attemptId });
+  const split = T.agreementByWeek([on('a', 'at-a', 'change'), on('b', 'at-b', 'approve'), on('c', 'at-c', 'approve'), on('d', 'at-gone', 'approve')], atts);
+  assert.deepEqual([split.n, split.approve, split.rate, split.recallN, split.recallApprove, split.unknownN], [2, 1, 0.5, 1, 1, 1], 'the approved replay and the verdict with no attempt on file are left out of the rate');
+  assert.equal(split.weeks.reduce((t, w) => t + w.n, 0), 2, 'and out of every week');
   assert.equal(T.rateText(3, 4), '3 of 4 (too few to judge)'); assert.equal(T.rateText(15, 20), '15 of 20 (75 %)'); assert.equal(T.rateText(0, 0), 'none yet');
   assert.match(T.fewText(3, 'graded setup'), /^Too few to judge: 3 graded setups, and 20 is the least/);
 });
@@ -88,7 +93,7 @@ test('lessons: version chains, the diff between two versions in words, where a l
   assert.deepEqual(T.lessonDiff(L1, L2), [{ field: 'Title', from: 'Wait in Asia', to: 'Wait in Asia and London' }, { field: 'When', from: 'session = asia', to: 'session is one of asia, london' }, { field: 'Then', from: 'WAIT', to: 'REFUSE the setup (wait)' }, { field: 'Note', from: '', to: 'not here' }]);
   assert.deepEqual(T.lessonDiff(L1, JSON.parse(JSON.stringify(L1))), []); assert.equal(T.lessonDiff(L1, { ...L1, edge: '*' })[0].to, 'all edges');
   assert.equal(T.lessonOrigin(L1), 'mentor correction'); assert.equal(T.lessonOrigin({ source: { kind: 'research', studyId: 'cond:gtl:ltfAlign:neutral' } }), 'research study cond:gtl:ltfAlign:neutral'); assert.equal(T.lessonOrigin({ source: { sessionId: 'se_1' } }), 'mentor note in a session'); assert.equal(T.lessonOrigin({}), 'not recorded');
-  const rec = T.lessonRecord(L1); assert.equal(rec.recallText, 'Recall on the same trade: passed 2, failed 1 (n = 3).'); assert.match(rec.freshText, /^New setups it matched: n = 3, same answer as without it on 1; net 0\.00R with lessons against \+1\.42R without\. Too few to judge\.$/);
+  const rec = T.lessonRecord(L1); assert.equal(rec.recallText, 'Recall on the same trade: passed 2, failed 1 (n = 3).'); assert.match(rec.freshText, /^New setups it matched: n = 3; the answer changed on 2 and stayed the same on 1; net 0\.00R with lessons against \+1\.42R without\. Too few to judge\.$/); assert.equal(rec.fresh.changed, 2);
   assert.equal(T.lessonRecord(L2).recallText, 'Recall on the same trade: not replayed yet.'); assert.equal(T.lessonRecord(L2).freshText, 'New setups: it has matched none in a test yet.');
 });
 test('research drafts: the evidence is given with n and t in both parts, and a draft\'s state comes from the stored lessons', () => {
@@ -154,7 +159,9 @@ test('blind arena: answers are graded as the API grades them, "closer" needs bot
   for (const [d, side] of [[{ action: 'WAIT' }, 'buy'], [{ action: 'BUY' }, 'buy'], [{ action: 'SELL' }, 'buy'], [null, 'buy']]) assert.equal(T.gradeLite(d, side, out), _t.gradeR(d, side, out), 'the same grade as the API');
   assert.equal(T.closer(0, 1.9), 'engine'); assert.equal(T.closer(1.9, -1), 'mentor'); assert.equal(T.closer(0, 0), 'tie'); assert.equal(T.closer(null, 1), null);
   const rows = [{ mentor: { action: 'WAIT' }, engine: { action: 'SELL' }, rMentor: 0, rEngine: 1.9 }, { mentor: { action: 'BUY' }, engine: { action: 'BUY' }, rMentor: -1.05, rEngine: -1.05 }, { mentor: { action: 'SELL' }, engine: { action: 'WAIT' }, rMentor: null, rEngine: 0 }, { mentor: { action: 'WAIT' }, engine: null, rMentor: 0, rEngine: null }];
-  assert.deepEqual(T.blindTable(rows), { n: 4, withEngine: 3, agree: 1, graded: 2, mentorR: -1.05, engineR: 0.85, mentorCloser: 0, engineCloser: 1, ties: 1, tooFew: true });
+  assert.deepEqual(T.blindTable(rows), { n: 4, recalled: 0, withEngine: 3, agree: 1, graded: 2, mentorR: -1.05, engineR: 0.85, mentorCloser: 0, engineCloser: 1, ties: 1, tooFew: true });
+  // a setup the engine had decided before (recall) is listed and never scored: a remembered answer is not evidence
+  assert.deepEqual(T.blindTable(rows.concat({ ...rows[0], recall: true }, { ...rows[1], recall: true })), { n: 6, recalled: 2, withEngine: 3, agree: 1, graded: 2, mentorR: -1.05, engineR: 0.85, mentorCloser: 0, engineCloser: 1, ties: 1, tooFew: true });
   assert.equal(T.blindTable(Array.from({ length: 20 }, () => rows[0])).tooFew, false); assert.equal(T.blindTable(null).n, 0);
 });
 test('a trade answer needs its stop on the losing side and, where asked, a reason', () => {

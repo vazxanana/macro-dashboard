@@ -16,6 +16,11 @@
 // "Replay this setup") → Research (studies, a study in full, the policy table, a notebook note) → Models → Costs → Audit →
 // Blind arena (the engine's answer stays hidden until the mentor's is stored; the outcome is read last) → Session (notes on a
 // missed opportunity and a right wait, verdicts, save, resume, end) → the rate limit (calls counted, a 429 waited out).
+// Verification pass (11i, its own server and store): every replay control (play, pause, resume, step, jump, each speed, restart,
+// save and resume), an approval, a rejection, a change to SELL with levels and a mark, the no-lesson control of a same-trade
+// replay, and "Check earlier corrections" in the Lessons tab finding a later lesson that undid an earlier answer, naming it,
+// and finding it mended after a revision. Access (11j): every route of the API answers 401 signed out (over HTTP, on a
+// signed-out server) and 403 to a member who is not the owner.
 // "What if" (alternatives on the candles after a decision): absent until the attempt is stored, then a table of the setup, the
 // engine's answer and fixed variants; no later candle ever reaches a snapshot; the later candles leave the chart on Continue.
 const { chromium } = require('playwright');
@@ -61,13 +66,14 @@ const ENDLESS = String.raw`(() => document.getAnimations().filter((a) => { try {
 // The page keeps itself under 24 Academy calls a minute (the site's firewall allows 30). The dev server has no firewall, so
 // the audit lifts that pace to finish in minutes; it counts the calls instead, and one check runs with the pace on.
 const NO_PACE = 'window.MXAC_PACE = 0;';
-async function startServer() {
+async function startServer(port = PORT, flags = []) {
+  const H = 'http://127.0.0.1:' + port, PORT = port;   // this server's own address
   const store = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-audit-'));
-  const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs')], { env: { ...process.env, PORT: String(PORT), ACADEMY_STORE_DIR: store }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...flags], { env: { ...process.env, PORT: String(PORT), ACADEMY_STORE_DIR: store }, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = ''; proc.stdout.on('data', (d) => { log += d; }); proc.stderr.on('data', (d) => { log += d; });
   for (let i = 0; i < 60; i++) {
     if (proc.exitCode != null) throw new Error('the dev server stopped: ' + log.trim() + ` (is port ${PORT} taken? set ACADEMY_PORT)`);
-    try { const r = await fetch(H + '/api/academy?get=edges'); if (r.ok) return { proc, store }; } catch (e) { /* not up yet */ }
+    try { const r = await fetch(H + '/api/academy?get=edges'); if (r.ok || r.status === 401) return { proc, store, H }; } catch (e) { /* not up yet */ }
     await new Promise((r) => setTimeout(r, 250));
   }
   proc.kill(); throw new Error('the dev server did not answer on ' + H + ': ' + log.trim());
@@ -247,6 +253,7 @@ async function startServer() {
     check('the second attempt differs from the first', second === 'WAIT' && second !== first, `${first} → ${second}`);
     check('the lesson is listed as applied', (await p.$$('#dec-lessons li[data-applied="yes"]')).length === 1 && /Audit lesson/.test(await txt(p, '#dec-lessons')) && /Lesson applied: yes/.test(await txt(p, '#prove-lesson')), await txt(p, '#dec-lessons'));
     check('the verdict is "learned"', (await p.getAttribute('#prove-verdict', 'data-verdict')) === 'learned' && /^Learned\./.test(await txt(p, '#prove-verdict')), await txt(p, '#prove-verdict'));
+    check('the control is shown: the same replay with every lesson switched off gives the FIRST answer, so the lesson alone made the change', (await p.getAttribute('#prove-control', 'data-same')) === 'yes' && new RegExp(`^Control: the same replay with every lesson switched off gives ${first}, the first answer\\. Whatever changed came from the lessons in force and from nothing else\\.$`).test(await txt(p, '#prove-control')), await txt(p, '#prove-control'));
     const cmp = await p.$$eval('#prove-table tr', (l) => l.map((r) => [...r.cells].map((c) => c.textContent.trim()).join('|')));
     check('side by side: attempt 1, attempt 2 and the mentor\'s correction, and the changed fields', cmp[0] === '|Attempt 1|Attempt 2|Mentor' && cmp[1] === `Action|${first}|WAIT|WAIT` && /Changed between the two attempts: action/.test(await txt(p, '#prove-changed')), cmp.slice(0, 2).join(' / '));
     check('the limit is stated: recall, not generalisation', (await txt(p, '#prove')).includes('Passing the same trade shows recall, not generalisation.'));
@@ -326,7 +333,7 @@ async function startServer() {
     await tab('lessons', '#ls-list li[data-lesson]');
     let ltxt = await txt(p, '#ls-list li[data-lesson]');
     check('Lessons: the saved lesson with its sentence, version, state and where it came from', (await p.$$('#ls-list > li')).length === 1 && /Audit lesson/.test(ltxt) && /version 1/.test(ltxt) && /in force/.test(ltxt) && /When: session = \w+ → Then: WAIT/.test(ltxt) && /mentor correction/.test(ltxt), ltxt.slice(0, 200));
-    check('Lessons: recall and new-setup records are shown apart, each with its n', /Recall on the same trade: passed 2, failed 0 \(n = 2\)\./.test(ltxt) && /New setups it matched: n = \d+, same answer as without it on \d+; net [+-]?\d+\.\d\dR with lessons against [+-]?\d+\.\d\dR without\. Too few to judge\./.test(ltxt), ltxt.slice(150, 420));
+    check('Lessons: recall and new-setup records are shown apart, each with its n', /Recall on the same trade: passed 2, failed 0 \(n = 2\)\./.test(ltxt) && /New setups it matched: n = \d+; the answer changed on \d+ and stayed the same on \d+; net [+-]?\d+\.\d\dR with lessons against [+-]?\d+\.\d\dR without\. Too few to judge\./.test(ltxt), ltxt.slice(150, 420));
     check('Lessons: an edge without a research draft says so and why', /No draft for Gold momentum pullback\. A draft is offered only when a pre-registered condition/.test(await txt(p, '#ls-drafts-card')), await txt(p, '#ls-drafts-card'));
     await p.click('#ls-list [data-act="revise"]'); await p.waitForSelector('#lr-title');
     check('Lessons: revising starts with nothing changed and cannot be saved yet', await p.isDisabled('#lr-save') && /Nothing is changed yet/.test(await txt(p, '#lr-diff')));
@@ -356,7 +363,7 @@ async function startServer() {
     await tab('progress', '#pg-queue');
     const prog = await api(p, `get=progress&edge=${EDGE}`);
     check('Progress: attempts, corrections and lessons are the stored counts', (await txt(p, '#pg-n-attempts')).startsWith(String(prog.counts.attempts)) && (await txt(p, '#pg-n-corrections')).startsWith(String(prog.counts.corrections)) && (await txt(p, '#pg-n-lessons')).startsWith(String(prog.counts.lessons)) && prog.counts.attempts >= 8 && /same-trade replays/.test(await txt(p, '#pg-counts')), `${await txt(p, '#pg-n-attempts')} / ${prog.counts.attempts}`);
-    check('Progress: agreement with the mentor by week, with n and "too few to judge"', /Overall you approved \d+ of \d+ \(too few to judge\) of the decisions you judged \(n = \d+\)\./.test(await txt(p, '#pg-agree-all')) && /\d{4}-W\d\d/.test(await txt(p, '#pg-agree-table')) && /too few to judge \(n = \d+\)/.test(await txt(p, '#pg-agree-table')), await txt(p, '#pg-agree-all'));
+    check('Progress: agreement with the mentor by week, with n and "too few to judge"', /Overall you approved \d+ of \d+ \(too few to judge\) of the first decisions you judged \(n = \d+\)\./.test(await txt(p, '#pg-agree-all')) && /\d{4}-W\d\d/.test(await txt(p, '#pg-agree-table')) && /too few to judge \(n = \d+\)/.test(await txt(p, '#pg-agree-table')), await txt(p, '#pg-agree-all'));
     const boxes = await p.evaluate(() => ['pg-recall', 'pg-fresh'].map((id) => { const r = document.getElementById(id).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top)]; }));
     check('Progress: recall and new setups sit side by side and are never added', boxes[0][1] === boxes[1][1] && boxes[0][0] < boxes[1][0] && /recall, never generalisation/.test(await txt(p, '#pg-recall')) && new RegExp(`n = ${ex.length} graded`).test(await txt(p, '#pg-fresh')) && /Too few to judge/.test(await txt(p, '#pg-fresh')) && /never added together/.test(await txt(p, '#pg-rvn')), `${JSON.stringify(boxes)} ${(await txt(p, '#pg-fresh')).slice(0, 120)}`);
     check('Progress: recall counts the same-trade replays that gave the answer asked for', new RegExp(`Passed${prog.replaySame.pass} of ${prog.replaySame.graded}`).test((await txt(p, '#pg-recall')).replace(/\s+/g, ' ').replace('Passed ', 'Passed')) && prog.replaySame.pass >= 2, await txt(p, '#pg-recall'));
@@ -441,6 +448,8 @@ async function startServer() {
     await p.fill('#bl-stop', String(c2.side === 'buy' ? c2.entry + 1 : c2.entry - 1)); check('Blind arena: a stop on the wrong side is refused', await p.isDisabled('#bl-save') && /The stop must be/.test(await txt(p, '#bl-err')), await txt(p, '#bl-err'));
     await p.fill('#bl-stop', String(c2.stop)); await p.fill('#bl-text', 'Audit: I take the setup.'); await p.click('#bl-save'); await p.waitForSelector('#bl-compare', { timeout: 20000 });
     const brows = (await api(p, `get=blind&edge=${EDGE}`)).blind;
+    { const rec = brows.filter((r) => r.recall).length, sub = (await txt(p, '#bl-n')).replace(/\s+/g, ' ');
+      check('Blind arena: a setup the engine had decided before in training is listed as recall and left out of every score', rec >= 1 && brows.find((r) => r.candidateId === c1.id).recall === true && (await p.$$('#bl-rows tr[data-recall="yes"]')).length === rec && sub.includes(`${brows.length - rec} scored · ${rec} recall, not scored`) && /a remembered answer is not evidence/.test(await txt(p, '#bl-table-note')) && /recall, not scored/.test(await txt(p, '#bl-rows tr[data-recall="yes"]')), `${rec} of ${brows.length} recall; "${sub}"`); }
     check('Blind arena: stored rows match the page; a trade on the setup\'s own side is graded with the setup\'s net R', brows.length === 2 && brows[0].candidateId === c2.id && brows[0].mentor.action === own && brows[0].mentor.stop === c2.stop && brows[0].engine && typeof brows[0].rMentor === 'number' && (await txt(p, '#bl-n')).startsWith('2') && (await p.$$('#bl-rows tbody tr')).length === 2, JSON.stringify(brows.map((b) => [b.mentor.action, b.rMentor, b.rEngine])));
     check('Blind arena: the engine\'s reasoning can be opened after the reveal', (await p.$$('#bl-why #bl-dec-action')).length === 1);
     await p.screenshot({ path: OUT + 'academy-8-blind.png', fullPage: true });
@@ -510,6 +519,151 @@ async function startServer() {
     }
     check('no endless animation in the other sections', (await p.evaluate(ENDLESS)).length === 0);
     await p.click('#tab-train');
+
+    // ---- 11i. verification pass on a fresh store: every replay control; approve, reject, change with levels; the regression check ----
+    {
+      const sv = await startServer(+PORT + 1), HV = sv.H, cv = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await cv.addInitScript(NO_PACE);
+      let v = await cv.newPage(); watch(v, 'verify');
+      const state = () => txt(v, '#clock-state'), clockMs = async () => Date.parse((await txt(v, '#clock-time')).replace(' UTC', 'Z')), until = (re) => v.waitForFunction((src) => new RegExp(src).test(document.getElementById('clock-state').textContent), re.source, { timeout: 10000 }).catch(() => {});
+      const saveCorrection = async () => { await v.click('#m-save'); await v.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 }); return reqs.filter((r) => r.tag === 'verify' && r.body && r.body.action === 'correct').pop().body.correction; };
+      const keepConds = async (keep) => { for (const k of (await v.$$eval('#lesson-conds .cond', (l) => l.map((x) => x.dataset.cond))).filter((x) => !keep.includes(x)).reverse()) await v.click(`#lesson-conds .cond[data-cond="${k}"] [data-del]`); return v.$$eval('#lesson-conds .cond', (l) => l.map((x) => x.dataset.cond)); };
+      const saveLesson = async (title) => { await v.fill('#lesson-title', title); await v.click('#lesson-save'); await v.waitForFunction(() => /Lesson saved/.test(document.getElementById('lesson-msg').textContent), null, { timeout: 15000 }); };
+      const prove = async () => { await v.click('#prove-run'); await v.waitForSelector('#prove-verdict', { timeout: 20000 }); return { verdict: await v.getAttribute('#prove-verdict', 'data-verdict'), action: await txt(v, '#dec-action'), control: await txt(v, '#prove-control'), same: await v.getAttribute('#prove-control', 'data-same') }; };
+      const onSetup = async (c) => { await nextPoint(v); return (await txt(v, '#clock-time')) === stamp(c.t); };
+      // "Check earlier corrections": every line the status shows is kept, so the progress is read exactly, not sampled
+      const runCheck = async (n) => {
+        await v.click('#tab-lessons'); await v.waitForSelector('#ls-check-run', { timeout: 20000 });
+        await v.evaluate(() => { window.__chk = []; const m = document.getElementById('ls-check-msg'); new MutationObserver(() => window.__chk.push(m.textContent)).observe(m, { childList: true, characterData: true, subtree: true }); });
+        const from = reqs.length; await v.click('#ls-check-run'); await v.waitForFunction((k) => window.__chk.some((t) => t === `Checked ${k} setups.`), n, { timeout: 60000 }).catch(() => {});
+        const sum = await v.$eval('#ls-check-sum', (e) => ({ text: e.textContent, holds: +e.dataset.holds, broken: +e.dataset.broken })).catch(() => ({ text: '', holds: -1, broken: -1 }));
+        return { sum, lines: await v.evaluate(() => window.__chk), rows: await v.$$eval('#ls-check-list li[data-cand]', (l) => l.map((x) => ({ id: x.dataset.cand, status: x.dataset.status, text: x.textContent }))), sent: calls(reqs, from, 'verify').map((r) => (r.body ? r.body.action + (r.body.attempt ? ':' + r.body.attempt.mode : '') : 'get=' + r.q.get)) };
+      };
+      try {
+        await v.goto(HV + '/academy', { waitUntil: 'load' }); await setup(v, iso(cands[0].t), null);
+        await v.click('#start'); await v.waitForSelector('#replay:not([hidden])', { timeout: 60000 });
+        const start = await txt(v, '#clock-time'), start0 = await clockMs();
+        check('controls: a new replay is paused at the start of the range and the button says Play', (await state()) === 'paused' && (await txt(v, '#c-play')) === 'Play' && (await v.getAttribute('#c-play', 'aria-pressed')) === 'false' && start === iso(cands[0].t) + ' 00:00 UTC', `${await state()} / ${await txt(v, '#c-play')} / ${start}`);
+        // each speed, while the clock is paused and while it plays (a long stretch with no setup: after the fifth, before the sixth)
+        await v.fill('#c-jump-at', iso(cands[4].t + 86400) + 'T00:00'); await v.click('#c-jump'); const jumped = await txt(v, '#clock-time');
+        check('controls: jump moves the clock to the time asked for, says what it skipped, and fires no setup on the way', jumped === iso(cands[4].t + 86400) + ' 00:00 UTC' && /^Jumped from .+ to .+\. Setups in between were not shown\./.test(await txt(v, '#log li')) && !(await vis(v, '#decision')) && calls(reqs, 0, 'verify').every((r) => !r.body || r.body.action !== 'attempt'), `${jumped} / ${await txt(v, '#log li')}`);
+        await v.click('#c-speed [data-speed="1"]'); await v.click('#c-play'); await until(/^playing 1×$/);
+        const seen = []; for (const sp of [1, 5, 10, 50, 100]) { await v.click(`#c-speed [data-speed="${sp}"]`); seen.push([sp, await state(), await v.$$eval('#c-speed [aria-pressed="true"]', (l) => l.map((x) => x.dataset.speed).join())]); }
+        check('controls: each speed (1, 5, 10, 50, 100) takes effect while playing and is the only one marked', seen.every(([sp, st, on]) => st === `playing ${sp}×` && on === String(sp)) && (await txt(v, '#c-play')) === 'Pause' && (await v.getAttribute('#c-play', 'aria-pressed')) === 'true', JSON.stringify(seen));
+        await v.click('#c-speed [data-speed="1"]'); await v.click('#c-play'); const tA = await clockMs();
+        check('controls: Pause stops the clock; the button then says Resume', (await state()) === 'paused' && (await txt(v, '#c-play')) === 'Resume' && (await v.getAttribute('#c-play', 'aria-pressed')) === 'false' && tA > Date.parse(jumped.replace(' UTC', 'Z')), `${await state()} / ${await txt(v, '#c-play')}`);
+        await v.waitForTimeout(400); check('controls: while paused the clock does not move', (await clockMs()) === tA);
+        await v.click('#c-step'); const tB = await clockMs(); check('controls: Step moves exactly one candle and stays paused', tB - tA === 300000 && (await state()) === 'paused', `${(tB - tA) / 1000} s`);
+        await v.click('#c-play'); await until(/^playing 1×$/); await v.waitForFunction((t) => Date.parse(document.getElementById('clock-time').textContent.replace(' UTC', 'Z')) > t, tB, { timeout: 10000 }).catch(() => {}); await v.click('#c-play'); const tC = await clockMs();
+        check('controls: Resume carries on from where it stopped', tC > tB && (await state()) === 'paused', `${(tC - tB) / 1000} s on`);
+        // save, reload, resume: the clock is back on the saved candle
+        await v.click('#sess-save'); await v.waitForFunction(() => /Session saved/.test(document.getElementById('replay-msg').textContent), null, { timeout: 15000 });
+        await v.reload({ waitUntil: 'load' }); await v.waitForSelector('#sess-list li[data-session] button', { timeout: 20000 }); await v.click('#sess-list li[data-session] button'); await v.waitForSelector('#replay:not([hidden])', { timeout: 60000 });
+        check('controls: a saved session is resumed on the candle it was saved on, paused', (await clockMs()) === tC && (await state()) === 'paused' && /^Session resumed/.test(await v.$eval('#log li:last-child', (e) => e.textContent)), `${await txt(v, '#clock-time')} / ${await state()}`);
+        await v.click('#c-restart'); check('controls: Restart goes back to the start of the range, paused, with Play again', (await clockMs()) === start0 && (await state()) === 'paused' && (await txt(v, '#c-play')) === 'Play' && /^Restarted from the beginning/.test(await txt(v, '#log li')), `${await txt(v, '#clock-time')} / ${await txt(v, '#c-play')}`);
+
+        // the first setup (the engine waits): approved
+        await v.click('#c-speed [data-speed="100"]'); await v.click('#c-play'); const on1 = await onSetup(cands[0]), a1 = await txt(v, '#dec-action');
+        await v.click('#mentor [data-choice="approve"]'); const k1 = await saveCorrection();
+        check('mentor: an approval needs no reason and is stored as an approval of the engine\'s own answer', on1 && k1.verdict === 'approve' && k1.action === null && k1.entry === null && k1.reasons.length === 0 && a1 === 'WAIT', JSON.stringify(k1).slice(0, 120));
+        await goOn(v); await nextPoint(v); await goOn(v); await nextPoint(v); await goOn(v);
+        // the fourth setup (the engine sells): rejected, and the lesson refuses the setup
+        const on4 = await onSetup(cands[3]), a4 = await txt(v, '#dec-action'); await v.click('#mentor [data-choice="reject"]');
+        const needsWhy = (await v.isDisabled('#m-save')) && /Say why/.test(await txt(v, '#m-err')); await v.click('#mentor [data-reason="session"]'); await v.fill('#m-text', 'Verify: never in this session.'); const k4 = await saveCorrection();
+        check('mentor: a rejection needs a reason, carries no action and no levels, and is stored as a rejection', on4 && a4 === 'SELL' && needsWhy && k4.verdict === 'reject' && k4.action === null && k4.entry === null && k4.stop === null && k4.reasons.join() === 'session', JSON.stringify(k4).slice(0, 160));
+        check('mentor: the draft from a rejected trade refuses the setup', /→ Then: REFUSE the setup \(wait\)$/.test(await txt(v, '#lesson-plain')), await txt(v, '#lesson-plain'));
+        await keepConds(['session']); await saveLesson('Verify lesson 1: refuse this session'); const p4 = await prove();
+        check('replay and prove: the rejected SELL is a WAIT on the same trade, learned, and the control with no lesson still gives SELL', p4.verdict === 'learned' && p4.action === 'WAIT' && p4.same === 'yes' && /gives SELL, the first answer/.test(p4.control), JSON.stringify(p4));
+        await goOn(v);
+        // the fifth setup (the engine waits): changed to SELL with the mentor's own stop, and a mark on the chart
+        const c5 = cands[4], on5 = await onSetup(c5), a5 = await txt(v, '#dec-action'); await v.click('#mentor [data-choice="SELL"]');
+        const pre = [+(await v.inputValue('#m-entry')), +(await v.inputValue('#m-stop')), +(await v.inputValue('#m-target'))], myStop = +(c5.stop + 1).toFixed(2);
+        await v.fill('#m-stop', String(myStop)); await v.click('#mentor [data-reason="session"]'); await v.click('#mentor [data-reason="wrong-structure"]'); await v.fill('#m-text', 'Verify: this range is the trade, with a wider stop.');
+        await v.selectOption('#a-kind', 'entry'); await v.click('#a-arm'); await v.evaluate(() => document.getElementById('chart').scrollIntoView({ block: 'center' })); { const q = await v.evaluate((x) => window.MXAC.chartPoint(x, 0.5), c5.entry); await v.mouse.click(q.x, q.y); }
+        const k5 = await saveCorrection();
+        check('mentor: a change to SELL starts from the setup\'s levels and is stored with the mentor\'s entry, stop, target and mark', on5 && a5 === 'WAIT' && pre.join() === [c5.entry, c5.stop, c5.target].join() && k5.verdict === 'change' && k5.action === 'SELL' && k5.entry === c5.entry && k5.stop === myStop && k5.target === c5.target && k5.annotations.length === 1 && k5.annotations[0].kind === 'entry' && k5.reasons.join() === 'session,wrong-structure', JSON.stringify(k5).slice(0, 200));
+        const plain5 = await txt(v, '#lesson-plain'); const kept5 = await keepConds(['session', 'regime']);
+        check('mentor: the draft takes the edge\'s trade and carries the stop as a rule relative to the chart, never a raw price', /→ Then: TAKE the edge's trade; stop = /.test(plain5) && !plain5.includes(String(myStop)) && kept5.join() === 'session,regime' && (await v.$$('#lesson-adjust li:not(.none)')).length === 1, plain5);
+        await saveLesson('Verify lesson 2: take this range'); const p5 = await prove(), row5 = await v.$$eval('#prove-table tr', (l) => l.map((r) => [...r.cells].map((c) => c.textContent.trim()).join('|')));
+        check('replay and prove: the same trade is now a SELL on the mentor\'s stop, learned, and the control with no lesson still waits', p5.verdict === 'learned' && p5.action === 'SELL' && p5.same === 'yes' && /gives WAIT, the first answer/.test(p5.control) && row5[1] === 'Action|WAIT|SELL|SELL' && row5[3].split('|')[2] === row5[3].split('|')[3] && row5[3].split('|')[2] !== row5[3].split('|')[1], JSON.stringify(p5) + ' ' + row5[3]);
+
+        // the regression check, before any later lesson: every earlier answer holds
+        let r = await runCheck(3);
+        check('Lessons: "Check earlier corrections" re-decides every judged train setup, with a progress line setup by setup', r.lines.some((t) => /^Setup 1 of 3 \(.+ UTC\): loading its candles…$/.test(t)) && r.lines.some((t) => /^Setup 3 of 3 \(.+ UTC\): deciding from its candles and storing…$/.test(t)) && r.lines[r.lines.length - 1] === 'Checked 3 setups.', r.lines.slice(0, 3).concat(r.lines.slice(-1)).join(' | '));
+        check('Lessons: the check finds all three earlier answers intact (an approval, a rejection, a change)', r.sum.holds === 3 && r.sum.broken === 0 && /^3 earlier verdicts checked against the 2 lessons in force: 3 still hold, 0 no longer hold, 0 never held\.$/.test(r.sum.text) && r.rows.length === 3 && r.rows.every((x) => x.status === 'holds') && !(await vis(v, '#ls-check-warn')), r.sum.text);
+        check('Lessons: each check is stored as one same-trade replay through the paced API, and no result is read', r.sent.filter((x) => x === 'attempt:replay-same').length === 3 && !r.sent.some((x) => /^attempt:(train|exam|blind)$/.test(x) || x === 'get=outcome') && /Stored as attempt 3 \(same-trade replay\)/.test(r.rows[2].text), r.sent.join());
+        const a5n = (await api(v, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c5.id)}`)).attempts;
+        check('Lessons: the stored check sits on the same decision point as the first attempt and leaves it untouched', a5n.length === 3 && a5n.map((x) => x.mode).join() === 'train,replay-same,replay-same' && new Set(a5n.map((x) => x.snapshotHash)).size === 1 && a5n[0].decision.action === 'WAIT' && a5n[2].decision.action === 'SELL', JSON.stringify(a5n.map((x) => [x.n, x.mode, x.decision.action])));
+        check('Lessons: the check says what it shows (recall of earlier answers, not that a lesson generalises)', /Each check is stored as a same-trade replay\. It shows recall of your earlier answers, not that a lesson generalises\./.test(await txt(v, '#ls-check-out')));
+
+        // a later lesson, made on the eighth setup, that also speaks about the fifth
+        await v.click('#tab-train'); await goOn(v); await nextPoint(v); await goOn(v); await nextPoint(v); await goOn(v);
+        const on8 = await onSetup(cands[7]), a8 = await txt(v, '#dec-action'); await v.click('#mentor [data-choice="WAIT"]'); await v.click('#mentor [data-reason="htf-bias"]'); await v.fill('#m-text', 'Verify: do not chase with the bias.'); await saveCorrection();
+        const kept8 = await keepConds(['biasAlign']); await saveLesson('Verify lesson 3: do not chase'); const p8 = await prove();
+        check('a later lesson: the BUY on the eighth setup is corrected to WAIT and learned', on8 && a8 === 'BUY' && kept8.join() === 'biasAlign' && p8.verdict === 'learned' && p8.action === 'WAIT' && p8.same === 'yes', `${a8} ${kept8.join()} ${JSON.stringify(p8)}`);
+        r = await runCheck(4); const broke = r.rows.find((x) => x.id === c5.id) || { text: '' };
+        check('regression: the check reports the earlier correction the later lesson undid, and only that one', r.sum.broken === 1 && r.sum.holds === 3 && broke.status === 'broken' && r.rows.filter((x) => x.status === 'broken').length === 1 && /4 earlier verdicts checked against the 3 lessons in force: 3 still hold, 1 no longer holds, 0 never held\./.test(r.sum.text), r.sum.text);
+        check('regression: it says what was asked for, what comes out now, and names the lesson that changed it', /No longer holds: you asked for SELL, and a fresh replay now gives WAIT\. Changed by: "Verify lesson 3: do not chase", it was not in force when this answer last held \(now: not applied: conflicts with lesson "Verify lesson 2: take this range"\)\./.test(broke.text) && !/Verify lesson 1/.test(broke.text) && /^An earlier answer was changed by a later lesson\./.test(await txt(v, '#ls-check-warn')), broke.text.slice(0, 260));
+        await v.screenshot({ path: OUT + 'academy-11-regression.png', fullPage: true });
+        for (const theme of ['dark', 'light', 'midnight']) { await v.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await v.waitForTimeout(350); const bad = await v.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (the regression check with a broken answer)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        await v.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+        // mend it: revise lesson 3 so that it only speaks where it was learned; the diff says what changes; the check is clean again
+        const li3 = '#ls-list li.lsn:has(.lsn-head b:text-is("Verify lesson 3: do not chase"))';
+        await v.click(`${li3} [data-act="revise"]`); await v.waitForSelector('#lr-save');
+        const idle = (await v.isDisabled('#lr-save')) && /Nothing is changed yet/.test(await txt(v, '#lr-diff'));
+        await v.click('#lr-add'); await v.fill('#lr-conds .cond:last-child input', 'newyork'); const diff = await txt(v, '#lr-diff');
+        check('Lessons: a revision starts unchanged, then the diff names the old and the new condition', idle && /When: higher-timeframe bias with the trade → higher-timeframe bias with the trade AND session = newyork/.test(diff) && !(await v.isDisabled('#lr-save')), diff);
+        await v.click('#lr-save'); await v.waitForSelector(`${li3}[data-version="2"]`, { timeout: 15000 });
+        r = await runCheck(4);
+        check('regression: after the revision the check finds every earlier answer intact again', r.sum.broken === 0 && r.sum.holds === 4 && r.rows.every((x) => x.status === 'holds') && !(await vis(v, '#ls-check-warn')), r.sum.text);
+        // switching the fifth setup's own lesson off breaks it again, and the check says that lesson is gone; on again mends it
+        const li2 = '#ls-list li.lsn:has(.lsn-head b:text-is("Verify lesson 2: take this range"))';
+        await v.click(`${li2} [data-act="off"]`); await v.waitForSelector(`${li2}[data-active="no"]`, { timeout: 15000 }); r = await runCheck(4); const gone = r.rows.find((x) => x.id === c5.id) || { text: '' };
+        check('regression: a lesson switched off is named as the cause when its own correction stops holding', r.sum.broken === 1 && gone.status === 'broken' && /Changed by: "Verify lesson 2: take this range", it gave this answer before and is no longer in force \(switched off or replaced\)\./.test(gone.text), gone.text.slice(0, 240));
+        await v.click(`${li2} [data-act="on"]`); await v.waitForSelector(`${li2}[data-active="yes"]`, { timeout: 15000 }); r = await runCheck(4);
+        check('regression: switched on again, the correction holds again', r.sum.broken === 0 && r.sum.holds === 4, r.sum.text);
+        // "Replay this setup" from a result opens the Train tab on that setup
+        await v.click(`#ls-check-list li[data-cand="${c5.id}"] [data-open]`); await v.waitForFunction((t) => document.getElementById('clock-time').textContent === t && /paused on a setup/.test(document.getElementById('clock-state').textContent), stamp(c5.t), { timeout: 60000 }).catch(() => {});
+        check('Lessons: a checked setup can be opened in the Train tab from its row', (await txt(v, '#clock-time')) === stamp(c5.t) && (await vis(v, '#decision')) && (await txt(v, '#dec-action')) === 'SELL', `${await txt(v, '#clock-time')} ${await txt(v, '#dec-action')}`);
+        // the records stay apart after all those replays: recall grew, new setups did not
+        const pg = await api(v, `get=progress&edge=${EDGE}`);
+        check('recall and new setups stay two records: the checks added same-trade replays and no test', pg.exam.n === 0 && pg.byMode.exam === 0 && pg.replaySame.n >= 18 && pg.byMode.train === 8 && pg.counts.corrections === 4, JSON.stringify({ byMode: pg.byMode, replay: pg.replaySame.n, exam: pg.exam.n }));
+        await v.click('#tab-progress'); await v.waitForSelector('#pg-agree-all', { timeout: 20000 });
+        check('Progress: agreement counts first decisions only (4 judged, 1 approved), under 20 says too few to judge', /Overall you approved 1 of 4 \(too few to judge\) of the first decisions you judged \(n = 4\)\./.test(await txt(v, '#pg-agree-all')) && /No test yet/.test(await txt(v, '#pg-fresh')), await txt(v, '#pg-agree-all'));
+        check('no future bar reached a decision in the verification pass, and no outcome was asked for before its attempt', (await v.evaluate(() => window.MXAC.checks.future)) === 0 && (await v.evaluate(() => window.MXAC.checks.snapshots)) > 20 && (() => { const mine = reqs.filter((x) => x.tag === 'verify' && x.path === '/api/academy'); return mine.every((x, i) => x.q.get !== 'outcome' || mine.slice(0, i).some((y) => y.body && y.body.action === 'attempt' && y.body.attempt.candidateId === x.q.id)); })());
+        await cv.close();
+        // the same card on a phone: no sideways scroll, text 12 px or more, 44 px controls
+        const pv = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce' }); await pv.addInitScript(NO_PACE); v = await pv.newPage(); watch(v, 'verify-phone');
+        await v.goto(HV + '/academy', { waitUntil: 'load' }); await setup(v, null, null); r = await runCheck(4);
+        const wv = await v.evaluate(() => document.documentElement.scrollWidth), smallV = await v.evaluate(SMALL), tapsV = await v.evaluate(TAPS);
+        check('390 px: the regression check runs and reads without sideways scroll, in text of 12 px or more, with 44 px controls', r.sum.holds === 4 && wv <= 390 && smallV.length === 0 && tapsV.length === 0 && (await v.evaluate(ENDLESS)).length === 0, `${wv} px; ${smallV.slice(0, 3).join(' ; ')} ${tapsV.slice(0, 3).join(' ; ')}`);
+        await v.screenshot({ path: OUT + 'academy-12-regression-phone.png', fullPage: true });
+        await pv.close();
+      } finally { await cv.close().catch(() => {}); sv.proc.kill(); fs.rmSync(sv.store, { recursive: true, force: true }); }
+    }
+
+    // ---- 11j. access: every route answers 401 signed out and 403 to a member who is not the owner ----
+    {
+      const T = require(path.join(ROOT, 'api/academy.js')), GETS = Object.keys(T._t.GET), POSTS = Object.keys(T._t.POST);
+      const q = (name) => `get=${name}&edge=${EDGE}&id=${encodeURIComponent(cands[0].id)}&cand=${encodeURIComponent(cands[0].id)}&month=2026-11&t=${cands[0].t}`;
+      const gs = await startServer(+PORT + 2, ['--guest']), out = { get: [], post: [], other: [] };
+      try {
+        for (const name of GETS) { const x = await fetch(`${gs.H}/api/academy?${q(name)}`); out.get.push([name, x.status, (await x.json()).error, x.headers.get('cache-control')]); }
+        for (const name of POSTS) { const x = await fetch(`${gs.H}/api/academy`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: name, edge: EDGE, id: 'x' }) }); out.post.push([name, x.status, (await x.json()).error]); }
+        for (const method of ['PUT', 'DELETE', 'PATCH']) { const x = await fetch(`${gs.H}/api/academy`, { method }); out.other.push([method, x.status]); }
+        check(`access, signed out: all ${GETS.length} GET names and all ${POSTS.length} POST actions answer 401 "sign in first", never cached`, GETS.length >= 20 && POSTS.length >= 16 && out.get.every((x) => x[1] === 401 && x[2] === 'sign in first' && x[3] === 'private, no-store') && out.post.every((x) => x[1] === 401 && x[2] === 'sign in first'), JSON.stringify(out.get.concat(out.post).filter((x) => x[1] !== 401).slice(0, 4)));
+        check('access: any method but GET and POST is refused (405)', out.other.every((x) => x[1] === 405), JSON.stringify(out.other));
+        check('access, signed out: nothing was written to the store', fs.readdirSync(gs.store).length === 0, fs.readdirSync(gs.store).join());
+        const gp = await (await b.newContext({ serviceWorkers: 'block' })).newPage(); watch(gp, 'guest2'); await gp.goto(gs.H + '/academy', { waitUntil: 'load' }); await gp.waitForTimeout(600);
+        check('access, signed out on a signed-out server: the page says who it is for and asks for nothing', /The Academy is for the desk owner\. Sign in on the desk\./.test(await txt(gp, '#ac-gate')) && !(await vis(gp, '#ac-app')) && reqs.filter((x) => x.tag === 'guest2').length === 0, await txt(gp, '#ac-gate'));
+        await gp.context().close();
+      } finally { gs.proc.kill(); fs.rmSync(gs.store, { recursive: true, force: true }); }
+      // a member who is not the owner: the real handler with that member's session, on a store that must stay empty
+      const mem = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-audit-member-')), codes = [];
+      const as = async (who, method, payload) => { const o = {}, res = { setHeader() {}, status(c) { o.code = c; return res; }, json(x) { o.body = x; return o; } }; await T.handle(method === 'GET' ? { method, headers: {}, query: payload } : { method, headers: {}, body: payload }, res, { env: { ACADEMY_STORE_DIR: mem }, who: async () => who, sameOrigin: () => true }); return o; };
+      for (const who of [{ u: 'fred', role: 'reviewer' }, { u: 'luxus', role: 'viewer' }]) { for (const name of GETS) codes.push([who.u, name, (await as(who, 'GET', { get: name, edge: EDGE, id: cands[0].id })).code]); for (const name of POSTS) codes.push([who.u, name, (await as(who, 'POST', { action: name, edge: EDGE })).code]); }
+      check('access, a reviewer and a viewer: every route answers 403 and nothing is written', codes.length === 2 * (GETS.length + POSTS.length) && codes.every((x) => x[2] === 403) && fs.readdirSync(mem).length === 0 && (await as({ u: 'owner' }, 'GET', { get: 'lessons' })).code === 200, JSON.stringify(codes.filter((x) => x[2] !== 403).slice(0, 4)));
+      fs.rmSync(mem, { recursive: true, force: true });
+    }
 
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
     for (const theme of ['dark', 'light', 'midnight']) {
