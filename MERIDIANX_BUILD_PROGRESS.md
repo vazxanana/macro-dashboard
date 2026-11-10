@@ -87,6 +87,11 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - [x] Owner-only link to `/academy` in the Desk's account menu (checked by the lead: owner sees it; reviewer, viewer and
   guest do not).
 
+- [x] **What-if card** (Train, test results, Blind arena): once an answer is stored, the candles after the decision are loaded
+  on request and `MXA.simulate` plays the setup as proposed, the engine's answer, the mentor's levels and fixed variants (stop
+  at half and one and a half times the distance, targets at 1R / 2R / 3R, entry one candle later). Nothing is stored; no
+  snapshot ever holds those candles; the card says that hindsight is for study, not evidence.
+
 ## In progress
 
 Nothing is running. All module, page, dataset, training and research branches are merged into the development branch.
@@ -101,8 +106,8 @@ Nothing is running. All module, page, dataset, training and research branches ar
   research drafts are for; it was deliberately not tuned on the training results.
 - [ ] Not built: automatic promotion (by design), a browser upload of model files (promotion is documented as a manual API
   step), a dollar-index series for gold decisions (no candles for it), live-candle runs of the Blind and Session tabs
-  (recorded candles only), four difficulty levels beyond the filter the Train tab has, alternative-decision simulation in
-  the page (the core function `MXA.simulate` exists and is tested; no panel uses it yet).
+  (recorded candles only), statistical training and the research run started from the page (both are commands and a manual GitHub workflow, by
+  design: no long job runs in a site function).
 - [ ] Owner decisions: the research-candle clock fix and study re-runs; whether `/api/academy` should get a higher firewall
   limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption.
 
@@ -113,12 +118,12 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **909 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
+- Whole suite on the development branch: **914 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
   before the Academy). Academy files: `tests/academy-replay.test.mjs` (23), `academy-core` (37), `academy-api` (21),
   `academy-risk` (8), `academy-edges` (20), `academy-ml` (13), `academy-research` (19), `academy-ui`. Model parity:
   `node ml/parity.mjs`.
-- `node scripts/audit/academy.cjs`: **202 of 202** (run by the lead after the last merge; 88 of 88 before the sections were
-  added). The loop part: the clock pauses on a real setup, the decision and
+- `node scripts/audit/academy.cjs`: **225 of 225** (run by the lead after the last merge; also green on GitHub's runner at the
+  88-check stage). The loop part: the clock pauses on a real setup, the decision and
   its evidence are stored, a SELL corrected to WAIT becomes a lesson, the same-trade replay gives WAIT with the lesson applied
   ("learned"), the test on 3 unseen setups stores both answers (with lessons 0.00R against +1.42R without, n = 3, "too few to
   judge": this lesson passes recall and does not help on new setups, which is exactly what the split is for), a reload keeps
