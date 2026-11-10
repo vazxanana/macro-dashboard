@@ -53,12 +53,15 @@ function main() {
   const i = process.argv.indexOf('--dir'), dir = i > 0 ? path.resolve(process.argv[i + 1]) : path.join(HERE, 'models');
   const index = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8')), matrix = loadMatrix();
   if (index.data.matrixVersion !== matrix.version) { console.error(`the models were trained on matrix ${index.data.matrixVersion} but ml/data holds ${matrix.version}`); process.exit(1); }
-  let bad = 0;
+  let bad = 0, none = 0;
   for (const e of index.models) {
+    // a linear scorer has no file (it cannot be written in MXA.MODEL_SCHEMA): there is nothing the page could load
+    if (!e.file) { none++; if (fs.existsSync(path.join(dir, e.id + '.json'))) { console.error(`${e.id}: the index says it has no file, but one exists`); bad++; } continue; }
     const model = JSON.parse(fs.readFileSync(path.join(dir, e.file), 'utf8')), pred = JSON.parse(fs.readFileSync(path.join(dir, e.pred), 'utf8'));
     const c = compare(model, pred, matrix), ok = c.maxRaw < TOLERANCE && c.maxP < TOLERANCE && c.maxExact < 1e-9; if (!ok) bad++;
     console.log(`${e.id.padEnd(24)} rows ${String(c.n).padStart(3)}  max |raw diff| ${c.maxRaw.toExponential(2)}  max |p diff| ${c.maxP.toExponential(2)}  unrounded raw ${c.maxExact.toExponential(2)}  ${ok ? 'ok' : 'FAIL (worst row ' + c.worst + ')'}`);
   }
+  if (none) console.log(`${none} linear scorer(s) have no exported file: nothing to load, nothing to check`);
   if (!index.models.length) console.log('no model was exported (not enough data for any edge)');
   if (bad) { console.error(`${bad} model(s) do not reproduce the training library's predictions`); process.exit(1); }
 }
