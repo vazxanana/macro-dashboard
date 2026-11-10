@@ -10,6 +10,7 @@ import zlib from 'node:zlib';
 import { MARKETS, P, MIN_GRADE, agg, signals, inHalt, isASetup, sizeOf } from '../../../ict/tracker.mjs';
 import { simulate, MAX_GAP } from '../../../ict/replay.mjs';
 import { eqts, lbh, gaps, FILTERS, FLOOR } from './concepts.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const DIR = process.argv[2], MODE = process.argv[3] || 'window', OUT = process.argv[4] || `ict-concepts-${MODE}.json`;
 const WIN = MODE === 'long' ? ['2018-03-01', '2025-08-01'] : ['2025-08-01', '2026-11-08'];
@@ -25,7 +26,7 @@ function loadM1(prefix, y0, y1) {
     const y = +f.slice(base.length + 4, base.length + 8); if (y < y0 || y > y1) continue;
     for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString().split('\n')) {
       if (!ln) continue; const [d, o, h, l, c] = ln.split(';');
-      const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600;   // EST, no DST
+      const t = histStampUtc(d);
       out.push({ time: t, open: +o, high: +h, low: +l, close: +c });
     }
   }

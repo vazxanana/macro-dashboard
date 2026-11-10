@@ -12,6 +12,7 @@ import { EDGES, EDGE_IDS, edgeById, fnv1a, poolOf, monthOf, EVAL_FROM } from '..
 import { computeVersion } from '../academy/gen/study.mjs';
 import { checkBars, closedOnly, summarize, isOpen, barExpected, isAligned, goodFriday, usEuDstMismatch, euSummer, nyClock, THRESHOLDS, CALENDARS } from '../academy/quality.mjs';
 import { SYSTEMS } from '../council/decay.mjs';
+import { histOffsetH } from '../council/histdata.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const J = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -21,6 +22,10 @@ const SEVEN = ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open'];
 const DATA = Object.fromEntries(SEVEN.map((id) => [id, { cands: J(`academy/data/cand-${id}.json`), outs: J(`academy/data/out-${id}.json`) }]));
 const UNFILLED = new Set(['missed', 'expired', 'cancelled']);
 const round3 = (x) => +x.toFixed(3);
+// the clock audit's weekly record (research/edge/histdata-clock): a week is verified when it shows the offset the converter uses
+const AUDIT = J('research/edge/histdata-clock/result.json'), AUDIT_SYM = { xau: 'XAUUSD', nas100: 'NSXUSD' }, W0 = T('2018-01-01T00:00:00Z');
+const weekVerified = (market, t) => { const i = Math.floor((t + 86400 - W0) / (7 * 86400)), c = AUDIT.symbols[AUDIT_SYM[market]].B.read[i], d = new Date((W0 + i * 7 * 86400 + 2 * 86400) * 1000);
+  return c != null && +c === histOffsetH(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); };
 
 // ── registry ──
 test('registry: exactly the seven live Meridian systems, named as council/decay.mjs names them', () => {
@@ -85,7 +90,8 @@ test('candidates: the contract shape, sorted by t, unique ids, and never an outc
       for (const k of OUTCOME_KEYS) { assert.ok(!(k in c), `${c.id}: no ${k}`); assert.ok(!(k in c.rule), `${c.id}: no rule.${k}`); }
       if ('exit' in c.rule) assert.equal(typeof c.rule.exit, 'string', `${c.id}: rule.exit is the exit RULE, not a price`);
       assert.equal(!!c.rule.pre2020, c.t < EVAL_FROM, `${c.id}: pre2020 marks candidates before 2020`);
-      if ('clockShift' in c.rule) { assert.equal(c.rule.clockShift, true); assert.ok(usEuDstMismatch(c.t) && c.t >= T('2019-01-01T00:00:00Z'), `${c.id}: clockShift only in a US / Europe daylight-saving mismatch week, 2019 on`); }
+      if ('clockShift' in c.rule) assert.equal(c.rule.clockShift, true);
+      assert.equal(!!c.rule.clockShift, !weekVerified(e.market, c.t), `${c.id}: clockShift exactly when the week of t was not verified against the second feed`);
     });
     assert.equal(e.signalTf === '1d' ? cands.every((c) => !('session' in c.rule)) : cands.every((c) => ['asia', 'london', 'ny', 'closed'].includes(c.rule.session)), true, `${id}: session tag on intraday edges`);
   }
@@ -98,7 +104,7 @@ test('candidates: the pool follows poolOf and both pools are populated for every
     const tr = cands.filter((c) => c.pool === 'train').length, ex = cands.length - tr;
     assert.ok(tr > 0 && ex > 0, `${id}: train ${tr}, exam ${ex}`);
     const since = cands.filter((c) => c.t >= EVAL_FROM && !c.rule.clockShift);
-    assert.ok(since.some((c) => c.pool === 'train') && since.some((c) => c.pool === 'exam'), `${id}: both pools also inside the 2020+ evaluation window, off the shifted weeks`);
+    assert.ok(since.some((c) => c.pool === 'train') && since.some((c) => c.pool === 'exam'), `${id}: both pools also inside the 2020+ evaluation window, off the unverified weeks`);
   }
 });
 
@@ -134,8 +140,8 @@ test('outcomes: one per candidate and nothing else, in the contract shape', () =
 // ── the proof: these are the studies' trades ──
 // Pinned from the published study outputs (research/edge/*): filled trades and net R a trade of the live variant.
 const PUBLISHED = {
-  replica: { n: 391, netR: 0.479, orders: 391 }, 'mosha-bo': { n: 64, netR: 0.531, orders: 72 }, gtrend: { n: 41, netR: 1.609, orders: 41 }, gtl: { n: 314, netR: 0.141, orders: 314 },
-  geg: { n: 174, netR: 0.294, orders: 233 }, gmp: { n: 1003, netR: 0.041, orders: 1003 }, 'nq-open': { n: 721, netR: 0.126, orders: 721 },
+  replica: { n: 394, netR: 0.462, orders: 394 }, 'mosha-bo': { n: 64, netR: 0.531, orders: 72 }, gtrend: { n: 41, netR: 1.609, orders: 41 }, gtl: { n: 315, netR: 0.159, orders: 315 },
+  geg: { n: 175, netR: 0.304, orders: 233 }, gmp: { n: 1004, netR: 0.043, orders: 1004 }, 'nq-open': { n: 724, netR: 0.115, orders: 724 },
 };
 const statOf = (id) => {
   const { cands, outs } = DATA[id], f = cands.map((c) => outs[c.id]).filter((o) => !UNFILLED.has(o.reason));
@@ -302,26 +308,36 @@ test('quality.json: both markets reported with source, span, status and issue co
     assert.ok(m.bars > 50000 && m.expected >= m.bars - (m.counts['off-session'] || 0) && typeof m.counts === 'object');
     assert.deepEqual(Object.keys(m.byYear), ['2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026']);
     assert.equal(m.byYear['2023'].status, 'unreliable', `${k}: HistData 2023 is full of holes and says so`);
-    assert.ok(m.clockShift.length >= 20 && m.clockShift.every((x) => x.shiftSec === -3600 && usEuDstMismatch(T(x.week + 'T15:00:00Z') + 86400)), `${k}: every shifted week is a US / Europe mismatch week`);
+    assert.deepEqual(m.clockShift, [], `${k}: on the corrected clock the session check finds no shifted week (it found 20 or more before 10 Nov 2026)`); assert.equal(m.counts['clock-shift'], undefined);
+    assert.match(m.source, /council\/histdata\.mjs/);
     assert.ok(m.usedBy.every((id) => edgeById(id).market === k));
     for (const c of DATA[m.usedBy[0]].cands) assert.ok(c.t >= m.span.from && c.t <= m.span.to + 2 * 86400);
   }
   assert.equal(q.markets.xau.status, 'usable'); assert.equal(q.markets.nas100.status, 'usable');
   assert.equal(q.markets.nas100.calendar, CALENDARS['nas100-histdata'].name);
   assert.ok(q.markets.nas100.openWindow.counts.duplicate > 0 && q.markets.nas100.openWindow.status === 'unreliable', 'the raw NSX minutes repeat labels and the report says so');
-  assert.match(q.clock.finding, /one hour EARLY/); assert.deepEqual(q.clock.evidence.detectedOutsideMismatchWeeks, { xau: [], nas100: [] });
+  assert.match(q.clock.finding, /New York time in 2018/); assert.match(q.clock.finding, /one hour EARLY/); assert.equal(q.clock.converter, 'council/histdata.mjs');
+  assert.deepEqual(q.clock.evidence.detected, { xau: [], nas100: [] }); assert.deepEqual(q.clock.evidence.weeksDetected, { xau: 0, nas100: 0 });
+  // every decisive week of the audit agrees with the converter; the rest are the unverified weeks, and only those are flagged
+  for (const k of ['xau', 'nas100']) { const w = q.clock.evidence.oandaWeeks[k], B = AUDIT.symbols[AUDIT_SYM[k]].B;
+    assert.deepEqual([w.weeks, w.readable, w.decisive, w.agreeWithConverter], [B.weeks, B.readable, B.decisive, B.decisive], k);
+    assert.equal(q.clock.unverifiedWeeks[k].length, B.weeks - B.decisive, k); assert.ok(q.clock.unverifiedWeeks[k].length < 0.06 * B.weeks); }
+  assert.deepEqual(q.clock.evidence.oandaWeeks.xau.decisive, 437); assert.deepEqual(q.clock.evidence.oandaWeeks.nas100.decisive, 436);
+  assert.deepEqual(q.clock.evidence.uncertifiedYears, { xau: [2023], nas100: [2018, 2020, 2023, 2024] });
+  assert.match(q.clock.flag, /could NOT be verified/);
   assert.deepEqual(q.clock.flagged, Object.fromEntries(SEVEN.map((id) => [id, DATA[id].cands.filter((c) => c.rule.clockShift).length])));
+  assert.deepEqual(q.clock.flagged, { replica: 18, 'mosha-bo': 4, gtrend: 3, gtl: 16, geg: 10, gmp: 34, 'nq-open': 16 });
   assert.ok(SEVEN.every((id) => q.clock.flagged[id] > 0 && q.clock.flagged[id] < 0.25 * DATA[id].cands.length));
-  // the independent cross-check against OANDA candles (academy/gen/clock-check.mjs): one hour early in exactly the tagged weeks
+  // the independent cross-check against OANDA candles (academy/gen/clock-check.mjs): the clocks agree in every week
   const cc = J('academy/data/clock-check.json');
-  assert.ok(cc.weeks.length >= 24 && cc.weeks.some((w) => w.week.startsWith('2018') && w.mismatchWeek));
+  assert.ok(cc.weeks.length >= 24 && cc.weeks.some((w) => w.week.startsWith('2018') && w.mismatchWeek) && cc.weeks.filter((w) => w.mismatchWeek && +w.week.slice(0, 4) >= 2019).length >= 16);
   for (const w of cc.weeks) {
     assert.equal(w.mismatchWeek, usEuDstMismatch(T(w.week + 'T15:00:00Z') + 86400), w.week);
-    assert.equal(w.studyClockEarlySec, w.mismatchWeek && +w.week.slice(0, 4) >= 2019 ? 3600 : 0, `${w.week}: ${JSON.stringify(w.meanAbsDiff)}`);
-    const d = w.meanAbsDiff, best = w.studyClockEarlySec ? d['-1h'] : d['0h'], other = w.studyClockEarlySec ? d['0h'] : d['-1h'];
-    assert.ok(best < 0.6 && other > 2.5 * best, `${w.week}: a clear match, not a coin toss`);
+    assert.equal(w.studyClockEarlySec, 0, `${w.week}: ${JSON.stringify(w.meanAbsDiff)}`);
+    const d = w.meanAbsDiff;
+    assert.ok(d['0h'] < 0.6 && Math.min(d['-1h'], d['+1h']) > 2.5 * d['0h'], `${w.week}: a clear match, not a coin toss`);
   }
-  assert.deepEqual([q.clock.crossCheck.weeks, q.clock.crossCheck.agreesWithTheTags], [cc.weeks.length, true]);
+  assert.deepEqual([q.clock.crossCheck.weeks, q.clock.crossCheck.weeksOff, q.clock.crossCheck.everyWeekAgrees], [cc.weeks.length, 0, true]);
   for (const d of q.clock.evidence.repeatedHourDays) { const dt = new Date(d + 'T12:00:00Z'); assert.ok(dt.getUTCMonth() === 9 && dt.getUTCDay() === 0 && dt.getUTCDate() >= 25, `${d} is the last Sunday of October`); }
 });
 test('summarize: the per-year verdicts and the worst gaps of a long series', () => {

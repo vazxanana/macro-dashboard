@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { nyParts, nyMidnight } from './lib.mjs';
+import { histStampUtc, nyOffsetH } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 // OANDA NAS100_USD mid candles written by fetch.mjs
 export function loadOanda(dir) {
@@ -15,18 +16,20 @@ export function loadOanda(dir) {
   return days;
 }
 
-// HistData NSXUSD M1 (council-data research/candles/nsxusd-histdata/*.csv.gz). Labels are New York wall-clock time incl. DST
-// (council-data research/log.md, 5 Nov "HistData time convention settled").
+// HistData NSXUSD M1 (council-data research/candles/nsxusd-histdata/*.csv.gz), converted with council/histdata.mjs (10 Nov 2026,
+// research/edge/histdata-clock: New York time in 2018, UTC-5 / UTC-4 on Europe's summer-time dates from 2019). Until then the
+// labels were read as New York wall-clock time for every year, so in the weeks the US is on daylight time and Europe is not
+// the bar taken as the 09:30 open was really the 10:30 one. d and m are the New York date and minute of the true instant.
 export function loadHistData(dir) {
   const days = new Map();
   for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.csv.gz')).sort()) {
     const txt = zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString();
     for (const line of txt.split('\n')) {
       if (line.length < 20) continue; const [ts, o, h, l, c] = line.split(';');
-      const d = `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}`, m = +ts.slice(9, 11) * 60 + +ts.slice(11, 13);
+      const time = histStampUtc(ts), loc = time - nyOffsetH(time) * 3600, d = new Date(loc * 1000).toISOString().slice(0, 10), m = Math.floor((loc % 86400) / 60);
       if (!(m === 0 || (m >= 570 && m <= 665))) continue;
       let a = days.get(d); if (!a) { a = []; days.set(d, a); }
-      a.push({ time: nyMidnight(d) + m * 60, open: +o, high: +h, low: +l, close: +c, vol: 0, m });
+      a.push({ time, open: +o, high: +h, low: +l, close: +c, vol: 0, m });
     }
   }
   for (const [d, a] of days) { const p = nyParts(nyMidnight(d) + 12 * 3600); if (p.wd === 'Sat' || p.wd === 'Sun') days.delete(d); else a.sort((x, y) => x.time - y.time); }

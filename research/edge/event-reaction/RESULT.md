@@ -2,17 +2,17 @@
 
 Paper research only. No live rule, size or trade changed. Pre-registration: `preregistration.md` (written before any number below).
 
-## Verdict: FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 72 (47%, p 0.722; 2018-21 32%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.
+## Verdict: FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 73 (47%, p 0.7586; 2018-21 31%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.
 
-Clock: the M1 files are read as UTC−5, UTC−4 while Europe is on summer time (Amendment 1 in preregistration.md: the release spikes put the files' "EST without DST" label wrong in summer). The first run, on +5 h all year, also failed (CPI 20 of 32, 63%, p 0.11).
+Clock: the M1 files are read as UTC−5, UTC−4 while Europe is on summer time (Amendment 1 in preregistration.md: the release spikes put the files' "EST without DST" label wrong in summer). The first run, on +5 h all year, also failed (CPI 20 of 32, 63%, p 0.11). Clock correction, 10 Nov 2026 (the pre-registered audit research/edge/histdata-clock; converter council/histdata.mjs): 2018 stamps are New York time, so the US-daylight / Europe-winter weeks of 2018 are an hour earlier than Amendment 1 put them. One event moved: CPI 2018-03-13 now passes the spike check (6.4x; 0.34x before) and enters the test, so 34 of 72 became 34 of 73, still a fail. The dollar-index file of 2018 is NOT certified by that audit (its hourly returns do not follow EUR/USD at any offset), so the dollar reads of the 2018 CPI rows are the weakest numbers here.
 
-Events: 170 with M1 coverage (85 CPI from 2018-02-14, 51 NFP and 34 FOMC from 2022), to 2026-10-28. CPI 2018-21 dates dropped by the spike check: 2018-01-12 (1.69x), 2018-03-13 (0.34x), 2018-04-11 (1.19x), 2018-06-12 (1.67x), 2018-07-12 (1.92x), 2019-12-11 (1.38x), 2020-02-13 (1.21x), 2020-03-11 (0.81x), 2020-04-10 (no barsx), 2020-05-12 (0.98x), 2020-06-10 (1.35x), 2020-07-14 (1.09x), 2020-08-12 (1.18x), 2020-10-13 (0.84x), 2020-11-12 (1.09x), 2021-01-13 (1.93x). Events without bars: FOMC 2022-06-15, NFP 2023-03-10, CPI 2023-03-14, FOMC 2023-03-22, NFP 2023-04-07, CPI 2023-04-12, FOMC 2023-05-03, NFP 2023-05-05, NFP 2023-06-02, CPI 2023-06-13, FOMC 2023-06-14, NFP 2023-07-07, CPI 2023-07-12, FOMC 2023-07-26, NFP 2026-04-03.
+Events: 171 with M1 coverage (86 CPI from 2018-02-14, 51 NFP and 34 FOMC from 2022), to 2026-10-28. CPI 2018-21 dates dropped by the spike check: 2018-01-12 (1.69x), 2018-04-11 (1.09x), 2018-06-12 (1.67x), 2018-07-12 (1.92x), 2019-12-11 (1.38x), 2020-02-13 (1.21x), 2020-03-11 (0.81x), 2020-04-10 (no bars), 2020-05-12 (0.98x), 2020-06-10 (1.35x), 2020-07-14 (1.09x), 2020-08-12 (1.18x), 2020-10-13 (0.84x), 2020-11-12 (1.09x), 2021-01-13 (1.93x). Events without bars: FOMC 2022-06-15, NFP 2023-03-10, CPI 2023-03-14, FOMC 2023-03-22, NFP 2023-04-07, CPI 2023-04-12, FOMC 2023-05-03, NFP 2023-05-05, NFP 2023-06-02, CPI 2023-06-13, FOMC 2023-06-14, NFP 2023-07-07, CPI 2023-07-12, FOMC 2023-07-26, NFP 2026-04-03.
 
 ## The test (CPI, gold T+5→T+60 against the dollar's first read)
 
 | Type | n | hits | hit rate | p (one-sided) | 2018-21 | 2022-26 | pass |
 |---|---|---|---|---|---|---|---|
-| CPI | 72 | 34 | 47% | 0.722 | 32% (25) | 55% (47) | no |
+| CPI | 73 | 34 | 47% | 0.7586 | 31% (26) | 55% (47) | no |
 | NFP (secondary) | 46 | 20 | 43% | 0.849 | n/a | 43% (46) | not a pass route |
 | FOMC (secondary) | 28 | 15 | 54% | 0.4253 | n/a | 54% (28) | not a pass route |
 
@@ -22,8 +22,8 @@ The first-hour split overlaps the first five minutes that define the read, so it
 
 | Type | Read | n | gold T→T+60 median | up | gold T+5→T+60 median | up |
 |---|---|---|---|---|---|---|
-| CPI | all | 85 | +0.10% | 58% | -0.00% | 49% |
-| CPI | hot read (dollar up) | 31 | -0.24% | 29% | +0.01% | 55% |
+| CPI | all | 86 | +0.12% | 58% | 0.00% | 50% |
+| CPI | hot read (dollar up) | 32 | -0.22% | 31% | +0.02% | 56% |
 | CPI | in line | 13 | +0.06% | 54% | -0.01% | 38% |
 | CPI | cool read (dollar down) | 41 | +0.26% | 80% | -0.04% | 49% |
 | NFP | all | 51 | +0.13% | 55% | -0.06% | 45% |

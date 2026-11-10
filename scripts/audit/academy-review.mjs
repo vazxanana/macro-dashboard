@@ -246,8 +246,11 @@ section = 'F';
   const ok = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t }, acct, { riskPct: 0.25 });
   check('an order without a stop, or with the stop on the wrong side, is blocked', noStop.allowed === false && wrongSide.allowed === false, `${noStop.codes}; ${wrongSide.codes}`);
   check('an allowed order risks 0.25 % of the balance, never more', ok.allowed === true && ok.riskPct <= 0.2501, `${r2(ok.riskCash)} of 100,000`);
-  const big = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t }, acct, { riskPct: 5 });
-  check('a request for more risk than the cap is not honoured', big.allowed === false || big.riskPct <= (MXK.DEFAULTS.maxRiskPct || 1) + 1e-9, `asked 5 %, got ${big.allowed ? r2(big.riskPct) + ' %' : 'blocked: ' + big.codes}`);
+  // the request is on the ORDER (the limits stay the engine's own): asking for 5 % is refused, and so is an explicit size that risks more
+  const big = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t, riskPct: 5 }, acct, {});
+  const bigUnits = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t, units: ok.size * 4 }, acct, {});
+  check('a request for more risk than the limit is not honoured (a risk % on the order, or an explicit size)', big.allowed === false && big.codes.includes('risk') && big.riskCash === 0 && bigUnits.allowed === false && big.proposed.riskPct <= MXK.DEFAULTS.riskPct + 1e-6,
+    `asked 5 %: ${big.allowed ? 'ALLOWED at ' + r2(big.riskPct) + ' %' : 'blocked (' + big.codes + ')'}; 4x the size: ${bigUnits.allowed ? 'ALLOWED' : 'blocked (' + bigUnits.codes + ')'}; the engine's own size risks ${big.proposed.riskPct} %`);
   let a = MXK.account(100000, { t: c.t }); a = { ...a, dayPnl: -1100, balance: 98900, equity: 98900 };
   const afterLoss = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t }, a, {});
   note(`after a day loss past the limit: ${afterLoss.allowed ? 'allowed' : 'blocked (' + afterLoss.codes + ')'}`);

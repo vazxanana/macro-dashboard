@@ -1,12 +1,13 @@
 // ICT iFVG exit study (edge research, topic ict-exits). Paper research only; changes nothing live.
 // Entries: the live tracker's own signals() / isASetup() (ict/tracker.mjs, post-#413) on HistData M1 2018 -> Oct 2026
 // (NSXUSD = Nasdaq 100 cash for NQ, SPXUSD = S&P 500 cash for ES, XAUUSD spot for GC). H1 and D1 are built from M1
-// (HistData is EST without DST -> UTC +5 h; tracker's halt hour 17 ET dropped from H1; day rolls 22:00 UTC as idxrec.mjs).
+// (HistData via the council/histdata.mjs clock, +5 h before 10 Nov 2026; tracker's halt hour 17 ET dropped from H1; day rolls 22:00 UTC as idxrec.mjs).
 // Every signal is its own trade (same entry set for every exit variant). Exits are simulated on M1 candles, stop checked
 // before the candle's own extreme moves the stop/MFE (as the tracker and replay do); stop wins a candle that also hits a target.
 // Usage: node sim.mjs <dataDir> <market nas|spx|xau> <out.json>
 import fs from 'node:fs'; import zlib from 'node:zlib'; import path from 'node:path';
 import { signals, agg, inHalt, isASetup, sizeOf, P, MIN_GRADE } from '../../../ict/tracker.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const [dir, mk, out] = process.argv.slice(2);
 const CFG = {
@@ -22,7 +23,7 @@ let T = [], O = [], Hh = [], L = [], C = [];
 for (const f of files) {
   for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(base, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const [d, o, h, l, c] = ln.split(';');
-    const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(d);
     T.push(t); O.push(+o); Hh.push(+h); L.push(+l); C.push(+c);
   }
 }

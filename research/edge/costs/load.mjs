@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { nyLocalToUtc } from './costs.mjs';
+import { histToUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 export const DIRS = { XAUUSD: 'xau-histdata', NSXUSD: 'nsxusd-histdata', SPXUSD: 'spxusd-histdata' };
 export function loadM1(root, sym, y0, y1) {
@@ -19,7 +19,7 @@ export function loadM1(root, sym, y0, y1) {
       if (ln.length < 20) continue;
       const p = ln.split(';');
       const d = p[0];
-      T.push(nyLocalToUtc(+d.slice(0, 4), +d.slice(4, 6), +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)));
+      T.push(histToUtc(+d.slice(0, 4), +d.slice(4, 6), +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)));
       O.push(+p[1]); H.push(+p[2]); L.push(+p[3]); C.push(+p[4]);
     }
   }

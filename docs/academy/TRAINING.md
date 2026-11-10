@@ -7,7 +7,7 @@ research candles (council-data commit `60cea4527cb1`); they are in `academy/data
 
 ## 1. What the dataset is
 
-One row per candidate of the seven edges: 2,775 rows.
+One row per candidate of the seven edges: 2,783 rows (corrected research clock, `docs/academy/DATA-CLOCK.md`).
 
 | File | What it holds |
 |---|---|
@@ -42,7 +42,7 @@ The page must build its snapshots the same way, or its features will not match t
   Its dates begin in January 2022. Before that no calendar is passed, so `eventNear` is null ("unknown"), not false.
   From 2022 on a candidate near one of these releases has `regime: 'event'`.
 
-Rows with a missing or short timeframe: 10 of 2,775 (gtl 3, geg 2, nq-open 5). All are in early 2018, before the
+Rows with a missing or short timeframe: 10 of 2,783 (gtl 3, geg 2, nq-open 5). All are in early 2018, before the
 candles hold enough history, and all are flagged `pre2020` anyway.
 
 ## 2. No look-ahead
@@ -67,27 +67,28 @@ Net R a trade, filled trades, train pool, policy `policy-1.0`, no lessons, no mo
 
 | Edge | Take every setup: n, R, t | Policy TAKE: n, R | Policy WAIT: n, R | TAKE minus WAIT, Welch t | Verdict |
 |---|---|---|---|---|---|
-| replica | 303, +0.428, 2.34 | 153, +0.209 | 150, +0.652 | -0.443, t -1.21 | no measurable difference |
-| mosha-bo | 29, +0.971, 2.08 | 16, +1.085 | 13, +0.831 | +0.254, t 0.27 | no measurable difference |
-| gtrend | 19, +1.730, 1.54 | 19, +1.730 | 0 | none | no measurable difference (it took all 19) |
-| gtl | 165, +0.232, 2.28 | 57, +0.405 | 108, +0.141 | +0.264, t 1.20 | no measurable difference |
-| geg | 84, +0.405, 1.81 | 57, +0.473 | 27, +0.262 | +0.210, t 0.41 | no measurable difference |
-| gmp | 494, +0.062, 1.09 | 110, -0.023 | 384, +0.086 | -0.109, t -0.80 | no measurable difference |
-| nq-open | 327, +0.185, 2.10 | 74, +0.490 | 253, +0.095 | +0.395, t 1.79 | no measurable difference |
-| all seven | 1,421, +0.249, 4.57 | 486, +0.342 | 935, +0.201 | +0.141, t 1.17 | no measurable difference |
+| replica | 325, +0.406, 2.34 | 169, +0.148 | 156, +0.685 | -0.537, t -1.53 | no measurable difference |
+| mosha-bo | 28, +0.815, 1.79 | 15, +1.227 | 13, +0.339 | +0.889, t 1.01 | no measurable difference |
+| gtrend | 18, +1.885, 1.60 | 18, +1.885 | 0 | none | no measurable difference (it took all 18) |
+| gtl | 166, +0.216, 2.13 | 59, +0.400 | 107, +0.114 | +0.286, t 1.33 | no measurable difference |
+| geg | 82, +0.469, 2.05 | 54, +0.463 | 28, +0.481 | -0.018, t -0.03 | no measurable difference |
+| gmp | 513, +0.075, 1.35 | 120, -0.041 | 393, +0.110 | -0.151, t -1.17 | no measurable difference |
+| nq-open | 344, +0.204, 2.39 | 87, +0.481 | 257, +0.111 | +0.370, t 1.84 | no measurable difference |
+| all seven | 1,476, +0.252, 4.74 | 522, +0.312 | 954, +0.219 | +0.093, t 0.82 | no measurable difference |
 
 Plainly: on this data the policy as built does not separate good setups from bad ones. It takes about a third of the
-setups (35 %). The trades it skips made money too (+0.201 R a trade, 935 trades), so following it would have earned less
+setups (36 %). The trades it skips made money too (+0.219 R a trade, 954 trades), so following it would have earned less
 in total than taking every setup. On replica and gmp the skipped trades did better than the taken ones, though not by a
-margin that means anything (|t| under 2). nq-open is the nearest to a real difference (t 1.79, both halves of the period
-the same sign), which is one result out of seven and not a finding by itself. gtrend (19 trades) and mosha-bo (29)
-are too small to show anything.
+margin that means anything (|t| under 2). nq-open is the nearest to a real difference (t 1.84, both halves of the period
+the same sign), which is one result out of seven and not a finding by itself. gtrend (18 trades) and mosha-bo (28)
+are too small to show anything. These numbers are from the corrected research clock; the table of the old-clock run
+(1,421 trades, t 1.17 overall) is in `docs/academy/DATA-CLOCK.md`.
 
 Each edge block in `eval.json` also has: the same split into the first 70 % and last 30 % of the period by time
 (`split`), how many orders never filled (`unfilled`), the gates and the strongest contradicting factor behind the waits
 (`waits`), and the taken trades by stated confidence (`takeByConfidence`). Most waits are evidence waits, not gates
-(689 of 949). The most frequent top reason is a resting level in the way of the target (`oppLiq`, 341), then the
-higher-timeframe bias (183). The policy was measured, not tuned: nothing in the core was changed.
+(705 of 966). The most frequent top reason is a resting level in the way of the target (`oppLiq`, 342), then the
+higher-timeframe bias (185). The policy was measured, not tuned: nothing in the core was changed.
 
 ## 4. The offline scorer (`ml/`)
 
@@ -98,7 +99,7 @@ node ml/parity.mjs                                # exported models against MXA.
 ```
 
 - **Target:** net R > 0 (a win after costs). A regression view of net R is reported as a secondary line only.
-- **Rows:** train pool, not flagged (clock-shifted week, before 2020), filled trades, every needed timeframe present.
+- **Rows:** train pool, not flagged (a week whose clock could not be verified, before 2020), filled trades, every needed timeframe present.
 - **Inputs:** 70 of the 95 feature keys (71 for the pooled model, which adds the edge id). Left out: the 15 raw price levels (they do not carry across years), three data
   flags and free text, the three calendar keys and `regime` (the calendar starts in 2022, so their missing values would
   mark the era), and the three dollar-index keys (always null). The list and reasons are in `index.json` `notInputs`.
@@ -128,30 +129,32 @@ gets no credit for simply preferring one edge.
 
 **Calibration.** `calibrated: true` only when Platt scaling, fitted on the out-of-fold scores of every fold but the
 last, gives on the last fold a Brier score no worse than the prior rate and a mean probability within 0.05 of the win
-rate. Then the model carries a `platt` block. The replica and nq-open models pass; gtl, gmp and the pooled model do
-not. The last fold of a single edge is small (33 to 74 trades), so this is a weak check, and a calibrated model that
+rate. Then the model carries a `platt` block. The nq-open model passes; replica, gtl, gmp and the pooled model do
+not. The last fold of a single edge is small (33 to 77 trades), so this is a weak check, and a calibrated model that
 cannot rank trades is still of no use.
 
 ### Results (out of fold)
 
 | Scope | Train rows | Out-of-fold n | AUC | Brier (prior-rate Brier) | Kept: n, R | Skipped: n, R | t | Verdict |
 |---|---|---|---|---|---|---|---|---|
-| replica | 303 | 182 | 0.561 | 0.1982 (0.2000) | 181, +0.595 | 1, -1.575 | none (1 skipped) | rejected challenger |
-| gtl | 165 | 99 | 0.516 | 0.2565 (0.2514) | 56, +0.340 | 43, +0.260 | 0.29 | rejected challenger |
-| gmp | 494 | 296 | 0.511 | 0.2517 (0.2467) | 248, +0.069 | 48, +0.092 | -0.12 | rejected challenger |
-| nq-open | 327 | 196 | 0.563 | 0.2597 (0.2630) | 154, +0.410 | 42, +0.077 | 1.29 | rejected challenger |
-| pooled | 1,421 | 853 | 0.602 | 0.2342 (0.2416) | 623, +0.382 | 230, +0.292 | -0.99 | rejected challenger |
-| mosha-bo, gtrend, geg | 29, 19, 84 | | | | | | | not enough data |
+| replica | 325 | 195 | 0.547 | 0.1847 (0.1842) | 185, +0.139 | 10, +2.652 | -1.33 | rejected challenger |
+| gtl | 166 | 100 | 0.456 | 0.2647 (0.2560) | 79, +0.114 | 21, +0.878 | -2.30 | rejected challenger |
+| gmp | 513 | 308 | 0.489 | 0.2571 (0.2489) | 258, +0.123 | 50, +0.098 | 0.13 | rejected challenger |
+| nq-open | 344 | 206 | 0.579 | 0.2553 (0.2625) | 178, +0.423 | 28, +0.054 | 1.31 | rejected challenger |
+| pooled | 1,476 | 886 | 0.587 | 0.2367 (0.2422) | 708, +0.361 | 178, +0.461 | -1.84 | rejected challenger |
+| mosha-bo, gtrend, geg | 28, 18, 82 | | | | | | | not enough data |
 
-No model improves on taking every setup. The pooled AUC of 0.602 is mostly the edges having different win rates
-(replica wins 24 % of the time, gtl 52 %); measured inside each edge it is 0.545. An AUC of 0.51 to 0.56 on 99 to 296
-trades is what noise looks like. The logistic baseline is no better (its Brier score is worse than the prior rate on
-every edge). The regression view agrees: out-of-fold error is about that of predicting the training mean.
+No model improves on taking every setup. The pooled AUC of 0.587 is mostly the edges having different win rates
+(replica wins 24 % of the time, gtl 51 %); measured inside each edge it is 0.534. An AUC of 0.46 to 0.58 on 100 to 308
+trades is what noise looks like. On gtl the trades the scorer kept did worse than the ones it skipped (t -2.30): a
+scorer that is wrong, not merely useless. The logistic baseline is no better. The regression view agrees: out-of-fold
+error is about that of predicting the training mean. These are the numbers on the corrected research clock; the
+old-clock report is `academy/archive/pre-clock/ml-models/report.md` (same verdicts: every model rejected).
 
 The exam pool was first read only after the walk-forward results above had been read and the settings were final, and
 it chose nothing. A run computes it once, after that run's verdicts are fixed; later runs repeat the same numbers. It is
-in a separate `exam` block per model: replica n 50, AUC 0.601; gtl n 61, 0.527; gmp n 211, 0.533; nq-open n 197, 0.537;
-pooled n 586, 0.538. Each final threshold keeps every trade, so the exam trading line equals taking every setup. Exam
+in a separate `exam` block per model: replica n 50, AUC 0.570; gtl n 60, 0.512; gmp n 213, 0.557; nq-open n 201, 0.562;
+pooled n 602, 0.544. Each final threshold keeps every trade, so the exam trading line equals taking every setup. Exam
 months lie between training months: it is held-out data, not later data.
 
 ### How to read `ml/models/index.json` and `report.md`
@@ -213,10 +216,11 @@ trains, runs parity and the tests, and uploads the results as an artifact. It co
 - **Two candle feeds.** Features, candidates and outcomes come from HistData M1 candles. The page replays candles from
   the live candle proxy. Prices differ by a small feed basis, the daily bar on the proxy may not match bar for bar, and
   the proxy has gaps of its own. A feature computed live can differ from the stored one for the same moment.
-- **The research clock.** In about four weeks a year the research candles are stamped one hour early (see
-  `MERIDIANX_BUILD_PROGRESS.md`). Those 187 candidates carry `rule.clockShift`. They have a feature row, but they are
-  out of the policy check, the training rows and the exam block. So are the candidates before 2020.
-- **Small samples.** 1,421 usable train trades over seven edges; three edges are too small to fit and two more
+- **The research clock.** Corrected on 10 Nov 2026 (`docs/academy/DATA-CLOCK.md`): the loaders convert the HistData
+  labels with `council/histdata.mjs`. 101 candidates still carry `rule.clockShift`: their week could not be verified
+  against a second feed (most are in the hole of the 2023 files). They have a feature row, but they are out of the
+  policy check, the training rows and the exam block. So are the candidates before 2020.
+- **Small samples.** 1,476 usable train trades over seven edges; three edges are too small to fit and two more
   (mosha-bo, gtrend) too small to judge the policy on. A t under 2 here means "cannot tell", not "no effect".
 - **Many comparisons.** Seven edges and five models were looked at. One t near 2 among them would not be evidence.
 - **The exam pool is interleaved in time** with the train pool (whole months), so it is not an out-of-time test. The

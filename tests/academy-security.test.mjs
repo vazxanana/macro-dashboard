@@ -400,7 +400,7 @@ const ACADEMY_FILES = [...RUNTIME, ...GENERATORS];
 test('isolation: no file of the Academy references the trader, the mirror, a broker, an order call, the council-data writer or a production write token', () => {
   assert.ok(RUNTIME.length >= 12 && RUNTIME.includes('assets/academy-core.js') && RUNTIME.some((f) => f.startsWith('ml/')) && GENERATORS.some((f) => f.startsWith('academy/gen/')), `${RUNTIME.length} + ${GENERATORS.length}`);
   const FORBID = [
-    [/(?:from|import|require)\s*\(?\s*['"][^'"]*council\/(?!events\.mjs)[\w.-]+['"]/, 'imports a council module (only council/events.mjs, the release calendar, may be read)'],
+    [/(?:from|import|require)\s*\(?\s*['"][^'"]*council\/(?!events\.mjs|histdata\.mjs)[\w.-]+['"]/, 'imports a council module (only council/events.mjs, the release calendar, and council/histdata.mjs, the research-candle clock converter, may be read)'],
     [/(?:from|import|require)\s*\(?\s*['"][^'"]*(?:\/|^)(?:ict\/|api\/(?!_?academy|_session)[\w-]+)/, 'imports the ICT desk or another API function'],
     [/ctrader|c-trader|tradovate|tradestation|metatrader|\bmt5\b/i, 'names a broker or a broker bridge'],
     [/NEW_ORDER|ORDER_REQ|AMEND_POSITION|CANCEL_ORDER|CLOSE_POSITION|placeOrder|sendOrder|submitOrder|createOrder|marketOrder\s*\(|limitOrder\s*\(/, 'calls or names an order message'],
@@ -417,6 +417,8 @@ test('isolation: no file of the Academy references the trader, the mirror, a bro
   for (const f of GENERATORS) { const text = src(f); for (const [re, what] of FORBID) { const m = re.exec(text); assert.ok(!m, `${f} ${what}: "${m && text.slice(Math.max(0, m.index - 30), m.index + 50).replace(/\s+/g, ' ')}"`); } }
   const readsRuleCode = GENERATORS.filter((f) => /readFileSync\([^)]*council\//.test(src(f))).sort();
   assert.deepEqual(readsRuleCode, ['academy/gen/gmp.mjs', 'academy/gen/run.mjs'], 'the generators that read the Trader\'s source text (read only): a new one is a decision, not a drift');
+  // the clock converter the generators read is pure: no import, no file, no network, so reading it pulls in no council code
+  { const h = src('council/histdata.mjs'); assert.ok(!/\bimport\b[^;]*from|\brequire\s*\(|\bfetch\s*\(|process\.env|node:/.test(h), 'council/histdata.mjs stays a pure module'); }
   // one generator uses the network: the clock check reads public candles from the site's keyless candle proxy, and nothing else
   const NET = /\bfetch\s*\(|https?:\/\/(?!www\.w3\.org)|node:https?|require\(['"]https?['"]\)/;
   assert.deepEqual(GENERATORS.filter((f) => NET.test(src(f))), ['academy/gen/clock-check.mjs']); assert.deepEqual([...src('academy/gen/clock-check.mjs').matchAll(/fetch\(`\$\{BASE\}(\/[a-z/]+)/g)].map((m) => m[1]), ['/md/bars']); assert.equal((src('academy/gen/clock-check.mjs').match(/\bfetch\s*\(/g) || []).length, 1);

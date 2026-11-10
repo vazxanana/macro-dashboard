@@ -1,0 +1,923 @@
+{
+ "thresholds": {
+  "CERT_COVERAGE": 0.995,
+  "USABLE_COVERAGE": 0.97,
+  "CERT_MAX_GAP_SEC": 86400,
+  "SPIKE_K": 12,
+  "SPIKE_WIN": 100,
+  "SPIKE_MIN": 30,
+  "MAX_SPIKE_RATE": 0.001,
+  "MAX_OFFSESSION": 0.01,
+  "SHIFT_MIN_DAYS": 3,
+  "MAX_SHIFT_WEEKS": 0.1,
+  "MAX_FLAT_CERT": 0.001,
+  "MAX_FLAT_UNRELIABLE": 0.05,
+  "END_TOL": 0.05
+ },
+ "clock": {
+  "finding": "From 2019 on, the HistData files are stamped on a clock that changes with Europe's daylight-saving dates, and the studies read the labels as New York wall-clock time. The two agree except while New York is on daylight time and Europe is not: from the second Sunday of March to the last Sunday of March, and from the last Sunday of October to the first Sunday of November. In those weeks every bar time the studies used is one hour EARLY. The 2018 files show no shift.",
+  "evidence": {
+   "check": "clock-shift (academy/quality.mjs): a week in which, on at least 3 of Monday-Thursday, the daily break sits one hour before its New York time",
+   "mismatchWeeksInSpan": 32,
+   "weeksDetected": {
+    "xau": 27,
+    "nas100": 26
+   },
+   "detectedOutsideMismatchWeeks": {
+    "xau": [],
+    "nas100": []
+   },
+   "mismatchWeeksNotDetected": {
+    "xau": [
+     "2018-03-12",
+     "2018-03-19",
+     "2018-10-29",
+     "2023-03-13",
+     "2023-03-20"
+    ],
+    "nas100": [
+     "2018-03-12",
+     "2018-03-19",
+     "2018-10-29",
+     "2023-03-13",
+     "2023-03-20",
+     "2024-10-28"
+    ]
+   },
+   "notDetectedNote": "the three 2018 weeks keep the break at 17:00 New York (no shift); the 2023 and 2024 weeks listed have too few complete days for the weekly check",
+   "yearsWithShift": {
+    "xau": [
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ],
+    "nas100": [
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ]
+   },
+   "repeatedHourDays": [
+    "2019-10-27",
+    "2020-10-25",
+    "2021-10-31",
+    "2022-10-30",
+    "2023-10-29",
+    "2024-10-27",
+    "2025-10-26"
+   ],
+   "repeatedHourNote": "days whose raw gold file repeats one whole hour of minute labels (the file's clock going back): each is the last Sunday of October, the European change, not the first Sunday of November"
+  },
+  "crossCheck": {
+   "file": "academy/data/clock-check.json",
+   "checked": "2026-11-10",
+   "feed": "meridianx.dev /md/bars sym=xau tf=1h (OANDA XAU_USD)",
+   "weeks": 27,
+   "weeksOneHourEarly": 16,
+   "agreesWithTheTags": true
+  },
+  "effect": "The candidates and outcomes are exactly what the studies produced, so they keep the studies' times. A candidate inside those weeks carries rule.clockShift = true: its t is one hour early against a correctly stamped feed, and a rule that reads the clock (the 09:30 New York open, the 07:00-17:00 UTC window, the news veto, the daily and H4 buckets) looked at the wrong hour. Leave these candidates out of anything replayed on another feed and out of exam scoring until the studies are re-run on a corrected clock.",
+  "flagged": {
+   "replica": 37,
+   "mosha-bo": 13,
+   "gtrend": 3,
+   "gtl": 18,
+   "geg": 15,
+   "gmp": 62,
+   "nq-open": 39
+  }
+ },
+ "markets": {
+  "xau": {
+   "source": "HistData XAUUSD M1 (council-data research/candles/xau-histdata), labels read as New York time and converted to UTC, aggregated to H1",
+   "tf": "1h",
+   "calendar": "spot gold: Sun 18:00 - Fri 17:00 New York, daily break 17:00-18:00",
+   "usedBy": [
+    "replica",
+    "mosha-bo",
+    "gtrend",
+    "gtl",
+    "geg",
+    "gmp"
+   ],
+   "rawM1": {
+    "files": 29,
+    "rows": 3082748,
+    "duplicateLabels": 1624,
+    "identicalRows": 422,
+    "repeatedHourDays": [
+     "2019-10-27",
+     "2020-10-25",
+     "2021-10-31",
+     "2022-10-30",
+     "2023-10-29",
+     "2024-10-27",
+     "2025-10-26"
+    ],
+    "firstLabel": "20180101 180100",
+    "lastLabel": "20261030 155800"
+   },
+   "status": "usable",
+   "coverage": 0.97654,
+   "bars": 51544,
+   "expected": 52508,
+   "missing": 1232,
+   "maxGapHours": 23,
+   "span": {
+    "from": 1514847600,
+    "to": 1793386800
+   },
+   "counts": {
+    "flat": 110,
+    "off-session": 268,
+    "gap": 846,
+    "spike": 6,
+    "clock-shift": 27
+   },
+   "worstGaps": [
+    {
+     "from": 1640300400,
+     "to": 1640559600,
+     "missing": 23
+    },
+    {
+     "from": 1672009200,
+     "to": 1672095600,
+     "missing": 23
+    },
+    {
+     "from": 1672614000,
+     "to": 1672700400,
+     "missing": 23
+    },
+    {
+     "from": 1790294400,
+     "to": 1790546400,
+     "missing": 21
+    },
+    {
+     "from": 1622433600,
+     "to": 1622505600,
+     "missing": 19
+    },
+    {
+     "from": 1606712400,
+     "to": 1606780800,
+     "missing": 18
+    },
+    {
+     "from": 1558908000,
+     "to": 1558933200,
+     "missing": 7
+    },
+    {
+     "from": 1764950400,
+     "to": 1765148400,
+     "missing": 6
+    }
+   ],
+   "clockShift": [
+    {
+     "week": "2019-03-11",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-03-18",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-03-25",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-10-28",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-09",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-16",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-23",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-10-26",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-03-15",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-03-22",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-11-01",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-03-14",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-03-21",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-10-31",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2023-10-30",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-11",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-18",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-25",
+     "shiftSec": -3600,
+     "days": 3
+    },
+    {
+     "week": "2024-10-28",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-03-10",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-03-17",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-03-24",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-10-27",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-03-09",
+     "shiftSec": -3600,
+     "days": 3
+    },
+    {
+     "week": "2026-03-16",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-03-23",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-10-26",
+     "shiftSec": -3600,
+     "days": 4
+    }
+   ],
+   "byYear": {
+    "2018": {
+     "status": "unreliable",
+     "bars": 6035,
+     "coverage": 0.99562,
+     "missing": 26,
+     "counts": {
+      "flat": 108,
+      "off-session": 127,
+      "gap": 8
+     }
+    },
+    "2019": {
+     "status": "usable",
+     "bars": 5899,
+     "coverage": 0.99073,
+     "missing": 55,
+     "counts": {
+      "gap": 31,
+      "off-session": 20,
+      "flat": 1,
+      "spike": 1,
+      "clock-shift": 4
+     }
+    },
+    "2020": {
+     "status": "usable",
+     "bars": 5907,
+     "coverage": 0.98825,
+     "missing": 70,
+     "counts": {
+      "gap": 31,
+      "off-session": 20,
+      "clock-shift": 4
+     }
+    },
+    "2021": {
+     "status": "usable",
+     "bars": 5891,
+     "coverage": 0.9864,
+     "missing": 81,
+     "counts": {
+      "gap": 24,
+      "off-session": 15,
+      "spike": 2,
+      "clock-shift": 3
+     }
+    },
+    "2022": {
+     "status": "usable",
+     "bars": 5914,
+     "coverage": 0.99026,
+     "missing": 58,
+     "counts": {
+      "gap": 25,
+      "off-session": 15,
+      "clock-shift": 3
+     }
+    },
+    "2023": {
+     "status": "unreliable",
+     "bars": 5153,
+     "coverage": 0.8699,
+     "missing": 769,
+     "counts": {
+      "gap": 636,
+      "off-session": 11,
+      "spike": 1,
+      "clock-shift": 1
+     }
+    },
+    "2024": {
+     "status": "usable",
+     "bars": 5933,
+     "coverage": 0.99278,
+     "missing": 43,
+     "counts": {
+      "gap": 30,
+      "off-session": 19,
+      "clock-shift": 4
+     }
+    },
+    "2025": {
+     "status": "usable",
+     "bars": 5905,
+     "coverage": 0.99174,
+     "missing": 49,
+     "counts": {
+      "gap": 32,
+      "off-session": 20,
+      "clock-shift": 4
+     }
+    },
+    "2026": {
+     "status": "usable",
+     "bars": 4907,
+     "coverage": 0.98827,
+     "missing": 58,
+     "counts": {
+      "gap": 28,
+      "spike": 1,
+      "off-session": 21,
+      "flat": 1,
+      "clock-shift": 4
+     }
+    }
+   }
+  },
+  "nas100": {
+   "source": "HistData NSXUSD M1 (council-data research/candles/nsxusd-histdata), labels read as New York time and converted to UTC, aggregated to H1",
+   "tf": "1h",
+   "calendar": "NSXUSD (HistData): Sun 18:00 - Fri 16:15 New York, daily break 16:15-18:00",
+   "usedBy": [
+    "nq-open"
+   ],
+   "rawM1": {
+    "files": 18,
+    "rows": 2981326,
+    "duplicateLabels": 856,
+    "identicalRows": 420,
+    "repeatedHourDays": [
+     "2019-10-27",
+     "2020-10-25",
+     "2021-10-31",
+     "2022-10-30",
+     "2023-10-29",
+     "2024-10-27",
+     "2025-10-26",
+     "2026-06-29"
+    ],
+    "firstLabel": "20180101 163000",
+    "lastLabel": "20261030 151300"
+   },
+   "status": "usable",
+   "coverage": 0.97355,
+   "bars": 51406,
+   "expected": 52508,
+   "missing": 1389,
+   "maxGapHours": 26,
+   "span": {
+    "from": 1514840400,
+    "to": 1793386800
+   },
+   "counts": {
+    "flat": 120,
+    "off-session": 287,
+    "gap": 833,
+    "spike": 10,
+    "incomplete": 1,
+    "clock-shift": 26
+   },
+   "worstGaps": [
+    {
+     "from": 1688407200,
+     "to": 1688508000,
+     "missing": 26
+    },
+    {
+     "from": 1640300400,
+     "to": 1640559600,
+     "missing": 23
+    },
+    {
+     "from": 1672009200,
+     "to": 1672095600,
+     "missing": 23
+    },
+    {
+     "from": 1672614000,
+     "to": 1672700400,
+     "missing": 23
+    },
+    {
+     "from": 1790294400,
+     "to": 1790546400,
+     "missing": 21
+    },
+    {
+     "from": 1622433600,
+     "to": 1622505600,
+     "missing": 19
+    },
+    {
+     "from": 1606712400,
+     "to": 1606780800,
+     "missing": 18
+    },
+    {
+     "from": 1584309600,
+     "to": 1584360000,
+     "missing": 14
+    }
+   ],
+   "clockShift": [
+    {
+     "week": "2019-03-11",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-03-18",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-03-25",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2019-10-28",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-09",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-16",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-03-23",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2020-10-26",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-03-15",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-03-22",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2021-11-01",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-03-14",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-03-21",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2022-10-31",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2023-10-30",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-11",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-18",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2024-03-25",
+     "shiftSec": -3600,
+     "days": 3
+    },
+    {
+     "week": "2025-03-10",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-03-17",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-03-24",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2025-10-27",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-03-09",
+     "shiftSec": -3600,
+     "days": 3
+    },
+    {
+     "week": "2026-03-16",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-03-23",
+     "shiftSec": -3600,
+     "days": 4
+    },
+    {
+     "week": "2026-10-26",
+     "shiftSec": -3600,
+     "days": 4
+    }
+   ],
+   "byYear": {
+    "2018": {
+     "status": "unreliable",
+     "bars": 6029,
+     "coverage": 0.99376,
+     "missing": 37,
+     "counts": {
+      "flat": 113,
+      "off-session": 132,
+      "gap": 10
+     }
+    },
+    "2019": {
+     "status": "usable",
+     "bars": 5890,
+     "coverage": 0.98921,
+     "missing": 64,
+     "counts": {
+      "gap": 32,
+      "off-session": 20,
+      "flat": 3,
+      "spike": 3,
+      "clock-shift": 4
+     }
+    },
+    "2020": {
+     "status": "usable",
+     "bars": 5875,
+     "coverage": 0.98288,
+     "missing": 102,
+     "counts": {
+      "gap": 37,
+      "spike": 1,
+      "off-session": 20,
+      "flat": 2,
+      "clock-shift": 4
+     }
+    },
+    "2021": {
+     "status": "usable",
+     "bars": 5907,
+     "coverage": 0.9864,
+     "missing": 81,
+     "counts": {
+      "gap": 24,
+      "off-session": 31,
+      "clock-shift": 3
+     }
+    },
+    "2022": {
+     "status": "usable",
+     "bars": 5902,
+     "coverage": 0.98825,
+     "missing": 70,
+     "counts": {
+      "gap": 25,
+      "off-session": 15,
+      "spike": 3,
+      "clock-shift": 3
+     }
+    },
+    "2023": {
+     "status": "unreliable",
+     "bars": 5136,
+     "coverage": 0.86686,
+     "missing": 787,
+     "counts": {
+      "gap": 601,
+      "flat": 1,
+      "off-session": 12,
+      "clock-shift": 1
+     }
+    },
+    "2024": {
+     "status": "usable",
+     "bars": 5893,
+     "coverage": 0.9864,
+     "missing": 81,
+     "counts": {
+      "gap": 40,
+      "off-session": 17,
+      "spike": 2,
+      "clock-shift": 3
+     }
+    },
+    "2025": {
+     "status": "usable",
+     "bars": 5878,
+     "coverage": 0.98719,
+     "missing": 76,
+     "counts": {
+      "gap": 34,
+      "off-session": 20,
+      "spike": 1,
+      "flat": 1,
+      "clock-shift": 4
+     }
+    },
+    "2026": {
+     "status": "usable",
+     "bars": 4896,
+     "coverage": 0.98625,
+     "missing": 68,
+     "counts": {
+      "gap": 29,
+      "off-session": 20,
+      "clock-shift": 4
+     }
+    }
+   },
+   "openWindow": {
+    "what": "the 1-minute candles the open-run rule reads: 09:30-11:00 New York on trading days",
+    "tf": "1m",
+    "calendar": "weekdays 09:30-11:00 New York",
+    "status": "unreliable",
+    "coverage": 0.97087,
+    "bars": 199741,
+    "expected": 205470,
+    "missing": 5985,
+    "maxGapHours": 4.5,
+    "span": {
+     "from": 1514903400,
+     "to": 1793372340
+    },
+    "counts": {
+     "spike": 42,
+     "flat": 230,
+     "gap": 114,
+     "duplicate": 256
+    },
+    "worstGaps": [
+     {
+      "from": 1684416600,
+      "to": 1684848600,
+      "missing": 270
+     },
+     {
+      "from": 1677510000,
+      "to": 1677682800,
+      "missing": 180
+     },
+     {
+      "from": 1678802400,
+      "to": 1678975200,
+      "missing": 180
+     },
+     {
+      "from": 1680184800,
+      "to": 1680530400,
+      "missing": 180
+     },
+     {
+      "from": 1684159200,
+      "to": 1684332000,
+      "missing": 180
+     },
+     {
+      "from": 1688392800,
+      "to": 1688563800,
+      "missing": 150
+     },
+     {
+      "from": 1677767400,
+      "to": 1677855600,
+      "missing": 120
+     },
+     {
+      "from": 1681306200,
+      "to": 1681394400,
+      "missing": 120
+     }
+    ],
+    "clockShift": [],
+    "byYear": {
+     "2018": {
+      "status": "usable",
+      "bars": 23131,
+      "coverage": 0.99617,
+      "missing": 89,
+      "counts": {
+       "spike": 6,
+       "flat": 2,
+       "gap": 1
+      }
+     },
+     "2019": {
+      "status": "usable",
+      "bars": 23219,
+      "coverage": 0.99996,
+      "missing": 1,
+      "counts": {
+       "flat": 1,
+       "gap": 1,
+       "spike": 3
+      }
+     },
+     "2020": {
+      "status": "usable",
+      "bars": 23218,
+      "coverage": 0.99605,
+      "missing": 92,
+      "counts": {
+       "gap": 3,
+       "spike": 3
+      }
+     },
+     "2021": {
+      "status": "usable",
+      "bars": 23127,
+      "coverage": 0.99215,
+      "missing": 183,
+      "counts": {
+       "spike": 19,
+       "gap": 3
+      }
+     },
+     "2022": {
+      "status": "certified",
+      "bars": 23214,
+      "coverage": 0.99588,
+      "missing": 96,
+      "counts": {
+       "gap": 3
+      }
+     },
+     "2023": {
+      "status": "unreliable",
+      "bars": 17943,
+      "coverage": 0.77575,
+      "missing": 5187,
+      "counts": {
+       "gap": 78,
+       "flat": 3
+      }
+     },
+     "2024": {
+      "status": "usable",
+      "bars": 23305,
+      "coverage": 0.99979,
+      "missing": 5,
+      "counts": {
+       "spike": 3,
+       "flat": 1,
+       "gap": 1
+      }
+     },
+     "2025": {
+      "status": "usable",
+      "bars": 23106,
+      "coverage": 0.99509,
+      "missing": 114,
+      "counts": {
+       "gap": 6,
+       "spike": 7
+      }
+     },
+     "2026": {
+      "status": "unreliable",
+      "bars": 19478,
+      "coverage": 0.99339,
+      "missing": 128,
+      "counts": {
+       "gap": 17,
+       "flat": 223,
+       "duplicate": 256,
+       "spike": 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

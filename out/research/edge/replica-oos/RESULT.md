@@ -1,5 +1,7 @@
 # Gold replica: out-of-sample test on 2017–2022
 
+> **Clock correction, 10 Nov 2026.** The out-of-sample result on this page is OANDA and is not affected. One cross-check block in `result.json` (`histdataLive`) quotes the gold-systems run on the old clock; the corrected numbers are in `research/edge/gold-systems/`. Details: the last section of this page.
+
 **Question.** The robustness audit (#486, `research/robustness.md`) rates the Gold replica **fragile**. Its +0.877R a trade over 212 trades (t 3.82) comes from the council replay of 2023–26, which is the same data the rule was fitted on. Does the exact live rule make money on 2017–2022, which the rule never saw?
 
 **Verdict: FAIL. The replica does not hold before 2023.**
@@ -152,3 +154,9 @@ CANDLES=$SCR/candles OUT_DIR=$SCR/out node research/edge/replica-oos/replay.mjs 
 D1_WEEKDAYS=1 CANDLES=$SCR/candles OUT_DIR=$SCR/wd node research/edge/replica-oos/replay.mjs                   # sensitivity
 node research/edge/replica-oos/analyze.mjs $SCR/out/trades.json $SCR/wd/trades.json > research/edge/replica-oos/result.json
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. The gold-systems study, which this page quotes as a cross-check, read every year as New York time, so from 2019 its bars were one hour early in about four weeks a year (the weeks the US is on daylight time and Europe is not).
+
+**Not re-run, because nothing here reads the HistData files.** The replay on this page uses OANDA candles and is not affected by the correction. `analyze.mjs` copies one cross-check block, `histdataLive`, from `research/edge/gold-systems/replica.json` when it runs; the block in the committed `result.json` is from the old-clock run (replica live 391 trades at +0.479R; on the corrected clock 394 at +0.462R). It could not be refreshed here because `analyze.mjs` needs the trade file of the OANDA replay, which is not kept in the repo. The verdict above does not rest on that block.

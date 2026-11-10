@@ -1,5 +1,7 @@
 # Which engine setups are worth promoting from shadow to live?
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Verdict: no engine setup has a robust edge on 2018–2026. Promote none to live.** A formal PASS (gold M30→M1, London session only) is weak and is explained below. Keep everything in shadow.
 
 ## What was tested
@@ -130,3 +132,9 @@ node analyze.mjs <out> .
 ```
 
 About 1.5 CPU-hours.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: the session filters, the daily candle boundary and the news windows were an hour late in Europe's summer.

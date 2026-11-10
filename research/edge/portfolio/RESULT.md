@@ -1,5 +1,7 @@
 # Portfolio rules: caps, sizing, correlation and drawdown (edge research, paper only)
 
+> **Clock correction, 10 Nov 2026.** The ICT stream built from HistData was re-run on the corrected candle clock and the portfolio was recomputed. No verdict field changed. Details: the last section of this page.
+
 **Verdict: no rule change passes.** The live caps hold up: a dollar cap of 2 and a 3-hour Scalp re-entry wait each scored best in-sample, and both held out-of-sample. The ICT desk's own `sizeOf` was the best sizing scheme that uses no future data. Two ideas looked promising but are **inconclusive**:
 - an ICT cap on index trades in the same direction
 - a rolling Kelly tilt on the council
@@ -175,3 +177,9 @@ ONLY=nq|es|gc node research/edge/portfolio/ict-stream.mjs <candles dir> ict-<m>.
 node research/edge/portfolio/portfolio.mjs backtest-150d-m30.json ict-nq.json,ict-es.json,ict-gc.json ict/replay.json backtest.json research/edge/portfolio
 node research/edge/portfolio/build-result.mjs
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**The HistData ICT stream (`ict-stream.mjs`) was re-run on the corrected clock on 10 Nov 2026 and `portfolio.mjs` recomputed. No rule or cap was changed.** `detail.json` and `result.json` hold the new numbers. The portfolio also reads live council-data files (`ict/replay.json`, `backtest.json`), which have moved on since the first run: a control run of the old loader on today's files differs from the published `result.json` in 66 of 1,111 numbers (the replay cross-check rows). Between that control and the corrected run, **none of the 17 verdict fields changed**. The verdict above stands: no rule change passes.

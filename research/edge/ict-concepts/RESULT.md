@@ -1,5 +1,7 @@
 # New ICT entry concepts: turtle soup at equal highs/lows, "lows that broke highs", NWOG/NDOG fill (edge research, ict-concepts)
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. The verdict is unchanged: no concept becomes a paper candidate. The live A-rule row improved a little (2018-26: 1,129 trades at +0.101R, t 2.21, became 1,150 at +0.122R, t 2.74). Details: the last section of this page.
+
 **Verdict: FAIL. No concept becomes a paper candidate.** Nothing on the desk changes. The live A-stream, the tracker and the replay are untouched: this study adds files under `research/edge/ict-concepts/` only.
 
 The paper-candidate bar was n ≥ 30, |t| ≥ 2 and positive in both halves, over the replay window (1 Aug 2025 – Nov 2026). In that window every concept is flat or negative. Two of them, the stop-floor versions of the two turtle soups, clear the bar on 2018 – Jul 2025 history and then lose in the window. They are worth a re-test once the window is longer. They are not a candidate now.
@@ -85,3 +87,19 @@ node research/edge/ict-concepts/run.mjs <council-data research/candles> window w
 node research/edge/ict-concepts/run.mjs <council-data research/candles> long long.json   # --max-old-space-size=12000
 node research/edge/ict-concepts/report.mjs window.json long.json   # writes result.json, prints the tables
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced every pass / fail field of the published file (20 of 1,366 numbers differ slightly: the code moved a little since the first run). ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` holds the new numbers.
+
+| Row | Before: n, R a trade, t | After |
+|---|---|---|
+| Live A-rule, replay window | 235, +0.201, 2.02 | 239, +0.238, 2.35 |
+| Live A-rule, 2018-26 | 1,129, +0.101, 2.21 | 1,150, +0.122, 2.74 |
+| gap-ndog, 2018-26 | 1,235, +0.168, 1.43 | 916, +0.180, 1.57 |
+| lbh-floor, 2018-26 | 765, +0.147, 2.57 | 767, +0.128, 2.22 |
+| eqts-floor, 2018-26 | 296, +0.243, 2.48 | 301, +0.250, 2.48 |
+
+No pass / fail field changed. The day-open gap concepts (NDOG, NWOG) lose the most trades, as they should: they are defined by the 17:00 and 18:00 New York hours, which the old clock put an hour late in summer. **The verdict is unchanged: FAIL.**

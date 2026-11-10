@@ -15,7 +15,9 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - The every-minute "keep improving" loop: already gone after the session restart (no scheduled jobs found).
 - Two agents were halted by the usage limit on 9 Nov. Their unfinished, **unverified** work is saved, not merged:
   - `wip/desk-inner-pages` (Desk inner pages design pass, includes the Council → Systems `sn is not defined` fix request).
-  - `wip/data-clock-fixes` (COT release-lag alignment and the HistData summer-clock audit; re-runs many study outputs).
+  - `wip/data-clock-fixes` (COT release-lag alignment and a first HistData clock fix). Its clock part is superseded by the
+    audited correction of 10 Nov 2026 (branch `academy-clock`, `docs/academy/DATA-CLOCK.md`); its COT part is open as
+    `docs/owner-decisions.md` item 25.
 - Everything merged before (#682 to #708) is on `main` and reused as is.
 - Not stopped (outside this session's control, and production): the council loop on GitHub Actions and the Vercel crons.
 
@@ -27,7 +29,7 @@ modules is `docs/academy/ARCHITECTURE.md`.
   actually built: `docs/academy/MODULES.md`.
 - [x] **Edges** (`academy/edges.mjs`, `academy/gen/`, `academy/data/`): candidates and outcomes for all seven edges, produced
   by running each study's own replay code on the research candles. Every edge reproduces its study's published n and net R
-  per trade exactly (the generator throws otherwise). 2,775 candidates; 2,038 usable (see "Known problems").
+  per trade exactly (the generator throws otherwise). 2,783 candidates; 2,131 usable since the clock correction of 10 Nov 2026 (2,775 and 2,058 before it; `docs/academy/DATA-CLOCK.md`).
 - [x] **Replay** `assets/academy-replay.js` (`MXR`): candle loading, closed-bar slicing, snapshots with a look-ahead guard,
   clock (play / pause / step / jump / 1x to 100x / restart), session save and restore.
 - [x] **Core** `assets/academy-core.js` (`MXA`): 95 features, regimes, the decision policy (BUY / SELL / WAIT / MANAGE with
@@ -35,7 +37,7 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - [x] **API and store** `api/academy.js` (owner only, private Blob or a local file store), **risk engine**
   `assets/academy-risk.js` (`MXK`, 0.25 % a trade, prop-firm simulation on the ChronosTrade presets), **optional
   language-model adapter** `api/_academy-llm.js` (off without a key; daily / monthly / hard budgets; cost ledger).
-- [x] Flagged setups (clock-shifted weeks, before 2020) are left out of candidate lists and can never be scored as a test;
+- [x] Flagged setups (weeks whose clock could not be verified, before 2020) are left out of candidate lists and can never be scored as a test;
   `history` route for "similar past cases" (train pool only, finished before the moment asked about, no ids).
 
 - [x] **Dataset and training service** (`academy/gen/features.mjs`, `academy/gen/evaluate.mjs`, `ml/`,
@@ -44,35 +46,38 @@ modules is `docs/academy/ARCHITECTURE.md`.
   offline gradient-boosting scorer with chronological walk-forward validation, JSON tree export and a parity check against
   `MXA.score` (max difference 5e-7). Manual workflow `academy-train.yml` (never on push, commits nothing; not yet run on GitHub).
 
-### Honest results so far (train pool, 2020 → now, flagged setups left out, net R a trade after costs)
+### Honest results so far (corrected research clock, train pool, 2020 → now, flagged setups left out, net R a trade after costs)
 
 | Edge | Every setup: n, R, t | Policy takes: n, R | Policy waits: n, R | Difference t |
 |---|---|---|---|---|
-| replica | 303, +0.428, 2.34 | 153, +0.209 | 150, +0.652 | −1.21 |
-| mosha-bo | 29, +0.971, 2.08 | 16, +1.085 | 13, +0.831 | 0.27 |
-| gtrend | 19, +1.730, 1.54 | 19, +1.730 | 0 | n/a |
-| gtl | 165, +0.232, 2.28 | 57, +0.405 | 108, +0.141 | 1.20 |
-| geg | 84, +0.405, 1.81 | 57, +0.473 | 27, +0.262 | 0.41 |
-| gmp | 494, +0.062, 1.09 | 110, −0.023 | 384, +0.086 | −0.80 |
-| nq-open | 327, +0.185, 2.10 | 74, +0.490 | 253, +0.095 | 1.79 |
-| all | 1,421, +0.249, 4.57 | 486, +0.342 | 935, +0.201 | 1.17 |
+| replica | 325, +0.406, 2.34 | 169, +0.148 | 156, +0.685 | −1.53 |
+| mosha-bo | 28, +0.815, 1.79 | 15, +1.227 | 13, +0.339 | 1.01 |
+| gtrend | 18, +1.885, 1.60 | 18, +1.885 | 0 | n/a |
+| gtl | 166, +0.216, 2.13 | 59, +0.400 | 107, +0.114 | 1.33 |
+| geg | 82, +0.469, 2.05 | 54, +0.463 | 28, +0.481 | −0.03 |
+| gmp | 513, +0.075, 1.35 | 120, −0.041 | 393, +0.110 | −1.17 |
+| nq-open | 344, +0.204, 2.39 | 87, +0.481 | 257, +0.111 | 1.84 |
+| all | 1,476, +0.252, 4.74 | 522, +0.312 | 954, +0.219 | 0.82 |
 
+- These are the numbers after the research-candle clock was corrected (10 Nov 2026). The table on the old clock (1,421
+  trades, +0.249, t 4.57; difference t 1.17) is in `docs/academy/DATA-CLOCK.md`. Nothing changed in kind.
 - **The deterministic policy, with no lessons, does not yet add measurable value over taking every setup** (no edge reaches
-  t 2; on replica and gmp it is worse, not significantly). This is the baseline the mentor's lessons have to beat; the
-  "every setup" column was recomputed independently by the lead and matches.
-- **No trained scorer beats taking every setup.** Out of fold: replica AUC 0.561, gtl 0.516, gmp 0.511, nq-open 0.563,
-  pooled 0.602 (0.545 within edge); none with t ≥ 2. All five are stored as rejected challengers (`promoted: false`);
-  mosha-bo, gtrend and geg have too few trades to fit. Nothing is promoted automatically, and nothing was promoted.
+  t 2; on replica and gmp it is worse, not significantly). This is the baseline the mentor's lessons have to beat.
+- **No trained scorer beats taking every setup.** Out of fold: replica AUC 0.547, gtl 0.456, gmp 0.489, nq-open 0.579,
+  pooled 0.587 (0.534 within edge); none with t ≥ 2, and on gtl the kept trades did worse than the skipped ones (t −2.30).
+  All five are stored as rejected challengers (`promoted: false`); mosha-bo, gtrend and geg have too few trades to fit.
+  Nothing is promoted automatically, and nothing was promoted.
 
 - [x] **The Academy page, Phase 2 loop** (`academy.html`, `assets/academy-ui.js`, `assets/academy.css`): select an edge → replay
   real candles → decision with evidence (stored at once) → mentor correction → lesson saved → replay the same trade → compare
   attempts → test on new setups (unseen exam pool, with and without lessons, kept apart) → paper account under the risk engine.
   Local server `scripts/academy-dev.mjs`, end-to-end audit `scripts/audit/academy.cjs` (88 checks, in CI), page tests.
-- [x] **Research engine** (`academy/gen/research.mjs` → `academy/data/research.json`, `docs/academy/RESEARCH.md`): 145 notebook
-  entries from pre-registered studies on the train pool (baselines, 420 registered conditions of which 121 had enough trades,
-  regimes, the book, the policy). **Nothing validated**: 0 conditions survive the multiple-comparison correction; 1 is
-  out-of-sample only (gtl, lower-timeframe structure neutral: discovery t 2.10, confirmation t 2.10, adjusted p 0.79) and is
-  offered as one inactive draft lesson; 2 flipped sign and are rejected. About 5.8 of 121 would pass discovery by chance; 7 did.
+- [x] **Research engine** (`academy/gen/research.mjs` → `academy/data/research.json`, `docs/academy/RESEARCH.md`): 154 notebook
+  entries from pre-registered studies on the train pool (baselines, 420 registered conditions of which 130 had enough trades,
+  regimes, the book, the policy). **Nothing validated**: 0 conditions survive the multiple-comparison correction and none is
+  out-of-sample; 2 are in-sample only and 3 flipped sign and are rejected. About 6.2 of 130 would pass discovery by chance;
+  5 did. No draft lesson is offered. (On the old clock one gtl condition was out-of-sample only at t 2.10; on the corrected
+  clock it does not pass discovery.)
 - [x] API reads for the page: corrections, research, evaluation, training report; module bugs found by the page work fixed
   (a stored decision keeps whether a lesson was applied; evidence text gives dates).
 
@@ -137,7 +142,8 @@ Outside the Academy, same day: the mirror's replica book (PR #709, on `main`), t
   step), a dollar-index series for gold decisions (no candles for it), live-candle runs of the Blind and Session tabs
   (recorded candles only), statistical training and the research run started from the page (both are commands and a manual GitHub workflow, by
   design: no long job runs in a site function).
-- [ ] Owner decisions: the research-candle clock fix and study re-runs; whether `/api/academy` should get a higher firewall
+- [ ] Owner decisions: what the clock correction leaves open (`docs/owner-decisions.md` items 19-25: baselines, one ICT
+      variant that now passes its bar, the studies not yet re-run); whether `/api/academy` should get a higher firewall
   limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption.
 
 ## Architecture decisions
@@ -175,11 +181,14 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Known problems / external blockers
 
-- **Research-candle clock (owner decision).** From 2019 the HistData files follow Europe's summer-time dates while the
-  studies read them as New York time, so in about four weeks a year every bar the studies used is stamped one hour early
-  (cross-checked against OANDA H1 in 27 weeks, `academy/data/clock-check.json`). The studies were not changed. 187 of the
-  2,775 candidates carry `rule.clockShift`; the Academy keeps them out of replay lists and tests. The real fix is re-running
-  the studies on a corrected clock (the unmerged `wip/data-clock-fixes` branch is about this).
+- **Research-candle clock: corrected on 10 Nov 2026.** A pre-registered audit (`research/edge/histdata-clock/`) settled the
+  rule: the HistData labels are New York time in 2018 and follow Europe's summer-time dates from 2019 (4,755 of 4,755
+  decisive weeks against OANDA H1 agree; 2,191 of 2,195 release minutes). Every study loader now converts with
+  `council/histdata.mjs`, the seven edges' source studies were re-run, and the Academy data was regenerated
+  (`docs/academy/DATA-CLOCK.md`; the old files are in `academy/archive/pre-clock/` and in git at 81f35f51). 101 of the 2,783
+  candidates keep `rule.clockShift`, which now means "the week could not be verified against the second feed" (most sit in
+  the hole of the 2023 files). Open for the owner: the live ICT replay still reads the files with the old clock
+  (`docs/owner-decisions.md`).
 - Data quality (`academy/data/quality.json`): both H1 research series are "usable", not "certified" (gold 97.65 %, NAS100
   97.36 % coverage); 2023 is "unreliable" for both (about 87 %); the NAS100 09:30–11:00 M1 window is "unreliable".
 - `gmp` (gold momentum pullback) candidates come from the robustness study's port, which departs from live (one position at

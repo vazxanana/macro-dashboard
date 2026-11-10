@@ -1,5 +1,7 @@
 # NQ New York open run: 22 years out of sample
 
+> **Clock correction, 10 Nov 2026.** Only the HistData cross-check was affected: 721 trades at +0.126R (t 2.26) became 724 at +0.115R (t 2.06), and it now agrees with OANDA on more days. Every OANDA number and the verdict are unchanged. Details: the last section of this page.
+
 Paper research only. No live rule, config or tracker was changed.
 
 **Question.** The council's NQ New York open run made +0.33R a trade over 299 replay trades (2023-26). The robustness audit (#486, `research/robustness.md`) rates it *fragile*. Its t is 3.67 against a multiple-testing bar of 3.68, and a 2018-22 rebuild made about +0.03R. Does the rule have a real edge?
@@ -183,3 +185,18 @@ node research/edge/nq-open-oos/run.mjs <cacheDir> <council-data research/candles
 ```
 
 The candle cache (about 26 MB) is not committed.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. The main run of this study is OANDA and never touched those files. Only the HistData cross-check did: `load.mjs` read the labels as New York time, so from 2019, in the weeks the US is on daylight time and Europe is not, the bar it took as the 09:30 open was really the 10:30 one.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter or cost was changed.** Every OANDA number in `result.json` is identical to the old file (checked field by field). The HistData cross-check moved:
+
+| HistData NSXUSD, same code, 1 point | Before | After |
+|---|---|---|
+| All years: n, R a trade, total R, t | 721, +0.126, +90.7, 2.26 | 724, +0.115, +83.0, 2.06 |
+| 2018 (the files were on New York time that year) | 95, +10.1R | 95, +10.1R |
+| Days both feeds signal / same side | 648 / 640 | 675 / 671 |
+| Days only one feed signals (OANDA / HistData) | 103 / 73 | 76 / 49 |
+
+The two feeds agree on more days now, which is what a corrected clock should do. **The verdict (regime-dependent: flat 2004-22, positive since 2023) rests on the OANDA run and is unchanged.** NSXUSD 2018, 2020, 2023 and 2024 are not certified years in the clock audit; every week of them that could be read agrees with the converter.

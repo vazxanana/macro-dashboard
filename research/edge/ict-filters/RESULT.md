@@ -1,5 +1,7 @@
 # ICT iFVG filters: which hold up out-of-sample (2018 to Oct 2026)
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. The Friday filter still passes, more clearly. The second filter named below (sweep into an unfilled D1/H4 FVG) is no longer picked in-sample; "Tuesday to Thursday only" is, and passes. The text below quotes the old numbers. Details: the last section of this page.
+
 **Verdict: PASS, but weak.** One simple filter passes every test: **don't take A-setups on Fridays (New York day)**. A second filter also passes: **only take A-setups whose sweep went into an unfilled D1/H4 FVG**. Its OOS improvement is bigger, but it halves the trade count and 2024 lost.
 
 The two claims from the CNBC replay are **noise**:
@@ -140,3 +142,21 @@ node research/edge/ict-filters/driver.mjs <dir>/research/candles trades.json
 node research/edge/ict-filters/analyse.mjs trades.json out && STRESS=2 node research/edge/ict-filters/analyse.mjs trades.json out
 node research/edge/ict-filters/build-result.mjs out/analysis.json out/analysis-stress2.json research/edge/ict-filters/result.json
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced the published file exactly, so every change below is the clock and nothing else. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` holds the new numbers.
+
+| A-setups (net) | Before: in-sample n, R a trade, t; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| Unfiltered baseline | 910, +0.091, 1.76; 411, +0.125, 1.72 | 922, +0.107, 2.09; 424, +0.170, 2.27 |
+| Drop Friday | 772, +0.142, 2.46; 354, +0.156, 1.96: PASS (weak) | 786, +0.166, 2.91; 364, +0.205, 2.50: PASS (weak) |
+| Tuesday to Thursday only | 583, +0.169, 2.50; 269, +0.217, 2.25: PASS (weak) | 590, +0.177, 2.69; 281, +0.234, 2.43: PASS (weak) |
+| Sweep into an unfilled D1/H4 FVG | PASS (weak) | not picked in-sample any more |
+| Drop Asia; D1 bias with | picked in-sample, FAIL out-of-sample | not picked in-sample any more |
+| Greedy in-sample combination | [D1 bias with + drop Friday]: FAIL out-of-sample | [Tuesday to Thursday only]: PASS (590, +0.177, 2.69; 281, +0.234, 2.43) |
+| All graded signals: valid (break-even point not taken) | FAIL out-of-sample | PASS (weak): 2,694, +0.094, 3.02; 1,259, +0.050, 1.24 |
+
+**The verdict stays "PASS, but weak", for the Friday filter.** What changes is the second sentence of the verdict above: the FVG filter no longer comes out of the in-sample selection, so it is not a result of this study on the corrected clock. Which filters the selection picks moved with a one-hour change of the clock; that is a reason to treat every filter here as weak.

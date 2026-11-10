@@ -1,5 +1,7 @@
 # Edge-decay monitor: how it works and how it does on the record (8 Nov 2026)
 
+> **Clock correction, 10 Nov 2026.** Four baselines in `council/decay-base.json` were rebuilt on the corrected candle clock: Mosha BO, gold H4 trendline, daily engulf, momentum pullback. The other six are identical. The tables below are the first build. Details: the last section of this page.
+
 Paper only. The monitor gives each system a status and, in the daily digest, an alert. **It never changes a rule, a filter,
 a size or a trade. The owner decides.**
 
@@ -230,3 +232,19 @@ trade out of sample, on only 18 positions. The two rebuilds disagree, and the mo
 monitor says decaying, and it changes nothing. Whether to look deeper is the owner's call.
 
 **Crypto trend** is decaying, as the June 2025 study found. It is already in shadow, so the digest does not alert on it.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. Four of the ten baselines come from the robustness audit's HistData rebuilds, which moved when that audit was re-run on the corrected clock.
+
+**`run.mjs` was run again on 10 Nov 2026. Nothing in the monitor or its settings changed.** A control run on the old robustness files reproduced the published `council/decay-base.json` exactly, system by system, so the changes below are the clock and nothing else. `council/decay-base.json` and `result.json` hold the new numbers.
+
+| System | Source | Before: n, R a trade, SD, worst drawdown, MC95 drawdown, drawdown limit | After |
+|---|---|---|---|
+| Mosha BO | robustness rebuild | 147, +0.009, 2.040, 39.2R, 37.5R, 39.2R | 157, −0.064, 1.969, 46.0R, 43.4R, 46.0R |
+| Gold H4 trendline | robustness rebuild | 302, +0.142, 1.241, 19.2R, 19.4R, 19.4R | 304, +0.106, 1.169, 20.2R, 21.0R, 21.0R |
+| Gold daily engulf | robustness rebuild | 217, +0.197, 1.698, 14.8R, 22.3R, 22.3R | 217, +0.198, 1.698, 14.7R, 22.3R, 22.3R |
+| Gold momentum pullback | robustness rebuild | 1,003, +0.041, 1.282, 40.0R, 50.6R, 50.6R | 1,004, +0.043, 1.286, 40.1R, 49.7R, 49.7R |
+| Gold replica, gold trend N20 / N5, NQ open run, ICT A-setups, crypto trend | council replays, daily candles, OANDA | unchanged | identical |
+
+These are monitoring baselines, not trading rules: the decay monitor compares each live system's forward record with them. **The one to look at is Mosha BO.** Its baseline expectancy is now slightly negative (−0.064R a trade on 157 trades, against +0.009R on 147) and its worst drawdown is 46R, not 39R. A monitor that watches for "worse than the baseline" is watching against a baseline that was never good; that was already true at +0.009R.

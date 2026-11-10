@@ -5,8 +5,9 @@
 // For three weeks of every year (one in the March stretch when New York is on daylight time and Europe is not, the one
 // around 1 November, and an ordinary week in May) it reads OANDA XAU_USD H1 candles from the site's keyless proxy
 // (/md/bars, the feed the Academy page replays) and compares them with the HistData H1 candles as the gold studies stamp
-// them (research/edge/gold-systems/data.mjs), moved by -1, 0 and +1 hour. The smallest mean |open/high/low/close
-// difference| says how far the studies' clock is off. Writes academy/data/clock-check.json; run.mjs quotes it in
+// them (research/edge/gold-systems/data.mjs, which converts with council/histdata.mjs), moved by -1, 0 and +1 hour. The
+// smallest mean |open/high/low/close difference| says how far the studies' clock is off: 0 in every week since the clock
+// correction of 10 Nov 2026 (the full audit, every week and symbol, is research/edge/histdata-clock). Writes academy/data/clock-check.json; run.mjs quotes it in
 // quality.json when it is there and does not need it.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,7 +37,7 @@ for (const wk of weeks) {
   rows.push({ week: new Date(wk * 1000).toISOString().slice(0, 10), mismatchWeek: usEuDstMismatch(wk + 2 * 86400 + 43200), bars: j.bars.length, meanAbsDiff: { '-1h': diff[-1], '0h': diff[0], '+1h': diff[1] }, studyClockEarlySec: best ? -best * 3600 : 0 });
   console.error(rows.at(-1).week, rows.at(-1).mismatchWeek ? 'mismatch' : 'normal  ', JSON.stringify(rows.at(-1).meanAbsDiff), 'early by', rows.at(-1).studyClockEarlySec);
 }
-const out = { checked: new Date().toISOString().slice(0, 10), feed: `${new URL(BASE).host} /md/bars sym=xau tf=1h (OANDA XAU_USD)`, against: 'HistData XAUUSD M1 -> H1 as research/edge/gold-systems/data.mjs stamps it',
+const out = { checked: new Date().toISOString().slice(0, 10), feed: `${new URL(BASE).host} /md/bars sym=xau tf=1h (OANDA XAU_USD)`, against: 'HistData XAUUSD M1 -> H1 as research/edge/gold-systems/data.mjs stamps it (council/histdata.mjs)',
   method: 'mean |open, high, low, close difference| ($) between the HistData candle at t + k and the OANDA candle at t, Monday-Thursday of the week; the k with the smallest difference is the clock offset',
   reading: 'studyClockEarlySec 3600 = the study stamps a candle one hour before its true time; 0 = the clocks agree', weeks: rows };
 fs.writeFileSync(path.join(DATA_DIR, 'clock-check.json'), JSON.stringify(out, null, 1) + '\n');

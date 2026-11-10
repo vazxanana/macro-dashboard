@@ -1,5 +1,7 @@
 # Open run breadth: does the NQ open run work on other index opens?
 
+> **Clock correction, 10 Nov 2026.** Only the HistData S&P 500 cross-check was affected. It was re-run on the corrected candle clock; it agrees with OANDA on more days now, and no verdict field changed. Details: the last section of this page.
+
 Paper research only. No live rule, config or tracker was changed.
 
 **Question.** The NQ New York open run made nothing over 2004-22 and +0.32R a trade over 2023-26 (#511). Is that 2023+
@@ -153,3 +155,17 @@ node research/edge/open-run-breadth/run.mjs <cacheDir> <nqCacheDir> [<council-da
 ```
 
 The candle caches (about 75 MB) are not committed.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. The study's own runs are OANDA and never read those files. Only the HistData SPXUSD cross-check did, through `nq-open-oos/load.mjs`, which read the labels as New York time (one hour early in about four weeks a year from 2019).
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule was changed.** A control run of the old loader reproduced the published `result.json` exactly (51,724 numbers). On the corrected clock 57 numbers differ, all inside the `histdataES` block:
+
+| HistData ES 2018-26 | Before | After |
+|---|---|---|
+| Early part: n, R a trade, t | 313, −0.125, −1.53 | 319, −0.123, −1.53 |
+| Late part: n, R a trade, t | 200, −0.110, −1.17 | 195, −0.078, −0.81 |
+| Days both feeds signal / same side | 443 / 437 | 463 / 462 |
+
+**The verdict is unchanged.**

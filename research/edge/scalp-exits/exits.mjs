@@ -215,7 +215,7 @@ fs.writeFileSync(path.join(outDir, 'result.json'), JSON.stringify({
   candidates: results.filter((r) => r !== B).map((r) => ({ group: r.group, rule: r.rule, is: pick(r.is), oos: pick(r.oos), signals: r.signals, unfilled: r.unfilled,
     pairedVsBaseline: { is: r.pairedIS, oos: r.pairedOOS }, byMarket: Object.fromEntries(Object.entries(r.byMarket).map(([m, v]) => [m, { is: pick(v.is), oos: pick(v.oos) }])), years: Object.fromEntries(Object.entries(r.years).map(([y, s]) => [y, pick(s)])), verdict: verdict(r) })),
   maeMfe: mae, variantsTried: results.length - 1,
-  notes: 'IS = Jun 2018-2023, OOS = 2024-Oct 2026. Markets: XAU/USD, EUR/USD, GBP/USD, USD/CAD, USD/CHF (histdata M1, EST+5h -> UTC). Net = gross minus one spread in R. Per-signal evaluation (no exposure / USD-cap / re-entry / news-guard portfolio rules, which depend on the exit itself). Stop-first when a candle touches both stop and target.',
+  notes: 'IS = Jun 2018-2023, OOS = 2024-Oct 2026. Markets: XAU/USD, EUR/USD, GBP/USD, USD/CAD, USD/CHF (histdata M1, council/histdata.mjs clock). Net = gross minus one spread in R. Per-signal evaluation (no exposure / USD-cap / re-entry / news-guard portfolio rules, which depend on the exit itself). Stop-first when a candle touches both stop and target.',
 }, null, 1));
 for (const r of results) console.log(`${r.rule.padEnd(46)} ${verdict(r)}`);
 console.log('chosen in-sample:', isBest.rule);

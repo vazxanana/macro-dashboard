@@ -1,6 +1,10 @@
 # Five ICT A-setup variants from the skill, 2020 → Nov 2026, IS / OOS (pre-registered, 9 Nov 2026)
 
-**Verdict: FAIL. None of the nine variant × book verdicts passes the pre-registered bar; the live A-rule stays and no proposal is made.**
+> **Clock correction, 10 Nov 2026.** On the corrected candle clock the pre-registered bar gives a different answer for one of the nine verdicts: V3 htffvg on the index book passes (in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92; not strong). The other eight do not pass. Nothing live changes; the owner decides. Details: the last section of this page.
+
+**Verdict: PASS for one of nine on the corrected clock (10 Nov 2026), not strong. V3 htffvg on the index book passes the pre-registered bar (in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92). The other eight do not pass. The live A-rule stays; the owner decides what, if anything, follows (docs/owner-decisions.md).**
+
+First run, on the old clock (9 Nov 2026): FAIL. None of the nine variant × book verdicts passed the pre-registered bar; the live A-rule stays and no proposal is made. The text and tables below are that first run.
 Four are inconclusive (better out of sample, short of the bar): HTF FVG confluence and premium/discount on the indices,
 premium/discount and kill zones on gold. Five fail outright. Break-even at +1R is clearly worse than the live +1.5R (paired t −2.05).
 
@@ -161,3 +165,19 @@ git archive -o c.tar origin/council-data research/candles/nsxusd-histdata resear
 mkdir d && tar xf c.tar -C d
 node research/edge/ict-variants/run.mjs d    # ~20 s; writes research/edge/ict-variants/result.json, prints the tables
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced the published file exactly, so every change below is the clock and nothing else. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` holds the new numbers; the tables above are the first run's.
+
+| | Before: in-sample n, R a trade, t; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| Live A-rule, index book | 406, +0.128, 1.66; 344, +0.184, 2.18 | 420, +0.139, 1.83; 353, +0.190, 2.32 |
+| V3 htffvg, index (sweep into an unfilled D1/H4 FVG) | 76, +0.225, 1.22; 91, +0.325, 1.85: INCONCLUSIVE | 80, +0.273, 1.44; 84, +0.355, 1.92: **PASS** (all six checks; not "strong") |
+| V1 atr50, index | 340, +0.132, 1.50; 275, +0.180, 1.88: FAIL | 353, +0.142, 1.64; 284, +0.196, 2.11: INCONCLUSIVE |
+| V1 atr50, gold | 164, +0.143, 0.99; 118, +0.132, 0.89: FAIL | 154, +0.217, 1.43; 123, +0.247, 1.56: INCONCLUSIVE |
+| V2 killzone, gold | 119, +0.265, 1.65; 78, +0.218, 1.17: INCONCLUSIVE | 127, +0.175, 1.26; 82, +0.026, 0.16: FAIL |
+
+**The pre-registered verdict changes: FAIL becomes "PASS for V3 htffvg (index); the other 8 verdicts do not pass".** Read it with the plan's own warning: nine verdicts were given, so one pass by luck is plausible. The t is under 2 in both halves, 2024 lost (21 trades, −0.5R), and the ict-filters study, on the same corrected clock, no longer picks the same filter in-sample. This is a candidate for the owner to look at, not an edge. The plan's rule for a pass applies: no edit to `ict/*.mjs` or the skill; the owner approves any change (`docs/owner-decisions.md`).

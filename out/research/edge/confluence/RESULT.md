@@ -1,5 +1,7 @@
 # When MERIDIAN and ICT agree, is the edge larger?
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Short answer: no.** We tested agreement both ways on spot gold, NAS100 and EUR/USD, 2018 to Oct 2026, with in-sample 2018–2023 and out-of-sample 2024–2026. No confluence filter both holds up out of sample and justifies taking fewer trades.
 
 - **(a) Meridian Scalp / Intraday with an ICT setup in the same direction.** This does not help. In-sample, Meridian trades that follow a same-side ICT signal do *worse* than the rest on every market and setup except NAS Intraday, where they are equal. Meridian Scalp and Intraday lose money after costs on all three markets in this replay, and ICT confluence does not change that.
@@ -152,3 +154,9 @@ node research/edge/confluence/analyze.mjs <out> research/edge/confluence
 ```
 
 The Meridian replay takes about 4–13 minutes per market-year on one core.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: the Meridian and ICT signal times that are matched against each other were both an hour late in Europe's summer (so their relative timing is mostly preserved), but the session tags and the daily boundary were not.

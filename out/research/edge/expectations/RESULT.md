@@ -1,5 +1,7 @@
 # What to expect: the live systems on the data they never saw
 
+> **Clock correction, 10 Nov 2026.** `council/expect-base.json` was rebuilt on the corrected candle clock. The "backtest" block of four systems moved (Mosha BO, gold H4 trendline, daily engulf, momentum pullback); every untouched-data ("honest") figure except one trade of the momentum pullback is identical. Details: the last section of this page.
+
 Paper research only. No live rule, size, filter or mirror setting was changed. This folder builds `council/expect-base.json`,
 which the Trader's Coach build turns into coach.json `expect` (pure `council/expect.mjs`, every 6 hours with the edge-decay
 reading) and the Council research pane shows as the card **What to expect** next to the edge-decay statuses.
@@ -64,3 +66,19 @@ Reading it:
 - `tests/expect.test.mjs`: the maths against the studies, the digest line, the trader and page wiring.
 
 Re-run after a study changes: `node research/edge/expectations/build.mjs`.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`.
+
+**`build.mjs` was run again on 10 Nov 2026, after the decay baselines were rebuilt. Nothing in the method changed.** A control build on the old files reproduced the published `council/expect-base.json` exactly. `council/expect-base.json` holds the new numbers. What moved:
+
+| System | Source | Before: n, R a trade, SD, worst drawdown, MC95 drawdown, drawdown limit | After |
+|---|---|---|---|
+| Mosha BO | robustness rebuild | 147, +0.009, 2.040, 39.2R, 37.5R, 39.2R | 157, −0.064, 1.969, 46.0R, 43.4R, 46.0R |
+| Gold H4 trendline | robustness rebuild | 302, +0.142, 1.241, 19.2R, 19.4R, 19.4R | 304, +0.106, 1.169, 20.2R, 21.0R, 21.0R |
+| Gold daily engulf | robustness rebuild | 217, +0.197, 1.698, 14.8R, 22.3R, 22.3R | 217, +0.198, 1.698, 14.7R, 22.3R, 22.3R |
+| Gold momentum pullback | robustness rebuild | 1,003, +0.041, 1.282, 40.0R, 50.6R, 50.6R | 1,004, +0.043, 1.286, 40.1R, 49.7R, 49.7R |
+| Gold replica, gold trend N20 / N5, NQ open run, ICT A-setups, crypto trend | council replays, daily candles, OANDA | unchanged | identical |
+
+The momentum pullback's own two windows also moved by one trade: untouched 2018-22 window 633 trades at −0.043R became 634 at −0.043R; built-on 2023-26 window 370 at +0.185R (t 2.74) became 370 at +0.191R (t 2.80). No other untouched-data figure changed: they come from OANDA and daily-candle studies that never read the HistData files.

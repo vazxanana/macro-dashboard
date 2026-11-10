@@ -1,6 +1,6 @@
 // NQ New York open run (nq-open): candidates and outcomes from the study's own functions, imported as they are:
 //   research/edge/nq-open-oos/lib.mjs   dayTrade (signal nqOpenSweep + the nyflip midnight filter + the live trade loop)
-//   research/edge/nq-open-oos/load.mjs  loadHistData (HistData NSXUSD M1, New York labels -> UTC)
+//   research/edge/nq-open-oos/load.mjs  loadHistData (HistData NSXUSD M1, labels -> UTC with council/histdata.mjs)
 // with the study's options for its HistData run (run.mjs: `run(HD, { cost: COST })`, COST = 1 point).
 // dayTrade returns the result but not the candle it closed on. The day's candles are therefore handed over as an array
 // whose iterator remembers the last candle it gave out: the trade loop stops (break) on the exit candle, so that is it.
