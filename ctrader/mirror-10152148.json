@@ -1026,6 +1026,33 @@
     ],
     "stopCheckedAt": "2026-11-10T10:35:43.000Z",
     "brokerStop": 1.41417
+   },
+   "btc-replica-1794307054-s": {
+    "positionId": "48004976",
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T10:38:38.000Z",
+    "councilEntry": 74190.7,
+    "stop": 74475.85,
+    "t1": 73620.41,
+    "riskCash": 2.85,
+    "margin": 74.16,
+    "minLot": true,
+    "mark": 74190.7,
+    "levelsFrom": "mark",
+    "fillPrice": 74178.75,
+    "slipR": 0.042,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T10:38:38.000Z",
+    "brokerStop": 74463.9
    }
   },
   "day": {
@@ -1033,7 +1060,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9988.37 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9988.37 · 11 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -1049,7 +1076,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9988.37,
-  "lastRun": "2026-11-10T10:35:43.000Z"
+  "lastRun": "2026-11-10T10:38:38.000Z"
  },
  "log": [
   {
@@ -1444,6 +1471,11 @@
    "at": "2026-11-10T10:35:43.000Z",
    "msg": "opened sell USDCAD 0.03 lot (council replica)",
    "trade": "usdcad-replica-1794306870-s"
+  },
+  {
+   "at": "2026-11-10T10:38:38.000Z",
+   "msg": "opened sell BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794307054-s"
   }
  ],
  "limits": {
@@ -1522,11 +1554,11 @@
   ]
  },
  "execution": {
-  "n": 36,
-  "meanSlipR": 0.081,
-  "medianSlipR": 0.009,
+  "n": 37,
+  "meanSlipR": 0.08,
+  "medianSlipR": 0.03,
   "worstSlipR": 0.765,
-  "medianLagSec": 3929,
+  "medianLagSec": 3167,
   "bySymbol": {
    "SOLUSD": {
     "n": 6,
@@ -1541,8 +1573,8 @@
     "meanSlipR": 0.159
    },
    "BTCUSD": {
-    "n": 5,
-    "meanSlipR": -0.058
+    "n": 6,
+    "meanSlipR": -0.042
    },
    "USDCAD": {
     "n": 3,
