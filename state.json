@@ -1754,9 +1754,10 @@
   "gbpusd|intraday|1792443600|1794315300": 1794315817,
   "usdcad|intraday|1794002400|1794303900": 1794316085,
   "usdcad|scalp|1794271500|1794314280": 1794316085,
-  "gbpusd|intraday|1793671200|1794315300": 1794316286
+  "gbpusd|intraday|1793671200|1794315300": 1794316286,
+  "usdcad|scalp|1794271500|1794316680": 1794316652
  },
- "lastRun": 1794316416,
+ "lastRun": 1794316652,
  "news": {
   "at": 1794307519,
   "data": [
@@ -1798,9 +1799,13 @@
     [
      1794313046,
      12.97
+    ],
+    [
+     1794316652,
+     13.77
     ]
    ],
-   "off": 12.97
+   "off": 13.37
   }
  },
  "goldMP": {
@@ -1808,29 +1813,29 @@
  },
  "feedLast": {
   "xau": {
-   "feed": "oanda",
-   "t": 1794316200,
-   "close": 4077.325
+   "feed": "kraken",
+   "t": 1794316560,
+   "close": 4076.7999999999997
   },
   "btc": {
    "feed": "kraken",
-   "t": 1794316320,
-   "close": 74329.2
+   "t": 1794316560,
+   "close": 74168.3
   },
   "eth": {
    "feed": "kraken",
-   "t": 1794316320,
-   "close": 2095.97
+   "t": 1794316620,
+   "close": 2090.52
   },
   "sol": {
    "feed": "kraken",
-   "t": 1794316380,
-   "close": 84.85
+   "t": 1794316620,
+   "close": 84.54
   },
   "xrp": {
    "feed": "kraken",
-   "t": 1794316380,
-   "close": 1.08024
+   "t": 1794316620,
+   "close": 1.07709
   },
   "eurusd": {
    "feed": "oanda",
@@ -1838,19 +1843,19 @@
    "close": 1.12128
   },
   "gbpusd": {
-   "feed": "oanda",
-   "t": 1794316260,
-   "close": 1.34208
+   "feed": "kraken",
+   "t": 1794316620,
+   "close": 1.34164
   },
   "audusd": {
    "feed": "kraken",
-   "t": 1794316380,
-   "close": 0.69037
+   "t": 1794316620,
+   "close": 0.69028
   },
   "usdcad": {
-   "feed": "oanda",
-   "t": 1794316260,
-   "close": 1.41377
+   "feed": "kraken",
+   "t": 1794316680,
+   "close": 1.41463
   },
   "usdchf": {
    "feed": "oanda",
@@ -1859,59 +1864,6 @@
   }
  },
  "feedChanges": [
-  {
-   "at": "2026-11-07T22:55:10.000Z",
-   "market": "eurusd",
-   "label": "EUR/USD",
-   "from": "kraken",
-   "to": "oanda",
-   "basis": null,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 0,
-   "kept": 3,
-   "ids": [
-    "eurusd-rswing-1793610380",
-    "eurusd-rswing-1793754423",
-    "eurusd-intraday-1793890935"
-   ]
-  },
-  {
-   "at": "2026-11-07T22:55:10.000Z",
-   "market": "gbpusd",
-   "label": "GBP/USD",
-   "from": "kraken",
-   "to": "oanda",
-   "basis": null,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 0,
-   "kept": 3,
-   "ids": [
-    "gbpusd-scalp-1793626672",
-    "gbpusd-intraday-1793805393",
-    "gbpusd-scalp-1793916690"
-   ]
-  },
-  {
-   "at": "2026-11-07T22:55:10.000Z",
-   "market": "audusd",
-   "label": "AUD/USD",
-   "from": "kraken",
-   "to": "oanda",
-   "basis": null,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 0,
-   "kept": 5,
-   "ids": [
-    "audusd-position-1793601653",
-    "audusd-scalp-1793949425",
-    "audusd-intraday-1793949765",
-    "audusd-scalp-1793996278",
-    "audusd-intraday-1793998319"
-   ]
-  },
   {
    "at": "2026-11-07T22:55:10.000Z",
    "market": "usdcad",
@@ -2786,14 +2738,76 @@
     "audusd-scalp-1794239726",
     "audusd-rintra-1794247547"
    ]
+  },
+  {
+   "at": "2026-11-10T13:17:32.000Z",
+   "market": "xau",
+   "label": "XAU/USD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": 0.825,
+   "rederived": 1,
+   "cancelled": 0,
+   "rebased": 6,
+   "kept": 0,
+   "ids": [
+    "xau-position-1793783465",
+    "xau-geg-1793664000",
+    "xau-gtl-1793836800-1794182400",
+    "xau-geg-1794096000",
+    "xau-rintra-1794301325",
+    "xau-rscalp-1794309302",
+    "xau-scalp-1794315817"
+   ]
+  },
+  {
+   "at": "2026-11-10T13:17:32.000Z",
+   "market": "gbpusd",
+   "label": "GBP/USD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": -0.00033,
+   "rederived": 0,
+   "cancelled": 1,
+   "rebased": 4,
+   "kept": 0,
+   "ids": [
+    "gbpusd-scalp-1793626672",
+    "gbpusd-intraday-1793805393",
+    "gbpusd-scalp-1793916690",
+    "gbpusd-scalp-1794315492",
+    "gbpusd-intraday-1794316286"
+   ]
+  },
+  {
+   "at": "2026-11-10T13:17:32.000Z",
+   "market": "usdcad",
+   "label": "USD/CAD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": 0.00082,
+   "rederived": 0,
+   "cancelled": 0,
+   "rebased": 8,
+   "kept": 0,
+   "ids": [
+    "usdcad-scalp-1793689919",
+    "usdcad-position-1793949081",
+    "usdcad-swing-1793949081",
+    "usdcad-intraday-1794304066",
+    "usdcad-position-1794304600",
+    "usdcad-swing-1794304600",
+    "usdcad-scalp-1794304921",
+    "usdcad-scalp-1794311168"
+   ]
   }
  ],
  "feedMiss": {
-  "xau": 1,
-  "eurusd": 0,
-  "gbpusd": 1,
-  "audusd": 2,
-  "usdcad": 1,
-  "usdchf": 0
+  "xau": 2,
+  "eurusd": 1,
+  "gbpusd": 2,
+  "audusd": 3,
+  "usdcad": 2,
+  "usdchf": 1
  }
 }
