@@ -136,10 +136,13 @@ test('a notebook note needs its required fields, and a sample size before it may
   assert.deepEqual(T.noteProblems(ok), []); assert.equal(T.noteProblems({}).length, 5); assert.match(T.noteProblems({ ...ok, validation: 'validated' }).join(' '), /never an edge without n/);
   assert.deepEqual(T.noteProblems({ ...ok, validation: 'out-of-sample', sampleSize: '120' }), []); assert.match(T.noteProblems({ ...ok, sampleSize: '1.5' }).join(' '), /whole number/); assert.match(T.noteProblems({ ...ok, validation: 'out-of-sample', sampleSize: 0 }).join(' '), /needs its sample size/);
 });
-test('the training report: every scorer with its walk-forward numbers, its verdict and its separate exam block; none promoted', () => {
-  const rows = T.modelRows(json('ml/models/index.json')); assert.deepEqual(rows.map((r) => r.scope), ['replica', 'gtl', 'gmp', 'nq-open', 'pooled']);
+// Since the training review of 10 Nov 2026 the index holds 20 scorers (the reference on five scopes, then four challenger configurations), walked forward
+// with the corrected embargo, and no exam block: the trainer cannot read the exam pool (research/edge/academy-ml-review).
+test('the training report: every scorer with its walk-forward numbers and its verdict; no exam block; none promoted', () => {
+  const rows = T.modelRows(json('ml/models/index.json')); assert.equal(rows.length, 20); assert.deepEqual(rows.slice(0, 5).map((r) => r.scope), ['replica', 'gtl', 'gmp', 'nq-open', 'pooled']);
+  assert.equal(new Set(rows.map((r) => r.scope)).size, rows.length, 'every row has its own label'); assert.ok(rows.slice(5).every((r) => /^(replica|gtl|gmp|nq-open|pooled) \u00b7 (logit-short|mono-gbt|pooled-logit|ridge-netR)$/.test(r.scope)));
   assert.ok(rows.every((r) => r.promoted === false && r.beats === false && r.status === 'rejected challenger' && /no improvement over taking every setup/.test(r.verdict)));
-  const rep = rows[0]; assert.deepEqual([rep.rows, rep.n, rep.auc, rep.kept.n, rep.skipped.n, rep.t], [325, 195, 0.5467, 185, 10, -1.33]); assert.deepEqual([rep.exam.n, rep.exam.auc], [50, 0.5704]); assert.match(rep.exam.what, /read once after the walk-forward verdict was fixed/);
+  const rep = rows[0]; assert.deepEqual([rep.rows, rep.n, rep.auc, rep.kept.n, rep.skipped.n, rep.t], [325, 195, 0.5484, 176, 19, -1.79]); assert.ok(rows.every((r) => r.exam === null));
   assert.deepEqual(T.modelRows(null), []); assert.deepEqual(T.modelRows({ models: [{ id: 'x' }] })[0].exam, null);
 });
 test('costs: off without a key says so with the money spent; the ledger is by day, newest first', () => {
