@@ -3166,6 +3166,32 @@
     "positionId": "47830366",
     "volume": 300000,
     "status": "open"
+   },
+   "audusd-rscalp-1794270274": {
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "setup": "rscalp",
+    "openedAt": "2026-11-10T00:27:15.000Z",
+    "councilEntry": 0.69191,
+    "stop": 0.693,
+    "t1": 0.69156,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.69191,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2,
+    "margin": 1.38,
+    "shadow": true,
+    "fillPrice": 0.69191,
+    "slipR": 0,
+    "lagSec": 161,
+    "positionId": "47831395",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -3173,7 +3199,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.42 · 22 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9975.42 · 23 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3186,38 +3212,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "audusd-rscalp-1794270274": {
-    "orderId": "33836461",
-    "symbol": "AUDUSD",
-    "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "rscalp",
-    "limitPrice": 0.69191,
-    "stop": 0.693,
-    "t1": 0.69156,
-    "placedAt": "2026-11-10T00:25:44.000Z",
-    "expires": "2026-11-10T03:24:34.000Z",
-    "riskCash": 2,
-    "margin": 1.38,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9975.42,
-  "lastRun": "2026-11-10T00:25:44.000Z"
+  "lastRun": "2026-11-10T00:27:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T08:49:06.000Z",
-   "msg": "opened buy USDCHF 0.02 lot (council scalp)",
-   "trade": "usdchf-scalp-1794214084"
-  },
   {
    "at": "2026-11-09T08:51:33.000Z",
    "msg": "placed sell limit GBPUSD 0.03 lot at 1.34105 (council rscalp, valid to 2026-11-09T11:50Z)",
@@ -4712,6 +4712,11 @@
    "at": "2026-11-10T00:25:44.000Z",
    "msg": "placed sell limit AUDUSD 0.01 lot at 0.69191 (council rscalp, valid to 2026-11-10T03:24Z)",
    "trade": "audusd-rscalp-1794270274"
+  },
+  {
+   "at": "2026-11-10T00:27:15.000Z",
+   "msg": "limit filled: AUDUSD position 47831395 at the broker",
+   "trade": "audusd-rscalp-1794270274"
   }
  ],
  "limits": {
@@ -4790,11 +4795,11 @@
   ]
  },
  "execution": {
-  "n": 106,
+  "n": 107,
   "meanSlipR": 0.007,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161.5,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -4825,8 +4830,8 @@
     "meanSlipR": 0.157
    },
    "AUDUSD": {
-    "n": 17,
-    "meanSlipR": 0.029
+    "n": 18,
+    "meanSlipR": 0.027
    },
    "XAUUSD": {
     "n": 11,
