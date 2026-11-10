@@ -57,6 +57,16 @@ const CONTRAST = String.raw`(() => {
   }
   return bad;
 })()`;
+// The contrast of the theme as it settles. A reading taken in the instant after a theme change can still hold the previous
+// theme's text colour on a busy runner (seen on CI only, 10 Nov 2026: light-theme text measured on the midnight background for
+// two elements, with nothing animating; the page has no theme switch, so no visitor sees that instant). So a failing reading
+// is taken again 700 ms later: what is still below AA then is a real contrast fault and fails; what cleared is printed as a note.
+const aa = async (pg) => {
+  let bad = await pg.evaluate(CONTRAST); if (!bad.length) return bad;
+  const first = bad.slice(0, 3).join(' ; '), n = bad.length; await pg.waitForTimeout(700); bad = await pg.evaluate(CONTRAST);
+  if (!bad.length) console.log(`note AA: ${n} text(s) read below AA right after a theme change and were fine 700 ms later (${first})`);
+  return bad;
+};
 // every visible text element is 12 px or more
 const SMALL = String.raw`(() => { const out = [], seen = new Set(), w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); for (let n = w.nextNode(); n; n = w.nextNode()) { const e = n.parentElement; if (!n.textContent.trim() || !e || seen.has(e) || !e.getClientRects().length || e.closest('canvas, .chart, script, style, option')) continue; seen.add(e); const px = parseFloat(getComputedStyle(e).fontSize); if (px < 12) out.push(px + ' ' + e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + ' "' + n.textContent.trim().slice(0, 20) + '"'); } return out; })()`;
 // touch targets: visible buttons, inputs, selects and links that act as buttons are at least 44 px tall
@@ -528,7 +538,7 @@ async function startServer(port = PORT, flags = []) {
     }
     for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['blind', '#bl-compare'], ['session', '#ss-summary']]) {
       await tab(id, sel);
-      for (const theme of ['dark', 'light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['dark', 'light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); check(`AA contrast, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
     }
     check('no endless animation in the other sections', (await p.evaluate(ENDLESS)).length === 0);
@@ -620,7 +630,7 @@ async function startServer(port = PORT, flags = []) {
         check('regression: the check reports the earlier correction the later lesson undid, and only that one', r.sum.broken === 1 && r.sum.holds === 3 && broke.status === 'broken' && r.rows.filter((x) => x.status === 'broken').length === 1 && /4 earlier verdicts checked against the 3 lessons in force: 3 still hold, 1 no longer holds, 0 never held\./.test(r.sum.text), r.sum.text);
         check('regression: it says what was asked for, what comes out now, and names the lesson that changed it', /No longer holds: you asked for SELL, and a fresh replay now gives WAIT\. Changed by: "Verify lesson 3: do not chase", it was not in force when this answer last held \(now: not applied: conflicts with lesson "Verify lesson 2: take this range"\)\./.test(broke.text) && !/Verify lesson 1/.test(broke.text) && /^An earlier answer was changed by a later lesson\./.test(await txt(v, '#ls-check-warn')), broke.text.slice(0, 260));
         await v.screenshot({ path: OUT + 'academy-11-regression.png', fullPage: true });
-        for (const theme of ['dark', 'light', 'midnight']) { await v.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await v.waitForTimeout(350); const bad = await v.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (the regression check with a broken answer)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        for (const theme of ['dark', 'light', 'midnight']) { await v.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await v.waitForTimeout(350); const bad = await aa(v); check(`AA contrast, ${theme} theme (the regression check with a broken answer)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
         await v.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
         // mend it: revise lesson 3 so that it only speaks where it was learned; the diff says what changes; the check is clean again
         const li3 = '#ls-list li.lsn:has(.lsn-head b:text-is("Verify lesson 3: do not chase"))';
@@ -684,7 +694,7 @@ async function startServer(port = PORT, flags = []) {
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
     for (const theme of ['dark', 'light', 'midnight']) {
       await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(450);   // colour transitions are 150 ms
-      const bad = await p.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (replay view)`, bad.length === 0, bad.slice(0, 4).join(' ; '));
+      const bad = await aa(p); check(`AA contrast, ${theme} theme (replay view)`, bad.length === 0, bad.slice(0, 4).join(' ; '));
     }
     await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
     await ctx.close();
@@ -697,7 +707,7 @@ async function startServer(port = PORT, flags = []) {
       let w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on the setup', w <= 390, w);
       let small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (setup)', small.length === 0, small.slice(0, 4).join(' ; '));
       let taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (setup)', taps.length === 0, taps.slice(0, 5).join(' ; '));
-      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await p.evaluate(CONTRAST); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       await p.tap('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await p.tap('#c-play'); await nextPoint(p);
       await p.tap('#mentor [data-choice="WAIT"]').catch(() => {}); await p.waitForTimeout(200);
@@ -708,7 +718,7 @@ async function startServer(port = PORT, flags = []) {
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll with the "What if" table open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (what if)', small.length === 0, small.slice(0, 4).join(' ; '));
       taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (what if)', taps.length === 0, taps.slice(0, 5).join(' ; '));
-      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await p.evaluate(CONTRAST); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       const order = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
       check('390 px: the panels stack and the chart stays first', order[0] < order[1] && order[1] < order[2] && order[2] < order[3], order.join(' < '));
@@ -720,7 +730,7 @@ async function startServer(port = PORT, flags = []) {
         w = await p.evaluate(() => document.documentElement.scrollWidth); check(`390 px: no sideways scroll (${id})`, w <= 390, w);
         small = await p.evaluate(SMALL); check(`390 px: every text is 12 px or more (${id})`, small.length === 0, small.slice(0, 4).join(' ; '));
         taps = await p.evaluate(TAPS); check(`390 px, touch: every control is at least 44 px tall (${id})`, taps.length === 0, taps.slice(0, 5).join(' ; '));
-        if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await p.evaluate(CONTRAST); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
         await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       }
       const two = await p.evaluate(() => { document.getElementById('tab-progress').click(); return null; }); await p.waitForSelector('#pg-recall');
@@ -862,7 +872,7 @@ async function analystAudit() {
       const auto = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c4.id)}&engine=language-model`)).attempts;
       ok('the next setup of the run is asked by itself, once, after the engine\'s own attempt', c4.id !== c3.id && auto.length === 1 && reqs.slice(-2).join() === 'attempt,analyse', reqs.slice(-3).join(' '));
       await p.click('#an-auto'); ok('unticking the switch stops it', !(await p.isChecked('#an-auto')) && (await p.$$('#an-auto-on')).length === 0);
-      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }   // 350 ms: colour transitions have ended
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }   // 350 ms: colour transitions have ended
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       ok('fake flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
       await ctx.close();
@@ -902,7 +912,7 @@ async function analystAudit() {
       ok('connector: "Check for the answer" shows it beside the engine\'s, said to come from your own assistant, stored apart, at no cost', /From your own assistant, through the connector\. It signed as: audit assistant\./.test(await txt(p, '#an-label')) && /no provider call, no cost/i.test(await txt(p, '#an-label')) && /^Analyst attempt 1 stored apart/.test(await txt(p, '#an-stored')) && (await p.getAttribute('#an-answer', 'data-action')) === ans.action && (await p.$$('#an-queued')).length === 0, await txt(p, '#an-label'));
       const cost = await api(p, 'get=cost'), an = (await api(p, `get=attempts&edge=${EDGE}&engine=language-model`)).attempts;
       ok('connector: nothing waits afterwards, the ledger is at zero and the answer is in the analyst\'s own file', /No question waits\.$/.test(await txt(p, '#an-via')) && cost.connector.pending === 0 && cost.total.usd === 0 && an.length === 1 && an[0].llm.provider === 'connector' && an[0].llm.costUsd === 0, JSON.stringify(cost.connector));
-      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); ok(`connector: AA contrast with the box and the answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); ok(`connector: AA contrast with the box and the answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       ok('connector flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
       await ctx.close();
