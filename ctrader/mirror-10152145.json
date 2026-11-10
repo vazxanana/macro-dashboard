@@ -4387,7 +4387,8 @@
     "t1": 1.12514,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.12274,
@@ -4401,7 +4402,8 @@
     "lagSec": 211,
     "positionId": "47994269",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T10:13:39.000Z"
    },
    "usdcad-scalp-1794304921": {
     "symbol": "USDCAD",
@@ -4435,7 +4437,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9922.81 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9921.15 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4474,15 +4476,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9922.81,
-  "lastRun": "2026-11-10T10:10:35.000Z"
+  "balance": 9921.15,
+  "lastRun": "2026-11-10T10:13:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:25:01.000Z",
-   "msg": "closed BTCUSD position 47694911 (council: missed)",
-   "trade": "btc-rscalp-1794237676"
-  },
   {
    "at": "2026-11-09T15:56:42.000Z",
    "msg": "opened buy AUDUSD 0.01 lot (council scalp)",
@@ -5977,6 +5974,11 @@
    "at": "2026-11-10T10:08:00.000Z",
    "msg": "not mirrored xrp-scalp-1794305213: none of XRPUSD found at the broker",
    "trade": "xrp-scalp-1794305213"
+  },
+  {
+   "at": "2026-11-10T10:13:39.000Z",
+   "msg": "EURUSD position 47994269 closed at the broker",
+   "trade": "eurusd-scalp-1794304921"
   }
  ],
  "limits": {
