@@ -5961,7 +5961,8 @@
     "t1": 0.68684,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.6864,
@@ -5975,9 +5976,10 @@
     "lagSec": 64,
     "positionId": "48205744",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-10T19:39:49.000Z",
-    "brokerStop": 0.6859
+    "brokerStop": 0.6859,
+    "closedAt": "2026-11-10T19:51:27.000Z"
    }
   },
   "day": {
@@ -5985,7 +5987,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9963.24 · 26 open",
+  "status": "ok · demo Fusion Markets · balance 9964.58 · 25 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5997,15 +5999,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9963.24,
-  "lastRun": "2026-11-10T19:48:57.000Z"
+  "balance": 9964.58,
+  "lastRun": "2026-11-10T19:51:27.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T11:06:38.000Z",
-   "msg": "moved EURUSD 47373487 protection: stop 1.0804547 -> 1.0801747, target 1.133285 -> 1.133005 (council rswing)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-10T11:06:38.000Z",
    "msg": "moved EURUSD 47964428 protection: stop 1.112987 -> 1.112707, target 1.147286 -> 1.147006 (council swing)",
@@ -7499,6 +7496,11 @@
   {
    "at": "2026-11-10T19:39:49.000Z",
    "msg": "limit filled at once: AUDUSD position 48205744 at the broker at 0.68636",
+   "trade": "audusd-rscalp-1794339525"
+  },
+  {
+   "at": "2026-11-10T19:51:27.000Z",
+   "msg": "AUDUSD position 48205744 closed at the broker",
    "trade": "audusd-rscalp-1794339525"
   }
  ],
