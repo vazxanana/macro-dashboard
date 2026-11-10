@@ -24,7 +24,8 @@
 //   attempts&edge=&cand=&limit=             oldest first; a blind attempt hides its decision until the mentor has answered
 //   sessions · session&id=                  replay session index / one session with its state
 //   progress&edge= · mistakes&edge= · exams&edge= · dataset&edge= · notebook · models · cost · audit&month=YYYY-MM
-//   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded
+//   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded;
+//                                           recall: true when the engine had decided that setup before (memory, not a fresh read)
 //   misses&edge=[&session=]                 the mentor's session notes: "the engine should have acted here" / "right to wait"
 //   attempts · corrections · dataset take &engine=language-model: the analyst's own rows (kept in their own files, never
 //   counted with the deterministic engine's); progress carries them in a separate `analyst` block
@@ -443,7 +444,8 @@ const GET = {
     return { edge, graded: outRaw != null, blind: rows.slice().reverse().map((b) => {
       const a = b.attemptId ? byId.get(b.attemptId) : null, c = cands.get(b.candidateId) || null, side = c && (c.side === 'buy' || c.side === 'sell') ? c.side : null, out = outRaw == null ? null : outcomeOf(outRaw, b.candidateId);
       const engine = a && a.decision ? { action: a.decision.action, entry: a.decision.entry, stop: a.decision.stop, target: a.decision.target, confidence: a.decision.confidence } : null;
-      return { ...b, t: c && typeof c.t === 'number' ? c.t : null, side, engine, outcome: out, rMentor: gradeR(b.mentor, side, out), rEngine: gradeR(engine, side, out) };
+      // recall: the engine had already decided this setup before its blind answer (attempt 2 or later), so that answer is memory, not a fresh read
+      return { ...b, t: c && typeof c.t === 'number' ? c.t : null, side, engine, recall: !!(a && a.n > 1), outcome: out, rMentor: gradeR(b.mentor, side, out), rEngine: gradeR(engine, side, out) };
     }) };
   },
 
@@ -499,6 +501,7 @@ const POST = {
     return X.write({ att: [kA, ST.emptyRows()], seen: [K.seen(edge), emptySeen()], cor: [kC, ST.emptyRows(), CAPS.corrections], ds: [kD, ST.emptyRows(), CAPS.dataset] }, async ({ att, seen, cor, ds }, at) => {
       const A = R(att, kA), C = R(cor, kC), D = R(ds, kD);
       const attempt = A.rows.find((r) => r.id === attemptId) || (A.archives ? (await X.store.rows(kA, true)).find((r) => r.id === attemptId) : null) || bad('no such attempt for this edge', 404);
+      if (attempt.mode === 'exam') bad('a test on a new setup is decided once and is never corrected: a lesson made from it would turn the exam pool into training data', 409);
       const se = seenOf(seen).ids[attempt.candidateId]; if (attempt.mode === 'blind' && se && se.blindPending) bad('answer first: submit the blind answer before correcting the engine', 409);
       const was = { action: attempt.decision.action, entry: attempt.decision.entry, stop: attempt.decision.stop, target: attempt.decision.target };
       if (verdict === 'approve') { if (action && action !== was.action) bad('an approval cannot change the action: use the verdict change'); action = was.action; levels(lv, action, 'correction', false); }
@@ -515,6 +518,8 @@ const POST = {
   async 'lesson.save'(X, b) {
     const l = obj(b.lesson, 'lesson'), edge = await X.edge(l.edge, 'lesson.edge', true);
     const base = { edge, title: text(l.title, 160, 'lesson.title', true), text: text(l.text, 6000, 'lesson.text'), when: whenOf(l.when, 'lesson.when'), then: thenOf(l.then, 'lesson.then'), source: sourceOf(l.source, 'lesson.source'), active: boolOrNull(l.active, 'lesson.active') !== false };
+    // a lesson never comes from an exam-pool setup: that setup, and the pool it stands for, would stop being unseen evidence
+    if (base.source.candidateId) for (const e of edge === '*' ? await X.edges() : [edge]) { const c = await X.cand(e, base.source.candidateId); if (c && c.pool === 'exam') bad('lesson.source: an exam-pool setup is only for tests and cannot be the source of a lesson'); }
     return X.write({ les: [K.lessons, ST.emptyRows(), CAPS.lessons] }, ({ les }, at) => {
       const L = R(les, K.lessons), id = X.id('ls'), row = { id, root: id, edge: base.edge, version: 1, active: base.active, title: base.title, text: base.text, createdAt: at, updatedAt: at, when: base.when, then: base.then, source: base.source, supersedes: null, supersededBy: null, stats: zeroStats() };
       return { write: { les: { ...L, rows: L.rows.concat(row) } }, result: { ok: true, lesson: row }, audit: { action: 'lesson.save', ids: [id, base.source.attemptId, base.source.correctionId], summary: `${edge} v1: ${base.title}` } };

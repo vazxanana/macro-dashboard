@@ -59,12 +59,19 @@
   // the action a correction asks for: the mentor's action, or WAIT when a trade was rejected outright (as the API reads it)
   const wanted = (c) => (c && c.action ? c.action : c && c.verdict === 'reject' && c.was && isTake(c.was.action) ? 'WAIT' : null);
 
-  // Agreement with the mentor by week: the share of corrections that were approvals.
-  function agreementByWeek(corrections) {
-    const by = {}; let n = 0, approve = 0;
-    for (const c of Array.isArray(corrections) ? corrections : []) { const k = weekOf(c.at) || 'unknown', w = (by[k] = by[k] || { week: k, n: 0, approve: 0 }); w.n++; n++; if (c.verdict === 'approve') { w.approve++; approve++; } }
+  // Agreement with the mentor by week: the share of verdicts that were approvals, on decisions the engine made on a setup
+  // it had not decided before (its first attempt, mode train). A verdict on a same-trade replay judges a remembered answer:
+  // it is recall and is counted apart (recallN), never in the rate. A verdict whose attempt is not among the rows passed in
+  // is counted as unknownN and left out too. Without attempts every verdict is taken as first sight (the caller cannot tell).
+  function agreementByWeek(corrections, attempts) {
+    const by = {}, kindOf = Array.isArray(attempts) ? new Map(attempts.map((x) => [x.id, x.mode === 'train' && !(x.n > 1) ? 'first' : 'recall'])) : null; let n = 0, approve = 0, recallN = 0, recallApprove = 0, unknownN = 0;
+    for (const c of Array.isArray(corrections) ? corrections : []) {
+      const kind = kindOf ? kindOf.get(c.attemptId) || 'unknown' : 'first';
+      if (kind === 'recall') { recallN++; if (c.verdict === 'approve') recallApprove++; continue; } if (kind === 'unknown') { unknownN++; continue; }
+      const k = weekOf(c.at) || 'unknown', w = (by[k] = by[k] || { week: k, n: 0, approve: 0 }); w.n++; n++; if (c.verdict === 'approve') { w.approve++; approve++; }
+    }
     const weeks = Object.values(by).sort((a, b) => (a.week < b.week ? -1 : 1)).map((w) => Object.assign(w, { rate: w.n ? r3(w.approve / w.n) : null, tooFew: tooFew(w.n) }));
-    return { n, approve, rate: n ? r3(approve / n) : null, tooFew: tooFew(n), weeks };
+    return { n, approve, rate: n ? r3(approve / n) : null, tooFew: tooFew(n), weeks, recallN, recallApprove, unknownN };
   }
 
   // Recall (same-trade replays) beside results on new setups (tests). Two separate records: they are never added together.
@@ -128,10 +135,54 @@
   // a lesson's record in two parts that are never added: recall (same-trade replays) and new setups (tests)
   function lessonRecord(l) {
     const s = (l && l.stats) || {}, rn = (s.replayPass || 0) + (s.replayFail || 0), en = s.examN || 0;
-    return { applied: s.applied || 0, recall: { n: rn, pass: s.replayPass || 0, fail: s.replayFail || 0 }, fresh: { n: en, agree: s.examAgree || 0, netWith: s.examNetWith || 0, netWithout: s.examNetWithout || 0, tooFew: tooFew(en) },
+    const changed = Math.max(0, en - (s.examAgree || 0));   // the tests in which the answer with lessons was not the answer without
+    return { applied: s.applied || 0, recall: { n: rn, pass: s.replayPass || 0, fail: s.replayFail || 0 }, fresh: { n: en, agree: s.examAgree || 0, changed, netWith: s.examNetWith || 0, netWithout: s.examNetWithout || 0, tooFew: tooFew(en) },
       recallText: rn ? `Recall on the same trade: passed ${s.replayPass || 0}, failed ${s.replayFail || 0} (n = ${rn}).` : 'Recall on the same trade: not replayed yet.',
-      freshText: en ? `New setups it matched: n = ${en}, same answer as without it on ${s.examAgree || 0}; net ${fmtR(s.examNetWith || 0)} with lessons against ${fmtR(s.examNetWithout || 0)} without.` + (tooFew(en) ? ' Too few to judge.' : '') : 'New setups: it has matched none in a test yet.' };
+      freshText: en ? `New setups it matched: n = ${en}; the answer changed on ${changed} and stayed the same on ${s.examAgree || 0}; net ${fmtR(s.examNetWith || 0)} with lessons against ${fmtR(s.examNetWithout || 0)} without.` + (tooFew(en) ? ' Too few to judge.' : '') : 'New setups: it has matched none in a test yet.' };
   }
+  // ---- do earlier verdicts still hold? ---------------------------------------------------------------------------------
+  // A later lesson can change the answer on a setup the mentor judged before. regressionTargets lists the setups to decide
+  // again: one per train-pool setup that has a verdict (the latest one), with the attempt it was given on and the latest
+  // later attempt that still gave the mentor's answer. regressionVerdict reads a fresh decision against that verdict.
+  const dec0 = (a) => (a && a.decision ? MXAC.restoreApplied(a.decision) : null);
+  const matchesVerdict = (first, d, k) => { if (!first || !d) return false; const m = MXA.compare(first, d, k).matchesCorrection; return m.action !== false && m.entry !== false && m.stop !== false && m.target !== false; };
+  // o = { corrections, attempts, times: { candidateId: t } (the train setups this server can replay) }
+  // → { targets: [{ candidateId, t, correction, first (the attempt judged), hash, heldAt (attempt | null), kind: 'corrected' | 'approved', want }], skipped: [{ candidateId, why }] }
+  function regressionTargets(o) {
+    const cors = Array.isArray(o && o.corrections) ? o.corrections : [], atts = Array.isArray(o && o.attempts) ? o.attempts : [], times = (o && o.times) || {}, corBy = {}, attBy = {}, targets = [], skipped = [];
+    for (const c of cors) (corBy[c.candidateId] = corBy[c.candidateId] || []).push(c); for (const a of atts) (attBy[a.candidateId] = attBy[a.candidateId] || []).push(a);
+    for (const id of Object.keys(corBy)) {
+      const k = corBy[id].slice().sort((a, b) => (a.at < b.at ? -1 : 1)).pop(), mine = (attBy[id] || []).slice().sort((a, b) => (a.n || 0) - (b.n || 0) || (a.at < b.at ? -1 : 1));
+      if (mine.some((a) => a.mode === 'exam' || a.mode === 'blind')) { skipped.push({ candidateId: id, why: 'it is a test or a blind setup, never replayed' }); continue; }
+      const first = mine.find((a) => a.id === k.attemptId) || null;
+      if (!first || !first.decision) { skipped.push({ candidateId: id, why: 'the attempt it was given on is not among the latest attempts read' }); continue; }
+      if (!fin(times[id])) { skipped.push({ candidateId: id, why: 'this setup is not in the list this server can replay' }); continue; }
+      // an approval was given on an answer the engine did give: that attempt itself is the first time it held
+      const fd = dec0(first), held = mine.filter((a) => a.at > k.at && a.decision && matchesVerdict(fd, dec0(a), k)).pop() || (k.verdict === 'approve' ? first : null);
+      targets.push({ candidateId: id, t: times[id], correction: k, first, hash: first.snapshotHash || null, heldAt: held, kind: k.verdict === 'approve' ? 'approved' : 'corrected', want: k.verdict === 'approve' ? fd.action : wanted(k) });
+    }
+    targets.sort((a, b) => a.t - b.t); return { targets, skipped };
+  }
+  // target + the fresh decision made with `lessons` (the versions now in force) → { status, want, got, changedBy: [{ id, title, why }], text }
+  //   holds        the fresh answer is the mentor's
+  //   broken       it held on an earlier replay and does not now; changedBy names the lessons that differ from that replay
+  //   never-held   it does not hold and no stored replay ever gave it (its lesson is missing, switched off, or does not apply)
+  function regressionVerdict(target, fresh, lessons) {
+    const k = target.correction, fd = dec0(target.first), d = MXAC.restoreApplied(fresh), ok = matchesVerdict(fd, d, k), got = d ? d.action : null, now = Array.isArray(lessons) ? lessons : [], byId = new Map(now.map((l) => [l.id, l]));
+    const name = (id, title) => (byId.get(id) && byId.get(id).title) || title || id, changedBy = [], said = target.kind === 'approved' ? 'approved' : 'asked for';
+    if (!ok && target.heldAt) {
+      const then = target.heldAt, had = new Set(then.lessonsAvailable || []);
+      const titled = (t) => now.reduce((x, l) => (l.title ? x.split(l.id).join(`"${l.title}"`) : x), String(t));   // the engine's effect text names lessons by id: say their titles
+      for (const l of (d.lessonsApplied || [])) if (!had.has(l.id)) changedBy.push({ id: l.id, title: name(l.id, l.title), why: 'it was not in force when this answer last held' + (l.effect ? ` (now: ${titled(l.effect)})` : '') });
+      for (const l of (dec0(then).lessonsApplied || [])) if (l.applied !== false && !byId.has(l.id)) changedBy.push({ id: l.id, title: name(l.id, l.title), why: 'it gave this answer before and is no longer in force (switched off or replaced)' });
+    }
+    const status = ok ? 'holds' : target.heldAt ? 'broken' : 'never-held', want = target.want || 'another answer';
+    const text = ok ? `Still holds: a fresh replay gives ${got}, the answer you ${said}.`
+      : status === 'broken' ? `No longer holds: you ${said} ${want}, and a fresh replay now gives ${got}. ` + (changedBy.length ? 'Changed by: ' + changedBy.map((x) => `"${x.title}", ${x.why}`).join('; ') + '.' : 'No lesson differs from the replay on which it last held, so the cause is elsewhere (other costs, or the running thesis of that sitting).')
+        : `Never held: you ${said} ${want} and no stored replay has given it; a fresh replay gives ${got}. Its lesson is missing, switched off, or does not apply here.`;
+    return { status, want: target.want || null, got, changedBy, text };
+  }
+  const regressionSummary = (rows) => { const s = { n: 0, holds: 0, broken: 0, neverHeld: 0, notReplayed: 0 }; for (const r of Array.isArray(rows) ? rows : []) { s.n++; if (r.status === 'holds') s.holds++; else if (r.status === 'broken') s.broken++; else if (r.status === 'never-held') s.neverHeld++; else s.notReplayed++; } return s; };
   // where a research draft stands, from the stored lessons that name its study
   function draftStatus(p, lessons) {
     const id = p && p.source && p.source.studyId, hits = (Array.isArray(lessons) ? lessons : []).filter((l) => l.source && l.source.studyId === id && id);
@@ -216,11 +267,13 @@
   }
   const closer = (rMentor, rEngine) => (!fin(rMentor) || !fin(rEngine) ? null : rMentor > rEngine ? 'mentor' : rEngine > rMentor ? 'engine' : 'tie');
   const CLOSER_WORD = { mentor: 'You were closer to the outcome.', engine: 'The engine was closer to the outcome.', tie: 'A tie: both answers were worth the same.' };
-  // the running mentor-against-engine table (rows of GET ?get=blind)
+  // the running mentor-against-engine table (rows of GET ?get=blind). A setup the engine had already decided before its
+  // blind answer (row.recall) is a remembered answer: it is counted in `recalled` and left out of every score.
   function blindTable(rows) {
-    const s = { n: 0, withEngine: 0, agree: 0, graded: 0, mentorR: 0, engineR: 0, mentorCloser: 0, engineCloser: 0, ties: 0, tooFew: true };
+    const s = { n: 0, recalled: 0, withEngine: 0, agree: 0, graded: 0, mentorR: 0, engineR: 0, mentorCloser: 0, engineCloser: 0, ties: 0, tooFew: true };
     for (const r of Array.isArray(rows) ? rows : []) {
-      s.n++; if (r.engine) { s.withEngine++; if (r.engine.action === r.mentor.action) s.agree++; }
+      s.n++; if (r.recall) { s.recalled++; continue; }
+      if (r.engine) { s.withEngine++; if (r.engine.action === r.mentor.action) s.agree++; }
       const c = closer(r.rMentor, r.rEngine); if (!c) continue; s.graded++; s.mentorR += r.rMentor; s.engineR += r.rEngine; if (c === 'mentor') s.mentorCloser++; else if (c === 'engine') s.engineCloser++; else s.ties++;
     }
     s.mentorR = r3(s.mentorR); s.engineR = r3(s.engineR); s.tooFew = tooFew(s.graded); return s;
@@ -248,7 +301,7 @@
     return out;
   }
 
-  const MXAT = { VERSION: '1.0.0', MIN_N, SCHEDULE_DAYS, weekOf, wanted, agreementByWeek, recallVsNew, mistakeGroups, reviewQueue, dueText, lessonChains, lessonDiff, lessonOrigin, lessonRecord, draftStatus, evidenceText, filterStudies, policyRows, tableSections, noteProblems,
+  const MXAT = { VERSION: '1.1.0', MIN_N, SCHEDULE_DAYS, weekOf, wanted, agreementByWeek, recallVsNew, mistakeGroups, reviewQueue, dueText, lessonChains, lessonDiff, lessonOrigin, lessonRecord, regressionTargets, regressionVerdict, regressionSummary, draftStatus, evidenceText, filterStudies, policyRows, tableSections, noteProblems,
     modelRows, costView, auditActions, filterAudit, monthList, gradeLite, closer, blindTable, sessionSummary, answerProblems, rateText, fewText, fmtUsd, fmtStamp, fmtAvgR, tooFew, CLASS_WORD, MODE_WORD };
   if (NODE) { module.exports = MXAT; return; }
   root.MXAT = MXAT;
@@ -359,6 +412,57 @@
     }
     box.appendChild(ul); return box;
   }
+  // "Check earlier corrections": every train setup that has a verdict is decided again from its candles with the lessons now
+  // in force, stored as a same-trade replay, and read against that verdict. It answers one question: did a later lesson
+  // quietly undo an earlier one? The last result of each edge is kept while the page is open.
+  const CHK = {};      // edge → { at, rows, skipped, lessons }
+  function checkOut(box, edge, ctx) {
+    const r = CHK[edge], out = clear(box); if (!r) return;
+    const s = regressionSummary(r.rows), times = {}; for (const x of r.rows) times[x.candidateId] = x.t;
+    out.appendChild(el('p', { id: 'ls-check-sum', 'data-broken': s.broken, 'data-holds': s.holds, text: `${plural(s.n, 'earlier verdict')} checked against the ${plural(r.lessons, 'lesson')} in force: ${s.holds} still ${s.holds === 1 ? 'holds' : 'hold'}, ${s.broken} no longer ${s.broken === 1 ? 'holds' : 'hold'}, ${s.neverHeld} never held` + (s.notReplayed ? `, ${s.notReplayed} could not be replayed` : '') + '.' + (r.skipped.length ? ` ${plural(r.skipped.length, 'setup')} left out (${Array.from(new Set(r.skipped.map((x) => x.why))).join('; ')}).` : '') }));
+    if (s.broken) out.appendChild(el('p', { class: 'ac-warn', id: 'ls-check-warn', text: `${s.broken === 1 ? 'An earlier answer was' : s.broken + ' earlier answers were'} changed by a later lesson. Open the setup, or revise or switch off the lesson named.` }));
+    out.appendChild(listOr(el('ul', { class: 'plain-list small', id: 'ls-check-list' }), r.rows, 'No train setup with a verdict could be replayed here.', (x) => el('li', { 'data-cand': x.candidateId, 'data-status': x.status }, el('div', {}, el('b', { text: fmtTime(x.t) + ' setup: ' }), x.text, x.attemptN ? el('small', { text: ` Stored as attempt ${x.attemptN} (same-trade replay).` }) : null),
+      el('button', { type: 'button', class: 'btn sm', 'data-open': x.candidateId, text: 'Replay this setup', onclick: () => K.openInTrain(edge, x.t) }))));
+    out.appendChild(el('p', { class: 'honest', text: 'Each check is stored as a same-trade replay. It shows recall of your earlier answers, not that a lesson generalises.' }));
+  }
+  async function runCheck(btn, msg, box, edge, ctx) {
+    const e = edgeDef(ctx, edge); if (!e || btn.disabled) return; btn.disabled = true; clear(box);
+    const say = (t) => { msg.textContent = t; };
+    try {
+      say('Reading the verdicts, the attempts and the lessons in force…');
+      const [C, A, pool] = await Promise.all([api.get({ get: 'corrections', edge, limit: 2000 }), api.get({ get: 'attempts', edge, limit: 2000 }), K.poolFor(edge, 'train')]);
+      const lessons = await K.lessonsFor(edge, true), byId = {}; for (const c of pool.candidates || []) byId[c.id] = c;
+      const times = {}; for (const id of Object.keys(byId)) times[id] = byId[id].t;
+      const plan = regressionTargets({ corrections: C.corrections || [], attempts: A.attempts || [], times }), rows = [];
+      let hist = { rows: [] }; if (plan.targets.length) { hist = await K.historyFor(edge, plan.targets[plan.targets.length - 1].t + 1); await K.ensureCalendar(); }
+      for (let i = 0; i < plan.targets.length; i++) {
+        const tg = plan.targets[i], c = byId[tg.candidateId], row = { candidateId: tg.candidateId, t: tg.t, kind: tg.kind };
+        say(`Setup ${i + 1} of ${plan.targets.length} (${fmtTime(tg.t)}): loading its candles…`);
+        try {
+          const got = await K.loadSeries(e.market, c.t, c.t + 1, () => {}); if (!got.series['5m'].length) throw new Error('no candles for its date');
+          const snap = K.snapOf(e, got.series, got.dataVersion, c.t, c), hash = MXR.hash(snap);
+          if (tg.hash && hash !== tg.hash) throw new Error('its candles no longer give the decision point first judged, so nothing was replayed or stored');
+          say(`Setup ${i + 1} of ${plan.targets.length} (${fmtTime(tg.t)}): deciding from its candles and storing…`);
+          const d = K.decideOn(snap, { setup: setupOf(e), account: MXK.account(BALANCE, { t: c.t }), lessons, thesis: MXA.thesis.start(snap), history: MXAC.historyAt(hist.rows, c.t) }).decision;   // a fresh thesis and a fresh paper account: only the lessons carry over
+          const res = await api.post(K.attemptBody(c, edge, 'replay-same', d, lessons, hash, MXA.features(snap), null)); K.decided(c.id);
+          const v = regressionVerdict(tg, d, lessons); Object.assign(row, v, { attemptN: res.n });
+          const own = lessons.filter((l) => l.source && l.source.correctionId === tg.correction.id);   // the lesson made from this verdict: its recall counters follow, as in the Train tab
+          for (const l of own) { const inc = v.status === 'holds' ? { replayPass: 1 } : { replayFail: 1 }; if ((d.lessonsApplied || []).some((x) => x.id === l.id && x.applied !== false)) inc.applied = 1; try { await api.post({ action: 'lesson.stats', id: l.id, inc }); } catch (e2) { /* a counter, not a result */ } }
+        } catch (e2) { Object.assign(row, { status: 'not-replayed', text: `Not replayed: ${(e2 && e2.code ? MXAC.candleError(e2) : (e2 && e2.message) || e2)}.` }); }
+        rows.push(row);
+      }
+      CHK[edge] = { at: Date.now(), rows, skipped: plan.skipped, lessons: lessons.length }; K.lessonsChanged();
+      say(plan.targets.length ? `Checked ${plural(rows.length, 'setup')}.` : 'Nothing to check yet: no train setup of this edge has a verdict. Approve or correct a decision in the Train tab first.'); checkOut(box, edge, ctx);
+    } catch (e2) { say('The check could not run: ' + ((e2 && e2.message) || e2) + '.'); }
+    finally { btn.disabled = false; }
+  }
+  function checkCard(edge, ctx) {
+    const box = card('Check earlier corrections', 'did a later lesson undo an earlier answer?', 'ls-check'), msg = el('span', { class: 'ac-status', id: 'ls-check-msg', role: 'status', 'aria-live': 'polite' }), out = el('div', { id: 'ls-check-out' });
+    box.appendChild(el('p', { text: 'Every train setup you have judged is decided again from its candles with the lessons now in force. Each answer is stored as a same-trade replay and read against your verdict. Run it after you save, revise or switch a lesson.' }));
+    box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn', id: 'ls-check-run', text: CHK[edge] ? 'Check again' : 'Check earlier corrections', onclick: (ev) => runCheck(ev.currentTarget, msg, out, edge, ctx) }), msg));
+    box.appendChild(out); if (CHK[edge]) { msg.textContent = `Last checked ${fmtStamp(new Date(CHK[edge].at).toISOString())}.`; checkOut(out, edge, ctx); }
+    return box;
+  }
   async function lessonsTab(sec, ctx) {
     const live = fresh('lessons'), edge = edgeOf(ctx), e = edgeDef(ctx, edge), redraw = () => lessonsTab(sec, ctx); closeEditor = null; loading(sec, 'Reading the lessons…');
     let lessons, research;
@@ -371,7 +475,7 @@
     const box = card('Lessons', `${e ? e.name : edge} and all edges · ${plural(chains.length, 'lesson')}, ${all.filter((l) => l.active).length} in force`, 'ls-card');
     if (!chains.length) box.appendChild(empty('No lesson yet. A lesson appears here when you correct a decision in the Train tab and save the draft, or when you save a research draft below.', el('button', { type: 'button', class: 'btn', text: 'Go to Train', onclick: () => ctx.go('train') })));
     else { const ul = el('ul', { class: 'lsn-list', id: 'ls-list' }); for (const vs of chains) ul.appendChild(lessonItem(vs, ctx, redraw)); box.appendChild(ul); }
-    sec.appendChild(box); sec.appendChild(draftsCard(research, all, ctx, redraw, e));
+    sec.appendChild(box); sec.appendChild(checkCard(edge, ctx)); sec.appendChild(draftsCard(research, all, ctx, redraw, e));
   }
   MXAC.registerTab('lessons', { title: 'Lessons', render: lessonsTab });
 
@@ -396,10 +500,12 @@
       ['Lessons', cn.lessons || 0, `${cn.lessonsActive || 0} in force`, 'pg-n-lessons'], ['Setups seen', cn.seen || 0, 'decided at least once'], ['Tests on new setups', cn.exams || 0, 'unseen exam-pool setups', 'pg-n-exams']]));
     sec.appendChild(c1);
 
-    const ag = agreementByWeek(cors), c2 = card('Agreement with the mentor over time', 'the share of your verdicts that were approvals', 'pg-agree');
-    if (!ag.n) c2.appendChild(empty('No verdict yet. Approve or correct a decision in the Train tab and the weeks appear here.'));
+    const ag = agreementByWeek(cors, atts), c2 = card('Agreement with the mentor over time', 'the share of your verdicts that were approvals, on setups the engine had not decided before', 'pg-agree');
+    const apart = (ag.recallN ? `${plural(ag.recallN, 'verdict')} on same-trade replays (${ag.recallApprove} approved) ${ag.recallN === 1 ? 'is' : 'are'} recall and ${ag.recallN === 1 ? 'is' : 'are'} not counted here. ` : '') + (ag.unknownN ? `${plural(ag.unknownN, 'older verdict')} could not be matched to an attempt and ${ag.unknownN === 1 ? 'is' : 'are'} left out. ` : '');
+    if (!ag.n) { c2.appendChild(empty('No verdict on a first decision yet. Approve or correct a decision in the Train tab and the weeks appear here.')); if (apart) c2.appendChild(el('p', { class: 'note', id: 'pg-agree-apart', text: apart.trim() })); }
     else {
-      c2.appendChild(el('p', { id: 'pg-agree-all', text: `Overall you approved ${rateText(ag.approve, ag.n)} of the decisions you judged (n = ${ag.n}).` }));
+      c2.appendChild(el('p', { id: 'pg-agree-all', text: `Overall you approved ${rateText(ag.approve, ag.n)} of the first decisions you judged (n = ${ag.n}).` }));
+      if (apart) c2.appendChild(el('p', { class: 'note', id: 'pg-agree-apart', text: apart.trim() }));
       c2.appendChild(table(['Week', 'Judged (n)', 'Approved', 'Agreement'], ag.weeks.map((w) => [w.week, num(w.n), num(w.approve), el('td', {}, w.tooFew ? `too few to judge (n = ${w.n})` : el('span', { class: 'meter' }, el('span', { class: 'bar', 'aria-hidden': 'true' }, el('i', { style: `width:${Math.round(w.rate * 100)}%` })), fmtPct(w.rate)))]), 'pg-agree-table'));
       c2.appendChild(el('p', { class: 'note', text: 'Agreement says how often you and the engine gave the same answer. It does not say who was right: results on new setups do.' + (C.corrections && cors.length >= 2000 ? ' Only the latest 2,000 corrections are counted here.' : '') }));
     }
@@ -576,7 +682,7 @@
     box.appendChild(el('h3', { text: 'Ledger by day' }));
     if (!v.ledger.length) box.appendChild(empty(v.enabled ? 'No call has been made yet, so the ledger is empty.' : 'The ledger is empty: the adapter is off, so no call was ever made. Every decision, lesson and grade on this page is deterministic code.'));
     else box.appendChild(table(['Day (UTC)', 'Spent', 'Requests', 'Tokens in', 'Tokens out', 'From the cache', 'Refused', 'Errors'], v.ledger.map((d) => [num(d.day), num(fmtUsd(d.usd)), num(d.requests || 0), num(d.tokensIn || 0), num(d.tokensOut || 0), num(d.cacheHits || 0), num(d.skipped || 0), num(d.errors || 0)]), 'co-ledger'));
-    box.appendChild(el('p', { class: 'note', text: 'To switch it on the owner sets ACADEMY_LLM_KEY, ACADEMY_LLM_URL and ACADEMY_LLM_MODEL on the server, with ACADEMY_LLM_DAILY_USD and ACADEMY_LLM_MONTHLY_USD as budgets. The key never reaches this page.' }));
+    box.appendChild(el('p', { class: 'note', text: 'To switch it on the owner gives the server the adapter\'s key, its address and its model name, with a daily and a monthly budget (the setting names are listed at the top of api/_academy-llm.js). The key never reaches this page.' }));
     sec.appendChild(box);
   }
   MXAC.registerTab('costs', { title: 'Costs', render: costsTab });
@@ -659,9 +765,9 @@
     function drawTable() {
       const s = blindTable(B.rows), e = edge(); clear(tableBox).appendChild(el('h2', { class: 'c-h' }, 'You against the engine', el('small', { text: `${e ? e.name : ''} · every blind answer stored for this edge` })));
       if (!s.n) { tableBox.appendChild(empty('No blind answer yet. Start a round above: you answer each setup before the engine\'s answer is shown, and the running score appears here.')); return; }
-      tableBox.appendChild(statGrid([['Setups answered', s.n, 'n', 'bl-n'], ['Same answer', `${s.agree} of ${s.withEngine}`, 'you and the engine', 'bl-agree'], ['Your net R', fmtR(s.mentorR), `n = ${s.graded} graded`, 'bl-mentor-r'], ['Engine net R', fmtR(s.engineR), `n = ${s.graded} graded`, 'bl-engine-r'], ['Closer to the outcome', `you ${s.mentorCloser} · engine ${s.engineCloser}`, `${plural(s.ties, 'tie')} · n = ${s.graded}`, 'bl-closer-n']]));
-      tableBox.appendChild(el('p', { class: 'note', id: 'bl-table-note', text: (s.tooFew ? fewText(s.graded, 'graded setup') + ' ' : '') + 'A WAIT counts as 0R; a trade on the setup\'s own side counts as the setup\'s net R after costs; a trade on the other side cannot be graded. Train-pool setups only.' }));
-      tableBox.appendChild(table(['Setup time (UTC)', 'Side', 'You', 'Engine', 'Your R', 'Engine R', 'Closer'], B.rows.slice(0, 30).map((r) => { const c = closer(r.rMentor, r.rEngine); return el('tr', { 'data-cand': r.candidateId }, num(fin(r.t) ? fmtTime(r.t).replace(' UTC', '') : 'n/a'), el('td', { text: r.side || 'n/a' }), el('td', {}, actBadge(r.mentor.action, true)), el('td', {}, r.engine ? actBadge(r.engine.action, true) : 'no answer stored'), num(fin(r.rMentor) ? fmtR(r.rMentor) : 'not graded'), num(fin(r.rEngine) ? fmtR(r.rEngine) : 'not graded'), el('td', { text: c === 'mentor' ? 'you' : c === 'engine' ? 'the engine' : c === 'tie' ? 'a tie' : 'not judged' })); }), 'bl-rows'));
+      tableBox.appendChild(statGrid([['Setups answered', s.n, s.recalled ? `${s.n - s.recalled} scored · ${s.recalled} recall, not scored` : 'n', 'bl-n'], ['Same answer', `${s.agree} of ${s.withEngine}`, 'you and the engine', 'bl-agree'], ['Your net R', fmtR(s.mentorR), `n = ${s.graded} graded`, 'bl-mentor-r'], ['Engine net R', fmtR(s.engineR), `n = ${s.graded} graded`, 'bl-engine-r'], ['Closer to the outcome', `you ${s.mentorCloser} · engine ${s.engineCloser}`, `${plural(s.ties, 'tie')} · n = ${s.graded}`, 'bl-closer-n']]));
+      tableBox.appendChild(el('p', { class: 'note', id: 'bl-table-note', text: (s.tooFew ? fewText(s.graded, 'graded setup') + ' ' : '') + 'A WAIT counts as 0R; a trade on the setup\'s own side counts as the setup\'s net R after costs; a trade on the other side cannot be graded. Train-pool setups only.' + (s.recalled ? ` ${plural(s.recalled, 'setup')} the engine had decided before in training ${s.recalled === 1 ? 'is' : 'are'} listed as recall and left out of every number above: a remembered answer is not evidence.` : '') }));
+      tableBox.appendChild(table(['Setup time (UTC)', 'Side', 'You', 'Engine', 'Your R', 'Engine R', 'Closer'], B.rows.slice(0, 30).map((r) => { const c = closer(r.rMentor, r.rEngine); return el('tr', { 'data-cand': r.candidateId, 'data-recall': r.recall ? 'yes' : 'no' }, num(fin(r.t) ? fmtTime(r.t).replace(' UTC', '') : 'n/a'), el('td', { text: r.side || 'n/a' }), el('td', {}, actBadge(r.mentor.action, true)), el('td', {}, r.engine ? actBadge(r.engine.action, true) : 'no answer stored', r.recall ? ' (recall)' : null), num(fin(r.rMentor) ? fmtR(r.rMentor) : 'not graded'), num(fin(r.rEngine) ? fmtR(r.rEngine) : 'not graded'), el('td', { text: r.recall ? 'recall, not scored' : c === 'mentor' ? 'you' : c === 'engine' ? 'the engine' : c === 'tie' ? 'a tie' : 'not judged' })); }), 'bl-rows'));
     }
     async function prepare(reset) {
       const e = edge(); if (!e) return; note.textContent = 'Counting setups…'; if (reset) { fromEl.value = ''; toEl.value = ''; }
@@ -716,7 +822,7 @@
         submit: async (a) => {
           const res = await api.post({ action: 'blind.submit', blind: { edge: e.id, candidateId: c.id, action: a.action, entry: a.entry, stop: a.stop, target: a.target, text: a.text } }); B.done.add(c.id);
           let out = null, outErr = null; try { out = (await api.get({ get: 'outcome', id: c.id, edge: e.id })).outcome; } catch (e2) { outErr = e2.message; }   // allowed now: both answers are stored
-          const row = Object.assign({}, res.blind, { t: c.t, side: c.side, engine: lite(res.engine), outcome: out, rMentor: gradeLite(res.blind.mentor, c.side, out), rEngine: gradeLite(res.engine, c.side, out) });
+          const row = Object.assign({}, res.blind, { t: c.t, side: c.side, engine: lite(res.engine), recall, outcome: out, rMentor: gradeLite(res.blind.mentor, c.side, out), rEngine: gradeLite(res.engine, c.side, out) });
           B.rows.unshift(row); try { showBoth(c, row, res.engine, out, outErr, recall); drawTable(); } catch (e2) { reveal.hidden = false; reveal.appendChild(errBox('The comparison', e2)); }
         } });
     }

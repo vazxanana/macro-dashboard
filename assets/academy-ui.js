@@ -165,6 +165,20 @@
     return s;
   }
   const VERDICT_WORD = { learned: 'Learned', partly: 'Partly learned', 'not-learned': 'Not learned' };
+  // The control of a same-trade replay: the same snapshot decided again with EVERY lesson switched off (a fresh thesis, the
+  // same paper account). If that already gives the first answer, the only thing left to explain a changed answer is the
+  // lessons in force. If it does not (the first sitting had a running thesis; the replay starts a fresh one), the change
+  // cannot be credited to a lesson: a "learned" whose control already gives the mentor's answer is taken back to "partly".
+  // → cmp with { control: { action, sameAsFirst, matchesCorrection, text } }
+  function proveWithControl(cmp, first, control, correction) {
+    const k = correction || {}, c = MXA.compare(first, control, k), m = c.matchesCorrection, lv = ['action', 'entry', 'stop', 'target'];
+    const sameAsFirst = !c.changed.some((x) => lv.indexOf(x.field) >= 0), matches = k.verdict !== 'approve' && m.action === true && m.entry !== false && m.stop !== false && m.target !== false;
+    const text = `Control: the same replay with every lesson switched off gives ${control.action}` + (sameAsFirst ? ', the first answer. Whatever changed came from the lessons in force and from nothing else.'
+      : ', which is not the first answer. The first attempt was made with the running thesis of its sitting and this replay starts a fresh one, so part of the change is there without any lesson.');
+    const out = Object.assign({}, cmp, { control: { action: control.action, sameAsFirst, matchesCorrection: matches, text } });
+    if (cmp.verdict === 'learned' && matches) { out.verdict = 'partly'; out.note = 'the second attempt matches the correction, but the same replay with every lesson switched off gives that answer too: this replay does not show the lesson at work'; }
+    return out;
+  }
   // a candle-loading error in words the owner can act on
   function candleError(e) {
     const c = e && e.code;
@@ -319,7 +333,7 @@
   const MXAC = {
     VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
-    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize,
+    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
@@ -1042,6 +1056,7 @@
         el('tbody', {}, row('Action', actBadge(A.action, true), actBadge(B.action, true), exp.action ? actBadge(exp.action, true) : k.verdict), row('Entry', lv(A, 'entry'), lv(B, 'entry'), ex('entry')), row('Stop', lv(A, 'stop'), lv(B, 'stop'), ex('stop')), row('Target', lv(A, 'target'), lv(B, 'target'), ex('target')),
           row('Confidence', A.confidence || 'n/a', B.confidence || 'n/a', ''), row('Lessons applied', applied(A), applied(B), (k.reasons || []).join(', ') || '')))));
       box.appendChild(el('p', { id: 'prove-changed', text: cmp.changed.length ? 'Changed between the two attempts: ' + cmp.changed.map((c) => (c.field === 'waitReasons' ? 'reasons to wait' : c.field === 'lessonsApplied' ? 'lessons applied' : c.field) + (typeof c.from === 'string' || typeof c.from === 'number' || c.from === null ? ` (${c.from === null ? 'none' : c.from} → ${c.to === null ? 'none' : c.to})` : '')).join(', ') + '.' : 'Nothing changed between the two attempts.' }));
+      if (cmp.control) box.appendChild(el('p', { id: 'prove-control', 'data-same': cmp.control.sameAsFirst ? 'yes' : 'no', text: cmp.control.text }));
       box.appendChild(el('p', { id: 'prove-lesson', text: cmp.lessonApplied ? 'Lesson applied: yes (' + cmp.lessonIds.map((id) => (S.lessons.find((x) => x.id === id) || {}).title || id).join('; ') + ').' : 'Lesson applied: no.' }));
       box.appendChild(el('p', { class: 'verdict ' + cmp.verdict, id: 'prove-verdict', 'data-verdict': cmp.verdict }, el('b', { text: (VERDICT_WORD[cmp.verdict] || cmp.verdict) + '. ' }), cmp.note ? cmp.note.charAt(0).toUpperCase() + cmp.note.slice(1) + '.' : ''));
     } else if (!cur.savedLesson) box.appendChild(el('p', { class: 'note', text: 'No lesson from this correction is saved yet: a replay now would only use the lessons already in force.' }));
@@ -1066,7 +1081,9 @@
       const f = MXA.features(snap), r = decideOn(snap, { setup: st, account: cur.acctAt, lessons, thesis: MXA.thesis.start(snap), history: hist.rows }), d = r.decision;   // a fresh thesis: nothing carried over
       const res = await api.post(attemptBody(c, st.edge.id, 'replay-same', d, lessons, hash, f));
       cur.latest = { decision: d, risk: r.risk, row: res.attempt, n: res.n };
-      cur.cmp = MXA.compare(cur.first.decision, d, cur.correction);
+      // the control: the same snapshot with no lesson at all (pure, nothing stored), so the change can be pinned on the lessons
+      const control = decideOn(snap, { setup: st, account: cur.acctAt, lessons: [], thesis: MXA.thesis.start(snap), history: hist.rows }).decision;
+      cur.cmp = proveWithControl(MXA.compare(cur.first.decision, d, cur.correction), cur.first.decision, control, cur.correction);
       // the lesson's counters: the lessons this replay applied, or the lesson saved from this correction when it did not fire
       const ids = cur.cmp.lessonIds.length ? cur.cmp.lessonIds : cur.savedLesson ? [cur.savedLesson.id] : [];
       for (const id of ids) { const inc = cur.cmp.verdict === 'learned' ? { replayPass: 1 } : { replayFail: 1 }; if (cur.cmp.lessonIds.indexOf(id) >= 0) inc.applied = 1; try { const sr = await api.post({ action: 'lesson.stats', id, inc }), L = S.lessons.find((x) => x.id === id); if (L && sr.stats) L.stats = sr.stats; } catch (e) { log('A lesson counter could not be updated: ' + e.message); } }
