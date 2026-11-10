@@ -290,15 +290,28 @@ section = 'H';
 section = 'I';
 {
   const ev = J('academy/data/eval.json'), tf = path.join(ROOT, 'academy/data/eval-trades.json'), per = fs.existsSync(tf) ? JSON.parse(fs.readFileSync(tf, 'utf8')) : null;
+  const ddOff = [], leak = [], examIds = new Set(EDGES.flatMap((e) => J(`academy/data/cand-${e.id}.json`).filter((c) => c.pool === 'exam').map((c) => c.id)));
   console.log('     edge        every setup: n, R/trade, t, maxDD  |  policy takes: n, R/trade, t, maxDD  |  take minus wait (t)');
   for (const e of EDGES) {
     const x = ev.edges[e.id], rows = usable(e.id, 'train').map((c) => ({ c, o: outs[e.id][c.id] })).filter((r) => r.o && !unfilled(r.o)).sort((a, b) => (a.o.exitT || a.c.t) - (b.o.exitT || b.c.t)), mech = rows.map((r) => r.o.netR);
     let takeDD = 'n/a';
-    if (per && per.edges && per.edges[e.id]) { const act = per.edges[e.id]; takeDD = r2(maxDD(rows.filter((r) => act[r.c.id] === 'TAKE' || act[r.c.id] === 'BUY' || act[r.c.id] === 'SELL').map((r) => r.o.netR))); }
+    if (per && per.edges && Array.isArray(per.edges[e.id])) {
+      // the policy's stored answer per train setup (no outcome in that file); the results are joined here, from the outcome files
+      const act = Object.fromEntries(per.edges[e.id].map((r) => [r.id, r.action])), taken = rows.filter((r) => act[r.c.id] === 'BUY' || act[r.c.id] === 'SELL').map((r) => r.o.netR), dd = maxDD(taken);
+      takeDD = r2(dd); const pub = x.drawdown || {};
+      if (taken.length !== x.take.n || !pub.take || Math.abs(pub.take.maxR - dd) > 0.011 || !pub.mechanical || Math.abs(pub.mechanical.maxR - maxDD(mech)) > 0.011) ddOff.push(`${e.id}: take n ${taken.length} / ${x.take.n}, take DD ${r2(dd)} / ${pub.take && pub.take.maxR}, mechanical DD ${r2(maxDD(mech))} / ${pub.mechanical && pub.mechanical.maxR}`);
+      for (const r of per.edges[e.id]) { if (Object.keys(r).some((k) => !['id', 't', 'action'].includes(k))) leak.push(`${r.id}: ${Object.keys(r)}`); if (examIds.has(r.id)) leak.push(`${r.id} is an exam setup`); }
+    } else if (per) ddOff.push(`${e.id}: no rows in eval-trades.json`);
     console.log(`     ${e.id.padEnd(10)}  ${String(mech.length).padStart(4)}, ${r2(mean(mech)).padStart(6)}, ${r2(tstat(mech)).padStart(5)}, ${r2(maxDD(mech)).padStart(6)}  |  ${String(x.take.n).padStart(4)}, ${r2(x.take.avg).padStart(6)}, ${r2(x.take.t).padStart(5)}, ${String(takeDD).padStart(6)}  |  ${r2(x.diff && x.diff.takeMinusWait)} (${r2(x.diff && x.diff.t)})  ${x.verdict || ''}`);
   }
   const better = EDGES.filter((e) => { const d = ev.edges[e.id].diff; return d && d.t >= 2; }).map((e) => e.id);
   note(`policy ${ev.policy || ''}: edges where taking beats waiting with t >= 2: ${better.length ? better.join(', ') : 'none'}`);
+  if (per) {
+    check('the published drawdowns (every setup, and the setups the policy takes) equal a recomputation from the per-trade answers and the outcome files', ddOff.length === 0, ddOff.slice(0, 3).join('; '));
+    check('the per-trade answer file holds an id, a time and an action only, and no exam setup', leak.length === 0, leak.slice(0, 3).join('; '));
+  }
+  const lf = path.join(ROOT, 'academy/data/exam-ledger.json');
+  if (fs.existsSync(lf)) { const L = JSON.parse(fs.readFileSync(lf, 'utf8')); note(`exam ledger: ${L.reads.length} read(s) of the unseen pool for policy evaluation`); check('every read of the unseen pool for a policy is in the ledger with its version and time', Array.isArray(L.reads) && L.reads.every((r) => r && r.at && r.policyVersion)); }
   check('the policy comparison is published with n and t for every edge (a negative or inconclusive result is a result)', EDGES.every((e) => ev.edges[e.id] && ev.edges[e.id].mechanical && ev.edges[e.id].take && ev.edges[e.id].diff));
 }
 

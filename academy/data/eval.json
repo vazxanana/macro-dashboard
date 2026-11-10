@@ -14,6 +14,7 @@
   "split": "first70 / last30 = before and after the point 70 % of the way through the period, by time",
   "t": "one-sample t of net R against zero; diff.t = Welch t of TAKE minus WAIT",
   "verdictRule": "diff.t >= 2 adds value; diff.t <= -2 worse; otherwise no measurable difference",
+  "drawdown": "maximum drawdown in R, net of costs: closed trades in exit order (ties by id), equity from zero, the largest fall from a running peak; overall = the seven edges' trades in one sequence",
   "unfilled": "limit orders that never filled are counted in orders / unfilled and are in no average",
   "caution": "Seven edges are tested at once: a single t near 2 is weak evidence. Small samples (gtrend, mosha-bo) cannot show a difference."
  },
@@ -65,6 +66,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 169 at 0.148 R a trade against WAIT n 156 at 0.685 R, difference -0.537 R, Welch t -1.53 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 325,
+     "maxR": 26.63
+    },
+    "take": {
+     "n": 169,
+     "maxR": 17.13
+    },
+    "wait": {
+     "n": 156,
+     "maxR": 18.36
+    }
+   },
    "split": {
     "cut": 1719340020,
     "first70": {
@@ -253,6 +270,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 15 at 1.227 R a trade against WAIT n 13 at 0.339 R, difference 0.889 R, Welch t 1.01 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 28,
+     "maxR": 4.57
+    },
+    "take": {
+     "n": 15,
+     "maxR": 3.11
+    },
+    "wait": {
+     "n": 13,
+     "maxR": 3.4
+    }
+   },
    "split": {
     "cut": 1729246470,
     "first70": {
@@ -433,6 +466,22 @@
    },
    "verdict": "no measurable difference",
    "why": "the policy skipped too few filled trades to compare (TAKE n 18, WAIT n 0)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 18,
+     "maxR": 5.26
+    },
+    "take": {
+     "n": 18,
+     "maxR": 5.26
+    },
+    "wait": {
+     "n": 0,
+     "maxR": null
+    }
+   },
    "split": {
     "cut": 1726125360,
     "first70": {
@@ -587,6 +636,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 59 at 0.4 R a trade against WAIT n 107 at 0.114 R, difference 0.286 R, Welch t 1.33 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 166,
+     "maxR": 13.48
+    },
+    "take": {
+     "n": 59,
+     "maxR": 5.47
+    },
+    "wait": {
+     "n": 107,
+     "maxR": 12.23
+    }
+   },
    "split": {
     "cut": 1727059920,
     "first70": {
@@ -779,6 +844,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 54 at 0.463 R a trade against WAIT n 28 at 0.481 R, difference -0.018 R, Welch t -0.03 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 82,
+     "maxR": 7.33
+    },
+    "take": {
+     "n": 54,
+     "maxR": 7.64
+    },
+    "wait": {
+     "n": 28,
+     "maxR": 4.89
+    }
+   },
    "split": {
     "cut": 1726090800,
     "first70": {
@@ -955,6 +1036,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 120 at -0.041 R a trade against WAIT n 393 at 0.11 R, difference -0.151 R, Welch t -1.17 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 513,
+     "maxR": 16.06
+    },
+    "take": {
+     "n": 120,
+     "maxR": 11.88
+    },
+    "wait": {
+     "n": 393,
+     "maxR": 13.87
+    }
+   },
    "split": {
     "cut": 1729139880,
     "first70": {
@@ -1139,6 +1236,22 @@
    },
    "verdict": "no measurable difference",
    "why": "TAKE n 87 at 0.481 R a trade against WAIT n 257 at 0.111 R, difference 0.37 R, Welch t 1.84 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 344,
+     "maxR": 16.29
+    },
+    "take": {
+     "n": 87,
+     "maxR": 4.94
+    },
+    "wait": {
+     "n": 257,
+     "maxR": 16.02
+    }
+   },
    "split": {
     "cut": 1726969842,
     "first70": {
@@ -1328,6 +1441,22 @@
   },
   "verdict": "no measurable difference",
   "why": "TAKE n 522 at 0.312 R a trade against WAIT n 954 at 0.219 R, difference 0.093 R, Welch t 0.82 (|t| under 2)",
+  "drawdown": {
+   "unit": "R, net of costs",
+   "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+   "mechanical": {
+    "n": 1476,
+    "maxR": 32.45
+   },
+   "take": {
+    "n": 522,
+    "maxR": 24.07
+   },
+   "wait": {
+    "n": 954,
+    "maxR": 24
+   }
+  },
   "split": {
    "cut": 1728418296,
    "first70": {

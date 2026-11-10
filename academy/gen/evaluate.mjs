@@ -13,6 +13,14 @@
 // An order that never filled (missed / expired / cancelled) is not a trade: it is counted apart and is in no average.
 // Verdict per edge, on net R a trade of TAKE against WAIT (Welch t):  t >= 2 "adds value", t <= -2 "worse", otherwise
 // "no measurable difference". Seven edges are tested, so one t near 2 among them is weak evidence by itself.
+//
+// Also written (10 Nov 2026, the policy investigation, research/edge/academy-policy/):
+//   eval.json `drawdown`        per edge and overall: the maximum drawdown in R of the mechanical set, the policy's take-set
+//                               and its wait-set. Closed trades in exit order (ties by id), equity from zero, the largest fall
+//                               from a running peak: the same definition as the research engine's baselines.
+//   academy/data/eval-trades.json   { policy, generated, edges: { <edge>: [{ id, t, action }] } }: the policy's action on every
+//                               usable train setup, in time order. NO outcome field of any kind and no exam setup, so anyone can
+//                               recompute the take-set's results from the outcome files without trusting this script.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -42,6 +50,15 @@ export function welch(a, b) {
 }
 const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
 const variance = (a, m) => a.reduce((s, x) => s + (x - m) * (x - m), 0) / (a.length - 1);
+// Maximum drawdown in R of a list of results already in closing order: equity from zero, largest fall from a running peak.
+export function maxDrawdown(a) { let eq = 0, peak = 0, dd = 0; for (const x of a) { eq += x; if (eq > peak) peak = eq; if (peak - eq > dd) dd = peak - eq; } return dd; }
+// decided rows -> their filled trades in exit order (ties by id); a row without an exit time (synthetic tests) keeps its signal time
+const exitKey = (r) => (Number.isFinite(r.exitT) ? r.exitT : r.t);
+export const inExitOrder = (rows) => rows.filter((r) => r.filled).sort((a, b) => exitKey(a) - exitKey(b) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+export function drawdownOf(rows) {
+  const dd = (a) => { const tr = inExitOrder(a); return { n: tr.length, maxR: tr.length ? rd(maxDrawdown(tr.map((r) => r.netR)), 2) : null }; };
+  return { unit: 'R, net of costs', order: 'closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak', mechanical: dd(rows), take: dd(rows.filter((r) => r.action !== 'WAIT')), wait: dd(rows.filter((r) => r.action === 'WAIT')) };
+}
 
 // One block of the report from decided rows [{ action, filled, netR, gates[], evidenceWait, topCon, confidence }]
 export function block(rows) {
@@ -68,35 +85,46 @@ function waitSummary(rows) {
 export function report(rows) {
   const b = block(rows), t0 = rows.length ? rows[0].t : null, t1 = rows.length ? rows[rows.length - 1].t : null, cut = rows.length ? Math.round(t0 + 0.7 * (t1 - t0)) : null;
   const conf = {}; for (const c of ['low', 'medium', 'high']) conf[c] = stat(rows.filter((r) => r.action !== 'WAIT' && r.filled && r.confidence === c).map((r) => r.netR));
-  return { from: t0, to: t1, ...b, ...verdictOf(b), split: { cut, first70: block(rows.filter((r) => r.t <= cut)), last30: block(rows.filter((r) => r.t > cut)) }, waits: waitSummary(rows), takeByConfidence: conf };
+  return { from: t0, to: t1, ...b, ...verdictOf(b), drawdown: drawdownOf(rows), split: { cut, first70: block(rows.filter((r) => r.t <= cut)), last30: block(rows.filter((r) => r.t > cut)) }, waits: waitSummary(rows), takeByConfidence: conf };
 }
 
 // ---- the walk -----------------------------------------------------------------------------------------------------------
 // rows of one edge, in time order. `history` grows as trades finish: a case is visible only once its exit lies before t.
-export function walkEdge({ edge, cands, outs, series, cal, dataVersion }) {
+// onDecision({ cand, decision, snapshot }) is called BEFORE the result of that candidate is read (the policy investigation
+// records the decision's votes there); it gets no outcome.
+export function walkEdge({ edge, cands, outs, series, cal, dataVersion, onDecision = null }) {
   const use = cands.filter((c) => c.pool === 'train' && !isFlagged(c)).sort((a, b) => a.t - b.t), done = [], rows = [];
   const edgeDef = { version: edge.version, cost: edge.costPerRoundTrip };
   for (const cand of use) {
     const snapshot = buildSnapshot({ edge, cand, series, cal, dataVersion });
     const history = done.filter((h) => h.t < cand.t && h.exitT < cand.t).map((h) => ({ t: h.t, exitT: h.exitT, features: h.lite, netR: h.netR }));
     const d = MXA.decide(snapshot, { history, edgeDef, lessons: [] });
+    if (onDecision) onDecision({ cand, decision: d, snapshot });
     // only now is the result read, to score the decision that was already made
     const o = outs[cand.id]; if (!o) throw new Error('no outcome for ' + cand.id);
     const filled = isFilled(o), ev = d.evidence;
-    rows.push({ id: cand.id, t: cand.t, action: d.action, filled, netR: filled ? o.netR : null, gates: d.gates.map((g) => g.code), evidenceWait: ev.margin < ev.needMargin || ev.support < ev.needSupport,
+    rows.push({ id: cand.id, t: cand.t, action: d.action, filled, netR: filled ? o.netR : null, exitT: filled ? o.exitT : null, gates: d.gates.map((g) => g.code), evidenceWait: ev.margin < ev.needMargin || ev.support < ev.needSupport,
       topCon: d.contradicting.length ? d.contradicting[0].factor : null, confidence: d.confidence, similarN: d.similar ? d.similar.n : 0 });
     if (filled) done.push({ t: cand.t, exitT: o.exitT, netR: o.netR, lite: MXA.lite(featuresOf(snapshot)) });
   }
   return rows;
 }
 
+// eval-trades.json as text: the head on its own lines, then one setup a line (small diffs, easy to read)
+export function tradesText(tr) {
+  const { edges, ...head } = tr, lines = Object.entries(head).map(([k, v]) => ` ${JSON.stringify(k)}: ${JSON.stringify(v)},`);
+  const blocks = Object.entries(edges).map(([id, rows]) => `  ${JSON.stringify(id)}: [\n${rows.map((r) => '   ' + JSON.stringify(r)).join(',\n')}\n  ]`);
+  return `{\n${lines.join('\n')}\n "edges": {\n${blocks.join(',\n')}\n }\n}\n`;
+}
+
 async function main() {
   const meta = readJson(path.join(DATA_DIR, 'meta.json')), cal = await calendar(), dataVersion = dataVersionOf(meta);
-  const series = await loadSeries(process.env.ACADEMY_CANDLES), edges = {}, all = [], h = crypto.createHash('sha256');
+  const series = await loadSeries(process.env.ACADEMY_CANDLES), edges = {}, all = [], h = crypto.createHash('sha256'), actions = {};
   for (const edge of EDGES) {
     const cands = readJson(path.join(DATA_DIR, `cand-${edge.id}.json`)), outs = readJson(path.join(DATA_DIR, `out-${edge.id}.json`));
     const rows = walkEdge({ edge, cands, outs, series: series[edge.market], cal, dataVersion });
     for (const r of rows) { h.update(`${r.id}:${r.action}\n`); all.push(r); }
+    actions[edge.id] = rows.map((r) => ({ id: r.id, t: r.t, action: r.action }));   // three keys, nothing about the result
     edges[edge.id] = { name: edge.name, edgeVersion: edge.version, cost: edge.costPerRoundTrip, pool: 'train', excluded: { exam: cands.filter((c) => c.pool === 'exam').length, flaggedTrain: cands.filter((c) => c.pool === 'train' && isFlagged(c)).length }, ...report(rows) };
     const e = edges[edge.id];
     console.error(edge.id.padEnd(9), 'mech n', String(e.mechanical.n).padStart(4), String(e.mechanical.avg).padStart(7), 't', String(e.mechanical.t).padStart(6), '| take n', String(e.take.n).padStart(4), String(e.take.avg).padStart(7),
@@ -110,11 +138,16 @@ async function main() {
     what: 'The decision policy as built, with no lessons and no model, on the train-pool setups that are not flagged, in time order. TAKE = it would have taken the setup, WAIT = it would not. R figures are net of costs, per trade, on filled trades only.',
     method: { history: 'earlier train cases whose trade had finished before the signal (the rows of GET /api/academy?get=history)', edgeDef: 'version and cost per round trip from academy/edges.mjs', lessons: 'none', model: 'none',
       split: 'first70 / last30 = before and after the point 70 % of the way through the period, by time', t: 'one-sample t of net R against zero; diff.t = Welch t of TAKE minus WAIT',
-      verdictRule: `diff.t >= ${T_LINE} adds value; diff.t <= -${T_LINE} worse; otherwise no measurable difference`, unfilled: 'limit orders that never filled are counted in orders / unfilled and are in no average',
+      verdictRule: `diff.t >= ${T_LINE} adds value; diff.t <= -${T_LINE} worse; otherwise no measurable difference`,
+      drawdown: 'maximum drawdown in R, net of costs: closed trades in exit order (ties by id), equity from zero, the largest fall from a running peak; overall = the seven edges\' trades in one sequence', unfilled: 'limit orders that never filled are counted in orders / unfilled and are in no average',
       caution: 'Seven edges are tested at once: a single t near 2 is weak evidence. Small samples (gtrend, mosha-bo) cannot show a difference.' },
     edges, overall,
   };
   fs.writeFileSync(path.join(DATA_DIR, 'eval.json'), JSON.stringify(out, null, 1) + '\n');
+  const trades = { version: out.version, generated: meta.generated, policy: MXA.POLICY_VERSION, dataVersion,
+    what: 'The decision policy\'s action (BUY / SELL = it would take the setup, WAIT = it would not) on every usable train setup (train pool, not flagged), in time order, no lessons and no model. No outcome field and no exam setup: join it to the outcome files to recompute any result.',
+    edges: actions };
+  fs.writeFileSync(path.join(DATA_DIR, 'eval-trades.json'), tradesText(trades));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main().catch((e) => { console.error(e.stack || e); process.exit(1); });

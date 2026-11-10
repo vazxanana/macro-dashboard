@@ -175,3 +175,34 @@ object there.
   The reason table shows every train trade that carries the feature behind the reason, waited on or not.
 - **Descriptive unless validated.** In-sample and out-of-sample labels are reports, not edges. Nothing in this run is
   validated.
+
+## 7. Policy investigation, 10 Nov 2026
+
+A separate, pre-registered study of the decision policy itself: `research/edge/academy-policy/` (`PREREGISTRATION.md`
+written and committed first, then `walk.mjs`, `lib.mjs`, `run.mjs`; report `RESULT.md`, numbers `result.json`, tests
+`tests/academy-policy.test.mjs`). The question: why does `policy-1.0` not beat taking every setup, worst on replica and
+gmp, and does any principled change generalise?
+
+- **Three sets, kept apart.** Discovery = the earliest 60 % of each edge's usable train setups, validation = the
+  latest 40 % (cut times fixed from the candidate files before any outcome was opened), and the exam pool as the
+  untouched final test. `academy/data/exam-ledger.json` logs every exam read made to judge a policy: one at most per
+  frozen candidate version, only after it passes validation, written before the read. **It holds zero reads.**
+- **Diagnosis.** The evidence margin does not rank trades: its rank correlation with net R is about zero on replica
+  (−0.07, −0.10) and gmp (−0.06, −0.02) in both parts. The replica gap is a discovery result (−0.73 R, t −1.43) that
+  is gone on validation (−0.07 R, t −0.19): the support votes that looked wrong-signed in discovery (momentum t −2.84,
+  lower-timeframe structure t −4.57) flipped sign. The gmp gap has one sign in both parts and is significant in
+  neither (t −0.43, t −1.47). Of 55 votes that could be tabled in both parts, 33 kept their sign. Two votes are
+  constants: every candidate but gtrend's carries the 10R cap as its target, so "reward to risk at least 2" always
+  supports and "a resting level in the way" almost always contradicts.
+- **Candidates** (five, fixed in advance; the null is "take every setup"): C1 defer to the edge, C2 gates only, C3 an
+  a-priori edge-logic table for replica and gmp, C4 drop the votes that are wrong-signed in discovery, C5 take only at
+  medium or high confidence. Acceptance needed a validation take-minus-wait t of 2 after a Holm correction, a take-set
+  above the baseline and a drawdown not worse. **0 of 16 tests accepted; the largest validation t is 1.00.** C2 and C3
+  are rejected, C1 (identical to the baseline: no hard gate ever fires), C4 and C5 are inconclusive.
+- **Power.** The smallest difference that reaches t = 2 on validation is 0.35 R (gmp) to 1.28 R (replica), several
+  times each edge's average trade. A modest real improvement cannot be shown on this data.
+- **Nothing shipped changed.** `policy-1.0` is still the policy; no `policy-1.1` exists. `eval.json` gained `drawdown`
+  and `eval-trades.json` was added (`TRAINING.md`, section 3).
+
+`node research/edge/academy-policy/run.mjs` is offline and reproduces `result.json` byte for byte from the committed
+files; `walk.mjs` (which needs the research candles) writes the outcome-free decision records it reads.

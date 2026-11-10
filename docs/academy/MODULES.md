@@ -118,6 +118,10 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
 - The dataset's calendar comes from `council/events.mjs` (read only; CPI / NFP / FOMC from 2022), written to
   `academy/data/calendar.json` by `node academy/gen/calendar.mjs`. The page gets the same cut from
   `GET ?get=calendar&t=<t>` → `{ events, schedule }` (both null outside the calendar's span) and passes them to `MXR.snapshot`.
+- `evaluate.mjs` also writes `eval.json` `drawdown` (mechanical, take-set and wait-set, per edge and overall) and
+  `academy/data/eval-trades.json` (`{ policy, generated, edges: { <edge>: [{ id, t, action }] } }`, train pool only, no outcome
+  field). `walkEdge({ …, onDecision })` hands each decision to a caller before its result is read; the policy investigation
+  (`research/edge/academy-policy/`, `RESEARCH.md` section 7) uses it. `academy/data/exam-ledger.json` logs exam reads (none).
 - `MXA.decide` hands the snapshot's edge id to the scorer (a pooled model uses it as a feature). A model is used only when
   `promoted` and `calibrated` are both true; every model in `ml/models/` is a rejected challenger.
 
