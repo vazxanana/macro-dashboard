@@ -116,7 +116,7 @@ test('feat-<edge>.json: a row for every candidate, lite keys only, the version f
     }
     assert.ok(read(`academy/data/feat-${e.id}.json`).length < 200000, `${e.id}: the file stays small`);
   }
-  assert.equal(total, 2775);
+  assert.equal(total, 2783);
 });
 
 test('the API history route reads the files: train pool only, finished before t, no ids', async () => {
@@ -139,7 +139,7 @@ test('the API history route reads the files: train pool only, finished before t,
 test('the feature matrix: every candidate, all feature keys, labels kept apart', () => {
   const m = JSON.parse(require('node:zlib').gunzipSync(fs.readFileSync(path.join(ROOT, 'ml/data/matrix.json.gz'))).toString('utf8'));
   assert.deepEqual(m.featureKeys, Object.keys(MXA.FEATURE_DOC)); assert.equal(m.featureKeys.length, 95); assert.deepEqual(m.labelKeys, F.LABEL_KEYS); assert.deepEqual(m.priceKeys, MXA.PRICE_KEYS);
-  assert.equal(m.rows.length, 2775);
+  assert.equal(m.rows.length, 2783);
   assert.deepEqual(m.featVersions, Object.fromEntries(EDGES.map((e) => [e.id, feat(e.id).version])), 'the matrix and the feat files come from the same run');
   const L = Object.fromEntries(m.labelKeys.map((k, i) => [k, i])), nl = m.labelKeys.length, iSide = m.featureKeys.indexOf('side'), iReg = m.featureKeys.indexOf('regime');
   for (const e of EDGES) {

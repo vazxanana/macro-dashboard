@@ -1,5 +1,7 @@
 # Gold systems on 8 years of spot gold — robustness check
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. The numbers moved slightly (replica live 391 trades at +0.479R became 394 at +0.462R); the FAIL verdict did not. The text below quotes the old numbers. Details: the last section of this page.
+
 **Question.** How robust are the council's gold systems on 2018–2026 gold M1 history? For each system: results by year, out-of-sample 2024–2026, and worst drawdown compared with what its approval claimed. Then: is the replica's volatility gate too strict? Gold's 20-day range is 1.48% today and the gate needs 2.416%, so the gate blocks every trade.
 
 **Short answer.**
@@ -149,3 +151,22 @@ node research/edge/gold-systems/summarize.mjs > research/edge/gold-systems/resul
 ```
 
 The raw outputs are committed next to this file as `replica.json`, `mosha.json` and `daily.json`.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study read every year as New York time, so from 2019 its bars were one hour early in about four weeks a year (the weeks the US is on daylight time and Europe is not).
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** `replica.json`, `mosha.json`, `daily.json` and `result.json` hold the new numbers; the text above is the original write-up and quotes the old ones. The files of the old run are in git at `81f35f51`.
+
+| Variant (all years, net) | Before: n, R a trade, total R, t | After |
+|---|---|---|
+| Replica, live | 391, +0.479, +187.5, 2.71 | 394, +0.462, +182.0, 2.66 |
+| Replica, top-third gate | 598, +0.323, +193.0, 2.39 | 603, +0.313, +188.9, 2.33 |
+| Replica, no gate | 1,559, +0.098, +152.4, 1.27 | 1,564, +0.097, +150.9, 1.26 |
+| Mosha BO, live | 64, +0.531, +34.0, 1.91 | 64, +0.531, +34.0, 1.91 |
+| Gold trend N20 + add | 41, +1.609, +66.0, 2.56 | 41, +1.609, +66.0, 2.56 |
+| Gold trend N5 + add | 76, +1.047, +79.6, 2.73 | 76, +1.048, +79.6, 2.73 |
+| H4 trendline, live | 314, +0.141, +44.2, 2.03 | 315, +0.159, +50.1, 2.24 |
+| Daily engulf, live | 174, +0.294, +51.1, 2.12 | 175, +0.304, +53.2, 2.21 |
+
+**The verdict is unchanged: FAIL, no setting change.** Every gate candidate gets the same verdict from the same walk-forward rule. Gold 2023 is not a certified year in the clock audit (the files have a hole from 20 Feb to 30 Jul 2023); every week of 2023 that could be read agrees with the converter.

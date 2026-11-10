@@ -198,8 +198,8 @@ function gradeR(dec, side, out) {
   if ((dec.action === 'BUY' && side === 'buy') || (dec.action === 'SELL' && side === 'sell')) { const r = typeof out.netR === 'number' ? out.netR : out.R; return typeof r === 'number' && Number.isFinite(r) ? r : null; }
   return null;
 }
-// candidates the Edges module flags: `clockShift` (the research candles are stamped an hour early in that week, so the setup
-// cannot be replayed on another feed) and `pre2020` (outside the 2020 -> now evaluation window). Left out by default; never a test.
+// candidates the Edges module flags: `clockShift` (the week could not be verified against a second feed, so the setup
+// is not replayed on another feed or scored) and `pre2020` (outside the 2020 -> now evaluation window). Left out by default; never a test.
 const flagOf = (c) => (isObj(c.rule) && c.rule.clockShift ? 'clockShift' : isObj(c.rule) && c.rule.pre2020 ? 'pre2020' : null);
 // exam candidates are only for tests, and a test is only on an exam candidate
 function poolRule(cand, mode, what) {

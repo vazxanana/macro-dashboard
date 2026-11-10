@@ -92,15 +92,8 @@ const MAY_PARSE = {
   'research/edge/setups-promote/check.mjs': 'an engine parity check on one stretch of bars: no clock is read',
   'ict/replay.mjs': 'LIVE code (the ICT desk replay): not changed here; docs/owner-decisions.md has the item',
 };
-// Loaders not converted yet (work in progress on this branch). Must be empty when the clock work is finished.
-const PENDING = [
-  'research/edge/confluence/lib.mjs', 'research/edge/costs/load.mjs', 'research/edge/event-reaction/build.mjs', 'research/edge/event-risk/build.mjs',
-  'research/edge/gold-systems/data.mjs', 'research/edge/ict-concepts/run.mjs', 'research/edge/ict-exits-replay/hist.mjs', 'research/edge/ict-exits/sim.mjs',
-  'research/edge/ict-filters/driver.mjs', 'research/edge/ict-index-longonly/run.mjs', 'research/edge/ict-smile/build.mjs', 'research/edge/ict-trend-side/run.mjs',
-  'research/edge/ict-universe/universe.mjs', 'research/edge/ict-variants/run.mjs', 'research/edge/nq-open-oos/load.mjs', 'research/edge/portfolio/ict-stream.mjs',
-  'research/edge/regime/replay.mjs', 'research/edge/robustness/lib.mjs', 'research/edge/scalp-exits/lib.mjs', 'research/edge/scalp-filters/scalp-long.mjs',
-  'research/edge/setups-promote/replay.mjs', 'research/edge/timing/replay.mjs',
-];
+// Loaders not converted yet: none. A new loader must import the converter, not join this list.
+const PENDING = [];
 test('every loader of the HistData files converts with the shared clock', () => {
   const files = [];
   const walk = (rel) => { for (const f of fs.readdirSync(new URL(rel, ROOT), { withFileTypes: true })) { const p = rel + f.name; if (f.isDirectory()) { if (!/node_modules|fixtures|\/out\/$/.test(p + '/')) walk(p + '/'); } else if (/\.(mjs|js|cjs)$/.test(f.name)) files.push(p); } };
@@ -113,11 +106,15 @@ test('every loader of the HistData files converts with the shared clock', () => 
     // nobody else re-implements the label clock: no "label + 5 h" and no private New York offset on a parsed stamp
     if (!MAY_PARSE[p] && !PENDING.includes(p)) assert.ok(!/slice\(9, ?11\)[^\n]*(5 ?\* ?3600|18000|nyOffset)/.test(s), `${p} converts a HistData stamp by itself`);
   }
-  assert.deepEqual(parses.filter((p) => !MAY_PARSE[p]).sort(), PENDING.slice().sort(), 'files that parse a HistData stamp without the shared converter');
+  assert.deepEqual(parses.filter((p) => !MAY_PARSE[p] && !(uses.includes(p) && /hist(ToUtc|StampUtc)\(/.test(read(p)))).sort(), PENDING.slice().sort(), 'files that parse a HistData stamp without the shared converter');
   for (const p of Object.keys(MAY_PARSE)) assert.ok(files.includes(p), `${p} exists`);
   // the converter stays a pure helper: no import, no I/O, no environment
   const conv = read('council/histdata.mjs'); assert.ok(!/^\s*import\s/m.test(conv) && !/process\.|require\(|fetch\(|readFile/.test(conv));
   // and nothing that trades or runs live imports it
   for (const p of uses) assert.ok(/^(research|academy)\//.test(p), `${p} imports the research clock`);
-  assert.ok(uses.length + PENDING.length >= 22, `found ${uses.length} loaders on the shared clock`);
+  assert.ok(uses.length >= 23, `found ${uses.length} files on the shared clock`);
+  // the 22 study loaders that used to convert by themselves, by name
+  for (const p of ['confluence/lib.mjs', 'costs/load.mjs', 'event-reaction/build.mjs', 'event-risk/build.mjs', 'gold-systems/data.mjs', 'ict-concepts/run.mjs', 'ict-exits-replay/hist.mjs', 'ict-exits/sim.mjs',
+    'ict-filters/driver.mjs', 'ict-index-longonly/run.mjs', 'ict-smile/build.mjs', 'ict-trend-side/run.mjs', 'ict-universe/universe.mjs', 'ict-variants/run.mjs', 'nq-open-oos/load.mjs', 'portfolio/ict-stream.mjs',
+    'regime/replay.mjs', 'robustness/lib.mjs', 'scalp-exits/lib.mjs', 'scalp-filters/scalp-long.mjs', 'setups-promote/replay.mjs', 'timing/replay.mjs']) assert.ok(uses.includes('research/edge/' + p), `${p} converts with the shared clock`);
 });

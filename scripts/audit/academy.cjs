@@ -342,6 +342,15 @@ async function startServer() {
     check('Lessons: switching off takes it out of force (and says so in words)', (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 0 && /switched off/.test(await txt(p, '#ls-list li[data-lesson] .lsn-head')) && /Switched off by the mentor/.test(await txt(p, '#ls-list li[data-lesson]')));
     await p.click('#ls-list [data-act="on"]'); await p.waitForSelector('#ls-list li[data-active="yes"]', { timeout: 15000 });
     check('Lessons: and back on', (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 1);
+    // The research run on the corrected candle clock offers no draft (docs/academy/DATA-CLOCK.md). First the real state:
+    await p.selectOption('#ls-edge', 'gtl'); await p.waitForFunction(() => /No draft for Gold H4 trendline\./.test((document.getElementById('ls-drafts-card') || {}).textContent || ''), null, { timeout: 15000 });
+    check('Lessons: on the corrected clock research offers no draft for gtl, and the page says so', (await api(p, 'get=research&edge=gtl&kind=baseline')).proposedLessons.length === 0 && /A draft is offered only when a pre-registered condition/.test(await txt(p, '#ls-drafts-card')));
+    // Then the draft flow, on the last real draft the engine produced: the one of the archived run before the correction
+    // (academy/archive/pre-clock/data/research.json), handed to the page in place of the empty list. Saving it goes through the real API.
+    const OLD_DRAFTS = JSON.parse(fs.readFileSync(path.join(ROOT, 'academy/archive/pre-clock/data/research.json'), 'utf8')).proposedLessons.filter((l) => l.edge === 'gtl');
+    const withDraft = async (route) => { const res = await route.fetch(), j = await res.json(); if (Array.isArray(j.proposedLessons) && !j.proposedLessons.length) j.proposedLessons = OLD_DRAFTS; await route.fulfill({ response: res, json: j }); };
+    await p.route(/\/api\/academy\?(?!.*_audit).*get=research.*edge=gtl/, withDraft);
+    await p.selectOption('#ls-edge', EDGE); await p.waitForSelector('#ls-list li[data-version="2"]', { timeout: 15000 });
     await p.selectOption('#ls-edge', 'gtl'); await p.waitForSelector('#ls-drafts li[data-draft]', { timeout: 15000 });
     const dtxt = await txt(p, '#ls-drafts li[data-draft]');
     check('Lessons: a research draft shows its evidence with n and t in both parts, and its status', /Discovery \(.+\): n \d+ at .+R a trade against n \d+ at .+R, t \d\.\d\d\. Confirmation \(.+\): n \d+ .+ t \d\.\d\d\. Status: out-of-sample only, did not survive the correction for 121 tests/.test(dtxt) && /draft, not in force/.test(dtxt) && /Not saved\. It is a proposal only\./.test(dtxt), dtxt.slice(0, 260));
@@ -350,6 +359,7 @@ async function startServer() {
     check('Lessons: a saved research draft stays inactive and remembers its study', gtl.length === 1 && gtl[0].active === false && gtl[0].source.kind === 'research' && /^cond:gtl:/.test(gtl[0].source.studyId) && (await api(p, 'get=lessons&edge=gtl&active=1')).lessons.length === 0 && /Saved as an inactive lesson/.test(await txt(p, '#ls-drafts li[data-draft]')) && (await p.$$('#ls-drafts [data-act="draft-save"]')).length === 0, JSON.stringify(gtl.map((l) => [l.active, l.source])));
     check('Lessons: the saved draft is in the list above, switched off, from its research study', /switched off/.test(await txt(p, '#ls-list li[data-lesson]')) && /research study cond:gtl:/.test(await txt(p, '#ls-list li[data-lesson]')));
     await p.screenshot({ path: OUT + 'academy-6-lessons.png', fullPage: true });
+    await p.unroute(/\/api\/academy\?(?!.*_audit).*get=research.*edge=gtl/, withDraft);
     await p.selectOption('#ls-edge', EDGE); await p.waitForSelector('#ls-list li[data-version="2"]', { timeout: 15000 });
 
     // ---- 11c. Progress and mistakes ----
@@ -376,17 +386,19 @@ async function startServer() {
 
     // ---- 11d. Research lab and notebook ----
     await tab('research', '#rs-table');
-    check('Research: the counts come with what chance alone would give, and nothing is called validated', /121 of 420 registered conditions had enough trades to test\. 7 passed discovery; about 5\.8 would pass by chance alone\. 0 survived the correction/.test(await txt(p, '#rs-chance')) && /Nothing is validated\. No condition here may be called an edge\./.test(await txt(p, '#rs-summary')), await txt(p, '#rs-chance'));
+    check('Research: the counts come with what chance alone would give, and nothing is called validated', /130 of 420 registered conditions had enough trades to test\. 5 passed discovery; about 6\.2 would pass by chance alone\. 0 survived the correction/.test(await txt(p, '#rs-chance')) && /Nothing is validated\. No condition here may be called an edge\./.test(await txt(p, '#rs-summary')), await txt(p, '#rs-chance'));
     check('Research: the pre-registration is on the page', /fixed in the code before any condition result was computed/.test(await p.$eval('#rs-prereg', (e) => e.textContent)) && /Market regime/.test(await p.$eval('#rs-prereg', (e) => e.textContent)));
     const nStudies = (await api(p, 'get=research')).studies.length;
     check('Research: every generated study is listed', (await txt(p, '#rs-count')).startsWith(`${nStudies} of ${nStudies} studies`) && (await p.$$('#rs-table tbody tr')).length === Math.min(150, nStudies), await txt(p, '#rs-count'));
     await p.selectOption('#rs-edge', 'gtl'); await p.selectOption('#rs-kind', 'condition'); await p.selectOption('#rs-validation', 'out-of-sample');
-    check('Research: filters by edge, kind and where it stands', (await p.$$('#rs-table tbody tr')).length === 1 && (await txt(p, '#rs-count')).startsWith(`1 of ${nStudies} studies`) && /out-of-sample only/.test(await txt(p, '#rs-table tbody tr')), await txt(p, '#rs-count'));
+    check('Research: no condition is out-of-sample on the corrected clock, and the table says so', (await p.$$('#rs-table tbody tr button')).length === 0 && (await txt(p, '#rs-count')).startsWith(`0 of ${nStudies} studies`), await txt(p, '#rs-count'));
+    await p.selectOption('#rs-edge', 'nq-open'); await p.selectOption('#rs-validation', 'in-sample');
+    check('Research: filters by edge, kind and where it stands', (await p.$$('#rs-table tbody tr')).length === 2 && (await txt(p, '#rs-count')).startsWith(`2 of ${nStudies} studies`) && /in-sample/.test(await txt(p, '#rs-table tbody tr')), await txt(p, '#rs-count'));
     await p.click('#rs-table tbody tr button'); await p.waitForSelector('#rs-detail-table', { timeout: 15000 });
     const sd = await txt(p, '#rs-detail');
     check('Research: a study opens in full with hypothesis, dataset, n, method, results, limits and its table', ['Hypothesis', 'Dataset', 'Method', 'Results', 'Limits', 'To reproduce', 'discovery', 'confirmation', 'n = '].every((x) => sd.includes(x)) && /adjusted p|Adjusted p/.test(sd) && (await p.$$('#rs-detail-table .kv dt')).length >= 8, sd.slice(0, 140));
     const pol = await sayAll('#rs-policy-table tbody tr');
-    check('Research: the policy against taking every setup, an edge a row, with n, t and the plain verdict', (await p.$$('#rs-policy-table tbody tr')).length === 8 && /Gold replica303\+0\.428R2\.34153\+0\.209R150\+0\.652R-1\.21no measurable difference/.test(pol) && /All seven1421/.test(pol) && /Overall: no measurable difference/.test(await txt(p, '#rs-policy-verdict')), pol.slice(0, 200));
+    check('Research: the policy against taking every setup, an edge a row, with n, t and the plain verdict', (await p.$$('#rs-policy-table tbody tr')).length === 8 && /Gold replica325\+0\.406R2\.34169\+0\.148R156\+0\.685R-1\.53no measurable difference/.test(pol) && /All seven1476/.test(pol) && /Overall: no measurable difference/.test(await txt(p, '#rs-policy-verdict')), pol.slice(0, 200));
     check('Research: an empty notebook says what a note is for', /No note yet\. Write down a hypothesis below before you test it/.test(await txt(p, '#nb-list')));
     await p.fill('#nb-title', 'Audit note: Asia waits'); await p.fill('#nb-hypothesis', 'Waiting in Asia costs nothing on gmp.'); await p.fill('#nb-dataset', 'gmp train pool, 2020 to now'); await p.fill('#nb-method', 'Net R a trade, Welch t, first 70 % against last 30 %.');
     await p.selectOption('#nb-validation', 'out-of-sample'); await p.click('#nb-save');
@@ -399,7 +411,7 @@ async function startServer() {
     await tab('models', '#md-training-table');
     check('Models: nothing is promoted, the registry is honestly empty, and promotion is a documented manual step', /^No champion\. Nothing is promoted/.test(await txt(p, '#md-champion')) && /The registry is empty: no scorer has been registered/.test(await txt(p, '#md-registry')) && /model\.register/.test(await txt(p, '#md-manual')) && /model\.promote/.test(await txt(p, '#md-manual')) && (await p.$$eval('#ac-models button', (l) => l.length)) === 0, await txt(p, '#md-champion'));
     const mrows = await p.$$eval('#md-training-table tbody tr', (l) => l.map((r) => r.textContent));
-    check('Models: each scorer with its walk-forward numbers and verdict; the exam block apart; the skipped edges', mrows.length === 5 && mrows.every((r) => /rejected challenger/.test(r) && /not promoted/.test(r)) && /^replica303/.test(mrows[0]) && /None of the 5 scorers beat taking every setup/.test(await txt(p, '#md-verdict')) && (await p.$$('#md-exam-table tbody tr')).length === 5 && (await p.$$('#md-skipped li')).length === 3 && /150 are needed to fit/.test(await txt(p, '#md-skipped')), mrows[0]);
+    check('Models: each scorer with its walk-forward numbers and verdict; the exam block apart; the skipped edges', mrows.length === 5 && mrows.every((r) => /rejected challenger/.test(r) && /not promoted/.test(r)) && /^replica325/.test(mrows[0]) && /None of the 5 scorers beat taking every setup/.test(await txt(p, '#md-verdict')) && (await p.$$('#md-exam-table tbody tr')).length === 5 && (await p.$$('#md-skipped li')).length === 3 && /150 are needed to fit/.test(await txt(p, '#md-skipped')), mrows[0]);
     check('Models: scores are never offered as probabilities', /they are not probabilities/.test(await txt(p, '#md-training')));
     await tab('costs', '#co-head');
     check('Costs: off, no key, nothing spent, and an honest empty ledger', (await txt(p, '#co-head')) === 'Off. No key is set. Spent: $0.00' && /^\$0\.00/.test(await txt(p, '#co-today')) && /of \$0\.50/.test(await txt(p, '#co-today')) && /The ledger is empty: the adapter is off/.test(await txt(p, '#co-card')), await txt(p, '#co-head'));

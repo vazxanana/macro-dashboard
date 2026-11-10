@@ -1,5 +1,7 @@
 # Robustness audit: how much of the claimed edge is real?
 
+> **Clock correction, 10 Nov 2026.** The HistData blocks were re-run on the corrected candle clock. No verdict changed. The largest move is this audit's own Mosha BO port (147 trades at +0.009R became 157 at −0.064R). The text below quotes the old numbers. Details: the last section of this page.
+
 Paper research only. No live rule, config or trader/tracker code was changed.
 Question: for every LIVE rule in `council-data config.json` (history entries by `user`, `coach-backtest`, `coach-stats`) and for the ICT desk, does the evidence hold up when you recompute it? Every rule got:
 - an out-of-sample (OOS) split,
@@ -113,3 +115,22 @@ Files:
 - `result.json`
 
 Re-run with `ROB_DATA=<dir with git archive of council-data research/candles/..., research/*.json, ict/replay.json> node systems.mjs && node claims.mjs && node report.mjs`.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study read every year as New York time, so from 2019 its bars were one hour early in about four weeks a year (the weeks the US is on daylight time and Europe is not).
+
+**The HistData blocks were re-run on the corrected clock on 10 Nov 2026 (`systems.mjs` in full, `claims.mjs` blocks `replica` and `ict`). No rule, parameter or cost was changed.** A control run of the old loader on the same day reproduced the published files byte for byte (mosha, gtl, nq, geg, replica), so every change below is the clock and nothing else. `out/*.json` and `result.json` hold the new numbers; the text above is the original write-up. Not re-run, because they read council replay records and not HistData: `scalp`, `coach`, `count`, and the `deskReplay` part of `ict` (kept as published).
+
+| System (net) | Before: in-sample n, R a trade; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| Gold daily engulf | 144, +0.095; 73, +0.398, 1.94 | 144, +0.095; 73, +0.402, 1.96 |
+| Gold H4 trendline | 197, −0.012; 105, +0.431, 3.08 | 199, −0.004; 105, +0.314, 2.53 |
+| NQ New York open run | 505, +0.040; 220, +0.390, 3.55 | 509, +0.029; 219, +0.381, 3.44 |
+| Gold momentum pullback (test) | 720, −0.021; 283, +0.199, 2.56 | 721, −0.021; 283, +0.207, 2.62 |
+| Mosha BO (this audit's port) | 97, +0.084; 50, −0.136, −0.45 | 108, −0.039; 49, −0.118, −0.38 |
+| ICT A-setups NQ (HistData) | 286, +0.068; 120, +0.294, 1.77 | 285, +0.078; 119, +0.265, 1.61 |
+| ICT A-setups GC (HistData) | 362, +0.198; 167, +0.223, 1.81 | 363, +0.191; 167, +0.246, 1.96 |
+| Gold trend, crypto | unchanged (daily candles; not HistData) | |
+
+**No verdict in `result.json` changed.** The largest move is this audit's own port of Mosha BO: all years 147 trades at +0.009R became 157 at −0.064R. Its structure is built from UTC H4 and H1 buckets, so a one-hour shift in a few weeks changes the swings that later chains hang on. It was not an edge before and is not one now.

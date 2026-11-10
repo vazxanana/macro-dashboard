@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const [uniPath, candleDir, outDir = 'research/edge/ict-smile'] = process.argv.slice(2);
 if (!uniPath || !candleDir) { console.error('usage: build.mjs <universe.json> <research/candles dir> [outDir]'); process.exit(2); }
@@ -25,12 +26,12 @@ const trades = u.trades.filter((r) => PRIMARY[r[C.market]] && r[C.cfg] === PRIMA
       size, Rraw: R, R: +(size * R).toFixed(4), net: +(size * (R - cost)).toFixed(4), costR: cost, session: r[C.session], grade: r[C.grade], exit: r[C.exit] }; })
   .sort((a, b) => a.signalAt - b.signalAt);
 
-// daily FX candles, UTC days (HistData M1 is EST without DST: +5 h)
+// daily FX candles, UTC days (HistData M1 via council/histdata.mjs; +5 h before 10 Nov 2026)
 function dailyUtc(dir, pre) {
   const files = fs.readdirSync(dir).filter((f) => f.startsWith(pre) && f.endsWith('.csv.gz')).sort(), out = []; let cur = null;
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const p = ln.split(';');
-    const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(ln);
     const o = +p[1], h = +p[2], l = +p[3], c = +p[4]; if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
     const k = t - (t % 86400);
     if (cur && cur.time === k) { if (h > cur.high) cur.high = h; if (l < cur.low) cur.low = l; cur.close = c; }

@@ -1,6 +1,6 @@
 // Edge research · scalp-filters: the council's Scalp setup (M15 → M1) replayed over 2018–2026 M1 history.
 // Usage: node research/edge/scalp-filters/scalp-long.mjs <SYMBOL> <candleDir> <outDir> [fromISO] [toISO]
-//   candleDir holds <SYM>_M1_<year>.csv.gz / <SYM>_M1_<yyyymm>.csv.gz (HistData format, EST without DST = UTC-5),
+//   candleDir holds <SYM>_M1_<year>.csv.gz / <SYM>_M1_<yyyymm>.csv.gz (HistData format; clock: council/histdata.mjs),
 //   extracted from origin/council-data:research/candles/.
 // Same engine as the live Trader and council/backtest.mjs: msAnalyze + buildSetup('scalp') from council/engine.mjs, the
 // M15 CHoCH feature from council/choch.mjs, the bad-print cleaner from council/clean.mjs (forex LTFs with wickK 15).
@@ -17,6 +17,7 @@ import zlib from 'node:zlib';
 import { msAnalyze, CFG, PAIRS, buildSetup, setMarket } from '../../../council/engine.mjs';
 import { m15cFeat } from '../../../council/choch.mjs';
 import { cleanBars, LTF_CLEAN } from '../../../council/clean.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const [SYM, CDIR, ODIR, FROM = '2018-06-15', TO = '2026-11-01'] = process.argv.slice(2);
 // market model: engine group (stop floor) and the round-trip spread charged per trade (backtest.mjs spreadOf, with realistic
@@ -41,7 +42,7 @@ for (const f of files) {
   for (const line of lines) {
     if (line.length < 20) continue;
     const p = line.split(';'), s = p[0];
-    const t = Date.UTC(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8), +s.slice(9, 11), +s.slice(11, 13)) / 1000 + 5 * 3600;   // EST → UTC
+    const t = histStampUtc(s);
     if (n1 && t <= Tm[n1 - 1]) continue;   // files are in time order; drop duplicates / out-of-order lines
     Tm[n1] = t; Om[n1] = +p[1]; Hm[n1] = +p[2]; Lm[n1] = +p[3]; Cm[n1] = +p[4]; n1++;
   }

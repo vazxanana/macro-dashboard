@@ -23,7 +23,7 @@ can show a generated study beside the owner's own notes.
 | Kind | Entries | What it says |
 |---|---|---|
 | `baseline` | 8 | Each edge, and the book of seven, with every setup taken: n, win rate, net R a trade, total, t, profit factor, worst drawdown, by year, first 70 % of the period against the last 30 %. Checked against `eval.json`. |
-| `condition` | 121 tested + 7 untested lists | One pre-registered feature bucket of one edge: does net R a trade differ inside the bucket? Tested on a discovery part and a confirmation part. |
+| `condition` | 130 tested + 7 untested lists | One pre-registered feature bucket of one edge: does net R a trade differ inside the bucket? Tested on a discovery part and a confirmation part. |
 | `regime` | 7 | Each edge by regime and by volatility band, with n and t. Under 20 trades in a regime it says "unfamiliar". |
 | `book` | 1 | How often the edges trade on the same days, the correlation of their daily net R, and the drawdown of the book. |
 | `policy` | 1 | `eval.json` joined: the decision policy against taking every setup, and the wait reasons. |
@@ -80,44 +80,46 @@ Otherwise the condition is "inconclusive: too few trades". It is not tested and 
 
 Baseline, regime, book and policy studies describe the train pool. They carry `in-sample` and are never called an edge.
 
-## 3. The run of 10 Nov 2026
+## 3. The run of 10 Nov 2026 (corrected research clock)
 
-Data: matrix `9035174e215f`, eval `6c59608207b3`, candles `histdata@60cea4527cb1`. 1,421 train trades.
+Data: matrix `70e66e9073af`, eval `986a22fc937c`, candles `histdata@85ef4b8ceaac`. 1,476 train trades.
+This run is on the corrected candle clock (`docs/academy/DATA-CLOCK.md`). The pre-registration did not change. The run
+on the old clock (1,421 trades, 121 tests) is kept in `academy/archive/pre-clock/data/research.json`.
 
-- **121 of 420 conditions had enough trades to test** (replica 32, gtl 9, gmp 47, nq-open 33). The other 299 are
-  inconclusive for lack of trades. mosha-bo (29 trades), gtrend (19) and geg (84) are too small for any test: their
+- **130 of 420 conditions had enough trades to test** (replica 35, gtl 13, gmp 45, nq-open 37). The other 290 are
+  inconclusive for lack of trades. mosha-bo (28 trades), gtrend (18) and geg (82) are too small for any test: their
   confirmation part holds fewer than 40 trades.
-- **7 of the 121 tests passed discovery. Chance alone gives about 5.8.** So the discovery passes are what noise looks
+- **5 of the 130 tests passed discovery. Chance alone gives about 6.2.** So the discovery passes are what noise looks
   like.
-- **Nothing is validated.** No discovery p-value survived the correction. The smallest adjusted p is 0.39.
-- 1 out-of-sample, 4 in-sample only, 2 rejected, 114 tested and inconclusive.
-- With no real effect anywhere, about 0.15 conditions would pass discovery and then confirm. One did.
+- **Nothing is validated.** No discovery p-value survived the correction. The smallest adjusted p is 0.47.
+- 0 out-of-sample, 2 in-sample only, 3 rejected, 125 tested and inconclusive.
+- With no real effect anywhere, about 0.16 conditions would pass discovery and then confirm. None did.
 
-The one out-of-sample condition:
+**The one out-of-sample condition of the old-clock run did not repeat.** On the old clock, "gtl: lower-timeframe
+structure is neutral" passed discovery and confirmation at t 2.10 each (adjusted p 0.79). On the corrected clock it does
+not pass discovery. It was one result out of 121 tests at the edge of the t line, and it is gone. That is what a chance
+result looks like.
 
-| Edge | Bucket | Discovery: in, out, t | Confirmation: in, out, t | Adjusted p |
-|---|---|---|---|---|
-| gtl | lower-timeframe structure is neutral (`ltfAlign` = neutral) | n 84 at +0.281 R, n 31 at -0.220 R, t 2.10 | n 26 at +0.788 R, n 24 at +0.043 R, t 2.10 | 0.79 |
+The two in-sample conditions are both on nq-open: the higher-timeframe regime is ranging (discovery t 2.70,
+confirmation t 1.17) and a high entry offset (discovery t 2.13, confirmation t 0.28). Neither confirms.
 
-It is one result out of 121 tests, it sits at the edge of the t line in both parts, and it did not survive the
-correction. It is a hypothesis for the mentor, not an edge.
+The three rejected conditions are a warning in themselves. On replica, momentum with the trade looked much worse in
+discovery (t -2.58) and momentum flat much better (t 2.62). Both flipped sign in confirmation. On gmp, the New York
+session looked worse in discovery (t -2.20) and flipped too.
 
-The two rejected conditions are a warning in themselves. On replica, momentum with the trade looked much worse in
-discovery (t -2.69) and momentum flat much better (t 2.64). Both flipped sign in confirmation.
+**Draft lessons.** None. No condition reached out-of-sample or validated, so research proposes nothing. (The old-clock
+run offered one inactive draft, the gtl condition above.)
 
-**Draft lessons.** One, inactive: "gtl: TAKE when the lower-timeframe structure is neutral", with its evidence and the
-study id. Research proposes. The mentor decides. A draft should be tested on the exam pool before it is switched on.
-
-**Baselines.** They equal `eval.json` exactly. Worst drawdowns in net R: replica 32.1, nq-open 20.4, gmp 16.1, gtl 12.6,
-geg 8.4, gtrend 6.3, mosha-bo 5.2. The book of seven: 1,421 trades, +0.249 R a trade, t 4.57, profit factor 1.46, every
+**Baselines.** They equal `eval.json` exactly. Worst drawdowns in net R: replica 26.6, nq-open 16.3, gmp 16.1, gtl 13.5,
+geg 7.3, gtrend 5.3, mosha-bo 4.6. The book of seven: 1,476 trades, +0.252 R a trade, t 4.74, profit factor 1.46, every
 year from 2020 positive.
 
-**Book.** More than one edge had a trade active on 48.7 % of the active days. Only 6 of the 21 pairs share 20 days on
-which both closed a trade, and none of those correlations is far from zero (the largest is +0.25 on 23 days, t 1.19).
-The book's worst drawdown is 36.0 R against 101.1 R for the seven edges' own worst drawdowns added together.
+**Book.** More than one edge had a trade active on 49.6 % of the active days. Only 6 of the 21 pairs share 20 days on
+which both closed a trade, and none of those correlations is far from zero (the largest is +0.30 on 23 days, t 1.41).
+The book's worst drawdown is 31.9 R against 89.6 R for the seven edges' own worst drawdowns added together.
 
-**Policy.** The policy took 486 trades at +0.342 R and waited on 935 at +0.201 R (t 1.17: no measurable difference). The
-waits skipped +187.95 R in total, most of it on replica. No wait reason marks a group of trades that lost money.
+**Policy.** The policy took 522 trades at +0.312 R and waited on 954 at +0.219 R (t 0.82: no measurable difference). The
+waits skipped +208.59 R in total, most of it on replica. No wait reason marks a group of trades that lost money.
 
 ## 4. How to read a study
 
@@ -165,7 +167,7 @@ object there.
   tests are not negatively related. The "expected by chance" figures are rough for the same reason.
 - **Trades overlap the cut.** A discovery trade can still be open when the first confirmation trade begins.
 - **HistData candles.** The candidates and outcomes come from the research candles. Coverage is "usable", not
-  "certified", and 2023 is weak. Clock-shifted weeks are left out.
+  "certified", and 2023 is weak. Weeks whose clock could not be verified against a second feed are left out (`docs/academy/DATA-CLOCK.md`).
 - **Holes in time.** The train pool misses each edge's exam months (about 30 %), and each edge misses different months.
   The book study is therefore not the live book, and its drawdown is understated.
 - **No exam data.** Nothing here has been tested on the exam pool. That is by design: the exam pool is for the mentor.

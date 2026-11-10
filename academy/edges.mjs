@@ -17,12 +17,15 @@
 //
 // Two tags every candidate may carry in `rule`:
 //   pre2020     t is before 2020-01-01: kept, but outside the repo's evaluation window (rule 4: 2020 -> now)
-//   clockShift  t lies in a week in which the research candles are stamped one hour early (New York on daylight time,
-//               Europe not, 2019 onwards; academy/data/quality.json `clock`). Do not replay these on another feed or score
-//               exams on them.
+//   clockShift  the week of t could not be verified against a second feed (the research files are too thin that week, or
+//               the hourly match was not decisive; academy/data/quality.json `clock`). Do not replay these on another feed
+//               or score exams on them. Until 10 Nov 2026 the tag meant "stamped one hour early": the loaders now convert
+//               the HistData labels with council/histdata.mjs (research/edge/histdata-clock), so that error is gone and the
+//               tag is kept only for the weeks nobody could check. The pre-correction files: academy/archive/pre-clock.
 
 const GOLD_TFS = ['5m', '15m', '1h', '4h', '1d'];
 const GS = 'research/edge/gold-systems/';
+const CLOCK = 'council/histdata.mjs';   // the label-to-UTC rule is part of every edge's version
 
 export const EDGES = [
   {
@@ -36,10 +39,10 @@ export const EDGES = [
       exit: 'Stop to break-even at +2R; one add at +1.5R (its stop at the first entry); from +4R the stop trails 1R behind the best price; 10R cap; out after 48 h.',
     },
     exit: { beAtR: 2, addAtR: 1.5, trail: [4, 1], capR: 10, maxHoldH: 48 },
-    ruleSource: [GS + 'replica.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs'],
+    ruleSource: [GS + 'replica.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs', CLOCK],
     liveSource: 'council/trader.mjs replicaSignals, platformEngulfs, goldLevels, msnrDirection (taken verbatim at run time by live.mjs); council/engine.mjs msAnalyze',
     costPerRoundTrip: 0.30, costUnit: '$ per ounce',
-    study: { path: GS + 'replica.json', variant: 'live', n: 391, netR: 0.479, grossR: 0.536, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
+    study: { path: GS + 'replica.json', variant: 'live', n: 394, netR: 0.462, grossR: 0.518, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
     notes: 'Engine events run on the full history (live: a rolling 720-candle window). The equity filter starts empty. 2018 has no trades: the volatility gate needs 200 days of history.',
   },
   {
@@ -53,7 +56,7 @@ export const EDGES = [
       exit: 'Stop to break-even at +1.5R; one add at +1.5R; from +3R the stop trails 1R behind the best price; 10R cap; out 72 h after the fill.',
     },
     exit: { beAtR: 1.5, addAtR: 1.5, trail: [3, 1], capR: 10, maxHoldH: 72, orderValidH: 24 },
-    ruleSource: [GS + 'mosha.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs'],
+    ruleSource: [GS + 'mosha.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs', CLOCK],
     liveSource: 'council/trader.mjs config.moshaBo block; council/mosha.mjs; council/engine.mjs msAnalyze',
     costPerRoundTrip: 0.30, costUnit: '$ per ounce',
     study: { path: GS + 'mosha.json', variant: 'live', n: 64, netR: 0.531, grossR: 0.577, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
@@ -70,7 +73,7 @@ export const EDGES = [
       exit: 'No target. After every closed day the stop is raised to that close minus 2 x ATR(14) when that is higher (it never moves down). One add at the next run once a daily close is at least +1R, with the same stop.',
     },
     exit: { ratchet: 'daily close - 2 x ATR14', addAtR: 1, capR: null, maxHoldH: null },
-    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs'],
+    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs', CLOCK],
     liveSource: 'council/trader.mjs config.goldTrend { n: 20, k: 2 } + goldTrendAdd',
     costPerRoundTrip: 0.30, costUnit: '$ per ounce',
     study: { path: GS + 'daily.json', variant: 'trend_N20_add', n: 41, netR: 1.609, grossR: 1.619, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
@@ -87,10 +90,10 @@ export const EDGES = [
       exit: 'From +2R the stop trails 1R behind the best price; 10R cap; out after 96 h.',
     },
     exit: { trail: [2, 1], capR: 10, maxHoldH: 96 },
-    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs'],
+    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs', CLOCK],
     liveSource: 'council/trader.mjs config.goldTL { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }; msnrDirection (verbatim)',
     costPerRoundTrip: 0.30, costUnit: '$ per ounce',
-    study: { path: GS + 'daily.json', variant: 'tl_live', n: 314, netR: 0.141, grossR: 0.161, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
+    study: { path: GS + 'daily.json', variant: 'tl_live', n: 315, netR: 0.159, grossR: 0.179, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
     notes: 'H4 candles are UTC buckets. The study found this edge flat before 2023.',
   },
   {
@@ -104,10 +107,10 @@ export const EDGES = [
       exit: 'From +2R the stop trails 1R behind the best price; 10R cap; out 240 h after the fill.',
     },
     exit: { trail: [2, 1], capR: 10, maxHoldH: 240, orderValidH: 480 },
-    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs'],
+    ruleSource: [GS + 'daily.mjs', GS + 'core.mjs', GS + 'data.mjs', GS + 'live.mjs', CLOCK],
     liveSource: 'council/trader.mjs config.goldEG { k: 3, life: 20, hold: 240, sma: 20, pad: 0.3, maxOpen: 3 }',
     costPerRoundTrip: 0.30, costUnit: '$ per ounce',
-    study: { path: GS + 'daily.json', variant: 'eg_live', n: 174, netR: 0.294, grossR: 0.311, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
+    study: { path: GS + 'daily.json', variant: 'eg_live', n: 175, netR: 0.304, grossR: 0.321, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
     notes: 'Candidates are the limit orders the live rule would place; 59 of the 233 never fill and carry a zero outcome.',
   },
   {
@@ -121,10 +124,10 @@ export const EDGES = [
       exit: 'From +2R the stop trails 1R behind the best price; 10R cap; out after 8 h.',
     },
     exit: { trail: [2, 1], capR: 10, maxHoldH: 8 },
-    ruleSource: ['research/edge/robustness/systems.mjs', 'research/edge/robustness/lib.mjs'],
+    ruleSource: ['research/edge/robustness/systems.mjs', 'research/edge/robustness/lib.mjs', CLOCK],
     liveSource: 'council/trader.mjs config.goldMP { mult: 1.5, top: 0.8, z1: 0.382, z2: 0.618, wait: 6, k: 2 } (the goldMP block)',
     costPerRoundTrip: 0.15, costUnit: '$ per ounce',
-    study: { path: 'research/edge/robustness/out/gmp.json', variant: 'live', n: 1003, netR: 0.041, grossR: 0.074, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
+    study: { path: 'research/edge/robustness/out/gmp.json', variant: 'live', n: 1004, netR: 0.043, grossR: 0.076, data: 'HistData XAUUSD M1 2018-01 to 2026-10' },
     notes: 'Live this system is on test (recorded as shadow trades since 6 Nov 2026). The only replay of it is the robustness audit\'s port (goldMP in systems.mjs), which is run here unchanged: it charges $0.15 a round trip (at $0.30 the same trades make +0.008R), takes one position at a time (live can hold several watches), enters at the next M1 open with no run lag, and builds daily candles from 17:00 New York. The study rates the edge fragile: it loses 2018-22.',
   },
   {
@@ -138,17 +141,17 @@ export const EDGES = [
       exit: 'From +2R the stop trails 1R behind the best price; 10R cap; out at the open of the 11:00 New York candle. Stop before target inside a candle; a gap fills at the open.',
     },
     exit: { trail: [2, 1], capR: 10, timeExit: '11:00 New York' },
-    ruleSource: ['research/edge/nq-open-oos/lib.mjs', 'research/edge/nq-open-oos/load.mjs'],
+    ruleSource: ['research/edge/nq-open-oos/lib.mjs', 'research/edge/nq-open-oos/load.mjs', CLOCK],
     liveSource: 'council/trader.mjs nqOpenSweep(bars, day, 570, 0, 0.0008, 0.00011) + the nyflip block + the nqRun trail',
     costPerRoundTrip: 1, costUnit: 'index points',
-    study: { path: 'research/edge/nq-open-oos/result.json', variant: 'histdata.all', n: 721, netR: 0.126, grossR: null, data: 'HistData NSXUSD M1 2018-01 to 2026-10 (the study\'s cross-check; its main run is OANDA 2004-26)' },
+    study: { path: 'research/edge/nq-open-oos/result.json', variant: 'histdata.all', n: 724, netR: 0.115, grossR: null, data: 'HistData NSXUSD M1 2018-01 to 2026-10 (the study\'s cross-check; its main run is OANDA 2004-26)' },
     notes: 'The study finds the edge regime-dependent: flat 2004-22, positive since 2023. HistData\'s 2023 is thin and disagrees with OANDA for that year.',
   },
 ];
 
 // version pins (computeVersion over ruleSource). Kept apart so a regeneration changes one block.
 const VERSIONS = {
-  replica: 'e50da1ccc244', 'mosha-bo': 'a234ed3f2a1f', gtrend: 'a8b89c5cfdc7', gtl: 'a8b89c5cfdc7', geg: 'a8b89c5cfdc7', gmp: '5350d454368f', 'nq-open': 'bcb38c491f6c',
+  replica: '541d222feed2', 'mosha-bo': '824b0a70af71', gtrend: '02bb39e4cf4e', gtl: '02bb39e4cf4e', geg: '02bb39e4cf4e', gmp: 'b4351209ebba', 'nq-open': '6921f6e3264b',
 };
 for (const e of EDGES) e.version = VERSIONS[e.id];
 

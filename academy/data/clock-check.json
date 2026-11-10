@@ -1,7 +1,7 @@
 {
  "checked": "2026-11-10",
  "feed": "meridianx.dev /md/bars sym=xau tf=1h (OANDA XAU_USD)",
- "against": "HistData XAUUSD M1 -> H1 as research/edge/gold-systems/data.mjs stamps it",
+ "against": "HistData XAUUSD M1 -> H1 as research/edge/gold-systems/data.mjs stamps it (council/histdata.mjs)",
  "method": "mean |open, high, low, close difference| ($) between the HistData candle at t + k and the OANDA candle at t, Monday-Thursday of the week; the k with the smallest difference is the clock offset",
  "reading": "studyClockEarlySec 3600 = the study stamps a candle one hour before its true time; 0 = the clocks agree",
  "weeks": [
@@ -43,11 +43,11 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.156,
-    "0h": 0.881,
-    "+1h": 1.331
+    "-1h": 0.873,
+    "0h": 0.156,
+    "+1h": 0.881
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2019-05-13",
@@ -65,22 +65,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.153,
-    "0h": 1.321,
-    "+1h": 1.86
+    "-1h": 1.316,
+    "0h": 0.153,
+    "+1h": 1.321
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2020-03-09",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.212,
-    "0h": 4.767,
-    "+1h": 7.291
+    "-1h": 4.739,
+    "0h": 0.212,
+    "+1h": 4.767
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2020-05-11",
@@ -98,22 +98,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.188,
-    "0h": 1.919,
-    "+1h": 2.89
+    "-1h": 1.93,
+    "0h": 0.188,
+    "+1h": 1.919
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2021-03-15",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.164,
-    "0h": 2.095,
-    "+1h": 3.105
+    "-1h": 2.135,
+    "0h": 0.164,
+    "+1h": 2.095
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2021-05-10",
@@ -131,22 +131,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.167,
-    "0h": 1.726,
-    "+1h": 2.653
+    "-1h": 1.759,
+    "0h": 0.167,
+    "+1h": 1.726
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2022-03-14",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.231,
-    "0h": 3.102,
-    "+1h": 4.462
+    "-1h": 3.073,
+    "0h": 0.231,
+    "+1h": 3.102
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2022-05-09",
@@ -164,22 +164,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.239,
-    "0h": 2.071,
-    "+1h": 3.077
+    "-1h": 2.073,
+    "0h": 0.239,
+    "+1h": 2.071
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2023-03-13",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.192,
-    "0h": 3.211,
-    "+1h": 4.732
+    "-1h": 3.286,
+    "0h": 0.192,
+    "+1h": 3.211
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2023-05-08",
@@ -197,22 +197,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.176,
-    "0h": 1.73,
-    "+1h": 2.495
+    "-1h": 1.748,
+    "0h": 0.176,
+    "+1h": 1.73
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2024-03-11",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.179,
-    "0h": 1.864,
-    "+1h": 2.615
+    "-1h": 1.913,
+    "0h": 0.179,
+    "+1h": 1.864
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2024-05-13",
@@ -230,22 +230,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.209,
-    "0h": 2.864,
-    "+1h": 4.001
+    "-1h": 2.928,
+    "0h": 0.209,
+    "+1h": 2.864
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2025-03-10",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.299,
-    "0h": 3.215,
-    "+1h": 4.628
+    "-1h": 3.298,
+    "0h": 0.299,
+    "+1h": 3.215
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2025-05-12",
@@ -263,22 +263,22 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.45,
-    "0h": 11.037,
-    "+1h": 16.759
+    "-1h": 10.999,
+    "0h": 0.45,
+    "+1h": 11.037
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2026-03-09",
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.465,
-    "0h": 10.746,
-    "+1h": 15.118
+    "-1h": 11.031,
+    "0h": 0.465,
+    "+1h": 10.746
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   },
   {
    "week": "2026-05-11",
@@ -296,11 +296,11 @@
    "mismatchWeek": true,
    "bars": 92,
    "meanAbsDiff": {
-    "-1h": 0.305,
-    "0h": 6.289,
-    "+1h": 8.997
+    "-1h": 6.319,
+    "0h": 0.305,
+    "+1h": 6.289
    },
-   "studyClockEarlySec": 3600
+   "studyClockEarlySec": 0
   }
  ]
 }

@@ -92,7 +92,9 @@ test('lessons: version chains, the diff between two versions in words, where a l
   assert.equal(T.lessonRecord(L2).recallText, 'Recall on the same trade: not replayed yet.'); assert.equal(T.lessonRecord(L2).freshText, 'New setups: it has matched none in a test yet.');
 });
 test('research drafts: the evidence is given with n and t in both parts, and a draft\'s state comes from the stored lessons', () => {
-  const R = json('academy/data/research.json'), p = R.proposedLessons[0]; assert.ok(p, 'the generated research offers a draft');
+  // the research run on the corrected clock offers no draft; the last real draft is the one from before the correction (kept in the archive)
+  assert.deepEqual(json('academy/data/research.json').proposedLessons, []);
+  const R = json('academy/archive/pre-clock/data/research.json'), p = R.proposedLessons[0]; assert.ok(p, 'the archived research run offers a draft');
   const ev = T.evidenceText(p.evidence);
   assert.match(ev, /^Discovery \(\d{4}-\d\d-\d\d to \d{4}-\d\d-\d\d\): n \d+ at [+-]\d\.\d{3}R a trade against n \d+ at [+-]\d\.\d{3}R, t -?\d+\.\d\d\. Confirmation \(.+\): n \d+ at .+ against n \d+ at .+, t -?\d+\.\d\d\. Status: out-of-sample only, did not survive the correction for \d+ tests \(adjusted p 0\.\d\d\)\.$/);
   assert.equal(T.evidenceText(null), 'No evidence is attached to this draft.');
@@ -109,15 +111,17 @@ test('studies filter by edge, kind and validation; the policy table has one row 
   assert.equal(T.filterStudies(R.studies, {}).length, R.studies.length); assert.ok(T.filterStudies(R.studies, { edge: 'gtl' }).every((s) => s.edge === 'gtl'));
   const book = T.filterStudies(R.studies, { edge: 'book' }); assert.ok(book.length >= 2 && book.every((s) => s.edge == null) && ['book', 'policy'].every((k) => book.some((s) => s.kind === k)), 'studies of the whole book, not of one edge');
   assert.equal(T.filterStudies(R.studies, { kind: 'baseline' }).length, R.studies.filter((s) => s.kind === 'baseline').length);
-  assert.equal(T.filterStudies(R.studies, { validation: 'out-of-sample' }).length, R.counts.byValidation['out-of-sample']); assert.equal(T.filterStudies(R.studies, { edge: 'gtl', kind: 'condition', validation: 'out-of-sample' }).length, 1);
+  assert.equal(T.filterStudies(R.studies, { validation: 'out-of-sample' }).length, R.counts.byValidation['out-of-sample']); assert.equal(T.filterStudies(R.studies, { edge: 'gtl', kind: 'condition', validation: 'out-of-sample' }).length, 0);
+  { const A = json('academy/archive/pre-clock/data/research.json'); assert.equal(T.filterStudies(A.studies, { edge: 'gtl', kind: 'condition', validation: 'out-of-sample' }).length, 1, 'the filter finds the one such study of the archived run'); }
   const rows = T.policyRows(E); assert.deepEqual(rows.map((r) => r.edge), EDGES.map((e) => e.id).concat('all'));
-  const rep = rows.find((r) => r.edge === 'replica'); assert.deepEqual([rep.every.n, rep.every.avg, rep.every.t, rep.take.n, rep.wait.n, rep.t, rep.verdict], [303, 0.428, 2.34, 153, 150, -1.21, 'no measurable difference']);
-  assert.equal(rows[rows.length - 1].name, 'All seven'); assert.equal(rows[rows.length - 1].every.n, 1421); assert.deepEqual(T.policyRows(null), []);
+  const rep = rows.find((r) => r.edge === 'replica'); assert.deepEqual([rep.every.n, rep.every.avg, rep.every.t, rep.take.n, rep.wait.n, rep.t, rep.verdict], [325, 0.406, 2.34, 169, 156, -1.53, 'no measurable difference']);
+  assert.equal(rows[rows.length - 1].name, 'All seven'); assert.equal(rows[rows.length - 1].every.n, 1476); assert.deepEqual(T.policyRows(null), []);
 });
 test('a study table becomes sections a page can draw: records as rows, plain values as pairs', () => {
   const R = json('academy/data/research.json'), base = R.studies.find((s) => s.id === 'base:replica'), secs = T.tableSections(base.table);
-  assert.equal(secs[0].title, 'Summary'); assert.ok(secs[0].pairs.some(([k, v]) => k === 'n' && v === '303'));
-  const byYear = secs.find((s) => s.title === 'byYear'); assert.deepEqual(byYear.cols, ['year', 'n', 'avg', 'total', 't', 'win']); assert.equal(byYear.rows.length, 7); assert.equal(byYear.rows[1][4], 'n/a', 'a missing t is said, not left blank');
+  assert.equal(secs[0].title, 'Summary'); assert.ok(secs[0].pairs.some(([k, v]) => k === 'n' && v === '325'));
+  const byYear = secs.find((s) => s.title === 'byYear'); assert.deepEqual(byYear.cols, ['year', 'n', 'avg', 'total', 't', 'win']); assert.equal(byYear.rows.length, 6);
+  { const one = R.studies.map((x) => T.tableSections(x.table).find((q) => q.title === 'byYear')).filter(Boolean).flatMap((q) => q.rows).filter((r) => r[1] === '1'); assert.ok(one.length > 0 && one.every((r) => r[4] === 'n/a'), 'a missing t (a year with one trade) is said, not left blank'); }
   assert.ok(secs.some((s) => s.title === 'split · first70' && s.pairs)); assert.ok(secs.every((s) => (s.pairs || s.rows).length > 0));
   for (const s of R.studies) assert.ok(T.tableSections(s.table).length > 0, `${s.id} has something to show`);
   assert.deepEqual(T.tableSections(null), []); assert.deepEqual(T.tableSections([1, 2]), [{ title: 'Values', pairs: [['values', '1, 2']] }]);
@@ -130,7 +134,7 @@ test('a notebook note needs its required fields, and a sample size before it may
 test('the training report: every scorer with its walk-forward numbers, its verdict and its separate exam block; none promoted', () => {
   const rows = T.modelRows(json('ml/models/index.json')); assert.deepEqual(rows.map((r) => r.scope), ['replica', 'gtl', 'gmp', 'nq-open', 'pooled']);
   assert.ok(rows.every((r) => r.promoted === false && r.beats === false && r.status === 'rejected challenger' && /no improvement over taking every setup/.test(r.verdict)));
-  const rep = rows[0]; assert.deepEqual([rep.rows, rep.n, rep.auc, rep.kept.n, rep.skipped.n, rep.t], [303, 182, 0.5615, 181, 1, null]); assert.deepEqual([rep.exam.n, rep.exam.auc], [50, 0.6007]); assert.match(rep.exam.what, /read once after the walk-forward verdict was fixed/);
+  const rep = rows[0]; assert.deepEqual([rep.rows, rep.n, rep.auc, rep.kept.n, rep.skipped.n, rep.t], [325, 195, 0.5467, 185, 10, -1.33]); assert.deepEqual([rep.exam.n, rep.exam.auc], [50, 0.5704]); assert.match(rep.exam.what, /read once after the walk-forward verdict was fixed/);
   assert.deepEqual(T.modelRows(null), []); assert.deepEqual(T.modelRows({ models: [{ id: 'x' }] })[0].exam, null);
 });
 test('costs: off without a key says so with the money spent; the ledger is by day, newest first', () => {
@@ -222,7 +226,9 @@ test('a lesson revised and switched off through the API reads as a chain with it
   assert.deepEqual(chain.map((l) => [l.version, l.active]), [[2, false], [1, false]]); assert.deepEqual(T.lessonDiff(chain[1], chain[0]).map((x) => x.field), ['Title', 'When', 'Note']); assert.equal(chain[0].deactivatedWhy, 'Switched off by the mentor');
   assert.equal((await api.post({ action: 'lesson.deactivate', id: v2.id, active: true })).lesson.active, true, 'and back on');
   assert.equal((await api.raw('POST', { action: 'lesson.deactivate', id: v1.id, active: true })).code, 409, 'a replaced version stays off');
-  const R = await api.get({ get: 'research', edge: 'gtl', kind: 'baseline' }), p = R.proposedLessons[0]; assert.ok(p && R.studies.length <= 2, 'the drafts come with a small read');
+  // the research run on the corrected clock offers no draft, so the draft of the archived run stands in for one
+  const R = await api.get({ get: 'research', edge: 'gtl', kind: 'baseline' }); assert.ok(Array.isArray(R.proposedLessons) && R.studies.length <= 2, 'the drafts come with a small read');
+  const p = json('academy/archive/pre-clock/data/research.json').proposedLessons[0]; assert.ok(p && p.edge === 'gtl');
   const sv = (await api.post({ action: 'lesson.save', lesson: { edge: p.edge, title: p.title, text: p.text, when: p.when, then: p.then, source: { kind: 'research', studyId: p.source.studyId }, active: false } })).lesson; assert.equal(sv.active, false);
   all = (await api.get({ get: 'lessons', edge: 'gtl' })).lessons; assert.equal(T.draftStatus(p, all).state, 'saved');
   await api.post({ action: 'lesson.deactivate', id: sv.id, active: false, reason: 'Dismissed research draft' }); assert.equal(T.draftStatus(p, (await api.get({ get: 'lessons', edge: 'gtl' })).lessons).state, 'dismissed');

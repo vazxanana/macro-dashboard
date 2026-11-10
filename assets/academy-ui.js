@@ -456,7 +456,7 @@
       const r = readRange(); if (!r) { note.textContent = 'Pick a start and an end date (the end on or after the start).'; return; }
       const rows = (all.candidates || []).filter((c) => c.t >= r.from && c.t < r.to), total = rows.length, seen = rows.filter((c) => seenBefore(all, c.id)).length, ex = all.excluded || {}, left = (ex.clockShift || 0) + (ex.pre2020 || 0);
       note.textContent = `${total} ${pool} setup${total === 1 ? '' : 's'} in this range` + (pool === 'train' && seen ? ` (${seen} already decided before)` : '') + (pool === 'exam' ? ' (unseen only)' : '') + '.'
-        + (left ? ` ${left} setup${left === 1 ? '' : 's'} of this edge ${left === 1 ? 'is' : 'are'} left out of every list: ${[ex.clockShift ? ex.clockShift + ' in research-clock weeks' : '', ex.pre2020 ? ex.pre2020 + ' before 2020' : ''].filter(Boolean).join(', ')}.` : '')
+        + (left ? ` ${left} setup${left === 1 ? '' : 's'} of this edge ${left === 1 ? 'is' : 'are'} left out of every list: ${[ex.clockShift ? ex.clockShift + ' in weeks whose research clock could not be checked' : '', ex.pre2020 ? ex.pre2020 + ' before 2020' : ''].filter(Boolean).join(', ')}.` : '')
         + (total === 0 ? ' The replay would not stop on anything.' : '');
     } catch (err) { if (token === S.poolToken) note.textContent = 'The setups could not be counted: ' + err.message + '.'; }
   }
