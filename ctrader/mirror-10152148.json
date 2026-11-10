@@ -1341,6 +1341,33 @@
     "stopCheckedAt": "2026-11-10T14:27:21.000Z",
     "brokerStop": 1.41783,
     "closedAt": "2026-11-10T15:27:10.000Z"
+   },
+   "usdchf-replica-1794330052-s": {
+    "positionId": "48164295",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T17:02:04.000Z",
+    "councilEntry": 0.8265,
+    "stop": 0.826918,
+    "t1": 0.825665,
+    "riskCash": 2.01,
+    "margin": 6,
+    "shadow": true,
+    "mark": 0.8265,
+    "levelsFrom": "mark",
+    "fillPrice": 0.82654,
+    "slipR": -0.096,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T17:02:04.000Z",
+    "brokerStop": 0.82696
    }
   },
   "day": {
@@ -1348,7 +1375,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10033.15 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 10033.15 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -1357,7 +1384,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10033.15,
-  "lastRun": "2026-11-10T16:59:29.000Z"
+  "lastRun": "2026-11-10T17:02:04.000Z"
  },
  "log": [
   {
@@ -1912,6 +1939,11 @@
    "at": "2026-11-10T15:27:10.000Z",
    "msg": "USDCAD position 48085048 closed at the broker",
    "trade": "usdcad-replica-1794320772-s"
+  },
+  {
+   "at": "2026-11-10T17:02:04.000Z",
+   "msg": "opened sell USDCHF 0.03 lot (council replica)",
+   "trade": "usdchf-replica-1794330052-s"
   }
  ],
  "limits": {
@@ -1990,11 +2022,11 @@
   ]
  },
  "execution": {
-  "n": 46,
-  "meanSlipR": 0.116,
-  "medianSlipR": 0.045,
+  "n": 47,
+  "meanSlipR": 0.111,
+  "medianSlipR": 0.042,
   "worstSlipR": 1.236,
-  "medianLagSec": 110,
+  "medianLagSec": 108,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -2025,8 +2057,8 @@
     "meanSlipR": 0.174
    },
    "USDCHF": {
-    "n": 2,
-    "meanSlipR": 0.697
+    "n": 3,
+    "meanSlipR": 0.432
    },
    "EURUSD": {
     "n": 2,
