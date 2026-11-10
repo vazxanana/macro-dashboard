@@ -15,7 +15,9 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - The every-minute "keep improving" loop: already gone after the session restart (no scheduled jobs found).
 - Two agents were halted by the usage limit on 9 Nov. Their unfinished, **unverified** work is saved, not merged:
   - `wip/desk-inner-pages` (Desk inner pages design pass, includes the Council → Systems `sn is not defined` fix request).
-  - `wip/data-clock-fixes` (COT release-lag alignment and the HistData summer-clock audit; re-runs many study outputs).
+  - `wip/data-clock-fixes` (COT release-lag alignment and a first HistData clock fix). Its clock part is superseded by the
+    audited correction of 10 Nov 2026 (branch `academy-clock`, `docs/academy/DATA-CLOCK.md`); its COT part is open as
+    `docs/owner-decisions.md` item 25.
 - Everything merged before (#682 to #708) is on `main` and reused as is.
 - Not stopped (outside this session's control, and production): the council loop on GitHub Actions and the Vercel crons.
 
@@ -111,7 +113,8 @@ Nothing is running. All module, page, dataset, training and research branches ar
   step), a dollar-index series for gold decisions (no candles for it), live-candle runs of the Blind and Session tabs
   (recorded candles only), statistical training and the research run started from the page (both are commands and a manual GitHub workflow, by
   design: no long job runs in a site function).
-- [ ] Owner decisions: the research-candle clock fix and study re-runs; whether `/api/academy` should get a higher firewall
+- [ ] Owner decisions: what the clock correction leaves open (`docs/owner-decisions.md` items 19-25: baselines, one ICT
+      variant that now passes its bar, the studies not yet re-run); whether `/api/academy` should get a higher firewall
   limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption.
 
 ## Architecture decisions
