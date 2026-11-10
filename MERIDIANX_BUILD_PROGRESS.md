@@ -128,10 +128,20 @@ Merged into the development branch and verified by the lead (suite, browser audi
   verified against a second feed"). The lead's check on live candles after the merge: sampled setups sit on the live feed in
   59 of 59 cases, and in 23 of 23 inside the US / Europe mismatch weeks.
 
+- **Policy investigation: nothing passes, nothing changed** (`research/edge/academy-policy/`, pre-registered before any run;
+  discovery = first 60 % of the train pool by time, validation = last 40 %). Five candidate policies, 16 validation tests,
+  none reaches t 2 (largest 1.00); `policy-1.0` stays. The unseen pool was read 0 times (`academy/data/exam-ledger.json`).
+  Why it does not help on replica and gmp: the evidence margin does not rank trades (rank correlation with net R about −0.1 to
+  0 in both parts); the replica gap is a discovery result that did not repeat (−0.73R, t −1.43 → −0.07R, t −0.19); the gmp gap
+  keeps its sign and is significant in neither part; two votes are constants because the 10R cap is read as a target. The data
+  cannot show a real +0.1R: the smallest difference that reaches t 2 on validation is 0.35R (gmp) to 1.28R (replica).
+  Max drawdown, every setup against the setups the policy takes (R): replica 26.63 / 17.13, mosha-bo 4.57 / 3.11, gtrend
+  5.26 / 5.26, gtl 13.48 / 5.47, geg 7.33 / 7.64, gmp 16.06 / 11.88, nq-open 16.29 / 4.94, all 32.45 / 24.07 (a take-set
+  holds about a third of the trades, so a smaller drawdown is not evidence of selection). The lead recomputed the
+  discovery / validation figures and both drawdowns from the outcome files: they match.
+
 Running:
 
-- **Policy investigation** (`research/edge/academy-policy/`, pre-registered: discovery = first 60 % of the train pool by time,
-  validation = last 40 %, the exam pool read at most once per frozen version and logged in `academy/data/exam-ledger.json`).
 - **Model-training review** (`research/edge/academy-ml-review/`: features, labels, leakage, sample size, overfitting,
   calibration, regimes; walk-forward only; nothing promoted; zero exam reads).
 
@@ -161,10 +171,10 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **1,004 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
+- Whole suite on the development branch: **1,016 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
   914 at the end of phase 8, 719 before the Academy). Model parity: `node ml/parity.mjs`.
 - `node scripts/audit/academy.cjs`: **270 of 270**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
-  scripts/audit/academy-review.mjs` (live candles): **38 of 38**. The paragraph below describes the 225-check stage.
+  scripts/audit/academy-review.mjs` (live candles): **41 of 41**. The paragraph below describes the 225-check stage.
 - `node scripts/audit/academy.cjs`: **225 of 225** (run by the lead after the last merge; also green on GitHub's runner at the
   88-check stage). The loop part: the clock pauses on a real setup, the decision and
   its evidence are stored, a SELL corrected to WAIT becomes a lesson, the same-trade replay gives WAIT with the lesson applied
