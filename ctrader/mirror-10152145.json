@@ -3371,7 +3371,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9971.1 · 23 open",
+  "status": "ok · demo Fusion Markets · balance 9971.1 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3384,17 +3384,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eurusd-scalp-1794282311": {
+    "orderId": "33842337",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.12226,
+    "stop": 1.12158,
+    "t1": 1.12362,
+    "placedAt": "2026-11-10T03:46:23.000Z",
+    "expires": "2026-11-10T06:45:11.000Z",
+    "riskCash": 1.99,
+    "margin": 4.49,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9971.1,
-  "lastRun": "2026-11-10T03:43:10.000Z"
+  "lastRun": "2026-11-10T03:46:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T09:52:35.000Z",
-   "msg": "not mirrored xrp-scalp-1794217886: none of XRPUSD found at the broker",
-   "trade": "xrp-scalp-1794217886"
-  },
   {
    "at": "2026-11-09T09:52:35.000Z",
    "msg": "placed buy limit EURUSD 0.04 lot at 1.11904 (council rintra, valid to 2026-11-09T21:51Z)",
@@ -4889,6 +4905,11 @@
    "at": "2026-11-10T03:42:34.000Z",
    "msg": "ETHUSD position 47605800 closed at the broker",
    "trade": "eth-rscalp-1794223067"
+  },
+  {
+   "at": "2026-11-10T03:46:23.000Z",
+   "msg": "placed buy limit EURUSD 0.02 lot at 1.12226 (council scalp, valid to 2026-11-10T06:45Z)",
+   "trade": "eurusd-scalp-1794282311"
   }
  ],
  "limits": {
