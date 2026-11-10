@@ -1322,7 +1322,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T14:27:21.000Z",
     "councilEntry": 1.41582,
     "stop": 1.417773,
@@ -1335,10 +1335,12 @@
     "slipR": -0.031,
     "lagSec": 69,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T14:27:21.000Z",
-    "brokerStop": 1.41783
+    "brokerStop": 1.41783,
+    "closedAt": "2026-11-10T15:27:10.000Z"
    }
   },
   "day": {
@@ -1346,7 +1348,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10034.58 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 10033.15 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -1354,8 +1356,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10034.58,
-  "lastRun": "2026-11-10T15:24:02.000Z"
+  "balance": 10033.15,
+  "lastRun": "2026-11-10T15:27:10.000Z"
  },
  "log": [
   {
@@ -1904,6 +1906,11 @@
   {
    "at": "2026-11-10T14:27:21.000Z",
    "msg": "opened sell USDCAD 0.01 lot (council replica)",
+   "trade": "usdcad-replica-1794320772-s"
+  },
+  {
+   "at": "2026-11-10T15:27:10.000Z",
+   "msg": "USDCAD position 48085048 closed at the broker",
    "trade": "usdcad-replica-1794320772-s"
   }
  ],
