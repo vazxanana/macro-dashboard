@@ -1313,6 +1313,32 @@
     "stopCheckedAt": "2026-11-10T13:28:12.000Z",
     "brokerStop": 0.69025,
     "closedAt": "2026-11-10T13:33:22.000Z"
+   },
+   "usdcad-replica-1794320772-s": {
+    "positionId": "48085048",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T14:27:21.000Z",
+    "councilEntry": 1.41582,
+    "stop": 1.417773,
+    "t1": 1.411914,
+    "riskCash": 2.01,
+    "margin": 2,
+    "mark": 1.41582,
+    "levelsFrom": "mark",
+    "fillPrice": 1.41588,
+    "slipR": -0.031,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T14:27:21.000Z",
+    "brokerStop": 1.41783
    }
   },
   "day": {
@@ -1320,7 +1346,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10034.58 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 10034.58 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -1329,7 +1355,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10034.58,
-  "lastRun": "2026-11-10T14:24:52.000Z"
+  "lastRun": "2026-11-10T14:27:21.000Z"
  },
  "log": [
   {
@@ -1874,6 +1900,11 @@
    "at": "2026-11-10T13:33:22.000Z",
    "msg": "AUDUSD position 48047226 closed at the broker",
    "trade": "audusd-replica-1794317224-b"
+  },
+  {
+   "at": "2026-11-10T14:27:21.000Z",
+   "msg": "opened sell USDCAD 0.01 lot (council replica)",
+   "trade": "usdcad-replica-1794320772-s"
   }
  ],
  "limits": {
@@ -1952,11 +1983,11 @@
   ]
  },
  "execution": {
-  "n": 45,
-  "meanSlipR": 0.119,
-  "medianSlipR": 0.048,
+  "n": 46,
+  "meanSlipR": 0.116,
+  "medianSlipR": 0.045,
   "worstSlipR": 1.236,
-  "medianLagSec": 112,
+  "medianLagSec": 110,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -1975,8 +2006,8 @@
     "meanSlipR": -0.019
    },
    "USDCAD": {
-    "n": 4,
-    "meanSlipR": 0.119
+    "n": 5,
+    "meanSlipR": 0.089
    },
    "AUDUSD": {
     "n": 8,
