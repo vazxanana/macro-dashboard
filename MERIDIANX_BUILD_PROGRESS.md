@@ -120,15 +120,23 @@ Merged into the development branch and verified by the lead (suite, browser audi
 - **The lead's independent review on live candles** (`scripts/audit/academy-review.mjs`): 38 of 38 on the pre-clock data.
 - **Owner acceptance checklist**: `docs/academy/ACCEPTANCE.md`.
 
-Running or waiting:
+- **Research-candle clock corrected** (`docs/academy/DATA-CLOCK.md`, `research/edge/histdata-clock/`, `council/histdata.mjs`):
+  New York time in 2018; from 2019 UTC−5, and UTC−4 while Europe is on summer time. Pre-registered audit: 4,755 of 4,755
+  decisive OANDA symbol-weeks, 2,191 of 2,195 release minutes; 26 of 99 symbol-years stay uncertified (all of 2023: the files
+  have a hole from 20 Feb to 30 Jul). Studies, Academy data, research, scorers and three monitoring baselines re-run; originals in
+  `academy/archive/pre-clock/`. No trading rule changed. Flagged setups 187 → 101 (`rule.clockShift` now means "week not
+  verified against a second feed"). The lead's check on live candles after the merge: sampled setups sit on the live feed in
+  59 of 59 cases, and in 23 of 23 inside the US / Europe mismatch weeks.
 
-- **Clock correction** (branch `academy-clock`): rule certified against OANDA H1 (4,755 of 4,755 decisive symbol-weeks);
-  studies and Academy data re-run; the agent is finishing. Then: merge, verify, re-run the review.
-- **Policy investigation and model-training review**: start on the corrected data (pre-registered; the exam pool is read once
-  per frozen version and logged).
+Running:
+
+- **Policy investigation** (`research/edge/academy-policy/`, pre-registered: discovery = first 60 % of the train pool by time,
+  validation = last 40 %, the exam pool read at most once per frozen version and logged in `academy/data/exam-ledger.json`).
+- **Model-training review** (`research/edge/academy-ml-review/`: features, labels, leakage, sample size, overfitting,
+  calibration, regimes; walk-forward only; nothing promoted; zero exam reads).
 
 Outside the Academy, same day: the mirror's replica book (PR #709, on `main`), the reconciliation tool, and Fred's connector
-(draft PR #710, applying ICT changes built and switched OFF behind two owner locks; not merged).
+(draft PR #710, applying ICT changes built and switched OFF behind two owner locks; not merged; CI green).
 
 ## Next (not done)
 
@@ -153,9 +161,9 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **998 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
+- Whole suite on the development branch: **1,004 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
   914 at the end of phase 8, 719 before the Academy). Model parity: `node ml/parity.mjs`.
-- `node scripts/audit/academy.cjs`: **268 of 268**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
+- `node scripts/audit/academy.cjs`: **270 of 270**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
   scripts/audit/academy-review.mjs` (live candles): **38 of 38**. The paragraph below describes the 225-check stage.
 - `node scripts/audit/academy.cjs`: **225 of 225** (run by the lead after the last merge; also green on GitHub's runner at the
   88-check stage). The loop part: the clock pauses on a real setup, the decision and
