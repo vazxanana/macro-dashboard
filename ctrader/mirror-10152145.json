@@ -3381,7 +3381,8 @@
     "t1": 1.12362,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.12226,
@@ -3395,7 +3396,8 @@
     "lagSec": 364,
     "positionId": "47889587",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T07:27:09.000Z"
    },
    "btc-rscalp-1794283012": {
     "positionId": "47891861",
@@ -3734,7 +3736,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9982.32 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9985.02 · 26 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3770,15 +3772,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9982.32,
-  "lastRun": "2026-11-10T07:24:40.000Z"
+  "balance": 9985.02,
+  "lastRun": "2026-11-10T07:27:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T11:38:48.000Z",
-   "msg": "cancelled XAUUSD limit order 33798727 for xau-m30m1-1794224183: the council filled it on its feed first",
-   "trade": "xau-m30m1-1794224183"
-  },
   {
    "at": "2026-11-09T11:38:48.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council m30m1)",
@@ -5273,6 +5270,11 @@
    "at": "2026-11-10T07:24:40.000Z",
    "msg": "limit filled: GBPUSD position 47946688 at the broker",
    "trade": "gbpusd-scalp-1794295261"
+  },
+  {
+   "at": "2026-11-10T07:27:09.000Z",
+   "msg": "EURUSD position 47889587 closed at the broker",
+   "trade": "eurusd-scalp-1794282311"
   }
  ],
  "limits": {
