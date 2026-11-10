@@ -1611,6 +1611,33 @@
     ],
     "stopCheckedAt": "2026-11-10T21:11:23.000Z",
     "brokerStop": 0.82487
+   },
+   "btc-replica-1794346855-s": {
+    "positionId": "48227201",
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T21:42:08.000Z",
+    "councilEntry": 73814.1,
+    "stop": 73980.71,
+    "t1": 73480.87,
+    "riskCash": 2.01,
+    "margin": 73.89,
+    "shadow": true,
+    "mark": 73814.1,
+    "levelsFrom": "mark",
+    "fillPrice": 73768.35,
+    "slipR": 0.275,
+    "lagSec": 73,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T21:42:08.000Z",
+    "brokerStop": 73934.96
    }
   },
   "day": {
@@ -1618,7 +1645,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10036.1 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10036.1 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker"
@@ -1630,7 +1657,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10036.1,
-  "lastRun": "2026-11-10T21:39:36.000Z"
+  "lastRun": "2026-11-10T21:42:08.000Z"
  },
  "log": [
   {
@@ -2250,6 +2277,11 @@
    "at": "2026-11-10T21:11:23.000Z",
    "msg": "opened buy USDCHF 0.02 lot (council replica)",
    "trade": "usdchf-replica-1794345020-b"
+  },
+  {
+   "at": "2026-11-10T21:42:08.000Z",
+   "msg": "opened sell BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794346855-s"
   }
  ],
  "limits": {
@@ -2328,9 +2360,9 @@
   ]
  },
  "execution": {
-  "n": 56,
-  "meanSlipR": 0.094,
-  "medianSlipR": 0.015,
+  "n": 57,
+  "meanSlipR": 0.098,
+  "medianSlipR": 0.03,
   "worstSlipR": 1.236,
   "medianLagSec": 74,
   "bySymbol": {
@@ -2347,8 +2379,8 @@
     "meanSlipR": 0.128
    },
    "BTCUSD": {
-    "n": 8,
-    "meanSlipR": -0.009
+    "n": 9,
+    "meanSlipR": 0.023
    },
    "USDCAD": {
     "n": 7,
