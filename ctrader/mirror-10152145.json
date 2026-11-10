@@ -5866,6 +5866,62 @@
     "status": "open",
     "stopCheckedAt": "2026-11-10T18:39:37.000Z",
     "brokerStop": 0.68428
+   },
+   "btc-rintra-1794336369": {
+    "positionId": "48193580",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rintra",
+    "status": "open",
+    "openedAt": "2026-11-10T18:47:23.000Z",
+    "councilEntry": 73412.5,
+    "stop": 72560.90000000001,
+    "t1": 73668.3,
+    "riskCash": 8.52,
+    "margin": 73.58,
+    "minLot": true,
+    "shadow": true,
+    "mark": 73412.5,
+    "levelsFrom": "mark",
+    "fillPrice": 73405.35,
+    "slipR": -0.008,
+    "lagSec": 74,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T18:47:23.000Z",
+    "brokerStop": 72553.75
+   },
+   "btc-rscalp-1794336369": {
+    "positionId": "48193588",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-10T18:47:23.000Z",
+    "councilEntry": 73412.5,
+    "stop": 72569.91750000001,
+    "t1": 73668.3,
+    "riskCash": 8.43,
+    "margin": 73.58,
+    "minLot": true,
+    "shadow": true,
+    "mark": 73412.5,
+    "levelsFrom": "mark",
+    "fillPrice": 73404.85,
+    "slipR": -0.009,
+    "lagSec": 74,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T18:47:23.000Z",
+    "brokerStop": 72562.27
    }
   },
   "day": {
@@ -5873,7 +5929,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.82 · 23 open",
+  "status": "ok · demo Fusion Markets · balance 9962.82 · 25 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5886,19 +5942,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9962.82,
-  "lastRun": "2026-11-10T18:44:44.000Z"
+  "lastRun": "2026-11-10T18:47:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T10:26:03.000Z",
-   "msg": "ETHUSD position 47979582 closed at the broker",
-   "trade": "eth-rscalp-1794302265"
-  },
-  {
-   "at": "2026-11-10T10:28:39.000Z",
-   "msg": "opened sell SOLUSD 0.01 lot (council position)",
-   "trade": "sol-position-1794306450"
-  },
   {
    "at": "2026-11-10T10:31:26.000Z",
    "msg": "USDCAD position 47998072 closed at the broker",
@@ -7388,6 +7434,16 @@
    "at": "2026-11-10T18:42:12.000Z",
    "msg": "EURUSD position 48140741 closed at the broker",
    "trade": "eurusd-scalp-1794326705"
+  },
+  {
+   "at": "2026-11-10T18:47:23.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council rintra)",
+   "trade": "btc-rintra-1794336369"
+  },
+  {
+   "at": "2026-11-10T18:47:23.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council rscalp)",
+   "trade": "btc-rscalp-1794336369"
   }
  ],
  "limits": {
@@ -7466,19 +7522,19 @@
   ]
  },
  "execution": {
-  "n": 197,
+  "n": 199,
   "meanSlipR": -0.016,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 162,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
     "meanSlipR": 0.074
    },
    "BTCUSD": {
-    "n": 13,
-    "meanSlipR": -0.069
+    "n": 15,
+    "meanSlipR": -0.061
    },
    "ETHUSD": {
     "n": 8,

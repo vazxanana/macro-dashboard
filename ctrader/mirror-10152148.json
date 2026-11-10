@@ -1452,6 +1452,33 @@
     ],
     "stopCheckedAt": "2026-11-10T17:57:13.000Z",
     "brokerStop": 1.33103
+   },
+   "audusd-replica-1794336369-b": {
+    "positionId": "48193610",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T18:47:30.000Z",
+    "councilEntry": 0.68606,
+    "stop": 0.684315,
+    "t1": 0.68955,
+    "riskCash": 2.01,
+    "margin": 1.37,
+    "shadow": true,
+    "mark": 0.68606,
+    "levelsFrom": "mark",
+    "fillPrice": 0.68604,
+    "slipR": -0.011,
+    "lagSec": 81,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T18:47:30.000Z",
+    "brokerStop": 0.6843
    }
   },
   "day": {
@@ -1459,7 +1486,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10036.1 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 10036.1 · 4 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker"
   },
@@ -1470,7 +1497,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10036.1,
-  "lastRun": "2026-11-10T18:44:46.000Z"
+  "lastRun": "2026-11-10T18:47:30.000Z"
  },
  "log": [
   {
@@ -2055,6 +2082,11 @@
    "at": "2026-11-10T18:32:04.000Z",
    "msg": "not mirrored xrp-replica-1794335450-b: none of XRPUSD found at the broker",
    "trade": "xrp-replica-1794335450-b"
+  },
+  {
+   "at": "2026-11-10T18:47:30.000Z",
+   "msg": "opened buy AUDUSD 0.01 lot (council replica)",
+   "trade": "audusd-replica-1794336369-b"
   }
  ],
  "limits": {
@@ -2133,9 +2165,9 @@
   ]
  },
  "execution": {
-  "n": 50,
-  "meanSlipR": 0.104,
-  "medianSlipR": 0.036,
+  "n": 51,
+  "meanSlipR": 0.101,
+  "medianSlipR": 0.03,
   "worstSlipR": 1.236,
   "medianLagSec": 81,
   "bySymbol": {
@@ -2160,8 +2192,8 @@
     "meanSlipR": 0.062
    },
    "AUDUSD": {
-    "n": 8,
-    "meanSlipR": 0.055
+    "n": 9,
+    "meanSlipR": 0.048
    },
    "GBPUSD": {
     "n": 2,
