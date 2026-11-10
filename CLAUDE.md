@@ -1549,6 +1549,21 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   "Check candles" replays one logged trade on `/md/bars` 5-minute candles (`replay`: was the entry traded within 30 minutes of
   the logged time; stop first when one candle holds both; up to the logged exit). CSV download. Phones: the table becomes cards
   under 760 px. The form shows only when the server says `canWrite`.
+- **The chart and replay** (same day, owner: "Check the screenshots of trades I've sent you so you can understand and replicate
+  them now in the charts and replay"): `assets/mosha-replay.js` (`window.MS_MOSHA_RP`, card `#mo-replay`). `EXAMPLES` = the owner's
+  five trades (10 Nov sell, 28 Oct sell, 29 Oct sell "Janda", 2 Nov sell, 2 Nov buy) with the owner's own marks read off the
+  screenshots and placed on our OANDA M5 candles (`/md/bars`): purple `level` lines, the red `vr` box (the owner's "5 mn" box:
+  from the extreme to the last swing before it), the green `bvr` box (a buy's range), the lavender `zone` of the break, an `htf`
+  zone, and the position (red stop band, grey target band). The screenshots' clock is New York (UTC-4 until 1 Nov 2026, UTC-5
+  after); the data is in UTC. Replay: Start / Back / Play / Next / End, a slider, numbered steps with a one-line caption
+  (`aria-live`), M5 / M15 / H1 (built from M5), 1x / 3x / 10x; a mark appears only from the moment it was known and grows with
+  the cursor (`marksAt`), so the replay never shows the future. `outcome()` finds the fill and the exit on our candles (stop
+  first; the owner's hand close for the 2 Nov sell) and the card states both "You" and "On our candles". A logged trade's
+  "Replay" opens it in the same chart (`specOfTrade`, levels only). "Trade it yourself in ChronosTrade" leaves
+  `localStorage btLab:handoff` (`handoff()`: market, 5m, start = when the VR is in, the marks known by then as drawings) and
+  opens `/backtest`, which reads it once, checks it (known market, under 10 minutes old, at most 24 line / box shapes) and
+  starts that session (`HAND` / `handDraw` at the end of backtest.html's script). The examples are the owner's picks: the card
+  says they show the pattern, not how often it wins. Tests: `tests/mosha-replay.test.mjs`.
 - A log only: nothing under it places, copies or changes a trade, and no council member reads it. A study of the logged trades
   needs its own pre-registration (n and t, the `pre` trades only).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,

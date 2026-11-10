@@ -127,7 +127,7 @@
     var box = $('mo-list'); if (!box) return; if (!M.trades) { box.innerHTML = '<div class="ms-k"><span>Trades</span></div><div class="ct-empty">Loading the log…</div>'; return; } var T = M.trades;
     var row = function (t) {
       var tags = [HOW[t.how] || '', t.tf, t.h4 ? (t.h4 === 'with' ? 'with H4' : 'against H4') : '', t.swept ? 'swept: ' + t.swept : ''].filter(Boolean).map(esc).join(' · ');
-      var acts = (M.canWrite && t.status === 'open' ? '<button type="button" class="ms-tbtn mo-go" data-mo-close="' + esc(t.id) + '">Close it</button>' : '') + '<button type="button" class="ms-tbtn" data-mo-check="' + esc(t.id) + '" title="Replay this trade on our own 5-minute candles">Check candles</button>' + (M.canWrite ? '<button type="button" class="ms-tbtn" data-mo-edit="' + esc(t.id) + '">Edit</button><button type="button" class="ms-tbtn" data-mo-del="' + esc(t.id) + '">Delete</button>' : '');
+      var acts = (M.canWrite && t.status === 'open' ? '<button type="button" class="ms-tbtn mo-go" data-mo-close="' + esc(t.id) + '">Close it</button>' : '') + '<button type="button" class="ms-tbtn" data-mo-replay="' + esc(t.id) + '" title="Open this trade on the chart above and replay it">Replay</button>' + '<button type="button" class="ms-tbtn" data-mo-check="' + esc(t.id) + '" title="Did the stop or the target come first on our 5-minute candles?">Check candles</button>' + (M.canWrite ? '<button type="button" class="ms-tbtn" data-mo-edit="' + esc(t.id) + '">Edit</button><button type="button" class="ms-tbtn" data-mo-del="' + esc(t.id) + '">Delete</button>' : '');
       return '<tr><td class="mo-c-time"><span class="mo-when">' + when(t.at) + '</span><small>' + esc(MKT[t.market] || t.market) + '</small></td><td class="mo-c-side"><span class="chip ' + t.side + '">' + t.side.toUpperCase() + '</span></td><td class="n" data-l="Entry">' + num(t.entry) + '</td><td class="n" data-l="Stop">' + num(t.stop) + '</td><td class="n" data-l="Target">' + num(t.target) + '</td><td class="n" data-l="Plan R:R">' + (t.planRR != null ? t.planRR.toFixed(1) : '—') + '</td>' +
         '<td class="mo-c-res">' + (t.status === 'open' ? 'Open' : 'Closed at ' + num(t.exit) + ' <b class="' + cls(t.R) + '">' + fR(t.R) + '</b>') + '<small>' + (t.pre ? 'logged before the result' : 'added afterwards') + '</small></td>' +
         '<td class="mo-tags">' + tags + (t.note ? '<small>' + esc(t.note) + '</small>' : '') + checkLine(t.id) + '</td><td class="mo-acts">' + acts + '</td></tr>';
@@ -188,6 +188,7 @@
     view.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return; var find = function (id) { return M.trades.find(function (x) { return x.id === id; }); };
       if (b.dataset.moCheck) check(b.dataset.moCheck);
+      else if (b.dataset.moReplay) { var rt = find(b.dataset.moReplay); if (rt && root.msMoshaReplayTrade) root.msMoshaReplayTrade(rt); }
       else if (b.dataset.moEdit) fillForm(find(b.dataset.moEdit));
       else if (b.dataset.moClose) fillForm(find(b.dataset.moClose), true);
       else if (b.dataset.moDel) { var id = b.dataset.moDel, t = find(id); if (!t) return;
@@ -196,6 +197,6 @@
       else if (b.id === 'mo-csv') { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv(M.trades)], { type: 'text/csv' })); a.download = 'mosha-trades.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
     });
   }
-  root.renderMosha = function () { wire(); if (!M.trades) draw(); load(); };
+  root.renderMosha = function () { wire(); if (!M.trades) draw(); load(); if (root.msMoshaReplay) root.msMoshaReplay(); };
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.renderMosha(); }   // opened straight on #mosha before this file ran
 })(typeof window !== 'undefined' ? window : globalThis);
