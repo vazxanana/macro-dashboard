@@ -3121,7 +3121,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.42 · 20 open",
+  "status": "ok · demo Fusion Markets · balance 9975.42 · 20 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3134,17 +3134,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eurusd-rscalp-1794269254": {
+    "orderId": "33836033",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 1.12196,
+    "stop": 1.1225,
+    "t1": 1.121335,
+    "placedAt": "2026-11-10T00:08:38.000Z",
+    "expires": "2026-11-10T03:07:34.000Z",
+    "riskCash": 2,
+    "margin": 6.73,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9975.42,
-  "lastRun": "2026-11-10T00:06:10.000Z"
+  "lastRun": "2026-11-10T00:08:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T07:38:52.000Z",
-   "msg": "XAUUSD position 47463476 closed at the broker",
-   "trade": "xau-rscalp-1794193018"
-  },
   {
    "at": "2026-11-09T08:23:46.000Z",
    "msg": "placed buy limit AUDUSD 0.02 lot at 0.68876 (council scalp, valid to 2026-11-09T11:22Z)",
@@ -4639,6 +4655,11 @@
    "at": "2026-11-09T23:01:34.000Z",
    "msg": "XAUUSD position 47810868 closed at the broker",
    "trade": "xau-rscalp-1794260665"
+  },
+  {
+   "at": "2026-11-10T00:08:38.000Z",
+   "msg": "placed sell limit EURUSD 0.03 lot at 1.12196 (council rscalp, valid to 2026-11-10T03:07Z)",
+   "trade": "eurusd-rscalp-1794269254"
   }
  ],
  "limits": {
