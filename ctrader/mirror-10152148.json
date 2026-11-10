@@ -1672,6 +1672,33 @@
     "stopCheckedAt": "2026-11-10T21:56:28.000Z",
     "brokerStop": 2061.22,
     "closedAt": "2026-11-10T22:08:26.000Z"
+   },
+   "sol-replica-1794349796-s": {
+    "positionId": "48229636",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T22:30:52.000Z",
+    "councilEntry": 83.06,
+    "stop": 83.613,
+    "t1": 81.954,
+    "riskCash": 5.53,
+    "margin": 83.32,
+    "minLot": true,
+    "mark": 83.06,
+    "levelsFrom": "mark",
+    "fillPrice": 82.851,
+    "slipR": 0.378,
+    "lagSec": 56,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T22:30:52.000Z",
+    "brokerStop": 83.404
    }
   },
   "day": {
@@ -1679,7 +1706,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10026.09 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10026.09 · 8 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker"
@@ -1691,7 +1718,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10026.09,
-  "lastRun": "2026-11-10T22:28:36.000Z"
+  "lastRun": "2026-11-10T22:30:52.000Z"
  },
  "log": [
   {
@@ -2341,6 +2368,11 @@
    "at": "2026-11-10T22:13:46.000Z",
    "msg": "GBPUSD position 48211846 closed at the broker",
    "trade": "gbpusd-replica-1794341068-s"
+  },
+  {
+   "at": "2026-11-10T22:30:52.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council replica)",
+   "trade": "sol-replica-1794349796-s"
   }
  ],
  "limits": {
@@ -2419,15 +2451,15 @@
   ]
  },
  "execution": {
-  "n": 58,
-  "meanSlipR": 0.1,
-  "medianSlipR": 0.035,
+  "n": 59,
+  "meanSlipR": 0.105,
+  "medianSlipR": 0.039,
   "worstSlipR": 1.236,
   "medianLagSec": 74,
   "bySymbol": {
    "SOLUSD": {
-    "n": 9,
-    "meanSlipR": 0.124
+    "n": 10,
+    "meanSlipR": 0.149
    },
    "ETHUSD": {
     "n": 6,
