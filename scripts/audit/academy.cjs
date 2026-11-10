@@ -576,3 +576,140 @@ async function startServer() {
   console.log(`\nAcademy audit: ${R.length - bad.length} of ${R.length} checks passed` + (bad.length ? `, ${bad.length} FAILED` : ''));
   process.exit(bad.length ? 1 : 0);
 })().catch((e) => { console.error('audit crashed:', e); process.exit(1); });
+
+// ====================================================================================================================
+// ANALYST (language model) — APPENDED BLOCK. Everything from here to the end of the file belongs to the analyst.
+// ====================================================================================================================
+// It runs after the audit above has printed its result (the hook below takes the audit's final process.exit, runs
+// analystAudit(), then exits with the audit's code, or 1 when an analyst check failed). It starts its own two dev servers
+// on PORT + 11 and PORT + 12, so it shares no page, store or port with the checks above. No network and no key:
+//   - the normal dev server: the analyst is OFF. The decision card says so, nothing is sent, a decision costs no extra call.
+//   - a `--fake-llm` dev server: the whole flow against the labelled FAKE provider (scripts/academy-fake-llm.cjs, a fixed
+//     rule, not a language model): the banner, ask, the answer beside the engine's, stored apart, the cache, a correction,
+//     a lesson, the same setup asked again, "ask on every setup" with its estimate first, the phone layout.
+// Not covered here (covered in tests/academy-analyst.test.mjs): the budgets and the call cap stopping a run, a refused
+// answer, hard gates, MANAGE, exam setups. The fake server's budgets cannot be changed from outside, on purpose.
+{
+  const exit0 = process.exit.bind(process); let ran = false;
+  process.exit = (code) => { if (ran) return exit0(code); ran = true; analystAudit().then((bad) => exit0(code || (bad ? 1 : 0)), (e) => { console.error('analyst audit crashed:', e); exit0(1); }); };
+}
+async function analystAudit() {
+  const A = [], ok = (name, pass, info = '') => { A.push({ name, ok: !!pass, info: String(info).slice(0, 220) }); };
+  const start = async (port, args) => {
+    const store = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-analyst-')), base = 'http://127.0.0.1:' + port, env = { ...process.env, PORT: String(port), ACADEMY_STORE_DIR: store };
+    for (const k of Object.keys(env)) if (/^ACADEMY_LLM_/.test(k)) delete env[k];
+    const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] }); let log = ''; proc.stdout.on('data', (d) => { log += d; }); proc.stderr.on('data', (d) => { log += d; });
+    for (let i = 0; i < 60; i++) { if (proc.exitCode != null) throw new Error('the dev server stopped: ' + log.trim()); try { const r = await fetch(base + '/api/academy?get=edges'); if (r.ok) return { proc, store, base, log: () => log }; } catch (e) { /* not up yet */ } await new Promise((r) => setTimeout(r, 250)); }
+    proc.kill(); throw new Error('the dev server did not answer on ' + base);
+  };
+  const stop = (s) => { if (s) { s.proc.kill(); fs.rmSync(s.store, { recursive: true, force: true }); } };
+  const open = async (b, base, opts = {}) => {
+    const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block', ...opts }); await ctx.addInitScript(NO_PACE);
+    const p = await ctx.newPage(), reqs = [], errs = [];
+    p.on('pageerror', (e) => errs.push(e.message.split('\n')[0])); p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text().slice(0, 160)); });
+    p.on('request', (r) => { const u = new URL(r.url()); if (u.pathname === '/api/academy' && !u.searchParams.get('_audit')) { let body = null; try { body = r.postDataJSON(); } catch (e) { /* GET */ } reqs.push(body ? body.action + (body.dryRun ? ':dry' : '') : 'get=' + u.searchParams.get('get')); } });
+    return { ctx, p, reqs, errs };
+  };
+  const run = async (p, from) => {
+    await p.waitForSelector('#f-edge option', { state: 'attached', timeout: 15000 }); await p.selectOption('#f-edge', EDGE);
+    await p.waitForFunction(() => /setups? in this range/.test(document.getElementById('f-count').textContent), null, { timeout: 15000 });
+    if (from) { await p.fill('#f-from', from); await p.dispatchEvent('#f-from', 'change'); await p.waitForTimeout(300); }
+    await p.click('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await p.click('#c-speed [data-speed="100"]');
+  };
+  const nextPoint = async (p) => { await p.waitForSelector('#dec-stored', { timeout: 60000 }); await p.waitForFunction(() => /stored/.test(document.getElementById('dec-stored').textContent) && /paused on a setup/.test(document.getElementById('clock-state').textContent), null, { timeout: 60000 }); await p.waitForSelector('#an-block', { timeout: 10000 }); };
+  const goOn = async (p) => { await p.click('#continue'); await p.waitForSelector('#dec-action', { state: 'detached', timeout: 20000 }); };
+  const candNow = (p) => p.evaluate(() => { const x = window.MXAC.point(); return x ? { id: x.cur.cand.id, t: x.cur.cand.t, engine: x.cur.latest.decision.action } : null; });
+  let off = null, fake = null, b = null;
+  try {
+    b = await chromium.launch();
+    const P = Number(PORT);
+    // ---- A. the normal dev server: the analyst is off ----
+    off = await start(P + 11, []);
+    {
+      const { ctx, p, reqs, errs } = await open(b, off.base); await p.goto(off.base + '/academy', { waitUntil: 'load' }); await run(p, null);
+      const m = reqs.length; await p.click('#c-play'); await nextPoint(p);
+      ok('analyst off: the decision card says "Off. No key is set. Nothing was sent. Cost so far: $0.00"', (await txt(p, '#an-off')) === 'Off. No key is set. Nothing was sent. Cost so far: $0.00', await txt(p, '#an-block'));
+      ok('analyst off: the block is titled "Analyst (language model)" and points to the setup doc', /^Analyst \(language model\)/.test(await txt(p, '#an-title')) && /docs\/academy\/LLM\.md/.test(await txt(p, '#an-howto')), await txt(p, '#an-howto'));
+      ok('analyst off: no ask button, no "every setup" switch, no fake banner', (await p.$$('#an-ask, #an-auto, #an-fake, #an-answer')).length === 0);
+      ok('analyst off: the block sits inside the decision card, above "Continue replay"', await p.evaluate(() => { const a = document.getElementById('an-block'), c = document.getElementById('continue'); return a.parentElement.id === 'decision' && !!(a.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING); }));
+      ok('analyst off: a train decision still costs the same Academy calls (the ledger was read once, when the replay opened)', reqs.slice(m).join() === 'session.save,attempt' && reqs.filter((x) => x === 'get=cost').length === 1 && !reqs.some((x) => /^analyse/.test(x)), reqs.join(' '));
+      const cur = await candNow(p), att = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(cur.id)}`)).attempts;
+      const direct = await p.evaluate(async (bd) => { const r = await fetch('/api/academy?_audit=1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bd) }); return { status: r.status, body: await r.json() }; }, { action: 'analyse', edge: EDGE, candidateId: cur.id, attemptId: att[0].id, provider: 'fake-test', fake: true });
+      ok('analyst off: the route itself answers "not available" with the reason, and makes nothing up', direct.status === 200 && direct.body.available === false && direct.body.reason === 'no language-model key configured' && direct.body.decision === undefined, JSON.stringify(direct.body));
+      const cost = await api(p, 'get=cost'), prog = await api(p, `get=progress&edge=${EDGE}`);
+      ok('analyst off: nothing was spent, nothing of the analyst is stored', cost.enabled === false && cost.total.usd === 0 && cost.total.requests === 0 && cost.fake === false && prog.analyst.attempts === 0 && !fs.existsSync(path.join(off.store, 'analyst')), JSON.stringify(cost.total));
+      await p.goto(off.base + '/academy?fake-llm=1&provider=fake-test', { waitUntil: 'load' }); await p.waitForTimeout(500);
+      ok('the fake provider cannot be switched on from the address bar', (await api(p, 'get=cost')).enabled === false && /analyst: off/.test(off.log()));
+      ok('analyst off: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
+      await ctx.close();
+    }
+    // ---- B. the labelled fake provider (only this dev server's injected dependency) ----
+    fake = await start(P + 12, ['--fake-llm']);
+    {
+      const { ctx, p, reqs, errs } = await open(b, fake.base); await p.goto(fake.base + '/academy', { waitUntil: 'load' }); await run(p, null);
+      const m = reqs.length; await p.click('#c-play'); await nextPoint(p);
+      ok('fake provider: a visible banner says "FAKE PROVIDER: test answers, not a language model"', await vis(p, '#an-fake') && /FAKE PROVIDER: test answers, not a language model/.test(await txt(p, '#an-fake')) && /FAKE PROVIDER \(--fake-llm\)/.test(fake.log()), await txt(p, '#an-fake'));
+      ok('never automatic: the decision came and went without an ask; the switch is off', reqs.slice(m).join() === 'session.save,attempt' && !(await p.isChecked('#an-auto')) && (await p.$$('#an-answer')).length === 0, reqs.slice(m).join(' '));
+      ok('the block shows the provider, today\'s spend and the calls left', /^Provider: fake-test\. Today \$0\.00 of \$0\.50, 40 calls left today\./.test(await txt(p, '#an-budget')), await txt(p, '#an-budget'));
+      const c1 = await candNow(p), prog0 = await api(p, `get=progress&edge=${EDGE}`);
+      const m1 = reqs.length; await p.click('#an-ask'); await p.waitForSelector('#an-answer', { timeout: 20000 });
+      const label = await txt(p, '#an-label');
+      ok('Ask the analyst: one call; the answer is labelled as language-model output with its provider and its cost', reqs.slice(m1).join() === 'analyse' && /^Language-model output\. Provider: fake-test\. Cost \$0\.\d+, [\d,]+ tokens in, [\d,]+ out\. Analyst attempt 1 stored apart ✓$/.test(label), label);
+      ok('the analyst\'s answer is shown beside the engine\'s: action, confidence and levels of both', (await txt(p, '#an-eng-action')) === c1.engine && ['BUY', 'SELL', 'WAIT'].includes(await txt(p, '#an-action')) && (await p.$$eval('#an-cmp tbody tr', (l) => l.map((r) => r.cells[0].textContent))).join() === 'Action,Confidence,Entry,Stop,Target,Lessons used', await txt(p, '#an-cmp'));
+      ok('it shows evidence both ways, the uncertainty, the lessons it used and what the checks refused', (await p.$$('#an-support li, #an-against li')).length >= 2 && /FAKE PROVIDER: this is a test answer/.test(await txt(p, '#an-uncertainty')) && /It named no lesson\./.test(await txt(p, '#an-lessons')) && /Checked before it was stored: nothing refused\./.test(await txt(p, '#an-checked')) && /^Thesis \(bias \w+\): FAKE PROVIDER/.test(await txt(p, '#an-thesis')));
+      const mine = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}&engine=language-model`)).attempts, theirs = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts, prog1 = await api(p, `get=progress&edge=${EDGE}`);
+      ok('stored apart: one analyst attempt marked language-model with its provider; the engine\'s attempts and counts did not move', mine.length === 1 && mine[0].engine === 'language-model' && mine[0].llm.provider === 'fake-test' && mine[0].decision.engine === 'language-model' && theirs.length === 1 && theirs[0].engine === undefined && prog1.counts.attempts === prog0.counts.attempts && prog1.analyst.attempts === 1 && fs.existsSync(path.join(fake.store, 'analyst', 'attempts', EDGE + '.json')), JSON.stringify([mine.length, theirs.length, prog1.counts.attempts, prog1.analyst.attempts]));
+      const au = (await api(p, 'get=audit')).rows.filter((r) => r.action === 'analyse'), cost1 = await api(p, 'get=cost');
+      ok('one audit row for the ask; the ledger holds one request and its cost; no key in either', au.length === 1 && /analyst (BUY|SELL|WAIT)/.test(au[0].summary) && /fake-test/.test(au[0].summary) && cost1.total.requests === 1 && cost1.total.usd > 0 && cost1.fake === true && !/fake-test-key/.test(JSON.stringify([au, cost1])), JSON.stringify(au.map((r) => r.summary)));
+      const m2 = reqs.length; await p.click('#an-ask'); await p.waitForFunction(() => /Answered from the cache/.test(document.getElementById('an-label').textContent), null, { timeout: 20000 });
+      const cost2 = await api(p, 'get=cost');
+      ok('the same question again is answered from the cache: no cost, no second attempt', reqs.slice(m2).join() === 'analyse' && /Answered from the cache: no call, no cost\./.test(await txt(p, '#an-label')) && cost2.total.requests === 1 && cost2.total.usd === cost1.total.usd && (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}&engine=language-model`)).attempts.length === 1, await txt(p, '#an-label'));
+      // on to a setup the engine takes, so there is a trade to correct
+      let cur = c1; for (let i = 0; i < 12 && cur.engine === 'WAIT'; i++) { await goOn(p); await nextPoint(p); cur = await candNow(p); }
+      ok('a later setup the engine takes: the card shows a fresh analyst block with no answer yet', cur.engine !== 'WAIT' && (await p.$$('#an-answer')).length === 0 && (await txt(p, '#an-ask')) === 'Ask the analyst', `${cur.id} ${cur.engine}`);
+      await p.click('#an-ask'); await p.waitForSelector('#an-answer', { timeout: 20000 });
+      ok('the fake follows the engine there (its fixed rule), on the setup\'s own levels', (await txt(p, '#an-action')) === cur.engine && (await p.getAttribute('#an-answer', 'data-provider')) === 'fake-test', await txt(p, '#an-action'));
+      // the mentor corrects the analyst: WAIT, a reason, a text
+      await p.click('[data-an-choice="WAIT"]'); await p.click('[data-an-reason="session"]'); await p.fill('#an-text', 'Audit: not in this session.'); await p.click('#an-save'); await p.waitForSelector('#an-corrected', { timeout: 15000 });
+      const corA = (await api(p, `get=corrections&edge=${EDGE}&engine=language-model`)).corrections, corE = (await api(p, `get=corrections&edge=${EDGE}`)).corrections;
+      ok('a correction of the analyst is stored in the analyst\'s own file, not with the engine\'s corrections', corA.length === 1 && corA[0].engine === 'language-model' && corA[0].action === 'WAIT' && corA[0].reasons.join() === 'session' && corE.length === 0 && /Correction saved ✓ \(change → WAIT\)/.test(await txt(p, '#an-corrected')), JSON.stringify([corA.length, corE.length]));
+      await p.waitForSelector('#an-lesson-save'); await p.click('#an-lesson-save'); await p.waitForSelector('#an-lesson-saved', { timeout: 15000 });
+      const lessons = (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons;
+      ok('the lesson from that correction is saved and in force', lessons.length === 1 && lessons[0].then.action === 'WAIT' && lessons[0].source.correctionId === corA[0].id && /Lesson saved ✓ \(version 1\)/.test(await txt(p, '#an-lesson-saved')), JSON.stringify(lessons.map((l) => l.title)));
+      await p.click('#an-again'); await p.waitForSelector('#an-verdict', { timeout: 20000 });
+      const two = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(cur.id)}&engine=language-model`)).attempts;
+      ok('asked again on the same setup: attempt 2 is a same-trade replay, the lesson is named, the answer is now WAIT, the verdict is "learned"', two.length === 2 && two[1].mode === 'replay-same' && two[1].decision.action === 'WAIT' && two[1].decision.lessonsApplied[0].id === lessons[0].id && (await p.getAttribute('#an-verdict', 'data-verdict')) === 'learned' && (await txt(p, '#an-action')) === 'WAIT' && /action \((BUY|SELL) → WAIT\)/.test(await txt(p, '#an-changed')), `${two.map((a) => a.mode + ':' + a.decision.action).join(' ')} ${await txt(p, '#an-verdict')}`);
+      const ls2 = (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons[0], prog2 = await api(p, `get=progress&edge=${EDGE}`);
+      ok('the engine\'s recall record and the lesson\'s own counters are untouched by the analyst\'s replay', ls2.stats.replayPass === 0 && ls2.stats.replayFail === 0 && prog2.replaySame.n === 0 && prog2.analyst.replaySame.pass === 1 && prog2.counts.corrections === 0, JSON.stringify([ls2.stats, prog2.analyst.replaySame]));
+      // "ask on every setup of this run": the estimate first, nothing starts on the tick
+      await goOn(p); await nextPoint(p); const c3 = await candNow(p), m3 = reqs.length;
+      await p.click('#an-auto'); await p.waitForSelector('#an-plan-text', { timeout: 15000 });
+      const plan = await txt(p, '#an-plan-text');
+      ok('"Ask on every setup of this run" shows the estimated cost of the run first and starts nothing', reqs.slice(m3).join() === 'analyse:dry' && !(await p.isChecked('#an-auto')) && /^\d+ setups? left in this run\. One ask costs at most about \$0\.\d+ \(the whole output cap is counted\), so the run costs at most about \$\d+\.\d+\./.test(plan) && /stops by itself/.test(plan) && (await p.$$('#an-answer')).length === 0, plan);
+      await p.click('#an-plan-go'); await p.waitForSelector('#an-answer', { timeout: 20000 });
+      ok('after the owner confirms it, the open setup is asked and the switch is on', await p.isChecked('#an-auto') && /On: the analyst is asked on every setup of this run/.test(await txt(p, '#an-auto-on')), await txt(p, '#an-auto-on'));
+      await goOn(p); await nextPoint(p); await p.waitForSelector('#an-answer', { timeout: 20000 }); const c4 = await candNow(p);
+      const auto = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c4.id)}&engine=language-model`)).attempts;
+      ok('the next setup of the run is asked by itself, once, after the engine\'s own attempt', c4.id !== c3.id && auto.length === 1 && reqs.slice(-2).join() === 'attempt,analyse', reqs.slice(-3).join(' '));
+      await p.click('#an-auto'); ok('unticking the switch stops it', !(await p.isChecked('#an-auto')) && (await p.$$('#an-auto-on')).length === 0);
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await p.evaluate(CONTRAST); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }   // 350 ms: colour transitions have ended
+      await p.evaluate(() => { delete document.documentElement.dataset.theme; });
+      ok('fake flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
+      await ctx.close();
+    }
+    // ---- C. the phone ----
+    {
+      const { ctx, p, errs } = await open(b, fake.base, { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }); await p.goto(fake.base + '/academy', { waitUntil: 'load' }); await run(p, null);
+      await p.tap('#c-play'); await nextPoint(p); await p.tap('#an-ask'); await p.waitForSelector('#an-answer', { timeout: 20000 }); await p.evaluate(() => document.getElementById('an-block').scrollIntoView());
+      const w = await p.evaluate(() => document.documentElement.scrollWidth), small = await p.evaluate(SMALL), taps = await p.evaluate(TAPS);
+      ok('390 px: no sideways scroll with the analyst\'s answer open', w <= 390, w); ok('390 px: every text is 12 px or more (analyst)', small.length === 0, small.slice(0, 4).join(' ; ')); ok('390 px, touch: every control is at least 44 px tall (analyst)', taps.length === 0, taps.slice(0, 5).join(' ; '));
+      ok('390 px: the fake banner is still on screen with the answer', await vis(p, '#an-fake') && errs.length === 0, errs.slice(0, 2).join(' | '));
+      await ctx.close();
+    }
+  } catch (e) { ok('the analyst audit ran to the end', false, e.message.split('\n')[0]); }
+  finally { if (b) await b.close().catch(() => {}); stop(off); stop(fake); }
+  const bad = A.filter((r) => !r.ok);
+  for (const r of A) console.log((r.ok ? 'ok   ' : 'FAIL ') + r.name + (r.ok || !r.info ? '' : ' :: ' + r.info));
+  console.log(`\nAcademy analyst audit: ${A.length - bad.length} of ${A.length} checks passed` + (bad.length ? `, ${bad.length} FAILED` : '') + ' (fake provider only: no real language-model call is ever made here)');
+  return bad.length;
+}

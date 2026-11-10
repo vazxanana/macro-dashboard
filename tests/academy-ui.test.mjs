@@ -205,7 +205,7 @@ test('academy.html: owner card, the nine sections, the scripts in order, built b
   for (const [id] of MXAC.TABS) assert.match(html, new RegExp(`<section id="ac-${id}" role="tabpanel"`), id);
   for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js fills it from stored data`);
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js', '/assets/academy-tabs.js']);
+  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js', '/assets/academy-tabs.js', '/assets/academy-analyst.js']);
   assert.ok(!/\son[a-z]+="/.test(html), 'no inline event handlers');
   assert.ok(!/Coming in the next build step|\(next step\)/.test(ui + src('assets/academy-tabs.js') + html), 'no placeholder is left: a section works or says honestly what is missing');
   assert.match(ui, /if \(!me \|\| me\.u !== 'owner'\) \{ \$\('ac-gate'\)\.hidden = false; return; \}/, 'anyone but the owner gets the card and the page stops there');
