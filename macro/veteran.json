@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-10T12:44:12.000Z",
+ "at": "2026-11-10T13:15:49.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-10T12:44:05.000Z",
+ "strategistAt": "2026-11-10T13:15:34.000Z",
  "shock": {
   "shock": "Mixed / no dominant shock",
   "clues": [
@@ -57,7 +57,7 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 1 bp",
+   "obs": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week",
    "lean": 0,
    "asOf": "2026-11-06",
    "stale": false,
@@ -117,7 +117,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.03 pts in 5 sessions (vote flat); score z (4-week fall) +0.05",
+   "macro": "+0.06 pts in 5 sessions (vote flat); score z (4-week fall) +0.05",
    "veteran": "DXY 102.36, +0.27% on the week, +0.13% over 4 weeks · broad USD +0.36% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -259,21 +259,21 @@
     "k": "v_dxy4w",
     "vs": "dxymom",
     "challenger": {
-     "n": 622,
-     "hit": 0.498,
-     "t": -0.08,
+     "n": 278,
+     "hit": 0.5,
+     "t": 0,
      "proven": false
     },
     "incumbent": {
-     "n": 760,
-     "hit": 0.488,
-     "t": -0.65,
+     "n": 387,
+     "hit": 0.491,
+     "t": -0.36,
      "proven": false
     }
    }
   ],
   "recent": [],
-  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.65. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
  },
  "releases": [
   {
@@ -643,7 +643,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week · SOFR−EFFR 1 bp (as of 2026-11-06)",
+     "read": "VIX 25.6 (VIX/VIX3M 1.04) · HY OAS 3.42%, −2 bp on the week (as of 2026-11-06)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -835,7 +835,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall."
  },
  "briefing": {
-  "at": "2026-11-10T12:44:12.000Z",
+  "at": "2026-11-10T13:15:49.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -843,7 +843,7 @@
     "lean": 0,
     "fx": "Hot → EUR/USD down (DXY up), USD/JPY up; cool the reverse.",
     "k": "event",
-    "score": 3.19,
+    "score": 3.2,
     "event": {
      "title": "Core CPI m/m",
      "country": "USD",
@@ -890,11 +890,6 @@
       "text": "HY OAS 3.42%, −2 bp on the week",
       "asOf": "2026-11-06",
       "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
-     },
-     {
-      "text": "SOFR − EFFR 1 bp",
-      "asOf": "2026-11-06",
-      "source": "NY Fed SOFR / EFFR via FRED"
      }
     ],
     "why": "In stress gold is often sold first for cash (margin calls), then bought as a haven: expect wider swings both ways, not a direction. Calm funding (SOFR − EFFR small) means a dash for cash is less likely.",
@@ -3827,7 +3822,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-10 12:44 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: Positioning, Regime. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.78% (+15 bp from 2.63%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.65. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD Core CPI m/m on Tue, 10 Nov is the week's pivot | 2. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 3. Real yields fell 28 bp in 4 weeks (10Y TIPS 2.63%) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). USD Core CPI m/m (Tue 10 Nov, 13:30 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: USD Core CPI m/m 2026-11-10 13:30 UTC: consensus 0.2% (previous 0.3%); P(gold up on the day) 58% vs base 54%; past CPI days n 86, gold up 59%, median |move| 0.613%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-10 13:15 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: Positioning, Regime. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.78% (+15 bp from 2.63%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.1 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD Core CPI m/m on Tue, 10 Nov is the week's pivot | 2. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 3. Real yields fell 28 bp in 4 weeks (10Y TIPS 2.63%) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). USD Core CPI m/m (Tue 10 Nov, 13:30 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: USD Core CPI m/m 2026-11-10 13:30 UTC: consensus 0.2% (previous 0.3%); P(gold up on the day) 58% vs base 54%; past CPI days n 86, gold up 59%, median |move| 0.613%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "eventsRecord": {
   "n": 0,
   "open": 1
