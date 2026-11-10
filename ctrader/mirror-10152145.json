@@ -5020,6 +5020,33 @@
     "status": "open",
     "stopCheckedAt": "2026-11-10T13:36:14.000Z",
     "brokerStop": 85.096
+   },
+   "eth-intraday-1794318507": {
+    "positionId": "48064246",
+    "symbol": "ETHUSD",
+    "side": "sell",
+    "volume": 2,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "intraday",
+    "status": "open",
+    "openedAt": "2026-11-10T13:49:36.000Z",
+    "councilEntry": 2073.89,
+    "stop": 2151.2603214285714,
+    "t1": 1910.4793571428572,
+    "riskCash": 1.98,
+    "margin": 4.14,
+    "shadow": true,
+    "mark": 2073.89,
+    "levelsFrom": "mark",
+    "fillPrice": 2070.21,
+    "slipR": 0.048,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T13:49:36.000Z",
+    "brokerStop": 2147.58
    }
   },
   "day": {
@@ -5027,7 +5054,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9922.39 · 17 open",
+  "status": "ok · demo Fusion Markets · balance 9922.39 · 18 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5043,14 +5070,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9922.39,
-  "lastRun": "2026-11-10T13:47:04.000Z"
+  "lastRun": "2026-11-10T13:49:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T05:56:10.000Z",
-   "msg": "limit filled: BTCUSD position 47918888 at the broker",
-   "trade": "btc-rscalp-1794289641"
-  },
   {
    "at": "2026-11-10T06:03:17.000Z",
    "msg": "BTCUSD position 47918888 closed at the broker",
@@ -6545,6 +6567,11 @@
    "at": "2026-11-10T13:47:04.000Z",
    "msg": "cancelled USDCHF limit order 33869654 for usdchf-scalp-1794317861: the council ended it: missed",
    "trade": "usdchf-scalp-1794317861"
+  },
+  {
+   "at": "2026-11-10T13:49:36.000Z",
+   "msg": "opened sell ETHUSD 0.02 lot (council intraday)",
+   "trade": "eth-intraday-1794318507"
   }
  ],
  "limits": {
@@ -6623,11 +6650,11 @@
   ]
  },
  "execution": {
-  "n": 168,
-  "meanSlipR": -0.018,
-  "medianSlipR": -0.001,
+  "n": 169,
+  "meanSlipR": -0.017,
+  "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 179,
+  "medianLagSec": 177,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -6638,8 +6665,8 @@
     "meanSlipR": -0.069
    },
    "ETHUSD": {
-    "n": 6,
-    "meanSlipR": -0.06
+    "n": 7,
+    "meanSlipR": -0.045
    },
    "EURUSD": {
     "n": 32,
