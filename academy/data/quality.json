@@ -1,0 +1,680 @@
+{
+ "thresholds": {
+  "CERT_COVERAGE": 0.995,
+  "USABLE_COVERAGE": 0.97,
+  "CERT_MAX_GAP_SEC": 86400,
+  "SPIKE_K": 12,
+  "SPIKE_WIN": 100,
+  "SPIKE_MIN": 30,
+  "MAX_SPIKE_RATE": 0.001,
+  "MAX_OFFSESSION": 0.01,
+  "SHIFT_MIN_DAYS": 3,
+  "MAX_SHIFT_WEEKS": 0.1,
+  "MAX_FLAT_CERT": 0.001,
+  "MAX_FLAT_UNRELIABLE": 0.05,
+  "END_TOL": 0.05
+ },
+ "clock": {
+  "finding": "The HistData labels are New York time in 2018 and UTC-5 / UTC-4 on Europe's summer-time dates from 2019 (research/edge/histdata-clock, 10 Nov 2026). The loaders convert with council/histdata.mjs, so the candidates and outcomes here carry true UTC times. Until that date the studies read every year as New York time, which stamped every bar one hour EARLY in the weeks the US is on daylight time and Europe is not (2019 on); the files of that state are in academy/archive/pre-clock and in git at 81f35f51.",
+  "converter": "council/histdata.mjs",
+  "audit": "research/edge/histdata-clock/RESULT.md",
+  "evidence": {
+   "oandaWeeks": {
+    "xau": {
+     "symbol": "XAUUSD",
+     "weeks": 461,
+     "readable": 438,
+     "decisive": 437,
+     "agreeWithConverter": 437
+    },
+    "nas100": {
+     "symbol": "NSXUSD",
+     "weeks": 461,
+     "readable": 438,
+     "decisive": 436,
+     "agreeWithConverter": 436
+    }
+   },
+   "releaseMinutes": {
+    "xau": {
+     "clear": 205,
+     "agree": 205
+    },
+    "nas100": {
+     "clear": 126,
+     "agree": 124
+    }
+   },
+   "uncertifiedYears": {
+    "xau": [
+     2023
+    ],
+    "nas100": [
+     2018,
+     2020,
+     2023,
+     2024
+    ]
+   },
+   "uncertifiedNote": "years that miss one of the audit's pre-registered criteria (2023: the files have a hole from 20 Feb to 30 Jul; NSXUSD 2018 and 2020: one release misread; NSXUSD 2024: two change weekends disturbed by Easter and a late first bar). Every decisive week of those years agrees with the converter.",
+   "check": "clock-shift (academy/quality.mjs): a week in which, on at least 3 of Monday-Thursday, the daily break sits one hour away from its New York time. On the corrected clock it should find none.",
+   "mismatchWeeksInSpan": 32,
+   "weeksDetected": {
+    "xau": 0,
+    "nas100": 0
+   },
+   "detected": {
+    "xau": [],
+    "nas100": []
+   },
+   "repeatedHourDays": [
+    "2019-10-27",
+    "2020-10-25",
+    "2021-10-31",
+    "2022-10-30",
+    "2023-10-29",
+    "2024-10-27",
+    "2025-10-26"
+   ],
+   "repeatedHourNote": "days whose raw gold file repeats one whole hour of minute labels: each is the last Sunday of October (2019 on), the European change. The repeated rows are identical copies and are dropped at load."
+  },
+  "crossCheck": {
+   "file": "academy/data/clock-check.json",
+   "checked": "2026-11-10",
+   "feed": "meridianx.dev /md/bars sym=xau tf=1h (OANDA XAU_USD)",
+   "weeks": 27,
+   "weeksOff": 0,
+   "everyWeekAgrees": true
+  },
+  "flag": "rule.clockShift = true now means: the week of this setup could NOT be verified against the second feed (the files are too thin that week, or the hourly match was not decisive). Its time is converted with the same rule as every other week; it is not known to be wrong, it is not proven right. These setups stay out of replay lists, tests, training and research, as before.",
+  "unverifiedWeeks": {
+   "xau": [
+    "2022-05-02",
+    "2023-02-20",
+    "2023-02-27",
+    "2023-03-06",
+    "2023-03-13",
+    "2023-03-20",
+    "2023-03-27",
+    "2023-04-03",
+    "2023-04-10",
+    "2023-04-17",
+    "2023-04-24",
+    "2023-05-01",
+    "2023-05-08",
+    "2023-05-15",
+    "2023-05-22",
+    "2023-05-29",
+    "2023-06-05",
+    "2023-06-12",
+    "2023-06-19",
+    "2023-06-26",
+    "2023-07-03",
+    "2023-07-10",
+    "2023-07-17",
+    "2023-07-24"
+   ],
+   "nas100": [
+    "2023-02-20",
+    "2023-02-27",
+    "2023-03-06",
+    "2023-03-13",
+    "2023-03-20",
+    "2023-03-27",
+    "2023-04-03",
+    "2023-04-10",
+    "2023-04-17",
+    "2023-04-24",
+    "2023-05-01",
+    "2023-05-08",
+    "2023-05-15",
+    "2023-05-22",
+    "2023-05-29",
+    "2023-06-05",
+    "2023-06-12",
+    "2023-06-19",
+    "2023-06-26",
+    "2023-07-03",
+    "2023-07-10",
+    "2023-07-17",
+    "2023-07-24",
+    "2025-03-31",
+    "2025-08-11"
+   ]
+  },
+  "flagged": {
+   "replica": 18,
+   "mosha-bo": 4,
+   "gtrend": 3,
+   "gtl": 16,
+   "geg": 10,
+   "gmp": 34,
+   "nq-open": 16
+  }
+ },
+ "markets": {
+  "xau": {
+   "source": "HistData XAUUSD M1 (council-data research/candles/xau-histdata), labels converted to UTC with council/histdata.mjs, aggregated to H1",
+   "tf": "1h",
+   "calendar": "spot gold: Sun 18:00 - Fri 17:00 New York, daily break 17:00-18:00",
+   "usedBy": [
+    "replica",
+    "mosha-bo",
+    "gtrend",
+    "gtl",
+    "geg",
+    "gmp"
+   ],
+   "rawM1": {
+    "files": 29,
+    "rows": 3082748,
+    "duplicateLabels": 1624,
+    "identicalRows": 422,
+    "repeatedHourDays": [
+     "2019-10-27",
+     "2020-10-25",
+     "2021-10-31",
+     "2022-10-30",
+     "2023-10-29",
+     "2024-10-27",
+     "2025-10-26"
+    ],
+    "firstLabel": "20180101 180100",
+    "lastLabel": "20261030 155800"
+   },
+   "status": "usable",
+   "coverage": 0.97918,
+   "bars": 51544,
+   "expected": 52509,
+   "missing": 1093,
+   "maxGapHours": 23,
+   "span": {
+    "from": 1514847600,
+    "to": 1793390400
+   },
+   "counts": {
+    "flat": 110,
+    "off-session": 128,
+    "gap": 710,
+    "spike": 6
+   },
+   "worstGaps": [
+    {
+     "from": 1640300400,
+     "to": 1640559600,
+     "missing": 23
+    },
+    {
+     "from": 1672009200,
+     "to": 1672095600,
+     "missing": 23
+    },
+    {
+     "from": 1672614000,
+     "to": 1672700400,
+     "missing": 23
+    },
+    {
+     "from": 1790294400,
+     "to": 1790546400,
+     "missing": 21
+    },
+    {
+     "from": 1622433600,
+     "to": 1622505600,
+     "missing": 19
+    },
+    {
+     "from": 1606712400,
+     "to": 1606780800,
+     "missing": 18
+    },
+    {
+     "from": 1558908000,
+     "to": 1558933200,
+     "missing": 7
+    },
+    {
+     "from": 1764950400,
+     "to": 1765148400,
+     "missing": 6
+    }
+   ],
+   "clockShift": [],
+   "byYear": {
+    "2018": {
+     "status": "unreliable",
+     "bars": 6035,
+     "coverage": 0.99562,
+     "missing": 26,
+     "counts": {
+      "flat": 108,
+      "off-session": 127,
+      "gap": 8
+     }
+    },
+    "2019": {
+     "status": "usable",
+     "bars": 5899,
+     "coverage": 0.9941,
+     "missing": 35,
+     "counts": {
+      "gap": 11,
+      "flat": 1,
+      "spike": 1
+     }
+    },
+    "2020": {
+     "status": "usable",
+     "bars": 5907,
+     "coverage": 0.99161,
+     "missing": 50,
+     "counts": {
+      "gap": 11
+     }
+    },
+    "2021": {
+     "status": "usable",
+     "bars": 5891,
+     "coverage": 0.98892,
+     "missing": 66,
+     "counts": {
+      "gap": 9,
+      "spike": 2
+     }
+    },
+    "2022": {
+     "status": "usable",
+     "bars": 5914,
+     "coverage": 0.99278,
+     "missing": 43,
+     "counts": {
+      "gap": 10
+     }
+    },
+    "2023": {
+     "status": "unreliable",
+     "bars": 5153,
+     "coverage": 0.87176,
+     "missing": 758,
+     "counts": {
+      "gap": 628,
+      "spike": 1
+     }
+    },
+    "2024": {
+     "status": "certified",
+     "bars": 5933,
+     "coverage": 0.99597,
+     "missing": 24,
+     "counts": {
+      "gap": 11
+     }
+    },
+    "2025": {
+     "status": "certified",
+     "bars": 5905,
+     "coverage": 0.99511,
+     "missing": 29,
+     "counts": {
+      "gap": 12
+     }
+    },
+    "2026": {
+     "status": "usable",
+     "bars": 4907,
+     "coverage": 0.99211,
+     "missing": 39,
+     "counts": {
+      "gap": 9,
+      "spike": 1,
+      "flat": 1,
+      "off-session": 1
+     }
+    }
+   }
+  },
+  "nas100": {
+   "source": "HistData NSXUSD M1 (council-data research/candles/nsxusd-histdata), labels converted to UTC with council/histdata.mjs, aggregated to H1",
+   "tf": "1h",
+   "calendar": "NSXUSD (HistData): Sun 18:00 - Fri 16:15 New York, daily break 16:15-18:00",
+   "usedBy": [
+    "nq-open"
+   ],
+   "rawM1": {
+    "files": 18,
+    "rows": 2981326,
+    "duplicateLabels": 856,
+    "identicalRows": 420,
+    "repeatedHourDays": [
+     "2019-10-27",
+     "2020-10-25",
+     "2021-10-31",
+     "2022-10-30",
+     "2023-10-29",
+     "2024-10-27",
+     "2025-10-26",
+     "2026-06-29"
+    ],
+    "firstLabel": "20180101 163000",
+    "lastLabel": "20261030 151300"
+   },
+   "status": "usable",
+   "coverage": 0.97614,
+   "bars": 51406,
+   "expected": 52509,
+   "missing": 1253,
+   "maxGapHours": 26,
+   "span": {
+    "from": 1514840400,
+    "to": 1793390400
+   },
+   "counts": {
+    "flat": 120,
+    "off-session": 150,
+    "gap": 700,
+    "spike": 10,
+    "incomplete": 1
+   },
+   "worstGaps": [
+    {
+     "from": 1688407200,
+     "to": 1688508000,
+     "missing": 26
+    },
+    {
+     "from": 1640300400,
+     "to": 1640559600,
+     "missing": 23
+    },
+    {
+     "from": 1672009200,
+     "to": 1672095600,
+     "missing": 23
+    },
+    {
+     "from": 1672614000,
+     "to": 1672700400,
+     "missing": 23
+    },
+    {
+     "from": 1790294400,
+     "to": 1790546400,
+     "missing": 21
+    },
+    {
+     "from": 1622433600,
+     "to": 1622505600,
+     "missing": 19
+    },
+    {
+     "from": 1606712400,
+     "to": 1606780800,
+     "missing": 18
+    },
+    {
+     "from": 1584313200,
+     "to": 1584363600,
+     "missing": 14
+    }
+   ],
+   "clockShift": [],
+   "byYear": {
+    "2018": {
+     "status": "unreliable",
+     "bars": 6029,
+     "coverage": 0.99376,
+     "missing": 37,
+     "counts": {
+      "flat": 113,
+      "off-session": 132,
+      "gap": 10
+     }
+    },
+    "2019": {
+     "status": "usable",
+     "bars": 5890,
+     "coverage": 0.99259,
+     "missing": 44,
+     "counts": {
+      "gap": 12,
+      "flat": 3,
+      "spike": 3
+     }
+    },
+    "2020": {
+     "status": "usable",
+     "bars": 5875,
+     "coverage": 0.98623,
+     "missing": 82,
+     "counts": {
+      "gap": 17,
+      "spike": 1,
+      "flat": 2
+     }
+    },
+    "2021": {
+     "status": "usable",
+     "bars": 5907,
+     "coverage": 0.98892,
+     "missing": 66,
+     "counts": {
+      "gap": 9,
+      "off-session": 16
+     }
+    },
+    "2022": {
+     "status": "usable",
+     "bars": 5902,
+     "coverage": 0.99077,
+     "missing": 55,
+     "counts": {
+      "gap": 10,
+      "spike": 3
+     }
+    },
+    "2023": {
+     "status": "unreliable",
+     "bars": 5136,
+     "coverage": 0.86855,
+     "missing": 777,
+     "counts": {
+      "gap": 593,
+      "flat": 1,
+      "off-session": 2
+     }
+    },
+    "2024": {
+     "status": "usable",
+     "bars": 5893,
+     "coverage": 0.98926,
+     "missing": 64,
+     "counts": {
+      "gap": 23,
+      "spike": 2
+     }
+    },
+    "2025": {
+     "status": "usable",
+     "bars": 5878,
+     "coverage": 0.99056,
+     "missing": 56,
+     "counts": {
+      "gap": 14,
+      "spike": 1,
+      "flat": 1
+     }
+    },
+    "2026": {
+     "status": "usable",
+     "bars": 4896,
+     "coverage": 0.99009,
+     "missing": 49,
+     "counts": {
+      "gap": 11
+     }
+    }
+   },
+   "openWindow": {
+    "what": "the 1-minute candles the open-run rule reads: 09:30-11:00 New York on trading days",
+    "tf": "1m",
+    "calendar": "weekdays 09:30-11:00 New York",
+    "status": "unreliable",
+    "coverage": 0.97064,
+    "bars": 199710,
+    "expected": 205470,
+    "missing": 6032,
+    "maxGapHours": 4.5,
+    "span": {
+     "from": 1514903400,
+     "to": 1793372340
+    },
+    "counts": {
+     "spike": 42,
+     "flat": 247,
+     "gap": 119,
+     "duplicate": 272
+    },
+    "worstGaps": [
+     {
+      "from": 1684416600,
+      "to": 1684848600,
+      "missing": 270
+     },
+     {
+      "from": 1677510000,
+      "to": 1677682800,
+      "missing": 180
+     },
+     {
+      "from": 1680184800,
+      "to": 1680530400,
+      "missing": 180
+     },
+     {
+      "from": 1684159200,
+      "to": 1684332000,
+      "missing": 180
+     },
+     {
+      "from": 1688392800,
+      "to": 1688563800,
+      "missing": 150
+     },
+     {
+      "from": 1677767400,
+      "to": 1677855600,
+      "missing": 120
+     },
+     {
+      "from": 1679405400,
+      "to": 1679493600,
+      "missing": 120
+     },
+     {
+      "from": 1681306200,
+      "to": 1681394400,
+      "missing": 120
+     }
+    ],
+    "clockShift": [],
+    "byYear": {
+     "2018": {
+      "status": "usable",
+      "bars": 23131,
+      "coverage": 0.99617,
+      "missing": 89,
+      "counts": {
+       "spike": 6,
+       "flat": 2,
+       "gap": 1
+      }
+     },
+     "2019": {
+      "status": "usable",
+      "bars": 23219,
+      "coverage": 0.99996,
+      "missing": 1,
+      "counts": {
+       "flat": 2,
+       "gap": 1,
+       "spike": 3
+      }
+     },
+     "2020": {
+      "status": "usable",
+      "bars": 23171,
+      "coverage": 0.99404,
+      "missing": 139,
+      "counts": {
+       "gap": 7,
+       "spike": 3
+      }
+     },
+     "2021": {
+      "status": "usable",
+      "bars": 23127,
+      "coverage": 0.99215,
+      "missing": 183,
+      "counts": {
+       "spike": 19,
+       "gap": 3
+      }
+     },
+     "2022": {
+      "status": "certified",
+      "bars": 23214,
+      "coverage": 0.99588,
+      "missing": 96,
+      "counts": {
+       "gap": 3
+      }
+     },
+     "2023": {
+      "status": "unreliable",
+      "bars": 17943,
+      "coverage": 0.77575,
+      "missing": 5187,
+      "counts": {
+       "gap": 79,
+       "flat": 3
+      }
+     },
+     "2024": {
+      "status": "usable",
+      "bars": 23305,
+      "coverage": 0.99979,
+      "missing": 5,
+      "counts": {
+       "spike": 3,
+       "flat": 1,
+       "gap": 1
+      }
+     },
+     "2025": {
+      "status": "usable",
+      "bars": 23107,
+      "coverage": 0.99513,
+      "missing": 113,
+      "counts": {
+       "gap": 5,
+       "spike": 7
+      }
+     },
+     "2026": {
+      "status": "unreliable",
+      "bars": 19493,
+      "coverage": 0.99333,
+      "missing": 129,
+      "counts": {
+       "gap": 18,
+       "flat": 239,
+       "duplicate": 272,
+       "spike": 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

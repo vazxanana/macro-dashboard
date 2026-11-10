@@ -11,6 +11,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { MARKETS, P, MIN_GRADE, agg, signals, inHalt, isASetup, isAPlus, sizeOf } from '../../../ict/tracker.mjs';
 import { simulate } from '../../../ict/replay.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const DIR = process.argv[2], OUT = process.argv[3] || 'ict-filters-trades.json';
 const SRC = { nq: 'nsxusd-histdata', es: 'spxusd-histdata', gc: 'xau-histdata' };
@@ -19,8 +20,7 @@ function loadM1(dir) {
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.csv.gz')).sort(), out = [];
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString().split('\n')) {
     if (!ln) continue; const [d, o, h, l, c] = ln.split(';');
-    // HistData stamps are EST without DST -> UTC = +5 h
-    const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(d);
     out.push({ time: t, open: +o, high: +h, low: +l, close: +c });
   }
   return out.sort((a, b) => a.time - b.time);

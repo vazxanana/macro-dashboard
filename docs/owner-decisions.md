@@ -1,11 +1,11 @@
-# Open owner decisions (9 Nov 2026; item 26 added 10 Nov)
+# Open owner decisions (9 Nov 2026; items 19 to 26 added 10 Nov)
 
 One checklist of what waits on the owner's yes or no. Each item: what it is, why it matters, the options, and the recommended
 one. Nothing below has been changed in the code; each item names where the change would go. Tick an item when it is decided and
 note the answer next to it (or in the PR that carries it out).
 
-Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research connector), **Trading on paper and demo** (9-14),
-**Reliability and data** (15-16), **Council proposals the study already answered** (17-18).
+Grouped: **Security** (1-8 and 26, of which 7-8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
+and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock, 10 Nov 2026** (19-25).
 
 ---
 
@@ -239,3 +239,101 @@ No difference (−0.001R a position over 719 positions). **Recommended: yes, clo
 ### [ ] 18. Proposal 2: no cost gate on the gold systems
 
 The trades a 0.10R cost gate would skip made +0.42R each. **Recommended: yes.** Nothing changes in the code.
+
+---
+
+## The research candle clock (10 Nov 2026)
+
+The HistData research candles were being read on the wrong clock. A pre-registered audit settled the rule and every study
+loader now uses one converter (`council/histdata.mjs`); the audit and the before → after table of every study are in
+`research/edge/histdata-clock/RESULT.md`, the Academy's part in `docs/academy/DATA-CLOCK.md`. No trading rule, live member
+or config was changed. The items below are what that work leaves for the owner.
+
+### [ ] 19. Monitoring baselines rebuilt on the corrected clock (already committed: confirm or revert)
+
+- **Context.** Three baseline files the council reads were rebuilt with their own build scripts, because their source studies
+  moved. They are monitoring baselines, not trading rules. A control build on the old study files reproduced each published
+  file exactly, so every change is the clock.
+
+  | File | What moved | Before | After |
+  |---|---|---|---|
+  | `council/decay-base.json` (decay monitor), `council/expect-base.json` ("What to expect", backtest block) | Mosha BO: n, R a trade, SD, worst drawdown, drawdown limit | 147, +0.009, 2.040, 39.2R, 39.2R | 157, −0.064, 1.969, 46.0R, 46.0R |
+  | same | Gold H4 trendline | 302, +0.142, 1.241, 19.2R, 19.4R | 304, +0.106, 1.169, 20.2R, 21.0R |
+  | same | Gold daily engulf | 217, +0.197, 1.698, 14.8R, 22.3R | 217, +0.198, 1.698, 14.7R, 22.3R |
+  | same | Gold momentum pullback | 1,003, +0.041, 1.282, 40.0R, 50.6R | 1,004, +0.043, 1.286, 40.1R, 49.7R |
+  | same | Gold replica, gold trend N20 / N5, NQ open run, ICT A-setups, crypto trend | unchanged | identical |
+  | `council/expect-base.json` | Momentum pullback, built-on window 2023-26 | 370 trades, +0.185R, t 2.74 | 370, +0.191R, t 2.80 |
+  | `council/event-base.json` (veteran's event playbook) | CPI rows | 85 (13 Mar 2018 dropped by the spike check) | 86 (13 Mar 2018 kept: the 2018 files are on New York time) |
+  | same | The one pre-registered test | FAILED, 34 of 72, p 0.72 | FAILED, 34 of 73, p 0.76 |
+
+- **What it means.** The decay monitor now watches Mosha BO against a baseline of −0.064R a trade and a 46R drawdown limit
+  (was +0.009R and 39R). Nothing else of weight moved.
+- **Options.** (a) Keep the rebuilt files. (b) Revert the commit titled "Monitoring baselines rebuilt on the corrected candle
+  clock" and keep the old-clock baselines.
+- **Recommended: (a).** The old numbers were computed on bars an hour off in four weeks a year. Separately, a live system
+  whose 8-year rebuild makes nothing (Mosha BO) is worth a look of its own.
+
+### [ ] 20. ICT variant "sweep into an unfilled D1/H4 FVG" now passes its pre-registered bar (index book)
+
+- **Context.** `research/edge/ict-variants` was pre-registered and failed on 9 Nov. On the corrected clock its script gives
+  PASS for one of nine verdicts: V3 htffvg, index book: in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92;
+  2024 lost (21 trades, −0.5R); not "strong". The plan itself warns that with nine tries one pass by luck is plausible. The
+  ict-filters study, on the same corrected clock, no longer picks this filter in-sample. The desk already records the
+  feature on every signal (`feat.htfFvg`, skill §29), so a forward record is building.
+- **Options.** (a) Do nothing new: keep forward-testing the recorded feature. (b) Add a paper shadow variant for it
+  (never alerted, as the other shadows). (c) Change the live A-rule.
+- **Recommended: (a).** One pass of nine with t under 2 in both halves is a hypothesis. Never (c) on this evidence.
+
+### [ ] 21. `ict/replay.mjs` still reads HistData files with the old clock (live code, not changed)
+
+- **Where.** `ict/replay.mjs` line 79: `... / 1000 + 5 * 3600` on the HistData stamp, inside the back-fill for `HD`
+  (line 67: EUR/USD and GBP/USD only).
+- **Effect today: none.** Both pairs left the desk's markets on 7 Nov, so no market reaches this branch. If a pair came
+  back, its back-filled candles would be one hour late for the whole of Europe's summer (session tags, kill zones, the
+  halt hour and the 18:00 New York day would all be off by an hour for those months).
+- **Proposed fix.** Replace the expression with `histStampUtc(d)` from `council/histdata.mjs` (one import, one line), or
+  delete the dead branch. The test `tests/histdata-clock.test.mjs` lists this file as the one allowed exception; remove
+  it from `MAY_PARSE` when fixed.
+- **Recommended: fix it the next time the replay is touched.** It is a one-line change to a file that runs live.
+
+### [ ] 22. Academy: 101 setups stay flagged (weeks nobody could verify)
+
+- **Context.** `rule.clockShift` now means "the week of this setup could not be checked against a second feed": 24 weeks
+  for gold and 25 for NAS100, almost all in the hole of the 2023 files (20 Feb to 30 Jul 2023). They stay out of lists,
+  tests, training and research. Separately, five symbol-years miss one of the audit's strict criteria (gold 2023; NAS100
+  2018, 2020, 2023, 2024) although every week of them that could be read agrees with the converter; their verified weeks
+  ARE in the working pool (`docs/academy/DATA-CLOCK.md` section 3 has both readings side by side).
+- **Options.** (a) Keep it as built. (b) Stricter: also drop every setup of the five uncertified years (the "certified
+  years only" column: nq-open would fall from 545 usable trades to 326). (c) Looser: unflag the 101.
+- **Recommended: (a).** (b) throws away 53 verified NAS100 weeks a year for one misread release; (c) trusts weeks nobody
+  could check.
+
+### [ ] 23. Studies still on the old clock
+
+- **Context.** Their loaders are fixed, but these were not re-run (each RESULT.md says so in a line under its title):
+  the long engine replays `scalp-filters`, `scalp-exits`, `timing`, `regime`, `setups-promote`, `confluence`, `costs`
+  (hours of machine time between them; every one is a FAIL on the Scalp or on a setup that is not live), `ict-smile`
+  (needs FRED), `ict-sessions` (inputs cannot be reproduced; its verdict fields do not move with the clock).
+- **Options.** (a) Re-run them on a free runner when convenient (the commands are in each RESULT.md). (b) Leave them.
+- **Recommended: (a), low priority.** None of them carries a live rule. Until then, read their numbers as old-clock numbers.
+
+### [ ] 24. The dollar-index file of 2018 is not a usable series
+
+- **Context.** The clock audit could not check `UDXUSD` 2018: its hourly returns do not follow EUR/USD at any offset
+  (correlation near zero in 50 weeks) and its weekly reopen matches in 3 of 52 weekends. From 2019 the file is fine.
+  The veteran's event playbook (`council/event-base.json`) uses it for the dollar's first read on the eight 2018 CPI rows.
+- **Options.** (a) Drop the 2018 rows from the event base (a change to the event-reaction study's pre-registered data
+  window: needs an amendment). (b) Keep them, labelled. (c) Find another 2018 dollar-index series.
+- **Recommended: (a) with a dated amendment.** Eight of 86 CPI rows; the playbook's figures are descriptive only.
+
+### [ ] 25. COT release lag in the Macro strategist (found by the unmerged `wip/data-clock-fixes` branch; not changed here)
+
+- **Where.** `council/macro.mjs` line 59 (`COT_LAG = 4`) and line 245 (`r.t <= D - COT_LAG * DAY`).
+- **Effect.** A CFTC report dated Tuesday is taken as public four days later. In a holiday week the CFTC publishes on the
+  following Monday, so the strategist's COT driver can read a report up to two days before it was public. The same lines
+  compute the "3-year" percentile over the last 60 rows of a pull that mixes two contracts. `council/cot.mjs` already has
+  the right release clock (`usableAt`, `RELEASE_LAG`).
+- **Proposed fix.** Use `cot.mjs` `usableAt` for the cut and its 156-week percentile, as the wip branch drafted
+  (unverified; it also changed `council/veteran.mjs` staleness and added tests). This is not the HistData clock and it
+  changes what a live member computes, so it was left for the owner.
+- **Recommended: yes, as its own reviewed change with tests.** Paper only either way.

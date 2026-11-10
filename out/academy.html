@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<title>MeridianX Academy</title>
+<meta name="description" content="MeridianX Academy: replay real candles, watch the apprentice decide on each edge candidate, correct it, save the lesson and prove what it learned. Paper only.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<style>@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-ext-f153aa07.woff2?v=f153aa07c1) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-8330490a.woff2?v=8330490a01) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-ext-9343de2c.woff2?v=9343de2ca5) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-4995a9a4.woff2?v=4995a9a43a) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-greek-49c3da6c.woff2?v=49c3da6c9a) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-vietnamese-d44eb193.woff2?v=d44eb19360) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-latin-ext-9c38cb2d.woff2?v=9c38cb2d0d) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-latin-2c32b9b3.woff2?v=2c32b9b3ee) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}</style>
+<script>
+  // Same theme key as the desk (localStorage msPrefs.theme): light, midnight, anything else dark; with nothing saved the page follows the system.
+  (function () {
+    try {
+      var p = JSON.parse(localStorage.getItem('msPrefs') || 'null');
+      if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark';
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="/assets/mx-page.css?v=63765a2737">
+<link rel="stylesheet" href="/assets/academy.css?v=a9e3e060f5">
+<link rel="stylesheet" href="/assets/academy-analyst.css?v=fc15975e51">
+<!-- app tags: scripts/pwa.mjs -->
+<link rel="manifest" href="/app.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meridian X">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="/assets/pwa.js?v=f264828d81" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the Academy</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <span class="crumb" aria-hidden="true">/</span>
+    <span class="brand here">Academy</span>
+    <div class="check">
+      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro, ChronosTrade or Academy"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a><a class="on" href="/academy" aria-current="page" title="MeridianX Academy"><i aria-hidden="true"></i><span>Academy</span></a></nav>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="ac-head">
+    <h1>MeridianX Academy</h1>
+    <p class="ac-lede">Replay real candles. On each setup an edge produces, the apprentice says buy, sell or wait and shows its evidence; you correct it, save the lesson, and test whether it learned. Replay and paper only: nothing here talks to a broker.</p>
+  </div>
+
+  <section class="card ac-gate" id="ac-gate" hidden aria-live="polite">
+    <h2>Owner only</h2>
+    <p>The Academy is for the desk owner. Sign in on the desk.</p>
+    <p><a class="btn" href="/">Go to the desk</a></p>
+  </section>
+
+  <p class="ac-wait" id="ac-wait" role="status">Checking who is signed in…</p>
+
+  <div id="ac-app" hidden>
+    <p class="ac-net" id="ac-net" role="status" aria-live="polite" hidden></p>
+    <div class="ac-tabs" id="ac-tabs" role="tablist" aria-label="Academy sections"></div>
+
+    <!-- ============================== Train ============================== -->
+    <section id="ac-train" role="tabpanel" aria-labelledby="tab-train" tabindex="-1">
+
+      <div class="card" id="setup">
+        <h2 class="c-h">Setup <small id="setup-sum"></small><button type="button" class="btn sm" id="setup-toggle" hidden aria-expanded="true" aria-controls="setup-body">Change setup</button></h2>
+        <div id="setup-body">
+          <p class="ac-err" id="setup-err" role="alert" hidden></p>
+          <form id="setup-form" novalidate>
+            <div class="f-grid">
+              <label class="f f-wide"><span>Edge</span><select id="f-edge" required></select></label>
+            </div>
+            <div class="edge-info" id="edge-info" aria-live="polite"></div>
+            <div class="f-grid">
+              <label class="f"><span>From <small>(UTC)</small></span><input type="date" id="f-from" required></label>
+              <label class="f"><span>To <small>(UTC, included)</small></span><input type="date" id="f-to" required></label>
+              <label class="f"><span>Chart timeframe</span><select id="f-tf"><option value="5m">5 minutes</option><option value="15m">15 minutes</option><option value="1h">1 hour</option><option value="4h">4 hours</option><option value="1d">1 day</option></select></label>
+              <label class="f"><span>Difficulty</span><select id="f-diff"><option value="beginner">Beginner: clear-cut setups only</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option><option value="expert" selected>Expert: every setup</option></select></label>
+            </div>
+            <p class="note" id="f-count" aria-live="polite"></p>
+            <div class="f-grid">
+              <fieldset class="f" id="f-speed"><legend>Replay speed</legend>
+                <div class="seg">
+                  <label><input type="radio" name="speed" value="1"><span>1×</span></label>
+                  <label><input type="radio" name="speed" value="5"><span>5×</span></label>
+                  <label><input type="radio" name="speed" value="10" checked><span>10×</span></label>
+                  <label><input type="radio" name="speed" value="50"><span>50×</span></label>
+                  <label><input type="radio" name="speed" value="100"><span>100×</span></label>
+                </div>
+              </fieldset>
+              <label class="f"><span>Starting balance</span><input type="number" id="f-balance" value="100000" min="100" step="100" inputmode="decimal"></label>
+              <label class="f"><span>Risk per trade, %</span><input type="number" id="f-risk" value="0.25" min="0.01" max="5" step="0.05" inputmode="decimal"></label>
+            </div>
+            <fieldset class="f-costs"><legend>Costs per round trip <small id="f-cost-unit"></small></legend>
+              <div class="f-grid">
+                <label class="f"><span>Spread</span><input type="number" id="f-spread" min="0" step="0.01" inputmode="decimal"></label>
+                <label class="f"><span>Commission</span><input type="number" id="f-comm" min="0" step="0.01" value="0" inputmode="decimal"></label>
+                <label class="f"><span>Slippage</span><input type="number" id="f-slip" min="0" step="0.01" value="0" inputmode="decimal"></label>
+              </div>
+              <p class="note" id="f-cost-note"></p>
+            </fieldset>
+            <fieldset class="f" id="f-mode"><legend>Training mode</legend>
+              <div class="seg">
+                <label><input type="radio" name="mode" value="train" checked><span>Train with corrections</span></label>
+                <label><input type="radio" name="mode" value="exam"><span>Exam on unseen setups</span></label>
+              </div>
+            </fieldset>
+            <p class="note" id="f-mode-note"></p>
+            <div class="f-actions">
+              <button type="submit" class="btn primary" id="start">Start replay</button>
+              <span class="ac-status" id="load-msg" role="status"></span>
+            </div>
+          </form>
+
+          <div class="sub" id="lessons-box">
+            <h3>Lessons in force for this edge <small id="lessons-n"></small></h3>
+            <ul class="plain-list" id="lessons-list"></ul>
+          </div>
+          <div class="sub" id="resume-box">
+            <h3>Resume a saved session</h3>
+            <ul class="plain-list" id="sess-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="replay" hidden>
+        <div class="ac-grid">
+          <div class="ac-chart-col">
+            <div class="card chart-card">
+              <div class="chart-head">
+                <div><b id="clock-time" class="num">—</b> <span class="pill" id="clock-state">paused</span></div>
+                <div class="chart-meta" id="chart-meta"></div>
+              </div>
+              <div class="chart-wrap" id="chart-wrap"><div id="chart" class="chart" role="img" aria-label="Replay chart: candles closed at the replay time"></div><div class="zones" id="zones" aria-hidden="true"></div></div>
+              <p class="note" id="chart-legend"></p>
+              <div class="ctl" id="ctl" role="group" aria-label="Replay controls">
+                <button type="button" class="btn primary" id="c-play" aria-keyshortcuts="Space">Play</button>
+                <button type="button" class="btn" id="c-step" aria-keyshortcuts="ArrowRight">Step one candle</button>
+                <button type="button" class="btn" id="c-restart">Restart</button>
+                <span class="seg inline" id="c-speed" role="group" aria-label="Speed">
+                  <button type="button" class="btn sm" data-speed="1">1×</button><button type="button" class="btn sm" data-speed="5">5×</button><button type="button" class="btn sm" data-speed="10">10×</button><button type="button" class="btn sm" data-speed="50">50×</button><button type="button" class="btn sm" data-speed="100">100×</button>
+                </span>
+                <label class="jump"><span>Jump to</span><input type="datetime-local" id="c-jump-at"><button type="button" class="btn sm" id="c-jump">Go</button></label>
+                <button type="button" class="btn" id="sess-save">Save session</button>
+                <button type="button" class="btn" id="sess-resume">Resume session</button>
+              </div>
+              <p class="ac-status" id="replay-msg" role="status" aria-live="polite"></p>
+              <p class="note">Keyboard: Space plays or pauses, the right arrow steps one candle.</p>
+            </div>
+
+            <div class="card chart-card">
+              <div class="chart-head">
+                <div><b>Higher timeframe</b></div>
+                <span class="seg inline" id="htf-sw" role="group" aria-label="Higher timeframe">
+                  <button type="button" class="btn sm" data-htf="1h">1h</button><button type="button" class="btn sm" data-htf="4h">4h</button><button type="button" class="btn sm" data-htf="1d">1d</button>
+                </span>
+              </div>
+              <div id="htf" class="chart small" role="img" aria-label="Higher-timeframe chart: candles closed at the replay time"></div>
+            </div>
+
+            <div class="card" id="log-card">
+              <h2 class="c-h">Replay log</h2>
+              <ol class="log" id="log" aria-live="polite"></ol>
+            </div>
+          </div>
+
+          <div class="ac-side">
+            <div class="card" id="acct-card">
+              <h2 class="c-h">Paper account <small>follows the engine's latest decision on each setup</small></h2>
+              <dl class="stats" id="acct"></dl>
+              <p class="ac-warn" id="acct-block" hidden></p>
+              <div id="trades-box" hidden><h3>Trades</h3><div class="tbl"><table id="trades"><thead><tr><th>Setup</th><th>Side</th><th>Risk</th><th>Result</th></tr></thead><tbody></tbody></table></div></div>
+            </div>
+
+            <div class="card" id="thesis-card">
+              <h2 class="c-h">Running thesis</h2>
+              <p id="thesis-line">—</p>
+              <ul class="plain-list small" id="thesis-changes"></ul>
+            </div>
+
+            <div class="card" id="decision" hidden aria-live="polite"></div>
+            <div class="card" id="mentor" hidden></div>
+            <div class="card" id="lesson" hidden></div>
+            <div class="card" id="prove" hidden></div>
+            <div class="card" id="whatif" hidden></div>
+
+            <div class="card" id="exam">
+              <h2 class="c-h">Test on new setups <small>unseen exam-pool setups, with and without your lessons</small></h2>
+              <p>The engine decides each unseen setup twice: without any lesson and with the lessons in force. Both answers are stored before any result is read. These results are kept apart from same-trade replays.</p>
+              <div class="f-actions"><button type="button" class="btn primary" id="exam-run">Test on 10 new setups</button><span class="ac-status" id="exam-msg" role="status" aria-live="polite"></span></div>
+              <div id="exam-out" hidden>
+                <dl class="stats" id="exam-summary"></dl>
+                <p class="note" id="exam-note"></p>
+                <div class="tbl"><table id="exam-table"><thead><tr><th>Setup time (UTC)</th><th>Side</th><th>Without lessons</th><th>With lessons</th><th>Lessons matched</th><th>R without</th><th>R with</th><th>Study</th></tr></thead><tbody></tbody></table></div>
+                <div class="sub" id="exam-whatif" hidden></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filled by assets/academy-tabs.js through window.MXAC.registerTab(id, { title, render }) -->
+    <section id="ac-session" role="tabpanel" aria-labelledby="tab-session" tabindex="-1" hidden></section>
+    <section id="ac-blind" role="tabpanel" aria-labelledby="tab-blind" tabindex="-1" hidden></section>
+    <section id="ac-progress" role="tabpanel" aria-labelledby="tab-progress" tabindex="-1" hidden></section>
+    <section id="ac-lessons" role="tabpanel" aria-labelledby="tab-lessons" tabindex="-1" hidden></section>
+    <section id="ac-research" role="tabpanel" aria-labelledby="tab-research" tabindex="-1" hidden></section>
+    <section id="ac-models" role="tabpanel" aria-labelledby="tab-models" tabindex="-1" hidden></section>
+    <section id="ac-costs" role="tabpanel" aria-labelledby="tab-costs" tabindex="-1" hidden></section>
+    <section id="ac-audit" role="tabpanel" aria-labelledby="tab-audit" tabindex="-1" hidden></section>
+  </div>
+</main>
+
+<script src="/assets/lightweight-charts-4.1.3.js?v=0c146b9bfb"></script>
+<script src="/assets/backtest-engine.js?v=c1aa9f3e8d"></script>
+<script src="/assets/academy-replay.js?v=7763ee8dee"></script>
+<script src="/assets/academy-core.js?v=b3adcdaae2"></script>
+<script src="/assets/academy-risk.js?v=9b9ae3d731"></script>
+<script src="/assets/mx-nav.js?v=3f8fef533d"></script>
+<script src="/assets/academy-ui.js?v=c9b9cc301c"></script>
+<script src="/assets/academy-tabs.js?v=0a55bf60ba"></script>
+<script src="/assets/academy-analyst.js?v=797a7899ac"></script>
+</body>
+</html>

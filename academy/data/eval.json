@@ -1,0 +1,1609 @@
+{
+ "version": "986a22fc937c",
+ "generated": "2026-11-10",
+ "recipe": "eval-1",
+ "policy": "policy-1.0",
+ "core": "1.0.0",
+ "dataVersion": "histdata@85ef4b8ceaac",
+ "what": "The decision policy as built, with no lessons and no model, on the train-pool setups that are not flagged, in time order. TAKE = it would have taken the setup, WAIT = it would not. R figures are net of costs, per trade, on filled trades only.",
+ "method": {
+  "history": "earlier train cases whose trade had finished before the signal (the rows of GET /api/academy?get=history)",
+  "edgeDef": "version and cost per round trip from academy/edges.mjs",
+  "lessons": "none",
+  "model": "none",
+  "split": "first70 / last30 = before and after the point 70 % of the way through the period, by time",
+  "t": "one-sample t of net R against zero; diff.t = Welch t of TAKE minus WAIT",
+  "verdictRule": "diff.t >= 2 adds value; diff.t <= -2 worse; otherwise no measurable difference",
+  "drawdown": "maximum drawdown in R, net of costs: closed trades in exit order (ties by id), equity from zero, the largest fall from a running peak; overall = the seven edges' trades in one sequence",
+  "unfilled": "limit orders that never filled are counted in orders / unfilled and are in no average",
+  "caution": "Seven edges are tested at once: a single t near 2 is weak evidence. Small samples (gtrend, mosha-bo) cannot show a difference."
+ },
+ "edges": {
+  "replica": {
+   "name": "Gold replica",
+   "edgeVersion": "541d222feed2",
+   "cost": 0.3,
+   "pool": "train",
+   "excluded": {
+    "exam": 50,
+    "flaggedTrain": 19
+   },
+   "from": 1584131940,
+   "to": 1777286340,
+   "orders": 325,
+   "unfilled": 0,
+   "mechanical": {
+    "n": 325,
+    "avg": 0.406,
+    "total": 131.92,
+    "t": 2.34,
+    "win": 0.24
+   },
+   "take": {
+    "orders": 169,
+    "unfilled": 0,
+    "n": 169,
+    "avg": 0.148,
+    "total": 25.06,
+    "t": 0.76,
+    "win": 0.225
+   },
+   "wait": {
+    "orders": 156,
+    "unfilled": 0,
+    "n": 156,
+    "avg": 0.685,
+    "total": 106.86,
+    "t": 2.35,
+    "win": 0.256
+   },
+   "takeShare": 0.52,
+   "diff": {
+    "takeMinusWait": -0.537,
+    "t": -1.53,
+    "df": 274.5,
+    "takeMinusMechanical": -0.258
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 169 at 0.148 R a trade against WAIT n 156 at 0.685 R, difference -0.537 R, Welch t -1.53 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 325,
+     "maxR": 26.63
+    },
+    "take": {
+     "n": 169,
+     "maxR": 17.13
+    },
+    "wait": {
+     "n": 156,
+     "maxR": 18.36
+    }
+   },
+   "split": {
+    "cut": 1719340020,
+    "first70": {
+     "orders": 122,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 122,
+      "avg": 0.239,
+      "total": 29.11,
+      "t": 0.87,
+      "win": 0.213
+     },
+     "take": {
+      "orders": 50,
+      "unfilled": 0,
+      "n": 50,
+      "avg": -0.211,
+      "total": -10.53,
+      "t": -0.83,
+      "win": 0.16
+     },
+     "wait": {
+      "orders": 72,
+      "unfilled": 0,
+      "n": 72,
+      "avg": 0.551,
+      "total": 39.64,
+      "t": 1.28,
+      "win": 0.25
+     },
+     "takeShare": 0.41,
+     "diff": {
+      "takeMinusWait": -0.761,
+      "t": -1.53,
+      "df": 110.2,
+      "takeMinusMechanical": -0.45
+     }
+    },
+    "last30": {
+     "orders": 203,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 203,
+      "avg": 0.506,
+      "total": 102.81,
+      "t": 2.27,
+      "win": 0.256
+     },
+     "take": {
+      "orders": 119,
+      "unfilled": 0,
+      "n": 119,
+      "avg": 0.299,
+      "total": 35.59,
+      "t": 1.17,
+      "win": 0.252
+     },
+     "wait": {
+      "orders": 84,
+      "unfilled": 0,
+      "n": 84,
+      "avg": 0.8,
+      "total": 67.22,
+      "t": 2,
+      "win": 0.262
+     },
+     "takeShare": 0.586,
+     "diff": {
+      "takeMinusWait": -0.501,
+      "t": -1.06,
+      "df": 147.3,
+      "takeMinusMechanical": -0.207
+     }
+    }
+   },
+   "waits": {
+    "n": 156,
+    "gateOnly": 13,
+    "evidenceOnly": 113,
+    "both": 30,
+    "gates": [
+     {
+      "code": "event",
+      "n": 18
+     },
+     {
+      "code": "unfamiliar",
+      "n": 16
+     },
+     {
+      "code": "volatility",
+      "n": 15
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "location",
+      "n": 88
+     },
+     {
+      "factor": "oppLiq",
+      "n": 29
+     },
+     {
+      "factor": "htfBias",
+      "n": 20
+     },
+     {
+      "factor": "event",
+      "n": 18
+     },
+     {
+      "factor": "displacement",
+      "n": 1
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 40,
+     "avg": -0.387,
+     "total": -15.49,
+     "t": -1.37,
+     "win": 0.15
+    },
+    "medium": {
+     "n": 81,
+     "avg": 0.368,
+     "total": 29.84,
+     "t": 1.12,
+     "win": 0.259
+    },
+    "high": {
+     "n": 48,
+     "avg": 0.223,
+     "total": 10.72,
+     "t": 0.67,
+     "win": 0.229
+    }
+   }
+  },
+  "mosha-bo": {
+   "name": "Mosha BO",
+   "edgeVersion": "824b0a70af71",
+   "cost": 0.3,
+   "pool": "train",
+   "excluded": {
+    "exam": 29,
+    "flaggedTrain": 10
+   },
+   "from": 1583142540,
+   "to": 1791862440,
+   "orders": 33,
+   "unfilled": 5,
+   "mechanical": {
+    "n": 28,
+    "avg": 0.815,
+    "total": 22.81,
+    "t": 1.79,
+    "win": 0.429
+   },
+   "take": {
+    "orders": 18,
+    "unfilled": 3,
+    "n": 15,
+    "avg": 1.227,
+    "total": 18.41,
+    "t": 1.67,
+    "win": 0.467
+   },
+   "wait": {
+    "orders": 15,
+    "unfilled": 2,
+    "n": 13,
+    "avg": 0.339,
+    "total": 4.4,
+    "t": 0.7,
+    "win": 0.385
+   },
+   "takeShare": 0.545,
+   "diff": {
+    "takeMinusWait": 0.889,
+    "t": 1.01,
+    "df": 23.7,
+    "takeMinusMechanical": 0.412
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 15 at 1.227 R a trade against WAIT n 13 at 0.339 R, difference 0.889 R, Welch t 1.01 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 28,
+     "maxR": 4.57
+    },
+    "take": {
+     "n": 15,
+     "maxR": 3.11
+    },
+    "wait": {
+     "n": 13,
+     "maxR": 3.4
+    }
+   },
+   "split": {
+    "cut": 1729246470,
+    "first70": {
+     "orders": 21,
+     "unfilled": 4,
+     "mechanical": {
+      "n": 17,
+      "avg": 0.428,
+      "total": 7.28,
+      "t": 0.85,
+      "win": 0.353
+     },
+     "take": {
+      "orders": 12,
+      "unfilled": 2,
+      "n": 10,
+      "avg": 0.679,
+      "total": 6.79,
+      "t": 0.93,
+      "win": 0.4
+     },
+     "wait": {
+      "orders": 9,
+      "unfilled": 2,
+      "n": 7,
+      "avg": 0.07,
+      "total": 0.49,
+      "t": 0.1,
+      "win": 0.286
+     },
+     "takeShare": 0.571,
+     "diff": {
+      "takeMinusWait": 0.609,
+      "t": 0.61,
+      "df": 14.8,
+      "takeMinusMechanical": 0.251
+     }
+    },
+    "last30": {
+     "orders": 12,
+     "unfilled": 1,
+     "mechanical": {
+      "n": 11,
+      "avg": 1.412,
+      "total": 15.53,
+      "t": 1.65,
+      "win": 0.545
+     },
+     "take": {
+      "orders": 6,
+      "unfilled": 1,
+      "n": 5,
+      "avg": 2.324,
+      "total": 11.62,
+      "t": 1.38,
+      "win": 0.6
+     },
+     "wait": {
+      "orders": 6,
+      "unfilled": 0,
+      "n": 6,
+      "avg": 0.652,
+      "total": 3.91,
+      "t": 0.87,
+      "win": 0.5
+     },
+     "takeShare": 0.5,
+     "diff": {
+      "takeMinusWait": 1.672,
+      "t": 0.91,
+      "df": 5.6,
+      "takeMinusMechanical": 0.912
+     }
+    }
+   },
+   "waits": {
+    "n": 15,
+    "gateOnly": 2,
+    "evidenceOnly": 9,
+    "both": 4,
+    "gates": [
+     {
+      "code": "conflict",
+      "n": 5
+     },
+     {
+      "code": "event",
+      "n": 1
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "htfBias",
+      "n": 9
+     },
+     {
+      "factor": "ltfStructure",
+      "n": 3
+     },
+     {
+      "factor": "sweep",
+      "n": 2
+     },
+     {
+      "factor": "event",
+      "n": 1
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 10,
+     "avg": 1.036,
+     "total": 10.36,
+     "t": 1.43,
+     "win": 0.5
+    },
+    "medium": {
+     "n": 5,
+     "avg": 1.609,
+     "total": 8.04,
+     "t": 0.89,
+     "win": 0.4
+    },
+    "high": {
+     "n": 0,
+     "avg": null,
+     "total": 0,
+     "t": null,
+     "win": null
+    }
+   }
+  },
+  "gtrend": {
+   "name": "Gold trend",
+   "edgeVersion": "02bb39e4cf4e",
+   "cost": 0.3,
+   "pool": "train",
+   "excluded": {
+    "exam": 17,
+    "flaggedTrain": 6
+   },
+   "from": 1586477040,
+   "to": 1785974640,
+   "orders": 18,
+   "unfilled": 0,
+   "mechanical": {
+    "n": 18,
+    "avg": 1.885,
+    "total": 33.92,
+    "t": 1.6,
+    "win": 0.5
+   },
+   "take": {
+    "orders": 18,
+    "unfilled": 0,
+    "n": 18,
+    "avg": 1.885,
+    "total": 33.92,
+    "t": 1.6,
+    "win": 0.5
+   },
+   "wait": {
+    "orders": 0,
+    "unfilled": 0,
+    "n": 0,
+    "avg": null,
+    "total": 0,
+    "t": null,
+    "win": null
+   },
+   "takeShare": 1,
+   "diff": {
+    "takeMinusWait": null,
+    "t": null,
+    "df": null,
+    "takeMinusMechanical": 0
+   },
+   "verdict": "no measurable difference",
+   "why": "the policy skipped too few filled trades to compare (TAKE n 18, WAIT n 0)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 18,
+     "maxR": 5.26
+    },
+    "take": {
+     "n": 18,
+     "maxR": 5.26
+    },
+    "wait": {
+     "n": 0,
+     "maxR": null
+    }
+   },
+   "split": {
+    "cut": 1726125360,
+    "first70": {
+     "orders": 10,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 10,
+      "avg": 0.477,
+      "total": 4.77,
+      "t": 0.67,
+      "win": 0.4
+     },
+     "take": {
+      "orders": 10,
+      "unfilled": 0,
+      "n": 10,
+      "avg": 0.477,
+      "total": 4.77,
+      "t": 0.67,
+      "win": 0.4
+     },
+     "wait": {
+      "orders": 0,
+      "unfilled": 0,
+      "n": 0,
+      "avg": null,
+      "total": 0,
+      "t": null,
+      "win": null
+     },
+     "takeShare": 1,
+     "diff": {
+      "takeMinusWait": null,
+      "t": null,
+      "df": null,
+      "takeMinusMechanical": 0
+     }
+    },
+    "last30": {
+     "orders": 8,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 8,
+      "avg": 3.644,
+      "total": 29.15,
+      "t": 1.5,
+      "win": 0.625
+     },
+     "take": {
+      "orders": 8,
+      "unfilled": 0,
+      "n": 8,
+      "avg": 3.644,
+      "total": 29.15,
+      "t": 1.5,
+      "win": 0.625
+     },
+     "wait": {
+      "orders": 0,
+      "unfilled": 0,
+      "n": 0,
+      "avg": null,
+      "total": 0,
+      "t": null,
+      "win": null
+     },
+     "takeShare": 1,
+     "diff": {
+      "takeMinusWait": null,
+      "t": null,
+      "df": null,
+      "takeMinusMechanical": 0
+     }
+    }
+   },
+   "waits": {
+    "n": 0,
+    "gateOnly": 0,
+    "evidenceOnly": 0,
+    "both": 0,
+    "gates": [],
+    "topContradiction": []
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 6,
+     "avg": 1.025,
+     "total": 6.15,
+     "t": 0.9,
+     "win": 0.5
+    },
+    "medium": {
+     "n": 12,
+     "avg": 2.315,
+     "total": 27.78,
+     "t": 1.37,
+     "win": 0.5
+    },
+    "high": {
+     "n": 0,
+     "avg": null,
+     "total": 0,
+     "t": null,
+     "win": null
+    }
+   }
+  },
+  "gtl": {
+   "name": "Gold H4 trendline",
+   "edgeVersion": "02bb39e4cf4e",
+   "cost": 0.3,
+   "pool": "train",
+   "excluded": {
+    "exam": 87,
+    "flaggedTrain": 62
+   },
+   "from": 1580990640,
+   "to": 1789661040,
+   "orders": 166,
+   "unfilled": 0,
+   "mechanical": {
+    "n": 166,
+    "avg": 0.216,
+    "total": 35.78,
+    "t": 2.13,
+    "win": 0.512
+   },
+   "take": {
+    "orders": 59,
+    "unfilled": 0,
+    "n": 59,
+    "avg": 0.4,
+    "total": 23.59,
+    "t": 2.24,
+    "win": 0.576
+   },
+   "wait": {
+    "orders": 107,
+    "unfilled": 0,
+    "n": 107,
+    "avg": 0.114,
+    "total": 12.19,
+    "t": 0.94,
+    "win": 0.477
+   },
+   "takeShare": 0.355,
+   "diff": {
+    "takeMinusWait": 0.286,
+    "t": 1.33,
+    "df": 111.3,
+    "takeMinusMechanical": 0.184
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 59 at 0.4 R a trade against WAIT n 107 at 0.114 R, difference 0.286 R, Welch t 1.33 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 166,
+     "maxR": 13.48
+    },
+    "take": {
+     "n": 59,
+     "maxR": 5.47
+    },
+    "wait": {
+     "n": 107,
+     "maxR": 12.23
+    }
+   },
+   "split": {
+    "cut": 1727059920,
+    "first70": {
+     "orders": 113,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 113,
+      "avg": 0.12,
+      "total": 13.51,
+      "t": 1,
+      "win": 0.496
+     },
+     "take": {
+      "orders": 39,
+      "unfilled": 0,
+      "n": 39,
+      "avg": 0.389,
+      "total": 15.15,
+      "t": 1.63,
+      "win": 0.564
+     },
+     "wait": {
+      "orders": 74,
+      "unfilled": 0,
+      "n": 74,
+      "avg": -0.022,
+      "total": -1.64,
+      "t": -0.17,
+      "win": 0.459
+     },
+     "takeShare": 0.345,
+     "diff": {
+      "takeMinusWait": 0.411,
+      "t": 1.51,
+      "df": 61.3,
+      "takeMinusMechanical": 0.269
+     }
+    },
+    "last30": {
+     "orders": 53,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 53,
+      "avg": 0.42,
+      "total": 22.27,
+      "t": 2.26,
+      "win": 0.547
+     },
+     "take": {
+      "orders": 20,
+      "unfilled": 0,
+      "n": 20,
+      "avg": 0.422,
+      "total": 8.44,
+      "t": 1.66,
+      "win": 0.6
+     },
+     "wait": {
+      "orders": 33,
+      "unfilled": 0,
+      "n": 33,
+      "avg": 0.419,
+      "total": 13.83,
+      "t": 1.61,
+      "win": 0.515
+     },
+     "takeShare": 0.377,
+     "diff": {
+      "takeMinusWait": 0.003,
+      "t": 0.01,
+      "df": 48.2,
+      "takeMinusMechanical": 0.002
+     }
+    }
+   },
+   "waits": {
+    "n": 107,
+    "gateOnly": 2,
+    "evidenceOnly": 90,
+    "both": 15,
+    "gates": [
+     {
+      "code": "unfamiliar",
+      "n": 12
+     },
+     {
+      "code": "event",
+      "n": 6
+     },
+     {
+      "code": "volatility",
+      "n": 6
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "oppLiq",
+      "n": 51
+     },
+     {
+      "factor": "htfBias",
+      "n": 45
+     },
+     {
+      "factor": "event",
+      "n": 6
+     },
+     {
+      "factor": "confirmation",
+      "n": 2
+     },
+     {
+      "factor": "displacement",
+      "n": 1
+     },
+     {
+      "factor": "momentum",
+      "n": 1
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 23,
+     "avg": 0.458,
+     "total": 10.53,
+     "t": 1.27,
+     "win": 0.522
+    },
+    "medium": {
+     "n": 33,
+     "avg": 0.463,
+     "total": 15.26,
+     "t": 2.43,
+     "win": 0.667
+    },
+    "high": {
+     "n": 3,
+     "avg": -0.734,
+     "total": -2.2,
+     "t": -2.66,
+     "win": 0
+    }
+   }
+  },
+  "geg": {
+   "name": "Gold daily engulf",
+   "edgeVersion": "02bb39e4cf4e",
+   "cost": 0.3,
+   "pool": "train",
+   "excluded": {
+    "exam": 70,
+    "flaggedTrain": 50
+   },
+   "from": 1580515440,
+   "to": 1788480240,
+   "orders": 113,
+   "unfilled": 31,
+   "mechanical": {
+    "n": 82,
+    "avg": 0.469,
+    "total": 38.45,
+    "t": 2.05,
+    "win": 0.451
+   },
+   "take": {
+    "orders": 75,
+    "unfilled": 21,
+    "n": 54,
+    "avg": 0.463,
+    "total": 24.99,
+    "t": 1.75,
+    "win": 0.481
+   },
+   "wait": {
+    "orders": 38,
+    "unfilled": 10,
+    "n": 28,
+    "avg": 0.481,
+    "total": 13.46,
+    "t": 1.09,
+    "win": 0.393
+   },
+   "takeShare": 0.664,
+   "diff": {
+    "takeMinusWait": -0.018,
+    "t": -0.03,
+    "df": 46.7,
+    "takeMinusMechanical": -0.006
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 54 at 0.463 R a trade against WAIT n 28 at 0.481 R, difference -0.018 R, Welch t -0.03 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 82,
+     "maxR": 7.33
+    },
+    "take": {
+     "n": 54,
+     "maxR": 7.64
+    },
+    "wait": {
+     "n": 28,
+     "maxR": 4.89
+    }
+   },
+   "split": {
+    "cut": 1726090800,
+    "first70": {
+     "orders": 71,
+     "unfilled": 16,
+     "mechanical": {
+      "n": 55,
+      "avg": 0.719,
+      "total": 39.52,
+      "t": 2.32,
+      "win": 0.509
+     },
+     "take": {
+      "orders": 48,
+      "unfilled": 10,
+      "n": 38,
+      "avg": 0.695,
+      "total": 26.42,
+      "t": 2.06,
+      "win": 0.553
+     },
+     "wait": {
+      "orders": 23,
+      "unfilled": 6,
+      "n": 17,
+      "avg": 0.77,
+      "total": 13.1,
+      "t": 1.14,
+      "win": 0.412
+     },
+     "takeShare": 0.676,
+     "diff": {
+      "takeMinusWait": -0.075,
+      "t": -0.1,
+      "df": 24.3,
+      "takeMinusMechanical": -0.024
+     }
+    },
+    "last30": {
+     "orders": 42,
+     "unfilled": 15,
+     "mechanical": {
+      "n": 27,
+      "avg": -0.04,
+      "total": -1.07,
+      "t": -0.15,
+      "win": 0.333
+     },
+     "take": {
+      "orders": 27,
+      "unfilled": 11,
+      "n": 16,
+      "avg": -0.09,
+      "total": -1.44,
+      "t": -0.24,
+      "win": 0.313
+     },
+     "wait": {
+      "orders": 15,
+      "unfilled": 4,
+      "n": 11,
+      "avg": 0.033,
+      "total": 0.36,
+      "t": 0.08,
+      "win": 0.364
+     },
+     "takeShare": 0.643,
+     "diff": {
+      "takeMinusWait": -0.123,
+      "t": -0.22,
+      "df": 22.3,
+      "takeMinusMechanical": -0.05
+     }
+    }
+   },
+   "waits": {
+    "n": 38,
+    "gateOnly": 13,
+    "evidenceOnly": 19,
+    "both": 6,
+    "gates": [
+     {
+      "code": "unfamiliar",
+      "n": 16
+     },
+     {
+      "code": "volatility",
+      "n": 7
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "oppLiq",
+      "n": 31
+     },
+     {
+      "factor": "momentum",
+      "n": 6
+     },
+     {
+      "factor": "volatility",
+      "n": 1
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 22,
+     "avg": 1.108,
+     "total": 24.37,
+     "t": 2.11,
+     "win": 0.591
+    },
+    "medium": {
+     "n": 26,
+     "avg": -0.056,
+     "total": -1.45,
+     "t": -0.23,
+     "win": 0.423
+    },
+    "high": {
+     "n": 6,
+     "avg": 0.346,
+     "total": 2.07,
+     "t": 0.44,
+     "win": 0.333
+    }
+   }
+  },
+  "gmp": {
+   "name": "Gold momentum pullback",
+   "edgeVersion": "b4351209ebba",
+   "cost": 0.15,
+   "pool": "train",
+   "excluded": {
+    "exam": 241,
+    "flaggedTrain": 250
+   },
+   "from": 1580899200,
+   "to": 1792671600,
+   "orders": 513,
+   "unfilled": 0,
+   "mechanical": {
+    "n": 513,
+    "avg": 0.075,
+    "total": 38.32,
+    "t": 1.35,
+    "win": 0.452
+   },
+   "take": {
+    "orders": 120,
+    "unfilled": 0,
+    "n": 120,
+    "avg": -0.041,
+    "total": -4.94,
+    "t": -0.37,
+    "win": 0.425
+   },
+   "wait": {
+    "orders": 393,
+    "unfilled": 0,
+    "n": 393,
+    "avg": 0.11,
+    "total": 43.26,
+    "t": 1.73,
+    "win": 0.461
+   },
+   "takeShare": 0.234,
+   "diff": {
+    "takeMinusWait": -0.151,
+    "t": -1.17,
+    "df": 201.7,
+    "takeMinusMechanical": -0.116
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 120 at -0.041 R a trade against WAIT n 393 at 0.11 R, difference -0.151 R, Welch t -1.17 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 513,
+     "maxR": 16.06
+    },
+    "take": {
+     "n": 120,
+     "maxR": 11.88
+    },
+    "wait": {
+     "n": 393,
+     "maxR": 13.87
+    }
+   },
+   "split": {
+    "cut": 1729139880,
+    "first70": {
+     "orders": 382,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 382,
+      "avg": 0.056,
+      "total": 21.42,
+      "t": 0.89,
+      "win": 0.453
+     },
+     "take": {
+      "orders": 82,
+      "unfilled": 0,
+      "n": 82,
+      "avg": -0.01,
+      "total": -0.79,
+      "t": -0.07,
+      "win": 0.439
+     },
+     "wait": {
+      "orders": 300,
+      "unfilled": 0,
+      "n": 300,
+      "avg": 0.074,
+      "total": 22.21,
+      "t": 1.06,
+      "win": 0.457
+     },
+     "takeShare": 0.215,
+     "diff": {
+      "takeMinusWait": -0.084,
+      "t": -0.52,
+      "df": 122,
+      "takeMinusMechanical": -0.066
+     }
+    },
+    "last30": {
+     "orders": 131,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 131,
+      "avg": 0.129,
+      "total": 16.89,
+      "t": 1.1,
+      "win": 0.45
+     },
+     "take": {
+      "orders": 38,
+      "unfilled": 0,
+      "n": 38,
+      "avg": -0.109,
+      "total": -4.16,
+      "t": -0.63,
+      "win": 0.395
+     },
+     "wait": {
+      "orders": 93,
+      "unfilled": 0,
+      "n": 93,
+      "avg": 0.226,
+      "total": 21.05,
+      "t": 1.53,
+      "win": 0.473
+     },
+     "takeShare": 0.29,
+     "diff": {
+      "takeMinusWait": -0.336,
+      "t": -1.46,
+      "df": 90.3,
+      "takeMinusMechanical": -0.238
+     }
+    }
+   },
+   "waits": {
+    "n": 393,
+    "gateOnly": 15,
+    "evidenceOnly": 283,
+    "both": 95,
+    "gates": [
+     {
+      "code": "volatility",
+      "n": 77
+     },
+     {
+      "code": "event",
+      "n": 30
+     },
+     {
+      "code": "unfamiliar",
+      "n": 17
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "oppLiq",
+      "n": 206
+     },
+     {
+      "factor": "displacement",
+      "n": 140
+     },
+     {
+      "factor": "event",
+      "n": 30
+     },
+     {
+      "factor": "htfBias",
+      "n": 17
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 67,
+     "avg": 0.067,
+     "total": 4.48,
+     "t": 0.43,
+     "win": 0.463
+    },
+    "medium": {
+     "n": 42,
+     "avg": -0.072,
+     "total": -3.04,
+     "t": -0.37,
+     "win": 0.429
+    },
+    "high": {
+     "n": 11,
+     "avg": -0.58,
+     "total": -6.38,
+     "t": -2.69,
+     "win": 0.182
+    }
+   }
+  },
+  "nq-open": {
+   "name": "NQ New York open run",
+   "edgeVersion": "6921f6e3264b",
+   "cost": 1,
+   "pool": "train",
+   "excluded": {
+    "exam": 239,
+    "flaggedTrain": 141
+   },
+   "from": 1578493920,
+   "to": 1790602380,
+   "orders": 344,
+   "unfilled": 0,
+   "mechanical": {
+    "n": 344,
+    "avg": 0.204,
+    "total": 70.23,
+    "t": 2.39,
+    "win": 0.433
+   },
+   "take": {
+    "orders": 87,
+    "unfilled": 0,
+    "n": 87,
+    "avg": 0.481,
+    "total": 41.8,
+    "t": 2.72,
+    "win": 0.529
+   },
+   "wait": {
+    "orders": 257,
+    "unfilled": 0,
+    "n": 257,
+    "avg": 0.111,
+    "total": 28.42,
+    "t": 1.14,
+    "win": 0.401
+   },
+   "takeShare": 0.253,
+   "diff": {
+    "takeMinusWait": 0.37,
+    "t": 1.84,
+    "df": 141.8,
+    "takeMinusMechanical": 0.277
+   },
+   "verdict": "no measurable difference",
+   "why": "TAKE n 87 at 0.481 R a trade against WAIT n 257 at 0.111 R, difference 0.37 R, Welch t 1.84 (|t| under 2)",
+   "drawdown": {
+    "unit": "R, net of costs",
+    "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+    "mechanical": {
+     "n": 344,
+     "maxR": 16.29
+    },
+    "take": {
+     "n": 87,
+     "maxR": 4.94
+    },
+    "wait": {
+     "n": 257,
+     "maxR": 16.02
+    }
+   },
+   "split": {
+    "cut": 1726969842,
+    "first70": {
+     "orders": 226,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 226,
+      "avg": 0.109,
+      "total": 24.7,
+      "t": 1.08,
+      "win": 0.407
+     },
+     "take": {
+      "orders": 51,
+      "unfilled": 0,
+      "n": 51,
+      "avg": 0.329,
+      "total": 16.79,
+      "t": 1.55,
+      "win": 0.51
+     },
+     "wait": {
+      "orders": 175,
+      "unfilled": 0,
+      "n": 175,
+      "avg": 0.045,
+      "total": 7.91,
+      "t": 0.39,
+      "win": 0.377
+     },
+     "takeShare": 0.226,
+     "diff": {
+      "takeMinusWait": 0.284,
+      "t": 1.18,
+      "df": 81.7,
+      "takeMinusMechanical": 0.22
+     }
+    },
+    "last30": {
+     "orders": 118,
+     "unfilled": 0,
+     "mechanical": {
+      "n": 118,
+      "avg": 0.386,
+      "total": 45.53,
+      "t": 2.46,
+      "win": 0.483
+     },
+     "take": {
+      "orders": 36,
+      "unfilled": 0,
+      "n": 36,
+      "avg": 0.695,
+      "total": 25.01,
+      "t": 2.29,
+      "win": 0.556
+     },
+     "wait": {
+      "orders": 82,
+      "unfilled": 0,
+      "n": 82,
+      "avg": 0.25,
+      "total": 20.52,
+      "t": 1.38,
+      "win": 0.451
+     },
+     "takeShare": 0.305,
+     "diff": {
+      "takeMinusWait": 0.445,
+      "t": 1.26,
+      "df": 61.1,
+      "takeMinusMechanical": 0.309
+     }
+    }
+   },
+   "waits": {
+    "n": 257,
+    "gateOnly": 11,
+    "evidenceOnly": 191,
+    "both": 55,
+    "gates": [
+     {
+      "code": "conflict",
+      "n": 38
+     },
+     {
+      "code": "event",
+      "n": 20
+     },
+     {
+      "code": "unfamiliar",
+      "n": 15
+     },
+     {
+      "code": "volatility",
+      "n": 7
+     }
+    ],
+    "topContradiction": [
+     {
+      "factor": "htfBias",
+      "n": 94
+     },
+     {
+      "factor": "confirmation",
+      "n": 73
+     },
+     {
+      "factor": "ltfStructure",
+      "n": 25
+     },
+     {
+      "factor": "oppLiq",
+      "n": 25
+     },
+     {
+      "factor": "event",
+      "n": 20
+     },
+     {
+      "factor": "momentum",
+      "n": 20
+     }
+    ]
+   },
+   "takeByConfidence": {
+    "low": {
+     "n": 34,
+     "avg": 0.298,
+     "total": 10.13,
+     "t": 0.91,
+     "win": 0.412
+    },
+    "medium": {
+     "n": 32,
+     "avg": 0.633,
+     "total": 20.26,
+     "t": 2.42,
+     "win": 0.625
+    },
+    "high": {
+     "n": 21,
+     "avg": 0.544,
+     "total": 11.42,
+     "t": 1.68,
+     "win": 0.571
+    }
+   }
+  }
+ },
+ "overall": {
+  "from": 1578493920,
+  "to": 1792671600,
+  "orders": 1512,
+  "unfilled": 36,
+  "mechanical": {
+   "n": 1476,
+   "avg": 0.252,
+   "total": 371.42,
+   "t": 4.74,
+   "win": 0.408
+  },
+  "take": {
+   "orders": 546,
+   "unfilled": 24,
+   "n": 522,
+   "avg": 0.312,
+   "total": 162.83,
+   "t": 3.3,
+   "win": 0.404
+  },
+  "wait": {
+   "orders": 966,
+   "unfilled": 12,
+   "n": 954,
+   "avg": 0.219,
+   "total": 208.59,
+   "t": 3.43,
+   "win": 0.41
+  },
+  "takeShare": 0.361,
+  "diff": {
+   "takeMinusWait": 0.093,
+   "t": 0.82,
+   "df": 992.4,
+   "takeMinusMechanical": 0.06
+  },
+  "verdict": "no measurable difference",
+  "why": "TAKE n 522 at 0.312 R a trade against WAIT n 954 at 0.219 R, difference 0.093 R, Welch t 0.82 (|t| under 2)",
+  "drawdown": {
+   "unit": "R, net of costs",
+   "order": "closed trades in exit order (ties by id); equity starts at zero; the largest fall from a running peak",
+   "mechanical": {
+    "n": 1476,
+    "maxR": 32.45
+   },
+   "take": {
+    "n": 522,
+    "maxR": 24.07
+   },
+   "wait": {
+    "n": 954,
+    "maxR": 24
+   }
+  },
+  "split": {
+   "cut": 1728418296,
+   "first70": {
+    "orders": 951,
+    "unfilled": 22,
+    "mechanical": {
+     "n": 929,
+     "avg": 0.199,
+     "total": 185.33,
+     "t": 3.2,
+     "win": 0.418
+    },
+    "take": {
+     "orders": 296,
+     "unfilled": 14,
+     "n": 282,
+     "avg": 0.271,
+     "total": 76.31,
+     "t": 2.45,
+     "win": 0.433
+    },
+    "wait": {
+     "orders": 655,
+     "unfilled": 8,
+     "n": 647,
+     "avg": 0.168,
+     "total": 109.01,
+     "t": 2.23,
+     "win": 0.411
+    },
+    "takeShare": 0.311,
+    "diff": {
+     "takeMinusWait": 0.102,
+     "t": 0.76,
+     "df": 550.8,
+     "takeMinusMechanical": 0.072
+    }
+   },
+   "last30": {
+    "orders": 561,
+    "unfilled": 14,
+    "mechanical": {
+     "n": 547,
+     "avg": 0.34,
+     "total": 186.09,
+     "t": 3.53,
+     "win": 0.391
+    },
+    "take": {
+     "orders": 250,
+     "unfilled": 10,
+     "n": 240,
+     "avg": 0.36,
+     "total": 86.52,
+     "t": 2.27,
+     "win": 0.371
+    },
+    "wait": {
+     "orders": 311,
+     "unfilled": 4,
+     "n": 307,
+     "avg": 0.324,
+     "total": 99.58,
+     "t": 2.74,
+     "win": 0.407
+    },
+    "takeShare": 0.446,
+    "diff": {
+     "takeMinusWait": 0.036,
+     "t": 0.18,
+     "df": 465.8,
+     "takeMinusMechanical": 0.02
+    }
+   }
+  },
+  "waits": {
+   "n": 966,
+   "gateOnly": 56,
+   "evidenceOnly": 705,
+   "both": 205,
+   "gates": [
+    {
+     "code": "volatility",
+     "n": 112
+    },
+    {
+     "code": "unfamiliar",
+     "n": 76
+    },
+    {
+     "code": "event",
+     "n": 75
+    },
+    {
+     "code": "conflict",
+     "n": 43
+    }
+   ],
+   "topContradiction": [
+    {
+     "factor": "oppLiq",
+     "n": 342
+    },
+    {
+     "factor": "htfBias",
+     "n": 185
+    },
+    {
+     "factor": "displacement",
+     "n": 142
+    },
+    {
+     "factor": "location",
+     "n": 88
+    },
+    {
+     "factor": "confirmation",
+     "n": 75
+    },
+    {
+     "factor": "event",
+     "n": 75
+    }
+   ]
+  },
+  "takeByConfidence": {
+   "low": {
+    "n": 202,
+    "avg": 0.25,
+    "total": 50.53,
+    "t": 1.94,
+    "win": 0.416
+   },
+   "medium": {
+    "n": 231,
+    "avg": 0.419,
+    "total": 96.68,
+    "t": 2.57,
+    "win": 0.433
+   },
+   "high": {
+    "n": 89,
+    "avg": 0.176,
+    "total": 15.62,
+    "t": 0.85,
+    "win": 0.303
+   }
+  }
+ }
+}

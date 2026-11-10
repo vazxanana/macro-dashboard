@@ -11,6 +11,7 @@ import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const require = createRequire(import.meta.url);
 const lab = require('../../../api/_ictlab.js');
@@ -23,12 +24,12 @@ const FROM = Date.UTC(2020, 0, 1) / 1000, OOS = Date.UTC(2024, 0, 1) / 1000, YEA
 const INDEX = ['nq', 'es', 'ym'], GOLD = ['gc'];
 
 // ---- candles: research files → H1 on the UTC hour → the lab's own cleaning (labSource: positive prices, halt hour dropped) ----
-function histH1(dir, pre) {   // HistData M1 csv.gz, EST without DST → UTC +5 h
+function histH1(dir, pre) {   // HistData M1 csv.gz → UTC (council/histdata.mjs)
   const d = path.join(DIR, dir), m = new Map();
   for (const f of fs.readdirSync(d).filter((f) => f.startsWith(pre) && f.endsWith('.csv.gz')).sort()) {
     for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(d, f))).toString().split('\n')) {
       if (ln.length < 20) continue; const p = ln.split(';');
-      const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+      const t = histStampUtc(ln);
       if (t < FROM - 400 * 86400) continue;
       const o = +p[1], h = +p[2], l = +p[3], c = +p[4], k = t - (t % 3600), b = m.get(k);
       if (!b) m.set(k, { time: k, open: o, high: h, low: l, close: c, last: t });

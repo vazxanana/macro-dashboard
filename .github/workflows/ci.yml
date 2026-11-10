@@ -7,6 +7,7 @@ name: CI
 #           (scripts/audit/smoke.cjs: no page errors, no sideways scroll at 390 px) against out/ served locally.
 #           Both read live candles through meridianx.dev /md/bars (as the audit always has); the smoke test also reads
 #           council-data from the public branch. /api/me is stubbed; nothing writes anywhere.
+#           The Academy audit (scripts/audit/academy.cjs) runs the learning loop on recorded candles, offline.
 on:
   pull_request:
   push:
@@ -93,6 +94,17 @@ jobs:
           node scripts/audit/chronostrade.cjs && exit 0
           echo "::warning::ChronosTrade audit failed once; retrying (live candles)"
           node scripts/audit/chronostrade.cjs
+
+      # offline: the audit starts its own server (the real API handler on a file store) and reads recorded candles
+      - name: Academy audit (the learning loop end to end)
+        env:
+          AUDIT_OUT: ${{ runner.temp }}/audit/
+          ACADEMY_PORT: 8770
+        run: |
+          mkdir -p "$AUDIT_OUT"
+          node scripts/audit/academy.cjs && exit 0
+          echo "::warning::Academy audit failed once; retrying (a browser timing wait can miss on a busy runner; a real failure fails twice)"
+          node scripts/audit/academy.cjs
 
       - name: Audit screenshots
         if: failure()

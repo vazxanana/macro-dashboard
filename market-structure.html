@@ -2783,6 +2783,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <div class="me-card"><span class="me-av me-av-lg" id="ms-me-av2" aria-hidden="true"></span><div><b id="ms-me-name2">Guest</b><small id="ms-me-role">Guest</small></div></div>
           <div class="me-today" id="ms-me-today"></div>
           <a role="menuitem" class="me-link" id="ms-me-profile" href="#profile">Profile and demo accounts</a>
+          <a role="menuitem" class="me-link adm own" id="ms-me-academy" href="/academy">MeridianX Academy</a>
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
@@ -6936,7 +6937,7 @@ function msNextSetup(bars, A) {
       const w = sn.goldW1;
       set('ms-rep-w1', !w ? 'Weekly structure: waiting for the Trader.' : `Weekly structure now: <b class="${w > 0 ? 'pos' : 'neg'}">${w > 0 ? 'bullish' : 'bearish'}</b> · the Mosha BO system takes only <b>${w > 0 ? 'buys' : 'sells'}</b>${sn.goldW1Src && sn.goldW1Src !== 'cnbc-spot' ? ` (read from ${sn.goldW1Src === 'paxg' ? 'PAXG' : 'OANDA daily'} candles: the CNBC spot feed failed this run)` : ''}`); }
       // Mosha BO chain (8 Nov, snapshot.moshaBo.state): where the H4 -> H1 -> M15 walk stands between trades, same words as council/mosha.mjs
-      { const m = sn.moshaBo && sn.moshaBo.state, side = (d) => (d < 0 ? 'sell' : 'buy'), when = (t) => new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC';
+      { const sn = COUNCIL.snap || {}, m = sn.moshaBo && sn.moshaBo.state, side = (d) => (d < 0 ? 'sell' : 'buy'), when = (t) => new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC';
         const wk = !m || m.w1 == null || m.stage === 'h4' ? '' : m.w1 === m.dir ? ' Weekly structure agrees.' : ' Weekly structure is against it: the trade would be recorded as a shadow.';
         const pos = m && (m.open || m.pending) ? ` ${m.open ? `${m.open} open` : ''}${m.open && m.pending ? ', ' : ''}${m.pending ? `${m.pending} pending` : ''} live.` : '';
         set('ms-rep-mosha', !m ? 'Mosha BO chain: waiting for the Trader.' : m.stage === 'h4' ? 'Mosha BO chain: waiting for an H4 BO.' + pos

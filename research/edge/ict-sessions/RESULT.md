@@ -1,5 +1,7 @@
 # When does the ICT A-setup edge live? Session, opening hours, weekday, post-halt (pre-registered)
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock for the HistData part. Details: the last section of this page.
+
 **Verdict: nothing passes. All four hypotheses FAIL the pre-registered bar; no shadow variant is added and no code outside this
 folder changes.** The timing of the edge is not stable across regimes: the cells that lost on 2008-17 are the cells that won on
 2018-26, and vice versa. Over the 12 cells with n ≥ 100 in the selection window, the 2008-17 and 2018-26 cell means agree in
@@ -171,3 +173,9 @@ node research/edge/ict-universe/universe.mjs ...  -> <histdata>/trades.json     
 curl -o replay.json https://meridianx.dev/cdata/ict/replay.json
 node research/edge/ict-sessions/run.mjs <oanda>/trades.json <histdata>/trades.json replay.json research/edge/ict-sessions/result.json
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: the result also rests on an OANDA trade file and the desk replay, and today's caches do not reproduce the first run's inputs (4,098 OANDA A-setups against 4,106; 254 replay trades against 251), so a fresh `result.json` would mix the clock with other changes. What was checked: `run.mjs` was run twice on today's inputs, once with the HistData trades of the old loader and once with the corrected ones. **None of its 32 verdict fields differs between the two.** The HistData trades themselves are in the ict-universe re-run.

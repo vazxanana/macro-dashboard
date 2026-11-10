@@ -1,5 +1,7 @@
 # Does market regime decide when MERIDIAN's setups work?
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Short answer: no.** The live Scalp loses in every regime we can measure. No gate fixes it out of sample. Intraday is close to break-even everywhere. Swing has one weak lead (a mid-range D1 ADX band). It passes the formal screen, but the evidence is thin, so it should be tracked on paper, not adopted.
 
 ## What was tested
@@ -125,3 +127,9 @@ node research/edge/regime/probe.mjs $OUT              # probe.txt (neighbours, p
 ```
 
 The trade-level files (about 15 MB) are not committed; the replay rebuilds them deterministically.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: the session and day-of-week splits and the daily candle boundary were an hour late in Europe's summer. The robustness ledger entry "Scalp live rule, 2018-26 HistData" quotes this study.

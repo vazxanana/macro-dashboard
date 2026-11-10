@@ -13,6 +13,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { msAnalyze, CFG, PAIRS, buildSetup, setMarket } from '../../../council/engine.mjs';
 import { cleanBars, LTF_CLEAN } from '../../../council/clean.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 
 const [RAW, KEY, OUT] = process.argv.slice(2);
 const MARKETS = {
@@ -36,7 +37,7 @@ const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h 
 const marketOpen = (t) => { const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };
 const spreadOf = (price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 
-// ─── load M1 (HistData timestamps are EST without DST = UTC-5) ───
+// ─── load M1 (HistData clock: council/histdata.mjs; fixed UTC-5 before 10 Nov 2026) ───
 // Stored as typed arrays (the machine is shared; 3M+ bar objects per market do not fit next to other jobs). Each file is
 // cleaned with the shared bad-print cleaner (clean.mjs, 1m options) before it is packed.
 function loadM1() {
@@ -50,7 +51,7 @@ function loadM1() {
       if (ln.length < 20) continue;
       const p = ln.split(';');
       const s = p[0];
-      const t = Date.UTC(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8), +s.slice(9, 11), +s.slice(11, 13)) / 1000 + 5 * 3600;
+      const t = histStampUtc(s);
       part.push({ time: t, open: +p[1], high: +p[2], low: +p[3], close: +p[4] });
     }
     part.sort((a, b) => a.time - b.time);

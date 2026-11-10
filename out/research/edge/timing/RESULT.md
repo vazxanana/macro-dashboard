@@ -1,5 +1,7 @@
 # Edge research · timing — time-of-day windows for Scalp / Intraday
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Question.** Inside the hours the MERIDIAN Scalp and Intraday setups already trade, are there hours (UTC, and London / New York local with daylight saving), minutes past the hour, session opens (London 08:00 local = 07:00/08:00 UTC, NY cash open 09:30 NY = 13:30/14:30 UTC), first/last 30 minutes, or Friday-afternoon / Monday-Asia windows where results are reliably better or worse out of sample?
 
 **Verdict: FAIL — no time window passes.** No window turns any of the four engine setups positive out of sample, so none meets the bar for a candidate. One finding is robust: **the New York afternoon (12:00–16:59 NY) and everything after 17:00 UTC are worse for Scalp in every year.** That makes this a damage-limitation note, not an edge. A bigger finding sits underneath it: **on 8.8 years of M1 data the live Scalp sleeve itself loses money after costs (−0.18R a trade in-sample, −0.23R out of sample, every year negative).** No time window fixes that.
@@ -169,3 +171,9 @@ How to read the heatmaps: no hour × market cell is reliably positive. Single ce
 - `yearly.mjs` → `yearly.txt`: year-by-year check of the consistent windows.
 
 No `proposal.md`: no window passed.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study read every year as New York time, so from 2019 its bars were one hour early in about four weeks a year (the weeks the US is on daylight time and Europe is not).
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: in about four weeks a year from 2019 the hour-of-day and session buckets, which are this study's subject, were an hour early.

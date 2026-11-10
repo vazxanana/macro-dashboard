@@ -1,5 +1,7 @@
 # Scalp exits: which exit, entry and stop buffer work best for the live Scalp rule?
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Verdict: FAIL. No exit rule found an edge.** All 23 variants lose money after costs, both in-sample (Jun 2018 to 2023) and out-of-sample (2024 to Oct 2026), on all five markets and in every year. The best exit (a fixed 1R target) and the best add-on (a 15-minute time stop) lose less than the live exit. Neither turns the setup positive. The problem is the entry, not the exit: before the stop is hit, price reaches each R level about as often as a coin flip would. No exit can create an edge in that case. Spread then takes about 0.13R per trade.
 
 ## What was tested
@@ -100,3 +102,9 @@ Other measurements:
 No `proposal.md`: no candidate passed.
 
 Files: `scan.mjs` (stage 1: engine replay to signals), `exits.mjs` (stage 2: entry/exit/stop simulation, stats, result.json), `lib.mjs`, `extract.mjs` (copies the M1 data from the council-data branch). To reproduce: `node extract.mjs <data>`, then `node scan.mjs <data> <mkt> 2018-06-01 2026-11-01 <sig>/<mkt>.json` for each market, then `node exits.mjs <data> <sig> <out>`. A scan takes about 8 minutes per market on a free core.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: session tags and the time-based exits were an hour late in Europe's summer. The verdict (FAIL: all 23 exits negative) is about a setup that is not live.

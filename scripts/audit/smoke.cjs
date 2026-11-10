@@ -1,6 +1,7 @@
 // Run: sh scripts/build.sh && (cd out && python3 -m http.server 8766 &) ; node --use-env-proxy scripts/audit/smoke.cjs
 // Page smoke test (CI, .github/workflows/ci.yml): every page of out/ opens without a page error (uncaught exception or
-// unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop; and no visible
+// unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop (the owner also
+// opens the Desk's inner views, see INNER); and no visible
 // element runs an endless animation of a custom property or box-shadow (the header ring rule, CLAUDE.md "Desk smoothness").
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
@@ -9,7 +10,11 @@
 const { chromium } = require('playwright');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
-const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
+// Inner views a page only draws when they are opened (the Desk's Council panes run their render functions on first show):
+// as the owner, each is opened by its hash on the loaded page and must not throw either. Council → Systems once threw
+// "sn is not defined" there, unseen by a check that only loaded the page.
+const INNER = { '/market-structure.html': ['#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/macro', '#council/week', '#scanner', '#gold', '#ict', '#lit', '#users', '#profile'] };
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 // script and font CDNs the pages load (a page without its chart library is not what visitors get)
 const ALLOW = /^https:\/\/(cdn\.jsdelivr\.net|s3\.tradingview\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
@@ -49,6 +54,10 @@ async function wire(ctx, account) {
       const res = await p.goto(H + path, { waitUntil: 'load', timeout: 30000 }).catch((e) => { errs.push('load: ' + e.message.split('\n')[0]); return null; });
       if (res && !res.ok()) errs.push('HTTP ' + res.status());
       await p.waitForTimeout(SETTLE);
+      if (account && INNER[path]) for (const h of INNER[path]) {
+        const n = errs.length; await p.evaluate((x) => { location.hash = x; }, h).catch(() => {}); await p.waitForTimeout(600);
+        for (let i = n; i < errs.length; i++) errs[i] = `${h}: ${errs[i]}`;
+      }
       // scroll to the bottom and back so lazy sections render before the width check
       await p.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 300)); window.scrollTo(0, 0); }).catch(() => {});
       const w = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })).catch(() => ({ sw: 0, iw: 0 }));

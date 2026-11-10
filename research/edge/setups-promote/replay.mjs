@@ -5,7 +5,7 @@
 // fill when price is already through it; expiry by the higher TF as in trader.mjs WAIT), managed on M1 to stop or first
 // target. Costs: one spread per round trip in R (backtest.mjs spreadOf: forex 0.0001, spot gold 0.3).
 //   node replay.mjs <key> <candleDir> <out.json> [fromISO] [toISO]
-// key: eurusd gbpusd audusd usdcad usdchf xau. HistData time is EST without DST (UTC-5): +5 h to UTC.
+// key: eurusd gbpusd audusd usdcad usdchf xau. HistData time → UTC with council/histdata.mjs (+5 h before 10 Nov 2026).
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
@@ -15,6 +15,7 @@ import { cleanBars, LTF_CLEAN } from '../../../council/clean.mjs';
 import { fastAnalyze } from './fastms.mjs';   // the engine's msAnalyze, same results, faster (check.mjs)
 
 const [key, DIR, OUT, fromS = '2018-07-01', toS = '2026-11-01'] = process.argv.slice(2);
+import { histStampUtc } from '../../../council/histdata.mjs';   // the shared HistData clock
 const SYMS = { eurusd: 'EURUSD', gbpusd: 'GBPUSD', audusd: 'AUDUSD', usdcad: 'USDCAD', usdchf: 'USDCHF', xau: 'xau-histdata' };
 const M = key === 'xau' ? { label: 'XAU/USD', group: 'Metals', spot: true, dec: 2 } : { label: key, group: 'Forex', dec: 5 };
 // live config (council-data config.json, 7 Nov 2026): buf 0.15, minRisk 1.1, fresh 12
@@ -49,7 +50,7 @@ for (const f of files) {
     const line = txt.slice(p, e); p = e + 1;
     if (line.length < 20) continue;
     const [dt, o, h, l, c] = line.split(';');
-    const t = Date.UTC(+dt.slice(0, 4), +dt.slice(4, 6) - 1, +dt.slice(6, 8), +dt.slice(9, 11), +dt.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(dt);
     if (t < loadFrom || t > t1 + 14 * 86400 || t <= lastT) continue;
     lastT = t;
     const b = { time: t, open: +o, high: +h, low: +l, close: +c };

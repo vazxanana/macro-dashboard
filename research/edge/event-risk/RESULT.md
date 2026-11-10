@@ -1,5 +1,7 @@
 # Event risk manager: does skipping or flattening trades around CPI, NFP and FOMC help?
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. All five pre-registered tests still fail; no verdict field changed. Details: the last section of this page.
+
 **Verdict: FAIL on all five pre-registered tests. Null result. No shadow variant is added and no rule changes.**
 
 - **Skipping entries near a release (H1)** cannot help the ICT desk or the Meridian main systems: their entries almost never
@@ -153,3 +155,9 @@ Files: `preregistration.md`, `build.mjs` (trades and flatten prices), `ict-hist.
 node research/edge/event-risk/build.mjs <council-data checkout>
 node research/edge/event-risk/analyse.mjs <council-data checkout>
 ```
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026 (`build.mjs`, then `analyse.mjs`). No rule was changed.** `ict-hist.json`, `flat.json`, `result.json` and `tables.md` hold the new numbers. A control run of the old loader reproduced the published `ict-hist.json` and `flat.json` exactly. `analyse.mjs` also reads live council-data files, which have moved on since the first run (the ICT replay has three more closed trades), so the control's `result.json` differs from the published one in 215 of 1,806 numbers with no verdict field changed. Between the control and the corrected run, the HistData ICT sample grew from 519 to 529 trades and **none of the 46 verdict fields changed**. The verdict above stands: FAIL on all five tests.

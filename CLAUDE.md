@@ -28,6 +28,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
 | `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
 | `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
+| `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
 | `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
@@ -1326,12 +1327,12 @@ release on the strategist's calendar within `WINDOW_H` 72 h (kept `KEEP_H` 12 h 
 repo has one (the batch's CPI pilot 0.255% and its captured Cleveland core nowcast 0.21%, `cpiPilot().comparator`), range n/a.
 Hot / in-line / cool rows (the strategist's `rule`, Fed path, dollar, gold, the action: act after the release, not before; a ¼
 starter after the first hour on a retest, the skill's rule G; funded accounts flat). History: `council/event-base.json`, built by
-`node research/edge/event-reaction/build.mjs <council-data>` from HistData M1 gold + dollar index (85 CPI 2018-26, 51 NFP and 34
-FOMC 2022-26; CPI 2018-21 dates spike-checked, 16 dropped), split by the dollar's first 5-minute read (±`READ_PCT` 0.05%, not a
+`node research/edge/event-reaction/build.mjs <council-data>` from HistData M1 gold + dollar index (86 CPI 2018-26, 51 NFP and 34
+FOMC 2022-26; CPI 2018-21 dates spike-checked, 15 dropped), split by the dollar's first 5-minute read (±`READ_PCT` 0.05%, not a
 consensus surprise) and, CPI 2022-24, by the core print vs the Cleveland nowcast; the release-day move from the daily closes at
-run time; rows and days cut at `now`. The one pre-registered test (CPI T+5→T+60 follows the dollar's read) FAILED (34/72, p 0.72),
+run time; rows and days cut at `now`. The one pre-registered test (CPI T+5→T+60 follows the dollar's read) FAILED (34/73, p 0.76),
 so every figure is labelled "Descriptive, not a tested edge". HistData clock: the files are UTC−5, and UTC−4 while Europe is on
-summer time (release spikes; preregistration Amendment 1), not "EST without DST" all year. The call: P(gold's release-day UTC close
+summer time, and New York time in 2018 (`council/histdata.mjs`; see "Research candle clock" below), not "EST without DST" all year. The call: P(gold's release-day UTC close
 > the prior close) = past same-type release days shrunk (`SHRINK` 20) to every weekday's 10-year up-rate (`baseP`), band 30-70%,
 calibrated, issued only before the release, one per day (`evt:<date>:gold:dayUp`), recorded once via `callsLedger`, scored by the
 new `dayUp` / `dayDown` kinds in `resolveCall`; calibration source `event`. Desk: `#c-next` under the glance (countdown UTC + local,
@@ -1360,6 +1361,56 @@ quick Buy / Sell labels under AA; the gold terminal had no way back to the desk 
 `tests/qa-sweep.test.mjs` (also pins the owner's grey / black light-mode candles) and `scripts/audit/smoke.cjs` (offline.html, and no
 visible endless animation of a custom property or box-shadow on any page).
 
+## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
+Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
+of `council/decay.mjs`; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.
+Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as built), `TRAINING.md`, `RESEARCH.md`; the running state is
+`MERIDIANX_BUILD_PROGRESS.md`. Rules that must hold in any change:
+- **No look-ahead.** A decision only ever sees `MXR.snapshot` (bars closed at or before t; the guard throws otherwise). Outcomes live in
+  `academy/data/out-<edge>.json` and leave the API only after an attempt for that setup is stored. History rows carry no ids.
+- **Exam pool** (whole months, `poolOf` in `academy/edges.mjs`) is for tests on new setups only: never trained on, never read by the
+  research or training code, an exam setup is decided once. Same-trade replays prove recall only; the page says so.
+- **Flagged setups** (`rule.clockShift`: since 10 Nov 2026 it means the week could not be verified against a second feed, 101 setups;
+  `rule.pre2020`) stay out of lists and tests. The candle clock itself was corrected: `docs/academy/DATA-CLOCK.md`; the Academy data
+  from before the correction is in `academy/archive/pre-clock/` (never shipped with the API).
+- **Lessons are explicit and versioned** (conditions on features → an effect; relative level rules, never raw prices). Research only
+  proposes inactive drafts; the mentor saves them. No scorer is used unless the owner registers and promotes it; none is promoted.
+- **Paper only, isolated**: nothing under `academy/`, `ml/`, `assets/academy-*` or `api/academy*.js` imports the council, the mirror or
+  any order code (tests pin this). The language-model adapter is off without `ACADEMY_LLM_KEY` and has daily / monthly / hard budgets.
+- **The other tabs** (`assets/academy-tabs.js`, `window.MXAT`, registered with `MXAC.registerTab`; shared pieces on `MXAC.kit`):
+  Lessons (versions, diff, switch off / on, research drafts), Progress (agreement, recall beside new setups, mistakes, the
+  1 / 3 / 7 / 21-day review queue `MXAT.reviewQueue`), Research + notebook, Models (nothing promoted; promotion is a manual API
+  step), Costs, Audit, Blind arena (the engine's answer is a hidden `blind` attempt until `blind.submit`; `?get=blind`), Session
+  (notes through `POST miss`, `?get=misses`; sessions `kind: 'session'`). Every statistic shows its n; under 20 graded it says
+  "too few to judge"; no number is shown as a probability. The Desk links to `/academy` from the account menu (`#ms-me-academy`,
+  classes `adm own`: owner only).
+- **The analyst** (`docs/academy/LLM.md`): the optional language model's second opinion on a decision the engine has already
+  stored (`POST analyse`, `api/_academy-analyst.js`, page block `assets/academy-analyst.js`). Off without `ACADEMY_LLM_KEY`; never a
+  made-up answer; no outcome field or later bar may reach its request; its answer is checked in code and held by the engine's
+  hard gates; stored apart (`engine: 'language-model'`, files under `analyst/`) and never counted with the engine's numbers.
+  Only ever run against the labelled fake (`node scripts/academy-dev.mjs --fake-llm`): no real provider call was made.
+- **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
+  a run reads candidates, lessons, calendar and past cases once, so a train decision is one call. Keep new code on `ctx.api`.
+- **Policy investigation** (10 Nov 2026, `research/edge/academy-policy/`, pre-registered; `docs/academy/RESEARCH.md` section 7):
+  discovery = the earliest 60 % of each edge's usable train setups, validation = the latest 40 %, the exam pool untouched. The
+  evidence margin does not rank trades and the replica gap did not repeat on validation. Five candidates, **0 of 16 tests accepted**
+  (largest validation t 1.00): `policy-1.0` is unchanged, no `policy-1.1` exists. **`academy/data/exam-ledger.json`** logs every exam
+  read made to judge a policy (one per frozen version, only after it passes validation, written first): zero reads. `eval.json`
+  carries `drawdown`; `eval-trades.json` = the policy's action per train setup, no outcome field. Tests: `tests/academy-policy.test.mjs`.
+- **Offline scorers** (`ml/`, `docs/academy/TRAINING.md`; review of 10 Nov 2026 in `research/edge/academy-ml-review/`): 20 scorers
+  (the reference trees and four pre-registered low-capacity configurations), all **rejected challengers**, none promoted; mosha-bo,
+  gtrend and geg are too small to fit at all. `python ml/train.py` (trainer `wf-2`) cannot read the exam pool (its loader drops
+  those rows; a test pins it); walk-forward only, with an embargo as long as the edge's longest label window and thresholds chosen
+  on closed trades. A scorer passes only on all five lines of the acceptance rule (t >= 2 and a Holm-corrected p over every
+  scorer x edge test, kept above mechanical, drawdown not deeper, Brier no worse than the prior rate, last block agrees), and is
+  then only marked "passed validation, not promoted: owner decision". Never tune on these few trades, never add a configuration
+  without a pre-registration, never show a score as a probability. After a change: `python ml/train.py && node ml/parity.mjs &&
+  python ml/review.py` (the tests compare the committed files with the code's hash).
+- Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
+  `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
+  `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
+  candle proxy). Audit: `node scripts/audit/academy.cjs` (in `ci.yml`). Tests: `tests/academy-*.test.mjs`.
+
 ## Mirror: the replica book takes the replica's research trades (10 Nov 2026, owner: "the mirror is not taking the replica trades")
 The Replica demo account stayed empty because the mirror read only trades.json and the ICT desk, while the replica's forward
 paper trades (gold, forex and crypto; `k: 'replica'`) are recorded by the Trader in research.json; trades.json holds only the
@@ -1376,3 +1427,26 @@ position or order with no open council trade behind it, and any position without
 mirror copies them: a market copy keeps the council's distances from the fill (the broker's price sits a small basis from the
 council's feed), an amended, limit or guard-set copy has the council's own levels, an ICT copy the desk's stop distance. Exit 1
 on a mismatch. Tests: `tests/ctrader-reconcile.test.mjs`.
+
+## Research candle clock (10 Nov 2026, owner: "the highest-priority task of this phase")
+The HistData M1 research files (council-data `research/candles/*`) were read on three different clocks. The pre-registered audit
+`research/edge/histdata-clock/` (PREREGISTRATION.md first, then `run.mjs`: release minutes, hourly returns against OANDA H1 for every
+week, the weekly reopen, raw-file artefacts; 11 symbols, 2018 to Oct 2026) settled it: **New York time in 2018; from 2019 UTC−5, and
+UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 327 of 327 in the US / Europe mismatch weeks; 2,191 of
+2,195 release minutes; 73 of 99 symbol-years pass every strict criterion, 26 stay UNCERTIFIED and none points to another rule).
+- **One converter**: `council/histdata.mjs` (`histStampUtc`, `histToUtc`, `histOffsetH`, `nyOffsetH`; pure, no imports, nothing live
+  reads it). `tests/histdata-clock.test.mjs` proves it equals the audited rule for every label hour, checks 10 real release windows
+  (`tests/fixtures/histdata/`) and FAILS on any file in research/, academy/, ict/, council/, scripts/, api/, ml/ that converts a
+  HistData label by itself. A new loader imports the converter. The one listed exception is live code: `ict/replay.mjs` line 79
+  (a dead EUR/USD / GBP/USD back-fill branch; docs/owner-decisions.md item 21).
+- **What was wrong**: "EST without daylight saving" (label + 5 h; most ICT studies) is an hour late all of Europe's summer; New York
+  time for every year (gold-systems, robustness, timing, costs, NQ open-run) is an hour early from 2019 in the weeks the US is on
+  daylight time and Europe is not (2nd to last Sunday of March; last Sunday of October to 1st Sunday of November).
+- **Re-runs** (no rule, parameter, filter or cost changed; a control run of the old loader on today's code was made for each, so the
+  clock's effect is separated from code drift): the before → after table of every study is in `research/edge/histdata-clock/RESULT.md`;
+  each re-run study's RESULT.md has a pointer under its title and a dated last section "Clock correction (10 Nov 2026)". One
+  pre-registered verdict changed (ict-variants: one of nine now passes, not strong; owner item 20). Studies not re-run say so in the
+  same place (owner item 23).
+- **Academy**: `docs/academy/DATA-CLOCK.md`. **Baselines** `council/decay-base.json`, `council/expect-base.json`,
+  `council/event-base.json` were rebuilt with their own scripts in one commit (owner item 19). Stale caches (`*-m1.bin`,
+  `xau_m1.bin`) made before 10 Nov hold old times: delete them before any re-run.

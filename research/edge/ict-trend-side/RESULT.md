@@ -1,5 +1,7 @@
 # ICT index A-setups: sells only below the 200-day average (pre-registered test on 2018-26)
 
+> **Clock correction, 10 Nov 2026.** Only the HistData cross-check was affected, and it was re-run on the corrected candle clock. Its answer is the same: FAIL. The OANDA runs, which carry the verdict, never read those files. Details: the last section of this page.
+
 **Verdict: FAILS.** The filter came from the 2008-17 observation that the index rule's sells lost in the bull market. On
 2018-26, data the observation did not come from, the sells it drops made money: **+0.062R a trade net (n 801)**. Removing
 them cut the index stream's total from +85.6R to +35.6R. The filter fails three of the four pre-registered conditions. Both
@@ -135,3 +137,16 @@ node research/edge/ict-trend-side/replaycheck.mjs <replay.json> <oanda5m cache> 
 - `analyse.mjs`: the statistics and the verdict.
 - `replaycheck.mjs`: the replay-window check.
 - `result.json`: the discovery run, the primary test and both checks.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced the published cross-check block exactly. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` block `check_histdata_2019_26` holds the new numbers; every other block is untouched.
+
+| HistData 2019-26, pooled, net | Before: n, R a trade, t | After |
+|---|---|---|
+| Unfiltered | 719, +0.085, 1.47 | 743, +0.091, 1.66 |
+| With the trend-side filter | 246, +0.171, 1.74 | 244, +0.203, 2.00 |
+
+The cross-check's own verdict fields are identical (FAIL: the filter does not beat the unfiltered rule by the pre-registered margin). **The verdict is unchanged: FAILS.**

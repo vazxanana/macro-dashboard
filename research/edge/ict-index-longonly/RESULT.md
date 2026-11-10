@@ -1,5 +1,7 @@
 # ICT index long-only: a real edge, or just being long equities?
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. The verdict is unchanged: the dip-buying candidate still passes (out-of-sample n 117, +0.434R, t 2.99). One pooled row moved from INCONCLUSIVE to FAIL. Details: the last section of this page.
+
 **Question.** `ict-universe` found that the gold A-rule (buys only, stop 0.3-0.75x the daily ATR, size 1, no break-even)
 passes on NAS100/SPX cash. Equities rose over 2018-26. Is the profit an edge, or just being long?
 
@@ -151,3 +153,18 @@ after sell-side liquidity is taken". In plain terms, it is a short-term dip-buy 
 - `result.json`: baseline, every candidate per market and pooled (IS/OOS, gross, drift-adjusted with CI, years), bear
   windows and all bootstrap cells.
 - `proposal.md`: the proposed NQ/ES rule change.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced the published file exactly, so every change below is the clock and nothing else. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` holds the new numbers.
+
+| | Before: in-sample n, R a trade, t; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| Current index A-rule (the baseline) | 550, +0.028, 0.45; 247, +0.143, 1.44 | 561, +0.045, 0.73; 256, +0.153, 1.59 |
+| NAS100 + SPX, gold rule buys, 20-day return below 0 | 256, +0.208, 2.20; 114, +0.479, 3.21: PASS | 254, +0.234, 2.46; 117, +0.434, 2.99: PASS |
+| NAS100 + SPX, gold rule buys, all | 694, +0.162, 2.91; 338, +0.149, 1.90: INCONCLUSIVE | 685, +0.202, 3.58; 342, +0.152, 1.98: FAIL |
+| NAS100, gold rule both sides | 650, +0.081, 1.40; 312, +0.270, 2.93: PASS | 641, +0.117, 1.99; 317, +0.225, 2.53: PASS |
+
+Of the 24 candidate verdicts, one changed (the pooled row above). **The verdict is unchanged.**

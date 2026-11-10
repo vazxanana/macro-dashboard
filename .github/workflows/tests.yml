@@ -30,7 +30,7 @@ jobs:
           node-version: '22'
 
       - name: Syntax check (council, ICT desk, Vercel functions)
-        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || exit 1; done
+        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs academy/*.mjs academy/gen/*.mjs ml/*.mjs assets/academy-*.js; do node --check "$f" || exit 1; done
 
       - name: Unit tests (tests/)
         run: node --test tests/*.test.mjs tests/*.test.js

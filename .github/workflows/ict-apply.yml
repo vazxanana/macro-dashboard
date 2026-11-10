@@ -99,7 +99,7 @@ jobs:
       # Lock: the same suite tests.yml runs, on the joined tree.
       - name: Syntax check (council, ICT desk, Vercel functions)
         working-directory: pr
-        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || exit 1; done
+        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs academy/*.mjs academy/gen/*.mjs ml/*.mjs assets/academy-*.js; do node --check "$f" || exit 1; done
 
       - name: Unit tests (tests/)
         working-directory: pr
