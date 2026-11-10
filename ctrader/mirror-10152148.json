@@ -592,6 +592,32 @@
     ],
     "stopCheckedAt": "2026-11-10T07:03:26.000Z",
     "brokerStop": 0.69281
+   },
+   "audusd-replica-1794295261-b": {
+    "positionId": "47946705",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T07:22:10.000Z",
+    "councilEntry": 0.69236,
+    "stop": 0.691812,
+    "t1": 0.693456,
+    "riskCash": 2,
+    "margin": 4.15,
+    "mark": 0.69236,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69224,
+    "slipR": -0.219,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T07:22:10.000Z",
+    "brokerStop": 0.69169
    }
   },
   "day": {
@@ -599,7 +625,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 22 open",
+  "status": "ok · demo Fusion Markets · balance 10000 · 23 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -609,7 +635,6 @@
    "eurusd-replica-1794272750-b": "price 1.12301 has run 1.10R from the council entry 1.12226: a different trade now",
    "gbpusd-replica-1794273051-b": "price 1.34501 has run 1.11R from the council entry 1.34404: a different trade now",
    "xrp-replica-1794277605-s": "none of XRPUSD found at the broker",
-   "eurusd-replica-1794282613-b": "price 1.12301 has run 1.29R from the council entry 1.12224: a different trade now",
    "xrp-replica-1794289775-b": "none of XRPUSD found at the broker"
   },
   "wait": {},
@@ -619,7 +644,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-10T07:19:40.000Z"
+  "lastRun": "2026-11-10T07:22:10.000Z"
  },
  "log": [
   {
@@ -799,6 +824,11 @@
    "at": "2026-11-10T07:03:26.000Z",
    "msg": "opened sell AUDUSD 0.02 lot (council replica)",
    "trade": "audusd-replica-1794293120-s"
+  },
+  {
+   "at": "2026-11-10T07:22:10.000Z",
+   "msg": "opened buy AUDUSD 0.03 lot (council replica)",
+   "trade": "audusd-replica-1794295261-b"
   }
  ],
  "limits": {
@@ -877,11 +907,11 @@
   ]
  },
  "execution": {
-  "n": 22,
-  "meanSlipR": 0.135,
-  "medianSlipR": 0.052,
+  "n": 23,
+  "meanSlipR": 0.12,
+  "medianSlipR": 0.048,
   "worstSlipR": 0.765,
-  "medianLagSec": 20371,
+  "medianLagSec": 19286,
   "bySymbol": {
    "SOLUSD": {
     "n": 4,
@@ -904,8 +934,8 @@
     "meanSlipR": 0.497
    },
    "AUDUSD": {
-    "n": 4,
-    "meanSlipR": 0.103
+    "n": 5,
+    "meanSlipR": 0.038
    }
   }
  }
