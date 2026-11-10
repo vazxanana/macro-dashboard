@@ -1471,5 +1471,16 @@ next M5 swing broken by a close, limit at that broken level, stop $0.30 past the
 engulf zone (the barrier, at least 2R away), one at a time, $0.30 cost, fills on M1. The detector finds the owner's own trade on the
 council's candles (`node run.mjs example`). **Verdict: FAIL**: 365 trades 2020 to October 2026, -0.35R a trade after costs, t -3.10,
 win rate 14.5 % (in sample -0.50R, out of sample -0.12R; 312 of 365 stopped, median stop $2.77); the three labelled variants lose
-too. It is my reading of one example, taken every time: a corrected reading is a new pre-registration (docs/owner-decisions.md item
-27). Nothing live changed; the live Mosha BO is untouched. Tests: `tests/mosha-level.test.mjs`.
+too. Nothing live changed; the live Mosha BO is untouched. Tests: `tests/mosha-level.test.mjs`.
+**The owner's correction, same day** ("after a H4 we can look for H1 to know when the retracement or pullback starts, then we use
+M15 or M5 to trade that retracement"): `research/edge/mosha-retrace/` (its own PREREGISTRATION.md first; imports the shared pieces
+of mosha-level). The chain: H4 BO (close beyond the last 3-a-side H4 swing), the FIRST H1 BO the other way after it (close beyond
+the last three-candle H1 swing), sell or buy limit at the broken H1 level, zone = the M5 candle that broke it and the 3 before, stop
+$0.30 past, target the H4 engulf barrier (2R or more), one signal per H4 BO, one at a time. The live Mosha BO shares the first two
+steps and then trades the END of the retracement (an M15 BO back with the H4); this trades the retracement itself. It reads the
+owner's own trade (`node run.mjs example`). **Verdict: FAIL on the pre-registered bar, in substance break-even**: 445 trades,
++0.02R a trade after costs, t 0.17 (in sample +0.07R, out of sample -0.03R; before costs +0.13R, median stop $3.21). Variants,
+reported only: zone on M15 +0.10R (t 0.81, positive in both halves: a hypothesis, Holm p 1.00 over the day's nine tests), weekly
+direction only -0.11R, H4 key level only -0.04R, fixed 3R 0.00R. Not an edge, never call it one; any follow-up (M15 zone, buy
+side) needs its own pre-registration on other data (OANDA 2006-17 as mosha-oos used). Owner decision: docs/owner-decisions.md
+item 27. Tests: `tests/mosha-retrace.test.mjs`.
