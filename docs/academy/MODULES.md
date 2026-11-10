@@ -95,8 +95,32 @@ tested). Full signatures are in each file's header comments and its tests.
 
 - Train tab = the whole loop: setup → replay → decision (stored as an attempt at once) → mentor controls → lesson draft → replay the
   same trade → comparison → test on new setups (exam pool, with and without lessons, results kept apart) → paper account.
-- Other tabs are filled with `MXAC.registerTab(id, { title, render(section, ctx) })`, `ctx = { api: { get, post }, edge(), edges(), me }`.
-  Tab ids: `session`, `blind`, `progress`, `lessons`, `research`, `models`, `costs`, `audit`.
+- The other tabs live in `assets/academy-tabs.js` (`window.MXAT`, tests `tests/academy-tabs.test.mjs`) and register with
+  `MXAC.registerTab(id, { title, render(section, ctx) })`, `ctx = { api: { get, post }, edge(), edges(), me, kit, go(tab) }`:
+  - `lessons`: every version (chains by `root`), origin, recall and new-setup records kept apart, revise through
+    `lesson.revise` with a live diff, switch off / on, research drafts (saved inactive; "Dismiss" = saved inactive and switched
+    off with the reason "Dismissed research draft", so it is kept and audited).
+  - `progress` (mistakes inside it): counts, agreement by week, recall beside new setups (never added), mistakes by class with
+    examples, and the spaced-repetition queue `MXAT.reviewQueue`: a setup whose latest verdict was not an approval is due
+    1, 3, 7, 21 days after its last review; a later sitting that gives the mentor's answer is a pass, anything else starts again
+    at 1 day; four passes in a row retire it; train pool only. "Replay this setup" = `kit.openInTrain(edge, t)`.
+  - `research` (studies, a study in full, the policy table, the notebook), `models`, `costs`, `audit`: read views.
+  - `blind`: the engine's decision is posted as a hidden `blind` attempt and dropped from the page; `blind.submit` returns it;
+    the outcome is read last. `GET ?get=blind&edge=` lists answered setups only, graded like tests.
+  - `session`: a range replayed with the running thesis; stops on train setups (attempt stored, verdict through `correct`);
+    notes anywhere through `POST { action: 'miss', miss: { edge, t, kind: 'missed' | 'right-wait', action, entry, stop, target,
+    text, sessionId, engine, cls, why, snapshotHash } }` (read back with `GET ?get=misses&edge=[&session=]`); sessions are
+    stored with `kind: 'session'`.
+- `ctx.kit` (shared with the Train loop, in `assets/academy-ui.js`): `el / clear / listOr / actBadge`, `newChart(host)`,
+  `viewBarsOf`, `loadSeries`, `snapOf` (the one snapshot builder), `decideOn`, `decisionView`, `lessonForm`, `attemptBody`,
+  `poolFor / lessonsFor / historyFor` (read once, cached), `seenBefore`, `openInTrain`.
+- **Rate limit.** The firewall allows 30 requests a minute per IP on `/api`. `MXAC.makeApi` keeps the page under `MXAC.PACE`
+  (24) Academy calls in any minute, waits out a 429 (`Retry-After`, else 5 s doubling, 4 tries) with a calm status line, and
+  sends writes one at a time. A replay run reads candidates, lessons, calendar and past cases once
+  (`?get=history&before=<end of the range>`, cut per decision by `MXAC.historyAt`); a train decision is then one call (the
+  attempt), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
+  calls instead).
+- A setup decided in an earlier sitting is stored as `replay-same` when the Train or Session clock stops on it again (recall).
 - `scripts/academy-dev.mjs`: out/ + the real API handler on a file store + `/md/bars` from `tests/fixtures/academy/` (real OANDA gold
   candles, 26 Apr to 17 May 2024, 10 train and 3 exam gmp setups) or `--live`.
 - More API reads added for the page: `corrections&edge=[&cand=]`, `research[&edge=&kind=]` / `research&id=`, `evaluation`, `training`.

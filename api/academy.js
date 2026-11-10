@@ -24,9 +24,11 @@
 //   attempts&edge=&cand=&limit=             oldest first; a blind attempt hides its decision until the mentor has answered
 //   sessions · session&id=                  replay session index / one session with its state
 //   progress&edge= · mistakes&edge= · exams&edge= · dataset&edge= · notebook · models · cost · audit&month=YYYY-MM
+//   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded
+//   misses&edge=[&session=]                 the mentor's session notes: "the engine should have acted here" / "right to wait"
 // POST /api/academy { action, ... }
 //   attempt · correct · lesson.save · lesson.revise · lesson.deactivate · lesson.stats · session.save · seen · exam.result ·
-//   blind.submit · notebook.add · model.register · model.promote · model.rollback · explain
+//   blind.submit · miss · notebook.add · model.register · model.promote · model.rollback · explain
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
@@ -37,7 +39,7 @@ const ST = require('./_academy-store.js');
 const LLM = require('./_academy-llm.js');
 
 const MAX_BODY = 256 * 1024, DATASET_VERSION = 'layer-b-1';
-const CAPS = { attempts: 2000, corrections: 4000, exams: 4000, dataset: 4000, blind: 2000, notebook: 1000, audit: 5000, lessons: 5000, sessions: 500 };
+const CAPS = { attempts: 2000, corrections: 4000, exams: 4000, dataset: 4000, blind: 2000, misses: 2000, notebook: 1000, audit: 5000, lessons: 5000, sessions: 500 };
 const EDGE_IDS = ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open'];   // architecture section 2; the registry wins when it is there
 const ACTIONS = ['BUY', 'SELL', 'WAIT', 'MANAGE'], MENTOR_ACTIONS = ['BUY', 'SELL', 'WAIT'], CONFIDENCE = ['low', 'medium', 'high'];
 const MODES = ['train', 'replay-same', 'exam', 'blind'], VERDICTS = ['approve', 'reject', 'change'], BIAS = ['up', 'down', 'neutral'];
@@ -45,7 +47,7 @@ const REASONS = ['missing-confirmation', 'wrong-structure', 'liquidity', 'htf-bi
 const ANNOTATIONS = ['entry', 'stop', 'target', 'liquidity', 'structure', 'sr', 'supply-demand', 'invalidation'];
 const OPS = ['eq', 'ne', 'gte', 'lte', 'in', 'between'], THEN = ['WAIT', 'SKIP', 'TAKE', 'FLIP'];
 const SESSION_STATUS = ['open', 'paused', 'done'], VALIDATION = ['hypothesis', 'in-sample', 'out-of-sample', 'validated', 'rejected', 'inconclusive'];
-const MODEL_STATUS = ['baseline', 'challenger'];
+const MODEL_STATUS = ['baseline', 'challenger'], MISS_KINDS = ['missed', 'right-wait'];
 const STAT_KEYS = ['applied', 'replayPass', 'replayFail', 'examN', 'examAgree', 'examNetWith', 'examNetWithout'];
 const CAND_FIELDS = ['id', 'edge', 'market', 't', 'side', 'entry', 'stop', 'target', 'tf', 'rule', 'edgeVersion', 'pool'];   // a candidate never carries an outcome
 const OUT_FIELDS = ['id', 'R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR'];
@@ -175,7 +177,7 @@ function outcomeOf(raw, id) {
 
 // ---- small helpers ------------------------------------------------------------------------------------------------------
 const K = { lessons: 'lessons.json', attempts: (e) => `attempts/${e}.json`, corrections: (e) => `corrections/${e}.json`, sessions: 'sessions/index.json', session: (id) => `sessions/${id}.json`,
-  seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json` };
+  seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', misses: (e) => `misses/${e}.json`, dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json` };
 const emptySeen = () => ({ v: 1, ids: {} });
 const seenOf = (doc) => (isObj(doc) && isObj(doc.ids) ? doc : emptySeen());
 const emptyModels = () => ({ v: 1, models: [], championId: null, promotions: [], history: [] });
@@ -406,6 +408,26 @@ const GET = {
     return { available: true, generated: t.generated, trainer: t.trainer, data: t.data, target: t.target, verdictRule: t.verdictRule, promotion: t.promotion, models: t.models.map(slim), skipped: t.skipped || [] };
   },
 
+  // The blind arena's record: each mentor answer with the engine's stored answer beside it. A row exists only once the mentor
+  // has answered, so nothing hidden is shown; the outcome is read for those setups only (both answers are stored by then).
+  // Grading is the same as for tests: WAIT = 0R, the setup's own side = its net R, anything else is not graded.
+  async blind(X, q) {
+    const edge = await X.edge(q.edge), rows = (await X.store.rows(K.blind, true)).filter((b) => b.edge === edge), att = await X.store.rows(K.attempts(edge), true), outRaw = await X.data.outcomes(edge), candRaw = await X.data.candidates(edge);
+    const byId = new Map(att.map((a) => [a.id, a])), cands = new Map(candList(candRaw == null ? [] : candRaw).map((c) => [c.id, c]));
+    return { edge, graded: outRaw != null, blind: rows.slice().reverse().map((b) => {
+      const a = b.attemptId ? byId.get(b.attemptId) : null, c = cands.get(b.candidateId) || null, side = c && (c.side === 'buy' || c.side === 'sell') ? c.side : null, out = outRaw == null ? null : outcomeOf(outRaw, b.candidateId);
+      const engine = a && a.decision ? { action: a.decision.action, entry: a.decision.entry, stop: a.decision.stop, target: a.decision.target, confidence: a.decision.confidence } : null;
+      return { ...b, t: c && typeof c.t === 'number' ? c.t : null, side, engine, outcome: out, rMentor: gradeR(b.mentor, side, out), rEngine: gradeR(engine, side, out) };
+    }) };
+  },
+
+  // The mentor's notes from session training, newest first: moments where the engine should have acted, or was right to wait
+  async misses(X, q) {
+    const edge = await X.edge(q.edge), session = q.session == null || q.session === '' ? null : idOf(q.session, 'session');
+    let rows = (await X.store.rows(K.misses(edge), true)).slice().reverse(); if (session) rows = rows.filter((m) => m.sessionId === session);
+    return { edge, misses: rows };
+  },
+
   async notebook(X) { return { notes: (await X.store.rows(K.notebook, true)).slice().reverse() }; },
   async models(X) { const m = await X.store.get(K.models, emptyModels()); return { models: m.models || [], championId: m.championId || null, history: (m.history || []).slice().reverse() }; },
   async cost(X, q, d) { return LLM.status({ env: X.env, store: X.store, now: X.now }); },
@@ -572,6 +594,22 @@ const POST = {
       const entry = { ...(p || {}), mode: 'blind', first: (p && p.first) || at, last: at, attempts: (p && p.attempts) || 0, blindDone: true, blindPending: false };
       return { write: { bl: { ...B, rows: B.rows.concat(row) }, seen: { ...Sn, ids: { ...Sn.ids, [candidateId]: entry } } }, result: { ok: true, blind: row, engine: eng ? eng.decision : null, engineAttemptId: eng ? eng.id : null },
         audit: { action: 'blind.submit', ids: [row.id, candidateId, row.attemptId], summary: `${edge} blind: mentor ${mentor.action}${eng ? `, engine ${eng.decision.action}` : ', no engine answer stored yet'}` } };
+    });
+  },
+
+  // { action: 'miss', miss: { edge, t, kind: 'missed' | 'right-wait', action?: BUY|SELL, entry?, stop?, target?, text, sessionId?, engine?: { action, confidence }, cls?, why?, snapshotHash? } }
+  // A note from session training at replay time t. 'missed' = the engine should have acted here: it needs a side, an entry, a
+  // stop on the losing side and a reason. 'right-wait' = the wait was right. It reads no outcome and changes no decision.
+  async miss(X, b) {
+    const m = obj(b.miss, 'miss'), edge = await X.edge(m.edge, 'miss.edge'), kind = oneOf(m.kind, MISS_KINDS, 'miss.kind'), t = num(m.t, 'miss.t (the replay time)');
+    if (!(t > 0 && t < 4e9)) bad('miss.t must be a time in UTC seconds');
+    const action = kind === 'missed' ? oneOf(m.action, ['BUY', 'SELL'], 'miss.action') : null, lv = kind === 'missed' ? levels(m, action, 'miss') : { entry: null, stop: null, target: null };
+    const body = text(m.text, 4000, 'miss.text', kind === 'missed'), cls = m.cls == null || m.cls === '' ? null : /^[a-z][a-z0-9-]{0,39}$/.test(m.cls) ? m.cls : bad('miss.cls must be a short lower-case name');
+    const engine = m.engine == null ? null : (obj(m.engine, 'miss.engine'), { action: oneOf(m.engine.action, ACTIONS, 'miss.engine.action'), confidence: oneOfOrNull(m.engine.confidence, CONFIDENCE, 'miss.engine.confidence') });
+    const row = { edge, sessionId: idOrNull(m.sessionId, 'miss.sessionId'), t, kind, action, entry: lv.entry, stop: lv.stop, target: lv.target, text: body, engine, cls, why: text(m.why, 600, 'miss.why'), snapshotHash: textOrNull(m.snapshotHash, 80, 'miss.snapshotHash') }, kM = K.misses(edge);
+    return X.write({ ms: [kM, ST.emptyRows(), CAPS.misses] }, ({ ms }, at) => {
+      const Mi = R(ms, kM), saved = { id: X.id('mi'), at, ...row };
+      return { write: { ms: { ...Mi, rows: Mi.rows.concat(saved) } }, result: { ok: true, miss: saved }, audit: { action: 'miss', ids: [saved.id, row.sessionId], summary: `${edge} ${kind === 'missed' ? `missed opportunity: ${action}` : 'right to wait'} at ${new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC` } };
     });
   },
 

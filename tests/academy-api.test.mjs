@@ -572,3 +572,39 @@ test('corrections, research, evaluation and training are readable; a research dr
   if (d) { const sv = await post(c, { action: 'lesson.save', lesson: { edge: d.edge, title: d.title, text: d.text, when: d.when, then: d.then, source: d.source, active: false } }); assert.equal(sv.code, 200, JSON.stringify(sv.body)); assert.equal(sv.body.lesson.active, false); assert.equal(sv.body.lesson.source.kind, 'research'); assert.equal(sv.body.lesson.source.studyId, d.source.studyId); }
   assert.equal((await post(c, { action: 'lesson.save', lesson: { edge: 'replica', title: 'x', when: [{ f: 'session', op: 'eq', v: 'london' }], then: { action: 'WAIT' }, source: { kind: 'robot' } } })).code, 400);
 });
+
+test('blind list: only answered setups, the engine answer beside the mentor answer, graded after both are stored', async () => {
+  const c = mk();
+  assert.equal((await get(c, { get: 'blind', edge: 'nope' })).code, 400);
+  assert.deepEqual((await get(c, { get: 'blind', edge: 'replica' })).body.blind, [], 'an empty arena reads as an empty list');
+  await post(c, attempt({ candidateId: 'replica:2', mode: 'blind' }, { action: 'SELL', entry: 2010, stop: 2015, target: 2000, t: T0 + 3600 }));
+  const hidden = await get(c, { get: 'blind', edge: 'replica' });
+  assert.deepEqual(hidden.body.blind, [], 'a setup the mentor has not answered is not listed');
+  assert.ok(!JSON.stringify(hidden.body).includes('1.9') && !JSON.stringify(hidden.body).includes('SELL'), 'neither the hidden answer nor the outcome leaks');
+  await post(c, { action: 'blind.submit', blind: { edge: 'replica', candidateId: 'replica:2', action: 'WAIT', text: 'Too late.' } });
+  await post(c, { action: 'blind.submit', blind: { edge: 'replica', candidateId: 'replica:1', action: 'BUY', entry: 2000, stop: 1995, target: 2010 } });   // no engine answer stored
+  const j = (await get(c, { get: 'blind', edge: 'replica' })).body;
+  assert.equal(j.graded, true); assert.deepEqual(j.blind.map((b) => b.candidateId), ['replica:1', 'replica:2'], 'newest first');
+  const b2 = j.blind[1]; assert.equal(b2.mentor.action, 'WAIT'); assert.deepEqual(b2.engine, { action: 'SELL', entry: 2010, stop: 2015, target: 2000, confidence: 'medium' });
+  assert.equal(b2.side, 'sell'); assert.equal(b2.t, T0 + 3600); assert.equal(b2.rMentor, 0); assert.equal(b2.rEngine, 1.9); assert.equal(b2.agree, false); assert.equal(b2.outcome.reason, 'target');
+  const b1 = j.blind[0]; assert.equal(b1.engine, null); assert.equal(b1.rEngine, null); assert.equal(b1.rMentor, -1.05);
+  assert.equal((await get(c, { get: 'blind', edge: 'replica' }, { who: async () => FRED })).code, 403, 'owner only');
+});
+
+test('session notes: a missed opportunity needs a side, a stop and a reason; a right wait needs nothing more; both are audited', async () => {
+  const c = mk(), base = { edge: 'replica', t: T0 + 600, kind: 'missed', action: 'BUY', entry: 2001, stop: 1996, target: 2011, text: 'Swept the low and closed back above it.', engine: { action: 'WAIT', confidence: 'low' }, cls: 'correct-wait', why: 'there was no candidate to take', snapshotHash: 'h9' };
+  for (const [wrong, why] of [[{ kind: 'maybe' }, 'kind'], [{ action: 'WAIT' }, 'a missed trade is a BUY or a SELL'], [{ stop: null }, 'every trade has a stop'], [{ stop: 2005 }, 'stop on the wrong side'], [{ target: 1990 }, 'target on the wrong side'], [{ text: '' }, 'a reason'], [{ t: null }, 'time'], [{ t: 1e300 }, 'time range'],
+    [{ edge: 'nope' }, 'edge'], [{ cls: 'Not A Class' }, 'class'], [{ engine: { action: 'HOLD' } }, 'engine action'], [{ sessionId: 'bad id' }, 'session id']])
+    assert.equal((await post(c, { action: 'miss', miss: { ...base, ...wrong } })).code, 400, why);
+  assert.equal(c.store.peek('misses/replica.json'), undefined, 'a refused note writes nothing');
+  assert.equal((await post(c, { action: 'miss', miss: base }, { who: async () => FRED })).code, 403);
+  const a = await post(c, { action: 'miss', miss: { ...base, sessionId: 'se_abcdefgh12' } }); assert.equal(a.code, 200, JSON.stringify(a.body));
+  assert.match(a.body.miss.id, /^mi_/); assert.equal(a.body.miss.action, 'BUY'); assert.equal(a.body.miss.stop, 1996); assert.equal(a.body.miss.cls, 'correct-wait'); assert.deepEqual(a.body.miss.engine, { action: 'WAIT', confidence: 'low' });
+  const w = await post(c, { action: 'miss', miss: { edge: 'replica', t: T0 + 1200, kind: 'right-wait', action: 'BUY', entry: 1, stop: 2 } }); assert.equal(w.code, 200, JSON.stringify(w.body));
+  assert.equal(w.body.miss.action, null); assert.equal(w.body.miss.entry, null); assert.equal(w.body.miss.stop, null, 'a right wait carries no trade');
+  const all = (await get(c, { get: 'misses', edge: 'replica' })).body.misses; assert.deepEqual(all.map((m) => m.kind), ['right-wait', 'missed'], 'newest first');
+  assert.equal((await get(c, { get: 'misses', edge: 'replica', session: 'se_abcdefgh12' })).body.misses.length, 1);
+  assert.deepEqual((await get(c, { get: 'misses', edge: 'gtrend' })).body.misses, []);
+  const rows = (await auditRows(c)).filter((r) => r.action === 'miss'); assert.equal(rows.length, 2); assert.match(rows.map((r) => r.summary).join(' | '), /missed opportunity: BUY at 2023-11-14 22:23 UTC/); assert.match(rows.map((r) => r.summary).join(' | '), /right to wait/);
+  assert.ok(!JSON.stringify(all).includes('netR'), 'a note never carries an outcome');
+});

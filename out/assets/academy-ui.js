@@ -12,9 +12,15 @@
 // goes to the paper ledger, never into a decision. window.MXAC.lastSnapshot is the last snapshot handed to a decision and
 // window.MXAC.checks counts every one of them (future = snapshots holding a bar that ends after t; it must stay 0).
 //
-// For the next build step: window.MXAC.registerTab(id, { title, render(section, ctx) }) fills one of the empty sections
-// (session, blind, progress, lessons, research, models, costs, audit) or adds a new one, without touching this file.
-// ctx = { api: { get(query), post(body) }, edge() (the chosen edge id), edges() (the registry), me }.
+// The other sections (session, blind, progress, lessons, research, models, costs, audit) are filled by
+// assets/academy-tabs.js through window.MXAC.registerTab(id, { title, render(section, ctx) }).
+// ctx = { api: { get(query), post(body) }, edge() (the chosen edge id), edges() (the registry), me, kit, go(tab) }.
+// ctx.kit holds the pieces the Train loop and those sections share: the DOM helpers, a chart on the page's look, candle
+// loading, the one snapshot builder, the decision call, the decision panel, the lesson form, and per-run caches.
+//
+// The site's firewall allows 30 requests a minute per IP on /api. Every Academy call goes through MXAC.makeApi: at most
+// PACE (24) calls in any minute, a wait and a retry on HTTP 429, POSTs one at a time. A replay run reads the candidates,
+// the lessons, the calendar and the past cases once; one train decision then costs one call (the stored attempt).
 //
 // The pure helpers at the top are also loaded by Node (tests/academy-ui.test.mjs, scripts/academy-dev.mjs).
 (function (root) {
@@ -194,10 +200,65 @@
   // The core writes one time as raw epoch seconds into text the mentor reads ("bias down since 1714608000"): show a date.
   const humanize = (s) => String(s == null ? '' : s).replace(/\bsince (\d{9,10})\b/g, (m, n) => 'since ' + fmtTime(+n));
 
+  // Past cases a decision at t may lean on, out of a list read once for a whole run (GET ?get=history&before=<end of the
+  // range>): only cases whose trade had finished before t. The same cut the API makes for cand=, and MXA.decide drops
+  // anything not finished by t again.
+  const historyAt = (rows, t) => (Array.isArray(rows) ? rows.filter((r) => r && r.t < t && r.exitT < t) : []);
+
+  // ---- the API wrapper ----------------------------------------------------------------------------------------------
+  // makeApi({ fetch, sleep(ms), now(), perMinute (number or function), onWait(kind, seconds), base }) → { get, post, stats }
+  //  - a sliding window: at most perMinute calls in any 60 seconds (0 = no pacing); a call over it waits its turn, in order;
+  //  - HTTP 429: wait for Retry-After (else 5 s, doubling) and try again, TRIES in all. A blocked request never reached
+  //    the handler, so sending it again cannot store anything twice. After the last try the call fails with status 429 and
+  //    the caller says so: a write is retried or reported, never dropped silently;
+  //  - POSTs run one at a time (the store has no compare-and-swap).
+  // onWait('pace' | 'limit', seconds) is called before a wait and onWait(null, 0) after it.
+  const PACE = 24, TRIES = 4, RETRY_MS = 5000;
+  function makeApi(o) {
+    const send = o.fetch, sleep = o.sleep || ((ms) => new Promise((r) => setTimeout(r, ms))), now = o.now || (() => Date.now()), onWait = o.onWait || (() => {}), base = o.base || '/api/academy';
+    const stamps = [], stats = { calls: 0, paced: 0, retries: 0 }; let chain = Promise.resolve(), gate = Promise.resolve();
+    const limit = () => { const n = typeof o.perMinute === 'function' ? o.perMinute() : o.perMinute; return n > 0 ? n : 0; };
+    function slot() {
+      const run = async () => {
+        for (;;) {
+          const lim = limit(), t = now(); while (stamps.length && t - stamps[0] >= 60000) stamps.shift();
+          if (!lim || stamps.length < lim) { stamps.push(t); return; }
+          const ms = 60000 - (t - stamps[0]) + 50; stats.paced++; onWait('pace', Math.ceil(ms / 1000)); await sleep(ms); onWait(null, 0);
+        }
+      };
+      const p = gate.then(run, run); gate = p.catch(() => {}); return p;
+    }
+    async function call(url, init) {
+      let wait = RETRY_MS;
+      for (let n = 1; ; n++) {
+        await slot(); stats.calls++;
+        let r; try { r = await send(url, init); } catch (e) { throw Object.assign(new Error('the Academy service could not be reached'), { status: 0 }); }
+        if (r.status === 429 && n < TRIES) {
+          const ra = parseFloat(r.headers && typeof r.headers.get === 'function' ? r.headers.get('Retry-After') : ''); let ms;
+          if (Number.isFinite(ra) && ra >= 0) ms = Math.min(ra, 120) * 1000; else { ms = wait; wait *= 2; }
+          stats.retries++; onWait('limit', Math.ceil(ms / 1000)); await sleep(ms); onWait(null, 0); continue;
+        }
+        let j = null; try { j = await r.json(); } catch (e) { /* no JSON body */ }
+        if (!r.ok) throw Object.assign(new Error(r.status === 429 ? `the server is still limiting requests after ${TRIES} tries: wait a minute and try again` : (j && j.error) || 'the Academy service answered ' + r.status), { status: r.status });
+        return j || {};
+      }
+    }
+    const get = (q) => call(base + '?' + new URLSearchParams(q).toString(), { cache: 'no-store', credentials: 'same-origin' });
+    const post = (body) => { const run = () => call(base, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const p = chain.then(run, run); chain = p.catch(() => {}); return p; };
+    return { get, post, stats };
+  }
+
+  // the levels a changed BUY / SELL starts from: the setup's own, mirrored when the mentor takes the other side
+  function mentorLevelsOf(c, choice) {
+    if (!c || !isTake(choice)) return { entry: null, stop: null, target: null };
+    if (actOf(c.side) === choice) return { entry: c.entry, stop: c.stop, target: c.target };
+    return { entry: c.entry, stop: +(c.entry + (c.entry - c.stop)).toFixed(2), target: fin(c.target) ? +(c.entry - (c.target - c.entry)).toFixed(2) : null };
+  }
+
   const REG = {};        // tabs registered by other files: id → { title, render }
   let onRegister = null;
   const MXAC = {
-    VERSION: '1.0.0', TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
+    VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
     condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 },
@@ -229,19 +290,10 @@
   const actClass = (a) => (a === 'BUY' ? 'buy' : a === 'SELL' ? 'sell' : 'wait');
   const actBadge = (a, small, id) => el('span', { class: 'act ' + actClass(a) + (small ? ' sm' : ''), id: id || null, text: a || 'n/a' });
 
-  // /api/academy: GETs run freely; POSTs go one at a time (the store has no compare-and-swap)
-  const api = (() => {
-    let chain = Promise.resolve();
-    async function call(url, init) {
-      let r; try { r = await fetch(url, init); } catch (e) { throw Object.assign(new Error('the Academy service could not be reached'), { status: 0 }); }
-      let j = null; try { j = await r.json(); } catch (e) { /* no JSON body */ }
-      if (!r.ok) throw Object.assign(new Error((j && j.error) || 'the Academy service answered ' + r.status), { status: r.status });
-      return j || {};
-    }
-    const get = (q) => call('/api/academy?' + new URLSearchParams(q).toString(), { cache: 'no-store', credentials: 'same-origin' });
-    const post = (body) => { const run = () => call('/api/academy', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const p = chain.then(run, run); chain = p.catch(() => {}); return p; };
-    return { get, post };
-  })();
+  // /api/academy through the paced wrapper. While it waits, one calm line says so (it is not an error).
+  const api = makeApi({ fetch: (url, init) => fetch(url, init), perMinute: () => (typeof root.MXAC_PACE === 'number' ? root.MXAC_PACE : PACE),
+    onWait: (kind, sec) => { const n = $('ac-net'); if (!n) return; n.hidden = !kind; n.textContent = kind ? `Waiting for the server's rate limit… about ${sec} s. Nothing is lost: the page carries on by itself.` : ''; } });
+  MXAC.api = api;
 
   const S = { me: null, edges: [], setup: null, cands: [], series: null, clock: null, account: null, thesis: null, lessons: [], cur: null, done: new Set(), open: [], closed: [], fromT: 0, sinceThesis: 0,
     pending: null, busy: false, loading: false, wasPlaying: false, sessionId: null, htf: '1h', dataVersion: null, poolToken: 0, lastBlock: null, exams: null, calendar: undefined };
@@ -250,16 +302,14 @@
 
   // ---- tabs -----------------------------------------------------------------------------------------------------------
   let activeTab = 'train';
-  const ctx = () => ({ api, edge: () => (S.setup ? S.setup.edge.id : $('f-edge').value || null), edges: () => S.edges.slice(), me: S.me });
+  const ctx = () => ({ api, edge: () => (S.setup ? S.setup.edge.id : $('f-edge').value || null), edges: () => S.edges.slice(), me: S.me, kit: MXAC.kit, go: showTab });
   function tabList() { const ids = TABS.map((t) => t[0]); for (const id of Object.keys(REG)) if (ids.indexOf(id) < 0) ids.push(id); return ids; }
   const tabTitle = (id) => (REG[id] && REG[id].title) || (TABS.find((t) => t[0] === id) || [id, id])[1];
   function renderTabs() {
     const bar = clear($('ac-tabs'));
     for (const id of tabList()) {
       if (!$('ac-' + id)) $('ac-app').appendChild(el('section', { id: 'ac-' + id, role: 'tabpanel', 'aria-labelledby': 'tab-' + id, tabindex: '-1', hidden: true }));
-      const built = id === 'train' || !!REG[id];
-      bar.appendChild(el('button', { type: 'button', role: 'tab', id: 'tab-' + id, 'aria-controls': 'ac-' + id, 'aria-selected': id === activeTab ? 'true' : 'false', tabindex: id === activeTab ? '0' : '-1', onclick: () => showTab(id) },
-        tabTitle(id), built ? null : el('span', { class: 'soon', text: '(next step)' })));
+      bar.appendChild(el('button', { type: 'button', role: 'tab', id: 'tab-' + id, 'aria-controls': 'ac-' + id, 'aria-selected': id === activeTab ? 'true' : 'false', tabindex: id === activeTab ? '0' : '-1', onclick: () => showTab(id) }, tabTitle(id)));
     }
   }
   function showTab(id) {
@@ -268,8 +318,8 @@
     if (id === 'train') { resizeCharts(); return; }
     if (S.clock && S.clock.state().playing) { S.clock.pause(); draw(); }
     const sec = $('ac-' + id);
-    if (REG[id]) { try { REG[id].render(sec, ctx()); } catch (e) { clear(sec).appendChild(el('p', { class: 'ac-err', text: 'This section failed to draw: ' + e.message })); } }
-    else clear(sec).appendChild(el('div', { class: 'card ac-soon' }, el('h2', { text: tabTitle(id) }), el('p', { text: 'Coming in the next build step.' }), el('p', { class: 'note', text: 'Nothing here works yet, so nothing is shown.' })));
+    if (REG[id]) { try { const r = REG[id].render(sec, ctx()); if (r && typeof r.catch === 'function') r.catch((e) => { clear(sec).appendChild(el('p', { class: 'ac-err', text: 'This section failed to draw: ' + e.message })); }); } catch (e) { clear(sec).appendChild(el('p', { class: 'ac-err', text: 'This section failed to draw: ' + e.message })); } }
+    else clear(sec).appendChild(el('p', { class: 'ac-err', text: 'This section did not load (assets/academy-tabs.js is missing). Reload the page.' }));
   }
   $('ac-tabs').addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'Home' && e.key !== 'End') return;
@@ -316,29 +366,45 @@
       : 'Train: the replay stops on train-pool setups. You approve or correct each decision, save the lesson and replay the same trade to check it.';
     $('start').textContent = modeVal() === 'exam' ? 'Start exam replay' : 'Start replay';
   }
+  // Per-run caches (the firewall allows few calls): the setups of an edge and pool, the lessons in force, the past cases.
+  const CACHE = { pool: {}, lessons: {}, hist: {} }, DECIDED = new Set();   // DECIDED: setups this page stored an attempt for
+  async function poolFor(edgeId, pool, force) {
+    const k = edgeId + '|' + pool; if (force || !CACHE.pool[k]) CACHE.pool[k] = api.get({ get: 'candidates', edge: edgeId, pool, limit: 5000 }).catch((e) => { delete CACHE.pool[k]; throw e; });
+    return CACHE.pool[k];
+  }
+  async function lessonsFor(edgeId, force) {
+    if (force || !CACHE.lessons[edgeId]) CACHE.lessons[edgeId] = api.get({ get: 'lessons', edge: edgeId, active: '1' }).then((j) => (Array.isArray(j.lessons) ? j.lessons : [])).catch((e) => { delete CACHE.lessons[edgeId]; throw e; });
+    return CACHE.lessons[edgeId];
+  }
+  const lessonsChanged = () => { CACHE.lessons = {}; };
+  // past cases up to `before`, read once and cut per decision with historyAt. A wider list already read is reused.
+  async function historyFor(edgeId, before) {
+    const c = CACHE.hist[edgeId]; if (c && c.before >= before) return c;
+    try { const j = await api.get({ get: 'history', edge: edgeId, before }); return (CACHE.hist[edgeId] = { before, rows: Array.isArray(j.rows) ? j.rows : [], available: j.available !== false }); }
+    catch (e) { return { before, rows: [], available: false }; }   // the route may be missing or its data not built: no sample
+  }
+  const seenBefore = (pool, id) => DECIDED.has(id) || !!(pool && pool.seen && pool.seen[id] && pool.seen[id].attempts > 0);
   async function refreshPool(resetRange) {
     const e = edgeSel(); if (!e) return; const token = ++S.poolToken, pool = modeVal() === 'exam' ? 'exam' : 'train', note = $('f-count');
     try {
+      if (resetRange) note.textContent = 'Counting setups…';
+      const all = await poolFor(e.id, pool); if (token !== S.poolToken) return;
       if (resetRange) {
-        note.textContent = 'Counting setups…';
-        const all = await api.get({ get: 'candidates', edge: e.id, pool, limit: 5000 }); if (token !== S.poolToken) return;
         const r = defaultRange(all.candidates || [], 60);
         if (r) { $('f-from').value = isoDay(r.from); $('f-to').value = isoDay(r.to - DAY); } else { $('f-from').value = ''; $('f-to').value = ''; }
         if (!r) { note.textContent = pool === 'exam' ? 'No unseen exam setup is left for this edge.' : 'No train setup is available for this edge.'; return; }
       }
       const r = readRange(); if (!r) { note.textContent = 'Pick a start and an end date (the end on or after the start).'; return; }
-      const j = await api.get({ get: 'candidates', edge: e.id, pool, from: r.from, to: r.to - 1, limit: 5000 }); if (token !== S.poolToken) return;
-      const seen = j.seen ? Object.keys(j.seen).filter((k) => j.seen[k].attempts > 0).length : 0, ex = j.excluded || {}, left = (ex.clockShift || 0) + (ex.pre2020 || 0);
-      note.textContent = `${j.total} ${pool} setup${j.total === 1 ? '' : 's'} in this range` + (pool === 'train' && seen ? ` (${seen} already decided before)` : '') + (pool === 'exam' ? ' (unseen only)' : '') + '.'
-        + (left ? ` ${left} setup${left === 1 ? '' : 's'} left out: ${[ex.clockShift ? ex.clockShift + ' in research-clock weeks' : '', ex.pre2020 ? ex.pre2020 + ' before 2020' : ''].filter(Boolean).join(', ')}.` : '')
-        + (j.total === 0 ? ' The replay would not stop on anything.' : '');
+      const rows = (all.candidates || []).filter((c) => c.t >= r.from && c.t < r.to), total = rows.length, seen = rows.filter((c) => seenBefore(all, c.id)).length, ex = all.excluded || {}, left = (ex.clockShift || 0) + (ex.pre2020 || 0);
+      note.textContent = `${total} ${pool} setup${total === 1 ? '' : 's'} in this range` + (pool === 'train' && seen ? ` (${seen} already decided before)` : '') + (pool === 'exam' ? ' (unseen only)' : '') + '.'
+        + (left ? ` ${left} setup${left === 1 ? '' : 's'} of this edge ${left === 1 ? 'is' : 'are'} left out of every list: ${[ex.clockShift ? ex.clockShift + ' in research-clock weeks' : '', ex.pre2020 ? ex.pre2020 + ' before 2020' : ''].filter(Boolean).join(', ')}.` : '')
+        + (total === 0 ? ' The replay would not stop on anything.' : '');
     } catch (err) { if (token === S.poolToken) note.textContent = 'The setups could not be counted: ' + err.message + '.'; }
   }
-  async function fetchLessons(edgeId) { const j = await api.get({ get: 'lessons', edge: edgeId, active: '1' }); return Array.isArray(j.lessons) ? j.lessons : []; }
   async function renderLessonsList() {
     const e = edgeSel(), ul = $('lessons-list'); if (!e) return;
     try {
-      const ls = await fetchLessons(e.id); $('lessons-n').textContent = `(${ls.length})`;
+      const ls = await lessonsFor(e.id); $('lessons-n').textContent = `(${ls.length})`;
       listOr(ul, ls, 'No lesson saved yet. A lesson appears here after you correct a decision and save it.', (l) => el('li', { 'data-lesson': l.id },
         el('div', {}, el('b', { text: l.title }), el('br'), lessonText(l), el('br'), el('small', { text: `version ${l.version} · applied ${(l.stats && l.stats.applied) || 0} · same-trade replays passed ${(l.stats && l.stats.replayPass) || 0}, failed ${(l.stats && l.stats.replayFail) || 0} · new setups ${(l.stats && l.stats.examN) || 0}` }))));
     } catch (err) { listOr(ul, [], 'The lessons could not be read: ' + err.message + '.', () => null); }
@@ -408,30 +474,26 @@
     try { const j = await api.get({ get: 'calendar' }); S.calendar = j && j.available !== false && Array.isArray(j.items) ? { from: j.from, to: j.to, items: j.items, types: j.types || [] } : null; }
     catch (e) { S.calendar = null; }
   }
-  async function fetchHistory(edgeId, cand) {
-    try { const j = await api.get({ get: 'history', edge: edgeId, cand: cand.id }); return { rows: Array.isArray(j.rows) ? j.rows : [], available: j.available !== false }; }
-    catch (e) { return { rows: [], available: false }; }   // the route may be missing (400 / 404) or its data not built (503): no sample
-  }
-  const attemptBody = (cand, edgeId, mode, d, lessons, hash, f) => ({ action: 'attempt', attempt: { candidateId: cand.id, edge: edgeId, mode, decision: d, sessionId: S.sessionId, lessonsAvailable: lessons.map((l) => l.id), snapshotHash: hash }, features: f });
+  const attemptBody = (cand, edgeId, mode, d, lessons, hash, f, sessionId) => ({ action: 'attempt', attempt: { candidateId: cand.id, edge: edgeId, mode, decision: d, sessionId: sessionId === undefined ? S.sessionId : sessionId, lessonsAvailable: lessons.map((l) => l.id), snapshotHash: hash }, features: f });
 
   // ---- replay ---------------------------------------------------------------------------------------------------------
   const say = (id, msg) => { $(id).textContent = msg || ''; };
   function log(text, strong) { const ol = $('log'), li = el('li', {}, strong ? el('b', { text: strong + ' ' }) : null, text); ol.insertBefore(li, ol.firstChild); while (ol.children.length > 80) ol.removeChild(ol.lastChild); }
 
-  async function startReplay(resume) {
+  async function startReplay(resume, opts) {
     if (S.loading) return;
     const st = resume ? resume.setup : readSetup(); if (st.error) { setupErr(st.error); return; }
     setupErr(''); S.loading = true; $('start').disabled = true;
     try {
       say('load-msg', 'Reading the setups…');
-      const cj = await api.get({ get: 'candidates', edge: st.edge.id, pool: st.mode === 'exam' ? 'exam' : 'train', from: st.from, to: st.to - 1, limit: 5000 });
+      const pj = await poolFor(st.edge.id, st.mode === 'exam' ? 'exam' : 'train', st.mode === 'exam'), cj = { candidates: (pj.candidates || []).filter((c) => c.t >= st.from && c.t < st.to) };
       const { series, dataVersion } = await loadSeries(st.edge.market, st.from, st.to, (m) => say('load-msg', m));
       if (!series[st.tf].length || !series['5m'].length) throw Object.assign(new Error('No candles came back for this market and range, so there is nothing to replay. Try other dates.'), { code: 'NO_BARS' });
-      say('load-msg', 'Reading the lessons and the release calendar…');
-      const lessons = await fetchLessons(st.edge.id); await ensureCalendar();
+      say('load-msg', 'Reading the lessons, the past cases and the release calendar…');
+      const lessons = await lessonsFor(st.edge.id, true), hist = await historyFor(st.edge.id, st.to); await ensureCalendar();
       // everything is loaded: swap the replay in
       if (S.clock) S.clock.pause();
-      S.setup = st; S.cands = (cj.candidates || []).slice().sort((a, b) => a.t - b.t); S.series = series; S.dataVersion = dataVersion; S.lessons = lessons;
+      S.setup = st; S.cands = (cj.candidates || []).slice().sort((a, b) => a.t - b.t); S.series = series; S.dataVersion = dataVersion; S.lessons = lessons; S.hist = hist; S.pool = pj;
       S.cur = null; S.pending = null; S.busy = false; S.sinceThesis = 0; S.lastBlock = null;
       S.sessionId = resume ? resume.id : null; S.done = new Set(resume ? resume.done : []); S.closed = resume ? resume.closed : []; S.open = [];
       S.account = resume ? resume.account : MXK.account(st.balance, { t: st.from });
@@ -451,6 +513,9 @@
       if (resume) { for (const tr of resume.open || []) await reopenTrade(tr); if (resume.cur) await restorePoint(resume.cur); }
       say('replay-msg', S.cur ? '' : 'Press Play, or Space.');
       $('replay').scrollIntoView({ block: 'start' });
+      if (opts && fin(opts.at) && !S.cur) {   // asked for one setup (a mistake due again): go to the candle before it and run onto it
+        const at = Math.min(st.to, Math.max(st.from, opts.at)); S.fromT = at; S.clock.jump(Math.max(st.from, at - MXR.TF[st.tf])); S.sinceThesis = 0; draw(); S.clock.play(); say('replay-msg', ''); draw();
+      }
     } catch (e) { setupErr(e && e.code ? candleError(e) : 'The replay could not start: ' + ((e && e.message) || e) + '.'); say('load-msg', ''); }
     finally { S.loading = false; $('start').disabled = false; }
   }
@@ -520,27 +585,38 @@
   const look = () => ({ layout: { background: { type: 'solid', color: css('--panel') || '#0f1116' }, textColor: css('--ink-dim') || '#a4abb8', fontSize: 12 }, grid: { vertLines: { color: css('--line-soft') }, horzLines: { color: css('--line-soft') } },
     rightPriceScale: { borderColor: css('--line') }, timeScale: { borderColor: css('--line'), timeVisible: true, secondsVisible: false, rightOffset: 6 } });
   const candleLook = () => ({ upColor: css('--buy'), downColor: css('--sell'), wickUpColor: css('--buy'), wickDownColor: css('--sell'), borderVisible: false, priceLineVisible: false, priceFormat: { type: 'price', precision: 2, minMove: 0.01 } });
-  function makeCharts() {
+  // Every chart on the page comes from here, so they share one look and a theme change reaches all of them.
+  // → { chart, series, setBars(bars), line(price, title, color, solid), clearLines(), fit() }
+  const CHARTS = [];
+  function newChart(host) {
     const LW = root.LightweightCharts; if (!LW) throw new Error('the chart library did not load');
+    const chart = LW.createChart(host, { autoSize: true, crosshair: { mode: 0 }, handleScroll: { vertTouchDrag: false } }), series = chart.addCandlestickSeries(candleLook()), lines = [];
+    const c = { chart, series, setBars: (bars) => series.setData(bars), fit: () => chart.timeScale().resetTimeScale(),
+      line(price, title, color, solid) { if (fin(price)) lines.push(series.createPriceLine({ price, color, lineWidth: solid ? 2 : 1, lineStyle: solid ? 0 : 2, axisLabelVisible: true, title })); },
+      clearLines() { while (lines.length) { try { series.removePriceLine(lines.pop()); } catch (e) { /* already gone */ } } } };
+    chart.applyOptions(look());
+    if (!CHARTS.length) { const mq = root.matchMedia ? root.matchMedia('(prefers-color-scheme: light)') : null; if (mq && mq.addEventListener) mq.addEventListener('change', themeCharts); }
+    CHARTS.push(c); return c;
+  }
+  function makeCharts() {
     if (!CH.main) {
-      const base = { autoSize: true, crosshair: { mode: 0 }, handleScroll: { vertTouchDrag: false } };
-      CH.main = LW.createChart($('chart'), base); CH.series = CH.main.addCandlestickSeries(candleLook());
-      CH.htf = LW.createChart($('htf'), base); CH.htfSeries = CH.htf.addCandlestickSeries(candleLook());
+      const a = newChart($('chart')), b = newChart($('htf'));
+      CH.main = a.chart; CH.series = a.series; CH.htf = b.chart; CH.htfSeries = b.series;
       CH.main.timeScale().subscribeVisibleLogicalRangeChange(placeZones);
-      const mq = root.matchMedia ? root.matchMedia('(prefers-color-scheme: light)') : null; if (mq && mq.addEventListener) mq.addEventListener('change', themeCharts);
       wireChartPointer();
     }
     themeCharts(); clearLines(CH.edgeLines); clearMentorLines(); clearLines(CH.annLines);
     CH.main.timeScale().resetTimeScale(); CH.htf.timeScale().resetTimeScale();
   }
-  function themeCharts() { if (!CH.main) return; CH.main.applyOptions(look()); CH.htf.applyOptions(look()); CH.series.applyOptions(candleLook()); CH.htfSeries.applyOptions(candleLook()); }
+  function themeCharts() { for (const c of CHARTS) { c.chart.applyOptions(look()); c.series.applyOptions(candleLook()); } }
   function resizeCharts() { if (CH.main) { draw(); } }
-  // bars of one timeframe as the chart may show them at t: closed bars, plus the forming bar built from closed 5m bars (grey)
-  function viewBars(tf, t, keep) {
-    const all = S.series[tf], n = MXR.closedCount(all, tf, t), out = all.slice(Math.max(0, n - keep), n);
-    if (tf !== '5m') { const f = MXR.formingAt(S.series['5m'], tf, t, '5m'), grey = css('--ink-faint'); if (f && (!out.length || f.time > out[out.length - 1].time)) out.push({ time: f.time, open: f.open, high: f.high, low: f.low, close: f.close, color: grey, wickColor: grey, borderColor: grey }); }
+  // bars of one timeframe as a chart may show them at t: closed bars, plus the forming bar built from closed 5m bars (grey)
+  function viewBarsOf(series, tf, t, keep) {
+    const all = series[tf], n = MXR.closedCount(all, tf, t), out = all.slice(Math.max(0, n - keep), n);
+    if (tf !== '5m') { const f = MXR.formingAt(series['5m'], tf, t, '5m'), grey = css('--ink-faint'); if (f && (!out.length || f.time > out[out.length - 1].time)) out.push({ time: f.time, open: f.open, high: f.high, low: f.low, close: f.close, color: grey, wickColor: grey, borderColor: grey }); }
     return out;
   }
+  const viewBars = (tf, t, keep) => viewBarsOf(S.series, tf, t, keep);
   function draw() {
     if (!CH.main || !S.clock) return; const st = S.clock.state();
     CH.series.setData(viewBars(S.setup.tf, st.t, 500)); CH.htfSeries.setData(viewBars(S.htf, st.t, 240));
@@ -694,7 +770,7 @@
     try {
       const snap = snapOf(st.edge, S.series, S.dataVersion, c.t, c), f = MXA.features(snap), hash = MXR.hash(snap);
       if (st.mode === 'exam') { await examPoint(c, snap, f, hash); return; }
-      const [lessons, hist] = await Promise.all([fetchLessons(st.edge.id), fetchHistory(st.edge.id, c)]); S.lessons = lessons;
+      const lessons = (S.lessons = await lessonsFor(st.edge.id)), hist = { rows: historyAt(S.hist.rows, c.t), available: S.hist.available };   // from the run's cache: read again only after a lesson changed
       const r = decideOn(snap, { setup: st, account: S.account, lessons, thesis: S.thesis, history: hist.rows }), d = r.decision, diff = MXA.difficulty(f, d);
       if (!difficultyAllows(st.difficulty, diff)) {
         log(`Setup at ${fmtTime(c.t)} passed by: it is ${diff}, harder than the ${st.difficulty} level chosen. Nothing was stored.`); say('replay-msg', '');
@@ -702,7 +778,9 @@
       }
       S.thesis = MXA.thesis.update(S.thesis, snap, d); renderThesis();
       if (!S.sessionId) await saveSession(true);
-      const res = await api.post(attemptBody(c, st.edge.id, 'train', d, lessons, hash, f));
+      const again = seenBefore(S.pool, c.id);   // decided in an earlier sitting: this one is a same-trade replay (recall), and is stored as one
+      const res = await api.post(attemptBody(c, st.edge.id, again ? 'replay-same' : 'train', d, lessons, hash, f)); DECIDED.add(c.id);
+      if (again) log(`The setup at ${fmtTime(c.t)} was decided in an earlier sitting: this answer is stored as a same-trade replay (recall, not a new setup).`);
       S.cur = { cand: c, snap, hash, features: f, diff, acctAt: r.acct, historyAvailable: hist.available, first: { decision: d, risk: r.risk, row: res.attempt, n: res.n }, latest: null, correction: null, lesson: null, savedLesson: null, cmp: null, closed: false };
       S.cur.latest = S.cur.first; S.lastBlock = r.risk && !r.risk.allowed ? r.risk.blocks.join('; ') : null;
       log(`${d.action} (${d.confidence} confidence) on the ${c.side} setup at ${fmtTime(c.t)}. Attempt ${res.n} stored.`, 'Decision.');
@@ -726,24 +804,28 @@
   function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); draw(); }
 
   const txtList = (items, none) => listOr(el('ul', { class: 'txt-list' }), items || [], none, (x) => el('li', { text: humanize(x) }));
-  function renderDecision() {
-    const cur = S.cur, box = clear($('decision')), a = cur.latest, d = a.decision, c = cur.cand, risk = a.risk, e = S.setup.edge; box.hidden = false;
-    box.appendChild(el('h2', {}, 'Decision', el('small', { text: `${e.name} · ${c.side} setup · ${fmtTime(c.t)} · ${cur.diff} difficulty` })));
-    box.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, 'dec-action'), el('span', { class: 'pill', id: 'dec-conf' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })),
-      el('span', { class: 'ac-ok', id: 'dec-stored', text: a.row ? `Attempt ${a.n} stored ✓` : '' }), a !== cur.first ? el('span', { class: 'pill', text: `first answer: ${cur.first.decision.action}` }) : null));
-    box.appendChild(el('p', { class: 'dec-thesis', id: 'dec-thesis', text: humanize(d.thesis) }));
-    const lv = el('dl', { class: 'kv' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
-    box.appendChild(lv); if (d.action === 'WAIT') box.appendChild(el('p', { class: 'note', text: 'On WAIT these are the levels of the setup that was not taken. They are drawn on the chart as dashed lines.' }));
+  // The decision panel. o = { idp (id prefix), edge, cand, d, risk, diff, stored (text), firstAction, hash, historyAvailable, lessons, title }
+  function decisionView(box, o) {
+    const d = o.d, c = o.cand, risk = o.risk, e = o.edge, idp = o.idp || 'dec', lessons = o.lessons || [];
+    box.appendChild(el('h2', {}, o.title || 'Decision', el('small', { text: `${e.name} · ${c ? c.side + ' setup' : 'no setup'} · ${fmtTime(d.t)}` + (o.diff ? ` · ${o.diff} difficulty` : '') })));
+    box.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, idp + '-action'), el('span', { class: 'pill', id: idp + '-conf' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })),
+      el('span', { class: 'ac-ok', id: idp + '-stored', text: o.stored || '' }), o.firstAction ? el('span', { class: 'pill', text: `first answer: ${o.firstAction}` }) : null));
+    box.appendChild(el('p', { class: 'dec-thesis', id: idp + '-thesis', text: humanize(d.thesis) }));
+    if (c) {
+      const lv = el('dl', { class: 'kv' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
+      box.appendChild(lv); if (d.action === 'WAIT') box.appendChild(el('p', { class: 'note', text: 'On WAIT these are the levels of the setup that was not taken. They are drawn on the chart as dashed lines.' }));
+    }
     const evItem = (sign) => (x) => el('li', {}, el('span', { text: humanize(x.text || x.factor) }), el('span', { class: 'w', title: 'weight of this item', text: fin(x.weight) ? sign + x.weight : 'n/a' }));
     const ev = d.evidence || {};
     box.appendChild(el('div', { class: 'ev' },
-      el('div', {}, el('h3', {}, 'Evidence for', el('small', { text: fin(ev.support) ? `weights add to ${ev.support}` : '' })), listOr(el('ul', { class: 'ev-list for', id: 'dec-support' }), d.supporting || [], 'Nothing supports it.', evItem('+'))),
-      el('div', {}, el('h3', {}, 'Evidence against', el('small', { text: fin(ev.contradiction) ? `weights add to ${ev.contradiction}` : '' })), listOr(el('ul', { class: 'ev-list against', id: 'dec-against' }), d.contradicting || [], 'Nothing contradicts it.', evItem('−')))));
+      el('div', {}, el('h3', {}, 'Evidence for', el('small', { text: fin(ev.support) ? `weights add to ${ev.support}` : '' })), listOr(el('ul', { class: 'ev-list for', id: idp + '-support' }), d.supporting || [], 'Nothing supports it.', evItem('+'))),
+      el('div', {}, el('h3', {}, 'Evidence against', el('small', { text: fin(ev.contradiction) ? `weights add to ${ev.contradiction}` : '' })), listOr(el('ul', { class: 'ev-list against', id: idp + '-against' }), d.contradicting || [], 'Nothing contradicts it.', evItem('−')))));
     if (fin(ev.needMargin)) box.appendChild(el('p', { class: 'note', text: `This edge takes a trade when the evidence for it beats the evidence against it by ${ev.needMargin} and nothing blocks it.` }));
     if ((d.waitReasons || []).length) { box.appendChild(el('h3', { text: 'Reasons to wait' })); box.appendChild(txtList(d.waitReasons, '')); }
     if ((d.waitingFor || []).length) { box.appendChild(el('h3', { text: 'What it is waiting for' })); box.appendChild(txtList(d.waitingFor, '')); }
     box.appendChild(el('h3', { text: 'Uncertainty' })); box.appendChild(txtList((d.uncertainty || []).concat(d.notes || []), 'Nothing flagged.'));
     box.appendChild(el('h3', { text: 'What would prove it wrong' })); box.appendChild(txtList(d.invalidation, 'No invalidation level could be named.'));
+    if (!c) return;
     box.appendChild(el('h3', { text: 'Risk' }));
     const rk = el('dl', { class: 'kv' }), R = d.risk || {}, put = (k, v) => { rk.appendChild(el('dt', { text: k })); rk.appendChild(el('dd', { text: v })); };
     put('Reward to risk', fin(R.rr) ? `${R.rr}` + (fin(R.rrNet) ? ` (${R.rrNet} after costs)` : '') : 'no fixed target');
@@ -752,22 +834,22 @@
     box.appendChild(rk);
     const sm = d.similar || {};
     box.appendChild(el('h3', { text: 'Similar past cases' }));
-    box.appendChild(el('p', { id: 'dec-similar', text: (sm.n > 0 ? `n = ${sm.n}, win rate ${fin(sm.winRate) ? Math.round(sm.winRate * 100) + ' %' : 'n/a'}, average ${fmtR(sm.avgR)} after costs. ` : 'No past-case sample to lean on. ') + (sm.note ? sm.note.charAt(0).toUpperCase() + sm.note.slice(1) + '.' : '') + (cur.historyAvailable === false ? ' The past-case file for this edge could not be read.' : '') + (fin(sm.total) && sm.total > 0 ? ` Out of ${sm.total} earlier train setups of this edge that had finished by then.` : '') }));
+    box.appendChild(el('p', { id: idp + '-similar', text: (sm.n > 0 ? `n = ${sm.n}, win rate ${fin(sm.winRate) ? Math.round(sm.winRate * 100) + ' %' : 'n/a'}, average ${fmtR(sm.avgR)} after costs. ` : 'No past-case sample to lean on. ') + (sm.note ? sm.note.charAt(0).toUpperCase() + sm.note.slice(1) + '.' : '') + (o.historyAvailable === false ? ' The past-case file for this edge could not be read.' : '') + (fin(sm.total) && sm.total > 0 ? ` Out of ${sm.total} earlier train setups of this edge that had finished by then.` : '') }));
     box.appendChild(el('h3', { text: 'Lessons applied' }));
-    box.appendChild(listOr(el('ul', { class: 'txt-list', id: 'dec-lessons' }), d.lessonsApplied || [], 'No lesson matched this setup.', (l) => { const full = S.lessons.find((x) => x.id === l.id); return el('li', { 'data-applied': l.applied === false ? 'no' : 'yes' }, el('b', { text: (l.title || (full && full.title) || l.id) + ': ' }), l.effect || '', l.applied === false ? ' (not applied)' : ''); }));
+    box.appendChild(listOr(el('ul', { class: 'txt-list', id: idp + '-lessons' }), d.lessonsApplied || [], 'No lesson matched this setup.', (l) => { const full = lessons.find((x) => x.id === l.id); return el('li', { 'data-applied': l.applied === false ? 'no' : 'yes' }, el('b', { text: (l.title || (full && full.title) || l.id) + ': ' }), l.effect || '', l.applied === false ? ' (not applied)' : ''); }));
     const rule = c.rule && typeof c.rule === 'object' ? Object.keys(c.rule) : [];
     if (rule.length) { const dl = el('dl', { class: 'kv' }); for (const k of rule) { dl.appendChild(el('dt', { text: k })); dl.appendChild(el('dd', { text: typeof c.rule[k] === 'object' ? JSON.stringify(c.rule[k]) : String(c.rule[k]) })); } box.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Facts about this setup from the edge' }), dl)); }
-    box.appendChild(el('p', { class: 'versions', text: `model ${d.modelVersion || 'none (policy only)'} · policy ${d.policyVersion || 'n/a'} · edge ${d.edgeVersion || 'n/a'} · data ${d.dataVersion || 'n/a'} · snapshot ${cur.hash}` }));
+    box.appendChild(el('p', { class: 'versions', text: `model ${d.modelVersion || 'none (policy only)'} · policy ${d.policyVersion || 'n/a'} · edge ${d.edgeVersion || 'n/a'} · data ${d.dataVersion || 'n/a'}` + (o.hash ? ` · snapshot ${o.hash}` : '') }));
+  }
+  function renderDecision() {
+    const cur = S.cur, box = clear($('decision')), a = cur.latest; box.hidden = false;
+    decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons });
     if (cur.exam) renderExamPoint(box);
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause })));
   }
 
   // ---- mentor controls ------------------------------------------------------------------------------------------------
-  function mentorLevels(choice) {     // the levels a changed BUY / SELL starts from: the setup's own, mirrored when the mentor takes the other side
-    const c = S.cur.cand; if (!isTake(choice)) return { entry: null, stop: null, target: null };
-    if (actOf(c.side) === choice) return { entry: c.entry, stop: c.stop, target: c.target };
-    return { entry: c.entry, stop: +(c.entry + (c.entry - c.stop)).toFixed(2), target: fin(c.target) ? +(c.entry - (c.target - c.entry)).toFixed(2) : null };
-  }
+  const mentorLevels = (choice) => mentorLevelsOf(S.cur.cand, choice);
   function mentorCheck() {
     const c = buildCorrection(M, S.cur.first.row ? S.cur.first.row.id : null), probs = M.choice ? correctionProblems(c, S.cur.first.decision) : [];
     const n = $('m-err'); if (n) { n.hidden = !probs.length; n.textContent = probs.join(' '); }
@@ -824,52 +906,57 @@
 
   // ---- lesson draft ---------------------------------------------------------------------------------------------------
   const LESSON_KEYS = Object.keys(MXA.FEATURE_DOC).filter((k) => MXA.PRICE_KEYS.indexOf(k) < 0).sort((a, b) => featLabel(a).localeCompare(featLabel(b)));
-  function lessonProblems() {
-    const L = S.cur.lesson, errs = MXA.lessons.validate(L); if (!String(L.title || '').trim()) errs.push('give the lesson a title');
+  function lessonProblemsOf(L) {
+    const errs = MXA.lessons.validate(L); if (!String(L.title || '').trim()) errs.push('give the lesson a title');
     for (const c of L.when || []) if (c.v == null || c.v === '' || (Array.isArray(c.v) && !c.v.length)) errs.push(`the condition on ${featLabel(c.f)} has no usable value`);
     return errs;
   }
-  function refreshLessonPlain() {
-    const L = S.cur.lesson; say('lesson-plain', lessonText(L));
-    const errs = lessonProblems(), n = $('lesson-err'); n.hidden = !errs.length; n.textContent = errs.length ? 'This lesson cannot be saved yet: ' + errs.join('; ') + '.' : '';
-    $('lesson-save').disabled = !!errs.length || !!S.cur.savedLesson;
-  }
-  function renderLesson() {
-    const cur = S.cur, L = cur.lesson, box = clear($('lesson')); box.hidden = false;
-    box.appendChild(el('h2', {}, 'Lesson draft', el('small', { text: cur.correction.verdict === 'approve' ? 'optional: an approval can be kept as a rule too' : 'proposed from your correction: edit it before saving' })));
-    box.appendChild(el('p', { class: 'plain', id: 'lesson-plain' }));
-    box.appendChild(el('label', { class: 'f' }, el('span', { text: 'Title' }), el('input', { type: 'text', id: 'lesson-title', maxlength: '160', value: L.title, oninput: (e) => { L.title = e.target.value; refreshLessonPlain(); } })));
+  // The lesson editor (the Train tab's draft and the Lessons tab's revision): the sentence, the title, the conditions, the
+  // effect and its note, the level rules. It edits L in place. o = { idp, features, onChange(errors) } → { refresh, problems }
+  function lessonForm(box, L, o) {
+    const idp = (o && o.idp) || 'lesson', feats = (o && o.features) || {}; L.when = L.when || []; L.then = L.then || { action: null, adjust: {}, note: '' }; L.then.adjust = L.then.adjust || {};
+    const plain = el('p', { class: 'plain', id: idp + '-plain' }), err = el('p', { class: 'ac-err', id: idp + '-err', role: 'alert', hidden: true });
+    const refresh = () => { plain.textContent = lessonText(L); const errs = lessonProblemsOf(L); err.hidden = !errs.length; err.textContent = errs.length ? 'This lesson cannot be saved yet: ' + errs.join('; ') + '.' : ''; if (o && o.onChange) o.onChange(errs); return errs; };
+    box.appendChild(plain);
+    box.appendChild(el('label', { class: 'f' }, el('span', { text: 'Title' }), el('input', { type: 'text', id: idp + '-title', maxlength: '160', value: L.title, oninput: (e) => { L.title = e.target.value; refresh(); } })));
     box.appendChild(el('h3', {}, 'When', el('small', { text: 'every condition must hold' })));
-    const conds = el('div', { id: 'lesson-conds' }); box.appendChild(conds);
+    const conds = el('div', { id: idp + '-conds' }); box.appendChild(conds);
     const drawConds = () => {
       clear(conds);
       L.when.forEach((c, i) => {
-        const fSel = el('select', { 'aria-label': 'Feature', onchange: (e) => { c.f = e.target.value; refreshLessonPlain(); } }, LESSON_KEYS.map((k) => el('option', { value: k, text: featLabel(k), selected: k === c.f, title: MXA.FEATURE_DOC[k] })));
-        const oSel = el('select', { 'aria-label': 'Comparison', onchange: (e) => { c.op = e.target.value; const p = parseValue(c.op, vIn.value); if (p.ok) c.v = p.v; refreshLessonPlain(); } }, [['eq', 'is'], ['ne', 'is not'], ['gte', 'at least'], ['lte', 'at most'], ['in', 'one of'], ['between', 'between']].map(([v, t]) => el('option', { value: v, text: t, selected: v === c.op })));
-        const vIn = el('input', { type: 'text', 'aria-label': 'Value', value: valueToInput(c), oninput: (e) => { const p = parseValue(c.op, e.target.value); e.target.setAttribute('aria-invalid', p.ok ? 'false' : 'true'); c.v = p.ok ? p.v : null; refreshLessonPlain(); } });
-        conds.appendChild(el('div', { class: 'cond', 'data-cond': c.f }, fSel, oSel, vIn, el('button', { type: 'button', class: 'btn sm danger', 'data-del': c.f, 'aria-label': `Remove the condition on ${featLabel(c.f)}`, text: 'Remove', onclick: () => { L.when.splice(i, 1); drawConds(); refreshLessonPlain(); } })));
+        const fSel = el('select', { 'aria-label': 'Feature', onchange: (e) => { c.f = e.target.value; refresh(); } }, LESSON_KEYS.map((k) => el('option', { value: k, text: featLabel(k), selected: k === c.f, title: MXA.FEATURE_DOC[k] })));
+        const oSel = el('select', { 'aria-label': 'Comparison', onchange: (e) => { c.op = e.target.value; const p = parseValue(c.op, vIn.value); if (p.ok) c.v = p.v; refresh(); } }, [['eq', 'is'], ['ne', 'is not'], ['gte', 'at least'], ['lte', 'at most'], ['in', 'one of'], ['between', 'between']].map(([v, t]) => el('option', { value: v, text: t, selected: v === c.op })));
+        const vIn = el('input', { type: 'text', 'aria-label': 'Value', value: valueToInput(c), oninput: (e) => { const p = parseValue(c.op, e.target.value); e.target.setAttribute('aria-invalid', p.ok ? 'false' : 'true'); c.v = p.ok ? p.v : null; refresh(); } });
+        conds.appendChild(el('div', { class: 'cond', 'data-cond': c.f }, fSel, oSel, vIn, el('button', { type: 'button', class: 'btn sm danger', 'data-del': c.f, 'aria-label': `Remove the condition on ${featLabel(c.f)}`, text: 'Remove', onclick: () => { L.when.splice(i, 1); drawConds(); refresh(); } })));
       });
       if (!L.when.length) conds.appendChild(el('p', { class: 'note', text: 'No condition: a lesson needs at least one, or it would fire on every setup.' }));
     };
     drawConds();
-    box.appendChild(el('div', { class: 'f-actions', style: 'margin-top:8px' }, el('button', { type: 'button', class: 'btn sm', id: 'lesson-add', text: 'Add a condition', onclick: () => { const k = LESSON_KEYS.find((x) => !L.when.some((c) => c.f === x) && cur.features[x] != null && typeof cur.features[x] !== 'number') || 'session'; L.when.push({ f: k, op: 'eq', v: cur.features[k] == null ? '' : cur.features[k] }); drawConds(); refreshLessonPlain(); } })));
+    box.appendChild(el('div', { class: 'f-actions', style: 'margin-top:8px' }, el('button', { type: 'button', class: 'btn sm', id: idp + '-add', text: 'Add a condition', onclick: () => { const k = LESSON_KEYS.find((x) => !L.when.some((c) => c.f === x) && feats[x] != null && typeof feats[x] !== 'number') || 'session'; L.when.push({ f: k, op: 'eq', v: feats[k] == null ? '' : feats[k] }); drawConds(); refresh(); } })));
     box.appendChild(el('h3', { text: 'Then' }));
-    const adj = el('ul', { class: 'plain-list small', id: 'lesson-adjust' });
-    const drawAdj = () => { const ks = Object.keys(L.then.adjust || {}); listOr(adj, ks, 'No level rule.', (k) => el('li', {}, el('div', { text: L.then.adjust[k].text || k }), el('button', { type: 'button', class: 'btn sm danger', text: 'Remove', 'aria-label': `Remove the ${k} rule`, onclick: () => { delete L.then.adjust[k]; drawAdj(); refreshLessonPlain(); } }))); };
+    const adj = el('ul', { class: 'plain-list small', id: idp + '-adjust' });
+    const drawAdj = () => { const ks = Object.keys(L.then.adjust || {}); listOr(adj, ks, 'No level rule.', (k) => el('li', {}, el('div', { text: L.then.adjust[k].text || k }), el('button', { type: 'button', class: 'btn sm danger', text: 'Remove', 'aria-label': `Remove the ${k} rule`, onclick: () => { delete L.then.adjust[k]; drawAdj(); refresh(); } }))); };
     box.appendChild(el('div', { class: 'f-grid' },
-      el('label', { class: 'f' }, el('span', { text: 'Effect' }), el('select', { id: 'lesson-action', onchange: (e) => { L.then.action = e.target.value || null; refreshLessonPlain(); } }, [['WAIT', 'WAIT'], ['SKIP', 'Refuse the setup'], ['TAKE', 'Take the edge\'s trade'], ['FLIP', 'Take the other side'], ['', 'No action (level rules only)']].map(([v, t]) => el('option', { value: v, text: t, selected: (L.then.action || '') === v })))),
-      el('label', { class: 'f' }, el('span', { text: 'Note shown when it applies' }), el('input', { type: 'text', id: 'lesson-note', maxlength: '400', value: L.then.note || '', oninput: (e) => { L.then.note = e.target.value; } }))));
+      el('label', { class: 'f' }, el('span', { text: 'Effect' }), el('select', { id: idp + '-action', onchange: (e) => { L.then.action = e.target.value || null; refresh(); } }, [['WAIT', 'WAIT'], ['SKIP', 'Refuse the setup'], ['TAKE', 'Take the edge\'s trade'], ['FLIP', 'Take the other side'], ['', 'No action (level rules only)']].map(([v, t]) => el('option', { value: v, text: t, selected: (L.then.action || '') === v })))),
+      el('label', { class: 'f' }, el('span', { text: 'Note shown when it applies' }), el('input', { type: 'text', id: idp + '-note', maxlength: '400', value: L.then.note || '', oninput: (e) => { L.then.note = e.target.value; } }))));
     box.appendChild(el('h3', {}, 'Level rules', el('small', { text: 'relative to features, never raw prices' }))); box.appendChild(adj); drawAdj();
-    box.appendChild(el('p', { class: 'ac-err', id: 'lesson-err', role: 'alert', hidden: true }));
+    box.appendChild(err);
+    return { refresh, problems: () => lessonProblemsOf(L) };
+  }
+  const lessonProblems = () => lessonProblemsOf(S.cur.lesson);
+  function renderLesson() {
+    const cur = S.cur, L = cur.lesson, box = clear($('lesson')); box.hidden = false;
+    box.appendChild(el('h2', {}, 'Lesson draft', el('small', { text: cur.correction.verdict === 'approve' ? 'optional: an approval can be kept as a rule too' : 'proposed from your correction: edit it before saving' })));
+    const form = lessonForm(box, L, { idp: 'lesson', features: cur.features, onChange: (errs) => { const b = $('lesson-save'); if (b) b.disabled = !!errs.length || !!cur.savedLesson; } });
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'lesson-save', text: 'Save lesson', onclick: saveLesson }), el('span', { class: 'ac-status', id: 'lesson-msg', role: 'status' })));
-    refreshLessonPlain();
+    form.refresh();
   }
   async function saveLesson() {
     const cur = S.cur, L = cur.lesson; if (lessonProblems().length || cur.savedLesson || S.busy) return; S.busy = true; $('lesson-save').disabled = true; say('lesson-msg', 'Saving…');
     try {
       const res = await api.post({ action: 'lesson.save', lesson: { edge: L.edge, title: String(L.title).trim(), text: L.text || '', when: L.when, then: { action: L.then.action || null, adjust: L.then.adjust || {}, note: L.then.note || '' }, source: Object.assign({}, L.source, { sessionId: S.sessionId }), active: true } });
       cur.savedLesson = res.lesson; say('lesson-msg', `Lesson saved ✓ (version ${res.lesson.version}). It is in force from now on.`);
-      log(`"${res.lesson.title}" saved: ${lessonText(res.lesson)}`, 'Lesson.'); S.lessons = await fetchLessons(S.setup.edge.id); renderLessonsList(); renderProve();
+      log(`"${res.lesson.title}" saved: ${lessonText(res.lesson)}`, 'Lesson.'); S.lessons = await lessonsFor(S.setup.edge.id, true); renderLessonsList(); renderProve();
     } catch (e) { say('lesson-msg', ''); const n = $('lesson-err'); n.hidden = false; n.textContent = 'The lesson was not saved: ' + e.message + '.'; $('lesson-save').disabled = false; }
     finally { S.busy = false; }
   }
@@ -910,14 +997,14 @@
     try {
       const snap = snapOf(st.edge, S.series, S.dataVersion, c.t, c), hash = MXR.hash(snap), want = cur.first.row.snapshotHash;
       if (hash !== want) throw new Error(`this is not the same decision point: the candles give snapshot ${hash}, the first attempt saw ${want}. The replay was refused and nothing was stored`);
-      const [lessons, hist] = await Promise.all([fetchLessons(st.edge.id), fetchHistory(st.edge.id, c)]); S.lessons = lessons;
+      const lessons = (S.lessons = await lessonsFor(st.edge.id)), hist = { rows: historyAt(S.hist.rows, c.t) };
       const f = MXA.features(snap), r = decideOn(snap, { setup: st, account: cur.acctAt, lessons, thesis: MXA.thesis.start(snap), history: hist.rows }), d = r.decision;   // a fresh thesis: nothing carried over
       const res = await api.post(attemptBody(c, st.edge.id, 'replay-same', d, lessons, hash, f));
       cur.latest = { decision: d, risk: r.risk, row: res.attempt, n: res.n };
       cur.cmp = MXA.compare(cur.first.decision, d, cur.correction);
       // the lesson's counters: the lessons this replay applied, or the lesson saved from this correction when it did not fire
       const ids = cur.cmp.lessonIds.length ? cur.cmp.lessonIds : cur.savedLesson ? [cur.savedLesson.id] : [];
-      for (const id of ids) { const inc = cur.cmp.verdict === 'learned' ? { replayPass: 1 } : { replayFail: 1 }; if (cur.cmp.lessonIds.indexOf(id) >= 0) inc.applied = 1; try { await api.post({ action: 'lesson.stats', id, inc }); } catch (e) { log('A lesson counter could not be updated: ' + e.message); } }
+      for (const id of ids) { const inc = cur.cmp.verdict === 'learned' ? { replayPass: 1 } : { replayFail: 1 }; if (cur.cmp.lessonIds.indexOf(id) >= 0) inc.applied = 1; try { const sr = await api.post({ action: 'lesson.stats', id, inc }), L = S.lessons.find((x) => x.id === id); if (L && sr.stats) L.stats = sr.stats; } catch (e) { log('A lesson counter could not be updated: ' + e.message); } }
       log(`Attempt ${res.n} (same trade): ${d.action}. Verdict: ${VERDICT_WORD[cur.cmp.verdict] || cur.cmp.verdict}.`, 'Replay.');
       renderDecision(); drawEdgeLines(d); renderProve(); renderLessonsList(); $('prove').scrollIntoView({ block: 'nearest' });
     } catch (e) { perr.hidden = false; perr.textContent = e.message.charAt(0).toUpperCase() + e.message.slice(1) + '.'; say('prove-msg', ''); if ($('prove-run')) $('prove-run').disabled = false; }
@@ -949,9 +1036,9 @@
   // ---- tests on new setups ----------------------------------------------------------------------------------------------
   // One unseen exam-pool setup: decided without lessons and with them (a fresh thesis and a fresh paper account each time),
   // the attempt and the result stored, and only then may its outcome be read (through ?get=exams).
-  async function examOne(c, edge, series, dataVersion, setup, lessons) {
+  async function examOne(c, edge, series, dataVersion, setup, lessons, histAll) {
     const snap = snapOf(edge, series, dataVersion, c.t, c), f = MXA.features(snap), hash = MXR.hash(snap), acct = MXK.account(setup.balance, { t: c.t });
-    const hist = await fetchHistory(edge.id, c), run = (ls) => decideOn(snap, { setup, account: acct, lessons: ls, thesis: MXA.thesis.start(snap), history: hist.rows }).decision;
+    const hist = { rows: historyAt(histAll.rows, c.t) }, run = (ls) => decideOn(snap, { setup, account: acct, lessons: ls, thesis: MXA.thesis.start(snap), history: hist.rows }).decision;
     const without = run([]), withL = run(lessons), lite = (d) => ({ action: d.action, entry: d.entry, stop: d.stop, target: d.target, confidence: d.confidence });
     const att = await api.post(attemptBody(c, edge.id, 'exam', withL, lessons, hash, f));
     const lessonIds = (withL.lessonsApplied || []).map((l) => l.id).filter((x, i, a) => a.indexOf(x) === i);
@@ -959,14 +1046,14 @@
     return { snap, hash, features: f, without, withL, attempt: att, result: res.result, lessonIds };
   }
   // after a batch: each matched lesson's exam counters, from the graded rows of this batch
-  async function examLessonStats(edgeId, ids) {
-    const rows = ((await api.get({ get: 'exams', edge: edgeId })).exams || []).filter((r) => ids.indexOf(r.candidateId) >= 0), by = {};
+  async function examLessonStats(edgeId, ids, all) {
+    const rows = (all || []).filter((r) => ids.indexOf(r.candidateId) >= 0), by = {};
     for (const r of rows) for (const id of r.lessonIds || []) { const b = (by[id] = by[id] || { examN: 0, examAgree: 0, examNetWith: 0, examNetWithout: 0 }); b.examN++; if (sameAnswer(r.withLessons, r.withoutLessons)) b.examAgree++; if (fin(r.rWith) && fin(r.rWithout)) { b.examNetWith += r.rWith; b.examNetWithout += r.rWithout; } }
     for (const id of Object.keys(by)) { const b = by[id], inc = { examN: b.examN }; if (b.examAgree) inc.examAgree = b.examAgree; if (b.examNetWith) inc.examNetWith = Math.round(b.examNetWith * 1000) / 1000; if (b.examNetWithout) inc.examNetWithout = Math.round(b.examNetWithout * 1000) / 1000; try { await api.post({ action: 'lesson.stats', id, inc }); } catch (e) { /* a counter, not a result */ } }
   }
-  async function renderExams() {
+  async function renderExams(have) {
     const edge = S.setup ? S.setup.edge : edgeSel(); if (!edge) return;
-    const j = await api.get({ get: 'exams', edge: edge.id }), rows = j.exams || [], s = examSummary(rows); S.exams = rows;
+    const j = have || await api.get({ get: 'exams', edge: edge.id }), rows = j.exams || [], s = examSummary(rows); S.exams = rows;
     $('exam-out').hidden = !rows.length; if (!rows.length) return;
     const dl = clear($('exam-summary')), cell = (k, v, sub, id) => dl.appendChild(el('div', {}, el('dt', { text: k }), el('dd', { id: id || null }, v, sub ? el('small', { text: sub }) : null)));
     cell('New setups tested', String(s.n), `${edge.name}, all runs`, 'exam-n');
@@ -986,19 +1073,22 @@
     S.busy = true; $('exam-run').disabled = true; let done = 0, failed = 0; const ids = [];
     try {
       say('exam-msg', 'Reading the unseen setups…');
-      const pool = (await api.get({ get: 'candidates', edge: edge.id, pool: 'exam', limit: 5000 })).candidates || [], pick = pool.slice().sort((a, b) => b.t - a.t).slice(0, 10);
+      const pool = (await poolFor(edge.id, 'exam', true)).candidates || [], pick = pool.slice().sort((a, b) => b.t - a.t).slice(0, 10);
       if (!pick.length) { say('exam-msg', 'No unseen exam setup is left for this edge.'); return; }
-      const lessons = await fetchLessons(edge.id); await ensureCalendar();
+      const lessons = await lessonsFor(edge.id), histAll = await historyFor(edge.id, pick[0].t); await ensureCalendar();   // read once for the batch; each setup then costs two calls
       for (const c of pick) {
         say('exam-msg', `Setup ${done + failed + 1} of ${pick.length} (${fmtTime(c.t)}): loading its candles…`);
         try {
           const { series, dataVersion } = await loadSeries(edge.market, c.t, c.t + 1, () => {});
           if (!series['5m'].length) throw new Error('no candles for its date');
-          await examOne(c, edge, series, dataVersion, setup, lessons); done++; ids.push(c.id);
+          say('exam-msg', `Setup ${done + failed + 1} of ${pick.length} (${fmtTime(c.t)}): deciding and storing…`);
+          await examOne(c, edge, series, dataVersion, setup, lessons, histAll); done++; ids.push(c.id);
         } catch (e) { failed++; log(`New setup at ${fmtTime(c.t)} was not tested: ${e && e.code ? candleError(e) : e.message}. Nothing was stored for it.`); }
       }
-      if (ids.length) await examLessonStats(edge.id, ids);
-      await renderExams(); renderLessonsList();
+      delete CACHE.pool[edge.id + '|exam'];
+      let ej = await api.get({ get: 'exams', edge: edge.id });
+      if (ids.length) { await examLessonStats(edge.id, ids, ej.exams); lessonsChanged(); }
+      await renderExams(ej); renderLessonsList();
       say('exam-msg', `${done} new setup${done === 1 ? '' : 's'} tested and stored` + (failed ? `, ${failed} could not be tested (see the replay log)` : '') + '.'); $('exam-run').textContent = 'Test on 10 more';
       log(`${done} unseen setup${done === 1 ? '' : 's'} decided with and without lessons. Results stored.`, 'Test on new setups.');
     } catch (e) { say('exam-msg', 'The test could not run: ' + e.message + '.'); }
@@ -1009,14 +1099,14 @@
   async function examPoint(c, snap, f, hash) {
     const st = S.setup;
     try {
-      const lessons = await fetchLessons(st.edge.id); S.lessons = lessons;
+      const lessons = (S.lessons = await lessonsFor(st.edge.id));
       if (!S.sessionId) await saveSession(true);
-      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons);
-      const row = ((await api.get({ get: 'exams', edge: st.edge.id })).exams || []).find((r) => r.candidateId === c.id) || null;
+      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons, S.hist); delete CACHE.pool[st.edge.id + '|exam'];
+      const ej = await api.get({ get: 'exams', edge: st.edge.id }), row = (ej.exams || []).find((r) => r.candidateId === c.id) || null;
       S.cur = { cand: c, snap, hash, features: f, diff: MXA.difficulty(f, x.withL), acctAt: null, historyAvailable: null, first: { decision: x.withL, risk: null, row: x.attempt.attempt, n: x.attempt.n }, latest: null, exam: { without: x.without, row }, closed: false };
       S.cur.latest = S.cur.first; S.thesis = MXA.thesis.update(S.thesis, snap, x.withL); renderThesis();
       log(`Exam setup at ${fmtTime(c.t)}: ${x.without.action} without lessons, ${x.withL.action} with. Stored.`, 'Exam.');
-      showPoint(); renderExams().catch(() => {}); say('replay-msg', 'Paused on an exam setup. Its result is shown; continue when ready.');
+      showPoint(); renderExams(ej).catch(() => {}); say('replay-msg', 'Paused on an exam setup. Its result is shown; continue when ready.');
     } catch (e) { pointError(c, e); say('replay-msg', ''); }
     finally { S.busy = false; draw(); }
   }
@@ -1027,6 +1117,18 @@
     box.appendChild(el('p', { text: !out ? 'The result of this setup could not be read.' : unfilled(out) ? `Result (read after both answers were stored): the order never filled (${out.reason}).` : `Result (read after both answers were stored): the setup's own trade made ${fmtR(out.netR)} after costs, exit by ${out.reason || 'rule'}. Without lessons ${fin(r.rWithout) ? fmtR(r.rWithout) : 'not graded'}, with lessons ${fin(r.rWith) ? fmtR(r.rWith) : 'not graded'}.` }));
     box.appendChild(el('p', { class: 'note', text: 'An exam setup is decided once and cannot be corrected or replayed.' }));
   }
+
+  // ---- shared with the other sections -------------------------------------------------------------------------------------
+  // "Replay this setup": the Train tab on that setup's day, the clock run onto the setup itself.
+  async function openInTrain(edgeId, t) {
+    showTab('train'); const edge = S.edges.find((e) => e.id === edgeId); if (!edge || !fin(t) || S.loading) return false;
+    if (S.clock && S.clock.state().playing) S.clock.pause();
+    $('f-edge').value = edgeId; renderEdgeInfo(); renderLessonsList(); document.querySelectorAll('input[name="mode"]').forEach((r) => { r.checked = r.value === 'train'; }); renderModeNote();
+    $('f-from').value = isoDay(t); $('f-to').value = isoDay(t); refreshPool(false);
+    await startReplay(null, { at: t }); return true;
+  }
+  MXAC.kit = { el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain,
+    decided: (id) => DECIDED.add(id), calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
   function boot(me) {
