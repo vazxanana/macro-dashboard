@@ -3666,7 +3666,8 @@
     "t1": 1.1248400000000003,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.12304,
@@ -3680,7 +3681,8 @@
     "lagSec": 129,
     "positionId": "47926350",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T08:51:56.000Z"
    },
    "gbpusd-scalp-1794291182": {
     "symbol": "GBPUSD",
@@ -4075,7 +4077,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9970.24 · 30 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9973.76 · 29 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4083,7 +4085,8 @@
    "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now",
    "gbpusd-scalp-1793916690": "price 1.33526 has run 2.33R from the council entry 1.34482: a different trade now",
    "xrp-intraday-1794242893": "none of XRPUSD found at the broker",
-   "xrp-scalp-1794297127": "none of XRPUSD found at the broker"
+   "xrp-scalp-1794297127": "none of XRPUSD found at the broker",
+   "xrp-scalp-1794300646": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -4109,33 +4112,53 @@
     "alerted": [
      "pending"
     ]
+   },
+   "sol-rscalp-1794300646": {
+    "orderId": "33852098",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "rscalp",
+    "limitPrice": 85.64,
+    "stop": 85.47287,
+    "t1": 87.44,
+    "placedAt": "2026-11-10T08:51:56.000Z",
+    "expires": "2026-11-10T11:50:46.000Z",
+    "riskCash": 1.99,
+    "margin": 85.74,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "eurusd-scalp-1794300646": {
+    "orderId": "33852099",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.12472,
+    "stop": 1.12352,
+    "t1": 1.1271199999999997,
+    "placedAt": "2026-11-10T08:51:56.000Z",
+    "expires": "2026-11-10T11:50:46.000Z",
+    "riskCash": 1.99,
+    "margin": 2.25,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9970.24,
-  "lastRun": "2026-11-10T08:48:37.000Z"
+  "balance": 9973.76,
+  "lastRun": "2026-11-10T08:51:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T13:33:56.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.4501 -> 1.45098, target 1.2917 -> 1.29258 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-09T13:33:56.000Z",
-   "msg": "moved USDCAD 47373489 protection: stop 1.3806374285714287 -> 1.3815174, target 1.47971 -> 1.48059 (council position)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-09T13:33:56.000Z",
-   "msg": "moved USDCAD 47373490 protection: stop 1.3806374285714287 -> 1.3815174, target 1.43446 -> 1.43534 (council swing)",
-   "trade": "usdcad-swing-1793949081"
-  },
-  {
-   "at": "2026-11-09T13:33:56.000Z",
-   "msg": "moved USDCAD 47376642 protection: stop 1.41296 -> 1.41384, target 1.40337 -> 1.40425 (council rintra)",
-   "trade": "usdcad-rintra-1794179194"
-  },
   {
    "at": "2026-11-09T13:33:56.000Z",
    "msg": "moved USDCAD 47605841 protection: stop 1.40768 -> 1.40856, target 1.41376 -> 1.41464 (council intraday)",
@@ -5615,6 +5638,26 @@
    "at": "2026-11-10T08:48:37.000Z",
    "msg": "EURUSD position 47957230 closed at the broker",
    "trade": "eurusd-rscalp-1794298047"
+  },
+  {
+   "at": "2026-11-10T08:51:56.000Z",
+   "msg": "EURUSD position 47926350 closed at the broker",
+   "trade": "eurusd-scalp-1794291182"
+  },
+  {
+   "at": "2026-11-10T08:51:56.000Z",
+   "msg": "placed buy limit SOLUSD 0.01 lot at 85.64 (council rscalp, valid to 2026-11-10T11:50Z)",
+   "trade": "sol-rscalp-1794300646"
+  },
+  {
+   "at": "2026-11-10T08:51:56.000Z",
+   "msg": "not mirrored xrp-scalp-1794300646: none of XRPUSD found at the broker",
+   "trade": "xrp-scalp-1794300646"
+  },
+  {
+   "at": "2026-11-10T08:51:56.000Z",
+   "msg": "placed buy limit EURUSD 0.01 lot at 1.12472 (council scalp, valid to 2026-11-10T11:50Z)",
+   "trade": "eurusd-scalp-1794300646"
   }
  ],
  "limits": {
