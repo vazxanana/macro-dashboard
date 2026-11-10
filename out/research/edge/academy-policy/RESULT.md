@@ -502,6 +502,8 @@ node research/edge/academy-policy/run.mjs --md                                  
 node --test tests/academy-policy.test.mjs
 ```
 
-The code was committed before its first run. After that run only display fields were added (the plain net R
-difference beside the pooled one, a t hidden under 10 trades, the direction line of H3); every verdict and every
-figure of the first run is unchanged.
+The code was committed before its first run. After that run: display fields were added (the plain net R difference
+beside the pooled one, a t hidden under 10 trades, the direction line of H3); a guard was added so that a
+non-overridable gate can never be on C4's drop list (none fires on any setup, so nothing moved); and the per-candidate
+"R a trade" lines for the Edge lab page were taken out of `result.json`, because a take-set of profitable edges has a
+positive t of its own and would read as a finding. Every verdict and every figure of the first run is unchanged.
