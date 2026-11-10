@@ -1,11 +1,11 @@
-# Open owner decisions (9 Nov 2026)
+# Open owner decisions (9 Nov 2026; item 26 added 10 Nov)
 
 One checklist of what waits on the owner's yes or no. Each item: what it is, why it matters, the options, and the recommended
 one. Nothing below has been changed in the code; each item names where the change would go. Tick an item when it is decided and
 note the answer next to it (or in the PR that carries it out).
 
-Grouped: **Security** (1-8, of which 7-8 are Fred's research connector), **Trading on paper and demo** (9-14), **Reliability
-and data** (15-16), **Council proposals the study already answered** (17-18).
+Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research connector), **Trading on paper and demo** (9-14),
+**Reliability and data** (15-16), **Council proposals the study already answered** (17-18).
 
 ---
 
@@ -78,10 +78,21 @@ and data** (15-16), **Council proposals the study already answered** (17-18).
 
 - **Context.** The ChatGPT connector (`api/mcp.js`) reads with `GH_READ_TOKEN` and writes with `GH_MCP_TOKEN`, falling back to
   `GH_TOKEN` (the council's own Contents-write token) when `GH_MCP_TOKEN` is not set. The server only ever writes to
-  `mcp/<name>/…` branches and draft PRs, but the token itself could write anywhere it is allowed.
+  `mcp/<name>/…` branches, pull requests, PR comments and two council-data files (`ict/mcp-notes.json`, `ict/desk.json`), but
+  the token itself could write anywhere it is allowed.
+- **Without a write token nothing writes.** If neither `GH_MCP_TOKEN` nor `GH_TOKEN` is set on Vercel, no write tool can work:
+  `ict_note`, `ict_desk_update`, `ict_propose_change` and `ict_proposal_comment` all answer with a GitHub error (401 or 404).
+  How to check: Vercel → project `macro-dashboard` → Settings → Environment Variables, Production: one of the two names must be
+  there. Or from the connector: `ict_note` with a test line. "saved" means Contents write works; a proposal that answers
+  "Branch pushed; the token could not open the PR" means the token lacks Pull requests write.
+- **More important since 10 Nov (item 26).** If the apply path is ever switched on, this token opens pull requests that a
+  workflow merges without review. It must then be the dedicated token, and it must NOT have the Workflows permission: GitHub
+  then refuses any push from it that changes a workflow file.
 - **Options.** (a) A dedicated fine-grained `GH_MCP_TOKEN`: this repository only, Contents read/write, Pull requests read/write,
-  Issues read/write (comments), Checks read, with an expiry; plus branch protection on `main` (PR + green CI required) so no token
-  can push there directly. (b) Keep using `GH_TOKEN`.
+  Issues read/write (comments), Checks read, no Workflows, with an expiry; plus branch protection (or a ruleset) on `main`:
+  pull request required, the status checks `test` (tests.yml), `build` and `pages` (ci.yml) required, no direct pushes, so no
+  token can push there directly. Do not require an approving review if item 26 is ever switched on (the apply merge has no
+  reviewer); the required checks still hold for it. (b) Keep using `GH_TOKEN`.
 - **Recommended: (a).** It keeps Fred's write path separate from the council's and makes revoking it a one-token job.
 
 ### [ ] 8. Fred's connector: candles and costs
@@ -94,6 +105,44 @@ and data** (15-16), **Council proposals the study already answered** (17-18).
 - **Options.** (a) Keep `OANDA_TOKEN` a practice-account token and set the lab's costs to `ICT_COST_PTS` (silver stays 0.03).
   (b) Keep the lab's numbers and say so in the guide. (c) Use the higher of the two per market.
 - **Recommended: (a).** One cost table for every ICT number Fred and the owner compare. Update `docs/fred-mcp.md` with it.
+
+### [x] 26. Fred may apply ICT changes without review: ON (your decision, 10 Nov 2026)
+
+- **Status: ON for Fred, off for everyone else.** You asked for it on 10 Nov ("mcp of fred he should be able to change and
+  edit anything regarding the ict desk such a edge"), first kept it disabled, then approved it the same day: "let fred have
+  100% control of ict he can change the edge and what he want, update his mcp to allow him doing that."
+- **What was switched on.** Fred's built-in record carries the apply permission (the Users page shows the box ticked for
+  him; unticking it stores an explicit "off" that wins), and `council/ict-apply.json` on `main` lists `fred`.
+- **How to switch it off again.** Untick the box (stops the next call at once: the connector reads the stored list on every
+  apply call), or remove the name from `council/ict-apply.json` (the hard off-switch: the workflows refuse the branch even
+  if a pull request exists).
+- **What it allows.** Through the connector Fred can change the ICT edge's own files only (`ict/*.mjs`, the ICT skill,
+  `tests/ict-*.test.mjs`, `tests/fixtures/ict/*`, `research/ict/*`, `research/edge/ict-*/*`) and have the change merged to
+  `main` without you. The council loop then runs the new ICT code from its next round, and the ICT A-setups are copied to the
+  demo account as today. He can also revert his own applied changes. At most 6 an hour (with proposals) and 10 a day.
+- **What it never allows.** The council's systems, the page, `api/`, workflows, scripts, users, tokens, cTrader orders, the
+  members file itself, the stop guard. Paper and demo only.
+- **The locks, in order.** (1) The connector: ICT write, the box, the name in the file, the path allowlist
+  (`api/_ictrules.js`), sizes, syntax, no new network / environment / process access, a test for a rule change, risk and
+  evidence, the limits; it only pushes a branch `mcp/<name>/apply-…` and opens a pull request, it never merges.
+  (2) `.github/workflows/ict-apply.yml` (read-only token, no secrets): main's own copy of the verifier
+  (`scripts/ict-apply-check.mjs`) checks the pull request again before any of its code runs; then the stop guard
+  `tests/desk-ict-guard.test.mjs` from main's copy (every signal and simulated trade has a stop on the right side; ICT imports
+  nothing from the council, the API or the mirror; no order call), the whole test suite, and the built site unchanged.
+  (3) `.github/workflows/ict-apply-merge.yml` (the only write token; runs from main's definition, no checkout): refuses unless
+  the checks passed for exactly the head commit, the pull request is open, not a draft, from this repository, the name is in
+  the file, every file is in the allowlist, and main's ICT files did not move; squash-merge bound to that commit. A refusal
+  is one comment; the pull request stays open for you.
+- **What it needs to work.** The connector needs a GitHub token on Vercel (`GH_MCP_TOKEN`, or `GH_TOKEN`) that may push a branch
+  and open a pull request; without one `ict_apply_change` answers with the reason and changes nothing. See item 7 (the dedicated token without the Workflows permission, and branch protection
+  with required checks). GitHub Actions needs no extra setting for the merge: the merge workflow asks for `contents: write`,
+  `pull-requests: write` and `actions: write` in its own file, which works with the read-only default too; "Allow GitHub
+  Actions to create and approve pull requests" is not needed (the workflow creates and approves nothing). Not verified from
+  here: your repository's current Actions settings and branch protection, and whether an organisation or ruleset policy
+  blocks a workflow token from merging; the first applied change would show it (a refusal comment with GitHub's reason).
+- **Worth doing now that it is on.** Read the merged pull requests whose titles start with "ICT (fred, applied):" (each one
+  is one squash commit you can revert), and do item 7 (a dedicated connector token without the Workflows permission, and
+  branch protection on `main` with required checks and no required review).
 
 ---
 

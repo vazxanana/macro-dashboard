@@ -12,6 +12,10 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account.
 3. **The owner approves every live rule change.** The Coach, studies and helpers' PRs only propose (`research/proposals/`, the
    week pane's "Decisions waiting"); owner rules (`userOwned`) and live setups stay out of the Coach's reach.
+   **One exception, made by the owner on 10 Nov 2026:** Fred has full control of the ICT edge. Through his connector he may
+   change the ICT edge's own files without the owner's review once the automatic checks pass (section "Fred applies ICT
+   changes"). Rules 1 and 2 still bind him: a stop guard he cannot edit keeps every ICT trade on a stop, paper and demo only.
+   Everything outside the ICT edge still needs the owner.
 4. **Backtests run 2020 → now**, pre-registered, net of costs, in sample vs out of sample; never call something an edge without
    n and t. ICT stays a separate edge: never mix it into council systems, filters or reports.
 5. **No paid services.** Keyless public data, the existing Vercel plan and free GitHub Actions minutes (the repo is public).
@@ -34,7 +38,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`), `live/` (VPS runner install), `daily-cache.mjs`, `make-icons.mjs` |
 | `out/` | The built site, **committed** (CI fails when it is stale) |
 | `council-data` branch | Everything the bots write (trades.json, snapshot.json, `ict/`, `macro/`, `ctrader/`, health.json, digest.json, `research/…`); the site reads it through `/cdata`. Never commit bot output to `main` |
-| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `deploy.yml` (GitHub Pages copy), research / cache workflows (mostly manual) |
+| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `deploy.yml` (GitHub Pages copy), `ict-apply.yml` + `ict-apply-merge.yml` (applied ICT changes: on for Fred since 10 Nov), research / cache workflows (mostly manual) |
 
 **Build, test, CI**
 ```sh
@@ -66,7 +70,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
-- ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`).
+- ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`), Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
@@ -811,6 +815,64 @@ checks the password with ctrader-link's `identify` and returns the URL; the page
 permission. Never: council files, api/, workflows, users, tokens, cTrader orders. Tests `tests/mcp.test.mjs` (fakes in
 `tests/fixtures/mcp-fake.mjs`: deterministic OANDA candles, GitHub routes, req/res driver). Rule: a helper's PR is reviewed like any rule
 change (tests, 2020-now evidence) before merging.
+
+## Fred applies ICT changes: ON for Fred (10 Nov 2026)
+Owner, 10 Nov: "mcp of fred he should be able to change and edit anything regarding the ict desk such a edge"; first kept
+disabled ("until I explicitly approve it"), then approved the same day: **"let fred have 100% control of ict he can change the
+edge and what he want, update his mcp to allow him doing that."** So Fred may change the ICT edge without the owner's review
+(the one exception to absolute rule 3). It is on for Fred and off for every other member. What "100 % control of ICT" means
+here: every file of the ICT edge (tracker, replay, calendar, the rule book, ICT tests and research). What still binds him:
+absolute rules 1 and 2 (the stop guard `tests/desk-ict-guard.test.mjs` runs from main's copy and is outside his reach; paper
+and demo only), the ICT file allowlist (nothing of the council, the page, `api/`, workflows, users, tokens or cTrader orders),
+and the automatic checks. Never widen the allowlist or weaken the guard without the owner. Off-switches:
+`docs/owner-decisions.md` item 26.
+- **Two things decide it for a member; each alone does nothing** (`tests/mcp-apply.test.mjs`): the apply permission (Fred's
+  built-in record carries `ictApply: true`, the owner's default; a stored box, ticked or unticked, wins over it): the Users page box
+  "ICT: may apply changes to the ICT edge without my review" (permission dialog, shown under ICT write; stored
+  `perms.ictApply: true`; `cleanPerms` knows the key, it is not in `MS_PERM_KEYS` and gates nothing on the page) AND the
+  account key in `council/ict-apply.json` on `main` (outside the ICT allowlist on purpose, so a change cannot add its author).
+- **Connector** (`api/mcp.js`): `canApply(name)` = ICT 'write' and `applyFlag` (a stored boolean `perms.ictApply` decides;
+  without one the built-in default, on for Fred only; never a stored record flag or an `MCP_KEYS` grant; fails closed; the stored list is read again before every apply call, so unticking stops the next
+  call). Off → `ict_apply_change` and `ict_revert_change` are not listed and answer `unknown tool …` like a tool that does
+  not exist. On → `ict_apply_change` takes the same arguments and the same `validateProposal` as a proposal, checks the members
+  file on main and the daily cap (`applyGate`), pushes `mcp/<name>/apply-<time>-<slug>` and opens a normal pull request
+  "ICT (<name>, applied): <title>". It never merges and never writes to `main`. `ict_revert_change { number, why }` restores the
+  files of one of the caller's own merged applied changes from the merge commit's parent (deletes what it added; refuses and
+  names the file when one changed again since) as a new applied change. Limits: applied changes and reverts count as
+  proposals (6 an hour) and have 10 a day (in memory, and counted from the pull requests on GitHub).
+- **One allowlist** `api/_ictrules.js` (paths, sizes, the risky-access screen, the apply branch pattern, the members-file
+  parser; no imports): used by the connector and by `scripts/ict-apply-check.mjs`. Never add a second list.
+- **`.github/workflows/ict-apply.yml`** (`pull_request` onto main touching ICT paths; job `verify`, named "ICT apply checks",
+  only for a branch of this repository named `mcp/…/apply-…`; `contents: read`, no secrets): checks out main's files in
+  `base/` and the pull request in `pr/`; runs `node base/scripts/ict-apply-check.mjs` first (member in the list, every changed
+  path in the allowlist, plain files, sizes, syntax, no new network / environment / process access, read from the diff,
+  nothing run); joins the change with main; runs the stop guard from `base/`, the `tests.yml` suite, and
+  `sh scripts/build.sh` with `out/` unchanged. Branch names and commit ids reach scripts through `env:` only.
+- **`.github/workflows/ict-apply-merge.yml`** (`workflow_run` after "ICT apply", so its definition is always main's; the only
+  write token: contents, pull-requests, actions; no checkout; `concurrency: ict-apply`): downloads main's
+  `scripts/ict-apply-merge.mjs`, the verifier, the rules and the members file through the API and sweeps the open
+  `mcp/<member>/apply-…` pull requests: merges (squash, PR title, bound to the head commit) only when the checks of
+  `ict-apply.yml` passed for exactly that commit, the pull request is open, not a draft, from this repository, the member is
+  listed, every file is in the allowlist and main's ICT files did not move since its base; then dispatches `ict-replay.yml`
+  (a merge made with the workflow token starts no push workflows). Any refusal is one comment (`<!-- ict-apply <sha> -->`),
+  the pull request stays open for the owner. The council loop picks up new `ict/` code by itself (`newcode()` between rounds).
+  This differs from a single `pull_request` workflow on purpose: such a run takes its file from the pull request, so it must
+  never hold a write token.
+- **Stop guard** `tests/desk-ict-guard.test.mjs` (NOT named `tests/ict-*`, so the allowlist cannot reach it; runs in the
+  normal suite and, from main's copy with `ICT_GUARD_ROOT`, in the apply checks): on the pinned ICT candles and a longer
+  deterministic path, every signal of `signals()` and every trade `simulate()` records has a stop on the right side of its
+  entry with a positive distance, and a moved stop is never looser; `ict/*.mjs` import only node built-ins, each other and
+  `../council/events.mjs` / `../council/engine.mjs` (tracker only, as on main today), nothing from `api/` or the mirror;
+  no order call, broker API or non-GET request; `MARKETS` / `SHADOW_MARKETS` carry no broker, account or credential.
+- **`ict_desk_update`** (ICT write; data, not code; on by default for Fred): the member's own record for a signal in
+  council-data `ict/desk.json`, in the shape the desk page writes (`{ updated, reviews: { <id>: { act, grade, tags, fill, r,
+  text, by, at, market, side } } }`; optional `score` 1-10), merged by signal id, never replacing another member's record.
+  `ict_note` and it write through `dataWrite` (one retry; a file that does not parse is never overwritten).
+- `scripts/vercel-ignore.sh` now deploys on `ict/` changes: `api/mcp.js` (the backtest lab) and `api/run.js` bundle `ict/*.mjs`.
+- Tests (offline; none named `tests/ict-*`): `tests/mcp-apply.test.mjs` (off by default, each lock alone, both locks end to
+  end, every refusal, revert, desk record, limits, guide text, the dialog), `tests/apply-workflow.test.mjs` (both workflow
+  files as text, the verifier on temporary git repositories, the merge script on a fake GitHub, one allowlist, the guard
+  failing on broken trackers), `tests/desk-ict-guard.test.mjs`, `tests/users-perms.test.mjs`.
 
 ## Per-member permissions (8 Nov 2026, owner: "select on members what they can and can't do or see")
 Keys `MS_PERM_KEYS`: charts, scanner, journal, desks (Gold / Crypto / LIT / NQ SDV), council (every tab; off = overview only),
