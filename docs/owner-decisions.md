@@ -1,4 +1,4 @@
-# Open owner decisions (9 Nov 2026; item 19 added 10 Nov)
+# Open owner decisions (9 Nov 2026; item 26 added 10 Nov)
 
 One checklist of what waits on the owner's yes or no. Each item: what it is, why it matters, the options, and the recommended
 one. Nothing below has been changed in the code; each item names where the change would go. Tick an item when it is decided and
@@ -85,13 +85,13 @@ Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research conne
   How to check: Vercel → project `macro-dashboard` → Settings → Environment Variables, Production: one of the two names must be
   there. Or from the connector: `ict_note` with a test line. "saved" means Contents write works; a proposal that answers
   "Branch pushed; the token could not open the PR" means the token lacks Pull requests write.
-- **More important since 10 Nov (item 19).** If the apply path is ever switched on, this token opens pull requests that a
+- **More important since 10 Nov (item 26).** If the apply path is ever switched on, this token opens pull requests that a
   workflow merges without review. It must then be the dedicated token, and it must NOT have the Workflows permission: GitHub
   then refuses any push from it that changes a workflow file.
 - **Options.** (a) A dedicated fine-grained `GH_MCP_TOKEN`: this repository only, Contents read/write, Pull requests read/write,
   Issues read/write (comments), Checks read, no Workflows, with an expiry; plus branch protection (or a ruleset) on `main`:
   pull request required, the status checks `test` (tests.yml), `build` and `pages` (ci.yml) required, no direct pushes, so no
-  token can push there directly. Do not require an approving review if item 19 is ever switched on (the apply merge has no
+  token can push there directly. Do not require an approving review if item 26 is ever switched on (the apply merge has no
   reviewer); the required checks still hold for it. (b) Keep using `GH_TOKEN`.
 - **Recommended: (a).** It keeps Fred's write path separate from the council's and makes revoking it a one-token job.
 
@@ -106,7 +106,7 @@ Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research conne
   (b) Keep the lab's numbers and say so in the guide. (c) Use the higher of the two per market.
 - **Recommended: (a).** One cost table for every ICT number Fred and the owner compare. Update `docs/fred-mcp.md` with it.
 
-### [ ] 19. Fred may apply ICT changes without review: off
+### [ ] 26. Fred may apply ICT changes without review: off
 
 - **Status: OFF. Nothing here can change the live desk until you take both actions below.** You asked for it on 10 Nov ("mcp
   of fred he should be able to change and edit anything regarding the ict desk such a edge") and then said: "Keep Fred's

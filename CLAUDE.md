@@ -818,7 +818,7 @@ day: "Keep Fred's automatic ICT deployment capability disabled until I explicitl
 do not activate autonomous production changes." So the path exists, is tested end to end, and ships disabled for everyone, Fred
 included. Absolute rule 3 is unchanged: the owner approves every live rule change, and `ict_propose_change` (a draft pull
 request the owner merges) is the only way a change reaches the desk. Never switch it on in code: no built-in apply flag, and
-`council/ict-apply.json` stays `{ "members": [] }` until the owner changes it. Owner's checklist: `docs/owner-decisions.md` item 19.
+`council/ict-apply.json` stays `{ "members": [] }` until the owner changes it. Owner's checklist: `docs/owner-decisions.md` item 26.
 - **Two owner actions switch it on for a member; each alone does nothing** (`tests/mcp-apply.test.mjs`): the Users page box
   "ICT: may apply changes to the ICT edge without my review" (permission dialog, shown under ICT write; stored
   `perms.ictApply: true`; `cleanPerms` knows the key, it is not in `MS_PERM_KEYS` and gates nothing on the page) AND the
