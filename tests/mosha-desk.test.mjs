@@ -117,7 +117,7 @@ test('CSV export: one row per trade, quoted where needed', () => {
 });
 
 test('page wiring: a desk next to the others, members only, the form on the server\'s say', () => {
-  assert.match(PAGE, /const VIEWS = \[[^\]]*'mosha'\]/); assert.match(PAGE, /mosha: 'desks'/); assert.match(PAGE, /const DESKS = \['ict', 'gold', 'mosha', 'crypto', 'lit', 'sdv'\]/);
+  assert.match(PAGE, /const VIEWS = \[[^\]]*'mosha'\]/); assert.match(PAGE, /mosha: 'mosha'/);   // its own key since Luxus teaches there (tests/mosha-lessons.test.mjs): open with the other desks, or on its own assert.match(PAGE, /const DESKS = \['ict', 'gold', 'mosha', 'crypto', 'lit', 'sdv'\]/);
   assert.match(PAGE, /if \(v === 'mosha' && window\.renderMosha\) setTimeout\(window\.renderMosha, 0\);/);
   assert.ok(PAGE.includes('<script src="/assets/mosha-desk.js" defer></script>'));
   assert.equal(PAGE.split('<a href="#mosha" data-dsw="mosha" class="adm">Mosha</a>').length - 1, 6, 'the switch on all six desks');

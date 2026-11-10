@@ -27,9 +27,9 @@ async function latest(env) {
 // ictApply (10 Nov 2026): the member may apply changes to the ICT edge through the connector without the owner's review. Off
 // for everyone by default; it lives in perms only (no record flag, no built-in): api/mcp.js canApply reads it on every apply
 // call, and council/ict-apply.json on main is the second lock.
-const PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict', 'ictApply'];
+const PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict', 'ictApply', 'mosha'];
 const cleanPerms = (p) => { if (p == null) return null; if (typeof p !== 'object' || Array.isArray(p)) return null; const out = {};
-  for (const [k, v] of Object.entries(p)) { if (!PERM_KEYS.includes(k)) return null; if (k === 'ict') { if (![false, true, 'read', 'write'].includes(v)) return null; out.ict = v === true ? 'write' : v; } else { if (typeof v !== 'boolean') return null; out[k] = v; } }
+  for (const [k, v] of Object.entries(p)) { if (!PERM_KEYS.includes(k)) return null; if (k === 'ict') { if (![false, true, 'read', 'write'].includes(v)) return null; out.ict = v === true ? 'write' : v; } else if (k === 'mosha') { if (![false, 'read', 'teach'].includes(v)) return null; out.mosha = v; } else { if (typeof v !== 'boolean') return null; out[k] = v; } }
   return out; };
 const clean = (users) => {
   if (!users || typeof users !== 'object' || Array.isArray(users)) return null;

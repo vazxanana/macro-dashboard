@@ -1,5 +1,6 @@
 // node --test tests/mosha-replay.test.mjs: the Mosha desk's chart (assets/mosha-replay.js): the owner's five example trades with
-// their marks, the replay's pure pieces, the page wiring and the hand-over to ChronosTrade. Offline: no candle is fetched.
+// their marks, the two bigger pictures from the earlier screenshots, the replay's pure pieces, the page wiring and the hand-over
+// to ChronosTrade. Offline: no candle is fetched.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -79,4 +80,49 @@ test('page wiring: the chart card on the Mosha desk, members only, nothing that 
   assert.deepEqual([...JS.matchAll(/fetch\('([^']+)'/g)].map((m) => m[1]), ['/md/bars?sym=']);
   // the owner's light-mode candles stay grey up / black down here too
   assert.match(JS, /light\(\) \? \{ upColor: '#c9ccd2', downColor: '#131722'/);
+});
+
+test('the bigger pictures: the earlier screenshots as two studies, shown only as far as the replay has reached', () => {
+  assert.deepEqual(R.STUDIES.map((e) => e.id), ['cycle', 'oct29e']); assert.equal(R.EXAMPLES.length, 5, 'the trades list is unchanged');
+  for (const e of R.STUDIES) {
+    const base = { '5m': 300, '15m': 900 }[e.base]; assert.ok(base, e.id); assert.equal(e.market, 'xau'); assert.ok(e.label && e.title && e.yours);
+    assert.ok(e.from < e.fillFrom && e.fillFrom < e.to && e.to - e.from <= 4900 * base, e.id + ': one candle request covers it');
+    assert.deepEqual(R.tfsOf(e), e.tfs); assert.ok(e.tfs.includes(e.view) && e.tfs.every((x) => x >= base), e.id + ': never candles smaller than the ones fetched');
+    assert.ok(e.handFrom > e.from && e.handFrom < e.to);
+    for (const m of e.marks) { assert.ok(['level', 'vr', 'bvr', 'zone'].includes(m.kind)); assert.ok(m.a >= e.from && m.b <= e.to && m.a < m.b, `${e.id} ${m.label}`); if (m.kind === 'level') assert.ok(m.p > 0); else assert.ok(m.top > m.bot);
+      assert.ok(m.at != null && m.at >= m.a && m.at <= m.b, `${e.id} ${m.label}: appears only once its high or low is in`); if (m.relabel) assert.ok(m.relabel.at >= m.at && /^BO sell /.test(m.relabel.label) && !/BO sell/.test(m.label), 'a line is called BO sell only once the break is in'); }
+    const ts = e.steps.filter((x) => typeof x.t === 'number').map((x) => x.t); assert.deepEqual(ts, [...ts].sort((a, b) => a - b), e.id + ': steps in time order'); assert.ok(ts[0] >= e.from && ts.at(-1) <= e.to);
+  }
+  assert.deepEqual(R.tfsOf(R.EXAMPLES[0]), [300, 900, 3600]);
+  // the top-down picture carries the 28 Oct sell, same levels, with its stop
+  const cy = R.STUDIES[0], s28 = R.EXAMPLES.find((x) => x.id === 'oct28'); assert.deepEqual([cy.side, cy.entry, cy.stop, cy.target], [s28.side, s28.entry, s28.stop, s28.target]); assert.ok(cy.stop > cy.entry);
+  assert.deepEqual([cy.base, cy.view, cy.h4off], ['15m', 3600, 3600]); assert.ok(cy.steps.some((x) => x.t === 'fill') && cy.steps.some((x) => x.t === 'exit'));
+  const at = (x) => R.marksAt(cy, U(x)).map((m) => m.label);
+  assert.deepEqual(at('2026-10-07T12:50'), []); assert.deepEqual(at('2026-10-12T02:00'), ['H4 low 4066.5'], 'the high is not named while it is still being made');
+  assert.deepEqual(at('2026-10-20T00:00'), ['H4 low 4066.5', 'High 4217.4']); assert.deepEqual(at('2026-10-22T17:00'), ['BO sell 4066.5', 'High 4217.4']);
+  assert.equal(at('2026-10-23T14:30').includes('M15 VR'), false); assert.equal(at('2026-10-23T14:45').includes('M15 VR'), true); assert.equal(at('2026-10-30T20:00').length, cy.marks.length);
+  assert.equal(cy.marks[0].label, 'H4 low 4066.5', 'the picture itself is not changed by the replay');
+  // the second one has no position on the screenshot, so none is invented
+  const ev = R.STUDIES[1]; assert.deepEqual([ev.entry, ev.stop, ev.target], [null, null, null]); assert.equal(R.outcome(ev, [bar(ev.fillFrom, 4008, 4010, 4005, 4006)]).fill, null); assert.deepEqual(ev.watch, { t: U('2026-10-29T23:45'), side: 'sell' });
+  assert.equal(R.stepsOf(ev, { fill: null }).length, ev.steps.length);
+});
+
+test('a picture without a position: what price did after the candle it points at; H4 candles from 17:00 New York', () => {
+  const t0 = U('2026-10-29T23:45'), sp = { watch: { t: t0, side: 'sell' } };
+  const B = [bar(t0 - 300, 12, 13, 11, 12), bar(t0, 12, 12.5, 9.5, 10), bar(t0 + 300, 10, 11.5, 9, 9.2), bar(t0 + 600, 9.2, 9.4, 4, 5), bar(t0 + 900, 5, 13, 4.5, 12)];
+  assert.deepEqual(R.follow(sp, B), { t: t0, px: 10, best: 6, bestT: t0 + 600, bestPx: 4, worst: 1.5 }, 'the move against it counts only on the way to the furthest point');
+  assert.deepEqual(R.follow({ watch: { t: t0, side: 'buy' } }, B), { t: t0, px: 10, best: 3, bestT: t0 + 900, bestPx: 13, worst: 6 });
+  assert.equal(R.follow(sp, B.slice(0, 1)), null); assert.equal(R.follow({}, B), null); assert.equal(R.follow(sp, []), null);
+  const h = U('2026-10-22T12:00'), H1 = [0, 1, 2, 3, 4, 5].map((i) => bar(h + i * 3600, 10 + i, 11 + i, 9 + i, 10.5 + i));
+  assert.deepEqual(R.aggBars(H1, 14400, 3600).map((x) => x.time), [U('2026-10-22T09:00'), U('2026-10-22T13:00'), U('2026-10-22T17:00')]); assert.deepEqual(R.aggBars(H1, 14400).map((x) => x.time), [U('2026-10-22T12:00'), U('2026-10-22T16:00')]);
+  assert.deepEqual(R.aggBars(H1, 14400, 3600)[1], bar(U('2026-10-22T13:00'), 11, 15, 10, 14.5));
+});
+
+test('the bigger pictures hand over to ChronosTrade too, and the page offers them apart from the trades', () => {
+  const cy = R.handoff(R.STUDIES[0], 5), ev = R.handoff(R.STUDIES[1], 5);
+  assert.deepEqual([cy.tf, cy.start, cy.days], ['5m', U('2026-10-28T20:15'), 3]); assert.ok(cy.draw.length >= 2 && cy.draw.every((d) => d.t1 >= cy.start - 86400 && d.t2 <= cy.start && d.t1 < d.t2), 'a line from weeks back starts a day before the session');
+  assert.match(cy.name, /4048\.59 \/ 4076\.69 \/ 3971\.09$/); assert.equal(ev.name, 'Mosha 29 Oct evening', 'no levels in the name when no position is drawn'); assert.equal(ev.start, U('2026-10-29T20:15')); assert.equal(ev.draw.length, 5);
+  assert.match(JS, /STUDIES\.map\(pick\)/); assert.match(JS, /The bigger picture/); assert.match(JS, /'&tf=' \+ \(BASE\[spec\.base\] \? spec\.base : '5m'\)/); assert.match(JS, /no position is drawn on this screenshot/);
+  assert.match(JS, /\[14400, 'H4'\]/); assert.match(JS, /sec === 14400 \? R\.spec\.h4off : 0/);
+  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-lit"')); assert.match(sec, /"The bigger picture" holds the higher-timeframe views/); assert.match(sec, /<i class="bv"><\/i>A range, your green box/);
 });
