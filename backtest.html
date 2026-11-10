@@ -789,7 +789,7 @@
     $('loadmsg').textContent = 'Loading…'; $('load').disabled = true;
     try { const from = st - 300 * TFS[tf], to = Math.min(Math.floor(Date.now() / 1000), st + days * 86400); const bars = await fetchBars(sym, tf, from, to, (k, n) => { $('loadmsg').textContent = `Loading candles… ${k} / ${n}`; }); if (bars.length < 50) throw new Error('too few candles in that window');
       S.id = 's' + Date.now().toString(36); S.name = $('sname').value.trim() || `${sym.toUpperCase()} ${tf} from ${$('start').value.slice(0, 10)}`; S.sym = sym; S.tf = tf; S.dec = MARKETS.find((m) => m[0] === sym)[2]; S.bars = bars; S.from = from; S.to = to; S.startAt = st;
-      S.idx = Math.max(10, bars.findIndex((b) => b.time >= st)); if (S.idx < 10) S.idx = 10; S.acct = BT.newAccount(+$('startbal').value || 100000, acctOpts()); S.ch = null; S.calMonth = null; S.draw = []; S.shots = {};
+      S.idx = Math.max(10, bars.findIndex((b) => b.time >= st)); if (S.idx < 10) S.idx = 10; S.acct = BT.newAccount(+$('startbal').value || 100000, acctOpts()); S.ch = null; S.calMonth = null; S.draw = handDraw(); S.shots = {};
       $('loadmsg').textContent = `${bars.length} candles · ${when(bars[0].time)} → ${when(bars[bars.length - 1].time)}`; render(); renderJournal(); save(); chart.timeScale().scrollToPosition(4, false); UNDO.length = 0; HTF.bars = []; loadHtf(); sessShow(false); toast(`${bars.length} candles loaded · ${esc(S.name)}`, 'good'); CO.ev('loaded');
     } catch (e) { $('loadmsg').textContent = 'Could not load: ' + e.message; } finally { $('load').disabled = false; CO.tick(); }
   });
@@ -1131,7 +1131,15 @@
   $('imp').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; try { const s = JSON.parse(await f.text()); if (!s.acct || !s.sym) throw new Error('not a session file'); const A = all(); s.id = s.id || 's' + Date.now().toString(36); if (s.shots) { localStorage.setItem(SKEY(s.id), JSON.stringify(s.shots)); delete s.shots; } A[s.id] = s; delete SJ[s.id]; writeAll(); listSessions(); resume(s.id); } catch (er) { $('loadmsg').textContent = 'Import failed: ' + er.message; } e.target.value = ''; });
 
   rulesForm(); listSessions(); render(); renderJournal(); renderStrip(); { let m = 'top'; try { m = localStorage.getItem('btLab:tbDock') || 'top'; } catch (e) {} tbPlace(m); }
-  const last = Object.values(all()).sort((a, b) => b.savedAt - a.savedAt)[0]; if (last) resume(last.id).then(() => setTimeout(CO.auto, 300)); else setTimeout(CO.auto, 400);
+  // Hand-over from the Mosha desk (10 Nov 2026, owner: "replicate them now in the charts and replay"): one of the owner's example
+  // trades opens here from the moment before its entry forms, with the marks known by then already drawn (level line, VR box).
+  // The desk leaves it in localStorage `btLab:handoff` and comes here; it is read once, checked, and removed.
+  let HAND = null; try { HAND = JSON.parse(localStorage.getItem('btLab:handoff') || 'null'); localStorage.removeItem('btLab:handoff'); } catch (e) { HAND = null; }
+  if (HAND && !(typeof HAND === 'object' && MARKETS.some((m) => m[0] === HAND.sym) && Number.isFinite(+HAND.start) && +HAND.start > 1.5e9 && Date.now() - (+HAND.made || 0) < 10 * 60e3)) HAND = null;
+  function handDraw() { const H = HAND; HAND = null; if (!H || !Array.isArray(H.draw)) return []; const ok = (v) => Number.isFinite(v) && v > 0;
+    return H.draw.filter((d) => d && (d.type === 't' || d.type === 'r') && ok(d.t1) && ok(d.t2) && ok(d.p1) && ok(d.p2)).slice(0, 24).map((d) => ({ type: d.type, t1: d.t1, p1: d.p1, t2: d.t2, p2: d.p2 })); }
+  if (HAND) { $('sym').value = HAND.sym; $('tf').value = TFS[HAND.tf] ? HAND.tf : '5m'; $('start').value = new Date(+HAND.start * 1000).toISOString().slice(0, 16); $('days').value = String(Math.min(10, Math.max(1, +HAND.days || 3))); $('sname').value = String(HAND.name || 'Mosha example').slice(0, 80); $('load').click(); setTimeout(CO.auto, 400); }
+  else { const last = Object.values(all()).sort((a, b) => b.savedAt - a.savedAt)[0]; if (last) resume(last.id).then(() => setTimeout(CO.auto, 300)); else setTimeout(CO.auto, 400); }
 })();
 </script>
 </body>

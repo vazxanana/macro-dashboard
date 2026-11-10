@@ -31,7 +31,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
@@ -69,7 +69,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
-  and NQ SDV desks, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
+  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`), Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
@@ -1527,3 +1527,44 @@ its own one-at-a-time stream; a cell had to be positive on 2006-12 (100+ trades)
 the CF -0.07R / -0.07R / -0.16R; a far target is worse than a near one in every period). So neither the pattern nor one of these
 simple conditions holds the owner's selection. Five Mosha studies, thirty-three tests on 10 Nov, none an edge. Do not write another
 mechanical reading or filter; the open step is the owner's own logged trades (owner decision 27). Tests: `tests/mosha-select.test.mjs`.
+
+## Mosha desk (10 Nov 2026, owner: "And a place to mosha")
+After five studies found no fixed rule of the owner's Mosha trading that makes money, the measurement left is the owner's own
+selection (owner decision 27, option a). The desk switch is ICT | Gold | Mosha | Crypto | LIT | NQ SDV; `#mosha` (`#v-mosha`, class
+`adm`, permission key `desks`) is the place for it: the record, the cycle in the owner's words, the log form, the trades and the five
+studies' figures (linked to the Edge lab; a test compares them with the result files).
+- **Log** `api/mosha.js` (private Blob `mosha/trades.json`, 500 kept; a failed read throws, so a save never overwrites the log):
+  GET for the owner and for a member who may open the desks (an explicit `perms.desks` wins, else reviewers; viewers and guests
+  get nothing), `{ trades, canWrite }`; POST `{ save }` / `{ remove }` for the owner's session only, same origin. Server rules the
+  page cannot bend: **every trade has a stop on the losing side of its entry** (absolute rule 1; no stop, no record), the target on
+  the winning side, `R` computed on the server from entry / stop / exit, and `pre: true` only for a trade written down while still
+  open. A trade logged already closed is `pre: false` ("added afterwards"); a closed trade keeps its side, entry, stop and target
+  (notes and tags stay editable). Fields: market (xau, xag, eurusd, gbpusd, nas100), side, at, entry, stop, target, how (cf / zone
+  / retest / other), tf, h4 (with / against), swept, note, status, exit, exitAt.
+- **Page** `assets/mosha-desk.js` (`window.MS_MOSHA` pure pieces + `window.renderMosha`, loaded with `defer`; styles
+  `<style id="ms-mosha-css">`): the record counts ONLY `pre` trades (tiles n / winners / R a trade / total / t / drawdown, a
+  running-total line from zero, splits by entry, H4, session and side with "under 10 trades" marked); trades added afterwards are
+  listed and totalled apart. `verdict()`: "Too few to judge" under `MIN_JUDGE` 20 closed trades, then negative / "positive, but
+  not yet apart from luck" / positive only with t >= 2. Never call it an edge on the desk; the log is a measurement, not a rule.
+  "Check candles" replays one logged trade on `/md/bars` 5-minute candles (`replay`: was the entry traded within 30 minutes of
+  the logged time; stop first when one candle holds both; up to the logged exit). CSV download. Phones: the table becomes cards
+  under 760 px. The form shows only when the server says `canWrite`.
+- **The chart and replay** (same day, owner: "Check the screenshots of trades I've sent you so you can understand and replicate
+  them now in the charts and replay"): `assets/mosha-replay.js` (`window.MS_MOSHA_RP`, card `#mo-replay`). `EXAMPLES` = the owner's
+  five trades (10 Nov sell, 28 Oct sell, 29 Oct sell "Janda", 2 Nov sell, 2 Nov buy) with the owner's own marks read off the
+  screenshots and placed on our OANDA M5 candles (`/md/bars`): purple `level` lines, the red `vr` box (the owner's "5 mn" box:
+  from the extreme to the last swing before it), the green `bvr` box (a buy's range), the lavender `zone` of the break, an `htf`
+  zone, and the position (red stop band, grey target band). The screenshots' clock is New York (UTC-4 until 1 Nov 2026, UTC-5
+  after); the data is in UTC. Replay: Start / Back / Play / Next / End, a slider, numbered steps with a one-line caption
+  (`aria-live`), M5 / M15 / H1 (built from M5), 1x / 3x / 10x; a mark appears only from the moment it was known and grows with
+  the cursor (`marksAt`), so the replay never shows the future. `outcome()` finds the fill and the exit on our candles (stop
+  first; the owner's hand close for the 2 Nov sell) and the card states both "You" and "On our candles". A logged trade's
+  "Replay" opens it in the same chart (`specOfTrade`, levels only). "Trade it yourself in ChronosTrade" leaves
+  `localStorage btLab:handoff` (`handoff()`: market, 5m, start = when the VR is in, the marks known by then as drawings) and
+  opens `/backtest`, which reads it once, checks it (known market, under 10 minutes old, at most 24 line / box shapes) and
+  starts that session (`HAND` / `handDraw` at the end of backtest.html's script). The examples are the owner's picks: the card
+  says they show the pattern, not how often it wins. Tests: `tests/mosha-replay.test.mjs`.
+- A log only: nothing under it places, copies or changes a trade, and no council member reads it. A study of the logged trades
+  needs its own pre-registration (n and t, the `pre` trades only).
+- Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
+  CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

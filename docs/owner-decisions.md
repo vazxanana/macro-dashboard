@@ -415,3 +415,7 @@ conditions is what makes your trades win.
   target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a setup, and I test
   that one filter. (c) Leave it. Five studies and thirty-three tests are enough; I do not recommend another mechanical one.
 - **Recommended: (a).** Nothing live changes on any option; the live Mosha BO is untouched.
+- **The place for (a), built 10 Nov ("And a place to mosha"):** Desks → **Mosha** on the desk. Write each trade down as you take
+  it (side, entry, stop, target; a trade without a stop is refused) and close it there when it is over. Only trades logged while
+  still open count in the record; it says "too few to judge" until 20 are closed and calls nothing more than luck below a t of
+  2. Reviewers can read it; only you can write it.
