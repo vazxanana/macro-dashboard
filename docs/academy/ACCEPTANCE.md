@@ -36,10 +36,15 @@ Either of these:
 - [ ] A lesson draft appears ("When … → Then WAIT"). Trim it to one condition you believe, Save lesson.
 - [ ] Press "Replay same trade again". The second attempt is WAIT, the lesson is named as applied, the verdict says
       "Learned", and the page says this proves recall, not generalisation.
+- [ ] Under the verdict a control line says what the engine answers on the same trade with the lesson left out: it is the
+      first answer again, so the change came from the lesson and from nothing else.
 - [ ] Press "Test on new setups". Each unseen setup is decided twice (with and without your lessons) and the table shows
       net R for both with its n, and "too few to judge" under 20.
 - [ ] Reload the page (or stop and start the local server). The lesson, the attempts and the saved session are still there.
 - [ ] Lessons tab: switch the lesson off and replay the same trade: the answer goes back to the first one. Switch it on again.
+- [ ] Lessons tab, "Check earlier corrections": every corrected trade is decided again with today's lessons; one that a
+      later lesson undid is listed as a regression.
+- [ ] A setup from "Test on new setups" cannot be corrected or turned into a lesson (the page says why): unseen setups stay unseen.
 
 ## 4. The other tabs
 
@@ -52,6 +57,9 @@ Either of these:
 - [ ] **Research:** the studies list opens; the counts say how many tests would pass by chance. Add one notebook note.
 - [ ] **Models:** every scorer shows its walk-forward numbers and "rejected challenger"; nothing is promoted.
 - [ ] **Costs:** "Off. No key is set. Spent: $0.00" (unless you set a language-model key yourself).
+- [ ] **The analyst** (the written second opinion under a stored decision): without a key it says it is off and asks
+      nothing. To see it work without spending anything, run the local server with `--fake-llm`: a banner says the answers
+      are test answers, and the analyst's answer sits beside the engine's, never in its place (`docs/academy/LLM.md`).
 - [ ] **Audit:** every save you just made is a row with its time.
 
 ## 5. The honest numbers
