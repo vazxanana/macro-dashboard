@@ -44,16 +44,48 @@
     if (!v || (!v.side && !v.entry && !v.stop && !v.target)) return null;
     var at = v.at ? Math.floor(new Date(v.at).getTime() / 1000) : null; return { market: v.market || 'xau', side: v.side || '', entry: v.entry, stop: v.stop, target: v.target || '', at: at };
   }
+  // What waits on the teacher: the desk's answers to check (their own lessons; every lesson for the owner) and the lines of the
+  // book that are still the desk's own reading; `waiting` = lessons the desk has not answered yet.
+  function todo(lessons, book, who, canTeach) {
+    var judge = [], wait = 0; (lessons || []).forEach(function (l) { if (who !== 'owner' && l.by !== who) return; var s = stateOf(l); if (s === 'read') judge.push(l.id); else if (s !== 'agreed') wait++; });
+    return { judge: canTeach ? judge : [], book: canTeach ? (book || []).filter(function (b) { return b.status === 'proposed'; }).length : 0, waiting: wait };
+  }
+  var FLT = { all: 'All', turn: 'Your turn', wait: 'Waiting for the desk', done: 'Understood' };
+  function filterLessons(list, f) { return (list || []).filter(function (l) { var s = stateOf(l); return f === 'turn' ? s === 'read' : f === 'wait' ? s === 'new' || s === 'more' : f === 'done' ? s === 'agreed' : true; }); }
+  // Captions to tap instead of typing: the ones this teacher used most, then the usual ones (at most 8, no repeats).
+  var CAPS = ['H4', 'H1', 'M30 sweep high', 'M15 vr', 'M5 vr', 'M5 cf for sell', 'Entry after BO', 'Result'];
+  function captionIdeas(lessons, who) {
+    var n = {}, first = {}; (lessons || []).forEach(function (l) { if (who && who !== 'owner' && l.by !== who) return; (l.shots || []).forEach(function (s) { if (/^chronostrade replay/i.test(String(s.caption || '').trim())) return; String(s.caption || '').split(/\s*[,·;]\s*/).forEach(function (c) { c = c.trim(); var k = c.toLowerCase(); if (!c || c.length > 30) return; n[k] = (n[k] || 0) + 1; if (!first[k]) first[k] = c; }); }); });
+    var out = Object.keys(n).sort(function (a, b) { return n[b] - n[a] || (a < b ? -1 : 1); }).slice(0, 5).map(function (k) { return first[k]; });
+    CAPS.forEach(function (c) { if (out.length < 8 && !out.some(function (x) { return x.toLowerCase() === c.toLowerCase(); })) out.push(c); }); return out;
+  }
+  // a tapped caption joins what is already typed
+  function addCaption(cur, idea) { cur = String(cur || '').trim(); return !cur ? idea : cur.toLowerCase().indexOf(idea.toLowerCase()) >= 0 ? cur : (cur + ', ' + idea).slice(0, 200); }
+  // The tutorial: the five things a teacher does, in order, and which of them this teacher has already done (read from the
+  // lessons and the book, so it is right on every device). `next` = the first one that is theirs to do now.
+  var STEPS = [
+    { k: 'send', t: 'Send a trade', go: 'Show me', p: 'Choose your screenshots (or drop or paste them), tap a caption on each one, like "M30 sweep high" or "M5 vr", and write in a few words what the desk should learn. Then press Send. No picture? Just write: a rule in words is a lesson too.' },
+    { k: 'wait', t: 'The desk answers', go: 'Show me', p: 'The desk reads your lesson and writes under it what it understood, in your own terms. It does not read the second you send: it can take a while. The "Your turn" strip at the top tells you when an answer is waiting.' },
+    { k: 'judge', t: 'Say right, or not right', go: 'Show me', p: 'Read the answer. If it is what you meant, press "That is right". If not, press "Not right…" and say what is wrong, the way you would tell a student. The desk answers again until it has it.' },
+    { k: 'book', t: 'Check what the desk knows', go: 'Show me', p: 'The book is everything the desk holds about your trading, one line at a time. On each line press Right, Correct or Erase. Your words replace the desk\'s, and you can teach a new line directly.' },
+    { k: 'replay', t: 'Backtest, and teach from the replay', go: 'Open ChronosTrade', p: 'In ChronosTrade, replay any day and take your trades. When one closes, press "Teach this trade" on the chart (or the T key): it comes here with its chart, entry, stop, target and result.' }];
+  function guide(lessons, book, who) {
+    var own = (lessons || []).filter(function (l) { return who === 'owner' || l.by === who; }), desk = function (f) { return own.some(function (l) { return (l.thread || []).some(function (m) { return m.by === 'assistant' && f(m); }); }); };
+    var done = { send: own.length > 0, wait: desk(function () { return true; }), judge: desk(function (m) { return !!m.verdict; }), book: (book || []).some(function (b) { return b.status !== 'proposed'; }), replay: own.some(function (l) { return !!(l.trade && l.trade.src === 'replay'); }) };
+    var can = { send: true, wait: false, judge: own.some(function (l) { return stateOf(l) === 'read'; }), book: (book || []).length > 0, replay: true }, next = null;
+    var steps = STEPS.map(function (s) { if (!next && !done[s.k] && can[s.k]) next = s.k; return { k: s.k, done: done[s.k] }; });
+    return { steps: steps, next: next, done: steps.filter(function (x) { return x.done; }).length, of: steps.length };
+  }
   // base64 length of a data URL -> bytes
   function bytesOf(dataUrl) { var i = String(dataUrl).indexOf(','), b = String(dataUrl).length - i - 1; return i < 0 ? 0 : Math.floor(b * 3 / 4); }
-  var API = { MAX_SIDE: MAX_SIDE, MAX_PICK: MAX_PICK, fit: fit, captionOf: captionOf, stateOf: stateOf, STATE: STATE, KIND: KIND, summary: summary, scoreLine: scoreLine, bookLine: bookLine, bookGroups: bookGroups, tradeFrom: tradeFrom, bytesOf: bytesOf };
+  var API = { MAX_SIDE: MAX_SIDE, MAX_PICK: MAX_PICK, fit: fit, captionOf: captionOf, stateOf: stateOf, STATE: STATE, KIND: KIND, summary: summary, scoreLine: scoreLine, bookLine: bookLine, bookGroups: bookGroups, tradeFrom: tradeFrom, bytesOf: bytesOf, todo: todo, FLT: FLT, filterLessons: filterLessons, captionIdeas: captionIdeas, addCaption: addCaption, guide: guide, STEPS: STEPS };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_TEACH = API;
   if (typeof document === 'undefined') return;
 
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  var URL_ = '/api/mosha-lessons', T = { lessons: null, book: [], score: null, canTeach: false, who: null, picks: [], busy: false, open: null, loading: false, err: null };
+  var URL_ = '/api/mosha-lessons', T = { lessons: null, book: [], score: null, canTeach: false, who: null, picks: [], busy: false, open: null, loading: false, err: null, flt: 'all', wrong: null, bookOnly: false, drafted: false, guideOpen: null };
   var day = function (iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); };
   var api = function (body) { return fetch(URL_, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || (r.status === 429 ? 'too many requests: wait a minute' : r.status === 413 ? 'that picture is too large' : 'the desk did not take it (' + r.status + ')')); return j; }); }); };
   var mine = function (l) { return T.who === 'owner' || (T.canTeach && l.by === T.who); };
@@ -68,12 +100,12 @@
   }
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'; };
   function talkHTML(l, own) {
-    var th = l.thread || [], st = stateOf(l), la = null; th.forEach(function (m) { if (m.by === 'assistant') la = m; });
+    var th = l.thread || [], st = stateOf(l), la = null, wrong = T.wrong === l.id && st === 'read'; th.forEach(function (m) { if (m.by === 'assistant') la = m; });
     var rows = th.map(function (m) { var desk = m.by === 'assistant';
       return '<li class="' + (desk ? 'mo-l-desk' : 'mo-l-you') + '"><b>' + (desk ? 'The desk understood' : esc(m.name || m.by)) + '</b><small>' + esc(day(m.at)) + '</small><p>' + esc(m.text) + '</p>' + (desk && m.verdict ? '<span class="mo-l-v mo-l-v-' + m.verdict + '">' + (m.verdict === 'right' ? 'Marked right' : 'Marked not right') + '</span>' : '') + '</li>'; }).join('');
     return '<div class="mo-l-reply"><ol class="mo-l-talk">' + (rows || '<li class="mo-l-desk"><p class="mo-l-wait">The desk has not read this lesson yet.</p></li>') + '</ol>'
       + (own && la && st === 'read' ? '<div class="mo-l-judge"><span>Did the desk get it right?</span><button type="button" class="ms-tbtn mo-l-yes" data-right="' + esc(l.id) + '">That is right</button><button type="button" class="ms-tbtn" data-wrong="' + esc(l.id) + '">Not right…</button></div>' : '')
-      + (own ? '<form class="mo-l-say" data-say="' + esc(l.id) + '"><label class="mo-f"><span>' + (la ? 'Tell the desk more, or correct it' : 'Add words for the desk') + '</span><textarea name="text" rows="2" maxlength="2000" placeholder="' + (la ? 'The VR starts at the high, not at…' : 'What else should it see here?') + '"></textarea></label><button type="submit" class="ms-tbtn">Send</button></form>' : '')
+      + (own ? '<form class="mo-l-say" data-say="' + esc(l.id) + '"' + (wrong ? ' data-wrong="1"' : '') + '><label class="mo-f"><span>' + (wrong ? 'What is not right? The desk learns from your words' : la ? 'Tell the desk more, or correct it' : 'Add words for the desk') + '</span><textarea name="text" rows="2" maxlength="2000" placeholder="' + (la ? 'The VR starts at the high, not at…' : 'What else should it see here?') + '"></textarea></label><span class="mo-l-sayb">' + (wrong ? '<button type="button" class="mo-l-x" data-unwrong="1">Cancel</button>' : '') + '<button type="submit" class="ms-tbtn">' + (wrong ? 'Send: not right' : 'Send') + '</button></span></form>' : '')
       + '</div>';
   }
   function lessonHTML(l, open) {
@@ -89,8 +121,9 @@
   }
   function showImgs(det) { Array.prototype.forEach.call(det.querySelectorAll('img[data-src]'), function (im) { if (im.getAttribute('src')) return; im.onerror = function () { if (im.dataset.retry) { im.alt = 'This picture could not be loaded'; return; } im.dataset.retry = '1'; setTimeout(function () { im.src = im.dataset.src + '&r=1'; }, 20000); }; im.src = im.dataset.src; }); }
   function bookHTML() {
-    var can = T.canTeach, g = bookGroups(T.book);
-    return (g.length ? g.map(function (grp) { return '<section class="mo-b-g"><h3>' + grp.name + '</h3><ul>' + grp.items.map(function (b) {
+    var can = T.canTeach, left = T.book.filter(function (b) { return b.status === 'proposed'; }); if (!left.length) T.bookOnly = false;
+    var g = bookGroups(T.bookOnly ? left : T.book), only = T.bookOnly ? '<p class="mo-tc-to"><span>Only the <b>' + left.length + (left.length === 1 ? ' line' : ' lines') + '</b> you have not checked yet.</span><button type="button" class="mo-l-x" data-b-all="1">Show every line</button></p>' : '';
+    return only + (g.length ? g.map(function (grp) { return '<section class="mo-b-g"><h3>' + grp.name + '</h3><ul>' + grp.items.map(function (b) {
       var chip = b.status === 'proposed' ? '<span class="mo-b-s mo-b-prop">The desk\'s reading, not confirmed</span>' : b.status === 'corrected' ? '<span class="mo-b-s mo-b-ok">Corrected by the teacher</span>' : '<span class="mo-b-s mo-b-ok">' + (b.by === 'assistant' ? 'Confirmed' : 'Taught by ' + esc(b.name || b.by)) + '</span>';
       return '<li data-b="' + esc(b.id) + '"><p>' + esc(b.text) + '</p>' + chip + (b.was ? '<small>The desk had: ' + esc(b.was) + '</small>' : '')
         + (can ? '<span class="mo-b-acts">' + (b.status === 'proposed' ? '<button type="button" class="mo-l-x" data-b-ok="' + esc(b.id) + '">Right</button>' : '') + '<button type="button" class="mo-l-x" data-b-fix="' + esc(b.id) + '">' + (b.status === 'proposed' ? 'Correct' : 'Change') + '</button><button type="button" class="mo-l-x" data-b-rm="' + esc(b.id) + '">Erase</button></span>' : '') + '</li>'; }).join('') + '</ul></section>'; }).join('')
@@ -104,29 +137,65 @@
     if (T.err && !T.lessons) { body.innerHTML = '<div class="ct-empty">' + esc(T.err.charAt(0).toUpperCase() + T.err.slice(1)) + '.</div>'; if (sub) sub.textContent = ''; if (bk) bk.innerHTML = ''; return; }
     if (!T.lessons) return;
     if (sub) sub.textContent = scoreLine(T.score);
-    var openId = T.open || (T.lessons[0] && T.lessons[0].id), keep = {};   // what the teacher is typing survives a redraw
+    var td = todo(T.lessons, T.book, T.who, T.canTeach), strip = $('mo-todo'), n1 = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
+    if (strip) { strip.hidden = !T.canTeach; var bits = (td.judge.length ? '<button type="button" class="ms-tbtn" data-todo="judge">' + n1(td.judge.length, 'answer', 'answers') + ' to check</button>' : '') + (td.book ? '<button type="button" class="ms-tbtn" data-todo="book">' + n1(td.book, 'line', 'lines') + ' of the book to check</button>' : '');
+      strip.classList.toggle('calm', !bits); strip.innerHTML = bits ? '<span>Your turn</span>' + bits + (td.waiting ? '<small>The desk still has ' + n1(td.waiting, 'lesson', 'lessons') + ' to read.</small>' : '') : '<span>Nothing waits on you.</span><small>' + (td.waiting ? 'The desk still has ' + n1(td.waiting, 'lesson', 'lessons') + ' to read.' : 'Send a trade whenever you have one.') + '</small>'; }
+    var fl = $('mo-l-flt'); if (fl) { fl.hidden = T.lessons.length < 4; if (fl.hidden) T.flt = 'all'; else fl.innerHTML = Object.keys(FLT).map(function (k) { var c = filterLessons(T.lessons, k).length; return '<button type="button" data-flt="' + k + '" aria-pressed="' + (T.flt === k) + '">' + FLT[k] + ' <small>' + c + '</small></button>'; }).join(''); }
+    var shown = filterLessons(T.lessons, T.flt), firstTurn = shown.filter(function (l) { return td.judge.indexOf(l.id) >= 0; })[0];
+    var openId = T.open || (firstTurn || shown[0] || {}).id, keep = {};   // the lesson that waits on the teacher opens first; what is being typed survives a redraw
     Array.prototype.forEach.call(body.querySelectorAll('form.mo-l-say'), function (f) { if (f.elements.text.value) keep[f.dataset.say] = f.elements.text.value; });
-    body.innerHTML = T.lessons.length ? T.lessons.map(function (l) { return lessonHTML(l, l.id === openId); }).join('')
-      : '<div class="ct-empty">' + (T.canTeach ? 'No lessons yet. Send your first trade above: the screenshots, or just words, and what the desk should see in them.' : 'No lessons yet. They appear here when the desk\'s teacher sends a trade.') + '</div>';
+    body.innerHTML = T.lessons.length && !shown.length ? '<div class="ct-empty">No lessons here.</div>' : T.lessons.length ? shown.map(function (l) { return lessonHTML(l, l.id === openId); }).join('')
+      : '<div class="ct-empty">' + (T.canTeach ? 'No lessons yet. Choose screenshots above, or just write what the desk should learn, and press Send.' : 'No lessons yet. They appear here when the desk\'s teacher sends a trade.') + '</div>';
     Array.prototype.forEach.call(body.querySelectorAll('details.mo-l'), function (d) { if (d.open) showImgs(d); d.addEventListener('toggle', function () { if (d.open) { T.open = d.dataset.id; showImgs(d); } }); });
     Array.prototype.forEach.call(body.querySelectorAll('form.mo-l-say'), function (f) { if (keep[f.dataset.say]) f.elements.text.value = keep[f.dataset.say]; });
     if (bk) { var typed = $('mo-b-form') && $('mo-b-form').elements.text.value; bk.innerHTML = bookHTML(); if (typed && $('mo-b-form')) $('mo-b-form').elements.text.value = typed; var bs = $('mo-b-sub'); if (bs) bs.textContent = bookLine(T.book); }
-    var sel = document.querySelector('#mo-t-form select[name="lesson"]'); if (sel) { var cur = sel.value; sel.innerHTML = '<option value="">A new lesson</option>' + T.lessons.filter(mine).map(function (l) { return '<option value="' + esc(l.id) + '">' + esc(l.title) + '</option>'; }).join(''); if (cur && sel.querySelector('option[value="' + cur + '"]')) sel.value = cur; }
+    var sel = document.querySelector('#mo-t-form select[name="lesson"]'); if (sel) { var cur = sel.value; sel.innerHTML = '<option value="">A new lesson</option>' + T.lessons.filter(mine).map(function (l) { return '<option value="' + esc(l.id) + '">' + esc(l.title) + '</option>'; }).join(''); if (cur && sel.querySelector('option[value="' + cur + '"]')) sel.value = cur; target(); }
+    draft(); drawGuide();
   }
+  // The tutorial card. It opens by itself for a teacher until they hide it or have done every step; "How to teach" brings it back.
+  var GKEY = function () { return 'msMoGuide:' + (T.who || ''); };
+  function drawGuide() {
+    var box = $('mo-guide'); if (!box) return; if (!T.canTeach || !T.lessons) { box.hidden = true; return; }
+    var g = guide(T.lessons, T.book, T.who), hid = false; try { hid = localStorage.getItem(GKEY()) === 'hide'; } catch (e) {}
+    var open = T.guideOpen != null ? T.guideOpen : (T.who !== 'owner' && !hid && g.done < g.of); box.hidden = !open; if (!open) return;
+    var sent = g.steps[0].done; box.classList.toggle('full', T.guideOpen === true);   // shown by itself, a done step is one line; asked for, every step is in full
+    box.innerHTML = '<div class="mo-g-h"><h2>How to teach the desk</h2><span class="mo-g-n">' + (g.done === g.of ? 'You have done every step.' : g.done + ' of ' + g.of + ' done') + '</span><button type="button" class="mo-l-x" data-g-hide="1">Hide the guide</button></div>'
+      + '<div class="mo-g-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + g.of + '" aria-valuenow="' + g.done + '" aria-label="Steps done"><i style="width:' + Math.round(100 * g.done / g.of) + '%"></i></div><ol class="mo-g-steps">'
+      + STEPS.map(function (s, i) { var st = g.steps[i], nx = g.next === s.k, label = st.done ? 'Done' : nx ? 'Next' : s.k === 'wait' ? (sent ? 'The desk is reading' : 'After you send') : s.k === 'judge' ? 'When the desk has answered' : 'To do';
+        return '<li class="' + (st.done ? 'done' : nx ? 'next' : '') + '"><span class="mo-g-num" aria-hidden="true">' + (st.done ? '✓' : i + 1) + '</span><div><h3>' + s.t + ' <span class="mo-g-st">' + label + '</span></h3><p>' + esc(s.p) + '</p></div>'
+          + (s.k === 'replay' ? '<a class="ms-tbtn" href="/backtest">' + s.go + '</a>' : '<button type="button" class="ms-tbtn" data-g-go="' + s.k + '">' + s.go + '</button>') + '</li>'; }).join('')
+      + '</ol><p class="ms-note mo-g-foot">Lessons only: nothing here places, copies or changes a trade. Explain it the way you would to a student: the higher timeframe first, then the entry. You can open this guide again with "How to teach".</p>';
+  }
+  // "Show me": the part of the page a step is about, brought into view and outlined for a moment
+  function showPart(k) {
+    var jd = todo(T.lessons, T.book, T.who, T.canTeach).judge[0], el = k === 'send' ? $('mo-teach') : k === 'book' ? $('mo-book') : k === 'judge' && jd ? (T.open = jd, T.flt = 'all', draw(), document.querySelector('#mo-l-body details.mo-l[data-id="' + jd + '"]')) : k === 'wait' ? ($('mo-todo') && !$('mo-todo').hidden ? $('mo-todo') : $('mo-lessons')) : $('mo-lessons');
+    if (!el) return; if (el.scrollIntoView) el.scrollIntoView({ block: k === 'wait' ? 'center' : 'start', behavior: 'smooth' }); el.classList.add('mo-show'); setTimeout(function () { el.classList.remove('mo-show'); }, 2200);
+    if (k === 'send') { var fi = $('mo-t-file'); if (fi) fi.focus({ preventScroll: true }); }
+  }
+  // which lesson the pictures go to, said in words (the select itself sits in the fold)
+  function target() { var f = $('mo-t-form'), row = $('mo-t-to'); if (!f || !row) return; var l = byId(f.elements.lesson.value); row.hidden = !l; if (l) row.querySelector('b').textContent = l.title; var s = $('mo-t-send'); if (s) s.disabled = !canSend(); }
+  // What the teacher typed is kept on this device until it is sent (a phone that switches apps reloads the page).
+  var DKEY = function () { return 'msMoDraft:' + (T.who || ''); }, dTimer = 0;
+  function draft() { var f = $('mo-t-form'); if (T.drafted || !f || !T.who || !T.canTeach) return; T.drafted = true; try { var d = JSON.parse(localStorage.getItem(DKEY()) || 'null'); if (d && !f.elements.note.value && !f.elements.title.value) { f.elements.note.value = String(d.note || '').slice(0, 2000); f.elements.title.value = String(d.title || '').slice(0, 80); if (f.elements.title.value) $('mo-t-more').open = true; var s = $('mo-t-send'); if (s) s.disabled = !canSend(); } } catch (e) {} }
+  function keepDraft() { clearTimeout(dTimer); dTimer = setTimeout(function () { var f = $('mo-t-form'); if (!f || !T.who) return; try { var d = { note: f.elements.note.value, title: f.elements.title.value }; if (d.note || d.title) localStorage.setItem(DKEY(), JSON.stringify(d)); else localStorage.removeItem(DKEY()); } catch (e) {} }, 400); }
+  function dropDraft() { clearTimeout(dTimer); try { localStorage.removeItem(DKEY()); } catch (e) {} }
+  var toCard = function (el) { if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
 
   // ─── sending ───
   function say(txt, bad) { var m = $('mo-t-msg'); if (m) { m.textContent = txt || ''; m.classList.toggle('mo-err-t', !!bad); } }
-  function canSend() { var f = $('mo-t-form'); return !!f && !T.busy && (T.picks.length > 0 || (!f.elements.lesson.value && f.elements.title.value.trim() && f.elements.note.value.trim())); }
+  function canSend() { var f = $('mo-t-form'); return !!f && !T.busy && (T.picks.length > 0 || (!f.elements.lesson.value && !!f.elements.note.value.trim())); }
   function drawPicks() {
     var ol = $('mo-t-picks'), send = $('mo-t-send'); if (!ol) return;
-    ol.innerHTML = T.picks.map(function (p, i) { return '<li><img src="' + esc(p.url) + '" alt="" width="96" height="60"><label class="mo-f"><span>Caption for picture ' + (i + 1) + '</span><input type="text" maxlength="200" data-pick="' + i + '" value="' + esc(p.caption) + '" placeholder="M5 vr · M30 sweep high · entry after BO sell"></label><button type="button" class="ms-tbtn" data-drop="' + i + '" aria-label="Take picture ' + (i + 1) + ' out">Take out</button></li>'; }).join('');
+    var ideas = T.picks.length ? captionIdeas(T.lessons, T.who) : [];
+    ol.innerHTML = T.picks.map(function (p, i) { return '<li><img src="' + esc(p.url) + '" alt="" width="96" height="60"><label class="mo-f"><span>Caption for picture ' + (i + 1) + '</span><input type="text" maxlength="200" data-pick="' + i + '" value="' + esc(p.caption) + '" placeholder="M5 vr · M30 sweep high · entry after BO sell"></label><button type="button" class="ms-tbtn" data-drop="' + i + '" aria-label="Take picture ' + (i + 1) + ' out">Take out</button><span class="mo-cap-ideas" role="group" aria-label="Captions to tap for picture ' + (i + 1) + '">' + ideas.map(function (c) { return '<button type="button" data-idea="' + i + '" data-text="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') + '</span></li>'; }).join('');
     if (send) send.disabled = !canSend();
   }
   function addFiles(files) {
     var took = 0, skipped = 0; Array.prototype.forEach.call(files || [], function (f) {
       if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { skipped++; return; } if (T.picks.length >= MAX_PICK) { skipped++; return; }
       T.picks.push({ file: f, url: URL.createObjectURL(f), caption: captionOf(f.name) }); took++; });
-    drawPicks(); say(skipped ? (took ? 'Some files were left out: ' : 'Not added: ') + 'send PNG, JPEG or WebP pictures, ' + MAX_PICK + ' at a time.' : '', skipped && !took);
+    drawPicks(); say(skipped ? (took ? 'Some files were left out: ' : 'Not added: ') + 'send PNG, JPEG or WebP pictures, ' + MAX_PICK + ' at a time.' : took ? (T.picks.length === 1 ? '1 picture' : T.picks.length + ' pictures') + ' ready. Add a caption or a few words, then send.' : '', skipped && !took);
+    if (took) toCard($('mo-teach'));
   }
   // one picture, as a JPEG data URL small enough to send (screenshots stay sharp: only the longest side is limited)
   function shrink(file) {
@@ -142,8 +211,7 @@
   function send(ev) {
     ev.preventDefault(); var f = $('mo-t-form'); if (!f || T.busy) return;
     var lesson = f.elements.lesson.value || null, title = f.elements.title.value.trim(), note = f.elements.note.value.trim(), total = T.picks.length, done = 0, trade = lesson ? null : levelsOf(f);
-    if (!lesson && !title) { say('Name the trade first: which one is it?', true); f.elements.title.focus(); return; }
-    if (!total && !(title && note)) { say(lesson ? 'Choose the pictures to add.' : 'Add a screenshot, or write what the desk should learn.', true); return; }
+    if (!total && (lesson || !note)) { say(lesson ? 'Choose the pictures to add. To add words, write under the lesson itself.' : 'Add a screenshot, or write what the desk should learn.', true); return; }
     if (trade && (!trade.side || !trade.entry || !trade.stop || !trade.at)) { say('The levels need a side, the entry, the stop and the entry time. Every trade has a stop.', true); return; }
     T.busy = true; drawPicks(); f.setAttribute('aria-busy', 'true');
     var first = function (extra) { var a = { lesson: lesson, title: title, note: done === 0 ? note : undefined, trade: done === 0 && trade ? trade : undefined }; for (var k in extra) a[k] = extra[k]; return api({ add: a }); };
@@ -154,7 +222,7 @@
         .then(function (j) { lesson = j.lesson.id; T.open = lesson; done++; URL.revokeObjectURL(p.url); T.picks.shift(); drawPicks(); return next(); });
     };
     (total ? next() : first({}).then(function (j) { T.open = j.lesson.id; }))
-      .then(function () { say((total > 1 ? total + ' pictures sent.' : 'Sent.') + ' The desk will read it and write back what it understood.'); f.reset(); })
+      .then(function () { say((total > 1 ? total + ' pictures sent.' : 'Sent.') + ' The desk will read it and write back what it understood.'); f.reset(); dropDraft(); $('mo-t-more').open = false; T.flt = 'all'; })
       .catch(function (e) { say((done ? done + ' of ' + total + ' sent, then: ' : 'Not sent: ') + (e.message || 'something went wrong') + '. The rest is still here; send again.', true); })
       .then(function () { T.busy = false; f.removeAttribute('aria-busy'); drawPicks(); load(); });
   }
@@ -189,31 +257,50 @@
       if (b.dataset.img) { var im = b.querySelector('img'); if (im) view(im); }
       else if (b.dataset.chart) { var L = byId(b.dataset.chart); if (L && root.msMoshaReplayLesson) root.msMoshaReplayLesson(L); }
       else if (b.dataset.right) act(api({ say: { id: b.dataset.right, verdict: 'right' } }));
-      else if (b.dataset.wrong) ask('What is not right? The desk learns from your words.', '', { title: 'Not right', ok: 'Send', max: 2000 }).then(function (v) { if (v != null && String(v).trim()) act(api({ say: { id: b.dataset.wrong, verdict: 'wrong', text: v } })); });
+      else if (b.dataset.wrong) { T.wrong = b.dataset.wrong; draw(); var tx = card.querySelector('form.mo-l-say[data-say="' + b.dataset.wrong + '"] textarea'); if (tx) tx.focus(); }   // typed in place, under the desk's answer
+      else if (b.dataset.unwrong) { T.wrong = null; draw(); }
+      else if (b.dataset.flt) { T.flt = b.dataset.flt; T.open = null; draw(); }
       else if (b.dataset.rmImg) sure('Remove this picture from the lesson?', { title: 'Remove the picture', ok: 'Remove', danger: true }).then(function (y) { if (y) act(api({ remove: { id: id, img: b.dataset.rmImg } })); });
       else if (b.dataset.cap) { var s = ((byId(id) || { shots: [] }).shots.filter(function (x) { return x.img === b.dataset.cap; })[0]); ask('Caption', s ? s.caption : '', { title: 'Caption of this picture', ok: 'Save', max: 200 }).then(function (v) { if (v != null) act(api({ edit: { id: id, img: b.dataset.cap, caption: v } })); }); }
       else if (b.dataset.rm) sure('Remove this lesson and its pictures? This cannot be undone.', { title: 'Remove the lesson', ok: 'Remove', danger: true }).then(function (y) { if (y) act(api({ remove: { id: b.dataset.rm } })); });
       else if (b.dataset.note) { var cur = byId(b.dataset.note); ask('What should the desk learn from it', cur ? cur.note : '', { title: 'Note of this lesson', ok: 'Save', max: 2000 }).then(function (v) { if (v != null) act(api({ edit: { id: b.dataset.note, note: v } })); }); }
       else if (b.dataset.levels) { var lv = byId(b.dataset.levels); if (lv) levelsDialog(lv); }
-      else if (b.dataset.more) { var f = $('mo-t-form'); if (f) { f.elements.lesson.value = b.dataset.more; $('mo-teach').scrollIntoView({ block: 'start', behavior: 'smooth' }); var fi = $('mo-t-file'); if (fi) fi.focus(); } }
+      else if (b.dataset.more) { var f = $('mo-t-form'); if (f) { f.elements.lesson.value = b.dataset.more; target(); toCard($('mo-teach')); var fi = $('mo-t-file'); if (fi) { fi.focus(); fi.click(); } } }   // straight to the picker
       else if (b.id === 'mo-l-keybtn') { b.disabled = true; fetch(URL_ + '?get=reader', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) { var o = $('mo-l-keyout'); if (!o) return; o.hidden = false; var inp = o.querySelector('input'); if (j.key) { inp.value = j.key; inp.focus(); inp.select(); o.querySelector('small').textContent = 'Host: ' + (j.host || 'meridianx.dev') + '. Paste the key only into the secure form the assistant opens for that host, never into a chat. With it one can read the lessons, answer them and propose lines for the book, nothing else.'; } else { inp.value = ''; o.querySelector('small').textContent = j.off ? 'The key is switched off on the server (MOSHA_READER=off).' : (j.error || 'The server has no session secret yet, so there is no key.'); } }).catch(function () {}).then(function () { b.disabled = false; }); }
       else if (b.id === 'mo-l-keycopy') { var k = $('mo-l-keyout').querySelector('input'); if (k.value && root.msCopy) root.msCopy(k.value); else if (k.value && navigator.clipboard) navigator.clipboard.writeText(k.value); }
     });
-    card.addEventListener('submit', function (ev) { var f = ev.target.closest('form.mo-l-say'); if (!f) return; ev.preventDefault(); var v = f.elements.text.value.trim(); if (!v) return; f.elements.text.value = ''; act(api({ say: { id: f.dataset.say, text: v } })); });
+    card.addEventListener('submit', function (ev) { var f = ev.target.closest('form.mo-l-say'); if (!f) return; ev.preventDefault(); var v = f.elements.text.value.trim(); if (!v) { f.elements.text.focus(); return; } f.elements.text.value = ''; var wrong = !!f.dataset.wrong; T.wrong = null; act(api({ say: wrong ? { id: f.dataset.say, verdict: 'wrong', text: v } : { id: f.dataset.say, text: v } })); });
+    var view_ = $('v-mosha'), strip = $('mo-todo'), gd = $('mo-guide'), gopen = $('mo-guide-open');
+    if (gd) gd.addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return;
+      if (b.dataset.gHide) { T.guideOpen = false; try { localStorage.setItem(GKEY(), 'hide'); } catch (e) {} drawGuide(); if (gopen) gopen.focus(); }
+      else if (b.dataset.gGo) showPart(b.dataset.gGo); });
+    if (gopen) gopen.addEventListener('click', function () { T.guideOpen = true; try { localStorage.removeItem(GKEY()); } catch (e) {} drawGuide(); if (gd && gd.scrollIntoView) gd.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+    // Ctrl / Cmd + Enter sends whatever is being written on the desk
+    if (view_) view_.addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' || !(ev.ctrlKey || ev.metaKey) || !ev.target.closest) return; var f = ev.target.closest('form.mo-l-say, #mo-t-form, #mo-b-form'); if (!f) return; ev.preventDefault(); if (f.requestSubmit) f.requestSubmit(); });
+    if (strip) strip.addEventListener('click', function (ev) { var b = ev.target.closest('button[data-todo]'); if (!b) return;
+      if (b.dataset.todo === 'book') { T.bookOnly = true; draw(); if ($('mo-book').scrollIntoView) $('mo-book').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      else { var id = todo(T.lessons, T.book, T.who, T.canTeach).judge[0]; if (!id) return; T.flt = 'all'; T.open = id; draw(); var d = card.querySelector('details.mo-l[data-id="' + id + '"]'); if (d && d.scrollIntoView) d.scrollIntoView({ block: 'start', behavior: 'smooth' }); } });
     var book = $('mo-book'); if (book) {
       book.addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return;
-        if (b.dataset.bOk) act(api({ book: { id: b.dataset.bOk, confirm: true } }));
+        if (b.dataset.bAll) { T.bookOnly = false; draw(); }
+        else if (b.dataset.bOk) act(api({ book: { id: b.dataset.bOk, confirm: true } }));
         else if (b.dataset.bFix) { var it = T.book.filter(function (x) { return x.id === b.dataset.bFix; })[0]; ask('Say it the way you mean it', it ? it.text : '', { title: 'Correct this line', ok: 'Save', max: 600 }).then(function (v) { if (v != null && String(v).trim()) act(api({ book: { id: b.dataset.bFix, text: v } })); }); }
         else if (b.dataset.bRm) sure('Erase this line from what the desk knows?', { title: 'Erase the line', ok: 'Erase', danger: true }).then(function (y) { if (y) act(api({ book: { id: b.dataset.bRm, remove: true } })); }); });
       book.addEventListener('submit', function (ev) { var f = ev.target.closest('#mo-b-form'); if (!f) return; ev.preventDefault(); var v = f.elements.text.value.trim(); if (v.length < 4) return; var kind = f.elements.kind.value; f.elements.text.value = ''; act(api({ learn: { kind: kind, text: v } })); });
     }
     var f = $('mo-t-form'); if (!f) return;
-    f.addEventListener('submit', send); f.addEventListener('input', function () { var s = $('mo-t-send'); if (s) s.disabled = !canSend(); }); f.addEventListener('reset', function () { setTimeout(drawPicks, 0); });
+    f.addEventListener('submit', send); f.addEventListener('input', function (ev) { var s = $('mo-t-send'); if (s) s.disabled = !canSend(); if (ev.target.name === 'note' || ev.target.name === 'title') keepDraft(); }); f.addEventListener('reset', function () { setTimeout(function () { drawPicks(); target(); }, 0); });
+    f.elements.lesson.addEventListener('change', target); $('mo-t-new').addEventListener('click', function () { f.elements.lesson.value = ''; target(); });
     $('mo-t-file').addEventListener('change', function (ev) { addFiles(ev.target.files); ev.target.value = ''; });
     $('mo-t-picks').addEventListener('input', function (ev) { var i = ev.target.dataset.pick; if (i != null && T.picks[+i]) T.picks[+i].caption = ev.target.value; });
-    $('mo-t-picks').addEventListener('click', function (ev) { var b = ev.target.closest('button[data-drop]'); if (!b || T.busy) return; var p = T.picks.splice(+b.dataset.drop, 1)[0]; if (p) URL.revokeObjectURL(p.url); drawPicks(); });
-    var drop = $('mo-t-drop'); ['dragenter', 'dragover'].forEach(function (n) { drop.addEventListener(n, function (ev) { ev.preventDefault(); drop.classList.add('over'); }); }); ['dragleave', 'drop'].forEach(function (n) { drop.addEventListener(n, function (ev) { ev.preventDefault(); drop.classList.remove('over'); if (n === 'drop' && ev.dataTransfer) addFiles(ev.dataTransfer.files); }); });
-    $('mo-teach').addEventListener('paste', function (ev) { var fs = ev.clipboardData && ev.clipboardData.files; if (fs && fs.length) { ev.preventDefault(); addFiles(fs); } });   // a screenshot straight from the clipboard
+    $('mo-t-picks').addEventListener('click', function (ev) { var idea = ev.target.closest('button[data-idea]'); if (idea) { var pk = T.picks[+idea.dataset.idea], inp = $('mo-t-picks').querySelector('input[data-pick="' + idea.dataset.idea + '"]'); if (pk && inp) { pk.caption = inp.value = addCaption(inp.value, idea.dataset.text); } return; }
+      var b = ev.target.closest('button[data-drop]'); if (!b || T.busy) return; var p = T.picks.splice(+b.dataset.drop, 1)[0]; if (p) URL.revokeObjectURL(p.url); drawPicks(); });
+    // a screenshot dropped anywhere on the desk, or pasted from the clipboard, lands in the form (a teacher's page only)
+    var hasFiles = function (ev) { var t = ev.dataTransfer && ev.dataTransfer.types; return !!t && Array.prototype.indexOf.call(t, 'Files') >= 0; };
+    if (view_) { ['dragenter', 'dragover'].forEach(function (n) { view_.addEventListener(n, function (ev) { if (!T.canTeach || !hasFiles(ev)) return; ev.preventDefault(); view_.classList.add('mo-over'); }); });
+      view_.addEventListener('dragleave', function (ev) { if (!ev.relatedTarget || !view_.contains(ev.relatedTarget)) view_.classList.remove('mo-over'); });
+      view_.addEventListener('drop', function (ev) { view_.classList.remove('mo-over'); if (!T.canTeach || !hasFiles(ev)) return; ev.preventDefault(); addFiles(ev.dataTransfer.files); }); }
+    document.addEventListener('paste', function (ev) { var v = $('v-mosha'), fs = ev.clipboardData && ev.clipboardData.files; if (!v || v.hidden || !T.canTeach || !fs || !fs.length || document.querySelector('dialog[open]')) return; ev.preventDefault(); addFiles(fs); });
   }
   root.msMoshaTeach = function () { wire(); if (!T.lessons) draw(); load(); };
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.msMoshaTeach(); }   // the desk was already open when this file ran

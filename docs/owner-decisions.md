@@ -441,6 +441,17 @@ conditions is what makes your trades win.
   entry, stop, target, exit and result, and his note. A second button sends the chart as it stands, with no trade, for
   "look at this moment". On the desk such a lesson is marked "from a ChronosTrade replay" and opens on the replay chart.
   These are practice trades on past candles: they teach the desk how he trades and are never counted as a record.
+- **"Do better and easier for" Luxus "to work with" (10 Nov):** teaching now takes fewer steps. On the desk he drops,
+  pastes or chooses screenshots, taps a caption, writes a few words and presses Send; a name and the levels are optional.
+  A strip at the top says what waits on him ("2 answers to check", "11 lines of the book to check") and takes him there.
+  "Not right" is typed right under the desk's answer. What he types is kept on his device until sent. In ChronosTrade a
+  "Teach this trade" button appears on the chart the moment a trade closes (or key T), and a number on the teach button
+  shows how many of the desk's answers wait for him.
+- **The tutorial (10 Nov, your words: "a tutorial to help him understand how to use the teaching and what he needs to
+  do"):** the first thing on his page is "How to teach the desk": five steps in plain words, each with a "Show me" button
+  that takes him to that part of the page. Steps tick themselves as he really does them, and the one that is his to do
+  next is marked "Next". He can hide it and bring it back with "How to teach". ChronosTrade shows a one-time hint the
+  first time a trade of his closes.
 - **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
   is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
   (it uses your plan's usage each time, so it is your call how often).

@@ -1642,5 +1642,30 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     `r0`), never a trailed or break-even one, and `tradeOf` still refuses a stop on the wrong side. The desk shows "from a
     ChronosTrade replay" on the lesson and opens it on the replay chart with its exit. A replay trade is practice on past
     candles: never count it in the Mosha record, never as evidence of an edge. The teach card links to `/backtest`.
+  - **Easier for the teacher** (same day, owner: "Do better and easier for" Luxus "to work with"). Keep it this simple:
+    the teach form is pictures, then words, then Send; the name, the levels and "goes with" sit in the fold `#mo-t-more`.
+    A lesson needs no name (`nameOf` on the server: the first caption, else the first words of the note) and a lesson in
+    words needs only the note. `#mo-todo` "Your turn" (`MS_MOSHA_TEACH.todo`: the desk's answers to his own lessons, the
+    book's unconfirmed lines; first for a teacher) jumps to the first answer to check or shows only the book lines left
+    (`T.bookOnly`). Captions are tapped (`captionIdeas`: his own most used, then the usual ones; `addCaption` joins them).
+    A screenshot dropped or pasted anywhere on the desk lands in the form; "Add pictures" opens the picker and
+    `#mo-t-to` says which lesson they go to. The note and name are kept in localStorage `msMoDraft:<account>` until sent.
+    "Not right…" is typed under the desk's answer (no dialog; `T.wrong`); Ctrl / Cmd + Enter sends. From four lessons
+    on, `#mo-l-flt` filters them (All / Your turn / Waiting for the desk / Understood) and the lesson that waits on him
+    opens first. In ChronosTrade: `#tchip` offers "Teach this trade" on the chart right after a close (only trades closed
+    in this visit, `TCH.old`; × dismisses), T or `#tch-btn` teaches the trade just closed, else the moment (`teachNow`),
+    Ctrl + Enter sends, a cleared name falls back to the suggested one, and `#tch-n` counts the desk's answers that wait
+    for him (one read of `/api/mosha-lessons` on load). None of this runs for a member who may not teach.
+  - **The tutorial** (same day, owner: "a tutorial to help him understand how to use the teaching and what he needs to
+    do"): card `#mo-guide` "How to teach the desk", first on a teacher's page. Five steps (`MS_MOSHA_TEACH.STEPS`: send
+    a trade, the desk answers, say right or not right, check what the desk knows, backtest and teach from the replay),
+    each with one plain paragraph and "Show me" (`showPart`: scrolls to that part and outlines it for two seconds; the
+    last step links to `/backtest`). `guide(lessons, book, who)` ticks a step from what he has really done (his lessons,
+    the desk's answers, his verdicts, the book, a replay lesson), so it is right on every device, and names the `next`
+    step that is his to do. Shown by itself until he hides it (localStorage `msMoGuide:<account>`) or has done all five
+    (then done steps fold to one line); "How to teach" (`#mo-guide-open`, teach card) brings it back in full, for the
+    owner too. Never shown to a reader. ChronosTrade shows one hint toast the first time the chip appears
+    (`btLab:teachTip:<account>`); the chip itself is for a teacher who is not the owner (the owner keeps T and the
+    button). Keep the steps' words free of any promise: it is a tutorial for teaching, not a claim that the trades win.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

@@ -270,8 +270,60 @@ test('backtest with him: a trade taken in a ChronosTrade replay goes to the desk
   assert.match(BT, /\$\{TEACH \? `<button class="shot-add tch/); assert.match(BT, /data-teach="\$\{t\.id\}"/); assert.match(BT, /\$\('tch-btn'\)\.hidden = !TEACH;/); assert.match(BT, /<dialog id="teachd" class="hkd teachd"/); assert.match(BT, /id="tch-btn"[^>]* hidden>/);
   assert.match(BT, /const stop0 = \(t\) => \(t\.r0 > 0 \? \+\(t\.side === 'buy' \? t\.entry - t\.r0 : t\.entry \+ t\.r0\)/, 'the stop the trade was opened with');
   assert.match(BT, /trade: \{ market: S\.sym, side: t\.side, at: t\.openedAt, entry: t\.entry, stop: stop0\(t\), target: t\.target == null \? '' : t\.target, exit: t\.exit, exitAt: t\.closedAt, tf: S\.tf, src: 'replay' \}/);
-  assert.match(BT, /fetch\('\/api\/mosha-lessons', \{ method: 'POST', credentials: 'same-origin'/); assert.match(BT, /Sent to the Mosha desk: \$\{esc\(title\)\}/, 'what the member typed is escaped in the toast');
-  assert.equal([...BT.matchAll(/api\/mosha-lessons/g)].length, 2, 'one call site (and its comment)'); assert.ok(PAGE.includes('<a class="ms-tbtn" href="/backtest">Backtest and teach in ChronosTrade</a>'));
+  assert.match(BT, /fetch\('\/api\/mosha-lessons', \{ method: 'POST', credentials: 'same-origin'/); assert.match(BT, /Sent to the Mosha desk: \$\{esc\(j\.lesson\.title \|\| title\)\}/, 'what the member typed is escaped in the toast');
+  assert.equal([...BT.matchAll(/fetch\('\/api\/mosha-lessons'/g)].length, 2, 'one send, and one read of the answers that wait'); assert.ok(PAGE.includes('<a class="ms-tbtn" href="/backtest">Backtest and teach in ChronosTrade</a>'));
   // every market ChronosTrade replays is one the desk knows
   const mk2 = [...BT.match(/const MARKETS = \[(.+?)\];/)[1].matchAll(/\['([a-z0-9]+)'/g)].map((m) => m[1]); assert.ok(mk2.length >= 16); for (const m of mk2) assert.ok(!L.tradeOf({ ...T, market: m }, NOW).error, m);
 });
+
+test('easier for the teacher: no name needed, his turn said at the top, captions to tap, the trade taught as it closes', async () => {
+  const s = mk();
+  // a lesson needs no name: the desk names it from the caption, else from the first words
+  const w = await call(s, 'POST', LUXUS, { add: { note: 'Never sell before the M5 CF closes. Wait for the close out of the VR.' } }); assert.equal(w.code, 200); assert.equal(w.body.lesson.title, 'Never sell before the M5 CF closes');
+  const p1 = await call(s, 'POST', LUXUS, { add: { image: url('image/jpeg', JPG), caption: 'M30 sweep high' } }); assert.equal(p1.body.lesson.title, 'M30 sweep high');
+  const p2 = await call(s, 'POST', LUXUS, { add: { image: url('image/png', PNG) } }); assert.equal(p2.body.lesson.title, 'A trade');
+  assert.equal((await call(s, 'POST', LUXUS, { add: { title: 'Only a name' } })).code, 400, 'words teach, a name alone does not');
+  assert.equal(L.nameOf('2 Nov sell', 'M5 vr', 'x'), '2 Nov sell'); const long = L.nameOf('', '', 'A very long first sentence that keeps going on and on about the sweep of the high and the range under it'); assert.ok(long.length <= 61 && long.endsWith('…') && !/\s…$/.test(long));
+  // what waits on him: the desk's answers to his own lessons and the unconfirmed lines of the book
+  await call(s, 'POST', null, { reply: { id: w.body.lesson.id, text: 'Understood: no sell before the CF candle closes.' } }, key());
+  await call(s, 'POST', OWNER, { add: { note: 'The owner writes one too.' } });
+  const g = (await call(s, 'GET', LUXUS)).body, td = TEACH.todo(g.lessons, g.book, 'luxus', true);
+  assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length); assert.equal(td.waiting, 2, 'his two pictures; the owner\'s lesson is not his');
+  assert.equal(TEACH.todo(g.lessons, g.book, 'owner', true).waiting, 3); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], book: 0, waiting: 0 }, 'a reader has no turn');
+  assert.deepEqual(Object.keys(TEACH.FLT), ['all', 'turn', 'wait', 'done']); assert.deepEqual([TEACH.filterLessons(g.lessons, 'all').length, TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length, TEACH.filterLessons(g.lessons, 'done').length], [4, 1, 3, 0]);
+  await call(s, 'POST', LUXUS, { say: { id: w.body.lesson.id, verdict: 'right' } }); assert.equal(TEACH.filterLessons((await call(s, 'GET', LUXUS)).body.lessons, 'done').length, 1);
+  // captions to tap: his own first, then the usual ones; a replay's automatic caption is not one of his
+  const ideas = TEACH.captionIdeas([{ by: 'luxus', shots: [{ caption: 'Janda' }, { caption: 'm5 vr' }, { caption: 'M5 vr, Janda' }, { caption: 'ChronosTrade replay · Gold 5m' }] }, { by: 'owner', shots: [{ caption: 'Mine' }] }], 'luxus');
+  assert.deepEqual(ideas.slice(0, 2), ['Janda', 'm5 vr'], 'a caption made of two taps counts as its two parts'); assert.equal(ideas.length, 8); assert.ok(!ideas.includes('Mine') && !ideas.some((c) => /ChronosTrade/.test(c)) && ideas.filter((c) => c.toLowerCase() === 'm5 vr').length === 1);
+  assert.equal(TEACH.addCaption('', 'M5 vr'), 'M5 vr'); assert.equal(TEACH.addCaption('M30 sweep high', 'M5 vr'), 'M30 sweep high, M5 vr'); assert.equal(TEACH.addCaption('m5 vr', 'M5 vr'), 'm5 vr');
+  // the desk: pictures and words first, everything else folded; the strip, the filters, drop and paste anywhere, a kept draft
+  const form = PAGE.slice(PAGE.indexOf('<form id="mo-t-form"'), PAGE.indexOf('</form>', PAGE.indexOf('<form id="mo-t-form"')));
+  assert.ok(form.indexOf('id="mo-t-drop"') < form.indexOf('name="note"') && form.indexOf('name="note"') < form.indexOf('<details class="mo-tc-lv" id="mo-t-more">') && form.indexOf('id="mo-t-more"') < form.indexOf('name="title"'), 'pictures, then words, then the fold with the name and the levels');
+  for (const id of ['mo-todo', 'mo-t-to', 'mo-t-new', 'mo-t-more', 'mo-l-flt']) assert.ok(PAGE.includes(`id="${id}"`), id);
+  assert.ok(!/Name the trade first/.test(JS)); assert.match(JS, /data-todo="judge"/); assert.match(JS, /data-todo="book"/); assert.match(JS, /document\.addEventListener\('paste'/); assert.match(JS, /view_\.addEventListener\('drop'/);
+  assert.match(JS, /localStorage\.setItem\(DKEY\(\)/); assert.match(JS, /dropDraft\(\)/); assert.match(JS, /verdict: 'wrong', text: v/, 'not right is typed under the answer, no dialog'); assert.ok(!/title: 'Not right'/.test(JS));
+  assert.match(JS, /ev\.ctrlKey \|\| ev\.metaKey/); assert.match(PAGE, /#v-mosha #mo-todo \{ order: -4; \}/);
+  // ChronosTrade: the chip after a close, T, the count of answers that wait
+  const BT = rd('../backtest.html'); for (const id of ['tchip', 'tchip-go', 'tchip-x', 'tch-n', 'hk-teach']) assert.ok(BT.includes(`id="${id}"`), id);
+  assert.match(BT, /function teachNow\(\) \{ if \(!TEACH \|\|/); assert.match(BT, /\(e\.key === 't' \|\| e\.key === 'T'\)/); assert.match(BT, /l\.state === 'read' && \(me\.u === 'owner' \|\| l\.by === me\.u\)/);
+  assert.match(BT, /if \(TEACH\) \{ setInterval\(teachSync, 600\)/, 'nothing runs for a member who may not teach'); assert.ok(!/Name it first/.test(BT));
+});
+
+test('the tutorial: five steps in the teacher\'s order, ticked from what he has really done, and brought back on request', async () => {
+  const s = mk(), g0 = TEACH.guide([], L.SEED.map((b) => ({ ...b, status: 'proposed' })), 'luxus');
+  assert.deepEqual(TEACH.STEPS.map((x) => x.k), ['send', 'wait', 'judge', 'book', 'replay']); assert.deepEqual([g0.done, g0.of, g0.next], [0, 5, 'send'], 'a new teacher starts by sending');
+  for (const st of TEACH.STEPS) { assert.ok(st.t.length <= 40 && st.p.length >= 80 && st.p.length <= 320, st.k); assert.ok(!/\b(edge|profit|win rate|guarantee)/i.test(st.p), 'a tutorial, not a promise'); }
+  const a = await call(s, 'POST', LUXUS, { add: { note: 'Never sell before the M5 CF closes.' } }), id = a.body.lesson.id;
+  let v = (await call(s, 'GET', LUXUS)).body, g = TEACH.guide(v.lessons, v.book, 'luxus'); assert.deepEqual(g.steps.filter((x) => x.done).map((x) => x.k), ['send']); assert.equal(g.next, 'book', 'while the desk reads, the book is his to check');
+  await call(s, 'POST', null, { reply: { id, text: 'No sell before the CF candle closes.' } }, key());
+  v = (await call(s, 'GET', LUXUS)).body; g = TEACH.guide(v.lessons, v.book, 'luxus'); assert.deepEqual(g.steps.filter((x) => x.done).map((x) => x.k), ['send', 'wait']); assert.equal(g.next, 'judge');
+  await call(s, 'POST', LUXUS, { say: { id, verdict: 'right' } }); await call(s, 'POST', LUXUS, { book: { id: v.book[0].id, confirm: true } });
+  const at = Date.UTC(2026, 10, 2, 7, 0) / 1000; await call(s, 'POST', LUXUS, { add: { note: 'From the replay.', trade: { market: 'xau', side: 'sell', at, entry: 3908.27, stop: 3916.1, target: 3878.42, exit: 3916.1, exitAt: at + 900, tf: '5m', src: 'replay' } } });
+  v = (await call(s, 'GET', LUXUS)).body; g = TEACH.guide(v.lessons, v.book, 'luxus'); assert.deepEqual([g.done, g.next], [5, null], 'every step done');
+  assert.equal(TEACH.guide(v.lessons, v.book, 'carlos').steps[0].done, false, 'another member\'s lessons are not his steps'); assert.equal(TEACH.guide(v.lessons, v.book, 'owner').done, 5);
+  // the page: the card comes first for a teacher, hides on request (kept per account), and "How to teach" brings it back
+  assert.ok(PAGE.includes('<section class="card mo-wide mo-guide" id="mo-guide" aria-label="How to teach the desk" hidden></section>')); assert.ok(PAGE.includes('id="mo-guide-open">How to teach</button>')); assert.match(PAGE, /#v-mosha #mo-guide \{ order: -5; \}/);
+  assert.match(JS, /if \(!T\.canTeach \|\| !T\.lessons\) \{ box\.hidden = true; return; \}/, 'never for a reader'); assert.match(JS, /T\.who !== 'owner' && !hid && g\.done < g\.of/); assert.match(JS, /localStorage\.setItem\(GKEY\(\), 'hide'\)/); assert.match(JS, /data-g-go="/); assert.match(JS, /role="progressbar"/);
+  const BT = rd('../backtest.html'); assert.match(BT, /'btLab:teachTip:' \+ me\.u/, 'the hint in ChronosTrade is shown once'); assert.match(BT, /const t = me\.u === 'owner' \? null : lastNew\(\)/);
+});
+
