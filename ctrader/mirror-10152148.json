@@ -361,7 +361,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T07:03:26.000Z",
     "councilEntry": 86.03,
     "stop": 85.374,
@@ -375,10 +375,12 @@
     "slipR": 0.41,
     "lagSec": 10639,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T07:03:26.000Z",
-    "brokerStop": 85.513
+    "brokerStop": 85.513,
+    "closedAt": "2026-11-10T08:24:26.000Z"
    },
    "eth-replica-1794285011-b": {
     "positionId": "47940907",
@@ -822,15 +824,14 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9993.1 · 27 open",
+  "status": "ok · demo Fusion Markets · balance 9985.22 · 26 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
    "sol-replica-1794240969-s": "price 86.16 has run 1.12R from the council entry 87.13: a different trade now",
    "xrp-replica-1794243038-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794249651-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794277605-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794297035-s": "none of XRPUSD found at the broker"
+   "xrp-replica-1794277605-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -838,8 +839,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9993.1,
-  "lastRun": "2026-11-10T08:21:58.000Z"
+  "balance": 9985.22,
+  "lastRun": "2026-11-10T08:24:26.000Z"
  },
  "log": [
   {
@@ -1079,6 +1080,11 @@
    "at": "2026-11-10T08:16:37.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1794298519-b"
+  },
+  {
+   "at": "2026-11-10T08:24:26.000Z",
+   "msg": "SOLUSD position 47940898 closed at the broker",
+   "trade": "sol-replica-1794283567-b"
   }
  ],
  "limits": {
