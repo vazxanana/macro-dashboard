@@ -1500,5 +1500,16 @@ for sell", "M30 sweep high", "i just took entry after bo sell", and the 10 Nov s
 VR and its CF on M5 / M15 (the red "5 mn" box = from the extreme to the last swing inside it; a close out of it = CF), earlier than
 the H1 BO; every sell starts from a SWEPT prior high at a higher-timeframe point; the main trade (28 Oct, with the H4 BO sell) is
 entered where the pullback ends, at the retest of the H4 BO level, by that same M5 CF; exits are managed by hand and stops are a
-few dollars (a $0.30 feed difference decided the 2 Nov buy). Any further Mosha test starts from that reading, confirmed by the owner
-first, on candles the day's thirteen tests did not use.
+few dollars (a $0.30 feed difference decided the 2 Nov buy).
+**That reading tested** (owner: "Test both", the two ways of entering): `research/edge/mosha-sweep/` (own PREREGISTRATION.md first;
+OANDA gold M5 from June 2006 through the candle proxy, `node run.mjs fetch <dir>`, 18 MB kept out of git; window A 2006-19 untouched
+by the day's other tests, window B 2020 to now; fills on M5). A swept H1 swing (2 a side, live 10 days), the M5 VR (the extreme to
+the last three-candle swing before it), the CF (a close out of it within 12 h), then entry CF (at the CF close, stop $0.30 past the
+extreme) or entry ZONE (limit at the next M5 swing broken after the CF, stop $0.30 past that break's base); target the nearest H4
+engulf zone or H4 swing 2R or more away; one at a time per entry. It finds the owner's 28 Oct and 10 Nov sells (the 2 Nov trades
+were read on M1 / M30). **Verdict: FAIL, both entries**: at the CF 6,260 trades -0.11R a trade after costs (t -4.62; 2006-19 -0.10R,
+2020 on -0.12R; before costs -0.03R); at the zone 6,478 trades -0.21R (t -7.36; -0.23R and -0.18R); 2 and 1 of 21 years positive.
+The pattern prints about five times a trading day, so the owner's five winning examples are picked from thousands of look-alikes:
+the selection is not in any rule. Fifteen tests in four Mosha studies on 10 Nov, none an edge (the retracement chain breaks even,
+the rest lose). Do not write a fifth mechanical reading; the open step is the owner's own logged trades (owner decision 27).
+Tests: `tests/mosha-sweep.test.mjs`.

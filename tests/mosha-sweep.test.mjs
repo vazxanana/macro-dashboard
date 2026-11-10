@@ -90,6 +90,19 @@ test('summaries and the verdict rule', () => {
   assert.equal(S.all.n, 3); assert.equal(S.a.n, 2); assert.equal(S.b.n, 1); assert.equal(S.all.total, 2);   // warm-up and marked trades are left out
 });
 
+test('the committed result is the pre-registered verdict on its own numbers', () => {
+  const R = JSON.parse(rd('../research/edge/mosha-sweep/result.json')), MD = rd('../research/edge/mosha-sweep/RESULT.md');
+  assert.equal(R.topic, 'mosha-sweep'); assert.equal(R.variantsTried, 2); assert.deepEqual(Object.keys(R.entries), ['CF', 'ZONE']);
+  for (const k of Object.keys(R.entries)) { const S = R.entries[k], v = verdictOf(S);
+    assert.equal(R.primary[k].verdict, v.verdict); assert.equal(S.filled, S.all.n); assert.equal(S.a.n + S.b.n, S.all.n); assert.equal(S.sells.n + S.buys.n, S.all.n);
+    assert.equal(Object.values(S.exits).reduce((a, b) => a + b, 0), S.all.n); assert.ok(S.pHolm >= S.p);
+    assert.ok(Object.keys(S.years).every((y) => +y >= 2006)); assert.ok(MD.includes(S.all.n.toLocaleString('en-US'))); assert.ok(MD.includes('−' + Math.abs(S.all.avg).toFixed(3))); }
+  const all = Object.values(R.primary).map((v) => v.verdict), head = all.includes('PASS') ? 'PASS' : all.every((v) => v === 'FAIL') ? 'FAIL' : 'INCONCLUSIVE';
+  assert.ok(R.verdict.startsWith(head + ':')); assert.ok(MD.includes(`**Verdict: ${head}`));
+  assert.equal(R.trades.length, R.entries[R.tradesOf].all.n);
+  assert.equal(R.candles.from.slice(0, 10), '2006-06-01');   // window A reaches back to candles the day's other tests never read
+});
+
 test('paper research only: candles in, its own files out', () => {
   assert.ok(!/council\/|api\/|child_process|histToUtc|histStampUtc/.test(RUN));
   assert.ok(!/process\.env\.(?!CANDLES|OUT_DIR|MD_BASE)/.test(RUN));

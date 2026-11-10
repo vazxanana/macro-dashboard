@@ -340,7 +340,7 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ## Mosha as you expected it (10 Nov 2026)
 
-### [ ] 27. Your Mosha cycle, tested as fixed rules in three studies: no edge. Log your own trades of it, or test more?
+### [ ] 27. Your Mosha trading, tested as fixed rules in four studies: no edge. Log your own trades of it?
 
 - **What you told me.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
   "This is how I was expecting Mosha to work." The method is top-down order only: after an H4 BO, H1 shows when the
@@ -386,13 +386,19 @@ What they show that my three tests did not hold:
 - **You manage the exit** (the 2 Nov sell was closed at 2.1R, not held for 3.8R), and the stops are a few dollars, so the
   price feed matters ($0.30 decided the 2 Nov buy on our feed).
 
-**The reading to confirm before any further test:** a prior high is swept at a higher-timeframe point (an H4 or H1 level,
-or the retest of an H4 BO level) → the M5 VR forms → M5 CF (close out of the box) → sell at the CF or on the return to the
-zone of the break, stop above the zone (or above the VR high) → target the next higher-timeframe zone or low. Buys are the
-mirror image. If that is right, it is one more pre-registered test, on gold candles today's tests did not use.
+**That reading, tested** (you: "Test both"; `research/edge/mosha-sweep/`, pre-registered, OANDA gold from 2006 so that
+2006-19 is data none of the earlier tests had read):
+
+| Entry | Trades | Win rate | R a trade after costs | t | 2006-19 | 2020 to now |
+|---|---|---|---|---|---|---|
+| At the CF, stop above the high | 6,260 | 25.7 % | −0.11 | −4.62 | −0.10 | −0.12 |
+| On the return to the zone, tight stop | 6,478 | 18.0 % | −0.21 | −7.36 | −0.23 | −0.18 |
+
+Both fail, in both windows. The detector finds your 28 Oct and 10 Nov sells; your 2 Nov trades were read on M1 and M30 and
+are outside it. A swept H1 high or low with an M5 CF happens about five times a trading day, so your five winners are
+five out of thousands of look-alikes, and what sets them apart is not in any rule written so far.
 
 - **Options.** (a) Log your own trades of this pattern for a few weeks (ChronosTrade or the Academy keep entry, stop,
-  target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a cycle, and I test
-  that one filter. (c) One more mechanical test on older candles (the M15 zone on the first half, OANDA 2006-17): the only
-  hint seen today, and a weak one. (d) Leave it.
+  target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a setup, and I test
+  that one filter. (c) Leave it. Four mechanical readings and fifteen tests are enough; I do not recommend a fifth.
 - **Recommended: (a).** Nothing live changes on any option; the live Mosha BO is untouched.
