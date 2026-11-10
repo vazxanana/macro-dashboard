@@ -26,9 +26,12 @@
 //   progress&edge= · mistakes&edge= · exams&edge= · dataset&edge= · notebook · models · cost · audit&month=YYYY-MM
 //   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded
 //   misses&edge=[&session=]                 the mentor's session notes: "the engine should have acted here" / "right to wait"
+//   attempts · corrections · dataset take &engine=language-model: the analyst's own rows (kept in their own files, never
+//   counted with the deterministic engine's); progress carries them in a separate `analyst` block
 // POST /api/academy { action, ... }
 //   attempt · correct · lesson.save · lesson.revise · lesson.deactivate · lesson.stats · session.save · seen · exam.result ·
-//   blind.submit · miss · notebook.add · model.register · model.promote · model.rollback · explain
+//   blind.submit · miss · notebook.add · model.register · model.promote · model.rollback · explain · analyse
+//   correct takes engine: 'language-model' to correct an analyst attempt (same checks, the analyst's own files)
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
@@ -49,12 +52,15 @@ const OPS = ['eq', 'ne', 'gte', 'lte', 'in', 'between'], THEN = ['WAIT', 'SKIP',
 const SESSION_STATUS = ['open', 'paused', 'done'], VALIDATION = ['hypothesis', 'in-sample', 'out-of-sample', 'validated', 'rejected', 'inconclusive'];
 const MODEL_STATUS = ['baseline', 'challenger'], MISS_KINDS = ['missed', 'right-wait'];
 const STAT_KEYS = ['applied', 'replayPass', 'replayFail', 'examN', 'examAgree', 'examNetWith', 'examNetWithout'];
+// The analyst (the optional language model, docs/academy/LLM.md) answers apart from the deterministic engine: its attempts, the
+// corrections of them and their dataset rows live in their own files, so no statistic of the engine ever counts them.
+const ENGINES = ['deterministic', 'language-model'], ANALYST_CACHE_MAX = 150;
 const CAND_FIELDS = ['id', 'edge', 'market', 't', 'side', 'entry', 'stop', 'target', 'tf', 'rule', 'edgeVersion', 'pool'];   // a candidate never carries an outcome
 const OUT_FIELDS = ['id', 'R', 'netR', 'exitT', 'exit', 'reason', 'mfeR', 'maeR'];
 
 // ---- errors and checks ----------------------------------------------------------------------------------------------------
-class Bad extends Error { constructor(msg, status = 400) { super(msg); this.status = status; } }
-const bad = (msg, status = 400) => { throw new Bad(msg, status); };
+class Bad extends Error { constructor(msg, status = 400, extra = null) { super(msg); this.status = status; this.extra = extra; } }
+const bad = (msg, status = 400, extra = null) => { throw new Bad(msg, status, extra); };
 const CTRL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:|@+-]{0,119}$/, EDGE_RE = /^[a-z0-9][a-z0-9-]{0,39}$/, SID_RE = /^se_[a-z0-9]{8,40}$/, KEY_NAME = /^[A-Za-z][A-Za-z0-9_.-]{0,59}$/;
 const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
 const obj = (v, name) => (isObj(v) ? v : bad(`${name} must be an object`));
@@ -178,6 +184,9 @@ function outcomeOf(raw, id) {
 // ---- small helpers ------------------------------------------------------------------------------------------------------
 const K = { lessons: 'lessons.json', attempts: (e) => `attempts/${e}.json`, corrections: (e) => `corrections/${e}.json`, sessions: 'sessions/index.json', session: (id) => `sessions/${id}.json`,
   seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', misses: (e) => `misses/${e}.json`, dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json` };
+const AK = { attempts: (e) => `analyst/attempts/${e}.json`, corrections: (e) => `analyst/corrections/${e}.json`, dataset: (e) => `analyst/dataset/${e}.json`, cache: 'analyst/cache.json' };
+const engineOf = (v, name = 'engine') => (v == null || v === '' ? 'deterministic' : oneOf(v, ENGINES, name));
+const keysFor = (engine) => (engine === 'language-model' ? AK : K);
 const emptySeen = () => ({ v: 1, ids: {} });
 const seenOf = (doc) => (isObj(doc) && isObj(doc.ids) ? doc : emptySeen());
 const emptyModels = () => ({ v: 1, models: [], championId: null, promotions: [], history: [] });
@@ -241,6 +250,22 @@ function context(req, d, env, acct) {
 // ---- GET ------------------------------------------------------------------------------------------------------------------
 const qInt = (v, name, def, min, max) => { if (v == null || v === '') return def; const n = Number(v); return Number.isFinite(n) ? Math.max(min, Math.min(max, Math.floor(n))) : bad(`${name} must be a number`); };
 const qNum = (v, name) => { if (v == null || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : bad(`${name} must be a number`); };
+// The analyst's own record for one edge, from its own files. Nothing here is added to a number of the deterministic engine.
+async function analystProgress(X, edge, outRaw) {
+  const [att, cor] = await Promise.all([X.store.rows(AK.attempts(edge), true), X.store.rows(AK.corrections(edge), true)]);
+  const byMode = {}, verdicts = { approve: 0, reject: 0, change: 0 }, corBy = {}; let costUsd = 0, forced = 0;
+  for (const c of cor) { verdicts[c.verdict] = (verdicts[c.verdict] || 0) + 1; (corBy[c.candidateId] = corBy[c.candidateId] || []).push(c); }
+  const replay = { n: 0, graded: 0, pass: 0, fail: 0, passRate: null }, exam = { n: 0, graded: 0, ungraded: 0, taken: 0, wins: 0, netR: 0, avgR: null }, sideOf = {};
+  if (att.some((a) => a.mode === 'exam')) { const raw = await X.data.candidates(edge); for (const c of candList(raw == null ? [] : raw)) sideOf[c.id] = c.side; }
+  for (const a of att) {
+    byMode[a.mode] = (byMode[a.mode] || 0) + 1; if (a.llm && typeof a.llm.costUsd === 'number') costUsd += a.llm.costUsd; if (a.decision && a.decision.forced) forced++;
+    if (a.mode === 'replay-same') { replay.n++; const prev = (corBy[a.candidateId] || []).filter((c) => c.at < a.at).pop(), want = prev ? expected(prev) : null; if (want && a.decision) { replay.graded++; if (a.decision.action === want) replay.pass++; else replay.fail++; } }
+    if (a.mode === 'exam') { exam.n++; const out = outRaw == null ? null : outcomeOf(outRaw, a.candidateId), r = gradeR(a.decision, sideOf[a.candidateId], out); if (r == null) exam.ungraded++; else { exam.graded++; if (a.decision.action !== 'WAIT') { exam.taken++; if (r > 0) exam.wins++; } exam.netR = r3(exam.netR + r); } }
+  }
+  replay.passRate = replay.graded ? r3(replay.pass / replay.graded) : null; exam.avgR = exam.taken ? r3(exam.netR / exam.taken) : null;
+  return { engine: 'language-model', attempts: att.length, corrections: cor.length, byMode, verdicts, forcedToWait: forced, replaySame: replay, exam, costUsd: Math.round(costUsd * 1e6) / 1e6,
+    note: 'The analyst is the optional language model. Its answers are stored apart and are not part of any number above.' };
+}
 const GET = {
   async edges(X) { const reg = await X.registry(); return reg ? { edges: reg } : bad('edges not generated yet', 503); },
 
@@ -314,8 +339,9 @@ const GET = {
   },
 
   async attempts(X, q) {
-    const edge = await X.edge(q.edge), cand = q.cand == null || q.cand === '' ? null : idOf(q.cand, 'cand'), limit = qInt(q.limit, 'limit', 200, 1, 2000), key = K.attempts(edge);
+    const edge = await X.edge(q.edge), cand = q.cand == null || q.cand === '' ? null : idOf(q.cand, 'cand'), limit = qInt(q.limit, 'limit', 200, 1, 2000), eng = engineOf(q.engine), key = keysFor(eng).attempts(edge);
     const seen = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids; let rows = await X.store.rows(key);
+    if (eng !== 'deterministic') { if (cand) rows = (await X.store.rows(key, true)).filter((a) => a.candidateId === cand); else rows = rows.slice(-limit); return { edge, engine: eng, attempts: rows }; }   // the analyst's rows: never hidden (it is asked only after the engine's answer is shown)
     if (cand) { rows = rows.filter((a) => a.candidateId === cand); if (seen[cand] && seen[cand].attempts > rows.length) rows = (await X.store.rows(key, true)).filter((a) => a.candidateId === cand); }
     else rows = rows.slice(-limit);
     return { edge, attempts: rows.map((a) => attemptView(a, seen[a.candidateId])) };
@@ -356,7 +382,7 @@ const GET = {
     for (const s of [exam.withLessons, exam.withoutLessons]) s.avgR = s.taken ? r3(s.netR / s.taken) : null;
     exam.deltaNetR = r3(exam.withLessons.netR - exam.withoutLessons.netR);
     return { edge, counts: { attempts: att.length, corrections: cor.length, lessons: mine.length, lessonsActive: mine.filter((l) => l.active).length, seen: Object.keys(seenDoc.ids).length, exams: exams.length, datasetRows: ds.length },
-      byMode, verdicts, replaySame: replay, exam, byWeek: Object.values(weeks).sort((a, b) => (a.week < b.week ? -1 : 1)),
+      byMode, verdicts, replaySame: replay, exam, byWeek: Object.values(weeks).sort((a, b) => (a.week < b.week ? -1 : 1)), analyst: await analystProgress(X, edge, outRaw),
       note: 'A same-trade replay pass shows the lesson is recalled, not that it generalises. Only tests on new setups count towards progression.' };
   },
 
@@ -373,15 +399,15 @@ const GET = {
 
   // Layer B rows for the offline training service: the mentor label and the outcome label are separate fields
   async dataset(X, q) {
-    const edge = await X.edge(q.edge), rows = await X.store.rows(K.dataset(edge), true), seen = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids, outRaw = await X.data.outcomes(edge);
-    return { edge, datasetVersion: DATASET_VERSION, rows: rows.filter((r) => !(seen[r.candidateId] && seen[r.candidateId].blindPending)).map((r) => { const o = outRaw == null ? null : outcomeOf(outRaw, r.candidateId); return { ...r, outcome: o ? { R: o.R, netR: o.netR, reason: o.reason } : null }; }) };
+    const edge = await X.edge(q.edge), eng = engineOf(q.engine), rows = await X.store.rows(keysFor(eng).dataset(edge), true), seen = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids, outRaw = await X.data.outcomes(edge);
+    return { edge, ...(eng === 'deterministic' ? {} : { engine: eng }), datasetVersion: DATASET_VERSION, rows: rows.filter((r) => !(seen[r.candidateId] && seen[r.candidateId].blindPending)).map((r) => { const o = outRaw == null ? null : outcomeOf(outRaw, r.candidateId); return { ...r, outcome: o ? { R: o.R, netR: o.netR, reason: o.reason } : null }; }) };
   },
 
   // the mentor's corrections for one edge (cand= narrows to one setup): what the page needs to show a correction again after a reload
   async corrections(X, q) {
     const edge = await X.edge(q.edge), cand = q.cand == null || q.cand === '' ? null : idOf(q.cand, 'cand'), limit = qInt(q.limit, 'limit', 200, 1, 2000);
-    let rows = await X.store.rows(K.corrections(edge), !!cand); rows = cand ? rows.filter((c) => c.candidateId === cand) : rows.slice(-limit);
-    return { edge, corrections: rows };
+    const eng = engineOf(q.engine); let rows = await X.store.rows(keysFor(eng).corrections(edge), !!cand); rows = cand ? rows.filter((c) => c.candidateId === cand) : rows.slice(-limit);
+    return { edge, ...(eng === 'deterministic' ? {} : { engine: eng }), corrections: rows };
   },
 
   // Generated research (academy/gen/research.mjs): pre-registered studies on the train pool. A list without the tables, or one
@@ -430,7 +456,7 @@ const GET = {
 
   async notebook(X) { return { notes: (await X.store.rows(K.notebook, true)).slice().reverse() }; },
   async models(X) { const m = await X.store.get(K.models, emptyModels()); return { models: m.models || [], championId: m.championId || null, history: (m.history || []).slice().reverse() }; },
-  async cost(X, q, d) { return LLM.status({ env: X.env, store: X.store, now: X.now }); },
+  async cost(X, q, d) { return LLM.status({ env: X.env, store: X.store, now: X.now, provider: d && d.provider }); },
   async audit(X, q) {
     const month = q.month == null || q.month === '' ? X.iso().slice(0, 7) : /^\d{4}-(0[1-9]|1[0-2])$/.test(q.month) ? q.month : bad('month must be YYYY-MM');
     return { month, rows: (await X.store.rows(K.audit(month), true)).slice().reverse() };
@@ -469,19 +495,19 @@ const POST = {
     const reasons = [...new Set(list(c.reasons, REASONS.length, 'correction.reasons', (r, n) => oneOf(r, REASONS, n)))], body = text(c.text, 6000, 'correction.text');
     const errorClass = c.errorClass == null || c.errorClass === '' ? null : /^[a-z][a-z0-9-]{0,39}$/.test(c.errorClass) ? c.errorClass : bad('correction.errorClass must be a short lower-case name');
     const annotations = list(c.annotations, 60, 'correction.annotations', (x, n) => { obj(x, n); return { kind: oneOf(x.kind, ANNOTATIONS, `${n}.kind`), t: num(x.t, `${n}.t`), price: num(x.price, `${n}.price`), t2: numOrNull(x.t2, `${n}.t2`), price2: numOrNull(x.price2, `${n}.price2`), note: text(x.note, 400, `${n}.note`) }; });
-    const kA = K.attempts(edge), kC = K.corrections(edge), kD = K.dataset(edge);
+    const eng = engineOf(b.engine), EK = keysFor(eng), kA = EK.attempts(edge), kC = EK.corrections(edge), kD = EK.dataset(edge);   // an analyst attempt is corrected in the analyst's own files
     return X.write({ att: [kA, ST.emptyRows()], seen: [K.seen(edge), emptySeen()], cor: [kC, ST.emptyRows(), CAPS.corrections], ds: [kD, ST.emptyRows(), CAPS.dataset] }, async ({ att, seen, cor, ds }, at) => {
       const A = R(att, kA), C = R(cor, kC), D = R(ds, kD);
       const attempt = A.rows.find((r) => r.id === attemptId) || (A.archives ? (await X.store.rows(kA, true)).find((r) => r.id === attemptId) : null) || bad('no such attempt for this edge', 404);
       const se = seenOf(seen).ids[attempt.candidateId]; if (attempt.mode === 'blind' && se && se.blindPending) bad('answer first: submit the blind answer before correcting the engine', 409);
       const was = { action: attempt.decision.action, entry: attempt.decision.entry, stop: attempt.decision.stop, target: attempt.decision.target };
       if (verdict === 'approve') { if (action && action !== was.action) bad('an approval cannot change the action: use the verdict change'); action = was.action; levels(lv, action, 'correction', false); }
-      const row = { id: X.id('co'), attemptId, at, verdict, action, entry: lv.entry, stop: lv.stop, target: lv.target, bias, edge: fixedEdge, reasons, text: body, annotations, errorClass, candidateId: attempt.candidateId, was };
+      const row = { id: X.id('co'), attemptId, at, verdict, action, entry: lv.entry, stop: lv.stop, target: lv.target, bias, edge: fixedEdge, reasons, text: body, annotations, errorClass, candidateId: attempt.candidateId, was, ...(eng === 'deterministic' ? {} : { engine: eng }) };
       // Layer B: the mentor's label goes in its own field; the outcome label is a different field and is never touched here
       const i = D.rows.findIndex((r) => r.id === attemptId), rows = D.rows.slice();
       if (i >= 0) rows[i] = { ...rows[i], mentor: { correctionId: row.id, at, verdict, action: expected(row), bias, reasons, errorClass } };
       return { write: { cor: { ...C, rows: C.rows.concat(row) }, ...(i >= 0 ? { ds: { ...D, rows } } : {}) }, result: { ok: true, correction: row, datasetUpdated: i >= 0 },
-        audit: { action: 'correct', ids: [row.id, attemptId, attempt.candidateId], summary: `${edge} ${verdict}${action ? ` -> ${action}` : ''}${reasons.length ? ` (${reasons.join(', ')})` : ''}` } };
+        audit: { action: 'correct', ids: [row.id, attemptId, attempt.candidateId], summary: `${edge}${eng === 'deterministic' ? '' : ' analyst answer:'} ${verdict}${action ? ` -> ${action}` : ''}${reasons.length ? ` (${reasons.join(', ')})` : ''}` } };
     });
   },
 
@@ -676,6 +702,88 @@ const POST = {
     await X.write({}, () => ({ audit: { action: 'explain', ids: [], summary: out.text != null ? (out.cached ? 'answered from the cache (no cost)' : `answered, cost $${(out.costUsd || 0).toFixed(4)}`) : out.skipped ? `skipped: ${out.skipped}${out.scope ? ` (${out.scope})` : ''}` : 'the call failed' } }));
     return { ok: true, ...out };
   },
+
+  // { action: 'analyse', edge, candidateId, attemptId (the engine's stored attempt for this setup), snapshot: { t, hash, bars: { tf: [[time, open,
+  //   high, low, close], …] }, dataVersion }, features, deterministic (the engine's decision with its evidence and gates), thesis?, position?,
+  //   ask?: 'setup' | 'position', cost?, sessionId?, dryRun?, retry? }
+  // The ANALYST: the optional language model judges one decision point (docs/academy/LLM.md). Off without a key: { available: false },
+  // nothing read, sent or stored, never a made-up answer. The request is built here from the checked payload and the server's own
+  // copies (the candidate, the lessons, the calendar, the registry); api/_academy-analyst.js refuses a payload holding an outcome
+  // field or a bar closing after the decision time, and checks the answer in code. A checked answer is stored as an attempt of
+  // engine 'language-model' in the analyst's own files. The same question is answered from the cache at no cost.
+  //   dryRun: true  -> the estimate only (no call, no ledger, no audit row)
+  //   retry: true   -> ask again when the cached answer for this question was refused (a new, billed call)
+  async analyse(X, b, d) {
+    const C = LLM.config(X.env), why = LLM.unavailable(C);
+    if (why) return { ok: true, available: false, reason: why };
+    let AN; try { AN = require('./_academy-analyst.js'); } catch (e) { return { ok: true, available: false, reason: 'the analyst module is not part of this build' }; }
+    const edge = await X.edge(b.edge), candidateId = idOf(b.candidateId, 'candidateId'), ask = b.ask == null || b.ask === '' ? 'setup' : oneOf(b.ask, ['setup', 'position'], 'ask');
+    const sn = obj(b.snapshot, 'snapshot'), t = num(sn.t, 'snapshot.t (the decision time)'), snapshotHash = text(sn.hash, 80, 'snapshot.hash', true), bars = safe(obj(sn.bars, 'snapshot.bars'), 'snapshot.bars');
+    const features = featuresOf(b.features, 'features') || bad('features is required'), det = b.deterministic == null ? (ask === 'setup' ? bad('deterministic (the engine\'s answer) is required') : null) : safe(obj(b.deterministic, 'deterministic'), 'deterministic');
+    const thesis = b.thesis == null ? null : safe(obj(b.thesis, 'thesis'), 'thesis'), position = b.position == null ? null : safe(obj(b.position, 'position'), 'position');
+    const cost = numOrNull(b.cost, 'cost'), sessionId = idOrNull(b.sessionId, 'sessionId'), dryRun = boolOrNull(b.dryRun, 'dryRun') === true, retry = boolOrNull(b.retry, 'retry') === true;
+    if (cost != null && cost < 0) bad('cost cannot be negative');
+    const raw = await X.cand(edge, candidateId); if (!raw) bad('no such candidate for this edge', 404);
+    const cand = candView(raw);   // the server's own copy, cut to a candidate's fields: no result can ride along
+    if (flagOf(raw) && raw.pool === 'exam') bad(`analyse: this setup is flagged ${flagOf(raw)} and is never scored as a test`);
+    if (ask === 'setup' && t !== cand.t) bad('snapshot.t must be the setup\'s own time: the decision is made when the edge fires');
+    if (ask === 'position' && !(t >= cand.t)) bad('a position cannot be managed before its setup');
+    // the engine answers first: the analyst is asked on a setup whose deterministic attempt is stored (and, in the blind arena, shown)
+    const seenE = seenOf(await X.store.get(K.seen(edge), emptySeen())).ids[candidateId] || null;
+    if (!seenE || !(seenE.attempts > 0)) bad('decide first: the analyst is asked once the engine\'s own answer for this setup is stored', 409);
+    if (seenE.blindPending) bad('answer first: submit the blind answer before the analyst is asked', 409);
+    let engineAttemptId = null;
+    if (ask === 'setup') {
+      engineAttemptId = idOf(b.attemptId, 'attemptId'); const stored = (await X.store.rows(K.attempts(edge), true)).find((a) => a.id === engineAttemptId) || bad('no such attempt for this edge', 404);
+      if (stored.candidateId !== candidateId) bad('attemptId belongs to another setup');
+      if (!stored.decision || stored.decision.action !== det.action) bad('the engine\'s answer in the request is not the stored attempt\'s', 409);
+      if (!Array.isArray(det.gates)) bad('deterministic.gates is required (an empty list when the engine raised none): a stored decision read back without its gates cannot be judged');
+    }
+    const kA = AK.attempts(edge), kD = AK.dataset(edge), prior = (await X.store.rows(kA, true)).filter((a) => a.candidateId === candidateId);
+    const lessons = (await X.store.rows(K.lessons, true)).filter((l) => l.edge === edge || l.edge === '*');
+    const calRaw = typeof X.data.calendar === 'function' ? await X.data.calendar() : null, pick = (e) => ({ t: e.t, title: e.title, impact: e.impact });
+    const calendar = isObj(calRaw) && Array.isArray(calRaw.items) && t >= calRaw.from && t <= calRaw.to ? { events: calRaw.items.filter((e) => e.t <= t && e.t > t - 7 * 86400).map(pick), schedule: calRaw.items.filter((e) => e.t > t && e.t <= t + 72 * 3600).map(pick) } : null;
+    const reg = await X.registry(), edgeDef = (reg && reg.find((e) => e.id === edge)) || { id: edge };
+    const rq = AN.buildRequest({ edge: edgeDef, features, snapshotDigest: { t, hash: snapshotHash, cand: ask === 'setup' ? cand : null, bars, dataVersion: textOrNull(sn.dataVersion, 80, 'snapshot.dataVersion') }, deterministic: det, lessons, thesis,
+      position: position ? { ...position, candidateId: ask === 'position' ? candidateId : idOrNull(position.candidateId, 'position.candidateId') } : null, calendar, ask, cost, examDecided: cand.pool === 'exam' && prior.length > 0 });
+    if (!rq.ok) bad(`the request was refused before any call: ${rq.refusals.join('; ')}`, cand.pool === 'exam' && prior.length > 0 ? 409 : 400, { refusals: rq.refusals });
+    const provider = LLM.providerOf(C, d), fake = provider === LLM.FAKE_PROVIDER, mode = cand.pool === 'exam' ? 'exam' : prior.length ? 'replay-same' : 'train';
+    const askKey = crypto.createHash('sha256').update(JSON.stringify([AN.PROMPT_VERSION, edge, candidateId, ask, snapshotHash, rq.context.lessonSignature, rq.context.thesisHash, rq.context.factsHash, C.url, C.model, C.format, C.analystMaxOut, provider])).digest('hex').slice(0, 40);
+    const cacheDoc = await X.store.get(AK.cache, { v: 1, rows: [] }), hit0 = (cacheDoc && Array.isArray(cacheDoc.rows) ? cacheDoc.rows : []).find((r) => r && r.k === askKey) || null, redo = retry && !!hit0 && hit0.valid === false, hit = redo ? null : hit0;
+    const est = LLM.estimate(C, rq.system, rq.prompt, C.analystMaxOut);
+    // what the page shows after an ask without reading the ledger again: today's spend, what is left, the calls left today
+    const budget = async () => { const s = await LLM.status({ env: X.env, store: X.store, now: X.now, provider: d.provider }); return { today: s.today, total: s.total, remaining: s.remaining, calls: s.calls }; };
+    if (dryRun) return { ok: true, available: true, dryRun: true, engine: 'language-model', provider, fake, mode, promptVersion: AN.PROMPT_VERSION, cached: !!hit, estimate: hit ? { tokensIn: 0, maxTokensOut: 0, usd: 0 } : est, fresh: est, hardGates: rq.context.gates.map((g) => g.code), budget: await budget() };
+    const out = hit ? { available: true, text: hit.text, stop: hit.stop || null, usage: hit.usage || null, costUsd: 0, provider: hit.provider || provider, model: hit.model || null, cached: true }
+      : await LLM.complete({ system: rq.system, prompt: rq.prompt, cap: 'analyst', long: true, schema: rq.schema, schemaName: 'analyst_answer', fresh: redo }, { env: X.env, store: X.store, fetch: d.fetch, now: X.now, sleep: d.sleep, provider: d.provider });
+    const head = { ok: true, available: true, engine: 'language-model', provider: out.provider || provider, fake, model: out.model || null, promptVersion: AN.PROMPT_VERSION, mode };
+    if (out.text == null) {   // over a budget or the call cap, or the call failed: said plainly, nothing stored as an answer
+      await X.write({}, () => ({ audit: { action: 'analyse', ids: [candidateId, engineAttemptId], summary: `${edge} ${mode}: no analyst answer (${out.skipped ? `not sent: ${out.skipped}${out.scope ? `, ${out.scope}` : ''}` : out.error || 'the call failed'})` } }));
+      return { ...head, ...out, provider: head.provider, decision: null, refusals: [], attempt: null, budget: await budget() };
+    }
+    const pa = AN.parseAnswer(out.text, rq.context), refusals = pa.ok ? [] : pa.refusals.slice();
+    if (!pa.ok && out.stop === 'length') refusals.unshift('the answer was cut off at the output cap (ACADEMY_LLM_ANALYST_MAX_TOKENS): raise the cap, or lower the model\'s reasoning effort');
+    if (!pa.ok && out.stop === 'refusal') refusals.unshift('the provider declined to answer');
+    const usage = out.usage || { tokensIn: 0, tokensOut: 0, estimated: true }, costUsd = out.cached ? 0 : out.costUsd || 0;
+    const res = await X.write({ att: [kA, ST.emptyRows(), CAPS.attempts], ds: [kD, ST.emptyRows(), CAPS.dataset], cache: [AK.cache, { v: 1, rows: [] }] }, async ({ att, ds, cache }, at) => {
+      const A = R(att, kA), D = R(ds, kD), w = {};
+      if (!hit) { const rows = (cache && Array.isArray(cache.rows) ? cache.rows : []).filter((r) => r && r.k !== askKey).concat({ k: askKey, at, edge, candidateId, text: out.text, stop: out.stop || null, usage, provider: head.provider, model: head.model, valid: pa.ok }); w.cache = { v: 1, rows: rows.slice(-ANALYST_CACHE_MAX) }; }
+      const cents = `${usage.tokensIn} tokens in, ${usage.tokensOut} out, ${out.cached ? 'from the cache (no cost)' : `cost $${costUsd.toFixed(4)}`}`;
+      if (!pa.ok) return { write: w, result: { decision: null, attempt: null }, audit: { action: 'analyse', ids: [candidateId, engineAttemptId], summary: `${edge} ${mode}: analyst answer refused (${refusals[0]}); ${head.provider}, ${cents}` } };
+      const mine = (A.archives ? await X.store.rows(kA, true) : A.rows).filter((r) => r.candidateId === candidateId), same = mine.find((r) => r.askKey === askKey) || null;
+      if (same) return { write: w, result: { decision: same.decision, attempt: { id: same.id, n: same.n, mode: same.mode, stored: false } }, audit: { action: 'analyse', ids: [same.id, candidateId, engineAttemptId], summary: `${edge} ${same.mode}: analyst ${same.decision.action}, the same question as attempt ${same.n}; ${head.provider}, ${cents}` } };
+      if (cand.pool === 'exam' && mine.length) bad('this exam setup has already been decided by the analyst: a test setup is decided once', 409);
+      const n = mine.length + 1, m = cand.pool === 'exam' ? 'exam' : n > 1 ? 'replay-same' : 'train', decision = { id: X.id('dc'), ...AN.record(pa.decision, rq.context, { provider: head.provider }) };
+      const row = { id: X.id('an'), candidateId, edge, sessionId, n, at, mode: m, engine: 'language-model', decision, lessonsAvailable: rq.context.lessonIds, snapshotHash, engineAttemptId, askKey, ask,
+        llm: { provider: head.provider, model: head.model, promptVersion: AN.PROMPT_VERSION, tokensIn: usage.tokensIn, tokensOut: usage.tokensOut, estimated: !!usage.estimated, costUsd, cached: !!out.cached, stop: out.stop || null } };
+      const dsRow = { id: row.id, candidateId, snapshotHash, t, edge, edgeVersion: decision.edgeVersion, features, decision: { action: decision.action, entry: decision.entry, stop: decision.stop, target: decision.target, confidence: decision.confidence },
+        modelVersion: null, datasetVersion: DATASET_VERSION, mode: m, n, at, engine: 'language-model', mentor: null, outcome: null };
+      w.att = { ...A, rows: A.rows.concat(row) }; w.ds = { ...D, rows: D.rows.concat(dsRow) };
+      return { write: w, result: { decision, attempt: { id: row.id, n, mode: m, stored: true } },
+        audit: { action: 'analyse', ids: [row.id, candidateId, engineAttemptId], summary: `${edge} ${m}: analyst ${decision.action}${decision.forced ? ` (wanted ${decision.wanted.action}, held by ${decision.gates.map((g) => g.code).join(', ')})` : ''}, engine ${det ? det.action : 'n/a'}; ${head.provider}, ${cents}` } };
+    });
+    return { ...head, mode: res.attempt ? res.attempt.mode : mode, cached: !!out.cached, costUsd, usage, stop: out.stop || null, decision: res.decision, wanted: res.decision ? res.decision.wanted : null, forced: !!(res.decision && res.decision.forced), refusals, notes: pa.ok ? pa.notes : [], attempt: res.attempt, budget: await budget() };
+  },
 };
 
 // ---- the handler ----------------------------------------------------------------------------------------------------------
@@ -709,11 +817,11 @@ async function handle(req, res, d = {}) {
     if (!fn) bad(`unknown action: use one of ${Object.keys(POST).join(', ')}`);
     return res.status(200).json(await fn(X, b, d));
   } catch (e) {
-    if (e instanceof Bad) return res.status(e.status).json({ error: e.message });
+    if (e instanceof Bad) return res.status(e.status).json({ error: e.message, ...(e.extra || {}) });
     if (e && e.store) return res.status(503).json({ error: 'the Academy store is unavailable: nothing was saved' });
     return res.status(e && e.status === 503 ? 503 : 500).json({ error: 'the Academy is unavailable' });
   }
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
-module.exports._t = { GET, POST, CAPS, EDGE_IDS, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite };
+module.exports._t = { GET, POST, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite };

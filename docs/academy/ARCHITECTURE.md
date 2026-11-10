@@ -139,7 +139,7 @@ strings (keys documented in the file: `htfBias`, `structH1`, `sweep`, `displacem
 **`/api/academy`** (owner session; POST needs `sameOrigin`; everything `private, no-store`)
 `GET ?get=edges|candidates&edge=|outcome&id=|lessons&edge=|attempts&edge=&cand=|sessions|session&id=|progress&edge=|mistakes&edge=|exams&edge=|notebook|models|cost|audit`
 `POST { action: 'attempt' | 'correct' | 'lesson.save' | 'lesson.revise' | 'lesson.deactivate' | 'session.save' | 'seen' |
-'exam.result' | 'blind.submit' | 'notebook.add' | 'explain', … }`.
+'exam.result' | 'blind.submit' | 'notebook.add' | 'explain' | 'analyse', … }`.
 `outcome` is only returned once an attempt for that candidate is stored (no peeking). Every write appends to the audit trail.
 
 ## 7. Limits stated honestly
@@ -149,3 +149,6 @@ strings (keys documented in the file: `htfBias`, `structH1`, `sweep`, `displacem
 - Replay candles on the page come from OANDA; candidates and outcomes were generated on HistData candles. Prices differ by
   a small feed basis; the page shows the data source of each.
 - A language-model explanation is commentary. It never changes a certified statistic.
+- The analyst (`docs/academy/LLM.md`) is a language model's second opinion on a decision the engine has already made and
+  stored. It is off without a key, checked in code, held by the engine's hard gates and stored apart from the engine's
+  attempts, so it changes no certified statistic either. Until the owner sets a key it has only ever run against a fake.

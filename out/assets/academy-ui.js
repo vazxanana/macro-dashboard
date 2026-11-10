@@ -358,6 +358,7 @@
     pending: null, busy: false, loading: false, wasPlaying: false, future: null, sessionId: null, htf: '1h', dataVersion: null, poolToken: 0, lastBlock: null, exams: null, calendar: undefined };
   const CH = { main: null, series: null, htf: null, htfSeries: null, edgeLines: [], mentorLines: {}, annLines: [] };
   const M = { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null };   // the mentor's form
+  MXAC.point = () => (S.cur ? { cur: S.cur, setup: S.setup, thesis: S.thesis, lessons: S.lessons, cands: S.cands, done: S.done, open: S.open, sessionId: S.sessionId } : null);   // read-only view of the open decision point, for assets/academy-analyst.js
 
   // ---- tabs -----------------------------------------------------------------------------------------------------------
   let activeTab = 'train';

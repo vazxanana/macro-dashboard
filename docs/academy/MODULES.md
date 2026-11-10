@@ -69,7 +69,37 @@ tested). Full signatures are in each file's header comments and its tests.
   reveals it.
 - Extras: `GET ?get=dataset&edge=` (Layer B rows, mentor label and outcome kept apart), `errorClass` on corrections.
 - Local runs: set `ACADEMY_STORE_DIR` to use a file store instead of the Blob.
-- The language-model adapter is off without `ACADEMY_LLM_KEY`; `explain` then answers `{ available: false }`.
+- The language-model adapter is off without `ACADEMY_LLM_KEY`; `explain` and `analyse` then answer `{ available: false }`.
+
+## The analyst · `api/_academy-analyst.js`, `analyse` in `api/academy.js`, `assets/academy-analyst.js` (tests: `tests/academy-analyst.test.mjs`)
+
+Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment variables, budgets, first-run checklist).
+
+- The analyst is the optional language model asked to judge one decision point: BUY, SELL, WAIT or MANAGE. Every decision
+  is still made by `MXA.decide`; the analyst's answer is a second opinion, stored apart. Nothing ran against a real provider.
+- `AN.buildRequest({ edge, features, snapshotDigest: { t, hash, cand, bars }, deterministic, lessons, thesis, position,
+  calendar, ask, cost, examDecided })` → `{ ok, system, prompt, schema, context, facts }` or `{ ok: false, refusals }`. Pure.
+  It refuses an outcome field, a bar closing after `t`, anything dated later, an exam setup already decided.
+  `AN.parseAnswer(text, context)` → `{ ok, decision, notes }` or `{ ok: false, refusals }`. `AN.record` turns a checked
+  decision into the Decision shape. Bump `AN.PROMPT_VERSION` when the system text, the facts layout or a rule changes.
+- `POST { action: 'analyse', edge, candidateId, attemptId, snapshot: { t, hash, bars, dataVersion }, features, deterministic,
+  thesis?, position?, ask?: 'setup' | 'position', cost?, sessionId?, dryRun?, retry? }`. The engine's attempt must be stored
+  first and `deterministic.gates` must be sent (an empty list when none). Answers: `{ available: false, reason }` when off;
+  else `{ decision, wanted, forced, refusals, provider, fake, usage, costUsd, cached, attempt: { id, n, mode, stored }, budget }`.
+  `skipped: 'budget'` (scope `day | month | hard-stop | calls`) and `error` mean nothing was stored as an answer.
+- Storage, apart from the engine's: `analyst/attempts/<edge>.json`, `analyst/corrections/<edge>.json`,
+  `analyst/dataset/<edge>.json`, `analyst/cache.json`. Read them with `GET ?get=attempts|corrections|dataset&engine=language-model`;
+  `GET ?get=progress` has an `analyst` block. `POST correct` takes `engine: 'language-model'`.
+- Adapter changes (`api/_academy-llm.js`): `messages` format sends the key in `x-api-key` and an API version header;
+  `ACADEMY_LLM_BODY`, `ACADEMY_LLM_MAX_TOKENS_FIELD`, `ACADEMY_LLM_SYSTEM_ROLE`, `ACADEMY_LLM_JSON_SCHEMA`; stop reasons;
+  cache-token pricing; a bounded retry on 408 / 429 / 5xx / 529; a daily call cap (`ACADEMY_LLM_MAX_CALLS_DAY`, all routes);
+  a timed-out call keeps its estimate in the ledger (`unconfirmed`). `complete` takes `{ cap: 'analyst', long, schema, fresh }`
+  and the dependencies `{ env, store, fetch, now, sleep, provider }`.
+- The page block is one file, `assets/academy-analyst.js` (`window.MXAN`), with one hook in `assets/academy-ui.js`:
+  `MXAC.point()`, a read-only view of the open decision point. It reads the ledger once when a replay opens (never while a
+  decision is made), so a train decision is still one Academy call. It never asks by itself.
+- The fake: `node scripts/academy-dev.mjs --fake-llm` injects `scripts/academy-fake-llm.cjs` (`provider: 'fake-test'`, a fixed
+  rule) into the handler. The deployed function takes no dependency, so nothing else can switch it on.
 
 ## Edges · `academy/edges.mjs`, `academy/data/` (tests: `tests/academy-edges.test.mjs`)
 

@@ -1320,6 +1320,11 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   (notes through `POST miss`, `?get=misses`; sessions `kind: 'session'`). Every statistic shows its n; under 20 graded it says
   "too few to judge"; no number is shown as a probability. The Desk links to `/academy` from the account menu (`#ms-me-academy`,
   classes `adm own`: owner only).
+- **The analyst** (`docs/academy/LLM.md`): the optional language model's second opinion on a decision the engine has already
+  stored (`POST analyse`, `api/_academy-analyst.js`, page block `assets/academy-analyst.js`). Off without `ACADEMY_LLM_KEY`; never a
+  made-up answer; no outcome field or later bar may reach its request; its answer is checked in code and held by the engine's
+  hard gates; stored apart (`engine: 'language-model'`, files under `analyst/`) and never counted with the engine's numbers.
+  Only ever run against the labelled fake (`node scripts/academy-dev.mjs --fake-llm`): no real provider call was made.
 - **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
   a run reads candidates, lessons, calendar and past cases once, so a train decision is one call. Keep new code on `ctx.api`.
 - Regenerate data (candles outside the repo): `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,

@@ -4,6 +4,9 @@
 //   sh scripts/build.sh && node scripts/academy-dev.mjs            recorded candles (tests/fixtures/academy), port 8770
 //   node --use-env-proxy scripts/academy-dev.mjs --live            real candles through https://meridianx.dev/md/bars
 //   node scripts/academy-dev.mjs --guest                           answers /api/me as signed out (to see the owner-only card)
+//   node scripts/academy-dev.mjs --fake-llm                        the analyst answers from a FAKE provider (scripts/academy-fake-llm.cjs:
+//                                                                  a fixed rule, not a language model, no network, no cost). It is injected
+//                                                                  into the handler here and nowhere else; the page shows a FAKE banner
 //   node --use-env-proxy scripts/academy-dev.mjs --record [--edge gmp --from 2024-04-23 --to 2024-05-09]
 //                                                                  records the fixtures ONCE from the live API, then exits
 //   PORT=8770  ACADEMY_STORE_DIR=<dir>  (default: a new folder under the system temp directory, printed at start)
@@ -81,7 +84,10 @@ async function bars(url, res) {
 // ---- /api/academy -----------------------------------------------------------------------------------------------------------
 const STORE = process.env.ACADEMY_STORE_DIR || fs.mkdtempSync(path.join(os.tmpdir(), 'academy-store-'));
 const DATA = require('../api/academy.js')._t.fileData(ROOT);
-const DEPS = { env: { ACADEMY_STORE_DIR: STORE }, who: async () => (GUEST ? null : OWNER), sameOrigin: () => true, data: DATA };
+// --fake-llm: the fake provider reaches the handler as an injected dependency (its settings, its fetch, its label). The server's
+// own environment is never read for it and the deployed function is called without dependencies, so nothing else can switch it on.
+const FAKE = flag('fake-llm') ? require('./academy-fake-llm.cjs').make() : null;
+const DEPS = { env: { ACADEMY_STORE_DIR: STORE, ...(FAKE ? FAKE.env : {}) }, who: async () => (GUEST ? null : OWNER), sameOrigin: () => true, data: DATA, ...(FAKE ? { fetch: FAKE.fetch, provider: FAKE.provider } : {}) };
 // fixture mode: only the LIST of setups (?get=candidates) is narrowed to the recorded window. Everything else reads the whole
 // generated files, so "similar past cases" (?get=history) are the same rows as on the live site.
 function listDeps() {
@@ -133,5 +139,6 @@ else {
     console.log(`Academy dev server: http://127.0.0.1:${PORT}/academy`);
     console.log(`  candles: ${LIVE ? 'LIVE through ' + LIVE_BASE + '/md/bars' : m ? `recorded ${m.sym} candles, setups from ${MXAC.isoDay(m.from)} to ${MXAC.isoDay(m.to - 86400)} (edge ${m.edge}: ${m.candidates.train} train, ${m.candidates.exam} exam)` : 'NO fixtures recorded (run with --record once)'}`);
     console.log(`  store:   ${STORE}${GUEST ? '\n  signed out (--guest)' : ''}`);
+    console.log(`  analyst: ${FAKE ? 'FAKE PROVIDER (--fake-llm): test answers by a fixed rule, not a language model, no network' : 'off (no key is read here; --fake-llm serves labelled test answers)'}`);
   });
 }
