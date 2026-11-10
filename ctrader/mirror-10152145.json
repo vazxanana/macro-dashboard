@@ -1825,7 +1825,7 @@
     "lots": 0.06,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T11:18:52.000Z",
     "councilEntry": 2125.17,
     "stop": 2096.5231785714286,
@@ -1839,10 +1839,12 @@
     "slipR": 0.235,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T11:18:52.000Z",
-    "brokerStop": 2103.24
+    "brokerStop": 2103.24,
+    "closedAt": "2026-11-10T03:42:34.000Z"
    },
    "usdcad-intraday-1794223067": {
     "symbol": "USDCAD",
@@ -3369,7 +3371,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9972.88 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9971.1 · 23 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3384,15 +3386,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9972.88,
-  "lastRun": "2026-11-10T03:41:07.000Z"
+  "balance": 9971.1,
+  "lastRun": "2026-11-10T03:43:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T09:52:35.000Z",
-   "msg": "cancelled AUDUSD limit order 33790348 for audusd-scalp-1794212567: the council ended it: missed",
-   "trade": "audusd-scalp-1794212567"
-  },
   {
    "at": "2026-11-09T09:52:35.000Z",
    "msg": "not mirrored xrp-scalp-1794217886: none of XRPUSD found at the broker",
@@ -4887,6 +4884,11 @@
    "at": "2026-11-10T03:22:03.000Z",
    "msg": "SOLUSD position 47875096 closed at the broker",
    "trade": "sol-rscalp-1794278912"
+  },
+  {
+   "at": "2026-11-10T03:42:34.000Z",
+   "msg": "ETHUSD position 47605800 closed at the broker",
+   "trade": "eth-rscalp-1794223067"
   }
  ],
  "limits": {
