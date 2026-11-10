@@ -65,6 +65,11 @@ weights change, no look-ahead by construction, private Blob persistence, full is
   `academy-risk` (8), `academy-edges` (20).
 - `sh scripts/build.sh` leaves `out/` unchanged (CI "build" check).
 - Replay + core on real gold candles from the live candle proxy (12 Mar 2025): regime read, WAIT with reasons.
+- Candidates against the live candle proxy (30 usable setups an edge, entry price against the 5m candles within 10 minutes
+  of the signal time): replica 30 / 30 inside, gtl 30 / 30, gmp 30 / 30, nq-open 30 / 30 (one of an earlier 8 was 0.26R
+  outside: the research and proxy index feeds differ by a few points); mosha-bo and geg are limit orders that fill later
+  (inside or resting, none wrong); gtrend and geg daily signals are stamped 00:04 UTC, so a Friday signal falls on the
+  closed weekend market (no candle at that minute; the entry is the next open). No setup was on the wrong price.
 
 ## Known problems / external blockers
 
