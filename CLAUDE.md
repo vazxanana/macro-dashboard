@@ -1313,6 +1313,15 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   proposes inactive drafts; the mentor saves them. No scorer is used unless the owner registers and promotes it; none is promoted.
 - **Paper only, isolated**: nothing under `academy/`, `ml/`, `assets/academy-*` or `api/academy*.js` imports the council, the mirror or
   any order code (tests pin this). The language-model adapter is off without `ACADEMY_LLM_KEY` and has daily / monthly / hard budgets.
+- **The other tabs** (`assets/academy-tabs.js`, `window.MXAT`, registered with `MXAC.registerTab`; shared pieces on `MXAC.kit`):
+  Lessons (versions, diff, switch off / on, research drafts), Progress (agreement, recall beside new setups, mistakes, the
+  1 / 3 / 7 / 21-day review queue `MXAT.reviewQueue`), Research + notebook, Models (nothing promoted; promotion is a manual API
+  step), Costs, Audit, Blind arena (the engine's answer is a hidden `blind` attempt until `blind.submit`; `?get=blind`), Session
+  (notes through `POST miss`, `?get=misses`; sessions `kind: 'session'`). Every statistic shows its n; under 20 graded it says
+  "too few to judge"; no number is shown as a probability. The Desk links to `/academy` from the account menu (`#ms-me-academy`,
+  classes `adm own`: owner only).
+- **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
+  a run reads candidates, lessons, calendar and past cases once, so a train decision is one call. Keep new code on `ctx.api`.
 - Regenerate data (candles outside the repo): `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
   candle proxy). Audit: `node scripts/audit/academy.cjs` (in `ci.yml`). Tests: `tests/academy-*.test.mjs`.
