@@ -1,0 +1,70 @@
+name: ICT apply merge
+
+# Merges an APPLIED change to the ICT edge once the "ICT apply" checks passed (owner, 10 Nov 2026). BUILT, AND SWITCHED OFF:
+# council/ict-apply.json lists nobody, so every branch is refused. See ict-apply.yml for the whole path.
+#
+# This is the only place with a write token, so:
+#   - It runs on workflow_run, never on pull_request: GitHub takes a workflow_run workflow from main, so a pull request cannot
+#     change what runs here.
+#   - It has NO checkout and never runs pull request code. It downloads four of main's own files through the API (the merge
+#     script, the verifier, its rules, the members list) and runs those. Everything it knows about a pull request comes from
+#     the API.
+#   - scripts/ict-apply-merge.mjs refuses unless: the checks of ict-apply.yml passed for exactly the head commit it merges; the
+#     pull request is open, not a draft, from this repository, onto main; the member is in council/ict-apply.json; every file is
+#     in the ICT allowlist (so the pull request did not touch a workflow, and the checks that ran were main's); main's ICT files
+#     did not change since. The merge call names the head commit, so GitHub refuses if the branch moved meanwhile.
+#   - A refusal is one comment on the pull request with the reason. It stays open for the owner; nothing changes on the desk.
+#   - After a merge it dispatches ict-replay.yml: a merge made with the workflow token starts no push workflows, and
+#     workflow_dispatch is the allowed exception. The council loop notices new ICT code on main by itself between rounds.
+on:
+  workflow_run:
+    workflows: [ICT apply]
+    types: [completed]
+  # the owner can run the sweep by hand (it only ever looks at open mcp/<member>/apply-… pull requests)
+  workflow_dispatch:
+
+# nothing by default; the one job asks for exactly what it needs
+permissions: {}
+
+jobs:
+  merge:
+    # only after checks of a pull request that finished one way or the other (a skipped or cancelled run has nothing to merge)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'pull_request' &&
+       (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # one apply at a time, and a running merge is never cancelled. Each run looks at every open applied change, so one that
+    # had to wait is picked up by the next run.
+    concurrency:
+      group: ict-apply
+      cancel-in-progress: false
+    permissions:
+      contents: write        # the squash merge
+      pull-requests: write   # read the pull request and its files; one comment on a refusal
+      actions: write         # read the checks run and its jobs; dispatch ict-replay.yml
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # GITHUB_SHA of a workflow_run is the last commit on main. No expression is written into a script: values come through env.
+      - name: Download main's scripts (no checkout)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          T="$RUNNER_TEMP/trusted"
+          mkdir -p "$T/scripts" "$T/api" "$T/council"
+          for f in scripts/ict-apply-merge.mjs scripts/ict-apply-check.mjs api/_ictrules.js council/ict-apply.json; do
+            gh api -H "Accept: application/vnd.github.raw" "repos/$REPO/contents/$f?ref=$GITHUB_SHA" > "$T/$f"
+          done
+
+      - name: Merge what passed every lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node "$RUNNER_TEMP/trusted/scripts/ict-apply-merge.mjs"

@@ -1,9 +1,12 @@
 # Working on the ICT desk from ChatGPT (or Claude / Cursor)
 
 The ICT desk has its own connector. Through it you can read the rules and every trade, look at candles, backtest
-the desk's own model on 2020-now data with your own settings, compare your idea against the live rule, and propose a
-change. A proposal becomes a draft pull request. The owner reviews it and decides. Nothing changes live until the
-owner merges it.
+the desk's own model on 2020-now data with your own settings, compare your idea against the live rule, keep your own
+desk record for each signal, and propose a change. A proposal becomes a draft pull request. The owner reviews it and
+decides. Nothing changes live until the owner merges it.
+
+A second way to change the edge, **apply**, is built but switched off. It is available only after the owner switches
+it on for you (section 6). Until then the apply tools are not in your tool list, and proposing is the way.
 
 ## 1. Get your connector URL
 
@@ -23,7 +26,7 @@ an admin has to allow developer mode first. Menus change: if yours look differen
 
 **Cursor.** Add this to `~/.cursor/mcp.json`: `{ "mcpServers": { "meridian-ict": { "url": "<your URL>" } } }`
 
-ChatGPT asks you to confirm before any tool that writes (a note, a proposal or a comment). That's expected.
+ChatGPT asks you to confirm before any tool that writes (a note, a desk record, a proposal or a comment). That's expected.
 
 ## 3. The tools
 
@@ -41,6 +44,8 @@ ChatGPT asks you to confirm before any tool that writes (a note, a proposal or a
 | `ict_propose_change` | Opens a draft PR. Send whole files, a test, what / why / evidence / risk. |
 | `ict_my_proposals`, `ict_proposal_comment` | Your PRs with CI status and the owner's comments; replies on your own PRs |
 | `ict_note` | Saves a note on a trade or for the owner |
+| `ict_desk_update` | Your own desk record for a signal: taken / skipped / missed, your fill, your R, your grade, tags, a note. The desk page shows it. |
+| `ict_apply_change`, `ict_revert_change` | **Off.** Available only after the owner switches apply on (section 6). |
 | `search`, `fetch` | Search across trades, rules and the guide (ChatGPT deep research uses these) |
 
 Backtest settings (`params`): `piv` (swing candles, 3), `look` (96), `vmax` (candles from sweep to inversion, 6),
@@ -58,6 +63,24 @@ Filters (`filters`): `min_grade`, `sides`, `sessions`, `atr_min` / `atr_max` (st
 - "Compare the live rule with `vmax: 4` and `filters: { atr_max: 0.6 }` on all five markets. Show it year by year."
 - "Read ict/tracker.mjs, change the A-setup to exclude the NY PM session, write a test for it, and propose the change with evidence_run."
 - "What did the owner say on my proposals? Is CI green?"
+- "Mark nq-b-1793926800 as taken, fill 25010.25, result 2.5R, grade A, tags sweep and fvg, note: clean sweep of the previous day's low."
+
+### Worked example: your desk record
+
+You took a signal and want it on the desk. Ask: "Mark signal `nq-b-1793926800` as taken at 25010.25, +2.5R, grade A,
+with the note 'clean sweep of PDL, entered on the M5 inversion'." ChatGPT calls:
+
+```json
+{ "name": "ict_desk_update",
+  "arguments": { "id": "nq-b-1793926800", "action": "taken", "fill": 25010.25, "r": 2.5,
+                 "grade": "A", "tags": ["sweep", "fvg"], "note": "clean sweep of PDL, entered on the M5 inversion" } }
+```
+
+The record is saved to the council data (`ict/desk.json`) in the same shape the desk page writes, with your name and
+the time, and shows on the page on its next load. What you leave out keeps its value, so a later
+`{ "id": "nq-b-1793926800", "r": 3.1 }` only changes the result. `action` is `taken`, `skipped`, `missed` or `none`.
+`grade` is one of the page's letters (A+, A, B, C, F); you can send `score` 1-10 instead (10 = A+, 8-9 = A, 5-7 = B,
+3-4 = C, 1-2 = F). There is one record per signal: a record another member wrote is never replaced.
 
 ## 5. The review rules
 
@@ -66,7 +89,8 @@ Filters (`filters`): `min_grade`, `sides`, `sessions`, `atr_min` / `atr_max` (st
 - **An edge must pass out of sample on 2020-now data.** That means at least 30 trades out of sample, positive
   average R both in sample and out of sample, and most out-of-sample years positive, all net of costs. A t of 2 or
   more is strong. Report every variant you tried, not only the best one.
-- **The owner approves every rule change.** The server checks a proposal before it opens the PR:
+- **The owner approves every rule change.** `ict_propose_change` is the only way a change reaches the desk while apply
+  is off. The server checks a proposal before it opens the PR:
   - only ICT files can change;
   - a code or rule change needs a test at `tests/ict-<topic>.test.mjs`;
   - every file must pass a syntax check;
@@ -75,10 +99,66 @@ Filters (`filters`): `min_grade`, `sides`, `sessions`, `atr_min` / `atr_max` (st
   CI runs the tests, and the owner decides.
 - **ICT stays separate** from the council systems.
 
-## 6. Limits and caveats
+## 6. Apply: built, switched off
+
+The owner asked for a way for your ICT changes to take effect without a manual merge each time, and then decided to keep
+it disabled until explicitly approved. So it is built and tested, and off for everyone. Nothing in it can change the
+desk until the owner does two things: tick "ICT: may apply changes to the ICT edge without my review" for you on the
+Users page, and add your name to `council/ict-apply.json` (a normal reviewed pull request). While it is off,
+`ict_apply_change` and `ict_revert_change` are not listed and answer like a tool that does not exist.
+
+Once it is on, this is how the two paths differ:
+
+| | Propose (`ict_propose_change`) | Apply (`ict_apply_change`) |
+|---|---|---|
+| Use it for | Anything you want the owner to look at first. The only way for a change that needs something outside the ICT files, or new network / environment / process access. | A change to the ICT edge's own files: `ict/*.mjs`, the rule book, `tests/ict-*.test.mjs`, the ICT fixtures and research. |
+| What it opens | A draft pull request | A normal pull request on a branch `mcp/<you>/apply-…` |
+| Who merges | The owner | The apply workflow, when every check passes. If one fails, the pull request stays open with a comment saying why, and nothing changes. |
+| Server checks | Allowed paths, sizes, syntax, no new network / environment / process access, a test for a rule change, risk and evidence | The same |
+| Extra checks | CI | Main's own copy of the verifier (the same rules again, on the pull request itself), the whole test suite, the built site unchanged, and a stop guard you cannot edit: every signal and every simulated trade keeps a stop on the right side of its entry, and ICT imports nothing from the council, the API or the mirror |
+| Live on the desk | After the owner merges | The tracker runs the new code from its next round (about 12 minutes); the replay is rerun; the backtest tools use it after the next site deploy |
+
+Out of reach on both paths: the council's systems, the page, the API, workflows, scripts, users, tokens and cTrader
+orders. ICT is paper and demo only. Every trade has a stop.
+
+### Worked example: apply a change (after the owner switched it on)
+
+"Read `ict/tracker.mjs`. Change the A-setup so the New York afternoon is excluded, write a test, and apply it with an
+evidence run on NQ, ES, YM and RTY." ChatGPT reads the file, writes the whole new file and a test, and calls:
+
+```json
+{ "name": "ict_apply_change",
+  "arguments": {
+    "title": "A-setup: skip NY PM",
+    "what": "aIndex() returns false when feat.session is NY PM.",
+    "why": "NY PM A-setups lose out of sample; the sweep is usually the day's last liquidity run.",
+    "risk": "About a fifth fewer trades. Not tested on gold (the gold rule is unchanged).",
+    "evidence_run": { "markets": ["nq", "es", "ym", "rty"], "filters": { "sessions": ["Asia", "London", "NY AM", "Close"] } },
+    "files": [ { "path": "ict/tracker.mjs", "content": "…the whole new file…" },
+               { "path": "tests/ict-nypm.test.mjs", "content": "…a node:test file that fails without the change…" } ] } }
+```
+
+The answer gives the pull request number and `applied: "pending"`. Then ask "Did my applied change merge?":
+`ict_my_proposals` shows it with `apply.checks` (running / passed / failed) and `apply.result` (`merged`, waiting, or
+`refused` with the reason). At most 6 proposals and applied changes an hour together, and 10 applied changes a day.
+
+### Worked example: undo an applied change
+
+"Revert my applied change 412, it added losers in the London session."
+
+```json
+{ "name": "ict_revert_change", "arguments": { "number": 412, "why": "more London losers than the backtest showed" } }
+```
+
+Every file that change touched goes back to its content before the merge (a file it added is deleted), as a new
+applied change through the same checks. It only works on your own merged applied changes. If one of the files changed
+again since, it refuses and names the file: read the file and apply the content you want instead.
+
+## 7. Limits and caveats
 
 - **Rate limits per key:** 90 calls a minute, 12 backtests or comparisons per 10 minutes, 40 candle requests per
-  10 minutes, and 20 writes an hour (6 of them can be proposals).
+  10 minutes, and 20 writes an hour (6 of them can be proposals; applied changes and reverts count as proposals, with
+  at most 10 applied changes a day).
 - **Backtest windows:** 1 to 5 markets, from 2020-01-01. Long answers are cut at 150,000 characters.
 - **Backtests run on OANDA cash CFDs** (NQ → NAS100, ES → SPX500, YM → US30, RTY → US2000, GC → spot gold), while
   the live desk trades futures. Prices differ, but the structure is the same. If OANDA is unavailable, NQ, ES and YM

@@ -836,6 +836,7 @@
   .perm-ict { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px 10px; margin: 0 0 12px; display: grid; gap: 6px; font-size: 13px; } .perm-ict legend { font-weight: 600; font-size: 12.5px; padding: 0 4px; } .perm-ict label { display: flex; gap: 8px; align-items: center; }
   .perm-dlg input[type="checkbox"], .perm-dlg input[type="radio"] { appearance: auto; -webkit-appearance: auto; width: 18px; height: 18px; min-height: 0; min-width: 0; margin: 1px 0 0; padding: 0; flex: none; accent-color: var(--accent); border: 0; background: none; box-shadow: none; }
   .perm-l { align-items: flex-start; } .perm-ict label { align-items: center; }
+  .perm-apply { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 2px; } .perm-apply[hidden] { display: none; } .perm-ict .perm-apply label { align-items: flex-start; font-weight: 600; } .perm-apply .ms-note { margin: 0 0 0 26px; }
   @media (max-width: 600px) { .perm-grid { grid-template-columns: 1fr; } }
   .u-acts .u-del { color: var(--sell); }
   .u-off td { opacity: .55; }
@@ -7683,18 +7684,24 @@ function msNextSetup(bars, A) {
   const uKey = (n) => n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
   // per-member permissions (owner, 8 Nov): what each member can see and do, saved on the user record as `perms`
   const PERM_LABEL = { charts: 'Charts (every market)', scanner: 'Scanner', journal: 'Journal', desks: 'Desks: Gold, Crypto, LIT, NQ SDV', council: 'Council: every tab (off = overview only)', macro: 'Macro desk', ct: 'Demo accounts\' results (labels only)', mcp: 'ChatGPT connector on the profile' };
+  // ICT apply (owner, 10 Nov): the member may apply changes to the ICT edge from the connector without the owner's review. Off
+  // for everyone until the owner ticks the box: only a stored perms.ictApply === true counts, exactly as api/mcp.js canApply.
+  const applyOn = (u) => !!(u && u.perms && u.perms.ictApply === true);
   const permChips = (u) => { const E = window.msPerms(u, false); const on = Object.keys(PERM_LABEL).filter((k) => E[k]).map((k) => PERM_LABEL[k].split(' ')[0].replace(/[:']/g, ''));
-    if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
+    if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); if (E.ict === 'write' && applyOn(u)) on.push('ICT apply'); return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
   function permDialog(k, cur) {
     let d = document.getElementById('ms-perm-dlg');
     if (!d) { d = document.createElement('dialog'); d.id = 'ms-perm-dlg'; d.className = 'own-dlg perm-dlg'; document.body.appendChild(d); }
     const E = window.msPerms(cur, false);
     d.innerHTML = `<form method="dialog"><h3>What ${esc(cur.name || k)} can see and do</h3><p class="ms-note">Starts from the ${esc(cur.role)} defaults. Changes apply on their next page load.</p>
       <div class="perm-grid">${Object.keys(PERM_LABEL).map((p) => `<label class="perm-l"><input type="checkbox" name="${p}"${E[p] ? ' checked' : ''}> ${esc(PERM_LABEL[p])}</label>`).join('')}</div>
-      <fieldset class="perm-ict"><legend>ICT desk</legend><label><input type="radio" name="ict" value=""${!E.ict ? ' checked' : ''}> No access</label><label><input type="radio" name="ict" value="read"${E.ict === 'read' ? ' checked' : ''}> Read only</label><label><input type="radio" name="ict" value="write"${E.ict === 'write' ? ' checked' : ''}> Review and trade (marks, grades, notes)</label></fieldset>
+      <fieldset class="perm-ict"><legend>ICT desk</legend><label><input type="radio" name="ict" value=""${!E.ict ? ' checked' : ''}> No access</label><label><input type="radio" name="ict" value="read"${E.ict === 'read' ? ' checked' : ''}> Read only</label><label><input type="radio" name="ict" value="write"${E.ict === 'write' ? ' checked' : ''}> Review and trade (marks, grades, notes)</label>
+        <div class="perm-apply" id="ms-perm-apply"${E.ict === 'write' ? '' : ' hidden'}><label><input type="checkbox" name="ictApply"${applyOn(cur) ? ' checked' : ''}> ICT: may apply changes to the ICT edge without my review</label>
+          <p class="ms-note">Off for everyone until you switch it on. It takes two steps: tick this box, and add the member's name to council/ict-apply.json (the list ships empty; change it through a normal reviewed pull request). With both done, ${esc(cur.name || k)} can change the ICT edge's own files (tracker, replay, rule book, ICT tests and research) from the ChatGPT connector without your review. Each change must still pass the automatic checks: ICT files only, the tests, and every trade keeps its stop. Each one is a merged pull request you can revert. Unticking this stops it at once. Removing the name from council/ict-apply.json is the hard off-switch.</p></div></fieldset>
       <div class="own-acts"><button type="button" value="reset" id="ms-perm-reset">Back to role defaults</button><button type="button" value="cancel" id="ms-perm-cancel">Cancel</button><button type="submit" value="ok" class="pri">Save</button></div></form>`;
     const f = d.querySelector('form');
-    f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false;
+    f.onchange = () => { d.querySelector('#ms-perm-apply').hidden = f.elements.ict.value !== 'write'; };   // the apply box only makes sense with ICT write
+    f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false; perms.ictApply = ict === 'write' && f.elements.ictApply.checked;
       d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
     d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
     d.querySelector('#ms-perm-cancel').onclick = () => d.close();

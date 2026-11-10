@@ -10,6 +10,9 @@ const crypto = require('node:crypto');
 const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';   // sha256 of the owner's password
 // Built-in members (moved here from the page's window.MS_USERS). role: viewer | reviewer; ict: true (write) | 'read'; ct: demo
 // accounts' results (labels only); mcp: ChatGPT connector on the profile. The Users page can override any field or disable one.
+// No built-in record carries an apply flag: applying ICT changes without the owner's review (api/mcp.js canApply) is OFF for
+// everyone until the owner ticks the box on the Users page (a stored perms.ictApply: true) and lists the name in
+// council/ict-apply.json. tests/mcp-apply.test.mjs pins that.
 const BUILT_IN = Object.freeze({
   fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true, mcp: true },
   orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'reviewer', ict: 'read', ct: true },
