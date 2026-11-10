@@ -340,25 +340,26 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ## Mosha as you expected it (10 Nov 2026)
 
-### [ ] 27. Your Mosha trade, tested as fixed rules: no edge yet. Test the M15 version on older data, or keep it discretionary?
+### [ ] 27. Your Mosha cycle, tested as fixed rules in three studies: no edge. Log your own trades of it, or test more?
 
-- **What you said.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
-  "This is how I was expecting Mosha to work." Then: "after a H4 we can look for H1 to know when the retracement or
-  pullback starts, then we use M15 or M5 to trade that retracement or pullback."
-- **What the live Mosha BO does instead.** Same first two steps (H4 BO, H1 BO the other way), then the opposite trade: it
-  waits for the retracement to END and trades back with the H4, on M15, in the weekly direction only. It could not have
-  taken your trade and has placed no live trade since 4 Nov.
-- **Two pre-registered tests on gold, 2020 to October 2026, after costs. Both find your own trade.**
-  - `research/edge/mosha-level/` (my first reading: a tap of an H4 level, then M5 breaks): 365 trades, **−0.35R a trade,
-    t −3.10**. Fails.
-  - `research/edge/mosha-retrace/` (your chain: H4 BO, H1 BO against, limit at the broken H1 level with the M5 zone, target
-    the H4 barrier): 445 trades, **+0.02R a trade, t 0.17**. Break-even: your correction removes the loss, but there is no
-    edge that can be told from zero. About one trade in five or six reaches the barrier, which is what the 5R winners need
-    just to break even.
-- **The one hint.** With the zone on M15 instead of M5 (a wider stop), the same chain made +0.10R a trade, positive in
-  both halves, t 0.81. That is one of nine tests run on this data today, so it is a hypothesis, not a result.
-- **Options.** (a) I register the M15 version and test it on gold candles this study did not use (OANDA 2006-17), one test,
-  one verdict. (b) Tell me what makes you take one chain and skip another, and I test that filter. (c) Keep it as your own
-  discretionary trade: practise it in ChronosTrade or the Academy, and log what you take so we get your real numbers.
-  (d) Leave it.
-- **Recommended: (a), and (c) alongside it.** Nothing live changes on any option; the live Mosha BO is untouched.
+- **What you told me.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
+  "This is how I was expecting Mosha to work." The method is top-down order only: after an H4 BO, H1 shows when the
+  retracement starts, M15 or M5 gives the entry at the zone of the break, the target is the H4 barrier; at the barrier you
+  close and buy with the H4, and that buy is the main trade.
+- **What the live Mosha BO does instead.** Same first two steps, then it trades back with the H4 without waiting for the
+  barrier, on M15, in the weekly direction only. It could not have taken your sell and has placed no live trade since 4 Nov.
+- **Three pre-registered tests on gold, 2020 to October 2026, after costs:**
+  - `research/edge/mosha-level/` (my first, wrong reading: a tap of an H4 level, then M5 breaks): 365 trades, −0.35R a
+    trade, t −3.10.
+  - `research/edge/mosha-retrace/` (your first half, the retracement trade; it finds your own trade): 445 trades, +0.02R a
+    trade, t 0.17. Break-even.
+  - `research/edge/mosha-cycle/` (your main trade, the buy at the barrier): 132 trades, −0.22R a trade, t −0.99.
+  - Both halves together: 577 trades, −0.03R a trade, t −0.29.
+- **What that means.** Taken every time by fixed rules, the cycle does not make money: about one trade in six reaches its
+  target and the 5R winners only just pay for the losers. It says nothing about the trades YOU pick; the rules cannot see
+  why you take one cycle and skip another.
+- **Options.** (a) Log your own trades of this pattern for a few weeks (ChronosTrade or the Academy keep entry, stop,
+  target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a cycle, and I test
+  that one filter. (c) One more mechanical test on older candles (the M15 zone on the first half, OANDA 2006-17): the only
+  hint seen today, and a weak one. (d) Leave it.
+- **Recommended: (a).** Nothing live changes on any option; the live Mosha BO is untouched.
