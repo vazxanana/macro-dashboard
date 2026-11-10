@@ -1,5 +1,12 @@
 # ICT index A-setups: sells only below the 200-day average (pre-registered test on 2018-26)
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Only Check 1 (HistData cash 2019-26) reads these files; it was re-run (`check_histdata_2019_26`
+in result.json is the re-run). The primary test (OANDA) and the replay check do not use HistData. **The verdict stands: FAILS.**
+Check 1: U net +0.085R (n 719) → +0.091R (n 743); the filtered F stream +0.171R (n 246, t 1.74) → +0.203R (n 244, t 2.00);
+the check's own verdict is still FAIL (C1 and C2 fail, as before).
+
 **Verdict: FAILS.** The filter came from the 2008-17 observation that the index rule's sells lost in the bull market. On
 2018-26, data the observation did not come from, the sells it drops made money: **+0.062R a trade net (n 801)**. Removing
 them cut the index stream's total from +85.6R to +35.6R. The filter fails three of the four pre-registered conditions. Both

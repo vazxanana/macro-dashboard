@@ -1,5 +1,12 @@
 # New ICT entry concepts: turtle soup at equal highs/lows, "lows that broke highs", NWOG/NDOG fill (edge research, ict-concepts)
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `run.mjs` (window and long) and `report.mjs` were re-run (result.json is the re-run; the tables
+below are the original run). **The verdict stands: FAIL, no concept becomes a paper candidate.** In the replay window the two
+stop-floor turtle soups still fail: eqts-floor −0.296R (n 72, t −1.99) → −0.234R (n 75, t −1.59); lbh-floor −0.065R (n 162)
+→ −0.107R (n 161). They still pass on 2018-25 alone (eqts-floor +0.243R → +0.250R, lbh-floor +0.147R → +0.128R), as before.
+
 **Verdict: FAIL. No concept becomes a paper candidate.** Nothing on the desk changes. The live A-stream, the tracker and the replay are untouched: this study adds files under `research/edge/ict-concepts/` only.
 
 The paper-candidate bar was n ≥ 30, |t| ≥ 2 and positive in both halves, over the replay window (1 Aug 2025 – Nov 2026). In that window every concept is flat or negative. Two of them, the stop-floor versions of the two turtle soups, clear the bar on 2018 – Jul 2025 history and then lose in the window. They are worth a re-test once the window is longer. They are not a candidate now.

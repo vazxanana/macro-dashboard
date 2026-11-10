@@ -1,5 +1,12 @@
 # Edge research · timing — time-of-day windows for Scalp / Intraday
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. Not re-run in the 9 Nov clock pass. From 2019, about 4 weeks a year (8% of days) had every bar an hour off; 2018 and the other
+48 weeks were right, so ~92% of the 3.7 M engine steps keep their hour. All 13 windows failed with no near miss, so a one-hour
+shift on 8% of days cannot plausibly lift one over the bar. `replay.mjs` now uses the shared clock; a re-run is
+`run-all.mjs` + `analyze.mjs` as below.
+
 **Question.** Inside the hours the MERIDIAN Scalp and Intraday setups already trade, are there hours (UTC, and London / New York local with daylight saving), minutes past the hour, session opens (London 08:00 local = 07:00/08:00 UTC, NY cash open 09:30 NY = 13:30/14:30 UTC), first/last 30 minutes, or Friday-afternoon / Monday-Asia windows where results are reliably better or worse out of sample?
 
 **Verdict: FAIL — no time window passes.** No window turns any of the four engine setups positive out of sample, so none meets the bar for a candidate. One finding is robust: **the New York afternoon (12:00–16:59 NY) and everything after 17:00 UTC are worse for Scalp in every year.** That makes this a damage-limitation note, not an edge. A bigger finding sits underneath it: **on 8.8 years of M1 data the live Scalp sleeve itself loses money after costs (−0.18R a trade in-sample, −0.23R out of sample, every year negative).** No time window fixes that.

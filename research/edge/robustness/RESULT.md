@@ -1,5 +1,12 @@
 # Robustness audit: how much of the claimed edge is real?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. Not re-run in the 9 Nov clock pass. The HistData rebuilds (ICT A-setups, gold systems, 2018-26) were an hour off in ~8% of days
+(the US/EU mismatch weeks from 2019). gold-systems, which read the same files the same New York way, moved by
+hundredths of an R when re-run on the corrected clock, so the "fragile / not robust" readings here are not expected to move.
+`lib.mjs` now uses the shared clock.
+
 Paper research only. No live rule, config or trader/tracker code was changed.
 Question: for every LIVE rule in `council-data config.json` (history entries by `user`, `coach-backtest`, `coach-stats`) and for the ICT desk, does the evidence hold up when you recompute it? Every rule got:
 - an out-of-sample (OOS) split,

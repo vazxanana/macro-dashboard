@@ -1,5 +1,12 @@
 # Gold systems on 8 years of spot gold — robustness check
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. `replica.mjs`, `mosha.mjs`, `daily.mjs` and `summarize.mjs` were re-run (result.json and the
+three raw outputs are the re-run; the prose below is the original run). **The verdict stands: FAIL, no setting change.**
+Replica live config IS n 159 +0.279R → n 158 +0.282R; every volatility-gate variant still fails the walk-forward rule
+(e.g. p67: IS +0.038R → +0.018R, OOS +0.626R → +0.630R).
+
 **Question.** How robust are the council's gold systems on 2018–2026 gold M1 history? For each system: results by year, out-of-sample 2024–2026, and worst drawdown compared with what its approval claimed. Then: is the replica's volatility gate too strict? Gold's 20-day range is 1.48% today and the gate needs 2.416%, so the gate blocks every trade.
 
 **Short answer.**

@@ -1561,7 +1561,7 @@
    }
   }
  },
- "verdict": "struct passes the gate on the replay (+0.058R a trade, t 1.44; halves +3.6R / +10.9R; better on ES, YM, RTY, GC, worse on NQ). It is NOT confirmed on 2018-26 history (-0.008R a trade, t -0.47; worse in 2018-21 and 2022-24, better in 2025-26; worse on all three markets), and its pivot neighbours (1 or 3 candles) fail on the replay: a 2025-26 regime effect as the earlier fixed-target result. Added as the paper-only shadow variant strail to forward-test; the live A-rule exit is unchanged.",
+ "verdict": "struct passes the gate on the replay (+0.058R a trade, t 1.44; halves +3.6R / +10.9R; better on ES, YM, RTY, GC, worse on NQ). It is NOT confirmed on 2018-26 history (-0.002R a trade, t -0.13 on the corrected HistData clock, 9 Nov; -0.008R, t -0.47 on the original +5 h clock; worse in 2018-21, level in 2022-24, better in 2025-26; better on NQ and ES, worse on GC), and its pivot neighbours (1 or 3 candles) fail on the replay: a 2025-26 regime effect as the earlier fixed-target result. Added as the paper-only shadow variant strail to forward-test; the live A-rule exit is unchanged.",
  "proof": {
   "tracker": {
    "how": "708 chained tracker runs (every 2 h, 1 Feb - 31 Mar 2026) of the old (origin/main) and new ict/tracker.mjs on a stubbed CNBC feed (OANDA 5m for NQ/ES/YM/GC), trades.json + shadow.json carried run to run; per run a hash of trades.json, snapshot.json (minus its clock) and bars.json, and of shadow.json without the strail stream",
@@ -1586,5 +1586,36 @@
    }
   },
   "equivalence": "replay simulate() live and strail == research engine on 225 OANDA-mapped A-trades (0 mismatches); tracker manageTrade == simulate() on a stored-candle window (audit-test)"
+ },
+ "historyRerun": {
+  "clock": "council/histdata.mjs (UTC-5, UTC-4 in Europe's summer, New York time in 2018); `history` above is the original +5 h run",
+  "live": {
+   "n": 1435,
+   "exp": 0.131,
+   "R": 188.5,
+   "dd": 31.1,
+   "t": 3.31
+  },
+  "struct": {
+   "n": 1435,
+   "exp": 0.129,
+   "R": 185.3,
+   "dd": 31.5,
+   "t": 3.17,
+   "vsLive": {
+    "perTrade": -0.002,
+    "t": -0.13
+   },
+   "periodsVsLive": {
+    "2018-21": -21.9,
+    "2022-24": -0.4,
+    "2025-26": 19.1
+   },
+   "marketsVsLive": {
+    "nq": 3.1,
+    "es": 4.0,
+    "gc": -10.4
+   }
+  }
  }
 }

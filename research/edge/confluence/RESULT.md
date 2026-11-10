@@ -1,5 +1,14 @@
 # When MERIDIAN and ICT agree, is the edge larger?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. All 27 Meridian market-years, the three ICT replays and `analyze.mjs` were re-run (result.json,
+tables.json and analysis.txt are the re-run; the prose below is the original run). **The verdict stands: FAIL.** The mechanical
+flags reshuffle as expected with 102 variants: 9 rows now carry a plain CANDIDATE flag (13 before), and they still point both
+ways across markets. The one observation the original run singled out, ICT A-setups gold + NAS with the Meridian H1 structure
+opposed, is now a plain CANDIDATE: OOS +0.365R a trade vs +0.221R, 63.8R vs 63.5R in total, in-sample +0.154R vs +0.034R for the
+aligned ones, but R per R of drawdown 5.19 vs 6.41. Still a forward-test idea, not an edge; skill §11 still forbids council filters on ICT.
+
 **Short answer: no.** We tested agreement both ways on spot gold, NAS100 and EUR/USD, 2018 to Oct 2026, with in-sample 2018–2023 and out-of-sample 2024–2026. No confluence filter both holds up out of sample and justifies taking fewer trades.
 
 - **(a) Meridian Scalp / Intraday with an ICT setup in the same direction.** This does not help. In-sample, Meridian trades that follow a same-side ICT signal do *worse* than the rest on every market and setup except NAS Intraday, where they are equal. Meridian Scalp and Intraday lose money after costs on all three markets in this replay, and ICT confluence does not change that.

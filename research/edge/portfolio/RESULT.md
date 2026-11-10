@@ -1,5 +1,13 @@
 # Portfolio rules: caps, sizing, correlation and drawdown (edge research, paper only)
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. The ICT long-history stream (`ict-stream.mjs`, NQ/ES/GC) was re-run and `portfolio.mjs` +
+`build-result.mjs` run on both clocks with the same council files (result.json below is the original run). **The verdict stands:
+no rule change passes.** ICT baseline IS n 910 +0.091R / OOS n 411 +0.125R → IS n 922 +0.107R / OOS n 424 +0.170R. The in-sample
+ICT caps now add little out of sample (+0.178R vs +0.170R; before +0.149R vs +0.125R) and still fail on the CNBC replay. The desk's
+`sizeOf` is still the best sizing without look-ahead (OOS +0.179R → +0.223R).
+
 **Verdict: no rule change passes.** The live caps hold up: a dollar cap of 2 and a 3-hour Scalp re-entry wait each scored best in-sample, and both held out-of-sample. The ICT desk's own `sizeOf` was the best sizing scheme that uses no future data. Two ideas looked promising but are **inconclusive**:
 - an ICT cap on index trades in the same direction
 - a rolling Kelly tilt on the council

@@ -16,6 +16,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { HISTORY, EVENTS, zonedToUtc } from '../../../council/events.mjs';
 import { READ_PCT, readOf, binomUpper, testRows, median } from '../../../council/playbook.mjs';
+import { histToUtc } from '../../../council/histdata.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '../../..');
 const CD = process.argv[2];
@@ -27,9 +28,8 @@ const CPI_EARLY = ['2018-01-12', '2018-02-14', '2018-03-13', '2018-04-11', '2018
   '2019-01-11', '2019-02-13', '2019-03-12', '2019-04-10', '2019-05-10', '2019-06-12', '2019-07-11', '2019-08-13', '2019-09-12', '2019-10-10', '2019-11-13', '2019-12-11',
   '2020-01-14', '2020-02-13', '2020-03-11', '2020-04-10', '2020-05-12', '2020-06-10', '2020-07-14', '2020-08-12', '2020-09-11', '2020-10-13', '2020-11-12', '2020-12-10',
   '2021-01-13', '2021-02-10', '2021-03-10', '2021-04-13', '2021-05-12', '2021-06-10', '2021-07-13', '2021-08-11', '2021-09-14', '2021-10-13', '2021-11-10', '2021-12-10'];
-// last Sunday of a month at 01:00 UTC (the EU summer-time switch)
-const lastSun = (y, m) => { const d = new Date(Date.UTC(y, m + 1, 0, 1)); d.setUTCDate(d.getUTCDate() - d.getUTCDay()); return d.getTime() / 1000; };
-function fileToUtc(y, mo, d, h, mi) { const t5 = Date.UTC(y, mo - 1, d, h, mi) / 1000 + 5 * 3600; return t5 >= lastSun(y, 2) && t5 < lastSun(y, 9) ? t5 - 3600 : t5; }
+// the shared HistData clock (council/histdata.mjs, 9 Nov): this study's Amendment 1 rule, plus New York time in 2018
+const fileToUtc = histToUtc;
 const T0 = Date.UTC(2018, 0, 1) / 1000, T1 = Date.UTC(2026, 10, 1) / 1000, NMIN = Math.ceil((T1 - T0) / 60);
 
 // ── HistData M1 into minute-indexed arrays (close, high, low; NaN = no bar) ──
@@ -94,7 +94,7 @@ const verdictText = T.pass
 
 const built = new Date().toISOString();
 const base = { v: 1, built, preregistration: 'research/edge/event-reaction/preregistration.md', readPct: READ_PCT,
-  note: 'Per-event gold (XAU/USD) and dollar index (UDX) moves around US CPI / NFP / FOMC releases, HistData M1 (EST+5h). pre = close at T; g5 / g60 = % to T+5 / T+60; g5to60 = T+5 to T+60; dx5 / dx60 = the dollar index. read = the dollar\'s first 5 minutes (±' + READ_PCT + '%): hot read = dollar up. nowcast (CPI 2022-24) = core first print vs the Cleveland core nowcast (a model benchmark, not survey consensus). Descriptive unless test.CPI.pass.',
+  note: 'Per-event gold (XAU/USD) and dollar index (UDX) moves around US CPI / NFP / FOMC releases, HistData M1 (clock: council/histdata.mjs). pre = close at T; g5 / g60 = % to T+5 / T+60; g5to60 = T+5 to T+60; dx5 / dx60 = the dollar index. read = the dollar\'s first 5 minutes (±' + READ_PCT + '%): hot read = dollar up. nowcast (CPI 2022-24) = core first print vs the Cleveland core nowcast (a model benchmark, not survey consensus). Descriptive unless test.CPI.pass.',
   coverage: { from: evs.length ? evs[0].d : null, to: evs.length ? evs.at(-1).d : null, xauBars: X.n, udxBars: U.n }, dropped, missing,
   test: { hypothesis: 'CPI: gold T+5→T+60 has the sign opposite to the dollar index T→T+5 when |dx5| ≥ ' + READ_PCT + '%', bar: 'n ≥ 30, hit ≥ 60%, one-sided binomial p < 0.05, both halves (2018-21, 2022-26) above 50%', ...test, verdict: verdictText },
   rows };
@@ -115,7 +115,7 @@ const tbl = (ty) => { const s = summary[ty]; return [`| ${ty} | all | ${s.all.g6
 const md = [`# Gold's reaction to US CPI, NFP and FOMC releases: result`, '',
   'Paper research only. No live rule, size or trade changed. Pre-registration: `preregistration.md` (written before any number below).', '',
   `## Verdict: ${verdictText}`, '',
-  'Clock: the M1 files are read as UTC−5, UTC−4 while Europe is on summer time (Amendment 1 in preregistration.md: the release spikes put the files\' "EST without DST" label wrong in summer). The first run, on +5 h all year, also failed (CPI 20 of 32, 63%, p 0.11).', '',
+  'Clock: the M1 files are read as UTC−5, UTC−4 while Europe is on summer time (Amendment 1 in preregistration.md: the release spikes put the files\' "EST without DST" label wrong in summer). The first run, on +5 h all year, also failed (CPI 20 of 32, 63%, p 0.11). 9 Nov clock audit (council/histdata.mjs, all 11 HistData files): 2018 stamps are New York time, so the US-daylight / Europe-winter weeks of 2018 are an hour earlier than Amendment 1 put them; CPI 2018-03-13 now passes the spike check (6.4x; 0.34x before) and enters the test: 34 of 72 became 34 of 73, still a fail.', '',
   `Events: ${rows.length} with M1 coverage (${summary.CPI.n} CPI from ${by('CPI')[0]?.d ?? 'n/a'}, ${summary.NFP.n} NFP and ${summary.FOMC.n} FOMC from 2022), to ${base.coverage.to}. CPI 2018-21 dates dropped by the spike check: ${dropped.length ? dropped.map((x) => `${x.d} (${x.spike != null ? x.spike + 'x' : 'no bars'})`).join(', ') : 'none'}. Events without bars: ${missing.length ? missing.map((x) => `${x.type} ${x.d}`).join(', ') : 'none'}.`, '',
   '## The test (CPI, gold T+5→T+60 against the dollar\'s first read)', '',
   '| Type | n | hits | hit rate | p (one-sided) | 2018-21 | 2022-26 | pass |', '|---|---|---|---|---|---|---|---|',

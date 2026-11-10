@@ -1,5 +1,11 @@
 # NQ New York open run: 22 years out of sample
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. Only the HistData NSXUSD cross-check reads these files (the verdict rests on OANDA); it was
+re-run with the same rule code. 2018-22 +0.020R (n 435) → +0.006R (n 443); 2023-26 +0.286R (n 286) → +0.286R (n 281); 2023
++0.03R → +0.04R, so the 2023 gap to OANDA is not the clock. **The verdict stands.** result.json below is the original run.
+
 Paper research only. No live rule, config or tracker was changed.
 
 **Question.** The council's NQ New York open run made +0.33R a trade over 299 replay trades (2023-26). The robustness audit (#486, `research/robustness.md`) rates it *fragile*. Its t is 3.67 against a multiple-testing bar of 3.68, and a 2018-22 rebuild made about +0.03R. Does the rule have a real edge?

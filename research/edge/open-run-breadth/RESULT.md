@@ -1,5 +1,11 @@
 # Open run breadth: does the NQ open run work on other index opens?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. Only the HistData SPXUSD cross-check reads these files; it was re-run with the same code: 2018-22
+−0.125R (n 313) → −0.123R (n 319); 2023-26 −0.110R (n 200) → −0.078R (n 195). Still negative in both periods. **The verdict
+stands: NQ-ONLY.** result.json below is the original run.
+
 Paper research only. No live rule, config or tracker was changed.
 
 **Question.** The NQ New York open run made nothing over 2004-22 and +0.32R a trade over 2023-26 (#511). Is that 2023+

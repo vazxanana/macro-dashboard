@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { MARKETS, MIN_GRADE, signals, isASetup, sizeOf, inHalt } from '../../../ict/tracker.mjs';
 import { simulate } from '../../../ict/replay.mjs';
 import { HISTORY, EVENTS } from '../../../council/events.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 const CD = process.argv[2];
 const OUT = process.argv[3] || path.dirname(fileURLToPath(import.meta.url));
@@ -31,12 +32,12 @@ export const FLAT = 300, STALE = 1800;   // flatten 5 min before the release; th
 export const crossed = (e, x) => REL.find((r) => e <= r.t - FLAT && r.t - FLAT < x) || null;
 const lb = (A, t, key = (a) => a) => { let lo = 0, hi = A.length; while (lo < hi) { const m = (lo + hi) >> 1; if (key(A[m]) < t) lo = m + 1; else hi = m; } return lo; };
 
-// ── HistData M1 (EST without DST, +5 h) ──
+// ── HistData M1 (council/histdata.mjs clock: UTC-5, UTC-4 in Europe's summer; +5 h before 9 Nov) ──
 function readM1(dir, pre) {
   const files = fs.readdirSync(dir).filter((f) => f.startsWith(pre) && f.endsWith('.csv.gz')).sort(), rows = [];
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const p = ln.split(';');
-    const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(ln);
     const o = +p[1], h = +p[2], l = +p[3], c = +p[4]; if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
     rows.push([t, o, h, l, c]);
   }

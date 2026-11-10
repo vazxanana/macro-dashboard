@@ -51,12 +51,8 @@ function dstBounds(y) {
 }
 export const nyOffset = (tUtc) => { const y = new Date(tUtc * 1000).getUTCFullYear(), [a, b] = dstBounds(y); return tUtc >= a && tUtc < b ? 4 : 5; };
 export const nyHour = (tUtc) => (new Date(tUtc * 1000).getUTCHours() - nyOffset(tUtc) + 24) % 24;
-// HistData stamps are New York local time (EST/EDT); convert a local wall-clock stamp to UTC seconds
-export function nyLocalToUtc(y, mo, d, h, mi) {
-  const asIfUtc = Date.UTC(y, mo - 1, d, h, mi) / 1000;
-  const guess = asIfUtc + 5 * 3600;   // EST first
-  return asIfUtc + nyOffset(guess - 3600) * 3600;
-}
+// HistData stamps convert with council/histdata.mjs `histToUtc` (load.mjs; 9 Nov: not New York time in the weeks the US and
+// Europe switch apart)
 
 // Account presets → per-trade cost function. Returns { spread, comm, slipM, slipS } in price units at time t.
 export function model(sym, account) {

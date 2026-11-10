@@ -1,5 +1,11 @@
 # ICT iFVG exits: what to do after entry (edge research, ict-exits)
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `sim.mjs` (×3) and `analyse.mjs` were re-run; result.json, detail.json and table.txt below are the
+original run. **The verdict stands: FAIL, the live exit stays.** All A-setups: base OOS +0.145R (n 440) → +0.179R (n 449);
+the in-sample pick is still trail_be15 and it still trails the base out of sample (+0.129R → +0.161R vs base +0.179R).
+
 **Verdict: FAIL. The live exit stays.** No exit variant beat the current one in-sample by more than noise. The variants that did best out-of-sample (fixed 4R target, half off at 2R and hold the rest) lost to the live exit in-sample, so picking them would be hindsight.
 
 ## Setup

@@ -1,5 +1,12 @@
 # ICT A-setups x Dollar Smile: out-of-sample test of the #507 lead
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Not re-run in the 9 Nov clock pass. It cannot run here: `analyse.mjs` needs FRED, which this sandbox cannot reach (the test ran
+on GitHub Actions). On the corrected clock `build.mjs` gives 1,156 A-setups (was 1,137) and only 397 keep the same signal hour, so
+the committed `trades.json` / `fx-daily.json` are the +5 h inputs. To re-run: `ict-universe/universe.mjs` → `build.mjs` →
+dispatch `.github/workflows/ict-smile.yml` with force. The verdict below (FAIL, null result) is the +5 h run.
+
 **Verdict: FAIL. Null result. The lead is closed.**
 
 Out of sample (2018 to July 2025), the A-setups taken when the Smile was on its left or right side did not lose money. They

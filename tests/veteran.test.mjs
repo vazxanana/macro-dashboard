@@ -144,6 +144,23 @@ test('build + run: veteran.json, the ledger and the analysis block, from the str
   const d2 = fs.mkdtempSync(path.join(os.tmpdir(), 'vet-')); assert.equal(V.run({ dir: d2, now: NOW, log: () => {} }), null); assert.equal(fs.existsSync(path.join(d2, 'macro', 'veteran.json')), false);
 });
 
+test('COT row: cot.mjs\'s release clock (first Monday after the as-of date) and a 3-year percentile, not a 4-day lag over 60 weeks', () => {
+  const T = (d) => Date.parse(d + 'T00:00:00Z') / 1000;
+  // 200 weekly reports, the last as of Tue 3 Nov 2026 (public Fri 6 Nov, known from Mon 9 Nov under the conservative rule)
+  const cot = Array.from({ length: 200 }, (_, k) => ({ t: T('2026-11-03') - (199 - k) * 7 * DAY, net: 100000 + k * 100, gross: 300000 }));
+  const C = { ...cache(), cot };
+  const pos = (now) => V.build({ fc: forecast(), cache: C, daily: { gold, dxy }, now }).v.channels.find((r) => r.k === 'pos');
+  const sun = pos(NOW);   // Sun 8 Nov: the old 4-day lag already used the 3 Nov report
+  assert.match(sun.obs, /as of 2026-10-27/); assert.match(sun.obs, /100th percentile of 3 years/);
+  assert.equal(sun.stale, false, 'a 12-day-old report is the newest usable one on a Sunday, not stale');
+  assert.equal(pos(T('2026-11-17')).stale, false, '14 days: a holiday week'); assert.equal(pos(T('2026-11-25')).stale, true, 'no new report for 3 weeks: stale');
+  const mon = pos(T('2026-11-09') + 3600);
+  assert.match(mon.obs, /as of 2026-11-03/);
+  // a short history says so instead of a percentile of a few weeks
+  const few = V.build({ fc: forecast(), cache: cache(), daily: { gold, dxy }, now: NOW }).v.channels.find((r) => r.k === 'pos');
+  assert.match(few.obs, /percentile n\/a \(\d+ weeks of history\)/);
+});
+
 test('wiring: the Macro desk loads macro/veteran.json and renders the discussion; the council round runs the veteran after the strategist', () => {
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   assert.ok(html.includes("get('macro/veteran.json')")); assert.match(html, /<section class="md-vet" id="ms-md-vet"/); assert.match(html, /function renderVet\(\)/); assert.match(html, /renderScore, renderVet, renderSmile/);

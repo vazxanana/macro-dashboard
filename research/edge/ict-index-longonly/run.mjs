@@ -6,7 +6,7 @@
 //   ctrlbuy / ctrlsell : random H1-close entries (1 in 10 candles), stop 0.3-0.75x D1 ATR, gold exit, same costs
 // and tags every trade with past-only regime features at the signal: last completed D1 close vs its 200-day MA, and the 20-day
 // return sign. Signals/A-filters/sizing come from ict/tracker.mjs and exits from ict/replay.mjs simulate(), unchanged. The loader
-// is copied from research/edge/ict-universe/universe.mjs (HistData EST-fixed -> UTC, 5m / H1 / D1 17:00 NY, halt hour dropped).
+// is copied from research/edge/ict-universe/universe.mjs (HistData -> UTC with council/histdata.mjs, +5 h before 9 Nov, 5m / H1 / D1 17:00 NY, halt hour dropped).
 //
 //   ICTU_DATA=<dir with nsxusd-histdata/ spxusd-histdata/> node research/edge/ict-index-longonly/run.mjs <market> <out.json>
 import fs from 'node:fs';
@@ -14,6 +14,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { MIN_GRADE, signals, isASetup, sizeOf, inHalt, RISK_FLOOR, RISK_CAP } from '../../../ict/tracker.mjs';
 import { simulate } from '../../../ict/replay.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 const DIR = process.env.ICTU_DATA || 'research/candles';
 const KEY = process.argv[2], OUT = process.argv[3];
@@ -28,7 +29,7 @@ function load(u) {
   const m5 = []; let cur = null;
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(d, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const p = ln.split(';');
-    const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(ln);
     if (inHalt(t)) continue;
     const o = +p[1], h = +p[2], l = +p[3], c = +p[4]; if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
     const k = t - (t % 300);

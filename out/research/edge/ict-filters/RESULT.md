@@ -1,6 +1,17 @@
 # ICT iFVG filters: which hold up out-of-sample (2018 to Oct 2026)
 
-**Verdict: PASS, but weak.** One simple filter passes every test: **don't take A-setups on Fridays (New York day)**. A second filter also passes: **only take A-setups whose sweep went into an unfilled D1/H4 FVG**. Its OOS improvement is bigger, but it halves the trade count and 2024 lost.
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Re-run with `driver.mjs` + `analyse.mjs` (×1 and ×2 cost) + `build-result.mjs` (result.json is the
+re-run; the sections below are the original run). **The verdict stands: PASS, but weak (Fridays).**
+- A-setup baseline: IS n 910 +0.091R, OOS n 411 +0.125R → IS n 922 +0.107R, OOS n 424 +0.170R.
+- Drop Friday: IS +0.142R (t 2.46), OOS +0.156R (t 1.96) → **IS +0.166R (t 2.91), OOS +0.205R (t 2.50): PASS (weak)**.
+- Tue-Thu only: PASS (weak) → PASS (weak) (IS +0.177R t 2.69, OOS +0.234R t 2.43; also the new greedy combo).
+- **Sweep into an unfilled D1/H4 FVG (A-setups): PASS (weak) → not chosen in-sample** (IS +0.186R, t 1.67; OOS +0.238R, n 116).
+  The desk's `feat.htfFvg` forward-test tag is unaffected (it is a tag, not a rule).
+- All graded signals, "valid (BE point not taken)": FAIL OOS → PASS (weak) (IS +0.094R t 3.02, OOS +0.050R vs +0.046R baseline).
+
+**Verdict: PASS, but weak.** One simple filter passes every test: **don't take A-setups on Fridays (New York day)**. A second filter passed on the original +5 h clock, **only take A-setups whose sweep went into an unfilled D1/H4 FVG**, but on the corrected HistData clock (9 Nov) it is no longer chosen in-sample, so it is not a candidate (see "Clock re-run").
 
 The two claims from the CNBC replay are **noise**:
 - **"NY PM is negative"** does not survive.

@@ -1,16 +1,19 @@
 // Shared helpers for the robustness audit (research/edge/robustness). Paper research only.
 // Data: HistData M1 CSVs extracted from origin/council-data research/candles/<dir>/ into $ROB_DATA (default ./data).
-// HistData labels are New York wall-clock time including DST (research/log.md, 5 Nov "HistData time convention settled").
+// HistData stamps convert with council/histdata.mjs (9 Nov: UTC-5, UTC-4 while Europe is on summer time, New York time in 2018;
+// the 5 Nov reading as New York time all along was an hour off in the ~4 weeks a year the US and Europe switch apart).
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { histToUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 export const DATA = process.env.ROB_DATA || path.join(path.dirname(new URL(import.meta.url).pathname), 'data');
 
 const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short' });
 export function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday, h: +o.hour }; }
 const offCache = new Map();
-// UTC offset (seconds) of New York on a calendar day (evaluated at noon UTC of that day; DST switch hour ignored)
+// UTC offset (seconds) of New York on a calendar day (evaluated at noon UTC of that day; DST switch hour ignored): the 17:00 New
+// York day / H4 alignment of `aggregate`, not the file clock
 function nyOffset(y, mo, d) {
   const k = y * 10000 + mo * 100 + d; if (offCache.has(k)) return offCache.get(k);
   const t = Date.UTC(y, mo - 1, d, 12) / 1000, p = nyParts(t), [yy, mm, dd] = p.d.split('-').map(Number);
@@ -29,7 +32,7 @@ export function loadM1(dir, years) {
     const txt = zlib.gunzipSync(fs.readFileSync(path.join(DATA, 'research/candles', dir, f))).toString();
     for (const line of txt.split('\n')) { if (line.length < 20) continue; const [ts, o, h, l, c] = line.split(';');
       const y = +ts.slice(0, 4), mo = +ts.slice(4, 6), d = +ts.slice(6, 8), hh = +ts.slice(9, 11), mi = +ts.slice(11, 13);
-      const t = Date.UTC(y, mo - 1, d, hh, mi) / 1000 + nyOffset(y, mo, d); rows.push([t, +o, +h, +l, +c]); }
+      const t = histToUtc(y, mo, d, hh, mi); rows.push([t, +o, +h, +l, +c]); }
   }
   rows.sort((a, b) => a[0] - b[0]);
   const u = []; for (const r of rows) if (!u.length || u[u.length - 1][0] !== r[0]) u.push(r);

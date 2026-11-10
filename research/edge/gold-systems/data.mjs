@@ -1,20 +1,12 @@
 // Gold M1 loader + bar aggregation for the gold-systems edge study.
-// Source: council-data research/candles/xau-histdata/XAUUSD_M1_*.csv.gz (HistData, labels are New York wall-clock time
-// WITH daylight saving -- research/log.md "5 Nov (loop 1)"), converted to UTC here.
+// Source: council-data research/candles/xau-histdata/XAUUSD_M1_*.csv.gz (HistData), converted to UTC with council/histdata.mjs
+// (9 Nov: the files are UTC-5, UTC-4 while Europe is on summer time, New York time in 2018; before, New York time all along,
+// an hour off in the ~4 weeks a year the US and Europe switch apart).
 // Env: GOLD_DIR = folder with the .csv.gz files; parsed once and cached as GOLD_DIR/xau_m1.bin.
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
-
-// New York local -> UTC offset (seconds) for a local wall-clock time (US rules since 2007)
-function nyOffset(y, mo, d, h) {
-  const dow = (yy, mm, dd) => new Date(Date.UTC(yy, mm - 1, dd)).getUTCDay();
-  const marSun2 = 8 + ((7 - dow(y, 3, 8)) % 7);   // second Sunday of March
-  const novSun1 = 1 + ((7 - dow(y, 11, 1)) % 7);  // first Sunday of November
-  const k = mo * 10000 + d * 100 + h;
-  const dst = k >= 3 * 10000 + marSun2 * 100 + 2 && k < 11 * 10000 + novSun1 * 100 + 2;
-  return (dst ? 4 : 5) * 3600;
-}
+import { histToUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 export function loadM1() {
   const dir = process.env.GOLD_DIR, cache = process.env.GOLD_CACHE || path.join(dir, 'xau_m1.bin');
@@ -32,7 +24,7 @@ export function loadM1() {
       if (line.length < 20) continue;
       const p = line.split(';'), s = p[0];
       const y = +s.slice(0, 4), mo = +s.slice(4, 6), d = +s.slice(6, 8), h = +s.slice(9, 11), mi = +s.slice(11, 13);
-      const t = Date.UTC(y, mo - 1, d, h, mi) / 1000 + nyOffset(y, mo, d, h);
+      const t = histToUtc(y, mo, d, h, mi);
       rows.push([t, +p[1], +p[2], +p[3], +p[4]]);
     }
   }

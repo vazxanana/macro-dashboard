@@ -15,6 +15,7 @@ import { simulate } from '../../../ict/replay.mjs';
 import { SMA_N, belowSma, passes as gate } from './gate.mjs';   // the pre-registered gate
 
 const [SRC, DIR, OUT, TO = '2026-11-01'] = process.argv.slice(2);
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 if (!SRC || !DIR || !OUT) { console.error('usage: run.mjs oanda|histdata <dir> <out.json> [toISO]'); process.exit(1); }
 const T_END = Date.parse(TO) / 1000;
 
@@ -42,13 +43,13 @@ function loadOanda(sym) {
   }
   return m5.sort((a, b) => a.time - b.time);
 }
-// HistData M1 (EST without DST = UTC-5) -> 5m, halt hour dropped (ict-universe's loader)
+// HistData M1 (council/histdata.mjs clock) -> 5m, halt hour dropped (ict-universe's loader)
 function loadHist(u) {
   const d = path.join(DIR, 'research', 'candles', u.dir), files = fs.readdirSync(d).filter((f) => f.startsWith(u.pre) && f.endsWith('.csv.gz')).sort();
   const m5 = []; let cur = null;
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(d, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const p = ln.split(';');
-    const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(ln);
     if (inHalt(t)) continue;
     const o = +p[1], h = +p[2], l = +p[3], c = +p[4]; if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
     const k = t - (t % 300);

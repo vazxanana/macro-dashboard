@@ -1,7 +1,8 @@
-// Shared loaders for the confluence study: HistData M1 (EST without DST -> UTC = +5 h), aggregation, stats.
+// Shared loaders for the confluence study: HistData M1 (council/histdata.mjs clock; +5 h before 9 Nov), aggregation, stats.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 export const RAW = process.env.CONFL_RAW || path.join(path.dirname(new URL(import.meta.url).pathname), 'raw');
 export const MKT = {
@@ -21,7 +22,7 @@ export function loadM1(key, fromYear = 2018, toYear = 2026) {
   const m = new Map();
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(RAW, f))).toString().split('\n')) {
     if (!ln) continue; const [d, o, h, l, c] = ln.split(';');
-    const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(d);
     const O = +o, H = +h, L = +l, C = +c; if (![O, H, L, C].every((v) => isFinite(v) && v > 0)) continue;
     m.set(t, { time: t, open: O, high: Math.max(H, O, C), low: Math.min(L, O, C), close: C });
   }

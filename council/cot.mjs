@@ -43,6 +43,10 @@ const isoD = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 export const isLate = (t) => { const d = isoD(t); return LATE.some((w) => d >= w.from && d <= w.to); };
 // 00:00 UTC of the first Monday strictly after the as-of date: Tuesday +6 (= RELEASE_LAG), holiday-week Monday +7, Wednesday +5
 export function knownAt(t) { const dow = new Date(t * 1000).getUTCDay(); return t + (((8 - dow) % 7) || 7) * DAY; }
+// when a replay may first use a report: knownAt, except the shutdown backlog (`LATE`), whose catch-up publication dates are not
+// tracked: those count only from the Monday after the window's last as-of date (by then the backlog was out). Used by the Macro
+// strategist and the veteran (council/macro.mjs `cotReading`), so every council reader of the COT shares one release clock.
+export function usableAt(t) { const w = isLate(t) && LATE.find((x) => { const d = isoD(t); return d >= x.from && d <= x.to; }); return w ? knownAt(Date.parse(w.to + 'T00:00:00Z') / 1000) : knownAt(t); }
 // weekday candles only: OANDA's Sunday-evening stub (and any Saturday row) is not a trading day
 export const weekdays = (px) => (px || []).filter((o) => { const d = new Date(o.t * 1000).getUTCDay(); return d !== 0 && d !== 6 && o.v > 0 && isFinite(o.v); });
 const FROM = '2019-01-01';   // 3-year lookback ahead of the 2020+ test window

@@ -1,5 +1,11 @@
 # Are the cost assumptions realistic? Which edges survive realistic execution?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read as New York time. They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`), so the ~4 weeks a year when the US and Europe are on different clocks (2019 on) were an hour off. Not re-run in the 9 Nov clock pass. Only the 2018-26 Scalp replay (`scalp.mjs`) and the session spread multiplier read HistData; ~8%
+of days (the US/EU mismatch weeks from 2019) were an hour off. Both FAILs rest on costs measured from OANDA and the 30-day replay,
+not on HistData hours, so the verdict cannot move on this fix. `load.mjs` now uses the shared clock.
+
 **Verdict: FAIL. No rule passes as a candidate, but the answer to the question is clear.**
 
 - **The Scalp has no edge before costs on 8.8 years of data.** The live Scalp rule is −0.07R a trade gross in 2018–23 and −0.11R in 2024–26. Realistic costs make that −0.24R and −0.30R. The 30-day replay's +0.23R gross for the live rule doesn't carry over to long history.

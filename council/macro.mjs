@@ -32,6 +32,7 @@ import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { readJson, writeAtomic, writeIfChanged } from './jsonio.mjs';
 import { EVENTS, HISTORY } from './events.mjs';
+import { MARKETS as COT_MARKETS, usableAt as cotUsableAt } from './cot.mjs';
 // Gold Macro Score (8 Nov, owner: the macro-agent-demo skill's directional engine): council/macroscore.mjs, a paper reading
 import { goldMacroScore, scoreLine, dxyDaily, dailyRows, weeklyFrame, isoDay as isoW } from './macroscore.mjs';
 
@@ -56,7 +57,20 @@ export const FRED = Object.keys(LAG);
 // ~−1k net was read as gold, 0th percentile). Old cached rows without gross keep the row with the largest |net|.
 export function cotMain(rows) { const by = new Map(); for (const r of rows || []) { const k = r.t, sz = r.gross != null ? r.gross : Math.abs(r.net), o = by.get(k); if (!o || sz > (o.gross != null ? o.gross : Math.abs(o.net))) by.set(k, r); }
   return [...by.values()].sort((a, b) => a.t - b.t); }
-const COT_LAG = 4;   // CFTC: Tuesday positions, released Friday
+// COT release clock (9 Nov data fix): the same rule as council/cot.mjs. A report is public from the first Monday after its as-of
+// date (Friday normally, Monday in holiday weeks; before, a fixed 4-day lag used holiday-week reports up to 2 days early), and the
+// 2025 shutdown backlog only once it was out (`usableAt`). `at` = the moment of the reading: the Macro strategist writes target
+// day D's reading at 21:00 UTC on D−1 (`LOG_FROM`), so a report known from Monday enters Tuesday's forecast; the veteran reads now.
+// The percentile is over the prior 156 weeks (3 years, cot.mjs's convention: share of those weeks at or below this net; null below
+// 52 weeks, `pctWeeks` says how many). Before 9 Nov it was the last 60 rows of a 200-row pull that mixed in the micro contract
+// (~100 report dates), so "3-year" was ~1 year.
+export const COT_WEEKS = 156, COT_MIN_WEEKS = 52, COT_GOLD = (COT_MARKETS.find((m) => m.k === 'gold') || {}).code || '088691';
+export function cotReading(rows, at) {
+  const known = cotMain(rows).filter((r) => cotUsableAt(r.t) <= at); if (known.length < 5) return null;
+  const i = known.length - 1, now = known[i], m4 = known[i - 4], hist = known.slice(Math.max(0, i - COT_WEEKS), i).map((r) => r.net);
+  return { net: now.net, chg4w: now.t - m4.t <= 31 * DAY ? now.net - m4.net : null, pct: hist.length >= COT_MIN_WEEKS ? Math.round(hist.filter((x) => x <= now.net).length / hist.length * 100) : null,
+    pctWeeks: hist.length, asOf: iso(now.t), knownAt: iso(cotUsableAt(now.t)) };
+}
 
 export const iso = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 const r2 = (x, d = 2) => x == null || !isFinite(x) ? null : +(+x).toFixed(d);
@@ -242,10 +256,7 @@ export function features(data, D, opt = {}) {
   // global dollar liquidity: Fed balance sheet − reverse repo − Treasury General Account, $bn, 4-week change
   const netAt = (t) => { const w = F('WALCL').at(t), r = F('RRPONTSYD').at(t), g = F('WTREGEN').at(t); return w && r && g ? w.v / 1000 - r.v - g.v / 1000 : null; };
   const cut = D - 2 * DAY, liqNow = netAt(cut), liq4 = netAt(cut - 28 * DAY);
-  const cotRows = cotMain(data.cot || []).filter((r) => r.t <= D - COT_LAG * DAY);
-  let cot = null;
-  if (cotRows.length >= 5) { const w = cotRows.slice(-60), now = w[w.length - 1], m4 = w[Math.max(0, w.length - 5)], s = w.map((r) => r.net).sort((a, b) => a - b);
-    cot = { net: now.net, chg4w: now.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= now.net)) / Math.max(1, s.length - 1) * 100), asOf: iso(now.t) }; }
+  const cot = cotReading(data.cot || [], D - LOG_FROM * 3600);
   const trend = {}, vol = {}, last = {};
   for (const k of AK) { const b = bars[k]; if (b.length >= 21) { const c = b[b.length - 1].close, sma = b.slice(-20).reduce((s, x) => s + x.close, 0) / 20; trend[k] = c > sma ? 1 : c < sma ? -1 : 0; last[k] = c; }
     const rets = b.slice(-21).map((x, i, a) => (i ? Math.log(x.close / a[i - 1].close) : null)).slice(1); vol[k] = rets.length >= 10 ? Math.sqrt(rets.reduce((s, x) => s + x * x, 0) / rets.length) * 100 : null; }
@@ -286,7 +297,7 @@ export function drivers(f) {
   add('dgs10', 'US 10Y yield trend (US-Japan rate gap)', 'rates', !f.d10 || f.d10.chg == null ? null : f.d10.chg >= 0.05 ? 1 : f.d10.chg <= -0.05 ? -1 : 0, f.d10 ? `${f.d10.level.toFixed(2)}%, ${sg((f.d10.chg || 0) * 100, 0)} bp a week` : 'no data');
   add('dxymom', 'USD 5-day momentum (ICE DXY on OANDA)', 'dollar', f.dm == null ? null : f.dm <= -0.25 ? 1 : f.dm >= 0.25 ? -1 : 0, f.dm == null ? 'no data' : `${sg(f.dm)} pts in 5 sessions`);
   const ct = f.cot;
-  add('cot', 'Funds positioning (COT managed money, gold)', 'positioning', !ct ? null : ct.pct >= 90 ? 0 : ct.chg4w > 5000 ? 1 : ct.chg4w < -5000 ? -1 : 0, ct ? `${Math.round(ct.net / 1000)}k net, ${sg(ct.chg4w / 1000, 0)}k in 4 weeks, ${ct.pct}th pct${ct.pct >= 90 ? ' (crowded)' : ''}, week of ${ct.asOf}` : 'no data');
+  add('cot', 'Funds positioning (COT managed money, gold)', 'positioning', !ct ? null : ct.pct != null && ct.pct >= 90 ? 0 : ct.chg4w == null ? 0 : ct.chg4w > 5000 ? 1 : ct.chg4w < -5000 ? -1 : 0, ct ? `${Math.round(ct.net / 1000)}k net, ${ct.chg4w == null ? '4-week change n/a' : `${sg(ct.chg4w / 1000, 0)}k in 4 weeks`}, ${ct.pct == null ? `percentile n/a (${ct.pctWeeks} weeks)` : `${ct.pct}th pct of 3 years`}${ct.pct >= 90 ? ' (crowded)' : ''}, week of ${ct.asOf}` : 'no data');
   add('curve', 'Yield curve (10Y−3M)', 'rates', f.curve == null ? null : f.curve < 0 ? 1 : 0, f.curve == null ? 'no data' : `${f.curve.toFixed(2)}%${f.curve < 0 ? ', inverted' : ''}`);
   add('hy', 'Credit stress (HY spreads)', 'risk', !f.hy || f.hy.chg == null ? null : f.hy.chg >= 0.08 ? 1 : f.hy.chg <= -0.08 ? -1 : 0, f.hy ? `${f.hy.level.toFixed(2)}%, ${sg((f.hy.chg || 0) * 100, 0)} bp a week` : 'no data');
   const sm = smileRegime({ dm: f.dm, hy: f.hy && f.hy.chg, d2: f.d2 && f.d2.chg, swapBn: f.swapBn, sofrBps: f.sofrBps, vix: vx, ryChg: ry && ry.chg });
@@ -704,8 +715,10 @@ export async function gather(fetchImpl, now, cache = {}) {
   const feeds = [['Fed', 'https://www.federalreserve.gov/feeds/press_all.xml'], ['ECB', 'https://www.ecb.europa.eu/rss/press.html'], ['BoJ', 'https://www.boj.or.jp/en/rss/whatsnew.xml']];
   await Promise.all(feeds.map(async ([name, url]) => { const r = await get(fetchImpl, url, 'text', 12000); const it = r.body ? parseRss(r.body, name) : [];
     src[`rss:${name}`] = it.length ? `ok (${it.length} items)` : `failed (${r.err || 'empty'})`; data.rss.push(...it.slice(0, 10)); }));
+  // the COMEX 100 oz contract only (by its CFTC code; "commodity_name='GOLD'" also returned the micro, half of a 200-row pull), 600
+  // weeks: the 3-year percentile window behind the 1000-day replay plus room
   const q = 'https://publicreporting.cftc.gov/resource/72hh-3qpy.json?$select=report_date_as_yyyy_mm_dd,m_money_positions_long_all,m_money_positions_short_all'
-    + '&$where=' + encodeURIComponent("commodity_name='GOLD'") + '&$order=' + encodeURIComponent('report_date_as_yyyy_mm_dd DESC') + '&$limit=200';
+    + '&$where=' + encodeURIComponent(`cftc_contract_market_code='${COT_GOLD}'`) + '&$order=' + encodeURIComponent('report_date_as_yyyy_mm_dd DESC') + '&$limit=600';
   const c = await get(fetchImpl, q, 'json', 15000);
   if (Array.isArray(c.body) && c.body.length) { data.cot = c.body.map((r) => ({ t: Date.parse(String(r.report_date_as_yyyy_mm_dd).slice(0, 10) + 'T00:00:00Z') / 1000, net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0), gross: (+r.m_money_positions_long_all || 0) + (+r.m_money_positions_short_all || 0) }))
     .filter((r) => isFinite(r.t)); data.cot = cotMain(data.cot); src.cot = `ok (${data.cot.length} weeks)`; }

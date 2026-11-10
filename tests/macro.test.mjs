@@ -286,3 +286,70 @@ test('veteran challengers: 4-week readings ride the replay with no weight; lesso
   assert.deepEqual(M.lessons([], { v_ry4w: { n: 20, hit: 0.9, t: 3.6, proven: true } }, 0).active, []);
   assert.equal(M.LESSON.provenT, 3);
 });
+
+// ---- COT release clock and the 3-year window (9 Nov data fix; the same rule as council/cot.mjs) ----
+const T = (d) => Date.parse(d + 'T00:00:00Z') / 1000;
+// weekly gold rows ending at `last` (Tuesdays), net = f(k) (k = 0 oldest), plus a micro-contract row on each date (smaller book)
+const cotWeeks = (last, n, f = (k) => 100000 + k * 100) => Array.from({ length: n }, (_, k) => ({ t: T(last) - (n - 1 - k) * 7 * DAY, net: f(k), gross: 200000 }));
+const withMicro = (rows) => rows.flatMap((r) => [r, { t: r.t, net: -900, gross: 3000 }]);
+// the reading for target day D (written at 21:00 UTC on D−1, as features() does)
+const readFor = (rows, d) => M.cotReading(rows, T(d) - M.LOG_FROM * 3600);
+
+test('COT clock: a report enters from the Tuesday target after the first Monday past its as-of date, never earlier', () => {
+  // normal week: as-of Tue 3 Nov 2026, published Fri 6 Nov; known from Mon 9 Nov → the Tuesday 10 Nov forecast
+  const normal = cotWeeks('2026-11-03', 20);
+  assert.equal(readFor(normal, '2026-11-09').asOf, '2026-10-27', 'the Monday forecast (written Sunday 21:00 UTC) keeps the week before');
+  assert.equal(readFor(normal, '2026-11-10').asOf, '2026-11-03');
+  assert.equal(readFor(normal, '2026-11-10').knownAt, '2026-11-09');
+  // Thanksgiving week: as-of Tue 26 Nov 2024 was published Mon 2 Dec. The old 4-day lag counted it from Sat 30 Nov, so the
+  // Mon 2 Dec forecast (written Sun 1 Dec) used a report the CFTC had not published yet
+  const thx = cotWeeks('2024-11-26', 20);
+  assert.equal(readFor(thx, '2024-12-02').asOf, '2024-11-19', 'not on the holiday Monday');
+  assert.equal(readFor(thx, '2024-12-03').asOf, '2024-11-26');
+  // a Monday as-of date (holiday week, 3 Jul 2023): known Mon 10 Jul, used from Tue 11 Jul
+  const mon = [...cotWeeks('2023-06-27', 10), { t: T('2023-07-03'), net: 5, gross: 200000 }];
+  assert.equal(readFor(mon, '2023-07-10').asOf, '2023-06-27');
+  assert.equal(readFor(mon, '2023-07-11').asOf, '2023-07-03');
+});
+
+test('COT clock: the 2025 shutdown backlog counts only once it was out (cot.mjs LATE), and the veteran shares the rule', async () => {
+  const { usableAt, knownAt } = await import('../council/cot.mjs');
+  const rows = cotWeeks('2025-12-30', 30);
+  assert.equal(M.iso(usableAt(T('2025-10-07'))), '2026-02-02');
+  assert.equal(M.iso(usableAt(T('2025-09-23'))), M.iso(knownAt(T('2025-09-23'))), 'the last week before the shutdown keeps its normal clock');
+  assert.equal(readFor(rows, '2025-11-25').asOf, '2025-09-23', 'mid-backlog: the last report published on time');
+  assert.equal(readFor(rows, '2026-02-03').asOf, '2025-12-30');
+  // the veteran reads the same function at its own moment (`now`)
+  const src = fs.readFileSync(new URL('../council/veteran.mjs', import.meta.url), 'utf8');
+  assert.match(src, /S\.cot = cotReading\(cache && cache\.cot \|\| \[\], now\)/);
+  assert.doesNotMatch(src, /r\.t <= now - 4 \* DAY/, 'no fixed 4-day COT lag left in the veteran');
+  assert.doesNotMatch(fs.readFileSync(new URL('../council/macro.mjs', import.meta.url), 'utf8'), /COT_LAG/);
+});
+
+test('COT 3-year percentile: the prior 156 weeks of the main contract, the micro ignored, null under a year', () => {
+  // 260 weekly rows rising by 100 a week; the last week drops back to 100000 + 18000
+  const rows = cotWeeks('2026-11-03', 260, (k) => (k === 259 ? 118000 : 100000 + k * 100));
+  const r = readFor(withMicro(rows), '2026-11-10');
+  assert.equal(r.pctWeeks, 156);
+  // the prior 156 weeks are k = 103..258 (nets 110300..125800); 118000 is at or above k = 103..180, 78 weeks → 50%
+  assert.equal(r.pct, 50);
+  assert.equal(r.net, 118000, 'the micro contract (net −900) never wins a date');
+  assert.equal(r.chg4w, 118000 - (100000 + 255 * 100));
+  const short = readFor(cotWeeks('2026-11-03', 40), '2026-11-10');
+  assert.equal(short.pct, null); assert.equal(short.pctWeeks, 39);
+  const d = M.drivers(M.features({ fred: {}, bars: {}, cot: cotWeeks('2026-11-03', 40) }, T('2026-11-10'))).list.find((x) => x.k === 'cot');
+  assert.match(d.detail, /percentile n\/a \(39 weeks\)/); assert.equal(d.v, 0, 'no percentile, 4-week flow +400: no vote');
+  const big = M.drivers(M.features({ fred: {}, bars: {}, cot: rows }, T('2026-11-10'))).list.find((x) => x.k === 'cot');
+  assert.match(big.detail, /50th pct of 3 years/); assert.equal(big.v, -1, '−7.5k in 4 weeks votes down');
+});
+
+test('COT fetch: the COMEX 100 oz contract by its CFTC code, 600 weeks (not 200 rows by commodity name)', async () => {
+  const s = synth(), calls = [];
+  const rows = cotWeeks('2026-11-03', 300).map((r) => ({ report_date_as_yyyy_mm_dd: M.iso(r.t) + 'T00:00:00.000', m_money_positions_long_all: String(r.net + 20000), m_money_positions_short_all: '20000' }));
+  const base = fakeFetch(s, { calls });
+  const f = async (url, o) => (url.includes('publicreporting.cftc.gov') ? (calls.push(url), { ok: true, status: 200, json: async () => rows, text: async () => JSON.stringify(rows) }) : base(url, o));
+  const { data, src } = await M.gather(f, NOW, {});
+  const u = decodeURIComponent(calls.find((x) => x.includes('publicreporting')));
+  assert.match(u, /cftc_contract_market_code='088691'/); assert.match(u, /\$limit=600/); assert.doesNotMatch(u, /commodity_name/);
+  assert.equal(data.cot.length, 300); assert.match(src.cot, /ok \(300 weeks\)/);
+});

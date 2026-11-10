@@ -1,5 +1,12 @@
 # Event risk manager: does skipping or flattening trades around CPI, NFP and FOMC help?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `build.mjs` and `analyse.mjs` were re-run on the corrected clock (flat.json, ict-hist.json,
+result.json and tables.md are the re-run; the prose below is the original run). **The verdict stands: FAIL on all five tests.**
+- H1-ICT (skip A-setups near a release): n 5, −0.32R → n 5, +0.23R: FAIL. H2-ICT (flatten across a release): n 62, d +0.44R,
+  t 2.03 → n 58, d +0.38R, t 1.98: FAIL (the bar needs more). H2-MSYS n 9 → 9, H1-MSYS n 1 → 1, H1-MSET (no HistData) unchanged.
+
 **Verdict: FAIL on all five pre-registered tests. Null result. No shadow variant is added and no rule changes.**
 
 - **Skipping entries near a release (H1)** cannot help the ICT desk or the Meridian main systems: their entries almost never

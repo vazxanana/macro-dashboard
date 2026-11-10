@@ -5,13 +5,14 @@ import fs from 'node:fs'; import zlib from 'node:zlib'; import path from 'node:p
 const [dir, mk, out] = process.argv.slice(2);
 import { signals, agg, inHalt, isASetup, sizeOf, MIN_GRADE } from '../../../ict/tracker.mjs';
 import { sim, VARIANTS, STRUCT_GRID } from './engine.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 const CFG = { nas: { file: 'nsxusd-histdata/NSXUSD', key: 'nq', tick: 0.25, cost: 1.0 }, spx: { file: 'spxusd-histdata/SPXUSD', key: 'es', tick: 0.25, cost: 0.5 },
   xau: { file: 'xau-histdata/XAUUSD', key: 'gc', tick: 0.1, cost: 0.30 } }[mk];
 const base = path.join(dir, path.dirname(CFG.file)), pre = path.basename(CFG.file);
 const map = new Map();
 for (const f of fs.readdirSync(base).filter((f) => f.startsWith(pre) && f.endsWith('.csv.gz')).sort())
   for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(base, f))).toString().split('\n')) { if (ln.length < 20) continue; const [d, o, h, l, c] = ln.split(';');
-    const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600; map.set(t, [t, +o, +h, +l, +c]); }
+    const t = histStampUtc(d); map.set(t, [t, +o, +h, +l, +c]); }
 const m1a = [...map.values()].sort((a, b) => a[0] - b[0]); map.clear();
 const T = Int32Array.from(m1a.map((b) => b[0]));
 const m1 = m1a.map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));

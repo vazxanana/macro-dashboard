@@ -1,5 +1,12 @@
 # Scalp exits: which exit, entry and stop buffer work best for the live Scalp rule?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `scan.mjs` (×5) and `exits.mjs` were re-run (result.json is the re-run; the prose below is the
+original run). **The verdict stands: FAIL, all 23 exit rules lose out of sample.** Live engine target: IS −0.202R (n 9,630) /
+OOS −0.243R (n 4,910) → IS −0.207R (n 9,361) / OOS −0.235R (n 4,860); the best OOS rule is still the 15-minute time stop
+(−0.182R → −0.186R).
+
 **Verdict: FAIL. No exit rule found an edge.** All 23 variants lose money after costs, both in-sample (Jun 2018 to 2023) and out-of-sample (2024 to Oct 2026), on all five markets and in every year. The best exit (a fixed 1R target) and the best add-on (a 15-minute time stop) lose less than the live exit. Neither turns the setup positive. The problem is the entry, not the exit: before the stop is hit, price reaches each R level about as often as a coin flip would. No exit can create an edge in that case. Spread then takes about 0.13R per trade.
 
 ## What was tested

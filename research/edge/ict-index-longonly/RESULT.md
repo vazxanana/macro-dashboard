@@ -1,5 +1,14 @@
 # ICT index long-only: a real edge, or just being long equities?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Re-run with `run.mjs` + `analyze.mjs` on the corrected clock (result.json is the re-run; the
+sections below are the original run). **The verdict stands: PASS.**
+- Trend gate (buys when the 20-day return is negative), NAS100+SPX: OOS +0.48R (n 114) → **+0.43R (n 117)**; drift-adjusted OOS
+  +0.47R, CI +0.19 to +0.75 → **+0.43R, CI +0.16 to +0.69**; positive in 9 of 9 years → 9 of 9.
+- Bear windows: edge over random longs +0.22R (t 1.96) → **+0.28R (t 2.44)**. Mirror sells IS −0.06R → −0.06R.
+- The ungated buy rule (as in ict-universe), pooled: INCONCLUSIVE → **FAIL** (OOS +0.15R, drift-adjusted CI −0.01 to +0.31).
+
 **Question.** `ict-universe` found that the gold A-rule (buys only, stop 0.3-0.75x the daily ATR, size 1, no break-even)
 passes on NAS100/SPX cash. Equities rose over 2018-26. Is the profit an edge, or just being long?
 

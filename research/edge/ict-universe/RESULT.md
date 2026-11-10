@@ -1,11 +1,23 @@
 # ICT universe: does the iFVG model work outside gold?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Re-run with `universe.mjs` + `analyze.mjs` (result.json is the re-run; the sections below are the
+original run). **The headline changes: EUR/USD's primary cell (index rule, A-setups) moves from "preamble gate only" to PASS.**
+It is weak (t below 1 in each half), so it is a lead for a pre-registered test, not a desk change; no rule was changed.
+- EUR/USD index A-setups: IS −0.025R / OOS +0.121R, 4 of 9 years → IS +0.051R / OOS +0.091R, 6 of 9 years: **INCONCLUSIVE → PASS**.
+- GC gold-rule A-setups: INCONCLUSIVE → PASS (IS +0.13R → +0.15R, OOS +0.10R → +0.20R); after the random-buy drift it still adds
+  little: drift-adjusted OOS −0.05R → +0.00R.
+- GBP/USD index A-setups: FAIL → INCONCLUSIVE (OOS +0.01R). EUR/USD index all signals: INCONCLUSIVE → FAIL.
+- Silver gold-rule A-setups: INCONCLUSIVE → INCONCLUSIVE (IS still −0.22R, t −3.3). NAS100 / SPX cells unchanged (PASS).
+
 **Question.** Gold carries most of the ICT desk's replay profit. Does the same H1 iFVG model, with its rules unchanged
 (post-#413 code), have an edge on the other liquid markets the council already watches: EURUSD, GBPUSD, USDJPY, AUDUSD,
 USDCAD, USDCHF, XAGUSD and NAS100/SPX cash? And is GC's edge there in every year, or only in the 2024-26 gold bull run?
 
 **Verdict.**
-- **No new market passes. Do not add any FX pair or silver to the ICT desk.** Of the eight new markets, none passes the
+- **Corrected clock (9 Nov): EUR/USD now passes the robustness gate, weakly; it is the only new market that does.** EUR/USD index-rule A-setups: IS +0.05R (t 0.66), OOS +0.09R (t 0.77), drift-adjusted OOS +0.17R (t 1.43), 6 of 9 years positive (before: IS −0.03R, OOS +0.12R, 4 of 9, preamble gate only). Neither half is significant on its own; a desk change would need its own pre-registered test.
+- Original +5 h run: **No new market passes. Do not add any FX pair or silver to the ICT desk.** Of the eight new markets, none passes the
   robustness gate. EUR/USD passes only the basic out-of-sample test, but loses in-sample and is positive in only 4 of 9
   years. Silver passes the basic test, but only because of the 2025-26 silver rally: it loses heavily in 2018-23 (t = -3.3).
 - NAS100 and SPX cash pass, but the desk already trades them as NQ and ES. So this result supports the existing

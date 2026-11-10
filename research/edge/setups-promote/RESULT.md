@@ -1,5 +1,12 @@
 # Which engine setups are worth promoting from shadow to live?
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `run.mjs` (54 market-year chunks) and `analyze.mjs` were re-run (result.json and analysis.txt are
+the re-run; the prose below is the original run). **The verdict stands: promote none.** The one formal PASS is still gold M30→M1
+in the London session and still weak: IS +0.032R (n 289, t 0.26) → +0.131R (n 299, t 1.04); OOS +0.222R (n 128, t 1.05) →
++0.249R (n 126, t 1.12), an OOS t near 1 after 392 variants. No other cell passes (the "session = overlap" cells still lose).
+
 **Verdict: no engine setup has a robust edge on 2018–2026. Promote none to live.** A formal PASS (gold M30→M1, London session only) is weak and is explained below. Keep everything in shadow.
 
 ## What was tested

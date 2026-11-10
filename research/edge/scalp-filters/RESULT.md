@@ -1,5 +1,12 @@
 # Scalp filters on 8 years of M1 (edge research: `scalp-filters`)
 
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. `scalp-long.mjs` (10 markets) and `analyze.mjs` were re-run (result.json and analysis-output.txt are
+the re-run; the prose below is the original run). **The verdict stands: FAIL.** This study filters by session, so the hour mattered,
+but nothing moved near the bar: the live-rule baseline IS −0.201R / OOS −0.195R → IS −0.209R / OOS −0.180R (gross OOS −0.062R →
+−0.044R), every one of the 9 years still negative; no single or pair passes IS n ≥ 300 and t ≥ 2.5; all 15 candidates fail.
+
 **Verdict: FAIL. The Scalp has no robust edge on any of the 10 markets tested, under any single or pairwise filter.**
 That includes the owner's live rule (against D1, not Asia/overlap, no AUD/USD). The live rule loses **−0.20R a trade
 in-sample and −0.20R out-of-sample after spread**, and it lost money in **every one of the 9 years**. Even with no costs

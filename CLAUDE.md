@@ -1132,13 +1132,25 @@ release on the strategist's calendar within `WINDOW_H` 72 h (kept `KEEP_H` 12 h 
 repo has one (the batch's CPI pilot 0.255% and its captured Cleveland core nowcast 0.21%, `cpiPilot().comparator`), range n/a.
 Hot / in-line / cool rows (the strategist's `rule`, Fed path, dollar, gold, the action: act after the release, not before; a ¼
 starter after the first hour on a retest, the skill's rule G; funded accounts flat). History: `council/event-base.json`, built by
-`node research/edge/event-reaction/build.mjs <council-data>` from HistData M1 gold + dollar index (85 CPI 2018-26, 51 NFP and 34
-FOMC 2022-26; CPI 2018-21 dates spike-checked, 16 dropped), split by the dollar's first 5-minute read (±`READ_PCT` 0.05%, not a
+`node research/edge/event-reaction/build.mjs <council-data>` from HistData M1 gold + dollar index (86 CPI 2018-26, 51 NFP and 34
+FOMC 2022-26; CPI 2018-21 dates spike-checked, 15 dropped), split by the dollar's first 5-minute read (±`READ_PCT` 0.05%, not a
 consensus surprise) and, CPI 2022-24, by the core print vs the Cleveland nowcast; the release-day move from the daily closes at
-run time; rows and days cut at `now`. The one pre-registered test (CPI T+5→T+60 follows the dollar's read) FAILED (34/72, p 0.72),
+run time; rows and days cut at `now`. The one pre-registered test (CPI T+5→T+60 follows the dollar's read) FAILED (34/73, p 0.76),
 so every figure is labelled "Descriptive, not a tested edge". HistData clock: the files are UTC−5, and UTC−4 while Europe is on
-summer time (release spikes; preregistration Amendment 1), not "EST without DST" all year. The call: P(gold's release-day UTC close
+summer time (release spikes; preregistration Amendment 1), not "EST without DST" all year (2018: New York time; `council/histdata.mjs`). The call: P(gold's release-day UTC close
 > the prior close) = past same-type release days shrunk (`SHRINK` 20) to every weekday's 10-year up-rate (`baseP`), band 30-70%,
 calibrated, issued only before the release, one per day (`evt:<date>:gold:dayUp`), recorded once via `callsLedger`, scored by the
 new `dayUp` / `dayDown` kinds in `resolveCall`; calibration source `event`. Desk: `#c-next` under the glance (countdown UTC + local,
 expectation scale, scenario table, strip of past first hours, folded detail). Tests: `tests/playbook.test.mjs`. Paper only.
+
+## Data clocks: COT release and HistData (9 Nov 2026, data-correctness fixes)
+- COT: `council/macro.mjs` `cotReading(rows, at)` (also the veteran's `S.cot`) uses `council/cot.mjs`'s clock: a report counts from
+  the first Monday after its as-of date (`usableAt`; the 2025 shutdown backlog only from 2 Feb 2026); the strategist reads at 21:00 UTC
+  on D−1, so a report enters Tuesday's forecast (the old fixed 4-day lag used holiday-week Monday releases up to 2 days early). The
+  percentile is over the prior 156 weeks of the COMEX 100 oz contract only (fetch by code 088691, 600 weeks; null under 52 weeks).
+  The veteran's COT row is stale only past `COT_STALE_DAYS` 15 (a reading is 6-14 days old under this clock). Tests: tests/macro, veteran.
+- HistData M1 (`research/candles/*`): every loader converts with `council/histdata.mjs` (`histStampUtc` / `histToUtc`): UTC−5, UTC−4
+  while Europe is on summer time, New York time in 2018 (release spikes + Sunday opens over all 11 files). Fixed +5 h was an hour
+  late every European summer; New York time an hour off in the ~4 US/EU mismatch weeks a year. Tests: `tests/histdata-clock.test.mjs`
+  (real spike windows in `tests/fixtures/histdata/`; fails on any loader not using the shared clock). Studies re-run on the corrected
+  clock carry a "Clock re-run (9 Nov 2026)" section in RESULT.md; ones not re-run say so. Live rules unchanged.

@@ -8,13 +8,15 @@
 // entry (filled at market when price is already through it), resting orders expire after WAIT, one spread per trade in R.
 // Differences (stated): only the four setups above are built (and only the timeframes they read: M1, M5, M15, H1), the D1
 // trend label is msAnalyze over the last 720 CLOSED New-York-17:00 daily candles (the OANDA alignment the live label uses;
-// live includes the forming day), and the data is HistData (file times are New York local, DST-aware: NFP prints at 08:30
-// in both winter and summer) converted to UTC.
+// live includes the forming day), and the data is HistData converted to UTC with council/histdata.mjs (9 Nov: UTC-5, UTC-4
+// while Europe is on summer time, New York time in 2018; before, New York time all along, an hour off in the ~4 weeks a year
+// the US and Europe switch apart).
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from '../../../council/engine.mjs';
 import { cleanBars, LTF_CLEAN } from '../../../council/clean.mjs';
+import { histToUtc, usDaylight } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 const [DIR, KEY, YEAR, OUT] = process.argv.slice(2);
 const MK = {
@@ -28,7 +30,7 @@ const MK = {
 const M = MK[KEY], Y = +YEAR;
 CFG.buf = 0.15; CFG.minRisk = 0.6;   // the backtest's defaults (config.json clamps around these)
 
-// ── New York local -> UTC (US DST: 2nd Sunday of March 02:00 to 1st Sunday of November 02:00) ──
+// ── New York offset (US DST: 2nd Sunday of March 02:00 to 1st Sunday of November 02:00), for the 17:00 New York day ──
 const nthSunday = (y, m, n) => { const d = new Date(Date.UTC(y, m, 1)); const first = (7 - d.getUTCDay()) % 7 + 1; return first + 7 * (n - 1); };
 const dstCache = new Map();
 function nyOffsetH(y, mo, d, h) {   // hours to add to NY local to get UTC
@@ -46,7 +48,7 @@ function loadFile(f, out, dayKeyOut) {
     if (line.length < 20) continue;
     const y = +line.slice(0, 4), mo = +line.slice(4, 6) - 1, d = +line.slice(6, 8), h = +line.slice(9, 11), mi = +line.slice(11, 13);
     const parts = line.slice(16).split(';');
-    const loc = Date.UTC(y, mo, d, h, mi) / 1000, t = loc + nyOffsetH(y, mo, d, h) * 3600;
+    const t = histToUtc(y, mo + 1, d, h, mi), loc = t - (usDaylight(t) ? 4 : 5) * 3600;   // loc = New York wall clock
     out.push({ time: t, open: +parts[0], high: +parts[1], low: +parts[2], close: +parts[3] });
     dayKeyOut.push(Math.floor((loc + 7 * 3600) / 86400));   // NY trading day: 17:00 NY rollover (OANDA D1 alignment)
   }

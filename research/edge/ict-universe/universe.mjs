@@ -1,6 +1,6 @@
 // ICT universe test (edge research, 7 Nov 2026). Does the live ICT desk's H1 iFVG model, with its rules UNCHANGED, have an
 // edge outside GC? Drives the desk's own code: signals()/isASetup()/sizeOf()/MIN_GRADE from ict/tracker.mjs and simulate()
-// (post-#413 gap guard) from ict/replay.mjs, over HistData M1 2018-2026 (EST fixed = UTC-5 -> UTC), resampled to 5m (exits),
+// (post-#413 gap guard) from ict/replay.mjs, over HistData M1 2018-2026 (council/histdata.mjs clock; fixed UTC-5 before 9 Nov), resampled to 5m (exits),
 // H1 (signals) and D1 (17:00 New York rollover, DST-aware). The CME halt hour (17:00 ET) is dropped like the tracker's feed.
 // Busy rule as replay.mjs: one trade per market; an A-setup is blocked only by an open A-setup. Paper research only.
 //
@@ -10,6 +10,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { MARKETS, MIN_GRADE, signals, isASetup, sizeOf, inHalt } from '../../../ict/tracker.mjs';
 import { simulate } from '../../../ict/replay.mjs';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 const DIR = process.env.ICTU_DATA || 'research/candles';
 const OUT = process.argv[2] || 'research/edge/ict-universe/trades.json';
@@ -30,13 +31,13 @@ const U = {
   xagusd: { dir: 'XAGUSD', pre: 'XAGUSD', M: { label: 'Silver', short: 'XAG', tick: 0.005, dec: 3 },       cost: () => 0.03 },
 };
 
-// M1 csv.gz (YYYYMMDD HHMMSS;o;h;l;c;v, EST without DST) -> 5m bars in UTC, halt hour dropped
+// M1 csv.gz (YYYYMMDD HHMMSS;o;h;l;c;v; clock: council/histdata.mjs) -> 5m bars in UTC, halt hour dropped
 function load(u) {
   const d = path.join(DIR, u.dir), files = fs.readdirSync(d).filter((f) => f.startsWith(u.pre) && f.endsWith('.csv.gz')).sort();
   const m5 = []; let cur = null;
   for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(d, f))).toString().split('\n')) {
     if (ln.length < 20) continue; const p = ln.split(';');
-    const t = Date.UTC(+ln.slice(0, 4), +ln.slice(4, 6) - 1, +ln.slice(6, 8), +ln.slice(9, 11), +ln.slice(11, 13)) / 1000 + 5 * 3600;
+    const t = histStampUtc(ln);
     if (inHalt(t)) continue;
     const o = +p[1], h = +p[2], l = +p[3], c = +p[4]; if (!(o > 0 && h > 0 && l > 0 && c > 0)) continue;
     const k = t - (t % 300);

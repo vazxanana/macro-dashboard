@@ -1,7 +1,8 @@
-// Shared helpers for the scalp-exits study: load histdata M1 (EST, no DST -> UTC +5 h), aggregate, the live markets' meta.
+// Shared helpers for the scalp-exits study: load histdata M1 (council/histdata.mjs clock; +5 h before 9 Nov), aggregate, the live markets' meta.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { histStampUtc } from '../../../council/histdata.mjs';   // HistData clock: UTC-5, UTC-4 in Europe's summer (2018: New York time)
 
 export const MARKETS = {
   xau: { file: 'XAUUSD', label: 'XAU/USD', group: 'Metals', spot: true, dec: 2 },
@@ -15,7 +16,7 @@ export const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.
 export const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 export const marketOpen = (t) => { const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };
 
-// histdata rows: "YYYYMMDD HHMMSS;O;H;L;C;V" in EST without DST
+// histdata rows: "YYYYMMDD HHMMSS;O;H;L;C;V" (file clock: council/histdata.mjs)
 export function loadM1(dir, file) {
   const fl = fs.readdirSync(dir).filter((f) => f.startsWith(file + '_M1_')).sort();
   const out = [];
@@ -24,7 +25,7 @@ export function loadM1(dir, file) {
     for (const ln of txt.split('\n')) {
       if (ln.length < 20) continue;
       const p = ln.split(';'), d = p[0];
-      const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600;
+      const t = histStampUtc(d);
       out.push({ time: t, open: +p[1], high: +p[2], low: +p[3], close: +p[4] });
     }
   }

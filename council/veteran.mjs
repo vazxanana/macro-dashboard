@@ -28,7 +28,7 @@ import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
 import { outlook, cotCalls, callsLedger, callsScore } from './outlook.mjs';
 import { MARKETS as COT_MARKETS } from './cot.mjs';
-import { cotMain } from './macro.mjs';
+import { cotReading } from './macro.mjs';
 import { briefing, briefingLines, P_CLAMP } from './briefing.mjs';
 import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf } from './glance.mjs';
@@ -203,6 +203,9 @@ export function fingerprint(c) {
 }
 
 // ---- 2. gold driver panel (gold driver map: channel, observation, as-of, freshness, lean, what it cannot establish) ------
+// a COT reading is usable from the Monday after its Tuesday as-of date until the next one lands: 6-13 days old (14 after a holiday
+// Monday as-of date), so it is stale only past 15 days (it was 12 under the old 4-day lag)
+export const COT_STALE_DAYS = 15;
 export function channels(S, now) {
   const W = (k, o) => window(S[k], now, o), ry = W('DFII10'), be = W('T10YIE'), d2 = W('DGS2'), d10 = W('DGS10'), cv = W('T10Y3M'), hy = W('BAMLH0A0HYM2'), vix = W('VIXCLS'), vx3 = W('VXVCLS');
   const dxy = W('dxy'), broad = W('DTWEXBGS'), gold = W('gold'), sofr = W('SOFR'), effr = W('EFFR');
@@ -226,8 +229,8 @@ export function channels(S, now) {
     vix ? (vts != null && vts > 1 ? 0 : vix.v >= 22 ? 1 : 0) : null, (vix && vix.asOf) || (hy && hy.asOf), (vix && vix.stale) || (hy && hy.stale),
     'Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction.'));
   const cot = S.cot;
-  list.push(row('pos', 'Investment flows and positioning', cot ? `COT managed money ${Math.round(cot.net / 1000)}k net, ${sg(cot.chg4w / 1000, 0, 'k')} over 4 weeks, ${cot.pct}th percentile (positions as of ${cot.asOf})` : 'no observation',
-    cot ? 0 : null, cot && cot.asOf, cot && now - Date.parse(cot.asOf + 'T00:00:00Z') / 1000 > 12 * DAY,
+  list.push(row('pos', 'Investment flows and positioning', cot ? `COT managed money ${Math.round(cot.net / 1000)}k net, ${cot.chg4w == null ? '4-week change n/a' : `${sg(cot.chg4w / 1000, 0, 'k')} over 4 weeks`}, ${cot.pct == null ? `percentile n/a (${cot.pctWeeks} weeks of history)` : `${cot.pct}th percentile of 3 years`} (positions as of ${cot.asOf})` : 'no observation',
+    cot ? 0 : null, cot && cot.asOf, cot && now - Date.parse(cot.asOf + 'T00:00:00Z') / 1000 > COT_STALE_DAYS * DAY,
     'COT is a Tuesday snapshot of reportable futures, published Friday: crowding and fragility context, not direction. ETF tonnage and options dealer positioning are not observed by the council.'));
   list.push(row('official', 'Official reserves and physical demand', 'not observed by the council (WGC monthly reserves run two months in arrears; quarterly demand is partly estimated)', null, null, false,
     'Reported reserve values rise with the price; value growth is not purchases. Exchange stocks, London vaults and ETF metal are different inventories and must not be added.'));
@@ -272,7 +275,7 @@ export function debate(fc, ch, fp, { now, base } = {}) {
     'A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.', mbe && mbe.vote, ci.lean);
   // positioning
   const mct = dr('cot'), cp = C.pos;
-  push('Positioning', mct ? `${mct.detail} (vote ${mct.vote > 0 ? 'up' : mct.vote < 0 ? 'down' : 'flat'})` : 'no reading', cp.obs + (cp.stale ? ' (lagged more than 12 days)' : ''), mct && mct.vote ? 'qualify' : 'agree',
+  push('Positioning', mct ? `${mct.detail} (vote ${mct.vote > 0 ? 'up' : mct.vote < 0 ? 'down' : 'flat'})` : 'no reading', cp.obs + (cp.stale ? ` (lagged more than ${COT_STALE_DAYS} days)` : ''), mct && mct.vote ? 'qualify' : 'agree',
     'COT is crowding and fragility context on a Tuesday snapshot of reportable futures; the 2007-26 test found no 4-week edge in positioning, so it sizes and times, it never directs.');
   // regime
   const rg = fc && fc.regime;
@@ -413,9 +416,9 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
   if (gold.length >= 50) { const w = gold.filter((o) => o.t <= now).slice(-50); S.avg10w = w.reduce((a, o) => a + o.v, 0) / w.length; }
-  const cotRows = cotMain(cache && cache.cot || []).filter((r) => r.t <= now - 4 * DAY);
-  if (cotRows.length >= 5) { const w = cotRows.slice(-60), cur = w[w.length - 1], m4 = w[Math.max(0, w.length - 5)], s = w.map((r) => r.net).sort((a, b) => a - b);
-    S.cot = { net: cur.net, chg4w: cur.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= cur.net)) / Math.max(1, s.length - 1) * 100), asOf: isoDay(cur.t) }; }
+  // the strategist's COT reading at this moment: cot.mjs's release clock (public from the first Monday after the as-of date, the 2025
+  // shutdown backlog once it was out) and a real 3-year percentile (9 Nov; before, a fixed 4-day lag and ~60 weeks)
+  S.cot = cotReading(cache && cache.cot || [], now);
   const ch = channels(S, now), fp = fingerprint(ch.changes), base = baseRates(gold, { now });
   const { topics, verdict, card } = debate(fc, ch, fp, { now, base });
   let L = ledgerResolve(ledger, gold); const { ledger: L2, issued } = ledgerIssue(L, { now, gold, verdict, base, gs: fc && fc.goldScore, card }); L = L2;

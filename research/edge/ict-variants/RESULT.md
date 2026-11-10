@@ -1,6 +1,18 @@
 # Five ICT A-setup variants from the skill, 2020 → Nov 2026, IS / OOS (pre-registered, 9 Nov 2026)
 
-**Verdict: FAIL. None of the nine variant × book verdicts passes the pre-registered bar; the live A-rule stays and no proposal is made.**
+## Clock re-run (9 Nov 2026)
+
+The HistData M1 files were read with a fixed +5 h ("EST without DST"). They are UTC−5, UTC−4 while Europe is on summer time, and New York time in 2018 (`council/histdata.mjs`; release spikes and Sunday opens), so every European summer was an hour late. Re-run with `run.mjs` (result.json is the re-run; the sections below are the original run).
+**The verdict moves from FAIL to PASS for one cell: V3 htffvg (sweep into an unfilled D1/H4 FVG) on the index book.**
+- V3 htffvg · index: INCONCLUSIVE (OOS n 91, +0.325R) → **PASS** (IS n 80 +0.273R t 1.44; OOS n 84 +0.355R t 1.92, ×2 cost
+  +0.342R; all six checks true, "strong" false; 2024 −0.5R, the other six years positive).
+- V2 killzone · gold: INCONCLUSIVE → FAIL (OOS +0.218R → +0.026R). V1 atr50 (index and gold): FAIL → INCONCLUSIVE.
+- V3 gold, V4 pd (both books), V5 be1: unchanged (FAIL / INCONCLUSIVE / INCONCLUSIVE / FAIL).
+PLAN.md says a pass is reported, not adopted: the desk's A-rule is unchanged, and adopting V3 is the owner's call after the
+forward test of `feat.htfFvg`. Note that the ict-filters re-run on the same clock no longer chooses the D1/H4 FVG filter in-sample
+(2018-23, all A-setups, every market), so the two studies disagree on it.
+
+**Verdict: PASS for V3 htffvg on the index book, on the corrected HistData clock (9 Nov re-run; the original run was FAIL, V3 index inconclusive). The other eight verdicts do not pass; no proposal was written and the live A-rule is unchanged.**
 Four are inconclusive (better out of sample, short of the bar): HTF FVG confluence and premium/discount on the indices,
 premium/discount and kill zones on gold. Five fail outright. Break-even at +1R is clearly worse than the live +1.5R (paired t −2.05).
 
