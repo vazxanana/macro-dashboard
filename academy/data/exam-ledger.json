@@ -1,0 +1,11 @@
+{
+ "schema": 1,
+ "what": "Every read of exam-pool outcomes made to evaluate a decision policy. One read at most per frozen candidate policy version, only for a candidate that passed validation, logged and committed before the read happens. Rule: research/edge/academy-policy/PREREGISTRATION.md, section 6.",
+ "reads": [],
+ "priorUses": [
+  { "what": "ml/train.py exam_block: each trained scorer (not the decision policy) scored once on the exam pool after its walk-forward verdict was fixed; exam mechanical averages are printed in ml/models/report.md", "policy": false, "tunedOn": false },
+  { "what": "academy/gen/clock-compare.mjs and docs/academy/DATA-CLOCK.md section 4: mechanical 'usable' figures over train and exam together", "policy": false, "tunedOn": false },
+  { "what": "The page's 'Test on new setups' in temporary stores only: 3 gmp exam setups in the page audit's fixture window, 10 nq-open exam setups in the lead's live walk of 10 Nov 2026 (policy-1.0, with and without a lesson)", "policy": true, "setups": 13, "tunedOn": false }
+ ],
+ "note": "Zero reads: no candidate of the policy investigation of 10 Nov 2026 has been read against the exam pool."
+}
