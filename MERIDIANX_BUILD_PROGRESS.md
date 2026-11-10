@@ -7,8 +7,8 @@ modules is `docs/academy/ARCHITECTURE.md`.
 
 - **Branch:** `claude/website-display-xoyadz` (development; a draft PR, never merged to `main` without the owner: `main`
   auto-deploys to production).
-- **Current phase:** 1 to 7 built and verified on the development branch (see "Next (not done)" for the gaps); 8 (preview and
-  production) waits for the owner.
+- **Current phase:** 1 to 8 built and verified on the development branch; phase 9 (finish, validate, improve) in progress,
+  see its section below. Preview and production wait for the owner.
 
 ## Previous work stopped or preserved (10 Nov)
 
@@ -92,9 +92,38 @@ modules is `docs/academy/ARCHITECTURE.md`.
   at half and one and a half times the distance, targets at 1R / 2R / 3R, entry one candle later). Nothing is stored; no
   snapshot ever holds those candles; the card says that hindsight is for study, not evidence.
 
-## In progress
+## Phase 9: finish, validate, improve (10 Nov, in progress)
 
-Nothing is running. All module, page, dataset, training and research branches are merged into the development branch.
+Merged into the development branch and verified by the lead (suite, browser audit, live-candle review after each merge):
+
+- **Preview, safe and opt-in** (`docs/academy/PREVIEW.md`, `tests/academy-preview.test.mjs`): one named branch builds a
+  preview only when the project variable `MX_PREVIEW_BRANCH` is set; a preview keeps its Academy files under
+  `academy-preview/`. No preview exists: this session's Vercel connection sees the team but not the project.
+- **The analyst** (`docs/academy/LLM.md`, `api/_academy-analyst.js`, `assets/academy-analyst.js`): the optional language
+  model's second opinion on a decision the engine has already stored. Off without a key; checked in code; held by the engine's
+  hard gates; stored apart. Only ever run against the labelled fake: no real call, $0.
+- **Replay and Prove, proven** (`tests/academy-prove.test.mjs`): fresh decisions, a context reset, lesson retrieval and
+  application, unseen evaluation, conflicting lessons, deactivation, regression after new lessons; a no-lesson control
+  (`MXAC.proveWithControl`) and "Check earlier corrections" on the Lessons tab. An exam setup refuses a correction (409).
+- **Security and reliability** (`tests/academy-security.test.mjs`): every route enumerated from the handler's own tables,
+  validation, storage, look-ahead, isolation, pacing.
+- **Four defects found by that work, fixed by the lead:** a TAKE / FLIP lesson overruled by the final reward-to-risk gate or
+  the risk engine is now recorded as not applied; a store write step is all or nothing (earlier files are put back when a
+  later write fails); a lesson condition, feature or model metric named like an inherited object member is refused and the
+  matcher reads own properties only; both look-ahead guards know every field of the outcome file.
+- **The Council → Systems "sn is not defined" bug** fixed (`renderReplica`); the page smoke test now opens 13 inner Desk views.
+- **The lead's independent review on live candles** (`scripts/audit/academy-review.mjs`): 38 of 38 on the pre-clock data.
+- **Owner acceptance checklist**: `docs/academy/ACCEPTANCE.md`.
+
+Running or waiting:
+
+- **Clock correction** (branch `academy-clock`): rule certified against OANDA H1 (4,755 of 4,755 decisive symbol-weeks);
+  studies and Academy data re-run; the agent is finishing. Then: merge, verify, re-run the review.
+- **Policy investigation and model-training review**: start on the corrected data (pre-registered; the exam pool is read once
+  per frozen version and logged).
+
+Outside the Academy, same day: the mirror's replica book (PR #709, on `main`), the reconciliation tool, and Fred's connector
+(draft PR #710, applying ICT changes built and switched OFF behind two owner locks; not merged).
 
 ## Next (not done)
 
@@ -118,10 +147,10 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **914 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
-  before the Academy). Academy files: `tests/academy-replay.test.mjs` (23), `academy-core` (37), `academy-api` (21),
-  `academy-risk` (8), `academy-edges` (20), `academy-ml` (13), `academy-research` (19), `academy-ui`. Model parity:
-  `node ml/parity.mjs`.
+- Whole suite on the development branch: **998 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
+  914 at the end of phase 8, 719 before the Academy). Model parity: `node ml/parity.mjs`.
+- `node scripts/audit/academy.cjs`: **268 of 268**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
+  scripts/audit/academy-review.mjs` (live candles): **38 of 38**. The paragraph below describes the 225-check stage.
 - `node scripts/audit/academy.cjs`: **225 of 225** (run by the lead after the last merge; also green on GitHub's runner at the
   88-check stage). The loop part: the clock pauses on a real setup, the decision and
   its evidence are stored, a SELL corrected to WAIT becomes a lesson, the same-trade replay gives WAIT with the lesson applied
