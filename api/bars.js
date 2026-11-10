@@ -4,7 +4,8 @@
 // Without a token it answers 503 and the page falls back to its exchange feeds.
 const { SYM } = require('./_oanda');
 // tf: page keys plus OANDA's own names for the daily and weekly granularity (D / W), used by research scripts
-const TF = Object.assign(Object.create(null), { '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '1d': ['D', 86400, 60], D: ['D', 86400, 60], '1w': ['W', 604800, 60], W: ['W', 604800, 60] });
+// 2m / 10m / 30m / 2h (10 Nov 2026): ChronosTrade's extra timeframes; OANDA only (the Kraken comparison below has no such candles)
+const TF = Object.assign(Object.create(null), { '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '2m': ['M2', 120, 3], '10m': ['M10', 600, 8], '30m': ['M30', 1800, 15], '2h': ['H2', 7200, 25], '1d': ['D', 86400, 60], D: ['D', 86400, 60], '1w': ['W', 604800, 60], W: ['W', 604800, 60] });
 module.exports = async (req, res) => {
   const q = req.query || {};
   // src=kraken (7 Nov): the exact candles the council trader reads (Kraken OHLC; gold = PAXG), to compare with OANDA
