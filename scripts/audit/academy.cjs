@@ -16,6 +16,8 @@
 // "Replay this setup") → Research (studies, a study in full, the policy table, a notebook note) → Models → Costs → Audit →
 // Blind arena (the engine's answer stays hidden until the mentor's is stored; the outcome is read last) → Session (notes on a
 // missed opportunity and a right wait, verdicts, save, resume, end) → the rate limit (calls counted, a 429 waited out).
+// "What if" (alternatives on the candles after a decision): absent until the attempt is stored, then a table of the setup, the
+// engine's answer and fixed variants; no later candle ever reaches a snapshot; the later candles leave the chart on Continue.
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
@@ -126,6 +128,7 @@ async function startServer() {
     check('the replay loads real candles for 5m, 15m, 1h, 4h and 1d', await vis(p, '#chart canvas') && await vis(p, '#htf canvas') && ['5m', '15m', '1h', '4h', '1d'].every((tf) => reqs.some((r) => r.path === '/md/bars' && r.q.tf === tf)), (await txt(p, '#setup-err')) || (await txt(p, '#chart-meta')));
     check('the chart names its data source', /OANDA/.test(await txt(p, '#chart-meta')), await txt(p, '#chart-meta'));
     const t0 = await txt(p, '#clock-time');
+    check('what if: before any attempt is stored there is no card and no button (absent, not disabled)', !(await vis(p, '#whatif')) && (await p.$$('#whatif-run, #whatif-table, #whatif button')).length === 0 && (await p.evaluate(() => window.MXAC.whatIfLoads.length)) === 0);
 
     // ---- 3. keyboard: Space plays and pauses, the right arrow steps one candle ----
     await p.click('h1'); await p.keyboard.press('Space'); await p.waitForTimeout(450);
@@ -156,11 +159,34 @@ async function startServer() {
     let att = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts;
     check('the attempt is stored at once: n = 1, mode train, with the snapshot hash', att.length === 1 && att[0].n === 1 && att[0].mode === 'train' && /^[0-9a-f]{16}$/.test(att[0].snapshotHash) && att[0].decision.action === a1 && /^se_/.test(att[0].sessionId || ''), JSON.stringify(att.map((a) => [a.n, a.mode])));
     check('the candidate\'s levels can be placed on the chart (entry inside the price scale)', await p.evaluate((e) => !!window.MXAC.chartPoint(e), c1.entry));
+    check('what if: once the attempt is stored the card is there, and it warns that no verdict has been given yet', await vis(p, '#whatif-run') && /The attempt for this setup is stored/.test(await txt(p, '#whatif')) && /hindsight is for study, not evidence/.test(await txt(p, '#whatif')) && /nothing here is stored/.test(await txt(p, '#whatif')) && /You have not judged this decision yet/.test(await txt(p, '#whatif-hindsight')) && (await p.evaluate(() => window.MXAC.whatIfLoads.length)) === 0, (await txt(p, '#whatif')).slice(0, 120));
     await p.screenshot({ path: OUT + 'academy-1-decision.png', fullPage: true });
     // approve it and go on
     await p.click('#mentor [data-choice="approve"]'); await p.click('#m-save'); await p.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 });
     check('an approval is stored and a lesson draft is offered as optional', /optional/.test(await txt(p, '#lesson h2')) && await vis(p, '#prove-run'));
+    // what if, on the first setup: the table, nothing near a snapshot, the later candles on the chart only on request
+    {
+      const before = await p.evaluate(() => { window.__snap = window.MXAC.lastSnapshot; return { n: window.MXAC.checks.snapshots, f: window.MXAC.checks.future }; }), mw = reqs.length, storedFirst = reqs.slice(0, mw).some((r) => r.body && r.body.action === 'attempt' && r.body.attempt.candidateId === c1.id);
+      check('what if: after a verdict the hindsight warning is gone', (await p.$$('#whatif-hindsight')).length === 0 && await vis(p, '#whatif-run'));
+      await p.click('#whatif-run'); await p.waitForSelector('#whatif-table', { timeout: 30000 });
+      const wrows = await p.$$eval('#whatif-table tbody tr', (l) => l.map((r) => [r.dataset.alt, r.dataset.filled, ...[...r.cells].map((c) => c.textContent.trim())]));
+      const keys = wrows.map((r) => r[0]), must = ['setup', 'stop-half', 'stop-wide', 'target-1r', 'target-2r', 'target-3r', 'late'];
+      check('what if: one row an alternative: the setup, the engine\'s answer when it differs, then the fixed variants', keys[0] === 'setup' && must.every((k) => keys.includes(k)) && keys.length === must.length + (a1 === 'WAIT' ? 1 : 0) && (a1 !== 'WAIT' || (keys[1] === 'engine' && /WAIT/.test(wrows[1][2]) && /^\+?0\.00R$/.test(wrows[1][5]))), keys.join(','));
+      check('what if: each row says filled or not, net R after costs, the exit, best and worst in R and the exit time', wrows.every((r) => (r[1] === 'yes' ? /^filled at [\d,.]+$/.test(r[4]) && /^[+-]?\d+\.\d\dR$/.test(r[5]) && /^(stop|target|still open at the last candle read)$/.test(r[6]) && /^\+?\d+\.\d\dR$/.test(r[7]) && /^-?\d+\.\d\dR$/.test(r[8]) && /^\d{4}-\d\d-\d\d \d\d:\d\d$/.test(r[9]) : /^(not filled|no trade)$/.test(r[4]) && /never filled|no trade|not valid/.test(r[6]))) && wrows.filter((r) => r[1] === 'yes').length >= 4, JSON.stringify(wrows[0]));
+      const wl = await p.evaluate(() => window.MXAC.whatIfLoads);
+      check('what if: the candles asked for start at the decision time, on the signal timeframe, and only after the attempt was stored', wl.length === 1 && wl[0].candidateId === c1.id && /^at_/.test(wl[0].attemptId) && wl[0].from === c1.t && wl[0].tf === '5m' && wl[0].to === c1.t + 97 * 300 && storedFirst && calls(reqs, mw, 'owner').map(what).join() === 'get=outcome', JSON.stringify(wl));
+      check('what if: the conservative rules, the costs and the candles read are stated under the table', /when one candle touches both the stop and the target, the stop is taken/.test(await txt(p, '#whatif-rules')) && /a stop that gaps is filled at the open \(worse\)/.test(await txt(p, '#whatif-rules')) && /Costs: 0\.15 a round trip/.test(await txt(p, '#whatif-rules')) && /^Candles: \d+ of 5m from .+ UTC to .+ UTC \(OANDA/.test(await txt(p, '#whatif-window')) && /maximum hold \(8 hours\)/.test(await txt(p, '#whatif-window')), await txt(p, '#whatif-window'));
+      const cmpNote = await txt(p, '#whatif-compare'), match = await p.getAttribute('#whatif-compare', 'data-match');
+      check('what if: the first row is compared with the stored result, and a difference is said plainly', (match === 'yes' && /^The first row agrees with the stored result/.test(cmpNote)) || (match === 'no' && /does NOT match the stored result/.test(cmpNote) && /the candles differ/.test(cmpNote)), `${match}: ${cmpNote.slice(0, 160)}`);
+      const after = await p.evaluate(() => ({ same: window.__snap === window.MXAC.lastSnapshot, n: window.MXAC.checks.snapshots, f: window.MXAC.checks.future, sec: { '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400 }, late: Object.keys(window.MXAC.lastSnapshot.bars).reduce((a, k) => a + window.MXAC.lastSnapshot.bars[k].filter((b) => b.time + ({ '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400 })[k] > window.MXAC.lastSnapshot.t).length, 0) }));
+      check('what if: no snapshot was made or touched: the last one is the same object, the count is unchanged, no future bar', after.same && after.n === before.n && after.f === 0 && before.f === 0 && after.late === 0, JSON.stringify({ same: after.same, n: [before.n, after.n], f: after.f }));
+      check('what if: the later candles are not on the chart until asked for', (await p.evaluate(() => window.MXAC.laterShown())) === 0 && (await p.getAttribute('#whatif-show', 'aria-pressed')) === 'false');
+      await p.click('#whatif-show'); await p.waitForFunction(() => window.MXAC.laterShown() > 0, null, { timeout: 15000 }).catch(() => {});
+      check('what if: "Show these candles on the chart" is a separate step and marks them as after the decision', (await p.evaluate(() => window.MXAC.laterShown())) > 10 && (await p.getAttribute('#whatif-show', 'aria-pressed')) === 'true' && /came AFTER the decision\. They go away when you continue\./.test(await txt(p, '#whatif-shown')) && (await p.evaluate(() => window.MXAC.checks.future)) === 0, await txt(p, '#whatif-shown'));
+      await p.screenshot({ path: OUT + 'academy-1b-whatif.png', fullPage: true });
+    }
     await goOn(p);
+    check('what if: on Continue the later candles leave the chart and the card goes away', (await p.evaluate(() => window.MXAC.laterShown())) === 0 && !(await vis(p, '#whatif')) && (await p.$$('#whatif-run')).length === 0);
 
     // ---- 5. the next setup the engine takes: correct it to WAIT ----
     let cur = null, first = null, eventWait = '';
@@ -229,6 +255,9 @@ async function startServer() {
     check('the stored attempts are n = 1 (train) and n = 2 (replay-same) on one snapshot hash', att.length === 2 && att[0].n === 1 && att[1].n === 2 && att[0].mode === 'train' && att[1].mode === 'replay-same' && att[0].snapshotHash === att[1].snapshotHash && att[0].decision.action === first && att[1].decision.action === 'WAIT' && (await p.$$eval('#attempts-table tbody tr', (l) => l.map((r) => r.dataset.n).join(','))) === '1,2', JSON.stringify(att.map((a) => [a.n, a.mode, a.decision.action])));
     const stats = (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons[0].stats;
     check('the lesson\'s counters are updated (applied 1, same-trade replay passed 1)', stats.applied === 1 && stats.replayPass === 1 && stats.replayFail === 0, JSON.stringify(stats));
+    await p.click('#whatif-run'); await p.waitForSelector('#whatif-table', { timeout: 30000 });
+    { const k7 = await p.$$eval('#whatif-table tbody tr', (l) => l.map((r) => r.dataset.alt + ':' + r.cells[0].textContent.trim()));
+      check('what if: after the lesson the engine\'s WAIT is its own row (0R) beside the setup it no longer takes', k7.length === 8 && /^setup:/.test(k7[0]) && k7[1] === 'engine:The engine\'s answer: WAIT' && !k7.some((x) => /^mentor:/.test(x)), k7.slice(0, 3).join(' | ')); }
     await p.click('#prove-run'); await p.waitForFunction(() => document.querySelectorAll('#attempts-table tbody tr').length === 3, null, { timeout: 20000 }).catch(() => {});
     check('the replay can be repeated (attempt 3)', (await p.$$('#attempts-table tbody tr')).length === 3 && (await p.getAttribute('#prove-verdict', 'data-verdict')) === 'learned');
     await p.screenshot({ path: OUT + 'academy-2-prove.png', fullPage: true });
@@ -254,6 +283,13 @@ async function startServer() {
     check('the new-setup panel shows matched, changed and net R with / without, with n', await vis(p, '#exam-out') && (await txt(p, '#exam-n')).startsWith(String(want)) && (await txt(p, '#exam-matched')).startsWith(`${matched} of ${want}`) && (await txt(p, '#exam-changed')).startsWith(`${changed} of ${want}`) && /R/.test(await txt(p, '#exam-with')) && /n = \d+ graded/.test(sum), sum);
     check('under 20 graded setups it says "too few to judge"', /Too few to judge/.test(await txt(p, '#exam-note')) && /separate from same-trade replays/.test(await txt(p, '#exam-note')), await txt(p, '#exam-note'));
     check('a table lists the tested setups', (await p.$$('#exam-table tbody tr')).length === want);
+    {
+      const wl0 = await p.evaluate(() => window.MXAC.whatIfLoads.length), xr = ex[0], mx = reqs.length;
+      check('what if on a tested setup: offered in the results only (both answers stored), and no later candles were asked for during the test', (await p.$$('#exam-table [data-whatif]')).length === want && !(await vis(p, '#exam-whatif')) && wl0 >= 1 && !(await p.evaluate((ids) => window.MXAC.whatIfLoads.some((x) => ids.includes(x.candidateId)), ex.map((e) => e.candidateId))));
+      await p.click(`#exam-table [data-whatif="${xr.candidateId}"]`); await p.click('#xwhatif-run'); await p.waitForSelector('#xwhatif-table, #xwhatif-none', { timeout: 30000 });
+      const xl = (await p.evaluate(() => window.MXAC.whatIfLoads)).pop(), xkeys = await p.$$eval('#xwhatif-table tbody tr', (l) => l.map((r) => r.dataset.alt));
+      check('what if on a tested setup: its later candles are read only now, after its attempt and its result were stored; the stored result is beside it', xl.candidateId === xr.candidateId && xl.attemptId === xr.attemptId && xl.from >= xr.t && xkeys[0] === 'setup' && xkeys.includes('target-2r') && /stored/.test(await txt(p, '#xwhatif-compare')) && reqs.slice(0, mx).some((r) => r.body && r.body.action === 'exam.result' && r.body.result.candidateId === xr.candidateId) && !calls(reqs, mx, 'owner').some((r) => r.body) && (await p.$$('#xwhatif-show')).length === 0, `${JSON.stringify(xl)} ${xkeys.join(',')}`);
+    }
     check('in this recorded window the lesson matches and changes at least one unseen setup', matched >= 1 && changed >= 1, `matched ${matched}, changed ${changed}`);
     check('the exam pool is used up: an exam setup is never shown twice', (await api(p, `get=candidates&edge=${EDGE}&pool=exam&limit=5000`)).candidates.length === exams0.length - want);
     await p.screenshot({ path: OUT + 'academy-3-exam.png', fullPage: true });
@@ -382,6 +418,7 @@ async function startServer() {
     const bAtt = calls(reqs, mb, 'owner').filter((r) => r.body && r.body.action === 'attempt');
     const hid = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.pop();
     check('Blind arena: the replay stops on the first train setup and the engine\'s answer is stored hidden', (await txt(p, '#bl-time')) === stamp(c1.t) && bAtt.length === 1 && bAtt[0].body.attempt.mode === 'blind' && bAtt[0].body.attempt.candidateId === c1.id && hid.mode === 'blind' && hid.hidden === true && hid.decision === null, `${await txt(p, '#bl-time')} ${JSON.stringify([hid.mode, hid.hidden])}`);
+    check('Blind arena: no "What if" before the mentor has answered (absent, not disabled)', (await p.$$('#bl-whatif-run, #bl-whatif-box, #bl-whatif-table')).length === 0);
     check('Blind arena: nothing of the engine\'s answer is on the page, and no outcome has been asked for', await vis(p, '#bl-hidden') && !(await vis(p, '#bl-reveal')) && (await p.$$('#bl-engine, #bl-compare')).length === 0 && !calls(reqs, mb, 'owner').some((r) => r.q.get === 'outcome') && (await api(p, `get=blind&edge=${EDGE}`)).blind.length === 0);
     check('Blind arena: a setup trained on before is labelled recall', /recall, not a fresh decision/.test(await txt(p, '#bl-recall')));
     await p.click('#bl-answer [data-choice="WAIT"]');
@@ -392,6 +429,12 @@ async function startServer() {
     check('Blind arena: both answers side by side, the engine\'s now revealed', (await txt(p, '#bl-you')) === 'WAIT' && (await txt(p, '#bl-engine')) === eng1.decision.action && eng1.hidden !== true && /^\|You\|The engine$/.test(await p.$eval('#bl-compare thead tr', (r) => [...r.cells].map((c) => c.textContent).join('|'))), `${await txt(p, '#bl-you')} / ${await txt(p, '#bl-engine')}`);
     check('Blind arena: the result is read after both answers and says who was closer', /Result, read after both answers were stored: /.test(await txt(p, '#bl-outcome')) && ['mentor', 'engine', 'tie', 'none'].includes(await p.getAttribute('#bl-closer', 'data-closer')) && /(closer to the outcome|A tie|cannot be judged)/.test(await txt(p, '#bl-closer')), `${await txt(p, '#bl-outcome')} | ${await txt(p, '#bl-closer')}`);
     check('Blind arena: the running table carries its n and says "too few to judge"', (await txt(p, '#bl-n')).startsWith('1') && /n = \d graded/.test(await txt(p, '#bl-mentor-r')) && /Too few to judge/.test(await txt(p, '#bl-table-note')) && (await p.$$('#bl-rows tbody tr')).length === 1, await txt(p, '#bl-table'));
+    {
+      const nb = await p.evaluate(() => window.MXAC.whatIfLoads.length); await p.click('#bl-whatif-run'); await p.waitForSelector('#bl-whatif-table', { timeout: 30000 });
+      const bk = await p.$$eval('#bl-whatif-table tbody tr', (l) => l.map((r) => r.dataset.alt + ':' + r.cells[0].textContent.trim())), bl = (await p.evaluate(() => window.MXAC.whatIfLoads)).pop();
+      check('Blind arena: after both answers are stored the same "What if" card is offered, with your answer as a row', (await p.evaluate(() => window.MXAC.whatIfLoads.length)) === nb + 1 && bl.candidateId === c1.id && bk[0].startsWith('setup:') && bk.some((x) => /^(mentor:Your answer: WAIT|engine:The engine's answer: WAIT)$/.test(x)) && bk.length >= 8 && /stored/.test(await txt(p, '#bl-whatif-compare')), bk.slice(0, 3).join(' | '));
+      await p.click('#bl-whatif-show'); check('Blind arena: the later candles can be shown on its chart, as a separate step', (await p.getAttribute('#bl-whatif-show', 'aria-pressed')) === 'true' && /came AFTER the decision/.test(await txt(p, '#bl-whatif-shown')) && (await p.evaluate(() => window.MXAC.checks.future)) === 0);
+    }
     await p.click('#bl-next'); await p.waitForSelector('#bl-save', { timeout: 60000 }); await p.waitForFunction(() => /your answer first/.test(document.getElementById('bl-state').textContent), null, { timeout: 20000 });
     const c2 = cands[1], own = c2.side === 'buy' ? 'BUY' : 'SELL'; await p.click(`#bl-answer [data-choice="${own}"]`);
     check('Blind arena: a BUY / SELL answer starts from the setup\'s own levels, stop included', +(await p.inputValue('#bl-entry')) === c2.entry && +(await p.inputValue('#bl-stop')) === c2.stop, `${await p.inputValue('#bl-entry')} / ${await p.inputValue('#bl-stop')}`);
@@ -491,6 +534,12 @@ async function startServer() {
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on a decision with the mentor controls open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (decision)', small.length === 0, small.slice(0, 4).join(' ; '));
       taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (decision)', taps.length === 0, taps.slice(0, 5).join(' ; '));
+      await p.tap('#whatif-run'); await p.waitForSelector('#whatif-table', { timeout: 30000 }); await p.evaluate(() => document.getElementById('whatif').scrollIntoView());
+      w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll with the "What if" table open', w <= 390, w);
+      small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (what if)', small.length === 0, small.slice(0, 4).join(' ; '));
+      taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (what if)', taps.length === 0, taps.slice(0, 5).join(' ; '));
+      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await p.evaluate(CONTRAST); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       const order = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
       check('390 px: the panels stack and the chart stays first', order[0] < order[1] && order[1] < order[2] && order[2] < order[3], order.join(' < '));
       check('reduced motion is respected (no transition left running)', await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.btn')).transitionDuration) <= 0.001));
