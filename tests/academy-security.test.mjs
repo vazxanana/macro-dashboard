@@ -394,7 +394,7 @@ test('look-ahead: the API hands out no outcome before the attempt, hides a blind
 
 // ==== isolation ==============================================================================================================
 const walk = (d, ok) => (fs.existsSync(path.join(ROOT, d)) ? fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? (e.name === '__pycache__' || e.name === 'node_modules' ? [] : walk(d + '/' + e.name, ok)) : ok.test(e.name) ? [d + '/' + e.name] : [])) : []);
-const RUNTIME = ['academy.html', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js', 'api/_academy-analyst.js', 'scripts/academy-dev.mjs', 'scripts/academy-fake-llm.cjs', ...walk('assets', /^academy[\w-]*\.(js|css)$/), ...walk('ml', /\.(py|mjs|js|sh|toml|txt|cfg|ya?ml)$/)];
+const RUNTIME = ['academy.html', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js', 'api/_academy-analyst.js', 'api/_academy-connector.js', 'api/academy-mcp.js', 'scripts/academy-dev.mjs', 'scripts/academy-fake-llm.cjs', ...walk('assets', /^academy[\w-]*\.(js|css)$/), ...walk('ml', /\.(py|mjs|js|sh|toml|txt|cfg|ya?ml)$/)];
 const GENERATORS = walk('academy', /\.(mjs|js)$/);
 const ACADEMY_FILES = [...RUNTIME, ...GENERATORS];
 test('isolation: no file of the Academy references the trader, the mirror, a broker, an order call, the council-data writer or a production write token', () => {
@@ -428,7 +428,7 @@ test('isolation: no file of the Academy references the trader, the mirror, a bro
   const blob = ACADEMY_FILES.filter((f) => /BLOB_READ_WRITE_TOKEN/.test(src(f))); assert.deepEqual(blob.sort(), ['api/_academy-store.js', 'api/academy.js']);
   // the session module is read for the owner check and for nothing else
   assert.deepEqual([...src('api/academy.js').matchAll(/\bS\.(\w+)/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort(), ['defaultDeps', 'fromRequest', 'sameOrigin']);
-  assert.deepEqual([...src('api/academy.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:fs', 'node:path', 'node:crypto', 'node:url', './_session.js', './_academy-store.js', './_academy-llm.js', './_academy-analyst.js']);
+  assert.deepEqual([...src('api/academy.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:fs', 'node:path', 'node:crypto', 'node:url', './_session.js', './_academy-store.js', './_academy-llm.js', './_academy-connector.js', './_academy-analyst.js']);
   // the analyst module reads the decision core (the hard gates it holds an answer to) and nothing else; the adapter reads nothing
   assert.deepEqual([...src('api/_academy-analyst.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['../assets/academy-core.js']); assert.deepEqual([...src('api/_academy-llm.js').matchAll(/require\('([^']+)'\)/g)].map((m) => m[1]), ['node:crypto']);
   // the network: the page talks to its own API and the candle proxy; the API talks to the Blob store and, only when the owner sets a key, to the language-model address

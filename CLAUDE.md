@@ -31,7 +31,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
@@ -1389,6 +1389,16 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   made-up answer; no outcome field or later bar may reach its request; its answer is checked in code and held by the engine's
   hard gates; stored apart (`engine: 'language-model'`, files under `analyst/`) and never counted with the engine's numbers.
   Only ever run against the labelled fake (`node scripts/academy-dev.mjs --fake-llm`): no real provider call was made.
+- **The assistant connector** (10 Nov 2026, owner: the analyst should be the owner's own assistant, "no need API";
+  `docs/academy/LLM.md` section 9): with no provider key, `POST analyse` QUEUES the question (`analyst/queue.json`, 25 at most)
+  instead of calling anyone, and the owner's assistant answers it through `api/academy-mcp.js` (`/api/academy-mcp/<key>`, MCP
+  JSON-RPC like `api/mcp.js`; four tools: `academy_guide`, `academy_pending`, `academy_question`, `academy_answer`). The key
+  (`api/_academy-connector.js`) is derived from the session secret and shown to the owner's session only (`?get=connector`,
+  the page's "Set up the connector"); `ACADEMY_CONNECTOR=off` / `_SALT` / `_SECRET` switch, rotate or replace it. An answer
+  goes through the same `parseAnswer` and the same write step as a provider's (`analystStore`), is stored apart with provider
+  `connector` at cost 0, and three refused tries drop the question. The connector reads queued questions and sends answers,
+  nothing else: never widen it to results, lessons, the store or any other route. With a provider key set it is not used.
+  Tests: `tests/academy-connector.test.mjs`; audit section D (`--connector` on the dev server).
 - **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
   a run reads candidates, lessons, calendar and past cases once, so a train decision is one call. Keep new code on `ctx.api`.
 - **Policy investigation** (10 Nov 2026, `research/edge/academy-policy/`, pre-registered; `docs/academy/RESEARCH.md` section 7):

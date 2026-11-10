@@ -10,6 +10,10 @@
       "destination": "/api/mcp?key=:key"
     },
     {
+      "source": "/api/academy-mcp/:key",
+      "destination": "/api/academy-mcp?key=:key"
+    },
+    {
       "source": "/cdata/:path*",
       "destination": "/api/data?p=:path*"
     },
@@ -262,6 +266,10 @@
     },
     "api/academy.js": {
       "maxDuration": 60,
+      "includeFiles": "{academy/edges.mjs,academy/data/**,ml/models/index.json,assets/academy-core.js}"
+    },
+    "api/academy-mcp.js": {
+      "maxDuration": 30,
       "includeFiles": "{academy/edges.mjs,academy/data/**,ml/models/index.json,assets/academy-core.js}"
     }
   }

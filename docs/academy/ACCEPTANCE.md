@@ -59,9 +59,10 @@ Any of these:
 - [ ] **Research:** the studies list opens; the counts say how many tests would pass by chance. Add one notebook note.
 - [ ] **Models:** every scorer shows its walk-forward numbers and "rejected challenger"; nothing is promoted.
 - [ ] **Costs:** "Off. No key is set. Spent: $0.00" (unless you set a language-model key yourself).
-- [ ] **The analyst** (the written second opinion under a stored decision): without a key it says it is off and asks
-      nothing. To see it work without spending anything, run the local server with `--fake-llm`: a banner says the answers
-      are test answers, and the analyst's answer sits beside the engine's, never in its place (`docs/academy/LLM.md`).
+- [ ] **The analyst** (the written second opinion under a stored decision), through your own assistant: press "Set up the
+      connector", paste the address into your assistant app as a custom connector, press "Ask the analyst" (the block says the
+      question waits), tell the assistant "Answer my Academy questions", then press "Check for the answer". The answer sits
+      beside the engine's, never in its place, marked as from your own assistant, at no cost (`docs/academy/LLM.md` section 9).
 - [ ] **Audit:** every save you just made is a row with its time.
 
 ## 5. The honest numbers

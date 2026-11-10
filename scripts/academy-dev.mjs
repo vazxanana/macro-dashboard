@@ -7,6 +7,9 @@
 //   node scripts/academy-dev.mjs --fake-llm                        the analyst answers from a FAKE provider (scripts/academy-fake-llm.cjs:
 //                                                                  a fixed rule, not a language model, no network, no cost). It is injected
 //                                                                  into the handler here and nowhere else; the page shows a FAKE banner
+//   node scripts/academy-dev.mjs --connector                       the analyst's questions wait for your own assistant: this server gets a
+//                                                                  LOCAL secret (so the connector has a key) and serves
+//                                                                  /api/academy-mcp/<key> through the real handler. No provider, no cost
 //   node --use-env-proxy scripts/academy-dev.mjs --record [--edge gmp --from 2024-04-23 --to 2024-05-09]
 //                                                                  records the fixtures ONCE from the live API, then exits
 //   PORT=8770  ACADEMY_STORE_DIR=<dir>  (default: a new folder under the system temp directory, printed at start)
@@ -87,7 +90,9 @@ const DATA = require('../api/academy.js')._t.fileData(ROOT);
 // --fake-llm: the fake provider reaches the handler as an injected dependency (its settings, its fetch, its label). The server's
 // own environment is never read for it and the deployed function is called without dependencies, so nothing else can switch it on.
 const FAKE = flag('fake-llm') ? require('./academy-fake-llm.cjs').make() : null;
-const DEPS = { env: { ACADEMY_STORE_DIR: STORE, ...(FAKE ? FAKE.env : {}) }, who: async () => (GUEST ? null : OWNER), sameOrigin: () => true, data: DATA, ...(FAKE ? { fetch: FAKE.fetch, provider: FAKE.provider } : {}) };
+// --connector: a connector secret that exists only in this process, so the connector has a key here (the deployed site uses its own)
+const CONNECTOR = flag('connector') && !FAKE;
+const DEPS = { env: { ACADEMY_STORE_DIR: STORE, ...(FAKE ? FAKE.env : {}), ...(CONNECTOR ? { ACADEMY_CONNECTOR_SECRET: 'local-dev-server-only-secret-0000' } : {}) }, who: async () => (GUEST ? null : OWNER), sameOrigin: () => true, data: DATA, ...(FAKE ? { fetch: FAKE.fetch, provider: FAKE.provider } : {}) };
 // fixture mode: only the LIST of setups (?get=candidates) is narrowed to the recorded window. Everything else reads the whole
 // generated files, so "similar past cases" (?get=history) are the same rows as on the live site.
 function listDeps() {
@@ -97,6 +102,13 @@ function listDeps() {
 const LIST_DEPS = listDeps();
 function readBody(req, max = 300 * 1024) {
   return new Promise((resolve, reject) => { const parts = []; let n = 0; req.on('data', (c) => { n += c.length; if (n > max) { reject(new Error('too large')); req.destroy(); } else parts.push(c); }); req.on('end', () => resolve(Buffer.concat(parts).toString('utf8'))); req.on('error', reject); });
+}
+// the assistant connector, through the real handler: /api/academy-mcp/<key> (the rewrite of vercel.json) or ?key=
+async function connector(req, res, url) {
+  let body; if (req.method === 'POST') { try { body = await readBody(req); } catch (e) { return json(res, 413, { error: 'the body is too large' }); } }
+  const key = url.pathname.split('/')[3] || url.searchParams.get('key') || '';
+  const vres = { setHeader: (k, v) => res.setHeader(k, v), status(c) { res.statusCode = c; return vres; }, json(o) { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(o)); return vres; }, end() { res.end(); return vres; } };
+  await require('../api/academy-mcp.js').handle({ method: req.method, headers: req.headers, query: { key }, body }, vres, { env: DEPS.env, data: DATA });
 }
 async function academy(req, res, url) {
   let body; if (req.method === 'POST') { try { body = await readBody(req); } catch (e) { return json(res, 413, { error: 'the body is too large' }); } }
@@ -124,6 +136,7 @@ async function serve(req, res) {
   try {
     if (url.pathname === '/api/me') return json(res, 200, { account: GUEST ? null : OWNER });
     if (url.pathname === '/api/academy') return await academy(req, res, url);
+    if (url.pathname === '/api/academy-mcp' || url.pathname.startsWith('/api/academy-mcp/')) return await connector(req, res, url);
     if (url.pathname === '/md/bars') return await bars(url, res);
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/md/') || url.pathname.startsWith('/cdata/')) return json(res, 404, { error: 'not served by the Academy dev server' });
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'GET', 'text/plain; charset=utf-8');
@@ -139,6 +152,6 @@ else {
     console.log(`Academy dev server: http://127.0.0.1:${PORT}/academy`);
     console.log(`  candles: ${LIVE ? 'LIVE through ' + LIVE_BASE + '/md/bars' : m ? `recorded ${m.sym} candles, setups from ${MXAC.isoDay(m.from)} to ${MXAC.isoDay(m.to - 86400)} (edge ${m.edge}: ${m.candidates.train} train, ${m.candidates.exam} exam)` : 'NO fixtures recorded (run with --record once)'}`);
     console.log(`  store:   ${STORE}${GUEST ? '\n  signed out (--guest)' : ''}`);
-    console.log(`  analyst: ${FAKE ? 'FAKE PROVIDER (--fake-llm): test answers by a fixed rule, not a language model, no network' : 'off (no key is read here; --fake-llm serves labelled test answers)'}`);
+    console.log(`  analyst: ${FAKE ? 'FAKE PROVIDER (--fake-llm): test answers by a fixed rule, not a language model, no network' : CONNECTOR ? 'through the connector (--connector): questions wait for your own assistant; the address is on the page under "Set up the connector"' : 'off (no key is read here; --fake-llm serves labelled test answers, --connector queues questions for your own assistant)'}`);
   });
 }

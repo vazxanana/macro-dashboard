@@ -173,9 +173,9 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **1,062 passing, 0 failing, 0 todo** (with the connector's tests from `main`) (`node --test tests/*.test.mjs tests/*.test.js`;
+- Whole suite on the development branch: **1,073 passing, 0 failing, 0 todo** (`node --test tests/*.test.mjs tests/*.test.js`;
   914 at the end of phase 8, 719 before the Academy). Model parity: `node ml/parity.mjs`.
-- `node scripts/audit/academy.cjs`: **270 of 270**, then the analyst block **36 of 36** (fake provider). `node --use-env-proxy
+- `node scripts/audit/academy.cjs`: **270 of 270**, then the analyst block **48 of 48** (fake provider, and the connector with a scripted assistant). `node --use-env-proxy
   scripts/audit/academy-review.mjs` (live candles): **41 of 41**. The paragraph below describes the 225-check stage.
 - `node scripts/audit/academy.cjs`: **225 of 225** (run by the lead after the last merge; also green on GitHub's runner at the
   88-check stage). The loop part: the clock pauses on a real setup, the decision and
@@ -213,8 +213,10 @@ weights change, no look-ahead by construction, private Blob persistence, full is
   97.36 % coverage); 2023 is "unreliable" for both (about 87 %); the NAS100 09:30–11:00 M1 window is "unreliable".
 - `gmp` (gold momentum pullback) candidates come from the robustness study's port, which departs from live (one position at
   a time, $0.15 cost); live it is a test / shadow system. `replica` has only 50 test setups and none after 27 Apr 2026.
-- No language-model API key exists in the project. The adapter is built and tested against a fake; it stays off (cost: $0)
-  until the owner sets a key and a budget. **API money spent so far: $0.**
+- No language-model API key exists in the project, and none is needed: since 10 Nov 2026 the analyst's questions are queued
+  and answered by the owner's own assistant through the connector (`docs/academy/LLM.md` section 9; no cost from this site).
+  The paid-provider path stays built and off. Neither has met a real model yet: the provider path ran against a fake, the
+  connector against a scripted assistant. **API money spent so far: $0.**
 - Preview deployments of branches are skipped by `scripts/vercel-ignore.sh`; a preview URL needs the owner's say-so.
 
 ## Next executable step

@@ -456,7 +456,8 @@ test('isolation: the Academy API and risk engine hold no reference to the counci
   for (const f of ['assets/academy-risk.js', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js']) { const m = src(f).match(banned); assert.equal(m, null, `${f} mentions ${m && m[0]}`); }
   // what each file loads: the API its own modules and the session check; the risk engine only the replay lab's rule sets
   const reqs = (f) => [...src(f).matchAll(/require\(\s*['"]([^'"]+)['"]\s*\)/g)].map((m) => m[1]).sort();
-  assert.deepEqual(reqs('api/academy.js'), ['./_academy-analyst.js', './_academy-llm.js', './_academy-store.js', './_session.js', 'node:crypto', 'node:fs', 'node:path', 'node:url']);
+  assert.deepEqual(reqs('api/academy.js'), ['./_academy-analyst.js', './_academy-connector.js', './_academy-llm.js', './_academy-store.js', './_session.js', 'node:crypto', 'node:fs', 'node:path', 'node:url']);
+  assert.deepEqual(reqs('api/_academy-connector.js'), ['./_session.js', 'node:crypto']);   // the connector's key comes from the session secret, nothing else
   assert.deepEqual(reqs('assets/academy-risk.js'), ['./backtest-engine.js']);
   assert.deepEqual(reqs('api/_academy-llm.js'), ['node:crypto']);
   assert.deepEqual(reqs('api/_academy-store.js'), ['@vercel/blob', 'node:fs', 'node:path']);
