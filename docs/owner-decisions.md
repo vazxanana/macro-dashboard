@@ -337,3 +337,23 @@ or config was changed. The items below are what that work leaves for the owner.
   (unverified; it also changed `council/veteran.mjs` staleness and added tests). This is not the HistData clock and it
   changes what a live member computes, so it was left for the owner.
 - **Recommended: yes, as its own reviewed change with tests.** Paper only either way.
+
+## Mosha as you expected it (10 Nov 2026)
+
+### [ ] 27. Your Mosha trade, tested as a fixed rule: it fails. Correct my reading, or keep it as your own discretion?
+
+- **What you said.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
+  "This is how I was expecting Mosha to work."
+- **What the live Mosha BO does instead.** It trades WITH the H4 breakout on M15 and only in the weekly direction. It could
+  not have taken your trade and has placed no live trade since 4 Nov.
+- **What I tested** (`research/edge/mosha-level/`, pre-registered): tap of an H4 swing high or low, M5 break of the last low
+  before the tap, limit at the next M5 break's zone, stop just past it, target the H4 barrier. The detector finds your own
+  trade. Taken every time on gold, 2020 to October 2026: 365 trades, **−0.35R a trade after costs, t −3.10**, one winner in
+  seven. Not an edge in this form.
+- **The choices in my reading you may want to correct:** which H4 levels count (I took every swing of the last 30 days,
+  both sides); what the low before the tap is (a three-candle swing); where the stop goes ($0.30 past the break candle's
+  base, median $2.77); what the barrier is (the nearest H4 engulf zone).
+- **Options.** (a) Tell me what makes you take one tap and skip another; I register that as a new version and test it.
+  (b) Keep the pattern as your own discretionary trade and practise it in ChronosTrade or the Academy. (c) Leave it.
+- **Recommended: (a) if you can name the filter, else (b).** Nothing live changes on any option; the live Mosha BO is
+  untouched.

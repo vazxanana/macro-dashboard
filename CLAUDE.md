@@ -1460,3 +1460,16 @@ UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 3
 - **Academy**: `docs/academy/DATA-CLOCK.md`. **Baselines** `council/decay-base.json`, `council/expect-base.json`,
   `council/event-base.json` were rebuilt with their own scripts in one commit (owner item 19). Stale caches (`*-m1.bin`,
   `xau_m1.bin`) made before 10 Nov hold old times: delete them before any re-run.
+
+## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
+The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
+Mosha BO (H4 BO, H1 BO against, M15 BO back, weekly direction) is a different trade: it could not have taken it (wrong side, M15
+not M5, weekly filter against) and has placed no live trade since 4 Nov. `research/edge/mosha-level/` (PREREGISTRATION.md
+committed first, then `run.mjs`, RESULT.md, result.json) writes the owner's trade down as one rule in the direction rule book's
+words: tap of a live H4 swing high or low, M5 close through the last three-candle swing made before the tap (external BO), the
+next M5 swing broken by a close, limit at that broken level, stop $0.30 past the break candle's base, target the nearest live H4
+engulf zone (the barrier, at least 2R away), one at a time, $0.30 cost, fills on M1. The detector finds the owner's own trade on the
+council's candles (`node run.mjs example`). **Verdict: FAIL**: 365 trades 2020 to October 2026, -0.35R a trade after costs, t -3.10,
+win rate 14.5 % (in sample -0.50R, out of sample -0.12R; 312 of 365 stopped, median stop $2.77); the three labelled variants lose
+too. It is my reading of one example, taken every time: a corrected reading is a new pre-registration (docs/owner-decisions.md item
+27). Nothing live changed; the live Mosha BO is untouched. Tests: `tests/mosha-level.test.mjs`.
