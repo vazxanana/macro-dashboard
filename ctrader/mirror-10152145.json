@@ -4764,6 +4764,59 @@
     "rr": 2.37,
     "amended": 1,
     "amendedAt": "2026-11-10T13:04:55.000Z"
+   },
+   "xau-scalp-1794315817": {
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-10T13:07:39.000Z",
+    "councilEntry": 4075.615,
+    "stop": 4080.0514285714285,
+    "t1": 4068.715,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 4075.61,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 4.44,
+    "margin": 8.15,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 4075.65,
+    "slipR": -0.008,
+    "lagSec": 159,
+    "positionId": "48039921",
+    "volume": 100,
+    "status": "open"
+   },
+   "gbpusd-intraday-1794315817": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "intraday",
+    "openedAt": "2026-11-10T13:07:39.000Z",
+    "councilEntry": 1.34208,
+    "stop": 1.34276,
+    "t1": 1.32747,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.34208,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.98,
+    "margin": 5.37,
+    "shadow": true,
+    "fillPrice": 1.34224,
+    "slipR": -0.235,
+    "lagSec": 242,
+    "positionId": "48039928",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -4771,7 +4824,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9902.52 · 26 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9902.52 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4790,64 +4843,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "xau-scalp-1794315817": {
-    "orderId": "33865489",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "scalp",
-    "limitPrice": 4075.61,
-    "stop": 4080.0514285714285,
-    "t1": 4068.715,
-    "placedAt": "2026-11-10T13:04:55.000Z",
-    "expires": "2026-11-10T16:03:37.000Z",
-    "riskCash": 4.44,
-    "margin": 8.15,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
-   "gbpusd-intraday-1794315817": {
-    "orderId": "33865491",
-    "symbol": "GBPUSD",
-    "side": "sell",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "intraday",
-    "limitPrice": 1.34208,
-    "stop": 1.34276,
-    "t1": 1.32747,
-    "placedAt": "2026-11-10T13:04:55.000Z",
-    "expires": "2026-11-11T01:03:37.000Z",
-    "riskCash": 1.98,
-    "margin": 5.37,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9902.52,
-  "lastRun": "2026-11-10T13:04:55.000Z"
+  "lastRun": "2026-11-10T13:07:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T18:07:24.000Z",
-   "msg": "moved USDCAD 47373489 protection: stop 1.3814874 -> 1.3807074, target 1.48056 -> 1.47978 (council position)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-09T18:07:24.000Z",
-   "msg": "moved USDCAD 47373490 protection: stop 1.3814874 -> 1.3807074, target 1.43531 -> 1.43453 (council swing)",
-   "trade": "usdcad-swing-1793949081"
-  },
   {
    "at": "2026-11-09T18:07:24.000Z",
    "msg": "moved AUDUSD 47373491 protection: stop 0.6920906 -> 0.6920606, target 0.6797287 -> 0.6796987 (council scalp)",
@@ -6337,6 +6338,16 @@
    "at": "2026-11-10T13:04:55.000Z",
    "msg": "placed sell limit GBPUSD 0.02 lot at 1.34208 (council intraday, valid to 2026-11-11T01:03Z)",
    "trade": "gbpusd-intraday-1794315817"
+  },
+  {
+   "at": "2026-11-10T13:07:39.000Z",
+   "msg": "limit filled: XAUUSD position 48039921 at the broker",
+   "trade": "xau-scalp-1794315817"
+  },
+  {
+   "at": "2026-11-10T13:07:39.000Z",
+   "msg": "limit filled: GBPUSD position 48039928 at the broker",
+   "trade": "gbpusd-intraday-1794315817"
   }
  ],
  "limits": {
@@ -6415,8 +6426,8 @@
   ]
  },
  "execution": {
-  "n": 161,
-  "meanSlipR": -0.008,
+  "n": 163,
+  "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
   "medianLagSec": 189,
@@ -6438,8 +6449,8 @@
     "meanSlipR": -0.042
    },
    "GBPUSD": {
-    "n": 23,
-    "meanSlipR": 0.034
+    "n": 24,
+    "meanSlipR": 0.023
    },
    "USDCAD": {
     "n": 19,
@@ -6454,8 +6465,8 @@
     "meanSlipR": -0.052
    },
    "XAUUSD": {
-    "n": 17,
-    "meanSlipR": -0.053
+    "n": 18,
+    "meanSlipR": -0.051
    }
   }
  }
