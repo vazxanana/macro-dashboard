@@ -3305,6 +3305,34 @@
     "positionId": "47858495",
     "volume": 300000,
     "status": "open"
+   },
+   "sol-rscalp-1794278912": {
+    "positionId": "47875096",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-10T02:52:19.000Z",
+    "councilEntry": 86.01,
+    "stop": 85.752788,
+    "t1": 87.44,
+    "riskCash": 3.27,
+    "margin": 85.91,
+    "minLot": true,
+    "shadow": true,
+    "mark": 86.08,
+    "levelsFrom": "mark",
+    "fillPrice": 86.159,
+    "slipR": 0.579,
+    "lagSec": 139,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T02:52:19.000Z",
+    "brokerStop": 85.832
    }
   },
   "day": {
@@ -3312,7 +3340,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9976.16 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9976.16 · 24 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3325,44 +3353,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "sol-rscalp-1794278912": {
-    "orderId": "33841210",
-    "symbol": "SOLUSD",
-    "side": "buy",
-    "volume": 1000,
-    "lots": 0.01,
-    "digits": 3,
-    "setup": "rscalp",
-    "limitPrice": 86.01,
-    "stop": 85.752788,
-    "t1": 87.44,
-    "placedAt": "2026-11-10T02:49:41.000Z",
-    "expires": "2026-11-10T05:48:32.000Z",
-    "riskCash": 2.57,
-    "margin": 85.91,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9976.16,
-  "lastRun": "2026-11-10T02:49:41.000Z"
+  "lastRun": "2026-11-10T02:52:19.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T09:42:15.000Z",
-   "msg": "limit filled: GBPUSD position 47580537 at the broker",
-   "trade": "gbpusd-scalp-1794217187"
-  },
-  {
-   "at": "2026-11-09T09:50:03.000Z",
-   "msg": "GBPUSD position 47566395 closed at the broker",
-   "trade": "gbpusd-rscalp-1794214229"
-  },
   {
    "at": "2026-11-09T09:50:03.000Z",
    "msg": "EURUSD position 47573867 closed at the broker",
@@ -4852,6 +4848,16 @@
    "at": "2026-11-10T02:49:41.000Z",
    "msg": "placed buy limit SOLUSD 0.01 lot at 86.01 (council rscalp, valid to 2026-11-10T05:48Z)",
    "trade": "sol-rscalp-1794278912"
+  },
+  {
+   "at": "2026-11-10T02:52:19.000Z",
+   "msg": "cancelled SOLUSD limit order 33841210 for sol-rscalp-1794278912: the council filled it on its feed first",
+   "trade": "sol-rscalp-1794278912"
+  },
+  {
+   "at": "2026-11-10T02:52:19.000Z",
+   "msg": "opened buy SOLUSD 0.01 lot (council rscalp)",
+   "trade": "sol-rscalp-1794278912"
   }
  ],
  "limits": {
@@ -4930,15 +4936,15 @@
   ]
  },
  "execution": {
-  "n": 111,
-  "meanSlipR": 0.005,
+  "n": 112,
+  "meanSlipR": 0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 162,
+  "medianLagSec": 161.5,
   "bySymbol": {
    "SOLUSD": {
-    "n": 9,
-    "meanSlipR": -0.006
+    "n": 10,
+    "meanSlipR": 0.053
    },
    "BTCUSD": {
     "n": 9,
