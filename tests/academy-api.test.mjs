@@ -533,3 +533,17 @@ test('the generated files of the seven edges load through the API as they are', 
     assert.equal((await get(c, { get: 'outcome', edge: e.id, id: tr.candidates[0].id })).code, 403);
   }
 });
+
+test('calendar: the dataset\'s release list, cut for a snapshot at t exactly as the dataset cuts it; nothing outside its span', async () => {
+  const c = mk({ data: undefined }), all = (await get(c, { get: 'calendar' })).body;
+  assert.equal(all.available, true); assert.ok(all.items.length > 100); assert.deepEqual(all.types, ['CPI', 'NFP', 'FOMC']);
+  for (const e of all.items) assert.deepEqual(Object.keys(e).sort(), ['impact', 't', 'title'], 'a release carries its time and name only, never a result');
+  const { calendar, calendarAt } = await import('../academy/gen/features.mjs'), cal = await calendar();
+  assert.equal(all.hash, cal.hash, 'academy/data/calendar.json is stale: run node academy/gen/calendar.mjs');
+  for (const t of [all.items[40].t - 3600, all.items[40].t, all.items[90].t + 5 * 86400, all.from - 86400, all.to + 86400]) {
+    const a = (await get(c, { get: 'calendar', t: String(t) })).body, b = calendarAt(cal, t);
+    assert.deepEqual([a.events, a.schedule], [b.events, b.schedule], `t ${t}`);
+    if (a.schedule) for (const e of a.schedule) assert.ok(e.t > t && e.t <= t + 72 * 3600); if (a.events) for (const e of a.events) assert.ok(e.t <= t);
+  }
+  assert.equal((await get(mk(), { get: 'calendar' })).body.available, false);
+});

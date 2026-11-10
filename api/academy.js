@@ -14,6 +14,7 @@
 //   edges                                   the registry (academy/edges.mjs, else academy/data/edges.json, else 503)
 //   candidates&edge=&pool=train|exam&from=&to=&limit=&offset=     no outcome fields, ever; pool=exam: only ids never marked seen
 //                                           flagged setups (rule.clockShift, rule.pre2020) are left out; flagged=1 lists them (train only)
+//   calendar[&t=]                           scheduled release times (the dataset's list); with t: { events, schedule } for a snapshot at t
 //   history&edge=&cand=|before=             past train-pool cases finished before that time: { t, exitT, netR, features }, no ids
 //   outcome&id=&edge=                       403 "decide first" until an attempt for that candidate is stored (no peeking)
 //   lessons&edge=&active=1                  all versions, newest first, with stats
@@ -153,6 +154,7 @@ function fileData(root) {
     async candidates(edge) { return json(path.join(dir, 'data', `cand-${edge}.json`)); },
     async outcomes(edge) { return json(path.join(dir, 'data', `out-${edge}.json`)); },
     async features(edge) { return json(path.join(dir, 'data', `feat-${edge}.json`)); },
+    async calendar() { return json(path.join(dir, 'data', 'calendar.json')); },
   };
 }
 const DATA = new Map();
@@ -248,6 +250,18 @@ const GET = {
     const page = rows.slice(offset, offset + limit).map(candView), out = { edge, pool, total: rows.length, count: page.length, excluded: flagged ? { clockShift: 0, pre2020: 0 } : excluded, candidates: page };
     if (pool === 'train') { out.seen = {}; for (const c of page) if (seen[c.id]) out.seen[c.id] = { mode: seen[c.id].mode, attempts: seen[c.id].attempts || 0, last: seen[c.id].last }; }
     return out;
+  },
+
+  // The release calendar the dataset rows were built with (scheduled times of public releases, never a result). With t: what a
+  // snapshot at t may hold, cut the same way as the dataset (events of the last 7 days, schedule of the next 72 hours; null
+  // outside the calendar's span, so "no calendar" is never read as "no event").
+  async calendar(X, q) {
+    const cal = typeof X.data.calendar === 'function' ? await X.data.calendar() : null;
+    if (!isObj(cal) || !Array.isArray(cal.items)) return { available: false, events: null, schedule: null, note: 'the release calendar is not generated yet' };
+    const head = { available: true, types: cal.types || [], from: cal.from, to: cal.to, hash: cal.hash || null }, t = qNum(q.t, 't');
+    if (t == null) return { ...head, items: cal.items };
+    if (t < cal.from || t > cal.to) return { ...head, t, events: null, schedule: null };
+    return { ...head, t, events: cal.items.filter((e) => e.t <= t && e.t > t - 7 * 86400), schedule: cal.items.filter((e) => e.t > t && e.t <= t + 72 * 3600) };
   },
 
   // Past cases for "similar history": train-pool setups of this edge whose trade had FINISHED before the moment asked about

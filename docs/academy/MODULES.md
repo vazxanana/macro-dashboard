@@ -85,7 +85,8 @@ tested). Full signatures are in each file's header comments and its tests.
 - Full notes: `docs/academy/TRAINING.md`. The page must build its snapshot the same way as the dataset so that live features
   and past-case features are comparable: series = the edge's `contextTfs` from the registry (no 1m), 300 bars a timeframe, no
   dollar index (those keys are null).
-- The dataset's calendar comes from `council/events.mjs` (read only; CPI / NFP / FOMC from 2022). The page has no calendar
-  source yet, so `eventNear` is null there.
+- The dataset's calendar comes from `council/events.mjs` (read only; CPI / NFP / FOMC from 2022), written to
+  `academy/data/calendar.json` by `node academy/gen/calendar.mjs`. The page gets the same cut from
+  `GET ?get=calendar&t=<t>` → `{ events, schedule }` (both null outside the calendar's span) and passes them to `MXR.snapshot`.
 - `MXA.decide` hands the snapshot's edge id to the scorer (a pooled model uses it as a feature). A model is used only when
   `promoted` and `calibrated` are both true; every model in `ml/models/` is a rejected challenger.
