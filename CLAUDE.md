@@ -1307,3 +1307,10 @@ limits, stop moves and closes follow the record). A record also in trades.json i
 side + time, never twice); one whose own filter failed (`pass: false`) counts as a shadow (config.json `mirrorShadow: false`
 leaves it out). They are copied only while the replica book has a demo account different from the council's
 (`replicaHasOwnAccount`), so they can never land on the council account. Demo only. Tests: `tests/ctrader-mirror.test.mjs`.
+Reconciliation (same day, owner: "check all the trades from the edges opened match everything on cTrader"):
+`node council/ctrader-reconcile.mjs <council-data dir>` reads files only (no broker contact) and lists, for every open or
+pending trade of every book, whether its demo account holds the copy and whether side, stop and target match; then every demo
+position or order with no open council trade behind it, and any position without a stop. Levels are compared the way the
+mirror copies them: a market copy keeps the council's distances from the fill (the broker's price sits a small basis from the
+council's feed), an amended, limit or guard-set copy has the council's own levels, an ICT copy the desk's stop distance. Exit 1
+on a mismatch. Tests: `tests/ctrader-reconcile.test.mjs`.
