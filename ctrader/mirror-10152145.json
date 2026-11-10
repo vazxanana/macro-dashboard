@@ -4314,7 +4314,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.41369,
@@ -4329,10 +4330,11 @@
     "lagSec": 213,
     "positionId": "47990251",
     "volume": 100000,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 2,
     "amended": 8,
-    "amendedAt": "2026-11-10T16:08:58.000Z"
+    "amendedAt": "2026-11-10T16:08:58.000Z",
+    "closedAt": "2026-11-10T16:14:52.000Z"
    },
    "usdcad-position-1794304600": {
     "symbol": "USDCAD",
@@ -5528,7 +5530,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9979.51 · 19 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9984.55 · 18 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5559,22 +5561,41 @@
      "pending"
     ]
    },
-   "usdchf-position-1794326705": {
-    "orderId": "33884672",
+   "gbpusd-scalp-1794327220": {
+    "orderId": "33885093",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.33299,
+    "stop": 1.33374,
+    "t1": 1.3314899999999998,
+    "placedAt": "2026-11-10T16:14:52.000Z",
+    "expires": "2026-11-10T19:13:40.000Z",
+    "riskCash": 2,
+    "margin": 5.33,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "usdchf-scalp-1794327220": {
+    "orderId": "33885094",
     "symbol": "USDCHF",
     "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
+    "volume": 300000,
+    "lots": 0.03,
     "digits": 5,
-    "setup": "position",
-    "limitPrice": 0.82494,
-    "stop": 0.8178093928571428,
-    "t1": 0.838,
-    "placedAt": "2026-11-10T16:06:36.000Z",
-    "expires": "2026-11-15T16:05:05.000Z",
-    "riskCash": 8.64,
-    "margin": 2,
-    "minLot": true,
+    "setup": "scalp",
+    "limitPrice": 0.82654,
+    "stop": 0.8260400000000001,
+    "t1": 0.8275399999999999,
+    "placedAt": "2026-11-10T16:14:52.000Z",
+    "expires": "2026-11-10T19:13:40.000Z",
+    "riskCash": 2,
+    "margin": 6,
     "shadow": true,
     "alerted": [
      "pending"
@@ -5582,30 +5603,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9979.51,
-  "lastRun": "2026-11-10T16:12:16.000Z"
+  "balance": 9984.55,
+  "lastRun": "2026-11-10T16:14:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T09:06:01.000Z",
-   "msg": "placed sell limit GBPUSD 0.01 lot at 1.34462 (council intraday, valid to 2026-11-10T21:04Z)",
-   "trade": "gbpusd-intraday-1794301485"
-  },
-  {
-   "at": "2026-11-10T09:08:33.000Z",
-   "msg": "cancelled AUDUSD limit order 33853254 for audusd-rscalp-1794301325: the council ended it: missed",
-   "trade": "audusd-rscalp-1794301325"
-  },
-  {
-   "at": "2026-11-10T09:10:23.000Z",
-   "msg": "AUDUSD position 47841251 closed at the broker",
-   "trade": "audusd-scalp-1794272483"
-  },
-  {
-   "at": "2026-11-10T09:10:23.000Z",
-   "msg": "EURUSD position 47973974 closed at the broker",
-   "trade": "eurusd-rscalp-1794301485"
-  },
   {
    "at": "2026-11-10T09:10:46.000Z",
    "msg": "AUDUSD position 47772710 closed at the broker",
@@ -7085,6 +7086,26 @@
    "at": "2026-11-10T16:12:16.000Z",
    "msg": "moved GBPUSD 48133872 protection: stop 1.3459167 -> 1.3463067, target 1.31782 -> 1.31821 (council position)",
    "trade": "gbpusd-position-1794325881"
+  },
+  {
+   "at": "2026-11-10T16:14:52.000Z",
+   "msg": "cancelled USDCHF limit order 33884672 for usdchf-position-1794326705: the council ended it: cancelled",
+   "trade": "usdchf-position-1794326705"
+  },
+  {
+   "at": "2026-11-10T16:14:52.000Z",
+   "msg": "USDCAD position 47990251 closed at the broker",
+   "trade": "usdcad-intraday-1794304066"
+  },
+  {
+   "at": "2026-11-10T16:14:52.000Z",
+   "msg": "placed sell limit GBPUSD 0.02 lot at 1.33299 (council scalp, valid to 2026-11-10T19:13Z)",
+   "trade": "gbpusd-scalp-1794327220"
+  },
+  {
+   "at": "2026-11-10T16:14:52.000Z",
+   "msg": "placed buy limit USDCHF 0.03 lot at 0.82654 (council scalp, valid to 2026-11-10T19:13Z)",
+   "trade": "usdchf-scalp-1794327220"
   }
  ],
  "limits": {
