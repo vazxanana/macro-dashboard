@@ -1667,5 +1667,36 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     owner too. Never shown to a reader. ChronosTrade shows one hint toast the first time the chip appears
     (`btLab:teachTip:<account>`); the chip itself is for a teacher who is not the owner (the owner keeps T and the
     button). Keep the steps' words free of any promise: it is a tutorial for teaching, not a claim that the trades win.
+  - **The full tutorial, and French** (same day, owner: "a proper tutorial because the better he knows how to work with
+    you he would do better", "the more the quality of the tutorial the better for him", "give him choice to choose french
+    instead but the trading terms leave it as english").
+    - `assets/mosha-tutor.js` (`MS_MOSHA_TUTOR`): "How to work with the desk", nine chapters in a `<dialog id="mo-tut">`
+      opened from the guide card ("Start / Continue / Read the tutorial again"): what the desk is, a good lesson, sending
+      it, what the desk can and cannot read on a screenshot, checking and correcting its answer, the book, teaching from
+      a ChronosTrade replay, the habits that help, a first session. A chapter = a lead, blocks (`p`, `h`, `ul`, `ol`,
+      `tip`, `warn`, `fig`, `cmp` weak against good, `dd` do / avoid), one question with every answer explained, and
+      sometimes a button to that part of the page. The pictures are drawn in code (`FIGS`: the loop, the order of
+      pictures, the annotated chart, mock-ups of the form, an answer, a book line, the replay chip): no image files.
+      Chapter list at the side (hidden on phones), arrows and Escape, progress kept in localStorage `msMoTut:<account>`.
+      It teaches TEACHING: it must keep saying that the desk never places a trade, does not answer at once, and that
+      whether a rule makes money is tested separately; it never promises a result (a test bans those words).
+    - `assets/mosha-i18n.js` (`MS_MOSHA_I18N`): English is the source, `FR` is looked up by the English phrase, a phrase
+      with no entry stays English. `tr`, `fill`, `apply(el)` for fixed page text (`data-tr`, `data-tr-ph`,
+      `data-tr-aria`, `data-tr-title`), `seed(b)` (a book line still in the desk's own words is shown translated; a
+      corrected line is the teacher's). In `mosha-teach.js` every word goes through `L('…')`, in `backtest.html`
+      through `ML('…')`, in the tutorial through `T('…')`; the tutorial's chapters are written out in both languages
+      (`TUT.en` / `TUT.fr`). **The words of the method are never translated** (`TERMS`: trade, sell, buy, entry, stop,
+      target, level, sweep, VR, CF, BO, zone of the break, barrier, pullback, swing, high, low, timeframe, top-down,
+      H4 … M5, backtest, replay); "the levels" of a trade (its prices) is "niveaux de prix", the method's "level" stays.
+    - The choice (`.mo-lang`: top of a teacher's page, the guide card, the tutorial) is kept per account on the device
+      (localStorage `msMoLang:<account>`; a new device takes the language of his last lesson) and travels with each
+      lesson and reply (`lang` on `add` / `say`, stored on the lesson, `langOf`). `scripts/mosha-lessons.mjs` prints
+      "Answer in FRENCH … keep the words of the method in English" in `lesson.txt`: answer a lesson, and propose its
+      book lines, in the lesson's language. Only the teaching surfaces are translated (the desk's teacher cards, the
+      tutorial, ChronosTrade's teach chip, dialog and messages); the rest of the site stays English.
+    - Adding a phrase: write it in English through `L` / `ML` / `T` or `data-tr`, add its French line to `FR`.
+      `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
+      translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
+      answer, and a French button name the page does not show.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

@@ -452,6 +452,17 @@ conditions is what makes your trades win.
   that takes him to that part of the page. Steps tick themselves as he really does them, and the one that is his to do
   next is marked "Next". He can hide it and bring it back with "How to teach". ChronosTrade shows a one-time hint the
   first time a trade of his closes.
+- **The full tutorial, in English or French (10 Nov, your words: "a proper tutorial because the better he knows how to
+  work with you he would do better", "give him choice to choose french instead but the trading terms leave it as
+  english"):** "How to work with the desk" is a nine-chapter course opened from the top of his page. Each chapter has a
+  picture of what to press, a weak example beside a good one where that helps, and one question with the answer
+  explained. It covers what makes a lesson easy to learn from, what the desk can and cannot read on a screenshot, how to
+  correct it, the book, teaching from a replay, and the habits that help. He chooses English or Français at the top of
+  his page; the choice also covers his teaching buttons and messages, ChronosTrade's teach dialog, and the language the
+  desk answers him in. The words of the method (trade, sell, buy, entry, stop, target, level, sweep, VR, CF, BO…) stay in
+  English in both. The rest of the site (menus, charts, other desks) is still English only: say if you want more of it
+  in French. The French was written by the assistant and checked by tests for the method's words, not by a French
+  speaker: a read-through by Luxus is the real check.
 - **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
   is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
   (it uses your plan's usage each time, so it is your call how often).

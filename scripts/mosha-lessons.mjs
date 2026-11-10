@@ -18,6 +18,8 @@ const BASE = (process.env.MOSHA_BASE || 'https://meridianx.dev').replace(/\/+$/,
 const headers = (extra = {}) => ({ ...(process.env.MOSHA_READER_KEY ? { Authorization: `Bearer ${process.env.MOSHA_READER_KEY}` } : {}), ...extra });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }, KIND = { term: 'Terms', step: 'Steps', rule: 'Rules', avoid: 'What to avoid' };
+// the language the teacher works in: the desk answers in it, and proposes its book lines in it
+const LANG = { en: 'Answer in English.', fr: 'Answer in FRENCH (the teacher works in French). Keep the words of the method in English, exactly as the teacher writes them: trade, sell, buy, entry, stop, target, level, sweep, VR, CF, BO, zone of the break, barrier, pullback, swing, high, low, timeframe, H4 / H1 / M30 / M15 / M5, backtest, replay.' };
 export const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'lesson';
 // the lessons the desk owes an answer: not read yet, or the teacher added something or said "not right"
 export const waiting = (l) => l.state === 'new' || l.state === 'more';
@@ -30,7 +32,7 @@ export function bookText(book) {
 }
 export function lessonText(l) {
   const t = l.trade, who = (m) => (m.by === 'assistant' ? 'THE DESK' : (m.name || m.by).toUpperCase());
-  return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, '', l.note || '(no note)', '',
+  return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, LANG[l.lang] || LANG.en, '', l.note || '(no note)', '',
     t ? `Levels: ${t.side} ${t.entry}, stop ${t.stop}${t.target != null ? `, target ${t.target}` : ''}, ${t.market}${t.tf ? ` ${t.tf}` : ''}, entry at ${new Date(t.at * 1000).toISOString()}${t.exit != null ? `, closed ${t.exit}${t.exitAt ? ` at ${new Date(t.exitAt * 1000).toISOString()}` : ''} = ${t.R > 0 ? '+' : ''}${t.R}R` : ''}${t.src === 'replay' ? '  (taken in a ChronosTrade replay: practice on past candles, not a live trade)' : ''}` : 'Levels: not given', '',
     ...(l.shots.length ? l.shots.map((s, i) => `Picture ${i + 1}: ${s.caption || '(no caption)'}`) : ['(a lesson in words: no picture)']), '',
     'Conversation:', ...(l.thread.length ? l.thread.map((m) => `[${m.at}] ${who(m)}${m.verdict ? ` (the teacher marked this ${m.verdict === 'right' ? 'RIGHT' : 'NOT RIGHT'})` : ''}: ${m.text}`) : ['(nothing yet: the desk has not answered)'])].join('\n');

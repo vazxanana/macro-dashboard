@@ -169,7 +169,9 @@ function stateOf(l) {
 // A lesson's name when the teacher gave none: the first picture's caption, else the first words of the note (cut at a word).
 const nameOf = (title, caption, note) => { const t = clean(title, 80) || clean(caption, 80); if (t) return t; const n = clean(note, 2000).split(/[\n.!?]/)[0].trim(); if (!n) return 'A trade';
   return n.length <= 60 ? n : n.slice(0, 60).replace(/\s+\S*$/, '') + '…'; };
-const view = (l) => ({ id: l.id, by: l.by, name: l.name, at: l.at, edited: l.edited || null, title: l.title, note: l.note, trade: l.trade || null, chart: l.chart || null,
+// the language a teacher writes in (the desk answers in it; the method's words stay English in every language)
+const LANGS = ['en', 'fr'], langOf = (v) => (LANGS.includes(v) ? v : null);
+const view = (l) => ({ id: l.id, by: l.by, name: l.name, at: l.at, edited: l.edited || null, title: l.title, note: l.note, lang: l.lang || 'en', trade: l.trade || null, chart: l.chart || null,
   shots: (l.shots || []).map((s) => ({ img: s.img, caption: s.caption, at: s.at })), thread: (l.thread || []).map((m) => ({ by: m.by, name: m.name, at: m.at, text: m.text, ...(m.by === 'assistant' ? { shots: m.shots || 0 } : {}), ...(m.verdict ? { verdict: m.verdict, vat: m.vat } : {}) })), state: stateOf(l) });
 // how teachable the desk has been so far: of the lessons whose first answer a teacher judged, how many were right first time;
 // and how much of the book is the teacher's word
@@ -260,6 +262,7 @@ async function handle(req, res, d = {}) {
       if (verdict === 'wrong' && !text) return res.status(400).json({ error: 'say what is not right, so the desk can learn it' });
       if (verdict) { la.verdict = verdict; la.vby = acct.u; la.vat = stamp; }
       if (text) { l.thread.push({ by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, text }); l.thread = l.thread.slice(-MAX_TALK); }
+      if (langOf(b.say.lang)) l.lang = b.say.lang;
       l.edited = stamp; await store.put(list); return res.status(200).json({ ok: true, lesson: view(l) });
     }
     if (isObj(b.add)) {
@@ -277,8 +280,8 @@ async function handle(req, res, d = {}) {
       if (!l && list.length >= KEEP) return res.status(400).json({ error: `the desk holds ${KEEP} lessons: remove old ones first` });
       const img = has ? newId(now) : null;
       if (has) await store.putImg(img, im.type, im.buf);   // the picture first: a lesson never points at a picture that is not there
-      if (!l) { l = { id: newId(now), by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, edited: null, title: nameOf(title, caption, note), note, trade: tr.trade, chart: null, shots: [], thread: [] }; list.push(l); }
-      else { l.edited = stamp; if (note) l.note = note; }
+      if (!l) { l = { id: newId(now), by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, edited: null, title: nameOf(title, caption, note), note, lang: langOf(a.lang) || 'en', trade: tr.trade, chart: null, shots: [], thread: [] }; list.push(l); }
+      else { l.edited = stamp; if (note) l.note = note; if (langOf(a.lang)) l.lang = a.lang; }
       if (has) l.shots.push({ img, type: im.type, caption, at: stamp, bytes: im.buf.length });
       await store.put(list); return res.status(200).json({ ok: true, lesson: view(l), img });
     }
@@ -305,4 +308,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha lessons are unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, stateOf, scoreOf, nameOf, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP });
+Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, stateOf, scoreOf, nameOf, langOf, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP });

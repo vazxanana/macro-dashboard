@@ -68,7 +68,7 @@ test('sending: a teacher starts a lesson and adds pictures to their own; readers
   const g0 = await call(s, 'GET', LUXUS); assert.deepEqual([g0.body.lessons, g0.body.canTeach, g0.body.who], [[], true, 'luxus']); assert.equal((await call(s, 'GET', FRED)).body.canTeach, false); assert.equal(g0.headers['cache-control'], 'private, no-store');
   const a = await call(s, 'POST', LUXUS, { add: { title: ' 2 Nov sell, gold ', note: 'M30 high swept, then the M5 VR.', caption: 'M30 sweep high', image: url('image/png', PNG) } });
   assert.equal(a.code, 200); const id = a.body.lesson.id; assert.match(id, /^\d{17}[a-z0-9]{4}$/);
-  assert.deepEqual({ ...a.body.lesson, id: 0, at: 0, shots: a.body.lesson.shots.map((x) => x.caption) }, { id: 0, by: 'luxus', name: 'Luxus', at: 0, edited: null, title: '2 Nov sell, gold', note: 'M30 high swept, then the M5 VR.', trade: null, chart: null, shots: ['M30 sweep high'], thread: [], state: 'new' });
+  assert.deepEqual({ ...a.body.lesson, id: 0, at: 0, shots: a.body.lesson.shots.map((x) => x.caption) }, { id: 0, by: 'luxus', name: 'Luxus', at: 0, edited: null, title: '2 Nov sell, gold', note: 'M30 high swept, then the M5 VR.', lang: 'en', trade: null, chart: null, shots: ['M30 sweep high'], thread: [], state: 'new' });
   assert.equal(s.img.size, 1); assert.deepEqual(s.img.get(a.body.img).buf, PNG);
   const b = await call(s, 'POST', LUXUS, { add: { lesson: id, caption: 'M5 vr', image: url('image/jpeg', JPG) } }); assert.equal(b.code, 200); assert.deepEqual(b.body.lesson.shots.map((x) => x.caption), ['M30 sweep high', 'M5 vr']); assert.equal(s.peek().length, 1);
   assert.equal(s.peek()[0].shots[1].type, 'image/jpeg', 'the stored type is the checked one');
@@ -247,7 +247,7 @@ test('the desk\'s reading on the chart: checked marks and steps, a position only
   const sp = RP.specOfLesson(r.body.lesson, NOW / 1000); assert.deepEqual([sp.id, sp.lesson, sp.title, sp.entry, sp.stop, sp.base, sp.marks.length, sp.steps.length, sp.h4off], ['lesson-' + id, true, '2 Nov sell', 3908.27, 3916.1, '5m', 2, 4, 7200]); assert.deepEqual(RP.tfsOf(sp), [300, 900, 3600]);
   const lv = RP.specOfLesson({ id: 'x', title: 'levels only', trade: T, chart: null }, NOW / 1000); assert.deepEqual([lv.entry, lv.stop, lv.target, lv.marks.length, lv.lesson, lv.label], [3908.27, 3916.1, 3878.42, 0, true, 'The levels of this lesson']); assert.equal(RP.specOfLesson({ id: 'y', title: 'words', trade: null, chart: null }, NOW / 1000), null);
   assert.equal(RP.usSummer(Date.UTC(2026, 9, 28) / 1000), true); assert.equal(RP.usSummer(Date.UTC(2026, 10, 2) / 1000), false); assert.equal(RP.usSummer(Date.UTC(2026, 2, 7) / 1000), false); assert.equal(RP.usSummer(Date.UTC(2026, 2, 9) / 1000), true);
-  assert.match(rd('../assets/mosha-replay.js'), /root\.msMoshaReplayLesson = function/); assert.match(JS, /root\.msMoshaReplayLesson\(L\)/);
+  assert.match(rd('../assets/mosha-replay.js'), /root\.msMoshaReplayLesson = function/); assert.match(JS, /root\.msMoshaReplayLesson\(Lc\)/);
   // what the assistant gets to read: the levels, every caption, the whole conversation with the teacher's marks
   const txt = TOOLS.lessonText((await call(s, 'GET', LUXUS)).body.lessons[0]); assert.match(txt, /Levels: sell 3908\.27, stop 3916\.1, target 3878\.42/); assert.match(txt, /Picture 1: M30 sweep high/); assert.match(txt, /THE DESK: words only this time/);
   assert.equal(TOOLS.waiting({ state: 'new' }), true); assert.equal(TOOLS.waiting({ state: 'more' }), true); assert.equal(TOOLS.waiting({ state: 'read' }), false); assert.equal(TOOLS.waiting({ state: 'agreed' }), false);
@@ -270,8 +270,8 @@ test('backtest with him: a trade taken in a ChronosTrade replay goes to the desk
   assert.match(BT, /\$\{TEACH \? `<button class="shot-add tch/); assert.match(BT, /data-teach="\$\{t\.id\}"/); assert.match(BT, /\$\('tch-btn'\)\.hidden = !TEACH;/); assert.match(BT, /<dialog id="teachd" class="hkd teachd"/); assert.match(BT, /id="tch-btn"[^>]* hidden>/);
   assert.match(BT, /const stop0 = \(t\) => \(t\.r0 > 0 \? \+\(t\.side === 'buy' \? t\.entry - t\.r0 : t\.entry \+ t\.r0\)/, 'the stop the trade was opened with');
   assert.match(BT, /trade: \{ market: S\.sym, side: t\.side, at: t\.openedAt, entry: t\.entry, stop: stop0\(t\), target: t\.target == null \? '' : t\.target, exit: t\.exit, exitAt: t\.closedAt, tf: S\.tf, src: 'replay' \}/);
-  assert.match(BT, /fetch\('\/api\/mosha-lessons', \{ method: 'POST', credentials: 'same-origin'/); assert.match(BT, /Sent to the Mosha desk: \$\{esc\(j\.lesson\.title \|\| title\)\}/, 'what the member typed is escaped in the toast');
-  assert.equal([...BT.matchAll(/fetch\('\/api\/mosha-lessons'/g)].length, 2, 'one send, and one read of the answers that wait'); assert.ok(PAGE.includes('<a class="ms-tbtn" href="/backtest">Backtest and teach in ChronosTrade</a>'));
+  assert.match(BT, /fetch\('\/api\/mosha-lessons', \{ method: 'POST', credentials: 'same-origin'/); assert.match(BT, /ML\('Sent to the Mosha desk: \{title\}\. The desk will write back what it understood\.', \{ title: esc\(j\.lesson\.title \|\| title\) \}\)/, 'what the member typed is escaped in the toast');
+  assert.equal([...BT.matchAll(/fetch\('\/api\/mosha-lessons'/g)].length, 2, 'one send, and one read of the answers that wait'); assert.ok(PAGE.includes('<a class="ms-tbtn" href="/backtest" data-tr>Backtest and teach in ChronosTrade</a>'));
   // every market ChronosTrade replays is one the desk knows
   const mk2 = [...BT.match(/const MARKETS = \[(.+?)\];/)[1].matchAll(/\['([a-z0-9]+)'/g)].map((m) => m[1]); assert.ok(mk2.length >= 16); for (const m of mk2) assert.ok(!L.tradeOf({ ...T, market: m }, NOW).error, m);
 });
@@ -322,7 +322,7 @@ test('the tutorial: five steps in the teacher\'s order, ticked from what he has 
   v = (await call(s, 'GET', LUXUS)).body; g = TEACH.guide(v.lessons, v.book, 'luxus'); assert.deepEqual([g.done, g.next], [5, null], 'every step done');
   assert.equal(TEACH.guide(v.lessons, v.book, 'carlos').steps[0].done, false, 'another member\'s lessons are not his steps'); assert.equal(TEACH.guide(v.lessons, v.book, 'owner').done, 5);
   // the page: the card comes first for a teacher, hides on request (kept per account), and "How to teach" brings it back
-  assert.ok(PAGE.includes('<section class="card mo-wide mo-guide" id="mo-guide" aria-label="How to teach the desk" hidden></section>')); assert.ok(PAGE.includes('id="mo-guide-open">How to teach</button>')); assert.match(PAGE, /#v-mosha #mo-guide \{ order: -5; \}/);
+  assert.ok(PAGE.includes('<section class="card mo-wide mo-guide" id="mo-guide" aria-label="How to teach the desk" data-tr-aria hidden></section>')); assert.ok(PAGE.includes('id="mo-guide-open" data-tr>How to teach</button>')); assert.match(PAGE, /#v-mosha #mo-guide \{ order: -5; \}/);
   assert.match(JS, /if \(!T\.canTeach \|\| !T\.lessons\) \{ box\.hidden = true; return; \}/, 'never for a reader'); assert.match(JS, /T\.who !== 'owner' && !hid && g\.done < g\.of/); assert.match(JS, /localStorage\.setItem\(GKEY\(\), 'hide'\)/); assert.match(JS, /data-g-go="/); assert.match(JS, /role="progressbar"/);
   const BT = rd('../backtest.html'); assert.match(BT, /'btLab:teachTip:' \+ me\.u/, 'the hint in ChronosTrade is shown once'); assert.match(BT, /const t = me\.u === 'owner' \? null : lastNew\(\)/);
 });
