@@ -1604,5 +1604,31 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     `#mo-lessons` (a lesson unfolds to its note, pictures and "What the desk understood"; pictures load only when unfolded).
     For a teacher who is not the owner the two cards come first and the heading speaks to him (`.mo-own` / `.mo-tch` /
     `.mo-rdr`). Tests: `tests/mosha-lessons.test.mjs`.
+- **100 % teachable** (same day, owner: "He needs to be 100% teachable"): the desk takes every way of teaching, keeps what it
+  is taught, and shows back what it understood so the teacher can check it. This replaces the single reply of the first version.
+  - **A lesson** may be words only (title + note, no picture) and may carry the trade's own levels (`trade`: market, side, at,
+    entry, stop, target; `tradeOf`: no stop on the losing side, no record). "Give / Change the levels" edits them later.
+  - **The conversation** (`thread`): the desk's answer (`{ reply }`, assistant or owner), then the teacher's `{ say: { id, text?,
+    verdict? } }`: "right", or "wrong" with the why (required). `stateOf` (the same function on the server and the page, a
+    test compares them): new → read ("The desk answered: is it right?") → agreed ("Understood"), or more ("Waiting for the
+    desk": new pictures, "not right", or words after the answer). `score`: of the lessons whose FIRST answer was judged, how
+    many were right first time.
+  - **The desk's reading on the chart**: a reply may carry `chart` (market, base 5m / 15m, window, marks, steps, and a
+    position only with its stop on the losing side; `chartOf` checks every field and keeps only known ones). "See the desk's
+    reading on the chart" opens it in the replay (`MS_MOSHA_RP.specOfLesson`, `msMoshaReplayLesson`); a lesson with levels but
+    no chart opens with the levels alone. Never draw a position the teacher did not give.
+  - **The book**, card `#mo-book` "What the desk knows" (private Blob `mosha/book.json`, 400 lines; kinds term / step / rule /
+    avoid). The assistant only PROPOSES (`{ learn }` with the key → `proposed`, shown as "The desk's reading, not confirmed");
+    a teacher confirms, corrects (the desk's first wording is kept in `was`) or erases (`{ book }`), or teaches a line directly
+    (`{ learn }` → `confirmed`). The key cannot confirm, change or erase any line. `SEED` = the desk's own first twelve lines,
+    all `proposed`, shown until the first change stores the book.
+  - **How the assistant learns, every time** (`scripts/mosha-lessons.mjs`): `pull <dir>` writes `BOOK.md` (the teacher's word
+    first, the unconfirmed readings last and marked) and a folder per lesson that waits for the desk (`lesson.txt` with the
+    note, levels, captions and the whole conversation; the pictures). Read `BOOK.md` FIRST: a confirmed or corrected line is
+    the teacher's word and overrides the studies' wording, the examples in `assets/mosha-replay.js` and anything the desk
+    wrote before. Then answer each lesson in the teacher's own terms (`reply <id> <file> [chart.json]`: what is seen, the
+    levels read off the picture, what is unclear, and the chart when times and levels can be placed on our candles), and
+    propose only what is new (`learn <kind> <file> [lesson ids]`). When told "not right", restate the correction, do not
+    argue it, and propose the corrected line. Never present a taught line as tested: it is how the teacher trades.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

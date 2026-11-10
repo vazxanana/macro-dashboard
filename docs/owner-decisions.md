@@ -431,5 +431,13 @@ conditions is what makes your trades win.
   meridianx.dev (never into a chat). Until then the lessons arrive and are stored, but nobody reads them.
 - **To change or stop it:** Users → Luxus → Permissions → "Mosha desk" (no access / read only / may send lessons). On Vercel,
   `MOSHA_READER=off` switches the assistant's key off; `MOSHA_READER_SALT=<anything>` replaces it.
+- **"He needs to be 100% teachable" (10 Nov, built the same day):** Luxus can teach in pictures or in words alone, give the
+  trade's levels, and talk back under each lesson: "right", or "not right" and why, until the desk has it. The desk can show
+  its reading of a lesson on the chart with the replay. "What the desk knows" is the whole of what it holds, line by line:
+  twelve lines of its own to start with, each marked as its reading until Luxus (or you) confirms, corrects or erases it.
+  The Lessons card counts how often the desk was right first time.
+- **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
+  is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
+  (it uses your plan's usage each time, so it is your call how often).
 - **What the lessons are not:** proof. They are the teacher's picks, so they show the pattern, not how often it wins. A rule
   drawn from them gets its own pre-registered test before it is called an edge, and nothing live changes without you.
