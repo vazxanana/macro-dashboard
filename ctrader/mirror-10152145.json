@@ -3897,6 +3897,32 @@
     "positionId": "47954593",
     "volume": 300000,
     "status": "open"
+   },
+   "audusd-rscalp-1794297606": {
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "setup": "rscalp",
+    "openedAt": "2026-11-10T08:04:06.000Z",
+    "councilEntry": 0.69185,
+    "stop": 0.6926599999999999,
+    "t1": 0.69156,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.69185,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 2,
+    "margin": 2.77,
+    "shadow": true,
+    "fillPrice": 0.69194,
+    "slipR": -0.111,
+    "lagSec": 240,
+    "positionId": "47955382",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -3904,7 +3930,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9978.25 · 28 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9978.25 · 29 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3918,38 +3944,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "audusd-rscalp-1794297606": {
-    "orderId": "33849930",
-    "symbol": "AUDUSD",
-    "side": "sell",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "rscalp",
-    "limitPrice": 0.69185,
-    "stop": 0.6926599999999999,
-    "t1": 0.69156,
-    "placedAt": "2026-11-10T08:01:26.000Z",
-    "expires": "2026-11-10T11:00:06.000Z",
-    "riskCash": 2,
-    "margin": 2.77,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9978.25,
-  "lastRun": "2026-11-10T08:01:26.000Z"
+  "lastRun": "2026-11-10T08:04:06.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T12:33:47.000Z",
-   "msg": "XAUUSD limit order 33768950 for xau-intraday-1794184368 is gone at the broker (expired or cancelled there)",
-   "trade": "xau-intraday-1794184368"
-  },
   {
    "at": "2026-11-09T12:33:47.000Z",
    "msg": "not mirrored yet xau-intraday-1794184368: XAUUSD limit order gone at the broker (will retry)",
@@ -5444,6 +5444,11 @@
    "at": "2026-11-10T08:01:26.000Z",
    "msg": "placed sell limit AUDUSD 0.02 lot at 0.69185 (council rscalp, valid to 2026-11-10T11:00Z)",
    "trade": "audusd-rscalp-1794297606"
+  },
+  {
+   "at": "2026-11-10T08:04:06.000Z",
+   "msg": "limit filled: AUDUSD position 47955382 at the broker",
+   "trade": "audusd-rscalp-1794297606"
   }
  ],
  "limits": {
@@ -5522,11 +5527,11 @@
   ]
  },
  "execution": {
-  "n": 132,
-  "meanSlipR": 0.011,
+  "n": 133,
+  "meanSlipR": 0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 183,
+  "medianLagSec": 189,
   "bySymbol": {
    "SOLUSD": {
     "n": 11,
@@ -5557,8 +5562,8 @@
     "meanSlipR": 0.143
    },
    "AUDUSD": {
-    "n": 22,
-    "meanSlipR": 0.017
+    "n": 23,
+    "meanSlipR": 0.011
    },
    "XAUUSD": {
     "n": 13,
