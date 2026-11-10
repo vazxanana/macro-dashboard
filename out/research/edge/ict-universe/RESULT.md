@@ -1,5 +1,7 @@
 # ICT universe: does the iFVG model work outside gold?
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock. The basic gate now returns PASS for EUR/USD A-setups (out-of-sample n 141, +0.091R, t 0.77) and for the live gold rule; the t values are low and no market is added. The text below quotes the old numbers. Details: the last section of this page.
+
 **Question.** Gold carries most of the ICT desk's replay profit. Does the same H1 iFVG model, with its rules unchanged
 (post-#413 code), have an edge on the other liquid markets the council already watches: EURUSD, GBPUSD, USDJPY, AUDUSD,
 USDCAD, USDCHF, XAGUSD and NAS100/SPX cash? And is GC's edge there in every year, or only in the 2024-26 gold bull run?
@@ -128,3 +130,19 @@ gold A-setups to lose.
 - `result.json`: every cell with IS/OOS {n, wr, exp, R, maxDD, t, streak}, gross, drift-adjusted, per year, and the verdict.
 
 No `proposal.md`: no new market passes.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced every verdict field of the published file (250 of 3,614 numbers differ in the second or third decimal: the code moved a little since the first run), so the verdict changes below are the clock. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `result.json` holds the new numbers.
+
+| Candidate (basic gate) | Before: in-sample n, R a trade, t; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| GC, live gold rule A-setups (the baseline) | 362, +0.127, 1.50; 165, +0.102, 0.91: INCONCLUSIVE | 363, +0.151, 1.82; 167, +0.202, 1.68: PASS |
+| GC, gold rules, all signals | 930, +0.023, 0.44; 434, +0.019, 0.29: INCONCLUSIVE | 935, +0.045, 0.88; 443, +0.056, 0.82: PASS |
+| EUR/USD, index rules, A-setups | 291, −0.025, −0.35; 140, +0.121, 1.01: INCONCLUSIVE | 283, +0.051, 0.66; 141, +0.091, 0.77: PASS |
+| EUR/USD, index rules, all signals | 1,049, −0.049, −1.19; 472, +0.028, 0.43: INCONCLUSIVE | 1,054, −0.035, −0.85; 475, +0.005, 0.08: FAIL |
+| GBP/USD, index rules, A-setups | 280, −0.088, −1.12; 145, −0.031, −0.31: FAIL | 269, −0.059, −0.73; 153, +0.012, 0.12: INCONCLUSIVE |
+
+The other 35 candidate verdicts are unchanged. **The written verdict above ("no new market passes") was about the stricter robustness gate, which was judged by hand and was not re-judged here.** What can be said from the numbers: EUR/USD A-setups now pass the basic gate with t under 1 in both halves, which is far from an edge; no FX pair or silver is added to the desk, and adding a market is the owner's call.

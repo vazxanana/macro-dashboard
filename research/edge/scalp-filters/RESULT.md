@@ -1,5 +1,7 @@
 # Scalp filters on 8 years of M1 (edge research: `scalp-filters`)
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Verdict: FAIL. The Scalp has no robust edge on any of the 10 markets tested, under any single or pairwise filter.**
 That includes the owner's live rule (against D1, not Asia/overlap, no AUD/USD). The live rule loses **−0.20R a trade
 in-sample and −0.20R out-of-sample after spread**, and it lost money in **every one of the 9 years**. Even with no costs
@@ -168,3 +170,9 @@ cross-tabs in `analysis-output.txt`. With this many tries a few OOS-positive sli
 - `analyze.mjs`: the filters, walk-forward, per-year stats and result.json.
 - `analysis-output.txt`: the full printout, including every single condition and the per-year rows.
 - `result.json`: the structured results.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: the session and overlap filters and the day rollover were an hour late in Europe's summer. The verdict (FAIL: the Scalp loses after spread in every one of 9 years) is about a setup that is not live.

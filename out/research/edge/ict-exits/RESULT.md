@@ -1,5 +1,7 @@
 # ICT iFVG exits: what to do after entry (edge research, ict-exits)
 
+> **Clock correction, 10 Nov 2026.** Re-run on the corrected candle clock (`detail.json`, `table.txt`). The first run's summary in `result.json` and the text below are on the old clock. No exit variant is chosen in either run. Details: the last section of this page.
+
 **Verdict: FAIL. The live exit stays.** No exit variant beat the current one in-sample by more than noise. The variants that did best out-of-sample (fixed 4R target, half off at 2R and hold the rest) lost to the live exit in-sample, so picking them would be hindsight.
 
 ## Setup
@@ -121,3 +123,16 @@ Live exit by year (net R): 2018 −10, 2019 +15, 2020 +26, 2021 −8, 2022 +32, 
 - `table.txt`: full output for the 4 groups × 24 variants.
 - `detail.json`: every statistic, including gross, per year, paired tests and live sizing.
 - `result.json`: summary in the standard format.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study used the documented "EST, no daylight saving" reading (label + 5 hours all year), which is one hour late for the whole of Europe's summer, about seven months a year.
+
+**Re-run on the corrected clock on 10 Nov 2026. No rule, parameter, filter or cost was changed.** A control run of the old loader on the same day, with today's code, reproduced `detail.json` and `table.txt` exactly. ICT stays a separate, paper-only edge; nothing on the desk, the tracker or the replay was changed. `detail.json` and `table.txt` hold the new numbers. `result.json` is the first run's hand-written summary and was left as it is: read its numbers as old-clock numbers.
+
+| All A-setups, net | Before: in-sample n, R a trade, t; out-of-sample n, R a trade, t | After |
+|---|---|---|
+| Live exit | 971, +0.088, 1.77; 440, +0.145, 2.05 | 986, +0.097, 1.97; 449, +0.179, 2.45 |
+| The in-sample pick (`trail_be15`) | 971, +0.090, 1.84; 440, +0.129, 1.84 | 986, +0.100, 2.05; 449, +0.161, 2.23 |
+
+The in-sample pick is the same variant as before and again loses to the live exit out-of-sample (−0.017R a trade, t −2.07). On the index book alone the in-sample pick is now the live exit itself. **The verdict is unchanged: FAIL, the live exit stays.**

@@ -89,6 +89,58 @@ as pre-registered.
 - Studies re-run on the corrected clock use every year, as their own rules require. Where a headline rests on an
   uncertified symbol-year, the table below says so.
 
+## Every study that reads the HistData files: before → after
+
+Added after the audit, as its consequence, not as its evidence. Every loader was switched to `council/histdata.mjs`; no
+rule, parameter, filter or cost was changed. "Control" means: the OLD loader was run again on today's code and data
+first. Where the control reproduces the published file, the change is the clock and nothing else. Numbers are n, net R a
+trade, t. "Old reading": NY = New York time for every year (an hour early in about four weeks a year from 2019);
++5 h = "EST, no daylight saving" (an hour late all of Europe's summer).
+
+| Study | Old reading | Re-run | Control = published | Headline before → after | Verdict before → after |
+|---|---|---|---|---|---|
+| gold-systems | NY | yes | (same code path as the Academy generator, which reproduced it) | replica live 391, +0.479, 2.71 → 394, +0.462, 2.66; gtl 314, +0.141, 2.03 → 315, +0.159, 2.24; geg 174, +0.294, 2.12 → 175, +0.304, 2.21; mosha 64 and gtrend 41 unchanged | FAIL → FAIL |
+| robustness (HistData blocks) | NY | yes | yes, byte for byte | NQ open run out-of-sample 220, +0.390, 3.55 → 219, +0.381, 3.44; gold H4 trendline OOS 105, +0.431, 3.08 → 105, +0.314, 2.53; its Mosha port, all years 147, +0.009 → 157, −0.064; gmp 1,003, +0.041, 1.01 → 1,004, +0.043, 1.06 | no verdict field changed |
+| nq-open-oos (HistData cross-check) | NY | yes | OANDA part identical | 721, +0.126, 2.26 → 724, +0.115, 2.06; days both feeds signal 648 → 675 | regime-dependent (rests on OANDA) → unchanged |
+| open-run-breadth (HistData ES cross-check) | NY | yes | yes | late part 200, −0.110, −1.17 → 195, −0.078, −0.81; days both feeds signal 443 → 463 | unchanged |
+| event-reaction | Europe's dates for every year | yes | n/a (one event moves) | CPI rows 85 → 86; test 34 of 72 (p 0.72) → 34 of 73 (p 0.76) | FAIL → FAIL |
+| event-risk | +5 h | yes | inputs yes; result differs by today's council data (215 of 1,806 numbers, no verdict field) | HistData ICT sample 519 → 529 | FAIL on all five → FAIL on all five (46 fields, 0 changed) |
+| ict-universe | +5 h | yes | every verdict field yes (250 of 3,614 numbers differ slightly) | live gold rule OOS 165, +0.102, 0.91 → 167, +0.202, 1.68 | written verdict "no new market passes" stands; basic gate: EUR/USD A-setups INCONCLUSIVE → PASS (OOS 141, +0.091, 0.77), GC rows INCONCLUSIVE → PASS; 5 of 40 fields changed |
+| ict-index-longonly | +5 h | yes | yes | dip-buying candidate OOS 114, +0.479, 3.21 → 117, +0.434, 2.99 | PASS → PASS (1 of 24 fields changed) |
+| **ict-variants** | +5 h | yes | yes | live index book OOS 344, +0.184, 2.18 → 353, +0.190, 2.32 | **FAIL → PASS for one of nine, not strong** (V3 htffvg, index: IS 80, +0.273, 1.44; OOS 84, +0.355, 1.92) |
+| ict-filters | +5 h | yes | yes | A-setups OOS 411, +0.125, 1.72 → 424, +0.170, 2.27; drop Friday OOS 354, +0.156, 1.96 → 364, +0.205, 2.50 | PASS (weak) → PASS (weak); the FVG filter is no longer picked in-sample, "Tuesday to Thursday only" is |
+| ict-concepts | +5 h | yes | every pass field yes | live A-rule 2018-26: 1,129, +0.101, 2.21 → 1,150, +0.122, 2.74 | FAIL → FAIL |
+| ict-exits (`detail.json`, `table.txt`) | +5 h | yes | yes | live exit OOS 440, +0.145, 2.05 → 449, +0.179, 2.45 | FAIL → FAIL (`result.json` summary left on the old clock) |
+| ict-exits-replay (history table) | +5 h | yes | yes | every A-setup its own trade 1,411, +0.111, 2.81 → 1,435, +0.131, 3.31; structure trail against live −0.008 (t −0.47) → −0.002 (t −0.13) | "not confirmed on history" → the same |
+| ict-trend-side (HistData cross-check) | +5 h | yes | yes | filtered 246, +0.171, 1.74 → 244, +0.203, 2.00 | FAILS → FAILS |
+| portfolio (HistData ICT stream) | +5 h | yes | differs by today's council data (66 of 1,111 numbers) | 17 verdict fields, 0 changed | no rule change passes → the same |
+| decay-monitor, expectations (baselines) | via robustness | rebuilt | yes | Mosha BO baseline 147, +0.009 → 157, −0.064; three others move slightly; six identical | monitoring baselines, no verdict |
+| Academy, seven edges | NY | regenerated | n/a | `docs/academy/DATA-CLOCK.md` | policy: no measurable difference → the same; no scorer promoted |
+| ict-sessions | +5 h (through ict-universe trades) | **not re-run: computed on the old clock** | inputs cannot be reproduced | its 32 verdict fields do not differ between old-clock and corrected HistData trades | nothing passes (old clock) |
+| ict-smile | +5 h | **not re-run: computed on the old clock** | needs FRED, not reachable | | FAIL (old clock) |
+| scalp-filters, scalp-exits, setups-promote, regime, confluence | +5 h | **not re-run: computed on the old clock** | long engine replays; machine time | | each FAIL (regime: mixed), old clock |
+| timing, costs | NY | **not re-run: computed on the old clock** | long engine replays; machine time | | each FAIL, old clock |
+| replica-oos | reads no HistData | not needed | | one quoted cross-check block is from the old gold-systems run | unchanged |
+| shadow-audit, `research/robustness.mjs` | read no candles | not needed | | | |
+
+What the table says, plainly:
+
+- **One pre-registered verdict changed.** ict-variants: one of nine variant × book verdicts now passes its bar, with t under
+  2 in both halves. The plan itself said one pass in nine by luck is plausible. It is a hypothesis for the owner
+  (`docs/owner-decisions.md` item 20), not an edge, and nothing live follows from it.
+- **No other study's verdict changed.** Some candidate rows moved between INCONCLUSIVE, PASS and FAIL at low t; each is
+  listed in that study's own note.
+- **The ICT A-rule on HistData reads a little better on the corrected clock** in every study that measures it (for
+  example 1,411 trades at +0.111R, t 2.81 → 1,435 at +0.131R, t 3.31). That is the same rule on the same cash data with
+  the sessions in the right hour. ICT stays a separate, paper-only edge.
+- **Studies on the New York reading moved little** (four weeks a year). The largest move is the robustness audit's own
+  Mosha BO port, which now makes nothing over 8 years (157 trades, −0.064R).
+- Two cross-checks against OANDA got closer on the corrected clock (NQ and ES open runs), which is independent support
+  for the rule.
+- UNCERTIFIED symbol-years a headline rests on: gold 2023 (every gold study), NAS100 2018 / 2020 / 2023 / 2024 and S&P 500
+  2023 / 2024 (the index studies), the dollar index 2018-20 and 2023 (event-reaction; its 2018 file is not a usable
+  series: owner item 24). In each, every week that could be read agrees with the converter.
+
 ## Limits
 
 - UDXUSD has no second feed. EUR/USD with the sign flipped is a proxy; it is decisive in 382 weeks, not 438.

@@ -1,5 +1,7 @@
 # Are the cost assumptions realistic? Which edges survive realistic execution?
 
+> **Clock correction, 10 Nov 2026.** NOT RE-RUN: the published numbers were computed on the old candle clock. Details: the last section of this page.
+
 **Verdict: FAIL. No rule passes as a candidate, but the answer to the question is clear.**
 
 - **The Scalp has no edge before costs on 8.8 years of data.** The live Scalp rule is −0.07R a trade gross in 2018–23 and −0.11R in 2024–26. Realistic costs make that −0.24R and −0.30R. The 30-day replay's +0.23R gross for the live rule doesn't carry over to long history.
@@ -248,3 +250,9 @@ By stop size: stops under 40 ticks (n16) lose 0.14R a trade to costs and are −
 5. **Cost guard for any future scalp:** stop ≥ 15× the all-in round trip at the hour of entry (table in section 4), and no entries in the 17:00–18:00 New York hour. If the council keeps a 5-spread floor, the "spread" should be the real all-in cost: 1.5–2 pips for an OANDA-type account, not 1 pip.
 
 **Multiple testing:** 20 rule variants (the m grid × 2 accounts), plus 5 session splits and 4 latency settings that were looked at but not selected. Nothing passed.
+
+## Clock correction (10 Nov 2026)
+
+The HistData M1 files were read on the wrong clock in part of every year. The pre-registered audit `research/edge/histdata-clock/` settled the rule (New York time in 2018; UTC−5, and UTC−4 on Europe's summer-time dates, from 2019) and every loader now converts with `council/histdata.mjs`. This study read every year as New York time, so from 2019 its bars were one hour early in about four weeks a year (the weeks the US is on daylight time and Europe is not).
+
+**Not re-run: computed on the old clock.** Reason: this is a long engine replay over 8 years of M1 candles for several markets, and the machine time was spent on the studies that feed a live system or the Academy. The loader is fixed, so the next run is on the corrected clock; the commands are on this page. Until then every number here is an old-clock number. What the old clock touched here: only the 2018-26 Scalp replay (`scalp.mjs`) and the session spread multiplier read HistData, an hour early in about four weeks a year from 2019. Both FAIL verdicts rest on costs measured from OANDA and on the 30-day replay, not on HistData hours.
