@@ -3731,6 +3731,32 @@
     "positionId": "47946688",
     "volume": 200000,
     "status": "open"
+   },
+   "eurusd-scalp-1794295261": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-10T07:36:32.000Z",
+    "councilEntry": 1.12324,
+    "stop": 1.12268,
+    "t1": 1.1243600000000002,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.12324,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 2,
+    "margin": 6.74,
+    "shadow": true,
+    "fillPrice": 1.12321,
+    "slipR": -0.054,
+    "lagSec": 931,
+    "positionId": "47946686",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -3738,7 +3764,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9976.76 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9976.76 · 26 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3751,38 +3777,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "eurusd-scalp-1794295261": {
-    "orderId": "33848111",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.12324,
-    "stop": 1.12268,
-    "t1": 1.1243600000000002,
-    "placedAt": "2026-11-10T07:22:05.000Z",
-    "expires": "2026-11-10T10:21:01.000Z",
-    "riskCash": 2,
-    "margin": 6.74,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9976.76,
-  "lastRun": "2026-11-10T07:34:01.000Z"
+  "lastRun": "2026-11-10T07:36:32.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T11:44:08.000Z",
-   "msg": "opened buy AUDUSD 0.03 lot (council scalp)",
-   "trade": "audusd-scalp-1794224588"
-  },
   {
    "at": "2026-11-09T11:55:52.000Z",
    "msg": "limit filled: EURUSD position 47582433 at the broker",
@@ -5277,6 +5277,11 @@
    "at": "2026-11-10T07:34:01.000Z",
    "msg": "XAUUSD position 47918384 closed at the broker",
    "trade": "xau-m30m1-1794289515"
+  },
+  {
+   "at": "2026-11-10T07:36:32.000Z",
+   "msg": "limit filled: EURUSD position 47946686 at the broker",
+   "trade": "eurusd-scalp-1794295261"
   }
  ],
  "limits": {
@@ -5355,11 +5360,11 @@
   ]
  },
  "execution": {
-  "n": 126,
+  "n": 127,
   "meanSlipR": 0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 164,
+  "medianLagSec": 166,
   "bySymbol": {
    "SOLUSD": {
     "n": 11,
@@ -5374,7 +5379,7 @@
     "meanSlipR": -0.087
    },
    "EURUSD": {
-    "n": 22,
+    "n": 23,
     "meanSlipR": -0.036
    },
    "GBPUSD": {
