@@ -5987,7 +5987,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.58 · 25 open",
+  "status": "ok · demo Fusion Markets · balance 9964.58 · 25 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5997,17 +5997,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "gbpusd-scalp-1794340917": {
+    "orderId": "33895469",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.33455,
+    "stop": 1.33508,
+    "t1": 1.33122,
+    "placedAt": "2026-11-10T20:03:03.000Z",
+    "expires": "2026-11-10T23:01:57.000Z",
+    "riskCash": 1.99,
+    "margin": 8.01,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9964.58,
-  "lastRun": "2026-11-10T20:00:34.000Z"
+  "lastRun": "2026-11-10T20:03:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T11:06:38.000Z",
-   "msg": "moved EURUSD 47964428 protection: stop 1.112987 -> 1.112707, target 1.147286 -> 1.147006 (council swing)",
-   "trade": "eurusd-swing-1794299390"
-  },
   {
    "at": "2026-11-10T11:09:11.000Z",
    "msg": "moved EURUSD 47373484 protection: stop 1.0794895 -> 1.0797995, target 1.16315 -> 1.16346 (council rswing)",
@@ -7502,6 +7518,11 @@
    "at": "2026-11-10T19:51:27.000Z",
    "msg": "AUDUSD position 48205744 closed at the broker",
    "trade": "audusd-rscalp-1794339525"
+  },
+  {
+   "at": "2026-11-10T20:03:03.000Z",
+   "msg": "placed sell limit GBPUSD 0.03 lot at 1.33455 (council scalp, valid to 2026-11-10T23:01Z)",
+   "trade": "gbpusd-scalp-1794340917"
   }
  ],
  "limits": {
