@@ -1479,6 +1479,32 @@
     ],
     "stopCheckedAt": "2026-11-10T18:47:30.000Z",
     "brokerStop": 0.6843
+   },
+   "gbpusd-replica-1794341068-s": {
+    "positionId": "48211846",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T20:05:35.000Z",
+    "councilEntry": 1.33442,
+    "stop": 1.335037,
+    "t1": 1.333186,
+    "riskCash": 2.01,
+    "margin": 8.01,
+    "mark": 1.33442,
+    "levelsFrom": "mark",
+    "fillPrice": 1.33436,
+    "slipR": 0.097,
+    "lagSec": 67,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T20:05:35.000Z",
+    "brokerStop": 1.33498
    }
   },
   "day": {
@@ -1486,7 +1512,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10036.1 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 10036.1 · 5 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker"
@@ -1498,7 +1524,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10036.1,
-  "lastRun": "2026-11-10T20:03:08.000Z"
+  "lastRun": "2026-11-10T20:05:35.000Z"
  },
  "log": [
   {
@@ -2093,6 +2119,11 @@
    "at": "2026-11-10T19:42:25.000Z",
    "msg": "not mirrored xrp-replica-1794339674-s: none of XRPUSD found at the broker",
    "trade": "xrp-replica-1794339674-s"
+  },
+  {
+   "at": "2026-11-10T20:05:35.000Z",
+   "msg": "opened sell GBPUSD 0.03 lot (council replica)",
+   "trade": "gbpusd-replica-1794341068-s"
   }
  ],
  "limits": {
@@ -2171,11 +2202,11 @@
   ]
  },
  "execution": {
-  "n": 51,
+  "n": 52,
   "meanSlipR": 0.101,
-  "medianSlipR": 0.03,
+  "medianSlipR": 0.036,
   "worstSlipR": 1.236,
-  "medianLagSec": 81,
+  "medianLagSec": 79.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -2202,8 +2233,8 @@
     "meanSlipR": 0.048
    },
    "GBPUSD": {
-    "n": 2,
-    "meanSlipR": 0.069
+    "n": 3,
+    "meanSlipR": 0.079
    },
    "USDCHF": {
     "n": 3,
