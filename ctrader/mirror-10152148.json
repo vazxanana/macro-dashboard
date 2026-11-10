@@ -1685,7 +1685,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T22:30:52.000Z",
     "councilEntry": 83.06,
     "stop": 83.613,
@@ -1699,10 +1699,12 @@
     "slipR": 0.378,
     "lagSec": 56,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T22:30:52.000Z",
-    "brokerStop": 83.404
+    "brokerStop": 83.404,
+    "closedAt": "2026-11-10T23:45:55.000Z"
    },
    "usdchf-replica-1794351613-s": {
     "positionId": "48230038",
@@ -1810,6 +1812,59 @@
     ],
     "stopCheckedAt": "2026-11-10T23:41:05.000Z",
     "brokerStop": 82.527
+   },
+   "btc-replica-1794354313-b": {
+    "positionId": "48236287",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T23:45:55.000Z",
+    "councilEntry": 73678.7,
+    "stop": 73443.84,
+    "t1": 74148.42,
+    "riskCash": 2.35,
+    "margin": 73.63,
+    "minLot": true,
+    "mark": 73678.7,
+    "levelsFrom": "mark",
+    "fillPrice": 73692.15,
+    "slipR": 0.057,
+    "lagSec": 42,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T23:45:55.000Z",
+    "brokerStop": 73457.29
+   },
+   "eth-replica-1794354313-b": {
+    "positionId": "48236292",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 20,
+    "lots": 0.2,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T23:45:55.000Z",
+    "councilEntry": 2049.83,
+    "stop": 2040.14,
+    "t1": 2069.209,
+    "riskCash": 2,
+    "margin": 40.98,
+    "mark": 2049.83,
+    "levelsFrom": "mark",
+    "fillPrice": 2051.19,
+    "slipR": 0.14,
+    "lagSec": 42,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T23:45:55.000Z",
+    "brokerStop": 2041.5
    }
   },
   "day": {
@@ -1817,7 +1872,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10022.86 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 10017.08 · 11 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker"
@@ -1828,8 +1883,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10022.86,
-  "lastRun": "2026-11-10T23:44:57.000Z"
+  "balance": 10017.08,
+  "lastRun": "2026-11-10T23:45:55.000Z"
  },
  "log": [
   {
@@ -2514,6 +2569,21 @@
    "at": "2026-11-10T23:41:05.000Z",
    "msg": "opened buy SOLUSD 0.01 lot (council replica)",
    "trade": "sol-replica-1794354025-b"
+  },
+  {
+   "at": "2026-11-10T23:45:55.000Z",
+   "msg": "SOLUSD position 48229636 closed at the broker",
+   "trade": "sol-replica-1794349796-s"
+  },
+  {
+   "at": "2026-11-10T23:45:55.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794354313-b"
+  },
+  {
+   "at": "2026-11-10T23:45:55.000Z",
+   "msg": "opened buy ETHUSD 0.2 lot (council replica)",
+   "trade": "eth-replica-1794354313-b"
   }
  ],
  "limits": {
@@ -2592,9 +2662,9 @@
   ]
  },
  "execution": {
-  "n": 63,
+  "n": 65,
   "meanSlipR": 0.101,
-  "medianSlipR": 0.038,
+  "medianSlipR": 0.039,
   "worstSlipR": 1.236,
   "medianLagSec": 73,
   "bySymbol": {
@@ -2603,16 +2673,16 @@
     "meanSlipR": 0.143
    },
    "ETHUSD": {
-    "n": 6,
-    "meanSlipR": 0.237
+    "n": 7,
+    "meanSlipR": 0.223
    },
    "XAUUSD": {
     "n": 7,
     "meanSlipR": 0.128
    },
    "BTCUSD": {
-    "n": 9,
-    "meanSlipR": 0.023
+    "n": 10,
+    "meanSlipR": 0.026
    },
    "USDCAD": {
     "n": 7,
