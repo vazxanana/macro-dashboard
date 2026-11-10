@@ -4178,6 +4178,34 @@
     "stopCheckedAt": "2026-11-10T09:06:01.000Z",
     "brokerStop": 1.12453,
     "closedAt": "2026-11-10T09:10:23.000Z"
+   },
+   "sol-rscalp-1794302265": {
+    "positionId": "47979585",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-10T09:18:47.000Z",
+    "councilEntry": 85.39,
+    "stop": 84.81210714285714,
+    "t1": 87.44,
+    "riskCash": 5.78,
+    "margin": 85.19,
+    "minLot": true,
+    "shadow": true,
+    "mark": 85.39,
+    "levelsFrom": "mark",
+    "fillPrice": 85.449,
+    "slipR": 0.102,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T09:18:47.000Z",
+    "brokerStop": 84.871
    }
   },
   "day": {
@@ -4185,7 +4213,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9915.87 · 19 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9915.87 · 20 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4220,23 +4248,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "eth-rscalp-1794302265": {
+    "orderId": "33854725",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 11,
+    "lots": 0.11,
+    "digits": 2,
+    "setup": "rscalp",
+    "limitPrice": 2104.01,
+    "stop": 2087.4224642857143,
+    "t1": 2160.8,
+    "placedAt": "2026-11-10T09:18:47.000Z",
+    "expires": "2026-11-10T12:17:45.000Z",
+    "riskCash": 1.98,
+    "margin": 23.08,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9915.87,
-  "lastRun": "2026-11-10T09:16:22.000Z"
+  "lastRun": "2026-11-10T09:18:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:03:27.000Z",
-   "msg": "moved XAUUSD 47603258 protection: stop 4091.39 -> 4092.355, target 4134.135 -> 4135.1 (council scalp)",
-   "trade": "xau-scalp-1794222860"
-  },
-  {
-   "at": "2026-11-09T15:03:27.000Z",
-   "msg": "moved XAUUSD 47612512 protection: stop 4101.71 -> 4102.675, target 4134.135 -> 4135.1 (council m30m1)",
-   "trade": "xau-m30m1-1794224183"
-  },
   {
    "at": "2026-11-09T15:03:27.000Z",
    "msg": "moved XAUUSD 47675609 protection: stop 4131.1029285714285 -> 4132.068, target 4094.2650000000003 -> 4095.23 (council rscalp)",
@@ -5726,6 +5764,16 @@
    "at": "2026-11-10T09:10:46.000Z",
    "msg": "EURUSD position 47951540 closed at the broker",
    "trade": "eurusd-scalp-1794296570"
+  },
+  {
+   "at": "2026-11-10T09:18:47.000Z",
+   "msg": "placed buy limit ETHUSD 0.11 lot at 2104.01 (council rscalp, valid to 2026-11-10T12:17Z)",
+   "trade": "eth-rscalp-1794302265"
+  },
+  {
+   "at": "2026-11-10T09:18:47.000Z",
+   "msg": "opened buy SOLUSD 0.01 lot (council rscalp)",
+   "trade": "sol-rscalp-1794302265"
   }
  ],
  "limits": {
@@ -5804,15 +5852,15 @@
   ]
  },
  "execution": {
-  "n": 141,
-  "meanSlipR": -0.005,
+  "n": 142,
+  "meanSlipR": -0.004,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 190,
+  "medianLagSec": 189.5,
   "bySymbol": {
    "SOLUSD": {
-    "n": 11,
-    "meanSlipR": 0.099
+    "n": 12,
+    "meanSlipR": 0.1
    },
    "BTCUSD": {
     "n": 11,
