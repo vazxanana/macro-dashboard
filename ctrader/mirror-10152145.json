@@ -5155,6 +5155,33 @@
     ],
     "stopCheckedAt": "2026-11-10T14:24:47.000Z",
     "brokerStop": 1.41771
+   },
+   "eth-swing-1794321379": {
+    "positionId": "48091332",
+    "symbol": "ETHUSD",
+    "side": "sell",
+    "volume": 2,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "swing",
+    "status": "open",
+    "openedAt": "2026-11-10T14:37:21.000Z",
+    "councilEntry": 2082.93,
+    "stop": 2152.449607142857,
+    "t1": 1908.1007857142858,
+    "riskCash": 1.98,
+    "margin": 4.15,
+    "shadow": true,
+    "mark": 2082.93,
+    "levelsFrom": "mark",
+    "fillPrice": 2075.51,
+    "slipR": 0.107,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T14:37:21.000Z",
+    "brokerStop": 2145.03
    }
   },
   "day": {
@@ -5162,7 +5189,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9920.35 · 21 open",
+  "status": "ok · demo Fusion Markets · balance 9920.35 · 22 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5175,27 +5202,53 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "gbpusd-scalp-1794321379": {
+    "orderId": "33874611",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.33861,
+    "stop": 1.33972,
+    "t1": 1.3363900000000002,
+    "placedAt": "2026-11-10T14:37:21.000Z",
+    "expires": "2026-11-10T17:36:19.000Z",
+    "riskCash": 1.98,
+    "margin": 2.68,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "usdchf-scalp-1794321379": {
+    "orderId": "33874612",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.82353,
+    "stop": 0.82248,
+    "t1": 0.82563,
+    "placedAt": "2026-11-10T14:37:21.000Z",
+    "expires": "2026-11-10T17:36:19.000Z",
+    "riskCash": 1.98,
+    "margin": 2,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9920.35,
-  "lastRun": "2026-11-10T14:34:16.000Z"
+  "lastRun": "2026-11-10T14:37:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T06:50:39.000Z",
-   "msg": "AUDUSD position 47907285 closed at the broker",
-   "trade": "audusd-rscalp-1794287076"
-  },
-  {
-   "at": "2026-11-10T07:22:05.000Z",
-   "msg": "EURUSD position 47896646 closed at the broker",
-   "trade": "eurusd-scalp-1794284173"
-  },
-  {
-   "at": "2026-11-10T07:22:05.000Z",
-   "msg": "EURUSD position 47899713 closed at the broker",
-   "trade": "eurusd-scalp-1794285436"
-  },
   {
    "at": "2026-11-10T07:22:05.000Z",
    "msg": "placed buy limit EURUSD 0.03 lot at 1.12324 (council scalp, valid to 2026-11-10T10:21Z)",
@@ -6680,6 +6733,21 @@
    "at": "2026-11-10T14:34:16.000Z",
    "msg": "USDCHF position 48082405 closed at the broker",
    "trade": "usdchf-rscalp-1794320449"
+  },
+  {
+   "at": "2026-11-10T14:37:21.000Z",
+   "msg": "opened sell ETHUSD 0.02 lot (council swing)",
+   "trade": "eth-swing-1794321379"
+  },
+  {
+   "at": "2026-11-10T14:37:21.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.33861 (council scalp, valid to 2026-11-10T17:36Z)",
+   "trade": "gbpusd-scalp-1794321379"
+  },
+  {
+   "at": "2026-11-10T14:37:21.000Z",
+   "msg": "placed buy limit USDCHF 0.01 lot at 0.82353 (council scalp, valid to 2026-11-10T17:36Z)",
+   "trade": "usdchf-scalp-1794321379"
   }
  ],
  "limits": {
@@ -6758,11 +6826,11 @@
   ]
  },
  "execution": {
-  "n": 173,
+  "n": 174,
   "meanSlipR": -0.017,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 177,
+  "medianLagSec": 176.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -6773,8 +6841,8 @@
     "meanSlipR": -0.069
    },
    "ETHUSD": {
-    "n": 7,
-    "meanSlipR": -0.045
+    "n": 8,
+    "meanSlipR": -0.026
    },
    "EURUSD": {
     "n": 32,
