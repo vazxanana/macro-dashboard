@@ -33,12 +33,12 @@
 //          validated (allowlisted paths, a tests/ict-*.test.mjs test, node --check, no new network / env / process access), as a
 //          branch mcp/<name>/… + draft PR with a structured body; comments on the caller's own PRs. A proposal reaches main
 //          only when the OWNER merges it.
-//   APPLY  (owner, 10 Nov 2026: "mcp of fred he should be able to change and edit anything regarding the ict desk such a edge";
-//          then, the same day: "Keep Fred's automatic ICT deployment capability disabled until I explicitly approve it").
-//          BUILT, AND OFF FOR EVERYONE. It takes two deliberate owner actions to switch on for a member: tick "may apply
-//          changes to the ICT edge" on the Users page (stored perms.ictApply: true; no built-in record has it) AND add the
-//          name to council/ict-apply.json on main (ships empty; a normal reviewed pull request). Until both are done the
-//          apply tools are not listed and answer like a tool that does not exist; ict_propose_change is the only way a change
+//   APPLY  (owner, 10 Nov 2026: "let fred have 100% control of ict he can change the edge and what he want, update his mcp
+//          to allow him doing that"). ON FOR FRED, off for everyone else. Two things decide it for a member: the apply
+//          permission (a stored perms.ictApply from the Users page checkbox wins; without one the built-in record's default
+//          counts, and only Fred's is on) AND the name in council/ict-apply.json on main (lists Fred; changed through a normal
+//          reviewed pull request). For anyone without both, the apply tools are not listed and answer like a tool that does
+//          not exist, and ict_propose_change is the way a change
 //          reaches the desk. Once on, a member with ICT 'write' may APPLY a change to the same ICT files: same validation, a branch
 //          mcp/<name>/apply-<time>-<slug> and a normal pull request. This server never merges and never pushes to main:
 //          .github/workflows/ict-apply.yml checks the pull request again (scripts/ict-apply-check.mjs from main, the tests, the
@@ -115,12 +115,12 @@ function ictLevel(name) {
   if (BUILT_IN[name]) return v(BUILT_IN[name].ict);
   return 'read';
 }
-// May the member APPLY changes to the ICT edge? Off by default for everyone (owner, 10 Nov 2026: disabled until explicitly
-// approved): only a stored perms.ictApply === true (the Users page checkbox) says yes, with ICT 'write'. No built-in record, no
-// record flag and no MCP_KEYS entry grants it. The owner's list council/ict-apply.json is the second lock (applyGate, and the
-// apply workflows). fresh = read the stored list now (every ict_apply_change / ict_revert_change call does, so unticking the box
-// stops the next call); otherwise the list cached for a minute (tools/list). Fails closed: an unreadable list means no.
-const applyFlag = (users, name) => { const u = users && users[name]; return !!u && !u.disabled && !!u.perms && u.perms.ictApply === true; };
+// May the member APPLY changes to the ICT edge? A stored perms.ictApply (the Users page checkbox) decides, true or false; without
+// one the built-in record's default counts (owner, 10 Nov 2026: on for Fred only). ICT 'write' is needed too, and no MCP_KEYS
+// entry grants it. The owner's list council/ict-apply.json is the second lock (applyGate, and the apply workflows). fresh = read
+// the stored list now (every ict_apply_change / ict_revert_change call does, so unticking the box stops the next call);
+// otherwise the list cached for a minute (tools/list). Fails closed: an unreadable list means no.
+const applyFlag = (users, name) => { const u = users && users[name]; if (u && u.disabled) return false; if (u && u.perms && typeof u.perms.ictApply === 'boolean') return u.perms.ictApply; return !!(BUILT_IN[name] && BUILT_IN[name].ictApply === true); };
 async function canApply(name, host, env = process.env, fresh = false) {
   if (fresh || !GRANT.users || Date.now() - GRANT.at > 60e3) { try { GRANT.users = await loadUsers(env, host); GRANT.at = Date.now(); } catch (e) { return false; } }
   return ictLevel(name) === 'write' && applyFlag(GRANT.users, name);
@@ -205,12 +205,12 @@ const GUIDE = {
     'Every trade has a stop. No proposal may remove the stop, move it away from the sweep extreme, or loosen a trailed stop.',
     'An edge must pass out of sample on 2020-now data: in sample 2020-2023, out of sample 2024-now (the default split of ict_backtest / ict_compare); OOS n >= 30, average R > 0 in sample AND out of sample, most OOS years positive; t >= 2 is strong. Net of costs.',
     'Report every variant you tried, not only the best one: the 6 Nov search found that most filters that looked good in sample failed out of sample (§14). Fewer, pre-stated ideas beat many tried ones.',
-    'The owner approves every rule change. PROPOSE (ict_propose_change) opens a DRAFT pull request; CI runs the tests; nothing reaches the live tracker until the owner merges. A second path, APPLY (ict_apply_change), is built but switched off: it is available only after the owner switches it on for you, and until then it is not in your tool list.',
+    'The owner approves every rule change. PROPOSE (ict_propose_change) opens a DRAFT pull request; CI runs the tests; nothing reaches the live tracker until the owner merges. The one exception (owner, 10 Nov 2026): APPLY (ict_apply_change) changes the ICT edge without the owner\'s review once its automatic checks pass. The owner switches it on per member (on for Fred); when it is not in your tool list it is off for you. Everything outside the ICT edge always needs the owner.',
     'ICT is a separate edge (§11): never use the council systems to filter it, never change council files.',
   ],
   paths: {
     propose: 'ict_propose_change: for anything you want the owner to review first, and the only way for a change that needs something outside the ICT files or new network / environment / process access (say what you need in the proposal or with ict_note). A draft pull request; the owner merges or closes it.',
-    apply: 'ict_apply_change: available only after the owner switches it on (off by default for everyone; when it is off the tool is not listed and every change goes through ict_propose_change). When on: for changes to the ICT edge\'s own files (' + ALLOW_TEXT + '). Same arguments and the same server checks as a proposal. It opens a normal pull request on a branch mcp/<you>/apply-…; the apply workflow checks it again (allowed paths only, no new network / environment / process access, the whole test suite, and a stop guard you cannot edit: every signal and every simulated trade has a stop on the right side of the entry), then merges it. The running tracker switches to the new code at its next round (about 12 minutes), the replay is rerun, and the backtest tools use it after the next site deploy (a few minutes). If a check fails the pull request stays open with a comment saying why, and the desk is unchanged.',
+    apply: 'ict_apply_change: available to the members the owner switched it on for (on for Fred since 10 Nov 2026; when it is off for you the tool is not listed and every change goes through ict_propose_change). When on: for changes to the ICT edge\'s own files (' + ALLOW_TEXT + '). Same arguments and the same server checks as a proposal. It opens a normal pull request on a branch mcp/<you>/apply-…; the apply workflow checks it again (allowed paths only, no new network / environment / process access, the whole test suite, and a stop guard you cannot edit: every signal and every simulated trade has a stop on the right side of the entry), then merges it. The running tracker switches to the new code at its next round (about 12 minutes), the replay is rerun, and the backtest tools use it after the next site deploy (a few minutes). If a check fails the pull request stays open with a comment saying why, and the desk is unchanged.',
     revert: 'ict_revert_change { number, why } (listed with ict_apply_change, only after the owner switches apply on): undoes one of YOUR applied changes (restores the files as they were before it, as a new applied change through the same checks). It refuses when a file changed again since; then read the file and apply the content you want.',
     outOfReach: 'Out of reach on both paths: the council\'s systems, the page, the API, workflows, scripts, users, tokens and cTrader orders. ICT is paper and demo only. Every trade has a stop. The owner switches the apply path on and off; every applied change is a merged pull request the owner can revert.',
   },
@@ -227,7 +227,7 @@ const GUIDE = {
   params: 'ict_backtest params: piv (swing candles each side, 3), look (candles a swing stays active, 96), vmax (max candles sweep → inversion, 6), maxAtr (max stop in H1 ATRs, 8), holdH (H1 candles before the time exit, 36), be (R for break-even on indices, 1.5; 0 = off), trail_from / trail_dist (trail start and distance in R, 2 / 1.5; trail_from 0 = no trail), mark (the R mark recorded, 2).',
   limits: 'Per key: 90 calls a minute; 12 backtests / comparisons per 10 minutes; 40 candle requests per 10 minutes; 20 writes an hour (6 proposals; applied changes and reverts, when the owner has switched them on, count as proposals and are capped at 10 a day). Backtests: 1-5 markets, 2020-01-01 to now, about 40 s of candle download. Answers are capped at 150 000 characters: narrow filters or use limit / offset.',
 };
-const INSTR = 'Meridian ICT desk (paper and demo trading, one model: the H1 iFVG reversal). Call ict_guide first: it explains the desk, the rules and the workflow. Rules: every trade has a stop; paper only; an edge must pass out of sample on 2020-now data (ict_backtest / ict_compare: in sample 2020-2023, out of sample 2024-now); the owner approves every rule change. Research with ict_rules, ict_trades, ict_bars, ict_backtest and ict_compare; propose a change with ict_propose_change (a draft PR with a test and the 2020-now evidence; nothing changes live until the owner merges); follow it with ict_my_proposals; keep your own desk record with ict_desk_update. A second path, ict_apply_change (a change to the ICT files merged by a workflow after its checks, without the owner), is available only after the owner switches it on: when it is not in your tool list it is off, and propose is the way. Only ICT files can be changed; the council systems, the page, api/, workflows, users, tokens and cTrader orders are out of reach.';
+const INSTR = 'Meridian ICT desk (paper and demo trading, one model: the H1 iFVG reversal). Call ict_guide first: it explains the desk, the rules and the workflow. Rules: every trade has a stop; paper only; an edge must pass out of sample on 2020-now data (ict_backtest / ict_compare: in sample 2020-2023, out of sample 2024-now); the owner approves every rule change (the one exception is ict_apply_change, below). Research with ict_rules, ict_trades, ict_bars, ict_backtest and ict_compare; propose a change with ict_propose_change (a draft PR with a test and the 2020-now evidence; nothing changes live until the owner merges); follow it with ict_my_proposals; keep your own desk record with ict_desk_update. A second path, ict_apply_change (a change to the ICT files merged by a workflow after its checks, without the owner), is there for the members the owner switched it on for (Fred, since 10 Nov 2026): when it is not in your tool list it is off for you, and propose is the way. Only ICT files can be changed; the council systems, the page, api/, workflows, users, tokens and cTrader orders are out of reach.';
 
 // ---- writes ----
 // read-modify-write of one council-data JSON file with the write token; one retry when the file moved meanwhile. mutate(current

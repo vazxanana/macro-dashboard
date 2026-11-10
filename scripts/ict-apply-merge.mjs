@@ -1,6 +1,6 @@
 // Merges applied ICT changes that passed every lock. Run by .github/workflows/ict-apply-merge.yml only, from main's copy,
 // downloaded through the API: that job has no checkout and never holds or runs pull request code. Everything it knows about a pull
-// request comes from the GitHub API. OFF while council/ict-apply.json lists nobody (it ships empty): every branch is refused.
+// request comes from the GitHub API. Only members listed in council/ict-apply.json on main (owner, 10 Nov 2026: fred); an empty list refuses every branch.
 //
 // For each open pull request main <- mcp/<member>/apply-… in this repository, oldest first:
 //   1. already answered for this head commit (our marker comment)?        -> leave it for the owner

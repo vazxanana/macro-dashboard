@@ -1,7 +1,7 @@
 name: ICT apply
 
-# Checks an APPLIED change to the ICT edge (owner, 10 Nov 2026). BUILT, AND SWITCHED OFF: council/ict-apply.json lists nobody, so
-# the first step refuses every branch. The owner switches it on with two actions (the Users page box, and a name in that file).
+# Checks an APPLIED change to the ICT edge (owner, 10 Nov 2026). ON FOR FRED: council/ict-apply.json lists fred; the first step
+# refuses a branch of anyone else. Two things decide it per member (the Users page box, and the name in that file).
 #
 # What it is for: the connector's ict_apply_change (api/mcp.js) opens a pull request from mcp/<member>/apply-… that changes the
 # ICT edge's own files. This workflow checks that pull request again, without trusting it. It never merges: a second workflow,

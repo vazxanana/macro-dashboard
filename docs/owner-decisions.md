@@ -106,23 +106,17 @@ Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research conne
   (b) Keep the lab's numbers and say so in the guide. (c) Use the higher of the two per market.
 - **Recommended: (a).** One cost table for every ICT number Fred and the owner compare. Update `docs/fred-mcp.md` with it.
 
-### [ ] 26. Fred may apply ICT changes without review: off
+### [x] 26. Fred may apply ICT changes without review: ON (your decision, 10 Nov 2026)
 
-- **Status: OFF. Nothing here can change the live desk until you take both actions below.** You asked for it on 10 Nov ("mcp
-  of fred he should be able to change and edit anything regarding the ict desk such a edge") and then said: "Keep Fred's
-  automatic ICT deployment capability disabled until I explicitly approve it. Finish and test the connector, but do not
-  activate autonomous production changes." It is built and tested and ships disabled for everyone, Fred included.
-  `ict_propose_change` (a draft pull request you merge) stays the only way a change reaches the desk.
-- **How to switch it on (two deliberate actions; each alone does nothing).**
-  1. Users page → Fred → Permissions… → with ICT on "Review and trade", tick **ICT: may apply changes to the ICT edge without
-     my review** and save (stored as `perms.ictApply: true`; no built-in record has it).
-  2. Add his account key to `council/ict-apply.json` on `main` (`{ "members": ["fred"] }`) through a normal pull request that
-     you review and merge. The file ships as `{ "members": [] }`; while it is empty the connector and both workflows refuse
-     every branch.
+- **Status: ON for Fred, off for everyone else.** You asked for it on 10 Nov ("mcp of fred he should be able to change and
+  edit anything regarding the ict desk such a edge"), first kept it disabled, then approved it the same day: "let fred have
+  100% control of ict he can change the edge and what he want, update his mcp to allow him doing that."
+- **What was switched on.** Fred's built-in record carries the apply permission (the Users page shows the box ticked for
+  him; unticking it stores an explicit "off" that wins), and `council/ict-apply.json` on `main` lists `fred`.
 - **How to switch it off again.** Untick the box (stops the next call at once: the connector reads the stored list on every
   apply call), or remove the name from `council/ict-apply.json` (the hard off-switch: the workflows refuse the branch even
   if a pull request exists).
-- **What it allows once on.** Through the connector Fred can change the ICT edge's own files only (`ict/*.mjs`, the ICT skill,
+- **What it allows.** Through the connector Fred can change the ICT edge's own files only (`ict/*.mjs`, the ICT skill,
   `tests/ict-*.test.mjs`, `tests/fixtures/ict/*`, `research/ict/*`, `research/edge/ict-*/*`) and have the change merged to
   `main` without you. The council loop then runs the new ICT code from its next round, and the ICT A-setups are copied to the
   demo account as today. He can also revert his own applied changes. At most 6 an hour (with proposals) and 10 a day.
@@ -139,14 +133,16 @@ Grouped: **Security** (1-8 and 19, of which 7-8 and 19 are Fred's research conne
   the checks passed for exactly the head commit, the pull request is open, not a draft, from this repository, the name is in
   the file, every file is in the allowlist, and main's ICT files did not move; squash-merge bound to that commit. A refusal
   is one comment; the pull request stays open for you.
-- **Before switching it on.** Do item 7 first (the dedicated token without the Workflows permission, and branch protection
+- **What it needs to work.** The connector needs a GitHub token on Vercel (`GH_MCP_TOKEN`, or `GH_TOKEN`) that may push a branch
+  and open a pull request; without one `ict_apply_change` answers with the reason and changes nothing. See item 7 (the dedicated token without the Workflows permission, and branch protection
   with required checks). GitHub Actions needs no extra setting for the merge: the merge workflow asks for `contents: write`,
   `pull-requests: write` and `actions: write` in its own file, which works with the read-only default too; "Allow GitHub
   Actions to create and approve pull requests" is not needed (the workflow creates and approves nothing). Not verified from
   here: your repository's current Actions settings and branch protection, and whether an organisation or ruleset policy
   blocks a workflow token from merging; the first applied change would show it (a refusal comment with GitHub's reason).
-- **Recommended.** Leave it off until Fred has a few merged proposals behind him, then switch it on for a trial week and read
-  each merged pull request (their titles start with "ICT (fred, applied):").
+- **Worth doing now that it is on.** Read the merged pull requests whose titles start with "ICT (fred, applied):" (each one
+  is one squash commit you can revert), and do item 7 (a dedicated connector token without the Workflows permission, and
+  branch protection on `main` with required checks and no required review).
 
 ---
 

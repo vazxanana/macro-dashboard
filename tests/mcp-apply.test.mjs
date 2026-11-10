@@ -1,8 +1,9 @@
-// node --test tests/mcp-apply.test.mjs — the connector's apply path (api/mcp.js: ict_apply_change, ict_revert_change), built
-// and SWITCHED OFF (owner, 10 Nov 2026: "Keep Fred's automatic ICT deployment capability disabled until I explicitly approve
-// it"), and ict_desk_update. Off by default for everyone, Fred included; two owner actions switch it on (the Users page box =
-// a stored perms.ictApply, and a name in council/ict-apply.json); each alone is not enough; with both the path works end to
-// end, through the verifier and the merge script. Fake GitHub only (tests/fixtures/mcp-fake.mjs). No network.
+// node --test tests/mcp-apply.test.mjs — the connector's apply path (api/mcp.js: ict_apply_change, ict_revert_change) and
+// ict_desk_update. ON FOR FRED, off for every other member (owner, 10 Nov 2026: "let fred have 100% control of ict he can
+// change the edge and what he want"). Two things decide it per member (the apply permission: a stored perms.ictApply from the
+// Users page box, else the built-in default, on for Fred only; and the name in council/ict-apply.json); each alone is not
+// enough; with both the path works end to end, through the verifier and the merge script. Fake GitHub only
+// (tests/fixtures/mcp-fake.mjs). No network.
 // This file is deliberately not named tests/ict-*: a change to the ICT edge cannot edit it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -39,21 +40,23 @@ function ghWrites(extra = [], pulls = []) {
 const good = { title: 'Tighter swing', what: 'piv 3 to 2', why: 'faster swings', risk: 'more trades', evidence: 'OOS avg R +0.2 vs +0.1 (n 120) @owner please',
   files: [{ path: 'ict/tracker.mjs', content: 'export const P = { piv: 2 };\nexport const f = () => fetch("x");\n' }, { path: 'tests/ict-piv.test.mjs', content: "import test from 'node:test';\nimport assert from 'node:assert';\ntest('piv', () => assert.ok(true));\n" }] };
 
-// ---- the default: off ----
-test('default: applying is off for everyone, Fred included; no built-in record carries an apply flag; the committed list is empty', async () => {
+// ---- who has it (owner, 10 Nov 2026: on for Fred, off for everyone else) ----
+test('who may apply: Fred by the owner\'s decision, nobody else; the committed list names Fred only; a stored box wins over the default', async () => {
   reset();
-  for (const [k, u] of Object.entries(A.BUILT_IN)) { assert.ok(!('ictApply' in u), `${k}: no apply flag on the built-in record`); assert.ok(!('ictApply' in A.publicRecord(u)), `${k}: none in the public record`); }
-  assert.equal(A.BUILT_IN.fred.ict, true, 'Fred keeps ICT write (proposals, notes, his desk record)');
-  assert.deepEqual(JSON.parse(fs.readFileSync(new URL('../council/ict-apply.json', import.meta.url), 'utf8')).members, [], 'council/ict-apply.json ships empty');
-  assert.deepEqual(readMembers(), [], 'the verifier reads nobody');
-  // only a stored perms.ictApply === true says yes: not the built-in, not a record flag, not "truthy"
-  assert.equal(L.applyFlag({}, 'fred'), false); assert.equal(L.applyFlag(null, 'fred'), false); assert.equal(L.applyFlag({ fred: {} }, 'fred'), false);
-  assert.equal(L.applyFlag({ fred: { ictApply: true } }, 'fred'), false, 'a record flag is not the permission');
-  assert.equal(L.applyFlag({ fred: { perms: { ictApply: 'yes' } } }, 'fred'), false); assert.equal(L.applyFlag({ fred: { perms: { ictApply: false } } }, 'fred'), false);
-  assert.equal(L.applyFlag({ fred: { perms: { ictApply: true } } }, 'fred'), true); assert.equal(L.applyFlag({ fred: { disabled: true, perms: { ictApply: true } } }, 'fred'), false);
+  for (const [k, u] of Object.entries(A.BUILT_IN)) { assert.equal(u.ictApply === true, k === 'fred', `${k}: the built-in apply default`); assert.equal(A.publicRecord(u).ictApply === true, k === 'fred', `${k}: the public record`); }
+  assert.equal(A.BUILT_IN.fred.ict, true, 'Fred has ICT write (apply needs it)');
+  assert.deepEqual(JSON.parse(fs.readFileSync(new URL('../council/ict-apply.json', import.meta.url), 'utf8')).members, ['fred'], 'council/ict-apply.json lists Fred and nobody else');
+  assert.deepEqual(readMembers(), ['fred'], 'the verifier reads the same list');
+  // Fred: on with nothing stored (the built-in default); a stored box, ticked or not, wins; a disabled record is off
+  assert.equal(L.applyFlag({}, 'fred'), true); assert.equal(L.applyFlag(null, 'fred'), true); assert.equal(L.applyFlag({ fred: {} }, 'fred'), true);
+  assert.equal(L.applyFlag({ fred: { perms: { ictApply: false } } }, 'fred'), false, 'unticking the box switches it off'); assert.equal(L.applyFlag({ fred: { perms: { ictApply: true } } }, 'fred'), true);
+  assert.equal(L.applyFlag({ fred: { disabled: true, perms: { ictApply: true } } }, 'fred'), false); assert.equal(L.applyFlag({ fred: { disabled: true } }, 'fred'), false);
+  // everyone else: off unless the owner ticks their box (a stored perms.ictApply === true); not a record flag, not "truthy", not an unknown name
+  for (const who of ['orlando', 'luxus', 'carlos', 'someone']) { assert.equal(L.applyFlag({}, who), false, who); assert.equal(L.applyFlag({ [who]: {} }, who), false); assert.equal(L.applyFlag({ [who]: { ictApply: true } }, who), false, 'a record flag is not the permission'); assert.equal(L.applyFlag({ [who]: { perms: { ictApply: 'yes' } } }, who), false); assert.equal(L.applyFlag({ [who]: { perms: { ictApply: true } } }, who), true); }
   // canApply reads the stored list; it fails closed
-  L.IO.loadUsers = async () => ({}); assert.equal(await L.canApply('fred', 'h', {}, true), false, 'nothing stored: off');
+  L.IO.loadUsers = async () => ({}); assert.equal(await L.canApply('fred', 'h', {}, true), true, 'nothing stored: the owner\'s default for Fred'); assert.equal(await L.canApply('orlando', 'h', {}, true), false, 'and for nobody else');
   L.IO.loadUsers = async () => TICKED; assert.equal(await L.canApply('fred', 'h', {}, true), true);
+  L.IO.loadUsers = async () => ({ fred: { ...TICKED.fred, perms: { ict: 'write', mcp: true, ictApply: false } } }); assert.equal(await L.canApply('fred', 'h', {}, true), false, 'the box unticked');
   L.IO.loadUsers = async () => ({ orlando: { ict: 'read', mcp: true, perms: { ictApply: true } } }); assert.equal(await L.canApply('orlando', 'h', {}, true), false, 'the box without ICT write is nothing');
   L.IO.loadUsers = async () => ({ fred: { ...TICKED.fred, perms: { ict: 'read', ictApply: true } } }); assert.equal(await L.canApply('fred', 'h', {}, true), false);
   L.IO.loadUsers = async () => { throw new Error('blob down'); }; assert.equal(await L.canApply('fred', 'h', {}, true), false, 'an unreadable list means no');
@@ -69,9 +72,9 @@ test('hidden: with apply off the two tools are not listed and answer exactly lik
   const none = await rpcCall('no_such_tool', {}, { level: 'write', apply: false });
   for (const n of APPLY) { const r = await rpcCall(n, { ...good, number: 7 }, { level: 'write', apply: false });
     assert.equal(r.result, undefined); assert.equal(r.error.code, none.error.code); assert.equal(r.error.message, none.error.message.replace('no_such_tool', n), 'the same answer as an unknown tool'); }
-  // through the HTTP handler: Fred, built-in, nothing stored -> off; nothing is ever written
+  // through the HTTP handler: Fred with his box unticked on the Users page -> off; nothing is ever written
   const { routes, made } = ghWrites();
-  L.IO.loadUsers = async () => ({});
+  L.IO.loadUsers = async () => ({ fred: { ...TICKED.fred, perms: { ict: 'write', mcp: true, ictApply: false } } });
   await withNet(fakeFetch({ files: { ...MAINF, [`main:${RULES.MEMBERS_FILE}`]: LISTED }, routes }), async () => {
     const names = (await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).body.result.tools.map((t) => t.name);
     for (const n of APPLY) assert.ok(!names.includes(n)); assert.ok(names.includes('ict_propose_change'));
@@ -90,7 +93,7 @@ test('annotations: the apply tools say they replace files; a client asks before 
 // ---- two locks ----
 test('each lock alone is not enough: the box without the list, and the list without the box', async () => {
   reset();
-  // lock 1 on (box ticked), lock 2 off (the committed, empty list): listed, but the call refuses before any write
+  // lock 1 on (box ticked), lock 2 off (an empty list on main): listed, but the call refuses before any write
   let w = ghWrites(); L.IO.loadUsers = async () => TICKED;
   await withNet(fakeFetch({ files: { ...MAINF, [`main:${RULES.MEMBERS_FILE}`]: EMPTY }, routes: w.routes }), async () => {
     assert.ok((await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).body.result.tools.find((t) => t.name === 'ict_apply_change'));
@@ -102,8 +105,8 @@ test('each lock alone is not enough: the box without the list, and the list with
   await withNet(fakeFetch({ files: MAINF, routes: w.routes }), async () => {
     assert.match((await rpcCall('ict_apply_change', good)).result.content[0].text, /not in council\/ict-apply\.json/); assert.equal(w.made.ref, undefined);
   });
-  // lock 2 on (the name is listed), lock 1 off (box not ticked): not listed, answers like a tool that does not exist
-  reset(); w = ghWrites(); L.IO.loadUsers = async () => ({ fred: { ...TICKED.fred, perms: { ict: 'write', mcp: true } } });
+  // lock 2 on (the name is listed), lock 1 off (box unticked): not listed, answers like a tool that does not exist
+  reset(); w = ghWrites(); L.IO.loadUsers = async () => ({ fred: { ...TICKED.fred, perms: { ict: 'write', mcp: true, ictApply: false } } });
   await withNet(fakeFetch({ files: { ...MAINF, [`main:${RULES.MEMBERS_FILE}`]: LISTED }, routes: w.routes }), async () => {
     assert.ok(!(await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).body.result.tools.find((t) => APPLY.includes(t.name)));
     const r = await post({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'ict_apply_change', arguments: good } });
@@ -143,9 +146,9 @@ test('both locks on: the path works end to end (connector -> pull request -> mai
     assert.deepEqual(calls, ['POST /git/blobs', 'POST /git/blobs', 'POST /git/trees', 'POST /git/commits', 'POST /git/refs', 'POST /pulls']);
     assert.ok(!calls.some((c) => /merge|heads\/main/.test(c)));
   });
-  // main's verifier (API mode) accepts exactly that pull request when the list names Fred, and refuses it with the committed list
+  // main's verifier (API mode) accepts exactly that pull request when the list names Fred (the committed list does), and refuses it with an empty one
   const apiFiles = w.made.tree.tree.map((t) => ({ filename: t.path, status: 'modified' }));
-  assert.equal(checkApiFiles(apiFiles, branch, ['fred']).ok, true); assert.equal(checkApiFiles(apiFiles, branch, readMembers()).ok, false, 'the committed list is empty');
+  assert.equal(checkApiFiles(apiFiles, branch, ['fred']).ok, true); assert.equal(checkApiFiles(apiFiles, branch, readMembers()).ok, true, 'the committed list names Fred'); assert.equal(checkApiFiles(apiFiles, branch, []).ok, false, 'an empty list refuses it');
   // the merge script merges it once the checks passed for its head commit
   const merged = {}, pr = { number: 7, state: 'open', draft: false, title: w.made.pr.title, changed_files: 2, head: { sha: 'c1', ref: branch, repo: { full_name: REPO } }, base: { ref: 'main', sha: 'head1' } };
   const net = fakeFetch({ routes: [['GET', /^\/pulls\/7$/, () => J(pr)], ['GET', /^\/issues\/7\/comments/, () => J([])],
@@ -155,11 +158,11 @@ test('both locks on: the path works end to end (connector -> pull request -> mai
   const out = await mergeOne(7, { gh: makeGh({ repo: REPO, token: 't', fetchFn: net }), repo: REPO, members: ['fred'] });
   assert.equal(out.result, 'merged'); assert.equal(merged.body.merge_method, 'squash'); assert.equal(merged.body.sha, 'c1', 'bound to the checked head commit'); assert.equal(merged.body.commit_title, 'ICT (fred, applied): Tighter swing (#7)');
   assert.deepEqual(merged.replay, { ref: 'main' }, 'the replay is dispatched: ICT code changed');
-  // ...and with the committed (empty) list the same pull request is refused, with one comment and no merge
+  // ...and with an empty list (the hard off-switch) the same pull request is refused, with one comment and no merge
   const m2 = {}; const net2 = fakeFetch({ routes: [['GET', /^\/pulls\/7$/, () => J(pr)], ['GET', /^\/issues\/7\/comments/, () => J([])],
     ['GET', /^\/actions\/workflows\/ict-apply\.yml\/runs/, () => J({ workflow_runs: [{ id: 1, head_sha: 'c1', status: 'completed', conclusion: 'success', created_at: 'x' }] })], ['GET', /^\/pulls\/7\/files/, () => J(apiFiles)],
     ['POST', /^\/issues\/7\/comments$/, (m, b) => { m2.comment = b.body; return J({}, 201); }], ['PUT', /^\/pulls\/7\/merge$/, () => { m2.merged = true; return J({}); }]] });
-  const out2 = await mergeOne(7, { gh: makeGh({ repo: REPO, token: 't', fetchFn: net2 }), repo: REPO, members: readMembers() });
+  const out2 = await mergeOne(7, { gh: makeGh({ repo: REPO, token: 't', fetchFn: net2 }), repo: REPO, members: [] });
   assert.equal(out2.result, 'refused'); assert.equal(m2.merged, undefined); assert.ok(m2.comment.startsWith(mark('c1'))); assert.match(m2.comment, /fred is not in council\/ict-apply\.json/);
   reset();
 });
@@ -378,23 +381,23 @@ test('ict_my_proposals shows an applied change with its checks and whether it me
   assert.ok(mark('abc').startsWith(L.APPLY_MARK), 'the marker the merge script writes');
   reset();
 });
-test('the guide and the instructions: propose is the way; apply is built but only after the owner switches it on; what stays out of reach', async () => {
+test('the guide and the instructions: the owner approves every rule change, apply is the one exception and per member; what stays out of reach', async () => {
   const g = (await rpcCall('ict_guide', {}, { level: 'read' })).result.structuredContent, init = (await L.rpc('fred', { jsonrpc: '2.0', id: 1, method: 'initialize', params: {} })).result.instructions;
-  assert.match(g.rules.join(' '), /The owner approves every rule change\./); assert.match(g.rules.join(' '), /built but switched off: it is available only after the owner switches it on/);
+  assert.match(g.rules.join(' '), /The owner approves every rule change\./); assert.match(g.rules.join(' '), /The one exception \(owner, 10 Nov 2026\): APPLY \(ict_apply_change\) changes the ICT edge without the owner's review once its automatic checks pass/); assert.match(g.rules.join(' '), /when it is not in your tool list it is off for you\. Everything outside the ICT edge always needs the owner\./);
   assert.match(g.paths.propose, /ict_propose_change/); assert.match(g.paths.propose, /outside the ICT files or new network \/ environment/);
-  assert.match(g.paths.apply, /available only after the owner switches it on \(off by default for everyone/); assert.match(g.paths.apply, /stop guard you cannot edit/); assert.match(g.paths.apply, /stays open with a comment/);
+  assert.match(g.paths.apply, /available to the members the owner switched it on for \(on for Fred since 10 Nov 2026; when it is off for you the tool is not listed/); assert.match(g.paths.apply, /stop guard you cannot edit/); assert.match(g.paths.apply, /stays open with a comment/);
   assert.match(g.paths.revert, /only after the owner switches apply on/);
   for (const w of ['council', 'page', 'API', 'workflows', 'users', 'tokens', 'cTrader orders', 'paper and demo only', 'Every trade has a stop']) assert.ok(g.paths.outOfReach.includes(w), w);
-  assert.match(init, /the owner approves every rule change/); assert.match(init, /ict_apply_change[^.]*is available only after the owner switches it on/); assert.match(init, /cTrader orders are out of reach/);
+  assert.match(init, /the owner approves every rule change/); assert.match(init, /ict_apply_change \([^)]*\), is there for the members the owner switched it on for \(Fred, since 10 Nov 2026\): when it is not in your tool list it is off for you/); assert.match(init, /cTrader orders are out of reach/);
   assert.match(g.workflow.join(' '), /ict_desk_update/);
 });
-test('the Users page: one checkbox under ICT write, saved as perms.ictApply, off by default, two steps named', () => {
-  assert.match(PAGE, /name="ictApply"\$\{applyOn\(cur\) \? ' checked' : ''\}> ICT: may apply changes to the ICT edge without my review<\/label>/);
-  assert.match(PAGE, /const applyOn = \(u\) => !!\(u && u\.perms && u\.perms\.ictApply === true\);/, 'ticked only from a stored perms.ictApply: no default');
+test('the Users page: one checkbox under ICT write, saved as perms.ictApply; ticked from the stored box, else from the built-in default; both locks named', () => {
+  assert.match(PAGE, /name="ictApply"\$\{applyOn\(cur, k\) \? ' checked' : ''\}> ICT: may apply changes to the ICT edge without my review<\/label>/);
+  assert.match(PAGE, /const applyOn = \(u, k\) => \(u && u\.perms && typeof u\.perms\.ictApply === 'boolean' \? u\.perms\.ictApply : /, 'a stored box (true or false) decides; only without one does the built-in default count, as api/mcp.js applyFlag');
   assert.match(PAGE, /id="ms-perm-apply"\$\{E\.ict === 'write' \? '' : ' hidden'\}/, 'shown only when ICT is write'); assert.match(PAGE, /hidden = f\.elements\.ict\.value !== 'write'/);
-  assert.match(PAGE, /perms\.ictApply = ict === 'write' && f\.elements\.ictApply\.checked;/);
-  const help = /<p class="ms-note">(Off for everyone until you switch it on\.[^<]+)<\/p>/.exec(PAGE)[1];
-  for (const re of [/It takes two steps: tick this box, and add the member's name to council\/ict-apply\.json/, /ships empty/, /normal reviewed pull request/, /merged pull request you can revert/, /Unticking this stops it at once/, /Removing the name from council\/ict-apply\.json is the hard off-switch/]) assert.match(help, re);
+  assert.match(PAGE, /perms\.ictApply = ict === 'write' && f\.elements\.ictApply\.checked;/, 'a save always stores an explicit true or false');
+  const help = /<p class="ms-note">(On for Fred since 10 Nov 2026 \(your decision\); off for everyone else\.[^<]+)<\/p>/.exec(PAGE)[1];
+  for (const re of [/It takes two things: this box ticked, and the member's name in council\/ict-apply\.json/, /it lists Fred/, /normal reviewed pull request/, /every trade keeps its stop/, /merged pull request you can revert/, /Unticking this stops it at once/, /Removing the name from council\/ict-apply\.json is the hard off-switch/]) assert.match(help, re);
   assert.ok(!window_perm_keys().includes('ictApply'), 'not a page-gating key: the page hides nothing by it');
 });
 function window_perm_keys() { return JSON.parse(/window\.MS_PERM_KEYS = (\[[^\]]+\]);/.exec(PAGE)[1].replace(/'/g, '"')); }

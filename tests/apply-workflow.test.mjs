@@ -1,7 +1,7 @@
 // node --test tests/apply-workflow.test.mjs — the locks between an applied ICT change and main, outside the connector:
 // the two workflow files (read as text), main's verifier scripts/ict-apply-check.mjs against temporary git repositories, the
 // merge script scripts/ict-apply-merge.mjs against a fake GitHub, the one shared allowlist (api/_ictrules.js), and the stop
-// guard biting on a broken tracker. The path ships SWITCHED OFF: council/ict-apply.json is empty and every branch is refused.
+// guard biting on a broken tracker. council/ict-apply.json lists fred (owner, 10 Nov 2026); any other member's branch is refused.
 // This file is deliberately not named tests/ict-*: a change to the ICT edge cannot edit it. No network.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -36,9 +36,9 @@ test('the two allowlists are one: the connector and the verifier use api/_ictrul
   assert.match(mcp, /const \{[^}]*okPath[^}]*riskyAdded[^}]*\} = require\('\.\/_ictrules\.js'\)/);
   // the rules module stays self-contained: the merge workflow downloads it alone
   assert.ok(!/\brequire\s*\(|^\s*import\s/m.test(rd('api/_ictrules.js')), 'api/_ictrules.js imports nothing');
-  // the list of who may apply is outside the allowlist, so a change cannot add its own author; and it ships empty
+  // the list of who may apply is outside the allowlist, so a change cannot add its own author; it names Fred only (owner, 10 Nov 2026)
   assert.equal(RULES.MEMBERS_FILE, 'council/ict-apply.json'); assert.ok(!RULES.okPath(RULES.MEMBERS_FILE));
-  assert.deepEqual(JSON.parse(rd(RULES.MEMBERS_FILE)).members, []);
+  assert.deepEqual(JSON.parse(rd(RULES.MEMBERS_FILE)).members, ['fred']);
   assert.deepEqual(RULES.membersOf('{"members":["fred","Owner!","owner",7,"orlando"]}'), ['fred', 'orlando']); assert.deepEqual(RULES.membersOf('{broken'), []); assert.deepEqual(RULES.membersOf({ members: 'fred' }), []); assert.deepEqual(RULES.membersOf(null), []);
 });
 test('apply branches: mcp/<member>/apply-<time>-<slug>, never a proposal branch, never the owner', () => {
@@ -133,10 +133,10 @@ const BR = 'mcp/fred/apply-abc-tighter-swing';
 const verify = (files, o = {}) => { const r = repoWith(o.base || BASE), head = r.branch(o.branch || BR, files); if (o.mainMoves) r.commit(o.mainMoves, 'main moves');
   return checkRepo({ repo: r.d, base: git(r.d, 'rev-parse', 'main'), head, branch: o.branch || BR, members: o.members || ['fred'] }); };
 test.after(() => { for (const d of TMP) fs.rmSync(d, { recursive: true, force: true }); });
-test('verifier: an allowed change by a listed member passes; with the committed (empty) list it is refused', () => {
+test('verifier: an allowed change by a listed member passes (the committed list names Fred); with an empty list it is refused', () => {
   const ok = verify(CHANGE); assert.deepEqual(ok.problems, []); assert.equal(ok.ok, true); assert.equal(ok.who, 'fred');
   assert.deepEqual(ok.files.map((f) => `${f.path} ${f.status}`), ['ict/tracker.mjs changed', 'research/ict/note.md new', 'tests/ict-piv.test.mjs new']);
-  const off = verify(CHANGE, { members: readMembers() }); assert.equal(off.ok, false); assert.match(off.problems.join('\n'), /fred is not in council\/ict-apply\.json on main/);
+  assert.equal(verify(CHANGE, { members: readMembers() }).ok, true, 'the committed list'); const off = verify(CHANGE, { members: [] }); assert.equal(off.ok, false); assert.match(off.problems.join('\n'), /fred is not in council\/ict-apply\.json on main/);
   // a deletion inside the allowlist (a revert removes the test it added), and main moving on elsewhere, are fine
   assert.equal(verify({ 'tests/ict-a.test.mjs': null }).ok, true);
   assert.equal(verify(CHANGE, { mainMoves: { 'council/trader.mjs': 'export const x = 2;\n', 'market-structure.html': '<html>2</html>\n' } }).ok, true, 'only the pull request\'s own changes count (merge base ... head)');
@@ -176,16 +176,20 @@ test('verifier: refuses new network / environment / process access, an oversize 
   git(r.d, 'add', '-A'); git(r.d, 'commit', '-q', '-m', 'x'); const out = checkRepo({ repo: r.d, base: r.mainSha, head: git(r.d, 'rev-parse', 'HEAD'), branch: BR, members: ['fred'] });
   assert.match(out.problems.join('\n'), /ict\/link\.mjs: only plain files \(mode 100644, not 120000\)/); assert.match(out.problems.join('\n'), /ict\/run\.mjs: only plain files \(mode 100644, not 100755\)/);
 });
-test('verifier, as the workflow starts it: exit 1 and REFUSED lines with the committed empty list; it never runs the change', () => {
+test('verifier, as the workflow starts it: exit 0 for a listed member, exit 1 and REFUSED lines for a member who is not listed; it never runs the change', () => {
   const r = repoWith(BASE), head = r.branch(BR, { ...CHANGE, 'ict/boom.mjs': "import fs from 'node:fs';\nfs.writeFileSync('PWNED', 'x');\nexport {};\n" });
   const run = (...a) => spawnSync(process.execPath, [path.join(ROOT, 'scripts/ict-apply-check.mjs'), ...a], { encoding: 'utf8' });
+  const OTHER = BR.replace('/fred/', '/orlando/'); assert.notEqual(OTHER, BR);
   const o = run('--repo', r.d, '--base', r.mainSha, '--head', head, '--branch', BR);
-  assert.equal(o.status, 1); assert.match(o.stdout, /REFUSED: fred is not in council\/ict-apply\.json on main/); assert.match(o.stdout, /this change is not applied/);
+  assert.equal(o.status, 0, 'Fred is listed and the files are inside the ICT edge: the verifier passes it on to the tests and the stop guard'); assert.ok(!/REFUSED/.test(o.stdout));
+  const o2 = run('--repo', r.d, '--base', r.mainSha, '--head', head, '--branch', OTHER);
+  assert.equal(o2.status, 1); assert.match(o2.stdout, /REFUSED: orlando is not in council\/ict-apply\.json on main/); assert.match(o2.stdout, /this change is not applied/);
   assert.ok(!fs.existsSync(path.join(r.d, 'PWNED')) && !fs.existsSync('PWNED'), 'the change is read, never run');
   assert.equal(run('--repo', r.d).status, 2, 'missing arguments: it could not run');
   assert.equal(run('--repo', r.d, '--base', r.mainSha, '--head', 'nope', '--branch', BR).status, 2);
   const f = path.join(r.d, 'files.json'); fs.writeFileSync(f, JSON.stringify([{ filename: 'ict/tracker.mjs', status: 'modified' }]));
-  const a = run('--api-files', f, '--branch', BR); assert.equal(a.status, 1); assert.match(a.stdout, /REFUSED: fred is not in/);
+  const a = run('--api-files', f, '--branch', OTHER); assert.equal(a.status, 1); assert.match(a.stdout, /REFUSED: orlando is not in/);
+  assert.equal(run('--api-files', f, '--branch', BR).status, 0, 'Fred is listed: the same file list passes the API-mode check');
 });
 test('verifier, API mode: branch, member, paths and the file count again, on main\'s rules', () => {
   const F = (...names) => names.map((n) => ({ filename: n, status: 'modified' }));

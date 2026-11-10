@@ -5,8 +5,9 @@ the desk's own model on 2020-now data with your own settings, compare your idea 
 desk record for each signal, and propose a change. A proposal becomes a draft pull request. The owner reviews it and
 decides. Nothing changes live until the owner merges it.
 
-A second way to change the edge, **apply**, is built but switched off. It is available only after the owner switches
-it on for you (section 6). Until then the apply tools are not in your tool list, and proposing is the way.
+A second way to change the edge, **apply**, is switched on for Fred (owner, 10 Nov 2026: full control of the ICT edge).
+With it a change to the ICT edge's own files takes effect without the owner's review once the automatic checks pass
+(section 6). For a member it is not switched on for, the apply tools are not in the tool list, and proposing is the way.
 
 ## 1. Get your connector URL
 
@@ -99,15 +100,18 @@ the time, and shows on the page on its next load. What you leave out keeps its v
   CI runs the tests, and the owner decides.
 - **ICT stays separate** from the council systems.
 
-## 6. Apply: built, switched off
+## 6. Apply: on for Fred
 
-The owner asked for a way for your ICT changes to take effect without a manual merge each time, and then decided to keep
-it disabled until explicitly approved. So it is built and tested, and off for everyone. Nothing in it can change the
-desk until the owner does two things: tick "ICT: may apply changes to the ICT edge without my review" for you on the
-Users page, and add your name to `council/ict-apply.json` (a normal reviewed pull request). While it is off,
-`ict_apply_change` and `ict_revert_change` are not listed and answer like a tool that does not exist.
+The owner decided on 10 Nov 2026 that Fred has full control of the ICT edge: his changes to the ICT edge's own files take
+effect without a manual merge. `ict_apply_change` and `ict_revert_change` are in Fred's tool list. For any other member
+they are not listed and answer like a tool that does not exist. The owner can switch it off at any time: unticking "ICT:
+may apply changes to the ICT edge without my review" on the Users page stops the next call, and removing the name from
+`council/ict-apply.json` is the hard off-switch.
 
-Once it is on, this is how the two paths differ:
+What does not change: every ICT trade keeps its stop (a guard test outside your reach checks it on every change), ICT is
+paper and demo only, and only the ICT edge's own files can be changed.
+
+This is how the two paths differ:
 
 | | Propose (`ict_propose_change`) | Apply (`ict_apply_change`) |
 |---|---|---|
@@ -121,7 +125,7 @@ Once it is on, this is how the two paths differ:
 Out of reach on both paths: the council's systems, the page, the API, workflows, scripts, users, tokens and cTrader
 orders. ICT is paper and demo only. Every trade has a stop.
 
-### Worked example: apply a change (after the owner switched it on)
+### Worked example: apply a change
 
 "Read `ict/tracker.mjs`. Change the A-setup so the New York afternoon is excluded, write a test, and apply it with an
 evidence run on NQ, ES, YM and RTY." ChatGPT reads the file, writes the whole new file and a test, and calls:
