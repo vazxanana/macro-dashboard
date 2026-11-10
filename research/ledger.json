@@ -1,19 +1,76 @@
 {
- "at": "2026-11-09T07:30:40.000Z",
- "count": 61,
+ "at": "2026-11-10T09:08:11.000Z",
+ "count": 64,
  "byVerdict": {
-  "pass": 2,
-  "inc": 19,
-  "fail": 40
+  "pass": 3,
+  "inc": 20,
+  "fail": 41
  },
  "rows": [
+  {
+   "topic": "academy-ml-review",
+   "name": "Academy ml review",
+   "title": "Academy scorer: training review (10 Nov 2026)",
+   "built": "2026-11-10",
+   "verdict": "fail",
+   "headline": "No scorer passes: all 20 (the reference and the four pre-registered challenger configurations) are rejected challengers; none is promoted.",
+   "systems": [
+    "Meridian"
+   ],
+   "pr": 1,
+   "cites": [],
+   "prereg": false,
+   "report": true,
+   "result": true,
+   "link": "edge-lab.html#academy-ml-review",
+   "first": "2026-11-10T09:07:54.000Z",
+   "looked": true
+  },
+  {
+   "topic": "academy-policy",
+   "name": "Academy policy",
+   "title": "Academy decision policy against taking every setup: diagnosis and five candidates",
+   "built": "2026-11-10",
+   "verdict": "fail",
+   "headline": "No candidate passes. The shipped policy stays and the exam pool was not read.",
+   "systems": [
+    "Meridian"
+   ],
+   "pr": 1,
+   "cites": [],
+   "prereg": false,
+   "report": true,
+   "result": true,
+   "link": "edge-lab.html#academy-policy",
+   "first": "2026-11-10T09:07:54.000Z",
+   "looked": true
+  },
+  {
+   "topic": "histdata-clock",
+   "name": "Histdata clock",
+   "title": "HistData M1 clock audit (10 Nov 2026)",
+   "built": "2026-11-10",
+   "verdict": "inc",
+   "headline": "Data audit, no trading rule tested. The HistData files are stamped on rule R4 (hybrid): New York time in 2018, Europe's summer-time dates from 2019.",
+   "systems": [
+    "Council-wide"
+   ],
+   "pr": 1,
+   "cites": [],
+   "prereg": false,
+   "report": true,
+   "result": true,
+   "link": "edge-lab.html#histdata-clock",
+   "first": "2026-11-10T09:07:54.000Z",
+   "looked": true
+  },
   {
    "topic": "event-reaction",
    "name": "Event reaction",
    "title": "Gold's reaction to US CPI, NFP and FOMC releases: result",
-   "built": "2026-11-09",
+   "built": "2026-11-10",
    "verdict": "fail",
-   "headline": "FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 72 (47%, p 0.722; 2018-21 32%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.",
+   "headline": "FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 73 (47%, p 0.7586; 2018-21 31%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.",
    "systems": [
     "Gold book"
    ],
@@ -69,8 +126,8 @@
    "name": "ICT variants",
    "title": "Five ICT A-setup variants from the skill, 2020 → Nov 2026, IS / OOS (pre-registered, 9 Nov 2026)",
    "built": "2026-11-09",
-   "verdict": "fail",
-   "headline": "FAIL. None of the nine variant × book verdicts passes the pre-registered bar; the live A-rule stays and no proposal is made.",
+   "verdict": "pass",
+   "headline": "PASS for one of nine on the corrected clock (10 Nov 2026), not strong. V3 htffvg on the index book passes the pre-registered bar (in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92).",
    "systems": [
     "ICT desk"
    ],
@@ -362,7 +419,7 @@
    "topic": "decay-monitor",
    "name": "Edge-decay monitor",
    "title": "Edge-decay monitor: how it works and how it does on the record (8 Nov 2026)",
-   "built": "2026-11-07",
+   "built": "2026-11-10",
    "verdict": "inc",
    "headline": "Paper only. The monitor gives each system a status and, in the daily digest, an alert.",
    "systems": [
@@ -602,7 +659,7 @@
    "topic": "open-run-breadth",
    "name": "Open run on other indices",
    "title": "Open run breadth: does the NQ open run work on other index opens?",
-   "built": "2026-11-07",
+   "built": "2026-11-10",
    "verdict": "fail",
    "headline": "NQ-ONLY. The rule does not carry over to any other market, in either period",
    "systems": [
@@ -758,7 +815,7 @@
    "topic": "event-risk",
    "name": "Event risk (CPI / NFP / FOMC)",
    "title": "Event risk manager: does skipping or flattening trades around CPI, NFP and FOMC help?",
-   "built": "2026-11-07",
+   "built": "2026-11-10",
    "verdict": "fail",
    "headline": "FAIL on all five pre-registered tests. Null result.",
    "systems": [
@@ -885,7 +942,7 @@
    "topic": "nq-open-oos",
    "name": "NQ open run 22 years",
    "title": "NQ New York open run: 22 years out of sample",
-   "built": "2026-11-07",
+   "built": "2026-11-10",
    "verdict": "inc",
    "headline": "Regime-dependent, not robust, not dead",
    "systems": [
@@ -1026,7 +1083,7 @@
    "topic": "ict-concepts",
    "name": "ICT concepts",
    "title": "New ICT entry concepts: turtle soup at equal highs/lows, \"lows that broke highs\", NWOG/NDOG fill (edge research, ict-concepts)",
-   "built": "2026-11-07",
+   "built": "2026-11-10",
    "verdict": "fail",
    "headline": "FAIL. No concept becomes a paper candidate.",
    "systems": [
