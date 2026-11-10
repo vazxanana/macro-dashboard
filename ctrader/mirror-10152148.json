@@ -823,6 +823,58 @@
     ],
     "stopCheckedAt": "2026-11-10T08:16:37.000Z",
     "brokerStop": 4110.08
+   },
+   "audusd-replica-1794300023-b": {
+    "positionId": "47966801",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T08:41:37.000Z",
+    "councilEntry": 0.6925,
+    "stop": 0.691684,
+    "t1": 0.694133,
+    "riskCash": 2,
+    "margin": 2.77,
+    "mark": 0.6925,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69249,
+    "slipR": -0.012,
+    "lagSec": 74,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T08:41:37.000Z",
+    "brokerStop": 0.69167
+   },
+   "usdcad-replica-1794300023-s": {
+    "positionId": "47966813",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T08:41:37.000Z",
+    "councilEntry": 1.41115,
+    "stop": 1.411836,
+    "t1": 1.409778,
+    "riskCash": 2,
+    "margin": 8,
+    "mark": 1.41115,
+    "levelsFrom": "mark",
+    "fillPrice": 1.41119,
+    "slipR": -0.058,
+    "lagSec": 74,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T08:41:37.000Z",
+    "brokerStop": 1.41188
    }
   },
   "day": {
@@ -830,7 +882,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9978.28 · 23 open",
+  "status": "ok · demo Fusion Markets · balance 9978.28 · 25 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -845,7 +897,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9978.28,
-  "lastRun": "2026-11-10T08:39:01.000Z"
+  "lastRun": "2026-11-10T08:41:37.000Z"
  },
  "log": [
   {
@@ -1105,6 +1157,16 @@
    "at": "2026-11-10T08:36:26.000Z",
    "msg": "AUDUSD position 47955397 closed at the broker",
    "trade": "audusd-replica-1794297606-s"
+  },
+  {
+   "at": "2026-11-10T08:41:37.000Z",
+   "msg": "opened buy AUDUSD 0.02 lot (council replica)",
+   "trade": "audusd-replica-1794300023-b"
+  },
+  {
+   "at": "2026-11-10T08:41:37.000Z",
+   "msg": "opened sell USDCAD 0.04 lot (council replica)",
+   "trade": "usdcad-replica-1794300023-s"
   }
  ],
  "limits": {
@@ -1183,11 +1245,11 @@
   ]
  },
  "execution": {
-  "n": 30,
-  "meanSlipR": 0.099,
-  "medianSlipR": 0.052,
+  "n": 32,
+  "meanSlipR": 0.091,
+  "medianSlipR": 0.039,
   "worstSlipR": 0.765,
-  "medianLagSec": 8859,
+  "medianLagSec": 7175,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -1206,12 +1268,12 @@
     "meanSlipR": -0.058
    },
    "USDCAD": {
-    "n": 1,
-    "meanSlipR": 0.497
+    "n": 2,
+    "meanSlipR": 0.22
    },
    "AUDUSD": {
-    "n": 6,
-    "meanSlipR": 0.008
+    "n": 7,
+    "meanSlipR": 0.005
    },
    "GBPUSD": {
     "n": 1,
