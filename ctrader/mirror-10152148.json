@@ -1015,7 +1015,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-10T10:35:43.000Z",
     "councilEntry": 1.41322,
     "stop": 1.414107,
@@ -1028,10 +1028,15 @@
     "slipR": -0.068,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T10:35:43.000Z",
-    "brokerStop": 1.41417
+    "brokerStop": 1.41417,
+    "closedAt": "2026-11-10T13:09:39.000Z",
+    "exitPrice": 1.41362,
+    "councilExit": null,
+    "councilR": -1.18
    },
    "btc-replica-1794307054-s": {
     "positionId": "48004976",
@@ -1232,7 +1237,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9980.87 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 9980.87 · 11 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794243038-s": "none of XRPUSD found at the broker",
@@ -1247,7 +1252,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9980.87,
-  "lastRun": "2026-11-10T13:07:42.000Z"
+  "lastRun": "2026-11-10T13:09:39.000Z"
  },
  "log": [
   {
@@ -1712,6 +1717,11 @@
    "at": "2026-11-10T12:52:24.000Z",
    "msg": "opened buy SOLUSD 0.01 lot (council replica)",
    "trade": "sol-replica-1794315078-b"
+  },
+  {
+   "at": "2026-11-10T13:09:39.000Z",
+   "msg": "closed USDCAD position 48004442 (council: loss)",
+   "trade": "usdcad-replica-1794306870-s"
   }
  ],
  "limits": {
