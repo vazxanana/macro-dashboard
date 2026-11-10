@@ -5510,7 +5510,8 @@
     "t1": 1.11402,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.1155,
@@ -5524,7 +5525,8 @@
     "lagSec": 233,
     "positionId": "48140741",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T18:42:12.000Z"
    },
    "gbpusd-scalp-1794327220": {
     "symbol": "GBPUSD",
@@ -5871,7 +5873,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.24 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9962.82 · 23 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5883,15 +5885,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9964.24,
-  "lastRun": "2026-11-10T18:39:37.000Z"
+  "balance": 9962.82,
+  "lastRun": "2026-11-10T18:42:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T10:18:58.000Z",
-   "msg": "SOLUSD position 47979585 closed at the broker",
-   "trade": "sol-rscalp-1794302265"
-  },
   {
    "at": "2026-11-10T10:26:03.000Z",
    "msg": "ETHUSD position 47979582 closed at the broker",
@@ -7386,6 +7383,11 @@
    "at": "2026-11-10T18:39:37.000Z",
    "msg": "limit filled at once: AUDUSD position 48191874 at the broker at 0.6859",
    "trade": "audusd-rscalp-1794335908"
+  },
+  {
+   "at": "2026-11-10T18:42:12.000Z",
+   "msg": "EURUSD position 48140741 closed at the broker",
+   "trade": "eurusd-scalp-1794326705"
   }
  ],
  "limits": {
