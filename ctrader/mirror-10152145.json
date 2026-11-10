@@ -5245,7 +5245,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9984.43 · 23 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9984.43 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5278,39 +5278,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-rintra-1794322093": {
-    "orderId": "33876075",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rintra",
-    "limitPrice": 4039.72,
-    "stop": 4064.7466785714287,
-    "t1": 4037.455,
-    "placedAt": "2026-11-10T14:49:16.000Z",
-    "expires": "2026-11-11T02:48:13.000Z",
-    "riskCash": 25.03,
-    "margin": 8.08,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9984.43,
-  "lastRun": "2026-11-10T14:49:16.000Z"
+  "lastRun": "2026-11-10T14:51:59.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T07:34:01.000Z",
-   "msg": "XAUUSD position 47918384 closed at the broker",
-   "trade": "xau-m30m1-1794289515"
-  },
   {
    "at": "2026-11-10T07:36:32.000Z",
    "msg": "limit filled: EURUSD position 47946686 at the broker",
@@ -6804,6 +6778,11 @@
   {
    "at": "2026-11-10T14:49:16.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 4039.72 (council rintra, valid to 2026-11-11T02:48Z)",
+   "trade": "xau-rintra-1794322093"
+  },
+  {
+   "at": "2026-11-10T14:51:59.000Z",
+   "msg": "cancelled XAUUSD limit order 33876075 for xau-rintra-1794322093: the council ended it: missed",
    "trade": "xau-rintra-1794322093"
   }
  ],
