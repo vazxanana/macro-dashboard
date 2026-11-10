@@ -5203,7 +5203,8 @@
     "t1": 1.3363900000000002,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.33861,
@@ -5217,7 +5218,8 @@
     "lagSec": 217,
     "positionId": "48091347",
     "volume": 100000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T15:32:10.000Z"
    },
    "xau-m30m1-1794321828": {
     "positionId": "48096028",
@@ -5341,7 +5343,8 @@
     "t1": 1.3364200000000002,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.33742,
@@ -5355,9 +5358,10 @@
     "lagSec": 59,
     "positionId": "48115060",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-10T15:19:47.000Z",
-    "brokerStop": 1.33792
+    "brokerStop": 1.33792,
+    "closedAt": "2026-11-10T15:32:10.000Z"
    },
    "eurusd-rscalp-1794324082": {
     "symbol": "EURUSD",
@@ -5369,7 +5373,8 @@
     "t1": 1.12142,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.11808,
@@ -5383,7 +5388,8 @@
     "lagSec": 158,
     "positionId": "48116355",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T15:32:10.000Z"
    },
    "xau-m30m1-1794324348": {
     "symbol": "XAUUSD",
@@ -5395,7 +5401,8 @@
     "t1": 4033.03,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4048.32,
@@ -5410,7 +5417,8 @@
     "lagSec": 155,
     "positionId": "48118500",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T15:32:10.000Z"
    },
    "eurusd-rscalp-1794324511": {
     "positionId": "48119785",
@@ -5420,7 +5428,7 @@
     "lots": 0.06,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T15:29:35.000Z",
     "councilEntry": 1.11787,
     "stop": 1.11758,
@@ -5434,10 +5442,12 @@
     "slipR": -0.276,
     "lagSec": 64,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T15:29:35.000Z",
-    "brokerStop": 1.1175
+    "brokerStop": 1.1175,
+    "closedAt": "2026-11-10T15:32:10.000Z"
    }
   },
   "day": {
@@ -5445,7 +5455,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9965.75 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9962.92 · 20 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5478,43 +5488,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "eurusd-scalp-1794324661": {
+    "orderId": "33880144",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.11772,
+    "stop": 1.11822,
+    "t1": 1.1167200000000002,
+    "placedAt": "2026-11-10T15:32:10.000Z",
+    "expires": "2026-11-10T18:31:01.000Z",
+    "riskCash": 1.99,
+    "margin": 6.71,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9965.75,
-  "lastRun": "2026-11-10T15:29:35.000Z"
+  "balance": 9962.92,
+  "lastRun": "2026-11-10T15:32:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T08:08:36.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council m30m1)",
-   "trade": "xau-m30m1-1794297871"
-  },
-  {
-   "at": "2026-11-10T08:08:36.000Z",
-   "msg": "placed sell limit EURUSD 0.02 lot at 1.12386 (council rscalp, valid to 2026-11-10T11:07Z)",
-   "trade": "eurusd-rscalp-1794298047"
-  },
-  {
-   "at": "2026-11-10T08:11:13.000Z",
-   "msg": "limit filled: EURUSD position 47957230 at the broker",
-   "trade": "eurusd-rscalp-1794298047"
-  },
-  {
-   "at": "2026-11-10T08:11:13.000Z",
-   "msg": "closed XAUUSD position 47957223 (council: loss)",
-   "trade": "xau-m30m1-1794297871"
-  },
-  {
-   "at": "2026-11-10T08:13:51.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council m30m1)",
-   "trade": "xau-m30m1-1794298363"
-  },
-  {
-   "at": "2026-11-10T08:24:23.000Z",
-   "msg": "SOLUSD position 47900628 closed at the broker",
-   "trade": "sol-rscalp-1794283456"
-  },
   {
    "at": "2026-11-10T08:31:02.000Z",
    "msg": "placed buy limit EURUSD 0.01 lot at 1.12442 (council swing, valid to 2026-11-12T08:29Z)",
@@ -6984,6 +6984,36 @@
    "at": "2026-11-10T15:29:35.000Z",
    "msg": "opened buy EURUSD 0.06 lot (council rscalp)",
    "trade": "eurusd-rscalp-1794324511"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "GBPUSD position 48091347 closed at the broker",
+   "trade": "gbpusd-scalp-1794321379"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "GBPUSD position 48115060 closed at the broker",
+   "trade": "gbpusd-scalp-1794323928"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "EURUSD position 48116355 closed at the broker",
+   "trade": "eurusd-rscalp-1794324082"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "XAUUSD position 48118500 closed at the broker",
+   "trade": "xau-m30m1-1794324348"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "EURUSD position 48119785 closed at the broker",
+   "trade": "eurusd-rscalp-1794324511"
+  },
+  {
+   "at": "2026-11-10T15:32:10.000Z",
+   "msg": "placed sell limit EURUSD 0.03 lot at 1.11772 (council scalp, valid to 2026-11-10T18:31Z)",
+   "trade": "eurusd-scalp-1794324661"
   }
  ],
  "limits": {
