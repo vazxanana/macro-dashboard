@@ -1325,3 +1325,20 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
 - Regenerate data (candles outside the repo): `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
   candle proxy). Audit: `node scripts/audit/academy.cjs` (in `ci.yml`). Tests: `tests/academy-*.test.mjs`.
+
+## Mirror: the replica book takes the replica's research trades (10 Nov 2026, owner: "the mirror is not taking the replica trades")
+The Replica demo account stayed empty because the mirror read only trades.json and the ICT desk, while the replica's forward
+paper trades (gold, forex and crypto; `k: 'replica'`) are recorded by the Trader in research.json; trades.json holds only the
+live gold replica, which fires rarely. `council/ctrader-mirror.mjs` `replicaCandidates(research, own)` now adds them as
+candidates for the `replica` book: same path as every other trade (a stop is required, `ensureStop`, the late-copy guard, the
+limits, stop moves and closes follow the record). A record also in trades.json is taken from there (by id and by market +
+side + time, never twice); one whose own filter failed (`pass: false`) counts as a shadow (config.json `mirrorShadow: false`
+leaves it out). They are copied only while the replica book has a demo account different from the council's
+(`replicaHasOwnAccount`), so they can never land on the council account. Demo only. Tests: `tests/ctrader-mirror.test.mjs`.
+Reconciliation (same day, owner: "check all the trades from the edges opened match everything on cTrader"):
+`node council/ctrader-reconcile.mjs <council-data dir>` reads files only (no broker contact) and lists, for every open or
+pending trade of every book, whether its demo account holds the copy and whether side, stop and target match; then every demo
+position or order with no open council trade behind it, and any position without a stop. Levels are compared the way the
+mirror copies them: a market copy keeps the council's distances from the fill (the broker's price sits a small basis from the
+council's feed), an amended, limit or guard-set copy has the council's own levels, an ICT copy the desk's stop distance. Exit 1
+on a mismatch. Tests: `tests/ctrader-reconcile.test.mjs`.

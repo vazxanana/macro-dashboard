@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -819,4 +819,57 @@ test('bug hunt 9 Nov: a pending council order re-quoted (new entry / stop) cance
   const pid = b.fillOrder(r.state.orders['eurusd-scalp-9'].orderId, 1.1);
   r = await mirrorRound({ env: ENV, trades: [pend({ stop: 1.0985 })], state: r.state, WS: b.WS, now: NOW + 60, marks: MK });
   assert.equal(r.state.map['eurusd-scalp-9'].status, 'open'); assert.equal(b.positions.get(String(pid)).stopLoss, 1.0985, 'broker stop follows the council stop');
+});
+
+// ---- 10 Nov (owner: "the mirror is not taking the replica trades") ------------------------------------------------------------
+// the replica's forward paper trades are recorded in research.json, as the Trader writes them (a real record, shortened)
+const rep = (o = {}) => ({ id: 'eurusd-replica-1794182743-b', sig: 'replica|b|1794182400', market: 'eurusd', label: 'EUR/USD', dec: 5, k: 'replica', name: 'EUR/USD replica', side: 'buy', entry: 1.1, stop: 1.098, stop0: 1.098, t1: 1.104, rr: 2,
+  opened: NOW - 60, filled: NOW - 60, checked: NOW, status: 'open', R: null, v: 5, pass: true, feed: 'oanda', note: 'Research (paper only): gold replica v5.', ...o });
+
+test('replica research trades become candidates for the replica book: never twice, a failed filter counts as a shadow', () => {
+  const live = { id: 'xau-replica-1793765703-b', market: 'xau', k: 'replica', side: 'buy', entry: 3949.82, stop: 3926.45, t1: 3996.56, status: 'open', opened: 1793765703, shadow: false };
+  const research = [rep(), rep({ id: 'eth-replica-2-s', market: 'eth', side: 'sell', pass: false }), { ...live }, { ...live, id: 'xau-replica-other-id' },
+    { id: 'nq-nyflip-1', k: 'nq-open', market: 'nq', side: 'buy', entry: 1, stop: 0.5, status: 'open' }, { id: 'c-1', k: 'cycle', market: 'btc' }, null, { k: 'replica' }];
+  const c = replicaCandidates(research, [live, tr()]);
+  assert.deepEqual(c.map((t) => t.id), ['eurusd-replica-1794182743-b', 'eth-replica-2-s'], 'only replica records; the live gold replica is taken from trades.json, by id and by market + side + time');
+  assert.deepEqual(c.map((t) => [bookOf(t), t.shadow, t.research]), [['replica', false, true], ['replica', true, true]]);
+  assert.equal(c[0].stop, 1.098); assert.equal(c[0].status, 'open');
+  assert.deepEqual(replicaCandidates(null), []); assert.deepEqual(replicaCandidates({ trades: [] }), []); assert.deepEqual(replicaCandidates([rep()]).length, 1);
+  // only while the replica book has a demo account of its own (else its trades would land on the council's account)
+  assert.equal(replicaHasOwnAccount(accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}).byBook), false);
+  assert.equal(replicaHasOwnAccount(accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, { mirrorAccounts: { replica: '9000' } }).byBook), true);
+  assert.equal(replicaHasOwnAccount(accountsFor({ CTRADER_ACCOUNT_ID: '4242', CTRADER_ACCOUNTS: 'replica:4242' }, {}).byBook), false);
+  assert.equal(replicaHasOwnAccount(null), false);
+});
+
+test('a replica research trade is copied to the replica account with its stop and target, follows a moved stop, and is closed when the record closes', async () => {
+  const [t] = replicaCandidates([rep()]), b = broker();
+  // the council account's round does not open it; the replica account's round does
+  let r = await mirrorRound({ env: ENV, trades: [t], state: started, WS: b.WS, now: NOW, openBooks: ['council', 'shadow'] });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0);
+  r = await mirrorRound({ env: ENV, trades: [t], state: started, WS: b.WS, now: NOW, openBooks: ['replica'] });
+  const o = b.sent.find((m) => m.payloadType === PT.NEW_ORDER_REQ).payload;
+  assert.equal(o.orderType, 1); assert.equal(o.tradeSide, 1); assert.equal(o.relativeStopLoss, 200, 'the stop is copied'); assert.equal(o.relativeTakeProfit, 400);
+  assert.equal(r.state.map[t.id].status, 'open'); assert.equal(b.positions.size, 1);
+  for (const p of b.positions.values()) assert.ok(p.stopLoss > 0, 'the demo position has a stop');
+  // the Trader moves the research trade's stop to break-even: the demo stop follows
+  r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: 1.1 })]), state: r.state, WS: b.WS, now: NOW + 240, openBooks: ['replica'] });
+  assert.equal(b.amends.length, 1, 'one stop move at the broker');
+  // the research record closes: so does the demo position
+  r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: 1.1, status: 'win', R: 2 })]), state: r.state, WS: b.WS, now: NOW + 480, openBooks: ['replica'] });
+  assert.equal(r.state.map[t.id].status, 'closed by council'); assert.equal(b.positions.size, 0);
+});
+
+test('a replica research trade without a stop is never sent; a failed-filter one is left out when shadows are off', async () => {
+  let b = broker(), r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: null })]), state: started, WS: b.WS, now: NOW, openBooks: ['replica'] });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0, 'no stop, no order');
+  b = broker(); r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ pass: false })]), state: started, WS: b.WS, now: NOW, openBooks: ['replica'], shadows: false });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ pass: false })]), state: started, WS: b.WS, now: NOW, openBooks: ['replica'], shadows: true });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 1);
+});
+
+test('the mirror\'s entry point reads research.json for the replica book', () => {
+  const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
+  assert.match(src, /research\.json/); assert.match(src, /replicaOwn \? replicaCandidates\(research, own\) : \[\]/);
 });
