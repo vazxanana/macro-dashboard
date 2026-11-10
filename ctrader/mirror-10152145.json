@@ -4232,6 +4232,32 @@
     "positionId": "47979582",
     "volume": 11,
     "status": "open"
+   },
+   "btc-rscalp-1794302960": {
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-10T09:32:56.000Z",
+    "councilEntry": 74363.1,
+    "stop": 74185.22480000001,
+    "t1": 74795.6,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 74363.1,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 1.98,
+    "margin": 74.25,
+    "shadow": true,
+    "fillPrice": 74344.85,
+    "slipR": -0.103,
+    "lagSec": 176,
+    "positionId": "47983029",
+    "volume": 1,
+    "status": "open"
    }
   },
   "day": {
@@ -4239,7 +4265,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9915.87 · 21 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9915.87 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4274,38 +4300,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "btc-rscalp-1794302960": {
-    "orderId": "33855381",
-    "symbol": "BTCUSD",
-    "side": "buy",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rscalp",
-    "limitPrice": 74363.1,
-    "stop": 74185.22480000001,
-    "t1": 74795.6,
-    "placedAt": "2026-11-10T09:30:22.000Z",
-    "expires": "2026-11-10T12:29:20.000Z",
-    "riskCash": 1.98,
-    "margin": 74.25,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9915.87,
-  "lastRun": "2026-11-10T09:30:22.000Z"
+  "lastRun": "2026-11-10T09:32:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:09:31.000Z",
-   "msg": "AUDUSD position 47684115 closed at the broker",
-   "trade": "audusd-scalp-1794235966"
-  },
   {
    "at": "2026-11-09T15:09:31.000Z",
    "msg": "moved USDCHF 47373488 protection: stop 0.8229724 -> 0.8224924, target 0.8004952 -> 0.8000152 (council swing)",
@@ -5800,6 +5801,11 @@
    "at": "2026-11-10T09:30:22.000Z",
    "msg": "placed buy limit BTCUSD 0.01 lot at 74363.1 (council rscalp, valid to 2026-11-10T12:29Z)",
    "trade": "btc-rscalp-1794302960"
+  },
+  {
+   "at": "2026-11-10T09:32:56.000Z",
+   "msg": "limit filled: BTCUSD position 47983029 at the broker",
+   "trade": "btc-rscalp-1794302960"
   }
  ],
  "limits": {
@@ -5878,19 +5884,19 @@
   ]
  },
  "execution": {
-  "n": 143,
-  "meanSlipR": -0.004,
+  "n": 144,
+  "meanSlipR": -0.005,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 190,
+  "medianLagSec": 189.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 12,
     "meanSlipR": 0.1
    },
    "BTCUSD": {
-    "n": 11,
-    "meanSlipR": -0.071
+    "n": 12,
+    "meanSlipR": -0.074
    },
    "ETHUSD": {
     "n": 5,
