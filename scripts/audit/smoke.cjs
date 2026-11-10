@@ -9,7 +9,7 @@
 const { chromium } = require('playwright');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
-const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 // script and font CDNs the pages load (a page without its chart library is not what visitors get)
 const ALLOW = /^https:\/\/(cdn\.jsdelivr\.net|s3\.tradingview\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
