@@ -5843,58 +5843,28 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.24 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9964.24 · 23 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
    "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now"
   },
-  "wait": {},
+  "wait": {
+   "audusd-scalp-1794324908": {
+    "why": "the council order expires within a minute",
+    "n": 1,
+    "at": "2026-11-10T18:36:43.000Z"
+   }
+  },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "audusd-scalp-1794324908": {
-    "orderId": "33880506",
-    "symbol": "AUDUSD",
-    "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 0.68692,
-    "stop": 0.68843,
-    "t1": 0.6839,
-    "placedAt": "2026-11-10T15:36:16.000Z",
-    "expires": "2026-11-10T18:35:08.000Z",
-    "riskCash": 1.99,
-    "margin": 1.37,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9964.24,
-  "lastRun": "2026-11-10T18:34:33.000Z"
+  "lastRun": "2026-11-10T18:36:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T10:05:32.000Z",
-   "msg": "limit filled: EURUSD position 47994269 at the broker",
-   "trade": "eurusd-scalp-1794304921"
-  },
-  {
-   "at": "2026-11-10T10:05:32.000Z",
-   "msg": "limit filled: USDCAD position 47994270 at the broker",
-   "trade": "usdcad-scalp-1794304921"
-  },
-  {
-   "at": "2026-11-10T10:08:00.000Z",
-   "msg": "not mirrored xrp-scalp-1794305213: none of XRPUSD found at the broker",
-   "trade": "xrp-scalp-1794305213"
-  },
   {
    "at": "2026-11-10T10:13:39.000Z",
    "msg": "EURUSD position 47994269 closed at the broker",
@@ -7379,6 +7349,21 @@
    "at": "2026-11-10T18:26:56.000Z",
    "msg": "limit filled: GBPUSD position 48187905 at the broker",
    "trade": "gbpusd-rscalp-1794334972"
+  },
+  {
+   "at": "2026-11-10T18:36:11.000Z",
+   "msg": "AUDUSD limit order 33880506 for audusd-scalp-1794324908 is gone at the broker (expired or cancelled there)",
+   "trade": "audusd-scalp-1794324908"
+  },
+  {
+   "at": "2026-11-10T18:36:11.000Z",
+   "msg": "not mirrored yet audusd-scalp-1794324908: AUDUSD limit order gone at the broker (will retry)",
+   "trade": "audusd-scalp-1794324908"
+  },
+  {
+   "at": "2026-11-10T18:36:11.000Z",
+   "msg": "not mirrored yet audusd-scalp-1794324908: the council order expires within a minute (will retry)",
+   "trade": "audusd-scalp-1794324908"
   }
  ],
  "limits": {
