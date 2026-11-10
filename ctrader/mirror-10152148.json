@@ -973,6 +973,59 @@
     ],
     "stopCheckedAt": "2026-11-10T10:26:06.000Z",
     "brokerStop": 85.455
+   },
+   "eurusd-replica-1794306870-b": {
+    "positionId": "48004429",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T10:35:43.000Z",
+    "councilEntry": 1.12238,
+    "stop": 1.12172,
+    "t1": 1.123699,
+    "riskCash": 2,
+    "margin": 6.73,
+    "shadow": true,
+    "mark": 1.12238,
+    "levelsFrom": "mark",
+    "fillPrice": 1.12227,
+    "slipR": -0.167,
+    "lagSec": 73,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T10:35:43.000Z",
+    "brokerStop": 1.12161
+   },
+   "usdcad-replica-1794306870-s": {
+    "positionId": "48004442",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T10:35:43.000Z",
+    "councilEntry": 1.41322,
+    "stop": 1.414107,
+    "t1": 1.411446,
+    "riskCash": 2,
+    "margin": 6,
+    "mark": 1.41322,
+    "levelsFrom": "mark",
+    "fillPrice": 1.41328,
+    "slipR": -0.068,
+    "lagSec": 73,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T10:35:43.000Z",
+    "brokerStop": 1.41417
    }
   },
   "day": {
@@ -980,7 +1033,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9988.37 · 8 open",
+  "status": "ok · demo Fusion Markets · balance 9988.37 · 10 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794223217-b": "none of XRPUSD found at the broker",
@@ -996,7 +1049,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9988.37,
-  "lastRun": "2026-11-10T10:34:08.000Z"
+  "lastRun": "2026-11-10T10:35:43.000Z"
  },
  "log": [
   {
@@ -1381,6 +1434,16 @@
    "at": "2026-11-10T10:34:08.000Z",
    "msg": "SOLUSD position 47958434 closed at the broker",
    "trade": "sol-replica-1794298204-s"
+  },
+  {
+   "at": "2026-11-10T10:35:43.000Z",
+   "msg": "opened buy EURUSD 0.03 lot (council replica)",
+   "trade": "eurusd-replica-1794306870-b"
+  },
+  {
+   "at": "2026-11-10T10:35:43.000Z",
+   "msg": "opened sell USDCAD 0.03 lot (council replica)",
+   "trade": "usdcad-replica-1794306870-s"
   }
  ],
  "limits": {
@@ -1459,11 +1522,11 @@
   ]
  },
  "execution": {
-  "n": 34,
-  "meanSlipR": 0.093,
-  "medianSlipR": 0.039,
+  "n": 36,
+  "meanSlipR": 0.081,
+  "medianSlipR": 0.009,
   "worstSlipR": 0.765,
-  "medianLagSec": 5259,
+  "medianLagSec": 3929,
   "bySymbol": {
    "SOLUSD": {
     "n": 6,
@@ -1482,8 +1545,8 @@
     "meanSlipR": -0.058
    },
    "USDCAD": {
-    "n": 2,
-    "meanSlipR": 0.22
+    "n": 3,
+    "meanSlipR": 0.124
    },
    "AUDUSD": {
     "n": 7,
@@ -1498,8 +1561,8 @@
     "meanSlipR": 0.157
    },
    "EURUSD": {
-    "n": 1,
-    "meanSlipR": -0.028
+    "n": 2,
+    "meanSlipR": -0.098
    }
   }
  }
