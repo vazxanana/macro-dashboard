@@ -6079,7 +6079,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-10T22:32:55.000Z",
     "councilEntry": 0.68678,
     "stop": 0.6863600000000001,
@@ -6093,10 +6093,15 @@
     "slipR": 0.048,
     "lagSec": 41,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T22:32:55.000Z",
-    "brokerStop": 0.68638
+    "brokerStop": 0.68638,
+    "closedAt": "2026-11-10T22:42:50.000Z",
+    "exitPrice": 0.68657,
+    "councilExit": 0.68684,
+    "councilR": 0.14
    }
   },
   "day": {
@@ -6104,7 +6109,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.39 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9964.39 · 23 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6117,14 +6122,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9964.39,
-  "lastRun": "2026-11-10T22:40:16.000Z"
+  "lastRun": "2026-11-10T22:42:50.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T11:21:27.000Z",
-   "msg": "not mirrored xrp-intraday-1794309616: none of XRPUSD found at the broker",
-   "trade": "xrp-intraday-1794309616"
-  },
   {
    "at": "2026-11-10T11:21:27.000Z",
    "msg": "not mirrored xrp-scalp-1794309616: none of XRPUSD found at the broker",
@@ -7619,6 +7619,11 @@
    "at": "2026-11-10T22:33:58.000Z",
    "msg": "EURUSD position 48205302 closed at the broker",
    "trade": "eurusd-scalp-1794339377"
+  },
+  {
+   "at": "2026-11-10T22:42:50.000Z",
+   "msg": "closed AUDUSD position 48229640 (council: win)",
+   "trade": "audusd-rscalp-1794349934"
   }
  ],
  "limits": {
