@@ -6021,7 +6021,8 @@
     "t1": 0.82682,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.82544,
@@ -6035,9 +6036,10 @@
     "lagSec": 70,
     "positionId": "48223322",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-10T21:02:10.000Z",
-    "brokerStop": 0.82494
+    "brokerStop": 0.82494,
+    "closedAt": "2026-11-10T22:12:44.000Z"
    },
    "btc-scalp-1794346855": {
     "symbol": "BTCUSD",
@@ -6071,7 +6073,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.7 · 26 open",
+  "status": "ok · demo Fusion Markets · balance 9967.9 · 25 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6083,15 +6085,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9969.7,
-  "lastRun": "2026-11-10T22:10:39.000Z"
+  "balance": 9967.9,
+  "lastRun": "2026-11-10T22:12:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T11:16:10.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council rscalp)",
-   "trade": "xau-rscalp-1794309302"
-  },
   {
    "at": "2026-11-10T11:18:50.000Z",
    "msg": "limit filled: BTCUSD position 48011978 at the broker",
@@ -7586,6 +7583,11 @@
    "at": "2026-11-10T22:08:23.000Z",
    "msg": "limit filled: BTCUSD position 48227161 at the broker",
    "trade": "btc-scalp-1794346855"
+  },
+  {
+   "at": "2026-11-10T22:12:44.000Z",
+   "msg": "USDCHF position 48223322 closed at the broker",
+   "trade": "usdchf-scalp-1794344460"
   }
  ],
  "limits": {
