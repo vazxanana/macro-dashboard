@@ -3558,6 +3558,33 @@
     "positionId": "47899713",
     "volume": 300000,
     "status": "open"
+   },
+   "xau-m30m1-1794289515": {
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "setup": "m30m1",
+    "openedAt": "2026-11-10T05:48:18.000Z",
+    "councilEntry": 4124.12,
+    "stop": 4115.817303571428,
+    "t1": 4148.71,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 4124.12,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 8.3,
+    "margin": 8.25,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 4123.97,
+    "slipR": -0.018,
+    "lagSec": 138,
+    "positionId": "47918384",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -3565,7 +3592,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.55 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9975.55 · 28 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3579,22 +3606,21 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "xau-m30m1-1794289515": {
-    "orderId": "33845169",
-    "symbol": "XAUUSD",
+   "btc-rscalp-1794289641": {
+    "orderId": "33845215",
+    "symbol": "BTCUSD",
     "side": "buy",
-    "volume": 100,
+    "volume": 1,
     "lots": 0.01,
     "digits": 2,
-    "setup": "m30m1",
-    "limitPrice": 4124.12,
-    "stop": 4115.817303571428,
-    "t1": 4148.71,
-    "placedAt": "2026-11-10T05:46:04.000Z",
-    "expires": "2026-11-10T11:45:15.000Z",
-    "riskCash": 8.3,
-    "margin": 8.25,
-    "minLot": true,
+    "setup": "rscalp",
+    "limitPrice": 74807.9,
+    "stop": 74630.03748,
+    "t1": 75100,
+    "placedAt": "2026-11-10T05:48:18.000Z",
+    "expires": "2026-11-10T08:47:21.000Z",
+    "riskCash": 2,
+    "margin": 74.79,
     "shadow": true,
     "alerted": [
      "pending"
@@ -3603,19 +3629,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9975.55,
-  "lastRun": "2026-11-10T05:46:04.000Z"
+  "lastRun": "2026-11-10T05:48:18.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T11:15:20.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council scalp)",
-   "trade": "xau-scalp-1794222860"
-  },
-  {
-   "at": "2026-11-09T11:15:20.000Z",
-   "msg": "opened buy GBPUSD 0.04 lot (council scalp)",
-   "trade": "gbpusd-scalp-1794222860"
-  },
   {
    "at": "2026-11-09T11:18:52.000Z",
    "msg": "GBPUSD position 47577305 closed at the broker",
@@ -5105,6 +5121,16 @@
    "at": "2026-11-10T05:46:04.000Z",
    "msg": "placed buy limit XAUUSD 0.01 lot at 4124.12 (council m30m1, valid to 2026-11-10T11:45Z)",
    "trade": "xau-m30m1-1794289515"
+  },
+  {
+   "at": "2026-11-10T05:48:18.000Z",
+   "msg": "limit filled: XAUUSD position 47918384 at the broker",
+   "trade": "xau-m30m1-1794289515"
+  },
+  {
+   "at": "2026-11-10T05:48:18.000Z",
+   "msg": "placed buy limit BTCUSD 0.01 lot at 74807.9 (council rscalp, valid to 2026-11-10T08:47Z)",
+   "trade": "btc-rscalp-1794289641"
   }
  ],
  "limits": {
@@ -5183,11 +5209,11 @@
   ]
  },
  "execution": {
-  "n": 120,
+  "n": 121,
   "meanSlipR": 0.013,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161.5,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 11,
@@ -5222,7 +5248,7 @@
     "meanSlipR": 0.023
    },
    "XAUUSD": {
-    "n": 12,
+    "n": 13,
     "meanSlipR": -0.027
    }
   }
