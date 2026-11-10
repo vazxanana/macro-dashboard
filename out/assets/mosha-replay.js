@@ -241,7 +241,7 @@
       else if (b.id === 'mo-rp-end') { stop(); if (R.bars) show(R.bars.length - 1); }
       else if (b.id === 'mo-rp-ct') { if (!R.spec) return; try { localStorage.setItem('btLab:handoff', JSON.stringify(handoff(R.spec, Date.now()))); } catch (e) {} location.href = '/backtest'; }
     });
-    $('mo-rp-slider').addEventListener('input', function (ev) { stop(); show(+ev.target.value); });
+    $('mo-rp-slider').addEventListener('input', function (ev) { var v = +ev.target.value; stop(); show(v); });   // read the value first: stop() redraws the slider at the old place
     card.addEventListener('keydown', function (ev) { if (/INPUT|TEXTAREA|SELECT/.test(ev.target.tagName) && ev.target.id !== 'mo-rp-slider') return; if (ev.key === 'ArrowRight' && ev.target.id !== 'mo-rp-slider') { stop(); show(R.cur + 1); ev.preventDefault(); } else if (ev.key === 'ArrowLeft' && ev.target.id !== 'mo-rp-slider') { stop(); show(R.cur - 1); ev.preventDefault(); } });
   }
   root.msMoshaReplay = function () { wire(); if (!R.spec) open(EXAMPLES[0]); else requestAnimationFrame(paint); };

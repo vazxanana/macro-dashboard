@@ -74,6 +74,7 @@ test('page wiring: the chart card on the Mosha desk, members only, nothing that 
   for (const id of ['mo-replay', 'mo-rp-pick', 'mo-rp-chart', 'mo-rp-ov', 'mo-rp-msg', 'mo-rp-cap', 'mo-rp-start', 'mo-rp-back', 'mo-rp-play', 'mo-rp-fwd', 'mo-rp-end', 'mo-rp-slider', 'mo-rp-steps', 'mo-rp-tf', 'mo-rp-speed', 'mo-rp-ct', 'mo-rp-res']) assert.ok(sec.includes(`id="${id}"`), id);
   assert.match(sec, /id="mo-rp-cap" aria-live="polite"/); assert.match(sec, /id="mo-rp-slider"[^>]*aria-label=/); assert.match(sec, /examples you picked, so they show the pattern, not how often it wins/);
   assert.match(DESK, /data-mo-replay=/); assert.match(DESK, /if \(root\.msMoshaReplay\) root\.msMoshaReplay\(\)/); assert.match(JS, /root\.msMoshaReplayTrade = function/);
+  assert.match(JS, /addEventListener\('input', function \(ev\) \{ var v = \+ev\.target\.value; stop\(\); show\(v\); \}\)/, 'the slider reads its value before the replay stops (stop redraws it at the old place)');
   assert.ok(!/require\(|import /.test(JS)); assert.ok(!/prompt\(|confirm\(|alert\(/.test(JS)); assert.ok(!/api\/(mosha|run|ctrader|bridge)/.test(JS), 'the chart reads candles only');
   assert.deepEqual([...JS.matchAll(/fetch\('([^']+)'/g)].map((m) => m[1]), ['/md/bars?sym=']);
   // the owner's light-mode candles stay grey up / black down here too
