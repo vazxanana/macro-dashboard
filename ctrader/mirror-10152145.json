@@ -4461,6 +4461,34 @@
     ],
     "stopCheckedAt": "2026-11-10T10:16:24.000Z",
     "brokerStop": 1.41337
+   },
+   "sol-position-1794306450": {
+    "positionId": "48002690",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "position",
+    "status": "open",
+    "openedAt": "2026-11-10T10:28:39.000Z",
+    "councilEntry": 85.03,
+    "stop": 88.03775,
+    "t1": 78.9245,
+    "riskCash": 30.08,
+    "margin": 85.06,
+    "minLot": true,
+    "shadow": true,
+    "mark": 85.03,
+    "levelsFrom": "mark",
+    "fillPrice": 85.001,
+    "slipR": 0.01,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T10:28:39.000Z",
+    "brokerStop": 88.009
    }
   },
   "day": {
@@ -4468,7 +4496,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9913.4 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9913.4 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4508,14 +4536,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9913.4,
-  "lastRun": "2026-11-10T10:26:03.000Z"
+  "lastRun": "2026-11-10T10:28:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T16:04:58.000Z",
-   "msg": "moved AUDUSD 47373491 protection: stop 0.6919706428571428 -> 0.6921306, target 0.6796087142857142 -> 0.6797687 (council scalp)",
-   "trade": "audusd-scalp-1793949425"
-  },
   {
    "at": "2026-11-09T16:04:58.000Z",
    "msg": "moved AUDUSD 47373492 protection: stop 0.6920872142857143 -> 0.6922472, target 0.6793755714285713 -> 0.6795356 (council intraday)",
@@ -6010,6 +6033,11 @@
    "at": "2026-11-10T10:26:03.000Z",
    "msg": "ETHUSD position 47979582 closed at the broker",
    "trade": "eth-rscalp-1794302265"
+  },
+  {
+   "at": "2026-11-10T10:28:39.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council position)",
+   "trade": "sol-position-1794306450"
   }
  ],
  "limits": {
@@ -6088,15 +6116,15 @@
   ]
  },
  "execution": {
-  "n": 151,
+  "n": 152,
   "meanSlipR": -0.007,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 193,
+  "medianLagSec": 191.5,
   "bySymbol": {
    "SOLUSD": {
-    "n": 12,
-    "meanSlipR": 0.1
+    "n": 13,
+    "meanSlipR": 0.093
    },
    "BTCUSD": {
     "n": 12,
