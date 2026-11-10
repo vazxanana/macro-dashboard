@@ -639,6 +639,9 @@ test('score: a hand-built two-tree model is evaluated exactly; decide uses a mod
   assert.equal(used.modelVersion, 'gbt-test-1'); assert.equal(typeof used.modelScore, 'number'); assert.equal(used.modelScore, MXA.score(model, MXA.features(s)).p);
   for (const off of [{ promoted: false }, { calibrated: false }]) { const d = MXA.decide(s, { model: Object.assign({}, model, off) }); assert.equal(d.modelVersion, null); assert.equal(d.modelScore, null); assert.ok(d.notes.some((n) => /not promoted and calibrated/.test(n))); assert.ok(!factors(d.supporting.concat(d.contradicting)).includes('model')); }
   assert.equal(MXA.decide(s, {}).modelScore, null, 'no model: confidence stays in words, no probability anywhere');
+  // a pooled model reads the edge id as a feature: decide hands it the snapshot's edge
+  const pooled = { version: 'pooled-test-1', promoted: true, calibrated: true, featureNames: ['edge'], encoders: { edge: { [s.edge]: 0, other: 1 } }, baseScore: 0, link: 'logit', trees: [{ f: 0, t: 0.5, left: { v: 1 }, right: { v: -1 } }] };
+  assert.equal(MXA.decide(s, { model: pooled }).modelScore, MXA.score(pooled, { edge: s.edge }).p); assert.notEqual(MXA.score(pooled, { edge: s.edge }).p, MXA.score(pooled, { edge: 'other' }).p);
 });
 
 test('difficulty grows with the amount of conflicting evidence and stated uncertainty', () => {

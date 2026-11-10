@@ -37,6 +37,32 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - [x] Flagged setups (clock-shifted weeks, before 2020) are left out of candidate lists and can never be scored as a test;
   `history` route for "similar past cases" (train pool only, finished before the moment asked about, no ids).
 
+- [x] **Dataset and training service** (`academy/gen/features.mjs`, `academy/gen/evaluate.mjs`, `ml/`,
+  `docs/academy/TRAINING.md`): one feature row per candidate from closed bars only (`academy/data/feat-<edge>.json`, so
+  "similar past cases" now works), the decision policy measured against taking every setup (`academy/data/eval.json`), an
+  offline gradient-boosting scorer with chronological walk-forward validation, JSON tree export and a parity check against
+  `MXA.score` (max difference 5e-7). Manual workflow `academy-train.yml` (never on push, commits nothing; not yet run on GitHub).
+
+### Honest results so far (train pool, 2020 → now, flagged setups left out, net R a trade after costs)
+
+| Edge | Every setup: n, R, t | Policy takes: n, R | Policy waits: n, R | Difference t |
+|---|---|---|---|---|
+| replica | 303, +0.428, 2.34 | 153, +0.209 | 150, +0.652 | −1.21 |
+| mosha-bo | 29, +0.971, 2.08 | 16, +1.085 | 13, +0.831 | 0.27 |
+| gtrend | 19, +1.730, 1.54 | 19, +1.730 | 0 | n/a |
+| gtl | 165, +0.232, 2.28 | 57, +0.405 | 108, +0.141 | 1.20 |
+| geg | 84, +0.405, 1.81 | 57, +0.473 | 27, +0.262 | 0.41 |
+| gmp | 494, +0.062, 1.09 | 110, −0.023 | 384, +0.086 | −0.80 |
+| nq-open | 327, +0.185, 2.10 | 74, +0.490 | 253, +0.095 | 1.79 |
+| all | 1,421, +0.249, 4.57 | 486, +0.342 | 935, +0.201 | 1.17 |
+
+- **The deterministic policy, with no lessons, does not yet add measurable value over taking every setup** (no edge reaches
+  t 2; on replica and gmp it is worse, not significantly). This is the baseline the mentor's lessons have to beat; the
+  "every setup" column was recomputed independently by the lead and matches.
+- **No trained scorer beats taking every setup.** Out of fold: replica AUC 0.561, gtl 0.516, gmp 0.511, nq-open 0.563,
+  pooled 0.602 (0.545 within edge); none with t ≥ 2. All five are stored as rejected challengers (`promoted: false`);
+  mosha-bo, gtrend and geg have too few trades to fit. Nothing is promoted automatically, and nothing was promoted.
+
 ## In progress
 
 - [ ] Academy page (`academy.html`, `assets/academy.css`, `assets/academy-ui.js`) wired to the modules: the Phase 2 loop
@@ -46,8 +72,6 @@ modules is `docs/academy/ARCHITECTURE.md`.
 ## Next
 
 - [ ] Lead verification of the loop with Playwright on real candles and the store.
-- [ ] Past-case features per candidate (`academy/data/feat-<edge>.json`) and the Layer C training service (`ml/`,
-  chronological walk-forward, JSON model export, champion / challenger; no automatic promotion).
 - [ ] Remaining tabs: session training, missed opportunities, blind arena, progress, mistakes, lessons manager, research
   lab and notebook, model registry, cost, audit trail.
 - [ ] Research engine and regime studies, discretionary-vs-mechanical measurement, security and cost review, the Academy
@@ -60,9 +84,9 @@ weights change, no look-ahead by construction, private Blob persistence, full is
 
 ## Verified tests
 
-- Whole suite on the development branch: **828 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
+- Whole suite on the development branch: **841 passing, 0 failing** (`node --test tests/*.test.mjs tests/*.test.js`; 719
   before the Academy). Academy files: `tests/academy-replay.test.mjs` (23), `academy-core` (37), `academy-api` (21),
-  `academy-risk` (8), `academy-edges` (20).
+  `academy-risk` (8), `academy-edges` (20), `academy-ml` (13). Model parity: `node ml/parity.mjs`.
 - `sh scripts/build.sh` leaves `out/` unchanged (CI "build" check).
 - Replay + core on real gold candles from the live candle proxy (12 Mar 2025): regime read, WAIT with reasons.
 - Candidates against the live candle proxy (30 usable setups an edge, entry price against the 5m candles within 10 minutes

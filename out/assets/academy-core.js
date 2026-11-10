@@ -800,7 +800,7 @@
     const lim = Object.assign({}, LIMITS, opts.limits || {});
     if (opts.position) return manageDecision(snapshot, opts, lim);
     const B = build(snapshot), f = B.f, P = B.P, cand = snapshot.cand || null, edgeDef = opts.edgeDef || null;
-    const model = usableModel(opts.model), ms = model ? score(model, f) : null;
+    const model = usableModel(opts.model), ms = model ? score(model, Object.assign({ edge: snapshot.edge || null }, f)) : null;   // a pooled model reads the edge id as a feature
     const d = {
       id: null, edge: snapshot.edge || null, market: snapshot.market || null, t: snapshot.t, action: 'WAIT', side: f.side,
       entry: cand && fin(cand.entry) ? cand.entry : null, stop: cand && fin(cand.stop) ? cand.stop : null, target: cand && fin(cand.target) ? cand.target : null,

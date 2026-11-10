@@ -79,3 +79,13 @@ tested). Full signatures are in each file's header comments and its tests.
 - `nq-open` candidates carry `tf: '1m'`; the core judges that edge on 5m bars.
 - Regenerate (about 40 s, deterministic): `ACADEMY_CANDLES=<dir outside the repo> node academy/gen/run.mjs`. The candles are
   the council-data `research/candles/` HistData files.
+
+## Dataset and training · `academy/gen/features.mjs`, `academy/gen/evaluate.mjs`, `ml/` (tests: `tests/academy-ml.test.mjs`)
+
+- Full notes: `docs/academy/TRAINING.md`. The page must build its snapshot the same way as the dataset so that live features
+  and past-case features are comparable: series = the edge's `contextTfs` from the registry (no 1m), 300 bars a timeframe, no
+  dollar index (those keys are null).
+- The dataset's calendar comes from `council/events.mjs` (read only; CPI / NFP / FOMC from 2022). The page has no calendar
+  source yet, so `eventNear` is null there.
+- `MXA.decide` hands the snapshot's edge id to the scorer (a pooled model uses it as a feature). A model is used only when
+  `promoted` and `calibrated` are both true; every model in `ml/models/` is a rejected challenger.
