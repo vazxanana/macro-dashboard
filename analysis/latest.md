@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-10 14:11 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-10 14:14 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **overlap** — the rule skips it, so no live Scalp until it ends.
 
@@ -21,6 +21,7 @@ Session now: **overlap** — the rule skips it, so no live Scalp until it ends.
 | XRP/USD | up (Kraken) | no (not live, overlap session) | WAIT VR sell | 41 trades, 41% won, +0.35R a trade |
 | EUR/USD | down (OANDA) | no (not live, overlap session) | IN ORIGIN sell | 33 trades, 21% won, −0.49R a trade |
 | GBP/USD | down (OANDA) | no (not live, overlap session) | READY sell (blocked: wrong side) | 40 trades, 23% won, −0.44R a trade |
+| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD, overlap session) | READY sell | 34 trades, 35% won, +0.02R a trade |
 | USD/CAD | up (OANDA) | no (not live, overlap session) | WAIT VR buy | 27 trades, 52% won, +0.42R a trade |
 | USD/CHF | down (OANDA) | no (not live, overlap session) | IN ORIGIN buy | 27 trades, 22% won, −0.48R a trade |
 
@@ -30,7 +31,7 @@ Replay total on the markets it trades live: 240 trades, −0.12R a trade (−29.
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-10 14:11 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-10 14:14 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -51,13 +52,13 @@ Built by the Trader at 2026-11-10 14:11 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-10 14:11 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-10 14:14 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 1 signal (0 open, 1 closed, +2.17R, 100% won); 3 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 2 signals in 7 days, 2 closed +0.45R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9855.97 · 3 open · 1 resting (checked 2026-11-10 14:09 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9855.97 · 3 open · 1 resting (checked 2026-11-10 14:12 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: BTCUSD sell scalp (btc-scalp-1793919871) · fill 75841.41 vs council 75500 (−0.36R slippage)
@@ -65,17 +66,17 @@ Built by the Trader at 2026-11-10 14:11 UTC. ICT desk: the last 7 days; mirror: 
 **Execution vs paper:** 13 demo fills; slippage against the council entry −0.01R on average (median +0.01R, worst +0.86R; positive = worse than paper), median 46368s from council fill to demo order.
 
 Last mirror events:
+- 11-10 14:12 placed buy limit XAUUSD 0.01 lot at 3971.36 (council geg, valid to 2026-11-26T09:15Z)
+- 11-10 14:12 cancelled XAUUSD limit order 33872414 for xau-geg-1793664000: the council re-quoted the order (entry 3982.27 -> 3971.36)
 - 11-10 14:05 placed buy limit XAUUSD 0.01 lot at 3982.27 (council geg, valid to 2026-11-26T09:15Z)
 - 11-10 14:05 cancelled XAUUSD limit order 33869231 for xau-geg-1793664000: the council re-quoted the order (entry 3971.36 -> 3982.27)
 - 11-10 13:36 placed buy limit XAUUSD 0.01 lot at 3971.36 (council geg, valid to 2026-11-26T09:15Z)
-- 11-10 13:36 cancelled XAUUSD limit order 33868822 for xau-geg-1793664000: the council re-quoted the order (entry 3981.87 -> 3971.36)
-- 11-10 13:33 placed buy limit XAUUSD 0.01 lot at 3981.87 (council geg, valid to 2026-11-26T09:15Z)
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-10 14:11 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-10 14:14 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -189,7 +190,7 @@ Checked 2026-11-10 11:28 UTC; live signals 2026-11-01 to 2026-11-10.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-10 14:11 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-10 14:14 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
