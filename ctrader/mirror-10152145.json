@@ -3228,7 +3228,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.74 · 23 open",
+  "status": "ok · demo Fusion Markets · balance 9975.74 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3241,17 +3241,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "audusd-scalp-1794272483": {
+    "orderId": "33838044",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.69179,
+    "stop": 0.69129,
+    "t1": 0.6931,
+    "placedAt": "2026-11-10T01:02:30.000Z",
+    "expires": "2026-11-10T04:01:23.000Z",
+    "riskCash": 2,
+    "margin": 4.15,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9975.74,
-  "lastRun": "2026-11-10T00:59:58.000Z"
+  "lastRun": "2026-11-10T01:02:30.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T09:07:16.000Z",
-   "msg": "placed buy limit GBPUSD 0.04 lot at 1.34112 (council scalp, valid to 2026-11-09T12:06Z)",
-   "trade": "gbpusd-scalp-1794215170"
-  },
   {
    "at": "2026-11-09T09:09:54.000Z",
    "msg": "limit filled: GBPUSD position 47570285 at the broker",
@@ -4746,6 +4762,11 @@
    "at": "2026-11-10T00:57:13.000Z",
    "msg": "opened buy EURUSD 0.03 lot (council scalp)",
    "trade": "eurusd-scalp-1794272171"
+  },
+  {
+   "at": "2026-11-10T01:02:30.000Z",
+   "msg": "placed buy limit AUDUSD 0.03 lot at 0.69179 (council scalp, valid to 2026-11-10T04:01Z)",
+   "trade": "audusd-scalp-1794272483"
   }
  ],
  "limits": {
