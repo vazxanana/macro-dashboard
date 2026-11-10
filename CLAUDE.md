@@ -1443,6 +1443,19 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   then only marked "passed validation, not promoted: owner decision". Never tune on these few trades, never add a configuration
   without a pre-registration, never show a score as a probability. After a change: `python ml/train.py && node ml/parity.mjs &&
   python ml/review.py` (the tests compare the committed files with the code's hash).
+- **Look pass** (10 Nov 2026, owner: "more visually good and approachable, it looks made with stones", "make sure all the
+  charts are working"): shape and colour only, no decision, lesson or API logic changed. `academy.html`: a hero (`.ac-hero`:
+  what the page is, the four steps; it folds to its title once a replay is on screen) and the setup as three numbered steps
+  (`.stp`: which edge, which days, train or exam) with the rest (chart timeframe, speed, difficulty, balance, risk, costs)
+  behind `#setup-opts` "More options". `assets/academy-ui.js`: the edges as cards (`#edge-cards`, `renderEdgeCards`; the
+  select `#f-edge` stays as the value the page reads and sets, so resume and "Replay this setup" move the card), a preview
+  chart (`#preview`, `preview()`: one-hour candles of the two weeks BEFORE the From date, nothing at or after the first
+  replay day is asked for; no decision reads it), charts on a see-through background. `assets/academy.css` ("Look pass"
+  section at the end): cards with depth (`--ac-card`, flat white in the light theme so the quiet text keeps AA), tabs as one
+  bar with an icon per section and the three groups apart, segmented controls, stat tiles, empty states with an icon, the
+  replay controls as a player, a long table scrolling inside its box under a sticky header (the research list). Checked on
+  live candles: every edge x chart timeframe x higher timeframe draws (56 of 56), and the Session, Blind arena and preview
+  charts. The audit opens "More options" before it sets the speed.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the

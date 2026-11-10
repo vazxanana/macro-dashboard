@@ -40,9 +40,18 @@
 </header>
 
 <main class="wrap" id="main">
-  <div class="ac-head">
-    <h1>MeridianX Academy</h1>
-    <p class="ac-lede">Replay real candles. On each setup an edge produces, the apprentice says buy, sell or wait and shows its evidence; you correct it, save the lesson, and test whether it learned. Replay and paper only: nothing here talks to a broker.</p>
+  <div class="ac-head ac-hero">
+    <div class="ac-hero-t">
+      <span class="ac-badge">Replay and paper only</span>
+      <h1>MeridianX Academy</h1>
+      <p class="ac-lede">Teach the apprentice to trade your edges. Replay real candles, see what it decides on each setup, correct it, and test whether the lesson stuck. Nothing here talks to a broker.</p>
+    </div>
+    <ol class="ac-steps" aria-label="How it works">
+      <li><b>Pick an edge and the days</b><span>Real candles from the past, replayed in order.</span></li>
+      <li><b>Watch it decide</b><span>Buy, sell or wait, with the evidence for and against.</span></li>
+      <li><b>Correct it</b><span>Approve or change the answer and save the lesson.</span></li>
+      <li><b>Test it</b><span>On setups it has never seen, with and without your lessons.</span></li>
+    </ol>
   </div>
 
   <section class="card ac-gate" id="ac-gate" hidden aria-live="polite">
@@ -61,51 +70,77 @@
     <section id="ac-train" role="tabpanel" aria-labelledby="tab-train" tabindex="-1">
 
       <div class="card" id="setup">
-        <h2 class="c-h">Setup <small id="setup-sum"></small><button type="button" class="btn sm" id="setup-toggle" hidden aria-expanded="true" aria-controls="setup-body">Change setup</button></h2>
+        <h2 class="c-h">Start a replay <small id="setup-sum"></small><button type="button" class="btn sm" id="setup-toggle" hidden aria-expanded="true" aria-controls="setup-body">Change setup</button></h2>
         <div id="setup-body">
           <p class="ac-err" id="setup-err" role="alert" hidden></p>
           <form id="setup-form" novalidate>
-            <div class="f-grid">
-              <label class="f f-wide"><span>Edge</span><select id="f-edge" required></select></label>
+            <div class="stp">
+              <span class="stp-n" aria-hidden="true">1</span>
+              <div class="stp-b">
+                <h3 class="stp-h">Which edge?</h3>
+                <div class="edge-cards" id="edge-cards" role="group" aria-label="Edge"></div>
+                <label class="f f-wide f-edge"><span>Edge</span><select id="f-edge" required></select></label>
+                <div class="edge-info" id="edge-info" aria-live="polite"></div>
+              </div>
             </div>
-            <div class="edge-info" id="edge-info" aria-live="polite"></div>
-            <div class="f-grid">
-              <label class="f"><span>From <small>(UTC)</small></span><input type="date" id="f-from" required></label>
-              <label class="f"><span>To <small>(UTC, included)</small></span><input type="date" id="f-to" required></label>
-              <label class="f"><span>Chart timeframe</span><select id="f-tf"><option value="5m">5 minutes</option><option value="15m">15 minutes</option><option value="1h">1 hour</option><option value="4h">4 hours</option><option value="1d">1 day</option></select></label>
-              <label class="f"><span>Difficulty</span><select id="f-diff"><option value="beginner">Beginner: clear-cut setups only</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option><option value="expert" selected>Expert: every setup</option></select></label>
-            </div>
-            <p class="note" id="f-count" aria-live="polite"></p>
-            <div class="f-grid">
-              <fieldset class="f" id="f-speed"><legend>Replay speed</legend>
-                <div class="seg">
-                  <label><input type="radio" name="speed" value="1"><span>1×</span></label>
-                  <label><input type="radio" name="speed" value="5"><span>5×</span></label>
-                  <label><input type="radio" name="speed" value="10" checked><span>10×</span></label>
-                  <label><input type="radio" name="speed" value="50"><span>50×</span></label>
-                  <label><input type="radio" name="speed" value="100"><span>100×</span></label>
+            <div class="stp">
+              <span class="stp-n" aria-hidden="true">2</span>
+              <div class="stp-b">
+                <h3 class="stp-h">Which days?</h3>
+                <div class="f-grid f-days">
+                  <label class="f"><span>From <small>(UTC)</small></span><input type="date" id="f-from" required></label>
+                  <label class="f"><span>To <small>(UTC, included)</small></span><input type="date" id="f-to" required></label>
                 </div>
-              </fieldset>
-              <label class="f"><span>Starting balance</span><input type="number" id="f-balance" value="100000" min="100" step="100" inputmode="decimal"></label>
-              <label class="f"><span>Risk per trade, %</span><input type="number" id="f-risk" value="0.25" min="0.01" max="5" step="0.05" inputmode="decimal"></label>
+                <p class="note f-count" id="f-count" aria-live="polite"></p>
+                <div class="preview" id="preview" hidden>
+                  <div class="preview-h"><b>Where the replay starts</b><span class="note" id="preview-note"></span></div>
+                  <div id="preview-chart" class="chart small" role="img" aria-label="The market before the replay starts: one-hour candles up to the first day"></div>
+                </div>
+              </div>
             </div>
-            <fieldset class="f-costs"><legend>Costs per round trip <small id="f-cost-unit"></small></legend>
+            <div class="stp">
+              <span class="stp-n" aria-hidden="true">3</span>
+              <div class="stp-b">
+                <h3 class="stp-h">Train or exam?</h3>
+                <fieldset class="f" id="f-mode"><legend class="sr">Training mode</legend>
+                  <div class="seg">
+                    <label><input type="radio" name="mode" value="train" checked><span>Train with corrections</span></label>
+                    <label><input type="radio" name="mode" value="exam"><span>Exam on unseen setups</span></label>
+                  </div>
+                </fieldset>
+                <p class="note" id="f-mode-note"></p>
+              </div>
+            </div>
+            <details class="opts" id="setup-opts">
+              <summary><b>More options</b><small>chart timeframe, speed, difficulty, balance, risk and costs: the defaults are fine to start</small></summary>
               <div class="f-grid">
-                <label class="f"><span>Spread</span><input type="number" id="f-spread" min="0" step="0.01" inputmode="decimal"></label>
-                <label class="f"><span>Commission</span><input type="number" id="f-comm" min="0" step="0.01" value="0" inputmode="decimal"></label>
-                <label class="f"><span>Slippage</span><input type="number" id="f-slip" min="0" step="0.01" value="0" inputmode="decimal"></label>
+                <label class="f"><span>Chart timeframe</span><select id="f-tf"><option value="5m">5 minutes</option><option value="15m">15 minutes</option><option value="1h">1 hour</option><option value="4h">4 hours</option><option value="1d">1 day</option></select></label>
+                <label class="f"><span>Difficulty</span><select id="f-diff"><option value="beginner">Beginner: clear-cut setups only</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option><option value="expert" selected>Expert: every setup</option></select></label>
+                <fieldset class="f" id="f-speed"><legend>Replay speed</legend>
+                  <div class="seg">
+                    <label><input type="radio" name="speed" value="1"><span>1×</span></label>
+                    <label><input type="radio" name="speed" value="5"><span>5×</span></label>
+                    <label><input type="radio" name="speed" value="10" checked><span>10×</span></label>
+                    <label><input type="radio" name="speed" value="50"><span>50×</span></label>
+                    <label><input type="radio" name="speed" value="100"><span>100×</span></label>
+                  </div>
+                </fieldset>
               </div>
-              <p class="note" id="f-cost-note"></p>
-            </fieldset>
-            <fieldset class="f" id="f-mode"><legend>Training mode</legend>
-              <div class="seg">
-                <label><input type="radio" name="mode" value="train" checked><span>Train with corrections</span></label>
-                <label><input type="radio" name="mode" value="exam"><span>Exam on unseen setups</span></label>
+              <div class="f-grid">
+                <label class="f"><span>Starting balance</span><input type="number" id="f-balance" value="100000" min="100" step="100" inputmode="decimal"></label>
+                <label class="f"><span>Risk per trade, %</span><input type="number" id="f-risk" value="0.25" min="0.01" max="5" step="0.05" inputmode="decimal"></label>
               </div>
-            </fieldset>
-            <p class="note" id="f-mode-note"></p>
+              <fieldset class="f-costs"><legend>Costs per round trip <small id="f-cost-unit"></small></legend>
+                <div class="f-grid">
+                  <label class="f"><span>Spread</span><input type="number" id="f-spread" min="0" step="0.01" inputmode="decimal"></label>
+                  <label class="f"><span>Commission</span><input type="number" id="f-comm" min="0" step="0.01" value="0" inputmode="decimal"></label>
+                  <label class="f"><span>Slippage</span><input type="number" id="f-slip" min="0" step="0.01" value="0" inputmode="decimal"></label>
+                </div>
+                <p class="note" id="f-cost-note"></p>
+              </fieldset>
+            </details>
             <div class="f-actions">
-              <button type="submit" class="btn primary" id="start">Start replay</button>
+              <button type="submit" class="btn primary big" id="start">Start replay</button>
               <span class="ac-status" id="load-msg" role="status"></span>
             </div>
           </form>
