@@ -480,6 +480,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const bOrders = new Map((rc.order || []).map((o) => [String(o.orderId), o]));   // pending orders resting at the broker
     const iso = new Date(now * 1000).toISOString(), byId = new Map(trades.map((t) => [t.id, t]));
     st.orders = st.orders || {};   // the mirror's own resting LIMIT orders, by council trade id
+    const limitsPlaced = [];       // the limits placed in THIS round: read back before the round ends (the stop check below)
     const PAUSE_KEY = (name, pending) => (pending ? `${name}:pending` : name);
     const skipT = (t, why) => { (st.skipped = st.skipped || {})[t.id] = why; if (st.wait) delete st.wait[t.id]; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
     // "not now" answers: tried again next round for as long as the trade is open or pending. Only a counted answer (count: a broker
@@ -693,7 +694,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
             const oid = ev.order && ev.order.orderId; if (oid == null) throw Object.assign(new Error('order accepted without an order id'), { code: 'NO_ORDER_ID' });
             st.orders[t.id] = { orderId: String(oid), symbol: name, side: t.side, volume: rv.volume, lots: rv.lots, digits: d, setup: t.k, limitPrice: order.limitPrice, stop: t.stop, t1: t.t1, placedAt: iso,
               expires: new Date(exp * 1000).toISOString(), riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}) };
-            if (st.wait) delete st.wait[t.id];
+            if (st.wait) delete st.wait[t.id]; limitsPlaced.push(t);
             out.sent.push({ type: 'limit', trade: t.id }); say(`placed ${sell ? 'sell' : 'buy'} limit ${name} ${rv.lots} lot at ${order.limitPrice} (council ${t.k}, valid to ${st.orders[t.id].expires.slice(0, 16)}Z)`, { trade: t.id });
             alert('pending', t.id, st.orders[t.id], () => ({ price: order.limitPrice, stop: t.stop, t1: t.t1, noTarget: !('takeProfit' in order), expires: st.orders[t.id].expires }));
           } catch (e) { const txt = `${e.code || ''} ${e.message}`;
@@ -750,6 +751,31 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           // next round (step 0, which then sends the open alert); only a broker's answer is alerted as a rejection
           if ((st.skipped || {})[t.id] && !(!e.code && UNSURE.test(e.message))) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: volume / +info.lotSize, result: st.skipped[t.id] })); }
       }
+    }
+    // RULE: never a position without a stop. (10 Nov 2026) A limit placed while the broker's price is already through it fills at
+    // once (the council's price said otherwise a minute earlier); an absolute stop on the wrong side of that fill is dropped by
+    // the broker, and the position then sat without a stop until the next round's guard closed it (AUD/USD, 3 minutes). So the
+    // account is read back in the SAME round: a limit that has already become a position is adopted now, and one without a stop
+    // gets the council's stop or is closed at once. A stop on the wrong side of the fill is not worth an amend: closed.
+    if (limitsPlaced.length) {
+      try {
+        if (slWaitMs > 0) await new Promise((r) => setTimeout(r, slWaitMs));
+        const rc3 = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
+        const filledNow = new Map(); for (const p of rc3.position || []) { const td = p.tradeData || {}; if (td.label === LABEL && td.comment) filledNow.set(td.comment, p); }
+        for (const t of limitsPlaced) {
+          const o = st.orders[t.id], p = o && filledNow.get(commentFor(t)); if (!p) continue;
+          const pid = String(p.positionId), fill = Number.isFinite(+p.price) && +p.price > 0 ? +p.price : null;
+          st.map[t.id] = { symbol: o.symbol, side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: o.stop, t1: o.t1, adopted: false, alerted: [],
+            viaLimit: true, limitPrice: o.limitPrice, digits: o.digits, lots: o.lots, riskCash: o.riskCash, ...(o.margin != null ? { margin: o.margin } : {}), ...(o.minLot ? { minLot: true } : {}), ...(o.shadow ? { shadow: true } : {}),
+            ...fillQuality(t, fill ?? o.limitPrice, now), positionId: pid, volume: +(p.tradeData || {}).volume || o.volume, status: 'open' };
+          delete st.orders[t.id];
+          say(`limit filled at once: ${o.symbol} position ${pid} at the broker${fill != null ? ` at ${fill}` : ''}`, { trade: t.id });
+          alert('open', t.id, st.map[t.id], () => ({ filled: true, viaLimit: true, price: fill ?? o.limitPrice, entry: t.entry, stop: t.stop, t1: t.t1, noTarget: t.t1 == null || t.rr >= 50 }));
+          if (p.stopLoss != null) { st.map[t.id].stopCheckedAt = iso; st.map[t.id].brokerStop = +p.stopLoss; continue; }
+          const stopN = +t.stop, wrongSide = fill != null && Number.isFinite(stopN) && (t.side === 'buy' ? stopN >= fill : stopN <= fill);
+          await ensureStop(t.id, st.map[t.id], wrongSide ? { ...t, stop: null } : t, p);
+        }
+      } catch (e) { say(`read-back after placing ${limitsPlaced.length} limit order(s) failed: ${scrub(e.message || e)} (the next round's stop check covers it)`); }
     }
     // housekeeping: skip/retry notes matter only while the council trade is open; finished positions are kept LIMITS.keepDays
     for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || !(OPEN.has(t.status) || t.status === 'pending')) delete st[k][id]; }
