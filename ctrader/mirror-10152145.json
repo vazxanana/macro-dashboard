@@ -5781,6 +5781,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-10T16:59:24.000Z",
     "brokerStop": 0.82692
+   },
+   "audusd-swing-1794333208": {
+    "positionId": "48181010",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "swing",
+    "status": "open",
+    "openedAt": "2026-11-10T17:54:35.000Z",
+    "councilEntry": 0.68544,
+    "stop": 0.6933006785714286,
+    "t1": 0.6697186428571429,
+    "riskCash": 7.86,
+    "margin": 1.37,
+    "minLot": true,
+    "shadow": true,
+    "mark": 0.68544,
+    "levelsFrom": "mark",
+    "fillPrice": 0.68545,
+    "slipR": -0.001,
+    "lagSec": 67,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T17:54:35.000Z",
+    "brokerStop": 0.69331
    }
   },
   "day": {
@@ -5788,7 +5816,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.24 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9964.24 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5822,14 +5850,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9964.24,
-  "lastRun": "2026-11-10T17:52:03.000Z"
+  "lastRun": "2026-11-10T17:54:35.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T10:03:03.000Z",
-   "msg": "EURUSD position 47993692 closed at the broker",
-   "trade": "eurusd-rscalp-1794304763"
-  },
   {
    "at": "2026-11-10T10:03:03.000Z",
    "msg": "placed buy limit EURUSD 0.03 lot at 1.12274 (council scalp, valid to 2026-11-10T13:02Z)",
@@ -7324,6 +7347,11 @@
    "at": "2026-11-10T17:49:26.000Z",
    "msg": "closed USDCHF position 48143363 (council: loss)",
    "trade": "usdchf-scalp-1794327220"
+  },
+  {
+   "at": "2026-11-10T17:54:35.000Z",
+   "msg": "opened sell AUDUSD 0.01 lot (council swing)",
+   "trade": "audusd-swing-1794333208"
   }
  ],
  "limits": {
@@ -7402,11 +7430,11 @@
   ]
  },
  "execution": {
-  "n": 194,
+  "n": 195,
   "meanSlipR": -0.016,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 164,
+  "medianLagSec": 162,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -7437,8 +7465,8 @@
     "meanSlipR": 0.091
    },
    "AUDUSD": {
-    "n": 27,
-    "meanSlipR": -0.048
+    "n": 28,
+    "meanSlipR": -0.046
    },
    "XAUUSD": {
     "n": 24,
