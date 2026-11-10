@@ -5251,7 +5251,8 @@
     "t1": 4006.8148928571427,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4033.91,
@@ -5266,9 +5267,10 @@
     "lagSec": 61,
     "positionId": "48101772",
     "volume": 100,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-10T14:54:24.000Z",
-    "brokerStop": 4047.47
+    "brokerStop": 4047.47,
+    "closedAt": "2026-11-10T15:01:25.000Z"
    },
    "audusd-rscalp-1794322550": {
     "symbol": "AUDUSD",
@@ -5302,7 +5304,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9983.37 · 24 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9973.52 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5338,15 +5340,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9983.37,
-  "lastRun": "2026-11-10T14:58:24.000Z"
+  "balance": 9973.52,
+  "lastRun": "2026-11-10T15:01:25.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T07:56:09.000Z",
-   "msg": "GBPUSD position 47951542 closed at the broker",
-   "trade": "gbpusd-scalp-1794296570"
-  },
   {
    "at": "2026-11-10T07:56:09.000Z",
    "msg": "placed sell limit GBPUSD 0.03 lot at 1.34529 (council rscalp, valid to 2026-11-10T10:54Z)",
@@ -6841,6 +6838,11 @@
    "at": "2026-11-10T14:58:24.000Z",
    "msg": "limit filled: AUDUSD position 48103267 at the broker",
    "trade": "audusd-rscalp-1794322550"
+  },
+  {
+   "at": "2026-11-10T15:01:25.000Z",
+   "msg": "XAUUSD position 48101772 closed at the broker",
+   "trade": "xau-m30m1-1794322403"
   }
  ],
  "limits": {
