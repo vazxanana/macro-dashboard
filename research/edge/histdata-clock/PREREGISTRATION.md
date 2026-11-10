@@ -133,3 +133,12 @@ before the rule is fixed, and the rule is never changed because of what a re-run
 verdict; the list of every disagreement; the D2 artefact counts; the chosen converter; what is uncertified and why.
 The before → after table of the studies re-run on the corrected clock is added to `RESULT.md` afterwards (Step 3 of the
 work order); it is a consequence of the audit, not part of its evidence.
+
+## Amendment 1 (10 Nov 2026, before the first run; nothing had been computed)
+
+The NFP 2018-21 sentence above lists exceptions from memory and is not reliable (the BLS date is the third Friday after
+the reference week, not a fixed "first Friday"). Replaced by a rule that needs no memory: for 2018-21, **both the first
+and the second Friday of every month are read at 08:30 New York** (plus Thursday 2 July 2020). The jobs report came on
+one of them; if another US 08:30 release fell on the other one, its spike is an equally valid reading of the clock at
+08:30 New York. A Friday with no clear spike is not counted, as before. Rows from this list are typed `US0830` in the
+result, not `NFP`. No other change.
