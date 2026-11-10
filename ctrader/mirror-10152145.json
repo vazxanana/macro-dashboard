@@ -5697,7 +5697,7 @@
     "lots": 0.07,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T16:46:35.000Z",
     "councilEntry": 1.11493,
     "stop": 1.1151799999999998,
@@ -5711,10 +5711,12 @@
     "slipR": 0.36,
     "lagSec": 82,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T16:46:35.000Z",
-    "brokerStop": 1.11509
+    "brokerStop": 1.11509,
+    "closedAt": "2026-11-10T16:51:59.000Z"
    }
   },
   "day": {
@@ -5722,7 +5724,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9971.82 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.71 · 22 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5752,23 +5754,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "eurusd-rscalp-1794329444": {
+    "orderId": "33887929",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 1.115,
+    "stop": 1.1145,
+    "t1": 1.1198350000000001,
+    "placedAt": "2026-11-10T16:51:59.000Z",
+    "expires": "2026-11-10T19:50:44.000Z",
+    "riskCash": 1.99,
+    "margin": 6.69,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9971.82,
-  "lastRun": "2026-11-10T16:49:18.000Z"
+  "balance": 9969.71,
+  "lastRun": "2026-11-10T16:51:59.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T09:48:51.000Z",
-   "msg": "USDCAD position 47775175 closed at the broker",
-   "trade": "usdcad-scalp-1794253228"
-  },
-  {
-   "at": "2026-11-10T09:48:51.000Z",
-   "msg": "placed buy limit USDCAD 0.01 lot at 1.41369 (council intraday, valid to 2026-11-10T21:47Z)",
-   "trade": "usdcad-intraday-1794304066"
-  },
   {
    "at": "2026-11-10T09:51:19.000Z",
    "msg": "limit filled: USDCAD position 47990251 at the broker",
@@ -7258,6 +7270,16 @@
    "at": "2026-11-10T16:46:35.000Z",
    "msg": "opened sell EURUSD 0.07 lot (council scalp)",
    "trade": "eurusd-scalp-1794329113"
+  },
+  {
+   "at": "2026-11-10T16:51:59.000Z",
+   "msg": "EURUSD position 48159279 closed at the broker",
+   "trade": "eurusd-scalp-1794329113"
+  },
+  {
+   "at": "2026-11-10T16:51:59.000Z",
+   "msg": "placed buy limit EURUSD 0.03 lot at 1.115 (council rscalp, valid to 2026-11-10T19:50Z)",
+   "trade": "eurusd-rscalp-1794329444"
   }
  ],
  "limits": {
