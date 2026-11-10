@@ -4018,7 +4018,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9973.72 · 30 open",
+  "status": "ok · demo Fusion Markets · balance 9973.72 · 30 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4032,17 +4032,34 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eurusd-swing-1794299390": {
+    "orderId": "33851309",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "swing",
+    "limitPrice": 1.12442,
+    "stop": 1.112987,
+    "t1": 1.147286,
+    "placedAt": "2026-11-10T08:31:02.000Z",
+    "expires": "2026-11-12T08:29:50.000Z",
+    "riskCash": 11.43,
+    "margin": 2.25,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9973.72,
-  "lastRun": "2026-11-10T08:29:25.000Z"
+  "lastRun": "2026-11-10T08:31:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T13:04:57.000Z",
-   "msg": "EURUSD position 47616616 closed at the broker",
-   "trade": "eurusd-intraday-1794225280"
-  },
   {
    "at": "2026-11-09T13:07:26.000Z",
    "msg": "opened buy EURUSD 0.01 lot (council scalp)",
@@ -5537,6 +5554,11 @@
    "at": "2026-11-10T08:24:23.000Z",
    "msg": "SOLUSD position 47900628 closed at the broker",
    "trade": "sol-rscalp-1794283456"
+  },
+  {
+   "at": "2026-11-10T08:31:02.000Z",
+   "msg": "placed buy limit EURUSD 0.01 lot at 1.12442 (council swing, valid to 2026-11-12T08:29Z)",
+   "trade": "eurusd-swing-1794299390"
   }
  ],
  "limits": {
