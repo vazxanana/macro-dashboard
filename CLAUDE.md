@@ -2126,6 +2126,22 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
   draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
   decision saves the sitting.
+- **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
+  verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
+  an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER
+  instance (every deploy starts new ones) read the attempts file without the row stored seconds earlier, so `correct`
+  answered 404; a WRITE made from such a read would also have dropped the rows stored in between (attempts, dataset, audit).
+  Fix: every Blob read of the store asks the origin (`?cache=0`, what the Blob client's own `get(…, { useCache: false })`
+  sends for a private file). Never read a store file through the CDN copy again. The page (`saveCorrection`,
+  `MXAC.correctionFailure`): a correction that cannot be saved leaves the form exactly as it is (verdict, levels, bias,
+  reasons, words, marks), says in plain words that nothing was lost and what to do, and the button becomes "Try again"; the
+  verdict still counts as unsaved for the leave guard. After a second "no stored attempt" answer in a row, the next press
+  stores the decision the page holds once more through the usual `attempt` call (same mode, same snapshot hash; every server
+  check applies; never an exam or a blind attempt) and saves the verdict on it. No new API route or field; a decision is
+  still two calls; a retry is one more, a re-stored decision two. Not proven from production logs (they could not be read):
+  the sequence is reproduced with the real handler and the real Blob backend over a fake Blob service that lags as documented.
+  The same CDN read is in the other private-Blob modules (`api/notify.js`, `profile.js`, `sounds.js`, `mosha.js`,
+  `mosha-lessons.js`, which overwrite one file in place): not changed here. Tests: `tests/academy-correction.test.mjs`; audit section 11l.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
