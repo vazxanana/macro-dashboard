@@ -1447,6 +1447,35 @@ quick Buy / Sell labels under AA; the gold terminal had no way back to the desk 
 `tests/qa-sweep.test.mjs` (also pins the owner's grey / black light-mode candles) and `scripts/audit/smoke.cjs` (offline.html, and no
 visible endless animation of a custom property or box-shadow on any page).
 
+## Post-merge QA sweep (11 Nov 2026, PRs #706-#722)
+The Mosha desk (log, replay chart, teach cards, tutorial, French / English, the one-tap questions), the ICT desk's execution chips
+and "Replay through" text, and ChronosTrade's split view, timeframe chips, session button and teach chip / dialog, at 390 px (touch)
+and 1440 px in dark / light / midnight as owner, reviewer, viewer (Luxus, Carlos) and signed out (stubbed /api/me, real council-data
+at /cdata, the lessons and log endpoints driven in memory by their own handlers with seeded lessons, answers, questions, a chart and
+book lines). No page or console error, no permission leak and no dead deep link (`#mosha`, `#ict`, `#trade/<id>` both executions)
+was found. Fixed:
+- **Every desk view was 10 px too wide on a phone** for the owner and reviewers since Mosha became the sixth desk: `.desk-sw` had
+  `width: max-content`, so the view's column grew to the switch and the right edge of every card was cut (the app clips, so nothing
+  scrolled and the old smoke test saw nothing). The switch now takes the room there is and scrolls inside itself; tighter padding
+  under 430 px; "soon" is 12 px and AA on the light panel.
+- Mosha desk: the teacher's own buttons (right / not right, send, the lesson's actions, the book form, picture viewer, levels dialog,
+  tutorial close) were 36-40 px on touch, now 44; 10-11 px text raised to 12; in the teach form's fold the date-and-time field pushed
+  "Entry time" under the next label on phones (a field now stays in its cell, that one takes the row); the replay's Steps / Candles /
+  Speed names sit beside their own buttons on phones; a record with no drawdown said "−0.00R"; light-theme green / red text and the
+  buy / sell chips were 3.8-4.5:1 (`--buy` / `--sell` scoped to the desk, its tutorial and levels dialog).
+- ICT desk: signal filters (34 px) and the review's fill / R fields (29 px) are 44 px on touch, 16 px text in the review fields on
+  touch (no zoom-in on an iPhone), the result tiles' small print (won · lost · flat · near-flat) is 12 px.
+- ChronosTrade: the chosen timeframe chip was white on the dark themes' accent (3.2:1; a fixed blue now, like quick Buy / Sell) and
+  the toolbar's timeframe on the light panel sat at 4.50; chips are 44 px on touch; a position card cut its stop and target to
+  "4180." (the old table's `#open input { width: 60px }`); the teach dialog's hints and the session form's labels are 12 px.
+- Checks: `tests/qa-sweep.test.mjs` (one per fix) and `scripts/audit/smoke.cjs`: on the phone no inner view of the Desk may end
+  past the screen ("view cut off on the right"; `#crypto` and `#sdv` joined the inner views).
+- Seen, left alone (older design or a decision for the owner): the ICT desk's 10-11.5 px labels and chips (dozens, from before
+  9 Nov); ChronosTrade's 32-36 px toolbar and pane-header buttons on phones (a stated choice of pass 11); the shared dialog's
+  primary button on the light theme (white on `--accent`, 4.50); a corrected book line's "The desk had: …" keeps the desk's first
+  wording in English in the French view; the replay card and the log on a teacher's page are English ("only the teaching surfaces
+  are translated"), and that page still shows "What the fixed rules said" to the teacher (see "Who teaches whom").
+
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
 of `council/decay.mjs`; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.

@@ -36,7 +36,7 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <script src="/assets/lightweight-charts-4.1.3.js?v=0c146b9bfb"></script>
 <script src="/assets/ms-dialog.js?v=9d6241afda"></script>
-<script src="/assets/mosha-desk.js?v=65e64faaf0" defer></script>
+<script src="/assets/mosha-desk.js?v=91e47cc8b8" defer></script>
 <script src="/assets/mosha-replay.js?v=73eb02ea24" defer></script>
 <script src="/assets/mosha-i18n.js?v=f5c6ba46fd" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
@@ -2628,7 +2628,11 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   #v-ict .ict-src button, #v-ict .ict-seg button, #v-ict .ict-tv-tf button, #v-ict .ict-tags button, #v-ict .ms-tbtn, #v-ict select, #v-ict summary, #v-ict .u-btn { min-height: 44px; }
   #v-ict .ict-cal-nav .ms-tbtn, #v-ict .tv-x { min-width: 44px; min-height: 44px; }
   #v-ict summary { display: flex; align-items: center; }
+  /* QA sweep 11 Nov: the signal filters (34 px, a more specific rule won) and the review's fill / R fields (29 px) */
+  #v-ict .ict-f select, #v-ict .ict-rv input { min-height: 44px; }
 }
+@media (pointer: coarse) { #v-ict .ict-rv input, #v-ict .ict-rv textarea { font-size: 16px; } }   /* no zoom-in on focus on an iPhone */
+#v-ict .ict-kpi small { font-size: 12px; }   /* the win-rate line (won · lost · flat · near-flat) and its neighbours were 11.5 px */
 @media (prefers-reduced-motion: reduce) { #v-ict *, #v-ict *::before, #v-ict *::after { transition: none !important; animation: none !important; } #v-ict .ict-cal-d:hover, #v-ict .ict-m:hover { transform: none !important; } }
 html[data-motion="off"] #v-ict *, html[data-motion="off"] #v-ict *::before, html[data-motion="off"] #v-ict *::after { transition: none !important; animation: none !important; }
 html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
@@ -11026,7 +11030,11 @@ html[data-role="public"] .hdr-sw { display: none; }
 </style>
 <style id="ms-mosha-css">
 /* Mosha desk (10 Nov 2026): the owner's own trades, logged and measured */
-.desk-sw { overflow-x: auto; scrollbar-width: none; } .desk-sw::-webkit-scrollbar { display: none; } .desk-sw a { flex: none; white-space: nowrap; }
+/* QA sweep 11 Nov: with six desks the switch is wider than a 390 px phone; `width: max-content` made every desk view as wide as the
+   switch (10 px cut off on the right). It now takes the room there is and scrolls inside itself. */
+.desk-sw { overflow-x: auto; scrollbar-width: none; width: auto; min-width: 0; justify-self: start; } .desk-sw::-webkit-scrollbar { display: none; } .desk-sw a { flex: none; white-space: nowrap; }
+@media (max-width: 430px) { .desk-sw a { padding: 0 8px; } .desk-sw a small { margin-left: 4px; padding: 1px 4px; } }
+.desk-sw a small { font-size: 12px; letter-spacing: 0; } :root[data-theme="light"] .desk-sw a small { color: #7a5200; }   /* "soon": 12 px, and AA on the light panel (was 10 px, 3.6:1) */
 #v-mosha .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #e0a526 16%, var(--panel)); box-shadow: inset 0 0 0 1px #c98f12; }
 #v-mosha .mo-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; } #v-mosha .mo-wide { grid-column: 1 / -1; }
 #v-mosha .ms-k small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; } #v-mosha .ms-k .ms-tbtn { margin-left: auto; }
@@ -11181,6 +11189,21 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
   #v-mosha .mo-t .mo-c-time { grid-column: span 3; font-weight: 600; } #v-mosha .mo-t .mo-c-side { text-align: right; } #v-mosha .mo-t .mo-c-res, #v-mosha .mo-t .mo-tags, #v-mosha .mo-t .mo-acts { grid-column: 1 / -1; }
   #v-mosha .mo-t .mo-tags:empty { display: none; } #v-mosha .mo-t .mo-acts { display: flex; flex-wrap: wrap; gap: 8px; } #v-mosha .mo-acts .ms-tbtn { margin: 0; flex: 1 1 auto; } }
 @media (pointer: coarse) { #v-mosha .mo-f input, #v-mosha .mo-f select, #v-mosha .mo-seg span { min-height: 44px; } #v-mosha .mo-f input, #v-mosha .mo-f select, #v-mosha .mo-f textarea { font-size: 16px; } #v-mosha .mo-acts .ms-tbtn { min-height: 40px; } }
+/* Post-merge QA sweep (11 Nov 2026) */
+/* touch: the teacher's own actions (right / not right, send, the lesson's buttons, the book form), the replay's ChronosTrade button, the
+   CSV button and the tutorial's close were 36-40 px on a phone */
+@media (pointer: coarse) { #v-mosha #mo-lessons .ms-tbtn, #v-mosha #mo-book .ms-tbtn, #v-mosha #mo-rp-ct, #v-mosha #mo-csv, #v-mosha .mo-g-tut .u-btn, #v-mosha .mo-acts .ms-tbtn, #v-mosha .mo-bar .u-btn { min-height: 44px; }
+  #v-mosha .mo-rp-seg button, #v-mosha .mo-b-acts .mo-l-x { min-width: 44px; } .mo-tut .mt-x { width: 44px; height: 44px; } .mo-tut .mt-go .ms-tbtn, .mo-tut .mt-go .u-btn { min-height: 44px; } }
+/* no text under 12 px ("optional" beside the fold, the counts in the lesson filter) */
+#v-mosha .mo-tc-lv > summary small, #v-mosha .mo-l-flt button small, .mo-lv-dlg .mo-f small { font-size: 12px; }
+@media (pointer: coarse) { .mo-lv-dlg .mo-f input, .mo-lv-dlg .mo-f select, .mo-lv-dlg .own-acts button, .mo-l-dlg form button { min-height: 44px; } }
+/* a field never grows past its cell: the date-and-time input pushed "Entry time" under the next field's label on phones */
+#v-mosha .mo-f, .mo-lv-dlg .mo-f { grid-template-columns: minmax(0, 1fr); } #v-mosha .mo-tc-lvg, .mo-lv-dlg .mo-lv { align-items: end; } #v-mosha .mo-tc-lvg input, #v-mosha .mo-tc-lvg select { min-width: 0; max-width: 100%; }
+@media (max-width: 760px) { #v-mosha .mo-tc-lvg .mo-f:has(input[type="datetime-local"]), .mo-lv-dlg .mo-f:has(input[type="datetime-local"]) { grid-column: 1 / -1; }
+  /* the replay's Steps / Candles / Speed: each name beside its own buttons (the names were left at the end of the row above) */
+  #v-mosha .mo-rp-ctl:has(> .mo-rp-k) { display: grid; grid-template-columns: auto minmax(0, 1fr); } #v-mosha .mo-rp-ctl > .mo-rp-ct { grid-column: 1 / -1; } }
+/* light theme: green and red text at AA on the cards, the wells and the buy / sell chips (the desk's light --buy was 4.2-4.5:1 here) */
+:root[data-theme="light"] #v-mosha, :root[data-theme="light"] .mo-tut, :root[data-theme="light"] .mo-lv-dlg { --buy: #067a64; --sell: #c8243f; }
 </style>
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
