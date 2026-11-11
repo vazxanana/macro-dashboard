@@ -3297,7 +3297,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T10:02:02.000Z",
     "councilEntry": 73741.3,
     "stop": 73451.63,
@@ -3311,10 +3311,12 @@
     "slipR": 0.038,
     "lagSec": 72,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T10:02:02.000Z",
-    "brokerStop": 73462.62
+    "brokerStop": 73462.62,
+    "closedAt": "2026-11-11T14:26:13.000Z"
    },
    "eth-replica-1794391250-b": {
     "positionId": "48376026",
@@ -3525,7 +3527,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5531.4 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 5528.4 · 5 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3539,12 +3541,22 @@
    "eth-replica-1794405367-b": {
     "why": "daily loss stop (44.8% down today)",
     "n": 0,
-    "at": "2026-11-11T14:23:43.000Z"
+    "at": "2026-11-11T14:26:13.000Z"
    },
    "sol-replica-1794406803-s": {
     "why": "daily loss stop (44.8% down today)",
     "n": 0,
-    "at": "2026-11-11T14:23:43.000Z"
+    "at": "2026-11-11T14:26:13.000Z"
+   },
+   "btc-replica-1794407102-s": {
+    "why": "daily loss stop (44.8% down today)",
+    "n": 0,
+    "at": "2026-11-11T14:26:13.000Z"
+   },
+   "eth-replica-1794407102-s": {
+    "why": "daily loss stop (44.8% down today)",
+    "n": 0,
+    "at": "2026-11-11T14:26:13.000Z"
    }
   },
   "paused": {},
@@ -3552,8 +3564,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5531.4,
-  "lastRun": "2026-11-11T14:23:43.000Z"
+  "balance": 5528.4,
+  "lastRun": "2026-11-11T14:26:13.000Z"
  },
  "log": [
   {
@@ -4898,6 +4910,21 @@
    "at": "2026-11-11T14:21:13.000Z",
    "msg": "not mirrored yet sol-replica-1794406803-s: daily loss stop (44.8% down today) (will retry)",
    "trade": "sol-replica-1794406803-s"
+  },
+  {
+   "at": "2026-11-11T14:26:13.000Z",
+   "msg": "BTCUSD position 48376002 closed at the broker",
+   "trade": "btc-replica-1794391250-b"
+  },
+  {
+   "at": "2026-11-11T14:26:13.000Z",
+   "msg": "not mirrored yet btc-replica-1794407102-s: daily loss stop (44.8% down today) (will retry)",
+   "trade": "btc-replica-1794407102-s"
+  },
+  {
+   "at": "2026-11-11T14:26:13.000Z",
+   "msg": "not mirrored yet eth-replica-1794407102-s: daily loss stop (44.8% down today) (will retry)",
+   "trade": "eth-replica-1794407102-s"
   }
  ],
  "limits": {
