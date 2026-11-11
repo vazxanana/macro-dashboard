@@ -439,3 +439,54 @@ test('what if: the simulated setup is compared with the stored result, and a dif
   assert.match(MXAC.whatIfNote(row(), null), /^No stored result is on file/); assert.equal(MXAC.whatIfNote(null, {}), 'Nothing was simulated.');
   assert.deepEqual(Object.keys(MXAC.WHATIF_REASON).sort(), ['bad-stop', 'no-fill', 'no-trade', 'open', 'stop', 'target', 'wait']);
 });
+
+// ---- usability pass (11 Nov 2026) -------------------------------------------------------------------------------------------
+test('humanize names a lesson by its title when the lessons are at hand, and mends a doubled full stop (display only)', () => {
+  const ls = [{ id: 'ls_0mwc3emu90a7dd6b9881', title: 'WAIT · gmp: htf-bias' }, { id: 'ls_0mwc3fjt60d27c861c61', title: 'FLIP · gmp: htf-bias' }];
+  const raw = 'conflicting lessons: ls_0mwc3emu90a7dd6b9881 vs ls_0mwc3fjt60d27c861c61 (FLIP against WAIT): the mentor has to settle which one holds here';
+  assert.equal(MXAC.humanize(raw, ls), 'conflicting lessons: "WAIT · gmp: htf-bias" vs "FLIP · gmp: htf-bias" (FLIP against WAIT): the mentor has to settle which one holds here');
+  assert.equal(MXAC.humanize(raw), raw, 'without the lessons the text is left alone');
+  assert.equal(MXAC.humanize('lesson ls_0mwc3zzzzzzzzzzzzzzz applied', ls), 'lesson ls_0mwc3zzzzzzzzzzzzzzz applied', 'an id that is not among them stays an id: nothing is guessed');
+  assert.equal(MXAC.humanize('Mentor: WAIT instead of BUY (htf-bias).. Bias down.'), 'Mentor: WAIT instead of BUY (htf-bias). Bias down.');
+  assert.equal(MXAC.humanize('wait for it... then act'), 'wait for it... then act', 'an ellipsis is not a doubled full stop');
+  assert.equal(MXAC.humanize('give two numbers, low .. high'), 'give two numbers, low .. high');
+  assert.equal(MXAC.humanize('ATR is 2.19 times its median (limit 2)'), 'ATR is 2.19 times its median (limit 2)');
+});
+
+test('a half-written verdict is known as unsaved until it is stored; an untouched or saved form is not', () => {
+  const blank = { choice: null, reasons: [], text: '', annotations: [], dirty: false };
+  assert.equal(MXAC.mentorUnsaved(blank), false); assert.equal(MXAC.mentorUnsaved(null), false);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true }), false, 'touched and emptied again: nothing to lose');
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true, text: '   ' }), false);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true, choice: 'reject' }), true);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true, text: 'It should have sold.' }), true);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true, reasons: ['late'] }), true);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: true, annotations: [{ kind: 'entry', price: 1 }] }), true);
+  assert.equal(MXAC.mentorUnsaved({ ...blank, dirty: false, choice: 'reject', text: 'stored' }), false, 'stored: dirty was cleared by the save');
+});
+
+test('the line under the chart at a decision point says what was decided and what to do next, never a number as a probability', () => {
+  assert.equal(MXAC.pointLine({ action: 'WAIT', confidence: 'low' }), 'Setup reached: the engine says WAIT (low confidence). Read why, then give your verdict.');
+  assert.equal(MXAC.pointLine({ action: 'BUY', confidence: 'high', corrected: true }), 'Setup reached: the engine says BUY (high confidence). Your verdict is saved: continue when you are ready.');
+  assert.equal(MXAC.pointLine({ action: 'SELL', exam: true }), 'Exam setup reached: the engine says SELL. Its result is in the decision card.');
+  for (const o of [{ action: 'WAIT', confidence: 'low' }, { action: 'BUY', corrected: true }, { action: 'SELL', exam: true }, {}]) assert.doesNotMatch(MXAC.pointLine(o), /%|probab|chance|\d/);
+});
+
+test('page wiring of the usability pass: the point line sits under the chart, Continue asks before dropping a verdict, the result columns lead', () => {
+  const html = src('academy.html'), ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js'), css = src('assets/academy.css');
+  const iChart = html.indexOf('id="chart-wrap"'), iBar = html.indexOf('id="point-bar"'), iCtl = html.indexOf('id="ctl"'), iLegend = html.indexOf('id="chart-legend"');
+  assert.ok(iChart > 0 && iChart < iBar && iBar < iCtl && iCtl < iLegend, 'chart, then the point line, then the controls, then the legend');
+  assert.match(html, /id="point-bar" role="status" aria-live="polite" hidden/);
+  // every way of leaving a decision point goes through the same question: play / continue, step, jump, restart
+  const guards = ui.match(/!leaveOk\(\)/g) || []; assert.equal(guards.length, 4, 'play, step, jump and restart');
+  assert.match(ui, /function leaveOk\(\) \{\s*if \(!S\.cur \|\| S\.cur\.closed \|\| !mentorUnsaved\(M\)\) return true;/);
+  assert.match(ui, /cur\.correction = res\.correction; cur\.cmp = null; M\.dirty = false;/, 'a stored correction is no longer unsaved');
+  assert.match(ui, /id: 'continue-msg', role: 'status'/);
+  // the guard only delays a click: it stores nothing and decides nothing
+  const body = ui.slice(ui.indexOf('function leaveOk()'), ui.indexOf('// ---- the line under the chart')); assert.doesNotMatch(body, /api\.|MXA\.|MXK\./);
+  assert.match(ui, /\['Alternative', 'Net R after costs', 'Exit', 'Filled', 'Levels', 'Best', 'Worst', 'Exit time \(UTC\)'\]/);
+  assert.match(ui, /PV\.chart\.timeScale\(\)\.fitContent\(\)/, 'the preview shows the whole two weeks it names');
+  assert.match(tabs, /K\.showNode\(st\.node\)/, 'Blind arena: "Next setup" brings the chart back');
+  assert.match(tabs, /MXAC\.humanize\(d\.thesis, Z\.lessons\)/);
+  assert.match(css, /scroll-margin-top: 64px/); assert.match(css, /\.ac-side \.cond > :first-child \{ grid-column: 1 \/ -1; \}/);
+});

@@ -795,6 +795,7 @@
     }
     function next() {
       const c = B.queue[B.i]; reveal.hidden = true; clear(reveal); clear(answer); clear(info); st.levels(null);
+      if (B.i > 0 && K.showNode) K.showNode(st.node);   // "Next setup" is pressed far below the chart on a phone: bring the chart back
       if (!c) { info.appendChild(el('h2', { text: 'Round finished' })); info.appendChild(el('p', { text: 'Every train setup of this range has your blind answer. Pick another range above for more.' })); st.state.textContent = 'round finished'; count(); return; }
       info.appendChild(el('h2', { class: 'c-h' }, 'Setup', el('small', { text: `${B.i + 1} of ${B.queue.length} in this round` }))); info.appendChild(el('p', { class: 'ac-wait', text: 'The replay is running to the setup…' }));
       st.state.textContent = 'running to the setup';
@@ -884,7 +885,7 @@
     function drawThesis() {
       const th = Z.thesis; clear(thesisBox).appendChild(el('h2', { class: 'c-h', text: 'Running thesis' })); if (!th) return;
       thesisBox.appendChild(el('p', { id: 'ss-thesis-line', text: `Bias ${th.bias}. Expecting ${th.expecting}.` + (th.status === 'invalidated' ? ' The thesis was invalidated and is being rebuilt.' : '') }));
-      thesisBox.appendChild(listOr(el('ul', { class: 'plain-list small' }), (th.changes || []).slice(-4).reverse(), 'No change yet.', (c) => el('li', {}, el('div', {}, el('small', { text: fmtTime(c.t) + ' ' }), c.text + (c.n > 1 ? ` (${c.n} checks)` : '')))));
+      thesisBox.appendChild(listOr(el('ul', { class: 'plain-list small' }), (th.changes || []).slice(-4).reverse(), 'No change yet.', (c) => el('li', {}, el('div', {}, el('small', { text: fmtTime(c.t) + ' ' }), MXAC.humanize(c.text, Z.lessons) + (c.n > 1 ? ` (${c.n} checks)` : '')))));
     }
     function drawSummary() {
       const s = sessionSummary(Z.events); clear(sumBox).appendChild(el('h2', { class: 'c-h' }, Z.ended ? 'Session summary' : 'Session so far', el('small', { text: Z.sessionId ? 'saved as ' + Z.sessionId : 'not saved yet' })));
@@ -939,7 +940,7 @@
         Z.cur = { cand: c, d, f, row: res.attempt, ev }; st.levels(c); pointBox.hidden = false; clear(pointBox);
         pointBox.appendChild(el('h2', { class: 'c-h' }, 'Decision', el('small', { text: `${c.side} setup · ${fmtTime(c.t)}` })));
         pointBox.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, 'ss-dec-action'), el('span', { class: 'pill' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })), el('span', { class: 'ac-ok', id: 'ss-dec-stored', text: `Attempt ${res.n} stored ✓` })));
-        pointBox.appendChild(el('p', { class: 'dec-thesis', text: MXAC.humanize(d.thesis) }));
+        pointBox.appendChild(el('p', { class: 'dec-thesis', text: MXAC.humanize(d.thesis, Z.lessons) }));
         if (again) pointBox.appendChild(el('p', { class: 'note', text: 'This setup was decided in an earlier sitting: this answer is stored as a same-trade replay (recall).' }));
         const full = el('div', {}); K.decisionView(full, { idp: 'ss-full', edge: Z.edge, cand: c, d: Object.assign({ t: c.t }, d), risk: r.risk, hash, lessons: Z.lessons, title: 'In full' });
         pointBox.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Evidence, risk, similar cases and lessons' }), full));
