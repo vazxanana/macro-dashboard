@@ -7555,7 +7555,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T14:16:55.000Z",
     "councilEntry": 0.8321,
     "stop": 0.83159,
@@ -7569,10 +7569,12 @@
     "slipR": 0.49,
     "lagSec": 355,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T14:16:55.000Z",
-    "brokerStop": 0.83162
+    "brokerStop": 0.83162,
+    "closedAt": "2026-11-11T17:04:47.000Z"
    },
    "sol-scalp-1794406639": {
     "positionId": "48444072",
@@ -8249,7 +8251,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9866.52 · 27 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9868.34 · 26 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8301,15 +8303,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9866.52,
-  "lastRun": "2026-11-11T17:02:25.000Z"
+  "balance": 9868.34,
+  "lastRun": "2026-11-11T17:04:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:08:58.000Z",
-   "msg": "moved GBPUSD 48133872 protection: stop 1.3461766785714284 -> 1.3459167, target 1.31808 -> 1.31782 (council position)",
-   "trade": "gbpusd-position-1794325881"
-  },
   {
    "at": "2026-11-10T16:12:16.000Z",
    "msg": "moved GBPUSD 47373485 protection: stop 1.32873 -> 1.32912, target 1.36881 -> 1.3692 (council scalp)",
@@ -9804,6 +9801,11 @@
    "at": "2026-11-11T17:02:25.000Z",
    "msg": "USDCHF position 48467265 closed at the broker",
    "trade": "usdchf-rscalp-1794409920"
+  },
+  {
+   "at": "2026-11-11T17:04:47.000Z",
+   "msg": "USDCHF position 48442004 closed at the broker",
+   "trade": "usdchf-scalp-1794406249"
   }
  ],
  "limits": {
