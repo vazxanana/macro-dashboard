@@ -9,43 +9,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
+import crypto from 'node:crypto';
 import * as V from '../council/veteran.mjs';
 import * as M from '../council/macro.mjs';
 import * as G from '../council/glance.mjs';
 import { nearestLevel } from '../council/briefing.mjs';
 import { resolveCall, callsLedger } from '../council/outlook.mjs';
 
-const DAY = 86400, T = (y, m, d, h = 0, mi = 0) => Date.UTC(y, m - 1, d, h, mi) / 1000, iso = (t) => new Date(t * 1000).toISOString().slice(0, 10);
-const NOW = T(2026, 11, 11, 12);   // Wed 11 Nov 2026 12:00 UTC: Mon 9 and Tue 10 are complete, Wed 11 is forming
-const wk = (t) => { const d = new Date(t * 1000).getUTCDay(); return d !== 0 && d !== 6; };
-// weekday candles ending on `last` (a day start), newest value f(0)
-const bars = (n, last, f) => { const out = []; let i = 0; for (let t = last; out.length < n; t -= DAY) { if (!wk(t)) continue; const c = +f(i).toFixed(2); out.unshift({ t, o: c - 3, h: c + 9, l: c - 11, c }); i++; } return out; };
-const TUE = T(2026, 11, 10), FRI = T(2026, 11, 6);
-const GOLD = bars(3000, TUE, (i) => 4000 * Math.exp(-i * 0.0003) * (1 + 0.004 * Math.sin(i / 7)));     // every closed day up to Tuesday
-const FX = { eurusd: 1.1, usdjpy: 150, gbpusd: 1.27, usdcad: 1.36, usdchf: 0.88 };
-const PAIR = (k) => bars(400, TUE, (i) => FX[k] * (1 + 0.0004 * i) * 100).map((b) => ({ ...b, o: b.o / 100, h: b.h / 100, l: b.l / 100, c: b.c / 100 }));
-const rowsOf = (B, to) => B.filter((b) => b.t <= to).map((b) => [b.t, b.o, b.h, b.l, b.c, 1]);
-const handOf = (B, n = 30) => B.slice(-n).map((b) => [b.t, b.o, b.h, b.l, b.c]);
-const series = (n, f) => { const out = []; let i = 0; for (let t = Math.floor(NOW / DAY) * DAY - DAY; out.length < n; t -= DAY) { if (!wk(t)) continue; out.unshift([iso(t), +f(i).toFixed(4)]); i++; } return out; };
-const cache = () => ({ fred: { DFII10: series(60, (i) => 2.6 + i * 0.016), DGS2: series(60, (i) => 4.46 + i * 0.016), DGS10: series(60, () => 4.84), T10YIE: series(60, () => 2.23), T10Y3M: series(60, () => 0.67), BAMLH0A0HYM2: series(60, () => 3.3), VIXCLS: series(60, () => 22), VXVCLS: series(60, () => 25.5), DTWEXBGS: series(60, () => 120), SOFR: series(60, () => 3.9), EFFR: series(60, () => 3.86) },
-  cot: Array.from({ length: 30 }, (_, i) => ({ t: NOW - (30 - i) * 7 * DAY - 5 * DAY, net: 100000 + i * 1000 })) });
-const forecast = (o = {}) => ({ at: new Date((NOW - 600) * 1000).toISOString(), assets: { gold: { pUp: 0.54, fit: { base: 0.536 }, drivers: [], last: GOLD.at(-1).c } }, sources: { 'bars:gold': 'OANDA ok (1400 days)' },
-  regime: { label: 'Dollar Smile middle' }, drivers: [{ k: 'ry', vote: -1, detail: '10Y TIPS 2.60%, falling' }], playbook: [],
-  goldScore: { ok: true, asOf: '2026-11-06', score: 0.13, z: { ry4w: 1.43, dxy4w: -0.03 }, bias: 'AUCTION', conviction: null, label: 'AUCTION (no macro edge)', weeks: 1067 }, ...o });
-// a council-data folder: the candle cache ending on `cacheTo`, and (hand) the strategist's hand-over in macro/cache.json
-function folder({ cacheTo = FRI, hand = true, fc = forecast(), calls = null, ledger = null } = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vetfresh-')); fs.mkdirSync(path.join(dir, 'macro')); fs.mkdirSync(path.join(dir, 'research', 'daily'), { recursive: true });
-  const C = cache(); if (hand) C.daily = { src: 'test', days: { xau: handOf(GOLD), ...Object.fromEntries(Object.keys(FX).map((k) => [k, handOf(PAIR(k))])) } };
-  fs.writeFileSync(path.join(dir, 'macro', 'forecast.json'), JSON.stringify(fc)); fs.writeFileSync(path.join(dir, 'macro', 'cache.json'), JSON.stringify(C));
-  fs.writeFileSync(path.join(dir, 'research', 'daily', 'xau.json'), JSON.stringify({ rows: rowsOf(GOLD, cacheTo) }));
-  for (const k of Object.keys(FX)) fs.writeFileSync(path.join(dir, 'research', 'daily', `${k}.json`), JSON.stringify({ rows: rowsOf(PAIR(k), cacheTo) }));
-  if (calls) fs.writeFileSync(path.join(dir, 'macro', 'veteran-calls.json'), JSON.stringify(calls));
-  if (ledger) fs.writeFileSync(path.join(dir, 'macro', 'veteran-ledger.json'), JSON.stringify(ledger));
-  return dir;
-}
-const rd = (dir, f) => JSON.parse(fs.readFileSync(path.join(dir, 'macro', f), 'utf8'));
+import { DAY, T, iso, NOW, TUE, FRI, GOLD, FX, PAIR, rowsOf, handOf, forecast, folder, rd, simulate, issued, TWO_WEEKS, ALL } from './fixtures/vet-fresh-fixture.mjs';
 
 test('strategist hand-over: the run\'s complete daily candles only, OANDA only, the last good days kept when a fetch fails', () => {
   const day = (t, c, live) => ({ time: t, open: c * 0.5, high: c * 2, low: c * 0.25, close: c, ...(live ? { live: true } : {}) });
@@ -86,14 +57,16 @@ test('extendDaily: appended after the cache\'s last day only when the days join 
   const full = V.extendDaily({ rows: rowsOf(GOLD, TUE) }, hand, NOW); assert.equal(full.added, 0); assert.equal(full.why, null); assert.equal(full.to, '2026-11-10');
 });
 
-test('run: mid-week the veteran\'s last close, levels and calls come from yesterday\'s close, not from last Friday\'s', () => {
+test('run: mid-week the veteran\'s last close and levels come from yesterday\'s close; the dated calls on the record stay the week\'s', () => {
   const stale = V.run({ dir: folder({ hand: false }), now: NOW, log: () => {} }), fresh = V.run({ dir: folder(), now: NOW, log: () => {} });
   const gs = stale.briefing.levels.gold, gf = fresh.briefing.levels.gold;
   assert.equal(gs.asOf, '2026-11-06'); assert.equal(gs.px, GOLD.find((b) => b.t === FRI).c);
   assert.equal(gf.asOf, '2026-11-10'); assert.equal(gf.px, GOLD.at(-1).c, 'the last COMPLETE candle');
   assert.equal(fresh.summary.levels.asOf, '2026-11-10'); assert.equal(fresh.briefing.levels.dxy.asOf, '2026-11-10', 'the dollar index too');
-  assert.match(fresh.outlook.week.list[0].claim, /^Gold closes 2026-11-17 above /); assert.equal(fresh.outlook.week.list[0].level, GOLD.at(-1).c);
-  assert.match(stale.outlook.week.list[0].claim, /^Gold closes 2026-11-13 above /);
+  // the dated calls are the week's, issued from the last close before the week began (Friday), fresh closes or not
+  assert.match(fresh.outlook.week.list[0].claim, /^Gold closes 2026-11-13 above /); assert.equal(fresh.outlook.week.list[0].level, GOLD.find((b) => b.t === FRI).c);
+  assert.deepEqual(fresh.outlook.week, stale.outlook.week); assert.deepEqual(fresh.outlook.month, stale.outlook.month);
+  assert.equal(fresh.outlook.anchor.asOf, '2026-11-06'); assert.equal(fresh.outlook.anchor.week, '2026-11-07');
   assert.equal(fresh.closes.markets.xau.added, 2); assert.equal(fresh.closes.markets.xau.to, '2026-11-10'); assert.match(stale.closes.markets.xau.why, /handed over no closed days/);
   // honesty in words
   assert.deepEqual(gf.fresh, { asOf: '2026-11-10', sessions: 0, stale: false, text: 'as of 2026-11-10 close' });
@@ -143,6 +116,50 @@ test('scored records: a short cache plus the hand-over is the same as a refreshe
   const lB = rd(B, 'veteran-ledger.json'), res = lB.find((r) => r.record_type === 'resolved' && r.forecast_id === led0[0].forecast_id);
   assert.deepEqual(lB.find((r) => r.record_id === led0[0].record_id), led0[0]); assert.equal(res.resolution.realized_value, GOLD.at(-1).c); assert.equal(res.resolution.resolved_at_utc.slice(0, 10), '2026-11-10');
   assert.equal(rd(C, 'veteran-ledger.json').some((r) => r.record_type === 'resolved'), false);
+});
+
+// ---- the record keeps its weekly cadence -----------------------------------------------------------------------------------
+// Rule (veteran.mjs run): everything RECORDED (dated week / month calls, COT calls, hypotheses, the weekly ledger forecast,
+// the debates) is built from the closes before the start of the current Saturday-based week: what the candle cache held after
+// Saturday's refresh, which is what main recorded from. Only the display reads the fresh closes.
+// MAIN_* below were produced by main's own council/veteran.mjs (commit 059ad599) on this fixture: simulate(main.run, { fresh:
+// false }) = two weeks of runs on the Saturday-refreshed cache alone. To regenerate after a deliberate change of the record:
+// import that commit's veteran.mjs and print issued(veteran-calls.json).length and its sha256.
+const MAIN_RECORDS = 54, MAIN_ISSUED_SHA = '7b070d4ab9eeaf899f3fe0fbb10e75d0eb4556ae194daa9517c2034165381ce9', MAIN_SCORED = 8;
+const sha = (x) => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
+let WEEKS = null; const weeks = () => { if (!WEEKS) { const per = []; const dir = simulate(V.run, { fresh: true, each: (now, d) => per.push({ now, calls: rd(d, 'veteran-calls.json'), v: rd(d, 'veteran.json') }) }); WEEKS = { dir, per }; } return WEEKS; };
+
+test('cadence: five consecutive trading days of one week add the week\'s dated calls once, not five times', () => {
+  const { per } = weeks(), week1 = per.slice(0, 5), dated = (L) => L.filter((r) => r.src === 'base rate + council tilt');
+  assert.deepEqual(week1.map((x) => iso(x.now)), ['2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13']);
+  // the display moved every day
+  assert.deepEqual(week1.map((x) => x.v.briefing.levels.gold.asOf), ['2026-11-06', '2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12']);
+  assert.equal(new Set(week1.map((x) => x.v.briefing.levels.gold.px)).size, 5); assert.equal(week1.every((x) => x.v.briefing.levels.gold.fresh.stale === false), true);
+  // the record did not: one due date per horizon for the whole week, one "closes above" per horizon and asset, anchored on Friday 6 Nov
+  const fri = week1[4].calls, d = dated(fri);
+  assert.deepEqual([...new Set(d.map((r) => r.by))].sort(), ['2026-11-13', '2026-12-04']);
+  const ca = d.filter((r) => r.kind === 'closeAbove' && r.asset === 'gold'); assert.equal(ca.length, 2, 'not ten'); assert.equal(ca.every((r) => r.level === ALL.find((b) => b.t === FRI).c && r.issued === '2026-11-09'), true);
+  for (const k of ['touchUp', 'touchDown', 'bigMove']) assert.equal(new Set(d.filter((r) => r.kind === k).map((r) => r.issued)).size, 1, `${k}: issued on one day only`);
+  const mon = dated(week1[0].calls); assert.equal(mon.length, 15);
+  // after Monday only a "range" call can be re-issued, when the council tilt moves its bounds: the id rule main already had
+  assert.deepEqual([...new Set(d.filter((r) => r.issued !== '2026-11-09').map((r) => r.kind))], ['range']); assert.ok(d.length - mon.length <= 4);
+  for (const x of week1) assert.deepEqual(x.v.outlook.week.list.map((c) => c.by), week1[0].v.outlook.week.list.map((c) => c.by), 'the desk shows the recorded week calls all week');
+});
+
+test('cadence: after two weeks the ledger holds exactly the records main\'s code wrote, and calibration reads the same inputs', () => {
+  const { dir, per } = weeks(), L = rd(dir, 'veteran-calls.json');
+  assert.equal(L.length, MAIN_RECORDS, 'the same number of records as before this change');
+  assert.equal(sha(issued(L)), MAIN_ISSUED_SHA, 'every id, issue date, level, due date, p, pRaw and baseP identical to main\'s');
+  assert.equal(L.filter((r) => r.hit != null).length, MAIN_SCORED); assert.equal(per.at(-1).v.calibration.n, MAIN_SCORED, 'calibration counts the same scored calls');
+  // and the same as this code on the cache alone (main's situation): cadence does not depend on the hand-over
+  const plain = simulate(V.run, { fresh: false }), P = rd(plain, 'veteran-calls.json');
+  assert.deepEqual(issued(L), issued(P)); assert.deepEqual(L.map((r) => [r.id, r.hit ?? null, r.brier ?? null]), P.map((r) => [r.id, r.hit ?? null, r.brier ?? null]), 'and every result');
+  for (const f of ['veteran-ledger.json', 'veteran-debates.json']) assert.deepEqual(rd(dir, f), rd(plain, f), f);
+  assert.deepEqual(per.at(-1).v.calibration, rd(plain, 'veteran.json').calibration);
+  assert.equal(rd(dir, 'veteran-ledger.json').filter((r) => r.record_type === 'issued').length, 3, 'one weekly forecast per Saturday-based week');
+  // the fresh closes only bring results forward: a call due Monday is scored on Wednesday, not after Saturday's refresh
+  const wed = per[2].calls.filter((r) => r.hit != null).length, wedPlain = (() => { const d = simulate(V.run, { fresh: false, days: TWO_WEEKS.slice(0, 3) }); return rd(d, 'veteran-calls.json').filter((r) => r.hit != null).length; })();
+  assert.ok(wed >= wedPlain);
 });
 
 test('resolveCall: a call is scored only once the closes on file reach its date; on complete closes the result is as before', () => {

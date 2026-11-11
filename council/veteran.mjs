@@ -408,7 +408,9 @@ export function teaching(fc) {
   return { adopted, pending, recent: L.recent || [], line };
 }
 
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase }) {
+// `keep` (run() only): the week's RECORDED outlook and ledger view, built from the record closes; the display build shows them
+// instead of issuing its own, so what is on the record and what the desk shows as "his calls" are the same thing.
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -431,10 +433,11 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
     releases, cpiRateStudy: CPI_RATE_STUDY,
     cpiPilot: cpiPilot(), skillVersion: SKILL_VERSION,
     source: `council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision ${SKILL_VERSION} (research/macro-veteran/); reads the strategist's data only, fetches nothing` };
-  { const pr = probability(verdict, base, fc && fc.goldScore); v.outlook = outlook({ gold, dxy: S.dxy, now, tilt20: base ? pr - base.upRate : 0, ch, fc }); }
+  if (keep) { v.outlook = keep.outlook; v.ledger = keep.ledger; }
+  else { const pr = probability(verdict, base, fc && fc.goldScore); v.outlook = outlook({ gold, dxy: S.dxy, now, tilt20: base ? pr - base.upRate : 0, ch, fc }); }
   // self-calibration (9 Nov, council/calibration.mjs): from his own scored record; k = 1 until the pre-registered threshold
   v.calibration = cal || calibration({});
-  if (v.outlook) for (const part of [v.outlook.week, v.outlook.month]) if (part) applyCalls(part.list, v.calibration);
+  if (v.outlook && !keep) for (const part of [v.outlook.week, v.outlook.month]) if (part) applyCalls(part.list, v.calibration);
   // the veteran's briefing (9 Nov, owner: key insights, near-inside information read from public data, hypotheses on a base of
   // what happened before, price levels): council/briefing.mjs; its hypotheses go to the calls ledger in run()
   try {
@@ -535,12 +538,24 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   // self-calibration from the record as it stands before today's calls (resolved on closes up to now only)
   const CL0 = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: null, closesBy: px, now });
   const cal = calibration({ calls: CL0, ledger: ledgerResolve(ledger, gold) });
-  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx }, ledger, debates, expectations, cot, now, cal });
+  // WHAT IS RECORDED keeps its weekly cadence (11 Nov). Until the closes became fresh, every dated call, hypothesis, weekly
+  // ledger forecast and debate was built from the candle cache as Saturday's refresh left it: the closes up to the last Friday.
+  // That is still the rule, now written down: the RECORD is built, exactly as before, from the closes before the start of the
+  // current Saturday-based week (weekKey) = `rec`; so one set of dated calls a week (same ids: asset, kind, level, due date),
+  // whatever day the first run of the week falls on. Results are read from every complete close (`px`, fresh). The DISPLAY
+  // (last close, levels, ladder, glance, analogs, the hypotheses' live reading) is a second build on the fresh closes.
+  const w0 = Date.parse(weekKey(now) + 'T00:00:00Z') / 1000, cut = (a) => (a || []).filter((o) => o.t < w0);
+  const rec = { gold: cut(gold), dxy: cut(dx), goldBars: goldBars ? cut(goldBars) : null, spx: cut(spx) }, pxRec = Object.fromEntries(Object.entries(px).map(([k, a]) => [k, cut(a)]));
+  const R = build({ fc, cache, daily: rec, ledger: ledgerResolve(ledger, gold), debates: debatesResolve(debates, gold), expectations, cot, now, cal });
+  if (R.v.outlook) { R.v.outlook.cot = applyCalls(cotCalls(cot, pxRec, now), R.v.calibration); R.v.outlook.anchor = { asOf: rec.gold.length ? isoDay(rec.gold[rec.gold.length - 1].t) : null, week: weekKey(now), note: 'Dated calls are issued once a week, from the last close before the week began; they are scored on every daily close after their issue date.' }; }
+  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger } });
   v.closes = { note: 'Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.', markets: closes };
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   let CL = CL0;
-  if (v.outlook) { v.outlook.cot = applyCalls(cotCalls(cot, px, now), v.calibration);
-    const hyps = (v.briefing && v.briefing.hypotheses) || [], evCalls = (v.events || []).map((e) => e.call).filter(Boolean);
+  if (v.outlook) {
+    // on the record: the week's hypotheses and the event calls of the record build (the desk shows them through freezeHypotheses /
+    // freezeEventCalls, with today's reading beside a recorded hypothesis when the levels have moved)
+    const hyps = (R.v.briefing && R.v.briefing.hypotheses) || [], evCalls = (R.v.events || []).map((e) => e.call).filter(Boolean);
     CL = callsLedger(CL0, { outlook: v.outlook, closesBy: px, now, extra: [...hyps, ...evCalls] }); w('veteran-calls.json', CL);
     v.eventsRecord = freezeEventCalls(v.events, CL);
     v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse();

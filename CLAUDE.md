@@ -1732,16 +1732,30 @@ written anywhere the veteran reads. Display / freshness only: no probability, ca
   basis), a failed fetch keeps the last good days, no timestamp. `veteran.mjs` `extendDaily` appends them after the cache's
   last day only when they reach back to that day AND agree with its close (same feed, no gap: the ledger counts rows), cut
   at the veteran's `now`; otherwise the cache is used alone. The veteran still fetches nothing. `veteran.json.closes` says per
-  market how far the cache went, how many days were added, or why none. xag / audusd / nzdusd (COT pair calls) are not
-  fetched by the strategist and stay on the weekly cache.
-- **Scored records**: the handed candles are the candle cache's own (1,396 overlapping gold days compared, identical), so a
-  short cache plus the hand-over gives byte-identical calls / ledger / debates / briefing files to a refreshed cache
-  (`tests/veteran-fresh.test.mjs`); records on file keep every recorded field. Two things follow: results arrive on the day
-  they are due instead of after Saturday, and the dated week / month calls now get a new set each trading day (new close =
-  new level and date; 16 a day instead of 16 a week; `callsLedger` keeps the last 600 records, about 7 weeks at that pace:
-  raising it is the owner's call before the calibration threshold is reached). The hypotheses stay one per week.
-  `resolveCall` now waits until the closes on file reach the call's date (a file ending early used to score the call on its
-  last day on file); on complete closes the result is unchanged.
+  market how far the cache went, how many days were added, or why none. xag / audusd / nzdusd are not fetched by the
+  strategist: their COT calls are resolved from the weekly cache as before. The handed candles are the candle cache's own
+  (1,396 overlapping gold days compared, identical).
+- **The record keeps its weekly cadence** (`veteran.mjs` `run`). Rule: everything RECORDED (the dated week / month calls,
+  the COT calls, the hypotheses, the weekly ledger forecast, the debates, the event calls) is built, by the unchanged
+  pipeline, from the closes BEFORE the start of the current Saturday-based week (`weekKey`): exactly what the candle cache
+  held after Saturday's refresh, which is what every record so far was built from. So the anchor is the last Friday's
+  close, the due dates and ids (`asset:kind:level:by`) are the ones main wrote, and one set is added a week whatever day
+  the week's first run falls on (a "range" call can still be re-issued when the council tilt moves its bounds: the id rule
+  as it was). The DISPLAY is a second `build` on the fresh closes with `keep` = the recorded outlook and ledger view:
+  last close, levels, ladder, glance, analogs move daily; "his dated calls" are the recorded ones (`outlook.anchor` says
+  from which close; the desk prints it) and a recorded hypothesis shows today's reading beside it through the existing
+  `freezeHypotheses` `live`. Results are read from every complete close, so they arrive on the day they are due instead of
+  after Saturday. Never issue the dated calls from the fresh closes: daily overlapping calls would fill the calibration
+  sample (its pre-registered 30 calls / 4 weeks gate, the Wilson bands) with correlated records and cut the 600-record
+  ledger from about nine months to seven weeks.
+  Proof: on the real council-data files of 11 Nov, main's code and this code (with the hand-over) write byte-identical
+  `veteran-calls.json`, `veteran-ledger.json`, `veteran-debates.json` and `veteran-expectations.json`; on the two-week
+  fixture (`tests/fixtures/vet-fresh-fixture.mjs` `simulate`) both write the same 54 records, pinned in
+  `tests/veteran-fresh.test.mjs` by count and by a hash of every id, issue date, level, due date, p, pRaw and baseP taken
+  from main's own code, with the same 8 scored calls and the same calibration block.
+- **`resolveCall` waits for the data**: a call is scored only once the closes on file reach its date. This changes the
+  outcome only for a candle file that ENDS before the call's date (it used to be scored on the file's last day); on a
+  file that reaches the date the result is what it was.
 - **Honesty** (`glance.mjs`): `closeAge(asOf, now)` = weekday sessions fully ended since the close, skipping full-closure
   days of `datacheck.mjs` `usHolidays` (no second calendar) → `fresh { asOf, sessions, stale, text }` on each level block:
   "as of <date> close", or "Stale: last close <date>, <n> trading days ago" from one missed session. `markOf(fc)` = the
