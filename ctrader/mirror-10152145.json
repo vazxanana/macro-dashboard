@@ -6821,6 +6821,33 @@
     "positionId": "48352572",
     "volume": 300000,
     "status": "open"
+   },
+   "audusd-scalp-1794386733": {
+    "positionId": "48358809",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T08:46:46.000Z",
+    "councilEntry": 0.68738,
+    "stop": 0.68658,
+    "t1": 0.68854,
+    "riskCash": 1.98,
+    "margin": 2.75,
+    "shadow": true,
+    "mark": 0.68738,
+    "levelsFrom": "mark",
+    "fillPrice": 0.68728,
+    "slipR": -0.125,
+    "lagSec": 73,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T08:46:46.000Z",
+    "brokerStop": 0.68648
    }
   },
   "day": {
@@ -6828,7 +6855,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9920.09 · 26 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9920.09 · 27 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6862,14 +6889,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9920.09,
-  "lastRun": "2026-11-11T08:44:08.000Z"
+  "lastRun": "2026-11-11T08:46:46.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved USDCAD 47992970 protection: stop 1.4105947 -> 1.4114147, target 1.4206606 -> 1.4214806 (council swing)",
-   "trade": "usdcad-swing-1794304600"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved USDCAD 47994270 protection: stop 1.41429 -> 1.41511, target 1.40797 -> 1.40879 (council scalp)",
@@ -8364,6 +8386,11 @@
    "at": "2026-11-11T08:33:57.000Z",
    "msg": "ETHUSD position 48340419 closed at the broker",
    "trade": "eth-rscalp-1794381427"
+  },
+  {
+   "at": "2026-11-11T08:46:46.000Z",
+   "msg": "opened buy AUDUSD 0.02 lot (council scalp)",
+   "trade": "audusd-scalp-1794386733"
   }
  ],
  "limits": {
@@ -8442,11 +8469,11 @@
   ]
  },
  "execution": {
-  "n": 230,
+  "n": 231,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161.5,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 17,
@@ -8477,8 +8504,8 @@
     "meanSlipR": 0.05
    },
    "AUDUSD": {
-    "n": 34,
-    "meanSlipR": -0.039
+    "n": 35,
+    "meanSlipR": -0.042
    },
    "XAUUSD": {
     "n": 26,
