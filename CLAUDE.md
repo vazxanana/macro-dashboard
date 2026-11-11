@@ -1622,6 +1622,20 @@ was found. Fixed:
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
   12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
 
+## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
+Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
+1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),
+dark ~370, midnight ~400; after: 0 on Charts and Scanner in all three. Causes: text in the same colour as its own tint (amber
+"IN ORIGIN" 1.8:1, chips 4.2-4.4), white on a solid green / red (READY 3.6, the candle countdown 2.5-3.0 on the dark themes),
+chart candle colours used inline as text (the scanner's day change), the brand gold on a light page (1.8), and opacity used to
+dim text (header shadow count, guest calendar days). Rule: **a badge takes its text colour from a token, never a hex**:
+`--buy-ink` / `--sell-ink` / `--warn-ink` / `--accent-ink` (text on a tint of its own colour), `--on-buy` / `--on-sell` (text on
+a solid fill), `--gold-ink` (the brand gold as text); defined once after the light tokens in the first `<style>` (dark and
+midnight = the theme's own colours, light = deeper inks). Never dim badge text with `opacity`. The scanner's day change is
+`.pr-c.up` / `.pr-c.dn`. Candle colours are untouched. Pinned in `tests/qa-sweep.test.mjs` ("badge inks"); no colour sampling
+in the smoke test (it would depend on live data). Left: the Council status line's amber warnings on its gradient (about 4.3:1
+at the gradient's darkest point, light only), outside this pass.
+
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
 of `council/decay.mjs`; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.

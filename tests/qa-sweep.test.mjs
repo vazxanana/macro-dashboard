@@ -214,6 +214,34 @@ test('Mosha forms on a phone: a date-and-time field takes the whole row (half a 
   assert.match(css, /@media \(max-width: 760px\) \{ #v-mosha \.mo-f:has\(input\[type="datetime-local"\]\), \.mo-lv-dlg \.mo-f:has\(input\[type="datetime-local"\]\) \{ grid-column: 1 \/ -1; \}/);
 });
 
+// ---- Badge inks, 11 Nov 2026 (branch light-badges): status badges, chips and pills on Charts and Scanner ----
+test('badge inks: every badge colour is a theme token, and each token passes AA on the tint it sits on (light, dark, midnight)', () => {
+  const html = src('market-structure.html'), css = styles(html);
+  const block = (sel) => [...css.matchAll(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{([^}]*)\\}', 'g'))].map((m) => m[1]).join(' ');
+  const base = block(':root'), light = block(':root[data-theme="light"]'), mid = block(':root[data-theme="midnight"]');
+  // light: its own inks; text on a 18% tint of the colour over the panel, the page and a hovered row
+  const T = { buy: 'rgba(8,153,129,.18)', sell: 'rgba(242,54,69,.18)', warn: 'rgba(240,165,0,.18)', accent: 'rgba(47,107,255,.18)' };
+  for (const k of ['buy', 'sell', 'warn', 'accent']) for (const bg of ['panel', 'bg', 'panel-hover']) { const on = over(T[k], tok(light, bg)), ink = tok(light, `${k}-ink`); assert.match(ink, /^#[0-9a-f]{6}$/); assert.ok(ratio(ink, on) >= 4.5, `light --${k}-ink ${ink} on its tint over --${bg}: ${ratio(ink, on).toFixed(2)}`); }
+  for (const bg of ['panel', 'bg']) assert.ok(ratio(tok(light, 'gold-ink'), tok(light, bg)) >= 4.5, 'the brand gold as text on light');
+  assert.ok(ratio(tok(light, 'on-buy'), tok(light, 'buy')) >= 4.5 && ratio(tok(light, 'on-sell'), tok(light, 'sell')) >= 4.5, 'light: the ink on a solid green / red fill');
+  // dark and midnight keep the theme's own green / red, with a dark ink on the solid fills (white was 2.5-3.6:1)
+  assert.match(base, /--buy-ink: var\(--buy\); --sell-ink: var\(--sell\);/);
+  for (const [name, b] of [['dark', base], ['midnight', mid]]) for (const k of ['buy', 'sell']) assert.ok(ratio(tok(base, `on-${k}`), tok(b, k)) >= 4.5, `${name}: --on-${k} on --${k}`);
+  for (const bg of ['#121722', '#0d1630']) assert.ok(ratio(tok(base, 'warn-ink'), over(T.warn, bg)) >= 4.5 && ratio(tok(base, 'gold-ink'), bg) >= 4.5);
+  // the components read the tokens (a hex here is how they drifted under AA)
+  for (const r of [/\.ms-st\.ready \{ background: var\(--buy\); color: var\(--on-buy\); \}/, /\.ms-st\.near \{[^}]*color: var\(--warn-ink\); \}/, /\.ms-st\.bad \{[^}]*color: var\(--sell-ink\); \}/,
+    /\.ms-al\.ok \{ color: var\(--buy-ink\);/, /\.ms-al\.against \{ color: var\(--sell-ink\);/, /\.ms-chip-buy \{ background: var\(--buy-soft\); color: var\(--buy-ink\);/, /\.ms-chip-sell \{ background: var\(--sell-soft\); color: var\(--sell-ink\);/,
+    /\.ms-tag\.counter \{ color: var\(--warn-ink\);/, /\.ms-q\.weak \{ color: var\(--warn-ink\);/, /\.ms-srow \.lv-d\.at \{ color: var\(--accent-ink\);/, /\.pr-c\.up \{ color: var\(--buy-ink\); \} \.pr-c\.dn \{ color: var\(--sell-ink\); \}/,
+    /\.btab-brand span \{[^}]*color: var\(--gold-ink\); \}/, /\.ch-cd \{[^}]*color: var\(--on-sell\); background: var\(--sell\);/, /\.g-s-st\.pending \{ color: var\(--warn-ink\);/,
+    /\.md-vet-row\.agree \.md-vet-st \{[^}]*color: var\(--buy-ink\); \}/, /\.md-vet-row\.disagree \.md-vet-st \{[^}]*color: var\(--sell-ink\); \}/]) assert.match(css, r);
+  assert.doesNotMatch(css, /:root\[data-theme="light"\] \.ms-al\.(ok|against) \{ color: #/);
+  // the scanner's day change is coloured by class, not by the chart's candle colour inline; a sign stays beside the colour
+  assert.match(html, /<small class="pr-c \$\{ch >= 0 \? 'up' : 'dn'\}" style="font-weight:600"/);
+  // no badge text dimmed by opacity: the header's shadow count and the guest calendar's day numbers
+  assert.doesNotMatch(css, /\.ho-sh\{opacity/);
+  assert.match(css, /:is\(#v-guest, \.g-merged\) \.cal \.cal-d\.fut \.cn \{ opacity: 1; \}/);
+});
+
 // ── Sign-in card and guest page (11 Nov 2026): what a stranger sees is the main system only, and it is called what it is ──
 const desk = () => src('market-structure.html');
 const cut = (html, from, to) => { const i = html.indexOf(from); assert.ok(i >= 0, `missing: ${from}`); const j = html.indexOf(to, i); assert.ok(j > i, `missing end: ${to}`); return html.slice(i, j); };
