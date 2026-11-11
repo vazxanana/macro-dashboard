@@ -6189,7 +6189,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9951.78 · 25 open",
+  "status": "ok · demo Fusion Markets · balance 9951.78 · 25 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6199,17 +6199,34 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-rscalp-1794361017": {
+    "orderId": "33903057",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "limitPrice": 4045.84,
+    "stop": 4026.1469464285715,
+    "t1": 4047.32,
+    "placedAt": "2026-11-11T01:37:53.000Z",
+    "expires": "2026-11-11T04:36:57.000Z",
+    "riskCash": 19.69,
+    "margin": 8.08,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9951.78,
-  "lastRun": "2026-11-11T01:35:39.000Z"
+  "lastRun": "2026-11-11T01:37:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:07:56.000Z",
-   "msg": "cancelled GBPUSD limit order 33853458 for gbpusd-intraday-1794301485: the council ended it: cancelled",
-   "trade": "gbpusd-intraday-1794301485"
-  },
   {
    "at": "2026-11-10T12:07:56.000Z",
    "msg": "moved GBPUSD 47373485 protection: stop 1.3289 -> 1.32868, target 1.36898 -> 1.36876 (council scalp)",
@@ -7704,6 +7721,11 @@
    "at": "2026-11-11T01:35:39.000Z",
    "msg": "XAUUSD position 48147097 closed at the broker",
    "trade": "xau-m30m1-1794327543"
+  },
+  {
+   "at": "2026-11-11T01:37:53.000Z",
+   "msg": "placed buy limit XAUUSD 0.01 lot at 4045.84 (council rscalp, valid to 2026-11-11T04:36Z)",
+   "trade": "xau-rscalp-1794361017"
   }
  ],
  "limits": {
