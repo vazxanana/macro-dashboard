@@ -488,11 +488,12 @@ test('page wiring of the usability pass: the point line sits under the chart, Co
   assert.match(html, /id="point-bar" role="status" aria-live="polite" hidden/);
   // every way of leaving a decision point goes through the same question: play / continue, step, jump, restart
   const guards = ui.match(/!leaveOk\(\)/g) || []; assert.equal(guards.length, 4, 'play, step, jump and restart');
-  assert.match(ui, /function leaveOk\(\) \{\s*if \(!S\.cur \|\| S\.cur\.closed \|\| !mentorUnsaved\(M\)\) return true;/);
+  // round 3 (11 Nov 2026): the question itself moved into MXAC.leaveGuard, shared with the Session tab and the Blind arena
+  assert.match(ui, /const trainUnsaved = \(\) => !!S\.cur && !S\.cur\.closed && mentorUnsaved\(M\);\s*const leaveOk = leaveGuard\(\{ unsaved: trainUnsaved, tell:/);
   assert.match(ui, /cur\.correction = res\.correction; cur\.cmp = null; M\.dirty = false;/, 'a stored correction is no longer unsaved');
   assert.match(ui, /id: 'continue-msg', role: 'status'/);
   // the guard only delays a click: it stores nothing and decides nothing
-  const body = ui.slice(ui.indexOf('function leaveOk()'), ui.indexOf('// ---- the line under the chart')); assert.doesNotMatch(body, /api\.|MXA\.|MXK\./);
+  const body = ui.slice(ui.indexOf('const trainUnsaved'), ui.indexOf('// ---- the line under the chart')) + ui.slice(ui.indexOf('function leaveGuard(o)'), ui.indexOf('// the one line under the chart')); assert.ok(body.length > 600); assert.doesNotMatch(body, /api\.|MXA\.|MXK\.|prefSet|localStorage/);
   assert.match(ui, /\['Alternative', 'Net R after costs', 'Exit', 'Filled', 'Levels', 'Best', 'Worst', 'Exit time \(UTC\)'\]/);
   assert.match(ui, /PV\.chart\.timeScale\(\)\.fitContent\(\)/, 'the preview shows the whole two weeks it names');
   assert.match(tabs, /K\.showNode\(st\.node\)/, 'Blind arena: "Next setup" brings the chart back');
@@ -573,4 +574,52 @@ test('the red problem line waits for Save: before it, what is missing is a calm 
   assert.ok(ui.indexOf('if (mentorCheck(true).length)') < ui.indexOf("api.post({ action: 'correct'"), 'the check comes before the call');
   assert.match(tabs, /if \(save\.disabled \|\| check\(true\)\.length\) return;/);
   assert.match(tabs, /err\.hidden = !on;/); assert.match(tabs, /save\.disabled = !A\.action;/);
+});
+
+// ---- round 3 (11 Nov 2026): the Session tab and the Blind arena get the protections of the Train tab ------------------------------
+test('leaveGuard: the first press over an unsaved answer says so and refuses, a second within ten seconds leaves, a saved answer never asks', () => {
+  let now = 1000, dirty = true, told = 0; const ok = MXAC.leaveGuard({ unsaved: () => dirty, tell: () => { told++; }, now: () => now });
+  assert.equal(MXAC.LEAVE_MS, 10000);
+  assert.equal(ok(), false); assert.equal(told, 1); now += 9000; assert.equal(ok(), true, 'a second press within the ten seconds leaves'); assert.equal(told, 1);
+  assert.equal(ok(), false, 'and the question starts again for the next half-written answer'); now += 10001; assert.equal(ok(), false, 'a press after the ten seconds is a first press again'); assert.equal(told, 3);
+  ok.reset(); now += 10; assert.equal(ok(), false, 'reset forgets a first press'); dirty = false; assert.equal(ok(), true, 'nothing unsaved: never asks'); assert.equal(told, 4);
+  dirty = true; assert.equal(ok(), false, 'a clean pass in between does not count as the first press');
+  // the answer forms of the Session tab and the Blind arena use the Train form's own rule
+  assert.equal(MXAC.mentorUnsaved({ dirty: true, choice: 'WAIT', text: '' }), true); assert.equal(MXAC.mentorUnsaved({ dirty: true, choice: null, text: 'a word' }), true); assert.equal(MXAC.mentorUnsaved({ dirty: false, choice: 'WAIT', text: 'x' }), false);
+});
+
+test('a sitting of the Session tab is offered after a reload, and only an unfinished one', () => {
+  const rows = MXAC.latestFirst([{ id: 'a', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T10:00:00Z' }, { id: 'b', kind: 'session', status: 'paused', updatedAt: '2026-11-11T12:00:00Z' }, { id: 'c', kind: 'session', status: 'done', updatedAt: '2026-11-11T13:00:00Z' }]);
+  assert.equal(MXAC.unfinished(rows).id, 'a', 'the default is still a Train replay'); assert.equal(MXAC.unfinished(rows, 'session').id, 'b', 'an ended sitting is not offered');
+  assert.equal(MXAC.unfinished(rows, ['replay', 'session']).id, 'b', 'whichever was saved last'); assert.equal(MXAC.unfinished([{ id: 'c', kind: 'session', status: 'done' }], 'session'), null);
+});
+
+test('page wiring of round 3: Session saves its place and guards a verdict, Blind guards an answer and answers once, the draft comes back without browser storage', () => {
+  const ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js'), css = src('assets/academy.css');
+  // one guard, three users; no copy of it in the sections
+  assert.equal((ui.match(/= leaveGuard\(\{/g) || []).length, 1, 'Train'); assert.equal((tabs.match(/K\.leaveGuard\(\{/g) || []).length, 2, 'Session and Blind arena'); assert.doesNotMatch(tabs, /LEAVE_MS|asked = /);
+  assert.match(ui, /root\.addEventListener\('beforeunload', \(e\) => \{ if \(UNSAVED\.some\(/); assert.equal((tabs.match(/K\.watchUnsaved\(/g) || []).length, 2);
+  // Session: every way of leaving a half-written verdict or note asks first
+  const sess = tabs.slice(tabs.indexOf('function sessionTab(sec, ctx)'));
+  for (const re of [/if \(canMove\(\) && leave\(\)\) \{ leavePoint\(\); Z\.clock\.step\(1\); \}/, /if \(cs\.playing\) \{ Z\.clock\.pause\(\); draw\(\); return; \} if \(!leave\(\)\) return;/, /if \(!Z\.clock \|\| Z\.ended \|\| !leave\(\)\) return;/, /if \(!sure && Z\.clock && !leave\(\)\) return;/, /if \(Z\.busy \|\| \(Z\.clock && !leave\(\)\)\) return;/, /Z\.clock\.state\(\)\.playing \|\| !leave\(\)\) return;/, /set: \(v\) => \{ myEdge = v; \}, leave \}/]) assert.match(sess, re);
+  // Session: the place is saved with every decision (the first save comes before the attempt and carries the setup), and a failed save never costs the decision
+  assert.match(sess, /const firstSave = !Z\.sessionId; if \(firstSave\) await save\(true, null, c\.id\);/);
+  assert.match(sess, /if \(!firstSave\) \{ try \{ await save\(true\); \} catch \(e2\) \{ warn = /);
+  assert.match(sess, /cur: Z\.cur \? Z\.cur\.cand\.id : curId \|\| null/);
+  assert.equal((sess.match(/action: 'session\.save'/g) || []).length, 1, 'one way of saving');
+  // Session resume: reads only (the stored attempt of this sitting, its verdict), the snapshot rebuilt at the setup's own time, no decision made again
+  const rp = sess.slice(sess.indexOf('async function restorePoint(candId)'), sess.indexOf('// a note at the replay time'));
+  assert.ok(rp.length > 500); assert.doesNotMatch(rp, /api\.post|decide\(|K\.decideOn|get: 'outcome'/); assert.match(rp, /K\.snapOf\(Z\.edge, Z\.series, Z\.dataVersion, c\.t, c\)/); assert.match(rp, /a\.sessionId === Z\.sessionId && a\.decision/);
+  // Blind arena: the guard on the two ways an answer can be lost; one answer a setup; a setup shown in Train or Session since is recall
+  const blind = tabs.slice(tabs.indexOf('function blindTab(sec, ctx)'), tabs.indexOf('// ---- Session training'));
+  assert.match(blind, /if \(B\.busy \|\| !leave\(\)\) return;/); assert.match(blind, /set: \(v\) => \{ myEdge = v; \}, leave \}/);
+  assert.match(blind, /catch \(e2\) \{ if \(e2\.status !== 409\) throw e2; B\.done\.add\(c\.id\); await already\(c\);/);
+  assert.match(blind, /K\.decided\(c\.id, B\.pool, 'blind'\);/); assert.match(ui, /decidedAs\(c\.id, S\.pool, again \? 'replay-same' : 'train'\)/); assert.match(sess, /K\.decided\(c\.id, Z\.pool, again \? 'replay-same' : 'train'\)/);
+  assert.doesNotMatch(blind, /get: 'attempts'|get: 'dataset'/, 'the arena never asks the server for a stored decision');
+  assert.equal((blind.match(/id: 'bl-next'/g) || []).length, 2, '"Next setup" is built only where an answer is already stored (both answers shown, or the server said it had one)');
+  // the lesson draft on resume: made again from stored things, never from the browser
+  assert.match(ui, /S\.cur\.lesson = MXA\.lessons\.fromCorrection\(S\.cur\.first\.decision, Object\.assign\(\{\}, S\.cur\.correction, \{ sessionId: S\.sessionId \}\), f\);/);
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/, 'the storage allowlist did not grow');
+  assert.match(ui, /delete CACHE\.pool\[st\.edge\.id \+ '\|exam'\]; if \(!firstSave\) await keepPlace\(\);/, 'the exam list is dropped after an exam setup (it sat inside a comment in round 2)');
+  assert.match(css, /\.card\.folded > :not\(\.c-h\):not\(\.fold-bar\) \{ display: none; \}/);
 });

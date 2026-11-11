@@ -1515,7 +1515,7 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   nothing else: never widen it to results, lessons, the store or any other route. With a provider key set it is not used.
   Tests: `tests/academy-connector.test.mjs`; audit section D (`--connector` on the dev server).
 - **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
-  a run reads candidates, lessons, calendar and past cases once, so a train decision is two calls (the attempt, then the session position: round 2, 11 Nov 2026; one before). Keep new code on `ctx.api`.
+  a run reads candidates, lessons, calendar and past cases once, so a train decision is two calls (the attempt, then the session position: round 2, 11 Nov 2026; one before), and since round 3 a Session-tab decision too. Keep new code on `ctx.api`.
 - **Policy investigation** (10 Nov 2026, `research/edge/academy-policy/`, pre-registered; `docs/academy/RESEARCH.md` section 7):
   discovery = the earliest 60 % of each edge's usable train setups, validation = the latest 40 %, the exam pool untouched. The
   evidence margin does not rank trades and the replica gap did not repeat on validation. Five candidates, **0 of 16 tests accepted**
@@ -1583,6 +1583,33 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   list and both writes); never a decision, a result or an API answer. The audit takes `ACADEMY_PORTS="a,b,c,d,e,f"` when the
   default ports are not free. Not done: the Session tab saves its position at its first stop only, and its Continue can
   still drop a half-written verdict; the conflict link opens the lessons but does not edit them for you.
+- **Round 3** (11 Nov 2026: the Session tab and the Blind arena get the Train tab's protections; page code, CSS, audit and
+  tests only, no decision, lesson, policy or API logic changed). (1) **One guard** `MXAC.leaveGuard({ unsaved, tell })` (pure,
+  `LEAVE_MS` 10 s; on `kit`): Train's `leaveOk` is built from it and the sections use it, never a copy. The answer forms of
+  Session and Blind report `unsaved()` by Train's own rule (`mentorUnsaved`). A reload or close over a half-written answer on
+  any section gets the browser's own question (`beforeunload`, `kit.watchUnsaved`); the page stores nothing. (2) **Session
+  tab**: the place is saved with every decision (first decision of a sitting: `session.save` then the attempt; every later
+  one: the attempt then `session.save`: **two calls a decision**, one before); the save carries the setup the clock is on
+  (`state.cur`). The sitting saved last and not ended is offered in the tab (`#ss-resume-now`) and, when it is the latest
+  thing saved, at the top of Train ("Resume in the Session tab", `MXAC.sessionResume`, `MXAC.unfinished(rows, kinds)`).
+  Resume comes back ON the setup with the stored decision and verdict (`restorePoint`: reads only, `attempts` +
+  `corrections`, + `lessons` when a disagreeing verdict is stored; nothing is decided or written again). Continue, Step, End,
+  another start or resume, an edge change and opening a note all ask before dropping a half-written verdict or note.
+  (3) **Blind arena**: "Next setup" exists only once an answer is stored, so the guard sits where an answer can be lost
+  (another "Start a round", an edge change). After a reload the page asks the server for no stored decision, a setup left
+  open keeps its one hidden attempt and is named in the count line, and the API's refusal of a second answer (409, unchanged)
+  is said in words ("the first answer stands", `#bl-already`). `kit.decided(id, pool, mode)` records the mode in the shared
+  pool list: a setup whose engine answer was shown in Train or Session after its hidden attempt is answered as recall (a
+  fresh hidden attempt, left out of every score), in the same sitting too. (4) **Lesson draft on resume**: made again from
+  the stored attempt, the stored correction and the rebuilt snapshot's features (Train: one extra `lessons` read on resume to
+  see whether it was already saved). Edits typed into a draft that was never saved are NOT kept: a draft carries the
+  corrected answer and its level rules, so keeping it would put a decision in browser storage; the allowlist stays
+  `mxacEdge`, `mxacFold` (test). (5) The Session and Blind setup card folds to one line while a sitting is on screen
+  (`setupFold`, `.card.folded`); saved sittings list the latest first; an exam replay drops its cached exam list again (the
+  line sat inside a comment since round 2). The audit has section 11k (its own server, port index 1 reused): Session guard,
+  place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
+  draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
+  decision saves the sitting.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the

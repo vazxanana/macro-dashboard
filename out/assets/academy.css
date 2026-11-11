@@ -402,3 +402,9 @@ main.hero-min .ac-hero { grid-template-columns: minmax(0, 1fr); padding: 12px 20
 main.hero-min .ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; } main.hero-min .ac-hero h1 { order: -1; margin: 0; }
 /* the audit trail's ids keep whole words and the table scrolls in its box (they broke one or two letters a line on a phone) */
 #au-table td.ids { min-width: 200px; overflow-wrap: normal; word-break: normal; } #au-table td:last-child { min-width: 220px; }
+
+/* Round 3 (11 Nov 2026): the Session and Blind setup card folds to its heading and one line while a sitting is on screen */
+.fold-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 6px; }
+.fold-bar[hidden] { display: none; }
+.fold-bar .fold-sum { flex: 1 1 220px; font-size: 13.5px; color: var(--ink-dim); }
+.card.folded > :not(.c-h):not(.fold-bar) { display: none; }

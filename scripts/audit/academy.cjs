@@ -539,7 +539,7 @@ async function startServer(port = PORT, flags = []) {
     check('Session: the draft is saved inactive, linked to the session', drafts.length === 1 && drafts[0].active === false && drafts[0].then.action === 'TAKE' && (await api(p, `get=lessons&edge=${EDGE}&active=1`)).lessons.length === 1, JSON.stringify(drafts.map((l) => [l.active, l.then.action])));
     const ms1 = reqs.length; await p.click('#ss-play'); await p.waitForSelector('#ss-dec-stored', { timeout: 60000 }); await p.waitForFunction(() => document.getElementById('ss-state').textContent === 'paused on a setup', null, { timeout: 20000 });
     const sAtt = calls(reqs, ms1, 'owner').map(what), d1 = dayCands[0], sRows = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(d1.id)}`)).attempts, sLast = sRows[sRows.length - 1];
-    check('Session: the clock stops on the first setup of the day and its decision is stored at once, with the session id (one call)', (await txt(p, '#ss-time')) === stamp(d1.t) && sAtt.join() === 'attempt' && sLast.sessionId === ssId && ['train', 'replay-same'].includes(sLast.mode) && (await txt(p, '#ss-dec-action')) === sLast.decision.action && /Attempt \d+ stored ✓/.test(await txt(p, '#ss-dec-stored')), `${await txt(p, '#ss-time')} ${sAtt.join()} ${sLast.mode}`);
+    check('Session: the clock stops on the first setup of the day and its decision is stored at once, with the session id, then the place is saved (two calls; this sitting has its id since the first note)', (await txt(p, '#ss-time')) === stamp(d1.t) && sAtt.join() === 'attempt,session.save' && sLast.sessionId === ssId && ['train', 'replay-same'].includes(sLast.mode) && (await txt(p, '#ss-dec-action')) === sLast.decision.action && /Attempt \d+ stored ✓/.test(await txt(p, '#ss-dec-stored')), `${await txt(p, '#ss-time')} ${sAtt.join()} ${sLast.mode}`);
     check('Session: the note buttons are off while the clock is on a setup', await p.isDisabled('#ss-missed') && await p.isDisabled('#ss-right'));
     await p.click('#ss-point [data-choice="approve"]'); await p.click('#ss-v-save'); await p.waitForFunction(() => /Verdict stored ✓/.test(document.getElementById('ss-v-msg').textContent), null, { timeout: 15000 });
     check('Session: an approval is stored and counted, with its n', (await txt(p, '#ss-n-agree')).startsWith('1 of 1 (too few to judge)') && (await txt(p, '#ss-n-dec')).startsWith('1'), await txt(p, '#ss-n-agree'));
@@ -554,7 +554,8 @@ async function startServer(port = PORT, flags = []) {
     let sessS = (await api(p, 'get=sessions')).sessions.filter((s) => s.kind === 'session');
     check('Session: saved through the session route, with its summary', sessS.length === 1 && sessS[0].id === ssId && sessS[0].status === 'paused' && /missed opportunity/.test(sessS[0].summary) && (await p.$$('#ss-saved li[data-session]')).length === 1, JSON.stringify(sessS.map((s) => [s.status, s.summary])));
     const nDec = (await txt(p, '#ss-summary-text')).match(/^(\d+) decision/)[1];
-    await p.click('#ss-saved li[data-session] button'); await p.waitForFunction(() => /Session resumed at/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 60000 });
+    check('Session: the setup card is folded to one line while the sitting is on screen', (await p.getAttribute('#ss-setup-toggle', 'aria-expanded')) === 'false' && !(await vis(p, '#ss-start')) && /setup/.test(await txt(p, '#ss-setup-sum')), await txt(p, '#ss-setup-sum'));
+    await p.click('#ss-setup-toggle'); await p.click('#ss-saved li[data-session] button'); await p.waitForFunction(() => /Session resumed (at|on)/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 60000 });
     check('Session: resuming brings back the clock, the notes and the counts', +nDec === Math.min(2, dayCands.length) && (await txt(p, '#ss-summary-text')).startsWith(nDec + ' decision') && (await txt(p, '#ss-n-missed')).startsWith('1') && (await p.$$('#ss-notes-list li[data-kind]')).length === 2 && /swept the low/.test(await txt(p, '#ss-notes-list')), await txt(p, '#ss-summary-text'));
     await p.click('#ss-end'); await p.waitForFunction(() => /Session ended and saved/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 15000 });
     sessS = (await api(p, 'get=sessions')).sessions.filter((s) => s.kind === 'session');
@@ -728,6 +729,81 @@ async function startServer(port = PORT, flags = []) {
       for (const who of [{ u: 'fred', role: 'reviewer' }, { u: 'luxus', role: 'viewer' }]) { for (const name of GETS) codes.push([who.u, name, (await as(who, 'GET', { get: name, edge: EDGE, id: cands[0].id })).code]); for (const name of POSTS) codes.push([who.u, name, (await as(who, 'POST', { action: name, edge: EDGE })).code]); }
       check('access, a reviewer and a viewer: every route answers 403 and nothing is written', codes.length === 2 * (GETS.length + POSTS.length) && codes.every((x) => x[2] === 403) && fs.readdirSync(mem).length === 0 && (await as({ u: 'owner' }, 'GET', { get: 'lessons' })).code === 200, JSON.stringify(codes.filter((x) => x[2] !== 403).slice(0, 4)));
       fs.rmSync(mem, { recursive: true, force: true });
+    }
+
+    // ---- 11k. round 3, on a fresh store: the Session tab keeps its place and a half-written verdict; the Blind arena after a reload;
+    //           the conflicting-lessons link ----
+    {
+      const s3 = await startServer(portOf(1, +PORT + 1)), H3 = s3.H, c3 = await b.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' }); await c3.addInitScript(NO_PACE);
+      const q = await c3.newPage(); watch(q, 'r3'); const asked = []; q.on('dialog', async (d) => { asked.push(d.type()); await d.accept(); });
+      const mine = (from) => calls(reqs, from, 'r3').map(what), ssState = (t) => q.waitForFunction((x) => document.getElementById('ss-state').textContent === x, t, { timeout: 60000 });
+      try {
+        await q.goto(H3 + '/academy', { waitUntil: 'load' }); await setup(q, iso(cands[0].t), null);
+        // -- Session: two setups, the place saved with each, a half-written verdict kept
+        await q.click('#tab-session'); await q.waitForSelector('#ss-start', { timeout: 20000 }); await q.waitForFunction(() => /train setups? in this range/.test(document.getElementById('ss-count').textContent), null, { timeout: 15000 });
+        check('Session: nothing to pick up on a fresh store', !(await vis(q, '#ss-resume-now')) && !(await vis(q, '#resume-now')));
+        await q.fill('#ss-from', iso(cands[0].t)); await q.dispatchEvent('#ss-from', 'change'); await q.selectOption('#ss-speed', '100'); await q.click('#ss-start'); await q.waitForSelector('#ss-live:not([hidden])', { timeout: 60000 });
+        let m = reqs.length; await q.click('#ss-play'); await q.waitForSelector('#ss-dec-stored', { timeout: 60000 }); await ssState('paused on a setup');
+        const first = mine(m).filter((x) => x === 'attempt' || x === 'session.save');
+        const other = await q.$eval('#ss-point [data-choice]:not([data-choice="approve"])', (x) => x.dataset.choice); await q.click(`#ss-point [data-choice="${other}"]`); await q.fill('#ss-v-text', 'Audit: half written.');
+        m = reqs.length; await q.click('#ss-continue'); await q.waitForTimeout(300);
+        check('Session: Continue with a half-written verdict leaves nothing behind the first time: it says so, stays on the setup and sends nothing', (await txt(q, '#ss-state')) === 'paused on a setup' && /Your verdict is not saved yet/.test(await txt(q, '#ss-run-msg')) && /Your verdict is not saved yet/.test(await txt(q, '#ss-continue-msg')) && (await q.inputValue('#ss-v-text')) === 'Audit: half written.' && mine(m).length === 0, `${await txt(q, '#ss-state')} | ${await txt(q, '#ss-run-msg')}`);
+        await q.click('#ss-step'); await q.waitForTimeout(300);
+        check('Session: a second press within ten seconds leaves (Step counts as the same question)', !(await vis(q, '#ss-point')) && (await txt(q, '#ss-state')) === 'paused');
+        m = reqs.length; await q.click('#ss-play'); await q.waitForSelector('#ss-dec-stored', { timeout: 60000 }); await ssState('paused on a setup');
+        const second = mine(m).filter((x) => x === 'attempt' || x === 'session.save'), t2 = await txt(q, '#ss-time'), a2 = await txt(q, '#ss-dec-action');
+        check('Session: the place is saved with every decision: the first saves the session, then the attempt; every later one the attempt, then the session (two calls a decision)', first.join() === 'session.save,attempt' && second.join() === 'attempt,session.save' && t2 === stamp(cands[1].t), `${first.join()} | ${second.join()} | ${t2}`);
+        const other2 = await q.$eval('#ss-point [data-choice]:not([data-choice="approve"])', (x) => x.dataset.choice); await q.click(`#ss-point [data-choice="${other2}"]`); await q.fill('#ss-v-text', 'Audit: I read this one differently.');
+        await q.click('#ss-v-save'); await q.waitForFunction(() => /Verdict stored ✓/.test(document.getElementById('ss-v-msg').textContent), null, { timeout: 15000 });
+        await q.click('#ss-continue'); await q.waitForTimeout(200); const leftClean = !(await vis(q, '#ss-point')); await q.click('#ss-play').catch(() => {});   // pause again at once: the place saved is the second setup
+        check('Session: a stored verdict never asks', leftClean);
+        // -- reload: offered on the Train tab and in the Session tab, back on the second setup with its verdict
+        m = reqs.length; const nAsk = asked.length; await q.reload({ waitUntil: 'load' }); await q.waitForSelector('#resume-now:not([hidden])', { timeout: 20000 });
+        check('Session: a reload with nothing half written asks nothing, and the sitting is offered at the top of the page', asked.length === nAsk && /^Session tab · .+ · paused at /.test(await txt(q, '#resume-now-text')) && (await txt(q, '#resume-now-go')) === 'Resume in the Session tab', await txt(q, '#resume-now-text'));
+        await q.click('#resume-now-go'); await q.waitForSelector('#ss-dec-stored', { timeout: 60000 }); await ssState('paused on a setup');
+        const back = mine(m);
+        check('Session: Resume returns to the latest setup with its stored decision and verdict; nothing is decided or written again', (await txt(q, '#ss-time')) === t2 && (await txt(q, '#ss-dec-action')) === a2 && /Your verdict is stored ✓: it should have been /.test(await txt(q, '#ss-v-stored')) && (await q.$$('#ss-v-save')).length === 0 && !back.some((x) => !x.startsWith('get=')) && /^2 decisions/.test(await txt(q, '#ss-summary-text')) && /agreed with 0 of 1/.test(await txt(q, '#ss-summary-text')), `${await txt(q, '#ss-time')} ${await txt(q, '#ss-v-stored')} | ${await txt(q, '#ss-summary-text')} | ${back.join(' ')}`);
+        check('Session: the resume costs reads only: the stored attempts and the verdict of that setup (and whether its lesson was saved)', back.filter((x) => x === 'get=attempts').length === 1 && back.filter((x) => x === 'get=corrections').length === 1 && !back.includes('get=outcome'), back.join(' '));
+        check('Session: the lesson draft of the stored verdict is offered again (made again from the stored correction, nothing kept in the browser)', /^When: .+ → Then: /.test(await txt(q, '#ss-lesson-plain')) && await q.evaluate(() => Object.keys(localStorage).every((k) => k === 'mxacEdge' || k === 'mxacFold' || k === 'msPrefs')), await q.evaluate(() => Object.keys(localStorage).join(',')));
+        await q.screenshot({ path: OUT + 'academy-r3-session-resumed.png', fullPage: true });
+        await q.click('#ss-end'); await q.waitForFunction(() => /Session ended and saved/.test(document.getElementById('ss-run-msg').textContent), null, { timeout: 15000 });
+        // -- Blind arena: a half-written answer, a reload, the hidden answer, one answer a setup
+        await q.click('#tab-blind'); await q.waitForSelector('#bl-start', { timeout: 20000 }); await q.waitForFunction(() => /in this range/.test(document.getElementById('bl-count').textContent), null, { timeout: 15000 });
+        await q.fill('#bl-from', iso(cands[2].t)); await q.dispatchEvent('#bl-from', 'change'); m = reqs.length; await q.click('#bl-start'); await q.waitForSelector('#bl-save', { timeout: 60000 });
+        const bCand = await q.evaluate(() => window.MXAC.lastSnapshot.cand.id), bTime = await txt(q, '#bl-time');
+        check('Blind arena: the setup card is folded while a round is on screen, and "Next setup" does not exist before an answer is stored', (await q.getAttribute('#bl-setup-toggle', 'aria-expanded')) === 'false' && (await q.$$('#bl-next')).length === 0);
+        await q.click('#bl-answer [data-choice="WAIT"]'); await q.fill('#bl-text', 'Audit: half an answer.'); await q.click('#bl-setup-toggle');
+        const m2 = reqs.length; await q.click('#bl-start'); await q.waitForTimeout(300);
+        check('Blind arena: starting another round over a half-written answer says so first and changes nothing', /Your answer is not stored yet/.test(await txt(q, '#bl-leave')) && await vis(q, '#bl-leave') && (await q.inputValue('#bl-text')) === 'Audit: half an answer.' && (await txt(q, '#bl-time')) === bTime && mine(m2).length === 0, await txt(q, '#bl-leave'));
+        const nAsk2 = asked.length; m = reqs.length; await q.reload({ waitUntil: 'load' });
+        check('a reload over a half-written answer: the browser asks first', asked.slice(nAsk2).join() === 'beforeunload', asked.slice(nAsk2).join());
+        await q.waitForSelector('#f-edge option', { state: 'attached', timeout: 15000 }); await q.click('#tab-blind'); await q.waitForSelector('#bl-start', { timeout: 20000 }); await q.waitForFunction(() => /in this range/.test(document.getElementById('bl-count').textContent), null, { timeout: 15000 });
+        const hid3 = (await api(q, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(bCand)}`)).attempts.filter((a) => a.mode === 'blind');
+        check('Blind arena, after a reload: the setup left open is named, the server still hides its engine answer and gives no outcome', /1 of them was left open: the engine's answer is stored and stays hidden until yours is/.test(await txt(q, '#bl-count')) && hid3.length === 1 && hid3[0].hidden === true && hid3[0].decision === null && (await q.evaluate(async (id) => (await fetch(`/api/academy?get=outcome&edge=gmp&_audit=1&id=${encodeURIComponent(id)}`)).status, bCand)) === 403, `${await txt(q, '#bl-count')} ${JSON.stringify(hid3.map((a) => [a.hidden, a.decision]))}`);
+        await q.fill('#bl-from', iso(cands[2].t)); await q.dispatchEvent('#bl-from', 'change'); await q.click('#bl-start'); await q.waitForSelector('#bl-save', { timeout: 60000 });
+        const after = mine(m);
+        check('Blind arena, after a reload: the same setup comes back with no second hidden attempt, and nothing of the engine\'s answer on the page', (await txt(q, '#bl-time')) === bTime && !after.includes('attempt') && !after.includes('get=outcome') && !after.includes('get=attempts') && (await q.$$('#bl-engine, #bl-compare, #bl-dec-action')).length === 0 && await vis(q, '#bl-hidden') && !/recall/.test(await txt(q, '#bl-info')), `${await txt(q, '#bl-time')} | ${after.join(' ')}`);
+        // the same setup answered meanwhile somewhere else (another window): the page's own answer is refused by the server and said in words
+        const elsewhere = await q.evaluate(async (id) => (await fetch('/api/academy?_audit=1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'blind.submit', blind: { edge: 'gmp', candidateId: id, action: 'WAIT', entry: null, stop: null, target: null, text: 'Audit: the other window.' } }) })).status, bCand);
+        await q.click('#bl-answer [data-choice="BUY"]'); await q.fill('#bl-text', 'Audit: a second answer.'); await q.click('#bl-save'); await q.waitForSelector('#bl-already', { timeout: 20000 });
+        const stored3 = (await api(q, `get=blind&edge=${EDGE}`)).blind.filter((r) => r.candidateId === bCand);
+        check('Blind arena: a setup is answered once: the server refuses a second answer (409), the page says the first one stands and goes on', elsewhere === 200 && stored3.length === 1 && stored3[0].mentor.action === 'WAIT' && /first answer stands and nothing was stored twice/.test(await txt(q, '#bl-already')) && /Not stored again/.test(await txt(q, '#bl-msg')) && await vis(q, '#bl-next') && (await q.$$(`#bl-rows tr[data-cand="${bCand}"]`)).length === 1 && !errs.some((e) => /^r3: /.test(e)), `${elsewhere} ${stored3.length} ${await txt(q, '#bl-already')}`);
+        for (let i = errs.length - 1; i >= 0; i--) if (/^r3 console: .*\b(409|403)\b/.test(errs[i])) errs.splice(i, 1);   // the refused outcome read (403) and the refused second answer (409) are the point of the checks above
+        // -- two lessons that disagree on one setup: the decision names them and the link opens them in the Lessons tab
+        const side = cands[3].side, mk = (title, action) => q.evaluate(async (l) => (await (await fetch('/api/academy?_audit=1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'lesson.save', lesson: l }) })).json()).lesson, { edge: EDGE, title, text: '', when: [{ f: 'side', op: 'eq', v: side }], then: { action, adjust: {}, note: '' }, source: {}, active: true });
+        const lw = await mk('Audit: wait on this side', 'WAIT'), lt = await mk('Audit: take this side', 'TAKE');
+        await q.click('#tab-train'); await q.fill('#f-from', iso(cands[3].t)); await q.dispatchEvent('#f-from', 'change'); await q.waitForTimeout(300); await q.evaluate(() => { const d = document.getElementById('setup-opts'); if (d) d.open = true; }); await q.check('input[name=speed][value="100"]', { force: true });
+        await q.click('#start'); await q.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await q.click('#c-play'); await nextPoint(q);
+        const cText = await txt(q, '#dec-conflict');
+        check('conflicting lessons: the decision waits, names both lessons by their titles and offers the way to them', (await txt(q, '#dec-action')) === 'WAIT' && /Two lessons disagree on this setup/.test(cText) && cText.includes('"Audit: wait on this side"') && cText.includes('"Audit: take this side"') && !/ls_[0-9a-z]{6,}/.test(cText) && await vis(q, '#dec-conflict-open'), cText);
+        m = reqs.length; await q.click('#dec-conflict-open'); await q.waitForSelector('#ls-list li[data-focus="yes"]', { timeout: 20000 });
+        const hit = await q.$$eval('#ls-list li[data-focus="yes"]', (l) => l.map((x) => x.textContent));
+        check('conflicting lessons: the link opens the Lessons tab on that edge with exactly the two lessons outlined and says what to do', (await q.getAttribute('#tab-lessons', 'aria-selected')) === 'true' && (await q.inputValue('#ls-edge')) === EDGE && hit.length === 2 && hit.some((t) => t.includes(lw.title)) && hit.some((t) => t.includes(lt.title)) && /Revise one so they no longer meet on the same setup, or switch one off/.test(await txt(q, '#ls-focus')) && !mine(m).some((x) => !x.startsWith('get=')), `${hit.length} | ${await txt(q, '#ls-focus')} | ${mine(m).join(' ')}`);
+        await q.click('#tab-train'); await q.click('#tab-lessons'); await q.waitForSelector('#ls-list li', { timeout: 20000 }); await q.waitForTimeout(400);
+        check('conflicting lessons: the outline is shown once (a later visit to the tab is plain)', (await q.$$('#ls-list li[data-focus="yes"], #ls-focus')).length === 0);
+        const ck3 = await q.evaluate(() => window.MXAC.checks);
+        check('round 3: no future bar reached a decision on this page either', ck3.future === 0 && ck3.snapshots > 0, JSON.stringify(ck3));
+      } finally { await c3.close().catch(() => {}); s3.proc.kill(); fs.rmSync(s3.store, { recursive: true, force: true }); }
     }
 
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
