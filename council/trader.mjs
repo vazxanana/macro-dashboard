@@ -19,7 +19,7 @@ import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
@@ -324,8 +324,36 @@ const USER_RULES = [
   { id: 'lit-shadow', apply: (c) => { c.litShadow = true; },
     change: 'LIT (M15 FBOS → M5 RBOS → limit at the order block) runs on gold as a paper shadow stream "LIT (paper shadow)"; no live rule changes',
     why: 'LIT study (#597): INCONCLUSIVE, too few trades at the skill\'s defaults (27 gold fills in 19 years) and what fills loses; the owner keeps it as a paper shadow to build a forward record, not as a system.' },
+  // 11 Nov, owner on the edge review's decisions (research/proposals/2026-11-11-edge-review.md): "yes anything that is better for the
+  // system and that applies it". Three rules, nothing wider.
+  // (1) The live paper book is Gold trend (20-day) and Gold daily engulf only. The gold replica, the momentum pullback (a test
+  // shadow since 6 Nov), the NQ New York open run, the H4 trendline and Mosha BO become paper shadows: the same rule, the same
+  // stop and the same loop, new trades recorded shadow: true, blockedBy 'owner-shadow' (never alerted, no futures ticket, not in
+  // the MT5 feed). config.ownerShadow[k] = when it started. Trades already open as live stay live and run to their own exits.
+  // Entries, filters, sizes, stops and exits are unchanged for all seven. Undo: a new user rule deleting a key of ownerShadow.
+  { id: 'supported-book', apply: (c) => { const at = Math.floor(Date.now() / 1000); c.ownerShadow = { ...(c.ownerShadow || {}) }; for (const k of OWNER_SHADOW_K) if (!c.ownerShadow[k]) c.ownerShadow[k] = at; },
+    change: 'Supported book (owner, 11 Nov): Gold trend (20-day) and Gold daily engulf stay live; Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO become paper shadows (same rules and stops, recorded and managed, never alerted); trades already open run to their exits as live',
+    why: 'Edge review of 11 Nov: no system has t 2 out of sample after costs; on untouched 2006-17 Gold trend +0.49R a position (n 75, t 1.77) and the daily engulf +0.19R (n 256, t 1.89) are the nearest, the H4 trendline +0.05R (t 0.83, +0.01R after financing), Mosha BO +0.14R (n 62, t 0.55), the replica -0.05R on 2017-22 (n 115), the momentum pullback -0.04R on 2018-22 (n 634), the NQ open run -0.02R on 2004-22 (n 1,560). The book of all of them made +4.3R a year with an 83R drawdown on 2006-17 and lost at doubled costs (research/edge/honest-book). The two-system book itself has not been run as a book. Owner: "yes anything that is better for the system and that applies it".' },
+  // (2) Overnight financing is part of the paper cost (council/fills.mjs FIN, financing): a gold long pays 0.0148 % of its entry
+  // price for every rollover it is held through. Every trade closed from this run on carries it in costR / Rnet (finR, nights);
+  // trades closed before keep the cost they were stamped with. config.financingFrom = when it started.
+  { id: 'count-financing', apply: (c) => { c.financingFrom = new Date().toISOString(); },
+    change: 'Paper costs now include overnight financing on gold longs (0.0148% of price a rollover, three on Wednesday), for every trade closed from now on; earlier trades keep their recorded cost',
+    why: 'trend-breadth Part A (11 Nov): the demo broker charges 5.903 pips a night on a long ounce of gold, about 5.3% a year, which no cost model counted: on untouched 2006-17 it takes Gold trend from +0.49R to +0.40R a position (t 1.77 to 1.49), the daily engulf from +0.19R to +0.14R and the H4 trendline from +0.05R to +0.01R, about 2.8R a year between them. Owner approved.' },
+  // (3) The demo mirror stops OPENING copies of the replica's forex and crypto research paper trades on the Replica demo account
+  // (council/ctrader-mirror.mjs reads config.mirrorReplica.markets). Gold replica copies and every other book are unchanged, and a
+  // position already copied is managed to its close as before. Condition to look again, written here and in the config: the
+  // forex and crypto replica paper trades closed since `since` number 200 or more and their total R before costs is above zero
+  // (snapshot.mirrorReplica counts it every round; nothing resumes by itself, the owner decides). Off-switch: a user rule setting
+  // c.mirrorReplica = null (every replica research trade is copied again).
+  { id: 'replica-mirror-gold-only', apply: (c) => { c.mirrorReplica = { markets: ['xau'], since: Math.floor(Date.now() / 1000), until: { n: 200, grossR: 0, text: 'forex and crypto replica paper trades closed since the rule: 200 or more, total R before costs above zero; then the owner decides' } }; },
+    change: 'Demo mirror: no new copies of the replica\'s forex and crypto paper trades on the Replica demo account until that stream is positive before costs over 200 trades; gold replica copies and positions already copied are unchanged',
+    why: 'Edge review of 11 Nov: the replica\'s forward paper trades on ten markets since 3 Nov made -0.08R a trade before costs (n 568, t -1.3), and the Replica demo account fills 0.08R worse than paper on every copy (n 121, t 3.9). Owner approved.' },
 ];
 config.userRules = config.userRules || [];
+// supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote
+const OWNER_SHADOW_K = ['replica', 'mosha-bo', 'gtl', 'gmp', 'nq-open'];
+const ownerSh = (k) => !!(config.ownerShadow || {})[k];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
 // Owner rules are never undone by the Coach (7 Nov). Normalise the older string form (gold-m30 stored src: 'user',
 // since: '<iso>') into the per-field objects the Coach reads, and mark the owner's "Scalp outside Asia" session rule.
@@ -812,7 +840,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (key === 'xau' && config.goldTL) {
       try {
         const TL = config.goldTL, H = src['4h'].bars.slice(0, -1), D = src['1d'].bars.slice(0, -1), n = H.length, last = H[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
-        const open = trades.find((x) => x.k === 'gtl' && x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+        // supported-book (owner, 11 Nov): new trendline trades are paper shadows (blockedBy owner-shadow), one position as before
+        const tlSh = ownerSh('gtl'), open = trades.find((x) => x.k === 'gtl' && x.market === key && ownStream(x) && (x.status === 'open' || x.status === 'pending'));
         // confirmed H4 pivot highs (half-width TL.n); the line runs through the last two when the second is lower
         const piv = []; for (let i = TL.n; i < n - TL.n; i++) { let ok = true; for (let k = i - TL.n; k <= i + TL.n && ok; k++) if (k !== i && H[k].high >= H[i].high) ok = false; if (ok) piv.push([i, H[i].high]); }
         let state = { line: null };
@@ -827,13 +856,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
                 const entry = +price.toFixed(dp), lo = Math.min(...H.slice(b).map((x) => x.low)), stop = +(lo - TL.pad).toFixed(dp), r0 = entry - stop;
                 if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gtl', name: 'Gold H4 trendline', pair: 'H4 trendline break', h: '4h', side: 'buy',
                   entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, maxHold: TL.hold * 3600, noBe: true, entryMode: 'market', drift: driftR('buy', last.close, entry, stop),
-                  feat: { line: +lv.toFixed(2), anchors: [+pa.toFixed(2), +pb.toFixed(2)], lo: +lo.toFixed(2) }, shadow: false, blockedBy: [],
+                  feat: { line: +lv.toFixed(2), anchors: [+pa.toFixed(2), +pb.toFixed(2)], lo: +lo.toFixed(2) }, shadow: tlSh, blockedBy: tlSh ? ['owner-shadow'] : [],
                   feed: FEED, note: `Gold H4 trendline: H4 close ${last.close} above the falling line ${lv.toFixed(2)} through the pivot highs ${pa.toFixed(2)} and ${pb.toFixed(2)}, H4 direction up (Malaysian SnR SOP). Buy at market, stop ${stop} under the low since the second anchor; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out after ${TL.hold} h.` });
               } else { state.blocked = 'direction'; }
             }
           }
         }
-        (snapshot.goldTL = snapshot.goldTL || {}).state = { ...state, open: !!open, stop: open ? open.stop : null };
+        (snapshot.goldTL = snapshot.goldTL || {}).state = { ...state, open: !!open, stop: open ? open.stop : null, ...(tlSh ? { shadow: true } : {}) };
       } catch (e) { snapshot.errors.goldTL = String(e.message || e); }
     }
     if (key === 'xau' && config.goldEG) {
@@ -928,20 +957,20 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const okW = (e) => config.moshaBoWeekly ? w1At(e.t) === e.dir : e.flip;
         // where the chain stands now (status only, for the site): the last H4 BO, the H1 BO the other way after it, the M15 BO back
         snapshot.moshaBo = { state: { ...moshaChain(E1, E2, E3), w1: snapshot.goldW1, w1Src: snapshot.goldW1Src || null,
-          open: trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && x.status === 'open').length, pending: trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && x.status === 'pending').length } };
+          open: trades.filter((x) => x.k === 'mosha-bo' && ownStream(x) && x.status === 'open').length, pending: trades.filter((x) => x.k === 'mosha-bo' && ownStream(x) && x.status === 'pending').length, ...(ownerSh('mosha-bo') ? { shadow: true } : {}) } };
         // 5 Nov (owner: record everything): a chain that fails the weekly filter, the 2-open cap or the price check is kept as a
         // shadow trade (managed the same way, not our system), so each filter's cost shows forward
         if (e3 && now - e3.t <= 3600) {
           const e2 = before(E2, e3.t), e1 = before(E1, e3.t), d = e3.dir, id = `xau-moshabo-${e3.t}`;
           if (e1 && e2 && e1.dir === d && e2.dir === -d && e2.t > e1.t && !trades.some((x) => x.id === id)) {
             const entry = +e3.level.toFixed(2), stop = +(d < 0 ? e3.top + 0.3 : e3.bot - 0.3).toFixed(2), r0 = Math.abs(entry - stop);
-            const openBo = trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length;
+            const openBo = trades.filter((x) => x.k === 'mosha-bo' && ownStream(x) && (x.status === 'open' || x.status === 'pending')).length;
             // pull (5 Nov, forward-test field only): H1 bars from the VR extreme (the H1 leg's extreme after the H1 BO) to the M15 CF.
             // Research: on gold a slow pullback did better than a fast one in every period; since 6 Nov (mosha-slow) a pullback under config.moshaSlow H1 bars blocks the chain (shadow).
             let pull = null; try { const hb = src['1h'].bars, i2 = hb.findIndex((b) => b.time >= e2.t); let ext = d < 0 ? Infinity : -Infinity, iE = i2;
               for (let i = Math.max(0, i2); i < hb.length && hb[i].time < e3.t; i++) { if (d < 0 ? hb[i].low < ext : hb[i].high > ext) { ext = d < 0 ? hb[i].low : hb[i].high; iE = i; } }
               pull = i2 < 0 || !isFinite(ext) ? null : hb.filter((b) => b.time > hb[iE].time && b.time < e3.t).length; } catch (e) { pull = null; }
-            const blk = [!okW(e3) && 'weekly', openBo >= 2 && 'cap', !(d < 0 ? price < stop : price > stop) && 'price', !!(config.moshaSlow && pull != null && pull < config.moshaSlow) && 'momentum'].filter(Boolean);
+            const blk = [!okW(e3) && 'weekly', openBo >= 2 && 'cap', !(d < 0 ? price < stop : price > stop) && 'price', !!(config.moshaSlow && pull != null && pull < config.moshaSlow) && 'momentum', ownerSh('mosha-bo') && 'owner-shadow'].filter(Boolean);   // owner-shadow (11 Nov): every new chain is a paper shadow; alone in the list = the chain the rule takes
             if (r0 > 0.5) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
               side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
               // mosha-add (5 Nov): breakeven and a second unit at +1.5R, after +3R trail 1R behind the best price (cap 10R)
@@ -986,7 +1015,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     const pxr = (v) => +v.toFixed(Math.max(2, (M.dec ?? 2) + 1));   // price rounding by market (forex has 5 decimals)
     // pair kill switch (user rule pairs-live): a pair stops trading live once its live replica trades since the switch-on sum to
     // config.pairStopR (−10R); its signals stay research
-    const pairLive = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.R != null && x.closed && x.opened >= (config.pairsLiveAt || 0));
+    const pairLive = trades.filter((x) => x.k === 'replica' && x.market === key && ownStream(x) && x.R != null && x.closed && x.opened >= (config.pairsLiveAt || 0));
     const pairR = pairLive.reduce((a, x) => a + x.R, 0), pairStop = key !== 'xau' && config.pairStopR != null && pairR <= config.pairStopR;
     if (key !== 'xau') (snapshot.pairs = snapshot.pairs || {})[key] = { label: M.label, vol: pairVol == null ? null : +pairVol.toFixed(2), gate: isFinite(volGate) ? volGate : null, on: volOk && !pairStop && (config.replicaLive || []).includes(key), n: pairLive.length, R: +pairR.toFixed(2), stopped: pairStop };
     if (marketOpen(M, now)) {
@@ -1035,11 +1064,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // of v5: 2R +74.8R (Jan-Jun +0.08R / Jun-Nov +0.22R a trade) vs trailing +98.7R (+0.17R / +0.23R); every nearby setting beat 2R
         // risk cap (4 Nov): at most 3 replica trades open at once (3R at risk). Year replay: +101.5R vs +98.7R uncapped, both halves
         // slightly better, worst drawdown −20.8R vs −21.8R. A daily −2R stop was tested and rejected (−4.4R a year: the skipped trades won).
-        const capped = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.status === 'open' && !x.addOf).length >= 3;
+        const capped = trades.filter((x) => x.k === 'replica' && x.market === key && ownStream(x) && x.status === 'open' && !x.addOf).length >= 3;   // ownStream: the replica's own trades, live or (since 11 Nov) owner-shadow, so its risk rules keep reading its own record
         // risk (4 Nov, year replay: drawdown −20.8R → −14.2R, worst month −14.1R → −8.4R, profit +101.5R → +91.2R, both halves):
         // daily stop: no new replica trade once today's closed replica trades reach −1.5R (UTC day);
         // equity filter: half size while the replica's equity is below its own 50-trade average (seeded with the replay history)
-        const liveRp = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.R != null && x.closed);
+        const liveRp = trades.filter((x) => x.k === 'replica' && x.market === key && ownStream(x) && x.R != null && x.closed);
         const dayR = liveRp.filter((x) => Math.floor(x.closed / 86400) === Math.floor(now / 86400)).reduce((a, x) => a + x.R, 0), dayStop = dayR <= -1.5;
         let size = 1;
         { const hist = rd('research/replay-2w.json', { trades: [] }).trades.filter((x) => x.market === key && x.k === 'replica' && x.R != null && x.closed < (liveRp.length ? Math.min(...liveRp.map((y) => y.opened)) : Infinity))
@@ -1072,7 +1101,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           // a fixed target; at +goldAdd.atR R a second unit of goldAdd.size opens at market with the stop at this entry (see the loop)
           ...(key === 'xau' && config.goldRun ? { t1: pxr(entry + (g.sell ? -10 : 10) * Math.abs(pxr(entry) - pxr(stop))), rr: 10, trail: [config.goldRun.atR, config.goldRun.trail], runAfter: config.goldRun.atR } : {}),
           ...(key === 'xau' && config.goldAdd ? { addAt: config.goldAdd.atR, addSize: config.goldAdd.size } : {}),
-          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, msnr: msnrOf(g.sell), session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
+          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, msnr: msnrOf(g.sell), session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: ownerSh('replica'), blockedBy: ownerSh('replica') ? ['owner-shadow'] : [],   // supported-book (owner, 11 Nov): a paper shadow, same rule
           feed: FEED, note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `${config.goldRun ? `after +${config.goldRun.atR}R the stop trails ${config.goldRun.trail}R behind the best price (cap 10R)` : `fixed target ${config.goldFixedR}R`}${config.goldBeR ? `, stop to breakeven at +${config.goldBeR}R` : ''}${config.goldAdd ? `, a second unit added at +${config.goldAdd.atR}R` : ''}` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
       }
     }
@@ -1647,7 +1676,7 @@ config.history = config.history.slice(-200);
 try {
   const model = costModel(MARKETS, { symbols: BROKER_SYMBOLS, brokerInfo: rd('ctrader/symbols.json', null), mirrorMap: ((rd('ctrader/mirror.json', {}) || {}).state || {}).map });
   annotateCosts(trades, MARKETS, model); backfillDrift(trades);
-  snapshot.costs = { model, ...costSummary(trades, MARKETS) };
+  snapshot.costs = { model, ...costSummary(trades, MARKETS), financing: { from: config.financingFrom || null, perNight: Object.fromEntries(Object.entries(FIN).map(([k, v]) => [k, v.long])), asOf: FIN.xau.asOf, src: FIN.xau.src } };
   snapshot.staleGuard = staleStats(trades);
   const gaps = trades.filter((x) => x.gapR || x.dataGap);
   snapshot.fillChecks = { gapStops: gaps.filter((x) => x.gapR).length, gapR: +gaps.reduce((a, x) => a + (x.gapR || 0), 0).toFixed(2), dataGaps: gaps.filter((x) => x.dataGap).length,
@@ -1663,7 +1692,7 @@ wr('trades.json', trades);
 try {
   const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
-    .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
+    .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).filter((x) => !x.shadow).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));   // a shadow open run (owner, 11 Nov) is never in the feed
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');
   const head = ['id', 'market', 'k', 'side', 'status', 'entryMode', 'entry', 'stop', 't1', 'tp1', 'trail0', 'trail1', 'beAt', 'addOf', 'size', 'opened', 'filled', 'closed', 'validFor', 'maxHold', 'exitRule', 'midStop', 'exitAt', 'R', 'exit'];
   const lines = [`# council-bridge v1 generated ${now} ${new Date(now * 1000).toISOString()}`, head.join(',')].concat(rows.map((x) => [x.id, x.market, x.k, x.side, x.status, x.entryMode || (x.k === 'mosha-bo' ? 'limit' : 'market'), x.entry, x.stop, x.t1, x.tp1, x.trail ? x.trail[0] : '', x.trail ? x.trail[1] : '', x.beAt, x.addOf, x.size, x.opened, x.filled, x.closed, x.validFor, x.maxHold, x.exitRule, x.midStop, x.exitAt, x.R, x.exit].map(f).join(',')));
@@ -2016,6 +2045,9 @@ try {
         // daily closes known before the entry, META = this stream's net R over the last 365 days; written on the trade only, the rule
         // above reads neither (tests/nq-regime.test.mjs pins it byte for byte). Shadow stream 'nyflip-trend' (user rule nq-regime-shadow):
         // a paper copy of the trade, taken only when |TS| >= 0.295, managed by the open-trade loop above like every other nq-open record.
+        // supported-book (owner, 11 Nov 2026): the open run is a paper shadow. The push above is untouched (same signal, entry, stop and
+        // exit); the record is only marked, so it is managed by the same loop and never alerted, ticketed or sent to the MT5 feed.
+        if (ownerSh('nq-open')) Object.assign(research.find((x) => x.id === `nq-nyflip-${ny.d}`), { shadow: true, blockedBy: ['owner-shadow'] });
         try {
           const live = research.find((x) => x.id === `nq-nyflip-${ny.d}`), rows = await regimeDaily(MD_BASE);
           live.regime = regimeOf(rows, research, live.opened, config.nqRegimeShadow);
@@ -2090,6 +2122,11 @@ try {
   snapshot.research.replica = { all: sum(rpx), pass: sum(rpx.filter((x) => x.pass && x.v >= 2)), v5: sum(rpx.filter((x) => x.v5)), star: sum(rpx.filter((x) => x.star)) };
   // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
+  // replica-mirror-gold-only (owner, 11 Nov): the count the rule's condition is read on. Status only: nothing resumes by itself.
+  if (config.mirrorReplica && Array.isArray(config.mirrorReplica.markets)) { const mr = config.mirrorReplica, u = mr.until || { n: 200, grossR: 0 };
+    const a = sum(rp.filter((x) => !mr.markets.includes(x.market) && (x.closed || 0) >= (mr.since || 0)));
+    snapshot.mirrorReplica = { markets: mr.markets, since: mr.since || null, closed: a.closed, grossR: a.R, need: u.n, met: a.closed >= u.n && a.R > u.grossR }; }
+  snapshot.ownerShadow = config.ownerShadow || null;
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   snapshot.research.goldNyrun = sum(research.filter((x) => x.k === 'gold-nyrun'));
   for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'nyflip-x', 'nyflip-trend', 'sd2ifvg', 'sd3mom', '80pct', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid));
@@ -2124,7 +2161,7 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
   if (!quiet && ev.length) Object.assign(snapshot.errors, await sendAlerts(ev, { topic, tgTok, tgChat }));
   if (ev.length) wr('trades.json', trades);
   // Mosha BO heads-up (8 Nov, council/alerts.mjs moshaArmed): H4 BO + H1 retracement in place, one M15 BO from a trade; marked in state.moshaArmedSent once a channel took it
-  try { const ma = quiet || !snapshot.moshaBo ? null : moshaArmed(snapshot.moshaBo.state, state.moshaArmedSent, now);
+  try { const ma = quiet || !snapshot.moshaBo || ownerSh('mosha-bo') ? null : moshaArmed(snapshot.moshaBo.state, state.moshaArmedSent, now);
     if (ma) { const e = await sendAlerts([ma.ev], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
       if (Object.keys(e).length < tried) { state.moshaArmedSent = ma.mark; wr('state.json', state); }
       for (const [c, m] of Object.entries(e)) snapshot.errors[`moshaArmed_${c}`] = m; }

@@ -69,6 +69,10 @@ tested). Full signatures are in each file's header comments and its tests.
   reveals it.
 - Extras: `GET ?get=dataset&edge=` (Layer B rows, mentor label and outcome kept apart), `errorClass` on corrections.
 - Local runs: set `ACADEMY_STORE_DIR` to use a file store instead of the Blob.
+- Blob reads ask the origin (`?cache=0`), never the CDN copy: an overwritten file is served from the CDN with its old bytes
+  for up to a minute, which made another function instance miss a row stored seconds earlier (11 Nov 2026: "no such attempt
+  for this edge" on a correction). A correction that cannot be saved keeps the form and offers "Try again"
+  (`MXAC.correctionFailure`, `saveCorrection`); `tests/academy-correction.test.mjs`, audit section 11l.
 - The language-model adapter is off without `ACADEMY_LLM_KEY`; `explain` and `analyse` then answer `{ available: false }`.
 
 ## The analyst · `api/_academy-analyst.js`, `analyse` in `api/academy.js`, `assets/academy-analyst.js` (tests: `tests/academy-analyst.test.mjs`)

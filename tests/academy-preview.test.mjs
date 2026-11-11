@@ -17,7 +17,7 @@ function fakeBlob() {
   return { files, io: () => ({ recent: new Map(), tails: new Map(),
     blob: { async list({ prefix }) { return { blobs: [...files.keys()].filter((k) => k.startsWith(prefix)).map((k) => ({ pathname: k, url: 'blob://' + k, uploadedAt: new Date(0).toISOString() })) }; },
       async put(p, json) { files.set(p, json); return { pathname: p }; } },
-    fetch: async (url) => { const k = String(url).replace('blob://', ''); return files.has(k) ? { ok: true, json: async () => JSON.parse(files.get(k)) } : { ok: false, status: 404 }; } }) };
+    fetch: async (url) => { const k = String(url).replace('blob://', '').replace(/\?cache=0$/, ''); return files.has(k) ? { ok: true, json: async () => JSON.parse(files.get(k)) } : { ok: false, status: 404 }; } }) };
 }
 
 test('the storage folder follows the deployment: production and local runs use academy/, a preview uses academy-preview/', () => {

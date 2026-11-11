@@ -2733,6 +2733,16 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 })();
 </script>
 <script>
+/* Simple phone view (11 Nov 2026): on a screen up to 640 px the Desk opens in its simple view unless this device chose the
+   full one (localStorage ms-phone = "full"). Set before the first paint so nothing folds after it; see #ms-ps-css. */
+(function () {
+  var R = document.documentElement, mq = window.matchMedia ? matchMedia('(max-width: 640px)') : null;
+  function set() { var full = false; try { full = localStorage.getItem('ms-phone') === 'full'; } catch (e) {} if (mq && mq.matches && !full) R.dataset.phone = 'simple'; else delete R.dataset.phone; }
+  set(); if (mq && mq.addEventListener) mq.addEventListener('change', function () { set(); document.dispatchEvent(new CustomEvent('ms:phone')); });
+  window.msPhoneView = function (v) { try { if (v === 'full') localStorage.setItem('ms-phone', 'full'); else localStorage.removeItem('ms-phone'); } catch (e) {} set(); document.dispatchEvent(new CustomEvent('ms:phone')); };
+})();
+</script>
+<script>
 /* shell (7 Nov): pick the theme before the first paint. A saved choice wins; otherwise follow the device (light or dark).
    The phone browser bar (theme-color) and the form controls (color-scheme) follow the page theme from the start. */
 (function () {
@@ -4696,6 +4706,100 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   #v-council #ms-cp-overview button { min-width: 44px; }
 }
 </style>
+<style id="ms-ps-css">
+/* Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
+   The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
+   ms-phone = "full" switches it off on that device). Everything this view adds carries .ps-only and is not drawn anywhere
+   else; every other rule sits inside the phone media query, so a wider screen and the Full view are untouched. Nothing is
+   removed: a [data-ps] section folds to its one-line row (.ps-fold) and opens on tap. Checked by tests/qa-sweep.test.mjs. */
+.ps-only { display: none; }
+@media (max-width: 640px) {
+  /* the switch, at the end of every view, in both phone views */
+  .ps-sw { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 28px 0 4px; color: var(--ink-dim); font: 500 13px var(--sans); }
+  .ps-sw-b { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+  .ps-sw button { min-height: 44px; min-width: 76px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--ink-dim); font: 600 13px var(--sans); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ps-sw button[aria-pressed="true"] { background: var(--panel-raised, var(--panel)); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong, var(--line)); }
+  .ps-sw button:focus-visible, .ps-fold:focus-visible, .ps-rows a:focus-visible, .ps-all:focus-visible, .ps-need:focus-visible, .ps-go a:focus-visible, .ps-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  html[data-role="public"] .ps-sw { display: none; }   /* guests: one page, already ordered for them */
+
+  html[data-phone="simple"] .ps-only:not([hidden]):not(.ps-sw) { display: block; }
+  html[data-phone="simple"] [data-ps]:not([data-ps-open]) { display: none !important; }
+
+  /* ── Home: the answer, what is open, what waits, where to go ── */
+  html[data-phone="simple"] #v-home .h-quick { display: none; }
+  html[data-phone="simple"] #v-home .h-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  html[data-phone="simple"] #v-home .h-top { margin-bottom: 0; }
+  html[data-phone="simple"] .ps-home { margin: 4px 0 18px; }
+  .ps-k { margin: 0; color: var(--ink-dim); font: 500 13px/1.4 var(--sans); letter-spacing: 0; }
+  .ps-ans { padding: 6px 0 18px; min-height: 104px; box-sizing: border-box; }
+  .ps-a { margin: 4px 0 6px; color: var(--ink); font: 600 28px/1.15 var(--sans); letter-spacing: -.01em; text-wrap: balance; }
+  .ps-a b { font: 600 28px/1.15 var(--mono); font-variant-numeric: tabular-nums; }
+  .ps-a small b { font: 600 15px/1.4 var(--mono); }
+  .ps-a small { display: block; margin-top: 4px; color: var(--ink-dim); font: 500 15px/1.4 var(--sans); letter-spacing: 0; }
+  .ps-a-s { margin: 0; color: var(--ink-dim); font: 400 14px/1.5 var(--sans); }
+  .ps-a-s b { font-weight: 600; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .ps-a-f { display: block; color: var(--ink-faint); font-size: 12.5px; }
+  .ps-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid var(--line-soft, var(--line)); }
+  .ps-h .ps-k { color: var(--ink); font-weight: 600; font-size: 15px; }
+  .ps-o-n { color: var(--ink-dim); font: 400 13px var(--sans); text-align: right; }
+  .ps-o-n b { font-family: var(--mono); font-weight: 600; }
+  .ps-rows { list-style: none; margin: 6px 0 0; padding: 0; }
+  .ps-rows[aria-busy="true"] { min-height: 156px; }
+  .ps-rows li + li { border-top: 1px solid var(--line-soft, var(--line)); }
+  .ps-rows a { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; min-height: 52px; padding: 6px 0; color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  .ps-rows a:active { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+  .ps-rows .chip { font: 600 12px var(--mono); padding: 3px 8px; border-radius: 6px; }
+  .ps-rows .chip.buy { color: var(--buy-ink); } .ps-rows .chip.sell { color: var(--sell-ink); }   /* badge inks: text on a tint of its own colour */
+  .ps-r-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px var(--sans); }
+  .ps-r-t small { margin-left: 8px; color: var(--ink-dim); font: 400 13px var(--sans); }
+  .ps-r-r { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; }
+  .ps-r-r.wait { color: var(--ink-dim); font: 500 13px var(--sans); }
+  .ps-rows .ps-none { padding: 14px 0; color: var(--ink-dim); font: 400 14px/1.5 var(--sans); }
+  html[data-phone="simple"] .ps-all:not([hidden]) { display: flex; }
+  .ps-all, .ps-more { align-items: center; min-height: 44px; color: var(--accent-ink, var(--accent)); font: 500 14px var(--sans); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  .ps-all::after { content: "›"; margin-left: 6px; font-size: 17px; line-height: 1; }
+  html[data-phone="simple"] .ps-only.ps-need:not([hidden]) { display: grid; }
+  .ps-need { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; min-height: 60px; margin-top: 10px; padding: 10px 14px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  .ps-need i { grid-row: span 2; width: 10px; height: 10px; border-radius: 50%; background: var(--buy); }
+  .ps-need[data-n]:not([data-n="0"]) { border-color: color-mix(in srgb, var(--warn, #f0a500) 55%, transparent); background: color-mix(in srgb, var(--warn, #f0a500) 9%, transparent); }
+  .ps-need[data-n]:not([data-n="0"]) i { background: var(--warn, #f0a500); }
+  .ps-need b { font: 600 15px/1.3 var(--sans); }
+  .ps-need small { grid-column: 2; color: var(--ink-dim); font: 400 13px/1.4 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ps-need::after { content: "›"; grid-column: 3; grid-row: 1 / span 2; color: var(--ink-dim); font-size: 20px; }
+  html[data-role="viewer"] #ps-need, html:not([data-mosha="teach"]) #ps-need-m, html[data-role="owner"] #ps-need-m { display: none !important; }
+  html[data-phone="simple"] .ps-only.ps-go:not([hidden]) { display: grid; }
+  .ps-go { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .ps-go a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); font: 500 14px var(--sans); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  .ps-go a:active { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+  .ps-go-n:not(:empty) { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--sell-soft, rgba(244,95,119,.16)); color: var(--sell-ink, var(--sell)); font: 600 12px/1.5 var(--mono); text-align: center; }
+  html[data-role="viewer"] .ps-go, html[data-deny~="council"] .ps-go a[data-c] { display: none !important; }
+
+  /* ── a folded section: one row, opens on tap ── */
+  html[data-phone="simple"] .ps-only.ps-fold:not([hidden]) { display: grid; }
+  .ps-fold { grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 54px; margin: 0; padding: 8px 2px; border: 0; border-top: 1px solid var(--line-soft, var(--line)); border-radius: 0; background: none; color: var(--ink); text-align: left; font: 600 15px var(--sans); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ps-fold > span:first-child { white-space: nowrap; }
+  .ps-f-s { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-dim); font: 400 13px var(--sans); text-align: right; }
+  .ps-fold::after { content: ""; width: 8px; height: 8px; margin: 0 6px 3px 2px; border-right: 2px solid var(--ink-dim); border-bottom: 2px solid var(--ink-dim); transform: rotate(45deg); transition: transform .18s cubic-bezier(.23,1,.32,1); }
+  .ps-fold[aria-expanded="true"]::after { transform: rotate(225deg); margin-bottom: -3px; }
+  .ps-fold[aria-expanded="true"] { margin-bottom: 10px; }
+  .ps-fold[aria-expanded="true"] .ps-f-s { visibility: hidden; }
+  html[data-phone="simple"] [data-ps][data-ps-open] { margin-bottom: 14px; }
+  html[data-phone="simple"] :is(#v-ict, #v-mosha, #v-profile) .ps-fold { grid-column: 1 / -1; }
+  html[data-phone="simple"] #v-home :is(.h-grid, .h-main, .h-side, .h-go) { display: block; margin: 0; padding: 0; gap: 0; }
+  html[data-phone="simple"][data-role="viewer"] #v-home .h-side { display: none; }
+  html[data-phone="simple"] #v-home .h-go[data-ps-open] { display: grid; gap: 8px; }
+  html[data-phone="simple"] #v-home .h-pulse[data-ps-open] { margin-top: 0; }
+
+  /* ── Council overview: the answer, then the first three positions ── */
+  .ps-c-ans { padding: 2px 2px 4px; }
+  html[data-phone="simple"] #ms-active-card:not([data-ps-all]) #ms-active > li:nth-child(n+4) { display: none; }
+  html[data-phone="simple"] #ms-active-card:not([data-ps-all]) :is(#ms-active-sum, #ms-active > li > .a-d, #ms-active > li > .a-m, #ms-active > li > details > summary > .a-d) { display: none; }
+  html[data-phone="simple"] #ms-active-card .ps-more { width: 100%; border: 0; border-top: 1px solid var(--line-soft, var(--line)); background: none; cursor: pointer; padding: 0 4px; }
+  html[data-phone="simple"] .ps-only.ps-more:not([hidden]) { display: flex; }
+
+  @media (prefers-reduced-motion: reduce) { .ps-fold::after { transition: none; } }
+}
+</style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -4946,8 +5050,18 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#council/macro" class="adm">Macro desk</a><a href="#council/week" class="adm">This week</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
-    <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
-    <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
+    <div class="ps-only ps-home" id="ps-home">
+      <section class="ps-ans" aria-labelledby="ps-a-k"><p class="ps-k" id="ps-a-k">Closed today · paper trading</p><h2 class="ps-a" id="ps-a">Loading the results…</h2><p class="ps-a-s" id="ps-a-s"></p></section>
+      <section aria-labelledby="ps-o-k"><div class="ps-h"><h2 class="ps-k" id="ps-o-k">Open now</h2><span class="ps-o-n" id="ps-o-n"></span></div>
+        <ul class="ps-rows" id="ps-o-list" aria-busy="true"></ul><a class="ps-all" id="ps-o-all" href="#council/overview" hidden>All open trades</a></section>
+      <a class="ps-only ps-need adm" id="ps-need" href="#council/week"><i aria-hidden="true"></i><b id="ps-need-t">Checking what waits on you…</b><small id="ps-need-s"></small></a>
+      <a class="ps-only ps-need" id="ps-need-m" href="#mosha"><i aria-hidden="true"></i><b>Your teaching desk</b><small>The desk's answers to check are at its top.</small></a>
+      <nav class="ps-only ps-go" id="ps-go" aria-label="Go to"><a href="#council/calendar">Calendar</a><a href="#council/week" class="adm" data-c>This week</a><a href="#council/review" class="adm" data-c>Loss review<span class="ps-go-n" id="ps-go-n"></span></a><a href="#council/trades" data-c>All trades</a></nav>
+    </div>
+    <button type="button" class="ps-only ps-fold" data-ps-for="today" aria-expanded="false"><span>Week and month</span><span class="ps-f-s" id="ps-s-today"></span></button>
+    <div class="h-today" id="h-today" role="group" aria-label="Results today" data-ps="today"></div>
+    <button type="button" class="ps-only ps-fold" data-ps-for="mk" aria-expanded="false"><span>Markets now</span><span class="ps-f-s" id="ps-s-mk"></span></button>
+    <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" data-ps="mk" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
     <script>
     // Desk load (11 Nov): the markets row and the date line hold their place from the first paint. The app script further down draws
     // the same empty cards (one per market with live quotes: 10, checked by tests/desk-load.test.mjs) and then fills them; before, the
@@ -4959,32 +5073,37 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </script>
     <div class="h-grid">
       <div class="h-main">
-      <a class="tile wide adm" href="#setup">
+      <button type="button" class="ps-only ps-fold adm" data-ps-for="setup" aria-expanded="false"><span>Setup now</span><span class="ps-f-s" id="ps-s-setup"></span></button>
+      <a class="tile wide adm" href="#setup" data-ps="setup">
         <span class="tile-k">Setup now <span class="ms-chip" id="h-bias">—</span></span>
         <span class="h-prog-row"><span class="h-prog" id="h-prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="h-prog-t" id="h-prog-t"></span></span>
         <span class="tile-big" id="h-step">Loading live candles…</span>
         <span class="tile-sub" id="h-align"></span>
         <span class="tile-go">Open setup</span>
       </a>
-      <div class="card h-act">
+      <button type="button" class="ps-only ps-fold" data-ps-for="act" aria-expanded="false"><span>Biggest movers</span><span class="ps-f-s" id="ps-s-act">largest floating results, shadow included</span></button>
+      <div class="card h-act" data-ps="act">
         <div class="ms-k"><span>Open positions <small id="h-active">—</small></span><a href="#council/overview" class="c-link">All active trades</a></div>
         <ul class="h-act-list" id="h-act-list"><li class="empty">Loading the council…</li></ul>
       </div>
       </div>
       <div class="h-side">
-      <section class="tile tile-s h-ring" id="h-ring" aria-labelledby="h-ring-k">
+      <button type="button" class="ps-only ps-fold" data-ps-for="ring" aria-expanded="false"><span>Sessions</span><span class="ps-f-s" id="ps-s-ring"></span></button>
+      <section class="tile tile-s h-ring" id="h-ring" aria-labelledby="h-ring-k" data-ps="ring">
         <span class="tile-k" id="h-ring-k">Sessions <span class="h-ring-tz" id="h-ring-tz"></span></span>
         <div class="h-ring-b"><svg class="h-ring-svg" id="h-ring-svg" viewBox="0 0 200 200" role="img" aria-label="24-hour session clock"></svg>
           <ul class="h-ring-lg" aria-hidden="true"><li class="as"><i></i>Asia</li><li class="lo"><i></i>London</li><li class="ny"><i></i>New York</li><li class="nw"><i></i>High-impact news</li></ul></div>
         <p class="h-ring-n" id="h-ring-n" aria-live="polite"></p>
       </section>
-      <a class="tile tile-s adm" href="#setup">
+      <button type="button" class="ps-only ps-fold adm" data-ps-for="ready" aria-expanded="false"><span>Possible trades</span><span class="ps-f-s" id="ps-s-ready"></span></button>
+      <a class="tile tile-s adm" href="#setup" data-ps="ready">
         <span class="tile-k">Possible trades</span>
         <span class="tile-big" id="h-ready">—</span>
         <span class="tile-sub" id="h-best"></span>
         <span class="tile-go">See trades</span>
       </a>
-      <nav class="h-go" aria-label="Go to">
+      <button type="button" class="ps-only ps-fold" data-ps-for="go" aria-expanded="false"><span>Sections</span><span class="ps-f-s" id="ps-s-go">the other pages of the Desk</span></button>
+      <nav class="h-go" aria-label="Go to" data-ps="go">
       <a class="tile tile-s h-go-i h-go-council" href="#council"><i class="h-go-ico" aria-hidden="true"></i>
         <span class="tile-k">AI council</span>
         <span class="tile-big" id="h-council">Starting up</span>
@@ -5012,7 +5131,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </nav>
       </div>
     </div>
-    <section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
+    <button type="button" class="ps-only ps-fold adm" data-ps-for="pulse" aria-expanded="false"><span>Market pulse</span><span class="ps-f-s" id="ps-s-pulse">trend on D1 · H4 · H1</span></button><section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" data-ps="pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
   </section>
 
   <!-- ─── Setup: checklist + possible trades ─── -->
@@ -5110,9 +5229,11 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </div>
     <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro" aria-selected="false">Macro<span class="c-nav-n" id="ms-cn-n-macro"></span></button><button type="button" role="tab" class="adm" id="ms-cn-week" data-pane="week" aria-controls="ms-cp-week" aria-selected="false">This week<span class="c-nav-n" id="ms-cn-n-week"></span></button></nav>
     <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
+      <div class="ps-only ps-ans ps-c-ans" id="ps-c-ans"><p class="ps-k">Open now · paper trading</p><h2 class="ps-a" id="ps-c-a">Loading the open trades…</h2><p class="ps-a-s" id="ps-c-s"></p></div>
       <div class="card c-active" id="ms-active-card">
         <div class="ms-k"><span role="heading" aria-level="2">Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
         <ul class="c-act" id="ms-active"></ul>
+        <button type="button" class="ps-only ps-more" id="ps-act-more" aria-controls="ms-active" aria-expanded="false" hidden>Show all</button>
       </div>
       <div class="card c-cal">
         <div class="ms-k"><span role="heading" aria-level="2">Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><input type="checkbox" id="ms-cal-sh" checked hidden style="display:none"><input type="checkbox" id="ms-cal-rp" checked hidden style="display:none"></span></div>
@@ -5135,6 +5256,11 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
+      <div class="card adm" id="ms-sys-book">
+        <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): the two that stay live are the nearest, not proven.</p>
+        <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
+      </div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
@@ -5143,7 +5269,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
       </div>
       <div class="card c-nq adm">
-        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · our system (paper)</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · paper shadow since 11 Nov (our system before)</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
           <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
@@ -5153,7 +5279,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
       <div class="card c-rep adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · trades only when gold is volatile</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · paper shadow since 11 Nov · trades only when gold is volatile</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (judged on 2023 onwards): at +1.5R a second unit is added with its stop at the first entry (since 6 Nov; the 5 Nov replay quoted above added at +2R; it shows as a separate “Replica add” trade, counted as 2R of risk); at +2R the stop moves to breakeven; after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
           <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
@@ -5206,13 +5332,13 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
         <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
-        <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
+        <p class="ms-note dc-foot">Each system's record after costs (overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests it is compared with do not carry it) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
       <div class="card c-expect adm" id="ms-expect">
         <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
         <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
         <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs, on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (since 11 Nov 2026 also after overnight financing for Gold trend, Gold trend fast, Gold daily engulf and the H4 trendline, at the demo broker's rate of that day; not computed for the replica, Mosha BO and the momentum pullback), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
       </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
@@ -5809,6 +5935,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 
 
   <p class="foot">Gold and forex candles from OANDA (spot, mid price); crypto from Binance and Kraken. Without OANDA the page falls back to exchange feeds, with gold aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
+  <div class="ps-only ps-sw" id="ps-sw" role="group" aria-label="Phone view"><span>Phone view</span><span class="ps-sw-b"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
   <nav class="btab" aria-label="Main sections">
     <a class="btab-brand" href="#home" aria-label="Aurum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span>Aurum</span></a>
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
@@ -9171,6 +9298,7 @@ function msNextSetup(bars, A) {
     const closed = sysClosed(), other = PUB ? [] : (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && !(SYS_K.includes(x.k) && !x.shadow));
     const sum = (t) => { const a = closed.filter((x) => x.closed >= t), o = other.filter((x) => x.closed >= t); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), oR: o.reduce((q, x) => q + x.R, 0), on: o.length }; };
     const F = window.FLOAT || null, D = sum(d0), W = sum(w0), M = sum(m0);
+    if (!PUB && COUNCIL.trades) { try { window.MS_TODAY = { D, W, M }; document.dispatchEvent(new CustomEvent('ms:today')); } catch (e) {} }   // simple phone view (#ms-ps-js)
     const cell = (k, v, sub, c, x) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span>${x || ''}</div>`;
     // last 7 weekdays as small squares (green win day, red loss day, grey none), today last
     const strip = (() => { const out = []; for (let k = 0, back = 0; out.length < 7 && back < 14; back++) { const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back), wd = day.getDay(); if (wd === 0 || wd === 6) continue;
@@ -12773,6 +12901,9 @@ function gpStats(T) {
     gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast && !c.goldTrendFastShadow; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
   var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
   var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;
+  // supported-book (owner, 11 Nov 2026): config.ownerShadow[k] = unix time from which the system's new trades are paper shadows
+  var OWNER_SH = function (c, k) { var o = c && c.ownerShadow; return o && o[k] ? +o[k] || 1 : 0; };
+  var shWhy = function (t) { return 'paper shadow by the owner' + (t > 1 ? ' since ' + new Date(t * 1000).toISOString().slice(0, 10) : '') + ': same rule, recorded, never alerted; its earlier live trades stay in its record'; };
   var num = function (v) { return typeof v === 'number' && isFinite(v); };
   var closedSt = function (s) { return s === 'win' || s === 'loss' || s === 'be'; };
   var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
@@ -12910,6 +13041,7 @@ function gpStats(T) {
     var RP = D.replay && Array.isArray(D.replay.trades) ? D.replay.trades.filter(function (x) { return x.k !== 'nq-open' || x.session === 'nyflip'; }) : [];
     RP.forEach(function (x) { if (x && x.k && !names[x.k]) names[x.k] = x.name || x.k; });
     var status = function (k) {
+      if ((SYS_K.indexOf(k) >= 0 || k === 'nq-open') && OWNER_SH(cfg, k)) return ['shadow', shWhy(OWNER_SH(cfg, k))];
       if (SYS_K.indexOf(k) >= 0) return SYS_ON[k] && !SYS_ON[k](cfg) ? ['failed', 'switched off in the council config'] : ['live', 'main system, trades live on paper'];
       if (k === 'nq-open') return ['live', 'main system (NQ New York open run), forward paper'];
       var f = F[k] || {};
@@ -12923,6 +13055,7 @@ function gpStats(T) {
       var P = props.filter(function (p) { return p.setup === k && ASK.test(p.kind); });
       if (P.length) return { n: P.length, text: P.map(function (p) { return cap(p.label || p.kind); }).join(' · '), href: '#council/systems' };
       if (st === 'failed') return { text: 'Nothing · switched off' };
+      if (st === 'shadow' && (SYS_K.indexOf(k) >= 0 || k === 'nq-open')) return { text: 'Nothing · you moved it to shadow; its forward record decides' };
       if (st === 'live') return { text: SYS_K.indexOf(k) >= 0 || k === 'nq-open' ? 'Nothing pending' : 'Nothing pending · the guard moves it back at −0.30R a trade over 20+' };
       return { text: 'Nothing yet · the Coach proposes a live slot at 100+ replay trades, +0.10R a trade, both halves up', shadow: 1 };
     };
@@ -13454,6 +13587,8 @@ function gpStats(T) {
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'Edge-decay monitor: ' + D.error : 'No edge-decay reading yet: the Coach writes one every 6 hours.'; body.innerHTML = ''; return; }
     var S = D.systems, T = tally(S), dec = T.decaying, wat = T.watch;
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
+    // a shadow system says since when (shadowSince, council/decay.mjs): its earlier live trades are still in its record
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     // the sentence counts what the rows say: a system with too few trades to judge is not "healthy", and a shadow system
     // the monitor calls decaying or on watch is named too (11 Nov: "8 healthy" stood over a "Too few" row and a "Decaying" one)
     sum.innerHTML = '<b>' + T.live.length + '</b> live systems: <b class="' + (dec.length ? 'neg' : '') + '">' + dec.length + ' decaying</b>' + names(dec) + ', ' + wat.length + ' on watch' + names(wat)
@@ -13464,7 +13599,7 @@ function gpStats(T) {
     body.innerHTML = S.slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ((ORDER[a.status] || 0) - (ORDER[b.status] || 0)); }).map(function (s) {
       var st = s.few ? 'few' : s.status, r = s.roll || {}, c = s.cusRef || {}, z = s.cusZero || {}, d = s.dd || {};
       var rec = (s.nLive || 0) + ' forward' + (s.nReplay ? ' + ' + s.nReplay + ' replay' : '') + (s.nHist ? ' + ' + s.nHist + ' rebuild' : '');
-      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
+      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
         + '<td class="dc-l"><span class="dc-st st-' + esc(st) + '">' + (s.few ? 'Too few' : LBL[s.status] || esc(s.status)) + '</span></td>'
         + '<td>' + (r.n ? cR(r.exp) + ' <small class="dc-n">(' + r.n + ')</small>' : '<small class="dc-n">—</small>') + '</td>'
         + '<td>' + meter(c.s, c.h) + '</td><td>' + esc(num(z.s) ? z.s : '—') + '</td>'
@@ -13513,12 +13648,13 @@ function gpStats(T) {
     sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
       + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.';
     var at = $('ms-expect-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     var ORD = function (s) { return !s.live ? 3 : s.forward && s.forward.out === 'below' ? 0 : s.forward && s.forward.out === 'above' ? 1 : 2; };
     body.innerHTML = S.slice().sort(function (a, b) { return ORD(a) - ORD(b); }).map(function (s) {
       var h = s.honest || {}, pt = s.perTrade || {}, py = s.perYear || {}, d = s.dd || {}, sh = s.live ? '' : ' ex-shadow';
-      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
+      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
         + '<td class="ex-l ex-val" data-l="Forward so far">' + fwdCell(s) + '</td>'
-        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small></td>'
+        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small>' + (s.fin && s.fin.before && num(s.fin.before.exp) ? '<small>after financing; ' + fR(s.fin.before.exp) + ' before</small>' : '') + '</td>'
         + '<td class="ex-val" data-l="In a year"><b class="' + cls(py.exp) + '">' + fR(py.exp, 1) + '</b><small>' + esc(fBand(py.lo, py.hi)) + '</small></td>'
         + '<td class="ex-val" data-l="Drawdown"><b class="neg">' + esc(fDD(d.lo, d.hi)) + '</b><small>worst seen −' + esc(num(d.worst) ? (d.worst < 10 ? d.worst.toFixed(1) : d.worst.toFixed(0)) : '—') + 'R</small></td>'
         + '<td class="ex-val" data-l="Trades a year"><b>' + (num(py.trades) ? Math.round(py.trades) : '—') + '</b><small>backtest ' + fR(s.backtest && s.backtest.exp) + ' a trade</small></td>'
@@ -13883,7 +14019,7 @@ function gpStats(T) {
         + '<span class="wk-val">' + fR(r.net) + (r.ck ? '' : '<small>gross</small>') + '</span></button>' + x + '</li>';
     }).join('');
     $('ms-wk-tot').innerHTML = GL[st.g] + ' total after costs <b class="' + (bk.net > 0.004 ? 'pos' : bk.net < -0.004 ? 'neg' : '') + '">' + fR(bk.net) + '</b> over ' + plural(bk.n, 'trade') + ' (' + bk.w + ' won, ' + bk.l + ' lost; gross ' + fR(bk.R) + ').';
-    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
+    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade, and overnight financing on gold buys closed since 11 Nov 2026' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
   }
 
   // ─── best and worst ───
@@ -14175,6 +14311,146 @@ function gpStats(T) {
 </script>
 <!-- Desk polish (9 Nov 2026, owner: "smoother", "buttons organised", "simpler"): one ordered chart toolbar, context folded on phones,
      pulses on the compositor, a header that fits a 390 px phone, aligned council rows. Scoped to Home, Charts, Council and the header. -->
+<script id="ms-ps-js">
+// Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked
+// out (window.MS_TODAY and window.MS_LIVE from the main script, window.FLOAT, MS_WEEK.decisions on the loaded council files)
+// and fetches nothing. Display only. Pure pieces on window.MS_PS for tests/qa-sweep.test.mjs.
+(function () {
+  var R = document.documentElement, $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var rT = function (v) { return typeof v === 'number' && isFinite(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(2) + 'R' : '—'; };
+  var cls = function (v) { return v > 0.004 ? 'pos' : v < -0.004 ? 'neg' : ''; };
+  var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
+  // today in one sentence: the forward paper result of the main systems (what the Today strip counts), before costs
+  function answer(T) {
+    if (!T || !T.D) return null;
+    var D = T.D, W = T.W || { n: 0, R: 0 };
+    return { head: D.n ? 'Today: <b class="' + cls(D.R) + '">' + rT(D.R) + '</b><small>on ' + pl(D.n, 'closed trade') + '</small>' : 'Nothing closed today',
+      sub: W.n ? 'This week <b class="' + cls(W.R) + '">' + rT(W.R) + '</b> on ' + pl(W.n, 'closed trade') + '.' : 'Nothing closed this week yet.' };
+  }
+  // what is open now: one row per market and side; our own trades and the shadow ones (setups a rule blocked, followed on
+  // paper) are never added into one figure: our own rows come first, then the shadow rows by the size of the floating result
+  function openRows(items) {
+    var G = {}, order = [];
+    (items || []).forEach(function (i) { var x = i && i.x; if (!x || x.tracker) return; var k = x.market + '|' + x.side + '|' + (x.shadow ? 's' : 'o'); if (!G[k]) { G[k] = { x: x, n: 0, sh: !!x.shadow, fl: null, id: x.id }; order.push(k); }
+      var g = G[k]; g.n++; if (typeof i.fl === 'number') g.fl = (g.fl || 0) + i.fl; });
+    return order.map(function (k) { return G[k]; }).sort(function (a, b) { return (a.sh - b.sh) || (Math.abs(b.fl || 0) - Math.abs(a.fl || 0)); });
+  }
+  function rowHTML(g) {
+    var note = [g.n > 1 ? g.n + ' trades' : '', g.sh ? 'shadow' : ''].filter(Boolean).join(' · ');
+    return '<li><a href="#trade/' + encodeURIComponent(g.id) + '"><span class="chip ' + esc(g.x.side) + '">' + esc(String(g.x.side).toUpperCase()) + '</span><span class="ps-r-t">' + esc(g.x.label) + (note ? '<small>' + esc(note) + '</small>' : '') + '</span>'
+      + (g.fl == null ? '<span class="ps-r-r wait">waiting for its entry</span>' : '<span class="ps-r-r ' + cls(g.fl) + '">' + rT(g.fl) + '</span>') + '</a></li>';
+  }
+  // what waits on the person: the week pane's own list (Coach proposals, a decaying live system, ICT filters, data feeds, pauses)
+  // for the owner, the data feeds alone for a reviewer, plus the losses of the last 24 h nobody reviewed yet
+  function needs(C, owner, losses, now) {
+    var L = []; try { L = (window.MS_WEEK && C ? window.MS_WEEK.decisions({ coach: C.coach, health: C.health, config: C.config }, now, []) : []) || []; } catch (e) { L = []; }
+    L = L.filter(function (d) { return d.k !== 'pause' && (owner || d.k === 'data'); }).map(function (d) { return d.title; });
+    if (losses > 0) L.push(losses === 1 ? '1 loss to review' : losses + ' losses to review');
+    return L;
+  }
+  window.MS_PS = { answer: answer, openRows: openRows, rowHTML: rowHTML, needs: needs, rT: rT };
+
+  var set = function (id, html) { var e = $(id); if (e && e._h !== html) { e._h = html; e.innerHTML = html; } return e; };
+  function drawToday() {
+    var T = window.MS_TODAY, a = answer(T); if (!a) return;
+    set('ps-a', a.head); set('ps-a-s', a.sub + '<span class="ps-a-f">Forward paper record, main systems, before costs.</span>');
+    var W = T.W, M = T.M; if (W && M) set('ps-s-today', 'week ' + rT(W.R) + ' · month ' + rT(M.R));
+    sums();
+  }
+  function drawOpen() {
+    var Lv = window.MS_LIVE, F = window.FLOAT, ul = $('ps-o-list'); if (!Lv || !ul) return;
+    var G = openRows(Lv.items), n = F ? F.open : 0, sh = F ? F.sh : 0;
+    ul.removeAttribute('aria-busy');
+    set('ps-o-list', G.length ? G.slice(0, 3).map(rowHTML).join('') : '<li class="ps-none">No open positions right now.</li>');
+    set('ps-o-n', F ? (n ? pl(n, 'trade') + ' · floating <b class="' + cls(F.liveTot || 0) + '">' + rT(F.liveTot || 0) + '</b>' : sh ? 'none of our own' : '') : '');
+    var all = $('ps-o-all'); if (all) { all.hidden = G.length <= 3 && !sh; all.textContent = sh ? 'All ' + (n + sh) + ' open trades (' + sh + ' shadow, followed on paper)' : 'All open trades'; }
+    // Council overview: the same answer above the list
+    var word = n ? pl(n, 'trade') + ' open' : 'No trade of ours is open';
+    set('ps-c-a', word + (n ? '<small>floating <b class="' + cls(F.liveTot || 0) + '">' + rT(F.liveTot || 0) + '</b> · at risk ' + (F.risk || 0).toFixed(1) + 'R</small>' : ''));
+    set('ps-c-s', sh ? pl(sh, 'shadow trade') + ' followed on paper (setups a rule blocked): <b class="' + cls((F.tot || 0) - (F.liveTot || 0)) + '">' + rT((F.tot || 0) - (F.liveTot || 0)) + '</b> floating.' : 'Paper trading only.');
+    var act = $('ms-active'), mb = $('ps-act-more'), card = $('ms-active-card');
+    if (act && mb && card) { var k = act.querySelectorAll(':scope > li:not(.empty)').length, all2 = card.hasAttribute('data-ps-all'); mb.hidden = k <= 3; mb.textContent = all2 ? 'Show the first three' : 'Show all ' + k + ' with their details'; mb.setAttribute('aria-expanded', String(all2)); }
+    sums();
+  }
+  function drawNeed() {
+    var el = $('ps-need'), C = window.MS_COUNCIL; if (!el || !C || !C.at) return;
+    var nb = $('ms-cn-n-review'), losses = nb ? parseInt(nb.textContent, 10) || 0 : 0, owner = window.MS_WHO === 'owner';
+    var L = needs(C, owner, losses, Date.now() / 1000), onlyLoss = L.length === 1 && losses > 0;
+    el.dataset.n = String(L.length); el.setAttribute('href', onlyLoss ? '#council/review' : owner ? '#council/week' : L.length ? '#council/overview' : '#council/review');
+    set('ps-need-t', L.length ? (L.length === 1 ? '1 thing waits on you' : L.length + ' things wait on you') : 'Nothing waits on you');
+    set('ps-need-s', esc(L.length ? L.join(' · ') : owner ? 'No Coach proposal, decaying system or data problem.' : 'No data problem, no loss to review.'));
+    set('ps-go-n', losses ? String(losses) : '');
+    var go = $('ps-go'); if (go) go.hidden = [].filter.call(go.children, function (a) { return getComputedStyle(a).display !== 'none'; }).length < 2 && R.dataset.phone === 'simple';
+  }
+  // one-line summaries of the folded Home sections, copied from what each section already shows
+  function sums() {
+    var tx = function (id) { var e = $(id); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; };
+    var mk = document.querySelector('#h-mk-row .h-mk-i:not(.h-mk-sk)'), mkT = '';
+    if (mk) { var q = function (s) { var e = mk.querySelector(s); return e ? e.textContent.trim() : ''; }; mkT = [q('.h-mk-t b'), q('.h-mk-p b'), q('.h-mk-t em')].filter(Boolean).join(' '); }
+    var S = { 'ps-s-mk': mkT, 'ps-s-setup': tx('h-head'), 'ps-s-ring': tx('h-ring-n'), 'ps-s-ready': tx('h-ready') };
+    for (var id in S) { var e = $(id); if (e && S[id] && e.textContent !== S[id]) e.textContent = S[id]; }
+    // a fold row follows its section: no row for a section the page keeps hidden (no data yet, not on this site)
+    [].forEach.call(document.querySelectorAll('.ps-fold[data-ps-for]'), function (b) { var t = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (t) { if (!t.id) t.id = 'ps-t-' + b.dataset.psFor; b.setAttribute('aria-controls', t.id); if (b.hidden !== t.hidden) b.hidden = t.hidden; } });
+  }
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+    if (R.dataset.phone === 'simple' && t.closest('#v-mosha, #v-ict, #v-profile')) setTimeout(desks, 400);   // a card renamed by what was tapped (the Mosha desk's language)
+    var f = t.closest('.ps-fold[data-ps-for]');
+    if (f) { var sec = document.querySelector('[data-ps="' + f.dataset.psFor + '"]'); if (!sec) return; var open = !sec.hasAttribute('data-ps-open');
+      if (open) sec.setAttribute('data-ps-open', ''); else sec.removeAttribute('data-ps-open'); f.setAttribute('aria-expanded', String(open));
+      if (open) setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 0);   // a chart drawn while folded has no width
+      return; }
+    if (t.closest('#ps-act-more')) { var card = $('ms-active-card'); if (card) { if (card.hasAttribute('data-ps-all')) card.removeAttribute('data-ps-all'); else card.setAttribute('data-ps-all', ''); drawOpen(); } return; }
+    var sw = t.closest('#ps-sw button[data-v]'); if (sw && window.msPhoneView) { window.msPhoneView(sw.dataset.v); window.scrollTo(0, 0); }
+  });
+  // The long desk views (ICT, Mosha, Profile): every card but the ones a person comes for folds to a row with the card's own
+  // heading. The rows are put in only while the simple view is on and taken out again with it, so the page of a wider screen
+  // or of the Full view is the page as it was. A card the account may not see (its own gate hides it) gets no row.
+  var DESKS = [
+    { v: 'v-ict', sel: '.card.ict-card', keep: function (c) { return c.classList.contains('ict-open-c') || c.id === 'ict-sig'; } },
+    { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && c.id === 'mo-rec'); } },
+    { v: 'v-profile', sel: '.card', keep: function (c, i) { return i === 0; } }
+  ];
+  function titleOf(c) {
+    var h = c.querySelector('.ict-h, .ms-k, h2, h3, summary'), t = '', s = '';
+    if (h) { var sp = h.matches('.ms-k') ? (h.querySelector(':scope > span, :scope > h2, :scope > h3') || h) : h, n = sp.firstChild;
+      while (n && !(n.nodeType === 3 && n.nodeValue.trim()) && !(n.nodeType === 1 && !/^(SMALL|BUTTON|A|INPUT|SELECT)$/.test(n.tagName) && n.textContent.trim())) n = n.nextSibling;
+      t = n ? n.textContent.replace(/\s+/g, ' ').trim() : ''; var sm = sp.querySelector('small'); s = sm ? sm.textContent.replace(/\s+/g, ' ').trim() : ''; }
+    if (!t) t = (c.getAttribute('aria-label') || '').trim();
+    return { t: t.replace(/[·:\s]+$/, '').slice(0, 44), s: s.replace(/^[·\s]+/, '').slice(0, 80), h: h };
+  }
+  var seq = 0, obs = typeof MutationObserver === 'function' ? new MutationObserver(function (L) { L.forEach(function (m) { var b = rowOf(m.target); if (b && b.hidden !== m.target.hidden) b.hidden = m.target.hidden; }); }) : null;
+  function rowOf(c) { var k = c.getAttribute('data-ps'); return k ? document.querySelector('.ps-dyn[data-ps-for="' + k + '"]') : null; }
+  var late = 0, obs2 = typeof MutationObserver === 'function' ? new MutationObserver(function () { clearTimeout(late); late = setTimeout(desks, 120); }) : null;
+  function desks() {
+    var simple = R.dataset.phone === 'simple';
+    DESKS.forEach(function (D) {
+      var v = $(D.v); if (!v) return;
+      if (!simple) { [].forEach.call(v.querySelectorAll('.ps-dyn'), function (b) { var c = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (c) { c.removeAttribute('data-ps'); c.removeAttribute('data-ps-open'); } b.remove(); }); return; }
+      [].filter.call(v.querySelectorAll(D.sel), function (c) { return !c.closest('dialog') && !c.parentElement.closest('.card'); }).forEach(function (c, i) {
+        var b = rowOf(c); if (b && b.nextElementSibling !== c) c.parentNode.insertBefore(b, c);   // the desk moved the card (the teacher's order): its row follows
+        if (!b) { if (c.hasAttribute('data-ps') || D.keep(c, i) || (!c.hidden && getComputedStyle(c).display === 'none')) return; }
+        var T = titleOf(c); if (!T.t) { if (obs2 && !c._psw) { c._psw = 1; obs2.observe(c, { childList: true }); } return; }   // a card still empty: looked at again when it is drawn
+        if (!b) { var key = 'd' + (++seq); if (!c.id) c.id = 'ps-t-' + key; c.setAttribute('data-ps', key);
+          b = document.createElement('button'); b.type = 'button'; b.className = 'ps-only ps-fold ps-dyn'; b.dataset.psFor = key; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', c.id);
+          b.innerHTML = '<span></span><span class="ps-f-s"></span>'; b.hidden = c.hidden; c.parentNode.insertBefore(b, c); if (obs) obs.observe(c, { attributes: true, attributeFilter: ['hidden'] });
+          if (obs2 && !c.parentNode._psw) { c.parentNode._psw = 1; obs2.observe(c.parentNode, { childList: true }); }
+          if (obs2 && T.h) obs2.observe(T.h, { childList: true, characterData: true, subtree: true }); }   // a heading that is rewritten (the Mosha desk in French) renames its row
+        if (b.firstChild.textContent !== T.t) b.firstChild.textContent = T.t; if (b.lastChild.textContent !== T.s) b.lastChild.textContent = T.s;
+      });
+    });
+  }
+  addEventListener('hashchange', function () { setTimeout(desks, 600); setTimeout(desks, 2500); });
+  function sync() { desks(); var simple = R.dataset.phone === 'simple'; [].forEach.call(document.querySelectorAll('#ps-sw button[data-v]'), function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'simple') === simple)); }); }
+  document.addEventListener('ms:phone', function () { sync(); drawNeed(); try { window.dispatchEvent(new Event('resize')); } catch (e) {} });
+  document.addEventListener('ms:today', drawToday);
+  document.addEventListener('ms:live', drawOpen);
+  document.addEventListener('ms:council', function () { drawNeed(); sums(); });
+  sync(); sums(); drawToday(); drawOpen(); drawNeed();
+  setTimeout(function () { sums(); drawNeed(); desks(); }, 2500);
+})();
+</script>
 <script id="ms-desk-js">
 // Desk polish (9 Nov): the phone Context fold on Charts and the council status line's one-line fold
 (function () {

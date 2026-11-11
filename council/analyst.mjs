@@ -3,6 +3,7 @@
 // The Trader refreshes the block on every run, between the markers below, so the Analyst's weekly text stays as written.
 import { eventsBetween } from './events.mjs';
 import { moshaChainText } from './mosha.mjs';
+import { ownStream } from './fills.mjs';
 
 const START = '<!-- live-rule:start -->', END = '<!-- live-rule:end -->';
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
@@ -404,18 +405,21 @@ const px2 = (v) => (Number.isFinite(+v) ? (+v).toFixed(2) : '—');
 export function goldSystemsSection({ snapshot, config, trades = [], research = [], now = Math.floor(Date.now() / 1000) }) {
   if (!snapshot || !config) return '';
   const sn = snapshot, T = Array.isArray(trades) ? trades : [], when = new Date(now * 1000).toISOString().slice(0, 16).replace('T', ' ');
-  const on = (k) => { const L = T.filter((x) => x.k === k && x.market === 'xau' && !x.shadow); const o = L.filter((x) => x.status === 'open').length, p = L.filter((x) => x.status === 'pending').length;
+  // supported-book (owner, 11 Nov 2026): config.ownerShadow[k] = the system's new trades are paper shadows; book() says so, on()
+  // counts its own stream (live trades from before, owner-shadow / test trades after: fills.mjs ownStream)
+  const OS = config.ownerShadow || {}, book = (k, isOn) => (!isOn ? 'off' : OS[k] ? 'shadow (paper, owner 11 Nov)' : 'live');
+  const on = (k) => { const L = T.filter((x) => x.k === k && x.market === 'xau' && ownStream(x)); const o = L.filter((x) => x.status === 'open').length, p = L.filter((x) => x.status === 'pending').length;
     return !o && !p ? 'nothing on' : [o ? `${o} open` : '', p ? `${p} pending` : ''].filter(Boolean).join(', '); };
   const st = (k) => (sn[k] && sn[k].state) || null, blocked = (x) => (x && x.blocked ? ` (blocked: ${x.blocked})` : '');
   const rows = [];
   // Gold replica: the volatility gate (the fixed leg goldVolMin when set, else the top-fifth percentile goldVolP; the lower opens it)
   { const live = (config.replicaLive || []).includes('xau'), legs = [sn.goldVolMin, sn.goldVolP].filter((v) => v != null), gate = legs.length ? Math.min(...legs) : null;
     const v = sn.goldVol, what = v == null ? 'volatility not read yet' : gate == null ? `20-day average daily range ${v.toFixed(2)}%` : v >= gate ? `gate open: ${v.toFixed(2)}% average daily range, gate ${gate.toFixed(2)}%` : `gate closed: ${v.toFixed(2)}% average daily range under the ${gate.toFixed(2)}% gate, so no new replica trade`;
-    rows.push(['Gold replica', live ? 'live' : 'off', what, on('replica')]); }
+    rows.push(['Gold replica', book('replica', live), what, on('replica')]); }
   // Mosha BO: the H4 -> H1 -> M15 chain (snapshot.moshaBo.state, council/mosha.mjs) and the weekly direction
   { const m = st('moshaBo'), w = sn.goldW1;
     const what = !config.moshaBo ? '—' : m ? moshaChainText(m, w).replace(/^Mosha BO chain(?: complete)?: /, '') : w == null ? 'waiting for the Trader' : `weekly structure ${w > 0 ? 'bullish: buys only' : 'bearish: sells only'}`;
-    rows.push(['Mosha BO', config.moshaBo ? 'live' : 'off', what, on('mosha-bo')]); }
+    rows.push(['Mosha BO', book('mosha-bo', config.moshaBo), what, on('mosha-bo')]); }
   // Gold trend (N-day breakout, long only): a daily close above the N-day high enters; the state has the high and the last close
   for (const [name, key, cfgKey, k, sh] of [['Gold trend', 'goldTrend', 'goldTrend', 'gtrend', false], ['Gold trend fast', 'goldTrendFast', 'goldTrendFast', 'gtrend5', !!config.goldTrendFastShadow]]) {
     const c = config[cfgKey], x = st(key); if (!c) { rows.push([name, 'off', '—', '—']); continue; }
@@ -423,7 +427,7 @@ export function goldSystemsSection({ snapshot, config, trades = [], research = [
     rows.push([name, sh ? 'shadow' : 'live', what, sh ? 'paper only' : on(k)]); }
   // Gold H4 trendline: a falling line through two H4 pivot highs; an H4 close above it (H4 direction up) buys
   { const x = st('goldTL'), what = !config.goldTL ? '—' : !x ? 'waiting for the Trader' : x.open ? `in a trade, stop ${px2(x.stop)}` : x.line ? `falling H4 line at ${px2(x.line)}; waiting for an H4 close above it${blocked(x)}` : `no falling H4 trendline through two pivot highs right now${blocked(x)}`;
-    rows.push(['Gold H4 trendline', config.goldTL ? 'live' : 'off', what, on('gtl')]); }
+    rows.push(['Gold H4 trendline', book('gtl', config.goldTL), what, on('gtl')]); }
   // Gold daily engulf: a daily close above the last red candle's high, above the moving average; a resting buy at the zone's top
   { const x = st('goldEG'), c = config.goldEG || {}, n = c.sma || 20;
     const what = !config.goldEG ? '—' : !x ? 'waiting for the Trader' : `daily close ${px2(x.lastClose)} ${x.up ? 'above' : 'below'} the ${n}-day average ${px2(x.sma)}${x.zone ? `; zone ${px2(x.zone[0])}-${px2(x.zone[1])}` : ''}${x.pending && x.pending.length ? `; resting buy at ${x.pending.map(px2).join(', ')}` : x.up ? '; waiting for the next engulfing close' : ''}${blocked(x)}`;
@@ -431,12 +435,12 @@ export function goldSystemsSection({ snapshot, config, trades = [], research = [
   // Gold momentum pullback: D1 direction, pullback zones watched
   { const x = st('goldMP'), w = x && Array.isArray(x.watching) ? x.watching : [];
     const what = !config.goldMP ? '—' : !x ? 'waiting for the Trader' : `D1 ${x.d1 > 0 ? 'up' : x.d1 < 0 ? 'down' : 'flat'}; ${w.length ? `${w.length} pullback zone${w.length === 1 ? '' : 's'} watched (${w.map((z) => `${z.side} ${px2(z.zone[0])}-${px2(z.zone[1])}`).join('; ')})` : 'no pullback zone watched'}${x.test ? ' · paper test' : ''}`;
-    rows.push(['Gold momentum pullback', config.goldMP ? 'live' : 'off', what, on('gmp')]); }
+    rows.push(['Gold momentum pullback', book('gmp', config.goldMP), what, on('gmp')]); }
   // NQ New York open run: one paper row a session (research.json, k nq-open, session nyflip)
   { const R = (Array.isArray(research) ? research : []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip').sort((a, b) => (b.opened || 0) - (a.opened || 0)), last = R[0];
     const today = new Date(now * 1000).toISOString().slice(0, 10), what = !last ? 'no session recorded yet' : last.day === today ? `today: ${last.side} ${px2(last.entry)}, ${last.status === 'open' ? 'open' : `${last.status}${Number.isFinite(last.R) ? ` ${sgn(last.R)}R` : ''}`}` : `last session ${last.day}: ${last.side} ${last.status}${Number.isFinite(last.R) ? ` ${sgn(last.R)}R` : ''}; next at the 09:30 New York open`;
-    rows.push(['NQ New York open run', 'live (paper, research.json)', what, '—']); }
-  const out = [GOLD_START, '## Live gold systems now', '', `Built by the Trader at ${when} UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.`, '',
+    rows.push(['NQ New York open run', OS['nq-open'] ? 'shadow (paper, owner 11 Nov; research.json)' : 'live (paper, research.json)', what, '—']); }
+  const out = [GOLD_START, '## Live gold systems now', '', `Built by the Trader at ${when} UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.`, '',
     '| System | Book | Now | On |', '|---|---|---|---|'];
   for (const r of rows) out.push(`| ${r.join(' | ').replace(/\n/g, ' ')} |`);
   out.push(GOLD_END);

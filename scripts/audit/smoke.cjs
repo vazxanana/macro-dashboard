@@ -6,6 +6,7 @@
 // On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways);
 // the same for every tab of the gold terminal; and no visible chart host (.vz) of a page may be left empty.
 // The ICT desk draws no text under 12 px.
+// On the phone the macro desk opens in its simple view: every folded section is opened and its charts must be drawn at their width.
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -97,16 +98,38 @@ async function wire(ctx, account, seen) {
       if (account && INNER[path]) { const n = errs.length; await ev(p, calm, () => { location.hash = '#scanner'; location.hash = '#council/trades'; setTimeout(() => { location.hash = '#home'; }, 30); }).catch((e) => errs.push(e.message.split('\n')[0]));
         const home = await p.waitForFunction(() => document.documentElement.dataset.view === 'home', null, { timeout: 10000 }).then(() => true, () => false); await p.waitForTimeout(400);
         if (!home) errs.push('did not end on the last view asked for'); for (let i = n; i < errs.length; i++) errs[i] = `views changed back to back: ${errs[i]}`; }
+      // simple phone view (11 Nov): a phone opens the Desk in its simple view, and Home's first screen holds the answer, at most
+      // three open rows, what waits, the places to go and a few folded rows: never the old wall of cards
+      if (account && DESK.includes(path) && viewport.width < 500) { const f = await ev(p, calm, () => { const top = innerHeight - 72, inF = (e) => { const r = e.getBoundingClientRect(); return r.height > 0 && r.top < top && r.bottom > 0; };
+          return { mode: document.documentElement.dataset.phone || '', view: document.documentElement.dataset.view, rows: document.querySelectorAll('#ps-o-list a').length, n: [...document.querySelectorAll('#v-home :is(.ps-ans, .ps-rows a, .ps-need, .ps-go, .ps-fold, .card, .tile, .h-today, .h-mk, .h-quick)')].filter(inF).length }; }).catch((e) => { errs.push('simple phone view could not be read: ' + e.message.split('\n')[0]); return null; });
+        if (f && f.mode !== 'simple') errs.push('simple phone view: the phone did not open the Desk in its simple view');
+        else if (f && f.view === 'home' && (!f.n || f.n > 9 || f.rows > 3)) errs.push(`simple phone view: Home's first screen holds ${f.n} blocks and ${f.rows} open rows (at most 9 and 3)`); }
       await calm();
       // the gold terminal clips sideways overflow (body overflow-x hidden): a tab wider than the phone is cut off and nothing scrolls,
       // so each tab is opened and the body's own content width is read (side pages pass, 11 Nov: the Daily Bias banner and a table)
       if (path === '/gold-trading.html' && viewport.width < 500) { const cut = await ev(p, calm, async () => { const out = []; if (typeof NAV_SECTIONS === 'undefined' || typeof switchSection !== 'function') return ['tabs not found'];
-        for (const [s, v] of Object.entries(NAV_SECTIONS)) for (const t of v.tabs) { switchSection(s, document.querySelector('[data-section=' + s + ']'), t.id); await new Promise((r) => setTimeout(r, 250)); if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} ${document.body.scrollWidth} px`); }
+        for (const [s, v] of Object.entries(NAV_SECTIONS)) for (const t of v.tabs) { switchSection(s, document.querySelector('[data-section=' + s + ']'), t.id); await new Promise((r) => setTimeout(r, 250)); if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} ${document.body.scrollWidth} px`);
+          // the phone's simple view folds the tab's blocks: each is opened too, and no block or chart inside may end past the screen (a chart made
+          // while its block was hidden starts 600 px wide and once stretched its grid column; the body clips, so nothing scrolled)
+          const folds = [...document.querySelectorAll('.tab-panel.active details.gx-fold:not([open])')]; if (folds.length) { folds.forEach((d) => { d.open = true; }); await new Promise((r) => setTimeout(r, 400));
+            if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} with its folds open ${document.body.scrollWidth} px`);
+            const far = [...document.querySelectorAll('.tab-panel.active [data-pf], .tab-panel.active canvas')].filter((e) => e.getClientRects().length && e.getBoundingClientRect().right > innerWidth + 1).length; if (far) out.push(`${t.id}: ${far} folded blocks or charts end past the screen`);
+            folds.forEach((d) => { d.open = false; }); } }
+        // simple view: every tab must be reachable from the bottom bar or its More sheet
+        if (document.documentElement.getAttribute('data-phone') === 'simple') { const have = new Set([...document.querySelectorAll('#gxBar [data-tab], #gxMore [data-tab]')].map((b) => b.dataset.tab)); for (const v of Object.values(NAV_SECTIONS)) for (const t of v.tabs) if (!have.has(t.id)) out.push(`${t.id} has no button on the phone`); if (!document.getElementById('gxBar').getClientRects().length) out.push('the phone tab bar is not shown'); }
         switchSection('dashboard', document.querySelector('[data-section=dashboard]')); return out; }).catch((e) => ['tab walk: ' + e.message.split('\n')[0]]); if (cut.length) errs.push('tab cut off on the right: ' + cut.join(', ')); }
       // a chart host that is on screen but empty: the macro desk once drew its charts while the story was still display:none
       // (no width, nothing drawn until a resize); folded or hidden hosts do not count
       const blank = await ev(p, calm, () => [...document.querySelectorAll('.vz[id]')].filter((e) => e.getClientRects().length && e.clientWidth > 0 && !e.children.length).map((e) => '#' + e.id)).catch((e) => { errs.push('chart check could not run: ' + e.message.split('\n')[0]); return []; });
       if (blank.length) errs.push('chart not drawn: ' + blank.join(', '));
+      // the macro desk's simple phone view folds its later sections: each is opened here, and its charts must then be drawn, at
+      // the width they have once open (a folded section has no width). They stay open for the sideways-scroll check below.
+      if (path === '/macro-desk.html' && viewport.width < 500 && account) { const bad = await ev(p, calm, async () => { const out = [], go = [...document.querySelectorAll('.sfold .st-go')].filter((b) => b.getClientRects().length);
+        if (document.documentElement.dataset.phone !== 'simple' || !go.length) return ['the simple phone view did not fold its sections'];
+        for (const b of go) { const sx = b.closest('.sfold'); b.click(); await new Promise((r) => setTimeout(r, 200)); if (!sx.classList.contains('open')) { out.push('#' + sx.id + ' did not open'); continue; }
+          sx.querySelectorAll('.vz[id]').forEach((h) => { if (!h.getClientRects().length || h.clientWidth <= 0) return; const g = h.querySelector('svg'), w = g ? Math.round(g.getBoundingClientRect().width) : 0;
+            if (!h.children.length) out.push('#' + h.id + ' not drawn'); else if (g && h.clientWidth >= 260 && Math.abs(w - h.clientWidth) > 2) out.push('#' + h.id + ' drawn ' + w + ' px wide in ' + h.clientWidth + ' px'); }); }
+        return out; }).catch((e) => ['could not run: ' + e.message.split('\n')[0]]); if (bad.length) errs.push('folded section opened: ' + bad.join(', ')); }
       // scroll to the bottom and back so lazy sections render before the width check
       await ev(p, calm, async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 300)); window.scrollTo(0, 0); }).catch((e) => errs.push('could not scroll the page: ' + e.message.split('\n')[0]));
       const w = await ev(p, calm, () => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })).catch((e) => { errs.push('width check could not run: ' + e.message.split('\n')[0]); return { sw: 0, iw: 0 }; });
