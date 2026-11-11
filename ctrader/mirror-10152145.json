@@ -6875,7 +6875,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T09:32:43.000Z",
     "councilEntry": 0.82866,
     "stop": 0.82772,
@@ -6889,10 +6889,12 @@
     "slipR": 0.021,
     "lagSec": 69,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T09:32:43.000Z",
-    "brokerStop": 0.82774
+    "brokerStop": 0.82774,
+    "closedAt": "2026-11-11T13:30:12.000Z"
    },
    "usdcad-scalp-1794389649": {
     "positionId": "48370009",
@@ -7334,7 +7336,8 @@
     "t1": 0.8307800000000002,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.82964,
@@ -7348,9 +7351,10 @@
     "lagSec": 64,
     "positionId": "48408925",
     "volume": 200000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T12:33:49.000Z",
-    "brokerStop": 0.82907
+    "brokerStop": 0.82907,
+    "closedAt": "2026-11-11T13:30:12.000Z"
    },
    "audusd-scalp-1794401227": {
     "symbol": "AUDUSD",
@@ -7414,7 +7418,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9905.32 · 23 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9910.37 · 21 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7466,49 +7470,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-rintra-1794403507": {
-    "orderId": "33929877",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rintra",
-    "limitPrice": 4040.64,
-    "stop": 4067.5539107142854,
-    "t1": 4037.455,
-    "placedAt": "2026-11-11T13:26:12.000Z",
-    "expires": "2026-11-12T01:25:07.000Z",
-    "riskCash": 26.92,
-    "margin": 8.09,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9905.32,
-  "lastRun": "2026-11-11T13:28:53.000Z"
+  "balance": 9910.37,
+  "lastRun": "2026-11-11T13:30:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "moved EURUSD 47964428 protection: stop 1.112687 -> 1.113057, target 1.146986 -> 1.147356 (council swing)",
-   "trade": "eurusd-swing-1794299390"
-  },
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "moved XAUUSD 47972669 protection: stop 4147.959 -> 4147.884, target 4035.97 -> 4035.895 (council rintra)",
-   "trade": "xau-rintra-1794301325"
-  },
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "placed sell limit SOLUSD 0.01 lot at 84.12 (council scalp, valid to 2026-11-10T16:34Z)",
-   "trade": "sol-scalp-1794317682"
-  },
   {
    "at": "2026-11-10T13:36:14.000Z",
    "msg": "placed sell limit AUDUSD 0.01 lot at 0.69022 (council scalp, valid to 2026-11-10T16:34Z)",
@@ -8993,6 +8961,21 @@
    "at": "2026-11-11T13:26:12.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 4040.64 (council rintra, valid to 2026-11-12T01:25Z)",
    "trade": "xau-rintra-1794403507"
+  },
+  {
+   "at": "2026-11-11T13:30:12.000Z",
+   "msg": "cancelled XAUUSD limit order 33929877 for xau-rintra-1794403507: the council ended it: missed",
+   "trade": "xau-rintra-1794403507"
+  },
+  {
+   "at": "2026-11-11T13:30:12.000Z",
+   "msg": "USDCHF position 48369564 closed at the broker",
+   "trade": "usdchf-scalp-1794389494"
+  },
+  {
+   "at": "2026-11-11T13:30:12.000Z",
+   "msg": "USDCHF position 48408925 closed at the broker",
+   "trade": "usdchf-scalp-1794400365"
   }
  ],
  "limits": {
