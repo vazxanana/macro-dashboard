@@ -1854,7 +1854,7 @@
     "lots": 0.2,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T23:45:55.000Z",
     "councilEntry": 2049.83,
     "stop": 2040.14,
@@ -1867,10 +1867,12 @@
     "slipR": 0.14,
     "lagSec": 42,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T23:45:55.000Z",
-    "brokerStop": 2041.5
+    "brokerStop": 2041.5,
+    "closedAt": "2026-11-11T01:03:57.000Z"
    },
    "eurusd-replica-1794354684-s": {
     "positionId": "48237102",
@@ -2015,11 +2017,10 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10014.26 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 10012.22 · 11 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794355612-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794357299-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
@@ -2028,8 +2029,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10014.26,
-  "lastRun": "2026-11-11T01:01:50.000Z"
+  "balance": 10012.22,
+  "lastRun": "2026-11-11T01:03:57.000Z"
  },
  "log": [
   {
@@ -2784,6 +2785,11 @@
    "at": "2026-11-11T01:01:50.000Z",
    "msg": "opened sell ETHUSD 0.24 lot (council replica)",
    "trade": "eth-replica-1794358841-s"
+  },
+  {
+   "at": "2026-11-11T01:03:57.000Z",
+   "msg": "ETHUSD position 48236292 closed at the broker",
+   "trade": "eth-replica-1794354313-b"
   }
  ],
  "limits": {
