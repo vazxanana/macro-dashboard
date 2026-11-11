@@ -178,8 +178,14 @@ async function startServer(port = PORT, flags = []) {
     check('the candidate\'s levels can be placed on the chart (entry inside the price scale)', await p.evaluate((e) => !!window.MXAC.chartPoint(e), c1.entry));
     check('what if: once the attempt is stored the card is there, and it warns that no verdict has been given yet', await vis(p, '#whatif-run') && /The attempt for this setup is stored/.test(await txt(p, '#whatif')) && /hindsight is for study, not evidence/.test(await txt(p, '#whatif')) && /nothing here is stored/.test(await txt(p, '#whatif')) && /You have not judged this decision yet/.test(await txt(p, '#whatif-hindsight')) && (await p.evaluate(() => window.MXAC.whatIfLoads.length)) === 0, (await txt(p, '#whatif')).slice(0, 120));
     await p.screenshot({ path: OUT + 'academy-1-decision.png', fullPage: true });
+    // usability pass (11 Nov 2026): the decision point is announced under the chart, and a half-written verdict is not dropped silently
+    check('the decision point is announced under the chart, with the way to the decision and to the verdict', await vis(p, '#point-bar') && /^Setup reached: the engine says (BUY|SELL|WAIT) \((low|medium|high) confidence\)\. Read why, then give your verdict\.$/.test(await txt(p, '#point-text')) && (await txt(p, '#point-action')) === a1 && await vis(p, '#point-decision') && await vis(p, '#point-verdict'), await txt(p, '#point-bar'));
+    { const n0 = reqs.length; await p.click('#mentor [data-choice="reject"]'); await p.fill('#m-text', 'half written'); await p.click('#continue'); await p.waitForTimeout(300);
+      check('Continue on a half-written verdict asks first: the point stays, the words stay, nothing is sent', /paused on a setup/.test(await txt(p, '#clock-state')) && (await p.inputValue('#m-text')) === 'half written' && /not saved yet/.test(await txt(p, '#continue-msg')) && /not saved yet/.test(await txt(p, '#point-text')) && await vis(p, '#dec-action') && calls(reqs, n0, 'owner').length === 0, await txt(p, '#continue-msg'));
+      await p.fill('#m-text', ''); }
     // approve it and go on
     await p.click('#mentor [data-choice="approve"]'); await p.click('#m-save'); await p.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 });
+    check('once the verdict is stored the line under the chart says so and the question is gone', /Your verdict is saved: continue when you are ready\.$/.test(await txt(p, '#point-text')) && (await txt(p, '#continue-msg')) === '' && /Verdict saved/.test(await txt(p, '#replay-msg')), await txt(p, '#point-text'));
     check('an approval is stored and a lesson draft is offered as optional', /optional/.test(await txt(p, '#lesson h2')) && await vis(p, '#prove-run'));
     // what if, on the first setup: the table, nothing near a snapshot, the later candles on the chart only on request
     {
@@ -188,8 +194,8 @@ async function startServer(port = PORT, flags = []) {
       await p.click('#whatif-run'); await p.waitForSelector('#whatif-table', { timeout: 30000 });
       const wrows = await p.$$eval('#whatif-table tbody tr', (l) => l.map((r) => [r.dataset.alt, r.dataset.filled, ...[...r.cells].map((c) => c.textContent.trim())]));
       const keys = wrows.map((r) => r[0]), must = ['setup', 'stop-half', 'stop-wide', 'target-1r', 'target-2r', 'target-3r', 'late'];
-      check('what if: one row an alternative: the setup, the engine\'s answer when it differs, then the fixed variants', keys[0] === 'setup' && must.every((k) => keys.includes(k)) && keys.length === must.length + (a1 === 'WAIT' ? 1 : 0) && (a1 !== 'WAIT' || (keys[1] === 'engine' && /WAIT/.test(wrows[1][2]) && /^\+?0\.00R$/.test(wrows[1][5]))), keys.join(','));
-      check('what if: each row says filled or not, net R after costs, the exit, best and worst in R and the exit time', wrows.every((r) => (r[1] === 'yes' ? /^filled at [\d,.]+$/.test(r[4]) && /^[+-]?\d+\.\d\dR$/.test(r[5]) && /^(stop|target|still open at the last candle read)$/.test(r[6]) && /^\+?\d+\.\d\dR$/.test(r[7]) && /^-?\d+\.\d\dR$/.test(r[8]) && /^\d{4}-\d\d-\d\d \d\d:\d\d$/.test(r[9]) : /^(not filled|no trade)$/.test(r[4]) && /never filled|no trade|not valid/.test(r[6]))) && wrows.filter((r) => r[1] === 'yes').length >= 4, JSON.stringify(wrows[0]));
+      check('what if: one row an alternative: the setup, the engine\'s answer when it differs, then the fixed variants', keys[0] === 'setup' && must.every((k) => keys.includes(k)) && keys.length === must.length + (a1 === 'WAIT' ? 1 : 0) && (a1 !== 'WAIT' || (keys[1] === 'engine' && /WAIT/.test(wrows[1][2]) && /^\+?0\.00R$/.test(wrows[1][3]))), keys.join(','));
+      check('what if: each row says filled or not, net R after costs, the exit, best and worst in R and the exit time', wrows.every((r) => (r[1] === 'yes' ? /^filled at [\d,.]+$/.test(r[5]) && /^[+-]?\d+\.\d\dR$/.test(r[3]) && /^(stop|target|still open at the last candle read)$/.test(r[4]) && /^\+?\d+\.\d\dR$/.test(r[7]) && /^-?\d+\.\d\dR$/.test(r[8]) && /^\d{4}-\d\d-\d\d \d\d:\d\d$/.test(r[9]) : /^(not filled|no trade)$/.test(r[5]) && /never filled|no trade|not valid/.test(r[4]))) && wrows.filter((r) => r[1] === 'yes').length >= 4, JSON.stringify(wrows[0]));
       const wl = await p.evaluate(() => window.MXAC.whatIfLoads);
       check('what if: the candles asked for start at the decision time, on the signal timeframe, and only after the attempt was stored', wl.length === 1 && wl[0].candidateId === c1.id && /^at_/.test(wl[0].attemptId) && wl[0].from === c1.t && wl[0].tf === '5m' && wl[0].to === c1.t + 97 * 300 && storedFirst && calls(reqs, mw, 'owner').map(what).join() === 'get=outcome', JSON.stringify(wl));
       check('what if: the conservative rules, the costs and the candles read are stated under the table', /when one candle touches both the stop and the target, the stop is taken/.test(await txt(p, '#whatif-rules')) && /a stop that gaps is filled at the open \(worse\)/.test(await txt(p, '#whatif-rules')) && /Costs: 0\.15 a round trip/.test(await txt(p, '#whatif-rules')) && /^Candles: \d+ of 5m from .+ UTC to .+ UTC \(OANDA/.test(await txt(p, '#whatif-window')) && /maximum hold \(8 hours\)/.test(await txt(p, '#whatif-window')), await txt(p, '#whatif-window'));
@@ -203,6 +209,7 @@ async function startServer(port = PORT, flags = []) {
       await p.screenshot({ path: OUT + 'academy-1b-whatif.png', fullPage: true });
     }
     await goOn(p);
+    check('one press of Continue was enough after the verdict was stored, and the line under the chart is gone', !(await vis(p, '#point-bar')));
     check('what if: on Continue the later candles leave the chart and the card goes away', (await p.evaluate(() => window.MXAC.laterShown())) === 0 && !(await vis(p, '#whatif')) && (await p.$$('#whatif-run')).length === 0);
 
     // ---- 5. the next setup the engine takes: correct it to WAIT ----
@@ -710,6 +717,10 @@ async function startServer(port = PORT, flags = []) {
       for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       await p.tap('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await p.tap('#c-play'); await nextPoint(p);
+      { const r = await p.$eval('#point-bar', (e) => { const q = e.getBoundingClientRect(); return [Math.round(q.top), Math.round(q.bottom), e.hidden]; });
+        check('390 px: when the clock stops on a setup the line that says so is on screen, under the chart', !r[2] && r[0] >= 0 && r[1] <= 844, r.join(','));
+        await p.tap('#point-verdict'); await p.waitForTimeout(250); const mt = await p.$eval('#mentor', (e) => Math.round(e.getBoundingClientRect().top));
+        check('390 px: "Give your verdict" brings the mentor controls to the top of the screen, clear of the top bar', mt >= 50 && mt <= 120, mt); }
       await p.tap('#mentor [data-choice="WAIT"]').catch(() => {}); await p.waitForTimeout(200);
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on a decision with the mentor controls open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (decision)', small.length === 0, small.slice(0, 4).join(' ; '));

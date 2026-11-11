@@ -212,7 +212,22 @@
     return { events: cal.items.filter((e) => e.t <= t && e.t > t - 7 * DAY).map(pick), schedule: cal.items.filter((e) => e.t > t && e.t <= t + 72 * 3600).map(pick) };
   }
   // The core writes one time as raw epoch seconds into text the mentor reads ("bias down since 1714608000"): show a date.
-  const humanize = (s) => String(s == null ? '' : s).replace(/\bsince (\d{9,10})\b/g, (m, n) => 'since ' + fmtTime(+n));
+  // It also names lessons by their id ("conflicting lessons: ls_… vs ls_…"): with the lessons at hand the title is shown
+  // instead (an id that is not among them stays as it is), and a doubled full stop left by a note ending in one is mended.
+  // Display only: the stored text is never changed.
+  const humanize = (s, lessons) => String(s == null ? '' : s).replace(/\bsince (\d{9,10})\b/g, (m, n) => 'since ' + fmtTime(+n))
+    .replace(/\bls_[0-9a-z]{6,}\b/g, (id) => { const l = Array.isArray(lessons) ? lessons.find((x) => x && x.id === id) : null; return l && l.title ? `"${l.title}"` : id; })
+    .replace(/([^.\s])\.\.(?=\s|$)/g, '$1.');
+  // Is a verdict being written that Continue would throw away? m = the mentor's form; m.dirty is set by every edit and
+  // cleared when the correction is stored. True from the first choice, reason, word or mark until it is saved.
+  const mentorUnsaved = (m) => !!m && !!m.dirty && !!(m.choice || (m.reasons || []).length || String(m.text || '').trim() || (m.annotations || []).length);
+  // the one line under the chart when the clock stops on a setup: what was decided and where to go next
+  function pointLine(o) {
+    const x = o || {}, a = x.action || 'n/a', conf = x.confidence ? ` (${x.confidence} confidence)` : '';
+    if (x.exam) return `Exam setup reached: the engine says ${a}. Its result is in the decision card.`;
+    if (x.corrected) return `Setup reached: the engine says ${a}${conf}. Your verdict is saved: continue when you are ready.`;
+    return `Setup reached: the engine says ${a}${conf}. Read why, then give your verdict.`;
+  }
 
   // Past cases a decision at t may lean on, out of a list read once for a whole run (GET ?get=history&before=<end of the
   // range>): only cases whose trade had finished before t. The same cut the API makes for cand=, and MXA.decide drops
@@ -333,7 +348,7 @@
   const MXAC = {
     VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
-    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize,
+    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, pointLine,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
@@ -371,7 +386,7 @@
   const S = { me: null, edges: [], setup: null, cands: [], series: null, clock: null, account: null, thesis: null, lessons: [], cur: null, done: new Set(), open: [], closed: [], fromT: 0, sinceThesis: 0,
     pending: null, busy: false, loading: false, wasPlaying: false, future: null, sessionId: null, htf: '1h', dataVersion: null, poolToken: 0, lastBlock: null, exams: null, calendar: undefined };
   const CH = { main: null, series: null, htf: null, htfSeries: null, edgeLines: [], mentorLines: {}, annLines: [] };
-  const M = { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null };   // the mentor's form
+  const M = { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false };   // the mentor's form
   MXAC.point = () => (S.cur ? { cur: S.cur, setup: S.setup, thesis: S.thesis, lessons: S.lessons, cands: S.cands, done: S.done, open: S.open, sessionId: S.sessionId } : null);   // read-only view of the open decision point, for assets/academy-analyst.js
 
   // ---- tabs -----------------------------------------------------------------------------------------------------------
@@ -432,7 +447,7 @@
       const got = await MXR.load({ sym: e.market, tf: '1h', from: r.from - 14 * DAY, to: r.from }); if (tok !== pvTok) return;
       const rows = (Array.isArray(got) ? got : got.bars || []).filter((b) => b.time < r.from).map((b) => ({ time: b.time, open: b.open, high: b.high, low: b.low, close: b.close }));
       if (rows.length < 5) { box.hidden = true; return; }
-      box.hidden = false; if (!PV) PV = newChart($('preview-chart')); PV.setBars(rows); PV.fit();
+      box.hidden = false; if (!PV) PV = newChart($('preview-chart')); PV.setBars(rows); PV.chart.timeScale().fitContent();
       say('preview-note', `${e.marketLabel || e.market} · 1h candles up to ${isoDay(r.from)} 00:00 UTC`);
     } catch (err) { if (tok === pvTok) box.hidden = true; }
   }
@@ -680,7 +695,7 @@
   function renderThesis() {
     const th = S.thesis; if (!th) return;
     say('thesis-line', `Bias ${th.bias}. Expecting ${th.expecting}.` + (th.status === 'invalidated' ? ' The thesis was invalidated and is being rebuilt.' : th.status === 'in-trade' && S.account && S.account.positions.length ? ' A paper trade is open.' : ''));
-    listOr($('thesis-changes'), (th.changes || []).slice(-4).reverse(), 'No change yet.', (c) => el('li', {}, el('div', {}, el('small', { text: fmtTime(c.t) + ' ' }), c.text + (c.n > 1 ? ` (${c.n} checks)` : ''))));
+    listOr($('thesis-changes'), (th.changes || []).slice(-4).reverse(), 'No change yet.', (c) => el('li', {}, el('div', {}, el('small', { text: fmtTime(c.t) + ' ' }), humanize(c.text, S.lessons) + (c.n > 1 ? ` (${c.n} checks)` : ''))));
   }
 
   // ---- charts ---------------------------------------------------------------------------------------------------------
@@ -775,14 +790,14 @@
     }, true);
     root.addEventListener('pointermove', (e) => {
       if (!drag) return; const v = CH.series.coordinateToPrice(at(e).y); if (v == null) return;
-      M[drag] = +v.toFixed(2); CH.mentorLines[drag].applyOptions({ price: M[drag] }); const inp = $('m-' + drag); if (inp) inp.value = M[drag]; mentorCheck();
+      M[drag] = +v.toFixed(2); M.dirty = true; CH.mentorLines[drag].applyOptions({ price: M[drag] }); const inp = $('m-' + drag); if (inp) inp.value = M[drag]; mentorCheck();
     });
     const end = (e) => {
       if (drag) { drag = null; lock(false); }
       if (ann) {
         const p = at(e), a = ann; ann = null; lock(false);
         const moved = Math.abs(p.x - a.x) > 6 || Math.abs(p.y - a.y) > 6, price2 = moved ? CH.series.coordinateToPrice(p.y) : null;
-        M.annotations.push({ kind: a.kind, t: a.t, price: a.price, t2: moved && price2 != null ? timeAt(p.x) : null, price2: moved && price2 != null ? +price2.toFixed(2) : null, note: '' });
+        M.dirty = true; M.annotations.push({ kind: a.kind, t: a.t, price: a.price, t2: moved && price2 != null ? timeAt(p.x) : null, price2: moved && price2 != null ? +price2.toFixed(2) : null, note: '' });
         M.arm = null; host.classList.remove('arm'); if (!isTake(M.choice)) host.style.touchAction = ''; renderAnnotations(); drawAnnotations();
       }
     };
@@ -799,14 +814,39 @@
   async function playPause() {
     if (!S.clock || S.busy) return;
     if (S.clock.state().playing) { S.clock.pause(); draw(); return; }
+    if (!leaveOk()) return;
     if (S.cur && !S.cur.closed) await settlePoint();
     S.clock.play(); say('replay-msg', ''); draw();
   }
-  async function stepOne() { if (!S.clock || S.busy) return; if (S.cur && !S.cur.closed) await settlePoint(); S.clock.step(1); }
+  async function stepOne() { if (!S.clock || S.busy || !leaveOk()) return; if (S.cur && !S.cur.closed) await settlePoint(); S.clock.step(1); }
+  // Leaving a decision point while a verdict is half written would throw it away without a word. The first press says so
+  // (beside both Continue buttons) and changes nothing; a second press within LEAVE_MS leaves. A saved verdict never asks.
+  const LEAVE_MS = 10000; let leaveAsked = 0;
+  function leaveOk() {
+    if (!S.cur || S.cur.closed || !mentorUnsaved(M)) return true;
+    const now = Date.now(); if (leaveAsked && now - leaveAsked < LEAVE_MS) { leaveAsked = 0; return true; }
+    leaveAsked = now; const msg = 'Your verdict is not saved yet. Press "Save correction" to keep it, or press Continue again to leave without it.';
+    say('replay-msg', msg); renderPointBar(msg); const c = $('continue-msg'); if (c) c.textContent = msg;
+    return false;
+  }
+  // ---- the line under the chart at a decision point, and scrolling between the chart and the cards ------------------------
+  const calm = () => !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function goTo(id) { const n = $(id); if (!n || n.hidden) return; n.scrollIntoView({ block: 'start', behavior: calm() ? 'auto' : 'smooth' }); if (!n.hasAttribute('tabindex')) n.setAttribute('tabindex', '-1'); try { n.focus({ preventScroll: true }); } catch (e) { /* older browsers */ } }
+  // bring a node back on screen when none of it, or only its edge, is in view (one column on a phone: the chart is far above the cards)
+  function showNode(n, anchor) { if (!n || !n.getBoundingClientRect) return; const h = root.innerHeight || 0; const out = () => { const q = n.getBoundingClientRect(); return q.top < 50 || q.bottom > h; }; if (!out()) return; (anchor || n).scrollIntoView({ block: 'start' }); if (out()) n.scrollIntoView({ block: 'nearest' }); }   // the second step reaches a node inside a column that scrolls by itself
+  function renderPointBar(warn) {
+    const bar = $('point-bar'), cur = S.cur; if (!bar) return; clear(bar);
+    if (!cur || cur.closed || !cur.latest) { bar.hidden = true; return; }
+    const d = cur.latest.decision; bar.hidden = false; bar.classList.toggle('warn', !!warn);
+    bar.appendChild(actBadge(d.action, true, 'point-action'));
+    bar.appendChild(el('span', { class: 'point-t', id: 'point-text', text: warn || pointLine({ action: d.action, confidence: d.confidence, exam: !!cur.exam, corrected: !!cur.correction }) }));
+    bar.appendChild(el('span', { class: 'point-go' }, el('button', { type: 'button', class: 'btn sm', id: 'point-decision', text: cur.exam ? 'See the result' : 'See the decision', onclick: () => goTo('decision') }),
+      !cur.exam && !$('mentor').hidden ? el('button', { type: 'button', class: 'btn sm' + (cur.correction ? '' : ' primary'), id: 'point-verdict', text: cur.correction ? 'Your verdict' : 'Give your verdict', onclick: () => goTo('mentor') }) : null));
+  }
   $('c-play').addEventListener('click', playPause);
   $('c-step').addEventListener('click', stepOne);
   $('c-restart').addEventListener('click', () => {
-    if (!S.clock || S.busy) return;
+    if (!S.clock || S.busy || !leaveOk()) return;
     S.cur = null; hidePoint(); S.done = new Set(); S.open = []; S.closed = []; S.account = MXK.account(S.setup.balance, { t: S.setup.from }); S.fromT = S.setup.from; S.sinceThesis = 0; S.lastBlock = null;
     S.clock.restart(); S.thesis = MXA.thesis.start(snapOf(S.setup.edge, S.series, S.dataVersion, S.setup.from, null));
     log('Restarted from the beginning: the paper account and the thesis start again. Stored attempts and lessons are kept.'); renderAccount(); renderThesis(); draw();
@@ -816,6 +856,7 @@
   $('c-jump').addEventListener('click', async () => {
     if (!S.clock || S.busy) return; const v = $('c-jump-at').value, t = v ? Date.parse(v + (v.length <= 16 ? ':00' : '') + 'Z') / 1000 : NaN;
     if (!Number.isFinite(t)) { say('replay-msg', 'Give a date and time (UTC) to jump to.'); return; }
+    if (!leaveOk()) return;
     if (S.cur && !S.cur.closed) await settlePoint();
     const was = S.clock.state().t; S.clock.jump(t); const now = S.clock.state().t; S.fromT = now; S.sinceThesis = THESIS_EVERY; closeDue(now);
     log(`Jumped from ${fmtTime(was)} to ${fmtTime(now)}.` + (now > was ? ' Setups in between were not shown.' : ' Setups already decided stay decided.')); renderAccount(); draw();
@@ -864,7 +905,8 @@
     for (const id of ['decision', 'mentor', 'lesson', 'prove', 'whatif']) { $(id).hidden = true; clear($(id)); }
     S.future = null; if (CH.series && CH.marked) { CH.series.setMarkers([]); CH.marked = false; }
     if (CH.series) { clearLines(CH.edgeLines); clearMentorLines(); clearLines(CH.annLines); }
-    Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null }); clear($('zones'));
+    Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false }); clear($('zones'));
+    leaveAsked = 0; renderPointBar();
   }
   function pointError(c, e) {
     S.cur = null; hidePoint(); const box = $('decision'); box.hidden = false;
@@ -909,30 +951,30 @@
       log(`Back on the setup at ${fmtTime(c.t)}: ${rows.length} stored attempt${rows.length === 1 ? '' : 's'}.`);
     } catch (e) { log(`The decision point of ${candId} could not be shown again: ${e.message}`); }
   }
-  function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); renderWhatIf(); draw(); }
+  function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); renderWhatIf(); renderPointBar(); draw(); }
 
-  const txtList = (items, none) => listOr(el('ul', { class: 'txt-list' }), items || [], none, (x) => el('li', { text: humanize(x) }));
+  const txtList = (items, none, lessons) => listOr(el('ul', { class: 'txt-list' }), items || [], none, (x) => el('li', { text: humanize(x, lessons) }));
   // The decision panel. o = { idp (id prefix), edge, cand, d, risk, diff, stored (text), firstAction, hash, historyAvailable, lessons, title }
   function decisionView(box, o) {
     const d = o.d, c = o.cand, risk = o.risk, e = o.edge, idp = o.idp || 'dec', lessons = o.lessons || [];
     box.appendChild(el('h2', {}, o.title || 'Decision', el('small', { text: `${e.name} · ${c ? c.side + ' setup' : 'no setup'} · ${fmtTime(d.t)}` + (o.diff ? ` · ${o.diff} difficulty` : '') })));
     box.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, idp + '-action'), el('span', { class: 'pill', id: idp + '-conf' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })),
       el('span', { class: 'ac-ok', id: idp + '-stored', text: o.stored || '' }), o.firstAction ? el('span', { class: 'pill', text: `first answer: ${o.firstAction}` }) : null));
-    box.appendChild(el('p', { class: 'dec-thesis', id: idp + '-thesis', text: humanize(d.thesis) }));
+    box.appendChild(el('p', { class: 'dec-thesis', id: idp + '-thesis', text: humanize(d.thesis, lessons) }));
     if (c) {
       const lv = el('dl', { class: 'kv' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
       box.appendChild(lv); if (d.action === 'WAIT') box.appendChild(el('p', { class: 'note', text: 'On WAIT these are the levels of the setup that was not taken. They are drawn on the chart as dashed lines.' }));
     }
-    const evItem = (sign) => (x) => el('li', {}, el('span', { text: humanize(x.text || x.factor) }), el('span', { class: 'w', title: 'weight of this item', text: fin(x.weight) ? sign + x.weight : 'n/a' }));
+    const evItem = (sign) => (x) => el('li', {}, el('span', { text: humanize(x.text || x.factor, lessons) }), el('span', { class: 'w', title: 'weight of this item', text: fin(x.weight) ? sign + x.weight : 'n/a' }));
     const ev = d.evidence || {};
     box.appendChild(el('div', { class: 'ev' },
       el('div', {}, el('h3', {}, 'Evidence for', el('small', { text: fin(ev.support) ? `weights add to ${ev.support}` : '' })), listOr(el('ul', { class: 'ev-list for', id: idp + '-support' }), d.supporting || [], 'Nothing supports it.', evItem('+'))),
       el('div', {}, el('h3', {}, 'Evidence against', el('small', { text: fin(ev.contradiction) ? `weights add to ${ev.contradiction}` : '' })), listOr(el('ul', { class: 'ev-list against', id: idp + '-against' }), d.contradicting || [], 'Nothing contradicts it.', evItem('−')))));
     if (fin(ev.needMargin)) box.appendChild(el('p', { class: 'note', text: `This edge takes a trade when the evidence for it beats the evidence against it by ${ev.needMargin} and nothing blocks it.` }));
-    if ((d.waitReasons || []).length) { box.appendChild(el('h3', { text: 'Reasons to wait' })); box.appendChild(txtList(d.waitReasons, '')); }
-    if ((d.waitingFor || []).length) { box.appendChild(el('h3', { text: 'What it is waiting for' })); box.appendChild(txtList(d.waitingFor, '')); }
-    box.appendChild(el('h3', { text: 'Uncertainty' })); box.appendChild(txtList((d.uncertainty || []).concat(d.notes || []), 'Nothing flagged.'));
-    box.appendChild(el('h3', { text: 'What would prove it wrong' })); box.appendChild(txtList(d.invalidation, 'No invalidation level could be named.'));
+    if ((d.waitReasons || []).length) { box.appendChild(el('h3', { text: 'Reasons to wait' })); box.appendChild(txtList(d.waitReasons, '', lessons)); }
+    if ((d.waitingFor || []).length) { box.appendChild(el('h3', { text: 'What it is waiting for' })); box.appendChild(txtList(d.waitingFor, '', lessons)); }
+    box.appendChild(el('h3', { text: 'Uncertainty' })); box.appendChild(txtList((d.uncertainty || []).concat(d.notes || []), 'Nothing flagged.', lessons));
+    box.appendChild(el('h3', { text: 'What would prove it wrong' })); box.appendChild(txtList(d.invalidation, 'No invalidation level could be named.', lessons));
     if (!c) return;
     box.appendChild(el('h3', { text: 'Risk' }));
     const rk = el('dl', { class: 'kv' }), R = d.risk || {}, put = (k, v) => { rk.appendChild(el('dt', { text: k })); rk.appendChild(el('dd', { text: v })); };
@@ -953,7 +995,8 @@
     const cur = S.cur, box = clear($('decision')), a = cur.latest; box.hidden = false;
     decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons });
     if (cur.exam) renderExamPoint(box);
-    box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause })));
+    box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause }), el('span', { class: 'ac-status', id: 'continue-msg', role: 'status' })));
+    renderPointBar();
   }
 
   // ---- mentor controls ------------------------------------------------------------------------------------------------
@@ -967,7 +1010,7 @@
   function renderAnnotations() {
     const ul = $('a-list'); if (!ul) return;
     listOr(ul, M.annotations, 'No mark yet.', (a, i) => el('li', {}, el('div', {}, el('b', { text: (ANNOTATIONS.find((x) => x[0] === a.kind) || [0, a.kind])[1] }), fin(a.price2) ? ` zone ${fmtPrice(Math.min(a.price, a.price2))} to ${fmtPrice(Math.max(a.price, a.price2))}` : ` level ${fmtPrice(a.price)}`, el('small', { text: ' · ' + fmtTime(a.t) })),
-      el('button', { type: 'button', class: 'btn sm danger', 'aria-label': 'Delete this mark', text: 'Delete', onclick: () => { M.annotations.splice(i, 1); renderAnnotations(); drawAnnotations(); } })));
+      el('button', { type: 'button', class: 'btn sm danger', 'aria-label': 'Delete this mark', text: 'Delete', onclick: () => { M.annotations.splice(i, 1); M.dirty = true; renderAnnotations(); drawAnnotations(); } })));
   }
   function renderMentor() {
     const box = clear($('mentor')), cur = S.cur; box.hidden = false;
@@ -975,15 +1018,15 @@
     const choices = el('div', { class: 'choices', role: 'group', 'aria-label': 'Your verdict' });
     for (const [v, label] of [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Change to BUY'], ['SELL', 'Change to SELL'], ['WAIT', 'Change to WAIT']]) choices.appendChild(el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) }));
     box.appendChild(choices);
-    const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), el('input', { type: 'number', step: '0.01', id: 'm-' + k, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); M[k] = v === '' || !Number.isFinite(+v) ? null : +v; if (CH.mentorLines[k] && fin(M[k])) CH.mentorLines[k].applyOptions({ price: M[k] }); else drawMentorLines(); mentorCheck(); } }));
+    const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), el('input', { type: 'number', step: '0.01', id: 'm-' + k, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); M.dirty = true; M[k] = v === '' || !Number.isFinite(+v) ? null : +v; if (CH.mentorLines[k] && fin(M[k])) CH.mentorLines[k].applyOptions({ price: M[k] }); else drawMentorLines(); mentorCheck(); } }));
     box.appendChild(el('div', { class: 'lv' }, numIn('entry', 'Entry'), numIn('stop', 'Stop'), numIn('target', 'Target')));
     box.appendChild(el('p', { class: 'note', text: 'For a changed BUY or SELL, type the levels or drag the solid Mentor lines on the chart.' }));
-    const bias = el('select', { id: 'm-bias', onchange: (e) => { M.bias = e.target.value; } }, el('option', { value: '', text: 'not given' }), el('option', { value: 'up', text: 'up' }), el('option', { value: 'down', text: 'down' }), el('option', { value: 'neutral', text: 'neutral' }));
-    const edge = el('select', { id: 'm-edge', onchange: (e) => { M.edge = e.target.value; } }, el('option', { value: '', text: 'the same edge' }), S.edges.filter((x) => x.id !== S.setup.edge.id).map((x) => el('option', { value: x.id, text: x.name })));
+    const bias = el('select', { id: 'm-bias', onchange: (e) => { M.bias = e.target.value; M.dirty = true; } }, el('option', { value: '', text: 'not given' }), el('option', { value: 'up', text: 'up' }), el('option', { value: 'down', text: 'down' }), el('option', { value: 'neutral', text: 'neutral' }));
+    const edge = el('select', { id: 'm-edge', onchange: (e) => { M.edge = e.target.value; M.dirty = true; } }, el('option', { value: '', text: 'the same edge' }), S.edges.filter((x) => x.id !== S.setup.edge.id).map((x) => el('option', { value: x.id, text: x.name })));
     box.appendChild(el('div', { class: 'f-grid' }, el('label', { class: 'f' }, el('span', { text: 'Your bias' }), bias), el('label', { class: 'f' }, el('span', {}, 'Corrected edge ', el('small', { text: '(optional)' })), edge)));
     box.appendChild(el('h3', { text: 'Why' }));
-    box.appendChild(el('div', { class: 'chips', role: 'group', 'aria-label': 'Reasons' }, REASONS.map(([id, label]) => el('button', { type: 'button', class: 'chip', 'data-reason': id, 'aria-pressed': 'false', text: label, onclick: (e) => { const i = M.reasons.indexOf(id); if (i >= 0) M.reasons.splice(i, 1); else M.reasons.push(id); e.currentTarget.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true'); mentorCheck(); } }))));
-    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: 'Your explanation' }), el('textarea', { id: 'm-text', maxlength: '4000', placeholder: 'What should it have seen?', oninput: (e) => { M.text = e.target.value; mentorCheck(); } })));
+    box.appendChild(el('div', { class: 'chips', role: 'group', 'aria-label': 'Reasons' }, REASONS.map(([id, label]) => el('button', { type: 'button', class: 'chip', 'data-reason': id, 'aria-pressed': 'false', text: label, onclick: (e) => { const i = M.reasons.indexOf(id); if (i >= 0) M.reasons.splice(i, 1); else M.reasons.push(id); M.dirty = true; e.currentTarget.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true'); mentorCheck(); } }))));
+    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: 'Your explanation' }), el('textarea', { id: 'm-text', maxlength: '4000', placeholder: 'What should it have seen?', oninput: (e) => { M.text = e.target.value; M.dirty = true; mentorCheck(); } })));
     box.appendChild(el('h3', {}, 'Marks on the chart', el('small', { text: 'click the chart for a level, drag for a zone' })));
     const kind = el('select', { id: 'a-kind', 'aria-label': 'Kind of mark' }, ANNOTATIONS.map(([id, label]) => el('option', { value: id, text: label })));
     box.appendChild(el('div', { class: 'f-actions', style: 'margin-top:6px' }, el('span', { style: 'flex:1 1 160px;max-width:240px' }, kind), el('button', { type: 'button', class: 'btn', id: 'a-arm', 'aria-pressed': 'false', text: 'Mark on chart', onclick: (e) => { M.arm = M.arm ? null : kind.value; e.currentTarget.setAttribute('aria-pressed', M.arm ? 'true' : 'false'); $('chart').classList.toggle('arm', !!M.arm); $('chart').style.touchAction = M.arm || isTake(M.choice) ? 'none' : ''; } })));
@@ -992,7 +1035,7 @@
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'm-save', disabled: true, text: 'Save correction', onclick: saveCorrection }), el('span', { class: 'ac-status', id: 'm-msg', role: 'status' })));
   }
   function choose(v) {
-    M.choice = v; document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
+    M.choice = v; M.dirty = true; leaveAsked = 0; document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
     const lv = mentorLevels(v), take = isTake(v);
     for (const k of ['entry', 'stop', 'target']) { M[k] = lv[k]; const inp = $('m-' + k); inp.disabled = !take; inp.value = take && fin(lv[k]) ? lv[k] : ''; }
     drawMentorLines(); mentorCheck();
@@ -1002,7 +1045,7 @@
     try {
       const c = buildCorrection(M, cur.first.row.id), errorClass = MXA.classifyError(cur.first.decision, c, null);
       const res = await api.post({ action: 'correct', edge: S.setup.edge.id, correction: Object.assign({}, c, { errorClass }) });
-      cur.correction = res.correction; cur.cmp = null;
+      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveAsked = 0; renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);
@@ -1141,7 +1184,7 @@
         }
       }
     } finally { S.busy = false; }
-    S.cur = null; hidePoint(); renderAccount();
+    S.cur = null; hidePoint(); renderAccount(); const col = document.querySelector('.ac-chart-col'); if (col) col.scrollTop = 0; showNode($('chart-wrap'), $('replay'));
   }
 
   // ---- what if ------------------------------------------------------------------------------------------------------------
@@ -1166,9 +1209,9 @@
         let outcome = o.outcome; if (outcome === undefined) { try { outcome = (await api.get({ get: 'outcome', id: o.cand.id, edge: o.edge.id })).outcome; } catch (e) { outcome = null; } }
         const rows = whatIfRun(alts, bars, costs), last = bars[bars.length - 1], n2 = (v) => (fin(v) ? (v > 0 ? '+' : '') + v.toFixed(2) + 'R' : 'n/a');
         clear(out); msg.textContent = '';
-        out.appendChild(el('div', { class: 'tbl' }, el('table', { class: 'wi', id: idp + '-table' }, el('thead', {}, el('tr', {}, ['Alternative', 'Levels', 'Filled', 'Net R after costs', 'Exit', 'Best', 'Worst', 'Exit time (UTC)'].map((h) => el('th', { text: h })))),
-          el('tbody', {}, rows.map((r) => { const x = r.result; return el('tr', { 'data-alt': r.key, 'data-filled': x.filled ? 'yes' : 'no' }, el('td', {}, el('b', { text: r.label })), el('td', { class: 'num', text: r.wait ? 'none' : `${r.side} ${r.entry == null ? 'at the open' : fmtPrice(r.entry)}, stop ${fmtPrice(r.stop)}, target ${r.target == null ? 'none' : fmtPrice(r.target)}` }),
-            el('td', { text: r.wait ? 'no trade' : x.filled ? 'filled at ' + fmtPrice(x.fill) : 'not filled' }), el('td', { class: 'num', text: x.filled || r.wait ? n2(x.netR) : 'n/a' }), el('td', { text: WHATIF_REASON[x.reason] || x.reason }), el('td', { class: 'num', text: x.filled ? n2(x.mfeR) : 'n/a' }), el('td', { class: 'num', text: x.filled ? n2(x.maeR) : 'n/a' }), el('td', { class: 'num', text: x.filled && fin(x.exitT) ? fmtTime(x.exitT).replace(' UTC', '') : 'n/a' })); })))));
+        out.appendChild(el('div', { class: 'tbl' }, el('table', { class: 'wi', id: idp + '-table' }, el('thead', {}, el('tr', {}, ['Alternative', 'Net R after costs', 'Exit', 'Filled', 'Levels', 'Best', 'Worst', 'Exit time (UTC)'].map((h) => el('th', { text: h })))),
+          el('tbody', {}, rows.map((r) => { const x = r.result; return el('tr', { 'data-alt': r.key, 'data-filled': x.filled ? 'yes' : 'no' }, el('td', {}, el('b', { text: r.label })), el('td', { class: 'num', text: x.filled || r.wait ? n2(x.netR) : 'n/a' }), el('td', { text: WHATIF_REASON[x.reason] || x.reason }),
+            el('td', { text: r.wait ? 'no trade' : x.filled ? 'filled at ' + fmtPrice(x.fill) : 'not filled' }), el('td', { class: 'num', text: r.wait ? 'none' : `${r.side} ${r.entry == null ? 'at the open' : fmtPrice(r.entry)}, stop ${fmtPrice(r.stop)}, target ${r.target == null ? 'none' : fmtPrice(r.target)}` }), el('td', { class: 'num', text: x.filled ? n2(x.mfeR) : 'n/a' }), el('td', { class: 'num', text: x.filled ? n2(x.maeR) : 'n/a' }), el('td', { class: 'num', text: x.filled && fin(x.exitT) ? fmtTime(x.exitT).replace(' UTC', '') : 'n/a' })); })))));
         out.appendChild(el('p', { class: 'note', id: idp + '-rules', text: `Conservative rules: candles are read as bid prices and the spread is paid; when one candle touches both the stop and the target, the stop is taken; a stop that gaps is filled at the open (worse); a resting entry never fills better than its price, and on the candle that fills it only the stop can be hit. Costs: ${total.toFixed(2)} a round trip. Best and worst are the furthest the trade went for and against it, in R.` }));
         out.appendChild(el('p', { class: 'note', id: idp + '-window', text: `Candles: ${bars.length} of ${w.tf} from ${fmtTime(bars[0].time)} to ${fmtTime(last.time)} (${bars.src || 'candle feed'}), read for ${w.why}. A row "still open" had not reached its stop or target by the last candle read.` }));
         out.appendChild(el('p', { id: idp + '-compare', 'data-match': /does NOT match/.test(whatIfNote(rows[0], outcome)) ? 'no' : outcome ? 'yes' : 'none', text: whatIfNote(rows[0], outcome) }));
@@ -1305,7 +1348,7 @@
     $('f-from').value = isoDay(t); $('f-to').value = isoDay(t); refreshPool(false);
     await startReplay(null, { at: t }); return true;
   }
-  MXAC.kit = { el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
+  MXAC.kit = { showNode, el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
     decided: (id) => DECIDED.add(id), calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
