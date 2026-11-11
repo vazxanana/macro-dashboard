@@ -504,3 +504,56 @@ test('Home / Council reading pass: text at 12 px, touch targets, and the cards t
   assert.match(deskHtml, /deepest drawdown, day to day: live /); assert.doesNotMatch(deskHtml, /max drawdown ' \+ esc\(num\(B\.live\.dd\)/);
 });
 
+
+// ── Account surfaces, quality pass (11 Nov 2026): Profile, Users, account menu, Settings, price alerts, the bell, the palette ──
+const DESK = src('market-structure.html');
+const acctCss = () => /<style id="ms-acct-css">([\s\S]*?)<\/style>/.exec(DESK)[1];
+
+test('Settings on a phone spans the screen under the header (it hung from its button and lost 68 px off the left edge)', () => {
+  assert.match(acctCss(), /@media \(max-width: 560px\) \{ \.top-actions \.menu > \.menu-body \{ position: fixed; left: 12px; right: 12px; top: 62px; width: auto; max-height: calc\(100vh - 62px - 84px\);/);
+});
+
+test('account surfaces: no text under 12 px, and every control is 44 px on touch', () => {
+  const css = acctCss();
+  assert.match(css, /\.u-chip, \.u-t td small, #v-profile \.ct-tag,[^{]*\.nt-pop li small, \.me-today b small, #ms-me-greet, \.pa-f label small,[^{]*\{ font-size: 12px !important; \}/);
+  const touch = /@media \(pointer: coarse\) \{([\s\S]*)\}\s*$/.exec(css)[1];
+  for (const sel of ['#v-profile .ms-tbtn', '#v-profile .ct-btn', '.me-pop button', '.me-pop .me-link', '.nt-in button', '.u-t td select', '.u-t .u-acts button', '.u-t .u-perm-btn', '.u-form input', '.perm-dlg .perm-l', '.top-actions .menu-body .ms-tbtn', '.top-actions .menu-body .ms-tog label', '#cmdk-q'])
+    assert.ok(new RegExp(sel.replace(/[.#[\]()]/g, '\\$&') + '[^{}]*\\{[^{}]*(min-height: 44px|height: 44px)').test(touch), `${sel} is 44 px on touch`);
+  assert.match(touch, /\.pa-x \{ width: 44px; height: 44px; \}/);
+  assert.match(src('assets/ms-dialog.js'), /@media \(pointer:coarse\)\{\.msd button,\.msd input\{min-height:44px\}\}/);
+  assert.match(css, /\.perm-dlg \.own-acts \{ position: sticky; bottom: -22px;/, 'Save stays in reach under the long permission list');
+});
+
+test('a profile photo or name the server did not take: said, retried, and kept for the next visit (it failed without a word and was undone)', () => {
+  assert.match(DESK, /async function pushProfile\(fields, what\) \{ if \(!API \|\| !acct\(\)\) return true;/);
+  assert.match(DESK, /if \(st !== 400\) pend\(\{ \.\.\.left, \.\.\.fields \}\);/, 'the change waits in this browser');
+  assert.match(DESK, /window\.msConfirm\(`Your \$\{what\} is changed on this device only: \$\{whyNot\(st\)\}[^`]*`, \{ title: 'Not saved on the server yet', ok: 'Try again' \}\)\) \? pushProfile\(fields, what\) : false;/);
+  assert.match(DESK, /if \(Object\.keys\(wait\)\.length\) pushProfile\(wait\);/, 'sent again on the next load');
+  assert.match(DESK, /if \(!\('photo' in wait\) && srv\.photo && srv\.photo !== lp\)/, 'the server\'s old photo does not overwrite a waiting one');
+  for (const call of ["pushProfile({ photo: du }, 'photo')", "pushProfile({ photo: null }, 'photo')", "pushProfile({ name: v }, 'display name')"]) assert.ok(DESK.includes(call), call);
+  assert.match(DESK, /whyNot = \(st\) => \(st === 401 \|\| st === 403 \? 'your session has ended\./, 'an ended session is named');
+  // the Profile card follows the account menu when the save is made, not 400 ms after the button press
+  assert.match(DESK, /if \(\$\('ms-pf-av'\) && \$\('ms-me-av2'\)\) \$\('ms-pf-av'\)\.innerHTML = \$\('ms-me-av2'\)\.innerHTML; if \(\$\('ms-pf-name'\) && who !== 'guest'\) \$\('ms-pf-name'\)\.textContent = name;/);
+  assert.match(DESK, /img\.onerror = \(\) => \{ alert\("That file isn't a picture[^"]*"\); URL\.revokeObjectURL\(url\); \$\('ms-me-file'\)\.value = ''; \};/, 'the same file can be chosen again');
+});
+
+test('ChronosTrade sounds on the profile: a save is said in words (the page called a toast that does not exist)', () => {
+  assert.doesNotMatch(DESK, /msToast/);
+  assert.match(DESK, /<span id="ms-snd-msg" role="status"><\/span>/);
+  assert.match(DESK, /say\(data \? 'Saved: everyone hears '/);
+  assert.match(DESK, /r\.status >= 500 \? 'The server could not save the sound \(error ' \+ r\.status \+ '\)\. Try again in a minute\.'/);
+});
+
+test('price alerts: failures in words, the message follows the last action, focus stays in the dialog after a delete', () => {
+  assert.match(DESK, /if \(!r\) throw new Error\(navigator\.onLine === false \? 'You are offline\. Connect and try again\.' : 'The server could not be reached\. Check your connection and try again\.'\);/);
+  assert.match(DESK, /try \{ await sync\(\); dlg\.querySelector\('#pa-msg'\)\.textContent = 'Alert deleted\.'; \}/);
+  assert.match(DESK, /if \(!\(v > 0\) \|\| !Number\.isFinite\(v\)\) \{ msg\.textContent = 'Type a price\.'; return; \}/, 'as api/push.js: a finite price only');
+  assert.match(DESK, /t = ds\[Math\.min\(at, ds\.length - 1\)\] \|\| dlg\.querySelector\('#pa-price'\); if \(t\) t\.focus\(\);/);
+});
+
+test('the palette knows the profile, its field has a name, and the demo-account rows work from the keyboard', () => {
+  assert.match(DESK, /if \(window\.MS_ACCT && !has\('profile'\)\) out\.push\(\{ g: 'Pages', t: 'Profile and demo accounts', d: '#profile'/);
+  assert.match(DESK, /<input id="cmdk-q" type="text" aria-label="Jump to a page, market or theme"/);
+  assert.match(DESK, /tr\.tabIndex = 0; tr\.title = `Show the \$\{tr\.cells\[0\]\.textContent\} account`;[^\n]*e\.key === 'Enter' \|\| e\.key === ' '/);
+});
+
