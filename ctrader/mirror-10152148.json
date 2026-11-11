@@ -2027,7 +2027,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T01:16:42.000Z",
     "councilEntry": 1.33458,
     "stop": 1.33522,
@@ -2041,10 +2041,15 @@
     "slipR": -0.125,
     "lagSec": 67,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T01:16:42.000Z",
-    "brokerStop": 1.3353
+    "brokerStop": 1.3353,
+    "closedAt": "2026-11-11T01:52:26.000Z",
+    "exitPrice": 1.33511,
+    "councilExit": null,
+    "councilR": -1
    },
    "sol-replica-1794360591-b": {
     "positionId": "48258990",
@@ -2106,7 +2111,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9993.96 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9993.96 · 9 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2119,7 +2124,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9993.96,
-  "lastRun": "2026-11-11T01:51:12.000Z"
+  "lastRun": "2026-11-11T01:52:26.000Z"
  },
  "log": [
   {
@@ -2919,6 +2924,11 @@
    "at": "2026-11-11T01:33:20.000Z",
    "msg": "opened buy BTCUSD 0.01 lot (council replica)",
    "trade": "btc-replica-1794360743-b"
+  },
+  {
+   "at": "2026-11-11T01:52:26.000Z",
+   "msg": "closed GBPUSD position 48254244 (council: loss)",
+   "trade": "gbpusd-replica-1794359735-s"
   }
  ],
  "limits": {
