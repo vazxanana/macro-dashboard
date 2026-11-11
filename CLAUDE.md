@@ -85,7 +85,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-42 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-46 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -2516,6 +2516,45 @@ FAIL or "nothing to change": **never quote the book as proven, never call it an 
 - Not done, said to the owner: the broker's past financing rates are unknown (today's rate, the highest of the sample,
   is charged for every year); the other markets' financing is assumed, not measured; `council/expect-base.json` still
   charges the first unit only (item 42).
+
+## Path to live: no lever left on the gold book, the forward-test protocol, what real money would mean (12 Nov 2026)
+Owner: "keep improving dont stop reach our goal". A proposal and its arithmetic; **no study was run, on purpose**, and no
+live rule, size, filter, stop, config, council member or demo-only code changed. The owner's document is
+`research/proposals/2026-11-12-path-to-live.md` (decisions: `docs/owner-decisions.md` items 43-46, all open).
+- **The research on the two-system book is exhausted.** The proposal's section 1 is one table of every lever tested on the
+  gold book (book, systems, Gold Macro Score as size step and as gate, real yields, volatility / trend / own-record
+  switches, move-size forecast, 12 exits, 10 entries, limit against market entry, sizing rules, weights, the add, Gold trend
+  fast, 13 other markets, weekend, calendar, news, costs, the random-entry control) with its study, n and t: none is
+  open. The Gold Macro Score's record (weekly IC +0.149, t 3.24) is in sample for the score, and `macroscore-overlay`
+  already put it on the gold longs and the gold books: do not run it again on the same positions. The two near misses
+  (the engulf only when gold's six-month trend is up, `regime-switch` second-half t 1.43; another zone candle for the
+  engulf, `geg-variants`, 1 of 5 fixed tests missed) have no third stretch of gold history to be confirmed on. **Do not
+  pre-register another gate, exit, entry or size on 2006-17 for these systems** (a dozen studies and over sixty
+  comparisons have read it) unless the owner asks for it knowing this (item 44).
+- **`research/proposals/2026-11-12-path-to-live.mjs` → `…-path-to-live.json`** (deterministic, no network; imports the
+  supported-book study's functions and `council/expect.mjs`; not a study, no verdict, not published to the Edge lab). From
+  the untouched S2 book (330 positions, 28.7 a year, +0.180R a position, sd 1.73): t 2 on a forward record needs 369
+  positions, about 13 years. A month-block bootstrap (138 months, 20,000 draws, seeded) in three worlds (as measured
+  +5.2R a year; no edge; −5.2R a year, by taking 1x / 2x the mean off every position) gives the forward bands and the
+  **pre-committed stop lines**: forward closed drawdown over 21.9R (the 95th percentile of three years as measured), or
+  the total under −9.7R / −12.0R / −12.1R at 12 / 24 / 36 months (the 5 % lines). Their power, said in the proposal:
+  stopped within three years 12 % as measured (false alarm), 43 % with no edge, 77 % when losing. Execution checks E1-E5
+  on the first 30 demo copies (a stop on every copy, 28 of 30 copied, fills within 0.03R of paper and never over 0.05R
+  worse, financing within a fifth of `FIN`, no order the mirror did not place). A stop line sends the book back to a paper
+  shadow by the owner's rule; it never closes a trade. Nothing computes these lines in the council yet: adopting the
+  protocol (item 43) is a document decision, a page card or a digest line would be a later build.
+- **Risk table** (untouched book, simple %): 0.1 / 0.25 / 0.5 / 1 % a unit → +0.5 / +1.3 / +2.6 / +5.2 % a year, worst
+  drawdown 2.0 / 5.0 / 9.9 / 19.8 % closed (22.1R marked), 3.8 years under water, 1-in-20 ten-year drawdown 34.1R. The
+  broker's minimum gold lot is 1 ounce: a unit risks $39-48 (engulf) to $93-136 (trend) at $4,000 gold, so 0.25 % a trade
+  needs about $55,000.
+- **What enforces demo-only, listed for the owner, none of it touched**: `council/ctrader-mirror.mjs` (`DEMO_HOST`,
+  `CTRADER_ENV` must be `demo`, the account's own `isLive` must be false before account auth), the same in
+  `ctrader-suite.mjs`, `ctrader-account.mjs`, `ctrader-symbols.mjs`. **Found: the two bridge programs
+  (`mt5/CouncilBridge.mq5`, `ctrader/CouncilBridge.cs`) print whether the account is a demo but do not refuse a real one**
+  (item 45; not changed here: programs that place orders are the owner's call).
+- Tests: `tests/path-to-live.test.mjs` (the json equals the script's output; every figure of the proposal against it and
+  against the supported-book result; the bootstrap on a hand-made series; items 43-46 open; the proposal never recommends
+  a live step; the mirror's three locks are still in the file).
 
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
