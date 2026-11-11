@@ -8509,7 +8509,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T19:22:39.000Z",
     "councilEntry": 3984.78,
     "stop": 3987.2850000000003,
@@ -8524,10 +8524,15 @@
     "slipR": 0.108,
     "lagSec": 159,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T19:22:39.000Z",
-    "brokerStop": 3988.03
+    "brokerStop": 3988.03,
+    "closedAt": "2026-11-11T19:26:35.000Z",
+    "exitPrice": 3986.33,
+    "councilExit": 3987.2850000000003,
+    "councilR": -1
    }
   },
   "day": {
@@ -8535,7 +8540,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9860.12 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9860.12 · 30 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8590,14 +8595,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9860.12,
-  "lastRun": "2026-11-11T19:23:36.000Z"
+  "lastRun": "2026-11-11T19:26:35.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:59:24.000Z",
-   "msg": "limit filled at once: USDCHF position 48163393 at the broker at 0.82635",
-   "trade": "usdchf-rscalp-1794329894"
-  },
   {
    "at": "2026-11-10T17:29:56.000Z",
    "msg": "USDCHF position 48157137 closed at the broker",
@@ -10091,6 +10091,11 @@
   {
    "at": "2026-11-11T19:22:39.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council scalp)",
+   "trade": "xau-scalp-1794424798"
+  },
+  {
+   "at": "2026-11-11T19:26:35.000Z",
+   "msg": "closed XAUUSD position 48535624 (council: loss)",
    "trade": "xau-scalp-1794424798"
   }
  ],
