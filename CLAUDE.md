@@ -337,6 +337,23 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   daily log entry should show `resolved` and `added` only, `corrected` and `removed` only for records closed in the 3 days before
   the previous run. Tests: `tests/desk-ict-stable.test.mjs` (a fake feed whose window and scale differ between runs).
 
+## ICT replay: a trigger that does not depend on GitHub's cron (11 Nov 2026, reliability)
+`ict-replay.yml`'s cron is not enough: of its 35 runs up to 11 Nov, one came from the schedule (the then weekly cron, 8 Nov,
+started 13:49 UTC for 06:41) and 34 from pushes; a run takes 2-32 min (median about 10). So the council loop starts it:
+after each round's save, one line of `council.yml` runs `council/replay-due.mjs data` (read only: `decide`, `listRuns`, `main`) and,
+only on exit 0, `gh workflow run ict-replay.yml --ref main` (main's definition, no inputs = never a rebuild; the loop already
+had `actions: write`). Due = council-data `ict/replay.json` `at` over `STALE_H` 20 h old AND no run of the workflow active
+(any status but completed) AND none started in the last `GAP_H` 6 h, by anyone (cron, push, a person, the loop): GitHub's own
+run list is the marker, so a hand-over of the loop or a failed replay cannot lead to a second start inside 6 h. A fresh file is
+answered without the network; an unreadable run list, a timeout or a crash is "no". The line is `if …; then … || echo …; fi`
+with `timeout` on both commands, so it cannot fail or hold a round (at most 75 s), and it sits after the save, never between
+the Trader and the mirror or in the quick pass. The cron stays as the second path; the replay's concurrency group keeps one
+run at a time. While the loop itself is down nothing starts the replay but the cron (the Vercel backup runner does not).
+Monitoring: `datahealth.mjs` `FILES` `ict/replay.json` warns after 36 h (named on the Data chip: "ICT replay … not updated
+for …") and is bad (pages through the data check) after 4 days; before, 8 and 15 days. Not verified by a live run (Actions
+cannot be run from the build sandbox): the dispatch itself; the decision was run against the live run list. Tests:
+`tests/replay-trigger.test.mjs`.
+
 ## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
 `council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
 `solid()` plus a shrunk expectancy ≥ 0.10R (empirical-Bayes prior around 0R), and each runs as a champion/challenger trial
