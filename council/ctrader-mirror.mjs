@@ -80,11 +80,18 @@ export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) =>
 // used to read trades.json and the ICT desk alone, so the Replica demo account stayed empty. They are candidates for the
 // 'replica' book like any other trade (same stop rules, same limits). A record that is also in trades.json is taken from there
 // (never twice); one whose own filter failed (`pass: false`) counts as a shadow, so config.json mirrorShadow: false leaves it out.
-export const replicaCandidates = (research, have = []) => {
+// Markets (11 Nov 2026, owner on the edge review; Trader user rule replica-mirror-gold-only -> config.json mirrorReplica.markets):
+// with a list, a research trade of a market outside it gets `noCopy: true`: the mirror never OPENS a new position or order for
+// it. It stays in the list on purpose, so a position copied before the rule keeps following its record (stop moves, the close)
+// and is never orphaned or left without a stop. No list (the default, and the off-switch mirrorReplica: null) = every market.
+// Condition to look again, kept in the config next to the list: 200 or more forex and crypto replica paper trades closed since
+// the rule with a total R before costs above zero (the Trader counts it in snapshot.mirrorReplica); the owner decides then.
+export const replicaCandidates = (research, have = [], markets = null) => {
   const ids = new Set(), sigs = new Set(); for (const t of have || []) { if (!t) continue; ids.add(t.id); if (t.k === 'replica') sigs.add(`${t.market}|${t.side}|${t.opened}`); }
   return (Array.isArray(research) ? research : []).filter((t) => t && t.k === 'replica' && typeof t.id === 'string' && !ids.has(t.id) && !sigs.has(`${t.market}|${t.side}|${t.opened}`))
-    .map((t) => ({ ...t, shadow: t.shadow === true || t.pass === false, research: true }));
+    .map((t) => ({ ...t, shadow: t.shadow === true || t.pass === false, research: true, ...(Array.isArray(markets) && !markets.includes(t.market) ? { noCopy: true } : {}) }));
 };
+export const replicaMarkets = (cfg) => (cfg && cfg.mirrorReplica && Array.isArray(cfg.mirrorReplica.markets) ? cfg.mirrorReplica.markets : null);
 // true only while the replica book trades on a different demo account from the council book
 export const replicaHasOwnAccount = (byBook) => !!(byBook && byBook.replica && byBook.council && byBook.replica !== byBook.council);
 // sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
@@ -650,7 +657,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length + Object.keys(st.orders).length;   // unconfirmed and resting orders count too
     // every open council trade not yet copied or skipped is eligible, whatever its age (8 Nov, owner: "even the ones active now");
     // a pending council trade (not ICT) is eligible for a resting LIMIT order at its entry
-    const fresh = trades.filter((t) => (!t.shadow || shadows) && (OPEN.has(t.status) || (t.status === 'pending' && !String(t.id).startsWith('ict:'))) && SYMBOLS[t.market]
+    const fresh = trades.filter((t) => (!t.shadow || shadows) && !t.noCopy && (OPEN.has(t.status) || (t.status === 'pending' && !String(t.id).startsWith('ict:'))) && SYMBOLS[t.market]
       && (!openBooks || openBooks.includes(bookOf(t))) && !(exclude && exclude.has(t.id))
       && !st.map[t.id] && !st.orders[t.id] && !(st.skipped || {})[t.id]
       && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
@@ -816,7 +823,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the replica's research trades are copied only while the replica book has a demo account of its own: without one they
   // would land on the council's account (a book without a number trades on the base account)
   const replicaOwn = replicaHasOwnAccount(byBook);
-  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own) : []);
+  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
   // opens the same trade

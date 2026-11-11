@@ -68,7 +68,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - The Desk page: Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
-- Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
+- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
@@ -85,7 +85,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-36 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-41 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -165,6 +165,58 @@ Header (6 Nov): Settings and Alerts are icon buttons; the account area `#ms-me` 
 name) opens a menu to change photo (resized, stored per user in localStorage `ms-photo-<user>`), display name
 (`ms-name-<user>`) and log in/out. Default portrait: a gold monogram for named users, a silhouette for guests. The sign-in page is
 branded "Aurum Desk" with a gold chart background (no system names on it).
+
+## Supported book, financing in the costs, replica mirror gold only (11 Nov 2026, owner on the edge review)
+The owner was shown `research/proposals/2026-11-11-edge-review.md` and answered "yes anything that is better for the system and
+that applies it": approval (absolute rule 3) of exactly its three recommended changes, nothing wider (docs/owner-decisions.md
+items 37-39; 40 and 41 are open). Each is a Trader `USER_RULES` entry, so it reaches council-data `config.json` the way every
+owner rule has: applied once on the first round after deploy, logged in `config.history` (`by: 'user'`). No entry rule, filter,
+size, stop or exit of any system changed; nothing of ICT was touched.
+- **1. `supported-book` → `config.ownerShadow = { replica, 'mosha-bo', gtl, gmp, 'nq-open': <unix start> }`.** Live on paper:
+  **Gold trend (`gtrend`) and Gold daily engulf (`geg`) only** (their Trader blocks are pinned by sha256 in
+  `tests/supported-book.test.mjs`). The five listed are **paper shadows**, the 7 Nov `gold-trend-fast-shadow` precedent: the same
+  block pushes the same record with `shadow: true, blockedBy ['owner-shadow']` (`ownerSh(k)` in trader.mjs; Mosha BO adds
+  `'owner-shadow'` to its blocker list; the momentum pullback keeps its 6 Nov `['test']`; the NQ open run's record is marked
+  AFTER the sha256-pinned push, like the regime tag), managed by the same loop, never alerted, no futures ticket, not in
+  `mt5/signals.csv`, no "Mosha armed" heads-up. **A trade already open as live stays live to its own exit with its stop**: the
+  management loop never reads the switch. `fills.mjs` `ownStream(x)` (live, or shadow with blockedBy exactly `['owner-shadow']` /
+  `['test']`) is "the system's own trades": the replica's cap / daily stop / equity filter, the trendline's one-position rule,
+  Mosha's cap, the decay monitor's forward record (`recordOf`) and the regime tag's META read it, so each shadowed system keeps
+  one continuous record (live trades before, owner-shadow trades after) and a trade another rule blocked is never in it.
+  `council/decay.mjs` `SYSTEMS`: `shadow: true, since` on the five (`SHADOW_11NOV`; `shadowSince` in coach.json decay / expect, shown
+  as "shadow since 11 Nov"); live = gtrend, geg, ict-a. To put one back: a new user rule deleting its key from `ownerShadow`.
+  **The page needed no list change**: `SYS_K`, `NQ_SYS`, `SYSG`, `GUEST_DATA` and `api/_guestcut.js` take a row only when it is
+  not `shadow`, so the five systems' new trades drop out of "main" by their own flag and the trades they took live before stay
+  main (history is not relabelled). The scoreboard reads `config.ownerShadow` (`OWNER_SH`: status "shadow", "paper shadow by the
+  owner since <date>"); the Systems pane opens with `#ms-sys-book` ("Which systems trade live · since 11 Nov 2026", class `adm`).
+  Still true and said to the owner: the system replay (`research/replay-2w.json`, ends 3 Nov) keeps its replica / NQ rows, so the
+  guest's replay curve is the systems that were main then; `council/book.mjs` `IDEAS` (a paper comparison) is unchanged; the
+  Academy still teaches the seven rules. On the cTrader mirror a shadow trade of the five goes to the shadow book's account
+  (`bookOf`; the gold replica stays on the replica book), as Gold trend fast does.
+- **2. `count-financing` → `config.financingFrom`.** `council/fills.mjs` `FIN` (named constant with source and date: gold longs
+  0.000148 of price a rollover, the demo broker's XAUUSD `swap.long` of 11 Nov 2026), `nights(t, c)` (Mon-Fri 22:00 UTC, Wednesday
+  three: the study's function, compared on 3,000 holds), `financing(t)` = nights x rate x entry / r0 per unit. `tradeCost` adds it
+  to `costR` (records get `finR`, `nights`), so `Rnet`, `snapshot.costs` (`fin` per book, `financing` block), the digest, week
+  pane, scoreboard and decay record carry it with no change of their own. **costR is stamped once at the close**
+  (`annotateCosts`), so it applies to trades closed from the first round after deploy; no closed trade was recosted (a dry run on
+  the live files changed none). Gold longs only: shorts credited nothing, no other market charged (no rate measured). "What to
+  expect": `research/edge/expectations/build.mjs` charges the four long-only gold systems' study positions (expect-base `fin`,
+  `financing`; gtrend +0.489 → +0.398, geg +0.186 → +0.141, gtl +0.048 → +0.013, gtrend5 +0.372 → +0.289, equal to
+  `research/edge/trend-breadth/result.json` `partA`, tested); replica / Mosha / gmp carry `fin: null` (their records have no
+  per-position risk). Not done: `council/decay-base.json` (the monitor's backtest baselines) and the engine's 30-day replay
+  (`council/backtest.mjs`) carry no financing; today's rate is used for every past year. Never change `FIN` without a source.
+- **3. `replica-mirror-gold-only` → `config.mirrorReplica = { markets: ['xau'], since, until: { n: 200, grossR: 0, text } }`.**
+  `ctrader-mirror.mjs` `replicaMarkets(cfg)` / `replicaCandidates(research, own, markets)`: a replica research trade of a market
+  outside the list gets `noCopy: true` and the one place that opens anything (`fresh`) skips it. **It stays in the trade list on
+  purpose**: a position copied before the rule keeps following its record (stop guard, stop moves, the close), never orphaned.
+  Gold replica copies and every other book are unchanged. Condition (in the config and counted every round in
+  `snapshot.mirrorReplica { closed, grossR, need, met }`): 200 or more forex / crypto replica paper trades closed since the rule,
+  total R before costs above zero. **Nothing resumes by itself**; off-switch: a user rule setting `c.mirrorReplica = null`.
+- Tests: `tests/supported-book.test.mjs` (17), `tests/ctrader-mirror.test.mjs` (3 new), `tests/expect.test.mjs`,
+  `tests/decay.test.mjs`. Changed on purpose: `tests/academy-edges.test.mjs` (the seven edges are the systems live until 11 Nov),
+  `tests/trend-breadth.test.mjs` (the Trader and fills.mjs may now NAME the study as the rate's source; none imports it).
+- Open for the owner: item 41 (a 10-lot gold buy on the Replica demo account, 11 Nov 13:37 UTC, not placed by the mirror: reset
+  the account before reading its record).
 
 ## Loss review (6 Nov 2026, owner request)
 
@@ -610,7 +662,7 @@ Shadow audit (8 Nov, `research/edge/shadow-audit`): the shadow book's −300R we
 `duplicate` (`dupOf`, `void`; no tally counts that status). Near-stop market fills (the engine's stop floor is checked on the planned entry,
 not the fill) is a proposal for the owner. Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
 paper trades pay the costs study's CFD round trip (0.04% of price, `CFD_CRYPTO` in `council/fills.mjs`) instead of Kraken spot fees.
-Gold fidelity (8 Nov, research/edge/gold-fidelity): `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
+Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also carries overnight financing on gold longs, `FIN` / `financing`, section "Supported book, financing".) `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
 "Manage open trades" step for one candle as pure functions (trail, beAt, maxHold, pyramid add included), used by that replay;
 `tests/fills-live.test.mjs` lifts the Trader's loop text out of trader.mjs and checks parity, so a change to the live loop must be
 mirrored there. A pyramid add inherits its parent's `shadow` flag (a blocked Mosha chain's add is not a live trade).
@@ -727,6 +779,7 @@ edge (cap 2 years; > 50 years = "cannot be proven"), the regime note, and the fo
 10 trades (`out`: above / below). Card `#ms-expect` (research pane, next to `#ms-decay`; `<style id="ms-ex-css">` + `<script id="ms-ex-js">`,
 phone blocks under 760 px); the daily digest (`expectLine` in `waiting()`) names a live system only when it leaves its band. Expectations
 only: never a rule, size or filter. Tests: `tests/expect.test.mjs` (maths against each study's result.json, digest, trader and page wiring).
+Since 11 Nov 2026 the four long-only gold systems' figures are after overnight financing and five systems are marked shadow (section "Supported book, financing").
 Re-run the build after a study changes.
 
 ## Daily owner digest (8 Nov 2026, owner: one message instead of many alerts)
@@ -1925,8 +1978,8 @@ in the smoke test (it would depend on live data). Left: the Council status line'
 at the gradient's darkest point, light only), outside this pass.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
-Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
-of `council/decay.mjs`; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.
+Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven Meridian systems that were live until 11 Nov 2026 (the seven edges
+of `council/decay.mjs`; five of them are paper shadows since that day, see "Supported book"; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.
 Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as built), `TRAINING.md`, `RESEARCH.md`; the running state is
 `MERIDIANX_BUILD_PROGRESS.md`. Rules that must hold in any change:
 - **No look-ahead.** A decision only ever sees `MXR.snapshot` (bars closed at or before t; the guard throws otherwise). Outcomes live in
@@ -2072,6 +2125,9 @@ limits, stop moves and closes follow the record). A record also in trades.json i
 side + time, never twice); one whose own filter failed (`pass: false`) counts as a shadow (config.json `mirrorShadow: false`
 leaves it out). They are copied only while the replica book has a demo account different from the council's
 (`replicaHasOwnAccount`), so they can never land on the council account. Demo only. Tests: `tests/ctrader-mirror.test.mjs`.
+**Since 11 Nov 2026 (owner) no NEW copy is opened for the replica's forex and crypto research trades** (`config.mirrorReplica`,
+`noCopy`; gold unchanged, positions already copied managed to their close): section "Supported book, financing in the costs,
+replica mirror gold only".
 Reconciliation (same day, owner: "check all the trades from the edges opened match everything on cTrader"):
 `node council/ctrader-reconcile.mjs <council-data dir>` reads files only (no broker contact) and lists, for every open or
 pending trade of every book, whether its demo account holds the copy and whether side, stop and target match; then every demo

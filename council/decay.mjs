@@ -23,6 +23,7 @@
 // (council/digest.mjs decayLine) adds one line only when a live system is decaying.
 import fs from 'node:fs';
 import { merNet, ictNet } from './digest.mjs';
+import { ownStream } from './fills.mjs';
 
 export const DK = {
   q: 0.95,          // control limit: 95th percentile of a year's highest CUSUM under the baseline (≈ 1 false alarm in 20 years)
@@ -35,18 +36,22 @@ export const DK = {
                               // system with 100+ trades a year goes flat most years by luck alone; RESULT.md)
   iters: 4000,
 };
-// the live systems (and crypto trend, which the owner moved to shadow on 7 Nov: shown, never alerted)
+// The systems watched. Live since 11 Nov 2026 (owner, on the edge review: user rule supported-book): Gold trend and Gold daily
+// engulf, and the ICT desk's A-setups (a separate edge). The others are paper shadows: shown, never alerted. `shadow` = the
+// owner's rule, `since` = the day of the owner's decision; a shadow system's forward record is its own stream (fills.mjs
+// ownStream: its live trades from before and the owner-shadow trades the same rule takes after), so its history is kept.
+export const SHADOW_11NOV = '2026-11-11';
 export const SYSTEMS = [
-  { id: 'replica', name: 'Gold replica', desk: 'Meridian', k: 'replica' },
-  { id: 'mosha-bo', name: 'Mosha BO', desk: 'Meridian', k: 'mosha-bo' },
+  { id: 'replica', name: 'Gold replica', desk: 'Meridian', k: 'replica', shadow: true, since: SHADOW_11NOV },
+  { id: 'mosha-bo', name: 'Mosha BO', desk: 'Meridian', k: 'mosha-bo', shadow: true, since: SHADOW_11NOV },
   { id: 'gtrend', name: 'Gold trend', desk: 'Meridian', k: 'gtrend' },
-  { id: 'gtrend5', name: 'Gold trend fast', desk: 'Meridian', k: 'gtrend5', shadow: true },   // owner moved to shadow 7 Nov (#530): shown, never alerted
-  { id: 'gtl', name: 'Gold H4 trendline', desk: 'Meridian', k: 'gtl' },
+  { id: 'gtrend5', name: 'Gold trend fast', desk: 'Meridian', k: 'gtrend5', shadow: true, since: '2026-11-07' },   // owner moved to shadow 7 Nov (#530): shown, never alerted
+  { id: 'gtl', name: 'Gold H4 trendline', desk: 'Meridian', k: 'gtl', shadow: true, since: SHADOW_11NOV },
   { id: 'geg', name: 'Gold daily engulf', desk: 'Meridian', k: 'geg' },
-  { id: 'gmp', name: 'Gold momentum pullback', desk: 'Meridian', k: 'gmp' },
-  { id: 'nq-open', name: 'NQ New York open run', desk: 'Meridian', k: 'nq-open', session: 'nyflip' },
+  { id: 'gmp', name: 'Gold momentum pullback', desk: 'Meridian', k: 'gmp', shadow: true, since: SHADOW_11NOV },   // a test shadow since 6 Nov; listed as a shadow system from 11 Nov
+  { id: 'nq-open', name: 'NQ New York open run', desk: 'Meridian', k: 'nq-open', session: 'nyflip', shadow: true, since: SHADOW_11NOV },
   { id: 'ict-a', name: 'ICT A-setups', desk: 'ICT' },
-  { id: 'trend', name: 'Crypto trend', desk: 'Meridian', k: 'trend', shadow: true },
+  { id: 'trend', name: 'Crypto trend', desk: 'Meridian', k: 'trend', shadow: true, since: '2026-11-07' },
 ];
 export const BASE_FILE = new URL('./decay-base.json', import.meta.url);
 export function loadBase(file = BASE_FILE) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return null; } }
@@ -160,7 +165,7 @@ export function recordOf(sys, D, b = {}) {
   const mine = (x) => x.k === sys.k && (!sys.session || x.session === sys.session);
   const rp = ((D.replay && D.replay.trades) || []).filter((x) => mine(x) && closed(x));
   const fwd = sys.session ? (Array.isArray(D.research) ? D.research : []) : (Array.isArray(D.trades) ? D.trades : []);
-  const lv = fwd.filter((x) => mine(x) && closed(x) && (sys.shadow ? true : !x.shadow));
+  const lv = fwd.filter((x) => mine(x) && closed(x) && (sys.shadow ? ownStream(x) : !x.shadow));
   return joinRecord(fold(rp, merNet), fold(lv, merNet), hist);
 }
 
@@ -172,7 +177,7 @@ export function buildDecay(D, { now = Math.floor(Date.now() / 1000), base = load
   for (const sys of SYSTEMS) {
     const b = base.systems[sys.id]; if (!b) continue;
     let a; try { a = assess(recordOf(sys, D, b), b); } catch (e) { a = { status: 'healthy', few: true, why: [`could not read the record: ${e.message}`] }; }
-    systems.push({ id: sys.id, name: sys.name, desk: sys.desk, live: !sys.shadow, base: b.src, ...a });
+    systems.push({ id: sys.id, name: sys.name, desk: sys.desk, live: !sys.shadow, ...(sys.shadow && sys.since ? { shadowSince: sys.since } : {}), base: b.src, ...a });
   }
   const ids = (st) => systems.filter((s) => s.live && s.status === st).map((s) => s.id);
   return { at, v: 1, baseAt: base.at, rule: 'status and alert only: the monitor never changes a rule; the owner decides', systems, decaying: ids('decaying'), watch: ids('watch') };

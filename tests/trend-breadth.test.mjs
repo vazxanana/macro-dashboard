@@ -157,6 +157,10 @@ test('the committed result: the gate decided, nothing interpreted past it, and t
 test('the study stands apart: no council, mirror, ICT or API import, and nothing live reads it', () => {
   const imports = [...RUN.matchAll(/from '([^']+)'/g)].map((m) => m[1]);
   assert.deepEqual(imports.sort(), ['node:child_process', 'node:fs', 'node:path', 'node:url']);
-  for (const f of ['../council/trader.mjs', '../council/fills.mjs', '../council/expect.mjs', '../council/ctrader-mirror.mjs', '../ict/tracker.mjs']) assert.ok(!rd(f).includes('trend-breadth'), f);
+  // 11 Nov 2026, later the same day: the owner approved counting financing, so council/fills.mjs and the Trader now NAME the study as
+  // the source of the rate in comments and in the rule's history text. The check that matters is unchanged: none of them imports
+  // or reads the study's code or files, and the mirror and the ICT tracker do not mention it at all.
+  for (const f of ['../council/trader.mjs', '../council/fills.mjs', '../council/expect.mjs', '../council/ctrader-mirror.mjs', '../ict/tracker.mjs']) assert.ok(!/(from\s*|import\(\s*|readFileSync\([^)]*|rd\w*\()['"`][^'"`]*trend-breadth/.test(rd(f)), f);
+  for (const f of ['../council/ctrader-mirror.mjs', '../ict/tracker.mjs']) assert.ok(!rd(f).includes('trend-breadth'), f);
   assert.match(PRE, /before\*\* any number below was computed/);
 });

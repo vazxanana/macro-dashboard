@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { EDGES, EDGE_IDS, edgeById, fnv1a, poolOf, monthOf, EVAL_FROM } from '../academy/edges.mjs';
 import { computeVersion } from '../academy/gen/study.mjs';
 import { checkBars, closedOnly, summarize, isOpen, barExpected, isAligned, goodFriday, usEuDstMismatch, euSummer, nyClock, THRESHOLDS, CALENDARS } from '../academy/quality.mjs';
-import { SYSTEMS } from '../council/decay.mjs';
+import { SYSTEMS, SHADOW_11NOV } from '../council/decay.mjs';
 import { histOffsetH } from '../council/histdata.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,11 +28,13 @@ const weekVerified = (market, t) => { const i = Math.floor((t + 86400 - W0) / (7
   return c != null && +c === histOffsetH(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); };
 
 // ── registry ──
-test('registry: exactly the seven live Meridian systems, named as council/decay.mjs names them', () => {
+// (11 Nov 2026: the owner made five of the seven paper shadows from that day, user rule supported-book. The Academy still teaches
+// the seven rules; the registry check is that each is a Meridian system of council/decay.mjs that was live until that decision.)
+test('registry: exactly the seven Meridian systems that were live until 11 Nov 2026, named as council/decay.mjs names them', () => {
   assert.deepEqual(EDGE_IDS, SEVEN);
   for (const e of EDGES) {
     const sys = SYSTEMS.find((s) => s.id === e.id);
-    assert.ok(sys && !sys.shadow && sys.desk === 'Meridian', `${e.id} is a live Meridian system`);
+    assert.ok(sys && sys.desk === 'Meridian' && (!sys.shadow || sys.since === SHADOW_11NOV), `${e.id} is a Meridian system, live until the 11 Nov decision`);
     assert.equal(e.name, sys.name);
     assert.equal(edgeById(e.id), e);
   }
