@@ -26,9 +26,19 @@
       if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark';
     } catch (e) {}
   })();
+  // Simple phone view (11 Nov 2026): on a screen up to 640 px the page opens in its simple view unless this device chose the
+  // full one. Same key and attribute as the Desk and the Macro desk (localStorage ms-phone = "full"; html[data-phone="simple"]),
+  // so one choice covers the site. Set before the first paint so nothing folds after it. This script only READS the key:
+  // the switch writes it through the page's allowed-storage helper (assets/academy-ui.js) and then calls msPhoneSet().
+  (function () {
+    var R = document.documentElement, mq = window.matchMedia ? matchMedia('(max-width: 640px)') : null;
+    function set() { var full = false; try { full = localStorage.getItem('ms-phone') === 'full'; } catch (e) {} if (mq && mq.matches && !full) R.dataset.phone = 'simple'; else delete R.dataset.phone; }
+    set(); if (mq && mq.addEventListener) mq.addEventListener('change', function () { set(); document.dispatchEvent(new CustomEvent('ms:phone')); });
+    window.msPhoneSet = function () { set(); document.dispatchEvent(new CustomEvent('ms:phone')); };
+  })();
 </script>
 <link rel="stylesheet" href="/assets/mx-page.css?v=e803654e03">
-<link rel="stylesheet" href="/assets/academy.css?v=e91e06c793">
+<link rel="stylesheet" href="/assets/academy.css?v=0c8f256342">
 <link rel="stylesheet" href="/assets/academy-analyst.css?v=fc15975e51">
 <!-- app tags: scripts/pwa.mjs -->
 <link rel="manifest" href="/app.webmanifest">
@@ -84,17 +94,18 @@
 
       <div class="card" id="setup">
         <h2 class="c-h">Start a replay <small id="setup-sum"></small><button type="button" class="btn sm" id="setup-toggle" hidden aria-expanded="true" aria-controls="setup-body">Change setup</button></h2>
-        <div id="setup-body">
+        <div id="setup-body" class="pm-host">
           <p class="ac-err" id="setup-err" role="alert" hidden></p>
           <div class="resume-now" id="resume-now" hidden></div>
           <form id="setup-form" novalidate>
             <div class="stp">
               <span class="stp-n" aria-hidden="true">1</span>
-              <div class="stp-b">
+              <div class="stp-b pm-host">
                 <h3 class="stp-h">Which edge?</h3>
                 <div class="edge-cards" id="edge-cards" role="group" aria-label="Edge"></div>
                 <label class="f f-wide f-edge"><span>Edge</span><select id="f-edge" required></select></label>
-                <div class="edge-info" id="edge-info" aria-live="polite"></div>
+                <div class="edge-info pm" id="edge-info" aria-live="polite"></div>
+                <button type="button" class="btn sm pmore" id="edge-more" aria-expanded="false">About this edge</button>
               </div>
             </div>
             <div class="stp">
@@ -159,11 +170,12 @@
             </div>
           </form>
 
-          <div class="sub" id="lessons-box">
+          <button type="button" class="btn sm pmore" id="setup-more" aria-expanded="false">Lessons in force and saved sessions</button>
+          <div class="sub pm" id="lessons-box">
             <h3>Lessons in force for this edge <small id="lessons-n"></small></h3>
             <ul class="plain-list" id="lessons-list"></ul>
           </div>
-          <div class="sub" id="resume-box">
+          <div class="sub pm" id="resume-box">
             <h3>Resume a saved session</h3>
             <ul class="plain-list" id="sess-list"></ul>
           </div>
@@ -180,23 +192,24 @@
               </div>
               <div class="chart-wrap" id="chart-wrap"><div id="chart" class="chart" role="img" aria-label="Replay chart: candles closed at the replay time"></div><div class="zones" id="zones" aria-hidden="true"></div></div>
               <div class="point-bar" id="point-bar" role="status" aria-live="polite" hidden></div>
-              <div class="ctl" id="ctl" role="group" aria-label="Replay controls">
+              <div class="ctl pm-host" id="ctl" role="group" aria-label="Replay controls">
                 <button type="button" class="btn primary" id="c-play" aria-keyshortcuts="Space">Play</button>
                 <button type="button" class="btn" id="c-step" aria-keyshortcuts="ArrowRight">Step one candle</button>
-                <button type="button" class="btn" id="c-restart">Restart</button>
+                <button type="button" class="btn pmore" id="ctl-more" aria-expanded="false">More</button>
+                <button type="button" class="btn pm" id="c-restart">Restart</button>
                 <span class="seg inline" id="c-speed" role="group" aria-label="Speed">
                   <button type="button" class="btn sm" data-speed="1">1×</button><button type="button" class="btn sm" data-speed="5">5×</button><button type="button" class="btn sm" data-speed="10">10×</button><button type="button" class="btn sm" data-speed="50">50×</button><button type="button" class="btn sm" data-speed="100">100×</button>
                 </span>
-                <label class="jump"><span>Jump to</span><input type="datetime-local" id="c-jump-at"><button type="button" class="btn sm" id="c-jump">Go</button></label>
-                <button type="button" class="btn" id="sess-save">Save session</button>
-                <button type="button" class="btn" id="sess-resume">Resume session</button>
+                <label class="jump pm"><span>Jump to</span><input type="datetime-local" id="c-jump-at"><button type="button" class="btn sm" id="c-jump">Go</button></label>
+                <button type="button" class="btn pm" id="sess-save">Save session</button>
+                <button type="button" class="btn pm" id="sess-resume">Resume session</button>
               </div>
               <p class="ac-status" id="replay-msg" role="status" aria-live="polite"></p>
-              <p class="note">Keyboard: Space plays or pauses, the right arrow steps one candle.</p>
+              <p class="note" id="kbd-note">Keyboard: Space plays or pauses, the right arrow steps one candle.</p>
               <p class="note" id="chart-legend"></p>
             </div>
 
-            <div class="card chart-card">
+            <div class="card chart-card pcard" id="htf-card">
               <div class="chart-head">
                 <div><b>Higher timeframe</b></div>
                 <span class="seg inline" id="htf-sw" role="group" aria-label="Higher timeframe">
@@ -206,33 +219,33 @@
               <div id="htf" class="chart small" role="img" aria-label="Higher-timeframe chart: candles closed at the replay time"></div>
             </div>
 
-            <div class="card" id="log-card">
+            <div class="card pcard" id="log-card">
               <h2 class="c-h">Replay log</h2>
               <ol class="log" id="log" aria-live="polite"></ol>
             </div>
           </div>
 
           <div class="ac-side">
-            <div class="card" id="acct-card">
+            <div class="card pcard" id="acct-card">
               <h2 class="c-h">Paper account <small>follows the engine's latest decision on each setup</small></h2>
               <dl class="stats" id="acct"></dl>
               <p class="ac-warn" id="acct-block" hidden></p>
               <div id="trades-box" hidden><h3>Trades</h3><div class="tbl"><table id="trades"><thead><tr><th>Setup</th><th>Side</th><th>Risk</th><th>Result</th></tr></thead><tbody></tbody></table></div></div>
             </div>
 
-            <div class="card" id="thesis-card">
+            <div class="card pcard" id="thesis-card">
               <h2 class="c-h">Running thesis</h2>
               <p id="thesis-line">—</p>
               <ul class="plain-list small" id="thesis-changes"></ul>
             </div>
 
-            <div class="card" id="decision" hidden aria-live="polite"></div>
-            <div class="card" id="mentor" hidden></div>
+            <div class="card pm-host" id="decision" hidden aria-live="polite"></div>
+            <div class="card pm-host" id="mentor" hidden></div>
             <div class="card" id="lesson" hidden></div>
             <div class="card" id="prove" hidden></div>
             <div class="card" id="whatif" hidden></div>
 
-            <div class="card" id="exam">
+            <div class="card pcard" id="exam">
               <h2 class="c-h">Test on new setups <small>unseen exam-pool setups, with and without your lessons</small></h2>
               <p>The engine decides each unseen setup twice: without any lesson and with the lessons in force. Both answers are stored before any result is read. These results are kept apart from same-trade replays.</p>
               <div class="f-actions"><button type="button" class="btn primary" id="exam-run">Test on 10 new setups</button><span class="ac-status" id="exam-msg" role="status" aria-live="polite"></span></div>
@@ -257,6 +270,9 @@
     <section id="ac-models" role="tabpanel" aria-labelledby="tab-models" tabindex="-1" hidden></section>
     <section id="ac-costs" role="tabpanel" aria-labelledby="tab-costs" tabindex="-1" hidden></section>
     <section id="ac-audit" role="tabpanel" aria-labelledby="tab-audit" tabindex="-1" hidden></section>
+
+    <!-- Phones only (640 px and under): the simple view is the default, Full is the phone page as it was before 11 Nov 2026 -->
+    <div class="pv" id="pv"><span id="pv-l">Phone view</span><span class="seg inline" role="group" aria-labelledby="pv-l"><button type="button" class="btn sm" data-pv="simple" aria-pressed="true">Simple</button><button type="button" class="btn sm" data-pv="full" aria-pressed="false">Full</button></span></div>
   </div>
 </main>
 
@@ -266,8 +282,8 @@
 <script src="/assets/academy-core.js?v=b3adcdaae2"></script>
 <script src="/assets/academy-risk.js?v=9b9ae3d731"></script>
 <script src="/assets/mx-nav.js?v=3f8fef533d"></script>
-<script src="/assets/academy-ui.js?v=9b90b5ce64"></script>
-<script src="/assets/academy-tabs.js?v=1534629ce7"></script>
+<script src="/assets/academy-ui.js?v=1e640a9a62"></script>
+<script src="/assets/academy-tabs.js?v=d36e604081"></script>
 <script src="/assets/academy-analyst.js?v=6667f165c8"></script>
 </body>
 </html>

@@ -112,6 +112,11 @@ async function startServer(port = PORT, flags = []) {
   };
   const nextPoint = async (p) => { await p.waitForSelector('#dec-stored', { timeout: 60000 }); await p.waitForFunction(() => /stored/.test(document.getElementById('dec-stored').textContent) && /paused on a setup/.test(document.getElementById('clock-state').textContent), null, { timeout: 60000 }); };
   const goOn = async (p) => { await p.click('#continue'); await p.waitForSelector('#dec-action', { state: 'detached', timeout: 20000 }); };
+  // The phone's simple view (11 Nov 2026): a seldom-used section sits behind "More" in the tab bar and some cards fold to their
+  // heading. These two open what a check needs the way a thumb would; on a wide screen and in the full view they do nothing.
+  const tabTo = async (p, id) => { if (!(await vis(p, '#tab-' + id))) await p.tap('#tab-more'); await p.tap('#tab-' + id); };
+  const unfold = async (p, id) => { const sel = `#${id} > :first-child > .pc-t[aria-expanded="false"]`; if (await vis(p, sel)) await p.tap(sel); };
+  const SHOWN = String.raw`((ids) => ids.filter((id) => { const e = document.getElementById(id); return e && e.getClientRects().length > 0; }))`;
   const setup = async (p, from, speed) => {
     await p.waitForSelector('#f-edge option', { state: 'attached', timeout: 15000 }); await p.selectOption('#f-edge', EDGE);
     await p.waitForFunction(() => /setups? in this range/.test(document.getElementById('f-count').textContent), null, { timeout: 15000 });
@@ -466,7 +471,7 @@ async function startServer(port = PORT, flags = []) {
 
     // ---- 11e. Models, Costs, Audit ----
     await tab('models', '#md-training-table');
-    check('Models: nothing is promoted, the registry is honestly empty, and promotion is a documented manual step', /^No champion\. Nothing is promoted/.test(await txt(p, '#md-champion')) && /The registry is empty: no scorer has been registered/.test(await txt(p, '#md-registry')) && /model\.register/.test(await txt(p, '#md-manual')) && /model\.promote/.test(await txt(p, '#md-manual')) && (await p.$$eval('#ac-models button', (l) => l.length)) === 0, await txt(p, '#md-champion'));
+    check('Models: nothing is promoted, the registry is honestly empty, and promotion is a documented manual step', /^No champion\. Nothing is promoted/.test(await txt(p, '#md-champion')) && /The registry is empty: no scorer has been registered/.test(await txt(p, '#md-registry')) && /model\.register/.test(await txt(p, '#md-manual')) && /model\.promote/.test(await txt(p, '#md-manual')) && (await p.$$eval('#ac-models button:not(.pmore)', (l) => l.length)) === 0, await txt(p, '#md-champion'));   // .pmore: the phone view's own fold chevron (not drawn here), never an action
     const mrows = await p.$$eval('#md-training-table tbody tr', (l) => l.map((r) => r.textContent));
     // 20 scorers since the training review of 10 Nov 2026 (the reference on 5 scopes, four challenger configurations on 15); the trainer reads no exam data, so there is no exam table
     check('Models: each scorer with its walk-forward numbers and verdict; no exam block (the trainer reads none); the skipped edges', mrows.length === 20 && mrows.every((r) => /rejected challenger/.test(r) && /not promoted/.test(r)) && /^replica325/.test(mrows[0]) && mrows.filter((r) => /mono-gbt|logit-short|pooled-logit|ridge-netR/.test(r)).length === 15 && /None of the 20 scorers beat taking every setup/.test(await txt(p, '#md-verdict')) && (await p.$$('#md-exam-table tbody tr')).length === 0 && (await p.$$('#md-skipped li')).length === 3 && /150 are needed to fit/.test(await txt(p, '#md-skipped')), mrows[0]);
@@ -596,7 +601,7 @@ async function startServer(port = PORT, flags = []) {
       const onSetup = async (c) => { await nextPoint(v); return (await txt(v, '#clock-time')) === stamp(c.t); };
       // "Check earlier corrections": every line the status shows is kept, so the progress is read exactly, not sampled
       const runCheck = async (n) => {
-        await v.click('#tab-lessons'); await v.waitForSelector('#ls-check-run', { timeout: 20000 });
+        await v.click('#tab-lessons'); await v.waitForSelector('#ls-check', { timeout: 20000 }); await unfold(v, 'ls-check'); await v.waitForSelector('#ls-check-run', { timeout: 20000 });   // on the phone's simple view the card is folded to its heading
         await v.evaluate(() => { window.__chk = []; const m = document.getElementById('ls-check-msg'); new MutationObserver(() => window.__chk.push(m.textContent)).observe(m, { childList: true, characterData: true, subtree: true }); });
         const from = reqs.length; await v.click('#ls-check-run'); await v.waitForFunction((k) => window.__chk.some((t) => t === `Checked ${k} setups.`), n, { timeout: 60000 }).catch(() => {});
         const sum = await v.$eval('#ls-check-sum', (e) => ({ text: e.textContent, holds: +e.dataset.holds, broken: +e.dataset.broken })).catch(() => ({ text: '', holds: -1, broken: -1 }));
@@ -819,12 +824,30 @@ async function startServer(port = PORT, flags = []) {
       const ph = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce' }); await ph.addInitScript(NO_PACE); p = await ph.newPage(); watch(p, 'phone');
       await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, iso(cands[0].t), '100');
       const n0 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.length;
+      { // the simple view is the default on a phone: before a replay the screen is "pick an edge, pick the days, start"
+        const seen = await p.evaluate(SHOWN + `(['tab-train','tab-session','tab-blind','tab-progress','tab-lessons','tab-more','tab-research','tab-models','tab-costs','tab-audit','edge-cards','f-from','f-to','start','setup-opts','edge-more','setup-more','edge-info','lessons-box','resume-box','pv'])`);
+        await p.evaluate(() => { document.getElementById('setup-opts').open = false; });   // measured as a visitor finds it (setup() opened "More options" to set the speed, which stays set)
+        const view = await p.evaluate(() => [(document.documentElement.getAttribute('data-phone') || 'full'), !!document.querySelector('.ac-steps').getClientRects().length, Math.round(document.documentElement.scrollHeight / innerHeight * 10) / 10]);
+        check('phone, simple view (the default): five sections and "More" in the tab bar, the edge, the days and Start; the hero is its title and the rest waits behind a button', view[0] === 'simple' && !view[1] && seen.join() === 'tab-train,tab-session,tab-blind,tab-progress,tab-lessons,tab-more,edge-cards,f-from,f-to,start,setup-opts,edge-more,setup-more,pv' && view[2] <= 2.2, view.join(' | ') + ' | ' + seen.join());
+        const n = reqs.length; await p.tap('#edge-more'); await p.tap('#setup-more');
+        const open = await p.evaluate(SHOWN + `(['edge-info','lessons-box','resume-box'])`);
+        check('phone, simple view: "About this edge" and "Lessons in force and saved sessions" open in place and ask the server for nothing', open.length === 3 && (await p.getAttribute('#edge-more', 'aria-expanded')) === 'true' && calls(reqs, n, 'phone').length === 0, open.join() + ' ' + calls(reqs, n, 'phone').map(what).join());
+        await p.tap('#edge-more'); await p.tap('#setup-more'); }
       let w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on the setup', w <= 390, w);
       let small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (setup)', small.length === 0, small.slice(0, 4).join(' ; '));
       let taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (setup)', taps.length === 0, taps.slice(0, 5).join(' ; '));
       for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
-      await p.tap('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await p.tap('#c-play'); await nextPoint(p);
+      await p.tap('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 });
+      { // during a replay the screen is the chart and the player; everything else is a heading away
+        const seen = await p.evaluate(SHOWN + `(['chart','c-play','c-step','c-speed','ctl-more','c-restart','c-jump','sess-save','sess-resume','kbd-note','chart-meta','htf','log','acct','thesis-line','exam-run'])`);
+        const top = await p.evaluate(() => { scrollTo(0, 0); const r = document.getElementById('ctl').getBoundingClientRect(); return Math.round(r.bottom); });
+        check('phone, simple view: a replay shows the chart, Play, Step, the speeds and "More"; the player is on the first screen', seen.join() === 'chart,c-play,c-step,c-speed,ctl-more' && top <= 844, seen.join() + ' | controls end at ' + top);
+        await p.tap('#ctl-more'); const more = await p.evaluate(SHOWN + `(['c-restart','c-jump','sess-save','sess-resume','kbd-note','chart-meta'])`); await p.tap('#ctl-more');
+        const folded = []; for (const [card, inner] of [['htf-card', 'htf'], ['log-card', 'log'], ['acct-card', 'acct'], ['thesis-card', 'thesis-line'], ['exam', 'exam-run']]) { await unfold(p, card); if (await vis(p, '#' + inner)) folded.push(card); await p.tap(`#${card} > :first-child > .pc-t`); }
+        const htfDrawn = await (async () => { await unfold(p, 'htf-card'); const ok = await p.waitForFunction(() => { const c = document.querySelector('#htf canvas'); return c && c.getBoundingClientRect().width > 200; }, null, { timeout: 5000 }).then(() => true, () => false); await p.tap('#htf-card > :first-child > .pc-t'); return ok; })();
+        check('phone, simple view: Restart, Jump, Save and Resume session sit behind "More", and each folded card (higher timeframe, log, paper account, thesis, test) opens from its heading with its chart drawn', more.length === 6 && folded.length === 5 && htfDrawn, more.join() + ' | ' + folded.join() + ' | htf ' + htfDrawn); }
+      await p.tap('#c-play'); await nextPoint(p);
       { const r = await p.$eval('#point-bar', (e) => { const q = e.getBoundingClientRect(); return [Math.round(q.top), Math.round(q.bottom), e.hidden]; });
         check('390 px: when the clock stops on a setup the line that says so is on screen, under the chart', !r[2] && r[0] >= 0 && r[1] <= 844, r.join(','));
         await p.tap('#point-verdict'); await p.waitForTimeout(250); const mt = await p.$eval('#mentor', (e) => Math.round(e.getBoundingClientRect().top));
@@ -840,7 +863,14 @@ async function startServer(port = PORT, flags = []) {
       for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       const order = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
-      check('390 px: the panels stack and the chart stays first', order[0] < order[1] && order[1] < order[2] && order[2] < order[3], order.join(' < '));
+      // simple view: the decision and the verdict come straight after the chart, the paper account after them (the full view keeps
+      // the order of before 11 Nov 2026: chart, account, decision, verdict; checked below)
+      check('390 px, simple view: the panels stack as chart, decision, verdict, then the paper account', order[0] < order[2] && order[2] < order[3] && order[3] < order[1], order.join(' , '));
+      { const m = await p.evaluate(SHOWN + `(['m-entry','m-bias','m-edge','a-kind','a-arm','m-text','m-save','m-more','dec-main','dec-fold-evidence','dec-more','continue'])`), h = await p.$eval('#mentor', (e) => Math.round(e.getBoundingClientRect().height));
+        check('phone, simple view: the verdict form is the answers, the why, the words and Save on one screen; levels, bias, another edge and chart marks wait until they are needed', m.join() === 'm-text,m-save,m-more,dec-main,dec-fold-evidence,dec-more,continue' && h <= 844, m.join() + ' | ' + h + ' px');
+        const ch = await p.$('#mentor [data-choice="BUY"], #mentor [data-choice="SELL"]'); if (ch) { await ch.tap(); await p.waitForFunction(() => !document.getElementById('m-entry').disabled); }
+        await p.tap('#m-more'); const m2 = await p.evaluate(SHOWN + `(['m-entry','m-stop','m-target','m-bias','m-edge','a-kind','a-arm'])`);
+        check('phone, simple view: changing the answer to a trade shows its entry, stop and target, and "more" shows bias, edge and marks', !!ch && m2.length === 7, m2.join()); await p.tap('#m-more'); }
       check('reduced motion is respected (no transition left running)', await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.btn')).transitionDuration) <= 0.001));
       // ... and no transition is STARTED either: with a tiny non-zero duration on `*` a theme change ran down the tree one level a
       // frame, and text kept the old theme's colour on the new background for several frames (shared.cjs). Read in the same task
@@ -851,14 +881,34 @@ async function startServer(port = PORT, flags = []) {
       { const a2 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts; check('another sitting on the same setup stores the next attempt number, as a same-trade replay', a2.length === n0 + 1 && a2[n0].n === n0 + 1 && a2[n0].mode === 'replay-same', JSON.stringify(a2.map((a) => [a.n, a.mode]))); }
       await p.screenshot({ path: OUT + 'academy-5-phone.png' });   // not a full-page shot: that would reset the touch emulation for the checks below
       for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['research', '#rs-table'], ['blind', '#bl-rows'], ['session', '#ss-saved li']]) {
-        await p.tap('#tab-' + id); await p.waitForSelector(sel, { timeout: 20000 }); if (id === 'lessons') { await p.tap('#ls-list [data-act="revise"]'); await p.waitForSelector('#lr-title'); }
+        await tabTo(p, id); if (id === 'research') { await p.waitForSelector('#rs-studies'); await unfold(p, 'rs-studies'); } await p.waitForSelector(sel, { timeout: 20000 }); if (id === 'lessons') { await p.tap('#ls-list [data-act="revise"]'); await p.waitForSelector('#lr-title'); }
         w = await p.evaluate(() => document.documentElement.scrollWidth); check(`390 px: no sideways scroll (${id})`, w <= 390, w);
         small = await p.evaluate(SMALL); check(`390 px: every text is 12 px or more (${id})`, small.length === 0, small.slice(0, 4).join(' ; '));
         taps = await p.evaluate(TAPS); check(`390 px, touch: every control is at least 44 px tall (${id})`, taps.length === 0, taps.slice(0, 5).join(' ; '));
         if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
         await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       }
-      const two = await p.evaluate(() => { document.getElementById('tab-progress').click(); return null; }); await p.waitForSelector('#pg-recall');
+      { // "More" in the tab bar, and the full view: the phone page as it was, remembered on this device
+        await p.tap('#tab-train'); const closed = await p.evaluate(SHOWN + `(['tab-research','tab-models','tab-costs','tab-audit'])`); await p.tap('#tab-more'); const opened = await p.evaluate(SHOWN + `(['tab-research','tab-models','tab-costs','tab-audit'])`);
+        await p.tap('#tab-audit'); await p.waitForSelector('#au-card'); const stays = (await p.getAttribute('#tab-more', 'aria-expanded')) === 'true' && await vis(p, '#tab-audit');
+        check('phone, simple view: Research, Models, Costs and Audit open from "More", which stays open while one of them is on screen', closed.length === 0 && opened.length === 4 && stays, closed.join() + ' | ' + opened.join() + ' | ' + stays);
+        const n = reqs.length; await p.tap('#tab-train'); await p.tap('#pv [data-pv="full"]');
+        const full = await p.evaluate(SHOWN + `(['tab-research','tab-audit','c-restart','c-jump','sess-save','htf','log','acct','thesis-line','exam-run','m-bias','a-kind','tab-more','ctl-more','m-more','dec-more'])`);
+        const ord = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
+        const kept = await p.evaluate(() => { try { return localStorage.getItem('ms-phone'); } catch (e) { return 'blocked'; } }), chev = await p.$$eval('.pc-t', (l) => l.filter((e) => e.getClientRects().length).length);
+        check('phone, full view: every section, control and card is back in the order of before (chart, account, decision, verdict), no "more" button is drawn, and switching asks the server for nothing', full.join() === 'tab-research,tab-audit,c-restart,c-jump,sess-save,htf,log,acct,thesis-line,exam-run,m-bias,a-kind' && ord[0] < ord[1] && ord[1] < ord[2] && ord[2] < ord[3] && chev === 0 && calls(reqs, n, 'phone').filter((r) => r.method === 'POST').length === 0, full.join() + ' | ' + ord.join(' < ') + ' | ' + chev);
+        w = await p.evaluate(() => document.documentElement.scrollWidth); taps = await p.evaluate(TAPS); small = await p.evaluate(SMALL);
+        check('phone, full view: no sideways scroll, text of 12 px or more, 44 px controls', w <= 390 && taps.length === 0 && small.length === 0, `${w} px; ${taps.slice(0, 3).join(' ; ')}; ${small.slice(0, 3).join(' ; ')}`);
+        p.once('dialog', (d) => d.accept().catch(() => {}));   // a verdict is half written above: the browser may ask before the reload
+        await p.reload({ waitUntil: 'load' }); await p.waitForSelector('#ac-tabs [role=tab]', { timeout: 15000 });
+        const after = await p.evaluate(() => [(document.documentElement.getAttribute('data-phone') || 'full'), document.querySelector('#pv [data-pv="full"]').getAttribute('aria-pressed'), !!document.querySelector('.ac-steps').getClientRects().length]);
+        check('phone: the choice of the full view is remembered on this device (the site\'s key ms-phone, in the page\'s allowed storage) and Simple view is one tap back', kept === 'full' && after.join() === 'full,true,true', kept + ' | ' + after.join());
+        await p.tap('#pv [data-pv="simple"]'); check('phone: back in the simple view, and the key is gone again (the site\'s convention: no key = simple)', (await p.evaluate(() => (document.documentElement.getAttribute('data-phone') || 'full') + ' ' + localStorage.getItem('ms-phone'))) === 'simple null' && !(await vis(p, '.ac-steps')));
+      }
+      const two = await p.evaluate(() => { document.getElementById('tab-progress').click(); return null; }); await p.waitForSelector('#pg-rvn');
+      { const heads = await p.evaluate(SHOWN + `(['pg-counts','pg-agree','pg-rvn','pg-mistakes','pg-queue','pg-attempts'])`), open = await p.$$eval('#ac-progress .pcard.pm-open', (l) => l.length), scr = await p.evaluate(() => Math.round(document.documentElement.scrollHeight / innerHeight * 10) / 10);
+        check('phone, simple view: Progress opens on "Where things stand" with every other card one heading each', heads.length === 6 && open === 0 && await vis(p, '#pg-counts .stats') && scr <= 2, heads.join() + ` | ${open} open | ${scr} screens`); }
+      await unfold(p, 'pg-rvn'); await p.waitForSelector('#pg-recall');
       const stack = await p.evaluate(() => ['pg-recall', 'pg-fresh'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top)));
       check('390 px: recall and new setups stack, still as two separate blocks', stack[0] < stack[1] && two === null, stack.join(' < '));
       await p.screenshot({ path: OUT + 'academy-10-phone-progress.png', fullPage: true });
