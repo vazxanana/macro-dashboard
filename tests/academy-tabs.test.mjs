@@ -281,3 +281,12 @@ test('the Desk has one way into the Academy, for the owner only', () => {
   assert.match(desk, /html\[data-mode="public"\] \.adm\{display:none!important\}/); assert.match(desk, /html\[data-role="reviewer"\] \.own\{display:none!important\}/); assert.match(desk, /html\[data-role="viewer"\] \.own,/);
   assert.ok(src('out/market-structure.html').includes('id="ms-me-academy"'), 'out/ carries it');
 });
+
+test('a study table shows a time kept as epoch seconds as a date, and leaves every other number alone (11 Nov 2026)', () => {
+  const secs = T.tableSections({ from: 1584131940, to: 1777286340, orders: 325, n: 1584131940, split: { cut: 1719340020, k: 0.7 }, byYear: [{ year: 2020, n: 34, t: -2.92 }] });
+  const sum = Object.fromEntries(secs.find((q) => q.title === 'Summary').pairs);
+  assert.equal(sum.from, '2020-03-13 20:39 UTC'); assert.equal(sum.to, '2026-04-27 10:39 UTC'); assert.equal(sum.orders, '325');
+  assert.equal(sum.n, '1584131940', 'a count is never read as a time, whatever its size');
+  assert.deepEqual(secs.find((q) => q.title === 'split').pairs, [['cut', '2024-06-25 18:27 UTC'], ['k', '0.7']]);
+  assert.deepEqual(secs.find((q) => q.title === 'byYear').rows, [['2020', '34', '-2.92']], 'a t statistic under the key t is not a time');
+});

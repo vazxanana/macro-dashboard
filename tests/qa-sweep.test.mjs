@@ -236,9 +236,11 @@ test('sign-in card: the proof counts and names main-system paper trades only, ne
   assert.equal(G.ict.v, '+125R'); assert.match(G.ict.s, /^815 trades since Aug 2025 · before costs$/); assert.match(G.ict.tip, /backtest/i);
   assert.match(html, /<span>ICT replay · a backtest<\/span>/);
   assert.doesNotMatch(html, /since 2020<\/small>/, 'the replay starts in August 2025; the card said "since 2020" until the file loaded');
-  // a file that did not load shows no card (it showed "Open now 0")
+  // a file that did not load keeps its dash (it showed "Open now 0"); the boxes are in the page from the first paint (desk load)
   const none = W.msGateProof(null, null, 0); assert.deepEqual(none, { open: null, ict: null, last: null });
-  assert.match(html, /\.gs-pk\[hidden\] \{ display: none; \}/);
+  assert.match(html, /set\('gs-p-open', G\.open \? G\.open\.v : '—'\)/);
+  assert.match(html, /<div class="gs-proof" id="gs-proof">\n      <div class="gs-pk" id="gs-pk-open">/);
+  assert.match(html, /window\.msGateProof\(null, I, 0\)\.ict/, 'the ICT line, read last, goes through the same function');
   // the same list of main systems as the page's SYS_K
   const sysK = /const SYS_K = (\[[^\]]+\]);\n  \/\/ guests: our main system only/.exec(html)[1], main = /var MAIN = (\[[^\]]+\])/.exec(html)[1];
   assert.equal(main, sysK);
