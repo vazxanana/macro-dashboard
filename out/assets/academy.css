@@ -359,3 +359,22 @@ details.opts > :not(summary) { margin-inline: 14px; } details.opts > :last-child
 tbody tr:hover td { background: color-mix(in srgb, var(--accent) 5%, transparent); }
 .ac-net { border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) { .btn, .ecard, input, select, textarea, details.opts > summary::before { transition: none; } .btn.primary:hover:not([disabled]), .ecard:hover { transform: none; } }
+
+/* ---- Usability pass (11 Nov 2026): finding the decision, the lesson editor, the what-if table ---------------------------- */
+/* a jump lands under the sticky top bar, not behind it */
+#replay, #decision, #mentor, #lesson, #prove, #whatif, #bl-live, #ss-live, .chart-card { scroll-margin-top: 64px; }
+#decision:focus, #mentor:focus { outline: none; }
+/* the line under the chart when the clock stops on a setup: what was decided and where to go next */
+.point-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: var(--s3); padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--accent-soft); }
+.point-bar[hidden] { display: none; }
+.point-bar .point-t { flex: 1 1 220px; font-size: 13.5px; line-height: 1.45; color: var(--ink); }
+.point-bar .point-go { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+.point-bar.warn { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); background: var(--gold-soft); }
+.point-bar .act.sm { box-shadow: none; }
+#continue-msg:not(:empty) { flex: 1 1 220px; padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid color-mix(in srgb, var(--gold) 55%, var(--line)); background: var(--gold-soft); color: var(--ink); font-size: 13px; line-height: 1.45; }
+/* a lesson condition in a narrow column: the feature on its own line, so its name is never cut ("higher-timefra…") */
+.ac-side .cond { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) max-content; padding: 8px; border-radius: 10px; border: 1px solid var(--line); margin-top: 8px; }
+.ac-side .cond > :first-child { grid-column: 1 / -1; }
+@media (max-width: 520px) { .cond { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) max-content; padding: 8px; border-radius: 10px; border: 1px solid var(--line); margin-top: 8px; } .cond > :first-child { grid-column: 1 / -1; } }
+/* what if: the result columns come first; the levels column may wrap instead of pushing them off the card */
+.wi td:nth-child(2) { font-weight: 600; }

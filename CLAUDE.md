@@ -1489,6 +1489,22 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   replay controls as a player, a long table scrolling inside its box under a sticky header (the research list). Checked on
   live candles: every edge x chart timeframe x higher timeframe draws (56 of 56), and the Session, Blind arena and preview
   charts. The audit opens "More options" before it sets the speed.
+- **Usability pass** (11 Nov 2026, owner: "keep improving our system academy"; found by using the page end to end at 1366 and
+  390 px in the three themes): page code and CSS only, no decision, lesson, policy or API logic changed. (1) When the clock stops
+  on a setup, a line under the chart says so (`#point-bar`, `renderPointBar`, `MXAC.pointLine`: the answer and its confidence
+  word, "See the decision", "Give your verdict"; `goTo` lands a card under the top bar, `scroll-margin-top`); on a phone the
+  decision used to sit about 1,700 px below the chart with only "Continue replay" in sight. Continue brings the chart back on
+  screen (`showNode`, also the Blind arena's "Next setup"). (2) Continue, Step, Jump, Restart and Space no longer drop a
+  half-written verdict without a word: the first press says it is not saved (`leaveOk`, `MXAC.mentorUnsaved`, `M.dirty`,
+  `#continue-msg`), a second press within 10 s leaves; a saved or untouched form never asks. The guard sends and stores nothing.
+  (3) `MXAC.humanize(text, lessons)` shows a lesson's title where the engine's text carries its id ("conflicting lessons:
+  ls_… vs ls_…") and mends a doubled full stop: display only, the stored text is unchanged. (4) The "What if" table leads
+  with Net R and Exit (the card is narrow, the result used to be scrolled out of sight); a lesson condition's feature has its
+  own line in a narrow column (names were cut); the setup preview shows the whole two weeks it names; the chart legend sits
+  under the controls. Tests: `tests/academy-ui.test.mjs` ("usability pass"); audit checks for the line, the question and the
+  phone jump. Known and not done: a reload returns to the last SAVED session point (the session is saved at the first
+  decision and on "Save session", not after each one, because a train decision is kept to one API call); the Train decision
+  card is long (the Session tab already folds the detail); two conflicting lessons are named but settled in the Lessons tab.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the

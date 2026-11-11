@@ -168,3 +168,8 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
   candles, 26 Apr to 17 May 2024, 10 train and 3 exam gmp setups) or `--live`.
 - More API reads added for the page: `corrections&edge=[&cand=]`, `research[&edge=&kind=]` / `research&id=`, `evaluation`, `training`.
   A saved lesson keeps `source.kind` (`mentor` | `research`) and `source.studyId`.
+- Usability pass (11 Nov 2026), page code only: `#point-bar` under the chart at a decision point (`renderPointBar`, pure
+  `MXAC.pointLine`; `goTo` / `showNode` move between the chart and the cards, `showNode` is on `MXAC.kit`); `leaveOk` in front
+  of play / continue, step, jump and restart, so a half-written verdict (`MXAC.mentorUnsaved`, `M.dirty`) needs a second press
+  to be dropped; `MXAC.humanize(text, lessons)` shows lesson titles for ids in the engine's text (display only). The "What if"
+  columns are Alternative, Net R after costs, Exit, Filled, Levels, Best, Worst, Exit time.
