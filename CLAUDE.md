@@ -781,6 +781,36 @@ infinite animation on the gate (live dot rings three times, the tape is static).
 `#g-curve` (cumulative R of `sysClosed()` over 90 days, `renderGuestCurve()` from `renderGuestCal()`, fixed plot height), the P&L
 calendar, then the invitation "Want a seat at the desk?" last. Shorter guest banner; the locked markup switch gets its own row on phones.
 
+## Sign-in card and guest page: honest and main system only (11 Nov 2026, quality round)
+Walked signed out and as a guest (390 px touch, 1440 px, dark / light / midnight; `/api/login` stubbed for every error state).
+- **What a stranger is shown is the main system only.** The sign-in card's proof counted every open shadow trade ("Open now 25"
+  with no main-system trade open) and named the newest shadow signal; `window.msGateProof(trades, ictReplay, now)` (pure, `MAIN` =
+  `SYS_K`) now counts and names main-system paper trades only, a card shows only when its file loaded, and the ICT card reads
+  "ICT replay · a backtest", n, "since <replay.from>", "before costs" (it said "since 2020"; the replay starts 1 Aug 2025).
+- **Guest memory** (`GUEST_DATA`, `guestRow`, next to `sysClosed`): for the public role, whatever the loader stores in
+  `COUNCIL.trades / research / replay / snap` passes through setters first: main-system rows only, cut to `GUEST_F` (no name, pair,
+  note, feat, blockedBy, pm), the snapshot cut to prices. Before, the hidden Home / Setup / Council views of a guest held 26 shadow
+  trades with "Blocked by: …" and the scanner's setup texts. Guest toasts (`councilAlerts`) are main-system only and say "Paper
+  trade", not the system's name. Never read a guest file into the page past these filters. Still true and NOT fixed here: the
+  guest files themselves (`/cdata/trades.json`, `snapshot.json`, `research.json`, `research/replay-2w.json`) carry every book with
+  names and notes to anyone who fetches them, the page source carries the admin views' static text, and the hidden views still
+  hold what the page computes in the browser from public candles (the top-down steps, the scanner). Closing that needs the
+  server to cut the guest files (`api/data.js`), an owner decision reported on 11 Nov.
+- **A backtest is called a backtest.** The guest "Last 90 days" curve is mostly the replay of the rules on past candles (11 Nov:
+  40 of 45 trades, +10.2R, against 5 forward paper trades, −2.05R) and was all labelled "paper trades". `guestSplit` counts the two
+  apart; the replay is drawn dashed, the forward record solid from a dotted marker, and the label, the count, the note and the
+  plot's aria-label name both; the calendar note gives the date before which days are a backtest. No number changed.
+- Empty states: the trade card says loading / could not be loaded / no gold trade (it vanished); the strip, curve and calendar say
+  when council-data could not be read (the calendar said "No closed trades"); "Floating now" no longer calls a waiting order open.
+  The curve redraws when its plot gets a width (`ResizeObserver`): results that arrived first left "Loading results…" on screen
+  until the next data load (2 of 3 desktop loads).
+- Sign-in card: the page behind is `inert` while the card is up (`msGateInert`; Tab used to reach "Skip to content" behind the
+  `aria-modal` card), closing hands focus back to the button that opened it, and Caps Lock + an error no longer stack and push the
+  button (the wrong-password line names Caps Lock). The gate's layout shift and `loadCouncil` were left to the load-performance pass.
+- "↓ Gold trade and results" did nothing: as a `#g-setup` link it changed the address, and the view router scrolled back to the
+  top. A click handler scrolls to `#g-merged` and leaves the address alone. A guest's account menu no longer offers the profile.
+- Tests: `tests/qa-sweep.test.mjs` (the five "sign-in card" / "guest" checks run `msGateProof`, `GUEST_DATA` and `guestSplit`).
+
 ## Guests on the charts, wide-screen density (8 Nov 2026)
 Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#charts`, header picker live only on the charts view;
 `html[data-view]` set by showView). Their markup is Clean only: `setMode` forces clean, Meridian / ICT buttons show a lock and open
