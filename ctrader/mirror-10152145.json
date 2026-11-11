@@ -6324,7 +6324,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T04:26:56.000Z",
     "councilEntry": 82.78,
     "stop": 83.696538,
@@ -6339,10 +6339,12 @@
     "slipR": 0.031,
     "lagSec": 116,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T04:26:56.000Z",
-    "brokerStop": 83.619
+    "brokerStop": 83.619,
+    "closedAt": "2026-11-11T09:54:29.000Z"
    },
    "eth-rscalp-1794372205": {
     "positionId": "48302070",
@@ -6913,7 +6915,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9921.71 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9912.95 · 26 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6946,15 +6948,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9921.71,
-  "lastRun": "2026-11-11T09:51:40.000Z"
+  "balance": 9912.95,
+  "lastRun": "2026-11-11T09:54:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved XAUUSD 48039921 protection: stop 4080.0514285714285 -> 4080.876, target 4068.715 -> 4069.54 (council scalp)",
-   "trade": "xau-scalp-1794315817"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "placed buy limit USDCAD 0.05 lot at 1.41459 (council scalp, valid to 2026-11-10T16:17Z)",
@@ -8449,6 +8446,11 @@
    "at": "2026-11-11T09:39:10.000Z",
    "msg": "USDCAD position 48346849 closed at the broker",
    "trade": "usdcad-scalp-1794383071"
+  },
+  {
+   "at": "2026-11-11T09:54:29.000Z",
+   "msg": "SOLUSD position 48299950 closed at the broker",
+   "trade": "sol-scalp-1794370912"
   }
  ],
  "limits": {
