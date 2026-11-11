@@ -363,6 +363,22 @@ for …") and is bad (pages through the data check) after 4 days; before, 8 and 
 cannot be run from the build sandbox): the dispatch itself; the decision was run against the live run list. Tests:
 `tests/replay-trigger.test.mjs`.
 
+## ICT study: what the sweep took, equal lows / highs vs one swing (11 Nov 2026, owner: "what about the strategies? use the skills")
+`research/edge/ict-equal-lows/` (PREREGISTRATION.md pushed first, with a table of every concept of the ICT skill against the earlier
+ICT studies; then `run.mjs`, RESULT.md, result.json). The one concept the skill puts first that no study had computed for a signal:
+did the sweep take a pool of relative equal lows / highs (engineered liquidity, skill §1, §9.1), or one swing? Detector `eq.mjs`
+(pure, candles at or before the sweep candle only): two or more confirmed, untouched H1 swing lows (3 a side, last 96 candles, 4+
+candles apart) within 0.1 x the daily ATR(14), all traded through by the sweep candle; sells mirror. Tested as a split of the desk's
+own A-setups (the lab's `runMarket`: the tracker's `signals` / `isASetup` / `sizeOf` and the replay's `simulate`, imported, never
+edited; live exit, sizing and stops) on OANDA mid H1 2020 to October 2026, NQ / ES / YM / RTY / GC, IS 2020-23 | OOS 2024 on, net of
+the lab's costs, three tests with Holm. **Verdict: FAIL.** Equal-pool A-setups (one in six) made −0.007R a trade in sample (n 172)
+and +0.092R out of sample (n 107, t 0.72); the other A-setups +0.092R (873) and +0.138R (579, t 2.07); OOS difference −0.046R,
+t −0.32. Index book the same; gold has 29 OOS trades and no difference (t 0.09). Not a filter, not a grade point, not a size-up, and
+not evidence that equal pools are bad (t under 1). It measures a mechanical H1 definition, not a pool chosen by eye: Fred's "REH/REL"
+review tag measures that. Nothing under `ict/` changed and no proposal was written. Still untested: NWOG / NDOG as the key level a
+sweep runs into (needs futures candles with real gaps), quarter of the month / year. To repeat: `node --use-env-proxy
+research/edge/ict-equal-lows/run.mjs fetch <dir>` (candles outside git), then `… full <dir>`. Tests: `tests/desk-ict-equal-lows.test.mjs`.
+
 ## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
 `council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
 `solid()` plus a shrunk expectancy ≥ 0.10R (empirical-Bayes prior around 0R), and each runs as a champion/challenger trial
@@ -1974,6 +1990,24 @@ UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 3
   `council/event-base.json` were rebuilt with their own scripts in one commit (owner item 19). Stale caches (`*-m1.bin`,
   `xau_m1.bin`) made before 10 Nov hold old times: delete them before any re-run.
 
+## MSNR entry study: the direction call as a gate in front of the engulfing entry (11 Nov 2026, owner: "what about the strategies? use the skills")
+`research/edge/msnr-entry/` (PREREGISTRATION.md committed first, then `run.mjs`, RESULT.md, result.json). Both skills used (the
+direction procedure and the research pipeline) are the owner's private material: never copy their text into the repository; the
+study words every rule itself (a test checks identifying words are absent). The follow-up the direction-call study
+(`research/edge/msnr-direction`, 0 of 6) named as untested: the call (H4 working, Daily key levels; its detector copied into this
+`run.mjs`, nothing imported) as a GATE in front of the pipeline's entry, as trades net of $0.30 a round trip. Entry: an M15 body
+engulf, then within 45 minutes an M5 body engulf the same way, market at the next M5 open, stop $0.30 past the trigger pair (every
+trade has one; none under $1.00 away), target 1.5R, out after 12 hours, one at a time. The same candidates three ways: ALL (no
+gate), WITH the call, AGAINST it. Three tests: T1 trigger 12:00-15:55 UTC, T2 the same at 2R, T3 any hour. OANDA gold M5 from
+2006 (the mosha-sweep file, kept out of git), 2020-26 confirmation, 2007-19 replication. **Verdict: FAIL, 0 of 3**: with the call
+T1 -0.110R a trade net in 2020-26 (n 795, t -2.51) and -0.159R in 2007-19 (n 1,269, t -4.63); without the gate -0.147R and
+-0.172R; before costs every stream is within 0.09R of zero (a 1.5R target hit 40 % of the time), so the loss is the cost. The gate
+adds nothing measurable (WITH minus AGAINST +0.01R to +0.11R, largest Welch t 1.55, absent at all hours); 47 of 48 hour-by-window
+cells are negative; the pipeline's own H4 closing-price structure filter does not help either. Not tested, because the skill gives
+no rule for them: its stacks built on the engulfing-failure signal, the abbreviated signals, an M1 entry and an exit by signal.
+Never call this method an edge; do not automate it; a further test needs those signals written down as rules by the owner and its
+own pre-registration. Nothing live changed. Tests: `tests/msnr-entry.test.mjs`.
+
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
 Mosha BO (H4 BO, H1 BO against, M15 BO back, weekly direction) is a different trade: it could not have taken it (wrong side, M15
@@ -2033,6 +2067,21 @@ its own one-at-a-time stream; a cell had to be positive on 2006-12 (100+ trades)
 the CF -0.07R / -0.07R / -0.16R; a far target is worse than a near one in every period). So neither the pattern nor one of these
 simple conditions holds the owner's selection. Five Mosha studies, thirty-three tests on 10 Nov, none an edge. Do not write another
 mechanical reading or filter; the open step is the owner's own logged trades (owner decision 27). Tests: `tests/mosha-select.test.mjs`.
+
+## MSNR direction call study (11 Nov 2026, owner: use the "MSNR direction SOP" skill)
+`research/edge/msnr-direction/` (PREREGISTRATION.md committed first, then `run.mjs`, RESULT.md, result.json). The skill is the
+owner's private material: never copy its text into the repository; the study describes the rule in its own words. A direction
+FILTER test, no trades: the call (buy / sell) = a close beyond the last swing level that existed before price first tapped a
+live key level one timeframe above (swing, engulfing, failed engulfing or dominant zone), while the structure was the other
+way; it stays until the opposite sequence completes. Ladders H4 / Daily and Daily / Weekly, on OANDA gold H4 from June 2006
+(Daily and Weekly built from the same candles; `node run.mjs fetch <dir>`, cache kept out of git). Measured at each daily
+close against the next 1, 5 and 20 daily closes as an excess over the window's own base rate (call x (return - mean
+return), Newey-West t), six tests, Holm, 2020-26 confirmation and 2007-19 replication. **Verdict: FAIL**: 0 of 6; largest t
+in 2020-26 +1.35 (Daily / Weekly, 5 days, 1,768 days), every test has opposite signs in the two windows; on H4 / Daily gold
+rose more after a sell call than after a buy call in 2020-26 (hit 48.4-50.7 % against a base of 51-52.5 %). The breakout-only
+call is noise too. Not an edge, never a council filter or bias gate; it does not judge the owner's own chart reading, the
+skill's entry sessions or forex. Tests: `tests/msnr-direction.test.mjs` (each element on hand-made candles, no look-ahead,
+the report against result.json).
 
 ## Mosha desk (10 Nov 2026, owner: "And a place to mosha")
 After five studies found no fixed rule of the owner's Mosha trading that makes money, the measurement left is the owner's own

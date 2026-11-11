@@ -1,0 +1,583 @@
+{
+ "topic": "msnr-direction",
+ "built": "2026-11-11",
+ "at": "2026-11-11T14:15:54.781Z",
+ "system": "MSNR direction call (external breakout on the working timeframe after a tap of a key level one timeframe above; H4 / Daily and Daily / Weekly), spot gold OANDA H4, direction filter test: no trades",
+ "window": {
+  "a": "2007-01-01 to 2019-12-31 (replication)",
+  "b": "2020-01-01 to 2026-10-31 (confirmation)"
+ },
+ "params": {
+  "K": 2,
+  "ZONE_AGE": 60,
+  "WAIT": 10,
+  "H4": 14400,
+  "DATA_FROM": 1149120000,
+  "A": [
+   "2007-01-01",
+   "2019-12-31"
+  ],
+  "B": [
+   "2020-01-01",
+   "2026-10-31"
+  ],
+  "HORIZONS": [
+   1,
+   5,
+   20
+  ]
+ },
+ "ladders": {
+  "L1": "working H4, key levels on the Daily",
+  "L2": "working Daily, key levels on the Weekly"
+ },
+ "candles": {
+  "h4": 33298,
+  "days": 5313,
+  "from": "2006-06-01 00:00",
+  "to": "2026-11-10 20:00"
+ },
+ "unit": "excessPct = mean of call x (forward log return - the window's mean forward return), in %, on the days with a call; t = Newey-West",
+ "tests": {
+  "L1-h1": {
+   "ladder": "L1",
+   "h": 1,
+   "a": {
+    "days": 3380,
+    "n": 3380,
+    "nBuy": 1847,
+    "nSell": 1533,
+    "basePct": 0.0257,
+    "buyPct": 0.0299,
+    "sellPct": 0.0207,
+    "excessPct": 0.0046,
+    "t": 0.24,
+    "tNoOverlap": 0.24,
+    "nNoOverlap": 3380,
+    "hit": 50.2,
+    "hitBase": 50.2,
+    "p": 0.4041
+   },
+   "b": {
+    "days": 1772,
+    "n": 1772,
+    "nBuy": 1147,
+    "nSell": 625,
+    "basePct": 0.0529,
+    "buyPct": 0.0219,
+    "sellPct": 0.1097,
+    "excessPct": -0.0401,
+    "t": -1.49,
+    "tNoOverlap": -1.46,
+    "nNoOverlap": 1772,
+    "hit": 48.4,
+    "hitBase": 51,
+    "p": 0.9314
+   },
+   "pHolm": 1,
+   "pass": false
+  },
+  "L1-h5": {
+   "ladder": "L1",
+   "h": 5,
+   "a": {
+    "days": 3376,
+    "n": 3376,
+    "nBuy": 1843,
+    "nSell": 1533,
+    "basePct": 0.1303,
+    "buyPct": 0.1982,
+    "sellPct": 0.0486,
+    "excessPct": 0.0742,
+    "t": 0.93,
+    "tNoOverlap": 1.01,
+    "nNoOverlap": 676,
+    "hit": 50,
+    "hitBase": 50.4,
+    "p": 0.1771
+   },
+   "b": {
+    "days": 1768,
+    "n": 1768,
+    "nBuy": 1147,
+    "nSell": 621,
+    "basePct": 0.2679,
+    "buyPct": 0.1881,
+    "sellPct": 0.4153,
+    "excessPct": -0.1036,
+    "t": -0.95,
+    "tNoOverlap": -0.68,
+    "nNoOverlap": 354,
+    "hit": 48.7,
+    "hitBase": 51.8,
+    "p": 0.8286
+   },
+   "pHolm": 1,
+   "pass": false
+  },
+  "L1-h20": {
+   "ladder": "L1",
+   "h": 20,
+   "a": {
+    "days": 3361,
+    "n": 3361,
+    "nBuy": 1828,
+    "nSell": 1533,
+    "basePct": 0.5109,
+    "buyPct": 0.5199,
+    "sellPct": 0.5001,
+    "excessPct": 0.0098,
+    "t": 0.04,
+    "tNoOverlap": -0.09,
+    "nNoOverlap": 169,
+    "hit": 49,
+    "hitBase": 50.4,
+    "p": 0.4834
+   },
+   "b": {
+    "days": 1753,
+    "n": 1753,
+    "nBuy": 1137,
+    "nSell": 616,
+    "basePct": 1.1027,
+    "buyPct": 0.9084,
+    "sellPct": 1.4612,
+    "excessPct": -0.2519,
+    "t": -0.74,
+    "tNoOverlap": -0.52,
+    "nNoOverlap": 88,
+    "hit": 50.7,
+    "hitBase": 52.5,
+    "p": 0.769
+   },
+   "pHolm": 1,
+   "pass": false
+  },
+  "L2-h1": {
+   "ladder": "L2",
+   "h": 1,
+   "a": {
+    "days": 3380,
+    "n": 3380,
+    "nBuy": 1551,
+    "nSell": 1829,
+    "basePct": 0.0257,
+    "buyPct": 0.0161,
+    "sellPct": 0.0338,
+    "excessPct": -0.0088,
+    "t": -0.47,
+    "tNoOverlap": -0.47,
+    "nNoOverlap": 3380,
+    "hit": 48.4,
+    "hitBase": 49.7,
+    "p": 0.6801
+   },
+   "b": {
+    "days": 1772,
+    "n": 1772,
+    "nBuy": 992,
+    "nSell": 780,
+    "basePct": 0.0529,
+    "buyPct": 0.08,
+    "sellPct": 0.0184,
+    "excessPct": 0.0303,
+    "t": 1.16,
+    "tNoOverlap": 1.1,
+    "nNoOverlap": 1772,
+    "hit": 52.3,
+    "hitBase": 50.4,
+    "p": 0.1239
+   },
+   "pHolm": 0.6195,
+   "pass": false
+  },
+  "L2-h5": {
+   "ladder": "L2",
+   "h": 5,
+   "a": {
+    "days": 3376,
+    "n": 3376,
+    "nBuy": 1547,
+    "nSell": 1829,
+    "basePct": 0.1303,
+    "buyPct": 0.0845,
+    "sellPct": 0.169,
+    "excessPct": -0.0419,
+    "t": -0.49,
+    "tNoOverlap": -0.73,
+    "nNoOverlap": 676,
+    "hit": 48.6,
+    "hitBase": 49.6,
+    "p": 0.6895
+   },
+   "b": {
+    "days": 1768,
+    "n": 1768,
+    "nBuy": 992,
+    "nSell": 776,
+    "basePct": 0.2679,
+    "buyPct": 0.4008,
+    "sellPct": 0.098,
+    "excessPct": 0.1491,
+    "t": 1.35,
+    "tNoOverlap": 1.19,
+    "nNoOverlap": 354,
+    "hit": 53.1,
+    "hitBase": 50.7,
+    "p": 0.0892
+   },
+   "pHolm": 0.5352,
+   "pass": false
+  },
+  "L2-h20": {
+   "ladder": "L2",
+   "h": 20,
+   "a": {
+    "days": 3361,
+    "n": 3361,
+    "nBuy": 1545,
+    "nSell": 1816,
+    "basePct": 0.5109,
+    "buyPct": 0.4396,
+    "sellPct": 0.5715,
+    "excessPct": -0.0655,
+    "t": -0.21,
+    "tNoOverlap": -0.35,
+    "nNoOverlap": 169,
+    "hit": 48.5,
+    "hitBase": 49.7,
+    "p": 0.5826
+   },
+   "b": {
+    "days": 1753,
+    "n": 1753,
+    "nBuy": 992,
+    "nSell": 761,
+    "basePct": 1.1027,
+    "buyPct": 1.4589,
+    "sellPct": 0.6383,
+    "excessPct": 0.4032,
+    "t": 0.98,
+    "tNoOverlap": 0.76,
+    "nNoOverlap": 88,
+    "hit": 54,
+    "hitBase": 51.1,
+    "p": 0.1642
+   },
+   "pHolm": 0.6568,
+   "pass": false
+  }
+ },
+ "states": {
+  "L1": {
+   "a": {
+    "days": 3381,
+    "from": "2007-01-01",
+    "to": "2019-12-31",
+    "buyPct": 54.7,
+    "sellPct": 45.3,
+    "nonePct": 0,
+    "switches": 172,
+    "byKind": {
+     "dom": 57,
+     "swing": 89,
+     "eg": 18,
+     "ef": 8
+    }
+   },
+   "b": {
+    "days": 1773,
+    "from": "2020-01-01",
+    "to": "2026-10-30",
+    "buyPct": 64.7,
+    "sellPct": 35.3,
+    "nonePct": 0,
+    "switches": 89,
+    "byKind": {
+     "eg": 17,
+     "dom": 26,
+     "swing": 42,
+     "ef": 4
+    }
+   }
+  },
+  "L2": {
+   "a": {
+    "days": 3381,
+    "from": "2007-01-01",
+    "to": "2019-12-31",
+    "buyPct": 45.9,
+    "sellPct": 54.1,
+    "nonePct": 0,
+    "switches": 40,
+    "byKind": {
+     "eg": 6,
+     "ef": 4,
+     "dom": 15,
+     "swing": 15
+    }
+   },
+   "b": {
+    "days": 1773,
+    "from": "2020-01-01",
+    "to": "2026-10-30",
+    "buyPct": 56,
+    "sellPct": 44,
+    "nonePct": 0,
+    "switches": 19,
+    "byKind": {
+     "eg": 6,
+     "swing": 8,
+     "dom": 3,
+     "ef": 2
+    }
+   }
+  }
+ },
+ "breakoutOnly": {
+  "L1-h1": {
+   "ladder": "L1",
+   "h": 1,
+   "a": {
+    "days": 3380,
+    "n": 3380,
+    "nBuy": 1796,
+    "nSell": 1584,
+    "basePct": 0.0257,
+    "buyPct": 0.0212,
+    "sellPct": 0.0308,
+    "excessPct": -0.0048,
+    "t": -0.26,
+    "tNoOverlap": -0.25,
+    "nNoOverlap": 3380,
+    "hit": 49.3,
+    "hitBase": 50.1,
+    "p": 0.6025
+   },
+   "b": {
+    "days": 1772,
+    "n": 1772,
+    "nBuy": 959,
+    "nSell": 813,
+    "basePct": 0.0529,
+    "buyPct": 0.0819,
+    "sellPct": 0.0186,
+    "excessPct": 0.0314,
+    "t": 1.19,
+    "tNoOverlap": 1.14,
+    "nNoOverlap": 1772,
+    "hit": 49.6,
+    "hitBase": 50.3,
+    "p": 0.117
+   }
+  },
+  "L1-h5": {
+   "ladder": "L1",
+   "h": 5,
+   "a": {
+    "days": 3376,
+    "n": 3376,
+    "nBuy": 1792,
+    "nSell": 1584,
+    "basePct": 0.1303,
+    "buyPct": 0.1382,
+    "sellPct": 0.1213,
+    "excessPct": 0.0085,
+    "t": 0.15,
+    "tNoOverlap": 0.32,
+    "nNoOverlap": 676,
+    "hit": 49.9,
+    "hitBase": 50.3,
+    "p": 0.4403
+   },
+   "b": {
+    "days": 1768,
+    "n": 1768,
+    "nBuy": 957,
+    "nSell": 811,
+    "basePct": 0.2679,
+    "buyPct": 0.3276,
+    "sellPct": 0.1975,
+    "excessPct": 0.0646,
+    "t": 0.8,
+    "tNoOverlap": 1.06,
+    "nNoOverlap": 354,
+    "hit": 51,
+    "hitBase": 50.5,
+    "p": 0.2117
+   }
+  },
+  "L1-h20": {
+   "ladder": "L1",
+   "h": 20,
+   "a": {
+    "days": 3361,
+    "n": 3361,
+    "nBuy": 1779,
+    "nSell": 1582,
+    "basePct": 0.5109,
+    "buyPct": 0.4833,
+    "sellPct": 0.5419,
+    "excessPct": -0.0292,
+    "t": -0.27,
+    "tNoOverlap": 0.42,
+    "nNoOverlap": 169,
+    "hit": 50.8,
+    "hitBase": 50.2,
+    "p": 0.608
+   },
+   "b": {
+    "days": 1753,
+    "n": 1753,
+    "nBuy": 952,
+    "nSell": 801,
+    "basePct": 1.1027,
+    "buyPct": 1.0764,
+    "sellPct": 1.1339,
+    "excessPct": -0.0285,
+    "t": -0.16,
+    "tNoOverlap": 0.55,
+    "nNoOverlap": 88,
+    "hit": 49.3,
+    "hitBase": 50.7,
+    "p": 0.5637
+   }
+  },
+  "L2-h1": {
+   "ladder": "L2",
+   "h": 1,
+   "a": {
+    "days": 3380,
+    "n": 3380,
+    "nBuy": 1843,
+    "nSell": 1537,
+    "basePct": 0.0257,
+    "buyPct": 0.0181,
+    "sellPct": 0.0348,
+    "excessPct": -0.0083,
+    "t": -0.44,
+    "tNoOverlap": -0.44,
+    "nNoOverlap": 3380,
+    "hit": 49.4,
+    "hitBase": 50.2,
+    "p": 0.6713
+   },
+   "b": {
+    "days": 1772,
+    "n": 1772,
+    "nBuy": 1024,
+    "nSell": 748,
+    "basePct": 0.0529,
+    "buyPct": 0.0443,
+    "sellPct": 0.0646,
+    "excessPct": -0.0099,
+    "t": -0.37,
+    "tNoOverlap": -0.36,
+    "nNoOverlap": 1772,
+    "hit": 50.3,
+    "hitBase": 50.5,
+    "p": 0.6444
+   }
+  },
+  "L2-h5": {
+   "ladder": "L2",
+   "h": 5,
+   "a": {
+    "days": 3376,
+    "n": 3376,
+    "nBuy": 1839,
+    "nSell": 1537,
+    "basePct": 0.1303,
+    "buyPct": 0.0707,
+    "sellPct": 0.2015,
+    "excessPct": -0.0649,
+    "t": -0.82,
+    "tNoOverlap": -0.94,
+    "nNoOverlap": 676,
+    "hit": 48.6,
+    "hitBase": 50.4,
+    "p": 0.794
+   },
+   "b": {
+    "days": 1768,
+    "n": 1768,
+    "nBuy": 1024,
+    "nSell": 744,
+    "basePct": 0.2679,
+    "buyPct": 0.2204,
+    "sellPct": 0.3332,
+    "excessPct": -0.055,
+    "t": -0.52,
+    "tNoOverlap": -0.57,
+    "nNoOverlap": 354,
+    "hit": 50,
+    "hitBase": 50.9,
+    "p": 0.6997
+   }
+  },
+  "L2-h20": {
+   "ladder": "L2",
+   "h": 20,
+   "a": {
+    "days": 3361,
+    "n": 3361,
+    "nBuy": 1838,
+    "nSell": 1523,
+    "basePct": 0.5109,
+    "buyPct": 0.2208,
+    "sellPct": 0.861,
+    "excessPct": -0.3173,
+    "t": -1.45,
+    "tNoOverlap": -0.11,
+    "nNoOverlap": 169,
+    "hit": 46.9,
+    "hitBase": 50.4,
+    "p": 0.9271
+   },
+   "b": {
+    "days": 1753,
+    "n": 1753,
+    "nBuy": 1024,
+    "nSell": 729,
+    "basePct": 1.1027,
+    "buyPct": 0.9775,
+    "sellPct": 1.2785,
+    "excessPct": -0.1463,
+    "t": -0.44,
+    "tNoOverlap": -0.28,
+    "nNoOverlap": 88,
+    "hit": 48.1,
+    "hitBase": 51.4,
+    "p": 0.6684
+   }
+  }
+ },
+ "variantsTried": 6,
+ "verdict": "FAIL: none of the six tests has t >= 2 in 2020-26 with the same sign in 2007-19; best L2-h5 +0.1491% (t 1.35, n 1768; 2007-19 -0.0419%, t -0.49)",
+ "candidates": [
+  {
+   "rule": "L1-h1: working H4, key levels on the Daily, next 1 daily close; excess over the base rate +0.0046% (2007-19, t 0.24, 3380 days), -0.0401% (2020-26, t -1.49, 1772 days)",
+   "verdict": "FAIL"
+  },
+  {
+   "rule": "L1-h5: working H4, key levels on the Daily, next 5 daily closes; excess over the base rate +0.0742% (2007-19, t 0.93, 3376 days), -0.1036% (2020-26, t -0.95, 1768 days)",
+   "verdict": "FAIL"
+  },
+  {
+   "rule": "L1-h20: working H4, key levels on the Daily, next 20 daily closes; excess over the base rate +0.0098% (2007-19, t 0.04, 3361 days), -0.2519% (2020-26, t -0.74, 1753 days)",
+   "verdict": "FAIL"
+  },
+  {
+   "rule": "L2-h1: working Daily, key levels on the Weekly, next 1 daily close; excess over the base rate -0.0088% (2007-19, t -0.47, 3380 days), +0.0303% (2020-26, t 1.16, 1772 days)",
+   "verdict": "FAIL"
+  },
+  {
+   "rule": "L2-h5: working Daily, key levels on the Weekly, next 5 daily closes; excess over the base rate -0.0419% (2007-19, t -0.49, 3376 days), +0.1491% (2020-26, t 1.35, 1768 days)",
+   "verdict": "FAIL"
+  },
+  {
+   "rule": "L2-h20: working Daily, key levels on the Weekly, next 20 daily closes; excess over the base rate -0.0655% (2007-19, t -0.21, 3361 days), +0.4032% (2020-26, t 0.98, 1753 days)",
+   "verdict": "FAIL"
+  }
+ ]
+}
