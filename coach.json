@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-11T06:00:44.000Z",
+  "at": "2026-11-11T12:01:25.000Z",
   "v": 1,
   "baseAt": "2026-11-10T07:20:57.962Z",
   "rule": "status and alert only: the monitor never changes a rule; the owner decides",
@@ -437,9 +437,9 @@
     "desk": "ICT",
     "live": true,
     "base": "ICT A-setups 2018-26 rebuild, GC/NQ/ES/YM (#526; record in research/edge/sizing/inputs.json)",
-    "n": 239,
+    "n": 242,
     "nLive": 1,
-    "nReplay": 238,
+    "nReplay": 241,
     "nHist": 0,
     "from": 1754596800,
     "to": 1794318300,
@@ -453,9 +453,9 @@
     "roll": {
      "n": 30,
      "W": 30,
-     "exp": 0.71,
-     "t": 1.81,
-     "R": 21.28
+     "exp": 0.93,
+     "t": 2.41,
+     "R": 27.86
     },
     "cusRef": {
      "s": 0,
@@ -474,7 +474,7 @@
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades +0.71R a trade, CUSUM 0 of 16.52"
+     "in line with its backtest: last 30 trades +0.93R a trade, CUSUM 0 of 16.52"
     ]
    },
    {
@@ -526,10 +526,10 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-11T06"
+  "slot": "2026-11-11T12"
  },
  "book": {
-  "at": "2026-11-11T06:00:44.000Z",
+  "at": "2026-11-11T12:01:25.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
@@ -559,28 +559,28 @@
    "note": "Expect the clean-half numbers, not the 2018-26 ones: a Sharpe of about 0.3 a year and drawdowns of about 81-189R at this book's budget of 9R (9-21R per 1R of budget)."
   },
   "cost": "after costs: trades.json Rnet; ICT the CME micro round trip (digest.mjs merNet / ictNet)",
-  "nTrades": 23,
+  "nTrades": 25,
   "nDays": 4,
-  "ictReplay": 6,
+  "ictReplay": 8,
   "ictForward": 1,
   "live": {
-   "R": 14.27,
-   "dd": 1.05,
+   "R": 16.87,
+   "dd": 0,
    "ddCur": 0,
    "sharpe": null,
-   "worstDay": -1.05,
+   "worstDay": 0.25,
    "bestDay": 9.02
   },
   "proposed": {
-   "R": 30.08,
-   "dd": 1.89,
+   "R": 34.75,
+   "dd": 0,
    "ddCur": 0,
    "sharpe": null,
-   "worstDay": -1.89,
+   "worstDay": 0.44,
    "bestDay": 16.23
   },
-  "diff": 15.81,
-  "corr": 0.99,
+  "diff": 17.88,
+  "corr": 0.98,
   "byIdea": [
    {
     "id": "replica",
@@ -672,11 +672,11 @@
     "desk": "ICT",
     "gold": false,
     "streams": 1,
-    "n": 7,
+    "n": 9,
     "w": 0.2,
     "m": 1.8,
-    "live": 17.4,
-    "prop": 31.33
+    "live": 20,
+    "prop": 36
    },
    {
     "id": "other",
@@ -710,25 +710,25 @@
    },
    {
     "d": "2026-11-09",
-    "n": 1,
-    "live": -1.05,
-    "prop": -1.89,
-    "cumLive": 11.49,
-    "cumProp": 22.818
+    "n": 2,
+    "live": 0.246,
+    "prop": 0.443,
+    "cumLive": 12.786,
+    "cumProp": 25.151
    },
    {
     "d": "2026-11-10",
-    "n": 5,
-    "live": 2.785,
-    "prop": 7.259,
-    "cumLive": 14.275,
-    "cumProp": 30.077
+    "n": 6,
+    "live": 4.085,
+    "prop": 9.599,
+    "cumLive": 16.871,
+    "cumProp": 34.75
    }
   ],
-  "slot": "2026-11-11T06"
+  "slot": "2026-11-11T12"
  },
  "expect": {
-  "at": "2026-11-11T06:00:44.000Z",
+  "at": "2026-11-11T12:01:25.000Z",
   "v": 1,
   "baseAt": "2026-11-10T07:21:28.218Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1375,7 +1375,7 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-11T06"
+  "slot": "2026-11-11T12"
  },
  "ledger": [
   {
@@ -2214,7 +2214,7 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-11T06",
+ "ledgerSlot": "2026-11-11T12",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
  "date": "2026-11-11",
  "at": "2026-11-11T00:00:17.000Z",
@@ -2420,7 +2420,7 @@
    "Against the D1 trend (103×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-11T06",
+ "fslot": "2026-11-11T12",
  "notes": [
   "No change today: not enough evidence to move a rule."
  ],
