@@ -563,3 +563,97 @@ test('the browser trader never runs for a guest (it saved to a journal a guest d
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   assert.match(html, /function autoTrade\(list, price\) \{\s*if \(!JEL \|\| PUB \|\| marketClosed\(\)\) return;/);
 });
+
+// ── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone") ──
+import vm from 'node:vm';
+const PS_CSS = /<style id="ms-ps-css">([\s\S]*?)<\/style>/.exec(DESK)[1].replace(/\/\*[\s\S]*?\*\//g, '');
+const PS_JS = /<script id="ms-ps-js">([\s\S]*?)<\/script>/.exec(DESK)[1];
+const PS_HEAD = /<script>\s*\/\* Simple phone view \(11 Nov 2026\)[\s\S]*?<\/script>/.exec(DESK)[0].replace(/<\/?script>/g, '');
+// the phone media block of #ms-ps-css, and what is left outside it
+const psSplit = () => { const at = PS_CSS.indexOf('@media (max-width: 640px) {'); let d = 0, end = -1; for (let i = PS_CSS.indexOf('{', at); i < PS_CSS.length; i++) { if (PS_CSS[i] === '{') d++; else if (PS_CSS[i] === '}' && --d === 0) { end = i; break; } }
+  return { inside: PS_CSS.slice(PS_CSS.indexOf('{', at) + 1, end), outside: (PS_CSS.slice(0, at) + PS_CSS.slice(end + 1)).trim() }; };
+
+test('simple phone view: chosen in the head, only on a screen up to 640 px, and "full" on this device switches it off', () => {
+  const run = (narrow, stored) => { const store = new Map(stored ? [['ms-phone', stored]] : []), R = { dataset: {} }, heard = [];
+    const mq = { matches: narrow, addEventListener: (k, f) => { mq.f = f; } };
+    const w = { matchMedia: (q) => { assert.equal(q, '(max-width: 640px)'); return mq; } };
+    vm.runInNewContext(PS_HEAD, { window: w, matchMedia: w.matchMedia, document: { documentElement: R, dispatchEvent: (e) => heard.push(e.type) }, localStorage: { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, v), removeItem: (k) => store.delete(k) }, CustomEvent: class { constructor(t) { this.type = t; } } });
+    return { R, w, mq, store, heard }; };
+  assert.equal(run(true).R.dataset.phone, 'simple', 'the default on a phone');
+  assert.equal(run(true, 'full').R.dataset.phone, undefined, 'this device chose the full view');
+  assert.equal(run(false).R.dataset.phone, undefined, 'never on a wider screen');
+  const a = run(true); a.w.msPhoneView('full'); assert.equal(a.R.dataset.phone, undefined); assert.equal(a.store.get('ms-phone'), 'full'); assert.deepEqual(a.heard, ['ms:phone']);
+  a.w.msPhoneView('simple'); assert.equal(a.R.dataset.phone, 'simple'); assert.equal(a.store.has('ms-phone'), false, 'simple is the default: nothing stored');
+  a.mq.matches = false; a.mq.f(); assert.equal(a.R.dataset.phone, undefined, 'a phone turned wide, or a window made wider, leaves the simple view');
+  assert.ok(DESK.indexOf('Simple phone view (11 Nov 2026): on a screen') < DESK.indexOf('<body'), 'set before the first paint');
+});
+
+test('simple phone view: a wider screen and the Full view get no new rule (#ms-ps-css)', () => {
+  const { inside, outside } = psSplit();
+  assert.equal(outside.replace(/\s+/g, ' '), '.ps-only { display: none; }', 'outside the phone media query: only "what this view adds is not drawn"');
+  const rules = [...inside.replace(/@media \(prefers-reduced-motion: reduce\) \{([^{}]*\{[^{}]*\})+\s*\}/g, (m) => m.slice(m.indexOf('{') + 1, -1)).matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => [m[1].trim(), m[2]]);
+  assert.ok(rules.length > 40);
+  for (const [sel, body] of rules) for (const one of sel.split(/,(?![^(]*\))/).map((x) => x.trim())) {
+    // a rule either styles one of the view's own parts (.ps-…: not drawn outside the simple view) or is scoped to the simple view
+    assert.ok(/^(html(\[[^\]]+\]|:not\([^)]*\))*\s+)?[.#]ps-/.test(one) || one.includes('html[data-phone="simple"]'), `not scoped to the simple view: ${one}`);
+    // and only a rule scoped to the simple view may draw a .ps-only part (the switch excepted: both phone views show it)
+    if (/display:\s*(?!none|\s)/.test(body) && /\.ps-(home|fold|need|go|more|sw|c-ans|only)$/.test(one) && !one.includes('html[data-phone="simple"]')) assert.match(one, /^\.ps-sw$/, `draws outside the simple view: ${one}`);
+  }
+  assert.doesNotMatch(PS_CSS, /infinite/, 'no endless animation');
+  for (const m of PS_CSS.matchAll(/font(?:-size)?:[^;]*?(\d+(?:\.\d+)?)px/g)) assert.ok(+m[1] >= 12, `text under 12 px: ${m[0]}`);
+  // nothing else on the page styles the simple view
+  const rest = DESK.replace(/<style id="ms-ps-css">[\s\S]*?<\/style>/, '').replace(/<script[\s\S]*?<\/script>/g, '');
+  assert.doesNotMatch(styles(rest), /data-phone|\.ps-(only|fold|home|sw)\b/);
+});
+
+test('simple phone view: every part it adds is .ps-only, and a fold row keeps the gate of the section it folds', () => {
+  const tags = [...DESK.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').matchAll(/<(\w+)\b[^>]*\bclass="([^"]*\bps-[^"]*)"[^>]*>/g)];
+  const top = tags.filter((m) => /(^|\s)ps-(home|fold|need|go|more|sw|c-ans)(\s|$)/.test(m[2]));
+  assert.ok(top.length >= 14);
+  for (const m of top) assert.match(m[2], /\bps-only\b/, m[0].slice(0, 90));
+  const folds = [...DESK.matchAll(/<button type="button" class="(ps-only ps-fold[^"]*)" data-ps-for="([\w-]+)" aria-expanded="false">/g)];
+  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse'], 'Home: everything under the summary folds');
+  for (const [, cls, key] of folds) { const t = new RegExp(`<\\w+\\b[^>]*\\bclass="([^"]*)"[^>]*\\bdata-ps="${key}"`).exec(DESK); assert.ok(t, `no section for the ${key} row`);
+    for (const gate of ['adm', 'own', 'pubonly']) assert.equal(new RegExp(`\\b${gate}\\b`).test(cls), new RegExp(`\\b${gate}\\b`).test(t[1]), `${key}: the row and its section differ on "${gate}"`); }
+  // what waits on the person and the owner-only places keep their gates
+  assert.match(DESK, /<a class="ps-only ps-need adm" id="ps-need"/);
+  assert.match(DESK, /<a href="#council\/week" class="adm" data-c>This week<\/a><a href="#council\/review" class="adm" data-c>Loss review/);
+  assert.match(PS_CSS, /html\[data-role="viewer"\] \.ps-go, html\[data-deny~="council"\] \.ps-go a\[data-c\] \{ display: none !important; \}/, 'as .h-quick: a viewer gets no council shortcuts');
+  assert.match(PS_CSS, /html\[data-role="viewer"\] #ps-need, html:not\(\[data-mosha="teach"\]\) #ps-need-m, html\[data-role="owner"\] #ps-need-m \{ display: none !important; \}/);
+  assert.match(PS_CSS, /html\[data-role="public"\] \.ps-sw \{ display: none; \}/, 'guests keep their one page');
+  assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-role="viewer"\] #v-home \.h-side \{ display: none; \}/, 'the viewer rule that hides the side column still wins');
+  // the main script hands the Today strip's own sums over, never for a guest
+  assert.match(DESK, /if \(!PUB && COUNCIL\.trades\) \{ try \{ window\.MS_TODAY = \{ D, W, M \}; document\.dispatchEvent\(new CustomEvent\('ms:today'\)\); \}/);
+  assert.doesNotMatch(PS_JS, /\bfetch\(|msData|XMLHttpRequest/, 'it fetches nothing');
+  // the desk rows exist only while the simple view is on (a wider screen's page is the page as it was)
+  assert.match(PS_JS, /if \(!simple\) \{ \[\]\.forEach\.call\(v\.querySelectorAll\('\.ps-dyn'\), function \(b\) \{[^\n]*c\.removeAttribute\('data-ps'\);[^\n]*b\.remove\(\); \}\); return; \}/);
+  assert.match(PS_JS, /\(!c\.hidden && getComputedStyle\(c\)\.display === 'none'\)\) return;/, 'a card the account may not see gets no row');
+});
+
+test('simple phone view: the answer, the open rows and what waits (MS_PS)', () => {
+  const none = () => null, w = { addEventListener() {}, MS_WEEK: null }, el = { dataset: {} };
+  const ctx = { window: w, document: { documentElement: el, getElementById: none, querySelector: none, querySelectorAll: () => [], addEventListener() {} }, addEventListener() {}, setTimeout() {}, clearTimeout() {}, getComputedStyle: () => ({}), encodeURIComponent, Date, isFinite, parseInt, String, Math };
+  vm.runInNewContext(PS_JS, ctx); const P = w.MS_PS;
+  assert.equal(P.answer(null), null);
+  assert.deepEqual({ ...P.answer({ D: { n: 0, R: 0 }, W: { n: 3, R: -3.05 } }) }, { head: 'Nothing closed today', sub: 'This week <b class="neg">−3.05R</b> on 3 closed trades.' });
+  assert.equal(P.answer({ D: { n: 1, R: 0.4 }, W: { n: 1, R: 0.4 } }).head, 'Today: <b class="pos">+0.40R</b><small>on 1 closed trade</small>');
+  assert.equal(P.answer({ D: { n: 0, R: 0 }, W: { n: 0, R: 0 } }).sub, 'Nothing closed this week yet.');
+  // our own trades and shadow trades are never one row or one figure; ours come first, a tracker is not listed
+  const T = (id, market, side, shadow, fl, x = {}) => ({ x: { id, market, side, shadow, label: market.toUpperCase(), ...x }, fl });
+  const rows = P.openRows([T('s1', 'usdcad', 'buy', true, 5), T('s2', 'usdcad', 'buy', true, 4.07), T('o1', 'xau', 'buy', false, null), T('s3', 'xau', 'buy', true, -0.3), T('s4', 'sol', 'sell', true, 2.34), T('t1', 'btc', 'buy', false, 9, { tracker: true })]);
+  assert.deepEqual(JSON.parse(JSON.stringify(rows.map((g) => [g.id, g.n, g.sh, g.fl]))), [['o1', 1, false, null], ['s1', 2, true, 9.07], ['s4', 1, true, 2.34], ['s3', 1, true, -0.3]]);
+  assert.match(P.rowHTML(rows[0]), /<a href="#trade\/o1"><span class="chip buy">BUY<\/span><span class="ps-r-t">XAU<\/span><span class="ps-r-r wait">waiting for its entry<\/span>/);
+  assert.match(P.rowHTML(rows[1]), /<small>2 trades · shadow<\/small><\/span><span class="ps-r-r pos">\+9\.07R<\/span>/);
+  assert.doesNotMatch(P.rowHTML({ id: 'a"b', n: 1, sh: false, fl: 0, x: { side: 'buy', label: '<img>' } }), /<img>|a"b/, 'escaped');
+  // what waits: the week pane's own list for the owner, the data feeds alone for a reviewer, and the unreviewed losses
+  w.MS_WEEK = { decisions: () => [{ k: 'coach', title: 'Promote X' }, { k: 'data', title: 'Data feeds shaky' }, { k: 'pause', title: 'The Coach would pause 2 setups' }] };
+  assert.deepEqual([...P.needs({}, true, 2, 0)], ['Promote X', 'Data feeds shaky', '2 losses to review'], 'a pause the owner already ruled out is not a thing to do');
+  assert.deepEqual([...P.needs({}, false, 1, 0)], ['Data feeds shaky', '1 loss to review']);
+  w.MS_WEEK = { decisions: () => { throw new Error('x'); } }; assert.deepEqual([...P.needs({}, true, 0, 0)], []);
+});
+
+test('simple phone view: the smoke test counts the phone Home first screen, and the tab bar keeps five places plus More', () => {
+  const smoke = src('scripts/audit/smoke.cjs');
+  assert.match(smoke, /simple phone view: Home's first screen holds/);
+  assert.match(DESK, /if \(vis\.length > 5\) \{\s*var keep = vis\.slice\(\)\.sort\([^\n]*\.slice\(0, 4\);/, 'at most five in the bar: four places and More');
+});

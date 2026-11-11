@@ -806,6 +806,56 @@ async function startServer(port = PORT, flags = []) {
       } finally { await c3.close().catch(() => {}); s3.proc.kill(); fs.rmSync(s3.store, { recursive: true, force: true }); }
     }
 
+    // ---- 11l. a correction the server cannot store (11 Nov 2026: "no such attempt for this edge" on the live site): the form
+    //      keeps everything, says what to do, "Try again" saves it; after two such answers the decision is stored again first ----
+    {
+      const s4 = await startServer(portOf(1, +PORT + 1)), H4 = s4.H, c4 = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await c4.addInitScript(NO_PACE);
+      const w = await c4.newPage(); watch(w, 'cor');
+      const mine = (from) => calls(reqs, from, 'cor').map((r) => (r.body ? r.body.action + (r.body.attempt ? ':' + r.body.attempt.mode : '') : 'get=' + r.q.get)), wrote = (from) => mine(from).filter((x) => !/^get=/.test(x)).join();
+      // the store as the page saw it that evening: the attempt was stored, the verdict's request could not find it
+      let lost = 0, refused = 0; const noAttempt = (r) => { let a = null; try { a = r.request().postDataJSON(); } catch (e) { /* a GET */ } if (lost > 0 && a && a.action === 'correct') { lost--; refused++; return r.fulfill({ status: 404, contentType: 'application/json', body: '{"error":"no such attempt for this edge"}' }); } return r.continue(); };
+      const form = () => w.evaluate(() => ({ choice: [...document.querySelectorAll('#mentor [data-choice][aria-pressed="true"]')].map((x) => x.dataset.choice).join(), bias: document.getElementById('m-bias').value, reasons: [...document.querySelectorAll('#mentor [data-reason][aria-pressed="true"]')].map((x) => x.dataset.reason).join(), text: document.getElementById('m-text').value, marks: document.querySelectorAll('#a-list li:not(.none)').length, err: document.getElementById('m-err').hidden ? '' : document.getElementById('m-err').textContent, save: document.getElementById('m-save').textContent, off: document.getElementById('m-save').disabled, head: document.querySelector('#mentor h2 small').textContent }));
+      const failed = (re) => w.waitForFunction((src) => { const n = document.getElementById('m-err'), b = document.getElementById('m-save'); return !n.hidden && new RegExp(src).test(n.textContent) && !b.disabled; }, re.source, { timeout: 15000 });
+      const saved = () => w.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 });
+      try {
+        await w.route(/\/api\/academy$/, noAttempt);
+        await w.goto(H4 + '/academy', { waitUntil: 'load' }); await setup(w, iso(cands[0].t), null);
+        await w.click('#start'); await w.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await w.click('#c-speed [data-speed="100"]'); await w.click('#c-play'); await nextPoint(w);
+        const cA = await w.evaluate(() => window.MXAC.lastSnapshot.cand), want = { choice: 'reject', bias: 'up', reasons: 'missing-confirmation', text: 'wait for better entry', marks: 2 };
+        // the owner's verdict: Reject, bias up, "missing confirmation", "wait for better entry", two entry marks on the chart
+        await w.click('#mentor [data-choice="reject"]'); await w.selectOption('#m-bias', 'up'); await w.click('#mentor [data-reason="missing-confirmation"]'); await w.fill('#m-text', want.text);
+        for (const dy of [-26, 18]) { await w.selectOption('#a-kind', 'entry'); await w.click('#a-arm'); await w.evaluate(() => document.getElementById('chart').scrollIntoView({ block: 'center' })); const pt = await w.evaluate((v) => window.MXAC.chartPoint(v, 0.5), cA.entry); await w.mouse.click(pt.x, pt.y + dy); }
+        const same = (f) => Object.keys(want).every((k) => f[k] === want[k]);
+        const f0 = await form(); check('correction: the verdict is written (reject, bias, reason, words, two entry marks)', same(f0) && f0.save === 'Save correction', JSON.stringify(f0));
+        let n0 = reqs.length; lost = 2; await w.click('#m-save'); await failed(/not saved/);
+        await w.locator('#mentor').screenshot({ path: OUT + 'academy-correction-not-saved.png' });
+        const f1 = await form(), cor1 = (await api(w, 'get=corrections&edge=' + EDGE)).corrections;
+        check('correction not stored (404): the form keeps the verdict, the bias, the reason, the words and both marks', same(f1) && refused === 1 && cor1.length === 0 && /paused on a setup/.test(await txt(w, '#clock-state')), JSON.stringify(f1));
+        check('correction not stored: plain words say it was not saved, that nothing was lost and what to do; the button says Try again', /^The correction was not saved: the server could not find the stored decision this verdict belongs to\. Your verdict is still here: nothing you chose, wrote or marked was lost\. Wait a few seconds, then press Try again\.$/.test(f1.err) && f1.save === 'Try again' && !f1.off && mine(n0).join() === 'correct', f1.err + ' / ' + f1.save);
+        n0 = reqs.length; await w.click('#continue'); await w.waitForFunction(() => /not saved yet/.test(document.getElementById('continue-msg').textContent), null, { timeout: 5000 }).catch(() => {});
+        check('correction not stored: Continue still asks first (the verdict counts as not saved) and sends nothing', /not saved yet/.test(await txt(w, '#continue-msg')) && /paused on a setup/.test(await txt(w, '#clock-state')) && same(await form()) && mine(n0).length === 0, await txt(w, '#continue-msg'));
+        n0 = reqs.length; await w.click('#m-save'); await failed(/once more/);
+        const f2 = await form();
+        check('a second such answer: the form is still whole and the page says it will store its decision again, then the verdict', same(f2) && refused === 2 && /Press Try again: the page will store its decision for this setup once more, then save your verdict on it\.$/.test(f2.err) && f2.save === 'Try again' && mine(n0).join() === 'correct', f2.err);
+        n0 = reqs.length; await w.click('#m-save'); await saved();
+        const f3 = await form(), attA = (await api(w, 'get=attempts&edge=' + EDGE + '&cand=' + encodeURIComponent(cA.id))).attempts, corA = (await api(w, 'get=corrections&edge=' + EDGE + '&cand=' + encodeURIComponent(cA.id))).corrections;
+        check('Try again stores the decision once more through the usual attempt call (same mode, same snapshot hash, same answer), then the verdict on it', wrote(n0) === 'attempt:train,correct' && attA.length === 2 && attA[1].n === 2 && attA[1].mode === 'train' && attA[1].snapshotHash === attA[0].snapshotHash && attA[1].decision.action === attA[0].decision.action && corA.length === 1 && corA[0].attemptId === attA[1].id, mine(n0).join() + ' / ' + attA.map((a) => a.n + a.mode).join());
+        check('the stored correction is the one that was on the form: reject, bias up, the reason, the words, two entry marks', corA.length === 1 && corA[0].verdict === 'reject' && corA[0].bias === 'up' && corA[0].reasons.join() === 'missing-confirmation' && corA[0].text === want.text && corA[0].annotations.length === 2 && corA[0].annotations.every((a) => a.kind === 'entry'), JSON.stringify(corA[0] || null).slice(0, 180));
+        check('after the save: no problem line, the button reads Save correction, the heading names the attempt the verdict is on', f3.err === '' && f3.save === 'Save correction' && f3.head === 'your verdict on attempt 2' && /Your verdict is saved/.test(await txt(w, '#point-text')), JSON.stringify([f3.err, f3.save, f3.head]));
+        // one failure, then Try again: saved on the SAME attempt, nothing stored twice
+        await goOn(w); await nextPoint(w);
+        const cB = await w.evaluate(() => window.MXAC.lastSnapshot.cand);
+        await w.click('#mentor [data-choice="approve"]'); await w.fill('#m-text', 'agreed'); n0 = reqs.length; lost = 1; await w.click('#m-save'); await failed(/Wait a few seconds/);
+        await w.click('#m-save'); await saved();
+        const attB = (await api(w, 'get=attempts&edge=' + EDGE + '&cand=' + encodeURIComponent(cB.id))).attempts, corB = (await api(w, 'get=corrections&edge=' + EDGE + '&cand=' + encodeURIComponent(cB.id))).corrections;
+        check('one failure, then Try again: the verdict is saved on the same attempt, with no second attempt and no second correction', cB.id !== cA.id && wrote(n0) === 'correct,correct' && attB.length === 1 && corB.length === 1 && corB[0].attemptId === attB[0].id && corB[0].text === 'agreed', mine(n0).join() + ' / ' + attB.length + ' / ' + corB.length);
+        const ck4 = await w.evaluate(() => window.MXAC.checks);
+        check('correction retry: no future bar reached a decision on this page either', ck4.future === 0 && ck4.snapshots > 0, JSON.stringify(ck4));
+        await w.screenshot({ path: OUT + 'academy-correction-retry.png', fullPage: true });
+        errs.splice(0, errs.length, ...errs.filter((e) => !(/^cor console/.test(e) && /404/.test(e))));   // the browser logs the three refused requests itself
+      } finally { await c4.close().catch(() => {}); s4.proc.kill(); fs.rmSync(s4.store, { recursive: true, force: true }); }
+    }
+
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
     for (const theme of ['dark', 'light', 'midnight']) {
       await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme);

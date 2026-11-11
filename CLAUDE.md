@@ -65,7 +65,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
   Server-side sign-in, API hardening, Profile photo and name on the server.
-- The Desk page: Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
+- The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
@@ -553,6 +553,43 @@ the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three
 - Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); Home's week / month
   figures are before costs while the week pane is after costs; the trade chart dialog still writes raw R ("Loss -1R"); the
   replica track chart's axis uses a hyphen; "Journal · No trades yet" on Home while the council has trades (the owner's own journal).
+
+## Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
+`market-structure.html` only; the other pages are untouched. On a screen up to 640 px the Desk opens in its **simple view**
+(`html[data-phone="simple"]`, set by a small head script before the first paint); "Phone view: Simple | Full" at the end of every
+view (`#ps-sw`, `window.msPhoneView`) switches to the dense phone layout as it was and remembers it on that device (localStorage
+`ms-phone` = `full`; nothing stored for simple). Measured before → after at 390 x 844 as the owner: Home 2.6 → 1.7 screens and
+39 → 21 numbers on the first screen, the ICT desk 9.5 → 3.4 screens, the Mosha desk 5.5 → 1.8 (Luxus's landing 5.9 → 2.0),
+Profile 4.3 → 1.0. Rules to keep:
+- **Nothing is removed, nothing moves on a wider screen.** `<style id="ms-ps-css">` has ONE rule outside its
+  `@media (max-width: 640px)` block (`.ps-only { display: none; }`: every part the view adds carries `.ps-only`); every rule inside
+  styles a `.ps-…` part or is scoped to `html[data-phone="simple"]`. A test parses the block. Checked with a box-by-box comparison
+  of every visible element at 1440, 1024 and 700 px and in the Full view at 390 px against the build before (0 differences).
+- **Home**: one answer (`#ps-a`: "Nothing closed today" / "Today: +0.40R on 1 closed trade", then the week; the forward paper
+  record of the main systems before costs, the same sums as the Today strip, handed over as `window.MS_TODAY` + `ms:today`), what
+  is open (`#ps-o-list`, at most three rows; **our own trades and shadow trades are never one row or one figure**, ours first;
+  a row opens the trade by its `#trade/<id>` link), what waits (`#ps-need`: `MS_WEEK.decisions` on the loaded coach / health /
+  config for the owner, the data feeds alone for a reviewer, plus the Review tab's unreviewed-loss count; robustness changes are
+  only in the week pane, which the row opens), and four places (`#ps-go`). Everything else on Home is a `[data-ps]` section
+  folded to a one-line row (`button.ps-fold[data-ps-for]`, static markup so nothing folds after the first paint; layout shift 0).
+  The quick-jump chips are not drawn in this view (their places are Council tabs).
+- **Council overview**: the same answer block (`#ps-c-ans`: our open trades and their float, the shadow book in its own
+  sentence) and the first three positions; "Show all n with their details" (`#ps-act-more`) gives the full list.
+- **ICT, Mosha, Profile**: `desks()` in `<script id="ms-ps-js">` folds every card but the ones a person comes for (ICT: Open
+  now and Signals; Mosha: the teach form, the lessons, the "Your turn" card, and the record for a non-teacher; Profile: the
+  identity card) to a row with the card's own heading. The rows are put in only while the simple view is on and taken out with
+  it; a row follows its card when the desk moves it (the teacher's order) or renames it (French), and a card the account's own
+  gate hides gets no row.
+- **Gates**: a fold row carries the same `adm` / `own` class as its section (a test compares them); `#ps-need` is `adm` and
+  hidden for viewers; the council shortcuts follow `.h-quick`'s rule; guests see no part of it (their page is unchanged, the
+  switch is not shown). The script fetches nothing. Verified per role: no text is visible in the simple view (all folds opened)
+  that the role could not see before, apart from the view's own labels and summaries of figures the role already saw.
+- The bottom bar already kept four places plus More (shell 2, 7 Nov); unchanged.
+- Tests: `tests/qa-sweep.test.mjs` ("simple phone view": the head script on fake media, the CSS scope, the gates, `MS_PS`
+  pure pieces); the smoke test's phone owner run fails when the Desk does not open simple or Home's first screen holds more
+  than 9 blocks / 3 open rows.
+- Not done: Charts, the Council's other panes (Trades is 2 screens of tiles and a table, Research is long), the guest page,
+  Setup, Scanner, Journal; `backtest.html`, `academy.html`, `macro-desk.html`, `gold-trading.html` have no simple view.
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
@@ -1403,6 +1440,44 @@ browser and then put in the audit:
 - Audit: sections 31-33 (Jump / Skip day from a forming and from an animated candle, the growing candle frame by frame, docks, full
   screen, split panes across five switches, the two challenges against a reference in Node, phones at three widths). Since the merge with main the reference candles come through `fetchRetry` and sizes are read after `settle()` (`scripts/audit/shared.cjs`).
 
+Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone"). Up to 640 px
+ChronosTrade opens in its simple view: `html[data-phone="simple"]`, set by a head script before the first paint. **The key and
+the switch are the Desk's**: localStorage `ms-phone` = `full` turns it off on that device (no key = simple), `window.msPhoneView(v)`,
+event `ms:phone`, and "Phone view: Simple | Full" (`#ps-sw`) at the foot of the page, so one choice covers the site. Rules that hold:
+- **Scoped.** Everything the view adds carries `.ps-only` (or is `.ps-sw`), hidden by default; every rule is inside ONE
+  `@media (max-width: 640px)` block at the end of the sheet and starts with `html[data-phone="simple"]` (or is the switch). A
+  wider screen and the Full view are the page as it was: checked box by box (every element's position and size at 390 Full,
+  768 and 1440 px equal the build before; the only differences are two new ids and the switch under the page at 390).
+- **What the phone shows**: the session as one line (`#sess.folded`: name, a thin progress bar, "Change session" opens the form;
+  in the form Days, Session name and one hint sit behind "More options", `.ps-x`), then the chart with the replay row and quick
+  Buy / Sell on it. The chart takes the height left (`calc(100dvh - 252px)`, 592 px on a 390 x 844 screen, was 439), one chart
+  only: a split keeps its own heights. Under it one line, `#ps-last`: "Last trade ▲ +1.42R $1,405.66" and "Journal ›" (one tap:
+  the Journal tab). Account, Trade and Challenge are one line each (`.ps-fold` buttons, `aria-controls` the card, which gets
+  `data-ps-open`): equity and today; open / pending and the risk; the challenge's state in the card's own words. "How it works"
+  shows only when Help opens it. The tabs are one row that scrolls inside itself; Journal and Statistics open on one headline
+  ("12 trades, 67% won, +4.42R", `psHl`, from the numbers those tabs already computed, filters included and said), the journal
+  with five rows of four columns (opened, side, R, net), Statistics with the equity curve; one button each (`.ps-all`) brings the
+  rest (filters, every row and column; the tiles, seven charts, all numbers, Monte Carlo) and redraws charts at their real width.
+  Calendar leads with the month's line; the Challenge log with the state in words and the day table behind its button.
+- **Orders are untouched.** The view's code (`ps()`, `psHl()`, `psOpen()`, at the end of the script) only reads the account and
+  writes text; it returns at once outside the view. Instant Buy / Sell, the on-chart draft readout, drag-to-place, the position
+  tags and the stop rule are as they were. Because the draft's form (levels to type, the rules checklist that strict mode needs,
+  tags, note) lives in the Trade card, the card opens by itself while a draft is up and folds again with it; "Go to the challenge
+  card" opens that card first.
+- **Split view on a phone**: left as it is (Layout under More, panes stacked). The quick switch between timeframes on one chart
+  is the timeframe button already in the replay row; a second way to do the same would be more, not simpler.
+- Measured at 390 x 844 (owner, 12 closed trades): page 2.7 → 1.9 screens (Statistics 4.7 → 2.0), controls on the page
+  148 → 49, cards 6 → 3 (Statistics 18 → 4), chart 439 → 592 px. Frame times on the phone profile (220 trades, 8 s each,
+  2 runs before and after): p50 16.7 ms and p95 16.7-16.8 ms at 1x and at 12x on both; with 4x CPU throttle p50 16.7 ms,
+  p95 33-50 ms on both. No change beyond noise.
+- Not done: the session form itself is still long on a first visit (the first-run card leads through it); the challenge log's
+  day table is still wider than a phone (as in Full); touch tablets keep the full page. The audit's older phone checks now run
+  in the simple view (the default) and all pass unchanged; Full is checked by section 34.
+- Tests: `tests/backtest-phone.test.mjs` (key and attribute, every rule scoped, folds point at real cards, the code only reads,
+  link colour AA on light). Audit: section 34 (first screen, one-line cards, a quick Buy keeps its stop, the result line against
+  the account's numbers, Journal in one tap, headlines, draft opens the Trade card, AA in three themes, Full and back, reload,
+  wider than 640 px): 241 checks.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
@@ -1645,6 +1720,30 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   n or t (done the same day, paragraph above); `research/macro-veteran/START_HERE.md` (shown in the veteran
   library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
+- **Gold terminal, simple phone view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the
+  phone"; display only, no number, score or rule changed, the locked features untouched). At 640 px and under the head script sets
+  `html[data-phone="simple"]` unless this device chose Full (localStorage `ms-phone` = "full": the Desk's key and its "Phone view:
+  Simple | Full" wording, so one choice covers both; the switch `#gxPv` sits above the footer and in the More sheet). Every rule of
+  the simple view hangs on that attribute, which a wider screen never gets; the new elements (`.gx-po`, `.gx-bar`, `.gx-pv`) are
+  `display: none` otherwise. What the simple view does: (1) Dashboard = hero, a shorter 5 min chart, then one line each for the
+  daily bias (`details[data-fold="pbias"]`, summary `#gxFoldBias`; the bias strip `#dash-bias-strip` is MOVED into it through
+  `data-pv-slot` and put back for Full, never copied) and the macro score (the setup fold first, phone title from `data-pt`), the
+  other folds, no shortcut tiles; (2) the two tab rows give way to a bottom bar `#gxBar` (Dashboard, Daily Bias, Charts = Multi-TF,
+  Red Folder, More) and the sheet `<dialog id="gxMore">` (the other eight tabs, light / dark, price alerts, the view switch);
+  `switchTab` tells it the tab (`window.gxPhoneTab`); (3) the header is one swipeable line of prices (none on the dashboard, where
+  the hero has the price); (4) every block marked `data-pf="Title"` is wrapped at run time in the page's own `.gx-fold`
+  (`details.gx-fold.gx-pf`, state in `gxFolds` through the one writer `window.gxFoldBind`) with a one-line summary: `data-pf-s`
+  text, or the live text of the elements `data-pf-q` names inside the block (an Edge Lab idea's line is its own status pills, word
+  for word; the Edge Lab note and each tab's answer block carry no `data-pf` and stay open); `undo()` takes every block out again,
+  so Full view and a rotated phone are the page as it was; (5) Multi-TF shows one timeframe (`#gxTf` Daily | H4 | M15,
+  `#tab-mtf[data-ptf]`, `data-ptf-w` on the three widgets, localStorage `gxPhoneTf`), each chart with its structure readout.
+  A chart made while its block is hidden starts 600 px wide and stretched a `1fr` grid column past the screen: the simple view's
+  `.mtf-grid` is `minmax(0, 1fr)`. To fold a new block on phones give it `data-pf` (and `data-pf-s` or `data-pf-q`); the block
+  itself must not be re-created by a render (its inside may be). Measured at 390 x 844: Daily Bias 8.2 → 1.8 screens, Live Analysis
+  9.2 → 1.1, Sessions 7.4 → 1.7, Edge Lab 14.1 → 1.7; at 1440 px and in the phone's Full view every element's box is unchanged
+  (0 of about 2,300 and 2,070 compared differ). Not folded: Edge Tracker (its cards are re-rendered by the page), Backtest Lab (short; its
+  "Honest assumptions" stay open). Tests: `tests/side-pages.test.mjs` ("phone simple view"); the smoke test opens each tab's folds
+  on the phone and fails on a block or chart past the screen or a tab with no phone button.
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -1820,6 +1919,37 @@ IntersectionObserver). `#stamp`: "Updated N min ago", or "Stale: last update …
 over `STALE_MIN` 90 min (red over `OLD_MIN` 6 h). COT tab: the pre-registered study's verdict in words (`#cot-edge`: failed
 overall, the markets with a passing cell, "no tested edge" for the rest) and a tag per gauge from `edgeStatus` / `edgeText`.
 No council logic changed. Tests: tests/macro-visual.test.mjs (calm pass).
+
+## Macro desk: simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
+macro-desk.html only; display only, no number, probability or claim wording changed. On a screen up to 640 px the page opens in
+its simple view: the head script sets `html[data-phone="simple"]` before the first paint unless this device chose the full view
+(localStorage `ms-phone` = `full`; `window.msPhoneView(v)`, event `ms:phone`). Key, attribute and the switch's wording
+("Phone view: Simple | Full", `#ps-sw`, foot of the page, phones only) are the Desk's, so one choice covers the site.
+Measured at 390 x 844 on the 11 Nov files: 8.9 screens → 1.9, 1,357 words → 282, 6 charts drawn on load → 1.
+- **First screen = the glance alone** (`#c-glance`): bias with the meter, the chance against its base and "Confidence …"; the
+  event; the two levels with the price now. Three plain rows in one card (no boxes in a box). The stale stamp (`#stamp`), the
+  stale-levels notice (`lvStale`) and "broken since the close" stay on it in words. Behind `#g-more` "The week in one sentence,
+  and more": the sentence (`.g-sent`) and the lines marked `gx` (channel tally, the playbook link, where the levels are from,
+  the daily-close line, the long form of "Public data only"). The page lede is hidden; "paper only" stays in the section header.
+- **Sections 2 to 6 fold** (`section.story.sfold`: Next release, Why, Where price sits, What he expects, Track record) to the
+  title and ONE line (`.st-go` button in the header, the whole row is the target; `.st-one`), and open on tap. The line is
+  COPIED by `syncOne()` from what the open card already prints (`#nx-take`, `#sc-top`, `#ld-take` with the `#ld-stale` notice in
+  front, `#hyp-take`, `#calls-take` / `#calib-take`), less the parts wrapped in `.tk-x` (chart legend words, the level list the
+  glance already shows): never a number or a sentence of its own. A section with no takeaway shows its sub-label instead.
+- **Charts**: a folded section has no width, so `draw()` leaves its charts undrawn (cheap); `foldSet(sx, true)` calls
+  `redraw(sx)` on EVERY opening, `ms:phone` (switching the view) redraws all, resize as before. The 11 Nov "blank on first
+  load" order (show the story, then `redraw()`) is unchanged and pinned. An address like `/macro-desk#s-price` opens that
+  section and goes to it.
+- **The detail** stays last and folded: in the simple view a stored `mdDeep = 1` is not restored on load (desktop and Full
+  still restore it). The section chips (`#toc`) stay desktop-only.
+- **Full view** is the phone page as it was plus the switch: every rule of the simple view sits in one
+  `@media (max-width: 640px)` block at the end of the sheet and, the switch apart, under the attribute. Checked by comparing
+  every visible element's box, font size, colour and text before / after at 1440 (three themes), 768, 641, 390 Full, 360 Full
+  and signed out: identical but for four wrapping spans (`gx` / `tk-x`, same text in the same place) and the switch.
+- Not simplified: the content of an opened section (it is today's card), and the detail once opened (many screens: the
+  discussion, sources, COT, ledger, library are reference reading).
+- Tests: `tests/macro-visual.test.mjs` (simple phone view: three tests). `scripts/audit/smoke.cjs`: on the phone, as a member,
+  every folded section is opened and each chart in it must be drawn at its host's width (fails with "folded section opened: …").
 
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
 Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
@@ -2111,6 +2241,22 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
   draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
   decision saves the sitting.
+- **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
+  verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
+  an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER
+  instance (every deploy starts new ones) read the attempts file without the row stored seconds earlier, so `correct`
+  answered 404; a WRITE made from such a read would also have dropped the rows stored in between (attempts, dataset, audit).
+  Fix: every Blob read of the store asks the origin (`?cache=0`, what the Blob client's own `get(…, { useCache: false })`
+  sends for a private file). Never read a store file through the CDN copy again. The page (`saveCorrection`,
+  `MXAC.correctionFailure`): a correction that cannot be saved leaves the form exactly as it is (verdict, levels, bias,
+  reasons, words, marks), says in plain words that nothing was lost and what to do, and the button becomes "Try again"; the
+  verdict still counts as unsaved for the leave guard. After a second "no stored attempt" answer in a row, the next press
+  stores the decision the page holds once more through the usual `attempt` call (same mode, same snapshot hash; every server
+  check applies; never an exam or a blind attempt) and saves the verdict on it. No new API route or field; a decision is
+  still two calls; a retry is one more, a re-stored decision two. Not proven from production logs (they could not be read):
+  the sequence is reproduced with the real handler and the real Blob backend over a fake Blob service that lags as documented.
+  The same CDN read is in the other private-Blob modules (`api/notify.js`, `profile.js`, `sounds.js`, `mosha.js`,
+  `mosha-lessons.js`, which overwrite one file in place): not changed here. Tests: `tests/academy-correction.test.mjs`; audit section 11l.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
