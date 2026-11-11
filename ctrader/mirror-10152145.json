@@ -8137,7 +8137,8 @@
     "t1": 0.83296,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.83232,
@@ -8151,7 +8152,8 @@
     "lagSec": 358,
     "positionId": "48483123",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T16:59:55.000Z"
    },
    "usdchf-scalp-1794413903": {
     "symbol": "USDCHF",
@@ -8243,7 +8245,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9868.16 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9870.33 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8295,15 +8297,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9868.16,
-  "lastRun": "2026-11-11T16:57:16.000Z"
+  "balance": 9870.33,
+  "lastRun": "2026-11-11T16:59:55.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:08:58.000Z",
-   "msg": "moved USDCAD 47992970 protection: stop 1.4116147 -> 1.4111247, target 1.4216806 -> 1.4211906 (council swing)",
-   "trade": "usdcad-swing-1794304600"
-  },
   {
    "at": "2026-11-10T16:08:58.000Z",
    "msg": "moved XAUUSD 48096028 protection: stop 4064.138214285714 -> 4064.688, target 3990.883571428571 -> 3991.434 (council m30m1)",
@@ -9798,6 +9795,11 @@
    "at": "2026-11-11T16:34:30.000Z",
    "msg": "limit filled at once: USDCAD position 48493280 at the broker at 1.42428",
    "trade": "usdcad-scalp-1794414809"
+  },
+  {
+   "at": "2026-11-11T16:59:55.000Z",
+   "msg": "USDCHF position 48483123 closed at the broker",
+   "trade": "usdchf-scalp-1794412360"
   }
  ],
  "limits": {
