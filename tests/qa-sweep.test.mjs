@@ -1,5 +1,5 @@
-// node --test tests/qa-sweep.test.mjs — post-merge QA sweep (9 Nov 2026, PRs #682-#705): one check per issue fixed, plus the
-// owner's light-mode candle choice, so the next design pass cannot bring them back.
+// node --test tests/qa-sweep.test.mjs — post-merge QA sweeps (9 Nov 2026, PRs #682-#705; 11 Nov 2026, PRs #706-#722): one check per
+// issue fixed, plus the owner's light-mode candle choice, so the next design pass cannot bring them back.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -84,4 +84,60 @@ test('owner\'s choice (#686): light-mode desk candles are grey up / black down; 
   assert.match(cc[2], /upColor: UPC, downColor: DNC/);
   // every chart pane gets them when the theme is applied (panes are created green / red first)
   assert.match(html, /const K = candleCols\(\); Object\.values\(panes\)\.forEach\(\(p\) => \{ try \{ p\.series\.applyOptions\(K\)/);
+});
+
+// ---- Post-merge QA sweep, 11 Nov 2026 (the Mosha desk, the ICT desk's executions, ChronosTrade's split view) ----
+const rule = (css0, sel) => { const out = [], css = css0.replace(/\/\*[\s\S]*?\*\//g, ''); const re = /([^{}]+)\{([^{}]*)\}/g; let m; while ((m = re.exec(css))) if (m[1].split(',').some((x) => x.trim() === sel)) out.push(m[2]); return out.join(' '); };
+
+test('desk switch: six desks never widen a desk view on a phone (it takes the room there is and scrolls inside itself)', () => {
+  const css = styles(src('market-structure.html')), all = rule(css, '.desk-sw');
+  assert.match(all, /overflow-x:\s*auto/);
+  // the base rule's `width: max-content` is what made every desk view as wide as the switch: a later rule must take it back
+  assert.ok(all.lastIndexOf('width: auto') > all.lastIndexOf('width: max-content'), 'width: auto comes after width: max-content');
+  assert.match(all, /min-width:\s*0/); assert.match(all, /justify-self:\s*start/);
+  const soon = rule(css, '.desk-sw a small'), px = [...soon.matchAll(/font-size:\s*([\d.]+)px/g)].map((m) => +m[1]);
+  assert.ok(px[px.length - 1] >= 12, '"soon" is at least 12 px');
+  const ink = /:root\[data-theme="light"\] \.desk-sw a small \{ color: (#[0-9a-f]{6}); \}/.exec(css);
+  assert.ok(ink && ratio(ink[1], over('rgba(224,165,38,0.18)', '#ffffff')) >= 4.5, '"soon" passes AA on the light panel');
+  // the page smoke test measures it in a browser
+  assert.match(src('scripts/audit/smoke.cjs'), /view cut off on the right/);
+});
+
+test('Mosha desk: touch targets, 12 px text, fields that stay in their cell, AA green and red on the light theme', () => {
+  const css = /<style id="ms-mosha-css">([\s\S]*?)<\/style>/.exec(src('market-structure.html'))[1];
+  const coarse = [...css.matchAll(/@media \(pointer: coarse\)(?:, \(max-width: 760px\))? \{((?:[^{}]*\{[^{}]*\})+)\s*\}/g)].map((m) => m[1]).join(' ');
+  for (const sel of ['#v-mosha #mo-lessons .ms-tbtn', '#v-mosha #mo-book .ms-tbtn', '#v-mosha #mo-rp-ct', '#v-mosha .mo-bar .u-btn', '.mo-tut .mt-go .ms-tbtn', '.mo-lv-dlg .own-acts button', '.mo-l-dlg form button'])
+    assert.match(rule(coarse, sel), /min-height:\s*44px/, `${sel} is 44 px on a touch screen`);
+  assert.match(rule(coarse, '.mo-tut .mt-x'), /width:\s*44px;\s*height:\s*44px/);
+  for (const sel of ['#v-mosha .mo-tc-lv > summary small', '#v-mosha .mo-l-flt button small', '.mo-lv-dlg .mo-f small']) assert.match(rule(css, sel), /font-size:\s*12px/, sel);
+  assert.match(rule(css, '#v-mosha .mo-f'), /grid-template-columns:\s*minmax\(0, 1fr\)/, 'a wide date-and-time input cannot push its label over the next field');
+  const light = /:root\[data-theme="light"\] #v-mosha, :root\[data-theme="light"\] \.mo-tut, :root\[data-theme="light"\] \.mo-lv-dlg \{ --buy: (#[0-9a-f]{6}); --sell: (#[0-9a-f]{6}); \}/.exec(css);
+  assert.ok(light, 'the light theme has its own green and red on the Mosha desk');
+  const page = /:root\[data-theme="light"\] \{([^}]*)\}/.exec(styles(src('market-structure.html')))[1];
+  for (const [k, c] of [['buy', light[1]], ['sell', light[2]]]) for (const bg of ['#ffffff', '#f7f8fb', over(tok(page, `${k}-soft`), '#ffffff')]) assert.ok(ratio(c, bg) >= 4.5, `${k} ${c} on ${bg}: ${ratio(c, bg).toFixed(2)}`);
+  // a record with no drawdown says 0.00R, not "−0.00R"
+  assert.match(src('assets/mosha-desk.js'), /\(s\.maxDD > 0 \? '−' : ''\) \+ s\.maxDD\.toFixed\(2\) \+ 'R'/);
+});
+
+test('ICT desk: the signal filters and the review fields are 44 px on touch, the result tiles\' small print is 12 px', () => {
+  const css = styles(src('market-structure.html'));
+  const touch = /\/\* touch: 44px targets \*\/\s*@media \(pointer: coarse\), \(max-width: 700px\) \{([\s\S]*?)\n\}/.exec(css)[1];
+  assert.match(rule(touch, '#v-ict .ict-f select'), /min-height:\s*44px/); assert.match(rule(touch, '#v-ict .ict-rv input'), /min-height:\s*44px/);
+  const small = [...rule(css, '#v-ict .ict-kpi small').matchAll(/(?:font:[^;]*?|font-size:\s*)([\d.]+)px/g)].map((m) => +m[1]);
+  assert.ok(small[small.length - 1] >= 12, `the won / lost / flat / near-flat line: ${small[small.length - 1]} px`);
+  assert.match(css, /@media \(pointer: coarse\) \{ \.ict-ex-b \{ min-height: 44px; \} \}/, 'the execution chips');
+});
+
+test('ChronosTrade: the chosen timeframe chip passes AA in every theme, an open trade shows its whole stop, the teach dialog has no 10 px text', () => {
+  const css = styles(src('backtest.html'));
+  const on = /\.tfchips button\[aria-pressed="true"\] \{ background: (#[0-9a-f]{6}); border-color: \1; color: #fff; \}/.exec(css);
+  assert.ok(on, 'a fixed background, not --accent (white on the dark themes\' accent was 3.2:1)'); assert.ok(ratio('#ffffff', on[1]) >= 4.5, ratio('#ffffff', on[1]).toFixed(2));
+  assert.match(css, /@media \(pointer: coarse\) \{ \.tfchips button \{ min-height: 44px; min-width: 44px; \} \}/);
+  const sess = /:root\[data-theme="light"\] \.tb-sess span \{ color: (#[0-9a-f]{6}); \}/.exec(css);
+  assert.ok(sess && ratio(sess[1], '#ffffff') >= 4.5, 'the toolbar\'s timeframe on the light panel');
+  assert.ok(css.includes(`@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]):not([data-theme="midnight"]) .tb-sess span { color: ${sess[1]}; } }`), 'and when the device picks the light theme');
+  // `#open input { width: 60px }` (the old table) cut the stop and target of a position card to "4180."
+  assert.match(css, /#open \.pos-l input \{ width: 100%; \}/);
+  assert.ok(css.indexOf('#open .pos-l input { width: 100%; }') >= 0 && /#open input \{ width: 60px; \}/.test(css), 'the card rule is the more specific one');
+  assert.match(rule(css, '.tch-f small'), /font-size:\s*12px/);
 });

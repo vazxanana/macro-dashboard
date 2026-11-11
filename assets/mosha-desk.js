@@ -100,7 +100,7 @@
   function tiles(s) {
     var pct = s.win == null ? '—' : Math.round(s.win * 100) + '%';
     return '<div class="ct-stats"><div><span>Closed</span><b>' + s.n + '</b></div><div><span>Winners</span><b>' + pct + '</b></div><div><span>R a trade</span><b class="' + (s.n ? 'ct-' + cls(s.avg) : '') + '">' + (s.n ? fR(s.avg) : '—') + '</b></div>' +
-      '<div><span>Total</span><b class="' + (s.n ? 'ct-' + cls(s.total) : '') + '">' + (s.n ? fR(s.total) : '—') + '</b></div><div><span>t</span><b>' + (s.t == null ? '—' : s.t.toFixed(2)) + '</b></div><div><span>Deepest drawdown</span><b>' + (s.n ? '−' + s.maxDD.toFixed(2) + 'R' : '—') + '</b></div></div>';
+      '<div><span>Total</span><b class="' + (s.n ? 'ct-' + cls(s.total) : '') + '">' + (s.n ? fR(s.total) : '—') + '</b></div><div><span>t</span><b>' + (s.t == null ? '—' : s.t.toFixed(2)) + '</b></div><div><span>Deepest drawdown</span><b>' + (s.n ? (s.maxDD > 0 ? '−' : '') + s.maxDD.toFixed(2) + 'R' : '—') + '</b></div></div>';
   }
   function splits(S) {
     var names = { cf: HOW.cf, zone: HOW.zone, retest: HOW.retest, other: HOW.other, 'with': 'With the H4', against: 'Against the H4', '': 'H4 not noted', asia: 'Asia', london: 'London', 'new york': 'New York', sell: 'Sells', buy: 'Buys' };

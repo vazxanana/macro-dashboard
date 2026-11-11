@@ -3,6 +3,7 @@
 // unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop (the owner also
 // opens the Desk's inner views, see INNER); and no visible
 // element runs an endless animation of a custom property or box-shadow (the header ring rule, CLAUDE.md "Desk smoothness").
+// On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways).
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -14,7 +15,7 @@ const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.htm
 // Inner views a page only draws when they are opened (the Desk's Council panes run their render functions on first show):
 // as the owner, each is opened by its hash on the loaded page and must not throw either. Council → Systems once threw
 // "sn is not defined" there, unseen by a check that only loaded the page.
-const INNER = { '/market-structure.html': ['#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/macro', '#council/week', '#scanner', '#gold', '#mosha', '#ict', '#lit', '#users', '#profile'] };
+const INNER = { '/market-structure.html': ['#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/macro', '#council/week', '#scanner', '#gold', '#mosha', '#ict', '#crypto', '#lit', '#sdv', '#users', '#profile'] };
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 // script and font CDNs the pages load (a page without its chart library is not what visitors get)
 const ALLOW = /^https:\/\/(cdn\.jsdelivr\.net|s3\.tradingview\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
@@ -56,6 +57,9 @@ async function wire(ctx, account) {
       await p.waitForTimeout(SETTLE);
       if (account && INNER[path]) for (const h of INNER[path]) {
         const n = errs.length; await p.evaluate((x) => { location.hash = x; }, h).catch(() => {}); await p.waitForTimeout(600);
+        // a view wider than the phone is cut off on the right without any sideways scroll (the app clips it), so the width check
+        // below cannot see it: the six-desk switch once made every desk view 10 px too wide (QA sweep, 11 Nov)
+        if (viewport.width < 500) { const cut = await p.evaluate(() => [...document.querySelectorAll('#ms-live > section')].filter((e) => e.getClientRects().length).flatMap((e) => [e, ...e.children]).filter((e) => e.getClientRects().length && e.getBoundingClientRect().right > innerWidth + 1).map((e) => `${e.id ? '#' + e.id : e.tagName.toLowerCase() + '.' + String(e.className).trim().split(/\s+/)[0]} ends at ${Math.round(e.getBoundingClientRect().right)} px`)).catch(() => []); if (cut.length) errs.push(`view cut off on the right: ${[...new Set(cut)].slice(0, 3).join(', ')}`); }
         for (let i = n; i < errs.length; i++) errs[i] = `${h}: ${errs[i]}`;
       }
       // scroll to the bottom and back so lazy sections render before the width check
