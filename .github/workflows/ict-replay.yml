@@ -3,12 +3,18 @@ name: ICT desk replay
 # Replays the ICT tracker's model from 1 Aug 2025 (owner, 7 Nov 2026; before: 1 Jan 2026) of CNBC futures candles and writes council-data
 # ict/replay.json for the ICT desk (calendar, stats). Runs when the replay code changes, on demand, and daily
 # (weekly before 11 Nov 2026: an unresolved record waited up to a week for its exit).
+# Booked history is frozen (11 Nov 2026): a record booked more than 3 days before the previous run ended is carried from the previous
+# ict/replay.json as booked, because the feed returns different candles for old hours from run to run. Tick "rebuild" to recompute all.
 on:
   workflow_dispatch:
     inputs:
       from:
         description: 'Replay start (UTC date)'
         default: '2025-08-01'
+      rebuild:
+        description: 'Recompute the whole history from today''s candles (logged as a rebuild). Normally off: booked history is carried as booked'
+        type: boolean
+        default: false
   schedule:
     - cron: '41 6 * * *'
   push:
@@ -44,6 +50,8 @@ jobs:
         with:
           node-version: 22
       - name: Replay
+        env:
+          ICT_REPLAY_REBUILD: ${{ github.event.inputs.rebuild == 'true' && 'on' || 'off' }}
         run: node ict/replay.mjs data/ict "${{ github.event.inputs.from || '2025-08-01' }}"
       - name: Save to council-data
         run: |
