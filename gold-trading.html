@@ -14,6 +14,14 @@
     (function () { var d = document.documentElement, g = null, p = null; try { g = localStorage.getItem('goldDarkMode'); p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); } catch (e) {}
       if (g === '1' || (g === null && !(p && p.theme === 'light'))) { d.classList.add('dark'); if (p && p.theme === 'midnight') d.classList.add('midnight'); } })();
   </script>
+  <script>
+    // Simple phone view (11 Nov 2026): on a screen up to 640 px the terminal opens in its simple view unless this device chose the
+    // full one. Same key as the Desk (localStorage ms-phone = "full"), so one choice covers both. Set before the first paint;
+    // every rule of the simple view hangs on html[data-phone="simple"], which a wider screen never gets.
+    (function () { var R = document.documentElement, mq = window.matchMedia ? matchMedia('(max-width: 640px)') : null;
+      function set() { var full = false; try { full = localStorage.getItem('ms-phone') === 'full'; } catch (e) {} if (mq && mq.matches && !full) R.setAttribute('data-phone', 'simple'); else R.removeAttribute('data-phone'); }
+      set(); window.gxPhone = { set: set, mq: mq }; })();
+  </script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#030607">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -2939,6 +2947,94 @@
     .gx-fold-b { padding: 12px; }
     #dash-setup > div:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   }
+
+  /* ── PHONE, SIMPLE VIEW (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone") ──
+     Everything here hangs on html[data-phone="simple"] (set in the head only at 640 px and under, unless Full view was chosen),
+     so a wider screen and the phone's Full view are the page as it was. Nothing is removed: panels fold (the .gx-fold pattern),
+     the tabs sit in a bottom bar with the rest under More, the Multi-TF charts show one timeframe at a time. */
+  .gx-po, .gx-bar, .gx-pv { display: none; }
+  .gx-seg { display: inline-flex; padding: 3px; gap: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  .gx-seg button { min-width: 64px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .gx-seg button[aria-pressed="true"] { background: var(--mint-soft); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--line); }
+  .gx-seg button:focus-visible, .gx-bar button:focus-visible, .gx-more button:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+  @media (max-width: 640px) { .gx-pv { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 16px 0; font-size: 14px; color: var(--text-secondary); } }
+  .gx-more { width: 100%; max-width: 100%; max-height: 86vh; margin: auto 0 0; padding: 8px 12px calc(14px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--line);
+    border-radius: 18px 18px 0 0; background: var(--bg-secondary); color: var(--text-primary); overflow-y: auto; }
+  html.dark .gx-more { background: #0d1416; }
+  .gx-more::backdrop { background: rgba(0, 0, 0, 0.55); }
+  .gx-more[open] { animation: gx-up 180ms ease-out; }
+  @keyframes gx-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .gx-more[open] { animation: none; } }
+  .gx-more h2 { margin: 10px 8px 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-tertiary); }
+  .gx-more-l { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .gx-more-l button { display: flex; align-items: center; min-height: 48px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text-primary);
+    font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+  .gx-more-l button[aria-current="page"] { border-color: var(--mint); color: var(--mint); }
+  .gx-more-pv { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 8px 4px; font-size: 14px; color: var(--text-secondary); }
+  .gx-more-x { display: block; width: 100%; min-height: 48px; margin-top: 10px; border: 0; border-radius: 12px; background: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  html[data-phone="simple"] .gx-po { display: block; }
+  html[data-phone="simple"] body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  /* the tabs: four in a bottom bar, the rest under More */
+  html[data-phone="simple"] .gx-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 120;
+    padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: var(--bg-secondary); }
+  html.dark[data-phone="simple"] .gx-bar { background: #0a1012; }
+  .gx-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 58px; padding: 4px 2px; border: 0; background: none;
+    color: var(--text-secondary); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  .gx-bar button i { font-style: normal; font-size: 17px; line-height: 1; }
+  .gx-bar button[aria-current="page"] { color: var(--mint); box-shadow: inset 0 2px 0 var(--mint); }
+  html[data-phone="simple"] .primary-nav .pnav-btn[data-section], html[data-phone="simple"] .primary-nav .pnav-sep, html[data-phone="simple"] .sub-nav { display: none; }
+  html[data-phone="simple"] .pnav-live-label { display: inline; }
+  /* the header: one line of prices to swipe; on the dashboard the hero carries the price, so the header goes */
+  html[data-phone="simple"] .header { padding: 12px 16px 10px; background: none; }
+  html[data-phone="simple"] .header::after { display: none; }
+  html[data-phone="simple"] body[data-section="dashboard"] .header { padding: 0; height: 8px; }
+  html[data-phone="simple"] .header-controls, html[data-phone="simple"] .header .logo, html[data-phone="simple"] .header .logo-sub { display: none; }
+  html[data-phone="simple"] .price-ticker { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 24px; overflow-x: auto; scrollbar-width: none; margin: 0; padding: 0; }
+  html[data-phone="simple"] body[data-section="dashboard"] .price-ticker { display: none; }
+  html[data-phone="simple"] .price-ticker::-webkit-scrollbar { display: none; }
+  html[data-phone="simple"] .ticker-item { flex: 0 0 auto; }
+  html[data-phone="simple"] .ticker-value { font-size: 17px; }
+  html[data-phone="simple"] .container { padding-top: 12px; }
+  /* dashboard: price, chart, then one line each */
+  html[data-phone="simple"] #tab-dashboard.active { display: flex; flex-direction: column; }
+  html[data-phone="simple"] #tab-dashboard > .gx-hero { order: 1; margin-bottom: 12px; padding: 14px 16px; gap: 10px; }
+  html[data-phone="simple"] #tab-dashboard > .gx-chart-card { order: 2; margin-bottom: 12px; }
+  html[data-phone="simple"] #tab-dashboard > [data-fold="pbias"] { order: 3; }
+  html[data-phone="simple"] #tab-dashboard > [data-fold="setup"] { order: 4; }
+  html[data-phone="simple"] #tab-dashboard > [data-fold="read"] { order: 5; }
+  html[data-phone="simple"] #tab-dashboard > [data-fold="yields"] { order: 6; }
+  html[data-phone="simple"] .dash-shortcuts { display: none; }
+  html[data-phone="simple"] .gx-chart { height: 236px; }
+  /* the chart names its own lines (Entry, Stop, T1, T2, prior day high / low), so the key above it goes; the level chips take one row */
+  html[data-phone="simple"] .gx-chart-src, html[data-phone="simple"] .gx-keys { display: none; }
+  html[data-phone="simple"] .gx-chart-card { padding-top: 12px; }
+  html[data-phone="simple"] .gx-levels { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-top: 8px; }
+  html[data-phone="simple"] .gx-levels::-webkit-scrollbar { display: none; }
+  html[data-phone="simple"] .gx-levels > * { flex: 0 0 auto; }
+  html[data-phone="simple"] .gx-fold { margin-bottom: 10px; }
+  html[data-phone="simple"] .gx-fold > summary { min-height: 58px; }
+  html[data-phone="simple"] .gx-fold-s { max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  html[data-phone="simple"] #dash-bias-strip { margin-bottom: 0; }
+  .gx-po-wait { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+  /* a folded block of another tab: the block keeps its own look inside, without its outer gap */
+  html[data-phone="simple"] .gx-pf > .gx-fold-b > [data-pf] { margin: 0 !important; }
+  html[data-phone="simple"] .gx-pf > .gx-fold-b > .card, html[data-phone="simple"] .gx-pf > .gx-fold-b > .dash-widget {
+    padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  html[data-phone="simple"] .gx-pf > .gx-fold-b > .section-header { border: 0; padding: 0; }
+  html[data-phone="simple"] .tab-panel > .section, html[data-phone="simple"] .tab-panel > .section-header { margin-bottom: 14px; }
+  /* Multi-TF: one timeframe at a time */
+  html[data-phone="simple"] .gx-tfsw { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; font-size: 14px; color: var(--text-secondary); }
+  html[data-phone="simple"] #tab-mtf[data-ptf="d"] [data-ptf-w]:not([data-ptf-w="d"]),
+  html[data-phone="simple"] #tab-mtf[data-ptf="h4"] [data-ptf-w]:not([data-ptf-w="h4"]),
+  html[data-phone="simple"] #tab-mtf[data-ptf="m15"] [data-ptf-w]:not([data-ptf-w="m15"]) { display: none; }
+  html[data-phone="simple"] #tab-mtf [data-ptf-w] { margin-top: 0 !important; }
+  /* a chart made while its block is hidden starts 600 px wide; a 1fr track would grow to it and cut the chart off on the right */
+  html[data-phone="simple"] .mtf-grid { grid-template-columns: minmax(0, 1fr); } html[data-phone="simple"] .mtf-grid > * { min-width: 0; }
+  html[data-phone="simple"] #tab-intel .grid-2 { gap: 0; }
+  html[data-phone="simple"] .container { padding-left: 16px; padding-right: 16px; padding-bottom: 8px; }
+  html[data-phone="simple"] .alerts-panel { left: 12px; right: 12px; width: auto; }   /* it was 360 px from the right edge: 10 px off a 390 px screen */
+  html[data-phone="simple"] #scGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 </style>
 </head>
 <body data-section="dashboard">
@@ -3082,6 +3178,13 @@
       <div id="scalpChartLevels" class="gx-levels"></div>
     </section>
 
+    <!-- Phone, simple view only: the daily bias in one line; it opens to the bias strip, which the phone script moves in from
+         the "Signal, session and today's plan" panel and puts back for the Full view -->
+    <details class="gx-fold gx-po" data-fold="pbias">
+      <summary><span class="gx-fold-t">Daily bias</span><span class="gx-fold-s" id="gxFoldBias">Waiting for the daily candles</span></summary>
+      <div class="gx-fold-b" data-pv-slot="#dash-bias-strip"><p class="gx-po-wait" id="gxBiasWait">The daily bias appears here once the daily candles have loaded.</p></div>
+    </details>
+
     <!-- SECONDARY PANELS: folded; each summary carries a one-line read (open state remembered on this device) -->
     <details class="gx-fold" data-fold="read">
       <summary><span class="gx-fold-t">Signal, session and today's plan</span><span class="gx-fold-s" id="gxFoldRead">Needs a live price</span></summary>
@@ -3114,7 +3217,7 @@
     </details>
 
     <details class="gx-fold" data-fold="setup">
-      <summary><span class="gx-fold-t">Trade setup, macro score and edge signals</span><span class="gx-fold-s" id="gxFoldSetup">Needs a live price</span></summary>
+      <summary><span class="gx-fold-t" data-pt="Macro score and trade setup">Trade setup, macro score and edge signals</span><span class="gx-fold-s" id="gxFoldSetup">Needs a live price</span></summary>
       <div class="gx-fold-b">
         <div class="dash-grid">
           <div class="dash-widget gx-flush">
@@ -3234,14 +3337,14 @@
 
     <!-- Macro synthesis — the drivers stitched into one coherent story, not
          just a weighted checklist -->
-    <div class="card glass" style="margin-bottom:16px;">
+    <div data-pf="Macro synthesis" data-pf-s="How the four driver clusters fit together" class="card glass" style="margin-bottom:16px;">
       <div class="levels-panel-title" style="margin-bottom:10px;">Macro Synthesis <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— how the 4 driver clusters fit (or fight) together</span></div>
       <div id="bias-cluster-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
       <div id="bias-narrative" style="font-size:12px;color:var(--text-secondary);line-height:1.85;">Loading…</div>
     </div>
 
     <!-- Confluence table + playbook -->
-    <div class="levels-grid" style="margin-bottom:16px;">
+    <div data-pf="Bias confluence" data-pf-s="Every driver, grouped by cluster" class="levels-grid" style="margin-bottom:16px;">
       <div class="levels-panel">
         <div class="levels-panel-title">Bias Confluence — every driver, grouped by cluster</div>
         <div id="bias-checks"></div>
@@ -3253,7 +3356,7 @@
     </div>
 
     <!-- Trade plan: bias + structure + unmitigated order block, assembled -->
-    <div class="card glass" style="margin-bottom:16px;">
+    <div data-pf="Trade plan" data-pf-s="Printed only when bias, structure and an order block agree" data-pf-q="#tradePlanBody" class="card glass" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
         <h3 style="margin:0;">Trade Plan <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— printed only when bias, daily structure and a live order block agree at ≥1.5R</span></h3>
       </div>
@@ -3261,7 +3364,7 @@
     </div>
 
     <!-- Reaction zones chart -->
-    <div class="dash-widget" style="margin-bottom:16px;">
+    <div data-pf="Daily chart" data-pf-s="Structure and supply / demand" data-pf-q="#biasChartStruct" class="dash-widget" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
         <div class="dash-widget-title" style="margin:0;">DAILY — Structure + Supply/Demand <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">major structure breaks + order blocks — bright = unmitigated, boxes die on a body close through</span></div>
         <div class="chart-legend">
@@ -3276,7 +3379,7 @@
     </div>
 
     <!-- H4 / M15: structure and execution views inside the zones -->
-    <div class="mtf-grid" style="margin-bottom:16px;">
+    <div data-pf="H4 and M15 charts" data-pf-s="Structure, order blocks, execution view" class="mtf-grid" style="margin-bottom:16px;">
       <div class="dash-widget">
         <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure + Blocks <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">supply/demand order blocks &middot; structure breaks only</span></div>
         <div id="biasH4" style="width:100%;height:300px;position:relative;">
@@ -3292,7 +3395,7 @@
     </div>
 
     <!-- Reaction zones table -->
-    <div class="card glass">
+    <div data-pf="Reaction zones" data-pf-s="Ranked by how hard price reacted there" class="card glass">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <h3 style="margin:0;">Reaction Zones — ranked by how hard price reacted there</h3>
         <span style="font-size:var(--fs-xs);color:var(--text-tertiary);">~1 year of daily history · zones cluster within 0.4× ATR</span>
@@ -3313,7 +3416,7 @@
     </div>
 
     <!-- Correlation + COT history -->
-    <div class="mtf-grid" style="margin-top:16px;">
+    <div data-pf="Correlations and COT" data-pf-s="Gold against the dollar and real yields; managed-money positions" class="mtf-grid" style="margin-top:16px;">
       <div class="dash-widget">
         <div class="dash-widget-title" style="margin-bottom:10px;">GOLD CORRELATIONS <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">20-day rolling vs DXY (blue) and real yields (gold) — near −1 = master drivers in gear; near 0 = decoupled, trust the fundamental gate less</span></div>
         <div id="corrChart" style="width:100%;height:260px;position:relative;">
@@ -3334,7 +3437,7 @@
   <div id="tab-analysis" class="tab-panel">
 
   <!-- LIVE TRADE SETUP BOARD -->
-  <div class="section">
+  <div data-pf="Live trade setup" data-pf-s="Direction, entry, stop, targets" data-pf-q="#setupDir" class="section">
     <div class="section-header">
       <div class="section-title">Live Trade Setup</div>
       <span class="badge" id="setup-updated">Calculating…</span>
@@ -3483,7 +3586,7 @@
   </div>
 
   <!-- MACRO DRIVERS FIRST -->
-  <div class="section">
+  <div data-pf="Fundamentals and macro drivers" data-pf-s="The five primary drivers, scored" class="section">
     <div class="section-header">
       <div class="section-title">Fundamental Analysis & Macro Drivers</div>
     </div>
@@ -3562,7 +3665,7 @@
   </div>
 
   <!-- THEN CHART + TRADING STRATEGY -->
-  <div class="chart-wrapper">
+  <div data-pf="Trading strategy and entry" data-pf-s="Entry zone, stop and targets" class="chart-wrapper">
     <div>
       <div class="section">
         <div class="section-header">
@@ -3616,7 +3719,7 @@
   </div>
 
   <!-- KEY PRICE LEVELS -->
-  <div class="section">
+  <div data-pf="Support and resistance levels" data-pf-s="Zones below and above the price" class="section">
     <div class="section-header">
       <div class="section-title">Key Support & Resistance Levels</div>
     </div>
@@ -3663,7 +3766,7 @@
   </div>
 
   <!-- CORE PHILOSOPHY -->
-  <div class="section">
+  <div data-pf="Trading philosophy" data-pf-s="How gold is read on this page" class="section">
     <div class="card glass-ultra" style="padding: 32px; background: rgba(0, 82, 204, 0.08);">
       <h3 style="font-size: 16px; margin-bottom: 16px;">Institutional Trading Philosophy</h3>
       <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.9;">
@@ -3706,7 +3809,7 @@
       </div>
     </div>
 
-    <div class="section">
+    <div data-pf="How events move gold" data-pf-s="The usual reaction to each kind of release" class="section">
       <div class="section-header">
         <div class="section-title">How Events Move Gold</div>
       </div>
@@ -3753,7 +3856,7 @@
       <div class="section-title">📕 Red Folder Desk <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— gold scenario maps for upcoming high-impact events</span></div>
     </div>
 
-    <div class="card glass" style="margin-bottom:16px;">
+    <div data-pf="How to read these cards" data-pf-s="What each scenario map shows" class="card glass" style="margin-bottom:16px;">
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
         Each card maps how gold typically reacts to a <strong>red-folder</strong> (high-impact) release:
         a directional <strong>skew</strong> with its components shown (macro regime + real yields + event asymmetry
@@ -3767,7 +3870,7 @@
     <div id="rf-cards"></div>
 
     <!-- PRINT REACTION METER — how hard did gold actually move on the print -->
-    <div class="card glass" style="margin-top:16px;">
+    <div data-pf="Print reaction meter" data-pf-s="Gold in the first 10 s, 1 min and 5 min after a release" class="card glass" style="margin-top:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <h3 style="margin:0;">Print Reaction Meter <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— XAU/USD move in the first 10s / 1m / 5m after each red-folder release</span></h3>
         <button class="j-add-btn" onclick="refreshPrintMeter(true)">↻ Measure recent prints</button>
@@ -3789,8 +3892,8 @@
   </div><!-- end tab-redfolder -->
 
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
-  <div id="tab-mtf" class="tab-panel">
-    <div class="section-header">
+  <div id="tab-mtf" class="tab-panel" data-ptf="d">
+    <div data-pf="How to read these charts" data-pf-s="Lines, labels and boxes explained" class="section-header">
       <div class="section-title">Multi-Timeframe Charts <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins — <strong>bright + &ldquo;unmitigated&rdquo;</strong> = price has never returned (highest probability), dim = already mitigated; killed by a body close through the far side</span></div>
     </div>
 
@@ -3808,15 +3911,17 @@
       </div>
     </div>
 
+    <!-- Phone, simple view only: one timeframe at a time (the three charts and their structure readouts are the same elements) -->
+    <div class="gx-po gx-tfsw" id="gxTf"><span id="gxTfL">Timeframe</span><span class="gx-seg" role="group" aria-labelledby="gxTfL"><button type="button" data-tf="d" aria-pressed="true">Daily</button><button type="button" data-tf="h4" aria-pressed="false">H4</button><button type="button" data-tf="m15" aria-pressed="false">M15</button></span></div>
     <div class="mtf-grid">
-      <div class="dash-widget">
+      <div class="dash-widget" data-ptf-w="d">
         <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — Trend <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">last ~4 months</span></div>
         <div id="mtfDaily" style="width:100%;height:300px;position:relative;">
           <div id="mtfDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
         <div id="mtfDailyStruct" style="margin-top:8px;font-size:var(--fs-xs);line-height:1.5;color:var(--text-tertiary);"></div>
       </div>
-      <div class="dash-widget">
+      <div class="dash-widget" data-ptf-w="h4">
         <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">last ~30 days &middot; structure + supply/demand only</span></div>
         <div id="mtfH4" style="width:100%;height:300px;position:relative;">
           <div id="mtfH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
@@ -3825,7 +3930,7 @@
       </div>
     </div>
 
-    <div class="dash-widget" style="margin-top:16px;">
+    <div class="dash-widget" data-ptf-w="m15" style="margin-top:16px;">
       <div class="dash-widget-title" style="margin-bottom:10px;">M15 — Execution <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">last 2 days &middot; structure + supply/demand only</span></div>
       <div id="mtfM15" style="width:100%;height:340px;position:relative;">
         <div id="mtfM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
@@ -3849,7 +3954,7 @@
     </div>
 
     <!-- Per-session macro + technical bias -->
-    <div class="section">
+    <div data-pf="Session signals" data-pf-s="Asia, London and New York, each on its own" class="section">
       <div class="section-header">
         <div class="section-title">Session Signals <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— Asia / London / New York, each scored on its own macro catalysts + its own market structure. Suggested stop = beyond the protected swing, padded by that session's own ATR (not the daily one), nudged clear of round-number stop hunts</span></div>
       </div>
@@ -3859,7 +3964,7 @@
     </div>
 
     <!-- Morning routine -->
-    <div class="section">
+    <div data-pf="Morning session: London open" data-pf-s="Checklist and playbook" class="section">
       <div class="section-header">
         <div class="section-title">Morning Session — London Open</div>
         <span class="badge">08:00 – 12:00 London</span>
@@ -3948,7 +4053,7 @@
     </div>
 
     <!-- Afternoon routine -->
-    <div class="section">
+    <div data-pf="Afternoon session: New York overlap" data-pf-s="Checklist and playbook" class="section">
       <div class="section-header">
         <div class="section-title">Afternoon Session — NY Overlap</div>
         <span class="badge">13:00 – 17:00 London / 08:00 – 12:00 New York</span>
@@ -4028,7 +4133,7 @@
     </div>
 
     <!-- Session times reference -->
-    <div class="section">
+    <div data-pf="Session times on your clock" data-pf-s="Each session in your local time" class="section">
       <div class="section-header">
         <div class="section-title">Session Times — Your Local Clock</div>
       </div>
@@ -4054,7 +4159,7 @@
     </div>
 
     <!-- Confluence Score -->
-    <div class="section">
+    <div data-pf="Rule-idea checklist" data-pf-q=".section-header .badge" class="section">
       <div class="section-header">
         <div class="section-title">Rule-idea checklist</div>
         <span class="badge" style="background:rgba(217,119,6,0.15); border-color:rgba(217,119,6,0.3); color:var(--amber);">Not tested</span>
@@ -4085,7 +4190,7 @@
     </div>
 
     <!-- Edge 1: COT -->
-    <div class="section">
+    <div data-pf="1 · COT Contrarian Signal" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,var(--amber),#F59E0B);">1</div>
@@ -4137,7 +4242,7 @@
     </div>
 
     <!-- Edge 2: Seasonal -->
-    <div class="section">
+    <div data-pf="2 · Seasonal Calendar Idea" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#059669,#10B981);">2</div>
@@ -4191,7 +4296,7 @@
     </div>
 
     <!-- Edge 3: Real Yield Threshold -->
-    <div class="section">
+    <div data-pf="3 · Real Yield Threshold Signal" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#0052CC,#2563EB);">3</div>
@@ -4242,7 +4347,7 @@
     </div>
 
     <!-- Edge 4: DXY Divergence -->
-    <div class="section">
+    <div data-pf="4 · DXY Divergence Idea" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#7C3AED,#8B5CF6);">4</div>
@@ -4290,7 +4395,7 @@
     </div>
 
     <!-- Edge 5: London PM Fix -->
-    <div class="section">
+    <div data-pf="5 · London Fix Intraday Pattern" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#C23B33,#EF4444);">5</div>
@@ -4339,7 +4444,7 @@
     </div>
 
     <!-- Edge 6: Bollinger Band Squeeze -->
-    <div class="section">
+    <div data-pf="6 · Bollinger Band Squeeze" data-pf-q=".edge-stat-pill" class="section">
       <div class="edge-card">
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#0891B2,#06B6D4);">6</div>
@@ -4390,7 +4495,7 @@
     </div>
 
     <!-- Edge Summary Table -->
-    <div class="section">
+    <div data-pf="Rule Ideas — Quick Reference" data-pf-s="All six in one table" class="section">
       <div class="section-header">
         <div class="section-title">Rule Ideas — Quick Reference</div>
       </div>
@@ -4490,28 +4595,28 @@
     </div>
 
     <div class="grid-2">
-      <div class="card glass">
+      <div data-pf="Every morning (5 min)" data-pf-s="ForexFactory, CME FedWatch, TradingView" class="card glass">
         <h3>★ Every Morning (5 min)</h3>
         <div class="intel-item"><a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">ForexFactory Calendar</a><span class="intel-desc">THE red-folder source — exact release times, consensus and prior for every print. Cross-check the Red Folder desk dates here (agencies shift dates around holidays).</span></div>
         <div class="intel-item"><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME FedWatch</a><span class="intel-desc">Live market-implied Fed cut/hike odds from Fed Funds futures — the fastest read on what's priced in before an event.</span></div>
         <div class="intel-item"><a href="https://www.tradingview.com/symbols/XAUUSD/" target="_blank" rel="noopener">TradingView XAU/USD</a><span class="intel-desc">Overnight structure, volume profile, and the levels other traders are watching (ideas feed shows crowd positioning).</span></div>
       </div>
 
-      <div class="card glass">
+      <div data-pf="Weekly (Friday / Monday)" data-pf-s="CFTC COT, WGC Goldhub, FRED real yield" class="card glass">
         <h3>★ Weekly (Friday/Monday)</h3>
         <div class="intel-item"><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC COT Report</a><span class="intel-desc">Managed-money gold positioning (Fridays, 15:30 ET). The old idea reads extremes as contrarian (crowded longs = pullback risk); this repository's COT study found no such edge for gold. Feeds Edge #1 in the Edge Lab.</span></div>
         <div class="intel-item"><a href="https://www.gold.org/goldhub" target="_blank" rel="noopener">WGC Goldhub</a><span class="intel-desc">Central-bank purchases and ETF flow updates — the structural bid. Refresh the Institutional Flows panel figures from here quarterly.</span></div>
         <div class="intel-item"><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener">FRED — 10Y Real Yield</a><span class="intel-desc">The master driver's official chart. Set a mental alert on the 2.0% and 1.5% levels — regime boundaries.</span></div>
       </div>
 
-      <div class="card glass">
+      <div data-pf="News and flows (as needed)" data-pf-s="Kitco, DailyFX, Investing.com" class="card glass">
         <h3>News &amp; Flows (as needed)</h3>
         <div class="intel-item"><a href="https://www.kitco.com/news/" target="_blank" rel="noopener">Kitco News</a><span class="intel-desc">Gold-specific headlines and analyst positioning — fastest gold-dedicated newswire.</span></div>
         <div class="intel-item"><a href="https://www.dailyfx.com/gold-price" target="_blank" rel="noopener">DailyFX Gold</a><span class="intel-desc">Retail sentiment data (IG client positioning) — useful contrarian read when >75% one-sided.</span></div>
         <div class="intel-item"><a href="https://www.investing.com/commodities/gold-news" target="_blank" rel="noopener">Investing.com Gold News</a><span class="intel-desc">Broad wire aggregation; good for catching geopolitical headlines that spike the safe-haven bid.</span></div>
       </div>
 
-      <div class="card glass">
+      <div data-pf="Deep context (monthly)" data-pf-s="WGC research, Fed calendar, LBMA" class="card glass">
         <h3>Deep Context (monthly)</h3>
         <div class="intel-item"><a href="https://www.gold.org/goldhub/research" target="_blank" rel="noopener">WGC Research Library</a><span class="intel-desc">Gold Demand Trends (quarterly) — the definitive supply/demand accounting.</span></div>
         <div class="intel-item"><a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noopener">Fed FOMC Calendar</a><span class="intel-desc">Official meeting dates + minutes release schedule — verify the Red Folder FOMC dates each quarter.</span></div>
@@ -4528,7 +4633,7 @@
 
     <div class="grid-3" style="margin-bottom:16px;" id="scGrid"></div>
 
-    <div class="levels-grid" style="margin-bottom:16px;">
+    <div data-pf="Driver league" data-pf-s="Who earns their weight" class="levels-grid" style="margin-bottom:16px;">
       <div class="levels-panel">
         <div class="levels-panel-title">Driver League — who earns their weight</div>
         <div id="scDrivers" style="font-size:12px;">Collecting data&hellip;</div>
@@ -4546,7 +4651,7 @@
       </div>
     </div>
 
-    <div class="card glass">
+    <div data-pf="Verdict ledger" data-pf-s="The last 30 graded days" class="card glass">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <h3 style="margin:0;">Verdict Ledger — last 30 graded days</h3>
         <span style="font-size:var(--fs-xs);color:var(--text-tertiary);" id="scLedgerNote">&mdash;</span>
@@ -4603,6 +4708,26 @@
 
 </div>
 
+<!-- PHONES (640 px and under): Simple is the default; Full is the phone page as it was before 11 Nov 2026 -->
+<div class="gx-pv" id="gxPv"><span id="gxPvL">Phone view</span><span class="gx-seg" role="group" aria-labelledby="gxPvL"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
+<nav class="gx-bar" id="gxBar" aria-label="Sections">
+  <button type="button" data-tab="dashboard" aria-current="page"><i aria-hidden="true">▣</i>Dashboard</button>
+  <button type="button" data-tab="bias"><i aria-hidden="true">◍</i>Daily Bias</button>
+  <button type="button" data-tab="mtf"><i aria-hidden="true">◈</i>Charts</button>
+  <button type="button" data-tab="redfolder"><i aria-hidden="true">⚑</i>Red Folder</button>
+  <button type="button" data-more aria-haspopup="dialog"><i aria-hidden="true">⋯</i>More</button>
+</nav>
+<dialog class="gx-more" id="gxMore" aria-label="More sections">
+  <h2>Markets</h2>
+  <div class="gx-more-l"><button type="button" data-tab="analysis">Live Analysis</button><button type="button" data-tab="sessions">Trade Sessions</button><button type="button" data-tab="calendar">Economic Calendar</button></div>
+  <h2>Research</h2>
+  <div class="gx-more-l"><button type="button" data-tab="edges">Edge Lab</button><button type="button" data-tab="edgetracker">Edge Tracker</button><button type="button" data-tab="scorecard">Bias Scorecard</button><button type="button" data-tab="backtest">Backtest Lab</button><button type="button" data-tab="intel">Intel Sources</button></div>
+  <h2>This page</h2>
+  <div class="gx-more-l"><button type="button" data-do="theme">Light / dark</button><button type="button" data-do="alerts">Price alerts</button></div>
+  <div class="gx-more-pv"><span id="gxPvL2">Phone view</span><span class="gx-seg" role="group" aria-labelledby="gxPvL2"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
+  <button type="button" class="gx-more-x" data-do="close">Close</button>
+</dialog>
+
 <!-- FOOTER -->
 <div class="footer">
   Institutional-Grade XAU/USD Trading Platform • Data Updates Every 30 Seconds • Last Updated: <span id="footerTime">—</span>
@@ -4627,6 +4752,7 @@
     if (name === 'calendar')  { renderCalendar(); }
     if (name === 'redfolder') { renderRedFolder(); renderPrintMeter(); refreshPrintMeter(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
+    if (window.gxPhoneTab) window.gxPhoneTab(name);   // the phone's bottom bar follows every tab change
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -8412,11 +8538,13 @@
 
     // Folded dashboard panels remember open / closed on this device
     (function () {
-      let st = {}; try { st = JSON.parse(localStorage.getItem('gxFolds') || '{}') || {}; } catch (e) {}
-      document.querySelectorAll('.gx-fold').forEach(d => {
-        if (st[d.dataset.fold]) d.open = true;
-        d.addEventListener('toggle', () => { st[d.dataset.fold] = d.open; try { localStorage.setItem('gxFolds', JSON.stringify(st)); } catch (e) {} });
-      });
+      // the store is read again at every change: the phone's simple view binds more folds later (window.gxFoldBind)
+      const read = () => { try { return JSON.parse(localStorage.getItem('gxFolds') || '{}') || {}; } catch (e) { return {}; } };
+      const bind = window.gxFoldBind = (d) => {
+        if (read()[d.dataset.fold]) d.open = true;
+        d.addEventListener('toggle', () => { const st = read(); st[d.dataset.fold] = d.open; try { localStorage.setItem('gxFolds', JSON.stringify(st)); } catch (e) {} });
+      };
+      document.querySelectorAll('.gx-fold').forEach(bind);
     })();
 
     // Boot institutional nav on Dashboard
@@ -9132,5 +9260,84 @@
   }
 </script>
 
+<script>
+  // ─── PHONE, SIMPLE VIEW (11 Nov 2026) ───────────────────────────────────────
+  // Display only: no number, score or rule is computed here. On a phone's simple view (html[data-phone="simple"], set in the
+  // head) every block marked data-pf is put inside a folded .gx-fold with a one-line summary (its data-pf-s text, or the live
+  // text of the element(s) data-pf-q names inside it), the bottom bar and the More sheet replace the two tab rows, and the
+  // Multi-TF tab shows one timeframe. Full view (or a wider screen) takes every block out again: the page as it was.
+  (function () {
+    const R = document.documentElement, $ = (id) => document.getElementById(id), simple = () => R.getAttribute('data-phone') === 'simple';
+    const bar = $('gxBar'), more = $('gxMore'), SEC = {};
+    Object.keys(NAV_SECTIONS).forEach((s) => NAV_SECTIONS[s].tabs.forEach((t) => { SEC[t.id] = s; }));
+    const txt = (e) => (e.textContent || '').replace(/\s+/g, ' ').trim();
+    const homes = new Map();   // moved element → the comment that marks where it came from
+    let timer = 0, tab = 'dashboard';
+
+    function fold(el) {
+      const d = document.createElement('details'), t = el.getAttribute('data-pf'), panel = el.closest('.tab-panel');
+      d.className = 'gx-fold gx-pf'; d.dataset.fold = 'pf-' + (panel ? panel.id.slice(4) : '') + '-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      d.innerHTML = '<summary><span class="gx-fold-t"></span><span class="gx-fold-s"></span></summary><div class="gx-fold-b"></div>';
+      d.querySelector('.gx-fold-t').textContent = t;
+      el.parentNode.insertBefore(d, el); d.lastChild.appendChild(el);
+      if (window.gxFoldBind) window.gxFoldBind(d);
+    }
+    function apply() {
+      document.querySelectorAll('[data-pf]').forEach((el) => { if (!el.parentNode.closest('.gx-pf') || el.parentNode.parentNode.querySelector(':scope > .gx-fold-b > [data-pf]') !== el) fold(el); });
+      document.querySelectorAll('[data-pv-slot]').forEach((slot) => { const el = document.querySelector(slot.getAttribute('data-pv-slot')); if (!el || homes.has(el)) return;
+        const mark = document.createComment('gx-home'); el.parentNode.insertBefore(mark, el); homes.set(el, mark); slot.appendChild(el); });
+      document.querySelectorAll('[data-pt]').forEach((e) => { if (e.dataset.pt0 == null) { e.dataset.pt0 = e.textContent; e.textContent = e.dataset.pt; } });
+      if (!timer) timer = setInterval(sums, 5000);
+      sums();
+    }
+    function undo() {
+      document.querySelectorAll('details.gx-pf').forEach((d) => { const el = d.querySelector(':scope > .gx-fold-b > [data-pf]'); if (el) d.parentNode.insertBefore(el, d); d.remove(); });
+      homes.forEach((mark, el) => { mark.parentNode.insertBefore(el, mark); mark.remove(); }); homes.clear();
+      document.querySelectorAll('[data-pt]').forEach((e) => { if (e.dataset.pt0 != null) { e.textContent = e.dataset.pt0; delete e.dataset.pt0; } });
+      clearInterval(timer); timer = 0;
+      if (more.open) more.close();
+    }
+    // the one-line summaries of the open tab (text only, written when it changed)
+    function sums() {
+      if (!simple() || document.hidden) return;
+      document.querySelectorAll('.tab-panel.active details.gx-pf').forEach((d) => { const el = d.querySelector(':scope > .gx-fold-b > [data-pf]'), s = d.querySelector(':scope > summary > .gx-fold-s'); if (!el || !s) return;
+        const q = el.getAttribute('data-pf-q'); let v = q ? [...el.querySelectorAll(q)].map(txt).filter(Boolean).join(' · ') : '';
+        if (!v || /^(Computing|Loading|Calculating)/.test(v)) v = el.getAttribute('data-pf-s') || v; if (v.length > 120) v = v.slice(0, 118) + '…';
+        if (s.textContent !== v) s.textContent = v; });
+      const strip = $('dash-bias-strip'), out = $('gxFoldBias'), wait = $('gxBiasWait');
+      if (strip && out) { const on = strip.style.display !== 'none' && strip.children.length > 0, v = on ? txt(strip.querySelector('span:nth-child(2)') || strip) : 'Waiting for the daily candles';
+        if (out.textContent !== v) out.textContent = v; if (wait) wait.hidden = on; }
+    }
+    function marks() {
+      const full = !simple(); document.querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === 'full') === full)));
+      const inBar = !!bar.querySelector('[data-tab="' + tab + '"]');
+      bar.querySelectorAll('button').forEach((b) => { const on = b.dataset.tab ? b.dataset.tab === tab : !inBar; if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+      more.querySelectorAll('[data-tab]').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    }
+    function sync() { if (simple()) apply(); else undo(); marks(); }
+    function go(t) { if (more.open) more.close(); if (!SEC[t]) return; switchSection(SEC[t], document.querySelector('.pnav-btn[data-section="' + SEC[t] + '"]'), t); window.scrollTo(0, 0); }
+    window.gxPhoneTab = (name) => { tab = name; marks(); if (simple()) setTimeout(sums, 0); };
+
+    bar.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.tab) go(b.dataset.tab); else if (more.showModal) more.showModal(); });
+    more.addEventListener('click', (e) => { if (e.target === more) { more.close(); return; } const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.tab) go(b.dataset.tab);
+      else if (b.dataset.do === 'close') more.close();
+      else if (b.dataset.do === 'theme') toggleDarkMode();
+      else if (b.dataset.do === 'alerts') { more.close(); toggleAlerts(); } });
+    document.addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (!b) return;
+      try { if (b.dataset.v === 'full') localStorage.setItem('ms-phone', 'full'); else localStorage.removeItem('ms-phone'); } catch (err) {}
+      window.gxPhone.set(); sync(); window.scrollTo(0, 0); });
+    // Multi-TF: one timeframe at a time, remembered on this device
+    const mtf = $('tab-mtf'), tfs = $('gxTf');
+    function tf(v, keep) { if (!/^(d|h4|m15)$/.test(v)) v = 'd'; mtf.setAttribute('data-ptf', v); tfs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tf === v)));
+      if (keep) { try { localStorage.setItem('gxPhoneTf', v); } catch (e) {} } }
+    tfs.addEventListener('click', (e) => { const b = e.target.closest('button[data-tf]'); if (b) tf(b.dataset.tf, true); });
+    let v0 = 'd'; try { v0 = localStorage.getItem('gxPhoneTf') || 'd'; } catch (e) {} tf(v0);
+    document.addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('gx-pf')) sums(); }, true);
+    if (window.gxPhone.mq && window.gxPhone.mq.addEventListener) window.gxPhone.mq.addEventListener('change', () => { window.gxPhone.set(); sync(); });
+    // after the page's own start (which binds the dashboard folds and defines gxFoldBind)
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', sync); else sync();
+  })();
+</script>
 </body>
 </html>

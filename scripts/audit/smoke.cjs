@@ -108,7 +108,15 @@ async function wire(ctx, account, seen) {
       // the gold terminal clips sideways overflow (body overflow-x hidden): a tab wider than the phone is cut off and nothing scrolls,
       // so each tab is opened and the body's own content width is read (side pages pass, 11 Nov: the Daily Bias banner and a table)
       if (path === '/gold-trading.html' && viewport.width < 500) { const cut = await ev(p, calm, async () => { const out = []; if (typeof NAV_SECTIONS === 'undefined' || typeof switchSection !== 'function') return ['tabs not found'];
-        for (const [s, v] of Object.entries(NAV_SECTIONS)) for (const t of v.tabs) { switchSection(s, document.querySelector('[data-section=' + s + ']'), t.id); await new Promise((r) => setTimeout(r, 250)); if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} ${document.body.scrollWidth} px`); }
+        for (const [s, v] of Object.entries(NAV_SECTIONS)) for (const t of v.tabs) { switchSection(s, document.querySelector('[data-section=' + s + ']'), t.id); await new Promise((r) => setTimeout(r, 250)); if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} ${document.body.scrollWidth} px`);
+          // the phone's simple view folds the tab's blocks: each is opened too, and no block or chart inside may end past the screen (a chart made
+          // while its block was hidden starts 600 px wide and once stretched its grid column; the body clips, so nothing scrolled)
+          const folds = [...document.querySelectorAll('.tab-panel.active details.gx-fold:not([open])')]; if (folds.length) { folds.forEach((d) => { d.open = true; }); await new Promise((r) => setTimeout(r, 400));
+            if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} with its folds open ${document.body.scrollWidth} px`);
+            const far = [...document.querySelectorAll('.tab-panel.active [data-pf], .tab-panel.active canvas')].filter((e) => e.getClientRects().length && e.getBoundingClientRect().right > innerWidth + 1).length; if (far) out.push(`${t.id}: ${far} folded blocks or charts end past the screen`);
+            folds.forEach((d) => { d.open = false; }); } }
+        // simple view: every tab must be reachable from the bottom bar or its More sheet
+        if (document.documentElement.getAttribute('data-phone') === 'simple') { const have = new Set([...document.querySelectorAll('#gxBar [data-tab], #gxMore [data-tab]')].map((b) => b.dataset.tab)); for (const v of Object.values(NAV_SECTIONS)) for (const t of v.tabs) if (!have.has(t.id)) out.push(`${t.id} has no button on the phone`); if (!document.getElementById('gxBar').getClientRects().length) out.push('the phone tab bar is not shown'); }
         switchSection('dashboard', document.querySelector('[data-section=dashboard]')); return out; }).catch((e) => ['tab walk: ' + e.message.split('\n')[0]]); if (cut.length) errs.push('tab cut off on the right: ' + cut.join(', ')); }
       // a chart host that is on screen but empty: the macro desk once drew its charts while the story was still display:none
       // (no width, nothing drawn until a resize); folded or hidden hosts do not count
