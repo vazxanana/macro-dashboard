@@ -1319,6 +1319,27 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   Edge lab: verdict donut + legend with counts and shares, best candidate IS vs OOS bars (baseline OOS tick, t in words), equity
   line where a study lists its own trades (`lab-summary.mjs` `equityOf`: cumulative R sampled to 48 points, drawdown from the full
   series; today crypto-trend-decay and nq-open-oos), `[data-tip]` tooltips on hover and tap.
+- Quality pass (11 Nov 2026; every page at 390 px touch and 1440 px, dark / light / midnight, owner / reviewer / viewer / signed
+  out). **Macro desk**: since the 9 Nov `main[data-loading]` fix the charts were drawn while the story was still `display: none`,
+  so `draw()` found no width and the score path, the level ladder, the expectation scale and the hit-rate chart stayed blank until a
+  resize or the 5-minute reload; `load()` now removes the flag, then calls `redraw()`. "No hypothesis this run" is said once, the
+  score chart's threshold names are drawn after the line, each dot of the header switch is a 44 px target on touch (25 px before)
+  and the switch hides when signed out. **Edge lab**: a study whose result stores an object under `system` read "[object Object]"
+  (only text is a description); `tidy()` mends a joined headline ("FAIL.; Intraday: …"); the report dialog renders the study's
+  RESULT.md (`md` / `mdInline`, the veteran library's renderer: escaped first, tables scroll inside `.tbl`, relative links stay text)
+  instead of raw Markdown in a monospace block. **Veteran library**: "Open raw" is 44 px on touch. **Gold terminal** (locked
+  features and the driver stack untouched): the page clips sideways overflow, so on phones the Daily Bias banner's Target / Daily ATR
+  column, the levels panels and Research → Edge Summary table were cut off with no way to reach them (the banner stacks under
+  700 px, `.levels-grid` uses `minmax(0, 1fr)`, the table's card is `.gx-scroll-x`); `.edge-rule` notes were pale text on a pale slab
+  in dark (2.3:1); the hero chart's key-level labels are drawn above the candles on a plate of the card colour (`P.plate`; the lines
+  stay underneath); the MTF opportunity line no longer reads "Buy the pullback into the wait for a pullback block" when M15 has no
+  block (`planTxt`). `scripts/audit/smoke.cjs` now opens every gold tab on the phone (body wider than the screen = "tab cut off on
+  the right") and fails on a visible, empty chart host (`.vz[id]`, "chart not drawn"); both fail on the build before this pass.
+  Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
+  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab states win rates and "high conviction" with no
+  n or t (older content, against the wording of absolute rule 4); `research/macro-veteran/START_HERE.md` (shown in the veteran
+  library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
+  and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the

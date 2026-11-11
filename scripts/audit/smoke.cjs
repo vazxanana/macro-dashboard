@@ -3,7 +3,8 @@
 // unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop (the owner also
 // opens the Desk's inner views, see INNER); and no visible
 // element runs an endless animation of a custom property or box-shadow (the header ring rule, CLAUDE.md "Desk smoothness").
-// On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways).
+// On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways);
+// the same for every tab of the gold terminal; and no visible chart host (.vz) of a page may be left empty.
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -62,7 +63,15 @@ async function wire(ctx, account) {
         if (viewport.width < 500) { const cut = await p.evaluate(() => [...document.querySelectorAll('#ms-live > section')].filter((e) => e.getClientRects().length).flatMap((e) => [e, ...e.children]).filter((e) => e.getClientRects().length && e.getBoundingClientRect().right > innerWidth + 1).map((e) => `${e.id ? '#' + e.id : e.tagName.toLowerCase() + '.' + String(e.className).trim().split(/\s+/)[0]} ends at ${Math.round(e.getBoundingClientRect().right)} px`)).catch(() => []); if (cut.length) errs.push(`view cut off on the right: ${[...new Set(cut)].slice(0, 3).join(', ')}`); }
         for (let i = n; i < errs.length; i++) errs[i] = `${h}: ${errs[i]}`;
       }
-      // scroll to the bottom and back so lazy sections render before the width check
+      // the gold terminal clips sideways overflow (body overflow-x hidden): a tab wider than the phone is cut off and nothing scrolls,
+      // so each tab is opened and the body's own content width is read (side pages pass, 11 Nov: the Daily Bias banner and a table)
+      if (path === '/gold-trading.html' && viewport.width < 500) { const cut = await p.evaluate(async () => { const out = []; if (typeof NAV_SECTIONS === 'undefined' || typeof switchSection !== 'function') return ['tabs not found'];
+        for (const [s, v] of Object.entries(NAV_SECTIONS)) for (const t of v.tabs) { switchSection(s, document.querySelector('[data-section=' + s + ']'), t.id); await new Promise((r) => setTimeout(r, 250)); if (document.body.scrollWidth > innerWidth + 1) out.push(`${t.id} ${document.body.scrollWidth} px`); }
+        switchSection('dashboard', document.querySelector('[data-section=dashboard]')); return out; }).catch((e) => ['tab walk: ' + e.message.split('\n')[0]]); if (cut.length) errs.push('tab cut off on the right: ' + cut.join(', ')); }
+      // a chart host that is on screen but empty: the macro desk once drew its charts while the story was still display:none
+      // (no width, nothing drawn until a resize); folded or hidden hosts do not count
+      const blank = await p.evaluate(() => [...document.querySelectorAll('.vz[id]')].filter((e) => e.getClientRects().length && e.clientWidth > 0 && !e.children.length).map((e) => '#' + e.id)).catch(() => []);
+      if (blank.length) errs.push('chart not drawn: ' + blank.join(', '));
       await p.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 300)); window.scrollTo(0, 0); }).catch(() => {});
       const w = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })).catch(() => ({ sw: 0, iw: 0 }));
       // endless animations that repaint every frame: a custom property (the conic ring's angle) or box-shadow; opacity / transform pulses are fine

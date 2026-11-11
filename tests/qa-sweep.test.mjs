@@ -141,3 +141,84 @@ test('ChronosTrade: the chosen timeframe chip passes AA in every theme, an open 
   assert.ok(css.indexOf('#open .pos-l input { width: 100%; }') >= 0 && /#open input \{ width: 60px; \}/.test(css), 'the card rule is the more specific one');
   assert.match(rule(css, '.tch-f small'), /font-size:\s*12px/);
 });
+
+// ---- Side pages quality pass (11 Nov 2026): macro desk, Edge lab, veteran library, gold terminal ----
+// the text of `function name(…) { … }` in a page script (brace matched), to run it here
+const fnSrc = (html, name) => { const i = html.indexOf(`function ${name}(`); assert.ok(i >= 0, `function ${name} is in the page`); let d = 0, j = html.indexOf('{', html.indexOf(')', i));
+  for (let k = j; k < html.length; k++) { if (html[k] === '{') d++; else if (html[k] === '}' && --d === 0) return html.slice(i, k + 1); } throw new Error(`${name}: no closing brace`); };
+
+test('macro desk: the story is shown before its charts are drawn (they were blank on first load)', () => {
+  const html = src('macro-desk.html');
+  // main[data-loading] hides the story with display:none, and draw() skips a host with no width: the flag must be gone before redraw()
+  assert.match(styles(html), /main\[data-loading\] \.story[^{]*\{ display: none; \}/);
+  const load = fnSrc(html, 'load'), off = load.indexOf('delete m.dataset.loading'), re = load.indexOf('redraw()');
+  assert.ok(off > 0 && re > off, 'load() removes data-loading, then calls redraw()');
+  assert.ok(load.indexOf('syncStory()') < off, 'after the sections know whether they have data');
+  assert.match(load, /\.finally\(/, 'a failed load still shows the page');
+});
+
+test('macro desk: "no hypothesis" is said once, the score\'s threshold names sit over the line, the switch is a 44 px target and hides when signed out', () => {
+  const html = src('macro-desk.html'), css = styles(html);
+  assert.equal(html.match(/No hypothesis this run/g).length, 1);
+  const spark = fnSrc(html, 'sparkSvg'); assert.ok(spark.indexOf('<path class="ln"') < spark.lastIndexOf('+ lab'), 'labels are appended after the path');
+  assert.match(css, /@media \(pointer: coarse\) \{ \.hdr-sw \{ padding: 0; \} \.hdr-sw a \{ min-width: 44px; justify-content: center; \} \}/);
+  assert.match(css, /\.hdr-sw\[hidden\] \{ display: none; \}/);
+  assert.match(html, /getElementById\('md-gate'\)\.hidden = false; var sw = document\.querySelector\('\.hdr-sw'\); if \(sw\) sw\.hidden = true;/);
+  // dots only on phones: every link of the switch keeps a name
+  const nav = /<nav class="hdr-sw"[^>]*>([\s\S]*?)<\/nav>/.exec(html)[1];
+  for (const a of nav.match(/<a [^>]*>/g)) assert.match(a, /title="[^"]+"/, a);
+});
+
+test('Edge lab: a study whose `system` is not text shows no "[object Object]", and a joined headline has one mark between its parts', () => {
+  const html = src('edge-lab.html');
+  assert.match(html, /var sys = typeof d\.system === 'string' \? esc\(d\.system\) : '';/);
+  const tidy = new Function(`${fnSrc(html, 'tidy')}; return tidy;`)();
+  assert.equal(tidy('Scalp (live rule): FAIL.; Intraday: FAIL.; Swing: INCONCLUSIVE.'), 'Scalp (live rule): FAIL; Intraday: FAIL; Swing: INCONCLUSIVE.');
+  assert.equal(tidy('t 0.55; n 62. Not an edge.'), 't 0.55; n 62. Not an edge.'); assert.equal(tidy(null), '');
+  assert.ok(!/esc\(rec\.headline\)/.test(html), 'every headline goes through tidy()');
+});
+
+test('Edge lab: the report dialog renders the study\'s Markdown, escaped first, wide tables scrolling inside it', () => {
+  const html = src('edge-lab.html'), css = styles(html);
+  const md = new Function(`${fnSrc(html, 'esc')}; ${fnSrc(html, 'mdInline')}; ${fnSrc(html, 'md')}; return md;`)();
+  const out = md('**Verdict: FAIL.** n 365, t -3.10\n\n# Title <script>alert(1)</script>\n\n| System | n |\n|---|---|\n| A `k` | 62 |\n\n- one\n- two *x*\n\n[site](https://example.org/a) and [file](run.mjs), 2 * 3 * 4\n');
+  assert.match(out, /<p><b>Verdict: FAIL\.<\/b> n 365, t -3\.10<\/p>/);
+  assert.match(out, /<h1>Title &lt;script&gt;alert\(1\)&lt;\/script&gt;<\/h1>/, 'markup in a report is text');
+  assert.match(out, /<div class="tbl" tabindex="0"><table><thead><tr><th scope="col">System<\/th><th scope="col">n<\/th><\/tr><\/thead><tbody><tr><td>A <code>k<\/code><\/td><td>62<\/td><\/tr>/);
+  assert.match(out, /<ul><li>one<\/li><li>two <i>x<\/i><\/li><\/ul>/);
+  assert.match(out, /<a href="https:\/\/example\.org\/a" target="_blank" rel="noopener">site<\/a> and file, 2 \* 3 \* 4/, 'a relative link stays text; a lone * is not emphasis');
+  assert.match(html, /<div id="rep-body" class="rep-doc" tabindex="0">/); assert.match(html, /\$\('rep-body'\)\.innerHTML = md\(txt\)/);
+  assert.match(css, /\.rep-doc \.tbl \{ overflow-x: auto;/);
+  assert.match(css, /@media \(pointer: coarse\) \{ \.rep-h a \{ display: inline-flex; align-items: center; min-height: 44px; \} \}/);
+});
+
+test('veteran library: "Open raw" is a 44 px target on touch', () => {
+  assert.match(styles(src('scripts/veteran-library.html')), /@media \(pointer: coarse\) \{[^}]*\} \.doc \.meta a \{ display: inline-flex; align-items: center; min-height: 44px; \} \}/);
+});
+
+test('gold terminal: nothing on a phone is cut off behind the page\'s sideways clip (bias banner, levels panels, edge summary table)', () => {
+  const html = src('gold-trading.html'), css = styles(html);
+  assert.match(css, /\.gx-scroll-x \{ overflow-x: auto;/);
+  assert.match(html, /<div class="card glass gx-scroll-x">\s*<table style="width:100%; border-collapse:collapse; font-size:var\(--fs-xs\);">/);
+  assert.match(css, /@media \(max-width: 1000px\) \{ \.levels-grid \{ grid-template-columns: minmax\(0, 1fr\); \} \}/);
+  const phone = css.slice(css.indexOf('.desk-banner { flex-direction: column;'));
+  assert.ok(css.lastIndexOf('@media (max-width: 700px) {', css.indexOf('.desk-banner { flex-direction: column;')) > 0);
+  assert.match(phone, /^\.desk-banner \{ flex-direction: column; align-items: stretch;[^}]*\}\s*\.desk-banner \.desk-vline \{ display: none; \}\s*\.desk-banner \.desk-details \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  // the later rules win over the first definitions
+  assert.ok(css.indexOf('.levels-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }') > css.indexOf('.levels-grid {\n'));
+});
+
+test('gold terminal: entry-rule notes are readable in the dark theme, key-level labels sit above the candles, the MTF sentence reads', () => {
+  const html = src('gold-trading.html'), css = styles(html);
+  const m = /html\.dark \.edge-rule \{ background: (rgba\([^)]+\)); \}/.exec(css); assert.ok(m);
+  const dark = /html\.dark[^{]*\{[^}]*--panel:\s*(#[0-9A-Fa-f]{6})/.exec(css) || [0, '#081011'];
+  const text = '#A8B8B5';   // --text-secondary in the dark theme as measured on the page (rgb 168,184,181)
+  assert.ok(ratio(text, over(m[1], dark[1].toLowerCase())) >= 4.5, 'note text on the slab');
+  const key = fnSrc(html, 'makeKeyLevelsPrimitive');
+  assert.match(key, /zOrder: \(\) => top \? 'top' : 'bottom'/); assert.match(key, /return \[pass\(false\), pass\(true\)\];/); assert.match(key, /ctx\.fillStyle = P\.plate;/);
+  assert.match(fnSrc(html, 'gxPalette'), /plate: gxAlpha\(v\('--panel'/);
+  assert.ok(!/into'\} the \$\{zoneTxt\}; full ticket/.test(html) && !html.includes('`wait for a pullback block to form on M15`'), 'no "into the wait for a pullback block"');
+  assert.match(html, /No M15 \$\{L \? 'demand' : 'supply'\} block yet: wait for one to form before/);
+  // locked features and the Yen carry row are untouched
+  for (const f of ['structureMap', 'makeStructPrimitive', 'renderStructReadout', 'computeDailyBias', 'dollarSmileRegime']) assert.ok(html.includes(`function ${f}(`), f);
+});
