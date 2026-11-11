@@ -414,11 +414,14 @@
   if (typeof document === 'undefined') return;
 
   // ---- the page -----------------------------------------------------------------------------------------------------
-  // The ONLY browser storage of this page: two display preferences of this device (the edge used last, which parts of the
-  // decision card are open). Never a decision, a result, a lesson or anything read from the API: those live on the server.
-  const PREFS = ['mxacEdge', 'mxacFold'];
+  // The ONLY browser storage of this page: three display preferences of this device (the edge used last, which parts of the
+  // decision card are open, and the site's phone view `ms-phone`: "full", or no key for the simple view; the Desk, the Macro
+  // desk and ChronosTrade use the same key, so one choice covers the site). Never a decision, a result, a lesson or anything
+  // read from the API: those live on the server.
+  const PREFS = ['mxacEdge', 'mxacFold', 'ms-phone'];
   function prefGet(k) { if (PREFS.indexOf(k) < 0) return null; try { return root.localStorage.getItem(k); } catch (e) { return null; } }
   function prefSet(k, v) { if (PREFS.indexOf(k) < 0) return; try { root.localStorage.setItem(k, String(v).slice(0, 400)); } catch (e) { /* private mode: not remembered */ } }
+  function prefDel(k) { if (PREFS.indexOf(k) < 0) return; try { root.localStorage.removeItem(k); } catch (e) { /* private mode */ } }
   const $ = (id) => document.getElementById(id);
   function el(tag, props) {
     const n = document.createElement(tag), p = props || {};
@@ -447,8 +450,40 @@
   const M = { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false };   // the mentor's form
   MXAC.point = () => (S.cur ? { cur: S.cur, setup: S.setup, thesis: S.thesis, lessons: S.lessons, cands: S.cands, done: S.done, open: S.open, sessionId: S.sessionId } : null);   // read-only view of the open decision point, for assets/academy-analyst.js
 
+  // ---- the phone's simple view (11 Nov 2026) ---------------------------------------------------------------------------
+  // Display only: no call, no decision, nothing stored but the one preference. The rules live in assets/academy.css under
+  // `@media (max-width: 640px)` and `html[data-phone="simple"]` (the attribute the page head sets, on a phone only, unless
+  // this device chose the full view); outside them every piece below is inert:
+  //   .pm-host > .pm     parts of a host that wait behind its `button.pmore` (the host gets .pm-open)
+  //   .pcard             a card that folds to its heading, opened by the chevron `pfold` puts in that heading
+  //   #tab-more          the sections a learner seldom opens sit behind "More" in the tab bar (TAB_MORE)
+  //   #pv                the "Phone view: Simple | Full" switch; Full is the phone page as it was
+  const TAB_MORE = ['research', 'models', 'costs', 'audit'];
+  const isSimple = () => document.documentElement.getAttribute('data-phone') === 'simple';
+  function moreToggle(btn) { const host = btn.closest('.pm-host'); if (!host) return; const on = !host.classList.contains('pm-open'); host.classList.toggle('pm-open', on); btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  // a "more" button for a host drawn by the page code; it comes back in the state the host was left in
+  const moreBtn = (host, id, label) => el('button', { type: 'button', class: 'btn sm pmore', id, 'aria-expanded': host.classList.contains('pm-open') ? 'true' : 'false', text: label, onclick: (e) => moreToggle(e.currentTarget) });
+  const PF = {};   // which folded cards were opened, this visit only (a section is drawn again each time it is shown)
+  function pfold(card, name) {
+    const head = card && card.firstElementChild; if (!head || card.querySelector(':scope > * > .pc-t')) return card;
+    const key = card.id || name, label = name || (head.querySelector('b') || head).firstChild.textContent.trim();
+    const set = (on) => { card.classList.toggle('pm-open', on); b.setAttribute('aria-expanded', on ? 'true' : 'false'); b.setAttribute('aria-label', (on ? 'Hide: ' : 'Show: ') + label); };
+    const b = el('button', { type: 'button', class: 'pmore pc-t', onclick: () => { PF[key] = !card.classList.contains('pm-open'); set(PF[key]); } });
+    card.classList.add('pcard'); head.appendChild(b); set(!!PF[key]); return card;
+  }
+  function setPhoneView(v) {
+    if (v === 'full') prefSet('ms-phone', 'full'); else prefDel('ms-phone');   // the site's convention: "full", or no key
+    if (typeof root.msPhoneSet === 'function') root.msPhoneSet();               // the head script reads the key and sets the attribute
+    syncPhoneView(); resizeCharts();
+  }
+  function syncPhoneView() { document.querySelectorAll('#pv [data-pv]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.pv === 'full') !== isSimple()))); }
+  document.querySelectorAll('#pv [data-pv]').forEach((b) => b.addEventListener('click', () => { setPhoneView(b.dataset.pv); const t = $('ac-tabs'); if (t) t.scrollIntoView({ block: 'start' }); }));
+  document.querySelectorAll('button.pmore[id]').forEach((b) => b.addEventListener('click', () => moreToggle(b)));
+  document.querySelectorAll('#ac-train .pcard').forEach((c) => pfold(c));
+  syncPhoneView(); document.addEventListener('ms:phone', syncPhoneView);
+
   // ---- tabs -----------------------------------------------------------------------------------------------------------
-  let activeTab = 'train';
+  let activeTab = 'train', tabsMore = false;
   const ctx = () => ({ api, edge: () => (S.setup ? S.setup.edge.id : $('f-edge').value || null), edges: () => S.edges.slice(), me: S.me, kit: MXAC.kit, go: showTab });
   function tabList() { const ids = TABS.map((t) => t[0]); for (const id of Object.keys(REG)) if (ids.indexOf(id) < 0) ids.push(id); return ids; }
   const tabTitle = (id) => (REG[id] && REG[id].title) || (TABS.find((t) => t[0] === id) || [id, id])[1];
@@ -456,11 +491,15 @@
     const bar = clear($('ac-tabs'));
     for (const id of tabList()) {
       if (!$('ac-' + id)) $('ac-app').appendChild(el('section', { id: 'ac-' + id, role: 'tabpanel', 'aria-labelledby': 'tab-' + id, tabindex: '-1', hidden: true }));
-      bar.appendChild(el('button', { type: 'button', role: 'tab', id: 'tab-' + id, 'aria-controls': 'ac-' + id, 'aria-selected': id === activeTab ? 'true' : 'false', tabindex: id === activeTab ? '0' : '-1', onclick: () => showTab(id) }, tabTitle(id)));
+      bar.appendChild(el('button', { type: 'button', role: 'tab', id: 'tab-' + id, class: TAB_MORE.indexOf(id) >= 0 ? 'tab-2' : null, 'aria-controls': 'ac-' + id, 'aria-selected': id === activeTab ? 'true' : 'false', tabindex: id === activeTab ? '0' : '-1', onclick: () => showTab(id) }, tabTitle(id)));
     }
+    // phones, simple view: the sections in TAB_MORE wait behind this button (it is not drawn anywhere else)
+    bar.appendChild(el('button', { type: 'button', id: 'tab-more', class: 'pmore', 'aria-expanded': 'false', text: 'More', onclick: () => { tabsMore = !bar.classList.contains('more-open'); syncTabsMore(); } }));
+    syncTabsMore();
   }
+  function syncTabsMore() { const bar = $('ac-tabs'), b = $('tab-more'), on = tabsMore || TAB_MORE.indexOf(activeTab) >= 0; bar.classList.toggle('more-open', on); if (b) b.setAttribute('aria-expanded', on ? 'true' : 'false'); }
   function showTab(id) {
-    activeTab = id;
+    activeTab = id; tabsMore = false; syncTabsMore();
     { const m = document.querySelector('main'); if (m) m.classList.toggle('hero-min', id !== 'train'); }   // the hero keeps its full size on Train only
     for (const t of tabList()) { const sec = $('ac-' + t), btn = $('tab-' + t); if (sec) sec.hidden = t !== id; if (btn) { btn.setAttribute('aria-selected', t === id ? 'true' : 'false'); btn.tabIndex = t === id ? 0 : -1; } }
     if (id === 'train') { resizeCharts(); return; }
@@ -1124,13 +1163,14 @@
     part('lessons', 'Lessons applied', fold ? (la.length ? `${nApplied} applied` + (la.length - nApplied ? `, ${la.length - nApplied} matched but not applied` : '') : 'none matched') : null)
       .appendChild(listOr(el('ul', { class: 'txt-list', id: idp + '-lessons' }), la, 'No lesson matched this setup.', (l) => { const full = lessons.find((x) => x.id === l.id); return el('li', { 'data-applied': l.applied === false ? 'no' : 'yes' }, el('b', { text: (l.title || (full && full.title) || l.id) + ': ' }), l.effect || '', l.applied === false ? ' (not applied)' : ''); }));
     const rule = c.rule && typeof c.rule === 'object' ? Object.keys(c.rule) : [];
-    if (rule.length) { const dl = el('dl', { class: 'kv' }); for (const k of rule) { dl.appendChild(el('dt', { text: k })); dl.appendChild(el('dd', { text: typeof c.rule[k] === 'object' ? JSON.stringify(c.rule[k]) : String(c.rule[k]) })); } box.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Facts about this setup from the edge' }), dl)); }
-    box.appendChild(el('p', { class: 'versions', text: `model ${d.modelVersion || 'none (policy only)'} · policy ${d.policyVersion || 'n/a'} · edge ${d.edgeVersion || 'n/a'} · data ${d.dataVersion || 'n/a'}` + (o.hash ? ` · snapshot ${o.hash}` : '') }));
+    if (rule.length) { const dl = el('dl', { class: 'kv' }); for (const k of rule) { dl.appendChild(el('dt', { text: k })); dl.appendChild(el('dd', { text: typeof c.rule[k] === 'object' ? JSON.stringify(c.rule[k]) : String(c.rule[k]) })); } box.appendChild(el('details', { class: 'more pm' }, el('summary', { text: 'Facts about this setup from the edge' }), dl)); }
+    box.appendChild(el('p', { class: 'versions pm', text: `model ${d.modelVersion || 'none (policy only)'} · policy ${d.policyVersion || 'n/a'} · edge ${d.edgeVersion || 'n/a'} · data ${d.dataVersion || 'n/a'}` + (o.hash ? ` · snapshot ${o.hash}` : '') }));
   }
   function renderDecision() {
     const cur = S.cur, box = clear($('decision')), a = cur.latest; box.hidden = false;
     decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons, fold: true, onLessons: (ids) => { MXAC.lessonFocus = { edge: S.setup.edge.id, ids: ids.slice() }; showTab('lessons'); } });
     if (cur.exam) renderExamPoint(box);
+    box.appendChild(moreBtn(box, 'dec-more', 'Setup facts and versions'));
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause }), el('span', { class: 'ac-status', id: 'continue-msg', role: 'status' })));
     renderPointBar();
   }
@@ -1163,14 +1203,15 @@
     box.appendChild(el('p', { class: 'note', text: 'For a changed BUY or SELL, type the levels or drag the solid Mentor lines on the chart.' }));
     const bias = el('select', { id: 'm-bias', onchange: (e) => { M.bias = e.target.value; M.dirty = true; } }, el('option', { value: '', text: 'not given' }), el('option', { value: 'up', text: 'up' }), el('option', { value: 'down', text: 'down' }), el('option', { value: 'neutral', text: 'neutral' }));
     const edge = el('select', { id: 'm-edge', onchange: (e) => { M.edge = e.target.value; M.dirty = true; } }, el('option', { value: '', text: 'the same edge' }), S.edges.filter((x) => x.id !== S.setup.edge.id).map((x) => el('option', { value: x.id, text: x.name })));
-    box.appendChild(el('div', { class: 'f-grid' }, el('label', { class: 'f' }, el('span', { text: 'Your bias' }), bias), el('label', { class: 'f' }, el('span', {}, 'Corrected edge ', el('small', { text: '(optional)' })), edge)));
+    box.appendChild(el('div', { class: 'f-grid pm' }, el('label', { class: 'f' }, el('span', { text: 'Your bias' }), bias), el('label', { class: 'f' }, el('span', {}, 'Corrected edge ', el('small', { text: '(optional)' })), edge)));
     box.appendChild(el('h3', { text: 'Why' }));
     box.appendChild(el('div', { class: 'chips', role: 'group', 'aria-label': 'Reasons' }, REASONS.map(([id, label]) => el('button', { type: 'button', class: 'chip', 'data-reason': id, 'aria-pressed': 'false', text: label, onclick: (e) => { const i = M.reasons.indexOf(id); if (i >= 0) M.reasons.splice(i, 1); else M.reasons.push(id); M.dirty = true; e.currentTarget.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true'); mentorCheck(); } }))));
     box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: 'Your explanation' }), el('textarea', { id: 'm-text', maxlength: '4000', placeholder: 'What should it have seen?', oninput: (e) => { M.text = e.target.value; M.dirty = true; mentorCheck(); } })));
-    box.appendChild(el('h3', {}, 'Marks on the chart', el('small', { text: 'click the chart for a level, drag for a zone' })));
+    box.appendChild(moreBtn(box, 'm-more', 'Bias, another edge, marks on the chart'));
+    box.appendChild(el('h3', { class: 'pm' }, 'Marks on the chart', el('small', { text: 'click the chart for a level, drag for a zone' })));
     const kind = el('select', { id: 'a-kind', 'aria-label': 'Kind of mark' }, ANNOTATIONS.map(([id, label]) => el('option', { value: id, text: label })));
-    box.appendChild(el('div', { class: 'f-actions', style: 'margin-top:6px' }, el('span', { style: 'flex:1 1 160px;max-width:240px' }, kind), el('button', { type: 'button', class: 'btn', id: 'a-arm', 'aria-pressed': 'false', text: 'Mark on chart', onclick: (e) => { M.arm = M.arm ? null : kind.value; e.currentTarget.setAttribute('aria-pressed', M.arm ? 'true' : 'false'); $('chart').classList.toggle('arm', !!M.arm); $('chart').style.touchAction = M.arm || isTake(M.choice) ? 'none' : ''; } })));
-    box.appendChild(el('ul', { class: 'plain-list small', id: 'a-list' })); renderAnnotations();
+    box.appendChild(el('div', { class: 'f-actions pm', style: 'margin-top:6px' }, el('span', { style: 'flex:1 1 160px;max-width:240px' }, kind), el('button', { type: 'button', class: 'btn', id: 'a-arm', 'aria-pressed': 'false', text: 'Mark on chart', onclick: (e) => { M.arm = M.arm ? null : kind.value; e.currentTarget.setAttribute('aria-pressed', M.arm ? 'true' : 'false'); $('chart').classList.toggle('arm', !!M.arm); $('chart').style.touchAction = M.arm || isTake(M.choice) ? 'none' : ''; } })));
+    box.appendChild(el('ul', { class: 'plain-list small pm', id: 'a-list' })); renderAnnotations();
     box.appendChild(el('p', { class: 'note', id: 'm-hint', hidden: true })); box.appendChild(el('p', { class: 'ac-err', id: 'm-err', role: 'alert', hidden: true }));
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'm-save', disabled: true, text: 'Save correction', onclick: saveCorrection }), el('span', { class: 'ac-status', id: 'm-msg', role: 'status' })));
   }
@@ -1499,7 +1540,7 @@
     $('f-from').value = isoDay(t); $('f-to').value = isoDay(t); refreshPool(false);
     await startReplay(null, { at: t }); return true;
   }
-  MXAC.kit = { showNode, el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
+  MXAC.kit = { pfold, showNode, el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
     decided: decidedAs, leaveGuard, watchUnsaved: (fn) => { if (typeof fn === 'function') UNSAVED.push(fn); }, savedLessonOf, calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
