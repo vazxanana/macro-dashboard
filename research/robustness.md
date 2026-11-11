@@ -1,12 +1,12 @@
 # Robustness audit: which edges hold up?
 
-Generated 2026-11-11T18:29:55.670Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
+Generated 2026-11-11T22:01:15.818Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
 
 ## Short answer
 
 - 33 claims audited: 1 robust, 18 fragile, 14 not proven.
 - **LIVE rules that are not robust. Flagged for the owner; nothing was changed:**
-  - ICT A-setups (desk replay): **fragile**, +0.290R a trade over 257. out-of-sample t 2.00 < 2; fails Bonferroni for N=363 (needs t 3.64, has 2.90); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). Long-history check (2008-17 untouched (OANDA cash, 4 markets)): −0.013R a trade (t -0.45, n 2235), **not proven**.
+  - ICT A-setups (desk replay): **fragile**, +0.261R a trade over 253. fails Bonferroni for N=363 (needs t 3.64, has 2.63); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). Long-history check (2008-17 untouched (OANDA cash, 4 markets)): −0.013R a trade (t -0.45, n 2235), **not proven**.
   - Gold replica (council replay): **fragile**, +0.877R a trade over 212. no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before).
   - Gold trend N20 (council replay): **not proven**, +1.682R a trade over 22. only 22 trades (needs 30+).
   - NQ New York open run (council replay): **fragile**, +0.331R a trade over 299. fails Bonferroni for N=424 (needs t 3.68, has 3.67); no untouched sample: the rule was chosen on data from 2023-01-01 on (3 trades before).
@@ -14,18 +14,18 @@ Generated 2026-11-11T18:29:55.670Z by `node research/robustness.mjs <council-dat
   - Gold daily engulf (council replay): **not proven**, +0.226R a trade over 18. only 18 trades (needs 30+).
   - Mosha BO, 2018-26 rebuild: **not proven**, −0.064R a trade over 157. out-of-sample −0.305 a trade; CI includes 0 (−0.357 to +0.257); −0.250 a trade at 2x costs; fails Bonferroni for N=424 (needs t 3.68, has -0.41); no untouched sample: the rule was chosen on data from 2019-01-01 on (9 trades before).
 - Robust: Crypto trend v3, 2018-26 rebuild, +2.804R a trade over 125 (note: the real drawdown (13.7R) is worse than 95% of reshuffles: losses cluster). The council's own replay of the same rule (2023-01-10 to 2026-09-19) is **fragile**: out-of-sample +0.045 a trade (t 0.18, n 39), so check whether the edge still holds now.
-- Shadow candidates with a positive record that is not yet robust (keep on paper): ICT A-setups, no Friday variant +0.354R over 223 (fragile); ICT A-setups, H1 structure opposed variant +0.337R over 177 (fragile); ICT dip-buy NQ/ES +0.473R over 70 (fragile); Gold trend fast N5 (council replay) +1.712R over 39 (fragile); Gold trend fast N5, 2018-26 rebuild +1.065R over 74 (fragile); Crypto trend v3 (council replay) +1.079R over 96 (fragile); Gold momentum pullback, 2018-26 rebuild +0.043R over 1004 (fragile); Swing D1 ADX band 19.4-29.2 +0.156R over 278 (fragile).
+- Shadow candidates with a positive record that is not yet robust (keep on paper): ICT A-setups, no Friday variant +0.321R over 219 (fragile); ICT A-setups, H1 structure opposed variant +0.319R over 176 (fragile); ICT dip-buy NQ/ES +0.473R over 70 (fragile); Gold trend fast N5 (council replay) +1.712R over 39 (fragile); Gold trend fast N5, 2018-26 rebuild +1.065R over 74 (fragile); Crypto trend v3 (council replay) +1.079R over 96 (fragile); Gold momentum pullback, 2018-26 rebuild +0.043R over 1004 (fragile); Swing D1 ADX band 19.4-29.2 +0.156R over 278 (fragile).
 - No edge (zero or negative after costs): Gold momentum pullback (council replay) −0.024R over 74; Mosha BO, 2018-26 rebuild −0.064R over 157; Scalp live rule, 30-day replay −0.041R over 269; Scalp live rule, 30-day replay, gold + forex −0.226R over 163; Scalp live rule, 150d replay −0.011R over 915; Scalp live rule, 150d-clean replay −0.027R over 937; Scalp live rule, 2018-26 HistData −0.201R over 14083.
 
 ## ICT desk
 
 | Claim | Status | n | Net R/trade (t) | Out-of-sample last 40% | Untouched (before the rule was fitted) | Bootstrap 95% CI | Costs ×1.5 / ×2 | MC max DD 95% | Multiple testing (Bonferroni p, DSR) | Verdict |
 |---|---|---|---|---|---|---|---|---|---|---|
-| ICT A-setups (desk replay) | live (paper desk + cTrader demo mirror) | 257 | +0.290 (t 2.90) | +0.310 (t 2.00, n 103) | none (fit 2023+) | +0.095 to +0.493 | +0.280 / +0.270 | 16.7R | N 363: p 0.687, DSR 0.47 | **fragile** |
-| ICT A-setups, no Friday variant | shadow (paper variant) | 223 | +0.354 (t 3.20) | +0.369 (t 2.14, n 90) | none (fit 2023+) | +0.147 to +0.574 | +0.344 / +0.335 | 14.3R | N 64: p 0.044, DSR 0.83 | **fragile** |
-| ICT A-setups, H1 structure opposed variant | shadow (paper variant) | 177 | +0.337 (t 2.71) | +0.481 (t 2.29, n 71) | none (fit 2023+) | +0.094 to +0.586 | +0.326 / +0.315 | 14.5R | N 102: p 0.341, DSR 0.58 | **fragile** |
+| ICT A-setups (desk replay) | live (paper desk + cTrader demo mirror) | 253 | +0.261 (t 2.63) | +0.318 (t 2.04, n 102) | none (fit 2023+) | +0.074 to +0.467 | +0.251 / +0.241 | 17.6R | N 363: p 1.000, DSR 0.35 | **fragile** |
+| ICT A-setups, no Friday variant | shadow (paper variant) | 219 | +0.321 (t 2.93) | +0.377 (t 2.14, n 88) | none (fit 2023+) | +0.119 to +0.540 | +0.311 / +0.301 | 15.4R | N 64: p 0.107, DSR 0.74 | **fragile** |
+| ICT A-setups, H1 structure opposed variant | shadow (paper variant) | 176 | +0.319 (t 2.58) | +0.481 (t 2.29, n 71) | none (fit 2023+) | +0.081 to +0.569 | +0.308 / +0.297 | 15.2R | N 102: p 0.500, DSR 0.52 | **fragile** |
 | ICT dip-buy NQ/ES | shadow (paper, NQ/ES) | 70 | +0.473 (t 2.19) | +0.394 (t 1.11, n 28) | none (fit 2018+) | +0.078 to +0.888 | +0.465 / +0.458 | 10.7R | N 86: p 1.000, DSR 0.37 | **fragile** |
-| ICT all graded signals | reference (every graded signal) | 815 | +0.126 (t 2.27) | +0.065 (t 0.79, n 326) | none (fit 2023+) | +0.019 to +0.235 | +0.112 / +0.098 | 38.3R | N 363: p 1.000, DSR 0.23 | **fragile** |
+| ICT all graded signals | reference (every graded signal) | 804 | +0.118 (t 2.14) | +0.073 (t 0.88, n 322) | none (fit 2023+) | +0.012 to +0.229 | +0.105 / +0.091 | 38.6R | N 363: p 1.000, DSR 0.19 | **fragile** |
 | ICT A-setups NQ, 2018-26 rebuild | long-history check of the live A rule | 404 | +0.133 (t 1.68) | +0.271 (t 1.96, n 162) | +0.045 (n 249, before 2023) | −0.018 to +0.293 | +0.127 / +0.121 | 29.3R | N 363: p 1.000, DSR 0.08 | **fragile** |
 | ICT A-setups GC, 2018-26 rebuild | long-history check of the live A rule | 530 | +0.208 (t 2.95) | +0.335 (t 2.62, n 212) | −0.016 (n 78, before 2019) | +0.070 to +0.351 | +0.192 / +0.177 | 26.8R | N 363: p 0.580, DSR 0.50 | **fragile** |
 | ICT A-setups, 2008-17 untouched (OANDA cash, 4 markets) | long-history check of the live A rule | 4021 | +0.034 (t 1.50) | −0.013 (t -0.45, n 2235) | – | −0.010 to +0.079* | +0.004 / −0.026 | – | N 363: p 1.000, DSR 0.07 | **not proven** |
@@ -64,11 +64,11 @@ Generated 2026-11-11T18:29:55.670Z by `node research/robustness.mjs <council-dat
 
 ## Why each verdict
 
-- **ICT A-setups (desk replay)** (live (paper desk + cTrader demo mirror); claim: desk replay since 2025-08-01: +0.310R a trade over 257 (before costs); source: `ict/replay.json trades (aset)`): **fragile**. out-of-sample t 2.00 < 2; fails Bonferroni for N=363 (needs t 3.64, has 2.90); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before).
-- **ICT A-setups, no Friday variant** (shadow (paper variant); claim: +0.374R a trade over 223 (before costs); source: `ict/replay.json shadowByVariant.nofri`): **fragile**. no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). The A-setups it drops: 34 trades at −0.130R (t -0.65).
-- **ICT A-setups, H1 structure opposed variant** (shadow (paper variant); claim: +0.359R a trade over 177 (before costs); source: `ict/replay.json shadowByVariant.h1opp`): **fragile**. fails Bonferroni for N=102 (needs t 3.30, has 2.71); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). The A-setups it drops: 80 trades at +0.187R (t 1.11).
+- **ICT A-setups (desk replay)** (live (paper desk + cTrader demo mirror); claim: desk replay since 2025-08-01: +0.281R a trade over 253 (before costs); source: `ict/replay.json trades (aset)`): **fragile**. fails Bonferroni for N=363 (needs t 3.64, has 2.63); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before).
+- **ICT A-setups, no Friday variant** (shadow (paper variant); claim: +0.341R a trade over 219 (before costs); source: `ict/replay.json shadowByVariant.nofri`): **fragile**. fails Bonferroni for N=64 (needs t 3.16, has 2.93); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). The A-setups it drops: 34 trades at −0.130R (t -0.65).
+- **ICT A-setups, H1 structure opposed variant** (shadow (paper variant); claim: +0.341R a trade over 176 (before costs); source: `ict/replay.json shadowByVariant.h1opp`): **fragile**. fails Bonferroni for N=102 (needs t 3.30, has 2.58); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). The A-setups it drops: 77 trades at +0.126R (t 0.78).
 - **ICT dip-buy NQ/ES** (shadow (paper, NQ/ES); claim: +0.487R a trade over 70 (before costs); source: `ict/replay.json shadow (variant dip)`): **fragile**. out-of-sample t 1.11 < 2; fails Bonferroni for N=86 (needs t 3.25, has 2.19); no untouched sample: the rule was chosen on data from 2018-01-01 on (0 trades before).
-- **ICT all graded signals** (reference (every graded signal); claim: reference: what the A filter is selected from; source: `ict/replay.json trades`): **fragile**. out-of-sample t 0.79 < 2; fails Bonferroni for N=363 (needs t 3.64, has 2.27); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before).
+- **ICT all graded signals** (reference (every graded signal); claim: reference: what the A filter is selected from; source: `ict/replay.json trades`): **fragile**. out-of-sample t 0.88 < 2; fails Bonferroni for N=363 (needs t 3.64, has 2.14); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before).
 - **ICT A-setups NQ, 2018-26 rebuild** (long-history check of the live A rule; claim: same rule on 8 years of HistData (earlier rebuild audit); source: `research/edge/robustness/out/ict.json nq`): **fragile**. out-of-sample t 1.96 < 2; CI includes 0 (−0.017 to +0.293); fails Bonferroni for N=363 (needs t 3.64, has 1.68).
 - **ICT A-setups GC, 2018-26 rebuild** (long-history check of the live A rule; claim: same rule on 8 years of HistData (earlier rebuild audit); source: `research/edge/robustness/out/ict.json gc`): **fragile**. fails Bonferroni for N=363 (needs t 3.64, has 2.95); untouched period before 2019-01-01: −0.016 a trade over 78.
 - **ICT A-setups, 2008-17 untouched (OANDA cash, 4 markets)** (long-history check of the live A rule; claim: pre-registered test #526: 2008-17 −0.013R a trade (n 2235, t -0.45) vs 2018-26 +0.093R (n 1786); verdict FAILS; source: `research/edge/ict-oos-2008/result.json (summary only)`): **not proven**. out-of-sample −0.013 a trade; CI includes 0 (−0.010 to +0.079); −0.026 a trade at 2x costs; fails Bonferroni for N=363 (needs t 3.64, has 1.50).
@@ -119,7 +119,7 @@ Generated 2026-11-11T18:29:55.670Z by `node research/robustness.mjs <council-dat
 
 ## Data
 
-- `ict/replay.json`: at 2026-11-11T14:48:02.171Z, from 2025-08-01
+- `ict/replay.json`: at 2026-11-11T18:41:21.643Z, from 2025-08-01
 - `research/replay-2w.json`: from 2022-12-27, to 2026-11-03
 - `backtest.json`: at 2026-11-11T11:14:22.932Z, from 2026-10-12T11:09:00.000Z, to 2026-11-11T11:09:00.000Z, days 30
 - `research/backtest-150d.json`: at 2026-11-02T21:57:46.797Z, from 2026-06-05T21:54:00.000Z, to 2026-11-02T21:54:00.000Z, days 150
