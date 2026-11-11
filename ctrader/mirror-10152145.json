@@ -7563,7 +7563,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9916.81 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9916.81 · 21 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7592,18 +7592,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "sol-scalp-1794406639": {
+    "orderId": "33933681",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "scalp",
+    "limitPrice": 83.98,
+    "stop": 84.71678800000001,
+    "t1": 81.26,
+    "placedAt": "2026-11-11T14:18:19.000Z",
+    "expires": "2026-11-11T17:17:19.000Z",
+    "riskCash": 7.37,
+    "margin": 84.55,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9916.81,
-  "lastRun": "2026-11-11T14:16:55.000Z"
+  "lastRun": "2026-11-11T14:18:19.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "moved USDCAD 47990251 protection: stop 1.4116 -> 1.41103, target 1.42135 -> 1.42078 (council intraday)",
-   "trade": "usdcad-intraday-1794304066"
-  },
   {
    "at": "2026-11-10T13:41:59.000Z",
    "msg": "moved USDCAD 47992968 protection: stop 1.4115647 -> 1.4109947, target 1.43114 -> 1.43057 (council position)",
@@ -9098,6 +9114,11 @@
    "at": "2026-11-11T14:16:55.000Z",
    "msg": "opened buy USDCHF 0.02 lot (council scalp)",
    "trade": "usdchf-scalp-1794406249"
+  },
+  {
+   "at": "2026-11-11T14:18:19.000Z",
+   "msg": "placed sell limit SOLUSD 0.01 lot at 83.98 (council scalp, valid to 2026-11-11T17:17Z)",
+   "trade": "sol-scalp-1794406639"
   }
  ],
  "limits": {
