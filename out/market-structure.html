@@ -36,7 +36,7 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
-<script src="/assets/ms-dialog.js?v=651ff2e1e5"></script>
+<script src="/assets/ms-dialog.js?v=b3db93e8b4"></script>
 <script src="/assets/mosha-desk.js?v=216811e631" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
 <script src="/assets/mosha-i18n.js?v=08699888a9" defer></script>
@@ -1482,14 +1482,27 @@ document.addEventListener('DOMContentLoaded', function () {
   // the home-screen app keep separate copies, and Safari wipes it after a week). Local storage stays as the fast cache.
   const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/profile' : null;
   const acct = () => who !== 'guest' && !!window.MS_ACCT;   // the session cookie says who (9 Nov); the server reads and writes only that account's record
-  function pushProfile(fields) { if (!API || !acct()) return; fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(fields) }).catch(() => {}); }
+  // A save the server did not take (11 Nov): it used to fail without a word, and the next visit then put the server's old photo
+  // or name back. Now the change waits in `pend` (this browser) and goes up again on the next load, and a save the member asked
+  // for (`what`) says why it failed and offers to try again.
+  const pend = (v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem(key('pfpend')) || 'null'); if (v && Object.keys(v).length) localStorage.setItem(key('pfpend'), JSON.stringify(v)); else localStorage.removeItem(key('pfpend')); } catch (e) {} return null; };
+  const whyNot = (st) => (st === 401 || st === 403 ? 'your session has ended. Sign in again, then press Try again.' : !st ? (navigator.onLine === false ? 'you are offline.' : 'the server could not be reached.') : st === 400 ? 'the server did not accept it.' : `the server could not save it (error ${st}).`);
+  async function pushProfile(fields, what) { if (!API || !acct()) return true;
+    let st = 0; try { const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(fields) }); st = r.status; } catch (e) {}
+    const left = { ...(pend() || {}) };
+    if (st >= 200 && st < 300) { Object.keys(fields).forEach((k) => delete left[k]); pend(left); return true; }
+    if (st !== 400) pend({ ...left, ...fields });   // a refused value is not sent again
+    if (!what || !window.msConfirm) return false;
+    return (await window.msConfirm(`Your ${what} is changed on this device only: ${whyNot(st)}${st === 400 ? '' : ' It is kept here and sent again the next time you open the desk.'}`, { title: 'Not saved on the server yet', ok: 'Try again' })) ? pushProfile(fields, what) : false; }
+  window.msProfilePending = () => pend();
   function pullProfile() { if (!API || !acct()) return;
     fetch(API, { cache: 'no-store', credentials: 'same-origin' }).then((r) => (r.ok ? r.json() : null)).then((srv) => { if (!srv) return;
-      let changed = false; const lp = get('photo'), ln = get('name');
-      if (srv.photo && srv.photo !== lp) { try { localStorage.setItem(key('photo'), srv.photo); } catch (e) {} changed = true; }
-      if (srv.name && srv.name !== ln) { try { localStorage.setItem(key('name'), srv.name); } catch (e) {} changed = true; }
+      let changed = false; const lp = get('photo'), ln = get('name'), wait = pend() || {};
+      if (Object.keys(wait).length) pushProfile(wait);   // what an earlier visit could not save goes up first and wins over the server's copy
+      if (!('photo' in wait) && srv.photo && srv.photo !== lp) { try { localStorage.setItem(key('photo'), srv.photo); } catch (e) {} changed = true; }
+      if (!('name' in wait) && srv.name && srv.name !== ln) { try { localStorage.setItem(key('name'), srv.name); } catch (e) {} changed = true; }
       // first visit after the change: a photo or name that only this browser had goes up to the server once
-      const up = {}; if (!srv.photo && lp) up.photo = lp; if (!srv.name && ln) up.name = ln; if (Object.keys(up).length) pushProfile(up);
+      const up = {}; if (!srv.photo && lp && !('photo' in wait)) up.photo = lp; if (!srv.name && ln && !('name' in wait)) up.name = ln; if (Object.keys(up).length) pushProfile(up);
       if (changed) { paint(); if ($('v-profile') && !$('v-profile').hidden && window.msProfile) window.msProfile(); } }).catch(() => {}); }
   function paint() {
     const photo = get('photo'), name = get('name') || defName;
@@ -1501,6 +1514,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if ($('ms-me-rmphoto')) $('ms-me-rmphoto').hidden = !photo;
     if ($('ms-me-out')) $('ms-me-out').textContent = who === 'guest' ? 'Log in' : 'Log out';
     const sm = document.querySelector('#ms-me > summary'); if (sm) sm.setAttribute('aria-label', `${greet()}, ${name}. Account menu`);
+    // the Profile card shows the same photo and name: it used to copy them 400 ms after the button press, before the member had chosen
+    if ($('ms-pf-av') && $('ms-me-av2')) $('ms-pf-av').innerHTML = $('ms-me-av2').innerHTML; if ($('ms-pf-name') && who !== 'guest') $('ms-pf-name').textContent = name;
   }
   document.addEventListener('DOMContentLoaded', () => {
     paint(); setInterval(paint, 60e3); pullProfile();
@@ -1518,12 +1533,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const img = new Image(), url = URL.createObjectURL(f);
       img.onload = () => { const W = 160, H = 184, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
         const sc = Math.max(W / img.width, H / img.height), w = img.width * sc, h = img.height * sc; g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-        const du = c.toDataURL('image/jpeg', 0.86); put('photo', du); pushProfile({ photo: du }); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
-      img.onerror = () => { alert("That file isn't an image this browser can read."); URL.revokeObjectURL(url); };
+        const du = c.toDataURL('image/jpeg', 0.86); put('photo', du); pushProfile({ photo: du }, 'photo'); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
+      img.onerror = () => { alert("That file isn't a picture this browser can read. Choose a JPEG or PNG."); URL.revokeObjectURL(url); $('ms-me-file').value = ''; };   // cleared, or choosing the same file again did nothing
       img.src = url;
     });
-    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); pushProfile({ photo: null }); paint(); });
-    $('ms-me-rename').addEventListener('click', async () => { const n = await msAsk('Display name', get('name') || defName, { title: 'Your display name', ok: 'Save', max: 24, placeholder: 'How the desk greets you' }); if (n === null) return; const v = n.trim().slice(0, 24) || null; put('name', v); pushProfile({ name: v }); paint(); });
+    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); pushProfile({ photo: null }, 'photo'); paint(); });
+    $('ms-me-rename').addEventListener('click', async () => { const n = await msAsk('Display name', get('name') || defName, { title: 'Your display name', ok: 'Save', max: 24, placeholder: 'How the desk greets you' }); if (n === null) return; const v = n.trim().slice(0, 24) || null; put('name', v); pushProfile({ name: v }, 'display name'); paint(); });
     $('ms-me-out').addEventListener('click', () => { me.open = false; const a = $('ms-admin-link'); if (a) a.click(); });
   });
 })();
@@ -2558,7 +2573,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 #v-ict .ict-open .r1 { display: flex; flex-wrap: wrap; align-items: center; }
 #v-ict .ict-open .r1 .mk { font: 700 15px var(--sans); }
 #v-ict .ict-open .r1 .live { margin-left: auto; display: grid; justify-items: end; line-height: 1.1; }
-#v-ict .ict-open .r1 .live small { font: 500 11px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-open .r1 .live small { font: 500 12px var(--sans); color: var(--ink-faint); }
 #v-ict .ict-open li.sep { all: unset; display: block; font: 600 12px var(--sans); color: var(--ink-faint); padding: 6px 2px 0; }
 #v-ict .ict-open li:has(.ict-rp) { background: none; border-style: dashed; }
 #v-ict .ict-trk { position: relative; height: 8px; border-radius: 4px; background: var(--line-soft); margin: 2px 0 0; }
@@ -3499,6 +3514,35 @@ html[data-role="public"] .hdr-sw { display: none; }
 @media (max-width: 900px) { #v-profile .pf-mcp { grid-column: 1; } }
 .me-pop .me-link { display: flex; align-items: center; min-height: 38px; padding: 8px 10px; text-decoration: none; color: var(--ink); font: 600 13px var(--sans); border-radius: 8px; } .me-pop .me-link:hover, .me-pop .me-link:focus-visible { background: var(--panel-hover); outline: none; }
 @media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-card { position: static; } }
+</style>
+<style id="ms-acct-css">
+/* ── Account surfaces, quality pass (11 Nov 2026): Profile, Users, account menu, Settings, price alerts, the bell, the palette.
+   Shape only. (1) On a phone the Settings menu hung from its button and lost 68 px off the left edge: it now spans the screen
+   under the header and ends above the tab bar. (2) No text under 12 px. (3) On touch every control is at least 44 px. ── */
+@media (max-width: 560px) { .top-actions .menu > .menu-body { position: fixed; left: 12px; right: 12px; top: 62px; width: auto; max-height: calc(100vh - 62px - 84px); max-height: calc(100dvh - 62px - 84px); } .top-actions .menu-body .cmp-row { flex-wrap: wrap; } .top-actions .menu-body .cmp-row select { max-width: 100% !important; } }
+.u-chip, .u-t td small, #v-profile .ct-tag, #v-profile .ct-sec h4 small, #v-profile .pf-ct-b h4 small, #v-profile .pf-nt-l small, .nt-pop li small, .me-today b small, #ms-me-greet, .pa-f label small, .menu-body .tog-h, .cmdk-g, #cmdk kbd { font-size: 12px !important; }
+#ms-snd-msg { color: var(--ink); font-weight: 600; } #ms-snd-msg:empty { display: none; }
+#v-profile .ct-books tbody tr[data-book] { cursor: pointer; } #v-profile .ct-books tbody tr[data-book]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.nt-in button.pri { background: #2a62f0; border-color: #2a62f0; }   /* white on the themes' --accent was under 4.5:1; the shared dialog's fill */
+/* the permission dialog on a phone: Save stays in reach under the long list */
+.perm-dlg { max-height: min(92vh, 900px); overflow-y: auto; }
+.perm-dlg .own-acts { position: sticky; bottom: -22px; margin: 0 -22px -22px; padding: 12px 22px 22px; background: var(--panel); border-top: 1px solid var(--line); flex-wrap: wrap; }
+.perm-dlg input[type="checkbox"], .perm-dlg input[type="radio"] { width: 18px; height: 18px; flex: none; margin: 0; }
+/* each box sits on its label's line (".own-dlg label { display: block }" beat ".perm-l { display: flex }", so the boxes hung above the text) */
+.perm-dlg .perm-l, .perm-dlg .perm-ict label { display: flex; gap: 10px; align-items: center; margin: 0; font-size: 13px; font-weight: 500; color: var(--ink); line-height: 1.35; } .perm-dlg .perm-ict .perm-apply label { align-items: flex-start; font-weight: 600; }
+.perm-dlg .perm-grid { gap: 8px 14px; } @media (max-width: 480px) { .perm-dlg .own-acts { gap: 6px; } .perm-dlg .own-acts button { padding: 0 11px; font-size: 13px; } }
+@media (pointer: coarse) {
+  #v-profile .ms-tbtn, #v-profile .ct-btn, #v-profile .pf-act .ms-tbtn, #v-profile input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), #v-profile select, #v-profile .ct-chips button { min-height: 44px; }
+  #v-profile .ct-books tbody tr[data-book] td { height: 44px; }
+  .me-pop button, .me-pop .me-link, .nt-in button, .nt-pop header button { min-height: 44px; } .nt-pop header button { padding: 0 6px; }
+  .u-t td select, .u-t .u-acts button, .u-t .u-perm-btn, .u-form input, .u-form select, .u-form .u-btn { min-height: 44px !important; height: auto; } .u-t .u-perm-btn { padding: 3px 14px; }
+  .perm-dlg .perm-l, .perm-dlg .perm-ict label { min-height: 44px; align-items: center; } .perm-dlg .own-acts button { height: 44px; } .perm-dlg .perm-grid { gap: 0 14px; } .perm-dlg .perm-ict { gap: 0; }
+  .pa-x { width: 44px; height: 44px; }
+  .top-actions .menu-body .ms-tbtn, .top-actions .menu-body .ms-lay button, .top-actions .menu-body select, .top-actions .menu-body input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), .top-actions .menu-body .pw-eye, .top-actions .menu-body summary.menu-h { min-height: 44px !important; }
+  .top-actions .menu-body summary.menu-h { display: flex; align-items: center; } .top-actions .menu-body .pw-eye { min-width: 44px; }
+  .top-actions .menu-body .ms-tog label { min-height: 44px; align-items: center; } .top-actions .menu-body .ms-tog.ms-tog-g { grid-template-columns: 1fr 1fr; gap: 6px 14px; } .top-actions .menu-body .tog-g { gap: 0; }
+  #cmdk-q { min-height: 44px; }
+}
 </style>
 <style id="ms-dense-css">
 /* ── Wide-screen density (8 Nov 2026, owner: "use better the space so I don't need to scroll too much; the other pages the same").
@@ -5350,7 +5394,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <div class="card u-card">
       <div class="ms-k"><span>Accounts</span><small id="ms-u-sync"></small></div>
       <div class="ms-bt-wrap"><table class="ms-bt-t c-t u-t"><thead><tr><th>Name</th><th>Access</th><th>Password</th><th class="n">Actions</th></tr></thead><tbody id="ms-u-body"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
-      <p class="ms-note">The owner account and its password live in the page code; ask Claude to change it.</p>
+      <p class="ms-note">The owner account is not in this list. Its password is changed in the server code (api/_accounts.js), not on this page.</p>
     </div>
     <div class="card u-card">
       <div class="ms-k"><span>Add a user</span></div>
@@ -5732,7 +5776,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="pf-snd-r" data-kind="tp"><b>Target hit</b><span class="pf-snd-n" id="ms-snd-tp">Chime (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
           <div class="pf-snd-r" data-kind="sl"><b>Stop-out</b><span class="pf-snd-n" id="ms-snd-sl">Faaaah (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
           <input type="file" id="ms-snd-file" accept="audio/*" hidden>
-          <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saved with your owner session.</p>
+          <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saved with your owner session. <span id="ms-snd-msg" role="status"></span></p>
         </div>
       </section>
       <section class="card pf-ct pf-mcp" id="ms-pf-mcp" aria-labelledby="ms-pf-mcp-t" hidden>
@@ -7240,8 +7284,10 @@ function msNextSetup(bars, A) {
     }
     async function sync() {
       const sub = PA.sub || await subscribe();
-      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list, tv: PA.tv === true }) });
-      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `Server ${r.status}`);
+      // the reason in words (11 Nov): it showed the browser's "Failed to fetch" and "Server 500"
+      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list, tv: PA.tv === true }) }).catch(() => null);
+      if (!r) throw new Error(navigator.onLine === false ? 'You are offline. Connect and try again.' : 'The server could not be reached. Check your connection and try again.');
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(r.status >= 500 && !j.error ? `The server could not save it (error ${r.status}). Try again in a minute.` : j.error || `Server error ${r.status}`);
     }
     // on load: drop alerts the server already fired (it removes them after sending)
     if (can() && PA.list.length && Notification.permission === 'granted') navigator.serviceWorker.getRegistration('/').then(async (reg) => {
@@ -7274,11 +7320,12 @@ function msNextSetup(bars, A) {
       dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
       dlg.querySelector('#pa-sym').onchange = async (e) => { const k = e.target.value, n = await quote(k); if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec); hint(); };
       dlg.querySelector('#pa-price').oninput = hint;
-      dlg.querySelector('#pa-list').onclick = async (e) => { const b = e.target.closest('.pa-del'); if (!b) return; const old = PA.list; PA.list = PA.list.filter((a) => a.id !== b.dataset.id); store(); lines(); render();
-        try { await sync(); } catch (err) { dlg.querySelector('#pa-msg').textContent = `Deleted here; the server copy will update next time (${err.message}).`; } };
+      dlg.querySelector('#pa-list').onclick = async (e) => { const b = e.target.closest('.pa-del'); if (!b) return; const li = b.closest('li'), at = [...li.parentElement.children].indexOf(li); PA.list = PA.list.filter((a) => a.id !== b.dataset.id); store(); lines(); render();
+        { const ds = dlg.querySelectorAll('#pa-list .pa-del'), t = ds[Math.min(at, ds.length - 1)] || dlg.querySelector('#pa-price'); if (t) t.focus(); }   // focus stays in the list (it fell out of the dialog)
+        try { await sync(); dlg.querySelector('#pa-msg').textContent = 'Alert deleted.'; } catch (err) { dlg.querySelector('#pa-msg').textContent = `Deleted on this device. The server still has it until your next change here: ${err.message}`; } };
       dlg.querySelector('#pa-f').onsubmit = async (e) => { e.preventDefault(); const msg = dlg.querySelector('#pa-msg'), btn = dlg.querySelector('.pa-go');
         const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k) || await quote(k);
-        if (!(v > 0)) { msg.textContent = 'Type a price.'; return; } if (!n) { msg.textContent = 'No live price for this market right now; try again in a moment.'; return; }
+        if (!(v > 0) || !Number.isFinite(v)) { msg.textContent = 'Type a price.'; return; }   // the server refuses a price that is not a finite number if (!n) { msg.textContent = 'No live price for this market right now; try again in a moment.'; return; }
         if (PA.list.length >= 20) { msg.textContent = 'Up to 20 alerts per device.'; return; }
         if (!can()) { msg.textContent = ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first (Share → Add to Home Screen), open it from there and set the alert again.' : 'This browser cannot receive notifications.'; return; }
         const a = { id: Math.random().toString(36).slice(2, 10), sym: k, price: v, dir: v >= n ? 'above' : 'below', note: dlg.querySelector('#pa-note').value.trim(), label: INSTRUMENTS[k].label, at: Math.floor(Date.now() / 1000) };
@@ -9934,17 +9981,23 @@ function msNextSetup(bars, A) {
       // the owner's session saves (9 Nov); records go up without hashes and keep theirs on the server; `pw` sets a new password
       if (!window.MS_USERS_API) throw new Error('Account changes are made on meridianx.dev.');
       if (msg) msg.textContent = 'Saving…';
-      const cur = await window.msFetchUsers(); if (!cur || !cur.builtins) throw new Error('Could not read the current accounts; check your connection and try again.');
+      // each failure names its reason (11 Nov): an ended session and a server error both used to read "check your connection"
+      const OFF = () => new Error(navigator.onLine === false ? 'Not saved: you are offline. Connect and try again.' : 'Not saved: the server could not be reached. Check your connection and try again.'), ENDED = 'Not saved: your owner session has ended. Sign in again and retry.';
+      const g = await fetch(window.MS_USERS_API, { cache: 'no-store', credentials: 'same-origin' }).catch(() => null); if (!g) throw OFF();
+      if (g.status === 401 || g.status === 403) throw new Error(ENDED);
+      const cur = g.ok ? await g.json().catch(() => null) : null; if (!cur || !cur.builtins) throw new Error(g.ok ? ENDED : `Not saved: the server could not read the current accounts (error ${g.status}). Nothing was changed; try again in a minute.`);
+      window.MS_USERS = cur.builtins;
       const data = { users: { ...(cur.users || {}) } };
       const err = mutate(data); if (err) throw new Error(err);
-      const r = await fetch(window.MS_USERS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ users: data.users, note }) });
+      const r = await fetch(window.MS_USERS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ users: data.users, note }) }).catch(() => null); if (!r) throw OFF();
       const j = await r.json().catch(() => ({}));
-      if (r.status === 403) throw new Error('Your owner session has ended. Sign in again and retry.');
-      if (r.status === 503) throw new Error('Account storage is not set up on the server yet.');
-      if (!r.ok) throw new Error(`Not saved: ${j.error || 'server error ' + r.status}`);
+      if (r.status === 401 || r.status === 403) throw new Error(ENDED);
+      if (r.status === 503) throw new Error('Not saved: account storage is not available on the server right now. Try again in a minute.');
+      if (!r.ok) throw new Error(`Not saved: ${j.error || 'server error ' + r.status + '. Nothing was changed; try again in a minute'}`);
       if (j.builtins) window.MS_USERS = j.builtins;
       US.remote = j; if (msg) msg.textContent = `Saved: ${note}.`; renderUsers(true); return true;
-    } catch (e) { if (msg) msg.textContent = e.message || String(e); alert(e.message || e); return false; }
+    } catch (e) { const t = e.message || String(e); if (msg) msg.textContent = t; renderUsers(true);   // the table goes back to what is saved (a role select kept showing the role that was refused)
+      if (window.msAlert) await window.msAlert(t.replace(/^Not saved: /, '').replace(/^./, (c) => c.toUpperCase()), { title: 'Not saved' }); else alert(t); uRefocus(); return false; }
     finally { US.busy = false; }
   }
   window.renderUsers = (...a) => renderUsers(...a);
@@ -9977,15 +10030,22 @@ function msNextSetup(bars, A) {
     f.onchange = () => { d.querySelector('#ms-perm-apply').hidden = f.elements.ict.value !== 'write'; };   // the apply box only makes sense with ICT write
     f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false; perms.ictApply = ict === 'write' && f.elements.ictApply.checked; { const m = f.elements.mosha.value; if (m) perms.mosha = m === 'off' ? false : m; }
       d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
-    d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
+    d.querySelector('#ms-perm-reset').onclick = async () => {   // asks first (11 Nov): one tap beside Cancel cleared every box, and for a built-in member it puts the built-in settings back (Fred: ICT apply on again)
+      const B = window.MS_USERS[k], back = B ? [B.ict && `the ICT desk (${B.ict === 'read' ? 'read only' : 'review and trade'})`, B.ct && 'the demo accounts\' results', B.mcp && 'the ChatGPT connector', B.ictApply && 'applying ICT changes without your review', B.mosha === 'teach' && 'teaching the Mosha desk'].filter(Boolean) : [];
+      if (!(await msConfirm(`Clear every box set for ${cur.name || k} and go back to what a ${cur.role} gets?${back.length ? ` ${cur.name || k}'s built-in settings come back with it: ${back.join(', ')}.` : ''}`, { title: 'Back to role defaults', ok: 'Clear and go back', danger: true }))) return;
+      d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
     d.querySelector('#ms-perm-cancel').onclick = () => d.close();
     d.showModal();
   }
+  function uRefocus() { const body = document.getElementById('ms-u-body'), fk = US.fk; if (!fk || !body || (document.activeElement && document.activeElement !== document.body)) return; US.fk = null;
+    const row = [...body.rows].find((r) => r.dataset.u === fk[0]), t = (row && (row.querySelector(`[data-act="${fk[1]}"]`) || row.querySelector('button, select'))) || body.querySelector('button, select') || document.getElementById('ms-u-name'); if (t) t.focus({ preventScroll: true }); }
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
     if (!skipFetch) US.remote = await window.msFetchUsers();
     const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on meridianx.dev';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
+    // keyboard focus survives the redraw (11 Nov): it fell back to the top of the page after every save
+    const ae = document.activeElement; if (ae && body.contains(ae) && ae.closest('tr')) US.fk = [ae.closest('tr').dataset.u, ae.dataset.act || '']; setTimeout(uRefocus, 0);
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
       return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><b>${esc(u.name || k)}</b></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select><div class="u-perm-row"><span class="u-chips">${permChips(u, k)}</span><button type="button" data-act="perms" class="u-perm-btn">Permissions…</button></div>`}</td><td><small>${esc(src)}</small></td>`
@@ -10000,7 +10060,7 @@ function msNextSetup(bars, A) {
         if (b.dataset.act === 'perms') { permDialog(k, cur); return; }
         if (b.dataset.act === 'pw') {
           const pw = await msAsk(`New password for ${cur.name}`, '', { title: 'New password', ok: 'Save' }); if (!pw) return;
-          if (pw.trim().length < 4) { alert('Use a password of at least 4 characters.'); return; }   // the server hashes it and refuses one already in use
+          if (pw.trim().length < 4) { const m = document.getElementById('ms-u-msg'); if (m) m.textContent = `Not saved: use a password of at least 4 characters for ${cur.name}.`; alert('Use a password of at least 4 characters.'); return; }   // the server hashes it and refuses one already in use
           saveUsers((d) => { d.users[k] = { ...(d.users[k] || window.MS_USERS[k] || {}), name: cur.name, role: cur.role, pw: pw.trim() }; delete d.users[k].disabled; }, `new password for ${cur.name}`);
         } else if (b.dataset.act === 'del') {
           if (!(await msConfirm(`Remove ${cur.name}? They will be signed out on their next visit.`, { title: 'Remove member', ok: 'Remove', danger: true }))) return;
@@ -11134,7 +11194,7 @@ function msNextSetup(bars, A) {
 </script>
 <dialog id="cmdk" aria-label="Command palette">
   <div class="cmdk-in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input id="cmdk-q" type="text" placeholder="Jump to a page, market or theme…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list"><kbd>Esc</kbd></div>
+    <input id="cmdk-q" type="text" aria-label="Jump to a page, market or theme" placeholder="Jump to a page, market or theme…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list"><kbd>Esc</kbd></div>
   <ul class="cmdk-list" id="cmdk-list" role="listbox" aria-label="Results"></ul>
   <div class="cmdk-help" id="cmdk-help" hidden></div>
   <div class="cmdk-ft"><span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>?</kbd> shortcuts</span></div>
@@ -11149,6 +11209,7 @@ function msNextSetup(bars, A) {
   const items = () => {
     const out = [], vs = views(), has = (k) => vs.some((v) => v.k === k);
     vs.forEach((v) => out.push({ g: 'Pages', t: v.label, d: '#' + v.k, run: () => { location.hash = v.k; } }));
+    if (window.MS_ACCT && !has('profile')) out.push({ g: 'Pages', t: 'Profile and demo accounts', d: '#profile', run: () => { location.hash = 'profile'; } });   // the profile is in no nav bar, so the palette did not know it
     if (has('council')) [['overview', 'Active trades & calendar'], ['trades', 'Trades'], ['systems', 'Systems'], ['review', 'Loss review'], ['research', 'Research']].forEach(([k, t]) => {
       if (document.getElementById('ms-cn-' + k) && shown(document.getElementById('ms-cn-' + k))) out.push({ g: 'Council', t, d: 'council/' + k, run: () => { location.hash = 'council/' + k; } }); });
     const sel = document.getElementById('ms-inst');
@@ -12204,7 +12265,7 @@ function gpStats(T) {
         const st = await call({ action: 'start', session: ls(sessKey()) }); location.href = st.url;
       } catch (e) { go.disabled = false; $('ms-ct-msg').textContent = e.status === 401 ? 'Please enter your password again.' : e.message; if (e.status === 401) linkForm('Please enter your password again.'); }
     });
-    if (pw) setTimeout(() => pw.focus(), 50);
+    if (pw && MODE !== 'page') setTimeout(() => pw.focus(), 50);   // only in the dialog: on the Profile page it took focus at every visit and opened a phone's keyboard
   }
 
   function render(d) {
@@ -12235,7 +12296,8 @@ function gpStats(T) {
         ${hist.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Closed</th><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n hide-s">Entry</th><th class="n hide-s">Exit</th><th class="n hide-s">Fees + swap</th><th class="n">Net P&amp;L</th></tr></thead><tbody>${histRows}</tbody></table></div>` : `<div class="ct-empty">No closed trades in the last ${d.days} days.</div>`}</section>
       <div class="ct-f"><span>${d.source === 'council' ? `${OWN ? "From the council's own connection to your demo account" : "The council's demo accounts, one per edge · paper money"} · updated ${new Date(d.at).toLocaleTimeString()} (every few minutes)` : `Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open`}</span><span class="sp"></span>${OWN ? '<button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button>' : ''}${d.source === 'council' ? '' : '<button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button>'}</div>`;
     const sel = $('ms-ct-acc'); if (sel) sel.addEventListener('change', () => { state.account = sel.value; ls('ms-ct-acc-' + (userKey() || 'x'), sel.value); load(true); });
-    body().querySelectorAll('.ct-books tbody tr[data-book]').forEach((tr) => tr.addEventListener('click', () => { state.book = tr.dataset.book; ls('ms-ct-book', state.book); const x = (state.all || []).find((a) => (a.books || [])[0] === state.book); if (x) render(x); }));
+    body().querySelectorAll('.ct-books tbody tr[data-book]').forEach((tr) => { const pick = (kb) => { state.book = tr.dataset.book; ls('ms-ct-book', state.book); const x = (state.all || []).find((a) => (a.books || [])[0] === state.book); if (x) { render(x); if (kb) { const r = body().querySelector('.ct-books tr[aria-selected="true"]'); if (r) r.focus({ preventScroll: true }); } } };
+      tr.tabIndex = 0; tr.title = `Show the ${tr.cells[0].textContent} account`; tr.addEventListener('click', () => pick(false)); tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(true); } }); });   // rows were mouse-only
     body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
     if ($('ms-ct-relink')) $('ms-ct-relink').addEventListener('click', () => linkForm());
     if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!(await msConfirm('Remove the cTrader link from your profile? You can link it again later.', { title: 'Unlink cTrader', ok: 'Unlink', danger: true }))) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
@@ -12295,10 +12357,10 @@ function gpStats(T) {
       go.disabled = true; $('ms-mcp-msg').textContent = 'Checking…';
       try {
         const r = await fetch(MCP_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mykey', user: me, pw: pw.value }), cache: 'no-store' });
-        const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || ('Error ' + r.status));
+        const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || (r.status >= 500 ? `The server could not answer (error ${r.status}). Try again in a minute.` : 'Error ' + r.status));
         b.innerHTML = `<div class="mcp-url"><code id="ms-mcp-url">${esc(j.url)}</code><button type="button" class="ms-tbtn" id="ms-mcp-copy">Copy</button></div>${steps}`;
         $('ms-mcp-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(j.url); $('ms-mcp-copy').textContent = 'Copied'; } catch (e) { $('ms-mcp-copy').textContent = 'Select and copy'; } });
-      } catch (e) { go.disabled = false; $('ms-mcp-msg').textContent = e.message; }
+      } catch (e) { go.disabled = false; $('ms-mcp-msg').textContent = e instanceof TypeError ? (navigator.onLine === false ? 'You are offline. Connect and try again.' : 'The server could not be reached. Check your connection and try again.') : e.message; }
     });
   }
   function open(msg) {
@@ -14010,11 +14072,14 @@ function gpStats(T) {
   function play(k) { var u = cur[k] ? cur[k].data : DEF[k].url; if (u) { try { new Audio(u).play(); } catch (e) {} } else chime(); }
   async function save(k, data, name) {
     var send = function (pw) { return fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw || undefined, kind: k, data: data, name: name }) }); };
+    var what = k === 'sl' ? 'stop-out' : 'target', say = function (t) { var m = $('ms-snd-msg'); if (m) m.textContent = t; }; say('Saving…');
     try { var r = await send(null);   // the owner's session is enough; the password only if the session is refused
-      if (r.status === 403) { var pw = await window.msAsk('Owner password', '', { title: 'Save the ' + (k === 'sl' ? 'stop-out' : 'target') + ' sound', type: 'password', ok: 'Save' }); if (!pw) return; r = await send(pw); }
+      if (r.status === 403) { var pw = await window.msAsk('Your owner session has ended. Type the owner password to save this sound, or cancel and sign in again.', '', { title: 'Save the ' + what + ' sound', type: 'password', ok: 'Save' }); if (!pw) return say('Not saved: sign in again, then choose the sound once more.'); r = await send(pw); }
       var j = await r.json().catch(function () { return {}; });
-      if (!r.ok) return window.msAlert(j.error || 'Could not save the sound.', { title: 'Not saved' });
-      load(); if (window.msToast) msToast('Sound saved'); } catch (e) { window.msAlert('Could not reach the server.', { title: 'Not saved' }); }
+      if (!r.ok) { var t = r.status === 403 ? 'The owner password was not accepted.' : r.status >= 500 ? 'The server could not save the sound (error ' + r.status + '). Try again in a minute.' : (j.error || 'Could not save the sound') + '.'; say('Not saved: the ' + what + ' sound is unchanged.'); return window.msAlert(t, { title: 'Not saved' }); }
+      // said in words (11 Nov): the page called a toast that does not exist, so a save only showed as a changed file name
+      load(); say(data ? 'Saved: everyone hears ' + (name || 'the new sound') + ' on the ' + what + ' from their next visit to ChronosTrade.' : 'Saved: the ' + what + ' is back to the built-in sound.'); }
+    catch (e) { say('Not saved: the ' + what + ' sound is unchanged.'); window.msAlert(navigator.onLine === false ? 'You are offline. Connect and choose the sound again.' : 'The server could not be reached. Check your connection and choose the sound again.', { title: 'Not saved' }); }
   }
   card.addEventListener('click', function (ev) { var b = ev.target.closest('[data-act]'); if (!b) return; var k = b.closest('[data-kind]').dataset.kind;
     if (b.dataset.act === 'play') play(k); else if (b.dataset.act === 'pick') { want = k; $('ms-snd-file').click(); } else if (b.dataset.act === 'reset') save(k, null, null); });
@@ -14034,7 +14099,7 @@ function gpStats(T) {
   var items = [], pop = null, esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var who = function () { var A = window.MS_ACCT; return A && A.u ? A.u : window.MS_WHO === 'owner' ? 'owner' : null; };
   var key = function () { return 'ms-nt-seen-' + who(); }, seen = function () { try { return localStorage.getItem(key()) || ''; } catch (e) { return ''; } };
-  var markAll = function () { if (items[0]) try { localStorage.setItem(key(), items[0].at); } catch (e) {} badge(); };
+  var markAll = function () { if (items[0]) try { localStorage.setItem(key(), items[0].at); } catch (e) {} badge(); var c = document.querySelector('.nt-in'); if (c) c.remove(); };   // the card on screen is read too
   var unread = function () { var s = seen(); return items.filter(function (x) { return x.at > s; }); };
   var when = function (iso) { return new Date(iso).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
   function badge() { var n = unread().length; $('nt-n').hidden = !n; $('nt-n').textContent = n > 9 ? '9+' : String(n); bell.setAttribute('aria-label', n ? n + ' new notification' + (n > 1 ? 's' : '') : 'Notifications'); }
@@ -14042,7 +14107,7 @@ function gpStats(T) {
   function openPop() { closePop(); var s = seen(); pop = document.createElement('div'); pop.className = 'nt-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Notifications');
     pop.innerHTML = '<header><b>Notifications</b>' + (unread().length ? '<button type="button" data-all>Mark all read</button>' : '') + '</header>' + (items.length ? '<ul>' + items.map(function (x) { return '<li class="' + (x.at > s ? 'new' : '') + '"><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<small>' + esc(when(x.at)) + '</small></li>'; }).join('') + '</ul>' : '<div class="nt-empty">Nothing yet. Messages from the desk show up here.</div>');
     document.body.appendChild(pop); bell.setAttribute('aria-expanded', 'true');
-    var all = pop.querySelector('[data-all]'); if (all) all.addEventListener('click', function () { markAll(); openPop(); }); }
+    var all = pop.querySelector('[data-all]'); if (all) all.addEventListener('click', function () { markAll(); openPop(); bell.focus(); }); }
   bell.addEventListener('click', function (e) { e.stopPropagation(); if (pop) closePop(); else openPop(); });
   document.addEventListener('click', function (e) { if (pop && !pop.contains(e.target)) closePop(); });
   document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (pop) { closePop(); return; } if (document.querySelector('dialog[open]')) return; var c = document.querySelector('.nt-in'); if (c) c.querySelector('[data-ok]').click(); });
@@ -14050,8 +14115,11 @@ function gpStats(T) {
   function slideIn() { var u = unread().slice().reverse(); if (!u.length || document.querySelector('.nt-in') || document.documentElement.dataset.gate) return; var x = u[0], c = document.createElement('div');
     c.className = 'nt-in'; c.setAttribute('role', 'alertdialog'); c.setAttribute('aria-live', 'assertive');
     c.innerHTML = '<h3><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>From the desk' + (u.length > 1 ? ' · 1 of ' + u.length : '') + '</h3><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<div class="nt-act">' + (u.length > 1 ? '<button type="button" data-skip>Mark all read</button>' : '') + '<button type="button" class="pri" data-ok>' + (u.length > 1 ? 'Next' : 'Got it') + '</button></div>';
-    document.body.appendChild(c); requestAnimationFrame(function () { requestAnimationFrame(function () { c.classList.add('on'); }); }); setTimeout(function () { var b = c.querySelector('[data-ok]'); if (b) b.focus(); }, 60);
-    var done = function (all) { try { localStorage.setItem(key(), all ? items[0].at : x.at); } catch (e) {} badge(); c.classList.remove('on'); setTimeout(function () { c.remove(); slideIn(); }, 300); };
+    // focus (11 Nov): the card never takes the keyboard from someone typing or from an open dialog (Space or Enter then closed it
+    // unread), and the last card hands focus back to where it was instead of dropping it
+    var prev = document.activeElement, typing = prev && (/^(INPUT|TEXTAREA|SELECT)$/.test(prev.tagName) || prev.isContentEditable || document.querySelector('dialog[open]'));
+    document.body.appendChild(c); requestAnimationFrame(function () { requestAnimationFrame(function () { c.classList.add('on'); }); }); if (!typing) setTimeout(function () { var b = c.querySelector('[data-ok]'); if (b) b.focus(); }, 60);
+    var done = function (all) { var had = c.contains(document.activeElement); try { localStorage.setItem(key(), all ? items[0].at : x.at); } catch (e) {} badge(); c.classList.remove('on'); setTimeout(function () { c.remove(); slideIn(); if (had && !document.querySelector('.nt-in')) { var t = prev && prev !== document.body && document.contains(prev) && prev.getClientRects().length ? prev : bell; try { t.focus({ preventScroll: true }); } catch (e) {} } }, 300); };
     c.querySelector('[data-ok]').addEventListener('click', function () { done(false); }); var sk = c.querySelector('[data-skip]'); if (sk) sk.addEventListener('click', function () { done(true); }); }
   function load() { if (!who()) { bell.hidden = true; return; } bell.hidden = false;
     fetch(API, { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (!j) return; items = (j.items || []).slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
@@ -14062,14 +14130,18 @@ function gpStats(T) {
   // the owner's profile: send to everyone, list and delete what was sent
   var card = $('ms-pf-nt'); if (!card) return;
   function own() { card.hidden = window.MS_WHO !== 'owner'; }
+  // one answer shape for send and delete: { ok, st, j }; st 0 = no answer at all. Each failure names its reason.
+  function post(body) { return fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, st: r.status, j: j || {} }; }); }).catch(function () { return { ok: false, st: 0, j: {} }; }); }
+  function why(x) { return x.st === 401 || x.st === 403 ? 'your owner session has ended. Sign in again, then try once more.' : !x.st ? (navigator.onLine === false ? 'you are offline. Connect and try again.' : 'the server could not be reached. Check your connection and try again.') : x.st >= 500 ? 'the server could not save it (error ' + x.st + '). Try again in a minute.' : (x.j.error || 'error ' + x.st) + '.'; }
   window.msNotices = function (list) { own(); var ul = $('ms-nt-sent'); if (!ul) return; ul.innerHTML = list.slice(0, 20).map(function (x) { return '<li><div><b>' + esc(x.title) + '</b>' + (x.body ? ' ' + esc(x.body.length > 140 ? x.body.slice(0, 140) + '…' : x.body) : '') + '<small>' + esc(when(x.at)) + '</small></div><button type="button" class="ms-tbtn" data-del="' + esc(x.id) + '">Delete</button></li>'; }).join(''); };
   $('ms-nt-f').addEventListener('submit', function (e) { e.preventDefault(); var t = $('ms-nt-title').value.trim(), b = $('ms-nt-body').value.trim(), m = $('ms-nt-msg'), btn = $('ms-nt-send');
     if (!t && !b) { m.textContent = 'Write a title or a message.'; return; } btn.disabled = true; m.textContent = 'Sending…';
-    fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: t, body: b }) }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (x) { btn.disabled = false; if (!x.ok) { m.textContent = x.j.error || 'Not sent.'; return; } m.textContent = 'Sent to everyone.'; $('ms-nt-title').value = ''; $('ms-nt-body').value = ''; try { localStorage.setItem(key(), x.j.item.at); } catch (e) {} load(); })
-      .catch(function () { btn.disabled = false; m.textContent = 'Could not reach the server.'; }); });
+    post({ title: t, body: b }).then(function (x) { btn.disabled = false; if (!x.ok) { m.textContent = 'Not sent: ' + why(x) + ' Your text is kept.'; return; } m.textContent = 'Sent to everyone.'; $('ms-nt-title').value = ''; $('ms-nt-body').value = ''; try { localStorage.setItem(key(), x.j.item.at); } catch (e) {} load(); }); });
+  // a delete that failed said nothing, and offline it threw (11 Nov): the reason is shown and the row stays to try again
   $('ms-nt-sent').addEventListener('click', function (e) { var b = e.target.closest('[data-del]'); if (!b) return; window.msConfirm('Delete this notification for everyone?', { title: 'Delete notification', ok: 'Delete', danger: true }).then(function (ok) { if (!ok) return;
-    fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ remove: b.dataset.del }) }).then(load); }); });
+    var m = $('ms-nt-msg'), li = b.closest('li'), nx = li && (li.nextElementSibling || li.previousElementSibling), nid = nx && nx.querySelector('[data-del]') ? nx.querySelector('[data-del]').dataset.del : null; b.disabled = true; b.textContent = 'Deleting…';
+    post({ remove: b.dataset.del }).then(function (x) { if (!x.ok) { b.disabled = false; b.textContent = 'Delete'; m.textContent = 'Not deleted: ' + why(x); window.msAlert(why(x).replace(/^./, function (c) { return c.toUpperCase(); }) + ' The notification is still there.', { title: 'Not deleted' }); return; }
+      m.textContent = 'Deleted for everyone.'; items = items.filter(function (i) { return i.id !== b.dataset.del; }); window.msNotices(items); badge(); var t = (nid && document.querySelector('#ms-nt-sent [data-del="' + nid + '"]')) || $('ms-nt-title'); if (t) t.focus({ preventScroll: true }); load(); }); }); });
   document.addEventListener('DOMContentLoaded', own); own();
 })();
 </script>
