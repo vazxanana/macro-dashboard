@@ -6900,7 +6900,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T09:35:12.000Z",
     "councilEntry": 1.42188,
     "stop": 1.42114,
@@ -6914,10 +6914,15 @@
     "slipR": 0.068,
     "lagSec": 63,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T09:35:12.000Z",
-    "brokerStop": 1.42119
+    "brokerStop": 1.42119,
+    "closedAt": "2026-11-11T13:05:16.000Z",
+    "exitPrice": 1.42343,
+    "councilExit": 1.4235399999999998,
+    "councilR": 2.24
    },
    "eth-rscalp-1794391100": {
     "symbol": "ETHUSD",
@@ -7395,7 +7400,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9900.66 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9900.66 · 30 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7450,14 +7455,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9900.66,
-  "lastRun": "2026-11-11T13:03:48.000Z"
+  "lastRun": "2026-11-11T13:05:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:33:16.000Z",
-   "msg": "XAUUSD position 48039921 closed at the broker",
-   "trade": "xau-scalp-1794315817"
-  },
   {
    "at": "2026-11-10T13:33:16.000Z",
    "msg": "XAUUSD position 48045430 closed at the broker",
@@ -8952,6 +8952,11 @@
    "at": "2026-11-11T13:03:48.000Z",
    "msg": "placed sell limit EURUSD 0.01 lot at 1.11311 (council position, valid to 2026-11-16T13:02Z)",
    "trade": "eurusd-position-1794402161"
+  },
+  {
+   "at": "2026-11-11T13:05:16.000Z",
+   "msg": "closed USDCAD position 48370009 (council: win)",
+   "trade": "usdcad-scalp-1794389649"
   }
  ],
  "limits": {
