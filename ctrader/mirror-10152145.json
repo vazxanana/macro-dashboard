@@ -8665,12 +8665,18 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9850.13 · 28 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9850.13 · 28 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
   },
-  "wait": {},
+  "wait": {
+   "xau-scalp-1794419483": {
+    "why": "the council order expires within a minute",
+    "n": 1,
+    "at": "2026-11-11T20:51:39.000Z"
+   }
+  },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
@@ -8695,49 +8701,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-scalp-1794419483": {
-    "orderId": "33953275",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "scalp",
-    "limitPrice": 3998.49,
-    "stop": 4007.28,
-    "t1": 3980.9249999999993,
-    "placedAt": "2026-11-11T17:52:22.000Z",
-    "expires": "2026-11-11T20:51:23.000Z",
-    "riskCash": 8.79,
-    "margin": 8,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9850.13,
-  "lastRun": "2026-11-11T20:49:08.000Z"
+  "lastRun": "2026-11-11T20:51:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T18:42:12.000Z",
-   "msg": "EURUSD position 48140741 closed at the broker",
-   "trade": "eurusd-scalp-1794326705"
-  },
-  {
-   "at": "2026-11-10T18:47:23.000Z",
-   "msg": "opened buy BTCUSD 0.01 lot (council rintra)",
-   "trade": "btc-rintra-1794336369"
-  },
-  {
-   "at": "2026-11-10T18:47:23.000Z",
-   "msg": "opened buy BTCUSD 0.01 lot (council rscalp)",
-   "trade": "btc-rscalp-1794336369"
-  },
   {
    "at": "2026-11-10T19:26:39.000Z",
    "msg": "AUDUSD position 48191874 closed at the broker",
@@ -10222,6 +10192,21 @@
    "at": "2026-11-11T20:42:11.000Z",
    "msg": "USDCAD position 48481319 closed at the broker",
    "trade": "usdcad-scalp-1794411962"
+  },
+  {
+   "at": "2026-11-11T20:51:39.000Z",
+   "msg": "XAUUSD limit order 33953275 for xau-scalp-1794419483 is gone at the broker (expired or cancelled there)",
+   "trade": "xau-scalp-1794419483"
+  },
+  {
+   "at": "2026-11-11T20:51:39.000Z",
+   "msg": "not mirrored yet xau-scalp-1794419483: XAUUSD limit order gone at the broker (will retry)",
+   "trade": "xau-scalp-1794419483"
+  },
+  {
+   "at": "2026-11-11T20:51:39.000Z",
+   "msg": "not mirrored yet xau-scalp-1794419483: the council order expires within a minute (will retry)",
+   "trade": "xau-scalp-1794419483"
   }
  ],
  "limits": {
