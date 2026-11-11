@@ -8391,6 +8391,32 @@
     ],
     "stopCheckedAt": "2026-11-11T18:13:00.000Z",
     "brokerStop": 0.83385
+   },
+   "usdchf-rintra-1794420863": {
+    "symbol": "USDCHF",
+    "side": "sell",
+    "setup": "rintra",
+    "openedAt": "2026-11-11T18:24:10.000Z",
+    "councilEntry": 0.83334,
+    "stop": 0.8338599999999999,
+    "t1": 0.829275,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.83334,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.97,
+    "margin": 6,
+    "shadow": true,
+    "fillPrice": 0.83334,
+    "slipR": 0,
+    "lagSec": 587,
+    "positionId": "48520033",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -8398,7 +8424,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9860.12 · 26 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9860.12 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8449,38 +8475,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdchf-rintra-1794420863": {
-    "orderId": "33954536",
-    "symbol": "USDCHF",
-    "side": "sell",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "rintra",
-    "limitPrice": 0.83334,
-    "stop": 0.8338599999999999,
-    "t1": 0.829275,
-    "placedAt": "2026-11-11T18:15:21.000Z",
-    "expires": "2026-11-12T06:14:23.000Z",
-    "riskCash": 1.97,
-    "margin": 6,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9860.12,
-  "lastRun": "2026-11-11T18:21:51.000Z"
+  "lastRun": "2026-11-11T18:24:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:40:02.000Z",
-   "msg": "limit filled at once: USDCHF position 48157137 at the broker at 0.82668",
-   "trade": "usdchf-scalp-1794328725"
-  },
   {
    "at": "2026-11-10T16:46:35.000Z",
    "msg": "GBPUSD position 48143359 closed at the broker",
@@ -9975,6 +9976,11 @@
    "at": "2026-11-11T18:15:21.000Z",
    "msg": "placed sell limit USDCHF 0.03 lot at 0.83334 (council rintra, valid to 2026-11-12T06:14Z)",
    "trade": "usdchf-rintra-1794420863"
+  },
+  {
+   "at": "2026-11-11T18:24:10.000Z",
+   "msg": "limit filled: USDCHF position 48520033 at the broker",
+   "trade": "usdchf-rintra-1794420863"
   }
  ],
  "limits": {
@@ -10053,11 +10059,11 @@
   ]
  },
  "execution": {
-  "n": 283,
+  "n": 284,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 154,
+  "medianLagSec": 154.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10084,8 +10090,8 @@
     "meanSlipR": -0.064
    },
    "USDCHF": {
-    "n": 39,
-    "meanSlipR": 0.043
+    "n": 40,
+    "meanSlipR": 0.042
    },
    "AUDUSD": {
     "n": 38,
