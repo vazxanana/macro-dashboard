@@ -19,8 +19,10 @@ modules: read it before touching any `academy` file. Progress and resume notes a
 
 ## 2. The seven edges
 
-Assumption (documented, the owner can correct it): "the seven edges" are the seven live Meridian systems in
-`council/decay.mjs` `SYSTEMS` (not shadow). The ICT desk stays a separate edge by the repo's rule 4 and is not mixed in.
+Assumption (documented, the owner can correct it): "the seven edges" are the seven Meridian systems in
+`council/decay.mjs` `SYSTEMS` that were live on paper when the Academy was built (live until 11 Nov 2026; since the owner's
+decision of that day Gold trend and Gold daily engulf trade live and the other five are paper shadows; the Academy's edges,
+data and rules are the same seven). The ICT desk stays a separate edge by the repo's rule 4 and is not mixed in.
 
 | id | Name | Market | Signal TF | Rule source (authoritative replay code) |
 |---|---|---|---|---|

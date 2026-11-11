@@ -5395,13 +5395,13 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
         <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
-        <p class="ms-note dc-foot">Each system's record after costs (overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests it is compared with do not carry it) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
+        <p class="ms-note dc-foot">Each system's record after costs (<span id="ms-decay-fin">overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge</span>) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
       <div class="card c-expect adm" id="ms-expect">
         <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
         <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
         <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (since 11 Nov 2026 also after overnight financing for Gold trend, Gold trend fast, Gold daily engulf and the H4 trendline, at the demo broker's rate of that day; not computed for the replica, Mosha BO and the momentum pullback), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
       </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
@@ -8961,6 +8961,7 @@ function msNextSetup(bars, A) {
       const m1 = panes['1m']; if (m1 && m1.bars) topDown();
     }
     renderCouncil();
+    try { if (window.MS_BOOK_NOW) window.MS_BOOK_NOW(COUNCIL.coach, COUNCIL.config); } catch (e) {}   // a 6-hourly reading older than the owner's live / shadow decision follows it at once (display only)
     try { window.MS_COUNCIL = COUNCIL; document.dispatchEvent(new CustomEvent('ms:council')); } catch (e) {}   // edge scoreboard (#ms-sb) reads the same copy
   }
   // the Data chip's per-market list (renderCouncil re-draws the status line on every load, so the open state lives in COUNCIL.dhOpen)
@@ -12976,6 +12977,15 @@ function gpStats(T) {
   var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); };
   var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+  // Overnight financing of a system replay row (11 Nov 2026, owner approved the cost): the replay's R is after the spread only, so a
+  // gold buy also pays what the Trader charges a closed trade (council/fills.mjs nights / financing / rowFinancing, mirrored here;
+  // tests/scoreboard.test.mjs compares the two), at the rate the Trader publishes in snapshot.costs.financing.perNight. With no
+  // rate on file (an older snapshot) nothing is charged and the row does not say "after financing". A row with a stamped cost: 0.
+  var nightsOf = function (t, c) { var n = 0, d, w; if (!num(t) || !num(c)) return 0;
+    for (d = Math.floor(t / 86400) * 86400 + 79200; d < c; d += 86400) { if (d <= t) continue; w = new Date(d * 1000).getUTCDay(); if (w >= 1 && w <= 5) n += w === 3 ? 3 : 1; } return n; };
+  var finOf = function (x, rates) { var rate = rates && x && x.side !== 'sell' ? +rates[x.market] : 0; if (!(rate > 0) || num(x.Rnet) || num(x.costR)) return 0;
+    var r0 = +x.r0 || Math.abs(x.entry - (x.stop0 != null ? x.stop0 : x.stop)), nn = nightsOf(x.filled != null ? x.filled : x.opened, x.closed);
+    return nn > 0 && x.entry > 0 && r0 > 0 ? nn * rate * x.entry / r0 * (x.rawR != null && x.size ? x.size : 1) : 0; };
   // one closed trade as a curve point: R after costs where recorded (Rnet), plus what the equity-curve tooltip shows (#ms-eq-js)
   var tp = function (x, t) { var o = { t: t, R: num(x.Rnet) ? +x.Rnet : +x.R, g: +x.R, m: x.short || x.label || x.market, sd: x.side, st: x.status, o: x.opened };
     if (num(x.costR)) o.c = x.costR; if (x.shadow) o.sh = 1; if (x.grade && x.grade.letter) o.gr = x.grade.letter; if (x.id != null) o.id = String(x.id); return o; };   // id: the readout opens the trade (#ms-trv-js)
@@ -13144,12 +13154,13 @@ function gpStats(T) {
       var BG = {}; BR.forEach(function (t) { (BG[t.setup] = BG[t.setup] || []).push(t); });
       Object.keys(BG).forEach(function (k) {
         var f = F[k] || {}, A = f.off ? BG[k] : BG[k].filter(function (t) { return passesLive(t, f); });
-        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { return { t: t.opened, R: t.R_none - (+t.cost || 0), g: t.R_none, c: +t.cost || 0, m: t.market, sd: t.side, st: t.R_none > 0 ? 'win' : t.R_none < 0 ? 'loss' : 'be' }; }));
+        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { var c = (+t.cost || 0) + (+t.fin || 0); return { t: t.opened, R: t.R_none - c, g: t.R_none, c: c, m: t.market, sd: t.side, st: t.R_none > 0 ? 'win' : t.R_none < 0 ? 'loss' : 'be' }; }));   // fin: the replay's own financing column (gold buys held over a rollover), absent in an older file
       });
     }
     // system replays (research/replay-2w.json): the main systems over years of history
-    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; (RG[x.k] = RG[x.k] || []).push(tp(x, x.closed)); });
-    Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : ''), 'sysreplay', RG[k]); });
+    var FR = D.snapshot && D.snapshot.costs && D.snapshot.costs.financing && D.snapshot.costs.financing.perNight || null, RF = {};
+    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; var p = tp(x, x.closed), f = finOf(x, FR); if (f > 0) { p.R -= f; p.c = (p.c || 0) + f; RF[x.k] = 1; } (RG[x.k] = RG[x.k] || []).push(p); });
+    Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : '') + (RF[k] ? ', after financing' : ''), 'sysreplay', RG[k]); });
 
     // ICT desk
     var IR = D.ictReplay || {}, IT = Array.isArray(D.ictTrades) ? D.ictTrades : [], IS = D.ictShadow || {};
@@ -13208,7 +13219,7 @@ function gpStats(T) {
   }
   // the approvals waiting for the owner (all Coach proposals that need an OK)
   function waiting(coach) { return (coach && Array.isArray(coach.proposals) ? coach.proposals : []).filter(function (p) { return ASK.test(p.kind); }); }
-  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, shown: shown, FWD_MIN: FWD_MIN, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting };
+  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, shown: shown, FWD_MIN: FWD_MIN, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting, nightsOf: nightsOf, finOf: finOf };
   W.MS_SB = API;
   if (typeof document === 'undefined' || !document.getElementById) return;
 
@@ -13235,7 +13246,7 @@ function gpStats(T) {
     if (!visible() || !W.MS_COUNCIL || !W.MS_COUNCIL.at) return;
     loadExtra().then(function (x) {
       var C = W.MS_COUNCIL;
-      SB.rows = build({ trades: C.trades, config: C.config, coach: C.coach, backtest: C.backtest, replay: C.replay, mirror: C.mirror, ictReplay: x.ictReplay, ictTrades: x.ictTrades, ictShadow: x.ictShadow, robust: x.robust, macro: x.macro, now: Date.now() / 1000 });
+      SB.rows = build({ trades: C.trades, config: C.config, coach: C.coach, backtest: C.backtest, replay: C.replay, snapshot: C.snap, mirror: C.mirror, ictReplay: x.ictReplay, ictTrades: x.ictTrades, ictShadow: x.ictShadow, robust: x.robust, macro: x.macro, now: Date.now() / 1000 });
       SB.hasRobust = !!x.robust; SB.coach = C.coach; SB.at = [C.backtest && C.backtest.at, x.ictReplay && x.ictReplay.at].filter(Boolean);
       render();
     });
@@ -13648,9 +13659,25 @@ function gpStats(T) {
     return { live: live, decaying: live.filter(is('decaying')), watch: live.filter(is('watch')), healthy: live.filter(is('healthy')), few: live.filter(function (s) { return s.few; }),
       shadowFlag: (S || []).filter(function (s) { return s && !s.live && !s.few && (s.status === 'decaying' || s.status === 'watch'); }) }; }
   W.MS_DECAY_TALLY = tally;
+  // Which systems are live NOW (11 Nov 2026). coach.json `decay` and `expect` are rebuilt every 6 hours, so for up to 6 hours after
+  // an owner's supported-book decision they still carry the old live flags ("8 live systems" beside a card that names two).
+  // The Trader's config says what is true at once: a system listed in config.ownerShadow is a paper shadow from that time. This
+  // marks such a row in the page's own copy (live false, shadowSince, bookLate) and counts them; a reading built after the
+  // decision already says so and is left alone. Display only: nothing is written anywhere. Idempotent.
+  function bookNow(coach, config) {
+    var o = config && config.ownerShadow, n = 0; if (!coach || !o || typeof o !== 'object') return 0;
+    [coach.decay, coach.expect].forEach(function (B) { if (!B || !Array.isArray(B.systems)) return; var k = 0;
+      B.systems.forEach(function (s) { if (!s || !o[s.id]) return; if (s.bookLate) { k++; return; } if (s.live !== true) return;
+        s.live = false; s.bookLate = true; k++; var t = +o[s.id]; if (t > 1e9 && !s.shadowSince) s.shadowSince = new Date(t * 1000).toISOString().slice(0, 10); });
+      B.bookLate = k; n += k; });
+    return n;
+  }
+  W.MS_BOOK_NOW = bookNow;
+  var LATE = ' This reading was made before your decision on which systems trade live; the list here already follows that decision, and the next reading (within 6 hours) is built on it.';
+  W.MS_BOOK_LATE = LATE;
   function render() {
     var body = $('ms-decay-b'), sum = $('ms-decay-sum'); if (!body || !sum) return;
-    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.decay;
+    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.decay; if (C) bookNow(C.coach, C.config);
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'Edge-decay monitor: ' + D.error : 'No edge-decay reading yet: the Coach writes one every 6 hours.'; body.innerHTML = ''; return; }
     var S = D.systems, T = tally(S), dec = T.decaying, wat = T.watch;
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
@@ -13661,7 +13688,10 @@ function gpStats(T) {
     sum.innerHTML = '<b>' + T.live.length + '</b> live systems: <b class="' + (dec.length ? 'neg' : '') + '">' + dec.length + ' decaying</b>' + names(dec) + ', ' + wat.length + ' on watch' + names(wat)
       + ', ' + T.healthy.length + ' healthy' + (T.few.length ? ', ' + T.few.length + ' with too few trades to judge' + names(T.few) : '') + '.'
       + (T.shadowFlag.length ? ' Shadow, not traded live: ' + T.shadowFlag.map(function (s) { return esc(s.name) + ' ' + esc(s.status === 'watch' ? 'on watch' : s.status); }).join(', ') + '.' : '')
-      + ' Status only: nothing here changes a rule.';
+      + ' Status only: nothing here changes a rule.' + (D.bookLate ? esc(LATE) : '');
+    // the footnote says whether THIS reading's backtests carry overnight financing (decay.financing, from the baseline file)
+    var ff = $('ms-decay-fin'); if (ff) ff.textContent = D.financing ? 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge'
+      : 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests of this reading do not carry it yet, the next reading does';
     var at = $('ms-decay-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
     body.innerHTML = S.slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ((ORDER[a.status] || 0) - (ORDER[b.status] || 0)); }).map(function (s) {
       var st = s.few ? 'few' : s.status, r = s.roll || {}, c = s.cusRef || {}, z = s.cusZero || {}, d = s.dd || {};
@@ -13706,14 +13736,17 @@ function gpStats(T) {
   }
   function render() {
     var body = $('ms-expect-b'), sum = $('ms-expect-sum'); if (!body || !sum) return;
-    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.expect;
+    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.expect; if (C && W.MS_BOOK_NOW) W.MS_BOOK_NOW(C.coach, C.config);
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'What to expect: ' + D.error : 'No expectations yet: the Coach writes them every 6 hours with the edge-decay reading.'; body.innerHTML = ''; return; }
     var S = D.systems.filter(function (s) { return s && !s.error; }), live = S.filter(function (s) { return s.live; });
     var posEdge = live.filter(function (s) { return s.perTrade && s.perTrade.lo > 0; }), judged = live.filter(function (s) { return s.forward && s.forward.judged; });
     var above = judged.filter(function (s) { return s.forward.out === 'above'; }), below = judged.filter(function (s) { return s.forward.out === 'below'; });
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
     sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
-      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.';
+      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.' + (D.bookLate ? esc(W.MS_BOOK_LATE || '') : '');
+    // the footnote says whether THIS reading is after overnight financing (a system's `fin`); one made before 11 Nov's change is not
+    var ff = $('ms-expect-fin'); if (ff) ff.textContent = S.some(function (s) { return s.fin; }) ? 'since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker\u2019s rate of that day: a system\u2019s Per trade cell says so and gives the figure before it'
+      : 'this reading was made before overnight financing was counted (11 Nov 2026): its figures are before financing, the next reading carries it';
     var at = $('ms-expect-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
     var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     var ORD = function (s) { return !s.live ? 3 : s.forward && s.forward.out === 'below' ? 0 : s.forward && s.forward.out === 'above' ? 1 : 2; };
