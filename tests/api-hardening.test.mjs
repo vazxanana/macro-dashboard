@@ -171,7 +171,7 @@ test('MCP: an explicit perms.mcp false revokes the connector even when the older
 });
 
 test('/cdata answers GET and HEAD only (a POST never reaches GitHub or the bridge ping)', async () => {
-  const data = require('../api/data.js'); let calls = 0; const f = async () => { calls++; return { ok: true, status: 200, arrayBuffer: async () => new ArrayBuffer(2) }; };
+  const data = require('../api/data.js'); let calls = 0; const f = async () => { calls++; return { ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode('[]').buffer }; };   // trades.json in its real shape (a list): a guest gets the cut copy, and a file the cut cannot read is a 503 (11 Nov)
   for (const m of ['POST', 'PUT', 'DELETE']) { const r = res(); await data.handle({ method: m, headers: {}, query: { p: 'mt5/signals.csv' } }, r, { env: {}, fetch: f }); assert.equal(r.code, 405, m); }
   assert.equal(calls, 0);
   const r = res(); await data.handle({ method: 'GET', headers: {}, query: { p: 'trades.json' } }, r, { env: {}, fetch: f }); assert.equal(r.code, 200);

@@ -127,7 +127,9 @@ test('/api/users POST: owner session (or password) only; hashes stay on the serv
 });
 
 test('/cdata: guests read only the allowlist; protected files need a session and are never cached publicly', async () => {
-  const env = { ...ENV }, fetchFn = async () => ({ ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode('{}').buffer });
+  // each guest file in its real shape: since 11 Nov a guest gets a cut copy, and a file the cut cannot read is a 503 (tests/guest-files.test.mjs)
+  const SHAPE = { 'trades.json': '[]', 'research.json': '[]', 'research/replay-2w.json': '{"trades":[]}', 'snapshot.json': '{"markets":{}}' };
+  const env = { ...ENV }, fetchFn = async (u) => ({ ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode(Object.entries(SHAPE).find(([f]) => String(u).includes('/' + f + '?')) ?. [1] || '{}').buffer });
   const d = { env, fetch: fetchFn, deps: { builtIns, blobUsers: listOf({}) } };
   assert.deepEqual([...data.GUEST_OK].sort(), ['ict/replay.json', 'mt5/signals.csv', 'research.json', 'research/replay-2w.json', 'snapshot.json', 'trades.json']);
   for (const p of data.GUEST_OK) { const r = await run(data, { query: { p } }, d); assert.equal(r.code, 200, p); assert.match(r.headers['cache-control'], /^public/); }
