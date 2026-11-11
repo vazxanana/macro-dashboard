@@ -6934,6 +6934,33 @@
     "positionId": "48374556",
     "volume": 20,
     "status": "open"
+   },
+   "eurusd-rscalp-1794391686": {
+    "positionId": "48378804",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-11T10:09:11.000Z",
+    "councilEntry": 1.11384,
+    "stop": 1.1134,
+    "t1": 1.11453,
+    "riskCash": 1.98,
+    "margin": 8.91,
+    "shadow": true,
+    "mark": 1.11384,
+    "levelsFrom": "mark",
+    "fillPrice": 1.1139,
+    "slipR": 0.136,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T10:09:11.000Z",
+    "brokerStop": 1.11346
    }
   },
   "day": {
@@ -6941,7 +6968,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9912.95 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9912.95 · 28 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6975,14 +7002,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9912.95,
-  "lastRun": "2026-11-11T10:06:43.000Z"
+  "lastRun": "2026-11-11T10:09:11.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "closed USDCAD position 48044323: the broker held it without a stop and refused one (no valid stop level (missing, zero, or on the wrong side of the fill))",
-   "trade": "usdcad-scalp-1794316652"
-  },
   {
    "at": "2026-11-10T13:22:44.000Z",
    "msg": "moved EURUSD 47373484 protection: stop 1.0797895 -> 1.0795395, target 1.16345 -> 1.1632 (council rswing)",
@@ -8477,6 +8499,11 @@
    "at": "2026-11-11T10:03:42.000Z",
    "msg": "limit filled: ETHUSD position 48374556 at the broker",
    "trade": "eth-rscalp-1794391100"
+  },
+  {
+   "at": "2026-11-11T10:09:11.000Z",
+   "msg": "opened buy EURUSD 0.04 lot (council rscalp)",
+   "trade": "eurusd-rscalp-1794391686"
   }
  ],
  "limits": {
@@ -8555,11 +8582,11 @@
   ]
  },
  "execution": {
-  "n": 234,
-  "meanSlipR": -0.011,
+  "n": 235,
+  "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 160,
+  "medianLagSec": 159,
   "bySymbol": {
    "SOLUSD": {
     "n": 17,
@@ -8574,8 +8601,8 @@
     "meanSlipR": 0.083
    },
    "EURUSD": {
-    "n": 40,
-    "meanSlipR": -0.025
+    "n": 41,
+    "meanSlipR": -0.021
    },
    "GBPUSD": {
     "n": 32,
