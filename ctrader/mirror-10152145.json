@@ -5774,7 +5774,8 @@
     "t1": 0.82267,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.82635,
@@ -5788,9 +5789,10 @@
     "lagSec": 70,
     "positionId": "48163393",
     "volume": 200000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-10T16:59:24.000Z",
-    "brokerStop": 0.82692
+    "brokerStop": 0.82692,
+    "closedAt": "2026-11-11T06:37:51.000Z"
    },
    "audusd-swing-1794333208": {
     "positionId": "48181010",
@@ -6424,7 +6426,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9934.63 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9932.83 · 24 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6458,15 +6460,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9934.63,
-  "lastRun": "2026-11-11T06:35:25.000Z"
+  "balance": 9932.83,
+  "lastRun": "2026-11-11T06:37:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:43:28.000Z",
-   "msg": "limit filled: USDCHF position 48031567 at the broker",
-   "trade": "usdchf-scalp-1794314304"
-  },
   {
    "at": "2026-11-10T12:52:20.000Z",
    "msg": "placed buy limit SOLUSD 0.01 lot at 84.8 (council rscalp, valid to 2026-11-10T15:51Z)",
@@ -7961,6 +7958,11 @@
    "at": "2026-11-11T06:35:25.000Z",
    "msg": "USDCHF position 48243978 closed at the broker",
    "trade": "usdchf-scalp-1794357162"
+  },
+  {
+   "at": "2026-11-11T06:37:51.000Z",
+   "msg": "USDCHF position 48163393 closed at the broker",
+   "trade": "usdchf-rscalp-1794329894"
   }
  ],
  "limits": {
