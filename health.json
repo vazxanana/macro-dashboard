@@ -1,6 +1,6 @@
 {
- "at": "2026-11-11T16:11:53.000Z",
- "status": "warn",
+ "at": "2026-11-11T16:34:36.000Z",
+ "status": "bad",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
@@ -11,7 +11,7 @@
      "sym": "xau",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 3.53,
      "clipped": 0,
@@ -22,7 +22,7 @@
      "sym": "eurusd",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 3.33,
      "clipped": 0,
@@ -33,7 +33,7 @@
      "sym": "gbpusd",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 2.62,
      "clipped": 0,
@@ -44,7 +44,7 @@
      "sym": "audusd",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 2.92,
      "clipped": 0,
@@ -55,7 +55,7 @@
      "sym": "usdcad",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 2.7,
      "clipped": 0,
@@ -66,9 +66,9 @@
      "sym": "usdchf",
      "status": "ok",
      "n": 300,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
-     "maxJump": 3.17,
+     "maxJump": 2.19,
      "clipped": 0,
      "issues": []
     }
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 4.13,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 4.08,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 3.13,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T16:10:00.000Z",
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 3.47,
      "clipped": 0,
@@ -126,14 +126,14 @@
   },
   "cnbc": {
    "label": "CNBC futures (ICT desk)",
-   "status": "ok",
+   "status": "bad",
    "markets": {
     "nq": {
      "label": "NQ",
      "sym": "@ND.1",
      "status": "ok",
-     "n": 760,
-     "last": "2026-11-11T16:10:00.000Z",
+     "n": 764,
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 4.08,
      "clipped": 0,
@@ -143,8 +143,8 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "ok",
-     "n": 760,
-     "last": "2026-11-11T16:10:00.000Z",
+     "n": 764,
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 4.1,
      "clipped": 0,
@@ -154,8 +154,8 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "ok",
-     "n": 760,
-     "last": "2026-11-11T16:10:00.000Z",
+     "n": 764,
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 7.41,
      "clipped": 0,
@@ -164,20 +164,22 @@
     "rty": {
      "label": "RTY",
      "sym": "@TFS.1",
-     "status": "ok",
-     "n": 760,
-     "last": "2026-11-11T16:10:00.000Z",
-     "staleMin": 0,
-     "maxJump": 7.77,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: Error in getting bars for symbol: @RTY.1 and barType: FIVE_MIN Security Master not found"
+      }
+     ]
     },
     "gc": {
      "label": "GC",
      "sym": "@GC.1",
      "status": "ok",
-     "n": 760,
-     "last": "2026-11-11T16:10:00.000Z",
+     "n": 764,
+     "last": "2026-11-11T16:30:00.000Z",
      "staleMin": 0,
      "maxJump": 3.57,
      "clipped": 0,
@@ -192,7 +194,7 @@
     "snapshot.json": {
      "label": "Trader snapshot (snapshot.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": [
       {
        "kind": "source",
@@ -204,7 +206,7 @@
     "state.json": {
      "label": "Trader state (state.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "trades.json": {
@@ -225,7 +227,7 @@
     "mt5/signals.csv": {
      "label": "MT5 / cTrader signal file (mt5/signals.csv)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "analysis/latest.md": {
@@ -236,13 +238,13 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -278,7 +280,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 12,
+     "ageMin": 11,
      "issues": [
       {
        "kind": "source",
@@ -290,13 +292,13 @@
     "ict/snapshot.json": {
      "label": "ICT desk snapshot (ict/snapshot.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 23,
      "issues": []
     },
     "ict/shadow.json": {
      "label": "ICT shadow book (ict/shadow.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 23,
      "issues": []
     },
     "ict/trades.json": {
@@ -312,7 +314,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 0,
+     "ageMin": 23,
      "issues": [
       {
        "kind": "input",
@@ -324,13 +326,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 23,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 23,
      "issues": []
     },
     "macro/history.json": {
@@ -351,7 +353,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 972,
+     "ageMin": 994,
      "issues": []
     },
     "digest.json": {
@@ -362,37 +364,37 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "warn",
-     "ageMin": 383,
+     "ageMin": 406,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 6.4 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+       "detail": "not updated for 6.8 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
       }
      ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 298,
+     "ageMin": 320,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 297,
+     "ageMin": 320,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 297,
+     "ageMin": 320,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 297,
+     "ageMin": 320,
      "issues": []
     },
     "research/ledger.json": {
@@ -413,19 +415,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 84,
+     "ageMin": 107,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 487,
+     "ageMin": 510,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 5362,
+     "ageMin": 5385,
      "issues": [
       {
        "kind": "stale",
@@ -452,19 +454,23 @@
    }
   }
  },
- "summary": "Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale",
+ "summary": "CNBC futures (ICT desk): RTY error · Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale",
  "brief": {
-  "status": "warn",
-  "line": "2 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1045 days old; over 120 the strategist drops it as \"no dat",
-  "bad": [],
+  "status": "bad",
+  "line": "1 problem, 2 warnings: CNBC futures (ICT desk) RTY: unreachable: Error in getting bars for symbol: @RTY.1 and barType: FIVE_MIN Security Master not found",
+  "bad": [
+   "CNBC futures (ICT desk) RTY: unreachable: Error in getting bars for symbol: @RTY.1 and barType: FIVE_MIN Security Master not found"
+  ],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1045 days old; over 120 the strategist drops it as \"no data\")",
-   "Loop watchdog (watchdog.json): not updated for 6.4 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+   "Loop watchdog (watchdog.json): not updated for 6.8 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
   ],
   "notes": 3
  },
  "alert": {
-  "streak": {},
+  "streak": {
+   "cnbc:rty": 1
+  },
   "sent": {
    "key": "",
    "at": "2026-11-09T04:12:20.000Z",
