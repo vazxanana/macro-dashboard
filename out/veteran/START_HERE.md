@@ -1,6 +1,6 @@
-# Claude handoff — gptmacro_v.1 revision1.3
+# Assistant handoff — gptmacro_v.1 revision1.3
 
-This is a standalone cumulative research bundle. Claude can use it even if it only received the original V1. The inventory identifies every new/changed file since V1.2; unchanged library files are included so no previous ZIP is required for the main research tools.
+This is a standalone cumulative research bundle. An assistant can use it even if it only received the original V1. The inventory identifies every new/changed file since V1.2; unchanged library files are included so no previous ZIP is required for the main research tools.
 
 ## Read these first
 
@@ -20,7 +20,7 @@ This is a standalone cumulative research bundle. Claude can use it even if it on
 - Source/verification:1498 same-producer format agreements;4683 independent primary outcome checks;1345 formal-FOMC checks;30 actual-bootstrap cross-language comparisons;12Python tests,7synthetic bootstrap fixtures and scoped metadata/interval regressions. Each report states what it does and does not prove.
 - NBU supplies a distinct UAH/troy-ounce accounting valuation with affirmative open-data permission and attribution.1096 effective calendar dates are not1096 independent observations.781 calculation dates, official FX, publication/effective dates and wartime/carryover rules need separate treatment. No gold returns or USD back-conversion were calculated.
 
-## Instructions for Claude
+## Instructions for the assistant
 
 Integrate these current files into the existing gptmacro_v.1 knowledge and preserve source/validation links. Same-path current files supersede prior working copies; retain dated audit failures as history. Do not call a model nowcast survey consensus, a bootstrap interval causal proof, or an unresolved pilot a scored forecast. Keep the real CPI ledger append-only and cTrader demo-only.
 

@@ -43,7 +43,7 @@ export function problems(d, prev, now) {
   const r = d.run;
   if (r && r.id && ['failure', 'timed_out', 'startup_failure'].includes(String(r.conclusion || ''))) P.push({ id: `run:${r.id}`, text: `Council loop run ${r.conclusion.replace('_', ' ')}${r.url ? ` (${r.url})` : ''}` });
   const iAt = d.ict ? ts(d.ict.at) : null, iAge = iAt != null ? min(iAt, now) : null;
-  if (!stopped && d.ict && !weekendShut(now) && (iAge == null || iAge > CFG.ictStoppedMin)) P.push({ id: 'ict', text: `ICT desk stopped: last round ${iAge == null ? 'unknown' : ago(iAge) + ' ago'} (expected ≤ 20 min)` });
+  if (!stopped && d.ict && !weekendShut(now) && (iAge == null || iAge > CFG.ictStoppedMin)) P.push({ id: 'ict', text: `ICT desk stopped: last round ${iAge == null ? 'unknown' : ago(iAge) + ' ago'} (expected about every 35 min, alert after ${CFG.ictStoppedMin} min)` });
   // errors repeating round after round
   const errStreak = {}, pst = (prev && prev.errStreak) || {}, newRound = sAt != null && (prevAt == null || sAt > prevAt), errs = (s && s.errors && typeof s.errors === 'object') ? s.errors : {};
   for (const k of Object.keys(errs)) errStreak[k] = newRound ? (pst[k] || 0) + 1 : (pst[k] || 1);
