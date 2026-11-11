@@ -1768,6 +1768,37 @@ over `STALE_MIN` 90 min (red over `OLD_MIN` 6 h). COT tab: the pre-registered st
 overall, the markets with a passing cell, "no tested edge" for the rest) and a tag per gauge from `edgeStatus` / `edgeText`.
 No council logic changed. Tests: tests/macro-visual.test.mjs (calm pass).
 
+## Macro desk: simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
+macro-desk.html only; display only, no number, probability or claim wording changed. On a screen up to 640 px the page opens in
+its simple view: the head script sets `html[data-phone="simple"]` before the first paint unless this device chose the full view
+(localStorage `ms-phone` = `full`; `window.msPhoneView(v)`, event `ms:phone`). Key, attribute and the switch's wording
+("Phone view: Simple | Full", `#ps-sw`, foot of the page, phones only) are the Desk's, so one choice covers the site.
+Measured at 390 x 844 on the 11 Nov files: 8.9 screens → 1.9, 1,357 words → 282, 6 charts drawn on load → 1.
+- **First screen = the glance alone** (`#c-glance`): bias with the meter, the chance against its base and "Confidence …"; the
+  event; the two levels with the price now. Three plain rows in one card (no boxes in a box). The stale stamp (`#stamp`), the
+  stale-levels notice (`lvStale`) and "broken since the close" stay on it in words. Behind `#g-more` "The week in one sentence,
+  and more": the sentence (`.g-sent`) and the lines marked `gx` (channel tally, the playbook link, where the levels are from,
+  the daily-close line, the long form of "Public data only"). The page lede is hidden; "paper only" stays in the section header.
+- **Sections 2 to 6 fold** (`section.story.sfold`: Next release, Why, Where price sits, What he expects, Track record) to the
+  title and ONE line (`.st-go` button in the header, the whole row is the target; `.st-one`), and open on tap. The line is
+  COPIED by `syncOne()` from what the open card already prints (`#nx-take`, `#sc-top`, `#ld-take` with the `#ld-stale` notice in
+  front, `#hyp-take`, `#calls-take` / `#calib-take`), less the parts wrapped in `.tk-x` (chart legend words, the level list the
+  glance already shows): never a number or a sentence of its own. A section with no takeaway shows its sub-label instead.
+- **Charts**: a folded section has no width, so `draw()` leaves its charts undrawn (cheap); `foldSet(sx, true)` calls
+  `redraw(sx)` on EVERY opening, `ms:phone` (switching the view) redraws all, resize as before. The 11 Nov "blank on first
+  load" order (show the story, then `redraw()`) is unchanged and pinned. An address like `/macro-desk#s-price` opens that
+  section and goes to it.
+- **The detail** stays last and folded: in the simple view a stored `mdDeep = 1` is not restored on load (desktop and Full
+  still restore it). The section chips (`#toc`) stay desktop-only.
+- **Full view** is the phone page as it was plus the switch: every rule of the simple view sits in one
+  `@media (max-width: 640px)` block at the end of the sheet and, the switch apart, under the attribute. Checked by comparing
+  every visible element's box, font size, colour and text before / after at 1440 (three themes), 768, 641, 390 Full, 360 Full
+  and signed out: identical but for four wrapping spans (`gx` / `tk-x`, same text in the same place) and the switch.
+- Not simplified: the content of an opened section (it is today's card), and the detail once opened (many screens: the
+  discussion, sources, COT, ledger, library are reference reading).
+- Tests: `tests/macro-visual.test.mjs` (simple phone view: three tests). `scripts/audit/smoke.cjs`: on the phone, as a member,
+  every folded section is opened and each chart in it must be drawn at its host's width (fails with "folded section opened: …").
+
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
 Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
 Cause: `veteran.mjs` `run()` read its closes only from the weekly candle cache (`research/daily/<key>.json`, Saturdays); the
