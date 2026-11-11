@@ -6323,6 +6323,33 @@
     ],
     "stopCheckedAt": "2026-11-11T04:26:56.000Z",
     "brokerStop": 83.619
+   },
+   "eth-rscalp-1794372205": {
+    "positionId": "48302070",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 16,
+    "lots": 0.16,
+    "digits": 2,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-11T04:44:29.000Z",
+    "councilEntry": 2066.19,
+    "stop": 2054.2667619999997,
+    "t1": 2071,
+    "riskCash": 1.99,
+    "margin": 33.08,
+    "shadow": true,
+    "mark": 2066.19,
+    "levelsFrom": "mark",
+    "fillPrice": 2069.69,
+    "slipR": 0.294,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T04:44:29.000Z",
+    "brokerStop": 2057.77
    }
   },
   "day": {
@@ -6330,7 +6357,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9949.53 · 28 open",
+  "status": "ok · demo Fusion Markets · balance 9949.53 · 29 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6343,14 +6370,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9949.53,
-  "lastRun": "2026-11-11T04:42:00.000Z"
+  "lastRun": "2026-11-11T04:44:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:14:14.000Z",
-   "msg": "moved EURUSD 47964428 protection: stop 1.112697 -> 1.113007, target 1.146996 -> 1.147306 (council swing)",
-   "trade": "eurusd-swing-1794299390"
-  },
   {
    "at": "2026-11-10T12:17:01.000Z",
    "msg": "moved GBPUSD 47373485 protection: stop 1.32868 -> 1.32889, target 1.36876 -> 1.36897 (council scalp)",
@@ -7845,6 +7867,11 @@
    "at": "2026-11-11T04:39:10.000Z",
    "msg": "AUDUSD position 48284994 closed at the broker",
    "trade": "audusd-scalp-1794366326"
+  },
+  {
+   "at": "2026-11-11T04:44:29.000Z",
+   "msg": "opened buy ETHUSD 0.16 lot (council rscalp)",
+   "trade": "eth-rscalp-1794372205"
   }
  ],
  "limits": {
@@ -7923,11 +7950,11 @@
   ]
  },
  "execution": {
-  "n": 213,
-  "meanSlipR": -0.016,
+  "n": 214,
+  "meanSlipR": -0.015,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161,
+  "medianLagSec": 160,
   "bySymbol": {
    "SOLUSD": {
     "n": 17,
@@ -7938,8 +7965,8 @@
     "meanSlipR": -0.057
    },
    "ETHUSD": {
-    "n": 8,
-    "meanSlipR": -0.026
+    "n": 9,
+    "meanSlipR": 0.01
    },
    "EURUSD": {
     "n": 40,
