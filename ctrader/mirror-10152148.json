@@ -2043,6 +2043,33 @@
     ],
     "stopCheckedAt": "2026-11-11T01:16:42.000Z",
     "brokerStop": 1.3353
+   },
+   "sol-replica-1794360591-b": {
+    "positionId": "48258990",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T01:30:49.000Z",
+    "councilEntry": 83.35,
+    "stop": 82.75,
+    "t1": 84.55,
+    "riskCash": 6,
+    "margin": 83.04,
+    "minLot": true,
+    "mark": 83.35,
+    "levelsFrom": "mark",
+    "fillPrice": 83.519,
+    "slipR": 0.282,
+    "lagSec": 58,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T01:30:49.000Z",
+    "brokerStop": 82.919
    }
   },
   "day": {
@@ -2050,11 +2077,12 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10003.78 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10003.78 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794357299-s": "none of XRPUSD found at the broker"
+   "xrp-replica-1794357299-s": "none of XRPUSD found at the broker",
+   "xrp-replica-1794360591-b": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -2063,7 +2091,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10003.78,
-  "lastRun": "2026-11-11T01:29:35.000Z"
+  "lastRun": "2026-11-11T01:30:49.000Z"
  },
  "log": [
   {
@@ -2843,6 +2871,16 @@
    "at": "2026-11-11T01:29:35.000Z",
    "msg": "ETHUSD position 48249113 closed at the broker",
    "trade": "eth-replica-1794358841-s"
+  },
+  {
+   "at": "2026-11-11T01:30:49.000Z",
+   "msg": "opened buy SOLUSD 0.01 lot (council replica)",
+   "trade": "sol-replica-1794360591-b"
+  },
+  {
+   "at": "2026-11-11T01:30:49.000Z",
+   "msg": "not mirrored xrp-replica-1794360591-b: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794360591-b"
   }
  ],
  "limits": {
@@ -2921,15 +2959,15 @@
   ]
  },
  "execution": {
-  "n": 71,
-  "meanSlipR": 0.1,
-  "medianSlipR": 0.039,
+  "n": 72,
+  "meanSlipR": 0.102,
+  "medianSlipR": 0.041,
   "worstSlipR": 1.236,
   "medianLagSec": 73,
   "bySymbol": {
    "SOLUSD": {
-    "n": 12,
-    "meanSlipR": 0.15
+    "n": 13,
+    "meanSlipR": 0.16
    },
    "ETHUSD": {
     "n": 8,
