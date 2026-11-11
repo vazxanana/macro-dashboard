@@ -151,10 +151,20 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
 - **Rate limit.** The firewall allows 30 requests a minute per IP on `/api`. `MXAC.makeApi` keeps the page under `MXAC.PACE`
   (24) Academy calls in any minute, waits out a 429 (`Retry-After`, else 5 s doubling, 4 tries) with a calm status line, and
   sends writes one at a time. A replay run reads candidates, lessons, calendar and past cases once
-  (`?get=history&before=<end of the range>`, cut per decision by `MXAC.historyAt`); a train decision is then one call (the
-  attempt), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
+  (`?get=history&before=<end of the range>`, cut per decision by `MXAC.historyAt`); a train decision is then two calls since
+  11 Nov 2026 (the attempt, then the session position; one before that), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
   calls instead).
 - A setup decided in an earlier sitting is stored as `replay-same` when the Train or Session clock stops on it again (recall).
+- **Round 3 (11 Nov 2026).** A Session-tab decision is two calls as well (the attempt, then `session.save` with the clock,
+  the events and the setup the clock is on; the first decision of a sitting saves before its attempt). Resuming a sitting
+  saved on a setup reads its stored attempt and verdict (`attempts`, `corrections`, and `lessons` when a disagreeing verdict
+  is stored) and decides nothing again. Leaving a half-written answer asks once on every section: `MXAC.leaveGuard`
+  (`kit.leaveGuard`), fed by `mentorUnsaved` in Train and by the answer form's `unsaved()` in Session and Blind;
+  `kit.watchUnsaved` adds a section to the browser's reload question. `kit.decided(id, pool, mode)` writes the mode of a
+  stored attempt into the shared pool list, which is how the Blind arena knows a setup was shown in Train or Session after
+  its hidden attempt (answered as recall, not scored). The Blind arena never reads a stored decision; the API refuses a
+  second answer for a setup (409) and the page says the first one stands. A lesson draft is rebuilt on resume from the
+  stored correction (`MXA.lessons.fromCorrection`), never from browser storage.
 - **What if** (`kit.whatIfCard`, pure parts `MXAC.whatIfAllowed / whatIfWindow / whatIfAlternatives / whatIfRun / whatIfNote`): the
   one user of `MXA.simulate`. The card is absent until the attempt is stored (a test: its result too; the blind arena: the
   mentor's answer too). On the click it asks `MXR.load` for the candles from the decision time on the edge's signal timeframe
@@ -173,3 +183,8 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
   of play / continue, step, jump and restart, so a half-written verdict (`MXAC.mentorUnsaved`, `M.dirty`) needs a second press
   to be dropped; `MXAC.humanize(text, lessons)` shows lesson titles for ids in the engine's text (display only). The "What if"
   columns are Alternative, Net R after costs, Exit, Filled, Levels, Best, Worst, Exit time.
+- Round 2 (11 Nov 2026), page code only: `keepPlace` (the session position with every decision; two API calls a train
+  decision: `attempt`, `session.save`), `#resume-now` / `renderResumeNow` (pure `MXAC.latestFirst`, `MXAC.unfinished`),
+  `decisionView(box, { fold: true, onLessons })` with `foldBox` and the pure `MXAC.mainReasons` / `MXAC.conflictIds`,
+  `MXAC.mentorChoices`, `mentorCheck(show)` (the red problem only after Save), `MXAC.lessonFocus = { edge, ids }` read once by
+  the Lessons tab, `prefGet` / `prefSet` (the page's only browser storage: `mxacEdge`, `mxacFold`), `MXAC.rememberEdge`.

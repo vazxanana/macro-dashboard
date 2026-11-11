@@ -241,3 +241,98 @@ test('badge inks: every badge colour is a theme token, and each token passes AA 
   assert.doesNotMatch(css, /\.ho-sh\{opacity/);
   assert.match(css, /:is\(#v-guest, \.g-merged\) \.cal \.cal-d\.fut \.cn \{ opacity: 1; \}/);
 });
+
+// ── Sign-in card and guest page (11 Nov 2026): what a stranger sees is the main system only, and it is called what it is ──
+const desk = () => src('market-structure.html');
+const cut = (html, from, to) => { const i = html.indexOf(from); assert.ok(i >= 0, `missing: ${from}`); const j = html.indexOf(to, i); assert.ok(j > i, `missing end: ${to}`); return html.slice(i, j); };
+const ROWS = [
+  { id: 'a', market: 'xau', label: 'XAU/USD', k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', side: 'buy', entry: 10, stop: 9, t1: 12, opened: 1000, status: 'pending', note: 'rule text', feat: { d1: 'with' } },
+  { id: 'b', market: 'eth', label: 'ETH/USD', k: 'scalp', name: 'Scalp', pair: 'M15 → M1', side: 'sell', entry: 5, stop: 6, opened: 5000, status: 'open', shadow: true, blockedBy: ['focus', 'usd'], note: 'Shadow (…)' },
+  { id: 'c', market: 'btc', label: 'BTC/USD', k: 'intraday', name: 'Intraday', side: 'buy', entry: 5, stop: 4, opened: 4000, status: 'open' },
+  { id: 'd', market: 'xau', label: 'XAU/USD', k: 'replica', name: 'Gold replica', side: 'sell', entry: 5, stop: 6, opened: 3000, closed: 3500, status: 'win', R: 2, pm: { cause: 'x' } },
+];
+
+test('sign-in card: the proof counts and names main-system paper trades only, never a shadow or an older strategy', () => {
+  const html = desk(), W = {};
+  new Function('window', cut(html, 'window.msGateProof = function', '  // live proof for guests'))(W);
+  const G = W.msGateProof(ROWS, { from: '2025-08-01', totals: { n: 815, wins: 308, R: 124.57 } }, 3600 * 3);
+  assert.equal(G.open.v, '0', 'the open shadow and the older-strategy trade are not counted');
+  assert.match(G.open.s, /^1 waiting for its entry$/);
+  assert.equal(G.last.v, '▼ XAU/USD', 'the latest main-system trade, not the newer shadow signal');
+  assert.doesNotMatch(JSON.stringify(G), /ETH|BTC|Scalp|replica|engulf|Intraday/i, 'no shadow market and no system name');
+  // the ICT replay is called a backtest, with its n, its period and "before costs"
+  assert.equal(G.ict.v, '+125R'); assert.match(G.ict.s, /^815 trades since Aug 2025 · before costs$/); assert.match(G.ict.tip, /backtest/i);
+  assert.match(html, /<span>ICT replay · a backtest<\/span>/);
+  assert.doesNotMatch(html, /since 2020<\/small>/, 'the replay starts in August 2025; the card said "since 2020" until the file loaded');
+  // a file that did not load keeps its dash (it showed "Open now 0"); the boxes are in the page from the first paint (desk load)
+  const none = W.msGateProof(null, null, 0); assert.deepEqual(none, { open: null, ict: null, last: null });
+  assert.match(html, /set\('gs-p-open', G\.open \? G\.open\.v : '—'\)/);
+  assert.match(html, /<div class="gs-proof" id="gs-proof">\n      <div class="gs-pk" id="gs-pk-open">/);
+  assert.match(html, /window\.msGateProof\(null, I, 0\)\.ict/, 'the ICT line, read last, goes through the same function');
+  // the same list of main systems as the page's SYS_K
+  const sysK = /const SYS_K = (\[[^\]]+\]);\n  \/\/ guests: our main system only/.exec(html)[1], main = /var MAIN = (\[[^\]]+\])/.exec(html)[1];
+  assert.equal(main, sysK);
+});
+
+test('guest page: only main-system rows, cut to the drawn fields, are kept in memory (nothing of the other books reaches the hidden views)', () => {
+  const html = desk(), block = cut(html, "  const GUEST_F = [", "  if (PUB) for (const [key, cut] of Object.entries(GUEST_DATA))");
+  const sysK = /const SYS_K = (\[[^\]]+\]);\n  \/\/ guests: our main system only/.exec(html)[1];
+  const D = new Function(`const SYS_K = ${sysK}, nqSys = (x) => x.market !== 'nq' || ['nyflip'].includes(x.session);\n${block}\nreturn GUEST_DATA;`)();
+  const T = D.trades(ROWS);
+  assert.deepEqual(T.map((x) => x.id), ['a', 'd']);
+  for (const x of T) for (const f of ['name', 'pair', 'note', 'feat', 'blockedBy', 'pm', 'shadow']) assert.ok(!(f in x), `a guest row carries ${f}`);
+  assert.equal(T[1].R, 2); assert.equal(T[0].stop, 9, 'the stop stays on the row');
+  const R = D.research([{ id: 'n1', market: 'nq', k: 'nq-open', session: 'nyflip', status: 'loss', R: -1, closed: 9, note: 'x' }, { id: 'n2', market: 'nq', k: 'nq-open', session: 'nyflip-trend', shadow: true }, { id: 'n3', market: 'nq', k: 'nq-open', session: '80pct' }, { id: 'r', market: 'xau', k: 'replica', status: 'win', R: 1 }]);
+  assert.deepEqual(R.map((x) => x.id), ['n1']);
+  const P = D.replay({ note: 'Replay of our systems … replica v5 …', from: 'a', to: 'b', trades: [{ id: 'p', market: 'xau', k: 'geg', name: 'Gold daily engulf', replay: true, status: 'loss', R: -1, closed: 5, note: 'x' }, { id: 'q', market: 'nq', k: 'nq-open', session: 'tokyo', replay: true }] });
+  assert.deepEqual(Object.keys(P), ['from', 'to', 'trades']); assert.deepEqual(P.trades, [{ id: 'p', market: 'xau', k: 'geg', closed: 5, status: 'loss', R: -1, replay: true }]);
+  const S = D.snap({ at: 't', lessons: { x: 1 }, ownerReviews: {}, moshaBo: {}, markets: { xau: { label: 'XAU/USD', name: 'Gold', price: 4000, dec: 1, trend: {}, setups: [{ name: 'Position', next: 'Wait for H1 to break down (the CF)' }] } } });
+  assert.deepEqual(S, { at: 't', nqLast: undefined, markets: { xau: { label: 'XAU/USD', name: 'Gold', price: 4000, dec: 1, open: undefined, setups: [] } } });
+  assert.equal(D.trades(null), null, 'a file that did not load stays null (the page says so)');
+  // installed for the public role before the first load, and the guest toasts name no system
+  assert.match(html, /if \(PUB\) for \(const \[key, cut\] of Object\.entries\(GUEST_DATA\)\) \{ let val; Object\.defineProperty\(COUNCIL, key,/);
+  assert.match(html, /trades\.filter\(\(x\) => !x\.shadow && \(!PUB \|\| SYS_K\.includes\(x\.k\)\)\)\.forEach/);
+  assert.match(html, /gName = PUB \? 'Paper trade' : `\$\{x\.name\} \$\{x\.pair\}`/);
+});
+
+test('guest results: a backtest replay is counted, drawn and named apart from the trades taken forward on paper', () => {
+  const html = desk();
+  const split = new Function(`${cut(html, '  const guestSplit = (L) =>', '\n  function renderGuestCurve()')}\nreturn guestSplit;`)();
+  const S = split([{ R: 2, closed: 10, replay: true }, { R: -1, closed: 20, replay: true }, { R: -1, closed: 30 }, { R: 0.5, closed: 25 }]);
+  assert.deepEqual(S, { rp: { n: 2, R: 1, from: 10 }, fw: { n: 2, R: -0.5, from: 25 } });
+  const fn = cut(html, '  function renderGuestCurve() {', "  ['g-cal-prev', 'g-cal-next']");
+  assert.match(fn, /forward, <b>\$\{split\.rp\.n\}<\/b> replay/); assert.match(fn, /a backtest, not trades that were taken/); assert.match(fn, /g-cv-rp/);
+  assert.match(fn, /Past results do not predict future ones\./);
+  assert.match(fn, /new ResizeObserver\(again\)\.observe\(plot\)/, 'results that arrive before the section has a width are drawn when it gets one');
+  assert.match(fn, /could not be loaded right now/);
+  assert.match(html, /\.g-cv-line\.g-cv-rp \{ stroke-dasharray:/);
+  const cal = cut(html, '  function renderGuestCal() {', '  // Guest results as a picture');
+  assert.match(cal, /come from a replay of its rules on past candles \(a backtest\), not from trades that were taken/);
+  // wording: paper, no promise
+  const guest = cut(html, '<section class="view" id="v-guest"', '</section>\n  <!-- ─── Home');
+  assert.doesNotMatch(guest, /nothing hidden/); assert.match(guest, /Paper trading only: no real money/); assert.doesNotMatch(guest, /<\/i>live<\/small>/);
+  assert.doesNotMatch(guest, /id="g-setup" hidden/, 'the trade card says loading / none / unreachable instead of vanishing');
+  assert.match(html, /No gold trade is open or waiting right now\./);
+  assert.match(html, /const gOpen = \(\) =>/, 'an order waiting for its entry is not counted as open');
+  assert.match(html, /og:description" content="[^"]*paper trades/);
+});
+
+test('sign-in card: the page behind is inert while it is up, closing returns focus, Caps Lock and the error never stack', () => {
+  const html = desk(), css = styles(html);
+  assert.match(html, /function msGateInert\(\) \{ var on = !!document\.documentElement\.dataset\.gate; \['\.skip', '#ms-live'\]\.forEach\(function \(q\) \{ var e = document\.querySelector\('body > ' \+ q\); if \(e\) e\.inert = on; \}\); \}/);
+  const gate = cut(html, 'function msGate(show) {', '\n}\n');
+  assert.match(gate, /msGate\.from = document\.activeElement/); assert.match(gate, /msGateInert\(\);/); assert.match(gate, /b\.focus\(\{ preventScroll: true \}\)/);
+  assert.match(html, /<a class="skip" href="#ms-main-start">[^<]*<\/a>\n<div class="ms-live app" id="ms-live"/, 'the two siblings the card covers');
+  assert.match(css, /\.gate-msg:has\(\.gate-err:not\(:empty\)\) \.gate-caps \{ display: none; \}/);
+  assert.match(html, /Caps Lock is on: turn it off and try again\./);
+});
+
+test('guest page: "Gold trade and results" scrolls there itself (as a hash link the view router sent the page back to the top)', () => {
+  const html = desk();
+  assert.match(html, /<a class="pubonly g-back" href="#g-setup">/);
+  assert.match(html, /const a = ev\.target\.closest && ev\.target\.closest\('a\.g-back'\); if \(!a\) return; const to = document\.getElementById\('g-merged'\); if \(!to\) return; ev\.preventDefault\(\);/);
+  assert.match(html, /to\.scrollIntoView\(\{ block: 'start', behavior: matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches \? 'auto' : 'smooth' \}\)/);
+  // a guest's account menu has no profile entry, and a guest toast gives the target the trade card shows
+  assert.match(styles(html), /html\[data-role="public"\] #ms-me-profile \{ display: none; \}/);
+  assert.match(html, /gT \? `target \$\{fmtT\(x, x\.tp1\)\}`/);
+});

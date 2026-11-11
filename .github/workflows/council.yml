@@ -155,6 +155,11 @@ jobs:
             # loop rebuilds its own files next round), the rest of the round is saved, a JSON file that does not parse is never
             # committed, and nothing is left half-rebased (8 Nov: an abort alone left the clone diverged, every push was rejected)
             node council/datasync.mjs data save "Council run $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Council data not pushed after round $i (next round retries)"
+            # ICT replay trigger (11 Nov): ict-replay.yml has a daily cron, but GitHub fires this repository's schedules late or
+            # not at all, so the desk could say "update pending" for days. After the round is saved, council/replay-due.mjs (read
+            # only) says whether ict/replay.json is over 20 h old with no replay run active or started in the last 6 h; only then
+            # main's ict-replay.yml is dispatched (its own concurrency group: never two at once). Not sure = no. Never fails the round.
+            if timeout 45 node council/replay-due.mjs data; then timeout 30 gh workflow run ict-replay.yml --ref main -R "${{ github.repository }}" || echo "ICT replay not dispatched after round $i (a later round retries)"; fi
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
               for k in 1 2 3 4; do sleep 60
