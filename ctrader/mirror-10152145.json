@@ -7556,6 +7556,34 @@
     ],
     "stopCheckedAt": "2026-11-11T14:16:55.000Z",
     "brokerStop": 0.83162
+   },
+   "sol-scalp-1794406639": {
+    "positionId": "48444072",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T14:21:09.000Z",
+    "councilEntry": 83.98,
+    "stop": 84.71678800000001,
+    "t1": 81.26,
+    "riskCash": 8.77,
+    "margin": 84.02,
+    "minLot": true,
+    "shadow": true,
+    "mark": 83.84,
+    "levelsFrom": "mark",
+    "fillPrice": 83.742,
+    "slipR": 0.323,
+    "lagSec": 189,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T14:21:09.000Z",
+    "brokerStop": 84.619
    }
   },
   "day": {
@@ -7563,7 +7591,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9916.81 · 21 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9916.81 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7592,44 +7620,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "sol-scalp-1794406639": {
-    "orderId": "33933681",
-    "symbol": "SOLUSD",
-    "side": "sell",
-    "volume": 1000,
-    "lots": 0.01,
-    "digits": 3,
-    "setup": "scalp",
-    "limitPrice": 83.98,
-    "stop": 84.71678800000001,
-    "t1": 81.26,
-    "placedAt": "2026-11-11T14:18:19.000Z",
-    "expires": "2026-11-11T17:17:19.000Z",
-    "riskCash": 7.37,
-    "margin": 84.55,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9916.81,
-  "lastRun": "2026-11-11T14:18:19.000Z"
+  "lastRun": "2026-11-11T14:21:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "moved USDCAD 47992968 protection: stop 1.4115647 -> 1.4109947, target 1.43114 -> 1.43057 (council position)",
-   "trade": "usdcad-position-1794304600"
-  },
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "moved USDCAD 47992970 protection: stop 1.4115647 -> 1.4109947, target 1.4216306 -> 1.4210606 (council swing)",
-   "trade": "usdcad-swing-1794304600"
-  },
   {
    "at": "2026-11-10T13:47:04.000Z",
    "msg": "cancelled USDCHF limit order 33869654 for usdchf-scalp-1794317861: the council ended it: missed",
@@ -9119,6 +9116,16 @@
    "at": "2026-11-11T14:18:19.000Z",
    "msg": "placed sell limit SOLUSD 0.01 lot at 83.98 (council scalp, valid to 2026-11-11T17:17Z)",
    "trade": "sol-scalp-1794406639"
+  },
+  {
+   "at": "2026-11-11T14:21:09.000Z",
+   "msg": "cancelled SOLUSD limit order 33933681 for sol-scalp-1794406639: the council filled it on its feed first",
+   "trade": "sol-scalp-1794406639"
+  },
+  {
+   "at": "2026-11-11T14:21:09.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council scalp)",
+   "trade": "sol-scalp-1794406639"
   }
  ],
  "limits": {
@@ -9197,15 +9204,15 @@
   ]
  },
  "execution": {
-  "n": 255,
-  "meanSlipR": -0.006,
+  "n": 256,
+  "meanSlipR": -0.005,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 159,
+  "medianLagSec": 160,
   "bySymbol": {
    "SOLUSD": {
-    "n": 18,
-    "meanSlipR": 0.067
+    "n": 19,
+    "meanSlipR": 0.08
    },
    "BTCUSD": {
     "n": 19,
