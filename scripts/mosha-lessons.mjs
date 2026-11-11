@@ -3,8 +3,12 @@
 //   node --use-env-proxy scripts/mosha-lessons.mjs pull <dir> [--all]
 //        BOOK.md (what the desk knows: the teacher's lines first) + lessons.json + a folder per lesson that waits for the desk
 //        (lesson.txt: the note, the levels, the captions and the whole conversation; the pictures beside it)
-//   node --use-env-proxy scripts/mosha-lessons.mjs reply <lesson id> <file with the answer> [chart.json]
-//        what was understood, in the teacher's words; chart.json = the same reading as marks and steps for the replay chart
+//   node --use-env-proxy scripts/mosha-lessons.mjs reply <lesson id> <file with the answer> [chart.json] [questions.json]
+//        what was understood, in the teacher's words; chart.json = the same reading as marks and steps for the replay chart;
+//        questions.json = up to 6 short questions the teacher answers with one tap: ["…", { "q": "…", "yn": true }]
+//        (yn = "yes" or "no" answers it). Ask few, ask one thing each, and prefer yes / no: he teaches between trades.
+//   node --use-env-proxy scripts/mosha-lessons.mjs ask <lesson id> <questions.json>
+//        the questions alone, put under the desk's last answer (while the teacher has not answered it)
 //   node --use-env-proxy scripts/mosha-lessons.mjs learn <term|step|rule|avoid> <file with one line> [lesson id,…]
 //        a proposed line of the book (it is the desk's reading until the teacher confirms or corrects it)
 // Order of work, every time: read BOOK.md first (a confirmed or corrected line is the teacher's word and overrides anything the
@@ -32,12 +36,16 @@ export function bookText(book) {
   return ['# What the desk knows about Mosha', '', WHO, '', ...part('The teacher\'s word (confirmed, corrected or taught): this overrides everything else', book.filter((b) => b.status !== 'proposed')),
     ...part('The desk\'s own reading, NOT confirmed: do not treat as the teacher\'s', book.filter((b) => b.status === 'proposed'))].join('\n');
 }
+// the questions under one of the desk's answers, each with the teacher's answer: his answer is his word on that point
+const asked = (m) => (m.by === 'assistant' && Array.isArray(m.ask) ? m.ask.map((x, i) => `    Question ${i + 1}${x.yn ? ' (yes / no)' : ''}: ${x.q}\n      -> ${x.a != null ? `THE TEACHER ANSWERED: ${x.a}` : 'not answered'}`) : []);
+// a file given to "reply": a list is the questions, an object is the chart
+const extras = (files) => { const o = {}; for (const f of files.filter(Boolean)) { const j = JSON.parse(read(f)); if (Array.isArray(j)) o.ask = j; else o.chart = j; } return o; };
 export function lessonText(l) {
   const t = l.trade, who = (m) => (m.by === 'assistant' ? 'THE DESK' : (m.name || m.by).toUpperCase());
   return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, LANG[l.lang] || LANG.en, '', l.note || '(no note)', '',
     t ? `Levels: ${t.side} ${t.entry}, stop ${t.stop}${t.target != null ? `, target ${t.target}` : ''}, ${t.market}${t.tf ? ` ${t.tf}` : ''}, entry at ${new Date(t.at * 1000).toISOString()}${t.exit != null ? `, closed ${t.exit}${t.exitAt ? ` at ${new Date(t.exitAt * 1000).toISOString()}` : ''} = ${t.R > 0 ? '+' : ''}${t.R}R` : ''}${t.src === 'replay' ? '  (taken in a ChronosTrade replay: practice on past candles, not a live trade)' : ''}` : 'Levels: not given', '',
     ...(l.shots.length ? l.shots.map((s, i) => `Picture ${i + 1}: ${s.caption || '(no caption)'}`) : ['(a lesson in words: no picture)']), '',
-    'Conversation:', ...(l.thread.length ? l.thread.map((m) => `[${m.at}] ${who(m)}${m.verdict ? ` (the teacher marked this ${m.verdict === 'right' ? 'RIGHT' : 'NOT RIGHT'})` : ''}: ${m.text}`) : ['(nothing yet: the desk has not answered)'])].join('\n');
+    'Conversation:', ...(l.thread.length ? l.thread.flatMap((m) => [`[${m.at}] ${who(m)}${m.verdict ? ` (the teacher marked this ${m.verdict === 'right' ? 'RIGHT' : 'NOT RIGHT'})` : ''}: ${m.text}`, ...asked(m)]) : ['(nothing yet: the desk has not answered)'])].join('\n');
 }
 
 async function call(url, init = {}) {
@@ -67,10 +75,11 @@ async function pull(dir, all) {
 }
 const read = (file) => { const t = fs.readFileSync(file, 'utf8').trim(); if (!t) throw new Error(`${file} is empty`); return t; };
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const [cmd, a, b, c] = process.argv.slice(2);
+  const [cmd, a, b, c, d] = process.argv.slice(2);
   const run = cmd === 'pull' && a ? pull(a, process.argv.includes('--all'))
-    : cmd === 'reply' && a && b ? post({ reply: { id: a, text: read(b), ...(c ? { chart: JSON.parse(read(c)) } : {}) } }).then((j) => console.log(`answer saved under "${j.lesson.title}"${j.lesson.chart ? ' with its chart' : ''}`))
+    : cmd === 'reply' && a && b ? post({ reply: { id: a, text: read(b), ...extras([c, d]) } }).then((j) => { const la = j.lesson.thread.filter((m) => m.by === 'assistant').pop(); console.log(`answer saved under "${j.lesson.title}"${j.lesson.chart ? ' with its chart' : ''}${la && la.ask ? ` and ${la.ask.length} questions` : ''}`); })
+    : cmd === 'ask' && a && b ? post({ reply: { id: a, ask: JSON.parse(read(b)) } }).then((j) => console.log(`questions put under the desk's last answer to "${j.lesson.title}"`))
     : cmd === 'learn' && a && b ? post({ learn: { kind: a, text: read(b), from: c ? c.split(',') : [] } }).then((j) => console.log(`proposed for the book (${j.item.kind}): ${j.item.text}`))
-    : Promise.reject(new Error('use: pull <dir> [--all]  |  reply <lesson id> <file> [chart.json]  |  learn <term|step|rule|avoid> <file> [lesson ids]'));
+    : Promise.reject(new Error('use: pull <dir> [--all]  |  reply <lesson id> <file> [chart.json] [questions.json]  |  ask <lesson id> <questions.json>  |  learn <term|step|rule|avoid> <file> [lesson ids]'));
   run.catch((e) => { console.error(e.message); process.exit(1); });
 }
