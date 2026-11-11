@@ -8597,6 +8597,33 @@
     ],
     "stopCheckedAt": "2026-11-11T19:35:16.000Z",
     "brokerStop": 1.42489
+   },
+   "usdchf-rscalp-1794427475": {
+    "positionId": "48545684",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-11T20:05:45.000Z",
+    "councilEntry": 0.83298,
+    "stop": 0.83344,
+    "t1": 0.83283,
+    "riskCash": 1.97,
+    "margin": 6,
+    "shadow": true,
+    "mark": 0.83298,
+    "levelsFrom": "mark",
+    "fillPrice": 0.833,
+    "slipR": -0.043,
+    "lagSec": 70,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T20:05:45.000Z",
+    "brokerStop": 0.83346
    }
   },
   "day": {
@@ -8604,7 +8631,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9854.67 · 29 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9854.67 · 30 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8659,14 +8686,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9854.67,
-  "lastRun": "2026-11-11T20:03:11.000Z"
+  "lastRun": "2026-11-11T20:05:45.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T18:36:11.000Z",
-   "msg": "AUDUSD limit order 33880506 for audusd-scalp-1794324908 is gone at the broker (expired or cancelled there)",
-   "trade": "audusd-scalp-1794324908"
-  },
   {
    "at": "2026-11-10T18:36:11.000Z",
    "msg": "not mirrored yet audusd-scalp-1794324908: AUDUSD limit order gone at the broker (will retry)",
@@ -10161,6 +10183,11 @@
    "at": "2026-11-11T19:40:29.000Z",
    "msg": "closed USDCHF position 48519656 (council: win)",
    "trade": "usdchf-rscalp-1794420721"
+  },
+  {
+   "at": "2026-11-11T20:05:45.000Z",
+   "msg": "opened sell USDCHF 0.03 lot (council rscalp)",
+   "trade": "usdchf-rscalp-1794427475"
   }
  ],
  "limits": {
@@ -10239,11 +10266,11 @@
   ]
  },
  "execution": {
-  "n": 290,
+  "n": 291,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 152.5,
+  "medianLagSec": 151,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10270,8 +10297,8 @@
     "meanSlipR": -0.059
    },
    "USDCHF": {
-    "n": 40,
-    "meanSlipR": 0.042
+    "n": 41,
+    "meanSlipR": 0.039
    },
    "AUDUSD": {
     "n": 38,
