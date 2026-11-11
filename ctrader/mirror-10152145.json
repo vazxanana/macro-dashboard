@@ -7438,6 +7438,34 @@
     ],
     "stopCheckedAt": "2026-11-11T13:38:16.000Z",
     "brokerStop": 1.33011
+   },
+   "usdcad-rscalp-1794404634": {
+    "symbol": "USDCAD",
+    "side": "sell",
+    "setup": "rscalp",
+    "openedAt": "2026-11-11T13:44:58.000Z",
+    "councilEntry": 1.42332,
+    "stop": 1.42482,
+    "t1": 1.42135,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.42332,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.98,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 1.42334,
+    "slipR": -0.013,
+    "lagSec": 64,
+    "positionId": "48430816",
+    "volume": 100000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-11T13:44:58.000Z",
+    "brokerStop": 1.42482
    }
   },
   "day": {
@@ -7445,7 +7473,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9910.37 · 22 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9910.37 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7481,19 +7509,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9910.37,
-  "lastRun": "2026-11-11T13:42:09.000Z"
+  "lastRun": "2026-11-11T13:44:58.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "limit filled at once: SOLUSD position 48055285 at the broker at 84.121",
-   "trade": "sol-scalp-1794317682"
-  },
-  {
-   "at": "2026-11-10T13:39:09.000Z",
-   "msg": "cancelled USDCAD limit order 33868845 for usdcad-position-1794317499: the council ended it: cancelled",
-   "trade": "usdcad-position-1794317499"
-  },
   {
    "at": "2026-11-10T13:39:09.000Z",
    "msg": "cancelled USDCHF limit order 33869241 for usdchf-scalp-1794317682: the council ended it: cancelled",
@@ -8983,6 +9001,16 @@
    "at": "2026-11-11T13:38:16.000Z",
    "msg": "opened sell GBPUSD 0.06 lot (council scalp)",
    "trade": "gbpusd-scalp-1794404226"
+  },
+  {
+   "at": "2026-11-11T13:44:58.000Z",
+   "msg": "placed sell limit USDCAD 0.01 lot at 1.42332 (council rscalp, valid to 2026-11-11T16:43Z)",
+   "trade": "usdcad-rscalp-1794404634"
+  },
+  {
+   "at": "2026-11-11T13:44:58.000Z",
+   "msg": "limit filled at once: USDCAD position 48430816 at the broker at 1.42334",
+   "trade": "usdcad-rscalp-1794404634"
   }
  ],
  "limits": {
@@ -9061,7 +9089,7 @@
   ]
  },
  "execution": {
-  "n": 251,
+  "n": 252,
   "meanSlipR": -0.007,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -9088,8 +9116,8 @@
     "meanSlipR": 0.022
    },
    "USDCAD": {
-    "n": 34,
-    "meanSlipR": -0.048
+    "n": 35,
+    "meanSlipR": -0.047
    },
    "USDCHF": {
     "n": 29,
