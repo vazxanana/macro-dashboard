@@ -5256,6 +5256,11 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
+      <div class="card adm" id="ms-sys-book">
+        <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): the two that stay live are the nearest, not proven.</p>
+        <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
+      </div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
@@ -5264,7 +5269,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
       </div>
       <div class="card c-nq adm">
-        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · our system (paper)</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · paper shadow since 11 Nov (our system before)</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
           <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
@@ -5274,7 +5279,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
       <div class="card c-rep adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · trades only when gold is volatile</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · paper shadow since 11 Nov · trades only when gold is volatile</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (judged on 2023 onwards): at +1.5R a second unit is added with its stop at the first entry (since 6 Nov; the 5 Nov replay quoted above added at +2R; it shows as a separate “Replica add” trade, counted as 2R of risk); at +2R the stop moves to breakeven; after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
           <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
@@ -5327,13 +5332,13 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
         <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
-        <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
+        <p class="ms-note dc-foot">Each system's record after costs (overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests it is compared with do not carry it) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
       <div class="card c-expect adm" id="ms-expect">
         <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
         <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
         <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs, on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (since 11 Nov 2026 also after overnight financing for Gold trend, Gold trend fast, Gold daily engulf and the H4 trendline, at the demo broker's rate of that day; not computed for the replica, Mosha BO and the momentum pullback), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
       </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
@@ -12896,6 +12901,9 @@ function gpStats(T) {
     gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast && !c.goldTrendFastShadow; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
   var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
   var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;
+  // supported-book (owner, 11 Nov 2026): config.ownerShadow[k] = unix time from which the system's new trades are paper shadows
+  var OWNER_SH = function (c, k) { var o = c && c.ownerShadow; return o && o[k] ? +o[k] || 1 : 0; };
+  var shWhy = function (t) { return 'paper shadow by the owner' + (t > 1 ? ' since ' + new Date(t * 1000).toISOString().slice(0, 10) : '') + ': same rule, recorded, never alerted; its earlier live trades stay in its record'; };
   var num = function (v) { return typeof v === 'number' && isFinite(v); };
   var closedSt = function (s) { return s === 'win' || s === 'loss' || s === 'be'; };
   var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
@@ -13033,6 +13041,7 @@ function gpStats(T) {
     var RP = D.replay && Array.isArray(D.replay.trades) ? D.replay.trades.filter(function (x) { return x.k !== 'nq-open' || x.session === 'nyflip'; }) : [];
     RP.forEach(function (x) { if (x && x.k && !names[x.k]) names[x.k] = x.name || x.k; });
     var status = function (k) {
+      if ((SYS_K.indexOf(k) >= 0 || k === 'nq-open') && OWNER_SH(cfg, k)) return ['shadow', shWhy(OWNER_SH(cfg, k))];
       if (SYS_K.indexOf(k) >= 0) return SYS_ON[k] && !SYS_ON[k](cfg) ? ['failed', 'switched off in the council config'] : ['live', 'main system, trades live on paper'];
       if (k === 'nq-open') return ['live', 'main system (NQ New York open run), forward paper'];
       var f = F[k] || {};
@@ -13046,6 +13055,7 @@ function gpStats(T) {
       var P = props.filter(function (p) { return p.setup === k && ASK.test(p.kind); });
       if (P.length) return { n: P.length, text: P.map(function (p) { return cap(p.label || p.kind); }).join(' · '), href: '#council/systems' };
       if (st === 'failed') return { text: 'Nothing · switched off' };
+      if (st === 'shadow' && (SYS_K.indexOf(k) >= 0 || k === 'nq-open')) return { text: 'Nothing · you moved it to shadow; its forward record decides' };
       if (st === 'live') return { text: SYS_K.indexOf(k) >= 0 || k === 'nq-open' ? 'Nothing pending' : 'Nothing pending · the guard moves it back at −0.30R a trade over 20+' };
       return { text: 'Nothing yet · the Coach proposes a live slot at 100+ replay trades, +0.10R a trade, both halves up', shadow: 1 };
     };
@@ -13577,6 +13587,8 @@ function gpStats(T) {
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'Edge-decay monitor: ' + D.error : 'No edge-decay reading yet: the Coach writes one every 6 hours.'; body.innerHTML = ''; return; }
     var S = D.systems, T = tally(S), dec = T.decaying, wat = T.watch;
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
+    // a shadow system says since when (shadowSince, council/decay.mjs): its earlier live trades are still in its record
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     // the sentence counts what the rows say: a system with too few trades to judge is not "healthy", and a shadow system
     // the monitor calls decaying or on watch is named too (11 Nov: "8 healthy" stood over a "Too few" row and a "Decaying" one)
     sum.innerHTML = '<b>' + T.live.length + '</b> live systems: <b class="' + (dec.length ? 'neg' : '') + '">' + dec.length + ' decaying</b>' + names(dec) + ', ' + wat.length + ' on watch' + names(wat)
@@ -13587,7 +13599,7 @@ function gpStats(T) {
     body.innerHTML = S.slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ((ORDER[a.status] || 0) - (ORDER[b.status] || 0)); }).map(function (s) {
       var st = s.few ? 'few' : s.status, r = s.roll || {}, c = s.cusRef || {}, z = s.cusZero || {}, d = s.dd || {};
       var rec = (s.nLive || 0) + ' forward' + (s.nReplay ? ' + ' + s.nReplay + ' replay' : '') + (s.nHist ? ' + ' + s.nHist + ' rebuild' : '');
-      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
+      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
         + '<td class="dc-l"><span class="dc-st st-' + esc(st) + '">' + (s.few ? 'Too few' : LBL[s.status] || esc(s.status)) + '</span></td>'
         + '<td>' + (r.n ? cR(r.exp) + ' <small class="dc-n">(' + r.n + ')</small>' : '<small class="dc-n">—</small>') + '</td>'
         + '<td>' + meter(c.s, c.h) + '</td><td>' + esc(num(z.s) ? z.s : '—') + '</td>'
@@ -13636,12 +13648,13 @@ function gpStats(T) {
     sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
       + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.';
     var at = $('ms-expect-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     var ORD = function (s) { return !s.live ? 3 : s.forward && s.forward.out === 'below' ? 0 : s.forward && s.forward.out === 'above' ? 1 : 2; };
     body.innerHTML = S.slice().sort(function (a, b) { return ORD(a) - ORD(b); }).map(function (s) {
       var h = s.honest || {}, pt = s.perTrade || {}, py = s.perYear || {}, d = s.dd || {}, sh = s.live ? '' : ' ex-shadow';
-      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
+      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
         + '<td class="ex-l ex-val" data-l="Forward so far">' + fwdCell(s) + '</td>'
-        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small></td>'
+        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small>' + (s.fin && s.fin.before && num(s.fin.before.exp) ? '<small>after financing; ' + fR(s.fin.before.exp) + ' before</small>' : '') + '</td>'
         + '<td class="ex-val" data-l="In a year"><b class="' + cls(py.exp) + '">' + fR(py.exp, 1) + '</b><small>' + esc(fBand(py.lo, py.hi)) + '</small></td>'
         + '<td class="ex-val" data-l="Drawdown"><b class="neg">' + esc(fDD(d.lo, d.hi)) + '</b><small>worst seen −' + esc(num(d.worst) ? (d.worst < 10 ? d.worst.toFixed(1) : d.worst.toFixed(0)) : '—') + 'R</small></td>'
         + '<td class="ex-val" data-l="Trades a year"><b>' + (num(py.trades) ? Math.round(py.trades) : '—') + '</b><small>backtest ' + fR(s.backtest && s.backtest.exp) + ' a trade</small></td>'
@@ -14006,7 +14019,7 @@ function gpStats(T) {
         + '<span class="wk-val">' + fR(r.net) + (r.ck ? '' : '<small>gross</small>') + '</span></button>' + x + '</li>';
     }).join('');
     $('ms-wk-tot').innerHTML = GL[st.g] + ' total after costs <b class="' + (bk.net > 0.004 ? 'pos' : bk.net < -0.004 ? 'neg' : '') + '">' + fR(bk.net) + '</b> over ' + plural(bk.n, 'trade') + ' (' + bk.w + ' won, ' + bk.l + ' lost; gross ' + fR(bk.R) + ').';
-    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
+    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade, and overnight financing on gold buys closed since 11 Nov 2026' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
   }
 
   // ─── best and worst ───

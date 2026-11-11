@@ -25,6 +25,39 @@ export const FEE = { maker: 0.0025, taker: 0.004 };   // Kraken Pro entry tier: 
 export const CFD_CRYPTO = 0.0004;                     // CFD round trip on crypto as a fraction of price (research/edge/costs "raw" column)
 export const costOf = (M, price, limitEntry) => spreadOf(M, price) + (M.group === 'Crypto' ? price * (CFD_CRYPTO - 0.0002) : 0);
 
+// Overnight financing (11 Nov 2026, owner approved the edge review's decision 2; research/edge/trend-breadth Part A). A long gold
+// position on the demo broker pays financing at every rollover it is held through: the broker's own XAUUSD symbol record
+// (council-data ctrader/symbols.json, read 11 Nov 2026: swap.long -5.903 pips of 0.1 an ounce near 3,987, three on Wednesday),
+// confirmed by the demo account's own deals (-$0.59 for one ounce held one night near $4,100) = 0.0148 % of the price a night,
+// about 5.3 % a year. Method as the study's: rollovers are Monday-Friday 22:00 UTC (17:00 New York to the hour), a Wednesday
+// counts three; financing in R = nights x rate x entry price / the trade's initial risk, per unit. Longs only: the broker
+// credits a short (+2.785 pips), the paper model credits nothing. Gold only: no other market's rate has been measured here, so
+// none is charged (the NQ open run is out before the rollover). Today's rate, not a history of it: update FIN when the broker's
+// record changes. It is part of costR from the first trade closed after this code runs; a costR already stamped is never redone.
+export const FIN = { xau: { long: 0.000148, short: 0, src: 'cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A', asOf: '2026-11-11' } };
+export const FIN_DAY = 86400;
+// rollovers strictly after t and before c (unix seconds): Monday-Friday 22:00 UTC, Wednesday counts three
+export function nights(t, c) {
+  let n = 0;
+  if (!Number.isFinite(t) || !Number.isFinite(c)) return 0;
+  for (let d = Math.floor(t / FIN_DAY) * FIN_DAY + 22 * 3600; d < c; d += FIN_DAY) {
+    if (d <= t) continue;
+    const w = new Date(d * 1000).getUTCDay();
+    if (w >= 1 && w <= 5) n += w === 3 ? 3 : 1;
+  }
+  return n;
+}
+// financing of one closed trade, in R of its initial risk per unit: { finR, nights } (0 when the market or side pays none)
+export function financing(t, fin = FIN) {
+  const f = fin[t.market], rate = f ? (t.side === 'sell' ? f.short : f.long) : 0, px = +t.entry, r0 = +t.r0 || Math.abs(t.entry - t.stop);
+  const from = t.filled != null ? t.filled : t.opened, nn = rate > 0 && Number.isFinite(from) && Number.isFinite(t.closed) ? nights(from, t.closed) : 0;
+  return { finR: nn > 0 && px > 0 && r0 > 0 ? nn * rate * px / r0 : 0, nights: nn };
+}
+// The stream a system is judged on once the owner has made it a paper shadow (blockedBy exactly ['owner-shadow']; the momentum
+// pullback's 6 Nov ['test']): its live trades from before plus the shadow trades the unchanged rule takes after. A trade another
+// rule blocked (weekly, cap, momentum, ...) is not part of it.
+export const ownStream = (x) => !!x && (!x.shadow || (Array.isArray(x.blockedBy) && x.blockedBy.length === 1 && (x.blockedBy[0] === 'owner-shadow' || x.blockedBy[0] === 'test')));
+
 export const SLIP_SPREADS = 0.5;   // conservative default: half a spread of slippage on every market order until real fills exist
 export const MIN_FILLS = 5;        // demo fills a market needs before the mirror's slippage replaces the default
 export const STALE_R = 0.25;       // stale-signal guard: price more than this many R from the signal's price when we fill
@@ -63,21 +96,23 @@ export function tradeCost(t, M, mm = {}) {
   let cost = costOf(M, px, lim) - spreadOf(M, px) + sp;
   if (!lim) cost += mm && mm.entrySlip != null ? Math.max(0, mm.entrySlip) - sp / 2 : slip;   // a demo fill already includes the half spread
   if (!targetExit(t)) cost += slip;
-  return { costR: cost / r0, src: (mm && mm.src) || 'default' };
+  const fin = financing(t);   // overnight financing (gold longs), 0 for a trade closed before its first rollover
+  return { costR: cost / r0 + fin.finR, src: (mm && mm.src) || 'default', finR: fin.finR, nights: fin.nights };
 }
 
 // Stamp costR (once, at the close) and Rnet (every run, so it follows R) on every closed trade; a trade reopened (bad print) loses both
 export function annotateCosts(trades, markets, model = {}) {
   for (const t of trades) {
-    if (!DONE.has(t.status) || !Number.isFinite(t.R)) { delete t.Rnet; delete t.costR; delete t.costSrc; continue; }
-    if (t.costR == null) { const c = tradeCost(t, markets[t.market], model[t.market]); if (!c) continue; t.costR = +c.costR.toFixed(3); t.costSrc = c.src; }
+    if (!DONE.has(t.status) || !Number.isFinite(t.R)) { delete t.Rnet; delete t.costR; delete t.costSrc; delete t.finR; delete t.nights; continue; }
+    if (t.costR == null) { const c = tradeCost(t, markets[t.market], model[t.market]); if (!c) continue; t.costR = +c.costR.toFixed(3); t.costSrc = c.src; if (c.nights > 0) { t.finR = +c.finR.toFixed(3); t.nights = c.nights; } }
     const scale = t.rawR != null && t.size ? t.size : 1;   // R is already x size once rawR is set
     t.Rnet = +(t.R - t.costR * scale).toFixed(2);
   }
   return trades;
 }
 
-const sumUp = (a) => ({ n: a.length, R: +a.reduce((s, t) => s + t.R, 0).toFixed(2), Rnet: +a.reduce((s, t) => s + (Number.isFinite(t.Rnet) ? t.Rnet : t.R), 0).toFixed(2) });
+const sumUp = (a) => ({ n: a.length, R: +a.reduce((s, t) => s + t.R, 0).toFixed(2), Rnet: +a.reduce((s, t) => s + (Number.isFinite(t.Rnet) ? t.Rnet : t.R), 0).toFixed(2),
+  fin: +a.reduce((s, t) => s + (Number.isFinite(t.finR) ? t.finR * (t.rawR != null && t.size ? t.size : 1) : 0), 0).toFixed(2) });   // fin: the financing part of the cost, in R (already inside Rnet)
 // gross vs net by book (live / shadow) and market group
 export function costSummary(trades, markets) {
   const out = {};

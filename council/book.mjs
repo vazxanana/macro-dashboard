@@ -33,6 +33,9 @@ export const BK = {
 // family under the cap. Gold trend N20 + N5 are one idea (monthly correlation 0.95, RESULT.md). The gold replica trades gold
 // too but the study measured its gold correlation at 0.07 and keeps it outside the family. Crypto trend is shadow (7 Nov):
 // not a live idea. Keep in step with council/decay.mjs SYSTEMS and the page's SYS_K.
+// 11 Nov 2026 (owner, supported-book): only Gold trend, Gold daily engulf and the ICT A-setups take live trades from that day; the
+// other ideas keep their rows from the trades they took live before it and stop growing (their new trades are shadows, which this
+// comparison never reads). The list stays the proposal's own set of ideas: it is a paper comparison the owner has not decided on.
 export const IDEAS = [
   { id: 'replica', name: 'Gold replica', desk: 'Meridian', ks: ['replica'] },
   { id: 'mosha-bo', name: 'Mosha BO', desk: 'Meridian', ks: ['mosha-bo'], gold: true },

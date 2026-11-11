@@ -82,7 +82,7 @@ export function lineOf(s) {
   const h = s.honest, y = s.perYear, d = s.dd;
   const fw = s.forward ? (s.forward.judged ? `Forward so far ${fR(s.forward.exp)} a trade over ${s.forward.n}: ${s.forward.out === 'above' ? 'above' : s.forward.out === 'below' ? 'below' : 'inside'} the band ${fBand(s.forward.lo, s.forward.hi, 2)}.`
     : `Forward so far ${fR(s.forward.exp)} a trade over ${s.forward.n}: too few to place.`) : 'No forward trade yet.';
-  return `Expect ${fR(h.exp)} a trade (${fBand(s.perTrade.lo, s.perTrade.hi, 2)}) over about ${Math.round(y.trades)} trades a year, so ${fBand(y.lo, y.hi)} in a year; plan for a drawdown of ${fDD(d.lo, d.hi)}. ${fw} Verdict: ${s.verdict.text}.`;
+  return `Expect ${fR(h.exp)} a trade${s.fin ? ' after financing' : ''} (${fBand(s.perTrade.lo, s.perTrade.hi, 2)}) over about ${Math.round(y.trades)} trades a year, so ${fBand(y.lo, y.hi)} in a year; plan for a drawdown of ${fDD(d.lo, d.hi)}. ${fw} Verdict: ${s.verdict.text}.`;
 }
 // b: the base entry; dsys: this system's decay reading (for the forward record); now for the stamp
 export function expectOne(b, dsys) {
@@ -91,7 +91,10 @@ export function expectOne(b, dsys) {
   const ddLo = Math.min(b.dd.mc95, b.dd.worst), ddHi = Math.max(b.dd.mc95, b.dd.worst);
   const v = { honest: nVerdict(h.exp, h.sd, N), backtest: nVerdict(bt.exp, bt.sd, bt.perYear) };
   const fwd = dsys && dsys.fwd ? forwardCheck(dsys.fwd, h) : null;
-  const o = { id: b.id, name: (dsys && dsys.name) || b.name, desk: (dsys && dsys.desk) || b.desk, live: dsys ? !!dsys.live : !!b.live,
+  const since = (dsys && dsys.shadowSince) || b.shadowSince || null;
+  const o = { id: b.id, name: (dsys && dsys.name) || b.name, desk: (dsys && dsys.desk) || b.desk, live: dsys ? !!dsys.live : !!b.live, ...(since ? { shadowSince: since } : {}),
+    // overnight financing (11 Nov 2026): what it takes per position in the honest window and the figure before it; null = not in this system's figures
+    fin: b.fin || null,
     honest: { src: h.src, window: h.window, n: h.n, exp: r3(h.exp), sd: r3(h.sd), t: r2(h.t), perYear: r2(N), maxDD: r2(h.maxDD), study: b.study },
     backtest: { src: bt.src, window: bt.window, n: bt.n, exp: r3(bt.exp), sd: r3(bt.sd), perYear: r2(bt.perYear), maxDD: r2(bt.maxDD), mcDD: r2(bt.mcDD) },
     perTrade: { exp: r3(h.exp), lo: r3(pt.lo), hi: r3(pt.hi) },
