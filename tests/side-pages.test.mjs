@@ -169,3 +169,50 @@ test('gold terminal Edge Lab tab: rule ideas, no unsourced figures, study figure
   assert.equal((tab.match(/class="edge-card"/g) || []).length, 6);
   assert.ok(!/<script[^>]+src="(?!https:\/\/(cdn\.jsdelivr\.net|unpkg\.com))[^"]*"/.test(tab));
 });
+
+// 11 Nov 2026, simpler phone version (owner: "on the mobile there's too much"): the gold terminal's simple view is the default at
+// 640 px and under, hangs on one attribute a wider screen never gets, keeps every tab and block reachable, and Full view undoes it.
+test('gold terminal, phone simple view: default on phones only, every tab reachable, blocks fold and unfold, locked charts kept', () => {
+  const h = src('gold-trading.html');
+  // set before the first paint from the Desk's key; only at 640 px and under
+  assert.match(h, /matchMedia\('\(max-width: 640px\)'\)/); assert.match(h, /localStorage\.getItem\('ms-phone'\) === 'full'/);
+  assert.match(h, /if \(mq && mq\.matches && !full\) R\.setAttribute\('data-phone', 'simple'\); else R\.removeAttribute\('data-phone'\);/);
+  assert.ok(h.indexOf("R.setAttribute('data-phone', 'simple')") < h.indexOf('<body'), 'decided in the head');
+  // the new phone-only elements are hidden unless the simple view shows them; every simple-view rule hangs on the attribute
+  assert.match(h, /\.gx-po, \.gx-bar, \.gx-pv \{ display: none; \}/);
+  const css = h.slice(h.indexOf('/* ── PHONE, SIMPLE VIEW (11 Nov 2026, owner'), h.indexOf('</head>'));
+  const sels = css.replace(/\/\*[\s\S]*?\*\//g, '').split('</style>')[0].matchAll(/([^{}]+)\{/g); let seen = 0;
+  for (const m of sels) { const sel = m[1].trim(); if (/^@|^(from|to)$/.test(sel)) continue;
+    for (const part of sel.split(',')) { seen++; assert.ok(/\[data-phone="simple"\]/.test(part) || /\.gx-(po|bar|pv|seg|more)/.test(part), 'a rule reaches past the simple view: ' + part.trim()); } }
+  assert.ok(seen > 60);
+  // four tabs in the bar, the rest under More: every tab of the page has a button
+  const bar = /<nav class="gx-bar"[\s\S]*?<\/nav>/.exec(h)[0], more = /<dialog class="gx-more"[\s\S]*?<\/dialog>/.exec(h)[0];
+  assert.deepEqual([...bar.matchAll(/data-tab="(\w+)"/g)].map((m) => m[1]), ['dashboard', 'bias', 'mtf', 'redfolder']); assert.match(bar, /data-more/);
+  const nav = /const NAV_SECTIONS = \{[\s\S]*?\n  \};/.exec(h)[0], ids = [...nav.matchAll(/id: '(\w+)'/g)].map((m) => m[1]);
+  assert.equal(ids.length, 12); for (const id of ids) assert.ok((bar + more).includes(`data-tab="${id}"`), id + ' has a button on the phone');
+  assert.match(h, /if \(window\.gxPhoneTab\) window\.gxPhoneTab\(name\);/);
+  // the switch: the Desk's words, in the page and in the sheet; Full takes every fold out again
+  assert.equal((h.match(/data-v="simple" aria-pressed="true">Simple<\/button><button type="button" data-v="full" aria-pressed="false">Full<\/button>/g) || []).length, 2);
+  assert.match(h, /function undo\(\) \{\n\s+document\.querySelectorAll\('details\.gx-pf'\)\.forEach\(\(d\) => \{ const el = d\.querySelector\(':scope > \.gx-fold-b > \[data-pf\]'\); if \(el\) d\.parentNode\.insertBefore\(el, d\); d\.remove\(\); \}\);/);
+  assert.match(h, /function sync\(\) \{ if \(simple\(\)\) apply\(\); else undo\(\); marks\(\); \}/);
+  // folds use the page's one pattern and its one store
+  assert.match(h, /d\.className = 'gx-fold gx-pf';/); assert.match(h, /window\.gxFoldBind = \(d\) =>/); assert.match(h, /if \(window\.gxFoldBind\) window\.gxFoldBind\(d\);/);
+  assert.equal((h.match(/localStorage\.setItem\('gxFolds'/g) || []).length, 1, 'one writer of the fold store');
+  // what folds: every block of the long tabs except each tab's answer; the Edge Lab note is never folded
+  const tab = (id) => { const a = h.indexOf(`<div id="tab-${id}"`); return h.slice(a, h.indexOf('<div id="tab-', a + 10) > 0 ? h.indexOf('<div id="tab-', a + 10) : h.indexOf('<div class="gx-pv"')); };
+  const n = (id) => (tab(id).match(/ data-pf="/g) || []).length;
+  assert.deepEqual(['bias', 'analysis', 'calendar', 'redfolder', 'mtf', 'sessions', 'edges', 'intel', 'scorecard'].map(n), [7, 5, 1, 2, 1, 4, 8, 4, 2]);
+  assert.match(h, /<div class="section">\s*<div class="edge-rule note" id="edge-lab-note"/, 'the Edge Lab note stays open, in a block that is not folded');
+  assert.ok(!/id="bias-banner"[^>]*data-pf|data-pf[^>]*id="bias-banner"/.test(h), 'the Daily Bias verdict stays open');
+  assert.equal((tab('edges').match(/data-pf-q="\.edge-stat-pill"/g) || []).length, 6, "an idea's folded line is its own status pills, word for word");
+  // dashboard: the daily bias in one line, the macro score line next; the bias strip is moved, not copied
+  assert.match(h, /<details class="gx-fold gx-po" data-fold="pbias">\s*<summary><span class="gx-fold-t">Daily bias<\/span><span class="gx-fold-s" id="gxFoldBias">/);
+  assert.match(h, /data-pv-slot="#dash-bias-strip"/); assert.equal((h.match(/id="dash-bias-strip"/g) || []).length, 1);
+  assert.match(h, /data-pt="Macro score and trade setup">Trade setup, macro score and edge signals</);
+  // Multi-TF: one timeframe at a time, each chart with its structure readout; the locked display preference is untouched
+  const mtf = tab('mtf'); assert.match(mtf, /class="tab-panel" data-ptf="d"/);
+  for (const [k, id] of [['d', 'mtfDaily'], ['h4', 'mtfH4'], ['m15', 'mtfM15']]) { const a = mtf.indexOf(`data-ptf-w="${k}"`), w = mtf.slice(a, a + 1400); assert.ok(a > 0 && w.includes(`id="${id}"`) && w.includes(`id="${id}Struct"`), k + ' chart and its readout');
+    assert.ok(mtf.includes(`data-tf="${k}"`)); assert.match(h, new RegExp(`#tab-mtf\\[data-ptf="${k}"\\] \\[data-ptf-w\\]:not\\(\\[data-ptf-w="${k}"\\]\\)`)); }
+  assert.match(h, /html\[data-phone="simple"\] \.mtf-grid \{ grid-template-columns: minmax\(0, 1fr\); \}/, 'a chart made while hidden cannot stretch its column');
+  assert.match(h, /hideTags/); assert.match(h, /hideBosLabel/); assert.match(h, /function structureMap\(/); assert.match(h, /function makeStructPrimitive\(/); assert.match(h, /function renderStructReadout\(/);
+});
