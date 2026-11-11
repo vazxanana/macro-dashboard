@@ -255,3 +255,175 @@ test('caching headers: the worker and manifest revalidate, only ?v= assets are i
   assert.ok(b.indexOf('scripts/pwa.mjs') > 0 && b.indexOf('scripts/pwa.mjs') < b.indexOf('scripts/stamp-assets.mjs'));
   assert.match(b, /\boffline\.html\b/); assert.match(b, /\bicons\b/);
 });
+
+// ---- 11 Nov 2026: what the browser audit (scripts/audit/pwa.cjs) showed, pinned offline ----
+
+const pushData = (raw) => ({ json: () => JSON.parse(raw), text: () => raw });
+async function push(w, raw) {
+  const shown = [];
+  w.ctx.self.registration.showNotification = async (title, o) => { shown.push({ title, ...o }); };
+  await new Promise((done) => w.on.push({ data: raw === undefined ? null : pushData(raw), waitUntil: (p) => Promise.resolve(p).then(done) }));
+  return shown[0];
+}
+
+test('push: the alert as sent; plain text, null, a bare string, a list or wrong types still give a notification', async () => {
+  const w = loadSw();
+  const a = await push(w, JSON.stringify({ title: 'XAU rose to 4,100', body: 'Now 4,100.2', url: '/?s=xau#charts', tag: 'pa-1' }));
+  assert.deepEqual([a.title, a.body, a.tag, a.data.url, a.icon, a.badge], ['XAU rose to 4,100', 'Now 4,100.2', 'pa-1', '/?s=xau#charts', '/icons/icon-192.png', '/icons/badge-96.png']);
+  const t = await push(w, 'not json at all');
+  assert.deepEqual([t.title, t.body, t.tag, t.data.url], ['Price alert', 'not json at all', 'price-alert', '/#charts']);
+  for (const raw of [undefined, 'null', '[1,2]', '7', 'true', '{}']) {
+    const n = await push(w, raw);
+    assert.deepEqual([n.title, n.body, n.tag, n.data.url], ['Price alert', '', 'price-alert', '/#charts'], String(raw));
+  }
+  assert.equal((await push(w, '"gold moved"')).body, 'gold moved');
+  const odd = await push(w, JSON.stringify({ title: 7, body: { a: 1 }, tag: ['x'], url: 9 }));
+  assert.deepEqual([odd.title, odd.body, odd.tag, odd.data.url], ['7', '', 'price-alert', '/#charts']);
+  assert.equal((await push(w, JSON.stringify({ title: 'x'.repeat(500), body: 'y'.repeat(2000) }))).title.length, 120);
+});
+
+test('push: a notification link never leaves this site', async () => {
+  const w = loadSw();
+  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://meridianx.dev/', '', null]) {
+    assert.equal((await push(w, JSON.stringify({ url }))).data.url, '/#charts', String(url));
+  }
+  assert.equal((await push(w, JSON.stringify({ url: 'https://meridianx.dev/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
+  assert.equal((await push(w, JSON.stringify({ url: 'gold' }))).data.url, '/gold');
+});
+
+async function click(w, url, windows, openWindow) {
+  const log = [];
+  const cl = windows.map((u, i) => ({ url: new URL(u, ORIGIN).href, navigate: async (to) => { log.push(`navigate ${i} ${to.replace(ORIGIN, '')}`); }, focus: async () => { log.push(`focus ${i}`); } }));
+  w.ctx.self.clients.matchAll = async () => cl;
+  w.ctx.self.clients.openWindow = openWindow || (async (to) => { log.push(`open ${to.replace(ORIGIN, '')}`); return {}; });
+  await new Promise((done) => w.on.notificationclick({ notification: { close: () => log.push('close'), data: url === undefined ? undefined : { url } }, waitUntil: (p) => Promise.resolve(p).then(done) }));
+  return log;
+}
+
+test('notification tap: a Desk window is brought forward and taken to the chart; a window on another page is left alone', async () => {
+  const w = loadSw();
+  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest', '/market-structure.html#council']), ['close', 'navigate 1 /?s=xau#charts', 'focus 1']);
+  assert.deepEqual(await click(w, '/?s=xau#charts', ['/?s=xau#charts']), ['close', 'focus 0'], 'already there: no navigation');
+  // a replay in ChronosTrade, the Academy or the macro desk is never navigated away while the browser can open a window
+  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest', '/academy', '/macro-desk']), ['close', 'open /?s=xau#charts']);
+  assert.deepEqual(await click(w, '/?s=xau#charts', []), ['close', 'open /?s=xau#charts']);
+  assert.deepEqual(await click(w, '/backtest#x', ['/', '/backtest']), ['close', 'navigate 1 /backtest#x', 'focus 1']);
+  // the browser refuses a new window (or answers nothing): an open one is used rather than doing nothing
+  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest'], async () => { throw new Error('not allowed'); }), ['close', 'navigate 0 /?s=xau#charts', 'focus 0']);
+  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest'], async () => null), ['close', 'navigate 0 /?s=xau#charts', 'focus 0']);
+  // no link, or a link to another site stored by an older worker: the Desk
+  assert.deepEqual(await click(w, undefined, []), ['close', 'open /']);
+  assert.deepEqual(await click(w, 'https://evil.example/', []), ['close', 'open /']);
+  // a window of another origin is never touched
+  assert.deepEqual(await click(w, '/', ['https://other.example/']), ['close', 'open /']);
+});
+
+test('after ?sw-reset with another window open: the worker in charge sets its caches up again and takes the page', async () => {
+  const w = loadSw(buildWorker(SRC, 'abc123', false), async () => ok('<h1>offline page</h1>'));
+  let claimed = 0; w.ctx.self.clients.claim = async () => { claimed++; };
+  const msg = async (data, state) => { w.ctx.self.serviceWorker = state ? { state } : undefined; const waits = []; w.on.message({ data, waitUntil: (p) => waits.push(p) }); await Promise.all(waits); };
+  await msg('mx-prime', 'activated');
+  assert.deepEqual([...w.store.keys()].sort(), ['mx-assets-abc123', 'mx-shell-abc123']);
+  assert.deepEqual(allKeys(w), [ORIGIN + '/offline.html']);
+  assert.equal(claimed, 1);
+  // a worker that is not (or no longer) the one in charge does nothing; neither does anything else a page may post
+  const old = loadSw(buildWorker(SRC, 'old', false));
+  await msg('anything else', 'activated'); assert.equal(claimed, 1);
+  for (const st of ['redundant', 'installing', 'installed', 'activating']) { old.ctx.self.serviceWorker = { state: st }; const waits = []; old.on.message({ data: 'mx-prime', waitUntil: (p) => waits.push(p) }); await Promise.all(waits); }
+  assert.deepEqual([...old.store.keys()], []);
+  const killed = loadSw(buildWorker(SRC, 'abc123', true));
+  killed.ctx.self.serviceWorker = { state: 'activated' };
+  { const waits = []; killed.on.message({ data: 'mx-prime', waitUntil: (p) => waits.push(p) }); await Promise.all(waits); }
+  assert.deepEqual([...killed.store.keys()], [], 'the kill switch keeps the caches away');
+});
+
+// assets/pwa.js in a fake page: what the test can turn is the clock, the visibility, the open dialogs, the focus and the text boxes
+function loadPage({ search = '', controller = {}, session = {} } = {}) {
+  const on = { doc: {}, sw: {}, win: {} }, s = { now: 1e12, vis: 'visible', modal: false, anyDialog: false, noModalSelector: false, active: null, areas: [], reloads: 0, replaced: null, registered: 0, updates: 0, posted: [], unregistered: 0, cachesDeleted: [], session };
+  const reg = { active: { postMessage: (m) => s.posted.push(m) }, update: async () => { s.updates++; }, unregister: async () => { s.unregistered++; } };
+  const sw = { controller, addEventListener: (t, f) => { on.sw[t] = f; }, register: async () => { s.registered++; return reg; }, getRegistrations: async () => [reg], ready: Promise.resolve(reg) };
+  const document = { readyState: 'complete', get visibilityState() { return s.vis; }, get activeElement() { return s.active; }, addEventListener: (t, f) => { on.doc[t] = f; },
+    querySelector: (q) => { if (q === 'dialog:modal') { if (s.noModalSelector) throw new SyntaxError('unknown selector'); return s.modal ? {} : null; } if (q === 'dialog[open]') return s.anyDialog || s.modal ? {} : null; throw new Error('unexpected selector ' + q); },
+    querySelectorAll: (q) => { assert.equal(q, 'textarea'); return s.areas; } };
+  const caches = { keys: async () => ['mx-shell-x', 'other'], delete: async (k) => { s.cachesDeleted.push(k); } };
+  const location = { search, href: ORIGIN + '/edge-lab.html' + search + '#top', reload: () => { s.reloads++; }, replace: (u) => { s.replaced = u; } };
+  const sessionStorage = { getItem: (k) => k in s.session ? s.session[k] : null, setItem: (k, v) => { s.session[k] = String(v); }, removeItem: (k) => { delete s.session[k]; } };
+  const window = { isSecureContext: true, caches };
+  vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'assets/pwa.js'), 'utf8'), { navigator: { serviceWorker: sw }, window, document, location, caches, sessionStorage, URL, Promise, Date: { now: () => s.now }, setInterval: () => 0, addEventListener: (t, f) => { on.win[t] = f; } });
+  const away = (min) => { s.vis = 'hidden'; on.doc.visibilitychange(); s.now += min * 60e3; s.vis = 'visible'; on.doc.visibilitychange(); return s.reloads; };
+  return { s, on, away };
+}
+const tick = () => new Promise((r) => setTimeout(r, 5));
+
+test('an open page reloads into a new deploy only at a quiet moment', async () => {
+  const p = loadPage(); await tick();
+  assert.equal(p.s.registered, 1);
+  assert.equal(p.away(60), 0, 'no update: never reloads');
+  p.on.sw.controllerchange();
+  assert.equal(p.away(5), 0, 'under 10 minutes away');
+  p.s.modal = true; assert.equal(p.away(11), 0, 'a dialog that blocks the page is open'); p.s.modal = false;
+  p.s.active = { tagName: 'TEXTAREA' }; assert.equal(p.away(11), 0, 'the cursor is in a text box');
+  p.s.active = { tagName: 'INPUT', type: 'text' }; assert.equal(p.away(11), 0, 'the cursor is in a field');
+  p.s.active = { tagName: 'DIV', isContentEditable: true }; assert.equal(p.away(11), 0);
+  p.s.active = { tagName: 'BODY' };
+  p.s.areas = [{ value: 'half a note', defaultValue: '', getClientRects: () => [1] }]; assert.equal(p.away(11), 0, 'text typed and not sent');
+  p.s.areas = [{ value: 'half a note', defaultValue: '', getClientRects: () => [] }, { value: 'same', defaultValue: 'same', getClientRects: () => [1] }, { value: '', defaultValue: 'x', getClientRects: () => [1] }];
+  // ChronosTrade's first-steps card is a dialog that blocks nothing and stays up until dismissed: it does not hold the update back
+  p.s.anyDialog = true; p.s.active = { tagName: 'BUTTON' };
+  assert.equal(p.away(11), 1, 'quiet: a hidden box, an unchanged one, a button in focus, a non-modal card');
+  // a browser without :modal falls back to any open dialog
+  const q = loadPage(); await tick(); q.on.sw.controllerchange(); q.s.noModalSelector = true; q.s.anyDialog = true;
+  assert.equal(q.away(11), 0); q.s.anyDialog = false; assert.equal(q.away(11), 1);
+  // a first visit (no worker before): the worker taking the page is not an update
+  const f = loadPage({ controller: null }); await tick(); f.on.sw.controllerchange(); assert.equal(f.away(11), 0);
+  f.on.sw.controllerchange(); assert.equal(f.away(11), 1, 'the next one is');
+});
+
+test('?sw-reset: unregisters, deletes every cache, drops the flag from the address; the reloaded page asks the worker for its caches', async () => {
+  const p = loadPage({ search: '?sw-reset&x=1' }); await tick(); await tick();
+  assert.equal(p.s.unregistered, 1);
+  assert.deepEqual(p.s.cachesDeleted, ['mx-shell-x', 'other']);
+  assert.equal(p.s.replaced, ORIGIN + '/edge-lab.html?x=1#top');
+  assert.equal(p.s.registered, 0, 'nothing is registered on the page that resets');
+  assert.equal(p.s.session['mx-sw-reset'], '1');
+  const next = loadPage({ controller: null, session: p.s.session }); await tick(); await tick();
+  assert.equal(next.s.registered, 1);
+  assert.deepEqual(next.s.posted, ['mx-prime']);
+  assert.equal('mx-sw-reset' in next.s.session, false, 'asked once');
+  const later = loadPage({ session: next.s.session }); await tick(); await tick();
+  assert.deepEqual(later.s.posted, [], 'an ordinary load posts nothing');
+});
+
+test('built site: every page has each app tag exactly once, and every manifest shortcut and icon is a built file', () => {
+  const out = path.join(ROOT, 'out');
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? (e.name === 'assets' ? [] : walk(path.join(d, e.name))) : /\.html$/.test(e.name) ? [path.join(d, e.name)] : []);
+  const pages = walk(out).filter((f) => path.relative(out, f) !== 'offline.html');
+  assert.ok(pages.length >= 9, 'pages found: ' + pages.length);
+  const once = [/<link\b[^>]*\brel=["']manifest["'][^>]*>/gi, /<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-capable["'][^>]*>/gi, /<meta\b[^>]*\bname=["']mobile-web-app-capable["'][^>]*>/gi,
+    /<meta\b[^>]*\bname=["']apple-mobile-web-app-title["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-status-bar-style["'][^>]*>/gi, /<script\b[^>]*\bsrc=["'][^"']*\/assets\/pwa\.js[^"']*["'][^>]*>/gi];
+  for (const f of pages) {
+    const rel = path.relative(out, f), head = fs.readFileSync(f, 'utf8').split(/<\/head>/i)[0];
+    for (const re of once) assert.equal((head.match(re) || []).length, 1, `${rel}: ${re.source}`);
+    assert.match(head, /<link rel="manifest" href="\/app\.webmanifest">/, rel);
+    assert.match(head, /<link rel="apple-touch-icon" href="\/icons\/apple-touch-icon\.png">/, rel);
+    // one theme colour, or one per colour scheme
+    const themes = head.match(/<meta\b[^>]*\bname=["']theme-color["'][^>]*>/gi) || [];
+    assert.ok(themes.length === 1 || (themes.length === 2 && themes.every((t) => /\bmedia=/.test(t))), `${rel}: theme-color x${themes.length}`);
+  }
+  const m = JSON.parse(fs.readFileSync(path.join(out, 'app.webmanifest'), 'utf8'));
+  assert.deepEqual(m, JSON.parse(fs.readFileSync(path.join(ROOT, 'app.webmanifest'), 'utf8')));
+  const rewrites = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')).rewrites;
+  const file = (url) => { const r = rewrites.find((x) => x.source === url); const p = (r ? r.destination : url).replace(/^\//, ''); return path.join(out, p === '' ? 'index.html' : p); };
+  for (const s of m.shortcuts) { assert.ok(fs.existsSync(file(s.url)), s.url); for (const i of s.icons) assert.ok(fs.existsSync(file(i.src)), i.src); }
+  assert.ok(fs.existsSync(file(m.start_url)));
+  for (const i of m.icons) assert.equal(pngSize(file(i.src)).join('x'), i.sizes, i.src);
+  assert.deepEqual(pngSize(path.join(out, 'apple-touch-icon.png')), [180, 180], 'iOS asks for the root file by itself');
+  // the worker's notification icons
+  for (const i of SRC.match(/'\/icons\/[^']+'/g)) assert.ok(fs.existsSync(path.join(out, i.slice(2, -1))), i);
+});
+
+test('the browser audit exists and is the documented manual / CI check', () => {
+  const a = fs.readFileSync(path.join(ROOT, 'scripts/audit/pwa.cjs'), 'utf8');
+  assert.match(a, /serviceWorkers: 'allow'/);
+  assert.match(a, /process\.exit\(failed\.length \? 1 : 0\)/);
+});
