@@ -7848,7 +7848,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9894.08 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9893.14 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7877,18 +7877,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdcad-rscalp-1794408898": {
+    "orderId": "33937758",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 1.42436,
+    "stop": 1.42496,
+    "t1": 1.421505,
+    "placedAt": "2026-11-11T14:56:03.000Z",
+    "expires": "2026-11-11T17:54:58.000Z",
+    "riskCash": 1.98,
+    "margin": 8,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9894.08,
-  "lastRun": "2026-11-11T14:53:36.000Z"
+  "balance": 9893.14,
+  "lastRun": "2026-11-11T14:56:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T14:54:24.000Z",
-   "msg": "limit filled at once: XAUUSD position 48101772 at the broker at 4037.99",
-   "trade": "xau-m30m1-1794322403"
-  },
   {
    "at": "2026-11-10T14:56:57.000Z",
    "msg": "AUDUSD position 48069966 closed at the broker",
@@ -9383,6 +9398,11 @@
    "at": "2026-11-11T14:53:36.000Z",
    "msg": "closed USDCAD position 48448521 (council: loss)",
    "trade": "usdcad-scalp-1794407707"
+  },
+  {
+   "at": "2026-11-11T14:56:03.000Z",
+   "msg": "placed sell limit USDCAD 0.04 lot at 1.42436 (council rscalp, valid to 2026-11-11T17:54Z)",
+   "trade": "usdcad-rscalp-1794408898"
   }
  ],
  "limits": {
