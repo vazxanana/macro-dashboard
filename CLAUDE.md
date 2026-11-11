@@ -1470,11 +1470,38 @@ was found. Fixed:
   "4180." (the old table's `#open input { width: 60px }`); the teach dialog's hints and the session form's labels are 12 px.
 - Checks: `tests/qa-sweep.test.mjs` (one per fix) and `scripts/audit/smoke.cjs`: on the phone no inner view of the Desk may end
   past the screen ("view cut off on the right"; `#crypto` and `#sdv` joined the inner views).
-- Seen, left alone (older design or a decision for the owner): the ICT desk's 10-11.5 px labels and chips (dozens, from before
-  9 Nov); ChronosTrade's 32-36 px toolbar and pane-header buttons on phones (a stated choice of pass 11); the shared dialog's
-  primary button on the light theme (white on `--accent`, 4.50); a corrected book line's "The desk had: …" keeps the desk's first
-  wording in English in the French view; the replay card and the log on a teacher's page are English ("only the teaching surfaces
-  are translated"), and that page still shows "What the fixed rules said" to the teacher (see "Who teaches whom").
+- Seen, left alone in the first pass: see the second pass below for what was then done.
+
+**Second pass, same day (branch `desk-polish`, owner: "keep working improving everything").**
+- **Who teaches whom, on the page**: for a teacher who is not the owner (`html[data-mosha="teach"]:not([data-role="owner"])`) the
+  cards `#mo-rules` ("What the fixed rules said", the five studies' figures) and `#mo-cycle` ("The cycle, as you described it": the
+  desk's own summary, addressed to the owner) are hidden. The owner and readers keep both. Never show either to the teacher.
+- **ICT typography pass**: every text on `#ict` and in the signal dialog is at least 12 px (chips, grades, pills, level labels,
+  calendar, tags were 9.5-11.5 px); one block "ICT typography pass" after the desk's touch rules, so put later ICT rules at 12 px or
+  more (a test reads every size after it; the smoke test measures the drawn desk). On a phone a signal with two executions keeps
+  its result and both chips in a row of their own (they were cut off at the right edge, over the result); "Replay through … update
+  pending" in the dialog is no longer clamped to three lines (it says which candles the result does not cover).
+- **Light theme tokens** (`market-structure.html`): `--buy` #067a64, `--sell` #c8243f, `--ink-faint` #666d7a, `--accent` #2a62f0
+  (were 4.46-4.50:1 as text on the white panel). Measured on all 20 views at 390 and 1440 px before and after: 272 texts reach AA,
+  none got worse (the candle countdown `.ch-cd.up` takes white text in light for that). Styled dialogs (`assets/ms-dialog.js`
+  `.msd button.pri`, `.own-acts button.pri`): fixed fills #2a62f0 / #c8243f, white at 5.1 / 5.6 in every theme (dark was 3.2).
+- **The address matches the view**: a refused view (`#mosha` or `#ict` for a viewer, anything but charts for a guest) is rewritten
+  with `history.replaceState` in `showView`. **Trade links**: the main `hashchange` handler leaves `#trade/<id>` to the trade router
+  and a view transition draws from the address of its own navigation (`showView(hx)`); before, a pasted trade link or Forward after
+  closing a signal sent the page home a frame later and an ICT signal's dialog sat "open" inside the hidden desk. `showBase` replaces
+  a pasted link's entry even when its desk is already shown, so closing the sheet lands on the desk. A skipped transition's rejected
+  promises are caught (they surfaced as "Transition was skipped" page errors).
+- Mosha: a corrected book line's "The desk had: …" shows the translated seed line in French (`wasOf`); a date-and-time field takes
+  the whole row on phones in the log form and its exit row too.
+- Checked by hand in a browser, nothing to fix: choosing, pasting and dropping screenshots into the teach form (a 2600 px PNG is
+  stored as an 1800 px JPEG of about 50 KB, captions kept, a text file refused with a message, the lesson shows its pictures); the
+  owner's log form (no stop and a stop on the wrong side refused, open → Check candles → close → record → replay → locked levels →
+  delete through the styled dialog); home, charts and the council panes at 390 and 1440 px.
+- Checks: `tests/qa-sweep.test.mjs` ("Second pass": 8 tests), `scripts/audit/smoke.cjs` ("ICT desk text under 12 px").
+- Still open: light-theme status badges with their own colours (`.ms-st.near` amber on amber 1.8:1, `.ms-st.ready` white on green
+  3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
+  words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
+  12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges

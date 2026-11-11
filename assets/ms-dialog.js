@@ -25,8 +25,9 @@
   .msd button{min-height:38px;padding:0 16px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.12));background:transparent;color:var(--ink,#eceef2);font:600 13.5px var(--sans,system-ui,sans-serif);cursor:pointer;transition:background .15s,border-color .15s,transform .08s}
   .msd button:hover{background:var(--panel-hover,rgba(255,255,255,.05));border-color:var(--line-strong,rgba(255,255,255,.2))}
   .msd button:active{transform:translateY(1px)}
-  .msd button.pri{background:var(--accent,#5b8cff);border-color:var(--accent,#5b8cff);color:#fff}.msd button.pri:hover{filter:brightness(1.08);background:var(--accent,#5b8cff)}
-  .msd.danger button.pri{background:var(--sell,#f2576f);border-color:var(--sell,#f2576f)}
+  /* fixed fills: white on the themes' --accent / --sell was 3.2-4.5:1 (QA sweep 11 Nov); these are 5.1 and 5.6 in every theme */
+  .msd button.pri{background:#2a62f0;border-color:#2a62f0;color:#fff}.msd button.pri:hover{filter:brightness(1.08);background:#2a62f0}
+  .msd.danger button.pri,.msd.danger button.pri:hover{background:#c8243f;border-color:#c8243f}
   .msd button:focus-visible{outline:2px solid var(--accent,#5b8cff);outline-offset:2px}
   @media (prefers-reduced-motion:reduce){.msd[open]{animation:none}}`;
   const ICON = { ask: '<path d="M4 20h4L18 10l-4-4L4 16z"/><path d="M13 7l4 4"/>', confirm: '<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>', alert: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>', lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>' };
