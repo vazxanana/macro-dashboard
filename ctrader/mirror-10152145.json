@@ -6502,6 +6502,59 @@
     ],
     "stopCheckedAt": "2026-11-11T07:02:00.000Z",
     "brokerStop": 0.82468
+   },
+   "audusd-scalp-1794381427": {
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T07:20:48.000Z",
+    "councilEntry": 0.6877,
+    "stop": 0.6872,
+    "t1": 0.68854,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.6877,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.99,
+    "margin": 4.13,
+    "shadow": true,
+    "fillPrice": 0.6877,
+    "slipR": 0,
+    "lagSec": 221,
+    "positionId": "48339580",
+    "volume": 300000,
+    "status": "open"
+   },
+   "eth-rscalp-1794381427": {
+    "positionId": "48340419",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 32,
+    "lots": 0.32,
+    "digits": 2,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-11T07:20:48.000Z",
+    "councilEntry": 2055.55,
+    "stop": 2051.608842,
+    "t1": 2071,
+    "riskCash": 1.99,
+    "margin": 65.72,
+    "shadow": true,
+    "mark": 2057.69,
+    "levelsFrom": "mark",
+    "fillPrice": 2058.79,
+    "slipR": 0.822,
+    "lagSec": 168,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T07:20:48.000Z",
+    "brokerStop": 2052.71
    }
   },
   "day": {
@@ -6509,7 +6562,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9932.83 · 27 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9932.83 · 29 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6519,68 +6572,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "eth-rscalp-1794381427": {
-    "orderId": "33913581",
-    "symbol": "ETHUSD",
-    "side": "buy",
-    "volume": 50,
-    "lots": 0.5,
-    "digits": 2,
-    "setup": "rscalp",
-    "limitPrice": 2055.55,
-    "stop": 2051.608842,
-    "t1": 2071,
-    "placedAt": "2026-11-11T07:18:12.000Z",
-    "expires": "2026-11-11T10:17:07.000Z",
-    "riskCash": 1.99,
-    "margin": 102.69,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
-   "audusd-scalp-1794381427": {
-    "orderId": "33913582",
-    "symbol": "AUDUSD",
-    "side": "buy",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 0.6877,
-    "stop": 0.6872,
-    "t1": 0.68854,
-    "placedAt": "2026-11-11T07:18:12.000Z",
-    "expires": "2026-11-11T10:17:07.000Z",
-    "riskCash": 1.99,
-    "margin": 4.13,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9932.83,
-  "lastRun": "2026-11-11T07:18:12.000Z"
+  "lastRun": "2026-11-11T07:20:48.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:04:55.000Z",
-   "msg": "placed sell limit XAUUSD 0.01 lot at 4075.61 (council scalp, valid to 2026-11-10T16:03Z)",
-   "trade": "xau-scalp-1794315817"
-  },
-  {
-   "at": "2026-11-10T13:04:55.000Z",
-   "msg": "placed sell limit GBPUSD 0.02 lot at 1.34208 (council intraday, valid to 2026-11-11T01:03Z)",
-   "trade": "gbpusd-intraday-1794315817"
-  },
-  {
-   "at": "2026-11-10T13:07:39.000Z",
-   "msg": "limit filled: XAUUSD position 48039921 at the broker",
-   "trade": "xau-scalp-1794315817"
-  },
   {
    "at": "2026-11-10T13:07:39.000Z",
    "msg": "limit filled: GBPUSD position 48039928 at the broker",
@@ -8065,6 +8062,21 @@
    "at": "2026-11-11T07:18:12.000Z",
    "msg": "placed buy limit AUDUSD 0.03 lot at 0.6877 (council scalp, valid to 2026-11-11T10:17Z)",
    "trade": "audusd-scalp-1794381427"
+  },
+  {
+   "at": "2026-11-11T07:20:48.000Z",
+   "msg": "limit filled: AUDUSD position 48339580 at the broker",
+   "trade": "audusd-scalp-1794381427"
+  },
+  {
+   "at": "2026-11-11T07:20:48.000Z",
+   "msg": "cancelled ETHUSD limit order 33913581 for eth-rscalp-1794381427: the council filled it on its feed first",
+   "trade": "eth-rscalp-1794381427"
+  },
+  {
+   "at": "2026-11-11T07:20:48.000Z",
+   "msg": "opened buy ETHUSD 0.32 lot (council rscalp)",
+   "trade": "eth-rscalp-1794381427"
   }
  ],
  "limits": {
@@ -8143,11 +8155,11 @@
   ]
  },
  "execution": {
-  "n": 219,
-  "meanSlipR": -0.014,
+  "n": 221,
+  "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 159,
+  "medianLagSec": 161,
   "bySymbol": {
    "SOLUSD": {
     "n": 17,
@@ -8158,8 +8170,8 @@
     "meanSlipR": -0.057
    },
    "ETHUSD": {
-    "n": 9,
-    "meanSlipR": 0.01
+    "n": 10,
+    "meanSlipR": 0.091
    },
    "EURUSD": {
     "n": 40,
@@ -8178,8 +8190,8 @@
     "meanSlipR": 0.072
    },
    "AUDUSD": {
-    "n": 33,
-    "meanSlipR": -0.041
+    "n": 34,
+    "meanSlipR": -0.039
    },
    "XAUUSD": {
     "n": 26,
