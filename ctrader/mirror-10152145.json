@@ -7246,6 +7246,33 @@
     ],
     "stopCheckedAt": "2026-11-11T11:43:40.000Z",
     "brokerStop": 1.33561
+   },
+   "usdcad-scalp-1794399947": {
+    "positionId": "48407835",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T12:26:52.000Z",
+    "councilEntry": 1.42322,
+    "stop": 1.4227800000000002,
+    "t1": 1.42428,
+    "riskCash": 1.98,
+    "margin": 12,
+    "shadow": true,
+    "mark": 1.42322,
+    "levelsFrom": "mark",
+    "fillPrice": 1.4232,
+    "slipR": -0.045,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T12:26:52.000Z",
+    "brokerStop": 1.42276
    }
   },
   "day": {
@@ -7253,7 +7280,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9913.96 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9913.96 · 31 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7307,14 +7334,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9913.96,
-  "lastRun": "2026-11-11T12:24:22.000Z"
+  "lastRun": "2026-11-11T12:26:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:28:08.000Z",
-   "msg": "moved AUDUSD 47446367 protection: stop 0.68573 -> 0.68566, target 0.69414 -> 0.69407 (council rintra)",
-   "trade": "audusd-rintra-1794189929"
-  },
   {
    "at": "2026-11-10T13:28:08.000Z",
    "msg": "moved AUDUSD 47706230 protection: stop 0.68968 -> 0.68961, target 0.69319 -> 0.69312 (council scalp)",
@@ -8809,6 +8831,11 @@
    "at": "2026-11-11T11:57:33.000Z",
    "msg": "AUDUSD position 48382306 closed at the broker",
    "trade": "audusd-scalp-1794392799"
+  },
+  {
+   "at": "2026-11-11T12:26:52.000Z",
+   "msg": "opened buy USDCAD 0.06 lot (council scalp)",
+   "trade": "usdcad-scalp-1794399947"
   }
  ],
  "limits": {
@@ -8887,7 +8914,7 @@
   ]
  },
  "execution": {
-  "n": 245,
+  "n": 246,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -8914,7 +8941,7 @@
     "meanSlipR": 0.013
    },
    "USDCAD": {
-    "n": 32,
+    "n": 33,
     "meanSlipR": -0.049
    },
    "USDCHF": {
