@@ -76,6 +76,12 @@ async function history(M) {
     { const t0 = process.env.ICT_REPLAY_LIQUID === 'on' ? liquidFrom(h1) : null;
       if (t0 && h1.length && t0 > h1[0].time) { const before = h1.length; h1 = h1.filter((b) => b.time >= t0); m5 = m5.filter((b) => b.time >= t0); log.push(`deferred-contract CNBC bars before ${new Date(t0 * 1000).toISOString().slice(0, 10)} dropped (${before - h1.length})`); } }
     const cnbc1 = h1.length ? h1[0].time : null;   // signals before this come from the Dukascopy cash-index fill
+    // 11 Nov 2026 (round 2): before the feed's continuous start only back-fill candles are used. The feed's stray 5m prints there
+    // (never the same on two runs) used to be mixed into the exit data and, where no back-fill exists (gold before 20 Dec 2025, RTY
+    // before its feed starts), were the ONLY candles: 11 gold and 2 RTY records of the 11 Nov file were built from them alone.
+    // `strayH` keeps the old series only to count the signals that are no longer recorded (replay.json `uncovered`).
+    const m5all = m5, strayM5 = cnbc1 == null ? 0 : m5.filter((b) => b.time < cnbc1).length;
+    if (strayM5) m5 = m5.filter((b) => b.time >= cnbc1);
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
     // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
     const DUKA = { NQ: 'USATECHIDXUSD', ES: 'USA500IDXUSD', YM: 'USA30IDXUSD' }[M.short];
@@ -110,15 +116,18 @@ async function history(M) {
         log.push(`${name} fill ${sf.n} H1 before ${new Date(sf.first * 1000).toISOString().slice(0, 10)}, scale ${sf.k.toFixed(4)}`);
       } else if (sf) log.push(`${DUKA || HD || 'spot gold'}: overlap too small (${sf.overlap})`);
     }
+    if (strayM5) log.push(`stray CNBC 5m bars before the continuous start dropped (${strayM5})`);
     console.log(M.short, sym, 'H1', h1.length, 'M5', m5.length, log.join(' '));
     if (h1.length + m5.length < 500) continue;
+    const covFrom = h1.length ? h1[0].time : null;   // the first candle of the back-fill, else of the continuous feed
+    const strayH = strayM5 && covFrom != null ? (() => { const hv = new Set(h1.map((b) => b.time)); return dedupe(h1.concat(agg(m5all.filter((b) => b.time < covFrom), 3600).filter((b) => !hv.has(b.time)))); })() : null;
     const have = new Set(h1.map((b) => b.time)), H = dedupe(h1.concat(agg(m5, 3600).filter((b) => !have.has(b.time)))).filter((b) => b.time + 3600 <= now);
     // daily candles back-adjusted across contract rolls (tracker.mjs rollAdjust; research/edge/futures-roll)
     const daily = await cnbcDaily(M, sym, FROM - 500 * 86400, now + 86400), D = daily.d1.filter((b) => b.time + 86400 <= now);
     // 5m counts as exit data from the first day with a near-full 5m session onwards
     const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
     const full = [...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d).sort((a, b) => a - b);
-    return { sym, m5, H, D, rolls: daily.rolls, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1, fill: fillInfo };
+    return { sym, m5, H, D, rolls: daily.rolls, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1, fill: fillInfo, covFrom, strayM5, strayH };
   }
   throw new Error(`no CNBC history for ${M.short}`);
 }
@@ -222,12 +231,16 @@ export function simulate(g, M, key, src, at = now, opt = {}) {
 // Everything is recomputed (and the run is written to the correction log as a rebuild) when ICT_REPLAY_REBUILD=on, when the
 // replay's start date differs, or when the ICT code changed (`ruleCode`: a rule change must show over the whole history).
 export const SETTLE = 3 * 86400;
+// Earlier fingerprints of the ICT code whose signal, sizing and exit rules are the SAME as today's: a change that is data plumbing
+// only (this list's reason) adds the fingerprint it replaces, so its merge does not recompute the history from the day's candles.
+// A rule change never adds one. 58cc4417...: the first frozen version (PR #723), replaced by "gold starts where its candles start".
+export const SAME_RULES = ['58cc441779077b22'];
 export function rulesHash() { const h = crypto.createHash('sha256'); for (const f of ['tracker.mjs', 'calendar.mjs', 'replay.mjs']) h.update(fs.readFileSync(new URL('./' + f, import.meta.url))); return h.digest('hex').slice(0, 16); }
 export function freezePlan(prev, o) {
   if (!prev || !Array.isArray(prev.trades)) return { on: false, why: 'no previous file: everything computed from this run\'s candles' };
   if (o.rebuild) return { on: false, rebuild: 'asked', why: 'rebuild asked for (ICT_REPLAY_REBUILD): everything recomputed from this run\'s candles' };
   if (prev.from !== o.from) return { on: false, rebuild: 'start', why: `replay start changed (${prev.from} -> ${o.from}): everything recomputed` };
-  if (prev.ruleCode && prev.ruleCode !== o.ruleCode) return { on: false, rebuild: 'code', why: 'the ICT code changed since the previous file: everything recomputed' };
+  if (prev.ruleCode && prev.ruleCode !== o.ruleCode && !SAME_RULES.includes(prev.ruleCode)) return { on: false, rebuild: 'code', why: 'the ICT code changed since the previous file: everything recomputed' };
   const through = typeof prev.through === 'number' ? prev.through : Math.floor(Date.parse(prev.at) / 1000);
   if (!Number.isFinite(through)) return { on: false, why: 'the previous file has no date: everything computed from this run\'s candles' };
   return { on: true, cut: through - SETTLE, baseAt: prev.at || null, adopted: !prev.ruleCode,
@@ -235,11 +248,15 @@ export function freezePlan(prev, o) {
 }
 // one stream of one market: `list` = its records in the previous file (null = nothing frozen)
 export function freezer(list, cut) {
-  const on = !!list && cut != null, frozen = new Map(), known = new Set(), st = { carried: 0, ignored: 0 };
+  const on = !!list && cut != null, frozen = new Map(), known = new Set(), st = { carried: 0, ignored: 0, blocked: 0 };
   if (on) for (const t of list) { known.add(t.id); if (booked(t) && t.closed && t.closed <= cut) frozen.set(t.id, t); }
   st.carried = frozen.size;
   // true = do not compute this signal: its record is carried, or it would start a record the previous file does not have inside settled history
-  const skip = (id, close) => { if (!on) return false; if (frozen.has(id)) return true; if (close <= cut && !known.has(id)) { st.ignored++; return true; } return false; };
+  // `blocked` = the signal fell inside a record of the previous file (one trade at a time: it was never a record); `ignored` = the
+  // rest: signals today's candles give in settled history that the previous file has no record for (`a`: an A-setup is only
+  // blocked by an A-setup, as in the stream itself)
+  const skip = (id, close, a) => { if (!on) return false; if (frozen.has(id)) return true;
+    if (close <= cut && !known.has(id)) { if (list.some((t) => t.opened <= close && close < (t.closed || Infinity) && (!a || t.aset))) st.blocked++; else st.ignored++; return true; } return false; };
   return { on, frozen, st, skip, carried: () => [...frozen.values()] };
 }
 const recId = (key, g, v) => `${key}-${g.side > 0 ? 'b' : 's'}-${g.t}${v ? '-' + v : ''}-r`;
@@ -251,40 +268,54 @@ export async function run(o = {}) {
   const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return null; } };
   const PREV = rd('replay.json'), ruleCode = o.ruleCode || rulesHash(), fromDay = new Date(from * 1000).toISOString().slice(0, 10);
   const plan = freezePlan(PREV, { from: fromDay, ruleCode, rebuild: o.rebuild != null ? o.rebuild : process.env.ICT_REPLAY_REBUILD === 'on' });
-  const FZ = { carried: {}, ignored: {}, shadowCarried: 0 };
+  const FZ = { carried: {}, ignored: {}, blocked: {}, shadowCarried: 0 };
   // a market the previous run could not read (its records were kept, its shadow lists left empty) is frozen only up to the last run
   // that did read it; a shadow stream that failed last time is recomputed whole
   const cutOf = (key, shadow) => { if (!plan.on) return null; const failed = PREV.errors && PREV.errors[key];
     if (shadow) return failed || Object.keys(PREV.shadowErrors || {}).some((k) => k.startsWith(key + '-')) ? null : plan.cut;
     if (!failed) return plan.cut; const c = PREV.marketThrough && PREV.marketThrough[key]; return typeof c === 'number' ? c - SETTLE : null; };
   const fz = (list, key, shadow) => { const cut = cutOf(key, shadow); return freezer(cut == null ? null : (list || []).filter((t) => t.market === key), cut); };
-  const out = { at: o.now ? new Date(at * 1000).toISOString() : new Date().toISOString(), from: fromDay, ruleCode, src: {}, errors: {}, gaps: {}, marketThrough: {}, trades: [], shadow: [], shadowByVariant: Object.fromEntries(VARIANTS.map((v) => [v, []])) };
+  // carried records from before a market's record start leave here, and the log names them and the reason (`uncovered`)
+  const RF = {}, GONE = { ids: [], shadow: 0 };
+  const covered = (list, key, main) => list.filter((t) => { if (t.opened >= (RF[key] || 0)) return true; if (main) GONE.ids.push(t.id); else GONE.shadow++; return false; });
+  const out = { at: o.now ? new Date(at * 1000).toISOString() : new Date().toISOString(), from: fromDay, ruleCode, src: {}, errors: {}, gaps: {}, recordFrom: {}, uncovered: {}, marketThrough: {}, trades: [], shadow: [], shadowByVariant: Object.fromEntries(VARIANTS.map((v) => [v, []])) };
   for (const [key, M] of Object.entries(MK)) {
     try {
       const src = await hist(M);
       out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length, d1Rolls: src.rolls,
         cnbcFrom: src.cnbcFrom ? new Date(src.cnbcFrom * 1000).toISOString().slice(0, 13) + 'Z' : null, fill: src.fill || null };   // the back-fill boundary and scale of THIS run
-      const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= from && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
+      // a market's record starts where its candles start (11 Nov 2026): the replay start, or later the first candle of its back-fill
+      // or, with no back-fill, of the feed's continuous history. Signals the old stray-candle series would have given are counted.
+      // The start never moves later once recorded (a market without back-fill would lose its oldest records as the feed's window
+      // moves): it is the earliest of today's first candle, the start in the previous file and that file's first record made from
+      // the feed's own continuous candles (not `cash`).
+      const cov = Math.max(from, src.covFrom || 0), pv = plan.on && PREV.recordFrom && PREV.recordFrom[key];
+      const real = plan.on ? PREV.trades.filter((t) => t.market === key && !t.cash).reduce((m, t) => Math.min(m, t.opened), Infinity) : Infinity;
+      const rf = Math.max(from, Math.min(cov, pv && typeof pv.t === 'number' ? pv.t : Infinity, real)), late = rf > from; RF[key] = rf;
+      out.recordFrom[key] = { from: new Date(rf * 1000).toISOString().slice(0, 10), t: rf, label: M.label, why: !late ? 'the replay start' : rf < cov ? 'as first recorded; today the feed\'s history starts later' : src.fill ? `the first candle of its back-fill (${src.fill.src}); the feed has no continuous candles before` : 'the first candle of the feed\'s continuous history; this market has no back-fill' };
+      if (late) out.uncovered[key] = { before: out.recordFrom[key].from, strayM5: src.strayM5 || 0,
+        signals: src.strayH ? [1, -1].flatMap((sd) => signals(src.strayH, src.D, sd, M.tick)).filter((g) => g.close >= from && g.close < rf && g.grade.total >= MIN_GRADE).length : 0 };
+      const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= rf && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
       const F = fz(PREV && PREV.trades, key), mine = [];
       let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
       // each A-setup carries the shadow variants' verdicts (vr), for the Coach's ICT filter verdicts; a failure here only loses the tags
       let vctx = null; try { vctx = { H: src.H, D: src.D, ms: await loadMeridian() }; } catch (e) { (out.shadowErrors = out.shadowErrors || {})[`${key}-vr`] = String(e.message || e); }
-      for (const g of sig) { const a = isASetup(g, key); if (F.skip(recId(key, g), g.close)) continue; if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src, at); if (!t) { out.gaps[key] = (out.gaps[key] || 0) + 1; continue; } t.aset = a; t.aplus = isAPlus(g, key); t.size = a ? sizeOf(g, key) : 1;
+      for (const g of sig) { const a = isASetup(g, key); if (F.skip(recId(key, g), g.close, a)) continue; if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src, at); if (!t) { out.gaps[key] = (out.gaps[key] || 0) + 1; continue; } t.aset = a; t.aplus = isAPlus(g, key); t.size = a ? sizeOf(g, key) : 1;
         if (a && vctx) { try { t.vr = variantTags(g, key, vctx); } catch (e) {} }
         if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
         mine.push(t);
         const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
-      out.trades.push(...F.carried(), ...mine); out.marketThrough[key] = at; if (F.on) { FZ.carried[key] = F.st.carried; FZ.ignored[key] = F.st.ignored; }
+      const keep = covered(F.carried(), key, true); out.trades.push(...keep, ...mine); out.marketThrough[key] = at; if (F.on) { FZ.carried[key] = keep.length; FZ.ignored[key] = F.st.ignored; FZ.blocked[key] = F.st.blocked; }
       // shadow 'dip' (paper comparison only, research/edge/ict-index-longonly): its own stream with its own one-open-trade rule, size 1,
       // no break-even (simulate() skips break-even when the market has an aRule), gold exit. Kept in out.shadow, never in out.trades.
-      if (SHADOW.dip.markets.includes(key)) { let busy = 0; const Fd = fz(PREV && PREV.shadow, key, true); out.shadow.push(...Fd.carried()); FZ.shadowCarried += Fd.st.carried;
+      if (SHADOW.dip.markets.includes(key)) { let busy = 0; const Fd = fz(PREV && PREV.shadow, key, true); out.shadow.push(...covered(Fd.carried(), key)); FZ.shadowCarried += Fd.st.carried;
         for (const g of sig) { if (g.close < busy || !isDip(g, key, src.D) || Fd.skip(recId(key, g, 'dip'), g.close)) continue; const t = simulate(g, { ...M, aRule: 'dip' }, key, src, at); if (!t) continue;
           Object.assign(t, { id: t.id.replace(/-r$/, '-dip-r'), shadow: true, variant: 'dip', aset: false, size: 1 }); out.shadow.push(t); busy = t.closed || Infinity; } }
       // shadow 'nofri' / 'h1opp' / 'strail' (paper comparison only): the A-setup rule plus one condition ('strail': the structure-trail
       // exit instead), each its own stream with its own one-open rule, A-setup sizing and break-even on indices, as the live tracker;
       // kept in out.shadowByVariant without the 72-candle path
       for (const v of VARIANTS) { if (!SHADOW[v].markets.includes(key)) continue;
-        try { const ctx = { H: src.H, D: src.D, ms: v === 'h1opp' ? await loadMeridian() : null }; let busy = 0; const Fv = fz(PREV && PREV.shadowByVariant && PREV.shadowByVariant[v], key, true); out.shadowByVariant[v].push(...Fv.carried()); FZ.shadowCarried += Fv.st.carried;
+        try { const ctx = { H: src.H, D: src.D, ms: v === 'h1opp' ? await loadMeridian() : null }; let busy = 0; const Fv = fz(PREV && PREV.shadowByVariant && PREV.shadowByVariant[v], key, true); out.shadowByVariant[v].push(...covered(Fv.carried(), key)); FZ.shadowCarried += Fv.st.carried;
           for (const g of sig) { if (g.close < busy || !variantRule(v, g, key, ctx) || Fv.skip(recId(key, g, v), g.close)) continue; const t = simulate(g, M, key, src, at, v === 'strail' ? { strail: [SHADOW.strail.from, SHADOW.strail.piv] } : {}); if (!t) continue;
             delete t.path; Object.assign(t, { id: t.id.replace(/-r$/, `-${v}-r`), shadow: true, variant: v, aset: true, aplus: isAPlus(g, key), size: sizeOf(g, key) });
             if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
@@ -326,13 +357,14 @@ export async function run(o = {}) {
   { const tl = tally(out.trades); out.totals = { n: tl.n, wins: tl.wins, losses: tl.losses, be: tl.be, nearFlat: tl.nearFlat, open: tl.open, R: tl.R, R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) }; }
   out.outcome = { rule: 'sign of the stored per-unit R (Rraw, else R) of a closed record', nearFlat: NEAR_FLAT };
   // what was carried and why (frozen history, above). `gaps` counts only the signals this run computed.
-  out.frozen = plan.on ? { on: true, cut: plan.cut, settleDays: SETTLE / 86400, baseAt: plan.baseAt, ...(plan.adopted ? { adopted: true } : {}), why: plan.why, carried: FZ.carried, ignored: FZ.ignored, shadowCarried: FZ.shadowCarried }
+  out.frozen = plan.on ? { on: true, cut: plan.cut, settleDays: SETTLE / 86400, baseAt: plan.baseAt, ...(plan.adopted ? { adopted: true } : {}), why: plan.why, carried: FZ.carried, ignored: FZ.ignored, blocked: FZ.blocked, shadowCarried: FZ.shadowCarried }
     : { on: false, ...(plan.rebuild ? { rebuild: plan.rebuild } : {}), why: plan.why };
   out.through = at;   // candles up to here were read; an unresolved record carries its own `through`
   fs.mkdirSync(DATA, { recursive: true });
   // what this run changes against the file it replaces goes to the correction log first
   // a rebuild is always written to the log, also when it changed nothing (that is the proof the history is stable)
   try { const entry = replayDiff(PREV, out, out.at); if (out.kept) entry.kept = out.kept;
+    if (GONE.ids.length || GONE.shadow) entry.uncovered = { why: 'built only from stray feed candles: before the market\'s first back-fill or continuous feed candle (replay.json recordFrom)', recordFrom: Object.fromEntries(Object.entries(out.recordFrom).filter(([k]) => RF[k] > from).map(([k, v]) => [k, v.from])), ids: GONE.ids, shadow: GONE.shadow };
     if (plan.rebuild) { entry.rebuild = plan.rebuild; entry.changed = true; } else if (plan.on) entry.frozen = { cut: plan.cut, carried: Object.values(FZ.carried).reduce((a, n) => a + n, 0) };
     const lg = appendLog(rd('replay-log.json'), entry);
     if (entry.changed) { fs.writeFileSync(path.join(DATA, 'replay-log.json'), JSON.stringify(lg)); console.log('log', JSON.stringify({ rebuild: entry.rebuild || null, resolved: entry.resolved, corrected: entry.corrected.length, removed: entry.removed.length, added: entry.added })); }
