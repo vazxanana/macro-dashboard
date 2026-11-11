@@ -9004,6 +9004,34 @@
     "positionId": "48563457",
     "volume": 100,
     "status": "open"
+   },
+   "xau-scalp-1794439329": {
+    "positionId": "48564676",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T23:22:54.000Z",
+    "councilEntry": 3984.415,
+    "stop": 3991.7050000000004,
+    "t1": 3964.644999999999,
+    "riskCash": 7.29,
+    "margin": 7.96,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3984.415,
+    "levelsFrom": "mark",
+    "fillPrice": 3984.35,
+    "slipR": 0.009,
+    "lagSec": 45,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T23:22:54.000Z",
+    "brokerStop": 3991.64
    }
   },
   "day": {
@@ -9011,7 +9039,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9824.16 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9824.16 · 32 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9066,14 +9094,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9824.16,
-  "lastRun": "2026-11-11T23:20:45.000Z"
+  "lastRun": "2026-11-11T23:22:54.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T01:57:09.000Z",
-   "msg": "GBPUSD position 48254217 closed at the broker",
-   "trade": "gbpusd-scalp-1794359735"
-  },
   {
    "at": "2026-11-11T02:23:33.000Z",
    "msg": "placed sell limit BTCUSD 0.01 lot at 73228.3 (council intraday, valid to 2026-11-11T14:22Z)",
@@ -10568,6 +10591,11 @@
    "at": "2026-11-11T23:18:22.000Z",
    "msg": "limit filled: XAUUSD position 48563457 at the broker",
    "trade": "xau-m30m1-1794439028"
+  },
+  {
+   "at": "2026-11-11T23:22:54.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council scalp)",
+   "trade": "xau-scalp-1794439329"
   }
  ],
  "limits": {
@@ -10646,11 +10674,11 @@
   ]
  },
  "execution": {
-  "n": 304,
+  "n": 305,
   "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 147.5,
+  "medianLagSec": 147,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10685,8 +10713,8 @@
     "meanSlipR": -0.039
    },
    "XAUUSD": {
-    "n": 36,
-    "meanSlipR": -0.057
+    "n": 37,
+    "meanSlipR": -0.055
    }
   }
  }
