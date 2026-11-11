@@ -1114,10 +1114,42 @@ called, in `panels()`), so they follow play, step, undo and jump; open trades an
 price lines (`xpLines`); one crosshair moves across all charts (`xpCross`). Orders, drafts, drag lines and drawings stay on the first
 chart: `xpGeom` keeps the quick Buy / Sell bar and the legend on it (`--mr`, `.chartc.mnarrow` under 640 px). The toolbar starts with
 the market and timeframe as a button (`#tb-sess`, opens the session form). `window.ctSplit()` is the audit's read-only summary.
-Not done: changing the replay's own timeframe in the middle of a session (the engine steps on the loaded candles). Audit: 152 checks
+Changing the replay's own timeframe in the middle of a session came on 11 Nov (next paragraph). Audit: 152 checks
 (the chips, a 4h pane, four charts with every pane ending at the replay moment, back to one chart); the audit reads the live candle
 proxy, so it only uses timeframes the live site already serves. Test: `tests/oanda-symbols.test.mjs` (page list = proxy list, each
 timeframe's OANDA granularity and the 4999-candle window).
+Timeframe switch in the middle of a session (11 Nov 2026, owner: "more timeframes"; the trader drops from 15m to 5m for an entry and
+goes back up): the toolbar's timeframe button (`#tfdd`, chips `#tfsw [data-stf]`, label `#tf-now`; keys `,` lower and `.` higher, also
+`[` `]`; in Help) calls `setTf(tf)`. `#tb-sess` now shows the market only. **One rule: the replay has one moment** (`mom()`,
+`BT.tfMoment`): every price before it has been through the engine, nothing at or after it has. A switch **never touches the account**
+(positions, orders, stops, targets, MFE / MAE, journal, drawings, challenge stay as they are; `S.acct` is not read or written). It only
+seats the moment on the new timeframe's candles (`BT.tfPlan`): candles that ended by it are shown closed; a candle that CONTAINS it
+(going up mid-candle, or an unaligned pair such as 15m → 10m or 5m → 2m) is shown **still forming**, built by `BT.tfPart` from finer
+candles that ended by the moment (`BT.tfFineSec` picks the coarsest timeframe that tiles both halves; the candles of a timeframe
+already loaded when they fit, else one small fetch), and sits in `S.bars` in place of the full candle (`S.part = { i, T, sec, g,
+formed, full, rest }`, `BT.tfSeat` / `tfUnseat`; legend tag "still forming", `#now` says "forming"). The next step (`step()`,
+`BT.tfNext` + `BT.advance`) runs `rest`, the finer candles from the moment to the candle's end, through the engine in order, each
+once, and puts the full candle back: so no price is skipped or processed twice, and a stop or target inside the candle is taken where
+the finer candles reach it (a test checks the account equals stepping the lower timeframe). Going down shows only candles that closed
+by the moment. `BT.advance(acct, ch, bars)` is the page's per-bar order (orders and positions, the challenge, then a breach closes
+everything, events marked `breach`) moved into the engine so the tests run the real code. Kept per session in memory: the candles of
+each timeframe used (`TFC`), so going back is instant. **Cleared at a switch: Undo history** (the toast and the panel say so); Undo
+works again from there and can bring a forming candle back. Playback does not animate the completion of a forming candle (it
+completes at the end of its time slot). Jump and Skip day complete a forming candle first. The extra panes take the moment, not the
+bar (`xpDraw` lower branch uses `mom()`), so a lower pane never shows a candle past it. Saved sessions carry `mom` (and `sw` once
+switched; the session strip's "replayed %" is then by time); `resume` builds a forming candle again from finer candles
+(`BT.tfResume`); a session saved before this change (index only) loads as before. Limits: the new timeframe is fetched for the whole
+session (300 candles of context before the start, `BT.tfWindow`); more than `XMAX` 40,000 candles is refused in words ("Too many
+1 minute candles for this session …: load fewer days"), nothing changes; a failed fetch leaves the session on its timeframe.
+After a switch, entry markers and connectors snap to the candle that holds their time (`timeToX` places a time inside a candle).
+"Avg hold (bars)" counts bars of whatever timeframe was on screen (finer candles while one formed). Phones: the timeframe button
+is in the toolbar row (44 px), Skip day moved under More (`#skipday2`) to make room. `window.ctTf()` is the audit's read-only
+summary. Not done: a weekly replay timeframe; a lower timeframe for only part of a long session (it is all or refused).
+Tests: `tests/backtest.test.mjs` (no future data in either direction, proven by changing every price after the moment; account
+identical across a switch; path equal to the lower timeframe; a stop in the rest taken once; a low before the moment never fills
+an order placed at it; chains of switches; data holes; refusal; old sessions). Audit: 179 checks (the switch against candles
+fetched apart from the page, forming candle, one step, Undo, split panes, reload, keys, play, the day candle, an old session,
+the refusal, AA in three themes, phone).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
@@ -1479,11 +1511,38 @@ was found. Fixed:
   "4180." (the old table's `#open input { width: 60px }`); the teach dialog's hints and the session form's labels are 12 px.
 - Checks: `tests/qa-sweep.test.mjs` (one per fix) and `scripts/audit/smoke.cjs`: on the phone no inner view of the Desk may end
   past the screen ("view cut off on the right"; `#crypto` and `#sdv` joined the inner views).
-- Seen, left alone (older design or a decision for the owner): the ICT desk's 10-11.5 px labels and chips (dozens, from before
-  9 Nov); ChronosTrade's 32-36 px toolbar and pane-header buttons on phones (a stated choice of pass 11); the shared dialog's
-  primary button on the light theme (white on `--accent`, 4.50); a corrected book line's "The desk had: …" keeps the desk's first
-  wording in English in the French view; the replay card and the log on a teacher's page are English ("only the teaching surfaces
-  are translated"), and that page still shows "What the fixed rules said" to the teacher (see "Who teaches whom").
+- Seen, left alone in the first pass: see the second pass below for what was then done.
+
+**Second pass, same day (branch `desk-polish`, owner: "keep working improving everything").**
+- **Who teaches whom, on the page**: for a teacher who is not the owner (`html[data-mosha="teach"]:not([data-role="owner"])`) the
+  cards `#mo-rules` ("What the fixed rules said", the five studies' figures) and `#mo-cycle` ("The cycle, as you described it": the
+  desk's own summary, addressed to the owner) are hidden. The owner and readers keep both. Never show either to the teacher.
+- **ICT typography pass**: every text on `#ict` and in the signal dialog is at least 12 px (chips, grades, pills, level labels,
+  calendar, tags were 9.5-11.5 px); one block "ICT typography pass" after the desk's touch rules, so put later ICT rules at 12 px or
+  more (a test reads every size after it; the smoke test measures the drawn desk). On a phone a signal with two executions keeps
+  its result and both chips in a row of their own (they were cut off at the right edge, over the result); "Replay through … update
+  pending" in the dialog is no longer clamped to three lines (it says which candles the result does not cover).
+- **Light theme tokens** (`market-structure.html`): `--buy` #067a64, `--sell` #c8243f, `--ink-faint` #666d7a, `--accent` #2a62f0
+  (were 4.46-4.50:1 as text on the white panel). Measured on all 20 views at 390 and 1440 px before and after: 272 texts reach AA,
+  none got worse (the candle countdown `.ch-cd.up` takes white text in light for that). Styled dialogs (`assets/ms-dialog.js`
+  `.msd button.pri`, `.own-acts button.pri`): fixed fills #2a62f0 / #c8243f, white at 5.1 / 5.6 in every theme (dark was 3.2).
+- **The address matches the view**: a refused view (`#mosha` or `#ict` for a viewer, anything but charts for a guest) is rewritten
+  with `history.replaceState` in `showView`. **Trade links**: the main `hashchange` handler leaves `#trade/<id>` to the trade router
+  and a view transition draws from the address of its own navigation (`showView(hx)`); before, a pasted trade link or Forward after
+  closing a signal sent the page home a frame later and an ICT signal's dialog sat "open" inside the hidden desk. `showBase` replaces
+  a pasted link's entry even when its desk is already shown, so closing the sheet lands on the desk. A skipped transition's rejected
+  promises are caught (they surfaced as "Transition was skipped" page errors).
+- Mosha: a corrected book line's "The desk had: …" shows the translated seed line in French (`wasOf`); a date-and-time field takes
+  the whole row on phones in the log form and its exit row too.
+- Checked by hand in a browser, nothing to fix: choosing, pasting and dropping screenshots into the teach form (a 2600 px PNG is
+  stored as an 1800 px JPEG of about 50 KB, captions kept, a text file refused with a message, the lesson shows its pictures); the
+  owner's log form (no stop and a stop on the wrong side refused, open → Check candles → close → record → replay → locked levels →
+  delete through the styled dialog); home, charts and the council panes at 390 and 1440 px.
+- Checks: `tests/qa-sweep.test.mjs` ("Second pass": 8 tests), `scripts/audit/smoke.cjs` ("ICT desk text under 12 px").
+- Still open: light-theme status badges with their own colours (`.ms-st.near` amber on amber 1.8:1, `.ms-st.ready` white on green
+  3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
+  words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
+  12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
