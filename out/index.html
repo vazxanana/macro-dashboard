@@ -4881,7 +4881,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   // What the sign-in card may say about the desk (pure; tests/qa-sweep.test.mjs runs it). T = trades.json rows or null, I = ict/replay.json
   // or null. Main system only: no shadow trade is counted or named, no system name is shown. Keep MAIN in step with SYS_K.
   window.msGateProof = function (T, I, now) {
-    var MAIN = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], out = { open: null, ict: null, last: null };
+    var MAIN = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], out = { open: null, ict: null, last: null };
     if (Array.isArray(T)) { var M = T.filter(function (t) { return t && !t.shadow && (MAIN.indexOf(t.k) >= 0 || t.k === 'main'); });   // 'main': the server's cut copy names no system (api/_guestcut.js)
       var open = M.filter(function (t) { return t.status === 'open'; }).length, wait = M.filter(function (t) { return t.status === 'pending'; }).length;
       out.open = { v: String(open), s: wait ? wait + ' waiting for ' + (wait === 1 ? 'its' : 'their') + ' entry' : 'paper trades, main system' };
@@ -5282,7 +5282,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </details>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note" id="ms-rep-w1"></p>
-        <p class="ms-note" id="ms-rep-mosha"></p>
+        <p class="ms-note" id="ms-rep-mosha"></p><p class="ms-note" id="ms-rep-mcycle"></p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
         <p class="ms-note" id="ms-rep-track-txt"></p>
@@ -8916,7 +8916,7 @@ function msNextSetup(bars, A) {
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
-  const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];
+  const SYS_K = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];
   // guests: our main system only (6 Nov, owner): live system trades + the system's replay + NQ forward paper, no shadow trades
   // One way to write an R figure in the Home and Council templates (11 Nov): a sign, the minus glyph, two decimals ("−1.00R",
   // never "-1R" beside "−1.05R"); rTxt(v, 1) for the few one-decimal totals. A value that is not a number reads "—".
@@ -9234,7 +9234,7 @@ function msNextSetup(bars, A) {
   }
   async function renderGuest() {
     if (!PUB || GV.busy) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg');
-    const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg'];
+    const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'mcycle', 'gtrend', 'gtrend5', 'gtl', 'geg'];
     const pool = (COUNCIL.trades || []).concat(typeof sysTrades === 'function' ? sysTrades() : []).filter((x) => x.market === 'xau' && !x.shadow && !x.replay && (SYSG.includes(x.k) || x.card) && x.entry && x.stop && !x.addOf);
     const live = pool.filter((x) => x.status === 'open' || x.status === 'pending').sort((a, b) => b.opened - a.opened);
     const x = live[0] || pool.filter((t) => t.closed).sort((a, b) => b.closed - a.closed)[0] || null;
@@ -9384,6 +9384,8 @@ function msNextSetup(bars, A) {
           : m.stage === 'h1' ? `Mosha BO chain: H4 BO <b>${side(m.dir)}</b> at ${m.h4.level} (${when(m.h4.t)}); waiting for the H1 BO the other way (the retracement).${wk}${pos}`
           : m.stage === 'm15' ? `Mosha BO chain: H4 BO <b>${side(m.dir)}</b> (${when(m.h4.t)}), H1 retracement BO (${when(m.h1.t)}); waiting for the M15 BO back <b>${side(m.dir)}</b>.${wk}${pos}`
           : `Mosha BO chain complete: M15 BO <b>${side(m.dir)}</b> at ${m.m15.level} (${when(m.m15.t)}) after the H4 BO (${when(m.h4.t)}) and H1 retracement (${when(m.h1.t)}); the trade is in the record, or blocked (weekly, cap, price or momentum) as a shadow.${wk}${pos}`); }
+      // Mosha cycle (11 Nov 2026, snapshot.moshaCycle: council/mosha-cycle.mjs cycleText)
+      { const mc = (COUNCIL.snap || {}).moshaCycle; set('ms-rep-mcycle', !mc ? 'Mosha cycle: waiting for the Trader.' : esc(mc.text || '') + (mc.open ? ` ${mc.open} open or pending.` : '')); }
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
     renderTrack();
     const rp = C.snap && C.snap.research && C.snap.research.replica;
@@ -12891,8 +12893,8 @@ function gpStats(T) {
 (function (W) {
   'use strict';
   var DAY = 86400;
-  var SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // keep in step with SYS_K in the main script
-  var SYS_ON = { replica: function (c) { return (c.replicaLive || []).length > 0; }, 'mosha-bo': function (c) { return !!c.moshaBo; }, trend: function (c) { return (c.cryptoTrend || []).length > 0 && !c.cryptoTrendShadow; },
+  var SYS_K = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // keep in step with SYS_K in the main script
+  var SYS_ON = { replica: function (c) { return (c.replicaLive || []).length > 0; }, 'mosha-bo': function (c) { return !!c.moshaBo; }, mcycle: function (c) { return !!c.moshaCycle; }, trend: function (c) { return (c.cryptoTrend || []).length > 0 && !c.cryptoTrendShadow; },
     gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast && !c.goldTrendFastShadow; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
   var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
   var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;

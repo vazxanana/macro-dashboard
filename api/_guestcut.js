@@ -20,9 +20,9 @@
 //   card: true  -> on a gold trade the guest trade card may show (the page's SYSG list), so the card needs no system key
 const crypto = require('node:crypto');
 
-const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // the page's SYS_K
+const SYS_K = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // the page's SYS_K
 const NQ_SYS = ['nyflip'];                                                                 // the page's NQ_SYS
-const SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg'];                   // the page's SYSG (guest trade card)
+const SYSG = ['replica', 'mosha-bo', 'mcycle', 'gtrend', 'gtrend5', 'gtl', 'geg'];                   // the page's SYSG (guest trade card)
 // the page's GUEST_F: the fields the guest page reads off a row
 const FIELDS = ['id', 'market', 'label', 'dec', 'k', 'session', 'side', 'entry', 'stop', 't1', 'tp1', 'rr', 'r0', 'size', 'opened', 'filled', 'closed', 'checked', 'status', 'R', 'replay', 'paper', 'addOf', 'card'];
 const MARKET_F = ['label', 'name', 'price', 'dec', 'open', 'chg', 'change'];               // snapshot.markets.<key>
