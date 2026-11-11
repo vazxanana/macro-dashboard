@@ -1543,7 +1543,7 @@ document.addEventListener('DOMContentLoaded', function () {
   #ms-c-status .c-meta::before { margin: 0 6px 0 2px; }
   /* design polish 4: accessibility safety nets (low specificity: any existing style wins) */
   :where(button, a[href], summary, [tabindex]:not([tabindex="-1"]), select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; } }
   /* design polish 5: rows that scroll sideways fade at the edge with more to see */
   .h-quick[data-more~="r"], .c-nav[data-more~="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
   .h-quick[data-more~="l"], .c-nav[data-more~="l"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
@@ -1819,7 +1819,7 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
 :root[data-theme="pro"] .h-clock { border-radius: 4px; }
 
 /* in-app motion switch: same effect as the OS reduced-motion setting */
-html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
 
 /* first-render stagger for live lists (once per list, ~35 ms per row, ease-out; off with reduced motion / Motion off) */
 @keyframes rowIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -8217,7 +8217,7 @@ function msNextSetup(bars, A) {
       if (!document.startViewTransition || still || !cur || cur === nx || document.hidden || document.querySelector('dialog[open]')) { showView(); return; }
       const ORD = ['home', 'setup', 'charts', 'scanner', 'crypto', 'council', 'journal', 'ict', 'users', 'guest'];
       R.dataset.vt = ORD.indexOf(nx) >= ORD.indexOf(cur) ? 'fwd' : 'back';
-      try { const t = document.startViewTransition(showView); t.finished.finally(() => { delete R.dataset.vt; }); } catch (e) { showView(); }
+      try { const t = document.startViewTransition(showView); t.ready.catch(() => {}); t.finished.then(() => { delete R.dataset.vt; }, () => { delete R.dataset.vt; }); } catch (e) { showView(); }   // a second change before the first has drawn skips the first: its `ready` rejects, which is not an error
     }); showView();
     setInterval(() => { renderSessList(); renderHome(); }, 30e3); renderSessList();
   }
