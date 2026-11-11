@@ -288,6 +288,22 @@
     return { get, post, stats };
   }
 
+  // A correction that could not be saved never costs the mentor's work: the form stays exactly as it is and the button
+  // becomes "Try again". e = the failed call, fails = how many times in a row the server said it has no stored attempt for
+  // this verdict (404), mode = the attempt's mode. → { text (plain words: what happened, what to do), restore }.
+  // restore: after the second such answer the next press stores the page's own decision for this setup once more through
+  // the usual attempt call (so every check of the server applies) and then saves the verdict on it. Never for a test on a
+  // new setup or a blind attempt: those are decided once.
+  function correctionFailure(e, fails, mode) {
+    const st = e && e.status, msg = String((e && e.message) || 'unknown error'), keep = ' Your verdict is still here: nothing you chose, wrote or marked was lost.';
+    if (st === 404 && /no such attempt/.test(msg)) {
+      const restore = fails >= 2 && (mode == null || mode === 'train' || mode === 'replay-same');
+      return { restore, text: 'The correction was not saved: the server could not find the stored decision this verdict belongs to.' + keep
+        + (restore ? ' Press Try again: the page will store its decision for this setup once more, then save your verdict on it.' : ' Wait a few seconds, then press Try again.') };
+    }
+    const again = st === 0 || st === 429 || st >= 500;
+    return { restore: false, text: 'The correction was not saved: ' + msg + '.' + keep + (again ? ' Check the connection, then press Try again.' : ' Change what the message names, then press Try again.') };
+  }
   // The verdicts offered on a decision. The engine's own answer is never offered as a "change": a WAIT it already gave is
   // left out (that is Approve), and its own BUY / SELL is offered as the same trade on other levels.
   function mentorChoices(engineAction) {
@@ -385,7 +401,7 @@
   const MXAC = {
     VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
-    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, leaveGuard, LEAVE_MS, pointLine, latestFirst, unfinished, mainReasons, conflictIds, mentorChoices,
+    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, correctionFailure, leaveGuard, LEAVE_MS, pointLine, latestFirst, unfinished, mainReasons, conflictIds, mentorChoices,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
@@ -1167,15 +1183,26 @@
   async function saveCorrection() {
     const cur = S.cur; if (!cur || S.busy) return; if (mentorCheck(true).length) { const n = $('m-err'); if (n) n.scrollIntoView({ block: 'nearest' }); return; } S.busy = true; $('m-save').disabled = true; say('m-msg', 'Saving…');
     try {
+      if (cur.corRestore) {   // twice the server had no stored attempt for this verdict: the decision the page holds is stored again (the usual attempt call), once
+        const was = cur.first.row, r = await api.post(attemptBody(cur.cand, S.setup.edge.id, was.mode === 'replay-same' ? 'replay-same' : 'train', cur.first.decision, (was.lessonsAvailable || []).map((id) => ({ id })), cur.hash, cur.features, was.sessionId || S.sessionId));
+        cur.first.row = r.attempt; cur.first.n = r.n; cur.corRestore = false; cur.corFails = 0;
+        const sm = document.querySelector('#mentor h2 small'); if (sm) sm.textContent = `your verdict on attempt ${r.n}`;
+        log(`The stored decision of the setup at ${fmtTime(cur.cand.t)} could not be found, so it was stored again as attempt ${r.n}.`);
+      }
       const c = buildCorrection(M, cur.first.row.id), errorClass = MXA.classifyError(cur.first.decision, c, null);
       const res = await api.post({ action: 'correct', edge: S.setup.edge.id, correction: Object.assign({}, c, { errorClass }) });
+      cur.corFails = 0; $('m-save').textContent = 'Save correction'; $('m-err').hidden = true;
       cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveOk.reset(); renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);
       cur.lesson = draft; cur.savedLesson = null; renderLesson(); renderProve(); renderWhatIf();
       $('lesson').scrollIntoView({ block: 'nearest' });
-    } catch (e) { say('m-msg', ''); const n = $('m-err'); n.hidden = false; n.textContent = 'The correction was not saved: ' + e.message + '.'; }
+    } catch (e) {   // nothing on the form is touched: the choice, the levels, the reasons, the words and the marks all stay
+      cur.corFails = e && e.status === 404 ? (cur.corFails || 0) + 1 : 0;
+      const f = correctionFailure(e, cur.corFails, S.setup.mode === 'exam' ? 'exam' : cur.first.row.mode); cur.corRestore = f.restore;
+      say('m-msg', ''); const n = $('m-err'), b = $('m-save'); if (n) { n.hidden = false; n.textContent = f.text; n.scrollIntoView({ block: 'nearest' }); } if (b) b.textContent = 'Try again';
+    }
     finally { S.busy = false; if ($('m-save')) $('m-save').disabled = false; }
   }
 
