@@ -8551,7 +8551,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T19:28:58.000Z",
     "councilEntry": 3986.915,
     "stop": 3982.8799999999997,
@@ -8566,10 +8566,12 @@
     "slipR": 0.033,
     "lagSec": 59,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T19:28:58.000Z",
-    "brokerStop": 3983.01
+    "brokerStop": 3983.01,
+    "closedAt": "2026-11-11T20:07:15.000Z"
    },
    "usdcad-rscalp-1794425657": {
     "positionId": "48538738",
@@ -8631,7 +8633,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9854.67 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9850.38 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8685,15 +8687,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9854.67,
-  "lastRun": "2026-11-11T20:05:45.000Z"
+  "balance": 9850.38,
+  "lastRun": "2026-11-11T20:07:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T18:36:11.000Z",
-   "msg": "not mirrored yet audusd-scalp-1794324908: AUDUSD limit order gone at the broker (will retry)",
-   "trade": "audusd-scalp-1794324908"
-  },
   {
    "at": "2026-11-10T18:36:11.000Z",
    "msg": "not mirrored yet audusd-scalp-1794324908: the council order expires within a minute (will retry)",
@@ -10188,6 +10185,11 @@
    "at": "2026-11-11T20:05:45.000Z",
    "msg": "opened sell USDCHF 0.03 lot (council rscalp)",
    "trade": "usdchf-rscalp-1794427475"
+  },
+  {
+   "at": "2026-11-11T20:07:15.000Z",
+   "msg": "XAUUSD position 48537313 closed at the broker",
+   "trade": "xau-rscalp-1794425279"
   }
  ],
  "limits": {
