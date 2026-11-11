@@ -78,7 +78,8 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
-  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
+  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
+  Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
 - Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
 
@@ -1650,6 +1651,36 @@ was found. Fixed:
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
   12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
 
+## Browser audits: false failures traced to their causes (11 Nov 2026)
+The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
+any audit change:
+- **Colours are read through `measured(page, expr, what)` only.** It waits until the page has no transition or finite animation
+  running for two frames (`settle`), then reads once; `expr` returns `{ bad, n }`. A reading that measured no element, or a page
+  whose colours never settle, is a FAILURE. No fixed wait after a theme change, no second reading. The smoke test reads no colours.
+- **The cause of the "stale colour after a theme change"** (it was retried 700 ms later in `academy.cjs` until now): under
+  `prefers-reduced-motion: reduce` the pages had `* { transition-duration: .01ms !important }`. `transition-property` defaults to
+  `all`, so every element got a transition on every property; a theme change then went down the tree one level a frame (each child
+  inherits the parent's still-old colour, sees it change a frame later and starts its own transition), while backgrounds set from a
+  token changed at once: old-theme text on the new background for 6-7 frames on the Academy (260 ms idle, 700 ms at a sixth of the
+  speed), 0.7-1.2 s on the Desk (which has a theme switch) and 2-2.5 s on the Edge lab. The rule is now `transition-duration: 0s`
+  (no transition is started) in `assets/mx-page.css`, `market-structure.html` (both rules), `edge-lab.html`, `gold-trading.html`.
+  **Never write a non-zero duration on `*`.** The Academy audit reads the contrast in the same task as the theme change, under
+  reduced motion, to pin it.
+- **The Desk, two view changes in quick succession**: the second skips the first one's View Transition, whose `ready` promise then
+  rejects; `t.finished.finally(…)` handed that on to a promise nobody handled ("Transition was skipped", a page error whenever a
+  runner needed over 600 ms for a view). Now `t.ready.catch(…)` and a caught `finished.finally(…)` (one handler, shared with the trade-link fix of the same day). The smoke test changes views back to
+  back on purpose, and an inner view only counts when the Desk really shows it (`data-view`, the view and the Council pane visible).
+- **Smoke settle time counts from the page's LAST load** (`calmer`): the Desk reloads once when `/api/me` first answers with an
+  account; a check landing in or just after that reload was swallowed as a pass or read the page half drawn (413 px wide for half
+  a second). A check that cannot be read is an error, never a pass.
+- **Network**: `fetchRetry` tries a proxied request three times (network error, 429, 5xx) and keeps one answer per URL for the run;
+  the ChronosTrade audit names candle requests that still failed. Its checks need candles relative to today (quick starts, the
+  default day), so they stay on the live proxy: recorded candles would have to be re-stamped, which is not real data.
+- **CI** (`ci.yml`): the retry of the ChronosTrade and Academy audits stays, but the checks that failed the first time are printed
+  as warnings and both logs are in the `audit-screenshots` artifact. A check that only passes on a retry is a bug to trace.
+- `academy.cjs`: every dev server it starts is stopped however the audit ends (`ACADEMY_PORTS` names its ports: one implementation,
+  the one in the file's header). ChronosTrade's "closing a trade takes under 150 ms" is the middle of five closes.
+- Tests: `tests/audit-shared.test.mjs` (the helper on a fake page and a fake fetch, the 0s rule on every page, the Desk's handler).
 ## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
 Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
 1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),
