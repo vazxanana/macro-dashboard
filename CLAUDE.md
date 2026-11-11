@@ -588,8 +588,58 @@ Profile 4.3 → 1.0. Rules to keep:
 - Tests: `tests/qa-sweep.test.mjs` ("simple phone view": the head script on fake media, the CSS scope, the gates, `MS_PS`
   pure pieces); the smoke test's phone owner run fails when the Desk does not open simple or Home's first screen holds more
   than 9 blocks / 3 open rows.
-- Not done: Charts, the Council's other panes (Trades is 2 screens of tiles and a table, Research is long), the guest page,
-  Setup, Scanner, Journal; `backtest.html`, `academy.html`, `macro-desk.html`, `gold-trading.html` have no simple view.
+- Not done in this first pass: Charts, the Council's other panes, Setup, Scanner (second pass, below); the guest page and
+  Journal (still as they were). The other pages got their own simple views the same day (their sections).
+
+**Second pass (11 Nov 2026, owner: "Need more")**: the rest of the Desk, same key, switch, style block and fold helpers
+(never a second mechanism). Order worked in, by how likely a phone opens it: Charts, Council → Trades, This week, Review,
+Systems, Research, Macro, then Setup, Scanner, the Gold playbook, LIT and Crypto desks. Measured at 390 x 844 as the owner,
+screens before → after: Trades 2.1 → 1.3, This week 6.9 → 1.9, Review 3.1 → 2.6, Systems 5.5 → 1.5, Research 37.9 → 1.4,
+Macro 7.6 → 2.7, Setup 5.7 → 2.9, Scanner 3.2 → 1.4, Gold playbook 2.7 → 1.6, LIT 16.4 → 1.2, Crypto 5.0 → 2.9; on Charts
+the chart started at 314 px and ended 110 px under the tab bar, now 255 px and above it.
+- **Charts**: row 1 the markets and **More** (`#ps-ch-more`, `.ps-cmore`), row 2 the timeframes, then the chart, sized to end
+  above the tab bar. Behind More (`#v-charts[data-ps-more]`): the markup switch, indicators, Context and its strip. Hidden is
+  not switched off: the markup in use is named on the button ("ICT · More"), and the script never touches `setMode`,
+  drawings or the watchlist. Every Charts rule is `html[data-phone="simple"]:not([data-role="public"]) #v-charts …`: a guest's
+  chart page (the lock, Clean only) is untouched, and `html[data-role="public"] .ps-cmore` is never drawn (a test reads both).
+- **An answer block per pane** (`.ps-ans`, static markup, filled from sums the pane already worked out; pure functions on
+  `MS_PS`): Trades `#ps-t-ans` = `tradesAnswer(window.MS_TRADES)`: "Forward record: −2.05R on 5 closed trades · 1 won", and the
+  backtest replay in its own sentence ("not traded and kept apart"); **forward and replay are never one figure**. The pane
+  hands `MS_TRADES` over (`ms:trades`; tab, open, `fwdSplit`'s fwd / rp; never for a guest). This week `#ps-w-ans` =
+  `weekAnswer(MS_WEEK_NOW, MS_WEEK_DEC)` (`ms:week`, from `renderHead` / `renderDec`): Meridian live after costs, the ICT desk
+  in its own sentence ("a separate edge"), then how many decisions wait; the decisions card comes right under it
+  (`order`, `.wk-col { display: contents }`), the tiles fold to "The week in numbers". Review `#ps-r-ans` =
+  `reviewAnswer(n)` from the Review tab's own badge (losses of the last 24 h not reviewed, live and shadow together, said so)
+  with "Show only the ones to review" (presses the pane's own To review filter).
+- **Cards fold to a row with two lines** (`.ps-fold.ps-two`, `rowText`): the heading up to its first " · ", and one line: the
+  rest of the heading, or the first sentence of the card's own summary once drawn (`.sb-sum`, `.dc-sum`, `.ex-sum`, `.bk-sum`,
+  `.md-verdict`; never a line the account's gate hides). `DESKS` now also lists `ms-cp-systems` (keeps `#ms-sys-book`,
+  **"Which systems trade live": open and first**, `order: -1`), `ms-cp-review` (keeps the loss review), `ms-cp-research`
+  (every card a row), `ms-cp-macro` (keeps Next day; the veteran's discussion inside it is the static row `vet`),
+  `ms-cp-week` (keeps the decisions), `v-setup` (folds the playbook check; price and levels are the static row `kv`),
+  `v-gold` and `v-lit` (keep the first card), `v-crypto` (keeps the chart and the setups). A made row copies its card's
+  `adm` / `own` class.
+- **Lists**: Trades shows the latest five rows, Setup the first three possible trades, Scanner the first four markets (the
+  page sorts ready ones first); "Show all n …" (`.ps-more`, `lists()`, `[data-ps-all]` on the card). One fold row may fold
+  several parts (`[data-ps="tnum"]`: the Trades note, tiles and curve).
+- **No fold after the paint** (the first pass's flaw): (1) the observer that folds a card drawn late runs `desks()` at once
+  (before the next paint) instead of 120 ms later, falling back to the timer if it is ever called more than 12 times in half a
+  second; (2) a desk a member lands on (ICT, Mosha) was painted with every card open until the script at the end of this
+  long page ran: `html[data-phone="simple"]:not([data-ps-ready])` holds the same cards back from the first paint and the
+  script sets `data-ps-ready` as its first statement (so a failure below shows the cards, never hides them). Open cards while
+  the ICT desk loads: 10 then 3 before, 2 then 3 now; Luxus's landing 5 then 1 → 1. A desk that draws its cards again (LIT)
+  keeps the rows a person opened (`OPENED`).
+- Verified: every drawn element's box and all visible text, build before against build after, 0 differences at 1440, 1024 and
+  700 px (owner), in the Full view at 390 px (owner, Fred, Orlando, Luxus, Carlos) and for a guest at 390 and 1440 px; per
+  role, the text visible in the simple view with every fold opened is the text of before plus the view's own labels and
+  sentences (figures the role already saw); AA, 12 px, 44 px and no cut-off at 360 / 390 / 430 in the three themes.
+- Tests: `tests/qa-sweep.test.mjs` ("simple phone view 2": six tests); the smoke test's phone owner run opens `#charts` and
+  `#setup` too and fails when a view does not lead as described (chart under the tab bar, Trades tiles unfolded or more than
+  five rows, a Systems card other than "Which systems trade live" open, an open Research card, This week without its
+  sentence, more than four Scanner markets).
+- Left: Journal (1.6 screens, its two cards are what it is for), Users and NQ SDV (one screen), the guest page; the Council's
+  status line and tab bar above every pane (about 230 px); the loss review's intro paragraph and three filter rows; a
+  landing on a hash still paints Home for a frame before the router shows the view (seen while measuring, not the fold).
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
