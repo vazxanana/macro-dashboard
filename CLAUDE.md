@@ -1719,6 +1719,18 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     levels read off the picture, what is unclear, and the chart when times and levels can be placed on our candles), and
     propose only what is new (`learn <kind> <file> [lesson ids]`). When told "not right", restate the correction, do not
     argue it, and propose the corrected line. Never present a taught line as tested: it is how the teacher trades.
+  - **The desk's questions** (11 Nov 2026, owner: "Keep improving the learning"; the teacher had sent three new lessons
+    instead of answering seven questions written inside one answer). A reply may carry `ask`: up to 6 (`MAX_ASK`) short
+    questions, each a string or `{ q, yn: true }` (`askOf`), stored on the desk's message as `{ q, yn, a, aat }`;
+    `{ reply: { id, ask } }` with no text puts them under the desk's last answer while none is answered. The lesson's
+    teacher answers under that answer with one tap (Yes / No where `yn`) or a few words (`{ say: { id, answers: [{ i, a }] } }`,
+    his lesson only, the last answer's questions only; an answer can be changed until the desk answers again; the
+    assistant's key cannot answer). An answered question moves the lesson to "Waiting for the desk" (`stateOf`, the same
+    rule on the server and the page; answers given with or before "right" do not reopen it) and he can still press
+    "That is right" / "Not right…" (`judge` in `talkHTML`). Page: `askHTML`, `answer`, `.mo-q`; a half-written answer
+    survives a redraw (`T.qd`). Script: `reply <id> <file> [chart.json] [questions.json]` (a list is the questions, an
+    object the chart), `ask <id> <questions.json>`; `lesson.txt` prints each question with "THE TEACHER ANSWERED: …",
+    which is his word on that point. Ask few, one thing each, yes / no where it fits: he teaches between trades.
   - **Backtesting with the teacher** (same day, owner: "And do backtest with him, he will teach you"): a member who may
     teach (`TEACH` in backtest.html: the owner, or effective `mosha === 'teach'` from `/api/me`) teaches from ChronosTrade.
     Each closed trade's journal row has "Teach" (`[data-teach]`, "Taught" once sent; the records keep `taught` = the lesson
