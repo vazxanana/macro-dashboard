@@ -1236,22 +1236,65 @@ the finer candles reach it (a test checks the account equals stepping the lower 
 by the moment. `BT.advance(acct, ch, bars)` is the page's per-bar order (orders and positions, the challenge, then a breach closes
 everything, events marked `breach`) moved into the engine so the tests run the real code. Kept per session in memory: the candles of
 each timeframe used (`TFC`), so going back is instant. **Cleared at a switch: Undo history** (the toast and the panel say so); Undo
-works again from there and can bring a forming candle back. Playback does not animate the completion of a forming candle (it
-completes at the end of its time slot). Jump and Skip day complete a forming candle first. The extra panes take the moment, not the
+works again from there and can bring a forming candle back. Playback first completed a forming candle in one piece at the end of its slot; it now grows over the slot (polish
+pass below). Jump and Skip day complete a forming candle first. The extra panes take the moment, not the
 bar (`xpDraw` lower branch uses `mom()`), so a lower pane never shows a candle past it. Saved sessions carry `mom` (and `sw` once
 switched; the session strip's "replayed %" is then by time); `resume` builds a forming candle again from finer candles
 (`BT.tfResume`); a session saved before this change (index only) loads as before. Limits: the new timeframe is fetched for the whole
 session (300 candles of context before the start, `BT.tfWindow`); more than `XMAX` 40,000 candles is refused in words ("Too many
 1 minute candles for this session …: load fewer days"), nothing changes; a failed fetch leaves the session on its timeframe.
 After a switch, entry markers and connectors snap to the candle that holds their time (`timeToX` places a time inside a candle).
-"Avg hold (bars)" counts bars of whatever timeframe was on screen (finer candles while one formed). Phones: the timeframe button
-is in the toolbar row (44 px), Skip day moved under More (`#skipday2`) to make room. `window.ctTf()` is the audit's read-only
+`holdBars` counts bars of whatever timeframe was on screen (finer candles while one formed), so hold is shown as time (polish
+pass below). Phones: the timeframe button is in the toolbar row (44 px); the phone toolbar was redone in the polish pass. `window.ctTf()` is the audit's read-only
 summary. Not done: a weekly replay timeframe; a lower timeframe for only part of a long session (it is all or refused).
 Tests: `tests/backtest.test.mjs` (no future data in either direction, proven by changing every price after the moment; account
 identical across a switch; path equal to the lower timeframe; a stop in the rest taken once; a low before the moment never fills
 an order placed at it; chains of switches; data holes; refusal; old sessions). Audit: 179 checks (the switch against candles
 fetched apart from the page, forming candle, one step, Undo, split panes, reload, keys, play, the day candle, an old session,
 the refusal, AA in three themes, phone).
+
+Polish pass after the switch (11 Nov 2026, quality round: "not quantity but quality"). What the switch had left open, verified in a
+browser and then put in the audit:
+- **Forming candle during playback** (was: it completed in one piece at the end of its slot): with "Live candle" on it now grows
+  over its slot by its real finer candles. `frame()` calls `step(false, k, keep)`: `k` finer candles go through `BT.advance`
+  FIRST, then `BT.tfProgress(part, k)` folds them into the candle on screen and moves the moment to the end of the k-th, so the
+  chart never holds a price the engine has not processed (the drawn-ahead `drawForming` path is only for an ordinary next candle,
+  as before). Pausing in the middle leaves a valid forming candle at that later moment; one Undo takes the whole slot back;
+  sessions save `pg` (the finer timeframe the rest runs on), so a reload in the middle changes nothing. "Live candle" off: one piece.
+- **Stamps**: an order or manual close made while a candle forms is stamped `nowT()` = `BT.tfStamp` = the start of the last finer
+  candle replayed (it was the forming candle's own start: a trade at 14:35 inside a day candle was journalled at 00:00, wrong hour,
+  wrong session, possibly the wrong firm day). Without a forming candle the stamp is the last bar's start, as it always was.
+- **Hold is time**: Statistics show "Avg hold" as `BT.durText(stats.holdAvgSec)` ("2 h 15 m"; `BT.holdSec` = close stamp minus
+  open stamp, exact to one candle). No stored field changed: `holdBars` / `holdAvg` stay for old sessions and exports.
+- **Name**: `sName()` = `BT.sessionName(name, sym, tf)` shows a name the page made itself ("XAU 15m from …") under the timeframe
+  the session is on now (summary, saved-sessions list, report, export file, guide); a typed name is never touched and the
+  stored name is never rewritten.
+- **Jump / Skip day**: a jump to a time already replayed inside a forming candle is refused; both stop at the candle where a
+  challenge ends (they ran one candle past it after a forming candle) and are no longer held to one candle at a time by a
+  challenge that ended earlier (`chGo`).
+- **Dropdowns open where there is room** (`placeDd`, a MutationObserver on `open` for every toolbar `details.dd`: class `up` /
+  `down`, sideways clamp): with the toolbar under the chart the timeframe panel opened below the window. More measures its own
+  sheet (`setMore`) instead of a fixed 260 px.
+- **Phone toolbar** (touch and a chart card of 640 px or less; checked at 360 / 390 / 430): one row of 44 px controls: timeframe,
+  undo, next, play, Skip day (back in the row), More. Speed (`.tb-spd2`, a second set of pills kept in step by value) and Jump
+  (`#jump2` opens the same `#jumpdd` panel under the bar; no focus on touch, it threw the date picker up) are in More with Layers /
+  Layout / Draw and View; a floating bar (grip 44 px) also sends Skip day into More (`#skipday2`). It was 30 × 32 px buttons,
+  22 × 28 px speed pills, a More button cut to 16 px at 360 and a wrapped "Skip to the next day". A mouse on a narrow window keeps
+  the 32 px layout of pass 11. Not done: touch tablets wider than 640 px keep 32 px buttons.
+- **A challenge across switches, proven** (tests "challenge across switches (1) (2) (3)", audit 32): (1) switching away and back
+  between steps is field-for-field the session that never switched, through the breach; (2) steps on any timeframe, forming
+  candles included, equal the engine fed each step's own interval once; (3) against a session that never left its timeframe, one
+  that also stepped on finer candles agrees on balance, every exit and result, each firm day's start / low / end, the trailing
+  floor, pass / fail, the rule and the candle of the breach. What may differ, by nature and not by error: bar counts, and the
+  price a breach closes at (the close of the finer candle it happened in); a stop and a target inside one coarse candle is
+  settled worst-case on the coarse candle and in true order on finer ones (kept out of comparison 3).
+- Frame times (220 closed trades, journal open, 8 s of playback each, headless on a shared 4-core box under load, so noisy;
+  before and after measured back to back, 2-3 runs): p50 16.7 ms at 1x and at 12x before and after; p95 33-50 → 17-33 ms at 1x,
+  17 → 17 ms at 12x; with 4× CPU throttle p50 16.7 ms, p95 33-50 ms on both. No change beyond noise. The new path (a day candle
+  growing from 5m candles with three extra panes): p50 16.7, p95 33 ms; 4× throttle p50 33 ms for that one slot.
+  `window.ctAcct()` is the audit's read-only copy of the account and challenge.
+- Audit: sections 31-33 (Jump / Skip day from a forming and from an animated candle, the growing candle frame by frame, docks, full
+  screen, split panes across five switches, the two challenges against a reference in Node, phones at three widths). Since the merge with main the reference candles come through `fetchRetry` and sizes are read after `settle()` (`scripts/audit/shared.cjs`).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
@@ -1595,12 +1638,37 @@ badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOL
   through the worker. Caches `mx-shell-<VERSION>` / `mx-assets-<VERSION>`; activate deletes older `mx-` / `meridian-` /
   `gold-terminal-` caches. skipWaiting + clients.claim: a deploy takes over within seconds of the next page load or of
   `assets/pwa.js`'s update check (tab visible again, every 15-30 min); open pages are not reloaded mid-use, only when they come back
-  after 10+ minutes hidden with no dialog open. Push / notificationclick handlers unchanged (icons now /icons/).
+  after 10+ minutes hidden with nothing in hand (`busy()`, 11 Nov note below). Push / notificationclick handlers unchanged (icons now /icons/).
 - Kill switch: Vercel env `MX_SW_KILL=1` + redeploy -> the worker stops handling fetches and deletes its caches but stays
   registered (price-alert pushes keep working). One device: open any page with `?sw-reset` (unregisters + clears caches; that
   device's price alerts need turning on again).
 - Install: iPhone Safari -> Share -> Add to Home Screen (needed for iPhone push); Android Chrome -> menu -> Install app; desktop
   Chrome / Edge -> install icon in the address bar.
+- **Checked in a real browser with the worker ON** (11 Nov 2026): `node scripts/audit/pwa.cjs` (47 checks, about 25 s, in `ci.yml`
+  `pages`; `PORT` = a FREE port, it serves `out/` itself with vercel.json's rewrites and cache rules; no network; every other audit
+  blocks service workers). First visit, heavy use as the owner (Cache Storage holds only `/offline.html` and `/assets/*?v=`; 100+
+  `/api`, `/cdata`, `/md` answers marked private and sent as cacheable never get in), offline on every page and back, a deploy under
+  open pages (a copy of `out/` with one asset changed), the kill switch, `?sw-reset`, real push events, manifest, fonts. Found and fixed:
+  - `assets/pwa.js` held the quiet-moment reload back for ANY open `<dialog>`. ChronosTrade's first-steps card is one (non-modal,
+    up until dismissed), so that page never picked up a deploy by itself. `busy()` now means: a modal dialog, the cursor in a
+    field, or text typed into a visible text box and not sent (that last case used to be reloaded away). A skipped reload is
+    tried again at the next return.
+  - `?sw-reset` with another window of the site open: the browser keeps the same worker and runs no install, so the page came
+    back with no worker and no caches until the next deploy. The reset page leaves `sessionStorage mx-sw-reset`; the next load
+    posts `mx-prime` and the worker in charge sets its caches up again (`prime()`, also the install step) and claims the page.
+  - Push: a JSON payload of `null` threw in the handler (no notification of ours) and a bare string lost its text; `notice()`
+    reads any payload, caps title / body / tag, and `inSite()` keeps the link inside this site (also on the tap).
+  - A tap on a price alert navigated whichever window was open, so a ChronosTrade replay or an Academy session was replaced by
+    the chart. Now a window already on the Desk is focused and taken there; other pages are left alone and the chart opens in
+    a new window (an open one is navigated only when the browser will not open a window).
+  - How the hand-over really goes (Chromium): the open pages get the new worker first, its `activate` step (old caches out) runs
+    about a second later; a page that keeps talking to the old worker (or holds a response from it unread) can delay the
+    hand-over until the worker is idle, 5 minutes at most. Old `?v=` URLs of an open page keep answering from the network.
+  - The stamp misses only URLs built in script (today `/assets/sounds/sl.mp3`): those revalidate and are never stored, so they
+    cost a request but cannot go stale. No `srcset`, preload, `@import` or stylesheet `url()` points at an asset
+    (`tests/delivery.test.mjs` fails if one appears, or if a stamp is not the file's hash, or a font file is missing).
+  - Not checked: Safari / iOS (install, push, `dialog:modal` falls back to any open dialog there if unsupported), a real push
+    service, and the tap on a real notification (the handlers are pinned in `tests/pwa.test.mjs` on a fake worker).
 
 ## The veteran's event playbook (9 Nov 2026, owner: "be the best of all times veteran", "keep improving all the bits")
 `council/playbook.mjs` (pure, no fetch; built by `veteran.mjs` → `veteran.json.events`, `eventsRecord`): one card per red-folder

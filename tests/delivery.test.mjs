@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { families, fontFaces, selfHostFonts } from '../scripts/self-host-fonts.mjs';
 
@@ -72,4 +73,88 @@ test('stamp-assets: src/href and url() in inline styles get ?v=<sha256 prefix>; 
   assert.match(h, /url\(\/assets\/fonts\/f\.woff2\?v=a1fce43638\)/);
   assert.match(h, /'\/assets\/sounds\/sl\.mp3'/); assert.match(h, /src="\/assets\/missing\.png"/);
   fs.rmSync(d, { recursive: true, force: true });
+});
+
+// ---- 11 Nov 2026: the built site, checked file by file (the browser side is scripts/audit/pwa.cjs) ----
+const OUT = path.join(ROOT, 'out');
+const builtPages = () => (function walk(d) { return fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? (e.name === 'assets' ? [] : walk(path.join(d, e.name))) : /\.html$/.test(e.name) ? [path.join(d, e.name)] : []); })(OUT);
+const sha10 = (f) => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex').slice(0, 10);
+
+test('built pages: every link to an existing asset carries the hash of that file; only URLs built in script go without', () => {
+  let stamped = 0; const bare = new Set();
+  for (const f of builtPages()) {
+    const rel = path.relative(OUT, f), s = fs.readFileSync(f, 'utf8');
+    // anything that looks like an asset URL, wherever it stands (attributes, srcset, url(), preload, @import, script strings)
+    // (a relative "assets/x.js" counts only as a src / href value: the pages also name files that way in comments)
+    for (const m of s.matchAll(/(["'(=\s,]|(?:src|href)=["']?(?:\.\.?\/)?(?=assets\/))((?:\/(?:macro-dashboard\/)?)?assets\/[\w./-]+\.[a-z0-9]{2,5})(\?v=([0-9a-f]+))?/g)) {
+      if (!m[2].startsWith('/') && !/^(?:src|href)=/.test(m[1])) continue;
+      const file = path.join(OUT, 'assets', m[2].replace(/^.*?assets\//, ''));
+      if (!fs.existsSync(file)) continue;
+      if (m[3]) { assert.equal(m[4], sha10(file), `${rel}: ${m[2]} is stamped with another file's hash (stale out/?)`); stamped++; }
+      else bare.add(m[2]);
+    }
+    assert.doesNotMatch(s, /\b(?:image)?srcset=["'][^"']*assets\//, rel + ': srcset to /assets is not stamped by scripts/stamp-assets.mjs');
+    assert.doesNotMatch(s, /@import\s+(?:url\()?["']?[^"');]*assets\//, rel + ': @import of an asset is not stamped');
+  }
+  assert.ok(stamped >= 100, 'stamped links: ' + stamped);
+  // Unstamped = revalidated on every use (vercel.json) and never stored by sw.js, so they cannot go stale; they only cost a
+  // request. The one such URL is built in script. A new one here should be a plain src / href so the stamp reaches it.
+  assert.deepEqual([...bare].sort(), ['/assets/sounds/sl.mp3']);
+});
+
+test('assets: no stylesheet or script pulls another asset by a URL the stamp cannot see', () => {
+  const dir = path.join(OUT, 'assets');
+  for (const f of fs.readdirSync(dir)) {
+    if (/\.css$/.test(f)) { const s = fs.readFileSync(path.join(dir, f), 'utf8'); assert.doesNotMatch(s, /@import/, f); assert.doesNotMatch(s.replace(/url\(\s*["']?data:[^)]*\)/g, ''), /url\(/, f + ': url() in a stylesheet is unversioned'); }
+    if (/\.js$/.test(f)) { const s = fs.readFileSync(path.join(dir, f), 'utf8'); assert.doesNotMatch(s, /\bimportScripts\s*\(|\bimport\s*\(\s*["']/, f); }
+  }
+  // the worker itself imports nothing either (updateViaCache would matter otherwise)
+  assert.doesNotMatch(src('sw.js'), /importScripts|^\s*import\s/m);
+});
+
+test('fonts: no built page, stylesheet or script names a Google host, and every @font-face file is in out/assets/fonts', () => {
+  const files = builtPages().concat(fs.readdirSync(path.join(OUT, 'assets')).filter((f) => /\.(css|js)$/.test(f)).map((f) => path.join(OUT, 'assets', f)), [path.join(OUT, 'sw.js')]);
+  let faces = 0;
+  for (const f of files) {
+    const rel = path.relative(OUT, f), s = fs.readFileSync(f, 'utf8');
+    assert.doesNotMatch(s, /fonts\.(?:googleapis|gstatic)\.com/, rel);
+    for (const block of s.match(/@font-face\s*\{[^}]*\}/g) || []) {
+      const urls = [...block.matchAll(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g)].map((m) => m[1]);
+      assert.ok(urls.length, rel + ': @font-face without a file');
+      for (const u of urls) {
+        const m = /^\/assets\/fonts\/([\w.-]+\.woff2)\?v=([0-9a-f]{10})$/.exec(u);
+        assert.ok(m, `${rel}: font URL ${u}`);
+        const file = path.join(OUT, 'assets/fonts', m[1]);
+        assert.ok(fs.existsSync(file) && fs.statSync(file).size > 1000, `${rel}: ${m[1]} is missing`);
+        assert.equal(m[2], sha10(file), `${rel}: ${m[1]} hash`);
+        faces++;
+      }
+    }
+  }
+  assert.ok(faces >= 20, '@font-face rules checked: ' + faces);
+  // every family a page's CSS asks for by name has a face on that page (a typo or a dropped link would fall back silently)
+  for (const f of builtPages()) {
+    const s = fs.readFileSync(f, 'utf8'), have = new Set([...s.matchAll(/@font-face\{font-family:'([^']+)'/g)].map((m) => m[1]));
+    for (const fam of ['Figtree', 'JetBrains Mono', 'Inter', 'Space Grotesk', 'IBM Plex Mono', 'IBM Plex Sans', 'Fraunces', 'Manrope']) {
+      if (new RegExp(`font(?:-family)?\\s*:[^;}]*['"]${fam}['"]`).test(s)) assert.ok(have.has(fam), `${path.relative(OUT, f)} uses ${fam} but has no @font-face for it`);
+    }
+  }
+});
+
+test('vercel.json: the two /assets prefixes each have exactly the pair of rules, and nothing else caches a page or the worker', () => {
+  const v = JSON.parse(src('vercel.json'));
+  for (const pre of ['/assets/(.*)', '/macro-dashboard/assets/(.*)']) {
+    const rules = v.headers.filter((h) => h.source === pre);
+    assert.equal(rules.length, 2, pre);
+    const withV = rules.find((r) => r.has), without = rules.find((r) => r.missing);
+    assert.deepEqual(withV.has, [{ type: 'query', key: 'v' }]); assert.equal(withV.missing, undefined);
+    assert.deepEqual(without.missing, [{ type: 'query', key: 'v' }]); assert.equal(without.has, undefined);
+    assert.equal(cc(withV), 'public, max-age=31536000, immutable');
+    assert.equal(cc(without), 'public, max-age=0, must-revalidate');
+  }
+  for (const h of v.headers) {
+    const c = cc(h); if (!c) continue;
+    if (/\.html|^\/$|sw\.js|webmanifest/.test(h.source)) assert.equal(c, 'no-cache', h.source);
+    if (!/assets/.test(h.source)) assert.doesNotMatch(c, /immutable/, h.source);
+  }
 });
