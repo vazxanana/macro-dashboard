@@ -1898,6 +1898,33 @@
     ],
     "stopCheckedAt": "2026-11-10T23:52:02.000Z",
     "brokerStop": 1.11701
+   },
+   "gbpusd-replica-1794357299-s": {
+    "positionId": "48244485",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T00:36:04.000Z",
+    "councilEntry": 1.33466,
+    "stop": 1.334998,
+    "t1": 1.333983,
+    "riskCash": 2,
+    "margin": 13.35,
+    "shadow": true,
+    "mark": 1.33466,
+    "levelsFrom": "mark",
+    "fillPrice": 1.33465,
+    "slipR": 0.03,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T00:36:04.000Z",
+    "brokerStop": 1.33499
    }
   },
   "day": {
@@ -1905,11 +1932,12 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10010.64 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10010.64 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794355612-b": "none of XRPUSD found at the broker"
+   "xrp-replica-1794355612-b": "none of XRPUSD found at the broker",
+   "xrp-replica-1794357299-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -1918,7 +1946,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10010.64,
-  "lastRun": "2026-11-11T00:33:43.000Z"
+  "lastRun": "2026-11-11T00:36:04.000Z"
  },
  "log": [
   {
@@ -2643,6 +2671,16 @@
    "at": "2026-11-11T00:31:26.000Z",
    "msg": "USDCHF position 48230038 closed at the broker",
    "trade": "usdchf-replica-1794351613-s"
+  },
+  {
+   "at": "2026-11-11T00:36:04.000Z",
+   "msg": "not mirrored xrp-replica-1794357299-s: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794357299-s"
+  },
+  {
+   "at": "2026-11-11T00:36:04.000Z",
+   "msg": "opened sell GBPUSD 0.05 lot (council replica)",
+   "trade": "gbpusd-replica-1794357299-s"
   }
  ],
  "limits": {
@@ -2721,8 +2759,8 @@
   ]
  },
  "execution": {
-  "n": 66,
-  "meanSlipR": 0.098,
+  "n": 67,
+  "meanSlipR": 0.097,
   "medianSlipR": 0.038,
   "worstSlipR": 1.236,
   "medianLagSec": 73,
@@ -2752,8 +2790,8 @@
     "meanSlipR": 0.041
    },
    "GBPUSD": {
-    "n": 4,
-    "meanSlipR": 0.066
+    "n": 5,
+    "meanSlipR": 0.059
    },
    "USDCHF": {
     "n": 5,
