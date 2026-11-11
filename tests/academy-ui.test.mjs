@@ -217,7 +217,16 @@ test('the page talks to the Academy API and the candle proxy only: no broker, no
   const urls = [...ui.matchAll(/fetch\(([^)]*)\)/g)].map((m) => m[1]);
   assert.deepEqual(urls, ['url, init'], 'one fetch call, inside the api helper');
   assert.deepEqual([...new Set([...ui.matchAll(/'(\/(?:api|md|cdata)\/[a-z-]+)[?']/g)].map((m) => m[1]))].sort(), ['/api/academy']);
-  assert.ok(!/ctrader|\/api\/bridge|tradovate|websocket|new WebSocket|localStorage|sessionStorage/i.test(ui), 'no broker code, no socket, no browser storage of results');
+  assert.ok(!/ctrader|\/api\/bridge|tradovate|websocket|new WebSocket|sessionStorage|indexedDB/i.test(ui), 'no broker code, no socket, no browser storage of results');
+  // Browser storage (11 Nov 2026, round 2): until then the page used none at all. It now keeps two DISPLAY preferences of the
+  // device (the edge used last, which parts of the decision card are open) and nothing else: one reader and one writer, both
+  // refusing any key outside the list, and no caller passes them a decision, a result, a lesson or an API answer.
+  assert.equal((ui.match(/localStorage/g) || []).length, 2, 'localStorage is touched in prefGet and prefSet only');
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/);
+  assert.match(ui, /function prefGet\(k\) \{ if \(PREFS\.indexOf\(k\) < 0\) return null; try \{ return root\.localStorage\.getItem\(k\); \}/);
+  assert.match(ui, /function prefSet\(k, v\) \{ if \(PREFS\.indexOf\(k\) < 0\) return; try \{ root\.localStorage\.setItem\(k, String\(v\)\.slice\(0, 400\)\); \}/);
+  assert.deepEqual([...ui.matchAll(/prefSet\(([^;]*?)\);/g)].map((m) => m[1]).filter((x) => !/^k, v$/.test(x)).sort(), ["'mxacEdge', String(id)", "'mxacFold', JSON.stringify(v)"], 'the two writes: an edge id, and the open flags of the card');
+  for (const f of ['assets/academy-tabs.js', 'assets/academy-analyst.js']) assert.ok(!/localStorage|sessionStorage/.test(src(f)), f + ' keeps nothing in the browser');
   // POSTs are queued: the store has no compare-and-swap
   assert.match(ui, /const p = chain\.then\(run, run\); chain = p\.catch\(\(\) => \{\}\); return p;/);
 });
@@ -479,14 +488,138 @@ test('page wiring of the usability pass: the point line sits under the chart, Co
   assert.match(html, /id="point-bar" role="status" aria-live="polite" hidden/);
   // every way of leaving a decision point goes through the same question: play / continue, step, jump, restart
   const guards = ui.match(/!leaveOk\(\)/g) || []; assert.equal(guards.length, 4, 'play, step, jump and restart');
-  assert.match(ui, /function leaveOk\(\) \{\s*if \(!S\.cur \|\| S\.cur\.closed \|\| !mentorUnsaved\(M\)\) return true;/);
+  // round 3 (11 Nov 2026): the question itself moved into MXAC.leaveGuard, shared with the Session tab and the Blind arena
+  assert.match(ui, /const trainUnsaved = \(\) => !!S\.cur && !S\.cur\.closed && mentorUnsaved\(M\);\s*const leaveOk = leaveGuard\(\{ unsaved: trainUnsaved, tell:/);
   assert.match(ui, /cur\.correction = res\.correction; cur\.cmp = null; M\.dirty = false;/, 'a stored correction is no longer unsaved');
   assert.match(ui, /id: 'continue-msg', role: 'status'/);
   // the guard only delays a click: it stores nothing and decides nothing
-  const body = ui.slice(ui.indexOf('function leaveOk()'), ui.indexOf('// ---- the line under the chart')); assert.doesNotMatch(body, /api\.|MXA\.|MXK\./);
+  const body = ui.slice(ui.indexOf('const trainUnsaved'), ui.indexOf('// ---- the line under the chart')) + ui.slice(ui.indexOf('function leaveGuard(o)'), ui.indexOf('// the one line under the chart')); assert.ok(body.length > 600); assert.doesNotMatch(body, /api\.|MXA\.|MXK\.|prefSet|localStorage/);
   assert.match(ui, /\['Alternative', 'Net R after costs', 'Exit', 'Filled', 'Levels', 'Best', 'Worst', 'Exit time \(UTC\)'\]/);
   assert.match(ui, /PV\.chart\.timeScale\(\)\.fitContent\(\)/, 'the preview shows the whole two weeks it names');
   assert.match(tabs, /K\.showNode\(st\.node\)/, 'Blind arena: "Next setup" brings the chart back');
   assert.match(tabs, /MXAC\.humanize\(d\.thesis, Z\.lessons\)/);
   assert.match(css, /scroll-margin-top: 64px/); assert.match(css, /\.ac-side \.cond > :first-child \{ grid-column: 1 \/ -1; \}/);
+});
+
+// ---- round 2 (11 Nov 2026): keeping the place, the folded card, calmer forms --------------------------------------------------
+test('a setup id in the engine\'s text is shown in plain words; other ids and words are left alone', () => {
+  assert.equal(MXAC.humanize('rejected candidate gmp-1714660200s: the evidence does not beat it'), 'rejected the sell setup of 2024-05-02 14:30 UTC: the evidence does not beat it');
+  assert.equal(MXAC.humanize('nq-open-1514903940b: not opened on paper'), 'the buy setup of 2018-01-02 14:39 UTC: not opened on paper');
+  assert.equal(MXAC.humanize('mosha-bo-1532336640s closed'), 'the sell setup of 2018-07-23 09:04 UTC closed');
+  for (const keep of ['data OANDA xau-usd policy-1.0', 'attempt at_0mwc5xyro13a8c328cea in session se_0mwc3emu9', 'snapshot 64e9d0fc81e8ea15', 'a body of 2.28 ATR 2 bars ago', 'level 2286.185 7 bars ago']) assert.equal(MXAC.humanize(keep), keep);
+  // every real candidate id of the seven edges reads as its own side and time
+  for (const e of EDGES) { const c = json(`academy/data/cand-${e.id}.json`)[0]; assert.equal(MXAC.humanize(c.id), `the ${c.side} setup of ${MXAC.fmtTime(c.t)}`, c.id); }
+});
+
+test('the folded decision card: the main reasons are a cut of lists that stay whole in the card', () => {
+  const wait = { action: 'WAIT', waitReasons: ['a', 'b', 'c', 'd', 'e'], supporting: [{ text: 'x', weight: 2 }] };
+  assert.deepEqual(MXAC.mainReasons(wait), { kind: 'wait', items: ['a', 'b', 'c'], more: 2 });
+  const take = { action: 'BUY', supporting: [{ text: 'light', weight: 0.5 }, { factor: 'heavy', weight: 2 }, { text: 'mid', weight: 1 }, { text: 'none' }] };
+  assert.deepEqual(MXAC.mainReasons(take), { kind: 'take', items: ['heavy', 'mid', 'light'], more: 1 });
+  assert.deepEqual(take.supporting.map((x) => x.text || x.factor), ['light', 'heavy', 'mid', 'none'], 'the decision itself is not reordered');
+  assert.deepEqual(MXAC.mainReasons({ action: 'SELL' }), { kind: 'take', items: [], more: 0 }); assert.deepEqual(MXAC.mainReasons(null), { kind: 'take', items: [], more: 0 });
+  const ui = src('assets/academy-ui.js'), view = ui.slice(ui.indexOf('function decisionView(box, o) {'), ui.indexOf('function renderDecision() {'));
+  // nothing left out: every part the unfolded card drew is still drawn, folded or not
+  for (const id of ['-thesis', '-support', '-against', '-similar', '-lessons']) assert.ok(view.includes(`idp + '${id}'`), id);
+  for (const t of ['Reasons to wait', 'What it is waiting for', 'Uncertainty', 'What would prove it wrong', 'Reward to risk', 'Stop distance', 'Risk engine', 'Similar past cases', 'Lessons applied', 'Facts about this setup from the edge']) assert.ok(view.includes(t), t);
+  for (const k of ['evidence', 'wait', 'doubt', 'risk', 'similar', 'lessons']) assert.ok(view.includes(`part('${k}'`), k);
+  assert.match(ui, /lessons: S\.lessons, fold: true, onLessons:/, 'the Train card is the folded one');
+  assert.doesNotMatch(src('assets/academy-tabs.js'), /fold: true/, 'the Session and Blind cards already sit behind their own disclosure');
+  // the view draws; it decides nothing and sends nothing
+  assert.doesNotMatch(view, /api\.|MXA\.decide|MXK\./);
+});
+
+test('two conflicting lessons named by a decision are found by their ids, and only then', () => {
+  const t = 'WAIT on the sell candidate: conflicting lessons: ls_0mwc3emu90a7dd6b9881 vs ls_0mwc3fjt60d27c861c61 (FLIP against WAIT): the mentor has to settle which one holds here.';
+  assert.deepEqual(MXAC.conflictIds({ thesis: t }), ['ls_0mwc3emu90a7dd6b9881', 'ls_0mwc3fjt60d27c861c61']);
+  assert.deepEqual(MXAC.conflictIds({ thesis: 'x', waitReasons: ['y', t] }), ['ls_0mwc3emu90a7dd6b9881', 'ls_0mwc3fjt60d27c861c61']);
+  assert.equal(MXAC.conflictIds({ thesis: 'lesson ls_0mwc3emu90a7dd6b9881 applied' }), null); assert.equal(MXAC.conflictIds(null), null); assert.equal(MXAC.conflictIds({}), null);
+  const tabs = src('assets/academy-tabs.js');
+  assert.match(tabs, /MXAC\.lessonFocus = null;/, 'the Lessons tab marks them once, not on every later visit');
+  assert.match(tabs, /li\.classList\.add\('hit'\)/);
+});
+
+test('the verdicts offered never repeat the engine\'s own answer as a change', () => {
+  assert.deepEqual(MXAC.mentorChoices('WAIT'), [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Change to BUY'], ['SELL', 'Change to SELL']]);
+  assert.deepEqual(MXAC.mentorChoices('BUY'), [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Keep BUY, other levels'], ['SELL', 'Change to SELL'], ['WAIT', 'Change to WAIT']]);
+  assert.deepEqual(MXAC.mentorChoices('SELL').map((x) => x[1]), ['Approve', 'Reject', 'Change to BUY', 'Keep SELL, other levels', 'Change to WAIT']);
+  // the rule that refuses a WAIT on a WAIT is still in force behind the form
+  assert.deepEqual(MXAC.correctionProblems(MXAC.buildCorrection({ choice: 'WAIT', reasons: ['late'] }, 'at_1'), { action: 'WAIT' }), ['The engine already said WAIT: use Approve.']);
+});
+
+test('a reload keeps the place: the session saved last comes first, a finished one is not offered, and the position rides on one call a decision', () => {
+  const rows = [{ id: 'a', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T10:00:00Z' }, { id: 'b', kind: 'replay', status: 'done', updatedAt: '2026-11-11T12:00:00Z' }, { id: 'c', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T11:00:00Z' }, { id: 'd', kind: 'session', status: 'paused', updatedAt: '2026-11-11T13:00:00Z' }];
+  assert.deepEqual(MXAC.latestFirst(rows).map((r) => r.id), ['d', 'b', 'c', 'a']); assert.deepEqual(rows.map((r) => r.id), ['a', 'b', 'c', 'd'], 'the list handed in is not reordered');
+  assert.equal(MXAC.unfinished(MXAC.latestFirst(rows)).id, 'c', 'the unfinished replay saved last; a finished one and a Session-tab sitting are not offered');
+  assert.equal(MXAC.unfinished([]), null); assert.equal(MXAC.unfinished(null), null); assert.deepEqual(MXAC.latestFirst(null), []);
+  const ui = src('assets/academy-ui.js'), open = ui.slice(ui.indexOf('  async function openPoint(c) {'), ui.indexOf('  // A reload keeps your place'));
+  // one train decision: the first of a run saves the session BEFORE its attempt (it needs the id) with the setup it is on, and
+  // adds no call; every later one saves once AFTER its attempt. Never both.
+  assert.match(open, /const firstSave = !S\.sessionId; if \(firstSave\) await saveSession\(true, c\.id\);/);
+  assert.match(open, /if \(!firstSave\) await keepPlace\(\);/);
+  assert.equal((open.match(/saveSession\(|keepPlace\(/g) || []).length, 2);
+  assert.ok(open.indexOf("api.post(attemptBody(") < open.indexOf('await keepPlace()'), 'the position is saved after the attempt is stored');
+  assert.match(ui, /async function keepPlace\(\) \{ try \{ await saveSession\(true\); \} catch \(e\) \{ log\(/, 'a failed position save never costs the decision');
+  assert.match(ui, /cur: S\.cur && !S\.cur\.closed \? S\.cur\.cand\.id : curId \|\| null \}/);
+  // the offer reads the list the page already asks for and loads nothing until Resume is pressed
+  const offer = ui.slice(ui.indexOf('function renderResumeNow(s) {'), ui.indexOf('  // The edge used last')); assert.doesNotMatch(offer, /api\.get|MXR\.load/);
+  assert.match(src('academy.html'), /id="resume-now" hidden/);
+});
+
+test('the red problem line waits for Save: before it, what is missing is a calm line and Save is offered', () => {
+  const ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js');
+  assert.match(ui, /const b = \$\('m-save'\); if \(b\) b\.disabled = !M\.choice;/);
+  assert.match(ui, /const n = \$\('m-err'\), on = !!M\.tried && probs\.length > 0;/);
+  assert.match(ui, /if \(mentorCheck\(true\)\.length\) \{.*?return; \} S\.busy = true;/, 'Save with something missing shows the problem and stores nothing');
+  assert.ok(ui.indexOf('if (mentorCheck(true).length)') < ui.indexOf("api.post({ action: 'correct'"), 'the check comes before the call');
+  assert.match(tabs, /if \(save\.disabled \|\| check\(true\)\.length\) return;/);
+  assert.match(tabs, /err\.hidden = !on;/); assert.match(tabs, /save\.disabled = !A\.action;/);
+});
+
+// ---- round 3 (11 Nov 2026): the Session tab and the Blind arena get the protections of the Train tab ------------------------------
+test('leaveGuard: the first press over an unsaved answer says so and refuses, a second within ten seconds leaves, a saved answer never asks', () => {
+  let now = 1000, dirty = true, told = 0; const ok = MXAC.leaveGuard({ unsaved: () => dirty, tell: () => { told++; }, now: () => now });
+  assert.equal(MXAC.LEAVE_MS, 10000);
+  assert.equal(ok(), false); assert.equal(told, 1); now += 9000; assert.equal(ok(), true, 'a second press within the ten seconds leaves'); assert.equal(told, 1);
+  assert.equal(ok(), false, 'and the question starts again for the next half-written answer'); now += 10001; assert.equal(ok(), false, 'a press after the ten seconds is a first press again'); assert.equal(told, 3);
+  ok.reset(); now += 10; assert.equal(ok(), false, 'reset forgets a first press'); dirty = false; assert.equal(ok(), true, 'nothing unsaved: never asks'); assert.equal(told, 4);
+  dirty = true; assert.equal(ok(), false, 'a clean pass in between does not count as the first press');
+  // the answer forms of the Session tab and the Blind arena use the Train form's own rule
+  assert.equal(MXAC.mentorUnsaved({ dirty: true, choice: 'WAIT', text: '' }), true); assert.equal(MXAC.mentorUnsaved({ dirty: true, choice: null, text: 'a word' }), true); assert.equal(MXAC.mentorUnsaved({ dirty: false, choice: 'WAIT', text: 'x' }), false);
+});
+
+test('a sitting of the Session tab is offered after a reload, and only an unfinished one', () => {
+  const rows = MXAC.latestFirst([{ id: 'a', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T10:00:00Z' }, { id: 'b', kind: 'session', status: 'paused', updatedAt: '2026-11-11T12:00:00Z' }, { id: 'c', kind: 'session', status: 'done', updatedAt: '2026-11-11T13:00:00Z' }]);
+  assert.equal(MXAC.unfinished(rows).id, 'a', 'the default is still a Train replay'); assert.equal(MXAC.unfinished(rows, 'session').id, 'b', 'an ended sitting is not offered');
+  assert.equal(MXAC.unfinished(rows, ['replay', 'session']).id, 'b', 'whichever was saved last'); assert.equal(MXAC.unfinished([{ id: 'c', kind: 'session', status: 'done' }], 'session'), null);
+});
+
+test('page wiring of round 3: Session saves its place and guards a verdict, Blind guards an answer and answers once, the draft comes back without browser storage', () => {
+  const ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js'), css = src('assets/academy.css');
+  // one guard, three users; no copy of it in the sections
+  assert.equal((ui.match(/= leaveGuard\(\{/g) || []).length, 1, 'Train'); assert.equal((tabs.match(/K\.leaveGuard\(\{/g) || []).length, 2, 'Session and Blind arena'); assert.doesNotMatch(tabs, /LEAVE_MS|asked = /);
+  assert.match(ui, /root\.addEventListener\('beforeunload', \(e\) => \{ if \(UNSAVED\.some\(/); assert.equal((tabs.match(/K\.watchUnsaved\(/g) || []).length, 2);
+  // Session: every way of leaving a half-written verdict or note asks first
+  const sess = tabs.slice(tabs.indexOf('function sessionTab(sec, ctx)'));
+  for (const re of [/if \(canMove\(\) && leave\(\)\) \{ leavePoint\(\); Z\.clock\.step\(1\); \}/, /if \(cs\.playing\) \{ Z\.clock\.pause\(\); draw\(\); return; \} if \(!leave\(\)\) return;/, /if \(!Z\.clock \|\| Z\.ended \|\| !leave\(\)\) return;/, /if \(!sure && Z\.clock && !leave\(\)\) return;/, /if \(Z\.busy \|\| \(Z\.clock && !leave\(\)\)\) return;/, /Z\.clock\.state\(\)\.playing \|\| !leave\(\)\) return;/, /set: \(v\) => \{ myEdge = v; \}, leave \}/]) assert.match(sess, re);
+  // Session: the place is saved with every decision (the first save comes before the attempt and carries the setup), and a failed save never costs the decision
+  assert.match(sess, /const firstSave = !Z\.sessionId; if \(firstSave\) await save\(true, null, c\.id\);/);
+  assert.match(sess, /if \(!firstSave\) \{ try \{ await save\(true\); \} catch \(e2\) \{ warn = /);
+  assert.match(sess, /cur: Z\.cur \? Z\.cur\.cand\.id : curId \|\| null/);
+  assert.equal((sess.match(/action: 'session\.save'/g) || []).length, 1, 'one way of saving');
+  // Session resume: reads only (the stored attempt of this sitting, its verdict), the snapshot rebuilt at the setup's own time, no decision made again
+  const rp = sess.slice(sess.indexOf('async function restorePoint(candId)'), sess.indexOf('// a note at the replay time'));
+  assert.ok(rp.length > 500); assert.doesNotMatch(rp, /api\.post|decide\(|K\.decideOn|get: 'outcome'/); assert.match(rp, /K\.snapOf\(Z\.edge, Z\.series, Z\.dataVersion, c\.t, c\)/); assert.match(rp, /a\.sessionId === Z\.sessionId && a\.decision/);
+  // Blind arena: the guard on the two ways an answer can be lost; one answer a setup; a setup shown in Train or Session since is recall
+  const blind = tabs.slice(tabs.indexOf('function blindTab(sec, ctx)'), tabs.indexOf('// ---- Session training'));
+  assert.match(blind, /if \(B\.busy \|\| !leave\(\)\) return;/); assert.match(blind, /set: \(v\) => \{ myEdge = v; \}, leave \}/);
+  assert.match(blind, /catch \(e2\) \{ if \(e2\.status !== 409\) throw e2; B\.done\.add\(c\.id\); await already\(c\);/);
+  assert.match(blind, /K\.decided\(c\.id, B\.pool, 'blind'\);/); assert.match(ui, /decidedAs\(c\.id, S\.pool, again \? 'replay-same' : 'train'\)/); assert.match(sess, /K\.decided\(c\.id, Z\.pool, again \? 'replay-same' : 'train'\)/);
+  assert.doesNotMatch(blind, /get: 'attempts'|get: 'dataset'/, 'the arena never asks the server for a stored decision');
+  assert.equal((blind.match(/id: 'bl-next'/g) || []).length, 2, '"Next setup" is built only where an answer is already stored (both answers shown, or the server said it had one)');
+  // the lesson draft on resume: made again from stored things, never from the browser
+  assert.match(ui, /S\.cur\.lesson = MXA\.lessons\.fromCorrection\(S\.cur\.first\.decision, Object\.assign\(\{\}, S\.cur\.correction, \{ sessionId: S\.sessionId \}\), f\);/);
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/, 'the storage allowlist did not grow');
+  assert.match(ui, /delete CACHE\.pool\[st\.edge\.id \+ '\|exam'\]; if \(!firstSave\) await keepPlace\(\);/, 'the exam list is dropped after an exam setup (it sat inside a comment in round 2)');
+  assert.match(css, /\.card\.folded > :not\(\.c-h\):not\(\.fold-bar\) \{ display: none; \}/);
 });

@@ -20,7 +20,7 @@
 //
 // The site's firewall allows 30 requests a minute per IP on /api. Every Academy call goes through MXAC.makeApi: at most
 // PACE (24) calls in any minute, a wait and a retry on HTTP 429, POSTs one at a time. A replay run reads the candidates,
-// the lessons, the calendar and the past cases once; one train decision then costs one call (the stored attempt).
+// the lessons, the calendar and the past cases once; one train decision then costs two calls (the stored attempt, then the session position, so a reload keeps the place). The Session tab does the same since round 3.
 //
 // The pure helpers at the top are also loaded by Node (tests/academy-ui.test.mjs, scripts/academy-dev.mjs).
 (function (root) {
@@ -216,11 +216,22 @@
   // instead (an id that is not among them stays as it is), and a doubled full stop left by a note ending in one is mended.
   // Display only: the stored text is never changed.
   const humanize = (s, lessons) => String(s == null ? '' : s).replace(/\bsince (\d{9,10})\b/g, (m, n) => 'since ' + fmtTime(+n))
+    .replace(/\b(?:candidate )?[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*-(\d{9,10})([sb])\b/g, (m, t, sd) => `the ${sd === 's' ? 'sell' : 'buy'} setup of ${fmtTime(+t)}`)   // a setup id (<edge>-<time><s|b>) in plain words
     .replace(/\bls_[0-9a-z]{6,}\b/g, (id) => { const l = Array.isArray(lessons) ? lessons.find((x) => x && x.id === id) : null; return l && l.title ? `"${l.title}"` : id; })
     .replace(/([^.\s])\.\.(?=\s|$)/g, '$1.');
   // Is a verdict being written that Continue would throw away? m = the mentor's form; m.dirty is set by every edit and
   // cleared when the correction is stored. True from the first choice, reason, word or mark until it is saved.
   const mentorUnsaved = (m) => !!m && !!m.dirty && !!(m.choice || (m.reasons || []).length || String(m.text || '').trim() || (m.annotations || []).length);
+  // One question for every way of leaving a half-written answer (Train, Session, Blind arena). leaveGuard({ unsaved(), tell(),
+  // now?, ms? }) → ok(): true when nothing unsaved is on the form, or when asked a second time within LEAVE_MS; the first
+  // time it calls tell() (the page says "not saved") and returns false. ok.reset() forgets a first press. It only delays a
+  // click: it stores nothing, sends nothing and decides nothing.
+  const LEAVE_MS = 10000;
+  function leaveGuard(o) {
+    const now = o.now || (() => Date.now()), ms = o.ms || LEAVE_MS; let asked = 0;
+    const ok = () => { if (!o.unsaved()) { asked = 0; return true; } const t = now(); if (asked && t - asked < ms) { asked = 0; return true; } asked = t; if (o.tell) o.tell(); return false; };
+    ok.reset = () => { asked = 0; }; return ok;
+  }
   // the one line under the chart when the clock stops on a setup: what was decided and where to go next
   function pointLine(o) {
     const x = o || {}, a = x.action || 'n/a', conf = x.confidence ? ` (${x.confidence} confidence)` : '';
@@ -277,6 +288,14 @@
     return { get, post, stats };
   }
 
+  // The verdicts offered on a decision. The engine's own answer is never offered as a "change": a WAIT it already gave is
+  // left out (that is Approve), and its own BUY / SELL is offered as the same trade on other levels.
+  function mentorChoices(engineAction) {
+    const out = [['approve', 'Approve'], ['reject', 'Reject']];
+    for (const a of ['BUY', 'SELL']) out.push([a, a === engineAction ? `Keep ${a}, other levels` : `Change to ${a}`]);
+    if (engineAction !== 'WAIT') out.push(['WAIT', 'Change to WAIT']);
+    return out;
+  }
   // the levels a changed BUY / SELL starts from: the setup's own, mirrored when the mentor takes the other side
   function mentorLevelsOf(c, choice) {
     if (!c || !isTake(choice)) return { entry: null, stop: null, target: null };
@@ -343,12 +362,30 @@
       : `The first row does NOT match the stored result of this setup: simulated ${sim}; stored ${stored} (a difference of ${fmtR(d)}).` + why;
   }
 
+  // The few lines of a decision kept in sight when its detail is folded: a WAIT's first reasons to wait, or the heaviest
+  // evidence for a trade. → { kind: 'wait' | 'take', items: [text], more: how many of the same list are not shown }
+  function mainReasons(d, n) {
+    const k = n || 3, x = d || {};
+    if (x.action === 'WAIT') { const all = (x.waitReasons || []).map(String); return { kind: 'wait', items: all.slice(0, k), more: Math.max(0, all.length - k) }; }
+    const all = (x.supporting || []).slice().sort((a, b) => (fin(b.weight) ? b.weight : 0) - (fin(a.weight) ? a.weight : 0)).map((e) => String(e.text || e.factor || ''));
+    return { kind: 'take', items: all.slice(0, k), more: Math.max(0, all.length - k) };
+  }
+  // the two lessons a decision names as conflicting (the engine's own words carry their ids), or null
+  function conflictIds(d) {
+    const x = d || {}, texts = [x.thesis].concat(x.waitReasons || [], x.uncertainty || [], x.notes || []);
+    for (const t of texts) { const m = /conflicting lessons: (ls_[0-9a-z]+) vs (ls_[0-9a-z]+)/.exec(String(t || '')); if (m) return [m[1], m[2]]; }
+    return null;
+  }
+  // saved sessions, the one saved last first (the API lists them in the order they were created)
+  const latestFirst = (rows) => (Array.isArray(rows) ? rows.slice().sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))) : []);
+  // kinds: 'replay' (a Train replay, the default), 'session' (a Session-tab sitting), or a list of both
+  const unfinished = (rows, kinds) => { const ks = [].concat(kinds || 'replay'); return Array.isArray(rows) ? rows.find((s) => s && ks.indexOf(s.kind) >= 0 && s.status !== 'done') || null : null; };
   const REG = {};        // tabs registered by other files: id → { title, render }
   let onRegister = null;
   const MXAC = {
     VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
-    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, pointLine,
+    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, leaveGuard, LEAVE_MS, pointLine, latestFirst, unfinished, mainReasons, conflictIds, mentorChoices,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
@@ -361,6 +398,11 @@
   if (typeof document === 'undefined') return;
 
   // ---- the page -----------------------------------------------------------------------------------------------------
+  // The ONLY browser storage of this page: two display preferences of this device (the edge used last, which parts of the
+  // decision card are open). Never a decision, a result, a lesson or anything read from the API: those live on the server.
+  const PREFS = ['mxacEdge', 'mxacFold'];
+  function prefGet(k) { if (PREFS.indexOf(k) < 0) return null; try { return root.localStorage.getItem(k); } catch (e) { return null; } }
+  function prefSet(k, v) { if (PREFS.indexOf(k) < 0) return; try { root.localStorage.setItem(k, String(v).slice(0, 400)); } catch (e) { /* private mode: not remembered */ } }
   const $ = (id) => document.getElementById(id);
   function el(tag, props) {
     const n = document.createElement(tag), p = props || {};
@@ -403,6 +445,7 @@
   }
   function showTab(id) {
     activeTab = id;
+    { const m = document.querySelector('main'); if (m) m.classList.toggle('hero-min', id !== 'train'); }   // the hero keeps its full size on Train only
     for (const t of tabList()) { const sec = $('ac-' + t), btn = $('tab-' + t); if (sec) sec.hidden = t !== id; if (btn) { btn.setAttribute('aria-selected', t === id ? 'true' : 'false'); btn.tabIndex = t === id ? 0 : -1; } }
     if (id === 'train') { resizeCharts(); return; }
     if (S.clock && S.clock.state().playing) { S.clock.pause(); draw(); }
@@ -494,12 +537,18 @@
     return CACHE.lessons[edgeId];
   }
   const lessonsChanged = () => { CACHE.lessons = {}; };
+  // the lesson already saved from a stored correction (in force or switched off), or null: one read of the edge's lessons
+  async function savedLessonOf(edgeId, correctionId) { if (!correctionId) return null; const all = (await api.get({ get: 'lessons', edge: edgeId })).lessons || []; return all.filter((l) => l && l.source && l.source.correctionId === correctionId).pop() || null; }
   // past cases up to `before`, read once and cut per decision with historyAt. A wider list already read is reused.
   async function historyFor(edgeId, before) {
     const c = CACHE.hist[edgeId]; if (c && c.before >= before) return c;
     try { const j = await api.get({ get: 'history', edge: edgeId, before }); return (CACHE.hist[edgeId] = { before, rows: Array.isArray(j.rows) ? j.rows : [], available: j.available !== false }); }
     catch (e) { return { before, rows: [], available: false }; }   // the route may be missing or its data not built: no sample
   }
+  // An attempt was just stored for a setup: remember it for this page, and in the pool list every section shares, with the
+  // mode it was stored in. The Blind arena reads that mode: a setup whose engine answer was shown in Train or Session since
+  // its hidden attempt is answered as recall (a fresh hidden attempt, left out of every score), never as a blind answer.
+  function decidedAs(id, pool, mode) { DECIDED.add(id); if (pool && mode) { pool.seen = pool.seen || {}; const p = pool.seen[id]; pool.seen[id] = Object.assign({}, p, { mode, attempts: ((p && p.attempts) || 0) + 1 }); } }
   const seenBefore = (pool, id) => DECIDED.has(id) || !!(pool && pool.seen && pool.seen[id] && pool.seen[id].attempts > 0);
   async function refreshPool(resetRange) {
     const e = edgeSel(); if (!e) return; const token = ++S.poolToken, pool = modeVal() === 'exam' ? 'exam' : 'train', note = $('f-count');
@@ -530,20 +579,38 @@
   async function renderSessions() {
     const ul = $('sess-list');
     try {
-      const j = await api.get({ get: 'sessions' }), rows = (j.sessions || []).filter((s) => s.kind === 'replay').slice(0, 12);
+      const j = await api.get({ get: 'sessions' }), all = latestFirst(j.sessions || []), rows = all.filter((s) => s.kind === 'replay').slice(0, 12);
+      renderResumeNow(unfinished(all, ['replay', 'session']));   // whichever was saved last: a Train replay, or a sitting of the Session tab
       listOr(ul, rows, 'No saved session yet. Use "Save session" during a replay.', (s) => el('li', { 'data-session': s.id },
         el('div', {}, el('b', { text: s.title || s.edge }), el('br'), el('small', { text: (s.summary || '') + ' · saved ' + String(s.updatedAt || '').slice(0, 16).replace('T', ' ') + ' UTC' })),
         el('button', { type: 'button', class: 'btn sm', text: 'Resume', onclick: () => resumeSession(s.id) })));
     } catch (err) { listOr(ul, [], 'The saved sessions could not be read: ' + err.message + '.', () => null); }
   }
+  // "Pick up where you left off": the unfinished replay saved last, offered at the top of the setup after a reload. It reads
+  // the list the page already asks for (no call of its own) and loads nothing until Resume is pressed.
+  let resumeHidden = false;
+  function renderResumeNow(s) {
+    const box = $('resume-now'); if (!box) return; clear(box);
+    if (!s || S.clock || S.loading || resumeHidden) { box.hidden = true; return; }
+    box.hidden = false;
+    const sit = s.kind === 'session';   // a sitting of the Session tab is resumed there (MXAC.sessionResume is read once by that tab)
+    box.appendChild(el('div', { class: 'resume-t' }, el('b', { text: 'Pick up where you left off' }), el('span', { id: 'resume-now-text', text: `${sit ? 'Session tab · ' : ''}${s.title || s.edge} · ${sit && fin(s.t) ? 'paused at ' + fmtTime(s.t) : s.summary || 'a saved replay'} · saved ${String(s.updatedAt || '').slice(0, 16).replace('T', ' ')} UTC` })));
+    box.appendChild(el('div', { class: 'resume-go' }, el('button', { type: 'button', class: 'btn primary', id: 'resume-now-go', 'data-kind': s.kind, text: sit ? 'Resume in the Session tab' : 'Resume', onclick: () => { box.hidden = true; if (sit) { resumeHidden = true; MXAC.sessionResume = s.id; showTab('session'); } else resumeSession(s.id); } }),
+      el('button', { type: 'button', class: 'btn', id: 'resume-now-no', text: 'Not now', onclick: () => { resumeHidden = true; box.hidden = true; } })));
+  }
+  // The edge used last is remembered on this device (pref mxacEdge), so the page and its sections open on it.
+  const lastEdge = () => prefGet('mxacEdge');
+  function rememberEdge(id) { if (id) prefSet('mxacEdge', String(id)); }
+  MXAC.rememberEdge = rememberEdge; MXAC.lastEdge = lastEdge;
   async function initSetup() {
     try { S.edges = (await api.get({ get: 'edges' })).edges || []; }
     catch (e) { setupErr(e.status === 503 ? 'The Academy data is not set up on this server yet (' + e.message + ').' : 'The Academy data could not be loaded: ' + e.message + '.'); $('start').disabled = true; return; }
     if (!S.edges.length) { setupErr('The edge registry is empty.'); $('start').disabled = true; return; }
     const sel = clear($('f-edge')); for (const e of S.edges) sel.appendChild(el('option', { value: e.id, text: `${e.name} · ${e.marketLabel || e.market}` }));
+    const last = lastEdge(); if (last && S.edges.some((e) => e.id === last)) sel.value = last;   // the edge used last, on this device
     renderEdgeInfo(); renderModeNote(); renderSessions(); renderLessonsList(); refreshPool(true);
   }
-  $('f-edge').addEventListener('change', () => { renderEdgeInfo(); renderLessonsList(); refreshPool(true); });
+  $('f-edge').addEventListener('change', () => { rememberEdge($('f-edge').value); renderEdgeInfo(); renderLessonsList(); refreshPool(true); });
   for (const id of ['f-from', 'f-to']) $(id).addEventListener('change', () => refreshPool(false));
   for (const id of ['f-spread', 'f-comm', 'f-slip']) $(id).addEventListener('input', renderCostNote);
   document.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener('change', () => { renderModeNote(); refreshPool(true); }));
@@ -596,7 +663,7 @@
 
   // ---- replay ---------------------------------------------------------------------------------------------------------
   const say = (id, msg) => { $(id).textContent = msg || ''; };
-  function log(text, strong) { const ol = $('log'), li = el('li', {}, strong ? el('b', { text: strong + ' ' }) : null, text); ol.insertBefore(li, ol.firstChild); while (ol.children.length > 80) ol.removeChild(ol.lastChild); }
+  function log(text0, strong) { const h = humanize(text0, S.lessons), text = h !== text0 && !strong ? h.charAt(0).toUpperCase() + h.slice(1) : h, ol = $('log'), li = el('li', {}, strong ? el('b', { text: strong + ' ' }) : null, text); ol.insertBefore(li, ol.firstChild); while (ol.children.length > 80) ol.removeChild(ol.lastChild); }
 
   async function startReplay(resume, opts) {
     if (S.loading) return;
@@ -611,7 +678,7 @@
       const lessons = await lessonsFor(st.edge.id, true), hist = await historyFor(st.edge.id, st.to); await ensureCalendar();
       // everything is loaded: swap the replay in
       if (S.clock) S.clock.pause();
-      S.setup = st; S.cands = (cj.candidates || []).slice().sort((a, b) => a.t - b.t); S.series = series; S.dataVersion = dataVersion; S.lessons = lessons; S.hist = hist; S.pool = pj;
+      rememberEdge(st.edge.id); S.setup = st; S.cands = (cj.candidates || []).slice().sort((a, b) => a.t - b.t); S.series = series; S.dataVersion = dataVersion; S.lessons = lessons; S.hist = hist; S.pool = pj;
       S.cur = null; S.pending = null; S.busy = false; S.sinceThesis = 0; S.lastBlock = null;
       S.sessionId = resume ? resume.id : null; S.done = new Set(resume ? resume.done : []); S.closed = resume ? resume.closed : []; S.open = [];
       S.account = resume ? resume.account : MXK.account(st.balance, { t: st.from });
@@ -620,7 +687,7 @@
       S.fromT = t0;
       S.clock = MXR.clock({ from: st.from, to: st.to, stepSec: st.tf, speed: st.speed, t: t0, onTick, onBatch, onDone: () => { log('The replay reached the end of the range.'); draw(); } });
       S.thesis = resume && resume.thesis ? resume.thesis : MXA.thesis.start(snapOf(st.edge, series, dataVersion, t0, null));
-      clear($('log')); $('replay').hidden = false; foldSetup(true); hidePoint();
+      clear($('log')); $('replay').hidden = false; $('resume-now').hidden = true; foldSetup(true); hidePoint();
       $('setup-sum').textContent = `${st.edge.name} · ${isoDay(st.from)} to ${isoDay(st.to - DAY)} · ${st.tf} · ${st.mode === 'exam' ? 'exam' : 'train'} · ${S.cands.length} setup${S.cands.length === 1 ? '' : 's'}`;
       $('chart-meta').textContent = `Candles: ${dataVersion}. Setups: the study's research candles (prices can differ by a small feed basis).`;
       say('chart-legend', 'Grey candle = still forming at the replay time (display only). Decisions only ever see closed candles (' + Object.keys(snapshotSeries(st.edge, series)).join(', ') + '). '
@@ -821,14 +888,16 @@
   async function stepOne() { if (!S.clock || S.busy || !leaveOk()) return; if (S.cur && !S.cur.closed) await settlePoint(); S.clock.step(1); }
   // Leaving a decision point while a verdict is half written would throw it away without a word. The first press says so
   // (beside both Continue buttons) and changes nothing; a second press within LEAVE_MS leaves. A saved verdict never asks.
-  const LEAVE_MS = 10000; let leaveAsked = 0;
-  function leaveOk() {
-    if (!S.cur || S.cur.closed || !mentorUnsaved(M)) return true;
-    const now = Date.now(); if (leaveAsked && now - leaveAsked < LEAVE_MS) { leaveAsked = 0; return true; }
-    leaveAsked = now; const msg = 'Your verdict is not saved yet. Press "Save correction" to keep it, or press Continue again to leave without it.';
+  // The guard itself is MXAC.leaveGuard, shared with the Session tab and the Blind arena.
+  const trainUnsaved = () => !!S.cur && !S.cur.closed && mentorUnsaved(M);
+  const leaveOk = leaveGuard({ unsaved: trainUnsaved, tell: () => {
+    const msg = 'Your verdict is not saved yet. Press "Save correction" to keep it, or press Continue again to leave without it.';
     say('replay-msg', msg); renderPointBar(msg); const c = $('continue-msg'); if (c) c.textContent = msg;
-    return false;
-  }
+  } });
+  // Closing or reloading the page with a half-written answer on any section: the browser asks first (its own question; the
+  // page stores nothing). Sections add their own check with kit.watchUnsaved.
+  const UNSAVED = [trainUnsaved];
+  root.addEventListener('beforeunload', (e) => { if (UNSAVED.some((f) => { try { return !!f(); } catch (x) { return false; } })) { e.preventDefault(); e.returnValue = ''; } });
   // ---- the line under the chart at a decision point, and scrolling between the chart and the cards ------------------------
   const calm = () => !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
   function goTo(id) { const n = $(id); if (!n || n.hidden) return; n.scrollIntoView({ block: 'start', behavior: calm() ? 'auto' : 'smooth' }); if (!n.hasAttribute('tabindex')) n.setAttribute('tabindex', '-1'); try { n.focus({ preventScroll: true }); } catch (e) { /* older browsers */ } }
@@ -870,12 +939,14 @@
   });
 
   // ---- sessions -------------------------------------------------------------------------------------------------------
-  async function saveSession(quiet) {
+  // curId: the setup the clock is on when its decision point is not built yet (the first save of a run is made before the
+  // attempt, to have the session id the attempt carries).
+  async function saveSession(quiet, curId) {
     const st = S.setup, cs = S.clock.state();
     const replay = MXR.session.save({ id: S.sessionId, edge: st.edge.id, market: st.edge.market, tf: st.tf, t: cs.t, from: st.from, to: st.to, speed: cs.speed, balance: S.account.balance, risk: { riskPct: st.riskPct }, costs: st.costs,
       difficulty: st.difficulty, mode: st.mode, openDecisions: S.cur && !S.cur.closed && S.cur.first.row ? [S.cur.first.row.id] : [], savedAt: new Date().toISOString() });
     const state = { replay, startBalance: st.balance, htf: S.htf, account: S.account, thesis: S.thesis, done: Array.from(S.done), closed: S.closed.slice(-200),
-      open: S.open.map((x) => ({ id: x.id, side: x.side, t: x.t, units: x.units, riskCash: x.riskCash })), cur: S.cur && !S.cur.closed ? S.cur.cand.id : null };
+      open: S.open.map((x) => ({ id: x.id, side: x.side, t: x.t, units: x.units, riskCash: x.riskCash })), cur: S.cur && !S.cur.closed ? S.cur.cand.id : curId || null };
     const session = { edge: st.edge.id, title: `${st.edge.name} · ${isoDay(st.from)} to ${isoDay(st.to - DAY)}`, kind: 'replay', status: cs.done ? 'done' : 'paused', candidateId: state.cur, t: cs.t,
       summary: `at ${fmtTime(cs.t)} · balance ${fmtCash(S.account.balance)} · ${S.done.size} setup${S.done.size === 1 ? '' : 's'} decided`, state };
     if (S.sessionId) session.id = S.sessionId;
@@ -905,8 +976,8 @@
     for (const id of ['decision', 'mentor', 'lesson', 'prove', 'whatif']) { $(id).hidden = true; clear($(id)); }
     S.future = null; if (CH.series && CH.marked) { CH.series.setMarkers([]); CH.marked = false; }
     if (CH.series) { clearLines(CH.edgeLines); clearMentorLines(); clearLines(CH.annLines); }
-    Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false }); clear($('zones'));
-    leaveAsked = 0; renderPointBar();
+    Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false, tried: false }); clear($('zones'));
+    leaveOk.reset(); renderPointBar();
   }
   function pointError(c, e) {
     S.cur = null; hidePoint(); const box = $('decision'); box.hidden = false;
@@ -927,17 +998,24 @@
         S.busy = false; if (S.wasPlaying) S.clock.play(); draw(); return;
       }
       S.thesis = MXA.thesis.update(S.thesis, snap, d); renderThesis();
-      if (!S.sessionId) await saveSession(true);
+      const firstSave = !S.sessionId; if (firstSave) await saveSession(true, c.id);
       const again = seenBefore(S.pool, c.id);   // decided in an earlier sitting: this one is a same-trade replay (recall), and is stored as one
-      const res = await api.post(attemptBody(c, st.edge.id, again ? 'replay-same' : 'train', d, lessons, hash, f)); DECIDED.add(c.id);
+      const res = await api.post(attemptBody(c, st.edge.id, again ? 'replay-same' : 'train', d, lessons, hash, f)); decidedAs(c.id, S.pool, again ? 'replay-same' : 'train');
       if (again) log(`The setup at ${fmtTime(c.t)} was decided in an earlier sitting: this answer is stored as a same-trade replay (recall, not a new setup).`);
       S.cur = { cand: c, snap, hash, features: f, diff, acctAt: r.acct, historyAvailable: hist.available, first: { decision: d, risk: r.risk, row: res.attempt, n: res.n }, latest: null, correction: null, lesson: null, savedLesson: null, cmp: null, closed: false };
       S.cur.latest = S.cur.first; S.lastBlock = r.risk && !r.risk.allowed ? r.risk.blocks.join('; ') : null;
+      if (!firstSave) await keepPlace();
       log(`${d.action} (${d.confidence} confidence) on the ${c.side} setup at ${fmtTime(c.t)}. Attempt ${res.n} stored.`, 'Decision.');
       showPoint(); say('replay-msg', 'Paused on a setup. Approve or correct the decision, then continue.');
     } catch (e) { pointError(c, e); say('replay-msg', ''); }
     finally { S.busy = false; draw(); renderAccount(); }
   }
+  // A reload keeps your place: the session's position (the clock, the setups decided, the paper account, the setup the
+  // clock is on) is saved with every decision, so "Resume" returns to the latest setup and not to the first one. ONE extra
+  // call a decision: the first decision of a run already saves the session before its attempt (for the session id) and that
+  // save carries the position, so it adds none; every later one saves after its attempt. A failed save never costs the
+  // decision: it is logged and the next decision saves again.
+  async function keepPlace() { try { await saveSession(true); } catch (e) { log('The session position was not saved here (' + e.message + '): a reload would return to the setup before this one.'); } }
   // A session saved while paused on a setup: show that decision point again from the stored attempts.
   async function restorePoint(candId) {
     const c = S.cands.find((x) => x.id === candId); if (!c) return; const st = S.setup;
@@ -947,53 +1025,95 @@
       const acct = MXK.roll(S.account, c.t), risk = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t }, acct, { riskPct: st.riskPct });
       const wrap = (row) => ({ decision: Object.assign({ side: c.side }, restoreApplied(row.decision)), risk, row, n: row.n, stored: true });
       S.cur = { cand: c, snap, hash, features: f, diff: MXA.difficulty(f, rows[0].decision), acctAt: acct, historyAvailable: null, first: wrap(rows[0]), latest: wrap(rows[rows.length - 1]), correction: null, lesson: null, savedLesson: null, cmp: null, closed: false, restored: true };
-      S.done.add(c.id); showPoint(); renderAttempts(rows);
+      // the verdict already stored on its first attempt comes back with it (one read, on resume only), so the point is not
+      // shown as unjudged
+      try { const ks = ((await api.get({ get: 'corrections', edge: st.edge.id, cand: c.id })).corrections || []).filter((k) => k.attemptId === rows[0].id); if (ks.length) S.cur.correction = ks[ks.length - 1]; } catch (e) { /* shown as unjudged */ }
+      // The lesson draft comes back too, with nothing kept in the browser: the proposal is a pure function of the stored
+      // attempt, the stored correction and the features of the snapshot rebuilt here, so it is simply made again (edits typed
+      // into a draft that was never saved are not kept: a draft carries the corrected answer, which must not sit in browser
+      // storage). One read, on resume only, says whether a lesson was already saved from this correction.
+      if (S.cur.correction) {
+        S.cur.lesson = MXA.lessons.fromCorrection(S.cur.first.decision, Object.assign({}, S.cur.correction, { sessionId: S.sessionId }), f);
+        try { S.cur.savedLesson = await savedLessonOf(st.edge.id, S.cur.correction.id); } catch (e) { S.cur.lesson = null; }   // not known: no draft is offered, rather than a second copy of a saved lesson
+      }
+      S.done.add(c.id); showPoint(); if (S.cur.correction) { if (S.cur.lesson) { renderLesson(); if (S.cur.savedLesson) say('lesson-msg', `Lesson saved ✓ (version ${S.cur.savedLesson.version}).`); } renderProve(); } renderAttempts(rows);
       log(`Back on the setup at ${fmtTime(c.t)}: ${rows.length} stored attempt${rows.length === 1 ? '' : 's'}.`);
     } catch (e) { log(`The decision point of ${candId} could not be shown again: ${e.message}`); }
   }
   function showPoint() { renderDecision(); drawEdgeLines(S.cur.latest.decision); if (S.setup.mode !== 'exam') renderMentor(); renderWhatIf(); renderPointBar(); draw(); }
 
   const txtList = (items, none, lessons) => listOr(el('ul', { class: 'txt-list' }), items || [], none, (x) => el('li', { text: humanize(x, lessons) }));
-  // The decision panel. o = { idp (id prefix), edge, cand, d, risk, diff, stored (text), firstAction, hash, historyAvailable, lessons, title }
+  // The decision panel. o = { idp (id prefix), edge, cand, d, risk, diff, stored (text), firstAction, hash, historyAvailable, lessons, title,
+  //   fold (true: the detail sits behind disclosures whose open state is remembered), onLessons(ids) (opens lessons by id) }
+  // Folded (the Train card): the answer, its sentence, the levels and the main reasons stay in sight; the evidence, the full
+  // reasons, uncertainty, risk, similar cases, lessons and the setup's facts are each one click away. Nothing is left out.
+  const foldState = () => { try { const v = JSON.parse(prefGet('mxacFold') || '{}'); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } };
+  function foldBox(idp, key, title, sub) {
+    const d = el('details', { class: 'more dfold', id: `${idp}-fold-${key}`, 'data-fold': key, open: !!foldState()[key] }, el('summary', {}, el('b', { text: title }), sub ? el('small', { text: sub }) : null));
+    d.addEventListener('toggle', () => { const v = foldState(); if (d.open) v[key] = true; else delete v[key]; prefSet('mxacFold', JSON.stringify(v)); });
+    return d;
+  }
   function decisionView(box, o) {
-    const d = o.d, c = o.cand, risk = o.risk, e = o.edge, idp = o.idp || 'dec', lessons = o.lessons || [];
+    const d = o.d, c = o.cand, risk = o.risk, e = o.edge, idp = o.idp || 'dec', lessons = o.lessons || [], fold = !!o.fold;
+    // a section: folded, a disclosure with the title as its summary; else the heading and the content straight in the card
+    const part = (key, title, sub) => { if (fold) { const f = foldBox(idp, key, title, sub); box.appendChild(f); return f; } box.appendChild(el('h3', { text: title })); return box; };
     box.appendChild(el('h2', {}, o.title || 'Decision', el('small', { text: `${e.name} · ${c ? c.side + ' setup' : 'no setup'} · ${fmtTime(d.t)}` + (o.diff ? ` · ${o.diff} difficulty` : '') })));
     box.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, idp + '-action'), el('span', { class: 'pill', id: idp + '-conf' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })),
       el('span', { class: 'ac-ok', id: idp + '-stored', text: o.stored || '' }), o.firstAction ? el('span', { class: 'pill', text: `first answer: ${o.firstAction}` }) : null));
     box.appendChild(el('p', { class: 'dec-thesis', id: idp + '-thesis', text: humanize(d.thesis, lessons) }));
+    const clash = conflictIds(d);
+    if (clash && typeof o.onLessons === 'function') {
+      const name = (id) => { const l = lessons.find((x) => x.id === id); return l && l.title ? `"${l.title}"` : id; };
+      box.appendChild(el('p', { class: 'ac-warn', id: idp + '-conflict' }, `Two lessons disagree on this setup: ${name(clash[0])} and ${name(clash[1])}. You settle which one holds: revise one or switch one off. `,
+        el('button', { type: 'button', class: 'link', id: idp + '-conflict-open', text: 'Open them in the Lessons tab', onclick: () => o.onLessons(clash) })));
+    }
     if (c) {
       const lv = el('dl', { class: 'kv' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
       box.appendChild(lv); if (d.action === 'WAIT') box.appendChild(el('p', { class: 'note', text: 'On WAIT these are the levels of the setup that was not taken. They are drawn on the chart as dashed lines.' }));
     }
-    const evItem = (sign) => (x) => el('li', {}, el('span', { text: humanize(x.text || x.factor, lessons) }), el('span', { class: 'w', title: 'weight of this item', text: fin(x.weight) ? sign + x.weight : 'n/a' }));
     const ev = d.evidence || {};
-    box.appendChild(el('div', { class: 'ev' },
+    if (fold) {
+      const m = mainReasons(d);
+      box.appendChild(el('h3', {}, 'Main reasons', el('small', { text: m.kind === 'wait' ? 'why it waits' : 'the strongest evidence for it' })));
+      box.appendChild(listOr(el('ul', { class: 'txt-list', id: idp + '-main' }), m.items, m.kind === 'wait' ? 'No reason to wait was recorded.' : 'Nothing supports it.', (x) => el('li', { text: humanize(x, lessons) })));
+      if (m.more > 0) box.appendChild(el('p', { class: 'note', id: idp + '-main-more', text: `${m.more} more ${m.more === 1 ? 'is' : 'are'} in the full lists below.` }));
+    }
+    const evItem = (sign) => (x) => el('li', {}, el('span', { text: humanize(x.text || x.factor, lessons) }), el('span', { class: 'w', title: 'weight of this item', text: fin(x.weight) ? sign + x.weight : 'n/a' }));
+    const evBox = fold ? part('evidence', 'Evidence for and against', fin(ev.support) && fin(ev.contradiction) ? `weights ${ev.support} for, ${ev.contradiction} against` : '') : box;
+    evBox.appendChild(el('div', { class: 'ev' },
       el('div', {}, el('h3', {}, 'Evidence for', el('small', { text: fin(ev.support) ? `weights add to ${ev.support}` : '' })), listOr(el('ul', { class: 'ev-list for', id: idp + '-support' }), d.supporting || [], 'Nothing supports it.', evItem('+'))),
       el('div', {}, el('h3', {}, 'Evidence against', el('small', { text: fin(ev.contradiction) ? `weights add to ${ev.contradiction}` : '' })), listOr(el('ul', { class: 'ev-list against', id: idp + '-against' }), d.contradicting || [], 'Nothing contradicts it.', evItem('−')))));
-    if (fin(ev.needMargin)) box.appendChild(el('p', { class: 'note', text: `This edge takes a trade when the evidence for it beats the evidence against it by ${ev.needMargin} and nothing blocks it.` }));
-    if ((d.waitReasons || []).length) { box.appendChild(el('h3', { text: 'Reasons to wait' })); box.appendChild(txtList(d.waitReasons, '', lessons)); }
-    if ((d.waitingFor || []).length) { box.appendChild(el('h3', { text: 'What it is waiting for' })); box.appendChild(txtList(d.waitingFor, '', lessons)); }
-    box.appendChild(el('h3', { text: 'Uncertainty' })); box.appendChild(txtList((d.uncertainty || []).concat(d.notes || []), 'Nothing flagged.', lessons));
-    box.appendChild(el('h3', { text: 'What would prove it wrong' })); box.appendChild(txtList(d.invalidation, 'No invalidation level could be named.', lessons));
+    if (fin(ev.needMargin)) evBox.appendChild(el('p', { class: 'note', text: `This edge takes a trade when the evidence for it beats the evidence against it by ${ev.needMargin} and nothing blocks it.` }));
+    const nWait = (d.waitReasons || []).length, nFor = (d.waitingFor || []).length;
+    if (nWait || nFor) {
+      const w = fold ? part('wait', 'Reasons to wait, and what it is waiting for', `${nWait} reason${nWait === 1 ? '' : 's'}`) : box;
+      if (nWait) { w.appendChild(el('h3', { text: 'Reasons to wait' })); w.appendChild(txtList(d.waitReasons, '', lessons)); }
+      if (nFor) { w.appendChild(el('h3', { text: 'What it is waiting for' })); w.appendChild(txtList(d.waitingFor, '', lessons)); }
+    }
+    { const u = fold ? part('doubt', 'Uncertainty, and what would prove it wrong') : box;
+      u.appendChild(el('h3', { text: 'Uncertainty' })); u.appendChild(txtList((d.uncertainty || []).concat(d.notes || []), 'Nothing flagged.', lessons));
+      u.appendChild(el('h3', { text: 'What would prove it wrong' })); u.appendChild(txtList(d.invalidation, 'No invalidation level could be named.', lessons)); }
     if (!c) return;
-    box.appendChild(el('h3', { text: 'Risk' }));
-    const rk = el('dl', { class: 'kv' }), R = d.risk || {}, put = (k, v) => { rk.appendChild(el('dt', { text: k })); rk.appendChild(el('dd', { text: v })); };
+    const R = d.risk || {};
+    const rkBox = part('risk', 'Risk', fold ? (risk ? (risk.allowed ? 'the risk engine allows it' : 'blocked by the risk engine') : '') : null);
+    const rk = el('dl', { class: 'kv' }), put = (k, v) => { rk.appendChild(el('dt', { text: k })); rk.appendChild(el('dd', { text: v })); };
     put('Reward to risk', fin(R.rr) ? `${R.rr}` + (fin(R.rrNet) ? ` (${R.rrNet} after costs)` : '') : 'no fixed target');
     put('Stop distance', fin(R.stopAtr) ? `${R.stopAtr} ATR` : 'n/a');
     if (risk) { const p = risk.allowed ? risk : risk.proposed || {}; put('Size', risk.allowed ? `${risk.size} units, risking ${fmtCash(risk.riskCash)} (${risk.riskPct} % of the balance)` : `none (would be ${p.units || 0} units)`); put('Risk engine', risk.allowed ? 'allowed' : 'blocked: ' + risk.blocks.join('; ')); }
-    box.appendChild(rk);
+    rkBox.appendChild(rk);
     const sm = d.similar || {};
-    box.appendChild(el('h3', { text: 'Similar past cases' }));
-    box.appendChild(el('p', { id: idp + '-similar', text: (sm.n > 0 ? `n = ${sm.n}, win rate ${fin(sm.winRate) ? Math.round(sm.winRate * 100) + ' %' : 'n/a'}, average ${fmtR(sm.avgR)} after costs. ` : 'No past-case sample to lean on. ') + (sm.note ? sm.note.charAt(0).toUpperCase() + sm.note.slice(1) + '.' : '') + (o.historyAvailable === false ? ' The past-case file for this edge could not be read.' : '') + (fin(sm.total) && sm.total > 0 ? ` Out of ${sm.total} earlier train setups of this edge that had finished by then.` : '') }));
-    box.appendChild(el('h3', { text: 'Lessons applied' }));
-    box.appendChild(listOr(el('ul', { class: 'txt-list', id: idp + '-lessons' }), d.lessonsApplied || [], 'No lesson matched this setup.', (l) => { const full = lessons.find((x) => x.id === l.id); return el('li', { 'data-applied': l.applied === false ? 'no' : 'yes' }, el('b', { text: (l.title || (full && full.title) || l.id) + ': ' }), l.effect || '', l.applied === false ? ' (not applied)' : ''); }));
+    part('similar', 'Similar past cases', fold ? (sm.n > 0 ? `n = ${sm.n}` : 'no sample') : null)
+      .appendChild(el('p', { id: idp + '-similar', text: (sm.n > 0 ? `n = ${sm.n}, win rate ${fin(sm.winRate) ? Math.round(sm.winRate * 100) + ' %' : 'n/a'}, average ${fmtR(sm.avgR)} after costs. ` : 'No past-case sample to lean on. ') + (sm.note ? sm.note.charAt(0).toUpperCase() + sm.note.slice(1) + '.' : '') + (o.historyAvailable === false ? ' The past-case file for this edge could not be read.' : '') + (fin(sm.total) && sm.total > 0 ? ` Out of ${sm.total} earlier train setups of this edge that had finished by then.` : '') }));
+    const la = d.lessonsApplied || [], nApplied = la.filter((l) => l.applied !== false).length;
+    part('lessons', 'Lessons applied', fold ? (la.length ? `${nApplied} applied` + (la.length - nApplied ? `, ${la.length - nApplied} matched but not applied` : '') : 'none matched') : null)
+      .appendChild(listOr(el('ul', { class: 'txt-list', id: idp + '-lessons' }), la, 'No lesson matched this setup.', (l) => { const full = lessons.find((x) => x.id === l.id); return el('li', { 'data-applied': l.applied === false ? 'no' : 'yes' }, el('b', { text: (l.title || (full && full.title) || l.id) + ': ' }), l.effect || '', l.applied === false ? ' (not applied)' : ''); }));
     const rule = c.rule && typeof c.rule === 'object' ? Object.keys(c.rule) : [];
     if (rule.length) { const dl = el('dl', { class: 'kv' }); for (const k of rule) { dl.appendChild(el('dt', { text: k })); dl.appendChild(el('dd', { text: typeof c.rule[k] === 'object' ? JSON.stringify(c.rule[k]) : String(c.rule[k]) })); } box.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Facts about this setup from the edge' }), dl)); }
     box.appendChild(el('p', { class: 'versions', text: `model ${d.modelVersion || 'none (policy only)'} · policy ${d.policyVersion || 'n/a'} · edge ${d.edgeVersion || 'n/a'} · data ${d.dataVersion || 'n/a'}` + (o.hash ? ` · snapshot ${o.hash}` : '') }));
   }
   function renderDecision() {
     const cur = S.cur, box = clear($('decision')), a = cur.latest; box.hidden = false;
-    decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons });
+    decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons, fold: true, onLessons: (ids) => { MXAC.lessonFocus = { edge: S.setup.edge.id, ids: ids.slice() }; showTab('lessons'); } });
     if (cur.exam) renderExamPoint(box);
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause }), el('span', { class: 'ac-status', id: 'continue-msg', role: 'status' })));
     renderPointBar();
@@ -1001,10 +1121,14 @@
 
   // ---- mentor controls ------------------------------------------------------------------------------------------------
   const mentorLevels = (choice) => mentorLevelsOf(S.cur.cand, choice);
-  function mentorCheck() {
+  // What is still missing is said in a calm line while the form is being filled; the red "Problem" appears only once Save was
+  // pressed with something missing (show = true), and stays current from then on. Save is offered as soon as a choice is made.
+  function mentorCheck(show) {
     const c = buildCorrection(M, S.cur.first.row ? S.cur.first.row.id : null), probs = M.choice ? correctionProblems(c, S.cur.first.decision) : [];
-    const n = $('m-err'); if (n) { n.hidden = !probs.length; n.textContent = probs.join(' '); }
-    const b = $('m-save'); if (b) b.disabled = !M.choice || !!probs.length;
+    if (show) M.tried = true;
+    const n = $('m-err'), on = !!M.tried && probs.length > 0; if (n) { n.hidden = !on; n.textContent = on ? probs.join(' ') : ''; }
+    const h = $('m-hint'), calm = !M.tried && probs.length > 0; if (h) { h.hidden = !calm; h.textContent = calm ? 'Before you save: ' + probs.join(' ') : ''; }
+    const b = $('m-save'); if (b) b.disabled = !M.choice;
     return probs;
   }
   function renderAnnotations() {
@@ -1016,7 +1140,7 @@
     const box = clear($('mentor')), cur = S.cur; box.hidden = false;
     box.appendChild(el('h2', {}, 'Mentor controls', el('small', { text: `your verdict on attempt ${cur.first.n}` })));
     const choices = el('div', { class: 'choices', role: 'group', 'aria-label': 'Your verdict' });
-    for (const [v, label] of [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Change to BUY'], ['SELL', 'Change to SELL'], ['WAIT', 'Change to WAIT']]) choices.appendChild(el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) }));
+    for (const [v, label] of mentorChoices(cur.first.decision.action)) choices.appendChild(el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) }));
     box.appendChild(choices);
     const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), el('input', { type: 'number', step: '0.01', id: 'm-' + k, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); M.dirty = true; M[k] = v === '' || !Number.isFinite(+v) ? null : +v; if (CH.mentorLines[k] && fin(M[k])) CH.mentorLines[k].applyOptions({ price: M[k] }); else drawMentorLines(); mentorCheck(); } }));
     box.appendChild(el('div', { class: 'lv' }, numIn('entry', 'Entry'), numIn('stop', 'Stop'), numIn('target', 'Target')));
@@ -1031,21 +1155,21 @@
     const kind = el('select', { id: 'a-kind', 'aria-label': 'Kind of mark' }, ANNOTATIONS.map(([id, label]) => el('option', { value: id, text: label })));
     box.appendChild(el('div', { class: 'f-actions', style: 'margin-top:6px' }, el('span', { style: 'flex:1 1 160px;max-width:240px' }, kind), el('button', { type: 'button', class: 'btn', id: 'a-arm', 'aria-pressed': 'false', text: 'Mark on chart', onclick: (e) => { M.arm = M.arm ? null : kind.value; e.currentTarget.setAttribute('aria-pressed', M.arm ? 'true' : 'false'); $('chart').classList.toggle('arm', !!M.arm); $('chart').style.touchAction = M.arm || isTake(M.choice) ? 'none' : ''; } })));
     box.appendChild(el('ul', { class: 'plain-list small', id: 'a-list' })); renderAnnotations();
-    box.appendChild(el('p', { class: 'ac-err', id: 'm-err', role: 'alert', hidden: true }));
+    box.appendChild(el('p', { class: 'note', id: 'm-hint', hidden: true })); box.appendChild(el('p', { class: 'ac-err', id: 'm-err', role: 'alert', hidden: true }));
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'm-save', disabled: true, text: 'Save correction', onclick: saveCorrection }), el('span', { class: 'ac-status', id: 'm-msg', role: 'status' })));
   }
   function choose(v) {
-    M.choice = v; M.dirty = true; leaveAsked = 0; document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
+    M.choice = v; M.dirty = true; M.tried = false; leaveOk.reset(); document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
     const lv = mentorLevels(v), take = isTake(v);
     for (const k of ['entry', 'stop', 'target']) { M[k] = lv[k]; const inp = $('m-' + k); inp.disabled = !take; inp.value = take && fin(lv[k]) ? lv[k] : ''; }
     drawMentorLines(); mentorCheck();
   }
   async function saveCorrection() {
-    const cur = S.cur; if (!cur || mentorCheck().length || S.busy) return; S.busy = true; $('m-save').disabled = true; say('m-msg', 'Saving…');
+    const cur = S.cur; if (!cur || S.busy) return; if (mentorCheck(true).length) { const n = $('m-err'); if (n) n.scrollIntoView({ block: 'nearest' }); return; } S.busy = true; $('m-save').disabled = true; say('m-msg', 'Saving…');
     try {
       const c = buildCorrection(M, cur.first.row.id), errorClass = MXA.classifyError(cur.first.decision, c, null);
       const res = await api.post({ action: 'correct', edge: S.setup.edge.id, correction: Object.assign({}, c, { errorClass }) });
-      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveAsked = 0; renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
+      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveOk.reset(); renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);
@@ -1321,8 +1445,8 @@
     const st = S.setup;
     try {
       const lessons = (S.lessons = await lessonsFor(st.edge.id));
-      if (!S.sessionId) await saveSession(true);
-      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons, S.hist); delete CACHE.pool[st.edge.id + '|exam'];
+      const firstSave = !S.sessionId; if (firstSave) await saveSession(true);
+      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons, S.hist); delete CACHE.pool[st.edge.id + '|exam']; if (!firstSave) await keepPlace();   // an exam setup is decided once: the place kept is after it
       const ej = await api.get({ get: 'exams', edge: st.edge.id }), row = (ej.exams || []).find((r) => r.candidateId === c.id) || null;
       S.cur = { cand: c, snap, hash, features: f, diff: MXA.difficulty(f, x.withL), acctAt: null, historyAvailable: null, first: { decision: x.withL, risk: null, row: x.attempt.attempt, n: x.attempt.n }, latest: null, exam: { without: x.without, row }, closed: false };
       S.cur.latest = S.cur.first; S.thesis = MXA.thesis.update(S.thesis, snap, x.withL); renderThesis();
@@ -1349,7 +1473,7 @@
     await startReplay(null, { at: t }); return true;
   }
   MXAC.kit = { showNode, el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
-    decided: (id) => DECIDED.add(id), calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
+    decided: decidedAs, leaveGuard, watchUnsaved: (fn) => { if (typeof fn === 'function') UNSAVED.push(fn); }, savedLessonOf, calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
   function boot(me) {
