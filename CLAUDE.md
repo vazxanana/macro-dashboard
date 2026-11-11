@@ -1622,12 +1622,37 @@ badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOL
   through the worker. Caches `mx-shell-<VERSION>` / `mx-assets-<VERSION>`; activate deletes older `mx-` / `meridian-` /
   `gold-terminal-` caches. skipWaiting + clients.claim: a deploy takes over within seconds of the next page load or of
   `assets/pwa.js`'s update check (tab visible again, every 15-30 min); open pages are not reloaded mid-use, only when they come back
-  after 10+ minutes hidden with no dialog open. Push / notificationclick handlers unchanged (icons now /icons/).
+  after 10+ minutes hidden with nothing in hand (`busy()`, 11 Nov note below). Push / notificationclick handlers unchanged (icons now /icons/).
 - Kill switch: Vercel env `MX_SW_KILL=1` + redeploy -> the worker stops handling fetches and deletes its caches but stays
   registered (price-alert pushes keep working). One device: open any page with `?sw-reset` (unregisters + clears caches; that
   device's price alerts need turning on again).
 - Install: iPhone Safari -> Share -> Add to Home Screen (needed for iPhone push); Android Chrome -> menu -> Install app; desktop
   Chrome / Edge -> install icon in the address bar.
+- **Checked in a real browser with the worker ON** (11 Nov 2026): `node scripts/audit/pwa.cjs` (47 checks, about 25 s, in `ci.yml`
+  `pages`; `PORT` = a FREE port, it serves `out/` itself with vercel.json's rewrites and cache rules; no network; every other audit
+  blocks service workers). First visit, heavy use as the owner (Cache Storage holds only `/offline.html` and `/assets/*?v=`; 100+
+  `/api`, `/cdata`, `/md` answers marked private and sent as cacheable never get in), offline on every page and back, a deploy under
+  open pages (a copy of `out/` with one asset changed), the kill switch, `?sw-reset`, real push events, manifest, fonts. Found and fixed:
+  - `assets/pwa.js` held the quiet-moment reload back for ANY open `<dialog>`. ChronosTrade's first-steps card is one (non-modal,
+    up until dismissed), so that page never picked up a deploy by itself. `busy()` now means: a modal dialog, the cursor in a
+    field, or text typed into a visible text box and not sent (that last case used to be reloaded away). A skipped reload is
+    tried again at the next return.
+  - `?sw-reset` with another window of the site open: the browser keeps the same worker and runs no install, so the page came
+    back with no worker and no caches until the next deploy. The reset page leaves `sessionStorage mx-sw-reset`; the next load
+    posts `mx-prime` and the worker in charge sets its caches up again (`prime()`, also the install step) and claims the page.
+  - Push: a JSON payload of `null` threw in the handler (no notification of ours) and a bare string lost its text; `notice()`
+    reads any payload, caps title / body / tag, and `inSite()` keeps the link inside this site (also on the tap).
+  - A tap on a price alert navigated whichever window was open, so a ChronosTrade replay or an Academy session was replaced by
+    the chart. Now a window already on the Desk is focused and taken there; other pages are left alone and the chart opens in
+    a new window (an open one is navigated only when the browser will not open a window).
+  - How the hand-over really goes (Chromium): the open pages get the new worker first, its `activate` step (old caches out) runs
+    about a second later; a page that keeps talking to the old worker (or holds a response from it unread) can delay the
+    hand-over until the worker is idle, 5 minutes at most. Old `?v=` URLs of an open page keep answering from the network.
+  - The stamp misses only URLs built in script (today `/assets/sounds/sl.mp3`): those revalidate and are never stored, so they
+    cost a request but cannot go stale. No `srcset`, preload, `@import` or stylesheet `url()` points at an asset
+    (`tests/delivery.test.mjs` fails if one appears, or if a stamp is not the file's hash, or a font file is missing).
+  - Not checked: Safari / iOS (install, push, `dialog:modal` falls back to any open dialog there if unsupported), a real push
+    service, and the tap on a real notification (the handlers are pinned in `tests/pwa.test.mjs` on a fake worker).
 
 ## The veteran's event playbook (9 Nov 2026, owner: "be the best of all times veteran", "keep improving all the bits")
 `council/playbook.mjs` (pure, no fetch; built by `veteran.mjs` → `veteran.json.events`, `eventsRecord`): one card per red-folder

@@ -8,6 +8,7 @@ name: CI
 #           Both read live candles through meridianx.dev /md/bars (as the audit always has); the smoke test also reads
 #           council-data from the public branch. /api/me is stubbed; nothing writes anywhere.
 #           The Academy audit (scripts/audit/academy.cjs) runs the learning loop on recorded candles, offline.
+#           The installable app audit (scripts/audit/pwa.cjs) runs with service workers on against its own server, offline.
 on:
   pull_request:
   push:
@@ -122,6 +123,21 @@ jobs:
           grep -E '^ *FAIL|crashed' "$AUDIT_OUT/academy-1.log" | head -8 | while IFS= read -r l; do echo "::warning::Academy audit, first run: $l"; done
           echo "::warning::Academy audit failed once; retrying (a real failure fails twice)"
           node scripts/audit/academy.cjs
+
+      # offline too: the audit serves out/ itself (vercel.json's rewrites and cache rules) with service workers ON, which the
+      # other audits block: first visit, offline, a deploy under open pages, the kill switch, ?sw-reset, push, manifest, fonts.
+      # No network and no colour readings, so nothing of scripts/audit/shared.cjs applies; one retry, the first run's failures named.
+      - name: Installable app audit (service worker on)
+        env:
+          AUDIT_OUT: ${{ runner.temp }}/audit/
+          PORT: 8771
+        run: |
+          mkdir -p "$AUDIT_OUT"
+          if node scripts/audit/pwa.cjs > "$AUDIT_OUT/pwa-1.log" 2>&1; then cat "$AUDIT_OUT/pwa-1.log"; exit 0; fi
+          cat "$AUDIT_OUT/pwa-1.log"
+          grep -E '^(FAIL|ABORTED)' "$AUDIT_OUT/pwa-1.log" | head -8 | while IFS= read -r l; do echo "::warning::Installable app audit, first run: $l"; done
+          echo "::warning::Installable app audit failed once; retrying (a worker hand-over can miss its wait on a busy runner; a real failure fails twice)"
+          node scripts/audit/pwa.cjs
 
       - name: Audit screenshots
         if: failure()
