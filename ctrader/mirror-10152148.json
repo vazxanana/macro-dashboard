@@ -3476,6 +3476,32 @@
     ],
     "stopCheckedAt": "2026-11-11T11:43:45.000Z",
     "brokerStop": 0.68719
+   },
+   "eth-replica-1794398755-s": {
+    "positionId": "48404841",
+    "symbol": "ETHUSD",
+    "side": "sell",
+    "volume": 14,
+    "lots": 0.14,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T12:07:02.000Z",
+    "councilEntry": 2050.66,
+    "stop": 2064.033,
+    "t1": 2023.914,
+    "riskCash": 1.99,
+    "margin": 28.76,
+    "mark": 2050.66,
+    "levelsFrom": "mark",
+    "fillPrice": 2048.91,
+    "slipR": 0.131,
+    "lagSec": 67,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T12:07:02.000Z",
+    "brokerStop": 2062.28
    }
   },
   "day": {
@@ -3483,13 +3509,14 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9944.63 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9944.63 · 11 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794364852-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794375992-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794381896-b": "none of XRPUSD found at the broker"
+   "xrp-replica-1794381896-b": "none of XRPUSD found at the broker",
+   "xrp-replica-1794398755-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -3498,7 +3525,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9944.63,
-  "lastRun": "2026-11-11T12:04:11.000Z"
+  "lastRun": "2026-11-11T12:07:02.000Z"
  },
  "log": [
   {
@@ -4793,6 +4820,16 @@
    "at": "2026-11-11T12:02:44.000Z",
    "msg": "closed XAUUSD position 48347933 (council: win)",
    "trade": "xau-replica-1794383466-s"
+  },
+  {
+   "at": "2026-11-11T12:07:02.000Z",
+   "msg": "opened sell ETHUSD 0.14 lot (council replica)",
+   "trade": "eth-replica-1794398755-s"
+  },
+  {
+   "at": "2026-11-11T12:07:02.000Z",
+   "msg": "not mirrored xrp-replica-1794398755-s: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794398755-s"
   }
  ],
  "limits": {
@@ -4871,9 +4908,9 @@
   ]
  },
  "execution": {
-  "n": 120,
-  "meanSlipR": 0.078,
-  "medianSlipR": 0.034,
+  "n": 121,
+  "meanSlipR": 0.079,
+  "medianSlipR": 0.038,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
@@ -4882,8 +4919,8 @@
     "meanSlipR": 0.143
    },
    "ETHUSD": {
-    "n": 13,
-    "meanSlipR": 0.194
+    "n": 14,
+    "meanSlipR": 0.189
    },
    "XAUUSD": {
     "n": 10,
