@@ -23,7 +23,8 @@ module.exports = async (req, res) => {
     if (b.alerts.some((a) => !a || typeof a !== 'object' || Array.isArray(a))) return res.status(400).json({ error: 'bad alert' });
     if (!by.has(id) && by.size >= 300) return res.status(429).json({ error: 'too many devices' });
     const alerts = b.alerts.map((a) => ({ id: String(a.id || '').slice(0, 16), sym: String(a.sym), price: +a.price, dir: a.dir === 'below' ? 'below' : 'above', note: String(a.note || '').slice(0, 60), label: String(a.label || '').slice(0, 20), at: Math.floor(+a.at || Date.now() / 1000) }));
-    if (alerts.some((a) => !a.id || !SYM[a.sym] || !(a.price > 0))) return res.status(400).json({ error: 'bad alert' });
+    // a finite price and time only: "1e999" passed "> 0", was stored as null and stopped the cron for every device (11 Nov 2026)
+    if (alerts.some((a) => !a.id || !SYM[a.sym] || !(a.price > 0) || !Number.isFinite(a.price) || !Number.isFinite(a.at))) return res.status(400).json({ error: 'bad alert' });
     const tv = b.tv === true;   // also forward TradingView alerts (api/tv-webhook) to this device
     await save(id, alerts.length || tv ? { sub: { endpoint: sub.endpoint, keys: { p256dh: String(sub.keys.p256dh), auth: String(sub.keys.auth) } }, alerts, tv, at: Date.now() } : null, blobs);
     return res.status(200).json({ alerts });

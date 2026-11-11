@@ -3,6 +3,9 @@ name: ICT desk replay
 # Replays the ICT tracker's model from 1 Aug 2025 (owner, 7 Nov 2026; before: 1 Jan 2026) of CNBC futures candles and writes council-data
 # ict/replay.json for the ICT desk (calendar, stats). Runs when the replay code changes, on demand, and daily
 # (weekly before 11 Nov 2026: an unresolved record waited up to a week for its exit).
+# The cron is the second path (11 Nov 2026): GitHub fires this repository's schedules late or not at all, so the council loop
+# (council.yml, council/replay-due.mjs) dispatches this workflow when ict/replay.json is over 20 h old and no run of it is active
+# or was started in the last 6 h. A dispatch without inputs is a normal run (no rebuild).
 # Booked history is frozen (11 Nov 2026): a record booked more than 3 days before the previous run ended is carried from the previous
 # ict/replay.json as booked, because the feed returns different candles for old hours from run to run. Tick "rebuild" to recompute all.
 on:

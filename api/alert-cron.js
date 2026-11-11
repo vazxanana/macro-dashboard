@@ -12,7 +12,10 @@ module.exports = async (req, res) => {
   try {
     const { by, blobs } = await all(); if (!by.size) return res.status(200).json({ devices: 0 });
     // an unreadable or malformed record is skipped (and kept: never deleted on a read error); it must not stop the other devices
-    const devs = []; for (const [id, bl] of by) { try { const d = await read(bl); if (d && typeof d === 'object' && d.sub && Array.isArray(d.alerts || [])) devs.push({ id, d }); } catch (e) {} }
+    // An alert that is not whole (no known market, a price or time that is not a finite number) is left out: it can never fire,
+    // and it used to throw below and end the round for every device after it (11 Nov 2026).
+    const whole = (a) => !!a && typeof a === 'object' && typeof a.sym === 'string' && !!SYM[a.sym] && Number.isFinite(a.price) && a.price > 0 && Number.isFinite(a.at);
+    const devs = []; for (const [id, bl] of by) { try { const d = await read(bl); if (d && typeof d === 'object' && d.sub && Array.isArray(d.alerts || [])) devs.push({ id, d: { ...d, alerts: (d.alerts || []).filter(whole) } }); } catch (e) {} }
     const need = {}; devs.forEach(({ d }) => (d.alerts || []).forEach((a) => { need[a.sym] = Math.min(need[a.sym] || now, Math.max(a.at, now - 900)); }));
     const bars = {};
     await Promise.all(Object.entries(need).map(async ([sym, from]) => {
@@ -20,7 +23,7 @@ module.exports = async (req, res) => {
         if (r.ok) bars[sym] = ((await r.json()).candles || []).map((c) => ({ t: Math.floor(+c.time), h: +c.mid.h, l: +c.mid.l, c: +c.mid.c })); } catch (e) {}
     }));
     let sent = 0, gone = 0;
-    for (const { id, d } of devs) {
+    for (const { id, d } of devs) { try {   // one device's failure (its record, its save) never stops the others
       const hit = [], keep = [];
       for (const a of d.alerts || []) {
         const b = (bars[a.sym] || []).filter((x) => x.t + 5 > a.at);
@@ -36,7 +39,7 @@ module.exports = async (req, res) => {
         catch (e) { if (e.statusCode === 404 || e.statusCode === 410) { dead = true; break; } console.warn(`[alerts] push ${e.statusCode || e.message}`); }
       }
       if (dead) { gone++; await save(id, null, blobs); } else await save(id, keep.length || d.tv ? { ...d, alerts: keep, at: Date.now() } : null, blobs);
-    }
+    } catch (e) { console.warn(`[alerts] device skipped: ${e.message}`); } }
     console.log(JSON.stringify({ devices: devs.length, sent, gone }));
     return res.status(200).json({ devices: devs.length, sent, gone });
   } catch (e) { console.error(`[alerts] ${e.message}`); return res.status(500).json({ error: String(e.message || e) }); }
