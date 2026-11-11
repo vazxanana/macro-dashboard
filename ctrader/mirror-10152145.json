@@ -6065,7 +6065,8 @@
     "t1": 72584.6,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 73826.6,
@@ -6079,7 +6080,8 @@
     "lagSec": 83,
     "positionId": "48227161",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T07:57:43.000Z"
    },
    "audusd-rscalp-1794349934": {
     "positionId": "48229640",
@@ -6232,7 +6234,8 @@
     "t1": 71793.71142857145,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 73228.3,
@@ -6247,7 +6250,8 @@
     "lagSec": 108,
     "positionId": "48274419",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T07:57:43.000Z"
    },
    "btc-intraday-1794364256": {
     "symbol": "BTCUSD",
@@ -6259,7 +6263,8 @@
     "t1": 71791.48285714285,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 73228.3,
@@ -6274,9 +6279,10 @@
     "lagSec": 60,
     "positionId": "48275938",
     "volume": 1,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T02:31:56.000Z",
-    "brokerStop": 73946.71
+    "brokerStop": 73946.71,
+    "closedAt": "2026-11-11T07:57:43.000Z"
    },
    "audusd-scalp-1794366326": {
     "symbol": "AUDUSD",
@@ -6676,7 +6682,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9930.22 · 31 open",
+  "status": "ok · demo Fusion Markets · balance 9914.25 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6688,25 +6694,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9930.22,
-  "lastRun": "2026-11-11T07:55:05.000Z"
+  "balance": 9914.25,
+  "lastRun": "2026-11-11T07:57:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:12:41.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.4511 -> 1.45036, target 1.2927 -> 1.29196 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-10T13:12:41.000Z",
-   "msg": "moved USDCAD 47373489 protection: stop 1.3816374 -> 1.3808974, target 1.48071 -> 1.47997 (council position)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-10T13:12:41.000Z",
-   "msg": "moved USDCAD 47373490 protection: stop 1.3816374 -> 1.3808974, target 1.43546 -> 1.43472 (council swing)",
-   "trade": "usdcad-swing-1793949081"
-  },
   {
    "at": "2026-11-10T13:12:41.000Z",
    "msg": "moved USDCAD 47990251 protection: stop 1.41137 -> 1.41063, target 1.42112 -> 1.42038 (council intraday)",
@@ -8191,6 +8182,21 @@
    "at": "2026-11-11T07:55:05.000Z",
    "msg": "limit filled: USDCAD position 48346849 at the broker",
    "trade": "usdcad-scalp-1794383071"
+  },
+  {
+   "at": "2026-11-11T07:57:43.000Z",
+   "msg": "BTCUSD position 48227161 closed at the broker",
+   "trade": "btc-scalp-1794346855"
+  },
+  {
+   "at": "2026-11-11T07:57:43.000Z",
+   "msg": "BTCUSD position 48274419 closed at the broker",
+   "trade": "btc-intraday-1794363757"
+  },
+  {
+   "at": "2026-11-11T07:57:43.000Z",
+   "msg": "BTCUSD position 48275938 closed at the broker",
+   "trade": "btc-intraday-1794364256"
   }
  ],
  "limits": {
