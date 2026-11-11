@@ -799,3 +799,24 @@ financing in the costs, replica mirror gold only (11 Nov 2026)".
 - **Recommended.** Whichever applies, reset the account before its record is read.
 - **If nothing is decided.** The Replica demo account keeps a balance that one hand-placed trade halved, and its record
   cannot be used to judge the replica.
+
+## The book study of 11 Nov 2026
+
+Three pre-registered studies on the book of item 37 (`research/proposals/2026-11-11-book-study.md`): the two-system book
+run as a book (+5.2R a year on 2006-17 after all costs, 330 positions, t 1.86: positive, not proven; worst drawdown about
+20R lasting almost four years), the trend leg's add on against off (no difference the data can see), and the Gold trend
+rule on thirteen other markets with hourly candles (0 of 14 tests pass). One decision came out of them.
+
+### [ ] 42. "What to expect": count financing on the trend legs' add unit as well
+
+- **Status (11 Nov 2026): open.** Proposed by the book study; nothing was changed.
+- **Context.** Since item 38 the "What to expect" figures charge overnight financing on a position's first unit only,
+  because the study records then on file did not carry the add unit. The book study committed unit-level records
+  (`research/edge/supported-book/legs.json`). With every unit charged, on untouched 2006-17: Gold trend +0.31R a position
+  (n 74, t 1.20) instead of the +0.40R (t 1.49) shown today; Gold trend fast +0.21R (n 128, t 1.17) instead of +0.29R.
+  The daily engulf has no add and does not change.
+- **Options.** (a) Rebuild the two trend legs' expectations from the unit-level records. (b) Leave the first-unit figures
+  and say so on the page.
+- **Recommended.** (a). No trade, size or rule changes; the page's expectation for Gold trend becomes about a fifth lower
+  and its time-to-judge longer, which is the honest state.
+- **If nothing is decided.** The page keeps overstating the trend legs' expectancy by about 0.08R a position.

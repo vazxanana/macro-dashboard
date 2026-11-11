@@ -321,7 +321,7 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
 test('the owner\'s decisions are on record: three approved with the owner\'s words, two open, numbers never reused', () => {
   const doc = rd('docs/owner-decisions.md'), heads = [...doc.matchAll(/^### \[(.)\] (\d+)\. (.*)$/gm)], nums = heads.map((m) => +m[2]);
   assert.deepEqual(nums.slice().sort((a, b) => a - b), nums.map((_, i) => i + 1), 'every number 1..n once: none renumbered, none reused');
-  assert.deepEqual(nums.slice(-5), [37, 38, 39, 40, 41], 'the new items are at the end');
+  assert.deepEqual(nums.slice(36, 41), [37, 38, 39, 40, 41], 'the five items of the edge review follow item 36 in order (later items are added after them: 42, the book study)');
   const item = (n) => { const a = doc.indexOf(`\n### [`, doc.search(new RegExp(`^### \\[.\\] ${n}\\. `, 'm')) - 1), b = doc.indexOf('\n### [', a + 5); return doc.slice(a, b < 0 ? undefined : b); };
   const five = [37, 38, 39, 40, 41].map(item), box = (n) => heads.find((m) => +m[2] === n)[1];
   for (const t of five.slice(0, 3)) { assert.match(t, /\*\*Status \(11 Nov 2026\): approved\.\*\*/); assert.match(t, /"yes anything that is better for the system and that applies it"/); }
