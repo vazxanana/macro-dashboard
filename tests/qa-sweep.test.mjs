@@ -141,3 +141,75 @@ test('ChronosTrade: the chosen timeframe chip passes AA in every theme, an open 
   assert.ok(css.indexOf('#open .pos-l input { width: 100%; }') >= 0 && /#open input \{ width: 60px; \}/.test(css), 'the card rule is the more specific one');
   assert.match(rule(css, '.tch-f small'), /font-size:\s*12px/);
 });
+
+// ---- Second pass, 11 Nov 2026 (branch desk-polish) ----
+const fnBody = (js, head) => { const i = js.indexOf(head); assert.ok(i >= 0, head); return js.slice(i, i + 2600); };
+
+test('Mosha, the teacher\'s page: the studies\' figures and the desk\'s own "cycle" are not put to the teacher (the owner and readers keep them)', () => {
+  const html = src('market-structure.html'), css = /<style id="ms-mosha-css">([\s\S]*?)<\/style>/.exec(html)[1];
+  const hide = /html\[data-mosha="teach"\]:not\(\[data-role="owner"\]\) #v-mosha #mo-rules, html\[data-mosha="teach"\]:not\(\[data-role="owner"\]\) #v-mosha #mo-cycle \{ display: none; \}/;
+  assert.match(css, hide);
+  // both cards still exist for the owner and for readers, and the studies are named nowhere else in what a teacher sees
+  assert.match(html, /<div class="card mo-wide" id="mo-rules">/); assert.match(html, /<div class="card" id="mo-cycle">/);
+  for (const m of html.matchAll(/<p class="ms-note mo-tch"[^>]*>([^<]*)</g)) assert.doesNotMatch(m[1], /stud(y|ies)|fixed rules|not an edge/i);
+  for (const f of ['assets/mosha-teach.js', 'assets/mosha-tutor.js']) assert.doesNotMatch(src(f), /five studies|fixed rules said|look-alikes/i, f);
+});
+
+test('ICT desk typography: the pass that brings every label, chip and calendar text to 12 px, and nothing after it undoes it', () => {
+  const css = styles(src('market-structure.html')), at = css.indexOf('/* ICT typography pass (11 Nov 2026)');
+  assert.ok(at > 0, 'the pass is there');
+  const pass = css.slice(at, css.indexOf('@media (max-width: 600px) { #v-ict .ict-cal-d { padding', at));
+  for (const sel of ['#v-ict .ms-chip', '#v-ict .ict-a', '#v-ict .ict-g', '#v-ict .ict-pill', '#v-ict .ict-tag', '#v-ict .ict-few', '#v-ict .ict-trk-l span', '#v-ict .ict-lv dt', '#v-ict .ict-lv dd small', '#v-ict .ict-m .k small', '#v-ict #ict-eq-d', '#v-ict .ict-t td small', '#v-ict .ict-mine-k span', '#v-ict .ict-cal-h', '#v-ict .ict-cal-d .d', '#v-ict .ict-cal-d small', '#v-ict #ict-tv-ck li.h', '#v-ict #ict-rv-tags button'])
+    assert.match(rule(pass, sel), /font-size:\s*12px/, sel);
+  // after the pass no ICT rule sets a smaller size again (a later rule of the same weight would win)
+  for (const m of css.slice(at).replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]*(?:#v-ict|\.ict-)[^{}]*)\{([^{}]*)\}/g)) for (const f of m[2].matchAll(/font(?:-size)?:[^;]*?([\d.]+)px/g)) assert.ok(+f[1] >= 12, `${m[1].trim().slice(0, 70)}: ${f[1]} px`);
+  assert.match(src('scripts/audit/smoke.cjs'), /ICT desk text under 12 px/, 'and the smoke test measures the drawn desk');
+  // light theme: buy / sell chips at AA on their own tint over the open-now card
+  const chip = /:root\[data-theme="light"\] #v-ict \.ms-chip-buy \{ color: (#[0-9a-f]{6}); \} :root\[data-theme="light"\] #v-ict \.ms-chip-sell \{ color: (#[0-9a-f]{6}); \}/.exec(css);
+  assert.ok(chip && ratio(chip[1], '#dae9ea') >= 4.5 && ratio(chip[2], '#fae6e9') >= 4.5);
+});
+
+test('ICT desk on a phone: a signal with two executions keeps its chips inside the row; "Replay through …" is never cut', () => {
+  const css = styles(src('market-structure.html'));
+  assert.match(css, /#v-ict \.ict-t tr:has\(\.ict-ex\) \{ grid-template-areas: "mk sd gr gr" "tm tm se en" "rs rs rs rs" "rv rv rv rv"; \}/);
+  assert.match(rule(css, '#v-ict .ict-t .ict-ex-b'), /flex:\s*1 1 0;\s*min-width:\s*0;\s*white-space:\s*normal/);
+  assert.match(css, /\.tv-h p\.ict-thru \{ display: block; overflow: visible; cursor: auto; \}/, 'the header clamps its other paragraphs to three lines on phones');
+});
+
+test('styled dialogs: the primary button is white on a fixed fill at AA in every theme (the themes\' --accent / --sell gave 3.2-4.5:1)', () => {
+  const js = src('assets/ms-dialog.js');
+  const pri = /\.msd button\.pri\{background:(#[0-9a-f]{6});border-color:\1;color:#fff\}/.exec(js), danger = /\.msd\.danger button\.pri,\.msd\.danger button\.pri:hover\{background:(#[0-9a-f]{6});/.exec(js);
+  assert.ok(pri && ratio('#ffffff', pri[1]) >= 4.5); assert.ok(danger && ratio('#ffffff', danger[1]) >= 4.5);
+  const own = /\.own-acts button\.pri \{ background: (#[0-9a-f]{6}); border-color: \1; color: #fff; \}/.exec(styles(src('market-structure.html')));
+  assert.ok(own && ratio('#ffffff', own[1]) >= 4.5, 'the Desk\'s own dialogs (permissions, a lesson\'s levels)');
+});
+
+test('the Desk\'s light theme: green, red, faint and accent text pass AA on the page, the panel and the raised panel', () => {
+  const light = /:root\[data-theme="light"\] \{([^}]*)\}/.exec(styles(src('market-structure.html')))[1];
+  for (const k of ['buy', 'sell', 'ink-faint', 'accent']) for (const bg of ['bg', 'panel', 'panel-raised']) assert.ok(ratio(tok(light, k), tok(light, bg)) >= 4.5, `--${k} ${tok(light, k)} on --${bg}: ${ratio(tok(light, k), tok(light, bg)).toFixed(2)}`);
+  assert.ok(ratio('#ffffff', tok(light, 'accent')) >= 4.5 && ratio('#ffffff', tok(light, 'buy')) >= 4.5 && ratio('#ffffff', tok(light, 'sell')) >= 4.5, 'and white on each as a fill');
+  assert.match(styles(src('market-structure.html')), /:root\[data-theme="light"\] \.ch-cd\.up \{ color: #fff; \}/, 'the candle countdown: white on the darker green');
+});
+
+test('the address matches the view: a refused view is rewritten, a #trade link is left to the trade router', () => {
+  const html = src('market-structure.html'), show = fnBody(html, '  function showView(hx) {');
+  assert.match(show, /const HX = typeof hx === 'string' \? hx : location\.hash, \[h0, sub\] = HX\.slice\(1\)\.split\('\/'\)/);
+  assert.match(show, /if \(h0 !== v && VIEWS\.includes\(h0\) && location\.hash === HX\) try \{ history\.replaceState\(null, '', location\.pathname \+ location\.search \+ '#' \+ v\); \}/);
+  const nav = html.slice(html.indexOf("addEventListener('hashchange', () => {\n      // a #trade/<id> link is not a view"), html.indexOf('setInterval(() => { renderSessList(); renderHome(); }, 30e3)'));
+  assert.match(nav, /if \(\/\^#trade\\\/\/\.test\(location\.hash\)\) return;/, 'drawing a view for a trade link sent the page home behind the sheet');
+  assert.match(nav, /const at = location\.hash, t = document\.startViewTransition\(\(\) => showView\(at\)\); t\.ready\.catch\(\(\) => \{\}\)/, 'a view transition draws from the address of its own navigation; a skipped one is not an error');
+  assert.match(html, /if \(el && !el\.hidden\) \{ if \(!push && parse\(location\.hash\)\) history\.replaceState\(null, '', hash\); return; \}/, 'a pasted trade link on its own desk: closing the sheet lands on the desk, not on the link again');
+});
+
+test('Mosha book in French: the desk\'s first wording of a corrected seed line is shown translated, like the line itself was', async () => {
+  const { createRequire } = await import('node:module'); const require = createRequire(import.meta.url);
+  const I = require('../assets/mosha-i18n.js'), L = require('../api/mosha-lessons.js');
+  assert.match(src('assets/mosha-teach.js'), /L\('The desk had:'\) \+ ' ' \+ esc\(wasOf\(b\)\)/);
+  assert.match(src('assets/mosha-teach.js'), /var wasOf = function \(b\) \{ var I = root\.MS_MOSHA_I18N; return I && I\.tr \? I\.tr\(b\.was\) : b\.was; \};/);
+  for (const line of L.SEED) assert.ok(I.FR[line.text], `the seed line "${line.text.slice(0, 40)}…" has its French`);
+});
+
+test('Mosha forms on a phone: a date-and-time field takes the whole row (half a row cut the date off)', () => {
+  const css = /<style id="ms-mosha-css">([\s\S]*?)<\/style>/.exec(src('market-structure.html'))[1];
+  assert.match(css, /@media \(max-width: 760px\) \{ #v-mosha \.mo-f:has\(input\[type="datetime-local"\]\), \.mo-lv-dlg \.mo-f:has\(input\[type="datetime-local"\]\) \{ grid-column: 1 \/ -1; \}/);
+});
