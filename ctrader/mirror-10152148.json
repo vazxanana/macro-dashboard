@@ -2667,7 +2667,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T05:37:44.000Z",
     "councilEntry": 1.11622,
     "stop": 1.11674,
@@ -2681,10 +2681,15 @@
     "slipR": 0.038,
     "lagSec": 69,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T05:37:44.000Z",
-    "brokerStop": 1.11672
+    "brokerStop": 1.11672,
+    "closedAt": "2026-11-11T06:42:09.000Z",
+    "exitPrice": 1.11521,
+    "councilExit": null,
+    "councilR": 2
    },
    "usdchf-replica-1794375395-b": {
     "positionId": "48317390",
@@ -2773,7 +2778,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.14 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 9962.14 · 11 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2788,7 +2793,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9962.14,
-  "lastRun": "2026-11-11T06:39:20.000Z"
+  "lastRun": "2026-11-11T06:42:09.000Z"
  },
  "log": [
   {
@@ -3823,6 +3828,11 @@
    "at": "2026-11-11T06:37:54.000Z",
    "msg": "USDCHF position 48317390 closed at the broker",
    "trade": "usdchf-replica-1794375395-b"
+  },
+  {
+   "at": "2026-11-11T06:42:09.000Z",
+   "msg": "closed EURUSD position 48317383 (council: win)",
+   "trade": "eurusd-replica-1794375395-s"
   }
  ],
  "limits": {
