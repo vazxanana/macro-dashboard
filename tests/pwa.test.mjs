@@ -425,5 +425,8 @@ test('built site: every page has each app tag exactly once, and every manifest s
 test('the browser audit exists and is the documented manual / CI check', () => {
   const a = fs.readFileSync(path.join(ROOT, 'scripts/audit/pwa.cjs'), 'utf8');
   assert.match(a, /serviceWorkers: 'allow'/);
+  assert.doesNotThrow(() => new vm.Script('(function (require, module, exports, __dirname, __filename) {' + a + '\n})', { filename: 'scripts/audit/pwa.cjs' }), 'the audit parses');
+  assert.match(a, /u\.origin !== H, \(r\) => \{[^}]*r\.abort\(/, 'hermetic: every other host is cut');
+  assert.match(fs.readFileSync(path.join(ROOT, '.github/workflows/ci.yml'), 'utf8'), /node scripts\/audit\/pwa\.cjs > "\$AUDIT_OUT\/pwa-1\.log"/);
   assert.match(a, /process\.exit\(failed\.length \? 1 : 0\)/);
 });

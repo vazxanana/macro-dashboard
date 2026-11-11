@@ -189,6 +189,9 @@
   .check { display: flex; align-items: center; gap: 12px; }
   /* phones (9 Nov audit): the three labelled pills ran 125px past a 390px screen; dots only, as on the main desk */
   @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
+  .hdr-sw[hidden] { display: none; }
+  /* touch: each dot of the switch is a 44 px target (they were 25 px wide), as on the other side pages */
+  @media (pointer: coarse) { .hdr-sw { padding: 0; } .hdr-sw a { min-width: 44px; justify-content: center; } }
   /* the channel table's no-wrap first column pushed it 8px past a 390px screen */
   @media (max-width: 600px) { .ch td:first-child { white-space: normal; } .ch td, .ch th { overflow-wrap: anywhere; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -457,7 +460,7 @@
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand" style="font-weight:500">Macro desk</span>
     <div class="check"><span class="when" id="when" aria-live="polite">Loading…</span>
-      <nav class="hdr-sw" aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav></div>
+      <nav class="hdr-sw" aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav></div>
   </div>
 </header>
 <main class="wrap" data-loading>
@@ -633,7 +636,7 @@
   // behind /cdata answer only signed-in sessions. GitHub Pages / local copies read the public raw files as before (no check there).
   if (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname)) {
     var me = null; try { var mr = await fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }); me = mr.ok ? (await mr.json()).account : null; } catch (e) {}
-    if (!me) { document.querySelector('main.wrap').style.display = 'none'; document.getElementById('md-gate').hidden = false; var w = document.getElementById('when'); if (w) w.textContent = 'Signed out'; return; }
+    if (!me) { document.querySelector('main.wrap').style.display = 'none'; document.getElementById('md-gate').hidden = false; var sw = document.querySelector('.hdr-sw'); if (sw) sw.hidden = true; var w = document.getElementById('when'); if (w) w.textContent = 'Signed out'; return; }
   }
   var BASE = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');
   var $ = function (id) { return document.getElementById(id); };
@@ -761,10 +764,10 @@
     }).join('') || '<li class="empty">No insights yet.</li>';
     var hy = b.hypotheses || [];
     var dues = hy.map(function (h) { return h.by; }).filter(function (x, i, A) { return x && A.indexOf(x) === i; });
-    $('hyp-take').innerHTML = hy.length ? '<b>' + hy.length + ' hypothes' + (hy.length === 1 ? 'is' : 'es') + '</b>, due ' + esc(dues.join(' and ')) + '. The bar is his chance; the tick is how often it happened in all weeks since 2007.' : 'No hypothesis this run.';
+    $('hyp-take').innerHTML = hy.length ? '<b>' + hy.length + ' hypothes' + (hy.length === 1 ? 'is' : 'es') + '</b>, due ' + esc(dues.join(' and ')) + '. The bar is his chance; the tick is how often it happened in all weeks since 2007.' : 'No hypothesis this run: too little history for the analogs.';
     $('brief-hyp').innerHTML = hy.length ? hypBars(hy)
       + (b.record ? '<p class="note" style="grid-column:1/-1">' + (b.record.n ? 'Hypotheses scored: ' + b.record.n + ', <b>' + pct(b.record.hitRate) + ' came true</b> vs ' + pct(b.record.expected) + ' expected, Brier ' + b.record.brier + '; ' + b.record.open + ' open.' : 'Track record: ' + (b.record.open || 0) + ' hypotheses on the record, none due yet.') + '</p>' : '')
-      : '<p class="empty">No hypothesis this run (too little history for the analogs).</p>';
+      : '';   // the line above says why; it was said twice
     var lv = b.levels || {};
     var ladder = function (L) { if (!L) return ''; var rows = [], placed = false, fmt = function (x) { return (L.unit || '') + (+x).toLocaleString('en-US', { minimumFractionDigits: L.dp, maximumFractionDigits: L.dp }); };
       L.list.forEach(function (l) { if (!placed && l.price < L.px) { rows.push('<tr class="now"><td>' + fmt(L.px) + '</td><td>Last close (' + esc(L.asOf) + ')</td><td>0.00%</td></tr>'); placed = true; }
@@ -925,12 +928,12 @@
     if (vals.length < 2) return '<p class="empty">Score history: n/a.</p>';
     var H = 220, top = 14, bot = H - 26, x0 = 4, x1 = w - 58, lo = Math.min(-0.5, Math.min.apply(null, vals)) - 0.1, hi = Math.max(0.5, Math.max.apply(null, vals)) + 0.1;
     if (0.25 / (hi - lo) * (bot - top) < 22) lo = hi - 0.25 * (bot - top) / 22;   // a wide range would squeeze the two threshold labels: keep them 22 px apart
-    var X = function (i) { return x0 + (P.length === 1 ? 0 : i / (P.length - 1)) * (x1 - x0); }, Y = function (v) { return top + (hi - v) / (hi - lo) * (bot - top); }, g = '';
+    var X = function (i) { return x0 + (P.length === 1 ? 0 : i / (P.length - 1)) * (x1 - x0); }, Y = function (v) { return top + (hi - v) / (hi - lo) * (bot - top); }, g = '', lab = '';
     g += '<rect class="zone" x="' + x0 + '" y="' + Y(hi) + '" width="' + (w - x0) + '" height="' + (Y(0.25) - Y(hi)) + '"/>';
-    [[0.5, '+0.5 BUY · High'], [0.25, '+0.25 BUY · Medium (tested edge above)']].forEach(function (t) { g += '<line class="thr" x1="' + x0 + '" x2="' + w + '" y1="' + Y(t[0]) + '" y2="' + Y(t[0]) + '"/><text x="' + (x0 + 2) + '" y="' + (Y(t[0]) - 4) + '">' + esc(t[1]) + '</text>'; });
-    g += '<line class="zero" x1="' + x0 + '" x2="' + w + '" y1="' + Y(0) + '" y2="' + Y(0) + '"/><text x="' + (x0 + 2) + '" y="' + (Y(0) + 15) + '">0 · below +0.25: no edge, never a sell</text>';
+    [[0.5, '+0.5 BUY · High'], [0.25, '+0.25 BUY · Medium (tested edge above)']].forEach(function (t) { g += '<line class="thr" x1="' + x0 + '" x2="' + w + '" y1="' + Y(t[0]) + '" y2="' + Y(t[0]) + '"/>'; lab += '<text x="' + (x0 + 2) + '" y="' + (Y(t[0]) - 4) + '">' + esc(t[1]) + '</text>'; });
+    g += '<line class="zero" x1="' + x0 + '" x2="' + w + '" y1="' + Y(0) + '" y2="' + Y(0) + '"/>'; lab += '<text x="' + (x0 + 2) + '" y="' + (Y(0) + 15) + '">0 · below +0.25: no edge, never a sell</text>';
     var d = '', pen = false; P.forEach(function (p, i) { if (p.s == null) { pen = false; return; } d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.s).toFixed(1); pen = true; });
-    g += '<path class="ln" d="' + d + '"/>';
+    g += '<path class="ln" d="' + d + '"/>' + lab;   // the threshold names are drawn after the line (their halo then covers it): on a phone the path ran through them
     var li = -1; P.forEach(function (p, i) { if (p.s != null) li = i; }); var last = P[li];
     g += '<circle class="dot" cx="' + X(li) + '" cy="' + Y(last.s) + '" r="5"/><text class="ink big mono" x="' + (X(li) + 9) + '" y="' + (Y(last.s) + 4) + '">' + esc(sg(last.s)) + '</text>';
     var fmtD = function (s) { return s ? new Date(s + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) : NA; };
@@ -1210,7 +1213,11 @@
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
       renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
-      syncStory(); redraw();
+      syncStory();
+      // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
+      // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
+      var m = document.querySelector('main.wrap'); if (m) delete m.dataset.loading;
+      redraw();
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     }).finally(function () { var m = document.querySelector('main.wrap'); if (m) delete m.dataset.loading; });   // the story shows once its cards know whether they have data
   }

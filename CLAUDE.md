@@ -1,6 +1,6 @@
 # macro-dashboard — working notes
 
-## Start here (map, 9 Nov 2026)
+## Start here (map, 9 Nov 2026; checked against the code 11 Nov)
 
 Meridian X: a paper-trading desk run by an automated council, live at https://meridianx.dev (Vercel). The owner's plain-English
 explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-decisions.md`; Fred's connector guide is
@@ -24,7 +24,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Where things live**
 | Path | What |
 |---|---|
-| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks, profile, users. Public / admin split: see below |
+| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Gold, Mosha, Crypto, LIT, NQ SDV), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
 | `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
 | `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
 | `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
@@ -71,13 +71,21 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
-- ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`), Fred applies ICT changes (on for Fred since 10 Nov).
+- ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
+  Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
+- Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
-  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
+  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
+  Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
+
+**Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
+`docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
+(1-36 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -113,7 +121,8 @@ fetches in `refreshFundamentalsX()`. The Yen carry-unwind row is
 deliberately always `dir: null` (a volatility warning, not a directional
 call) — don't "fix" it to always vote a direction.
 The Eurozone growth pulse reads FRED `BSCICP03DEM665S`, which stopped at 2024-01-01: the strategist (`council/macro.mjs`
-`MAX_AGE`) drops it as "no data", but `gold-trading.html` still shows the 2024 value (open: docs/owner-decisions.md, item 16).
+`MAX_AGE`) drops it as "no data", and since 9 Nov (#703) `gold-trading.html` ignores a value over about 4 months old too, so the row is
+empty on both (a replacement series is still open: docs/owner-decisions.md, item 16).
 
 ## Conventions
 
@@ -337,6 +346,23 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   daily log entry should show `resolved` and `added` only, `corrected` and `removed` only for records closed in the 3 days before
   the previous run. Tests: `tests/desk-ict-stable.test.mjs` (a fake feed whose window and scale differ between runs).
 
+## ICT replay: a trigger that does not depend on GitHub's cron (11 Nov 2026, reliability)
+`ict-replay.yml`'s cron is not enough: of its 35 runs up to 11 Nov, one came from the schedule (the then weekly cron, 8 Nov,
+started 13:49 UTC for 06:41) and 34 from pushes; a run takes 2-32 min (median about 10). So the council loop starts it:
+after each round's save, one line of `council.yml` runs `council/replay-due.mjs data` (read only: `decide`, `listRuns`, `main`) and,
+only on exit 0, `gh workflow run ict-replay.yml --ref main` (main's definition, no inputs = never a rebuild; the loop already
+had `actions: write`). Due = council-data `ict/replay.json` `at` over `STALE_H` 20 h old AND no run of the workflow active
+(any status but completed) AND none started in the last `GAP_H` 6 h, by anyone (cron, push, a person, the loop): GitHub's own
+run list is the marker, so a hand-over of the loop or a failed replay cannot lead to a second start inside 6 h. A fresh file is
+answered without the network; an unreadable run list, a timeout or a crash is "no". The line is `if …; then … || echo …; fi`
+with `timeout` on both commands, so it cannot fail or hold a round (at most 75 s), and it sits after the save, never between
+the Trader and the mirror or in the quick pass. The cron stays as the second path; the replay's concurrency group keeps one
+run at a time. While the loop itself is down nothing starts the replay but the cron (the Vercel backup runner does not).
+Monitoring: `datahealth.mjs` `FILES` `ict/replay.json` warns after 36 h (named on the Data chip: "ICT replay … not updated
+for …") and is bad (pages through the data check) after 4 days; before, 8 and 15 days. Not verified by a live run (Actions
+cannot be run from the build sandbox): the dispatch itself; the decision was run against the live run list. Tests:
+`tests/replay-trigger.test.mjs`.
+
 ## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
 `council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
 `solid()` plus a shrunk expectancy ≥ 0.10R (empirical-Bayes prior around 0R), and each runs as a champion/challenger trial
@@ -385,6 +411,8 @@ the prior 5 daily highs, its own position and add next to the 20-day leg (`gtren
 (`LEG`). Sizing guide 0.25% (bridges: the shared gold risk). Replay 2023-Oct 2026 in research/replay-2w.json (39 trades).
 Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
 −6.21 → −6.47%), positive every year 2019-26 alone.
+Same day, later (owner, #530; user rule `gold-trend-fast-shadow`, `config.goldTrendFastShadow`): the fast leg's new trades are
+paper shadows (`blockedBy owner-shadow`), still managed by the same loop, never alerted; `council/decay.mjs` lists it `shadow: true`.
 
 
 ## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
@@ -411,6 +439,34 @@ prices = spot + the GC−spot basis from the ICT snapshot) and opens that contra
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
 
+## Home and Council reading pass (11 Nov 2026, quality round)
+Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
+the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
+- **Forward and replay are never one figure.** The Trades pane's "Live · our system" tiles said Closed 715, Win rate 42%, Total
+  +497.9R; 710 of those were backtest replay rows (research/replay-2w.json, +499.97R) and the forward paper record was 5 trades,
+  1 won, -2.05R. `fwdSplit(closed)` (main script, `window.MS_HC`) splits by `x.replay`: the tiles show the forward record
+  ("Closed, forward", win rate with "1 of 5", "Total, before costs") and one labelled line carries the replay ("Backtest replay,
+  not traded: n trades since <month>, % won, R"). The Home council tile says both apart too. Keep any new total on that split.
+- **Edge decay counts match the rows**: a live system with `few: true` is "too few to judge", not healthy, and a shadow system the
+  monitor calls decaying / on watch is named (`MS_DECAY_TALLY` in `#ms-decay-js`, `MS_WEEK.decayCount` for the week pane's chips).
+  The card said "8 healthy, 0 decaying" over a "Too few" row and a "Decaying" one.
+- **One way to write R** in the Home / Council templates: `rTxt(v, d = 2)` (sign, the minus glyph, two decimals; "—" when not a
+  number). The loss review, trade table, equity labels and the Home strip use it; `mnTxt` shows a hyphen-minus in council-written
+  text (the Analyst's report, rule history, the macro brief) as the minus glyph, leaving dates, ranges and arrows. A planned
+  reward:risk reads "target 2.00R", not "2R" like a result.
+- **Stamps**: `stampTxt(iso, everyH)` = day, time, zone name, and "Stale: …, N h old (written every 6 h)" past twice the cadence
+  (decay, what to expect, book weights); the trade table and loss review say whose clock their times use.
+- **`<style id="ms-hc-css">`** (after `#ms-desk-css`, scoped to `#v-home` / `#v-council`): no text under 12 px in these panes
+  (the Home session ring's hour ticks excepted), 44 px touch targets (Data chip, folded status line, checkbox labels, scoreboard
+  sort buttons and links), the Systems mirror row no longer stretched to 966 px by the broker table on a phone, report tables
+  with readable columns that scroll inside their box, long tags wrapping beside the R figure in Active trades, the Active list
+  holding its place while loading (layout shift 0.62 → 0 on a phone), and no dead Macro / This week tabs for a member without the
+  council permission. Add new Home / Council size fixes there, never a second block.
+- Tests: `tests/qa-sweep.test.mjs` ("Home and Council reading pass"), `tests/week-report.test.mjs` (`decayCount`).
+- Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); Home's week / month
+  figures are before costs while the week pane is after costs; the trade chart dialog still writes raw R ("Loss -1R"); the
+  replica track chart's axis uses a hyphen; "Journal · No trades yet" on Home while the council has trades (the owner's own journal).
+
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
 work, `/gold`, `/macro-desk`, `/backtest`, `/cdata`, `/md/*`, `/api/mcp/<key>` rewrites, no-cache on HTML). The first stage's
@@ -428,7 +484,7 @@ assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle an
   sends alerts; otherwise dry run (no commit, alerts off). Owner, 7 Nov 16:3x: GitHub Actions is the council runner (council.yml);
   the Vercel council job stands down while Actions saved in the last 10 min and takes over by itself if the loop stops. A full
   cut-over (GH_TOKEN + the trader's NTFY/Telegram/FUT env on Vercel, RUN_MODE=live, the GitHub loop removed, repo private) has not
-  happened; a private repo would end the free Actions minutes the loop relies on (see docs/owner-decisions.md).
+  happened; a private repo would end the free Actions minutes the loop relies on (see docs/owner-decisions.md, item 32).
 Since 8 Nov the project deploys from GitHub `main` (production only, and only when a served file changed: `scripts/vercel-ignore.sh`).
 Server-side login landed on 9 Nov (below); broker-order functions are a later stage.
 
@@ -781,6 +837,36 @@ infinite animation on the gate (live dot rings three times, the tape is static).
 `#g-curve` (cumulative R of `sysClosed()` over 90 days, `renderGuestCurve()` from `renderGuestCal()`, fixed plot height), the P&L
 calendar, then the invitation "Want a seat at the desk?" last. Shorter guest banner; the locked markup switch gets its own row on phones.
 
+## Sign-in card and guest page: honest and main system only (11 Nov 2026, quality round)
+Walked signed out and as a guest (390 px touch, 1440 px, dark / light / midnight; `/api/login` stubbed for every error state).
+- **What a stranger is shown is the main system only.** The sign-in card's proof counted every open shadow trade ("Open now 25"
+  with no main-system trade open) and named the newest shadow signal; `window.msGateProof(trades, ictReplay, now)` (pure, `MAIN` =
+  `SYS_K`) now counts and names main-system paper trades only, a box whose file did not load keeps its dash, and the ICT card reads
+  "ICT replay · a backtest", n, "since <replay.from>", "before costs" (it said "since 2020"; the replay starts 1 Aug 2025).
+- **Guest memory** (`GUEST_DATA`, `guestRow`, next to `sysClosed`): for the public role, whatever the loader stores in
+  `COUNCIL.trades / research / replay / snap` passes through setters first: main-system rows only, cut to `GUEST_F` (no name, pair,
+  note, feat, blockedBy, pm), the snapshot cut to prices. Before, the hidden Home / Setup / Council views of a guest held 26 shadow
+  trades with "Blocked by: …" and the scanner's setup texts. Guest toasts (`councilAlerts`) are main-system only and say "Paper
+  trade", not the system's name. Never read a guest file into the page past these filters. Still true and NOT fixed here: the
+  guest files themselves (`/cdata/trades.json`, `snapshot.json`, `research.json`, `research/replay-2w.json`) carry every book with
+  names and notes to anyone who fetches them, the page source carries the admin views' static text, and the hidden views still
+  hold what the page computes in the browser from public candles (the top-down steps, the scanner). Closing that needs the
+  server to cut the guest files (`api/data.js`), an owner decision reported on 11 Nov.
+- **A backtest is called a backtest.** The guest "Last 90 days" curve is mostly the replay of the rules on past candles (11 Nov:
+  40 of 45 trades, +10.2R, against 5 forward paper trades, −2.05R) and was all labelled "paper trades". `guestSplit` counts the two
+  apart; the replay is drawn dashed, the forward record solid from a dotted marker, and the label, the count, the note and the
+  plot's aria-label name both; the calendar note gives the date before which days are a backtest. No number changed.
+- Empty states: the trade card says loading / could not be loaded / no gold trade (it vanished); the strip, curve and calendar say
+  when council-data could not be read (the calendar said "No closed trades"); "Floating now" no longer calls a waiting order open.
+  The curve redraws when its plot gets a width (`ResizeObserver`): results that arrived first left "Loading results…" on screen
+  until the next data load (2 of 3 desktop loads).
+- Sign-in card: the page behind is `inert` while the card is up (`msGateInert`; Tab used to reach "Skip to content" behind the
+  `aria-modal` card), closing hands focus back to the button that opened it, and Caps Lock + an error no longer stack and push the
+  button (the wrong-password line names Caps Lock). The gate's layout shift and `loadCouncil` were left to the load-performance pass.
+- "↓ Gold trade and results" did nothing: as a `#g-setup` link it changed the address, and the view router scrolled back to the
+  top. A click handler scrolls to `#g-merged` and leaves the address alone. A guest's account menu no longer offers the profile.
+- Tests: `tests/qa-sweep.test.mjs` (the five "sign-in card" / "guest" checks run `msGateProof`, `GUEST_DATA` and `guestSplit`).
+
 ## Guests on the charts, wide-screen density (8 Nov 2026)
 Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#charts`, header picker live only on the charts view;
 `html[data-view]` set by showView). Their markup is Clean only: `setMode` forces clean, Meridian / ICT buttons show a lock and open
@@ -1114,10 +1200,42 @@ called, in `panels()`), so they follow play, step, undo and jump; open trades an
 price lines (`xpLines`); one crosshair moves across all charts (`xpCross`). Orders, drafts, drag lines and drawings stay on the first
 chart: `xpGeom` keeps the quick Buy / Sell bar and the legend on it (`--mr`, `.chartc.mnarrow` under 640 px). The toolbar starts with
 the market and timeframe as a button (`#tb-sess`, opens the session form). `window.ctSplit()` is the audit's read-only summary.
-Not done: changing the replay's own timeframe in the middle of a session (the engine steps on the loaded candles). Audit: 152 checks
+Changing the replay's own timeframe in the middle of a session came on 11 Nov (next paragraph). Audit: 152 checks
 (the chips, a 4h pane, four charts with every pane ending at the replay moment, back to one chart); the audit reads the live candle
 proxy, so it only uses timeframes the live site already serves. Test: `tests/oanda-symbols.test.mjs` (page list = proxy list, each
 timeframe's OANDA granularity and the 4999-candle window).
+Timeframe switch in the middle of a session (11 Nov 2026, owner: "more timeframes"; the trader drops from 15m to 5m for an entry and
+goes back up): the toolbar's timeframe button (`#tfdd`, chips `#tfsw [data-stf]`, label `#tf-now`; keys `,` lower and `.` higher, also
+`[` `]`; in Help) calls `setTf(tf)`. `#tb-sess` now shows the market only. **One rule: the replay has one moment** (`mom()`,
+`BT.tfMoment`): every price before it has been through the engine, nothing at or after it has. A switch **never touches the account**
+(positions, orders, stops, targets, MFE / MAE, journal, drawings, challenge stay as they are; `S.acct` is not read or written). It only
+seats the moment on the new timeframe's candles (`BT.tfPlan`): candles that ended by it are shown closed; a candle that CONTAINS it
+(going up mid-candle, or an unaligned pair such as 15m → 10m or 5m → 2m) is shown **still forming**, built by `BT.tfPart` from finer
+candles that ended by the moment (`BT.tfFineSec` picks the coarsest timeframe that tiles both halves; the candles of a timeframe
+already loaded when they fit, else one small fetch), and sits in `S.bars` in place of the full candle (`S.part = { i, T, sec, g,
+formed, full, rest }`, `BT.tfSeat` / `tfUnseat`; legend tag "still forming", `#now` says "forming"). The next step (`step()`,
+`BT.tfNext` + `BT.advance`) runs `rest`, the finer candles from the moment to the candle's end, through the engine in order, each
+once, and puts the full candle back: so no price is skipped or processed twice, and a stop or target inside the candle is taken where
+the finer candles reach it (a test checks the account equals stepping the lower timeframe). Going down shows only candles that closed
+by the moment. `BT.advance(acct, ch, bars)` is the page's per-bar order (orders and positions, the challenge, then a breach closes
+everything, events marked `breach`) moved into the engine so the tests run the real code. Kept per session in memory: the candles of
+each timeframe used (`TFC`), so going back is instant. **Cleared at a switch: Undo history** (the toast and the panel say so); Undo
+works again from there and can bring a forming candle back. Playback does not animate the completion of a forming candle (it
+completes at the end of its time slot). Jump and Skip day complete a forming candle first. The extra panes take the moment, not the
+bar (`xpDraw` lower branch uses `mom()`), so a lower pane never shows a candle past it. Saved sessions carry `mom` (and `sw` once
+switched; the session strip's "replayed %" is then by time); `resume` builds a forming candle again from finer candles
+(`BT.tfResume`); a session saved before this change (index only) loads as before. Limits: the new timeframe is fetched for the whole
+session (300 candles of context before the start, `BT.tfWindow`); more than `XMAX` 40,000 candles is refused in words ("Too many
+1 minute candles for this session …: load fewer days"), nothing changes; a failed fetch leaves the session on its timeframe.
+After a switch, entry markers and connectors snap to the candle that holds their time (`timeToX` places a time inside a candle).
+"Avg hold (bars)" counts bars of whatever timeframe was on screen (finer candles while one formed). Phones: the timeframe button
+is in the toolbar row (44 px), Skip day moved under More (`#skipday2`) to make room. `window.ctTf()` is the audit's read-only
+summary. Not done: a weekly replay timeframe; a lower timeframe for only part of a long session (it is all or refused).
+Tests: `tests/backtest.test.mjs` (no future data in either direction, proven by changing every price after the moment; account
+identical across a switch; path equal to the lower timeframe; a stop in the rest taken once; a low before the moment never fills
+an order placed at it; chains of switches; data holes; refusal; old sessions). Audit: 179 checks (the switch against candles
+fetched apart from the page, forming candle, one step, Undo, split panes, reload, keys, play, the day candle, an old session,
+the refusal, AA in three themes, phone).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
@@ -1270,6 +1388,15 @@ errors are generic (bridge GET, push 500). push.js caps what a device may store 
 non-object alerts 400). alert-cron skips a malformed device record instead of failing every device. MCP `granted`: an explicit
 `perms.mcp` wins over the record's `mcp` flag (as `msPerms`). `/cdata` answers GET / HEAD only; bridge GET / POST only; profile
 refuses a non-object JSON body (400, was 500); a failed sounds read is answered `no-store`. Tests: `tests/api-hardening.test.mjs`.
+Review of 11 Nov 2026 (every function read; `tests/api-review.test.mjs`): three fixes. (1) `/api/push` (no sign-in) took a price
+such as "1e999": it passed "> 0", was stored as null, and `alert-cron` then threw for that device and ended the round for every
+device after it, each minute. Push now wants a finite price and time; the cron leaves out an alert that is not whole and one
+device's failure never stops the others. (2) `/api/mosha-lessons`: the owner's `remove` let a `book` or `add` sent in the same
+body through (the owner reads and removes, only Luxus teaches); only the `remove` is carried out now. (3) `api/mcp.js` `granted`:
+with an `MCP_KEYS` entry the stored user list was not read before `ictLevel`, so the first call on a cold instance got the
+built-in ICT level whatever the Users page said; the list is read first for every key (an explicit key is still a grant while
+the list cannot be read). The same file re-checks: a foreign Origin on every state-changing endpoint, `/cdata` path handling,
+the Mosha assistant's key against every other endpoint, who teaches, who writes whose record, where `ictApply` can come from.
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
@@ -1319,6 +1446,27 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   Edge lab: verdict donut + legend with counts and shares, best candidate IS vs OOS bars (baseline OOS tick, t in words), equity
   line where a study lists its own trades (`lab-summary.mjs` `equityOf`: cumulative R sampled to 48 points, drawdown from the full
   series; today crypto-trend-decay and nq-open-oos), `[data-tip]` tooltips on hover and tap.
+- Quality pass (11 Nov 2026; every page at 390 px touch and 1440 px, dark / light / midnight, owner / reviewer / viewer / signed
+  out). **Macro desk**: since the 9 Nov `main[data-loading]` fix the charts were drawn while the story was still `display: none`,
+  so `draw()` found no width and the score path, the level ladder, the expectation scale and the hit-rate chart stayed blank until a
+  resize or the 5-minute reload; `load()` now removes the flag, then calls `redraw()`. "No hypothesis this run" is said once, the
+  score chart's threshold names are drawn after the line, each dot of the header switch is a 44 px target on touch (25 px before)
+  and the switch hides when signed out. **Edge lab**: a study whose result stores an object under `system` read "[object Object]"
+  (only text is a description); `tidy()` mends a joined headline ("FAIL.; Intraday: …"); the report dialog renders the study's
+  RESULT.md (`md` / `mdInline`, the veteran library's renderer: escaped first, tables scroll inside `.tbl`, relative links stay text)
+  instead of raw Markdown in a monospace block. **Veteran library**: "Open raw" is 44 px on touch. **Gold terminal** (locked
+  features and the driver stack untouched): the page clips sideways overflow, so on phones the Daily Bias banner's Target / Daily ATR
+  column, the levels panels and Research → Edge Summary table were cut off with no way to reach them (the banner stacks under
+  700 px, `.levels-grid` uses `minmax(0, 1fr)`, the table's card is `.gx-scroll-x`); `.edge-rule` notes were pale text on a pale slab
+  in dark (2.3:1); the hero chart's key-level labels are drawn above the candles on a plate of the card colour (`P.plate`; the lines
+  stay underneath); the MTF opportunity line no longer reads "Buy the pullback into the wait for a pullback block" when M15 has no
+  block (`planTxt`). `scripts/audit/smoke.cjs` now opens every gold tab on the phone (body wider than the screen = "tab cut off on
+  the right") and fails on a visible, empty chart host (`.vz[id]`, "chart not drawn"); both fail on the build before this pass.
+  Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
+  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab states win rates and "high conviction" with no
+  n or t (older content, against the wording of absolute rule 4); `research/macro-veteran/START_HERE.md` (shown in the veteran
+  library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
+  and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -1495,11 +1643,82 @@ was found. Fixed:
   "4180." (the old table's `#open input { width: 60px }`); the teach dialog's hints and the session form's labels are 12 px.
 - Checks: `tests/qa-sweep.test.mjs` (one per fix) and `scripts/audit/smoke.cjs`: on the phone no inner view of the Desk may end
   past the screen ("view cut off on the right"; `#crypto` and `#sdv` joined the inner views).
-- Seen, left alone (older design or a decision for the owner): the ICT desk's 10-11.5 px labels and chips (dozens, from before
-  9 Nov); ChronosTrade's 32-36 px toolbar and pane-header buttons on phones (a stated choice of pass 11); the shared dialog's
-  primary button on the light theme (white on `--accent`, 4.50); a corrected book line's "The desk had: …" keeps the desk's first
-  wording in English in the French view; the replay card and the log on a teacher's page are English ("only the teaching surfaces
-  are translated"), and that page still shows "What the fixed rules said" to the teacher (see "Who teaches whom").
+- Seen, left alone in the first pass: see the second pass below for what was then done.
+
+**Second pass, same day (branch `desk-polish`, owner: "keep working improving everything").**
+- **Who teaches whom, on the page**: for a teacher who is not the owner (`html[data-mosha="teach"]:not([data-role="owner"])`) the
+  cards `#mo-rules` ("What the fixed rules said", the five studies' figures) and `#mo-cycle` ("The cycle, as you described it": the
+  desk's own summary, addressed to the owner) are hidden. The owner and readers keep both. Never show either to the teacher.
+- **ICT typography pass**: every text on `#ict` and in the signal dialog is at least 12 px (chips, grades, pills, level labels,
+  calendar, tags were 9.5-11.5 px); one block "ICT typography pass" after the desk's touch rules, so put later ICT rules at 12 px or
+  more (a test reads every size after it; the smoke test measures the drawn desk). On a phone a signal with two executions keeps
+  its result and both chips in a row of their own (they were cut off at the right edge, over the result); "Replay through … update
+  pending" in the dialog is no longer clamped to three lines (it says which candles the result does not cover).
+- **Light theme tokens** (`market-structure.html`): `--buy` #067a64, `--sell` #c8243f, `--ink-faint` #666d7a, `--accent` #2a62f0
+  (were 4.46-4.50:1 as text on the white panel). Measured on all 20 views at 390 and 1440 px before and after: 272 texts reach AA,
+  none got worse (the candle countdown `.ch-cd.up` takes white text in light for that). Styled dialogs (`assets/ms-dialog.js`
+  `.msd button.pri`, `.own-acts button.pri`): fixed fills #2a62f0 / #c8243f, white at 5.1 / 5.6 in every theme (dark was 3.2).
+- **The address matches the view**: a refused view (`#mosha` or `#ict` for a viewer, anything but charts for a guest) is rewritten
+  with `history.replaceState` in `showView`. **Trade links**: the main `hashchange` handler leaves `#trade/<id>` to the trade router
+  and a view transition draws from the address of its own navigation (`showView(hx)`); before, a pasted trade link or Forward after
+  closing a signal sent the page home a frame later and an ICT signal's dialog sat "open" inside the hidden desk. `showBase` replaces
+  a pasted link's entry even when its desk is already shown, so closing the sheet lands on the desk. A skipped transition's rejected
+  promises are caught (they surfaced as "Transition was skipped" page errors).
+- Mosha: a corrected book line's "The desk had: …" shows the translated seed line in French (`wasOf`); a date-and-time field takes
+  the whole row on phones in the log form and its exit row too.
+- Checked by hand in a browser, nothing to fix: choosing, pasting and dropping screenshots into the teach form (a 2600 px PNG is
+  stored as an 1800 px JPEG of about 50 KB, captions kept, a text file refused with a message, the lesson shows its pictures); the
+  owner's log form (no stop and a stop on the wrong side refused, open → Check candles → close → record → replay → locked levels →
+  delete through the styled dialog); home, charts and the council panes at 390 and 1440 px.
+- Checks: `tests/qa-sweep.test.mjs` ("Second pass": 8 tests), `scripts/audit/smoke.cjs` ("ICT desk text under 12 px").
+- Still open: light-theme status badges with their own colours (`.ms-st.near` amber on amber 1.8:1, `.ms-st.ready` white on green
+  3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
+  words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
+  12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
+
+## Browser audits: false failures traced to their causes (11 Nov 2026)
+The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
+any audit change:
+- **Colours are read through `measured(page, expr, what)` only.** It waits until the page has no transition or finite animation
+  running for two frames (`settle`), then reads once; `expr` returns `{ bad, n }`. A reading that measured no element, or a page
+  whose colours never settle, is a FAILURE. No fixed wait after a theme change, no second reading. The smoke test reads no colours.
+- **The cause of the "stale colour after a theme change"** (it was retried 700 ms later in `academy.cjs` until now): under
+  `prefers-reduced-motion: reduce` the pages had `* { transition-duration: .01ms !important }`. `transition-property` defaults to
+  `all`, so every element got a transition on every property; a theme change then went down the tree one level a frame (each child
+  inherits the parent's still-old colour, sees it change a frame later and starts its own transition), while backgrounds set from a
+  token changed at once: old-theme text on the new background for 6-7 frames on the Academy (260 ms idle, 700 ms at a sixth of the
+  speed), 0.7-1.2 s on the Desk (which has a theme switch) and 2-2.5 s on the Edge lab. The rule is now `transition-duration: 0s`
+  (no transition is started) in `assets/mx-page.css`, `market-structure.html` (both rules), `edge-lab.html`, `gold-trading.html`.
+  **Never write a non-zero duration on `*`.** The Academy audit reads the contrast in the same task as the theme change, under
+  reduced motion, to pin it.
+- **The Desk, two view changes in quick succession**: the second skips the first one's View Transition, whose `ready` promise then
+  rejects; `t.finished.finally(…)` handed that on to a promise nobody handled ("Transition was skipped", a page error whenever a
+  runner needed over 600 ms for a view). Now `t.ready.catch(…)` and a caught `finished.finally(…)` (one handler, shared with the trade-link fix of the same day). The smoke test changes views back to
+  back on purpose, and an inner view only counts when the Desk really shows it (`data-view`, the view and the Council pane visible).
+- **Smoke settle time counts from the page's LAST load** (`calmer`): the Desk reloads once when `/api/me` first answers with an
+  account; a check landing in or just after that reload was swallowed as a pass or read the page half drawn (413 px wide for half
+  a second). A check that cannot be read is an error, never a pass.
+- **Network**: `fetchRetry` tries a proxied request three times (network error, 429, 5xx) and keeps one answer per URL for the run;
+  the ChronosTrade audit names candle requests that still failed. Its checks need candles relative to today (quick starts, the
+  default day), so they stay on the live proxy: recorded candles would have to be re-stamped, which is not real data.
+- **CI** (`ci.yml`): the retry of the ChronosTrade and Academy audits stays, but the checks that failed the first time are printed
+  as warnings and both logs are in the `audit-screenshots` artifact. A check that only passes on a retry is a bug to trace.
+- `academy.cjs`: every dev server it starts is stopped however the audit ends (`ACADEMY_PORTS` names its ports: one implementation,
+  the one in the file's header). ChronosTrade's "closing a trade takes under 150 ms" is the middle of five closes.
+- Tests: `tests/audit-shared.test.mjs` (the helper on a fake page and a fake fetch, the 0s rule on every page, the Desk's handler).
+## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
+Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
+1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),
+dark ~370, midnight ~400; after: 0 on Charts and Scanner in all three. Causes: text in the same colour as its own tint (amber
+"IN ORIGIN" 1.8:1, chips 4.2-4.4), white on a solid green / red (READY 3.6, the candle countdown 2.5-3.0 on the dark themes),
+chart candle colours used inline as text (the scanner's day change), the brand gold on a light page (1.8), and opacity used to
+dim text (header shadow count, guest calendar days). Rule: **a badge takes its text colour from a token, never a hex**:
+`--buy-ink` / `--sell-ink` / `--warn-ink` / `--accent-ink` (text on a tint of its own colour), `--on-buy` / `--on-sell` (text on
+a solid fill), `--gold-ink` (the brand gold as text); defined once after the light tokens in the first `<style>` (dark and
+midnight = the theme's own colours, light = deeper inks). Never dim badge text with `opacity`. The scanner's day change is
+`.pr-c.up` / `.pr-c.dn`. Candle colours are untouched. Pinned in `tests/qa-sweep.test.mjs` ("badge inks"); no colour sampling
+in the smoke test (it would depend on live data). Left: the Council status line's amber warnings on its gradient (about 4.3:1
+at the gradient's darkest point, light only), outside this pass.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
@@ -1540,7 +1759,7 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   nothing else: never widen it to results, lessons, the store or any other route. With a provider key set it is not used.
   Tests: `tests/academy-connector.test.mjs`; audit section D (`--connector` on the dev server).
 - **Rate limit**: every Academy call goes through `MXAC.makeApi` (at most 24 calls a minute, 429 waited out, writes one at a time);
-  a run reads candidates, lessons, calendar and past cases once, so a train decision is one call. Keep new code on `ctx.api`.
+  a run reads candidates, lessons, calendar and past cases once, so a train decision is two calls (the attempt, then the session position: round 2, 11 Nov 2026; one before), and since round 3 a Session-tab decision too. Keep new code on `ctx.api`.
 - **Policy investigation** (10 Nov 2026, `research/edge/academy-policy/`, pre-registered; `docs/academy/RESEARCH.md` section 7):
   discovery = the earliest 60 % of each edge's usable train setups, validation = the latest 40 %, the exam pool untouched. The
   evidence margin does not rank trades and the replica gap did not repeat on validation. Five candidates, **0 of 16 tests accepted**
@@ -1585,6 +1804,56 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   phone jump. Known and not done: a reload returns to the last SAVED session point (the session is saved at the first
   decision and on "Save session", not after each one, because a train decision is kept to one API call); the Train decision
   card is long (the Session tab already folds the detail); two conflicting lessons are named but settled in the Lessons tab.
+- **Usability pass, round 2** (11 Nov 2026, owner: "keep working improving everything"): page code and CSS only, no decision,
+  lesson, policy, scorer or API logic changed. (1) **A reload keeps your place**: the session position is saved with every
+  train and exam decision (`keepPlace`; the first decision of a run already saves the session before its attempt and that
+  save now carries the setup, so it adds no call; every later decision is the attempt, then `session.save`: **two calls a
+  decision**, approved by the owner's coordinator, one audit-trail row each). After a reload the top of the setup offers
+  "Pick up where you left off" (`#resume-now`, from the sessions list the page already reads; nothing loads until Resume) and
+  the resumed point comes back with its stored verdict (one `corrections` read, on resume only). (2) **The Train decision card
+  is folded** (`decisionView` with `fold: true`): the answer, its sentence, the levels and the main reasons
+  (`MXAC.mainReasons`) stay in sight; evidence, reasons to wait, uncertainty, risk, similar cases and lessons are each a
+  `details.dfold` whose open state is remembered. Nothing is removed (a test lists every part); Session and Blind keep their
+  own single disclosure. (3) Calmer forms: what is missing is a neutral "Before you save: …" line and the red "Problem" shows
+  only when Save is pressed with something missing (mentor form and the Session / Blind answer forms; Save is offered once a
+  choice is made and such a press sends nothing); the engine's own answer is not offered as a change (`MXAC.mentorChoices`: no
+  "Change to WAIT" on a WAIT, its own BUY / SELL reads "Keep BUY, other levels"); setup ids in the engine's text and the log
+  read "the sell setup of <time>" (`humanize`); the page and its sections open on the edge used last. (4) A decision that
+  names two conflicting lessons has "Open them in the Lessons tab" (`MXAC.conflictIds`, `MXAC.lessonFocus`): the tab opens on
+  that edge with the two outlined, once. (5) Session tab on a phone: the pause is announced above the controls with "See the
+  decision" and the decision card comes first in its column; the hero folds to its title on every section but Train; the
+  audit trail's ids no longer break a letter a line; a study's times show as dates. **Browser storage**: the page now keeps
+  two display preferences of the device and nothing else (`prefGet` / `prefSet`, keys `mxacEdge`, `mxacFold`; a test pins the
+  list and both writes); never a decision, a result or an API answer. The audit takes `ACADEMY_PORTS="a,b,c,d,e,f"` when the
+  default ports are not free. Not done: the Session tab saves its position at its first stop only, and its Continue can
+  still drop a half-written verdict; the conflict link opens the lessons but does not edit them for you.
+- **Round 3** (11 Nov 2026: the Session tab and the Blind arena get the Train tab's protections; page code, CSS, audit and
+  tests only, no decision, lesson, policy or API logic changed). (1) **One guard** `MXAC.leaveGuard({ unsaved, tell })` (pure,
+  `LEAVE_MS` 10 s; on `kit`): Train's `leaveOk` is built from it and the sections use it, never a copy. The answer forms of
+  Session and Blind report `unsaved()` by Train's own rule (`mentorUnsaved`). A reload or close over a half-written answer on
+  any section gets the browser's own question (`beforeunload`, `kit.watchUnsaved`); the page stores nothing. (2) **Session
+  tab**: the place is saved with every decision (first decision of a sitting: `session.save` then the attempt; every later
+  one: the attempt then `session.save`: **two calls a decision**, one before); the save carries the setup the clock is on
+  (`state.cur`). The sitting saved last and not ended is offered in the tab (`#ss-resume-now`) and, when it is the latest
+  thing saved, at the top of Train ("Resume in the Session tab", `MXAC.sessionResume`, `MXAC.unfinished(rows, kinds)`).
+  Resume comes back ON the setup with the stored decision and verdict (`restorePoint`: reads only, `attempts` +
+  `corrections`, + `lessons` when a disagreeing verdict is stored; nothing is decided or written again). Continue, Step, End,
+  another start or resume, an edge change and opening a note all ask before dropping a half-written verdict or note.
+  (3) **Blind arena**: "Next setup" exists only once an answer is stored, so the guard sits where an answer can be lost
+  (another "Start a round", an edge change). After a reload the page asks the server for no stored decision, a setup left
+  open keeps its one hidden attempt and is named in the count line, and the API's refusal of a second answer (409, unchanged)
+  is said in words ("the first answer stands", `#bl-already`). `kit.decided(id, pool, mode)` records the mode in the shared
+  pool list: a setup whose engine answer was shown in Train or Session after its hidden attempt is answered as recall (a
+  fresh hidden attempt, left out of every score), in the same sitting too. (4) **Lesson draft on resume**: made again from
+  the stored attempt, the stored correction and the rebuilt snapshot's features (Train: one extra `lessons` read on resume to
+  see whether it was already saved). Edits typed into a draft that was never saved are NOT kept: a draft carries the
+  corrected answer and its level rules, so keeping it would put a decision in browser storage; the allowlist stays
+  `mxacEdge`, `mxacFold` (test). (5) The Session and Blind setup card folds to one line while a sitting is on screen
+  (`setupFold`, `.card.folded`); saved sittings list the latest first; an exam replay drops its cached exam list again (the
+  line sat inside a comment since round 2). The audit has section 11k (its own server, port index 1 reused): Session guard,
+  place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
+  draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
+  decision saves the sitting.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
@@ -1616,7 +1885,7 @@ UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 3
 - **One converter**: `council/histdata.mjs` (`histStampUtc`, `histToUtc`, `histOffsetH`, `nyOffsetH`; pure, no imports, nothing live
   reads it). `tests/histdata-clock.test.mjs` proves it equals the audited rule for every label hour, checks 10 real release windows
   (`tests/fixtures/histdata/`) and FAILS on any file in research/, academy/, ict/, council/, scripts/, api/, ml/ that converts a
-  HistData label by itself. A new loader imports the converter. The one listed exception is live code: `ict/replay.mjs` line 79
+  HistData label by itself. A new loader imports the converter. The one listed exception is live code: `ict/replay.mjs` line 95 (line 79 on 10 Nov)
   (a dead EUR/USD / GBP/USD back-fill branch; docs/owner-decisions.md item 21).
 - **What was wrong**: "EST without daylight saving" (label + 5 h; most ICT studies) is an hour late all of Europe's summer; New York
   time for every year (gold-systems, robustness, timing, costs, NQ open-run) is an hour early from 2019 in the weeks the US is on
@@ -1765,8 +2034,9 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     and do whaeva"). The server also accepts `MOSHA_ASSISTANT_KEY` (`ownKey`: 32-128 plain characters, else ignored): the
     assistant makes a random one, saves it as that Vercel environment variable (Production) and uses it as
     `MOSHA_READER_KEY` for the script. It opens exactly what the derived key opens, nothing more, and `MOSHA_READER=off`
-    shuts both. A later session reads the value back from the Vercel project (the owner asked for this); it never goes
-    into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
+    shuts both. A later session CANNOT read the value back (found 11 Nov: the variable is stored as sensitive, and Vercel
+    never returns a sensitive value): it sets a NEW key the same way (replace the variable, redeploy), or uses the network
+    secret the owner saved for meridianx.dev. The key never goes into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
   - **Reading the lessons in a session** (the "learn" part): `node --use-env-proxy scripts/mosha-lessons.mjs pull <dir>` saves
     `lessons.json` and the pictures of the lessons not read yet (2.5 s apart: the firewall allows 30 API calls a minute); look
     at each picture with its caption and note, then `… reply <lesson id> <file>` writes back what was understood (levels read
@@ -1895,5 +2165,86 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
       `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
       translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
       answer, and a French button name the page does not show.
+  - **His turn first, one tap away** (11 Nov 2026, quality round; he had sent lessons but judged no answer and confirmed no
+    book line). On his page `#mo-todo` now comes BEFORE the guide (`order: -6`) and is no longer a row of jump buttons: it
+    counts what waits ("3 answers to check · 4 questions from the desk", then the book's lines) and holds the FIRST item,
+    answerable in place with the lesson's own buttons (`drawTodo`): the desk's answer (clamped past 280 characters, "Read it
+    all"), its first open question (Yes / No or a few words; the next one follows by itself), "That is right" / "Not right…"
+    (typed in place), "Open the whole lesson", "Later" (to the back of the queue, this visit only). When no answer waits,
+    the first unconfirmed book line with Right / Correct / Erase. After each tap the item rests (`mo-busy`), then
+    `#mo-td-flash` (the only live region) says what happened and "Here is the next one."; a phone hides the intro line
+    while something waits (`#v-mosha.mo-turn`) so the judge buttons stay on the first screen. `turnOf(l)` (pure): a lesson
+    is still HIS while the desk's last answer has an unanswered question and he wrote nothing after it, although the server
+    already calls it "more" after his first answer; `todo()` returns `turn` (oldest first) and `ask` beside `judge`; the
+    "Your turn" filter and the lesson's chip ("The desk has 2 questions for you") follow it. `stateOf` is unchanged (the
+    server's rule). A correction or answer stays in its box until the desk has it (`T.sd`, `T.qd`); errors say what to do
+    (no connection, too many requests, a picture too large), the lessons that cannot be read offer "Try again". No new
+    permission, endpoint or concept; `api/mosha*.js` untouched.
+  - **The chart card and the log in his language, addressed to no one** (11 Nov 2026). `assets/mosha-replay.js` and the
+    reader's side of `assets/mosha-desk.js` go through `L(...)` like the teach cards (controls, captions, every step of
+    the examples, the result line, the log's record, table and candle check; `msMoshaReplayLang` / `msMoshaDeskLang` redraw
+    on a switch). The examples are HIS screenshots and every reader sees the card, so the desk's text about them says
+    "the red "5 mn" box", "Closed by hand", "On the screenshot: +5.6R" / "In the log:" / "The lesson:", never "you" /
+    "your" (a test bans it); the owner's own sentence on the 10 Nov example shows to the owner only (`ownLabel`). The
+    owner's log form and prompts stay English. `scripts/mosha-lessons.mjs`: `lesson.txt` says under its heading whose move
+    it is and why (`why`), `BOOK.md` counts the teacher's lines against the desk's, and `pull` prints first how many
+    lessons wait for the desk, for the teacher, and are understood (`counts`, `countsText`).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
+
+## Desk load: one request per file, late loading (11 Nov 2026)
+Owner request: the Desk (`market-structure.html`) should load faster and steadier. Measured with Playwright on a phone profile
+(390 px, DPR 3, CPU 4x) against a local server that streams like a slow connection (one shared 1.6 Mbps link, 150 ms before
+each answer, brotli sizes; council-data and candles replayed from disk), median of 3 loads, before → after:
+
+| | Guest (sign-in card) | Owner (home) |
+|---|---|---|
+| Requests in the first 20 s | 116 → 16 | 126 → 126 |
+| Council-data files asked twice | trades.json x2, snapshot.json x3 → none | none → none |
+| Bytes on the wire | 1,800 → 1,045 KB | 1,561 → 1,562 KB |
+| Council-data | 8 requests, 739 KB → 3, 472 KB | 19, 552 KB → the same |
+| First paint | 1.21 → 1.13 s | 1.18 → 1.12 s |
+| First useful content | proof line 7.9 → 3.3 s | Today strip with real numbers 6.5 → 4.3 s |
+| Layout shift (CLS) | 0.086 → 0.001 | 0.088 (one run 0.197) → 0.063 |
+| Long tasks | 19, 2.9 s → 9, 1.2 s | 12, 1.6 s → 11, 1.6 s |
+
+What was done, and the rules to keep:
+- **`window.msData`** (head script, between the `ms-data` markers; `msData.json(file)`, `.text(file)`, `{ fresh }`): every reader
+  of council-data on the Desk asks through it, so a file is one request per load (the sign-in card, the council, the ICT strip
+  and desk, the macro pane, the scoreboard and the week report each had their own fetch and cache-buster). A request in flight
+  is shared; a finished one is reused for 45 s (so every refresh timer on the page, 1 to 10 minutes, still reads new data);
+  `ict/replay.json` (written once a day, 2 MB) for 10 minutes; `{ fresh: 0 }` always reads again (the ICT desk's own files);
+  a failed read is never reused; each caller gets its own parsed copy. A visitor who is not signed in gets `null` without a
+  request for anything outside the guest list (the same list as `GUEST_OK` in `api/data.js`; a test compares them).
+  **Never add a direct `fetch` of a council-data file to the page**: the test lists the four left (files nobody else reads).
+- **Early requests** (`msData.warm`, a small script at the top of the body): trades and snapshot for the sign-in card; those
+  two plus the system replay and research.json otherwise. `loadCouncil` picks them up and, on the first load only, draws the
+  home strip and open positions (`renderActive`) from those four before the other ten files are in (`COUNCIL.early`); the full
+  council render follows when every file is, and later refreshes swap the whole set at once as before.
+- **The app sleeps under the first-load sign-in card** (`window.msBootGate`: a promise while `html[data-gate]` was set at load).
+  Leaving that card always reloads the page (sign-in, "Continue as guest", `/api/me` finding a session; the close button and
+  Escape only exist once the guest view was chosen), so `boot()` (candles, streams, the scanner), `loadCouncil` and `mdQuotes`
+  wait for it: 100 requests and half the main-thread work of that load were for a page nobody saw. If a way to close that card
+  without a reload is ever added, the promise resolves and everything starts.
+- **The sign-in card**: its script sits right under its markup (it was 1.3 MB further down); the three proof boxes are in the
+  page from the first paint (hidden only when nothing could be read); the open trades and last signal come from the shared
+  trades / snapshot requests; the ICT replay line is read last, after `load` and in idle time (`later(ictProof)`).
+- **`scripts/hoist-styles.mjs`** (build step, right after the pages are copied): the 25 `<style>` blocks in the Desk's body
+  (233 KB) go to the end of the head in the built page, order kept, so the cascade is the same and the first screen is drawn
+  once with all its rules (the sign-in card used to change height by 230 px when `#ms-gate3-css` arrived). The page source is
+  untouched: keep writing a feature's style block next to its markup, and never rely on a body style arriving late.
+- **The charting library's script tag** is in the body, right before the app script (with its CDN fallback line), not in the
+  head: it no longer blocks the first paint. No preload for it and no data request from the head: both took bandwidth from the
+  styles of the first paint (measured: first paint 1.2 → 1.6-1.9 s).
+- **Home holds its place**: a small script after `#h-mk` draws the empty market cards and the date line at once (the app
+  script drew them seconds later and pushed the page down; the count, 10, is checked against `INSTRUMENTS`), and on phones the
+  headline keeps two lines (`min-height: 2lh`).
+- Not changed, measured: the page itself is 1.55 MB (400 KB compressed), a quarter of it CSS and about 150 KB compressed the
+  app script, which the browser still parses under the sign-in card; the five Mosha scripts (65 KB compressed) load for every
+  visitor; fonts swap at about 1.5 s on this profile (a 0.04 shift on the owner's home); candles are 90 requests, 470 KB.
+  Open for the writers' owners: a slim companion to `ict/replay.json` without the 72-candle `path` arrays (the sign-in card
+  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry; and ETag / 304 answers
+  from `/cdata` so an unchanged file costs no bytes on a refresh.
+- Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
+  fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
+  guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
