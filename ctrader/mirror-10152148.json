@@ -3172,7 +3172,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T08:31:28.000Z",
     "councilEntry": 73732,
     "stop": 74103.1,
@@ -3186,10 +3186,12 @@
     "slipR": 0.066,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T08:31:28.000Z",
-    "brokerStop": 74078.71
+    "brokerStop": 74078.71,
+    "closedAt": "2026-11-11T10:33:53.000Z"
    },
    "eth-replica-1794385823-s": {
     "positionId": "48356103",
@@ -3385,7 +3387,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9940.81 · 13 open",
+  "status": "ok · demo Fusion Markets · balance 9936.95 · 12 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3400,8 +3402,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9940.81,
-  "lastRun": "2026-11-11T10:31:24.000Z"
+  "balance": 9936.95,
+  "lastRun": "2026-11-11T10:33:53.000Z"
  },
  "log": [
   {
@@ -4651,6 +4653,11 @@
    "at": "2026-11-11T10:31:24.000Z",
    "msg": "opened buy AUDUSD 0.02 lot (council replica)",
    "trade": "audusd-replica-1794393014-b"
+  },
+  {
+   "at": "2026-11-11T10:33:53.000Z",
+   "msg": "BTCUSD position 48356090 closed at the broker",
+   "trade": "btc-replica-1794385823-s"
   }
  ],
  "limits": {
