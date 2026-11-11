@@ -1768,6 +1768,53 @@ over `STALE_MIN` 90 min (red over `OLD_MIN` 6 h). COT tab: the pre-registered st
 overall, the markets with a passing cell, "no tested edge" for the rest) and a tag per gauge from `edgeStatus` / `edgeText`.
 No council logic changed. Tests: tests/macro-visual.test.mjs (calm pass).
 
+## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
+Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
+Cause: `veteran.mjs` `run()` read its closes only from the weekly candle cache (`research/daily/<key>.json`, Saturdays); the
+strategist's "this run's closed days" extension (9 Nov) lived only inside `scoreSeries` for the Gold Macro Score and was never
+written anywhere the veteran reads. Display / freshness only: no probability, calibration, rule or trade maths changed.
+- **Hand-over** `macro.mjs` `handDaily` → `macro/cache.json` `daily: { src, days: { <cache key>: [[dayStart, o, h, l, c]] } }`
+  (`HAND_KEYS`: xau, the five DXY pairs, spx500, nas100; last `HAND_DAYS` 30): COMPLETE UTC days only (never the forming
+  candle: a level must not move intraday), only when the run's candles are OANDA's (a Kraken fallback has another price
+  basis), a failed fetch keeps the last good days, no timestamp. `veteran.mjs` `extendDaily` appends them after the cache's
+  last day only when they reach back to that day AND agree with its close (same feed, no gap: the ledger counts rows), cut
+  at the veteran's `now`; otherwise the cache is used alone. The veteran still fetches nothing. `veteran.json.closes` says per
+  market how far the cache went, how many days were added, or why none. xag / audusd / nzdusd are not fetched by the
+  strategist: their COT calls are resolved from the weekly cache as before. The handed candles are the candle cache's own
+  (1,396 overlapping gold days compared, identical).
+- **The record keeps its weekly cadence** (`veteran.mjs` `run`). Rule: everything RECORDED (the dated week / month calls,
+  the COT calls, the hypotheses, the weekly ledger forecast, the debates, the event calls) is built, by the unchanged
+  pipeline, from the closes BEFORE the start of the current Saturday-based week (`weekKey`): exactly what the candle cache
+  held after Saturday's refresh, which is what every record so far was built from. So the anchor is the last Friday's
+  close, the due dates and ids (`asset:kind:level:by`) are the ones main wrote, and one set is added a week whatever day
+  the week's first run falls on (a "range" call can still be re-issued when the council tilt moves its bounds: the id rule
+  as it was). The DISPLAY is a second `build` on the fresh closes with `keep` = the recorded outlook and ledger view:
+  last close, levels, ladder, glance, analogs move daily; "his dated calls" are the recorded ones (`outlook.anchor` says
+  from which close; the desk prints it) and a recorded hypothesis shows today's reading beside it through the existing
+  `freezeHypotheses` `live`. Results are read from every complete close, so they arrive on the day they are due instead of
+  after Saturday. Never issue the dated calls from the fresh closes: daily overlapping calls would fill the calibration
+  sample (its pre-registered 30 calls / 4 weeks gate, the Wilson bands) with correlated records and cut the 600-record
+  ledger from about nine months to seven weeks.
+  Proof: on the real council-data files of 11 Nov, main's code and this code (with the hand-over) write byte-identical
+  `veteran-calls.json`, `veteran-ledger.json`, `veteran-debates.json` and `veteran-expectations.json`; on the two-week
+  fixture (`tests/fixtures/vet-fresh-fixture.mjs` `simulate`) both write the same 54 records, pinned in
+  `tests/veteran-fresh.test.mjs` by count and by a hash of every id, issue date, level, due date, p, pRaw and baseP taken
+  from main's own code, with the same 8 scored calls and the same calibration block.
+- **`resolveCall` waits for the data**: a call is scored only once the closes on file reach its date. This changes the
+  outcome only for a candle file that ENDS before the call's date (it used to be scored on the file's last day); on a
+  file that reaches the date the result is what it was.
+- **Honesty** (`glance.mjs`): `closeAge(asOf, now)` = weekday sessions fully ended since the close, skipping full-closure
+  days of `datacheck.mjs` `usHolidays` (no second calendar) → `fresh { asOf, sessions, stale, text }` on each level block:
+  "as of <date> close", or "Stale: last close <date>, <n> trading days ago" from one missed session. `markOf(fc)` = the
+  strategist's latest gold price (`assets.gold.last` at `fc.at`, OANDA only); `markLevels` stamps `mark` and `crossed: true`
+  on every level between the close and that price; `watchLevels` then picks the two levels either side of the PRICE, tags a
+  crossed one, and `broken` names the level that was the one to watch at the close. The sentence says "Gold has traded below
+  $X (label) since the <date> close and is near $Y". None of it is read by a hypothesis or a call (`nearestLevel`'s `ref`
+  argument is display only; a test pins that hypotheses, calls and level prices are the same whatever the latest price is).
+- **Desk** (macro-desk.html): `lvFresh` / `lvStale` / `hmUtc`; the glance tile, the ladder (`#ld-stale`, a hollow dot for
+  the latest price, "broken since the close" on crossed rows, next above / below from the price) and the level table.
+  An older veteran.json without the fields reads as before.
+
 ## Post-merge QA sweep (9 Nov 2026, PRs #682-#705)
 Every page at 390 / 1440 px in dark / light / midnight as owner, reviewer, viewer and signed out (stubbed /api/me, real council-data
 at /cdata). Fixed: the side pages' header ring spun forever (`assets/mx-page.css`, now one sweep on hover / focus like the desk);

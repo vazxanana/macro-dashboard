@@ -72,6 +72,9 @@ export function resolveCall(c, closes, now) {
     const S = (closes || []).filter((o) => o.t <= end), i = S.findIndex((o) => new Date(o.t * 1000).toISOString().slice(0, 10) === c.by); if (i < 1) return null;
     return c.kind === 'dayUp' ? S[i].v > S[i - 1].v : S[i].v < S[i - 1].v;
   }
+  // the closes on file must reach the call's date (11 Nov): with a candle file that ends earlier the call would be scored on
+  // its last day on file, not on the close it names; it waits for the data instead (the result on complete data is unchanged)
+  if (!(closes || []).some((o) => o.t > end - 86400)) return null;
   const S = (closes || []).filter((o) => o.t > dayOf(c.issued) && o.t <= end); if (!S.length) return null;
   const last = S[S.length - 1].v;
   switch (c.kind) {
