@@ -1,6 +1,6 @@
 # macro-dashboard — working notes
 
-## Start here (map, 9 Nov 2026)
+## Start here (map, 9 Nov 2026; checked against the code 11 Nov)
 
 Meridian X: a paper-trading desk run by an automated council, live at https://meridianx.dev (Vercel). The owner's plain-English
 explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-decisions.md`; Fred's connector guide is
@@ -24,7 +24,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Where things live**
 | Path | What |
 |---|---|
-| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks, profile, users. Public / admin split: see below |
+| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Gold, Mosha, Crypto, LIT, NQ SDV), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
 | `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
 | `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
 | `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
@@ -71,13 +71,19 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
-- ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`), Fred applies ICT changes (on for Fred since 10 Nov).
+- ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
+  Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
+
+**Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
+`docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
+(1-36 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -113,7 +119,8 @@ fetches in `refreshFundamentalsX()`. The Yen carry-unwind row is
 deliberately always `dir: null` (a volatility warning, not a directional
 call) — don't "fix" it to always vote a direction.
 The Eurozone growth pulse reads FRED `BSCICP03DEM665S`, which stopped at 2024-01-01: the strategist (`council/macro.mjs`
-`MAX_AGE`) drops it as "no data", but `gold-trading.html` still shows the 2024 value (open: docs/owner-decisions.md, item 16).
+`MAX_AGE`) drops it as "no data", and since 9 Nov (#703) `gold-trading.html` ignores a value over about 4 months old too, so the row is
+empty on both (a replacement series is still open: docs/owner-decisions.md, item 16).
 
 ## Conventions
 
@@ -385,6 +392,8 @@ the prior 5 daily highs, its own position and add next to the 20-day leg (`gtren
 (`LEG`). Sizing guide 0.25% (bridges: the shared gold risk). Replay 2023-Oct 2026 in research/replay-2w.json (39 trades).
 Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
 −6.21 → −6.47%), positive every year 2019-26 alone.
+Same day, later (owner, #530; user rule `gold-trend-fast-shadow`, `config.goldTrendFastShadow`): the fast leg's new trades are
+paper shadows (`blockedBy owner-shadow`), still managed by the same loop, never alerted; `council/decay.mjs` lists it `shadow: true`.
 
 
 ## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
@@ -428,7 +437,7 @@ assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle an
   sends alerts; otherwise dry run (no commit, alerts off). Owner, 7 Nov 16:3x: GitHub Actions is the council runner (council.yml);
   the Vercel council job stands down while Actions saved in the last 10 min and takes over by itself if the loop stops. A full
   cut-over (GH_TOKEN + the trader's NTFY/Telegram/FUT env on Vercel, RUN_MODE=live, the GitHub loop removed, repo private) has not
-  happened; a private repo would end the free Actions minutes the loop relies on (see docs/owner-decisions.md).
+  happened; a private repo would end the free Actions minutes the loop relies on (see docs/owner-decisions.md, item 32).
 Since 8 Nov the project deploys from GitHub `main` (production only, and only when a served file changed: `scripts/vercel-ignore.sh`).
 Server-side login landed on 9 Nov (below); broker-order functions are a later stage.
 
@@ -1591,7 +1600,7 @@ UTC−4 while Europe is on summer time** (4,755 of 4,755 decisive OANDA weeks, 3
 - **One converter**: `council/histdata.mjs` (`histStampUtc`, `histToUtc`, `histOffsetH`, `nyOffsetH`; pure, no imports, nothing live
   reads it). `tests/histdata-clock.test.mjs` proves it equals the audited rule for every label hour, checks 10 real release windows
   (`tests/fixtures/histdata/`) and FAILS on any file in research/, academy/, ict/, council/, scripts/, api/, ml/ that converts a
-  HistData label by itself. A new loader imports the converter. The one listed exception is live code: `ict/replay.mjs` line 79
+  HistData label by itself. A new loader imports the converter. The one listed exception is live code: `ict/replay.mjs` line 95 (line 79 on 10 Nov)
   (a dead EUR/USD / GBP/USD back-fill branch; docs/owner-decisions.md item 21).
 - **What was wrong**: "EST without daylight saving" (label + 5 h; most ICT studies) is an hour late all of Europe's summer; New York
   time for every year (gold-systems, robustness, timing, costs, NQ open-run) is an hour early from 2019 in the weeks the US is on
@@ -1740,8 +1749,9 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     and do whaeva"). The server also accepts `MOSHA_ASSISTANT_KEY` (`ownKey`: 32-128 plain characters, else ignored): the
     assistant makes a random one, saves it as that Vercel environment variable (Production) and uses it as
     `MOSHA_READER_KEY` for the script. It opens exactly what the derived key opens, nothing more, and `MOSHA_READER=off`
-    shuts both. A later session reads the value back from the Vercel project (the owner asked for this); it never goes
-    into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
+    shuts both. A later session CANNOT read the value back (found 11 Nov: the variable is stored as sensitive, and Vercel
+    never returns a sensitive value): it sets a NEW key the same way (replace the variable, redeploy), or uses the network
+    secret the owner saved for meridianx.dev. The key never goes into the repo, a commit, a PR or a page. To change it: replace the variable and redeploy; to end it: delete it.
   - **Reading the lessons in a session** (the "learn" part): `node --use-env-proxy scripts/mosha-lessons.mjs pull <dir>` saves
     `lessons.json` and the pictures of the lessons not read yet (2.5 s apart: the firewall allows 30 API calls a minute); look
     at each picture with its caption and note, then `… reply <lesson id> <file>` writes back what was understood (levels read
