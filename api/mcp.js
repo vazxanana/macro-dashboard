@@ -160,19 +160,40 @@ async function file(branch, p, { json = true, buf = false, ttl = 60e3 } = {}) {
 const labIO = { dataBuf: (p) => file(DATA, p, { buf: true, ttl: 3600e3 }) };
 
 // ---- ICT data ----
-const outcome = (t) => ['win', 'loss', 'be'].includes(t.status) ? t.status : t.status === 'open' ? 'open' : t.R == null ? 'open' : t.R > 0.05 ? 'win' : t.R < -0.05 ? 'loss' : 'be';
-const brief = (t) => ({ id: t.id, market: t.short || t.market, side: t.side, signal: iso(t.signalAt), entry: t.entry, stop: t.stop, target: t.t2 ?? t.t1, r0: t.r0, status: outcome(t), R: t.R, R2: t.R2,
-  closed: iso(t.closed), exit: t.exit, grade: t.grade && t.grade.letter, score: t.grade && t.grade.total, aSetup: !!t.aset, aPlus: !!t.aplus, session: t.feat && t.feat.session, bias: t.feat && t.feat.bias, zone: t.feat && t.feat.zone, replay: !!t.replay });
+// ONE booked outcome (11 Nov 2026, Fred's audit: the connector counted |R| <= 0.05 as break-even while the desk read the stored
+// status, so the same snapshot gave 294 / 462 / 61 here and 301 / 464 / 52 there). A closed record is a win, a loss or break-even by
+// the sign of its stored per-unit R (Rraw, else R), as ict/replay.mjs outcomeOf and the desk's MS_ICT.outcome; a record without a
+// close is open and never counts in booked performance. "Near-flat" (|per-unit R| <= NEAR_FLAT) is a research label beside it.
+const NEAR_FLAT = 0.05;
+const unitR = (t) => (typeof t.Rraw === 'number' ? t.Rraw : typeof t.R === 'number' ? t.R : null);
+const booked = (t) => !!t && t.status !== 'open' && unitR(t) != null && (!!t.closed || ['win', 'loss', 'be'].includes(t.status));
+const outcome = (t) => { if (!booked(t)) return 'open'; const r = unitR(t); return r > 0 ? 'win' : r < 0 ? 'loss' : 'be'; };
+const nearFlat = (t) => outcome(t) !== 'open' && Math.abs(unitR(t)) <= NEAR_FLAT;
+const sourceOf = (t) => (t.replay ? 'replay' : 'live');
+// an unresolved replay record is shown as of the last candle the replay processed, never against a newer price
+const brief = (t) => ({ id: t.id, source: sourceOf(t), market: t.short || t.market, side: t.side, signal: iso(t.signalAt), entry: t.entry, stop: t.stop, target: t.t2 ?? t.t1, r0: t.r0, status: outcome(t), R: t.R, R2: t.R2,
+  closed: iso(t.closed), exit: t.exit, grade: t.grade && t.grade.letter, score: t.grade && t.grade.total, aSetup: !!t.aset, aPlus: !!t.aplus, session: t.feat && t.feat.session, bias: t.feat && t.feat.bias, zone: t.feat && t.feat.zone, replay: !!t.replay,
+  ...(t.replay && !t.closed ? { updatePending: true, replayThrough: iso(t.through), stopAtThrough: t.stopNow ?? null, unitRAtThrough: t.markR ?? null } : {}), ...(t.otherExecution ? { otherExecution: t.otherExecution } : {}) });
 function stats(rows) {
-  const closed = rows.filter((t) => outcome(t) !== 'open' && typeof t.R === 'number'), by = (f) => { const o = {}; for (const t of closed) { const k = f(t) || '?'; (o[k] = o[k] || { n: 0, R: 0, wins: 0 }); o[k].n++; o[k].R += t.R; if (t.R > 0.05) o[k].wins++; } for (const v of Object.values(o)) v.R = +v.R.toFixed(2); return o; };
-  const netR = closed.reduce((s, t) => s + t.R, 0), wins = closed.filter((t) => t.R > 0.05).length;
-  return { n: rows.length, open: rows.length - closed.length, closed: closed.length, wins, losses: closed.filter((t) => t.R < -0.05).length, breakEven: closed.length - wins - closed.filter((t) => t.R < -0.05).length,
+  const closed = rows.filter((t) => outcome(t) !== 'open' && typeof t.R === 'number'), by = (f) => { const o = {}; for (const t of closed) { const k = f(t) || '?'; (o[k] = o[k] || { n: 0, R: 0, wins: 0 }); o[k].n++; o[k].R += t.R; if (outcome(t) === 'win') o[k].wins++; } for (const v of Object.values(o)) v.R = +v.R.toFixed(2); return o; };
+  const netR = closed.reduce((s, t) => s + t.R, 0), n = (k) => closed.filter((t) => outcome(t) === k).length, wins = n('win');
+  return { n: rows.length, open: rows.length - closed.length, closed: closed.length, wins, losses: n('loss'), breakEven: n('be'), nearFlat: closed.filter(nearFlat).length,
+    outcomeRule: `win / loss / break-even = the sign of the stored per-unit R of a closed record; nearFlat = |per-unit R| <= ${NEAR_FLAT}, a research label that does not change the outcome; open records are not booked`,
     netR: +netR.toFixed(2), winRate: closed.length ? +(wins / closed.length).toFixed(3) : null, avgR: closed.length ? +(netR / closed.length).toFixed(3) : null, byMarket: by((t) => t.short || t.market), byGrade: by((t) => t.grade && t.grade.letter), bySession: by((t) => t.feat && t.feat.session) };
 }
+// every execution, live and replay, by its exact id (a signal the live tracker took has two: <id> and <id>-r)
+async function executions() {
+  const live = (await file(DATA, 'ict/trades.json')) || [], rep = ((await file(DATA, 'ict/replay.json')) || {}).trades || [];
+  return [...(Array.isArray(live) ? live : []), ...rep];
+}
+const twinId = (id) => (/-r$/.test(id) ? id.replace(/-r$/, '') : `${id}-r`);
+async function findExec(id) { const all = await executions(), t = all.find((x) => x.id === id); if (!t) return null; const o = all.find((x) => x.id === twinId(id)); return { t, other: o || null }; }
 async function allTrades(source = 'both') {
   const live = source === 'replay' ? [] : (await file(DATA, 'ict/trades.json')) || [], rep = source === 'live' ? [] : ((await file(DATA, 'ict/replay.json')) || {}).trades || [];
   const liveIds = new Set(live.map((t) => t.id.replace(/-r$/, '')));
-  return [...live, ...rep.filter((t) => source !== 'both' || !liveIds.has(t.id.replace(/-r$/, '')))];   // Both never counts a live signal twice
+  const repIds = new Set(rep.map((t) => t.id));
+  // Both never counts a live signal twice: the row is the live execution, and it names its replay execution (still readable by its own id)
+  return [...live.map((t) => (source === 'both' && repIds.has(`${t.id}-r`) ? { ...t, otherExecution: `${t.id}-r` } : t)), ...rep.filter((t) => source !== 'both' || !liveIds.has(t.id.replace(/-r$/, '')))];
 }
 function filterTrades(rows, a) {
   let r = rows;
@@ -254,7 +275,7 @@ const DESK_ACTS = ['taken', 'skipped', 'missed'], DESK_GRADES = ['A+', 'A', 'B',
 const DESK_TAGS = ['sweep', 'fvg', 'dol', 'bias', 'pd', 'time', 'against', 'chop', 'news', 'late', 'nodol', 'opens', 'induce', 'smt', 'cisd', 'disp', 'reh', 'eqwin', 'htffvg'];
 const scoreGrade = (n) => (n >= 10 ? 'A+' : n >= 8 ? 'A' : n >= 5 ? 'B' : n >= 3 ? 'C' : 'F');   // 1-10 onto the page's letters, as the tracker's bands
 async function deskUpdate(who, a) {
-  const id = String(a.id || '').trim(), t = id && (await allTrades('both')).find((x) => x.id === id); if (!t) throw new Error('no such signal: take the id from ict_trades');
+  const id = String(a.id || '').trim(), fe = id ? await findExec(id) : null, t = fe && fe.t; if (!t) throw new Error('no such signal: take the id from ict_trades');
   if (!['action', 'fill', 'r', 'grade', 'score', 'tags', 'note'].some((k) => a[k] !== undefined)) throw new Error('nothing to save: send action, fill, r, grade, score, tags or note');
   const name = displayName(who), own = (by) => { const b = String(by || '').trim().toLowerCase(); return b === who || b === name.toLowerCase(); };
   let review = null;
@@ -264,7 +285,7 @@ async function deskUpdate(who, a) {
     const o = old || {};
     review = { act: a.action !== undefined ? (a.action === 'none' ? '' : a.action) : o.act || '', grade: a.grade !== undefined ? a.grade : a.score !== undefined ? scoreGrade(a.score) : o.grade || '',
       tags: a.tags !== undefined ? [...new Set(a.tags)] : Array.isArray(o.tags) ? o.tags : [], fill: a.fill !== undefined ? a.fill : o.fill ?? null, r: a.r !== undefined ? a.r : o.r ?? null,
-      text: a.note !== undefined ? String(a.note).trim().slice(0, 3000) : o.text || '', by: name, at: Math.floor(Date.now() / 1000), market: t.market, side: t.side };
+      text: a.note !== undefined ? String(a.note).trim().slice(0, 3000) : o.text || '', by: name, at: Math.floor(Date.now() / 1000), market: t.market, side: t.side, exec: sourceOf(t) };
     const score = a.score !== undefined ? a.score : o.score; if (score != null) review.score = score;
     return { updated: new Date().toISOString(), reviews: { ...reviews, [id]: review } };
   }, 0);
@@ -482,7 +503,7 @@ const TOOLS = [
   T('ict_trades', 'ICT trades and stats', 'ICT signals with statistics. source: live (the running tracker since 6 Nov 2026), replay (the same rule over CNBC futures since Aug 2025) or both (default; a live signal is never counted twice). Filters: market, status, grade (A = A-setups, A+ = A+ tier, or a letter like B), side, since / until. Returns stats for the whole filtered set and a page of records, newest first.',
     { source: S('which records', { enum: ['live', 'replay', 'both'], default: 'both' }), market: S('nq, es, ym, rty or gc'), status: S('outcome', { enum: ['open', 'win', 'loss', 'be', 'closed'] }), grade: S('A, A+ or a grade letter'), side: S('side', { enum: ['buy', 'sell'] }), since: S('YYYY-MM-DD'), until: S('YYYY-MM-DD'),
       limit: I('records in the page', { minimum: 1, maximum: 200, default: 50 }), offset: I('records to skip', { minimum: 0, default: 0 }), full: B('every recorded field (features, grade parts, path) instead of a brief line', { default: false }) }),
-  T('ict_trade', 'One ICT trade', 'One ICT signal with every recorded field (features, grade, sweep, FVG, draw on liquidity, excursion path).', { id: S('trade id from ict_trades') }, ['id']),
+  T('ict_trade', 'One ICT trade', 'One ICT execution by its exact id, with every recorded field (features, grade, sweep, FVG, draw on liquidity, excursion path), its source (live or replay) and, when the same signal has another execution, that one\'s id. A replay execution\'s id ends in -r. An unresolved replay execution says updatePending and is shown as of the last candle the replay processed (through).', { id: S('exact execution id from ict_trades') }, ['id']),
   T('ict_status', 'ICT tracker status', 'The tracker\'s latest state: each market\'s price, last signal, previous day high / low, open paper trades, the shadow variants\' totals, and the notes written through this MCP.'),
   T('ctrader_results', 'Demo cTrader results', 'Demo cTrader results of the mirror accounts by edge label (Council, ICT, Shadows, LIT, Replica): balance, equity, floating, open positions, resting orders, recent history. Account numbers and ids are never included.'),
   T('ict_bars', 'Candles', 'OHLC candles (OANDA mid) for a market, timeframe and window: rows [time UTC, open, high, low, close, volume], at most 1500. Without from / to: the latest count candles. Desk markets map to cash CFDs (NQ → NAS100, ES → SPX500, YM → US30, RTY → US2000, GC → XAU spot).',
@@ -540,7 +561,8 @@ async function call(who, name, a = {}) {
     case 'ict_rules': { const S2 = sections(await skill()); if (!a.section) return { live: await liveParams(), sections: S2.map((s) => ({ n: s.n, title: s.title })), note: 'Sections 11+ are the owner\'s tests and decisions, dated; the rules in force are the latest dated ones.' };
       const q = String(a.section).toLowerCase(), s = S2.find((x) => String(x.n) === q) || S2.find((x) => x.title.toLowerCase().includes(q)); if (!s) throw new Error('no such section'); return { n: s.n, title: s.title, text: s.text.trim() }; }
     case 'ict_trades': { const rows = filterTrades(await allTrades(a.source || 'both'), a), p = page(rows, a); return { stats: stats(rows), ...p, records: p.records.map((t) => a.full ? t : brief(t)) }; }
-    case 'ict_trade': { const t = (await allTrades('both')).find((x) => x.id === a.id || x.id === `${a.id}-r` || `${x.id}-r` === a.id); if (!t) throw new Error('no such trade'); return t; }
+    case 'ict_trade': { const f = await findExec(String(a.id || '').trim()); if (!f) throw new Error('no such trade: ids are exact (a replay execution ends in -r)');   // the exact execution, never its twin
+      return { ...f.t, source: sourceOf(f.t), outcome: outcome(f.t), ...(f.t.replay && !f.t.closed ? { updatePending: true } : {}), ...(f.other ? { otherExecution: { id: f.other.id, source: sourceOf(f.other), status: outcome(f.other), entry: f.other.entry, R: f.other.R ?? null } } : {}) }; }
     case 'ict_status': { const [snap, shadow, live, notes] = await Promise.all([file(DATA, 'ict/snapshot.json'), file(DATA, 'ict/shadow.json'), file(DATA, 'ict/trades.json'), file(DATA, NOTES)]);
       return { snapshot: snap, openLive: (live || []).filter((t) => t.status === 'open').map(brief), shadow: shadow && { variant: shadow.variant, since: shadow.since, totals: shadow.totals, variants: Object.fromEntries(Object.entries(shadow.variants || {}).map(([k, v]) => [k, v.totals])) }, notes: (notes || []).slice(-20) }; }
     case 'ctrader_results': { const j = await file(DATA, 'ctrader/accounts.json', { ttl: 10e3 }); if (!j) return { note: 'no snapshot yet' }; return scrub({ at: j.at, accounts: (j.accounts || []).map((x) => ({ label: x.label, books: x.books, balance: x.balance, equity: x.equity, floating: x.floating, open: x.open, orders: x.orders, history: x.history, error: x.error })) }); }

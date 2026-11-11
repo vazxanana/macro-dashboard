@@ -291,7 +291,7 @@ test('ict_desk_update writes the desk page\'s own shape, merged by signal id, wi
   reset();
   // the shape, read from the page's own save line, buttons and tag list
   const save = /S\.desk\.reviews\[x\.id\] = \{([^}]+)\}/.exec(PAGE)[1], pageKeys = [...save.matchAll(/(?:^|,)\s*([a-z]+):/g)].map((m) => m[1]);
-  assert.deepEqual(pageKeys, ['act', 'grade', 'tags', 'fill', 'r', 'text', 'by', 'at', 'market', 'side']);
+  assert.deepEqual(pageKeys, ['act', 'grade', 'tags', 'fill', 'r', 'text', 'by', 'at', 'market', 'side', 'exec']);   // exec: whose execution the note is for (live or replay)
   assert.match(PAGE, /JSON\.stringify\(\{ updated: new Date\(\)\.toISOString\(\), reviews: S\.desk\.reviews \}\)/);
   assert.deepEqual([...PAGE.matchAll(/<button type="button" data-a="([a-z]+)">/g)].map((m) => m[1]), L.DESK_ACTS, 'the page\'s Taken / Skipped / Missed');
   assert.deepEqual([...PAGE.matchAll(/<button type="button" data-g="([^"]+)">/g)].map((m) => m[1]), L.DESK_GRADES, 'the page\'s grade letters');
@@ -303,7 +303,7 @@ test('ict_desk_update writes the desk page\'s own shape, merged by signal id, wi
     assert.equal(r.result.isError, undefined, r.result.content[0].text);
     const rv = w.put.json.reviews['nq-b-1'];
     assert.deepEqual(Object.keys(rv), pageKeys, 'the same keys, in the page\'s order'); assert.deepEqual(Object.keys(w.put.json), ['updated', 'reviews']);
-    assert.deepEqual({ ...rv, at: 0 }, { act: 'taken', grade: 'A', tags: ['sweep', 'fvg'], fill: 25010.25, r: 2.5, text: 'clean sweep of PDL', by: 'Fred', at: 0, market: 'nq', side: 'buy' });
+    assert.deepEqual({ ...rv, at: 0 }, { act: 'taken', grade: 'A', tags: ['sweep', 'fvg'], fill: 25010.25, r: 2.5, text: 'clean sweep of PDL', by: 'Fred', at: 0, market: 'nq', side: 'buy', exec: 'live' });
     assert.ok(rv.at >= t0 && rv.at <= t0 + 5, 'the time in seconds, as the page'); assert.ok(!Number.isNaN(Date.parse(w.put.json.updated)));
     assert.deepEqual({ 'ym-b-9': w.put.json.reviews['ym-b-9'], 'gc-b-2': w.put.json.reviews['gc-b-2'] }, others, 'other members\' records are untouched');
     assert.equal(w.put.body.branch, 'council-data'); assert.equal(w.put.body.sha, 's1'); assert.match(w.put.body.message, /^ICT desk review by fred \(MCP\)$/);
@@ -313,7 +313,7 @@ test('ict_desk_update writes the desk page\'s own shape, merged by signal id, wi
   const w2 = deskNet({ updated: 'x', reviews: { ...others, 'nq-b-1': mine } });
   await withNet(w2.net, async () => {
     assert.equal((await rpcCall('ict_desk_update', { id: 'nq-b-1', r: -1, score: 6 })).result.isError, undefined);
-    assert.deepEqual({ ...w2.put.json.reviews['nq-b-1'], at: 0 }, { ...mine, r: -1, grade: 'B', at: 0, score: 6 });
+    assert.deepEqual({ ...w2.put.json.reviews['nq-b-1'], at: 0 }, { ...mine, r: -1, grade: 'B', at: 0, exec: 'live', score: 6 });
     assert.equal((await rpcCall('ict_desk_update', { id: 'nq-b-1', action: 'none', fill: null })).result.isError, undefined);
     assert.equal(w2.put.json.reviews['nq-b-1'].act, ''); assert.equal(w2.put.json.reviews['nq-b-1'].fill, null);
   });

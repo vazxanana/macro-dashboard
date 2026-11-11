@@ -278,6 +278,39 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   by H1 structure trail from +2R instead of the 1.5R trail; `manageTrade` / `simulate` act on it only for records carrying `strail`).
   The live A-rule records and stats never change for a shadow; the owner approves live rule changes.
 
+## ICT desk: every result traceable to its execution (11 Nov 2026, Fred's proposal after his audit; owner: "And then deploy")
+The audit's case: the 6 Nov ES short. Live `es-s-1793995200` entered 7,405.00 and booked -1R; its replay copy
+`es-s-1793995200-r` entered 7,401.75 and was still unresolved when the replay's candles ended, yet the desk kept comparing it
+with newer prices (-5.22R on screen), and the connector counted outcomes differently from the desk. Three changes:
+- **Checkpoint** (`ict/replay.mjs` `simulate`): every record carries `through` (the end of the last candle processed for exits; the
+  exit time once booked); an unresolved one also `stopNow`, `markPx`, `markR` (per unit, at that candle's close), `beMoved` /
+  `trailMoved`. The desk never marks a replay record against a newer price: `liveR` / `liveRs` / `pxOf` read the checkpoint and the
+  card, row and dialog say "Replay through <time> ET · update pending" (`rpThrough`; an older file without `through` says "as of
+  its run"). A run replays every candle in order from the signal, so the first exit is booked and booked once; with fewer than 36
+  H1 candles on file every candle on file is processed (before: only the first 36 clock hours, so a weekend hid a stop until the
+  window was complete). A hole of over 4 days still means no record (`gaps`), never a guessed exit; a market whose feed fails keeps
+  its records of the file being replaced (`out.kept`). The replay workflow runs **daily** (weekly before).
+- **Correction log** council-data `ict/replay-log.json` (`replayDiff`, `appendLog`, written before replay.json is replaced): per
+  run that changed something, `resolved` (was unresolved, now booked: its `through` / `markR` before, the booked values after),
+  `corrected` (a booked result that differs, from / to), `removed`, `added`, totals before and after. A run that changes nothing
+  writes no entry. The replaced file stays in council-data's git history at `prevAt`.
+- **Two executions of one signal**: live `<id>` and replay `<id>-r`. The combined list keeps one row; its result cell shows both
+  (`execs`, `.ict-ex-b`: source, fill, status, review grade), each opens by its exact id, the dialog has the same switch
+  (`#ict-tv-ex`) and says whose review is being written (`#ict-rv-for`). A note is stored under the execution's id with
+  `exec: 'live' | 'replay'`; `MS_ICT.reviewExec` reads an older note's execution from its key and flags "check" when its
+  recorded fill is nearer the OTHER execution's entry. Connector: `ict_trade` and `ict_desk_update` take the exact id
+  (`findExec`; no more `-r` guessing), records carry `source`, `otherExecution`, and an unresolved replay one `updatePending`,
+  `replayThrough`, `stopAtThrough`, `unitRAtThrough`.
+- **One booked outcome**: win / loss / break-even = the sign of a closed record's stored per-unit R (`Rraw`, else `R`); sizing
+  and display rounding never change it; an unresolved record is never booked. The same rule in `ict/replay.mjs` (`outcomeOf`,
+  `tally`, replay.json `totals` with losses / be / nearFlat / open and `outcome`), the page (`MS_ICT.outcome`, `stats`) and the
+  connector (`outcome`, `stats`; it used |R| <= 0.05 as break-even: 294 / 462 / 61 against the desk's 301 / 464 / 52).
+  **Near-flat** = |per-unit R| <= `NEAR_FLAT` 0.05, a named research label shown beside the counts, never an outcome.
+- Not done here: no historical result was edited by hand. The three unresolved records (ES, NQ, gold) are resolved by the replay
+  on its own futures feed and land in the log as `resolved`; Fred's independent reconstruction (ES stop -1R at 7,437.75, NQ time
+  exit 27,316, gold time exit 4,129.7) is to be compared with those entries. Tests: `tests/desk-ict-trace.test.mjs` (not named
+  `tests/ict-*`: it also checks the page and the connector), `tests/mcp.test.mjs`, `tests/mcp-apply.test.mjs`.
+
 ## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
 `council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
 `solid()` plus a shrunk expectancy ≥ 0.10R (empirical-Bayes prior around 0R), and each runs as a champion/challenger trial
