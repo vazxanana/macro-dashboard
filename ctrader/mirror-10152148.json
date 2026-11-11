@@ -3442,6 +3442,33 @@
     ],
     "stopCheckedAt": "2026-11-11T10:57:16.000Z",
     "brokerStop": 1.33314
+   },
+   "audusd-replica-1794397356-s": {
+    "positionId": "48398223",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T11:43:45.000Z",
+    "councilEntry": 0.68676,
+    "stop": 0.687279,
+    "t1": 0.685723,
+    "riskCash": 1.99,
+    "margin": 4.12,
+    "shadow": true,
+    "mark": 0.68676,
+    "levelsFrom": "mark",
+    "fillPrice": 0.68667,
+    "slipR": 0.173,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T11:43:45.000Z",
+    "brokerStop": 0.68719
    }
   },
   "day": {
@@ -3449,7 +3476,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9931.89 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 9931.89 · 12 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3464,7 +3491,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9931.89,
-  "lastRun": "2026-11-11T11:40:25.000Z"
+  "lastRun": "2026-11-11T11:43:45.000Z"
  },
  "log": [
   {
@@ -4744,6 +4771,11 @@
    "at": "2026-11-11T11:36:01.000Z",
    "msg": "closed EURUSD position 48385899 (council: loss)",
    "trade": "eurusd-replica-1794394012-b"
+  },
+  {
+   "at": "2026-11-11T11:43:45.000Z",
+   "msg": "opened sell AUDUSD 0.03 lot (council replica)",
+   "trade": "audusd-replica-1794397356-s"
   }
  ],
  "limits": {
@@ -4822,9 +4854,9 @@
   ]
  },
  "execution": {
-  "n": 119,
-  "meanSlipR": 0.077,
-  "medianSlipR": 0.03,
+  "n": 120,
+  "meanSlipR": 0.078,
+  "medianSlipR": 0.034,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
@@ -4849,8 +4881,8 @@
     "meanSlipR": 0.044
    },
    "AUDUSD": {
-    "n": 18,
-    "meanSlipR": 0.007
+    "n": 19,
+    "meanSlipR": 0.016
    },
    "GBPUSD": {
     "n": 12,

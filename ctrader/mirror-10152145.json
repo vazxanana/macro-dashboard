@@ -7186,6 +7186,60 @@
     "positionId": "48382306",
     "volume": 300000,
     "status": "open"
+   },
+   "eurusd-scalp-1794396738": {
+    "symbol": "EURUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T11:43:40.000Z",
+    "councilEntry": 1.11352,
+    "stop": 1.11406,
+    "t1": 1.11244,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.11352,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.98,
+    "margin": 6.68,
+    "shadow": true,
+    "fillPrice": 1.11353,
+    "slipR": -0.019,
+    "lagSec": 220,
+    "positionId": "48396690",
+    "volume": 300000,
+    "status": "open"
+   },
+   "gbpusd-intraday-1794397356": {
+    "positionId": "48398201",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "intraday",
+    "status": "open",
+    "openedAt": "2026-11-11T11:43:40.000Z",
+    "councilEntry": 1.33134,
+    "stop": 1.33568,
+    "t1": 1.3223000000000003,
+    "riskCash": 4.34,
+    "margin": 2.66,
+    "minLot": true,
+    "shadow": true,
+    "mark": 1.33134,
+    "levelsFrom": "mark",
+    "fillPrice": 1.33127,
+    "slipR": 0.016,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T11:43:40.000Z",
+    "brokerStop": 1.33561
    }
   },
   "day": {
@@ -7193,7 +7247,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9908.74 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9908.74 · 33 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7204,26 +7258,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "eurusd-scalp-1794396738": {
-    "orderId": "33924777",
-    "symbol": "EURUSD",
-    "side": "sell",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.11352,
-    "stop": 1.11406,
-    "t1": 1.11244,
-    "placedAt": "2026-11-11T11:33:24.000Z",
-    "expires": "2026-11-11T14:32:18.000Z",
-    "riskCash": 1.98,
-    "margin": 6.68,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "usdcad-scalp-1794396738": {
     "orderId": "33924780",
     "symbol": "USDCAD",
@@ -7247,19 +7281,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9908.74,
-  "lastRun": "2026-11-11T11:40:23.000Z"
+  "lastRun": "2026-11-11T11:43:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:25:35.000Z",
-   "msg": "moved USDCAD 47992970 protection: stop 1.4114147 -> 1.4106547, target 1.4214806 -> 1.4207206 (council swing)",
-   "trade": "usdcad-swing-1794304600"
-  },
-  {
-   "at": "2026-11-10T13:25:35.000Z",
-   "msg": "moved USDCAD 47994270 protection: stop 1.41511 -> 1.41435, target 1.40879 -> 1.40803 (council scalp)",
-   "trade": "usdcad-scalp-1794304921"
-  },
   {
    "at": "2026-11-10T13:25:35.000Z",
    "msg": "moved USDCAD 48018890 protection: stop 1.41342 -> 1.41266, target 1.41505 -> 1.41429 (council scalp)",
@@ -8749,6 +8773,16 @@
    "at": "2026-11-11T11:40:23.000Z",
    "msg": "limit filled: AUDUSD position 48382306 at the broker",
    "trade": "audusd-scalp-1794392799"
+  },
+  {
+   "at": "2026-11-11T11:43:40.000Z",
+   "msg": "limit filled: EURUSD position 48396690 at the broker",
+   "trade": "eurusd-scalp-1794396738"
+  },
+  {
+   "at": "2026-11-11T11:43:40.000Z",
+   "msg": "opened sell GBPUSD 0.01 lot (council intraday)",
+   "trade": "gbpusd-intraday-1794397356"
   }
  ],
  "limits": {
@@ -8827,7 +8861,7 @@
   ]
  },
  "execution": {
-  "n": 243,
+  "n": 245,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -8846,11 +8880,11 @@
     "meanSlipR": 0.083
    },
    "EURUSD": {
-    "n": 41,
+    "n": 42,
     "meanSlipR": -0.021
    },
    "GBPUSD": {
-    "n": 33,
+    "n": 34,
     "meanSlipR": 0.013
    },
    "USDCAD": {
