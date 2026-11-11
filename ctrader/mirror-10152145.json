@@ -7502,6 +7502,33 @@
     "volume": 21,
     "status": "closed at broker",
     "closedAt": "2026-11-11T14:11:51.000Z"
+   },
+   "gbpusd-scalp-1794406395": {
+    "positionId": "48440625",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T14:14:14.000Z",
+    "councilEntry": 1.32754,
+    "stop": 1.32842,
+    "t1": 1.3257200000000002,
+    "riskCash": 1.98,
+    "margin": 5.31,
+    "shadow": true,
+    "mark": 1.32754,
+    "levelsFrom": "mark",
+    "fillPrice": 1.32772,
+    "slipR": -0.205,
+    "lagSec": 59,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T14:14:14.000Z",
+    "brokerStop": 1.3286
    }
   },
   "day": {
@@ -7509,7 +7536,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9916.81 · 19 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9916.81 · 20 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7562,14 +7589,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9916.81,
-  "lastRun": "2026-11-11T14:11:51.000Z"
+  "lastRun": "2026-11-11T14:14:14.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "moved USDCAD 47373489 protection: stop 1.3818674 -> 1.3812974, target 1.48094 -> 1.48037 (council position)",
-   "trade": "usdcad-position-1793949081"
-  },
   {
    "at": "2026-11-10T13:41:59.000Z",
    "msg": "moved USDCAD 47373490 protection: stop 1.3818674 -> 1.3812974, target 1.43569 -> 1.43512 (council swing)",
@@ -9064,6 +9086,11 @@
    "at": "2026-11-11T14:11:51.000Z",
    "msg": "placed buy limit USDCHF 0.03 lot at 0.8321 (council scalp, valid to 2026-11-11T17:10Z)",
    "trade": "usdchf-scalp-1794406249"
+  },
+  {
+   "at": "2026-11-11T14:14:14.000Z",
+   "msg": "opened sell GBPUSD 0.02 lot (council scalp)",
+   "trade": "gbpusd-scalp-1794406395"
   }
  ],
  "limits": {
@@ -9142,8 +9169,8 @@
   ]
  },
  "execution": {
-  "n": 253,
-  "meanSlipR": -0.007,
+  "n": 254,
+  "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
   "medianLagSec": 159,
@@ -9165,8 +9192,8 @@
     "meanSlipR": -0.021
    },
    "GBPUSD": {
-    "n": 35,
-    "meanSlipR": 0.022
+    "n": 36,
+    "meanSlipR": 0.016
    },
    "USDCAD": {
     "n": 35,
