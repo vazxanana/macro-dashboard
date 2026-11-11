@@ -8500,6 +8500,34 @@
     "positionId": "48533156",
     "volume": 100,
     "status": "open"
+   },
+   "xau-scalp-1794424798": {
+    "positionId": "48535624",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T19:22:39.000Z",
+    "councilEntry": 3984.78,
+    "stop": 3987.2850000000003,
+    "t1": 3979.77,
+    "riskCash": 3.52,
+    "margin": 7.97,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3983.765,
+    "levelsFrom": "mark",
+    "fillPrice": 3984.51,
+    "slipR": 0.108,
+    "lagSec": 159,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T19:22:39.000Z",
+    "brokerStop": 3988.03
    }
   },
   "day": {
@@ -8507,7 +8535,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9860.12 · 30 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9860.12 · 31 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8558,44 +8586,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-scalp-1794424798": {
-    "orderId": "33956866",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "scalp",
-    "limitPrice": 3984.78,
-    "stop": 3987.2850000000003,
-    "t1": 3979.77,
-    "placedAt": "2026-11-11T19:20:55.000Z",
-    "expires": "2026-11-11T22:19:58.000Z",
-    "riskCash": 2.51,
-    "margin": 7.97,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9860.12,
-  "lastRun": "2026-11-11T19:20:55.000Z"
+  "lastRun": "2026-11-11T19:23:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:54:48.000Z",
-   "msg": "opened buy EURUSD 0.03 lot (council rscalp)",
-   "trade": "eurusd-rscalp-1794329444"
-  },
-  {
-   "at": "2026-11-10T16:59:24.000Z",
-   "msg": "placed sell limit USDCHF 0.02 lot at 0.82635 (council rscalp, valid to 2026-11-10T19:58Z)",
-   "trade": "usdchf-rscalp-1794329894"
-  },
   {
    "at": "2026-11-10T16:59:24.000Z",
    "msg": "limit filled at once: USDCHF position 48163393 at the broker at 0.82635",
@@ -10085,6 +10082,16 @@
    "at": "2026-11-11T19:20:55.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 3984.78 (council scalp, valid to 2026-11-11T22:19Z)",
    "trade": "xau-scalp-1794424798"
+  },
+  {
+   "at": "2026-11-11T19:22:39.000Z",
+   "msg": "cancelled XAUUSD limit order 33956866 for xau-scalp-1794424798: the council filled it on its feed first",
+   "trade": "xau-scalp-1794424798"
+  },
+  {
+   "at": "2026-11-11T19:22:39.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council scalp)",
+   "trade": "xau-scalp-1794424798"
   }
  ],
  "limits": {
@@ -10163,11 +10170,11 @@
   ]
  },
  "execution": {
-  "n": 287,
-  "meanSlipR": -0.012,
+  "n": 288,
+  "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 154,
+  "medianLagSec": 154.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10202,8 +10209,8 @@
     "meanSlipR": -0.039
    },
    "XAUUSD": {
-    "n": 31,
-    "meanSlipR": -0.062
+    "n": 32,
+    "meanSlipR": -0.057
    }
   }
  }
