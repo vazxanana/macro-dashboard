@@ -706,13 +706,13 @@ Each is from a finished study; nothing was changed. All paper only.
 ### [ ] 37. The AI second opinion on each edge entry uses a paid key
 
 - **Status (11 Nov 2026).** Built on your request ("have an ai to study the trade decisions in the edge", answered "each
-  entry, blind" and "an API key, automatic"). Off until a key is set in Vercel; no call has been made.
+  entry, blind" and "an API key, automatic"). It uses the key already set for the Academy ("the key is the same as academy
+  so no need to setup anything"), so it runs from its first deploy; it studies entries made after its first run.
 - **Context.** Absolute rule 5 says no paid services. You chose a paid language-model key for this one feature, so it is
   recorded here as your exception. It has its own budget, separate from the Academy's: $0.50 a day, $5 a month, $25 in
   total, at most 12 calls a day (Vercel variables `EDGE_LLM_DAILY_USD`, `EDGE_LLM_MONTHLY_USD`, `EDGE_LLM_HARD_USD`,
   `EDGE_LLM_MAX_CALLS_DAY`). About one to five live entries a day are studied.
 - **What it does.** When a live trade of the seven edges opens, the model sees only what was known then and says take,
   reduce or skip. The trade happens either way; the answer is put beside the result. It changes no rule, size or trade.
-- **Options.** (a) Set the key and keep it on. (b) Leave it off (nothing set = nothing spent). (c) Switch it off later:
-  `EDGE_ANALYST=off`.
-- **If nothing is decided.** It stays off and costs nothing.
+- **Options.** (a) Keep it on (nothing to set). (b) Switch it off: `EDGE_ANALYST=off` in Vercel.
+- **If nothing is decided.** It runs within its budget.
