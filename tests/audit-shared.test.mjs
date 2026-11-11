@@ -79,10 +79,11 @@ test('reduced motion starts no transition: 0s, never a tiny duration on every el
 });
 
 test('the Desk: a view change that skips the one before it leaves no rejected promise unhandled', () => {
-  const s = src('market-structure.html'), calls = s.match(/document\.startViewTransition\(showView\);[^\n]*/g) || [];
-  assert.equal(calls.length, 1);
+  const s = src('market-structure.html'), calls = s.match(/document\.startViewTransition\([^\n]*/g) || [];
+  assert.equal(calls.length, 1);                                  // one handler (the trade-link fix of the same day wrote it)
   assert.match(calls[0], /t\.ready\.catch\(/);
-  assert.doesNotMatch(calls[0], /finished\.finally\(/);   // finally() hands the rejection on to a new promise nobody handles
+  // finally() hands a rejection on to a new promise: that one must be handled too
+  assert.ok(!/finished\.finally\(/.test(calls[0]) || /finished\.finally\([^\n]*?\}\)\.catch\(/.test(calls[0]));
   assert.match(src('scripts/audit/smoke.cjs'), /views changed back to back/);
   assert.match(src('scripts/audit/smoke.cjs'), /the view did not open/);
 });
