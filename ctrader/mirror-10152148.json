@@ -2104,6 +2104,33 @@
     ],
     "stopCheckedAt": "2026-11-11T01:33:20.000Z",
     "brokerStop": 73248.86
+   },
+   "eurusd-replica-1794362172-b": {
+    "positionId": "48266645",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T01:57:11.000Z",
+    "councilEntry": 1.11692,
+    "stop": 1.11584,
+    "t1": 1.11908,
+    "riskCash": 2,
+    "margin": 2.23,
+    "shadow": true,
+    "mark": 1.11692,
+    "levelsFrom": "mark",
+    "fillPrice": 1.11695,
+    "slipR": 0.028,
+    "lagSec": 59,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T01:57:11.000Z",
+    "brokerStop": 1.11587
    }
   },
   "day": {
@@ -2111,7 +2138,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9992.43 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 9992.43 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2124,7 +2151,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9992.43,
-  "lastRun": "2026-11-11T01:54:55.000Z"
+  "lastRun": "2026-11-11T01:57:11.000Z"
  },
  "log": [
   {
@@ -2929,6 +2956,11 @@
    "at": "2026-11-11T01:52:26.000Z",
    "msg": "closed GBPUSD position 48254244 (council: loss)",
    "trade": "gbpusd-replica-1794359735-s"
+  },
+  {
+   "at": "2026-11-11T01:57:11.000Z",
+   "msg": "opened buy EURUSD 0.01 lot (council replica)",
+   "trade": "eurusd-replica-1794362172-b"
   }
  ],
  "limits": {
@@ -3007,11 +3039,11 @@
   ]
  },
  "execution": {
-  "n": 73,
-  "meanSlipR": 0.101,
-  "medianSlipR": 0.039,
+  "n": 74,
+  "meanSlipR": 0.1,
+  "medianSlipR": 0.038,
   "worstSlipR": 1.236,
-  "medianLagSec": 73,
+  "medianLagSec": 72.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 13,
@@ -3046,8 +3078,8 @@
     "meanSlipR": 0.264
    },
    "EURUSD": {
-    "n": 4,
-    "meanSlipR": -0.063
+    "n": 5,
+    "meanSlipR": -0.044
    }
   }
  }

@@ -6167,7 +6167,8 @@
     "t1": 1.33122,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.33467,
@@ -6181,7 +6182,8 @@
     "lagSec": 202,
     "positionId": "48254217",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T01:57:09.000Z"
    },
    "xau-intraday-1794361153": {
     "symbol": "XAUUSD",
@@ -6216,7 +6218,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9953.29 · 26 open",
+  "status": "ok · demo Fusion Markets · balance 9951.1 · 25 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6228,15 +6230,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9953.29,
-  "lastRun": "2026-11-11T01:54:53.000Z"
+  "balance": 9951.1,
+  "lastRun": "2026-11-11T01:57:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:11:10.000Z",
-   "msg": "moved EURUSD 47373487 protection: stop 1.0804847 -> 1.0801647, target 1.133315 -> 1.132995 (council rswing)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-10T12:11:10.000Z",
    "msg": "moved EURUSD 47964428 protection: stop 1.113017 -> 1.112697, target 1.147316 -> 1.146996 (council swing)",
@@ -7731,6 +7728,11 @@
    "at": "2026-11-11T01:48:53.000Z",
    "msg": "limit filled: XAUUSD position 48261841 at the broker",
    "trade": "xau-intraday-1794361153"
+  },
+  {
+   "at": "2026-11-11T01:57:09.000Z",
+   "msg": "GBPUSD position 48254217 closed at the broker",
+   "trade": "gbpusd-scalp-1794359735"
   }
  ],
  "limits": {
