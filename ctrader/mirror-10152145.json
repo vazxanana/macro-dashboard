@@ -6990,6 +6990,32 @@
     "stopCheckedAt": "2026-11-11T10:18:43.000Z",
     "brokerStop": 0.82843,
     "closedAt": "2026-11-11T10:28:19.000Z"
+   },
+   "btc-scalp-1794385122": {
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T10:31:22.000Z",
+    "councilEntry": 73942.5,
+    "stop": 74099.48564,
+    "t1": 72584.6,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 73942.5,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 1.98,
+    "margin": 73.97,
+    "shadow": true,
+    "fillPrice": 73943.51,
+    "slipR": -0.006,
+    "lagSec": 7960,
+    "positionId": "48353354",
+    "volume": 1,
+    "status": "open"
    }
   },
   "day": {
@@ -6997,7 +7023,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9911.18 · 28 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9911.18 · 29 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7008,26 +7034,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "btc-scalp-1794385122": {
-    "orderId": "33916097",
-    "symbol": "BTCUSD",
-    "side": "sell",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "scalp",
-    "limitPrice": 73942.5,
-    "stop": 74099.48564,
-    "t1": 72584.6,
-    "placedAt": "2026-11-11T08:19:46.000Z",
-    "expires": "2026-11-11T11:18:42.000Z",
-    "riskCash": 1.98,
-    "margin": 73.97,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "audusd-scalp-1794392799": {
     "orderId": "33921729",
     "symbol": "AUDUSD",
@@ -7051,14 +7057,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9911.18,
-  "lastRun": "2026-11-11T10:28:19.000Z"
+  "lastRun": "2026-11-11T10:31:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:22:44.000Z",
-   "msg": "moved EURUSD 47964428 protection: stop 1.113007 -> 1.112757, target 1.147306 -> 1.147056 (council swing)",
-   "trade": "eurusd-swing-1794299390"
-  },
   {
    "at": "2026-11-10T13:22:44.000Z",
    "msg": "moved XAUUSD 47972669 protection: stop 4148.514 -> 4146.324, target 4036.525 -> 4034.335 (council rintra)",
@@ -8553,6 +8554,11 @@
    "at": "2026-11-11T10:28:19.000Z",
    "msg": "USDCHF position 48380796 closed at the broker",
    "trade": "usdchf-scalp-1794392251"
+  },
+  {
+   "at": "2026-11-11T10:31:22.000Z",
+   "msg": "limit filled: BTCUSD position 48353354 at the broker",
+   "trade": "btc-scalp-1794385122"
   }
  ],
  "limits": {
@@ -8631,7 +8637,7 @@
   ]
  },
  "execution": {
-  "n": 236,
+  "n": 237,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -8642,8 +8648,8 @@
     "meanSlipR": 0.071
    },
    "BTCUSD": {
-    "n": 18,
-    "meanSlipR": -0.057
+    "n": 19,
+    "meanSlipR": -0.054
    },
    "ETHUSD": {
     "n": 11,
