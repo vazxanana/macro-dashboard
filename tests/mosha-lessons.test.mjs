@@ -339,3 +339,48 @@ test('the key the assistant sets for itself: the same narrow door, and the same 
   assert.equal((await go({ ...env, MOSHA_READER: 'off' }, 'GET', null, OWN)).code, 401, 'the off switch shuts both keys');
 });
 
+
+test('the desk\'s questions: asked under its answer, answered by the teacher with one tap or a few words, read back by the desk', async () => {
+  const s = mk(), a = await call(s, 'POST', LUXUS, { add: { title: '11 Nov buy', note: 'M5 vr bo buy formed', image: url('image/png', PNG) } }), id = a.body.lesson.id;
+  // the shape of a question list
+  assert.match(L.askOf([]).error, /1 to 6/); assert.match(L.askOf(Array(7).fill('Is it so?')).error, /1 to 6/); assert.match(L.askOf(['ok?']).error, /needs its words/); assert.match(L.askOf('Is it so?').error, /1 to 6/);
+  assert.deepEqual(L.askOf(['Where does the VR start?', { q: 'Is the stop under the zone?', yn: true }]).ask, [{ q: 'Where does the VR start?', yn: false, a: null, aat: null }, { q: 'Is the stop under the zone?', yn: true, a: null, aat: null }]);
+  // questions alone need an answer to sit under; only the desk (or the owner) asks
+  assert.match((await call(s, 'POST', null, { reply: { id, ask: ['Is the stop under the zone?'] } }, key())).body.error, /has not answered/);
+  assert.equal((await call(s, 'POST', LUXUS, { reply: { id, text: 'x', ask: ['Is it so?'] } })).code, 403);
+  assert.equal((await call(s, 'POST', null, { reply: { id, text: 'The buy is from 4,025.49.', ask: 'no list' } }, key())).code, 400, 'a bad list refuses the whole answer');
+  assert.equal((await call(s, 'GET', LUXUS)).body.lessons[0].state, 'new');
+  const r = await call(s, 'POST', null, { reply: { id, text: 'The buy is from 4,025.49 with the stop at 4,018.82.', ask: [{ q: 'Is the stop under the zone of the BO buy?', yn: true }, 'Where does the M5 VR start?'] } }, key());
+  assert.equal(r.code, 200); assert.deepEqual(r.body.lesson.thread.at(-1).ask, [{ q: 'Is the stop under the zone of the BO buy?', yn: true, a: null, aat: null }, { q: 'Where does the M5 VR start?', yn: false, a: null, aat: null }]); assert.equal(r.body.lesson.state, 'read');
+  // the questions can be replaced while nothing is answered
+  const r2 = await call(s, 'POST', null, { reply: { id, ask: [{ q: 'Is the stop under the zone of the BO buy?', yn: true }, 'Where does the M5 VR of this buy start?', { q: 'Is the third box a planned sell?', yn: true }] } }, key());
+  assert.deepEqual([r2.code, r2.body.lesson.thread.length, r2.body.lesson.thread.at(-1).ask.length], [200, 1, 3], 'no new message: the questions sit under the last answer');
+  // the teacher answers: only his own lesson, only a question that exists, never empty; the key cannot answer for him
+  assert.equal((await call(s, 'POST', null, { say: { id, answers: [{ i: 0, a: 'yes' }] } }, key())).code, 403);
+  assert.equal((await call(s, 'POST', OWNER, { say: { id, answers: [{ i: 0, a: 'yes' }] } })).code, 403); assert.equal((await call(s, 'POST', FRED, { say: { id, answers: [{ i: 0, a: 'yes' }] } })).code, 403);
+  for (const bad of [[{ i: 3, a: 'yes' }], [{ i: -1, a: 'yes' }], [{ i: 0.5, a: 'yes' }], [{ i: 0, a: ' ' }], [], 'yes', [null]]) assert.equal((await call(s, 'POST', LUXUS, { say: { id, answers: bad } })).code, 400, JSON.stringify(bad));
+  const y = await call(s, 'POST', LUXUS, { say: { id, answers: [{ i: 0, a: 'YES' }] } }); assert.equal(y.code, 200);
+  assert.deepEqual([y.body.lesson.thread.at(-1).ask[0].a, y.body.lesson.thread.at(-1).ask[1].a, y.body.lesson.thread.length, y.body.lesson.state], ['yes', null, 1, 'more'], 'an answer is not a new message; the desk now owes a reading');
+  assert.equal(TEACH.stateOf(y.body.lesson), 'more', 'the page agrees');
+  const w = await call(s, 'POST', LUXUS, { say: { id, answers: [{ i: 1, a: 'From the low 4,014 up to the last swing high before it.' }, { i: 0, a: 'no' }] } });
+  assert.deepEqual(w.body.lesson.thread.at(-1).ask.map((x) => x.a), ['no', 'From the low 4,014 up to the last swing high before it.', null], 'an answer can be changed, several can come at once');
+  assert.match((await call(s, 'POST', null, { reply: { id, ask: ['Another question?'] } }, key())).body.error, /already answered/, 'answered questions are never replaced');
+  // he may still say "right" after answering; answers given with or before "right" do not reopen the lesson, later ones do
+  const ok = await call(s, 'POST', LUXUS, { say: { id, verdict: 'right', answers: [{ i: 2, a: 'yes' }] } }); assert.deepEqual([ok.body.lesson.state, TEACH.stateOf(ok.body.lesson)], ['agreed', 'agreed']);
+  const late = await call(s, 'POST', LUXUS, { say: { id, answers: [{ i: 2, a: 'no' }] } }); assert.deepEqual([late.body.lesson.state, TEACH.stateOf(late.body.lesson)], ['more', 'more']);
+  // the desk reads the answers back, each beside its question; a new answer starts clean
+  const txt = TOOLS.lessonText(late.body.lesson);
+  assert.match(txt, /Question 1 \(yes \/ no\): Is the stop under the zone of the BO buy\?\n\s+-> THE TEACHER ANSWERED: no/); assert.match(txt, /Question 2: Where does the M5 VR of this buy start\?\n\s+-> THE TEACHER ANSWERED: From the low 4,014/);
+  const next = await call(s, 'POST', null, { reply: { id, text: 'So the stop is not under the zone, and the VR runs from the low 4,014 up to the last swing high before it.' } }, key());
+  assert.deepEqual([next.body.lesson.state, next.body.lesson.thread.at(-1).ask], ['read', undefined]); assert.equal(next.body.lesson.thread[0].ask.length, 3, 'the earlier questions and answers stay in the conversation');
+  assert.match((await call(s, 'POST', LUXUS, { say: { id, answers: [{ i: 0, a: 'yes' }] } })).body.error, /asked nothing/, 'only the last answer\'s questions are open');
+  // same rule on the server and on the page, with and without "right"
+  const D = (o) => ({ by: 'assistant', at: '2026-11-11T10:00:00.000Z', text: 'x', shots: 0, ...o }), Q = (a, aat) => ({ q: 'Is it so?', yn: true, a, aat });
+  for (const [l, want] of [[{ shots: [], thread: [D({ ask: [Q(null, null)] })] }, 'read'], [{ shots: [], thread: [D({ ask: [Q('yes', '2026-11-11T11:00:00.000Z')] })] }, 'more'],
+    [{ shots: [], thread: [D({ verdict: 'right', vat: '2026-11-11T11:00:00.000Z', ask: [Q('yes', '2026-11-11T11:00:00.000Z')] })] }, 'agreed'], [{ shots: [], thread: [D({ verdict: 'right', vat: '2026-11-11T11:00:00.000Z', ask: [Q('no', '2026-11-11T12:00:00.000Z')] })] }, 'more']])
+    { assert.equal(L.stateOf(l), want); assert.equal(TEACH.stateOf(l), want, 'the server and the page agree'); }
+  // the page: the questions under the desk's last answer with Yes / No and a field, in both languages; the script sends and attaches them
+  for (const k of ['askHTML', 'data-qa="yes"', 'data-qa="no"', 'form class="mo-q-f"', 'data-qedit', 'answers: [{ i: +f.dataset.i, a: a }]', "L('The desk asks')", "L('Yes')", "L('No')"]) assert.ok(JS.includes(k), k);
+  assert.match(PAGE, /#v-mosha \.mo-q \{/); assert.match(PAGE, /@media \(pointer: coarse\) \{ #v-mosha \.mo-q-f input, #v-mosha \.mo-q-f \.ms-tbtn \{ min-height: 44px; \}/);
+  assert.match(TOOL, /cmd === 'ask' && a && b \? post\(\{ reply: \{ id: a, ask:/); assert.match(TOOL, /Array\.isArray\(j\)\) o\.ask = j; else o\.chart = j;/);
+});

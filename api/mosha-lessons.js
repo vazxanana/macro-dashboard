@@ -15,9 +15,11 @@
 //                                                                        one more picture on their own
 //   POST { edit: { id, title?, note?, img?, caption?, trade? } }         the lesson's teacher or the owner
 //   POST { remove: { id, img? } }                                        the lesson's teacher or the owner
-//   POST { say: { id, text?, verdict? } }     the lesson's teacher or the owner: more words, and "right" / "wrong" on the
-//                                             desk's last answer
-//   POST { reply: { id, text, chart? } }      the assistant or the owner: what was understood (+ its marks for the replay)
+//   POST { say: { id, text?, verdict?, answers? } }   the lesson's teacher: more words, "right" / "wrong" on the desk's last
+//                                             answer, and answers to its questions ([{ i, a }]: "yes", "no" or a few words)
+//   POST { reply: { id, text, chart?, ask? } }   the assistant or the owner: what was understood (+ its marks for the replay,
+//                                             + up to 6 short QUESTIONS the teacher answers with one tap or a few words)
+//   POST { reply: { id, ask } }               the same, no text: puts the questions under the desk's last answer
 //   POST { learn: { kind, text, from? } }     the assistant: a proposed line of the book; a teacher: a line taught directly
 //   POST { book: { id, confirm? | text? | remove? } }   a teacher: confirm, correct or erase a line
 // Readers: the owner, a member who may open the Mosha desk (api/mosha.js moshaLevel), and the assistant. Teachers: the owner
@@ -34,7 +36,7 @@ const S = require('./_session.js');
 const G = require('./_guard.js');
 const { moshaLevel } = require('./mosha.js');
 
-const KEEP = 300, MAX_SHOTS = 12, MAX_BYTES = 1.5 * 1024 * 1024, DAY_MAX = 80, MAX_TALK = 60, BOOK_KEEP = 400;
+const KEEP = 300, MAX_SHOTS = 12, MAX_BYTES = 1.5 * 1024 * 1024, DAY_MAX = 80, MAX_TALK = 60, BOOK_KEEP = 400, MAX_ASK = 6;
 const ID_RE = /^[0-9]{17}[a-z0-9]{4}$/, BOOK_ID = /^(seed-[0-9]{2}|[0-9]{17}[a-z0-9]{4})$/;
 const TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 // the markets a lesson's trade can be on: the ones ChronosTrade replays (a trade taught from a backtest keeps its market)
@@ -154,6 +156,14 @@ function chartOf(c, lesson, now) {
   }
   return { chart: { market, base, from, to, ...pos, marks, steps, at: new Date(now).toISOString() } };
 }
+// The questions the desk puts under its answer, so the teacher can teach with one tap (11 Nov 2026: he sent new lessons instead of
+// answering seven questions written in a block of text). A question is a string, or { q, yn: true } when "yes" or "no" answers it.
+function askOf(a) {
+  if (!Array.isArray(a) || !a.length || a.length > MAX_ASK) return { error: `an answer takes 1 to ${MAX_ASK} questions` };
+  const out = [];
+  for (const x of a) { const q = clean(isObj(x) ? x.q : x, 300); if (q.length < 4) return { error: 'a question needs its words' }; out.push({ q, yn: isObj(x) && x.yn === true, a: null, aat: null }); }
+  return { ask: out };
+}
 // a stored lesson in today's shape (a first version kept one reply instead of the conversation)
 function norm(l) {
   if (!Array.isArray(l.thread)) { l.thread = l.reply && l.reply.text ? [{ by: 'assistant', name: READER.name, at: l.reply.at, text: l.reply.text, shots: l.reply.shots || 0 }] : []; }
@@ -167,6 +177,7 @@ function stateOf(l) {
   if (!la) return 'new'; if ((la.shots || 0) < (l.shots || []).length || la.verdict === 'wrong') return 'more';
   const after = th.slice(th.indexOf(la) + 1);   // what the teacher said since: words sent together with "right" close the lesson, later ones reopen it
   if (after.some((m) => !(la.verdict === 'right' && la.vat && m.at <= la.vat))) return 'more';
+  if ((la.ask || []).some((x) => x.a != null && !(la.verdict === 'right' && la.vat && x.aat <= la.vat))) return 'more';   // he answered a question: the desk reads it
   return la.verdict === 'right' ? 'agreed' : 'read';
 }
 // what a reader sees of a lesson (the stored record as it is: it holds no secret)
@@ -176,7 +187,7 @@ const nameOf = (title, caption, note) => { const t = clean(title, 80) || clean(c
 // the language a teacher writes in (the desk answers in it; the method's words stay English in every language)
 const LANGS = ['en', 'fr'], langOf = (v) => (LANGS.includes(v) ? v : null);
 const view = (l) => ({ id: l.id, by: l.by, name: l.name, at: l.at, edited: l.edited || null, title: l.title, note: l.note, lang: l.lang || 'en', trade: l.trade || null, chart: l.chart || null,
-  shots: (l.shots || []).map((s) => ({ img: s.img, caption: s.caption, at: s.at })), thread: (l.thread || []).map((m) => ({ by: m.by, name: m.name, at: m.at, text: m.text, ...(m.by === 'assistant' ? { shots: m.shots || 0 } : {}), ...(m.verdict ? { verdict: m.verdict, vat: m.vat } : {}) })), state: stateOf(l) });
+  shots: (l.shots || []).map((s) => ({ img: s.img, caption: s.caption, at: s.at })), thread: (l.thread || []).map((m) => ({ by: m.by, name: m.name, at: m.at, text: m.text, ...(m.by === 'assistant' ? { shots: m.shots || 0 } : {}), ...(m.verdict ? { verdict: m.verdict, vat: m.vat } : {}), ...(m.by === 'assistant' && Array.isArray(m.ask) && m.ask.length ? { ask: m.ask.map((x) => ({ q: x.q, yn: !!x.yn, a: x.a == null ? null : x.a, aat: x.aat || null })) } : {}) })), state: stateOf(l) });
 // how teachable the desk has been so far: of the lessons whose first answer a teacher judged, how many were right first time;
 // and how much of the book is the teacher's word
 function scoreOf(lessons, book) {
@@ -231,9 +242,16 @@ async function handle(req, res, d = {}) {
     if (isObj(b.reply)) {   // what the assistant understood, and its marks for the chart (the owner may write it too)
       if (!bot && !owner) return res.status(403).json({ error: 'only the desk\'s assistant writes the desk\'s answer' });
       const l = find(b.reply.id); if (!l) return res.status(404).json({ error: 'no such lesson' });
-      const text = clean(b.reply.text, 3000); if (!text) return res.status(400).json({ error: 'the answer is empty' });
+      const qs = b.reply.ask != null ? askOf(b.reply.ask) : { ask: null }; if (qs.error) return res.status(400).json({ error: qs.error });
+      const text = clean(b.reply.text, 3000);
+      if (!text && qs.ask) {   // questions alone go under the desk's last answer, while the teacher has not answered any of them
+        const la = lastSaid(l); if (!la) return res.status(400).json({ error: 'the desk has not answered this lesson yet' });
+        if (la.verdict || (la.ask || []).some((x) => x.a != null)) return res.status(409).json({ error: 'the teacher has already answered: write a new answer' });
+        la.ask = qs.ask; await store.put(list); return res.status(200).json({ ok: true, lesson: view(l) });
+      }
+      if (!text) return res.status(400).json({ error: 'the answer is empty' });
       let chart = l.chart; if (b.reply.chart != null) { const c = chartOf(b.reply.chart, l, now); if (c.error) return res.status(400).json({ error: c.error }); chart = c.chart; }
-      l.thread.push({ by: 'assistant', name: READER.name, at: stamp, text, shots: l.shots.length }); l.thread = l.thread.slice(-MAX_TALK); l.chart = chart;
+      l.thread.push({ by: 'assistant', name: READER.name, at: stamp, text, shots: l.shots.length, ...(qs.ask ? { ask: qs.ask } : {}) }); l.thread = l.thread.slice(-MAX_TALK); l.chart = chart;
       await store.put(list); return res.status(200).json({ ok: true, lesson: view(l) });
     }
     if (isObj(b.learn)) {   // a line of the book: proposed by the assistant, or taught directly by a teacher
@@ -261,9 +279,16 @@ async function handle(req, res, d = {}) {
       const l = find(b.say.id); if (!l) return res.status(404).json({ error: 'no such lesson' });
       if (!mine(l)) return res.status(403).json({ error: 'that lesson belongs to someone else' });
       const text = clean(b.say.text, 2000), verdict = b.say.verdict === 'right' || b.say.verdict === 'wrong' ? b.say.verdict : null, la = lastSaid(l);
-      if (!text && !verdict) return res.status(400).json({ error: 'say something, or mark the answer right or not right' });
+      // answers to the desk's questions: each is "yes", "no" or a few words, on a question of its last answer
+      const ans = []; if (b.say.answers != null) {
+        if (!Array.isArray(b.say.answers) || !b.say.answers.length || b.say.answers.length > MAX_ASK) return res.status(400).json({ error: 'the answers are not a list' });
+        if (!la || !Array.isArray(la.ask) || !la.ask.length) return res.status(400).json({ error: 'the desk asked nothing under its last answer' });
+        for (const x of b.say.answers) { const i = isObj(x) ? Number(x.i) : NaN, a = clean(isObj(x) ? x.a : '', 600); if (!Number.isInteger(i) || i < 0 || i >= la.ask.length) return res.status(400).json({ error: 'no such question' }); if (!a) return res.status(400).json({ error: 'an answer needs its words' }); ans.push({ i, a: /^(yes|no)$/i.test(a) ? a.toLowerCase() : a }); }
+      }
+      if (!text && !verdict && !ans.length) return res.status(400).json({ error: 'say something, or mark the answer right or not right' });
       if (verdict && !la) return res.status(400).json({ error: 'the desk has not answered this lesson yet' });
       if (verdict === 'wrong' && !text) return res.status(400).json({ error: 'say what is not right, so the desk can learn it' });
+      for (const x of ans) { la.ask[x.i].a = x.a; la.ask[x.i].aat = stamp; }
       if (verdict) { la.verdict = verdict; la.vby = acct.u; la.vat = stamp; }
       if (text) { l.thread.push({ by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, text }); l.thread = l.thread.slice(-MAX_TALK); }
       if (langOf(b.say.lang)) l.lang = b.say.lang;
@@ -312,4 +337,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha lessons are unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP });
+Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, askOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP, MAX_ASK });

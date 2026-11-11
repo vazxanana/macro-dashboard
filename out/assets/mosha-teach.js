@@ -29,6 +29,7 @@
     var th = l.thread || [], la = null, i; for (i = th.length - 1; i >= 0; i--) if (th[i].by === 'assistant') { la = th[i]; break; }
     if (!la) return 'new'; if ((la.shots || 0) < (l.shots || []).length || la.verdict === 'wrong') return 'more';
     if (th.slice(i + 1).some(function (m) { return !(la.verdict === 'right' && la.vat && m.at <= la.vat); })) return 'more';
+    if ((la.ask || []).some(function (x) { return x.a != null && !(la.verdict === 'right' && la.vat && x.aat <= la.vat); })) return 'more';   // he answered a question: the desk reads it
     return la.verdict === 'right' ? 'agreed' : 'read';
   }
   var STATE = { 'new': 'Not read yet', more: 'Waiting for the desk', read: 'The desk answered: is it right?', agreed: 'Understood' };
@@ -102,12 +103,28 @@
       .then(function () { T.loading = false; draw(); });
   }
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'; };
+  // The desk's questions under one of its answers. Under its LAST answer the lesson's teacher answers each with one tap (Yes / No,
+  // when the desk marked it so) or a few words; an answer can be changed until the desk answers again. Elsewhere they are read only.
+  var said = function (a) { return a === 'yes' ? L('Yes') : a === 'no' ? L('No') : a; };
+  function askOpen(m) { return (m.ask || []).filter(function (x) { return x.a == null; }).length; }
+  function askHTML(l, m, live) {
+    if (!m.ask || !m.ask.length) return '';
+    return '<div class="mo-q"><b class="mo-q-h">' + L('The desk asks') + (live && askOpen(m) ? ' <small>' + L('one tap each, in any order') + '</small>' : '') + '</b><ol>' + m.ask.map(function (x, i) {
+      var k = l.id + ':' + i, edit = live && (x.a == null || T.qedit === k), dv = (T.qd && T.qd[k]) || '';
+      return '<li' + (x.a != null ? ' class="mo-q-done"' : '') + '><span class="mo-q-t">' + esc(x.q) + '</span>'
+        + (x.a != null && !edit ? '<span class="mo-q-a"><b>' + esc(said(x.a)) + '</b>' + (live ? '<button type="button" class="mo-l-x" data-qedit="' + esc(k) + '">' + L('Change') + '</button>' : '') + '</span>' : '')
+        + (edit ? '<form class="mo-q-f" data-q="' + esc(l.id) + '" data-i="' + i + '">' + (x.yn ? '<button type="button" class="ms-tbtn mo-q-y" data-qa="yes">' + L('Yes') + '</button><button type="button" class="ms-tbtn mo-q-n" data-qa="no">' + L('No') + '</button>' : '')
+          + '<input name="a" maxlength="600" autocomplete="off" aria-label="' + esc(L('Your answer')) + '" placeholder="' + esc(x.yn ? L('or in your words') : L('Your answer')) + '" value="' + esc(dv) + '"><button type="submit" class="ms-tbtn">' + L('Send') + '</button></form>' : '')
+        + (x.a == null && !live ? '<span class="mo-q-a mo-q-none">' + L('not answered') + '</span>' : '') + '</li>'; }).join('') + '</ol></div>';
+  }
   function talkHTML(l, own) {
-    var th = l.thread || [], st = stateOf(l), la = null, wrong = T.wrong === l.id && st === 'read'; th.forEach(function (m) { if (m.by === 'assistant') la = m; });
+    var th = l.thread || [], st = stateOf(l), la = null; th.forEach(function (m) { if (m.by === 'assistant') la = m; });
+    // He may still judge the desk's answer after answering its questions (that alone moves the lesson to "Waiting for the desk").
+    var judge = !!la && (st === 'read' || (st === 'more' && !la.verdict && (la.shots || 0) >= (l.shots || []).length && th[th.length - 1] === la)), wrong = T.wrong === l.id && judge;
     var rows = th.map(function (m) { var desk = m.by === 'assistant';
-      return '<li class="' + (desk ? 'mo-l-desk' : 'mo-l-you') + '"><b>' + (desk ? L('The desk understood') : esc(m.name || m.by)) + '</b><small>' + esc(day(m.at)) + '</small><p>' + esc(m.text) + '</p>' + (desk && m.verdict ? '<span class="mo-l-v mo-l-v-' + m.verdict + '">' + (m.verdict === 'right' ? L('Marked right') : L('Marked not right')) + '</span>' : '') + '</li>'; }).join('');
+      return '<li class="' + (desk ? 'mo-l-desk' : 'mo-l-you') + '"><b>' + (desk ? L('The desk understood') : esc(m.name || m.by)) + '</b><small>' + esc(day(m.at)) + '</small><p>' + esc(m.text) + '</p>' + (desk ? askHTML(l, m, own && m === la) : '') + (desk && m.verdict ? '<span class="mo-l-v mo-l-v-' + m.verdict + '">' + (m.verdict === 'right' ? L('Marked right') : L('Marked not right')) + '</span>' : '') + '</li>'; }).join('');
     return '<div class="mo-l-reply"><ol class="mo-l-talk">' + (rows || '<li class="mo-l-desk"><p class="mo-l-wait">' + L('The desk has not read this lesson yet.') + '</p></li>') + '</ol>'
-      + (own && la && st === 'read' ? '<div class="mo-l-judge"><span>' + L('Did the desk get it right?') + '</span><button type="button" class="ms-tbtn mo-l-yes" data-right="' + esc(l.id) + '">' + L('That is right') + '</button><button type="button" class="ms-tbtn" data-wrong="' + esc(l.id) + '">' + L('Not right…') + '</button></div>' : '')
+      + (own && judge ? '<div class="mo-l-judge"><span>' + L('Did the desk get it right?') + '</span><button type="button" class="ms-tbtn mo-l-yes" data-right="' + esc(l.id) + '">' + L('That is right') + '</button><button type="button" class="ms-tbtn" data-wrong="' + esc(l.id) + '">' + L('Not right…') + '</button></div>' : '')
       + (own ? '<form class="mo-l-say" data-say="' + esc(l.id) + '"' + (wrong ? ' data-wrong="1"' : '') + '><label class="mo-f"><span>' + (wrong ? L('What is not right? The desk learns from your words') : la ? L('Tell the desk more, or correct it') : L('Add words for the desk')) + '</span><textarea name="text" rows="2" maxlength="2000" placeholder="' + esc(la ? L('The VR starts at the high, not at…') : L('What else should it see here?')) + '"></textarea></label><span class="mo-l-sayb">' + (wrong ? '<button type="button" class="mo-l-x" data-unwrong="1">' + L('Cancel') + '</button>' : '') + '<button type="submit" class="ms-tbtn">' + (wrong ? L('Send: not right') : L('Send')) + '</button></span></form>' : '')
       + '</div>';
   }
@@ -259,6 +276,8 @@
     d.querySelector('#mo-lv-cancel').onclick = function () { d.close(); }; var cl = d.querySelector('#mo-lv-clear'); if (cl) cl.onclick = function () { d.close(); act(api({ edit: { id: l.id, trade: null } })); };
     if (d.showModal) d.showModal(); else d.setAttribute('open', '');
   }
+  // one answer to one of the desk's questions
+  function answer(f, a) { var k = f.dataset.q + ':' + f.dataset.i; if (T.qd) delete T.qd[k]; T.qedit = null; var lg = root.MS_MOSHA_I18N ? root.MS_MOSHA_I18N.lang() : 'en'; act(api({ say: { id: f.dataset.q, answers: [{ i: +f.dataset.i, a: a }], lang: lg } })); }
   function wire() {
     var card = $('mo-lessons'); if (!card || card.dataset.wired) return; card.dataset.wired = '1';
     card.addEventListener('click', function (ev) {
@@ -268,6 +287,8 @@
       else if (b.dataset.right) act(api({ say: { id: b.dataset.right, verdict: 'right' } }));
       else if (b.dataset.wrong) { T.wrong = b.dataset.wrong; draw(); var tx = card.querySelector('form.mo-l-say[data-say="' + b.dataset.wrong + '"] textarea'); if (tx) tx.focus(); }   // typed in place, under the desk's answer
       else if (b.dataset.unwrong) { T.wrong = null; draw(); }
+      else if (b.dataset.qedit) { T.qedit = b.dataset.qedit; draw(); var qi = card.querySelector('form.mo-q-f[data-q="' + b.dataset.qedit.split(':')[0] + '"][data-i="' + b.dataset.qedit.split(':')[1] + '"] input'); if (qi) qi.focus(); }
+      else if (b.dataset.qa) { var qf = b.closest('form.mo-q-f'); if (qf) answer(qf, b.dataset.qa); }
       else if (b.dataset.flt) { T.flt = b.dataset.flt; T.open = null; draw(); }
       else if (b.dataset.rmImg) sure(L('Remove this picture from the lesson?'), { title: L('Remove the picture'), ok: L('Remove'), danger: true }).then(function (y) { if (y) act(api({ remove: { id: id, img: b.dataset.rmImg } })); });
       else if (b.dataset.cap) { var s = ((byId(id) || { shots: [] }).shots.filter(function (x) { return x.img === b.dataset.cap; })[0]); ask(L('Caption'), s ? s.caption : '', { title: L('Caption of this picture'), ok: L('Save'), max: 200 }).then(function (v) { if (v != null) act(api({ edit: { id: id, img: b.dataset.cap, caption: v } })); }); }
@@ -278,7 +299,9 @@
       else if (b.id === 'mo-l-keybtn') { b.disabled = true; fetch(URL_ + '?get=reader', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) { var o = $('mo-l-keyout'); if (!o) return; o.hidden = false; var inp = o.querySelector('input'); if (j.key) { inp.value = j.key; inp.focus(); inp.select(); o.querySelector('small').textContent = 'Host: ' + (j.host || 'meridianx.dev') + '. Paste the key only into the secure form the assistant opens for that host, never into a chat. With it one can read the lessons, answer them and propose lines for the book, nothing else.'; } else { inp.value = ''; o.querySelector('small').textContent = j.off ? 'The key is switched off on the server (MOSHA_READER=off).' : (j.error || 'The server has no session secret yet, so there is no key.'); } }).catch(function () {}).then(function () { b.disabled = false; }); }
       else if (b.id === 'mo-l-keycopy') { var k = $('mo-l-keyout').querySelector('input'); if (k.value && root.msCopy) root.msCopy(k.value); else if (k.value && navigator.clipboard) navigator.clipboard.writeText(k.value); }
     });
-    card.addEventListener('submit', function (ev) { var f = ev.target.closest('form.mo-l-say'); if (!f) return; ev.preventDefault(); var v = f.elements.text.value.trim(); if (!v) { f.elements.text.focus(); return; } f.elements.text.value = ''; var wrong = !!f.dataset.wrong; T.wrong = null; var lg = root.MS_MOSHA_I18N ? root.MS_MOSHA_I18N.lang() : 'en'; act(api({ say: wrong ? { id: f.dataset.say, verdict: 'wrong', text: v, lang: lg } : { id: f.dataset.say, text: v, lang: lg } })); });
+    card.addEventListener('input', function (ev) { var qf = ev.target.closest && ev.target.closest('form.mo-q-f'); if (qf) { T.qd = T.qd || {}; T.qd[qf.dataset.q + ':' + qf.dataset.i] = ev.target.value; } });   // a half-written answer survives a redraw
+    card.addEventListener('submit', function (ev) { var qf = ev.target.closest('form.mo-q-f'); if (qf) { ev.preventDefault(); var qv = qf.elements.a.value.trim(); if (!qv) { qf.elements.a.focus(); return; } answer(qf, qv); return; }
+      var f = ev.target.closest('form.mo-l-say'); if (!f) return; ev.preventDefault(); var v = f.elements.text.value.trim(); if (!v) { f.elements.text.focus(); return; } f.elements.text.value = ''; var wrong = !!f.dataset.wrong; T.wrong = null; var lg = root.MS_MOSHA_I18N ? root.MS_MOSHA_I18N.lang() : 'en'; act(api({ say: wrong ? { id: f.dataset.say, verdict: 'wrong', text: v, lang: lg } : { id: f.dataset.say, text: v, lang: lg } })); });
     var view_ = $('v-mosha'), strip = $('mo-todo'), gd = $('mo-guide'), gopen = $('mo-guide-open');
     if (gd) gd.addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return;
       if (b.dataset.lang) setLang(b.dataset.lang);
