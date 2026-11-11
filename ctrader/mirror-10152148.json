@@ -3268,6 +3268,86 @@
     ],
     "stopCheckedAt": "2026-11-11T09:51:07.000Z",
     "brokerStop": 1.33152
+   },
+   "btc-replica-1794391250-b": {
+    "positionId": "48376002",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T10:02:02.000Z",
+    "councilEntry": 73741.3,
+    "stop": 73451.63,
+    "t1": 74320.63,
+    "riskCash": 2.9,
+    "margin": 73.63,
+    "minLot": true,
+    "mark": 73741.3,
+    "levelsFrom": "mark",
+    "fillPrice": 73752.29,
+    "slipR": 0.038,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T10:02:02.000Z",
+    "brokerStop": 73462.62
+   },
+   "eth-replica-1794391250-b": {
+    "positionId": "48376026",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 17,
+    "lots": 0.17,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T10:02:02.000Z",
+    "councilEntry": 2055.89,
+    "stop": 2044.815,
+    "t1": 2078.04,
+    "riskCash": 1.99,
+    "margin": 34.93,
+    "mark": 2055.89,
+    "levelsFrom": "mark",
+    "fillPrice": 2057.19,
+    "slipR": 0.117,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T10:02:02.000Z",
+    "brokerStop": 2046.12
+   },
+   "usdchf-replica-1794391250-s": {
+    "positionId": "48376057",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T10:02:02.000Z",
+    "councilEntry": 0.82838,
+    "stop": 0.828908,
+    "t1": 0.827324,
+    "riskCash": 1.99,
+    "margin": 6,
+    "shadow": true,
+    "mark": 0.82838,
+    "levelsFrom": "mark",
+    "fillPrice": 0.82839,
+    "slipR": -0.019,
+    "lagSec": 72,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T10:02:02.000Z",
+    "brokerStop": 0.82892
    }
   },
   "day": {
@@ -3275,7 +3355,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9954.7 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 9954.7 · 14 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3292,7 +3372,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9954.7,
-  "lastRun": "2026-11-11T09:59:28.000Z"
+  "lastRun": "2026-11-11T10:02:02.000Z"
  },
  "log": [
   {
@@ -4512,6 +4592,21 @@
    "at": "2026-11-11T09:51:07.000Z",
    "msg": "opened buy GBPUSD 0.02 lot (council replica)",
    "trade": "gbpusd-replica-1794390602-b"
+  },
+  {
+   "at": "2026-11-11T10:02:02.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794391250-b"
+  },
+  {
+   "at": "2026-11-11T10:02:02.000Z",
+   "msg": "opened buy ETHUSD 0.17 lot (council replica)",
+   "trade": "eth-replica-1794391250-b"
+  },
+  {
+   "at": "2026-11-11T10:02:02.000Z",
+   "msg": "opened sell USDCHF 0.03 lot (council replica)",
+   "trade": "usdchf-replica-1794391250-s"
   }
  ],
  "limits": {
@@ -4590,9 +4685,9 @@
   ]
  },
  "execution": {
-  "n": 113,
-  "meanSlipR": 0.08,
-  "medianSlipR": 0.03,
+  "n": 116,
+  "meanSlipR": 0.079,
+  "medianSlipR": 0.034,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
@@ -4601,15 +4696,15 @@
     "meanSlipR": 0.143
    },
    "ETHUSD": {
-    "n": 12,
-    "meanSlipR": 0.2
+    "n": 13,
+    "meanSlipR": 0.194
    },
    "XAUUSD": {
     "n": 10,
     "meanSlipR": 0.104
    },
    "BTCUSD": {
-    "n": 16,
+    "n": 17,
     "meanSlipR": 0.042
    },
    "USDCAD": {
@@ -4625,8 +4720,8 @@
     "meanSlipR": 0.078
    },
    "USDCHF": {
-    "n": 10,
-    "meanSlipR": 0.124
+    "n": 11,
+    "meanSlipR": 0.111
    },
    "EURUSD": {
     "n": 11,
