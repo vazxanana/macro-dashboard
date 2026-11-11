@@ -2860,6 +2860,32 @@
     ],
     "stopCheckedAt": "2026-11-11T07:02:05.000Z",
     "brokerStop": 1.33329
+   },
+   "usdcad-replica-1794380725-s": {
+    "positionId": "48337508",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T07:06:31.000Z",
+    "councilEntry": 1.42057,
+    "stop": 1.421359,
+    "t1": 1.418992,
+    "riskCash": 1.99,
+    "margin": 6,
+    "mark": 1.42057,
+    "levelsFrom": "mark",
+    "fillPrice": 1.42059,
+    "slipR": -0.025,
+    "lagSec": 66,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T07:06:31.000Z",
+    "brokerStop": 1.42138
    }
   },
   "day": {
@@ -2867,13 +2893,14 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.51 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 9962.51 · 13 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794364852-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794370912-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794375992-b": "none of XRPUSD found at the broker"
+   "xrp-replica-1794375992-b": "none of XRPUSD found at the broker",
+   "xrp-replica-1794380725-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -2882,7 +2909,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9962.51,
-  "lastRun": "2026-11-11T07:03:39.000Z"
+  "lastRun": "2026-11-11T07:06:31.000Z"
  },
  "log": [
   {
@@ -3947,6 +3974,16 @@
    "at": "2026-11-11T07:02:05.000Z",
    "msg": "opened buy GBPUSD 0.04 lot (council replica)",
    "trade": "gbpusd-replica-1794380452-b"
+  },
+  {
+   "at": "2026-11-11T07:06:31.000Z",
+   "msg": "not mirrored xrp-replica-1794380725-s: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794380725-s"
+  },
+  {
+   "at": "2026-11-11T07:06:31.000Z",
+   "msg": "opened sell USDCAD 0.03 lot (council replica)",
+   "trade": "usdcad-replica-1794380725-s"
   }
  ],
  "limits": {
@@ -4025,9 +4062,9 @@
   ]
  },
  "execution": {
-  "n": 99,
-  "meanSlipR": 0.084,
-  "medianSlipR": 0.038,
+  "n": 100,
+  "meanSlipR": 0.083,
+  "medianSlipR": 0.034,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
@@ -4048,8 +4085,8 @@
     "meanSlipR": 0.027
    },
    "USDCAD": {
-    "n": 9,
-    "meanSlipR": 0.052
+    "n": 10,
+    "meanSlipR": 0.044
    },
    "AUDUSD": {
     "n": 15,
