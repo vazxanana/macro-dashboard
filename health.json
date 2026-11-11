@@ -1,5 +1,5 @@
 {
- "at": "2026-11-11T22:46:07.000Z",
+ "at": "2026-11-11T22:48:32.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -230,13 +230,13 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -272,7 +272,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 10,
+     "ageMin": 2,
      "issues": [
       {
        "kind": "source",
@@ -306,7 +306,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 20,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "input",
@@ -318,13 +318,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 19,
+     "ageMin": 0,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "ok",
-     "ageMin": 19,
+     "ageMin": 0,
      "issues": []
     },
     "macro/history.json": {
@@ -345,7 +345,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1366,
+     "ageMin": 1368,
      "issues": []
     },
     "digest.json": {
@@ -356,37 +356,37 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "warn",
-     "ageMin": 295,
+     "ageMin": 297,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 4.9 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+       "detail": "not updated for 5.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
       }
      ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 692,
+     "ageMin": 694,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 692,
+     "ageMin": 694,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 692,
+     "ageMin": 694,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 10,
+     "ageMin": 2,
      "issues": []
     },
     "research/ledger.json": {
@@ -407,19 +407,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 245,
+     "ageMin": 247,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 882,
+     "ageMin": 884,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 5757,
+     "ageMin": 5759,
      "issues": [
       {
        "kind": "stale",
@@ -453,7 +453,7 @@
   "bad": [],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1045 days old; over 120 the strategist drops it as \"no data\")",
-   "Loop watchdog (watchdog.json): not updated for 4.9 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+   "Loop watchdog (watchdog.json): not updated for 5.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
   ],
   "notes": 2
  },
