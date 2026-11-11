@@ -7485,7 +7485,8 @@
     "t1": 2071,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 2055.77,
@@ -7499,7 +7500,8 @@
     "lagSec": 169,
     "positionId": "48433910",
     "volume": 21,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T14:11:51.000Z"
    }
   },
   "day": {
@@ -7507,7 +7509,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9918.93 · 20 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9916.81 · 19 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7536,23 +7538,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdchf-scalp-1794406249": {
+    "orderId": "33933449",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.8321,
+    "stop": 0.83159,
+    "t1": 0.8331199999999997,
+    "placedAt": "2026-11-11T14:11:51.000Z",
+    "expires": "2026-11-11T17:10:49.000Z",
+    "riskCash": 1.98,
+    "margin": 6,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9918.93,
-  "lastRun": "2026-11-11T14:09:26.000Z"
+  "balance": 9916.81,
+  "lastRun": "2026-11-11T14:11:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "cancelled USDCAD limit order 33869653 for usdcad-intraday-1794317861: the council ended it: cancelled",
-   "trade": "usdcad-intraday-1794317861"
-  },
-  {
-   "at": "2026-11-10T13:41:59.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.45133 -> 1.45076, target 1.29293 -> 1.29236 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-10T13:41:59.000Z",
    "msg": "moved USDCAD 47373489 protection: stop 1.3818674 -> 1.3812974, target 1.48094 -> 1.48037 (council position)",
@@ -9042,6 +9054,16 @@
    "at": "2026-11-11T14:05:16.000Z",
    "msg": "cancelled USDCHF limit order 33931399 for usdchf-scalp-1794404945: the council ended it: missed",
    "trade": "usdchf-scalp-1794404945"
+  },
+  {
+   "at": "2026-11-11T14:11:51.000Z",
+   "msg": "ETHUSD position 48433910 closed at the broker",
+   "trade": "eth-rscalp-1794405367"
+  },
+  {
+   "at": "2026-11-11T14:11:51.000Z",
+   "msg": "placed buy limit USDCHF 0.03 lot at 0.8321 (council scalp, valid to 2026-11-11T17:10Z)",
+   "trade": "usdchf-scalp-1794406249"
   }
  ],
  "limits": {
