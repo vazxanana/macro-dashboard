@@ -8277,7 +8277,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9868.34 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9868.34 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8306,18 +8306,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794417165": {
+    "orderId": "33951089",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.32752,
+    "stop": 1.3288,
+    "t1": 1.3249600000000001,
+    "placedAt": "2026-11-11T17:13:43.000Z",
+    "expires": "2026-11-11T20:12:45.000Z",
+    "riskCash": 1.97,
+    "margin": 2.66,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9868.34,
-  "lastRun": "2026-11-11T17:11:24.000Z"
+  "lastRun": "2026-11-11T17:13:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:12:16.000Z",
-   "msg": "moved XAUUSD 48096028 protection: stop 4064.688 -> 4062.968, target 3991.434 -> 3989.714 (council m30m1)",
-   "trade": "xau-m30m1-1794321828"
-  },
   {
    "at": "2026-11-10T16:12:16.000Z",
    "msg": "moved XAUUSD 48107209 protection: stop 4033.091 -> 4031.371, target 4057.568 -> 4055.848 (council rscalp)",
@@ -9812,6 +9827,11 @@
    "at": "2026-11-11T17:07:17.000Z",
    "msg": "limit filled: EURUSD position 48464186 at the broker",
    "trade": "eurusd-rscalp-1794409682"
+  },
+  {
+   "at": "2026-11-11T17:13:43.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.32752 (council scalp, valid to 2026-11-11T20:12Z)",
+   "trade": "gbpusd-scalp-1794417165"
   }
  ],
  "limits": {
