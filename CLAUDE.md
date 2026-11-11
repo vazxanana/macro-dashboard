@@ -1870,5 +1870,29 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
       `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
       translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
       answer, and a French button name the page does not show.
+  - **His turn first, one tap away** (11 Nov 2026, quality round; he had sent lessons but judged no answer and confirmed no
+    book line). On his page `#mo-todo` now comes BEFORE the guide (`order: -6`) and is no longer a row of jump buttons: it
+    counts what waits ("3 answers to check · 4 questions from the desk", then the book's lines) and holds the FIRST item,
+    answerable in place with the lesson's own buttons (`drawTodo`): the desk's answer (clamped past 280 characters, "Read it
+    all"), its first open question (Yes / No or a few words; the next one follows by itself), "That is right" / "Not right…"
+    (typed in place), "Open the whole lesson", "Later" (to the back of the queue, this visit only). When no answer waits,
+    the first unconfirmed book line with Right / Correct / Erase. After each tap the item rests (`mo-busy`), then
+    `#mo-td-flash` (the only live region) says what happened and "Here is the next one."; a phone hides the intro line
+    while something waits (`#v-mosha.mo-turn`) so the judge buttons stay on the first screen. `turnOf(l)` (pure): a lesson
+    is still HIS while the desk's last answer has an unanswered question and he wrote nothing after it, although the server
+    already calls it "more" after his first answer; `todo()` returns `turn` (oldest first) and `ask` beside `judge`; the
+    "Your turn" filter and the lesson's chip ("The desk has 2 questions for you") follow it. `stateOf` is unchanged (the
+    server's rule). A correction or answer stays in its box until the desk has it (`T.sd`, `T.qd`); errors say what to do
+    (no connection, too many requests, a picture too large), the lessons that cannot be read offer "Try again". No new
+    permission, endpoint or concept; `api/mosha*.js` untouched.
+  - **The chart card and the log in his language, addressed to no one** (11 Nov 2026). `assets/mosha-replay.js` and the
+    reader's side of `assets/mosha-desk.js` go through `L(...)` like the teach cards (controls, captions, every step of
+    the examples, the result line, the log's record, table and candle check; `msMoshaReplayLang` / `msMoshaDeskLang` redraw
+    on a switch). The examples are HIS screenshots and every reader sees the card, so the desk's text about them says
+    "the red "5 mn" box", "Closed by hand", "On the screenshot: +5.6R" / "In the log:" / "The lesson:", never "you" /
+    "your" (a test bans it); the owner's own sentence on the 10 Nov example shows to the owner only (`ownLabel`). The
+    owner's log form and prompts stay English. `scripts/mosha-lessons.mjs`: `lesson.txt` says under its heading whose move
+    it is and why (`why`), `BOOK.md` counts the teacher's lines against the desk's, and `pull` prints first how many
+    lessons wait for the desk, for the teacher, and are understood (`counts`, `countsText`).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
