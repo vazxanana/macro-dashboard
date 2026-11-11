@@ -7273,6 +7273,33 @@
     ],
     "stopCheckedAt": "2026-11-11T12:26:52.000Z",
     "brokerStop": 1.42276
+   },
+   "sol-scalp-1794400038": {
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T12:31:16.000Z",
+    "councilEntry": 83.58,
+    "stop": 83.85671,
+    "t1": 81.26,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 83.58,
+    "digits": 3,
+    "lots": 0.01,
+    "riskCash": 2.77,
+    "margin": 83.8,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 83.582,
+    "slipR": -0.007,
+    "lagSec": 196,
+    "positionId": "48408033",
+    "volume": 1000,
+    "status": "open"
    }
   },
   "day": {
@@ -7280,7 +7307,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9913.96 · 31 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9913.96 · 32 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7330,39 +7357,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "sol-scalp-1794400038": {
-    "orderId": "33927118",
-    "symbol": "SOLUSD",
-    "side": "sell",
-    "volume": 1000,
-    "lots": 0.01,
-    "digits": 3,
-    "setup": "scalp",
-    "limitPrice": 83.58,
-    "stop": 83.85671,
-    "t1": 81.26,
-    "placedAt": "2026-11-11T12:28:18.000Z",
-    "expires": "2026-11-11T15:27:18.000Z",
-    "riskCash": 2.77,
-    "margin": 83.8,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9913.96,
-  "lastRun": "2026-11-11T12:28:18.000Z"
+  "lastRun": "2026-11-11T12:31:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:28:08.000Z",
-   "msg": "moved AUDUSD 47748537 protection: stop 0.68917 -> 0.6891, target 0.69586 -> 0.69579 (council rintra)",
-   "trade": "audusd-rintra-1794247547"
-  },
   {
    "at": "2026-11-10T13:29:54.000Z",
    "msg": "USDCHF position 48031567 closed at the broker",
@@ -8857,6 +8858,11 @@
    "at": "2026-11-11T12:28:18.000Z",
    "msg": "placed sell limit SOLUSD 0.01 lot at 83.58 (council scalp, valid to 2026-11-11T15:27Z)",
    "trade": "sol-scalp-1794400038"
+  },
+  {
+   "at": "2026-11-11T12:31:16.000Z",
+   "msg": "limit filled: SOLUSD position 48408033 at the broker",
+   "trade": "sol-scalp-1794400038"
   }
  ],
  "limits": {
@@ -8935,15 +8941,15 @@
   ]
  },
  "execution": {
-  "n": 246,
+  "n": 247,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
   "medianLagSec": 159,
   "bySymbol": {
    "SOLUSD": {
-    "n": 17,
-    "meanSlipR": 0.071
+    "n": 18,
+    "meanSlipR": 0.067
    },
    "BTCUSD": {
     "n": 19,
