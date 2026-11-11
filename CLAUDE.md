@@ -1417,8 +1417,8 @@ badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOL
   - `?sw-reset` with another window of the site open: the browser keeps the same worker and runs no install, so the page came
     back with no worker and no caches until the next deploy. The reset page leaves `sessionStorage mx-sw-reset`; the next load
     posts `mx-prime` and the worker in charge sets its caches up again (`prime()`, also the install step) and claims the page.
-  - Push: a payload of `null`, a list or a bare string threw in the handler (no notification of ours); `notice()` reads any
-    payload, caps title / body / tag, and `inSite()` keeps the link inside this site (also on the tap).
+  - Push: a JSON payload of `null` threw in the handler (no notification of ours) and a bare string lost its text; `notice()`
+    reads any payload, caps title / body / tag, and `inSite()` keeps the link inside this site (also on the tap).
   - A tap on a price alert navigated whichever window was open, so a ChronosTrade replay or an Academy session was replaced by
     the chart. Now a window already on the Desk is focused and taken there; other pages are left alone and the chart opens in
     a new window (an open one is navigated only when the browser will not open a window).
