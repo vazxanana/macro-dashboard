@@ -2161,6 +2161,86 @@
     ],
     "stopCheckedAt": "2026-11-11T02:02:00.000Z",
     "brokerStop": 1.41962
+   },
+   "eurusd-replica-1794363611-s": {
+    "positionId": "48274085",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:21:15.000Z",
+    "councilEntry": 1.11665,
+    "stop": 1.117051,
+    "t1": 1.115848,
+    "riskCash": 2,
+    "margin": 8.93,
+    "shadow": true,
+    "mark": 1.11665,
+    "levelsFrom": "mark",
+    "fillPrice": 1.11665,
+    "slipR": 0,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:21:15.000Z",
+    "brokerStop": 1.11705
+   },
+   "audusd-replica-1794363611-s": {
+    "positionId": "48274089",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:21:15.000Z",
+    "councilEntry": 0.68802,
+    "stop": 0.688576,
+    "t1": 0.686907,
+    "riskCash": 2,
+    "margin": 4.13,
+    "shadow": true,
+    "mark": 0.68802,
+    "levelsFrom": "mark",
+    "fillPrice": 0.68809,
+    "slipR": -0.126,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:21:15.000Z",
+    "brokerStop": 0.68865
+   },
+   "usdchf-replica-1794363611-b": {
+    "positionId": "48274091",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:21:15.000Z",
+    "councilEntry": 0.82566,
+    "stop": 0.825307,
+    "t1": 0.826366,
+    "riskCash": 2,
+    "margin": 8,
+    "mark": 0.82566,
+    "levelsFrom": "mark",
+    "fillPrice": 0.8256,
+    "slipR": -0.17,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:21:15.000Z",
+    "brokerStop": 0.82525
    }
   },
   "day": {
@@ -2168,7 +2248,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9981.22 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 9981.22 · 12 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2181,7 +2261,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9981.22,
-  "lastRun": "2026-11-11T02:18:55.000Z"
+  "lastRun": "2026-11-11T02:21:15.000Z"
  },
  "log": [
   {
@@ -3006,6 +3086,21 @@
    "at": "2026-11-11T02:12:24.000Z",
    "msg": "BTCUSD position 48259827 closed at the broker",
    "trade": "btc-replica-1794360743-b"
+  },
+  {
+   "at": "2026-11-11T02:21:15.000Z",
+   "msg": "opened sell EURUSD 0.04 lot (council replica)",
+   "trade": "eurusd-replica-1794363611-s"
+  },
+  {
+   "at": "2026-11-11T02:21:15.000Z",
+   "msg": "opened sell AUDUSD 0.03 lot (council replica)",
+   "trade": "audusd-replica-1794363611-s"
+  },
+  {
+   "at": "2026-11-11T02:21:15.000Z",
+   "msg": "opened buy USDCHF 0.04 lot (council replica)",
+   "trade": "usdchf-replica-1794363611-b"
   }
  ],
  "limits": {
@@ -3084,11 +3179,11 @@
   ]
  },
  "execution": {
-  "n": 75,
-  "meanSlipR": 0.099,
-  "medianSlipR": 0.038,
+  "n": 78,
+  "meanSlipR": 0.091,
+  "medianSlipR": 0.03,
   "worstSlipR": 1.236,
-  "medianLagSec": 73,
+  "medianLagSec": 72,
   "bySymbol": {
    "SOLUSD": {
     "n": 13,
@@ -3111,20 +3206,20 @@
     "meanSlipR": 0.05
    },
    "AUDUSD": {
-    "n": 11,
-    "meanSlipR": 0.041
+    "n": 12,
+    "meanSlipR": 0.027
    },
    "GBPUSD": {
     "n": 6,
     "meanSlipR": 0.028
    },
    "USDCHF": {
-    "n": 5,
-    "meanSlipR": 0.264
+    "n": 6,
+    "meanSlipR": 0.191
    },
    "EURUSD": {
-    "n": 5,
-    "meanSlipR": -0.044
+    "n": 6,
+    "meanSlipR": -0.037
    }
   }
  }
