@@ -7793,7 +7793,8 @@
     "t1": 72584.6,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 73438.1,
@@ -7808,7 +7809,8 @@
     "lagSec": 102,
     "positionId": "48448517",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T15:36:31.000Z"
    },
    "usdchf-rscalp-1794407857": {
     "positionId": "48449706",
@@ -8101,7 +8103,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9878.56 · 28 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9871.97 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8153,15 +8155,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9878.56,
-  "lastRun": "2026-11-11T15:35:08.000Z"
+  "balance": 9871.97,
+  "lastRun": "2026-11-11T15:37:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:06:36.000Z",
-   "msg": "moved USDCAD 47992970 protection: stop 1.4109947 -> 1.4116147, target 1.4210606 -> 1.4216806 (council swing)",
-   "trade": "usdcad-swing-1794304600"
-  },
   {
    "at": "2026-11-10T16:06:36.000Z",
    "msg": "placed sell limit EURUSD 0.02 lot at 1.1155 (council scalp, valid to 2026-11-10T19:05Z)",
@@ -9656,6 +9653,11 @@
    "at": "2026-11-11T15:35:08.000Z",
    "msg": "ETHUSD position 48450870 closed at the broker",
    "trade": "eth-rscalp-1794408007"
+  },
+  {
+   "at": "2026-11-11T15:36:31.000Z",
+   "msg": "BTCUSD position 48448517 closed at the broker",
+   "trade": "btc-intraday-1794407707"
   }
  ],
  "limits": {

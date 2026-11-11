@@ -1411,7 +1411,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T17:57:13.000Z",
     "councilEntry": 73139.3,
     "stop": 72537.6,
@@ -1425,10 +1425,12 @@
     "slipR": 0.059,
     "lagSec": 70,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T17:57:13.000Z",
-    "brokerStop": 72572.95
+    "brokerStop": 72572.95,
+    "closedAt": "2026-11-11T15:36:33.000Z"
    },
    "gbpusd-replica-1794333363-b": {
     "positionId": "48181683",
@@ -3531,56 +3533,52 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5524.57 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 5536.33 · 2 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794364852-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794375992-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794381896-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794398755-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794400923-b": "none of XRPUSD found at the broker"
+   "xrp-replica-1794375992-b": "none of XRPUSD found at the broker"
   },
   "wait": {
-   "sol-replica-1794406803-s": {
-    "why": "daily loss stop (44.8% down today)",
-    "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
-   },
-   "btc-replica-1794407102-s": {
-    "why": "daily loss stop (44.8% down today)",
-    "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
-   },
    "usdcad-replica-1794409166-s": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
    },
    "eurusd-replica-1794409826-b": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
    },
    "gbpusd-replica-1794409826-b": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
    },
    "audusd-replica-1794409826-b": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
    },
    "usdcad-replica-1794409920-s": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
    },
    "usdchf-replica-1794410120-s": {
-    "why": "daily loss stop (44.8% down today)",
+    "why": "daily loss stop (44.7% down today)",
     "n": 0,
-    "at": "2026-11-11T15:35:10.000Z"
+    "at": "2026-11-11T15:37:18.000Z"
+   },
+   "btc-replica-1794411328-b": {
+    "why": "daily loss stop (44.7% down today)",
+    "n": 0,
+    "at": "2026-11-11T15:37:18.000Z"
+   },
+   "sol-replica-1794411328-b": {
+    "why": "daily loss stop (44.7% down today)",
+    "n": 0,
+    "at": "2026-11-11T15:37:18.000Z"
    }
   },
   "paused": {},
@@ -3588,8 +3586,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5524.57,
-  "lastRun": "2026-11-11T15:35:10.000Z"
+  "balance": 5536.33,
+  "lastRun": "2026-11-11T15:37:18.000Z"
  },
  "log": [
   {
@@ -4999,6 +4997,51 @@
    "at": "2026-11-11T15:35:10.000Z",
    "msg": "ETHUSD position 48356103 closed at the broker",
    "trade": "eth-replica-1794385823-s"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "BTCUSD position 48181678 closed at the broker",
+   "trade": "btc-replica-1794333363-b"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet usdcad-replica-1794409166-s: daily loss stop (44.7% down today) (will retry)",
+   "trade": "usdcad-replica-1794409166-s"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet eurusd-replica-1794409826-b: daily loss stop (44.7% down today) (will retry)",
+   "trade": "eurusd-replica-1794409826-b"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet gbpusd-replica-1794409826-b: daily loss stop (44.7% down today) (will retry)",
+   "trade": "gbpusd-replica-1794409826-b"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet audusd-replica-1794409826-b: daily loss stop (44.7% down today) (will retry)",
+   "trade": "audusd-replica-1794409826-b"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet usdcad-replica-1794409920-s: daily loss stop (44.7% down today) (will retry)",
+   "trade": "usdcad-replica-1794409920-s"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet usdchf-replica-1794410120-s: daily loss stop (44.7% down today) (will retry)",
+   "trade": "usdchf-replica-1794410120-s"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet btc-replica-1794411328-b: daily loss stop (44.7% down today) (will retry)",
+   "trade": "btc-replica-1794411328-b"
+  },
+  {
+   "at": "2026-11-11T15:36:33.000Z",
+   "msg": "not mirrored yet sol-replica-1794411328-b: daily loss stop (44.7% down today) (will retry)",
+   "trade": "sol-replica-1794411328-b"
   }
  ],
  "limits": {
