@@ -68,7 +68,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
-- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
+- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
@@ -202,9 +202,9 @@ size, stop or exit of any system changed; nothing of ICT was touched.
   the live files changed none). Gold longs only: shorts credited nothing, no other market charged (no rate measured). "What to
   expect": `research/edge/expectations/build.mjs` charges the four long-only gold systems' study positions (expect-base `fin`,
   `financing`; gtrend +0.489 → +0.398, geg +0.186 → +0.141, gtl +0.048 → +0.013, gtrend5 +0.372 → +0.289, equal to
-  `research/edge/trend-breadth/result.json` `partA`, tested); replica / Mosha / gmp carry `fin: null` (their records have no
-  per-position risk). Not done: `council/decay-base.json` (the monitor's backtest baselines) and the engine's 30-day replay
-  (`council/backtest.mjs`) carry no financing; today's rate is used for every past year. Never change `FIN` without a source.
+  `research/edge/trend-breadth/result.json` `partA`, tested). The replica, Mosha BO, the momentum pullback, the decay baselines,
+  the council replay rows and the engine's 30-day replay were done the same evening: next section. Today's rate is used for
+  every past year. Never change `FIN` without a source.
 - **3. `replica-mirror-gold-only` → `config.mirrorReplica = { markets: ['xau'], since, until: { n: 200, grossR: 0, text } }`.**
   `ctrader-mirror.mjs` `replicaMarkets(cfg)` / `replicaCandidates(research, own, markets)`: a replica research trade of a market
   outside the list gets `noCopy: true` and the one place that opens anything (`fresh`) skips it. **It stays in the trade list on
@@ -217,6 +217,60 @@ size, stop or exit of any system changed; nothing of ICT was touched.
   `tests/trend-breadth.test.mjs` (the Trader and fills.mjs may now NAME the study as the rate's source; none imports it).
 - Open for the owner: item 41 (a 10-lot gold buy on the Replica demo account, 11 Nov 13:37 UTC, not placed by the mirror: reset
   the account before reading its record).
+
+## Financing, the rest: baselines, replay rows, the engine replay, the page between two readings (11 Nov 2026)
+The loose ends of the section above, inside the same approval (the approved cost model made the same everywhere). No entry
+rule, filter, size, stop or exit changed; no stored trade or cost was rewritten; nothing of ICT was touched.
+- **One rule for a backtest row**: a gold BUY pays `nights(entry, exit) x FIN.xau.long x entry price / initial risk`, first unit
+  only; a sell pays nothing and is credited nothing; no other market is charged. Three helpers in `council/fills.mjs`, all on
+  `financing()`: `rowFinancing(x)` (a replay / study row with no stamped cost; risk = `r0`, else the first stop `stop0`, else
+  `stop`; a row with `costR` / `Rnet` gets 0, so a closed forward trade is never recosted) and `replayFin(tr, v)` (one engine
+  replay trade, for one exit variant).
+- **Decay baselines** (`council/decay-base.json`, `research/edge/decay-monitor/run.mjs`; `financing` block, per system `fin`
+  `{ perTrade, nights, charged, before }`). Before → after, R a trade: Gold trend +1.640 → +1.504 (0.136R a position, 22.8
+  nights), Gold trend fast +1.064 → +0.940, daily engulf +0.198 → +0.139, H4 trendline +0.106 → +0.068, momentum pullback
+  +0.043 → +0.032, Mosha BO −0.064 → −0.093, replica +0.877 → +0.865; NQ, ICT, crypto unchanged. Drawdown limits a little
+  wider (Gold trend 6.88R → 7.47R, daily engulf 22.28R → 25.49R). **No decay status changed** on council-data of 11 Nov.
+  - The rebuild records (`research/edge/robustness/out/*.json`) hold t / R / gross / side only. **Never edit
+    `research/edge/robustness/systems.mjs` or `lib.mjs` for a reason like this: their bytes are the Academy's version of the
+    momentum pullback edge** (`academy/edges.mjs` `ruleSource`; a changed byte means regenerating Academy data).
+    `research/edge/decay-monitor/positions.mjs` instead loads that file's own functions (the text above its main part, the shared
+    `simTrade` wrapped), runs them, refuses to write unless every position equals the committed record, and writes
+    `positions.json` (`[t, o, c, e, r0, side]` per position, row for row with the record). Candles: `research/candles/xau-histdata`
+    from `origin/council-data` (`git show`, no network) + the Mosha event cache (`systems.mjs mosha` once, about 2 minutes).
+  - The council replay rows (`research/replay-2w.json`) are read through `decay.mjs` `replayNet` (= `merNet` less
+    `rowFinancing` x size) in `recordOf` AND in the baseline build, so a record and its baseline are costed alike. Forward
+    trades keep `merNet`. coach.json `decay.financing` says a reading's baselines carry the charge.
+- **"What to expect"**: the replica (−0.052 → −0.057R on 2017-22, t −0.19), Mosha BO (+0.137 → +0.121R on 2006-17, t 0.48) and
+  the momentum pullback (−0.043 → −0.052R on 2018-22, t −1.05) are charged too (their records do allow it: `mosha-oos`
+  positions carry side / times / r0, `replica-oos/positions.json` lines up with `sizing/inputs.json`, gmp from positions.json).
+  The four long-only gold systems are unchanged; every system's "backtest" block follows the new baselines.
+- **Engine replay** (`council/backtest.mjs`): a new LAST column `fin` (financing of the live exit `R_none`, in R; `null` for an
+  open row) and `backtest.json` `financing { rate, asOf, of, trades, R }`. **The `cost` column is still the spread alone**:
+  `trader.mjs`'s Coach statistics (which move live filters) subtract `cost` only, on purpose, so financing can never move a
+  live filter (a test pins that line). Readers that judge `R_none` take `fin` off: the scoreboard's 30-day rows, the
+  Analyst's Scalp table, `proposals.mjs` (proposals only). A fresh 90-day gold replay (13 Aug - 11 Nov 2026, OANDA, 776
+  live-style trades): R_none −69.99R, spread 31.18R, financing 3.73R on 77 buys held over a rollover; net −101.17R → −104.90R
+  (−0.130 → −0.135R a trade). The forex rows carry 0. The 8 Nov "pinned" 90-day file is not in the repository (the window
+  rolls with the clock), so this is a new run, not a re-cost of that one.
+- **Scoreboard system-replay rows** (`#ms-sb-js` `nightsOf` / `finOf`, a mirror of `fills.mjs` compared on 2,000 holds in the
+  test): a gold buy of `research/replay-2w.json` pays at the rate the Trader publishes in `snapshot.costs.financing.perNight`
+  (no rate in the page; no rate on file = nothing charged, and the row does not say "after financing"). On 11 Nov: Gold trend
+  +37.0R → +34.0R (t 2.49 → 2.36), Gold trend fast +66.8R → +62.6R, replica +186.0R → +183.4R, others under 0.5R; **no
+  verdict moved** (`r.v` unchanged for all 43 rows). `digest.mjs` hands the snapshot to the same function.
+- **Between two Coach readings** (`#ms-decay-js` `MS_BOOK_NOW(coach, config)`): coach.json `decay` / `expect` are rebuilt
+  every 6 hours, so after an owner's supported-book rule they said "8 live systems" for up to 6 hours. The page marks a
+  system listed in `config.ownerShadow` as shadow in its own copy (`bookLate`, display only, before the `ms:council` event)
+  and both cards add "This reading was made before your decision…". The financing clauses of the two footnotes
+  (`#ms-decay-fin`, `#ms-expect-fin`) follow the reading in hand (an older one says its figures are before financing).
+- **Wording**: the Academy's seven edges are "the seven Meridian systems that were live until 11 Nov 2026"
+  (`academy/edges.mjs` comment, `docs/academy/ARCHITECTURE.md`, `MERIDIAN-X.md`); no Academy logic, data or page file changed.
+- Not done, on purpose: `council/fidelity.mjs` and `research/portfolio.mjs` (research tools) still read `cost` only; the add
+  unit of a trend position is not charged in any backtest (the records do not carry its entry); the quoted worst drawdowns
+  of the gold systems (`gold-systems` RESULT.md) are before financing; `research/replay-2w.json` itself is not rewritten.
+- Tests: `tests/financing-rest.test.mjs` (11), `tests/expect.test.mjs` (`finCheck`). Changed on purpose:
+  `tests/backtest-oanda.test.mjs` (the last column), `tests/research-ledger.test.mjs` (the decay-monitor's build date),
+  `tests/supported-book.test.mjs` (the replica's `fin`, the footnote).
 
 ## Loss review (6 Nov 2026, owner request)
 
@@ -816,7 +870,7 @@ edge (cap 2 years; > 50 years = "cannot be proven"), the regime note, and the fo
 10 trades (`out`: above / below). Card `#ms-expect` (research pane, next to `#ms-decay`; `<style id="ms-ex-css">` + `<script id="ms-ex-js">`,
 phone blocks under 760 px); the daily digest (`expectLine` in `waiting()`) names a live system only when it leaves its band. Expectations
 only: never a rule, size or filter. Tests: `tests/expect.test.mjs` (maths against each study's result.json, digest, trader and page wiring).
-Since 11 Nov 2026 the four long-only gold systems' figures are after overnight financing and five systems are marked shadow (section "Supported book, financing").
+Since 11 Nov 2026 every gold buy in these figures is after overnight financing (the four long-only gold systems, and the buys of the replica, Mosha BO and the momentum pullback) and five systems are marked shadow (sections "Supported book, financing" and "Financing, the rest").
 Re-run the build after a study changes.
 
 ## Daily owner digest (8 Nov 2026, owner: one message instead of many alerts)

@@ -1,6 +1,7 @@
 // MeridianX Academy: the edge registry (docs/academy/ARCHITECTURE.md sections 2, 4 and 5).
 //
-// The seven edges are the seven live Meridian systems of council/decay.mjs SYSTEMS. This file only DESCRIBES them: every rule
+// The seven edges are seven Meridian systems of council/decay.mjs SYSTEMS (all live on paper until 11 Nov 2026; since then Gold
+// trend and the daily engulf are live and the other five are paper shadows). This file only DESCRIBES them: every rule
 // is read from the authoritative replay code named in `ruleSource`, and the candidates in academy/data/cand-<id>.json are
 // produced by running that code on the research candles (academy/gen/). Nothing here is imported by the council, and this
 // file imports nothing (it is safe to load from the API).
