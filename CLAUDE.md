@@ -411,6 +411,34 @@ prices = spot + the GC−spot basis from the ICT snapshot) and opens that contra
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
 
+## Home and Council reading pass (11 Nov 2026, quality round)
+Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
+the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
+- **Forward and replay are never one figure.** The Trades pane's "Live · our system" tiles said Closed 715, Win rate 42%, Total
+  +497.9R; 710 of those were backtest replay rows (research/replay-2w.json, +499.97R) and the forward paper record was 5 trades,
+  1 won, -2.05R. `fwdSplit(closed)` (main script, `window.MS_HC`) splits by `x.replay`: the tiles show the forward record
+  ("Closed, forward", win rate with "1 of 5", "Total, before costs") and one labelled line carries the replay ("Backtest replay,
+  not traded: n trades since <month>, % won, R"). The Home council tile says both apart too. Keep any new total on that split.
+- **Edge decay counts match the rows**: a live system with `few: true` is "too few to judge", not healthy, and a shadow system the
+  monitor calls decaying / on watch is named (`MS_DECAY_TALLY` in `#ms-decay-js`, `MS_WEEK.decayCount` for the week pane's chips).
+  The card said "8 healthy, 0 decaying" over a "Too few" row and a "Decaying" one.
+- **One way to write R** in the Home / Council templates: `rTxt(v, d = 2)` (sign, the minus glyph, two decimals; "—" when not a
+  number). The loss review, trade table, equity labels and the Home strip use it; `mnTxt` shows a hyphen-minus in council-written
+  text (the Analyst's report, rule history, the macro brief) as the minus glyph, leaving dates, ranges and arrows. A planned
+  reward:risk reads "target 2.00R", not "2R" like a result.
+- **Stamps**: `stampTxt(iso, everyH)` = day, time, zone name, and "Stale: …, N h old (written every 6 h)" past twice the cadence
+  (decay, what to expect, book weights); the trade table and loss review say whose clock their times use.
+- **`<style id="ms-hc-css">`** (after `#ms-desk-css`, scoped to `#v-home` / `#v-council`): no text under 12 px in these panes
+  (the Home session ring's hour ticks excepted), 44 px touch targets (Data chip, folded status line, checkbox labels, scoreboard
+  sort buttons and links), the Systems mirror row no longer stretched to 966 px by the broker table on a phone, report tables
+  with readable columns that scroll inside their box, long tags wrapping beside the R figure in Active trades, the Active list
+  holding its place while loading (layout shift 0.62 → 0 on a phone), and no dead Macro / This week tabs for a member without the
+  council permission. Add new Home / Council size fixes there, never a second block.
+- Tests: `tests/qa-sweep.test.mjs` ("Home and Council reading pass"), `tests/week-report.test.mjs` (`decayCount`).
+- Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); Home's week / month
+  figures are before costs while the week pane is after costs; the trade chart dialog still writes raw R ("Loss -1R"); the
+  replica track chart's axis uses a hyphen; "Journal · No trades yet" on Home while the council has trades (the owner's own journal).
+
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
 work, `/gold`, `/macro-desk`, `/backtest`, `/cdata`, `/md/*`, `/api/mcp/<key>` rewrites, no-cache on HTML). The first stage's

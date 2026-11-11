@@ -213,3 +213,89 @@ test('Mosha forms on a phone: a date-and-time field takes the whole row (half a 
   const css = /<style id="ms-mosha-css">([\s\S]*?)<\/style>/.exec(src('market-structure.html'))[1];
   assert.match(css, /@media \(max-width: 760px\) \{ #v-mosha \.mo-f:has\(input\[type="datetime-local"\]\), \.mo-lv-dlg \.mo-f:has\(input\[type="datetime-local"\]\) \{ grid-column: 1 \/ -1; \}/);
 });
+
+// ---- Home and Council reading pass (11 Nov 2026) ----
+const deskHtml = src('market-structure.html');
+// the small display helpers of the main script (window.MS_HC), lifted out by their own lines and run without a page
+const hc = (() => {
+  const mn = /^ {2}const mnTxt = .*$/m.exec(deskHtml), a = deskHtml.indexOf('  const rTxt = '), z = deskHtml.indexOf('window.MS_HC = {');
+  assert.ok(mn && a > 0 && z > a, 'the MS_HC helpers are in the main script');
+  const end = deskHtml.indexOf('\n', z), window = {};
+  new Function('window', `${mn[0]}\n${deskHtml.slice(a, end)}`)(window);
+  return window.MS_HC;
+})();
+
+test('Home / Council: one way to write R (sign, minus glyph, two decimals), never "-1R" beside "−1.05R"', () => {
+  assert.equal(hc.rTxt(-1), '−1.00R'); assert.equal(hc.rTxt(2), '+2.00R'); assert.equal(hc.rTxt(-1.05), '−1.05R');
+  assert.equal(hc.rTxt(0), '0.00R'); assert.equal(hc.rTxt(-0.001), '0.00R', 'no "−0.00R"'); assert.equal(hc.rTxt(-276, 1), '−276.0R');
+  assert.equal(hc.rTxt(undefined), '—'); assert.equal(hc.rTxt(NaN), '—');
+  // the templates that wrote raw numbers use it now
+  assert.match(deskHtml, /\(x\.status === 'win' \|\| x\.status === 'loss' \|\| x\.status === 'be'\) \? ` \$\{rTxt\(x\.R\)\}` : ''\}\$\{liveR\(x\)\}/, 'the trade table wrote "-1R" / "+2R"');
+  assert.doesNotMatch(deskHtml, /\$\{x\.R != null \? x\.R : -1\}R<\/b>/, 'the loss review wrote "-1R"');
+  assert.doesNotMatch(deskHtml, /<b class="neg">\$\{R\.toFixed\(1\)\}R<\/b> · reviewed/, 'the loss review group total had a hyphen');
+  assert.match(deskHtml, /Drawdown · worst <b>\$\{rTxt\(worst\)\}<\/b>/);
+});
+
+test('council-written text: a hyphen used as a minus sign is shown as the minus glyph; dates, ranges and arrows stay', () => {
+  assert.equal(hc.mnTxt('-0.46R each over 135, the excluded side -0.37R (t -3.4)'), '−0.46R each over 135, the excluded side −0.37R (t −3.4)');
+  assert.equal(hc.mnTxt('2026-11-07: 2004-26, entry 3983.29 -> 3971.36, 11-10 16:12'), '2026-11-07: 2004-26, entry 3983.29 -> 3971.36, 11-10 16:12');
+  assert.equal(hc.mnTxt('- a bullet'), '- a bullet'); assert.equal(hc.mnTxt('z -.85'), 'z −.85');
+});
+
+test('Trades pane and Home tile: forward paper trades and the backtest replay are counted apart (was "Closed 715 · Total +497.9R" under Live)', () => {
+  const closed = [{ status: 'win', R: 2, opened: 300 }, { status: 'loss', R: -1, opened: 200 }, { status: 'loss', R: -1.05, opened: 400 },
+    { status: 'win', R: 1.39, replay: true, opened: 50 }, { status: 'loss', R: -1, replay: true, opened: 10 }, { status: 'win', R: 3, replay: true, opened: 20 }];
+  const S = hc.fwdSplit(closed);
+  assert.deepEqual([S.fwd.n, S.fwd.w, +S.fwd.R.toFixed(2)], [3, 1, -0.05]);
+  assert.deepEqual([S.rp.n, S.rp.w, +S.rp.R.toFixed(2), S.rp.from], [3, 2, 3.39, 10]);
+  assert.deepEqual(hc.fwdSplit([]).fwd, { n: 0, w: 0, R: 0, from: null });
+  assert.match(deskHtml, /Backtest replay, not traded:/); assert.match(deskHtml, /kp\('Closed, forward', SP\.fwd\)/);
+  assert.doesNotMatch(deskHtml, /our system, \$\{cl\.length\} trades \(live \+ replay\)/, 'the Home tile summed forward and replay into one figure');
+  assert.match(deskHtml, /forward paper trade\$\{sp\.fwd\.n === 1 \? '' : 's'\}\$\{sp\.rp\.n \? ` · backtest replay /);
+  assert.doesNotMatch(deskHtml, /live: 'Paper trades our system placed:/, 'the Live tab note called replay rows placed trades');
+});
+
+test('Council "as of" stamps name the time zone and say "Stale" in words past twice the writer\'s cadence', () => {
+  const now = Date.parse('2026-11-11T14:00:00Z');
+  const fresh = hc.stampTxt('2026-11-11T12:01:25Z', 6, now), old = hc.stampTxt('2026-11-10T20:00:00Z', 6, now), days = hc.stampTxt('2026-11-07T12:00:00Z', 6, now);
+  assert.doesNotMatch(fresh, /Stale/); assert.match(fresh, /11 Nov/); assert.match(fresh, /\d\d:\d\d \S+$/, 'a zone name ends the stamp');
+  assert.match(old, /^Stale: 10 Nov.*, 18 h old \(written every 6 h\)$/); assert.match(days, /^Stale: .*4 days old/);
+  assert.equal(hc.stampTxt('not a date', 6, now), '');
+  for (const id of ['ms-decay-js', 'ms-ex-js', 'ms-book-js']) assert.match(new RegExp(`<script id="${id}">([\\s\\S]*?)</script>`).exec(deskHtml)[1], /MS_HC\.stampTxt\((D|B)\.at, 6\)/, id);
+  assert.match(deskHtml, /id="ms-c-tz"/, 'the trade table says whose clock its times use');
+});
+
+test('Edge decay card: the sentence counts what the rows show ("too few" is not healthy, a flagged shadow system is named)', () => {
+  const js = /<script id="ms-decay-js">([\s\S]*?)<\/script>/.exec(deskHtml)[1], W = {};
+  new Function('window', 'document', 'setTimeout', js)(W, { getElementById: () => null, addEventListener() {} }, (f) => f());
+  const S = [{ id: 'replica', name: 'Gold replica', live: true, status: 'healthy' }, { id: 'mosha-bo', name: 'Mosha BO', live: true, status: 'healthy', few: true },
+    { id: 'gtl', name: 'Gold H4 trendline', live: true, status: 'watch' }, { id: 'geg', name: 'Gold daily engulf', live: true, status: 'decaying' },
+    { id: 'trend', name: 'Crypto trend', live: false, status: 'decaying' }, { id: 'gtrend5', name: 'Gold trend fast', live: false, status: 'healthy' }];
+  const T = W.MS_DECAY_TALLY(S), ids = (a) => a.map((s) => s.id);
+  assert.equal(T.live.length, 4); assert.deepEqual(ids(T.healthy), ['replica']); assert.deepEqual(ids(T.few), ['mosha-bo']);
+  assert.deepEqual(ids(T.watch), ['gtl']); assert.deepEqual(ids(T.decaying), ['geg']); assert.deepEqual(ids(T.shadowFlag), ['trend']);
+  assert.equal(T.healthy.length + T.few.length + T.watch.length + T.decaying.length, T.live.length, 'every live system is counted once');
+  assert.doesNotMatch(js, /live\.length - dec\.length - wat\.length\) \+ ' healthy/, 'healthy was "everything else"');
+});
+
+test('Home / Council reading pass: text at 12 px, touch targets, and the cards that were cut on a phone (#ms-hc-css)', () => {
+  const css = /<style id="ms-hc-css">([\s\S]*?)<\/style>/.exec(deskHtml)[1];
+  assert.ok(deskHtml.indexOf('id="ms-hc-css"') > deskHtml.indexOf('id="ms-desk-css"'), 'after the blocks it corrects');
+  // every size the block sets is 12 px or more, and it only speaks about the Home and Council views
+  for (const m of css.matchAll(/font(?:-size)?:[^;}]*?(\d+(?:\.\d+)?)px/g)) assert.ok(+m[1] >= 12, m[0]);
+  for (const sel of css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@media[^{]*\{/g, '').split('}').map((r) => r.split('{')[0].trim()).filter(Boolean))
+    for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one.trim(), /^(html\[data-deny~="council"\] )?(#v-home|#v-council|#ms-cp-macro)\b/, `scoped: ${one.trim().slice(0, 60)}`);
+  assert.match(css, /html\[data-deny~="council"\] #v-council :is\(#ms-cn-macro, #ms-cn-week\) \{ display: none; \}/, 'no dead Macro / This week tabs for a member with the Overview only');
+  // Systems on a phone: the broker table no longer stretches the mirror row (its log lines ended at 966 px)
+  assert.match(css, /#v-council \.c-sleeve \.sl-row \{ grid-template-columns: minmax\(0, 1fr\); \}/); assert.match(css, /\.c-sleeve \.sl-row > \* \{ min-width: 0; \}/);
+  // report tables scroll with readable columns; the Active list holds its place while loading; long tags wrap beside the R figure
+  assert.match(css, /@media \(max-width: 760px\) \{\s*#v-council \.c-md-tw table \{ min-width: max-content; \}/);
+  assert.match(css, /#v-council #ms-active:empty \{ min-height: 80vh; \}/);
+  assert.match(css, /#v-council \.c-act li \{ grid-template-columns: auto minmax\(0, 1fr\) auto; \}/);
+  // 44 px: the Data chip, the folded status line, the checkbox labels, the scoreboard's sort buttons and links
+  const touch = /@media \(hover: none\), \(pointer: coarse\), \(max-width: 760px\) \{([\s\S]*?)\n\}/.exec(css)[1];
+  for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '.md-full { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
+  // a planned reward:risk is not written like a result
+  assert.match(deskHtml, /<span title="Planned reward for 1R of risk, not a result">target \$\{\(\+t\.rr\)\.toFixed\(2\)\}R<\/span>/);
+  assert.match(deskHtml, /deepest drawdown, day to day: live /); assert.doesNotMatch(deskHtml, /max drawdown ' \+ esc\(num\(B\.live\.dd\)/);
+});
