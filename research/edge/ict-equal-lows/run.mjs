@@ -141,7 +141,7 @@ async function full() {
   const T1 = rows[0];
   const result = {
     topic: 'ict-equal-lows', built: '2026-11-11',
-    system: 'ICT desk A-setups (H1 iFVG reversal) split by what the sweep took: a pool of relative equal lows / highs vs one swing. Lab engine api/_ictlab.js runMarket (the desk\'s signals / isASetup / sizeOf / simulate) on OANDA mid H1: NAS100, SPX500, US30, US2000, XAU',
+    system: 'ICT desk A-setups (H1 iFVG reversal) split by what the sweep took: a pool of relative equal lows / highs vs a single low / high. Lab engine api/_ictlab.js runMarket (the desk\'s signals / isASetup / sizeOf / simulate) on OANDA mid H1: NAS100, SPX500, US30, US2000, XAU',
     preregistered: 'PREREGISTRATION.md (committed and pushed before the full stage ran)', planSha256: sha,
     window: { from: day(FROM), to: day(TO - 1), is: `${day(FROM)} to ${day(OOS - 1)}`, oos: `${day(OOS)} to ${day(TO - 1)}`, candlesTo: day(END - 1) },
     definition: { ...EQ, text: 'the sweep candle trades through two or more confirmed, untouched H1 swing lows (3 candles each side, last 96 H1 candles, at least 4 candles apart) whose lows are within 0.1 x the daily ATR(14) of each other; sells mirror' },
