@@ -2787,7 +2787,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T06:47:10.000Z",
     "councilEntry": 73584.6,
     "stop": 73879.28,
@@ -2801,10 +2801,12 @@
     "slipR": -0.006,
     "lagSec": 68,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T06:47:10.000Z",
-    "brokerStop": 73881.19
+    "brokerStop": 73881.19,
+    "closedAt": "2026-11-11T07:26:01.000Z"
    },
    "xau-replica-1794379804-b": {
     "positionId": "48334106",
@@ -3022,6 +3024,59 @@
     ],
     "stopCheckedAt": "2026-11-11T07:23:29.000Z",
     "brokerStop": 2052.59
+   },
+   "sol-replica-1794381896-b": {
+    "positionId": "48343314",
+    "symbol": "SOLUSD",
+    "side": "buy",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T07:26:01.000Z",
+    "councilEntry": 82.94,
+    "stop": 82.148,
+    "t1": 84.525,
+    "riskCash": 7.92,
+    "margin": 82.41,
+    "minLot": true,
+    "mark": 82.94,
+    "levelsFrom": "mark",
+    "fillPrice": 82.918,
+    "slipR": -0.028,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T07:26:01.000Z",
+    "brokerStop": 82.126
+   },
+   "usdchf-replica-1794381896-b": {
+    "positionId": "48343327",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T07:26:01.000Z",
+    "councilEntry": 0.8268,
+    "stop": 0.826207,
+    "t1": 0.827985,
+    "riskCash": 1.99,
+    "margin": 4,
+    "mark": 0.8268,
+    "levelsFrom": "mark",
+    "fillPrice": 0.82689,
+    "slipR": 0.152,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T07:26:01.000Z",
+    "brokerStop": 0.8263
    }
   },
   "day": {
@@ -3029,14 +3084,15 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9965.31 · 17 open",
+  "status": "ok · demo Fusion Markets · balance 9962.28 · 18 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794364852-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794370912-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794375992-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794380725-s": "none of XRPUSD found at the broker"
+   "xrp-replica-1794380725-s": "none of XRPUSD found at the broker",
+   "xrp-replica-1794381896-b": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -3044,8 +3100,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9965.31,
-  "lastRun": "2026-11-11T07:23:29.000Z"
+  "balance": 9962.28,
+  "lastRun": "2026-11-11T07:26:01.000Z"
  },
  "log": [
   {
@@ -4150,6 +4206,26 @@
    "at": "2026-11-11T07:23:29.000Z",
    "msg": "opened buy ETHUSD 0.17 lot (council replica)",
    "trade": "eth-replica-1794381743-b"
+  },
+  {
+   "at": "2026-11-11T07:26:01.000Z",
+   "msg": "BTCUSD position 48333326 closed at the broker",
+   "trade": "btc-replica-1794379562-s"
+  },
+  {
+   "at": "2026-11-11T07:26:01.000Z",
+   "msg": "opened buy SOLUSD 0.01 lot (council replica)",
+   "trade": "sol-replica-1794381896-b"
+  },
+  {
+   "at": "2026-11-11T07:26:01.000Z",
+   "msg": "not mirrored xrp-replica-1794381896-b: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794381896-b"
+  },
+  {
+   "at": "2026-11-11T07:26:01.000Z",
+   "msg": "opened buy USDCHF 0.02 lot (council replica)",
+   "trade": "usdchf-replica-1794381896-b"
   }
  ],
  "limits": {
@@ -4228,15 +4304,15 @@
   ]
  },
  "execution": {
-  "n": 105,
-  "meanSlipR": 0.083,
+  "n": 107,
+  "meanSlipR": 0.082,
   "medianSlipR": 0.03,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
    "SOLUSD": {
-    "n": 15,
-    "meanSlipR": 0.154
+    "n": 16,
+    "meanSlipR": 0.143
    },
    "ETHUSD": {
     "n": 11,
@@ -4263,8 +4339,8 @@
     "meanSlipR": 0.065
    },
    "USDCHF": {
-    "n": 9,
-    "meanSlipR": 0.121
+    "n": 10,
+    "meanSlipR": 0.124
    },
    "EURUSD": {
     "n": 10,
