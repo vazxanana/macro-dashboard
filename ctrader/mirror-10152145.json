@@ -8671,7 +8671,8 @@
     "t1": 0.83459,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.83337,
@@ -8685,9 +8686,10 @@
     "lagSec": 62,
     "positionId": "48554363",
     "volume": 200000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T21:08:20.000Z",
-    "brokerStop": 0.83276
+    "brokerStop": 0.83276,
+    "closedAt": "2026-11-11T22:06:29.000Z"
    },
    "usdchf-scalp-1794431147": {
     "symbol": "USDCHF",
@@ -8699,7 +8701,8 @@
     "t1": 0.83376,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.83318,
@@ -8713,7 +8716,8 @@
     "lagSec": 1035,
     "positionId": "48554244",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T22:06:29.000Z"
    }
   },
   "day": {
@@ -8721,7 +8725,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9848.4 · 29 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9843.05 · 27 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8754,20 +8758,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9848.4,
-  "lastRun": "2026-11-11T22:03:53.000Z"
+  "balance": 9843.05,
+  "lastRun": "2026-11-11T22:06:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T19:51:27.000Z",
-   "msg": "AUDUSD position 48205744 closed at the broker",
-   "trade": "audusd-rscalp-1794339525"
-  },
-  {
-   "at": "2026-11-10T20:03:03.000Z",
-   "msg": "placed sell limit GBPUSD 0.03 lot at 1.33455 (council scalp, valid to 2026-11-10T23:01Z)",
-   "trade": "gbpusd-scalp-1794340917"
-  },
   {
    "at": "2026-11-10T20:20:06.000Z",
    "msg": "limit filled: GBPUSD position 48211400 at the broker",
@@ -10257,6 +10251,16 @@
    "at": "2026-11-11T22:02:55.000Z",
    "msg": "GBPUSD position 48463397 closed at the broker",
    "trade": "gbpusd-rscalp-1794409528"
+  },
+  {
+   "at": "2026-11-11T22:06:29.000Z",
+   "msg": "USDCHF position 48554363 closed at the broker",
+   "trade": "usdchf-intraday-1794431238"
+  },
+  {
+   "at": "2026-11-11T22:06:29.000Z",
+   "msg": "USDCHF position 48554244 closed at the broker",
+   "trade": "usdchf-scalp-1794431147"
   }
  ],
  "limits": {
