@@ -4,6 +4,7 @@
 // opens the Desk's inner views, see INNER); and no visible
 // element runs an endless animation of a custom property or box-shadow (the header ring rule, CLAUDE.md "Desk smoothness").
 // On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways).
+// The ICT desk draws no text under 12 px.
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -73,6 +74,8 @@ async function wire(ctx, account, seen) {
         // a view wider than the phone is cut off on the right without any sideways scroll (the app clips it), so the width check
         // below cannot see it: the six-desk switch once made every desk view 10 px too wide (QA sweep, 11 Nov)
         if (viewport.width < 500) { const cut = await p.evaluate(() => [...document.querySelectorAll('#ms-live > section')].filter((e) => e.getClientRects().length).flatMap((e) => [e, ...e.children]).filter((e) => e.getClientRects().length && e.getBoundingClientRect().right > innerWidth + 1).map((e) => `${e.id ? '#' + e.id : e.tagName.toLowerCase() + '.' + String(e.className).trim().split(/\s+/)[0]} ends at ${Math.round(e.getBoundingClientRect().right)} px`)).catch(() => []); if (cut.length) errs.push(`view cut off on the right: ${[...new Set(cut)].slice(0, 3).join(', ')}`); }
+        // the ICT desk's typography pass (11 Nov): no drawn text under 12 px on the desk (labels, chips and the calendar were 9.5-11.5 px)
+        if (h === '#ict') { await p.waitForTimeout(1500); const tiny = await p.evaluate(() => { const root = document.getElementById('v-ict'), out = new Set(); if (!root || root.hidden) return []; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode())) { const el = t.parentElement; if (!t.nodeValue.trim() || !el.getClientRects().length || el.closest('svg, canvas, option')) continue; const fs = parseFloat(getComputedStyle(el).fontSize); if (fs < 11.95) out.add(`${fs}px "${t.nodeValue.trim().slice(0, 16)}"`); } return [...out]; }).catch(() => []); if (tiny.length) errs.push(`ICT desk text under 12 px: ${tiny.slice(0, 4).join(', ')}`); }
         for (let i = n; i < errs.length; i++) errs[i] = `${h}: ${errs[i]}`;
       }
       // scroll to the bottom and back so lazy sections render before the width check

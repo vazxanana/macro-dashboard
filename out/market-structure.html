@@ -36,12 +36,12 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
-<script src="/assets/ms-dialog.js?v=9d6241afda"></script>
+<script src="/assets/ms-dialog.js?v=651ff2e1e5"></script>
 <script src="/assets/mosha-desk.js?v=91e47cc8b8" defer></script>
 <script src="/assets/mosha-replay.js?v=73eb02ea24" defer></script>
 <script src="/assets/mosha-i18n.js?v=f5c6ba46fd" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
-<script src="/assets/mosha-teach.js?v=54afc07ca9" defer></script>
+<script src="/assets/mosha-teach.js?v=3e36043133" defer></script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
   :root {
@@ -51,9 +51,11 @@
     --mono: Figtree, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color-scheme: dark;
   }
+  /* Light tokens, 11 Nov 2026 (QA sweep): --buy / --sell / --ink-faint / --accent were 4.46-4.50:1 as text on the white panel, under AA
+     by a hair on 270 texts across the Desk. One step darker each; measured on every view at 390 and 1440 px: nothing got worse. */
   :root[data-theme="light"] {
     --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #c9d0db;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #6b7280; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.10); --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #666d7a; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.10); --buy: #067a64; --sell: #c8243f; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
@@ -2646,6 +2648,11 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   #v-ict .ict-t td:nth-child(8)::before { content: "Entry "; font-family: var(--sans); color: var(--ink-faint); }
   #v-ict .ict-t td:nth-child(11) { grid-area: rs; text-align: right; font-weight: 600; }
   #v-ict .ict-t td:nth-child(12) { grid-area: rv; }
+  /* a signal with two executions (11 Nov): its chips were cut off at the right edge of the phone row, over the result. The result
+     and the two chips take a row of their own, side by side, each wrapping inside itself. */
+  #v-ict .ict-t tr:has(.ict-ex) { grid-template-areas: "mk sd gr gr" "tm tm se en" "rs rs rs rs" "rv rv rv rv"; }
+  #v-ict .ict-t tr:has(.ict-ex) td:nth-child(11) { text-align: left; white-space: normal; }
+  #v-ict .ict-t .ict-ex { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 6px; } #v-ict .ict-t .ict-ex-b { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.3; font-weight: 500; }
   #v-ict .ict-t td:nth-child(11) .ict-pill, #v-ict .ict-t td:nth-child(11) small { display: none; }
   #v-ict .ict-t tr.rp td:nth-child(1)::after { content: " · replay"; }
   #v-ict .ict-t td:nth-child(12):has(> .ms-note), #v-ict .ict-t td:nth-child(6), #v-ict .ict-t td:nth-child(7), #v-ict .ict-t td:nth-child(9), #v-ict .ict-t td:nth-child(10) { display: none; }
@@ -2668,6 +2675,13 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 }
 @media (pointer: coarse) { #v-ict .ict-rv input, #v-ict .ict-rv textarea { font-size: 16px; } }   /* no zoom-in on focus on an iPhone */
 #v-ict .ict-kpi small { font-size: 12px; }   /* the win-rate line (won · lost · flat · near-flat) and its neighbours were 11.5 px */
+/* ICT typography pass (11 Nov 2026): no text under 12 px on the desk or in the signal dialog (the dialog sits inside #v-ict).
+   tests/qa-sweep.test.mjs reads every font size the ICT rules set; scripts/audit/smoke.cjs measures the drawn desk. */
+#v-ict .ms-chip, #v-ict .ict-a, #v-ict .ict-g, #v-ict .ict-pill, #v-ict .ict-tag, #v-ict .ict-few, #v-ict .ict-trk-l span, #v-ict .ict-lv dt, #v-ict .ict-lv dd small, #v-ict dl dt, #v-ict dl dd small,
+#v-ict .ict-m .k small, #v-ict #ict-eq-d, #v-ict .ict-t td small, #v-ict .ict-mine-k span, #v-ict .ict-cal-h, #v-ict .ict-cal-d .d, #v-ict .ict-cal-d small,
+#v-ict .ict-tv-ck li.h, #v-ict #ict-tv-ck li.h, #v-ict .ict-tags button, #v-ict #ict-rv-tags button { font-size: 12px; }
+:root[data-theme="light"] #v-ict .ms-chip-buy { color: #05604f; } :root[data-theme="light"] #v-ict .ms-chip-sell { color: #a91c33; }   /* AA on their own tint over the open-now card (buy was 4.3:1) */
+@media (max-width: 600px) { #v-ict .ict-cal-d { padding: 4px 2px; } #v-ict .ict-cal-d b { font: 600 12px var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -.02em; white-space: nowrap; } }
 @media (prefers-reduced-motion: reduce) { #v-ict *, #v-ict *::before, #v-ict *::after { transition: none !important; animation: none !important; } #v-ict .ict-cal-d:hover, #v-ict .ict-m:hover { transform: none !important; } }
 html[data-motion="off"] #v-ict *, html[data-motion="off"] #v-ict *::before, html[data-motion="off"] #v-ict *::after { transition: none !important; animation: none !important; }
 html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
@@ -2752,7 +2766,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 .own-dlg .own-err { color: var(--sell); min-height: 1.2em; margin: 8px 0 10px; }
 .own-acts { display: flex; justify-content: flex-end; gap: 8px; }
 .own-acts button { height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
-.own-acts button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+.own-acts button.pri { background: #2a62f0; border-color: #2a62f0; color: #fff; }   /* fixed, as in assets/ms-dialog.js: white on --accent was 3.2:1 dark, 4.50 light */
 .hdr-spr { margin-left: 10px; font: 500 11px var(--mono, ui-monospace, monospace); color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .hdr-spr[hidden] { display: none; }
 @media (max-width: 900px) { .hdr-spr { display: none; } }
@@ -2815,7 +2829,7 @@ html[data-mk="ict"] .mk-mode button[data-mk="ict"].on { background: color-mix(in
 html[data-mk="clean"] .mk-mode button[data-mk="clean"].on { background: color-mix(in srgb, var(--ink) 10%, var(--panel)); border-color: var(--ink-dim); color: var(--ink); }
 html[data-mk="clean"] .ict-strip { display: none; }
 .ict-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, #9c27b0 40%, var(--line)); background: color-mix(in srgb, #9c27b0 7%, var(--panel)); font-size: 12.5px; color: var(--ink-dim); }
-.ict-strip[hidden] { display: none; } .ict-strip b { color: var(--ink); } .ict-strip .ict-k { flex-basis: 100%; font-size: 11.5px; }
+.ict-strip[hidden] { display: none; } .ict-strip b { color: var(--ink); } .ict-strip .ict-k { flex-basis: 100%; font-size: 12px; }
 .ict-sg { color: var(--ink); text-decoration: none; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; } .ict-sg.up { color: var(--buy); } .ict-sg.dn { color: var(--sell); }
 .ms-live.app:has(> #v-charts:not([hidden])) { max-width: none; }
 .ms-grid4[data-view]:not([data-view="all"]) .ms-chart { height: max(420px, calc(100vh - 330px)); }
@@ -2884,6 +2898,7 @@ html[data-mk="clean"] .ict-strip { display: none; }
   .tv-h h3 { font-size: 15px; line-height: 1.35; }
   .tv-h p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
   .tv-h p.open { display: block; }
+  .tv-h p.ict-thru { display: block; overflow: visible; cursor: auto; }   /* never cut: it says which candles this replay result does NOT cover (was clamped to three lines on phones) */
   .tv-tf { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; }
   .tv-tk { margin: 8px 12px 12px; }
 }
@@ -2965,7 +2980,7 @@ html[data-mk="clean"] .ict-strip { display: none; }
 @media (max-width: 480px) { .pa-f { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pa-dlg[open] { animation: none; } }
 .ch-cd { position: absolute; top: 0; right: 0; z-index: 4; pointer-events: none; height: 16px; display: flex; align-items: center; justify-content: center; font: 600 10.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: #fff; background: var(--sell); border-radius: 0 0 3px 3px; opacity: .92; }
-.ch-cd.up { background: var(--buy); color: #04140f; }
+.ch-cd.up { background: var(--buy); color: #04140f; } :root[data-theme="light"] .ch-cd.up { color: #fff; }   /* the light theme's green is dark enough for white (11 Nov) */
 .ms-ph .ms-cd { display: none; }   /* the countdown now sits on the price scale */
 /* TradingView-style type everywhere (7 Nov, owner): Figtree (free, near the TradingView face), tabular figures for prices; code keeps a monospace */
 html, body, button, input, select, textarea { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -3554,6 +3569,9 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-mosha .mo-t td { vertical-align: top; white-space: normal; } #v-mosha .mo-t td small { display: block; color: var(--ink-faint); font-size: 12px; margin-top: 2px; } #v-mosha .mo-tags { min-width: 180px; max-width: 420px; }
 #v-mosha .mo-acts { white-space: nowrap; text-align: right; } #v-mosha .mo-acts .ms-tbtn { margin: 0 0 0 4px; } #v-mosha .mo-acts .mo-go { border-color: var(--gold-line, #c98f12); color: var(--mo-gold); font-weight: 600; } #v-mosha .mo-when { white-space: nowrap; } #v-mosha .mo-check { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: var(--well, color-mix(in srgb, var(--ink) 6%, transparent)); font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
 /* who is looking: the owner (the log is theirs), a teacher (the lessons come first on their page), a reader */
+/* Who teaches whom (11 Nov): the teacher never has the five studies' figures or the desk's own summary of "the cycle" put to him as
+   his method. The owner and readers keep both cards; what the desk thinks it knows is in the book, marked unconfirmed, for him to judge. */
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-rules, html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-cycle { display: none; }
 html:not([data-role="owner"]) #v-mosha .mo-own, html[data-role="owner"] #v-mosha .mo-tch, html:not([data-mosha="teach"]) #v-mosha .mo-tch, html[data-role="owner"] #v-mosha .mo-rdr, html[data-mosha="teach"] #v-mosha .mo-rdr { display: none; }
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-todo { order: -4; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-teach { order: -3; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lessons { order: -2; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-book { order: -1; }
 #v-mosha .mo-tc-lv { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 10px; padding: 0 14px; } #v-mosha .mo-tc-lv > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font: 600 13px var(--sans); color: var(--ink-dim); } #v-mosha .mo-tc-lv > summary small { font-weight: 500; color: var(--ink-faint); } #v-mosha .mo-tc-lv > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -3683,7 +3701,7 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
 @media (pointer: coarse) { .mo-lv-dlg .mo-f input, .mo-lv-dlg .mo-f select, .mo-lv-dlg .own-acts button, .mo-l-dlg form button { min-height: 44px; } }
 /* a field never grows past its cell: the date-and-time input pushed "Entry time" under the next field's label on phones */
 #v-mosha .mo-f, .mo-lv-dlg .mo-f { grid-template-columns: minmax(0, 1fr); } #v-mosha .mo-tc-lvg, .mo-lv-dlg .mo-lv { align-items: end; } #v-mosha .mo-tc-lvg input, #v-mosha .mo-tc-lvg select { min-width: 0; max-width: 100%; }
-@media (max-width: 760px) { #v-mosha .mo-tc-lvg .mo-f:has(input[type="datetime-local"]), .mo-lv-dlg .mo-f:has(input[type="datetime-local"]) { grid-column: 1 / -1; }
+@media (max-width: 760px) { #v-mosha .mo-f:has(input[type="datetime-local"]), .mo-lv-dlg .mo-f:has(input[type="datetime-local"]) { grid-column: 1 / -1; }   /* teach form, log form and its exit row: half a phone row cut the date off */
   /* the replay's Steps / Candles / Speed: each name beside its own buttons (the names were left at the end of the row above) */
   #v-mosha .mo-rp-ctl:has(> .mo-rp-k) { display: grid; grid-template-columns: auto minmax(0, 1fr); } #v-mosha .mo-rp-ctl > .mo-rp-ct { grid-column: 1 / -1; } }
 /* light theme: green and red text at AA on the cards, the wells and the buy / sell chips (the desk's light --buy was 4.2-4.5:1 here) */
@@ -9995,8 +10013,13 @@ function msNextSetup(bars, A) {
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
   const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', mosha: 'mosha', ict: 'ict' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
-  function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+  // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
+  // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
+  function showView(hx) {
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
+    // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
+    if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
@@ -10149,12 +10172,16 @@ function msNextSetup(bars, A) {
     if (hdr && window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', hdr.offsetHeight + 'px')).observe(hdr);
     // overdrive 4: page switches slide in the direction of travel (View Transitions); same-page changes and reduced motion switch instantly
     addEventListener('hashchange', () => {
+      // a #trade/<id> link is not a view: the trade router (#ms-trv-js) shows the page behind it and opens the sheet. Drawing a view
+      // for it here sent the page home, and through a view transition it did so AFTER the router had opened the sheet: an ICT
+      // signal's dialog then sat "open" inside the hidden desk (Forward after closing a signal, or a pasted link; QA sweep 11 Nov).
+      if (/^#trade\//.test(location.hash)) return;
       const R = document.documentElement, cur = VIEWS.find((k) => { const el = document.getElementById('v-' + k); return el && !el.hidden; }), nx = location.hash.slice(1).split('/')[0] || 'home';
       const still = R.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!document.startViewTransition || still || !cur || cur === nx || document.hidden || document.querySelector('dialog[open]')) { showView(); return; }
       const ORD = ['home', 'setup', 'charts', 'scanner', 'crypto', 'council', 'journal', 'ict', 'users', 'guest'];
       R.dataset.vt = ORD.indexOf(nx) >= ORD.indexOf(cur) ? 'fwd' : 'back';
-      try { const t = document.startViewTransition(showView); t.finished.finally(() => { delete R.dataset.vt; }); } catch (e) { showView(); }
+      try { const at = location.hash, t = document.startViewTransition(() => showView(at)); t.ready.catch(() => {}); t.finished.finally(() => { delete R.dataset.vt; }).catch(() => {}); } catch (e) { showView(); }   // a second navigation skips the first transition: its promises reject, which is not an error
     }); showView();
     setInterval(() => { renderSessList(); renderHome(); }, 30e3); renderSessList();
   }
@@ -10846,7 +10873,7 @@ function msNextSetup(bars, A) {
   // show the page that belongs behind a sheet (a cold #trade link lands on Home otherwise): council trades, or the ICT desk
   async function showBase(hash, push) {
     var v = hash.slice(1).split('/')[0], el = document.getElementById('v-' + v);
-    if (el && !el.hidden) return;
+    if (el && !el.hidden) { if (!push && parse(location.hash)) history.replaceState(null, '', hash); return; }   // already there: the pasted link's entry still becomes the page behind the sheet, so closing the sheet lands on it
     Rt.busy = true;
     if (push) history.pushState(null, '', hash); else history.replaceState(null, '', hash);
     W.dispatchEvent(new HashChangeEvent('hashchange'));
