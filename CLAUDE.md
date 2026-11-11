@@ -1532,6 +1532,38 @@ focus; Escape closes; textContent only). Missing fields read `n/a`. New fields, 
 `briefing.analogs.top[].path` (briefing.mjs, gold % from the entry close, sessions 1-20), `callsScore().weekly` (`callsByWeek`,
 outlook.mjs). No probability, rule or trade changes.
 
+## Account surfaces, quality pass (11 Nov 2026, owner: "every bit of the website improved, not quantity but quality")
+Profile, Users, the account menu, Settings, the price-alert dialog, the bell and the palette, walked as the owner, Fred, Orlando,
+Luxus and Carlos at 390 px (touch) and 1440 px in dark / light / midnight, with the real `api/` handlers driven in memory (fake
+stores) and saves failed on purpose (5xx, offline, an ended session). The permission dialog matched `msPerms` for every built-in
+member and for every single-key combination; members never get a demo account number in the DOM or localStorage. Fixed:
+- **Settings was cut off on phones**: the menu hung from its button and lost 68 px off the left edge. `#ms-acct-css` (a new style
+  block after `#ms-profile-css`; put account-surface CSS there) pins it under the header at <= 560 px, above the tab bar.
+- **Photo and display name** (`pushProfile(fields, what)` in the account-area script): a save the server did not take used to
+  fail without a word, and the next visit put the server's old photo or name back. Now it says why (offline / ended session /
+  server error) with **Try again**, the change waits in localStorage `ms-pfpend-<account>` and goes up first on the next load
+  (`pullProfile` never overwrites a waiting field). `paint()` also refreshes the Profile card (it copied the menu 400 ms after
+  the button press, before the member had chosen). A file that is not a picture clears the picker, so it can be chosen again.
+- **Users page** (`saveUsers`): every failure names its reason (an ended session and a 500 both read "check your connection"),
+  the table is redrawn from what is saved (a role select kept showing the refused role), keyboard focus survives the redraw
+  (`US.fk`, `uRefocus`). "Back to role defaults" asks first and names the built-in settings that come back (for Fred that
+  includes applying ICT changes without review). The owner note no longer names a model and says where the password lives.
+- **Notifications**: send and delete share `post()` / `why()`; a failed delete used to say nothing (offline it threw). The
+  slide-in card no longer takes the keyboard from someone typing or from an open dialog, hands focus back when dismissed, and
+  "Mark all read" clears the card on screen.
+- **Sounds**: the page called `msToast`, which does not exist: a save is now said in `#ms-snd-msg`, failures name the reason.
+- **Price alerts**: failures in words (was "Failed to fetch" / "Server 500"), the message follows the last action, focus stays
+  in the list after a delete. **Connector card**: the same for its errors. The cTrader link form no longer takes focus on every
+  Profile visit (it opened a phone's keyboard). The palette lists "Profile and demo accounts"; the demo-account rows work by
+  keyboard.
+- No text under 12 px and every control at least 44 px on touch on these surfaces (`@media (pointer: coarse)` in `#ms-acct-css`;
+  `assets/ms-dialog.js` buttons too); the permission dialog keeps Save / Cancel in reach (sticky row).
+- Seen, left alone: the account button itself is 38 px wide on phones (the header's width budget at 390 px); deleting a price
+  alert has no confirm (one tap, recreated in seconds); a member without `ct` sees "link your own cTrader account" on the
+  profile (the older linking feature); a viewer's account menu counts shadow trades ("+ n shadow").
+- Tests: `tests/qa-sweep.test.mjs`, `tests/users-perms.test.mjs`, `tests/notify.test.mjs` (page wiring). Playwright note: a
+  `fullPage` or element screenshot resets touch emulation, so measure sizes before taking one.
+
 ## Installable app (9 Nov 2026, owner: "installable on phones and desktops")
 `app.webmanifest` (id `/`, "Meridian X", standalone, `#08090c` = the desk's dark `--bg`, shortcuts /gold, /macro-desk, /backtest)
 with icons in `icons/` drawn from the coin favicon by `scripts/make-icons.mjs` (any 192/512, maskable 192/512, apple-touch-icon 180,
