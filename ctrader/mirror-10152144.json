@@ -130,7 +130,7 @@
     "lots": 0.09,
     "digits": 2,
     "setup": "ict-A",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T20:10:01.000Z",
     "councilEntry": 27735.75,
     "stop": 28365.67,
@@ -142,14 +142,16 @@
     "lagSec": 27,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T20:10:01.000Z",
     "brokerStop": 27405.28,
     "rollsSeen": 0,
     "rr": 99,
     "amended": 22,
-    "amendedAt": "2026-11-11T18:52:32.000Z"
+    "amendedAt": "2026-11-11T18:52:32.000Z",
+    "closedAt": "2026-11-11T23:00:34.000Z"
    },
    "ict:gc-b-1794351600": {
     "positionId": "48239176",
@@ -235,7 +237,7 @@
    "startBalance": 9998.28
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9954.25 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 9996.73 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -243,8 +245,8 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 9954.25,
-  "lastRun": "2026-11-11T22:58:06.000Z"
+  "balance": 9996.73,
+  "lastRun": "2026-11-11T23:00:34.000Z"
  },
  "log": [
   {
@@ -1073,6 +1075,11 @@
   {
    "at": "2026-11-11T18:52:32.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28354.65 -> 28365.67 (council ict-A)",
+   "trade": "ict:nq-b-1794337200"
+  },
+  {
+   "at": "2026-11-11T23:00:34.000Z",
+   "msg": "NAS100 position 48212677 closed at the broker",
    "trade": "ict:nq-b-1794337200"
   }
  ],
