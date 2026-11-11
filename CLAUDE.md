@@ -85,7 +85,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-41 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-42 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -2469,9 +2469,53 @@ decisions). What it found, from council-data of 11 Nov and the committed studies
   again INSIDE a day after a stop-out while the last closed day is still an unused breakout (nine such positions in
   2018-26, eight losers); daily candles cannot place them, so a daily harness flatters the rule. The four sets' figures
   are in result.json under `uninterpreted`; never quote them as a finding. A real breadth test needs hourly candles and
-  its own pre-registration. **Any daily-candle replay of gtrend / gtrend5 has this bias.**
+  its own pre-registration (done the same day: `trend-breadth-h1`, section "Book study" below). **Any daily-candle replay of gtrend / gtrend5 has this bias.**
 - To repeat: `node research/edge/trend-breadth/run.mjs fetch <dir>` (git show from `origin/council-data`, no network), then
   `… full <dir>`. Tests: `tests/trend-breadth.test.mjs`.
+
+## Book study: the supported book as a book, the add, and trend breadth on hourly candles (11 Nov 2026, owner: "we need more improvement so we start make money")
+Three pre-registered studies on the book the owner approved that day (Gold trend + Gold daily engulf). Research only: no
+live rule, size, filter, stop, config or council member changed. The owner's document is
+`research/proposals/2026-11-11-book-study.md` (one decision: `docs/owner-decisions.md` item 42). All three verdicts are
+FAIL or "nothing to change": **never quote the book as proven, never call it an edge.**
+- **`research/edge/supported-book/`** (PREREGISTRATION.md first; `run.mjs`, `legs.json`, RESULT.md, result.json). The
+  committed `gold-systems-oos` engine (not edited) run once more on the same candles; its unit-level output for `gtrend`,
+  `gtrend5`, `geg` is `legs.json` (963 units: fill, close, entry, r0, gross R, `of` for an add), gated against all 813
+  committed positions (0 mismatches). Book = daily series booked on the close day, fixed 1R a unit, $0.30 a unit and
+  **financing on every unit** by `council/fills.mjs` `nights` x `FIN.xau.long` (imported). One question: on untouched
+  2006-07 to 2017-12, is the two-system book's t on daily book R at least 2 (both halves positive, positive at x2 costs)?
+  **FAIL on the t: +59.3R, +5.16R a year (330 positions, t 1.86; 90 % bootstrap +0.3 to +10.3R a year)**; halves +55.3R
+  (2006-11) and +4.0R (2012-17); x2 costs +48.7R. Worst drawdown 19.8R closed / 22.1R marked to market, from March 2014,
+  not regained by the end of 2017 (988 weekdays); worst year 2013 −8.1R; 6 of 12 years positive; a unit open on 37 % of
+  weekdays; the legs' daily correlation 0.01 (monthly 0.21). Financing took 20.5R (1.8R a year): the t is 2.43 without
+  it and 2.15 at half the rate. With every unit charged Gold trend is +0.313R a position (n 74, t 1.20), not the +0.398R
+  (t 1.49) of the first-unit table; the engulf +0.141R (n 256, t 1.46). At 0.25 % a unit: about +1.3 % a year with a 5 %
+  drawdown. With Gold trend fast added (S3): +86.4R, t 1.77, drawdown 29.5R (same return ÷ drawdown, 2.9 against 3.0).
+  2018-26 and 2020-26 are built-on years for these rules (all in sample; +13.4R and +15.1R a year): shown, never evidence.
+  Tests: `tests/supported-book-study.test.mjs` (`tests/supported-book.test.mjs` is the Trader's own-rule test).
+- **`research/edge/book-sizing/`** (the comparison was fixed in the supported-book pre-registration before any result):
+  the Gold trend pyramid add on (as live) against off, same records and functions. Exact, because the add never changes
+  the first unit's stop or exit. Untouched 2006-17, return ÷ closed drawdown: ON 2.99 (+59.3R on 19.8R, t 1.86), OFF 2.87
+  (+54.3R on 18.9R, t 1.94); paired month bootstrap P(OFF better) 0.535, 90 % interval −0.99 to +0.99: **within noise, no
+  proposal, the add stays.** The add units alone: 34, +5.0R, +0.148R, t 0.60 on untouched data against +1.08R (n 29,
+  t 2.45) on the built-on years. No other sizing question is left worth a test (weights between systems: `sizing`,
+  `portfolio-v2`). Tests: `tests/book-sizing.test.mjs`.
+- **`research/edge/trend-breadth-h1/`** (PREREGISTRATION.md first; `markets.mjs`, `fetch.mjs`, `run.mjs`): the live Gold
+  trend rule on OANDA H1 + D1 candles (`node --use-env-proxy fetch.mjs <dir>`: H1 is served from January 2004, gold and
+  silver from March 2006; 23 MB kept out of git). Harness: one run at every H1 close, entries and adds at the next H1
+  open, stops by `stopFill`, `spotSkip` hours for metals and currencies, so the re-entry inside a day is placed.
+  **Parity gate on gold passed**: 75 of 75 positions (+0.526R against +0.506R gross) on 2006-17 and 59 of 59 (+1.286R
+  against +1.347R) on 2018-26. Thirteen markets fixed before any run (`xag`; `nas100 spx500 us30 de40 jp225`; `eurusd
+  gbpusd usdjpy audusd usdcad`, both sides; `wtico bco`), costs and financing as `trend-breadth`, t on calendar-month
+  sums, Holm over 14 tests (13 markets + the pool), confirmation closed 2020-26, replication 2005-19. **FAIL, 0 of 14**:
+  pool −0.059R a position net on 2020-26 (n 827, t −0.89; +0.040R before any cost) and −0.028R on 2005-19 (n 1,690,
+  t −0.52); currencies −0.201R (n 422, t −2.91); best market Brent +0.586R (n 39, t 1.64, Holm p 0.71) which lost on
+  2005-19. So the rule is not a general trend rule: read and size the gold record as one bet on gold rising with a
+  trailing exit; do not propose it on another market without new, pre-registered evidence. The hourly harness is the one
+  to reuse for any future replay of `gtrend` on a market without M5 history. Tests: `tests/trend-breadth-h1.test.mjs`.
+- Not done, said to the owner: the broker's past financing rates are unknown (today's rate, the highest of the sample,
+  is charged for every year); the other markets' financing is assumed, not measured; `council/expect-base.json` still
+  charges the first unit only (item 42).
 
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
