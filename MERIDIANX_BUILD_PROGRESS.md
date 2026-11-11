@@ -8,6 +8,10 @@ modules is `docs/academy/ARCHITECTURE.md`.
 - **Deployed.** The owner said "Deploy everything" on 10 Nov 2026: the development branch `claude/website-display-xoyadz`
   (PR #1) is merged to `main`, which deploys to production (`/academy`, owner only). Fred's connector (#710) went first.
 - **Current phase:** 1 to 9 built and verified. What the owner still has to do is under "Next (not done)".
+- **Since then (11 Nov 2026):** a usability pass on the page is on `main` (#724: a line under the chart at each decision,
+  a warning before a half-written verdict is dropped, plainer text; `docs/academy/MODULES.md`). A second round (a reload
+  keeps your place, a folded decision card) is in an open pull request, #728, not merged. The test counts under
+  "Verified tests" are the 10 Nov ones.
 
 ## Previous work stopped or preserved (10 Nov)
 
@@ -164,7 +168,8 @@ ICT file allowlist still bind him).
   design: no long job runs in a site function).
 - [ ] Owner decisions: what the clock correction leaves open (`docs/owner-decisions.md` items 19-25: baselines, one ICT
       variant that now passes its bar, the studies not yet re-run); whether `/api/academy` should get a higher firewall
-  limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption.
+  limit; a language-model key and budget, if commentary is wanted; the seven-edge assumption. The Academy's own points
+  are item 36 of `docs/owner-decisions.md`.
 
 ## Architecture decisions
 
@@ -207,8 +212,9 @@ weights change, no look-ahead by construction, private Blob persistence, full is
   `council/histdata.mjs`, the seven edges' source studies were re-run, and the Academy data was regenerated
   (`docs/academy/DATA-CLOCK.md`; the old files are in `academy/archive/pre-clock/` and in git at 81f35f51). 101 of the 2,783
   candidates keep `rule.clockShift`, which now means "the week could not be verified against the second feed" (most sit in
-  the hole of the 2023 files). Open for the owner: the live ICT replay still reads the files with the old clock
-  (`docs/owner-decisions.md`).
+  the hole of the 2023 files). Open for the owner: one unused branch of the live ICT replay (a back-fill for two forex
+  pairs that left the desk on 7 Nov) still converts with the old clock; no market reaches it today
+  (`docs/owner-decisions.md` item 21).
 - Data quality (`academy/data/quality.json`): both H1 research series are "usable", not "certified" (gold 97.65 %, NAS100
   97.36 % coverage); 2023 is "unreliable" for both (about 87 %); the NAS100 09:30–11:00 M1 window is "unreliable".
 - `gmp` (gold momentum pullback) candidates come from the robustness study's port, which departs from live (one position at

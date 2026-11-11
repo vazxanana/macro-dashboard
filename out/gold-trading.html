@@ -1595,7 +1595,7 @@
       * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        transition-duration: 0s !important;
       }
     }
 
@@ -2926,7 +2926,18 @@
   .gx-mt6 { margin-top: 6px; } .gx-mb16 { margin-bottom: 16px; }
   .gx-flush { padding: 0 !important; overflow: hidden; } .gx-flush-t { padding: 16px 20px 12px; margin-bottom: 0 !important; } .gx-flush-b { padding: 0 20px 20px; }
 
+  /* 11 Nov 2026 quality pass. The page clips sideways overflow (body overflow-x hidden), so a block wider than a phone was cut
+     off with no way to reach it: the Daily Bias banner's Target / Daily ATR column, the levels panels, the edge summary table. */
+  .gx-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .levels-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .levels-panel { min-width: 0; }
+  @media (max-width: 1000px) { .levels-grid { grid-template-columns: minmax(0, 1fr); } }
+  /* the entry-rule notes kept the light theme's white wash in dark: pale text on a pale slab (2.3:1) */
+  html.dark .edge-rule { background: rgba(255,255,255,0.05); }
   @media (max-width: 700px) {
+    .desk-banner { flex-direction: column; align-items: stretch; gap: 14px; padding: 18px 16px; }
+    .desk-banner .desk-vline { display: none; }
+    .desk-banner .desk-details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+    .desk-banner .desk-det-val { overflow-wrap: anywhere; }
     .gx-hero { grid-template-columns: 1fr; padding: 18px 16px; gap: 14px; min-height: 0; }
     .gx-hero-row { min-height: 52px; }
     .gx-hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 12px; }
@@ -2943,7 +2954,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Meridian X">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<script src="/assets/pwa.js?v=f264828d81" defer></script>
+<script src="/assets/pwa.js?v=938afbe5f4" defer></script>
 </head>
 <body data-section="dashboard">
 
@@ -4389,7 +4400,7 @@
       <div class="section-header">
         <div class="section-title">Edge Summary — Quick Reference</div>
       </div>
-      <div class="card glass">
+      <div class="card glass gx-scroll-x">
         <table style="width:100%; border-collapse:collapse; font-size:var(--fs-xs);">
           <thead>
             <tr style="border-bottom:2px solid rgba(26,29,41,0.1);">
@@ -5689,6 +5700,7 @@
   // text and plan lines match dark, light and midnight and follow the theme toggle (gxRestyleCharts). Horizontal grid only.
   let GX_PAL = null;
   const _gxCharts = [];
+  function gxAlpha(hex, a) { const m = /^#([0-9a-f]{6})$/i.exec(hex); if (!m) return hex; const n = parseInt(m[1], 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
   function gxPalette() {
     const cs = getComputedStyle(document.documentElement), v = (n, d) => (cs.getPropertyValue(n) || '').trim() || d;
     const dark = document.documentElement.classList.contains('dark');
@@ -5697,7 +5709,8 @@
       entry: v('--accent-blue', '#1C64F2'), stop: v('--accent-red', '#E02424'), tgt: v('--accent-green', '#0E9F6E'), vwap: v('--gx-vwap', '#8B5CF6'),
       grid: dark ? 'rgba(255,255,255,0.045)' : 'rgba(16,32,29,0.06)', cross: dark ? 'rgba(255,255,255,0.3)' : 'rgba(16,32,29,0.32)',
       crossBg: v('--gx-cross-bg', dark ? '#1b2627' : '#33413e'), key: dark ? 'rgba(200,215,212,0.34)' : 'rgba(16,32,29,0.32)',
-      upRGB: v('--gx-up-rgb', '0,166,81'), dnRGB: v('--gx-dn-rgb', '194,59,51')
+      upRGB: v('--gx-up-rgb', '0,166,81'), dnRGB: v('--gx-dn-rgb', '194,59,51'),
+      plate: gxAlpha(v('--panel', dark ? '#081011' : '#FFFFFF'), 0.86)   // behind a key-level label, over the candles (the card's own colour per theme)
     };
   }
   function gxChartOptions(P, interval) {
@@ -5730,29 +5743,36 @@
       setLevels(l) { _lv = l || []; if (_req) _req(); },
       updateAllViews() {},
       paneViews() {
-        return [{
-          zOrder: () => 'bottom',
+        // lines under the candles; the labels above them on a plate of the panel colour (11 Nov 2026: drawn underneath, the
+        // first candles ran through "4,050" and "Prior day low" and the dashed line struck the text out)
+        const pass = (top) => ({
+          zOrder: () => top ? 'top' : 'bottom',
           renderer: () => ({
             draw(target) {
               if (!_series || !_lv.length) return;
               const P = GX_PAL || gxPalette();
               target.useBitmapCoordinateSpace(scope => {
                 const ctx = scope.context, hr = scope.horizontalPixelRatio, vr = scope.verticalPixelRatio, W = scope.bitmapSize.width;
-                ctx.font = `500 ${12 * hr}px 'JetBrains Mono', ui-monospace, monospace`; ctx.textBaseline = 'bottom'; ctx.textAlign = 'left';
+                ctx.font = `500 ${12 * hr}px 'JetBrains Mono', ui-monospace, monospace`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
                 for (const l of _lv) {
                   const y = _series.priceToCoordinate(l.price);
                   if (y === null) continue;
                   const Y = Math.round(y * vr) + 0.5;
-                  ctx.strokeStyle = P.key; ctx.lineWidth = Math.max(1, hr);
-                  ctx.setLineDash(l.round ? [2 * hr, 5 * hr] : [6 * hr, 4 * hr]);
-                  ctx.beginPath(); ctx.moveTo(0, Y); ctx.lineTo(W, Y); ctx.stroke();
-                  ctx.setLineDash([]); ctx.fillStyle = P.faint;
-                  ctx.fillText(l.label, 8 * hr, Y - 3 * vr);
+                  if (!top) {
+                    ctx.strokeStyle = P.key; ctx.lineWidth = Math.max(1, hr);
+                    ctx.setLineDash(l.round ? [2 * hr, 5 * hr] : [6 * hr, 4 * hr]);
+                    ctx.beginPath(); ctx.moveTo(0, Y); ctx.lineTo(W, Y); ctx.stroke(); ctx.setLineDash([]);
+                    continue;
+                  }
+                  const tw = ctx.measureText(l.label).width, h = 16 * vr, x = 6 * hr;
+                  ctx.fillStyle = P.plate; ctx.fillRect(x, Y - h / 2, tw + 8 * hr, h);
+                  ctx.fillStyle = P.text; ctx.fillText(l.label, x + 4 * hr, Y + 0.5 * vr);
                 }
               });
             }
           })
-        }];
+        });
+        return [pass(false), pass(true)];
       }
     };
   }
@@ -6087,17 +6107,20 @@
       .sort((a, b) => (b.fresh ? 1 : 0) - (a.fresh ? 1 : 0))[0];
     const zoneTxt = zone
       ? `${zone.fresh ? 'unmitigated ' : ''}${L ? 'demand' : 'supply'} block ${zone.lo.toFixed(0)}–${zone.hi.toFixed(0)} on M15`
-      : `wait for a pullback block to form on M15`;
+      : '';
+    // with no block on M15 yet the sentence read "Buy the pullback into the wait for a pullback block to form on M15"
+    const planTxt = zone ? `${L ? 'Buy the pullback into' : 'Sell the rally into'} the ${zoneTxt}`
+      : `No M15 ${L ? 'demand' : 'supply'} block yet: wait for one to form before ${L ? 'buying a pullback' : 'selling a rally'}`;
     if (opp) {
       opp.style.display = 'block';
       opp.innerHTML = `<strong style="color:${L ? 'var(--accent-green)' : 'var(--accent-red)'}">⚡ TRADING OPPORTUNITY — ${L ? 'LONG' : 'SHORT'}</strong>
         <span style="color:var(--text-secondary)"> · Daily, H4 and M15 structure all ${L ? 'bullish' : 'bearish'}.
-        ${L ? 'Buy the pullback into' : 'Sell the rally into'} the ${zoneTxt}; full ticket on the Daily Bias → Trade Plan card.</span>`;
+        ${planTxt}; full ticket on the Daily Bias → Trade Plan card.</span>`;
     }
     if (last !== dir) {
       localStorage.setItem('lastMtfAlign', dir);
       sendNotif(`⚡ MTF alignment — ${L ? 'LONG' : 'SHORT'} opportunity`,
-        `Daily, H4 and M15 structure all ${L ? 'bullish' : 'bearish'}. ${L ? 'Buy pullbacks into' : 'Sell rallies into'} the ${zoneTxt}. Check the Trade Plan.`);
+        `Daily, H4 and M15 structure all ${L ? 'bullish' : 'bearish'}. ${planTxt}. Check the Trade Plan.`);
     }
   }
 

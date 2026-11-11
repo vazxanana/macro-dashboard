@@ -163,3 +163,17 @@ test('week report: builds a week from the fixtures (books, systems, best and wor
   const rg = MW.weeks(all, last + 86400); assert.ok(rg.first <= B.from && rg.last >= B.from);
   const O = MW.openNow({ ...D, snap: { markets: { xau: { price: 4000 } } } }); assert.ok(Array.isArray(O.list) && Number.isFinite(O.shadow));
 });
+
+test('edge-decay chips count what the rows show: live only, "too few" apart from healthy, flagged shadow systems in their own chip (11 Nov)', () => {
+  const WK = loadWeek();
+  const S = [{ live: true, status: 'healthy' }, { live: true, status: 'healthy', few: true }, { live: true, status: 'healthy' }, { live: true, status: 'watch' },
+    { live: true, status: 'decaying' }, { live: false, status: 'decaying' }, { live: false, status: 'healthy' }, { live: false, status: 'watch', few: true }, null];
+  assert.deepEqual({ ...WK.decayCount(S) }, { healthy: 2, watch: 1, decaying: 1, few: 1, shadow: 1 });
+  assert.deepEqual({ ...WK.decayCount(undefined) }, { healthy: 0, watch: 0, decaying: 0, few: 0, shadow: 0 });
+  // on what the Trader really writes: the counts add up to the live systems, and a system marked `few` is never "healthy"
+  const D = buildDecay({ trades: [], research: [], ictTrades: [], ictReplay: null, replay: null, now: Date.parse('2026-11-11T12:00:00Z') / 1000 });
+  if (D && Array.isArray(D.systems)) { const c = WK.decayCount(D.systems), live = D.systems.filter((s) => s.live);
+    assert.equal(c.healthy + c.watch + c.decaying + c.few, live.length); assert.equal(c.few, live.filter((s) => s.few).length); }
+  const js = html.match(/<script id="ms-wk-js">([\s\S]*?)<\/script>/)[1];
+  assert.match(js, /var c = decayCount\(S\);/); assert.match(js, /too few to judge/); assert.match(js, /shadow flagged/);
+});

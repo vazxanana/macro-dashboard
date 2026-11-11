@@ -8,7 +8,7 @@
 // - The build (scripts/pwa.mjs) writes VERSION (hash of everything served), so every deploy is a new worker; it takes over at once
 //   (skipWaiting + clients.claim) and deletes the caches of older versions. KILL (build env MX_SW_KILL=1) turns every fetch
 //   rule off and deletes the caches, keeping push notifications working.
-const VERSION = 'fac0ebe12443';
+const VERSION = '36a14f25e38f';
 const KILL = false;
 const SHELL = 'mx-shell-' + VERSION;
 const ASSETS = 'mx-assets-' + VERSION;
@@ -65,12 +65,15 @@ async function asset(e) {
   return fresh;
 }
 
+// The caches of this version: the asset cache and the offline page.
+async function prime() {
+  await caches.open(ASSETS);
+  try { await (await caches.open(SHELL)).add(new Request(OFFLINE, { cache: 'reload' })); } catch (err) { /* the inline FALLBACK covers it */ }
+}
+
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
-    if (!KILL) {
-      await caches.open(ASSETS);
-      try { await (await caches.open(SHELL)).add(new Request(OFFLINE, { cache: 'reload' })); } catch (err) { /* the inline FALLBACK covers it */ }
-    }
+    if (!KILL) await prime();
     await self.skipWaiting();
   })());
 });
@@ -92,22 +95,51 @@ self.addEventListener('fetch', (e) => {
 
 self.addEventListener('message', (e) => {
   if (e.data === 'mx-version' && e.source) e.source.postMessage({ mxVersion: VERSION, kill: KILL });
+  // After ?sw-reset with another window still open the browser keeps this same worker (no install runs again), so the page
+  // that was reset (assets/pwa.js) asks for the caches back and for the worker to take it. Only the worker in charge answers.
+  if (e.data === 'mx-prime' && !KILL && (!self.serviceWorker || self.serviceWorker.state === 'activated')) {
+    e.waitUntil(prime().then(() => self.clients.claim()).catch(() => {}));
+  }
 });
+
+// Push payloads come from api/alert-cron.js as JSON { title, body, url, tag }. Anything else (plain text, null, a bare
+// string, wrong types) still becomes a readable notification, and its link only ever points into this site.
+const text = (v, max) => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '').slice(0, max);
+function inSite(url, fallback) {
+  try { const u = new URL(String(url), self.location.origin); if (u.origin === self.location.origin && typeof url === 'string' && url) return u.pathname + u.search + u.hash; } catch (err) { /* fallback */ }
+  return fallback;
+}
+function notice(e) {
+  let d = null;
+  try { d = e.data ? e.data.json() : null; } catch (err) { try { d = { body: e.data.text() }; } catch (err2) { d = null; } }
+  if (typeof d === 'string') d = { body: d };
+  if (!d || typeof d !== 'object' || Array.isArray(d)) d = {};
+  return [text(d.title, 120) || 'Price alert', {
+    body: text(d.body, 400), tag: text(d.tag, 80) || 'price-alert', renotify: true, requireInteraction: true,
+    icon: '/icons/icon-192.png', badge: '/icons/badge-96.png', data: { url: inSite(d.url, '/#charts') }, vibrate: [120, 60, 120],
+  }];
+}
 
 self.addEventListener('push', (e) => {
-  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (err) { d = { title: 'Price alert', body: e.data ? e.data.text() : '' }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'Price alert', {
-    body: d.body || '', tag: d.tag || 'price-alert', renotify: true, requireInteraction: true,
-    icon: '/icons/icon-192.png', badge: '/icons/badge-96.png', data: { url: d.url || '/#charts' }, vibrate: [120, 60, 120],
-  }));
+  const n = notice(e);
+  e.waitUntil(self.registration.showNotification(n[0], n[1]));
 });
 
+// A tap opens the alert's chart on the Desk. A window already on the Desk is brought forward and taken there; a window on
+// another page (a ChronosTrade replay, the Academy, the macro desk) is left as it is and the chart opens in a new one. Only
+// when the browser will not open a window does an open one get navigated.
+const DESK = /^\/(?:index\.html|market-structure\.html)?$/;
+const samePage = (a, b) => a.pathname === b.pathname || (DESK.test(a.pathname) && DESK.test(b.pathname));
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
-  const url = (e.notification.data && e.notification.data.url) || '/';
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((ws) => {
-    const w = ws.find((c) => new URL(c.url).origin === location.origin);
-    if (w) { w.navigate(url).catch(() => {}); return w.focus(); }
-    return self.clients.openWindow(url);
-  }));
+  const want = new URL(inSite(e.notification.data && e.notification.data.url, '/'), self.location.origin);
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true }).catch(() => []);
+    const mine = all.filter((c) => { try { return new URL(c.url).origin === self.location.origin; } catch (err) { return false; } });
+    const go = (c) => { if (c.url !== want.href) { try { Promise.resolve(c.navigate(want.href)).catch(() => {}); } catch (err) { /* not ours to move */ } } return Promise.resolve(c.focus()).catch(() => {}); };
+    const hit = mine.find((c) => samePage(new URL(c.url), want));
+    if (hit) return go(hit);
+    try { if (await self.clients.openWindow(want.href)) return; } catch (err) { /* no window allowed: use an open one */ }
+    if (mine[0]) return go(mine[0]);
+  })());
 });

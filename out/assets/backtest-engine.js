@@ -80,6 +80,12 @@
     }
     return out;
   }
+  // how long a trade was held, in seconds, from its stamps (works for every record ever saved: no new stored field). A stamp
+  // is the start of the candle a thing happened in, so the figure is exact to one candle of the timeframe on screen then.
+  const holdSec = (t) => (t && t.closedAt > 0 && t.openedAt > 0 ? Math.max(0, t.closedAt - t.openedAt) : 0);
+  // a duration in words: "under 1 m", "45 m", "2 h 15 m", "3 d 4 h" (two units at most)
+  function durText(sec) { if (sec == null || !Number.isFinite(sec)) return '—'; const m = Math.round(Math.max(0, sec) / 60); if (m < 1) return 'under 1 m'; if (m < 60) return m + ' m';
+    if (m < 1440) { const h = Math.floor(m / 60), r = m % 60; return h + ' h' + (r ? ' ' + r + ' m' : ''); } const hh = Math.round(m / 60), d = Math.floor(hh / 24), r = hh % 24; return d + ' d' + (r ? ' ' + r + ' h' : ''); }
   const equity = (a, px) => r2(a.balance + a.positions.reduce((s, p) => s + pnl(p, px), 0));
 
   // ---- statistics (the journal) -------------------------------------------------------------------------------------
@@ -102,8 +108,10 @@
     const by = (f) => { const o = {}; for (const t of closed) { const k = f(t); if (k == null) continue; o[k] = o[k] || { n: 0, net: 0, wins: 0, R: 0 }; o[k].n++; o[k].net = r2(o[k].net + t.net); o[k].R = r2(o[k].R + (t.R || 0)); if (t.net > 0) o[k].wins++; } return o; };
     const hourOf = (t) => new Date(t.openedAt * 1000).getUTCHours(), dayOf = (t) => new Date(t.openedAt * 1000).getUTCDay();
     const sessOf = (t) => { const h = hourOf(t); return h >= 7 && h < 12 ? 'London' : h >= 12 && h < 21 ? 'New York' : 'Asia'; };
-    const holdAvg = n ? r2(closed.reduce((s, t) => s + (t.holdBars || 0), 0) / n, 1) : null, rDist = {}; for (const x of Rs) { const k = x <= -1 ? '≤-1R' : x < 0 ? '-1..0' : x < 1 ? '0..1R' : x < 2 ? '1..2R' : x < 3 ? '2..3R' : '≥3R'; rDist[k] = (rDist[k] || 0) + 1; }
-    return { n, holdAvg, rDist, wins: wins.length, losses: losses.length, winRate: n ? r2(wins.length / n, 3) : null, net, netR, avgR: Rs.length ? r2(netR / Rs.length, 2) : null,
+    // holdAvg counts bars (kept for sessions and exports that read it); holdAvgSec is the same as time, from each trade's own
+    // open and close stamps, so it means the same thing whatever timeframe each bar was replayed on
+    const holdAvg = n ? r2(closed.reduce((s, t) => s + (t.holdBars || 0), 0) / n, 1) : null, holdAvgSec = n ? Math.round(closed.reduce((s, t) => s + holdSec(t), 0) / n) : null, rDist = {}; for (const x of Rs) { const k = x <= -1 ? '≤-1R' : x < 0 ? '-1..0' : x < 1 ? '0..1R' : x < 2 ? '1..2R' : x < 3 ? '2..3R' : '≥3R'; rDist[k] = (rDist[k] || 0) + 1; }
+    return { n, holdAvg, holdAvgSec, rDist, wins: wins.length, losses: losses.length, winRate: n ? r2(wins.length / n, 3) : null, net, netR, avgR: Rs.length ? r2(netR / Rs.length, 2) : null,
       profitFactor: gl > 0 ? r2(gw / gl) : gw > 0 ? Infinity : null, expectancy: n ? r2(net / n) : null, avgWin: wins.length ? r2(gw / wins.length) : null, avgLoss: losses.length ? r2(gl / losses.length) : null,
       best: n ? Math.max(...closed.map((t) => t.net)) : null, worst: n ? Math.min(...closed.map((t) => t.net)) : null, maxDD: r2(dd), maxDDPct: start ? r2(dd / start * 100, 2) : null, bestStreak, worstStreak: -worstStreak,
       avgMfe: n ? r2(closed.reduce((s, t) => s + (t.mfe || 0), 0) / n, 2) : null, avgMae: n ? r2(closed.reduce((s, t) => s + (t.mae || 0), 0) / n, 2) : null, curve,
@@ -194,6 +202,63 @@
   // (curve: the pass / fail share at every risk tried, for a chart; it does not change which risk is best)
   function bestRisk(Rs, o = {}) { let best = null; const curve = []; for (const r of [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02, 0.025, 0.03]) { const m = monteCarlo(Rs, { ...o, fan: 0, risk: r, n: o.n || 1000 }); if (m) curve.push({ risk: r, pass: m.pass, fail: m.fail, unfinished: m.unfinished }); if (m && (!best || m.pass > best.pass)) best = { risk: r, ...m }; } if (best) best.curve = curve; return best; }
 
-  const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2 };
+  // ---- changing the replay's timeframe in the middle of a session (11 Nov 2026) -----------------------------------------
+  // The replay has ONE moment T (unix seconds): every price before T has been replayed and has gone through the engine,
+  // nothing at or after T has. A timeframe is only a way of drawing that: its candles that ended by T are closed; the one
+  // that contains T (started before it, ends after it) is still FORMING and is built from finer candles that ended by T;
+  // the finer candles from T to its end (`rest`) are what the engine still has to process, once, when the user steps.
+  // So a switch never touches the account, and no price is processed twice or skipped. Candles are UTC-aligned (the candle
+  // proxy asks OANDA for UTC alignment), so a candle of `sec` seconds covers [time, time + sec).
+  const TF_SECS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400];
+  const countLE = (bars, t) => { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time <= t) lo = m + 1; else hi = m; } return lo; };   // bars that start at or before t
+  // the replay moment: the end of the last fully replayed bar, or the moment a forming candle was built up to
+  function tfMoment(bars, idx, sec, part) { if (part) return part.T; const b = bars[idx - 1]; return b ? b.time + sec : (bars[0] ? bars[0].time : 0); }
+  // where the moment T sits on a series: how many bars ended by T, and the index of the bar that contains T (-1 when none)
+  function tfPlan(bars, sec, T) { const closed = countLE(bars, T - sec), nb = bars[closed]; return { closed, straddle: nb && nb.time < T ? closed : -1 }; }
+  // the coarsest timeframe that tiles both halves of the candle [start, start + sec) cut at T (0 = none: T is on its edge)
+  function tfFineSec(sec, start, T, secs = TF_SECS) { let g = 0; for (const s of secs) if (s < sec && sec % s === 0 && (T - start) % s === 0 && start % s === 0 && s > g) g = s; return g; }
+  // the fetch window of a timeframe for a session that started at startAt and ends at `to` (300 candles of context, as the
+  // session form loads them); `ok` is false when it would be more than `max` candles ("load fewer days")
+  function tfWindow(startAt, to, sec, max) { const from = startAt - 300 * sec, n = Math.ceil((to - from) / sec); return { from, to, n, ok: n <= max }; }
+  // the forming candle: `fine` = candles of g seconds covering the candle bars[i]; formed from those that ended by T only
+  function tfPart(full, i, sec, T, fine, g) { const s = full.time, e = s + sec, formed = [], rest = [];
+    for (const b of fine || []) { if (b.time < s || b.time >= e) continue; if (b.time + g <= T) formed.push(b); else if (b.time >= T) rest.push(b); else throw new Error('a finer candle crosses the replay moment'); }
+    if (!formed.length) return { idx: i, part: null };        // nothing traded in it before T: the whole candle is still ahead
+    if (!rest.length) return { idx: i + 1, part: null };      // nothing traded in it from T on: it is complete
+    let h = -Infinity, l = Infinity, v = 0; for (const b of formed) { if (b.high > h) h = b.high; if (b.low < l) l = b.low; v += b.volume || 0; }
+    const bar = { time: s, open: formed[0].open, high: h, low: l, close: formed[formed.length - 1].close, volume: v, forming: true };
+    return { idx: i + 1, part: { i, T, sec, g, formed: bar, full: { ...full }, rest: rest.map((b) => ({ ...b })) } }; }
+  // seat the moment T on a series: { idx, part }. `fine` (candles of g seconds) is needed only when a bar contains T.
+  function tfEnter(bars, sec, T, fine, g) { const p = tfPlan(bars, sec, T); if (p.straddle < 0) return { idx: p.closed, part: null };
+    if (!fine || !(g > 0)) throw new Error('the forming candle needs finer candles'); return tfPart(bars[p.straddle], p.straddle, sec, T, fine, g); }
+  // the forming candle sits in the series in place of the full one while it forms; the full one comes back when it completes
+  function tfSeat(bars, part) { if (part) bars[part.i] = part.formed; return bars; }
+  function tfUnseat(bars, part) { if (part && bars[part.i] && bars[part.i].time === part.full.time) bars[part.i] = part.full; return bars; }
+  // what the engine processes on one step: the rest of the forming candle (its finer candles, in order), else the next bar
+  function tfNext(bars, idx, part) { return part ? part.rest : (idx < bars.length ? [bars[idx]] : []); }
+  // one step of the replay over those bars: orders and positions, then the challenge, then a breach closes everything at that
+  // bar's close (the same order the page has always used per bar). Events of a breach close carry `breach: true`.
+  function advance(a, ch, bars) { const out = [];
+    for (const b of bars) { const ev = onBar(a, b); if (ch) evaluate(ch, a, b.close, b.time, b);
+      if (ch && ch.status === 'failed' && (a.positions.length || a.orders.length)) { for (const q of a.positions.slice()) ev.push({ kind: 'close', trade: close(a, q, b.close, b.time, 'challenge breach'), breach: true }); a.orders = []; }
+      for (const e of ev) { e.bar = b; out.push(e); } }
+    return out; }
+  // the stamp of something done now (an order placed, a manual close): the start of the last candle replayed. While a candle
+  // forms that is the last FINER candle that went into it, not the forming candle's own start (a day candle starts at 00:00:
+  // a trade taken at 14:35 inside it must not be journalled at midnight).
+  function tfStamp(bars, idx, part) { if (part) return part.T - part.g; const b = bars[idx - 1]; return b ? b.time : 0; }
+  // part of the rest of a forming candle has been replayed (its first k finer candles went through the engine): the candle
+  // as it stands now, the moment moved to the end of the k-th. null when the whole rest is done (the candle is complete).
+  function tfProgress(part, k) { if (!part) return null; k = Math.max(0, Math.min(part.rest.length, Math.floor(k) || 0)); if (k >= part.rest.length) return null; if (!k) return part;
+    const f = { ...part.formed }; for (let i = 0; i < k; i++) { const b = part.rest[i]; if (b.high > f.high) f.high = b.high; if (b.low < f.low) f.low = b.low; f.close = b.close; f.volume = (f.volume || 0) + (b.volume || 0); }
+    return { ...part, T: part.rest[k - 1].time + part.g, formed: f, rest: part.rest.slice(k) }; }
+  // the name a session is shown under: a name the page made by itself ("XAU 15m from 2026-10-27") follows the timeframe the
+  // session is on now; a name the user typed is never touched. The stored name is not changed.
+  function sessionName(name, sym, tf) { const m = /^(\S+) (\d+[mhdw]) from (\d{4}-\d{2}-\d{2})$/.exec(name || ''); return m && tf && sym && m[1] === String(sym).toUpperCase() && m[2] !== tf ? `${m[1]} ${tf} from ${m[3]}` : (name || ''); }
+  // a saved session: sessions saved before the timeframe switch carry `idx` only; newer ones carry the moment `mom`
+  function tfResume(saved, bars, sec) { if (saved && saved.mom > 0) { const p = tfPlan(bars, sec, saved.mom); return { idx: p.closed, straddle: p.straddle, T: saved.mom }; } const idx = Math.min((saved && saved.idx) || 0, bars.length); return { idx, straddle: -1, T: tfMoment(bars, idx, sec, null) }; }
+
+  const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
+    TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

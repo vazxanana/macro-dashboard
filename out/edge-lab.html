@@ -28,7 +28,7 @@
     } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="assets/mx-page.css?v=63765a2737">
+<link rel="stylesheet" href="assets/mx-page.css?v=e803654e03">
 <script src="assets/mx-nav.js?v=3f8fef533d" defer></script>
 <style>
   /* tokens, base, top bar and the Desk | Macro | ChronosTrade switch: assets/mx-page.css (shared with /macro and /veteran/) */
@@ -201,7 +201,23 @@
   .rep-h a { font-size: 12.5px; white-space: nowrap; }
   .x { width: var(--tap); height: var(--tap); flex: none; display: grid; place-items: center; border-radius: var(--r-sm); border: 1px solid var(--line); background: none; cursor: pointer; color: var(--ink-dim); }
   .x:hover { color: var(--ink); border-color: var(--line-strong); }
-  .rep pre { margin: 0; padding: 18px 20px 24px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12.5px/1.65 var(--mono); color: var(--ink-dim); }
+  .rep-doc { margin: 0; padding: 14px 20px 24px; overflow: auto; overscroll-behavior: contain; font: 14px/1.6 var(--sans); color: var(--ink-dim); overflow-wrap: anywhere; }
+  .rep-doc h1 { font-size: 19px; line-height: 1.3; margin: 14px 0 8px; color: var(--ink); } .rep-doc h2 { font-size: 16.5px; margin: 20px 0 6px; color: var(--ink); } .rep-doc h3, .rep-doc h4 { font-size: 14.5px; margin: 16px 0 4px; color: var(--ink); }
+  .rep-doc > :first-child { margin-top: 4px; }
+  .rep-doc p { margin: 8px 0; } .rep-doc ul, .rep-doc ol { padding-left: 22px; margin: 8px 0; } .rep-doc li { margin: 4px 0; } .rep-doc b { color: var(--ink); font-weight: 600; }
+  .rep-doc .tbl { overflow-x: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: var(--r-sm); }
+  .rep-doc table { border-collapse: collapse; font-size: 13px; width: max-content; min-width: 100%; overflow-wrap: normal; }   /* a wide table scrolls inside .tbl; columns keep readable widths */
+  .rep-doc th, .rep-doc td { max-width: 44ch; }
+  .rep-doc th, .rep-doc td { border-bottom: 1px solid var(--line-soft); padding: 6px 9px; vertical-align: top; text-align: left; }
+  .rep-doc tr:last-child td { border-bottom: 0; }
+  .rep-doc th { background: var(--panel-raised); color: var(--ink); font-weight: 600; white-space: nowrap; }
+  .rep-doc code { font: 12.5px var(--mono); background: var(--neutral-soft); padding: 1px 5px; border-radius: 4px; }
+  .rep-doc pre { background: var(--neutral-soft); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; overflow: auto; overflow-wrap: normal; } .rep-doc pre code { background: none; padding: 0; }
+  .rep-doc blockquote { margin: 10px 0; padding: 4px 14px; border-left: 3px solid var(--line-strong); color: var(--ink-faint); }
+  .rep-doc hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+  .rep-doc .rep-msg { color: var(--ink-faint); }
+  @media (max-width: 520px) { .rep-doc { padding: 12px 16px 20px; } }
+  @media (pointer: coarse) { .rep-h a { display: inline-flex; align-items: center; min-height: 44px; } }
 
   @media (max-width: 1100px) {
     .cols, .row { grid-template-columns: minmax(0, 1.4fr) 112px minmax(0, 1fr) minmax(0, 1.1fr) 56px 68px 120px 70px; column-gap: 12px; padding-left: 14px; padding-right: 14px; }
@@ -236,7 +252,7 @@
     .donut text.s { font-size: 13.5px; }   /* the 124-unit viewBox drawn at 112 px: 13.5 units = 12.2 px on screen */
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; }
     .badge.run .dot { opacity: .7; }
   }
 </style>
@@ -247,7 +263,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Meridian X">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<script src="/assets/pwa.js?v=f264828d81" defer></script>
+<script src="/assets/pwa.js?v=938afbe5f4" defer></script>
 </head>
 <body>
 <a class="skip" href="#groups">Skip to the studies</a>
@@ -296,7 +312,7 @@
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg>
     </button>
   </div>
-  <pre id="rep-body">Loading…</pre>
+  <div id="rep-body" class="rep-doc" tabindex="0">Loading…</div>
 </dialog>
 
 <script>
@@ -324,6 +340,8 @@
   var $ = function (id) { return document.getElementById(id); };
   var state = { studies: {}, index: null, sig: '' };
 
+  // a headline joined from several verdict lines read "FAIL.; Intraday: FAIL.; …": one mark between the parts
+  function tidy(s) { return String(s == null ? '' : s).replace(/\.;(\s)/g, ';$1'); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function num(v) { if (v == null || v === '') return NaN; var n = typeof v === 'number' ? v : parseFloat(v); return isFinite(n) ? n : NaN; }
   function fmtR(v, d) { v = num(v); if (!isFinite(v)) return '<span class="dash">–</span>'; var s = Math.abs(v).toFixed(d == null ? 2 : d); return (v > 0 ? '+' : v < 0 ? '−' : '') + s + 'R'; }
@@ -485,7 +503,7 @@
       var rv = /^(pass|fail)$/.test(rec.verdict) ? rec.verdict : 'inc';
       return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
         '<div class="c-study"><h3>' + esc(name) + '</h3><p class="meta">' + esc(topic) + (rec.built ? ' · built ' + esc(rec.built) : '') + '</p>' +
-        (rec.headline ? '<p class="rule hl" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '') + '</div>' +
+        (rec.headline ? '<p class="rule hl" title="' + esc(tidy(rec.headline)) + '"><em>Verdict:</em> ' + esc(tidy(rec.headline)) + '</p>' : '') + '</div>' +
         '<div class="c-verdict">' + BADGE[rv] + '</div>' +
         '<div class="waiting">Written report only, no results table</div>' +
         '<div class="c-rep"><button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report' + CHEV.replace('<svg', '<svg width="11" height="11"') + '</button></div></article>';
@@ -506,10 +524,11 @@
       pick = pick || baseSet.filter(function (e) { return /^all$/i.test(e[0]); })[0] || baseSet[0];
       base = pick[1]; baseKey = pick[0];
     }
-    var sys = d.system ? esc(d.system) : '';
+    var sys = typeof d.system === 'string' ? esc(d.system) : '';   // one study stores its statistics under `system`: only text is a description (it read "[object Object]")
     var tried = num(d.variantsTried);
     var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : ''), rec.built ? 'built ' + esc(rec.built) : ''].filter(Boolean).join(' · ');
-    var headline = rec.headline ? '<p class="rule hl" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '';
+    var hlText = tidy(rec.headline);
+    var headline = hlText ? '<p class="rule hl" title="' + esc(hlText) + '"><em>Verdict:</em> ' + esc(hlText) + '</p>' : '';
     var bestStats = b || { is: base.is, oos: base.oos };
     var oosB = bestStats.oos || {}, baseOos = num(base.oos && base.oos.exp), bestOos = num(oosB.exp);
     var delta = b && isFinite(baseOos) && isFinite(bestOos) ? bestOos - baseOos : NaN;
@@ -721,7 +740,33 @@
   });
   window.addEventListener('scroll', hideTip, { passive: true });
 
-  // report dialog
+  // report dialog: the study's RESULT.md, rendered (11 Nov 2026; it was shown as raw Markdown in a monospace block). The veteran
+  // library's small renderer: the text is escaped first, so nothing in a report can inject markup; links open in a new tab
+  // only when absolute (a report's relative links point into the repository, not the site, and stay plain text).
+  function mdInline(t) {
+    return t.replace(/`([^`]+)`/g, function (m, c) { return '<code>' + c + '</code>'; }).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*\w])\*([^*\s][^*\n]*)\*(?![*\w])/g, '$1<i>$2</i>')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, txt, href) { return /^https?:\/\//.test(href) ? '<a href="' + href + '" target="_blank" rel="noopener">' + txt + '</a>' : txt; });
+  }
+  function md(src) {
+    var lines = esc(src).replace(/\r/g, '').split('\n'), out = [], i = 0, para = [];
+    function flush() { if (para.length) { out.push('<p>' + mdInline(para.join(' ')) + '</p>'); para = []; } }
+    while (i < lines.length) {
+      var l = lines[i];
+      if (/^```/.test(l)) { flush(); var code = []; i++; while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]); i++; out.push('<pre><code>' + code.join('\n') + '</code></pre>'); continue; }
+      var h = /^(#{1,4})\s+(.*)$/.exec(l); if (h) { flush(); out.push('<h' + h[1].length + '>' + mdInline(h[2]) + '</h' + h[1].length + '>'); i++; continue; }
+      if (/^\s*(-{3,}|\*{3,})\s*$/.test(l)) { flush(); out.push('<hr>'); i++; continue; }
+      if (/^\s*\|/.test(l) && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}/.test(lines[i + 1])) {
+        flush(); var cells = function (r) { return r.trim().replace(/^\|/, '').replace(/\|$/, '').split('|'); }, head = cells(l), rows = []; i += 2; while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(cells(lines[i++]));
+        out.push('<div class="tbl" tabindex="0"><table><thead><tr>' + head.map(function (c) { return '<th scope="col">' + mdInline(c.trim()) + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + mdInline(c.trim()) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>'); continue; }
+      var li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(l);
+      if (li) { flush(); var ol = /\d/.test(li[1]), items = []; while (i < lines.length && (li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(lines[i]))) { var it = li[2]; i++; while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])) it += ' ' + lines[i++].trim(); items.push('<li>' + mdInline(it) + '</li>'); } out.push((ol ? '<ol>' : '<ul>') + items.join('') + (ol ? '</ol>' : '</ul>')); continue; }
+      if (/^&gt;\s?/.test(l)) { flush(); var q = []; while (i < lines.length && /^&gt;\s?/.test(lines[i])) q.push(lines[i++].replace(/^&gt;\s?/, '')); out.push('<blockquote>' + mdInline(q.join(' ')) + '</blockquote>'); continue; }
+      if (!l.trim()) { flush(); i++; continue; }
+      para.push(l.trim()); i++;
+    }
+    flush(); return out.join('\n');
+  }
+  window.MX_EDGE_MD = md;
   var dlg = $('rep');
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-rep]'); if (!b) return;
@@ -731,7 +776,7 @@
     $('rep-body').textContent = 'Loading…';
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
     fetch(url, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'This study has no RESULT.md yet.' : 'HTTP ' + r.status); return r.text(); })
-      .then(function (txt) { $('rep-body').textContent = txt; $('rep-body').scrollTop = 0; }, function (err) { $('rep-body').textContent = err.message; });
+      .then(function (txt) { $('rep-body').innerHTML = md(txt); $('rep-body').scrollTop = 0; }, function (err) { $('rep-body').textContent = err.message; });
   });
   $('rep-x').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
   dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
