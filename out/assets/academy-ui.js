@@ -20,7 +20,7 @@
 //
 // The site's firewall allows 30 requests a minute per IP on /api. Every Academy call goes through MXAC.makeApi: at most
 // PACE (24) calls in any minute, a wait and a retry on HTTP 429, POSTs one at a time. A replay run reads the candidates,
-// the lessons, the calendar and the past cases once; one train decision then costs two calls (the stored attempt, then the session position, so a reload keeps the place).
+// the lessons, the calendar and the past cases once; one train decision then costs two calls (the stored attempt, then the session position, so a reload keeps the place). The Session tab does the same since round 3.
 //
 // The pure helpers at the top are also loaded by Node (tests/academy-ui.test.mjs, scripts/academy-dev.mjs).
 (function (root) {
@@ -222,6 +222,16 @@
   // Is a verdict being written that Continue would throw away? m = the mentor's form; m.dirty is set by every edit and
   // cleared when the correction is stored. True from the first choice, reason, word or mark until it is saved.
   const mentorUnsaved = (m) => !!m && !!m.dirty && !!(m.choice || (m.reasons || []).length || String(m.text || '').trim() || (m.annotations || []).length);
+  // One question for every way of leaving a half-written answer (Train, Session, Blind arena). leaveGuard({ unsaved(), tell(),
+  // now?, ms? }) → ok(): true when nothing unsaved is on the form, or when asked a second time within LEAVE_MS; the first
+  // time it calls tell() (the page says "not saved") and returns false. ok.reset() forgets a first press. It only delays a
+  // click: it stores nothing, sends nothing and decides nothing.
+  const LEAVE_MS = 10000;
+  function leaveGuard(o) {
+    const now = o.now || (() => Date.now()), ms = o.ms || LEAVE_MS; let asked = 0;
+    const ok = () => { if (!o.unsaved()) { asked = 0; return true; } const t = now(); if (asked && t - asked < ms) { asked = 0; return true; } asked = t; if (o.tell) o.tell(); return false; };
+    ok.reset = () => { asked = 0; }; return ok;
+  }
   // the one line under the chart when the clock stops on a setup: what was decided and where to go next
   function pointLine(o) {
     const x = o || {}, a = x.action || 'n/a', conf = x.confidence ? ` (${x.confidence} confidence)` : '';
@@ -368,13 +378,14 @@
   }
   // saved sessions, the one saved last first (the API lists them in the order they were created)
   const latestFirst = (rows) => (Array.isArray(rows) ? rows.slice().sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))) : []);
-  const unfinished = (rows) => (Array.isArray(rows) ? rows.find((s) => s && s.kind === 'replay' && s.status !== 'done') || null : null);
+  // kinds: 'replay' (a Train replay, the default), 'session' (a Session-tab sitting), or a list of both
+  const unfinished = (rows, kinds) => { const ks = [].concat(kinds || 'replay'); return Array.isArray(rows) ? rows.find((s) => s && ks.indexOf(s.kind) >= 0 && s.status !== 'done') || null : null; };
   const REG = {};        // tabs registered by other files: id → { title, render }
   let onRegister = null;
   const MXAC = {
     VERSION: '1.1.0', PACE, TRIES, makeApi, historyAt, mentorLevelsOf, whatIfAllowed, whatIfWindow, whatIfAlternatives, whatIfRun, whatIfNote, WHATIF_REASON, WHATIF_CAP_BARS, WHATIF_TOL, fmtCash, isTake, actOf, fin, featLabel, VERDICT_WORD, TFS, HTFS, DIFFICULTY, TABS, REASONS, ANNOTATIONS, LOOKBACK_BARS, THESIS_EVERY,
     lookbackSec, dayStart, isoDay, dayToSec, fmtTime, fmtPrice, fmtR, chartTfOf, htfFor, defaultRange, dueCandidate, difficultyAllows, costTotal, unfilled, netRAt,
-    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, pointLine, latestFirst, unfinished, mainReasons, conflictIds, mentorChoices,
+    condText, thenText, lessonText, parseValue, valueToInput, restoreApplied, proveWithControl, buildCorrection, correctionProblems, examSummary, sameAnswer, candleError, snapshotClean, snapshotSeries, calendarCut, humanize, mentorUnsaved, leaveGuard, LEAVE_MS, pointLine, latestFirst, unfinished, mainReasons, conflictIds, mentorChoices,
     lastSnapshot: null, checks: { snapshots: 0, future: 0 }, whatIfLoads: [],
     registerTab(id, def) {
       if (typeof id !== 'string' || !/^[a-z][a-z0-9-]{0,30}$/.test(id) || !def || typeof def.render !== 'function') throw new Error('MXAC.registerTab(id, { title, render }) needs a short id and a render function');
@@ -526,12 +537,18 @@
     return CACHE.lessons[edgeId];
   }
   const lessonsChanged = () => { CACHE.lessons = {}; };
+  // the lesson already saved from a stored correction (in force or switched off), or null: one read of the edge's lessons
+  async function savedLessonOf(edgeId, correctionId) { if (!correctionId) return null; const all = (await api.get({ get: 'lessons', edge: edgeId })).lessons || []; return all.filter((l) => l && l.source && l.source.correctionId === correctionId).pop() || null; }
   // past cases up to `before`, read once and cut per decision with historyAt. A wider list already read is reused.
   async function historyFor(edgeId, before) {
     const c = CACHE.hist[edgeId]; if (c && c.before >= before) return c;
     try { const j = await api.get({ get: 'history', edge: edgeId, before }); return (CACHE.hist[edgeId] = { before, rows: Array.isArray(j.rows) ? j.rows : [], available: j.available !== false }); }
     catch (e) { return { before, rows: [], available: false }; }   // the route may be missing or its data not built: no sample
   }
+  // An attempt was just stored for a setup: remember it for this page, and in the pool list every section shares, with the
+  // mode it was stored in. The Blind arena reads that mode: a setup whose engine answer was shown in Train or Session since
+  // its hidden attempt is answered as recall (a fresh hidden attempt, left out of every score), never as a blind answer.
+  function decidedAs(id, pool, mode) { DECIDED.add(id); if (pool && mode) { pool.seen = pool.seen || {}; const p = pool.seen[id]; pool.seen[id] = Object.assign({}, p, { mode, attempts: ((p && p.attempts) || 0) + 1 }); } }
   const seenBefore = (pool, id) => DECIDED.has(id) || !!(pool && pool.seen && pool.seen[id] && pool.seen[id].attempts > 0);
   async function refreshPool(resetRange) {
     const e = edgeSel(); if (!e) return; const token = ++S.poolToken, pool = modeVal() === 'exam' ? 'exam' : 'train', note = $('f-count');
@@ -562,8 +579,8 @@
   async function renderSessions() {
     const ul = $('sess-list');
     try {
-      const j = await api.get({ get: 'sessions' }), rows = latestFirst((j.sessions || []).filter((s) => s.kind === 'replay')).slice(0, 12);
-      renderResumeNow(unfinished(rows));
+      const j = await api.get({ get: 'sessions' }), all = latestFirst(j.sessions || []), rows = all.filter((s) => s.kind === 'replay').slice(0, 12);
+      renderResumeNow(unfinished(all, ['replay', 'session']));   // whichever was saved last: a Train replay, or a sitting of the Session tab
       listOr(ul, rows, 'No saved session yet. Use "Save session" during a replay.', (s) => el('li', { 'data-session': s.id },
         el('div', {}, el('b', { text: s.title || s.edge }), el('br'), el('small', { text: (s.summary || '') + ' · saved ' + String(s.updatedAt || '').slice(0, 16).replace('T', ' ') + ' UTC' })),
         el('button', { type: 'button', class: 'btn sm', text: 'Resume', onclick: () => resumeSession(s.id) })));
@@ -576,8 +593,9 @@
     const box = $('resume-now'); if (!box) return; clear(box);
     if (!s || S.clock || S.loading || resumeHidden) { box.hidden = true; return; }
     box.hidden = false;
-    box.appendChild(el('div', { class: 'resume-t' }, el('b', { text: 'Pick up where you left off' }), el('span', { id: 'resume-now-text', text: `${s.title || s.edge} · ${s.summary || 'a saved replay'} · saved ${String(s.updatedAt || '').slice(0, 16).replace('T', ' ')} UTC` })));
-    box.appendChild(el('div', { class: 'resume-go' }, el('button', { type: 'button', class: 'btn primary', id: 'resume-now-go', text: 'Resume', onclick: () => { box.hidden = true; resumeSession(s.id); } }),
+    const sit = s.kind === 'session';   // a sitting of the Session tab is resumed there (MXAC.sessionResume is read once by that tab)
+    box.appendChild(el('div', { class: 'resume-t' }, el('b', { text: 'Pick up where you left off' }), el('span', { id: 'resume-now-text', text: `${sit ? 'Session tab · ' : ''}${s.title || s.edge} · ${sit && fin(s.t) ? 'paused at ' + fmtTime(s.t) : s.summary || 'a saved replay'} · saved ${String(s.updatedAt || '').slice(0, 16).replace('T', ' ')} UTC` })));
+    box.appendChild(el('div', { class: 'resume-go' }, el('button', { type: 'button', class: 'btn primary', id: 'resume-now-go', 'data-kind': s.kind, text: sit ? 'Resume in the Session tab' : 'Resume', onclick: () => { box.hidden = true; if (sit) { resumeHidden = true; MXAC.sessionResume = s.id; showTab('session'); } else resumeSession(s.id); } }),
       el('button', { type: 'button', class: 'btn', id: 'resume-now-no', text: 'Not now', onclick: () => { resumeHidden = true; box.hidden = true; } })));
   }
   // The edge used last is remembered on this device (pref mxacEdge), so the page and its sections open on it.
@@ -870,14 +888,16 @@
   async function stepOne() { if (!S.clock || S.busy || !leaveOk()) return; if (S.cur && !S.cur.closed) await settlePoint(); S.clock.step(1); }
   // Leaving a decision point while a verdict is half written would throw it away without a word. The first press says so
   // (beside both Continue buttons) and changes nothing; a second press within LEAVE_MS leaves. A saved verdict never asks.
-  const LEAVE_MS = 10000; let leaveAsked = 0;
-  function leaveOk() {
-    if (!S.cur || S.cur.closed || !mentorUnsaved(M)) return true;
-    const now = Date.now(); if (leaveAsked && now - leaveAsked < LEAVE_MS) { leaveAsked = 0; return true; }
-    leaveAsked = now; const msg = 'Your verdict is not saved yet. Press "Save correction" to keep it, or press Continue again to leave without it.';
+  // The guard itself is MXAC.leaveGuard, shared with the Session tab and the Blind arena.
+  const trainUnsaved = () => !!S.cur && !S.cur.closed && mentorUnsaved(M);
+  const leaveOk = leaveGuard({ unsaved: trainUnsaved, tell: () => {
+    const msg = 'Your verdict is not saved yet. Press "Save correction" to keep it, or press Continue again to leave without it.';
     say('replay-msg', msg); renderPointBar(msg); const c = $('continue-msg'); if (c) c.textContent = msg;
-    return false;
-  }
+  } });
+  // Closing or reloading the page with a half-written answer on any section: the browser asks first (its own question; the
+  // page stores nothing). Sections add their own check with kit.watchUnsaved.
+  const UNSAVED = [trainUnsaved];
+  root.addEventListener('beforeunload', (e) => { if (UNSAVED.some((f) => { try { return !!f(); } catch (x) { return false; } })) { e.preventDefault(); e.returnValue = ''; } });
   // ---- the line under the chart at a decision point, and scrolling between the chart and the cards ------------------------
   const calm = () => !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
   function goTo(id) { const n = $(id); if (!n || n.hidden) return; n.scrollIntoView({ block: 'start', behavior: calm() ? 'auto' : 'smooth' }); if (!n.hasAttribute('tabindex')) n.setAttribute('tabindex', '-1'); try { n.focus({ preventScroll: true }); } catch (e) { /* older browsers */ } }
@@ -957,7 +977,7 @@
     S.future = null; if (CH.series && CH.marked) { CH.series.setMarkers([]); CH.marked = false; }
     if (CH.series) { clearLines(CH.edgeLines); clearMentorLines(); clearLines(CH.annLines); }
     Object.assign(M, { choice: null, entry: null, stop: null, target: null, bias: '', edge: '', reasons: [], text: '', annotations: [], arm: null, dirty: false, tried: false }); clear($('zones'));
-    leaveAsked = 0; renderPointBar();
+    leaveOk.reset(); renderPointBar();
   }
   function pointError(c, e) {
     S.cur = null; hidePoint(); const box = $('decision'); box.hidden = false;
@@ -980,7 +1000,7 @@
       S.thesis = MXA.thesis.update(S.thesis, snap, d); renderThesis();
       const firstSave = !S.sessionId; if (firstSave) await saveSession(true, c.id);
       const again = seenBefore(S.pool, c.id);   // decided in an earlier sitting: this one is a same-trade replay (recall), and is stored as one
-      const res = await api.post(attemptBody(c, st.edge.id, again ? 'replay-same' : 'train', d, lessons, hash, f)); DECIDED.add(c.id);
+      const res = await api.post(attemptBody(c, st.edge.id, again ? 'replay-same' : 'train', d, lessons, hash, f)); decidedAs(c.id, S.pool, again ? 'replay-same' : 'train');
       if (again) log(`The setup at ${fmtTime(c.t)} was decided in an earlier sitting: this answer is stored as a same-trade replay (recall, not a new setup).`);
       S.cur = { cand: c, snap, hash, features: f, diff, acctAt: r.acct, historyAvailable: hist.available, first: { decision: d, risk: r.risk, row: res.attempt, n: res.n }, latest: null, correction: null, lesson: null, savedLesson: null, cmp: null, closed: false };
       S.cur.latest = S.cur.first; S.lastBlock = r.risk && !r.risk.allowed ? r.risk.blocks.join('; ') : null;
@@ -1006,9 +1026,17 @@
       const wrap = (row) => ({ decision: Object.assign({ side: c.side }, restoreApplied(row.decision)), risk, row, n: row.n, stored: true });
       S.cur = { cand: c, snap, hash, features: f, diff: MXA.difficulty(f, rows[0].decision), acctAt: acct, historyAvailable: null, first: wrap(rows[0]), latest: wrap(rows[rows.length - 1]), correction: null, lesson: null, savedLesson: null, cmp: null, closed: false, restored: true };
       // the verdict already stored on its first attempt comes back with it (one read, on resume only), so the point is not
-      // shown as unjudged; a lesson draft that was never saved is not rebuilt
+      // shown as unjudged
       try { const ks = ((await api.get({ get: 'corrections', edge: st.edge.id, cand: c.id })).corrections || []).filter((k) => k.attemptId === rows[0].id); if (ks.length) S.cur.correction = ks[ks.length - 1]; } catch (e) { /* shown as unjudged */ }
-      S.done.add(c.id); showPoint(); if (S.cur.correction) renderProve(); renderAttempts(rows);
+      // The lesson draft comes back too, with nothing kept in the browser: the proposal is a pure function of the stored
+      // attempt, the stored correction and the features of the snapshot rebuilt here, so it is simply made again (edits typed
+      // into a draft that was never saved are not kept: a draft carries the corrected answer, which must not sit in browser
+      // storage). One read, on resume only, says whether a lesson was already saved from this correction.
+      if (S.cur.correction) {
+        S.cur.lesson = MXA.lessons.fromCorrection(S.cur.first.decision, Object.assign({}, S.cur.correction, { sessionId: S.sessionId }), f);
+        try { S.cur.savedLesson = await savedLessonOf(st.edge.id, S.cur.correction.id); } catch (e) { S.cur.lesson = null; }   // not known: no draft is offered, rather than a second copy of a saved lesson
+      }
+      S.done.add(c.id); showPoint(); if (S.cur.correction) { if (S.cur.lesson) { renderLesson(); if (S.cur.savedLesson) say('lesson-msg', `Lesson saved ✓ (version ${S.cur.savedLesson.version}).`); } renderProve(); } renderAttempts(rows);
       log(`Back on the setup at ${fmtTime(c.t)}: ${rows.length} stored attempt${rows.length === 1 ? '' : 's'}.`);
     } catch (e) { log(`The decision point of ${candId} could not be shown again: ${e.message}`); }
   }
@@ -1131,7 +1159,7 @@
     box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'm-save', disabled: true, text: 'Save correction', onclick: saveCorrection }), el('span', { class: 'ac-status', id: 'm-msg', role: 'status' })));
   }
   function choose(v) {
-    M.choice = v; M.dirty = true; M.tried = false; leaveAsked = 0; document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
+    M.choice = v; M.dirty = true; M.tried = false; leaveOk.reset(); document.querySelectorAll('#mentor [data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
     const lv = mentorLevels(v), take = isTake(v);
     for (const k of ['entry', 'stop', 'target']) { M[k] = lv[k]; const inp = $('m-' + k); inp.disabled = !take; inp.value = take && fin(lv[k]) ? lv[k] : ''; }
     drawMentorLines(); mentorCheck();
@@ -1141,7 +1169,7 @@
     try {
       const c = buildCorrection(M, cur.first.row.id), errorClass = MXA.classifyError(cur.first.decision, c, null);
       const res = await api.post({ action: 'correct', edge: S.setup.edge.id, correction: Object.assign({}, c, { errorClass }) });
-      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveAsked = 0; renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
+      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveOk.reset(); renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);
@@ -1418,7 +1446,7 @@
     try {
       const lessons = (S.lessons = await lessonsFor(st.edge.id));
       const firstSave = !S.sessionId; if (firstSave) await saveSession(true);
-      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons, S.hist); if (!firstSave) await keepPlace();   // an exam setup is decided once: the place kept is after it delete CACHE.pool[st.edge.id + '|exam'];
+      const x = await examOne(c, st.edge, S.series, S.dataVersion, st, lessons, S.hist); delete CACHE.pool[st.edge.id + '|exam']; if (!firstSave) await keepPlace();   // an exam setup is decided once: the place kept is after it
       const ej = await api.get({ get: 'exams', edge: st.edge.id }), row = (ej.exams || []).find((r) => r.candidateId === c.id) || null;
       S.cur = { cand: c, snap, hash, features: f, diff: MXA.difficulty(f, x.withL), acctAt: null, historyAvailable: null, first: { decision: x.withL, risk: null, row: x.attempt.attempt, n: x.attempt.n }, latest: null, exam: { without: x.without, row }, closed: false };
       S.cur.latest = S.cur.first; S.thesis = MXA.thesis.update(S.thesis, snap, x.withL); renderThesis();
@@ -1445,7 +1473,7 @@
     await startReplay(null, { at: t }); return true;
   }
   MXAC.kit = { showNode, el, add, clear, listOr, actBadge, actClass, css, say, newChart, viewBarsOf, loadSeries, snapOf, decideOn, ensureCalendar, poolFor, lessonsFor, lessonsChanged, historyFor, seenBefore, attemptBody, decisionView, lessonForm, lessonProblemsOf, openInTrain, whatIfCard,
-    decided: (id) => DECIDED.add(id), calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
+    decided: decidedAs, leaveGuard, watchUnsaved: (fn) => { if (typeof fn === 'function') UNSAVED.push(fn); }, savedLessonOf, calendar: () => S.calendar, lessonKeys: () => LESSON_KEYS.slice() };
 
   // ---- boot -----------------------------------------------------------------------------------------------------------
   function boot(me) {
