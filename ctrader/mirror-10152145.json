@@ -6668,7 +6668,8 @@
     "t1": 1.4221599999999999,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42116,
@@ -6682,7 +6683,8 @@
     "lagSec": 634,
     "positionId": "48346849",
     "volume": 500000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T09:39:10.000Z"
    },
    "usdcad-scalp-1794384097": {
     "symbol": "USDCAD",
@@ -6911,7 +6913,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9918.41 · 28 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9921.71 · 27 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6944,15 +6946,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9918.41,
-  "lastRun": "2026-11-11T09:37:45.000Z"
+  "balance": 9921.71,
+  "lastRun": "2026-11-11T09:39:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved GBPUSD 48035675 protection: stop 1.34322 -> 1.34289, target 1.34046 -> 1.34013 (council scalp)",
-   "trade": "gbpusd-scalp-1794315492"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved XAUUSD 48039921 protection: stop 4080.0514285714285 -> 4080.876, target 4068.715 -> 4069.54 (council scalp)",
@@ -8447,6 +8444,11 @@
    "at": "2026-11-11T09:35:12.000Z",
    "msg": "opened buy USDCAD 0.03 lot (council scalp)",
    "trade": "usdcad-scalp-1794389649"
+  },
+  {
+   "at": "2026-11-11T09:39:10.000Z",
+   "msg": "USDCAD position 48346849 closed at the broker",
+   "trade": "usdcad-scalp-1794383071"
   }
  ],
  "limits": {
