@@ -299,7 +299,7 @@ test('a failed store read answers 5xx and writes nothing', async () => {
 test('the store: missing reads as the fallback, a failed Blob read throws, same options as the other private files, a queue per key, caps roll into archives', async () => {
   // Blob backend with a fake client
   const puts = [], files = new Map(), blob = { list: async ({ prefix }) => ({ blobs: [...files.keys()].filter((k) => k.startsWith(prefix)).map((k) => ({ pathname: k, url: `https://blob.example/${k}` })) }), put: async (p, body, opts) => { puts.push({ p, opts }); files.set(p, body); } };
-  let ok = true; const fetchFn = async (url, o) => { assert.equal(o.headers.Authorization, 'Bearer tok'); assert.equal(o.cache, 'no-store'); return { ok, status: ok ? 200 : 500, json: async () => JSON.parse(files.get(url.replace('https://blob.example/', ''))) }; };
+  let ok = true; const fetchFn = async (url, o) => { assert.equal(o.headers.Authorization, 'Bearer tok'); assert.equal(o.cache, 'no-store'); assert.match(url, /\?cache=0$/, 'read from the origin, not the CDN copy'); return { ok, status: ok ? 200 : 500, json: async () => JSON.parse(files.get(url.replace('https://blob.example/', '').replace(/\?cache=0$/, ''))) }; };
   const B = ST.blobStore({ BLOB_READ_WRITE_TOKEN: 'tok' }, { blob, fetch: fetchFn, recent: new Map(), tails: new Map() });
   assert.deepEqual(await B.get('lessons.json', { rows: [] }), { rows: [] }, 'missing = the fallback');
   await B.put('lessons.json', { v: 1, rows: [1] });
