@@ -81,5 +81,5 @@ By group (reported): equity indices +0.038R (n 517, t 0.40) then −0.069R (n 27
 
 ## To repeat
 
-`node --use-env-proxy research/edge/trend-breadth-h1/fetch.mjs <dir>` (about 600 candle requests, 26 MB, kept out of git),
+`node --use-env-proxy research/edge/trend-breadth-h1/fetch.mjs <dir>` (about 600 candle requests, 23 MB, kept out of git),
 then `node research/edge/trend-breadth-h1/run.mjs full <dir>`. Tests: `tests/trend-breadth-h1.test.mjs`.
