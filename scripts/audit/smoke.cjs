@@ -97,6 +97,12 @@ async function wire(ctx, account, seen) {
       if (account && INNER[path]) { const n = errs.length; await ev(p, calm, () => { location.hash = '#scanner'; location.hash = '#council/trades'; setTimeout(() => { location.hash = '#home'; }, 30); }).catch((e) => errs.push(e.message.split('\n')[0]));
         const home = await p.waitForFunction(() => document.documentElement.dataset.view === 'home', null, { timeout: 10000 }).then(() => true, () => false); await p.waitForTimeout(400);
         if (!home) errs.push('did not end on the last view asked for'); for (let i = n; i < errs.length; i++) errs[i] = `views changed back to back: ${errs[i]}`; }
+      // simple phone view (11 Nov): a phone opens the Desk in its simple view, and Home's first screen holds the answer, at most
+      // three open rows, what waits, the places to go and a few folded rows: never the old wall of cards
+      if (account && DESK.includes(path) && viewport.width < 500) { const f = await ev(p, calm, () => { const top = innerHeight - 72, inF = (e) => { const r = e.getBoundingClientRect(); return r.height > 0 && r.top < top && r.bottom > 0; };
+          return { mode: document.documentElement.dataset.phone || '', view: document.documentElement.dataset.view, rows: document.querySelectorAll('#ps-o-list a').length, n: [...document.querySelectorAll('#v-home :is(.ps-ans, .ps-rows a, .ps-need, .ps-go, .ps-fold, .card, .tile, .h-today, .h-mk, .h-quick)')].filter(inF).length }; }).catch((e) => { errs.push('simple phone view could not be read: ' + e.message.split('\n')[0]); return null; });
+        if (f && f.mode !== 'simple') errs.push('simple phone view: the phone did not open the Desk in its simple view');
+        else if (f && f.view === 'home' && (!f.n || f.n > 9 || f.rows > 3)) errs.push(`simple phone view: Home's first screen holds ${f.n} blocks and ${f.rows} open rows (at most 9 and 3)`); }
       await calm();
       // the gold terminal clips sideways overflow (body overflow-x hidden): a tab wider than the phone is cut off and nothing scrolls,
       // so each tab is opened and the body's own content width is read (side pages pass, 11 Nov: the Daily Bias banner and a table)
