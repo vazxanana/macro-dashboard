@@ -125,13 +125,46 @@ async function paperHistory(M) {
   return { H, m5, D, m5days: new Set([...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d)) };
 }
 
+// ONE booked outcome for every surface (11 Nov 2026): a closed record is a win, a loss or break-even by the sign of its stored
+// per-unit R (`Rraw`, else `R`), exactly as it was booked; display rounding or sizing never changes it. The desk page
+// (MS_ICT.outcome) and the connector (api/mcp.js outcome) use the same rule; tests/ict-trace.test.mjs compares the three.
+// "Near-flat" is a research label only, with a published tolerance: |per-unit R| <= NEAR_FLAT. It never replaces the outcome.
+export const NEAR_FLAT = 0.05;
+export const unitR = (t) => (typeof t.Rraw === 'number' ? t.Rraw : typeof t.R === 'number' ? t.R : null);
+export const booked = (t) => !!t && t.status !== 'open' && unitR(t) != null && (!!t.closed || ['win', 'loss', 'be'].includes(t.status));
+export function outcomeOf(t) { if (!booked(t)) return 'open'; const r = unitR(t); return r > 0 ? 'win' : r < 0 ? 'loss' : 'be'; }
+export const nearFlat = (t) => outcomeOf(t) !== 'open' && Math.abs(unitR(t)) <= NEAR_FLAT;
+export function tally(list) {
+  const o = { n: 0, wins: 0, losses: 0, be: 0, nearFlat: 0, open: 0, R: 0 };
+  for (const t of list) { const k = outcomeOf(t); if (k === 'open') { o.open++; continue; } o.n++; o[k === 'win' ? 'wins' : k === 'loss' ? 'losses' : 'be']++; if (nearFlat(t)) o.nearFlat++; o.R += t.R; }
+  o.R = +o.R.toFixed(2); return o;
+}
+// The correction log (council-data ict/replay-log.json): what a run changed against the file it replaces, so a changed result can
+// always be explained. `resolved` = a record that was unresolved and is now booked (its first and only exit); `corrected` = a
+// booked result that differs; `removed` / `added` = records that left or joined the list. A run that changes nothing writes no
+// entry, so running twice books everything once. The file being replaced stays in council-data's git history at `prevAt`.
+const BOOKED = ['status', 'R', 'Rraw', 'R2', 'closed', 'exit', 'exitPx', 'entry', 'stop', 'size'];
+const bookedOf = (t) => Object.fromEntries(BOOKED.filter((k) => t[k] !== undefined).map((k) => [k, t[k]]));
+export function replayDiff(prev, next, at) {
+  const P0 = new Map(((prev && prev.trades) || []).map((t) => [t.id, t])), N0 = new Map(next.trades.map((t) => [t.id, t]));
+  const e = { at, prevAt: (prev && prev.at) || null, resolved: [], corrected: [], removed: [], added: 0, totalsFrom: prev ? tally(prev.trades || []) : null, totalsTo: tally(next.trades) };
+  for (const [id, t] of N0) { const o = P0.get(id); if (!o) { e.added++; continue; }
+    const a = bookedOf(o), b = bookedOf(t); if (JSON.stringify(a) === JSON.stringify(b)) continue;
+    if (!o.closed && t.closed) e.resolved.push({ id, through: o.through ?? null, markR: o.markR ?? null, to: b });
+    else if (o.closed) e.corrected.push({ id, from: a, to: b }); }
+  for (const [id, o] of P0) if (!N0.has(id)) e.removed.push({ id, from: bookedOf(o) });
+  e.changed = e.resolved.length + e.corrected.length + e.removed.length > 0 || (!!prev && e.added > 0);
+  return e;
+}
+export function appendLog(log, entry, keep = 200) { const runs = (log && Array.isArray(log.runs) ? log.runs : []); return entry.changed ? { runs: runs.concat([entry]).slice(-keep) } : { runs }; }
+
 // audit (7 Nov): a hole in the candle history longer than any exchange holiday (4 days) inside a trade's window means the
 // exit cannot be known (gold before CNBC's continuous history had holes of 1-3 weeks: one trade was "held" 17 days)
 export const MAX_GAP = 4 * 86400;
 // opt.strail (shadow 'strail' only): the structure trail [from R, swing candles each side] replaces the 1.5R trail
 export function simulate(g, M, key, src, at = now, opt = {}) {
   const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0;
-  const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : g.close + P.holdH * 3600;   // P.holdH closed H1 candles
+  const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : Math.max(g.close + P.holdH * 3600, hb.length ? hb[hb.length - 1].time + 3600 : 0);   // P.holdH closed H1 candles; with fewer on file (the window is still running, e.g. across a weekend), every candle on file is processed, not only the first 36 clock hours
   { let p = g.close; for (const b of hb) { if (b.time - p > MAX_GAP) return null; p = b.time + 3600; } }
   const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
   const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
@@ -141,7 +174,9 @@ export function simulate(g, M, key, src, at = now, opt = {}) {
   let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0, stop = g.stop, moved = false, beMoved = false;
   const beAt = M.aRule ? null : P.be;   // break-even from +1.5R on index futures, as the tracker
   const trail = opt.strail ? null : P.trail; let sk = 0;
+  let seen = null;   // the last candle processed for exits: the record's checkpoint (`through`)
   for (const b of bars) {
+    seen = b;
     // 'strail': at each H1 close since the signal (hb), from +strail[0] R the stop moves to the last confirmed H1 swing when tighter (as the tracker)
     if (opt.strail) while (sk < hb.length && hb[sk].time + 3600 <= b.time) { sk++;
       if (mfe >= opt.strail[0]) { const ns = strailLevel(hb, sk, s, opt.strail[1]); if (ns != null && (ns - stop) * s > 0) { stop = ns; moved = true; } } }
@@ -155,10 +190,14 @@ export function simulate(g, M, key, src, at = now, opt = {}) {
   // 36 CLOCK hours, i.e. on Friday's last bar
   if (status === 'open' && hb.length === P.holdH && end <= at && bars.length) { const last = bars.at(-1); R = +((s * (last.close - entry)) / r0).toFixed(2); status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; closed = last.time + step; exit = 'time'; exitPx = last.close; }
   const R2 = closed ? (mark2 && mark2 <= closed ? 2 : R) : null;
+  // checkpoint (11 Nov 2026, Fred's audit): how far this record's candles were processed, and, while it is unresolved, the stop in
+  // force there and the R at that candle's close. The desk shows an open replay record "as of" this time, never against a newer price.
+  const through = closed || (seen ? seen.time + step : g.close);
+  const mark = status === 'open' ? { stopNow: f(stop), markPx: seen ? f(seen.close) : f(entry), markR: seen ? +((s * (seen.close - entry)) / r0).toFixed(2) : 0, ...(beMoved ? { beMoved: true } : {}), ...(moved ? { trailMoved: true } : {}) } : {};
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
   return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h', ...(src.cnbcFrom && g.close < src.cnbcFrom ? { cash: true } : {}),
-    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail, ...(opt.strail ? { strail: opt.strail } : {}), be: beAt, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
+    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail, ...(opt.strail ? { strail: opt.strail } : {}), be: beAt, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), through, ...mark, mfe: +mfe.toFixed(2), path,
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
 
@@ -211,6 +250,11 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
       console.log(key, 'paper', JSON.stringify(out.shadowSrc[key]), 'signals', sig.length, 'trades', out.shadowByVariant[v].length);
     } catch (e) { (out.shadowErrors = out.shadowErrors || {})[`${key}-${v}`] = String(e.message || e); console.log(key, 'paper', String(e.message || e)); }
   }
+  // a market whose feed failed this run keeps the records of the file being replaced (11 Nov 2026): missing coverage is not a
+  // correction, and a failed download must never empty the record. They stay exactly as they were, unresolved ones included.
+  const PREV = (() => { try { return JSON.parse(fs.readFileSync(path.join(DATA, 'replay.json'), 'utf8')); } catch (e) { return null; } })();
+  for (const key of Object.keys(out.errors)) { const keep = ((PREV && PREV.trades) || []).filter((t) => t.market === key); if (!keep.length) continue;
+    out.trades = out.trades.filter((t) => t.market !== key).concat(keep); (out.kept = out.kept || {})[key] = keep.length; console.log(key, 'feed failed: kept', keep.length, 'records of the previous file'); }
   out.trades.sort((a, b) => a.opened - b.opened);
   const C = out.trades.filter((x) => x.closed);
   const CA = C.filter((x) => x.aset);
@@ -220,8 +264,15 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
   out.totalsByVariant = {};
   for (const [v, a] of [['dip', out.shadow], ...Object.entries(out.shadowByVariant)]) { a.sort((x, y) => x.opened - y.opened); const SC = a.filter((x) => x.closed);
     out.totalsByVariant[v] = { n: SC.length, wins: SC.filter((x) => x.R > 0).length, R: +SC.reduce((q, x) => q + x.R, 0).toFixed(2) }; }
-  out.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) };
+  { const tl = tally(out.trades); out.totals = { n: tl.n, wins: tl.wins, losses: tl.losses, be: tl.be, nearFlat: tl.nearFlat, open: tl.open, R: tl.R, R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) }; }
+  out.outcome = { rule: 'sign of the stored per-unit R (Rraw, else R) of a closed record', nearFlat: NEAR_FLAT };
+  out.through = now;   // candles up to here were read; an unresolved record carries its own `through`
   fs.mkdirSync(DATA, { recursive: true });
+  // what this run changes against the file it replaces goes to the correction log first
+  try { const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return null; } };
+    const entry = replayDiff(PREV, out, out.at), lg = appendLog(rd('replay-log.json'), entry); if (out.kept) entry.kept = out.kept;
+    if (entry.changed) { fs.writeFileSync(path.join(DATA, 'replay-log.json'), JSON.stringify(lg)); console.log('log', JSON.stringify({ resolved: entry.resolved, corrected: entry.corrected.length, removed: entry.removed.length, added: entry.added })); }
+  } catch (e) { console.log('replay log:', String(e.message || e)); }
   fs.writeFileSync(path.join(DATA, 'replay.json'), JSON.stringify(out));
   console.log('totals', JSON.stringify(out.totals), 'A', JSON.stringify(out.totalsA), 'shadow', JSON.stringify(out.totalsByVariant));
 }

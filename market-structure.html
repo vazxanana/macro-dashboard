@@ -1054,6 +1054,11 @@
   .ict-g { display: inline-block; min-width: 26px; text-align: center; padding: 1px 6px; border-radius: 6px; font: 700 11px var(--mono); border: 1px solid var(--line-strong); }
   .ict-g.ga { color: var(--gold); border-color: var(--gold-line); background: var(--gold-soft); }
   .ict-g.gb { color: var(--ink); } .ict-g.gc { color: var(--ink-faint); }
+  .ict-ex { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .ict-ex-b { font: 500 12px var(--sans); color: var(--ink-dim); background: var(--panel-raised); border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; cursor: pointer; text-align: left; min-height: 28px; }
+  .ict-ex-b b { color: var(--ink); font-weight: 600; } .ict-ex-b.on { border-color: var(--accent); color: var(--ink); } .ict-ex-b:hover { border-color: var(--line-strong, var(--accent)); } .ict-ex-b:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .ict-ex-ck { color: var(--sell); font-weight: 600; } .ict-thru { margin: 4px 0 0; font: 500 12px/1.45 var(--sans); color: var(--ink-dim); }
+  @media (pointer: coarse) { .ict-ex-b { min-height: 44px; } }
   .ict-pill { display: inline-block; padding: 1px 7px; border-radius: 999px; font: 500 11px var(--sans); background: var(--panel-raised); color: var(--ink-dim); border: 1px solid var(--line); }
   .ict-eq svg { width: 100%; height: 180px; display: block; }
   .ict-sw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin: 0 2px 0 6px; }
@@ -3405,7 +3410,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </ol>
     </details>
     <dialog class="tv ict-tv" id="ict-tv" aria-labelledby="ict-tv-t">
-      <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="m5" aria-pressed="false">M5</button><button type="button" data-tf="m15" aria-pressed="false">M15</button><button type="button" data-tf="h1" class="on" aria-pressed="true">H1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
+      <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p><div id="ict-tv-ex"></div></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="m5" aria-pressed="false">M5</button><button type="button" data-tf="m15" aria-pressed="false">M15</button><button type="button" data-tf="h1" class="on" aria-pressed="true">H1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
       <div class="ict-tv-c" id="ict-tv-c"></div>
       <dl class="ict-lv ict-tv-lv" id="ict-tv-lv"></dl>
       <ul class="ict-ck" id="ict-tv-ck" aria-label="Signal checklist"></ul>
@@ -3421,7 +3426,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <div class="ict-tags" id="ict-rv-tags"></div>
           <textarea id="ict-rv-text" rows="3" maxlength="3000" placeholder="What did the chart say: liquidity, draw on liquidity, premium / discount, time of day…"></textarea>
         </fieldset>
-        <div class="u-actions"><button type="submit" class="u-btn">Save</button><span class="ms-note" id="ict-rv-msg" role="status"></span></div>
+        <p class="ms-note" id="ict-rv-for"></p><div class="u-actions"><button type="submit" class="u-btn">Save</button><span class="ms-note" id="ict-rv-msg" role="status"></span></div>
       </form>
     </dialog>
   </section>
@@ -8262,12 +8267,34 @@ function msNextSetup(bars, A) {
   }
   // summary of closed records: n, wins, win rate, total, expectancy (R / trade), average win / loss, profit factor, max drawdown
   // (peak to trough of the running total, in close order)
+  // ONE booked outcome (11 Nov, Fred's audit), the same rule as ict/replay.mjs outcomeOf and the connector: a closed record is a
+  // win, a loss or break-even by the sign of its stored per-unit R (Rraw, else R); sizing and display rounding never change it; a
+  // record with no close is open and is never counted as booked. Near-flat (|per-unit R| <= NEAR_FLAT) is a research label only.
+  var NEAR_FLAT = 0.05;
+  function unitR(x) { return num(x && x.Rraw) != null ? x.Rraw : num(x && x.R); }
+  function booked(x) { return !!x && x.status !== 'open' && unitR(x) != null && (!!x.closed || x.status === 'win' || x.status === 'loss' || x.status === 'be'); }
+  function outcome(x) { if (!booked(x)) return 'open'; var r = unitR(x); return r > 0 ? 'win' : r < 0 ? 'loss' : 'be'; }
+  function nearFlat(x) { return booked(x) && Math.abs(unitR(x)) <= NEAR_FLAT; }
+  // an unresolved replay record as of the last candle the replay processed: per-unit R there (never against a newer price)
+  function markR(x) { return x && x.replay && x.status === 'open' && num(x.markR) != null ? x.markR : null; }
+  // the two executions of one signal: the live tracker's <id> and the replay's <id>-r
+  function twinId(id) { id = String(id); return /-r$/.test(id) ? id.replace(/-r$/, '') : id + '-r'; }
+  // whose execution a desk note belongs to: its key says it (a replay id ends in -r). A note whose recorded fill sits nearer the
+  // OTHER execution's entry is flagged for a look (it may have been written while reading the other one).
+  function reviewExec(id, rv, own, other) {
+    var ex = (rv && rv.exec) || (/-r$/.test(String(id)) ? 'replay' : 'live'), f = rv && num(rv.fill), check = false;
+    if (f != null && own && other && num(own.entry) != null && num(other.entry) != null && Math.abs(f - other.entry) < Math.abs(f - own.entry)) check = true;
+    return { exec: ex, check: check };
+  }
   function stats(L, f) {
+    var byOutcome = !f;   // the default view counts wins and losses by the booked outcome; a custom value (R2, own R) by its sign
     f = f || function (x) { return x.R; };
     var A = (L || []).filter(function (x) { return x && num(f(x)) != null; }).slice().sort(function (a, b) { return (a.closed || 0) - (b.closed || 0); });
     var n = A.length, w = 0, l = 0, gw = 0, gl = 0, tot = 0, pk = 0, dd = 0;
-    A.forEach(function (x) { var r = f(x); tot += r; if (r > 0) { w++; gw += r; } else if (r < 0) { l++; gl -= r; } pk = Math.max(pk, tot); dd = Math.max(dd, pk - tot); });
-    return { n: n, w: w, l: l, wr: n ? w / n : null, tot: tot, exp: n ? tot / n : null, avgW: w ? gw / w : null, avgL: l ? -gl / l : null, pf: gl > 0 ? gw / gl : (gw > 0 ? Infinity : null), dd: dd };
+    var be = 0, nf = 0;
+    A.forEach(function (x) { var r = f(x), k = byOutcome && booked(x) ? outcome(x) : r > 0 ? 'win' : r < 0 ? 'loss' : 'be'; tot += r; if (k === 'win') w++; else if (k === 'loss') l++; else be++; if (byOutcome && nearFlat(x)) nf++;
+      if (r > 0) gw += r; else if (r < 0) gl -= r; pk = Math.max(pk, tot); dd = Math.max(dd, pk - tot); });
+    return { n: n, w: w, l: l, be: be, nearFlat: nf, wr: n ? w / n : null, tot: tot, exp: n ? tot / n : null, avgW: w ? gw / w : null, avgL: l ? -gl / l : null, pf: gl > 0 ? gw / gl : (gw > 0 ? Infinity : null), dd: dd };
   }
   // fixed orders for the breakdown rows (grades best first, sessions in the order of the day); unknown keys after, by sample size
   var ORDER = { grade: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C', 'n/a'], session: ['Asia', 'London', 'NY AM', 'NY PM', 'Close', 'n/a'], tier: ['A+', 'A-setup', 'Other'] };
@@ -8310,7 +8337,7 @@ function msNextSetup(bars, A) {
     if (!gold && x && x.aset === false && rule.every(function (q) { return q.ok === true; })) add('rule', 'Not a jobs-report morning', false);
     return I;
   }
-  W.MS_ICT = { NY: NY, HOLD: HOLD, nyShift: nyShift, checklist: checklist, nyDay: nyDay, nyTime: nyTime, nyHM: nyHM, openHour: openHour, norm: norm, liveR: liveR, liveRs: liveRs, holdLeft: holdLeft, stats: stats, groupBy: groupBy, ORDER: ORDER };
+  W.MS_ICT = { NY: NY, HOLD: HOLD, nyShift: nyShift, checklist: checklist, nyDay: nyDay, nyTime: nyTime, nyHM: nyHM, openHour: openHour, norm: norm, liveR: liveR, liveRs: liveRs, holdLeft: holdLeft, outcome: outcome, booked: booked, nearFlat: nearFlat, NEAR_FLAT: NEAR_FLAT, unitR: unitR, markR: markR, twinId: twinId, reviewExec: reviewExec, stats: stats, groupBy: groupBy, ORDER: ORDER };
 })(window);
 </script>
 <script>
@@ -8369,16 +8396,27 @@ function msNextSetup(bars, A) {
   async function load() {
     const [t, s, b, d, r, sh] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json'), get('shadow.json')]);
     if (t) S.trades = t.map(ICT.norm).filter(KEEP); if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
-    if (r && r.trades) { S.replay = r.trades.map(ICT.norm).filter(KEEP); S.replayInfo = r; }
+    if (r && r.trades) { S.replay = r.trades.map(ICT.norm).filter(KEEP).map((x) => (x.status === 'open' && x.stopNow != null ? Object.assign(x, { stop0: x.stop0 ?? x.stop, stop: x.stopNow }) : x)); S.replayInfo = r; }
+    BYID.clear(); for (const x of S.trades.concat(S.replay)) BYID.set(x.id, x);
     S.dip = sh && Array.isArray(sh.trades) ? sh : null; S.dipReplay = r && Array.isArray(r.shadow) ? r.shadow.map(ICT.norm).filter(KEEP) : null;   // candidate 'dip' rule, paper comparison only
     S.vars = sh && sh.variants ? sh.variants : null; S.varsReplay = r && r.shadowByVariant ? r.shadowByVariant : null;   // 'nofri' / 'h1opp' A-rule variants, paper comparison only
     window.renderIct();
   }
   // floating R per unit from the snapshot price (null without a price: never a fake loss); liveRs is x size, as closed R is booked.
   // A cash-index replay record (x.cash) has no futures price to read.
-  const pxOf = (x) => { const m = S.snap && S.snap.markets && S.snap.markets[x.market]; return m ? m.price : null; };
-  const liveR = (x) => (x.cash ? null : ICT.liveR(x, pxOf(x))), liveRs = (x) => (x.cash ? null : ICT.liveRs(x, pxOf(x)));
+  // An unresolved REPLAY record is never marked against a newer price (11 Nov, Fred's audit: an ES replay short whose history had
+  // ended kept being compared with new prices and read -5.22R). It shows the R at the close of the last candle the replay
+  // processed (`markR`, `through`), and says that an update is pending.
+  const pxOf = (x) => { if (x.replay) return x.status === 'open' && x.markPx != null ? x.markPx : null; const m = S.snap && S.snap.markets && S.snap.markets[x.market]; return m ? m.price : null; };
+  const liveR = (x) => (x.replay ? ICT.markR(x) : x.cash ? null : ICT.liveR(x, pxOf(x))), liveRs = (x) => { if (!x.replay) return x.cash ? null : ICT.liveRs(x, pxOf(x)); const r = ICT.markR(x); return r == null ? null : r * (x.size || 1); };
+  const rpThrough = (x) => (x.through ? `Replay through ${ICT.nyTime(x.through, true)} ET` : S.replayInfo && S.replayInfo.at ? `Replay as of its run ${ICT.nyTime(Date.parse(S.replayInfo.at) / 1000, true)} ET` : 'Replay') + ' · update pending';
   const myRev = (x) => S.desk.reviews[x.id];
+  // the two executions of one signal (live <id>, replay <id>-r): each keeps its own fill, status and review, and opens by its exact id
+  const BYID = new Map(), twin = (x) => BYID.get(ICT.twinId(x.id)) || null;
+  const exState = (y) => (y.closed ? 'closed' : y.replay ? 'update pending' : 'open');
+  const exRev = (y) => { const rv = S.desk.reviews[y.id]; if (!rv) return { t: 'unreviewed', check: false }; const o = ICT.reviewExec(y.id, rv, y, twin(y)); return { t: `reviewed${rv.grade ? ' ' + rv.grade : ''}`, check: o.check }; };
+  const exBtn = (y, cur) => { const r = exRev(y); return `<button type="button" class="ict-ex-b${cur ? ' on' : ''}" data-id="${esc(y.id)}"${cur ? ' aria-current="true"' : ''} title="${esc(`${y.replay ? 'Replay' : 'Live'} execution ${y.id}: fill ${fx(y.entry, y.market)}`)}"><b>${y.replay ? 'Replay' : 'Live'}</b> · ${esc(fx(y.entry, y.market))} · ${exState(y)} · ${esc(r.t)}${r.check ? ' <span class="ict-ex-ck" title="This note\'s fill is nearer the other execution\'s entry: check which execution it belongs to">check</span>' : ''}</button>`; };
+  const execs = (x, cur) => { const o = twin(x); if (!o) return ''; const lv = x.replay ? o : x, rp = x.replay ? x : o; return `<span class="ict-ex" role="group" aria-label="Executions of this signal">${exBtn(lv, cur && cur === lv.id)}${exBtn(rp, cur && cur === rp.id)}</span>`; };
 
   // setup tier of a record: A+ / A-setup / Other (the desk's filters, skill §14 / §17)
   const tier = (x) => (isAP(x) ? 'A+' : isA(x) ? 'A-setup' : 'Other');
@@ -8395,12 +8433,13 @@ function msNextSetup(bars, A) {
     const pc = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100)).toFixed(1), z = pc(0);
     const fill = r == null ? '' : `<i class="f ${r >= 0 ? 'up' : 'dn'}" style="left:${r >= 0 ? z : pc(r)}%;width:${Math.abs(pc(r) - z).toFixed(1)}%"></i>`;
     const [lt, ls, lh] = leftTxt(x), st = stopState(x);
-    return `<li data-id="${esc(x.id)}" tabindex="0" aria-label="${esc(`${x.side} ${x.short}, ${r == null ? 'no live price' : fR(rs)} now, open, view the chart`)}">`
+    return `<li data-id="${esc(x.id)}" tabindex="0" aria-label="${esc(`${x.side} ${x.short}, ${x.replay ? `${r == null ? 'not processed yet' : fR(rs)}, ${rpThrough(x)}` : `${r == null ? 'no live price' : fR(rs)} now, open`}, view the chart`)}">`
       + `<div class="r1">${sideChip(x)}<b class="mk">${esc(x.short)}</b> <span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${tierPill(x)}${sizePill(x)}${clTag(x)}${x.feat.session ? ` <span class="ict-pill">${esc(x.feat.session)}</span>` : ''}${x.replay ? ' <span class="ict-pill ict-rp" title="Still open in the replay of the rules over history; the live tracker holds no trade on it">replay</span>' : ''}`
-      + `<span class="live ${cls(rs)}">${r == null ? '<small>no price</small>' : fR(rs)}${r != null && x.size != null && x.size !== 1 ? `<small>${fR(r)} a unit</small>` : ''}</span></div>`
+      + `<span class="live ${cls(rs)}">${r == null ? `<small>${x.replay ? 'not processed yet' : 'no price'}</small>` : fR(rs)}${r != null && x.size != null && x.size !== 1 ? `<small>${fR(r)} a unit</small>` : ''}</span></div>`
+      + (x.replay ? `<p class="ict-thru">${esc(rpThrough(x))}. R is at that candle's close, not at today's price.</p>` : '')
       + `<div class="ict-trk" aria-hidden="true">${fill}<span class="tk z" style="left:${z}%"></span><span class="tk" style="left:${pc(2)}%"></span>${sR != null ? `<span class="sp" style="left:${pc(sR)}%" title="Stop ${fRn(sR)}"></span>` : ''}${best != null ? `<span class="bs" style="left:${pc(best)}%" title="Best ${fRn(best)}"></span>` : ''}${r != null ? `<span class="nw ${r >= 0 ? 'up' : 'dn'}" style="left:${pc(r)}%"></span>` : ''}</div>`
       + `<div class="ict-trk-l" aria-hidden="true"><span style="left:0">−1R stop</span><span style="left:${z}%">0</span><span style="left:${pc(2)}%">+2R</span></div>`
-      + `<dl class="ict-lv">${lvl('Entry', fx(x.entry, x.market))}${lvl('Stop', fx(x.stop, x.market), `${st}${sR != null && st !== 'first stop' ? ` ${fRn(sR)}` : ''}`, st === 'first stop' ? '' : 'mv')}${lvl('Now', fx(pxOf(x), x.market), r == null ? 'no price' : '')}`
+      + `<dl class="ict-lv">${lvl('Entry', fx(x.entry, x.market))}${lvl('Stop', fx(x.stop, x.market), `${st}${sR != null && st !== 'first stop' ? ` ${fRn(sR)}` : ''}`, st === 'first stop' ? '' : 'mv')}${lvl(x.replay ? 'At cut-off' : 'Now', fx(pxOf(x), x.market), r == null ? (x.replay ? 'not processed' : 'no price') : '')}`
       + `${lvl('Best', fRn(best), x.replay ? 'at the replay run' : best != null && best >= 2 ? 'trail on' : best != null && x.be && best >= x.be ? 'BE on' : '')}${x.dol != null ? lvl('DOL', fx(x.dol, x.market)) : lvl('2R', fx(x.t2, x.market))}${lvl('Time left', `<span title="${esc(lh || '')}">${lt}</span>`, ls)}</dl></li>`;
   }
   // a breakdown table: n, win rate, R a signal (bar), total; rows under 20 closed signals are faded (small samples mislead)
@@ -8439,7 +8478,7 @@ function msNextSetup(bars, A) {
     const cell = (k, v, sub, c, tip) => `<div${tip ? ` title="${esc(tip)}"` : ''}><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
     $('ict-kpi').innerHTML = cell('Total', fR(st.tot), `${st.n} closed · ${T.length - C.length} open`, cls(st.tot))
       + cell('Expectancy', fRn(st.exp), st.n ? `a signal · avg win ${fRn(st.avgW)}, loss ${fRn(st.avgL)}` : 'no closed yet', cls(st.exp), 'Average R per closed signal, sized as booked')
-      + cell('Win rate', st.n ? Math.round(100 * st.wr) + '%' : '—', `${st.w} won · ${st.l} lost${st.n - st.w - st.l ? ` · ${st.n - st.w - st.l} flat` : ''}`)
+      + cell('Win rate', st.n ? Math.round(100 * st.wr) + '%' : '—', `${st.w} won · ${st.l} lost${st.be ? ` · ${st.be} flat` : ''}${st.nearFlat ? ` · ${st.nearFlat} near-flat` : ''}`, '', `Booked outcome: the sign of each closed signal's stored R a unit. Near-flat = within ±${ICT.NEAR_FLAT}R a unit, a research label that does not change the outcome. Unresolved replay records are not counted.`)
       + cell('Profit factor', st.pf == null ? '—' : st.pf === Infinity ? '∞' : st.pf.toFixed(2), 'won R ÷ lost R', st.pf != null ? (st.pf >= 1 ? 'pos' : 'neg') : '')
       + cell('Max drawdown', st.n ? fR(-st.dd) : '—', 'peak to trough, in close order', st.dd ? 'neg' : '')
       + cell('Fixed 2R', fR(R2), st.n ? `${fR(R2 / st.n)} a signal` : '—', cls(R2), 'The same signals with a fixed 2R target instead of the trail')
@@ -8478,7 +8517,7 @@ function msNextSetup(bars, A) {
     $('ict-f-x').hidden = !any;
     $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveRs(x);
       return `<tr data-id="${esc(x.id)}" tabindex="0"${x.replay ? ' class="rp"' : ''}><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td>${sideChip(x)}</td><td><span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${sizePill(x)}${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">' + (isAP(x) ? 'A+' : 'A') + '</span>' : ''}${clTag(x)}</td><td>${esc(x.feat.session || '—')}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
-        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fRn(r)}${x.exit === 'time' ? ' <small>time</small>' : x.exit === 'trail' ? ' <small>trail</small>' : x.exit === 'breakeven' ? ' <small>BE</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fRn(r)}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}`}</td>`
+        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${ICT.outcome(x) === 'win' ? 'Win' : ICT.outcome(x) === 'loss' ? 'Loss' : 'Flat'} ${fRn(r)}${x.exit === 'time' ? ' <small>time</small>' : x.exit === 'trail' ? ' <small>trail</small>' : x.exit === 'breakeven' ? ' <small>BE</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : x.replay ? `<span title="${esc(rpThrough(x))}">Pending ${fRn(r)}</span> <span class="ict-pill">replay</span>` : `Open ${fRn(r)}`}${execs(x)}</td>`
         + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
         + (L.length > 300 ? `<tr class="empty"><td colspan="12">Showing the newest 300 of ${L.length}. Narrow the filters to see older signals.</td></tr>` : '')
       : `<tr class="empty"><td colspan="12">${T.length ? 'No signal matches the filters. <button type="button" class="ms-tbtn" data-clear>Clear filters</button>' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM, RTY or gold.'}</td></tr>`;
@@ -8521,6 +8560,7 @@ function msNextSetup(bars, A) {
   $('ict-cal-prev').addEventListener('click', () => { S.cal.m--; if (S.cal.m < 0) { S.cal.m = 11; S.cal.y--; } S.calDay = null; render(); });
   $('ict-cal-next').addEventListener('click', () => { S.cal.m++; if (S.cal.m > 11) { S.cal.m = 0; S.cal.y++; } S.calDay = null; render(); });
   $('ict-flt').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.flt = b.dataset.f; try { localStorage.setItem('ictFlt', S.flt); } catch (e) {} S.calDay = null; render(); });
+  $('ict-tv-ex').addEventListener('click', (ev) => { const b = ev.target.closest('.ict-ex-b'); if (b && (!S.cur || b.dataset.id !== S.cur.id)) openSig(b.dataset.id); });   // the other execution of the same signal, by its own id
   $('ict-src').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.src = b.dataset.s; try { localStorage.setItem('ictSrc', S.src); } catch (e) {} render(); });
   function openFrom0(ev) { const el = ev.target.closest('[data-id]'); if (el) { OPENER = el; openSig(el.dataset.id); } }
   // session clock (ET) with the ICT / MMXM kill zones; A+ skips NY PM
@@ -8657,6 +8697,8 @@ function msNextSetup(bars, A) {
     const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
     const f = x.feat, g = x.grade, gp = (v, of) => (v == null ? '?' : v) + '/' + of;
     $('ict-tv-t').innerHTML = `${sideChip(x)} ${esc(x.label)} <span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${tierPill(x)}${sizePill(x)}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}`;
+    $('ict-tv-ex').innerHTML = execs(x, x.id) + (x.replay && !x.closed ? `<p class="ict-thru">${esc(rpThrough(x))}. Candles after that time are on the chart for context only: this execution has not processed them, so no result is shown for them.</p>` : '');
+    $('ict-rv-for').textContent = `This review is for the ${x.replay ? 'Replay' : 'Live'} execution (${x.id}).`;
     // the rule checklist of this market (script#ms-ict-lib checklist): the A-setup rule, the A+ / size extras, then context
     { const I = ICT.checklist(x), GR = [['model', 'Model'], ['rule', x.market === 'gc' ? 'Gold A-setup rule' : 'A-setup rule'], ['plus', 'A+ and size'], ['info', 'Context']];
       $('ict-tv-ck').innerHTML = GR.map(([k, n]) => { const L = I.filter((q) => q.grp === k); return L.length ? `<li class="h">${n}</li>` + L.map((q) => `<li class="${q.ok === true ? 'y' : q.ok === false ? 'n' : 'u'}"><span aria-hidden="true">${q.ok === true ? '✓' : q.ok === false ? '✕' : '?'}</span> ${esc(q.t)}<span class="trv-sr">${q.ok === true ? ': yes' : q.ok === false ? ': no' : ': not recorded'}</span></li>`).join('') : ''; }).join('')
@@ -8669,8 +8711,8 @@ function msNextSetup(bars, A) {
       $('ict-tv-lv').innerHTML = lvl('Entry', fx(x.entry, x.market)) + lvl('First stop', fx(x.stop0 ?? x.stop, x.market), x.r0 ? `1R = ${fx(x.r0, x.market)}` : '')
         + (x.closed ? '' : lvl('Stop now', fx(x.stop, x.market), `${st}${sR != null && st !== 'first stop' ? ` ${fRn(sR)}` : ''}`, st === 'first stop' ? '' : 'mv'))
         + lvl('+2R', fx(x.t2, x.market)) + (x.dol != null ? lvl('Draw on liquidity', fx(x.dol, x.market)) : '')
-        + (x.closed ? lvl('Exit', fx(x.exitPx, x.market), `${esc(x.exit || '')} · ${ICT.nyTime(x.closed, true)} ET`) : lvl('Now', fx(pxOf(x), x.market), r == null ? 'no live price' : ''))
-        + lvl(x.closed ? 'Result' : 'R now', `<span class="${cls(r)}">${fRn(r)}</span>`, per != null && x.size != null && x.size !== 1 ? `${fR(per)} a unit × ${x.size}` : '')
+        + (x.closed ? lvl('Exit', fx(x.exitPx, x.market), `${esc(x.exit || '')} · ${ICT.nyTime(x.closed, true)} ET`) : lvl(x.replay ? 'At cut-off' : 'Now', fx(pxOf(x), x.market), r == null ? (x.replay ? 'not processed' : 'no live price') : x.replay && x.through ? `${ICT.nyTime(x.through)} ET` : ''))
+        + lvl(x.closed ? 'Result' : x.replay ? 'R at cut-off' : 'R now', `<span class="${cls(r)}">${fRn(r)}</span>`, per != null && x.size != null && x.size !== 1 ? `${fR(per)} a unit × ${x.size}` : '')
         + lvl('Best', fRn(typeof x.mfe === 'number' ? x.mfe : null), x.replay && !x.closed ? 'a unit, at the replay run' : 'max favourable, a unit')
         + (x.closed ? lvl('Held', `${ICT.nyTime(x.signalAt)} →`, `${ICT.nyTime(x.closed)} ET`) : lvl('Time left', `<span title="${esc(lh || '')}">${lt}</span>`, ls)); }
     const rv = myRev(x) || {};
@@ -8724,8 +8766,8 @@ function msNextSetup(bars, A) {
   $('ict-rv').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const x = S.cur; if (!x) return;
     const num = (v) => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
-    S.desk.reviews[x.id] = { act: S.rv.act, grade: S.rv.grade, tags: [...S.rv.tags], fill: num($('ict-rv-fill').value), r: num($('ict-rv-r').value), text: $('ict-rv-text').value.trim().slice(0, 3000), by: who, at: Math.floor(Date.now() / 1000), market: x.market, side: x.side };
-    saveLocal(); render(); const msg = $('ict-rv-msg'); msg.textContent = 'Saving…';
+    S.desk.reviews[x.id] = { act: S.rv.act, grade: S.rv.grade, tags: [...S.rv.tags], fill: num($('ict-rv-fill').value), r: num($('ict-rv-r').value), text: $('ict-rv-text').value.trim().slice(0, 3000), by: who, at: Math.floor(Date.now() / 1000), market: x.market, side: x.side, exec: x.replay ? 'replay' : 'live' };
+    saveLocal(); render(); $('ict-tv-ex').innerHTML = execs(x, x.id) + (x.replay && !x.closed ? `<p class="ict-thru">${esc(rpThrough(x))}.</p>` : ''); const msg = $('ict-rv-msg'); msg.textContent = 'Saving…';
     try { const r = await push(); msg.textContent = r === 'synced' ? 'Saved and synced to GitHub.' : 'Saved in this browser. Connect GitHub on the desk to share it.'; }
     catch (e) { msg.textContent = `Saved in this browser; GitHub: ${e.message || e}`; }
   });

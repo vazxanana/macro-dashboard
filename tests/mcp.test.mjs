@@ -115,6 +115,11 @@ test('handler: reads trades through a fake GitHub; Both never counts a live sign
     const r = await post({ jsonrpc: '2.0', id: 9, method: 'tools/call', params: { name: 'ict_trades', arguments: { source: 'both' } } });
     assert.equal(r.code, 200); const o = r.body.result.structuredContent;
     assert.equal(o.total, 2, 'the live signal is not counted twice'); assert.equal(o.stats.wins, 1); assert.equal(o.records[0].id, 'nq-b-1');
+    // one row for the signal, naming its replay execution; each execution is read by its exact id and says its source (11 Nov)
+    assert.equal(o.records[0].source, 'live'); assert.equal(o.records[0].otherExecution, 'nq-b-1-r');
+    const lv = out(await rpcCall('ict_trade', { id: 'nq-b-1' })), rp = out(await rpcCall('ict_trade', { id: 'nq-b-1-r' }));
+    assert.deepEqual([lv.id, lv.source, lv.otherExecution.id], ['nq-b-1', 'live', 'nq-b-1-r']); assert.deepEqual([rp.id, rp.source, rp.updatePending, rp.otherExecution.id], ['nq-b-1-r', 'replay', true, 'nq-b-1']);
+    assert.ok((await rpcCall('ict_trade', { id: 'es-s-0' })).result.isError, 'an id is exact: the replay execution es-s-0-r is not returned for es-s-0');
     // ChatGPT's search / fetch shapes: one text item holding JSON
     const s = await rpcCall('search', { query: 'a-setup' }); assert.equal(s.result.content.length, 1); assert.equal(s.result.content[0].type, 'text');
     const res = out(s).results; assert.ok(res.length >= 1); for (const x of res) assert.deepEqual(Object.keys(x).sort(), ['id', 'title', 'url']);

@@ -1,7 +1,8 @@
 name: ICT desk replay
 
 # Replays the ICT tracker's model from 1 Aug 2025 (owner, 7 Nov 2026; before: 1 Jan 2026) of CNBC futures candles and writes council-data
-# ict/replay.json for the ICT desk (calendar, stats). Runs when the replay code changes, on demand, and weekly.
+# ict/replay.json for the ICT desk (calendar, stats). Runs when the replay code changes, on demand, and daily
+# (weekly before 11 Nov 2026: an unresolved record waited up to a week for its exit).
 on:
   workflow_dispatch:
     inputs:
@@ -9,7 +10,7 @@ on:
         description: 'Replay start (UTC date)'
         default: '2025-08-01'
   schedule:
-    - cron: '41 6 * * 0'
+    - cron: '41 6 * * *'
   push:
     branches: [main]
     paths:
@@ -49,7 +50,7 @@ jobs:
           cd data
           git config user.name "ict-desk"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ict/replay.json
+          git add ict/replay.json ict/replay-log.json 2>/dev/null || git add ict/replay.json
           git commit -qm "ICT desk replay $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for i in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && exit 0; sleep $((i * 3)); done
           exit 1
