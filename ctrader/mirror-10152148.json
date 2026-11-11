@@ -3002,7 +3002,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T07:23:29.000Z",
     "councilEntry": 73751.2,
     "stop": 73423.08,
@@ -3016,10 +3016,12 @@
     "slipR": 0.23,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:23:29.000Z",
-    "brokerStop": 73498.47
+    "brokerStop": 73498.47,
+    "closedAt": "2026-11-11T09:18:31.000Z"
    },
    "eth-replica-1794381743-b": {
     "positionId": "48342142",
@@ -3221,7 +3223,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T08:46:52.000Z",
     "councilEntry": 0.68738,
     "stop": 0.686645,
@@ -3234,10 +3236,12 @@
     "slipR": -0.136,
     "lagSec": 79,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T08:46:52.000Z",
-    "brokerStop": 0.68654
+    "brokerStop": 0.68654,
+    "closedAt": "2026-11-11T09:18:31.000Z"
    }
   },
   "day": {
@@ -3245,7 +3249,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9959.6 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 9954.7 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3261,8 +3265,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9959.6,
-  "lastRun": "2026-11-11T09:15:20.000Z"
+  "balance": 9954.7,
+  "lastRun": "2026-11-11T09:18:31.000Z"
  },
  "log": [
   {
@@ -4467,6 +4471,16 @@
    "at": "2026-11-11T09:15:20.000Z",
    "msg": "XAUUSD position 48334106 closed at the broker",
    "trade": "xau-replica-1794379804-b"
+  },
+  {
+   "at": "2026-11-11T09:18:31.000Z",
+   "msg": "BTCUSD position 48342120 closed at the broker",
+   "trade": "btc-replica-1794381743-b"
+  },
+  {
+   "at": "2026-11-11T09:18:31.000Z",
+   "msg": "AUDUSD position 48358826 closed at the broker",
+   "trade": "audusd-replica-1794386733-b"
   }
  ],
  "limits": {
