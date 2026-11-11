@@ -8784,7 +8784,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T22:42:55.000Z",
     "councilEntry": 1.32718,
     "stop": 1.3280399999999999,
@@ -8798,10 +8798,12 @@
     "slipR": 0.605,
     "lagSec": 40,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T22:42:55.000Z",
-    "brokerStop": 1.32752
+    "brokerStop": 1.32752,
+    "closedAt": "2026-11-11T22:46:03.000Z"
    }
   },
   "day": {
@@ -8809,7 +8811,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9839.65 · 29 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9837.31 · 28 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8883,15 +8885,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9839.65,
-  "lastRun": "2026-11-11T22:45:00.000Z"
+  "balance": 9837.31,
+  "lastRun": "2026-11-11T22:46:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T22:08:23.000Z",
-   "msg": "limit filled: BTCUSD position 48227161 at the broker",
-   "trade": "btc-scalp-1794346855"
-  },
   {
    "at": "2026-11-10T22:12:44.000Z",
    "msg": "USDCHF position 48223322 closed at the broker",
@@ -10386,6 +10383,11 @@
    "at": "2026-11-11T22:42:55.000Z",
    "msg": "placed buy limit USDCAD 0.03 lot at 1.42528 (council scalp, valid to 2026-11-12T01:42Z)",
    "trade": "usdcad-scalp-1794436935"
+  },
+  {
+   "at": "2026-11-11T22:46:03.000Z",
+   "msg": "GBPUSD position 48558288 closed at the broker",
+   "trade": "gbpusd-scalp-1794436935"
   }
  ],
  "limits": {
