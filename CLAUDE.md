@@ -1387,6 +1387,44 @@ browser and then put in the audit:
 - Audit: sections 31-33 (Jump / Skip day from a forming and from an animated candle, the growing candle frame by frame, docks, full
   screen, split panes across five switches, the two challenges against a reference in Node, phones at three widths). Since the merge with main the reference candles come through `fetchRetry` and sizes are read after `settle()` (`scripts/audit/shared.cjs`).
 
+Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone"). Up to 640 px
+ChronosTrade opens in its simple view: `html[data-phone="simple"]`, set by a head script before the first paint. **The key and
+the switch are the Desk's**: localStorage `ms-phone` = `full` turns it off on that device (no key = simple), `window.msPhoneView(v)`,
+event `ms:phone`, and "Phone view: Simple | Full" (`#ps-sw`) at the foot of the page, so one choice covers the site. Rules that hold:
+- **Scoped.** Everything the view adds carries `.ps-only` (or is `.ps-sw`), hidden by default; every rule is inside ONE
+  `@media (max-width: 640px)` block at the end of the sheet and starts with `html[data-phone="simple"]` (or is the switch). A
+  wider screen and the Full view are the page as it was: checked box by box (every element's position and size at 390 Full,
+  768 and 1440 px equal the build before; the only differences are two new ids and the switch under the page at 390).
+- **What the phone shows**: the session as one line (`#sess.folded`: name, a thin progress bar, "Change session" opens the form;
+  in the form Days, Session name and one hint sit behind "More options", `.ps-x`), then the chart with the replay row and quick
+  Buy / Sell on it. The chart takes the height left (`calc(100dvh - 252px)`, 592 px on a 390 x 844 screen, was 439), one chart
+  only: a split keeps its own heights. Under it one line, `#ps-last`: "Last trade ▲ +1.42R $1,405.66" and "Journal ›" (one tap:
+  the Journal tab). Account, Trade and Challenge are one line each (`.ps-fold` buttons, `aria-controls` the card, which gets
+  `data-ps-open`): equity and today; open / pending and the risk; the challenge's state in the card's own words. "How it works"
+  shows only when Help opens it. The tabs are one row that scrolls inside itself; Journal and Statistics open on one headline
+  ("12 trades, 67% won, +4.42R", `psHl`, from the numbers those tabs already computed, filters included and said), the journal
+  with five rows of four columns (opened, side, R, net), Statistics with the equity curve; one button each (`.ps-all`) brings the
+  rest (filters, every row and column; the tiles, seven charts, all numbers, Monte Carlo) and redraws charts at their real width.
+  Calendar leads with the month's line; the Challenge log with the state in words and the day table behind its button.
+- **Orders are untouched.** The view's code (`ps()`, `psHl()`, `psOpen()`, at the end of the script) only reads the account and
+  writes text; it returns at once outside the view. Instant Buy / Sell, the on-chart draft readout, drag-to-place, the position
+  tags and the stop rule are as they were. Because the draft's form (levels to type, the rules checklist that strict mode needs,
+  tags, note) lives in the Trade card, the card opens by itself while a draft is up and folds again with it; "Go to the challenge
+  card" opens that card first.
+- **Split view on a phone**: left as it is (Layout under More, panes stacked). The quick switch between timeframes on one chart
+  is the timeframe button already in the replay row; a second way to do the same would be more, not simpler.
+- Measured at 390 x 844 (owner, 12 closed trades): page 2.7 → 1.9 screens (Statistics 4.7 → 2.0), controls on the page
+  148 → 49, cards 6 → 3 (Statistics 18 → 4), chart 439 → 592 px. Frame times on the phone profile (220 trades, 8 s each,
+  2 runs before and after): p50 16.7 ms and p95 16.7-16.8 ms at 1x and at 12x on both; with 4x CPU throttle p50 16.7 ms,
+  p95 33-50 ms on both. No change beyond noise.
+- Not done: the session form itself is still long on a first visit (the first-run card leads through it); the challenge log's
+  day table is still wider than a phone (as in Full); touch tablets keep the full page. The audit's older phone checks now run
+  in the simple view (the default) and all pass unchanged; Full is checked by section 34.
+- Tests: `tests/backtest-phone.test.mjs` (key and attribute, every rule scoped, folds point at real cards, the code only reads,
+  link colour AA on light). Audit: section 34 (first screen, one-line cards, a quick Buy keeps its stop, the result line against
+  the account's numbers, Journal in one tap, headlines, draft opens the Trade card, AA in three themes, Full and back, reload,
+  wider than 640 px): 241 checks.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
