@@ -7822,7 +7822,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T14:38:42.000Z",
     "councilEntry": 0.83262,
     "stop": 0.83309,
@@ -7836,10 +7836,12 @@
     "slipR": -0.085,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T14:38:42.000Z",
-    "brokerStop": 0.83313
+    "brokerStop": 0.83313,
+    "closedAt": "2026-11-11T17:02:25.000Z"
    },
    "eth-rscalp-1794408007": {
     "symbol": "ETHUSD",
@@ -8055,7 +8057,8 @@
     "t1": 0.828875,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.83254,
@@ -8069,7 +8072,8 @@
     "lagSec": 273,
     "positionId": "48467265",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T17:02:25.000Z"
    },
    "usdcad-rscalp-1794410955": {
     "symbol": "USDCAD",
@@ -8245,7 +8249,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9870.33 · 29 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9866.52 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8297,20 +8301,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9870.33,
-  "lastRun": "2026-11-11T16:59:55.000Z"
+  "balance": 9866.52,
+  "lastRun": "2026-11-11T17:02:25.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:08:58.000Z",
-   "msg": "moved XAUUSD 48096028 protection: stop 4064.138214285714 -> 4064.688, target 3990.883571428571 -> 3991.434 (council m30m1)",
-   "trade": "xau-m30m1-1794321828"
-  },
-  {
-   "at": "2026-11-10T16:08:58.000Z",
-   "msg": "moved XAUUSD 48107209 protection: stop 4032.5411071428575 -> 4033.091, target 4057.0175 -> 4057.568 (council rscalp)",
-   "trade": "xau-rscalp-1794322967"
-  },
   {
    "at": "2026-11-10T16:08:58.000Z",
    "msg": "moved GBPUSD 48133872 protection: stop 1.3461766785714284 -> 1.3459167, target 1.31808 -> 1.31782 (council position)",
@@ -9800,6 +9794,16 @@
    "at": "2026-11-11T16:59:55.000Z",
    "msg": "USDCHF position 48483123 closed at the broker",
    "trade": "usdchf-scalp-1794412360"
+  },
+  {
+   "at": "2026-11-11T17:02:25.000Z",
+   "msg": "USDCHF position 48449706 closed at the broker",
+   "trade": "usdchf-rscalp-1794407857"
+  },
+  {
+   "at": "2026-11-11T17:02:25.000Z",
+   "msg": "USDCHF position 48467265 closed at the broker",
+   "trade": "usdchf-rscalp-1794409920"
   }
  ],
  "limits": {
