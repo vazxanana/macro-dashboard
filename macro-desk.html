@@ -22,6 +22,15 @@
       if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark';
     } catch (e) {}
   })();
+  // Simple phone view (11 Nov 2026): on a screen up to 640 px the page opens in its simple view unless this device chose the
+  // full one. Same key and attribute as the Desk (localStorage ms-phone = "full"; html[data-phone="simple"]), so one choice
+  // covers the site. Set before the first paint so nothing folds after it.
+  (function () {
+    var R = document.documentElement, mq = window.matchMedia ? matchMedia('(max-width: 640px)') : null;
+    function set() { var full = false; try { full = localStorage.getItem('ms-phone') === 'full'; } catch (e) {} if (mq && mq.matches && !full) R.dataset.phone = 'simple'; else delete R.dataset.phone; }
+    set(); if (mq && mq.addEventListener) mq.addEventListener('change', function () { set(); document.dispatchEvent(new CustomEvent('ms:phone')); });
+    window.msPhoneView = function (v) { try { if (v === 'full') localStorage.setItem('ms-phone', 'full'); else localStorage.removeItem('ms-phone'); } catch (e) {} set(); document.dispatchEvent(new CustomEvent('ms:phone')); };
+  })();
 </script>
 <style>
   /* Tokens copied from market-structure.html (4 Nov design pass) so the lab reads as part of the desk */
@@ -455,6 +464,66 @@
   details.fold + details.fold { margin-top: 0; }
   @media (pointer: coarse) { .tabs button, .lim, details summary, .toc a, .hdr-sw a, .brand[href], .jump { min-height: 44px; } .jump, .brand[href] { display: inline-flex; align-items: center; } .lim { padding: 0 var(--s2); } details:not(.fold):not(.deep) > summary { display: flex; align-items: center; } }
   @media (max-width: 600px) { .top #when { display: none; } .card, .glance { padding: var(--s4); } .story { margin-top: var(--s5); } .g-sent { font-size: 17px !important; } .stamp { font-size: var(--fs-xs); } }
+  /* ─── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
+     The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
+     ms-phone = "full" keeps the full view; the same key and attribute as the Desk). The first screen is the glance alone: the
+     bias and how sure, the event, the two levels, with the stale and broken states in words. Every later section folds to its
+     title and one line of takeaway and opens on tap, where its charts are drawn at the width they then have. Nothing is removed:
+     "Full" in the switch at the foot of the page is the phone page as it was. Every rule below sits inside the phone media
+     query and, apart from the switch itself, under the attribute, so a wider screen and the Full view are untouched. ─── */
+  .ps-sw, .st-go, .g-more { display: none; }
+  @media (max-width: 640px) {
+    main[data-loading] .ps-sw { display: none; }   /* shown with the story, so it is never pushed down when the data lands */
+    main:not([data-loading]) > .ps-sw { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 28px 0 4px; color: var(--ink-dim); font: 500 13px var(--sans); }
+    .ps-sw-b { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+    .ps-sw button { min-height: 44px; min-width: 76px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--ink-dim); font: 600 13px var(--sans); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .ps-sw button[aria-pressed="true"] { background: var(--panel-raised); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+    .ps-sw button:focus-visible, .g-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    html[data-phone="simple"] .head { padding: var(--s3) 0 var(--s1); }
+    html[data-phone="simple"] .head p.lede { display: none; }
+    html[data-phone="simple"] #s-week { margin-top: var(--s2); }
+    html[data-phone="simple"] #s-week > .st-h { margin-bottom: var(--s2); }
+    /* the glance: three plain rows in one card instead of three boxes in a box; the sentence and the small print behind "more" */
+    html[data-phone="simple"] .glance { padding: var(--s3) var(--s4) var(--s1); }
+    html[data-phone="simple"] .glance:not(.more) :is(.g-sent, .gx) { display: none; }
+    html[data-phone="simple"] .glance.more .g-sent { font-size: var(--fs-lg) !important; }
+    html[data-phone="simple"] .g-grid { gap: 0; }
+    html[data-phone="simple"] .g-grid .tile { border: 0; border-top: 1px solid var(--line-soft); border-radius: 0; background: none; padding: var(--s3) 0; }
+    html[data-phone="simple"] .g-grid .tile:first-child { border-top: 0; padding-top: 0; }
+    html[data-phone="simple"] .glance.more .g-grid .tile:first-child { border-top: 1px solid var(--line-soft); padding-top: var(--s3); }
+    html[data-phone="simple"] .tile .hero { font-size: 22px; }
+    html[data-phone="simple"] .tile .lab { margin-bottom: 2px; }
+    html[data-phone="simple"] .meter { margin: 10px 0 4px; }
+    html[data-phone="simple"] .ldr b { font-size: 20px; }
+    html[data-phone="simple"] .g-pub { margin: 0 !important; padding-top: var(--s2); border-top: 1px solid var(--line-soft); }
+    html[data-phone="simple"] .g-more { display: flex; align-items: center; gap: var(--s2); width: 100%; min-height: 44px; margin: 0; padding: 0; border: 0; background: none; color: var(--ink); font: 600 var(--fs-sm) var(--sans); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    html[data-phone="simple"] .g-more::before { content: "▸"; color: var(--gold-ink); width: 12px; flex: none; }
+    html[data-phone="simple"] .g-more[aria-expanded="true"]::before { content: "▾"; }
+    html[data-phone="simple"] .g-more .gm-1, html[data-phone="simple"] .g-more[aria-expanded="true"] .gm-0 { display: none; }
+    html[data-phone="simple"] .g-more[aria-expanded="true"] .gm-1 { display: inline; }
+    html[data-phone="simple"] .glance details.fold { margin-top: 0; }
+    /* the later sections: a row with the title and one line; the cards and their charts come on tap */
+    html[data-phone="simple"] .story { margin-top: var(--s2); }
+    html[data-phone="simple"] .sfold > .st-h { position: relative; display: block; margin: 0; padding: var(--s3) 40px var(--s3) var(--s4); border: 1px solid var(--line-soft); border-radius: var(--r); background: var(--panel); }
+    html[data-phone="simple"] .sfold > .st-h::after { content: "▸"; position: absolute; right: var(--s4); top: 14px; color: var(--gold-ink); font-size: var(--fs-md); line-height: 1; }
+    html[data-phone="simple"] .sfold.open > .st-h::after { content: "▾"; }
+    html[data-phone="simple"] .sfold.open > .st-h { margin-bottom: var(--s2); border-color: var(--line-strong); }
+    html[data-phone="simple"] .sfold.open { margin-bottom: var(--s5); }
+    html[data-phone="simple"] .sfold > .st-h .st-m { display: block; margin-top: var(--s1); }
+    html[data-phone="simple"] .sfold:not(.open) > .st-h .st-m.has-one { display: none; }
+    html[data-phone="simple"] .st-go { display: block; width: 100%; margin: 0; padding: 0; border: 0; background: none; color: var(--ink-dim); font: 400 var(--fs-md)/1.45 var(--sans); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    html[data-phone="simple"] .st-go::after { content: ""; position: absolute; inset: 0; border-radius: var(--r); }   /* the whole row is the tap target */
+    html[data-phone="simple"] .st-go:focus-visible { outline: 0; } html[data-phone="simple"] .st-go:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+    html[data-phone="simple"] .st-one { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; margin-top: var(--s1); }
+    html[data-phone="simple"] .st-one:empty, html[data-phone="simple"] .sfold.open .st-one { display: none; }
+    html[data-phone="simple"] .st-one b { color: var(--ink); font-weight: 600; }
+    html[data-phone="simple"] .sfold:not(.open) > :not(.st-h) { display: none !important; }
+    /* the detail stays last and folded: one row like the others until it is opened */
+    html[data-phone="simple"] #s-deep:not(:has(> details[open])) { padding: var(--s3) var(--s4) var(--s1); border: 1px solid var(--line-soft); border-radius: var(--r); background: var(--panel); }
+    html[data-phone="simple"] #s-deep:not(:has(> details[open])) > .st-h { margin: 0; }
+    html[data-phone="simple"] #s-deep:not(:has(> details[open])) > .st-h .st-m { display: none; }
+    html[data-phone="simple"] #s-deep:not(:has(> details[open])) > details.deep > summary { border: 0; background: none; padding: 0; min-height: 44px; color: var(--ink-dim); font: 400 var(--fs-md) var(--sans); }
+  }
 </style>
 </head>
 <body>
@@ -490,14 +559,15 @@
         <div class="tile" id="g-event" aria-label="The event that matters most"></div>
         <div class="tile" id="g-levels" aria-label="Two levels to watch"></div>
       </div>
-      <p class="g-pub"><b>Public data only.</b> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></p>
+      <p class="g-pub"><b>Public data only.</b><span class="gx"> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></span></p>
+      <button type="button" class="g-more" id="g-more" aria-expanded="false" aria-controls="c-glance"><span class="gm-0">The week in one sentence, and more</span><span class="gm-1">Show less</span></button>
       <details class="fold" id="c-changes" hidden><summary>What changed since last week <small id="chg-sub"></small></summary><ul class="chg" id="chg"></ul></details>
     </article>
   </section>
 
   <!-- 2. Next release: the veteran's event playbook, council/playbook.mjs → veteran.json.events -->
-  <section class="story" id="s-next" aria-labelledby="nx-h">
-    <header class="st-h"><h2 id="nx-h">Next release</h2><small class="st-m" id="nx-sub"></small></header>
+  <section class="story sfold" id="s-next" aria-labelledby="nx-h">
+    <header class="st-h"><h2 id="nx-h">Next release</h2><small class="st-m" id="nx-sub"></small><button type="button" class="st-go" id="go-s-next" aria-expanded="false" aria-controls="c-next" aria-labelledby="nx-h one-s-next"><span class="st-one" id="one-s-next"></span></button></header>
     <article class="card nxt" id="c-next" hidden>
       <p class="c-take" id="nx-take"></p>
       <div class="nx-top">
@@ -515,8 +585,8 @@
   </section>
 
   <!-- 3. Why: the tested Gold Macro Score and its four drivers, then the briefing's key insights -->
-  <section class="story" id="s-why" aria-labelledby="why-h">
-    <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small></header>
+  <section class="story sfold" id="s-why" aria-labelledby="why-h">
+    <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small><button type="button" class="st-go" id="go-s-why" aria-expanded="false" aria-controls="c-score c-ins" aria-labelledby="why-h one-s-why"><span class="st-one" id="one-s-why"></span></button></header>
     <article class="card" id="c-score" aria-labelledby="sc-h" hidden>
       <h3 class="c-t" id="sc-h">Gold Macro Score <small id="sc-sub"></small></h3>
       <div class="sc-grid">
@@ -535,8 +605,8 @@
 
   <div class="pair">
     <!-- 4. Where price sits: the briefing's structural levels on one price scale -->
-    <section class="story" id="s-price" aria-labelledby="ld-h">
-      <header class="st-h"><h2 id="ld-h">Where price sits</h2><small class="st-m" id="ld-sub"></small></header>
+    <section class="story sfold" id="s-price" aria-labelledby="ld-h">
+      <header class="st-h"><h2 id="ld-h">Where price sits</h2><small class="st-m" id="ld-sub"></small><button type="button" class="st-go" id="go-s-price" aria-expanded="false" aria-controls="c-ladder" aria-labelledby="ld-h one-s-price"><span class="st-one" id="one-s-price"></span></button></header>
       <article class="card" id="c-ladder" hidden>
         <p class="lv-stale" id="ld-stale" role="status" hidden></p>
         <p class="c-take" id="ld-take"></p>
@@ -547,8 +617,8 @@
     </section>
 
     <!-- 5. What he expects: the briefing's hypotheses against the base rate; his dated calls and the analogs folded -->
-    <section class="story" id="s-expect" aria-labelledby="brief-h">
-      <header class="st-h"><h2 id="brief-h">What he expects</h2><small class="st-m">his chance against the base rate; scored on the date</small></header>
+    <section class="story sfold" id="s-expect" aria-labelledby="brief-h">
+      <header class="st-h"><h2 id="brief-h">What he expects</h2><small class="st-m">his chance against the base rate; scored on the date</small><button type="button" class="st-go" id="go-s-expect" aria-expanded="false" aria-controls="c-brief" aria-labelledby="brief-h one-s-expect"><span class="st-one" id="one-s-expect"></span></button></header>
       <article class="card brief" id="c-brief" hidden>
         <p class="c-take" id="hyp-take"></p>
         <div class="hyb" id="brief-hyp"></div>
@@ -561,8 +631,8 @@
   </div>
 
   <!-- 6. Track record: the calls scored on their dates, and the self-calibration (council/calibration.mjs) -->
-  <section class="story" id="s-track" aria-labelledby="tr-h">
-    <header class="st-h"><h2 id="tr-h">Track record</h2><small class="st-m">every call is kept once and scored on its date</small></header>
+  <section class="story sfold" id="s-track" aria-labelledby="tr-h">
+    <header class="st-h"><h2 id="tr-h">Track record</h2><small class="st-m">every call is kept once and scored on its date</small><button type="button" class="st-go" id="go-s-track" aria-expanded="false" aria-controls="c-calls c-calib" aria-labelledby="tr-h one-s-track"><span class="st-one" id="one-s-track"></span></button></header>
     <div class="duo">
       <article class="card" id="c-calls" aria-labelledby="calls-h" hidden>
         <h3 class="c-t" id="calls-h">His calls over time <small>running share that came true</small></h3>
@@ -632,6 +702,7 @@
   </details>
   </section>
   <p class="note" id="foot"></p>
+  <div class="ps-sw" id="ps-sw" role="group" aria-label="Phone view"><span>Phone view</span><span class="ps-sw-b"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
 </main>
 <div id="vz-tip" class="vz-tip" role="tooltip" hidden></div>
 <section id="md-gate" style="padding:0 16px" hidden><div class="card" style="max-width:520px;margin:48px auto;text-align:center"><h2>Macro desk</h2><p>Sign in on the desk first, then come back here.</p><p><a href="/#home">Open the desk</a></p></div></section>
@@ -706,14 +777,14 @@
         + '<div class="mlab" aria-hidden="true"><span class="' + (b.lean === 'against' ? 'on' : '') + '">Against</span><span class="' + (b.lean === 'neutral' ? 'on' : '') + '">Neutral</span><span class="' + (b.lean === 'supportive' ? 'on' : '') + '">Supportive</span></div>'
         + '<p class="sub"><b>' + pct(b.p) + '</b> chance gold is higher' + (b.by ? ' by ' + esc(b.by) : '') + ' · base <b>' + pct(b.base) + '</b></p>'
         + '<p class="sub">Confidence ' + esc(b.confidence) + '<span class="pips" aria-hidden="true">' + [0, 1, 2].map(function (k) { return '<i class="' + (k <= ci ? 'on' : '') + '"></i>'; }).join('') + '</span> · ' + esc(b.why) + '</p>'
-        + (b.channels ? '<p class="sub">Channels: ' + b.channels.up + ' support · ' + b.channels.down + ' against · ' + b.channels.flat + ' flat' + (b.channels.unobserved ? ' · ' + b.channels.unobserved + ' not observed' : '') + '</p>' : '');
+        + (b.channels ? '<p class="sub gx">Channels: ' + b.channels.up + ' support · ' + b.channels.down + ' against · ' + b.channels.flat + ' flat' + (b.channels.unobserved ? ' · ' + b.channels.unobserved + ' not observed' : '') + '</p>' : '');
     } else $('g-meter').innerHTML = '<span class="lab">Gold bias</span><p class="empty">No read yet.</p>';
     var e = s.event, loc = function (iso) { return new Date(iso).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
     if (e) { var hrs = (Date.parse(e.at) - Date.now()) / 36e5, rel = hrs > 0 ? 'in ' + (hrs >= 48 ? Math.round(hrs / 24) + ' days' : Math.round(hrs) + ' h') : 'released';
       $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
         + '<p class="sub"><b>' + esc(e.when) + '</b> · ' + esc(rel) + '<br><small>your time: ' + esc(loc(e.at)) + '</small></p>'
         + '<p class="sub">' + (e.consensus != null ? 'Expected <b>' + esc(e.consensus) + '</b>' : 'No consensus yet') + (e.previous != null ? ' · previous ' + esc(e.previous) : '') + (num(e.goldMovePct) ? ' · gold typically moves ±' + esc(e.goldMovePct) + '% that day' : '') + '</p>'
-        + (v.events && v.events.length ? '<p class="sub"><a class="jump" href="#s-next">The release playbook <span aria-hidden="true">↓</span></a></p>' : ''); }
+        + (v.events && v.events.length ? '<p class="sub gx"><a class="jump" href="#s-next">The release playbook <span aria-hidden="true">↓</span></a></p>' : ''); }
     else $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">None scheduled</div><p class="sub">No red-folder release this week: gold trades on rates and the dollar.</p>';
     var L = s.levels;
     if (L && (L.above || L.below)) { var row = function (cls, ar, x, txt) { return '<div><span class="ar ' + cls + '" aria-hidden="true">' + ar + '</span><b>' + usd(x) + '</b><small>' + txt + '</small></div>'; };
@@ -723,9 +794,9 @@
         + (L.above ? row('up', '▲', L.above.price, lt(L.above)) : '')
         + (mk ? row('now', '●', mk.px, 'price at ' + esc(hmUtc(mk.at)) + ' · ' + sg(mk.dist, 1) + '% since the close') : row('now', '●', L.px, esc(lvFresh(L))))
         + (L.below ? row('dn', '▼', L.below.price, lt(L.below)) : '') + '</div>'
-        + (mk ? '<p class="sub">Levels ' + esc(lvFresh(L).replace(/^Stale: /, 'from the ')) + ': <b>' + usd(L.px) + '</b>. Distances are from the price now.</p>' : '')
+        + (mk ? '<p class="sub gx">Levels ' + esc(lvFresh(L).replace(/^Stale: /, 'from the ')) + ': <b>' + usd(L.px) + '</b>. Distances are from the price now.</p>' : '')
         + (L.broken && !((L.above && L.above.crossed) || (L.below && L.below.crossed)) ? '<p class="sub"><em class="brk">Broken since the close:</em> ' + usd(L.broken.price) + ' ' + esc(String(L.broken.label).toLowerCase()) + ' (price traded ' + esc(L.broken.side) + ' it).</p>' : '')
-        + '<p class="sub">A daily close beyond either is the week\'s first real move.</p>'; }
+        + '<p class="sub gx">A daily close beyond either is the week\'s first real move.</p>'; }
     else $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span><p class="empty">No price history.</p>';
     var cal = v.calibration; $('g-cal').textContent = cal ? 'Self-calibration: ' + (cal.status === 'active' ? cal.state + ' (k = ' + cal.k + ')' : 'waiting (' + cal.n + ' of ' + ((cal.need && cal.need.scored) || 30) + ' scored calls)') + '.' : '';
   }
@@ -778,7 +849,7 @@
     }).join('') || '<li class="empty">No insights yet.</li>';
     var hy = b.hypotheses || [];
     var dues = hy.map(function (h) { return h.by; }).filter(function (x, i, A) { return x && A.indexOf(x) === i; });
-    $('hyp-take').innerHTML = hy.length ? '<b>' + hy.length + ' hypothes' + (hy.length === 1 ? 'is' : 'es') + '</b>, due ' + esc(dues.join(' and ')) + '. The bar is his chance; the tick is how often it happened in all weeks since 2007.' : 'No hypothesis this run: too little history for the analogs.';
+    $('hyp-take').innerHTML = hy.length ? '<b>' + hy.length + ' hypothes' + (hy.length === 1 ? 'is' : 'es') + '</b>, due ' + esc(dues.join(' and ')) + '.<span class="tk-x"> The bar is his chance; the tick is how often it happened in all weeks since 2007.</span>' : 'No hypothesis this run: too little history for the analogs.';
     $('brief-hyp').innerHTML = hy.length ? hypBars(hy)
       + (b.record ? '<p class="note" style="grid-column:1/-1">' + (b.record.n ? 'Hypotheses scored: ' + b.record.n + ', <b>' + pct(b.record.hitRate) + ' came true</b> vs ' + pct(b.record.expected) + ' expected, Brier ' + b.record.brier + '; ' + b.record.open + ' open.' : 'Track record: ' + (b.record.open || 0) + ' hypotheses on the record, none due yet.') + '</p>' : '')
       : '';   // the line above says why; it was said twice
@@ -975,7 +1046,7 @@
     if (!gs.ok) { $('sc-sub').textContent = ''; $('sc-top').innerHTML = '<span class="v">n/a</span><p>' + esc(gs.why || 'The score could not be computed this run.') + '</p>'; $('score-spark').innerHTML = ''; $('score-drv').innerHTML = ''; $('score-tbl').innerHTML = ''; return; }
     $('sc-sub').textContent = 'week to ' + gs.asOf + (gs.partial ? ' (not closed)' : '') + ' · tested 2007-26';
     $('sc-top').innerHTML = '<span class="v">' + esc(sg(gs.score)) + '</span><span class="lb">' + esc(gs.label) + '</span><p>' + (gs.score > 0.25 ? 'Above +0.25 the tested rule had gold up 69% of the time over the next 4 weeks.' : 'Under +0.25 the macro layer has no direction edge: the technical systems lead. A negative score is not a sell.')
-      + (gs.trend ? ' Gold is ' + (gs.trend.above10w ? 'above' : 'below') + ' its 10-week average (' + money(gs.trend.avg10w, '$') + ').' : '') + (gs.stale && gs.stale.length ? ' Stale input: ' + esc(gs.stale.map(function (x) { return x.name; }).join(', ')) + '.' : '') + '</p>';
+      + (gs.trend ? '<span class="tk-x"> Gold is ' + (gs.trend.above10w ? 'above' : 'below') + ' its 10-week average (' + money(gs.trend.avg10w, '$') + ').</span>' : '') + (gs.stale && gs.stale.length ? ' Stale input: ' + esc(gs.stale.map(function (x) { return x.name; }).join(', ')) + '.' : '') + '</p>';
     draw('score-spark', function (w) { return sparkSvg(gs, w); });
     $('score-drv').innerHTML = driversHtml(gs);
     var P = scorePoints(gs).slice().reverse();
@@ -1030,7 +1101,7 @@
     var mk = L.mark && num(L.mark.px) ? L.mark : null, ref = mk ? +mk.px : +L.px;
     var lv = (L.list || []).filter(function (l) { return LADDER_KINDS[l.kind] && num(l.price); }), up = lv.filter(function (l) { return l.price > ref; }).sort(function (a, b) { return a.price - b.price; })[0], dn = lv.filter(function (l) { return l.price < ref; }).sort(function (a, b) { return b.price - a.price; })[0];
     var lvTxt = function (l) { return '<b>' + esc(money(l.price, L.unit, L.dp)) + '</b> ' + esc(l.label) + ' (' + esc(sg((l.price / ref - 1) * 100, 1)) + '%' + (l.crossed ? ', <em class="brk">broken since the close</em>' : '') + ')'; };
-    $('ld-take').innerHTML = 'Gold closed at <b>' + esc(money(L.px, L.unit, L.dp)) + '</b> on ' + esc(L.asOf || NA) + (mk ? ' and was near <b>' + esc(money(mk.px, L.unit, L.dp)) + '</b> at ' + esc(hmUtc(mk.at)) + ' (' + esc(sg(mk.dist, 1)) + '%)' : '') + (up ? '; next above ' + lvTxt(up) : '') + (dn ? '; next below ' + lvTxt(dn) : '') + '.';
+    $('ld-take').innerHTML = 'Gold closed at <b>' + esc(money(L.px, L.unit, L.dp)) + '</b> on ' + esc(L.asOf || NA) + (mk ? ' and was near <b>' + esc(money(mk.px, L.unit, L.dp)) + '</b> at ' + esc(hmUtc(mk.at)) + ' (' + esc(sg(mk.dist, 1)) + '%)' : '') + '<span class="tk-x">' + (up ? '; next above ' + lvTxt(up) : '') + (dn ? '; next below ' + lvTxt(dn) : '') + '</span>.';
     $('ld-note').textContent = 'Nearest swing high and low, the 20/50/200-day averages, last week\'s and last month\'s high and low, all from complete daily candles (a level does not move intraday). ▲ above the close, ▼ below; tap a level for why it matters.';
     draw('ladder', function (w) { return ladderSvg(L, w); });
   }
@@ -1232,17 +1303,19 @@
       document.querySelectorAll('#toc a').forEach(function (a) { if (cur && a.getAttribute('href') === '#' + cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }); }, { rootMargin: '-120px 0px -55% 0px' });
     document.querySelectorAll('main .story').forEach(function (sx) { io.observe(sx); }); }
   $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
+  $('g-event').addEventListener('click', function (e) { if (e.target.closest('a[href="#s-next"]')) foldSet($('s-next'), true); });   // the glance's link into a folded section opens it
   function load() {
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
       renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
-      syncStory();
+      syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
       var m = document.querySelector('main.wrap'); if (m) delete m.dataset.loading;
       redraw();
+      if (hashGo) { hashGo = false; var ht = simple() && openHash(); if (ht) ht.scrollIntoView({ behavior: 'instant' }); }
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     }).finally(function () { var m = document.querySelector('main.wrap'); if (m) delete m.dataset.loading; });   // the story shows once its cards know whether they have data
   }
@@ -1284,7 +1357,33 @@
   // tabs (the owner: "i dont like to scroll down all the time"): one lower section at a time, remembered per browser
   var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'cot', 'ledger', 'library'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); if (t === 'library') loadLib(); try { localStorage.setItem('mdTab', t); } catch (e) {} }
   tabs.forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.t); }); }); try { var t0 = localStorage.getItem('mdTab'); if (t0 && $('tab-' + t0)) showTab(t0); } catch (e) {}
-  var deep = $('deep'); try { if (localStorage.getItem('mdDeep') === '1') deep.open = true; } catch (e) {} deep.addEventListener('toggle', function () { try { localStorage.setItem('mdDeep', deep.open ? '1' : '0'); } catch (e) {} });
+  // ---- Simple phone view (11 Nov 2026): the head script sets html[data-phone="simple"] on a screen up to 640 px unless this
+  // device chose the full view. Sections 2 to 6 (.sfold) then show their title and ONE line, copied from the line the open card
+  // already prints (no new number, no new wording), and open on tap. A closed section has no width, so draw() leaves its charts
+  // undrawn; foldSet draws them when it opens, at the width they have then, and again on every later opening (a 5-minute
+  // reload in between changes the data). Outside the simple view the classes do nothing.
+  function simple() { return document.documentElement.dataset.phone === 'simple'; }
+  function foldSet(sx, open) { if (!sx || !sx.classList.contains('sfold')) return; sx.classList.toggle('open', !!open); var b = sx.querySelector('.st-go'); if (b) b.setAttribute('aria-expanded', String(!!open)); if (open) redraw(sx); }
+  function takeOf(id) { var el = typeof id === 'string' ? $(id) : id; if (!el || el.closest('[hidden]')) return ''; var c = el.cloneNode(true); c.querySelectorAll('.tk-x').forEach(function (x) { x.remove(); }); return c.innerHTML.trim(); }
+  function syncOne() {
+    var st = $('ld-stale'), stb = st && !st.hidden && st.querySelector('b'), sc = !$('c-score').hidden && $('sc-top'), scv = sc && sc.querySelector('.v'), scl = sc && sc.querySelector('.lb'), scp = sc && sc.querySelector('p');
+    var one = { 's-next': takeOf('nx-take'),
+      's-why': scv ? 'Gold Macro Score <b>' + esc(scv.textContent) + '</b>' + (scl ? ' · ' + esc(scl.textContent) : '') + (scp ? '. ' + takeOf(scp) : '') : '',
+      's-price': (stb ? '<b>' + esc(stb.textContent) + '</b> ' : '') + takeOf('ld-take'),
+      's-expect': takeOf('hyp-take'),
+      's-track': takeOf('calls-take') || takeOf('calib-take') };
+    Object.keys(one).forEach(function (id) { var o = $('one-' + id), m = $(id).querySelector('.st-h .st-m'); if (o) o.innerHTML = one[id]; if (m) m.classList.toggle('has-one', !!one[id]); });
+  }
+  document.querySelectorAll('.st-go').forEach(function (b) { b.addEventListener('click', function () { var sx = b.closest('.sfold'); foldSet(sx, !sx.classList.contains('open')); }); });
+  $('g-more').addEventListener('click', function () { var on = $('c-glance').classList.toggle('more'); this.setAttribute('aria-expanded', String(on)); });
+  function syncSw() { var s = simple(); document.querySelectorAll('#ps-sw button[data-v]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'simple') === s)); }); }
+  $('ps-sw').addEventListener('click', function (e) { var b = e.target.closest('button[data-v]'); if (b && window.msPhoneView) { window.msPhoneView(b.dataset.v); window.scrollTo({ top: 0, behavior: 'instant' }); } });
+  document.addEventListener('ms:phone', function () { syncSw(); redraw(); }); syncSw();   // the other view lays the charts out at other widths
+  // a link to a section (the address, or a link on the page) opens it when it is folded
+  function openHash() { var t = null; try { t = location.hash.length > 1 ? document.querySelector(location.hash) : null; } catch (e) {} t = t && t.closest('.sfold'); if (t) foldSet(t, true); return t; }
+  window.addEventListener('hashchange', openHash); openHash();
+  var hashGo = true;   // the first load only: the story was hidden when the browser looked for the address's section, so go there now
+  var deep = $('deep'); try { if (localStorage.getItem('mdDeep') === '1' && !simple()) deep.open = true; } catch (e) {} deep.addEventListener('toggle', function () { try { localStorage.setItem('mdDeep', deep.open ? '1' : '0'); } catch (e) {} });
   load(); setInterval(load, 5 * 60e3);
 })();
 </script>

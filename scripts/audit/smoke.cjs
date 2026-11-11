@@ -6,6 +6,7 @@
 // On the phone no inner view of the Desk may be wider than the screen either (the app clips it, so it never scrolls sideways);
 // the same for every tab of the gold terminal; and no visible chart host (.vz) of a page may be left empty.
 // The ICT desk draws no text under 12 px.
+// On the phone the macro desk opens in its simple view: every folded section is opened and its charts must be drawn at their width.
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -107,6 +108,14 @@ async function wire(ctx, account, seen) {
       // (no width, nothing drawn until a resize); folded or hidden hosts do not count
       const blank = await ev(p, calm, () => [...document.querySelectorAll('.vz[id]')].filter((e) => e.getClientRects().length && e.clientWidth > 0 && !e.children.length).map((e) => '#' + e.id)).catch((e) => { errs.push('chart check could not run: ' + e.message.split('\n')[0]); return []; });
       if (blank.length) errs.push('chart not drawn: ' + blank.join(', '));
+      // the macro desk's simple phone view folds its later sections: each is opened here, and its charts must then be drawn, at
+      // the width they have once open (a folded section has no width). They stay open for the sideways-scroll check below.
+      if (path === '/macro-desk.html' && viewport.width < 500 && account) { const bad = await ev(p, calm, async () => { const out = [], go = [...document.querySelectorAll('.sfold .st-go')].filter((b) => b.getClientRects().length);
+        if (document.documentElement.dataset.phone !== 'simple' || !go.length) return ['the simple phone view did not fold its sections'];
+        for (const b of go) { const sx = b.closest('.sfold'); b.click(); await new Promise((r) => setTimeout(r, 200)); if (!sx.classList.contains('open')) { out.push('#' + sx.id + ' did not open'); continue; }
+          sx.querySelectorAll('.vz[id]').forEach((h) => { if (!h.getClientRects().length || h.clientWidth <= 0) return; const g = h.querySelector('svg'), w = g ? Math.round(g.getBoundingClientRect().width) : 0;
+            if (!h.children.length) out.push('#' + h.id + ' not drawn'); else if (g && h.clientWidth >= 260 && Math.abs(w - h.clientWidth) > 2) out.push('#' + h.id + ' drawn ' + w + ' px wide in ' + h.clientWidth + ' px'); }); }
+        return out; }).catch((e) => ['could not run: ' + e.message.split('\n')[0]]); if (bad.length) errs.push('folded section opened: ' + bad.join(', ')); }
       // scroll to the bottom and back so lazy sections render before the width check
       await ev(p, calm, async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 300)); window.scrollTo(0, 0); }).catch((e) => errs.push('could not scroll the page: ' + e.message.split('\n')[0]));
       const w = await ev(p, calm, () => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })).catch((e) => { errs.push('width check could not run: ' + e.message.split('\n')[0]); return { sw: 0, iw: 0 }; });
