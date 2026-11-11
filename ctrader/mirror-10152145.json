@@ -6135,7 +6135,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9963.35 · 24 open",
+  "status": "ok · demo Fusion Markets · balance 9963.35 · 24 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6145,17 +6145,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "usdchf-scalp-1794357162": {
+    "orderId": "33900891",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.82552,
+    "stop": 0.82476,
+    "t1": 0.82682,
+    "placedAt": "2026-11-11T00:33:39.000Z",
+    "expires": "2026-11-11T03:32:42.000Z",
+    "riskCash": 1.99,
+    "margin": 4,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9963.35,
-  "lastRun": "2026-11-11T00:31:24.000Z"
+  "lastRun": "2026-11-11T00:33:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T11:47:16.000Z",
-   "msg": "placed buy limit USDCAD 0.05 lot at 1.41291 (council scalp, valid to 2026-11-10T14:46Z)",
-   "trade": "usdcad-scalp-1794311168"
-  },
   {
    "at": "2026-11-10T11:57:02.000Z",
    "msg": "limit filled: USDCAD position 48018890 at the broker",
@@ -7650,6 +7666,11 @@
    "at": "2026-11-10T23:53:56.000Z",
    "msg": "limit filled: EURUSD position 48236698 at the broker",
    "trade": "eurusd-scalp-1794354451"
+  },
+  {
+   "at": "2026-11-11T00:33:39.000Z",
+   "msg": "placed buy limit USDCHF 0.02 lot at 0.82552 (council scalp, valid to 2026-11-11T03:32Z)",
+   "trade": "usdchf-scalp-1794357162"
   }
  ],
  "limits": {
