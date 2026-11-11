@@ -310,6 +310,32 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   on its own futures feed and land in the log as `resolved`; Fred's independent reconstruction (ES stop -1R at 7,437.75, NQ time
   exit 27,316, gold time exit 4,129.7) is to be compared with those entries. Tests: `tests/desk-ict-trace.test.mjs` (not named
   `tests/ict-*`: it also checks the page and the connector), `tests/mcp.test.mjs`, `tests/mcp-apply.test.mjs`.
+- **Frozen history** (11 Nov 2026, the first logged run): 8 Nov 13:49 -> 11 Nov 09:12 UTC changed 26 booked records, removed 11
+  and added 8 (+23.6R of the +26.65R move, 97.92R -> 124.57R) with no rule change. Cause: the futures feed does not return the
+  same candles for the same past hours on every run, and the replay rebuilt everything from them each time. Shown from the two
+  files and the spot-gold fill file: (1) gold's back-fill boundary is the feed's first candle of that run (1 Mar 23:00 on 8 Nov,
+  27 Feb 00:00 on 11 Nov) and the scale is the median futures / spot ratio of the 20 days after it, over thin candles
+  (1.02967 -> 1.02950): every level of 23 Dec - 26 Feb moved by about $0.80 (25 records); (2) rebuilt from the fill file alone,
+  6 of the old file's gold records and 4 of the new one's differ, each where another candle was mixed into the 5-minute exit
+  data: the five changed results; (3) the fill file starts 20 Dec 2025, so gold before that is built only from the feed's stray
+  candles and differs on every run (8 removed, 7 added here; that stretch summed +8.4R, -1.3R, -5.8R and +7.5R
+  in the four files of 7-11 Nov made on the same rule); (4) the removed NQ record has no signal on the Dukascopy fill alone, and the ES entry moved one tick on the
+  last hourly candle before a weekend. Inferred, not shown (the candles of a run are not saved): that the odd candles are the
+  feed's stray prints of the then-deferred contract. Fix (`ict/replay.mjs` `freezePlan`, `freezer`, `run`): a booked record that
+  closed more than `SETTLE` (3 days) before the END of the previous run is carried from the previous replay.json exactly as
+  booked (paper streams too), and no record the previous file does not have is started inside that stretch; open records,
+  those booked in the last 3 days and new ones are computed. replay.json says so: `frozen` (`cut`, `baseAt`, `why`, `carried` /
+  `ignored` per market, `adopted` when the base file predates this), `ruleCode`, `marketThrough`, and per market
+  `src.<m>.cnbcFrom` + `src.<m>.fill` (`scale`) = that run's own boundary and scale. Everything is recomputed, and the run is
+  written to the log as `rebuild` (also when it changed nothing), when the workflow's "rebuild" box / `ICT_REPLAY_REBUILD=on` asks,
+  when the start date differs, or when `ict/tracker.mjs`, `calendar.mjs` or `replay.mjs` changed (`ruleCode`: a rule change must
+  show over the whole history). A market whose feed failed is frozen only up to the last run that read it. `gaps` now counts only
+  the signals a run computed. No result was edited: the base is whatever file is in place at the first frozen run, stray-built
+  gold records of Aug - Dec 2025 included (11 records, +7.49R in the 11 Nov file; keeping or dropping them is the owner's call).
+  Still open: a rebuild draws the feed's noise again (about +/-25R), so a rule change's effect on old history cannot be told from
+  it until the replay keeps its own candle archive; not checked on the live feed (not reachable from the build sandbox). A normal
+  daily log entry should show `resolved` and `added` only, `corrected` and `removed` only for records closed in the 3 days before
+  the previous run. Tests: `tests/desk-ict-stable.test.mjs` (a fake feed whose window and scale differ between runs).
 
 ## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
 `council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
