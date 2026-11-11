@@ -8,9 +8,11 @@
 // The bias is the veteran's own 20-session probability for gold (his month "closes above today" call, after calibration)
 // against its 10-year base rate: no new model, no new rule.
 import { nearestLevel } from './briefing.mjs';
+import { usHolidays } from './datacheck.mjs';
 
 export const LEAN_PTS = 0.03;   // the bias reads supportive / against only 3+ points away from the base rate
 export const KEEP_WEEKS = 26;
+const DAY = 86400;
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const dShort = (iso) => { const d = new Date(String(iso).length <= 10 ? iso + 'T00:00:00Z' : iso); return Number.isFinite(d.getTime()) ? `${d.getUTCDate()} ${MON[d.getUTCMonth()]}` : String(iso); };
 const tShort = (iso) => { const d = new Date(iso); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}, ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')} UTC`; };
@@ -39,10 +41,45 @@ export function eventOf(v) {
   if (i) return { ...i.event, when: tShort(i.event.at) };
   const e = v && v.verdict && v.verdict.eventWithin72h; return e ? { title: e.title, at: e.at, consensus: e.consensus ?? null, when: tShort(e.at) } : null;
 }
+// ---- how fresh the levels are, and what price has done since the close (11 Nov, display only) ---------------------------------
+// Every level is computed from complete daily candles. closeAge counts the weekday sessions that have fully ended (UTC days)
+// since the last close on file, skipping the days the market is shut all day (datacheck.mjs usHolidays, the calendar the data
+// check and the digest use): 0 = the latest close there can be; 1 or more = stale, said in words.
+const dayT = (iso) => Date.parse(iso + 'T00:00:00Z') / 1000, isoD = (t) => new Date(t * 1000).toISOString().slice(0, 10);
+export function closeAge(asOf, now) {
+  if (!/^\d{4}-\d\d-\d\d$/.test(String(asOf || '')) || !Number.isFinite(now)) return null;
+  let n = 0;
+  for (let t = dayT(asOf) + DAY; t + DAY <= now; t += DAY) { const d = isoD(t), w = new Date(t * 1000).getUTCDay(); if (w >= 1 && w <= 5 && usHolidays(+d.slice(0, 4)).get(d) !== 'closed') n++; }
+  return { asOf, sessions: n, stale: n >= 1, text: n >= 1 ? `Stale: last close ${asOf}, ${n} trading day${n === 1 ? '' : 's'} ago` : `as of ${asOf} close` };
+}
+// the strategist's latest price for an asset (forecast.json assets.<k>.last at fc.at): used only when it comes from the same feed
+// as the daily candles (OANDA), so a fallback feed's price basis never "breaks" a level
+export function markOf(fc, k = 'gold') {
+  const a = fc && fc.assets && fc.assets[k], at = fc && fc.at, src = fc && fc.sources && fc.sources[`bars:${k}`];
+  if (!a || !Number.isFinite(a.last) || !(a.last > 0) || !Number.isFinite(Date.parse(at || '')) || (src != null && !/^OANDA ok/.test(src))) return null;
+  return { px: a.last, at };
+}
+// Stamps a level block (briefing.levels.gold / .dxy) for the desk: `fresh` (closeAge), `mark` (the latest price, only when it is
+// later than the close the levels come from) and `crossed: true` on each level price has traded through since that close.
+// Nothing here is read by a hypothesis, a call or their scoring: the list's prices, sides and distances stay as computed.
+export function markLevels(lv, { now, mark = null } = {}) {
+  if (!lv || !Array.isArray(lv.list)) return lv;
+  lv.fresh = closeAge(lv.asOf, now);
+  const ok = mark && Number.isFinite(mark.px) && /^\d{4}-\d\d-\d\d$/.test(String(lv.asOf || '')) && Date.parse(mark.at) / 1000 >= dayT(lv.asOf) + DAY && mark.px !== lv.px;
+  lv.mark = ok ? { px: mark.px, at: mark.at, dist: +((mark.px / lv.px - 1) * 100).toFixed(2) } : null;
+  for (const l of lv.list) { const x = ok && (mark.px > lv.px ? l.price > lv.px && l.price <= mark.px : l.price < lv.px && l.price >= mark.px); if (x) l.crossed = true; else delete l.crossed; }
+  return lv;
+}
+// The two levels to watch. Without a later price: the nearest structural level each side of the close (as before). With one:
+// the nearest each side of that price, so a level already traded through is never offered as the level "above" when price is
+// above it; `broken` names the level that WAS the one to watch on that side at the close, when price has crossed it.
 export function watchLevels(v) {
   const g = v && v.briefing && v.briefing.levels && v.briefing.levels.gold; if (!g) return null;
-  const pick = (side) => { const l = nearestLevel(g, side); return l ? { price: l.price, label: l.label, dist: l.dist } : null; };
-  return { px: g.px, asOf: g.asOf, above: pick('above'), below: pick('below') };
+  const m = g.mark && Number.isFinite(g.mark.px) ? g.mark.px : null;
+  const out = (l) => (l ? { price: l.price, label: l.label, dist: l.dist, ...(m != null ? { distNow: +((l.price / m - 1) * 100).toFixed(2) } : {}), ...(l.crossed ? { crossed: true } : {}) } : null);
+  const was = m == null ? null : nearestLevel(g, m > g.px ? 'above' : 'below');
+  return { px: g.px, asOf: g.asOf, above: out(nearestLevel(g, 'above', 0.4, m)), below: out(nearestLevel(g, 'below', 0.4, m)),
+    fresh: g.fresh || null, mark: g.mark || null, broken: was && was.crossed ? { price: was.price, label: was.label, side: m > g.px ? 'above' : 'below' } : null };
 }
 export function summary(v) {
   if (!v) return null;
@@ -50,7 +87,15 @@ export function summary(v) {
   if (bias) parts.push(`${bias.lean === 'supportive' ? 'the macro leans supportive for gold' : bias.lean === 'against' ? 'the macro leans against gold' : 'no macro edge for gold, neutral'} (${pc(bias.p)} chance it is higher${bias.by ? ` by ${dShort(bias.by)}` : ''}, base ${bias.base == null ? 'n/a' : pc(bias.base)})`);
   let s = `This week: ${parts[0] || 'no read yet'}.`;
   s += event ? ` ${event.country ? event.country + ' ' : ''}${event.title} (${event.when}) is the event that matters most.` : ' No major release is scheduled this week.';
-  if (levels && (levels.above || levels.below)) s += ` Watch ${[levels.above && `${usd(levels.above.price)} above`, levels.below && `${usd(levels.below.price)} below`].filter(Boolean).join(' and ')}.`;
+  if (levels && (levels.above || levels.below)) {
+    // the levels come from daily closes: say which close, say so when it is old, and never call a level price has already
+    // crossed a level "above" or "below" without saying it broke
+    const f = levels.fresh, close = f ? `${dShort(f.asOf)} close` : 'last close', br = levels.broken;
+    const tag = (l) => (!l.crossed ? '' : br && br.price === l.price ? ' (that level, broken since the close)' : ' (broken since the close)');
+    if (br) s += ` Gold has traded ${br.side === 'below' ? 'below' : 'above'} ${usd(br.price)} (${br.label.toLowerCase()}) since the ${close} and is near ${usd(levels.mark.px)}.`;
+    s += ` Watch ${[levels.above && `${usd(levels.above.price)} above${tag(levels.above)}`, levels.below && `${usd(levels.below.price)} below${tag(levels.below)}`].filter(Boolean).join(' and ')}`;
+    s += f && f.stale ? `. Levels are stale: last close ${dShort(f.asOf)}, ${f.sessions} trading day${f.sessions === 1 ? '' : 's'} ago.` : f ? ` (levels as of the ${close}).` : '.';
+  }
   return { sentence: s, bias, event, levels, calibration: v.calibration ? { status: v.calibration.status, line: v.calibration.line, k: v.calibration.k } : null, publicOnly: true };
 }
 

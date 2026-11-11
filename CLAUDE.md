@@ -1721,6 +1721,39 @@ over `STALE_MIN` 90 min (red over `OLD_MIN` 6 h). COT tab: the pre-registered st
 overall, the markets with a passing cell, "no tested edge" for the rest) and a tag per gauge from `edgeStatus` / `edgeText`.
 No council logic changed. Tests: tests/macro-visual.test.mjs (calm pass).
 
+## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
+Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
+Cause: `veteran.mjs` `run()` read its closes only from the weekly candle cache (`research/daily/<key>.json`, Saturdays); the
+strategist's "this run's closed days" extension (9 Nov) lived only inside `scoreSeries` for the Gold Macro Score and was never
+written anywhere the veteran reads. Display / freshness only: no probability, calibration, rule or trade maths changed.
+- **Hand-over** `macro.mjs` `handDaily` → `macro/cache.json` `daily: { src, days: { <cache key>: [[dayStart, o, h, l, c]] } }`
+  (`HAND_KEYS`: xau, the five DXY pairs, spx500, nas100; last `HAND_DAYS` 30): COMPLETE UTC days only (never the forming
+  candle: a level must not move intraday), only when the run's candles are OANDA's (a Kraken fallback has another price
+  basis), a failed fetch keeps the last good days, no timestamp. `veteran.mjs` `extendDaily` appends them after the cache's
+  last day only when they reach back to that day AND agree with its close (same feed, no gap: the ledger counts rows), cut
+  at the veteran's `now`; otherwise the cache is used alone. The veteran still fetches nothing. `veteran.json.closes` says per
+  market how far the cache went, how many days were added, or why none. xag / audusd / nzdusd (COT pair calls) are not
+  fetched by the strategist and stay on the weekly cache.
+- **Scored records**: the handed candles are the candle cache's own (1,396 overlapping gold days compared, identical), so a
+  short cache plus the hand-over gives byte-identical calls / ledger / debates / briefing files to a refreshed cache
+  (`tests/veteran-fresh.test.mjs`); records on file keep every recorded field. Two things follow: results arrive on the day
+  they are due instead of after Saturday, and the dated week / month calls now get a new set each trading day (new close =
+  new level and date; 16 a day instead of 16 a week; `callsLedger` keeps the last 600 records, about 7 weeks at that pace:
+  raising it is the owner's call before the calibration threshold is reached). The hypotheses stay one per week.
+  `resolveCall` now waits until the closes on file reach the call's date (a file ending early used to score the call on its
+  last day on file); on complete closes the result is unchanged.
+- **Honesty** (`glance.mjs`): `closeAge(asOf, now)` = weekday sessions fully ended since the close, skipping full-closure
+  days of `datacheck.mjs` `usHolidays` (no second calendar) → `fresh { asOf, sessions, stale, text }` on each level block:
+  "as of <date> close", or "Stale: last close <date>, <n> trading days ago" from one missed session. `markOf(fc)` = the
+  strategist's latest gold price (`assets.gold.last` at `fc.at`, OANDA only); `markLevels` stamps `mark` and `crossed: true`
+  on every level between the close and that price; `watchLevels` then picks the two levels either side of the PRICE, tags a
+  crossed one, and `broken` names the level that was the one to watch at the close. The sentence says "Gold has traded below
+  $X (label) since the <date> close and is near $Y". None of it is read by a hypothesis or a call (`nearestLevel`'s `ref`
+  argument is display only; a test pins that hypotheses, calls and level prices are the same whatever the latest price is).
+- **Desk** (macro-desk.html): `lvFresh` / `lvStale` / `hmUtc`; the glance tile, the ladder (`#ld-stale`, a hollow dot for
+  the latest price, "broken since the close" on crossed rows, next above / below from the price) and the level table.
+  An older veteran.json without the fields reads as before.
+
 ## Post-merge QA sweep (9 Nov 2026, PRs #682-#705)
 Every page at 390 / 1440 px in dark / light / midnight as owner, reviewer, viewer and signed out (stubbed /api/me, real council-data
 at /cdata). Fixed: the side pages' header ring spun forever (`assets/mx-page.css`, now one sweep on hover / focus like the desk);

@@ -296,6 +296,10 @@
   .vz .now-band { fill: var(--gold); opacity: .12; } .vz .wh { stroke: var(--ink-faint); stroke-width: 2; stroke-linecap: round; }
   .vz-h { margin-top: 14px !important; } .vz-h small { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin-left: 6px; }
   .vz-note { font-size: 13px !important; color: var(--ink-faint) !important; margin: 2px 0 0 !important; }
+  /* levels come from daily closes (11 Nov): an old close is said in words; a level price has crossed since the close is marked */
+  .lv-stale { margin: 0 0 var(--s3) !important; padding: var(--s2) var(--s3); border-radius: var(--r-sm); background: color-mix(in srgb, var(--gold) 12%, var(--panel)); color: var(--ink) !important; font-size: var(--fs-sm) !important; line-height: 1.45; }
+  .tile .lv-stale { margin: 6px 0 2px !important; }
+  .brk { color: var(--gold-ink); font-style: normal; font-weight: 600; } .vz svg text.brk { fill: var(--gold-ink); font-weight: 600; }
   .vz-tip { position: fixed; z-index: var(--z-tip); max-width: min(320px, calc(100vw - 16px)); padding: 8px 10px; border-radius: var(--r-sm); background: var(--panel-raised); border: 1px solid var(--line-strong);
     box-shadow: var(--shadow-pop); font: 500 12.5px/1.45 var(--sans); color: var(--ink-dim); pointer-events: none; font-variant-numeric: tabular-nums; }
   .vz-tip b { display: block; color: var(--ink); font: 700 13.5px var(--sans); margin-bottom: 2px; } .vz-tip span { display: block; }
@@ -547,6 +551,7 @@
     <section class="story" id="s-price" aria-labelledby="ld-h">
       <header class="st-h"><h2 id="ld-h">Where price sits</h2><small class="st-m" id="ld-sub"></small></header>
       <article class="card" id="c-ladder" hidden>
+        <p class="lv-stale" id="ld-stale" role="status" hidden></p>
         <p class="c-take" id="ld-take"></p>
         <div class="vz" id="ladder"></div>
         <p class="vz-note" id="ld-note"></p>
@@ -697,6 +702,11 @@
   }
   // ---- the glance (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler"): council/glance.mjs → veteran.json.summary
   var usd = function (x) { return '$' + Math.round(+x).toLocaleString('en-US'); };
+  // levels are computed from complete daily candles; veteran.json stamps each block with `fresh` (which close, how many
+  // trading days old: council/glance.mjs closeAge) and `mark` (the strategist's latest price, when later than that close)
+  function lvFresh(L) { var f = L && L.fresh; return f && f.text ? f.text : 'last close ' + ((L && L.asOf) || NA); }
+  function lvStale(L) { var f = L && L.fresh; return f && f.stale ? '<p class="lv-stale" role="status"><b>' + esc(f.text) + '.</b> These levels are from that close: newer closes have not reached the veteran.</p>' : ''; }
+  function hmUtc(iso) { var d = new Date(iso); return isFinite(d.getTime()) ? d.toISOString().slice(11, 16) + ' UTC' : NA; }
   function renderGlance(v) {
     var s = v && v.summary, sec = $('c-glance'); if (!s) { sec.hidden = true; return; } sec.hidden = false;
     $('g-at').textContent = 'built ' + ago(v.at) + ' · paper only';
@@ -720,10 +730,14 @@
     else $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">None scheduled</div><p class="sub">No red-folder release this week: gold trades on rates and the dollar.</p>';
     var L = s.levels;
     if (L && (L.above || L.below)) { var row = function (cls, ar, x, txt) { return '<div><span class="ar ' + cls + '" aria-hidden="true">' + ar + '</span><b>' + usd(x) + '</b><small>' + txt + '</small></div>'; };
-      $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span><div class="ldr">'
-        + (L.above ? row('up', '▲', L.above.price, esc(L.above.label) + ' · ' + sg(L.above.dist, 1) + '%') : '')
-        + row('now', '●', L.px, 'last close ' + esc(L.asOf))
-        + (L.below ? row('dn', '▼', L.below.price, esc(L.below.label) + ' · ' + sg(L.below.dist, 1) + '%') : '') + '</div>'
+      // the levels are from the last daily close: say which one, say when it is old, and mark a level price has crossed since
+      var mk = L.mark && num(L.mark.px) ? L.mark : null, lt = function (l) { return esc(l.label) + ' · ' + sg(mk && num(l.distNow) ? l.distNow : l.dist, 1) + '%' + (l.crossed ? ' · <em class="brk">broken since the close</em>' : ''); };
+      $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span>' + lvStale(L) + '<div class="ldr">'
+        + (L.above ? row('up', '▲', L.above.price, lt(L.above)) : '')
+        + (mk ? row('now', '●', mk.px, 'price at ' + esc(hmUtc(mk.at)) + ' · ' + sg(mk.dist, 1) + '% since the close') : row('now', '●', L.px, esc(lvFresh(L))))
+        + (L.below ? row('dn', '▼', L.below.price, lt(L.below)) : '') + '</div>'
+        + (mk ? '<p class="sub">Levels ' + esc(lvFresh(L).replace(/^Stale: /, 'from the ')) + ': <b>' + usd(L.px) + '</b>. Distances are from the price now.</p>' : '')
+        + (L.broken && !((L.above && L.above.crossed) || (L.below && L.below.crossed)) ? '<p class="sub"><em class="brk">Broken since the close:</em> ' + usd(L.broken.price) + ' ' + esc(String(L.broken.label).toLowerCase()) + ' (price traded ' + esc(L.broken.side) + ' it).</p>' : '')
         + '<p class="sub">A daily close beyond either is the week\'s first real move.</p>'; }
     else $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span><p class="empty">No price history.</p>';
     var cal = v.calibration; $('g-cal').textContent = cal ? 'Self-calibration: ' + (cal.status === 'active' ? cal.state + ' (k = ' + cal.k + ')' : 'waiting (' + cal.n + ' of ' + ((cal.need && cal.need.scored) || 30) + ' scored calls)') + '.' : '';
@@ -784,9 +798,9 @@
     var lv = b.levels || {};
     var ladder = function (L) { if (!L) return ''; var rows = [], placed = false, fmt = function (x) { return (L.unit || '') + (+x).toLocaleString('en-US', { minimumFractionDigits: L.dp, maximumFractionDigits: L.dp }); };
       L.list.forEach(function (l) { if (!placed && l.price < L.px) { rows.push('<tr class="now"><td>' + fmt(L.px) + '</td><td>Last close (' + esc(L.asOf) + ')</td><td>0.00%</td></tr>'); placed = true; }
-        rows.push('<tr class="' + (l.near ? 'cf ' : '') + (l.kind === 'analog' || l.kind === 'range60' ? 'dv' : '') + '"><td>' + fmt(l.price) + '</td><td>' + esc(l.label) + '<small>' + esc(l.why) + '</small></td><td>' + sg(l.dist, 2) + '%</td></tr>'); });
+        rows.push('<tr class="' + (l.near ? 'cf ' : '') + (l.kind === 'analog' || l.kind === 'range60' ? 'dv' : '') + '"><td>' + fmt(l.price) + '</td><td>' + esc(l.label) + (l.crossed ? ' · <em class="brk">broken since the close</em>' : '') + '<small>' + esc(l.why) + '</small></td><td>' + sg(l.dist, 2) + '%</td></tr>'); });
       if (!placed) rows.push('<tr class="now"><td>' + fmt(L.px) + '</td><td>Last close (' + esc(L.asOf) + ')</td><td>0.00%</td></tr>');
-      return '<div><b>' + esc(L.name) + '</b><table class="lvt">' + rows.join('') + '</table></div>'; };
+      return '<div><b>' + esc(L.name) + '</b> <small>' + esc(lvFresh(L)) + (L.mark && num(L.mark.px) ? ' · price ' + fmt(L.mark.px) + ' at ' + esc(hmUtc(L.mark.at)) : '') + '</small><table class="lvt">' + rows.join('') + '</table></div>'; };
     $('brief-lv').innerHTML = (ladder(lv.gold) + ladder(lv.dxy)) || '<p class="empty">No price history.</p>';
     $('brief-lv').querySelectorAll('.lvt tr').forEach(function (tr) { tr.addEventListener('click', function () { tr.classList.toggle('open'); }); });
     var a = b.analogs; if (!a) { $('brief-an-sub').textContent = ''; $('brief-an').innerHTML = '<p class="empty">Not enough history for analogs.</p>'; return; }
@@ -989,14 +1003,17 @@
     pick = pick.filter(function (l) { var k = Math.round(l.price); if (seen[k]) return false; seen[k] = 1; return true; });
     if (!pick.length || !num(L.px)) return '<p class="empty">Levels: n/a.</p>';
     var rows = pick.map(function (l) { return { price: +l.price, label: l.label, why: l.why, dist: num(l.dist) ? +l.dist : (l.price / L.px - 1) * 100, usd: l.price - L.px }; });
-    rows.push({ price: +L.px, now: true, label: 'Last close ' + (L.asOf || NA) }); rows.sort(function (a, b) { return b.price - a.price; });
+    var mk = L.mark && num(L.mark.px) ? L.mark : null;
+    rows.forEach(function (r, i) { r.crossed = !!pick[i].crossed; });
+    rows.push({ price: +L.px, now: true, label: 'Last close ' + (L.asOf || NA) }); if (mk) rows.push({ price: +mk.px, mk: true, label: 'Price at ' + hmUtc(mk.at) });
+    rows.sort(function (a, b) { return b.price - a.price; });
     var GAP = 36, top = 14, H = Math.max(rows.length * GAP + 22, 260), bot = H - 18, hiP = rows[0].price, loP = rows[rows.length - 1].price, span = (hiP - loP) || 1;
     var Y = function (p) { return top + (hiP - p) / span * (bot - top); };
     rows.forEach(function (r) { r.y = Y(r.price); r.ly = r.y; });
     for (var i = 1; i < rows.length; i++) if (rows[i].ly < rows[i - 1].ly + GAP) rows[i].ly = rows[i - 1].ly + GAP;   // push labels apart, then pull back inside
     for (var j = rows.length - 1; j >= 0; j--) { var lim = j === rows.length - 1 ? bot : rows[j + 1].ly - GAP; if (rows[j].ly > lim) rows[j].ly = lim; }
-    var rx = 16, lx = 46, dp = L.dp || 0, unit = L.unit || '', g = '', ni = rows.findIndex(function (r) { return r.now; });
-    var above = rows[ni - 1], below = rows[ni + 1];
+    var rx = 16, lx = 46, dp = L.dp || 0, unit = L.unit || '', g = '', ni = rows.findIndex(function (r) { return mk ? r.mk : r.now; });   // the band sits around the latest price when there is one
+    var lvl = function (r) { return r && !r.now && !r.mk; }, above = rows.slice(0, ni).reverse().find(lvl), below = rows.slice(ni + 1).find(lvl);
     g += '<line class="rail" x1="' + rx + '" x2="' + rx + '" y1="' + top + '" y2="' + bot + '"/>';
     if (above && below) g += '<rect class="now-band" x="' + (rx - 7) + '" y="' + above.y + '" width="14" height="' + Math.max(2, below.y - above.y) + '" rx="4"/>';
     rows.forEach(function (r) {
@@ -1004,22 +1021,30 @@
           + '<rect class="lab-bg" x="' + (lx - 4) + '" y="' + (r.ly - 14) + '" width="' + (w - lx) + '" height="32" rx="6"/>'
           + '<path class="lead" d="M' + rx + ' ' + r.y + ' L' + (lx - 8) + ' ' + r.ly + '"/><circle class="dot" cx="' + rx + '" cy="' + r.y + '" r="7"/>'
           + '<text class="gold big mono" x="' + lx + '" y="' + (r.ly + 1) + '">' + esc(money(r.price, unit, dp)) + '</text><text class="dim" x="' + lx + '" y="' + (r.ly + 16) + '">◆ ' + esc(r.label) + '</text></g>'; return; }
-      var up = r.price > L.px, arrow = up ? '▲' : '▼', dist = sg(r.dist, 1) + '% · ' + (r.usd >= 0 ? '+' : '−') + money(Math.abs(r.usd), unit, dp);
-      g += '<g tabindex="0"' + tip(r.label + ' ' + money(r.price, unit, dp) + '\n' + sg(r.dist, 2) + '% · ' + (r.usd >= 0 ? '+' : '−') + money(Math.abs(r.usd), unit, dp) + ' from the close (' + (up ? 'above' : 'below') + ')\n' + (r.why || '')) + '>'
+      if (r.mk) { g += '<g tabindex="0"' + tip('Price at the strategist\'s last run: ' + money(r.price, unit, dp) + '\n' + hmUtc(mk.at) + ' · ' + sg(mk.dist, 2) + '% since the ' + (L.asOf || NA) + ' close\nThe levels do not move intraday: they are from that close.') + '>'
+          + '<rect class="lab-bg" x="' + (lx - 4) + '" y="' + (r.ly - 14) + '" width="' + (w - lx) + '" height="32" rx="6"/>'
+          + '<path class="lead" d="M' + rx + ' ' + r.y + ' L' + (lx - 8) + ' ' + r.ly + '"/><circle class="dot2" cx="' + rx + '" cy="' + r.y + '" r="6"/>'
+          + '<text class="ink mono" x="' + lx + '" y="' + (r.ly + 1) + '">' + esc(money(r.price, unit, dp)) + '</text><text class="dim mono" x="' + (lx + 62) + '" y="' + (r.ly + 1) + '">' + esc(sg(mk.dist, 1)) + '% since the close</text>'
+          + '<text class="dim" x="' + lx + '" y="' + (r.ly + 16) + '">○ ' + esc(r.label) + '</text></g>'; return; }
+      var up = r.price > L.px, arrow = up ? '▲' : '▼', dist = r.crossed ? 'broken since the close' : sg(r.dist, 1) + '% · ' + (r.usd >= 0 ? '+' : '−') + money(Math.abs(r.usd), unit, dp);   // a crossed level: the words, the distance stays in its tooltip
+      g += '<g tabindex="0"' + tip(r.label + ' ' + money(r.price, unit, dp) + '\n' + sg(r.dist, 2) + '% · ' + (r.usd >= 0 ? '+' : '−') + money(Math.abs(r.usd), unit, dp) + ' from the close (' + (up ? 'above' : 'below') + ')' + (r.crossed ? '\nBroken since the close: price has traded through it.' : '') + '\n' + (r.why || '')) + '>'
         + '<rect class="lab-bg" x="' + (lx - 4) + '" y="' + (r.ly - 14) + '" width="' + (w - lx) + '" height="32" rx="6"/>'
         + '<line class="tick" x1="' + (rx - 6) + '" x2="' + (rx + 6) + '" y1="' + r.y + '" y2="' + r.y + '"/><path class="lead" d="M' + (rx + 6) + ' ' + r.y + ' L' + (lx - 8) + ' ' + r.ly + '"/>'
-        + '<text class="ink mono" x="' + lx + '" y="' + (r.ly + 1) + '">' + esc(money(r.price, unit, dp)) + '</text><text class="dim mono" x="' + (lx + 62) + '" y="' + (r.ly + 1) + '">' + arrow + ' ' + esc(dist) + '</text>'
+        + '<text class="ink mono" x="' + lx + '" y="' + (r.ly + 1) + '">' + esc(money(r.price, unit, dp)) + '</text><text class="' + (r.crossed ? 'brk' : 'dim') + ' mono" x="' + (lx + 62) + '" y="' + (r.ly + 1) + '">' + arrow + ' ' + esc(dist) + '</text>'
         + '<text x="' + lx + '" y="' + (r.ly + 16) + '">' + esc(r.label.length > Math.floor((w - lx) / 6.6) ? r.label.slice(0, Math.floor((w - lx) / 6.6) - 1) + '…' : r.label) + '</text></g>';
     });
-    return '<svg width="' + w + '" height="' + H + '" viewBox="0 0 ' + w + ' ' + H + '" role="img" aria-label="' + esc(L.name || 'Gold') + ' levels: ' + rows.map(function (r) { return r.label + ' ' + money(r.price, unit, dp); }).join('; ') + '">' + g + '</svg>';
+    return '<svg width="' + w + '" height="' + H + '" viewBox="0 0 ' + w + ' ' + H + '" role="img" aria-label="' + esc(L.name || 'Gold') + ' levels, ' + esc(lvFresh(L)) + ': ' + rows.map(function (r) { return r.label + ' ' + money(r.price, unit, dp) + (r.crossed ? ' (broken since the close)' : ''); }).join('; ') + '">' + g + '</svg>';
   }
   function renderLadder(v) {
     var L = v && v.briefing && v.briefing.levels && v.briefing.levels.gold, sec = $('c-ladder'); if (!L) { sec.hidden = true; return; } sec.hidden = false;
-    $('ld-sub').textContent = 'last close ' + (L.asOf || NA);
-    var lv = (L.list || []).filter(function (l) { return LADDER_KINDS[l.kind] && num(l.price); }), up = lv.filter(function (l) { return l.price > L.px; }).sort(function (a, b) { return a.price - b.price; })[0], dn = lv.filter(function (l) { return l.price < L.px; }).sort(function (a, b) { return b.price - a.price; })[0];
-    var lvTxt = function (l) { return '<b>' + esc(money(l.price, L.unit, L.dp)) + '</b> ' + esc(l.label) + ' (' + esc(sg(num(l.dist) ? l.dist : (l.price / L.px - 1) * 100, 1)) + '%)'; };
-    $('ld-take').innerHTML = 'Gold closed at <b>' + esc(money(L.px, L.unit, L.dp)) + '</b>' + (up ? '; next above ' + lvTxt(up) : '') + (dn ? '; next below ' + lvTxt(dn) : '') + '.';
-    $('ld-note').textContent = 'Nearest swing high and low, the 20/50/200-day averages, last week\'s and last month\'s high and low. ▲ above the close, ▼ below; tap a level for why it matters.';
+    $('ld-sub').textContent = lvFresh(L);
+    var st = $('ld-stale'), f = L.fresh; st.hidden = !(f && f.stale); st.innerHTML = f && f.stale ? '<b>' + esc(f.text) + '.</b> These levels are from that close: newer closes have not reached the veteran.' : '';
+    // next above / below: from the latest price when the strategist has one after the close (a crossed level is said to be broken)
+    var mk = L.mark && num(L.mark.px) ? L.mark : null, ref = mk ? +mk.px : +L.px;
+    var lv = (L.list || []).filter(function (l) { return LADDER_KINDS[l.kind] && num(l.price); }), up = lv.filter(function (l) { return l.price > ref; }).sort(function (a, b) { return a.price - b.price; })[0], dn = lv.filter(function (l) { return l.price < ref; }).sort(function (a, b) { return b.price - a.price; })[0];
+    var lvTxt = function (l) { return '<b>' + esc(money(l.price, L.unit, L.dp)) + '</b> ' + esc(l.label) + ' (' + esc(sg((l.price / ref - 1) * 100, 1)) + '%' + (l.crossed ? ', <em class="brk">broken since the close</em>' : '') + ')'; };
+    $('ld-take').innerHTML = 'Gold closed at <b>' + esc(money(L.px, L.unit, L.dp)) + '</b> on ' + esc(L.asOf || NA) + (mk ? ' and was near <b>' + esc(money(mk.px, L.unit, L.dp)) + '</b> at ' + esc(hmUtc(mk.at)) + ' (' + esc(sg(mk.dist, 1)) + '%)' : '') + (up ? '; next above ' + lvTxt(up) : '') + (dn ? '; next below ' + lvTxt(dn) : '') + '.';
+    $('ld-note').textContent = 'Nearest swing high and low, the 20/50/200-day averages, last week\'s and last month\'s high and low, all from complete daily candles (a level does not move intraday). ▲ above the close, ▼ below; tap a level for why it matters.';
     draw('ladder', function (w) { return ladderSvg(L, w); });
   }
 

@@ -743,6 +743,24 @@ export async function scoreSeries(fetchImpl, now, { dir = 'data', data = { fred:
   src['score:dxy'] = dxy.length ? `${dxy.length} days (${cached === 5 ? 'daily cache since ' + iso(dxy[0].t) : `${cached} of 5 pairs cached, rest from this run's bars`})` : 'no DXY (pairs missing)';
   return { ry: out.DFII10 || [], y2: out.DGS2 || [], y10: out.DGS10 || [], dxy, gold };
 }
+// ─── the run's closed daily candles, handed to the veteran (11 Nov) ───────────────────────────────────────────────────────────
+// The veteran fetches nothing and read its prices only from the candle cache (research/daily, refreshed on Saturdays), so by
+// Wednesday its last close, levels and ranges were three sessions old while this run already held every closed day. macro/cache.json
+// `daily` hands them over: per candle-cache key the last HAND_DAYS COMPLETE UTC days as [dayStart, o, h, l, c]. Never the forming
+// candle (a level must not move intraday), only OANDA candles (the feed the candle cache is built from: a Kraken fallback has
+// another price basis), and a market whose fetch failed keeps the closed days of the last good run. No timestamp inside.
+export const HAND_KEYS = { gold: 'xau', eurusd: 'eurusd', usdjpy: 'usdjpy', gbpusd: 'gbpusd', usdcad: 'usdcad', usdchf: 'usdchf', es: 'spx500', nq: 'nas100' };
+export const HAND_DAYS = 30;
+export function handDaily(data, src, now, prev = null) {
+  const days = {}, old = (prev && prev.days) || {};
+  for (const [k, key] of Object.entries(HAND_KEYS)) {
+    const ok = /^OANDA ok/.test((src && src[`bars:${k}`]) || '');
+    const rows = !ok ? [] : ((data && data.bars && data.bars[k]) || []).filter((b) => b && !b.live && b.close > 0 && b.open > 0 && b.high > 0 && b.low > 0 && Math.floor(b.time / DAY) * DAY + DAY <= now)
+      .map((b) => [Math.floor(b.time / DAY) * DAY, +b.open, +b.high, +b.low, +b.close]).sort((x, y) => x[0] - y[0]).slice(-HAND_DAYS);
+    if (rows.length) days[key] = rows; else if (Array.isArray(old[key]) && old[key].length) days[key] = old[key];
+  }
+  return Object.keys(days).length ? { src: 'OANDA daily candles through /md/bars: complete UTC days only', days } : null;
+}
 // weekly [date, value] per series for macro/cache.json (small, and enough to rebuild the score when FRED is down)
 export function scoreCache(S) {
   const fred = {};
@@ -922,6 +940,7 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   const nc = { fred: {}, cal: data.cal && data.cal.length ? data.cal : cache.cal || [], cot: data.cot && data.cot.length ? data.cot : cache.cot || [] };
   for (const id of [...FRED, 'ECB2Y']) if (data.fred[id] && data.fred[id].length) nc.fred[id] = data.fred[id].slice(-300).map((o) => [iso(o.t), o.v]); else if (cache.fred && cache.fred[id]) nc.fred[id] = cache.fred[id];
   nc.score = S.ry.length && S.y2.length && S.y10.length ? scoreCache(S) : cache.score || null;
+  nc.daily = handDaily(data, src, now, cache.daily);
   w('cache.json', nc, false);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, macroSection(fc), MACRO_START, MACRO_END); if (nx !== md) writeAtomic(fA, nx); } } catch (e) { log('macro: analysis section skipped:', e.message); }

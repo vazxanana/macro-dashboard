@@ -148,9 +148,12 @@ export function levelsFor({ bars, now, step, dp = 0, name = 'Gold', unit = '$', 
 }
 // the nearest level beyond `minPct` on a side, from the structural kinds (not the derived ranges or projections)
 const STRUCT = new Set(['week', 'month', 'sma', 'swing', 'range', 'round']);
-export function nearestLevel(lv, side, minPct = 0.4) {
-  const c = (lv && lv.list || []).filter((l) => STRUCT.has(l.kind) && (side === 'above' ? l.dist >= minPct : l.dist <= -minPct));
-  return c.sort((a, b) => Math.abs(a.dist) - Math.abs(b.dist))[0] || null;
+// `ref` (display only, council/glance.mjs): measure from another price than the close, e.g. the latest price; the hypotheses
+// never pass it, so they are always built from the close
+export function nearestLevel(lv, side, minPct = 0.4, ref = null) {
+  const d = (l) => (ref == null ? l.dist : (l.price / ref - 1) * 100);
+  const c = (lv && lv.list || []).filter((l) => STRUCT.has(l.kind) && (side === 'above' ? d(l) >= minPct : d(l) <= -minPct));
+  return c.sort((a, b) => Math.abs(d(a)) - Math.abs(d(b)))[0] || null;
 }
 
 // ---- 4. hypotheses ------------------------------------------------------------------------------------------------------
