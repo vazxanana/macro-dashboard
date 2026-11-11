@@ -7523,7 +7523,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T14:14:14.000Z",
     "councilEntry": 1.32754,
     "stop": 1.32842,
@@ -7537,10 +7537,15 @@
     "slipR": -0.205,
     "lagSec": 59,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T14:14:14.000Z",
-    "brokerStop": 1.3286
+    "brokerStop": 1.3286,
+    "closedAt": "2026-11-11T15:23:43.000Z",
+    "exitPrice": 1.32836,
+    "councilExit": 1.32842,
+    "councilR": -1
    },
    "usdchf-scalp-1794406249": {
     "positionId": "48442004",
@@ -8064,7 +8069,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9886.1 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9886.1 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8117,14 +8122,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9886.1,
-  "lastRun": "2026-11-11T15:21:17.000Z"
+  "lastRun": "2026-11-11T15:23:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:06:36.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.45076 -> 1.45138, target 1.29236 -> 1.29298 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-10T16:06:36.000Z",
    "msg": "moved USDCAD 47373489 protection: stop 1.3812974 -> 1.3819174, target 1.48037 -> 1.48099 (council position)",
@@ -9619,6 +9619,11 @@
    "at": "2026-11-11T15:16:33.000Z",
    "msg": "moved USDCAD 48467224 protection: stop 1.42377 -> 1.42324, target 1.42853 -> 1.428 (council intraday)",
    "trade": "usdcad-intraday-1794409920"
+  },
+  {
+   "at": "2026-11-11T15:23:43.000Z",
+   "msg": "closed GBPUSD position 48440625 (council: loss)",
+   "trade": "gbpusd-scalp-1794406395"
   }
  ],
  "limits": {
