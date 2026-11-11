@@ -7886,7 +7886,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42436,
@@ -7900,10 +7901,11 @@
     "lagSec": 215,
     "positionId": "48457580",
     "volume": 400000,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 4.76,
     "amended": 2,
-    "amendedAt": "2026-11-11T15:16:33.000Z"
+    "amendedAt": "2026-11-11T15:16:33.000Z",
+    "closedAt": "2026-11-11T17:16:16.000Z"
    },
    "gbpusd-scalp-1794409047": {
     "positionId": "48459604",
@@ -8171,7 +8173,8 @@
     "t1": 0.8335999999999999,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.8326,
@@ -8185,9 +8188,10 @@
     "lagSec": 58,
     "positionId": "48489888",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T16:19:21.000Z",
-    "brokerStop": 0.8321
+    "brokerStop": 0.8321,
+    "closedAt": "2026-11-11T17:16:16.000Z"
    },
    "usdchf-scalp-1794414574": {
     "symbol": "USDCHF",
@@ -8277,7 +8281,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9868.34 · 27 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9870.34 · 25 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8329,20 +8333,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9868.34,
-  "lastRun": "2026-11-11T17:13:43.000Z"
+  "balance": 9870.34,
+  "lastRun": "2026-11-11T17:16:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:12:16.000Z",
-   "msg": "moved XAUUSD 48107209 protection: stop 4033.091 -> 4031.371, target 4057.568 -> 4055.848 (council rscalp)",
-   "trade": "xau-rscalp-1794322967"
-  },
-  {
-   "at": "2026-11-10T16:12:16.000Z",
-   "msg": "moved GBPUSD 48133872 protection: stop 1.3459167 -> 1.3463067, target 1.31782 -> 1.31821 (council position)",
-   "trade": "gbpusd-position-1794325881"
-  },
   {
    "at": "2026-11-10T16:14:52.000Z",
    "msg": "cancelled USDCHF limit order 33884672 for usdchf-position-1794326705: the council ended it: cancelled",
@@ -9832,6 +9826,16 @@
    "at": "2026-11-11T17:13:43.000Z",
    "msg": "placed sell limit GBPUSD 0.01 lot at 1.32752 (council scalp, valid to 2026-11-11T20:12Z)",
    "trade": "gbpusd-scalp-1794417165"
+  },
+  {
+   "at": "2026-11-11T17:16:16.000Z",
+   "msg": "USDCAD position 48457580 closed at the broker",
+   "trade": "usdcad-rscalp-1794408898"
+  },
+  {
+   "at": "2026-11-11T17:16:16.000Z",
+   "msg": "USDCHF position 48489888 closed at the broker",
+   "trade": "usdchf-scalp-1794413903"
   }
  ],
  "limits": {
