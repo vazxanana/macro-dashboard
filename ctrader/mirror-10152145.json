@@ -8916,6 +8916,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-11T23:04:52.000Z",
     "brokerStop": 1.42558
+   },
+   "xau-rscalp-1794438377": {
+    "positionId": "48561043",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-11T23:06:59.000Z",
+    "councilEntry": 3987.865,
+    "stop": 3982.3849999999998,
+    "t1": 4013.635,
+    "riskCash": 5.48,
+    "margin": 7.98,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3987.865,
+    "levelsFrom": "mark",
+    "fillPrice": 3986.92,
+    "slipR": -0.172,
+    "lagSec": 42,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T23:06:59.000Z",
+    "brokerStop": 3981.44
    }
   },
   "day": {
@@ -8923,7 +8951,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9830.75 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9830.75 · 31 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8978,14 +9006,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9830.75,
-  "lastRun": "2026-11-11T23:04:52.000Z"
+  "lastRun": "2026-11-11T23:06:59.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T01:16:37.000Z",
-   "msg": "placed sell limit GBPUSD 0.03 lot at 1.33467 (council scalp, valid to 2026-11-11T04:15Z)",
-   "trade": "gbpusd-scalp-1794359735"
-  },
   {
    "at": "2026-11-11T01:18:57.000Z",
    "msg": "limit filled: GBPUSD position 48254217 at the broker",
@@ -10480,6 +10503,11 @@
    "at": "2026-11-11T23:04:52.000Z",
    "msg": "limit filled at once: USDCAD position 48560463 at the broker at 1.42462",
    "trade": "usdcad-rintra-1794438249"
+  },
+  {
+   "at": "2026-11-11T23:06:59.000Z",
+   "msg": "opened buy XAUUSD 0.01 lot (council rscalp)",
+   "trade": "xau-rscalp-1794438377"
   }
  ],
  "limits": {
@@ -10558,11 +10586,11 @@
   ]
  },
  "execution": {
-  "n": 301,
-  "meanSlipR": -0.008,
+  "n": 302,
+  "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 148,
+  "medianLagSec": 147.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10597,8 +10625,8 @@
     "meanSlipR": -0.039
    },
    "XAUUSD": {
-    "n": 34,
-    "meanSlipR": -0.055
+    "n": 35,
+    "meanSlipR": -0.058
    }
   }
  }
