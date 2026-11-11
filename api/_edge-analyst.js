@@ -12,10 +12,11 @@
 // its OWN cost ledger in its own store folder and its own budgets (EDGE_LLM_*), so the two never share a spend limit.
 'use strict';
 
-// the live edges and what each one does, in words the model is given (keep in step with council/decay.mjs SYSTEMS)
+// the live edges and what each one does, in words the model is given (the decay monitor's systems, plus the Mosha cycle of 11 Nov)
 const EDGES = {
   replica: { name: 'Gold replica', rule: 'After a strong move of at least 2 M15 ATRs in 3-6 hours, an M5 close back through the last swing against it; only with the daily trend and while gold is volatile; market entry, stop just past the extreme, break-even at +2R, a second unit at +1.5R, trail after +4R, out after 48 h.' },
   'mosha-bo': { name: 'Mosha BO', rule: 'Weekly-direction gold trades: an H4 breakout, an H1 breakout the other way (the retracement), an M15 breakout back with the H4; a limit at the broken M15 level, stop past the M15 origin, 3R target, break-even at +1.5R.' },
+  mcycle: { name: 'Mosha cycle', rule: 'Gold: the last H4 BO is the move; an H1 ChoCh against it starts the pullback. Pullback leg: the first M15 or M5 BO with the pullback, target the H4 50%. Main leg: after it, the first M15 or M5 ChoCh back with the H4, target the H4 extreme. Limit at the broken level, stop $0.30 past its origin, valid 24 h, out after 72 h.' },
   gtrend: { name: 'Gold trend', rule: 'A closed daily candle above the prior 20 daily highs buys gold; stop 2 daily ATRs below, lifted to the daily close minus 2 ATRs each day; no target, no time limit.' },
   gtl: { name: 'Gold H4 trendline', rule: 'Buys only: a closed H4 candle above the falling line through the last two H4 pivot highs while the H4 direction reads up; stop under the low since the second anchor; trail 1R behind the best price after +2R; out after 96 h.' },
   geg: { name: 'Gold daily engulf', rule: 'Buys only: a daily candle that body-closes above the high of a red base candle makes a buy zone; while the close is above the 20-day average a limit waits at the zone high for 20 days; stop under the zone; trail after +2R; out 10 days after the fill.' },
