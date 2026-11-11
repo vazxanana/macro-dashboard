@@ -13,7 +13,7 @@ const L = require('../api/mosha-lessons.js');
 const { moshaLevel, canRead, handle: logHandle } = require('../api/mosha.js');
 const A = require('../api/_accounts.js'), S = require('../api/_session.js'), G = require('../api/_guard.js');
 const { cleanPerms, clean } = require('../api/users.js');
-const TEACH = require('../assets/mosha-teach.js'), RP = require('../assets/mosha-replay.js');
+const TEACH = require('../assets/mosha-teach.js'), RP = require('../assets/mosha-replay.js'), I18N = require('../assets/mosha-i18n.js');
 const TOOLS = await import('../scripts/mosha-lessons.mjs');
 const rd = (p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
 const PAGE = rd('../market-structure.html'), JS = rd('../assets/mosha-teach.js'), API = rd('../api/mosha-lessons.js'), DESK = rd('../assets/mosha-desk.js'), TOOL = rd('../scripts/mosha-lessons.mjs');
@@ -288,7 +288,7 @@ test('easier for the teacher: no name needed, his turn said at the top, captions
   await call(s, 'POST', null, { reply: { id: w.body.lesson.id, text: 'Understood: no sell before the CF candle closes.' } }, key());
   const g = (await call(s, 'GET', LUXUS)).body, td = TEACH.todo(g.lessons, g.book, 'luxus', true);
   assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length); assert.equal(td.waiting, 2, 'his two pictures');
-  assert.equal(TEACH.todo(g.lessons, g.book, 'carlos', true).waiting, 0, 'another member\'s lessons are not his'); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], book: 0, waiting: 0 }, 'a reader has no turn');
+  assert.equal(TEACH.todo(g.lessons, g.book, 'carlos', true).waiting, 0, 'another member\'s lessons are not his'); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], turn: [], ask: 0, book: 0, waiting: 0 }, 'a reader has no turn');
   assert.deepEqual(Object.keys(TEACH.FLT), ['all', 'turn', 'wait', 'done']); assert.deepEqual([TEACH.filterLessons(g.lessons, 'all').length, TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length, TEACH.filterLessons(g.lessons, 'done').length], [3, 1, 2, 0]);
   await call(s, 'POST', LUXUS, { say: { id: w.body.lesson.id, verdict: 'right' } }); assert.equal(TEACH.filterLessons((await call(s, 'GET', LUXUS)).body.lessons, 'done').length, 1);
   // captions to tap: his own first, then the usual ones; a replay's automatic caption is not one of his
@@ -301,7 +301,7 @@ test('easier for the teacher: no name needed, his turn said at the top, captions
   for (const id of ['mo-todo', 'mo-t-to', 'mo-t-new', 'mo-t-more', 'mo-l-flt']) assert.ok(PAGE.includes(`id="${id}"`), id);
   assert.ok(!/Name the trade first/.test(JS)); assert.match(JS, /data-todo="judge"/); assert.match(JS, /data-todo="book"/); assert.match(JS, /document\.addEventListener\('paste'/); assert.match(JS, /view_\.addEventListener\('drop'/);
   assert.match(JS, /localStorage\.setItem\(DKEY\(\)/); assert.match(JS, /dropDraft\(\)/); assert.match(JS, /verdict: 'wrong', text: v/, 'not right is typed under the answer, no dialog'); assert.ok(!/title: 'Not right'/.test(JS));
-  assert.match(JS, /ev\.ctrlKey \|\| ev\.metaKey/); assert.match(PAGE, /#v-mosha #mo-todo \{ order: -4; \}/);
+  assert.match(JS, /ev\.ctrlKey \|\| ev\.metaKey/); assert.match(PAGE, /#v-mosha #mo-todo \{ order: -6; \}/);
   // ChronosTrade: the chip after a close, T, the count of answers that wait
   const BT = rd('../backtest.html'); for (const id of ['tchip', 'tchip-go', 'tchip-x', 'tch-n', 'hk-teach']) assert.ok(BT.includes(`id="${id}"`), id);
   assert.match(BT, /function teachNow\(\) \{ if \(!TEACH \|\|/); assert.match(BT, /\(e\.key === 't' \|\| e\.key === 'T'\)/); assert.match(BT, /l\.state === 'read' && \(me\.u === 'owner' \|\| l\.by === me\.u\)/);
@@ -383,4 +383,58 @@ test('the desk\'s questions: asked under its answer, answered by the teacher wit
   for (const k of ['askHTML', 'data-qa="yes"', 'data-qa="no"', 'form class="mo-q-f"', 'data-qedit', 'answers: [{ i: +f.dataset.i, a: a }]', "L('The desk asks')", "L('Yes')", "L('No')"]) assert.ok(JS.includes(k), k);
   assert.match(PAGE, /#v-mosha \.mo-q \{/); assert.match(PAGE, /@media \(pointer: coarse\) \{ #v-mosha \.mo-q-f input, #v-mosha \.mo-q-f \.ms-tbtn \{ min-height: 44px; \}/);
   assert.match(TOOL, /cmd === 'ask' && a && b \? post\(\{ reply: \{ id: a, ask:/); assert.match(TOOL, /Array\.isArray\(j\)\) o\.ask = j; else o\.chart = j;/);
+});
+
+// 11 Nov 2026, the teacher's page polished: what is his to do is first, counted and answerable in place.
+test('his turn is first and one tap away: the strip, the questions that are still his, feedback, errors that say what to do', async () => {
+  const s = mk();
+  const a = (await call(s, 'POST', LUXUS, { add: { note: 'Sell after the M30 sweep, M5 vr then cf.' } })).body.lesson.id, b = (await call(s, 'POST', LUXUS, { add: { note: 'H4 BO sell then pullback.' } })).body.lesson.id, c = (await call(s, 'POST', LUXUS, { add: { note: 'Not answered yet.' } })).body.lesson.id;
+  await call(s, 'POST', null, { reply: { id: a, text: 'A sell after the sweep.', ask: [{ q: 'Does the VR start at the high?', yn: true }, 'Where is the stop?'] } }, key());
+  await call(s, 'POST', null, { reply: { id: b, text: 'An H4 BO sell, then the pullback.' } }, key());
+  let g = (await call(s, 'GET', LUXUS)).body, td = TEACH.todo(g.lessons, g.book, 'luxus', true); const by = (id) => g.lessons.find((l) => l.id === id);
+  assert.deepEqual(td.turn, [a, b], 'the oldest answer first'); assert.equal(td.ask, 2); assert.equal(td.waiting, 1); assert.deepEqual(TEACH.turnOf(by(a)), { open: 2 }); assert.deepEqual(TEACH.turnOf(by(b)), { open: 0 }); assert.equal(TEACH.turnOf(by(c)), null);
+  // one of two questions answered: the server calls the lesson "more", but the other question is still his, so it stays his turn
+  await call(s, 'POST', LUXUS, { say: { id: a, answers: [{ i: 0, a: 'yes' }] } }); g = (await call(s, 'GET', LUXUS)).body; td = TEACH.todo(g.lessons, g.book, 'luxus', true);
+  assert.equal(by(a).state, 'more'); assert.deepEqual(TEACH.turnOf(by(a)), { open: 1 }); assert.deepEqual(td.turn, [a, b]); assert.equal(td.ask, 1); assert.deepEqual(td.judge, [b], 'judge keeps its meaning: the answers nothing was said to'); assert.equal(td.waiting, 1);
+  assert.deepEqual([TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length], [2, 1], 'the filter agrees with the strip');
+  // the last question answered: now the desk owes a reading; words after an answer, a verdict or a new picture end his turn too
+  await call(s, 'POST', LUXUS, { say: { id: a, answers: [{ i: 1, a: 'Above the high.' }] } }); g = (await call(s, 'GET', LUXUS)).body; assert.equal(TEACH.turnOf(by(a)), null); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'luxus', true).turn, [b]);
+  const D = (o) => ({ by: 'assistant', at: '2026-11-11T10:00:00.000Z', text: 'x', shots: 0, ...o }), Q = (x) => ({ q: 'Is it so?', yn: true, a: x, aat: x ? '2026-11-11T11:00:00.000Z' : null });
+  assert.equal(TEACH.turnOf({ shots: [], thread: [D({ ask: [Q('yes'), Q(null)] }), { by: 'luxus', at: '2026-11-11T12:00:00.000Z', text: 'more words' }] }), null, 'he wrote after it: the desk reads');
+  assert.equal(TEACH.turnOf({ shots: [{}], thread: [D({ ask: [Q(null)] })] }), null, 'a picture the desk has not seen'); assert.equal(TEACH.turnOf({ shots: [], thread: [D({ verdict: 'wrong', ask: [Q(null)] })] }), null); assert.equal(TEACH.turnOf({ shots: [], thread: [D({ verdict: 'right', vat: 'x' })] }), null);
+  assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false).turn, [], 'a reader has no turn'); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'owner', false).turn, []);
+  // the page: the strip comes before the guide on his page, holds a live line for what just happened, and draws the first item with the lesson's own buttons
+  assert.match(PAGE, /<div class="mo-todo mo-wide" id="mo-todo" hidden><p class="mo-td-flash" id="mo-td-flash" role="status" aria-live="polite" hidden><\/p><div class="mo-td-body" id="mo-td-body"><\/div><\/div>/);
+  assert.match(PAGE, /#v-mosha #mo-guide \{ order: -5; \}/); assert.match(PAGE, /#v-mosha #mo-todo \{ order: -6; \}/); assert.match(PAGE, /#v-mosha\.mo-turn \.v-head \.ms-note\.mo-tch \{ display: none; \}/); assert.match(PAGE, /#v-mosha \.mo-td-item \.mo-l-judge \.ms-tbtn \{ min-height: 48px;/);
+  const strip = JS.slice(JS.indexOf('function drawTodo(td)'), JS.indexOf('function firstLang()'));
+  for (const k of ['qLi(l, open[0].x, open[0].i, true)', 'data-right="', 'data-wrong="', 'data-b-ok="', 'data-b-fix="', 'data-b-rm="', 'data-td-later="', 'data-todo="judge"', 'data-todo="book"', "L('Here is the next one.')", "L('Nothing waits on you.')", "L('{n} questions from the desk'"]) assert.ok(strip.includes(k), k);
+  assert.match(JS, /\[card, strip\]\.forEach\(function \(el\) \{ if \(!el\) return; el\.addEventListener\('click', onClick\); el\.addEventListener\('input', onInput\); el\.addEventListener\('submit', onSubmit\); \}\)/, 'the same handlers in the lesson and in the strip');
+  assert.match(JS, /book\.addEventListener\('click', onBook\); if \(strip\) strip\.addEventListener\('click', onBook\)/);
+  // a tap is answered: the buttons rest while it travels, then the strip says what happened; a send that fails keeps the words
+  for (const k of ["L('Marked right: the desk keeps it.')", "L('Answer sent.')", "L('Answer sent: the desk will read it and answer again.')", "L('Sent: the desk will read your correction and answer again.')", "L('Confirmed: this line is now your word.')", "strip.classList.toggle('mo-busy', !!T.acting)", 'if (!b || T.acting) return;', '.then(function () { delete T.sd[sid]; if (wrong) T.wrong = null; })']) assert.ok(JS.includes(k), k);
+  assert.ok(!/f\.elements\.text\.value = ''; var wrong/.test(JS), 'the box is not emptied before the desk has the words');
+  // errors say what to do, in both languages
+  for (const k of ['no connection: nothing was sent. Check the network and try again', 'too many requests at once: wait a minute, then try again', 'that picture is too large for the desk: take it out, crop it or take a smaller screenshot, and add it again', 'no connection: the lessons could not be read', 'Try again']) { assert.ok(JS.includes("L('" + k + "')"), k); assert.ok(I18N.FR[k], k); }
+  assert.match(JS, /data-reload="1"/); assert.equal(TEACH.STATE.new, 'Not read by the desk yet', 'who has not read it is said');
+  // nothing new can be done from the strip: no key, no other account, no new endpoint
+  assert.ok(!/reader|Bearer|perms|canTeach = true/.test(strip));
+});
+
+test('the reading script says whose move each lesson is, and pull counts them plainly', async () => {
+  const s = mk();
+  const a = (await call(s, 'POST', LUXUS, { add: { note: 'First lesson in words.' } })).body.lesson.id, b = (await call(s, 'POST', LUXUS, { add: { note: 'Second lesson in words.' } })).body.lesson.id, c = (await call(s, 'POST', LUXUS, { add: { note: 'Third lesson in words.' } })).body.lesson.id, d = (await call(s, 'POST', LUXUS, { add: { note: 'Fourth lesson in words.' } })).body.lesson.id;
+  await call(s, 'POST', null, { reply: { id: a, text: 'Read one.', ask: [{ q: 'Is it so?', yn: true }, 'And where?'] } }, key()); await call(s, 'POST', null, { reply: { id: b, text: 'Read two.' } }, key()); await call(s, 'POST', null, { reply: { id: c, text: 'Read three.' } }, key());
+  await call(s, 'POST', LUXUS, { say: { id: b, verdict: 'right' } }); await call(s, 'POST', LUXUS, { say: { id: c, verdict: 'wrong', text: 'No: the VR starts at the high.' } });
+  let ls = (await call(s, 'GET', null, null, key())).body.lessons; const by = (id) => ls.find((l) => l.id === id);
+  assert.match(TOOLS.why(by(d)), /^WAITS FOR THE DESK: not answered yet\./); assert.match(TOOLS.why(by(b)), /^Understood: the teacher marked the desk's last answer RIGHT/);
+  assert.match(TOOLS.why(by(a)), /^Waits for the TEACHER: he has not said right or not right yet, and 2 of the desk's questions are not answered\. Do not answer again\./);
+  assert.match(TOOLS.why(by(c)), /^WAITS FOR THE DESK: the teacher marked the last answer NOT RIGHT \(his correction is his word: restate it, do not argue it\)\.$/);
+  await call(s, 'POST', LUXUS, { say: { id: a, answers: [{ i: 0, a: 'yes' }] } }); ls = (await call(s, 'GET', null, null, key())).body.lessons;
+  assert.match(TOOLS.why(by(a)), /^WAITS FOR THE DESK: the teacher answered 1 of the desk's 2 questions \(each answer is his word on that point\)\. 1 question is still unanswered: they stay on his page, do not ask them again\.$/);
+  const txt = TOOLS.lessonText(by(a)).split('\n'); assert.match(txt[2], /^WAITS FOR THE DESK/, 'said right under the heading, before the language line'); assert.match(txt[3], /^Answer in English\./);
+  const cn = TOOLS.counts(ls); assert.deepEqual(cn, { all: 4, fresh: 1, more: 2, teacher: 0, agreed: 1, desk: 3 });
+  assert.equal(TOOLS.countsText(cn), '3 lessons wait for the desk (1 not answered yet, 2 with something new from the teacher)  ·  0 wait for the teacher  ·  1 understood  ·  4 in all');
+  assert.equal(TOOLS.countsText({ all: 1, fresh: 1, more: 0, teacher: 0, agreed: 0, desk: 1 }).split('  ·  ')[0], '1 lesson waits for the desk (1 not answered yet, 0 with something new from the teacher)');
+  assert.match(TOOL, /console\.log\(countsText\(counts\(lessons\)\)\);/);
+  assert.match(TOOLS.bookText(L.SEED), /\n12 lines: 0 the teacher's word, 12 still the desk's own reading \(not confirmed\)\.\n/);
 });
