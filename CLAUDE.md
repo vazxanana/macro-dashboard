@@ -78,7 +78,8 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
-  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
+  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
+  Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
 - Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
 
@@ -437,6 +438,34 @@ repository variables `FUT_ACCOUNT` / `FUT_RISK`, default $10,000 / 0.25%; stop /
 prices = spot + the GC−spot basis from the ICT snapshot) and opens that contract's TradingView chart. Limit systems get a
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
+
+## Home and Council reading pass (11 Nov 2026, quality round)
+Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
+the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
+- **Forward and replay are never one figure.** The Trades pane's "Live · our system" tiles said Closed 715, Win rate 42%, Total
+  +497.9R; 710 of those were backtest replay rows (research/replay-2w.json, +499.97R) and the forward paper record was 5 trades,
+  1 won, -2.05R. `fwdSplit(closed)` (main script, `window.MS_HC`) splits by `x.replay`: the tiles show the forward record
+  ("Closed, forward", win rate with "1 of 5", "Total, before costs") and one labelled line carries the replay ("Backtest replay,
+  not traded: n trades since <month>, % won, R"). The Home council tile says both apart too. Keep any new total on that split.
+- **Edge decay counts match the rows**: a live system with `few: true` is "too few to judge", not healthy, and a shadow system the
+  monitor calls decaying / on watch is named (`MS_DECAY_TALLY` in `#ms-decay-js`, `MS_WEEK.decayCount` for the week pane's chips).
+  The card said "8 healthy, 0 decaying" over a "Too few" row and a "Decaying" one.
+- **One way to write R** in the Home / Council templates: `rTxt(v, d = 2)` (sign, the minus glyph, two decimals; "—" when not a
+  number). The loss review, trade table, equity labels and the Home strip use it; `mnTxt` shows a hyphen-minus in council-written
+  text (the Analyst's report, rule history, the macro brief) as the minus glyph, leaving dates, ranges and arrows. A planned
+  reward:risk reads "target 2.00R", not "2R" like a result.
+- **Stamps**: `stampTxt(iso, everyH)` = day, time, zone name, and "Stale: …, N h old (written every 6 h)" past twice the cadence
+  (decay, what to expect, book weights); the trade table and loss review say whose clock their times use.
+- **`<style id="ms-hc-css">`** (after `#ms-desk-css`, scoped to `#v-home` / `#v-council`): no text under 12 px in these panes
+  (the Home session ring's hour ticks excepted), 44 px touch targets (Data chip, folded status line, checkbox labels, scoreboard
+  sort buttons and links), the Systems mirror row no longer stretched to 966 px by the broker table on a phone, report tables
+  with readable columns that scroll inside their box, long tags wrapping beside the R figure in Active trades, the Active list
+  holding its place while loading (layout shift 0.62 → 0 on a phone), and no dead Macro / This week tabs for a member without the
+  council permission. Add new Home / Council size fixes there, never a second block.
+- Tests: `tests/qa-sweep.test.mjs` ("Home and Council reading pass"), `tests/week-report.test.mjs` (`decayCount`).
+- Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); Home's week / month
+  figures are before costs while the week pane is after costs; the trade chart dialog still writes raw R ("Loss -1R"); the
+  replica track chart's axis uses a hyphen; "Journal · No trades yet" on Home while the council has trades (the owner's own journal).
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
@@ -1417,6 +1446,27 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   Edge lab: verdict donut + legend with counts and shares, best candidate IS vs OOS bars (baseline OOS tick, t in words), equity
   line where a study lists its own trades (`lab-summary.mjs` `equityOf`: cumulative R sampled to 48 points, drawdown from the full
   series; today crypto-trend-decay and nq-open-oos), `[data-tip]` tooltips on hover and tap.
+- Quality pass (11 Nov 2026; every page at 390 px touch and 1440 px, dark / light / midnight, owner / reviewer / viewer / signed
+  out). **Macro desk**: since the 9 Nov `main[data-loading]` fix the charts were drawn while the story was still `display: none`,
+  so `draw()` found no width and the score path, the level ladder, the expectation scale and the hit-rate chart stayed blank until a
+  resize or the 5-minute reload; `load()` now removes the flag, then calls `redraw()`. "No hypothesis this run" is said once, the
+  score chart's threshold names are drawn after the line, each dot of the header switch is a 44 px target on touch (25 px before)
+  and the switch hides when signed out. **Edge lab**: a study whose result stores an object under `system` read "[object Object]"
+  (only text is a description); `tidy()` mends a joined headline ("FAIL.; Intraday: …"); the report dialog renders the study's
+  RESULT.md (`md` / `mdInline`, the veteran library's renderer: escaped first, tables scroll inside `.tbl`, relative links stay text)
+  instead of raw Markdown in a monospace block. **Veteran library**: "Open raw" is 44 px on touch. **Gold terminal** (locked
+  features and the driver stack untouched): the page clips sideways overflow, so on phones the Daily Bias banner's Target / Daily ATR
+  column, the levels panels and Research → Edge Summary table were cut off with no way to reach them (the banner stacks under
+  700 px, `.levels-grid` uses `minmax(0, 1fr)`, the table's card is `.gx-scroll-x`); `.edge-rule` notes were pale text on a pale slab
+  in dark (2.3:1); the hero chart's key-level labels are drawn above the candles on a plate of the card colour (`P.plate`; the lines
+  stay underneath); the MTF opportunity line no longer reads "Buy the pullback into the wait for a pullback block" when M15 has no
+  block (`planTxt`). `scripts/audit/smoke.cjs` now opens every gold tab on the phone (body wider than the screen = "tab cut off on
+  the right") and fails on a visible, empty chart host (`.vz[id]`, "chart not drawn"); both fail on the build before this pass.
+  Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
+  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab states win rates and "high conviction" with no
+  n or t (older content, against the wording of absolute rule 4); `research/macro-veteran/START_HERE.md` (shown in the veteran
+  library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
+  and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -1632,6 +1682,50 @@ was found. Fixed:
   3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
   12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
+
+## Browser audits: false failures traced to their causes (11 Nov 2026)
+The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
+any audit change:
+- **Colours are read through `measured(page, expr, what)` only.** It waits until the page has no transition or finite animation
+  running for two frames (`settle`), then reads once; `expr` returns `{ bad, n }`. A reading that measured no element, or a page
+  whose colours never settle, is a FAILURE. No fixed wait after a theme change, no second reading. The smoke test reads no colours.
+- **The cause of the "stale colour after a theme change"** (it was retried 700 ms later in `academy.cjs` until now): under
+  `prefers-reduced-motion: reduce` the pages had `* { transition-duration: .01ms !important }`. `transition-property` defaults to
+  `all`, so every element got a transition on every property; a theme change then went down the tree one level a frame (each child
+  inherits the parent's still-old colour, sees it change a frame later and starts its own transition), while backgrounds set from a
+  token changed at once: old-theme text on the new background for 6-7 frames on the Academy (260 ms idle, 700 ms at a sixth of the
+  speed), 0.7-1.2 s on the Desk (which has a theme switch) and 2-2.5 s on the Edge lab. The rule is now `transition-duration: 0s`
+  (no transition is started) in `assets/mx-page.css`, `market-structure.html` (both rules), `edge-lab.html`, `gold-trading.html`.
+  **Never write a non-zero duration on `*`.** The Academy audit reads the contrast in the same task as the theme change, under
+  reduced motion, to pin it.
+- **The Desk, two view changes in quick succession**: the second skips the first one's View Transition, whose `ready` promise then
+  rejects; `t.finished.finally(…)` handed that on to a promise nobody handled ("Transition was skipped", a page error whenever a
+  runner needed over 600 ms for a view). Now `t.ready.catch(…)` and a caught `finished.finally(…)` (one handler, shared with the trade-link fix of the same day). The smoke test changes views back to
+  back on purpose, and an inner view only counts when the Desk really shows it (`data-view`, the view and the Council pane visible).
+- **Smoke settle time counts from the page's LAST load** (`calmer`): the Desk reloads once when `/api/me` first answers with an
+  account; a check landing in or just after that reload was swallowed as a pass or read the page half drawn (413 px wide for half
+  a second). A check that cannot be read is an error, never a pass.
+- **Network**: `fetchRetry` tries a proxied request three times (network error, 429, 5xx) and keeps one answer per URL for the run;
+  the ChronosTrade audit names candle requests that still failed. Its checks need candles relative to today (quick starts, the
+  default day), so they stay on the live proxy: recorded candles would have to be re-stamped, which is not real data.
+- **CI** (`ci.yml`): the retry of the ChronosTrade and Academy audits stays, but the checks that failed the first time are printed
+  as warnings and both logs are in the `audit-screenshots` artifact. A check that only passes on a retry is a bug to trace.
+- `academy.cjs`: every dev server it starts is stopped however the audit ends (`ACADEMY_PORTS` names its ports: one implementation,
+  the one in the file's header). ChronosTrade's "closing a trade takes under 150 ms" is the middle of five closes.
+- Tests: `tests/audit-shared.test.mjs` (the helper on a fake page and a fake fetch, the 0s rule on every page, the Desk's handler).
+## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
+Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
+1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),
+dark ~370, midnight ~400; after: 0 on Charts and Scanner in all three. Causes: text in the same colour as its own tint (amber
+"IN ORIGIN" 1.8:1, chips 4.2-4.4), white on a solid green / red (READY 3.6, the candle countdown 2.5-3.0 on the dark themes),
+chart candle colours used inline as text (the scanner's day change), the brand gold on a light page (1.8), and opacity used to
+dim text (header shadow count, guest calendar days). Rule: **a badge takes its text colour from a token, never a hex**:
+`--buy-ink` / `--sell-ink` / `--warn-ink` / `--accent-ink` (text on a tint of its own colour), `--on-buy` / `--on-sell` (text on
+a solid fill), `--gold-ink` (the brand gold as text); defined once after the light tokens in the first `<style>` (dark and
+midnight = the theme's own colours, light = deeper inks). Never dim badge text with `opacity`. The scanner's day change is
+`.pr-c.up` / `.pr-c.dn`. Candle colours are untouched. Pinned in `tests/qa-sweep.test.mjs` ("badge inks"); no colour sampling
+in the smoke test (it would depend on live data). Left: the Council status line's amber warnings on its gradient (about 4.3:1
+at the gradient's darkest point, light only), outside this pass.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
@@ -2078,6 +2172,30 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
       `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
       translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
       answer, and a French button name the page does not show.
+  - **His turn first, one tap away** (11 Nov 2026, quality round; he had sent lessons but judged no answer and confirmed no
+    book line). On his page `#mo-todo` now comes BEFORE the guide (`order: -6`) and is no longer a row of jump buttons: it
+    counts what waits ("3 answers to check · 4 questions from the desk", then the book's lines) and holds the FIRST item,
+    answerable in place with the lesson's own buttons (`drawTodo`): the desk's answer (clamped past 280 characters, "Read it
+    all"), its first open question (Yes / No or a few words; the next one follows by itself), "That is right" / "Not right…"
+    (typed in place), "Open the whole lesson", "Later" (to the back of the queue, this visit only). When no answer waits,
+    the first unconfirmed book line with Right / Correct / Erase. After each tap the item rests (`mo-busy`), then
+    `#mo-td-flash` (the only live region) says what happened and "Here is the next one."; a phone hides the intro line
+    while something waits (`#v-mosha.mo-turn`) so the judge buttons stay on the first screen. `turnOf(l)` (pure): a lesson
+    is still HIS while the desk's last answer has an unanswered question and he wrote nothing after it, although the server
+    already calls it "more" after his first answer; `todo()` returns `turn` (oldest first) and `ask` beside `judge`; the
+    "Your turn" filter and the lesson's chip ("The desk has 2 questions for you") follow it. `stateOf` is unchanged (the
+    server's rule). A correction or answer stays in its box until the desk has it (`T.sd`, `T.qd`); errors say what to do
+    (no connection, too many requests, a picture too large), the lessons that cannot be read offer "Try again". No new
+    permission, endpoint or concept; `api/mosha*.js` untouched.
+  - **The chart card and the log in his language, addressed to no one** (11 Nov 2026). `assets/mosha-replay.js` and the
+    reader's side of `assets/mosha-desk.js` go through `L(...)` like the teach cards (controls, captions, every step of
+    the examples, the result line, the log's record, table and candle check; `msMoshaReplayLang` / `msMoshaDeskLang` redraw
+    on a switch). The examples are HIS screenshots and every reader sees the card, so the desk's text about them says
+    "the red "5 mn" box", "Closed by hand", "On the screenshot: +5.6R" / "In the log:" / "The lesson:", never "you" /
+    "your" (a test bans it); the owner's own sentence on the 10 Nov example shows to the owner only (`ownLabel`). The
+    owner's log form and prompts stay English. `scripts/mosha-lessons.mjs`: `lesson.txt` says under its heading whose move
+    it is and why (`why`), `BOOK.md` counts the teacher's lines against the desk's, and `pull` prints first how many
+    lessons wait for the desk, for the teacher, and are understood (`counts`, `countsText`).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 

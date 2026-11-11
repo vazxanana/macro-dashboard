@@ -24,6 +24,7 @@
 // "What if" (alternatives on the candles after a decision): absent until the attempt is stored, then a table of the setup, the
 // engine's answer and fixed variants; no later candle ever reaches a snapshot; the later candles leave the chart on Continue.
 const { chromium } = require('playwright');
+const { measured } = require('./shared.cjs');
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
 // Six servers in all, by default on PORT, +1, +2 (this part) and +11, +12, +13 (the analyst part). Where only a few ports are free,
@@ -36,6 +37,10 @@ const OUT = process.env.AUDIT_OUT || os.tmpdir() + '/';
 const ROOT = path.join(__dirname, '..', '..');
 const M = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/academy/manifest.json'), 'utf8'));
 const EDGE = M.edge, iso = (t) => new Date(t * 1000).toISOString().slice(0, 10), stamp = (t) => new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+// every dev server this audit starts is stopped when the audit ends, however it ends (a crash before the `finally`, Ctrl-C, a
+// CI cancel): a server left behind keeps its port, and the next run then fails with "is the port taken?"
+const KIDS = new Set(), reap = () => { for (const k of KIDS) { try { k.kill(); } catch (e) { /* already gone */ } } };
+process.on('exit', reap); { const quit = process.exit.bind(process); for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sig, () => { reap(); quit(130); }); }
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 200) }); if (!ok) console.log('  FAIL ' + name + (info ? ' :: ' + String(info).slice(0, 200) : '')); };
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent.trim()).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!e.getClientRects().length && !e.hidden).catch(() => false);
@@ -49,7 +54,7 @@ const CONTRAST = String.raw`(() => {
   const over = (f, b) => { const a = f[3]; return [f[0] * a + b[0] * (1 - a), f[1] * a + b[1] * (1 - a), f[2] * a + b[2] * (1 - a), 1]; };
   const bgOf = (e) => { const stack = []; for (let x = e; x; x = x.parentElement) { const b = getComputedStyle(x).backgroundColor; if (b && !/^rgba\(0, 0, 0, 0\)$|^transparent$/.test(b)) { const c = parse(b); stack.push(c); if (c[3] >= 1) break; } } let out = [255, 255, 255, 1]; for (let i = stack.length - 1; i >= 0; i--) out = over(stack[i], out); return out; };
   const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
-  const bad = [], seen = new Set();
+  const bad = [], seen = new Set(); let count = 0;
   const w = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT);
   for (let n = w.nextNode(); n; n = w.nextNode()) {
     const e = n.parentElement; if (!n.textContent.trim() || !e || seen.has(e) || e.closest('canvas, .chart, option, [hidden]')) continue; seen.add(e);
@@ -57,21 +62,16 @@ const CONTRAST = String.raw`(() => {
     if (!e.getClientRects().length || e.closest('[disabled]')) continue;
     const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
     const bg = bgOf(e), fg = over(parse(cs.color), bg), l1 = lum(fg), l2 = lum(bg), r = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-    const px = parseFloat(cs.fontSize), big = px >= 24 || (px >= 18.66 && +cs.fontWeight >= 700);
+    const px = parseFloat(cs.fontSize), big = px >= 24 || (px >= 18.66 && +cs.fontWeight >= 700); count++;
     if (r < (big ? 3 : 4.5)) bad.push(r.toFixed(2) + ' ' + e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/)[0] : '') + ' "' + n.textContent.trim().slice(0, 24) + '"');
   }
-  return bad;
+  return { bad, n: count };
 })()`;
-// The contrast of the theme as it settles. A reading taken in the instant after a theme change can still hold the previous
-// theme's text colour on a busy runner (seen on CI only, 10 Nov 2026: light-theme text measured on the midnight background for
-// two elements, with nothing animating; the page has no theme switch, so no visitor sees that instant). So a failing reading
-// is taken again 700 ms later: what is still below AA then is a real contrast fault and fails; what cleared is printed as a note.
-const aa = async (pg) => {
-  let bad = await pg.evaluate(CONTRAST); if (!bad.length) return bad;
-  const first = bad.slice(0, 3).join(' ; '), n = bad.length; await pg.waitForTimeout(700); bad = await pg.evaluate(CONTRAST);
-  if (!bad.length) console.log(`note AA: ${n} text(s) read below AA right after a theme change and were fine 700 ms later (${first})`);
-  return bad;
-};
+// The contrast of a theme once every colour has arrived: `measured` (shared.cjs) waits for the page's transitions to end
+// and then reads once. No second reading: what is below AA then is a contrast fault. A reading that measured no text at
+// all, or a page whose colours never stop changing, is a fault too. (Until 11 Nov 2026 a failing reading was taken again
+// 700 ms later; the cause it papered over is written up in shared.cjs and fixed in assets/mx-page.css.)
+const aa = (pg) => measured(pg, CONTRAST, 'text in <main>');
 // every visible text element is 12 px or more
 const SMALL = String.raw`(() => { const out = [], seen = new Set(), w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); for (let n = w.nextNode(); n; n = w.nextNode()) { const e = n.parentElement; if (!n.textContent.trim() || !e || seen.has(e) || !e.getClientRects().length || e.closest('canvas, .chart, script, style, option')) continue; seen.add(e); const px = parseFloat(getComputedStyle(e).fontSize); if (px < 12) out.push(px + ' ' + e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + ' "' + n.textContent.trim().slice(0, 20) + '"'); } return out; })()`;
 // touch targets: visible buttons, inputs, selects and links that act as buttons are at least 44 px tall
@@ -93,7 +93,7 @@ const NO_PACE = 'window.MXAC_PACE = 0;';
 async function startServer(port = PORT, flags = []) {
   const H = 'http://127.0.0.1:' + port, PORT = port;   // this server's own address
   const store = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-audit-'));
-  const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...flags], { env: { ...process.env, PORT: String(PORT), ACADEMY_STORE_DIR: store }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...flags], { env: { ...process.env, PORT: String(PORT), ACADEMY_STORE_DIR: store }, stdio: ['ignore', 'pipe', 'pipe'] }); KIDS.add(proc);
   let log = ''; proc.stdout.on('data', (d) => { log += d; }); proc.stderr.on('data', (d) => { log += d; });
   for (let i = 0; i < 60; i++) {
     if (proc.exitCode != null) throw new Error('the dev server stopped: ' + log.trim() + ` (is port ${PORT} taken? set ACADEMY_PORT)`);
@@ -578,7 +578,7 @@ async function startServer(port = PORT, flags = []) {
     }
     for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['blind', '#bl-compare'], ['session', '#ss-summary']]) {
       await tab(id, sel);
-      for (const theme of ['dark', 'light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); check(`AA contrast, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['dark', 'light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
     }
     check('no endless animation in the other sections', (await p.evaluate(ENDLESS)).length === 0);
@@ -670,7 +670,7 @@ async function startServer(port = PORT, flags = []) {
         check('regression: the check reports the earlier correction the later lesson undid, and only that one', r.sum.broken === 1 && r.sum.holds === 3 && broke.status === 'broken' && r.rows.filter((x) => x.status === 'broken').length === 1 && /4 earlier verdicts checked against the 3 lessons in force: 3 still hold, 1 no longer holds, 0 never held\./.test(r.sum.text), r.sum.text);
         check('regression: it says what was asked for, what comes out now, and names the lesson that changed it', /No longer holds: you asked for SELL, and a fresh replay now gives WAIT\. Changed by: "Verify lesson 3: do not chase", it was not in force when this answer last held \(now: not applied: conflicts with lesson "Verify lesson 2: take this range"\)\./.test(broke.text) && !/Verify lesson 1/.test(broke.text) && /^An earlier answer was changed by a later lesson\./.test(await txt(v, '#ls-check-warn')), broke.text.slice(0, 260));
         await v.screenshot({ path: OUT + 'academy-11-regression.png', fullPage: true });
-        for (const theme of ['dark', 'light', 'midnight']) { await v.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await v.waitForTimeout(350); const bad = await aa(v); check(`AA contrast, ${theme} theme (the regression check with a broken answer)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        for (const theme of ['dark', 'light', 'midnight']) { await v.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(v); check(`AA contrast, ${theme} theme (the regression check with a broken answer)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
         await v.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
         // mend it: revise lesson 3 so that it only speaks where it was learned; the diff says what changes; the check is clean again
         const li3 = '#ls-list li.lsn:has(.lsn-head b:text-is("Verify lesson 3: do not chase"))';
@@ -808,7 +808,7 @@ async function startServer(port = PORT, flags = []) {
 
     // ---- 12. themes: AA contrast in dark, light and midnight, on the setup and on a decision ----
     for (const theme of ['dark', 'light', 'midnight']) {
-      await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(450);   // colour transitions are 150 ms
+      await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme);
       const bad = await aa(p); check(`AA contrast, ${theme} theme (replay view)`, bad.length === 0, bad.slice(0, 4).join(' ; '));
     }
     await p.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
@@ -822,7 +822,7 @@ async function startServer(port = PORT, flags = []) {
       let w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on the setup', w <= 390, w);
       let small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (setup)', small.length === 0, small.slice(0, 4).join(' ; '));
       let taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (setup)', taps.length === 0, taps.slice(0, 5).join(' ; '));
-      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast, ${theme} theme (setup)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       await p.tap('#start'); await p.waitForSelector('#replay:not([hidden])', { timeout: 60000 }); await p.tap('#c-play'); await nextPoint(p);
       { const r = await p.$eval('#point-bar', (e) => { const q = e.getBoundingClientRect(); return [Math.round(q.top), Math.round(q.bottom), e.hidden]; });
@@ -837,11 +837,17 @@ async function startServer(port = PORT, flags = []) {
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll with the "What if" table open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (what if)', small.length === 0, small.slice(0, 4).join(' ; '));
       taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (what if)', taps.length === 0, taps.slice(0, 5).join(' ; '));
-      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (what if)`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       const order = await p.evaluate(() => ['chart', 'acct-card', 'decision', 'mentor'].map((id) => Math.round(document.getElementById(id).getBoundingClientRect().top + scrollY)));
       check('390 px: the panels stack and the chart stays first', order[0] < order[1] && order[1] < order[2] && order[2] < order[3], order.join(' < '));
       check('reduced motion is respected (no transition left running)', await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.btn')).transitionDuration) <= 0.001));
+      // ... and no transition is STARTED either: with a tiny non-zero duration on `*` a theme change ran down the tree one level a
+      // frame, and text kept the old theme's colour on the new background for several frames (shared.cjs). Read in the same task
+      // as the change, before any frame: nothing may be in transition and the text must already hold the new theme's contrast.
+      { const now = await p.evaluate((C) => { document.documentElement.dataset.theme = 'midnight'; const r = eval(C), tr = document.getAnimations().filter((a) => a.transitionProperty).length; return { bad: r.bad, n: r.n, tr }; }, CONTRAST);
+        check('reduced motion: a theme change reaches every text at once (no transition is started, AA in the same instant)', now.tr === 0 && now.n > 20 && now.bad.length === 0, `${now.tr} transitions, ${now.n} texts, ${now.bad.slice(0, 3).join(' ; ')}`);
+        await p.evaluate(() => { delete document.documentElement.dataset.theme; }); }
       { const a2 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts; check('another sitting on the same setup stores the next attempt number, as a same-trade replay', a2.length === n0 + 1 && a2[n0].n === n0 + 1 && a2[n0].mode === 'replay-same', JSON.stringify(a2.map((a) => [a.n, a.mode]))); }
       await p.screenshot({ path: OUT + 'academy-5-phone.png' });   // not a full-page shot: that would reset the touch emulation for the checks below
       for (const [id, sel] of [['lessons', '#ls-list li[data-lesson]'], ['progress', '#pg-queue'], ['research', '#rs-table'], ['blind', '#bl-rows'], ['session', '#ss-saved li']]) {
@@ -849,7 +855,7 @@ async function startServer(port = PORT, flags = []) {
         w = await p.evaluate(() => document.documentElement.scrollWidth); check(`390 px: no sideways scroll (${id})`, w <= 390, w);
         small = await p.evaluate(SMALL); check(`390 px: every text is 12 px or more (${id})`, small.length === 0, small.slice(0, 4).join(' ; '));
         taps = await p.evaluate(TAPS); check(`390 px, touch: every control is at least 44 px tall (${id})`, taps.length === 0, taps.slice(0, 5).join(' ; '));
-        if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(120); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+        if (id === 'lessons' || id === 'progress') for (const theme of ['light', 'midnight']) { await p.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); check(`AA contrast on the phone, ${theme} theme (${id})`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
         await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       }
       const two = await p.evaluate(() => { document.getElementById('tab-progress').click(); return null; }); await p.waitForSelector('#pg-recall');
@@ -881,7 +887,7 @@ async function startServer(port = PORT, flags = []) {
 // ====================================================================================================================
 // It runs after the audit above has printed its result (the hook below takes the audit's final process.exit, runs
 // analystAudit(), then exits with the audit's code, or 1 when an analyst check failed). It starts its own two dev servers
-// on PORT + 11 and PORT + 12, so it shares no page, store or port with the checks above. No network and no key:
+// on their own ports (see the top of the file), so it shares no page, store or port with the checks above. No network and no key:
 //   - the normal dev server: the analyst is OFF. The decision card says so, nothing is sent, a decision costs no extra call.
 //   - a `--fake-llm` dev server: the whole flow against the labelled FAKE provider (scripts/academy-fake-llm.cjs, a fixed
 //     rule, not a language model): the banner, ask, the answer beside the engine's, stored apart, the cache, a correction,
@@ -897,7 +903,7 @@ async function analystAudit() {
   const start = async (port, args) => {
     const store = fs.mkdtempSync(path.join(os.tmpdir(), 'academy-analyst-')), base = 'http://127.0.0.1:' + port, env = { ...process.env, PORT: String(port), ACADEMY_STORE_DIR: store };
     for (const k of Object.keys(env)) if (/^ACADEMY_LLM_/.test(k)) delete env[k];
-    const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] }); let log = ''; proc.stdout.on('data', (d) => { log += d; }); proc.stderr.on('data', (d) => { log += d; });
+    const proc = spawn(process.execPath, [path.join(ROOT, 'scripts/academy-dev.mjs'), ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] }); KIDS.add(proc); let log = ''; proc.stdout.on('data', (d) => { log += d; }); proc.stderr.on('data', (d) => { log += d; });
     for (let i = 0; i < 60; i++) { if (proc.exitCode != null) throw new Error('the dev server stopped: ' + log.trim()); try { const r = await fetch(base + '/api/academy?get=edges'); if (r.ok) return { proc, store, base, log: () => log }; } catch (e) { /* not up yet */ } await new Promise((r) => setTimeout(r, 250)); }
     proc.kill(); throw new Error('the dev server did not answer on ' + base);
   };
@@ -991,7 +997,7 @@ async function analystAudit() {
       const auto = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c4.id)}&engine=language-model`)).attempts;
       ok('the next setup of the run is asked by itself, once, after the engine\'s own attempt', c4.id !== c3.id && auto.length === 1 && reqs.slice(-3).join() === 'attempt,session.save,analyse', reqs.slice(-4).join(' '));   // the position save sits between them since round 2
       await p.click('#an-auto'); ok('unticking the switch stops it', !(await p.isChecked('#an-auto')) && (await p.$$('#an-auto-on')).length === 0);
-      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }   // 350 ms: colour transitions have ended
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       ok('fake flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
       await ctx.close();
@@ -1031,7 +1037,7 @@ async function analystAudit() {
       ok('connector: "Check for the answer" shows it beside the engine\'s, said to come from your own assistant, stored apart, at no cost', /From your own assistant, through the connector\. It signed as: audit assistant\./.test(await txt(p, '#an-label')) && /no provider call, no cost/i.test(await txt(p, '#an-label')) && /^Analyst attempt 1 stored apart/.test(await txt(p, '#an-stored')) && (await p.getAttribute('#an-answer', 'data-action')) === ans.action && (await p.$$('#an-queued')).length === 0, await txt(p, '#an-label'));
       const cost = await api(p, 'get=cost'), an = (await api(p, `get=attempts&edge=${EDGE}&engine=language-model`)).attempts;
       ok('connector: nothing waits afterwards, the ledger is at zero and the answer is in the analyst\'s own file', /No question waits\.$/.test(await txt(p, '#an-via')) && cost.connector.pending === 0 && cost.total.usd === 0 && an.length === 1 && an[0].llm.provider === 'connector' && an[0].llm.costUsd === 0, JSON.stringify(cost.connector));
-      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); ok(`connector: AA contrast with the box and the answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
+      for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); const bad = await aa(p); ok(`connector: AA contrast with the box and the answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
       ok('connector flow: no page errors', errs.length === 0, errs.slice(0, 2).join(' | '));
       await ctx.close();

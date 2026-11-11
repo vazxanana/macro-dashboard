@@ -29,11 +29,34 @@ const LANG = { en: 'Answer in English.', fr: 'Answer in FRENCH (the teacher work
 export const safe = (s) => String(s).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'lesson';
 // the lessons the desk owes an answer: not read yet, or the teacher added something or said "not right"
 export const waiting = (l) => l.state === 'new' || l.state === 'more';
+const lastDesk = (l) => (l.thread || []).filter((m) => m.by === 'assistant').pop() || null;
+// why a lesson waits for the desk, in plain words (the same facts the site's state is made of), or where it stands otherwise
+export function why(l) {
+  const la = lastDesk(l), th = l.thread || [];
+  if (!la) return 'WAITS FOR THE DESK: not answered yet.';
+  if (l.state === 'agreed') return 'Understood: the teacher marked the desk\'s last answer RIGHT. Nothing to do.';
+  if (l.state === 'read') { const open = (la.ask || []).filter((x) => x.a == null).length; return `Waits for the TEACHER: he has not said right or not right yet${open ? `, and ${open} of the desk's questions ${open === 1 ? 'is' : 'are'} not answered` : ''}. Do not answer again.`; }
+  const bits = [], after = th.slice(th.indexOf(la) + 1).filter((m) => m.by !== 'assistant'), ans = (la.ask || []).filter((x) => x.a != null).length, open = (la.ask || []).filter((x) => x.a == null).length;
+  if ((la.shots || 0) < (l.shots || []).length) bits.push(`${l.shots.length - (la.shots || 0)} new picture${l.shots.length - (la.shots || 0) === 1 ? '' : 's'} since the desk's last answer`);
+  if (la.verdict === 'wrong') bits.push('the teacher marked the last answer NOT RIGHT (his correction is his word: restate it, do not argue it)');
+  if (after.length && la.verdict !== 'wrong') bits.push('the teacher wrote after the last answer');
+  if (ans) bits.push(`the teacher answered ${ans} of the desk's ${la.ask.length} question${la.ask.length === 1 ? '' : 's'} (each answer is his word on that point)`);
+  return `WAITS FOR THE DESK: ${bits.join('; ') || 'something new since the last answer'}.${open ? ` ${open} question${open === 1 ? ' is' : 's are'} still unanswered: they stay on his page, do not ask them again.` : ''}`;
+}
+// the lessons counted by whose move it is: what `pull` prints first
+export function counts(lessons) {
+  const c = { all: lessons.length, fresh: 0, more: 0, teacher: 0, agreed: 0 }; for (const l of lessons) c[l.state === 'new' ? 'fresh' : l.state === 'more' ? 'more' : l.state === 'read' ? 'teacher' : 'agreed']++;
+  c.desk = c.fresh + c.more; return c;
+}
+export function countsText(c) {
+  return `${c.desk} lesson${c.desk === 1 ? '' : 's'} wait${c.desk === 1 ? 's' : ''} for the desk (${c.fresh} not answered yet, ${c.more} with something new from the teacher)  ·  ${c.teacher} wait${c.teacher === 1 ? 's' : ''} for the teacher  ·  ${c.agreed} understood  ·  ${c.all} in all`;
+}
 // the book as the desk must read it: the teacher's lines first, its own unconfirmed readings last and marked as such
 export function bookText(book) {
   const line = (b) => `- ${b.text}${b.status === 'corrected' && b.was ? `  (the desk had: ${b.was})` : ''}`;
   const part = (title, items) => (items.length ? [`## ${title}`, ...Object.keys(KIND).flatMap((k) => { const xs = items.filter((b) => b.kind === k); return xs.length ? [`### ${KIND[k]}`, ...xs.map(line), ''] : []; })] : []);
-  return ['# What the desk knows about Mosha', '', WHO, '', ...part('The teacher\'s word (confirmed, corrected or taught): this overrides everything else', book.filter((b) => b.status !== 'proposed')),
+  const own = book.filter((b) => b.status !== 'proposed').length;
+  return ['# What the desk knows about Mosha', '', WHO, '', `${book.length} line${book.length === 1 ? '' : 's'}: ${own} the teacher's word, ${book.length - own} still the desk's own reading (not confirmed).`, '', ...part('The teacher\'s word (confirmed, corrected or taught): this overrides everything else', book.filter((b) => b.status !== 'proposed')),
     ...part('The desk\'s own reading, NOT confirmed: do not treat as the teacher\'s', book.filter((b) => b.status === 'proposed'))].join('\n');
 }
 // the questions under one of the desk's answers, each with the teacher's answer: his answer is his word on that point
@@ -42,7 +65,7 @@ const asked = (m) => (m.by === 'assistant' && Array.isArray(m.ask) ? m.ask.map((
 const extras = (files) => { const o = {}; for (const f of files.filter(Boolean)) { const j = JSON.parse(read(f)); if (Array.isArray(j)) o.ask = j; else o.chart = j; } return o; };
 export function lessonText(l) {
   const t = l.trade, who = (m) => (m.by === 'assistant' ? 'THE DESK' : (m.name || m.by).toUpperCase());
-  return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, LANG[l.lang] || LANG.en, '', l.note || '(no note)', '',
+  return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, why(l), LANG[l.lang] || LANG.en, '', l.note || '(no note)', '',
     t ? `Levels: ${t.side} ${t.entry}, stop ${t.stop}${t.target != null ? `, target ${t.target}` : ''}, ${t.market}${t.tf ? ` ${t.tf}` : ''}, entry at ${new Date(t.at * 1000).toISOString()}${t.exit != null ? `, closed ${t.exit}${t.exitAt ? ` at ${new Date(t.exitAt * 1000).toISOString()}` : ''} = ${t.R > 0 ? '+' : ''}${t.R}R` : ''}${t.src === 'replay' ? '  (taken in a ChronosTrade replay: practice on past candles, not a live trade)' : ''}` : 'Levels: not given', '',
     ...(l.shots.length ? l.shots.map((s, i) => `Picture ${i + 1}: ${s.caption || '(no caption)'}`) : ['(a lesson in words: no picture)']), '',
     'Conversation:', ...(l.thread.length ? l.thread.flatMap((m) => [`[${m.at}] ${who(m)}${m.verdict ? ` (the teacher marked this ${m.verdict === 'right' ? 'RIGHT' : 'NOT RIGHT'})` : ''}: ${m.text}`, ...asked(m)]) : ['(nothing yet: the desk has not answered)'])].join('\n');
@@ -70,7 +93,8 @@ async function pull(dir, all) {
     }
     console.log(`${l.state.padEnd(6)} ${l.id}  ${l.title}  (${l.shots.length} pictures, ${l.thread.length} messages)  -> ${d}`);
   }
-  console.log(`${lessons.length} lessons, ${todo.length} waiting for the desk, ${n} pictures saved in ${dir}`);
+  console.log(countsText(counts(lessons)));
+  console.log(`${todo.length} lesson folder${todo.length === 1 ? '' : 's'} written${all ? ' (--all: every lesson)' : ''}, ${n} pictures saved in ${dir}`);
   console.log(`book: ${score.book} lines, ${score.taught} the teacher's word, ${score.proposed} still the desk's reading  ·  right first time: ${score.right} of ${score.judged} judged`);
 }
 const read = (file) => { const t = fs.readFileSync(file, 'utf8').trim(); if (!t) throw new Error(`${file} is empty`); return t; };

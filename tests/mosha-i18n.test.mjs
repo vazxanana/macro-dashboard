@@ -10,7 +10,8 @@ const require = createRequire(import.meta.url);
 const I = require('../assets/mosha-i18n.js'), TU = require('../assets/mosha-tutor.js'), TEACH = require('../assets/mosha-teach.js'), L = require('../api/mosha-lessons.js');
 const TOOLS = await import('../scripts/mosha-lessons.mjs');
 const rd = (p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
-const PAGE = rd('../market-structure.html'), BT = rd('../backtest.html'), JS = rd('../assets/mosha-teach.js'), TUT = rd('../assets/mosha-tutor.js');
+const PAGE = rd('../market-structure.html'), BT = rd('../backtest.html'), JS = rd('../assets/mosha-teach.js'), TUT = rd('../assets/mosha-tutor.js'), RPJ = rd('../assets/mosha-replay.js'), DKJ = rd('../assets/mosha-desk.js');
+const RP = require('../assets/mosha-replay.js'), DESK = require('../assets/mosha-desk.js');
 const lits = (src, fn) => [...src.matchAll(new RegExp('\\b' + fn + "\\('((?:[^'\\\\]|\\\\.)*)'", 'g'))].map((m) => m[1].replace(/\\'/g, "'"));
 const SEC = PAGE.slice(PAGE.indexOf('<section class="view adm" id="v-mosha"'), PAGE.indexOf('</section>', PAGE.indexOf('id="mo-book"')));
 const marked = (html) => [...html.matchAll(/<[a-z0-9]+\b[^>]*\sdata-tr(?=[\s>])[^>]*>([^<]+)</g)].map((m) => m[1].trim())
@@ -21,13 +22,15 @@ const TERM = { level: /\blevel\b(?!s)/i, high: /\bhigh\b/i, low: /\blow\b/i, sto
 const keeps = (en, fr, where) => { for (const t of I.TERMS) { const re = TERM[t] || new RegExp('\\b' + t.replace(/[-/]/g, '\\$&') + '\\b', 'i'); if (re.test(en)) assert.ok(nb(fr).toLowerCase().includes(t.toLowerCase()), `${where}: "${t}" must stay English in: ${fr}`); } };
 
 test('every phrase the teaching pages use has its French line', () => {
-  const used = new Set([...lits(JS, 'L'), ...lits(BT, 'ML'), ...lits(TUT, 'T'), ...marked(SEC), ...marked(BT),
+  // the chart card's own words: every step of the examples, the figure written on each screenshot, and the mark names that are not the method's
+  const SHOTS = [...RP.EXAMPLES, ...RP.STUDIES], rpData = [...SHOTS.flatMap((e) => [...e.steps.map((s) => s.text), e.yours]), 'Zone below', 'H4 BO sell level, about 4066', 'Under the level, no VR'];
+  const used = new Set([...lits(JS, 'L'), ...lits(RPJ, 'L'), ...lits(DKJ, 'L'), ...rpData, ...lits(BT, 'ML'), ...lits(TUT, 'T'), ...marked(SEC), ...marked(BT),
     ...Object.values(TEACH.STATE), ...Object.values(TEACH.KIND), ...Object.values(TEACH.FLT), ...TEACH.STEPS.flatMap((s) => [s.t, s.p, s.go]), ...L.SEED.map((b) => b.text)]);
   assert.ok(used.size > 230, `phrases found: ${used.size}`);
   const missing = [...used].filter((k) => !Object.prototype.hasOwnProperty.call(I.FR, k)); assert.deepEqual(missing, [], 'no French line for these');
   assert.ok(lits(JS, 'L').length > 140 && lits(BT, 'ML').length >= 14 && marked(SEC).length >= 28 && marked(BT).length >= 8);
   // nothing in the dictionary is dead weight except what the server may answer
-  const all = JS + BT + TUT + rd('../api/mosha-lessons.js'), quoted = (k) => all.includes("'" + k.replace(/'/g, "\\'") + "'");
+  const all = JS + BT + TUT + RPJ + DKJ + rd('../api/mosha-lessons.js'), quoted = (k) => all.includes("'" + k.replace(/'/g, "\\'") + "'");
   const dead = Object.keys(I.FR).filter((k) => !used.has(k) && !quoted(k)); assert.deepEqual(dead, [], 'French lines nothing uses');
 });
 
@@ -99,4 +102,29 @@ test('the language travels with the lesson, so the desk answers in it', async ()
   assert.deepEqual(L.LANGS, I.LANGS); assert.equal(L.langOf('fr'), 'fr'); assert.equal(L.langOf('de'), null);
   const txt = TOOLS.lessonText(a.body.lesson); assert.match(txt, /Answer in FRENCH \(the teacher works in French\)\. Keep the words of the method in English/); for (const t of ['VR', 'CF', 'BO', 'sweep', 'stop', 'target', 'zone of the break']) assert.ok(txt.includes(t), t);
   assert.match(TOOLS.lessonText((await call('GET', LUXUS)).body.lessons.find((l) => l.lang === 'en')), /Answer in English\./);
+});
+
+// 11 Nov 2026: the chart card and the log on the teacher's page speak his language, and speak to no one in particular.
+test('the chart card and the log: neutral wording, French through the same dictionary, the method\'s words kept', () => {
+  const SHOTS = [...RP.EXAMPLES, ...RP.STUDIES];
+  // the examples are the teacher's screenshots and every reader sees the card: no "you" / "your" in what the desk wrote about them
+  for (const e of SHOTS) { for (const t of [...e.steps.map((s) => s.text), e.yours, ...e.marks.map((m) => m.label), ...e.marks.filter((m) => m.relabel).map((m) => m.relabel.label)]) assert.ok(!/\byou(r|rs)?\b/i.test(t), `${e.id}: ${t}`);
+    for (const s of e.steps) { assert.ok(I.FR[s.text], `${e.id}: a French line for: ${s.text}`); keeps(s.text, I.FR[s.text], e.id); assert.ok(!/\b(guarantee[sd]?|profitable|win rate|always wins|garanti[es]?|rentable|taux de réussite)\b/i.test(s.text + I.FR[s.text]), s.text); }
+    assert.ok(I.FR[e.yours], e.yours); }
+  assert.deepEqual(SHOTS.filter((e) => e.ownLabel).map((e) => e.id), ['nov10'], 'the owner\'s own sentence is shown to the owner only');
+  assert.match(RPJ, /spec\.ownLabel && document\.documentElement\.dataset\.role !== 'owner' \? ''/);
+  assert.match(RPJ, /sp\.lesson \? L\('The lesson:'\) : sp\.log \? L\('In the log:'\) : L\('On the screenshot:'\)/); assert.ok(!/'You: '/.test(RPJ));
+  const t = { id: 'x', market: 'xau', side: 'sell', at: 1794286800, entry: 4120.42, stop: 4128.92, target: 4072.84, status: 'open' }, sp = RP.specOfTrade(t, 1794300000); assert.equal(sp.log, true); assert.equal(sp.label, 'From the log'); assert.equal(sp.steps[0].text, 'The twelve hours before the entry.');
+  const ls = RP.specOfLesson({ id: 'y', title: 'A lesson', trade: { ...t, at: t.at } }, 1794300000); assert.equal(ls.log, false); assert.equal(ls.lesson, true); assert.equal(ls.yours, 'the levels given with the lesson');
+  // the card's fixed words are marked on the page and the picture still says it is no measure of how often it wins, in both languages
+  for (const k of ['The example trades, on the chart', 'Start', 'End', 'Candles', 'Speed', 'Trade it yourself in ChronosTrade', 'M5 VR, the red "5 mn" box', 'A range, the green box']) { assert.ok(marked(SEC).includes(k), k); assert.ok(I.FR[k], k); }
+  const note = marked(SEC).find((x) => /^These are the trades of the screenshots/.test(x)); assert.match(note, /they show the pattern, not how often it wins/); assert.match(nb(I.FR[note]), /ils montrent le schéma, pas la fréquence à laquelle il réussit/);
+  assert.ok(!/id="mo-rp-(msg|cap)"[^>]*data-tr/.test(PAGE), 'the two lines the replay writes itself are not reset by the page translation');
+  // a language switch redraws the card and the log
+  assert.match(RPJ, /root\.msMoshaReplayLang = relang;/); assert.match(DKJ, /root\.msMoshaDeskLang = function \(\) \{ if \(M\.trades\) draw\(\); \};/); assert.match(JS, /var relang = function \(\) \{ if \(root\.msMoshaReplayLang\) root\.msMoshaReplayLang\(\); if \(root\.msMoshaDeskLang\) root\.msMoshaDeskLang\(\); \};/);
+  assert.equal((JS.match(/relang\(\);/g) || []).length, 2, 'on the first load and on every switch');
+  // the log a reader sees is the owner's and says so; the owner's own form is left in English
+  assert.match(DKJ, /var foot = M\.canWrite \? null : L\('\{n\} open now\.'/); assert.match(DKJ, /L\('the owner\\'s log'\)/); assert.ok(!/L\('Log a trade'\)|L\('Save the trade'\)/.test(DKJ));
+  assert.equal(DESK.verdict({ n: 0 }).text, 'No closed trade yet', 'the pure verdict stays English: the page translates it by its key');
+  for (const k of ['Too few to judge: {n} of {m} closed trades', 'Positive, but not yet apart from luck (t {t} over {n} trades)', 'Negative so far (t {t} over {n} trades)']) assert.ok(I.FR[k] && DKJ.includes("L('" + k + "'"), k);
 });
