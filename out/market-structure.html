@@ -2764,6 +2764,18 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
+<style id="ms-cycle-css">
+      #ms-cycle { margin: 6px 0 2px; font-size: 13px; line-height: 1.5; }
+      #ms-cycle .cy-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      #ms-cycle .cy-h { font-weight: 600; color: var(--ink); margin-right: 2px; }
+      #ms-cycle .cy-c { border: 1px solid var(--line); border-radius: 10px; padding: 2px 8px; color: var(--ink-dim); font-size: 12px; }
+      #ms-cycle .cy-c.pullback { border-color: #a64dc9; color: var(--ink); }
+      #ms-cycle .cy-c small { font-size: 12px; color: var(--ink-faint); }
+      #ms-cycle .cy-say { margin: 4px 0 0; color: var(--ink-dim); }
+      #ms-cycle .cy-say small { font-size: 12px; color: var(--ink-faint); }
+      #v-charts .sec-h > .cycle { order: 11; flex: 1 0 100%; }
+      html[data-mk="ict"] #ms-cycle, html[data-mk="clean"] #ms-cycle, html[data-role="public"] #ms-cycle { display: none; }
+      </style>
 <style id="ms-trv-css">
 /* Trade replay (#ms-trv-js, 7 Nov): the trade viewers (#ms-tv council / systems, #ict-tv ICT desk) as phone sheets with a #trade/<id> link */
 .tv-nb { display: grid; gap: 6px; padding: 10px 16px 12px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
@@ -4960,6 +4972,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
+            <label><input type="checkbox" id="ms-show-cycle" data-show="cycle" checked><i style="background:#a64dc9;height:2px"></i>Market cycle</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed labels</label></div>
             <div class="tog-g"><div class="tog-h">Council</div>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Trades + history</label>
@@ -5179,6 +5192,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
+            <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
       <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button>
       <div class="seg" role="group" aria-label="Chart view">
@@ -6078,6 +6092,31 @@ function msAnalyze(bars, N) {
   return { events, trend, ext, prot, last, n };
 }
 
+// Market cycle (11 Nov 2026, owner: "H4 move, H1 ChoCh tells the pullback or retracement started, M15 / M5 to entry, target H4 or
+// H1; H4 tells the retracement of the daily, M15 the retracement of H1 and M5 of M15"). Display only: no rule, trade or alert reads it.
+// legs: highest timeframe first, [{ id, label, dir (trend: 1 / -1 / 0), move: { level, top, bot, t } (its last break with the trend),
+// ext (the move's extreme so far), events: [{ dir, level, t, fromT, structure }] (its breaks, oldest first) }].
+// For each timeframe and the one under it: 'move' = the lower one still agrees (the move runs), 'pullback' = the lower one broke
+// against it after its break (its ChoCh: the pullback / retracement started), 'resumed' = the lower one then broke back with it
+// (the pullback is over). Targets: the pullback's = 50% of the move and the move's origin (the broken level); the move's = its extreme.
+function msCycle(legs) {
+  const out = [];
+  for (let k = 0; k + 1 < (legs || []).length; k++) {
+    const P = legs[k], c = legs[k + 1], row = { parent: P.id, pl: P.label, child: c.id, cl: c.label, dir: P.dir || 0, phase: 'none' };
+    out.push(row);
+    if (!P.dir || !P.move || !isFinite(P.ext)) continue;
+    const far = P.dir < 0 ? P.move.top : P.move.bot;
+    row.target = { p50: (far + P.ext) / 2, origin: P.move.level, far, ext: P.ext };
+    const after = (c.events || []).filter((e) => e && e.t >= P.move.t);
+    const ci = after.findIndex((e) => e.dir === -P.dir);
+    if (ci < 0) { row.phase = 'move'; continue; }
+    row.choch = { level: after[ci].level, t: after[ci].t, fromT: after[ci].fromT };
+    const back = after.slice(ci + 1).find((e) => e.dir === P.dir && e.structure);
+    if (back) { row.phase = 'resumed'; row.resume = { level: back.level, t: back.t, fromT: back.fromT }; }
+    else row.phase = 'pullback';
+  }
+  return out;
+}
 function msNextSetup(bars, A) {
   const e = A.last, n = bars.length, price = bars[n-1].close;
   if (!e) return null;
@@ -6184,7 +6223,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -6610,6 +6649,21 @@ function msNextSetup(bars, A) {
         let l1 = bars.findIndex((b) => b.time >= t0); if (l1 < 0) return;
         items.boxes.push({ kind: 'htf', open: true, l1, l2: n + 26, lo: he.bot, hi: he.top, stroke: Z.htf, dash: true });
         items.labels.push({ l: n + 26, dx: -4, align: 'right', p: he.top, dy: 14, text: `${h.label} Origin`, color: Z.htf });
+      });
+    }
+    // market cycle (msCycle): the ChoCh that starts a pullback of the timeframe above, and the targets of the legs above this one
+    if (own && G.show.cycle !== false) { const CY = G.cycle = cycleNow(), at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; };
+      CY.filter((r) => r.child === tf.id && r.choch).forEach((r) => {
+        const up = r.dir < 0, i0 = at(r.choch.fromT), i1 = at(r.choch.t);
+        items.lines.push({ l1: i0, l2: Math.min(n + 6, i1 + 14), p: r.choch.level, color: CYC, w: 2, text: `ChoCh ${up ? '▲' : '▼'} · ${r.pl} ${r.phase === 'resumed' ? 'pulled back here' : 'pullback starts'}`, below: !up });
+        if (r.resume) items.lines.push({ l1: at(r.resume.fromT), l2: Math.min(n + 6, at(r.resume.t) + 14), p: r.resume.level, color: CYC, w: 2, text: `ChoCh ${up ? '▼' : '▲'} · back with ${r.pl}`, below: up });
+      });
+      const above = { '4h': ['1d'], '1h': ['4h'], '15m': ['4h', '1h'], '5m': ['4h', '1h'] }[tf.id] || [];
+      above.forEach((id) => { const r = CY.find((x) => x.parent === id); if (!r || !r.target || r.phase === 'none') return; const T = r.target, lo = r.dir < 0;
+        if (r.phase === 'pullback') {
+          items.lines.push({ l1: n - 30, l2: n + 26, p: T.p50, color: CYC, dash: true, w: 1, text: `${r.pl} pullback target · 50% ${fmt(T.p50)}`, below: lo });
+          items.lines.push({ l1: n - 30, l2: n + 26, p: T.origin, color: CYC, dash: true, w: 1, text: `${r.pl} origin ${fmt(T.origin)}`, below: lo });
+        } else items.lines.push({ l1: n - 30, l2: n + 26, p: T.ext, color: CYC, dash: true, w: 1, text: `${r.pl} target · ${lo ? 'low' : 'high'} ${fmt(T.ext)}`, below: !lo });
       });
     }
     const pos = own && G.show.plan && G.plan;
@@ -7179,6 +7233,32 @@ function msNextSetup(bars, A) {
   document.getElementById('h-mk-row')?.addEventListener('scroll', hmkEdge, { passive: true }); window.addEventListener('resize', hmkEdge);
   setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
   // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
+  // market cycle: the legs of D1, H4, H1, M15 and M5 handed to msCycle, and its reading in words under the alignment strip
+  const CYC = '#a64dc9';
+  function cycleNow() {
+    const legs = ['1d', '4h', '1h', '15m', '5m'].filter((id) => panes[id] && panes[id].A && panes[id].bars && panes[id].bars.length).map((id) => {
+      const P = panes[id], A = P.A, B = P.bars, tf = TFS.find((t) => t.id === id);
+      const mv = A.last && A.last.dir === A.trend ? A.last : A.events.slice().reverse().find((e) => e.dir === A.trend);
+      return { id, label: tf.label, dir: A.trend || 0, ext: A.ext ? A.ext.p : NaN, move: mv ? { level: mv.level, top: mv.top, bot: mv.bot, t: B[mv.breakIdx].time } : null,
+        events: A.events.map((e) => ({ dir: e.dir, level: e.level, structure: e.structure, t: B[e.breakIdx].time, fromT: B[e.fromIdx].time })) };
+    });
+    return msCycle(legs);
+  }
+  function cycleStrip() {
+    const el = document.getElementById('ms-cycle'); if (!el) return;
+    const CY = G.cycle = cycleNow(), r4 = CY.find((r) => r.parent === '4h' && r.child === '1h');
+    if (!CY.some((r) => r.phase !== 'none')) { el.hidden = true; return; }
+    const ar = (d) => (d < 0 ? '▼' : '▲'), way = (d) => (d < 0 ? 'down' : 'up');
+    const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'pullback over'}</b> <small>(${r.cl})</small></span>`;
+    let say = '';
+    if (r4 && r4.target) { const T = r4.target, hl = r4.dir < 0 ? 'low' : 'high';
+      say = r4.phase === 'move' ? `H4 is moving ${way(r4.dir)} and H1 agrees: no pullback yet. An H1 ChoCh ${ar(-r4.dir)} would start it.`
+        : r4.phase === 'pullback' ? `H1 ChoCh ${ar(-r4.dir)} at ${fmt(r4.choch.level)} (${ftime(r4.choch.t)}): the H4 move ${way(r4.dir)} is pulling back. Pullback target: H4 50% ${fmt(T.p50)}, then the H4 origin ${fmt(T.origin)}. When M15 / M5 break back ${way(r4.dir)}, the pullback is over: target the H4 ${hl} ${fmt(T.ext)}.`
+        : `H1 broke back ${way(r4.dir)} at ${fmt(r4.resume.level)} (${ftime(r4.resume.t)}): the H4 pullback is over. Target the H4 ${hl} ${fmt(T.ext)}.`; }
+    el.hidden = false;
+    el.innerHTML = `<div class="cy-row"><span class="cy-h">Market cycle</span>${CY.map(chip).join('')}</div>${say ? `<p class="cy-say">${say} <small>A reading of structure, not a tested rule.</small></p>` : ''}`;
+  }
+  setTimeout(cycleStrip, 3600); setInterval(cycleStrip, 10e3);
   function mtfStrip() {
     const el = document.getElementById('ms-mtf'); if (!el) return;
     const rows = TFS.map((tf) => { const P = panes[tf.id], e = P && P.A && P.A.last; return { tf, dir: e ? (e.dir < 0 ? -1 : 1) : 0 }; }).filter((r) => panes[r.tf.id]);
