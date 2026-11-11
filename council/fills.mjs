@@ -53,6 +53,15 @@ export function financing(t, fin = FIN) {
   const from = t.filled != null ? t.filled : t.opened, nn = rate > 0 && Number.isFinite(from) && Number.isFinite(t.closed) ? nights(from, t.closed) : 0;
   return { finR: nn > 0 && px > 0 && r0 > 0 ? nn * rate * px / r0 : 0, nights: nn };
 }
+// Financing of a replay or study row that carries no stamped cost (its R is after the spread only): the same charge, from the
+// row's own entry, initial risk (r0, else its first stop stop0, else stop), fill and close. A row whose cost was stamped at its
+// close already holds its financing (or closed before financing was counted, and is never recosted): 0 here.
+export const rowFinancing = (x, fin = FIN) => !x || x.costR != null || Number.isFinite(x.Rnet) ? { finR: 0, nights: 0 }
+  : financing({ ...x, r0: +x.r0 || (x.stop0 != null ? Math.abs(x.entry - x.stop0) : undefined) }, fin);
+// Financing of one replay trade (council/backtest.mjs; tr as replayBar manages it: m, side, entry, r0, filled) for one of its exit
+// variants (default the live exit, R_none): the charge the Trader stamps on the same trade at its close, 0 while that exit runs.
+export const replayFin = (tr, v = tr && tr.v && tr.v[0], fin = FIN) => !tr || !v || !v.done || !Number.isFinite(v.closed) ? 0
+  : financing({ market: tr.m, side: tr.side, entry: tr.entry, r0: tr.r0, filled: tr.filled, closed: v.closed }, fin).finR;
 // The stream a system is judged on once the owner has made it a paper shadow (blockedBy exactly ['owner-shadow']; the momentum
 // pullback's 6 Nov ['test']): its live trades from before plus the shadow trades the unchanged rule takes after. A trade another
 // rule blocked (weekly, cap, momentum, ...) is not part of it.

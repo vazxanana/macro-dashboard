@@ -736,6 +736,10 @@ financing in the costs, replica mirror gold only (11 Nov 2026)".
   not itself been run as a book. Expect about +6R a year after financing, give or take 15R, with a drawdown near 30R.
 - **To undo.** Ask for a system back: a new owner rule removes its entry from the council's `ownerShadow` setting, and its
   next trade is live again.
+- **Completed the same evening (11 Nov 2026).** The edge-decay and "What to expect" cards are rebuilt every 6 hours, so
+  for up to 6 hours after the decision they still said "8 live systems". The page now follows the decision at once (it
+  reads the council's own setting) and says when a reading is older than the decision. The Academy's texts call its seven
+  edges "the seven systems that were live until 11 Nov 2026"; the Academy itself is unchanged.
 
 ### [x] 38. Overnight financing is counted in the paper costs
 
@@ -754,9 +758,15 @@ financing in the costs, replica mirror gold only (11 Nov 2026)".
   the two, and the page says so.
 - **Limits, said plainly.** Today's rate, not a history of it (the repository has none). Gold buys only: a gold sell is
   credited nothing (the broker would credit a little), and no other market's rate has been measured, so none is charged.
-  Not in the figures of the replica, Mosha BO or the momentum pullback in "What to expect" (their study records do not
-  carry what the sum needs). The 30-day replay of the retired engine's setups and the decay monitor's backtest baselines
-  do not carry it either.
+  The add unit of a trend position is not charged in any backtest (the records do not carry its entry).
+- **Completed the same evening (11 Nov 2026), inside this approval.** The backtests now carry the same charge as the
+  trades: the decay monitor's baselines (Gold trend +1.64R becomes +1.50R a trade, Gold trend fast +1.06R becomes +0.94R,
+  the daily engulf +0.20R becomes +0.14R, the H4 trendline +0.11R becomes +0.07R, the momentum pullback +0.04R becomes
+  +0.03R, Mosha BO -0.06R becomes -0.09R, the replica +0.88R becomes +0.86R; **no system's status changed**), the replay
+  trades the monitor and the edge scoreboard read (no verdict moved), the 30-day replay of the retired engine's setups (a
+  separate column; on a fresh 90-day gold run financing took 3.7R of -101R), and "What to expect" for the replica
+  (-0.05R becomes -0.06R), Mosha BO (+0.14R becomes +0.12R) and the momentum pullback (-0.04R becomes -0.05R).
+  Left as it was on purpose: the Coach's own statistics that can move a live filter do not read the financing column.
 - **To change the rate.** One named constant, `FIN`, with its source and date.
 
 ### [x] 39. The demo mirror stops copying the replica's forex and crypto paper trades
