@@ -73,7 +73,17 @@ jobs:
       - name: Install Chromium (headless shell)
         run: |
           playwright install --only-shell chromium
-          playwright install-deps --dry-run chromium-headless-shell >/dev/null 2>&1 || playwright install-deps chromium-headless-shell
+          # The runner image already carries what the headless shell needs. System packages are installed
+          # only when the browser really does not start (the dry-run check was never true, so every run
+          # fetched font packages, and a package-mirror outage then failed the job before any test ran).
+          try() { node -e "require('playwright').chromium.launch().then((b) => b.close()).catch((e) => { console.error(String(e)); process.exit(1); })"; }
+          if ! try; then
+            for i in 1 2 3; do
+              sudo apt-get update -qq && playwright install-deps chromium-headless-shell && break
+              echo "::warning::browser system packages: try $i failed"; sleep 20
+            done
+            try
+          fi
 
       - name: Build and serve out/
         run: |
