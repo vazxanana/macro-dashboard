@@ -130,3 +130,42 @@ test('gold terminal design pass: 12 px floor and AA tokens, hero, premium chart,
   assert.match(h, /else for \(const c of candles\) if \(c\.time >= prevLast\) series\.update\(c\);/);
   assert.match(h, /if \(!fitted && chart/, 'the view is fitted once, not reset every minute');
 });
+
+// 11 Nov 2026, wording pass: the gold terminal's Research → Edge Lab tab states no win rate, profit factor or "conviction"
+// without a measured source, says near the top that these are rule ideas, and quotes the three studies as their RESULT.md has them.
+test('gold terminal Edge Lab tab: rule ideas, no unsourced figures, study figures as the studies state them', () => {
+  const g = fs.readFileSync(new URL('../gold-trading.html', import.meta.url), 'utf8');
+  const tab = g.slice(g.indexOf('<div id="tab-edges"'), g.indexOf('<!-- end tab-edges -->'));
+  assert.ok(tab.length > 5000);
+  const text = tab.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  // the label near the top, before the first card, with the way to the tested results
+  const note = tab.indexOf('id="edge-lab-note"');
+  assert.ok(note > 0 && note < tab.indexOf('edge-card'), 'the note comes before the cards');
+  assert.match(text, /Rule ideas, not tested edges\./); assert.match(tab, /<a href="\.\/edge-lab\.html">Edge lab page<\/a>/);
+  // what must not come back
+  for (const re of [/\d+\s*%\s*win rate/i, /win rate[^.]{0,20}\d/i, /high conviction|highest conviction|full conviction/i, /historically/i, /profit factor\s*\d/i, /\bPF\s*\d/, /\d:1/, /−0\.85|−0\.73|−0\.25/,
+    /50-year/i, /backtest-validated|most reliable|powerful|holy grail|high-probability|overwhelmingly/i, /why it works/i, /6\/6/, /guarantee/i, /full size/i])
+    assert.ok(!re.test(text), 'the tab still says ' + re);
+  // the same goes for what the tab's script writes into it
+  const js = g.slice(g.indexOf('function edgeConfluence()'), g.indexOf('// ─── PRICE DATA'));
+  for (const re of [/confluence —/i, /full size/, /strongest 4-month/, /Gold outperforms/, /structural tailwind/, /seasonal edge active/i]) assert.ok(!re.test(js), 'the script still writes ' + re);
+  assert.ok(!/dots\[0\] = 'on'/.test(js), 'the COT dot is not lit by the seasonal month');
+  assert.ok(!/pct: SEAS\.includes\(month\)\?'80%'/.test(g), 'the dashboard feed no longer shows 80% for the season');
+  // every figure quoted from a study is in that study's own report
+  const rd = (t) => fs.readFileSync(new URL('../research/edge/' + t + '/RESULT.md', import.meta.url), 'utf8');
+  const cot = rd('cot-positioning'), seas = rd('seasonality'), mg = rd('macro-gold');
+  assert.match(cot, /\| Gold \|.*\| 34 \/ 50% \/ \+0\.15% \(0\.14\) \| 47 \/ 26% \/ −2\.14% \(−3\.1\) \| none \|/);
+  assert.match(text, /right in 50% of 34 cases in sample \(\+0\.15% a case, t 0\.14\) and in 26% of 47 cases out of sample \(−2\.14% a case, t −3\.1\)/);
+  assert.match(seas, /\| H4 \| Gold PM fix 15:00→15:30 London \| short \| 2,471 \| −0\.036 \(−5\.73\) \| 2,741 \| −0\.017 \(−3\.48\) \|/); assert.match(seas, /Gross it is −0\.007% \(A\) and −0\.000% \(B\)/); assert.match(seas, /loses in 20 of 21 years/);
+  assert.match(text, /Before costs −0\.007% a trade in 2006–15 \(2,471 trades\) and −0\.000% in 2016–26 \(2,741 trades\)/); assert.match(text, /After the \$0\.30 spread −0\.036% \(t −5\.73\) and −0\.017% \(t −3\.48\); it lost in 20 of 21 years/);
+  assert.match(mg, /correlates −0\.20 \(2006–17\) and −0\.31 \(2018–26\)/); assert.match(mg, /the correlation is −0\.015 and \+0\.019/);
+  assert.match(mg, /\*\*0\.33 \/ 0\.31\*\* \| \*\*0\.44\*\* \|.*54%, 154 \|/); assert.match(mg, /Confirm 2018 to Nov 2026 \| 0\.68 \/ 0\.67 \| 0\.82 \|.*48%, 103 \|/);
+  assert.match(text, /correlate −0\.20 \(2006–17\) and −0\.31 \(2018 to Nov 2026\)/); assert.match(text, /Sharpe 0\.33 against 0\.44 for simply holding gold in 2006–17 \(154 entries\), 0\.68 against 0\.82 in 2018–26 \(103 entries\)/);
+  for (const t of ['cot-positioning', 'seasonality', 'macro-gold']) assert.ok(tab.includes('./edge-lab.html#' + t), 'links the ' + t + ' study');
+  // the three untested ideas say so, and a "tested" box sits on every card
+  assert.equal((tab.match(/class="edge-rule note edge-tested"/g) || []).length, 6);
+  assert.equal((text.match(/Tested in this repository: no\./g) || []).length, 3);
+  // the rules themselves stay (six cards), and the file stays self-contained
+  assert.equal((tab.match(/class="edge-card"/g) || []).length, 6);
+  assert.ok(!/<script[^>]+src="(?!https:\/\/(cdn\.jsdelivr\.net|unpkg\.com))[^"]*"/.test(tab));
+});
