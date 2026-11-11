@@ -73,7 +73,17 @@ jobs:
       - name: Install Chromium (headless shell)
         run: |
           playwright install --only-shell chromium
-          playwright install-deps --dry-run chromium-headless-shell >/dev/null 2>&1 || playwright install-deps chromium-headless-shell
+          # The runner image already carries what the headless shell needs. System packages are installed
+          # only when the browser really does not start (the dry-run check was never true, so every run
+          # fetched font packages, and a package-mirror outage then failed the job before any test ran).
+          try() { node -e "require('playwright').chromium.launch().then((b) => b.close()).catch((e) => { console.error(String(e)); process.exit(1); })"; }
+          if ! try; then
+            for i in 1 2 3; do
+              sudo apt-get update -qq && playwright install-deps chromium-headless-shell && break
+              echo "::warning::browser system packages: try $i failed"; sleep 20
+            done
+            try
+          fi
 
       - name: Build and serve out/
         run: |
@@ -85,25 +95,32 @@ jobs:
       - name: Page smoke test (every page, 390 px and desktop)
         run: node scripts/audit/smoke.cjs
 
-      # live candles: one retry so a network blip on meridianx.dev does not fail the PR (a retry shows as a warning)
+      # live candles: each candle request is tried three times inside the audit (scripts/audit/shared.cjs); one retry of the whole
+      # audit stays for a longer outage. A retry is never silent: the checks that failed the first time are named as warnings.
       - name: ChronosTrade audit
         env:
           AUDIT_OUT: ${{ runner.temp }}/audit/
         run: |
           mkdir -p "$AUDIT_OUT"
-          node scripts/audit/chronostrade.cjs && exit 0
+          if node scripts/audit/chronostrade.cjs > "$AUDIT_OUT/chronostrade-1.log" 2>&1; then cat "$AUDIT_OUT/chronostrade-1.log"; exit 0; fi
+          cat "$AUDIT_OUT/chronostrade-1.log"
+          grep -E '^(FAIL|ABORTED)' "$AUDIT_OUT/chronostrade-1.log" | head -8 | while IFS= read -r l; do echo "::warning::ChronosTrade audit, first run: $l"; done
           echo "::warning::ChronosTrade audit failed once; retrying (live candles)"
           node scripts/audit/chronostrade.cjs
 
-      # offline: the audit starts its own server (the real API handler on a file store) and reads recorded candles
+      # offline: the audit starts its own servers (the real API handler on a file store) and reads recorded candles.
+      # One retry stays (a full run is many timed browser steps); the checks that failed the first time are named as warnings,
+      # so a check that only passes on the second try is seen and can be traced, not buried.
       - name: Academy audit (the learning loop end to end)
         env:
           AUDIT_OUT: ${{ runner.temp }}/audit/
           ACADEMY_PORT: 8770
         run: |
           mkdir -p "$AUDIT_OUT"
-          node scripts/audit/academy.cjs && exit 0
-          echo "::warning::Academy audit failed once; retrying (a browser timing wait can miss on a busy runner; a real failure fails twice)"
+          if node scripts/audit/academy.cjs > "$AUDIT_OUT/academy-1.log" 2>&1; then cat "$AUDIT_OUT/academy-1.log"; exit 0; fi
+          cat "$AUDIT_OUT/academy-1.log"
+          grep -E '^ *FAIL|crashed' "$AUDIT_OUT/academy-1.log" | head -8 | while IFS= read -r l; do echo "::warning::Academy audit, first run: $l"; done
+          echo "::warning::Academy audit failed once; retrying (a real failure fails twice)"
           node scripts/audit/academy.cjs
 
       - name: Audit screenshots
