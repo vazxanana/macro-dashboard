@@ -78,3 +78,62 @@ test('desk calm pass: one story top to bottom, a staleness stamp, COT says when 
   assert.match(html, /details\.fold > summary \{[^}]*min-height: 44px/, 'folds are 44 px targets');
   assert.doesNotMatch(html, /infinite/, 'no infinite animation on the page');
 });
+
+// Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
+test('desk simple phone view: set before the first paint with the Desk\'s key, phone-only rules, Full view untouched', () => {
+  const head = html.slice(0, html.indexOf('<style>'));
+  assert.match(head, /matchMedia\('\(max-width: 640px\)'\)/, 'decided in the head, before the styles');
+  assert.match(head, /localStorage\.getItem\('ms-phone'\) === 'full'/, 'the same key as the Desk: one choice covers the site');
+  assert.match(head, /R\.dataset\.phone = 'simple'; else delete R\.dataset\.phone/);
+  assert.match(head, /window\.msPhoneView = function/);
+  const css = html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
+  const at = css.indexOf('Simple phone view'), blockAt = css.indexOf('@media (max-width: 640px) {', at);
+  assert.ok(at > 0 && blockAt > at);
+  assert.equal(css.indexOf('data-phone'), css.indexOf('data-phone', at), 'no rule about the phone view before its own block');
+  assert.equal(css.slice(at, blockAt).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[\s\S]*?\*\//, '').trim(), '.ps-sw, .st-go, .g-more { display: none; }', 'outside the phone query the new controls do not exist');
+  // every rule of the block is the switch itself or sits under the attribute, and the block runs to the end of the sheet
+  const block = css.slice(blockAt + '@media (max-width: 640px) {'.length).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(block, /\}\s*\}\s*$/, 'the phone block is the last thing in the sheet');
+  const sels = block.replace(/\}\s*$/, '').split('}').map((r) => r.split('{')[0].trim()).filter(Boolean);
+  assert.ok(sels.length > 30);
+  for (const s of sels) for (const one of s.split(/,(?![^(]*\))/)) assert.ok(/^html\[data-phone="simple"\] /.test(one.trim()) || /\.ps-sw|^\.g-more:focus-visible$/.test(one.trim()), 'phone rule outside the simple view: ' + one);
+  assert.doesNotMatch(block, /\.toc\b/, 'the section chips stay desktop-only');
+  assert.doesNotMatch(block, /animation|transition/, 'no new motion');
+  assert.match(block, /html\[data-phone="simple"\] \.sfold:not\(\.open\) > :not\(\.st-h\) \{ display: none !important; \}/);
+});
+
+test('desk simple phone view: sections 2 to 6 fold to a title and one line, the glance and the detail do not; charts draw on opening', () => {
+  for (const [id, ctl] of [['s-next', 'c-next'], ['s-why', 'c-score c-ins'], ['s-price', 'c-ladder'], ['s-expect', 'c-brief'], ['s-track', 'c-calls c-calib']]) {
+    const m = new RegExp('<section class="story sfold" id="' + id + '"[^>]*>\\s*<header class="st-h">.*?<button type="button" class="st-go" id="go-' + id + '" aria-expanded="false" aria-controls="' + ctl + '" aria-labelledby="[\\w-]+ one-' + id + '"><span class="st-one" id="one-' + id + '"></span></button></header>').exec(html);
+    assert.ok(m, id + ' has its fold button inside the section header');
+    for (const c of ctl.split(' ')) assert.ok(html.includes('id="' + c + '"'));
+  }
+  assert.match(html, /<section class="story" id="s-week"/); assert.match(html, /<section class="story" id="s-deep"/);
+  assert.equal(html.match(/class="story sfold"/g).length, 5);
+  // opening draws the section's charts at the width they have then; switching the view redraws all
+  assert.match(html, /function foldSet\(sx, open\) \{[^\n]*if \(open\) redraw\(sx\); \}/);
+  assert.match(html, /document\.addEventListener\('ms:phone', function \(\) \{ syncSw\(\); redraw\(\); \}\)/);
+  assert.match(html, /function draw\(id, fn\) \{[^\n]*if \(w > 0\) el\.innerHTML = fn\(Math\.max\(260, w\)\); else el\.dataset\.pending = '1'; \}/, 'a folded chart is not drawn at a guessed width');
+  assert.match(html, /syncStory\(\); syncOne\(\);[\s\S]{0,400}delete m\.dataset\.loading;\s*redraw\(\);/, 'the story is shown, then drawn (the blank-chart fix of 11 Nov stays)');
+  // the one line is the open card's own line: copied, never computed
+  const so = /function syncOne\(\) \{[\s\S]*?\n  \}/.exec(html)[0];
+  for (const id of ['nx-take', 'ld-take', 'hyp-take', 'calls-take', 'calib-take', 'sc-top', 'ld-stale']) assert.ok(so.includes("'" + id + "'"), 'takeaway from #' + id);
+  assert.doesNotMatch(so.replace(/'[^']*'/g, ''), /\d/, 'no number of its own');
+  assert.match(so, /stb \? '<b>' \+ esc\(stb\.textContent\) \+ '<\/b> '/, 'a stale level file is said on the folded row too');
+  // the detail stays folded in the simple view whatever was stored; a link into a folded section opens it
+  assert.match(html, /localStorage\.getItem\('mdDeep'\) === '1' && !simple\(\)\) deep\.open = true/);
+  assert.match(html, /window\.addEventListener\('hashchange', openHash\); openHash\(\);/);
+  assert.match(html, /<div class="ps-sw" id="ps-sw" role="group" aria-label="Phone view"><span>Phone view<\/span><span class="ps-sw-b"><button type="button" data-v="simple" aria-pressed="true">Simple<\/button><button type="button" data-v="full" aria-pressed="false">Full<\/button>/);
+});
+
+test('desk simple phone view: the first screen keeps the stale and broken states, and no claim lost its wording', () => {
+  // what the glance hides until "more" is marked gx; the stale notice and the broken-level lines are not
+  assert.match(html, /function lvStale\(L\) \{[^\n]*'<p class="lv-stale" role="status">/);
+  assert.match(html, /<em class="brk">broken since the close<\/em>/);
+  assert.match(html, /'<p class="sub"><em class="brk">Broken since the close:<\/em> '/);
+  assert.match(html, /'<p class="sub">Confidence ' \+ esc\(b\.confidence\)/, 'how sure stays on the first screen');
+  assert.equal(html.match(/class="sub gx"/g).length, 4);
+  assert.match(html, /<p class="g-pub"><b>Public data only\.<\/b><span class="gx"> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully\. No inside information\. <span id="g-cal"><\/span><\/span><\/p>/);
+  assert.match(html, /<p class="stamp" id="stamp" role="status">/);
+  for (const t of ['Descriptive, not a tested edge', 'no tested edge', 'not a tested edge', 'A negative score is not a sell.', 'Paper only.']) assert.ok(html.includes(t), t);
+});
