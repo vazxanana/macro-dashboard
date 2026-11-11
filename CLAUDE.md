@@ -345,6 +345,25 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   it until the replay keeps its own candle archive; not checked on the live feed (not reachable from the build sandbox). A normal
   daily log entry should show `resolved` and `added` only, `corrected` and `removed` only for records closed in the 3 days before
   the previous run. Tests: `tests/desk-ict-stable.test.mjs` (a fake feed whose window and scale differ between runs).
+- **First frozen run, and gold starts where its candles start** (11 Nov 2026, round 2). The run of 13:15 UTC did what was
+  expected: `adopted`, 810 records carried (803 paper), 813 of 817 records byte-identical, the 4 others inside the 3-day window with
+  the same booking, totals unchanged (815 / +124.57R), no log entry. That run's own gold boundary was a third one (9 Mar 00:00, scale
+  1.02986; whole 10-day blocks of old gold hours come and go in the feed's answers), and booked history did not follow it. Changes:
+  (1) before the feed's continuous start only back-fill candles are used: the feed's stray 5m prints there are dropped
+  (`strayM5`); (2) a market's record starts at `recordFrom.<m>` (`from`, `t`, `why`) = the replay start, or later the first candle
+  of its back-fill or, with no back-fill, of the feed's continuous history; derived from the run's candles, never a date in the
+  code, and it never moves later once recorded (also bounded by the previous file's first record that is not `cash`); signals the
+  old stray-built series would have given are counted in `uncovered.<m>` (`before`, `signals`, `strayM5`); (3) carried records
+  from before a market's start leave once, and the log entry names them: `uncovered` (`why`, `recordFrom`, `ids`, `shadow`), the
+  same ids in `removed`. On the 13:15 file that is 11 gold records before 21 Dec 2025 (+7.49R) and 2 RTY records of 27 and 29 May
+  2026 (-2R; RTY has no back-fill and its feed starts 7 Jun): the headline goes from +124.57R to about +119.08R. (4) `SAME_RULES`:
+  a plumbing-only change lists the `ruleCode` it replaces, so its merge is not a rebuild; a rule change never adds one. (5)
+  `frozen.blocked` = signals inside a record of the previous file (never records); `frozen.ignored` = only the rest (the first run
+  counted both: about 100 a market). The desk's status line says "(Gold from <date>, where its candles start)" after "Replay
+  since". Still open: a rebuild cannot recompute what the feed no longer returns (RTY before its feed start is lost on a rebuild),
+  and the candle archive is designed, not built: about 266,000 5m and 28,000 H1 candles, 3.6 MB as gzip JSON (1.9 MB
+  delta-coded), about 0.4 MB of new blobs a day; it needs an additive level shift at each contract switch, which cannot be
+  checked without the live feed.
 
 ## ICT replay: a trigger that does not depend on GitHub's cron (11 Nov 2026, reliability)
 `ict-replay.yml`'s cron is not enough: of its 35 runs up to 11 Nov, one came from the schedule (the then weekly cron, 8 Nov,
