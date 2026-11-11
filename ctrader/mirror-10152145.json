@@ -7411,6 +7411,33 @@
     "volume": 500000,
     "status": "closed at broker",
     "closedAt": "2026-11-11T13:26:12.000Z"
+   },
+   "gbpusd-scalp-1794404226": {
+    "positionId": "48429206",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T13:38:16.000Z",
+    "councilEntry": 1.32992,
+    "stop": 1.33021,
+    "t1": 1.32871,
+    "riskCash": 1.98,
+    "margin": 15.96,
+    "shadow": true,
+    "mark": 1.32992,
+    "levelsFrom": "mark",
+    "fillPrice": 1.32982,
+    "slipR": 0.345,
+    "lagSec": 70,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T13:38:16.000Z",
+    "brokerStop": 1.33011
    }
   },
   "day": {
@@ -7418,7 +7445,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9910.37 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9910.37 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7454,14 +7481,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9910.37,
-  "lastRun": "2026-11-11T13:35:44.000Z"
+  "lastRun": "2026-11-11T13:38:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "placed buy limit USDCHF 0.01 lot at 0.82182 (council scalp, valid to 2026-11-10T16:34Z)",
-   "trade": "usdchf-scalp-1794317682"
-  },
   {
    "at": "2026-11-10T13:36:14.000Z",
    "msg": "limit filled at once: SOLUSD position 48055285 at the broker at 84.121",
@@ -8956,6 +8978,11 @@
    "at": "2026-11-11T13:35:44.000Z",
    "msg": "cancelled USDCAD limit order 33928918 for usdcad-scalp-1794402871: the council ended it: missed",
    "trade": "usdcad-scalp-1794402871"
+  },
+  {
+   "at": "2026-11-11T13:38:16.000Z",
+   "msg": "opened sell GBPUSD 0.06 lot (council scalp)",
+   "trade": "gbpusd-scalp-1794404226"
   }
  ],
  "limits": {
@@ -9034,11 +9061,11 @@
   ]
  },
  "execution": {
-  "n": 250,
-  "meanSlipR": -0.008,
+  "n": 251,
+  "meanSlipR": -0.007,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 160,
+  "medianLagSec": 159,
   "bySymbol": {
    "SOLUSD": {
     "n": 18,
@@ -9057,8 +9084,8 @@
     "meanSlipR": -0.021
    },
    "GBPUSD": {
-    "n": 34,
-    "meanSlipR": 0.013
+    "n": 35,
+    "meanSlipR": 0.022
    },
    "USDCAD": {
     "n": 34,
