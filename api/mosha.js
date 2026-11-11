@@ -13,11 +13,15 @@
 const S = require('./_session.js');
 const KEEP = 500, MIN_T = Date.UTC(2020, 0, 1) / 1000;
 const MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100'], HOW = ['cf', 'zone', 'retest', 'other'], TF = ['M1', 'M5', 'M15', 'M30', 'H1'], H4 = ['with', 'against', ''];
+// Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the file is overwritten in place, and the CDN serves an overwritten
+// file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
+// what was stored in between (11 Nov 2026, the Academy store's bug; same fix).
+const fresh = (url) => { const u = new URL(url); u.searchParams.set('cache', '0'); return u.toString(); };
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'mosha/trades.json';
   return {
     async get() { const { blobs } = await B().list({ prefix: P, token }); const b = blobs.find((x) => x.pathname === P); if (!b) return [];
-      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`mosha log read ${r.status}`); const j = await r.json(); return Array.isArray(j) ? j : []; },   // a failed read never looks empty (a save would overwrite the log)
+      const r = await F(fresh(b.url), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`mosha log read ${r.status}`); const j = await r.json(); return Array.isArray(j) ? j : []; },   // a failed read never looks empty (a save would overwrite the log)
     async put(list) { await B().put(P, JSON.stringify(list), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }

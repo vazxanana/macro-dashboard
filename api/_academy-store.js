@@ -11,8 +11,11 @@
 //   - Row files ({ v, archives, rows }) have a size cap. Past the cap the oldest rows move to <name>-archive-<n>.json (written
 //     before the trimmed file), they are never dropped.
 //   - memoryStore() and fileStore(dir) are the same API over a Map / a folder, for tests and local runs.
-// Limit, stated honestly: the queue is per function instance. Two instances writing the same file in the same second can still
-// lose one of the writes (the Blob store has no compare-and-swap here), so the page sends its writes one at a time.
+// Limit, stated honestly: the queue is per function instance. Two instances that both read a file and then both write it within
+// the same few milliseconds can still lose one of the writes, so the page sends its writes one at a time. Reads ask the origin
+// (see blobBackend), which closes the minute-long window; what is left is the gap between a read and its write. The Blob client
+// has a conditional write (`ifMatch` with the listed ETag) that would close that too; it is NOT used yet because it could not be
+// tried against the real service from the build sandbox, and a wrong ETag form would refuse every save.
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
@@ -130,7 +133,10 @@ function blobBackend(env, io = {}) {
     async read(k) {
       const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); if (!b) return undefined;
       const mine = recent.get(P), up = b.uploadedAt ? new Date(b.uploadedAt).getTime() : NaN;
-      if (mine && now() - mine.at < RECENT_MS && !(up > mine.at + 1500)) return JSON.parse(mine.json);
+      // Its own copy only while the file in the store is still the one it wrote: by the ETag the write returned when the service
+      // gives one (exact), else by the upload time. The time rule alone let a write by ANOTHER instance within 1.5 s of this
+      // one's go unseen for a minute, and this instance's next write then dropped it (11 Nov 2026).
+      if (mine && now() - mine.at < RECENT_MS && (mine.etag && b.etag ? b.etag === mine.etag : !(up > mine.at + 1500))) return JSON.parse(mine.json);
       const u = new URL(b.url); u.searchParams.set('cache', '0');
       const r = await F(u.toString(), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
       if (!r.ok) throw new Error(`blob read ${r.status}`);   // a failed read never looks empty
@@ -138,8 +144,8 @@ function blobBackend(env, io = {}) {
     },
     async write(k, v) {
       const P = ROOT + k, json = JSON.stringify(v);
-      await B().put(P, json, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token });
-      recent.set(P, { json, at: now() }); if (recent.size > 200) recent.delete(recent.keys().next().value);
+      const done = await B().put(P, json, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token });
+      recent.set(P, { json, at: now(), etag: (done && done.etag) || null }); if (recent.size > 200) recent.delete(recent.keys().next().value);
     },
     // only ever a file this same step created a moment ago (the undo of a write step that failed half way)
     async remove(k) { const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); recent.delete(P); if (b) await B().del(b.url, { token }); },
