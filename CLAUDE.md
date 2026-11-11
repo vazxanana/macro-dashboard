@@ -1638,6 +1638,33 @@ with an `MCP_KEYS` entry the stored user list was not read before `ictLevel`, so
 built-in ICT level whatever the Users page said; the list is read first for every key (an explicit key is still a grant while
 the list cannot be read). The same file re-checks: a foreign Origin on every state-changing endpoint, `/cdata` path handling,
 the Mosha assistant's key against every other endpoint, who teaches, who writes whose record, where `ictApply` can come from.
+Blob freshness audit (11 Nov 2026, after the Academy lost a verdict to a stale read; `tests/blob-fresh.test.mjs`, lagging fake
+Blob service `tests/fixtures/blob-lag.mjs`). The Blob CDN serves a file that was OVERWRITTEN IN PLACE with its old bytes for
+up to a minute; a read with `?cache=0` asks the origin. Every reader / writer under `api/` was read:
+- **Overwritten in place, read through the CDN until now** (old data on another instance, and its next save dropped what was
+  stored in between): `notify.js` (notices/list.json), `profile.js` (profiles/<key>.json), `sounds.js` (sounds/config.json),
+  `mosha.js` (mosha/trades.json), `mosha-lessons.js` (mosha/lessons.json, mosha/book.json). Each store now reads through
+  `fresh(url)` (`?cache=0`), as `_academy-store.js` does. A lesson's picture is written once under its own name and may come
+  from the CDN. **Rule: a module that writes with `allowOverwrite: true` reads with `cache=0`** (a test lists the six files).
+- **Not affected, a new file name per save** (`addRandomSuffix: true`: a new URL, no CDN copy can exist; the reader takes the
+  newest from the listing): the user list (`users.js` writes, `_accounts.js` `blobUsers` reads: sign-in, `/api/me`, profile,
+  users, ctrader-link, the connectors), price alerts (`_alerts.js`), cTrader link tokens, TradingView alerts, run reports, the
+  bridge ping. So a changed password, a removed member or a removed permission is never honoured from a stale Blob read.
+- **What does lag by design**: `S.fromRequest(…, { cacheMs: 60e3 })` keeps the user list a minute per instance (and up to 10
+  minutes while the list cannot be read) for READS on `/cdata`, notifications, the Mosha log and lessons. The one WRITE path
+  that used it, a teacher's POST to `/api/mosha-lessons`, now checks the list as it is (a removed account, a new password or
+  teaching switched off is refused on the next call); `handle` takes `d.deps` for tests.
+- **Two small guards where real time passes between a read and its write** (not locks): `mosha-lessons.js` reads the list again
+  after a picture upload (a lesson stored meanwhile is kept; a lesson removed meanwhile answers 404 and the picture is taken
+  away); `alert-cron.js` reads a device's record again before saving it after the candles and pushes (an alert the device
+  added meanwhile is kept, a device that removed itself is not written back).
+- **Academy store**: its "own copy for a minute" shortcut is now used only while the listed ETag is the one its write returned
+  (the upload-time rule, the fallback, let a write by another instance within 1.5 s go unseen for a minute and be dropped).
+- **Still open, everywhere a file is overwritten in place**: two instances that both read and both write inside the same few
+  milliseconds can lose one write (single-writer in practice: the owner, one teacher, one page at a time). The Blob client
+  (2.8.2) has a conditional write (`put(…, { ifMatch: <listed etag> })`); it is not used because it could not be tried against
+  the real service from the build sandbox and a wrong ETag form would refuse every save. Try it on a preview deployment first.
+- Not verified against the real Blob service: that `cache=0` reads are read-your-writes, and that the listing is.
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
