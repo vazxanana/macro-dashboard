@@ -1,0 +1,2857 @@
+{
+ "built": "2026-11-11",
+ "prereg": "research/edge/supported-book/PREREGISTRATION.md",
+ "rule": "paper research only: no live rule, size, filter, stop or config changes",
+ "costs": {
+  "roundTrip": 0.3,
+  "financingRate": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
+  "risk": 0.0025
+ },
+ "gate": {
+  "reference": 813,
+  "mine": 813,
+  "mismatched": 0,
+  "ok": true
+ },
+ "books": {
+  "S2": [
+   "gtrend",
+   "geg"
+  ],
+  "S3": [
+   "gtrend",
+   "geg",
+   "gtrend5"
+  ]
+ },
+ "windows": {
+  "W1": {
+   "label": "untouched 2006-07 to 2017-12",
+   "from": "2006-07-01",
+   "to": "2017-12-31",
+   "S2": {
+    "x1F1": {
+     "positions": 330,
+     "units": 364,
+     "total": 59.3,
+     "perYear": 5.16,
+     "years": 11.5,
+     "perPosition": 0.18,
+     "tPosition": 1.89,
+     "tDaily": 1.86,
+     "tMonthly": 1.65,
+     "days": 3000,
+     "maxDD": 19.8,
+     "ddDays": 988,
+     "ddRegained": false,
+     "ddFrom": "2014-03-18",
+     "ddTo": "2015-09-30",
+     "longestUnder": 988,
+     "retDD": 2.99,
+     "worstYear": {
+      "year": "2013",
+      "R": -8.1
+     },
+     "posYears": "6/12",
+     "posMonths": 0.4,
+     "byYear": {
+      "2006": -2.8,
+      "2007": 13.8,
+      "2008": -4.4,
+      "2009": 6.4,
+      "2010": 23.9,
+      "2011": 18.4,
+      "2012": 9.6,
+      "2013": -8.1,
+      "2014": -2.5,
+      "2015": -2,
+      "2016": 12.2,
+      "2017": -5.2
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 55.3,
+       "tDaily": 2.14,
+       "maxDD": 13.7
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 4,
+       "tDaily": 0.22,
+       "maxDD": 19.8
+      }
+     ],
+     "financing": 20.5,
+     "financingPerYear": 1.78,
+     "cost": 10.6,
+     "gross": 90.4,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 23.1,
+       "perPosition": 0.313,
+       "tPosition": 1.2,
+       "tDaily": 1.2,
+       "maxDD": 5.6,
+       "financing": 9.1
+      },
+      "geg": {
+       "positions": 256,
+       "total": 36.2,
+       "perPosition": 0.141,
+       "tPosition": 1.46,
+       "tDaily": 1.44,
+       "maxDD": 16.5,
+       "financing": 11.4
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.21
+      }
+     },
+     "marked": {
+      "maxDD": 22.1,
+      "ddDays": 990,
+      "ddRegained": false,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 990,
+      "retDD": 2.68
+     },
+     "inMarket": {
+      "share": 0.368,
+      "meanUnits": 0.56,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201
+      },
+      "all": 0.081
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": 0.3,
+      "mid": 4.9,
+      "hi": 10.3,
+      "pGt0": 0.959
+     },
+     "retDD": {
+      "lo": 0.12,
+      "mid": 2.89,
+      "hi": 8.88
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 1.29,
+     "pctLo": 0.08,
+     "pctHi": 2.57,
+     "ddPct": 4.95,
+     "ddMarkedPct": 5.53
+    },
+    "x1Fh": {
+     "positions": 330,
+     "units": 364,
+     "total": 69.6,
+     "perYear": 6.05,
+     "years": 11.5,
+     "perPosition": 0.211,
+     "tPosition": 2.19,
+     "tDaily": 2.15,
+     "tMonthly": 1.9,
+     "days": 3000,
+     "maxDD": 18.9,
+     "ddDays": 769,
+     "ddRegained": true,
+     "ddFrom": "2014-03-18",
+     "ddTo": "2015-09-30",
+     "longestUnder": 768,
+     "retDD": 3.68,
+     "worstYear": {
+      "year": "2013",
+      "R": -7.5
+     },
+     "posYears": "6/12",
+     "posMonths": 0.41,
+     "byYear": {
+      "2006": -2.5,
+      "2007": 15.1,
+      "2008": -3.8,
+      "2009": 7.4,
+      "2010": 25,
+      "2011": 19.6,
+      "2012": 10.5,
+      "2013": -7.5,
+      "2014": -1.5,
+      "2015": -1.4,
+      "2016": 12.7,
+      "2017": -4.1
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 60.9,
+       "tDaily": 2.32,
+       "maxDD": 12.9
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 8.7,
+       "tDaily": 0.46,
+       "maxDD": 18.9
+      }
+     ],
+     "financing": 10.3,
+     "financingPerYear": 0.89,
+     "cost": 10.6,
+     "gross": 90.4,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 27.7,
+       "perPosition": 0.374,
+       "tPosition": 1.4,
+       "tDaily": 1.39,
+       "maxDD": 5.5,
+       "financing": 4.6
+      },
+      "geg": {
+       "positions": 256,
+       "total": 41.9,
+       "perPosition": 0.164,
+       "tPosition": 1.68,
+       "tDaily": 1.65,
+       "maxDD": 15.8,
+       "financing": 5.7
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.22
+      }
+     },
+     "marked": {
+      "maxDD": 21,
+      "ddDays": 742,
+      "ddRegained": true,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 741,
+      "retDD": 3.32
+     },
+     "inMarket": {
+      "share": 0.368,
+      "meanUnits": 0.56,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201
+      },
+      "all": 0.081
+     }
+    },
+    "x1F0": {
+     "positions": 330,
+     "units": 364,
+     "total": 79.8,
+     "perYear": 6.94,
+     "years": 11.5,
+     "perPosition": 0.242,
+     "tPosition": 2.47,
+     "tDaily": 2.43,
+     "tMonthly": 2.14,
+     "days": 3000,
+     "maxDD": 18,
+     "ddDays": 687,
+     "ddRegained": true,
+     "ddFrom": "2014-03-18",
+     "ddTo": "2015-09-30",
+     "longestUnder": 686,
+     "retDD": 4.45,
+     "worstYear": {
+      "year": "2013",
+      "R": -6.8
+     },
+     "posYears": "6/12",
+     "posMonths": 0.42,
+     "byYear": {
+      "2006": -2.2,
+      "2007": 16.4,
+      "2008": -3.3,
+      "2009": 8.4,
+      "2010": 26.2,
+      "2011": 20.8,
+      "2012": 11.5,
+      "2013": -6.8,
+      "2014": -0.6,
+      "2015": -0.8,
+      "2016": 13.3,
+      "2017": -3.1
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 66.4,
+       "tDaily": 2.49,
+       "maxDD": 12.1
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 13.4,
+       "tDaily": 0.71,
+       "maxDD": 18
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 10.6,
+     "gross": 90.4,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 32.3,
+       "perPosition": 0.436,
+       "tPosition": 1.59,
+       "tDaily": 1.58,
+       "maxDD": 5.4,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 256,
+       "total": 47.6,
+       "perPosition": 0.186,
+       "tPosition": 1.89,
+       "tDaily": 1.86,
+       "maxDD": 15.2,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0,
+       "monthly": 0.23
+      }
+     },
+     "marked": {
+      "maxDD": 19.9,
+      "ddDays": 741,
+      "ddRegained": true,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 740,
+      "retDD": 4.02
+     },
+     "inMarket": {
+      "share": 0.368,
+      "meanUnits": 0.56,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201
+      },
+      "all": 0.081
+     }
+    },
+    "x2F1": {
+     "positions": 330,
+     "units": 364,
+     "total": 48.7,
+     "perYear": 4.23,
+     "years": 11.5,
+     "perPosition": 0.148,
+     "tPosition": 1.55,
+     "tDaily": 1.53,
+     "tMonthly": 1.36,
+     "days": 3000,
+     "maxDD": 21.3,
+     "ddDays": 988,
+     "ddRegained": false,
+     "ddFrom": "2014-03-18",
+     "ddTo": "2015-09-30",
+     "longestUnder": 988,
+     "retDD": 2.29,
+     "worstYear": {
+      "year": "2013",
+      "R": -8.9
+     },
+     "posYears": "6/12",
+     "posMonths": 0.39,
+     "byYear": {
+      "2006": -3.4,
+      "2007": 12.1,
+      "2008": -4.9,
+      "2009": 5.4,
+      "2010": 22.6,
+      "2011": 17.8,
+      "2012": 9.1,
+      "2013": -8.9,
+      "2014": -3.7,
+      "2015": -3.1,
+      "2016": 11.6,
+      "2017": -6
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 49.6,
+       "tDaily": 1.93,
+       "maxDD": 14.6
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": -0.9,
+       "tDaily": -0.05,
+       "maxDD": 21.3
+      }
+     ],
+     "financing": 20.5,
+     "financingPerYear": 1.78,
+     "cost": 21.2,
+     "gross": 90.4,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 21.9,
+       "perPosition": 0.296,
+       "tPosition": 1.14,
+       "tDaily": 1.14,
+       "maxDD": 5.7,
+       "financing": 9.1
+      },
+      "geg": {
+       "positions": 256,
+       "total": 26.8,
+       "perPosition": 0.105,
+       "tPosition": 1.08,
+       "tDaily": 1.07,
+       "maxDD": 17.8,
+       "financing": 11.4
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.21
+      }
+     },
+     "marked": {
+      "maxDD": 23.6,
+      "ddDays": 990,
+      "ddRegained": false,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 990,
+      "retDD": 2.06
+     },
+     "inMarket": {
+      "share": 0.368,
+      "meanUnits": 0.56,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201
+      },
+      "all": 0.081
+     }
+    }
+   },
+   "S3": {
+    "x1F1": {
+     "positions": 458,
+     "units": 543,
+     "total": 86.4,
+     "perYear": 7.51,
+     "years": 11.5,
+     "perPosition": 0.189,
+     "tPosition": 2.22,
+     "tDaily": 1.77,
+     "tMonthly": 1.57,
+     "days": 3000,
+     "maxDD": 29.5,
+     "ddDays": 1365,
+     "ddRegained": false,
+     "ddFrom": "2012-10-05",
+     "ddTo": "2015-09-30",
+     "longestUnder": 1365,
+     "retDD": 2.93,
+     "worstYear": {
+      "year": "2013",
+      "R": -15.4
+     },
+     "posYears": "7/12",
+     "posMonths": 0.38,
+     "byYear": {
+      "2006": -5.9,
+      "2007": 21.4,
+      "2008": -3,
+      "2009": 12.8,
+      "2010": 26.5,
+      "2011": 32.4,
+      "2012": 13.7,
+      "2013": -15.4,
+      "2014": -5.1,
+      "2015": -4,
+      "2016": 13,
+      "2017": 0
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 84.1,
+       "tDaily": 2.01,
+       "maxDD": 15.9
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 2.2,
+       "tDaily": 0.09,
+       "maxDD": 29.5
+      }
+     ],
+     "financing": 35.4,
+     "financingPerYear": 3.08,
+     "cost": 12.5,
+     "gross": 134.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 23.1,
+       "perPosition": 0.313,
+       "tPosition": 1.2,
+       "tDaily": 1.2,
+       "maxDD": 5.6,
+       "financing": 9.1
+      },
+      "geg": {
+       "positions": 256,
+       "total": 36.2,
+       "perPosition": 0.141,
+       "tPosition": 1.46,
+       "tDaily": 1.44,
+       "maxDD": 16.5,
+       "financing": 11.4
+      },
+      "gtrend5": {
+       "positions": 128,
+       "total": 27,
+       "perPosition": 0.211,
+       "tPosition": 1.17,
+       "tDaily": 1.17,
+       "maxDD": 13.9,
+       "financing": 14.8
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.21
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.91,
+       "monthly": 0.91
+      },
+      "geg~gtrend5": {
+       "daily": 0.01,
+       "monthly": 0.26
+      }
+     },
+     "marked": {
+      "maxDD": 31.9,
+      "ddDays": 1375,
+      "ddRegained": false,
+      "ddFrom": "2012-09-21",
+      "ddTo": "2015-09-30",
+      "longestUnder": 1375,
+      "retDD": 2.7
+     },
+     "inMarket": {
+      "share": 0.509,
+      "meanUnits": 1.17,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201,
+       "gtrend5": 0.445
+      },
+      "all": 0.081
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": -0.1,
+      "mid": 7.1,
+      "hi": 15.4,
+      "pGt0": 0.944
+     },
+     "retDD": {
+      "lo": -0.04,
+      "mid": 3.05,
+      "hi": 9.33
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 1.88,
+     "pctLo": -0.03,
+     "pctHi": 3.85,
+     "ddPct": 7.38,
+     "ddMarkedPct": 7.98
+    },
+    "x1Fh": {
+     "positions": 458,
+     "units": 543,
+     "total": 104,
+     "perYear": 9.04,
+     "years": 11.5,
+     "perPosition": 0.227,
+     "tPosition": 2.63,
+     "tDaily": 2.09,
+     "tMonthly": 1.84,
+     "days": 3000,
+     "maxDD": 25.8,
+     "ddDays": 1277,
+     "ddRegained": true,
+     "ddFrom": "2012-10-05",
+     "ddTo": "2015-09-30",
+     "longestUnder": 1276,
+     "retDD": 4.04,
+     "worstYear": {
+      "year": "2013",
+      "R": -14.4
+     },
+     "posYears": "7/12",
+     "posMonths": 0.41,
+     "byYear": {
+      "2006": -5.4,
+      "2007": 23.6,
+      "2008": -2,
+      "2009": 14.5,
+      "2010": 28.5,
+      "2011": 34.4,
+      "2012": 15.3,
+      "2013": -14.4,
+      "2014": -3.5,
+      "2015": -2.9,
+      "2016": 14,
+      "2017": 2.1
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 93.5,
+       "tDaily": 2.19,
+       "maxDD": 14.6
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 10.5,
+       "tDaily": 0.41,
+       "maxDD": 25.8
+      }
+     ],
+     "financing": 17.7,
+     "financingPerYear": 1.54,
+     "cost": 12.5,
+     "gross": 134.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 27.7,
+       "perPosition": 0.374,
+       "tPosition": 1.4,
+       "tDaily": 1.39,
+       "maxDD": 5.5,
+       "financing": 4.6
+      },
+      "geg": {
+       "positions": 256,
+       "total": 41.9,
+       "perPosition": 0.164,
+       "tPosition": 1.68,
+       "tDaily": 1.65,
+       "maxDD": 15.8,
+       "financing": 5.7
+      },
+      "gtrend5": {
+       "positions": 128,
+       "total": 34.5,
+       "perPosition": 0.269,
+       "tPosition": 1.46,
+       "tDaily": 1.45,
+       "maxDD": 12.3,
+       "financing": 7.4
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.22
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.92,
+       "monthly": 0.91
+      },
+      "geg~gtrend5": {
+       "daily": 0.01,
+       "monthly": 0.26
+      }
+     },
+     "marked": {
+      "maxDD": 28.7,
+      "ddDays": 909,
+      "ddRegained": true,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 908,
+      "retDD": 3.62
+     },
+     "inMarket": {
+      "share": 0.509,
+      "meanUnits": 1.17,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201,
+       "gtrend5": 0.445
+      },
+      "all": 0.081
+     }
+    },
+    "x1F0": {
+     "positions": 458,
+     "units": 543,
+     "total": 121.7,
+     "perYear": 10.58,
+     "years": 11.5,
+     "perPosition": 0.266,
+     "tPosition": 3.01,
+     "tDaily": 2.39,
+     "tMonthly": 2.11,
+     "days": 3000,
+     "maxDD": 22.9,
+     "ddDays": 772,
+     "ddRegained": true,
+     "ddFrom": "2014-03-18",
+     "ddTo": "2015-09-30",
+     "longestUnder": 771,
+     "retDD": 5.32,
+     "worstYear": {
+      "year": "2013",
+      "R": -13.4
+     },
+     "posYears": "7/12",
+     "posMonths": 0.42,
+     "byYear": {
+      "2006": -5,
+      "2007": 25.8,
+      "2008": -1,
+      "2009": 16.2,
+      "2010": 30.5,
+      "2011": 36.4,
+      "2012": 16.8,
+      "2013": -13.4,
+      "2014": -1.9,
+      "2015": -1.8,
+      "2016": 14.9,
+      "2017": 4.2
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 102.9,
+       "tDaily": 2.35,
+       "maxDD": 14.1
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": 18.8,
+       "tDaily": 0.72,
+       "maxDD": 22.9
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 12.5,
+     "gross": 134.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 32.3,
+       "perPosition": 0.436,
+       "tPosition": 1.59,
+       "tDaily": 1.58,
+       "maxDD": 5.4,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 256,
+       "total": 47.6,
+       "perPosition": 0.186,
+       "tPosition": 1.89,
+       "tDaily": 1.86,
+       "maxDD": 15.2,
+       "financing": 0
+      },
+      "gtrend5": {
+       "positions": 128,
+       "total": 41.9,
+       "perPosition": 0.327,
+       "tPosition": 1.72,
+       "tDaily": 1.71,
+       "maxDD": 10.7,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0,
+       "monthly": 0.23
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.92,
+       "monthly": 0.92
+      },
+      "geg~gtrend5": {
+       "daily": 0,
+       "monthly": 0.26
+      }
+     },
+     "marked": {
+      "maxDD": 26.7,
+      "ddDays": 842,
+      "ddRegained": true,
+      "ddFrom": "2014-03-14",
+      "ddTo": "2015-09-30",
+      "longestUnder": 841,
+      "retDD": 4.56
+     },
+     "inMarket": {
+      "share": 0.509,
+      "meanUnits": 1.17,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201,
+       "gtrend5": 0.445
+      },
+      "all": 0.081
+     }
+    },
+    "x2F1": {
+     "positions": 458,
+     "units": 543,
+     "total": 73.8,
+     "perYear": 6.42,
+     "years": 11.5,
+     "perPosition": 0.161,
+     "tPosition": 1.9,
+     "tDaily": 1.52,
+     "tMonthly": 1.34,
+     "days": 3000,
+     "maxDD": 32.5,
+     "ddDays": 1365,
+     "ddRegained": false,
+     "ddFrom": "2012-10-05",
+     "ddTo": "2015-09-30",
+     "longestUnder": 1365,
+     "retDD": 2.27,
+     "worstYear": {
+      "year": "2013",
+      "R": -16.3
+     },
+     "posYears": "6/12",
+     "posMonths": 0.37,
+     "byYear": {
+      "2006": -6.7,
+      "2007": 19.4,
+      "2008": -3.7,
+      "2009": 11.6,
+      "2010": 25.1,
+      "2011": 31.5,
+      "2012": 13.1,
+      "2013": -16.3,
+      "2014": -6.4,
+      "2015": -5.1,
+      "2016": 12.2,
+      "2017": -1
+     },
+     "halves": [
+      {
+       "from": "2006-07-01",
+       "to": "2011-12-31",
+       "total": 77.3,
+       "tDaily": 1.86,
+       "maxDD": 17
+      },
+      {
+       "from": "2012-01-01",
+       "to": "2017-12-31",
+       "total": -3.5,
+       "tDaily": -0.14,
+       "maxDD": 32.5
+      }
+     ],
+     "financing": 35.4,
+     "financingPerYear": 3.08,
+     "cost": 25,
+     "gross": 134.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 74,
+       "total": 21.9,
+       "perPosition": 0.296,
+       "tPosition": 1.14,
+       "tDaily": 1.14,
+       "maxDD": 5.7,
+       "financing": 9.1
+      },
+      "geg": {
+       "positions": 256,
+       "total": 26.8,
+       "perPosition": 0.105,
+       "tPosition": 1.08,
+       "tDaily": 1.07,
+       "maxDD": 17.8,
+       "financing": 11.4
+      },
+      "gtrend5": {
+       "positions": 128,
+       "total": 25.1,
+       "perPosition": 0.196,
+       "tPosition": 1.09,
+       "tDaily": 1.09,
+       "maxDD": 14.3,
+       "financing": 14.8
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": 0.01,
+       "monthly": 0.21
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.91,
+       "monthly": 0.91
+      },
+      "geg~gtrend5": {
+       "daily": 0.01,
+       "monthly": 0.26
+      }
+     },
+     "marked": {
+      "maxDD": 35.1,
+      "ddDays": 1375,
+      "ddRegained": false,
+      "ddFrom": "2012-09-21",
+      "ddTo": "2015-09-30",
+      "longestUnder": 1375,
+      "retDD": 2.11
+     },
+     "inMarket": {
+      "share": 0.509,
+      "meanUnits": 1.17,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.248,
+       "geg": 0.201,
+       "gtrend5": 0.445
+      },
+      "all": 0.081
+     }
+    }
+   }
+  },
+  "W2": {
+   "label": "built on, 2018-01 to 2026-10",
+   "from": "2018-01-01",
+   "to": "2026-10-31",
+   "S2": {
+    "x1F1": {
+     "positions": 255,
+     "units": 284,
+     "total": 118.1,
+     "perYear": 13.37,
+     "years": 8.83,
+     "perPosition": 0.463,
+     "tPosition": 3.01,
+     "tDaily": 2.99,
+     "tMonthly": 3.04,
+     "days": 2305,
+     "maxDD": 11.3,
+     "ddDays": 321,
+     "ddRegained": true,
+     "ddFrom": "2018-03-27",
+     "ddTo": "2019-01-21",
+     "longestUnder": 320,
+     "retDD": 10.42,
+     "worstYear": {
+      "year": "2018",
+      "R": -5
+     },
+     "posYears": "7/9",
+     "posMonths": 0.47,
+     "byYear": {
+      "2018": -5,
+      "2019": 20.1,
+      "2020": 21.7,
+      "2021": 10.8,
+      "2022": -3.5,
+      "2023": 14.1,
+      "2024": 17.3,
+      "2025": 39.1,
+      "2026": 3.5
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 47.4,
+       "tDaily": 2.05,
+       "maxDD": 11.3
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 70.7,
+       "tDaily": 2.2,
+       "maxDD": 5.8
+      }
+     ],
+     "financing": 19.1,
+     "financingPerYear": 2.17,
+     "cost": 7,
+     "gross": 144.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 72.4,
+       "perPosition": 1.207,
+       "tPosition": 2.38,
+       "tDaily": 2.3,
+       "maxDD": 4.2,
+       "financing": 10.8
+      },
+      "geg": {
+       "positions": 195,
+       "total": 45.7,
+       "perPosition": 0.234,
+       "tPosition": 1.89,
+       "tDaily": 1.87,
+       "maxDD": 10,
+       "financing": 8.3
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      }
+     },
+     "marked": {
+      "maxDD": 13.7,
+      "ddDays": 357,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 356,
+      "retDD": 8.63
+     },
+     "inMarket": {
+      "share": 0.393,
+      "meanUnits": 0.64,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187
+      },
+      "all": 0.081
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": 6.4,
+      "mid": 13.3,
+      "hi": 20.9,
+      "pGt0": 1
+     },
+     "retDD": {
+      "lo": 2.97,
+      "mid": 9.23,
+      "hi": 20.51
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 3.34,
+     "pctLo": 1.6,
+     "pctHi": 5.22,
+     "ddPct": 2.83,
+     "ddMarkedPct": 3.42
+    },
+    "x1Fh": {
+     "positions": 255,
+     "units": 284,
+     "total": 127.7,
+     "perYear": 14.45,
+     "years": 8.83,
+     "perPosition": 0.501,
+     "tPosition": 3.19,
+     "tDaily": 3.17,
+     "tMonthly": 3.23,
+     "days": 2305,
+     "maxDD": 10.8,
+     "ddDays": 309,
+     "ddRegained": true,
+     "ddFrom": "2018-03-27",
+     "ddTo": "2018-11-20",
+     "longestUnder": 308,
+     "retDD": 11.8,
+     "worstYear": {
+      "year": "2018",
+      "R": -3.9
+     },
+     "posYears": "7/9",
+     "posMonths": 0.48,
+     "byYear": {
+      "2018": -3.9,
+      "2019": 22,
+      "2020": 22.5,
+      "2021": 11.8,
+      "2022": -2.6,
+      "2023": 15,
+      "2024": 18.5,
+      "2025": 40.5,
+      "2026": 3.8
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 52.7,
+       "tDaily": 2.23,
+       "maxDD": 10.8
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 75,
+       "tDaily": 2.3,
+       "maxDD": 5.6
+      }
+     ],
+     "financing": 9.6,
+     "financingPerYear": 1.08,
+     "cost": 7,
+     "gross": 144.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 77.8,
+       "perPosition": 1.297,
+       "tPosition": 2.5,
+       "tDaily": 2.4,
+       "maxDD": 4,
+       "financing": 5.4
+      },
+      "geg": {
+       "positions": 195,
+       "total": 49.8,
+       "perPosition": 0.256,
+       "tPosition": 2.05,
+       "tDaily": 2.03,
+       "maxDD": 9.4,
+       "financing": 4.1
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      }
+     },
+     "marked": {
+      "maxDD": 12.7,
+      "ddDays": 353,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 352,
+      "retDD": 10.04
+     },
+     "inMarket": {
+      "share": 0.393,
+      "meanUnits": 0.64,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187
+      },
+      "all": 0.081
+     }
+    },
+    "x1F0": {
+     "positions": 255,
+     "units": 284,
+     "total": 137.2,
+     "perYear": 15.54,
+     "years": 8.83,
+     "perPosition": 0.538,
+     "tPosition": 3.37,
+     "tDaily": 3.34,
+     "tMonthly": 3.41,
+     "days": 2305,
+     "maxDD": 10.3,
+     "ddDays": 257,
+     "ddRegained": true,
+     "ddFrom": "2018-03-27",
+     "ddTo": "2018-11-20",
+     "longestUnder": 278,
+     "retDD": 13.32,
+     "worstYear": {
+      "year": "2018",
+      "R": -2.9
+     },
+     "posYears": "7/9",
+     "posMonths": 0.48,
+     "byYear": {
+      "2018": -2.9,
+      "2019": 24,
+      "2020": 23.3,
+      "2021": 12.9,
+      "2022": -1.7,
+      "2023": 15.9,
+      "2024": 19.8,
+      "2025": 41.9,
+      "2026": 4.1
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 58,
+       "tDaily": 2.39,
+       "maxDD": 10.3
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 79.3,
+       "tDaily": 2.39,
+       "maxDD": 5.3
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 7,
+     "gross": 144.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 83.2,
+       "perPosition": 1.387,
+       "tPosition": 2.61,
+       "tDaily": 2.5,
+       "maxDD": 3.8,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 195,
+       "total": 54,
+       "perPosition": 0.277,
+       "tPosition": 2.21,
+       "tDaily": 2.18,
+       "maxDD": 9.1,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      }
+     },
+     "marked": {
+      "maxDD": 11.7,
+      "ddDays": 352,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 351,
+      "retDD": 11.7
+     },
+     "inMarket": {
+      "share": 0.393,
+      "meanUnits": 0.64,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187
+      },
+      "all": 0.081
+     }
+    },
+    "x2F1": {
+     "positions": 255,
+     "units": 284,
+     "total": 111,
+     "perYear": 12.57,
+     "years": 8.83,
+     "perPosition": 0.435,
+     "tPosition": 2.83,
+     "tDaily": 2.81,
+     "tMonthly": 2.86,
+     "days": 2305,
+     "maxDD": 12.6,
+     "ddDays": 329,
+     "ddRegained": true,
+     "ddFrom": "2018-03-27",
+     "ddTo": "2019-01-21",
+     "longestUnder": 328,
+     "retDD": 8.78,
+     "worstYear": {
+      "year": "2018",
+      "R": -6.1
+     },
+     "posYears": "7/9",
+     "posMonths": 0.47,
+     "byYear": {
+      "2018": -6.1,
+      "2019": 18.4,
+      "2020": 21,
+      "2021": 10,
+      "2022": -4.2,
+      "2023": 13.3,
+      "2024": 16.7,
+      "2025": 38.5,
+      "2026": 3.4
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 42.6,
+       "tDaily": 1.85,
+       "maxDD": 12.6
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 68.4,
+       "tDaily": 2.13,
+       "maxDD": 6
+      }
+     ],
+     "financing": 19.1,
+     "financingPerYear": 2.17,
+     "cost": 14.1,
+     "gross": 144.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 71.7,
+       "perPosition": 1.195,
+       "tPosition": 2.36,
+       "tDaily": 2.28,
+       "maxDD": 4.2,
+       "financing": 10.8
+      },
+      "geg": {
+       "positions": 195,
+       "total": 39.3,
+       "perPosition": 0.202,
+       "tPosition": 1.63,
+       "tDaily": 1.62,
+       "maxDD": 11.4,
+       "financing": 8.3
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      }
+     },
+     "marked": {
+      "maxDD": 14.8,
+      "ddDays": 365,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 364,
+      "retDD": 7.48
+     },
+     "inMarket": {
+      "share": 0.393,
+      "meanUnits": 0.64,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187
+      },
+      "all": 0.081
+     }
+    }
+   },
+   "S3": {
+    "x1F1": {
+     "positions": 354,
+     "units": 419,
+     "total": 205.7,
+     "perYear": 23.29,
+     "years": 8.83,
+     "perPosition": 0.581,
+     "tPosition": 3.88,
+     "tDaily": 2.89,
+     "tMonthly": 2.95,
+     "days": 2305,
+     "maxDD": 19.2,
+     "ddDays": 354,
+     "ddRegained": true,
+     "ddFrom": "2018-02-20",
+     "ddTo": "2019-01-21",
+     "longestUnder": 353,
+     "retDD": 10.72,
+     "worstYear": {
+      "year": "2018",
+      "R": -8
+     },
+     "posYears": "7/9",
+     "posMonths": 0.43,
+     "byYear": {
+      "2018": -8,
+      "2019": 34.4,
+      "2020": 34.7,
+      "2021": 11.1,
+      "2022": -1.1,
+      "2023": 21.3,
+      "2024": 28.5,
+      "2025": 70.9,
+      "2026": 13.9
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 76.3,
+       "tDaily": 1.95,
+       "maxDD": 19.2
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 129.4,
+       "tDaily": 2.18,
+       "maxDD": 8.6
+      }
+     ],
+     "financing": 35.5,
+     "financingPerYear": 4.02,
+     "cost": 8,
+     "gross": 249.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 72.4,
+       "perPosition": 1.207,
+       "tPosition": 2.38,
+       "tDaily": 2.3,
+       "maxDD": 4.2,
+       "financing": 10.8
+      },
+      "geg": {
+       "positions": 195,
+       "total": 45.7,
+       "perPosition": 0.234,
+       "tPosition": 1.89,
+       "tDaily": 1.87,
+       "maxDD": 10,
+       "financing": 8.3
+      },
+      "gtrend5": {
+       "positions": 99,
+       "total": 87.6,
+       "perPosition": 0.885,
+       "tPosition": 2.46,
+       "tDaily": 2.41,
+       "maxDD": 8.4,
+       "financing": 16.3
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.95
+      },
+      "geg~gtrend5": {
+       "daily": -0.01,
+       "monthly": 0.09
+      }
+     },
+     "marked": {
+      "maxDD": 25.6,
+      "ddDays": 365,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 364,
+      "retDD": 8.03
+     },
+     "inMarket": {
+      "share": 0.574,
+      "meanUnits": 1.37,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187,
+       "gtrend5": 0.534
+      },
+      "all": 0.081
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": 11,
+      "mid": 22.8,
+      "hi": 36.8,
+      "pGt0": 0.999
+     },
+     "retDD": {
+      "lo": 3.99,
+      "mid": 11.61,
+      "hi": 25.82
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 5.82,
+     "pctLo": 2.74,
+     "pctHi": 9.21,
+     "ddPct": 4.8,
+     "ddMarkedPct": 6.4
+    },
+    "x1Fh": {
+     "positions": 354,
+     "units": 419,
+     "total": 223.5,
+     "perYear": 25.3,
+     "years": 8.83,
+     "perPosition": 0.631,
+     "tPosition": 4.13,
+     "tDaily": 3.06,
+     "tMonthly": 3.13,
+     "days": 2305,
+     "maxDD": 18.2,
+     "ddDays": 346,
+     "ddRegained": true,
+     "ddFrom": "2018-02-20",
+     "ddTo": "2018-11-20",
+     "longestUnder": 345,
+     "retDD": 12.29,
+     "worstYear": {
+      "year": "2018",
+      "R": -6.1
+     },
+     "posYears": "8/9",
+     "posMonths": 0.43,
+     "byYear": {
+      "2018": -6.1,
+      "2019": 38,
+      "2020": 36.4,
+      "2021": 12.9,
+      "2022": 0.4,
+      "2023": 23.1,
+      "2024": 30.8,
+      "2025": 73.6,
+      "2026": 14.4
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 86,
+       "tDaily": 2.13,
+       "maxDD": 18.2
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 137.4,
+       "tDaily": 2.26,
+       "maxDD": 8.3
+      }
+     ],
+     "financing": 17.7,
+     "financingPerYear": 2.01,
+     "cost": 8,
+     "gross": 249.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 77.8,
+       "perPosition": 1.297,
+       "tPosition": 2.5,
+       "tDaily": 2.4,
+       "maxDD": 4,
+       "financing": 5.4
+      },
+      "geg": {
+       "positions": 195,
+       "total": 49.8,
+       "perPosition": 0.256,
+       "tPosition": 2.05,
+       "tDaily": 2.03,
+       "maxDD": 9.4,
+       "financing": 4.1
+      },
+      "gtrend5": {
+       "positions": 99,
+       "total": 95.8,
+       "perPosition": 0.968,
+       "tPosition": 2.63,
+       "tDaily": 2.56,
+       "maxDD": 8,
+       "financing": 8.2
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.96
+      },
+      "geg~gtrend5": {
+       "daily": -0.01,
+       "monthly": 0.09
+      }
+     },
+     "marked": {
+      "maxDD": 23.8,
+      "ddDays": 357,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 356,
+      "retDD": 9.39
+     },
+     "inMarket": {
+      "share": 0.574,
+      "meanUnits": 1.37,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187,
+       "gtrend5": 0.534
+      },
+      "all": 0.081
+     }
+    },
+    "x1F0": {
+     "positions": 354,
+     "units": 419,
+     "total": 241.2,
+     "perYear": 27.31,
+     "years": 8.83,
+     "perPosition": 0.681,
+     "tPosition": 4.36,
+     "tDaily": 3.22,
+     "tMonthly": 3.31,
+     "days": 2305,
+     "maxDD": 17.2,
+     "ddDays": 282,
+     "ddRegained": true,
+     "ddFrom": "2018-02-20",
+     "ddTo": "2018-11-20",
+     "longestUnder": 281,
+     "retDD": 14.04,
+     "worstYear": {
+      "year": "2018",
+      "R": -4.3
+     },
+     "posYears": "8/9",
+     "posMonths": 0.45,
+     "byYear": {
+      "2018": -4.3,
+      "2019": 41.5,
+      "2020": 38.1,
+      "2021": 14.7,
+      "2022": 1.9,
+      "2023": 25,
+      "2024": 33.1,
+      "2025": 76.2,
+      "2026": 15
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 95.7,
+       "tDaily": 2.28,
+       "maxDD": 17.2
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 145.5,
+       "tDaily": 2.34,
+       "maxDD": 7.9
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 8,
+     "gross": 249.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 83.2,
+       "perPosition": 1.387,
+       "tPosition": 2.61,
+       "tDaily": 2.5,
+       "maxDD": 3.8,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 195,
+       "total": 54,
+       "perPosition": 0.277,
+       "tPosition": 2.21,
+       "tDaily": 2.18,
+       "maxDD": 9.1,
+       "financing": 0
+      },
+      "gtrend5": {
+       "positions": 99,
+       "total": 104,
+       "perPosition": 1.05,
+       "tPosition": 2.78,
+       "tDaily": 2.7,
+       "maxDD": 7.5,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.96
+      },
+      "geg~gtrend5": {
+       "daily": -0.01,
+       "monthly": 0.08
+      }
+     },
+     "marked": {
+      "maxDD": 22,
+      "ddDays": 353,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 352,
+      "retDD": 10.96
+     },
+     "inMarket": {
+      "share": 0.574,
+      "meanUnits": 1.37,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187,
+       "gtrend5": 0.534
+      },
+      "all": 0.081
+     }
+    },
+    "x2F1": {
+     "positions": 354,
+     "units": 419,
+     "total": 197.7,
+     "perYear": 22.38,
+     "years": 8.83,
+     "perPosition": 0.558,
+     "tPosition": 3.73,
+     "tDaily": 2.78,
+     "tMonthly": 2.84,
+     "days": 2305,
+     "maxDD": 20.8,
+     "ddDays": 354,
+     "ddRegained": true,
+     "ddFrom": "2018-02-20",
+     "ddTo": "2019-01-21",
+     "longestUnder": 353,
+     "retDD": 9.5,
+     "worstYear": {
+      "year": "2018",
+      "R": -9.3
+     },
+     "posYears": "7/9",
+     "posMonths": 0.43,
+     "byYear": {
+      "2018": -9.3,
+      "2019": 32.6,
+      "2020": 33.9,
+      "2021": 10.2,
+      "2022": -2,
+      "2023": 20.3,
+      "2024": 27.8,
+      "2025": 70.4,
+      "2026": 13.8
+     },
+     "halves": [
+      {
+       "from": "2018-01-01",
+       "to": "2022-05-31",
+       "total": 70.9,
+       "tDaily": 1.82,
+       "maxDD": 20.8
+      },
+      {
+       "from": "2022-06-01",
+       "to": "2026-10-31",
+       "total": 126.8,
+       "tDaily": 2.13,
+       "maxDD": 8.9
+      }
+     ],
+     "financing": 35.5,
+     "financingPerYear": 4.02,
+     "cost": 16.1,
+     "gross": 249.2,
+     "bySystem": {
+      "gtrend": {
+       "positions": 60,
+       "total": 71.7,
+       "perPosition": 1.195,
+       "tPosition": 2.36,
+       "tDaily": 2.28,
+       "maxDD": 4.2,
+       "financing": 10.8
+      },
+      "geg": {
+       "positions": 195,
+       "total": 39.3,
+       "perPosition": 0.202,
+       "tPosition": 1.63,
+       "tDaily": 1.62,
+       "maxDD": 11.4,
+       "financing": 8.3
+      },
+      "gtrend5": {
+       "positions": 99,
+       "total": 86.6,
+       "perPosition": 0.875,
+       "tPosition": 2.44,
+       "tDaily": 2.39,
+       "maxDD": 8.5,
+       "financing": 16.3
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": 0.01
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.95
+      },
+      "geg~gtrend5": {
+       "daily": -0.01,
+       "monthly": 0.09
+      }
+     },
+     "marked": {
+      "maxDD": 26.9,
+      "ddDays": 365,
+      "ddRegained": true,
+      "ddFrom": "2018-01-24",
+      "ddTo": "2018-12-14",
+      "longestUnder": 364,
+      "retDD": 7.34
+     },
+     "inMarket": {
+      "share": 0.574,
+      "meanUnits": 1.37,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.287,
+       "geg": 0.187,
+       "gtrend5": 0.534
+      },
+      "all": 0.081
+     }
+    }
+   }
+  },
+  "W3": {
+   "label": "in sample, 2020-01 to 2026-10",
+   "from": "2020-01-01",
+   "to": "2026-10-31",
+   "S2": {
+    "x1F1": {
+     "positions": 200,
+     "units": 225,
+     "total": 103,
+     "perYear": 15.07,
+     "years": 6.83,
+     "perPosition": 0.515,
+     "tPosition": 2.85,
+     "tDaily": 2.83,
+     "tMonthly": 2.99,
+     "days": 1783,
+     "maxDD": 8.1,
+     "ddDays": 313,
+     "ddRegained": true,
+     "ddFrom": "2022-01-05",
+     "ddTo": "2022-02-22",
+     "longestUnder": 312,
+     "retDD": 12.76,
+     "worstYear": {
+      "year": "2022",
+      "R": -3.5
+     },
+     "posYears": "6/7",
+     "posMonths": 0.51,
+     "byYear": {
+      "2020": 21.7,
+      "2021": 10.8,
+      "2022": -3.5,
+      "2023": 14.1,
+      "2024": 17.3,
+      "2025": 39.1,
+      "2026": 3.5
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 34.6,
+       "tDaily": 1.87,
+       "maxDD": 8.1
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 68.4,
+       "tDaily": 2.18,
+       "maxDD": 4.5
+      }
+     ],
+     "financing": 13.2,
+     "financingPerYear": 1.93,
+     "cost": 4.2,
+     "gross": 120.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 58.5,
+       "perPosition": 1.171,
+       "tPosition": 2.04,
+       "tDaily": 1.99,
+       "maxDD": 4.2,
+       "financing": 7.4
+      },
+      "geg": {
+       "positions": 150,
+       "total": 44.4,
+       "perPosition": 0.296,
+       "tPosition": 2.05,
+       "tDaily": 2.03,
+       "maxDD": 6.5,
+       "financing": 5.7
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      }
+     },
+     "marked": {
+      "maxDD": 11.6,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 8.86
+     },
+     "inMarket": {
+      "share": 0.389,
+      "meanUnits": 0.63,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185
+      },
+      "all": 0.086
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": 7.5,
+      "mid": 14.7,
+      "hi": 23.5,
+      "pGt0": 1
+     },
+     "retDD": {
+      "lo": 3.21,
+      "mid": 9.1,
+      "hi": 20.97
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 3.77,
+     "pctLo": 1.87,
+     "pctHi": 5.88,
+     "ddPct": 2.02,
+     "ddMarkedPct": 2.9
+    },
+    "x1Fh": {
+     "positions": 200,
+     "units": 225,
+     "total": 109.5,
+     "perYear": 16.03,
+     "years": 6.83,
+     "perPosition": 0.548,
+     "tPosition": 2.99,
+     "tDaily": 2.96,
+     "tMonthly": 3.13,
+     "days": 1783,
+     "maxDD": 8,
+     "ddDays": 279,
+     "ddRegained": true,
+     "ddFrom": "2022-01-05",
+     "ddTo": "2022-02-22",
+     "longestUnder": 278,
+     "retDD": 13.75,
+     "worstYear": {
+      "year": "2022",
+      "R": -2.6
+     },
+     "posYears": "6/7",
+     "posMonths": 0.51,
+     "byYear": {
+      "2020": 22.5,
+      "2021": 11.8,
+      "2022": -2.6,
+      "2023": 15,
+      "2024": 18.5,
+      "2025": 40.5,
+      "2026": 3.8
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 37.9,
+       "tDaily": 2.02,
+       "maxDD": 8
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 71.6,
+       "tDaily": 2.25,
+       "maxDD": 4.4
+      }
+     ],
+     "financing": 6.6,
+     "financingPerYear": 0.96,
+     "cost": 4.2,
+     "gross": 120.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 62.3,
+       "perPosition": 1.245,
+       "tPosition": 2.13,
+       "tDaily": 2.07,
+       "maxDD": 4,
+       "financing": 3.7
+      },
+      "geg": {
+       "positions": 150,
+       "total": 47.3,
+       "perPosition": 0.315,
+       "tPosition": 2.18,
+       "tDaily": 2.15,
+       "maxDD": 6.3,
+       "financing": 2.9
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      }
+     },
+     "marked": {
+      "maxDD": 11.2,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 9.8
+     },
+     "inMarket": {
+      "share": 0.389,
+      "meanUnits": 0.63,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185
+      },
+      "all": 0.086
+     }
+    },
+    "x1F0": {
+     "positions": 200,
+     "units": 225,
+     "total": 116.1,
+     "perYear": 16.99,
+     "years": 6.83,
+     "perPosition": 0.581,
+     "tPosition": 3.12,
+     "tDaily": 3.09,
+     "tMonthly": 3.26,
+     "days": 1783,
+     "maxDD": 7.9,
+     "ddDays": 279,
+     "ddRegained": true,
+     "ddFrom": "2022-01-05",
+     "ddTo": "2022-02-22",
+     "longestUnder": 278,
+     "retDD": 14.77,
+     "worstYear": {
+      "year": "2022",
+      "R": -1.7
+     },
+     "posYears": "6/7",
+     "posMonths": 0.51,
+     "byYear": {
+      "2020": 23.3,
+      "2021": 12.9,
+      "2022": -1.7,
+      "2023": 15.9,
+      "2024": 19.8,
+      "2025": 41.9,
+      "2026": 4.1
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 41.2,
+       "tDaily": 2.16,
+       "maxDD": 7.9
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 74.9,
+       "tDaily": 2.31,
+       "maxDD": 4.3
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 4.2,
+     "gross": 120.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 66,
+       "perPosition": 1.32,
+       "tPosition": 2.22,
+       "tDaily": 2.14,
+       "maxDD": 3.8,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 150,
+       "total": 50.1,
+       "perPosition": 0.334,
+       "tPosition": 2.3,
+       "tDaily": 2.26,
+       "maxDD": 6.3,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      }
+     },
+     "marked": {
+      "maxDD": 10.7,
+      "ddDays": 231,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 230,
+      "retDD": 10.82
+     },
+     "inMarket": {
+      "share": 0.389,
+      "meanUnits": 0.63,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185
+      },
+      "all": 0.086
+     }
+    },
+    "x2F1": {
+     "positions": 200,
+     "units": 225,
+     "total": 98.8,
+     "perYear": 14.46,
+     "years": 6.83,
+     "perPosition": 0.494,
+     "tPosition": 2.74,
+     "tDaily": 2.72,
+     "tMonthly": 2.87,
+     "days": 1783,
+     "maxDD": 8.4,
+     "ddDays": 313,
+     "ddRegained": true,
+     "ddFrom": "2022-01-05",
+     "ddTo": "2022-10-13",
+     "longestUnder": 312,
+     "retDD": 11.81,
+     "worstYear": {
+      "year": "2022",
+      "R": -4.2
+     },
+     "posYears": "6/7",
+     "posMonths": 0.51,
+     "byYear": {
+      "2020": 21,
+      "2021": 10,
+      "2022": -4.2,
+      "2023": 13.3,
+      "2024": 16.7,
+      "2025": 38.5,
+      "2026": 3.4
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 32.1,
+       "tDaily": 1.74,
+       "maxDD": 8.4
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 66.7,
+       "tDaily": 2.13,
+       "maxDD": 4.6
+      }
+     ],
+     "financing": 13.2,
+     "financingPerYear": 1.93,
+     "cost": 8.3,
+     "gross": 120.3,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 58.1,
+       "perPosition": 1.161,
+       "tPosition": 2.03,
+       "tDaily": 1.97,
+       "maxDD": 4.2,
+       "financing": 7.4
+      },
+      "geg": {
+       "positions": 150,
+       "total": 40.7,
+       "perPosition": 0.271,
+       "tPosition": 1.89,
+       "tDaily": 1.87,
+       "maxDD": 7.1,
+       "financing": 5.7
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      }
+     },
+     "marked": {
+      "maxDD": 12,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 8.24
+     },
+     "inMarket": {
+      "share": 0.389,
+      "meanUnits": 0.63,
+      "maxUnits": 4,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185
+      },
+      "all": 0.086
+     }
+    }
+   },
+   "S3": {
+    "x1F1": {
+     "positions": 278,
+     "units": 335,
+     "total": 179.3,
+     "perYear": 26.23,
+     "years": 6.83,
+     "perPosition": 0.645,
+     "tPosition": 3.68,
+     "tDaily": 2.73,
+     "tMonthly": 2.85,
+     "days": 1783,
+     "maxDD": 10.4,
+     "ddDays": 170,
+     "ddRegained": true,
+     "ddFrom": "2021-07-16",
+     "ddTo": "2022-02-22",
+     "longestUnder": 230,
+     "retDD": 17.28,
+     "worstYear": {
+      "year": "2022",
+      "R": -1.1
+     },
+     "posYears": "6/7",
+     "posMonths": 0.49,
+     "byYear": {
+      "2020": 34.7,
+      "2021": 11.1,
+      "2022": -1.1,
+      "2023": 21.3,
+      "2024": 28.5,
+      "2025": 70.9,
+      "2026": 13.9
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 55.4,
+       "tDaily": 1.85,
+       "maxDD": 10.4
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 123.9,
+       "tDaily": 2.12,
+       "maxDD": 6.6
+      }
+     ],
+     "financing": 24.7,
+     "financingPerYear": 3.62,
+     "cost": 4.8,
+     "gross": 208.8,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 58.5,
+       "perPosition": 1.171,
+       "tPosition": 2.04,
+       "tDaily": 1.99,
+       "maxDD": 4.2,
+       "financing": 7.4
+      },
+      "geg": {
+       "positions": 150,
+       "total": 44.4,
+       "perPosition": 0.296,
+       "tPosition": 2.05,
+       "tDaily": 2.03,
+       "maxDD": 6.5,
+       "financing": 5.7
+      },
+      "gtrend5": {
+       "positions": 78,
+       "total": 76.3,
+       "perPosition": 0.978,
+       "tPosition": 2.33,
+       "tDaily": 2.28,
+       "maxDD": 4.5,
+       "financing": 11.6
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.95
+      },
+      "geg~gtrend5": {
+       "daily": -0.02,
+       "monthly": 0.04
+      }
+     },
+     "marked": {
+      "maxDD": 20.5,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 8.74
+     },
+     "inMarket": {
+      "share": 0.563,
+      "meanUnits": 1.35,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185,
+       "gtrend5": 0.519
+      },
+      "all": 0.086
+     }
+    },
+    "bootstrap": {
+     "draws": 2000,
+     "perYear": {
+      "lo": 12.8,
+      "mid": 25.5,
+      "hi": 41.9,
+      "pGt0": 1
+     },
+     "retDD": {
+      "lo": 4.19,
+      "mid": 11.83,
+      "hi": 27.71
+     }
+    },
+    "aYear": {
+     "risk": "0.25 % of the account a unit",
+     "pct": 6.56,
+     "pctLo": 3.19,
+     "pctHi": 10.47,
+     "ddPct": 2.6,
+     "ddMarkedPct": 5.13
+    },
+    "x1Fh": {
+     "positions": 278,
+     "units": 335,
+     "total": 191.6,
+     "perYear": 28.04,
+     "years": 6.83,
+     "perPosition": 0.689,
+     "tPosition": 3.86,
+     "tDaily": 2.85,
+     "tMonthly": 2.98,
+     "days": 1783,
+     "maxDD": 9.7,
+     "ddDays": 231,
+     "ddRegained": true,
+     "ddFrom": "2022-03-14",
+     "ddTo": "2022-10-13",
+     "longestUnder": 230,
+     "retDD": 19.75,
+     "worstYear": {
+      "year": "2022",
+      "R": 0.4
+     },
+     "posYears": "7/7",
+     "posMonths": 0.49,
+     "byYear": {
+      "2020": 36.4,
+      "2021": 12.9,
+      "2022": 0.4,
+      "2023": 23.1,
+      "2024": 30.8,
+      "2025": 73.6,
+      "2026": 14.4
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 61.5,
+       "tDaily": 1.99,
+       "maxDD": 9.7
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 130.1,
+       "tDaily": 2.18,
+       "maxDD": 6.5
+      }
+     ],
+     "financing": 12.4,
+     "financingPerYear": 1.81,
+     "cost": 4.8,
+     "gross": 208.8,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 62.3,
+       "perPosition": 1.245,
+       "tPosition": 2.13,
+       "tDaily": 2.07,
+       "maxDD": 4,
+       "financing": 3.7
+      },
+      "geg": {
+       "positions": 150,
+       "total": 47.3,
+       "perPosition": 0.315,
+       "tPosition": 2.18,
+       "tDaily": 2.15,
+       "maxDD": 6.3,
+       "financing": 2.9
+      },
+      "gtrend5": {
+       "positions": 78,
+       "total": 82.1,
+       "perPosition": 1.052,
+       "tPosition": 2.45,
+       "tDaily": 2.39,
+       "maxDD": 4.2,
+       "financing": 5.8
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.95
+      },
+      "geg~gtrend5": {
+       "daily": -0.02,
+       "monthly": 0.04
+      }
+     },
+     "marked": {
+      "maxDD": 19.7,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 9.74
+     },
+     "inMarket": {
+      "share": 0.563,
+      "meanUnits": 1.35,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185,
+       "gtrend5": 0.519
+      },
+      "all": 0.086
+     }
+    },
+    "x1F0": {
+     "positions": 278,
+     "units": 335,
+     "total": 204,
+     "perYear": 29.85,
+     "years": 6.83,
+     "perPosition": 0.734,
+     "tPosition": 4.03,
+     "tDaily": 2.97,
+     "tMonthly": 3.11,
+     "days": 1783,
+     "maxDD": 9.3,
+     "ddDays": 231,
+     "ddRegained": true,
+     "ddFrom": "2022-03-14",
+     "ddTo": "2022-10-13",
+     "longestUnder": 230,
+     "retDD": 21.97,
+     "worstYear": {
+      "year": "2022",
+      "R": 1.9
+     },
+     "posYears": "7/7",
+     "posMonths": 0.49,
+     "byYear": {
+      "2020": 38.1,
+      "2021": 14.7,
+      "2022": 1.9,
+      "2023": 25,
+      "2024": 33.1,
+      "2025": 76.2,
+      "2026": 15
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 67.6,
+       "tDaily": 2.13,
+       "maxDD": 9.3
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 136.4,
+       "tDaily": 2.24,
+       "maxDD": 6.4
+      }
+     ],
+     "financing": 0,
+     "financingPerYear": 0,
+     "cost": 4.8,
+     "gross": 208.8,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 66,
+       "perPosition": 1.32,
+       "tPosition": 2.22,
+       "tDaily": 2.14,
+       "maxDD": 3.8,
+       "financing": 0
+      },
+      "geg": {
+       "positions": 150,
+       "total": 50.1,
+       "perPosition": 0.334,
+       "tPosition": 2.3,
+       "tDaily": 2.26,
+       "maxDD": 6.3,
+       "financing": 0
+      },
+      "gtrend5": {
+       "positions": 78,
+       "total": 87.9,
+       "perPosition": 1.127,
+       "tPosition": 2.57,
+       "tDaily": 2.49,
+       "maxDD": 3.9,
+       "financing": 0
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.96
+      },
+      "geg~gtrend5": {
+       "daily": -0.02,
+       "monthly": 0.04
+      }
+     },
+     "marked": {
+      "maxDD": 18.8,
+      "ddDays": 268,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 267,
+      "retDD": 10.83
+     },
+     "inMarket": {
+      "share": 0.563,
+      "meanUnits": 1.35,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185,
+       "gtrend5": 0.519
+      },
+      "all": 0.086
+     }
+    },
+    "x2F1": {
+     "positions": 278,
+     "units": 335,
+     "total": 174.4,
+     "perYear": 25.52,
+     "years": 6.83,
+     "perPosition": 0.627,
+     "tPosition": 3.58,
+     "tDaily": 2.66,
+     "tMonthly": 2.78,
+     "days": 1783,
+     "maxDD": 11,
+     "ddDays": 170,
+     "ddRegained": true,
+     "ddFrom": "2021-07-16",
+     "ddTo": "2022-02-22",
+     "longestUnder": 230,
+     "retDD": 15.81,
+     "worstYear": {
+      "year": "2022",
+      "R": -2
+     },
+     "posYears": "6/7",
+     "posMonths": 0.49,
+     "byYear": {
+      "2020": 33.9,
+      "2021": 10.2,
+      "2022": -2,
+      "2023": 20.3,
+      "2024": 27.8,
+      "2025": 70.4,
+      "2026": 13.8
+     },
+     "halves": [
+      {
+       "from": "2020-01-01",
+       "to": "2023-05-31",
+       "total": 52.5,
+       "tDaily": 1.76,
+       "maxDD": 11
+      },
+      {
+       "from": "2023-06-01",
+       "to": "2026-10-31",
+       "total": 121.9,
+       "tDaily": 2.09,
+       "maxDD": 6.7
+      }
+     ],
+     "financing": 24.7,
+     "financingPerYear": 3.62,
+     "cost": 9.7,
+     "gross": 208.8,
+     "bySystem": {
+      "gtrend": {
+       "positions": 50,
+       "total": 58.1,
+       "perPosition": 1.161,
+       "tPosition": 2.03,
+       "tDaily": 1.97,
+       "maxDD": 4.2,
+       "financing": 7.4
+      },
+      "geg": {
+       "positions": 150,
+       "total": 40.7,
+       "perPosition": 0.271,
+       "tPosition": 1.89,
+       "tDaily": 1.87,
+       "maxDD": 7.1,
+       "financing": 5.7
+      },
+      "gtrend5": {
+       "positions": 78,
+       "total": 75.6,
+       "perPosition": 0.97,
+       "tPosition": 2.31,
+       "tDaily": 2.26,
+       "maxDD": 4.6,
+       "financing": 11.6
+      }
+     },
+     "corr": {
+      "gtrend~geg": {
+       "daily": -0.02,
+       "monthly": -0.04
+      },
+      "gtrend~gtrend5": {
+       "daily": 0.96,
+       "monthly": 0.95
+      },
+      "geg~gtrend5": {
+       "daily": -0.02,
+       "monthly": 0.04
+      }
+     },
+     "marked": {
+      "maxDD": 20.9,
+      "ddDays": 280,
+      "ddRegained": true,
+      "ddFrom": "2022-03-08",
+      "ddTo": "2022-11-28",
+      "longestUnder": 279,
+      "retDD": 8.33
+     },
+     "inMarket": {
+      "share": 0.563,
+      "meanUnits": 1.35,
+      "maxUnits": 6,
+      "bySystem": {
+       "gtrend": 0.29,
+       "geg": 0.185,
+       "gtrend5": 0.519
+      },
+      "all": 0.086
+     }
+    }
+   }
+  }
+ },
+ "verdictDetail": {
+  "pass": false,
+  "positive": true,
+  "tests": {
+   "t": 1.86,
+   "tPass": false,
+   "halves": [
+    55.3,
+    4
+   ],
+   "halvesPass": true,
+   "x2": 48.7,
+   "x2Pass": true
+  }
+ },
+ "verdict": "FAIL: on untouched 2006-17, after costs and financing on every unit, the two-system book made +59.3R (+5.16R a year, 330 positions, t 1.86 on daily book R), worst drawdown 19.8R closed and 22.1R marked to market",
+ "sizingStudy": {
+  "run": true,
+  "why": "S2 is positive on W1 at x1, F1: the pre-registered add on / off comparison follows (research/edge/book-sizing)"
+ }
+}
