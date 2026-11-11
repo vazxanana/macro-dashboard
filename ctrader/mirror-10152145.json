@@ -8888,6 +8888,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-11T23:02:43.000Z",
     "brokerStop": 1.32632
+   },
+   "usdcad-rintra-1794438249": {
+    "symbol": "USDCAD",
+    "side": "sell",
+    "setup": "rintra",
+    "openedAt": "2026-11-11T23:04:52.000Z",
+    "councilEntry": 1.42461,
+    "stop": 1.42558,
+    "t1": 1.4217300000000002,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.42461,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.97,
+    "margin": 4,
+    "shadow": true,
+    "fillPrice": 1.42462,
+    "slipR": -0.01,
+    "lagSec": 43,
+    "positionId": "48560463",
+    "volume": 200000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-11T23:04:52.000Z",
+    "brokerStop": 1.42558
    }
   },
   "day": {
@@ -8895,7 +8923,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9830.75 · 29 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9830.75 · 30 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -8950,19 +8978,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9830.75,
-  "lastRun": "2026-11-11T23:02:43.000Z"
+  "lastRun": "2026-11-11T23:04:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T00:33:39.000Z",
-   "msg": "placed buy limit USDCHF 0.02 lot at 0.82552 (council scalp, valid to 2026-11-11T03:32Z)",
-   "trade": "usdchf-scalp-1794357162"
-  },
-  {
-   "at": "2026-11-11T00:36:02.000Z",
-   "msg": "limit filled: USDCHF position 48243978 at the broker",
-   "trade": "usdchf-scalp-1794357162"
-  },
   {
    "at": "2026-11-11T01:16:37.000Z",
    "msg": "placed sell limit GBPUSD 0.03 lot at 1.33467 (council scalp, valid to 2026-11-11T04:15Z)",
@@ -10452,6 +10470,16 @@
    "at": "2026-11-11T23:02:43.000Z",
    "msg": "limit filled at once: GBPUSD position 48559742 at the broker at 1.32782",
    "trade": "gbpusd-rscalp-1794438122"
+  },
+  {
+   "at": "2026-11-11T23:04:52.000Z",
+   "msg": "placed sell limit USDCAD 0.02 lot at 1.42461 (council rintra, valid to 2026-11-12T11:04Z)",
+   "trade": "usdcad-rintra-1794438249"
+  },
+  {
+   "at": "2026-11-11T23:04:52.000Z",
+   "msg": "limit filled at once: USDCAD position 48560463 at the broker at 1.42462",
+   "trade": "usdcad-rintra-1794438249"
   }
  ],
  "limits": {
@@ -10530,7 +10558,7 @@
   ]
  },
  "execution": {
-  "n": 300,
+  "n": 301,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -10557,8 +10585,8 @@
     "meanSlipR": 0.028
    },
    "USDCAD": {
-    "n": 44,
-    "meanSlipR": -0.058
+    "n": 45,
+    "meanSlipR": -0.057
    },
    "USDCHF": {
     "n": 43,
