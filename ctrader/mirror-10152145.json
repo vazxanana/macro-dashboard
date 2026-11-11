@@ -7410,11 +7410,12 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9897.8 · 25 open · 4 resting",
+  "status": "ok · demo Fusion Markets · balance 9897.8 · 25 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
-   "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now"
+   "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now",
+   "usdchf-scalp-1794402871": "price 0.83044 has run 1.12R from the council entry 0.82988: a different trade now"
   },
   "wait": {},
   "paused": {},
@@ -7481,43 +7482,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdchf-scalp-1794402871": {
-    "orderId": "33928919",
-    "symbol": "USDCHF",
-    "side": "buy",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 0.82988,
-    "stop": 0.82938,
-    "t1": 0.8308799999999998,
-    "placedAt": "2026-11-11T13:15:47.000Z",
-    "expires": "2026-11-11T16:14:31.000Z",
-    "riskCash": 1.98,
-    "margin": 6,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9897.8,
-  "lastRun": "2026-11-11T13:18:12.000Z"
+  "lastRun": "2026-11-11T13:21:06.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "cancelled XAUUSD limit order 33868840 for xau-m30m1-1794317499: the council ended it: cancelled",
-   "trade": "xau-m30m1-1794317499"
-  },
-  {
-   "at": "2026-11-10T13:36:14.000Z",
-   "msg": "cancelled XAUUSD limit order 33868842 for xau-rintra-1794317499: the council ended it: cancelled",
-   "trade": "xau-rintra-1794317499"
-  },
   {
    "at": "2026-11-10T13:36:14.000Z",
    "msg": "cancelled GBPUSD limit order 33868843 for gbpusd-scalp-1794317499: the council ended it: missed",
@@ -9007,6 +8978,16 @@
    "at": "2026-11-11T13:17:45.000Z",
    "msg": "AUDUSD position 48414556 closed at the broker",
    "trade": "audusd-scalp-1794401227"
+  },
+  {
+   "at": "2026-11-11T13:21:06.000Z",
+   "msg": "cancelled USDCHF limit order 33928919 for usdchf-scalp-1794402871: the council filled it on its feed first",
+   "trade": "usdchf-scalp-1794402871"
+  },
+  {
+   "at": "2026-11-11T13:21:06.000Z",
+   "msg": "not mirrored usdchf-scalp-1794402871: price 0.83044 has run 1.12R from the council entry 0.82988: a different trade now",
+   "trade": "usdchf-scalp-1794402871"
   }
  ],
  "limits": {
