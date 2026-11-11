@@ -119,6 +119,10 @@ function fileStore(dir) {
 // The private Blob store. Same options as api/notify.js. io = { blob, fetch } for tests.
 // A function instance remembers what it wrote for a minute: a read straight after an overwrite can otherwise be served the old
 // bytes. Its own copy is used only while the listing shows no newer upload by someone else.
+// Every other read asks the ORIGIN (`?cache=0`, what the Blob client's own get(..., { useCache: false }) sends for a private
+// file), never the CDN copy: an overwritten file is served from the CDN with its old bytes for up to a minute, so ANOTHER
+// instance (a new deployment, a second region) read a file without the row just stored ("no such attempt for this edge",
+// 11 Nov 2026), and a write made from such a read would have dropped that row for good.
 const BLOB_TAILS = new Map(), RECENT = new Map(), RECENT_MS = 60e3;
 function blobBackend(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, recent = io.recent || RECENT, now = io.now || Date.now, ROOT = rootFor(env), BASE = io.root || ROOT;   // io.root: another feature's own folder set in code (the edge analyst), never from a request
@@ -127,7 +131,8 @@ function blobBackend(env, io = {}) {
       const P = BASE + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); if (!b) return undefined;
       const mine = recent.get(P), up = b.uploadedAt ? new Date(b.uploadedAt).getTime() : NaN;
       if (mine && now() - mine.at < RECENT_MS && !(up > mine.at + 1500)) return JSON.parse(mine.json);
-      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
+      const u = new URL(b.url); u.searchParams.set('cache', '0');
+      const r = await F(u.toString(), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
       if (!r.ok) throw new Error(`blob read ${r.status}`);   // a failed read never looks empty
       return r.json();
     },
