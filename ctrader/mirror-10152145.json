@@ -5745,7 +5745,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T16:54:48.000Z",
     "councilEntry": 1.115,
     "stop": 1.1145,
@@ -5759,10 +5759,12 @@
     "slipR": 0.16,
     "lagSec": 228,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T16:54:48.000Z",
-    "brokerStop": 1.11447
+    "brokerStop": 1.11447,
+    "closedAt": "2026-11-11T08:19:46.000Z"
    },
    "usdchf-rscalp-1794329894": {
     "symbol": "USDCHF",
@@ -6794,7 +6796,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9917.25 · 29 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9915.01 · 28 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6824,23 +6826,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "btc-scalp-1794385122": {
+    "orderId": "33916097",
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "limitPrice": 73942.5,
+    "stop": 74099.48564,
+    "t1": 72584.6,
+    "placedAt": "2026-11-11T08:19:46.000Z",
+    "expires": "2026-11-11T11:18:42.000Z",
+    "riskCash": 1.98,
+    "margin": 73.97,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9917.25,
-  "lastRun": "2026-11-11T08:16:52.000Z"
+  "balance": 9915.01,
+  "lastRun": "2026-11-11T08:19:46.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved USDCAD 47373486 protection: stop 1.45036 -> 1.45118, target 1.29196 -> 1.29278 (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved USDCAD 47373489 protection: stop 1.3808974 -> 1.3817174, target 1.47997 -> 1.48079 (council position)",
-   "trade": "usdcad-position-1793949081"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved USDCAD 47373490 protection: stop 1.3808974 -> 1.3817174, target 1.43472 -> 1.43554 (council swing)",
@@ -8330,6 +8342,16 @@
    "at": "2026-11-11T08:16:52.000Z",
    "msg": "EURUSD position 48236698 closed at the broker",
    "trade": "eurusd-scalp-1794354451"
+  },
+  {
+   "at": "2026-11-11T08:19:46.000Z",
+   "msg": "EURUSD position 48162044 closed at the broker",
+   "trade": "eurusd-rscalp-1794329444"
+  },
+  {
+   "at": "2026-11-11T08:19:46.000Z",
+   "msg": "placed sell limit BTCUSD 0.01 lot at 73942.5 (council scalp, valid to 2026-11-11T11:18Z)",
+   "trade": "btc-scalp-1794385122"
   }
  ],
  "limits": {
