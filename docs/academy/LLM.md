@@ -278,3 +278,12 @@ Everything ran offline: `tests/academy-connector.test.mjs` plays the assistant, 
 (`scripts/audit/academy.cjs`, section D) walks the page with a scripted assistant on the local server
 (`node scripts/academy-dev.mjs --connector`). **No real assistant app has called the connector yet: the first real run is the
 owner's.**
+
+## 10. The same adapter for the edge analyst (11 Nov 2026)
+
+`api/edge-analyst.js` (logic `api/_edge-analyst.js`) uses this adapter for a second purpose: a blind second opinion on each
+live entry of the seven Meridian edges (Council → Review, card "AI second opinion"). It shares the provider settings of
+section 3 (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`, …) but keeps its own store folder (`edge-analyst/`, with its own
+`cost.json` and `llm-cache.json`) and its own budgets (`EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
+`EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12), so it can never spend the Academy's allowance or the other way round.
+`EDGE_ANALYST=off` or `EDGE_LLM_STOP=1` stops it. Owner decision 37 records the paid key.

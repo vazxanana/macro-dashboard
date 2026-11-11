@@ -3266,6 +3266,26 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
       </div>
+      <div class="card adm" id="ms-ea">
+        <style id="ms-ea-css">
+          #ms-ea .ea-sum { font-size: 13px; margin: 6px 0 10px; color: var(--ink-dim); line-height: 1.5; }
+          #ms-ea .ea-sum b { color: var(--ink); }
+          #ms-ea .ea-tb { width: 100%; border-collapse: collapse; font-size: 13px; }
+          #ms-ea .ea-tb th { text-align: left; font-weight: 500; font-size: 12px; color: var(--ink-faint); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+          #ms-ea .ea-tb td { padding: 8px; border-bottom: 1px solid var(--line-soft, var(--line)); vertical-align: top; }
+          #ms-ea .ea-v { display: inline-block; font-weight: 600; font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--line); }
+          #ms-ea .ea-v.TAKE { color: var(--buy-ink, var(--buy)); } #ms-ea .ea-v.SKIP { color: var(--sell-ink, var(--sell)); } #ms-ea .ea-v.REDUCE { color: var(--warn-ink, var(--ink)); }
+          #ms-ea details summary { cursor: pointer; font-size: 12px; color: var(--ink-dim); min-height: 24px; }
+          #ms-ea details ul { margin: 6px 0 0 18px; padding: 0; font-size: 13px; line-height: 1.5; }
+          #ms-ea .pos { color: var(--buy-ink, var(--buy)); } #ms-ea .neg { color: var(--sell-ink, var(--sell)); }
+          #ms-ea .ea-wrap { overflow-x: auto; }
+          @media (pointer: coarse) { #ms-ea details summary { min-height: 44px; display: flex; align-items: center; } }
+        </style>
+        <div class="ms-k" role="heading" aria-level="2">AI second opinion · each entry, judged blind</div>
+        <p class="ms-note">When a live trade of the seven edges opens, a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
+        <div class="ea-sum" id="ms-ea-sum">Loading…</div>
+        <div class="ea-wrap"><table class="ea-tb" id="ms-ea-list" hidden><thead><tr><th>Entry (UTC)</th><th>System</th><th>Trade</th><th>AI said</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+      </div>
     </div>
     <div class="c-grid c-pane c-pane-research adm" id="ms-cp-research" role="tabpanel" aria-labelledby="ms-cn-research" data-pane="research" hidden>
       <div class="card c-sb adm" id="ms-sb">
@@ -13270,6 +13290,44 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 .bk-t .bk-short { display: none; }
 @media (max-width: 520px) { .bk-t { font-size: 12.5px; } .bk-t th, .bk-t td { padding: 6px 5px; } .bk-t .bk-pc, .bk-t .bk-long { display: none; } .bk-t .bk-short { display: inline; } .c-book .bk-chart { height: 110px; } }
 </style>
+<script id="ms-ea-js">
+// AI second opinion card (#ms-ea, Council review pane; api/edge-analyst.js). Display only: it reads the analyst's records.
+(function () {
+  var box = document.getElementById('ms-ea'); if (!box) return;
+  var sum = document.getElementById('ms-ea-sum'), tb = document.getElementById('ms-ea-list');
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var rt = function (v) { return v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v < 0 ? '\u2212' : '') + Math.abs(v).toFixed(2) + 'R'; };
+  var usd = function (v) { return '$' + (+v || 0).toFixed(2); };
+  function render(j) {
+    var s = j.stats || {}, by = s.by || {}, rows = j.rows || [];
+    var head = j.enabled ? 'On' : 'Off: ' + esc(j.reason || 'not set up');
+    var line = '<b>' + head + '</b> · spent today ' + usd(j.cost && j.cost.today) + ' of ' + usd(j.cost && j.cost.budgets && j.cost.budgets.dailyUsd) + ', this month ' + usd(j.cost && j.cost.month) + (j.since ? ' · studying entries since ' + esc(j.since.slice(0, 10)) : '');
+    if (s.studied) {
+      var part = ['TAKE', 'REDUCE', 'SKIP'].map(function (v) { var b = by[v] || {}; return v.toLowerCase() + ' ' + (b.n || 0) + (b.n ? ' (' + rt(b.avg) + ' a trade)' : ''); }).join(', ');
+      line += '<br>' + s.studied + ' entries studied, ' + s.closed + ' closed: ' + part + '. Taking every trade ' + rt(s.takeAll) + '; following the AI (skip = not taken, reduce = half) ' + rt(s.followAI) + '. ' + esc(s.note);
+    } else line += '<br>No entry studied yet.';
+    sum.innerHTML = line;
+    if (!rows.length) { tb.hidden = true; return; }
+    tb.hidden = false;
+    tb.tBodies[0].innerHTML = rows.map(function (r) {
+      var a = r.answer, v = a ? '<span class="ea-v ' + a.verdict + '">' + a.verdict.toLowerCase() + '</span> <small>' + esc(a.confidence) + '</small>' : '<small>answer refused: ' + esc((r.refused || []).join('; ')) + '</small>';
+      var det = a ? '<details><summary>Why</summary><ul>' + a.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + (a.risks || []).map(function (x) { return '<li>Risk: ' + esc(x) + '</li>'; }).join('') + (a.wouldChange ? '<li>Would change: ' + esc(a.wouldChange) + '</li>' : '') + '</ul></details>' : '';
+      var res = r.result ? '<span class="' + (r.result.R > 0 ? 'pos' : r.result.R < 0 ? 'neg' : '') + '">' + rt(r.result.R) + '</span>' : 'open';
+      return '<tr><td>' + esc((r.entryAt || '').slice(0, 16).replace('T', ' ')) + '</td><td>' + esc(r.system) + '</td><td>' + esc(r.side) + ' ' + esc(r.entry) + '<br><small>stop ' + esc(r.stop) + (r.target != null ? ' · target ' + esc(r.target) : '') + '</small></td><td>' + v + det + '</td><td>' + res + '</td></tr>';
+    }).join('');
+  }
+  function load() {
+    if (!/meridianx\.dev$|vercel\.app$|^localhost$|^127\./.test(location.hostname)) { sum.textContent = 'Available on meridianx.dev (it needs the site\'s server).'; return; }
+    fetch('/api/edge-analyst', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401 || r.status === 403) { sum.textContent = 'Sign in as the owner or a reviewer to see it.'; return null; }
+      if (!r.ok) { sum.textContent = 'Could not be loaded (server ' + r.status + ').'; return null; }
+      return r.json();
+    }).then(function (j) { if (j) render(j); }).catch(function () { sum.textContent = 'Could not be loaded: no connection.'; });
+  }
+  if (document.documentElement.dataset.role === 'public') return;
+  load(); setInterval(function () { if (!document.hidden) load(); }, 5 * 60e3);
+})();
+</script>
 <script id="ms-book-js">
 // Book weights, paper comparison (8 Nov 2026): renders coach.json `book` (council/book.mjs, written by the Trader every 6 hours)
 // into #ms-book: a two-line running-R chart (live book as traded vs the proposed weights on the same trades), a table per

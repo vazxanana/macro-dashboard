@@ -121,10 +121,10 @@ function fileStore(dir) {
 // bytes. Its own copy is used only while the listing shows no newer upload by someone else.
 const BLOB_TAILS = new Map(), RECENT = new Map(), RECENT_MS = 60e3;
 function blobBackend(env, io = {}) {
-  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, recent = io.recent || RECENT, now = io.now || Date.now, ROOT = rootFor(env);
+  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, recent = io.recent || RECENT, now = io.now || Date.now, ROOT = rootFor(env), BASE = io.root || ROOT;   // io.root: another feature's own folder set in code (the edge analyst), never from a request
   return {
     async read(k) {
-      const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); if (!b) return undefined;
+      const P = BASE + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); if (!b) return undefined;
       const mine = recent.get(P), up = b.uploadedAt ? new Date(b.uploadedAt).getTime() : NaN;
       if (mine && now() - mine.at < RECENT_MS && !(up > mine.at + 1500)) return JSON.parse(mine.json);
       const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
@@ -132,12 +132,12 @@ function blobBackend(env, io = {}) {
       return r.json();
     },
     async write(k, v) {
-      const P = ROOT + k, json = JSON.stringify(v);
+      const P = BASE + k, json = JSON.stringify(v);
       await B().put(P, json, { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token });
       recent.set(P, { json, at: now() }); if (recent.size > 200) recent.delete(recent.keys().next().value);
     },
     // only ever a file this same step created a moment ago (the undo of a write step that failed half way)
-    async remove(k) { const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); recent.delete(P); if (b) await B().del(b.url, { token }); },
+    async remove(k) { const P = BASE + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); recent.delete(P); if (b) await B().del(b.url, { token }); },
   };
 }
 const blobStore = (env, io = {}) => make(blobBackend(env, io), io.tails || BLOB_TAILS);

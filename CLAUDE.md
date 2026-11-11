@@ -31,7 +31,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
@@ -2553,3 +2553,26 @@ What was done, and the rules to keep:
 - Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
+
+## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
+`api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
+(`api/_academy-llm.js`) and store (`api/_academy-store.js`, `blobBackend(env, { root })`; own folder `edge-analyst/`, preview
+`edge-analyst-preview/`: `reviews.json` 400 rows, `state.json`, and the adapter's own `cost.json` / `llm-cache.json`).
+- **Cron** `/api/edge-analyst?job=scan` every 10 min (`CRON_SECRET`): first puts closed results (`Rnet`, else `R`) beside
+  earlier answers, then studies up to `PER_RUN` 3 new entries: live, non-shadow, not an add, of the seven edges (`EDGES`, keep
+  in step with `council/decay.mjs`; trades.json + research.json `nq-open` with session `nyflip`), entered after the first run's
+  `state.since` and within 3 days, never twice. A budget skip ends the run; a candle fetch failure is retried next run.
+- **Blind, no look-ahead**: the request holds only `entryFacts` (system and rule in words, side, entry, the OPENING stop from
+  `r0`, target, planned R:R, `feat` keys that are not outcome-like), OANDA mid candles D1 / H4 / H1 / M15 that ENDED at or
+  before the entry (`cutCandles`), and releases 12 h before to 48 h after with consensus / previous only (`releasesAround`;
+  never an actual). The answer is checked in code (`parseAnswer`: TAKE / REDUCE / SKIP, low / medium / high, 1-4 reasons);
+  one that does not fit is stored as `refused`.
+- **Read** `GET /api/edge-analyst`: owner or reviewer session; `{ enabled, reason, cost, since, rows (60), stats }`. `stats`:
+  per verdict n / wins / R, taking every trade vs following the answer (SKIP 0, REDUCE ½); "Too few to judge" under
+  `MIN_JUDGE` 20 closed; at 20+ "a forward comparison, not a tested edge". Card `#ms-ea` (`adm`) in the Council review pane,
+  `<style id="ms-ea-css">` + `<script id="ms-ea-js">`.
+- **Money**: a paid key, the owner's exception to absolute rule 5 (docs/owner-decisions.md item 37). Shares the provider
+  settings (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`); own budgets `EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
+  `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12; `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` stops it. No key = no call.
+- Paper only: it changes no rule, size, filter or trade, imports nothing of the council or the mirror (test), and no council
+  member reads its file. Tests: `tests/edge-analyst.test.mjs`.
