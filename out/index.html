@@ -8564,7 +8564,7 @@ function msNextSetup(bars, A) {
   // Spot gold and forex close Fri 21:00 – Sun 22:00 UTC (crypto never does)
   const marketClosed = () => { if (INST.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };   // incl. the first hour after the Sunday reopen
   function autoTrade(list, price) {
-    if (!JEL || marketClosed()) return;
+    if (!JEL || PUB || marketClosed()) return;   // never for a guest: no journal to save to, and the toast named a setup
     const now = Date.now() / 1000; let added = 0;
     for (const t of list) {
       const id = `${instKey}|${t.sig}`;
