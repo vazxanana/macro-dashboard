@@ -1114,10 +1114,42 @@ called, in `panels()`), so they follow play, step, undo and jump; open trades an
 price lines (`xpLines`); one crosshair moves across all charts (`xpCross`). Orders, drafts, drag lines and drawings stay on the first
 chart: `xpGeom` keeps the quick Buy / Sell bar and the legend on it (`--mr`, `.chartc.mnarrow` under 640 px). The toolbar starts with
 the market and timeframe as a button (`#tb-sess`, opens the session form). `window.ctSplit()` is the audit's read-only summary.
-Not done: changing the replay's own timeframe in the middle of a session (the engine steps on the loaded candles). Audit: 152 checks
+Changing the replay's own timeframe in the middle of a session came on 11 Nov (next paragraph). Audit: 152 checks
 (the chips, a 4h pane, four charts with every pane ending at the replay moment, back to one chart); the audit reads the live candle
 proxy, so it only uses timeframes the live site already serves. Test: `tests/oanda-symbols.test.mjs` (page list = proxy list, each
 timeframe's OANDA granularity and the 4999-candle window).
+Timeframe switch in the middle of a session (11 Nov 2026, owner: "more timeframes"; the trader drops from 15m to 5m for an entry and
+goes back up): the toolbar's timeframe button (`#tfdd`, chips `#tfsw [data-stf]`, label `#tf-now`; keys `,` lower and `.` higher, also
+`[` `]`; in Help) calls `setTf(tf)`. `#tb-sess` now shows the market only. **One rule: the replay has one moment** (`mom()`,
+`BT.tfMoment`): every price before it has been through the engine, nothing at or after it has. A switch **never touches the account**
+(positions, orders, stops, targets, MFE / MAE, journal, drawings, challenge stay as they are; `S.acct` is not read or written). It only
+seats the moment on the new timeframe's candles (`BT.tfPlan`): candles that ended by it are shown closed; a candle that CONTAINS it
+(going up mid-candle, or an unaligned pair such as 15m → 10m or 5m → 2m) is shown **still forming**, built by `BT.tfPart` from finer
+candles that ended by the moment (`BT.tfFineSec` picks the coarsest timeframe that tiles both halves; the candles of a timeframe
+already loaded when they fit, else one small fetch), and sits in `S.bars` in place of the full candle (`S.part = { i, T, sec, g,
+formed, full, rest }`, `BT.tfSeat` / `tfUnseat`; legend tag "still forming", `#now` says "forming"). The next step (`step()`,
+`BT.tfNext` + `BT.advance`) runs `rest`, the finer candles from the moment to the candle's end, through the engine in order, each
+once, and puts the full candle back: so no price is skipped or processed twice, and a stop or target inside the candle is taken where
+the finer candles reach it (a test checks the account equals stepping the lower timeframe). Going down shows only candles that closed
+by the moment. `BT.advance(acct, ch, bars)` is the page's per-bar order (orders and positions, the challenge, then a breach closes
+everything, events marked `breach`) moved into the engine so the tests run the real code. Kept per session in memory: the candles of
+each timeframe used (`TFC`), so going back is instant. **Cleared at a switch: Undo history** (the toast and the panel say so); Undo
+works again from there and can bring a forming candle back. Playback does not animate the completion of a forming candle (it
+completes at the end of its time slot). Jump and Skip day complete a forming candle first. The extra panes take the moment, not the
+bar (`xpDraw` lower branch uses `mom()`), so a lower pane never shows a candle past it. Saved sessions carry `mom` (and `sw` once
+switched; the session strip's "replayed %" is then by time); `resume` builds a forming candle again from finer candles
+(`BT.tfResume`); a session saved before this change (index only) loads as before. Limits: the new timeframe is fetched for the whole
+session (300 candles of context before the start, `BT.tfWindow`); more than `XMAX` 40,000 candles is refused in words ("Too many
+1 minute candles for this session …: load fewer days"), nothing changes; a failed fetch leaves the session on its timeframe.
+After a switch, entry markers and connectors snap to the candle that holds their time (`timeToX` places a time inside a candle).
+"Avg hold (bars)" counts bars of whatever timeframe was on screen (finer candles while one formed). Phones: the timeframe button
+is in the toolbar row (44 px), Skip day moved under More (`#skipday2`) to make room. `window.ctTf()` is the audit's read-only
+summary. Not done: a weekly replay timeframe; a lower timeframe for only part of a long session (it is all or refused).
+Tests: `tests/backtest.test.mjs` (no future data in either direction, proven by changing every price after the moment; account
+identical across a switch; path equal to the lower timeframe; a stop in the rest taken once; a low before the moment never fills
+an order placed at it; chains of switches; data holes; refusal; old sessions). Audit: 179 checks (the switch against candles
+fetched apart from the page, forming candle, one step, Undo, split panes, reload, keys, play, the day candle, an old session,
+the refusal, AA in three themes, phone).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
