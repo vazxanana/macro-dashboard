@@ -1379,7 +1379,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-10T17:46:29.000Z",
     "councilEntry": 1.41912,
     "stop": 1.421113,
@@ -1393,10 +1393,15 @@
     "slipR": -0.07,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T17:46:29.000Z",
-    "brokerStop": 1.42125
+    "brokerStop": 1.42125,
+    "closedAt": "2026-11-11T06:33:17.000Z",
+    "exitPrice": 1.42111,
+    "councilExit": null,
+    "councilR": -1
    },
    "btc-replica-1794333363-b": {
     "positionId": "48181678",
@@ -1573,7 +1578,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T21:11:23.000Z",
     "councilEntry": 1.41896,
     "stop": 1.417936,
@@ -1587,10 +1592,12 @@
     "slipR": 0.039,
     "lagSec": 63,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T21:11:23.000Z",
-    "brokerStop": 1.41798
+    "brokerStop": 1.41798,
+    "closedAt": "2026-11-11T06:33:17.000Z"
    },
    "usdchf-replica-1794345020-b": {
     "positionId": "48224449",
@@ -2764,7 +2771,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9957.56 · 15 open",
+  "status": "ok · demo Fusion Markets · balance 9960.38 · 13 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2778,8 +2785,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9957.56,
-  "lastRun": "2026-11-11T06:30:46.000Z"
+  "balance": 9960.38,
+  "lastRun": "2026-11-11T06:33:17.000Z"
  },
  "log": [
   {
@@ -3799,6 +3806,16 @@
    "at": "2026-11-11T06:26:24.000Z",
    "msg": "opened sell ETHUSD 0.23 lot (council replica)",
    "trade": "eth-replica-1794378319-s"
+  },
+  {
+   "at": "2026-11-11T06:33:17.000Z",
+   "msg": "USDCAD position 48224447 closed at the broker",
+   "trade": "usdcad-replica-1794345020-b"
+  },
+  {
+   "at": "2026-11-11T06:33:17.000Z",
+   "msg": "closed USDCAD position 48179100 (council: loss)",
+   "trade": "usdcad-replica-1794332716-s"
   }
  ],
  "limits": {
