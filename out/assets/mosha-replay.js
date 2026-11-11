@@ -13,18 +13,18 @@
   // kind: level = a purple line; vr = the red "5 mn" box (a sell's VR); bvr = the green box (a buy's VR); zone = the lavender
   // zone of the break; htf = a higher-timeframe zone (the target area). `a`..`b` = when the mark starts and ends.
   var EXAMPLES = [
-    { id: 'nov10', title: '10 Nov sell', label: 'This is how I was expecting Mosha to work', market: 'xau', side: 'sell', entry: 4120.42, stop: 4128.92, target: 4072.84,
+    { id: 'nov10', title: '10 Nov sell', label: 'This is how I was expecting Mosha to work', ownLabel: true, market: 'xau', side: 'sell', entry: 4120.42, stop: 4128.92, target: 4072.84,
       from: T('2026-11-09T15:00'), to: T('2026-11-10T11:30'), fillFrom: T('2026-11-10T05:00'), yours: '+5.6R, target reached',
       marks: [
-        { kind: 'level', label: 'Your level 4146.9', p: 4146.9, a: T('2026-11-09T15:00'), b: T('2026-11-09T20:30') },
+        { kind: 'level', label: 'Level 4146.9', p: 4146.9, a: T('2026-11-09T15:00'), b: T('2026-11-09T20:30') },
         { kind: 'vr', label: '5 mn', top: 4148.71, bot: 4127.0, a: T('2026-11-09T20:00'), b: T('2026-11-10T02:15'), at: T('2026-11-09T20:30') },
         { kind: 'level', under: true, label: 'Low 4121.65', p: 4121.65, a: T('2026-11-10T00:55'), b: T('2026-11-10T02:30') },
         { kind: 'zone', label: 'Zone of the break', top: 4128.3, bot: 4121.65, a: T('2026-11-10T02:30'), b: T('2026-11-10T05:40') },
         { kind: 'htf', label: 'H4 zone', top: 4079, bot: 4061, a: T('2026-11-09T15:00'), b: T('2026-11-10T11:30') }],
       steps: [
-        { t: T('2026-11-09T15:00'), text: 'Your level at 4146.9 is above price. Wait for it.' },
+        { t: T('2026-11-09T15:00'), text: 'The level at 4146.9 is above price.' },
         { t: T('2026-11-09T20:25'), text: 'The sweep: price trades through the level to 4148.71 and does not hold above it.' },
-        { t: T('2026-11-09T20:30'), text: 'The M5 VR, your red "5 mn" box: from the extreme 4148.71 down to the last swing low before it, about 4127.' },
+        { t: T('2026-11-09T20:30'), text: 'The M5 VR, the red "5 mn" box: from the extreme 4148.71 down to the last swing low before it, about 4127.' },
         { t: T('2026-11-10T00:30'), text: 'The CF: an M5 candle closes below the VR. The low it leaves is 4121.65.' },
         { t: T('2026-11-10T02:30'), text: 'BO sell on M5: a close below 4121.65. The zone of the break runs from 4121.65 up to 4128.3.' },
         { t: 'fill', text: 'The return to the zone: sell 4120.42, stop 4128.92 above the zone, target 4072.84 at the H4 zone. Plan 1 : 5.6.' },
@@ -37,7 +37,7 @@
       steps: [
         { t: T('2026-10-28T12:00'), text: 'The H4 is a sell (BO sell on 22 Oct, below about 4066). Price is pulling back up to that level.' },
         { t: T('2026-10-28T20:00'), text: 'The pullback ends with a spike to 4082.8, over the earlier highs, straight back down.' },
-        { t: T('2026-10-28T20:15'), text: 'The M5 VR, your red "5 mn" box: from the highs at 4076.7 down to the last swing low before them, 4048.6.' },
+        { t: T('2026-10-28T20:15'), text: 'The M5 VR, the red "5 mn" box: from the highs at 4076.7 down to the last swing low before them, 4048.6.' },
         { t: T('2026-10-29T00:00'), text: 'The CF for the sell: an M5 candle closes below the VR, at 4047.7.' },
         { t: 'fill', text: 'Price comes back up to the VR low: sell 4048.59, stop 4076.69 above the VR, target 3971.09. Plan 1 : 2.8.' },
         { t: 'exit', text: 'The target is reached: the main trade, with the H4.' }] },
@@ -66,7 +66,7 @@
         { t: T('2026-11-02T05:45'), text: 'The M5 VR: from the extreme 3919.5 down to the last swing low before it, about 3906.5.' },
         { t: T('2026-11-02T06:35'), text: 'BO sell: an M5 close below the VR. The zone of the break is 3903.7 to 3909.2.' },
         { t: 'fill', text: 'Entry after the BO sell: sell 3908.27, stop 3916.10, first target 3878.42 at the zone below.' },
-        { t: 'exit', text: 'You closed by hand at 3891.46. Price never reached 3878.42, and later went back through the stop.' }] },
+        { t: 'exit', text: 'Closed by hand at 3891.46. Price never reached 3878.42, and later went back through the stop.' }] },
     { id: 'nov2b', title: '2 Nov buy', label: 'Learn this and let it be your new guide', market: 'xau', side: 'buy', entry: 3900.709, stop: 3896.786, target: 3965.077,
       from: T('2026-11-02T05:00'), to: T('2026-11-02T16:00'), fillFrom: T('2026-11-02T13:20'), yours: '+16.4R, target reached',
       marks: [
@@ -74,9 +74,9 @@
         { kind: 'level', label: '3900', p: 3900.0, a: T('2026-11-02T06:30'), b: T('2026-11-02T08:15') }],
       steps: [
         { t: T('2026-11-02T05:00'), text: 'The sell before it is done. Price is falling back to the lows.' },
-        { t: T('2026-11-02T08:25'), text: 'The low: 3891.26. From here the market holds in a range, your green box.' },
+        { t: T('2026-11-02T08:25'), text: 'The low: 3891.26. From here the market holds in a range, the green box.' },
         { t: T('2026-11-02T12:15'), text: 'The range builds for four hours between 3891 and 3907.' },
-        { t: 'fill', text: 'Buy 3900.71, stop 3896.79 (3.9 a unit), target 3965.08. Plan 1 : 16.4. On our feed the lows at 13:00 and 13:15 UTC were 3896.47 and 3896.53, under your stop by 0.3: a stop this tight depends on the price feed.' },
+        { t: 'fill', text: 'Buy 3900.71, stop 3896.79 (3.9 a unit), target 3965.08. Plan 1 : 16.4. On our feed the lows at 13:00 and 13:15 UTC were 3896.47 and 3896.53, under the stop by 0.3: a stop this tight depends on the price feed.' },
         { t: 'exit', text: 'The target is reached in a little over an hour.' }] }
   ];
   // The earlier screenshots (2 Nov 2026): "POV 26 October" on H4 and H1, "M15 vr", "2000 pips"; then "H1" and "no vr just after
@@ -89,7 +89,7 @@
   var STUDIES = [
     { id: 'cycle', title: '22–30 Oct, top-down', label: 'POV 26 October · M15 vr · 2000 pips', market: 'xau', side: 'sell', entry: 4048.59, stop: 4076.69, target: 3971.09,
       base: '15m', tfs: [900, 3600, 14400], view: 3600, h4off: 3600, handFrom: T('2026-10-28T20:15'),
-      from: T('2026-10-06T00:00'), to: T('2026-10-30T21:00'), fillFrom: T('2026-10-29T00:15'), yours: '+2.8R on the sell, target reached; the whole fall is your "2000 pips"',
+      from: T('2026-10-06T00:00'), to: T('2026-10-30T21:00'), fillFrom: T('2026-10-29T00:15'), yours: '+2.8R on the sell, target reached; the whole fall is the "2000 pips"',
       marks: [
         { kind: 'level', under: true, keep: true, label: 'H4 low 4066.5', relabel: { at: T('2026-10-22T17:00'), label: 'BO sell 4066.5' }, p: 4066.5, a: T('2026-10-07T12:45'), b: T('2026-10-22T17:00'), at: T('2026-10-07T13:00') },
         { kind: 'level', label: 'High 4217.4', p: 4217.4, a: T('2026-10-12T01:00'), b: T('2026-10-28T20:00'), at: T('2026-10-12T05:00') },
@@ -100,15 +100,15 @@
         { t: T('2026-10-07T13:00'), text: 'An H4 low forms at 4066.5. While it holds, the H4 is not a sell.' },
         { t: T('2026-10-12T05:00'), text: 'The high: 4217.4 on 12 Oct. Price does not get above it again.' },
         { t: T('2026-10-22T17:00'), text: 'BO sell: the H4 candle closes at 4038, below 4066.5 (H1 had closed below it at 12:00). The H4 is a sell from here.' },
-        { t: T('2026-10-23T14:45'), text: 'The fall stops at 3975.7, just under the morning low of 3986.7. Your M15 VR, the green box: from that extreme up to the last swing high before it, 4034.1.' },
+        { t: T('2026-10-23T14:45'), text: 'The fall ends at 3975.7, just under the morning low of 3986.7. The M15 VR, the green box: from that extreme up to the last swing high before it, 4034.1.' },
         { t: T('2026-10-26T02:00'), text: 'The range holds: the lows of 26 Oct (3983.3 and 3978.2) stay above 3975.7.' },
         { t: T('2026-10-27T14:15'), text: 'The CF: an M15 candle closes above the VR, at 4035.9. The pullback up has started.' },
         { t: T('2026-10-27T17:45'), text: 'The pullback reaches the H4 BO sell level from below: highs of 4064.9 and 4065.7 against 4066.5.' },
-        { t: T('2026-10-28T20:15'), text: 'It ends with a spike to 4082.8, straight back down. The M5 VR, your red "5 mn" box: 4076.7 down to 4048.6.' },
+        { t: T('2026-10-28T20:15'), text: 'It ends with a spike to 4082.8, straight back down. The M5 VR, the red "5 mn" box: 4076.7 down to 4048.6.' },
         { t: T('2026-10-29T00:00'), text: 'The CF for the sell: an M5 candle closes below the VR, at 4047.7.' },
         { t: 'fill', text: 'Price comes back to the VR low: sell 4048.59, stop 4076.69, target 3971.09. The main trade, with the H4.' },
         { t: 'exit', text: 'The target is reached.' },
-        { t: T('2026-10-30T20:00'), text: 'Price runs on to 3870.3 by the end of the week: 206 dollars below the VR high, your "2000 pips".' }] },
+        { t: T('2026-10-30T20:00'), text: 'Price runs on to 3870.3 by the end of the week: 206 dollars below the VR high, the "2000 pips".' }] },
     { id: 'oct29e', title: '29 Oct evening', label: 'no vr just after gave M5 vr m5 cf for sell', market: 'xau', side: 'sell', entry: null, stop: null, target: null,
       base: '5m', tfs: [300, 900, 3600], view: 900, handFrom: T('2026-10-29T20:15'), watch: { t: T('2026-10-29T23:45'), side: 'sell' },
       from: T('2026-10-28T16:00'), to: T('2026-10-30T16:00'), fillFrom: T('2026-10-29T23:50'), yours: 'no position is drawn on this screenshot',
@@ -171,10 +171,10 @@
   // a logged trade as a chart spec (levels only)
   function specOfTrade(t, now) {
     var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400);
-    return { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', label: 'From your log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
+    return { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, label: 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
       from: t.at - 12 * 3600, to: Math.max(end, t.at + 3600), fillFrom: t.at - 300, exit: t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
-      steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before your entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
+      steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before the entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
   }
   // A lesson as a chart: the desk's own reading when it has drawn one (its marks and steps, checked by the server), else the
   // teacher's levels alone. null when the lesson has neither. H4 candles start at 17:00 New York (21:00 or 22:00 UTC).
@@ -185,7 +185,7 @@
       base: c.base, tfs: c.base === '15m' ? [900, 3600, 14400] : [300, 900, 3600], h4off: usSummer(c.from) ? 3600 : 7200, from: c.from, to: c.to, fillFrom: c.fillFrom != null ? c.fillFrom : c.from, yours: 'the levels as the desk read them', marks: c.marks || [], steps: c.steps || [] };
     if (!t) return null;
     var s = specOfTrade({ id: l.id, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, status: t.exit != null ? 'closed' : 'open', exit: t.exit != null ? t.exit : null, exitAt: t.exitAt || null, R: t.R != null ? t.R : null }, now);
-    s.id = 'lesson-' + l.id; s.lesson = true; s.title = l.title; s.label = t.src === 'replay' ? 'A trade from a ChronosTrade replay' : 'The levels of this lesson'; s.yours = t.exit != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'the levels you gave'; return s;
+    s.id = 'lesson-' + l.id; s.lesson = true; s.title = l.title; s.label = t.src === 'replay' ? 'A trade from a ChronosTrade replay' : 'The levels of this lesson'; s.yours = t.exit != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'the levels given with the lesson'; s.log = false; return s;
   }
   // the hand-over to ChronosTrade: the same market from the moment before the entry forms, with the marks already known then
   function handoff(spec, now) {
@@ -200,6 +200,8 @@
   if (typeof document === 'undefined') return;
 
   // ─── the chart ───
+  // Words go through L(): English is the key, assets/mosha-i18n.js holds the teacher's other language (the method's words stay English).
+  var L = function (s, v) { var I = root.MS_MOSHA_I18N; s = I ? I.tr(s) : s; return v ? s.replace(/\{(\w+)\}/g, function (m, k) { return v[k] != null ? v[k] : m; }) : s; };
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var TFS = [[300, 'M5'], [900, 'M15'], [3600, 'H1'], [14400, 'H4']], SPEEDS = [[1, 420], [3, 140], [10, 40]];
@@ -236,11 +238,11 @@
     var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10)); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
     marksAt(sp, now).forEach(function (m) {
       var x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
-      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(m.label, m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
+      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(L(m.label), m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
       var yt = Y(m.top), yb = Y(m.bot); if (yt == null || yb == null) return;
-      if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(m.label, (x1 + x2) / 2 - 16, yt - 11, col); }
-      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) tag(m.label, x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); }
-      else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(m.label, x1 + 6, (yt + yb) / 2, C.level); }
+      if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(L(m.label), (x1 + x2) / 2 - 16, yt - 11, col); }
+      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) tag(L(m.label), x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); }
+      else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(L(m.label), x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
     var oc = R.oc; if (oc && oc.fill != null && oc.fill <= now) {
@@ -256,10 +258,10 @@
   function caption() {
     if (!R.bars || !R.bars.length) return;
     var now = R.bars[R.cur].time + R.tf - 1, k = stepAt(R.steps, now), box = $('mo-rp-cap'), st = $('mo-rp-steps');
-    if (box) { var txt = k < 0 ? 'Press play, or step through.' : (k + 1) + ' of ' + R.steps.length + ' · ' + R.steps[k].text; if (box.textContent !== txt) box.textContent = txt; }
+    if (box) { var txt = k < 0 ? L('Press play, or step through.') : L('{a} of {b}', { a: k + 1, b: R.steps.length }) + ' · ' + L(R.steps[k].text); if (box.textContent !== txt) box.textContent = txt; }
     if (st) Array.prototype.forEach.call(st.children, function (b, i) { b.setAttribute('aria-current', i === k ? 'step' : 'false'); b.classList.toggle('done', i < k); });
     var clock = $('mo-rp-clock'); if (clock) clock.textContent = utc(R.bars[R.cur].time); var sl = $('mo-rp-slider'); if (sl && +sl.value !== R.cur) sl.value = R.cur;
-    var pl = $('mo-rp-play'); if (pl) { pl.textContent = R.timer ? 'Pause' : R.cur >= R.bars.length - 1 ? 'Play again' : 'Play'; pl.setAttribute('aria-pressed', R.timer ? 'true' : 'false'); }
+    var pl = $('mo-rp-play'); if (pl) { pl.textContent = R.timer ? L('Pause') : R.cur >= R.bars.length - 1 ? L('Play again') : L('Play'); pl.setAttribute('aria-pressed', R.timer ? 'true' : 'false'); }
   }
   function show(i) { if (!R.bars) return; R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
   function stop() { if (R.timer) { clearInterval(R.timer); R.timer = 0; } caption(); }
@@ -277,36 +279,44 @@
   }
   function result() {
     var el = $('mo-rp-res'), oc = R.oc, sp = R.spec; if (!el) return;
-    if (sp.entry == null && !sp.watch) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · marks only, no position<small>' + esc(sp.label || '') + '.</small>'; return; }   // a lesson the desk marked without a trade
+    if (sp.entry == null && !sp.watch) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('marks only, no position') + '<small>' + esc(L(sp.label || '')) + '.</small>'; return; }   // a lesson the desk marked without a trade
     if (sp.entry == null) { var f = follow(sp, R.base), dn = sp.side === 'sell';   // a picture without a position
-      el.innerHTML = '<b>' + esc(sp.title) + '</b> · no position is drawn on this screenshot<small>On our candles: ' + esc(!f ? 'the candle it points at is not in the feed' : 'the ' + utc(f.t) + ' candle closed at ' + f.px.toFixed(1) + '. After it price went ' + f.worst.toFixed(1) + ' ' + (dn ? 'up' : 'down') + ' at most, then ' + f.best.toFixed(1) + ' ' + (dn ? 'down' : 'up') + ', to ' + f.bestPx.toFixed(1) + ' at ' + utc(f.bestT)) + '.</small>'; return; }
-    var ours = !oc || oc.fill == null ? 'the entry price was not traded on our candles at that time' : oc.kind === 'target' ? 'filled ' + utc(oc.fill) + ', target reached ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against'
-      : oc.kind === 'stop' ? 'filled ' + utc(oc.fill) + ', stopped ' + utc(oc.exit) : oc.kind === 'hand' ? 'filled ' + utc(oc.fill) + ', closed ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against' : 'filled ' + utc(oc.fill) + ', neither stop nor target by the end of the window';
-    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? 'The lesson: ' : 'You: ') + esc(sp.yours || '—') + '. On our candles: ' + esc(ours) + '.</small>';
+      el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('no position is drawn on this screenshot') + '<small>' + L('On our candles:') + ' ' + esc(!f ? L('the candle it points at is not in the feed') : L(dn ? 'the {t} candle closed at {px}. After it price went {w} up at most, then {b} down, to {bp} at {bt}' : 'the {t} candle closed at {px}. After it price went {w} down at most, then {b} up, to {bp} at {bt}', { t: utc(f.t), px: f.px.toFixed(1), w: f.worst.toFixed(1), b: f.best.toFixed(1), bp: f.bestPx.toFixed(1), bt: utc(f.bestT) })) + '.</small>'; return; }
+    var v = oc && oc.fill != null ? { f: utc(oc.fill), x: oc.exit != null ? utc(oc.exit) : '', r: fR(oc.R), w: oc.worst.toFixed(2) } : null;
+    var ours = !v ? L('the entry price was not traded on our candles at that time') : oc.kind === 'target' ? L('filled {f}, target reached {x} ({r}), worst point {w}R against', v)
+      : oc.kind === 'stop' ? L('filled {f}, stop touched {x}', v) : oc.kind === 'hand' ? L('filled {f}, closed {x} ({r}), worst point {w}R against', v) : L('filled {f}, neither stop nor target by the end of the window', v);
+    // whose figure the first one is: the lesson's, the log's, or the one written on the screenshot (never "you": every reader sees this card)
+    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? L('The lesson:') : sp.log ? L('In the log:') : L('On the screenshot:')) + ' ' + esc(yoursOf(sp)) + '. ' + L('On our candles:') + ' ' + esc(ours) + '.</small>';
   }
+  // the first figure in the reader's language: a fixed phrase is looked up, "+1.20R, closed at 3891" is put together
+  function yoursOf(sp) { var y = sp.yours || '—', m = /^(.*R), closed at (.+)$/.exec(y); return m && (sp.log || sp.lesson) ? L('{r}, closed at {p}', { r: m[1], p: m[2] }) : L(y); }
+  function labelOf(spec) { return spec.ownLabel && document.documentElement.dataset.role !== 'owner' ? '' : spec.label ? (spec.lesson || spec.log ? L(spec.label) : '"' + spec.label + '"') : ''; }
+  function pickHTML() { var pick = function (e) { return '<button type="button" data-ex="' + e.id + '" aria-pressed="' + (!!R.spec && R.spec.id === e.id) + '">' + esc(L(e.title)) + '</button>'; }; return EXAMPLES.map(pick).join('') + '<span class="mo-rp-k mo-rp-sep">' + L('The bigger picture') + '</span>' + STUDIES.map(pick).join(''); }
+  function stepsHTML() { return R.steps.map(function (s, i) { return '<button type="button" data-step="' + i + '" title="' + esc(L(s.text)) + '">' + (i + 1) + '</button>'; }).join(''); }
+  // the language changed: every word of the card again (the chart and the place in the replay stay)
+  function relang() { var pk = $('mo-rp-pick'); if (!pk || !$('mo-replay').dataset.wired) return; pk.innerHTML = pickHTML(); if (!R.spec) return; $('mo-rp-label').textContent = labelOf(R.spec); if (!R.bars) return; $('mo-rp-steps').innerHTML = stepsHTML(); result(); caption(); requestAnimationFrame(paint); }
   function open(spec, scroll) {
     var card = $('mo-replay'); if (!card) return; stop(); R.spec = spec; var tk = ++R.token, msg = $('mo-rp-msg');
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-pick button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.ex === spec.id)); });
-    $('mo-rp-label').textContent = spec.label ? '"' + spec.label + '"' : '';
+    $('mo-rp-label').textContent = labelOf(spec);
     if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = 'The chart library did not load. Reload the page.'; return; }
-    var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = 'No candles came back for that time. The chart needs the live site and an open candle feed.'; return; }
+    if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = L('The chart library did not load. Reload the page.'); return; }
+    var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); return; }
       msg.hidden = true; build(); R.base = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
       var list = tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0) R.tf = list[0]; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
       $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
-      $('mo-rp-steps').innerHTML = R.steps.map(function (s, i) { return '<button type="button" data-step="' + i + '" title="' + esc(s.text) + '">' + (i + 1) + '</button>'; }).join('');
+      $('mo-rp-steps').innerHTML = stepsHTML();
       result(); setTf(R.tf); };
     var ck = spec.id + ':' + spec.from + ':' + spec.to + ':' + (spec.base || '5m');   // a lesson's chart can change: the candles are kept per window
     if (R.cache[ck]) return done(R.cache[ck]);
-    msg.hidden = false; msg.textContent = 'Loading the candles…';
+    msg.hidden = false; msg.textContent = L('Loading the candles…');
     fetch('/md/bars?sym=' + encodeURIComponent(spec.market) + '&tf=' + (BASE[spec.base] ? spec.base : '5m') + '&from=' + spec.from + '&to=' + spec.to, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { var bars = j && Array.isArray(j.bars) ? j.bars.filter(function (b) { return !b.live; }).map(function (b) { return { time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; }) : null; if (bars && bars.length >= 20) R.cache[ck] = bars; done(bars); })
       .catch(function () { done(null); });
   }
   function wire() {
     var card = $('mo-replay'); if (!card || card.dataset.wired) return; card.dataset.wired = '1';
-    var pick = function (e) { return '<button type="button" data-ex="' + e.id + '" aria-pressed="false">' + esc(e.title) + '</button>'; };
-    $('mo-rp-pick').innerHTML = EXAMPLES.map(pick).join('') + '<span class="mo-rp-k mo-rp-sep">The bigger picture</span>' + STUDIES.map(pick).join('');
+    $('mo-rp-pick').innerHTML = pickHTML();
     $('mo-rp-speed').innerHTML = SPEEDS.map(function (s) { return '<button type="button" data-sp="' + s[0] + '" aria-pressed="' + (s[0] === R.speed) + '">' + s[0] + '×</button>'; }).join('');
     card.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return;
@@ -327,6 +337,6 @@
   root.msMoshaReplay = function () { wire(); if (!R.spec) open(EXAMPLES[0]); else requestAnimationFrame(paint); };
   root.msMoshaReplayTrade = function (t) { wire(); open(specOfTrade(t, Math.floor(Date.now() / 1000)), true); };
   root.msMoshaReplayLesson = function (l) { var sp = specOfLesson(l, Math.floor(Date.now() / 1000)); if (!sp) return false; wire(); open(sp, true); return true; };
-  root.msMoshaReplayStop = stop;
+  root.msMoshaReplayStop = stop; root.msMoshaReplayLang = relang;
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.msMoshaReplay(); }   // the desk was already open when this file ran
 })(typeof window !== 'undefined' ? window : globalThis);

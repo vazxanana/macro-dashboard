@@ -1417,6 +1417,27 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   Edge lab: verdict donut + legend with counts and shares, best candidate IS vs OOS bars (baseline OOS tick, t in words), equity
   line where a study lists its own trades (`lab-summary.mjs` `equityOf`: cumulative R sampled to 48 points, drawdown from the full
   series; today crypto-trend-decay and nq-open-oos), `[data-tip]` tooltips on hover and tap.
+- Quality pass (11 Nov 2026; every page at 390 px touch and 1440 px, dark / light / midnight, owner / reviewer / viewer / signed
+  out). **Macro desk**: since the 9 Nov `main[data-loading]` fix the charts were drawn while the story was still `display: none`,
+  so `draw()` found no width and the score path, the level ladder, the expectation scale and the hit-rate chart stayed blank until a
+  resize or the 5-minute reload; `load()` now removes the flag, then calls `redraw()`. "No hypothesis this run" is said once, the
+  score chart's threshold names are drawn after the line, each dot of the header switch is a 44 px target on touch (25 px before)
+  and the switch hides when signed out. **Edge lab**: a study whose result stores an object under `system` read "[object Object]"
+  (only text is a description); `tidy()` mends a joined headline ("FAIL.; Intraday: …"); the report dialog renders the study's
+  RESULT.md (`md` / `mdInline`, the veteran library's renderer: escaped first, tables scroll inside `.tbl`, relative links stay text)
+  instead of raw Markdown in a monospace block. **Veteran library**: "Open raw" is 44 px on touch. **Gold terminal** (locked
+  features and the driver stack untouched): the page clips sideways overflow, so on phones the Daily Bias banner's Target / Daily ATR
+  column, the levels panels and Research → Edge Summary table were cut off with no way to reach them (the banner stacks under
+  700 px, `.levels-grid` uses `minmax(0, 1fr)`, the table's card is `.gx-scroll-x`); `.edge-rule` notes were pale text on a pale slab
+  in dark (2.3:1); the hero chart's key-level labels are drawn above the candles on a plate of the card colour (`P.plate`; the lines
+  stay underneath); the MTF opportunity line no longer reads "Buy the pullback into the wait for a pullback block" when M15 has no
+  block (`planTxt`). `scripts/audit/smoke.cjs` now opens every gold tab on the phone (body wider than the screen = "tab cut off on
+  the right") and fails on a visible, empty chart host (`.vz[id]`, "chart not drawn"); both fail on the build before this pass.
+  Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
+  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab states win rates and "high conviction" with no
+  n or t (older content, against the wording of absolute rule 4); `research/macro-veteran/START_HERE.md` (shown in the veteran
+  library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
+  and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -2060,6 +2081,30 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
       `tests/mosha-i18n.test.mjs` fails on a phrase with no French line, a French line nothing uses, a method word
       translated away, a `{blank}` or `<b>` that differs, a chapter whose two languages differ in shape or right
       answer, and a French button name the page does not show.
+  - **His turn first, one tap away** (11 Nov 2026, quality round; he had sent lessons but judged no answer and confirmed no
+    book line). On his page `#mo-todo` now comes BEFORE the guide (`order: -6`) and is no longer a row of jump buttons: it
+    counts what waits ("3 answers to check · 4 questions from the desk", then the book's lines) and holds the FIRST item,
+    answerable in place with the lesson's own buttons (`drawTodo`): the desk's answer (clamped past 280 characters, "Read it
+    all"), its first open question (Yes / No or a few words; the next one follows by itself), "That is right" / "Not right…"
+    (typed in place), "Open the whole lesson", "Later" (to the back of the queue, this visit only). When no answer waits,
+    the first unconfirmed book line with Right / Correct / Erase. After each tap the item rests (`mo-busy`), then
+    `#mo-td-flash` (the only live region) says what happened and "Here is the next one."; a phone hides the intro line
+    while something waits (`#v-mosha.mo-turn`) so the judge buttons stay on the first screen. `turnOf(l)` (pure): a lesson
+    is still HIS while the desk's last answer has an unanswered question and he wrote nothing after it, although the server
+    already calls it "more" after his first answer; `todo()` returns `turn` (oldest first) and `ask` beside `judge`; the
+    "Your turn" filter and the lesson's chip ("The desk has 2 questions for you") follow it. `stateOf` is unchanged (the
+    server's rule). A correction or answer stays in its box until the desk has it (`T.sd`, `T.qd`); errors say what to do
+    (no connection, too many requests, a picture too large), the lessons that cannot be read offer "Try again". No new
+    permission, endpoint or concept; `api/mosha*.js` untouched.
+  - **The chart card and the log in his language, addressed to no one** (11 Nov 2026). `assets/mosha-replay.js` and the
+    reader's side of `assets/mosha-desk.js` go through `L(...)` like the teach cards (controls, captions, every step of
+    the examples, the result line, the log's record, table and candle check; `msMoshaReplayLang` / `msMoshaDeskLang` redraw
+    on a switch). The examples are HIS screenshots and every reader sees the card, so the desk's text about them says
+    "the red "5 mn" box", "Closed by hand", "On the screenshot: +5.6R" / "In the log:" / "The lesson:", never "you" /
+    "your" (a test bans it); the owner's own sentence on the 10 Nov example shows to the owner only (`ownLabel`). The
+    owner's log form and prompts stay English. `scripts/mosha-lessons.mjs`: `lesson.txt` says under its heading whose move
+    it is and why (`why`), `BOOK.md` counts the teacher's lines against the desk's, and `pull` prints first how many
+    lessons wait for the desk, for the teacher, and are understood (`counts`, `countsText`).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 
