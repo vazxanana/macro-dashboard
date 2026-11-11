@@ -1692,6 +1692,33 @@ with an `MCP_KEYS` entry the stored user list was not read before `ictLevel`, so
 built-in ICT level whatever the Users page said; the list is read first for every key (an explicit key is still a grant while
 the list cannot be read). The same file re-checks: a foreign Origin on every state-changing endpoint, `/cdata` path handling,
 the Mosha assistant's key against every other endpoint, who teaches, who writes whose record, where `ictApply` can come from.
+Blob freshness audit (11 Nov 2026, after the Academy lost a verdict to a stale read; `tests/blob-fresh.test.mjs`, lagging fake
+Blob service `tests/fixtures/blob-lag.mjs`). The Blob CDN serves a file that was OVERWRITTEN IN PLACE with its old bytes for
+up to a minute; a read with `?cache=0` asks the origin. Every reader / writer under `api/` was read:
+- **Overwritten in place, read through the CDN until now** (old data on another instance, and its next save dropped what was
+  stored in between): `notify.js` (notices/list.json), `profile.js` (profiles/<key>.json), `sounds.js` (sounds/config.json),
+  `mosha.js` (mosha/trades.json), `mosha-lessons.js` (mosha/lessons.json, mosha/book.json). Each store now reads through
+  `fresh(url)` (`?cache=0`), as `_academy-store.js` does. A lesson's picture is written once under its own name and may come
+  from the CDN. **Rule: a module that writes with `allowOverwrite: true` reads with `cache=0`** (a test lists the six files).
+- **Not affected, a new file name per save** (`addRandomSuffix: true`: a new URL, no CDN copy can exist; the reader takes the
+  newest from the listing): the user list (`users.js` writes, `_accounts.js` `blobUsers` reads: sign-in, `/api/me`, profile,
+  users, ctrader-link, the connectors), price alerts (`_alerts.js`), cTrader link tokens, TradingView alerts, run reports, the
+  bridge ping. So a changed password, a removed member or a removed permission is never honoured from a stale Blob read.
+- **What does lag by design**: `S.fromRequest(…, { cacheMs: 60e3 })` keeps the user list a minute per instance (and up to 10
+  minutes while the list cannot be read) for READS on `/cdata`, notifications, the Mosha log and lessons. The one WRITE path
+  that used it, a teacher's POST to `/api/mosha-lessons`, now checks the list as it is (a removed account, a new password or
+  teaching switched off is refused on the next call); `handle` takes `d.deps` for tests.
+- **Two small guards where real time passes between a read and its write** (not locks): `mosha-lessons.js` reads the list again
+  after a picture upload (a lesson stored meanwhile is kept; a lesson removed meanwhile answers 404 and the picture is taken
+  away); `alert-cron.js` reads a device's record again before saving it after the candles and pushes (an alert the device
+  added meanwhile is kept, a device that removed itself is not written back).
+- **Academy store**: its "own copy for a minute" shortcut is now used only while the listed ETag is the one its write returned
+  (the upload-time rule, the fallback, let a write by another instance within 1.5 s go unseen for a minute and be dropped).
+- **Still open, everywhere a file is overwritten in place**: two instances that both read and both write inside the same few
+  milliseconds can lose one write (single-writer in practice: the owner, one teacher, one page at a time). The Blob client
+  (2.8.2) has a conditional write (`put(…, { ifMatch: <listed etag> })`); it is not used because it could not be tried against
+  the real service from the build sandbox and a wrong ETag form would refuse every save. Try it on a preview deployment first.
+- Not verified against the real Blob service: that `cache=0` reads are read-your-writes, and that the listing is.
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
@@ -2295,6 +2322,41 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
   draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
   decision saves the sitting.
+- **The phone's simple view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone";
+  page markup, CSS, page code, audit and tests only: no decision, lesson, policy or API logic changed, and it adds **no API
+  call**). The site's one convention, as on the Desk, the Macro desk and ChronosTrade, so one choice covers every page: at
+  640 px and under the page head sets `html[data-phone="simple"]` before the first paint unless localStorage `ms-phone` is
+  `full` (no key = simple; the attribute is never set on a wider screen); the switch "Phone view: Simple | Full" (`#pv` at
+  the foot of the page, `setPhoneView`, then the head's `msPhoneSet()`) writes it, and Full is the phone page as it was.
+  **Storage allowlist**: `PREFS` is now `mxacEdge`, `mxacFold`, `ms-phone`, with a third helper `prefDel` (same allowlist)
+  because that key means "simple" by being absent; the pin tests list the three writes and the one removal, and the page
+  head only reads (still never a decision, a draft or an API answer). Every rule is in ONE block at the end of
+  `assets/academy.css`, inside `@media (max-width: 640px)` and under the simple attribute (a test reads every selector), so
+  a wider screen and the full view read none of it. Three inert-elsewhere pieces, all in `assets/academy-ui.js` ("the phone's simple view"):
+  `.pm-host > .pm` + `button.pmore` (parts that wait behind a "more" button: `moreToggle`, `moreBtn`), `.pcard` + `pfold`
+  (a card folds to its heading with a chevron; on `kit.pfold` for the sections; open state kept for the visit in `PF`) and
+  `TAB_MORE` (`#tab-more`). What the simple view shows: before a replay the hero is its title and the setup is the edge
+  cards (name and market), the days with the preview, train / exam, "More options" and a full-width Start ("About this
+  edge" and "Lessons in force and saved sessions" are buttons); during a replay the hero and the long setup card step
+  aside and the screen is the chart, Play / Step / speeds / "More" (Restart, Jump, Save and Resume session, the feed note,
+  the keyboard line and the legend) and the line that says the clock stopped with two full-width buttons; then the
+  decision, the verdict, the lesson, the proof and "What if" come straight after the chart (CSS `order`; the DOM is
+  unchanged) and Paper account, Higher timeframe, Running thesis, Replay log and "Test on new setups" are folded cards.
+  Decision card: levels in one row, "Setup facts and versions" behind a button, the analyst block hidden only while it is
+  switched off (`:has(#an-off)`). Verdict form: answers two by two, entry / stop / target only when the answer is changed
+  to a trade (`:has(input:enabled)`), "Bias, another edge, marks on the chart" behind a button, full-width Save: one
+  screen. Tab bar: Train, Session, Blind arena, Progress, Lessons and "More" (Research, Models, Costs, Audit; it stays
+  open while one of them is on screen). Sections open on their headline card and fold the rest (`PHONE_FOLD` in
+  `assets/academy-tabs.js`: Lessons keeps the list; Progress keeps "Where things stand"; Research keeps the policy table;
+  Models keeps the registry). Measured at 390 x 844: setup 3.2 -> 1.9 screens, a replay 2.9 -> 1.5, stopped on a setup
+  6.7 -> 4.0 (decision card 1,323 -> 992 px, verdict form 985 -> 577 px), Progress 2.9 -> 1.5, Research 4.3 -> 1.9,
+  Models 5.3 -> 1.3. Proof that nothing else moved: the box, font size, colour and display of every drawn element of
+  `<main>` at 1440 px, and at 390 px in the full view, equal the build before (ten page states; the only differences are two
+  new ids, the 76 px switch at the foot of the phone page and replay-clock text). Session and Blind keep their own
+  round-3 layout (only the tab bar and the hero change there). The audit's phone part runs in the simple view (helpers
+  `tabTo`, `unfold`) and adds 12 checks, the full view and the remembered choice among them; its Models check counts buttons
+  other than the fold chevron. Not done: the What-if card is not folded (its body is redrawn by the page code), and an
+  open fold is forgotten on reload on purpose (nothing more goes into storage).
 - **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
   verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
   an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER

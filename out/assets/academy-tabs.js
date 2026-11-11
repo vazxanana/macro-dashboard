@@ -312,7 +312,10 @@
   // ---- shared page pieces ----------------------------------------------------------------------------------------------
   const K = MXAC.kit, el = K.el, clear = K.clear, listOr = K.listOr, actBadge = K.actBadge, api = MXAC.api;
   const $ = (id) => document.getElementById(id);
-  const card = (title, small, id) => el('div', { class: 'card', id: id || null }, el('h2', { class: 'c-h' }, title, small ? el('small', { text: small }) : null));
+  // On a phone's simple view a section opens on its headline card; these fold to their heading (K.pfold: display only, and
+  // inert on a wider screen and in the full view). Nothing is removed: the chevron in the heading opens the card.
+  const PHONE_FOLD = ['ls-check', 'ls-drafts-card', 'pg-agree', 'pg-rvn', 'pg-mistakes', 'pg-queue', 'pg-attempts', 'rs-studies', 'rs-notebook', 'md-training'];
+  const card = (title, small, id) => { const c = el('div', { class: 'card', id: id || null }, el('h2', { class: 'c-h' }, title, small ? el('small', { text: small }) : null)); return id && PHONE_FOLD.indexOf(id) >= 0 && K.pfold ? K.pfold(c, title) : c; };
   const empty = (text, extra) => el('div', { class: 'ac-empty' }, el('p', { text }), extra || null);
   const errBox = (what, e) => el('p', { class: 'ac-err', text: `${what} could not be read: ${(e && e.message) || e}.` });
   const tag = (text, kind) => el('span', { class: 'tag' + (kind ? ' ' + kind : ''), text });
