@@ -96,3 +96,59 @@ test('forward trades count after costs (Rnet) where recorded, and keep what the 
   assert.equal(p.g, -1); assert.equal(p.c, 0.4); assert.equal(p.sh, 1); assert.equal(p.m, 'XAU/USD'); assert.equal(p.sd, 'buy'); assert.equal(p.st, 'loss');
   assert.equal(r.s.P[2].c, undefined);
 });
+
+// 11 Nov 2026: a verdict that rests on a backtest says so. The machine verdict (r.v) is what the digest and week pane compare.
+test('backtest only: the chip says it, the machine verdict does not change, the digest sees no movers', async () => {
+  const win = (i) => (i % 4 ? 1.2 : -1);
+  // a system replay with an edge verdict and 3 forward live trades of the same setup; a forward stream with 40 trades and the same verdict
+  const replay = { from: '2020-01-01', trades: mk(80, (i) => ({ k: 'gtrend', name: 'Gold trend', status: win(i) > 0 ? 'win' : 'loss', R: win(i), closed: NOW - 9e6 + i * 1e5 })) };
+  const trades = mk(3, (i) => ({ k: 'gtrend', name: 'Gold trend', shadow: false, status: 'win', R: 1, closed: NOW - i * 1000 }))
+    .concat(mk(2, (i) => ({ k: 'gtrend', name: 'Gold trend', shadow: true, status: 'loss', R: -1, closed: NOW - i * 1000 })))
+    .concat(mk(40, (i) => ({ k: 'fwd', name: 'Forward stream', shadow: true, status: win(i) > 0 ? 'win' : 'loss', R: win(i), closed: NOW - 4e6 + i * 5e4 })));
+  const ictReplay = { from: '2025-08-01', trades: mk(60, (i) => ({ id: 'a' + i, aset: true, status: win(i) > 0 ? 'win' : 'loss', R: win(i), closed: NOW - 4e6 + i * 5e4 })) };
+  const ictTrades = mk(5, (i) => ({ id: 'f' + i, aset: true, status: 'win', R: 1, closed: NOW - i * 100 }));
+  const macro = { scorecard: { replay: { gold: { n: 400, hit: 0.55, base: 0.52, z: 1.2 } }, live: { gold: { n: 3, hit: 0.67, base: 0.67 } } } };
+  const D = { trades, replay, ictReplay, ictTrades, macro, config: { goldTrend: true }, now: NOW };
+  const rows = SB.build(D), by = Object.fromEntries(rows.map((r) => [r.id, r]));
+
+  const rp = by['mer-gtrend-sysreplay'];
+  assert.equal(rp.v, 'edge', 'the machine verdict is the old one'); assert.equal(rp.fwd, 0); assert.equal(rp.vBt, true);
+  assert.equal(rp.vShow, 'Edge (backtest only)');
+  assert.match(rp.vTip, /None of this row’s 80 trades is a forward/); assert.match(rp.vTip, /A backtest is not a forward record\./);
+  assert.match(rp.vTip, /own row: 5 closed \(3 live, 2 shadow\)/, 'the same setup\'s forward count, live and shadow apart');
+  assert.match(SB.build({ replay, now: NOW })[0].vTip, /The same setup has no closed forward trade yet\.$/);
+  const fw = by['mer-fwd-shadow'];
+  assert.equal(fw.v, 'edge'); assert.equal(fw.fwd, 40); assert.equal(fw.vBt, false); assert.equal(fw.vShow, 'Edge'); assert.equal(fw.vTip, '');
+  const ia = by['ict-a'];   // 60 replay + 5 forward: under 20 forward, so the verdict rests on the replay
+  assert.equal(ia.v, 'edge'); assert.equal(ia.fwd, 5); assert.equal(ia.vShow, 'Edge (backtest only)'); assert.match(ia.vTip, /Only 5 of this row’s 65 trades are forward/);
+  assert.equal(by.macro.v, 'promising'); assert.equal(by.macro.vShow, 'Promising (backtest only)'); assert.match(by.macro.vTip, /Only 3 of this row’s 400 scored days/);
+  assert.equal(by['mer-gtrend-live'].v, 'few'); assert.equal(by['mer-gtrend-live'].vShow, 'Too few'); assert.equal(by['mer-gtrend-live'].vBt, false);
+
+  // shown(): only Edge and Promising are relabelled; 20 forward trades is enough; a row that does not know its forward count is left alone
+  assert.equal(SB.FWD_MIN, 20);
+  assert.equal(SB.shown({ v: 'losing', fwd: 0, s: { n: 50 } }).label, 'Losing');
+  assert.equal(SB.shown({ v: 'unclear', fwd: 0, s: { n: 50 } }).bt, false);
+  assert.equal(SB.shown({ v: 'edge', fwd: 20, s: { n: 50 } }).label, 'Edge');
+  assert.equal(SB.shown({ v: 'edge', fwd: 19, s: { n: 50 } }).label, 'Edge (backtest only)');
+  assert.equal(SB.shown({ v: 'edge', s: { n: 50 } }).label, 'Edge');
+  assert.match(SB.shown({ v: 'promising', fwd: 1, s: { n: 50 } }).tip, /Only 1 of this row’s 50 trades is a forward \(live or paper\) trade,/);
+
+  // every machine verdict is still one of the five words, and nothing but the display fields carries the new wording
+  for (const r of rows) { assert.match(r.v, /^(edge|promising|unclear|losing|few)$/); assert.ok(!/backtest/.test(r.v)); assert.equal(typeof r.vShow, 'string'); }
+
+  // the digest: a baseline saved before this change (plain machine verdicts) against today's rows = no movers, same map
+  const dg = await import('../council/digest.mjs');
+  const before = Object.fromEntries(rows.map((r) => [r.id, r.v]));
+  assert.deepEqual(dg.verdictMap(rows), before);
+  assert.equal(dg.movers(rows, before).length, 0);
+  assert.ok(Object.values(dg.verdictMap(rows)).every((v) => dg.VERDICT[v]), 'the digest can still name every verdict');
+  assert.equal(dg.movers(rows, { ...before, 'mer-gtrend-sysreplay': 'promising' }).map((m) => [m.id, m.from, m.to].join(' ')).join('|'), 'mer-gtrend-sysreplay promising edge');
+});
+
+test('backtest only: the page shows the display field, the legend explains it, the row class keeps the machine verdict', () => {
+  assert.match(src, /class="sb-v v-' \+ r\.v \+ \(r\.vBt \? ' v-bt" title="' \+ esc\(r\.vTip\)/);
+  assert.match(src, /'<tr class="sb-r v-' \+ r\.v \+ \(r\.vBt \? ' bt' : ''\)/);
+  assert.match(src, /if \(r\.vBt\) bits\.push\(/, 'the opened row says it in words (a tooltip does not open on touch)');
+  assert.match(html, /<p class="ms-note sb-foot">[^<]*(<b>[^<]*<\/b>[^<]*)*<b>\(backtest only\)<\/b> after Edge or Promising: fewer than 20 of the row’s trades are forward/);
+  assert.match(html, /\.sb-v\.v-bt \{ background: none; border-style: dashed; \}/);
+});

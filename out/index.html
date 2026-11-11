@@ -4258,6 +4258,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 .sb-v.v-edge { background: var(--buy-soft, rgba(47,191,143,.12)); color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
 .sb-v.v-promising { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
 .sb-v.v-losing { background: var(--sell-soft, rgba(242,87,111,.12)); color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
+.sb-v.v-bt { background: none; border-style: dashed; } .sb-t tr.sb-r.bt td { background: none; }   /* backtest only: no fill, dashed, no row tint */
 .sb-v.v-unclear { color: var(--ink); } .sb-v.v-few { border-style: dashed; color: var(--ink-faint); }
 .sb-st.st-live { color: var(--ink); border-color: var(--accent); background: var(--accent-soft, rgba(91,140,255,.12)); } .sb-st.st-paper { color: var(--ink); }
 .sb-st.st-watch { color: var(--gold, #e3b341); border-color: color-mix(in srgb, var(--gold, #e3b341) 45%, transparent); } .sb-st.st-failed { color: var(--sell); border-style: dashed; } .sb-st.st-shadow { color: var(--ink-faint); }
@@ -4268,7 +4269,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 .sb-t .sb-xin svg { width: 100%; height: auto; max-width: 560px; display: block; } .sb-t .sb-xin p { margin: 0; font-size: 12px; color: var(--ink-dim); line-height: 1.45; } .sb-t .sb-xin p b { color: var(--ink); }
 .sb-t td.sb-empty { text-align: left; color: var(--ink-dim); white-space: normal; }
 .c-sb .sb-foot { margin: 10px 0 0; font-size: 12px; line-height: 1.5; } .c-sb .sb-foot b { color: var(--ink); font-weight: 600; }
-@media (max-width: 520px) { .sb-t { font-size: 12.5px; } .sb-t th, .sb-t td { padding: 6px 7px; } .sb-t tbody th { min-width: 132px; max-width: 160px; } }
+@media (max-width: 520px) { .sb-v.v-bt { white-space: normal; max-width: 92px; } .sb-t { font-size: 12.5px; } .sb-t th, .sb-t td { padding: 6px 7px; } .sb-t tbody th { min-width: 132px; max-width: 160px; } }
 @media (forced-colors: active) { .sb-v, .sb-st, .sb-rb { forced-color-adjust: none; } }
 :root[data-theme="light"] .sb-st.st-watch, :root[data-theme="light"] .sb-rb.rb-fragile { color: #8a5d00; border-color: rgba(138,93,0,.4); }
 </style>
@@ -5199,7 +5200,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <label class="sb-thin"><input type="checkbox" id="ms-sb-thin"> Thin shadow streams (under 20 trades)</label>
         </div>
         <div class="sb-wrap" tabindex="0" role="region" aria-label="Edge scoreboard, scrolls sideways"><table class="sb-t"><thead id="ms-sb-h"></thead><tbody id="ms-sb-b"><tr><td class="sb-empty">Loading…</td></tr></tbody></table></div>
-        <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. Replay rows are net of spread; forward rows are net of costs where the trade records them (R less its cost in R), else as recorded. Tap a stream for its equity curve.</p>
+        <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. <b>(backtest only)</b> after Edge or Promising: fewer than 20 of the row’s trades are forward (live or paper) trades, so the verdict rests on a replay of the rules on past candles, which is not a forward record; the chip’s tooltip and the opened row give the counts. Replay rows are net of spread; forward rows are net of costs where the trade records them (R less its cost in R), else as recorded. Tap a stream for its equity curve.</p>
       </div>
       <div class="card c-decay adm" id="ms-decay">
         <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
@@ -12796,6 +12797,21 @@ function gpStats(T) {
       l30: { n: L.length, exp: mean(L), R: L.reduce(function (a, p) { return a + p.R; }, 0) }, from: P[0].t || null, to: P[n - 1].t || null, split: h, curve: curve, P: P };
   }
   var tv = function (s) { return num(s.t) ? s.t : s.tFlat ? s.tFlat * 1e6 : 0; };
+  // What the verdict chip SAYS (11 Nov 2026). The machine verdict r.v never changes (the digest and the week pane compare it);
+  // an Edge / Promising whose row has under FWD_MIN closed forward (live or paper) trades rests on a backtest replay and says so.
+  var VL = { edge: 'Edge', promising: 'Promising', unclear: 'Unclear', losing: 'Losing', few: 'Too few' };
+  var FWD_MIN = 20;   // the scoreboard's own "too few" line
+  function shown(r) {
+    var v = r && r.v, n = (r && r.s && r.s.n) || 0, f = r && r.fwd, out = { label: VL[v] || '', bt: false, tip: '' };
+    if ((v !== 'edge' && v !== 'promising') || !num(f) || f >= FWD_MIN) return out;
+    var u = r.sys === 'Macro' ? 'scored days' : 'trades', one = r.sys === 'Macro' ? 'scored day' : 'trade', sm = r.fwdSame;
+    out.bt = true; out.label = VL[v] + ' (backtest only)';
+    out.tip = (f === 0 ? 'None of this row’s ' + n + ' ' + u + ' is a forward (live or paper) ' + one + ': all of them are a backtest replay.'
+      : 'Only ' + f + ' of this row’s ' + n + ' ' + u + ' ' + (f === 1 ? 'is a forward (live or paper) ' + one : 'are forward (live or paper) ' + u) + ', under ' + FWD_MIN + ' and too few to judge; the rest are a backtest replay.')
+      + ' A backtest is not a forward record.'
+      + (sm ? (sm.live + sm.shadow ? ' The same setup’s forward record is its own row: ' + (sm.live + sm.shadow) + ' closed (' + sm.live + ' live, ' + sm.shadow + ' shadow).' : ' The same setup has no closed forward trade yet.') : '');
+    return out;
+  }
   function verdict(s) {
     if (!s || !s.n || s.n < 20) return 'few';
     var t = tv(s);
@@ -12856,7 +12872,7 @@ function gpStats(T) {
     if (SC && SC.replay && typeof SC.replay === 'object' && !Array.isArray(SC.replay)) {
       var lv = SC.live && SC.live.gold, use = lv && lv.n >= 20 ? lv : SC.replay.gold, isLive = use === lv;
       var mrow = { id: 'macro', sys: 'Macro', name: 'Macro forecast (gold)', code: 'strategist', src: (isLive ? 'live forecast log' : 'walk-forward replay') + ', daily direction, hit +1R / miss −1R', status: 'watch',
-        statusWhy: 'paper only: the Macro strategist changes no rule or trade', pts: [], aliases: ['macro', 'macro forecast', 'forecast', 'macro strategist'], ask: { text: 'Nothing · a forecast scorecard, not a trading rule' } };
+        statusWhy: 'paper only: the Macro strategist changes no rule or trade', pts: [], fwd: isLive ? use.n : (lv && +lv.n) || 0, aliases: ['macro', 'macro forecast', 'forecast', 'macro strategist'], ask: { text: 'Nothing · a forecast scorecard, not a trading rule' } };
       if (use && use.n) { mrow.agg = { n: use.n, wins: Math.round(use.hit * use.n), R: use.n * (2 * use.hit - 1), t: num(use.z) ? use.z : null };
         mrow.note = 'Hit rate ' + Math.round(use.hit * 100) + '% against a ' + Math.round(use.base * 100) + '% base rate over ' + use.n + ' days (t = z of the hit rate against the base rate' + (num(use.brier) ? '; Brier ' + use.brier + ' vs 0.25 for a coin flip' : '') + (use.pt != null ? '; Pesaran-Timmermann ' + use.pt : '') + ').' + (lv && lv.n && !isLive ? ' Live log: ' + lv.n + ' days so far.' : ''); }
       else mrow.note = 'No scored forecasts yet.';
@@ -12912,7 +12928,7 @@ function gpStats(T) {
     };
     var add = function (k, src, sk, pts, extra) {
       var st = status(k), r = { id: 'mer-' + k + '-' + sk, sys: 'Meridian', k: k, name: names[k] || k, code: k, src: src, status: st[0], statusWhy: st[1], pts: pts,
-        aliases: [k, names[k] || k, 'meridian ' + k], ask: ask(k, st[0]) };
+        fwd: sk === 'live' || sk === 'shadow' ? pts.length : 0, aliases: [k, names[k] || k, 'meridian ' + k], ask: ask(k, st[0]) };
       rows.push(Object.assign(r, extra || {}));
     };
     // forward: closed live and shadow trades by setup
@@ -12944,7 +12960,7 @@ function gpStats(T) {
       var fwdA = IT.filter(function (x) { return x && x.aset; }).map(pt).filter(Boolean);
       var A = (IR.trades || []).filter(function (x) { return x && x.aset; }).map(pt).filter(Boolean).concat(fwdA);
       var ra = { id: 'ict-a', sys: 'ICT', name: 'ICT A-rule', code: 'A-setups', src: ictFrom + ' + forward (' + fwdA.length + ')', status: 'paper', statusWhy: 'ICT desk: paper only, the edge is not proven on 2023-26 cash data',
-        pts: A, aliases: ['ict a', 'ict a rule', 'ict a setups', 'ict a setup', 'a rule', 'a setups', 'ict desk', 'ict'],
+        pts: A, fwd: fwdA.length, aliases: ['ict a', 'ict a rule', 'ict a setups', 'ict a setup', 'a rule', 'a setups', 'ict desk', 'ict'],
         ask: ictProps.length ? { n: ictProps.length, text: ictProps.map(function (p) { return 'Adopt filter: ' + String(p.label || p.value).replace(/^ICT A-setups:\s*/, ''); }).join(' · '), href: '#council/systems' } : { text: 'Nothing yet · paper until about 30 closed forward A+ trades' } };
       if (!A.length && IR.totalsA) ra.agg = IR.totalsA;
       rows.push(ra);
@@ -12958,7 +12974,7 @@ function gpStats(T) {
       var fwP = (Array.isArray(fw) ? fw : []).map(pt).filter(Boolean), pts = (Array.isArray(rp) ? rp : []).map(pt).filter(Boolean).concat(fwP);
       var pr = ictProps.find(function (p) { return p.value === v; }), w = watch.find(function (p) { return p.value === v; });
       var r = { id: 'ict-' + v, sys: 'ICT', name: VARIANT[v] || 'ICT variant ' + v, code: v, src: ictFrom + ' + forward (' + fwP.length + ')',
-        status: pr || w ? 'watch' : 'shadow', statusWhy: pr ? 'the Coach proposes this filter' : w ? 'on the Coach’s ICT watch list' : 'paper variant, recorded next to the A-rule', pts: pts,
+        status: pr || w ? 'watch' : 'shadow', statusWhy: pr ? 'the Coach proposes this filter' : w ? 'on the Coach’s ICT watch list' : 'paper variant, recorded next to the A-rule', pts: pts, fwd: fwP.length,
         aliases: [v, VARIANT[v] || v, 'ict ' + v, v === 'dip' ? 'dip buy' : v, v === 'dip' ? 'ict dip' : v],
         ask: pr ? { n: 1, text: 'Adopt filter: ' + String(pr.label || v).replace(/^ICT A-setups:\s*/, ''), href: '#council/systems' } : w ? { text: 'Nothing yet · on the Coach’s watch list (proposed when the trades it drops lose at t ≤ −2)', href: '#council/systems' } : { text: 'Nothing yet · paper candidate' } };
       if (w && w.why) r.note = w.why;
@@ -12973,7 +12989,7 @@ function gpStats(T) {
       var mp = Object.keys(map).map(function (id) { return map[id]; }).filter(function (m) { return m && num(m.councilR) && m.closedAt; }).map(function (m) { return { t: tsec(m.closedAt), R: m.councilR - (num(m.slipR) ? m.slipR : 0), g: m.councilR, c: num(m.slipR) ? m.slipR : null, m: m.market || m.symbol, sd: m.side }; });
       var sg = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R'; };
       rows.push({ id: 'mirror', sys: 'cTrader', name: 'cTrader demo mirror', code: 'demo', src: 'demo fills, council R less slippage', status: 'paper', statusWhy: (M.state && M.state.status) || 'demo account',
-        pts: mp, aliases: ['mirror', 'ctrader', 'ctrader mirror', 'ctrader demo', 'demo mirror'], ask: { text: 'Nothing · demo account only' },
+        pts: mp, fwd: mp.length, aliases: ['mirror', 'ctrader', 'ctrader mirror', 'ctrader demo', 'demo mirror'], ask: { text: 'Nothing · demo account only' },
         note: X.n ? X.n + ' demo fill' + (X.n === 1 ? '' : 's') + '; slippage against the council entry ' + sg(X.meanSlipR) + ' on average (median ' + sg(X.medianSlipR) + ', worst ' + sg(X.worstSlipR) + ')' + (X.medianLagSec != null ? ', median ' + X.medianLagSec + ' s to the demo order' : '') + '.' : 'No demo fills yet.' });
     }
     var mr = macroRow(D.macro, now); if (mr) rows.push(mr);
@@ -12983,17 +12999,20 @@ function gpStats(T) {
       r.v = verdict(r.s);
       if (r.ask && r.ask.shadow && r.v === 'losing') r.ask = { text: 'Nothing · it loses, so it stays in the shadow book' };
     });
+    // display only: r.v stays the machine verdict; vShow / vBt / vTip are what the chip says (shown())
+    var FW = {}; rows.forEach(function (r) { if (r.sys === 'Meridian' && r.k && r.fwd) { var o = FW[r.k] = FW[r.k] || { live: 0, shadow: 0 }; o[/-shadow$/.test(r.id) ? 'shadow' : 'live'] += r.fwd; } });
+    rows.forEach(function (r) { if (r.sys === 'Meridian' && r.k && r.fwd === 0) r.fwdSame = FW[r.k] || { live: 0, shadow: 0 };
+      var d = shown(r); r.vShow = d.label; r.vBt = d.bt; r.vTip = d.tip; });
     if (D.robust) applyRobust(rows, D.robust);
     return rows.sort(byEvidence);
   }
   // the approvals waiting for the owner (all Coach proposals that need an OK)
   function waiting(coach) { return (coach && Array.isArray(coach.proposals) ? coach.proposals : []).filter(function (p) { return ASK.test(p.kind); }); }
-  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting };
+  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, shown: shown, FWD_MIN: FWD_MIN, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting };
   W.MS_SB = API;
   if (typeof document === 'undefined' || !document.getElementById) return;
 
   // ─── page ───
-  var VL = { edge: 'Edge', promising: 'Promising', unclear: 'Unclear', losing: 'Losing', few: 'Too few' };
   var SL = { live: 'Live', paper: 'Paper', shadow: 'Shadow', watch: 'Watch', failed: 'Failed' };
   var RL = { robust: 'Robust', fragile: 'Fragile', notproven: 'Not proven' };
   var SB = { f: 'all', thin: false, sort: null, open: {}, rows: null, extra: null, extraAt: 0, loading: null, hasRobust: false };
@@ -13056,6 +13075,7 @@ function gpStats(T) {
     else if (!s.n) bits.push('No closed trades yet.');
     bits.push('<b>' + SL[r.status] + '</b>: ' + esc(r.statusWhy || '') + '.');
     if (r.robust) bits.push('<b>' + RL[r.robust] + '</b> (research/robustness.json)' + (r.robustWhy ? ': ' + esc(r.robustWhy) : '.'));
+    if (r.vBt) bits.push('<b>' + esc(r.vShow) + '</b>: ' + esc(r.vTip));
     if (r.note) bits.push(esc(r.note));
     return '<tr class="sb-x" id="sb-x-' + esc(r.id) + '"><td colspan="' + span + '"><div class="sb-xin">' + (W.MS_EQ ? W.MS_EQ.slot(r) : spark(r)) + bits.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div></td></tr>';
   }
@@ -13064,7 +13084,7 @@ function gpStats(T) {
     switch (c.k) {
       case 'name': return '<th scope="row"><button type="button" class="sb-name" aria-expanded="' + (SB.open[r.id] ? 'true' : 'false') + '" aria-controls="sb-x-' + esc(r.id) + '" data-sb-row="' + esc(r.id) + '"><span class="sb-sys">' + esc(r.sys) + (r.code && r.code !== r.name ? ' · ' + esc(r.code) : '') + '</span><b>' + esc(r.name) + '</b><small>' + esc(r.src) + '</small></button></th>';
       case 'status': return '<td class="sb-l"><span class="sb-st st-' + r.status + '" title="' + esc(r.statusWhy || '') + '">' + SL[r.status] + '</span></td>';
-      case 'verdict': return '<td class="sb-l"><span class="sb-v v-' + r.v + '">' + VL[r.v] + '</span></td>';
+      case 'verdict': return '<td class="sb-l"><span class="sb-v v-' + r.v + (r.vBt ? ' v-bt" title="' + esc(r.vTip) : '') + '">' + esc(r.vShow || VL[r.v]) + '</span></td>';
       case 'robust': return '<td class="sb-l">' + (r.robust ? '<span class="sb-rb rb-' + r.robust + '" title="' + esc(r.robustWhy) + '">' + RL[r.robust] + '</span>' : '<small class="sb-n">—</small>') + '</td>';
       case 'n': return '<td>' + (s.n || 0) + '</td>';
       case 'wr': return '<td>' + (num(s.wr) ? Math.round(s.wr * 100) + '%' : '<small class="sb-n">—</small>') + '</td>';
@@ -13089,14 +13109,15 @@ function gpStats(T) {
       rows = rows.slice().sort(function (a, b) { var x = c0.v(a), y = c0.v(b), xn = x == null || x === -1, yn = y == null || y === -1; if (xn !== yn) return xn ? 1 : -1; if (xn) return byEvidence(a, b); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * dir || byEvidence(a, b); }); }
     head.innerHTML = '<tr>' + cols.map(function (c) { var on = SB.sort && SB.sort.k === c.k;
       return '<th scope="col" class="' + (c.l ? 'sb-l' : '') + '"' + (on ? ' aria-sort="' + (SB.sort.dir > 0 ? 'ascending' : 'descending') + '"' : '') + '>' + (c.nosort ? c.h : '<button type="button" data-sb-sort="' + c.k + '">' + c.h + (on ? '<span class="sb-ar" aria-hidden="true">' + (SB.sort.dir > 0 ? '▲' : '▼') + '</span>' : '') + '</button>') + '</th>'; }).join('') + '</tr>';
-    body.innerHTML = rows.length ? rows.map(function (r) { return '<tr class="sb-r v-' + r.v + '">' + cols.map(function (c) { return cell(c, r); }).join('') + '</tr>' + (SB.open[r.id] ? detail(r, cols.length) : ''); }).join('')
+    body.innerHTML = rows.length ? rows.map(function (r) { return '<tr class="sb-r v-' + r.v + (r.vBt ? ' bt' : '') + '">' + cols.map(function (c) { return cell(c, r); }).join('') + '</tr>' + (SB.open[r.id] ? detail(r, cols.length) : ''); }).join('')
       : '<tr><td class="sb-empty" colspan="' + cols.length + '">' + (all.length ? 'Only thin shadow streams here: tick the box to see them.' : 'No streams to show yet.') + '</td></tr>';
     document.querySelectorAll('[data-sbf]').forEach(function (b) { var on = b.dataset.sbf === SB.f; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     var th = $('ms-sb-thin'); if (th) { th.checked = SB.thin; th.parentNode.lastChild.textContent = ' Thin shadow streams (under 20 trades' + (!SB.thin && thinN ? ', ' + thinN + ' hidden' : '') + ')'; }
     // summary: how many streams show an edge, the strongest one, what waits for the owner
     var big = SB.rows.filter(function (r) { return r.s.n >= 20; }), ed = big.filter(function (r) { return r.v === 'edge'; }), pr = big.filter(function (r) { return r.v === 'promising'; }), lo = big.filter(function (r) { return r.v === 'losing'; });
+    var btN = function (A) { var k = A.filter(function (r) { return r.vBt; }).length; return k ? ' (' + (k === A.length ? (k === 1 ? 'backtest only' : k === 2 ? 'both backtest only' : 'all backtest only') : k + ' backtest only') + ')' : ''; };
     var top = big.filter(function (r) { return num(r.s.t) && r.s.t > 0; }).sort(byEvidence)[0], W8 = waiting(SB.coach);
-    var sum = $('ms-sb-sum'); if (sum) sum.innerHTML = '<b>' + SB.rows.length + '</b> streams, ' + big.length + ' with 20+ trades: <b class="' + (ed.length ? 'pos' : '') + '">' + ed.length + ' edge</b>, ' + pr.length + ' promising, <b class="' + (lo.length ? 'neg' : '') + '">' + lo.length + ' losing</b>.'
+    var sum = $('ms-sb-sum'); if (sum) sum.innerHTML = '<b>' + SB.rows.length + '</b> streams, ' + big.length + ' with 20+ trades: <b class="' + (ed.length ? 'pos' : '') + '">' + ed.length + ' edge</b>' + btN(ed) + ', ' + pr.length + ' promising' + btN(pr) + ', <b class="' + (lo.length ? 'neg' : '') + '">' + lo.length + ' losing</b>.'
       + (top ? ' Strongest evidence: <b>' + esc(top.name) + '</b> <small>(' + esc(top.src) + ')</small>, ' + fR(top.s.exp) + ' a trade over ' + top.s.n + ', t ' + top.s.t.toFixed(2) + '.' : '')
       + ' ' + (W8.length ? '<b>' + W8.length + ' Coach proposal' + (W8.length === 1 ? '' : 's') + ' wait' + (W8.length === 1 ? 's' : '') + ' for your OK</b> · <a href="#council/systems" data-sb-go="ms-sleeve">open them →</a>' : 'Nothing waits for your OK.');
     if (W.MS_EQ) W.MS_EQ.drawn(rows, SB);   // equity curves (#ms-eq-js): the all-streams overlay and the open rows' charts

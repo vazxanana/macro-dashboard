@@ -627,6 +627,16 @@ hit +1R / miss −1R, t = z against the base rate → a "Macro forecast" row). C
 R/trade, total R, max DD, t, halves, last 30 days, status (live / paper / shadow / watch / failed), verdict (Edge / Promising / Unclear /
 Losing / Too few, text + colour) and the owner approval (Coach proposals, linking to `#ms-sleeve`). Sorted by t; thin shadow streams
 hidden behind a checkbox. The main script hands its data over with `window.MS_COUNCIL` + the `ms:council` event (no second download).
+**A verdict that rests on a backtest says so** (11 Nov 2026, owner's rule: never an edge without n, t and what it was measured on).
+Every row carries `fwd` = how many of its trades are forward (live or paper) trades: all of a forward row, none of a 30-day or system
+replay row, the forward part of an ICT row, the demo fills of the mirror, the live-log days of the macro row (unknown = not set, left
+alone). `MS_SB.shown(r)` gives what the chip SAYS: an Edge or Promising with `fwd` under `FWD_MIN` 20 reads "Edge (backtest only)" /
+"Promising (backtest only)" (dashed chip, no fill, no row tint; `r.vShow`, `r.vBt`, `r.vTip` = the counts and "A backtest is not a
+forward record", shown as the chip's tooltip and as a line in the opened row, since a tooltip does not open on touch; a Meridian replay
+row also names the same setup's forward count, `fwdSame`). The summary line counts them ("11 edge (all backtest only)", the state on
+11 Nov) and the legend explains it. **`r.v` is the machine verdict and never changes**: the digest's movers (`verdictMap`), the sort,
+the row class and the week pane read it; a test compares a baseline saved before the change with today's rows (no movers). Never put
+display wording into `r.v`. Tests: `tests/scoreboard.test.mjs` ("backtest only").
 
 ## Reliability: tests and data health (7 Nov 2026)
 - **CI** `.github/workflows/tests.yml` (every PR and push to main, Node 22, no npm install, no secrets, no network): `node --check` on
@@ -1565,9 +1575,21 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   stay underneath); the MTF opportunity line no longer reads "Buy the pullback into the wait for a pullback block" when M15 has no
   block (`planTxt`). `scripts/audit/smoke.cjs` now opens every gold tab on the phone (body wider than the screen = "tab cut off on
   the right") and fails on a visible, empty chart host (`.vz[id]`, "chart not drawn"); both fail on the build before this pass.
+  **Gold terminal, Research → Edge Lab tab: rule ideas, not tested edges** (11 Nov 2026, owner approved; text only, the locked
+  features and the driver stack untouched). The tab stated win rates, profit factors, reward ratios, correlations and "high
+  conviction" with no n, period, cost basis or test. Each claim was traced: three have a study here and the card now states its
+  sample, period, costs and verdict with a link (`.edge-tested`; COT extremes: `research/edge/cot-positioning` FAIL; the PM fix
+  fade: `seasonality` H4 FAIL; real yields: `macro-gold`, same-day correlation and the failed timing rule); everything else had no
+  source and its number is gone (the seasonal monthly averages and "80%", the −0.85 / −0.73 / −0.25 correlations, every Bollinger
+  figure, the AM-range win rate, the summary table's Win Rate and R:R columns, now "Tested here?" and "Study"). `#edge-lab-note` at
+  the top says what the tab is and links the Edge lab page. The checklist score is described as a count (it can reach 4 of 6: COT
+  and the squeeze are never read, DXY is always counted), its verdict line no longer gives sizing advice, and the seasonal month no
+  longer lights the COT dot. The Dashboard signal feed's "80%" for the season reads "On". Never put a win rate or "edge" back on
+  this tab without n, t, the period and costs from a study in the repository. Test: `tests/side-pages.test.mjs` (the quoted figures
+  are compared with each study's RESULT.md). Still older wording outside the tab: the Dashboard's "Seasonal Edge" tile and feed row.
   Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
-  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab states win rates and "high conviction" with no
-  n or t (older content, against the wording of absolute rule 4); `research/macro-veteran/START_HERE.md` (shown in the veteran
+  site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab stated win rates and "high conviction" with no
+  n or t (done the same day, paragraph above); `research/macro-veteran/START_HERE.md` (shown in the veteran
   library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 

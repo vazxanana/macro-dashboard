@@ -1155,6 +1155,10 @@
     .edge-rule.buy  { border-left-color: var(--accent-green); }
     .edge-rule.sell { border-left-color: var(--accent-red);   }
     .edge-rule.note { border-left-color: var(--amber);             }
+    /* Edge Lab tab wording pass (11 Nov 2026): what a study measured, and links to the Edge lab page */
+    .edge-rule.edge-tested { margin-top: 12px; }
+    #tab-edges .edge-rule a, #tab-edges .gx-scroll-x a { color: var(--accent-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+    #edge-lab-note { margin-bottom: 0; color: var(--text-primary); }
 
     .edge-status {
       padding: 14px 18px;
@@ -4059,11 +4063,20 @@
   <!-- EDGE LAB TAB -->
   <div id="tab-edges" class="tab-panel">
 
+    <!-- What this tab is (11 Nov 2026): rule ideas, not tested edges -->
+    <div class="section">
+      <div class="edge-rule note" id="edge-lab-note" style="font-size:13px; padding:14px 16px;">
+        <strong>Rule ideas, not tested edges.</strong> The six cards below are the terminal's older trading ideas, written before this project tested anything. None of them is a tested edge, so no win rate, profit factor or reward figure is shown for them.
+        Three were later tested in this repository's pre-registered studies and <strong>did not pass</strong>: COT extremes, the London PM fix, and real yields as a timing rule; each card says what was measured. The other three have no test here.
+        The tested results, with sample sizes, t-statistics and costs, are on the <a href="./edge-lab.html">Edge lab page</a>.
+      </div>
+    </div>
+
     <!-- Confluence Score -->
     <div class="section">
       <div class="section-header">
-        <div class="section-title">Edge Confluence Score</div>
-        <span class="badge" style="background:rgba(217,119,6,0.15); border-color:rgba(217,119,6,0.3); color:var(--amber);">Deep Research Analysis</span>
+        <div class="section-title">Rule-idea checklist</div>
+        <span class="badge" style="background:rgba(217,119,6,0.15); border-color:rgba(217,119,6,0.3); color:var(--amber);">Not tested</span>
       </div>
 
       <div class="edge-confluence">
@@ -4083,8 +4096,8 @@
           </div>
           <div class="confluence-verdict" id="conf-verdict">Calculating…</div>
           <div class="confluence-sub">
-            Six independently-researched edges synthesised from quantitative studies, COT positioning data, seasonal anomaly databases, and macro correlation analysis.
-            A score of 4+ means multiple independent signals align — take only high-R:R setups. A score of 6/6 has historically preceded the strongest gold rallies.
+            A count of how many of the six rule ideas below have their condition on right now. This page can read four of them: the seasonal window, the real-yield level, the London hours and the DXY idea (which it always counts as on). COT and the Bollinger squeeze cannot be read here and never count, so the highest score it can show is 4.
+            The score has never been tested against gold's later returns: it is a checklist, not a forecast.
           </div>
         </div>
       </div>
@@ -4101,21 +4114,22 @@
           </div>
           <div class="edge-stats">
             <div class="edge-stat-pill pill-amber">Published Weekly</div>
-            <div class="edge-stat-pill pill-green">High Conviction</div>
+            <div class="edge-stat-pill pill-red">Tested here: did not pass</div>
           </div>
         </div>
         <div class="edge-body">
           <div>
-            <div class="edge-section-title">Research Basis</div>
+            <div class="edge-section-title">The Idea</div>
             <div class="stat-row"><span class="stat-row-label">Signal type</span><span class="stat-row-val">Contrarian</span></div>
             <div class="stat-row"><span class="stat-row-label">Data source</span><span class="stat-row-val">CFTC Weekly</span></div>
-            <div class="stat-row"><span class="stat-row-label">Strongest signal</span><span class="stat-row-val">Divergence</span></div>
+            <div class="stat-row"><span class="stat-row-label">Looks for</span><span class="stat-row-val">Divergence</span></div>
             <div class="stat-row"><span class="stat-row-label">Lag</span><span class="stat-row-val">3 days (Tue→Fri)</span></div>
             <div class="edge-section-body" style="margin-top:12px;">
               The CFTC Commitments of Traders report separates gold futures positions into Managed Money (hedge funds), Producers (commercials), and Non-Reportables.
-              When <strong>Managed Money net longs approach the 90th percentile</strong> of their 3-year range, the crowd is too long — a reversal typically follows.
-              The <strong>"holy grail" divergence signal</strong> occurs when commercials are extreme net short (hedging) while speculators are extreme net long simultaneously.
+              When <strong>Managed Money net longs approach the 90th percentile</strong> of their 3-year range, the idea reads the crowd as too long and expects a reversal.
+              Its strictest form also wants commercials extreme net short (hedging) while speculators are extreme net long. That form has not been run here.
             </div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> the COT positioning study (<a href="./edge-lab.html#cot-positioning">Edge lab: cot-positioning</a>, pre-registered; weekly CFTC reports 2019 to Nov 2026, in sample 2020–23, out of sample 2024 to Sep 2026; price moves on daily closes, before costs). Verdict: FAIL. For gold, fading the 90th / 10th percentile extremes over the next 4 weeks was right in 50% of 34 cases in sample (+0.15% a case, t 0.14) and in 26% of 47 cases out of sample (−2.14% a case, t −3.1): crowded-long gold kept rising in 2024–26.</div>
           </div>
           <div>
             <div class="edge-section-title">Entry Rules</div>
@@ -4147,33 +4161,32 @@
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#059669,#10B981);">2</div>
           <div class="edge-meta">
-            <div class="edge-name">Seasonal Calendar Edge</div>
-            <div class="edge-tagline">50-year statistical anomaly — month-of-year and day-of-week patterns</div>
+            <div class="edge-name">Seasonal Calendar Idea</div>
+            <div class="edge-tagline">Month-of-year and day-of-week patterns — not measured in this repository</div>
           </div>
           <div class="edge-stats">
-            <div class="edge-stat-pill pill-green">Jan: 80% Win Rate</div>
-            <div class="edge-stat-pill pill-green">Nov–Feb Window</div>
-            <div class="edge-stat-pill pill-amber">Monday: Weakest Day</div>
+            <div class="edge-stat-pill pill-amber">Nov–Feb Window</div>
+            <div class="edge-stat-pill pill-amber">Not tested here</div>
           </div>
         </div>
         <div class="edge-body">
           <div>
-            <div class="edge-section-title">Monthly Statistics (50-Year Data)</div>
-            <div class="stat-row"><span class="stat-row-label">January</span><span class="stat-row-val" style="color:var(--accent-green)">+1.79% avg · 80% ↑</span></div>
-            <div class="stat-row"><span class="stat-row-label">November</span><span class="stat-row-val" style="color:var(--accent-green)">+1.4% avg · seasonal buy</span></div>
-            <div class="stat-row"><span class="stat-row-label">December</span><span class="stat-row-val" style="color:var(--accent-green)">+0.9% avg · pre-Jan setup</span></div>
-            <div class="stat-row"><span class="stat-row-label">March</span><span class="stat-row-val" style="color:var(--accent-red)">−0.6% avg · avoid longs</span></div>
-            <div class="stat-row"><span class="stat-row-label">June</span><span class="stat-row-val" style="color:var(--accent-red)">−0.4% avg · weakest Q2</span></div>
-            <div class="stat-row"><span class="stat-row-label">Nov–Feb window</span><span class="stat-row-val" style="color:var(--accent-green)">Strongest 4-month run</span></div>
+            <div class="edge-section-title">What the Idea Says, Month by Month</div>
+            <div class="stat-row"><span class="stat-row-label">November</span><span class="stat-row-val">Buy window opens</span></div>
+            <div class="stat-row"><span class="stat-row-label">December</span><span class="stat-row-val">Buy window</span></div>
+            <div class="stat-row"><span class="stat-row-label">January</span><span class="stat-row-val">Buy window</span></div>
+            <div class="stat-row"><span class="stat-row-label">February</span><span class="stat-row-val">Window ends</span></div>
+            <div class="stat-row"><span class="stat-row-label">March, June</span><span class="stat-row-val">Idea avoids new longs</span></div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> no. The monthly averages and the January win rate this card used to show had no source in this repository and were removed. The seasonality study (<a href="./edge-lab.html#seasonality">Edge lab: seasonality</a>) tested clock and calendar windows on gold and index futures, not the month of the year, and none of its ten tests passed.</div>
           </div>
           <div>
             <div class="edge-section-title">Day-of-Week Pattern</div>
-            <div class="stat-row"><span class="stat-row-label">Friday</span><span class="stat-row-val" style="color:var(--accent-green)">Strongest · pre-weekend buy</span></div>
-            <div class="stat-row"><span class="stat-row-label">Tuesday / Wed</span><span class="stat-row-val" style="color:var(--accent-green)">Best entry days</span></div>
-            <div class="stat-row"><span class="stat-row-label">Monday</span><span class="stat-row-val" style="color:var(--accent-red)">Weakest · avoid new longs</span></div>
-            <div class="edge-section-title" style="margin-top:16px;">Why It Persists</div>
+            <div class="stat-row"><span class="stat-row-label">Friday</span><span class="stat-row-val">Idea: strongest day</span></div>
+            <div class="stat-row"><span class="stat-row-label">Tuesday / Wed</span><span class="stat-row-val">Idea: entry days</span></div>
+            <div class="stat-row"><span class="stat-row-label">Monday</span><span class="stat-row-val">Idea: no new longs</span></div>
+            <div class="edge-section-title" style="margin-top:16px;">The Reasoning Behind It</div>
             <div class="edge-section-body">
-              Structurally driven: <strong>Diwali/Indian wedding season</strong> (Oct–Nov), <strong>Chinese New Year restocking</strong> (Dec–Jan), and <strong>Christmas jewellery demand</strong> all converge in the Nov–Feb window. These are <em>physical demand cycles</em>, not noise.
+              The idea rests on physical demand: <strong>Diwali/Indian wedding season</strong> (Oct–Nov), <strong>Chinese New Year restocking</strong> (Dec–Jan), and <strong>Christmas jewellery demand</strong> all fall in the Nov–Feb window. Whether that shows up in gold's price has not been measured here.
             </div>
           </div>
           <div>
@@ -4189,7 +4202,7 @@
               <strong>Avoid:</strong> New longs in March and June. Reduce size. Wait for May/Sep for next seasonal setup.
             </div>
             <div class="edge-rule note">
-              <strong>Day rule:</strong> Enter Tuesday or Wednesday. Avoid Monday entries — statistically the worst day to initiate a gold position.
+              <strong>Day rule:</strong> Enter Tuesday or Wednesday; the idea avoids Monday entries. No day-of-week figure for gold has been measured here.
             </div>
           </div>
         </div>
@@ -4203,29 +4216,30 @@
           <div class="edge-number" style="background: linear-gradient(135deg,#0052CC,#2563EB);">3</div>
           <div class="edge-meta">
             <div class="edge-name">Real Yield Threshold Signal</div>
-            <div class="edge-tagline">10-Year TIPS yield regime — the most reliable gold macro signal</div>
+            <div class="edge-tagline">10-Year TIPS yield regime — explains gold on the day, did not time it in our test</div>
           </div>
           <div class="edge-stats">
-            <div class="edge-stat-pill pill-blue">−0.73 Correlation</div>
-            <div class="edge-stat-pill pill-blue">2003–2022 Consistent</div>
+            <div class="edge-stat-pill pill-blue">Same-day corr. −0.20 / −0.31</div>
+            <div class="edge-stat-pill pill-red">Timing rule: did not pass</div>
           </div>
         </div>
         <div class="edge-body">
           <div>
             <div class="edge-section-title">Threshold Map</div>
-            <div class="stat-row"><span class="stat-row-label">TIPS below 0%</span><span class="stat-row-val" style="color:var(--accent-green)">STRONGLY BULLISH</span></div>
+            <div class="stat-row"><span class="stat-row-label">TIPS below 0%</span><span class="stat-row-val" style="color:var(--accent-green)">Idea: strongly bullish</span></div>
             <div class="stat-row"><span class="stat-row-label">TIPS 0% – +0.5%</span><span class="stat-row-val" style="color:var(--accent-green)">Bullish regime</span></div>
             <div class="stat-row"><span class="stat-row-label">TIPS +0.5% – +1.5%</span><span class="stat-row-val" style="color:var(--amber);">Neutral — mixed</span></div>
             <div class="stat-row"><span class="stat-row-label">TIPS +1.5% – +2%</span><span class="stat-row-val" style="color:var(--accent-red);">Headwinds building</span></div>
             <div class="stat-row"><span class="stat-row-label">TIPS above +2%</span><span class="stat-row-val" style="color:var(--accent-red);">Strong headwinds</span></div>
-            <div class="stat-row"><span class="stat-row-label">Correlation (avg)</span><span class="stat-row-val">−0.73 rolling 12m</span></div>
+            <div class="stat-row"><span class="stat-row-label">Thresholds</span><span class="stat-row-val">Not tested here</span></div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> the macro gold study (<a href="./edge-lab.html#macro-gold">Edge lab: macro-gold</a>, pre-registered; daily gold closes against the 10-year real yield). Gold's daily return and the same day's real-yield change correlate −0.20 (2006–17) and −0.31 (2018 to Nov 2026). With the yield change known at the prior close the correlation is −0.015 and +0.019. The timing rule "long gold while the real yield has fallen over 20 observations" FAILED after costs ($0.30 a round trip): Sharpe 0.33 against 0.44 for simply holding gold in 2006–17 (154 entries), 0.68 against 0.82 in 2018–26 (103 entries). The level thresholds on this card were not tested.</div>
           </div>
           <div>
-            <div class="edge-section-title">The Correlation Breakdown Signal</div>
+            <div class="edge-section-title">The Correlation Breakdown Idea</div>
             <div class="edge-section-body">
-              From 2023 onward, gold rose <strong>despite rising real yields</strong> — breaking the historical rule. This is itself a powerful edge:<br/><br/>
-              When gold holds or rises while TIPS yields rise → <strong>structural demand override</strong> (central bank buying, de-dollarization). This regime creates a <strong>stealth accumulation signal</strong>: when TIPS eventually falls, gold will accelerate far beyond what the yield move alone implies.<br/><br/>
-              <strong>Current correlation:</strong> ~−0.25 (vs historical −0.85). The structural demand floor is in place.
+              From 2023 onward, gold rose <strong>despite rising real yields</strong>. The idea reads that as a signal of its own:<br/><br/>
+              When gold holds or rises while TIPS yields rise, it assumes <strong>structural demand</strong> (central bank buying, de-dollarization) is overriding yields, and expects gold to rise further once TIPS yields fall.<br/><br/>
+              This reading has not been tested here, and this page does not compute a current correlation.
             </div>
           </div>
           <div>
@@ -4233,13 +4247,13 @@
             <div class="edge-status" id="tips-status">Loading TIPS reading…</div>
             <div class="edge-section-title" style="margin-top:16px;">Entry Rules</div>
             <div class="edge-rule buy">
-              <strong>Regime BUY:</strong> TIPS yield crosses below +0.5% (direction matters). Add to longs aggressively. Target: prior highs.
+              <strong>Regime BUY:</strong> TIPS yield crosses below +0.5% (direction matters). The rule adds to longs. Target: prior highs.
             </div>
             <div class="edge-rule buy">
-              <strong>Stealth BUY:</strong> Gold rises while TIPS rises. Do NOT short. Structural demand is overriding yields — buy any pullbacks.
+              <strong>Stealth BUY:</strong> Gold rises while TIPS rises. The rule does not short and buys pullbacks, on the assumption that structural demand is overriding yields.
             </div>
             <div class="edge-rule note">
-              <strong>3 confirming inputs:</strong> TIPS yield direction + breakeven inflation rate + CME FedWatch cut probabilities. All three dovish = highest conviction.
+              <strong>3 confirming inputs:</strong> TIPS yield direction + breakeven inflation rate + CME FedWatch cut probabilities. The rule wants all three dovish.
             </div>
           </div>
         </div>
@@ -4252,31 +4266,31 @@
         <div class="edge-header">
           <div class="edge-number" style="background: linear-gradient(135deg,#7C3AED,#8B5CF6);">4</div>
           <div class="edge-meta">
-            <div class="edge-name">DXY Divergence Edge</div>
-            <div class="edge-tagline">When gold breaks its inverse dollar relationship — a powerful anticipatory signal</div>
+            <div class="edge-name">DXY Divergence Idea</div>
+            <div class="edge-tagline">When gold breaks its inverse dollar relationship — not measured in this repository</div>
           </div>
           <div class="edge-stats">
-            <div class="edge-stat-pill pill-blue">Historical: −0.85</div>
-            <div class="edge-stat-pill pill-amber">Current: −0.25</div>
-            <div class="edge-stat-pill pill-green">Divergence = Setup</div>
+            <div class="edge-stat-pill pill-amber">Divergence = Setup</div>
+            <div class="edge-stat-pill pill-amber">Not tested here</div>
           </div>
         </div>
         <div class="edge-body">
           <div>
             <div class="edge-section-title">Normal vs Divergence Regime</div>
             <div class="edge-section-body">
-              Historically, gold and DXY hold a <strong>−0.85 average correlation</strong>. DXY up → gold down. Simple.<br/><br/>
-              But when this rule breaks, it tells you something: the structural demand for gold (central banks, geopolitical safe-haven) is <strong>overriding the dollar effect</strong>. This is the signal most retail traders miss.<br/><br/>
-              In 2023–2024, gold and DXY rose together during geopolitical escalations — and both kept rising. Traders who shorted gold because "DXY is up" were trapped.
+              Gold and the dollar index usually move in opposite directions: DXY up, gold down.<br/><br/>
+              The idea is that when this breaks, structural demand for gold (central banks, geopolitical safe-haven) is <strong>overriding the dollar effect</strong>.<br/><br/>
+              In 2023–2024, gold and DXY rose together during geopolitical escalations.
             </div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> no. The correlation figures this card used to show (historical and current) had no source in this repository and this page does not compute them, so they were removed. No divergence rule has been tested.</div>
           </div>
           <div>
             <div class="edge-section-title">Two Divergence Signals</div>
             <div class="edge-rule buy">
-              <strong>BULLISH DIVERGENCE:</strong> DXY makes a new monthly high, but gold fails to make a new monthly low (gold is "holding"). When DXY eventually reverses down, gold will accelerate upward — often by 3–5%.
+              <strong>BULLISH DIVERGENCE:</strong> DXY makes a new monthly high, but gold fails to make a new monthly low (gold is "holding"). The idea expects gold to rise when DXY reverses down.
             </div>
             <div class="edge-rule sell">
-              <strong>BEARISH DIVERGENCE:</strong> DXY falls, but gold also falls (or doesn't rally). When DXY turns back up, gold will drop sharply. Avoid longs until resolved.
+              <strong>BEARISH DIVERGENCE:</strong> DXY falls, but gold also falls (or doesn't rally). The idea expects gold to fall when DXY turns back up, and avoids longs until resolved.
             </div>
             <div class="edge-rule note">
               <strong>Confirmation rule:</strong> Divergence must hold on the daily timeframe for 3+ sessions. Don't act on intraday divergence alone.
@@ -4284,10 +4298,10 @@
           </div>
           <div>
             <div class="edge-section-title">Current Regime</div>
-            <div class="edge-status status-bull">STRUCTURAL BULL — Divergence Era<br/><span style="font-size:var(--fs-xs); font-weight:500; margin-top:4px; display:block;">30-day corr. ≈ −0.25. Gold decoupled from DXY. Buy dips — structural buyers absorb any weakness.</span></div>
+            <div class="edge-status status-watch">NOT COMPUTED HERE<br/><span style="font-size:var(--fs-xs); font-weight:500; margin-top:4px; display:block;">This page does not measure the gold–DXY correlation. The checklist above counts this idea as on at all times, a fixed assumption from when the tab was written.</span></div>
             <div class="edge-section-title" style="margin-top:16px;">Entry Rule</div>
             <div class="edge-rule buy">
-              <strong>Action:</strong> Any DXY spike that fails to break gold below S1 = strong accumulation opportunity. Buy the pullback.
+              <strong>Action:</strong> When a DXY spike fails to break gold below S1, the rule buys the pullback.
             </div>
           </div>
         </div>
@@ -4304,8 +4318,8 @@
             <div class="edge-tagline">LBMA AM fix (10:30) and PM fix (15:00) create recurring intraday price behaviour</div>
           </div>
           <div class="edge-stats">
-            <div class="edge-stat-pill pill-red">PM Fix: Downward Bias</div>
-            <div class="edge-stat-pill pill-green">AM Fix Range: High Win</div>
+            <div class="edge-stat-pill pill-red">PM fix fade: did not pass</div>
+            <div class="edge-stat-pill pill-amber">AM range: not tested here</div>
           </div>
         </div>
         <div class="edge-body">
@@ -4313,11 +4327,11 @@
             <div class="edge-section-title">Fix Times & Patterns</div>
             <div class="stat-row"><span class="stat-row-label">AM Fix time</span><span class="stat-row-val">10:30 London</span></div>
             <div class="stat-row"><span class="stat-row-label">PM Fix time</span><span class="stat-row-val">15:00 London</span></div>
-            <div class="stat-row"><span class="stat-row-label">PM Fix bias</span><span class="stat-row-val" style="color:var(--accent-red);">Downward historically</span></div>
-            <div class="stat-row"><span class="stat-row-label">AM range breakout</span><span class="stat-row-val" style="color:var(--accent-green);">High-probability setup</span></div>
-            <div class="stat-row"><span class="stat-row-label">Best trading window</span><span class="stat-row-val">12:00–16:00 GMT</span></div>
+            <div class="stat-row"><span class="stat-row-label">PM fix drift</span><span class="stat-row-val">None found in our test</span></div>
+            <div class="stat-row"><span class="stat-row-label">AM range breakout</span><span class="stat-row-val">Not tested here</span></div>
+            <div class="stat-row"><span class="stat-row-label">Window the idea uses</span><span class="stat-row-val">12:00–16:00 GMT</span></div>
             <div class="edge-section-body" style="margin-top:10px;">
-              The LBMA gold price is set at electronic auction. <strong>Institutional orders cluster around fix times</strong> creating predictable pre- and post-fix price behaviour.
+              The LBMA gold price is set at electronic auction. The idea is that <strong>institutional orders cluster around fix times</strong> and shape the price before and after the fix.
             </div>
           </div>
           <div>
@@ -4326,16 +4340,17 @@
               <strong>Step 1:</strong> Mark the high and low of the 09:30–10:30 London pre-fix range.<br/><br/>
               <strong>Step 2:</strong> Wait for a close <em>outside</em> this range on a 15-minute candle after 10:30.<br/><br/>
               <strong>Step 3:</strong> Enter in the breakout direction. Stop inside the range. Target 1.5× the range width.<br/><br/>
-              <strong>Why it works:</strong> Institutional orders queued for the fix create a liquidity pool. Once the fix prints, the accumulated directional pressure resolves sharply.
+              <strong>The reasoning:</strong> orders queued for the fix build up, and the idea expects that pressure to resolve in one direction once the fix prints. No test of this breakout exists in this repository.
             </div>
           </div>
           <div>
             <div class="edge-section-title">PM Fix Fade (15:00 London)</div>
             <div class="edge-section-body">
-              Historical analysis found PM fix moves were <strong>overwhelmingly to the downside</strong>. At 10:00 AM New York (= 15:00 London), US economic data often releases, exacerbating moves.<br/><br/>
-              <strong>Rule:</strong> If PM Fix produces a sharp spike UP, wait 15 minutes. If price fails to hold above the spike high, a fade short is historically valid.<br/><br/>
-              <strong>Caution:</strong> Do not fade strong macro-driven moves. Apply only in choppy, range-bound sessions.
+              The idea comes from older studies of the fix that reported moves to the downside. At 10:00 AM New York (= 15:00 London), US economic data often releases at the same time.<br/><br/>
+              <strong>Rule:</strong> If the PM fix produces a sharp spike UP, wait 15 minutes. If price fails to hold above the spike high, the rule fades it short.<br/><br/>
+              <strong>Caution:</strong> The rule does not fade strong macro-driven moves; it is meant for choppy, range-bound sessions.
             </div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> the seasonality study, test H4 (<a href="./edge-lab.html#seasonality">Edge lab: seasonality</a>, pre-registered; spot gold, short from 15:00 to 15:30 London every trading day). Verdict: FAIL. Before costs −0.007% a trade in 2006–15 (2,471 trades) and −0.000% in 2016–26 (2,741 trades): gold did not fall around the fix. After the $0.30 spread −0.036% (t −5.73) and −0.017% (t −3.48); it lost in 20 of 21 years. The spike-fade rule above is narrower and was not tested.</div>
             <div class="edge-status status-watch">Active: Check 10:30 &amp; 15:00 London daily<br/><span style="font-size:var(--fs-xs); font-weight:500; margin-top:4px; display:block;">Mark pre-fix range every morning before 10:30</span></div>
           </div>
         </div>
@@ -4349,23 +4364,21 @@
           <div class="edge-number" style="background: linear-gradient(135deg,#0891B2,#06B6D4);">6</div>
           <div class="edge-meta">
             <div class="edge-name">Bollinger Band Squeeze</div>
-            <div class="edge-tagline">Volatility compression → explosive directional breakout — gold's most backtest-validated technical edge</div>
+            <div class="edge-tagline">Volatility compression, then a directional breakout — not measured in this repository</div>
           </div>
           <div class="edge-stats">
-            <div class="edge-stat-pill pill-blue">55–65% Win Rate</div>
-            <div class="edge-stat-pill pill-blue">3:1 – 6:1 R:R</div>
-            <div class="edge-stat-pill pill-green">Profit Factor 1.14 (daily)</div>
+            <div class="edge-stat-pill pill-blue">Daily chart</div>
+            <div class="edge-stat-pill pill-amber">Not tested here</div>
           </div>
         </div>
         <div class="edge-body">
           <div>
-            <div class="edge-section-title">Backtest Statistics</div>
-            <div class="stat-row"><span class="stat-row-label">Win rate (confirmed)</span><span class="stat-row-val">55–65%</span></div>
-            <div class="stat-row"><span class="stat-row-label">R:R ratio</span><span class="stat-row-val">3:1 – 6:1</span></div>
-            <div class="stat-row"><span class="stat-row-label">Breakout rate</span><span class="stat-row-val">70–80% confirmed</span></div>
-            <div class="stat-row"><span class="stat-row-label">Gold daily PF</span><span class="stat-row-val">1.14</span></div>
-            <div class="stat-row"><span class="stat-row-label">Choppy market WR</span><span class="stat-row-val" style="color:var(--accent-red);">drops to 51%</span></div>
-            <div class="stat-row"><span class="stat-row-label">Trending SMA WR</span><span class="stat-row-val" style="color:var(--accent-green);">increases to 65%+</span></div>
+            <div class="edge-section-title">What Has Been Measured</div>
+            <div class="stat-row"><span class="stat-row-label">Backtest in this repository</span><span class="stat-row-val">None</span></div>
+            <div class="stat-row"><span class="stat-row-label">Win rate</span><span class="stat-row-val">Not measured</span></div>
+            <div class="stat-row"><span class="stat-row-label">Profit factor</span><span class="stat-row-val">Not measured</span></div>
+            <div class="stat-row"><span class="stat-row-label">Squeeze read on this page</span><span class="stat-row-val">No</span></div>
+            <div class="edge-rule note edge-tested"><strong>Tested in this repository:</strong> no. The win rates, reward ratios, breakout rate and profit factors this card used to show had no source in this repository (no sample size, period or cost basis) and were removed.</div>
           </div>
           <div>
             <div class="edge-section-title">Setup Rules</div>
@@ -4379,15 +4392,15 @@
               <strong>Step 3 — Enter on close:</strong> Enter when price closes above the upper band (bullish) or below lower band (bearish). Stop at the opposite band.
             </div>
             <div class="edge-rule note">
-              <strong>Timeframe:</strong> Daily chart is most reliable (PF 1.14). Hourly has flat edge (PF 1.01) — use only with macro confirmation.
+              <strong>Timeframe:</strong> The rule is written for the daily chart; on the hourly chart it asks for macro confirmation as well.
             </div>
           </div>
           <div>
-            <div class="edge-section-title">Why It Works on Gold</div>
+            <div class="edge-section-title">The Reasoning Behind It</div>
             <div class="edge-section-body">
-              Gold alternates between trending (high volatility) and consolidating (low volatility) regimes. The Bollinger Band squeeze identifies the exact moment of transition.<br/><br/>
-              Because gold is driven by macro events (CPI, FOMC, geopolitics) that arrive suddenly, long periods of compression are frequently followed by explosive moves when a catalyst lands — exactly the breakout the squeeze is designed to capture.<br/><br/>
-              <strong>Best squeeze setups follow:</strong> 3–7 days of sideways price action, declining volume, and a narrowing ATR.
+              Gold alternates between trending (high volatility) and consolidating (low volatility) stretches. The rule looks for the change from one to the other.<br/><br/>
+              Because gold is driven by macro events (CPI, FOMC, geopolitics) that arrive suddenly, the idea expects a long compression to end in a large move when a catalyst lands. How often that happens, and in which direction, has not been measured here.<br/><br/>
+              <strong>The rule looks for:</strong> 3–7 days of sideways price action, declining volume, and a narrowing ATR.
             </div>
             <div class="edge-status status-watch">Check daily chart for BB width &lt; 20-day low<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">TradingView: add "Bollinger Bands Width" indicator, watch for 20-bar compression lows</span></div>
           </div>
@@ -4398,17 +4411,17 @@
     <!-- Edge Summary Table -->
     <div class="section">
       <div class="section-header">
-        <div class="section-title">Edge Summary — Quick Reference</div>
+        <div class="section-title">Rule Ideas — Quick Reference</div>
       </div>
       <div class="card glass gx-scroll-x">
         <table style="width:100%; border-collapse:collapse; font-size:var(--fs-xs);">
           <thead>
             <tr style="border-bottom:2px solid rgba(26,29,41,0.1);">
               <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">#</th>
-              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Edge</th>
+              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Rule idea</th>
               <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Timeframe</th>
-              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Win Rate</th>
-              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">R:R</th>
+              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Tested here?</th>
+              <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Study</th>
               <th style="text-align:left; padding:10px 16px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Check Frequency</th>
             </tr>
           </thead>
@@ -4417,54 +4430,54 @@
               <td style="padding:12px 16px; font-weight:700; color:var(--amber);">1</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">COT Contrarian</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Weekly/Monthly</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">High (not quantified)</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">2:1 – 4:1</td>
+              <td style="padding:12px 16px; color:var(--accent-red); font-weight:700;">Did not pass</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);"><a href="./edge-lab.html#cot-positioning">cot-positioning</a></td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Every Friday (CFTC release)</td>
             </tr>
             <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
               <td style="padding:12px 16px; font-weight:700; color:#059669;">2</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">Seasonal Calendar</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Monthly</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">80% (January)</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">Macro position</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Not tested</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">None</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Monthly review</td>
             </tr>
             <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
               <td style="padding:12px 16px; font-weight:700; color:#0052CC;">3</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">Real Yield Threshold</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Weekly/Swing</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">−0.73 corr.</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1 – 5:1</td>
+              <td style="padding:12px 16px; color:var(--accent-red); font-weight:700;">Did not pass as a timing rule</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);"><a href="./edge-lab.html#macro-gold">macro-gold</a></td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Daily (FRED / header)</td>
             </tr>
             <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
               <td style="padding:12px 16px; font-weight:700; color:#7C3AED;">4</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">DXY Divergence</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Daily/Swing</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">High in trend</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1+</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Not tested</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">None</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Daily (DXY chart)</td>
             </tr>
             <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
               <td style="padding:12px 16px; font-weight:700; color:var(--accent-red);">5</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">London Fix Pattern</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Intraday</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">60%+ (AM range)</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">1.5× range</td>
+              <td style="padding:12px 16px; color:var(--accent-red); font-weight:700;">PM fix fade did not pass; AM range not tested</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);"><a href="./edge-lab.html#seasonality">seasonality</a> (H4)</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">10:30 &amp; 15:00 London</td>
             </tr>
             <tr>
               <td style="padding:12px 16px; font-weight:700; color:#0891B2;">6</td>
               <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">BB Squeeze</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Daily/Swing</td>
-              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">55–65%</td>
-              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1 – 6:1</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Not tested</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">None</td>
               <td style="padding:12px 16px; color:var(--text-secondary);">Daily chart review</td>
             </tr>
           </tbody>
         </table>
         <div style="padding:16px; font-size:var(--fs-xs); color:var(--text-tertiary); border-top: 1px solid rgba(26,29,41,0.06); margin-top:4px;">
-          ⚠ Win rates and statistics sourced from: 50-year seasonal anomaly databases, CFTC COT research, LBMA pricing studies, Bollinger Band backtests across 6 markets. Past performance does not guarantee future results. Use all edges with proper risk management.
+          No win rate or reward ratio is shown on this tab: the figures it used to carry had no sample size, period or cost basis and could not be traced to anything measured in this repository. Where a study exists, the card states its sample, period, costs and verdict. Results that passed or failed a pre-registered test are on the <a href="./edge-lab.html">Edge lab page</a>.
         </div>
       </div>
     </div>
@@ -4505,7 +4518,7 @@
 
       <div class="card glass">
         <h3>★ Weekly (Friday/Monday)</h3>
-        <div class="intel-item"><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC COT Report</a><span class="intel-desc">Managed-money gold positioning (Fridays, 15:30 ET). Extremes are contrarian: crowded longs = pullback risk. Feeds Edge #1 in the Edge Lab.</span></div>
+        <div class="intel-item"><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC COT Report</a><span class="intel-desc">Managed-money gold positioning (Fridays, 15:30 ET). The old idea reads extremes as contrarian (crowded longs = pullback risk); this repository's COT study found no such edge for gold. Feeds Edge #1 in the Edge Lab.</span></div>
         <div class="intel-item"><a href="https://www.gold.org/goldhub" target="_blank" rel="noopener">WGC Goldhub</a><span class="intel-desc">Central-bank purchases and ETF flow updates — the structural bid. Refresh the Institutional Flows panel figures from here quarterly.</span></div>
         <div class="intel-item"><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener">FRED — 10Y Real Yield</a><span class="intel-desc">The master driver's official chart. Set a mental alert on the 2.0% and 1.5% levels — regime boundaries.</span></div>
       </div>
@@ -5496,7 +5509,7 @@
     const inWeakMonth   = WEAK_MONTHS.includes(month);
     const isFriday      = dow === 5;
     const notMonday     = dow !== 1;
-    if (inStrongMonth) { score++; dots[0] = 'on'; dots.push('on'); }
+    if (inStrongMonth) { score++; dots.push('on'); }   // the COT dot stays neutral: this page cannot read COT
     else if (!inWeakMonth && notMonday) { dots.push('warn'); }
     else { dots.push('neutral'); }
 
@@ -5527,15 +5540,13 @@
     const verdictEl= document.getElementById('conf-verdict');
     if (scoreEl)   scoreEl.textContent = score;
     if (labelEl) {
-      if (score >= 5) { labelEl.textContent = 'STRONG'; labelEl.style.color = 'var(--accent-green)'; }
-      else if (score >= 3) { labelEl.textContent = 'MODERATE'; labelEl.style.color = 'var(--amber)'; }
-      else { labelEl.textContent = 'WEAK'; labelEl.style.color = 'var(--accent-red)'; }
+      if (score >= 5) { labelEl.textContent = 'ALL ON'; labelEl.style.color = 'var(--accent-green)'; }
+      else if (score >= 3) { labelEl.textContent = 'MOST ON'; labelEl.style.color = 'var(--amber)'; }
+      else { labelEl.textContent = 'FEW ON'; labelEl.style.color = 'var(--accent-red)'; }
     }
     if (verdictEl) {
-      if (score >= 5) verdictEl.textContent = 'Strong multi-edge confluence — take quality setups with full size';
-      else if (score >= 4) verdictEl.textContent = 'Good confluence — trade setups with standard sizing';
-      else if (score >= 3) verdictEl.textContent = 'Moderate alignment — trade only A-grade setups, reduce size';
-      else verdictEl.textContent = 'Low confluence — wait for better alignment or paper-trade only';
+      // a count, not advice: the score has never been tested against later returns
+      verdictEl.textContent = score + ' of the 4 conditions this page can read ' + (score === 1 ? 'is' : 'are') + ' on';
     }
 
     // Seasonal status
@@ -5544,14 +5555,14 @@
       if (SEASONAL_WINDOW.includes(month)) {
         const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         seasonEl.className = 'edge-status status-bull';
-        seasonEl.innerHTML = `SEASONAL BUY WINDOW — ${names[month]}<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Nov–Feb is the strongest 4-month window. Enter on any 2–4% pullback.</span>`;
+        seasonEl.innerHTML = `IN THE IDEA'S BUY WINDOW — ${names[month]}<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Nov–Feb is the window the idea buys in, on a 2–4% pullback. Not a tested signal.</span>`;
       } else if (WEAK_MONTHS.includes(month)) {
         const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         seasonEl.className = 'edge-status status-bear';
-        seasonEl.innerHTML = `SEASONAL WEAK MONTH — ${names[month]}<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Reduce new long entries. Tighten trailing stops on existing positions.</span>`;
+        seasonEl.innerHTML = `A MONTH THE IDEA AVOIDS — ${names[month]}<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">The idea takes no new longs in March and June. Not a tested signal.</span>`;
       } else {
         seasonEl.className = 'edge-status status-neutral';
-        seasonEl.textContent = 'NEUTRAL MONTH — No seasonal edge active';
+        seasonEl.textContent = 'OUTSIDE THE WINDOW — the idea says nothing about this month';
       }
     }
 
@@ -5561,16 +5572,16 @@
       const tv = parseFloat(tipsRaw);
       if (tv < 0) {
         tipsEl.className = 'edge-status status-bull';
-        tipsEl.innerHTML = `STRONGLY BULLISH — TIPS negative (${tv.toFixed(2)}%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Bonds destroying real purchasing power. Gold outperforms in this regime.</span>`;
+        tipsEl.innerHTML = `IDEA: STRONGLY BULLISH — TIPS negative (${tv.toFixed(2)}%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">The idea reads a negative real yield as its most bullish regime. The level thresholds are not tested here.</span>`;
       } else if (tv < 0.5) {
         tipsEl.className = 'edge-status status-bull';
-        tipsEl.innerHTML = `BULLISH REGIME — TIPS ${tv.toFixed(2)}% (below +0.5%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Real yield opportunity cost is low. Gold has structural tailwind.</span>`;
+        tipsEl.innerHTML = `IDEA: BULLISH REGIME — TIPS ${tv.toFixed(2)}% (below +0.5%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">The idea reads a low real yield as supportive for gold. The level thresholds are not tested here.</span>`;
       } else if (tv < 1.5) {
         tipsEl.className = 'edge-status status-watch';
-        tipsEl.innerHTML = `NEUTRAL — TIPS ${tv.toFixed(2)}% (0.5%–1.5% range)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">Mixed regime. Watch direction of change, not just level.</span>`;
+        tipsEl.innerHTML = `IDEA: NEUTRAL — TIPS ${tv.toFixed(2)}% (0.5%–1.5% range)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">The idea calls this range mixed and watches the direction of change, not just the level.</span>`;
       } else {
         tipsEl.className = 'edge-status status-bear';
-        tipsEl.innerHTML = `HEADWINDS — TIPS ${tv.toFixed(2)}% (above +1.5%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">High real yields make bonds more attractive vs gold. Reduce size.</span>`;
+        tipsEl.innerHTML = `IDEA: HEADWINDS — TIPS ${tv.toFixed(2)}% (above +1.5%)<br/><span style="font-size:var(--fs-xs);font-weight:500;margin-top:4px;display:block;">The idea reads high real yields as a headwind for gold and trades smaller. The level thresholds are not tested here.</span>`;
       }
     }
   }
@@ -9071,7 +9082,7 @@
       const SEAS   = [0,10,11,1];
       const signals = [
         { dot: md.isLong?'bull':md.isShort?'bear':'wait', title: 'Macro Direction', desc: `Score ${md.macroScore}/40 — ${md.isLong?'Bullish regime':'Mixed signals'}`, pct: md.conf+'%' },
-        { dot: SEAS.includes(month)?'bull':'wait',        title: 'Seasonal Edge',   desc: SEAS.includes(month)?'Strong season (Nov–Feb window)':'Neutral season',           pct: SEAS.includes(month)?'80%':'—' },
+        { dot: SEAS.includes(month)?'bull':'wait',        title: 'Seasonal Edge',   desc: SEAS.includes(month)?'Strong season (Nov–Feb window)':'Neutral season',           pct: SEAS.includes(month)?'On':'—' },
         { dot: md.tips<0.5?'bull':md.tips<1.5?'wait':'bear', title: 'Real Yield',  desc: `TIPS ${md.tips.toFixed(2)}% — ${md.tips<0.5?'Bullish threshold':'Neutral zone'}`, pct: md.tips<0.5?'On':'Watch' },
         { dot: 'bull',                                     title: 'DXY Decoupled', desc: 'USD decoupling regime active — supportive',                                       pct: 'Active' },
         { dot: h>=9&&h<16?'bull':'wait',                   title: 'London Fix',    desc: h>=9&&h<16?'Fix window active (09:00–16:00 UTC)':'Outside fix window',              pct: h>=9&&h<16?'On':'Off' },
