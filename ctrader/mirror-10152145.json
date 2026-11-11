@@ -6300,7 +6300,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9951.1 · 28 open",
+  "status": "ok · demo Fusion Markets · balance 9951.1 · 28 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6310,17 +6310,34 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "sol-scalp-1794370912": {
+    "orderId": "33907101",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "scalp",
+    "limitPrice": 82.78,
+    "stop": 83.696538,
+    "t1": 81.26,
+    "placedAt": "2026-11-11T04:22:54.000Z",
+    "expires": "2026-11-11T07:21:52.000Z",
+    "riskCash": 9.17,
+    "margin": 83.12,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9951.1,
-  "lastRun": "2026-11-11T04:20:27.000Z"
+  "lastRun": "2026-11-11T04:22:54.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:14:14.000Z",
-   "msg": "moved AUDUSD 47446367 protection: stop 0.68577 -> 0.68575, target 0.69418 -> 0.69416 (council rintra)",
-   "trade": "audusd-rintra-1794189929"
-  },
   {
    "at": "2026-11-10T12:14:14.000Z",
    "msg": "moved AUDUSD 47706230 protection: stop 0.68972 -> 0.6897, target 0.69323 -> 0.69321 (council scalp)",
@@ -7815,6 +7832,11 @@
    "at": "2026-11-11T03:21:26.000Z",
    "msg": "limit filled: AUDUSD position 48284994 at the broker",
    "trade": "audusd-scalp-1794366326"
+  },
+  {
+   "at": "2026-11-11T04:22:54.000Z",
+   "msg": "placed sell limit SOLUSD 0.01 lot at 82.78 (council scalp, valid to 2026-11-11T07:21Z)",
+   "trade": "sol-scalp-1794370912"
   }
  ],
  "limits": {

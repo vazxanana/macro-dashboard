@@ -1798,7 +1798,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-10T23:41:05.000Z",
     "councilEntry": 83.22,
     "stop": 82.468,
@@ -1812,10 +1812,12 @@
     "slipR": 0.078,
     "lagSec": 40,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-10T23:41:05.000Z",
-    "brokerStop": 82.527
+    "brokerStop": 82.527,
+    "closedAt": "2026-11-11T04:23:00.000Z"
    },
    "btc-replica-1794354313-b": {
     "positionId": "48236287",
@@ -2504,11 +2506,12 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9977.46 · 16 open",
+  "status": "ok · demo Fusion Markets · balance 9969.89 · 15 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
-   "xrp-replica-1794364852-b": "none of XRPUSD found at the broker"
+   "xrp-replica-1794364852-b": "none of XRPUSD found at the broker",
+   "xrp-replica-1794370912-s": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -2516,8 +2519,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9977.46,
-  "lastRun": "2026-11-11T04:20:29.000Z"
+  "balance": 9969.89,
+  "lastRun": "2026-11-11T04:23:00.000Z"
  },
  "log": [
   {
@@ -3432,6 +3435,16 @@
    "at": "2026-11-11T04:17:59.000Z",
    "msg": "opened sell BTCUSD 0.01 lot (council replica)",
    "trade": "btc-replica-1794370613-s"
+  },
+  {
+   "at": "2026-11-11T04:23:00.000Z",
+   "msg": "SOLUSD position 48235863 closed at the broker",
+   "trade": "sol-replica-1794354025-b"
+  },
+  {
+   "at": "2026-11-11T04:23:00.000Z",
+   "msg": "not mirrored xrp-replica-1794370912-s: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794370912-s"
   }
  ],
  "limits": {
