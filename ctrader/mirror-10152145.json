@@ -6509,7 +6509,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9932.83 · 27 open",
+  "status": "ok · demo Fusion Markets · balance 9932.83 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6519,22 +6519,53 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eth-rscalp-1794381427": {
+    "orderId": "33913581",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 50,
+    "lots": 0.5,
+    "digits": 2,
+    "setup": "rscalp",
+    "limitPrice": 2055.55,
+    "stop": 2051.608842,
+    "t1": 2071,
+    "placedAt": "2026-11-11T07:18:12.000Z",
+    "expires": "2026-11-11T10:17:07.000Z",
+    "riskCash": 1.99,
+    "margin": 102.69,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "audusd-scalp-1794381427": {
+    "orderId": "33913582",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 0.6877,
+    "stop": 0.6872,
+    "t1": 0.68854,
+    "placedAt": "2026-11-11T07:18:12.000Z",
+    "expires": "2026-11-11T10:17:07.000Z",
+    "riskCash": 1.99,
+    "margin": 4.13,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9932.83,
-  "lastRun": "2026-11-11T07:15:22.000Z"
+  "lastRun": "2026-11-11T07:18:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:04:55.000Z",
-   "msg": "moved GBPUSD 47373485 protection: stop 1.32889 -> 1.32856, target 1.36897 -> 1.36864 (council scalp)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
-  {
-   "at": "2026-11-10T13:04:55.000Z",
-   "msg": "moved GBPUSD 48035675 protection: stop 1.34316 -> 1.34283, target 1.3404000000000005 -> 1.34007 (council scalp)",
-   "trade": "gbpusd-scalp-1794315492"
-  },
   {
    "at": "2026-11-10T13:04:55.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 4075.61 (council scalp, valid to 2026-11-10T16:03Z)",
@@ -8024,6 +8055,16 @@
    "at": "2026-11-11T07:02:00.000Z",
    "msg": "opened buy USDCHF 0.01 lot (council intraday)",
    "trade": "usdchf-intraday-1794380452"
+  },
+  {
+   "at": "2026-11-11T07:18:12.000Z",
+   "msg": "placed buy limit ETHUSD 0.5 lot at 2055.55 (council rscalp, valid to 2026-11-11T10:17Z)",
+   "trade": "eth-rscalp-1794381427"
+  },
+  {
+   "at": "2026-11-11T07:18:12.000Z",
+   "msg": "placed buy limit AUDUSD 0.03 lot at 0.6877 (council scalp, valid to 2026-11-11T10:17Z)",
+   "trade": "audusd-scalp-1794381427"
   }
  ],
  "limits": {
