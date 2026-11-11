@@ -26,7 +26,12 @@
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const fs = require('fs'), os = require('os'), path = require('path');
-const PORT = process.env.ACADEMY_PORT || process.env.PORT || 8770, H = 'http://127.0.0.1:' + PORT;
+// Six servers in all, by default on PORT, +1, +2 (this part) and +11, +12, +13 (the analyst part). Where only a few ports are free,
+// ACADEMY_PORTS="main,verify,guest,off,fake,connector" names them; a port may be named again once its server has stopped
+// (at most three run at one time: verify and guest never overlap, and the analyst part starts after this part has ended).
+const PORTS = String(process.env.ACADEMY_PORTS || '').split(',').map((x) => +x.trim()).filter((x) => x > 0);
+const PORT = PORTS[0] || process.env.ACADEMY_PORT || process.env.PORT || 8770, H = 'http://127.0.0.1:' + PORT;
+const portOf = (i, d) => PORTS[i] || d;
 const OUT = process.env.AUDIT_OUT || os.tmpdir() + '/';
 const ROOT = path.join(__dirname, '..', '..');
 const M = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/academy/manifest.json'), 'utf8'));
@@ -73,6 +78,15 @@ const SMALL = String.raw`(() => { const out = [], seen = new Set(), w = document
 const TAPS = String.raw`(() => [...document.querySelectorAll('main button, main select, main input:not([type=radio]):not([type=checkbox]), main textarea, main a.btn, main .seg label span, main summary')].filter((e) => e.getClientRects().length).map((e) => [Math.round(e.getBoundingClientRect().height), e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + ' ' + (e.textContent || '').trim().slice(0, 16)]).filter((x) => x[0] < 44).map((x) => x.join(' ')))()`;
 const ENDLESS = String.raw`(() => document.getAnimations().filter((a) => { try { return a.effect.getComputedTiming().iterations === Infinity && a.playState === 'running' && a.effect.target && a.effect.target.getClientRects().length; } catch (e) { return false; } }).map((a) => a.animationName || 'animation'))()`;
 
+// "Cannot be saved without ..." (11 Nov 2026, round 2). Until then the Save button was disabled and a red "Problem" showed
+// the moment a choice was made. Now Save is offered once a choice is made, what is still missing is a calm line (#<idp>-hint)
+// and the red problem (#<idp>-err) appears only when Save is pressed with something missing. What is proved here is the same
+// promise, by its effect: the missing thing is named before the press, the press shows the problem, and it sends NOTHING.
+const refused = async (pg, idp, re, reqs) => {
+  const calm = re.test(await txt(pg, `#${idp}-hint`)) && await vis(pg, `#${idp}-hint`) && !(await vis(pg, `#${idp}-err`)), n = reqs.length;
+  await pg.click(`#${idp}-save`); await pg.waitForTimeout(200);
+  return calm && re.test(await txt(pg, `#${idp}-err`)) && await vis(pg, `#${idp}-err`) && !(await vis(pg, `#${idp}-hint`)) && !reqs.slice(n).some((r) => r.method === 'POST');
+};
 // The page keeps itself under 24 Academy calls a minute (the site's firewall allows 30). The dev server has no firewall, so
 // the audit lifts that pace to finish in minutes; it counts the calls instead, and one check runs with the pace on.
 const NO_PACE = 'window.MXAC_PACE = 0;';
@@ -180,6 +194,11 @@ async function startServer(port = PORT, flags = []) {
     await p.screenshot({ path: OUT + 'academy-1-decision.png', fullPage: true });
     // usability pass (11 Nov 2026): the decision point is announced under the chart, and a half-written verdict is not dropped silently
     check('the decision point is announced under the chart, with the way to the decision and to the verdict', await vis(p, '#point-bar') && /^Setup reached: the engine says (BUY|SELL|WAIT) \((low|medium|high) confidence\)\. Read why, then give your verdict\.$/.test(await txt(p, '#point-text')) && (await txt(p, '#point-action')) === a1 && await vis(p, '#point-decision') && await vis(p, '#point-verdict'), await txt(p, '#point-bar'));
+    const folds = await p.$$eval('#decision details.dfold', (l) => l.map((d) => d.dataset.fold));
+    // round 2 (11 Nov 2026): the card folds its detail (nothing removed), and the engine's own answer is not offered as a "change"
+    check('the decision card keeps the answer and its main reasons in sight and folds the detail away, all of it still there', await vis(p, '#dec-main') && (await p.$$('#dec-main li:not(.none)')).length >= 1 && (await p.$$eval('#decision details.dfold', (l) => l.every((d) => !d.open))) && (await txt(p, '#dec-support')).length > 10 && (await txt(p, '#dec-similar')).length > 10 && ['evidence', 'doubt', 'risk', 'similar', 'lessons'].every((k) => folds.includes(k)), folds.join());
+    await p.click('#dec-fold-evidence > summary'); check('a folded part opens on a click', await p.$eval('#dec-fold-evidence', (d) => d.open) && await p.$eval('#dec-support', (e) => e.checkVisibility({ contentVisibilityAuto: true, checkVisibilityCSS: true })));
+    check('the engine\'s own answer is not offered as a change: no "Change to WAIT" on a WAIT, its own BUY / SELL only on other levels', a1 === 'WAIT' ? (await p.$$('#mentor [data-choice="WAIT"]')).length === 0 && (await p.$$('#mentor [data-choice]')).length === 4 : /^Keep (BUY|SELL), other levels$/.test(await txt(p, `#mentor [data-choice="${a1}"]`)) && (await p.$$('#mentor [data-choice]')).length === 5, await p.$$eval('#mentor [data-choice]', (l) => l.map((x) => x.textContent).join(' | ')));
     { const n0 = reqs.length; await p.click('#mentor [data-choice="reject"]'); await p.fill('#m-text', 'half written'); await p.click('#continue'); await p.waitForTimeout(300);
       check('Continue on a half-written verdict asks first: the point stays, the words stay, nothing is sent', /paused on a setup/.test(await txt(p, '#clock-state')) && (await p.inputValue('#m-text')) === 'half written' && /not saved yet/.test(await txt(p, '#continue-msg')) && /not saved yet/.test(await txt(p, '#point-text')) && await vis(p, '#dec-action') && calls(reqs, n0, 'owner').length === 0, await txt(p, '#continue-msg'));
       await p.fill('#m-text', ''); }
@@ -217,8 +236,21 @@ async function startServer(port = PORT, flags = []) {
     const perSetup = [];
     for (let i = 1; i < cands.length; i++) { const m5 = reqs.length; await nextPoint(p); perSetup.push(calls(reqs, m5, 'owner').map(what).filter((x) => x !== 'get=outcome')); first = await txt(p, '#dec-action'); const now = await txt(p, '#clock-time'); cur = cands.find((c) => stamp(c.t) === now); if (first !== 'WAIT') break; const d = await txt(p, '#decision'); if (/event risk: /.test(d)) eventWait = d.match(/event risk: [^.]{0,80}/)[0]; await goOn(p); }
     check('a setup hours before a scheduled release waits on event risk and names the release', /Non-Farm Payrolls/.test(eventWait), eventWait);
-    check('every later train decision costs ONE Academy call (the attempt): lessons, past cases and calendar were read once for the run', perSetup.length >= 1 && perSetup.every((x) => x.join() === 'attempt'), `calls per setup: ${perSetup.map((x) => x.length).join(',')} (${perSetup[0] && perSetup[0].join('+')})`);
+    // TWO calls since 11 Nov 2026 (round 2, the cost was approved): the attempt, then the session's position, so a reload returns to
+    // the latest setup instead of the first one. Before that it was ONE (the attempt) and the position was saved at the first decision only.
+    check('every later train decision costs TWO Academy calls (the attempt, then the session position): lessons, past cases and calendar were read once for the run', perSetup.length >= 1 && perSetup.every((x) => x.join() === 'attempt,session.save'), `calls per setup: ${perSetup.map((x) => x.length).join(',')} (${perSetup[0] && perSetup[0].join('+')})`);
     check('the run read its lists once: one history read with before = the end of the range, none per setup', reqs.filter((r) => r.tag === 'owner' && r.q.get === 'history').length === 1 && reqs.filter((r) => r.tag === 'owner' && r.q.get === 'history')[0].q.before != null && !reqs.some((r) => r.q.get === 'history' && r.q.cand), JSON.stringify(reqs.filter((r) => r.q.get === 'history').map((r) => r.q)));
+    // a reload keeps the place: no "Save session" was pressed in this run, yet another tab of the same browser is offered the
+    // latest setup (not the first one) and Resume lands on it, with its stored attempt; that tab only reads
+    if (cur) {
+      const p2 = await ctx.newPage(); watch(p2, 'reload'); const n2 = reqs.length; await p2.goto(H + '/academy', { waitUntil: 'load' });
+      await p2.waitForSelector('#resume-now:not([hidden])', { timeout: 15000 }).catch(() => {});
+      const offer = await txt(p2, '#resume-now-text'), edge2 = await p2.inputValue('#f-edge');
+      await p2.click('#resume-now-go').catch(() => {}); await p2.waitForSelector('#dec-action', { timeout: 60000 }).catch(() => {});
+      check('a reload keeps your place: the latest setup is offered and Resume lands on it, on the edge used last, reading only', cur.t !== c1.t && offer.includes('at ' + stamp(cur.t)) && edge2 === EDGE && (await txt(p2, '#clock-time')) === stamp(cur.t) && (await txt(p2, '#dec-action')) === first && /Attempt 1 stored/.test(await txt(p2, '#dec-stored')) && !reqs.slice(n2).some((r) => r.tag === 'reload' && r.method === 'POST'), `${offer} | ${await txt(p2, '#clock-time')} ${await txt(p2, '#dec-action')}`);
+      await p2.close();
+    }
+    check('the part of the card opened on the first setup is still open on this one (remembered)', await p.$eval('#dec-fold-evidence', (d) => d.open).catch(() => false) && await vis(p, '#dec-support'));
     check('the engine takes a later real setup (BUY or SELL), so there is something to correct', (first === 'BUY' || first === 'SELL') && !!cur, `${first} at ${await txt(p, '#clock-time')}`);
     // mentor lines: change to the same action, drag the stop line, see the field follow
     await p.click(`#mentor [data-choice="${first}"]`);
@@ -239,7 +271,7 @@ async function startServer(port = PORT, flags = []) {
     await p.click('#a-list li:nth-child(3) button'); check('a mark can be deleted', (await p.$$('#a-list li:not(.none)')).length === 2);
     // the correction itself
     await p.click('#mentor [data-choice="WAIT"]');
-    check('a correction without a reason or a text cannot be saved', await p.isDisabled('#m-save') && /Say why/.test(await txt(p, '#m-err')), await txt(p, '#m-err'));
+    check('a correction without a reason or a text cannot be saved: named calmly first, the problem on Save, nothing sent', await refused(p, 'm', /Say why/, reqs), await txt(p, '#m-err'));
     await p.click('#mentor [data-reason="session"]'); await p.click('#mentor [data-reason="wrong-structure"]'); await p.selectOption('#m-bias', 'neutral');
     await p.fill('#m-text', 'Audit: not in this session; wait for a second confirmation.');
     await p.click('#m-save'); await p.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 });
@@ -460,7 +492,7 @@ async function startServer(port = PORT, flags = []) {
     check('Blind arena: nothing of the engine\'s answer is on the page, and no outcome has been asked for', await vis(p, '#bl-hidden') && !(await vis(p, '#bl-reveal')) && (await p.$$('#bl-engine, #bl-compare')).length === 0 && !calls(reqs, mb, 'owner').some((r) => r.q.get === 'outcome') && (await api(p, `get=blind&edge=${EDGE}`)).blind.length === 0);
     check('Blind arena: a setup trained on before is labelled recall', /recall, not a fresh decision/.test(await txt(p, '#bl-recall')));
     await p.click('#bl-answer [data-choice="WAIT"]');
-    check('Blind arena: an answer without a reason cannot be stored', await p.isDisabled('#bl-save') && /Say why in a line/.test(await txt(p, '#bl-err')));
+    check('Blind arena: an answer without a reason cannot be stored: named calmly first, the problem on Save, nothing sent', await refused(p, 'bl', /Say why in a line/, reqs), await txt(p, '#bl-err'));
     await p.fill('#bl-text', 'Audit: I would wait here.'); await p.click('#bl-save'); await p.waitForSelector('#bl-compare', { timeout: 20000 });
     const bc = calls(reqs, mb, 'owner').map(what), eng1 = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c1.id)}`)).attempts.pop();
     check('Blind arena: order of calls: the hidden attempt, the mentor\'s answer, and only then the outcome (three calls a setup)', bc.slice(-3).join() === 'attempt,blind.submit,get=outcome' && bc.filter((x) => x === 'attempt' || x === 'blind.submit' || x === 'get=outcome').length === 3, bc.join(' '));
@@ -476,7 +508,7 @@ async function startServer(port = PORT, flags = []) {
     await p.click('#bl-next'); await p.waitForSelector('#bl-save', { timeout: 60000 }); await p.waitForFunction(() => /your answer first/.test(document.getElementById('bl-state').textContent), null, { timeout: 20000 });
     const c2 = cands[1], own = c2.side === 'buy' ? 'BUY' : 'SELL'; await p.click(`#bl-answer [data-choice="${own}"]`);
     check('Blind arena: a BUY / SELL answer starts from the setup\'s own levels, stop included', +(await p.inputValue('#bl-entry')) === c2.entry && +(await p.inputValue('#bl-stop')) === c2.stop, `${await p.inputValue('#bl-entry')} / ${await p.inputValue('#bl-stop')}`);
-    await p.fill('#bl-stop', String(c2.side === 'buy' ? c2.entry + 1 : c2.entry - 1)); check('Blind arena: a stop on the wrong side is refused', await p.isDisabled('#bl-save') && /The stop must be/.test(await txt(p, '#bl-err')), await txt(p, '#bl-err'));
+    await p.fill('#bl-stop', String(c2.side === 'buy' ? c2.entry + 1 : c2.entry - 1)); check('Blind arena: a stop on the wrong side is refused (Save sends nothing)', await refused(p, 'bl', /The stop must be/, reqs), await txt(p, '#bl-err'));
     await p.fill('#bl-stop', String(c2.stop)); await p.fill('#bl-text', 'Audit: I take the setup.'); await p.click('#bl-save'); await p.waitForSelector('#bl-compare', { timeout: 20000 });
     const brows = (await api(p, `get=blind&edge=${EDGE}`)).blind;
     { const rec = brows.filter((r) => r.recall).length, sub = (await txt(p, '#bl-n')).replace(/\s+/g, ' ');
@@ -496,7 +528,7 @@ async function startServer(port = PORT, flags = []) {
     await p.click('#ss-step'); await p.click('#ss-missed'); await p.waitForSelector('#ss-m-save');
     check('Session: a missed opportunity shows the engine\'s own read of that moment first', /No setup of Gold momentum pullback was on the table at this moment, and the engine said WAIT/.test(await txt(p, '#ss-engine-read')), await txt(p, '#ss-engine-read'));
     await p.click('#ss-note [data-choice="BUY"]'); const mEntry = +(await p.inputValue('#ss-m-entry'));
-    check('Session: the note starts at the last closed price and needs a stop and a reason', mEntry > 1000 && await p.isDisabled('#ss-m-save') && /every trade has a stop/.test(await txt(p, '#ss-m-err')), `${mEntry} ${await txt(p, '#ss-m-err')}`);
+    check('Session: the note starts at the last closed price and needs a stop and a reason', mEntry > 1000 && await refused(p, 'ss-m', /every trade has a stop/, reqs), `${mEntry} ${await txt(p, '#ss-m-err')}`);
     await p.fill('#ss-m-stop', (mEntry - 6).toFixed(2)); await p.fill('#ss-m-target', (mEntry + 12).toFixed(2)); await p.fill('#ss-m-text', 'Audit: swept the low and closed back above it.'); await p.click('#ss-m-save'); await p.waitForSelector('#ss-draft-save', { timeout: 15000 });
     const misses = (await api(p, `get=misses&edge=${EDGE}`)).misses, ssId = misses[0] && misses[0].sessionId;
     check('Session: both notes are stored with the session, the engine\'s answer and its class beside the mentor\'s', misses.length === 2 && misses[0].kind === 'missed' && misses[0].action === 'BUY' && misses[0].entry === mEntry && misses[0].stop === +(mEntry - 6).toFixed(2) && misses[0].engine.action === 'WAIT' && typeof misses[0].cls === 'string' && /^se_/.test(ssId) && misses[1].kind === 'right-wait' && misses[1].sessionId === ssId && /^[0-9a-f]{16}$/.test(misses[0].snapshotHash), JSON.stringify(misses.map((m) => [m.kind, m.action, m.cls])));
@@ -514,7 +546,7 @@ async function startServer(port = PORT, flags = []) {
     if (dayCands.length > 1) {
       await p.click('#ss-continue'); await p.waitForFunction((t) => document.getElementById('ss-time').textContent === t && document.getElementById('ss-state').textContent === 'paused on a setup', stamp(dayCands[1].t), { timeout: 60000 });
       const other = await p.$eval('#ss-point [data-choice]:not([data-choice="approve"])', (b) => b.dataset.choice); await p.click(`#ss-point [data-choice="${other}"]`);
-      check('Session: a disagreeing verdict needs a reason', await p.isDisabled('#ss-v-save') && /Say why in a line/.test(await txt(p, '#ss-v-err')), await txt(p, '#ss-v-err'));
+      check('Session: a disagreeing verdict needs a reason (Save sends nothing without one)', await refused(p, 'ss-v', /Say why in a line/, reqs), await txt(p, '#ss-v-err'));
       await p.fill('#ss-v-text', 'Audit: I read this one differently.'); await p.click('#ss-v-save'); await p.waitForSelector('#ss-lesson-plain', { timeout: 15000 });
       check('Session: the disagreement is stored as a correction and a lesson draft is offered', (await txt(p, '#ss-n-agree')).startsWith('1 of 2 (too few to judge)') && /^When: .+ → Then: /.test(await txt(p, '#ss-lesson-plain')) && (await api(p, `get=corrections&edge=${EDGE}&cand=${encodeURIComponent(dayCands[1].id)}`)).corrections.some((c) => c.verdict === 'change' && c.action === other), await txt(p, '#ss-lesson-plain'));
     }
@@ -553,7 +585,7 @@ async function startServer(port = PORT, flags = []) {
 
     // ---- 11i. verification pass on a fresh store: every replay control; approve, reject, change with levels; the regression check ----
     {
-      const sv = await startServer(+PORT + 1), HV = sv.H, cv = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await cv.addInitScript(NO_PACE);
+      const sv = await startServer(portOf(1, +PORT + 1)), HV = sv.H, cv = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await cv.addInitScript(NO_PACE);
       let v = await cv.newPage(); watch(v, 'verify');
       const state = () => txt(v, '#clock-state'), clockMs = async () => Date.parse((await txt(v, '#clock-time')).replace(' UTC', 'Z')), until = (re) => v.waitForFunction((src) => new RegExp(src).test(document.getElementById('clock-state').textContent), re.source, { timeout: 10000 }).catch(() => {});
       const saveCorrection = async () => { await v.click('#m-save'); await v.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 }); return reqs.filter((r) => r.tag === 'verify' && r.body && r.body.action === 'correct').pop().body.correction; };
@@ -601,7 +633,7 @@ async function startServer(port = PORT, flags = []) {
         await goOn(v); await nextPoint(v); await goOn(v); await nextPoint(v); await goOn(v);
         // the fourth setup (the engine sells): rejected, and the lesson refuses the setup
         const on4 = await onSetup(cands[3]), a4 = await txt(v, '#dec-action'); await v.click('#mentor [data-choice="reject"]');
-        const needsWhy = (await v.isDisabled('#m-save')) && /Say why/.test(await txt(v, '#m-err')); await v.click('#mentor [data-reason="session"]'); await v.fill('#m-text', 'Verify: never in this session.'); const k4 = await saveCorrection();
+        const needsWhy = await refused(v, 'm', /Say why/, reqs); await v.click('#mentor [data-reason="session"]'); await v.fill('#m-text', 'Verify: never in this session.'); const k4 = await saveCorrection();
         check('mentor: a rejection needs a reason, carries no action and no levels, and is stored as a rejection', on4 && a4 === 'SELL' && needsWhy && k4.verdict === 'reject' && k4.action === null && k4.entry === null && k4.stop === null && k4.reasons.join() === 'session', JSON.stringify(k4).slice(0, 160));
         check('mentor: the draft from a rejected trade refuses the setup', /→ Then: REFUSE the setup \(wait\)$/.test(await txt(v, '#lesson-plain')), await txt(v, '#lesson-plain'));
         await keepConds(['session']); await saveLesson('Verify lesson 1: refuse this session'); const p4 = await prove();
@@ -678,7 +710,7 @@ async function startServer(port = PORT, flags = []) {
     {
       const T = require(path.join(ROOT, 'api/academy.js')), GETS = Object.keys(T._t.GET), POSTS = Object.keys(T._t.POST);
       const q = (name) => `get=${name}&edge=${EDGE}&id=${encodeURIComponent(cands[0].id)}&cand=${encodeURIComponent(cands[0].id)}&month=2026-11&t=${cands[0].t}`;
-      const gs = await startServer(+PORT + 2, ['--guest']), out = { get: [], post: [], other: [] };
+      const gs = await startServer(portOf(2, +PORT + 2), ['--guest']), out = { get: [], post: [], other: [] };
       try {
         for (const name of GETS) { const x = await fetch(`${gs.H}/api/academy?${q(name)}`); out.get.push([name, x.status, (await x.json()).error, x.headers.get('cache-control')]); }
         for (const name of POSTS) { const x = await fetch(`${gs.H}/api/academy`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: name, edge: EDGE, id: 'x' }) }); out.post.push([name, x.status, (await x.json()).error]); }
@@ -815,7 +847,7 @@ async function analystAudit() {
     b = await chromium.launch();
     const P = Number(PORT);
     // ---- A. the normal dev server: the analyst is off ----
-    off = await start(P + 11, []);
+    off = await start(portOf(3, P + 11), []);
     {
       const { ctx, p, reqs, errs } = await open(b, off.base); await p.goto(off.base + '/academy', { waitUntil: 'load' }); await run(p, null);
       const m = reqs.length; await p.click('#c-play'); await nextPoint(p);
@@ -835,7 +867,7 @@ async function analystAudit() {
       await ctx.close();
     }
     // ---- B. the labelled fake provider (only this dev server's injected dependency) ----
-    fake = await start(P + 12, ['--fake-llm']);
+    fake = await start(portOf(4, P + 12), ['--fake-llm']);
     {
       const { ctx, p, reqs, errs } = await open(b, fake.base); await p.goto(fake.base + '/academy', { waitUntil: 'load' }); await run(p, null);
       const m = reqs.length; await p.click('#c-play'); await nextPoint(p);
@@ -881,7 +913,7 @@ async function analystAudit() {
       ok('after the owner confirms it, the open setup is asked and the switch is on', await p.isChecked('#an-auto') && /On: the analyst is asked on every setup of this run/.test(await txt(p, '#an-auto-on')), await txt(p, '#an-auto-on'));
       await goOn(p); await nextPoint(p); await p.waitForSelector('#an-answer', { timeout: 20000 }); const c4 = await candNow(p);
       const auto = (await api(p, `get=attempts&edge=${EDGE}&cand=${encodeURIComponent(c4.id)}&engine=language-model`)).attempts;
-      ok('the next setup of the run is asked by itself, once, after the engine\'s own attempt', c4.id !== c3.id && auto.length === 1 && reqs.slice(-2).join() === 'attempt,analyse', reqs.slice(-3).join(' '));
+      ok('the next setup of the run is asked by itself, once, after the engine\'s own attempt', c4.id !== c3.id && auto.length === 1 && reqs.slice(-3).join() === 'attempt,session.save,analyse', reqs.slice(-4).join(' '));   // the position save sits between them since round 2
       await p.click('#an-auto'); ok('unticking the switch stops it', !(await p.isChecked('#an-auto')) && (await p.$$('#an-auto-on')).length === 0);
       for (const theme of ['', 'light', 'midnight']) { await p.evaluate((t) => { if (t) document.documentElement.dataset.theme = t; }, theme); await p.waitForTimeout(350); const bad = await aa(p); ok(`AA contrast with the analyst's answer open, ${theme || 'the default'} theme`, bad.length === 0, bad.slice(0, 4).join(' ; ')); }   // 350 ms: colour transitions have ended
       await p.evaluate(() => { delete document.documentElement.dataset.theme; });
@@ -898,7 +930,7 @@ async function analystAudit() {
       await ctx.close();
     }
     // ---- D. the connector: no provider key, the owner's own assistant answers through /api/academy-mcp ----
-    con = await start(P + 13, ['--connector']);
+    con = await start(portOf(5, P + 13), ['--connector']);
     {
       const { ctx, p, reqs, errs } = await open(b, con.base); await p.goto(con.base + '/academy', { waitUntil: 'load' }); await run(p, null);
       await p.click('#c-play'); await nextPoint(p);

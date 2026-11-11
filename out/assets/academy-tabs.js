@@ -211,10 +211,12 @@
   }
   // a generated study's table → sections a page can draw: { title, cols, rows } for a list of records, { title, pairs } for plain values
   function tableSections(table, title, depth) {
-    const out = [], d = depth || 0, isO = (v) => !!v && typeof v === 'object' && !Array.isArray(v), cell = (v) => (v == null ? 'n/a' : typeof v === 'object' ? JSON.stringify(v) : String(v));
+    const out = [], d = depth || 0, isO = (v) => !!v && typeof v === 'object' && !Array.isArray(v), cell0 = (v) => (v == null ? 'n/a' : typeof v === 'object' ? JSON.stringify(v) : String(v));
+    // a time written as epoch seconds under a key that names a time (from, to, cut, ...) is shown as a date
+    const cell = (v, k) => (typeof v === 'number' && Number.isInteger(v) && v > 9e8 && v < 3e9 && /^(from|to|cut|first|last|start|end|t|at|exitT|entryT)$/.test(String(k || '')) ? fmtTime(v) : cell0(v));
     if (Array.isArray(table)) {
-      if (table.length && table.every(isO)) { const cols = []; for (const r of table) for (const k of Object.keys(r)) if (cols.indexOf(k) < 0) cols.push(k); out.push({ title: title || 'Rows', cols, rows: table.map((r) => cols.map((k) => cell(r[k]))) }); }
-      else if (table.length) out.push({ title: title || 'Values', pairs: [[title || 'values', table.map(cell).join(', ')]] });
+      if (table.length && table.every(isO)) { const cols = []; for (const r of table) for (const k of Object.keys(r)) if (cols.indexOf(k) < 0) cols.push(k); out.push({ title: title || 'Rows', cols, rows: table.map((r) => cols.map((k) => cell(r[k], k))) }); }
+      else if (table.length) out.push({ title: title || 'Values', pairs: [[title || 'values', table.map((x) => cell(x)).join(', ')]] });
       return out;
     }
     if (!isO(table)) return out;
@@ -223,8 +225,8 @@
       const v = table[k], name = title ? `${title} · ${k}` : k;
       if (Array.isArray(v) && v.length && v.every(isO)) out.push(...tableSections(v, name, d + 1));
       else if (isO(v) && d < 2 && Object.values(v).some((x) => x && typeof x === 'object')) out.push(...tableSections(v, name, d + 1));
-      else if (isO(v)) out.push({ title: name, pairs: Object.keys(v).map((kk) => [kk, cell(v[kk])]) });
-      else pairs.push([k, Array.isArray(v) ? v.map(cell).join(', ') : cell(v)]);
+      else if (isO(v)) out.push({ title: name, pairs: Object.keys(v).map((kk) => [kk, cell(v[kk], kk)]) });
+      else pairs.push([k, Array.isArray(v) ? v.map((x) => cell(x)).join(', ') : cell(v, k)]);
     }
     if (pairs.length) out.unshift({ title: title || 'Summary', pairs });
     return out;
@@ -335,7 +337,7 @@
   // own = { get, set }: a section with a sitting in progress (blind, session) keeps its own edge
   function edgeBar(ctx, idp, onChange, note, own) {
     const cur = own ? own.get() : edgeOf(ctx);
-    const sel = el('select', { id: idp + '-edge', onchange: (e) => { if (own) own.set(e.target.value); else EDGE = e.target.value; onChange(); } }, ctx.edges().map((e) => el('option', { value: e.id, text: `${e.name} · ${e.marketLabel || e.market}`, selected: e.id === cur })));
+    const sel = el('select', { id: idp + '-edge', onchange: (e) => { if (own) own.set(e.target.value); else EDGE = e.target.value; if (MXAC.rememberEdge) MXAC.rememberEdge(e.target.value); onChange(); } }, ctx.edges().map((e) => el('option', { value: e.id, text: `${e.name} · ${e.marketLabel || e.market}`, selected: e.id === cur })));
     return el('div', { class: 'tb-bar' }, el('label', { class: 'f' }, el('span', { text: 'Edge' }), sel), note ? el('p', { class: 'note', text: note }) : null);
   }
   // a section draws into `sec` after its reads; a newer draw (another edge, another visit) wins over an older one still loading
@@ -464,6 +466,8 @@
     return box;
   }
   async function lessonsTab(sec, ctx) {
+    // asked for from a decision that names two conflicting lessons (MXAC.lessonFocus = { edge, ids }): open on that edge and mark them
+    const focus = MXAC.lessonFocus && Array.isArray(MXAC.lessonFocus.ids) ? MXAC.lessonFocus : null; MXAC.lessonFocus = null; if (focus && focus.edge && ctx.edges().some((x) => x.id === focus.edge)) EDGE = focus.edge;
     const live = fresh('lessons'), edge = edgeOf(ctx), e = edgeDef(ctx, edge), redraw = () => lessonsTab(sec, ctx); closeEditor = null; loading(sec, 'Reading the lessons…');
     let lessons, research;
     // the drafts come with any research read; kind=baseline keeps that answer small (one study an edge)
@@ -474,7 +478,12 @@
     clear(sec).appendChild(edgeBar(ctx, 'ls', redraw, 'Lessons of this edge and the lessons that hold for every edge, newest first. Every version is kept.'));
     const box = card('Lessons', `${e ? e.name : edge} and all edges · ${plural(chains.length, 'lesson')}, ${all.filter((l) => l.active).length} in force`, 'ls-card');
     if (!chains.length) box.appendChild(empty('No lesson yet. A lesson appears here when you correct a decision in the Train tab and save the draft, or when you save a research draft below.', el('button', { type: 'button', class: 'btn', text: 'Go to Train', onclick: () => ctx.go('train') })));
-    else { const ul = el('ul', { class: 'lsn-list', id: 'ls-list' }); for (const vs of chains) ul.appendChild(lessonItem(vs, ctx, redraw)); box.appendChild(ul); }
+    else {
+      const ul = el('ul', { class: 'lsn-list', id: 'ls-list' }), hits = [];
+      for (const vs of chains) { const li = lessonItem(vs, ctx, redraw); if (focus && vs.some((v) => focus.ids.indexOf(v.id) >= 0)) { li.classList.add('hit'); li.setAttribute('data-focus', 'yes'); hits.push(li); } ul.appendChild(li); }
+      if (focus) box.appendChild(el('p', { class: 'ac-warn', id: 'ls-focus', text: hits.length ? `The ${hits.length === 1 ? 'lesson' : plural(hits.length, 'lesson')} the decision named as conflicting ${hits.length === 1 ? 'is' : 'are'} outlined below. Revise one so they no longer meet on the same setup, or switch one off; then go back to Train and replay the same trade.` : 'The lessons that decision named are not in this list any more.' }));
+      box.appendChild(ul); if (hits.length) setTimeout(() => { if (hits[0].isConnected) hits[0].scrollIntoView({ block: 'center' }); }, 0);
+    }
     sec.appendChild(box); sec.appendChild(checkCard(edge, ctx)); sec.appendChild(draftsCard(research, all, ctx, redraw, e));
   }
   MXAC.registerTab('lessons', { title: 'Lessons', render: lessonsTab });
@@ -729,23 +738,25 @@
     const err = el('p', { class: 'ac-err', id: idp + '-err', role: 'alert', hidden: true }), msg = el('span', { class: 'ac-status', id: idp + '-msg', role: 'status' });
     const needText = () => (typeof o.needText === 'function' ? o.needText(A.action) : !!o.needText);
     const save = el('button', { type: 'button', class: 'btn primary', id: idp + '-save', disabled: true, text: o.submitLabel || 'Save' });
-    const check = () => { const p = A.action ? answerProblems(A, needText()) : []; err.hidden = !p.length; err.textContent = p.join(' '); save.disabled = !A.action || !!p.length; return p; };
+    // what is missing is a calm line until Save is pressed with something missing (show); only then the red "Problem"
+    let tried = false; const hint = el('p', { class: 'note', id: idp + '-hint', hidden: true });
+    const check = (show) => { if (show) tried = true; const p = A.action ? answerProblems(A, needText()) : [], on = tried && p.length > 0, calm = !tried && p.length > 0; err.hidden = !on; err.textContent = on ? p.join(' ') : ''; hint.hidden = !calm; hint.textContent = calm ? 'Before you save: ' + p.join(' ') : ''; save.disabled = !A.action; return p; };
     const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), (inputs[k] = el('input', { type: 'number', step: '0.01', id: `${idp}-${k}`, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); A[k] = v === '' || !Number.isFinite(+v) ? null : +v; check(); } })));
     const choices = el('div', { class: 'choices', role: 'group', 'aria-label': o.label || 'Your answer' }, o.actions.map(([v, label]) => el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) })));
     function choose(v) {
-      A.action = v; choices.querySelectorAll('[data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
+      A.action = v; tried = false; choices.querySelectorAll('[data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
       const lv = (o.levels && o.levels(v)) || {}, take = isTake(v);
       for (const k of ['entry', 'stop', 'target']) { A[k] = take && fin(lv[k]) ? lv[k] : null; inputs[k].disabled = !take; inputs[k].value = A[k] == null ? '' : A[k]; }
       check();
     }
     const ta = el('textarea', { id: idp + '-text', maxlength: '4000', placeholder: o.placeholder || 'What do you see?', oninput: (e) => { A.text = e.target.value; check(); } });
     save.addEventListener('click', async () => {
-      if (check().length || save.disabled) return; save.disabled = true; msg.textContent = 'Saving…';
+      if (save.disabled || check(true).length) return; save.disabled = true; msg.textContent = 'Saving…';
       try { await o.submit({ action: A.action, entry: A.entry, stop: A.stop, target: A.target, text: A.text.trim() }); msg.textContent = o.done || 'Stored ✓'; choices.querySelectorAll('button').forEach((b) => { b.disabled = true; }); for (const k of Object.keys(inputs)) inputs[k].disabled = true; ta.disabled = true; }
       catch (e) { msg.textContent = ''; err.hidden = false; err.textContent = 'Not stored: ' + ((e && e.message) || e) + '.'; save.disabled = false; }
     });
     box.appendChild(choices); box.appendChild(el('div', { class: 'lv' }, numIn('entry', 'Entry'), numIn('stop', 'Stop'), numIn('target', 'Target')));
-    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: o.textLabel || 'Your reason' }), ta)); box.appendChild(err); box.appendChild(el('div', { class: 'f-actions' }, save, msg));
+    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: o.textLabel || 'Your reason' }), ta)); box.appendChild(hint); box.appendChild(err); box.appendChild(el('div', { class: 'f-actions' }, save, msg));
     return { choose };
   }
 
@@ -874,6 +885,8 @@
     const btn = (id, text, onclick, cls) => el('button', { type: 'button', class: 'btn' + (cls ? ' ' + cls : ''), id, text, onclick });
     const bPlay = btn('ss-play', 'Play', () => playPause(), 'primary'), bStep = btn('ss-step', 'Step one candle', () => { if (canMove()) { leavePoint(); Z.clock.step(1); } }), bMiss = btn('ss-missed', 'The engine should have acted here', () => openNote('missed')), bRight = btn('ss-right', 'The engine was right to wait', () => openNote('right-wait')), bSave = btn('ss-save', 'Save session', () => save(false).catch((e2) => { runMsg.textContent = 'The session was not saved: ' + e2.message + '.'; })), bEnd = btn('ss-end', 'End session', () => endSession());
     const canMove = () => !!Z.clock && !Z.busy && !Z.ended;
+    // the way from the controls to the decision card (on a phone it is more than a screen below the chart)
+    const pointGo = el('button', { type: 'button', class: 'btn primary', id: 'ss-point-go', hidden: true, text: 'See the decision', onclick: () => { pointBox.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' }); } });
     const decide = (snap) => K.decideOn(snap, { setup: setupOf(Z.edge), account: Z.account, lessons: Z.lessons, thesis: Z.thesis, history: snap.cand ? MXAC.historyAt(Z.hist.rows, snap.t) : [] });
 
     function draw() {
@@ -907,8 +920,8 @@
         if (Z.since >= MXAC.THESIS_EVERY) { Z.since = 0; try { const snap = K.snapOf(Z.edge, Z.series, Z.dataVersion, t, null); Z.thesis = MXA.thesis.update(Z.thesis, snap, decide(snap).decision); drawThesis(); } catch (e2) { runMsg.textContent = 'The thesis could not be updated here: ' + e2.message + '.'; } }
       }
     }
-    function leavePoint() { if (Z.cur) { Z.cur = null; pointBox.hidden = true; clear(pointBox); st.levels(null); } noteBox.hidden = true; clear(noteBox); }
-    function playPause() { if (!canMove()) return; const cs = Z.clock.state(); if (cs.playing) { Z.clock.pause(); draw(); return; } leavePoint(); runMsg.textContent = ''; Z.clock.play(); draw(); }
+    function leavePoint() { if (Z.cur) { Z.cur = null; pointBox.hidden = true; clear(pointBox); st.levels(null); } noteBox.hidden = true; clear(noteBox); pointGo.hidden = true; }
+    function playPause() { if (!canMove()) return; const cs = Z.clock.state(); if (cs.playing) { Z.clock.pause(); draw(); return; } const was = !!Z.cur; leavePoint(); runMsg.textContent = ''; Z.clock.play(); draw(); if (was && K.showNode) K.showNode(st.node); }   // "Continue" is pressed far below the chart on a phone: bring it back
     async function save(quiet, status) {
       const cs = Z.clock.state(), s = sessionSummary(Z.events);
       const replay = MXR.session.save({ id: Z.sessionId, edge: Z.edge.id, market: Z.edge.market, tf: Z.tf, t: cs.t, from: Z.from, to: Z.to, speed: cs.speed, mode: 'train', savedAt: new Date().toISOString() });
@@ -952,7 +965,7 @@
             if (!ok) offerLesson(lBox, MXA.lessons.fromCorrection(d, Object.assign({}, saved, { sessionId: Z.sessionId }), f), true, null);
           } });
         pointBox.appendChild(el('div', { class: 'f-actions' }, btn('ss-continue', 'Continue the session', () => playPause(), 'primary')));
-        runMsg.textContent = 'Paused on a setup. Give your verdict, or continue.'; drawSummary();
+        runMsg.textContent = `Setup reached: the engine says ${d.action} (${d.confidence || 'n/a'} confidence). Give your verdict, or continue.`; pointGo.hidden = false; drawSummary();
       } catch (e2) {
         Z.done.delete(c.id); pointBox.hidden = false; clear(pointBox).appendChild(el('p', { class: 'ac-err', text: `The setup at ${fmtTime(c.t)} could not be decided or stored: ${e2.message}. Nothing was recorded for it.` }));
         pointBox.appendChild(el('div', { class: 'f-actions' }, btn(null, 'Try again', () => openPoint(c), 'primary'), btn(null, 'Skip this setup', () => { Z.done.add(c.id); pointBox.hidden = true; clear(pointBox); draw(); }))); runMsg.textContent = '';
@@ -1032,7 +1045,7 @@
       el('p', { text: 'The replay runs through the range with the running thesis. It stops on every train-pool setup, where the decision is stored and you give a verdict. Pause anywhere else to note a missed opportunity or a right wait. No paper account runs here: the Train tab has it.' }),
       edgeBar(ctx, 'ss', () => { if (Z.clock) Z.clock.pause(); live.hidden = true; prepare(true); }, null, { get: () => myEdge, set: (v) => { myEdge = v; } }), el('div', { class: 'f-grid' }, from, to, el('label', { class: 'f' }, el('span', { text: 'Chart timeframe' }), tfSel), el('label', { class: 'f' }, el('span', { text: 'Speed' }), spSel)), note, err,
       el('div', { class: 'f-actions' }, btn('ss-start', 'Start the session', () => start(null), 'primary'), msg), el('div', { class: 'sub' }, el('h3', { text: 'Saved sessions' }), savedList)));
-    live.appendChild(el('div', { class: 'ac-grid' }, el('div', { class: 'ac-chart-col2' }, st.node, el('div', { class: 'card' }, el('div', { class: 'ctl', role: 'group', 'aria-label': 'Session controls' }, bPlay, bStep, speeds, bSave, bEnd), el('div', { class: 'ctl', role: 'group', 'aria-label': 'Notes' }, bMiss, bRight), runMsg), notesBox), el('div', { class: 'ac-side' }, sumBox, thesisBox, pointBox, noteBox)));
+    live.appendChild(el('div', { class: 'ac-grid' }, el('div', { class: 'ac-chart-col2' }, st.node, el('div', { class: 'card' }, runMsg, pointGo, el('div', { class: 'ctl', role: 'group', 'aria-label': 'Session controls' }, bPlay, bStep, speeds, bSave, bEnd), el('div', { class: 'ctl', role: 'group', 'aria-label': 'Notes' }, bMiss, bRight)), notesBox), el('div', { class: 'ac-side' }, pointBox, noteBox, sumBox, thesisBox)));
     sec.appendChild(live); prepare(false); listSaved();
   }
   MXAC.registerTab('session', { title: 'Session', render: sessionTab });

@@ -151,8 +151,8 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
 - **Rate limit.** The firewall allows 30 requests a minute per IP on `/api`. `MXAC.makeApi` keeps the page under `MXAC.PACE`
   (24) Academy calls in any minute, waits out a 429 (`Retry-After`, else 5 s doubling, 4 tries) with a calm status line, and
   sends writes one at a time. A replay run reads candidates, lessons, calendar and past cases once
-  (`?get=history&before=<end of the range>`, cut per decision by `MXAC.historyAt`); a train decision is then one call (the
-  attempt), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
+  (`?get=history&before=<end of the range>`, cut per decision by `MXAC.historyAt`); a train decision is then two calls since
+  11 Nov 2026 (the attempt, then the session position; one before that), a test on a new setup two, a blind setup three. `window.MXAC_PACE = 0` lifts the pace (the audit does, and counts
   calls instead).
 - A setup decided in an earlier sitting is stored as `replay-same` when the Train or Session clock stops on it again (recall).
 - **What if** (`kit.whatIfCard`, pure parts `MXAC.whatIfAllowed / whatIfWindow / whatIfAlternatives / whatIfRun / whatIfNote`): the
@@ -173,3 +173,8 @@ Owner's guide: `docs/academy/LLM.md` (what it sees, safeguards, environment vari
   of play / continue, step, jump and restart, so a half-written verdict (`MXAC.mentorUnsaved`, `M.dirty`) needs a second press
   to be dropped; `MXAC.humanize(text, lessons)` shows lesson titles for ids in the engine's text (display only). The "What if"
   columns are Alternative, Net R after costs, Exit, Filled, Levels, Best, Worst, Exit time.
+- Round 2 (11 Nov 2026), page code only: `keepPlace` (the session position with every decision; two API calls a train
+  decision: `attempt`, `session.save`), `#resume-now` / `renderResumeNow` (pure `MXAC.latestFirst`, `MXAC.unfinished`),
+  `decisionView(box, { fold: true, onLessons })` with `foldBox` and the pure `MXAC.mainReasons` / `MXAC.conflictIds`,
+  `MXAC.mentorChoices`, `mentorCheck(show)` (the red problem only after Save), `MXAC.lessonFocus = { edge, ids }` read once by
+  the Lessons tab, `prefGet` / `prefSet` (the page's only browser storage: `mxacEdge`, `mxacFold`), `MXAC.rememberEdge`.

@@ -217,7 +217,16 @@ test('the page talks to the Academy API and the candle proxy only: no broker, no
   const urls = [...ui.matchAll(/fetch\(([^)]*)\)/g)].map((m) => m[1]);
   assert.deepEqual(urls, ['url, init'], 'one fetch call, inside the api helper');
   assert.deepEqual([...new Set([...ui.matchAll(/'(\/(?:api|md|cdata)\/[a-z-]+)[?']/g)].map((m) => m[1]))].sort(), ['/api/academy']);
-  assert.ok(!/ctrader|\/api\/bridge|tradovate|websocket|new WebSocket|localStorage|sessionStorage/i.test(ui), 'no broker code, no socket, no browser storage of results');
+  assert.ok(!/ctrader|\/api\/bridge|tradovate|websocket|new WebSocket|sessionStorage|indexedDB/i.test(ui), 'no broker code, no socket, no browser storage of results');
+  // Browser storage (11 Nov 2026, round 2): until then the page used none at all. It now keeps two DISPLAY preferences of the
+  // device (the edge used last, which parts of the decision card are open) and nothing else: one reader and one writer, both
+  // refusing any key outside the list, and no caller passes them a decision, a result, a lesson or an API answer.
+  assert.equal((ui.match(/localStorage/g) || []).length, 2, 'localStorage is touched in prefGet and prefSet only');
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/);
+  assert.match(ui, /function prefGet\(k\) \{ if \(PREFS\.indexOf\(k\) < 0\) return null; try \{ return root\.localStorage\.getItem\(k\); \}/);
+  assert.match(ui, /function prefSet\(k, v\) \{ if \(PREFS\.indexOf\(k\) < 0\) return; try \{ root\.localStorage\.setItem\(k, String\(v\)\.slice\(0, 400\)\); \}/);
+  assert.deepEqual([...ui.matchAll(/prefSet\(([^;]*?)\);/g)].map((m) => m[1]).filter((x) => !/^k, v$/.test(x)).sort(), ["'mxacEdge', String(id)", "'mxacFold', JSON.stringify(v)"], 'the two writes: an edge id, and the open flags of the card');
+  for (const f of ['assets/academy-tabs.js', 'assets/academy-analyst.js']) assert.ok(!/localStorage|sessionStorage/.test(src(f)), f + ' keeps nothing in the browser');
   // POSTs are queued: the store has no compare-and-swap
   assert.match(ui, /const p = chain\.then\(run, run\); chain = p\.catch\(\(\) => \{\}\); return p;/);
 });
@@ -489,4 +498,79 @@ test('page wiring of the usability pass: the point line sits under the chart, Co
   assert.match(tabs, /K\.showNode\(st\.node\)/, 'Blind arena: "Next setup" brings the chart back');
   assert.match(tabs, /MXAC\.humanize\(d\.thesis, Z\.lessons\)/);
   assert.match(css, /scroll-margin-top: 64px/); assert.match(css, /\.ac-side \.cond > :first-child \{ grid-column: 1 \/ -1; \}/);
+});
+
+// ---- round 2 (11 Nov 2026): keeping the place, the folded card, calmer forms --------------------------------------------------
+test('a setup id in the engine\'s text is shown in plain words; other ids and words are left alone', () => {
+  assert.equal(MXAC.humanize('rejected candidate gmp-1714660200s: the evidence does not beat it'), 'rejected the sell setup of 2024-05-02 14:30 UTC: the evidence does not beat it');
+  assert.equal(MXAC.humanize('nq-open-1514903940b: not opened on paper'), 'the buy setup of 2018-01-02 14:39 UTC: not opened on paper');
+  assert.equal(MXAC.humanize('mosha-bo-1532336640s closed'), 'the sell setup of 2018-07-23 09:04 UTC closed');
+  for (const keep of ['data OANDA xau-usd policy-1.0', 'attempt at_0mwc5xyro13a8c328cea in session se_0mwc3emu9', 'snapshot 64e9d0fc81e8ea15', 'a body of 2.28 ATR 2 bars ago', 'level 2286.185 7 bars ago']) assert.equal(MXAC.humanize(keep), keep);
+  // every real candidate id of the seven edges reads as its own side and time
+  for (const e of EDGES) { const c = json(`academy/data/cand-${e.id}.json`)[0]; assert.equal(MXAC.humanize(c.id), `the ${c.side} setup of ${MXAC.fmtTime(c.t)}`, c.id); }
+});
+
+test('the folded decision card: the main reasons are a cut of lists that stay whole in the card', () => {
+  const wait = { action: 'WAIT', waitReasons: ['a', 'b', 'c', 'd', 'e'], supporting: [{ text: 'x', weight: 2 }] };
+  assert.deepEqual(MXAC.mainReasons(wait), { kind: 'wait', items: ['a', 'b', 'c'], more: 2 });
+  const take = { action: 'BUY', supporting: [{ text: 'light', weight: 0.5 }, { factor: 'heavy', weight: 2 }, { text: 'mid', weight: 1 }, { text: 'none' }] };
+  assert.deepEqual(MXAC.mainReasons(take), { kind: 'take', items: ['heavy', 'mid', 'light'], more: 1 });
+  assert.deepEqual(take.supporting.map((x) => x.text || x.factor), ['light', 'heavy', 'mid', 'none'], 'the decision itself is not reordered');
+  assert.deepEqual(MXAC.mainReasons({ action: 'SELL' }), { kind: 'take', items: [], more: 0 }); assert.deepEqual(MXAC.mainReasons(null), { kind: 'take', items: [], more: 0 });
+  const ui = src('assets/academy-ui.js'), view = ui.slice(ui.indexOf('function decisionView(box, o) {'), ui.indexOf('function renderDecision() {'));
+  // nothing left out: every part the unfolded card drew is still drawn, folded or not
+  for (const id of ['-thesis', '-support', '-against', '-similar', '-lessons']) assert.ok(view.includes(`idp + '${id}'`), id);
+  for (const t of ['Reasons to wait', 'What it is waiting for', 'Uncertainty', 'What would prove it wrong', 'Reward to risk', 'Stop distance', 'Risk engine', 'Similar past cases', 'Lessons applied', 'Facts about this setup from the edge']) assert.ok(view.includes(t), t);
+  for (const k of ['evidence', 'wait', 'doubt', 'risk', 'similar', 'lessons']) assert.ok(view.includes(`part('${k}'`), k);
+  assert.match(ui, /lessons: S\.lessons, fold: true, onLessons:/, 'the Train card is the folded one');
+  assert.doesNotMatch(src('assets/academy-tabs.js'), /fold: true/, 'the Session and Blind cards already sit behind their own disclosure');
+  // the view draws; it decides nothing and sends nothing
+  assert.doesNotMatch(view, /api\.|MXA\.decide|MXK\./);
+});
+
+test('two conflicting lessons named by a decision are found by their ids, and only then', () => {
+  const t = 'WAIT on the sell candidate: conflicting lessons: ls_0mwc3emu90a7dd6b9881 vs ls_0mwc3fjt60d27c861c61 (FLIP against WAIT): the mentor has to settle which one holds here.';
+  assert.deepEqual(MXAC.conflictIds({ thesis: t }), ['ls_0mwc3emu90a7dd6b9881', 'ls_0mwc3fjt60d27c861c61']);
+  assert.deepEqual(MXAC.conflictIds({ thesis: 'x', waitReasons: ['y', t] }), ['ls_0mwc3emu90a7dd6b9881', 'ls_0mwc3fjt60d27c861c61']);
+  assert.equal(MXAC.conflictIds({ thesis: 'lesson ls_0mwc3emu90a7dd6b9881 applied' }), null); assert.equal(MXAC.conflictIds(null), null); assert.equal(MXAC.conflictIds({}), null);
+  const tabs = src('assets/academy-tabs.js');
+  assert.match(tabs, /MXAC\.lessonFocus = null;/, 'the Lessons tab marks them once, not on every later visit');
+  assert.match(tabs, /li\.classList\.add\('hit'\)/);
+});
+
+test('the verdicts offered never repeat the engine\'s own answer as a change', () => {
+  assert.deepEqual(MXAC.mentorChoices('WAIT'), [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Change to BUY'], ['SELL', 'Change to SELL']]);
+  assert.deepEqual(MXAC.mentorChoices('BUY'), [['approve', 'Approve'], ['reject', 'Reject'], ['BUY', 'Keep BUY, other levels'], ['SELL', 'Change to SELL'], ['WAIT', 'Change to WAIT']]);
+  assert.deepEqual(MXAC.mentorChoices('SELL').map((x) => x[1]), ['Approve', 'Reject', 'Change to BUY', 'Keep SELL, other levels', 'Change to WAIT']);
+  // the rule that refuses a WAIT on a WAIT is still in force behind the form
+  assert.deepEqual(MXAC.correctionProblems(MXAC.buildCorrection({ choice: 'WAIT', reasons: ['late'] }, 'at_1'), { action: 'WAIT' }), ['The engine already said WAIT: use Approve.']);
+});
+
+test('a reload keeps the place: the session saved last comes first, a finished one is not offered, and the position rides on one call a decision', () => {
+  const rows = [{ id: 'a', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T10:00:00Z' }, { id: 'b', kind: 'replay', status: 'done', updatedAt: '2026-11-11T12:00:00Z' }, { id: 'c', kind: 'replay', status: 'paused', updatedAt: '2026-11-11T11:00:00Z' }, { id: 'd', kind: 'session', status: 'paused', updatedAt: '2026-11-11T13:00:00Z' }];
+  assert.deepEqual(MXAC.latestFirst(rows).map((r) => r.id), ['d', 'b', 'c', 'a']); assert.deepEqual(rows.map((r) => r.id), ['a', 'b', 'c', 'd'], 'the list handed in is not reordered');
+  assert.equal(MXAC.unfinished(MXAC.latestFirst(rows)).id, 'c', 'the unfinished replay saved last; a finished one and a Session-tab sitting are not offered');
+  assert.equal(MXAC.unfinished([]), null); assert.equal(MXAC.unfinished(null), null); assert.deepEqual(MXAC.latestFirst(null), []);
+  const ui = src('assets/academy-ui.js'), open = ui.slice(ui.indexOf('  async function openPoint(c) {'), ui.indexOf('  // A reload keeps your place'));
+  // one train decision: the first of a run saves the session BEFORE its attempt (it needs the id) with the setup it is on, and
+  // adds no call; every later one saves once AFTER its attempt. Never both.
+  assert.match(open, /const firstSave = !S\.sessionId; if \(firstSave\) await saveSession\(true, c\.id\);/);
+  assert.match(open, /if \(!firstSave\) await keepPlace\(\);/);
+  assert.equal((open.match(/saveSession\(|keepPlace\(/g) || []).length, 2);
+  assert.ok(open.indexOf("api.post(attemptBody(") < open.indexOf('await keepPlace()'), 'the position is saved after the attempt is stored');
+  assert.match(ui, /async function keepPlace\(\) \{ try \{ await saveSession\(true\); \} catch \(e\) \{ log\(/, 'a failed position save never costs the decision');
+  assert.match(ui, /cur: S\.cur && !S\.cur\.closed \? S\.cur\.cand\.id : curId \|\| null \}/);
+  // the offer reads the list the page already asks for and loads nothing until Resume is pressed
+  const offer = ui.slice(ui.indexOf('function renderResumeNow(s) {'), ui.indexOf('  // The edge used last')); assert.doesNotMatch(offer, /api\.get|MXR\.load/);
+  assert.match(src('academy.html'), /id="resume-now" hidden/);
+});
+
+test('the red problem line waits for Save: before it, what is missing is a calm line and Save is offered', () => {
+  const ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js');
+  assert.match(ui, /const b = \$\('m-save'\); if \(b\) b\.disabled = !M\.choice;/);
+  assert.match(ui, /const n = \$\('m-err'\), on = !!M\.tried && probs\.length > 0;/);
+  assert.match(ui, /if \(mentorCheck\(true\)\.length\) \{.*?return; \} S\.busy = true;/, 'Save with something missing shows the problem and stores nothing');
+  assert.ok(ui.indexOf('if (mentorCheck(true).length)') < ui.indexOf("api.post({ action: 'correct'"), 'the check comes before the call');
+  assert.match(tabs, /if \(save\.disabled \|\| check\(true\)\.length\) return;/);
+  assert.match(tabs, /err\.hidden = !on;/); assert.match(tabs, /save\.disabled = !A\.action;/);
 });
