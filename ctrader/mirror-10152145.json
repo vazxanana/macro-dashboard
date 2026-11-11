@@ -9032,6 +9032,34 @@
     ],
     "stopCheckedAt": "2026-11-11T23:22:54.000Z",
     "brokerStop": 3991.64
+   },
+   "xau-m30m1-1794440182": {
+    "positionId": "48567493",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "status": "open",
+    "openedAt": "2026-11-11T23:37:01.000Z",
+    "councilEntry": 3982.58,
+    "stop": 3986.3,
+    "t1": 3971.0749999999994,
+    "riskCash": 3.72,
+    "margin": 7.96,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3982.58,
+    "levelsFrom": "mark",
+    "fillPrice": 3983.01,
+    "slipR": -0.116,
+    "lagSec": 39,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T23:37:01.000Z",
+    "brokerStop": 3986.73
    }
   },
   "day": {
@@ -9039,7 +9067,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9824.16 · 32 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9824.16 · 33 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9114,14 +9142,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9824.16,
-  "lastRun": "2026-11-11T23:35:00.000Z"
+  "lastRun": "2026-11-11T23:37:01.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T02:24:48.000Z",
-   "msg": "limit filled: BTCUSD position 48274419 at the broker",
-   "trade": "btc-intraday-1794363757"
-  },
   {
    "at": "2026-11-11T02:31:56.000Z",
    "msg": "placed sell limit BTCUSD 0.01 lot at 73228.3 (council intraday, valid to 2026-11-11T14:30Z)",
@@ -10616,6 +10639,11 @@
    "at": "2026-11-11T23:30:49.000Z",
    "msg": "placed buy limit USDCHF 0.03 lot at 0.83213 (council scalp, valid to 2026-11-12T02:30Z)",
    "trade": "usdchf-scalp-1794439801"
+  },
+  {
+   "at": "2026-11-11T23:37:01.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council m30m1)",
+   "trade": "xau-m30m1-1794440182"
   }
  ],
  "limits": {
@@ -10694,11 +10722,11 @@
   ]
  },
  "execution": {
-  "n": 305,
+  "n": 306,
   "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 147,
+  "medianLagSec": 145,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -10733,8 +10761,8 @@
     "meanSlipR": -0.039
    },
    "XAUUSD": {
-    "n": 37,
-    "meanSlipR": -0.055
+    "n": 38,
+    "meanSlipR": -0.056
    }
   }
  }
