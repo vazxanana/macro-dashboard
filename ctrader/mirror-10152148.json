@@ -1940,7 +1940,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T00:50:58.000Z",
     "councilEntry": 83.12,
     "stop": 83.556,
@@ -1954,10 +1954,12 @@
     "slipR": 0.227,
     "lagSec": 60,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T00:50:58.000Z",
-    "brokerStop": 83.457
+    "brokerStop": 83.457,
+    "closedAt": "2026-11-11T01:29:35.000Z"
    },
    "xau-replica-1794358613-s": {
     "positionId": "48247827",
@@ -1995,7 +1997,7 @@
     "lots": 0.24,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T01:01:50.000Z",
     "councilEntry": 2047.28,
     "stop": 2055.358,
@@ -2008,10 +2010,12 @@
     "slipR": 0.417,
     "lagSec": 69,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T01:01:50.000Z",
-    "brokerStop": 2051.99
+    "brokerStop": 2051.99,
+    "closedAt": "2026-11-11T01:29:35.000Z"
    },
    "gbpusd-replica-1794359735-s": {
     "positionId": "48254244",
@@ -2046,7 +2050,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10010.22 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 10003.78 · 9 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -2058,8 +2062,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10010.22,
-  "lastRun": "2026-11-11T01:27:19.000Z"
+  "balance": 10003.78,
+  "lastRun": "2026-11-11T01:29:35.000Z"
  },
  "log": [
   {
@@ -2829,6 +2833,16 @@
    "at": "2026-11-11T01:16:42.000Z",
    "msg": "opened sell GBPUSD 0.03 lot (council replica)",
    "trade": "gbpusd-replica-1794359735-s"
+  },
+  {
+   "at": "2026-11-11T01:29:35.000Z",
+   "msg": "SOLUSD position 48246770 closed at the broker",
+   "trade": "sol-replica-1794358198-s"
+  },
+  {
+   "at": "2026-11-11T01:29:35.000Z",
+   "msg": "ETHUSD position 48249113 closed at the broker",
+   "trade": "eth-replica-1794358841-s"
   }
  ],
  "limits": {
