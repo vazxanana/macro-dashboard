@@ -107,7 +107,10 @@ export const FILES = [
   { file: 'research/ledger.json', label: 'Research ledger', every: 'when a study lands', check: (j, c) => { if (!j || !Array.isArray(j.rows)) c.add('parse', 'warn', 'no rows'); } },
   { file: 'research/replay-2w.json', label: 'System replays', every: 'by hand (replay.yml)', need: true },
   { file: 'research/shadow-replay.json', label: 'Shadow replay', every: 'by hand' },
-  { file: 'ict/replay.json', label: 'ICT replay', every: 'weekly, Sunday 06:41 UTC', at: (j) => j.at, warn: 8 * 24 * H, bad: 15 * 24 * H },
+  // daily since 11 Nov 2026 (started by the council loop when the file is over 20 h old, council/replay-due.mjs; cron 06:41 UTC as the
+  // second path): over 36 h means a day was missed and the desk's unresolved replay records say "update pending" meanwhile
+  { file: 'ict/replay.json', label: 'ICT replay', every: 'daily (council loop trigger, cron as backup)', at: (j) => j.at, warn: 36 * H, bad: 4 * 24 * H,
+    why: 'unresolved replay records on the ICT desk stay "update pending" until ict-replay.yml runs' },
   { file: 'lit/replay.json', label: 'LIT replay', every: 'at most every 20 h (council loop)', at: (j) => j.at, warn: 30 * H, bad: 72 * H },
   { file: 'research/daily/_index.json', label: 'Daily candle cache', every: 'weekly, Saturday 03:17 UTC', at: (j) => j.updated, warn: 8 * 24 * H, bad: 15 * 24 * H, check: dailyIndexCheck },
   { file: 'reviews/latest.md', label: 'Coach AI review', type: 'text', every: 'daily (scheduled session)', need: true, check: reviewsCheck },

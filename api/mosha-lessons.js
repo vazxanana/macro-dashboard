@@ -264,7 +264,11 @@ async function handle(req, res, d = {}) {
       book.push(item); await store.putBook(book); return res.status(200).json({ ok: true, item, book });
     }
     if (bot) return res.status(403).json({ error: 'the assistant\'s key reads, answers and proposes lines, nothing else' });
-    if (!teach && !(owner && isObj(b.remove))) return res.status(403).json({ error: 'this account cannot teach the desk' });
+    if (!teach) {   // the owner reads, and may remove a lesson or a picture: nothing else of the body is carried out (a "book" or
+      // "add" sent beside "remove" used to be, 11 Nov 2026)
+      if (!(owner && isObj(b.remove))) return res.status(403).json({ error: 'this account cannot teach the desk' });
+      b = { remove: b.remove };
+    }
 
     if (isObj(b.book)) {   // the teacher's word on a line: confirm it, correct it, or erase it
       const id = String(b.book.id), i = BOOK_ID.test(id) ? book.findIndex((x) => x.id === id) : -1; if (i < 0) return res.status(404).json({ error: 'no such line' });

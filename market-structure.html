@@ -29,14 +29,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
-<script src="/assets/lightweight-charts-4.1.3.js"></script>
+<!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
+     without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js"></script>
 <script src="/assets/mosha-desk.js" defer></script>
 <script src="/assets/mosha-replay.js" defer></script>
 <script src="/assets/mosha-i18n.js" defer></script>
 <script src="/assets/mosha-tutor.js" defer></script>
 <script src="/assets/mosha-teach.js" defer></script>
-<script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
   :root {
@@ -46,9 +46,11 @@
     --mono: Figtree, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color-scheme: dark;
   }
+  /* Light tokens, 11 Nov 2026 (QA sweep): --buy / --sell / --ink-faint / --accent were 4.46-4.50:1 as text on the white panel, under AA
+     by a hair on 270 texts across the Desk. One step darker each; measured on every view at 390 and 1440 px: nothing got worse. */
   :root[data-theme="light"] {
     --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #c9d0db;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #6b7280; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.10); --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #666d7a; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.10); --buy: #067a64; --sell: #c8243f; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
@@ -1340,6 +1342,40 @@ window.msFetchUsers = function () {
   if (E.mosha) document.documentElement.dataset.mosha = E.mosha;   // the Mosha desk is open to this account ('teach' = may send lessons)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
+/* ms-data:start */
+// Council data, one request per file (11 Nov 2026, desk load pass). Every reader of council-data on this page asks through
+// window.msData, so a file is downloaded once per load however many scripts want it (the sign-in card, the council, the ICT
+// desk, the scoreboard and the week report each used their own fetch and their own cache-buster):
+//   msData.text(file, { fresh })  -> Promise<string | null>      msData.json(file, { fresh }) -> Promise<value | null>
+// A request in flight is always shared. A finished one is reused for `fresh` ms (default 45 s; ict/replay.json, written once a
+// day and 2 MB, 10 minutes), then asked for again: the readers' own timers (1 to 10 minutes) therefore still get new data on
+// every tick. { fresh: 0 } always asks again. A failed read is never reused. Each json() caller gets its own parsed copy, so one
+// reader cannot change what another sees. The text is dropped from memory once it can no longer be reused.
+// Guests: a visitor who is not signed in is only ever asked the files in GUEST (GUEST_OK in api/data.js); anything else answers
+// null here without a request, whoever calls. tests/desk-load.test.mjs runs this block with a fake fetch and clock.
+window.msDataMake = function (W, clock) {
+  var E = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
+  var GUEST = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];
+  function allowed(f) { return !(W.MS_API && W.document.documentElement.dataset.mode !== 'admin') || GUEST.indexOf(f) >= 0; }
+  function text(f, o) {
+    if (typeof f !== 'string' || !f || !allowed(f)) return Promise.resolve(null);
+    var keep = LONG[f] || FRESH, fresh = o && o.fresh != null ? Math.min(+o.fresh || 0, keep) : keep, e = E[f];
+    if (e && (e.done == null || (e.ok && now() - e.done < fresh))) return e.p;
+    e = E[f] = { done: null, ok: false, p: null };
+    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; })
+      .then(function (t) { e.done = now(); e.ok = t != null; W.setTimeout(function () { if (E[f] === e) delete E[f]; }, keep); return t; });
+    return e.p;
+  }
+  function json(f, o) { return text(f, o).then(function (t) { if (t == null) return null; try { return JSON.parse(t); } catch (x) { return null; } }); }
+  return { text: text, json: json, allowed: allowed, warm: function (list) { list.forEach(function (f) { text(f); }); }, GUEST: GUEST };
+};
+/* ms-data:end */
+window.msData = window.msDataMake(window);
+// First-load sign-in card (html[data-gate] set above): leaving it always reloads the page (a sign-in, "Continue as guest", or
+// /api/me finding a session), so the app under it sleeps: no candles, quotes, streams, scans or council panes until it is gone.
+// msBootGate is a promise while that card is up (null otherwise, and null again if the card ever closes without a reload).
+window.msBootGate = (function () { var R = document.documentElement; if (!R.dataset.gate || !window.MutationObserver) return null;
+  return new Promise(function (ok) { var mo = new MutationObserver(function () { if (!R.dataset.gate) { mo.disconnect(); window.msBootGate = null; ok(); } }); mo.observe(R, { attributes: true, attributeFilter: ['data-gate'] }); }); })();
 // signing out forgets the cTrader view-only session (and account choice) kept in this browser, so the next person on a shared
 // device cannot open someone's broker account with it (security review, 7 Nov)
 window.msForgetCt = function () {
@@ -2361,6 +2397,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 #v-home { --hmk-amber: #e0a63a; }
 #v-home .h-top { padding-bottom: 2px; }
 #v-home .h-head { text-wrap: balance; }
+@media (max-width: 700px) { #v-home #h-head { min-height: 2lh; } }   /* desk load, 11 Nov: on a phone the headline is two lines once candles are read; the "Loading" line holds that room so the page under it does not jump */
 /* no layout shift while Home fills in: the date/session line and the results strip hold their final height from the start */
 #v-home .h-dl { min-height: 20px; }
 #v-home #h-today:empty { min-height: 92px; }
@@ -2606,6 +2643,11 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   #v-ict .ict-t td:nth-child(8)::before { content: "Entry "; font-family: var(--sans); color: var(--ink-faint); }
   #v-ict .ict-t td:nth-child(11) { grid-area: rs; text-align: right; font-weight: 600; }
   #v-ict .ict-t td:nth-child(12) { grid-area: rv; }
+  /* a signal with two executions (11 Nov): its chips were cut off at the right edge of the phone row, over the result. The result
+     and the two chips take a row of their own, side by side, each wrapping inside itself. */
+  #v-ict .ict-t tr:has(.ict-ex) { grid-template-areas: "mk sd gr gr" "tm tm se en" "rs rs rs rs" "rv rv rv rv"; }
+  #v-ict .ict-t tr:has(.ict-ex) td:nth-child(11) { text-align: left; white-space: normal; }
+  #v-ict .ict-t .ict-ex { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 6px; } #v-ict .ict-t .ict-ex-b { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.3; font-weight: 500; }
   #v-ict .ict-t td:nth-child(11) .ict-pill, #v-ict .ict-t td:nth-child(11) small { display: none; }
   #v-ict .ict-t tr.rp td:nth-child(1)::after { content: " · replay"; }
   #v-ict .ict-t td:nth-child(12):has(> .ms-note), #v-ict .ict-t td:nth-child(6), #v-ict .ict-t td:nth-child(7), #v-ict .ict-t td:nth-child(9), #v-ict .ict-t td:nth-child(10) { display: none; }
@@ -2628,6 +2670,13 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 }
 @media (pointer: coarse) { #v-ict .ict-rv input, #v-ict .ict-rv textarea { font-size: 16px; } }   /* no zoom-in on focus on an iPhone */
 #v-ict .ict-kpi small { font-size: 12px; }   /* the win-rate line (won · lost · flat · near-flat) and its neighbours were 11.5 px */
+/* ICT typography pass (11 Nov 2026): no text under 12 px on the desk or in the signal dialog (the dialog sits inside #v-ict).
+   tests/qa-sweep.test.mjs reads every font size the ICT rules set; scripts/audit/smoke.cjs measures the drawn desk. */
+#v-ict .ms-chip, #v-ict .ict-a, #v-ict .ict-g, #v-ict .ict-pill, #v-ict .ict-tag, #v-ict .ict-few, #v-ict .ict-trk-l span, #v-ict .ict-lv dt, #v-ict .ict-lv dd small, #v-ict dl dt, #v-ict dl dd small,
+#v-ict .ict-m .k small, #v-ict #ict-eq-d, #v-ict .ict-t td small, #v-ict .ict-mine-k span, #v-ict .ict-cal-h, #v-ict .ict-cal-d .d, #v-ict .ict-cal-d small,
+#v-ict .ict-tv-ck li.h, #v-ict #ict-tv-ck li.h, #v-ict .ict-tags button, #v-ict #ict-rv-tags button { font-size: 12px; }
+:root[data-theme="light"] #v-ict .ms-chip-buy { color: #05604f; } :root[data-theme="light"] #v-ict .ms-chip-sell { color: #a91c33; }   /* AA on their own tint over the open-now card (buy was 4.3:1) */
+@media (max-width: 600px) { #v-ict .ict-cal-d { padding: 4px 2px; } #v-ict .ict-cal-d b { font: 600 12px var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -.02em; white-space: nowrap; } }
 @media (prefers-reduced-motion: reduce) { #v-ict *, #v-ict *::before, #v-ict *::after { transition: none !important; animation: none !important; } #v-ict .ict-cal-d:hover, #v-ict .ict-m:hover { transform: none !important; } }
 html[data-motion="off"] #v-ict *, html[data-motion="off"] #v-ict *::before, html[data-motion="off"] #v-ict *::after { transition: none !important; animation: none !important; }
 html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
@@ -2697,10 +2746,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="gs-sess" id="gs-sess"></div>
     </div>
     <!-- what the desk is doing right now, from public council-data (8 Nov, owner: make guests want to join) -->
-    <div class="gs-proof" id="gs-proof" hidden>
+    <div class="gs-proof" id="gs-proof">
       <div class="gs-pk"><span>Open now</span><b id="gs-p-open">—</b><small>paper trades the council manages</small></div>
       <div class="gs-pk"><span>ICT replay</span><b id="gs-p-ict">—</b><small id="gs-p-ict-s">since 2020</small></div>
-      <div class="gs-pk"><span>Last signal</span><b id="gs-p-last">—</b><small id="gs-p-last-s"></small></div>
+      <div class="gs-pk"><span>Last signal</span><b id="gs-p-last">—</b><small id="gs-p-last-s">&nbsp;</small></div>
     </div>
     <div class="gs-tape" id="gs-tape" aria-hidden="true" hidden><div class="gs-tape-in" id="gs-tape-in"></div></div>
   </aside>
@@ -2723,6 +2772,58 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   </div>
   </div>
 </div>
+<script>
+// Login 2: caps-lock hint, shake on a wrong password, the live gold strip (public snapshot) and the session line.
+// Desk load (11 Nov): this script sits right under the card (it was 1.3 MB further down the page), so the strip and the proof
+// line fill as soon as their two small requests answer, not when the whole page has arrived.
+(function () {
+  var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
+  var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
+  function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
+  if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }
+  function sess() { var d = new Date(), h = d.getUTCHours() + d.getUTCMinutes() / 60, w = d.getUTCDay(), on = [], el = document.getElementById('gs-sess'); if (!el) return;
+    if (w === 6 || (w === 0 && h < 22) || (w === 5 && h >= 21)) { el.innerHTML = 'Forex and gold <b>closed</b> for the weekend · crypto trades 24/7'; return; }
+    if (h >= 23 || h < 8) on.push('Asia'); if (h >= 7 && h < 16) on.push('London'); if (h >= 12.5 && h < 21) on.push('New York');
+    el.innerHTML = on.length ? '<b>' + on.join(' + ') + '</b> session open · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time' : 'Between sessions · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time'; }
+  function px() { if (!R.dataset.gate) return;
+    window.msData.json('snapshot.json').then(function (j) { var m = j && j.markets && j.markets.xau; var dot = document.querySelector('.gs-dot');
+      if (!m || !m.price) { if (dot) dot.classList.add('off'); return; }
+      document.getElementById('gs-px').textContent = (+m.price).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      var t = m.trend || {}; document.getElementById('gs-tf').innerHTML = [['D1', t['1d']], ['H4', t['4h']], ['H1', t['1h']]].map(function (z) { return '<i class="' + (z[1] > 0 ? 'u' : z[1] < 0 ? 'd' : '') + '" title="' + z[0] + (z[1] > 0 ? ' up' : z[1] < 0 ? ' down' : ' flat') + '">' + z[0] + (z[1] > 0 ? '▲' : z[1] < 0 ? '▼' : '') + '</i>'; }).join(''); })
+      .catch(function () { var dot = document.querySelector('.gs-dot'); if (dot) dot.classList.add('off'); }); }
+  // live proof for guests: open paper trades, the ICT replay record, the latest signal, and a market tape (public council-data)
+  // 11 Nov: the three boxes hold their place from the first paint (the card no longer jumps when they fill), the open trades and
+  // the last signal come from the same trades / snapshot requests the page already makes (window.msData), and the ICT replay record
+  // (one line read from a 2 MB file) is asked for last, once the page has loaded and the browser is idle
+  var set = function (id, v, cls) { var el = document.getElementById(id); if (el) { el.textContent = v; if (cls != null) el.className = cls; } };
+  var later = function (f) { var go = function () { if (window.requestIdleCallback) window.requestIdleCallback(f, { timeout: 4000 }); else setTimeout(f, 600); }; if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true }); };
+  function ictProof() { if (!R.dataset.gate) return; window.msData.json('ict/replay.json').then(function (I) {
+    var tot = I && I.totals; if (tot && tot.n) { set('gs-p-ict', (tot.R > 0 ? '+' : '') + Math.round(tot.R) + 'R', tot.R > 0 ? 'pos' : tot.R < 0 ? 'neg' : ''); set('gs-p-ict-s', tot.n + ' trades · ' + Math.round(100 * tot.wins / tot.n) + '% won'); } }); }
+  function proof() { if (!R.dataset.gate) return;
+    var get = function (f) { return window.msData.json(f); };
+    Promise.all([get('trades.json'), get('snapshot.json')]).then(function (a) {
+      var box = document.getElementById('gs-proof'); if (!box) return;
+      if (a[0] == null && a[1] == null && !box.dataset.on) { box.hidden = true; return; }   // nothing could be read: no row of empty boxes
+      var T = Array.isArray(a[0]) ? a[0] : (a[0] && a[0].trades) || [], S = a[1] || null;
+      var open = T.filter(function (t) { return t.status === 'open'; });
+      set('gs-p-open', String(open.length)); box.dataset.on = '1';
+      later(ictProof);
+      var last = T.filter(function (t) { return t.opened; }).sort(function (x, y) { return y.opened - x.opened; })[0];
+      if (last) { set('gs-p-last', (last.side === 'sell' ? '▼ ' : '▲ ') + (last.label || String(last.market || '').toUpperCase())); var ago = Math.max(1, Math.round((Date.now() / 1000 - last.opened) / 60)); set('gs-p-last-s', (last.side === 'sell' ? 'sell' : 'buy') + ' · ' + (ago < 60 ? ago + ' min ago' : ago < 1440 ? Math.round(ago / 60) + ' h ago' : Math.round(ago / 1440) + ' d ago')); }
+      box.hidden = false;
+      var M = S && S.markets, tape = document.getElementById('gs-tape-in'); if (M && tape) { var rows = Object.keys(M).map(function (k) { var m = M[k]; if (!m || !m.price) return ''; var ch = m.chg != null ? m.chg : m.change != null ? m.change : null; return '<i>' + (m.label || k.toUpperCase()) + '</i> ' + (+m.price).toLocaleString(undefined, { maximumFractionDigits: m.price > 100 ? 1 : 5 }) + (ch != null ? ' <span class="' + (ch > 0 ? 'u' : ch < 0 ? 'd' : '') + '">' + (ch > 0 ? '+' : '') + (+ch).toFixed(2) + '%</span>' : ''); }).filter(Boolean);
+        if (rows.length) { tape.innerHTML = rows.join('<span aria-hidden="true">·</span>'); document.getElementById('gs-tape').hidden = false; } }
+    }); }
+  sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
+  window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
+})();
+</script>
+<script>
+// Desk load (11 Nov): the data the first screen shows is asked for here, while the rest of the page is still arriving, and after
+// the styles of the first paint (in the head it competed with them): the sign-in card's proof line; the home strip and the open
+// positions. The council's loader further down picks these same requests up (window.msData: one request per file).
+window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trades.json', 'snapshot.json', 'research/replay-2w.json', 'research.json']);
+</script>
 <a class="skip" href="#ms-main-start">Skip to content</a>
 <div class="ms-live app" id="ms-live" data-chart="dark">
   <div class="ms-notice" id="ms-notice" role="status" hidden><span class="ms-notice-t" id="ms-notice-t"></span><button type="button" class="ms-notice-x" id="ms-notice-x" aria-label="Hide this notice">×</button></div>
@@ -2849,6 +2950,15 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
     <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
+    <script>
+    // Desk load (11 Nov): the markets row and the date line hold their place from the first paint. The app script further down draws
+    // the same empty cards (one per market with live quotes: 10, checked by tests/desk-load.test.mjs) and then fills them; before, the
+    // row appeared when that script ran, seconds into a slow load, and pushed the page down. Same condition as there: the Vercel site.
+    (function () { var box = document.getElementById('h-mk'), el = document.getElementById('h-mk-row'), hd = document.getElementById('h-date'); if (!box || !el || !window.MS_API || window.msBootGate) return;
+      el.innerHTML = new Array(10 + 1).join('<span class="h-mk-i h-mk-sk" aria-hidden="true"><span class="h-mk-t"><b></b><em></em></span><span class="h-mk-p"><b></b></span><span class="h-mk-m"></span><span class="h-mk-g"></span></span>');
+      box.hidden = false; box.dataset.state = 'loading';
+      if (hd && !hd.textContent) hd.textContent = new Date().toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }); })();
+    </script>
     <div class="h-grid">
       <div class="h-main">
       <a class="tile wide adm" href="#setup">
@@ -3720,6 +3830,8 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
+<script src="/assets/lightweight-charts-4.1.3.js"></script>
+<script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <script>
 // public / admin mode (see CLAUDE.md): PUB hides every rule, system name and note; the head script sets the mode
 const PUB = document.documentElement.dataset.mode !== 'admin';
@@ -4875,7 +4987,7 @@ function msNextSetup(bars, A) {
   // closed = the newest daily candle is complete (weekend / holiday); stale = no H1 candle in the last 3 hours while not closed.
   const MDQ = { at: 0, p: null, q: {} };
   function mdQuotes() {
-    if (!MD.base || MD.on === false) return Promise.resolve({});
+    if (!MD.base || MD.on === false || window.msBootGate) return Promise.resolve({});   // no quotes under the first-load sign-in card
     if (MDQ.p && Date.now() - MDQ.at < 50e3) return MDQ.p;
     MDQ.at = Date.now();
     MDQ.p = (async () => {
@@ -5640,6 +5752,9 @@ function msNextSetup(bars, A) {
   }
 
   async function boot() {
+    // 11 Nov: under the first-load sign-in card nothing below is seen, and leaving the card always reloads the page (sign-in,
+    // Continue as guest), so no candles, streams or scans start until the card is gone
+    if (window.msBootGate) await window.msBootGate;
     const res = await Promise.allSettled(ACTIVE.map((tf) => fetchBars(tf)));
     const ok = res.filter((r) => r.status === 'fulfilled');
     if (!ok.length) {
@@ -5822,7 +5937,7 @@ function msNextSetup(bars, A) {
   setTimeout(indRender, 0);
   // Meridian / ICT markup switch (7 Nov, owner): one or the other on every chart, never mixed
   async function ictStrip() { const el = document.getElementById('ms-ict-strip'); if (!el) return; if (G.mode !== 'ict') { el.hidden = true; return; }
-    let T = []; try { T = await (await fetch(window.MS_CDATA + 'ict/trades.json?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' })).json(); } catch (e) {}
+    let T = []; try { T = await window.msData.json('ict/trades.json'); } catch (e) {}
     const live = (Array.isArray(T) ? T : []).filter((x) => x && (x.status === 'open' || x.status === 'pending') && !(x.grade && x.grade.letter === 'F')).slice(-4);
     el.hidden = false;
     el.innerHTML = `<b>ICT desk</b>` + (live.length ? live.map((x) => `<a href="#ict" class="ict-sg ${x.side === 'sell' ? 'dn' : 'up'}">${x.side === 'sell' ? '▼' : '▲'} ${String(x.short || x.market || '').toUpperCase()} ${x.side} · ${x.model || 'signal'}${x.grade ? ` · ${x.grade.letter}` : ''} · ${x.status}</a>`).join('') : '<span>No open signals right now.</span>') + `<span class="ict-k">Boxes: fair value gaps · purple: Asia range · teal: London range · orange: NY midnight open · grey: 50% of yesterday</span>`; }
@@ -6623,14 +6738,22 @@ function msNextSetup(bars, A) {
   }
   const ago = (t) => { const d = Date.now() / 1000 - t; return d < 90 ? 'just now' : d < 3600 ? `${Math.round(d / 60)} min ago` : d < 86400 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
   async function loadCouncil() {
-    if (!document.getElementById('v-council')) return;
-    const bust = Math.floor(Date.now() / 120000);
+    if (!document.getElementById('v-council') || window.msBootGate) return;   // under the first-load sign-in card the app sleeps
     const GUEST_FILES = ['trades.json', 'snapshot.json', 'research/replay-2w.json', 'research.json'];   // same list as GUEST_OK in api/data.js
-    const get = (f, json) => PUB && window.MS_API && !GUEST_FILES.includes(f) ? Promise.resolve(null) : fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
+    // one request per file per load (11 Nov): window.msData shares it with the sign-in card and the other panes, and the head has
+    // already asked for the four files the home strip needs
+    const get = (f, json) => PUB && window.MS_API && !GUEST_FILES.includes(f) ? Promise.resolve(null) : json ? window.msData.json(f) : window.msData.text(f);
     const anP = get('reviews/analyst.json', 1);   // Analyst post-mortems of live losses (shown on the loss review; owner reviews win)
-    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror, health, specs] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1), get('health.json', 1), get('ctrader/symbols.json', 1)]);
     // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
-    if (Array.isArray(trades)) { const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); trades = trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); }
+    const once = (trades) => { if (!Array.isArray(trades)) return trades; const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); return trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); };
+    const all = [get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1), get('health.json', 1), get('ctrader/symbols.json', 1)];
+    // first load (11 Nov): the home strip and the open positions read four of the fourteen files (trades, snapshot, the system
+    // replay, the research trackers); they are drawn as soon as those are in, the rest of the council follows when every file is.
+    // Later refreshes swap the whole set at once, as before.
+    if (!COUNCIL.at && !COUNCIL.early) { const [t0, s0, rp0, rs0] = await Promise.all([all[0], all[3], all[7], all[8]]);
+      if (!COUNCIL.at) { COUNCIL.early = Date.now(); Object.assign(COUNCIL, { trades: once(t0), snap: s0, replay: rp0, research: rs0 }); try { renderActive(); } catch (e) {} } }
+    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror, health, specs] = await Promise.all(all);
+    trades = once(trades);
     if (lossRev && lossRev.reviews) rvMerge(lossRev);
     COUNCIL.anRev = ((await anP) || {}).reviews || {};
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, mirror, health, specs, shRpRows: null, at: Date.now() });
@@ -8012,7 +8135,7 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', (ev) => { if (ev.target.closest('#ms-c-more')) { window.CLIM = (window.CLIM || 60) + 60; renderCouncil(); } });
   
   const sysEl = document.getElementById('ms-c-sys'); if (sysEl) sysEl.addEventListener('change', () => { renderCouncil(); renderHome(); });
-  if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
+  if (document.getElementById('v-council')) { councilReady = window.msBootGate ? window.msBootGate.then(loadCouncil) : loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile', 'lit', 'sdv', 'mosha'];
@@ -8049,8 +8172,13 @@ function msNextSetup(bars, A) {
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
   const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', mosha: 'mosha', ict: 'ict' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
-  function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+  // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
+  // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
+  function showView(hx) {
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
+    // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
+    if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
@@ -8203,12 +8331,16 @@ function msNextSetup(bars, A) {
     if (hdr && window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', hdr.offsetHeight + 'px')).observe(hdr);
     // overdrive 4: page switches slide in the direction of travel (View Transitions); same-page changes and reduced motion switch instantly
     addEventListener('hashchange', () => {
+      // a #trade/<id> link is not a view: the trade router (#ms-trv-js) shows the page behind it and opens the sheet. Drawing a view
+      // for it here sent the page home, and through a view transition it did so AFTER the router had opened the sheet: an ICT
+      // signal's dialog then sat "open" inside the hidden desk (Forward after closing a signal, or a pasted link; QA sweep 11 Nov).
+      if (/^#trade\//.test(location.hash)) return;
       const R = document.documentElement, cur = VIEWS.find((k) => { const el = document.getElementById('v-' + k); return el && !el.hidden; }), nx = location.hash.slice(1).split('/')[0] || 'home';
       const still = R.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!document.startViewTransition || still || !cur || cur === nx || document.hidden || document.querySelector('dialog[open]')) { showView(); return; }
       const ORD = ['home', 'setup', 'charts', 'scanner', 'crypto', 'council', 'journal', 'ict', 'users', 'guest'];
       R.dataset.vt = ORD.indexOf(nx) >= ORD.indexOf(cur) ? 'fwd' : 'back';
-      try { const t = document.startViewTransition(showView); t.finished.finally(() => { delete R.dataset.vt; }); } catch (e) { showView(); }
+      try { const at = location.hash, t = document.startViewTransition(() => showView(at)); t.ready.catch(() => {}); t.finished.finally(() => { delete R.dataset.vt; }).catch(() => {}); } catch (e) { showView(); }   // a second navigation skips the first transition: its promises reject, which is not an error
     }); showView();
     setInterval(() => { renderSessList(); renderHome(); }, 30e3); renderSessList();
   }
@@ -8394,7 +8526,9 @@ function msNextSetup(bars, A) {
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
   const saveLocal = () => { try { localStorage.setItem('ictDesk', JSON.stringify(S.desk)); } catch (e) {} };
   const tok = () => { try { return localStorage.getItem('msGhTok') || ''; } catch (e) { return ''; } };
-  const get = (f) => fetch(ROOT + f + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  // window.msData (11 Nov): one request per file; the desk's own files are always read again, the replay record (written once a day,
+  // 2 MB) is reused for ten minutes and shared with the scoreboard and the week report
+  const get = (f) => window.msData.json('ict/' + f, f === 'replay.json' ? null : { fresh: 0 });
   const mergeDesk = (remote) => { for (const [id, r] of Object.entries((remote && remote.reviews) || {})) { const l = S.desk.reviews[id]; if (!l || (r.at || 0) > (l.at || 0)) S.desk.reviews[id] = r; } };
 
   async function load() {
@@ -8917,7 +9051,7 @@ function msNextSetup(bars, A) {
   // show the page that belongs behind a sheet (a cold #trade link lands on Home otherwise): council trades, or the ICT desk
   async function showBase(hash, push) {
     var v = hash.slice(1).split('/')[0], el = document.getElementById('v-' + v);
-    if (el && !el.hidden) return;
+    if (el && !el.hidden) { if (!push && parse(location.hash)) history.replaceState(null, '', hash); return; }   // already there: the pasted link's entry still becomes the page behind the sheet, so closing the sheet lands on it
     Rt.busy = true;
     if (push) history.pushState(null, '', hash); else history.replaceState(null, '', hash);
     W.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -9934,40 +10068,9 @@ function gpStats(T) {
 })();
 </script>
 <script>
-// Login 2: caps-lock hint, shake on a wrong password, the live gold strip (public snapshot) and the session line
-(function () {
-  var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
-  var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
-  function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
-  if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }
-  function sess() { var d = new Date(), h = d.getUTCHours() + d.getUTCMinutes() / 60, w = d.getUTCDay(), on = [], el = document.getElementById('gs-sess'); if (!el) return;
-    if (w === 6 || (w === 0 && h < 22) || (w === 5 && h >= 21)) { el.innerHTML = 'Forex and gold <b>closed</b> for the weekend · crypto trades 24/7'; return; }
-    if (h >= 23 || h < 8) on.push('Asia'); if (h >= 7 && h < 16) on.push('London'); if (h >= 12.5 && h < 21) on.push('New York');
-    el.innerHTML = on.length ? '<b>' + on.join(' + ') + '</b> session open · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time' : 'Between sessions · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time'; }
-  function px() { if (!R.dataset.gate) return; var u = (window.MS_CDATA || '') + 'snapshot.json?t=' + Math.floor(Date.now() / 60000);
-    fetch(u, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { var m = j && j.markets && j.markets.xau; var dot = document.querySelector('.gs-dot');
-      if (!m || !m.price) { if (dot) dot.classList.add('off'); return; }
-      document.getElementById('gs-px').textContent = (+m.price).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-      var t = m.trend || {}; document.getElementById('gs-tf').innerHTML = [['D1', t['1d']], ['H4', t['4h']], ['H1', t['1h']]].map(function (z) { return '<i class="' + (z[1] > 0 ? 'u' : z[1] < 0 ? 'd' : '') + '" title="' + z[0] + (z[1] > 0 ? ' up' : z[1] < 0 ? ' down' : ' flat') + '">' + z[0] + (z[1] > 0 ? '▲' : z[1] < 0 ? '▼' : '') + '</i>'; }).join(''); })
-      .catch(function () { var dot = document.querySelector('.gs-dot'); if (dot) dot.classList.add('off'); }); }
-  // live proof for guests: open paper trades, the ICT replay record, the latest signal, and a market tape (public council-data)
-  function proof() { if (!R.dataset.gate) return; var q = '?t=' + Math.floor(Date.now() / 300000), base = window.MS_CDATA || '';
-    var get = function (f) { return fetch(base + f + q, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
-    Promise.all([get('trades.json'), get('ict/replay.json'), get('snapshot.json')]).then(function (a) {
-      var T = Array.isArray(a[0]) ? a[0] : (a[0] && a[0].trades) || [], I = a[1] || null, S = a[2] || null, box = document.getElementById('gs-proof'); if (!box) return;
-      var open = T.filter(function (t) { return t.status === 'open'; }), set = function (id, v, cls) { var el = document.getElementById(id); if (el) { el.textContent = v; if (cls != null) el.className = cls; } };
-      set('gs-p-open', String(open.length));
-      var tot = I && I.totals; if (tot && tot.n) { set('gs-p-ict', (tot.R > 0 ? '+' : '') + Math.round(tot.R) + 'R', tot.R > 0 ? 'pos' : tot.R < 0 ? 'neg' : ''); set('gs-p-ict-s', tot.n + ' trades · ' + Math.round(100 * tot.wins / tot.n) + '% won'); }
-      var last = T.filter(function (t) { return t.opened; }).sort(function (x, y) { return y.opened - x.opened; })[0];
-      if (last) { set('gs-p-last', (last.side === 'sell' ? '▼ ' : '▲ ') + (last.label || String(last.market || '').toUpperCase())); var ago = Math.max(1, Math.round((Date.now() / 1000 - last.opened) / 60)); set('gs-p-last-s', (last.side === 'sell' ? 'sell' : 'buy') + ' · ' + (ago < 60 ? ago + ' min ago' : ago < 1440 ? Math.round(ago / 60) + ' h ago' : Math.round(ago / 1440) + ' d ago')); }
-      box.hidden = false;
-      var M = S && S.markets, tape = document.getElementById('gs-tape-in'); if (M && tape) { var rows = Object.keys(M).map(function (k) { var m = M[k]; if (!m || !m.price) return ''; var ch = m.chg != null ? m.chg : m.change != null ? m.change : null; return '<i>' + (m.label || k.toUpperCase()) + '</i> ' + (+m.price).toLocaleString(undefined, { maximumFractionDigits: m.price > 100 ? 1 : 5 }) + (ch != null ? ' <span class="' + (ch > 0 ? 'u' : ch < 0 ? 'd' : '') + '">' + (ch > 0 ? '+' : '') + (+ch).toFixed(2) + '%</span>' : ''); }).filter(Boolean);
-        if (rows.length) { tape.innerHTML = rows.join('<span aria-hidden="true">·</span>'); document.getElementById('gs-tape').hidden = false; } }
-    }); }
-  sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
-  window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
-  var jb = document.getElementById('g-join-btn'); if (jb) jb.addEventListener('click', function () { msGate(true); proof(); });
-})();
+// the invitation's Sign in button on the guest page opens the full card (msGate refreshes its strip and proof line); the card's own
+// script sits next to the card at the top of the body since 11 Nov
+(function () { var jb = document.getElementById('g-join-btn'); if (jb) jb.addEventListener('click', function () { msGate(true); }); })();
 </script>
 <style>
 /* site notice (Edge Config "notice") and bot-stall pill (from /api/status), 7 Nov 2026 */
@@ -10028,7 +10131,7 @@ function gpStats(T) {
 .own-dlg .own-err { color: var(--sell); min-height: 1.2em; margin: 8px 0 10px; }
 .own-acts { display: flex; justify-content: flex-end; gap: 8px; }
 .own-acts button { height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
-.own-acts button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+.own-acts button.pri { background: #2a62f0; border-color: #2a62f0; color: #fff; }   /* fixed, as in assets/ms-dialog.js: white on --accent was 3.2:1 dark, 4.50 light */
 .hdr-spr { margin-left: 10px; font: 500 11px var(--mono, ui-monospace, monospace); color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .hdr-spr[hidden] { display: none; }
 @media (max-width: 900px) { .hdr-spr { display: none; } }
@@ -10091,7 +10194,7 @@ html[data-mk="ict"] .mk-mode button[data-mk="ict"].on { background: color-mix(in
 html[data-mk="clean"] .mk-mode button[data-mk="clean"].on { background: color-mix(in srgb, var(--ink) 10%, var(--panel)); border-color: var(--ink-dim); color: var(--ink); }
 html[data-mk="clean"] .ict-strip { display: none; }
 .ict-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, #9c27b0 40%, var(--line)); background: color-mix(in srgb, #9c27b0 7%, var(--panel)); font-size: 12.5px; color: var(--ink-dim); }
-.ict-strip[hidden] { display: none; } .ict-strip b { color: var(--ink); } .ict-strip .ict-k { flex-basis: 100%; font-size: 11.5px; }
+.ict-strip[hidden] { display: none; } .ict-strip b { color: var(--ink); } .ict-strip .ict-k { flex-basis: 100%; font-size: 12px; }
 .ict-sg { color: var(--ink); text-decoration: none; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; } .ict-sg.up { color: var(--buy); } .ict-sg.dn { color: var(--sell); }
 .ms-live.app:has(> #v-charts:not([hidden])) { max-width: none; }
 .ms-grid4[data-view]:not([data-view="all"]) .ms-chart { height: max(420px, calc(100vh - 330px)); }
@@ -10160,6 +10263,7 @@ html[data-mk="clean"] .ict-strip { display: none; }
   .tv-h h3 { font-size: 15px; line-height: 1.35; }
   .tv-h p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
   .tv-h p.open { display: block; }
+  .tv-h p.ict-thru { display: block; overflow: visible; cursor: auto; }   /* never cut: it says which candles this replay result does NOT cover (was clamped to three lines on phones) */
   .tv-tf { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; }
   .tv-tk { margin: 8px 12px 12px; }
 }
@@ -10241,7 +10345,7 @@ html[data-mk="clean"] .ict-strip { display: none; }
 @media (max-width: 480px) { .pa-f { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pa-dlg[open] { animation: none; } }
 .ch-cd { position: absolute; top: 0; right: 0; z-index: 4; pointer-events: none; height: 16px; display: flex; align-items: center; justify-content: center; font: 600 10.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: #fff; background: var(--sell); border-radius: 0 0 3px 3px; opacity: .92; }
-.ch-cd.up { background: var(--buy); color: #04140f; }
+.ch-cd.up { background: var(--buy); color: #04140f; } :root[data-theme="light"] .ch-cd.up { color: #fff; }   /* the light theme's green is dark enough for white (11 Nov) */
 .ms-ph .ms-cd { display: none; }   /* the countdown now sits on the price scale */
 /* TradingView-style type everywhere (7 Nov, owner): Figtree (free, near the TradingView face), tabular figures for prices; code keeps a monospace */
 html, body, button, input, select, textarea { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -11061,6 +11165,9 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-mosha .mo-t td { vertical-align: top; white-space: normal; } #v-mosha .mo-t td small { display: block; color: var(--ink-faint); font-size: 12px; margin-top: 2px; } #v-mosha .mo-tags { min-width: 180px; max-width: 420px; }
 #v-mosha .mo-acts { white-space: nowrap; text-align: right; } #v-mosha .mo-acts .ms-tbtn { margin: 0 0 0 4px; } #v-mosha .mo-acts .mo-go { border-color: var(--gold-line, #c98f12); color: var(--mo-gold); font-weight: 600; } #v-mosha .mo-when { white-space: nowrap; } #v-mosha .mo-check { margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: var(--well, color-mix(in srgb, var(--ink) 6%, transparent)); font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
 /* who is looking: the owner (the log is theirs), a teacher (the lessons come first on their page), a reader */
+/* Who teaches whom (11 Nov): the teacher never has the five studies' figures or the desk's own summary of "the cycle" put to him as
+   his method. The owner and readers keep both cards; what the desk thinks it knows is in the book, marked unconfirmed, for him to judge. */
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-rules, html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-cycle { display: none; }
 html:not([data-role="owner"]) #v-mosha .mo-own, html[data-role="owner"] #v-mosha .mo-tch, html:not([data-mosha="teach"]) #v-mosha .mo-tch, html[data-role="owner"] #v-mosha .mo-rdr, html[data-mosha="teach"] #v-mosha .mo-rdr { display: none; }
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-todo { order: -4; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-teach { order: -3; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lessons { order: -2; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-book { order: -1; }
 #v-mosha .mo-tc-lv { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 10px; padding: 0 14px; } #v-mosha .mo-tc-lv > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font: 600 13px var(--sans); color: var(--ink-dim); } #v-mosha .mo-tc-lv > summary small { font-weight: 500; color: var(--ink-faint); } #v-mosha .mo-tc-lv > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -11190,7 +11297,7 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
 @media (pointer: coarse) { .mo-lv-dlg .mo-f input, .mo-lv-dlg .mo-f select, .mo-lv-dlg .own-acts button, .mo-l-dlg form button { min-height: 44px; } }
 /* a field never grows past its cell: the date-and-time input pushed "Entry time" under the next field's label on phones */
 #v-mosha .mo-f, .mo-lv-dlg .mo-f { grid-template-columns: minmax(0, 1fr); } #v-mosha .mo-tc-lvg, .mo-lv-dlg .mo-lv { align-items: end; } #v-mosha .mo-tc-lvg input, #v-mosha .mo-tc-lvg select { min-width: 0; max-width: 100%; }
-@media (max-width: 760px) { #v-mosha .mo-tc-lvg .mo-f:has(input[type="datetime-local"]), .mo-lv-dlg .mo-f:has(input[type="datetime-local"]) { grid-column: 1 / -1; }
+@media (max-width: 760px) { #v-mosha .mo-f:has(input[type="datetime-local"]), .mo-lv-dlg .mo-f:has(input[type="datetime-local"]) { grid-column: 1 / -1; }   /* teach form, log form and its exit row: half a phone row cut the date off */
   /* the replay's Steps / Candles / Speed: each name beside its own buttons (the names were left at the end of the row above) */
   #v-mosha .mo-rp-ctl:has(> .mo-rp-k) { display: grid; grid-template-columns: auto minmax(0, 1fr); } #v-mosha .mo-rp-ctl > .mo-rp-ct { grid-column: 1 / -1; } }
 /* light theme: green and red text at AA on the cards, the wells and the buy / sell chips (the desk's light --buy was 4.2-4.5:1 here) */
@@ -11978,7 +12085,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   });
 
   // ─── data ───
-  var get = function (p) { return fetch((window.MS_CDATA || '') + p + '?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+  var get = function (p) { return window.msData.json(p); };   // one request per file, shared with the scoreboard and the week report
   function load() {
     Promise.all([get('macro/forecast.json'), get('macro/events.json'), get('macro/history.json'), get('macro/veteran.json')]).then(function (x) {
       if (!x[0] || !x[0].assets) { if (!D.f) $('ms-md-at').textContent = x[0] === null ? 'Could not load the Macro strategist\'s forecast. It is written about every 25 minutes once the council loop runs it.' : 'No macro forecast yet.'; return; }
@@ -12291,8 +12398,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   function loadExtra() {
     if (SB.extra && Date.now() - SB.extraAt < 5 * 60e3) return Promise.resolve(SB.extra);
     if (SB.loading) return SB.loading;
-    var base = W.MS_CDATA || '', bust = Math.floor(Date.now() / 120000);
-    var get = function (f) { return fetch(base + f + '?v=' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+    var get = function (f) { return W.msData.json(f); };   // one request per file, shared between the panes (window.msData)
     SB.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('research/robustness.json'), get('macro/forecast.json')]).then(function (a) {
       SB.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], robust: a[3], macro: a[4] }; SB.extraAt = Date.now(); SB.loading = null; return SB.extra; });
     return SB.loading;
@@ -13617,8 +13723,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   function loadExtra() {
     if (st.extra && Date.now() - st.extraAt < 5 * 60e3) return Promise.resolve(st.extra);
     if (st.loading) return st.loading;
-    var base = W.MS_CDATA || '', bust = Math.floor(Date.now() / 120000);
-    var get = function (f) { return fetch(base + f + '?v=' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+    var get = function (f) { return W.msData.json(f); };   // one request per file, shared between the panes (window.msData)
     st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json'), get('research/ledger.json')]).then(function (a) {
       st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6], ledger: a[7] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
     return st.loading;
