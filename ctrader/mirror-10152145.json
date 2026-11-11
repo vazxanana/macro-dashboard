@@ -6332,7 +6332,7 @@
     "lots": 0.16,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T04:44:29.000Z",
     "councilEntry": 2066.19,
     "stop": 2054.2667619999997,
@@ -6346,10 +6346,12 @@
     "slipR": 0.294,
     "lagSec": 64,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T04:44:29.000Z",
-    "brokerStop": 2057.77
+    "brokerStop": 2057.77,
+    "closedAt": "2026-11-11T04:58:40.000Z"
    }
   },
   "day": {
@@ -6357,7 +6359,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9949.53 · 29 open",
+  "status": "ok · demo Fusion Markets · balance 9947.55 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6369,15 +6371,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9949.53,
-  "lastRun": "2026-11-11T04:56:10.000Z"
+  "balance": 9947.55,
+  "lastRun": "2026-11-11T04:58:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:17:01.000Z",
-   "msg": "moved GBPUSD 47373485 protection: stop 1.32868 -> 1.32889, target 1.36876 -> 1.36897 (council scalp)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-10T12:18:49.000Z",
    "msg": "moved AUDUSD 47446367 protection: stop 0.68575 -> 0.68572, target 0.69416 -> 0.69413 (council rintra)",
@@ -7871,6 +7868,11 @@
   {
    "at": "2026-11-11T04:44:29.000Z",
    "msg": "opened buy ETHUSD 0.16 lot (council rscalp)",
+   "trade": "eth-rscalp-1794372205"
+  },
+  {
+   "at": "2026-11-11T04:58:40.000Z",
+   "msg": "ETHUSD position 48302070 closed at the broker",
    "trade": "eth-rscalp-1794372205"
   }
  ],
