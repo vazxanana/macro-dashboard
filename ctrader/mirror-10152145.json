@@ -8244,6 +8244,32 @@
     "status": "open",
     "stopCheckedAt": "2026-11-11T16:34:30.000Z",
     "brokerStop": 1.42349
+   },
+   "eurusd-rscalp-1794409682": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-11T17:07:17.000Z",
+    "councilEntry": 1.10898,
+    "stop": 1.10816,
+    "t1": 1.11109,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.10898,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.98,
+    "margin": 4.43,
+    "shadow": true,
+    "fillPrice": 1.10898,
+    "slipR": 0,
+    "lagSec": 7155,
+    "positionId": "48464186",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -8251,7 +8277,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9868.34 · 26 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9868.34 · 27 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -8280,38 +8306,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "eurusd-rscalp-1794409682": {
-    "orderId": "33938956",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "rscalp",
-    "limitPrice": 1.10898,
-    "stop": 1.10816,
-    "t1": 1.11109,
-    "placedAt": "2026-11-11T15:09:03.000Z",
-    "expires": "2026-11-11T18:08:02.000Z",
-    "riskCash": 1.98,
-    "margin": 4.43,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9868.34,
-  "lastRun": "2026-11-11T17:04:47.000Z"
+  "lastRun": "2026-11-11T17:07:17.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T16:12:16.000Z",
-   "msg": "moved GBPUSD 47373485 protection: stop 1.32873 -> 1.32912, target 1.36881 -> 1.3692 (council scalp)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-10T16:12:16.000Z",
    "msg": "moved XAUUSD 48096028 protection: stop 4064.688 -> 4062.968, target 3991.434 -> 3989.714 (council m30m1)",
@@ -9806,6 +9807,11 @@
    "at": "2026-11-11T17:04:47.000Z",
    "msg": "USDCHF position 48442004 closed at the broker",
    "trade": "usdchf-scalp-1794406249"
+  },
+  {
+   "at": "2026-11-11T17:07:17.000Z",
+   "msg": "limit filled: EURUSD position 48464186 at the broker",
+   "trade": "eurusd-rscalp-1794409682"
   }
  ],
  "limits": {
@@ -9884,11 +9890,11 @@
   ]
  },
  "execution": {
-  "n": 278,
+  "n": 279,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 154.5,
+  "medianLagSec": 155,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -9903,7 +9909,7 @@
     "meanSlipR": 0.067
    },
    "EURUSD": {
-    "n": 42,
+    "n": 43,
     "meanSlipR": -0.021
    },
    "GBPUSD": {
