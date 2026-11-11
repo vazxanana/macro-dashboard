@@ -6740,7 +6740,8 @@
     "t1": 1.42102,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42124,
@@ -6754,7 +6755,8 @@
     "lagSec": 214,
     "positionId": "48351152",
     "volume": 500000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T08:15:23.000Z"
    },
    "usdchf-scalp-1794384709": {
     "symbol": "USDCHF",
@@ -6790,7 +6792,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9912.27 · 31 open",
+  "status": "ok · demo Fusion Markets · balance 9910.36 · 30 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6800,22 +6802,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "usdcad-scalp-1794384861": {
+    "orderId": "33915926",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.42156,
+    "stop": 1.42072,
+    "t1": 1.4232399999999998,
+    "placedAt": "2026-11-11T08:15:23.000Z",
+    "expires": "2026-11-11T11:14:21.000Z",
+    "riskCash": 1.98,
+    "margin": 6,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9912.27,
-  "lastRun": "2026-11-11T08:12:53.000Z"
+  "balance": 9910.36,
+  "lastRun": "2026-11-11T08:15:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:15:02.000Z",
-   "msg": "moved AUDUSD 47748537 protection: stop 0.68916 -> 0.68917, target 0.69585 -> 0.69586 (council rintra)",
-   "trade": "audusd-rintra-1794247547"
-  },
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "cancelled GBPUSD limit order 33865962 for gbpusd-intraday-1794316286: the council ended it: cancelled",
-   "trade": "gbpusd-intraday-1794316286"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved GBPUSD 47373485 protection: stop 1.32895 -> 1.32862, target 1.36903 -> 1.3687 (council scalp)",
@@ -8305,6 +8318,16 @@
    "at": "2026-11-11T08:12:53.000Z",
    "msg": "limit filled at once: USDCHF position 48352071 at the broker at 0.82786",
    "trade": "usdchf-scalp-1794384709"
+  },
+  {
+   "at": "2026-11-11T08:15:23.000Z",
+   "msg": "USDCAD position 48351152 closed at the broker",
+   "trade": "usdcad-rscalp-1794384409"
+  },
+  {
+   "at": "2026-11-11T08:15:23.000Z",
+   "msg": "placed buy limit USDCAD 0.03 lot at 1.42156 (council scalp, valid to 2026-11-11T11:14Z)",
+   "trade": "usdcad-scalp-1794384861"
   }
  ],
  "limits": {
