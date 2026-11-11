@@ -557,3 +557,9 @@ test('the palette knows the profile, its field has a name, and the demo-account 
   assert.match(DESK, /tr\.tabIndex = 0; tr\.title = `Show the \$\{tr\.cells\[0\]\.textContent\} account`;[^\n]*e\.key === 'Enter' \|\| e\.key === ' '/);
 });
 
+
+// ---- Guest: the browser trader does not run (11 Nov 2026) ----
+test('the browser trader never runs for a guest (it saved to a journal a guest does not have and named a setup in a toast)', () => {
+  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(html, /function autoTrade\(list, price\) \{\s*if \(!JEL \|\| PUB \|\| marketClosed\(\)\) return;/);
+});
