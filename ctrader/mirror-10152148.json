@@ -2241,6 +2241,87 @@
     ],
     "stopCheckedAt": "2026-11-11T02:21:15.000Z",
     "brokerStop": 0.82525
+   },
+   "btc-replica-1794364852-b": {
+    "positionId": "48278271",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:41:52.000Z",
+    "councilEntry": 73537,
+    "stop": 73092.88,
+    "t1": 74425.25,
+    "riskCash": 4.44,
+    "margin": 73.33,
+    "minLot": true,
+    "shadow": true,
+    "mark": 73537,
+    "levelsFrom": "mark",
+    "fillPrice": 73525.39,
+    "slipR": -0.026,
+    "lagSec": 60,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:41:52.000Z",
+    "brokerStop": 73081.27
+   },
+   "eth-replica-1794364852-b": {
+    "positionId": "48278274",
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "volume": 13,
+    "lots": 0.13,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:41:52.000Z",
+    "councilEntry": 2058.07,
+    "stop": 2042.888,
+    "t1": 2088.433,
+    "riskCash": 2,
+    "margin": 26.7,
+    "mark": 2058.07,
+    "levelsFrom": "mark",
+    "fillPrice": 2057.69,
+    "slipR": -0.025,
+    "lagSec": 60,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:41:52.000Z",
+    "brokerStop": 2042.51
+   },
+   "gbpusd-replica-1794364852-s": {
+    "positionId": "48278281",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-11T02:41:52.000Z",
+    "councilEntry": 1.33481,
+    "stop": 1.335618,
+    "t1": 1.333194,
+    "riskCash": 2,
+    "margin": 5.34,
+    "shadow": true,
+    "mark": 1.33481,
+    "levelsFrom": "mark",
+    "fillPrice": 1.33476,
+    "slipR": 0.062,
+    "lagSec": 60,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T02:41:52.000Z",
+    "brokerStop": 1.33557
    }
   },
   "day": {
@@ -2248,10 +2329,11 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9981.22 · 12 open",
+  "status": "ok · demo Fusion Markets · balance 9981.22 · 15 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
-   "xrp-replica-1794339674-s": "none of XRPUSD found at the broker"
+   "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
+   "xrp-replica-1794364852-b": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -2260,7 +2342,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9981.22,
-  "lastRun": "2026-11-11T02:39:36.000Z"
+  "lastRun": "2026-11-11T02:41:52.000Z"
  },
  "log": [
   {
@@ -3100,6 +3182,26 @@
    "at": "2026-11-11T02:21:15.000Z",
    "msg": "opened buy USDCHF 0.04 lot (council replica)",
    "trade": "usdchf-replica-1794363611-b"
+  },
+  {
+   "at": "2026-11-11T02:41:52.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794364852-b"
+  },
+  {
+   "at": "2026-11-11T02:41:52.000Z",
+   "msg": "opened buy ETHUSD 0.13 lot (council replica)",
+   "trade": "eth-replica-1794364852-b"
+  },
+  {
+   "at": "2026-11-11T02:41:52.000Z",
+   "msg": "not mirrored xrp-replica-1794364852-b: none of XRPUSD found at the broker",
+   "trade": "xrp-replica-1794364852-b"
+  },
+  {
+   "at": "2026-11-11T02:41:52.000Z",
+   "msg": "opened sell GBPUSD 0.02 lot (council replica)",
+   "trade": "gbpusd-replica-1794364852-s"
   }
  ],
  "limits": {
@@ -3178,8 +3280,8 @@
   ]
  },
  "execution": {
-  "n": 78,
-  "meanSlipR": 0.091,
+  "n": 81,
+  "meanSlipR": 0.088,
   "medianSlipR": 0.03,
   "worstSlipR": 1.236,
   "medianLagSec": 72,
@@ -3189,16 +3291,16 @@
     "meanSlipR": 0.16
    },
    "ETHUSD": {
-    "n": 8,
-    "meanSlipR": 0.247
+    "n": 9,
+    "meanSlipR": 0.217
    },
    "XAUUSD": {
     "n": 8,
     "meanSlipR": 0.12
    },
    "BTCUSD": {
-    "n": 11,
-    "meanSlipR": 0.025
+    "n": 12,
+    "meanSlipR": 0.02
    },
    "USDCAD": {
     "n": 8,
@@ -3209,8 +3311,8 @@
     "meanSlipR": 0.027
    },
    "GBPUSD": {
-    "n": 6,
-    "meanSlipR": 0.028
+    "n": 7,
+    "meanSlipR": 0.033
    },
    "USDCHF": {
     "n": 6,
