@@ -6549,7 +6549,7 @@
     "lots": 0.32,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T07:20:48.000Z",
     "councilEntry": 2055.55,
     "stop": 2051.608842,
@@ -6563,10 +6563,12 @@
     "slipR": 0.822,
     "lagSec": 168,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:20:48.000Z",
-    "brokerStop": 2052.71
+    "brokerStop": 2052.71,
+    "closedAt": "2026-11-11T08:33:57.000Z"
    },
    "usdchf-rscalp-1794381987": {
     "positionId": "48343563",
@@ -6826,7 +6828,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9922.04 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9920.09 · 26 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6859,15 +6861,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9922.04,
-  "lastRun": "2026-11-11T08:31:25.000Z"
+  "balance": 9920.09,
+  "lastRun": "2026-11-11T08:33:57.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved USDCAD 47992968 protection: stop 1.4105947 -> 1.4114147, target 1.43017 -> 1.43099 (council position)",
-   "trade": "usdcad-position-1794304600"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved USDCAD 47992970 protection: stop 1.4105947 -> 1.4114147, target 1.4206606 -> 1.4214806 (council swing)",
@@ -8362,6 +8359,11 @@
    "at": "2026-11-11T08:31:25.000Z",
    "msg": "USDCHF position 48349988 closed at the broker",
    "trade": "usdchf-scalp-1794384097"
+  },
+  {
+   "at": "2026-11-11T08:33:57.000Z",
+   "msg": "ETHUSD position 48340419 closed at the broker",
+   "trade": "eth-rscalp-1794381427"
   }
  ],
  "limits": {
