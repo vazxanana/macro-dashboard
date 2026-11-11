@@ -7045,6 +7045,33 @@
     ],
     "stopCheckedAt": "2026-11-11T10:57:11.000Z",
     "brokerStop": 1.4214
+   },
+   "usdchf-scalp-1794395163": {
+    "positionId": "48389691",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-11T11:07:09.000Z",
+    "councilEntry": 0.82924,
+    "stop": 0.82828,
+    "t1": 0.8313999999999998,
+    "riskCash": 1.98,
+    "margin": 2,
+    "shadow": true,
+    "mark": 0.82924,
+    "levelsFrom": "mark",
+    "fillPrice": 0.82922,
+    "slipR": -0.021,
+    "lagSec": 66,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-11T11:07:09.000Z",
+    "brokerStop": 0.82826
    }
   },
   "day": {
@@ -7052,7 +7079,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9909.57 · 29 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9909.57 · 30 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7086,14 +7113,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9909.57,
-  "lastRun": "2026-11-11T11:04:19.000Z"
+  "lastRun": "2026-11-11T11:07:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:22:44.000Z",
-   "msg": "moved GBPUSD 48035675 protection: stop 1.34289 -> 1.34326, target 1.34013 -> 1.3405 (council scalp)",
-   "trade": "gbpusd-scalp-1794315492"
-  },
   {
    "at": "2026-11-10T13:22:44.000Z",
    "msg": "moved XAUUSD 48039921 protection: stop 4080.876 -> 4078.686, target 4069.54 -> 4067.35 (council scalp)",
@@ -8588,6 +8610,11 @@
    "at": "2026-11-11T10:57:11.000Z",
    "msg": "opened buy USDCAD 0.03 lot (council scalp)",
    "trade": "usdcad-scalp-1794394567"
+  },
+  {
+   "at": "2026-11-11T11:07:09.000Z",
+   "msg": "opened buy USDCHF 0.01 lot (council scalp)",
+   "trade": "usdchf-scalp-1794395163"
   }
  ],
  "limits": {
@@ -8666,7 +8693,7 @@
   ]
  },
  "execution": {
-  "n": 238,
+  "n": 239,
   "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -8697,8 +8724,8 @@
     "meanSlipR": -0.05
    },
    "USDCHF": {
-    "n": 26,
-    "meanSlipR": 0.063
+    "n": 27,
+    "meanSlipR": 0.06
    },
    "AUDUSD": {
     "n": 35,
