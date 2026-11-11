@@ -1665,6 +1665,21 @@ the CF -0.07R / -0.07R / -0.16R; a far target is worse than a near one in every 
 simple conditions holds the owner's selection. Five Mosha studies, thirty-three tests on 10 Nov, none an edge. Do not write another
 mechanical reading or filter; the open step is the owner's own logged trades (owner decision 27). Tests: `tests/mosha-select.test.mjs`.
 
+## MSNR direction call study (11 Nov 2026, owner: use the "MSNR direction SOP" skill)
+`research/edge/msnr-direction/` (PREREGISTRATION.md committed first, then `run.mjs`, RESULT.md, result.json). The skill is the
+owner's private material: never copy its text into the repository; the study describes the rule in its own words. A direction
+FILTER test, no trades: the call (buy / sell) = a close beyond the last swing level that existed before price first tapped a
+live key level one timeframe above (swing, engulfing, failed engulfing or dominant zone), while the structure was the other
+way; it stays until the opposite sequence completes. Ladders H4 / Daily and Daily / Weekly, on OANDA gold H4 from June 2006
+(Daily and Weekly built from the same candles; `node run.mjs fetch <dir>`, cache kept out of git). Measured at each daily
+close against the next 1, 5 and 20 daily closes as an excess over the window's own base rate (call x (return - mean
+return), Newey-West t), six tests, Holm, 2020-26 confirmation and 2007-19 replication. **Verdict: FAIL**: 0 of 6; largest t
+in 2020-26 +1.35 (Daily / Weekly, 5 days, 1,768 days), every test has opposite signs in the two windows; on H4 / Daily gold
+rose more after a sell call than after a buy call in 2020-26 (hit 48.4-50.7 % against a base of 51-52.5 %). The breakout-only
+call is noise too. Not an edge, never a council filter or bias gate; it does not judge the owner's own chart reading, the
+skill's entry sessions or forex. Tests: `tests/msnr-direction.test.mjs` (each element on hand-made candles, no look-ahead,
+the report against result.json).
+
 ## Mosha desk (10 Nov 2026, owner: "And a place to mosha")
 After five studies found no fixed rule of the owner's Mosha trading that makes money, the measurement left is the owner's own
 selection (owner decision 27, option a). The desk switch is ICT | Gold | Mosha | Crypto | LIT | NQ SDV; `#mosha` (`#v-mosha`, class
