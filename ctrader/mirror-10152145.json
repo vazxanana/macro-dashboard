@@ -6211,6 +6211,33 @@
     "positionId": "48261841",
     "volume": 100,
     "status": "open"
+   },
+   "btc-intraday-1794363757": {
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "setup": "intraday",
+    "openedAt": "2026-11-11T02:24:48.000Z",
+    "councilEntry": 73228.3,
+    "stop": 73945.59428571428,
+    "t1": 71793.71142857145,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 73228.3,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 7.17,
+    "margin": 73.37,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 73232.75,
+    "slipR": -0.006,
+    "lagSec": 108,
+    "positionId": "48274419",
+    "volume": 1,
+    "status": "open"
    }
   },
   "day": {
@@ -6218,7 +6245,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9951.1 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9951.1 · 26 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6228,39 +6255,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "btc-intraday-1794363757": {
-    "orderId": "33904637",
-    "symbol": "BTCUSD",
-    "side": "sell",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "intraday",
-    "limitPrice": 73228.3,
-    "stop": 73945.59428571428,
-    "t1": 71793.71142857145,
-    "placedAt": "2026-11-11T02:23:33.000Z",
-    "expires": "2026-11-11T14:22:37.000Z",
-    "riskCash": 7.17,
-    "margin": 73.37,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9951.1,
-  "lastRun": "2026-11-11T02:23:33.000Z"
+  "lastRun": "2026-11-11T02:24:48.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:11:10.000Z",
-   "msg": "placed sell limit EURUSD 0.02 lot at 1.12159 (council intraday, valid to 2026-11-11T00:09Z)",
-   "trade": "eurusd-intraday-1794312562"
-  },
   {
    "at": "2026-11-10T12:14:14.000Z",
    "msg": "limit filled: EURUSD position 48023655 at the broker",
@@ -7755,6 +7755,11 @@
    "at": "2026-11-11T02:23:33.000Z",
    "msg": "placed sell limit BTCUSD 0.01 lot at 73228.3 (council intraday, valid to 2026-11-11T14:22Z)",
    "trade": "btc-intraday-1794363757"
+  },
+  {
+   "at": "2026-11-11T02:24:48.000Z",
+   "msg": "limit filled: BTCUSD position 48274419 at the broker",
+   "trade": "btc-intraday-1794363757"
   }
  ],
  "limits": {
@@ -7833,7 +7838,7 @@
   ]
  },
  "execution": {
-  "n": 209,
+  "n": 210,
   "meanSlipR": -0.016,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -7844,8 +7849,8 @@
     "meanSlipR": 0.074
    },
    "BTCUSD": {
-    "n": 16,
-    "meanSlipR": -0.061
+    "n": 17,
+    "meanSlipR": -0.058
    },
    "ETHUSD": {
     "n": 8,
