@@ -6417,7 +6417,8 @@
     "t1": 4068.715,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4052.68,
@@ -6432,9 +6433,10 @@
     "lagSec": 62,
     "positionId": "48310545",
     "volume": 100,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T05:15:16.000Z",
-    "brokerStop": 4040.34
+    "brokerStop": 4040.34,
+    "closedAt": "2026-11-11T13:08:04.000Z"
    },
    "usdcad-position-1794378728": {
     "symbol": "USDCAD",
@@ -7400,7 +7402,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9900.66 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9891.24 · 29 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -7451,23 +7453,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794402420": {
+    "orderId": "33928510",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.33109,
+    "stop": 1.33167,
+    "t1": 1.3299300000000005,
+    "placedAt": "2026-11-11T13:08:04.000Z",
+    "expires": "2026-11-11T16:07:00.000Z",
+    "riskCash": 1.98,
+    "margin": 7.99,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9900.66,
-  "lastRun": "2026-11-11T13:05:16.000Z"
+  "balance": 9891.24,
+  "lastRun": "2026-11-11T13:08:04.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:33:16.000Z",
-   "msg": "XAUUSD position 48045430 closed at the broker",
-   "trade": "xau-scalp-1794316864"
-  },
-  {
-   "at": "2026-11-10T13:33:16.000Z",
-   "msg": "USDCAD position 48046438 closed at the broker",
-   "trade": "usdcad-scalp-1794317055"
-  },
   {
    "at": "2026-11-10T13:33:16.000Z",
    "msg": "closed BTCUSD position 47718263 (council: win)",
@@ -8957,6 +8969,16 @@
    "at": "2026-11-11T13:05:16.000Z",
    "msg": "closed USDCAD position 48370009 (council: win)",
    "trade": "usdcad-scalp-1794389649"
+  },
+  {
+   "at": "2026-11-11T13:08:04.000Z",
+   "msg": "XAUUSD position 48310545 closed at the broker",
+   "trade": "xau-rscalp-1794374054"
+  },
+  {
+   "at": "2026-11-11T13:08:04.000Z",
+   "msg": "placed sell limit GBPUSD 0.03 lot at 1.33109 (council scalp, valid to 2026-11-11T16:07Z)",
+   "trade": "gbpusd-scalp-1794402420"
   }
  ],
  "limits": {
