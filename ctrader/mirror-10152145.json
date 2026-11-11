@@ -6154,6 +6154,32 @@
     "positionId": "48243978",
     "volume": 200000,
     "status": "open"
+   },
+   "gbpusd-scalp-1794359735": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T01:18:57.000Z",
+    "councilEntry": 1.33467,
+    "stop": 1.33528,
+    "t1": 1.33122,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.33467,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.99,
+    "margin": 8.01,
+    "shadow": true,
+    "fillPrice": 1.33467,
+    "slipR": 0,
+    "lagSec": 202,
+    "positionId": "48254217",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -6161,7 +6187,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9963.35 · 25 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9963.35 · 26 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6171,38 +6197,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "gbpusd-scalp-1794359735": {
-    "orderId": "33902125",
-    "symbol": "GBPUSD",
-    "side": "sell",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.33467,
-    "stop": 1.33528,
-    "t1": 1.33122,
-    "placedAt": "2026-11-11T01:16:37.000Z",
-    "expires": "2026-11-11T04:15:35.000Z",
-    "riskCash": 1.99,
-    "margin": 8.01,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9963.35,
-  "lastRun": "2026-11-11T01:16:37.000Z"
+  "lastRun": "2026-11-11T01:18:57.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T12:04:00.000Z",
-   "msg": "moved AUDUSD 47706230 protection: stop 0.68973 -> 0.68972, target 0.69324 -> 0.69323 (council scalp)",
-   "trade": "audusd-scalp-1794239726"
-  },
   {
    "at": "2026-11-10T12:04:00.000Z",
    "msg": "moved AUDUSD 47748537 protection: stop 0.68922 -> 0.68921, target 0.69591 -> 0.6959 (council rintra)",
@@ -7697,6 +7697,11 @@
    "at": "2026-11-11T01:16:37.000Z",
    "msg": "placed sell limit GBPUSD 0.03 lot at 1.33467 (council scalp, valid to 2026-11-11T04:15Z)",
    "trade": "gbpusd-scalp-1794359735"
+  },
+  {
+   "at": "2026-11-11T01:18:57.000Z",
+   "msg": "limit filled: GBPUSD position 48254217 at the broker",
+   "trade": "gbpusd-scalp-1794359735"
   }
  ],
  "limits": {
@@ -7775,11 +7780,11 @@
   ]
  },
  "execution": {
-  "n": 207,
+  "n": 208,
   "meanSlipR": -0.016,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161,
+  "medianLagSec": 161.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -7798,7 +7803,7 @@
     "meanSlipR": -0.025
    },
    "GBPUSD": {
-    "n": 31,
+    "n": 32,
     "meanSlipR": 0.013
    },
    "USDCAD": {
