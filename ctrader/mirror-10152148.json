@@ -2954,7 +2954,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T07:20:54.000Z",
     "councilEntry": 0.82634,
     "stop": 0.827393,
@@ -2967,10 +2967,12 @@
     "slipR": -0.066,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:20:54.000Z",
-    "brokerStop": 0.82746
+    "brokerStop": 0.82746,
+    "closedAt": "2026-11-11T07:33:52.000Z"
    },
    "btc-replica-1794381743-b": {
     "positionId": "48342120",
@@ -3084,7 +3086,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.28 · 18 open",
+  "status": "ok · demo Fusion Markets · balance 9960.92 · 17 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3100,8 +3102,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9962.28,
-  "lastRun": "2026-11-11T07:31:18.000Z"
+  "balance": 9960.92,
+  "lastRun": "2026-11-11T07:33:52.000Z"
  },
  "log": [
   {
@@ -4226,6 +4228,11 @@
    "at": "2026-11-11T07:26:01.000Z",
    "msg": "opened buy USDCHF 0.02 lot (council replica)",
    "trade": "usdchf-replica-1794381896-b"
+  },
+  {
+   "at": "2026-11-11T07:33:52.000Z",
+   "msg": "USDCHF position 48340519 closed at the broker",
+   "trade": "usdchf-replica-1794381581-s"
   }
  ],
  "limits": {
