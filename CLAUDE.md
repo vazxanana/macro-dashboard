@@ -75,6 +75,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
+- Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
@@ -1872,3 +1873,60 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
       answer, and a French button name the page does not show.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
+
+## Desk load: one request per file, late loading (11 Nov 2026)
+Owner request: the Desk (`market-structure.html`) should load faster and steadier. Measured with Playwright on a phone profile
+(390 px, DPR 3, CPU 4x) against a local server that streams like a slow connection (one shared 1.6 Mbps link, 150 ms before
+each answer, brotli sizes; council-data and candles replayed from disk), median of 3 loads, before → after:
+
+| | Guest (sign-in card) | Owner (home) |
+|---|---|---|
+| Requests in the first 20 s | 116 → 16 | 126 → 126 |
+| Council-data files asked twice | trades.json x2, snapshot.json x3 → none | none → none |
+| Bytes on the wire | 1,800 → 1,045 KB | 1,561 → 1,562 KB |
+| Council-data | 8 requests, 739 KB → 3, 472 KB | 19, 552 KB → the same |
+| First paint | 1.21 → 1.13 s | 1.18 → 1.12 s |
+| First useful content | proof line 7.9 → 3.3 s | Today strip with real numbers 6.5 → 4.3 s |
+| Layout shift (CLS) | 0.086 → 0.001 | 0.088 (one run 0.197) → 0.063 |
+| Long tasks | 19, 2.9 s → 9, 1.2 s | 12, 1.6 s → 11, 1.6 s |
+
+What was done, and the rules to keep:
+- **`window.msData`** (head script, between the `ms-data` markers; `msData.json(file)`, `.text(file)`, `{ fresh }`): every reader
+  of council-data on the Desk asks through it, so a file is one request per load (the sign-in card, the council, the ICT strip
+  and desk, the macro pane, the scoreboard and the week report each had their own fetch and cache-buster). A request in flight
+  is shared; a finished one is reused for 45 s (so every refresh timer on the page, 1 to 10 minutes, still reads new data);
+  `ict/replay.json` (written once a day, 2 MB) for 10 minutes; `{ fresh: 0 }` always reads again (the ICT desk's own files);
+  a failed read is never reused; each caller gets its own parsed copy. A visitor who is not signed in gets `null` without a
+  request for anything outside the guest list (the same list as `GUEST_OK` in `api/data.js`; a test compares them).
+  **Never add a direct `fetch` of a council-data file to the page**: the test lists the four left (files nobody else reads).
+- **Early requests** (`msData.warm`, a small script at the top of the body): trades and snapshot for the sign-in card; those
+  two plus the system replay and research.json otherwise. `loadCouncil` picks them up and, on the first load only, draws the
+  home strip and open positions (`renderActive`) from those four before the other ten files are in (`COUNCIL.early`); the full
+  council render follows when every file is, and later refreshes swap the whole set at once as before.
+- **The app sleeps under the first-load sign-in card** (`window.msBootGate`: a promise while `html[data-gate]` was set at load).
+  Leaving that card always reloads the page (sign-in, "Continue as guest", `/api/me` finding a session; the close button and
+  Escape only exist once the guest view was chosen), so `boot()` (candles, streams, the scanner), `loadCouncil` and `mdQuotes`
+  wait for it: 100 requests and half the main-thread work of that load were for a page nobody saw. If a way to close that card
+  without a reload is ever added, the promise resolves and everything starts.
+- **The sign-in card**: its script sits right under its markup (it was 1.3 MB further down); the three proof boxes are in the
+  page from the first paint (hidden only when nothing could be read); the open trades and last signal come from the shared
+  trades / snapshot requests; the ICT replay line is read last, after `load` and in idle time (`later(ictProof)`).
+- **`scripts/hoist-styles.mjs`** (build step, right after the pages are copied): the 25 `<style>` blocks in the Desk's body
+  (233 KB) go to the end of the head in the built page, order kept, so the cascade is the same and the first screen is drawn
+  once with all its rules (the sign-in card used to change height by 230 px when `#ms-gate3-css` arrived). The page source is
+  untouched: keep writing a feature's style block next to its markup, and never rely on a body style arriving late.
+- **The charting library's script tag** is in the body, right before the app script (with its CDN fallback line), not in the
+  head: it no longer blocks the first paint. No preload for it and no data request from the head: both took bandwidth from the
+  styles of the first paint (measured: first paint 1.2 → 1.6-1.9 s).
+- **Home holds its place**: a small script after `#h-mk` draws the empty market cards and the date line at once (the app
+  script drew them seconds later and pushed the page down; the count, 10, is checked against `INSTRUMENTS`), and on phones the
+  headline keeps two lines (`min-height: 2lh`).
+- Not changed, measured: the page itself is 1.55 MB (400 KB compressed), a quarter of it CSS and about 150 KB compressed the
+  app script, which the browser still parses under the sign-in card; the five Mosha scripts (65 KB compressed) load for every
+  visitor; fonts swap at about 1.5 s on this profile (a 0.04 shift on the owner's home); candles are 90 requests, 470 KB.
+  Open for the writers' owners: a slim companion to `ict/replay.json` without the 72-candle `path` arrays (the sign-in card
+  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry; and ETag / 304 answers
+  from `/cdata` so an unchanged file costs no bytes on a refresh.
+- Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
+  fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
+  guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
