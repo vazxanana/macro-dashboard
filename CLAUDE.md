@@ -2121,6 +2121,40 @@ no rule for them: its stacks built on the engulfing-failure signal, the abbrevia
 Never call this method an edge; do not automate it; a further test needs those signals written down as rules by the owner and its
 own pre-registration. Nothing live changed. Tests: `tests/msnr-entry.test.mjs`.
 
+## Edge review, and the trend-breadth / financing study (11 Nov 2026, owner: "now our edges, we need more improvement so we start make money")
+An evidence review, a ranked plan and one study; no live rule, size, filter, stop or council member changed. The owner's
+document is `research/proposals/2026-11-11-edge-review.md` (one row per system, where the R goes, five actions, five
+decisions). What it found, from council-data of 11 Nov and the committed studies:
+- **No system has an out-of-sample t of 2 after costs.** Nearest: Gold trend (+0.49R a position on 2006-17, n 75, t 1.77),
+  Gold trend fast (+0.37R, n 129, t 1.92), Gold daily engulf (+0.19R, n 256, t 1.89). Flat or negative out of sample: H4
+  trendline, Mosha BO, replica, momentum pullback, NQ open run, ICT A-setups. Forward: 5 main-system trades, −2.05R gross.
+- Costs took 157R from the shadow book in eleven days (804 trades, +133.0R gross, −24.2R net). The replica's forward paper
+  trades on ten markets: 568 closed, −0.08R a trade before costs; their demo copies fill 0.08R worse (n 121, t 3.9).
+- `research/edge/honest-book` (7-8 Nov) was never put to the owner as a decision: it is decision 1 of the proposal (live
+  paper book = Gold trend + Gold daily engulf, the rest as shadows). Not added to `docs/owner-decisions.md` here (other
+  work was renumbering nothing but adding items the same day): add the proposal's five decisions there as new items.
+- Seen and reported, not acted on: a 10-lot gold buy on the Replica demo account (closed 11 Nov 13:37 UTC, −$4,427) that
+  is not in the mirror's records (the mirror's cap is 5 lots); the day's loss stop then refused the replica copies.
+**`research/edge/trend-breadth/`** (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json):
+- **Part A, financing** (accounting, no rule tested). No cost model in the repository counts overnight financing
+  (`council/fills.mjs` and the studies count spread and slippage). The demo broker charges a long gold position 5.903 pips
+  of 0.1 a night (`ctrader/symbols.json`; the demo deals show −$0.59 an ounce a night), about 0.0148 % of price, 5.3 % a
+  year. On the recorded positions of `gold-systems-oos`, untouched 2006-17, first unit only: Gold trend +0.489R → +0.398R
+  (t 1.77 → 1.49), Gold trend fast +0.372R → +0.289R (t 1.92 → 1.53), daily engulf +0.186R → +0.141R (t 1.89 → 1.46),
+  H4 trendline +0.048R → +0.013R (t 0.83 → 0.23: "does not survive at today's rate" by the pre-registered reading). About
+  2.8R a year across gtrend, geg and gtl; with the add unit the trend legs pay about a third more. The broker's past rates
+  are not known (a half-rate column is shown). Adding financing to `fills.mjs` / `expect-base.json` is a proposal, not done.
+- **Part B, breadth: harness not validated, nothing interpreted.** The live Gold trend rule on the council's daily candle
+  cache (four pre-registered sets: other metals, 17 equity indices, energies and agriculturals, currency majors both
+  sides; monthly-sum t, Holm). The parity gate on gold passed on 2006-17 (72 positions against 75, gross +0.517R against
+  +0.506R) and missed on 2018-26 (+1.644R against +1.347R; the gate allows 0.15R). Cause (post-hoc): the live rule buys
+  again INSIDE a day after a stop-out while the last closed day is still an unused breakout (nine such positions in
+  2018-26, eight losers); daily candles cannot place them, so a daily harness flatters the rule. The four sets' figures
+  are in result.json under `uninterpreted`; never quote them as a finding. A real breadth test needs hourly candles and
+  its own pre-registration. **Any daily-candle replay of gtrend / gtrend5 has this bias.**
+- To repeat: `node research/edge/trend-breadth/run.mjs fetch <dir>` (git show from `origin/council-data`, no network), then
+  `… full <dir>`. Tests: `tests/trend-breadth.test.mjs`.
+
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
 Mosha BO (H4 BO, H1 BO against, M15 BO back, weekly direction) is a different trade: it could not have taken it (wrong side, M15
