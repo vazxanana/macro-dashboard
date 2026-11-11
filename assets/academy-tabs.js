@@ -211,10 +211,12 @@
   }
   // a generated study's table → sections a page can draw: { title, cols, rows } for a list of records, { title, pairs } for plain values
   function tableSections(table, title, depth) {
-    const out = [], d = depth || 0, isO = (v) => !!v && typeof v === 'object' && !Array.isArray(v), cell = (v) => (v == null ? 'n/a' : typeof v === 'object' ? JSON.stringify(v) : String(v));
+    const out = [], d = depth || 0, isO = (v) => !!v && typeof v === 'object' && !Array.isArray(v), cell0 = (v) => (v == null ? 'n/a' : typeof v === 'object' ? JSON.stringify(v) : String(v));
+    // a time written as epoch seconds under a key that names a time (from, to, cut, ...) is shown as a date
+    const cell = (v, k) => (typeof v === 'number' && Number.isInteger(v) && v > 9e8 && v < 3e9 && /^(from|to|cut|first|last|start|end|t|at|exitT|entryT)$/.test(String(k || '')) ? fmtTime(v) : cell0(v));
     if (Array.isArray(table)) {
-      if (table.length && table.every(isO)) { const cols = []; for (const r of table) for (const k of Object.keys(r)) if (cols.indexOf(k) < 0) cols.push(k); out.push({ title: title || 'Rows', cols, rows: table.map((r) => cols.map((k) => cell(r[k]))) }); }
-      else if (table.length) out.push({ title: title || 'Values', pairs: [[title || 'values', table.map(cell).join(', ')]] });
+      if (table.length && table.every(isO)) { const cols = []; for (const r of table) for (const k of Object.keys(r)) if (cols.indexOf(k) < 0) cols.push(k); out.push({ title: title || 'Rows', cols, rows: table.map((r) => cols.map((k) => cell(r[k], k))) }); }
+      else if (table.length) out.push({ title: title || 'Values', pairs: [[title || 'values', table.map((x) => cell(x)).join(', ')]] });
       return out;
     }
     if (!isO(table)) return out;
@@ -223,8 +225,8 @@
       const v = table[k], name = title ? `${title} · ${k}` : k;
       if (Array.isArray(v) && v.length && v.every(isO)) out.push(...tableSections(v, name, d + 1));
       else if (isO(v) && d < 2 && Object.values(v).some((x) => x && typeof x === 'object')) out.push(...tableSections(v, name, d + 1));
-      else if (isO(v)) out.push({ title: name, pairs: Object.keys(v).map((kk) => [kk, cell(v[kk])]) });
-      else pairs.push([k, Array.isArray(v) ? v.map(cell).join(', ') : cell(v)]);
+      else if (isO(v)) out.push({ title: name, pairs: Object.keys(v).map((kk) => [kk, cell(v[kk], kk)]) });
+      else pairs.push([k, Array.isArray(v) ? v.map((x) => cell(x)).join(', ') : cell(v, k)]);
     }
     if (pairs.length) out.unshift({ title: title || 'Summary', pairs });
     return out;
@@ -332,10 +334,11 @@
   let EDGE = null;
   const edgeOf = (ctx) => (EDGE && ctx.edges().some((e) => e.id === EDGE) ? EDGE : (EDGE = ctx.edge() || (ctx.edges()[0] || {}).id || null));
   const edgeDef = (ctx, id) => ctx.edges().find((e) => e.id === id) || null;
-  // own = { get, set }: a section with a sitting in progress (blind, session) keeps its own edge
+  // own = { get, set, leave? }: a section with a sitting in progress (blind, session) keeps its own edge; leave() may refuse a change once
   function edgeBar(ctx, idp, onChange, note, own) {
     const cur = own ? own.get() : edgeOf(ctx);
-    const sel = el('select', { id: idp + '-edge', onchange: (e) => { if (own) own.set(e.target.value); else EDGE = e.target.value; onChange(); } }, ctx.edges().map((e) => el('option', { value: e.id, text: `${e.name} · ${e.marketLabel || e.market}`, selected: e.id === cur })));
+    const sel = el('select', { id: idp + '-edge', onchange: (e) => { if (own && own.leave && !own.leave()) { e.target.value = own.get(); return; }   // a half-written answer: the first change is put back and says so
+      if (own) own.set(e.target.value); else EDGE = e.target.value; if (MXAC.rememberEdge) MXAC.rememberEdge(e.target.value); onChange(); } }, ctx.edges().map((e) => el('option', { value: e.id, text: `${e.name} · ${e.marketLabel || e.market}`, selected: e.id === cur })));
     return el('div', { class: 'tb-bar' }, el('label', { class: 'f' }, el('span', { text: 'Edge' }), sel), note ? el('p', { class: 'note', text: note }) : null);
   }
   // a section draws into `sec` after its reads; a newer draw (another edge, another visit) wins over an older one still loading
@@ -464,6 +467,8 @@
     return box;
   }
   async function lessonsTab(sec, ctx) {
+    // asked for from a decision that names two conflicting lessons (MXAC.lessonFocus = { edge, ids }): open on that edge and mark them
+    const focus = MXAC.lessonFocus && Array.isArray(MXAC.lessonFocus.ids) ? MXAC.lessonFocus : null; MXAC.lessonFocus = null; if (focus && focus.edge && ctx.edges().some((x) => x.id === focus.edge)) EDGE = focus.edge;
     const live = fresh('lessons'), edge = edgeOf(ctx), e = edgeDef(ctx, edge), redraw = () => lessonsTab(sec, ctx); closeEditor = null; loading(sec, 'Reading the lessons…');
     let lessons, research;
     // the drafts come with any research read; kind=baseline keeps that answer small (one study an edge)
@@ -474,7 +479,12 @@
     clear(sec).appendChild(edgeBar(ctx, 'ls', redraw, 'Lessons of this edge and the lessons that hold for every edge, newest first. Every version is kept.'));
     const box = card('Lessons', `${e ? e.name : edge} and all edges · ${plural(chains.length, 'lesson')}, ${all.filter((l) => l.active).length} in force`, 'ls-card');
     if (!chains.length) box.appendChild(empty('No lesson yet. A lesson appears here when you correct a decision in the Train tab and save the draft, or when you save a research draft below.', el('button', { type: 'button', class: 'btn', text: 'Go to Train', onclick: () => ctx.go('train') })));
-    else { const ul = el('ul', { class: 'lsn-list', id: 'ls-list' }); for (const vs of chains) ul.appendChild(lessonItem(vs, ctx, redraw)); box.appendChild(ul); }
+    else {
+      const ul = el('ul', { class: 'lsn-list', id: 'ls-list' }), hits = [];
+      for (const vs of chains) { const li = lessonItem(vs, ctx, redraw); if (focus && vs.some((v) => focus.ids.indexOf(v.id) >= 0)) { li.classList.add('hit'); li.setAttribute('data-focus', 'yes'); hits.push(li); } ul.appendChild(li); }
+      if (focus) box.appendChild(el('p', { class: 'ac-warn', id: 'ls-focus', text: hits.length ? `The ${hits.length === 1 ? 'lesson' : plural(hits.length, 'lesson')} the decision named as conflicting ${hits.length === 1 ? 'is' : 'are'} outlined below. Revise one so they no longer meet on the same setup, or switch one off; then go back to Train and replay the same trade.` : 'The lessons that decision named are not in this list any more.' }));
+      box.appendChild(ul); if (hits.length) setTimeout(() => { if (hits[0].isConnected) hits[0].scrollIntoView({ block: 'center' }); }, 0);
+    }
     sec.appendChild(box); sec.appendChild(checkCard(edge, ctx)); sec.appendChild(draftsCard(research, all, ctx, redraw, e));
   }
   MXAC.registerTab('lessons', { title: 'Lessons', render: lessonsTab });
@@ -714,6 +724,14 @@
   const unfilled = MXAC.unfilled;
   const rangeOf = (fromEl, toEl) => { const a = dayToSec(fromEl.value), b = dayToSec(toEl.value); return a == null || b == null || b < a ? null : { from: a, to: b + DAY }; };
   const dateIn = (id, label, onchange) => el('label', { class: 'f' }, el('span', {}, label, el('small', { text: ' (UTC)' })), el('input', { type: 'date', id, onchange }));
+  // While a sitting is on screen its setup card folds to its heading and one line (as the Train setup does), so the chart is
+  // not a screen below it on a phone. → { bar (put it in the card), fold(on, summaryText) }
+  function setupFold(cardOf, idp) {
+    const sum = el('span', { class: 'fold-sum', id: idp + '-setup-sum' }), tog = el('button', { type: 'button', class: 'btn sm', id: idp + '-setup-toggle', 'aria-expanded': 'true', text: 'Hide setup' }), bar = el('div', { class: 'fold-bar', hidden: true }, sum, tog);
+    const set = (folded) => { const c = cardOf(); if (!c) return; c.classList.toggle('folded', folded); tog.setAttribute('aria-expanded', folded ? 'false' : 'true'); tog.textContent = folded ? 'Change setup' : 'Hide setup'; };
+    tog.addEventListener('click', () => { const c = cardOf(); set(!(c && c.classList.contains('folded'))); });
+    return { bar, fold(on, text) { bar.hidden = !on; if (text != null) sum.textContent = text; set(!!on); } };
+  }
   // a chart with its clock line: the same chart factory as the Train tab
   function stage(idp, label) {
     const time = el('b', { class: 'num', id: idp + '-time', text: '—' }), state = el('span', { class: 'pill', id: idp + '-state', text: 'not started' }), host = el('div', { class: 'chart', id: idp + '-chart', role: 'img', 'aria-label': label }), meta = el('div', { class: 'chart-meta', id: idp + '-meta' });
@@ -723,45 +741,58 @@
       levels(c) { const x = chart(); x.clearLines(); if (!c) return; x.line(c.entry, 'Edge entry', K.css('--accent')); x.line(c.stop, 'Edge stop', K.css('--sell')); x.line(c.target, 'Edge target', K.css('--buy')); } };
   }
   // A trade answer: the action buttons, the levels of a BUY / SELL, a reason. o = { idp, actions: [[value, label]], levels(value) → { entry, stop, target },
-  // needText (true | fn(value)), submit(answer) (async), submitLabel, textLabel, placeholder, done }
+  // needText (true | fn(value)), submit(answer) (async; a string it returns replaces `done`), submitLabel, textLabel, placeholder, done }
+  // → { choose, unsaved() }: unsaved is true from the first choice or word until the answer is stored (the same rule as the Train form)
   function answerForm(box, o) {
-    const idp = o.idp, A = { action: null, entry: null, stop: null, target: null, text: '' }, inputs = {};
+    const idp = o.idp, A = { action: null, entry: null, stop: null, target: null, text: '' }, inputs = {}; let dirty = false, stored = false;
     const err = el('p', { class: 'ac-err', id: idp + '-err', role: 'alert', hidden: true }), msg = el('span', { class: 'ac-status', id: idp + '-msg', role: 'status' });
     const needText = () => (typeof o.needText === 'function' ? o.needText(A.action) : !!o.needText);
     const save = el('button', { type: 'button', class: 'btn primary', id: idp + '-save', disabled: true, text: o.submitLabel || 'Save' });
-    const check = () => { const p = A.action ? answerProblems(A, needText()) : []; err.hidden = !p.length; err.textContent = p.join(' '); save.disabled = !A.action || !!p.length; return p; };
-    const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), (inputs[k] = el('input', { type: 'number', step: '0.01', id: `${idp}-${k}`, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); A[k] = v === '' || !Number.isFinite(+v) ? null : +v; check(); } })));
+    // what is missing is a calm line until Save is pressed with something missing (show); only then the red "Problem"
+    let tried = false; const hint = el('p', { class: 'note', id: idp + '-hint', hidden: true });
+    const check = (show) => { if (show) tried = true; const p = A.action ? answerProblems(A, needText()) : [], on = tried && p.length > 0, calm = !tried && p.length > 0; err.hidden = !on; err.textContent = on ? p.join(' ') : ''; hint.hidden = !calm; hint.textContent = calm ? 'Before you save: ' + p.join(' ') : ''; save.disabled = !A.action; return p; };
+    const numIn = (k, label) => el('label', { class: 'f' }, el('span', { text: label }), (inputs[k] = el('input', { type: 'number', step: '0.01', id: `${idp}-${k}`, inputmode: 'decimal', disabled: true, oninput: (e) => { const v = e.target.value.trim(); dirty = true; A[k] = v === '' || !Number.isFinite(+v) ? null : +v; check(); } })));
     const choices = el('div', { class: 'choices', role: 'group', 'aria-label': o.label || 'Your answer' }, o.actions.map(([v, label]) => el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) })));
     function choose(v) {
-      A.action = v; choices.querySelectorAll('[data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
+      A.action = v; dirty = true; tried = false; choices.querySelectorAll('[data-choice]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.choice === v ? 'true' : 'false'));
       const lv = (o.levels && o.levels(v)) || {}, take = isTake(v);
       for (const k of ['entry', 'stop', 'target']) { A[k] = take && fin(lv[k]) ? lv[k] : null; inputs[k].disabled = !take; inputs[k].value = A[k] == null ? '' : A[k]; }
       check();
     }
-    const ta = el('textarea', { id: idp + '-text', maxlength: '4000', placeholder: o.placeholder || 'What do you see?', oninput: (e) => { A.text = e.target.value; check(); } });
+    const ta = el('textarea', { id: idp + '-text', maxlength: '4000', placeholder: o.placeholder || 'What do you see?', oninput: (e) => { A.text = e.target.value; dirty = true; check(); } });
     save.addEventListener('click', async () => {
-      if (check().length || save.disabled) return; save.disabled = true; msg.textContent = 'Saving…';
-      try { await o.submit({ action: A.action, entry: A.entry, stop: A.stop, target: A.target, text: A.text.trim() }); msg.textContent = o.done || 'Stored ✓'; choices.querySelectorAll('button').forEach((b) => { b.disabled = true; }); for (const k of Object.keys(inputs)) inputs[k].disabled = true; ta.disabled = true; }
+      if (save.disabled || check(true).length) return; save.disabled = true; msg.textContent = 'Saving…';
+      try { const said = await o.submit({ action: A.action, entry: A.entry, stop: A.stop, target: A.target, text: A.text.trim() }); stored = true; msg.textContent = typeof said === 'string' ? said : o.done || 'Stored ✓'; choices.querySelectorAll('button').forEach((b) => { b.disabled = true; }); for (const k of Object.keys(inputs)) inputs[k].disabled = true; ta.disabled = true; }
       catch (e) { msg.textContent = ''; err.hidden = false; err.textContent = 'Not stored: ' + ((e && e.message) || e) + '.'; save.disabled = false; }
     });
     box.appendChild(choices); box.appendChild(el('div', { class: 'lv' }, numIn('entry', 'Entry'), numIn('stop', 'Stop'), numIn('target', 'Target')));
-    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: o.textLabel || 'Your reason' }), ta)); box.appendChild(err); box.appendChild(el('div', { class: 'f-actions' }, save, msg));
-    return { choose };
+    box.appendChild(el('label', { class: 'f', style: 'margin-top:10px' }, el('span', { text: o.textLabel || 'Your reason' }), ta)); box.appendChild(hint); box.appendChild(err); box.appendChild(el('div', { class: 'f-actions' }, save, msg));
+    return { choose, unsaved: () => !stored && MXAC.mentorUnsaved({ dirty, choice: A.action, text: A.text }) };
   }
 
   // ---- Blind arena ----------------------------------------------------------------------------------------------------------
   // The mentor answers first. The engine's decision is stored as a hidden attempt (mode blind) and dropped from the page; it
   // comes back only in the answer to blind.submit, after the mentor's own answer is stored. The outcome is asked for last.
+  // After a reload nothing of it can come back early either: the page asks the server for no decision of a waiting setup (the
+  // API hides it anyway), a waiting setup keeps its one hidden attempt (no second one is stored), and the server refuses a
+  // second answer for a setup (409), which the page says in words. "Next setup" exists only once an answer is stored; a
+  // half-written answer can be lost by starting another round or changing the edge, and those ask first (K.leaveGuard).
   let BL = null;
   function blindTab(sec, ctx) {
     if (BL && BL.sec === sec && sec.firstChild) return;   // a sitting in progress is kept when the tab is shown again
-    const B = (BL = { sec, rows: [], done: new Set(), pool: null, queue: [], i: 0, busy: false, clock: null }); clear(sec);
-    const note = el('p', { class: 'note', id: 'bl-count', role: 'status' }), msg = el('span', { class: 'ac-status', id: 'bl-msg', role: 'status' }), err = el('p', { class: 'ac-err', id: 'bl-setup-err', role: 'alert', hidden: true });
+    const B = (BL = { sec, rows: [], done: new Set(), pool: null, queue: [], i: 0, busy: false, clock: null, form: null }); clear(sec);
+    const note = el('p', { class: 'note', id: 'bl-count', role: 'status' }), msg = el('span', { class: 'ac-status', id: 'bl-setup-msg', role: 'status' }), err = el('p', { class: 'ac-err', id: 'bl-setup-err', role: 'alert', hidden: true });
     const st = stage('bl', 'Blind arena chart: candles closed at the setup time'), live = el('div', { id: 'bl-live', hidden: true }), info = el('div', { class: 'card', id: 'bl-info' }), answer = el('div', { class: 'card', id: 'bl-answer' }), reveal = el('div', { class: 'card', id: 'bl-reveal', hidden: true }), tableBox = el('div', { class: 'card', id: 'bl-table' });
     let myEdge = edgeOf(ctx);
+    const LEAVE = 'Your answer is not stored yet. Store it to keep it, or do the same again to leave without it.';
+    const unsaved = () => !live.hidden && !!B.form && B.form.unsaved();
+    const leave = K.leaveGuard({ unsaved, tell: () => { msg.textContent = LEAVE; const w = $('bl-leave'); if (w) { w.hidden = false; w.textContent = LEAVE; } } });
+    K.watchUnsaved(() => BL === B && unsaved());
+    const sf = setupFold(() => $('bl-setup'), 'bl');
+    const waitingIn = (q) => q.filter((c) => { const x = B.pool && B.pool.seen && B.pool.seen[c.id]; return !!x && x.mode === 'blind' && x.attempts > 0; }).length;   // the engine's hidden answer is stored, yours is not (a round left open, or a reload)
     const edge = () => edgeDef(ctx, myEdge), from = dateIn('bl-from', 'From', () => count()), to = dateIn('bl-to', 'To, included', () => count()), fromEl = from.querySelector('input'), toEl = to.querySelector('input');
     const queue = () => { const r = rangeOf(fromEl, toEl); return !r || !B.pool ? [] : (B.pool.candidates || []).filter((c) => c.t >= r.from && c.t < r.to && !B.done.has(c.id)); };
-    const count = () => { const r = rangeOf(fromEl, toEl), q = queue(); note.textContent = !r ? 'Pick a start and an end date (the end on or after the start).' : `${plural(q.length, 'train setup')} in this range without a blind answer yet.` + (q.length ? '' : ' Widen the range, or pick another edge.'); };
+    const count = () => { const r = rangeOf(fromEl, toEl), q = queue(); note.textContent = !r ? 'Pick a start and an end date (the end on or after the start).' : `${plural(q.length, 'train setup')} in this range without a blind answer yet.` + (q.length ? '' : ' Widen the range, or pick another edge.') + (waitingIn(q) ? ` ${waitingIn(q)} of them ${waitingIn(q) === 1 ? 'was' : 'were'} left open: the engine's answer is stored and stays hidden until yours is. Start a round to answer.` : ''); };
     function drawTable() {
       const s = blindTable(B.rows), e = edge(); clear(tableBox).appendChild(el('h2', { class: 'c-h' }, 'You against the engine', el('small', { text: `${e ? e.name : ''} · every blind answer stored for this edge` })));
       if (!s.n) { tableBox.appendChild(empty('No blind answer yet. Start a round above: you answer each setup before the engine\'s answer is shown, and the running score appears here.')); return; }
@@ -779,7 +810,7 @@
       } catch (e2) { note.textContent = 'The setups could not be read: ' + e2.message + '.'; }
     }
     async function start() {
-      const e = edge(), r = rangeOf(fromEl, toEl), q = queue(); err.hidden = true; if (B.busy) return;
+      const e = edge(), r = rangeOf(fromEl, toEl), q = queue(); err.hidden = true; if (B.busy || !leave()) return;
       if (!e || !r) { count(); return; } if (!q.length) { count(); return; }
       B.busy = true; $('bl-start').disabled = true;
       try {
@@ -788,13 +819,13 @@
         if (!got.series[B.tf].length || !got.series['5m'].length) throw Object.assign(new Error('No candles came back for this market and range, so there is nothing to show. Try other dates.'), { code: 'NO_BARS' });
         msg.textContent = 'Reading the lessons and the past cases…';
         B.lessons = await K.lessonsFor(e.id); B.hist = await K.historyFor(e.id, r.to); await K.ensureCalendar();
-        B.edge = e; B.series = got.series; B.dataVersion = got.dataVersion; B.queue = q; B.i = 0; live.hidden = false; st.meta.textContent = `Candles: ${got.dataVersion}. Setups: the study's research candles.`; st.chart().fit(); msg.textContent = '';
+        B.edge = e; B.series = got.series; B.dataVersion = got.dataVersion; B.queue = q; B.i = 0; live.hidden = false; sf.fold(true, `${e.name} · ${isoDay(r.from)} to ${isoDay(r.to - DAY)} · ${plural(q.length, 'setup')} in this round`); st.meta.textContent = `Candles: ${got.dataVersion}. Setups: the study's research candles.`; st.chart().fit(); msg.textContent = '';
         next();
       } catch (e2) { err.hidden = false; err.textContent = e2 && e2.code ? MXAC.candleError(e2) : 'The round could not start: ' + ((e2 && e2.message) || e2) + '.'; msg.textContent = ''; }
       finally { B.busy = false; $('bl-start').disabled = false; }
     }
     function next() {
-      const c = B.queue[B.i]; reveal.hidden = true; clear(reveal); clear(answer); clear(info); st.levels(null);
+      const c = B.queue[B.i]; reveal.hidden = true; clear(reveal); clear(answer); clear(info); st.levels(null); B.form = null; leave.reset();
       if (B.i > 0 && K.showNode) K.showNode(st.node);   // "Next setup" is pressed far below the chart on a phone: bring the chart back
       if (!c) { info.appendChild(el('h2', { text: 'Round finished' })); info.appendChild(el('p', { text: 'Every train setup of this range has your blind answer. Pick another range above for more.' })); st.state.textContent = 'round finished'; count(); return; }
       info.appendChild(el('h2', { class: 'c-h' }, 'Setup', el('small', { text: `${B.i + 1} of ${B.queue.length} in this round` }))); info.appendChild(el('p', { class: 'ac-wait', text: 'The replay is running to the setup…' }));
@@ -811,7 +842,7 @@
       if (!pending) {   // a setup left unanswered in an earlier sitting already has its hidden attempt
         let d = K.decideOn(snap, { setup: setupOf(e), account: MXK.account(BALANCE, { t: c.t }), lessons: B.lessons, thesis: MXA.thesis.start(snap), history: MXAC.historyAt(B.hist.rows, c.t) }).decision;
         await api.post(K.attemptBody(c, e.id, 'blind', d, B.lessons, hash, f, null)); d = null;   // stored hidden; this page keeps no copy
-        K.decided(c.id); B.pool.seen = B.pool.seen || {}; B.pool.seen[c.id] = { mode: 'blind', attempts: ((seen && seen.attempts) || 0) + 1 };
+        K.decided(c.id, B.pool, 'blind');
       }
       st.state.textContent = 'paused on a setup: your answer first'; clear(info);
       info.appendChild(el('h2', { class: 'c-h' }, 'Setup', el('small', { text: `${B.i + 1} of ${B.queue.length} in this round · ${e.name}` })));
@@ -819,13 +850,25 @@
       info.appendChild(el('p', { class: 'honest', id: 'bl-hidden', text: 'The engine has answered and its answer is stored. It stays hidden until yours is stored.' }));
       if (recall) info.appendChild(el('p', { class: 'ac-warn', id: 'bl-recall', text: 'This setup was decided before in training, so the engine\'s answer here is recall, not a fresh decision.' }));
       answer.appendChild(el('h2', { class: 'c-h' }, 'Your answer', el('small', { text: 'before you see the engine\'s' })));
-      answerForm(answer, { idp: 'bl', actions: [['BUY', 'BUY'], ['SELL', 'SELL'], ['WAIT', 'WAIT']], levels: (v) => MXAC.mentorLevelsOf(c, v), needText: true, submitLabel: 'Store my answer and show the engine\'s', placeholder: 'Why this answer?', done: 'Your answer is stored ✓',
+      answer.appendChild(el('p', { class: 'ac-warn', id: 'bl-leave', role: 'status', hidden: true }));
+      B.form = answerForm(answer, { idp: 'bl', actions: [['BUY', 'BUY'], ['SELL', 'SELL'], ['WAIT', 'WAIT']], levels: (v) => MXAC.mentorLevelsOf(c, v), needText: true, submitLabel: 'Store my answer and show the engine\'s', placeholder: 'Why this answer?', done: 'Your answer is stored ✓',
         submit: async (a) => {
-          const res = await api.post({ action: 'blind.submit', blind: { edge: e.id, candidateId: c.id, action: a.action, entry: a.entry, stop: a.stop, target: a.target, text: a.text } }); B.done.add(c.id);
+          let res; try { res = await api.post({ action: 'blind.submit', blind: { edge: e.id, candidateId: c.id, action: a.action, entry: a.entry, stop: a.stop, target: a.target, text: a.text } }); }
+          catch (e2) { if (e2.status !== 409) throw e2; B.done.add(c.id); await already(c); return 'Not stored again: this setup already had your answer.'; }   // a setup is answered once: the server refused a second answer
+          B.done.add(c.id); { const w = $('bl-leave'); if (w) w.hidden = true; }
           let out = null, outErr = null; try { out = (await api.get({ get: 'outcome', id: c.id, edge: e.id })).outcome; } catch (e2) { outErr = e2.message; }   // allowed now: both answers are stored
           const row = Object.assign({}, res.blind, { t: c.t, side: c.side, engine: lite(res.engine), recall, outcome: out, rMentor: gradeLite(res.blind.mentor, c.side, out), rEngine: gradeLite(res.engine, c.side, out) });
           B.rows.unshift(row); try { showBoth(c, row, res.engine, out, outErr, recall); drawTable(); } catch (e2) { reveal.hidden = false; reveal.appendChild(errBox('The comparison', e2)); }
         } });
+    }
+    // The server refused a second answer for this setup (it was answered in another window, or before a reload): the stored
+    // answer stands. The table is read again (one call) and the round goes on.
+    async function already(c) {
+      try { B.rows = (await api.get({ get: 'blind', edge: B.edge.id })).blind || []; B.done = new Set(B.rows.map((r) => r.candidateId).concat([c.id])); drawTable(); } catch (e2) { /* the table keeps what it had */ }
+      reveal.hidden = false; clear(reveal); st.state.textContent = 'already answered';
+      reveal.appendChild(el('h2', { class: 'c-h' }, 'Already answered', el('small', { text: `${c.side} setup · ${fmtTime(c.t)}` })));
+      reveal.appendChild(el('p', { class: 'ac-warn', id: 'bl-already', text: 'This setup already has a blind answer of yours, given in another window or before a reload. A setup is answered once, so the first answer stands and nothing was stored twice. It is in the table below.' }));
+      reveal.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'bl-next', text: B.i + 1 < B.queue.length ? 'Next setup' : 'Finish the round', onclick: () => { B.i++; next(); } })));
     }
     function showBoth(c, row, eng, out, outErr, recall) {
       const m = row.mentor, who = closer(row.rMentor, row.rEngine), r = (label, a, b) => el('tr', {}, el('td', { text: label }), el('td', {}, a), el('td', {}, b)), R = (v, d) => (fin(v) ? fmtR(v) : d && isTake(d.action) ? 'not graded (the other side than the setup)' : 'not graded');
@@ -847,9 +890,9 @@
       reveal.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'bl-next', text: more ? 'Next setup' : 'Finish the round', onclick: () => { B.i++; next(); } })));
       reveal.scrollIntoView({ block: 'nearest' });
     }
-    sec.appendChild(el('div', { class: 'card', id: 'bl-setup' }, el('h2', { class: 'c-h' }, 'Blind arena', el('small', { text: 'you answer first, then the engine\'s answer is shown' })),
+    sec.appendChild(el('div', { class: 'card', id: 'bl-setup' }, el('h2', { class: 'c-h' }, 'Blind arena', el('small', { text: 'you answer first, then the engine\'s answer is shown' })), sf.bar,
       el('p', { text: 'On each train-pool setup the engine decides and its answer is stored out of sight. You give BUY, SELL or WAIT with your levels and a reason. Only then are both shown side by side, and the result is read last.' }),
-      edgeBar(ctx, 'bl', () => { if (B.clock) B.clock.pause(); live.hidden = true; prepare(true); }, null, { get: () => myEdge, set: (v) => { myEdge = v; } }), el('div', { class: 'f-grid' }, from, to), note, err, el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'bl-start', text: 'Start a round', onclick: start }), msg)));
+      edgeBar(ctx, 'bl', () => { if (B.clock) B.clock.pause(); live.hidden = true; sf.fold(false); B.form = null; msg.textContent = ''; prepare(true); }, null, { get: () => myEdge, set: (v) => { myEdge = v; }, leave }), el('div', { class: 'f-grid' }, from, to), note, err, el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'bl-start', text: 'Start a round', onclick: start }), msg)));
     live.appendChild(el('div', { class: 'ac-grid' }, el('div', { class: 'ac-chart-col2' }, st.node), el('div', { class: 'ac-side' }, info, answer, reveal)));
     sec.appendChild(live); sec.appendChild(tableBox); prepare(false);
   }
@@ -858,10 +901,16 @@
   // ---- Session training and missed opportunities ---------------------------------------------------------------------------------
   // A whole day or range of one edge replayed at speed. The clock stops on every train setup (the decision is stored at once,
   // as in Train) and the mentor may stop anywhere to note "the engine should have acted here" or "the engine was right to wait".
+  // A reload keeps the place (as in Train): the position is saved with every decision (the first decision of a sitting saves
+  // the session before its attempt, for the session id, and that save carries the setup; every later one saves after its
+  // attempt: two calls a decision). The sitting saved last and not ended is offered at the top ("Pick up where you left off"),
+  // and a sitting saved on a setup comes back on it with its stored decision and verdict (two reads, on resume only).
+  // Leaving a half-written verdict or note (Continue, Step, End, another start or edge) asks first: K.leaveGuard.
   let SS = null;
   function sessionTab(sec, ctx) {
-    if (SS && SS.sec === sec && sec.firstChild) return;   // a running session is kept when the tab is shown again
-    const Z = (SS = { sec, events: [], done: new Set(), sessionId: null, clock: null, cur: null, busy: false, pending: null, fromT: 0, since: 0, ended: false }); clear(sec);
+    const want = MXAC.sessionResume || null; MXAC.sessionResume = null;   // asked for from "Pick up where you left off" on the Train tab
+    if (SS && SS.sec === sec && sec.firstChild) { if (want && SS.resume) SS.resume(want); return; }   // a running session is kept when the tab is shown again
+    const Z = (SS = { sec, events: [], done: new Set(), sessionId: null, clock: null, cur: null, busy: false, pending: null, fromT: 0, since: 0, ended: false, vForm: null, nForm: null }); clear(sec);
     const note = el('p', { class: 'note', id: 'ss-count', role: 'status' }), msg = el('span', { class: 'ac-status', id: 'ss-msg', role: 'status' }), err = el('p', { class: 'ac-err', id: 'ss-setup-err', role: 'alert', hidden: true }), runMsg = el('p', { class: 'ac-status', id: 'ss-run-msg', role: 'status', 'aria-live': 'polite' });
     const st = stage('ss', 'Session chart: candles closed at the replay time'), live = el('div', { id: 'ss-live', hidden: true });
     const thesisBox = el('div', { class: 'card', id: 'ss-thesis' }), sumBox = el('div', { class: 'card', id: 'ss-summary' }), pointBox = el('div', { class: 'card', id: 'ss-point', hidden: true }), noteBox = el('div', { class: 'card', id: 'ss-note', hidden: true }), notesBox = el('div', { class: 'card', id: 'ss-notes' }), savedList = el('ul', { class: 'plain-list', id: 'ss-saved' });
@@ -872,8 +921,14 @@
     const inRange = () => { const r = rangeOf(fromEl, toEl); return !r || !pool ? [] : (pool.candidates || []).filter((c) => c.t >= r.from && c.t < r.to); };
     const count = () => { const r = rangeOf(fromEl, toEl); note.textContent = !r ? 'Pick a start and an end date (the end on or after the start).' : `${plural(inRange().length, 'train setup')} in this range: the clock stops on each one.`; };
     const btn = (id, text, onclick, cls) => el('button', { type: 'button', class: 'btn' + (cls ? ' ' + cls : ''), id, text, onclick });
-    const bPlay = btn('ss-play', 'Play', () => playPause(), 'primary'), bStep = btn('ss-step', 'Step one candle', () => { if (canMove()) { leavePoint(); Z.clock.step(1); } }), bMiss = btn('ss-missed', 'The engine should have acted here', () => openNote('missed')), bRight = btn('ss-right', 'The engine was right to wait', () => openNote('right-wait')), bSave = btn('ss-save', 'Save session', () => save(false).catch((e2) => { runMsg.textContent = 'The session was not saved: ' + e2.message + '.'; })), bEnd = btn('ss-end', 'End session', () => endSession());
+    const bPlay = btn('ss-play', 'Play', () => playPause(), 'primary'), bStep = btn('ss-step', 'Step one candle', () => { if (canMove() && leave()) { leavePoint(); Z.clock.step(1); } }), bMiss = btn('ss-missed', 'The engine should have acted here', () => openNote('missed')), bRight = btn('ss-right', 'The engine was right to wait', () => openNote('right-wait')), bSave = btn('ss-save', 'Save session', () => save(false).catch((e2) => { runMsg.textContent = 'The session was not saved: ' + e2.message + '.'; })), bEnd = btn('ss-end', 'End session', () => endSession());
     const canMove = () => !!Z.clock && !Z.busy && !Z.ended;
+    const unsaved = () => !live.hidden && !Z.ended && !!((Z.vForm && Z.vForm.unsaved()) || (Z.nForm && Z.nForm.unsaved()));
+    const leave = K.leaveGuard({ unsaved, tell: () => { const t = `Your ${Z.vForm && Z.vForm.unsaved() ? 'verdict' : 'note'} is not saved yet. Save it to keep it, or press again to leave without it.`; runMsg.textContent = t; const w = $('ss-continue-msg'); if (w) w.textContent = t; } });
+    K.watchUnsaved(() => SS === Z && unsaved());
+    const resumeBox = el('div', { class: 'resume-now', id: 'ss-resume-now', hidden: true }), sf = setupFold(() => $('ss-setup'), 'ss');
+    // the way from the controls to the decision card (on a phone it is more than a screen below the chart)
+    const pointGo = el('button', { type: 'button', class: 'btn primary', id: 'ss-point-go', hidden: true, text: 'See the decision', onclick: () => { pointBox.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' }); } });
     const decide = (snap) => K.decideOn(snap, { setup: setupOf(Z.edge), account: Z.account, lessons: Z.lessons, thesis: Z.thesis, history: snap.cand ? MXAC.historyAt(Z.hist.rows, snap.t) : [] });
 
     function draw() {
@@ -907,12 +962,12 @@
         if (Z.since >= MXAC.THESIS_EVERY) { Z.since = 0; try { const snap = K.snapOf(Z.edge, Z.series, Z.dataVersion, t, null); Z.thesis = MXA.thesis.update(Z.thesis, snap, decide(snap).decision); drawThesis(); } catch (e2) { runMsg.textContent = 'The thesis could not be updated here: ' + e2.message + '.'; } }
       }
     }
-    function leavePoint() { if (Z.cur) { Z.cur = null; pointBox.hidden = true; clear(pointBox); st.levels(null); } noteBox.hidden = true; clear(noteBox); }
-    function playPause() { if (!canMove()) return; const cs = Z.clock.state(); if (cs.playing) { Z.clock.pause(); draw(); return; } leavePoint(); runMsg.textContent = ''; Z.clock.play(); draw(); }
-    async function save(quiet, status) {
+    function leavePoint() { if (Z.cur) { Z.cur = null; pointBox.hidden = true; clear(pointBox); st.levels(null); } noteBox.hidden = true; clear(noteBox); pointGo.hidden = true; Z.vForm = null; Z.nForm = null; leave.reset(); }
+    function playPause() { if (!canMove()) return; const cs = Z.clock.state(); if (cs.playing) { Z.clock.pause(); draw(); return; } if (!leave()) return; const was = !!Z.cur; leavePoint(); runMsg.textContent = ''; Z.clock.play(); draw(); if (was && K.showNode) K.showNode(st.node); }   // "Continue" is pressed far below the chart on a phone: bring it back
+    async function save(quiet, status, curId) {   // curId: the setup the clock is on when its decision is not stored yet (the first save of a sitting)
       const cs = Z.clock.state(), s = sessionSummary(Z.events);
       const replay = MXR.session.save({ id: Z.sessionId, edge: Z.edge.id, market: Z.edge.market, tf: Z.tf, t: cs.t, from: Z.from, to: Z.to, speed: cs.speed, mode: 'train', savedAt: new Date().toISOString() });
-      const session = { edge: Z.edge.id, title: `${Z.edge.name} session · ${isoDay(Z.from)} to ${isoDay(Z.to - DAY)}`, kind: 'session', status: status || (cs.done ? 'done' : 'paused'), t: cs.t, summary: s.text.slice(0, 400), state: { replay, events: Z.events.slice(-500), done: Array.from(Z.done), thesis: Z.thesis } };
+      const session = { edge: Z.edge.id, title: `${Z.edge.name} session · ${isoDay(Z.from)} to ${isoDay(Z.to - DAY)}`, kind: 'session', status: status || (cs.done ? 'done' : 'paused'), t: cs.t, summary: s.text.slice(0, 400), state: { replay, events: Z.events.slice(-500), done: Array.from(Z.done), thesis: Z.thesis, cur: Z.cur ? Z.cur.cand.id : curId || null } };
       if (Z.sessionId) session.id = Z.sessionId;
       Z.sessionId = (await api.post({ action: 'session.save', session })).session.id;
       if (!quiet) { runMsg.textContent = `Session saved at ${fmtTime(cs.t)}.`; drawSummary(); listSaved(); }
@@ -929,38 +984,67 @@
         Z.events.push({ kind: active ? 'lesson' : 'draft', t: Z.clock.state().t }); if (active) { K.lessonsChanged(); Z.lessons = await K.lessonsFor(Z.edge.id, true); } drawSummary(); b.hidden = true;
       }, active ? 'Lesson saved ✓. Edit or revise it in the Lessons tab.' : 'Draft saved ✓, switched off. It is in the Lessons tab.') }), m2));
     }
+    // the decision card of the setup the clock is on. o = { c, d, f, risk, hash, n, again, row, ev, correction (a stored verdict, on resume), draft }
+    function showCard(o) {
+      const c = o.c, d = o.d, k = o.correction || null; st.levels(c); pointBox.hidden = false; clear(pointBox);
+      pointBox.appendChild(el('h2', { class: 'c-h' }, 'Decision', el('small', { text: `${c.side} setup · ${fmtTime(c.t)}` })));
+      pointBox.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, 'ss-dec-action'), el('span', { class: 'pill' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })), el('span', { class: 'ac-ok', id: 'ss-dec-stored', text: `Attempt ${o.n} stored ✓` })));
+      pointBox.appendChild(el('p', { class: 'dec-thesis', text: MXAC.humanize(d.thesis, Z.lessons) }));
+      if (o.again) pointBox.appendChild(el('p', { class: 'note', text: 'This setup was decided in an earlier sitting: this answer is stored as a same-trade replay (recall).' }));
+      const full = el('div', {}); K.decisionView(full, { idp: 'ss-full', edge: Z.edge, cand: c, d: Object.assign({ t: c.t }, d), risk: o.risk, hash: o.hash, lessons: Z.lessons, title: 'In full' });
+      pointBox.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Evidence, risk, similar cases and lessons' }), full));
+      pointBox.appendChild(el('h3', { text: 'Your verdict' })); const vBox = el('div', {}), lBox = el('div', { id: 'ss-lesson' }); pointBox.appendChild(vBox); pointBox.appendChild(lBox);
+      if (k) {   // resumed on a setup whose verdict is already stored: it is shown, not asked for again
+        vBox.appendChild(el('p', { class: 'ac-ok', id: 'ss-v-stored', text: `Your verdict is stored ✓: ${k.verdict === 'approve' ? 'you approved it' : 'it should have been ' + (k.action || 'something else')}.` }));
+        if (o.draft) offerLesson(lBox, o.draft, true, null);
+      } else Z.vForm = answerForm(vBox, { idp: 'ss-v', label: 'Your verdict', actions: [['approve', 'Approve']].concat(['BUY', 'SELL', 'WAIT'].filter((a) => a !== d.action).map((a) => [a, 'Should be ' + a])), levels: (v) => MXAC.mentorLevelsOf(c, v), needText: (v) => v !== 'approve', submitLabel: 'Save verdict', textLabel: 'Why', placeholder: 'What should it have seen?', done: 'Verdict stored ✓',
+        submit: async (a) => {
+          const ok = a.action === 'approve', corr = { attemptId: o.row.id, verdict: ok ? 'approve' : 'change', action: ok ? null : a.action, entry: ok ? null : a.entry, stop: ok ? null : a.stop, target: ok ? null : a.target, bias: null, edge: null, reasons: [], text: a.text, annotations: [] };
+          const saved = (await api.post({ action: 'correct', edge: Z.edge.id, correction: Object.assign({}, corr, { errorClass: MXA.classifyError(d, corr, null) }) })).correction; o.ev.verdict = saved.verdict; o.ev.want = saved.action; drawSummary();
+          { const w = $('ss-continue-msg'); if (w) w.textContent = ''; }
+          if (!ok) offerLesson(lBox, MXA.lessons.fromCorrection(d, Object.assign({}, saved, { sessionId: Z.sessionId }), o.f), true, null);
+        } });
+      pointBox.appendChild(el('div', { class: 'f-actions' }, btn('ss-continue', 'Continue the session', () => playPause(), 'primary'), el('span', { class: 'ac-status', id: 'ss-continue-msg', role: 'status' })));
+      pointGo.hidden = false; drawSummary();
+    }
     async function openPoint(c) {
       Z.busy = true; Z.done.add(c.id); leavePoint(); draw(); runMsg.textContent = `Setup at ${fmtTime(c.t)}: deciding…`;
       try {
         Z.lessons = await K.lessonsFor(Z.edge.id);   // cached: read again only after a lesson changed
         const snap = K.snapOf(Z.edge, Z.series, Z.dataVersion, c.t, c), f = MXA.features(snap), hash = MXR.hash(snap), r = decide(snap), d = r.decision;
-        Z.thesis = MXA.thesis.update(Z.thesis, snap, d); drawThesis(); if (!Z.sessionId) await save(true);
-        const again = K.seenBefore(Z.pool, c.id), res = await api.post(K.attemptBody(c, Z.edge.id, again ? 'replay-same' : 'train', d, Z.lessons, hash, f, Z.sessionId)); K.decided(c.id);
+        Z.thesis = MXA.thesis.update(Z.thesis, snap, d); drawThesis(); const firstSave = !Z.sessionId; if (firstSave) await save(true, null, c.id);
+        const again = K.seenBefore(Z.pool, c.id), res = await api.post(K.attemptBody(c, Z.edge.id, again ? 'replay-same' : 'train', d, Z.lessons, hash, f, Z.sessionId)); K.decided(c.id, Z.pool, again ? 'replay-same' : 'train');
         const ev = { kind: 'decision', t: c.t, candidateId: c.id, action: d.action, verdict: null }; Z.events.push(ev);
-        Z.cur = { cand: c, d, f, row: res.attempt, ev }; st.levels(c); pointBox.hidden = false; clear(pointBox);
-        pointBox.appendChild(el('h2', { class: 'c-h' }, 'Decision', el('small', { text: `${c.side} setup · ${fmtTime(c.t)}` })));
-        pointBox.appendChild(el('div', { class: 'dec-top' }, actBadge(d.action, false, 'ss-dec-action'), el('span', { class: 'pill' }, 'confidence ', el('b', { text: d.confidence || 'n/a' })), el('span', { class: 'ac-ok', id: 'ss-dec-stored', text: `Attempt ${res.n} stored ✓` })));
-        pointBox.appendChild(el('p', { class: 'dec-thesis', text: MXAC.humanize(d.thesis, Z.lessons) }));
-        if (again) pointBox.appendChild(el('p', { class: 'note', text: 'This setup was decided in an earlier sitting: this answer is stored as a same-trade replay (recall).' }));
-        const full = el('div', {}); K.decisionView(full, { idp: 'ss-full', edge: Z.edge, cand: c, d: Object.assign({ t: c.t }, d), risk: r.risk, hash, lessons: Z.lessons, title: 'In full' });
-        pointBox.appendChild(el('details', { class: 'more' }, el('summary', { text: 'Evidence, risk, similar cases and lessons' }), full));
-        pointBox.appendChild(el('h3', { text: 'Your verdict' })); const vBox = el('div', {}), lBox = el('div', { id: 'ss-lesson' }); pointBox.appendChild(vBox); pointBox.appendChild(lBox);
-        answerForm(vBox, { idp: 'ss-v', label: 'Your verdict', actions: [['approve', 'Approve']].concat(['BUY', 'SELL', 'WAIT'].filter((a) => a !== d.action).map((a) => [a, 'Should be ' + a])), levels: (v) => MXAC.mentorLevelsOf(c, v), needText: (v) => v !== 'approve', submitLabel: 'Save verdict', textLabel: 'Why', placeholder: 'What should it have seen?', done: 'Verdict stored ✓',
-          submit: async (a) => {
-            const ok = a.action === 'approve', corr = { attemptId: res.attempt.id, verdict: ok ? 'approve' : 'change', action: ok ? null : a.action, entry: ok ? null : a.entry, stop: ok ? null : a.stop, target: ok ? null : a.target, bias: null, edge: null, reasons: [], text: a.text, annotations: [] };
-            const saved = (await api.post({ action: 'correct', edge: Z.edge.id, correction: Object.assign({}, corr, { errorClass: MXA.classifyError(d, corr, null) }) })).correction; ev.verdict = saved.verdict; ev.want = saved.action; drawSummary();
-            if (!ok) offerLesson(lBox, MXA.lessons.fromCorrection(d, Object.assign({}, saved, { sessionId: Z.sessionId }), f), true, null);
-          } });
-        pointBox.appendChild(el('div', { class: 'f-actions' }, btn('ss-continue', 'Continue the session', () => playPause(), 'primary')));
-        runMsg.textContent = 'Paused on a setup. Give your verdict, or continue.'; drawSummary();
+        Z.cur = { cand: c, d, f, row: res.attempt, ev };
+        let warn = ''; if (!firstSave) { try { await save(true); } catch (e2) { warn = ` The session position was not saved here (${e2.message}): a reload would return to the setup before this one.`; } }   // a failed save never costs the decision
+        showCard({ c, d, f, risk: r.risk, hash, n: res.n, again, row: res.attempt, ev });
+        runMsg.textContent = `Setup reached: the engine says ${d.action} (${d.confidence || 'n/a'} confidence). Give your verdict, or continue.` + warn;
       } catch (e2) {
         Z.done.delete(c.id); pointBox.hidden = false; clear(pointBox).appendChild(el('p', { class: 'ac-err', text: `The setup at ${fmtTime(c.t)} could not be decided or stored: ${e2.message}. Nothing was recorded for it.` }));
         pointBox.appendChild(el('div', { class: 'f-actions' }, btn(null, 'Try again', () => openPoint(c), 'primary'), btn(null, 'Skip this setup', () => { Z.done.add(c.id); pointBox.hidden = true; clear(pointBox); draw(); }))); runMsg.textContent = '';
       } finally { Z.busy = false; draw(); }
     }
+    // A sitting saved while the clock was on a setup: that decision comes back from the stored attempt of this sitting, with
+    // the verdict already stored for it. Nothing is decided again and nothing is written; two reads (three when a disagreeing
+    // verdict is stored: whether its lesson was saved), on resume only. The snapshot is rebuilt at the setup's own time.
+    async function restorePoint(candId) {
+      const c = Z.cands.find((x) => x.id === candId); if (!c) return false;
+      try {
+        const rows = (await api.get({ get: 'attempts', edge: Z.edge.id, cand: c.id })).attempts || [], row = rows.filter((a) => a.sessionId === Z.sessionId && a.decision).pop() || null; if (!row) return false;
+        const snap = K.snapOf(Z.edge, Z.series, Z.dataVersion, c.t, c), f = MXA.features(snap), hash = MXR.hash(snap), d = Object.assign({ side: c.side }, MXAC.restoreApplied(row.decision));
+        const risk = MXK.check({ market: c.market, side: c.side, entry: c.entry, stop: c.stop, target: c.target, t: c.t }, MXK.roll(Z.account, c.t), { riskPct: RISK_PCT });
+        let corr = null, draft = null;
+        try { corr = ((await api.get({ get: 'corrections', edge: Z.edge.id, cand: c.id })).corrections || []).filter((k) => k.attemptId === row.id).pop() || null; } catch (e2) { /* shown as unjudged */ }
+        if (corr && corr.verdict !== 'approve') { try { if (!(await K.savedLessonOf(Z.edge.id, corr.id))) draft = MXA.lessons.fromCorrection(d, Object.assign({}, corr, { sessionId: Z.sessionId }), f); } catch (e2) { /* not known: no draft is offered */ } }
+        let ev = Z.events.find((x) => x.kind === 'decision' && x.candidateId === c.id); if (!ev) { ev = { kind: 'decision', t: c.t, candidateId: c.id, action: d.action, verdict: null }; Z.events.push(ev); }
+        if (corr) { ev.verdict = corr.verdict; ev.want = corr.action; }
+        Z.done.add(c.id); Z.cur = { cand: c, d, f, row, ev }; showCard({ c, d, f, risk, hash, n: row.n, again: row.mode === 'replay-same', row, ev, correction: corr, draft });
+        return true;
+      } catch (e2) { runMsg.textContent = `The decision of the setup at ${fmtTime(c.t)} could not be shown again: ${e2.message}.`; return false; }
+    }
     // a note at the replay time, between setups: the engine's own read of that moment is stored beside the mentor's
     async function openNote(kind) {
-      if (!canMove() || Z.cur || Z.clock.state().playing) return; const t = Z.clock.state().t; noteBox.hidden = false; clear(noteBox);
+      if (!canMove() || Z.cur || Z.clock.state().playing || !leave()) return; Z.nForm = null; const t = Z.clock.state().t; noteBox.hidden = false; clear(noteBox);
       let snap, f, hash, d, cm;
       try { snap = K.snapOf(Z.edge, Z.series, Z.dataVersion, t, null); f = MXA.features(snap); hash = MXR.hash(snap); d = decide(snap).decision; cm = MXA.classifyMiss(d, null, f); }
       catch (e2) { noteBox.appendChild(el('p', { class: 'ac-err', text: 'This moment could not be read: ' + e2.message + '.' })); return; }
@@ -974,7 +1058,7 @@
       const bars = MXR.closedAt(Z.series[Z.tf], Z.tf, t), lastClose = bars.length ? bars[bars.length - 1].close : null, lBox = el('div', {});
       noteBox.appendChild(el('h2', { class: 'c-h' }, 'Missed opportunity', el('small', { text: fmtTime(t) })));
       noteBox.appendChild(el('p', { id: 'ss-engine-read', text: `No setup of ${Z.edge.name} was on the table at this moment, and the engine said ${d.action}. Its own read: ${cm.why || 'no reason recorded'}.` }));
-      answerForm(noteBox, { idp: 'ss-m', label: 'What it should have done', actions: [['BUY', 'It should have bought'], ['SELL', 'It should have sold']], levels: () => ({ entry: lastClose, stop: null, target: null }), needText: true, submitLabel: 'Store the note', textLabel: 'Why here', placeholder: 'What made this a trade?', done: 'Note stored ✓',
+      Z.nForm = answerForm(noteBox, { idp: 'ss-m', label: 'What it should have done', actions: [['BUY', 'It should have bought'], ['SELL', 'It should have sold']], levels: () => ({ entry: lastClose, stop: null, target: null }), needText: true, submitLabel: 'Store the note', textLabel: 'Why here', placeholder: 'What made this a trade?', done: 'Note stored ✓',
         submit: async (a) => {
           const m = await send({ kind: 'missed', action: a.action, entry: a.entry, stop: a.stop, target: a.target, text: a.text }); Z.events.push({ kind: 'missed', t, action: m.action, entry: m.entry, stop: m.stop, text: m.text }); drawSummary();
           offerLesson(lBox, MXA.lessons.fromCorrection(d, { verdict: 'change', action: a.action, entry: a.entry, stop: a.stop, target: a.target, reasons: [], text: a.text, sessionId: Z.sessionId }, f), false, 'A lesson only acts when the edge itself produces a setup: it cannot make a trade where the edge was silent. So this one is saved switched off, for you to judge in the Lessons tab.');
@@ -982,23 +1066,31 @@
       noteBox.appendChild(lBox); noteBox.scrollIntoView({ block: 'nearest' });
     }
     async function endSession() {
-      if (!Z.clock || Z.ended) return; if (Z.clock.state().playing) Z.clock.pause(); leavePoint(); Z.ended = true; draw();
+      if (!Z.clock || Z.ended || !leave()) return; if (Z.clock.state().playing) Z.clock.pause(); leavePoint(); Z.ended = true; draw();
       try { await save(true, 'done'); runMsg.textContent = 'Session ended and saved. Its summary is below; start another above.'; } catch (e2) { runMsg.textContent = 'The session ended but was not saved: ' + e2.message + '.'; }
       drawSummary(); listSaved(); sumBox.scrollIntoView({ block: 'nearest' });
     }
     async function listSaved() {
       try {
-        const rows = ((await api.get({ get: 'sessions' })).sessions || []).filter((s) => s.kind === 'session').slice(0, 12);
+        const rows = MXAC.latestFirst(((await api.get({ get: 'sessions' })).sessions || []).filter((s) => s.kind === 'session')).slice(0, 12);   // the one saved last first
+        offerResume(Z.clock ? null : MXAC.unfinished(rows, 'session'));
         listOr(savedList, rows, 'No saved session yet. A session is saved when the clock first stops on a setup, and when you press "Save session".', (s) => el('li', { 'data-session': s.id }, el('div', {}, el('b', { text: s.title || s.edge }), ' ', tag(s.status === 'done' ? 'ended' : 'paused', s.status === 'done' ? 'off' : 'ok'), el('br'), el('small', { text: (s.summary || '') + ' · saved ' + fmtStamp(s.updatedAt) })),
           s.status === 'done' ? null : el('button', { type: 'button', class: 'btn sm', text: 'Resume', onclick: () => resume(s.id) })));
       } catch (e2) { listOr(savedList, [], 'The saved sessions could not be read: ' + e2.message + '.', () => null); }
     }
+    // "Pick up where you left off": the sitting saved last and not ended, from the list this tab already reads (no call of its own)
+    let resumeNo = false;
+    function offerResume(s) {
+      clear(resumeBox); if (!s || resumeNo) { resumeBox.hidden = true; return; } resumeBox.hidden = false;
+      resumeBox.appendChild(el('div', { class: 'resume-t' }, el('b', { text: 'Pick up where you left off' }), el('span', { id: 'ss-resume-text', text: `${s.title || s.edge} · ${fin(s.t) ? 'paused at ' + fmtTime(s.t) : 'a saved session'} · saved ${fmtStamp(s.updatedAt)}` })));
+      resumeBox.appendChild(el('div', { class: 'resume-go' }, btn('ss-resume-go', 'Resume', () => { resumeBox.hidden = true; resume(s.id); }, 'primary'), btn('ss-resume-no', 'Not now', () => { resumeNo = true; resumeBox.hidden = true; })));
+    }
     async function resume(id) {
-      err.hidden = true;
+      err.hidden = true; if (Z.busy || (Z.clock && !leave())) return; resumeBox.hidden = true;
       try {
         const s = (await api.get({ get: 'session', id })).session, st0 = s.state || {}, rp = MXR.session.restore(st0.replay); if (!edgeDef(ctx, rp.edge)) throw new Error('its edge is no longer in the registry');
         myEdge = rp.edge; const sel = $('ss-edge'); if (sel) sel.value = rp.edge; await prepare(false); fromEl.value = isoDay(rp.from); toEl.value = isoDay(rp.to - DAY); tfSel.value = rp.tf; spSel.value = String([10, 50, 100].indexOf(rp.speed) >= 0 ? rp.speed : 50); count();
-        await start({ id: s.id, t: rp.t, events: st0.events || [], done: st0.done || [], thesis: st0.thesis || null });
+        await start({ id: s.id, t: rp.t, events: st0.events || [], done: st0.done || [], thesis: st0.thesis || null, cur: st0.cur || null }, true);
       } catch (e2) { err.hidden = false; err.textContent = 'That session could not be resumed: ' + e2.message + '.'; }
     }
     async function prepare(reset) {
@@ -1009,8 +1101,8 @@
         tfSel.value = MXAC.chartTfOf(e); count();
       } catch (e2) { note.textContent = 'The setups could not be read: ' + e2.message + '.'; }
     }
-    async function start(res) {
-      const e = edge(), r = rangeOf(fromEl, toEl); err.hidden = true; if (Z.busy || !e) return; if (!r) { count(); return; }
+    async function start(res, sure) {   // sure: the caller has already asked about a half-written answer
+      const e = edge(), r = rangeOf(fromEl, toEl); err.hidden = true; if (Z.busy || !e) return; if (!sure && Z.clock && !leave()) return; if (!r) { count(); return; }
       Z.busy = true; $('ss-start').disabled = true;
       try {
         if (Z.clock) Z.clock.pause(); const tf = tfSel.value, speed = +spSel.value; msg.textContent = 'Loading candles…';
@@ -1023,17 +1115,18 @@
         Z.clock = MXR.clock({ from: r.from, to: r.to, stepSec: tf, speed, t: t0, onTick, onBatch, onDone: () => { runMsg.textContent = 'The replay reached the end of the range. End the session to save its summary.'; draw(); } });
         Z.thesis = res && res.thesis ? res.thesis : MXA.thesis.start(K.snapOf(e, got.series, got.dataVersion, t0, null));
         live.hidden = false; leavePoint(); st.meta.textContent = `Candles: ${got.dataVersion}. ${plural(Z.cands.length, 'train setup')} in range.`; st.chart().fit(); st.levels(null); msg.textContent = ''; runMsg.textContent = res ? `Session resumed at ${fmtTime(t0)}.` : 'Press Play. The clock stops on every setup; pause anywhere to leave a note.';
-        draw(); drawThesis(); drawSummary(); live.scrollIntoView({ block: 'start' });
+        resumeBox.hidden = true; sf.fold(true, `${e.name} · ${isoDay(r.from)} to ${isoDay(r.to - DAY)} · ${tf} · ${plural(Z.cands.length, 'setup')}`); draw(); drawThesis(); drawSummary(); live.scrollIntoView({ block: 'start' });
+        if (res && res.cur && await restorePoint(res.cur)) runMsg.textContent = `Session resumed on the setup at ${fmtTime(t0)}: ${Z.cur.ev.verdict ? 'your verdict is stored, continue when you are ready' : 'give your verdict, or continue'}.`;
       } catch (e2) { err.hidden = false; err.textContent = e2 && e2.code ? MXAC.candleError(e2) : 'The session could not start: ' + ((e2 && e2.message) || e2) + '.'; msg.textContent = ''; }
       finally { Z.busy = false; $('ss-start').disabled = false; draw(); }
     }
     const speeds = el('span', { class: 'seg inline', role: 'group', 'aria-label': 'Speed' }, [10, 50, 100].map((x) => el('button', { type: 'button', class: 'btn sm', 'data-speed': x, text: x + '×', onclick: () => { if (Z.clock) { Z.clock.setSpeed(x); draw(); } } })));
-    sec.appendChild(el('div', { class: 'card', id: 'ss-setup' }, el('h2', { class: 'c-h' }, 'Session training', el('small', { text: 'a whole day or range of one edge, with your notes on what it missed' })),
+    sec.appendChild(el('div', { class: 'card', id: 'ss-setup' }, resumeBox, el('h2', { class: 'c-h' }, 'Session training', el('small', { text: 'a whole day or range of one edge, with your notes on what it missed' })), sf.bar,
       el('p', { text: 'The replay runs through the range with the running thesis. It stops on every train-pool setup, where the decision is stored and you give a verdict. Pause anywhere else to note a missed opportunity or a right wait. No paper account runs here: the Train tab has it.' }),
-      edgeBar(ctx, 'ss', () => { if (Z.clock) Z.clock.pause(); live.hidden = true; prepare(true); }, null, { get: () => myEdge, set: (v) => { myEdge = v; } }), el('div', { class: 'f-grid' }, from, to, el('label', { class: 'f' }, el('span', { text: 'Chart timeframe' }), tfSel), el('label', { class: 'f' }, el('span', { text: 'Speed' }), spSel)), note, err,
+      edgeBar(ctx, 'ss', () => { if (Z.clock) Z.clock.pause(); live.hidden = true; sf.fold(false); Z.vForm = null; Z.nForm = null; prepare(true); }, null, { get: () => myEdge, set: (v) => { myEdge = v; }, leave }), el('div', { class: 'f-grid' }, from, to, el('label', { class: 'f' }, el('span', { text: 'Chart timeframe' }), tfSel), el('label', { class: 'f' }, el('span', { text: 'Speed' }), spSel)), note, err,
       el('div', { class: 'f-actions' }, btn('ss-start', 'Start the session', () => start(null), 'primary'), msg), el('div', { class: 'sub' }, el('h3', { text: 'Saved sessions' }), savedList)));
-    live.appendChild(el('div', { class: 'ac-grid' }, el('div', { class: 'ac-chart-col2' }, st.node, el('div', { class: 'card' }, el('div', { class: 'ctl', role: 'group', 'aria-label': 'Session controls' }, bPlay, bStep, speeds, bSave, bEnd), el('div', { class: 'ctl', role: 'group', 'aria-label': 'Notes' }, bMiss, bRight), runMsg), notesBox), el('div', { class: 'ac-side' }, sumBox, thesisBox, pointBox, noteBox)));
-    sec.appendChild(live); prepare(false); listSaved();
+    live.appendChild(el('div', { class: 'ac-grid' }, el('div', { class: 'ac-chart-col2' }, st.node, el('div', { class: 'card' }, runMsg, pointGo, el('div', { class: 'ctl', role: 'group', 'aria-label': 'Session controls' }, bPlay, bStep, speeds, bSave, bEnd), el('div', { class: 'ctl', role: 'group', 'aria-label': 'Notes' }, bMiss, bRight)), notesBox), el('div', { class: 'ac-side' }, pointBox, noteBox, sumBox, thesisBox)));
+    sec.appendChild(live); Z.resume = resume; listSaved(); if (want) resume(want); else prepare(false);
   }
   MXAC.registerTab('session', { title: 'Session', render: sessionTab });
 
