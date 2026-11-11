@@ -6217,7 +6217,8 @@
     "t1": 4146.92,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4045.84,
@@ -6232,7 +6233,8 @@
     "lagSec": 113,
     "positionId": "48261841",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T14:33:43.000Z"
    },
    "btc-intraday-1794363757": {
     "symbol": "BTCUSD",
@@ -7638,6 +7640,62 @@
     "positionId": "48445193",
     "volume": 100000,
     "status": "open"
+   },
+   "gbpusd-scalp-1794407562": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T14:33:43.000Z",
+    "councilEntry": 1.32692,
+    "stop": 1.32768,
+    "t1": 1.3254000000000004,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.32692,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.98,
+    "margin": 5.31,
+    "shadow": true,
+    "fillPrice": 1.32694,
+    "slipR": -0.026,
+    "lagSec": 61,
+    "positionId": "48447467",
+    "volume": 200000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-11T14:33:43.000Z",
+    "brokerStop": 1.32768
+   },
+   "usdchf-scalp-1794407562": {
+    "symbol": "USDCHF",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-11T14:33:43.000Z",
+    "councilEntry": 0.83284,
+    "stop": 0.8323400000000001,
+    "t1": 0.8338399999999999,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.83284,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.98,
+    "margin": 6,
+    "shadow": true,
+    "fillPrice": 0.83279,
+    "slipR": -0.1,
+    "lagSec": 61,
+    "positionId": "48447470",
+    "volume": 300000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-11T14:33:43.000Z",
+    "brokerStop": 0.83234
    }
   },
   "day": {
@@ -7645,7 +7703,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9915.72 · 23 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9894.69 · 24 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -7697,35 +7755,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9915.72,
-  "lastRun": "2026-11-11T14:30:39.000Z"
+  "balance": 9894.69,
+  "lastRun": "2026-11-11T14:33:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T14:12:47.000Z",
-   "msg": "limit filled: GBPUSD position 48074794 at the broker",
-   "trade": "gbpusd-scalp-1794319591"
-  },
-  {
-   "at": "2026-11-10T14:12:47.000Z",
-   "msg": "moved XAUUSD 47972669 protection: stop 4148.344 -> 4148.569, target 4036.355 -> 4036.58 (council rintra)",
-   "trade": "xau-rintra-1794301325"
-  },
-  {
-   "at": "2026-11-10T14:21:58.000Z",
-   "msg": "opened sell USDCHF 0.02 lot (council rscalp)",
-   "trade": "usdchf-rscalp-1794320449"
-  },
-  {
-   "at": "2026-11-10T14:24:47.000Z",
-   "msg": "opened sell USDCAD 0.01 lot (council rscalp)",
-   "trade": "usdcad-rscalp-1794320622"
-  },
-  {
-   "at": "2026-11-10T14:34:16.000Z",
-   "msg": "USDCHF position 48082405 closed at the broker",
-   "trade": "usdchf-rscalp-1794320449"
-  },
   {
    "at": "2026-11-10T14:37:21.000Z",
    "msg": "opened sell ETHUSD 0.02 lot (council swing)",
@@ -9200,6 +9233,31 @@
    "at": "2026-11-11T14:28:47.000Z",
    "msg": "limit filled: USDCAD position 48445193 at the broker",
    "trade": "usdcad-scalp-1794407102"
+  },
+  {
+   "at": "2026-11-11T14:33:43.000Z",
+   "msg": "XAUUSD position 48261841 closed at the broker",
+   "trade": "xau-intraday-1794361153"
+  },
+  {
+   "at": "2026-11-11T14:33:43.000Z",
+   "msg": "placed sell limit GBPUSD 0.02 lot at 1.32692 (council scalp, valid to 2026-11-11T17:32Z)",
+   "trade": "gbpusd-scalp-1794407562"
+  },
+  {
+   "at": "2026-11-11T14:33:43.000Z",
+   "msg": "placed buy limit USDCHF 0.03 lot at 0.83284 (council scalp, valid to 2026-11-11T17:32Z)",
+   "trade": "usdchf-scalp-1794407562"
+  },
+  {
+   "at": "2026-11-11T14:33:43.000Z",
+   "msg": "limit filled at once: GBPUSD position 48447467 at the broker at 1.32694",
+   "trade": "gbpusd-scalp-1794407562"
+  },
+  {
+   "at": "2026-11-11T14:33:43.000Z",
+   "msg": "limit filled at once: USDCHF position 48447470 at the broker at 0.83279",
+   "trade": "usdchf-scalp-1794407562"
   }
  ],
  "limits": {
@@ -9278,11 +9336,11 @@
   ]
  },
  "execution": {
-  "n": 258,
+  "n": 260,
   "meanSlipR": -0.005,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161,
+  "medianLagSec": 160,
   "bySymbol": {
    "SOLUSD": {
     "n": 19,
@@ -9301,16 +9359,16 @@
     "meanSlipR": -0.021
    },
    "GBPUSD": {
-    "n": 37,
-    "meanSlipR": 0.015
+    "n": 38,
+    "meanSlipR": 0.014
    },
    "USDCAD": {
     "n": 36,
     "meanSlipR": -0.046
    },
    "USDCHF": {
-    "n": 30,
-    "meanSlipR": 0.074
+    "n": 31,
+    "meanSlipR": 0.068
    },
    "AUDUSD": {
     "n": 37,
