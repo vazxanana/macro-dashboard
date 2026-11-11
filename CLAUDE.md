@@ -2241,6 +2241,41 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
   draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
   decision saves the sitting.
+- **The phone's simple view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone";
+  page markup, CSS, page code, audit and tests only: no decision, lesson, policy or API logic changed, and it adds **no API
+  call**). The site's one convention, as on the Desk, the Macro desk and ChronosTrade, so one choice covers every page: at
+  640 px and under the page head sets `html[data-phone="simple"]` before the first paint unless localStorage `ms-phone` is
+  `full` (no key = simple; the attribute is never set on a wider screen); the switch "Phone view: Simple | Full" (`#pv` at
+  the foot of the page, `setPhoneView`, then the head's `msPhoneSet()`) writes it, and Full is the phone page as it was.
+  **Storage allowlist**: `PREFS` is now `mxacEdge`, `mxacFold`, `ms-phone`, with a third helper `prefDel` (same allowlist)
+  because that key means "simple" by being absent; the pin tests list the three writes and the one removal, and the page
+  head only reads (still never a decision, a draft or an API answer). Every rule is in ONE block at the end of
+  `assets/academy.css`, inside `@media (max-width: 640px)` and under the simple attribute (a test reads every selector), so
+  a wider screen and the full view read none of it. Three inert-elsewhere pieces, all in `assets/academy-ui.js` ("the phone's simple view"):
+  `.pm-host > .pm` + `button.pmore` (parts that wait behind a "more" button: `moreToggle`, `moreBtn`), `.pcard` + `pfold`
+  (a card folds to its heading with a chevron; on `kit.pfold` for the sections; open state kept for the visit in `PF`) and
+  `TAB_MORE` (`#tab-more`). What the simple view shows: before a replay the hero is its title and the setup is the edge
+  cards (name and market), the days with the preview, train / exam, "More options" and a full-width Start ("About this
+  edge" and "Lessons in force and saved sessions" are buttons); during a replay the hero and the long setup card step
+  aside and the screen is the chart, Play / Step / speeds / "More" (Restart, Jump, Save and Resume session, the feed note,
+  the keyboard line and the legend) and the line that says the clock stopped with two full-width buttons; then the
+  decision, the verdict, the lesson, the proof and "What if" come straight after the chart (CSS `order`; the DOM is
+  unchanged) and Paper account, Higher timeframe, Running thesis, Replay log and "Test on new setups" are folded cards.
+  Decision card: levels in one row, "Setup facts and versions" behind a button, the analyst block hidden only while it is
+  switched off (`:has(#an-off)`). Verdict form: answers two by two, entry / stop / target only when the answer is changed
+  to a trade (`:has(input:enabled)`), "Bias, another edge, marks on the chart" behind a button, full-width Save: one
+  screen. Tab bar: Train, Session, Blind arena, Progress, Lessons and "More" (Research, Models, Costs, Audit; it stays
+  open while one of them is on screen). Sections open on their headline card and fold the rest (`PHONE_FOLD` in
+  `assets/academy-tabs.js`: Lessons keeps the list; Progress keeps "Where things stand"; Research keeps the policy table;
+  Models keeps the registry). Measured at 390 x 844: setup 3.2 -> 1.9 screens, a replay 2.9 -> 1.5, stopped on a setup
+  6.7 -> 4.0 (decision card 1,323 -> 992 px, verdict form 985 -> 577 px), Progress 2.9 -> 1.5, Research 4.3 -> 1.9,
+  Models 5.3 -> 1.3. Proof that nothing else moved: the box, font size, colour and display of every drawn element of
+  `<main>` at 1440 px, and at 390 px in the full view, equal the build before (ten page states; the only differences are two
+  new ids, the 76 px switch at the foot of the phone page and replay-clock text). Session and Blind keep their own
+  round-3 layout (only the tab bar and the hero change there). The audit's phone part runs in the simple view (helpers
+  `tabTo`, `unfold`) and adds 12 checks, the full view and the remembered choice among them; its Models check counts buttons
+  other than the fold chevron. Not done: the What-if card is not folded (its body is redrawn by the page code), and an
+  open fold is forgotten on reload on purpose (nothing more goes into storage).
 - **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
   verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
   an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER
