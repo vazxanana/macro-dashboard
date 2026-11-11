@@ -3317,7 +3317,7 @@
     "lots": 0.17,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-11T10:02:02.000Z",
     "councilEntry": 2055.89,
     "stop": 2044.815,
@@ -3330,10 +3330,12 @@
     "slipR": 0.117,
     "lagSec": 72,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T10:02:02.000Z",
-    "brokerStop": 2046.12
+    "brokerStop": 2046.12,
+    "closedAt": "2026-11-11T13:01:19.000Z"
    },
    "usdchf-replica-1794391250-s": {
     "positionId": "48376057",
@@ -3509,7 +3511,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9944.63 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 9942.61 · 10 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3525,8 +3527,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9944.63,
-  "lastRun": "2026-11-11T12:58:35.000Z"
+  "balance": 9942.61,
+  "lastRun": "2026-11-11T13:01:19.000Z"
  },
  "log": [
   {
@@ -4836,6 +4838,11 @@
    "at": "2026-11-11T12:43:08.000Z",
    "msg": "not mirrored xrp-replica-1794400923-b: none of XRPUSD found at the broker",
    "trade": "xrp-replica-1794400923-b"
+  },
+  {
+   "at": "2026-11-11T13:01:19.000Z",
+   "msg": "ETHUSD position 48376026 closed at the broker",
+   "trade": "eth-replica-1794391250-b"
   }
  ],
  "limits": {
