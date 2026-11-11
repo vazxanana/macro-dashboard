@@ -97,9 +97,13 @@ const explicitKey = (name, env) => String(env.MCP_KEYS || '').split(',').some((e
 const IO = { loadUsers: null };   // tests put a fake stored list here
 async function loadUsers(env, host) { if (IO.loadUsers) return IO.loadUsers(env, host); const ct = require('./ctrader-link.js')._t; const r = await ct.blobUsers(env, host); return (r && r.users) || {}; }
 async function granted(name, host, env = process.env) {
-  if (explicitKey(name, env)) return true;   // an explicit key is the owner's grant
+  // The stored list is read first for every key, an explicit one too: ictLevel() takes the member's ICT level from it. An
+  // explicit key used to return before the read, so on a cold instance the first call got the built-in level (Fred: write)
+  // whatever the Users page said (11 Nov 2026).
+  const explicit = explicitKey(name, env);   // an explicit key is the owner's grant, also while the list cannot be read
   let users = GRANT.users;
-  if (!users || Date.now() - GRANT.at > 60e3) { try { users = await loadUsers(env, host); GRANT.users = users; GRANT.at = Date.now(); } catch (e) { if (!GRANT.users) return false; users = GRANT.users; } }   // fails closed: no list read yet, no grant (a built-in member disabled on the Users page stays out)
+  if (!users || Date.now() - GRANT.at > 60e3) { try { users = await loadUsers(env, host); GRANT.users = users; GRANT.at = Date.now(); } catch (e) { if (!GRANT.users) return explicit; users = GRANT.users; } }   // fails closed: no list read yet, no grant (a built-in member disabled on the Users page stays out)
+  if (explicit) return true;
   const u = users[name]; if (u && u.disabled) return false;
   if (u && u.perms && typeof u.perms.mcp === 'boolean') return u.perms.mcp;   // an explicit permission wins over the older flag (as msPerms on the page)
   if (u && u.mcp) return true;

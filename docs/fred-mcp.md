@@ -27,7 +27,8 @@ an admin has to allow developer mode first. Menus change: if yours look differen
 
 **Cursor.** Add this to `~/.cursor/mcp.json`: `{ "mcpServers": { "meridian-ict": { "url": "<your URL>" } } }`
 
-ChatGPT asks you to confirm before any tool that writes (a note, a desk record, a proposal or a comment). That's expected.
+ChatGPT asks you to confirm before any tool that writes (a note, a desk record, a proposal, an applied change or a comment).
+That's expected.
 
 ## 3. The tools
 
@@ -35,7 +36,8 @@ ChatGPT asks you to confirm before any tool that writes (a note, a desk record, 
 |---|---|
 | `ict_guide` | Explains the desk, the model, the rules and the workflow. Start here. |
 | `ict_rules` | The rule book (`.claude/skills/ICT/SKILL.md`) by section, plus the live parameters |
-| `ict_trades`, `ict_trade` | Live and replay signals with stats and filters (market, grade, side, dates, outcome); one trade with every feature |
+| `ict_trades` | Live and replay signals with stats and filters (`source` live / replay / both, market, grade, side, dates, outcome). "Both" never counts a signal twice. |
+| `ict_trade` | One execution by its **exact id**, with every feature (section 3a) |
 | `ict_status` | The tracker now: prices, open paper trades, shadow variants, notes |
 | `ctrader_results` | Demo account results by label (no account numbers) |
 | `ict_bars` | Candles (OANDA) for a market, timeframe and window, up to 1500 |
@@ -46,7 +48,7 @@ ChatGPT asks you to confirm before any tool that writes (a note, a desk record, 
 | `ict_my_proposals`, `ict_proposal_comment` | Your PRs with CI status and the owner's comments; replies on your own PRs |
 | `ict_note` | Saves a note on a trade or for the owner |
 | `ict_desk_update` | Your own desk record for a signal: taken / skipped / missed, your fill, your R, your grade, tags, a note. The desk page shows it. |
-| `ict_apply_change`, `ict_revert_change` | **Off.** Available only after the owner switches apply on (section 6). |
+| `ict_apply_change`, `ict_revert_change` | Apply a change to the ICT edge's own files without the owner's review, and undo one of your own applied changes. **On for Fred** since 10 Nov 2026; not listed for anyone else (section 6). |
 | `search`, `fetch` | Search across trades, rules and the guide (ChatGPT deep research uses these) |
 
 Backtest settings (`params`): `piv` (swing candles, 3), `look` (96), `vmax` (candles from sweep to inversion, 6),
@@ -55,6 +57,26 @@ Backtest settings (`params`): `piv` (swing candles, 3), `look` (96), `vmax` (can
 Filters (`filters`): `min_grade`, `sides`, `sessions`, `atr_min` / `atr_max` (stop vs the daily ATR), `bias`, `zone`,
 `min_body`, `max_speed`, `htf_fvg`, `skip_friday`, `min_room_r`.
 `rule: "all"` tests every signal instead of the A-setups, and `sizing: "flat"` sizes every trade at 1 unit.
+`oos_from` moves the first out-of-sample day (default 2024-01-01).
+
+### 3a. Ids, the two executions of a signal, and how results are counted (since 11 Nov 2026)
+
+- **One signal can have two executions**: the live tracker's (`nq-b-1793926800`) and the replay's (the same id ending in
+  `-r`). They can have different fills and different results. `ict_trade` and `ict_desk_update` take the **exact** id and
+  never swap one for the other; an id that does not exist is an error. Every record says its `source` (`live` or `replay`),
+  and `otherExecution` names the twin when there is one.
+- **A replay record that is not resolved yet** carries `updatePending: true`. In `ict_trades` it comes with
+  `replayThrough` (the last candle the replay processed), `stopAtThrough` and `unitRAtThrough`; `ict_trade` gives the
+  same facts under the record's own names (`through`, `stopNow`, `markR`). It is shown as of that candle, never
+  against a newer price, and it is not counted as a win or a loss.
+- **One rule for win / loss / break-even**: the sign of a closed record's stored per-unit R. Sizing and rounding never change
+  it. `nearFlat` (within 0.05R of zero) is a label shown beside the counts, never an outcome. The desk page, the replay
+  file and this connector count the same way; `ict_trades` returns the rule as `outcomeRule`.
+- **Old replay results are kept as booked.** The daily replay carries a record that closed more than 3 days ago exactly as
+  it was booked, so the history no longer moves from run to run. A change to the tracker, the replay or the calendar
+  rebuilds everything once and is logged as a rebuild. A rebuild also redraws the futures feed's noise (about ±25R on the
+  whole record), so do not read a small before / after difference on old replay history as the effect of your change:
+  use `ict_compare`, which runs both rules on the same candles.
 
 ## 4. Example prompts
 
@@ -77,8 +99,8 @@ with the note 'clean sweep of PDL, entered on the M5 inversion'." ChatGPT calls:
                  "grade": "A", "tags": ["sweep", "fvg"], "note": "clean sweep of PDL, entered on the M5 inversion" } }
 ```
 
-The record is saved to the council data (`ict/desk.json`) in the same shape the desk page writes, with your name and
-the time, and shows on the page on its next load. What you leave out keeps its value, so a later
+The record is saved to the council data (`ict/desk.json`) in the same shape the desk page writes, with your name, the
+time and which execution it is about (`exec`: live or replay, from the id you sent), and shows on the page on its next load. What you leave out keeps its value, so a later
 `{ "id": "nq-b-1793926800", "r": 3.1 }` only changes the result. `action` is `taken`, `skipped`, `missed` or `none`.
 `grade` is one of the page's letters (A+, A, B, C, F); you can send `score` 1-10 instead (10 = A+, 8-9 = A, 5-7 = B,
 3-4 = C, 1-2 = F). There is one record per signal: a record another member wrote is never replaced.
@@ -90,14 +112,15 @@ the time, and shows on the page on its next load. What you leave out keeps its v
 - **An edge must pass out of sample on 2020-now data.** That means at least 30 trades out of sample, positive
   average R both in sample and out of sample, and most out-of-sample years positive, all net of costs. A t of 2 or
   more is strong. Report every variant you tried, not only the best one.
-- **The owner approves every rule change.** `ict_propose_change` is the only way a change reaches the desk while apply
-  is off. The server checks a proposal before it opens the PR:
+- **The owner approves every rule change, with one exception:** Fred's applied changes to the ICT edge's own files
+  (section 6). For everyone else, and for anything outside those files, `ict_propose_change` is the only way a change
+  reaches the desk. The server checks a proposal, and an applied change, before it opens the PR:
   - only ICT files can change;
   - a code or rule change needs a test at `tests/ict-<topic>.test.mjs`;
   - every file must pass a syntax check;
   - no new network, environment or process access.
 
-  CI runs the tests, and the owner decides.
+  CI runs the tests, and the owner decides (a proposal) or the apply workflow merges when every check passes (an applied change).
 - **ICT stays separate** from the council systems.
 
 ## 6. Apply: on for Fred

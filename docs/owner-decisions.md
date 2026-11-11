@@ -1,17 +1,51 @@
-# Open owner decisions (9 Nov 2026; items 19 to 26 added 10 Nov)
+# Owner decisions (checked against the code on 11 Nov 2026)
 
-One checklist of what waits on the owner's yes or no. Each item: what it is, why it matters, the options, and the recommended
-one. Nothing below has been changed in the code; each item names where the change would go. Tick an item when it is decided and
-note the answer next to it (or in the PR that carries it out).
+One list of what waits on your yes or no. Each item says what it is, why it matters, the options and the one I recommend.
+Item numbers never change (other documents point to them). An item that is settled stays here, ticked, with the answer.
+Everything is paper and demo only; no item below puts real money at risk.
 
-Grouped: **Security** (1-8 and 26, of which 7-8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
-and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock, 10 Nov 2026** (19-25).
+How to read the boxes: `[ ]` open, `[x]` decided or done, `[~]` partly done (what is left is said in its status line).
+Every item has a "Status, 11 Nov" line: that line is the current truth; the text under it is the original write-up.
+
+## What needs you now (most important first)
+
+1. **Change every password, yours first (item 1).** If nothing is decided: the scrambled passwords stay readable in the
+   public repository's history, and a short one can be worked out and used to sign in as you.
+2. **Give Fred's connector its own limited key and protect the main branch (item 7).** If nothing is decided: his changes,
+   which now merge without your review (item 26), keep travelling on whatever key is set, possibly the council's own.
+3. **Thirteen ICT replay results built before a market's price history starts: keep or drop (item 29).** If nothing is
+   decided: they stay in the ICT record (11 gold results worth +7.49R and 2 Russell 2000 results worth -2R) and the fix
+   waits unmerged.
+4. **Mosha: who reads Luxus's lessons, and when (item 28).** If nothing is decided: his lessons are stored but nobody reads
+   or answers them until a session is started for it, and each new session needs a key set again.
+5. **Mosha: log your own trades (item 27).** If nothing is decided: the only evidence on Mosha stays the five failed
+   rule tests; your own selection is never measured.
+6. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
+   (they are the corrected ones; this is the outcome I recommend).
+7. **The "council stopped" alert can be hours late (items 15 and 31).** If nothing is decided: it keeps depending on
+   GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
+8. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
+   (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
+9. **Mosha BO as a live paper system (item 33).** If nothing is decided: it stays among the main systems although its
+   rebuild on earlier years makes nothing and it has placed no live trade since 4 Nov.
+10. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
+    being recorded and copied to the demo shadow account.
+11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
+    loop free to run.
+
+Everything else below is smaller, or already answered and only needs a tick.
+
+Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
+and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
+**Mosha** (27-28), **Added 11 Nov 2026** (29-36).
 
 ---
 
 ## Security
 
 ### [ ] 1. Change every password, including the owner's
+
+- **Status, 11 Nov: OPEN.** The scrambled passwords in `api/_accounts.js` are the same as on 9 Nov (the file changed since only to add permissions), so no built-in password has been changed there. A member's password changed on the Users page is not visible from the code.
 
 - **Context.** Until the 9 Nov security fix the password hashes (unsalted SHA-256) were readable by anyone, and they are still
   in this repository's history; the built-in members' hashes and `OWNER_HASH` are still in `api/_accounts.js` today, and the repo
@@ -26,6 +60,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 2. Stronger password hashing
 
+- **Status, 11 Nov: OPEN.** Still plain SHA-256, 4-character minimum (`api/users.js`).
+
 - **Context.** Passwords are stored as plain SHA-256 with no salt (`api/_accounts.js` `sha`, `api/users.js`), and the Users page
   accepts passwords of 4 characters. The 9 Nov fix keeps hashes off the page, but a leaked user list (Blob, repo history) is easy
   to crack.
@@ -36,6 +72,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
   tests in `tests/auth.test.mjs`; nobody has to do anything except sign in once.
 
 ### [ ] 3. Per-permission gating of `/cdata`
+
+- **Status, 11 Nov: OPEN.** `api/data.js` still serves any file to any signed-in member.
 
 - **Context.** Since 9 Nov every council-data file except the guest allowlist needs a session (`api/data.js`), but any signed-in
   member can read any file, whatever their permissions (only `ctrader/tokens.json` and `users.json` are never served). A viewer
@@ -50,6 +88,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 4. cTrader link: add the OAuth `state` check
 
+- **Status, 11 Nov: OPEN.** No `state` value in `api/ctrader-link.js`.
+
 - **Context.** "Link my cTrader account" (`api/ctrader-link.js`) sends the browser to cTrader without a `state` value. The return
   is already tied to a 15-minute HttpOnly link cookie for the signed-in member, which blocks most abuse, but `state` is the
   standard guard against a forged return carrying someone else's grant code.
@@ -58,6 +98,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 - **Recommended: (a).** Small and standard; check once that cTrader passes `state` back on the redirect.
 
 ### [ ] 5. Vercel firewall rule for `/api/login`
+
+- **Status, 11 Nov: OPEN as far as the code shows** (a firewall rule is set in Vercel, not in the repository; not checked there).
 
 - **Context.** Password guessing is limited to 10 failures per 10 minutes per IP by `api/_guard.js`, but that table lives in
   memory per server instance, so several instances each allow 10. The firewall's general `/api` limit is 30 a minute per IP.
@@ -68,6 +110,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 6. Who may see `/api/status`
 
+- **Status, 11 Nov: OPEN.** Still public with the run mode, the last error line and step.
+
 - **Context.** `/api/status` is public and edge-cached. Since 9 Nov it no longer carries error stacks, but it still tells anyone
   how old each bot's last round is, the run mode, and the last run's error line, step and commit.
 - **Options.** (a) Public answer reduced to "ok / behind"; the details only with a signed-in session. (b) Session only.
@@ -75,6 +119,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 - **Recommended: (a).** The page shows "Council bot behind" to signed-in users only, so nothing visible changes.
 
 ### [ ] 7. Fred's connector: GitHub token scopes
+
+- **Status, 11 Nov: OPEN, and more urgent** since the apply path is on (item 26). Which keys are set on Vercel was not checked from here.
 
 - **Context.** The ChatGPT connector (`api/mcp.js`) reads with `GH_READ_TOKEN` and writes with `GH_MCP_TOKEN`, falling back to
   `GH_TOKEN` (the council's own Contents-write token) when `GH_MCP_TOKEN` is not set. The server only ever writes to
@@ -97,6 +143,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 8. Fred's connector: candles and costs
 
+- **Status, 11 Nov: OPEN.** The lab's costs are unchanged (`api/_ictlab.js`); `docs/fred-mcp.md` says the two cost tables differ.
+
 - **Context.** `ict_backtest` / `ict_compare` need `OANDA_TOKEN` on the server (the same token `/md/bars` uses; `OANDA_ENV`
   unset = practice account). Without it NQ / ES / YM fall back to research candles from 2023 only. The lab's round-trip costs
   (`api/_ictlab.js` `COST`: NQ 1.5, ES 0.5, YM 3, RTY 0.4 points, gold 0.5, silver 0.03) differ from the CME micro round trip the
@@ -108,6 +156,7 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [x] 26. Fred may apply ICT changes without review: ON (your decision, 10 Nov 2026)
 
+- **Status, 11 Nov: unchanged, ON for Fred.** Checked: his built-in record carries the permission and `council/ict-apply.json` lists only `fred`.
 - **Status: ON for Fred, off for everyone else.** You asked for it on 10 Nov ("mcp of fred he should be able to change and
   edit anything regarding the ict desk such a edge"), first kept it disabled, then approved it the same day: "let fred have
   100% control of ict he can change the edge and what he want, update his mcp to allow him doing that."
@@ -150,6 +199,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 9. Non-A ICT signals on the demo account
 
+- **Status, 11 Nov: OPEN.** Unchanged in `council/ctrader-mirror.mjs`.
+
 - **Context.** The mirror treats ICT signals that are not A-setups as shadows (`council/ctrader-mirror.mjs` `ictCandidates`),
   and the code comment says they are "never sent". But shadows are mirrored by default (config `mirrorShadow` is not `false`), and
   every ICT trade is routed to the ICT book, so the non-A signals are copied to the ICT demo account next to the A-setups.
@@ -161,6 +212,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 
 ### [ ] 10. Late-copy check for ICT trades
 
+- **Status, 11 Nov: OPEN.** Unchanged.
+
 - **Context.** A council trade copied late is skipped when the price is already past its stop or target or has run more than 1R
   from the entry (`LIMITS.maxDriftR`). ICT trades skip that check (their levels are futures prices, the demo trades the cash CFD),
   so an ICT trade copied hours late (closed market, capacity wait) goes in at the price then, with the original distances.
@@ -170,6 +223,8 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 - **Recommended: (a).** Same rule as the council trades, and it cannot loosen a stop.
 
 ### [ ] 11. Shadow streams after the cost study (proposals 3a-3e)
+
+- **Status, 11 Nov: OPEN.** No answer recorded; nothing changed.
 
 Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/shadow-cost/`. Paper and demo only; nothing live.
 
@@ -185,6 +240,8 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ### [ ] 12. LIT: keep or retire
 
+- **Status, 11 Nov: OPEN.** Your 8 Nov choice (keep it as a paper shadow) stands until you say otherwise.
+
 - **Context.** The LIT study was inconclusive (27 gold fills in 19 years; what can be measured is negative), and LIT costs about
   0.25R a trade, well over the owner's 0.10R limit; no LIT trade in 19 years was cheaper than 0.10R. On 8 Nov the owner chose to keep
   it as a paper shadow, and it also has a demo account and a "study" replay with loosened rules.
@@ -194,12 +251,16 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ### [ ] 13. Proposal 4: damp the Coach's session flips on paper engine setups
 
+- **Status, 11 Nov: OPEN.** Not built.
+
 - **Context.** 37 Coach changes on 17 rules in one week, 4 rules flipped back and forth 3+ times; a fair session rule tested on
   2020-26 found almost nothing to switch off, and the Coach's choices did no better than random (`research/edge/coach-learning`).
 - **Proposal.** A session is switched only after at least 15 trades and a clearly losing record (t ≤ −1) over a fixed window.
 - **Recommended: yes.** Main systems and owner rules are already outside the Coach's reach; this only slows the shadow-book churn.
 
 ### [ ] 14. Proposal 5: size the replica for its real drawdown
+
+- **Status, 11 Nov: OPEN.** Since 10 Nov the replica's paper trades are also copied to the Replica demo account when it has its own account, at the mirror's usual size.
 
 - **Context.** 2020-26: worst drawdown −45R at normal costs, −62R at doubled costs, two losing years in a row (2022-23); the rule
   also failed before 2023 (`research/edge/replica-oos`).
@@ -212,6 +273,8 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ### [ ] 15. Trigger the watchdog from a Vercel cron
 
+- **Status, 11 Nov: OPEN.** See also item 31 (the same weakness in the other timed jobs).
+
 - **Context.** `watchdog.yml` runs on a GitHub cron at :11 / :41 (GitHub fires this repo's crons only a few times a day) and after
   every completed council run. If the loop hangs inside a run, nothing completes, and the "council stopped" alert can be hours late.
   The old `api/kick.js` that dispatched workflows from Vercel is gone.
@@ -219,7 +282,9 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
   needs a token with Actions write, never committed). (b) Keep GitHub's cron.
 - **Recommended: (a).** Costs nothing extra on the current plan and makes the watchdog independent of GitHub's scheduler.
 
-### [ ] 16. Dead FRED series `BSCICP03DEM665S` (German business confidence)
+### [~] 16. Dead FRED series `BSCICP03DEM665S` (German business confidence)
+
+- **Status, 11 Nov: MOSTLY DONE.** Fixed on 9 Nov (pull request #703): the gold terminal now ignores a value more than about four months old, so it no longer shows the 2024 number as today's. The "Eurozone growth pulse" row is empty on both pages. Still open, low priority: find a free, live replacement series, or remove the row. The "Context" below describes the state before the fix.
 
 - **Context.** This OECD series stopped at 2024-01-01. The Macro strategist already drops it as "no data" (`council/macro.mjs`
   `MAX_AGE`), so its "Eurozone growth pulse" driver is empty; but the gold terminal (`gold-trading.html` `refreshFundamentalsX`)
@@ -234,9 +299,13 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ### [ ] 17. Proposal 1: keep the time exit at the candle's close
 
+- **Status, 11 Nov: answered by the study; only your tick is missing.** Nothing changes either way.
+
 No difference (−0.001R a position over 719 positions). **Recommended: yes, close the question.** Nothing changes in the code.
 
 ### [ ] 18. Proposal 2: no cost gate on the gold systems
+
+- **Status, 11 Nov: answered by the study; only your tick is missing.** Nothing changes either way.
 
 The trades a 0.10R cost gate would skip made +0.42R each. **Recommended: yes.** Nothing changes in the code.
 
@@ -250,6 +319,8 @@ loader now uses one converter (`council/histdata.mjs`); the audit and the before
 or config was changed. The items below are what that work leaves for the owner.
 
 ### [ ] 19. Monitoring baselines rebuilt on the corrected clock (already committed: confirm or revert)
+
+- **Status, 11 Nov: IN USE, waiting for your confirm.** The rebuilt files are on `main` and the council reads them.
 
 - **Context.** Three baseline files the council reads were rebuilt with their own build scripts, because their source studies
   moved. They are monitoring baselines, not trading rules. A control build on the old study files reproduced each published
@@ -275,6 +346,8 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ### [ ] 20. ICT variant "sweep into an unfilled D1/H4 FVG" now passes its pre-registered bar (index book)
 
+- **Status, 11 Nov: OPEN.** Option (a) is what happens by default. Note that since 10 Nov Fred may add an ICT paper variant or change the ICT rule himself (item 26); this item is about what you want.
+
 - **Context.** `research/edge/ict-variants` was pre-registered and failed on 9 Nov. On the corrected clock its script gives
   PASS for one of nine verdicts: V3 htffvg, index book: in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92;
   2024 lost (21 trades, −0.5R); not "strong". The plan itself warns that with nine tries one pass by luck is plausible. The
@@ -285,6 +358,8 @@ or config was changed. The items below are what that work leaves for the owner.
 - **Recommended: (a).** One pass of nine with t under 2 in both halves is a hypothesis. Never (c) on this evidence.
 
 ### [ ] 21. `ict/replay.mjs` still reads HistData files with the old clock (live code, not changed)
+
+- **Status, 11 Nov: OPEN, still no effect.** The line has moved: it is now line 95 of `ict/replay.mjs` (the pair list is line 83). The line numbers in the text below are from 10 Nov.
 
 - **Where.** `ict/replay.mjs` line 79: `... / 1000 + 5 * 3600` on the HistData stamp, inside the back-fill for `HD`
   (line 67: EUR/USD and GBP/USD only).
@@ -298,6 +373,8 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ### [ ] 22. Academy: 101 setups stay flagged (weeks nobody could verify)
 
+- **Status, 11 Nov: OPEN.** As built (option a) until you say otherwise.
+
 - **Context.** `rule.clockShift` now means "the week of this setup could not be checked against a second feed": 24 weeks
   for gold and 25 for NAS100, almost all in the hole of the 2023 files (20 Feb to 30 Jul 2023). They stay out of lists,
   tests, training and research. Separately, five symbol-years miss one of the audit's strict criteria (gold 2023; NAS100
@@ -310,6 +387,8 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ### [ ] 23. Studies still on the old clock
 
+- **Status, 11 Nov: OPEN.** None of them has been re-run.
+
 - **Context.** Their loaders are fixed, but these were not re-run (each RESULT.md says so in a line under its title):
   the long engine replays `scalp-filters`, `scalp-exits`, `timing`, `regime`, `setups-promote`, `confluence`, `costs`
   (hours of machine time between them; every one is a FAIL on the Scalp or on a setup that is not live), `ict-smile`
@@ -319,6 +398,8 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ### [ ] 24. The dollar-index file of 2018 is not a usable series
 
+- **Status, 11 Nov: OPEN.** The eight 2018 rows are still in the event base.
+
 - **Context.** The clock audit could not check `UDXUSD` 2018: its hourly returns do not follow EUR/USD at any offset
   (correlation near zero in 50 weeks) and its weekly reopen matches in 3 of 52 weekends. From 2019 the file is fine.
   The veteran's event playbook (`council/event-base.json`) uses it for the dollar's first read on the eight 2018 CPI rows.
@@ -327,6 +408,8 @@ or config was changed. The items below are what that work leaves for the owner.
 - **Recommended: (a) with a dated amendment.** Eight of 86 CPI rows; the playbook's figures are descriptive only.
 
 ### [ ] 25. COT release lag in the Macro strategist (found by the unmerged `wip/data-clock-fixes` branch; not changed here)
+
+- **Status, 11 Nov: OPEN.** `council/macro.mjs` lines 59 and 245 are unchanged.
 
 - **Where.** `council/macro.mjs` line 59 (`COT_LAG = 4`) and line 245 (`r.t <= D - COT_LAG * DAY`).
 - **Effect.** A CFTC report dated Tuesday is taken as public four days later. In a holiday week the CFTC publishes on the
@@ -341,6 +424,8 @@ or config was changed. The items below are what that work leaves for the owner.
 ## Mosha as you expected it (10 Nov 2026)
 
 ### [ ] 27. Your Mosha trading, tested as fixed rules in five studies: no edge. Log your own trades of it?
+
+- **Status, 11 Nov: the place is built (Desks → Mosha); the logging is yours to do.** The five studies are final: none is an edge.
 
 - **What you told me.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
   "This is how I was expecting Mosha to work." The method is top-down order only: after an H4 BO, H1 shows when the
@@ -420,7 +505,20 @@ conditions is what makes your trades win.
   still open count in the record; it says "too few to judge" until 20 are closed and calls nothing more than luck below a t of
   2. Reviewers can read it; only you can write it.
 
-### [ ] 28. Luxus teaches on the Mosha desk: one step is yours (the assistant's key)
+### [~] 28. Luxus teaches on the Mosha desk: who reads the lessons, and when
+
+- **Status, 11 Nov: the teaching side is built and Luxus is using it. What is open is the reading.**
+  - **A correction.** The update of 10 Nov below says the assistant keeps its own key in the site's settings and a later
+    session can use it again. That last part was wrong: the setting is stored as "sensitive", and Vercel never shows a
+    sensitive value again, not even to the assistant. So a new session cannot read the old key back.
+  - **What that means.** Each new session either sets a new key (replace the `MOSHA_ASSISTANT_KEY` setting and redeploy the
+    site, a few minutes), or uses a key you saved once in the secure form for meridianx.dev (the original step below:
+    Lessons card → "Show the assistant's key"). The second way survives from session to session; the first does not.
+  - **Options.** (a) Save the key once in the secure form, so any later session can read the lessons without touching the
+    site's settings. (b) Leave it: every session that should read lessons sets a new key first. (c) Either way, decide
+    whether you want the reading on a schedule (it uses your plan's usage each time).
+  - **Recommended: (a).** One step, once. If nothing is decided, lessons wait unread until a session is told to read them.
+  - **Also still open:** a read-through of the French tutorial by Luxus (it was checked by tests, not by a French speaker).
 
 - **What is built (10 Nov, your words: the Mosha desk "will be main page of" Luxus, "he will train u, allow him to send you
   trades images so u can learn"):** Luxus signs in and lands on the Mosha desk. There he sends a trade as screenshots, each
@@ -433,7 +531,8 @@ conditions is what makes your trades win.
   teach: send lessons, say right or not right, decide the book, teach from ChronosTrade. His password is all he needs.
   You and the other members who may open the desk read it; you can also remove a lesson or a picture, and switch his
   access on the Users page. Giving "teaches" to anyone else has no effect.
-- **Update, 10 Nov ("No need for key u can read and do whaeva"):** you no longer have to copy anything. The assistant
+- **Update, 10 Nov ("No need for key u can read and do whaeva"; corrected in the status above: the key does not carry
+  over to a later session):** you no longer have to copy anything. The assistant
   makes its own key and saves it in the site's settings on Vercel (`MOSHA_ASSISTANT_KEY`). It opens only the lessons
   (read, answer, propose book lines). The one cost: that key is visible in the assistant's private session log, where
   the hand-copied one would not have been. To end it, delete that variable on Vercel, or set `MOSHA_READER=off`.
@@ -476,8 +575,127 @@ conditions is what makes your trades win.
   it is unclear. It never teaches the method back to him, never judges a trade, and never treats its own first lines of
   the book or the earlier studies' wording as his method. The tutorial opens by telling him so, and shows only how to
   teach, never what Mosha is.
-- **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
-  is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
+- **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Without a key (see the status at the top of this item)
+  nothing is read, and with one a lesson waits until the next reading. Say if you want the reading on a schedule
   (it uses your plan's usage each time, so it is your call how often).
 - **What the lessons are not:** proof. They are the teacher's picks, so they show the pattern, not how often it wins. A rule
   drawn from them gets its own pre-registered test before it is called an edge, and nothing live changes without you.
+
+---
+
+## Added 11 Nov 2026
+
+Open points that were written down elsewhere (developer notes, study results, open pull requests) but not in this list.
+
+### [ ] 29. ICT replay: thirteen results from before a market's price history starts. Keep or drop?
+
+- **Context.** The ICT replay re-plays history since August 2025. For gold, real candle history on file starts on
+  21 Dec 2025; for the Russell 2000 it starts on 7 Jun 2026. Before those dates the price feed returns only stray candles,
+  different ones on each run, and thirteen results were built from them: 11 gold results (30 Sep to 24 Nov 2025, together
+  +7.49R) and 2 Russell 2000 results (27 and 29 May 2026, together -2R). Since 11 Nov booked results are kept as booked, so
+  these thirteen are now frozen into the record as they happened to fall that day.
+- **What is ready.** Pull request #726 (open, not merged): each market is recorded only from where its candles really
+  start; the thirteen leave once, listed by id in the replay's correction log; signals before the start are counted, not
+  hidden. Headline effect: about +124.6R over 815 closed results becomes about +119.1R over 800. No ICT rule, stop or size
+  changes.
+- **Options.** (a) Merge it: drop the thirteen. (b) Keep them: close the pull request. (c) Keep them but mark them on the
+  desk as "built from incomplete candles".
+- **Recommended: (a).** A result nobody can rebuild from saved candles should not be in the record, and the change lowers
+  the headline rather than flattering it. Either way the ICT record is a replay, not proof (the rule broke even on 2008-17).
+- **If nothing is decided.** The thirteen stay in, and the pull request waits.
+
+### [ ] 30. ICT replay: keep its own archive of candles (designed, not built)
+
+- **Context.** The replay reads history from the futures feed each time, and the feed does not return the same old candles
+  twice. Freezing booked results (11 Nov) stops the record from drifting day to day. But a full rebuild, which happens by
+  itself whenever the ICT tracker, replay or calendar code changes (and Fred can now change those, item 26), draws the
+  feed's noise again: about plus or minus 25R on the whole record. So the effect of a rule change on old history cannot be
+  told from noise.
+- **What exists.** A design for a small archive (about 3.6 MB) that saves each run's candles so a rebuild always uses the
+  same ones. Not built: at each futures contract switch it needs a price shift measured on the live feed, and that could
+  not be checked from the build environment. It needs one live contract switch to verify.
+- **Options.** (a) Build it and verify it at the next contract switch, on paper, before trusting it. (b) Leave it and read
+  every rebuild's before / after difference as noise unless it is far larger than 25R.
+- **Recommended: (a).** Until then: judge an ICT rule change by the connector's side-by-side comparison on the same
+  candles, never by the replay total before and after.
+- **If nothing is decided.** Option (b) is what happens.
+
+### [ ] 31. Timed jobs depend on GitHub's timer, which often does not fire
+
+- **Context.** GitHub runs this repository's timed jobs only a few times a day at best (measured 6 to 7 Nov: a 15-minute
+  timer fired 3 times in 22 hours). The council loop does not depend on it (it restarts itself, and the website's host
+  takes over if it stops). These do: the watchdog (item 15), the daily ICT replay (06:41 UTC), the weekly candle cache for
+  research (Saturdays), the crypto history back-fill (every 30 minutes) and the daily backtest.
+- **Why it matters.** A late replay means "update pending" results stay pending longer; a late watchdog means a late
+  "council stopped" alert; a late cache means research reads older candles. Nothing trades wrongly because of it.
+- **Options.** (a) Let the website's host start these jobs on time (a small scheduled function with a narrow key that may
+  only start workflows; free on the current plan). (b) Run the ICT replay from inside the council loop once a day, as the
+  ICT tracker already is. (c) Leave it.
+- **Recommended: (a) for the watchdog and the replay.** Same change as item 15, so decide them together.
+- **If nothing is decided.** They keep running whenever GitHub happens to fire them.
+
+### [ ] 32. Public or private repository
+
+- **Context.** On 7 Nov you said you want the repository private. Two things pull the other way. The council's loop runs
+  on GitHub's free minutes, which are free only for a public repository; private, the loop would need paid minutes or a
+  move to the website's host or your own server (that cut-over is prepared but has not happened). And the public copy on
+  GitHub Pages would show nothing. On the other side: while it is public, anyone can read the code, the old scrambled
+  passwords in its history (item 1) and the research.
+- **Options.** (a) Stay public; do item 1 so the history holds nothing useful. (b) Go private after moving the loop to your
+  always-on server or the website's host, and accept that GitHub Pages goes dark. (c) Go private and pay for minutes
+  (against the "no paid services" rule).
+- **Recommended: (a) now.** (b) is possible later; it is a project of its own.
+- **If nothing is decided.** It stays public.
+
+### [ ] 33. Mosha BO stays among the live paper systems?
+
+- **Context.** Rebuilt on earlier years with the corrected clock, Mosha BO makes -0.064R a trade over 157 trades with a
+  46R worst drawdown (item 19). On 2006-17 it was "in substance a null result". It has placed no live paper trade since
+  4 Nov. The five Mosha studies of 10 Nov tested other readings of the method and none passed.
+- **Options.** (a) Move it to a shadow (recorded, never alerted, like Gold trend fast). (b) Keep it live on paper and let
+  the decay monitor watch it. (c) Retire it.
+- **Recommended: (a).** It costs nothing on paper either way, but the main systems' results should not carry a system
+  with no evidence behind it. A live rule change, so it is yours to make.
+- **If nothing is decided.** (b) is what happens.
+
+### [ ] 34. Three study proposals nobody has answered
+
+Each is from a finished study; nothing was changed. All paper only.
+
+- [ ] **Book weights (`research/edge/portfolio-v2`, 7-8 Nov).** Equal risk per idea with the gold family capped at 40 %,
+  instead of one unit per system. The comparison runs on paper on the Council research pane ("Paper comparison"). The study
+  itself says it is **not an edge on untouched data**. **Recommended: leave the sizes as they are**; look at the paper
+  comparison again after 20 trading days.
+- [ ] **Near-stop market fills (`research/edge/shadow-audit`, 7 Nov).** The engine checks its minimum stop distance on the
+  planned entry, not on the actual fill, so a market fill can land very close to the stop and one small move counts as a
+  full loss. Proposal: check the distance on the fill and skip the trade when it is too small. **Recommended: yes** (it can
+  only skip a trade, never loosen a stop). It mostly concerns the retired engine's shadow streams.
+- [ ] **Gold daily engulf and the Sunday candle (`research/edge/gold-weekend`, 7 Nov).** The rule counts a short Sunday
+  candle as a day. Counting proper trading days instead is "correct by construction and not worse" (+7.1R over 20 years,
+  within noise). For Gold trend the same change is worse, so that stays. **Recommended: adopt it for the engulf only, or
+  leave it; the evidence does not favour either strongly.**
+
+### [ ] 35. Small display leftovers from the 11 Nov check of every page
+
+- **Context.** The check found and fixed the larger problems. Left alone on purpose, as older design or your call: very
+  small labels on the ICT desk; small toolbar buttons in ChronosTrade on phones (a stated choice); in the light theme, the
+  main button of the shared dialog and some badges whose text sits at or just under the readable-contrast line; a corrected
+  line of the Mosha book that keeps the desk's first wording in English in the French view; and Luxus's page still showing
+  the fixed-rule studies' figures to the teacher.
+- **What is ready.** Pull request #729 (open, not merged) covers most of these: ICT text at readable size, light-theme
+  colours at the contrast standard, the teacher's page without the studies.
+- **Options.** (a) Merge #729 after its checks pass. (b) Leave them.
+- **Recommended: (a).** Display only; no rule or trade is involved.
+- **If nothing is decided.** The site works; these stay slightly harder to read.
+
+### [ ] 36. Academy: three small open points
+
+- [ ] **A higher request limit for the Academy.** The site's firewall allows 30 requests a minute per person to the
+  server functions; the Academy paces itself to 24 and waits when it must. Raising the limit for `/api/academy` only would
+  make long training runs a little faster. **Recommended: leave it** unless the waits bother you.
+- [ ] **Written second opinions from a paid model.** Built, switched off, never called; costs money and so breaks the
+  "no paid services" rule. The free route (your own assistant answers queued questions) is in place. **Recommended: keep
+  the paid route off.**
+- [ ] **Your acceptance walk** (`docs/academy/ACCEPTANCE.md`): sign in, open `/academy`, go through the list once. The
+  Academy's store is empty until you train on it; every number on the page will be from your own attempts.
+
