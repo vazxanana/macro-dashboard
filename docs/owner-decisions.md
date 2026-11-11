@@ -38,7 +38,8 @@ Everything else below is smaller, or already answered and only needs a tick.
 
 Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
 and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
-**Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, two open).
+**Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, two open),
+**The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov 2026** (43-46).
 
 ---
 
@@ -830,3 +831,71 @@ rule on thirteen other markets with hourly candles (0 of 14 tests pass). One dec
 - **Recommended.** (a). No trade, size or rule changes; the page's expectation for Gold trend becomes about a fifth lower
   and its time-to-judge longer, which is the honest state.
 - **If nothing is decided.** The page keeps overstating the trend legs' expectancy by about 0.08R a position.
+
+## The path to real money, 12 Nov 2026
+
+From `research/proposals/2026-11-12-path-to-live.md`, written after "we need more improvement so we start make money" and
+"keep improving dont stop reach our goal". It reads every study on the gold book and finds no untested lever left (no new
+study was run), then says what a forward test can and cannot show and what a first step with real money would mean.
+Nothing was changed: no rule, size, filter, stop, setting, and no code that keeps the desk on paper and demo accounts.
+
+### [ ] 43. Adopt the forward-test protocol for the live paper book, with its stop lines fixed now
+
+- **Status (12 Nov 2026): open.** Proposed; nothing was changed.
+- **Context.** The book (Gold trend + Gold daily engulf) measured +5.2R a year on untouched 2006-17 after all costs (330
+  positions, t 1.86: positive, not proven), with a worst drawdown of about 20R lasting almost four years. At 29 positions a
+  year a forward record needs about 13 years to prove a book that good. In one to three years it can only catch a broken
+  one. The protocol fixes the lines before the record exists: back to a paper shadow if the forward drawdown passes 21.9R,
+  or the total is below -9.7R after 12 months, -12.0R after 24 or -12.1R after 36; five execution checks on the first 30
+  demo copies (every copy has a stop; at least 28 of 30 copied; fills within 0.03R of paper and never worse by more than
+  0.05R on average; financing within a fifth of the cost model; no order the mirror did not place); dated notes at 6, 12,
+  24 and 36 months from 12 Nov 2026. These lines stop a losing book three times in four within three years, a book with no
+  edge less than half the time, and a good book one time in eight by bad luck.
+- **Options.** (a) Adopt it as written. (b) Adopt it with other lines (say which, before the first checkpoint). (c) No
+  protocol.
+- **Recommended.** (a). No trade changes today; no open trade is ever closed by a stop line (each keeps its stop and runs
+  to its own exit).
+- **If nothing is decided.** The record runs without pre-set lines, and any later judgement of it is made after seeing it.
+
+### [ ] 44. Stop testing new gates, exits, entries and sizes on this book
+
+- **Status (12 Nov 2026): open.** Proposed; nothing was changed.
+- **Context.** Twenty-odd studies have put a macro gate, the Gold Macro Score, real yields, volatility and trend
+  switches, twelve exits, ten entries, three sizing rules, system weights, the add, thirteen other markets, the weekend,
+  the calendar and news releases on these systems. None passed its own bar (the table is section 1 of the proposal). The
+  years called "untouched" (2006-17) have been read by a dozen studies and over sixty comparisons, and there is no other
+  gold history for these rules: one more test there is as likely to find luck as an improvement.
+- **Options.** (a) Stop: research time goes to the forward record, the execution checks and anything new you bring (your
+  own logged Mosha trades, item 27). (b) Keep testing ideas on the same years.
+- **Recommended.** (a).
+- **If nothing is decided.** The next "improvement" found on the same years may be put to you as if it were evidence.
+
+### [ ] 45. Make the two bridge programs refuse an account that is not a demo
+
+- **Status (12 Nov 2026): open.** Found while listing what keeps the desk on demo accounts; nothing was changed.
+- **Context.** The demo mirror refuses a real account three separate ways. The two bridge programs the owner can download
+  from the site (`mt5/CouncilBridge.mq5` for MetaTrader 5, `ctrader/CouncilBridge.cs` for cTrader) do not: they read the
+  live signal file and place its orders on whatever account they are attached to, and only print whether it is a demo.
+  The rule "paper and demo only" is held there by where the program is attached, not by the program.
+- **Options.** (a) Add the refusal to both programs (they stop with a message on a real or contest account). (b) Leave
+  them and keep attaching them to demo accounts only.
+- **Recommended.** (a). It is a small change that makes the rule hold in code everywhere; it needs your word because it
+  touches programs that place orders.
+- **If nothing is decided.** A bridge attached to a real account would trade it.
+
+### [ ] 46. Real money: keep the paper-and-demo rule, and look again no earlier than November 2027
+
+- **Status (12 Nov 2026): open.** Nothing was changed and nothing can be without you: absolute rule 2 forbids it.
+- **Context.** At 0.25 % risk a trade the book's measured rate is about +1.3 % a year (between +0.1 % and +2.6 %) with a
+  drawdown of about 5 % lasting almost four years; at 1 % a trade +5.2 % a year with a drawdown of 20 to 22 %. The
+  broker's smallest gold order (1 ounce) risks $39 to $136 a unit, so 0.25 % a trade needs an account of about $55,000;
+  on $10,000 one Gold trend unit risks about 1.4 %. On $55,000 at 0.25 % the measured gain is about $700 a year, likely
+  less than plain interest on the same cash, and unproven. The proposal lists the options (stay on paper; the minimum
+  lot on a small account; a fixed 0.25 %; micro futures by hand) and every place in the code that keeps the desk on demo
+  accounts.
+- **Options.** (a) Keep the rule; look again at the 12-month checkpoint of item 43 with its execution checks passed.
+  (b) Decide on a live step now.
+- **Recommended.** (a). Meanwhile one question to your broker costs nothing: what it charges overnight on a gold buy,
+  against two other brokers. That charge is the book's largest cost (1.8R of every year) and the only one that differs
+  between brokers; at half today's rate the book's test would have passed.
+- **If nothing is decided.** Nothing changes: paper and demo only.
