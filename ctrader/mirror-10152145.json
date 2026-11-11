@@ -6650,7 +6650,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9930.22 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9930.22 · 30 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6661,26 +6661,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "usdcad-scalp-1794382203": {
-    "orderId": "33914211",
-    "symbol": "USDCAD",
-    "side": "buy",
-    "volume": 500000,
-    "lots": 0.05,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.4207,
-    "stop": 1.42017,
-    "t1": 1.42132,
-    "placedAt": "2026-11-11T07:31:12.000Z",
-    "expires": "2026-11-11T10:30:03.000Z",
-    "riskCash": 1.99,
-    "margin": 10,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "usdcad-scalp-1794383071": {
     "orderId": "33914723",
     "symbol": "USDCAD",
@@ -6704,14 +6684,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9930.22,
-  "lastRun": "2026-11-11T07:48:06.000Z"
+  "lastRun": "2026-11-11T07:50:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:12:41.000Z",
-   "msg": "closed GBPUSD position 48039928 (council: cancelled)",
-   "trade": "gbpusd-intraday-1794315817"
-  },
   {
    "at": "2026-11-10T13:12:41.000Z",
    "msg": "moved GBPUSD 47373485 protection: stop 1.32856 -> 1.32895, target 1.36864 -> 1.36903 (council scalp)",
@@ -8206,6 +8181,11 @@
    "at": "2026-11-11T07:48:06.000Z",
    "msg": "limit filled at once: USDCHF position 48347186 at the broker at 0.8275",
    "trade": "usdchf-scalp-1794383223"
+  },
+  {
+   "at": "2026-11-11T07:50:39.000Z",
+   "msg": "cancelled USDCAD limit order 33914211 for usdcad-scalp-1794382203: the council ended it: missed",
+   "trade": "usdcad-scalp-1794382203"
   }
  ],
  "limits": {

@@ -2878,7 +2878,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T07:06:31.000Z",
     "councilEntry": 1.42057,
     "stop": 1.421359,
@@ -2891,10 +2891,15 @@
     "slipR": -0.025,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:06:31.000Z",
-    "brokerStop": 1.42138
+    "brokerStop": 1.42138,
+    "closedAt": "2026-11-11T07:50:43.000Z",
+    "exitPrice": 1.42127,
+    "councilExit": null,
+    "councilR": -1
    },
    "eurusd-replica-1794381581-b": {
     "positionId": "48340471",
@@ -2904,7 +2909,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T07:20:54.000Z",
     "councilEntry": 1.11598,
     "stop": 1.115067,
@@ -2917,10 +2922,15 @@
     "slipR": -0.022,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:20:54.000Z",
-    "brokerStop": 1.11505
+    "brokerStop": 1.11505,
+    "closedAt": "2026-11-11T07:50:43.000Z",
+    "exitPrice": 1.11516,
+    "councilExit": null,
+    "councilR": -1
    },
    "audusd-replica-1794381581-b": {
     "positionId": "48340494",
@@ -3117,7 +3127,7 @@
    "startBalance": 10017.08
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9962.25 · 16 open",
+  "status": "ok · demo Fusion Markets · balance 9962.25 · 14 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker",
    "xrp-replica-1794339674-s": "none of XRPUSD found at the broker",
@@ -3134,7 +3144,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9962.25,
-  "lastRun": "2026-11-11T07:48:11.000Z"
+  "lastRun": "2026-11-11T07:50:43.000Z"
  },
  "log": [
   {
@@ -4279,6 +4289,16 @@
    "at": "2026-11-11T07:45:41.000Z",
    "msg": "AUDUSD position 48274089 closed at the broker",
    "trade": "audusd-replica-1794363611-s"
+  },
+  {
+   "at": "2026-11-11T07:50:43.000Z",
+   "msg": "closed USDCAD position 48337508 (council: loss)",
+   "trade": "usdcad-replica-1794380725-s"
+  },
+  {
+   "at": "2026-11-11T07:50:43.000Z",
+   "msg": "closed EURUSD position 48340471 (council: loss)",
+   "trade": "eurusd-replica-1794381581-b"
   }
  ],
  "limits": {
