@@ -6564,7 +6564,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-11T07:27:29.000Z",
     "councilEntry": 0.82697,
     "stop": 0.82746,
@@ -6578,10 +6578,15 @@
     "slipR": -0.163,
     "lagSec": 62,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-11T07:27:29.000Z",
-    "brokerStop": 0.82754
+    "brokerStop": 0.82754,
+    "closedAt": "2026-11-11T07:38:51.000Z",
+    "exitPrice": 0.82729,
+    "councilExit": 0.82746,
+    "councilR": -1
    },
    "usdchf-scalp-1794382360": {
     "symbol": "USDCHF",
@@ -6615,7 +6620,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9932.83 · 31 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9932.83 · 30 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6649,14 +6654,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9932.83,
-  "lastRun": "2026-11-11T07:36:21.000Z"
+  "lastRun": "2026-11-11T07:38:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:09:34.000Z",
-   "msg": "moved USDCAD 47990251 protection: stop 1.41044 -> 1.41137, target 1.4201899999999998 -> 1.42112 (council intraday)",
-   "trade": "usdcad-intraday-1794304066"
-  },
   {
    "at": "2026-11-10T13:09:34.000Z",
    "msg": "moved USDCAD 47992968 protection: stop 1.4104046785714284 -> 1.4113347, target 1.42998 -> 1.43091 (council position)",
@@ -8151,6 +8151,11 @@
    "at": "2026-11-11T07:36:21.000Z",
    "msg": "limit filled: USDCHF position 48344861 at the broker",
    "trade": "usdchf-scalp-1794382360"
+  },
+  {
+   "at": "2026-11-11T07:38:51.000Z",
+   "msg": "closed USDCHF position 48343563 (council: loss)",
+   "trade": "usdchf-rscalp-1794381987"
   }
  ],
  "limits": {
