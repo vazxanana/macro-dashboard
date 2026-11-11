@@ -161,7 +161,7 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
 
 test('/cdata: the sealed tokens and the user list are never read, whatever the spelling; no path leaves the branch; guests get the allowlist only', async () => {
   const data = require('../api/data.js'), asked = [];
-  const fetchFn = async (u) => { asked.push(String(u)); return { ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode('{}').buffer }; };
+  const fetchFn = async (u) => { asked.push(String(u)); return { ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode('[]').buffer }; };   // a list, as trades.json is: a guest gets its cut copy (11 Nov)
   const get = async (p, c, method = 'GET') => { const r = res(); await data.handle({ method, headers: { host: 'x.test', ...(c ? { cookie: c } : {}) }, query: { p } }, r, { env: ENV, fetch: fetchFn, deps }); return r; };
   S._cache.users = null;
   for (const c of [null, CARLOS_C, FRED_C, OWNER_C]) for (const p of ['users.json', 'ctrader/tokens.json', 'USERS.JSON', 'Ctrader/Tokens.json', '/users.json', '//ctrader/tokens.json'])

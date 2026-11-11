@@ -641,6 +641,9 @@ Open points that were written down elsewhere (developer notes, study results, op
   move to the website's host or your own server (that cut-over is prepared but has not happened). And the public copy on
   GitHub Pages would show nothing. On the other side: while it is public, anyone can read the code, the old scrambled
   passwords in its history (item 1) and the research.
+  Since 11 Nov the website itself hands a visitor who is not signed in only the main system's trades and a few prices
+  (`/cdata` cuts the guest files), but the `council-data` branch, with every book, name and note, stays readable on
+  GitHub for as long as the repository is public: the site's own door is closed, that one is not.
 - **Options.** (a) Stay public; do item 1 so the history holds nothing useful. (b) Go private after moving the loop to your
   always-on server or the website's host, and accept that GitHub Pages goes dark. (c) Go private and pay for minutes
   (against the "no paid services" rule).

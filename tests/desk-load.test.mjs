@@ -33,8 +33,11 @@ test('msData: readers that ask for the same file while it loads share one reques
   const { D, calls } = make();
   const p1 = D.json('trades.json'), p2 = D.json('trades.json'), p3 = D.text('trades.json');
   assert.equal(calls.length, 1);
-  assert.match(calls[0].url, /^https:\/\/x\/cdata\/trades\.json\?v=\d+$/);
-  assert.equal(calls[0].url, 'https://x/cdata/trades.json?v=' + Math.floor(1_800_000_000_000 / 60000), 'the cache-buster changes once a minute');
+  // a signed-in member asks under his own address (&m=1, 11 Nov guest cut): the shared cache's guest copy is never his answer
+  assert.match(calls[0].url, /^https:\/\/x\/cdata\/trades\.json\?v=\d+&m=1$/);
+  assert.equal(calls[0].url, 'https://x/cdata/trades.json?v=' + Math.floor(1_800_000_000_000 / 60000) + '&m=1', 'the cache-buster changes once a minute');
+  { const g = make({ mode: 'public' }); g.D.json('trades.json'); assert.equal(g.calls[0].url, 'https://x/cdata/trades.json?v=' + Math.floor(1_800_000_000_000 / 60000), 'a visitor asks the plain, publicly cached address'); }
+  { const g = make({ mode: 'admin', api: '' }); g.D.json('trades.json'); assert.doesNotMatch(g.calls[0].url, /m=1/, 'no mark on the raw GitHub copy'); }
   assert.deepEqual(calls[0].opt, { cache: 'no-store' });
   calls[0].answer('[{"id":"a","R":1}]');
   const [a, b, t] = await Promise.all([p1, p2, p3]);

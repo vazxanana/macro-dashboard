@@ -1362,12 +1362,15 @@ window.msDataMake = function (W, clock) {
   var E = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
   var GUEST = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];
   function allowed(f) { return !(W.MS_API && W.document.documentElement.dataset.mode !== 'admin') || GUEST.indexOf(f) >= 0; }
+  // a signed-in member asks under his own address (&m=1): the server cuts the guest files for visitors (api/_guestcut.js) and its
+  // shared cache keeps the visitors' copy, which a member must never be handed; an answer to a marked address is never cached
+  function member() { return !!W.MS_API && W.document.documentElement.dataset.mode === 'admin'; }
   function text(f, o) {
     if (typeof f !== 'string' || !f || !allowed(f)) return Promise.resolve(null);
     var keep = LONG[f] || FRESH, fresh = o && o.fresh != null ? Math.min(+o.fresh || 0, keep) : keep, e = E[f];
     if (e && (e.done == null || (e.ok && now() - e.done < fresh))) return e.p;
     e = E[f] = { done: null, ok: false, p: null };
-    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; })
+    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000) + (member() ? '&m=1' : ''), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; })
       .then(function (t) { e.done = now(); e.ok = t != null; W.setTimeout(function () { if (E[f] === e) delete E[f]; }, keep); return t; });
     return e.p;
   }
@@ -2824,7 +2827,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   // or null. Main system only: no shadow trade is counted or named, no system name is shown. Keep MAIN in step with SYS_K.
   window.msGateProof = function (T, I, now) {
     var MAIN = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], out = { open: null, ict: null, last: null };
-    if (Array.isArray(T)) { var M = T.filter(function (t) { return t && !t.shadow && MAIN.indexOf(t.k) >= 0; });
+    if (Array.isArray(T)) { var M = T.filter(function (t) { return t && !t.shadow && (MAIN.indexOf(t.k) >= 0 || t.k === 'main'); });   // 'main': the server's cut copy names no system (api/_guestcut.js)
       var open = M.filter(function (t) { return t.status === 'open'; }).length, wait = M.filter(function (t) { return t.status === 'pending'; }).length;
       out.open = { v: String(open), s: wait ? wait + ' waiting for ' + (wait === 1 ? 'its' : 'their') + ' entry' : 'paper trades, main system' };
       var last = M.filter(function (t) { return t.opened; }).sort(function (x, y) { return y.opened - x.opened; })[0];
@@ -6864,7 +6867,7 @@ function msNextSetup(bars, A) {
   // their rule text). For the public role whatever the loader stores in COUNCIL passes through these filters first: main-system rows
   // only (the rows sysClosed / activeTrades / renderGuest read), each cut to the fields the guest page draws; the snapshot keeps
   // prices only. The guest numbers do not change (tests/qa-sweep.test.mjs runs these filters).
-  const GUEST_F = ['id', 'market', 'label', 'dec', 'k', 'session', 'side', 'entry', 'stop', 't1', 'tp1', 'rr', 'r0', 'size', 'opened', 'filled', 'closed', 'checked', 'status', 'R', 'replay', 'paper', 'addOf'];
+  const GUEST_F = ['id', 'market', 'label', 'dec', 'k', 'session', 'side', 'entry', 'stop', 't1', 'tp1', 'rr', 'r0', 'size', 'opened', 'filled', 'closed', 'checked', 'status', 'R', 'replay', 'paper', 'addOf', 'card'];
   const guestRow = (x) => { const o = {}; for (const f of GUEST_F) if (x[f] !== undefined) o[f] = x[f]; return o; };
   const GUEST_DATA = {
     trades: (v) => Array.isArray(v) ? v.filter((x) => x && !x.shadow && SYS_K.includes(x.k)).map(guestRow) : v,
@@ -6873,6 +6876,10 @@ function msNextSetup(bars, A) {
     snap: (v) => v && v.markets ? { at: v.at, nqLast: v.nqLast, markets: Object.fromEntries(Object.entries(v.markets).map(([k, m]) => [k, { label: m.label, name: m.name, price: m.price, dec: m.dec, open: m.open, setups: [] }])) } : v,
   };
   if (PUB) for (const [key, cut] of Object.entries(GUEST_DATA)) { let val; Object.defineProperty(COUNCIL, key, { enumerable: true, configurable: true, get: () => val, set: (v) => { val = cut(v); } }); }
+  // On the site the server already cuts the guest files (api/_guestcut.js, 11 Nov 2026: same rows, same fields) and names no
+  // system: a main-system row arrives with k 'main', an opaque id, and `card` on a gold trade the trade card may show. The
+  // filters above still run (the GitHub Pages copy reads the whole public files).
+  if (PUB) SYS_K.push('main');
   const GCAL = { y: null, m: null };
   function renderGuestCal() {
     const el = document.getElementById('g-cal'); if (!el || !PUB) return;
@@ -7155,7 +7162,7 @@ function msNextSetup(bars, A) {
   async function renderGuest() {
     if (!PUB || GV.busy) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg');
     const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg'];
-    const pool = (COUNCIL.trades || []).concat(typeof sysTrades === 'function' ? sysTrades() : []).filter((x) => x.market === 'xau' && !x.shadow && !x.replay && SYSG.includes(x.k) && x.entry && x.stop && !x.addOf);
+    const pool = (COUNCIL.trades || []).concat(typeof sysTrades === 'function' ? sysTrades() : []).filter((x) => x.market === 'xau' && !x.shadow && !x.replay && (SYSG.includes(x.k) || x.card) && x.entry && x.stop && !x.addOf);
     const live = pool.filter((x) => x.status === 'open' || x.status === 'pending').sort((a, b) => b.opened - a.opened);
     const x = live[0] || pool.filter((t) => t.closed).sort((a, b) => b.closed - a.closed)[0] || null;
     // the levels on the chart panes (guests see the desk's gold trade on every timeframe) and the card in words

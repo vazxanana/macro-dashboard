@@ -897,6 +897,31 @@ Walked signed out and as a guest (390 px touch, 1440 px, dark / light / midnight
   names and notes to anyone who fetches them, the page source carries the admin views' static text, and the hidden views still
   hold what the page computes in the browser from public candles (the top-down steps, the scanner). Closing that needs the
   server to cut the guest files (`api/data.js`), an owner decision reported on 11 Nov.
+- **The server cuts the guest files** (11 Nov 2026, owner: "do what you think is best"). `api/_guestcut.js` (pure) + `api/data.js`:
+  a `/cdata` request without a valid session gets the five guest JSON files cut to what the guest page and sign-in card draw; a
+  signed-in member gets the whole file, byte for byte. Sizes on 11 Nov, whole → guest: trades.json 1,588 KB → 1.4 KB (5 rows),
+  snapshot.json 62 KB → 0.9 KB, research.json 599 KB → 0.3 KB (1 row), research/replay-2w.json 806 KB → 190 KB (710 rows),
+  ict/replay.json 2,100 KB → 62 bytes. `mt5/signals.csv` is never cut (the broker bridges read it without a session).
+  - Rows and fields are the PAGE's definitions (`SYS_K`, `NQ_SYS`, `SYSG`, `GUEST_F`, `GUEST_DATA`); the lists are written once
+    more in `api/_guestcut.js` and `tests/guest-files.test.mjs` fails when one drifts, and when the cut keeps a row or value the
+    page's own guest filter would not. Snapshot: `at`, `nqLast` (price, at), per market label / name / price / dec / open /
+    chg, and gold's D1 / H4 / H1 trend arrows (the sign-in card). ICT replay: `from` and `totals` n / wins / R.
+  - Three values are rewritten so no row names its system: `id` / `addOf` become an opaque id (HMAC with the session secret,
+    the same in every file; with no secret set they are stable but guessable), `k` becomes `'main'` (`'other'` for a replay row
+    outside `SYS_K`; `'nq-open'` + session `'nyflip'` stay: every NQ row a guest gets is that one system), and a gold trade the
+    trade card may show carries `card: true`. The page takes them: `if (PUB) SYS_K.push('main')`, `SYSG.includes(x.k) || x.card`,
+    `msGateProof` counts `'main'`. The page's own filters stay (the GitHub Pages copy reads whole files).
+  - Cache: only a request with no session cookie and no member mark is answered `public` (as before, 20 s at the edge); the
+    page adds `&m=1` to a signed-in member's requests (`msData` `member()`), and any request with a cookie or the mark is
+    answered `private, no-store` whatever it gets; `Vary: Cookie` on the five files. A wrong or expired cookie, the mark without
+    a session, or the sign-in check failing all get the cut file. A file that does not parse, or a cut that throws, is a 503 for
+    a visitor (the page says "could not be loaded"), never the whole file. **Never add a file to `GUEST_OK` without a cut.**
+  - **What is still public, said plainly**: the `council-data` branch itself is readable on GitHub while the repository is
+    public (the Pages copy and the smoke test read it there); this closes the site's own door, not that one
+    (docs/owner-decisions.md item 32). Also public: `mt5/signals.csv` (live main-system orders with their system key), the page
+    source (system keys, the admin views' static text), and what the page computes in the browser from public candles.
+  - Other readers of council-data without a session, unaffected: `api/status.js` and `api/pine.js` use `readFile` (not
+    `/cdata`); the MT5 / cTrader bridges read only the csv; index.html and macro-desk.html read members' files.
 - **A backtest is called a backtest.** The guest "Last 90 days" curve is mostly the replay of the rules on past candles (11 Nov:
   40 of 45 trades, +10.2R, against 5 forward paper trades, −2.05R) and was all labelled "paper trades". `guestSplit` counts the two
   apart; the replay is drawn dashed, the forward record solid from a dotted marker, and the label, the count, the note and the
@@ -1351,7 +1376,7 @@ were CSS-hidden and /cdata served every file. Now:
 - Session checks: `/api/profile`, `/api/users` (above), `/cdata` (`api/data.js`, user list cached a minute per instance), and the
   owner's session also opens `/api/bridge` downloads and the `/api/tv-webhook` URL/log (the owner password still works there).
   ctrader-link, mcp `mykey`, users `ownerPw` keep taking the real password.
-- `/cdata` guest allowlist `GUEST_OK` (api/data.js, public edge cache + CORS): trades.json, snapshot.json, ict/replay.json,
+- `/cdata` guest allowlist `GUEST_OK` (api/data.js, public edge cache + CORS; since 11 Nov a guest gets these files CUT, see "Sign-in card and guest page"): trades.json, snapshot.json, ict/replay.json,
   research/replay-2w.json, research.json (guest view, sign-in card proof, guest results/calendar) and mt5/signals.csv (the EAs).
   Everything else: 401 without a session, `Cache-Control: private, no-store`, no CORS. Never served: ctrader/tokens.json, users.json.
   `loadCouncil` fetches only the guest files for `PUB` (same list). `api/status.js` / `api/pine.js` read council-data with
