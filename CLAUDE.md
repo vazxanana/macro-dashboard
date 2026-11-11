@@ -2721,3 +2721,13 @@ What was done, and the rules to keep:
 - Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
+
+## Gold playbook study: the weekly-bull daily rejection long, out of its own sample (11 Nov 2026, owner: "keep improving and follow our strategy and learn more about it")
+`research/edge/gold-drd-long/` (PREREGISTRATION.md pushed first, then `run.mjs`, RESULT.md, result.json). The gold playbook
+skill's best edge (weekly structure bullish + a 17:00 New York day closing above the previous low in the top 30% of its range
+→ buy the next open, stop $0.30 under its low, 3R, 10 days) was found on November 2022 to October 2026 only. Tested on OANDA mid
+H1 gold March 2006 to October 2022, net of $0.35, against the same trade on every bullish-week day. The code reproduces the
+skill's window (294 trades, PF 2.17 vs its 271 / 2.20). **Verdict: FAIL**: out of sample +0.141R a trade, PF 1.22 (n 910),
+profitable in 2006-19 and 2020-22, but lift over the baseline +0.10R, t 1.58 (bar t >= 2); worst drawdown -77R; it follows
+gold's trend year by year (losing 2012-15, 2017-19, 2021). The mirror short has no edge. Not an edge of its own; the `#gold`
+view's wording stays the skill's; nothing live changed. Tests: `tests/gold-drd-long.test.mjs`.
