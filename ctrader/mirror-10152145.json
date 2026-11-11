@@ -6636,7 +6636,8 @@
     "t1": 0.8284999999999999,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.8275,
@@ -6650,9 +6651,10 @@
     "lagSec": 63,
     "positionId": "48347186",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T07:48:06.000Z",
-    "brokerStop": 0.827
+    "brokerStop": 0.827,
+    "closedAt": "2026-11-11T08:24:42.000Z"
    },
    "usdcad-scalp-1794383071": {
     "symbol": "USDCAD",
@@ -6796,7 +6798,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9915.01 · 28 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9918.49 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -6849,15 +6851,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9915.01,
-  "lastRun": "2026-11-11T08:22:16.000Z"
+  "balance": 9918.49,
+  "lastRun": "2026-11-11T08:24:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T13:19:35.000Z",
-   "msg": "moved USDCAD 47373490 protection: stop 1.3808974 -> 1.3817174, target 1.43472 -> 1.43554 (council swing)",
-   "trade": "usdcad-swing-1793949081"
-  },
   {
    "at": "2026-11-10T13:19:35.000Z",
    "msg": "moved XAUUSD 47972669 protection: stop 4147.689 -> 4148.514, target 4035.7 -> 4036.525 (council rintra)",
@@ -8352,6 +8349,11 @@
    "at": "2026-11-11T08:19:46.000Z",
    "msg": "placed sell limit BTCUSD 0.01 lot at 73942.5 (council scalp, valid to 2026-11-11T11:18Z)",
    "trade": "btc-scalp-1794385122"
+  },
+  {
+   "at": "2026-11-11T08:24:42.000Z",
+   "msg": "USDCHF position 48347186 closed at the broker",
+   "trade": "usdchf-scalp-1794383223"
   }
  ],
  "limits": {
