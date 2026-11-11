@@ -5,11 +5,15 @@
 // Stored privately in the Blob store as notices/list.json (100 kept). Read/unread is kept per browser and account (localStorage).
 const S = require('./_session.js');
 const KEEP = 100, SHOW = 50;
+// Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the file is overwritten in place, and the CDN serves an overwritten
+// file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
+// what was stored in between (11 Nov 2026, the Academy store's bug; same fix).
+const fresh = (url) => { const u = new URL(url); u.searchParams.set('cache', '0'); return u.toString(); };
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'notices/list.json';
   return {
     async get() { const { blobs } = await B().list({ prefix: P, token }); const b = blobs.find((x) => x.pathname === P); if (!b) return [];
-      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`notices read ${r.status}`); const j = await r.json(); return Array.isArray(j) ? j : []; },   // a failed read never looks empty (a POST would overwrite the list),
+      const r = await F(fresh(b.url), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`notices read ${r.status}`); const j = await r.json(); return Array.isArray(j) ? j : []; },   // a failed read never looks empty (a POST would overwrite the list),
     async put(list) { await B().put(P, JSON.stringify(list), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }

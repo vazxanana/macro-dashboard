@@ -8,11 +8,15 @@ const isOwner = (pw) => require('./users.js')._t.isOwner(pw);
 const S = require('./_session.js');
 const G = require('./_guard.js');
 const MAX = 700 * 1024;
+// Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the file is overwritten in place, and the CDN serves an overwritten
+// file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
+// what was stored in between (11 Nov 2026, the Academy store's bug; same fix).
+const fresh = (url) => { const u = new URL(url); u.searchParams.set('cache', '0'); return u.toString(); };
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'sounds/config.json';
   return {
     async get() { const { blobs } = await B().list({ prefix: P, token }); const b = blobs.find((x) => x.pathname === P); if (!b) return null;
-      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`sounds read ${r.status}`); return r.json(); },   // a failed read never looks empty (a POST would drop the other sound)
+      const r = await F(fresh(b.url), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`sounds read ${r.status}`); return r.json(); },   // a failed read never looks empty (a POST would drop the other sound)
     async put(data) { await B().put(P, JSON.stringify(data), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }

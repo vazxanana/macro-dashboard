@@ -6,9 +6,11 @@ import fs from 'node:fs';
 import { EX, describe, drawdown, seBand, yearBand, nVerdict, forwardCheck, expectOne, buildExpect, expectLine, loadExpectBase, fBand, fDD, verdictText } from '../council/expect.mjs';
 import { waiting } from '../council/digest.mjs';
 import { mcDrawdown, loadBase } from '../council/decay.mjs';
+import { P as STUDY, nights as studyNights } from '../research/edge/trend-breadth/run.mjs';
 
 const rdE = (f) => JSON.parse(fs.readFileSync(new URL(`../research/edge/${f}`, import.meta.url), 'utf8'));
 const BASE = loadExpectBase(), DBASE = loadBase();
+const GOLD = rdE('honest-book/gold-1d.json').bars;
 const sys = (id) => BASE.systems.find((s) => s.id === id);
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b}`);
 
@@ -42,14 +44,31 @@ test('forward record against the honest band for its own n: above / below / insi
 });
 
 // ─── the base file against the studies' result.json (same windows, same costs x1) ───
-test('gold systems: 2006-17 out of sample and the 2018-26 calibration match research/edge/gold-systems-oos result.json', () => {
-  const G = rdE('gold-systems-oos/result.json');
+// Since 11 Nov 2026 (owner approved the edge review's decision 2) the four long-only gold systems' figures are AFTER overnight
+// financing: n is still the study's, the mean and t are those of research/edge/trend-breadth Part A (same method, same rate), and
+// the figure before financing (fin.before) is still gold-systems-oos'.
+test('gold systems: 2006-17 out of sample and 2018-26 match gold-systems-oos before financing and trend-breadth Part A after it', () => {
+  const G = rdE('gold-systems-oos/result.json'), A = rdE('trend-breadth/result.json').partA;
+  const partA = (k, w) => A.find((r) => r.sys === k && r.window.startsWith(w));
   for (const [id, k] of [['gtrend', 'gtrend'], ['gtrend5', 'gtrend5'], ['gtl', 'gtl'], ['geg', 'geg']]) {
-    const s = sys(id), o = G.systems[k].periods.oos.x1, c = G.systems[k].periods.cal.x1;
-    assert.equal(s.honest.n, o.n, `${id} oos n`); near(s.honest.exp, o.mean, 0.0015, `${id} oos mean`); near(s.honest.t, o.t, 0.011, `${id} oos t`); near(s.honest.maxDD, -o.maxDD, 0.011, `${id} oos maxDD`);
-    assert.equal(s.builtOn.n, c.n, `${id} cal n`); near(s.builtOn.exp, c.mean, 0.0015, `${id} cal mean`);
-    assert.equal(G.systems[k].verdict.verdict, 'regime-bound'); assert.match(s.regime, /regime-bound/);
+    const s = sys(id), o = G.systems[k].periods.oos.x1, c = G.systems[k].periods.cal.x1, a = partA(k, 'untouched'), a2 = partA(k, '2018-01');
+    assert.equal(s.honest.n, o.n, `${id} oos n`); assert.equal(s.honest.n, a.n);
+    near(s.honest.exp, a.afterF1, 0.0011, `${id} oos mean after financing`); near(s.honest.t, a.tF1, 0.011, `${id} oos t after financing`);
+    near(s.fin.before.exp, o.mean, 0.0015, `${id} oos mean before financing`); near(s.fin.before.t, o.t, 0.011, `${id} oos t before financing`);
+    near(s.fin.perTrade, a.fin, 0.0011, `${id} financing a position`); near(s.fin.nights, a.nights, 0.011, `${id} nights held`);
+    near(s.fin.before.exp - s.fin.perTrade, s.honest.exp, 0.0011, `${id}: after = before less financing`);
+    assert.ok(s.honest.exp < o.mean, `${id}: financing only lowers the figure`);
+    // the built-on window runs a few days past the study's (to 6 Nov), so it is recomputed here with the STUDY's own night counter and rate
+    const sec = (x) => Date.parse(x + ':00Z') / 1000, px = (t) => { let v = GOLD[0][1]; for (const b of GOLD) { if (b[0] <= t) v = b[1]; else break; } return v; };
+    const cal = G.positions.filter((p) => p.sys === k && sec(p.t) >= Date.parse('2018-01-01T00:00:00Z') / 1000 && sec(p.t) < Date.parse('2026-11-07T00:00:00Z') / 1000);
+    const want = cal.reduce((q, p) => q + p.n - studyNights(sec(p.t), sec(p.c)) * STUDY.FIN_GOLD * px(sec(p.t)) / p.r0, 0) / cal.length;
+    assert.equal(s.builtOn.n, c.n, `${id} cal n`); assert.equal(cal.length, c.n); near(s.builtOn.exp, want, 0.0011, `${id} cal mean after financing`); near(s.builtOn.exp, a2.afterF1, 0.02, `${id} cal mean near Part A's 2018-26 row`);
+    assert.equal(G.systems[k].verdict.verdict, 'regime-bound'); assert.match(s.regime, /regime-bound/); assert.match(s.regime, /financing/);
   }
+  assert.equal(partA('gtl', 'untouched').survives, false); assert.match(sys('gtl').regime, /does not survive financing/);
+  for (const id of ['replica', 'mosha-bo', 'gmp', 'nq-open', 'ict-a', 'trend']) assert.equal(sys(id).fin, null, `${id}: no financing in its figures, and the file says so`);
+  assert.match(BASE.financing.notComputed, /replica/i); assert.equal(BASE.financing.rate, 0.000148);
+  assert.deepEqual(BASE.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a'], 'live since 11 Nov: Gold trend, Gold daily engulf (and the separate ICT desk)');
   near(sys('gtrend').honest.perYear, 75 / 11.5, 0.05, 'gtrend trades a year over the 11.5-year window');
 });
 test('NQ open run: 2004-22 untouched and 2023-26 built on match research/edge/nq-open-oos result.json', () => {

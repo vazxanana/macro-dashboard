@@ -12,6 +12,7 @@
 // only when |TS| >= 0.295, the cut frozen on the first half of 2004-26 (p20 of first-half readings; second half ON +0.119R vs
 // OFF -0.200R a trade, Welch t 2.73, nominal only). The study's own verdict: a loss filter for dead regimes, not a regime
 // detector, and in 2023-26 the trades it skips were winners. Paper only; the owner decides.
+import { ownStream } from './fills.mjs';
 export const REGIME = { sym: 'nas100', window: 126, trendMin: 0.295, year: 365 * 86400 };
 const DAY = 86400;
 const r3 = (x) => +x.toFixed(3);
@@ -46,7 +47,8 @@ export function trendStrength(rows, T, n = REGIME.window) {
   return { ts, abs: Math.abs(ts), asOf: new Date(rows[i][0] * 1000).toISOString().slice(0, 10) };
 }
 // the stream's own net R over trades closed in [T - year, T): closed nyflip records only
-export const isNyflipClosed = (x) => !!x && x.k === 'nq-open' && x.session === 'nyflip' && !x.void && !x.shadow
+// (since the owner made the open run a paper shadow on 11 Nov 2026 its own records carry blockedBy ['owner-shadow']: still the stream)
+export const isNyflipClosed = (x) => !!x && x.k === 'nq-open' && x.session === 'nyflip' && !x.void && ownStream(x)
   && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && Number.isFinite(x.closed) && Number.isFinite(x.R);
 export const netOf = (x) => (Number.isFinite(x.Rnet) ? x.Rnet : x.R);
 export function metaR(trades, T, year = REGIME.year) {

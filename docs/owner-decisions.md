@@ -26,8 +26,9 @@ Every item has a "Status, 11 Nov" line: that line is the current truth; the text
    GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
 8. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
-9. **Mosha BO as a live paper system (item 33).** If nothing is decided: it stays among the main systems although its
-   rebuild on earlier years makes nothing and it has placed no live trade since 4 Nov.
+9. **A 10-lot gold buy on the Replica demo account that the mirror did not place (item 41).** If nothing is decided:
+   that account's balance and record do not measure the replica, and nobody knows who has its password.
+   (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with items 37 and 40.)
 10. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
     being recorded and copied to the demo shadow account.
 11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
@@ -37,7 +38,7 @@ Everything else below is smaller, or already answered and only needs a tick.
 
 Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
 and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
-**Mosha** (27-28), **Added 11 Nov 2026** (29-36).
+**Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, two open).
 
 ---
 
@@ -652,6 +653,8 @@ Open points that were written down elsewhere (developer notes, study results, op
 
 ### [ ] 33. Mosha BO stays among the live paper systems?
 
+- **Status, 11 Nov 2026 (evening): done in the code as part of item 37** (Mosha BO is a paper shadow from the first council
+  round after the change is deployed). You did not answer this item by its number, so the box stays open: see item 40.
 - **Context.** Rebuilt on earlier years with the corrected clock, Mosha BO makes -0.064R a trade over 157 trades with a
   46R worst drawdown (item 19). On 2006-17 it was "in substance a null result". It has placed no live paper trade since
   4 Nov. The five Mosha studies of 10 Nov tested other readings of the method and none passed.
@@ -702,8 +705,102 @@ Each is from a finished study; nothing was changed. All paper only.
 - [ ] **Your acceptance walk** (`docs/academy/ACCEPTANCE.md`): sign in, open `/academy`, go through the list once. The
   Academy's store is empty until you train on it; every number on the page will be from your own attempts.
 
+## The edge review of 11 Nov 2026
 
-### [ ] 37. The AI second opinion on each edge entry uses a paid key
+From `research/proposals/2026-11-11-edge-review.md` (its evidence: `research/edge/honest-book`, `research/edge/trend-breadth`
+and the studies it lists). You were shown its decisions on 11 Nov 2026 and answered: **"yes anything that is better for the
+system and that applies it"**. That is taken as your approval of exactly the three recommended changes below (items 37 to
+39) and nothing wider. Paper and demo only. No entry rule, filter, size, stop or exit of any system changed, no stop was
+removed, loosened or moved, and nothing of the ICT desk was touched. Developer notes: `CLAUDE.md`, "Supported book,
+financing in the costs, replica mirror gold only (11 Nov 2026)".
+
+### [x] 37. The live paper book is Gold trend and Gold daily engulf only
+
+- **Status (11 Nov 2026): approved.** Your words: "yes anything that is better for the system and that applies it". Done in
+  the code (Trader user rule `supported-book`); it takes effect on the first council round after the change is deployed,
+  and that round writes the dated line into the council's rule history.
+- **What changed.** Gold trend (the 20-day breakout) and Gold daily engulf keep trading live on paper, exactly as before.
+  Gold replica, Gold momentum pullback, the NQ New York open run, Gold H4 trendline and Mosha BO become **paper shadows**:
+  the same rule finds the same trades with the same stops, every trade is recorded and managed by the same loop to its
+  exit, but it is never alerted, gets no futures ticket and is not counted as "our system". Gold trend fast stays the
+  shadow it has been since 7 Nov. (The momentum pullback was already recorded as a test shadow since 6 Nov; it is now
+  listed as a shadow everywhere.)
+- **Trades already open.** A trade that was open as a live trade keeps running as a live trade to its own exit, with its
+  stop. On 11 Nov, 22:00 UTC, there was none of the five systems': the only main-system order on the book was one resting
+  Gold daily engulf buy limit (3,971.36, stop 3,895.27), which stays live.
+- **History.** Trades the five systems took live before the change stay in the main record as live trades; nothing is
+  relabelled. The page says "paper shadow since 11 Nov" beside each of them.
+- **Why.** No system has a t of 2 on data it was not built on. On untouched 2006-17, Gold trend (+0.49R a position, n 75,
+  t 1.77) and the daily engulf (+0.19R, n 256, t 1.89) are the nearest; the other five are flat or negative there. The book
+  of all of them made +4.3R a year with an 83R worst drawdown and lost at doubled costs. Not shown: the two-system book has
+  not itself been run as a book. Expect about +6R a year after financing, give or take 15R, with a drawdown near 30R.
+- **To undo.** Ask for a system back: a new owner rule removes its entry from the council's `ownerShadow` setting, and its
+  next trade is live again.
+
+### [x] 38. Overnight financing is counted in the paper costs
+
+- **Status (11 Nov 2026): approved.** Your words: "yes anything that is better for the system and that applies it". Done in
+  the code (`council/fills.mjs`, Trader user rule `count-financing`); in effect from the first council round after the
+  change is deployed.
+- **What changed.** A gold buy held overnight on the demo broker pays financing: 0.0148 % of the price for each rollover
+  (Monday to Friday 22:00 UTC, three on Wednesday), about 5.3 % a year. It is the broker's own rate read on 11 Nov 2026 and
+  the method of `research/edge/trend-breadth` Part A. It is now part of the cost of every paper trade, so of every "after
+  costs" figure that is built from the trades: the council's cost summary, the week pane, the daily digest, the edge
+  scoreboard, the decay monitor. "What to expect" was rebuilt with it: Gold trend +0.49R becomes +0.40R a position
+  (t 1.77 becomes 1.49), the daily engulf +0.19R becomes +0.14R (t 1.46), the H4 trendline +0.05R becomes +0.01R (t 0.23),
+  Gold trend fast +0.37R becomes +0.29R (t 1.53).
+- **History is not rewritten.** The cost of a trade is recorded once, when it closes. Trades closed before the change keep
+  the cost they were recorded with; every trade closed after it carries financing. A net figure that spans that day mixes
+  the two, and the page says so.
+- **Limits, said plainly.** Today's rate, not a history of it (the repository has none). Gold buys only: a gold sell is
+  credited nothing (the broker would credit a little), and no other market's rate has been measured, so none is charged.
+  Not in the figures of the replica, Mosha BO or the momentum pullback in "What to expect" (their study records do not
+  carry what the sum needs). The 30-day replay of the retired engine's setups and the decay monitor's backtest baselines
+  do not carry it either.
+- **To change the rate.** One named constant, `FIN`, with its source and date.
+
+### [x] 39. The demo mirror stops copying the replica's forex and crypto paper trades
+
+- **Status (11 Nov 2026): approved.** Your words: "yes anything that is better for the system and that applies it". Done in
+  the code (Trader user rule `replica-mirror-gold-only`, read by the mirror); in effect from the first council round after
+  the change is deployed.
+- **What changed.** The Replica demo account gets no NEW copy of the replica's paper trades on forex and crypto. Gold
+  replica copies, and every other book and account, are unchanged. A position that was already copied is managed exactly
+  as before: its stop stays, a moved stop is followed, and it is closed when its paper trade closes. Nothing is closed or
+  left without a stop by this change.
+- **Until when.** Until that stream is positive before costs over 200 trades: the forex and crypto replica paper trades
+  closed since the rule started must number 200 or more and sum to more than zero before costs. The council counts it
+  every round. It does **not** switch back by itself: when the condition is met, it is yours to decide.
+- **Why.** Those paper trades made -0.08R a trade before costs over 568 trades (t -1.3), and the Replica demo account
+  filled 0.08R worse than paper on every copy (n 121, t 3.9).
+- **Off-switch.** A new owner rule that clears the council's `mirrorReplica` setting: every replica paper trade is copied
+  again from the next round.
+
+### [ ] 40. Mosha BO to a paper shadow (item 33): covered by item 37
+
+- **Status (11 Nov 2026): open** as a question, done in the code. The review's decision 4 ("Mosha BO to shadow: recommended
+  yes; it is part of decision 1") is carried out by item 37. You approved the review's recommendations as a whole and did
+  not answer item 33 by its number.
+- **What is asked.** Nothing more needs doing. If you agree, item 33 can be ticked with this one. If you want Mosha BO
+  live on paper again, say so: it is one line (item 37, "To undo").
+- **If nothing is decided.** It stays a paper shadow, recorded and judged on its forward record.
+
+### [ ] 41. Who placed the 10-lot gold buy on the Replica demo account that closed 11 Nov 13:37 UTC for -$4,427? Reset the account before reading its record
+
+- **Status (11 Nov 2026): open.** The owner has not answered.
+- **Context.** On 11 Nov at 13:37 UTC a 10-lot gold buy on the Replica demo account closed with a loss of $4,427 (entry
+  4,040.45, exit 4,036.12), which took the account from about $10,017 to $5,545. It is not in the mirror's records, and the
+  mirror cannot send more than 5 lots: it was not a copied trade and looks placed by hand. Nothing real was lost (a demo
+  account). The mirror's daily loss stop then refused every replica copy for the rest of that day, and the account's
+  balance and results no longer measure the replica.
+- **Options.** (a) It was you: reset the account (close everything by hand, set the balance back, and ask for the mirror's
+  records of that account to be started afresh), then read its record from that day. (b) It was not you: change that
+  account's password first, then (a).
+- **Recommended.** Whichever applies, reset the account before its record is read.
+- **If nothing is decided.** The Replica demo account keeps a balance that one hand-placed trade halved, and its record
+  cannot be used to judge the replica.
+
+### [ ] 42. The AI second opinion on each edge entry uses a paid key
 
 - **Status (11 Nov 2026).** Built on your request ("have an ai to study the trade decisions in the edge", answered "each
   entry, blind" and "an API key, automatic"). It uses the key already set for the Academy ("the key is the same as academy

@@ -8,11 +8,15 @@
 // writes only its own record. Stored privately in the Blob store as profiles/<key>.json. Nothing here touches trading.
 const S = require('./_session');
 
+// Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the file is overwritten in place, and the CDN serves an overwritten
+// file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
+// what was stored in between (11 Nov 2026, the Academy store's bug; same fix).
+const fresh = (url) => { const u = new URL(url); u.searchParams.set('cache', '0'); return u.toString(); };
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN;
   return {
     async get(u) { const { blobs } = await B().list({ prefix: `profiles/${u}.json`, token }); const b = blobs.find((x) => x.pathname === `profiles/${u}.json`); if (!b) return null;
-      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`profile read ${r.status}`); return r.json(); },   // a failed read never looks empty (a save would drop the photo)
+      const r = await F(fresh(b.url), { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`profile read ${r.status}`); return r.json(); },   // a failed read never looks empty (a save would drop the photo)
     async put(u, data) { await B().put(`profiles/${u}.json`, JSON.stringify(data), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }

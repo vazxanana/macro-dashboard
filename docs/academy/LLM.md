@@ -286,4 +286,4 @@ live entry of the seven Meridian edges (Council → Review, card "AI second opin
 section 3 (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`, …) but keeps its own store folder (`edge-analyst/`, with its own
 `cost.json` and `llm-cache.json`) and its own budgets (`EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
 `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12), so it can never spend the Academy's allowance or the other way round.
-`EDGE_ANALYST=off` or `EDGE_LLM_STOP=1` stops it. Owner decision 37 records the paid key.
+`EDGE_ANALYST=off` or `EDGE_LLM_STOP=1` stops it. Owner decision 42 records the paid key.
