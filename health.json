@@ -1,6 +1,6 @@
 {
- "at": "2026-11-11T22:04:03.000Z",
- "status": "bad",
+ "at": "2026-11-11T22:22:17.000Z",
+ "status": "warn",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
@@ -22,7 +22,7 @@
      "sym": "eurusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-11T21:55:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 1.8,
      "clipped": 0,
@@ -33,9 +33,9 @@
      "sym": "gbpusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-11T21:55:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
-     "maxJump": 1.5,
+     "maxJump": 1.88,
      "clipped": 0,
      "issues": []
     },
@@ -44,9 +44,9 @@
      "sym": "audusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-11T21:55:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
-     "maxJump": 1.86,
+     "maxJump": 7.95,
      "clipped": 0,
      "issues": []
     },
@@ -55,9 +55,9 @@
      "sym": "usdcad",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-11T21:55:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
-     "maxJump": 1.34,
+     "maxJump": 3.05,
      "clipped": 0,
      "issues": []
     },
@@ -66,7 +66,7 @@
      "sym": "usdchf",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-11T21:55:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 2.4,
      "clipped": 0,
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T22:00:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 2.4,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T22:00:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 2.83,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T22:00:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 1.97,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-11T22:00:00.000Z",
+     "last": "2026-11-11T22:20:00.000Z",
      "staleMin": 0,
      "maxJump": 1.86,
      "clipped": 0,
@@ -126,7 +126,7 @@
   },
   "cnbc": {
    "label": "CNBC futures (ICT desk)",
-   "status": "bad",
+   "status": "closed",
    "markets": {
     "nq": {
      "label": "NQ",
@@ -142,15 +142,13 @@
     "es": {
      "label": "ES",
      "sym": "@SP.1",
-     "status": "bad",
-     "n": 0,
-     "issues": [
-      {
-       "kind": "error",
-       "sev": "bad",
-       "detail": "unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found"
-      }
-     ]
+     "status": "closed",
+     "n": 828,
+     "last": "2026-11-11T21:55:00.000Z",
+     "staleMin": 0,
+     "maxJump": 2.29,
+     "clipped": 0,
+     "issues": []
     },
     "ym": {
      "label": "YM",
@@ -194,13 +192,13 @@
     "snapshot.json": {
      "label": "Trader snapshot (snapshot.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "state.json": {
      "label": "Trader state (state.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "trades.json": {
@@ -221,7 +219,7 @@
     "mt5/signals.csv": {
      "label": "MT5 / cTrader signal file (mt5/signals.csv)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "analysis/latest.md": {
@@ -232,13 +230,13 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -274,7 +272,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 3,
+     "ageMin": 9,
      "issues": [
       {
        "kind": "source",
@@ -314,7 +312,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": [
       {
        "kind": "input",
@@ -326,13 +324,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": []
     },
     "macro/history.json": {
@@ -353,7 +351,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1324,
+     "ageMin": 1342,
      "issues": []
     },
     "digest.json": {
@@ -364,37 +362,37 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "warn",
-     "ageMin": 253,
+     "ageMin": 271,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 4.2 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+       "detail": "not updated for 4.5 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
       }
      ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 650,
+     "ageMin": 668,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 650,
+     "ageMin": 668,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 649,
+     "ageMin": 668,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 3,
+     "ageMin": 21,
      "issues": []
     },
     "research/ledger.json": {
@@ -415,19 +413,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 203,
+     "ageMin": 221,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 839,
+     "ageMin": 858,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 5715,
+     "ageMin": 5733,
      "issues": [
       {
        "kind": "stale",
@@ -454,23 +452,19 @@
    }
   }
  },
- "summary": "CNBC futures (ICT desk): ES error · Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale",
+ "summary": "Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale",
  "brief": {
-  "status": "bad",
-  "line": "1 problem, 2 warnings: CNBC futures (ICT desk) ES: unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found",
-  "bad": [
-   "CNBC futures (ICT desk) ES: unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found"
-  ],
+  "status": "warn",
+  "line": "2 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1045 days old; over 120 the strategist drops it as \"no dat",
+  "bad": [],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1045 days old; over 120 the strategist drops it as \"no data\")",
-   "Loop watchdog (watchdog.json): not updated for 4.2 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+   "Loop watchdog (watchdog.json): not updated for 4.5 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
   ],
   "notes": 3
  },
  "alert": {
-  "streak": {
-   "cnbc:es": 1
-  },
+  "streak": {},
   "sent": {
    "key": "",
    "at": "2026-11-09T04:12:20.000Z",
