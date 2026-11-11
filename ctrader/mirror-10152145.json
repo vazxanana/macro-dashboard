@@ -8819,7 +8819,8 @@
     "t1": 1.4268200000000004,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42528,
@@ -8833,7 +8834,8 @@
     "lagSec": 334,
     "positionId": "48558289",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-11T23:12:36.000Z"
    },
    "audusd-scalp-1794437986": {
     "symbol": "AUDUSD",
@@ -8951,7 +8953,7 @@
    "startBalance": 9963.35
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9830.75 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9828.97 · 30 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9005,15 +9007,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9830.75,
-  "lastRun": "2026-11-11T23:10:33.000Z"
+  "balance": 9828.97,
+  "lastRun": "2026-11-11T23:12:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T01:18:57.000Z",
-   "msg": "limit filled: GBPUSD position 48254217 at the broker",
-   "trade": "gbpusd-scalp-1794359735"
-  },
   {
    "at": "2026-11-11T01:35:39.000Z",
    "msg": "XAUUSD position 48147097 closed at the broker",
@@ -10508,6 +10505,11 @@
    "at": "2026-11-11T23:06:59.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council rscalp)",
    "trade": "xau-rscalp-1794438377"
+  },
+  {
+   "at": "2026-11-11T23:12:36.000Z",
+   "msg": "USDCAD position 48558289 closed at the broker",
+   "trade": "usdcad-scalp-1794436935"
   }
  ],
  "limits": {
