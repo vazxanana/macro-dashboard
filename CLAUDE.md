@@ -1270,6 +1270,15 @@ errors are generic (bridge GET, push 500). push.js caps what a device may store 
 non-object alerts 400). alert-cron skips a malformed device record instead of failing every device. MCP `granted`: an explicit
 `perms.mcp` wins over the record's `mcp` flag (as `msPerms`). `/cdata` answers GET / HEAD only; bridge GET / POST only; profile
 refuses a non-object JSON body (400, was 500); a failed sounds read is answered `no-store`. Tests: `tests/api-hardening.test.mjs`.
+Review of 11 Nov 2026 (every function read; `tests/api-review.test.mjs`): three fixes. (1) `/api/push` (no sign-in) took a price
+such as "1e999": it passed "> 0", was stored as null, and `alert-cron` then threw for that device and ended the round for every
+device after it, each minute. Push now wants a finite price and time; the cron leaves out an alert that is not whole and one
+device's failure never stops the others. (2) `/api/mosha-lessons`: the owner's `remove` let a `book` or `add` sent in the same
+body through (the owner reads and removes, only Luxus teaches); only the `remove` is carried out now. (3) `api/mcp.js` `granted`:
+with an `MCP_KEYS` entry the stored user list was not read before `ictLevel`, so the first call on a cold instance got the
+built-in ICT level whatever the Users page said; the list is read first for every key (an explicit key is still a grant while
+the list cannot be read). The same file re-checks: a foreign Origin on every state-changing endpoint, `/cdata` path handling,
+the Mosha assistant's key against every other endpoint, who teaches, who writes whose record, where `ictApply` can come from.
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
