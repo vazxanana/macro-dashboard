@@ -10631,7 +10631,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9852.51 · 36 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9852.51 · 36 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10680,18 +10680,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdchf-rscalp-1794481683": {
+    "orderId": "33993678",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 0.83169,
+    "stop": 0.8310500000000001,
+    "t1": 0.8319,
+    "placedAt": "2026-11-12T11:09:15.000Z",
+    "expires": "2026-11-12T14:08:03.000Z",
+    "riskCash": 1.97,
+    "margin": 4,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9852.51,
-  "lastRun": "2026-11-12T11:06:15.000Z"
+  "lastRun": "2026-11-12T11:09:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T08:14:53.000Z",
-   "msg": "moved USDCAD 48598990 protection: stop 1.42426 -> 1.42489, target 1.4272 -> 1.42783 (council scalp)",
-   "trade": "usdcad-scalp-1794447126"
-  },
   {
    "at": "2026-11-12T08:14:53.000Z",
    "msg": "moved USDCAD 48613819 protection: stop 1.4246 -> 1.42523, target 1.42724 -> 1.42787 (council intraday)",
@@ -12186,6 +12201,11 @@
    "at": "2026-11-12T10:56:14.000Z",
    "msg": "limit filled at once: XAUUSD position 48750658 at the broker at 3953.27",
    "trade": "xau-rscalp-1794480911"
+  },
+  {
+   "at": "2026-11-12T11:09:15.000Z",
+   "msg": "placed buy limit USDCHF 0.02 lot at 0.83169 (council rscalp, valid to 2026-11-12T14:08Z)",
+   "trade": "usdchf-rscalp-1794481683"
   }
  ],
  "limits": {
