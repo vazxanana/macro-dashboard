@@ -23,7 +23,7 @@ import { d1AdxFeat } from './adx.mjs';
 import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
-import { cycleTrades, cycleText } from './mosha-cycle.mjs';
+import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
 import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
@@ -989,16 +989,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     // Mosha cycle (11 Nov 2026, owner; user rule mosha-cycle, council/mosha-cycle.mjs): H4 move, H1 ChoCh = the pullback starts,
     // M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme). A main paper
-    // system; a signal whose target is under 1R away, a second open trade of the same leg, or a limit already past its stop is a shadow.
+    // system; a signal whose target is under 1R away, a second open trade of the same leg, or a limit already past its stop is a shadow,
+    // and so is every new one while the owner lists 'mcycle' in config.ownerShadow (cycleBlockers; a trade already open stays live).
     if (key === 'xau' && config.moshaCycle) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
       try {
         const C = cycleTrades({ E4: ev('4h', 14400), E1: ev('1h', 3600), E15: ev('15m', 900), E5: ev('5m', 300), h1: src['1h'].bars.slice(0, -1) }, now);
-        snapshot.moshaCycle = { state: C.state, text: cycleText(C.state), open: trades.filter((x) => x.k === 'mcycle' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length };
+        snapshot.moshaCycle = { state: C.state, text: cycleText(C.state), open: trades.filter((x) => x.k === 'mcycle' && ownStream(x) && (x.status === 'open' || x.status === 'pending')).length, ...(ownerSh('mcycle') ? { shadow: true } : {}) };
         for (const o of C.trades.filter((x) => x.fresh)) {
           const id = `xau-mcycle-${o.leg}-${o.h4.t}`; if (trades.some((x) => x.id === id)) continue;
-          const d = o.side === 'sell' ? -1 : 1, busy = trades.some((x) => x.k === 'mcycle' && x.leg === o.leg && !x.shadow && (x.status === 'open' || x.status === 'pending'));
-          const blk = [!o.room && 'room', busy && 'cap', !(d < 0 ? price < o.stop : price > o.stop) && 'price'].filter(Boolean);
+          const d = o.side === 'sell' ? -1 : 1, blk = cycleBlockers(o, trades, price, ownerSh('mcycle'));   // owner-shadow (12 Nov): like Mosha BO; the cap reads the system's own stream
           const t1 = o.t1 != null && o.room ? o.t1 : +(o.entry + d * 2 * o.r0).toFixed(2);
           trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mcycle', name: o.leg === 'pull' ? 'Mosha cycle (pullback)' : 'Mosha cycle (main)', leg: o.leg,
             pair: `H4 → H1 ChoCh → ${o.tf === '5m' ? 'M5' : 'M15'}`, h: o.tf, side: o.side, entry: o.entry, stop: o.stop, t1, rr: o.room ? o.rr : 2, buf: 0.3,

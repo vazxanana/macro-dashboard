@@ -3045,6 +3045,10 @@ it like any non-shadow trade. Not yet in the decay monitor, expectations or book
 edge**: the mechanical studies of this cycle (mosha-retrace, mosha-cycle) did not pass; the owner chose to trade it on paper
 and judge its forward record. `snapshot.moshaCycle` → `#ms-rep-mcycle` under the Mosha BO chain line. Tests:
 `tests/mosha-cycle.test.mjs`.
+12 Nov 2026: owner-shadowable like the others: `cycleBlockers(o, trades, price, ownerSh('mcycle'))` (pure, in mosha-cycle.mjs)
+adds `'owner-shadow'` when `config.ownerShadow.mcycle` is set (none today: live records unchanged, pinned against the old
+blockers); the one-per-leg cap and `snapshot.moshaCycle.open` count `ownStream`, not `!x.shadow`; a trade already open stays
+live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`tests/analyst-gold.test.mjs` now expects 9 systems).
 
 ## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
 `api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
