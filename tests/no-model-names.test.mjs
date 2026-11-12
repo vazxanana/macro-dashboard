@@ -57,7 +57,7 @@ function tracked() {
 
 test('the pattern finds model names and leaves ordinary words alone', () => {
   const bad = [j('G', 'PT') + '-4o said', j('Cl', 'aude') + ' 3 ' + j('Op', 'us'), 'the ' + j('son', 'net') + '-4 run', j('Cla', 'ude') + ' wrote it',
-    'via ' + j('Gem', 'ini') + ' 1.5 Pro', j('Lla', 'ma') + '-3 70B', j('Mis', 'tral') + ' Large', j('Deep', 'Seek') + ' R1', 'o3-mini', j('Co', 'dex') + ' built it'];
+    'via ' + j('Gem', 'ini') + ' 1.5 Pro', j('Lla', 'ma') + '-3 70B', j('Mis', 'tral') + ' Large', j('Deep', 'Seek') + ' R1', j('o3', '-mini'), j('Co', 'dex') + ' built it'];
   for (const s of bad) assert.ok(scanText(s).length, 'should flag: ' + s);
   const ok = ['gptmacro_v.1 skill', 'magnum ' + j('op', 'us'), 'a ' + j('hai', 'ku') + ' about gold', 'a ' + j('son', 'net'), 'see CLAUDE.md',
     '.claude/skills/ICT/SKILL.md', 'https://' + j('cla', 'ude') + '.ai', j('Cla', 'ude') + ' Code', 'branch ' + j('cla', 'ude') + '/msnr-study',
