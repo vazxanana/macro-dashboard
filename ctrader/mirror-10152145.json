@@ -9562,7 +9562,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9818.33 · 33 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9818.33 · 33 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9592,23 +9592,53 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794461258": {
+    "orderId": "33977477",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.32585,
+    "stop": 1.32642,
+    "t1": 1.32502,
+    "placedAt": "2026-11-12T05:28:37.000Z",
+    "expires": "2026-11-12T08:27:38.000Z",
+    "riskCash": 1.96,
+    "margin": 7.96,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "audusd-intraday-1794461258": {
+    "orderId": "33977478",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 0.68348,
+    "stop": 0.68492,
+    "t1": 0.6806,
+    "placedAt": "2026-11-12T05:28:37.000Z",
+    "expires": "2026-11-12T17:27:38.000Z",
+    "riskCash": 1.96,
+    "margin": 1.37,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9818.33,
-  "lastRun": "2026-11-12T05:26:17.000Z"
+  "lastRun": "2026-11-12T05:28:37.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T08:12:53.000Z",
-   "msg": "placed buy limit USDCHF 0.02 lot at 0.82787 (council scalp, valid to 2026-11-11T11:11Z)",
-   "trade": "usdchf-scalp-1794384709"
-  },
-  {
-   "at": "2026-11-11T08:12:53.000Z",
-   "msg": "limit filled at once: USDCHF position 48352071 at the broker at 0.82786",
-   "trade": "usdchf-scalp-1794384709"
-  },
   {
    "at": "2026-11-11T08:15:23.000Z",
    "msg": "USDCAD position 48351152 closed at the broker",
@@ -11098,6 +11128,16 @@
    "at": "2026-11-12T05:19:53.000Z",
    "msg": "ETHUSD position 48581227 closed at the broker",
    "trade": "eth-rscalp-1794443123"
+  },
+  {
+   "at": "2026-11-12T05:28:37.000Z",
+   "msg": "placed sell limit GBPUSD 0.03 lot at 1.32585 (council scalp, valid to 2026-11-12T08:27Z)",
+   "trade": "gbpusd-scalp-1794461258"
+  },
+  {
+   "at": "2026-11-12T05:28:37.000Z",
+   "msg": "placed sell limit AUDUSD 0.01 lot at 0.68348 (council intraday, valid to 2026-11-12T17:27Z)",
+   "trade": "audusd-intraday-1794461258"
   }
  ],
  "limits": {
