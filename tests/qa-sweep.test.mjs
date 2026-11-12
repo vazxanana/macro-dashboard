@@ -78,8 +78,8 @@ test('ChronosTrade quick Buy / Sell: the white label passes AA in every theme', 
 
 test('owner\'s choice (#686): light-mode desk candles are grey up / black down; dark themes stay green / red', () => {
   const html = src('market-structure.html');
-  const cc = /const candleCols = \(\) => G\.theme === 'light'\s*\?\s*(\{[^}]*\})\s*:\s*(\{[^}]*\})/.exec(html);
-  assert.ok(cc, 'candleCols picks by theme');
+  const cc = /const themeCols = \(\) => G\.theme === 'light'\s*\?\s*(\{[^}]*\})\s*:\s*(\{[^}]*\})/.exec(html);
+  assert.ok(cc, 'the theme colours pick by theme (candleCols puts a member\'s own colours over them, 12 Nov 2026)');
   assert.match(cc[1], /upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722'/);
   assert.match(cc[2], /upColor: UPC, downColor: DNC/);
   // every chart pane gets them when the theme is applied (panes are created green / red first)
