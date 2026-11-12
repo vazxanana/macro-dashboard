@@ -11902,6 +11902,32 @@
     ],
     "stopCheckedAt": "2026-11-12T15:52:12.000Z",
     "brokerStop": 85.751
+   },
+   "eth-swing-1794498683": {
+    "symbol": "ETHUSD",
+    "side": "sell",
+    "setup": "swing",
+    "openedAt": "2026-11-12T15:54:38.000Z",
+    "councilEntry": 2002,
+    "stop": 2107.59975,
+    "t1": 1790.8005000000003,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 2002,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 1.99,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 2002.01,
+    "slipR": 0,
+    "lagSec": 158,
+    "positionId": "48908687",
+    "volume": 1,
+    "status": "open"
    }
   },
   "day": {
@@ -11909,7 +11935,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.73 · 30 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.73 · 31 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -11920,9 +11946,9 @@
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 287.14, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 282.88, 2.8% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T15:52:12.000Z"
+    "at": "2026-11-12T15:54:38.000Z"
    }
   },
   "paused": {},
@@ -11970,43 +11996,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "eth-swing-1794498683": {
-    "orderId": "34016895",
-    "symbol": "ETHUSD",
-    "side": "sell",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "swing",
-    "limitPrice": 2002,
-    "stop": 2107.59975,
-    "t1": 1790.8005000000003,
-    "placedAt": "2026-11-12T15:52:12.000Z",
-    "expires": "2026-11-14T15:51:23.000Z",
-    "riskCash": 1.99,
-    "margin": 2,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.73,
-  "lastRun": "2026-11-12T15:52:12.000Z"
+  "lastRun": "2026-11-12T15:54:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:34:45.000Z",
-   "msg": "moved GBPUSD 48503620 protection: stop 1.32865 -> 1.32844, target 1.32481 -> 1.3246 (council scalp)",
-   "trade": "gbpusd-scalp-1794417165"
-  },
-  {
-   "at": "2026-11-12T12:34:45.000Z",
-   "msg": "moved AUDUSD 48659864 protection: stop 0.68507 -> 0.68525, target 0.68075 -> 0.68093 (council intraday)",
-   "trade": "audusd-intraday-1794461258"
-  },
   {
    "at": "2026-11-12T12:34:45.000Z",
    "msg": "moved GBPUSD 48709438 protection: stop 1.328312 -> 1.328102, target 1.30033 -> 1.30012 (council position)",
@@ -13496,6 +13492,16 @@
    "at": "2026-11-12T15:52:12.000Z",
    "msg": "opened sell SOLUSD 0.01 lot (council swing)",
    "trade": "sol-swing-1794498683"
+  },
+  {
+   "at": "2026-11-12T15:54:38.000Z",
+   "msg": "limit filled: ETHUSD position 48908687 at the broker",
+   "trade": "eth-swing-1794498683"
+  },
+  {
+   "at": "2026-11-12T15:54:38.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 282.88, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
   }
  ],
  "limits": {
@@ -13574,11 +13580,11 @@
   ]
  },
  "execution": {
-  "n": 398,
+  "n": 399,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 139.5,
+  "medianLagSec": 140,
   "bySymbol": {
    "SOLUSD": {
     "n": 24,
@@ -13589,8 +13595,8 @@
     "meanSlipR": 0.002
    },
    "ETHUSD": {
-    "n": 16,
-    "meanSlipR": 0.066
+    "n": 17,
+    "meanSlipR": 0.062
    },
    "EURUSD": {
     "n": 47,
