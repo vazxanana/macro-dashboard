@@ -20,6 +20,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
    n and t. ICT stays a separate edge: never mix it into council systems, filters or reports.
 5. **No paid services.** Keyless public data, the existing Vercel plan and free GitHub Actions minutes (the repo is public).
 6. **No model names in repo files** (code, comments, docs, page text). Commit attribution lines are not repo files.
+   `tests/no-model-names.test.mjs` scans every tracked text file (out/ excluded); its short allowlist names each exception and why.
 
 **Where things live**
 | Path | What |
@@ -1861,7 +1862,8 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   Tests: `tests/qa-sweep.test.mjs` ("Side pages quality pass"). Left for the owner: the header switch is dots only on phones (a
   site-wide choice shared with the Desk); the gold terminal's Research → Edge Lab tab stated win rates and "high conviction" with no
   n or t (done the same day, paragraph above); `research/macro-veteran/START_HERE.md` (shown in the veteran
-  library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
+  library) named an assistant product in its title and headings and had words run together in its source (done 12 Nov 2026: the
+  names are neutral, the spacing mended, `tests/no-model-names.test.mjs` guards rule 6); the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
 - **Gold terminal, simple phone view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the
   phone"; display only, no number, score or rule changed, the locked features untouched). At 640 px and under the head script sets
