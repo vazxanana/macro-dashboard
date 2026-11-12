@@ -1,0 +1,1669 @@
+{
+ "built": "2026-11-12",
+ "prereg": "research/edge/gold-carry/PREREGISTRATION.md",
+ "rule": "paper research only: no trading rule tested; no live rule, size, filter, stop, config, cost constant or mirror setting changed",
+ "sources": {
+  "cfd": [
+   {
+    "key": "icm",
+    "name": "IC Markets, Raw account",
+    "perLot": -57.55,
+    "date": "2026-09-03",
+    "src": "Finance Magnates article \"The battle for gold traders moves overnight: 32 accounts charge, one offers positive swaps\" (ForexBenchmark data), as republished by coinspectator.com on 3 Sep 2026; seen in a web search summary on 12 Nov 2026, page not opened"
+   },
+   {
+    "key": "afterprime",
+    "name": "Afterprime",
+    "perLot": -70.26,
+    "date": "2026-09-03",
+    "src": "the same article"
+   },
+   {
+    "key": "pepperstone",
+    "name": "Pepperstone UK",
+    "perLot": -95.58,
+    "date": "2026-09-03",
+    "src": "the same article"
+   },
+   {
+    "key": "dlsm",
+    "name": "DLSM (the lowest in one monthly review)",
+    "perLot": -4.33,
+    "date": "2026-01-15",
+    "dateNote": "January 2026 review, day not given: mid-month used",
+    "src": "FastBull BrokersView \"January 2026 swap rates review\" (\"lowest among all brokers\"); seen in a web search summary on 12 Nov 2026, page not opened"
+   }
+  ],
+  "etf": [
+   {
+    "key": "gldm",
+    "name": "GLDM",
+    "er": 0.001
+   },
+   {
+    "key": "iau",
+    "name": "IAU",
+    "er": 0.0025
+   },
+   {
+    "key": "gld",
+    "name": "GLD",
+    "er": 0.004
+   }
+  ],
+  "etfSrc": "expense ratios as listed by Snowball Analytics, Nasdaq and 247wallst (July 2026), seen in a web search summary on 12 Nov 2026, pages not opened; the issuers' own pages were not reached",
+  "mgc": "all-in round trip for one E-Micro Gold contract: $2.12, a Tradeify help page (a prop firm, not a broker the desk uses); Interactive Brokers lists $0.10-0.25 a contract a side plus exchange and regulatory fees, and the last CME non-member micro gold fee found was $0.50 a side (AMP notice, February 2021): seen in web search summaries on 12 Nov 2026, pages not opened",
+  "rates": "FRED DGS2 (weekly, from the council macro strategist cache, council-data macro/cache.json score.fred) and SOFR / EFFR (daily since Aug 2025, same file, fred); fred.stlouisfed.org itself could not be reached",
+  "basis": "COMEX GCZ26 one-minute prints from council-data research/probe/cnbc-gc (CNBC, 1 Jan to 4 Nov 2026) against OANDA XAU_USD one-minute mid candles through the candle proxy"
+ },
+ "councilData": "09a51743713f8eef84d225808376d87fa19a3ffd",
+ "demoRate": 0.054,
+ "sofrNow": 0.0388,
+ "sofrAsOf": "2026-11-11",
+ "cfd": [
+  {
+   "key": "icm",
+   "name": "IC Markets, Raw account",
+   "perLot": -57.55,
+   "date": "2026-09-03",
+   "px": 4480.16,
+   "rate": 0.0469,
+   "perNightPct": 0.0128,
+   "sofr": 0.0366,
+   "markup": 0.0103,
+   "src": "Finance Magnates article \"The battle for gold traders moves overnight: 32 accounts charge, one offers positive swaps\" (ForexBenchmark data), as republished by coinspectator.com on 3 Sep 2026; seen in a web search summary on 12 Nov 2026, page not opened"
+  },
+  {
+   "key": "afterprime",
+   "name": "Afterprime",
+   "perLot": -70.26,
+   "date": "2026-09-03",
+   "px": 4480.16,
+   "rate": 0.0572,
+   "perNightPct": 0.0157,
+   "sofr": 0.0366,
+   "markup": 0.0206,
+   "src": "the same article"
+  },
+  {
+   "key": "pepperstone",
+   "name": "Pepperstone UK",
+   "perLot": -95.58,
+   "date": "2026-09-03",
+   "px": 4480.16,
+   "rate": 0.0779,
+   "perNightPct": 0.0213,
+   "sofr": 0.0366,
+   "markup": 0.0413,
+   "src": "the same article"
+  },
+  {
+   "key": "dlsm",
+   "name": "DLSM (the lowest in one monthly review)",
+   "perLot": -4.33,
+   "date": "2026-01-15",
+   "px": 4610.36,
+   "rate": 0.0034,
+   "perNightPct": 0.0009,
+   "sofr": 0.0366,
+   "markup": -0.0332,
+   "src": "FastBull BrokersView \"January 2026 swap rates review\" (\"lowest among all brokers\"); seen in a web search summary on 12 Nov 2026, page not opened",
+   "dateNote": "January 2026 review, day not given: mid-month used"
+  }
+ ],
+ "basis": {
+  "days": 198,
+  "from": "2026-01-02",
+  "to": "2026-11-04",
+  "k": 0.0359,
+  "kAlt": 0.0422,
+  "kNow": 0.022,
+  "kNowAlt": 0.0381,
+  "nowFrom": "2026-10-08",
+  "nowTo": "2026-11-04",
+  "sofrNow": 0.0389,
+  "leaseNow": 0.0171,
+  "months": {
+   "2026-01": {
+    "days": 9,
+    "k": 0.0378,
+    "sofr": 0.0365,
+    "lease": -0.0013
+   },
+   "2026-02": {
+    "days": 12,
+    "k": 0.0367,
+    "sofr": 0.0367,
+    "lease": -0.0001
+   },
+   "2026-03": {
+    "days": 22,
+    "k": 0.0375,
+    "sofr": 0.0365,
+    "lease": -0.001
+   },
+   "2026-04": {
+    "days": 21,
+    "k": 0.0375,
+    "sofr": 0.0365,
+    "lease": -0.0011
+   },
+   "2026-05": {
+    "days": 21,
+    "k": 0.0368,
+    "sofr": 0.036,
+    "lease": -0.0012
+   },
+   "2026-06": {
+    "days": 22,
+    "k": 0.0363,
+    "sofr": 0.0362,
+    "lease": 0
+   },
+   "2026-07": {
+    "days": 23,
+    "k": 0.0348,
+    "sofr": 0.0363,
+    "lease": 0.0015
+   },
+   "2026-08": {
+    "days": 21,
+    "k": 0.0348,
+    "sofr": 0.0364,
+    "lease": 0.0015
+   },
+   "2026-09": {
+    "days": 22,
+    "k": 0.0325,
+    "sofr": 0.0366,
+    "lease": 0.0042
+   },
+   "2026-10": {
+    "days": 22,
+    "k": 0.0247,
+    "sofr": 0.0389,
+    "lease": 0.0142
+   },
+   "2026-11": {
+    "days": 3,
+    "k": 0.0166,
+    "sofr": 0.0395,
+    "lease": 0.023
+   }
+  },
+  "symbols": [
+   "GCZ26 (asked @GC.1)"
+  ]
+ },
+ "mgc": {
+  "roundTrip": 2.12,
+  "oz": 10,
+  "tick": 0.1
+ },
+ "proxyGap": {
+  "from": "2025-09-02",
+  "to": "2026-11-09",
+  "medianPts": 0.15,
+  "min": -0.95,
+  "max": 1.01
+ },
+ "dgs2Years": {
+  "2006": 4.82,
+  "2007": 4.36,
+  "2008": 2.01,
+  "2009": 0.96,
+  "2010": 0.7,
+  "2011": 0.44,
+  "2012": 0.28,
+  "2013": 0.31,
+  "2014": 0.46,
+  "2015": 0.68,
+  "2016": 0.84,
+  "2017": 1.4
+ },
+ "hold": {
+  "units": 364,
+  "positions": 330,
+  "nightsUnitMedian": 4,
+  "nightsUnitMean": 6.5,
+  "nightsPositionMedian": 4,
+  "nightsPositionMean": 6,
+  "bySystem": {
+   "gtrend": {
+    "median": 12.5,
+    "mean": 14.1
+   },
+   "geg": {
+    "median": 2,
+    "mean": 3.7
+   }
+  }
+ },
+ "gate": {
+  "demo": true,
+  "none": true,
+  "ok": true,
+  "reference": {
+   "demo": {
+    "total": 59.3,
+    "tDaily": 1.86,
+    "maxDD": 19.8,
+    "financing": 20.5
+   },
+   "none": {
+    "total": 79.8,
+    "tDaily": 2.43
+   }
+  }
+ },
+ "routes": {
+  "none": {
+   "name": "No financing (reference)",
+   "kind": "flat",
+   "rate": 0,
+   "perNightPct": 0,
+   "add": null,
+   "meanRateW1": 0,
+   "W1": {
+    "positions": 330,
+    "total": 79.8,
+    "perYear": 6.94,
+    "tDaily": 2.43,
+    "tMonthly": 2.14,
+    "perPosition": 0.242,
+    "maxDD": 18,
+    "markedDD": 19.9,
+    "halves": [
+     66.4,
+     13.4
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.8
+    },
+    "posYears": "6/12",
+    "financing": 0,
+    "financingPerYear": 0,
+    "fees": 0,
+    "perYearBand": [
+     1.9,
+     12.3
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 116.1,
+    "perYear": 16.99,
+    "tDaily": 3.09,
+    "tMonthly": 3.26,
+    "perPosition": 0.581,
+    "maxDD": 7.9,
+    "markedDD": 10.7,
+    "halves": [
+     41.2,
+     74.9
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.7
+    },
+    "posYears": "6/7",
+    "financing": 0,
+    "fees": 0
+   }
+  },
+  "demo": {
+   "name": "Demo broker CFD swap, today's rate",
+   "kind": "flat",
+   "rate": 0.054,
+   "perNightPct": 0.0148,
+   "add": null,
+   "meanRateW1": 0.054,
+   "W1": {
+    "positions": 330,
+    "total": 59.3,
+    "perYear": 5.16,
+    "tDaily": 1.86,
+    "tMonthly": 1.65,
+    "perPosition": 0.18,
+    "maxDD": 19.8,
+    "markedDD": 22.1,
+    "halves": [
+     55.3,
+     4
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -8.1
+    },
+    "posYears": "6/12",
+    "financing": 20.5,
+    "financingPerYear": 1.78,
+    "fees": 0,
+    "perYearBand": [
+     0.3,
+     10.3
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 103,
+    "perYear": 15.07,
+    "tDaily": 2.83,
+    "tMonthly": 2.99,
+    "perPosition": 0.515,
+    "maxDD": 8.1,
+    "markedDD": 11.6,
+    "halves": [
+     34.6,
+     68.4
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.5
+    },
+    "posYears": "6/7",
+    "financing": 13.2,
+    "fees": 0
+   }
+  },
+  "demo-h": {
+   "name": "Demo broker CFD swap, following short rates",
+   "kind": "history",
+   "rate": null,
+   "add": 0.0152,
+   "meanRateW1": 0.0282,
+   "W1": {
+    "positions": 330,
+    "total": 68.9,
+    "perYear": 5.99,
+    "tDaily": 2.13,
+    "tMonthly": 1.88,
+    "perPosition": 0.209,
+    "maxDD": 18.7,
+    "markedDD": 20.7,
+    "halves": [
+     59.2,
+     9.7
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.2
+    },
+    "posYears": "6/12",
+    "financing": 10.9,
+    "financingPerYear": 0.95,
+    "fees": 0,
+    "perYearBand": [
+     1.1,
+     11.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 105.4,
+    "perYear": 15.43,
+    "tDaily": 2.89,
+    "tMonthly": 3.05,
+    "perPosition": 0.527,
+    "maxDD": 8,
+    "markedDD": 11.4,
+    "halves": [
+     37.4,
+     68.1
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3
+    },
+    "posYears": "6/7",
+    "financing": 10.7,
+    "fees": 0
+   }
+  },
+  "cfd-icm": {
+   "name": "IC Markets, Raw account CFD swap",
+   "kind": "flat",
+   "rate": 0.0469,
+   "perNightPct": 0.0128,
+   "add": null,
+   "meanRateW1": 0.0469,
+   "W1": {
+    "positions": 330,
+    "total": 62,
+    "perYear": 5.39,
+    "tDaily": 1.94,
+    "tMonthly": 1.71,
+    "perPosition": 0.188,
+    "maxDD": 19.6,
+    "markedDD": 21.8,
+    "halves": [
+     56.8,
+     5.3
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.9
+    },
+    "posYears": "6/12",
+    "financing": 17.8,
+    "financingPerYear": 1.55,
+    "fees": 0,
+    "perYearBand": [
+     0.5,
+     10.5
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 104.7,
+    "perYear": 15.32,
+    "tDaily": 2.86,
+    "tMonthly": 3.03,
+    "perPosition": 0.524,
+    "maxDD": 8,
+    "markedDD": 11.5,
+    "halves": [
+     35.4,
+     69.3
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.2
+    },
+    "posYears": "6/7",
+    "financing": 11.4,
+    "fees": 0
+   }
+  },
+  "cfd-icm-h": {
+   "name": "IC Markets, Raw account CFD swap, following short rates",
+   "kind": "history",
+   "rate": null,
+   "add": 0.0103,
+   "meanRateW1": 0.0232,
+   "W1": {
+    "positions": 330,
+    "total": 70.8,
+    "perYear": 6.15,
+    "tDaily": 2.18,
+    "tMonthly": 1.92,
+    "perPosition": 0.215,
+    "maxDD": 18.5,
+    "markedDD": 20.5,
+    "halves": [
+     60.2,
+     10.5
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.1
+    },
+    "posYears": "6/12",
+    "financing": 9.1,
+    "financingPerYear": 0.79,
+    "fees": 0,
+    "perYearBand": [
+     1.2,
+     11.4
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 106.6,
+    "perYear": 15.6,
+    "tDaily": 2.91,
+    "tMonthly": 3.07,
+    "perPosition": 0.533,
+    "maxDD": 7.9,
+    "markedDD": 11.3,
+    "halves": [
+     38,
+     68.7
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -2.9
+    },
+    "posYears": "6/7",
+    "financing": 9.5,
+    "fees": 0
+   }
+  },
+  "cfd-afterprime": {
+   "name": "Afterprime CFD swap",
+   "kind": "flat",
+   "rate": 0.0572,
+   "perNightPct": 0.0157,
+   "add": null,
+   "meanRateW1": 0.0572,
+   "W1": {
+    "positions": 330,
+    "total": 58.1,
+    "perYear": 5.05,
+    "tDaily": 1.83,
+    "tMonthly": 1.62,
+    "perPosition": 0.176,
+    "maxDD": 19.9,
+    "markedDD": 22.3,
+    "halves": [
+     54.6,
+     3.4
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -8.2
+    },
+    "posYears": "6/12",
+    "financing": 21.8,
+    "financingPerYear": 1.89,
+    "fees": 0,
+    "perYearBand": [
+     0.2,
+     10.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 102.2,
+    "perYear": 14.95,
+    "tDaily": 2.81,
+    "tMonthly": 2.97,
+    "perPosition": 0.511,
+    "maxDD": 8.1,
+    "markedDD": 11.7,
+    "halves": [
+     34.2,
+     68
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.6
+    },
+    "posYears": "6/7",
+    "financing": 13.9,
+    "fees": 0
+   }
+  },
+  "cfd-afterprime-h": {
+   "name": "Afterprime CFD swap, following short rates",
+   "kind": "history",
+   "rate": null,
+   "add": 0.0206,
+   "meanRateW1": 0.0336,
+   "W1": {
+    "positions": 330,
+    "total": 66.9,
+    "perYear": 5.81,
+    "tDaily": 2.07,
+    "tMonthly": 1.83,
+    "perPosition": 0.203,
+    "maxDD": 18.9,
+    "markedDD": 20.9,
+    "halves": [
+     58.1,
+     8.7
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.4
+    },
+    "posYears": "6/12",
+    "financing": 13,
+    "financingPerYear": 1.13,
+    "fees": 0,
+    "perYearBand": [
+     0.9,
+     11
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 104.1,
+    "perYear": 15.23,
+    "tDaily": 2.86,
+    "tMonthly": 3.02,
+    "perPosition": 0.521,
+    "maxDD": 8,
+    "markedDD": 11.5,
+    "halves": [
+     36.7,
+     67.4
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.2
+    },
+    "posYears": "6/7",
+    "financing": 12,
+    "fees": 0
+   }
+  },
+  "cfd-pepperstone": {
+   "name": "Pepperstone UK CFD swap",
+   "kind": "flat",
+   "rate": 0.0779,
+   "perNightPct": 0.0213,
+   "add": null,
+   "meanRateW1": 0.0779,
+   "W1": {
+    "positions": 330,
+    "total": 50.2,
+    "perYear": 4.37,
+    "tDaily": 1.6,
+    "tMonthly": 1.42,
+    "perPosition": 0.152,
+    "maxDD": 20.7,
+    "markedDD": 23.1,
+    "halves": [
+     50.4,
+     -0.1
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -8.7
+    },
+    "posYears": "6/12",
+    "financing": 29.6,
+    "financingPerYear": 2.57,
+    "fees": 0,
+    "perYearBand": [
+     -0.4,
+     9.4
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 97.2,
+    "perYear": 14.22,
+    "tDaily": 2.71,
+    "tMonthly": 2.86,
+    "perPosition": 0.486,
+    "maxDD": 8.2,
+    "markedDD": 12,
+    "halves": [
+     31.6,
+     65.5
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -4.2
+    },
+    "posYears": "6/7",
+    "financing": 19,
+    "fees": 0
+   }
+  },
+  "cfd-pepperstone-h": {
+   "name": "Pepperstone UK CFD swap, following short rates",
+   "kind": "history",
+   "rate": null,
+   "add": 0.0413,
+   "meanRateW1": 0.0542,
+   "W1": {
+    "positions": 330,
+    "total": 59,
+    "perYear": 5.13,
+    "tDaily": 1.85,
+    "tMonthly": 1.64,
+    "perPosition": 0.179,
+    "maxDD": 19.6,
+    "markedDD": 21.8,
+    "halves": [
+     53.9,
+     5.2
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.9
+    },
+    "posYears": "6/12",
+    "financing": 20.8,
+    "financingPerYear": 1.81,
+    "fees": 0,
+    "perYearBand": [
+     0.3,
+     10.3
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 99.1,
+    "perYear": 14.5,
+    "tDaily": 2.75,
+    "tMonthly": 2.91,
+    "perPosition": 0.495,
+    "maxDD": 8.1,
+    "markedDD": 11.8,
+    "halves": [
+     34.1,
+     64.9
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.9
+    },
+    "posYears": "6/7",
+    "financing": 17,
+    "fees": 0
+   }
+  },
+  "cfd-dlsm": {
+   "name": "DLSM (the lowest in one monthly review) CFD swap",
+   "kind": "flat",
+   "rate": 0.0034,
+   "perNightPct": 0.0009,
+   "add": null,
+   "meanRateW1": 0.0034,
+   "W1": {
+    "positions": 330,
+    "total": 78.5,
+    "perYear": 6.83,
+    "tDaily": 2.4,
+    "tMonthly": 2.11,
+    "perPosition": 0.238,
+    "maxDD": 18.1,
+    "markedDD": 20,
+    "halves": [
+     65.7,
+     12.8
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.9
+    },
+    "posYears": "6/12",
+    "financing": 1.3,
+    "financingPerYear": 0.11,
+    "fees": 0,
+    "perYearBand": [
+     1.8,
+     12.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 115.3,
+    "perYear": 16.87,
+    "tDaily": 3.07,
+    "tMonthly": 3.24,
+    "perPosition": 0.576,
+    "maxDD": 7.9,
+    "markedDD": 10.8,
+    "halves": [
+     40.8,
+     74.5
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.8
+    },
+    "posYears": "6/7",
+    "financing": 0.8,
+    "fees": 0
+   }
+  },
+  "cfd-dlsm-h": {
+   "name": "DLSM (the lowest in one monthly review) CFD swap, following short rates",
+   "kind": "history",
+   "rate": null,
+   "add": -0.0332,
+   "meanRateW1": 0.0016,
+   "W1": {
+    "positions": 330,
+    "total": 79.1,
+    "perYear": 6.87,
+    "tDaily": 2.41,
+    "tMonthly": 2.12,
+    "perPosition": 0.24,
+    "maxDD": 18,
+    "markedDD": 19.9,
+    "halves": [
+     65.7,
+     13.4
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.8
+    },
+    "posYears": "6/12",
+    "financing": 0.8,
+    "financingPerYear": 0.07,
+    "fees": 0,
+    "perYearBand": [
+     1.9,
+     12.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 114.9,
+    "perYear": 16.81,
+    "tDaily": 3.07,
+    "tMonthly": 3.24,
+    "perPosition": 0.574,
+    "maxDD": 7.9,
+    "markedDD": 10.7,
+    "halves": [
+     41,
+     73.9
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.8
+    },
+    "posYears": "6/7",
+    "financing": 1.3,
+    "fees": 0
+   }
+  },
+  "mgc": {
+   "name": "Micro gold futures (MGC), basis measured in 2026",
+   "kind": "flat",
+   "rate": 0.022,
+   "perNightPct": 0.006,
+   "add": null,
+   "meanRateW1": 0.022,
+   "W1": {
+    "positions": 330,
+    "total": 63.4,
+    "perYear": 5.51,
+    "tDaily": 1.96,
+    "tMonthly": 1.73,
+    "perPosition": 0.192,
+    "maxDD": 19.8,
+    "markedDD": 21.9,
+    "halves": [
+     57.5,
+     5.8
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -8
+    },
+    "posYears": "6/12",
+    "financing": 8.4,
+    "financingPerYear": 0.73,
+    "fees": 8.1,
+    "perYearBand": [
+     0.6,
+     10.8
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 107.6,
+    "perYear": 15.74,
+    "tDaily": 2.91,
+    "tMonthly": 3.07,
+    "perPosition": 0.538,
+    "maxDD": 8.2,
+    "markedDD": 11.4,
+    "halves": [
+     36.7,
+     70.9
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3
+    },
+    "posYears": "6/7",
+    "financing": 5.4,
+    "fees": 3.2
+   }
+  },
+  "mgc-alt": {
+   "name": "Micro gold futures (MGC), basis with the expiry taken as 1 Dec 2026 (sensitivity, post hoc)",
+   "kind": "flat",
+   "rate": 0.0381,
+   "perNightPct": 0.0104,
+   "add": null,
+   "meanRateW1": 0.0381,
+   "W1": {
+    "positions": 330,
+    "total": 57.2,
+    "perYear": 4.98,
+    "tDaily": 1.79,
+    "tMonthly": 1.58,
+    "perPosition": 0.173,
+    "maxDD": 20.3,
+    "markedDD": 22.5,
+    "halves": [
+     54.2,
+     3
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -8.4
+    },
+    "posYears": "6/12",
+    "financing": 14.5,
+    "financingPerYear": 1.26,
+    "fees": 8.1,
+    "perYearBand": [
+     0.1,
+     10.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 103.6,
+    "perYear": 15.17,
+    "tDaily": 2.83,
+    "tMonthly": 2.98,
+    "perPosition": 0.518,
+    "maxDD": 8.2,
+    "markedDD": 11.6,
+    "halves": [
+     34.7,
+     69
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.5
+    },
+    "posYears": "6/7",
+    "financing": 9.3,
+    "fees": 3.2
+   }
+  },
+  "mgc-h": {
+   "name": "Micro gold futures (MGC), carry = short rate, lease 0",
+   "kind": "history",
+   "rate": null,
+   "add": 0,
+   "meanRateW1": 0.0129,
+   "W1": {
+    "positions": 330,
+    "total": 66.6,
+    "perYear": 5.79,
+    "tDaily": 2.05,
+    "tMonthly": 1.8,
+    "perPosition": 0.202,
+    "maxDD": 19.2,
+    "markedDD": 21.1,
+    "halves": [
+     58,
+     8.6
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.5
+    },
+    "posYears": "6/12",
+    "financing": 5.1,
+    "financingPerYear": 0.45,
+    "fees": 8.1,
+    "perYearBand": [
+     0.9,
+     11.1
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 105.9,
+    "perYear": 15.5,
+    "tDaily": 2.88,
+    "tMonthly": 3.04,
+    "perPosition": 0.53,
+    "maxDD": 8.1,
+    "markedDD": 11.4,
+    "halves": [
+     37.4,
+     68.5
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.1
+    },
+    "posYears": "6/7",
+    "financing": 7,
+    "fees": 3.2
+   }
+  },
+  "etf-gldm": {
+   "name": "GLDM (statement charge)",
+   "kind": "flat",
+   "rate": 0.001,
+   "perNightPct": 0.0003,
+   "add": null,
+   "meanRateW1": 0.001,
+   "W1": {
+    "positions": 330,
+    "total": 79.5,
+    "perYear": 6.91,
+    "tDaily": 2.42,
+    "tMonthly": 2.13,
+    "perPosition": 0.241,
+    "maxDD": 18,
+    "markedDD": 19.9,
+    "halves": [
+     66.2,
+     13.2
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.8
+    },
+    "posYears": "6/12",
+    "financing": 0.4,
+    "financingPerYear": 0.03,
+    "fees": 0,
+    "perYearBand": [
+     1.9,
+     12.3
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 115.9,
+    "perYear": 16.96,
+    "tDaily": 3.09,
+    "tMonthly": 3.26,
+    "perPosition": 0.579,
+    "maxDD": 7.9,
+    "markedDD": 10.8,
+    "halves": [
+     41.1,
+     74.8
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.7
+    },
+    "posYears": "6/7",
+    "financing": 0.2,
+    "fees": 0
+   }
+  },
+  "etf-gldm-e": {
+   "name": "GLDM (counting the interest the cash would earn)",
+   "kind": "flat",
+   "rate": 0.0398,
+   "perNightPct": 0.0109,
+   "add": null,
+   "meanRateW1": 0.0398,
+   "W1": {
+    "positions": 330,
+    "total": 64.7,
+    "perYear": 5.62,
+    "tDaily": 2.02,
+    "tMonthly": 1.78,
+    "perPosition": 0.196,
+    "maxDD": 19.3,
+    "markedDD": 21.5,
+    "halves": [
+     58.2,
+     6.5
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.8
+    },
+    "posYears": "6/12",
+    "financing": 15.1,
+    "financingPerYear": 1.32,
+    "fees": 0,
+    "perYearBand": [
+     0.8,
+     10.8
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 106.4,
+    "perYear": 15.57,
+    "tDaily": 2.9,
+    "tMonthly": 3.06,
+    "perPosition": 0.532,
+    "maxDD": 8,
+    "markedDD": 11.4,
+    "halves": [
+     36.3,
+     70.1
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3
+    },
+    "posYears": "6/7",
+    "financing": 9.7,
+    "fees": 0
+   }
+  },
+  "etf-gldm-eh": {
+   "name": "GLDM (counting interest, following short rates)",
+   "kind": "history",
+   "rate": null,
+   "add": 0.001,
+   "meanRateW1": 0.0139,
+   "W1": {
+    "positions": 330,
+    "total": 74.3,
+    "perYear": 6.46,
+    "tDaily": 2.28,
+    "tMonthly": 2.01,
+    "perPosition": 0.225,
+    "maxDD": 18.2,
+    "markedDD": 20.1,
+    "halves": [
+     62.2,
+     12.2
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.9
+    },
+    "posYears": "6/12",
+    "financing": 5.5,
+    "financingPerYear": 0.48,
+    "fees": 0,
+    "perYearBand": [
+     1.5,
+     11.8
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 108.9,
+    "perYear": 15.93,
+    "tDaily": 2.96,
+    "tMonthly": 3.12,
+    "perPosition": 0.544,
+    "maxDD": 7.9,
+    "markedDD": 11.2,
+    "halves": [
+     39.1,
+     69.8
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -2.6
+    },
+    "posYears": "6/7",
+    "financing": 7.2,
+    "fees": 0
+   }
+  },
+  "etf-iau": {
+   "name": "IAU (statement charge)",
+   "kind": "flat",
+   "rate": 0.0025,
+   "perNightPct": 0.0007,
+   "add": null,
+   "meanRateW1": 0.0025,
+   "W1": {
+    "positions": 330,
+    "total": 78.9,
+    "perYear": 6.86,
+    "tDaily": 2.41,
+    "tMonthly": 2.12,
+    "perPosition": 0.239,
+    "maxDD": 18,
+    "markedDD": 20,
+    "halves": [
+     65.9,
+     13
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.9
+    },
+    "posYears": "6/12",
+    "financing": 1,
+    "financingPerYear": 0.08,
+    "fees": 0,
+    "perYearBand": [
+     1.8,
+     12.2
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 115.5,
+    "perYear": 16.9,
+    "tDaily": 3.08,
+    "tMonthly": 3.25,
+    "perPosition": 0.578,
+    "maxDD": 7.9,
+    "markedDD": 10.8,
+    "halves": [
+     40.9,
+     74.6
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.8
+    },
+    "posYears": "6/7",
+    "financing": 0.6,
+    "fees": 0
+   }
+  },
+  "etf-iau-e": {
+   "name": "IAU (counting the interest the cash would earn)",
+   "kind": "flat",
+   "rate": 0.0413,
+   "perNightPct": 0.0113,
+   "add": null,
+   "meanRateW1": 0.0413,
+   "W1": {
+    "positions": 330,
+    "total": 64.1,
+    "perYear": 5.58,
+    "tDaily": 2,
+    "tMonthly": 1.77,
+    "perPosition": 0.194,
+    "maxDD": 19.4,
+    "markedDD": 21.6,
+    "halves": [
+     57.9,
+     6.2
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.8
+    },
+    "posYears": "6/12",
+    "financing": 15.7,
+    "financingPerYear": 1.36,
+    "fees": 0,
+    "perYearBand": [
+     0.7,
+     10.8
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 106.1,
+    "perYear": 15.52,
+    "tDaily": 2.89,
+    "tMonthly": 3.05,
+    "perPosition": 0.53,
+    "maxDD": 8,
+    "markedDD": 11.4,
+    "halves": [
+     36.1,
+     69.9
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.1
+    },
+    "posYears": "6/7",
+    "financing": 10.1,
+    "fees": 0
+   }
+  },
+  "etf-iau-eh": {
+   "name": "IAU (counting interest, following short rates)",
+   "kind": "history",
+   "rate": null,
+   "add": 0.0025,
+   "meanRateW1": 0.0154,
+   "W1": {
+    "positions": 330,
+    "total": 73.8,
+    "perYear": 6.41,
+    "tDaily": 2.27,
+    "tMonthly": 1.99,
+    "perPosition": 0.223,
+    "maxDD": 18.2,
+    "markedDD": 20.2,
+    "halves": [
+     61.8,
+     11.9
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.9
+    },
+    "posYears": "6/12",
+    "financing": 6.1,
+    "financingPerYear": 0.53,
+    "fees": 0,
+    "perYearBand": [
+     1.5,
+     11.7
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 108.5,
+    "perYear": 15.88,
+    "tDaily": 2.95,
+    "tMonthly": 3.11,
+    "perPosition": 0.543,
+    "maxDD": 7.9,
+    "markedDD": 11.2,
+    "halves": [
+     38.9,
+     69.6
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -2.6
+    },
+    "posYears": "6/7",
+    "financing": 7.6,
+    "fees": 0
+   }
+  },
+  "etf-gld": {
+   "name": "GLD (statement charge)",
+   "kind": "flat",
+   "rate": 0.004,
+   "perNightPct": 0.0011,
+   "add": null,
+   "meanRateW1": 0.004,
+   "W1": {
+    "positions": 330,
+    "total": 78.3,
+    "perYear": 6.81,
+    "tDaily": 2.39,
+    "tMonthly": 2.1,
+    "perPosition": 0.237,
+    "maxDD": 18.1,
+    "markedDD": 20,
+    "halves": [
+     65.6,
+     12.7
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -6.9
+    },
+    "posYears": "6/12",
+    "financing": 1.5,
+    "financingPerYear": 0.13,
+    "fees": 0,
+    "perYearBand": [
+     1.8,
+     12.1
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 115.2,
+    "perYear": 16.85,
+    "tDaily": 3.07,
+    "tMonthly": 3.24,
+    "perPosition": 0.576,
+    "maxDD": 7.9,
+    "markedDD": 10.8,
+    "halves": [
+     40.7,
+     74.4
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -1.8
+    },
+    "posYears": "6/7",
+    "financing": 1,
+    "fees": 0
+   }
+  },
+  "etf-gld-e": {
+   "name": "GLD (counting the interest the cash would earn)",
+   "kind": "flat",
+   "rate": 0.0428,
+   "perNightPct": 0.0117,
+   "add": null,
+   "meanRateW1": 0.0428,
+   "W1": {
+    "positions": 330,
+    "total": 63.6,
+    "perYear": 5.53,
+    "tDaily": 1.98,
+    "tMonthly": 1.75,
+    "perPosition": 0.193,
+    "maxDD": 19.4,
+    "markedDD": 21.6,
+    "halves": [
+     57.6,
+     6
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7.8
+    },
+    "posYears": "6/12",
+    "financing": 16.3,
+    "financingPerYear": 1.41,
+    "fees": 0,
+    "perYearBand": [
+     0.7,
+     10.7
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 105.7,
+    "perYear": 15.47,
+    "tDaily": 2.89,
+    "tMonthly": 3.05,
+    "perPosition": 0.528,
+    "maxDD": 8,
+    "markedDD": 11.4,
+    "halves": [
+     36,
+     69.7
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -3.1
+    },
+    "posYears": "6/7",
+    "financing": 10.4,
+    "fees": 0
+   }
+  },
+  "etf-gld-eh": {
+   "name": "GLD (counting interest, following short rates)",
+   "kind": "history",
+   "rate": null,
+   "add": 0.004,
+   "meanRateW1": 0.0169,
+   "W1": {
+    "positions": 330,
+    "total": 73.2,
+    "perYear": 6.36,
+    "tDaily": 2.25,
+    "tMonthly": 1.98,
+    "perPosition": 0.222,
+    "maxDD": 18.3,
+    "markedDD": 20.2,
+    "halves": [
+     61.5,
+     11.6
+    ],
+    "worstYear": {
+     "year": "2013",
+     "R": -7
+    },
+    "posYears": "6/12",
+    "financing": 6.7,
+    "financingPerYear": 0.58,
+    "fees": 0,
+    "perYearBand": [
+     1.4,
+     11.7
+    ]
+   },
+   "W3": {
+    "positions": 200,
+    "total": 108.2,
+    "perYear": 15.83,
+    "tDaily": 2.94,
+    "tMonthly": 3.11,
+    "perPosition": 0.541,
+    "maxDD": 7.9,
+    "markedDD": 11.2,
+    "halves": [
+     38.7,
+     69.4
+    ],
+    "worstYear": {
+     "year": "2022",
+     "R": -2.7
+    },
+    "posYears": "6/7",
+    "financing": 8,
+    "fees": 0
+   }
+  }
+ },
+ "grid": [
+  {
+   "rate": 0,
+   "perYear": 6.94,
+   "total": 79.8,
+   "tDaily": 2.43,
+   "maxDD": 18
+  },
+  {
+   "rate": 0.005,
+   "perYear": 6.77,
+   "total": 77.9,
+   "tDaily": 2.38,
+   "maxDD": 18.1
+  },
+  {
+   "rate": 0.01,
+   "perYear": 6.61,
+   "total": 76,
+   "tDaily": 2.33,
+   "maxDD": 18.3
+  },
+  {
+   "rate": 0.015,
+   "perYear": 6.44,
+   "total": 74.1,
+   "tDaily": 2.28,
+   "maxDD": 18.5
+  },
+  {
+   "rate": 0.02,
+   "perYear": 6.28,
+   "total": 72.2,
+   "tDaily": 2.23,
+   "maxDD": 18.7
+  },
+  {
+   "rate": 0.025,
+   "perYear": 6.11,
+   "total": 70.3,
+   "tDaily": 2.17,
+   "maxDD": 18.8
+  },
+  {
+   "rate": 0.03,
+   "perYear": 5.95,
+   "total": 68.4,
+   "tDaily": 2.12,
+   "maxDD": 19
+  },
+  {
+   "rate": 0.035,
+   "perYear": 5.78,
+   "total": 66.5,
+   "tDaily": 2.07,
+   "maxDD": 19.2
+  },
+  {
+   "rate": 0.04,
+   "perYear": 5.62,
+   "total": 64.6,
+   "tDaily": 2.01,
+   "maxDD": 19.3
+  },
+  {
+   "rate": 0.045,
+   "perYear": 5.45,
+   "total": 62.7,
+   "tDaily": 1.96,
+   "maxDD": 19.5
+  },
+  {
+   "rate": 0.05,
+   "perYear": 5.29,
+   "total": 60.8,
+   "tDaily": 1.91,
+   "maxDD": 19.7
+  },
+  {
+   "rate": 0.055,
+   "perYear": 5.12,
+   "total": 58.9,
+   "tDaily": 1.85,
+   "maxDD": 19.9
+  },
+  {
+   "rate": 0.06,
+   "perYear": 4.96,
+   "total": 57,
+   "tDaily": 1.8,
+   "maxDD": 20
+  },
+  {
+   "rate": 0.065,
+   "perYear": 4.79,
+   "total": 55.1,
+   "tDaily": 1.74,
+   "maxDD": 20.2
+  },
+  {
+   "rate": 0.07,
+   "perYear": 4.63,
+   "total": 53.2,
+   "tDaily": 1.69,
+   "maxDD": 20.4
+  }
+ ],
+ "breakEven": 0.041,
+ "cheapest": [
+  {
+   "key": "cfd-dlsm",
+   "rate": 0.0034
+  },
+  {
+   "key": "mgc",
+   "rate": 0.022
+  },
+  {
+   "key": "etf-gldm-e",
+   "rate": 0.0398
+  },
+  {
+   "key": "etf-iau-e",
+   "rate": 0.0413
+  },
+  {
+   "key": "etf-gld-e",
+   "rate": 0.0428
+  },
+  {
+   "key": "cfd-icm",
+   "rate": 0.0469
+  },
+  {
+   "key": "demo",
+   "rate": 0.054
+  },
+  {
+   "key": "cfd-afterprime",
+   "rate": 0.0572
+  },
+  {
+   "key": "cfd-pepperstone",
+   "rate": 0.0779
+  }
+ ],
+ "belowBreakEven": [
+  "cfd-dlsm",
+  "mgc",
+  "etf-gldm-e"
+ ],
+ "verdict": "INCONCLUSIVE (cost accounting, no rule tested): holding the book's gold buys costs 5.4 % a year at the demo broker (book +5.16R a year, t 1.86, 330 positions, untouched 2006-17); the cheapest route that could be checked, micro gold futures, carried 2.2 % a year in Oct-Nov 2026 (3.6 % over the year) plus commissions and rolls, and leaves the book at +5.51R a year, t 1.96: the route is worth about half an R a year, not the difference between a proven and an unproven book."
+}
