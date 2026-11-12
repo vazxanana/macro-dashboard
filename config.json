@@ -631,6 +631,12 @@
    "by": "coach-backtest",
    "change": "intraday: only a continuation BO as the confirming break (backtest)",
    "why": "226 trades over the last 30 days: a continuation BO as the confirming break +0.28R each, a CHoCH as the confirming break -0.42R (gap t = 3.0); true in both halves."
+  },
+  {
+   "at": "2026-11-12T22:26:31.000Z",
+   "by": "repair",
+   "change": "Trades: 5 exact duplicate records marked duplicate (5 scalp of intraday; 1 live; +1.76R gross counted twice); no stat counts them",
+   "why": "Two setups produced the same order (same market, side, second, entry, stop and target) and it was recorded and counted twice. Owner, 12 Nov 2026: count duplicates once. The Trader records such an order once from now on."
   }
  ],
  "btAt": "2026-11-12T11:33:40.101Z",
@@ -696,7 +702,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-12T22:24:33.000Z",
+   "at": "2026-11-12T22:26:31.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -734,7 +740,8 @@
   "history-crypto-trend-v3",
   "history-pairs-dormant",
   "void-m30m1-twins-2026-11-06",
-  "recost-crypto-cfd-2026-11-07"
+  "recost-crypto-cfd-2026-11-07",
+  "void-exact-twins-2026-11-12"
  ],
  "takeAll": false,
  "focus": [
