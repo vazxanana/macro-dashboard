@@ -6120,6 +6120,11 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 const PUB = document.documentElement.dataset.mode !== 'admin';
 const VIEWER = document.documentElement.dataset.role === 'viewer';   // Orlando (6 Nov): read-only, setups + calendar + active trades only
 // ═══ MOSHA STRUCTURE ENGINE (pure functions, no DOM) ═══
+// Closed candles only (12 Nov 2026, owner: "price must close below, if it doesn't close it is not a BO"): how many of `bars`
+// have closed by `now` (unix seconds). `shift` = what was added to the feed's times for display (the panes add TZ). The forming
+// candle is left out of every structure reading, so a wick or a not-yet-closed body through a level never draws a BO, a ChoCh,
+// a VR or a moved extreme; it counts once that candle has closed beyond the level.
+function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; while (k > 0 && bars[k - 1].time - shift + sec > now) k--; return k; }
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -6805,14 +6810,17 @@ function msNextSetup(bars, A) {
       CY.filter((r) => r.child === tf.id && r.choch).forEach((r) => {
         const up = r.dir < 0, i0 = at(r.choch.fromT), i1 = at(r.choch.t);
         items.lines.push({ l1: i0, l2: Math.min(n + 6, i1 + 14), p: r.choch.level, color: CYC, w: 2, text: `ChoCh ${up ? '▲' : '▼'} · ${r.pl} ${r.phase === 'resumed' ? 'pulled back here' : 'pullback starts'}`, below: !up });
-        if (r.resume) items.lines.push({ l1: at(r.resume.fromT), l2: Math.min(n + 6, at(r.resume.t) + 14), p: r.resume.level, color: CYC, w: 2, text: `ChoCh ${up ? '▼' : '▲'} · back with ${r.pl}`, below: up });
+        if (r.resume) { const tx = `ChoCh ${up ? '▼' : '▲'} · back with ${r.pl}`, same = items.lines.find((x) => x.bo && x.p === r.resume.level);
+          if (same) same.text = same.text ? `${same.text} · ${tx}` : tx;   // the same break as this chart's BO: one line, one label
+          else items.lines.push({ l1: at(r.resume.fromT), l2: Math.min(n + 6, at(r.resume.t) + 14), p: r.resume.level, color: CYC, w: 2, text: tx, below: up }); }
       });
       const above = { '4h': ['1d'], '1h': ['4h'], '15m': ['4h', '1h'], '5m': ['4h', '1h'] }[tf.id] || [];
       above.forEach((id) => { const r = CY.find((x) => x.parent === id); if (!r || !r.target || r.phase === 'none') return; const T = r.target, lo = r.dir < 0;
         if (r.phase === 'pullback') {
           items.lines.push({ l1: n - 30, l2: n + 26, p: T.p50, color: CYC, dash: true, w: 1, text: `${r.pl} pullback target · 50% ${fmt(T.p50)}`, below: lo });
           items.lines.push({ l1: n - 30, l2: n + 26, p: T.origin, color: CYC, dash: true, w: 1, text: `${r.pl} origin ${fmt(T.origin)}`, below: lo });
-        } else items.lines.push({ l1: n - 30, l2: n + 26, p: T.ext, color: CYC, dash: true, w: 1, text: `${r.pl} target · ${lo ? 'low' : 'high'} ${fmt(T.ext)}`, below: !lo });
+        } else { const t0 = r.resume ? r.resume.t : r.choch ? r.choch.t : 0, hit = bars.some((b) => b.time >= t0 && (lo ? b.low <= T.ext : b.high >= T.ext));
+          items.lines.push({ l1: n - 30, l2: n + 26, p: T.ext, color: CYC, dash: true, w: 1, text: `${r.pl} target · ${lo ? 'low' : 'high'} ${fmt(T.ext)}${hit ? ' · reached, no close beyond' : ''}`, below: !lo }); }
       });
     }
     const pos = own && G.show.plan && G.plan;
@@ -7160,9 +7168,9 @@ function msNextSetup(bars, A) {
         if (!P.rp) attach(overlay); P._mkSig = null; P._ctSig = null; if (P.A) P.draw(); }
     };
     P.analyze = function () {
-      const bars = P.bars, n = bars.length;
-      if (n < 40) return;
-      P.A = msAnalyze(bars, PIVOT);
+      const bars = P.bars, k = msClosedN(bars, tf.sec, Date.now() / 1000, TZ);
+      if (k < 40) return;
+      P.A = msAnalyze(k < bars.length ? bars.slice(0, k) : bars, PIVOT);   // closed candles only: a BO needs a close beyond the level
       P.S = P.A.last ? msNextSetup(bars, P.A) : null;
       if (G.mode === 'ict') P.ictDraw(); else if (G.mode !== 'clean') P.draw();
       P.readout();
@@ -8362,7 +8370,7 @@ function msNextSetup(bars, A) {
     const PL = (price, title, color, dash, vis = true) => SP.pl.push(SP.series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash === 2 ? LW.LineStyle.Dotted : dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: plT(title, SP.chart.chartElement().clientWidth), lineVisible: vis }));
     if (B && B.length > 40) try {
       if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
-      else { const A = msAnalyze(B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
+      else { const kc = msClosedN(B, tf.sec, Date.now() / 1000, TZ), A = msAnalyze(kc < B.length ? B.slice(0, kc) : B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
         if (S) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
         const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); }
         // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
@@ -8652,7 +8660,8 @@ function msNextSetup(bars, A) {
     res.forEach((r, k) => {
       if (r.status !== 'fulfilled' || r.value.bars.length < 40) return;
       const bars = r.value.bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
-      src[TFS[k].id] = { bars, A: msAnalyze(bars, PIVOT) };
+      const kc = msClosedN(bars, TFS[k].sec, Date.now() / 1000);
+      src[TFS[k].id] = { bars, A: msAnalyze(kc < bars.length ? bars.slice(0, kc) : bars, PIVOT) };
     });
     if (!Object.keys(src).length) throw new Error((res.find((r) => r.status === 'rejected') || {}).reason?.message || 'No data');
     const d1 = res[TFS.findIndex((t) => t.id === '1d')];
