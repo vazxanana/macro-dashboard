@@ -11208,7 +11208,8 @@
     "t1": 0.68148,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.68244,
@@ -11222,7 +11223,8 @@
     "lagSec": 410,
     "positionId": "48790759",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T13:44:46.000Z"
    },
    "sol-position-1794489401": {
     "symbol": "SOLUSD",
@@ -11332,6 +11334,34 @@
     "positionId": "48795622",
     "volume": 1,
     "status": "open"
+   },
+   "audusd-rscalp-1794491028": {
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-12T13:44:46.000Z",
+    "councilEntry": 0.68274,
+    "stop": 0.68159,
+    "t1": 0.6831499999999999,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.68274,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.98,
+    "margin": 1.37,
+    "shadow": true,
+    "fillPrice": 0.68269,
+    "slipR": -0.043,
+    "lagSec": 58,
+    "positionId": "48805092",
+    "volume": 100000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-12T13:44:46.000Z",
+    "brokerStop": 0.68159
    }
   },
   "day": {
@@ -11339,7 +11369,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9913.27 · 32 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9911.67 · 32 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker"
@@ -11371,25 +11401,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9913.27,
-  "lastRun": "2026-11-12T13:42:11.000Z"
+  "balance": 9911.67,
+  "lastRun": "2026-11-12T13:44:46.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T10:06:21.000Z",
-   "msg": "moved GBPUSD 48737308 protection: stop 1.32767 -> 1.32753, target 1.32501 -> 1.32487 (council scalp)",
-   "trade": "gbpusd-scalp-1794476672"
-  },
-  {
-   "at": "2026-11-12T10:06:21.000Z",
-   "msg": "opened sell GBPUSD 0.03 lot (council scalp)",
-   "trade": "gbpusd-scalp-1794477878"
-  },
-  {
-   "at": "2026-11-12T10:09:50.000Z",
-   "msg": "moved USDCHF 48520033 protection: stop 0.83399 -> 0.83396, target 0.829405 -> 0.829375 (council rintra)",
-   "trade": "usdchf-rintra-1794420863"
-  },
   {
    "at": "2026-11-12T10:12:46.000Z",
    "msg": "moved EURUSD 47373484 protection: stop 1.0794395 -> 1.0797495, target 1.1631 -> 1.16341 (council rswing)",
@@ -12874,6 +12889,21 @@
    "at": "2026-11-12T13:40:22.000Z",
    "msg": "USDCAD position 48792993 closed at the broker",
    "trade": "usdcad-scalp-1794489401"
+  },
+  {
+   "at": "2026-11-12T13:44:46.000Z",
+   "msg": "AUDUSD position 48790759 closed at the broker",
+   "trade": "audusd-scalp-1794489121"
+  },
+  {
+   "at": "2026-11-12T13:44:46.000Z",
+   "msg": "placed buy limit AUDUSD 0.01 lot at 0.68274 (council rscalp, valid to 2026-11-12T16:43Z)",
+   "trade": "audusd-rscalp-1794491028"
+  },
+  {
+   "at": "2026-11-12T13:44:46.000Z",
+   "msg": "limit filled at once: AUDUSD position 48805092 at the broker at 0.68269",
+   "trade": "audusd-rscalp-1794491028"
   }
  ],
  "limits": {
@@ -12952,11 +12982,11 @@
   ]
  },
  "execution": {
-  "n": 379,
+  "n": 380,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 143,
+  "medianLagSec": 142.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 21,
@@ -12987,7 +13017,7 @@
     "meanSlipR": 0.028
    },
    "AUDUSD": {
-    "n": 59,
+    "n": 60,
     "meanSlipR": -0.021
    },
    "XAUUSD": {
