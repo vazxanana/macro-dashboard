@@ -3,8 +3,9 @@
 //   1. Costs: every closed paper trade keeps its raw R (R, as before) and gets a cost-adjusted R (Rnet) with the cost in R (costR).
 //      The cost is the Backtest's costOf (spread + Kraken fees on crypto) plus slippage on every market order (entry at market,
 //      stop, time or at-market exit; a limit entry and a target exit pay none). Spread: the broker's symbol info when known
-//      (ctrader/symbols.json), else the Backtest's typical spread. Entry slippage: the cTrader demo mirror's own fills once a
-//      market has MIN_FILLS of them (median of demo fill - council entry, in price), else SLIP_SPREADS of a spread.
+//      (ctrader/symbols.json: the median quoted spread, or a positive spread, plus the broker's commission; see costModel), else the
+//      Backtest's typical spread. Entry slippage: the cTrader demo mirror's own fills (every demo account) once a market has
+//      MIN_FILLS of them (median of demo fill - council entry, in price), else SLIP_SPREADS of a spread.
 //   2. Stale-signal guard (a shadow stat, it changes no trade): drift = how far price had moved from the signal's price when the
 //      Trader filled, in R of the signal's risk (+ = chased, the fill is worse; - = price came back toward the stop).
 //      |drift| > STALE_R would be recorded as "missed" by the guard; staleStats() counts those and what they made.
@@ -74,21 +75,41 @@ export const STALE_R = 0.25;       // stale-signal guard: price more than this m
 const med = (a) => { const v = a.slice().sort((x, y) => x - y), n = v.length; return n ? (n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2) : null; };
 const DONE = new Set(['win', 'loss', 'be']);
 
-// Per-market cost inputs. symbols: market -> broker symbol names (ctrader-mirror SYMBOLS); brokerInfo: { symbols: { XAUUSD: { spread } } }
-// (spread in price); mirrorMap: ctrader/mirror.json state.map (each fill has symbol, side, fillPrice, councilEntry).
-export function costModel(markets, { symbols = {}, brokerInfo = null, mirrorMap = null, minFills = MIN_FILLS } = {}) {
+// Per-market cost inputs. symbols: market -> broker symbol names (ctrader-mirror SYMBOLS); brokerInfo: ctrader/symbols.json
+// ({ symbols: { XAUUSD: { spread, spreadSrc, spreadTypical, commissionRT } } }, spread in price); mirrorMap: the demo mirror's
+// state.map (one file's, or several merged by mirrorMaps; each fill has symbol, side, fillPrice, councilEntry).
+// The quoted spread, in this order (12 Nov 2026): the median of the broker's quotes outside the rollover hours once MIN_QUOTES
+// reads exist (spreadTypical; it may be 0 on a raw-spread account, and is used then only when the broker's commission is known,
+// so a round trip never costs nothing), else a POSITIVE broker spread (measured or kept: a spread of 0 is treated as missing),
+// else the Backtest's typical spread (default). The broker's round-trip commission (commissionRT, a fraction of the price) is
+// charged on top when the file has it. src names the basis: quotes | broker | default, then +commission, +mirror.
+export const MIN_QUOTES = 20;
+export function costModel(markets, { symbols = {}, brokerInfo = null, mirrorMap = null, minFills = MIN_FILLS, minQuotes = MIN_QUOTES } = {}) {
   const info = (brokerInfo && (brokerInfo.symbols || brokerInfo)) || {}, slips = {};
   for (const m of Object.values(mirrorMap || {})) {
+    if (!m) continue;
     const px = +m.fillPrice, ce = +m.councilEntry; if (!(px > 0 && ce > 0)) continue;
     const k = Object.keys(markets).find((x) => (symbols[x] || []).includes(m.symbol)); if (!k) continue;
     (slips[k] = slips[k] || []).push((m.side === 'sell' ? -1 : 1) * (px - ce));
   }
   const out = {};
   for (const k of Object.keys(markets)) {
-    const bi = (symbols[k] || []).map((n) => info[n]).find((x) => x && +x.spread > 0), s = slips[k] || [];
-    out[k] = { spread: bi ? +bi.spread : null, entrySlip: s.length >= minFills ? +med(s).toPrecision(6) : null, fills: s.length,
-      src: (bi ? 'broker' : 'default') + (s.length >= minFills ? '+mirror' : '') };
+    const recs = (symbols[k] || []).map((n) => info[n]).filter((x) => x && typeof x === 'object'), s = slips[k] || [];
+    const com = recs.map((x) => x.commissionRT).find((v) => Number.isFinite(v) && v >= 0);
+    const typ = recs.map((x) => x.spreadTypical).find((t) => t && t.n >= minQuotes && Number.isFinite(t.median) && (t.median > 0 || (t.median === 0 && com > 0)));
+    const bi = recs.find((x) => +x.spread > 0);
+    const basis = typ ? 'quotes' : bi ? 'broker' : 'default';
+    out[k] = { spread: typ ? +typ.median : bi ? +bi.spread : null, quotes: typ ? typ.n : 0, commissionRT: com != null ? com : null,
+      entrySlip: s.length >= minFills ? +med(s).toPrecision(6) : null, fills: s.length,
+      src: basis + (com > 0 ? '+commission' : '') + (s.length >= minFills ? '+mirror' : '') };
   }
+  return out;
+}
+// every demo account's mirror records in one map (ctrader/mirror.json + mirror-<account>.json): keys are prefixed with the file so
+// two accounts never overwrite each other. files: [[name, parsed file], ...]
+export function mirrorMaps(files) {
+  const out = {};
+  for (const [name, f] of files || []) for (const [id, m] of Object.entries(((f && f.state) || {}).map || {})) out[`${name}:${id}`] = m;
   return out;
 }
 
@@ -101,8 +122,12 @@ export const limitEntry = (t) => t.entryMode === 'limit' || (t.entryMode !== 'ma
 export function tradeCost(t, M, mm = {}) {
   const px = +t.entry, r0 = +t.r0 || Math.abs(t.entry - t.stop);
   if (!M || !(px > 0) || !(r0 > 0)) return null;
-  const lim = limitEntry(t), sp = mm && mm.spread > 0 ? mm.spread : spreadOf(M, px), slip = SLIP_SPREADS * sp;
-  let cost = costOf(M, px, lim) - spreadOf(M, px) + sp;
+  // the quoted spread: the model's when positive, or 0 from the broker's quotes (raw account, commission charged instead); a 0 from
+  // anywhere else is missing. Slippage is half a spread, of the default spread when the quoted one is 0 (assumed, not measured).
+  const quoted = mm && Number.isFinite(mm.spread) && (mm.spread > 0 || (mm.spread === 0 && /^quotes/.test(mm.src || '')));
+  const lim = limitEntry(t), sp = quoted ? mm.spread : spreadOf(M, px), slip = SLIP_SPREADS * (sp > 0 ? sp : spreadOf(M, px));
+  const com = mm && mm.commissionRT > 0 ? mm.commissionRT * px : 0;
+  let cost = costOf(M, px, lim) - spreadOf(M, px) + sp + com;
   if (!lim) cost += mm && mm.entrySlip != null ? Math.max(0, mm.entrySlip) - sp / 2 : slip;   // a demo fill already includes the half spread
   if (!targetExit(t)) cost += slip;
   const fin = financing(t);   // overnight financing (gold longs), 0 for a trade closed before its first rollover

@@ -20,7 +20,7 @@ import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+import { costModel, mirrorMaps, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
@@ -1712,7 +1712,9 @@ config.history = config.history.slice(-200);
 // they exist). The stale-signal guard is a shadow stat only: snapshot.staleGuard counts the fills more than STALE_R from the
 // signal's price and what they made. Nothing here changes an entry, a filter or R.
 try {
-  const model = costModel(MARKETS, { symbols: BROKER_SYMBOLS, brokerInfo: rd('ctrader/symbols.json', null), mirrorMap: ((rd('ctrader/mirror.json', {}) || {}).state || {}).map });
+  // every demo account's fills (12 Nov 2026): the forex copies sit on the shadow and replica accounts, not the council's mirror.json
+  const mfiles = ['mirror.json', ...(((rd('ctrader/mirror-accounts.json', {}) || {}).groups || []).map((g) => g && g.file).filter((f) => typeof f === 'string' && /^mirror(-\d+)?\.json$/.test(f)))];
+  const model = costModel(MARKETS, { symbols: BROKER_SYMBOLS, brokerInfo: rd('ctrader/symbols.json', null), mirrorMap: mirrorMaps([...new Set(mfiles)].map((f) => [f, rd('ctrader/' + f, null)])) });
   annotateCosts(trades, MARKETS, model); backfillDrift(trades);
   snapshot.costs = { model, ...costSummary(trades, MARKETS), financing: { from: config.financingFrom || null, perNight: Object.fromEntries(Object.entries(FIN).map(([k, v]) => [k, v.long])), asOf: FIN.xau.asOf, src: FIN.xau.src } };
   snapshot.staleGuard = staleStats(trades);
