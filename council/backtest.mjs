@@ -31,7 +31,7 @@ import { krakenData as krakenLoad, krakenGap, basisSeries, aggregate } from './k
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
-import { spreadOf, costOf, spotClosed, spotSkip, replayBar, replayFin, FIN } from './fills.mjs';
+import { spreadOf, costOf, spotClosed, spotSkip, replayBar, replayFin, FIN, minStopDist, fillCheck } from './fills.mjs';
 import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
@@ -460,9 +460,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (st.k === 'swing') { try { Object.assign(feat, d1AdxFeat(src['1d'].bars, t)); } catch (e) {} }   // tag only (paper sleeve swing-adx), as the live Trader
         try { Object.assign(feat, newsFeat(t)); } catch (e) {}   // news research tag (tier-1 US release within +-120 min), as the live Trader; no rule reads it
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
+        // a market fill is judged as the Trader does (12 Nov 2026, owner approved, item 53): past the stop or target, or inside the
+        // engine's minimum stop from the stop (fills.mjs fillCheck), the order is not opened
+        const floor = minStopDist(src[def.l].bars, spreadOf(M, price), CFG.minRisk);
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
+          if (fillCheck(side, price, st.stop, st.t1, floor)) continue;
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
-          if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
           tr.entry = price; tr.rr = rw / r; tr.status = 'open'; tr.filled = t;
         }
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? costOf(M, tr.entry, tr.filled !== t) / tr.r0 : 0;   // filled at the signal = crossed the limit at market
@@ -472,8 +475,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // its twin entered at market at the signal (same stop and targets): the other entry style, for a fair comparison
         const tw = { ...tr, k: st.k + '@mkt', twin: true, mfe: 0 };
         if (tr.status === 'pending') {
+          if (fillCheck(side, price, st.stop, st.t1, floor)) continue;
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
-          if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
           Object.assign(tw, { entry: price, rr: rw / r, status: 'open', filled: t });
         }
         tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? costOf(M, tw.entry, false) / tw.r0 : 0;

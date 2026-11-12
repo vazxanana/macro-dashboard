@@ -156,6 +156,34 @@ export function staleStats(trades, X = STALE_R) {
   return out;
 }
 
+// ─── Near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 53) ───
+// The engine (engine.mjs buildSetup / buildRetrace) never plans a stop closer to the ENTRY than the minimum stop
+// max(minRisk x ATR(14) of the setup's lower timeframe, 5 spreads). A setup the Trader (and the replay) takes at market fills
+// at the price of the moment, which can sit much nearer the stop than the planned entry (9-12 Nov: an AUD/USD fill 0.4 pip
+// above its stop booked about -6R after costs). The same floor is checked again on the FILL: inside it, or on / past the stop,
+// the order is not opened (status 'skipped', reason 'fill-near-stop'; never a trade in any tally). The stop is never moved.
+export const NEAR_STOP = 'fill-near-stop';
+// ATR(14) exactly as engine.mjs atr() / review.mjs atrOf(): the mean true range of the last n candles
+export function atrN(bars, n = 14) {
+  const m = (bars || []).length; let s = 0, k = 0;
+  for (let i = Math.max(1, m - n); i < m; i++) { const b = bars[i], pc = bars[i - 1].close; s += Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc)); k++; }
+  return k ? s / k : 0;
+}
+// the engine's minimum stop distance for a setup whose lower timeframe has these candles (spread = fills.mjs spreadOf)
+export const minStopDist = (bars, spread, minRisk) => Math.max(minRisk * atrN(bars), 5 * spread);
+// why a market fill at px must not be opened, or null. 'past-stop' / 'past-target': px on or beyond the stop or the target;
+// NEAR_STOP: |px - stop| under the floor (float noise of 1e-9 relative ignored, so a fill exactly at the floor is opened)
+export function fillCheck(side, px, stop, t1, floor) {
+  const sell = side === 'sell', r = Math.abs(px - stop), rw = (t1 - px) * (sell ? -1 : 1);
+  if (!(r > 0) || (sell ? px >= stop : px <= stop)) return 'past-stop';
+  if (!(rw > 0)) return 'past-target';
+  if (Number.isFinite(floor) && floor > 0 && r < floor * (1 - 1e-9)) return NEAR_STOP;
+  return null;
+}
+export const fillCheckText = (why, M = {}, px, floor) => why === NEAR_STOP
+  ? `Not filled: the market price ${Number.isFinite(px) ? px.toFixed(M.dec != null ? M.dec : 5) : ''} was inside the minimum stop (${Number.isFinite(floor) ? floor.toPrecision(3) : '?'} from the stop), so the order was not opened (fill-near-stop).`
+  : 'Price already past the stop or target when the signal came in.';
+
 // ─── trade-state helpers ───
 // the exit price of a stop hit on candle b: the stop, or the candle's open when price opened beyond it (a weekend or news gap,
 // missing candles). afterFill: the candle started after the fill (on the fill candle the open came before the fill: use the stop)

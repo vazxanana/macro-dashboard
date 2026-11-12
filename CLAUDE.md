@@ -70,7 +70,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
-  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
+  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
@@ -87,7 +87,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-52 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-53 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -824,7 +824,7 @@ forex): 249 of 9,230 rows changed, R_none −131 → −182R; most gap R is the 
 Shadow audit (8 Nov, `research/edge/shadow-audit`): the shadow book's −300R week was costs, not trading (+92.6R gross; 300R of Kraken fees on
 139 crypto scalps). One repair: `council/repairs.mjs` `voidM30Twins` gives the 29 pre-dedupe m30m1 copies of Scalp entries status
 `duplicate` (`dupOf`, `void`; no tally counts that status). Near-stop market fills (the engine's stop floor is checked on the planned entry,
-not the fill) is a proposal for the owner. Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
+not the fill): done 12 Nov 2026, section "Near-stop market fills". Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
 paper trades pay the costs study's CFD round trip (0.04% of price, `CFD_CRYPTO` in `council/fills.mjs`) instead of Kraken spot fees.
 Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also carries overnight financing on gold longs, `FIN` / `financing`, section "Supported book, financing".) `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
 "Manage open trades" step for one candle as pure functions (trail, beAt, maxHold, pyramid add included), used by that replay;
@@ -843,6 +843,28 @@ not studied) and the page (`risk0`: Active trades, the trade table's live R, the
 Open for the owner (item 51): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
 side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
 
+## Near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 53, fix 2 of the week review)
+The engine (`buildSetup` / `buildRetrace`) widens every planned stop to the minimum stop `max(CFG.minRisk x ATR(14) of the
+lower timeframe, 5 spreads)` from the PLANNED entry; a READY setup the Trader takes at market (price through the entry, or
+`config.entry[k] === 'market'`) used to fill at the price of the moment whatever its distance to the stop (9-12 Nov: 7 fills
+within half the planned risk, an AUD/USD buy 0.4 pip above its stop booked about -6R after costs).
+- `council/fills.mjs`: `atrN` (= engine `atr` = review `atrOf`), `minStopDist(bars, spread, minRisk)` (the engine's floor),
+  `fillCheck(side, px, stop, t1, floor)` -> `'past-stop'` / `'past-target'` / `NEAR_STOP` (`'fill-near-stop'`, distance under
+  the floor; a fill exactly at the floor opens) / null, `fillCheckText`.
+- Trader, "Take new Ready setups", the `if (mkt)` step: the floor from `src[def.l].bars`, `spreadOf(M, price)`, `CFG.minRisk`
+  (the same inputs the engine used a moment before). A refused fill is pushed as `status: 'skipped'`, `reason`, `fillPx` (the
+  price it would have filled at), `minStop`, `closed: now`, `R: 0`, the planned entry and the stop untouched, NO `filled`,
+  `r0` or `drift` (a past-stop / past-target skip is now the same; before, it carried the fill time and price). An opened fill
+  now stamps `r0` (the opening risk) at once. `state.seen` already holds the signal, so it is not taken again.
+- Replay (`council/backtest.mjs`): the market fill at the signal and the `@mkt` twin use the same `fillCheck` (refused = no row).
+- Never a trade: tallies count win / loss / be only (`DONE` in fills / digest / decay / book, the page's `done`), `forward.mjs`
+  leaves `skipped` out of the book, the mirror copies only open / pending, the edge analyst and the Desk's chart markers skip
+  it; the page shows it as "Skipped". `fidelity.mjs` names the reason.
+- Before the change (council-data of 12 Nov, `minRisk` as it stood at each trade from config history, ATR from `ctx.atr`):
+  65 of 332 recorded engine market fills inside the floor (2 live, 2-3 Nov; the rest shadow), +10.2R before costs, -28.9R
+  after; since 9 Nov 33, +1.7R / -18.6R. Stored trades were not rewritten.
+- Tests: `tests/near-stop-fill.test.mjs` (lifts the Trader's market-fill block as text and runs it; the engine's floor
+  formula is pinned there, so a change to it must change `minStopDist` too).
 ## One order, recorded once (12 Nov 2026, owner approved: "count duplicates once")
 Plumbing only: no entry rule, filter, size, stop, exit or pinned block changed. Two setup keys built on shared structure can
 give the SAME order in one round; it was recorded and counted twice. `council/dedupe.mjs` (pure) defines an **exact duplicate**:
