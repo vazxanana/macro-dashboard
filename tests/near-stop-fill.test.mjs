@@ -1,4 +1,4 @@
-// node --test tests/near-stop-fill.test.mjs: near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 52).
+// node --test tests/near-stop-fill.test.mjs: near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 53).
 // The engine plans every stop at least the minimum stop max(minRisk x ATR(14) of the lower timeframe, 5 spreads) from the PLANNED
 // entry; a setup taken at market fills at the price of the moment, which can sit much nearer the stop. The same floor is checked
 // on the fill: inside it, or past the stop / target, the order is not opened (status 'skipped', reason 'fill-near-stop'), never

@@ -460,7 +460,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (st.k === 'swing') { try { Object.assign(feat, d1AdxFeat(src['1d'].bars, t)); } catch (e) {} }   // tag only (paper sleeve swing-adx), as the live Trader
         try { Object.assign(feat, newsFeat(t)); } catch (e) {}   // news research tag (tier-1 US release within +-120 min), as the live Trader; no rule reads it
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
-        // a market fill is judged as the Trader does (12 Nov 2026, owner approved, item 52): past the stop or target, or inside the
+        // a market fill is judged as the Trader does (12 Nov 2026, owner approved, item 53): past the stop or target, or inside the
         // engine's minimum stop from the stop (fills.mjs fillCheck), the order is not opened
         const floor = minStopDist(src[def.l].bars, spreadOf(M, price), CFG.minRisk);
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader

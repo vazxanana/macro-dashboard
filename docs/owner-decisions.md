@@ -690,10 +690,10 @@ Each is from a finished study; nothing was changed. All paper only.
   planned entry, not on the actual fill, so a market fill can land very close to the stop and one small move counts as a
   full loss. Proposal: check the distance on the fill and skip the trade when it is too small. **Recommended: yes** (it can
   only skip a trade, never loosen a stop). It mostly concerns the retired engine's shadow streams.
-- [ ] **Gold daily engulf and the Sunday candle (`research/edge/gold-weekend`, 7 Nov).** The rule counts a short Sunday
+- [x] **Gold daily engulf and the Sunday candle (`research/edge/gold-weekend`, 7 Nov).** The rule counts a short Sunday
   candle as a day. Counting proper trading days instead is "correct by construction and not worse" (+7.1R over 20 years,
   within noise). For Gold trend the same change is worse, so that stays. **Recommended: adopt it for the engulf only, or
-  leave it; the evidence does not favour either strongly.**
+  leave it; the evidence does not favour either strongly.** **Status (12 Nov 2026): approved for the engulf only, item 52.**
 
 ### [ ] 35. Small display leftovers from the 11 Nov check of every page
 
@@ -1049,9 +1049,27 @@ figure or demo-mirror setting.
 - **If nothing is decided.** The first ICT A-setup copied after its trail passed the entry gets a demo stop on the losing
   side, and some catch-up copies of ratcheted gold trend positions are refused.
 
+## Gold daily engulf and the Sunday candle, 12 Nov 2026
+
+### [x] 52. Gold daily engulf reads trading days: the Sunday reopen candle is no longer a day
+
+- **Status: approved 12 Nov 2026** (owner: "yes" to the week review's plumbing fixes). Applied on branch `geg-sunday-stub`.
+  This answers the engulf part of item 34's third point (`research/edge/gold-weekend`); Gold trend stays as it is.
+- **Context.** On 10 Nov 2026 the engulf took its zone from OANDA's Sunday 8 Nov daily candle: the two hours between the
+  22:00 UTC reopen and midnight (volume about 18,000 against 400,000 or more on a weekday, range $19). Its stop sat about $21
+  under the entry and was hit the same day (`xau-geg-1794096000`, -1R). The 7 Nov study had tested exactly this: Saturday /
+  Sunday candles folded into the next weekday, and an order allowed for 24 hours from the reopen after its day (so a Friday
+  close is traded at the Sunday reopen). Pre-registered verdict for the engulf: ADOPT, "correct by construction and not
+  worse" (+0.207 against +0.186R a position on 2006-17, +0.326 against +0.277R on 2018-26; the gain itself is within noise).
+- **What changed.** Only the engulf's daily candles and its freshness window (`council/fills.mjs` `foldWeekend`,
+  `gegFresh`; the feed-switch re-derivation reads the same days). Entry, stop, target, trail, hold, cap and the zone cancel
+  are the rule as before. On the same candles the 10 Nov signal becomes a zone on Friday 6 Nov ($78 wide), not the stub.
+- **Not changed.** Gold trend and Gold trend fast keep the raw daily candles: the same study found the fold worse for them.
+  The forward-test bands (item 43) and "What to expect" were built on the raw-candle engulf; the two rules are within noise
+  of each other, so the bands stay. No closed trade was recosted or relabelled.
 ## Market fills near the stop, 12 Nov 2026
 
-### [x] 52. Check the minimum stop again on the price a market entry really fills at
+### [x] 53. Check the minimum stop again on the price a market entry really fills at
 
 - **Status (12 Nov 2026): approved.** You answered "yes" to the week review's plumbing fixes; this is fix 2 of that review
   ("Stop floor on the fill"), the proposal first named in the 8 Nov fills audit ("near-stop market fills").
