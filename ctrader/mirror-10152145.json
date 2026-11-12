@@ -10358,6 +10358,34 @@
     "rr": 2.91,
     "amended": 1,
     "amendedAt": "2026-11-12T09:54:59.000Z"
+   },
+   "xau-gmp-1794470400": {
+    "positionId": "48739368",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "gmp",
+    "status": "open",
+    "openedAt": "2026-11-12T09:56:34.000Z",
+    "councilEntry": 3942.59,
+    "stop": 3963.81,
+    "t1": 3730.39,
+    "riskCash": 21.22,
+    "margin": 7.88,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3942.585,
+    "levelsFrom": "mark",
+    "fillPrice": 3943.73,
+    "slipR": -0.054,
+    "lagSec": 69,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-12T09:56:34.000Z",
+    "brokerStop": 3964.95
    }
   },
   "day": {
@@ -10365,7 +10393,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9855.58 · 32 open",
+  "status": "ok · demo Fusion Markets · balance 9855.58 · 33 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10377,14 +10405,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9855.58,
-  "lastRun": "2026-11-12T09:54:59.000Z"
+  "lastRun": "2026-11-12T09:56:34.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T02:43:25.000Z",
-   "msg": "cancelled AUDUSD limit order 33971376 for audusd-intraday-1794450613: the council ended it: missed",
-   "trade": "audusd-intraday-1794450613"
-  },
   {
    "at": "2026-11-12T02:43:25.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 3978.89 (council m30m1, valid to 2026-11-12T08:42Z)",
@@ -11879,6 +11902,11 @@
    "at": "2026-11-12T09:54:59.000Z",
    "msg": "moved GBPUSD 48737308 protection: stop 1.3275 -> 1.32767, target 1.32484 -> 1.32501 (council scalp)",
    "trade": "gbpusd-scalp-1794476672"
+  },
+  {
+   "at": "2026-11-12T09:56:34.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council gmp)",
+   "trade": "xau-gmp-1794470400"
   }
  ],
  "limits": {
@@ -11957,7 +11985,7 @@
   ]
  },
  "execution": {
-  "n": 348,
+  "n": 349,
   "meanSlipR": -0.013,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
@@ -11996,7 +12024,7 @@
     "meanSlipR": -0.037
    },
    "XAUUSD": {
-    "n": 47,
+    "n": 48,
     "meanSlipR": -0.047
    }
   }
