@@ -57,16 +57,30 @@
   }
  ],
  "decay": {
-  "at": "2026-11-11T18:00:28.000Z",
+  "at": "2026-11-12T00:02:13.000Z",
   "v": 1,
-  "baseAt": "2026-11-10T07:20:57.962Z",
+  "baseAt": "2026-11-11T22:19:46.138Z",
+  "financing": {
+   "asOf": "2026-11-11",
+   "rate": 0.000148,
+   "systems": [
+    "replica",
+    "mosha-bo",
+    "gtrend",
+    "gtrend5",
+    "gtl",
+    "geg",
+    "gmp"
+   ]
+  },
   "rule": "status and alert only: the monitor never changes a rule; the owner decides",
   "systems": [
    {
     "id": "replica",
     "name": "Gold replica",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
     "base": "council replay 2022-12-27 to 2026-11-03 (research/replay-2w.json)",
     "n": 214,
     "nLive": 2,
@@ -74,8 +88,8 @@
     "nHist": 0,
     "from": 1702539420,
     "to": 1793771640,
-    "ref": 0.877,
-    "sd": 3.343,
+    "ref": 0.865,
+    "sd": 3.338,
     "fwd": {
      "n": 2,
      "exp": 0.48,
@@ -84,35 +98,36 @@
     "roll": {
      "n": 30,
      "W": 30,
-     "exp": 0.33,
-     "t": 0.58,
-     "R": 9.81
+     "exp": 0.31,
+     "t": 0.55,
+     "R": 9.34
     },
     "cusRef": {
-     "s": 8.13,
-     "h": 11.55,
-     "max": 8.59
+     "s": 8.21,
+     "h": 11.63,
+     "max": 8.67
     },
     "cusZero": {
-     "s": 1.83,
-     "h": 11.55
+     "s": 1.99,
+     "h": 11.63
     },
     "dd": {
-     "cur": 16.63,
-     "max": 18.61,
+     "cur": 17.05,
+     "max": 19.03,
      "limit": 40.2,
      "hist": 40.2
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades +0.33R a trade, CUSUM 8.13 of 11.55"
+     "in line with its backtest: last 30 trades +0.31R a trade, CUSUM 8.21 of 11.63"
     ]
    },
    {
     "id": "mosha-bo",
     "name": "Mosha BO",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
     "base": "Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)",
     "n": 47,
     "nLive": 0,
@@ -120,8 +135,8 @@
     "nHist": 47,
     "from": 1718847960,
     "to": 1781100000,
-    "ref": -0.064,
-    "sd": 1.969,
+    "ref": -0.093,
+    "sd": 1.951,
     "fwd": {
      "n": 0,
      "exp": 0,
@@ -130,24 +145,24 @@
     "roll": {
      "n": 20,
      "W": 20,
-     "exp": -0.59,
-     "t": -1.15,
-     "R": -11.75
+     "exp": -0.61,
+     "t": -1.21,
+     "R": -12.3
     },
     "cusRef": {
-     "s": 7.9,
-     "h": 5.99,
-     "max": 7.9
+     "s": 7.92,
+     "h": 5.97,
+     "max": 7.92
     },
     "cusZero": {
-     "s": 8.42,
-     "h": 5.99
+     "s": 8.69,
+     "h": 5.97
     },
     "dd": {
-     "cur": 19.73,
-     "max": 19.73,
-     "limit": 45.99,
-     "hist": 45.99
+     "cur": 20.07,
+     "max": 20.07,
+     "limit": 49.45,
+     "hist": 49.45
     },
     "few": true,
     "status": "healthy",
@@ -167,8 +182,8 @@
     "nHist": 0,
     "from": 1675153800,
     "to": 1787933280,
-    "ref": 1.64,
-    "sd": 4.003,
+    "ref": 1.504,
+    "sd": 3.903,
     "fwd": {
      "n": 0,
      "exp": 0,
@@ -177,28 +192,28 @@
     "roll": {
      "n": 10,
      "W": 10,
-     "exp": 2.42,
-     "t": 1.86,
-     "R": 24.17
+     "exp": 2.29,
+     "t": 1.81,
+     "R": 22.85
     },
     "cusRef": {
      "s": 0.3,
-     "h": 2.86,
-     "max": 0.95
+     "h": 2.92,
+     "max": 1
     },
     "cusZero": {
      "s": 0,
-     "h": 2.86
+     "h": 2.92
     },
     "dd": {
      "cur": 0,
-     "max": 1.4,
-     "limit": 6.88,
-     "hist": 3.7
+     "max": 1.64,
+     "limit": 7.47,
+     "hist": 3.78
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 10 trades +2.42R a trade, CUSUM 0.3 of 2.86"
+     "in line with its backtest: last 10 trades +2.29R a trade, CUSUM 0.3 of 2.92"
     ]
    },
    {
@@ -206,6 +221,7 @@
     "name": "Gold trend fast",
     "desk": "Meridian",
     "live": false,
+    "shadowSince": "2026-11-07",
     "base": "gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)",
     "n": 39,
     "nLive": 0,
@@ -213,8 +229,8 @@
     "nHist": 0,
     "from": 1675382400,
     "to": 1792627200,
-    "ref": 1.064,
-    "sd": 3.365,
+    "ref": 0.94,
+    "sd": 3.272,
     "fwd": {
      "n": 0,
      "exp": 0,
@@ -223,35 +239,36 @@
     "roll": {
      "n": 10,
      "W": 10,
-     "exp": 1.15,
-     "t": 1.05,
-     "R": 11.48
+     "exp": 1.09,
+     "t": 1.01,
+     "R": 10.89
     },
     "cusRef": {
      "s": 1.2,
-     "h": 2.92,
-     "max": 1.65
+     "h": 3.04,
+     "max": 1.64
     },
     "cusZero": {
-     "s": 0.11,
-     "h": 2.92
+     "s": 0.15,
+     "h": 3.04
     },
     "dd": {
-     "cur": 0.91,
-     "max": 2.88,
-     "limit": 9.23,
+     "cur": 0.96,
+     "max": 3.02,
+     "limit": 10.63,
      "hist": 6.6
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 10 trades +1.15R a trade, CUSUM 1.2 of 2.92"
+     "in line with its backtest: last 10 trades +1.09R a trade, CUSUM 1.2 of 3.04"
     ]
    },
    {
     "id": "gtl",
     "name": "Gold H4 trendline",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
     "base": "gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)",
     "n": 25,
     "nLive": 1,
@@ -259,8 +276,8 @@
     "nHist": 0,
     "from": 1767945600,
     "to": 1794317400,
-    "ref": 0.106,
-    "sd": 1.169,
+    "ref": 0.068,
+    "sd": 1.157,
     "fwd": {
      "n": 1,
      "exp": -1.02,
@@ -269,28 +286,28 @@
     "roll": {
      "n": 25,
      "W": 30,
-     "exp": 0.1,
-     "t": 0.32,
-     "R": 2.49
+     "exp": 0.08,
+     "t": 0.26,
+     "R": 2.05
     },
     "cusRef": {
-     "s": 2.12,
-     "h": 9.08,
-     "max": 5.6
+     "s": 2.07,
+     "h": 9.07,
+     "max": 5.46
     },
     "cusZero": {
-     "s": 1.76,
-     "h": 9.08
+     "s": 1.83,
+     "h": 9.07
     },
     "dd": {
-     "cur": 2.52,
-     "max": 6.64,
-     "limit": 20.96,
-     "hist": 20.24
+     "cur": 2.58,
+     "max": 6.75,
+     "limit": 23.86,
+     "hist": 23.08
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 25 trades +0.10R a trade, CUSUM 2.12 of 9.08"
+     "in line with its backtest: last 25 trades +0.08R a trade, CUSUM 2.07 of 9.07"
     ]
    },
    {
@@ -305,8 +322,8 @@
     "nHist": 0,
     "from": 1769799180,
     "to": 1794317400,
-    "ref": 0.198,
-    "sd": 1.698,
+    "ref": 0.139,
+    "sd": 1.671,
     "fwd": {
      "n": 1,
      "exp": -1.06,
@@ -315,35 +332,36 @@
     "roll": {
      "n": 19,
      "W": 25,
-     "exp": 0.16,
-     "t": 0.36,
-     "R": 3
+     "exp": 0.14,
+     "t": 0.31,
+     "R": 2.6
     },
     "cusRef": {
-     "s": 3.08,
-     "h": 6.98,
-     "max": 3.27
+     "s": 3,
+     "h": 6.99,
+     "max": 3.11
     },
     "cusZero": {
-     "s": 2.5,
-     "h": 6.98
+     "s": 2.59,
+     "h": 6.99
     },
     "dd": {
-     "cur": 5.09,
-     "max": 5.27,
-     "limit": 22.28,
-     "hist": 14.68
+     "cur": 5.16,
+     "max": 5.48,
+     "limit": 25.49,
+     "hist": 18.2
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 19 trades +0.16R a trade, CUSUM 3.08 of 6.98"
+     "in line with its backtest: last 19 trades +0.14R a trade, CUSUM 3 of 6.99"
     ]
    },
    {
     "id": "gmp",
     "name": "Gold momentum pullback",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
     "base": "gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)",
     "n": 74,
     "nLive": 0,
@@ -351,8 +369,8 @@
     "nHist": 0,
     "from": 1767713880,
     "to": 1792672980,
-    "ref": 0.043,
-    "sd": 1.286,
+    "ref": 0.032,
+    "sd": 1.281,
     "fwd": {
      "n": 0,
      "exp": 0,
@@ -361,35 +379,36 @@
     "roll": {
      "n": 30,
      "W": 30,
-     "exp": -0.21,
-     "t": -1.14,
-     "R": -6.28
+     "exp": -0.22,
+     "t": -1.18,
+     "R": -6.47
     },
     "cusRef": {
-     "s": 3.67,
-     "h": 14.57,
-     "max": 4.83
+     "s": 3.51,
+     "h": 14.48,
+     "max": 4.8
     },
     "cusZero": {
-     "s": 2.87,
-     "h": 14.57
+     "s": 2.91,
+     "h": 14.48
     },
     "dd": {
-     "cur": 6.78,
-     "max": 7.32,
-     "limit": 49.67,
-     "hist": 40.06
+     "cur": 6.83,
+     "max": 7.4,
+     "limit": 52.66,
+     "hist": 43.48
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades −0.21R a trade, CUSUM 3.67 of 14.57"
+     "in line with its backtest: last 30 trades −0.22R a trade, CUSUM 3.51 of 14.48"
     ]
    },
    {
     "id": "nq-open",
     "name": "NQ New York open run",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
     "base": "council replay 2022-12-27 to 2026-11-03, session nyflip",
     "n": 300,
     "nLive": 1,
@@ -437,9 +456,9 @@
     "desk": "ICT",
     "live": true,
     "base": "ICT A-setups 2018-26 rebuild, GC/NQ/ES/YM (#526; record in research/edge/sizing/inputs.json)",
-    "n": 243,
+    "n": 238,
     "nLive": 2,
-    "nReplay": 241,
+    "nReplay": 236,
     "nHist": 0,
     "from": 1754596800,
     "to": 1794408000,
@@ -482,6 +501,7 @@
     "name": "Crypto trend",
     "desk": "Meridian",
     "live": false,
+    "shadowSince": "2026-11-07",
     "base": "crypto trend v3 2017-26 rebuild (robustness/out/crypto.json)",
     "n": 65,
     "nLive": 0,
@@ -526,10 +546,10 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-11T18"
+  "slot": "2026-11-12T00"
  },
  "book": {
-  "at": "2026-11-11T18:00:28.000Z",
+  "at": "2026-11-12T00:02:13.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
@@ -733,55 +753,64 @@
     "cumProp": 32.921
    }
   ],
-  "slot": "2026-11-11T18"
+  "slot": "2026-11-12T00"
  },
  "expect": {
-  "at": "2026-11-11T18:00:28.000Z",
+  "at": "2026-11-12T00:02:13.000Z",
   "v": 1,
-  "baseAt": "2026-11-10T07:21:28.218Z",
+  "baseAt": "2026-11-11T22:19:51.148Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
   "systems": [
    {
     "id": "replica",
     "name": "Gold replica",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
+    "fin": {
+     "perTrade": 0.005,
+     "nights": 0.2,
+     "before": {
+      "exp": -0.052,
+      "t": -0.17
+     }
+    },
     "honest": {
      "src": "research/edge/replica-oos",
      "window": "2017-22 out of sample",
      "n": 115,
-     "exp": -0.052,
-     "sd": 3.256,
-     "t": -0.17,
+     "exp": -0.057,
+     "sd": 3.255,
+     "t": -0.19,
      "perYear": 19.17,
-     "maxDD": 29.31,
+     "maxDD": 29.45,
      "study": "research/edge/replica-oos"
     },
     "backtest": {
      "src": "council replay 2022-12-27 to 2026-11-03 (research/replay-2w.json)",
      "window": "2023-12-14 to 2026-04-23",
      "n": 212,
-     "exp": 0.877,
-     "sd": 3.343,
+     "exp": 0.865,
+     "sd": 3.338,
      "perYear": 89.54,
      "maxDD": 40.2,
-     "mcDD": 23.96
+     "mcDD": 24.26
     },
     "perTrade": {
-     "exp": -0.052,
-     "lo": -0.551,
-     "hi": 0.447
+     "exp": -0.057,
+     "lo": -0.556,
+     "hi": 0.442
     },
     "perYear": {
      "trades": 19.17,
-     "exp": -1,
-     "lo": -24.45,
-     "hi": 22.45
+     "exp": -1.09,
+     "lo": -24.54,
+     "hi": 22.35
     },
     "dd": {
-     "lo": 23.96,
+     "lo": 24.26,
      "hi": 40.2,
-     "mc95": 23.96,
+     "mc95": 24.26,
      "worst": 40.2
     },
     "verdict": {
@@ -791,71 +820,80 @@
       "within": false
      },
      "backtest": {
-      "n": 59,
-      "years": 0.66,
+      "n": 60,
+      "years": 0.67,
       "within": true
      },
-     "text": "59 trades (about 8 months) if it repeats its backtest (+0.88R a trade); an edge of −0.05R a trade out of sample cannot be proven"
+     "text": "60 trades (about 8 months) if it repeats its backtest (+0.86R a trade); an edge of −0.06R a trade out of sample cannot be proven"
     },
-    "regime": "fails out of sample: −0.05R a trade on 2017-22 (115 trades, all in 9 months of open gate; no trade in 2017, 2021); +0.58R on 2023-26 with the same harness (#512)",
+    "regime": "fails out of sample: −0.06R a trade after financing on 2017-22 (115 trades, all in 9 months of open gate; no trade in 2017, 2021); +0.57R on 2023-26 with the same harness (#512)",
     "forward": {
      "n": 2,
      "exp": 0.48,
      "R": 0.95,
      "lo": -3.84,
-     "hi": 3.74,
+     "hi": 3.73,
      "judged": false,
      "out": null
     },
-    "line": "Expect −0.05R a trade (−0.55 to +0.45R) over about 19 trades a year, so −24 to +22R in a year; plan for a drawdown of −24 to −40R. Forward so far +0.48R a trade over 2: too few to place. Verdict: 59 trades (about 8 months) if it repeats its backtest (+0.88R a trade); an edge of −0.05R a trade out of sample cannot be proven."
+    "line": "Expect −0.06R a trade after financing (−0.56 to +0.44R) over about 19 trades a year, so −25 to +22R in a year; plan for a drawdown of −24 to −40R. Forward so far +0.48R a trade over 2: too few to place. Verdict: 60 trades (about 8 months) if it repeats its backtest (+0.86R a trade); an edge of −0.06R a trade out of sample cannot be proven."
    },
    {
     "id": "mosha-bo",
     "name": "Mosha BO",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
+    "fin": {
+     "perTrade": 0.016,
+     "nights": 0.97,
+     "before": {
+      "exp": 0.137,
+      "t": 0.55
+     }
+    },
     "honest": {
      "src": "research/edge/mosha-oos",
      "window": "2006-17 out of sample",
      "n": 62,
-     "exp": 0.137,
+     "exp": 0.121,
      "sd": 1.977,
-     "t": 0.55,
+     "t": 0.48,
      "perYear": 5.39,
-     "maxDD": 16.23,
+     "maxDD": 16.53,
      "study": "research/edge/mosha-oos"
     },
     "backtest": {
      "src": "Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)",
      "window": "2018-07-17 to 2026-06-10",
      "n": 157,
-     "exp": -0.064,
-     "sd": 1.969,
+     "exp": -0.093,
+     "sd": 1.951,
      "perYear": 19.75,
-     "maxDD": 45.99,
-     "mcDD": 43.35
+     "maxDD": 49.45,
+     "mcDD": 45.84
     },
     "perTrade": {
-     "exp": 0.137,
-     "lo": -0.276,
-     "hi": 0.55
+     "exp": 0.121,
+     "lo": -0.292,
+     "hi": 0.534
     },
     "perYear": {
      "trades": 5.39,
-     "exp": 0.74,
-     "lo": -6.81,
-     "hi": 8.29
+     "exp": 0.65,
+     "lo": -6.9,
+     "hi": 8.2
     },
     "dd": {
-     "lo": 43.35,
-     "hi": 45.99,
-     "mc95": 43.35,
-     "worst": 45.99
+     "lo": 45.84,
+     "hi": 49.45,
+     "mc95": 45.84,
+     "worst": 49.45
     },
     "verdict": {
      "honest": {
-      "n": 833,
-      "years": 154.55,
+      "n": 1068,
+      "years": 198.14,
       "within": false
      },
      "backtest": {
@@ -863,310 +901,353 @@
       "years": null,
       "within": false
      },
-     "text": "no verdict within 2 years: an edge of +0.14R a trade out of sample cannot be proven"
+     "text": "no verdict within 2 years: an edge of +0.12R a trade out of sample cannot be proven"
     },
-    "regime": "a null result in substance: +0.14R a trade on 2006-17 (62 positions, t 0.55; the bull half lost, −16.5R without its best 5) against +0.25R on 2018-26; the independent 2018-26 rebuild made +0.01R with a −39R drawdown (#560, #486)",
+    "regime": "a null result in substance: +0.12R a trade after financing on 2006-17 (62 positions, t 0.48; the bull half lost, −16.5R without its best 5) against +0.22R on 2018-26; the independent 2018-26 rebuild made +0.01R with a −39R drawdown (#560, #486)",
     "forward": null,
-    "line": "Expect +0.14R a trade (−0.28 to +0.55R) over about 5 trades a year, so −6.8 to +8.3R in a year; plan for a drawdown of −43 to −46R. No forward trade yet. Verdict: no verdict within 2 years: an edge of +0.14R a trade out of sample cannot be proven."
+    "line": "Expect +0.12R a trade after financing (−0.29 to +0.53R) over about 5 trades a year, so −6.9 to +8.2R in a year; plan for a drawdown of −46 to −49R. No forward trade yet. Verdict: no verdict within 2 years: an edge of +0.12R a trade out of sample cannot be proven."
    },
    {
     "id": "gtrend",
     "name": "Gold trend",
     "desk": "Meridian",
     "live": true,
+    "fin": {
+     "perTrade": 0.09,
+     "nights": 14.32,
+     "before": {
+      "exp": 0.489,
+      "t": 1.77
+     }
+    },
     "honest": {
      "src": "research/edge/gold-systems-oos",
      "window": "2006-17 out of sample",
      "n": 75,
-     "exp": 0.489,
-     "sd": 2.385,
-     "t": 1.77,
+     "exp": 0.398,
+     "sd": 2.318,
+     "t": 1.49,
      "perYear": 6.52,
-     "maxDD": 5.38,
+     "maxDD": 5.57,
      "study": "research/edge/gold-systems-oos"
     },
     "backtest": {
      "src": "gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)",
      "window": "2018-03-22 to 2026-08-04",
      "n": 40,
-     "exp": 1.64,
-     "sd": 4.003,
+     "exp": 1.504,
+     "sd": 3.903,
      "perYear": 4.66,
-     "maxDD": 3.7,
-     "mcDD": 6.88
+     "maxDD": 3.78,
+     "mcDD": 7.47
     },
     "perTrade": {
-     "exp": 0.489,
-     "lo": 0.036,
-     "hi": 0.942
+     "exp": 0.398,
+     "lo": -0.042,
+     "hi": 0.838
     },
     "perYear": {
      "trades": 6.52,
-     "exp": 3.19,
-     "lo": -6.83,
-     "hi": 13.21
+     "exp": 2.59,
+     "lo": -7.14,
+     "hi": 12.33
     },
     "dd": {
-     "lo": 5.38,
-     "hi": 6.88,
-     "mc95": 6.88,
-     "worst": 5.38
+     "lo": 5.57,
+     "hi": 7.47,
+     "mc95": 7.47,
+     "worst": 5.57
     },
     "verdict": {
      "honest": {
-      "n": 96,
-      "years": 14.72,
+      "n": 136,
+      "years": 20.86,
       "within": false
      },
      "backtest": {
-      "n": 24,
-      "years": 5.15,
+      "n": 27,
+      "years": 5.79,
       "within": false
      },
-     "text": "no verdict within 2 years: the out-of-sample edge (+0.49R) would need 96 trades, about 14.7 years; even its backtest edge (+1.64R) would need 24 trades, about 5.2 years"
+     "text": "no verdict within 2 years: the out-of-sample edge (+0.40R) would need 136 trades, about 20.9 years; even its backtest edge (+1.50R) would need 27 trades, about 5.8 years"
     },
-    "regime": "regime-bound: +0.49R a trade on 2006-17 (8 of 12 years positive) against +1.34R on 2018-26; random long entries with the same exit made +0.28R, so most of it is being long gold with a trailing exit (#530)",
+    "regime": "regime-bound: +0.40R a trade after financing on 2006-17 (+0.49R before it; 8 of 12 years positive) against +1.23R on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)",
     "forward": null,
-    "line": "Expect +0.49R a trade (+0.04 to +0.94R) over about 7 trades a year, so −6.8 to +13R in a year; plan for a drawdown of −5.4 to −6.9R. No forward trade yet. Verdict: no verdict within 2 years: the out-of-sample edge (+0.49R) would need 96 trades, about 14.7 years; even its backtest edge (+1.64R) would need 24 trades, about 5.2 years."
+    "line": "Expect +0.40R a trade after financing (−0.04 to +0.84R) over about 7 trades a year, so −7.1 to +12R in a year; plan for a drawdown of −5.6 to −7.5R. No forward trade yet. Verdict: no verdict within 2 years: the out-of-sample edge (+0.40R) would need 136 trades, about 20.9 years; even its backtest edge (+1.50R) would need 27 trades, about 5.8 years."
    },
    {
     "id": "gtrend5",
     "name": "Gold trend fast",
     "desk": "Meridian",
     "live": false,
+    "shadowSince": "2026-11-07",
+    "fin": {
+     "perTrade": 0.083,
+     "nights": 14.64,
+     "before": {
+      "exp": 0.372,
+      "t": 1.92
+     }
+    },
     "honest": {
      "src": "research/edge/gold-systems-oos",
      "window": "2006-17 out of sample",
      "n": 129,
-     "exp": 0.372,
-     "sd": 2.202,
-     "t": 1.92,
+     "exp": 0.289,
+     "sd": 2.142,
+     "t": 1.53,
      "perYear": 11.21,
-     "maxDD": 10.75,
+     "maxDD": 13.33,
      "study": "research/edge/gold-systems-oos"
     },
     "backtest": {
      "src": "gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)",
      "window": "2018-02-13 to 2026-07-01",
      "n": 74,
-     "exp": 1.064,
-     "sd": 3.365,
+     "exp": 0.94,
+     "sd": 3.272,
      "perYear": 8.71,
      "maxDD": 6.6,
-     "mcDD": 9.23
+     "mcDD": 10.63
     },
     "perTrade": {
-     "exp": 0.372,
-     "lo": 0.053,
-     "hi": 0.691
+     "exp": 0.289,
+     "lo": -0.021,
+     "hi": 0.599
     },
     "perYear": {
      "trades": 11.21,
-     "exp": 4.17,
-     "lo": -7.96,
-     "hi": 16.3
+     "exp": 3.24,
+     "lo": -8.56,
+     "hi": 15.04
     },
     "dd": {
-     "lo": 9.23,
-     "hi": 10.75,
-     "mc95": 9.23,
-     "worst": 10.75
+     "lo": 10.63,
+     "hi": 13.33,
+     "mc95": 10.63,
+     "worst": 13.33
     },
     "verdict": {
      "honest": {
-      "n": 141,
-      "years": 12.58,
+      "n": 220,
+      "years": 19.63,
       "within": false
      },
      "backtest": {
-      "n": 41,
-      "years": 4.71,
+      "n": 49,
+      "years": 5.63,
       "within": false
      },
-     "text": "no verdict within 2 years: the out-of-sample edge (+0.37R) would need 141 trades, about 12.6 years; even its backtest edge (+1.06R) would need 41 trades, about 4.7 years"
+     "text": "no verdict within 2 years: the out-of-sample edge (+0.29R) would need 220 trades, about 19.6 years; even its backtest edge (+0.94R) would need 49 trades, about 5.6 years"
     },
-    "regime": "regime-bound: +0.37R a trade on 2006-17 against +0.99R on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)",
+    "regime": "regime-bound: +0.29R a trade after financing on 2006-17 (+0.37R before it) against +0.88R on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)",
     "forward": null,
-    "line": "Expect +0.37R a trade (+0.05 to +0.69R) over about 11 trades a year, so −8.0 to +16R in a year; plan for a drawdown of −9.2 to −11R. No forward trade yet. Verdict: no verdict within 2 years: the out-of-sample edge (+0.37R) would need 141 trades, about 12.6 years; even its backtest edge (+1.06R) would need 41 trades, about 4.7 years."
+    "line": "Expect +0.29R a trade after financing (−0.02 to +0.60R) over about 11 trades a year, so −8.6 to +15R in a year; plan for a drawdown of −11 to −13R. No forward trade yet. Verdict: no verdict within 2 years: the out-of-sample edge (+0.29R) would need 220 trades, about 19.6 years; even its backtest edge (+0.94R) would need 49 trades, about 5.6 years."
    },
    {
     "id": "gtl",
     "name": "Gold H4 trendline",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
+    "fin": {
+     "perTrade": 0.035,
+     "nights": 3.02,
+     "before": {
+      "exp": 0.048,
+      "t": 0.83
+     }
+    },
     "honest": {
      "src": "research/edge/gold-systems-oos",
      "window": "2006-17 out of sample",
      "n": 402,
-     "exp": 0.048,
-     "sd": 1.163,
-     "t": 0.83,
+     "exp": 0.013,
+     "sd": 1.154,
+     "t": 0.23,
      "perYear": 34.94,
-     "maxDD": 26.28,
+     "maxDD": 35.51,
      "study": "research/edge/gold-systems-oos"
     },
     "backtest": {
      "src": "gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)",
      "window": "2018-01-19 to 2026-10-27",
      "n": 304,
-     "exp": 0.106,
-     "sd": 1.169,
+     "exp": 0.068,
+     "sd": 1.157,
      "perYear": 34.55,
-     "maxDD": 20.24,
-     "mcDD": 20.96
+     "maxDD": 23.08,
+     "mcDD": 23.86
     },
     "perTrade": {
-     "exp": 0.048,
-     "lo": -0.047,
-     "hi": 0.143
+     "exp": 0.013,
+     "lo": -0.082,
+     "hi": 0.108
     },
     "perYear": {
      "trades": 34.94,
-     "exp": 1.68,
-     "lo": -9.63,
-     "hi": 12.99
+     "exp": 0.45,
+     "lo": -10.77,
+     "hi": 11.68
     },
     "dd": {
-     "lo": 20.96,
-     "hi": 26.28,
-     "mc95": 20.96,
-     "worst": 26.28
+     "lo": 23.86,
+     "hi": 35.51,
+     "mc95": 23.86,
+     "worst": 35.51
     },
     "verdict": {
      "honest": {
-      "n": 2349,
-      "years": 67.23,
+      "n": 31520,
+      "years": 902.12,
       "within": false
      },
      "backtest": {
-      "n": 487,
-      "years": 14.1,
+      "n": 1159,
+      "years": 33.55,
       "within": false
      },
-     "text": "no verdict within 2 years: an edge of +0.05R a trade out of sample cannot be proven; even its backtest edge (+0.11R) would need 487 trades, about 14.1 years"
+     "text": "no verdict within 2 years: an edge of +0.01R a trade out of sample cannot be proven; even its backtest edge (+0.07R) would need 1,159 trades, about 33.5 years"
     },
-    "regime": "regime-bound, at the edge of failing: +0.05R a trade on 2006-17 (a coin flip at double cost, −26R drawdown, loses without 2016) against +0.17R on 2018-26 (#530)",
+    "regime": "regime-bound, and does not survive financing: +0.01R a trade after it on 2006-17 (+0.05R before it; a coin flip at double cost, −36R drawdown, loses without 2016) against +0.13R on 2018-26; shadow since 11 Nov (#530, trend-breadth)",
     "forward": {
      "n": 1,
      "exp": -1.02,
      "R": -1.02,
-     "lo": -1.87,
-     "hi": 1.96,
+     "lo": -1.89,
+     "hi": 1.91,
      "judged": false,
      "out": null
     },
-    "line": "Expect +0.05R a trade (−0.05 to +0.14R) over about 35 trades a year, so −9.6 to +13R in a year; plan for a drawdown of −21 to −26R. Forward so far −1.02R a trade over 1: too few to place. Verdict: no verdict within 2 years: an edge of +0.05R a trade out of sample cannot be proven; even its backtest edge (+0.11R) would need 487 trades, about 14.1 years."
+    "line": "Expect +0.01R a trade after financing (−0.08 to +0.11R) over about 35 trades a year, so −11 to +12R in a year; plan for a drawdown of −24 to −36R. Forward so far −1.02R a trade over 1: too few to place. Verdict: no verdict within 2 years: an edge of +0.01R a trade out of sample cannot be proven; even its backtest edge (+0.07R) would need 1,159 trades, about 33.5 years."
    },
    {
     "id": "geg",
     "name": "Gold daily engulf",
     "desk": "Meridian",
     "live": true,
+    "fin": {
+     "perTrade": 0.045,
+     "nights": 3.66,
+     "before": {
+      "exp": 0.186,
+      "t": 1.89
+     }
+    },
     "honest": {
      "src": "research/edge/gold-systems-oos",
      "window": "2006-17 out of sample",
      "n": 256,
-     "exp": 0.186,
-     "sd": 1.572,
-     "t": 1.89,
+     "exp": 0.141,
+     "sd": 1.551,
+     "t": 1.46,
      "perYear": 22.25,
-     "maxDD": 15.17,
+     "maxDD": 16.47,
      "study": "research/edge/gold-systems-oos"
     },
     "backtest": {
      "src": "gold daily engulf 2018-26 rebuild (robustness/out/geg.json)",
      "window": "2018-02-21 to 2026-09-04",
      "n": 217,
-     "exp": 0.198,
-     "sd": 1.698,
+     "exp": 0.139,
+     "sd": 1.671,
      "perYear": 25.32,
-     "maxDD": 14.68,
-     "mcDD": 22.28
+     "maxDD": 18.2,
+     "mcDD": 25.49
     },
     "perTrade": {
-     "exp": 0.186,
-     "lo": 0.024,
-     "hi": 0.348
+     "exp": 0.141,
+     "lo": -0.018,
+     "hi": 0.3
     },
     "perYear": {
      "trades": 22.25,
-     "exp": 4.14,
-     "lo": -8.06,
-     "hi": 16.34
+     "exp": 3.14,
+     "lo": -8.9,
+     "hi": 15.17
     },
     "dd": {
-     "lo": 15.17,
-     "hi": 22.28,
-     "mc95": 22.28,
-     "worst": 15.17
+     "lo": 18.2,
+     "hi": 25.49,
+     "mc95": 25.49,
+     "worst": 18.2
     },
     "verdict": {
      "honest": {
-      "n": 286,
-      "years": 12.85,
+      "n": 484,
+      "years": 21.75,
       "within": false
      },
      "backtest": {
-      "n": 295,
-      "years": 11.65,
+      "n": 579,
+      "years": 22.87,
       "within": false
      },
-     "text": "no verdict within 2 years: the out-of-sample edge (+0.19R) would need 286 trades, about 12.8 years; even its backtest edge (+0.20R) would need 295 trades, about 11.7 years"
+     "text": "no verdict within 2 years: the out-of-sample edge (+0.14R) would need 484 trades, about 21.8 years; even its backtest edge (+0.14R) would need 579 trades, about 22.9 years"
     },
-    "regime": "regime-bound: +0.19R a trade on 2006-17 (near zero when gold is not rising: 2012-17 +0.06R) against +0.28R on 2018-26 (#530)",
+    "regime": "regime-bound: +0.14R a trade after financing on 2006-17 (+0.19R before it; near zero when gold is not rising: 2012-17 +0.06R before financing) against +0.23R on 2018-26 (#530)",
     "forward": {
      "n": 1,
      "exp": -1.06,
      "R": -1.06,
-     "lo": -2.4,
-     "hi": 2.77,
+     "lo": -2.41,
+     "hi": 2.69,
      "judged": false,
      "out": null
     },
-    "line": "Expect +0.19R a trade (+0.02 to +0.35R) over about 22 trades a year, so −8.1 to +16R in a year; plan for a drawdown of −15 to −22R. Forward so far −1.06R a trade over 1: too few to place. Verdict: no verdict within 2 years: the out-of-sample edge (+0.19R) would need 286 trades, about 12.8 years; even its backtest edge (+0.20R) would need 295 trades, about 11.7 years."
+    "line": "Expect +0.14R a trade after financing (−0.02 to +0.30R) over about 22 trades a year, so −8.9 to +15R in a year; plan for a drawdown of −18 to −25R. Forward so far −1.06R a trade over 1: too few to place. Verdict: no verdict within 2 years: the out-of-sample edge (+0.14R) would need 484 trades, about 21.8 years; even its backtest edge (+0.14R) would need 579 trades, about 22.9 years."
    },
    {
     "id": "gmp",
     "name": "Gold momentum pullback",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
+    "fin": {
+     "perTrade": 0.009,
+     "nights": 0.2,
+     "before": {
+      "exp": -0.043,
+      "t": -0.86
+     }
+    },
     "honest": {
      "src": "research/edge/robustness",
      "window": "2018-22 before the rule was judged",
      "n": 634,
-     "exp": -0.043,
-     "sd": 1.265,
-     "t": -0.86,
+     "exp": -0.052,
+     "sd": 1.261,
+     "t": -1.05,
      "perYear": 126.82,
-     "maxDD": 40.06,
+     "maxDD": 43.48,
      "study": "research/edge/robustness"
     },
     "backtest": {
      "src": "gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)",
      "window": "2018-02-05 to 2026-10-22",
      "n": 1004,
-     "exp": 0.043,
-     "sd": 1.286,
+     "exp": 0.032,
+     "sd": 1.281,
      "perYear": 115.17,
-     "maxDD": 40.06,
-     "mcDD": 49.67
+     "maxDD": 43.48,
+     "mcDD": 52.66
     },
     "perTrade": {
-     "exp": -0.043,
-     "lo": -0.126,
-     "hi": 0.04
+     "exp": -0.052,
+     "lo": -0.134,
+     "hi": 0.03
     },
     "perYear": {
      "trades": 126.82,
-     "exp": -5.45,
-     "lo": -28.89,
-     "hi": 17.98
+     "exp": -6.59,
+     "lo": -29.95,
+     "hi": 16.77
     },
     "dd": {
-     "lo": 40.06,
-     "hi": 49.67,
-     "mc95": 49.67,
-     "worst": 40.06
+     "lo": 43.48,
+     "hi": 52.66,
+     "mc95": 52.66,
+     "worst": 43.48
     },
     "verdict": {
      "honest": {
@@ -1175,21 +1256,23 @@
       "within": false
      },
      "backtest": {
-      "n": 3578,
-      "years": 31.07,
+      "n": 6411,
+      "years": 55.67,
       "within": false
      },
-     "text": "no verdict within 2 years: an edge of −0.04R a trade out of sample cannot be proven; even its backtest edge (+0.04R) would need 3,578 trades, about 31.1 years"
+     "text": "no verdict within 2 years: an edge of −0.05R a trade out of sample cannot be proven"
     },
-    "regime": "regime-bound: −0.04R a trade on 2018-22 (634 trades) against +0.19R on 2023-26; fragile in the robustness audit (#486)",
+    "regime": "regime-bound: −0.05R a trade after financing on 2018-22 (634 trades) against +0.18R on 2023-26; fragile in the robustness audit (#486)",
     "forward": null,
-    "line": "Expect −0.04R a trade (−0.13 to +0.04R) over about 127 trades a year, so −29 to +18R in a year; plan for a drawdown of −40 to −50R. No forward trade yet. Verdict: no verdict within 2 years: an edge of −0.04R a trade out of sample cannot be proven; even its backtest edge (+0.04R) would need 3,578 trades, about 31.1 years."
+    "line": "Expect −0.05R a trade after financing (−0.13 to +0.03R) over about 127 trades a year, so −30 to +17R in a year; plan for a drawdown of −43 to −53R. No forward trade yet. Verdict: no verdict within 2 years: an edge of −0.05R a trade out of sample cannot be proven."
    },
    {
     "id": "nq-open",
     "name": "NQ New York open run",
     "desk": "Meridian",
-    "live": true,
+    "live": false,
+    "shadowSince": "2026-11-11",
+    "fin": null,
     "honest": {
      "src": "research/edge/nq-open-oos",
      "window": "2004-22 untouched",
@@ -1258,6 +1341,7 @@
     "name": "ICT A-setups",
     "desk": "ICT",
     "live": true,
+    "fin": null,
     "honest": {
      "src": "research/edge/ict-oos-2008",
      "window": "2008-17 out of sample",
@@ -1326,6 +1410,8 @@
     "name": "Crypto trend",
     "desk": "Meridian",
     "live": false,
+    "shadowSince": "2026-11-07",
+    "fin": null,
     "honest": {
      "src": "research/edge/crypto-trend-decay",
      "window": "June 2025 on (decayed window)",
@@ -1383,7 +1469,7 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-11T18"
+  "slot": "2026-11-12T00"
  },
  "ledger": [
   {
@@ -2222,10 +2308,10 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-11T18",
+ "ledgerSlot": "2026-11-12T00",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
- "date": "2026-11-11",
- "at": "2026-11-11T00:00:17.000Z",
+ "date": "2026-11-12",
+ "at": "2026-11-12T00:02:13.000Z",
  "stats": {
   "rscalp": {
    "n": 6,
@@ -2299,55 +2385,55 @@
   "exp": -0.46
  },
  "lessons": {
-  "n": 781,
-  "losses": 479,
-  "system": 239,
-  "market": 240,
+  "n": 879,
+  "losses": 543,
+  "system": 270,
+  "market": 273,
   "byCause": {
    "retrace-fail": {
-    "n": 46,
-    "R": -46,
+    "n": 51,
+    "R": -51,
     "verdict": "market",
     "title": "The retracement never came",
     "lesson": "Retracement trades work best right after a strong HTF VR; skip them when the HTF move is still impulsive.",
     "live": 4,
-    "shadow": 42
+    "shadow": 47
    },
    "hunt": {
-    "n": 34,
-    "R": -34.07,
+    "n": 40,
+    "R": -40.07,
     "verdict": "system",
     "title": "Right idea, stopped out first",
     "lesson": "Put the stop past the next swing or the liquidity just beyond the CF, or wait for the sweep before entering.",
     "live": 1,
-    "shadow": 33
+    "shadow": 39
    },
    "leftmoney": {
-    "n": 147,
-    "R": 375.6,
+    "n": 177,
+    "R": 436.52,
     "verdict": "system",
     "title": "Target left money on the table",
     "lesson": "Consider holding part of the position for the next target.",
     "live": 2,
-    "shadow": 145
+    "shadow": 175
    },
    "reversal": {
-    "n": 38,
-    "R": -38,
+    "n": 47,
+    "R": -47,
     "verdict": "market",
     "title": "The market turned for real",
     "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
     "live": 1,
-    "shadow": 37
+    "shadow": 46
    },
    "clean": {
-    "n": 127,
-    "R": 237.99,
+    "n": 131,
+    "R": 249.42,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 4,
-    "shadow": 123
+    "shadow": 127
    },
    "becost": {
     "n": 3,
@@ -2359,22 +2445,22 @@
     "shadow": 1
    },
    "normal": {
-    "n": 95,
-    "R": -95.03,
+    "n": 112,
+    "R": -112.04,
     "verdict": "market",
     "title": "Normal loss",
     "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
     "live": 3,
-    "shadow": 92
+    "shadow": 109
    },
    "late": {
-    "n": 8,
-    "R": -8,
+    "n": 9,
+    "R": -9,
     "verdict": "system",
     "title": "Late entry",
     "lesson": "Take signals within the first few candles after the CF.",
     "live": 1,
-    "shadow": 7
+    "shadow": 8
    },
    "besaved": {
     "n": 7,
@@ -2386,22 +2472,22 @@
     "shadow": 4
    },
    "against": {
-    "n": 103,
-    "R": -103,
+    "n": 107,
+    "R": -107,
     "verdict": "system",
     "title": "Against the D1 trend",
     "lesson": "Favour trades with the D1 trend, or demand more reward:risk against it.",
     "live": 7,
-    "shadow": 96
+    "shadow": 100
    },
    "gaveback": {
-    "n": 104,
-    "R": -104.01,
+    "n": 124,
+    "R": -124.05,
     "verdict": "system",
     "title": "Gave back the profit",
     "lesson": "Move the stop to break-even or take a partial at +1R.",
     "live": 3,
-    "shadow": 101
+    "shadow": 121
    },
    "gap": {
     "n": 31,
@@ -2413,24 +2499,23 @@
     "shadow": 31
    },
    "news": {
-    "n": 38,
-    "R": -38,
+    "n": 40,
+    "R": -40,
     "verdict": "market",
     "title": "News spike",
     "lesson": "Avoid holding scalps and intraday trades through high-impact news: check the calendar before entering.",
     "live": 7,
-    "shadow": 31
+    "shadow": 33
    }
   },
   "top": [
-   "Target left money on the table (147×): Consider holding part of the position for the next target.",
-   "Gave back the profit (104×): Move the stop to break-even or take a partial at +1R.",
-   "Against the D1 trend (103×): Favour trades with the D1 trend, or demand more reward:risk against it."
+   "Target left money on the table (177×): Consider holding part of the position for the next target.",
+   "Gave back the profit (124×): Move the stop to break-even or take a partial at +1R.",
+   "Against the D1 trend (107×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-11T18",
+ "fslot": "2026-11-12T00",
  "notes": [
   "No change today: not enough evidence to move a rule."
- ],
- "proposalsBt": "2026-11-11T22:52:54.740Z"
+ ]
 }

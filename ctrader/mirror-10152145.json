@@ -9154,7 +9154,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9822.78 · 34 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9822.78 · 34 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9205,18 +9205,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "xau-scalp-1794441733": {
+    "orderId": "33964328",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "limitPrice": 3978.24,
+    "stop": 3984.0600000000004,
+    "t1": 3966.614999999999,
+    "placedAt": "2026-11-12T00:03:14.000Z",
+    "expires": "2026-11-12T03:02:13.000Z",
+    "riskCash": 5.82,
+    "margin": 7.96,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9822.78,
-  "lastRun": "2026-11-12T00:00:48.000Z"
+  "lastRun": "2026-11-12T00:03:14.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T04:26:56.000Z",
-   "msg": "opened sell SOLUSD 0.01 lot (council scalp)",
-   "trade": "sol-scalp-1794370912"
-  },
   {
    "at": "2026-11-11T04:39:10.000Z",
    "msg": "AUDUSD position 48284994 closed at the broker",
@@ -10711,6 +10727,11 @@
    "at": "2026-11-11T23:57:05.000Z",
    "msg": "XAUUSD position 48572505 closed at the broker",
    "trade": "xau-rscalp-1794441257"
+  },
+  {
+   "at": "2026-11-12T00:03:14.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3978.24 (council scalp, valid to 2026-11-12T03:02Z)",
+   "trade": "xau-scalp-1794441733"
   }
  ],
  "limits": {
