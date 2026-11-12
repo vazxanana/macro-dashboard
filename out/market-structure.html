@@ -3235,7 +3235,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-head p#ms-c-status { gap: 6px 10px; margin-top: 8px; font-size: 13px; }
 #v-council #ms-c-status .c-ok, #v-council #ms-c-status .c-warn, #v-council #ms-c-status .c-bad { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 999px; font: 600 12.5px var(--sans); }
 #v-council #ms-c-status .c-ok { color: color-mix(in srgb, var(--buy) 85%, var(--ink)); background: color-mix(in srgb, var(--buy) 11%, transparent); }
-#v-council #ms-c-status .c-warn { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council #ms-c-status .c-warn { color: var(--warn-ink); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }   /* the badge ink (12 Nov 2026): --c-warn on its own tint over the page's gradient was 4.1-4.5:1 in light */
 #v-council #ms-c-status .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
 #v-council #ms-c-status .c-meta { flex-basis: 100%; display: block; margin: 0; color: var(--ink-dim); font-size: 12.5px; }
 #v-council #ms-c-status .c-meta::before { content: none; }
@@ -3860,6 +3860,9 @@ html[data-role="public"] #v-charts::before { content: "Guest view: candles, your
 :is(#v-guest, .g-merged) .cal > :nth-child(7n+6):not(.cal-h):not(.win):not(.loss), :is(#v-guest, .g-merged) .cal > :nth-child(7n+7):not(.cal-h):not(.win):not(.loss) { opacity: 1; background: transparent; }
 :is(#v-guest, .g-merged) .cal .cal-d.fut .cn { opacity: 1; }
 :is(#v-guest, .g-merged) .cal .cal-d.fut:not(.today) .cn { color: var(--ink-faint); }
+/* a guest's calendar on a phone (12 Nov 2026): the day figure was 9.5 px; 12 px like the Council's, with the cell's inner padding
+   trimmed so six characters fit (calR writes a figure of 10R or more with fewer decimals) */
+@media (max-width: 560px) { :is(#v-guest, .g-merged) .cal { gap: 2px; } :is(#v-guest, .g-merged) .cal-d { padding-inline: 2px; } :is(#v-guest, .g-merged) .cal-d .cn { padding-left: 2px; font-size: 12px; } :is(#v-guest, .g-merged) .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.5px; font-variant-numeric: tabular-nums; } }
 :is(#v-guest, .g-merged) .cal-d.loss .cr { color: color-mix(in srgb, var(--sell-ink) 82%, var(--ink)); } :is(#v-guest, .g-merged) .cal-d.win .cr { color: color-mix(in srgb, var(--buy-ink) 82%, var(--ink)); }
 :is(#v-guest, .g-merged) .g-s-fl { margin-left: auto; font: 650 14px var(--sans); font-variant-numeric: tabular-nums; } :is(#v-guest, .g-merged) .g-s-fl.pos { color: var(--buy); } :is(#v-guest, .g-merged) .g-s-fl.neg { color: var(--sell); }
 :is(#v-guest, .g-merged) .g-s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
@@ -4683,7 +4686,7 @@ html[data-role="public"] .cx-tog { display: none !important; }
 #v-council :is(#ms-sleeve td small, .c-pane-research .c-t thead th small, #ms-cp-macro .md-mv-pct small) { font-size: 12px; }
 #v-council .c-kpi span { font-size: 12px; letter-spacing: .3px; }
 #v-council .cal b.neg, #v-council .cal b.pos { font-size: 12px; }
-@media (max-width: 560px) { #v-council .cal-d { padding-inline: 2px; } #v-council .cal-d .cn { padding-left: 2px; } #v-council .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.3px; font-variant-numeric: tabular-nums; } }   /* six characters in a 44 px day cell */
+@media (max-width: 560px) { #v-council .cal { gap: 2px; } #v-council .cal-d { padding-inline: 2px; } #v-council .cal-d .cn { padding-left: 2px; } #v-council .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.5px; font-variant-numeric: tabular-nums; } }   /* six characters in a day cell at 390 px (12 Nov 2026: "−9.87R" needed 39 px in a 38 px box; calR keeps every figure to six) */
 /* one column (phones, tablets): the Active trades list holds its place while the data loads, so the calendar under it does not
    jump down the screen when the trades land (layout shift 0.62 on a phone) */
 @media (max-width: 1000px) { #v-council #ms-active:empty { min-height: 80vh; } }
@@ -9102,7 +9105,10 @@ function msNextSetup(bars, A) {
   const stampTxt = (iso, everyH, now = Date.now()) => { const d = new Date(iso); if (isNaN(d)) return '';
     const txt = d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }), ageH = (now - d) / 36e5;
     return everyH && ageH > 2 * everyH ? `Stale: ${txt}, ${ageH >= 48 ? Math.round(ageH / 24) + ' days' : Math.round(ageH) + ' h'} old (written every ${everyH} h)` : txt; };
-  window.MS_HC = { rTxt, fwdSplit, stampTxt, mnTxt: (s) => mnTxt(s) };
+  // a calendar day / week cell holds six characters at 12 px on a 390 px phone (12 Nov 2026): "−9.87R" fits, "−12.34R" was cut
+  // off. From 10R one decimal ("−12.3R"), from 100R none ("−137R"); the cell's aria-label and the day's detail keep two decimals.
+  const calR = (v) => { v = +v; if (!isFinite(v)) return '—'; const a = Math.abs(v); return rTxt(v, a >= 99.95 ? 0 : a >= 9.995 ? 1 : 2); };
+  window.MS_HC = { rTxt, fwdSplit, stampTxt, calR, mnTxt: (s) => mnTxt(s) };
   const sysClosed = () => { const ok = (x) => !x.shadow && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null;
     const live = (COUNCIL.trades || []).filter((x) => SYS_K.includes(x.k) && ok(x)), rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => nqSys(x) && ok(x));
     const nqF = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ok(x)); const seen = new Set();
@@ -9138,7 +9144,7 @@ function msNextSetup(bars, A) {
     for (let d = 1; d <= days; d++) {
       const k = `${GCAL.y}-${GCAL.m}-${d}`, has = byDay.has(k), R = byDay.get(k) || 0, isT = now.getFullYear() === GCAL.y && now.getMonth() === GCAL.m && now.getDate() === d; const isF = new Date(GCAL.y, GCAL.m, d) > now;
       if (has) { mR += R; if (R > 0) up++; else if (R < 0) dn++; }
-      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}${isF ? ' fut' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
+      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}${isF ? ' fut' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${calR(R)}</span>` : ''}</div>`;
     }
     el.innerHTML = html;
     document.getElementById('g-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${up + dn ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}">${fR(mR)}</small>` : ''}`;
@@ -9225,9 +9231,9 @@ function msNextSetup(bars, A) {
       if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
       const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d; const isF = new Date(CAL.y, CAL.m, d) > now;
       const col = (lead + d - 1) % 7; wkR += R; wkN += arr.length;
-      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${isF ? ' fut' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
+      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${isF ? ' fut' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${calR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
       if (col === 6 || d === days) { if (col < 6) html += '<div class="cal-d out"></div>'.repeat(6 - col); wkI++;
-        html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${fR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
+        html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${calR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
     }
     el.innerHTML = html;
     document.getElementById('ms-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${mN ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}" title="Month total over ${mN} trades">${fR(mR)}</small>` : ''}`;
@@ -10520,7 +10526,8 @@ function msNextSetup(bars, A) {
   const CPANE = { cur: 'overview' };
   try { const p0 = localStorage.getItem('msCpane'); if (CPANES.includes(p0)) CPANE.cur = p0; } catch (e) {}
   function setPane(p, push = true) {
-    if (!CPANES.includes(p) || (PUB && !CPUB.includes(p)) || VIEWER) p = 'overview';
+    // a viewer, and a member whose council permission is off, has the overview only (the other panes are hidden by CSS for them)
+    if (!CPANES.includes(p) || (PUB && !CPUB.includes(p)) || VIEWER || (!PUB && window.MS_PERMS && window.MS_PERMS.council === false)) p = 'overview';
     const changed = CPANE.cur !== p; CPANE.cur = p;
     try { localStorage.setItem('msCpane', p); } catch (e) {}
     CPANES.forEach((k) => { const el = document.getElementById('ms-cp-' + k), b = document.getElementById('ms-cn-' + k); if (el) el.hidden = k !== p; if (b) { b.setAttribute('aria-selected', String(k === p)); b.tabIndex = k === p ? 0 : -1; } });
@@ -10561,7 +10568,9 @@ function msNextSetup(bars, A) {
     if (v === 'mosha' && window.renderMosha) setTimeout(window.renderMosha, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
-    if (v === 'council') setPane(sub || CPANE.cur, false);
+    // a pane this account may not open (#council/trades for a viewer) shows the overview: the address says so too (12 Nov 2026;
+    // it kept the refused pane's name), as for a refused view above
+    if (v === 'council') { setPane(sub || CPANE.cur, false); if (sub && sub !== CPANE.cur && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + (CPANE.cur === 'overview' ? '#council' : '#council/' + CPANE.cur)); } catch (e) {} }
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     document.documentElement.dataset.view = v;
     if (PUB) { const btn = document.getElementById('ms-mk-btn'); if (btn && typeof INST !== 'undefined' && INST) { btn.textContent = v === 'charts' ? INST.label : 'XAU/USD'; btn.title = v === 'charts' ? `Market: ${INST.label} · ${INST.name} (click to change)` : 'Gold'; } }

@@ -763,3 +763,45 @@ test('simple phone view 2: the smoke test checks what each view leads with on th
   for (const t of ['the chart ends', 'Trades does not lead with the forward record', '"Which systems trade live" is not first', 'Research: open cards', 'This week does not lead with its sentence', 'Review does not lead with what is not reviewed', 'Scanner shows']) assert.ok(smoke.includes(t), t);
   assert.match(smoke, /const INNER = \{ '\/market-structure\.html': \['#charts', '#setup', '#council\/overview'/);
 });
+
+// ---- Open items of the 11 Nov sweep, done 12 Nov 2026 (branch desk-open-qa) ----
+test('a viewer\'s #council/<pane> shows the overview and the address says #council (it kept the refused pane\'s name)', () => {
+  const html = src('market-structure.html'), i = html.indexOf('  function setPane(p, push = true) {'), set = html.slice(i, i + 900);
+  // the panes an account may open: a viewer, and a member whose council permission is off, have the overview only
+  assert.match(set, /if \(!CPANES\.includes\(p\) \|\| \(PUB && !CPUB\.includes\(p\)\) \|\| VIEWER \|\| \(!PUB && window\.MS_PERMS && window\.MS_PERMS\.council === false\)\) p = 'overview';/);
+  const j = html.indexOf('  function showView(hx) {'), show = html.slice(j, html.indexOf('VIEWS.forEach((k) =>', j));
+  assert.match(show, /if \(v === 'council'\) \{ setPane\(sub \|\| CPANE\.cur, false\); if \(sub && sub !== CPANE\.cur && location\.hash === HX\) try \{ history\.replaceState\(null, '', location\.pathname \+ location\.search \+ \(CPANE\.cur === 'overview' \? '#council' : '#council\/' \+ CPANE\.cur\)\); \} catch \(e\) \{\} \}/,
+    'replaceState like a refused view: no second hashchange, and Back does not return to the refused link');
+  // only a pane that was not shown is rewritten, so a deep link the page honours (#council/week/<date>) stays as it is
+  assert.doesNotMatch(show, /history\.pushState/);
+});
+
+test('calendar cells: a figure of 10R or more keeps to six characters, so it fits a 390 px day cell at 12 px (Council and guest)', () => {
+  assert.equal(hc.calR(-9.87), '−9.87R'); assert.equal(hc.calR(2), '+2.00R'); assert.equal(hc.calR(0), '0.00R');
+  assert.equal(hc.calR(-12.34), '−12.3R'); assert.equal(hc.calR(-10), '−10.0R'); assert.equal(hc.calR(24.5), '+24.5R'); assert.equal(hc.calR(-9.996), '−10.0R', 'rounds up into the next width');
+  assert.equal(hc.calR(-99.6), '−99.6R'); assert.equal(hc.calR(-99.96), '−100R'); assert.equal(hc.calR(-137.2), '−137R'); assert.equal(hc.calR(NaN), '—');
+  for (const v of [-0.004, 1.5, -9.994, -9.996, 12.34, -55.55, 99.94, -99.95, 137.2, -999.4]) assert.ok(hc.calR(v).length <= 6, `${v} → ${hc.calR(v)}`);
+  // the day and week cells use it; the cell's aria-label keeps two decimals (fR), so nothing is lost for a screen reader
+  assert.equal((deskHtml.match(/<span class="cr">\$\{calR\((R|wkR)\)\}<\/span>/g) || []).length, 3, 'two day cells (Council, guest) and the week cell');
+  assert.doesNotMatch(deskHtml, /<span class="cr">\$\{fR\(/);
+  assert.match(deskHtml, /aria-label="\$\{d\}: \$\{has \? fR\(R\) : 'no trades'\}"/); assert.match(deskHtml, /aria-label="\$\{d\}: \$\{arr\.length \? `\$\{fR\(R\)\}, \$\{arr\.length\} trades`/);
+  // 12 px on a phone in both calendars (the guest's was 9.5 px), with the room six characters need
+  const css = styles(deskHtml);
+  assert.match(css, /@media \(max-width: 560px\) \{ #v-council \.cal \{ gap: 2px; \} #v-council \.cal-d \{ padding-inline: 2px; \} [^\n]*#v-council \.cal-d \.cr \{ font: 600 12px var\(--sans\); letter-spacing: -\.5px;/);
+  assert.match(css, /@media \(max-width: 560px\) \{ :is\(#v-guest, \.g-merged\) \.cal \{ gap: 2px; \} :is\(#v-guest, \.g-merged\) \.cal-d \{ padding-inline: 2px; \} :is\(#v-guest, \.g-merged\) \.cal-d \.cn \{ padding-left: 2px; font-size: 12px; \} :is\(#v-guest, \.g-merged\) \.cal-d \.cr \{ font: 600 12px var\(--sans\); letter-spacing: -\.5px;/);
+});
+
+test('Council status line: the amber warning takes the badge ink and passes AA on its tint over the page\'s gradient (light, dark, midnight)', () => {
+  const css = styles(deskHtml), block = (sel) => [...css.matchAll(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{([^}]*)\\}', 'g'))].map((m) => m[1]).join(' ');
+  assert.match(css, /#v-council #ms-c-status \.c-warn \{ color: var\(--warn-ink\); background: color-mix\(in srgb, var\(--c-warn\) 14%, transparent\); \}/);
+  assert.doesNotMatch(css, /#ms-c-status \.c-warn \{[^}]*(color: #|opacity)/, 'never a hex or opacity on the status warning');
+  const light = block(':root[data-theme="light"]'), base = block(':root'), mid = block(':root[data-theme="midnight"]');
+  const rgbOf = (h) => h.replace('#', '').match(/../g).map((x) => parseInt(x, 16));
+  // the darkest point behind the pill: the page under the gradient's gold glow, then the pill's 14 % tint of --c-warn
+  const behind = (bg, warn, glow) => over(`rgba(${rgbOf(warn).join(',')},.14)`, over(`rgba(227,179,65,${glow})`, bg));
+  const lw = /--c-warn: (#[0-9a-f]{6}); \}/.exec(css.slice(css.indexOf(':root[data-theme="light"] #v-council {')))[1];
+  const lBg = behind(tok(light, 'bg'), lw, 0.05);
+  assert.ok(ratio(tok(light, 'warn-ink'), lBg) >= 4.5, `light: ${ratio(tok(light, 'warn-ink'), lBg).toFixed(2)}`);
+  assert.ok(ratio(lw, lBg) < 4.5, 'the old colour (--c-warn as text) is what failed');
+  for (const [name, bg, glow] of [['dark', '#08090c', 0.05], ['midnight', tok(mid, 'bg'), 0.1]]) { const on = behind(bg, '#f2b33d', glow); assert.ok(ratio(tok(base, 'warn-ink'), on) >= 4.5, `${name}: ${ratio(tok(base, 'warn-ink'), on).toFixed(2)}`); }
+});
