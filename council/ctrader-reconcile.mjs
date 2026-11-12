@@ -14,16 +14,22 @@
 // (also when the stop guard had to set the stop itself) and that is what is expected. An ICT copy carries the desk's stop distance (futures levels, a cash CFD at the broker).
 import fs from 'node:fs';
 import path from 'node:path';
-import { bookOf, ictCandidates, replicaCandidates, replicaHasOwnAccount, SYMBOLS } from './ctrader-mirror.mjs';
+import { bookOf, ictCandidates, replicaCandidates, replicaHasOwnAccount, replicaMarkets, SYMBOLS } from './ctrader-mirror.mjs';
 
 const rd = (dir, f, d) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return d; } };
+// "owner rule: replica gold only since 2026-11-11" (the markets and the date from config.json mirrorReplica)
+export function replicaRuleWhy(cfg) {
+  const R = (cfg && cfg.mirrorReplica) || {}, mk = Array.isArray(R.markets) ? R.markets : [], since = Number.isFinite(+R.since) ? new Date(+R.since * 1000).toISOString().slice(0, 10) : null;
+  const names = mk.map((m) => (m === 'xau' ? 'gold' : m)).join(', ') || 'none';
+  return `owner rule: replica ${names} only${since ? ` since ${since}` : ''}`;
+}
 const near = (a, b, tol) => a != null && b != null && Math.abs(a - b) <= tol;
 
 export function reconcile(dir) {
   const raw = rd(dir, 'trades.json', []), own = Array.isArray(raw) ? raw : raw.trades || [], ict = rd(dir, 'ict/trades.json', []), research = rd(dir, 'research.json', []), cfg = rd(dir, 'config.json', {}) || {};
   const map = rd(dir, 'ctrader/mirror-accounts.json', { groups: [] }), accounts = rd(dir, 'ctrader/accounts.json', { accounts: [] }), shadows = cfg.mirrorShadow !== false;
   const byBook = {}; for (const g of map.groups) for (const b of g.books) byBook[b] = g;
-  const trades = own.concat(ictCandidates(ict), replicaHasOwnAccount(Object.fromEntries(Object.entries(byBook).map(([b, g]) => [b, g.account]))) ? replicaCandidates(research, own) : []);
+  const trades = own.concat(ictCandidates(ict), replicaHasOwnAccount(Object.fromEntries(Object.entries(byBook).map(([b, g]) => [b, g.account]))) ? replicaCandidates(research, own, replicaMarkets(cfg)) : []);
   const state = new Map(); for (const g of map.groups) state.set(g.account, (rd(dir, 'ctrader/' + g.file, {}).state) || {});
   const acct = (g) => (accounts.accounts || []).find((a) => (a.books || []).some((b) => g.books.includes(b))) || { open: [], orders: [] };
   const rows = [], usedPos = new Set(), usedOrd = new Set();
@@ -40,6 +46,9 @@ export function reconcile(dir) {
     if (!h) {
       const sk = (stHome.skipped || {})[t.id], w = (stHome.wait || {})[t.id];
       row.state = 'not copied'; row.why = sk ? `skipped: ${typeof sk === 'string' ? sk : sk.why || JSON.stringify(sk)}` : w ? `waiting: ${w.why || JSON.stringify(w)}` : null;
+      // the owner rule replica-mirror-gold-only (11 Nov 2026, config.mirrorReplica): the mirror opens nothing new for a replica
+      // research trade outside its market list (replicaCandidates marks it noCopy); that is the mirror's reason, not a gap
+      if (!row.why && t.noCopy) row.why = replicaRuleWhy(cfg);
       if (!row.why) row.issues.push('open at the council, no copy and no recorded reason'); continue;
     }
     row.account = h.g.books.join('+'); const A = acct(h.g);

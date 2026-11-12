@@ -15,6 +15,7 @@ import { buildDecay } from './decay.mjs';
 import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
 import { buildBook } from './book.mjs';
 import { buildExpect } from './expect.mjs';
+import { buildForward, loadProtocol } from './forward.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1641,7 +1642,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals, the ICT watch list (coachCarry) and the ledger between the daily runs
-  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, book: prev.book, expect: prev.expect, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, book: prev.book, expect: prev.expect, forward: prev.forward, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -2223,6 +2224,16 @@ try { const cj = rd('coach.json', {});
     if (Object.keys(e).length < tried) { cj.decaySent = dg.mark; wr('coach.json', cj); }
     for (const [c, m] of Object.entries(e)) snapshot.errors[`decay_${c}`] = m; }
 } catch (e) { console.log('decay monitor failed:', e.message); }
+// Forward tracker (12 Nov, council/forward.mjs): the live paper book (Gold trend + Gold daily engulf) against the forward-test
+// protocol PROPOSED in research/proposals/2026-11-12-path-to-live.md (bands, stop lines S1-S4, execution checks E1-E5 on the
+// demo copies), on the decay monitor's 6-hour slot. Not adopted (owner decision 43): a measurement only; a crossed line or a
+// failed check is only reported. Its own slot check, so the first round after a deploy writes the first reading. Without the
+// protocol file (a runner without research/) the last reading is kept, never overwritten by an error.
+try { const cj = rd('coach.json', {}), pr = (!cj.forward || cj.forward.slot !== CC_SLOT) ? loadProtocol() : null;
+  if (pr) { const ma = rd('ctrader/mirror-accounts.json', { groups: [] }), mirrors = (Array.isArray(ma && ma.groups) ? ma.groups : []).map((g) => ({ account: g.account, books: g.books || [], state: (rd('ctrader/' + g.file, {}) || {}).state || {} }));
+    cj.forward = { ...buildForward({ trades, snapshot, mirrors, accounts: rd('ctrader/accounts.json', null), protocol: pr, prev: cj.forward }, { now }), slot: CC_SLOT };
+    wr('coach.json', cj); }
+} catch (e) { console.log('forward tracker failed:', e.message); }
 // Book weights, paper comparison (8 Nov, council/book.mjs): the live book as traded against the portfolio-v2 proposal (equal
 // risk per distinct idea, gold family capped at 40%, clean-half sizing) applied to the SAME closed trades -> coach.json book,
 // every 6 hours. Paper comparison only: no live change; nothing here changes a rule, a size, a filter or a trade.
