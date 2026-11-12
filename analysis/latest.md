@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-12 00:02 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-12 00:04 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -31,33 +31,33 @@ Replay total on the markets it trades live: 244 trades, +0.04R a trade (+9.05R),
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-12 00:02 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-12 00:04 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
 | m30m1 · D1 rule **(back and forth)** | 4 | 11-06 dropped the D1 rule → 11-06 only with D1 → 11-07 dropped the D1 rule → 11-07 only with D1 |
-| Minimum stop **(up every time)** | 3 | 0.8 → 0.9 → 1 → 1.1 (11-05 to 11-07) |
 | scalp · overlap session **(back and forth)** | 3 | 11-06 skip the overlap session → 11-07 trading the overlap session again → 11-07 skip the overlap session |
+| Minimum stop | 2 | 0.9 → 1 → 1.1 (11-06 to 11-07) |
 | intraday · D1 rule | 1 | 11-07 "only against D1" dropped |
 | rintra · D1 rule | 1 | 11-07 dropped the D1 rule |
 | rscalp · asia session | 1 | 11-06 trading the asia session again |
 | rscalp · newyork session | 1 | 11-06 skip the newyork session |
 | rscalp · overlap session | 1 | 11-06 trading the overlap session again |
 
-15 changes on 8 rules; 2 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
+14 changes on 8 rules; 2 rules went back and forth 3+ times. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
 <!-- coach-churn:end -->
 
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-12 00:02 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-12 00:04 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 3 signals (1 open, 2 closed, +1.17R, 50% won); 5 other signals tracked, not A-setups.
 - open: YM buy from 52440, stop 52139 (H1 iFVG reversal)
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 3 closed +3.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 2 open · 1 resting (checked 2026-11-12 00:00 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 2 open · 1 resting (checked 2026-11-12 00:03 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 
@@ -74,7 +74,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-12 00:02 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-12 00:04 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -180,17 +180,17 @@ Checked 2026-11-11 22:52 UTC; live signals 2026-11-01 to 2026-11-11.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-12 00:02 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-12 00:04 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
-| Gold replica | shadow (paper, owner 11 Nov) | gate closed: 1.79% average daily range under the 2.47% gate, so no new replica trade | nothing on |
+| Gold replica | shadow (paper, owner 11 Nov) | gate closed: 1.83% average daily range under the 2.47% gate, so no new replica trade | nothing on |
 | Mosha BO | shadow (paper, owner 11 Nov) | H4 BO buy at 4082.82 (11-05 04:00 UTC); waiting for the H1 BO the other way (the retracement). Weekly structure is against it: the trade would be recorded as a shadow. | nothing on |
-| Gold trend | live | waiting for a daily close above the 20-day high 4190.42 (last close 4039.03) | nothing on |
-| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4148.71 (last close 4039.03) | paper only |
+| Gold trend | live | waiting for a daily close above the 20-day high 4190.42 (last close 3978.77) | nothing on |
+| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4148.71 (last close 3978.77) | paper only |
 | Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 4026.30; waiting for an H4 close above it | nothing on |
-| Gold daily engulf | live | daily close 4039.03 above the 20-day average 4031.81; resting buy at 3971.36 | 1 pending |
-| Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 up; no pullback zone watched · paper test | nothing on |
+| Gold daily engulf | live | daily close 3978.77 below the 20-day average 4024.13; resting buy at 3971.36 | 1 pending |
+| Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; no pullback zone watched · paper test | nothing on |
 | NQ New York open run | shadow (paper, owner 11 Nov; research.json) | last session 2026-11-09: sell loss −1.05R; next at the 09:30 New York open | — |
 <!-- gold-systems:end -->
 
