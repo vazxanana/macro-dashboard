@@ -10659,7 +10659,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9850.6 · 36 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9850.6 · 36 open · 4 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10709,23 +10709,53 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-intraday-1794482833": {
+    "orderId": "33994565",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 1.3269,
+    "stop": 1.3280399999999999,
+    "t1": 1.32502,
+    "placedAt": "2026-11-12T11:28:21.000Z",
+    "expires": "2026-11-12T23:27:13.000Z",
+    "riskCash": 1.97,
+    "margin": 2.65,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "gbpusd-scalp-1794482833": {
+    "orderId": "33994568",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.3269,
+    "stop": 1.3280399999999999,
+    "t1": 1.32502,
+    "placedAt": "2026-11-12T11:28:21.000Z",
+    "expires": "2026-11-12T14:27:13.000Z",
+    "riskCash": 1.97,
+    "margin": 2.65,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9850.6,
-  "lastRun": "2026-11-12T11:25:46.000Z"
+  "lastRun": "2026-11-12T11:28:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T08:14:53.000Z",
-   "msg": "placed sell limit AUDUSD 0.01 lot at 0.68372 (council swing, valid to 2026-11-14T08:13Z)",
-   "trade": "audusd-swing-1794471204"
-  },
-  {
-   "at": "2026-11-12T08:19:28.000Z",
-   "msg": "cancelled AUDUSD limit order 33985817 for audusd-swing-1794471204: the council ended it: cancelled",
-   "trade": "audusd-swing-1794471204"
-  },
   {
    "at": "2026-11-12T08:19:28.000Z",
    "msg": "moved AUDUSD 48181010 protection: stop 0.6934907 -> 0.6932307, target 0.6699086 -> 0.6696486 (council swing)",
@@ -12215,6 +12245,16 @@
    "at": "2026-11-12T11:17:38.000Z",
    "msg": "limit filled: AUDUSD position 48743144 at the broker",
    "trade": "audusd-rintra-1794478545"
+  },
+  {
+   "at": "2026-11-12T11:28:21.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.3269 (council intraday, valid to 2026-11-12T23:27Z)",
+   "trade": "gbpusd-intraday-1794482833"
+  },
+  {
+   "at": "2026-11-12T11:28:21.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.3269 (council scalp, valid to 2026-11-12T14:27Z)",
+   "trade": "gbpusd-scalp-1794482833"
   }
  ],
  "limits": {
