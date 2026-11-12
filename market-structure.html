@@ -7000,6 +7000,8 @@ function msNextSetup(bars, A) {
   // One way to write an R figure in the Home and Council templates (11 Nov): a sign, the minus glyph, two decimals ("−1.00R",
   // never "-1R" beside "−1.05R"); rTxt(v, 1) for the few one-decimal totals. A value that is not a number reads "—".
   const rTxt = (v, d = 2) => { v = +v; if (!isFinite(v)) return '—'; const z = Math.abs(v) < 0.5 * Math.pow(10, -d); return `${z ? '' : v > 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}R`; };
+  // a planned reward:risk is not a result: "target 2.00R", never "2R" or "+2.00R" (trade chart dialog, 12 Nov)
+  const rrTxt = (v) => (v == null || v === '' || !isFinite(+v) ? '—' : `target ${(+v).toFixed(2)}R`);
   // forward (paper, as it happened) against replay (backtest over past candles) in a list of closed system trades: the Trades
   // pane and the Home tile say both apart, so a backtest total is never read as traded profit
   const fwdSplit = (closed) => { const mk = (a) => ({ n: a.length, w: a.filter((x) => x.status === 'win').length, R: a.reduce((q, x) => q + (+x.R || 0), 0), from: a.length ? Math.min(...a.map((x) => x.opened || Infinity)) : null });
@@ -7009,7 +7011,7 @@ function msNextSetup(bars, A) {
   const stampTxt = (iso, everyH, now = Date.now()) => { const d = new Date(iso); if (isNaN(d)) return '';
     const txt = d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }), ageH = (now - d) / 36e5;
     return everyH && ageH > 2 * everyH ? `Stale: ${txt}, ${ageH >= 48 ? Math.round(ageH / 24) + ' days' : Math.round(ageH) + ' h'} old (written every ${everyH} h)` : txt; };
-  window.MS_HC = { rTxt, fwdSplit, stampTxt, mnTxt: (s) => mnTxt(s) };
+  window.MS_HC = { rTxt, rrTxt, fwdSplit, stampTxt, mnTxt: (s) => mnTxt(s) };
   const sysClosed = () => { const ok = (x) => !x.shadow && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null;
     const live = (COUNCIL.trades || []).filter((x) => SYS_K.includes(x.k) && ok(x)), rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => nqSys(x) && ok(x));
     const nqF = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ok(x)); const seen = new Set();
@@ -7387,7 +7389,8 @@ function msNextSetup(bars, A) {
       return `<svg class="h-spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Month so far, cumulative R by day: ${fR(c)}"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="z"/><path d="${d}" class="${c >= 0 ? 'up' : 'dn'}"/></svg>`; })();
     // guests: an order still waiting for its entry is not "open" (the strip said "1 open" beside a card saying "Waiting for the entry")
     const gOpen = () => { const A = activeTrades().filter((x) => !x.tracker), o = A.filter((x) => x.status === 'open').length, w = A.length - o; return `${o} open${w ? ` · ${w} waiting for ${w === 1 ? 'its' : 'their'} entry` : ''}`; };
-    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} system trade${S.n === 1 ? '' : 's'}${S.on ? ` · shadow ${fR(S.oR)} over ${S.on}` : ''}`;
+    // members also see the week pane, whose figures are after costs: these are before costs and say so (12 Nov)
+    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} system trade${S.n === 1 ? '' : 's'}, before costs${S.on ? ` · shadow ${fR(S.oR)} over ${S.on}` : ''}`;
     const prev = (window.TODAY_PREV = window.TODAY_PREV || {});
     el.innerHTML = COUNCIL.trades ? [
       PUB ? cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? gOpen() : 'loading', F ? cls(F.liveTot || 0) : '')
@@ -7812,7 +7815,7 @@ function msNextSetup(bars, A) {
     const size = x.market === instKey && typeof sizeText === 'function' ? sizeText(risk, x.entry) : '';
     const mt5 = `${sym} ${type} ${f(x.entry)} SL ${f(x.stop)}${tp != null ? ` TP ${f(tp)}` : ''}`;
     const ct = `${buy ? 'Buy' : 'Sell'} ${x.status === 'open' ? 'market' : type.split(' ').slice(1).join(' ').toLowerCase() + ' order'} ${sym} @ ${f(x.entry)} | Stop loss ${f(x.stop)}${tp != null ? ` | Take profit ${f(tp)}` : ''}`;
-    const txt = [`Council ${x.name || x.k} · ${I.label || x.label} · ${buy ? 'BUY' : 'SELL'}${x.shadow ? ' (shadow)' : ''}`, `Entry ${f(x.entry)}${x.status === 'pending' ? ' (pending)' : ''}`, `Stop ${f(x.stop)} (risk ${f(risk)})`, tp != null ? `Target ${f(tp)}${x.rr ? ` (${x.rr}R)` : ''}` : 'Target: trailing', size ? `Size at your risk setting: ${size}` : '', 'Paper / research signal, not advice.'].filter(Boolean).join('\n');
+    const txt = [`Council ${x.name || x.k} · ${I.label || x.label} · ${buy ? 'BUY' : 'SELL'}${x.shadow ? ' (shadow)' : ''}`, `Entry ${f(x.entry)}${x.status === 'pending' ? ' (pending)' : ''}`, `Stop ${f(x.stop)} (risk ${f(risk)})`, tp != null ? `Target ${f(tp)}${x.rr ? ` (${rrTxt(x.rr)})` : ''}` : 'Target: trailing', size ? `Size at your risk setting: ${size}` : '', 'Paper / research signal, not advice.'].filter(Boolean).join('\n');
     el.hidden = false;
     el.innerHTML = `<b class="tk-h">Ticket</b><code class="tk-l" title="MT5 order">${esc(mt5)}</code>${size ? `<span class="tk-sz">Size ${esc(size)}</span>` : ''}<span class="tk-b"><button type="button" data-tk="mt5">Copy MT5</button><button type="button" data-tk="ct">Copy cTrader</button><button type="button" data-tk="txt">Copy text</button><a href="${window.msTvUrl ? window.msTvUrl(x.market, '15m') : '#'}" target="_blank" rel="noopener">TradingView</a></span>`;
     const val = { mt5, ct, txt };
@@ -7834,14 +7837,15 @@ function msNextSetup(bars, A) {
     const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
     // the first stop: a trade whose stop moved (break-even or trail) keeps its first risk in r0 (trade viewer, 7 Nov: trailed trades drew the moved stop as the stop)
     const r0 = x.r0 || (x.beMoved || x.trailMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.stop0 != null && isFinite(x.stop0) ? +x.stop0 : (x.beMoved || x.trailMoved) && r0 ? x.entry - s * r0 : x.stop;
-    const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? `Loss ${x.R != null && x.R !== -1 ? `${x.R}R${x.exit ? ` (${x.exit})` : ''}` : '−1R'}` : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
+    // every R through rTxt (12 Nov: the title read "Loss -1R" / "Win +2R" beside "−1.05R" elsewhere)
+    const res = x.status === 'win' ? `Win ${rTxt(x.R)}` : x.status === 'loss' ? `Loss ${rTxt(x.R != null ? x.R : -1)}${x.R != null && x.R !== -1 && x.exit ? ` (${x.exit})` : ''}` : x.status === 'be' ? `Break-even ${rTxt(0)}` : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = PUB ? `${x.label} ${x.side === 'sell' ? 'sell' : 'buy'}` : `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
-    document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
+    document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${mnTxt(esc(x.pm.detail))} <br>Lesson: ${mnTxt(esc(x.pm.lesson))}${x.shadow && x.note ? `<br>${mnTxt(esc(x.note))}` : ''}` : mnTxt(esc(x.note || ''));
     // the conditions at the signal, the ones the Coach learns from (D1, structure, the CHoCH rule, session) and the entry style
     const ft = x.feat || {}, cond = [ft.d1 && `${ft.d1 === 'with' ? 'With' : 'Against'} D1`, ft.struct && ft.struct !== 'n/a' && `${ft.struct === 'main' ? 'Main' : 'Internal'} structure`,
       ft.cf && (ft.cf === 'choch' ? 'CF is a CHoCH' : 'CF is a continuation BO'), ft.choch && (ft.choch === 'yes' ? 'Fresh M15/M5 CHoCH' : 'No fresh M15/M5 CHoCH'), ft.m15c && (ft.m15c === 'yes' ? 'Your M15 CHoCH within the hour' : 'No M15 CHoCH (yours) within the hour'),
       ft.session && (SESSION_NAME[ft.session] || ft.session), x.entryMode === 'market' && 'Market entry'].filter(Boolean);
-    document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}${x.t1 == null || !isFinite(x.t1) ? `<span><i style="background:${UPC}"></i>Target <b>none</b> (trend trade: rides until its exit rule)</span>` : `<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span>`}${x.rr != null && isFinite(x.rr) ? `<span>Reward:risk <b>${x.rr}R</b></span>` : ''}${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}${x.t1 == null || !isFinite(x.t1) ? `<span><i style="background:${UPC}"></i>Target <b>none</b> (trend trade: rides until its exit rule)</span>` : `<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span>`}${x.rr != null && isFinite(x.rr) ? `<span title="Planned reward for 1R of risk, not a result">Planned <b>${rrTxt(x.rr)}</b></span>` : ''}${x.mfe != null ? `<span>Best <b>${rTxt(x.mfe)}</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     tradeTicket(x, PUB);
     { const nb = document.getElementById('ms-tv-nb'), T = window.MS_TRV; if (nb) { nb.innerHTML = PUB || !T ? '' : T.nbHtml(x, !!(x.pm && x.pm.title) && !x.shadow); nb.hidden = !nb.innerHTML; } }   // note + blockers (#ms-trv-js)
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
@@ -7926,18 +7930,18 @@ function msNextSetup(bars, A) {
       const r0v = Math.abs(x.entry - C.stop0) || 1, rwP = !noTgt && Math.abs(x.t1 - x.entry) <= 4.5 * r0v ? x.t1 : aim, endI = before ? tgtIdx : (iX > iE ? iX : n - 1 + 2);
       items.boxes.push({ kind: 'rw', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, rwP), hi: Math.max(x.entry, rwP), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
       items.boxes.push({ kind: 'rk', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, C.stop0), hi: Math.max(x.entry, C.stop0), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
-      items.labels.push({ l: iE, dx: 6, p: rwP, dy: sell ? 14 : -5, text: `${((rwP - x.entry) * s / r0v).toFixed(1)}R · ${f(rwP)}`, color: '#089981' }, { l: iE, dx: 6, p: C.stop0, dy: sell ? -5 : 14, text: `−1R · ${f(C.stop0)}`, color: '#f23645' });
-      if (!before && x.status === 'open') { const L = (window.MS_LIVE && window.MS_LIVE.items || []).find((i) => i.x.id === x.id); if (L && L.fl != null) items.labels.push({ l: n - 1, p: data[n - 1].close, pill: true, bg: L.fl >= 0 ? '#089981' : '#f23645', dy: (L.fl >= 0) === (s > 0) ? -22 : 22, text: `Now ${L.fl >= 0 ? '+' : ''}${L.fl.toFixed(2)}R` }); }
+      items.labels.push({ l: iE, dx: 6, p: rwP, dy: sell ? 14 : -5, text: `${rrTxt((rwP - x.entry) * s / r0v)} · ${f(rwP)}`, color: '#089981' }, { l: iE, dx: 6, p: C.stop0, dy: sell ? -5 : 14, text: `${rTxt(-1)} · ${f(C.stop0)}`, color: '#f23645' });
+      if (!before && x.status === 'open') { const L = (window.MS_LIVE && window.MS_LIVE.items || []).find((i) => i.x.id === x.id); if (L && L.fl != null) items.labels.push({ l: n - 1, p: data[n - 1].close, pill: true, bg: L.fl >= 0 ? '#089981' : '#f23645', dy: (L.fl >= 0) === (s > 0) ? -22 : 22, text: `Now ${rTxt(L.fl)}` }); }
     }
     if (iE >= 0 && before) {
       items.path = [{ l: iE, p: x.entry }, { l: tgtIdx, p: aim }];   // dashed arrow: the predicted move
-      items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + aim) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: noTgt ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then ride the trend (no fixed target)` : trailing ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then trail` : `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${x.rr}R)` });
+      items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + aim) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: noTgt ? `Prediction: ${sell ? 'SELL' : 'BUY'}, ${rrTxt(2)} at ${f(aim)}, then ride the trend (no fixed target)` : trailing ? `Prediction: ${sell ? 'SELL' : 'BUY'}, ${rrTxt(2)} at ${f(aim)}, then trail` : `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${rrTxt(x.rr)})` });
     }
     if (iE >= 0) {
       items.vlines.push({ l: iE, color: '#2962ff', text: before ? 'Signal (now)' : 'Signal' });
       if (!before && iX > 0 && ['win', 'loss', 'be'].includes(x.status)) {
         const px = x.status === 'win' && !x.exit && !noTgt ? x.t1 : x.status === 'loss' && !x.exit ? C.stop0 : x.entry + s * (x.R || 0) * Math.abs(x.entry - C.stop0);
-        items.labels.push({ l: iX, p: px, pill: true, bg: x.R > 0 ? '#089981' : x.R < 0 ? '#f23645' : '#8a94a8', dy: (px > x.entry) ? -30 : 30, text: `Result: ${x.R > 0 ? 'win' : x.R < 0 ? 'loss' : 'break-even'} ${x.R > 0 ? '+' : ''}${x.R}R${x.exit ? ` · out after ${x.exit}` : ''}` });
+        items.labels.push({ l: iX, p: px, pill: true, bg: x.R > 0 ? '#089981' : x.R < 0 ? '#f23645' : '#8a94a8', dy: (px > x.entry) ? -30 : 30, text: `Result: ${x.R > 0 ? 'win' : x.R < 0 ? 'loss' : 'break-even'} ${rTxt(x.R)}${x.exit ? ` · out after ${x.exit}` : ''}` });
       }
     }
     if (TV.ov) TV.ov.set(items);
@@ -8124,7 +8128,7 @@ function msNextSetup(bars, A) {
     if (!RV.raf) RV.raf = requestAnimationFrame(rvDraw);
     if (!show) { RV.strokes = []; return; }
     const ft = x.feat || {};
-    document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, ${x.t1 == null ? 'no fixed target (trend exit)' : `target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })}${x.rr != null ? ` (${x.rr}R)` : ''}`} · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}${(COUNCIL.anRev || {})[x.id] ? `<br><small>Analyst post-mortem: <b>${esc(COUNCIL.anRev[x.id].title)}</b> · ${esc(COUNCIL.anRev[x.id].text)}</small>` : ''}`;
+    document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, ${x.t1 == null ? 'no fixed target (trend exit)' : `target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })}${x.rr != null ? ` (${rrTxt(x.rr)})` : ''}`} · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}${(COUNCIL.anRev || {})[x.id] ? `<br><small>Analyst post-mortem: <b>${esc(COUNCIL.anRev[x.id].title)}</b> · ${mnTxt(esc(COUNCIL.anRev[x.id].text))}</small>` : ''}`;
     document.getElementById('ms-rv-tags').innerHTML = RV_TAGS.map(([t, n]) => `<button type="button" data-tag="${t}" aria-pressed="${RV.tags.has(t)}" class="${RV.tags.has(t) ? 'on' : ''}">${esc(n)}</button>`).join('');
     document.getElementById('ms-rv-text').value = r.text || ''; document.getElementById('ms-rv-lesson').value = r.lesson || '';
     document.getElementById('ms-rv-msg').textContent = r.at && !r.draft ? `Saved ${new Date(r.at * 1000).toLocaleString()}${r.by && r.by !== 'owner' ? ` by ${r.by}` : ''}` : '';
@@ -8311,7 +8315,7 @@ function msNextSetup(bars, A) {
     const tt = document.getElementById('ms-to-top');
     if (tt) { addEventListener('scroll', () => { tt.hidden = scrollY < 900; }, { passive: true }); tt.addEventListener('click', () => { scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); const m = document.getElementById('ms-main-start'); if (m) m.focus({ preventScroll: true }); }); }
     // what each Today figure means
-    const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
+    const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R, before costs', 'This week': 'Closed since Monday, in R, before costs (the This week pane counts after costs)', 'This month': 'Closed since the 1st, in R, before costs' };
     // perf (8 Nov): one pass per frame however many DOM changes arrive (the observer used to run on every mutation batch)
     // perf (9 Nov): live ticks rewrite the chart legends, countdowns and the header price several times a second; those changes can
     // never add a KPI, a scroll box or a "Loading…" label, so the page-wide observers below skip batches made only of them
@@ -14076,9 +14080,9 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var tile = function (lbl, v, sub, isR) { var d = isR && num(v) && Math.abs(v) >= 0.005 ? '<i class="dir ' + (v > 0 ? 'up' : 'dn') + '" aria-hidden="true"></i>' : '';
       return '<div class="wk-tile"><small>' + lbl + '</small><b>' + d + (isR ? fR(v) : esc(v)) + '</b><span>' + sub + '</span></div>'; };
     var t1 = B.merLive, t2 = B.ictA, t3 = B.books.shadow;
-    $('ms-wk-tiles').innerHTML = tile('Meridian live, net', t1.n ? t1.net : 0, t1.n ? plural(t1.n, 'trade') + ' · ' + t1.w + 'W ' + t1.l + 'L · gross ' + fR(t1.R) : 'no closed trades', true)
-      + tile('ICT desk A-setups, net', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
-      + tile('Shadow book, net', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
+    $('ms-wk-tiles').innerHTML = tile('Meridian live, after costs', t1.n ? t1.net : 0, t1.n ? plural(t1.n, 'trade') + ' · ' + t1.w + 'W ' + t1.l + 'L · before costs ' + fR(t1.R) : 'no closed trades', true)
+      + tile('ICT desk A-setups, after costs', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
+      + tile('Shadow book, after costs', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
       + tile('Rule changes', String(nR.length), nR.length ? 'you ' + cnt.you + ' · Coach ' + cnt.coach + (cnt.fix ? ' · fixes ' + cnt.fix : '') : 'none this week', false);
     try { var pk = function (t) { return { n: t.n, net: t.n ? t.net : 0, w: t.w, l: t.l, rp: t.rp || 0 }; }; W.MS_WEEK_NOW = { title: $('ms-wk-title').textContent, live: pk(t1), ict: pk(t2), shadow: pk(t3), rules: nR.length }; document.dispatchEvent(new CustomEvent('ms:week')); } catch (e) {}   // the simple phone view's one sentence (#ms-ps-js)
   }

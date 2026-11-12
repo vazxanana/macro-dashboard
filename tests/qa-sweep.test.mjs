@@ -505,6 +505,30 @@ test('Home / Council reading pass: text at 12 px, touch targets, and the cards t
 });
 
 
+test('trade chart dialog (#ms-tv): every R through rTxt, a planned reward:risk as "target 2.00R" (was "Loss -1R", "Win +2R", "Reward:risk 2R")', () => {
+  assert.equal(hc.rrTxt(2), 'target 2.00R'); assert.equal(hc.rrTxt('1.5'), 'target 1.50R'); assert.equal(hc.rrTxt(null), '—'); assert.equal(hc.rrTxt(NaN), '—');
+  const a = deskHtml.indexOf('// trade ticket (7 Nov loop)'), z = deskHtml.indexOf('const ST_NAME = {', a);
+  assert.ok(a > 0 && z > a, 'the dialog code (ticket, openTrade, before / after view) is found');
+  const dlg = deskHtml.slice(a, z) + /document\.getElementById\('ms-rv-strat'\)\.innerHTML = .*$/m.exec(deskHtml)[0];
+  // no raw number followed by "R", no hard-written "−1R" / "0R"
+  assert.doesNotMatch(dlg, /\$\{x\.(R|rr|mfe)\}R/, 'a raw R value');
+  assert.doesNotMatch(dlg, /toFixed\(\d\)\}R/, 'a toFixed figure with its own sign');
+  assert.doesNotMatch(dlg, /'−1R'|'Break-even 0R'|`−1R ·|\+\$\{x\.(R|mfe)\}R/);
+  assert.match(dlg, /`Win \$\{rTxt\(x\.R\)\}`/); assert.match(dlg, /`Loss \$\{rTxt\(x\.R != null \? x\.R : -1\)\}/); assert.match(dlg, /`Break-even \$\{rTxt\(0\)\}`/);
+  assert.match(dlg, /Planned <b>\$\{rrTxt\(x\.rr\)\}<\/b>/); assert.match(dlg, /Best <b>\$\{rTxt\(x\.mfe\)\}<\/b>/);
+  assert.match(dlg, /`Now \$\{rTxt\(L\.fl\)\}`/); assert.match(dlg, /\$\{rTxt\(-1\)\} · \$\{f\(C\.stop0\)\}/); assert.match(dlg, /\(\$\{rrTxt\(x\.rr\)\}\)/);
+  assert.match(dlg, /Analyst post-mortem: <b>\$\{esc\(COUNCIL\.anRev\[x\.id\]\.title\)\}<\/b> · \$\{mnTxt\(esc\(COUNCIL\.anRev\[x\.id\]\.text\)\)\}/, 'council-written text in the dialog shows the minus glyph');
+  assert.match(dlg, /Result: \$\{x\.R > 0 \? 'win' : x\.R < 0 \? 'loss' : 'break-even'\} \$\{rTxt\(x\.R\)\}/);
+});
+
+test('Home strip says "before costs" and the week pane\'s tiles say "after costs", so the two weeks are never compared unknowingly', () => {
+  assert.match(deskHtml, /`\$\{S\.n\} system trade\$\{S\.n === 1 \? '' : 's'\}, before costs\$\{S\.on/, 'Home Today / week / month sublines name their basis');
+  assert.match(deskHtml, /'This week': 'Closed since Monday, in R, before costs \(the This week pane counts after costs\)'/);
+  for (const l of ['Meridian live', 'ICT desk A-setups', 'Shadow book']) assert.match(deskHtml, new RegExp(`tile\\('${l}, after costs',`), l);
+  assert.doesNotMatch(deskHtml, /tile\('[^']*, net',/, 'a week tile said only "net"');
+  assert.match(deskHtml, /'L · before costs ' \+ fR\(t1\.R\)/, 'the gross figure under Meridian live is "before costs"');
+});
+
 // ── Account surfaces, quality pass (11 Nov 2026): Profile, Users, account menu, Settings, price alerts, the bell, the palette ──
 const DESK = src('market-structure.html');
 const acctCss = () => /<style id="ms-acct-css">([\s\S]*?)<\/style>/.exec(DESK)[1];
