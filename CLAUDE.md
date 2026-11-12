@@ -2256,8 +2256,13 @@ was found. Fixed:
 - Checks: `tests/qa-sweep.test.mjs` ("Second pass": 8 tests), `scripts/audit/smoke.cjs` ("ICT desk text under 12 px").
 - Still open: light-theme status badges with their own colours (`.ms-st.near` amber on amber 1.8:1, `.ms-st.ready` white on green
   3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
-  words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
-  12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
+  words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones. **Done 12 Nov 2026** (branch `desk-open-qa`, display only):
+  a viewer's (or a member without the council permission) `#council/<pane>` is rewritten to `#council` with `replaceState` in
+  `showView`, like a refused view; calendar day and week cells write a figure through `MS_HC.calR` (two decimals under 10R, one
+  from 10R, none from 100R: six characters; the cell's aria-label and the day detail keep two), and both calendars are 12 px on
+  a phone in a 39 px box (the Council's six-character figures needed 38.8 px in 38.3, the guest's were 9.5 px); the Council
+  status line's amber warning reads `--warn-ink` (light, at the gradient's darkest point: 4.2-4.5:1 → 5.0-5.4:1). Tests in
+  `tests/qa-sweep.test.mjs` ("Open items of the 11 Nov sweep").
 
 ## Post-merge QA sweep (12 Nov 2026, the ~20 PRs merged since 11 Nov 21:00 UTC, two sessions in parallel)
 Every page at 360 / 390 px (touch; simple view and Full view) and 1440 px, in dark / light / midnight, as owner, Fred, Orlando,
@@ -2322,8 +2327,8 @@ dim text (header shadow count, guest calendar days). Rule: **a badge takes its t
 a solid fill), `--gold-ink` (the brand gold as text); defined once after the light tokens in the first `<style>` (dark and
 midnight = the theme's own colours, light = deeper inks). Never dim badge text with `opacity`. The scanner's day change is
 `.pr-c.up` / `.pr-c.dn`. Candle colours are untouched. Pinned in `tests/qa-sweep.test.mjs` ("badge inks"); no colour sampling
-in the smoke test (it would depend on live data). Left: the Council status line's amber warnings on its gradient (about 4.3:1
-at the gradient's darkest point, light only), outside this pass.
+in the smoke test (it would depend on live data). The Council status line's amber warnings (about 4.3:1 on its gradient in
+light, left by this pass) take `--warn-ink` since 12 Nov 2026 ("Post-merge QA sweep (11 Nov 2026…)", Still open).
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
 Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven Meridian systems that were live until 11 Nov 2026 (the seven edges
