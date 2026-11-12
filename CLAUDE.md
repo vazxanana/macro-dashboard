@@ -68,7 +68,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
-- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
+- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
@@ -2617,6 +2617,53 @@ live rule, size, filter, stop, config, council member or demo-only code changed.
 - Tests: `tests/path-to-live.test.mjs` (the json equals the script's output; every figure of the proposal against it and
   against the supported-book result; the bootstrap on a hand-made series; items 43-46 open; the proposal never recommends
   a live step; the mirror's three locks are still in the file).
+
+## Forward record of the live book against the proposed protocol (12 Nov 2026)
+A MEASUREMENT of the live paper book (Gold trend + Gold daily engulf) against the forward-test protocol PROPOSED in
+`research/proposals/2026-11-12-path-to-live.md` section 3. The owner has not adopted it (docs/owner-decisions.md item 43,
+open): every surface says "proposed protocol, not adopted: your decision 43". It changes no rule, size, filter, stop, trade,
+mirror setting or config, and a crossed line or a failed check is only reported, never acted on.
+- **`council/forward.mjs`** (pure; inputs handed in, clock `now`). Counted: `alertable` (not a shadow) and `ownStream` trades of
+  `BOOK` = gtrend, geg (the json's "S2 = gtrend + geg"), filled at or after `START` (12 Nov 2026 00:00 UTC, the proposal's
+  "Clock start"), never a replay row, never a pending / expired / void record; R = the digest's `merNet` (after costs including
+  financing). Record: positions closed (adds are units, not positions), total, drawdown from the record's own high (which starts
+  at 0), closed and marked to the snapshot price (open trades before costs). Band: the json's `worlds.expected.horizons`
+  p5 / p50 / p95, linear between its checkpoints (0R at the start), held past 60 months; "too few to say" under the json's
+  smallest `bands` key (10). Stop lines from `gates`: S1 `ddStop` on the closed drawdown every reading; S2-S4 `floor[12/24/36]`
+  judged on the total of the positions closed by that calendar checkpoint, "checked later" before it. **Never type a band or
+  line number into the code: read the json.** E1-E5 thresholds are section 3's table (the json does not carry them): `EXEC`,
+  pinned against the proposal's text by the test. E-checks read every `ctrader/mirror*.json` state (`mirror-accounts.json`)
+  and `ctrader/accounts.json` (the account whose books include `council`), for the book's first 30 paper fills only: E1 a copy
+  is flagged when the guard had to set its stop (`stopSetBy: 'guard'`, `noStopTries`, a "no stop" close) or the open position
+  shows none; E2 copied n of m with each miss's reason (`skipped` / `wait`), a fill under `COPY_GRACE` (6 h) old is not a miss
+  yet; E3 mean `slipR` (positive = worse); E4 the account's `swap` on gold-buy copies against `nights` x `FIN.xau.long` x fill x
+  ounces (`volume` / 100); E5 a position, order or deal on the Council account since `START` that no mirror record holds.
+  Decisions at 30 copies (E1, E5 and three E2 misses fail at once); before that "Counting", or "Not measurable yet".
+  **Per-copy records are carried in the reading** (`exec.copies`, `exec.foreign`; a no-stop flag stays once seen) because the
+  mirror drops finished copies after `LIMITS.keepDays` (30) and the account history keeps about 30 deals.
+- **Trader**: coach.json `forward` (+ `slot`) on the decay monitor's 6-hour slot (`CC_SLOT`) in its OWN block with its own slot
+  check, so **the first round after deploy writes the first reading** (it does not wait for the decay rebuild); the daily Coach
+  rewrite carries it (`forward: prev.forward`). The protocol file is read from `research/` (`loadProtocol`): a runner without it
+  (the Vercel bundle ships council/ and ict/ only) keeps the last reading instead of writing an error.
+- **Page**: card `#ms-fwd` (class `card c-fwd adm`) on Council → Systems right under `#ms-sys-book`; `<style id="ms-fw-css">` +
+  `<script id="ms-fw-js">` after `#ms-ex-js` (reads `MS_COUNCIL.coach.forward`, fetches nothing): the one sentence first (`.fw-sum`:
+  "On track / Too few trades to say / Below the expected range / A stop line is crossed", n and dates), the band chart (accent
+  band, dashed middle, the record in ink, stop lines S2-S4 as sell-ink dots; a legend word for each), S1-S4 and E1-E5 as rows
+  with their state in words, the "not adopted" tag and a link to item 43. An older coach.json without `forward` reads "No
+  reading yet: the first one comes with the next Coach rebuild". Simple phone view: the Systems pane's existing fold helper
+  makes it a two-line row (`.fw-sum` added to its summary selector; no new mechanism). Home's "things wait on you" and the
+  daily digest's "Waiting on you" get ONE line only when `alerts` is non-empty (`MS_WEEK.decisions` item `k: 'forward'`,
+  `forwardLine`), never otherwise.
+- **Today's reading** (council-data of 12 Nov 07:46 UTC): too few to say, no book position closed since 12 Nov; one Gold daily
+  engulf buy open (filled 12 Nov 00:09, copied at 3971.24, slipR −0.002); E1, E2, E3, E5 counting; E4 not measurable yet (no
+  copy held over a rollover with its swap on file).
+- **`council/ctrader-reconcile.mjs`**: a replica research trade left uncopied by the owner rule `replica-mirror-gold-only` is
+  listed under "Not copied, with the mirror's reason" (`replicaRuleWhy`: "owner rule: replica gold only since 2026-11-11", from
+  config.json `mirrorReplica`), not as a mismatch (17 rows read that way on 12 Nov). A recorded skip / wait reason still wins;
+  an uncopied gold replica trade is still a mismatch; exit code logic unchanged.
+- Tests: `tests/forward.test.mjs` (10: json bands and interpolation, every stop line, drawdown maths, shadows / replay / other
+  systems / pre-start excluded, E1-E5 on fake mirror and account files, carry, digest line, Trader and page wiring),
+  `tests/ctrader-reconcile.test.mjs` (the owner-rule reason), `tests/qa-sweep.test.mjs` ("forward card": 3).
 
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
