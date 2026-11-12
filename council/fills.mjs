@@ -181,6 +181,34 @@ export function staleStats(trades, X = STALE_R) {
   return out;
 }
 
+// ─── Near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 53) ───
+// The engine (engine.mjs buildSetup / buildRetrace) never plans a stop closer to the ENTRY than the minimum stop
+// max(minRisk x ATR(14) of the setup's lower timeframe, 5 spreads). A setup the Trader (and the replay) takes at market fills
+// at the price of the moment, which can sit much nearer the stop than the planned entry (9-12 Nov: an AUD/USD fill 0.4 pip
+// above its stop booked about -6R after costs). The same floor is checked again on the FILL: inside it, or on / past the stop,
+// the order is not opened (status 'skipped', reason 'fill-near-stop'; never a trade in any tally). The stop is never moved.
+export const NEAR_STOP = 'fill-near-stop';
+// ATR(14) exactly as engine.mjs atr() / review.mjs atrOf(): the mean true range of the last n candles
+export function atrN(bars, n = 14) {
+  const m = (bars || []).length; let s = 0, k = 0;
+  for (let i = Math.max(1, m - n); i < m; i++) { const b = bars[i], pc = bars[i - 1].close; s += Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc)); k++; }
+  return k ? s / k : 0;
+}
+// the engine's minimum stop distance for a setup whose lower timeframe has these candles (spread = fills.mjs spreadOf)
+export const minStopDist = (bars, spread, minRisk) => Math.max(minRisk * atrN(bars), 5 * spread);
+// why a market fill at px must not be opened, or null. 'past-stop' / 'past-target': px on or beyond the stop or the target;
+// NEAR_STOP: |px - stop| under the floor (float noise of 1e-9 relative ignored, so a fill exactly at the floor is opened)
+export function fillCheck(side, px, stop, t1, floor) {
+  const sell = side === 'sell', r = Math.abs(px - stop), rw = (t1 - px) * (sell ? -1 : 1);
+  if (!(r > 0) || (sell ? px >= stop : px <= stop)) return 'past-stop';
+  if (!(rw > 0)) return 'past-target';
+  if (Number.isFinite(floor) && floor > 0 && r < floor * (1 - 1e-9)) return NEAR_STOP;
+  return null;
+}
+export const fillCheckText = (why, M = {}, px, floor) => why === NEAR_STOP
+  ? `Not filled: the market price ${Number.isFinite(px) ? px.toFixed(M.dec != null ? M.dec : 5) : ''} was inside the minimum stop (${Number.isFinite(floor) ? floor.toPrecision(3) : '?'} from the stop), so the order was not opened (fill-near-stop).`
+  : 'Price already past the stop or target when the signal came in.';
+
 // ─── trade-state helpers ───
 // the exit price of a stop hit on candle b: the stop, or the candle's open when price opened beyond it (a weekend or news gap,
 // missing candles). afterFill: the candle started after the fill (on the fill candle the open came before the fill: use the stop)
@@ -214,6 +242,29 @@ const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', w
 export function spotClosed(t) {
   const p = Object.fromEntries(nyFmt.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])), h = +p.hour;
   return p.weekday === 'Sat' || (p.weekday === 'Fri' && h >= 17) || (p.weekday === 'Sun' && h < 17);
+}
+// Gold daily engulf: trading days, not UTC calendar days (owner, 12 Nov 2026, fidelity fix; docs/owner-decisions.md item 52).
+// OANDA serves a Sunday-dated daily candle for the ~2 hours between the 22:00 UTC reopen and midnight; on 10 Nov 2026 that stub
+// (range $19, a thirtieth of a weekday's volume) became the engulf's base candle and put its stop $21 away. The pre-registered
+// research/edge/gold-weekend study (its replay-intended.mjs, "ADOPT" for geg) folds a Saturday / Sunday candle into the NEXT
+// weekday candle: that weekday's time and close, the first weekend open, the high / low over all; a weekend candle with no weekday
+// after it belongs to the forming Monday and is left out. The research/edge/robustness rebuild (17:00 New York days) and
+// research/edge/gold-systems (Sunday folded into Monday) never had the stub either. Gold trend / Gold trend fast keep the raw
+// candles: the same study found the fold worse for them (KEEP), and their out-of-sample record was built with the stub.
+export function foldWeekend(bars) {
+  const out = []; let w = null;
+  for (const b of bars || []) {
+    const wd = new Date(b.time * 1000).getUTCDay();
+    if (wd === 0 || wd === 6) { w = w ? { open: w.open, high: Math.max(w.high, b.high), low: Math.min(w.low, b.low) } : { open: b.open, high: b.high, low: b.low }; continue; }
+    out.push(w ? { ...b, open: w.open, high: Math.max(w.high, b.high), low: Math.min(w.low, b.low) } : b); w = null;
+  }
+  return out;
+}
+// the same study's freshness: a signal day's order may be placed for 24 h from the reopen after the day's UTC end (Monday-Thursday:
+// the day end; Friday: the Sunday reopen), and never while spot is shut
+export function gegFresh(dayTime, now) {
+  let reopen = dayTime + 86400; while (spotClosed(reopen)) reopen += 300;
+  return !spotClosed(now) && now - reopen < 86400;
 }
 // 7 Nov (owner OK): the daily 17:00 New York rollover. Its first minutes print spiky mid prices on forex (USD/CHF 12 Aug 21:04 UTC);
 // over 90 days 21 live-style stops (12.6R) were taken there (#520). OANDA prints next to nothing 17:00-17:04 and the spread spike

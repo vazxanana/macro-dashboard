@@ -35,7 +35,7 @@ export const EXEC = { n: 30, missFail: 3, slipPass: 0.03, slipFail: 0.05, finTol
 // mirror holds market copies after a reopen, LIMITS.settle): a copy is expected within this many seconds of the paper fill
 export const COPY_GRACE = 6 * 3600;
 const MONTH = 30.4375 * 86400;
-const DONE = new Set(['expired', 'missed', 'duplicate', 'cancelled', 'canceled', 'void']);
+const DONE = new Set(['expired', 'missed', 'duplicate', 'cancelled', 'canceled', 'void', 'skipped']);   // never a position (skipped: a market fill refused, fills.mjs fillCheck)
 
 export function loadProtocol(file = PROTOCOL_FILE) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return null; } }
 

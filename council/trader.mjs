@@ -17,10 +17,11 @@ import { buildBook } from './book.mjs';
 import { buildExpect } from './expect.mjs';
 import { buildForward, loadProtocol, stopSwitch } from './forward.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
-import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
+import { voidRoundedReplicas, historyCatchUp, voidM30Twins, voidExactTwins, recostCrypto } from './repairs.mjs';
+import { recordOnce } from './dedupe.mjs';   // 12 Nov 2026 (owner approved): one order is recorded once
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, mirrorMaps, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+import { costModel, mirrorMaps, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, foldWeekend, gegFresh, minStopDist, fillCheck, fillCheckText } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
@@ -470,6 +471,8 @@ let research = rd('research.json', []);
 // One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines;
 // 8 Nov: the pre-dedupe m30m1 copies of Scalp entries get status 'duplicate' (research/edge/shadow-audit)
 voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO); voidM30Twins(trades, config, nowISO);
+// 12 Nov 2026 (owner approved, "count duplicates once"): past exact duplicates (council/dedupe.mjs) get status 'duplicate'
+voidExactTwins(trades, config, nowISO);
 // 7 Nov: closed crypto trades re-costed under the CFD model (#568); annotateCosts below recomputes costR / Rnet this round
 recostCrypto(trades, MARKETS, config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
@@ -880,7 +883,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     if (key === 'xau' && config.goldEG) {
       try {
-        const EG = config.goldEG, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        // trading days (owner, 12 Nov 2026, fidelity fix, item 52; research/edge/gold-weekend): closed UTC days, the Sunday reopen stub
+        // (and any Saturday / Sunday candle) folded into the next weekday; a signal is fresh for 24 h from the reopen after its day
+        const EG = config.goldEG, D = foldWeekend(src['1d'].bars.filter((b) => b.time + 86400 <= now)), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
         // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts geg in config.ownerShadow (stopSwitch): new orders are paper
         // shadows; the system's own orders (live, or shadow by the owner) keep the zone cancel and the cap as one stream
         const egSh = ownerSh('geg'), mine = trades.filter((x) => x.k === 'geg' && x.market === key && ownStream(x));
@@ -896,7 +901,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           state.zone = base ? [base.low, base.high] : null;
           const id = base ? `${key}-geg-${base.time}` : null;
           const openCnt = mine.filter((x) => x.status === 'open' || x.status === 'pending').length;
-          if (base && up && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400 && openCnt < EG.maxOpen) {
+          if (base && up && !trades.some((x) => x.id === id) && gegFresh(last.time, now) && openCnt < EG.maxOpen) {
             const entry = +base.high.toFixed(dp), stop = +(base.low - EG.pad).toFixed(dp), r0 = entry - stop;
             if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', h: '1d', side: 'buy',
               entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: EG.life * 86400, maxHold: EG.hold * 3600, noBe: true, entryMode: 'limit',
@@ -1240,14 +1245,23 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (mkt) {
         // fill at the market price, never at a better level than was available
         if (mktEntry) tr.entryMode = 'market';
-        tr.entry = price; tr.status = 'open'; tr.filled = now;
-        tr.drift = driftR(tr.side, t.entry, price, t.stop);   // stale-signal shadow stat (8 Nov): fill vs the setup's planned entry, in R
-        const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
-        if (!(r > 0) || (t.sell ? price >= tr.stop : price <= tr.stop) || rw <= 0) { tr.status = 'skipped'; tr.note = 'Price already past the stop or target when the signal came in.'; }
-        else tr.rr = +(rw / r).toFixed(2);
+        // near-stop fills (12 Nov 2026, owner approved, docs/owner-decisions.md item 53): the engine's minimum stop is checked
+        // again on the price we would really get; inside it, or past the stop / target, the order is not opened (never a trade:
+        // no fill time, R 0, the stop untouched, the planned entry kept; the price it would have filled at is in fillPx)
+        const floor = minStopDist(src[def.l].bars, spreadOf(M, price), CFG.minRisk), skip = fillCheck(tr.side, price, tr.stop, tr.t1, floor);
+        if (skip) { tr.status = 'skipped'; tr.reason = skip; tr.fillPx = price; tr.minStop = +floor.toPrecision(5); tr.closed = now; tr.R = 0; tr.note = fillCheckText(skip, M, price, floor); }
+        else {
+          tr.entry = price; tr.status = 'open'; tr.filled = now; tr.r0 = Math.abs(price - tr.stop);
+          tr.drift = driftR(tr.side, t.entry, price, t.stop);   // stale-signal shadow stat (8 Nov): fill vs the setup's planned entry, in R
+          tr.rr = +(((tr.t1 - tr.entry) * (t.sell ? -1 : 1)) / tr.r0).toFixed(2);
+        }
       }
       // m30m1 (M30 → M1) fires on the same M1 entry as the Scalp: the same trade recorded twice (6 Nov, 29 of 31). Keep one.
       if (t.k === 'm30m1' && trades.some((x) => x.market === key && x.k !== 'm30m1' && x.side === tr.side && x.opened === tr.opened && x.entry === tr.entry)) continue;
+      // 12 Nov 2026 (owner approved, "count duplicates once"): two setups giving the SAME order this round (same market, side,
+      // second, entry, stop and target; council/dedupe.mjs) record it once: the second (or the shadow one, when the other is
+      // live) is kept with status 'duplicate' + dupOf, never managed, alerted, copied or counted. Other targets stay two trades.
+      recordOnce(trades, tr, now);
       trades.push(tr);
     }
   } catch (e) { snapshot.errors[key] = String(e.message || e); }

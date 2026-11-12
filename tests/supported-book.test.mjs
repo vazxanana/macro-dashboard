@@ -77,7 +77,15 @@ test('the two systems that stay live are byte for byte what they were: Gold tren
   const E_NEW = "        // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts geg in config.ownerShadow (stopSwitch): new orders are paper\n        // shadows; the system's own orders (live, or shadow by the owner) keep the zone cancel and the cap as one stream\n        const egSh = ownerSh('geg'), mine = trades.filter((x) => x.k === 'geg' && x.market === key && ownStream(x));";
   assert.ok(legs.includes(L_NEW) && eg.includes(E_NEW) && eg.includes("shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],"));
   const legs0 = legs.replace(L_NEW, "        const sh = LEG.k === 'gtrend5' && !!config.goldTrendFastShadow;");
-  const eg0 = eg.replace(E_NEW, "        const mine = trades.filter((x) => x.k === 'geg' && x.market === key && !x.shadow);").replace("shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],", 'shadow: false, blockedBy: [],');
+  // 12 Nov 2026 (owner approved a fidelity fix, docs/owner-decisions.md item 52; tests/geg-trading-days.test.mjs): the engulf reads
+  // trading days (the Sunday reopen stub folded into Monday) with the reopen freshness, as research/edge/gold-weekend tested; with
+  // those lines also put back the block is byte for byte the 11 Nov one. The trend legs are untouched (that study: KEEP).
+  const E_DAYS = "        // trading days (owner, 12 Nov 2026, fidelity fix, item 52; research/edge/gold-weekend): closed UTC days, the Sunday reopen stub\n        // (and any Saturday / Sunday candle) folded into the next weekday; a signal is fresh for 24 h from the reopen after its day\n        const EG = config.goldEG, D = foldWeekend(src['1d'].bars.filter((b) => b.time + 86400 <= now)), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);";
+  const E_FRESH = 'if (base && up && !trades.some((x) => x.id === id) && gegFresh(last.time, now) && openCnt < EG.maxOpen) {';
+  assert.ok(eg.includes(E_DAYS) && eg.includes(E_FRESH), 'the engulf reads trading days (item 52)');
+  const eg0 = eg.replace(E_NEW, "        const mine = trades.filter((x) => x.k === 'geg' && x.market === key && !x.shadow);").replace("shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],", 'shadow: false, blockedBy: [],')
+    .replace(E_DAYS, "        const EG = config.goldEG, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);")
+    .replace(E_FRESH, 'if (base && up && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400 && openCnt < EG.maxOpen) {');
   assert.equal(sha(legs0), 'ee3dfa27f9788c2917ec79a2b01e52c1dbf255161511b2a0c51519a6f57e573e', 'the trend legs changed beyond the owner switch: that is a rule change the owner did not approve');
   assert.equal(sha(eg0), '511e46164b69e41191d05b3e6d5b1b2b655f66b4191e89ec26e5cefe77544ac0', 'the daily engulf changed beyond the owner switch: that is a rule change the owner did not approve');
   assert.ok(!/ownerSh\(/.test(legs0 + eg0), 'apart from those lines neither reads the owner-shadow switch');
