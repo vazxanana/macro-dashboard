@@ -82,10 +82,11 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
 - Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9, 11 and 12 Nov).
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study, Gold carry (cost of holding a gold buy, 12 Nov). QA: Post-merge QA sweeps (9 and 11 Nov).
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-48 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-49 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -2720,6 +2721,29 @@ Before 12 Nov this section described a measurement against a PROPOSED protocol; 
 - Tests: `tests/forward.test.mjs` (10: json bands and interpolation, every stop line, drawdown maths, shadows / replay / other
   systems / pre-start excluded, E1-E5 on fake mirror and account files, carry, digest line, Trader and page wiring),
   `tests/ctrader-reconcile.test.mjs` (the owner-rule reason), `tests/qa-sweep.test.mjs` ("forward card": 3).
+
+## Gold carry: what a gold buy costs to hold, route by route (12 Nov 2026, item 46's "ask what your broker charges")
+`research/edge/gold-carry/` (PREREGISTRATION.md committed first; `run.mjs`, `rates.json`, `basis.json`, RESULT.md, result.json).
+Cost accounting only: **no rule tested** (item 44 holds), no rule, size, filter, stop, config, `FIN` or mirror setting changed.
+The owner's document is `research/proposals/2026-11-12-gold-carry.md` (decision: `docs/owner-decisions.md` item 49, open).
+- Each route is an annual rate charged per `nights` rollover (rate / 365, Wednesday three) on every unit of the supported
+  book's `legs.json`, taken off gross R; the supported-book study's own `positions` / `bookStats` are imported (not edited).
+  Gate: the `demo` route (`FIN.xau.long` x 365 = 5.40 %) reproduces supported-book x1F1 and `none` x1F0 exactly.
+- Untouched 2006-17, S2 (330 positions): demo CFD 5.40 % → +5.16R a year, t 1.86; IC Markets Raw 4.69 % → +5.39, t 1.94;
+  Afterprime 5.72 % → +5.05, t 1.83; Pepperstone UK 7.79 % → +4.37, t 1.60; micro gold futures 2.20 % + $2.12 a round trip
+  and a roll → +5.51, t 1.96 (8.1R of fees, about half the carry saved); GLDM counting the interest its cash would earn
+  3.98 % → +5.62, t 2.02. Break-even: t 2 at a flat 4.1 % a year. Holds: median 4 nights a position (Gold trend 12.5,
+  engulf 2). **Not a new verdict on the book** (the supported-book FAIL stands; a cost picked after seeing it proves nothing).
+- Futures carry measured from council-data `research/probe/cnbc-gc` (the files are `GCZ26`'s own prints, asked as `@GC.1`)
+  against OANDA spot, 198 weekdays of 2026: 3.6 % over the year (lease about 0 to June), 2.2 % over the last 20 days, 3.8 %
+  if the expiry is taken as 1 Dec: the late figure is fragile near expiry.
+- History rows use FRED `DGS2` from the council's `macro/cache.json` (the overnight rate before Aug 2025 and gold's lease
+  rate are not reachable from the build sandbox: FRED, Treasury, NY Fed, CME, broker and issuer hosts are refused); broker,
+  CME and ETF figures are web search summaries, each with source and date, pages not opened. One figure (DLSM, 0.34 %) is
+  below the cash rate and is listed, not relied on.
+- Why the paper cost stays `FIN`: it is what the demo account really pays, and protocol check E4 (item 43) compares the two.
+- To repeat: `node --use-env-proxy research/edge/gold-carry/run.mjs fetch`, then `node research/edge/gold-carry/run.mjs`.
+  Tests: `tests/gold-carry.test.mjs`.
 
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
