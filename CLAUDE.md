@@ -3463,3 +3463,19 @@ worse, gain within noise), trend legs KEEP the raw days (the fold widens their A
   replay from the first quote): a handful of days a year. The forward bands (item 43) and "What to expect" stay on the raw-day
   engulf (within noise of each other). Test: `tests/geg-trading-days.test.mjs` (runs the Trader's own block on the real OANDA
   daily candles of that week, `tests/fixtures/xau-d1-oanda-2026-11.json`, the old block against the new).
+
+## Shadow cut: the engine setups' shadow signals are no longer recorded (12 Nov 2026, owner: "filter the best shadows", "yes apply the cut when it's done")
+`research/edge/shadow-best/` (PREREGISTRATION.md pushed first; `run.mjs` imports shadow-scalp-filters' replay unchanged) tested
+every (setup, market) stream of scalp, intraday, rscalp and rintra (32 cells: six M1 markets x four setups, four coins x
+intraday / rintra) on 2020-26 net of `tradeCost`: keep a stream only when net R a trade > 0 in 2020-23 AND 2024-26, OOS t >= 2
+on calendar-month sums after Holm, OOS n >= 100; placebo of 40 random partitions. **FAIL, 0 of 32 kept** (31 of 32 negative
+out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 keeps). The 11-day forward "best" streams
+(XRP / USD/CHF / BTC scalps) are luck among 55.
+- User rule `shadow-best` → `config.shadowCut = { setups, keep: [], since, study }`; `council/shadow-cut.mjs` `dropShadow`:
+  a NEW signal of those four setups that would be a shadow is not recorded (one line right before `recordOnce`; the
+  management loop never reads it). Live trades are never dropped; open and pending shadows run to their exits with their
+  stops. swing, position, rswing, m30m1 and the systems are untouched. `snapshot.shadowCut.dropped` counts the dropped ones.
+- Effects: the shadow book, the Shadows demo account and the week pane's shadow totals shrink; the 30-day replay
+  (`council/backtest.mjs`) and the Coach's backtest evidence still cover the setups. Off-switch: a user rule setting
+  `c.shadowCut = null`; a stream comes back only through a new pre-registered study. Tests: `tests/shadow-cut.test.mjs`,
+  `tests/shadow-best.test.mjs`.
