@@ -27,7 +27,7 @@ import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
-import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
+import { feedTag, requoteMarket, feedChangeText, feedDecision, countSwitch, switchSummary } from './feed.mjs';
 import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';
@@ -564,14 +564,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // gold/forex: every timeframe from OANDA spot, or (any one missing) every timeframe from Kraken, never a mix
     let feed = 'Kraken';
     if (OANDA_D1.has(key)) {
-      const got = {}; for (const [id] of tfs) { got[id] = await oandaBars(key, id); if (!got[id]) break; }
+      // one feed per market (12 Nov 2026): a timeframe that does not answer is asked once more before the round counts a miss
+      const got = {}; for (const [id] of tfs) { got[id] = await oandaBars(key, id); if (!got[id]) { await sleep(1500); got[id] = await oandaBars(key, id); } if (!got[id]) break; }
       const ok = tfs.every(([id]) => got[id]);
       // hysteresis (8 Nov, council/feed.mjs feedDecision): a market on OANDA skips the round on one missed read instead of flipping
-      // to Kraken and back (two re-quotes); it falls to Kraken only on the second miss in a row. state.feedMiss counts the misses.
-      const FM = (state.feedMiss = state.feedMiss || {}), d = feedDecision({ oandaOk: ok, oandaMarket: true, prevFeed: ((state.feedLast || {})[key] || {}).feed || null, misses: FM[key] || 0 });
-      FM[key] = d.misses;
+      // to Kraken and back (two re-quotes); it falls to Kraken only on the FEED_MISSES-th miss in a row (state.feedMiss), and since
+      // 12 Nov 2026 a market on Kraken goes back to OANDA only after FEED_BACK good reads in a row (state.feedOk): one feed per market.
+      const FM = (state.feedMiss = state.feedMiss || {}), FO = (state.feedOk = state.feedOk || {}), d = feedDecision({ oandaOk: ok, oandaMarket: true, prevFeed: ((state.feedLast || {})[key] || {}).feed || null, misses: FM[key] || 0, oks: FO[key] || 0 });
+      FM[key] = d.misses; FO[key] = d.oks;
       if (d.feed === 'skip') { (snapshot.feed = snapshot.feed || {})[key] = 'OANDA'; snapshot.errors['feed:' + key] = `OANDA not read this round (${d.misses} miss): ${M.label} skipped, feed kept, nothing re-quoted`; continue; }
-      if (ok) { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
+      if (d.feed === 'OANDA') { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
     }
     (snapshot.feed = snapshot.feed || {})[key] = feed;
     const FEED = feedTag(feed);   // 'oanda' | 'kraken': written on every record this round creates
@@ -604,13 +606,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // or cancelled with the reason; open positions keep the fill and have stop / target / trail marks re-based by the basis measured
     // on the switch minute (state.feedLast = the previous round's last closed 1-minute candle, same frame as these bars). Every live
     // record gets its feed tag here; a switch is logged in state.feedChanges and shown in snapshot.errors / snapshot.feedChanges.
-    { const FL = (state.feedLast = state.feedLast || {}), prev = FL[key], dpF = Math.max(2, (M.dec ?? 2) + 1);
-      const q = requoteMarket({ trades, key, feed, src, price, now, dp: dpF, config, prev, oandaMarket: OANDA_D1.has(key) });
+    // One feed per market (12 Nov 2026, owner approved): records priced on the primary feed are HELD (not re-based) while the market
+    // is on its fallback, a record is managed only by its own feed's candles, and an adoption is one logged offset that never
+    // loosens a stop (council/feed.mjs). state.feedLastBy keeps the last minute each feed was read on; state.feedSwitch counts.
+    { const FL = (state.feedLast = state.feedLast || {}), prev = FL[key], dpF = Math.max(2, (M.dec ?? 2) + 1), FLB = (state.feedLastBy = state.feedLastBy || {});
+      const q = requoteMarket({ trades, key, feed, src, price, now, dp: dpF, config, prev, prevBy: FLB[key] || null, oandaMarket: OANDA_D1.has(key) });
+      if (prev && prev.feed !== FEED) { const FS = (state.feedSwitch = state.feedSwitch || {}); FS[key] = countSwitch(FS[key], now); }
+      if (q.held) (snapshot.feedHeld = snapshot.feedHeld || {})[key] = { on: FEED, held: q.held, ids: q.heldIds.slice(0, 20) };
       if (q.from || (prev && prev.feed !== FEED)) {
-        const c = { at: nowISO, market: key, label: M.label, from: q.from || prev.feed, to: FEED, basis: q.basis, rederived: q.rederived, cancelled: q.cancelled, rebased: q.rebased, kept: q.kept, ids: q.ids.slice(0, 20) };
+        const c = { at: nowISO, market: key, label: M.label, from: q.from || prev.feed, to: FEED, basis: q.basis, rederived: q.rederived, cancelled: q.cancelled, rebased: q.rebased, kept: q.kept, held: q.held, ids: q.ids.concat(q.heldIds).slice(0, 20) };
         state.feedChanges = (state.feedChanges || []).concat([c]).slice(-50); snapshot.errors['feed:' + key] = feedChangeText(c);
       }
-      const lc = src['1m'].bars.at(-2) || src['1m'].bars.at(-1); FL[key] = { feed: FEED, t: lc.time, close: lc.close }; }
+      const lc = src['1m'].bars.at(-2) || src['1m'].bars.at(-1); FL[key] = { feed: FEED, t: lc.time, close: lc.close }; (FLB[key] = FLB[key] || {})[FEED] = { t: lc.time, close: lc.close }; }
     setMarket(M);
     const setups = BUILDERS.map(([pr, fn]) => { try { return fn(pr, price, src); } catch (e) { return null; } }).filter(Boolean);
     snapshot.markets[key] = {
@@ -619,12 +626,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && (!x.feed || x.feed === FEED) && !x.shadow && !['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry - (tr.feedBasis || 0))) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
     // ─── Manage open trades on this market with the candles since the last check ───
     for (const tr of trades.filter((x) => x.market === key && (x.status === 'pending' || x.status === 'open'))) {
+      if (tr.feed && tr.feed !== FEED) continue;   // held (12 Nov 2026): priced on the other feed, never filled or stopped by these candles
       const bars = (src['1m'].bars[0].time <= tr.checked ? src['1m'] : src['5m'].bars[0].time <= tr.checked ? src['5m'] : src['15m']).bars;
       const s = tr.side === 'sell', E = tr.entry + (tr.feedBasis || 0);   // E: the entry in this feed's frame (council/feed.mjs)
       let exitBar = null, next = bars.at(-1).time;
@@ -1272,6 +1280,8 @@ for (const [sig, t] of Object.entries(state.seen)) if (now - t > 30 * 86400) del
 trades = trades.slice(-3000);
 state.lastRun = now;
 snapshot.feedChanges = (state.feedChanges || []).filter((c) => now - Date.parse(c.at) / 1000 < 7 * 86400);
+// feed switches per market (12 Nov 2026): how often a market changed feed, so the effect of one feed per market is visible
+snapshot.feedSwitches = Object.fromEntries(Object.entries(state.feedSwitch || {}).map(([k, r]) => [k, switchSummary(r, now)]));
 
 // ─── Daily statistical Coach: small, bounded rule changes from the results ───
 // ─── Self-evolution: learn condition filters (D1 / structure / session) from the trades that lose.

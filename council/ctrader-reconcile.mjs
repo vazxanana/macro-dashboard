@@ -90,7 +90,9 @@ export function reconcile(dir) {
     } else {
       // distances from the fill until the council moves a level (or for a limit copy: absolute levels from the start)
       const rel = m.levelsFrom === 'mark' && m.mark != null && m.fillPrice != null && !m.amended && !m.viaLimit && !m.stopSetBy, moved = Math.abs((+t.stop) - (+m.stop)) > tol;
-      const wantSL = rel ? m.fillPrice + (m.stop - m.mark) : moved ? null : +t.stop, wantTP = t.t1 == null || t.rr >= 50 ? null : rel ? m.fillPrice + (m.t1 - m.mark) : +t.t1, tolR = Math.max(tol * 3, (openRisk(t) || Math.abs(t.entry - t.stop)) * 0.03);
+      // a feed adoption moved the council's numbers but not the broker's (one feed per market, 12 Nov 2026): m.brokerShift
+      const bsh = m.brokerShift || { stop: 0, t1: 0 };
+      const wantSL = rel ? m.fillPrice + (m.stop - bsh.stop - m.mark) : moved ? null : +t.stop - bsh.stop, wantTP = t.t1 == null || t.rr >= 50 ? null : rel ? m.fillPrice + (m.t1 - bsh.t1 - m.mark) : +t.t1 - bsh.t1, tolR = Math.max(tol * 3, (openRisk(t) || Math.abs(t.entry - t.stop)) * 0.03);
       row.basis = rel ? +(m.fillPrice - m.mark).toFixed(m.digits ?? 2) : null;
       if (moved) row.note = `the council moved its stop ${m.stop} -> ${t.stop}; the mirror follows on its next round`;
       else if (!near(bp.sl, wantSL, tolR)) row.issues.push(`stop ${bp.sl}, expected ${(+wantSL).toFixed(m.digits ?? 2)} (${rel ? 'the council\'s distance from the fill' : 'the council\'s level'})`);

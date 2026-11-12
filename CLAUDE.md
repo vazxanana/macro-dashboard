@@ -78,7 +78,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
-- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
+- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, One feed per market (12 Nov), Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
@@ -3385,6 +3385,39 @@ live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`test
   take a day past its budget by that one call's difference; two INSTANCES writing `cost.json` at the same moment can still
   lose a reservation (the store's documented limit; the cron runs every 10 min with a 120 s limit); `ACADEMY_LLM_STOP=1` does
   not stop this feature (`llmEnv` replaces it; only `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` do).
+
+## One feed per market (12 Nov 2026, plumbing fix, owner approved)
+council-data 9-12 Nov: the Trader's gold / forex candle feed flipped OANDA -> Kraken -> OANDA for a few minutes at a time (189
+switch events in the trade notes: gold 43, AUD/USD 35, USD/CAD 35, EUR/USD 31, GBP/USD 25, USD/CHF 20; 112 on 12 Nov alone; gold's 21
+Kraken episodes lasted 3 minutes in the median, 24 at most). The 8 Nov hysteresis (`feedDecision`) fell to Kraken on the 2nd
+missed read and went back on the 1st good one, and every switch re-based every open position's stop / target / 2R mark by a
+one-minute basis between two feeds (`requoteMarket`): 914 re-base notes on 107 trades, 435 of them loosening the stop, 38 shadow
+orders cancelled and 19 re-quotes; the 12 Nov Gold daily engulf took 18 re-bases (stop ended 3893.955 against the rule's 3895.27,
+$1.32 looser) and its demo copy 18 amends; the H4 trendline's stop ended 4053.235 against 4054.72 while its broker stop sat at
+4055.22. 100 demo copies of re-based trades took 727 amends. No stored trade was rewritten for this (20 open shadow records still
+carry their old `feedBasis`). Now (`council/feed.mjs`, `council/trader.mjs`, `council/ctrader-mirror.mjs`):
+- **Hysteresis both ways**: `FEED_MISSES` 3 missed reads in a row before a market leaves OANDA (the rounds in between skip the
+  market, as before), `FEED_BACK` 3 good reads in a row before it returns (`state.feedOk`); a timeframe that does not answer is
+  asked once more (1.5 s) before the round counts a miss. First round and crypto unchanged.
+- **A record is managed only by its own feed's candles**: the manage loop skips `tr.feed !== FEED` (one line at its top; the
+  lifted-loop tests in `fills-live`, `supported-book` and `one-feed` run it); retire-legacy too.
+- **Held, not re-based**: while a market is on its fallback, records priced on the primary are HELD (`feedHeld`, one note per
+  episode, `snapshot.feedHeld`): never filled, stopped, re-quoted, cancelled or re-based by the fallback; `checked` stays, so on the
+  return the gap is read from OANDA itself.
+- **Adoption = ONE offset that never loosens a stop**: a record priced on the fallback is adopted when the primary returns, and a
+  primary record held over `ADOPT_AFTER_S` (6 h) is adopted by the fallback. The basis is measured on the record's OWN feed's last
+  minute (`state.feedLastBy[key][feed]`), targets / 2R mark move by it, the stop (and `midStop`) only when that tightens it
+  (`shiftStop`); logged in `feedMoves` and the note; `feedAdj { stop, t1 }` sums what offsets did. Pending orders: re-derived (geg)
+  or cancelled on adoption only, as before.
+- **Mirror**: `feedOnlyMove(t, m, tick)` = the council's levels differ from the copy's only by `feedAdj` since the copy: the copy
+  takes the new numbers, `m.brokerShift` records the gap, nothing is sent to the broker. A real move (break-even, trail) is sent as
+  before and clears the shift; `ctrader-reconcile.mjs` reads `brokerShift`.
+- **Visible**: `state.feedSwitch` → `snapshot.feedSwitches[market] = { n, since, last24h, last7d, lastAt }` (`countSwitch`,
+  `switchSummary`); `snapshot.feedChanges` keeps the per-switch log, now with `held`.
+- Not changed, said: a gold trend daily ratchet or a geg zone cancel can still read the fallback's daily candle during an episode
+  (both sha256-pinned blocks; a ratchet only tightens); the open shadow records' past re-bases stay; why the proxy misses reads
+  (rate limit, a slow timeframe) was not traced, only absorbed. Tests: `tests/one-feed.test.mjs` (6), `tests/feed-hysteresis.test.mjs`,
+  `tests/feed-requote.test.mjs`, `tests/ctrader-mirror.test.mjs` ("one feed").
 
 ## Gold daily engulf reads trading days (12 Nov 2026, owner approved fidelity fix, docs/owner-decisions.md item 52)
 On 10 Nov 2026 the engulf (`geg`) took its zone from OANDA's Sunday 8 Nov daily candle, the ~2-hour stub between the 22:00 UTC
