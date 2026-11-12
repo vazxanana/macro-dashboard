@@ -2252,9 +2252,13 @@
   "xrp|scalp|1794317400|1794486180": 1794486256,
   "usdcad|rintra|1794171600|1794480000": 1794486256,
   "xau|scalp|1794441600|1794486420": 1794486476,
-  "xau|m30m1|1794441600|1794486420": 1794486476
+  "xau|m30m1|1794441600|1794486420": 1794486476,
+  "gbpusd|intraday|1794445200|1794486300": 1794486790,
+  "gbpusd|scalp|1794447000|1794486060": 1794486790,
+  "audusd|intraday|1794348000|1794486300": 1794486790,
+  "audusd|scalp|1794450600|1794486540": 1794486790
  },
- "lastRun": 1794486629,
+ "lastRun": 1794486790,
  "news": {
   "at": 1794481066,
   "data": [
@@ -2296,9 +2300,13 @@
     [
      1794486012,
      11.1
+    ],
+    [
+     1794486790,
+     10.78
     ]
    ],
-   "off": 11.1
+   "off": 10.94
   }
  },
  "goldMP": {
@@ -2306,111 +2314,57 @@
  },
  "feedLast": {
   "xau": {
-   "feed": "oanda",
-   "t": 1794486360,
-   "close": 3944.335
+   "feed": "kraken",
+   "t": 1794486720,
+   "close": 3941.44
   },
   "btc": {
    "feed": "kraken",
-   "t": 1794486540,
-   "close": 72729.2
+   "t": 1794486720,
+   "close": 72863.3
   },
   "eth": {
    "feed": "kraken",
-   "t": 1794486540,
-   "close": 2017.83
+   "t": 1794486720,
+   "close": 2021.49
   },
   "sol": {
    "feed": "kraken",
-   "t": 1794486540,
-   "close": 82.05
+   "t": 1794486720,
+   "close": 82.14
   },
   "xrp": {
    "feed": "kraken",
-   "t": 1794486600,
-   "close": 1.03427
+   "t": 1794486720,
+   "close": 1.03588
   },
   "eurusd": {
    "feed": "oanda",
-   "t": 1794486420,
-   "close": 1.10876
+   "t": 1794486720,
+   "close": 1.10848
   },
   "gbpusd": {
-   "feed": "oanda",
-   "t": 1794486420,
-   "close": 1.3264
+   "feed": "kraken",
+   "t": 1794486780,
+   "close": 1.32603
   },
   "audusd": {
-   "feed": "oanda",
-   "t": 1794486420,
-   "close": 0.68262
+   "feed": "kraken",
+   "t": 1794486780,
+   "close": 0.6825
   },
   "usdcad": {
    "feed": "oanda",
-   "t": 1794486420,
-   "close": 1.42474
+   "t": 1794486780,
+   "close": 1.42492
   },
   "usdchf": {
    "feed": "oanda",
-   "t": 1794486600,
-   "close": 0.83257
+   "t": 1794486780,
+   "close": 0.83264
   }
  },
  "feedChanges": [
-  {
-   "at": "2026-11-12T08:57:47.000Z",
-   "market": "xau",
-   "label": "XAU/USD",
-   "from": "oanda",
-   "to": "kraken",
-   "basis": 1.76,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 3,
-   "kept": 0,
-   "ids": [
-    "xau-position-1793783465",
-    "xau-geg-1793664000",
-    "xau-scalp-1794471647"
-   ]
-  },
-  {
-   "at": "2026-11-12T08:57:47.000Z",
-   "market": "audusd",
-   "label": "AUD/USD",
-   "from": "oanda",
-   "to": "kraken",
-   "basis": 0.00022,
-   "rederived": 0,
-   "cancelled": 1,
-   "rebased": 4,
-   "kept": 0,
-   "ids": [
-    "audusd-position-1793601653",
-    "audusd-swing-1794333208",
-    "audusd-intraday-1794461258",
-    "audusd-scalp-1794472705",
-    "audusd-intraday-1794473600"
-   ]
-  },
-  {
-   "at": "2026-11-12T09:01:06.000Z",
-   "market": "audusd",
-   "label": "AUD/USD",
-   "from": "kraken",
-   "to": "oanda",
-   "basis": -0.00024,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 4,
-   "kept": 0,
-   "ids": [
-    "audusd-position-1793601653",
-    "audusd-swing-1794333208",
-    "audusd-intraday-1794461258",
-    "audusd-scalp-1794472705"
-   ]
-  },
   {
    "at": "2026-11-12T09:01:06.000Z",
    "market": "usdcad",
@@ -3294,14 +3248,76 @@
     "usdchf-rintra-1794478719",
     "usdchf-rscalp-1794483451"
    ]
+  },
+  {
+   "at": "2026-11-12T12:33:10.000Z",
+   "market": "xau",
+   "label": "XAU/USD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": 0.885,
+   "rederived": 0,
+   "cancelled": 1,
+   "rebased": 5,
+   "kept": 0,
+   "ids": [
+    "xau-position-1793783465",
+    "xau-geg-1793664000",
+    "xau-gmp-1794470400",
+    "xau-rscalp-1794480911",
+    "xau-m30m1-1794483321",
+    "xau-scalp-1794486476"
+   ]
+  },
+  {
+   "at": "2026-11-12T12:33:10.000Z",
+   "market": "gbpusd",
+   "label": "GBP/USD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": -0.00021,
+   "rederived": 0,
+   "cancelled": 0,
+   "rebased": 8,
+   "kept": 0,
+   "ids": [
+    "gbpusd-position-1794325881",
+    "gbpusd-position-1794396738",
+    "gbpusd-intraday-1794397356",
+    "gbpusd-scalp-1794417165",
+    "gbpusd-position-1794471647",
+    "gbpusd-swing-1794471647",
+    "gbpusd-intraday-1794482833",
+    "gbpusd-scalp-1794482833"
+   ]
+  },
+  {
+   "at": "2026-11-12T12:33:10.000Z",
+   "market": "audusd",
+   "label": "AUD/USD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": 0.00018,
+   "rederived": 0,
+   "cancelled": 1,
+   "rebased": 5,
+   "kept": 0,
+   "ids": [
+    "audusd-position-1793601653",
+    "audusd-swing-1794333208",
+    "audusd-intraday-1794461258",
+    "audusd-rintra-1794474883",
+    "audusd-rintra-1794478545",
+    "audusd-scalp-1794480911"
+   ]
   }
  ],
  "feedMiss": {
-  "xau": 1,
-  "eurusd": 1,
-  "gbpusd": 1,
-  "audusd": 1,
-  "usdcad": 1,
+  "xau": 2,
+  "eurusd": 0,
+  "gbpusd": 2,
+  "audusd": 2,
+  "usdcad": 0,
   "usdchf": 0
  }
 }
