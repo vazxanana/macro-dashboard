@@ -750,7 +750,7 @@ test('simple phone view 2: Charts puts the rarely used rows behind "More", and a
   for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
   assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
   // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
-  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips\) \{ display: none !important; \}/);
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips, \.cycle\) \{ display: none !important; \}/);
   assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
   // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
   assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
@@ -831,4 +831,51 @@ test('forward card: every text at least 12 px and every colour a theme token (no
 test('forward card: an older coach.json with no forward field reads correctly, and the card fetches nothing', () => {
   assert.match(FW_JS, /No reading yet: the first one comes with the next Coach rebuild \(every 6 hours\)\./);
   assert.doesNotMatch(FW_JS, /fetch\(|msData/, 'reads the copy the page already loaded');
+});
+
+// ── Post-merge QA sweep (12 Nov 2026, the ~20 PRs merged since 11 Nov 21:00 UTC): one check per fix ──
+const Q12 = src('market-structure.html');
+const Q12_CSS = styles(Q12);
+
+test('QA 12 Nov: on a phone the market-cycle strip waits behind "More" with the markup it reads (it pushed the chart 135 px down, 3.6 s after load)', () => {
+  const rule = /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(([^)]*)\) \{ display: none !important; \}/.exec(Q12_CSS);
+  assert.ok(rule, 'the "More" rule of the Charts simple view');
+  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.pa-chips', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
+  assert.match(Q12, /<div class="cycle" id="ms-cycle"/, 'the strip is still the .cycle child of the charts toolbar');
+  assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context and the market cycle"/);
+  assert.match(src('scripts/audit/smoke.cjs'), /the market-cycle strip is not behind "More"/);
+});
+
+test('QA 12 Nov: the Mosha cycle (a live main paper system) says where it stands in "Which systems trade live", not inside the Gold replica card (a paper shadow, folded on phones)', () => {
+  const book = Q12.slice(Q12.indexOf('id="ms-sys-book"'), Q12.indexOf('id="ms-fwd"'));
+  assert.match(book, /<p class="ms-note" id="ms-rep-mcycle"><\/p>/);
+  const rep = Q12.slice(Q12.indexOf('Gold replica · paper shadow since 11 Nov'), Q12.indexOf('id="ms-rep-kpi"'));
+  assert.doesNotMatch(rep, /ms-rep-mcycle/);
+  assert.equal((Q12.match(/id="ms-rep-mcycle"/g) || []).length, 1);
+});
+
+test('QA 12 Nov: card headings and texts say which systems are live as the Systems card does (crypto trend is a shadow since 7 Nov; the analyst studies live trades, no longer "the seven edges")', () => {
+  assert.match(Q12, /Pairs · crypto trend \(paper shadow since 7 Nov\) · forex research only/);
+  assert.doesNotMatch(Q12, /crypto trend \(live paper\)/);
+  const ea = Q12.slice(Q12.indexOf('id="ms-ea"'), Q12.indexOf('id="ms-ea-sum"'));
+  assert.doesNotMatch(ea, /seven edges/);
+  assert.match(ea, /When a live trade of one of our systems opens \(a paper shadow is not studied\)/);
+});
+
+test('QA 12 Nov: the analyst card asks its API only for the roles it answers (owner, reviewers): a viewer made a refused call every 5 minutes', () => {
+  const js = /<script id="ms-ea-js">([\s\S]*?)<\/script>/.exec(Q12)[1];
+  assert.match(js, /dataset\.role === 'public' \|\| document\.documentElement\.dataset\.role === 'viewer'\) return;[^\n]*\n\s*load\(\);/);
+});
+
+test('QA 12 Nov: the browser Trader saves no journal entry and shows no "It\'s in your journal" toast to a member without the Journal (viewers; Luxus landed on the Mosha desk with "Trader saved Retrace buy")', () => {
+  const body = Q12.slice(Q12.indexOf('function autoTrade(list, price) {'), Q12.indexOf("jAdd(tr, 'Auto paper trade · browser Trader')"));
+  assert.match(body, /if \(\/\(\^\|\\s\)journal\(\\s\|\$\)\/\.test\(document\.documentElement\.dataset\.deny \|\| ''\)\) return;/);
+  // the gate it reads: the viewer defaults deny the journal (msPerms)
+  assert.match(Q12, /viewer: \{[^}]*journal: false/);
+});
+
+test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on the light panel was 1.8:1)', () => {
+  assert.match(Q12_CSS, /:root\[data-theme="light"\] \.ms-toast b \{ color: var\(--gold-ink\) !important; \}/);
+  const light = /:root\[data-theme="light"\] \{ --buy-ink:[^}]*\}/.exec(Q12_CSS)[0];
+  assert.ok(ratio(tok(light, 'gold-ink'), '#ffffff') >= 4.5);
 });

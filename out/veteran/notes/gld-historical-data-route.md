@@ -49,7 +49,7 @@ A daily GLD closing-price endpoint could, if permitted for the intended use and 
 
 The [issuer terms](https://www.spdrgoldshares.com/terms-and-conditions/) permit saving/display/printing **“only for your personal, non-commercial use”**. Separate clauses restrict **“create derivative works from”** the information and **“commercial or money-making purpose”** without consent. The workbook bars reproduction/redistribution without prior consent. Those restrictions are distinct: the redistribution bar alone does not establish that private personal analysis is forbidden, but no blanket trading-study permission was found. Verify the intended use; this is not a legal conclusion.
 
-A separate LBMA-specific clause limits supplied benchmark information to internal review of WGTS analysis and prohibits disclosure. Do not transfer that narrower clause automatically to non-LBMA share-price/NAV fields, which remain subject to the general terms. Public download availability is not an open-data licence. Keep raw data out of the Claude package.
+A separate LBMA-specific clause limits supplied benchmark information to internal review of WGTS analysis and prohibits disclosure. Do not transfer that narrower clause automatically to non-LBMA share-price/NAV fields, which remain subject to the general terms. Public download availability is not an open-data licence. Keep raw data out of the assistant package.
 
 ## Decision for the parent study
 

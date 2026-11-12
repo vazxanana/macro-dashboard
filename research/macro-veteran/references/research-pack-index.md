@@ -2,7 +2,7 @@
 
 **Purpose:** Navigate the macro, gold, market-flow, issuer-fundamental, and cTrader demo-research material in this folder. This index is a map, not a substitute for checking the current primary source.
 
-**Reference update:** The [8 November quality audit and Claude correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
+**Reference update:** The [8 November quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
 
 **Latest increment:** [9 November findings, validation and unfinished work](latest-research-batch-status-2026-11-09.md) adds the 36-release CPI first-print ledger, direct release-integrity evidence, the frozen daily Treasury comparison and a separately defined NBU accounting-gold route. The [8 November batch status](latest-research-batch-status-2026-11-08.md) remains the dated state accompanying the unchanged V1.2 delivery.
 
@@ -100,7 +100,7 @@
 - [Market Expectations Capture Playbook](market-expectations-capture-playbook.md): point-in-time Fed rate pricing, breakevens, surveys, and event-expectation capture without conflating market prices and objective probabilities.
 - [Source Gap Audit Template](source-gap-audit-template.md): structured intake, overlap and independence check, official-source evidence matrix, vintage/access/revision controls, interpretation hazards and final registry/index audit for proposed datasets.
 - [GDP revision and composition case](gdp-revision-and-composition-case-2023-q3.md): three archived releases, explicit missing GDI, 45 reported/calculated records, source hashes, revision chains and annualization arithmetic; no retrospective claim of a forecast track record.
-- [Quality audit and Claude correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
+- [Quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
 
 ### Macro, markets, and positioning
 

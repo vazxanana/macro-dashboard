@@ -26,7 +26,8 @@ test('one row per live Meridian system: gate, chain stage, what each waits for, 
   assert.match(s, /\| Gold daily engulf \| live \| daily close 4085\.95 above the 20-day average 4047\.51; zone 3895\.57-3971\.36; resting buy at 3971\.36 \| 1 pending \|/);
   assert.match(s, /\| Gold momentum pullback \| live \| D1 up; no pullback zone watched · paper test \| nothing on \|/);
   assert.match(s, /\| NQ New York open run \| live \(paper, research\.json\) \| last session 2026-11-07: buy loss −1\.00R; next at the 09:30 New York open \| — \|/);
-  assert.equal(s.split('\n').filter((l) => l.startsWith('| ')).length, 9, 'header + 8 systems');
+  assert.match(s, /\| Mosha cycle \| off \| — \| nothing on \|/);   // 12 Nov 2026: the Mosha cycle got its row (off in this 8 Nov config)
+  assert.equal(s.split('\n').filter((l) => l.startsWith('| ')).length, 10, 'header + 9 systems');
 });
 test('off systems and a snapshot without state blocks still render; no snapshot renders nothing', () => {
   const s = goldSystemsSection({ snapshot: { goldVol: 2.9, goldVolMin: 1.5 }, config: { replicaLive: ['xau'] }, now });

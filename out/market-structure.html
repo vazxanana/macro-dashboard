@@ -932,6 +932,7 @@
   .loss-g[open] > summary::before { transform: rotate(45deg); }                                             /* 43 */
   .ms-toast { background: var(--panel-raised) !important; color: var(--ink) !important; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; padding: 12px 14px !important; box-shadow: var(--sh-2) !important; font-size: 13px !important; animation: toastIn .22s cubic-bezier(.16,1,.3,1); }
   .ms-toast b { text-transform: none !important; letter-spacing: 0 !important; color: var(--gold) !important; font-size: 12.5px !important; }   /* 45, 68 */
+  :root[data-theme="light"] .ms-toast b { color: var(--gold-ink) !important; }   /* the brand gold as text on the light panel was 1.8:1 (QA 12 Nov) */
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
   .tv::backdrop { background: rgba(4,6,10,.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }   /* 46 */
   .tv[open] { animation: dlgIn .22s cubic-bezier(.16,1,.3,1); }                                              /* 67 */
@@ -4902,7 +4903,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips) { display: none !important; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
@@ -5314,7 +5315,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
             <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
-      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context">More</button>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -5397,6 +5398,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="card adm" id="ms-sys-book">
         <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
         <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle (not a tested edge: no study to measure it against, so it has no row in the decay and expectation cards). <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
+        <p class="ms-note" id="ms-rep-mcycle"></p>
         <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
       </div>
       <div class="card c-fwd adm" id="ms-fwd">
@@ -5433,7 +5435,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </details>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note" id="ms-rep-w1"></p>
-        <p class="ms-note" id="ms-rep-mosha"></p><p class="ms-note" id="ms-rep-mcycle"></p>
+        <p class="ms-note" id="ms-rep-mosha"></p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
         <p class="ms-note" id="ms-rep-track-txt"></p>
@@ -5441,7 +5443,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-pairs adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (paper shadow since 7 Nov) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
           <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
@@ -5465,7 +5467,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
       <div class="card adm" id="ms-ea">
                 <div class="ms-k" role="heading" aria-level="2">AI second opinion · each entry, judged blind</div>
-        <p class="ms-note">When a live trade of the seven edges opens, a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
+        <p class="ms-note">When a live trade of one of our systems opens (a paper shadow is not studied), a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
         <div class="ea-sum" id="ms-ea-sum">Loading…</div>
         <div class="ea-wrap"><table class="ea-tb" id="ms-ea-list" hidden><thead><tr><th>Entry (UTC)</th><th>System</th><th>Trade</th><th>AI said</th><th>Result</th></tr></thead><tbody></tbody></table></div>
       </div>
@@ -8914,6 +8916,7 @@ function msNextSetup(bars, A) {
   const marketClosed = () => { if (INST.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };   // incl. the first hour after the Sunday reopen
   function autoTrade(list, price) {
     if (!JEL || PUB || marketClosed()) return;   // never for a guest: no journal to save to, and the toast named a setup
+    if (/(^|\s)journal(\s|$)/.test(document.documentElement.dataset.deny || '')) return;   // nor for a member who cannot open the Journal (viewers): the toast said "It's in your journal" (QA 12 Nov)
     const now = Date.now() / 1000; let added = 0;
     for (const t of list) {
       const id = `${instKey}|${t.sig}`;
@@ -14053,7 +14056,7 @@ function gpStats(T) {
       return r.json();
     }).then(function (j) { if (j) render(j); }).catch(function () { sum.textContent = 'Could not be loaded: no connection.'; });
   }
-  if (document.documentElement.dataset.role === 'public') return;
+  if (document.documentElement.dataset.role === 'public' || document.documentElement.dataset.role === 'viewer') return;   // the API answers the owner and reviewers only
   load(); setInterval(function () { if (!document.hidden) load(); }, 5 * 60e3);
 })();
 </script>
