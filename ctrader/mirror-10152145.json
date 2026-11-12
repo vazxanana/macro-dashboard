@@ -8429,8 +8429,8 @@
     "setup": "rintra",
     "openedAt": "2026-11-11T18:24:10.000Z",
     "councilEntry": 0.83334,
-    "stop": 0.83407,
-    "t1": 0.829485,
+    "stop": 0.83464,
+    "t1": 0.830055,
     "adopted": false,
     "alerted": [
      "open",
@@ -8450,8 +8450,8 @@
     "volume": 300000,
     "status": "open",
     "rr": 7.82,
-    "amended": 8,
-    "amendedAt": "2026-11-12T10:12:46.000Z"
+    "amended": 9,
+    "amendedAt": "2026-11-12T12:03:06.000Z"
    },
    "xau-scalp-1794423257": {
     "positionId": "48528746",
@@ -10442,11 +10442,12 @@
     "setup": "rintra",
     "openedAt": "2026-11-12T10:24:42.000Z",
     "councilEntry": 0.83152,
-    "stop": 0.83244,
-    "t1": 0.829275,
+    "stop": 0.83301,
+    "t1": 0.829845,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "viaLimit": true,
     "limitPrice": 0.83152,
@@ -10460,7 +10461,10 @@
     "lagSec": 363,
     "positionId": "48743719",
     "volume": 100000,
-    "status": "open"
+    "status": "open",
+    "rr": 2.44,
+    "amended": 1,
+    "amendedAt": "2026-11-12T12:03:06.000Z"
    },
    "usdchf-scalp-1794478719": {
     "symbol": "USDCHF",
@@ -10468,11 +10472,12 @@
     "setup": "scalp",
     "openedAt": "2026-11-12T10:27:11.000Z",
     "councilEntry": 0.83154,
-    "stop": 0.83244,
-    "t1": 0.8297399999999999,
+    "stop": 0.83301,
+    "t1": 0.83031,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "viaLimit": true,
     "limitPrice": 0.83154,
@@ -10486,7 +10491,10 @@
     "lagSec": 512,
     "positionId": "48743718",
     "volume": 100000,
-    "status": "open"
+    "status": "open",
+    "rr": 2,
+    "amended": 1,
+    "amendedAt": "2026-11-12T12:03:06.000Z"
    },
    "usdcad-rintra-1794479019": {
     "symbol": "USDCAD",
@@ -10751,12 +10759,17 @@
    "eurusd-scalp-1794483451": {
     "why": "40 mirror positions already open",
     "n": 0,
-    "at": "2026-11-12T12:01:37.000Z"
+    "at": "2026-11-12T12:03:06.000Z"
    },
    "usdchf-rscalp-1794483451": {
     "why": "40 mirror positions already open",
     "n": 0,
-    "at": "2026-11-12T12:01:37.000Z"
+    "at": "2026-11-12T12:03:06.000Z"
+   },
+   "usdcad-scalp-1794484916": {
+    "why": "40 mirror positions already open",
+    "n": 0,
+    "at": "2026-11-12T12:03:06.000Z"
    }
   },
   "paused": {},
@@ -10807,29 +10820,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9834.74,
-  "lastRun": "2026-11-12T12:01:37.000Z"
+  "lastRun": "2026-11-12T12:03:06.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T08:22:30.000Z",
-   "msg": "moved XAUUSD 48604390 protection: stop 4001.061392857143 -> 4002.111, target 3940.112214285714 -> 3941.162 (council m30m1)",
-   "trade": "xau-m30m1-1794448238"
-  },
-  {
-   "at": "2026-11-12T08:22:30.000Z",
-   "msg": "opened sell XAUUSD 0.01 lot (council scalp)",
-   "trade": "xau-scalp-1794471647"
-  },
-  {
-   "at": "2026-11-12T08:22:30.000Z",
-   "msg": "opened sell GBPUSD 0.01 lot (council position)",
-   "trade": "gbpusd-position-1794471647"
-  },
-  {
-   "at": "2026-11-12T08:22:30.000Z",
-   "msg": "opened sell GBPUSD 0.01 lot (council swing)",
-   "trade": "gbpusd-swing-1794471647"
-  },
   {
    "at": "2026-11-12T08:25:38.000Z",
    "msg": "moved AUDUSD 48181010 protection: stop 0.6932307 -> 0.6935607, target 0.6696486 -> 0.6699786 (council swing)",
@@ -12309,6 +12302,26 @@
    "at": "2026-11-12T11:38:43.000Z",
    "msg": "limit filled at once: XAUUSD position 48759267 at the broker at 3947.37",
    "trade": "xau-m30m1-1794483321"
+  },
+  {
+   "at": "2026-11-12T12:03:06.000Z",
+   "msg": "moved USDCHF 48520033 protection: stop 0.83407 -> 0.83464, target 0.829485 -> 0.830055 (council rintra)",
+   "trade": "usdchf-rintra-1794420863"
+  },
+  {
+   "at": "2026-11-12T12:03:06.000Z",
+   "msg": "moved USDCHF 48743719 protection: stop 0.83244 -> 0.83301, target 0.829275 -> 0.829845 (council rintra)",
+   "trade": "usdchf-rintra-1794478719"
+  },
+  {
+   "at": "2026-11-12T12:03:06.000Z",
+   "msg": "moved USDCHF 48743718 protection: stop 0.83244 -> 0.83301, target 0.8297399999999999 -> 0.83031 (council scalp)",
+   "trade": "usdchf-scalp-1794478719"
+  },
+  {
+   "at": "2026-11-12T12:03:06.000Z",
+   "msg": "not mirrored yet usdcad-scalp-1794484916: 40 mirror positions already open (will retry)",
+   "trade": "usdcad-scalp-1794484916"
   }
  ],
  "limits": {
