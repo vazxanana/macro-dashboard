@@ -2919,6 +2919,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-cycle" data-show="cycle" checked><i style="background:#a64dc9;height:2px"></i>Market cycle</label>
+            <label><input type="checkbox" id="ms-show-zones" data-show="zones" checked><i style="background:rgba(41,98,255,.28);border:1px dashed #2962ff"></i>Fresh entry zones (OB after BO / iBO)</label>
             <label><input type="checkbox" id="ms-show-mosha" data-show="mosha" checked><i style="background:#ff9800;height:2px"></i>Mosha storyline (VR, CF, barriers)</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed labels</label></div>
             <div class="tog-g"><div class="tog-h">Council</div>
@@ -4010,6 +4011,28 @@ function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; whi
 // broken yet is an internal break: every one an iBO with its direction (structure = it went against the previous internal break).
 // Closed candles only (closedN); a swing is used only once it is confirmed, and each swing is broken once.
 const MS_IPIV = 6;
+// Fresh entry zones (12 Nov 2026, owner: "after iBOs and BO mark zone for entry, barrier / EG unmitigated, fresh supply or demand
+// OB"): for every break (major BO and iBO), the order block it came from = the last candle against the break at or before the
+// leg's origin (the lowest low before a break up: the last red candle there; the highest high before a break down: the last green
+// one; else the origin candle), drawn wick to wick and out to the origin's extreme (the EG / barrier zone). It is FRESH while no closed candle after the break has traded back into it; the first touch
+// mitigates it and it is no longer drawn. A close through its far side breaks it. Display only, not a tested rule.
+// breaks: [{ dir, fromIdx, breakIdx, kind }]; returns zones oldest first: { dir, lo, hi, i, breakIdx, kind, fresh, touchIdx, brokenIdx }
+function msZones(bars, breaks, closedN) {
+  const n = Math.min(closedN == null ? bars.length : closedN, bars.length), out = [], seen = new Set();
+  for (const e of breaks || []) {
+    if (!(e.breakIdx < n) || !(e.fromIdx >= 0) || e.fromIdx >= e.breakIdx) continue;
+    const up = e.dir > 0; let oi = e.fromIdx;
+    for (let j = e.fromIdx; j < e.breakIdx; j++) if (up ? bars[j].low < bars[oi].low : bars[j].high > bars[oi].high) oi = j;
+    let zi = oi; for (let j = oi; j >= e.fromIdx; j--) { const b = bars[j]; if (up ? b.close < b.open : b.close > b.open) { zi = j; break; } }
+    if (seen.has(zi)) continue; seen.add(zi);
+    const z = { dir: e.dir, lo: Math.min(bars[zi].low, up ? bars[oi].low : Infinity), hi: Math.max(bars[zi].high, up ? -Infinity : bars[oi].high), i: zi, breakIdx: e.breakIdx, kind: e.kind || 'bo', fresh: true, touchIdx: null, brokenIdx: null };
+    for (let k = e.breakIdx + 1; k < n; k++) { const b = bars[k];
+      if (z.touchIdx == null && (up ? b.low <= z.hi : b.high >= z.lo)) { z.touchIdx = k; z.fresh = false; }
+      if (up ? b.close < z.lo : b.close > z.hi) { z.brokenIdx = k; z.fresh = false; break; } }
+    out.push(z);
+  }
+  return out;
+}
 function msInternal(bars, closedN, N = MS_IPIV) {
   const n = Math.min(closedN, bars.length), H = bars.map((b) => b.high), L = bars.map((b) => b.low), C = bars.map((b) => b.close), out = [];
   const piv = (j, hi) => { for (let k = 1; k <= N; k++) { if (j - k < 0 || j + k >= n) return false; if (hi ? (H[j - k] > H[j] || H[j + k] >= H[j]) : (L[j - k] < L[j] || L[j + k] <= L[j])) return false; } return true; };
@@ -4351,7 +4374,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, mosha: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, mosha: true, zones: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -4756,6 +4779,17 @@ function msNextSetup(bars, A) {
       msInternal(bars, A.n || n, PIVOT).filter((e) => !major.has(e.level)).forEach((e) => {
         const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: `iBO ${sell ? '▼' : '▲'}`, below: sell });
       });
+    }
+    // fresh entry zones (msZones): the unmitigated order block of each BO / iBO, the three nearest to price a side, out to the right edge
+    if (own && G.show.zones !== false) {
+      const nc = A.n || n, brk = A.events.map((e) => ({ dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'bo' }))
+        .concat(msInternal(bars, nc, PIVOT).map((e) => ({ dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'ibo' })));
+      const fresh = msZones(bars, brk, nc).filter((z) => z.fresh);
+      const px = bars[n - 1].close;   // the three nearest to price a side (the next ones price can come back to)
+      [1, -1].forEach((d) => fresh.filter((z) => z.dir === d).sort((a, b) => Math.abs((a.lo + a.hi) / 2 - px) - Math.abs((b.lo + b.hi) / 2 - px)).slice(0, 3).forEach((z) => { const dem = d > 0;
+        items.boxes.push({ kind: 'oz', open: true, l1: z.i, l2: n + 20, lo: z.lo, hi: z.hi, fill: dem ? 'rgba(8,153,129,.13)' : 'rgba(242,54,69,.13)', stroke: dem ? 'rgba(8,153,129,.75)' : 'rgba(242,54,69,.75)', dash: true });
+        items.labels.push({ l: n + 20, dx: -4, align: 'right', p: dem ? z.lo : z.hi, dy: dem ? 14 : -5, text: `${dem ? 'Demand' : 'Supply'} OB · fresh · ${z.kind === 'ibo' ? 'iBO' : 'BO'} ${fmt(z.lo)}–${fmt(z.hi)}`, color: dem ? Z.buy.line : Z.sell.line });
+      }));
     }
     evs.forEach((e, k) => {
       const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
