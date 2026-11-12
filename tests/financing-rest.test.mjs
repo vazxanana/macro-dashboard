@@ -182,7 +182,7 @@ test('an older coach.json (made before the owner\'s decision) is shown with the 
   assert.match(html, /window\.MS_BOOK_NOW\(COUNCIL\.coach, COUNCIL\.config\); \} catch \(e\) \{\}[^\n]*\n\s*try \{ window\.MS_COUNCIL = COUNCIL;/);
   assert.match(script('ms-decay-js'), /\(D\.bookLate \? esc\(LATE\) : ''\)/); assert.match(script('ms-ex-js'), /W\.MS_BOOK_NOW\(C\.coach, C\.config\)/); assert.match(script('ms-ex-js'), /D\.bookLate \? esc\(W\.MS_BOOK_LATE/);
   assert.match(script('ms-decay-js'), /D\.financing \? '[^']*carry the same charge'\s*: '[^']*do not carry it yet/);
-  assert.match(script('ms-ex-js'), /S\.some\(function \(s\) \{ return s\.fin; \}\) \? '[^']*after overnight financing on gold buys[^']*'\s*: 'this reading was made before overnight financing was counted/);
+  assert.match(script('ms-ex-js'), /S\.some\(function \(s\) \{ return s\.fin; \}\) \? '[^']*after overnight financing on gold buys[^']*' \+ \(S\.some\(function \(s\) \{ return s\.fin && s\.fin\.everyUnit; \}\) \? '[^']*every unit, the add included[^']*' : ''\)\s*: 'this reading was made before overnight financing was counted/);
   assert.match(html, /<span id="ms-decay-fin">/); assert.match(html, /<span id="ms-expect-fin">/);
 });
 
@@ -192,7 +192,8 @@ test('no page or owner document calls the Academy\'s seven edges "live systems";
   for (const f of files) assert.doesNotMatch(rd(f), /seven live|7 live (systems|edges)|eight live|8 live systems/i, f);
   assert.match(rd('docs/academy/ARCHITECTURE.md'), /live until 11 Nov 2026/); assert.match(rd('academy/edges.mjs'), /all live on paper until 11 Nov 2026/);
   const mx = rd('MERIDIAN-X.md'); assert.match(mx, /two\s+trade live on paper: \*\*Gold trend\*\* \(the 20-day breakout\) and \*\*Gold daily engulf\*\*/); assert.match(mx, /the seven that traded live until 11 Nov 2026/);
-  assert.match(html, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\) and Gold daily engulf\./);
+  assert.match(html, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle/);   // 12 Nov: the owner's main paper system named
+  assert.match(mx, /Also live on paper, by your own choice of 11 Nov \(kept on 12 Nov\): the \*\*Mosha cycle\*\*/);
   assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
   // the Academy still has the same seven edges
   assert.deepEqual(EDGES.map((e) => e.id), ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open']);
