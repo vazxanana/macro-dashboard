@@ -11589,7 +11589,8 @@
     "t1": 3919.41,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3896.43,
@@ -11604,7 +11605,8 @@
     "lagSec": 80,
     "positionId": "48832944",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T14:47:54.000Z"
    },
    "usdcad-intraday-1794494117": {
     "positionId": "48848073",
@@ -11694,7 +11696,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9989.16 · 35 open",
+  "status": "ok · demo Fusion Markets · balance 9975.05 · 34 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -11706,15 +11708,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9989.16,
-  "lastRun": "2026-11-12T14:45:09.000Z"
+  "balance": 9975.05,
+  "lastRun": "2026-11-12T14:47:54.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:03:06.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1794484916: 40 mirror positions already open (will retry)",
-   "trade": "usdcad-scalp-1794484916"
-  },
   {
    "at": "2026-11-12T12:05:56.000Z",
    "msg": "moved USDCHF 48520033 protection: stop 0.83464 -> 0.83436, target 0.830055 -> 0.829775 (council rintra)",
@@ -13209,6 +13206,11 @@
    "at": "2026-11-12T14:38:46.000Z",
    "msg": "limit filled at once: USDCHF position 48850224 at the broker at 0.83328",
    "trade": "usdchf-intraday-1794494263"
+  },
+  {
+   "at": "2026-11-12T14:47:54.000Z",
+   "msg": "XAUUSD position 48832944 closed at the broker",
+   "trade": "xau-rscalp-1794492928"
   }
  ],
  "limits": {
