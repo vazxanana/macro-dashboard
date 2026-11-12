@@ -1,10 +1,128 @@
 {
- "at": "2026-11-12T16:03:26.000Z",
+ "at": "2026-11-12T16:06:12.000Z",
  "markets": {
+  "xau": {
+   "label": "XAU/USD",
+   "name": "Gold",
+   "price": 3872.07,
+   "dec": 1,
+   "trend": {
+    "1d": -1,
+    "4h": -1,
+    "1h": -1
+   },
+   "setups": [
+    {
+     "k": "position",
+     "name": "Position",
+     "pair": "D1 → H1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 4009.5150000000003,
+     "stop": 4157.596678571429,
+     "t1": 3852.58,
+     "rr": 1.06,
+     "next": "Price is in the D1 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "swing",
+     "name": "Swing",
+     "pair": "H4 → H1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 4009.5150000000003,
+     "stop": 4151.93025,
+     "t1": 3852.58,
+     "rr": 1.1,
+     "next": "Price is in the H4 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "intraday",
+     "name": "Intraday",
+     "pair": "H1 → M5",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 4009.5150000000003,
+     "stop": 4150.860178571429,
+     "t1": 3852.58,
+     "rr": 1.11,
+     "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "scalp",
+     "name": "Scalp",
+     "pair": "M15 → M1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 3940.225,
+     "stop": 3957.32825,
+     "t1": 3852.58,
+     "rr": 5.12,
+     "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "m30m1",
+     "name": "M30",
+     "pair": "M30 → M1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 3940.225,
+     "stop": 3957.497,
+     "t1": 3852.58,
+     "rr": 5.07,
+     "next": "Price is in the M30 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "rswing",
+     "name": "Retrace",
+     "pair": "H4 → H1",
+     "side": "buy",
+     "state": "PLAYED OUT",
+     "entry": 3856.128,
+     "stop": 3849.35975,
+     "t1": 3870.32,
+     "rr": 2.1,
+     "next": "The retracement already reached the H4 Origin 3,870.3 – 4,148.7. Look for sells there instead (the main setup cards).",
+     "retrace": true
+    },
+    {
+     "k": "rintra",
+     "name": "Retrace",
+     "pair": "H1 → M5",
+     "side": "buy",
+     "state": "PLAYED OUT",
+     "entry": 3856.128,
+     "stop": 3850.4298214285714,
+     "t1": 3870.32,
+     "rr": 2.49,
+     "next": "The retracement already reached the H1 Origin 3,870.3 – 4,148.7. Look for sells there instead (the main setup cards).",
+     "retrace": true
+    },
+    {
+     "k": "rscalp",
+     "name": "Retrace",
+     "pair": "M15 → M1",
+     "side": "buy",
+     "state": "READY",
+     "entry": 3867.09,
+     "stop": 3861.4967500000002,
+     "t1": 3904.1724999999997,
+     "rr": 6.63,
+     "next": "M15 made its VR and M1 broke up. Buy the pullback to 3,867.1, stop past 3,861.5. Take profit at 3,904.2 then 3,924.7, and be out before the Origin: that's where the M15 sells resume.",
+     "retrace": true
+    }
+   ],
+   "open": true
+  },
   "btc": {
    "label": "BTC/USD",
    "name": "Bitcoin",
-   "price": 71620.7,
+   "price": 71847.1,
    "dec": 1,
    "trend": {
     "1d": 1,
@@ -32,7 +150,7 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 73669.35,
-     "stop": 74848.47785714286,
+     "stop": 74850.12357142857,
      "t1": 71133.4,
      "rr": 2.15,
      "next": "Price is in the H4 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
@@ -45,7 +163,7 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 73669.35,
-     "stop": 74794.52214285715,
+     "stop": 74796.16785714286,
      "t1": 71133.4,
      "rr": 2.25,
      "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
@@ -58,9 +176,9 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 73669.35,
-     "stop": 74793.56571428572,
+     "stop": 74795.21142857143,
      "t1": 71133.4,
-     "rr": 2.26,
+     "rr": 2.25,
      "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
@@ -71,9 +189,9 @@
      "side": "buy",
      "state": "WAIT VR",
      "entry": 71423.64,
-     "stop": 71039.02214285714,
+     "stop": 71037.37642857143,
      "t1": 72584.6,
-     "rr": 3.02,
+     "rr": 3.01,
      "next": "H4 is still extending down. A retracement buy only comes after the H4 VR.",
      "retrace": true
     },
@@ -84,9 +202,9 @@
      "side": "buy",
      "state": "WAIT VR",
      "entry": 71423.64,
-     "stop": 71092.97785714285,
+     "stop": 71091.33214285714,
      "t1": 72584.6,
-     "rr": 3.51,
+     "rr": 3.49,
      "next": "H1 is still extending down. A retracement buy only comes after the H1 VR.",
      "retrace": true
     },
@@ -97,10 +215,10 @@
      "side": "buy",
      "state": "READY",
      "entry": 71599.9,
-     "stop": 71118.33142857143,
+     "stop": 71117.30392857142,
      "t1": 72584.6,
      "rr": 2.04,
-     "next": "M15 made its VR and M1 broke up. Buy the pullback to 71,599.9, stop past 71,118.3. Take profit at 72,584.6 then 72,943.8, and be out before the Origin: that's where the M15 sells resume.",
+     "next": "M15 made its VR and M1 broke up. Buy the pullback to 71,599.9, stop past 71,117.3. Take profit at 72,584.6 then 72,943.8, and be out before the Origin: that's where the M15 sells resume.",
      "retrace": true
     }
    ],
@@ -109,7 +227,7 @@
   "eth": {
    "label": "ETH/USD",
    "name": "Ethereum",
-   "price": 2010.78,
+   "price": 2019.01,
    "dec": 2,
    "trend": {
     "1d": -1,
@@ -137,10 +255,10 @@
      "side": "sell",
      "state": "READY",
      "entry": 2071,
-     "stop": 2151.6204285714284,
-     "t1": 1909.7591428571432,
+     "stop": 2151.7201785714287,
+     "t1": 1909.5596428571425,
      "rr": 2,
-     "next": "H1 CF confirmed inside the H4 Origin, in internal structure (under the 50% line). Sell the pullback to 2,071.00, stop past 2,151.62.",
+     "next": "H1 CF confirmed inside the H4 Origin, in internal structure (under the 50% line). Sell the pullback to 2,071.00, stop past 2,151.72.",
      "retrace": false
     },
     {
@@ -150,10 +268,10 @@
      "side": "sell",
      "state": "READY",
      "entry": 2010.34,
-     "stop": 2106.3445714285713,
-     "t1": 1818.3308571428572,
+     "stop": 2106.367178571428,
+     "t1": 1818.2856428571433,
      "rr": 2,
-     "next": "M5 CF confirmed inside the H1 Origin, in main structure (past the 50% line). Sell the pullback to 2,010.34, stop past 2,106.34.",
+     "next": "M5 CF confirmed inside the H1 Origin, in main structure (past the 50% line). Sell the pullback to 2,010.34, stop past 2,106.37.",
      "retrace": false
     },
     {
@@ -161,12 +279,12 @@
      "name": "Scalp",
      "pair": "M15 → M1",
      "side": "sell",
-     "state": "READY",
-     "entry": 1985,
-     "stop": 2016.5735714285713,
-     "t1": 1921.8528571428574,
-     "rr": 2,
-     "next": "M1 CF confirmed inside the M15 Origin, in internal structure (under the 50% line). Sell the pullback to 1,985.00, stop past 2,016.57.",
+     "state": "IN ORIGIN",
+     "entry": 2057.7799999999997,
+     "stop": 2106.788,
+     "t1": 1981.12,
+     "rr": 1.56,
+     "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
     {
@@ -176,9 +294,9 @@
      "side": "buy",
      "state": "WAIT BO",
      "entry": 2015.8,
-     "stop": 1998.3847857142857,
+     "stop": 1998.3182857142858,
      "t1": 2071,
-     "rr": 3.17,
+     "rr": 3.16,
      "next": "H4 VR is in at 2,002.00. Wait for H1 to print a BO Buy, then buy the retracement up to the 50% line 2,115.77 and the Origin 2,071.00.",
      "retrace": true
     },
@@ -189,9 +307,9 @@
      "side": "buy",
      "state": "WAIT BO",
      "entry": 2015.8,
-     "stop": 2000.4597142857142,
+     "stop": 2000.3932142857143,
      "t1": 2071,
-     "rr": 3.6,
+     "rr": 3.58,
      "next": "H1 VR is in at 2,002.00. Wait for M5 to print a BO Buy, then buy the retracement up to the 50% line 2,075.65 and the Origin 2,071.00.",
      "retrace": true
     },
@@ -201,10 +319,10 @@
      "pair": "M15 → M1",
      "side": "buy",
      "state": "PLAYED OUT",
-     "entry": 1986.964,
-     "stop": 1979.6184999999998,
-     "t1": 2010.34,
-     "rr": 3.18,
+     "entry": 2016.07,
+     "stop": 1989.9931785714284,
+     "t1": 2043.1699999999998,
+     "rr": 1.04,
      "next": "The retracement already reached the M15 Origin 2,010.34 – 2,105.22. Look for sells there instead (the main setup cards).",
      "retrace": true
     }
@@ -214,7 +332,7 @@
   "sol": {
    "label": "SOL/USD",
    "name": "Solana",
-   "price": 81.64,
+   "price": 81.99,
    "dec": 2,
    "trend": {
     "1d": -1,
@@ -229,8 +347,8 @@
      "side": "sell",
      "state": "READY",
      "entry": 81.26,
-     "stop": 85.87628571428571,
-     "t1": 72.02742857142859,
+     "stop": 85.87928571428571,
+     "t1": 72.02142857142859,
      "rr": 2,
      "next": "H1 CF confirmed inside the D1 Origin, in main structure (past the 50% line). Sell the pullback to 81.26, stop past 85.88.",
      "retrace": false
@@ -242,8 +360,8 @@
      "side": "sell",
      "state": "READY",
      "entry": 81.26,
-     "stop": 85.87628571428571,
-     "t1": 72.02742857142859,
+     "stop": 85.87928571428571,
+     "t1": 72.02142857142859,
      "rr": 2,
      "next": "H1 CF confirmed inside the H4 Origin, in main structure (past the 50% line). Sell the pullback to 81.26, stop past 85.88.",
      "retrace": false
@@ -255,7 +373,7 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 83.515,
-     "stop": 85.84085714285713,
+     "stop": 85.84285714285714,
      "t1": 80.37,
      "rr": 1.35,
      "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
@@ -266,12 +384,12 @@
      "name": "Scalp",
      "pair": "M15 → M1",
      "side": "sell",
-     "state": "READY",
-     "entry": 80.51,
-     "stop": 81.744,
-     "t1": 78.04200000000002,
-     "rr": 2,
-     "next": "M1 CF confirmed inside the M15 Origin, in internal structure (under the 50% line). Sell the pullback to 80.51, stop past 81.74.",
+     "state": "IN ORIGIN",
+     "entry": 83.515,
+     "stop": 85.83507142857142,
+     "t1": 80.37,
+     "rr": 1.36,
+     "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
     {
@@ -281,7 +399,7 @@
      "side": "buy",
      "state": "WAIT BO",
      "entry": 82.00800000000001,
-     "stop": 81.10092857142858,
+     "stop": 81.09892857142857,
      "t1": 84.605,
      "rr": 2.86,
      "next": "H4 VR is in at 81.26. Wait for H1 to print a BO Buy, then buy the retracement up to the 50% line 84.61 and the Origin 85.00.",
@@ -294,9 +412,9 @@
      "side": "buy",
      "state": "PLAYED OUT",
      "entry": 80.548,
-     "stop": 80.29914285714287,
+     "stop": 80.29714285714286,
      "t1": 81.26,
-     "rr": 2.86,
+     "rr": 2.84,
      "next": "The retracement already reached the H1 Origin 81.26 – 85.77. Look for sells there instead (the main setup cards).",
      "retrace": true
     },
@@ -306,10 +424,10 @@
      "pair": "M15 → M1",
      "side": "buy",
      "state": "PLAYED OUT",
-     "entry": 80.548,
-     "stop": 80.30692857142857,
-     "t1": 81.26,
-     "rr": 2.95,
+     "entry": 81.72,
+     "stop": 80.54471428571428,
+     "t1": 83.07,
+     "rr": 1.15,
      "next": "The retracement already reached the M15 Origin 81.26 – 85.77. Look for sells there instead (the main setup cards).",
      "retrace": true
     }
@@ -319,7 +437,7 @@
   "xrp": {
    "label": "XRP/USD",
    "name": "XRP",
-   "price": 1.0263,
+   "price": 1.03029,
    "dec": 4,
    "trend": {
     "1d": 1,
@@ -347,9 +465,9 @@
      "side": "buy",
      "state": "IN ORIGIN",
      "entry": 1.0163449999999998,
-     "stop": 0.9825058571428571,
+     "stop": 0.9824815714285714,
      "t1": 1.7,
-     "rr": 20.2,
+     "rr": 20.19,
      "next": "Price is in the H4 Origin. Wait for H1 to break up (the CF), then buy the pullback.",
      "retrace": false
     },
@@ -360,7 +478,7 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 1.042795,
-     "stop": 1.0563859285714285,
+     "stop": 1.0564102142857144,
      "t1": 1.01516,
      "rr": 2.03,
      "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
@@ -373,9 +491,9 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 1.042795,
-     "stop": 1.0562237142857143,
+     "stop": 1.056248,
      "t1": 1.01516,
-     "rr": 2.06,
+     "rr": 2.05,
      "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
@@ -386,7 +504,7 @@
      "side": "sell",
      "state": "PLAYED OUT",
      "entry": 1.03011,
-     "stop": 1.0568388928571428,
+     "stop": 1.0568753214285713,
      "t1": 1.04798,
      "rr": 0,
      "next": "The retracement already reached the H4 Origin 0.9847 – 1.0480. Look for buys there instead (the main setup cards).",
@@ -397,12 +515,12 @@
      "name": "Retrace",
      "pair": "H1 → M5",
      "side": "buy",
-     "state": "WAIT VR",
+     "state": "PLAYED OUT",
      "entry": 1.01815,
-     "stop": 1.0142540714285715,
+     "stop": 1.0142297857142857,
      "t1": 1.03011,
-     "rr": 3.07,
-     "next": "H1 is still extending down. A retracement buy only comes after the H1 VR.",
+     "rr": 3.05,
+     "next": "The retracement already reached the H1 Origin 1.0301 – 1.0555. Look for sells there instead (the main setup cards).",
      "retrace": true
     },
     {
@@ -410,12 +528,12 @@
      "name": "Retrace",
      "pair": "M15 → M1",
      "side": "buy",
-     "state": "READY",
+     "state": "PLAYED OUT",
      "entry": 1.022,
-     "stop": 1.0185848928571428,
+     "stop": 1.0185773928571429,
      "t1": 1.03011,
      "rr": 2.37,
-     "next": "M15 made its VR and M1 broke up. Buy the pullback to 1.0220, stop past 1.0186. Take profit at 1.0301 then 1.0353, and be out before the Origin: that's where the M15 sells resume.",
+     "next": "The retracement already reached the M15 Origin 1.0301 – 1.0555. Look for sells there instead (the main setup cards).",
      "retrace": true
     }
    ],
@@ -424,7 +542,7 @@
   "eurusd": {
    "label": "EUR/USD",
    "name": "Euro",
-   "price": 1.1062,
+   "price": 1.10608,
    "dec": 5,
    "trend": {
     "1d": -1,
@@ -436,13 +554,13 @@
      "k": "position",
      "name": "Position",
      "pair": "D1 → H1",
-     "side": "buy",
+     "side": "sell",
      "state": "IN ORIGIN",
-     "entry": 1.1486,
-     "stop": 1.0991038571428573,
-     "t1": 1.29,
-     "rr": 2.86,
-     "next": "Price is in the D1 Origin. Wait for H1 to break up (the CF), then buy the pullback.",
+     "entry": 1.118215,
+     "stop": 1.1258012142857143,
+     "t1": 1.10536,
+     "rr": 1.69,
+     "next": "Price is in the D1 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
     {
@@ -450,12 +568,12 @@
      "name": "Swing",
      "pair": "H4 → H1",
      "side": "sell",
-     "state": "WAIT RETRACE",
-     "entry": 1.164675,
-     "stop": 1.1660175714285714,
-     "t1": 1.10113,
-     "rr": 47.33,
-     "next": "H4 VR is in. Wait for price to come back up into the Origin 1.16359 – 1.16576 (0.05847 away). Under the 50% line (1.13345) is internal structure, past it is main structure.",
+     "state": "IN ORIGIN",
+     "entry": 1.118215,
+     "stop": 1.1253927142857143,
+     "t1": 1.10536,
+     "rr": 1.79,
+     "next": "Price is in the H4 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
     {
@@ -463,12 +581,12 @@
      "name": "Intraday",
      "pair": "H1 → M5",
      "side": "sell",
-     "state": "IN ORIGIN",
-     "entry": 1.108195,
-     "stop": 1.1100709285714285,
-     "t1": 1.10499,
-     "rr": 1.71,
-     "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
+     "state": "WAIT VR",
+     "entry": 1.10846,
+     "stop": 1.1104081428571428,
+     "t1": 1.10604,
+     "rr": 1.24,
+     "next": "H1 just broke down. Let the move finish and reverse on M5 before planning the sell.",
      "retrace": false
     },
     {
@@ -477,10 +595,10 @@
      "pair": "M15 → M1",
      "side": "sell",
      "state": "IN ORIGIN",
-     "entry": 1.108195,
-     "stop": 1.11005,
-     "t1": 1.10499,
-     "rr": 1.73,
+     "entry": 1.10846,
+     "stop": 1.1103802142857142,
+     "t1": 1.10536,
+     "rr": 1.61,
      "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
@@ -489,12 +607,12 @@
      "name": "Retrace",
      "pair": "H4 → H1",
      "side": "buy",
-     "state": "WAIT BO",
-     "entry": 1.113622,
-     "stop": 1.1008724285714284,
-     "t1": 1.133445,
-     "rr": 1.55,
-     "next": "H4 VR is in at 1.10113. Wait for H1 to print a BO Buy, then buy the retracement up to the 50% line 1.13345 and the Origin 1.16359.",
+     "state": "WAIT VR",
+     "entry": 1.1065459999999998,
+     "stop": 1.1051072857142856,
+     "t1": 1.11129,
+     "rr": 3.3,
+     "next": "H4 is still extending down. A retracement buy only comes after the H4 VR.",
      "retrace": true
     },
     {
@@ -503,10 +621,10 @@
      "pair": "H1 → M5",
      "side": "buy",
      "state": "WAIT VR",
-     "entry": 1.10528,
-     "stop": 1.1048690714285714,
-     "t1": 1.10644,
-     "rr": 2.82,
+     "entry": 1.10616,
+     "stop": 1.105911857142857,
+     "t1": 1.10664,
+     "rr": 1.93,
      "next": "H1 is still extending down. A retracement buy only comes after the H1 VR.",
      "retrace": true
     },
@@ -516,11 +634,11 @@
      "pair": "M15 → M1",
      "side": "buy",
      "state": "READY",
-     "entry": 1.10591,
-     "stop": 1.10489,
-     "t1": 1.10644,
-     "rr": 0.52,
-     "next": "M15 made its VR and M1 broke up. Buy the pullback to 1.10591, stop past 1.10489. Take profit at 1.10644 then 1.10747, and be out before the Origin: that's where the M15 sells resume.",
+     "entry": 1.10636,
+     "stop": 1.10526,
+     "t1": 1.10664,
+     "rr": 0.25,
+     "next": "M15 made its VR and M1 broke up. Buy the pullback to 1.10636, stop past 1.10526. Take profit at 1.10664 then 1.10782, and be out before the Origin: that's where the M15 sells resume.",
      "retrace": true
     }
    ],
@@ -529,7 +647,7 @@
   "gbpusd": {
    "label": "GBP/USD",
    "name": "Pound",
-   "price": 1.32388,
+   "price": 1.32342,
    "dec": 5,
    "trend": {
     "1d": -1,
@@ -544,7 +662,7 @@
      "side": "sell",
      "state": "READY",
      "entry": 1.32502,
-     "stop": 1.3276605714285714,
+     "stop": 1.3276627142857145,
      "t1": 1.31808,
      "rr": 2.63,
      "next": "H1 CF confirmed inside the D1 Origin, in main structure (past the 50% line). Sell the pullback to 1.32502, stop past 1.32766.",
@@ -557,7 +675,7 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 1.3400949999999998,
-     "stop": 1.3462405,
+     "stop": 1.3462419285714284,
      "t1": 1.32213,
      "rr": 2.92,
      "next": "Price is in the H4 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
@@ -570,9 +688,9 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 1.32624,
-     "stop": 1.3275937142857144,
+     "stop": 1.3275951428571429,
      "t1": 1.32213,
-     "rr": 3.04,
+     "rr": 3.03,
      "next": "Price is in the H1 Origin. Wait for M5 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
@@ -583,9 +701,9 @@
      "side": "sell",
      "state": "IN ORIGIN",
      "entry": 1.32624,
-     "stop": 1.3275753571428572,
+     "stop": 1.3275767857142857,
      "t1": 1.32213,
-     "rr": 3.08,
+     "rr": 3.07,
      "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
      "retrace": false
     },
@@ -596,7 +714,7 @@
      "side": "buy",
      "state": "WAIT VR",
      "entry": 1.324554,
-     "stop": 1.3218295,
+     "stop": 1.3218280714285715,
      "t1": 1.334035,
      "rr": 3.48,
      "next": "H4 is still extending down. A retracement buy only comes after the H4 VR.",
@@ -609,7 +727,7 @@
      "side": "buy",
      "state": "WAIT VR",
      "entry": 1.322708,
-     "stop": 1.3219962857142857,
+     "stop": 1.3219948571428572,
      "t1": 1.324795,
      "rr": 2.93,
      "next": "H1 is still extending down. A retracement buy only comes after the H1 VR.",
@@ -631,10 +749,220 @@
    ],
    "open": true
   },
+  "audusd": {
+   "label": "AUD/USD",
+   "name": "Aussie",
+   "price": 0.681,
+   "dec": 5,
+   "trend": {
+    "1d": -1,
+    "4h": -1,
+    "1h": -1
+   },
+   "setups": [
+    {
+     "k": "position",
+     "name": "Position",
+     "pair": "D1 → H1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 0.695075,
+     "stop": 0.7073434285714286,
+     "t1": 0.67978,
+     "rr": 1.25,
+     "next": "Price is in the D1 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "swing",
+     "name": "Swing",
+     "pair": "H4 → H1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 0.68927,
+     "stop": 0.6933030714285715,
+     "t1": 0.67978,
+     "rr": 2.35,
+     "next": "Price is in the H4 Origin. Wait for H1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "intraday",
+     "name": "Intraday",
+     "pair": "H1 → M5",
+     "side": "sell",
+     "state": "READY",
+     "entry": 0.68169,
+     "stop": 0.68304,
+     "t1": 0.67978,
+     "rr": 1.41,
+     "next": "M5 CF confirmed inside the H1 Origin, in main structure (past the 50% line). Sell the pullback to 0.68169, stop past 0.68304.",
+     "retrace": false
+    },
+    {
+     "k": "scalp",
+     "name": "Scalp",
+     "pair": "M15 → M1",
+     "side": "sell",
+     "state": "IN ORIGIN",
+     "entry": 0.68221,
+     "stop": 0.68304,
+     "t1": 0.67978,
+     "rr": 2.93,
+     "next": "Price is in the M15 Origin. Wait for M1 to break down (the CF), then sell the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "rswing",
+     "name": "Retrace",
+     "pair": "H4 → H1",
+     "side": "buy",
+     "state": "WAIT VR",
+     "entry": 0.6809120000000001,
+     "stop": 0.6795769285714286,
+     "t1": 0.68544,
+     "rr": 3.39,
+     "next": "H4 is still extending down. A retracement buy only comes after the H4 VR.",
+     "retrace": true
+    },
+    {
+     "k": "rintra",
+     "name": "Retrace",
+     "pair": "H1 → M5",
+     "side": "buy",
+     "state": "WAIT BO",
+     "entry": 0.6807000000000001,
+     "stop": 0.6796762857142857,
+     "t1": 0.6841600000000001,
+     "rr": 3.38,
+     "next": "H1 VR is in at 0.67978. Wait for M5 to print a BO Buy, then buy the retracement up to the 50% line 0.68416 and the Origin 0.68438.",
+     "retrace": true
+    },
+    {
+     "k": "rscalp",
+     "name": "Retrace",
+     "pair": "M15 → M1",
+     "side": "buy",
+     "state": "WAIT VR",
+     "entry": 0.6801200000000001,
+     "stop": 0.6796800000000001,
+     "t1": 0.68136,
+     "rr": 2.82,
+     "next": "M15 is still extending down. A retracement buy only comes after the M15 VR.",
+     "retrace": true
+    }
+   ],
+   "open": true
+  },
+  "usdcad": {
+   "label": "USD/CAD",
+   "name": "Loonie",
+   "price": 1.42608,
+   "dec": 5,
+   "trend": {
+    "1d": 1,
+    "4h": 1,
+    "1h": 1
+   },
+   "setups": [
+    {
+     "k": "position",
+     "name": "Position",
+     "pair": "D1 → H1",
+     "side": "buy",
+     "state": "READY",
+     "entry": 1.42102,
+     "stop": 1.4178138214285714,
+     "t1": 1.42998,
+     "rr": 2.79,
+     "next": "H1 CF confirmed inside the D1 Origin, in main structure (past the 50% line). Buy the pullback to 1.42102, stop past 1.41781.",
+     "retrace": false
+    },
+    {
+     "k": "swing",
+     "name": "Swing",
+     "pair": "H4 → H1",
+     "side": "buy",
+     "state": "IN ORIGIN",
+     "entry": 1.41215,
+     "stop": 1.4103047142857141,
+     "t1": 1.4272,
+     "rr": 8.16,
+     "next": "Price is in the H4 Origin. Wait for H1 to break up (the CF), then buy the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "intraday",
+     "name": "Intraday",
+     "pair": "H1 → M5",
+     "side": "buy",
+     "state": "READY",
+     "entry": 1.42536,
+     "stop": 1.42236,
+     "t1": 1.4313599999999997,
+     "rr": 2,
+     "next": "M5 CF confirmed inside the H1 Origin, in main structure (past the 50% line). Buy the pullback to 1.42536, stop past 1.42236.",
+     "retrace": false
+    },
+    {
+     "k": "scalp",
+     "name": "Scalp",
+     "pair": "M15 → M1",
+     "side": "buy",
+     "state": "IN ORIGIN",
+     "entry": 1.42391,
+     "stop": 1.42236,
+     "t1": 1.4272,
+     "rr": 2.12,
+     "next": "Price is in the M15 Origin. Wait for M1 to break up (the CF), then buy the pullback.",
+     "retrace": false
+    },
+    {
+     "k": "rswing",
+     "name": "Retrace",
+     "pair": "H4 → H1",
+     "side": "sell",
+     "state": "WAIT VR",
+     "entry": 1.424512,
+     "stop": 1.4274352857142858,
+     "t1": 1.41887,
+     "rr": 1.93,
+     "next": "H4 is still extending up. A retracement sell only comes after the H4 VR.",
+     "retrace": true
+    },
+    {
+     "k": "rintra",
+     "name": "Retrace",
+     "pair": "H1 → M5",
+     "side": "sell",
+     "state": "WAIT BO",
+     "entry": 1.425436,
+     "stop": 1.4266507857142856,
+     "t1": 1.42226,
+     "rr": 2.61,
+     "next": "H1 VR is in at 1.42654. Wait for M5 to print a BO Sell, then sell the retracement down to the 50% line 1.42226 and the Origin 1.42102.",
+     "retrace": true
+    },
+    {
+     "k": "rscalp",
+     "name": "Retrace",
+     "pair": "M15 → M1",
+     "side": "sell",
+     "state": "READY",
+     "entry": 1.4259,
+     "stop": 1.4273,
+     "t1": 1.42536,
+     "rr": 0.39,
+     "next": "M15 made its VR and M1 broke down. Sell the pullback to 1.42590, stop past 1.42730. Take profit at 1.42536 then 1.42483, and be out before the Origin: that's where the M15 buys resume.",
+     "retrace": true
+    }
+   ],
+   "open": true
+  },
   "usdchf": {
    "label": "USD/CHF",
    "name": "Swissy",
-   "price": 0.83472,
+   "price": 0.8351,
    "dec": 5,
    "trend": {
     "1d": 1,
@@ -662,7 +990,7 @@
      "side": "buy",
      "state": "IN ORIGIN",
      "entry": 0.81915,
-     "stop": 0.8125435000000001,
+     "stop": 0.8125413571428571,
      "t1": 0.83542,
      "rr": 2.46,
      "next": "Price is in the H4 Origin. Wait for H1 to break up (the CF), then buy the pullback.",
@@ -701,9 +1029,9 @@
      "side": "sell",
      "state": "WAIT VR",
      "entry": 0.8334440000000001,
-     "stop": 0.8356365,
+     "stop": 0.835638642857143,
      "t1": 0.82554,
-     "rr": 3.61,
+     "rr": 3.6,
      "next": "H4 is still extending up. A retracement sell only comes after the H4 VR.",
      "retrace": true
     },
@@ -738,10 +1066,7 @@
   }
  },
  "errors": {
-  "feed:xau": "OANDA not read this round (1 miss): XAU/USD skipped, feed kept, nothing re-quoted",
-  "feed:eurusd": "feed changed oanda → kraken: 2 cancelled, 2 open re-based (basis -0.00049)",
-  "feed:audusd": "OANDA not read this round (1 miss): AUD/USD skipped, feed kept, nothing re-quoted",
-  "feed:usdcad": "OANDA not read this round (1 miss): USD/CAD skipped, feed kept, nothing re-quoted"
+  "feed:eurusd": "feed changed kraken → oanda: 2 open re-based (basis +0.00042)"
  },
  "feed": {
   "xau": "OANDA",
@@ -749,12 +1074,180 @@
   "eth": "Kraken",
   "sol": "Kraken",
   "xrp": "Kraken",
-  "eurusd": "Kraken",
+  "eurusd": "OANDA",
   "gbpusd": "OANDA",
   "audusd": "OANDA",
   "usdcad": "OANDA",
   "usdchf": "OANDA"
  },
+ "d1src": {
+  "xau": {
+   "src": "OANDA",
+   "trend": -1,
+   "kraken": -1
+  },
+  "eurusd": {
+   "src": "OANDA",
+   "trend": -1,
+   "kraken": -1
+  },
+  "gbpusd": {
+   "src": "OANDA",
+   "trend": -1,
+   "kraken": -1
+  },
+  "audusd": {
+   "src": "OANDA",
+   "trend": -1,
+   "kraken": -1
+  },
+  "usdcad": {
+   "src": "OANDA",
+   "trend": 1,
+   "kraken": 1
+  },
+  "usdchf": {
+   "src": "OANDA",
+   "trend": 1,
+   "kraken": 1
+  }
+ },
+ "goldTrend": {
+  "state": {
+   "hi20": 4190.42,
+   "lastClose": 3978.77,
+   "open": false,
+   "stop": null
+  }
+ },
+ "goldTrendFast": {
+  "state": {
+   "hi20": 4148.71,
+   "lastClose": 3978.77,
+   "open": false,
+   "stop": null
+  }
+ },
+ "lit": {
+  "at": "2026-11-12T16:06:12.000Z",
+  "bars": 3999,
+  "m15": 1333,
+  "last": 1794499200,
+  "orders": 3,
+  "placed": [],
+  "skipped": [],
+  "held": 0,
+  "be": 0,
+  "funnel": {
+   "sweeps": 294,
+   "eqh": 32,
+   "inSession": 80,
+   "withAcc": 71,
+   "premium": 57,
+   "fbos": 25
+  },
+  "build": {
+   "noSwing": 0,
+   "mxBroken": 11,
+   "noRbos": 2,
+   "rbosSlow": 0,
+   "rbosOverlap": 2,
+   "rbosFlip": 6,
+   "noOb": 0,
+   "badGeom": 0,
+   "lowRR": 1,
+   "capped": 0,
+   "orders": 3
+  },
+  "open": 0,
+  "pending": 0
+ },
+ "goldTL": {
+  "state": {
+   "line": 3985.49,
+   "a": 1794254400,
+   "b": 1794369600,
+   "lastClose": 3870.13,
+   "traded": false,
+   "open": false,
+   "stop": null,
+   "shadow": true
+  }
+ },
+ "goldEG": {
+  "state": {
+   "lastClose": 3978.77,
+   "sma": 4024.13,
+   "up": false,
+   "zone": null,
+   "pending": [],
+   "open": 0
+  }
+ },
+ "goldMP": {
+  "state": {
+   "d1": -1,
+   "watching": [
+    {
+     "side": "sell",
+     "zone": [
+      3909.38,
+      3924.43
+     ],
+     "until": 1794513600
+    },
+    {
+     "side": "sell",
+     "zone": [
+      3882.68,
+      3892.84
+     ],
+     "until": 1794517200
+    }
+   ],
+   "open": 0,
+   "test": true
+  }
+ },
+ "goldW1Src": "cnbc-spot",
+ "goldW1": -1,
+ "moshaBo": {
+  "state": {
+   "stage": "h1",
+   "dir": -1,
+   "h4": {
+    "t": 1794499200,
+    "dir": -1,
+    "level": 3870.32
+   },
+   "h1": null,
+   "m15": null,
+   "w1": -1,
+   "w1Src": "cnbc-spot",
+   "open": 0,
+   "pending": 0,
+   "shadow": true
+  }
+ },
+ "moshaCycle": {
+  "state": {
+   "stage": "move",
+   "dir": -1,
+   "h4": {
+    "t": 1794499200,
+    "level": 3870.32,
+    "far": 4148.71
+   },
+   "ext": 3852.58,
+   "p50": 4000.64
+  },
+  "text": "Mosha cycle: H4 moving down from 3870.32; waiting for the H1 ChoCh that starts the pullback.",
+  "open": 0
+ },
+ "goldVol": 1.83,
+ "goldVolMin": null,
+ "goldVolP": 2.47,
+ "goldVolPn": 365,
  "trend": {
   "btc": {
    "label": "BTC/USD",
@@ -767,7 +1260,7 @@
    "nOpen": 0,
    "stop": null,
    "midStop": null,
-   "toBreakout": 22.1,
+   "toBreakout": 21.71,
    "n": 0,
    "R": 0,
    "stopped": false,
@@ -784,7 +1277,7 @@
    "nOpen": 0,
    "stop": null,
    "midStop": null,
-   "toBreakout": 39.58,
+   "toBreakout": 39.01,
    "n": 0,
    "R": 0,
    "stopped": false,
@@ -801,7 +1294,7 @@
    "nOpen": 0,
    "stop": null,
    "midStop": null,
-   "toBreakout": 53,
+   "toBreakout": 52.35,
    "n": 0,
    "R": 0,
    "stopped": false,
@@ -818,7 +1311,7 @@
    "nOpen": 0,
    "stop": null,
    "midStop": null,
-   "toBreakout": 61.53,
+   "toBreakout": 60.91,
    "n": 0,
    "R": 0,
    "stopped": false,
@@ -864,8 +1357,8 @@
   },
   "eurusd": {
    "label": "EUR/USD",
-   "vol": 0.6,
-   "gate": 0.588,
+   "vol": 0.54,
+   "gate": 0.545,
    "on": false,
    "n": 0,
    "R": 0,
@@ -875,6 +1368,24 @@
    "label": "GBP/USD",
    "vol": 0.49,
    "gate": 0.583,
+   "on": false,
+   "n": 0,
+   "R": 0,
+   "stopped": false
+  },
+  "audusd": {
+   "label": "AUD/USD",
+   "vol": 0.66,
+   "gate": 0.796,
+   "on": false,
+   "n": 0,
+   "R": 0,
+   "stopped": false
+  },
+  "usdcad": {
+   "label": "USD/CAD",
+   "vol": 0.42,
+   "gate": 0.395,
    "on": false,
    "n": 0,
    "R": 0,
@@ -890,46 +1401,7 @@
    "stopped": false
   }
  },
- "cleaned": {
-  "eurusd": {
-   "4h": 1,
-   "15m": 1
-  }
- },
- "d1src": {
-  "eurusd": {
-   "src": "OANDA",
-   "trend": -1,
-   "kraken": 1
-  },
-  "gbpusd": {
-   "src": "OANDA",
-   "trend": -1,
-   "kraken": -1
-  },
-  "usdchf": {
-   "src": "OANDA",
-   "trend": 1,
-   "kraken": 1
-  }
- },
  "feedChanges": [
-  {
-   "at": "2026-11-12T10:11:19.000Z",
-   "market": "eurusd",
-   "label": "EUR/USD",
-   "from": "kraken",
-   "to": "oanda",
-   "basis": 0.00031,
-   "rederived": 0,
-   "cancelled": 0,
-   "rebased": 2,
-   "kept": 0,
-   "ids": [
-    "eurusd-rswing-1793610380",
-    "eurusd-rswing-1793754423"
-   ]
-  },
   {
    "at": "2026-11-12T10:11:19.000Z",
    "market": "gbpusd",
@@ -1897,6 +2369,22 @@
     "eurusd-intraday-1794496465",
     "eurusd-rscalp-1794498960"
    ]
+  },
+  {
+   "at": "2026-11-12T16:06:12.000Z",
+   "market": "eurusd",
+   "label": "EUR/USD",
+   "from": "kraken",
+   "to": "oanda",
+   "basis": 0.00042,
+   "rederived": 0,
+   "cancelled": 0,
+   "rebased": 2,
+   "kept": 0,
+   "ids": [
+    "eurusd-rswing-1793610380",
+    "eurusd-rswing-1793754423"
+   ]
   }
  ],
  "costs": {
@@ -1992,16 +2480,16 @@
   },
   "shadow": {
    "all": {
-    "n": 916,
-    "R": 133.67,
-    "Rnet": -51.03,
+    "n": 917,
+    "R": 135.39,
+    "Rnet": -49.38,
     "fin": 0.04
    },
    "byGroup": {
     "Crypto": {
-     "n": 250,
-     "R": 73.41,
-     "Rnet": 18.86,
+     "n": 251,
+     "R": 75.13,
+     "Rnet": 20.51,
      "fin": 0
     },
     "Metals": {
@@ -2029,7 +2517,7 @@
  },
  "staleGuard": {
   "X": 0.25,
-  "n": 338,
+  "n": 339,
   "live": {
    "chased": {
     "n": 0,
@@ -2064,7 +2552,7 @@
     "Rnet": -12.68
    },
    "kept": {
-    "n": 248,
+    "n": 249,
     "closed": 228,
     "R": 31.7,
     "Rnet": -15.84
@@ -2322,8 +2810,8 @@
    "xau"
   ],
   "since": 1794434536,
-  "closed": 95,
-  "grossR": 15.9,
+  "closed": 96,
+  "grossR": 14.9,
   "need": 200,
   "met": false
  },
@@ -2346,11 +2834,11 @@
   "day": "2026-11-09"
  },
  "nqLast": {
-  "price": 28488.5,
-  "at": 1794499380
+  "price": 28512.5,
+  "at": 1794499560
  },
  "lessons": {
-  "n": 981,
+  "n": 982,
   "losses": 605,
   "system": 308,
   "market": 297,
@@ -2392,13 +2880,13 @@
     "shadow": 52
    },
    "clean": {
-    "n": 161,
-    "R": 312.2,
+    "n": 162,
+    "R": 313.92,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 4,
-    "shadow": 157
+    "shadow": 158
    },
    "becost": {
     "n": 3,
@@ -2517,6 +3005,6 @@
    }
   },
   "candidates": [],
-  "at": "2026-11-12T16:03:26.000Z"
+  "at": "2026-11-12T16:06:12.000Z"
  }
 }
