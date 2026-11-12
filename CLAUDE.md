@@ -2483,8 +2483,10 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   new ids, the 76 px switch at the foot of the phone page and replay-clock text). Session and Blind keep their own
   round-3 layout (only the tab bar and the hero change there). The audit's phone part runs in the simple view (helpers
   `tabTo`, `unfold`) and adds 12 checks, the full view and the remembered choice among them; its Models check counts buttons
-  other than the fold chevron. Not done: the What-if card is not folded (its body is redrawn by the page code), and an
-  open fold is forgotten on reload on purpose (nothing more goes into storage).
+  other than the fold chevron. Done 12 Nov 2026: the What-if card folds too (`renderWhatIf` puts the chevron back with
+  `pfold(box, 'What if')` after each build, since `whatIfCard` empties the box; `PF` keyed by its id keeps it open or folded
+  through a redraw for the visit; no new CSS rule, storage key or call): 365 -> 62 px at 390 x 844 on a stopped setup, 1440 px
+  and the full view unchanged. Not done: an open fold is forgotten on reload on purpose (nothing more goes into storage).
 - **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
   verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
   an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER
