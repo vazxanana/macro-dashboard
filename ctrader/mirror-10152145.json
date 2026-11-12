@@ -11689,6 +11689,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-12T14:38:46.000Z",
     "brokerStop": 0.8321
+   },
+   "xau-scalp-1794494955": {
+    "positionId": "48859824",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-12T14:50:20.000Z",
+    "councilEntry": 3884.705,
+    "stop": 3909.868285714286,
+    "t1": 3829.428428571428,
+    "riskCash": 25.16,
+    "margin": 7.79,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3884.705,
+    "levelsFrom": "mark",
+    "fillPrice": 3884.03,
+    "slipR": 0.027,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-12T14:50:20.000Z",
+    "brokerStop": 3909.19
    }
   },
   "day": {
@@ -11696,7 +11724,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.05 · 34 open",
+  "status": "ok · demo Fusion Markets · balance 9975.05 · 35 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -11709,14 +11737,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9975.05,
-  "lastRun": "2026-11-12T14:47:54.000Z"
+  "lastRun": "2026-11-12T14:50:20.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:05:56.000Z",
-   "msg": "moved USDCHF 48520033 protection: stop 0.83464 -> 0.83436, target 0.830055 -> 0.829775 (council rintra)",
-   "trade": "usdchf-rintra-1794420863"
-  },
   {
    "at": "2026-11-12T12:05:56.000Z",
    "msg": "moved USDCHF 48743719 protection: stop 0.83301 -> 0.83273, target 0.829845 -> 0.829565 (council rintra)",
@@ -13211,6 +13234,11 @@
    "at": "2026-11-12T14:47:54.000Z",
    "msg": "XAUUSD position 48832944 closed at the broker",
    "trade": "xau-rscalp-1794492928"
+  },
+  {
+   "at": "2026-11-12T14:50:20.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council scalp)",
+   "trade": "xau-scalp-1794494955"
   }
  ],
  "limits": {
@@ -13289,7 +13317,7 @@
   ]
  },
  "execution": {
-  "n": 391,
+  "n": 392,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
@@ -13328,8 +13356,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 52,
-    "meanSlipR": -0.049
+    "n": 53,
+    "meanSlipR": -0.048
    }
   }
  }
