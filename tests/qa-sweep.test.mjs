@@ -769,11 +769,12 @@ const FW_HTML = src('market-structure.html');
 const FW_CSS = (() => { const m = /<style id="ms-fw-css">([\s\S]*?)<\/style>/.exec(FW_HTML); return m ? m[1] : ''; })();
 const FW_JS = (() => { const m = /<script id="ms-fw-js">([\s\S]*?)<\/script>/.exec(FW_HTML); return m ? m[1] : ''; })();
 
-test('forward card: admin only like its neighbours, right under "Which systems trade live", labelled as a proposal you have not adopted', () => {
+test('forward card: admin only like its neighbours, right under "Which systems trade live", labelled as the protocol you adopted on 12 Nov 2026', () => {
   const pane = FW_HTML.slice(FW_HTML.indexOf('id="ms-cp-systems"'), FW_HTML.indexOf('id="ms-cp-review"'));
   assert.match(pane, /<div class="card adm" id="ms-sys-book">[\s\S]*?<\/div>\n      <div class="card c-fwd adm" id="ms-fwd">/);
-  assert.match(pane, /Proposed protocol · not adopted/); assert.match(pane, /your decision 43<\/a>, open/);
-  assert.match(pane, /changes no rule, size, stop, trade or mirror setting/);
+  assert.match(pane, /Protocol adopted · 12 Nov 2026/); assert.match(pane, /your decision 43<\/a>: “Yes to all”/);
+  // what the adoption does, said on the card: a crossed line sends the book back to a paper shadow, no open trade is closed, nothing returns by itself
+  assert.match(pane, /no open trade is closed, every stop stays, and nothing goes back by itself\. A failed execution check \(E1 to E5\) is only reported/);
 });
 
 test('forward card: every text at least 12 px and every colour a theme token (no hex), a word beside every colour', () => {

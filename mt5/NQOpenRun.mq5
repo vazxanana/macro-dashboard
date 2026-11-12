@@ -41,6 +41,16 @@ input double InpMaxDDPct     = 6.0;
 input double InpStartBalance = 0;
 
 CTrade trade;
+
+// Paper and demo only (absolute rule 2; owner, 12 Nov 2026, docs/owner-decisions.md item 45): this program refuses an account that
+// is not a demo (a real or contest account). Checked on start and right before every order it sends; on a refusal it says why and
+// removes itself without sending anything. ACCOUNT_TRADE_MODE is the platform's own account-type flag.
+bool DemoOnly() {
+  if (AccountInfoInteger(ACCOUNT_TRADE_MODE) == ACCOUNT_TRADE_MODE_DEMO) return true;
+  Print("NQOpenRun refused: account ", AccountInfoInteger(ACCOUNT_LOGIN), " is not a demo account (real or contest). This program runs on demo accounts only; it stops now and sends nothing.");
+  ExpertRemove();
+  return false;
+}
 string GVP = "NQ.";
 double gvGet(string k) { return GlobalVariableCheck(GVP + k) ? GlobalVariableGet(GVP + k) : 0; }
 void   gvSet(string k, double v) { GlobalVariableSet(GVP + k, v); }
@@ -90,7 +100,8 @@ void scanDay(string day, int uptoMinute) {
   }
 }
 
-int OnInit() { trade.SetExpertMagicNumber(InpMagic); trade.SetDeviationInPoints(InpSlippagePts); trade.SetTypeFillingBySymbol(_Symbol);
+int OnInit() { if (!DemoOnly()) return INIT_FAILED;
+  trade.SetExpertMagicNumber(InpMagic); trade.SetDeviationInPoints(InpSlippagePts); trade.SetTypeFillingBySymbol(_Symbol);
   // adopt an open position of ours after a restart
   for (int i = PositionsTotal() - 1; i >= 0; i--) { ulong t = PositionGetTicket(i); if (PositionSelectByTicket(t) && PositionGetInteger(POSITION_MAGIC) == InpMagic && PositionGetString(POSITION_SYMBOL) == _Symbol) { g_ticket = t; g_entry = PositionGetDouble(POSITION_PRICE_OPEN); g_sell = PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_SELL; g_r0 = gvGet("r0"); g_mfe = gvGet("mfe"); g_trailMoved = gvGet("trailMoved") >= 1; } }
   Print("NQOpenRun started on ", _Symbol, ". Demo? ", AccountInfoInteger(ACCOUNT_TRADE_MODE) == ACCOUNT_TRADE_MODE_DEMO ? "yes" : "NO");
@@ -99,6 +110,7 @@ void OnDeinit(const int reason) {}
 
 datetime g_lastBar = 0;
 void OnTick() {
+  if (!DemoOnly()) return;
   datetime bt = iTime(_Symbol, PERIOD_M1, 0); if (bt == g_lastBar) return; g_lastBar = bt;   // a new M1 bar: work on the one just closed
   MqlRates r[]; if (CopyRates(_Symbol, PERIOD_M1, 1, 1, r) < 1) return; MqlRates b = r[0];
   string day; int m, wd; etParts(b.time, day, m, wd);
@@ -136,6 +148,7 @@ void OnTick() {
   if (MathAbs(mkt - e0) > InpMaxSlipR * r0) { Print("NQOpenRun: price moved, skipped"); return; }
   double stop = px(sell ? mkt + r0 : mkt - r0), tp = px(sell ? mkt - InpCapR * r0 : mkt + InpCapR * r0), lots = lotsForRisk(mkt, stop);
   if (lots <= 0) { Print("NQOpenRun: lot size too small, skipped"); return; }
+  if (!DemoOnly()) return;
   bool ok = sell ? trade.Sell(lots, _Symbol, 0, stop, tp, "nq-open-run") : trade.Buy(lots, _Symbol, 0, stop, tp, "nq-open-run");
   if (!ok) { Print("NQOpenRun: order failed ", trade.ResultRetcodeDescription()); return; }
   ulong posT = 0; if (HistoryDealSelect(trade.ResultDeal())) posT = (ulong)HistoryDealGetInteger(trade.ResultDeal(), DEAL_POSITION_ID); if (posT == 0) posT = trade.ResultOrder();
