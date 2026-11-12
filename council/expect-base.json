@@ -1,5 +1,5 @@
 {
- "at": "2026-11-11T22:19:51.148Z",
+ "at": "2026-11-12T09:34:49.973Z",
  "method": "research/edge/expectations/build.mjs",
  "costs": "x1 per study: gold 0.30 a unit, NQ 1 point, ICT the futures round trip, crypto Kraken fees; since 11 Nov 2026 every long gold position also pays overnight financing (the four long-only gold systems, and the buys of the Gold replica, Mosha BO and the momentum pullback)",
  "z": 1.645,
@@ -7,7 +7,11 @@
   "rate": 0.000148,
   "asOf": "2026-11-11",
   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
-  "method": "research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only (the momentum pullback: its rebuild's own entry price; the replica: its first leg at the leg's size); a sell pays nothing and is credited nothing",
+  "method": "research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only (the momentum pullback: its rebuild's own entry price; the replica: its first leg at the leg's size); a sell pays nothing and is credited nothing. Since 12 Nov 2026 (owner, item 42) Gold trend and Gold trend fast pay on EVERY unit, the add included, at each unit's own entry price and risk, from research/edge/supported-book/legs.json through that study's position function (a window holds the positions closed in it)",
+  "everyUnit": [
+   "gtrend",
+   "gtrend5"
+  ],
   "systems": [
    "gtrend",
    "gtrend5",
@@ -148,20 +152,21 @@
    "desk": "Meridian",
    "live": true,
    "study": "research/edge/gold-systems-oos",
+   "units": "research/edge/supported-book/legs.json (every unit)",
    "honest": {
     "src": "research/edge/gold-systems-oos",
     "window": "2006-17 out of sample",
     "from": "2006-07-01",
     "to": "2017-12-31",
     "years": 11.5,
-    "n": 75,
-    "exp": 0.398,
-    "sd": 2.318,
-    "t": 1.49,
-    "R": 29.88,
-    "maxDD": 5.57,
-    "perYear": 6.52,
-    "mc95": 13.92
+    "n": 74,
+    "exp": 0.313,
+    "sd": 2.237,
+    "t": 1.2,
+    "R": 23.15,
+    "maxDD": 5.63,
+    "perYear": 6.43,
+    "mc95": 14.6
    },
    "builtOn": {
     "src": "research/edge/gold-systems-oos",
@@ -169,14 +174,14 @@
     "from": "2018-01-01",
     "to": "2026-11-06",
     "years": 8.85,
-    "n": 59,
-    "exp": 1.225,
-    "sd": 4.037,
-    "t": 2.33,
-    "R": 72.27,
-    "maxDD": 4.09,
-    "perYear": 6.67,
-    "mc95": 9.88
+    "n": 60,
+    "exp": 1.207,
+    "sd": 3.933,
+    "t": 2.38,
+    "R": 72.39,
+    "maxDD": 4.15,
+    "perYear": 6.78,
+    "mc95": 9.68
    },
    "backtest": {
     "src": "gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)",
@@ -189,18 +194,19 @@
     "mcDD": 7.47
    },
    "fin": {
-    "perTrade": 0.09,
-    "nights": 14.32,
+    "perTrade": 0.123,
+    "nights": 19.5,
     "before": {
-     "exp": 0.489,
-     "t": 1.77
-    }
+     "exp": 0.436,
+     "t": 1.59
+    },
+    "everyUnit": true
    },
    "dd": {
     "mc95": 7.47,
-    "worst": 5.57
+    "worst": 5.63
    },
-   "regime": "regime-bound: +0.40R a trade after financing on 2006-17 (+0.49R before it; 8 of 12 years positive) against +1.23R on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)"
+   "regime": "regime-bound: +0.31R a position after financing on every unit on 2006-17 (+0.44R before it; the positions closed in the window, as the book study counts them; 8 of 12 years positive) against +1.21R on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)"
   },
   {
    "id": "gtrend5",
@@ -209,20 +215,21 @@
    "live": false,
    "shadowSince": "2026-11-07",
    "study": "research/edge/gold-systems-oos",
+   "units": "research/edge/supported-book/legs.json (every unit)",
    "honest": {
     "src": "research/edge/gold-systems-oos",
     "window": "2006-17 out of sample",
     "from": "2006-07-01",
     "to": "2017-12-31",
     "years": 11.5,
-    "n": 129,
-    "exp": 0.289,
-    "sd": 2.142,
-    "t": 1.53,
-    "R": 37.28,
-    "maxDD": 13.33,
-    "perYear": 11.21,
-    "mc95": 17.78
+    "n": 128,
+    "exp": 0.211,
+    "sd": 2.037,
+    "t": 1.17,
+    "R": 27.04,
+    "maxDD": 13.92,
+    "perYear": 11.13,
+    "mc95": 19.06
    },
    "builtOn": {
     "src": "research/edge/gold-systems-oos",
@@ -230,14 +237,14 @@
     "from": "2018-01-01",
     "to": "2026-11-06",
     "years": 8.85,
-    "n": 99,
+    "n": 100,
     "exp": 0.875,
-    "sd": 3.63,
-    "t": 2.4,
-    "R": 86.62,
-    "maxDD": 8.41,
-    "perYear": 11.19,
-    "mc95": 13.83
+    "sd": 3.558,
+    "t": 2.46,
+    "R": 87.45,
+    "maxDD": 8.42,
+    "perYear": 11.3,
+    "mc95": 13.41
    },
    "backtest": {
     "src": "gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)",
@@ -250,18 +257,19 @@
     "mcDD": 10.63
    },
    "fin": {
-    "perTrade": 0.083,
-    "nights": 14.64,
+    "perTrade": 0.116,
+    "nights": 19.8,
     "before": {
-     "exp": 0.372,
-     "t": 1.92
-    }
+     "exp": 0.327,
+     "t": 1.72
+    },
+    "everyUnit": true
    },
    "dd": {
     "mc95": 10.63,
-    "worst": 13.33
+    "worst": 13.92
    },
-   "regime": "regime-bound: +0.29R a trade after financing on 2006-17 (+0.37R before it) against +0.88R on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)"
+   "regime": "regime-bound: +0.21R a position after financing on every unit on 2006-17 (+0.33R before it; the positions closed in the window) against +0.88R on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)"
   },
   {
    "id": "gtl",

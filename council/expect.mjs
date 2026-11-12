@@ -82,7 +82,7 @@ export function lineOf(s) {
   const h = s.honest, y = s.perYear, d = s.dd;
   const fw = s.forward ? (s.forward.judged ? `Forward so far ${fR(s.forward.exp)} a trade over ${s.forward.n}: ${s.forward.out === 'above' ? 'above' : s.forward.out === 'below' ? 'below' : 'inside'} the band ${fBand(s.forward.lo, s.forward.hi, 2)}.`
     : `Forward so far ${fR(s.forward.exp)} a trade over ${s.forward.n}: too few to place.`) : 'No forward trade yet.';
-  return `Expect ${fR(h.exp)} a trade${s.fin ? ' after financing' : ''} (${fBand(s.perTrade.lo, s.perTrade.hi, 2)}) over about ${Math.round(y.trades)} trades a year, so ${fBand(y.lo, y.hi)} in a year; plan for a drawdown of ${fDD(d.lo, d.hi)}. ${fw} Verdict: ${s.verdict.text}.`;
+  return `Expect ${fR(h.exp)} a ${s.fin && s.fin.everyUnit ? 'position' : 'trade'}${s.fin ? (s.fin.everyUnit ? ' after financing on every unit' : ' after financing') : ''} (${fBand(s.perTrade.lo, s.perTrade.hi, 2)}) over about ${Math.round(y.trades)} trades a year, so ${fBand(y.lo, y.hi)} in a year; plan for a drawdown of ${fDD(d.lo, d.hi)}. ${fw} Verdict: ${s.verdict.text}.`;
 }
 // b: the base entry; dsys: this system's decay reading (for the forward record); now for the stamp
 export function expectOne(b, dsys) {

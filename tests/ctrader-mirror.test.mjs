@@ -971,9 +971,9 @@ test('the rule lives in the config the Trader writes, with its condition and its
   assert.match(src, /200 or more forex and crypto replica paper trades/);
 });
 
-// ─── moved-stop audit (12 Nov 2026, research/proposals/2026-11-12-moved-stop-audit.md, docs/owner-decisions.md item 49) ───
+// ─── moved-stop audit (12 Nov 2026, research/proposals/2026-11-12-moved-stop-audit.md, docs/owner-decisions.md item 50) ───
 // The mirror reads |entry - stop| as 1R in three places. After the council's stop moved (trail, break-even, the gold trend ratchet)
-// that is not the risk the trade opened with. fillQuality (accounting) is fixed; the two copy decisions are the owner's (item 49)
+// that is not the risk the trade opened with. fillQuality (accounting) is fixed; the two copy decisions are the owner's (item 50)
 // and these tests record what the mirror does TODAY, so a fix changes them on purpose.
 test('moved-stop audit: fill quality is measured in the opening risk (r0), not in the distance to a moved stop', async () => {
   const { fillQuality } = await import('../council/ctrader-mirror.mjs');
@@ -987,7 +987,7 @@ test('moved-stop audit: fill quality is measured in the opening risk (r0), not i
   assert.equal(fillQuality({ ...t, id: 'ict:gc-b-1' }, 4002, NOW).slipR, undefined, 'ICT fills keep no slipR (futures vs cash)');
 });
 
-test('moved-stop audit, item 49 (a): a market copy of a trade whose stop already sits PAST its entry gets its stop on the losing side', async () => {
+test('moved-stop audit, item 50 (a): a market copy of a trade whose stop already sits PAST its entry gets its stop on the losing side', async () => {
   // a council buy from 1.1000 (r0 0.0020) whose trail has locked +0.6R: stop 1.1012. No council price on file (marks missing or
   // older than LIMITS.markMaxAge), so no late-copy check runs and the copy is measured from the entry: the relative stop is a
   // DISTANCE (relative() drops the sign), so the broker puts it 0.0012 BELOW the fill. The council's trade cannot lose; the copy can.
@@ -1010,7 +1010,7 @@ test('moved-stop audit, item 49 (a): a market copy of a trade whose stop already
   const p4 = [...b4.positions.values()][0]; assert.ok(p4.stopLoss < p4.price, 'the demo stop sits under its fill while the desk has +0.6R locked');
 });
 
-test('moved-stop audit, item 49 (b): the late-copy check reads "R" from the moved stop, so a ratcheted trade is skipped earlier than 1R', async () => {
+test('moved-stop audit, item 50 (b): the late-copy check reads "R" from the moved stop, so a ratcheted trade is skipped earlier than 1R', async () => {
   // gold-trend-like: r0 0.0020, the stop ratcheted to 1.0990 (still under the entry); price 0.0016 (0.8 opening R) above the entry
   const t = tr({ id: 'eurusd-ratchet-1', stop: 1.099, r0: 0.002, trailMoved: true, opened: NOW - 7200, filled: NOW - 7200 });
   const b = broker(); const r = await mirrorRound({ env: ENV, trades: [t], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1016 } });

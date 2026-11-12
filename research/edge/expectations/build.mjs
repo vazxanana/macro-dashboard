@@ -11,7 +11,8 @@
 // "backtest" the forward record is watched against, and an authored regime note whose numbers come from the computed stats.
 // Records:
 //   research/edge/sizing/inputs.json            ict-a (2008-26), nq-open (2004-26), replica (2018-26), gtrend, geg (2006-26)
-//   research/edge/gold-systems-oos/result.json  positions: gtrend5, gtl (2006-26; x1 net = `n`)
+//   research/edge/gold-systems-oos/result.json  positions: gtl, geg (2006-26; x1 net = `n`)
+//   research/edge/supported-book/legs.json      units of gtrend, gtrend5 (2006-26; every unit, since 12 Nov 2026)
 //   research/edge/mosha-oos/result.json         positions: Mosha BO live combination, OANDA 2006-26 (#560)
 //   research/edge/robustness/out/gmp.json       gold momentum pullback 2018-26 rebuild
 //   research/edge/crypto-trend-decay/result.json  crypto trend v3 positions (closed only)
@@ -20,6 +21,7 @@ import path from 'node:path';
 import { loadBase, mcDrawdown, SYSTEMS } from '../../../council/decay.mjs';
 import { describe, drawdown, fR } from '../../../council/expect.mjs';
 import { FIN, nights } from '../../../council/fills.mjs';
+import { positions as bookPositions } from '../supported-book/run.mjs';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname), ROOT = path.resolve(HERE, '../../..'), EDGE = path.resolve(HERE, '..');
 const rdE = (f) => JSON.parse(fs.readFileSync(path.join(EDGE, f), 'utf8'));
@@ -58,7 +60,18 @@ const replica = SZ.systems.replica.map((r, i) => { const p = RPOS[i]; if (!p || 
   const l = p.legs[0], nn = p.side === 'buy' ? nights(r[0], r[1]) : 0, f = nn * FIN.xau.long * goldPx(r[0]) / l[2] * l[1]; return { t: r[0], c: r[1], R: r[cN] - f, R0: r[cN], fin: f, nn }; });
 const CR = rdE('crypto-trend-decay/result.json');
 const crypto = CR.trades.filter((x) => x.exitKind !== 'open' && Number.isFinite(x.R)).map((x) => ({ t: sec(x.sig), c: sec(x.exit), R: x.R }));
-const cut = (rec, from, to) => rec.filter((p) => inRange(p.t, from, to));
+// Gold trend and Gold trend fast, every unit (12 Nov 2026, owner approved docs/owner-decisions.md item 42): the book study's
+// unit-level records (research/edge/supported-book/legs.json, the committed gold-systems-oos engine's units, gated against its
+// positions) through that study's own position function: a position = its first unit and its add, net of $0.30 a unit and of
+// financing on EVERY unit (nights x FIN.xau.long x the unit's own entry price / the unit's own risk), booked on the day its last
+// unit closes (a weekend close on the Monday), so a window holds the positions CLOSED in it, as the book study counts them.
+// R = net after financing, R0 = before it (all units, after the round trip), nn = unit-nights.
+const LEGS = rdE('supported-book/legs.json').units;
+const bookRec = (sys) => { const L = LEGS.filter((u) => u.sys === sys), nn = new Map();
+  for (const u of L) { const k = u.of || u.id; nn.set(k, (nn.get(k) || 0) + nights(u.t, u.c)); }
+  return bookPositions(L).map((p) => ({ t: p.t, c: p.c, day: p.day, R: p.n, R0: p.n + p.fin, fin: p.fin, nn: nn.get(p.id), units: p.units })); };
+// a record with `day` (the book study's) is cut by its close day, every other by its entry time
+const cut = (rec, from, to) => rec.filter((p) => (p.day ? p.day >= from && p.day <= to : inRange(p.t, from, to)));
 
 const base = loadBase();
 const SRC = {
@@ -66,10 +79,10 @@ const SRC = {
     study: 'research/edge/replica-oos', note: (h, b) => `fails out of sample: ${fR(h.exp)} a trade after financing on 2017-22 (${h.n} trades, all in 9 months of open gate; no trade in 2017, 2021); ${fR(b.exp)} on 2023-26 with the same harness (#512)` },
   'mosha-bo': { rec: mosha, honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 calibration'],
     study: 'research/edge/mosha-oos', note: (h, b) => `a null result in substance: ${fR(h.exp)} a trade after financing on 2006-17 (${h.n} positions, t ${h.t}; the bull half lost, −16.5R without its best 5) against ${fR(b.exp)} on 2018-26; the independent 2018-26 rebuild made +0.01R with a −39R drawdown (#560, #486)` },
-  gtrend: { rec: gso('gtrend'), honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
-    study: 'research/edge/gold-systems-oos', note: (h, b) => `regime-bound: ${fR(h.exp)} a trade after financing on 2006-17 (+0.49R before it; 8 of 12 years positive) against ${fR(b.exp)} on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)` },
-  gtrend5: { rec: gso('gtrend5'), honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
-    study: 'research/edge/gold-systems-oos', note: (h, b) => `regime-bound: ${fR(h.exp)} a trade after financing on 2006-17 (+0.37R before it) against ${fR(b.exp)} on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)` },
+  gtrend: { rec: bookRec('gtrend'), units: true, honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
+    study: 'research/edge/gold-systems-oos', note: (h, b, f) => `regime-bound: ${fR(h.exp)} a position after financing on every unit on 2006-17 (${fR(f.before.exp)} before it; the positions closed in the window, as the book study counts them; 8 of 12 years positive) against ${fR(b.exp)} on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)` },
+  gtrend5: { rec: bookRec('gtrend5'), units: true, honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
+    study: 'research/edge/gold-systems-oos', note: (h, b, f) => `regime-bound: ${fR(h.exp)} a position after financing on every unit on 2006-17 (${fR(f.before.exp)} before it; the positions closed in the window) against ${fR(b.exp)} on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)` },
   gtl: { rec: gso('gtl'), honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
     study: 'research/edge/gold-systems-oos', note: (h, b) => `regime-bound, and does not survive financing: ${fR(h.exp)} a trade after it on 2006-17 (+0.05R before it; a coin flip at double cost, −${h.maxDD.toFixed(0)}R drawdown, loses without 2016) against ${fR(b.exp)} on 2018-26; shadow since 11 Nov (#530, trend-breadth)` },
   geg: { rec: gso('geg'), honest: ['2006-07-01', '2017-12-31', '2006-17 out of sample'], built: ['2018-01-01', '2026-11-06', '2018-26 built on'],
@@ -85,7 +98,7 @@ const SRC = {
 };
 
 const out = { at: new Date().toISOString(), method: 'research/edge/expectations/build.mjs', costs: 'x1 per study: gold 0.30 a unit, NQ 1 point, ICT the futures round trip, crypto Kraken fees; since 11 Nov 2026 every long gold position also pays overnight financing (the four long-only gold systems, and the buys of the Gold replica, Mosha BO and the momentum pullback)', z: 1.645,
-  financing: { rate: FIN.xau.long, asOf: FIN.xau.asOf, src: FIN.xau.src, method: 'research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only (the momentum pullback: its rebuild\'s own entry price; the replica: its first leg at the leg\'s size); a sell pays nothing and is credited nothing', systems: ['gtrend', 'gtrend5', 'geg', 'gtl', 'replica', 'mosha-bo', 'gmp'],
+  financing: { rate: FIN.xau.long, asOf: FIN.xau.asOf, src: FIN.xau.src, method: 'research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only (the momentum pullback: its rebuild\'s own entry price; the replica: its first leg at the leg\'s size); a sell pays nothing and is credited nothing. Since 12 Nov 2026 (owner, item 42) Gold trend and Gold trend fast pay on EVERY unit, the add included, at each unit\'s own entry price and risk, from research/edge/supported-book/legs.json through that study\'s position function (a window holds the positions closed in it)', everyUnit: ['gtrend', 'gtrend5'], systems: ['gtrend', 'gtrend5', 'geg', 'gtl', 'replica', 'mosha-bo', 'gmp'],
     notComputed: 'NQ open run: out before the rollover, none; ICT and crypto: not measured' }, systems: [] };
 // financing of a window: what it took per position and the figures before it (null for a system whose record carries none)
 const finOf = (rec, from, to) => { const a = cut(rec, from, to); if (!a.length || a[0].R0 == null) return null; const d0 = describe(a.map((p) => p.R0));
@@ -97,9 +110,9 @@ for (const s of SYSTEMS) {
   const h = win(cut(S.rec, S.honest[0], S.honest[1]), S.honest[0], S.honest[1], S.honest[2], S.study);
   const bo = S.built ? win(cut(S.rec, S.built[0], S.built[1]), S.built[0], S.built[1], S.built[2], S.study) : { ...h, sameAsHonest: true };
   const backtest = { src: b.src, window: `${b.from} to ${b.to}`, n: b.n, exp: b.ref, sd: b.sd, perYear: b.perYear, maxDD: b.maxDD, mcDD: b.mcDD };
-  const fin = finOf(S.rec, S.honest[0], S.honest[1]);
-  const e = { id: s.id, name: s.name, desk: s.desk, live: !s.shadow, ...(s.shadow && s.since ? { shadowSince: s.since } : {}), study: S.study, honest: h, builtOn: bo, backtest, fin,
-    dd: { mc95: b.mcDD, worst: r2(Math.max(h.maxDD, b.maxDD)) }, regime: S.note(h, bo) };
+  const fin = finOf(S.rec, S.honest[0], S.honest[1]); if (S.units && fin) fin.everyUnit = true;
+  const e = { id: s.id, name: s.name, desk: s.desk, live: !s.shadow, ...(s.shadow && s.since ? { shadowSince: s.since } : {}), study: S.study, ...(S.units ? { units: 'research/edge/supported-book/legs.json (every unit)' } : {}), honest: h, builtOn: bo, backtest, fin,
+    dd: { mc95: b.mcDD, worst: r2(Math.max(h.maxDD, b.maxDD)) }, regime: S.note(h, bo, fin) };
   out.systems.push(e);
   rows.push(`| ${s.name}${s.shadow ? ' (shadow)' : ''} | ${h.window} | ${h.n.toLocaleString('en-GB')} | ${fR(h.exp)} (t ${h.t}) | ${h.perYear} | −${h.maxDD}R | ${fR(bo.exp)} (${bo.window}) | ${fR(b.ref)}, MC95 −${b.mcDD}R |`);
 }

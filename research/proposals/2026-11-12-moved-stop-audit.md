@@ -1,7 +1,7 @@
 # Moved stops: where else 1R is read from a stop that has already moved (12 Nov 2026)
 
-An audit, four small accounting / display fixes, and one proposal for the owner (docs/owner-decisions.md item 49, which follows
-item 48 of the NQ open-run report). It follows `research/proposals/2026-11-12-nq-open-r0.md` (branch `nq-open-r0`, item 48),
+An audit, four small accounting / display fixes, and one proposal for the owner (docs/owner-decisions.md item 50, which follows
+item 49 of the NQ open-run report). It follows `research/proposals/2026-11-12-nq-open-r0.md` (branch `nq-open-r0`, item 49),
 which found that the NQ open run's loop works out its risk as `|entry - stop|` from a stop its trail has already moved. The
 question here: does the same defect sit anywhere else? Proof: `tests/moved-stop-audit.test.mjs` and the "moved-stop audit"
 tests at the end of `tests/ctrader-mirror.test.mjs` (offline, hand-made candles, one management call per candle as the live
@@ -35,7 +35,7 @@ target or exit of any system changed; no stored record was rewritten.
    One helper, `openRisk(x)` in `council/fills.mjs` (copies in `api/_edge-analyst.js` and the page, compared by a test): the
    stamped `r0`; else `|entry - stop|` while the stop has not moved; else the first stop `stop0`; else, for the NQ open run,
    half the distance to its 2R mark; else unknown (the figure is left out).
-4. **Two copy decisions of the demo mirror read 1R from the moved stop: proposed, not changed** (item 49, below). One of them
+4. **Two copy decisions of the demo mirror read 1R from the moved stop: proposed, not changed** (item 50, below). One of them
    can leave a demo copy with its stop on the losing side while the council's trade has a profit locked in.
 5. **Effect so far: none.** On council-data of 12 Nov (all five mirror accounts, 495 copies kept, 30 days): no copy was made
    of a trade whose stop sat past its entry, no copy was skipped because of the moved-stop reading (two "has run" skips, both
@@ -55,15 +55,15 @@ target or exit of any system changed; no stored record was rewritten.
 | `council/trader.mjs:613` retire legacy | R at retirement | Sound: `tr.r0 \|\|`, stamped while managed | text check of every stop move |
 | `council/trader.mjs:692` replica research loop | R from `|entry - stop|` each run | Sound: the stop never moves | `Trader text: …` |
 | `council/trader.mjs:1138` other research rows (Daily Cycle, gold New York run) | same | Sound: the stop never moves | same |
-| `council/trader.mjs:1998` NQ open run (+ regime shadow) | R, mfe, trail from `|entry - stop|` | **Defect: item 48** (branch `nq-open-r0`) | its own test; pinned as found here |
+| `council/trader.mjs:1998` NQ open run (+ regime shadow) | R, mfe, trail from `|entry - stop|` | **Defect: item 49** (branch `nq-open-r0`) | its own test; pinned as found here |
 | `council/fills.mjs` `manageLive`, `addUnit`, `sizeR`, `expireOrder` | as the Trader's loop | Sound (parity-tested to the trader's text) | as above |
 | `council/fills.mjs` `tradeCost`, `financing`, `annotateCosts` | cost and financing in R | Sound: `r0`; no closed moved record lacks it | `costs and financing …` |
 | `council/fills.mjs` `rowFinancing` | financing of replay rows | Sound for moved stops (replay rows keep the opening stop); see "Left as is" for `stop0` | same |
 | `council/fills.mjs` `replayBar` / `manageVariant`, `council/backtest.mjs` | variants' stops, mfe | Sound: `tr.stop` / `tr.r0` never move | `the daily replay …` |
 | `council/ctrader-mirror.mjs:413` `fillQuality` | `slipR` | **Fixed** (opening risk) | `moved-stop audit: fill quality …` |
 | `council/ctrader-mirror.mjs:267` `riskVolume` | lots and cash at risk of a NEW copy | Sound: the copy's real risk is from its fill to the council's stop now | n/a |
-| `council/ctrader-mirror.mjs:719` late-copy check | "run more than 1R" | **Proposal 49 (b)**: reads R from the moved stop | `… item 49 (b) …` |
-| `council/ctrader-mirror.mjs:737` market copy's relative stop | the demo stop of a new copy | **Proposal 49 (a)**: a stop past the entry is placed on the losing side | `… item 49 (a) …` |
+| `council/ctrader-mirror.mjs:719` late-copy check | "run more than 1R" | **Proposal 50 (b)**: reads R from the moved stop | `… item 50 (b) …` |
+| `council/ctrader-mirror.mjs:737` market copy's relative stop | the demo stop of a new copy | **Proposal 50 (a)**: a stop past the entry is placed on the losing side | `… item 50 (a) …` |
 | `council/ctrader-mirror.mjs:579` `ensureStop`, 2c stop moves | absolute stop, ICT moved by the same distance | Sound (signed) | existing mirror tests |
 | `council/ctrader-reconcile.mjs:71-97` | tolerances, ICT "moved", wrong-side check | **Fixed** (report only) | `reconciliation: …` |
 | `council/forward.mjs:74` | floating R of the book | Sound: gtrend / geg carry `r0` | n/a |
@@ -74,7 +74,7 @@ target or exit of any system changed; no stored record was rewritten.
 | `market-structure.html:7840` trade chart dialog | its own `r0` / `stop0` reading | Sound (already handles moves) | read |
 | `ict/tracker.mjs`, `ict/replay.mjs` (report only) | R, mfe, trail | Sound: stored `r0` | read |
 
-## The proposal: item 49
+## The proposal: item 50
 
 **(a) A market copy of a trade whose stop already sits past its entry.** The mirror copies an open council trade with a
 RELATIVE stop: `relativeStopLoss = relative(from - t.stop)`, and `relative()` keeps only the distance. When the council's stop
@@ -108,7 +108,7 @@ on that line (`fills.mjs` `openRisk`, imported in the mirror as `riskAtOpen`, be
 
 - Recommended: (a) and (b) together. (a) only removes copies that cannot be right; (b) makes the guard measure what it
   says. Both are demo-mirror decisions (which trades the demo account opens), so they wait for the owner.
-- If applied: the two "item 49" tests at the end of `tests/ctrader-mirror.test.mjs` change on purpose (they record today's
+- If applied: the two "item 50" tests at the end of `tests/ctrader-mirror.test.mjs` change on purpose (they record today's
   behaviour); nothing else in the suite reads these lines.
 - If nothing is decided: nothing has happened yet on council-data; the first ICT A-setup copied after its trail passed the
   entry gets a demo stop on the losing side.

@@ -165,7 +165,7 @@ export const exitR = (sell, entry, px, r0) => +(((sell ? entry - px : px - entry
 // (displays, the digest, the mirror's fill quality, reconciliation): never a management loop. 1R is the record's stamped r0;
 // without one, |entry - stop| only while the stop has not moved (no trailMoved / beMoved: the stop IS the opening stop, also
 // for a replica row whose stop0 is the level before its round-number step); once it moved, the first stop stop0, else for the
-// NQ open run (no r0 on file, docs/owner-decisions.md item 48) half the distance to its 2R mark tp1; else null (unknown: a
+// NQ open run (no r0 on file, docs/owner-decisions.md item 49) half the distance to its 2R mark tp1; else null (unknown: a
 // reader shows nothing rather than a figure in the trailed unit). api/_edge-analyst.js and market-structure.html carry a copy
 // (tests/moved-stop-audit.test.mjs compares them).
 export function openRisk(x) {
