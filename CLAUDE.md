@@ -1162,6 +1162,18 @@ stacked; Clean detaches both overlays, their price lines and markers (indicators
 layers are four named groups (Meridian markup, Council, Levels and time, Chart); Telegram sits behind a disclosure. The header carries a
 centred "Macro desk" button (`.hdr-macro`, animated conic border, hidden for the public role) linking to /macro-desk.
 
+## Meridian markup: the market cycle (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … H4 tells retracement of daily, M15 retracement of H1, M5 of M15")
+`msCycle(legs)` (pure, top level of `market-structure.html` next to `msAnalyze`; `cycleNow()` builds the legs of D1 / H4 / H1 /
+M15 / M5 from each pane's own analysis): for each timeframe and the one under it, `move` (the lower one still agrees), `pullback`
+(the lower one broke against it after its break: that break is the ChoCh, the pullback / retracement started) or `resumed` (the
+lower one then broke back with it: the pullback is over). Targets: a pullback goes to 50% of the move, then the move's origin
+(the broken level); the move's own target is its extreme. On the charts (layer "Market cycle", `G.show.cycle`, purple `CYC`):
+the ChoCh line on the lower chart ("ChoCh ▲ · H4 pullback starts", "back with H4"), and on H4 / H1 / M15 / M5 the targets of
+the legs above it (H4 shows D1's; H1 shows H4's; M15 and M5 show H4's and H1's). `#ms-cycle` under the alignment strip: a chip
+per pair and one sentence for H4 / H1. Display only, Meridian markup only, hidden for guests: no rule, trade or alert reads it,
+and it says "a reading of structure, not a tested rule" (the mosha-retrace / mosha-cycle studies of this reading failed).
+Tests: `tests/market-cycle.test.mjs`.
+
 ## cTrader demo accounts on the profile (8 Nov 2026)
 `council/ctrader-account.mjs` (`accountSnapshots`) reads every account the mirror trades on (accountsFor: council/ctrader-accounts.json,
 config.json mirrorAccounts, env) and writes council-data `ctrader/accounts.json { at, accounts: [{ label, books, base, account, balance,
