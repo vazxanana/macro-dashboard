@@ -10542,6 +10542,59 @@
     "exitPrice": 0.6835,
     "councilExit": 0.68359,
     "councilR": 0.26
+   },
+   "eurusd-rswing-1794480334": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "rswing",
+    "openedAt": "2026-11-12T10:49:13.000Z",
+    "councilEntry": 1.11005,
+    "stop": 1.1064818571428572,
+    "t1": 1.11129,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.11005,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 3.57,
+    "margin": 2.22,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 1.11005,
+    "slipR": 0,
+    "lagSec": 219,
+    "positionId": "48748679",
+    "volume": 100000,
+    "status": "open"
+   },
+   "usdchf-scalp-1794480334": {
+    "symbol": "USDCHF",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-12T10:49:13.000Z",
+    "councilEntry": 0.83132,
+    "stop": 0.8318199999999999,
+    "t1": 0.8303200000000001,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.83132,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.97,
+    "margin": 6,
+    "shadow": true,
+    "fillPrice": 0.83133,
+    "slipR": -0.02,
+    "lagSec": 219,
+    "positionId": "48748683",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -10549,7 +10602,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9852.51 · 33 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9852.51 · 35 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10578,64 +10631,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "eurusd-rswing-1794480334": {
-    "orderId": "33992905",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "rswing",
-    "limitPrice": 1.11005,
-    "stop": 1.1064818571428572,
-    "t1": 1.11129,
-    "placedAt": "2026-11-12T10:46:43.000Z",
-    "expires": "2026-11-14T10:45:34.000Z",
-    "riskCash": 3.57,
-    "margin": 2.22,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
-   "usdchf-scalp-1794480334": {
-    "orderId": "33992906",
-    "symbol": "USDCHF",
-    "side": "sell",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 0.83132,
-    "stop": 0.8318199999999999,
-    "t1": 0.8303200000000001,
-    "placedAt": "2026-11-12T10:46:43.000Z",
-    "expires": "2026-11-12T13:45:34.000Z",
-    "riskCash": 1.97,
-    "margin": 6,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9852.51,
-  "lastRun": "2026-11-12T10:46:43.000Z"
+  "lastRun": "2026-11-12T10:49:13.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T08:14:53.000Z",
-   "msg": "moved AUDUSD 48181010 protection: stop 0.6933006785714286 -> 0.6934907, target 0.6697186428571429 -> 0.6699086 (council swing)",
-   "trade": "audusd-swing-1794333208"
-  },
-  {
-   "at": "2026-11-12T08:14:53.000Z",
-   "msg": "moved USDCAD 48330679 protection: stop 1.4178206 -> 1.4184506, target 1.42995 -> 1.43058 (council position)",
-   "trade": "usdcad-position-1794378728"
-  },
   {
    "at": "2026-11-12T08:14:53.000Z",
    "msg": "moved USDCAD 48333306 protection: stop 1.41785 -> 1.41848, target 1.42727 -> 1.4279 (council intraday)",
@@ -12125,6 +12127,16 @@
    "at": "2026-11-12T10:46:43.000Z",
    "msg": "placed sell limit USDCHF 0.03 lot at 0.83132 (council scalp, valid to 2026-11-12T13:45Z)",
    "trade": "usdchf-scalp-1794480334"
+  },
+  {
+   "at": "2026-11-12T10:49:13.000Z",
+   "msg": "limit filled: EURUSD position 48748679 at the broker",
+   "trade": "eurusd-rswing-1794480334"
+  },
+  {
+   "at": "2026-11-12T10:49:13.000Z",
+   "msg": "limit filled: USDCHF position 48748683 at the broker",
+   "trade": "usdchf-scalp-1794480334"
   }
  ],
  "limits": {
@@ -12203,11 +12215,11 @@
   ]
  },
  "execution": {
-  "n": 354,
+  "n": 356,
   "meanSlipR": -0.013,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 140.5,
+  "medianLagSec": 142,
   "bySymbol": {
    "SOLUSD": {
     "n": 20,
@@ -12222,8 +12234,8 @@
     "meanSlipR": 0.069
    },
    "EURUSD": {
-    "n": 43,
-    "meanSlipR": -0.021
+    "n": 44,
+    "meanSlipR": -0.02
    },
    "GBPUSD": {
     "n": 52,
@@ -12234,8 +12246,8 @@
     "meanSlipR": -0.053
    },
    "USDCHF": {
-    "n": 51,
-    "meanSlipR": 0.027
+    "n": 52,
+    "meanSlipR": 0.026
    },
    "AUDUSD": {
     "n": 51,
