@@ -912,3 +912,23 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   reduce or skip. The trade happens either way; the answer is put beside the result. It changes no rule, size or trade.
 - **Options.** (a) Keep it on (nothing to set). (b) Switch it off: `EDGE_ANALYST=off` in Vercel.
 - **If nothing is decided.** It runs within its budget.
+
+## The NQ open run's trail, 12 Nov 2026
+
+### [ ] 48. The NQ open run's trail measures its risk from the moved stop: fix it
+
+- **Status (12 Nov 2026): open, waiting for you.** Found in a review and confirmed with a test; nothing in the trader was
+  changed.
+- **Context.** The NQ New York open run (a paper shadow since 11 Nov) trails its stop 1R behind the best price from +2R.
+  The loop that manages it works out "1R" again on every run from where the stop is now, not from where it started. Once
+  the stop has moved, a trailing-stop exit is booked at about +1R whatever the profit was, a time exit is booked too
+  small, and the trail itself jumps further than the rule says, so trades can be closed early. No trade has reached +2R
+  yet, so no stored result is wrong today; but in the rule's four-year replay the trailing-stop exits are +165R of its
+  +99R total, so a forward record kept this way would look like a broken edge. Write-up, proof and the three-line fix:
+  `research/proposals/2026-11-12-nq-open-r0.md` (test `tests/nq-open-r0.test.mjs`).
+- **Options.** (a) Apply the fix: the record keeps its opening risk and the trail follows the rule as tested. (b) Fix
+  only the booked R, keep today's trail. (c) Leave it.
+- **Recommended.** (a). It needs your word because it changes where the trail puts the stop (an exit), although it only
+  makes the trail follow the rule it was tested with; no stop is ever loosened and no closed result is rewritten.
+- **If nothing is decided.** Harmless until the first open-run trade reaches +2R; that one is booked about +1R and may be
+  closed early.
