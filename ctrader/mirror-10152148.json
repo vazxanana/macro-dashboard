@@ -3713,7 +3713,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T12:21:30.000Z",
     "councilEntry": 3949.1,
     "stop": 3942.65,
@@ -3727,10 +3727,12 @@
     "slipR": -0.228,
     "lagSec": 78,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T12:21:30.000Z",
-    "brokerStop": 3941.18
+    "brokerStop": 3941.18,
+    "closedAt": "2026-11-12T12:29:13.000Z"
    }
   },
   "day": {
@@ -3738,7 +3740,7 @@
    "startBalance": 5543.45
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5522.47 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 5515.92 · 2 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker"
   },
@@ -3754,15 +3756,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5522.47,
-  "lastRun": "2026-11-12T12:26:23.000Z"
+  "balance": 5515.92,
+  "lastRun": "2026-11-12T12:29:13.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T08:05:39.000Z",
-   "msg": "opened buy USDCHF 0.01 lot (council replica)",
-   "trade": "usdchf-replica-1794297871-b"
-  },
   {
    "at": "2026-11-10T08:11:16.000Z",
    "msg": "opened sell BTCUSD 0.01 lot (council replica)",
@@ -5256,6 +5253,11 @@
   {
    "at": "2026-11-12T12:21:30.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794486012-b"
+  },
+  {
+   "at": "2026-11-12T12:29:13.000Z",
+   "msg": "XAUUSD position 48768062 closed at the broker",
    "trade": "xau-replica-1794486012-b"
   }
  ],

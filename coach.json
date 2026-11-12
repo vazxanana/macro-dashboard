@@ -3,26 +3,26 @@
   {
    "setup": "all",
    "kind": "dataSource",
-   "value": "oanda:usdcad",
+   "value": "oanda:usdchf",
    "markets": [
-    "usdcad"
+    "usdchf"
    ],
-   "label": "manage USD/CAD trades on OANDA spot candles",
-   "n": 44,
-   "liveR": 3.35,
-   "spotR": -14.86,
-   "exp": 0.41,
-   "why": "The same closed live trades re-judged on OANDA spot candles: +3.4R on Kraken candles vs −14.9R on spot over 44 trades (USD/CAD +0.08R live vs −0.34R spot (44)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
+   "label": "manage USD/CHF trades on OANDA spot candles",
+   "n": 57,
+   "liveR": 33.21,
+   "spotR": -1.74,
+   "exp": 0.61,
+   "why": "The same closed live trades re-judged on OANDA spot candles: +33.2R on Kraken candles vs −1.7R on spot over 57 trades (USD/CHF +0.58R live vs −0.03R spot (57)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
    "spotAt": "2026-11-12T11:33:46.457Z",
-   "at": "2026-11-12T12:24:16.000Z"
+   "at": "2026-11-12T12:27:56.000Z"
   }
  ],
- "proposalsKey": "v5|2026-11-12T11:33:40.101Z|2026-11-12T11:33:46.457Z|2026-11-11T18:41:21.643Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"Kraken\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsKey": "v5|2026-11-12T11:33:40.101Z|2026-11-12T11:33:46.457Z|2026-11-11T18:41:21.643Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"Kraken\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsSent": {
-  "key": "all:dataSource:oanda:usdcad",
-  "at": "2026-11-12T12:24:16.000Z",
+  "key": "all:dataSource:oanda:usdchf",
+  "at": "2026-11-12T12:27:56.000Z",
   "items": [
-   "Manage USD/CAD trades on OANDA spot candles — live +0.08R vs spot −0.34R a trade over 44 trades"
+   "Manage USD/CHF trades on OANDA spot candles — live +0.58R vs spot −0.03R a trade over 57 trades"
   ]
  },
  "ictWatch": [
@@ -48,7 +48,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: skip Fridays: the 34 A-setups it drops made −0.11R a trade (t -0.54; halves +0.09R / −0.31R); the 219 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-12T12:24:16.000Z"
+   "at": "2026-11-12T12:27:56.000Z"
   },
   {
    "setup": "ICT A",
@@ -72,7 +72,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: only trades against or without H1 structure: the 77 A-setups it drops made +0.14R a trade (t 0.88; halves +0.35R / −0.06R); the 176 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-12T12:24:16.000Z"
+   "at": "2026-11-12T12:27:56.000Z"
   }
  ],
  "decay": {
