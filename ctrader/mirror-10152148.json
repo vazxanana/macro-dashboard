@@ -3530,14 +3530,42 @@
     "stopCheckedAt": "2026-11-11T12:07:02.000Z",
     "brokerStop": 2062.28,
     "closedAt": "2026-11-11T15:13:43.000Z"
+   },
+   "xau-replica-1794438963-s": {
+    "positionId": "48573496",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-12T00:00:50.000Z",
+    "councilEntry": 3984.09,
+    "stop": 3991.81,
+    "t1": 3968.65,
+    "riskCash": 12.59,
+    "margin": 7.96,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3979.22,
+    "levelsFrom": "mark",
+    "fillPrice": 3978.77,
+    "slipR": 0.689,
+    "lagSec": 2687,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-12T00:00:50.000Z",
+    "brokerStop": 3991.36
    }
   },
   "day": {
-   "date": "2026-11-11",
-   "startBalance": 10017.08
+   "date": "2026-11-12",
+   "startBalance": 5543.45
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5543.45 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 5543.45 · 1 open",
   "skipped": {
    "xrp-replica-1794335450-b": "none of XRPUSD found at the broker"
   },
@@ -3571,11 +3599,6 @@
     "why": "daily loss stop (44.6% down today)",
     "n": 0,
     "at": "2026-11-11T22:01:21.000Z"
-   },
-   "xau-replica-1794438963-s": {
-    "why": "daily loss stop (44.7% down today)",
-    "n": 0,
-    "at": "2026-11-11T23:58:09.000Z"
    }
   },
   "paused": {},
@@ -3584,14 +3607,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 5543.45,
-  "lastRun": "2026-11-11T23:58:09.000Z"
+  "lastRun": "2026-11-12T00:00:50.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T07:03:26.000Z",
-   "msg": "opened sell ETHUSD 0.17 lot (council replica)",
-   "trade": "eth-replica-1794291039-s"
-  },
   {
    "at": "2026-11-10T07:03:26.000Z",
    "msg": "opened sell SOLUSD 0.01 lot (council replica)",
@@ -5086,6 +5104,11 @@
    "at": "2026-11-11T23:16:47.000Z",
    "msg": "not mirrored yet xau-replica-1794438963-s: daily loss stop (44.7% down today) (will retry)",
    "trade": "xau-replica-1794438963-s"
+  },
+  {
+   "at": "2026-11-12T00:00:50.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794438963-s"
   }
  ],
  "limits": {
@@ -5164,8 +5187,8 @@
   ]
  },
  "execution": {
-  "n": 121,
-  "meanSlipR": 0.079,
+  "n": 122,
+  "meanSlipR": 0.084,
   "medianSlipR": 0.038,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
@@ -5179,8 +5202,8 @@
     "meanSlipR": 0.189
    },
    "XAUUSD": {
-    "n": 10,
-    "meanSlipR": 0.104
+    "n": 11,
+    "meanSlipR": 0.157
    },
    "BTCUSD": {
     "n": 17,
