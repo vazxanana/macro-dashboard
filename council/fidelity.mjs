@@ -99,7 +99,7 @@ const forexClosed = (m, t) => { if (['xau', 'btc', 'eth', 'sol', 'xrp'].includes
 function whyLive(x) {
   if (!replaySetups.has(x.k)) return ['setup not modelled in replay', 'replay gap'];
   if (errors[x.market] || !replayMarkets.has(x.market)) return ['market failed in replay', 'data feed'];
-  if (x.status === 'skipped') return ['live skipped (price past stop/target at signal)', 'live-only guard'];
+  if (x.status === 'skipped') return [x.reason === 'fill-near-stop' ? 'live skipped (market fill inside the minimum stop)' : 'live skipped (price past stop/target at signal)', 'live-only guard'];
   if (!hasStatus && (x.status === 'open' || x.status === 'pending') && x.opened > to - 2 * 86400) return ['still open live; replay drops trades not closed by its end', 'replay bug'];
   const near = R.filter((r) => r.market === x.market && r.setup === x.k && r.side === x.side && Math.abs(r.opened - x.opened) <= NEAR && rMatch[R.indexOf(r)] < 0);
   if (near.length) return ['replay fired the same signal 10-60 min apart (timing/candle-close drift)', 'data feed'];

@@ -14,6 +14,7 @@
 //    overlapping minute exists (weekend, feed down, a switch before this code) the stops are kept and the note says so.
 //  - records from before this code have no feed tag: gold / forex records opened before FEED_SWITCH_AT are Kraken-priced,
 //    later ones OANDA; crypto is Kraken only.
+import { foldWeekend } from './fills.mjs';
 export const FEED_SWITCH_AT = 1794067260;   // 2026-11-07T16:01:00Z: gold and forex candles from OANDA spot (council/trader.mjs)
 export const feedTag = (feed) => /oanda/i.test(String(feed || '')) ? 'oanda' : 'kraken';
 // the feed a record was priced on: its tag, else inferred from the switch time (oandaMarket = a market that reads OANDA)
@@ -35,9 +36,11 @@ export function measureBasis(prev, bars, { maxGap = 900, maxFrac = 0.02, dp = 3 
 }
 // Gold daily engulf (geg): the order's levels are the base candle's range on the new feed. The base day is in the id
 // (`<market>-geg-<base.time>`); the candle must still be red and the limit must still sit below price (the rule's own check).
+// The engulf reads trading days since 12 Nov 2026 (council/fills.mjs foldWeekend, item 52), so the base is looked up on the same
+// folded series: a Monday base carries the Sunday reopen stub's range; a Sunday-dated base no longer exists (null: cancelled).
 export function rederiveGeg(tr, D, EG, price, dp) {
   const t = Number.isFinite(tr.zoneT) ? tr.zoneT : +String(tr.id || '').split('-').pop();
-  const b = (D || []).find((x) => x.time === t);
+  const b = foldWeekend(D).find((x) => x.time === t);
   if (!b || !(b.open > b.close) || !EG) return null;
   const entry = +b.high.toFixed(dp), stop = +(b.low - EG.pad).toFixed(dp), r0 = +(entry - stop).toFixed(dp);
   if (!(r0 > 0) || !(price > entry)) return null;

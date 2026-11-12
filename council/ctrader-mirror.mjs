@@ -51,6 +51,7 @@ import crypto from 'node:crypto';
 import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 import { openRisk as riskAtOpen } from './fills.mjs';   // the risk a trade OPENED with (12 Nov 2026, moved-stop audit): fill quality in R (renamed: riskVolume and the round have their own openRisk = cash at risk)
 import { writeAtomic } from './jsonio.mjs';   // state files: a killed run never leaves one cut short (the live runner's child timeout)
+import { dropTwins, sameOrder } from './dedupe.mjs';   // 12 Nov 2026: one order is copied once (never a duplicate record, never the twin of a copied order)
 
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
@@ -681,7 +682,11 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const fresh = trades.filter((t) => (!t.shadow || shadows) && !t.noCopy && (OPEN.has(t.status) || (t.status === 'pending' && !String(t.id).startsWith('ict:'))) && SYMBOLS[t.market]
       && (!openBooks || openBooks.includes(bookOf(t))) && !(exclude && exclude.has(t.id))
       && !st.map[t.id] && !st.orders[t.id] && !(st.skipped || {})[t.id]
-      && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
+      && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0)
+      // 12 Nov 2026 (owner: "count duplicates once"): a record marked 'duplicate', a trade whose exact twin (same market, side,
+      // second, entry, stop and target; council/dedupe.mjs) is already copied on any account, or the second twin of this round
+      // is never copied: one order, one demo position
+      .filter((t, i, arr) => dropTwins([t], trades, (id) => !!(st.map[id] || st.orders[id] || (exclude && exclude.has(id)))).length && !arr.slice(0, i).some((u) => sameOrder(u, t)));
     if (shadows && !st.catchUpAt) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
     st.paused = Object.fromEntries(Object.entries(st.paused || {}).filter(([, until]) => Date.parse(until) / 1000 > now));
     if (st.closedSeen) st.closedSeen = Object.fromEntries(Object.entries(st.closedSeen).filter(([, at]) => now - Date.parse(at) / 1000 < 86400));   // closed-market pauses still running

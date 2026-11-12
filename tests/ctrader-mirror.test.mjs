@@ -83,7 +83,10 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
   return { WS, sent, positions, orders, amends, o, fillOrder, setBalance: (b) => { balance = b; } };
 }
 const NOW = 1794000000;
-const tr = (o = {}) => ({ id: 'eurusd-intraday-1', market: 'eurusd', k: 'intraday', side: 'buy', entry: 1.1, stop: 1.098, t1: 1.105, rr: 2.5, status: 'open', opened: NOW - 60, filled: NOW - 60, shadow: false, ...o });
+// 12 Nov 2026: the mirror copies one order once (council/dedupe.mjs: same market, side, second, entry, stop and target), so
+// trades made here with another id are a second apart unless a test sets the time: distinct orders, as the Trader records them
+const SEC = new Map(), secOf = (id) => (id == null || id === 'eurusd-intraday-1' || id === 'eurusd-scalp-9' ? 0 : SEC.get(id) ?? (SEC.set(id, SEC.size + 1), SEC.size));
+const tr = (o = {}) => ({ id: 'eurusd-intraday-1', market: 'eurusd', k: 'intraday', side: 'buy', entry: 1.1, stop: 1.098, t1: 1.105, rr: 2.5, status: 'open', opened: NOW - 60 - secOf(o.id), filled: NOW - 60 - secOf(o.id), shadow: false, ...o });
 const started = { startedAt: new Date((NOW - 3600) * 1000).toISOString() };
 const types = (b) => b.sent.map((m) => m.payloadType);
 
@@ -131,7 +134,7 @@ test('8 Nov (owner: mirror everything): shadows are copied by default, marked sh
   assert.equal(b.positions.size, 2); assert.ok(r.state.catchUpAt); assert.equal(r.state.map['old-shadow'].shadow, true); assert.equal(r.state.map['old-shadow'].status, 'open');
   assert.ok(r.log.some((l) => /catch-up round: 2 open council trades/.test(l.msg)));
   // later rounds keep copying whatever is open and not yet copied, old or new (no freshness window any more)
-  r = await mirrorRound({ env: ENV, trades: trades.concat([tr({ id: 'old2', shadow: true, opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'new2', shadow: true, opened: NOW + 200, filled: NOW + 200 })]), state: r.state, WS: b.WS, now: NOW + 300 });
+  r = await mirrorRound({ env: ENV, trades: trades.concat([tr({ id: 'old2', shadow: true, opened: NOW - 3 * 3600 - 1, filled: NOW - 3 * 3600 - 1 }), tr({ id: 'new2', shadow: true, opened: NOW + 200, filled: NOW + 200 })]), state: r.state, WS: b.WS, now: NOW + 300 });
   assert.equal(b.positions.size, 4); assert.equal(r.state.map.old2.status, 'open'); assert.equal(r.state.map.new2.status, 'open');
   // the shadow trade closing at the council closes the demo position
   r = await mirrorRound({ env: ENV, trades: [tr({ id: 'old-shadow', shadow: true, status: 'loss' }), trades[1], tr({ id: 'new2', shadow: true }), tr({ id: 'old2', shadow: true })], state: r.state, WS: b.WS, now: NOW + 600 });
@@ -248,7 +251,7 @@ test('market closed: the trade waits for as long as it is open (no try counted),
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(r.state.wait['eurusd-intraday-1'], undefined);
   // a whole weekend of closed-market rounds: one order per symbol per pause, never a skip; a second trade on the symbol sends nothing while paused
   const b2 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started };
-  for (let i = 0; i < 30; i++) r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 }), tr({ id: 'two', opened: NOW + 100, filled: NOW + 100 })], state: r.state, WS: b2.WS, now: NOW + 100 + i * 240 });
+  for (let i = 0; i < 30; i++) r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 }), tr({ id: 'two', opened: NOW + 101, filled: NOW + 101 })], state: r.state, WS: b2.WS, now: NOW + 100 + i * 240 });
   assert.ok(orders(b2).length >= 4 && orders(b2).length <= 8, `orders ${orders(b2).length}`);   // 30 rounds x 4 min: one probe per pause + settle window
   assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined); assert.match(r.state.wait.two.why, /market closed/);
   assert.equal(r.log.filter((l) => /not mirrored yet two/.test(l.msg)).length <= 1, true);   // a repeat of the same reason is not logged again
@@ -542,7 +545,7 @@ test('owner reset: drops the copied-trade records, notes, pauses and day once pe
 });
 
 // ---- 8 Nov (owner: "open at the same time"): resting LIMIT orders for the council's pending trades ----------------------------
-const pend = (o = {}) => tr({ id: 'eurusd-scalp-9', k: 'scalp', status: 'pending', filled: undefined, opened: NOW - 120, h: '15m', entry: 1.1, stop: 1.098, t1: 1.105, ...o });
+const pend = (o = {}) => tr({ id: 'eurusd-scalp-9', k: 'scalp', status: 'pending', filled: undefined, opened: NOW - 120 - secOf(o.id), h: '15m', entry: 1.1, stop: 1.098, t1: 1.105, ...o });
 const limits = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ && m.payload.orderType === 2).map((m) => m.payload);
 const markets = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ && m.payload.orderType === 1).map((m) => m.payload);
 const cancels = (b) => b.sent.filter((m) => m.payloadType === PT.CANCEL_ORDER_REQ).map((m) => m.payload);
@@ -1043,4 +1046,15 @@ test('one feed: a feed-only offset leaves the broker stop alone; a break-even on
   assert.equal(feedOnlyMove({ stop: 2.5, t1: 3, feedAdj: { stop: 0.5, t1: 0 } }, { stop: 2, t1: 3 }, 1e-6), true);
   assert.equal(feedOnlyMove({ stop: 2.7, t1: 3, feedAdj: { stop: 0.5, t1: 0 } }, { stop: 2, t1: 3 }, 1e-6), false, 'a real move on top of the offset');
   assert.deepEqual(adjOf({}), { stop: 0, t1: 0 });
+});
+test('12 Nov 2026 (owner: count duplicates once): one order recorded under two setups is copied once, on any account', async () => {
+  const a = tr({ id: 'gbp-intraday-7', k: 'intraday', opened: NOW - 30, filled: NOW - 30 }), b2 = tr({ id: 'gbp-scalp-7', k: 'scalp', opened: NOW - 30, filled: NOW - 30 });
+  const other = tr({ id: 'gbp-rscalp-7', k: 'rscalp', opened: NOW - 30, filled: NOW - 30, t1: 1.104 });   // another target: its own trade
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [a, b2, other], state: started, WS: b.WS, now: NOW });
+  assert.equal(b.positions.size, 2); assert.ok(r.state.map['gbp-intraday-7']); assert.equal(r.state.map['gbp-scalp-7'], undefined); assert.ok(r.state.map['gbp-rscalp-7']);
+  r = await mirrorRound({ env: ENV, trades: [a, b2, other], state: r.state, WS: b.WS, now: NOW + 60 });
+  assert.equal(b.positions.size, 2, 'the twin is never opened later either');
+  // held on another account: not opened here; a record marked duplicate is never a candidate
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [a, b2, { ...other, status: 'duplicate', dupOf: a.id }], state: started, WS: b.WS, now: NOW, exclude: new Set([a.id]) });
+  assert.equal(b.positions.size, 0);
 });

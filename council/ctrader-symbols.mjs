@@ -28,6 +28,43 @@ export const SAMPLE = { balance: 50000, risk: LIMITS.risk.ict,
   stops: { xau: 32, gc: 32, nq: 160, es: 30, ym: 200, rty: 18, eurusd: 0.002, gbpusd: 0.002, audusd: 0.002, usdcad: 0.002, usdchf: 0.002 } };
 export const MODES = ['ENABLED', 'DISABLED_WITHOUT_PENDINGS_EXECUTION', 'DISABLED_WITH_PENDINGS_EXECUTION', 'CLOSE_ONLY_MODE'];
 const FRESH_QUOTE = 15 * 60;   // a quote older than this (market shut) keeps the previous spread
+// Spreads (12 Nov 2026, owner approved the cost-measurement fix). The demo is a raw-spread account: its forex majors are quoted
+// with bid = ask most of the day (EURUSD, AUDUSD, USDCAD, USDCHF 0.0 pips on 93-95 % of the reads of 8-12 Nov outside the 17:00
+// New York rollover, GBPUSD 0.0 on 83 %) and it charges a commission instead (ProtoOASymbol commissionType 1 = USD per million
+// USD of notional, a side: 22.5 on forex, 12 on gold; the demo's own deals show 0.04-0.06 a 0.01-lot round trip). So:
+//   spread       only ever a POSITIVE quoted spread: measured this run (spreadSrc 'measured'), else the last positive one kept for
+//                at most SPREAD_KEEP_DAYS with its own spreadAt ('kept'), else null ('default': the cost model uses its default).
+//                A zero or negative ask - bid is never written here (before this, a bid = ask quote wrote spread 0).
+//   quoteSpread  this run's ask - bid as quoted (0 allowed), quoteSpreadAt.
+//   spreadLog    the quoted spreads of the last SPREAD_LOG fresh reads ([unix sec, spread], zeros included), and spreadTypical
+//                { n, median, mean, zeroShare, from, to } over the reads outside the rollover hours (21:00-22:59 UTC, where raw
+//                spreads widen): what a fill outside the rollover really pays.
+//   commissionRT the broker's round-trip commission as a fraction of the price (2 x rate a side / 1e6; commission type 1 only,
+//                0 where the broker charges none, null where the type is another one).
+export const SPREAD_KEEP_DAYS = 7, SPREAD_LOG = 300, SPREAD_LOG_DAYS = 14;
+export const rolloverHour = (sec) => { const h = new Date(sec * 1000).getUTCHours(); return h === 21 || h === 22; };
+const med0 = (a) => { const v = a.slice().sort((x, y) => x - y), n = v.length; return n ? (n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2) : null; };
+export function spreadFields(q, fresh, before = {}, nowSec) {
+  const raw = fresh && q && Number.isFinite(q.ask - q.bid) ? +(q.ask - q.bid).toPrecision(6) : null, qsec = q ? Math.floor(q.ts / 1000) : null;
+  const o = { quoteSpread: raw != null && raw >= 0 ? raw : null, quoteSpreadAt: raw != null && raw >= 0 ? new Date(q.ts).toISOString() : null };
+  const keptAge = before.spreadAt ? nowSec - Date.parse(before.spreadAt) / 1000 : Infinity;
+  if (raw > 0) Object.assign(o, { spread: raw, spreadAt: new Date(q.ts).toISOString(), spreadSrc: 'measured' });
+  else if (+before.spread > 0 && keptAge <= SPREAD_KEEP_DAYS * 86400) Object.assign(o, { spread: +before.spread, spreadAt: before.spreadAt, spreadSrc: 'kept' });
+  else Object.assign(o, { spread: null, spreadAt: null, spreadSrc: 'default' });
+  let log = (Array.isArray(before.spreadLog) ? before.spreadLog : []).filter((x) => Array.isArray(x) && Number.isFinite(x[0]) && Number.isFinite(x[1]) && x[1] >= 0 && x[0] >= nowSec - SPREAD_LOG_DAYS * 86400);
+  if (o.quoteSpread != null && !log.some((x) => x[0] === qsec)) log = log.concat([[qsec, o.quoteSpread]]);
+  o.spreadLog = log.slice(-SPREAD_LOG);
+  const v = o.spreadLog.filter((x) => !rolloverHour(x[0])).map((x) => x[1]);
+  o.spreadTypical = v.length ? { n: v.length, median: +med0(v).toPrecision(6), mean: +(v.reduce((a, b) => a + b, 0) / v.length).toPrecision(6),
+    zeroShare: +(v.filter((x) => x === 0).length / v.length).toFixed(3), from: new Date(o.spreadLog[0][0] * 1000).toISOString(), to: new Date(o.spreadLog[o.spreadLog.length - 1][0] * 1000).toISOString() } : null;
+  return o;
+}
+export function commissionRT(x) {
+  const type = x && x.commissionType, rate = num(x && x.preciseTradingCommissionRate);
+  if (rate == null) return null;
+  if (rate === 0) return 0;
+  return type === 1 || type === 'USD_PER_MILLION_USD' ? +(2 * rate / 1e8 / 1e6).toPrecision(6) : null;
+}
 const DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const hm = (sec) => { const s = ((+sec % 604800) + 604800) % 604800, d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
   return `${DAY[d]} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
@@ -152,9 +189,9 @@ export async function symbolSpecs({ env, tokens = null, prev = null, history = n
         swap: { long: num(x.swapLong), short: num(x.swapShort), type: x.swapCalculationType ?? null, rollover3Days: x.swapRollover3Days ?? null },
         distances: { sl: num(x.slDistance), tp: num(x.tpDistance), setIn: x.distanceSetIn ?? null }, pnlConversionFeeRate: num(x.pnlConversionFeeRate),
         enableShortSelling: x.enableShortSelling ?? null,
-        // quotes: a fresh one replaces the last; with the market shut the previous spread is kept (the Trader's cost model reads it)
+        // quotes: a fresh one replaces the last; spreads by spreadFields (a positive spread only; the last good one kept with its time)
         bid: q ? q.bid : before.bid ?? null, ask: q ? q.ask : before.ask ?? null, quoteAt: q ? new Date(q.ts).toISOString() : before.quoteAt ?? null,
-        spread: fresh ? +(q.ask - q.bid).toPrecision(6) : before.spread ?? null, spreadAt: fresh ? new Date(q.ts).toISOString() : before.spreadAt ?? null,
+        ...spreadFields(q, fresh, before, nowSec), commissionRT: commissionRT(x),
         quoteToDeposit: rateNow ?? before.quoteToDeposit ?? null, rateAt: rateNow != null ? at : before.rateAt ?? null,
         marginPerLot,
       };

@@ -1,3 +1,4 @@
+import { findDuplicates, markDuplicate } from './dedupe.mjs';
 // One-time data repairs for the council Trader (data hygiene only: no trading rule, threshold, entry or exit changes).
 // Each repair runs once: its key goes into config.repairs and a line into config.history (by 'repair'). Running the same
 // repair again changes nothing. Split out of trader.mjs (7 Nov) so it can be tested on copies of the council-data files.
@@ -71,6 +72,31 @@ export function voidM30Twins(trades, config, nowISO) {
   config.repairs.push(key);
   config.history.push({ at: nowISO, by: 'repair', change: `Shadow: ${n} m30m1 trades of 4-6 Nov marked duplicate (copies of a Scalp entry, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R gross); no stat counts them`,
     why: 'm30m1 fires on the same M1 entry as the Scalp. The Trader drops the copy since 6 Nov 18:03 UTC (#259); the copies recorded before that still counted the same trade twice in the shadow book and in the m30m1 rules.' });
+  return n;
+}
+
+// 12 Nov 2026 (owner approved: "count duplicates once"): records that are EXACT duplicates (council/dedupe.mjs: same market,
+// side, second, entry, stop and target; on 1-12 Nov five Scalp records that copy an Intraday order) are marked, never deleted:
+// status 'duplicate', `dupOf`, `void`, `voidWhy`, as voidM30Twins does. R is kept for the record; a duplicate still open or
+// pending is closed at the repair's time (it is no longer managed: its twin carries the order). The live one of a pair is kept.
+// Records with the same entry and stop but another target are distinct trades and are never touched here.
+export const EXACT_TWINS_KEY = 'void-exact-twins-2026-11-12';
+export function voidExactTwins(trades, config, nowISO) {
+  config.repairs = config.repairs || []; config.history = config.history || [];
+  if (config.repairs.includes(EXACT_TWINS_KEY)) return 0;
+  const now = Math.floor(Date.parse(nowISO) / 1000);
+  let n = 0, R = 0, live = 0; const ks = {};
+  for (const { dup, keep } of findDuplicates(trades)) {
+    const was = dup.status;
+    markDuplicate(dup, keep, `the same order as ${keep.id} (same market, side, second, entry, stop and target) under the ${keep.k} setup; recorded once since 12 Nov 2026`);
+    if (was === 'open' || was === 'pending') dup.closed = now;
+    if (['win', 'loss', 'be'].includes(was)) R += +dup.R || 0;
+    if (!dup.shadow) live++;
+    const pk = `${dup.k} of ${keep.k}`; ks[pk] = (ks[pk] || 0) + 1; n++;
+  }
+  config.repairs.push(EXACT_TWINS_KEY);
+  config.history.push({ at: nowISO, by: 'repair', change: `Trades: ${n} exact duplicate record${n === 1 ? '' : 's'} marked duplicate (${Object.entries(ks).map(([k, c]) => `${c} ${k}`).join(', ') || 'none found'}; ${live} live; ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R gross counted twice); no stat counts them`,
+    why: 'Two setups produced the same order (same market, side, second, entry, stop and target) and it was recorded and counted twice. Owner, 12 Nov 2026: count duplicates once. The Trader records such an order once from now on.' });
   return n;
 }
 
