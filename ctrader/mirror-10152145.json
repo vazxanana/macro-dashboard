@@ -12089,7 +12089,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T16:07:25.000Z",
     "councilEntry": 1.42608,
     "stop": 1.4273,
@@ -12103,10 +12103,12 @@
     "slipR": 0.066,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T16:07:25.000Z",
-    "brokerStop": 1.42722
+    "brokerStop": 1.42722,
+    "closedAt": "2026-11-12T17:00:04.000Z"
    },
    "xau-rscalp-1794502188": {
     "positionId": "48948263",
@@ -12142,7 +12144,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9970.21 · 36 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9971.15 · 35 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -12150,9 +12152,9 @@
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 266.12, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 267.60, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T16:58:09.000Z"
+    "at": "2026-11-12T17:01:03.000Z"
    }
   },
   "paused": {},
@@ -12182,20 +12184,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9970.21,
-  "lastRun": "2026-11-12T16:58:09.000Z"
+  "balance": 9971.15,
+  "lastRun": "2026-11-12T17:01:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:48:54.000Z",
-   "msg": "moved AUDUSD 48776851 protection: stop 0.6829999999999999 -> 0.68297, target 0.68178 -> 0.68175 (council scalp)",
-   "trade": "audusd-scalp-1794487422"
-  },
-  {
-   "at": "2026-11-12T12:48:54.000Z",
-   "msg": "placed buy limit EURUSD 0.02 lot at 1.10837 (council scalp, valid to 2026-11-12T15:47Z)",
-   "trade": "eurusd-scalp-1794487623"
-  },
   {
    "at": "2026-11-12T12:48:54.000Z",
    "msg": "not mirrored yet audusd-scalp-1794487623: 40 mirror positions already open (will retry)",
@@ -13684,6 +13676,16 @@
   {
    "at": "2026-11-12T16:58:09.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 266.12, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T17:00:04.000Z",
+   "msg": "USDCAD position 48919692 closed at the broker",
+   "trade": "usdcad-rscalp-1794499572"
+  },
+  {
+   "at": "2026-11-12T17:00:04.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 267.60, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
   }
  ],
