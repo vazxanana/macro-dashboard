@@ -4204,14 +4204,31 @@ function msMosha(htf, ltf, buf) {
   const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot);
   out.cf = { level: C.level, t: C.t, fromT: C.fromT, lo: zl, hi: zh };
   out.case = (d < 0 ? C.level < out.vr.lo : C.level > out.vr.hi) ? 3 : (C.level >= out.vr.lo && C.level <= out.vr.hi) ? 2 : 1;
-  const entry = d < 0 ? zl : zh, stop = d < 0 ? zh + b0 : zl - b0, risk = Math.abs(stop - entry);
   out.state = out.case === 3 ? 'case3' : 'cf';
+  // the entry is an EG (owner, 12 Nov 2026: "i want eg as entry"): price pulls back into the CF zone, then a candle CLOSES beyond
+  // the last opposite candle (sell: below the low of the last green candle; buy: above the high of the last red one; the close may
+  // come one or more candles later, a wick never counts). Entry at that close, stop past the pullback's extreme, target as before.
+  // A close through the zone's far side before any EG = the zone failed (EF): no trade.
+  const after = B.filter((b) => b.time > C.t);
+  let k0 = -1, base = null, eg = null;
+  for (let k = 0; k < after.length; k++) { const b = after[k];
+    if (k0 < 0) { if (d < 0 ? b.high >= zl : b.low <= zh) k0 = k; else continue; }
+    if (d < 0 ? b.close > zh : b.close < zl) { out.state = 'failed'; return out; }
+    const opp = d < 0 ? b.close > b.open : b.close < b.open;
+    if (base && (d < 0 ? b.close < base.low : b.close > base.high)) { eg = { k, b, base }; break; }
+    if (opp) base = b;
+  }
+  if (k0 < 0) { out.state = out.case === 3 ? 'case3' : 'wait-pullback'; return out; }
+  if (!eg) { out.state = 'wait-eg'; return out; }
+  const leg = after.slice(k0, eg.k + 1), ext = d < 0 ? Math.max(...leg.map((x) => x.high)) : Math.min(...leg.map((x) => x.low));
+  const entry = eg.b.close, stop = d < 0 ? ext + b0 : ext - b0, risk = Math.abs(stop - entry);
+  out.eg = { t: eg.b.time, baseT: eg.base.time, lo: eg.base.low, hi: eg.base.high, entry };
+  out.state = 'eg';
   if (!(risk > 0)) return out;
   const t1 = out.case === 3 || (d < 0 ? x >= entry : x <= entry) ? htf.ext : x;   // the VR's extreme, unless price is already past it
   if (!isFinite(t1) || (d < 0 ? t1 >= entry : t1 <= entry)) return out;
-  const tr = out.trade = { side: d, entry, stop, target: t1, rr: Math.abs(t1 - entry) / risk, status: 'waiting' };
-  for (const b of B) { if (b.time <= C.t) continue;
-    if (tr.status === 'waiting') { if (d < 0 ? b.high >= entry : b.low <= entry) { tr.status = 'filled'; tr.fillT = b.time; } else continue; }
+  const tr = out.trade = { side: d, entry, stop, target: t1, rr: Math.abs(t1 - entry) / risk, status: 'filled', fillT: eg.b.time };
+  for (const b of after.slice(eg.k + 1)) {
     const hitS = d < 0 ? b.high >= stop : b.low <= stop, hitT = d < 0 ? b.low <= t1 : b.high >= t1;
     if (hitS) { tr.status = 'stopped'; tr.endT = b.time; break; }   // stop first when one candle holds both
     if (hitT) { tr.status = 'target'; tr.endT = b.time; break; }
@@ -4803,9 +4820,12 @@ function msNextSetup(bars, A) {
       if (M.cf) { const e = M.cf.t, i0 = at(M.cf.fromT), T = M.trade, live = T && (T.status === 'waiting' || T.status === 'filled');
         items.boxes.push({ kind: 'mcf', l1: i0, l2: live ? n + 20 : Math.min(n + 4, at(T && T.endT ? T.endT : e) + 2), lo: M.cf.lo, hi: M.cf.hi, fill: sell ? 'rgba(242,54,69,.16)' : 'rgba(8,153,129,.16)', stroke: '#ff9800' });
         items.labels.push({ l: at(e), p: sell ? M.cf.lo : M.cf.hi, dy: sell ? 15 : -6, text: `CF · case ${M.case}${M.case === 3 ? ' · read one TF lower' : ''}`, align: 'center', color: '#ff9800' });
-        if (T) { const st = { waiting: 'waiting for the pullback', filled: 'in the zone', stopped: 'stopped', target: 'target reached' }[T.status];
-          items.lines.push({ l1: at(e), l2: n + 20, p: T.stop, color: 'rgba(242,54,69,.85)', w: 1, dash: true, text: `Mosha stop ${fmt(T.stop)}`, below: !sell });
-          items.lines.push({ l1: at(e), l2: n + 20, p: T.target, color: 'rgba(8,153,129,.85)', w: 1, dash: true, text: `Mosha target ${fmt(T.target)} · ${T.rr.toFixed(1)}R · ${st}`, below: sell }); } } } }
+        if (!T && M.state !== 'case3') items.labels.push({ l: n + 2, dx: 4, p: sell ? M.cf.lo : M.cf.hi, dy: sell ? 15 : -6, text: { 'wait-pullback': 'Mosha: wait for the pullback into the CF zone', 'wait-eg': `Mosha: in the zone, wait for an EG ${sell ? '▼' : '▲'}`, failed: 'Mosha: CF zone closed through (EF), no trade' }[M.state] || '', color: '#ff9800' });
+        if (M.eg) { const ie = at(M.eg.t); items.labels.push({ l: ie, p: sell ? M.eg.hi : M.eg.lo, dy: sell ? -8 : 17, text: `EG ${sell ? '▼' : '▲'} entry ${fmt(M.eg.entry)}`, pill: true, bg: sell ? '#f23645' : '#089981' }); }
+        if (T) { const st = { filled: 'in the trade', stopped: 'stopped', target: 'target reached' }[T.status];
+          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.entry, color: '#ff9800', w: 1, text: '', below: false });
+          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.stop, color: 'rgba(242,54,69,.85)', w: 1, dash: true, text: `Mosha stop ${fmt(T.stop)}`, below: !sell });
+          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.target, color: 'rgba(8,153,129,.85)', w: 1, dash: true, text: `Mosha target ${fmt(T.target)} · ${T.rr.toFixed(1)}R · ${st}`, below: sell }); } } } }
     const pos = own && G.show.plan && G.plan;
     if (pos) {
       const pl = G.plan, l1 = n + 3, l2 = n + 20;
@@ -5404,7 +5424,7 @@ function msNextSetup(bars, A) {
     const up = { '4h': '1d', '1h': '4h', '15m': '1h', '5m': '15m' }[id], hp = up && panes[up], P = panes[id];
     if (!hp || !hp.A || !hp.bars || !hp.bars.length || !P || !P.A) return null;
     const A = hp.A, H = hp.bars, mv = A.last && A.last.dir === A.trend ? A.last : A.events.slice().reverse().find((e) => e.dir === A.trend);
-    if (!mv || !A.trend) return null; const Bc = bars;
+    if (!mv || !A.trend) return null; const tf0 = TFS.find((t) => t.id === id), Bc = tf0 ? bars.slice(0, msClosedN(bars, tf0.sec, Date.now() / 1000, TZ)) : bars;   // an EG needs a closed candle
     const M = msMosha({ dir: A.trend, level: mv.level, t: H[mv.breakIdx].time, ext: A.ext ? A.ext.p : NaN },
       { events: P.A.events.map((e) => ({ dir: e.dir, level: e.level, t: Bc[e.breakIdx] ? Bc[e.breakIdx].time : Infinity, fromT: Bc[e.fromIdx] ? Bc[e.fromIdx].time : 0, top: e.top, bot: e.bot })), bars: Bc },
       CUR && CUR.md === 'xau' ? 0.3 : 0);
