@@ -9448,7 +9448,7 @@
     "lots": 0.49,
     "digits": 5,
     "setup": "rintra",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T02:28:24.000Z",
     "councilEntry": 0.68436,
     "stop": 0.68432,
@@ -9462,10 +9462,12 @@
     "slipR": 0,
     "lagSec": 61,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T02:28:24.000Z",
-    "brokerStop": 0.68432
+    "brokerStop": 0.68432,
+    "closedAt": "2026-11-12T02:31:22.000Z"
    }
   },
   "day": {
@@ -9473,7 +9475,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9823.59 · 35 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9820.13 · 34 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9523,23 +9525,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "audusd-intraday-1794450613": {
+    "orderId": "33971376",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 0.68442,
+    "stop": 0.6852199999999999,
+    "t1": 0.68359,
+    "placedAt": "2026-11-12T02:31:22.000Z",
+    "expires": "2026-11-12T14:30:13.000Z",
+    "riskCash": 1.96,
+    "margin": 2.74,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9823.59,
-  "lastRun": "2026-11-12T02:28:24.000Z"
+  "balance": 9820.13,
+  "lastRun": "2026-11-12T02:31:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T07:45:35.000Z",
-   "msg": "placed buy limit USDCAD 0.05 lot at 1.42116 (council scalp, valid to 2026-11-11T10:44Z)",
-   "trade": "usdcad-scalp-1794383071"
-  },
-  {
-   "at": "2026-11-11T07:48:06.000Z",
-   "msg": "placed buy limit USDCHF 0.03 lot at 0.8275 (council scalp, valid to 2026-11-11T10:47Z)",
-   "trade": "usdchf-scalp-1794383223"
-  },
   {
    "at": "2026-11-11T07:48:06.000Z",
    "msg": "limit filled at once: USDCHF position 48347186 at the broker at 0.8275",
@@ -11029,6 +11041,16 @@
    "at": "2026-11-12T02:28:24.000Z",
    "msg": "opened buy AUDUSD 0.49 lot (council rintra)",
    "trade": "audusd-rintra-1794450443"
+  },
+  {
+   "at": "2026-11-12T02:31:22.000Z",
+   "msg": "AUDUSD position 48615658 closed at the broker",
+   "trade": "audusd-rintra-1794450443"
+  },
+  {
+   "at": "2026-11-12T02:31:22.000Z",
+   "msg": "placed sell limit AUDUSD 0.02 lot at 0.68442 (council intraday, valid to 2026-11-12T14:30Z)",
+   "trade": "audusd-intraday-1794450613"
   }
  ],
  "limits": {
