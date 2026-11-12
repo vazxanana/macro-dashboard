@@ -165,3 +165,15 @@ test('page: the card reads only fields forward.mjs writes, says the protocol is 
   // Home's "things wait on you" takes it from MS_WEEK.decisions, one item, only with alerts
   assert.match(html, /var FW = co\.forward; if \(FW && Array\.isArray\(FW\.alerts\) && FW\.alerts\.length\)/);
 });
+
+// 12 Nov 2026: the council loop's sparse checkout left out research/proposals, so loadProtocol() found no file on the
+// runner and no forward reading (nor the adopted stop switch) was ever written. The loop must check out the protocol's folder.
+test('council loop checks out the forward protocol file', async () => {
+  const fs = await import('node:fs');
+  const { PROTOCOL_FILE } = await import('../council/forward.mjs');
+  const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
+  const block = yml.slice(yml.indexOf('sparse-checkout: |'), yml.indexOf('Checkout council data'));
+  const dirs = block.split('\n').slice(1).map((l) => l.trim()).filter(Boolean);
+  const rel = PROTOCOL_FILE.pathname.split('/macro-dashboard/').pop().replace(/^.*?(research\/)/, '$1');
+  assert.ok(dirs.some((d) => rel.startsWith(d + '/')), `council.yml sparse-checkout must include the folder of ${rel}; has ${dirs.join(', ')}`);
+});
