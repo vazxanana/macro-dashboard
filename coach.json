@@ -3,27 +3,28 @@
   {
    "setup": "all",
    "kind": "dataSource",
-   "value": "oanda:eurusd,usdcad",
+   "value": "oanda:eurusd,usdcad,gbpusd",
    "markets": [
     "eurusd",
-    "usdcad"
+    "usdcad",
+    "gbpusd"
    ],
-   "label": "manage EUR/USD, USD/CAD trades on OANDA spot candles",
-   "n": 78,
-   "liveR": 6.61,
-   "spotR": -33.55,
-   "exp": 0.51,
-   "why": "The same closed live trades re-judged on OANDA spot candles: +6.6R on Kraken candles vs −33.5R on spot over 78 trades (EUR/USD +0.10R live vs −0.55R spot (34); USD/CAD +0.08R live vs −0.34R spot (44)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
+   "label": "manage EUR/USD, USD/CAD, GBP/USD trades on OANDA spot candles",
+   "n": 124,
+   "liveR": -5.07,
+   "spotR": -60.33,
+   "exp": 0.45,
+   "why": "The same closed live trades re-judged on OANDA spot candles: −5.1R on Kraken candles vs −60.3R on spot over 124 trades (EUR/USD +0.10R live vs −0.55R spot (34); USD/CAD +0.08R live vs −0.34R spot (44); GBP/USD −0.25R live vs −0.58R spot (46)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
    "spotAt": "2026-11-12T11:33:46.457Z",
-   "at": "2026-11-12T12:43:42.000Z"
+   "at": "2026-11-12T12:47:03.000Z"
   }
  ],
- "proposalsKey": "v5|2026-11-12T11:33:40.101Z|2026-11-12T11:33:46.457Z|2026-11-11T18:41:21.643Z|{\"xau\":\"Kraken\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"Kraken\",\"gbpusd\":\"OANDA\",\"audusd\":\"Kraken\",\"usdcad\":\"Kraken\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsKey": "v5|2026-11-12T11:33:40.101Z|2026-11-12T11:33:46.457Z|2026-11-11T18:41:21.643Z|{\"xau\":\"Kraken\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"Kraken\",\"gbpusd\":\"Kraken\",\"audusd\":\"OANDA\",\"usdcad\":\"Kraken\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsSent": {
-  "key": "all:dataSource:oanda:eurusd,usdcad",
-  "at": "2026-11-12T12:43:42.000Z",
+  "key": "all:dataSource:oanda:eurusd,usdcad,gbpusd",
+  "at": "2026-11-12T12:47:03.000Z",
   "items": [
-   "Manage EUR/USD, USD/CAD trades on OANDA spot candles — live +0.08R vs spot −0.43R a trade over 78 trades"
+   "Manage EUR/USD, USD/CAD, GBP/USD trades on OANDA spot candles — live −0.04R vs spot −0.49R a trade over 124 trades"
   ]
  },
  "ictWatch": [
@@ -49,7 +50,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: skip Fridays: the 34 A-setups it drops made −0.11R a trade (t -0.54; halves +0.09R / −0.31R); the 219 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-12T12:43:42.000Z"
+   "at": "2026-11-12T12:47:03.000Z"
   },
   {
    "setup": "ICT A",
@@ -73,7 +74,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: only trades against or without H1 structure: the 77 A-setups it drops made +0.14R a trade (t 0.88; halves +0.35R / −0.06R); the 176 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-12T12:43:42.000Z"
+   "at": "2026-11-12T12:47:03.000Z"
   }
  ],
  "decay": {
