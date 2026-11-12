@@ -20,7 +20,7 @@ import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, foldWeekend, gegFresh } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
@@ -880,7 +880,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     if (key === 'xau' && config.goldEG) {
       try {
-        const EG = config.goldEG, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        // trading days (owner, 12 Nov 2026, fidelity fix, item 52; research/edge/gold-weekend): closed UTC days, the Sunday reopen stub
+        // (and any Saturday / Sunday candle) folded into the next weekday; a signal is fresh for 24 h from the reopen after its day
+        const EG = config.goldEG, D = foldWeekend(src['1d'].bars.filter((b) => b.time + 86400 <= now)), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
         // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts geg in config.ownerShadow (stopSwitch): new orders are paper
         // shadows; the system's own orders (live, or shadow by the owner) keep the zone cancel and the cap as one stream
         const egSh = ownerSh('geg'), mine = trades.filter((x) => x.k === 'geg' && x.market === key && ownStream(x));
@@ -896,7 +898,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           state.zone = base ? [base.low, base.high] : null;
           const id = base ? `${key}-geg-${base.time}` : null;
           const openCnt = mine.filter((x) => x.status === 'open' || x.status === 'pending').length;
-          if (base && up && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400 && openCnt < EG.maxOpen) {
+          if (base && up && !trades.some((x) => x.id === id) && gegFresh(last.time, now) && openCnt < EG.maxOpen) {
             const entry = +base.high.toFixed(dp), stop = +(base.low - EG.pad).toFixed(dp), r0 = entry - stop;
             if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', h: '1d', side: 'buy',
               entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: EG.life * 86400, maxHold: EG.hold * 3600, noBe: true, entryMode: 'limit',

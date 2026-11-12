@@ -190,6 +190,29 @@ export function spotClosed(t) {
   const p = Object.fromEntries(nyFmt.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])), h = +p.hour;
   return p.weekday === 'Sat' || (p.weekday === 'Fri' && h >= 17) || (p.weekday === 'Sun' && h < 17);
 }
+// Gold daily engulf: trading days, not UTC calendar days (owner, 12 Nov 2026, fidelity fix; docs/owner-decisions.md item 52).
+// OANDA serves a Sunday-dated daily candle for the ~2 hours between the 22:00 UTC reopen and midnight; on 10 Nov 2026 that stub
+// (range $19, a thirtieth of a weekday's volume) became the engulf's base candle and put its stop $21 away. The pre-registered
+// research/edge/gold-weekend study (its replay-intended.mjs, "ADOPT" for geg) folds a Saturday / Sunday candle into the NEXT
+// weekday candle: that weekday's time and close, the first weekend open, the high / low over all; a weekend candle with no weekday
+// after it belongs to the forming Monday and is left out. The research/edge/robustness rebuild (17:00 New York days) and
+// research/edge/gold-systems (Sunday folded into Monday) never had the stub either. Gold trend / Gold trend fast keep the raw
+// candles: the same study found the fold worse for them (KEEP), and their out-of-sample record was built with the stub.
+export function foldWeekend(bars) {
+  const out = []; let w = null;
+  for (const b of bars || []) {
+    const wd = new Date(b.time * 1000).getUTCDay();
+    if (wd === 0 || wd === 6) { w = w ? { open: w.open, high: Math.max(w.high, b.high), low: Math.min(w.low, b.low) } : { open: b.open, high: b.high, low: b.low }; continue; }
+    out.push(w ? { ...b, open: w.open, high: Math.max(w.high, b.high), low: Math.min(w.low, b.low) } : b); w = null;
+  }
+  return out;
+}
+// the same study's freshness: a signal day's order may be placed for 24 h from the reopen after the day's UTC end (Monday-Thursday:
+// the day end; Friday: the Sunday reopen), and never while spot is shut
+export function gegFresh(dayTime, now) {
+  let reopen = dayTime + 86400; while (spotClosed(reopen)) reopen += 300;
+  return !spotClosed(now) && now - reopen < 86400;
+}
 // 7 Nov (owner OK): the daily 17:00 New York rollover. Its first minutes print spiky mid prices on forex (USD/CHF 12 Aug 21:04 UTC);
 // over 90 days 21 live-style stops (12.6R) were taken there (#520). OANDA prints next to nothing 17:00-17:04 and the spread spike
 // sits on the first candles after (USD/CHF 1m range 17:05 median 2.6 / p90 5.7 pips vs ~0.5-0.8 / ~2 the rest of the hour; back to
