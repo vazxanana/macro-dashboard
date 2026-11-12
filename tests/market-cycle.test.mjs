@@ -100,3 +100,17 @@ test('more history: 1,500 candles at load, older ones on scroll back, a refresh 
   assert.match(html, /r\.from < 25 && P\.fitted && P\.vis !== false\) P\.loadOlder\(\)/);
   assert.match(html, /data-show="hist" checked/); assert.match(html, /text: e\.structure \? 'ChoCh' : 'BOS'/);
 });
+
+// 12 Nov 2026, owner: internal BO lines ("I mean iBO"); after a pullback the first ChoCh back = the continuation starts
+test('the first ChoCh back after the pullback is labelled the start of the continuation', () => {
+  assert.match(html, /\$\{r\.pl\} continuation starts/); assert.match(html, /the H4 continuation has started/);
+});
+test('internal breaks: small swings, closed candles, inside the last three legs, never on a major level', () => {
+  const msInternal = new Function(`${fn('msAnalyze')}; const MS_IPIV = 2; ${fn('msInternal')}; return msInternal;`)();
+  const B = []; for (let i = 0; i < 160; i++) { const c = 100 + i * 0.3 + 8 * Math.sin(i * Math.PI / 10) + 2 * Math.sin(i * Math.PI / 2.5); B.push({ time: i * 3600, open: c, high: c + 0.6, low: c - 0.6, close: c }); }
+  const major = msAnalyze(B, 6).events, inner = msInternal(B, B.length);
+  assert.ok(inner.length >= major.length, 'smaller swings give at least as many breaks');
+  assert.deepEqual(msInternal(B.concat({ time: 160 * 3600, open: 0, high: 0, low: -999, close: -999 }), B.length).length, inner.length, 'a candle past the closed count is never read');
+  assert.match(html, /data-show="ibos" checked/); assert.match(html, /show: \{ bo: true, hist: true, ibos: true,/);
+  assert.match(html, /text: e\.structure \? 'iChoCh' : 'iBO'/); assert.match(html, /!major\.has\(e\.level\)/);
+});

@@ -2912,6 +2912,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="ms-tog ms-tog-g">
             <div class="tog-g"><div class="tog-h">Meridian markup</div>
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
+            <label><input type="checkbox" id="ms-show-ibos" data-show="ibos" checked><i style="border-top:1px dotted #089981;height:0;border-radius:0"></i>Internal breaks (iBO / iChoCh)</label>
             <label><input type="checkbox" id="ms-show-hist" data-show="hist" checked><i style="border-top:1px dashed #f23645;height:0;border-radius:0"></i>Earlier breaks (BOS / ChoCh)</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
@@ -3978,6 +3979,9 @@ const VIEWER = document.documentElement.dataset.role === 'viewer';   // Orlando 
 // candle is left out of every structure reading, so a wick or a not-yet-closed body through a level never draws a BO, a ChoCh,
 // a VR or a moved extreme; it counts once that candle has closed beyond the level.
 function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; while (k > 0 && bars[k - 1].time - shift + sec > now) k--; return k; }
+// internal structure (iBO / iChoCh): msAnalyze on 2-a-side swings over the closed candles; display only
+const MS_IPIV = 2;
+function msInternal(bars, closedN) { return msAnalyze(bars.slice(0, closedN), MS_IPIV).events; }
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -4243,7 +4247,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -4639,6 +4643,15 @@ function msNextSetup(bars, A) {
     if (G.show.bo && G.show.hist !== false) A.events.slice(0, A.events.length - evs.length).forEach((e) => {
       const sell = e.dir < 0; items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: (sell ? Z.sell : Z.buy).line, w: 1, dash: true, text: e.structure ? 'ChoCh' : 'BOS', below: sell });
     });
+    // internal breaks (12 Nov 2026, owner: "I'd like to have the iBOS as well (internal BOS) lines", "I mean iBO"): the same engine on small
+    // swings (2 candles a side, closed candles only, a close beyond the swing) inside the last three major legs; iBO = with the
+    // internal trend, iChoCh = the internal trend flipped. Thin dotted lines; a level the major structure already draws is skipped
+    if (G.show.ibos !== false) {
+      const major = new Set(A.events.map((e) => e.level)), from = A.events.length ? A.events[Math.max(0, A.events.length - 3)].fromIdx : 0;
+      msInternal(bars, A.n || n).filter((e) => e.breakIdx >= from && !major.has(e.level)).forEach((e) => {
+        const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: e.structure ? 'iChoCh' : 'iBO', below: sell });
+      });
+    }
     evs.forEach((e, k) => {
       const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
       if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
@@ -4681,7 +4694,7 @@ function msNextSetup(bars, A) {
       CY.filter((r) => r.child === tf.id && r.choch).forEach((r) => {
         const up = r.dir < 0, i0 = at(r.choch.fromT), i1 = at(r.choch.t);
         items.lines.push({ l1: i0, l2: Math.min(n + 6, i1 + 14), p: r.choch.level, color: CYC, w: 2, text: `ChoCh ${up ? '▲' : '▼'} · ${r.pl} ${r.phase === 'resumed' ? 'pulled back here' : 'pullback starts'}`, below: !up });
-        if (r.resume) { const tx = `ChoCh ${up ? '▼' : '▲'} · back with ${r.pl}`, same = items.lines.find((x) => x.bo && x.p === r.resume.level);
+        if (r.resume) { const tx = `ChoCh ${up ? '▼' : '▲'} · ${r.pl} continuation starts`, same = items.lines.find((x) => x.bo && x.p === r.resume.level);
           if (same) same.text = same.text ? `${same.text} · ${tx}` : tx;   // the same break as this chart's BO: one line, one label
           else items.lines.push({ l1: at(r.resume.fromT), l2: Math.min(n + 6, at(r.resume.t) + 14), p: r.resume.level, color: CYC, w: 2, text: tx, below: up }); }
       });
@@ -5301,12 +5314,12 @@ function msNextSetup(bars, A) {
     const CY = G.cycle = cycleNow(), r4 = CY.find((r) => r.parent === '4h' && r.child === '1h');
     if (!CY.some((r) => r.phase !== 'none')) { el.hidden = true; return; }
     const ar = (d) => (d < 0 ? '▼' : '▲'), way = (d) => (d < 0 ? 'down' : 'up');
-    const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'pullback over'}</b> <small>(${r.cl})</small></span>`;
+    const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'continuation'}</b> <small>(${r.cl})</small></span>`;
     let say = '';
     if (r4 && r4.target) { const T = r4.target, hl = r4.dir < 0 ? 'low' : 'high';
       say = r4.phase === 'move' ? `H4 is moving ${way(r4.dir)} and H1 agrees: no pullback yet. An H1 ChoCh ${ar(-r4.dir)} would start it.`
-        : r4.phase === 'pullback' ? `H1 ChoCh ${ar(-r4.dir)} at ${fmt(r4.choch.level)} (${ftime(r4.choch.t)}): the H4 move ${way(r4.dir)} is pulling back. Pullback target: H4 50% ${fmt(T.p50)}, then the H4 origin ${fmt(T.origin)}. When M15 / M5 break back ${way(r4.dir)}, the pullback is over: target the H4 ${hl} ${fmt(T.ext)}.`
-        : `H1 broke back ${way(r4.dir)} at ${fmt(r4.resume.level)} (${ftime(r4.resume.t)}): the H4 pullback is over. Target the H4 ${hl} ${fmt(T.ext)}.`; }
+        : r4.phase === 'pullback' ? `H1 ChoCh ${ar(-r4.dir)} at ${fmt(r4.choch.level)} (${ftime(r4.choch.t)}): the H4 move ${way(r4.dir)} is pulling back. Pullback target: H4 50% ${fmt(T.p50)}, then the H4 origin ${fmt(T.origin)}. The first M15 / M5 ChoCh back ${way(r4.dir)} starts the continuation: target the H4 ${hl} ${fmt(T.ext)}.`
+          : `H1 ChoCh ${ar(r4.dir)} at ${fmt(r4.resume.level)} (${ftime(r4.resume.t)}), the first after the pullback: the H4 continuation has started. Target the H4 ${hl} ${fmt(T.ext)}.`; }
     el.hidden = false;
     el.innerHTML = `<div class="cy-row"><span class="cy-h">Market cycle</span>${CY.map(chip).join('')}</div>${say ? `<p class="cy-say">${say} <small>A reading of structure, not a tested rule.</small></p>` : ''}`;
   }
