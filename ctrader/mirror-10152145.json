@@ -11662,7 +11662,8 @@
     "t1": 1.32357,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.32623,
@@ -11676,7 +11677,8 @@
     "lagSec": 209,
     "positionId": "48848070",
     "volume": 100000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T15:18:04.000Z"
    },
    "usdchf-intraday-1794494263": {
     "symbol": "USDCHF",
@@ -11819,17 +11821,18 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9973.46 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9976.08 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
-   "xrp-scalp-1794493418": "none of XRPUSD found at the broker"
+   "xrp-scalp-1794493418": "none of XRPUSD found at the broker",
+   "xrp-scalp-1794496620": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 296.37, 3.0% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 292.73, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T15:15:21.000Z"
+    "at": "2026-11-12T15:18:04.000Z"
    }
   },
   "paused": {},
@@ -11880,25 +11883,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9973.46,
-  "lastRun": "2026-11-12T15:15:21.000Z"
+  "balance": 9976.08,
+  "lastRun": "2026-11-12T15:18:04.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:25:51.000Z",
-   "msg": "moved USDCAD 48467224 protection: stop 1.42352 -> 1.42441, target 1.42828 -> 1.42917 (council intraday)",
-   "trade": "usdcad-intraday-1794409920"
-  },
-  {
-   "at": "2026-11-12T12:25:51.000Z",
-   "msg": "moved USDCAD 48744665 protection: stop 1.42664 -> 1.42753, target 1.42226 -> 1.42315 (council rintra)",
-   "trade": "usdcad-rintra-1794479019"
-  },
-  {
-   "at": "2026-11-12T12:25:51.000Z",
-   "msg": "not mirrored yet xrp-scalp-1794486256: 40 mirror positions already open (will retry)",
-   "trade": "xrp-scalp-1794486256"
-  },
   {
    "at": "2026-11-12T12:29:05.000Z",
    "msg": "USDCHF position 48743719 closed at the broker",
@@ -13383,6 +13371,21 @@
    "at": "2026-11-12T15:15:21.000Z",
    "msg": "placed sell limit EURUSD 0.01 lot at 1.10664 (council intraday, valid to 2026-11-13T03:14Z)",
    "trade": "eurusd-intraday-1794496465"
+  },
+  {
+   "at": "2026-11-12T15:18:04.000Z",
+   "msg": "GBPUSD position 48848070 closed at the broker",
+   "trade": "gbpusd-scalp-1794494117"
+  },
+  {
+   "at": "2026-11-12T15:18:04.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 292.73, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T15:18:04.000Z",
+   "msg": "not mirrored xrp-scalp-1794496620: none of XRPUSD found at the broker",
+   "trade": "xrp-scalp-1794496620"
   }
  ],
  "limits": {
