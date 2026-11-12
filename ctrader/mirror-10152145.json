@@ -10432,7 +10432,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9855.58 · 34 open",
+  "status": "ok · demo Fusion Markets · balance 9855.58 · 34 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10441,22 +10441,53 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "audusd-rintra-1794478545": {
+    "orderId": "33991739",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rintra",
+    "limitPrice": 0.683,
+    "stop": 0.68244,
+    "t1": 0.68438,
+    "placedAt": "2026-11-12T10:16:49.000Z",
+    "expires": "2026-11-12T22:15:45.000Z",
+    "riskCash": 1.97,
+    "margin": 4.1,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "audusd-rscalp-1794478545": {
+    "orderId": "33991740",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 0.683,
+    "stop": 0.68244,
+    "t1": 0.6831499999999999,
+    "placedAt": "2026-11-12T10:16:49.000Z",
+    "expires": "2026-11-12T13:15:45.000Z",
+    "riskCash": 1.97,
+    "margin": 4.1,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9855.58,
-  "lastRun": "2026-11-12T10:15:18.000Z"
+  "lastRun": "2026-11-12T10:16:49.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T07:14:45.000Z",
-   "msg": "cancelled AUDUSD limit order 33982610 for audusd-scalp-1794467396: the council filled it on its feed first",
-   "trade": "audusd-scalp-1794467396"
-  },
-  {
-   "at": "2026-11-12T07:14:45.000Z",
-   "msg": "opened sell AUDUSD 0.03 lot (council scalp)",
-   "trade": "audusd-scalp-1794467396"
-  },
   {
    "at": "2026-11-12T07:26:58.000Z",
    "msg": "placed buy limit USDCAD 0.04 lot at 1.42618 (council scalp, valid to 2026-11-12T10:26Z)",
@@ -11946,6 +11977,16 @@
    "at": "2026-11-12T10:15:18.000Z",
    "msg": "moved XAUUSD 48739368 protection: stop 3963.525 -> 3963.98, target 3730.105 -> 3730.56 (council gmp)",
    "trade": "xau-gmp-1794470400"
+  },
+  {
+   "at": "2026-11-12T10:16:49.000Z",
+   "msg": "placed buy limit AUDUSD 0.03 lot at 0.683 (council rintra, valid to 2026-11-12T22:15Z)",
+   "trade": "audusd-rintra-1794478545"
+  },
+  {
+   "at": "2026-11-12T10:16:49.000Z",
+   "msg": "placed buy limit AUDUSD 0.03 lot at 0.683 (council rscalp, valid to 2026-11-12T13:15Z)",
+   "trade": "audusd-rscalp-1794478545"
   }
  ],
  "limits": {
