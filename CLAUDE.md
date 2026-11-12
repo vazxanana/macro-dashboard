@@ -2741,3 +2741,14 @@ is flat in the skill's window. The other two checks passed: filtered PF 1.33 / 1
 -77.4R (496 of 910 trades kept). A risk tool on this rule at most, not a better selection; not a council rule, nothing live
 changed. ER >= 0.3 and the signed ER looked better but were chosen after the fact: their own pre-registration on other data or
 nothing. Tests: `tests/gold-drd-er.test.mjs`.
+
+## Gold playbook study 3: that long and its two cuts on silver (12 Nov 2026, owner: "Keep improving")
+`research/edge/gold-drd-silver/` (PREREGISTRATION.md pushed first; imports gold-drd-long's days / weeks / statistics and
+gold-drd-er's ER; buffer $0.004 and cost $0.03 scaled for silver). The two cuts gold-drd-er found after the fact (ER20 >= 0.3, and
+ER20 >= 0.2 with the close up over 20 days) tested on a market they were not chosen on, OANDA mid H1 XAG 2006 to Nov 2026.
+**Verdict: PASS on the pre-registered bar, and not robust**: T1 every signal +0.097R (n 1,146, PF 1.14), T2 ER >= 0.3 +0.176R
+(n 450, PF 1.28, -49R worst drawdown against -107R), T3 signed +0.186R (n 531, PF 1.29), all PF > 1 in both halves, Holm p
+0.018-0.029. But t counts overlapping trades as independent: on monthly sums t is 1.15-1.43, and without 2025 each stream is
+about +0.04 to +0.10R with t near 1. Evidence the cuts are not pure curve-fit, not a proven edge; not a council rule, nothing live
+changed. A next test would hold one position at a time on gold and silver together, judged on monthly sums, with its own
+pre-registration. Tests: `tests/gold-drd-silver.test.mjs`.
