@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-12 00:08 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-12 00:11 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -23,7 +23,7 @@ Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 | GBP/USD | down (OANDA) | no (not live, asia session) | IN ORIGIN sell | 40 trades, 28% won, −0.34R a trade |
 | AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD, asia session) | READY sell | 26 trades, 46% won, +0.29R a trade |
 | USD/CAD | up (OANDA) | no (not live, asia session) | IN ORIGIN buy | 28 trades, 46% won, +0.35R a trade |
-| USD/CHF | up (OANDA) | no (not live, asia session) | READY buy (blocked: wrong side) | 40 trades, 38% won, +0.23R a trade |
+| USD/CHF | up (OANDA) | no (not live, asia session) | IN ORIGIN buy | 40 trades, 38% won, +0.23R a trade |
 
 Replay total on the markets it trades live: 244 trades, +0.04R a trade (+9.05R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 244 trades, +0.04R a trade (+9.05R),
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-12 00:08 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-12 00:11 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -50,31 +50,32 @@ Built by the Trader at 2026-11-12 00:08 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-12 00:08 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-12 00:11 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 3 signals (1 open, 2 closed, +1.17R, 50% won); 5 other signals tracked, not A-setups.
 - open: YM buy from 52440, stop 52139 (H1 iFVG reversal)
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 3 closed +3.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 2 open · 1 resting (checked 2026-11-12 00:08 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 3 open (checked 2026-11-12 00:09 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
+- open: XAUUSD buy geg (xau-geg-1793664000) · fill 3971.24 vs council 3971.36 (−0.00R slippage)
 
-**Execution vs paper:** 13 demo fills; slippage against the council entry −0.01R on average (median +0.01R, worst +0.86R; positive = worse than paper), median 46368s from council fill to demo order.
+**Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
 Last mirror events:
+- 11-12 00:09 limit filled: XAUUSD position 48142419 at the broker
 - 11-10 16:12 placed buy limit XAUUSD 0.01 lot at 3971.36 (council geg, valid to 2026-11-26T09:15Z)
 - 11-10 16:12 cancelled XAUUSD limit order 33884791 for xau-geg-1793664000: the council re-quoted the order (entry 3983.29 -> 3971.36)
 - 11-10 16:08 placed buy limit XAUUSD 0.01 lot at 3983.29 (council geg, valid to 2026-11-26T09:15Z)
 - 11-10 16:08 cancelled XAUUSD limit order 33872885 for xau-geg-1793664000: the council re-quoted the order (entry 3971.36 -> 3983.29)
-- 11-10 15:39 BTCUSD position 47357957 closed at the broker
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-12 00:08 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-12 00:11 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -180,7 +181,7 @@ Checked 2026-11-11 22:52 UTC; live signals 2026-11-01 to 2026-11-11.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-12 00:08 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-12 00:11 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
@@ -189,7 +190,7 @@ Built by the Trader at 2026-11-12 00:08 UTC from its own snapshot and the live r
 | Gold trend | live | waiting for a daily close above the 20-day high 4190.42 (last close 3978.77) | nothing on |
 | Gold trend fast | shadow | waiting for a daily close above the 5-day high 4148.71 (last close 3978.77) | paper only |
 | Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 4026.30; waiting for an H4 close above it | nothing on |
-| Gold daily engulf | live | daily close 3978.77 below the 20-day average 4024.13; resting buy at 3971.36 | 1 pending |
+| Gold daily engulf | live | daily close 3978.77 below the 20-day average 4024.13 | 1 open |
 | Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; no pullback zone watched · paper test | nothing on |
 | NQ New York open run | shadow (paper, owner 11 Nov; research.json) | last session 2026-11-09: sell loss −1.05R; next at the 09:30 New York open | — |
 <!-- gold-systems:end -->
