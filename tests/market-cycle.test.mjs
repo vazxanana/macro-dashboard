@@ -162,3 +162,13 @@ test('Mosha layer wired: its own switch, Meridian markup only, said to be displa
   assert.match(html, /data-show="mosha" checked/); assert.match(html, /mosha: true/); assert.match(html, /G\.show\.mosha !== false/);
   assert.match(html, /function moshaNow\(/); assert.match(html, /i want eg as entry/); assert.match(html, /an EG needs a closed candle/); assert.match(html, /not a tested rule \(the mechanical Mosha studies failed\)/);
 });
+
+// 12 Nov 2026, owner: "make the chart cleaner, let me choose colour background and candle, I can't find the line chart option"
+test('Style button on the charts toolbar: chart type, colours saved per device, a reversible clean look', () => {
+  assert.match(html, /id="ms-sty-btn"[^>]*aria-controls="ms-sty-pop"/);
+  for (const v of ['candles', 'line', 'both']) assert.match(html, new RegExp(`data-cs="${v}"`));
+  for (const id of ['ms-sty-bg', 'ms-sty-up', 'ms-sty-dn', 'ms-sty-ln']) assert.match(html, new RegExp(`id="${id}" value="#`));
+  assert.match(html, /localStorage\.setItem\('ms-colors'/); assert.match(html, /function setCs\(m\)/);
+  assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news'\]/);
+  assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
+});

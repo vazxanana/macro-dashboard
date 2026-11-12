@@ -1293,6 +1293,13 @@ Display only (`market-structure.html`); the council's own engine copy in `counci
   beyond it moves the protected level and the Origin edge to that wick (`sweepProt`); only a close beyond the new level is a BO.
 - **Chart type** (Settings → Chart, `#ms-cs`, localStorage `ms-cs`): Candles, Line (closes) or Candles + line; the markup stays
   on the candle series (invisible candles in Line mode, `P.setStyle`, re-applied on a theme change).
+- **Style button** (12 Nov 2026, owner: "make the chart cleaner, let me choose colour background and candle, I can't find the line
+  chart option"): `#ms-sty-btn` on the charts toolbar (also on phones, outside "More") opens `#ms-sty-pop`: chart type (one setter
+  `setCs` keeps it and Settings' `#ms-cs` in step), colour pickers for the background, up / down candles and the line (localStorage
+  `ms-colors` `{ bg, up, dn, ln }`, per device; `candleCols` / `applyTheme` use them over the theme, the scale text turns dark on a
+  light background by luminance; "Theme colours" clears them) and **Clean look**: switches the busiest layers off through their
+  own Settings checkboxes (earlier breaks, iBO, volume, session shading, key levels, news; `BUSY`), remembers what was on
+  (localStorage `ms-clean`) and puts it back on a second tap. Display only.
 - **More history**: `BARS` 1,500 a timeframe at load (was 500); scrolling to the first candles loads older OANDA windows up to
   `CAP` 6,000 (`P.loadOlder`); refreshes ask for 300 and join them (`mergeBars`) so older candles stay. Every earlier break is
   drawn as a thin dashed BOS / ChoCh line (layer "Earlier breaks", `G.show.hist`). The cycle line joins the BO line of the same

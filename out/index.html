@@ -2776,6 +2776,18 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       #ms-cycle .cy-say small { font-size: 12px; color: var(--ink-faint); }
       #v-charts .sec-h > .cycle { order: 11; flex: 1 0 100%; }
       html[data-mk="ict"] #ms-cycle, html[data-mk="clean"] #ms-cycle, html[data-role="public"] #ms-cycle { display: none; }
+      #ms-sty { position: relative; display: inline-block; }
+      .sty-btn { background: transparent; color: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font: 600 12px var(--sans); cursor: pointer; min-height: 32px; }
+      .sty-btn small { color: var(--ink-dim); font-weight: 500; margin-left: 4px; }
+      .sty-pop { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; width: 260px; max-width: calc(100vw - 32px); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: grid; gap: 8px; }
+      .sty-pop[hidden] { display: none; }
+      .sty-h { font: 600 12px var(--sans); color: var(--ink-dim); margin-top: 2px; }
+      .sty-seg { display: flex; gap: 4px; } .sty-seg button { flex: 1; min-height: 32px; border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 6px; font: 600 12px var(--sans); cursor: pointer; }
+      .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .sty-c { display: flex; align-items: center; justify-content: space-between; font-size: 13px; } .sty-c input { width: 44px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: transparent; padding: 0; cursor: pointer; }
+      .sty-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; } .sty-note { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+      #ms-sty-clean[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+      @media (pointer: coarse) { .sty-btn, .sty-seg button, #ms-sty-pop .ms-tbtn { min-height: 44px; } .sty-c input { width: 52px; height: 40px; } }
       </style>
 <style id="ms-ea-css">
           #ms-ea .ea-sum { font-size: 13px; margin: 6px 0 10px; color: var(--ink-dim); line-height: 1.5; }
@@ -5318,6 +5330,19 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
             <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
+      <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
+      <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
+        <div class="sty-h">Chart type</div>
+        <div class="sty-seg seg" role="group" aria-label="Chart type"><button type="button" data-cs="candles">Candles</button><button type="button" data-cs="line">Line</button><button type="button" data-cs="both">Both</button></div>
+        <div class="sty-h">Colours</div>
+        <label class="sty-c">Background <input type="color" id="ms-sty-bg" value="#131821"></label>
+        <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
+        <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
+        <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button></div>
+        <div class="sty-h">Markup</div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Hides earlier breaks, iBO lines, volume, session shading, key levels and news. Tap again to bring them back.</small></div>
+      </div></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
       <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
@@ -6458,7 +6483,15 @@ function msNextSetup(bars, A) {
     pro: { bg: '#11110f', bgTop: '#171715', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
   const UPC = '#089981', DNC = '#f23645';
-  const candleCols = () => G.theme === 'light'
+  // chart colours chosen by the member (12 Nov 2026, owner: "let me choose colour background and candle"; Style → Colours):
+  // localStorage ms-colors { bg, up, dn, ln }; a missing key keeps the theme's own colour
+  let CUS = {}; try { CUS = JSON.parse(localStorage.getItem('ms-colors') || '{}') || {}; } catch (e) { CUS = {}; }
+  const hexOk = (v) => /^#[0-9a-f]{6}$/i.test(v || '');
+  const lumOf = (h) => { const n = parseInt(h.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const candleCols = () => { const K = themeCols(); if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
+    const u = hexOk(CUS.up) ? CUS.up : K.upColor, d = hexOk(CUS.dn) ? CUS.dn : K.downColor;
+    return { upColor: u, downColor: d, borderUpColor: u, borderDownColor: d, wickUpColor: u, wickDownColor: d }; };
+  const themeCols = () => G.theme === 'light'
     ? { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' }
     : { upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC };
   const Z = {
@@ -7023,7 +7056,7 @@ function msNextSetup(bars, A) {
     const P = { tf, el, chart, series, overlay, raw: null, bars: null, A: null, S: null, fitted: false, priceLines: [], pv: [] };
     P.lineS = lineS;
     P.setStyle = function () { const m = G.cs, T = 'rgba(0,0,0,0)';
-      try { lineS.applyOptions({ visible: m !== 'candles', color: m === 'both' ? 'rgba(41,98,255,.85)' : '#2962ff', lineWidth: m === 'both' ? 1.5 : 2 }); } catch (e) {}
+      try { lineS.applyOptions({ visible: m !== 'candles', color: hexOk(CUS.ln) ? CUS.ln : m === 'both' ? 'rgba(41,98,255,.85)' : '#2962ff', lineWidth: m === 'both' ? 1.5 : 2 }); } catch (e) {}
       try { series.applyOptions(m === 'line' ? { upColor: T, downColor: T, borderUpColor: T, borderDownColor: T, wickUpColor: T, wickDownColor: T } : candleCols()); } catch (e) {} };
     P.setLine = (B) => { try { lineS.setData(closeLine(B)); } catch (e) {} };
     // older candles when the chart is scrolled back to its first candles (12 Nov 2026, owner: "it needs to show more previous data"):
@@ -7646,7 +7679,39 @@ function msNextSetup(bars, A) {
       else { try { m = JSON.parse(localStorage.getItem('ms-lay-mine') || 'null'); } catch (e) { m = null; } if (!m) { flash(b, 'Save one first'); return; } }
       apply(m); box.querySelectorAll('[data-lay]').forEach((x) => x.classList.toggle('on', x === b)); if (window.msTrack) try { window.msTrack('layout', { k }); } catch (e) {} }); } }
   { const v = document.getElementById('ms-show-log'); if (v) { v.checked = !!G.log; v.addEventListener('change', () => { G.log = v.checked; try { localStorage.setItem('ms-log', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setLog && P.setLog()); }); } }
-  { const v = document.getElementById('ms-cs'); if (v) { v.value = G.cs; v.addEventListener('change', () => { G.cs = ['line', 'both'].includes(v.value) ? v.value : 'candles'; try { localStorage.setItem('ms-cs', G.cs); } catch (e) {} Object.values(panes).forEach((P) => P.setStyle && P.setStyle()); }); } }
+  // chart type (Settings → Chart, and the Style button on the charts toolbar: one setter, both kept in step)
+  const CS_NAME = { candles: 'Candles', line: 'Line', both: 'Candles + line' };
+  function setCs(m) { G.cs = ['line', 'both'].includes(m) ? m : 'candles'; try { localStorage.setItem('ms-cs', G.cs); } catch (e) {}
+    const v = document.getElementById('ms-cs'); if (v) v.value = G.cs;
+    document.querySelectorAll('#ms-sty-pop [data-cs]').forEach((b) => { const on = b.dataset.cs === G.cs; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    const n = document.getElementById('ms-sty-now'); if (n) n.textContent = CS_NAME[G.cs];
+    Object.values(panes).forEach((P) => P.setStyle && P.setStyle()); }
+  { const v = document.getElementById('ms-cs'); if (v) v.addEventListener('change', () => setCs(v.value)); setCs(G.cs); }
+  // the Style popover (12 Nov 2026, owner: "make the chart cleaner, let me choose colour background and candle, I can't find the
+  // line chart option"): chart type, colours (saved per device, ms-colors), and one "Clean look" switch over the busiest layers
+  { const btn = $('ms-sty-btn'), pop = $('ms-sty-pop');
+    const open = (on) => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); open(pop.hidden); });
+    document.addEventListener('click', (e) => { if (!pop.hidden && !e.target.closest('#ms-sty')) open(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !pop.hidden) { open(false); btn.focus(); } });
+    pop.querySelectorAll('[data-cs]').forEach((b) => b.addEventListener('click', () => setCs(b.dataset.cs)));
+    const T0 = () => (THEMES[G.theme] || THEMES.dark);
+    const fill = () => { $('ms-sty-bg').value = hexOk(CUS.bg) ? CUS.bg : T0().bg; $('ms-sty-up').value = hexOk(CUS.up) ? CUS.up : (G.theme === 'light' ? '#c9ccd2' : UPC);
+      $('ms-sty-dn').value = hexOk(CUS.dn) ? CUS.dn : (G.theme === 'light' ? '#131722' : DNC); $('ms-sty-ln').value = hexOk(CUS.ln) ? CUS.ln : '#2962ff'; };
+    const save = () => { try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} applyTheme(); };
+    [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
+    $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
+    btn.addEventListener('click', fill); fill();
+    // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
+    const BUSY = ['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news'];
+    const cb = $('ms-sty-clean'); let was = null; try { was = JSON.parse(localStorage.getItem('ms-clean') || 'null'); } catch (e) {}
+    const mark = () => cb.setAttribute('aria-pressed', String(!!was));
+    const setBox = (id, on) => { const x = $(id); if (x && x.checked !== on) { x.checked = on; x.dispatchEvent(new Event('change', { bubbles: true })); } };
+    cb.addEventListener('click', () => {
+      if (!was) { was = {}; BUSY.forEach((id) => { const x = $(id); if (x) { was[id] = x.checked; setBox(id, false); } }); }
+      else { Object.entries(was).forEach(([id, on]) => setBox(id, on)); was = null; }
+      try { was ? localStorage.setItem('ms-clean', JSON.stringify(was)) : localStorage.removeItem('ms-clean'); } catch (e) {} mark(); });
+    mark(); }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} lyAll('setVol'); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
@@ -8309,7 +8374,10 @@ function msNextSetup(bars, A) {
       p.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
       p.overlay.set(p.overlay.items);
     });
-    root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
+    if (hexOk(CUS.bg)) { const txt = lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2';
+      Object.values(panes).forEach((p) => { try { p.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: txt } }); } catch (e) {} });
+      document.documentElement.style.setProperty('--ms-bg', CUS.bg); } else document.documentElement.style.removeProperty('--ms-bg');
+    root.dataset.chart = (hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light') ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
     // owner (7 Nov): on the white (Light) theme the candles are monochrome, like a printed chart: grey up candles and black
     // down candles with black borders and wicks; the dark themes keep the green / red candles
     { const K = candleCols(); Object.values(panes).forEach((p) => { try { p.series.applyOptions(K); if (p.setStyle) p.setStyle(); if (p.setVol) p.setVol(); } catch (e) {} });
