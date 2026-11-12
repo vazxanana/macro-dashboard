@@ -639,6 +639,31 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       await m.setViewportSize({ width: 900, height: 800 }); await m.waitForFunction(() => !document.documentElement.dataset.phone); const wd = await sv();
       check('wider than 640 px: no simple view, none of its parts drawn (not even the switch)', wd.attr === '' && wd.ps === 0 && wd.cards.every(Boolean), JSON.stringify([wd.attr, wd.ps, wd.cards]));
       await cx.close(); } }
+  // 35. touch tablets and the challenge log at phone width (12 Nov 2026): every toolbar control 44 px on a touch screen at any
+  // width, nothing past the chart card, More takes what does not fit; the day table scrolls inside its own box on a phone
+  { const TBM = () => { const tb = document.getElementById('tb'), cc = document.querySelector('.chartc').getBoundingClientRect(); const c = [...tb.querySelectorAll('button, summary')].filter((e) => !e.closest('.ddp')).map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.height > 0);
+      return { n: c.length, small: c.filter((r) => r.width < 44 || r.height < 44).length, past: c.filter((r) => r.right > cc.right + 1 || r.left < cc.left - 1).length, over: document.documentElement.scrollWidth - innerWidth, more: getComputedStyle(document.getElementById('tb-more')).display !== 'none' }; };
+    for (const [w, h, wantMore] of [[768, 1024, true], [1024, 1366, false]]) {
+      const cx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push(`tablet ${w}: ` + e.message));
+      await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400); await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click());
+      await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+      const v = await t.evaluate(TBM); let sh = { small: 0, out: 0 };
+      if (v.more) { await t.click('#tb-more'); await settle(t); sh = await t.evaluate(() => { const c = [...document.querySelectorAll('#tb-ovf button, #tb-ovf summary')].filter((e) => !e.closest('.ddp')).map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0); return { small: c.filter((r) => r.width < 44 || r.height < 44).length, out: c.filter((r) => r.left < 0 || r.right > innerWidth).length, n: c.length }; }); await t.click('#tb-more'); }
+      check(`touch tablet ${w} x ${h}: every toolbar control 44 px, none past the chart card, no sideways scroll${wantMore ? ', the rest in More (44 px, on screen)' : ', all in one row'}`, v.n >= 5 && !v.small && !v.past && v.over <= 0 && v.more === wantMore && !sh.small && !sh.out, JSON.stringify([v, sh]));
+      await cx.close(); }
+    // a mouse on a narrow window keeps the 32 px layout of pass 11
+    { const cx = await b.newContext({ viewport: { width: 600, height: 900 } }); const t = await cx.newPage(); await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await settle(t);
+      check('a mouse keeps 32 px toolbar buttons', await t.$eval('#undo', (e) => Math.round(e.getBoundingClientRect().height)) === 32); await cx.close(); }
+    for (const [w, full] of [[360, false], [390, true], [430, false]]) {
+      const cx = await b.newContext({ viewport: { width: w, height: 844 }, hasTouch: true, isMobile: true }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push(`log ${w}: ` + e.message));
+      await route(t); await me(t, OWNER); await t.addInitScript((f) => { try { localStorage.setItem('btLab:onb:owner', 'done'); if (f) localStorage.setItem('ms-phone', 'full'); } catch (e) {} }, full); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400); await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click());
+      await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+      await t.evaluate(() => { const f = document.getElementById('firm'); f.value = 'ftmo2'; f.dispatchEvent(new Event('change', { bubbles: true })); document.getElementById('pf-start').click(); }); await t.click('dialog.msd button.pri', { timeout: 1500 }).catch(() => {}); await t.waitForTimeout(250);
+      for (let k = 0; k < 3; k++) { await t.evaluate(() => document.getElementById('skipday').click()); await t.waitForTimeout(200); }
+      await t.evaluate(() => { document.querySelector('.tabs [data-t=log]').click(); const a = document.querySelector('#tab-log .ps-all'); if (a && a.offsetParent) a.click(); }); await settle(t);
+      const lg = await t.evaluate(() => { const box = document.querySelector('#pflog .pflog-t'), tb = box && box.querySelector('table'), card = document.getElementById('tab-log').getBoundingClientRect(); if (!tb) return null; const r = box.getBoundingClientRect(); box.scrollLeft = 150; const d = tb.querySelector('tbody td').getBoundingClientRect(); return { rows: tb.rows.length, inCard: r.right <= card.right + 0.5 && r.left >= card.left - 0.5, scrolls: box.scrollWidth > box.clientWidth, day: Math.round(d.left - r.left), over: document.documentElement.scrollWidth - innerWidth, font: Math.min(...[...tb.querySelectorAll('th, td')].map((c) => parseFloat(getComputedStyle(c).fontSize))) }; });
+      check(`challenge log at ${w} px (${full ? 'Full' : 'Simple'} view): the day table scrolls inside its own box in the card, the day stays at the left, 12 px at least, no sideways page`, lg && lg.rows > 2 && lg.inCard && lg.scrolls && lg.day === 0 && lg.over <= 0 && lg.font >= 12, JSON.stringify(lg));
+      await cx.close(); } }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

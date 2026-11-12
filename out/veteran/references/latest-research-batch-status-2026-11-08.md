@@ -49,7 +49,7 @@ Historical monthly survey-consensus access remains unverified. Vendor documentat
 
 The next concrete steps are to finalize the intended source/use and endpoint, freeze the chosen specification before inspecting market statistics, extract all first-print target fields, build the event/control coverage table, and then run the declared analysis. The historical sample would remain retrospective; a freeze now cannot turn it into a past prospective experiment or untouched holdout.
 
-## How Claude should read this batch
+## How the assistant should read this batch
 
 Use current `outputs/` documents as the main reference layer and `work/` notes as supporting research history. Some working files are superseded audits, deliberate invalid controls or synthetic future scenarios. They must not replace the real CPI ledger or be interpreted as observations.
 

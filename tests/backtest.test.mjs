@@ -444,7 +444,7 @@ test('the page: orders and manual closes carry the moment\'s stamp and a stop; h
   const fr = html.slice(html.indexOf('function frame(ts)'), html.indexOf('function stop()')); assert.match(fr, /if \(LAY\.anim && S\.part\) \{[^]*?step\(false, k, !first\)/); assert.match(fr, /else if \(LAY\.anim\) \{[^]*?drawForming\(b, p\)/, 'the drawn-ahead animation is only for a candle that is not forming by a switch');
   const stp = html.slice(html.indexOf('function step(quiet, k, keep)'), html.indexOf('const chGo')); assert.ok(stp.indexOf('BT.advance(S.acct, S.ch, seq)') > 0 && stp.indexOf('BT.advance(S.acct, S.ch, seq)') < stp.indexOf('BT.tfProgress(P0, seq.length)'), 'engine first, candle second');
   // phones: 44 px controls in one row, Speed and Jump inside More
-  const ph = html.slice(html.indexOf('@media (pointer: coarse) { @container cc (max-width: 640px) {')); assert.ok(ph.length > 100);
+  const ph = html.slice(html.indexOf('@media (pointer: coarse) { @container cc (max-width: 860px) {')); assert.ok(ph.length > 100);
   assert.match(ph, /\.tb \.ib, \.tb \.dd > summary\.ib, \.tb \.tb-rp \.ib \{ width: 44px; height: 44px; min-height: 44px; \}/); assert.match(ph, /\.tb #skipday \{ display: inline-grid; \}/); assert.match(html, /id="jump2"/); assert.match(html, /class="tbg tb-spd2"/);
   assert.match(html, /const placeDd = \(d\) =>/, 'toolbar dropdowns are placed where there is room');
 });

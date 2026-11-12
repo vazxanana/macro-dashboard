@@ -1,4 +1,4 @@
-# Assistant handoff — gptmacro_v.1 revision1.3
+# Assistant handoff — gptmacro_v.1 revision 1.3
 
 This is a standalone cumulative research bundle. An assistant can use it even if it only received the original V1. The inventory identifies every new/changed file since V1.2; unchanged library files are included so no previous ZIP is required for the main research tools.
 
@@ -6,7 +6,7 @@ This is a standalone cumulative research bundle. An assistant can use it even if
 
 1. `SKILL.md` — current operating instructions and boundaries.
 2. `outputs/latest-research-batch-status-2026-11-09.md` — all new findings and unfinished work.
-3. `outputs/cpi-first-print-coverage-2022-2024.md` and its JSON ledger/validation —144 printed headline/core figures; correction metadata repaired.
+3. `outputs/cpi-first-print-coverage-2022-2024.md` and its JSON ledger/validation — 144 printed headline/core figures; correction metadata repaired.
 4. `outputs/treasury-cpi-calendar-study-2022-2024.md` — frozen daily rate comparison, uncertainty, placebo and influence checks.
 5. `outputs/treasury-cpi-fomc-exclusion-2022-2024.md` — separately checked formal-statement exclusion; no rematching.
 6. `work/gold-permitted-data-route-followup.md` — NBU accounting-gold access/permission, dates, units and remaining methodology gates.
@@ -14,11 +14,11 @@ This is a standalone cumulative research bundle. An assistant can use it even if
 
 ## New findings to integrate
 
-- All144 selected CPI-U figures agree between release tables, narratives and separate extraction. Retain scheduled times versus unknown actual availability; June/July2024 reissues, Jan2022PDF and Oct2024 companion corrections are scoped correctly. V1's notice-scan failure remains documented with its v2 repair.
-- Treasury: all36 intended actual windows scored. Mean absolute real10y yield change6.11bp versus matched mean4.06bp; equal-event contrast+2.06bp. Approximate circular-block intervals are[0.20,3.96]bp with3-month blocks and[0.13,3.90]bp with6-month blocks. Only20/36 contrasts are positive. This is a daily association, not causal isolation, a gold finding or an execution return.
-- Formal FOMC scope:24 statement dates reconciled with annual archives,133 original intervals checked, one event and9 controls removed. Remaining35-event contrast+2.24bp. No new CI; broader macro/Fed-news coverage remains incomplete.
-- Source/verification:1498 same-producer format agreements;4683 independent primary outcome checks;1345 formal-FOMC checks;30 actual-bootstrap cross-language comparisons;12Python tests,7synthetic bootstrap fixtures and scoped metadata/interval regressions. Each report states what it does and does not prove.
-- NBU supplies a distinct UAH/troy-ounce accounting valuation with affirmative open-data permission and attribution.1096 effective calendar dates are not1096 independent observations.781 calculation dates, official FX, publication/effective dates and wartime/carryover rules need separate treatment. No gold returns or USD back-conversion were calculated.
+- All 144 selected CPI-U figures agree between release tables, narratives and separate extraction. Retain scheduled times versus unknown actual availability; June/July 2024 reissues, Jan 2022 PDF and Oct 2024 companion corrections are scoped correctly. V1's notice-scan failure remains documented with its v2 repair.
+- Treasury: all 36 intended actual windows scored. Mean absolute real10y yield change 6.11bp versus matched mean 4.06bp; equal-event contrast +2.06bp. Approximate circular-block intervals are [0.20, 3.96]bp with 3-month blocks and [0.13, 3.90]bp with 6-month blocks. Only 20/36 contrasts are positive. This is a daily association, not causal isolation, a gold finding or an execution return.
+- Formal FOMC scope: 24 statement dates reconciled with annual archives, 133 original intervals checked, one event and 9 controls removed. Remaining 35-event contrast +2.24bp. No new CI; broader macro/Fed-news coverage remains incomplete.
+- Source/verification: 1498 same-producer format agreements; 4683 independent primary outcome checks; 1345 formal-FOMC checks; 30 actual-bootstrap cross-language comparisons; 12 Python tests, 7 synthetic bootstrap fixtures and scoped metadata/interval regressions. Each report states what it does and does not prove.
+- NBU supplies a distinct UAH/troy-ounce accounting valuation with affirmative open-data permission and attribution. 1096 effective calendar dates are not 1096 independent observations. 781 calculation dates, official FX, publication/effective dates and wartime/carryover rules need separate treatment. No gold returns or USD back-conversion were calculated.
 
 ## Instructions for the assistant
 
@@ -30,7 +30,7 @@ The next proposed research step is a Cleveland-model versus simple-baseline firs
 
 Use the preserved `outputs/` and `work/` layout. Read only relevant references; do not ingest every raw capture or blindly execute every historical script. One-time registration/repair/build/finalizer scripts can mutate files. Tests include deliberate invalid inputs and synthetic future scenarios, clearly separated from genuine forecasts.
 
-Core Treasury scripts use Python standard libraries plus IANA timezone data. Node forecast tools and schema dependencies are described in their guides. Finished Newmont XLSX and inputs are included; the original Codex spreadsheet runtime/dependencies are not. Old archive-protection validators refer to separately retained V1/V1.1/V1.2 ZIPs; those duplicate archives are omitted here, with hashes recorded.
+Core Treasury scripts use Python standard libraries plus IANA timezone data. Node forecast tools and schema dependencies are described in their guides. Finished Newmont XLSX and inputs are included; the original assistant's spreadsheet runtime/dependencies are not. Old archive-protection validators refer to separately retained V1/V1.1/V1.2 ZIPs; those duplicate archives are omitted here, with hashes recorded.
 
 `batch-inventory.json` lists all payload hashes and new/changed/unchanged states relative to V1.2, plus explicit raw-data and duplicate/cache omissions. `DATA_LICENSES.md` preserves attribution and boundaries. All authored findings, models, analysis scripts, independent reviews and eligible source evidence are included. Restricted publisher payloads and the separate uninspected NBU numeric response are represented by findings/URLs/hashes/profiles rather than silently treated as analyzed data.
 
