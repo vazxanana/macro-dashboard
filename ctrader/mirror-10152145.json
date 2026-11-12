@@ -11847,6 +11847,33 @@
     "stopCheckedAt": "2026-11-12T15:25:03.000Z",
     "brokerStop": 3862.81,
     "closedAt": "2026-11-12T15:32:06.000Z"
+   },
+   "xau-rscalp-1794497462": {
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-12T15:41:04.000Z",
+    "councilEntry": 3862.37,
+    "stop": 3852.0366249999997,
+    "t1": 3904.1724999999997,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 3862.37,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 10.33,
+    "margin": 7.71,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 3862.23,
+    "slipR": -0.014,
+    "lagSec": 184,
+    "positionId": "48894253",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -11854,20 +11881,20 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.73 · 28 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.73 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
    "xrp-scalp-1794493418": "none of XRPUSD found at the broker",
    "xrp-scalp-1794496620": "none of XRPUSD found at the broker",
    "xrp-scalp-1794496903": "none of XRPUSD found at the broker",
-   "xrp-scalp-1794497608": "none of XRPUSD found at the broker"
+   "xrp-rscalp-1794497989": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 287.97, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 287.25, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T15:38:13.000Z"
+    "at": "2026-11-12T15:41:04.000Z"
    }
   },
   "paused": {},
@@ -11915,49 +11942,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-rscalp-1794497462": {
-    "orderId": "34015436",
-    "symbol": "XAUUSD",
-    "side": "buy",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rscalp",
-    "limitPrice": 3862.37,
-    "stop": 3852.0366249999997,
-    "t1": 3904.1724999999997,
-    "placedAt": "2026-11-12T15:32:06.000Z",
-    "expires": "2026-11-12T18:31:02.000Z",
-    "riskCash": 10.33,
-    "margin": 7.71,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.73,
-  "lastRun": "2026-11-12T15:38:13.000Z"
+  "lastRun": "2026-11-12T15:41:04.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:31:49.000Z",
-   "msg": "EURUSD position 48768012 closed at the broker",
-   "trade": "eurusd-scalp-1794483451"
-  },
-  {
-   "at": "2026-11-12T12:31:49.000Z",
-   "msg": "moved USDCHF 48520033 protection: stop 0.83441 -> 0.83416, target 0.829825 -> 0.829575 (council rintra)",
-   "trade": "usdchf-rintra-1794420863"
-  },
-  {
-   "at": "2026-11-12T12:31:49.000Z",
-   "msg": "not mirrored xrp-scalp-1794486256: none of XRPUSD found at the broker",
-   "trade": "xrp-scalp-1794486256"
-  },
   {
    "at": "2026-11-12T12:31:49.000Z",
    "msg": "not mirrored yet xau-scalp-1794486476: no current council price to place the limit against (will retry)",
@@ -13442,6 +13433,21 @@
    "at": "2026-11-12T15:38:13.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 287.97, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T15:41:04.000Z",
+   "msg": "limit filled: XAUUSD position 48894253 at the broker",
+   "trade": "xau-rscalp-1794497462"
+  },
+  {
+   "at": "2026-11-12T15:41:04.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 287.25, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T15:41:04.000Z",
+   "msg": "not mirrored xrp-rscalp-1794497989: none of XRPUSD found at the broker",
+   "trade": "xrp-rscalp-1794497989"
   }
  ],
  "limits": {
@@ -13520,11 +13526,11 @@
   ]
  },
  "execution": {
-  "n": 396,
+  "n": 397,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 139.5,
+  "medianLagSec": 140,
   "bySymbol": {
    "SOLUSD": {
     "n": 23,
@@ -13559,8 +13565,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 54,
-    "meanSlipR": -0.048
+    "n": 55,
+    "meanSlipR": -0.047
    }
   }
  }
