@@ -22,6 +22,7 @@ import { d1AdxFeat } from './adx.mjs';
 import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
+import { cycleTrades, cycleText } from './mosha-cycle.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
 import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
@@ -324,6 +325,9 @@ const USER_RULES = [
   { id: 'lit-shadow', apply: (c) => { c.litShadow = true; },
     change: 'LIT (M15 FBOS → M5 RBOS → limit at the order block) runs on gold as a paper shadow stream "LIT (paper shadow)"; no live rule changes',
     why: 'LIT study (#597): INCONCLUSIVE, too few trades at the skill\'s defaults (27 gold fills in 19 years) and what fills loses; the owner keeps it as a paper shadow to build a forward record, not as a system.' },
+  { id: 'mosha-cycle', apply: (c) => { c.moshaCycle = true; },
+    change: "Gold: the Mosha cycle trades as a main paper system: H4 move, H1 ChoCh = the pullback starts, M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme); limit at the broken level, stop past its origin",
+    why: "Owner, 11 Nov: 'H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot', chosen as a main system. Not a tested edge: the mechanical studies of this cycle (mosha-retrace break-even, mosha-cycle -0.22R) did not pass; this is the owner's call, judged on its forward record." },
   // 11 Nov, owner on the edge review's decisions (research/proposals/2026-11-11-edge-review.md): "yes anything that is better for the
   // system and that applies it". Three rules, nothing wider.
   // (1) The live paper book is Gold trend (20-day) and Gold daily engulf only. The gold replica, the momentum pullback (a test
@@ -604,7 +608,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry - (tr.feedBasis || 0))) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -981,6 +985,29 @@ for (const [key, M] of Object.entries(MARKETS)) {
           }
         }
       } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
+    }
+    // Mosha cycle (11 Nov 2026, owner; user rule mosha-cycle, council/mosha-cycle.mjs): H4 move, H1 ChoCh = the pullback starts,
+    // M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme). A main paper
+    // system; a signal whose target is under 1R away, a second open trade of the same leg, or a limit already past its stop is a shadow.
+    if (key === 'xau' && config.moshaCycle) {
+      const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
+      try {
+        const C = cycleTrades({ E4: ev('4h', 14400), E1: ev('1h', 3600), E15: ev('15m', 900), E5: ev('5m', 300), h1: src['1h'].bars.slice(0, -1) }, now);
+        snapshot.moshaCycle = { state: C.state, text: cycleText(C.state), open: trades.filter((x) => x.k === 'mcycle' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length };
+        for (const o of C.trades.filter((x) => x.fresh)) {
+          const id = `xau-mcycle-${o.leg}-${o.h4.t}`; if (trades.some((x) => x.id === id)) continue;
+          const d = o.side === 'sell' ? -1 : 1, busy = trades.some((x) => x.k === 'mcycle' && x.leg === o.leg && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+          const blk = [!o.room && 'room', busy && 'cap', !(d < 0 ? price < o.stop : price > o.stop) && 'price'].filter(Boolean);
+          const t1 = o.t1 != null && o.room ? o.t1 : +(o.entry + d * 2 * o.r0).toFixed(2);
+          trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mcycle', name: o.leg === 'pull' ? 'Mosha cycle (pullback)' : 'Mosha cycle (main)', leg: o.leg,
+            pair: `H4 → H1 ChoCh → ${o.tf === '5m' ? 'M5' : 'M15'}`, h: o.tf, side: o.side, entry: o.entry, stop: o.stop, t1, rr: o.room ? o.rr : 2, buf: 0.3,
+            opened: now, checked: now, status: 'pending', R: null, r0: o.r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
+            feat: { h4At: o.h4.t, chochAt: o.choch.t, trigAt: o.t, tf: o.tf, p50: o.p50, ext: o.ext, room: o.rr }, shadow: blk.length > 0, blockedBy: blk, feed: FEED,
+            note: o.leg === 'pull'
+              ? `Mosha cycle, pullback: H4 move ${d > 0 ? 'down' : 'up'} from ${o.h4.level}, H1 ChoCh at ${o.choch.level} (the pullback started), ${o.tf === '5m' ? 'M5' : 'M15'} BO ${o.side} through ${o.entry}. Limit at the broken level ${o.entry}, stop past its origin ${o.stop}, target the H4 50% ${o.p50} (${o.rr}R); valid 24 h, out after 72 h.`
+              : `Mosha cycle, main: the pullback of the H4 move ${d < 0 ? 'down' : 'up'} is over: ${o.tf === '5m' ? 'M5' : 'M15'} ChoCh ${o.side} through ${o.entry} after the H1 ChoCh at ${o.choch.level}. Limit at the broken level ${o.entry}, stop past its origin ${o.stop}, target the H4 extreme ${o.ext} (${o.rr}R); valid 24 h, out after 72 h.` });
+        }
+      } catch (e) { snapshot.errors.moshaCycle = String(e.message || e); }
     }
     // volatility gate (4 Nov, user rule gold-vol-gate): 20-day average daily range as % of price, from the last 20 closed daily
     // bars. Since 5 Nov (gold-top-be) the fixed 1.5% leg (config.goldVolMin) is null and only the percentile gate below
@@ -1690,7 +1717,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).filter((x) => !x.shadow).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));   // a shadow open run (owner, 11 Nov) is never in the feed
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');

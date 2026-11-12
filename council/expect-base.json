@@ -1,20 +1,23 @@
 {
- "at": "2026-11-11T21:35:00.964Z",
+ "at": "2026-11-11T22:19:51.148Z",
  "method": "research/edge/expectations/build.mjs",
- "costs": "x1 per study: gold 0.30 a unit, NQ 1 point, ICT the futures round trip, crypto Kraken fees; since 11 Nov 2026 the four long-only gold systems (Gold trend, Gold trend fast, Gold daily engulf, Gold H4 trendline) also pay overnight financing",
+ "costs": "x1 per study: gold 0.30 a unit, NQ 1 point, ICT the futures round trip, crypto Kraken fees; since 11 Nov 2026 every long gold position also pays overnight financing (the four long-only gold systems, and the buys of the Gold replica, Mosha BO and the momentum pullback)",
  "z": 1.645,
  "financing": {
   "rate": 0.000148,
   "asOf": "2026-11-11",
   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
-  "method": "research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only",
+  "method": "research/edge/trend-breadth Part A: rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x gold close on the entry day / r0, first unit only (the momentum pullback: its rebuild's own entry price; the replica: its first leg at the leg's size); a sell pays nothing and is credited nothing",
   "systems": [
    "gtrend",
    "gtrend5",
    "geg",
-   "gtl"
+   "gtl",
+   "replica",
+   "mosha-bo",
+   "gmp"
   ],
-  "notComputed": "Gold replica, Mosha BO and the momentum pullback: their study records carry no per-position risk, so no financing is charged in their figures (it would lower them); NQ open run: out before the rollover, none; ICT and crypto: not measured"
+  "notComputed": "NQ open run: out before the rollover, none; ICT and crypto: not measured"
  },
  "systems": [
   {
@@ -31,13 +34,13 @@
     "to": "2022-12-31",
     "years": 6,
     "n": 115,
-    "exp": -0.052,
-    "sd": 3.256,
-    "t": -0.17,
-    "R": -5.95,
-    "maxDD": 29.31,
+    "exp": -0.057,
+    "sd": 3.255,
+    "t": -0.19,
+    "R": -6.55,
+    "maxDD": 29.45,
     "perYear": 19.17,
-    "mc95": 49.28
+    "mc95": 49.84
    },
    "builtOn": {
     "src": "research/edge/replica-oos",
@@ -46,30 +49,37 @@
     "to": "2026-11-06",
     "years": 3.85,
     "n": 226,
-    "exp": 0.579,
-    "sd": 3.302,
-    "t": 2.64,
-    "R": 130.84,
-    "maxDD": 20.02,
+    "exp": 0.567,
+    "sd": 3.293,
+    "t": 2.59,
+    "R": 128.08,
+    "maxDD": 20.09,
     "perYear": 58.71,
-    "mc95": 32.58
+    "mc95": 32.89
    },
    "backtest": {
     "src": "council replay 2022-12-27 to 2026-11-03 (research/replay-2w.json)",
     "window": "2023-12-14 to 2026-04-23",
     "n": 212,
-    "exp": 0.877,
-    "sd": 3.343,
+    "exp": 0.865,
+    "sd": 3.338,
     "perYear": 89.54,
     "maxDD": 40.2,
-    "mcDD": 23.96
+    "mcDD": 24.26
    },
-   "fin": null,
+   "fin": {
+    "perTrade": 0.005,
+    "nights": 0.2,
+    "before": {
+     "exp": -0.052,
+     "t": -0.17
+    }
+   },
    "dd": {
-    "mc95": 23.96,
+    "mc95": 24.26,
     "worst": 40.2
    },
-   "regime": "fails out of sample: −0.05R a trade on 2017-22 (115 trades, all in 9 months of open gate; no trade in 2017, 2021); +0.58R on 2023-26 with the same harness (#512)"
+   "regime": "fails out of sample: −0.06R a trade after financing on 2017-22 (115 trades, all in 9 months of open gate; no trade in 2017, 2021); +0.57R on 2023-26 with the same harness (#512)"
   },
   {
    "id": "mosha-bo",
@@ -85,13 +95,13 @@
     "to": "2017-12-31",
     "years": 11.5,
     "n": 62,
-    "exp": 0.137,
+    "exp": 0.121,
     "sd": 1.977,
-    "t": 0.55,
-    "R": 8.5,
-    "maxDD": 16.23,
+    "t": 0.48,
+    "R": 7.48,
+    "maxDD": 16.53,
     "perYear": 5.39,
-    "mc95": 18.17
+    "mc95": 18.67
    },
    "builtOn": {
     "src": "research/edge/mosha-oos",
@@ -100,30 +110,37 @@
     "to": "2026-11-06",
     "years": 8.85,
     "n": 46,
-    "exp": 0.253,
-    "sd": 2.027,
-    "t": 0.85,
-    "R": 11.62,
-    "maxDD": 11.38,
+    "exp": 0.216,
+    "sd": 2.015,
+    "t": 0.73,
+    "R": 9.96,
+    "maxDD": 11.95,
     "perYear": 5.2,
-    "mc95": 13.12
+    "mc95": 13.72
    },
    "backtest": {
     "src": "Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)",
     "window": "2018-07-17 to 2026-06-10",
     "n": 157,
-    "exp": -0.064,
-    "sd": 1.969,
+    "exp": -0.093,
+    "sd": 1.951,
     "perYear": 19.75,
-    "maxDD": 45.99,
-    "mcDD": 43.35
+    "maxDD": 49.45,
+    "mcDD": 45.84
    },
-   "fin": null,
+   "fin": {
+    "perTrade": 0.016,
+    "nights": 0.97,
+    "before": {
+     "exp": 0.137,
+     "t": 0.55
+    }
+   },
    "dd": {
-    "mc95": 43.35,
-    "worst": 45.99
+    "mc95": 45.84,
+    "worst": 49.45
    },
-   "regime": "a null result in substance: +0.14R a trade on 2006-17 (62 positions, t 0.55; the bull half lost, −16.5R without its best 5) against +0.25R on 2018-26; the independent 2018-26 rebuild made +0.01R with a −39R drawdown (#560, #486)"
+   "regime": "a null result in substance: +0.12R a trade after financing on 2006-17 (62 positions, t 0.48; the bull half lost, −16.5R without its best 5) against +0.22R on 2018-26; the independent 2018-26 rebuild made +0.01R with a −39R drawdown (#560, #486)"
   },
   {
    "id": "gtrend",
@@ -165,11 +182,11 @@
     "src": "gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)",
     "window": "2018-03-22 to 2026-08-04",
     "n": 40,
-    "exp": 1.64,
-    "sd": 4.003,
+    "exp": 1.504,
+    "sd": 3.903,
     "perYear": 4.66,
-    "maxDD": 3.7,
-    "mcDD": 6.88
+    "maxDD": 3.78,
+    "mcDD": 7.47
    },
    "fin": {
     "perTrade": 0.09,
@@ -180,7 +197,7 @@
     }
    },
    "dd": {
-    "mc95": 6.88,
+    "mc95": 7.47,
     "worst": 5.57
    },
    "regime": "regime-bound: +0.40R a trade after financing on 2006-17 (+0.49R before it; 8 of 12 years positive) against +1.23R on 2018-26; random long entries with the same exit made +0.28R before financing, so most of it is being long gold with a trailing exit (#530)"
@@ -226,11 +243,11 @@
     "src": "gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)",
     "window": "2018-02-13 to 2026-07-01",
     "n": 74,
-    "exp": 1.064,
-    "sd": 3.365,
+    "exp": 0.94,
+    "sd": 3.272,
     "perYear": 8.71,
     "maxDD": 6.6,
-    "mcDD": 9.23
+    "mcDD": 10.63
    },
    "fin": {
     "perTrade": 0.083,
@@ -241,7 +258,7 @@
     }
    },
    "dd": {
-    "mc95": 9.23,
+    "mc95": 10.63,
     "worst": 13.33
    },
    "regime": "regime-bound: +0.29R a trade after financing on 2006-17 (+0.37R before it) against +0.88R on 2018-26; moves with Gold trend (0.92 correlation), so it doubles that bet rather than adding one; shadow since 7 Nov (#530)"
@@ -287,11 +304,11 @@
     "src": "gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)",
     "window": "2018-01-19 to 2026-10-27",
     "n": 304,
-    "exp": 0.106,
-    "sd": 1.169,
+    "exp": 0.068,
+    "sd": 1.157,
     "perYear": 34.55,
-    "maxDD": 20.24,
-    "mcDD": 20.96
+    "maxDD": 23.08,
+    "mcDD": 23.86
    },
    "fin": {
     "perTrade": 0.035,
@@ -302,7 +319,7 @@
     }
    },
    "dd": {
-    "mc95": 20.96,
+    "mc95": 23.86,
     "worst": 35.51
    },
    "regime": "regime-bound, and does not survive financing: +0.01R a trade after it on 2006-17 (+0.05R before it; a coin flip at double cost, −36R drawdown, loses without 2016) against +0.13R on 2018-26; shadow since 11 Nov (#530, trend-breadth)"
@@ -347,11 +364,11 @@
     "src": "gold daily engulf 2018-26 rebuild (robustness/out/geg.json)",
     "window": "2018-02-21 to 2026-09-04",
     "n": 217,
-    "exp": 0.198,
-    "sd": 1.698,
+    "exp": 0.139,
+    "sd": 1.671,
     "perYear": 25.32,
-    "maxDD": 14.68,
-    "mcDD": 22.28
+    "maxDD": 18.2,
+    "mcDD": 25.49
    },
    "fin": {
     "perTrade": 0.045,
@@ -362,8 +379,8 @@
     }
    },
    "dd": {
-    "mc95": 22.28,
-    "worst": 16.47
+    "mc95": 25.49,
+    "worst": 18.2
    },
    "regime": "regime-bound: +0.14R a trade after financing on 2006-17 (+0.19R before it; near zero when gold is not rising: 2012-17 +0.06R before financing) against +0.23R on 2018-26 (#530)"
   },
@@ -381,13 +398,13 @@
     "to": "2022-12-31",
     "years": 5,
     "n": 634,
-    "exp": -0.043,
-    "sd": 1.265,
-    "t": -0.86,
-    "R": -27.32,
-    "maxDD": 40.06,
+    "exp": -0.052,
+    "sd": 1.261,
+    "t": -1.05,
+    "R": -33.25,
+    "maxDD": 43.48,
     "perYear": 126.82,
-    "mc95": 65.68
+    "mc95": 69.43
    },
    "builtOn": {
     "src": "research/edge/robustness",
@@ -396,30 +413,37 @@
     "to": "2026-10-31",
     "years": 3.83,
     "n": 370,
-    "exp": 0.191,
-    "sd": 1.309,
-    "t": 2.8,
-    "R": 70.52,
-    "maxDD": 10.37,
+    "exp": 0.178,
+    "sd": 1.304,
+    "t": 2.63,
+    "R": 65.85,
+    "maxDD": 10.92,
     "perYear": 96.53,
-    "mc95": 19.04
+    "mc95": 19.7
    },
    "backtest": {
     "src": "gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)",
     "window": "2018-02-05 to 2026-10-22",
     "n": 1004,
-    "exp": 0.043,
-    "sd": 1.286,
+    "exp": 0.032,
+    "sd": 1.281,
     "perYear": 115.17,
-    "maxDD": 40.06,
-    "mcDD": 49.67
+    "maxDD": 43.48,
+    "mcDD": 52.66
    },
-   "fin": null,
+   "fin": {
+    "perTrade": 0.009,
+    "nights": 0.2,
+    "before": {
+     "exp": -0.043,
+     "t": -0.86
+    }
+   },
    "dd": {
-    "mc95": 49.67,
-    "worst": 40.06
+    "mc95": 52.66,
+    "worst": 43.48
    },
-   "regime": "regime-bound: −0.04R a trade on 2018-22 (634 trades) against +0.19R on 2023-26; fragile in the robustness audit (#486)"
+   "regime": "regime-bound: −0.05R a trade after financing on 2018-22 (634 trades) against +0.18R on 2023-26; fragile in the robustness audit (#486)"
   },
   {
    "id": "nq-open",

@@ -408,3 +408,94 @@ main.hero-min .ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; 
 .fold-bar[hidden] { display: none; }
 .fold-bar .fold-sum { flex: 1 1 220px; font-size: 13.5px; color: var(--ink-dim); }
 .card.folded > :not(.c-h):not(.fold-bar) { display: none; }
+
+/* ==== The phone's simple view (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone") ====
+   The default at 640 px and under. Every rule below sits inside that media query AND under html[data-phone="simple"] (the
+   site's one phone-view attribute, set in the page head only at that width), so a wider screen never reads one of them and
+   Phone view "Full" (localStorage ms-phone = full, the same key as the Desk) is the phone page as it was.
+   Nothing is removed: a part marked .pm waits behind its host's "more" button, a .pcard folds to its heading, the seldom-used
+   sections sit behind "More" in the tab bar. Display only: no rule here changes what is decided, stored or asked for. */
+button.pmore, .pv { display: none; }
+@media (max-width: 640px) {
+  /* the switch itself is offered in both phone views */
+  .pv { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; margin: var(--s5) 0 var(--s4); font-size: 13px; color: var(--ink-dim); }
+  .pv .btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+
+  /* --- the mechanism --- */
+  html[data-phone="simple"] button.pmore { display: inline-flex; }
+  html[data-phone="simple"] .pm-host:not(.pm-open) > .pm { display: none !important; }
+  html[data-phone="simple"] button.pmore:not(.pc-t):not(#tab-more) { align-items: center; gap: 8px; width: 100%; justify-content: flex-start; margin-top: 10px; color: var(--ink-dim); text-align: left; }
+  html[data-phone="simple"] button.pmore:not(.pc-t):not(#tab-more)::before, html[data-phone="simple"] .pc-t::before { content: ""; width: 14px; height: 14px; flex: none; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat; }
+  html[data-phone="simple"] button.pmore[aria-expanded="true"]::before { transform: rotate(90deg); }
+  /* a folded card: its heading and a chevron, nothing else until it is opened */
+  html[data-phone="simple"] .pcard:not(.pm-open) > :not(:first-child) { display: none !important; }
+  html[data-phone="simple"] .pcard > :first-child { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px 10px; margin: 0; min-width: 0; }
+  html[data-phone="simple"] .pcard > :first-child > small { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  html[data-phone="simple"] .pcard.pm-open > :first-child { flex-wrap: wrap; margin-bottom: var(--s2); } html[data-phone="simple"] .pcard.pm-open > :first-child > small { white-space: normal; flex-basis: 60%; }
+  html[data-phone="simple"] .pcard:not(.pm-open) > :first-child > .seg { display: none; }
+  html[data-phone="simple"] .pcard { padding-block: 8px; } html[data-phone="simple"] .pcard.pm-open { padding-bottom: 16px; }
+  html[data-phone="simple"] .pc-t { order: 9; margin-left: auto; flex: none; width: 44px; height: 44px; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: none; color: var(--ink-dim); cursor: pointer; }
+  html[data-phone="simple"] .pc-t:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* --- the hero is its title, and steps aside for a replay --- */
+  html[data-phone="simple"] .ac-steps, html[data-phone="simple"] .ac-hero .ac-lede { display: none; }
+  html[data-phone="simple"] .ac-hero { grid-template-columns: minmax(0, 1fr); padding: 10px 16px; margin: 10px 0; border-radius: 16px; }
+  html[data-phone="simple"] .ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; } html[data-phone="simple"] .ac-hero h1 { order: -1; margin: 0; font-size: 19px; }
+  html[data-phone="simple"] main:has(#ac-train:not([hidden]) #replay:not([hidden])) .ac-hero { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); border: 0; }
+
+  /* --- the tab bar: the five sections a learner uses, the rest behind "More" --- */
+  html[data-phone="simple"] .ac-tabs { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; overflow: visible; padding: 4px; margin-bottom: var(--s3); }
+  html[data-phone="simple"] .ac-tabs button { grid-column: span 2; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; min-height: 52px; padding: 5px 1px; font-size: 12px; line-height: 1.15; white-space: normal; text-align: center; }
+  html[data-phone="simple"] .ac-tabs button[aria-selected="true"] { font-weight: 500; }   /* the cell is 51 px wide at 360 px: bold "Progress" does not fit */
+  html[data-phone="simple"] .pcard:not(.pm-open) > .c-h { font-size: 15px; }
+  html[data-phone="simple"] #tab-more { order: 1; border: 0; background: none; color: var(--ink-dim); font: 500 12px/1.15 var(--sans); border-radius: 11px; cursor: pointer; }
+  html[data-phone="simple"] #tab-more { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Ccircle cx='5' cy='12' r='2'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Ccircle cx='19' cy='12' r='2'/%3E%3C/svg%3E"); }
+  html[data-phone="simple"] #tab-more[aria-expanded="true"] { color: var(--ink); background: var(--panel-hover); }
+  html[data-phone="simple"] .ac-tabs .tab-2 { order: 2; grid-column: span 3; display: none; flex-direction: row; gap: 5px; min-height: 44px; padding-inline: 2px; }
+  html[data-phone="simple"] .ac-tabs.more-open .tab-2 { display: inline-flex; }
+
+  /* --- before a replay: pick an edge, pick the days, start --- */
+  html[data-phone="simple"] .ecard { padding: 9px 12px; gap: 1px; min-height: 52px; } html[data-phone="simple"] .ecard small { display: none; }
+  html[data-phone="simple"] .ecard[aria-pressed="true"]::after { right: 8px; top: 8px; width: 16px; height: 16px; }
+  html[data-phone="simple"] .stp { padding: 12px 0; } html[data-phone="simple"] .preview .chart.small { height: 150px; }
+  html[data-phone="simple"] #setup-form .f-actions { margin-top: var(--s3); } html[data-phone="simple"] #start { width: 100%; justify-content: center; min-height: 52px; }
+  html[data-phone="simple"] details.opts > summary small { display: none; }
+  html[data-phone="simple"] #f-mode .seg { display: grid; grid-template-columns: 1fr 1fr; width: auto; } html[data-phone="simple"] #f-mode .seg label span { width: 100%; padding-inline: 6px; text-align: center; line-height: 1.2; }
+  /* ... and once it runs, the setup is one line with "Change setup" */
+  html[data-phone="simple"] #setup:has(#setup-body[hidden]) { padding: 8px 12px; margin-bottom: var(--s2); }
+  html[data-phone="simple"] #setup:has(#setup-body[hidden]) > .c-h { display: grid; grid-template-columns: minmax(0, 1fr) max-content; align-items: center; gap: 0 10px; margin: 0; font-size: 14px; }
+  html[data-phone="simple"] #setup:has(#setup-body[hidden]) > .c-h > small { grid-column: 1 / -1; order: 3; margin: 0; font-size: 12.5px; line-height: 1.35; }
+  html[data-phone="simple"] #setup:has(#setup-body[hidden]) > .c-h > .btn { margin: 0; }
+
+  /* --- during a replay: the chart, the player, the one-line answer; the decision and the verdict come next, the rest folds --- */
+  html[data-phone="simple"] #replay .ac-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  html[data-phone="simple"] #replay .ac-chart-col, html[data-phone="simple"] #replay .ac-side { display: contents; }
+  html[data-phone="simple"] #replay .ac-chart-col > .chart-card:first-child { order: 1; }
+  html[data-phone="simple"] #decision { order: 2; } html[data-phone="simple"] #mentor { order: 3; } html[data-phone="simple"] #lesson { order: 4; } html[data-phone="simple"] #prove { order: 5; } html[data-phone="simple"] #whatif { order: 6; }
+  html[data-phone="simple"] #acct-card { order: 7; } html[data-phone="simple"] #htf-card { order: 8; } html[data-phone="simple"] #thesis-card { order: 9; } html[data-phone="simple"] #log-card { order: 10; } html[data-phone="simple"] #exam { order: 11; }
+  html[data-phone="simple"] #replay .card { margin-bottom: var(--s2); }
+  html[data-phone="simple"] #replay .ac-chart-col > .chart-card:first-child { padding: 10px 10px 12px; }
+  html[data-phone="simple"] .chart-card:has(#ctl:not(.pm-open)) #chart-meta, html[data-phone="simple"] .chart-card:has(#ctl:not(.pm-open)) > .note { display: none; }
+  html[data-phone="simple"] #ctl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) max-content; gap: 6px; padding: 6px; }
+  html[data-phone="simple"] #ctl > * { grid-column: 1 / -1; margin: 0; min-width: 0; } html[data-phone="simple"] #ctl > .btn { justify-content: center; }
+  html[data-phone="simple"] #ctl > #c-play { grid-column: 1; min-height: 48px; } html[data-phone="simple"] #ctl > #c-step { grid-column: 2; min-height: 48px; padding-inline: 6px; } html[data-phone="simple"] #ctl > #ctl-more { grid-column: 3; width: auto; min-height: 48px; }
+  html[data-phone="simple"] #ctl > #c-speed { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: auto; } html[data-phone="simple"] #ctl > #c-speed .btn { justify-content: center; padding-inline: 2px; }
+  html[data-phone="simple"] #ctl.pm-open > #sess-save, html[data-phone="simple"] #ctl.pm-open > #sess-resume, html[data-phone="simple"] #ctl.pm-open > #c-restart { grid-column: auto / span 1; }
+  html[data-phone="simple"] #ctl .jump { flex-wrap: wrap; } html[data-phone="simple"] #ctl .jump input { flex: 1 1 150px; max-width: none; }
+  /* the line that says the clock stopped is the main thing on the screen */
+  html[data-phone="simple"] .point-bar { padding: 12px; gap: 8px 10px; } html[data-phone="simple"] .point-bar .point-t { flex: 1 1 180px; font-size: 14.5px; }
+  html[data-phone="simple"] .point-bar .point-go { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; } html[data-phone="simple"] .point-bar .point-go .btn { justify-content: center; min-height: 48px; font-size: 14px; }
+
+  /* --- the decision: the answer, its sentence, the levels and the main reasons; the folds as they were --- */
+  html[data-phone="simple"] #decision > .kv:not(.pm) { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: auto auto; gap: 0 10px; padding: 8px 10px; border-radius: 12px; background: var(--neutral-soft); }
+  html[data-phone="simple"] #decision > .kv:not(.pm) dt { font-size: 12px; } html[data-phone="simple"] #decision > .kv:not(.pm) dd { color: var(--ink); font-size: 14px; }
+  html[data-phone="simple"] #decision:not(.pm-open) > #an-block:has(#an-off) { display: none; }   /* the analyst while it is switched off: one tap away; switched on, it stays in sight */
+  html[data-phone="simple"] #decision > .f-actions .btn.primary, html[data-phone="simple"] #m-save { width: 100%; justify-content: center; min-height: 48px; }
+
+  /* --- the verdict: four big answers, levels only when a trade is being changed, the why, save --- */
+  html[data-phone="simple"] #mentor .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } html[data-phone="simple"] #mentor .choices .btn { justify-content: center; min-height: 48px; padding-inline: 6px; }
+  html[data-phone="simple"] #mentor .choices .btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+  html[data-phone="simple"] #mentor .lv:not(:has(input:enabled)), html[data-phone="simple"] #mentor .lv:not(:has(input:enabled)) + .note { display: none; }
+  html[data-phone="simple"] #mentor .lv { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #mentor .lv input { padding-inline: 8px; }
+  html[data-phone="simple"] #mentor .chips { gap: 8px; }
+}

@@ -196,7 +196,9 @@ test('what to expect: live flags, shadow dates and the financing figures reach c
   for (const id of SHADOWED) assert.equal(ex.systems.find((s) => s.id === id).shadowSince, SHADOW_11NOV);
   const g = ex.systems.find((s) => s.id === 'gtrend');
   assert.deepEqual([g.fin.before.exp, g.honest.exp], [0.489, 0.398]); assert.match(g.line, /^Expect \+0\.40R a trade after financing/);
-  assert.equal(ex.systems.find((s) => s.id === 'replica').fin, null); assert.doesNotMatch(ex.systems.find((s) => s.id === 'replica').line, /financing/);
+  // the replica, Mosha BO and the momentum pullback: their buys are charged too since the follow-up of 11 Nov (small: they hold hours, not weeks)
+  const rp = ex.systems.find((s) => s.id === 'replica'); assert.ok(rp.fin.perTrade > 0 && rp.fin.perTrade < 0.02); assert.match(rp.line, /after financing/);
+  assert.equal(ex.systems.find((s) => s.id === 'nq-open').fin, null); assert.doesNotMatch(ex.systems.find((s) => s.id === 'nq-open').line, /financing/);
   // a shadow system outside its band is not a digest line
   const fake = { systems: [{ id: 'replica', name: 'Gold replica', live: false, forward: { out: 'below', exp: -1, n: 12, lo: -0.5, hi: 0.5 } }] };
   assert.equal(expectLine(fake), null);
@@ -288,7 +290,8 @@ test('the paper cost of a closed trade includes its financing, from the first cl
 
 // ─── the page, the guest files and the docs agree ───
 test('the page: the system lists a guest is cut by are unchanged (history stays main, by its own shadow flag), and the scoreboard calls the five shadows', () => {
-  assert.ok(PAGE.includes("const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];"));
+  // 'mcycle' (owner, 11 Nov: the Mosha cycle trades with the main system) joined the list after this test was written
+  assert.ok(PAGE.includes("const SYS_K = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];"));
   assert.ok(PAGE.includes("const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);"));
   // every "main" reader takes a row only when it is not a shadow: a trade the five systems take after the rule is out by its own flag
   assert.ok(PAGE.includes("trades: (v) => Array.isArray(v) ? v.filter((x) => x && !x.shadow && SYS_K.includes(x.k)).map(guestRow) : v,"));
@@ -315,13 +318,13 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
   assert.match(card, /Costs now include overnight financing<\/b> on gold buys: 0\.0148% of the price/); assert.match(card, /trades closed before keep the cost they were recorded with/);
   assert.ok(PAGE.includes('<div class="card adm" id="ms-sys-book">'), 'owner and reviewers only (class adm): a rule description is never public');
   assert.ok(PAGE.includes('NQ New York open run · paper shadow since 11 Nov (our system before)')); assert.ok(PAGE.includes('Gold replica · paper shadow since 11 Nov · trades only when gold is volatile'));
-  assert.match(PAGE, /id="ms-expect-foot">[^<]*since 11 Nov 2026 also after overnight financing/);
+  assert.match(PAGE, /id="ms-expect-foot">[^<]*<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys/);
 });
 
 test('the owner\'s decisions are on record: three approved with the owner\'s words, two open, numbers never reused', () => {
   const doc = rd('docs/owner-decisions.md'), heads = [...doc.matchAll(/^### \[(.)\] (\d+)\. (.*)$/gm)], nums = heads.map((m) => +m[2]);
   assert.deepEqual(nums.slice().sort((a, b) => a - b), nums.map((_, i) => i + 1), 'every number 1..n once: none renumbered, none reused');
-  assert.deepEqual(nums.slice(-5), [37, 38, 39, 40, 41], 'the new items are at the end');
+  assert.deepEqual(nums.slice(36, 41), [37, 38, 39, 40, 41], 'the five items of the edge review follow item 36 in order (later items are added after them: 42, the book study)');
   const item = (n) => { const a = doc.indexOf(`\n### [`, doc.search(new RegExp(`^### \\[.\\] ${n}\\. `, 'm')) - 1), b = doc.indexOf('\n### [', a + 5); return doc.slice(a, b < 0 ? undefined : b); };
   const five = [37, 38, 39, 40, 41].map(item), box = (n) => heads.find((m) => +m[2] === n)[1];
   for (const t of five.slice(0, 3)) { assert.match(t, /\*\*Status \(11 Nov 2026\): approved\.\*\*/); assert.match(t, /"yes anything that is better for the system and that applies it"/); }
