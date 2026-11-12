@@ -32,6 +32,7 @@ import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';
 import { readJson, writeAtomic } from './jsonio.mjs';
+import { dropShadow, FAMILY as CUT_FAMILY } from './shadow-cut.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -1269,6 +1270,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // 12 Nov 2026 (owner approved, "count duplicates once"): two setups giving the SAME order this round (same market, side,
       // second, entry, stop and target; council/dedupe.mjs) record it once: the second (or the shadow one, when the other is
       // live) is kept with status 'duplicate' + dupOf, never managed, alerted, copied or counted. Other targets stay two trades.
+      // shadow cut (owner, 12 Nov 2026; council/shadow-cut.mjs): a shadow signal of an engine setup whose (setup, market)
+      // stream did not pass research/edge/shadow-best is not recorded; live trades and the kept streams are
+      if (dropShadow(config.shadowCut, t.k, key, tr.shadow)) { const d = (snapshot.shadowCut = snapshot.shadowCut || { dropped: {} }).dropped; d[t.k] = (d[t.k] || 0) + 1; continue; }
       recordOnce(trades, tr, now);
       trades.push(tr);
     }
