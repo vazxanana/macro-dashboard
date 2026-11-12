@@ -2518,5 +2518,191 @@
  "notes": [
   "No change today: not enough evidence to move a rule."
  ],
- "proposalsBt": "2026-11-11T22:52:54.740Z"
+ "proposalsBt": "2026-11-11T22:52:54.740Z",
+ "forward": {
+  "at": "2026-11-12T11:29:12.000Z",
+  "v": 1,
+  "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
+  "decision": 43,
+  "adopted": "2026-11-12",
+  "doc": "research/proposals/2026-11-12-path-to-live.md",
+  "protocol": {
+   "built": "2026-11-12",
+   "start": "2026-11-12",
+   "minPositions": 10,
+   "ddStop": 21.9,
+   "floor": {
+    "6": -7.3,
+    "12": -9.7,
+    "24": -12,
+    "36": -12.1,
+    "60": -10.6
+   },
+   "months": 36
+  },
+  "book": [
+   "gtrend",
+   "geg"
+  ],
+  "names": [
+   "Gold trend",
+   "Gold daily engulf"
+  ],
+  "status": "few",
+  "head": "Too few trades to say",
+  "sentence": "Too few trades to say: no position closed since 2026-11-12, +0.00R after costs.",
+  "record": {
+   "n": 0,
+   "units": 0,
+   "open": 1,
+   "total": 0,
+   "floating": -0.31,
+   "marked": -0.31,
+   "peak": 0,
+   "dd": 0,
+   "ddMax": 0,
+   "ddMarked": 0.31,
+   "firstAt": null,
+   "lastAt": null,
+   "months": 0.02,
+   "from": "2026-11-12",
+   "path": []
+  },
+  "band": {
+   "months": 0.015724389687428703,
+   "p5": -0.02,
+   "p50": 0,
+   "p95": 0.05,
+   "clamp": false,
+   "where": "inside",
+   "show": 12
+  },
+  "bandPts": [
+   [
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    6,
+    -7.3,
+    1.2,
+    17.2
+   ],
+   [
+    12,
+    -9.7,
+    3.5,
+    24.5
+   ]
+  ],
+  "stops": [
+   {
+    "id": "S1",
+    "rule": "Drawdown from the forward record’s own high",
+    "line": 21.9,
+    "value": 0,
+    "state": "clear",
+    "every": true
+   },
+   {
+    "id": "S2",
+    "rule": "Total after 12 months",
+    "months": 12,
+    "line": -9.7,
+    "due": 1825977600,
+    "dueDay": "2027-11-12",
+    "value": 0,
+    "state": "later"
+   },
+   {
+    "id": "S3",
+    "rule": "Total after 24 months",
+    "months": 24,
+    "line": -12,
+    "due": 1857600000,
+    "dueDay": "2028-11-12",
+    "value": 0,
+    "state": "later"
+   },
+   {
+    "id": "S4",
+    "rule": "Total after 36 months",
+    "months": 36,
+    "line": -12.1,
+    "due": 1889136000,
+    "dueDay": "2029-11-12",
+    "value": 0,
+    "state": "later"
+   }
+  ],
+  "exec": {
+   "window": 30,
+   "trades": 1,
+   "copied": 1,
+   "checks": [
+    {
+     "id": "E1",
+     "label": "A stop at the broker on every copy",
+     "state": "running",
+     "n": 1,
+     "bad": 0,
+     "text": "1 of 1 copies so far held a stop from the fill."
+    },
+    {
+     "id": "E2",
+     "label": "Paper trades of the book that reached the demo",
+     "state": "running",
+     "n": 1,
+     "of": 1,
+     "misses": [],
+     "text": "1 of 1 copied."
+    },
+    {
+     "id": "E3",
+     "label": "Average fill against paper, in R",
+     "state": "running",
+     "n": 1,
+     "avg": -0.002,
+     "text": "Average 0.002R better than paper over 1 copy (positive = worse)."
+    },
+    {
+     "id": "E4",
+     "label": "Financing charged on gold buys against the cost model",
+     "state": "nodata",
+     "n": 0,
+     "ratio": null,
+     "charged": 0,
+     "model": 0,
+     "text": "Not measurable yet: no copy of a gold buy has been held over a rollover with its swap in the account files."
+    },
+    {
+     "id": "E5",
+     "label": "Nothing on the account the mirror did not place",
+     "state": "running",
+     "n": 0,
+     "text": "None since the clock start."
+    }
+   ],
+   "copies": {
+    "xau-geg-1793664000": {
+     "id": "xau-geg-1793664000",
+     "k": "geg",
+     "fill": 1794442140,
+     "account": "49478137",
+     "positionId": "48142419",
+     "status": "open",
+     "slipR": -0.002,
+     "copied": true,
+     "noStop": false,
+     "noStopWhy": null,
+     "due": true
+    }
+   },
+   "foreign": []
+  },
+  "alerts": [],
+  "slot": "2026-11-12T06"
+ }
 }
