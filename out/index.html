@@ -5094,6 +5094,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-cycle" data-show="cycle" checked><i style="background:#a64dc9;height:2px"></i>Market cycle</label>
+            <label><input type="checkbox" id="ms-show-mosha" data-show="mosha" checked><i style="background:#ff9800;height:2px"></i>Mosha storyline (VR, CF, barriers)</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed labels</label></div>
             <div class="tog-g"><div class="tog-h">Council</div>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Trades + history</label>
@@ -6301,6 +6302,46 @@ function msCycle(legs) {
   }
   return out;
 }
+// The Mosha layer (12 Nov 2026, owner: "build the mosha layer", after the M21 staircase and the S.CODE storyline). Display only,
+// Meridian markup only: no rule, trade or alert reads it, and it is not a tested rule (the mechanical Mosha studies failed).
+// The storyline of the timeframe above read on this one: the HTF BO, then the VR = the first break of this timeframe AGAINST it
+// after the BO (box from the extreme the BO made to the level the VR broke, wicks included), then the CF = the first break back
+// WITH the BO after the VR; its origin is the CF zone: entry where price pulls back into it, stop past the zone, target the
+// next barrier (the VR's extreme first, then the HTF extreme). Case 1 the CF is clear of the VR box, case 2 it sits inside it,
+// case 3 it broke through the VR's extreme (read the storyline again one timeframe lower). The staircase: every break with the
+// BO since it is a barrier price moves from and to.
+// htf = { dir, level, t, ext }; ltf = { events: [{ dir, level, t, fromT, top, bot }] oldest first, bars: [{ time, high, low }] }
+function msMosha(htf, ltf, buf) {
+  if (!htf || !htf.dir || !ltf || !ltf.bars || !ltf.bars.length) return null;
+  const d = htf.dir, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
+  const out = { dir: d, htf, state: 'wait-vr', barriers: ev.filter((e) => e.dir === d).map((e) => ({ level: e.level, t: e.t })) };
+  const vi = ev.findIndex((e) => e.dir === -d);
+  if (vi < 0) return out;
+  const V = ev[vi], span = B.filter((b) => b.time >= htf.t && b.time <= V.t);
+  if (!span.length) return out;
+  const x = d < 0 ? Math.min(...span.map((b) => b.low)) : Math.max(...span.map((b) => b.high));
+  const xt = span.find((b) => (d < 0 ? b.low : b.high) === x).time;
+  out.vr = { level: V.level, t: V.t, fromT: Math.min(V.fromT, xt), ext: x, extT: xt, lo: Math.min(x, V.level), hi: Math.max(x, V.level) };
+  out.state = 'wait-cf';
+  const C = ev.slice(vi + 1).find((e) => e.dir === d);
+  if (!C) return out;
+  const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot);
+  out.cf = { level: C.level, t: C.t, fromT: C.fromT, lo: zl, hi: zh };
+  out.case = (d < 0 ? C.level < out.vr.lo : C.level > out.vr.hi) ? 3 : (C.level >= out.vr.lo && C.level <= out.vr.hi) ? 2 : 1;
+  const entry = d < 0 ? zl : zh, stop = d < 0 ? zh + b0 : zl - b0, risk = Math.abs(stop - entry);
+  out.state = out.case === 3 ? 'case3' : 'cf';
+  if (!(risk > 0)) return out;
+  const t1 = out.case === 3 || (d < 0 ? x >= entry : x <= entry) ? htf.ext : x;   // the VR's extreme, unless price is already past it
+  if (!isFinite(t1) || (d < 0 ? t1 >= entry : t1 <= entry)) return out;
+  const tr = out.trade = { side: d, entry, stop, target: t1, rr: Math.abs(t1 - entry) / risk, status: 'waiting' };
+  for (const b of B) { if (b.time <= C.t) continue;
+    if (tr.status === 'waiting') { if (d < 0 ? b.high >= entry : b.low <= entry) { tr.status = 'filled'; tr.fillT = b.time; } else continue; }
+    const hitS = d < 0 ? b.high >= stop : b.low <= stop, hitT = d < 0 ? b.low <= t1 : b.high >= t1;
+    if (hitS) { tr.status = 'stopped'; tr.endT = b.time; break; }   // stop first when one candle holds both
+    if (hitT) { tr.status = 'target'; tr.endT = b.time; break; }
+  }
+  return out;
+}
 function msNextSetup(bars, A) {
   const e = A.last, n = bars.length, price = bars[n-1].close;
   if (!e) return null;
@@ -6409,7 +6450,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, mosha: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -6870,6 +6911,17 @@ function msNextSetup(bars, A) {
           items.lines.push({ l1: n - 30, l2: n + 26, p: T.ext, color: CYC, dash: true, w: 1, text: `${r.pl} target · ${lo ? 'low' : 'high'} ${fmt(T.ext)}${hit ? ' · reached, no close beyond' : ''}`, below: !lo }); }
       });
     }
+    // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
+    if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
+      M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
+      if (M.vr) { items.boxes.push({ kind: 'mvr', l1: at(M.vr.fromT), l2: Math.min(n + 4, at(M.vr.t) + 6), lo: M.vr.lo, hi: M.vr.hi, fill: 'rgba(255,152,0,.08)', stroke: 'rgba(255,152,0,.8)' });
+        items.labels.push({ l: at(M.vr.t), p: sell ? M.vr.hi : M.vr.lo, dy: sell ? -6 : 15, text: `VR vs ${pl} BO ${sell ? '▼' : '▲'}`, align: 'center', color: '#ff9800' }); }
+      if (M.cf) { const e = M.cf.t, i0 = at(M.cf.fromT), T = M.trade, live = T && (T.status === 'waiting' || T.status === 'filled');
+        items.boxes.push({ kind: 'mcf', l1: i0, l2: live ? n + 20 : Math.min(n + 4, at(T && T.endT ? T.endT : e) + 2), lo: M.cf.lo, hi: M.cf.hi, fill: sell ? 'rgba(242,54,69,.16)' : 'rgba(8,153,129,.16)', stroke: '#ff9800' });
+        items.labels.push({ l: at(e), p: sell ? M.cf.lo : M.cf.hi, dy: sell ? 15 : -6, text: `CF · case ${M.case}${M.case === 3 ? ' · read one TF lower' : ''}`, align: 'center', color: '#ff9800' });
+        if (T) { const st = { waiting: 'waiting for the pullback', filled: 'in the zone', stopped: 'stopped', target: 'target reached' }[T.status];
+          items.lines.push({ l1: at(e), l2: n + 20, p: T.stop, color: 'rgba(242,54,69,.85)', w: 1, dash: true, text: `Mosha stop ${fmt(T.stop)}`, below: !sell });
+          items.lines.push({ l1: at(e), l2: n + 20, p: T.target, color: 'rgba(8,153,129,.85)', w: 1, dash: true, text: `Mosha target ${fmt(T.target)} · ${T.rr.toFixed(1)}R · ${st}`, below: sell }); } } } }
     const pos = own && G.show.plan && G.plan;
     if (pos) {
       const pl = G.plan, l1 = n + 3, l2 = n + 20;
@@ -7463,6 +7515,18 @@ function msNextSetup(bars, A) {
   // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
   // market cycle: the legs of D1, H4, H1, M15 and M5 handed to msCycle, and its reading in words under the alignment strip
   const CYC = '#a64dc9';
+  // the Mosha storyline for a pane: the timeframe above's last BO with its trend, this pane's breaks after it (msMosha)
+  function moshaNow(id, bars) {
+    const up = { '4h': '1d', '1h': '4h', '15m': '1h', '5m': '15m' }[id], hp = up && panes[up], P = panes[id];
+    if (!hp || !hp.A || !hp.bars || !hp.bars.length || !P || !P.A) return null;
+    const A = hp.A, H = hp.bars, mv = A.last && A.last.dir === A.trend ? A.last : A.events.slice().reverse().find((e) => e.dir === A.trend);
+    if (!mv || !A.trend) return null; const Bc = bars;
+    const M = msMosha({ dir: A.trend, level: mv.level, t: H[mv.breakIdx].time, ext: A.ext ? A.ext.p : NaN },
+      { events: P.A.events.map((e) => ({ dir: e.dir, level: e.level, t: Bc[e.breakIdx] ? Bc[e.breakIdx].time : Infinity, fromT: Bc[e.fromIdx] ? Bc[e.fromIdx].time : 0, top: e.top, bot: e.bot })), bars: Bc },
+      CUR && CUR.md === 'xau' ? 0.3 : 0);
+    if (M) M.htf.label = (TFS.find((t) => t.id === up) || {}).label || up;
+    return M;
+  }
   function cycleNow() {
     const legs = ['1d', '4h', '1h', '15m', '5m'].filter((id) => panes[id] && panes[id].A && panes[id].bars && panes[id].bars.length).map((id) => {
       const P = panes[id], A = P.A, B = P.bars, tf = TFS.find((t) => t.id === id);
