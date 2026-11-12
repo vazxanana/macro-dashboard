@@ -32,7 +32,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `backup` (the owner's download of the private store), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
@@ -3277,3 +3277,17 @@ live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`test
   take a day past its budget by that one call's difference; two INSTANCES writing `cost.json` at the same moment can still
   lose a reservation (the store's documented limit; the cron runs every 10 min with a 120 s limit); `ACADEMY_LLM_STOP=1` does
   not stop this feature (`llmEnv` replaces it; only `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` do).
+
+## Backup and moving platform (12 Nov 2026, owner: "do a backup of the whole website in case I need to change platform")
+`docs/platform-backup.md` is the guide: where every part lives, a `git clone --mirror` of the repository (both branches), the
+names (never the values) of every secret on Vercel and GitHub, the settings to set again by hand (domain, firewall, crons, Edge
+Config), and what a move to another host needs. The private data lives only in the Vercel Blob store (48 files, 1.6 MB on 12 Nov):
+the owner downloads it from **Profile → "Back up the site"** (`#ms-pf-bk`, owner only), which asks `POST /api/backup` (owner
+session, same origin, `private, no-store`) for every part (`BUDGET` 3.2 MB of file data a part, `next` until null; every file read
+from the Blob origin, `?cache=0`; a file that cannot be read fails the part, never a silent gap) and saves one
+`meridianx-backup-<date>.json`: every file at its own path (text as `utf8`, pictures and sounds as `base64`), the Edge Config
+switches, and for each environment variable the code reads (`ENV_NAMES`) only whether it is set. **Never a secret value.** The
+file holds the password hashes and the cTrader link tokens: it never goes into the repository. `scripts/backup-restore.mjs`
+`check | files <dir> | blob` checks it, writes it to a folder (paths that leave the folder are refused) or puts it back into a
+Blob store. Add a new `process.env` name the code reads to `ENV_NAMES`. Tests: `tests/backup.test.mjs`.
+

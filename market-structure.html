@@ -3918,6 +3918,34 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saved with your owner session. <span id="ms-snd-msg" role="status"></span></p>
         </div>
       </section>
+      <section class="card pf-ct pf-bk" id="ms-pf-bk" aria-labelledby="ms-pf-bk-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-bk-t">Back up the site</h2><div class="ct-sub">Everything only Vercel holds: accounts, profiles, notifications, sounds, the Mosha log and lessons, the Academy, price alerts and the settings. The code and the bots' data are on GitHub.</div></div></div>
+        <div class="ct-b pf-ct-b"><button type="button" class="ms-tbtn pri" id="ms-bk-go">Download a backup</button> <small id="ms-bk-msg" role="status"></small>
+          <p class="ms-note">The file holds the password hashes and the cTrader link tokens: keep it on your own device, never on GitHub or a shared folder. How to restore it on another platform: <code>docs/platform-backup.md</code>.</p></div>
+      </section>
+      <script>
+      // owner's backup (12 Nov 2026): ask /api/backup for every part, save one file (api/backup.js, scripts/backup-restore.mjs)
+      (function () {
+        var card = document.getElementById('ms-pf-bk'); if (!card) return;
+        function own() { card.hidden = window.MS_WHO !== 'owner'; }
+        document.addEventListener('DOMContentLoaded', own); own();
+        var btn = document.getElementById('ms-bk-go'), msg = document.getElementById('ms-bk-msg');
+        function part(from) { return fetch('/api/backup', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: from }) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(r.status === 401 ? 'your owner session has ended: sign in again, then try once more' : (j.error || 'error ' + r.status)); throw e; } return j; }); }); }
+        btn.addEventListener('click', function () {
+          btn.disabled = true; msg.textContent = 'Reading the stored files…'; var all = null;
+          (function next(from) { return part(from).then(function (j) {
+            if (!all) { all = j; all.files = j.files.slice(); } else all.files = all.files.concat(j.files);
+            msg.textContent = 'Read ' + all.files.length + ' of ' + j.store.count + ' files…';
+            return j.next == null ? all : next(j.next); }); })(0)
+          .then(function (b) { delete b.from; delete b.next; var name = 'meridianx-backup-' + b.at.slice(0, 10) + '.json', url = URL.createObjectURL(new Blob([JSON.stringify(b)], { type: 'application/json' })), a = document.createElement('a');
+            a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+            msg.textContent = 'Saved ' + name + ': ' + b.files.length + ' files.'; })
+          .catch(function (e) { msg.textContent = 'Not saved: ' + (navigator.onLine === false ? 'you are offline' : e.message) + '.'; })
+          .then(function () { btn.disabled = false; });
+        });
+      })();
+      </script>
       <section class="card pf-ct pf-mcp" id="ms-pf-mcp" aria-labelledby="ms-pf-mcp-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
