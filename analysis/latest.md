@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-12 09:58 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-12 10:00 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **london**.
 
@@ -19,19 +19,16 @@ Session now: **london**.
 | ETH/USD | down (Kraken) | no (not live) | READY sell (blocked: wrong side) | 16 trades, 25% won, −0.39R a trade |
 | SOL/USD | down (Kraken) | no (not live) | READY buy | 21 trades, 24% won, +0.08R a trade |
 | XRP/USD | up (Kraken) | no (not live) | IN ORIGIN sell | 43 trades, 47% won, +0.52R a trade |
-| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 32 trades, 22% won, −0.48R a trade |
-| GBP/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 40 trades, 28% won, −0.34R a trade |
-| AUD/USD | down (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN sell | 26 trades, 46% won, +0.29R a trade |
 | USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 28 trades, 46% won, +0.35R a trade |
 | USD/CHF | up (OANDA) | no (not live) | IN ORIGIN sell | 40 trades, 38% won, +0.23R a trade |
 
-Replay total on the markets it trades live: 244 trades, +0.04R a trade (+9.05R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+Replay total on the markets it trades live: 172 trades, +0.22R a trade (+38.13R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
 
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-12 09:58 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-12 10:00 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -50,14 +47,14 @@ Built by the Trader at 2026-11-12 09:58 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-12 09:58 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-12 10:00 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 3 signals (1 open, 2 closed, +1.17R, 50% won); 6 other signals tracked, not A-setups.
 - open: YM buy from 52440, stop 52139 (H1 iFVG reversal)
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 3 closed +3.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 3 open (checked 2026-11-12 09:56 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9880.24 · 3 open (checked 2026-11-12 09:59 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: XAUUSD buy geg (xau-geg-1793664000) · fill 3971.24 vs council 3971.36 (−0.00R slippage)
@@ -75,7 +72,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-12 09:58 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-12 10:00 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -106,7 +103,7 @@ No 30-day results yet.
 <!-- macro:start -->
 ## Macro strategist
 
-Built by the Macro strategist at 2026-11-12 08:44 UTC for 2026-11-13 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility**.
+Built by the Macro strategist at 2026-11-12 10:02 UTC for 2026-11-13 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility**.
 
 Gold Macro Score -0.40 → AUCTION (no macro edge) (real yield 4w z +0.37, DXY 4w z -0.51, 2Y 13w z -0.85, curve 13w z -0.63; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.40; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading.
 
@@ -119,13 +116,12 @@ Gold Macro Score -0.40 → AUCTION (no macro edge) (real yield 4w z +0.37, DXY 4
 | ES (S&P 500) | 52% | macro tilt down 2 pts | ±0.9% (20-day avg) | real yields down; credit stress up; own price trend down | 54% / 54% (877 d) | 0.2481 vs 0.25 |
 
 Next high-impact events:
-- 2026-11-12 07:00 UTC GBP GDP m/m (cons. 0.0%, prev. 0.1%): hot if ≥ 0.1%, cool if ≤ -0.1%, in line in between (one reporting step; ±1 SD once 8 surprises are logged); hot → gold mixed, EUR/USD mixed, USD/JPY mixed, NQ mixed.
 - 2026-11-13 13:30 UTC USD Core PPI m/m (cons. 0.3%, prev. 0.7%): hot if ≥ 0.4%, cool if ≤ 0.2%, in line in between (one reporting step; ±1 SD once 8 surprises are logged); hot → gold down, EUR/USD down, USD/JPY up, NQ down.
 - 2026-11-13 13:30 UTC USD PPI m/m (cons. 0.4%, prev. 1.3%): hot if ≥ 0.5%, cool if ≤ 0.3%, in line in between (one reporting step; ±1 SD once 8 surprises are logged); hot → gold down, EUR/USD down, USD/JPY up, NQ down.
 
 Lessons from the Macro veteran: no challenger has beaten its incumbent on the replay yet; v_ry4w hit 0.512 t 0.59 vs ry hit 0.519 t 1.02; v_d2_4w hit 0.523 t 1.06 vs dgs2 hit 0.537 t 2.12; v_dxy4w hit 0.498 t -0.08 vs dxymom hit 0.489 t -0.58.
 
-Macro strategist, Thu 12 Nov 08:44 UTC, for Fri 13 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility. Fri 13 Nov is an event day (USD Core PPI m/m): expect bigger moves. Gold: 50% up (base rate 54%; macro tilt down 4 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±1.22% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.29% (20-day average). USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.31% (20-day average). NQ (Nasdaq 100): 54% up (base rate 56%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.5% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.9% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.40 → AUCTION (no macro edge) (real yield 4w z +0.37, DXY 4w z -0.51, 2Y 13w z -0.85, curve 13w z -0.63; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.40; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: GBP GDP m/m Thu 12 Nov 07:00 UTC (consensus 0.0%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.22%; USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.22%; USD PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.4%, previous 1.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.22%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.56): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.985% on average against 0.864% on other days, but no model turned that into a better forecast.
+Macro strategist, Thu 12 Nov 10:02 UTC, for Fri 13 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility. Fri 13 Nov is an event day (USD Core PPI m/m): expect bigger moves. Gold: 50% up (base rate 54%; macro tilt down 4 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±1.22% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.29% (20-day average). USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: real yields, real-yield 1-week momentum; against: fed expectations. Expected move ±0.31% (20-day average). NQ (Nasdaq 100): 54% up (base rate 56%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.5% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.9% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.40 → AUCTION (no macro edge) (real yield 4w z +0.37, DXY 4w z -0.51, 2Y 13w z -0.85, curve 13w z -0.63; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.40; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.22%; USD PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.4%, previous 1.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.22%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.56): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.985% on average against 0.864% on other days, but no model turned that into a better forecast.
 <!-- macro:end -->
 
 <!-- postmortems:start -->
@@ -181,7 +177,7 @@ Checked 2026-11-11 22:52 UTC; live signals 2026-11-01 to 2026-11-11.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-12 09:58 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-12 10:00 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
@@ -198,13 +194,13 @@ Built by the Trader at 2026-11-12 09:58 UTC from its own snapshot and the live r
 <!-- veteran:start -->
 ## Macro veteran
 
-Built by the Macro veteran at 2026-11-12 08:44 UTC from the strategist's data (paper only; full view in macro/veteran.json). Shock fingerprint: **Positive growth / demand news** (low confidence). Consensus: **AUCTION**.
+Built by the Macro veteran at 2026-11-12 10:02 UTC from the strategist's data (paper only; full view in macro/veteran.json). Shock fingerprint: **Positive growth / demand news** (low confidence). Consensus: **AUCTION**.
 
 | Topic | Macro strategist | Macro veteran | Stance |
 |---|---|---|---|
 | Direction for gold | Gold Macro Score −0.40 → AUCTION (no macro edge); next-day P(up) 50% | 7 of 8 channels observed; tally 0 → neutral | agree |
 | Real yields | 10Y TIPS 2.66%, rising (vote down); score z (4-week fall) +0.37 | 10Y TIPS 2.66%, +4 bp on the week, −25 bp over 4 weeks | disagree |
-| US dollar | +1.36 pts in 5 sessions (vote down); score z (4-week fall) −0.51 | DXY 102.94, +1.33% on the week, +0.92% over 4 weeks · broad USD +0.36% over 4 weeks | qualify |
+| US dollar | +1.34 pts in 5 sessions (vote down); score z (4-week fall) −0.51 | DXY 102.94, +1.33% on the week, +0.92% over 4 weeks · broad USD +0.36% over 4 weeks | qualify |
 | Inflation and the next release | 2.20%, −10 bp a week (vote down); playbook: Core PPI m/m 2026-11-13 13:30 UTC | 10Y breakeven 2.20%, −10 bp on the week. A red-folder event lands within 72 hours (Core PPI m/m): the view is conditional and the plan is to read real yields and the dollar after the print, not before. | agree |
 | Positioning | 104k net, −7k in 4 weeks, 34th pct, week of 2026-11-03 (vote down) | COT managed money 104k net, −7k over 4 weeks, 34th percentile (positions as of 2026-11-03) | qualify |
 | Regime | Dollar Smile right side (US outperformance) · dollar liquidity draining · normal volatility | Positive growth / demand news (low confidence) · clues: 10Y real +4 bp, HY −9 bp, VIX −1.4 on the week | qualify |
@@ -227,7 +223,7 @@ Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry
 
 Calibration: Not enough scored calls yet: 1 of 30, over 1 of 4 weeks. Probabilities are used as computed until then.
 
-Event playbook: GBP GDP m/m 2026-11-12 07:00 UTC: consensus 0.0% (previous 0.1%). Act after the release, not before (¼ starter). Descriptive, not a tested edge. · USD Core PPI m/m 2026-11-13 13:30 UTC: consensus 0.3% (previous 0.7%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.
+Event playbook: USD Core PPI m/m 2026-11-13 13:30 UTC: consensus 0.3% (previous 0.7%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.
 
 ### The veteran's briefing
 
