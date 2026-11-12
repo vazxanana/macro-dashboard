@@ -17,7 +17,10 @@ const E = require('./_edge-analyst.js');
 
 const ROWS = 'reviews.json', STATE = 'state.json', KEEP = 400;
 const rootOf = (env) => (env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'edge-analyst-preview/' : 'edge-analyst/');
-const storeOf = (env) => ST.make(ST.blobBackend(env, { root: rootOf(env) }));
+// one lock map per function instance, as the store's rules say (a new Map per request let two requests in one instance
+// interleave a read-modify-write of cost.json and lose a reservation: 12 Nov 2026 review). io = { blob, fetch, recent } for tests.
+const TAILS = new Map();
+const storeOf = (env, io = {}) => ST.make(ST.blobBackend(env, { ...io, root: rootOf(env) }), TAILS);
 // the adapter reads ACADEMY_LLM_* : the key, endpoint and model are shared, the budgets are this feature's own
 function llmEnv(env) {
   return { ...env, ACADEMY_LLM_DAILY_USD: env.EDGE_LLM_DAILY_USD || '0.5', ACADEMY_LLM_MONTHLY_USD: env.EDGE_LLM_MONTHLY_USD || '5', ACADEMY_LLM_HARD_USD: env.EDGE_LLM_HARD_USD || '25',
@@ -64,11 +67,14 @@ async function scan(d) {
     catch (e) { out.skipped.push({ id: x.id, why: String(e.message || e).slice(0, 80) }); continue; }   // tried again next run (within 3 days)
     const q = E.buildRequest(x, bars, forecast && forecast.playbook);
     const ans = await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'analyst', maxTokens: 900 }, { env: llmEnv(env), store, now: d.now });
-    if (!ans || !ans.available || ans.skipped || ans.error) { out.skipped.push({ id: x.id, why: ans && (ans.skipped ? `budget: ${ans.scope || ans.skipped}` : ans.error || ans.reason) }); if (ans && ans.skipped === 'budget') break; continue; }
-    const p = E.parseAnswer(ans.text), f = q.payload.trade;
+    // a call that may have been paid for (an answer with no usable text, a timeout, an unreadable answer) is stored as refused
+    // like an answer that does not fit, so the entry is never paid for twice; a refused call (not billed) is tried again next run
+    const billed = !!(ans && ans.available && ans.error && (ans.usage || ans.costEstimated || ans.costUsd > 0));
+    if (!billed && (!ans || !ans.available || ans.skipped || ans.error)) { out.skipped.push({ id: x.id, why: ans && (ans.skipped ? `budget: ${ans.scope || ans.skipped}` : ans.error || ans.reason) }); if (ans && ans.skipped === 'budget') break; continue; }
+    const p = billed ? { ok: false } : E.parseAnswer(ans.text), f = q.payload.trade;
     const row = { id: x.id, k: x.k, system: f.system, market: x.market, side: x.side, entryAt: f.entryTimeUtc, entry: f.entry, stop: f.stop, target: f.target,
       at: new Date(now * 1000).toISOString(), provider: ans.provider || null, model: ans.model || null, costUsd: ans.costUsd || 0,
-      ...(p.ok ? { answer: p.answer } : { refused: p.why }), result: E.resultOf(x) };
+      ...(billed ? { refused: [String(ans.error).slice(0, 120)] } : p.ok ? { answer: p.answer } : { refused: p.why }), result: E.resultOf(x) };
     await store.update(ROWS, { v: 1, rows: [] }, (D) => { const rows = (Array.isArray(D && D.rows) ? D.rows : []).filter((y) => y.id !== row.id).concat(row); return { v: 1, rows: rows.slice(-KEEP) }; });
     out.studied.push({ id: x.id, verdict: p.ok ? p.answer.verdict : 'refused' });
   }
@@ -99,3 +105,4 @@ module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports.scan = scan;
 module.exports.llmEnv = llmEnv;
+module.exports.storeOf = storeOf;

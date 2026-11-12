@@ -46,18 +46,22 @@ function candidates(trades, research, done, now, since) {
     if (!x || typeof x !== 'object' || x.shadow || x.addOf || !LIVE.includes(x.k) || seen.has(x.id)) continue;
     if (x.status === 'pending' || x.status === 'missed' || x.status === 'expired' || x.status === 'duplicate' || x.void) continue;
     const t = entryT(x); if (!t || t < since || now - t > NEW_WINDOW_S || t > now) continue;
-    if (!INST[x.market] || num(x.entry) == null) continue;
+    if (!INST[x.market] || num(x.entry) == null || stopAtEntry(x) == null) continue;
     out.push(x);
   }
   return out.sort((a, b) => entryT(a) - entryT(b));
 }
 
-// the stop the trade OPENED with (the record's `stop` may have been trailed or moved to break-even since)
+// the stop the trade OPENED with (the record's `stop` may have been trailed or moved to break-even since). null when it cannot
+// be known: a record with no r0 / stop0 whose stop has moved, or whose stop is no longer on the losing side of the entry (the
+// NQ open-run records carry no r0 and the Trader trails their `stop` after +2R: sending it would show the trade's later path).
 function stopAtEntry(x) {
   const s = x.side === 'sell' ? -1 : 1;
   if (num(x.r0) != null && x.r0 > 0) return x.entry - s * x.r0;
   if (num(x.stop0) != null) return x.stop0;
-  return num(x.stop);
+  const st = num(x.stop);
+  if (st == null || x.trailMoved || x.beMoved || s * (x.entry - st) <= 0) return null;
+  return st;
 }
 
 // only fields known at the entry; never an outcome (R, exit, closed, mfe, mae, pm, trail moves, status beyond "open")

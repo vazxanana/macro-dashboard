@@ -3088,3 +3088,14 @@ and judge its forward record. `snapshot.moshaCycle` → `#ms-rep-mcycle` under t
   `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12; `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` stops it. No key = no call.
 - Paper only: it changes no rule, size, filter or trade, imports nothing of the council or the mirror (test), and no council
   member reads its file. Tests: `tests/edge-analyst.test.mjs`.
+- **Money and safety review (12 Nov 2026)**, `tests/edge-analyst-money.test.mjs` (real adapter, fake provider / Blob / clock).
+  Fixed: (1) `storeOf` made a new lock map per request, so two requests in one instance could interleave on `cost.json` and
+  lose a reservation; one map per instance now (`TAILS`), as the store's rules say. (2) A call that may have been paid for but
+  gave no usable answer (no text, a timeout, unreadable) was not stored and was paid for again every run; it is stored as
+  `refused` now (an unbilled refusal is still tried next run). (3) With no `r0` / `stop0` the request fell back to the
+  record's current `stop`: the NQ open-run records have neither and the Trader trails their stop, so a trailed stop could
+  reach the model; `stopAtEntry` is null then (and when the stop is not on the losing side) and the entry is not studied.
+  Known, not changed: the budget check is on the estimate (characters / 4), so a provider that counts more input tokens can
+  take a day past its budget by that one call's difference; two INSTANCES writing `cost.json` at the same moment can still
+  lose a reservation (the store's documented limit; the cron runs every 10 min with a 120 s limit); `ACADEMY_LLM_STOP=1` does
+  not stop this feature (`llmEnv` replaces it; only `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` do).
