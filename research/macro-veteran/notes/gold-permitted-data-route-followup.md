@@ -14,7 +14,7 @@ The current [NBU Open Data page](https://bank.gov.ua/en/open-data) permits unres
 
 Separately, [Regulation 148, consolidated through 30 November 2021](https://bank.gov.ua/admin_uploads/law/Regulation_10122019_148_30112021.pdf?v=4), §4¹ (printed page 3), permits resident/nonresident use in money/FX-market transactions without obligation. This paraphrases the Ukrainian text; it is not a legal opinion or permission for every financial-product licence.
 
-The open-data permission is broader than mere private saving and is not conditioned on publishing the analysis. Redistribution is a separate action: attribution remains mandatory, but this project will keep the raw numeric response local and outside the Claude skill. NBU’s permission for its published accounting output should not be presented as a licence to obtain, reconstruct or redistribute Bloomberg/LBMA source feeds. No such feed was accessed.
+The open-data permission is broader than mere private saving and is not conditioned on publishing the analysis. Redistribution is a separate action: attribution remains mandatory, but this project will keep the raw numeric response local and outside the assistant skill. NBU’s permission for its published accounting output should not be presented as a licence to obtain, reconstruct or redistribute Bloomberg/LBMA source feeds. No such feed was accessed.
 
 ## 2. Concrete access and audited coverage
 

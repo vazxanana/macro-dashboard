@@ -1,4 +1,4 @@
-# Claude update: gptmacro_v.1, revision 1.1
+# Assistant update: gptmacro_v.1, revision 1.1
 
 **Prepared:** 8 November 2026. This is a complete current reference snapshot, not a claim that all dated facts remain current. It retains the skill name `gptmacro-v-1` and updates its metadata version to `1.1`. The original V1 archive remains a separate frozen artifact.
 

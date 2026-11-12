@@ -1,12 +1,12 @@
-# Claude reference update — corrections and quality audit
+# Assistant reference update — corrections and quality audit
 
-**Date:** 8 November 2026. Apply this note to the current master references when preparing the next Claude update. The original V1 ZIP remains an archive; it is not evidence that every example in it passed validation.
+**Date:** 8 November 2026. Apply this note to the current master references when preparing the next assistant update. The original V1 ZIP remains an archive; it is not evidence that every example in it passed validation.
 
 ## Correction that affects the already shared V1 example
 
 Replace V1's `research-evidence-record-example.json` with the [corrected master example](research-evidence-record-example.json). Its calculated net-position record used `revision_status: "derived"`, which its own schema does not allow. The corrected value is `not_applicable`; derivation remains represented by the record type and quality status.
 
-The destination inside the Claude package is `gptmacro-v-1/references/research-evidence-record-example.json` (or `references/research-evidence-record-example.json` relative to its skill folder).
+The destination inside the assistant package is `gptmacro-v-1/references/research-evidence-record-example.json` (or `references/research-evidence-record-example.json` relative to its skill folder).
 
 The same record also placed observation IDs in a field intended for source IDs and inherited its input report's publication date. The correction keeps observation references under `measurement.derivation.input_record_ids`, clears the calculation's unsupported publication date and records the reconstruction time. The two reported inputs now mark initial-vintage status as unknown because original-release bytes were not captured. Do not infer historical delivery from a later retrieval.
 
