@@ -2378,6 +2378,8 @@
     .gauge-row-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size:var(--fs-xs); }
 
     .signal-feed { display: flex; flex-direction: column; gap: 7px; }
+    .gx-feed-note { margin: 10px 0 0; font-size: var(--fs-xs); line-height: 1.5; color: var(--text-secondary); }
+    .gx-feed-note a { color: var(--gold-ink); }
     .signal-item {
       display: flex; align-items: center; gap: 10px;
       padding: 9px 12px; border-radius: 10px;
@@ -3220,7 +3222,7 @@
             <div class="kpi-sub" id="dash-sess-sub">—</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-label">Edge Confluence</div>
+            <div class="kpi-label">Rule ideas on</div>
             <div class="kpi-value" id="dash-conf-val">—</div>
             <div class="kpi-sub" id="dash-conf-sub">—</div>
           </div>
@@ -3236,7 +3238,7 @@
     </details>
 
     <details class="gx-fold" data-fold="setup">
-      <summary><span class="gx-fold-t" data-pt="Macro score and trade setup">Trade setup, macro score and edge signals</span><span class="gx-fold-s" id="gxFoldSetup">Needs a live price</span></summary>
+      <summary><span class="gx-fold-t" data-pt="Macro score and trade setup">Trade setup, macro score and rule ideas</span><span class="gx-fold-s" id="gxFoldSetup">Needs a live price</span></summary>
       <div class="gx-fold-b">
         <div class="dash-grid">
           <div class="dash-widget gx-flush">
@@ -3254,8 +3256,9 @@
               </div>
             </div>
             <div class="dash-widget">
-              <div class="dash-widget-title">Active Edge Signals</div>
+              <div class="dash-widget-title">Rule ideas, not tested edges</div>
               <div class="signal-feed" id="dash-signals"></div>
+              <p class="gx-feed-note" id="dash-signals-note">Conditions of untested ideas, on or off right now. None is a tested edge; the tested results are on the <a href="./edge-lab.html">Edge lab page</a>.</p>
             </div>
           </div>
         </div>
@@ -3430,7 +3433,7 @@
         </table>
       </div>
       <div style="margin-top:10px;font-size:var(--fs-xs);color:var(--text-tertiary);line-height:1.6;">
-        Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade INTO these zones in the bias direction — an engulfing printed inside one (watch the M15 execution view above) is the highest-probability setup on the platform.
+        Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the stronger this page reads the zone. The idea is to trade into these zones in the bias direction on an engulfing printed inside one (watch the M15 execution view above); this setup is not tested in this repository, and no win rate or edge is claimed for it.
       </div>
     </div>
 
@@ -3467,7 +3470,7 @@
       <div class="setup-direction" id="setupDir">
         <div class="dir-arrow" id="setupArrow">↑</div>
         <div class="dir-label" id="setupLabel">LONG</div>
-        <div class="dir-conf" id="setupConf">72% Confidence</div>
+        <div class="dir-conf" id="setupConf">Score —/40</div>
       </div>
 
       <!-- Entry & Stop -->
@@ -3629,7 +3632,7 @@
           <div class="metric-detail" id="dxy-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
-          <div class="metric-label">Seasonal Edge</div>
+          <div class="metric-label">Seasonal tendency (not tested here)</div>
           <div class="metric-value" id="seasonal-driver-score">—/10</div>
           <div class="metric-detail" id="seasonal-driver-detail">Loading…</div>
         </div>
@@ -3666,7 +3669,7 @@
             <strong>Fundamental Drivers:</strong><br/>
             • Real yields &amp; TIPS regime<br/>
             • CB de-dollarization flow<br/>
-            • Seasonal + session confluence<br/>
+            • Seasonal and session ideas (not tested here)<br/>
             • DXY correlation regime
           </div>
         </div>
@@ -5508,7 +5511,7 @@
       arrowEl.textContent = '→';
       labelEl.textContent = 'WAIT';
     }
-    confEl.textContent = conf + '% Confidence';
+    confEl.textContent = 'Score ' + macroScore + '/40 · not tested here';
 
     // ── Key level offsets (% of price, calibrated to gold volatility) ────────
     // Gold daily ATR ≈ 0.8–1.2% of price
@@ -7474,7 +7477,7 @@
           if (!_alertMemo[k] || Date.now() - _alertMemo[k] > 12 * 3600e3) {
             _alertMemo[k] = Date.now();
             sendNotif('Gold tapped an unmitigated ' + (z.bull ? 'demand' : 'supply') + ' block',
-              `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} first touch — the highest-probability reaction. Hunt the trigger.`);
+              `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} first touch (an untested idea, not a tested edge). Watch for the trigger.`);
           }
         }
       }
@@ -9008,7 +9011,7 @@
     const seasEl = document.getElementById('seasonal-driver-score');
     if (seasEl) { seasEl.textContent = seasS + '/10'; seasEl.style.color = seasColor; }
     const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const seasDesc = [10,11,0,1].includes(month) ? `${MONTH_NAMES[month]} — Strong seasonal window` : [2,5].includes(month) ? `${MONTH_NAMES[month]} — Weak seasonal window` : `${MONTH_NAMES[month]} — Neutral month`;
+    const seasDesc = ([10,11,0,1].includes(month) ? `${MONTH_NAMES[month]}: inside the Nov–Feb idea` : [2,5].includes(month) ? `${MONTH_NAMES[month]}: a Mar / Jun weak month in the idea` : `${MONTH_NAMES[month]}: outside the idea's months`) + ' · a seasonal tendency, not tested here';
     set('seasonal-driver-detail', seasDesc);
 
     // CB flows driver — anchored to WGC published data (scaled to /10 display)
@@ -9169,7 +9172,7 @@
     // KPI cards
     const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
     gxRenderHero();
-    setEl('gxFoldRead', `${md.isLong ? '▲ Long' : md.isShort ? '▼ Short' : '→ Wait'} · ${md.conf}% · ${si.name} session · confluence ${conf}/10`);
+    setEl('gxFoldRead', `${md.isLong ? '▲ Long' : md.isShort ? '▼ Short' : '→ Wait'} · score ${md.macroScore}/40 · ${si.name} session · ideas ${conf}/10`);
     setEl('gxFoldSetup', `Macro score ${md.macroScore}/40 · ${md.isLong ? 'bullish' : md.isShort ? 'bearish' : 'mixed'} regime`);
     const sigEl = document.getElementById('dash-sig');
     if (sigEl) {
@@ -9180,14 +9183,14 @@
     const badgeEl = document.getElementById('dash-sig-badge');
     if (badgeEl) {
       const cls = md.isLong ? 'bull' : md.isShort ? 'bear' : 'wait';
-      badgeEl.innerHTML = `<span class="kpi-badge ${cls}">${md.conf}% Confidence</span>`;
+      badgeEl.innerHTML = `<span class="kpi-badge ${cls}">Score ${md.macroScore}/40</span>`;
     }
     setEl('dash-sess', si.name);
     setEl('dash-sess-sub', si.sub);
     const cvEl = document.getElementById('dash-conf-val');
     if (cvEl) { cvEl.textContent = conf + '/10'; cvEl.style.color = conf >= 7 ? 'var(--accent-green)' : conf >= 5 ? 'var(--amber)' : 'var(--accent-red)'; }
     const cSubEl = document.getElementById('dash-conf-sub');
-    if (cSubEl) cSubEl.textContent = conf >= 7 ? 'Strong confluence' : conf >= 5 ? 'Moderate' : 'Low — wait';
+    if (cSubEl) cSubEl.textContent = 'A count of untested ideas, not a signal';
 
     // Macro gauge
     const pct = Math.round((md.macroScore / 40) * 100);
@@ -9199,7 +9202,7 @@
       ['Macro Score', md.macroScore + '/40'],
       ['Regime',      md.isLong ? 'BULLISH' : md.isShort ? 'BEARISH' : 'MIXED'],
       ['TIPS Yield',  '+' + md.tips.toFixed(2) + '%'],
-      ['Confidence',  md.conf + '%']
+      ['Tested here?', 'No']
     ].map(([l,v]) => `<div class="gauge-row"><span class="gauge-row-lbl">${l}</span><span class="gauge-row-val" style="color:${l==='Regime'&&md.isLong?'var(--accent-green)':l==='Regime'&&md.isShort?'var(--accent-red)':'var(--text-primary)'}">${v}</span></div>`).join('');
 
     // Signal feed
@@ -9209,12 +9212,12 @@
       const h      = new Date().getUTCHours();
       const SEAS   = [0,10,11,1];
       const signals = [
-        { dot: md.isLong?'bull':md.isShort?'bear':'wait', title: 'Macro Direction', desc: `Score ${md.macroScore}/40 — ${md.isLong?'Bullish regime':'Mixed signals'}`, pct: md.conf+'%' },
-        { dot: SEAS.includes(month)?'bull':'wait',        title: 'Seasonal Edge',   desc: SEAS.includes(month)?'Strong season (Nov–Feb window)':'Neutral season',           pct: SEAS.includes(month)?'On':'—' },
+        { dot: md.isLong?'bull':md.isShort?'bear':'wait', title: 'Macro Direction', desc: `Score ${md.macroScore}/40 — ${md.isLong?'bullish regime':md.isShort?'bearish regime':'mixed signals'}`, pct: md.isLong?'Long':md.isShort?'Short':'Wait' },
+        { dot: SEAS.includes(month)?'bull':'wait',        title: 'Seasonal tendency', desc: (SEAS.includes(month)?'Inside the Nov–Feb window':'Outside the Nov–Feb window') + ' · not tested here', pct: SEAS.includes(month)?'On':'—' },
         { dot: md.tips<0.5?'bull':md.tips<1.5?'wait':'bear', title: 'Real Yield',  desc: `TIPS ${md.tips.toFixed(2)}% — ${md.tips<0.5?'Bullish threshold':'Neutral zone'}`, pct: md.tips<0.5?'On':'Watch' },
-        { dot: 'bull',                                     title: 'DXY Decoupled', desc: 'USD decoupling regime active — supportive',                                       pct: 'Active' },
+        { dot: 'wait',                                     title: 'DXY idea',      desc: 'Always counted as on · not read from live data',                                  pct: 'Fixed' },
         { dot: h>=9&&h<16?'bull':'wait',                   title: 'London Fix',    desc: h>=9&&h<16?'Fix window active (09:00–16:00 UTC)':'Outside fix window',              pct: h>=9&&h<16?'On':'Off' },
-        { dot: si.code==='overlap'||si.code==='london'?'bull':'wait', title: 'Session Edge', desc: `${si.name} session — ${si.hint}`, pct: si.vol }
+        { dot: si.code==='overlap'||si.code==='london'?'bull':'wait', title: 'Session', desc: `${si.name} session — ${si.hint}`, pct: si.vol }
       ];
       feedEl.innerHTML = signals.map(s => `
         <div class="signal-item">

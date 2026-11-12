@@ -13,6 +13,8 @@
 // A target nearer than MIN_R (1R) is not a main-system trade: the Trader records it as a shadow ('room').
 // Entry: a limit at the broken M15 / M5 level (the zone of the break), stop BUF past that break's origin, valid 24 h, out after
 // 72 h. Every trade has a stop on the losing side of its entry (absolute rule 1): a signal without one is never returned.
+import { ownStream } from './fills.mjs';
+
 export const BUF = 0.3, MIN_R = 1, FRESH = 3600, MIN_RISK = 0.5;
 
 const first = (E, f) => { for (const e of E || []) if (f(e)) return e; return null; };
@@ -52,6 +54,16 @@ export function cycleTrades({ E4, E1, E15, E5, h1 }, now) {
   const em = ep && L.find((e) => e.t > ep.t && e.dir === d && e.flip);
   if (em) { const o = order(em, d, st.ext, 'main', st, now); if (o) out.push(o); }
   return { state: { ...st, stage: em ? 'resumed' : st.stage }, trades: out };
+}
+
+// why a new cycle signal is recorded as a shadow (12 Nov 2026): 'room' (target under 1R), 'cap' (the leg already has an open or
+// pending trade of the system's OWN stream, fills.mjs ownStream: live, or owner-shadow while the owner keeps it on paper), 'price'
+// (price already past the stop), 'owner-shadow' (config.ownerShadow.mcycle: every new trade is a paper shadow, as the other
+// owner-shadowable systems; a trade already open stays live to its own exit). An empty list = a live main-system trade.
+export function cycleBlockers(o, trades, price, ownerShadow = false) {
+  const d = o.side === 'sell' ? -1 : 1;
+  const busy = (trades || []).some((x) => x.k === 'mcycle' && x.leg === o.leg && ownStream(x) && (x.status === 'open' || x.status === 'pending'));
+  return [!o.room && 'room', busy && 'cap', !(d < 0 ? price < o.stop : price > o.stop) && 'price', !!ownerShadow && 'owner-shadow'].filter(Boolean);
 }
 
 // one line for the site

@@ -1,9 +1,10 @@
 // node --test tests/forward.test.mjs — the forward tracker of the live paper book (council/forward.mjs): the record against the
-// PROPOSED forward-test protocol (research/proposals/2026-11-12-path-to-live.*, owner decision 43, open). Offline, fake files only.
+// forward-test protocol (research/proposals/2026-11-12-path-to-live.*, owner decision 43, adopted 12 Nov 2026), and the protocol's
+// one consequence (stopSwitch: a crossed stop line sends the book back to a paper shadow, once). Offline, fake files only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { buildForward, bandAt, minPositions, bookTrades, netR, stopLines, record, execChecks, forwardLine, loadProtocol, START, BOOK, EXEC, COPY_GRACE, LABEL } from '../council/forward.mjs';
+import { buildForward, bandAt, minPositions, bookTrades, netR, stopLines, record, execChecks, forwardLine, loadProtocol, START, BOOK, EXEC, COPY_GRACE, LABEL, ADOPTED, stopSwitch, SWITCH_K, QUOTE } from '../council/forward.mjs';
 import { merNet, waiting } from '../council/digest.mjs';
 import { FIN } from '../council/fills.mjs';
 
@@ -21,7 +22,7 @@ test('the protocol file is the proposal\'s own json; the book, the clock start a
   assert.match(DOC, /at least 28 of 30.*3 or more missed/); assert.equal(EXEC.missFail, 3);
   assert.match(DOC, /within 0\.03R of paper \| worse than paper by more than 0\.05R/); assert.equal(EXEC.slipPass, 0.03); assert.equal(EXEC.slipFail, 0.05);
   assert.match(DOC, /within a fifth \| the demo charges over a fifth more/); assert.equal(EXEC.finTol, 0.2);
-  assert.match(LABEL, /not adopted: your decision 43/);
+  assert.match(LABEL, /adopted by the owner, 12 Nov 2026 \(decision 43\)/); assert.equal(ADOPTED, '2026-11-12');
 });
 
 test('bands: read from the json at its checkpoints, interpolated between them, 0R at the start, held past the last', () => {
@@ -120,7 +121,7 @@ test('the reading, the one digest / Home line only when a line is crossed or a c
   const losers = Array.from({ length: 25 }, (_, i) => T({ Rnet: -1, filled: START + i * 3600, closed: START + i * 3600 + 60 }));
   const bad = buildForward({ trades: losers, protocol: P, mirrors: [], accounts: null }, { now: START + 30 * DAY });
   assert.equal(bad.status, 'stop'); assert.equal(bad.head, 'A stop line is crossed'); assert.equal(bad.alerts.length, 2);   // S1, and E2: 25 paper fills, no copy file
-  const line = forwardLine(bad); assert.match(line, /stop line S1 crossed; execution check E2 fails/); assert.match(line, /not adopted: decision 43/);
+  const line = forwardLine(bad); assert.match(line, /stop line S1 crossed; execution check E2 fails/); assert.match(line, /protocol adopted 12 Nov 2026: decision 43/); assert.match(line, /goes back to a paper shadow \(no open trade closed, every stop kept\)/);
   // the digest's "Waiting on you" carries it once, and nothing when nothing is crossed
   const W = (fw) => waiting({ coach: { forward: fw }, health: { status: 'ok', at: new Date().toISOString() } }, Date.now() / 1000, {});
   assert.equal(W(bad).filter((s) => /Forward book/.test(s)).length, 1); assert.equal(W(few).filter((s) => /Forward book/.test(s)).length, 0); assert.equal(W(undefined).filter((s) => /Forward book/.test(s)).length, 0);
@@ -132,14 +133,14 @@ test('the reading, the one digest / Home line only when a line is crossed or a c
 
 test('wiring: the Trader writes coach.json forward on the 6-hour slot and the daily Coach rewrite carries it; financing is the Trader\'s FIN', () => {
   const tr = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
-  assert.match(tr, /import \{ buildForward, loadProtocol \} from '\.\/forward\.mjs'/);
+  assert.match(tr, /import \{ buildForward, loadProtocol, stopSwitch \} from '\.\/forward\.mjs'/);
   assert.match(tr, /cj\.forward = \{ \.\.\.buildForward\(\{ trades, snapshot, mirrors, accounts: rd\('ctrader\/accounts\.json', null\), protocol: pr, prev: cj\.forward \}, \{ now \}\), slot: CC_SLOT \}/);
   assert.match(tr, /!cj\.forward \|\| cj\.forward\.slot !== CC_SLOT/);
   assert.match(tr, /expect: prev\.expect, forward: prev\.forward,/);
   assert.ok(FIN.xau.long > 0);
 });
 
-test('page: the card reads only fields forward.mjs writes, says the protocol is not adopted, and reads an older coach.json', () => {
+test('page: the card reads only fields forward.mjs writes, says the protocol is adopted (12 Nov 2026), and reads an older coach.json', () => {
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   const i = html.indexOf('<script id="ms-fw-js">'), js = html.slice(i, html.indexOf('</script>', i));
   const card = html.slice(html.indexOf('id="ms-fwd"'), html.indexOf('id="ms-edge"'));
@@ -147,7 +148,8 @@ test('page: the card reads only fields forward.mjs writes, says the protocol is 
   assert.match(html, /<div class="card c-fwd adm" id="ms-fwd">/);
   // right under "Which systems trade live", in the Systems pane
   const sys = html.indexOf('id="ms-sys-book"'), fwd = html.indexOf('id="ms-fwd"'), edge = html.indexOf('id="ms-edge"'); assert.ok(sys < fwd && fwd < edge);
-  assert.match(card, /Proposed protocol · not adopted/); assert.match(card, /your decision 43/);
+  assert.match(card, /Protocol adopted · 12 Nov 2026/); assert.match(card, /your decision 43<\/a>: “Yes to all”/); assert.doesNotMatch(card, /not adopted|proposed protocol/i);
+  assert.match(card, /The Mosha cycle, a main paper system since 11 Nov by your choice, is not part of the protocol's book and is not counted here\./);
   assert.match(js, /first one comes with the next Coach rebuild/);
   // every field the card reads exists in a reading
   const fw = buildForward({ trades: [T({})], snapshot: { markets: { xau: { price: 4000 } } }, mirrors: [], accounts: null, protocol: P }, { now: START + 2 * DAY });
@@ -162,4 +164,60 @@ test('page: the card reads only fields forward.mjs writes, says the protocol is 
   assert.match(html, /c\.querySelector\('\.sb-sum, \.dc-sum, \.ex-sum, \.bk-sum, \.fw-sum, \.md-verdict'\)/);
   // Home's "things wait on you" takes it from MS_WEEK.decisions, one item, only with alerts
   assert.match(html, /var FW = co\.forward; if \(FW && Array\.isArray\(FW\.alerts\) && FW\.alerts\.length\)/);
+});
+
+// 12 Nov 2026: the council loop's sparse checkout left out research/proposals, so loadProtocol() found no file on the
+// runner and no forward reading (nor the adopted stop switch) was ever written. The loop must check out the protocol's folder.
+test('council loop checks out the forward protocol file', async () => {
+  const fs = await import('node:fs');
+  const { PROTOCOL_FILE } = await import('../council/forward.mjs');
+  const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
+  const block = yml.slice(yml.indexOf('sparse-checkout: |'), yml.indexOf('Checkout council data'));
+  const dirs = block.split('\n').slice(1).map((l) => l.trim()).filter(Boolean);
+  const rel = PROTOCOL_FILE.pathname.split('/macro-dashboard/').pop().replace(/^.*?(research\/)/, '$1');
+  assert.ok(dirs.some((d) => rel.startsWith(d + '/')), `council.yml sparse-checkout must include the folder of ${rel}; has ${dirs.join(', ')}`);
+});
+
+// review of 12 Nov 2026: two defects found against the protocol's own wording, each proven here first
+test('review: a stop line is judged on the unrounded figure ("more than 21.9R", "below -9.7R"), never after rounding to cents', () => {
+  const G = P.gates, due = (() => { const d = new Date(START * 1000); d.setUTCMonth(d.getUTCMonth() + 12); return d.getTime() / 1000; })();
+  // a drawdown of 21.904R is more than 21.9R; rounded to 21.90 it read as clear
+  let rec = record(bookTrades([T({ Rnet: -(G.ddStop + 0.004), filled: START + DAY, closed: START + DAY + 60 })]));
+  assert.equal(stopLines(P, rec, START + 40 * DAY)[0].state, 'crossed');
+  // exactly on the line is not more than it
+  rec = record(bookTrades([T({ Rnet: -G.ddStop, filled: START + DAY, closed: START + DAY + 60 })]));
+  assert.equal(stopLines(P, rec, START + 40 * DAY)[0].state, 'clear');
+  // a 12-month total of -9.704R is below -9.7R
+  rec = record(bookTrades([T({ Rnet: G.floor[12] - 0.004, filled: START + DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'crossed');
+  rec = record(bookTrades([T({ Rnet: G.floor[12], filled: START + DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'clear');
+  // a total that is exactly the line once summed (float noise such as -9.700000000000001) is not below it
+  rec = record(bookTrades([T({ Rnet: G.floor[12] - 0.1, filled: START + DAY, closed: due - 2 * DAY }), T({ Rnet: 0.1, filled: START + 2 * DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'clear');
+});
+
+test('review: E5 counts only what no mirror record holds: a flag the mirror later accounts for is dropped, and a filled limit is the mirror\'s', () => {
+  const now = START + 5 * DAY, iso = (t) => new Date(t * 1000).toISOString();
+  // reading 1: the account file shows a position the mirror state does not hold yet (a limit that filled between the mirror's round
+  // and the account read); reading 2: the mirror has adopted it under its position id -> no longer "not placed by the mirror"
+  const pos = { id: '777', symbol: 'XAUUSD', side: 'buy', lots: 0.01, sl: 3950, openedAt: iso(START + 2 * DAY) };
+  const r1 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ open: [pos] }), now });
+  assert.equal(r1.checks.find((c) => c.id === 'E5').state, 'fail');
+  const r2 = execChecks({ rows: [], mirrors: mirrorsOf({ map: { 'xau-mcycle-main-1': { positionId: '777', viaLimit: true, symbol: 'XAUUSD', side: 'buy', limitPrice: 3990, status: 'open' } } }),
+    accounts: acct({ open: [pos] }), prev: { exec: r1 }, now: now + DAY });
+  assert.equal(r2.checks.find((c) => c.id === 'E5').state, 'running'); assert.deepEqual(r2.foreign, []);
+  // an account file read before the mirror's round still lists the resting limit that has since filled: the mirror moved it from
+  // `orders` to its position record (viaLimit, the same symbol, side and limit price), so it is the mirror's order
+  const r3 = execChecks({ rows: [], mirrors: mirrorsOf({ map: { 'xau-geg-1': { positionId: '778', viaLimit: true, symbol: 'XAUUSD', side: 'buy', limitPrice: 3990.5, status: 'open' } } }),
+    accounts: acct({ orders: [{ id: '555', symbol: 'XAUUSD', side: 'buy', type: 2, price: 3990.5 }] }), now });
+  assert.equal(r3.checks.find((c) => c.id === 'E5').state, 'running');
+  // a real stranger stays flagged, reading after reading
+  const r4 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ orders: [{ id: '556', symbol: 'XAUUSD', side: 'buy', price: 3000 }] }), now });
+  const r5 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct(), prev: { exec: r4 }, now: now + DAY });
+  assert.equal(r5.checks.find((c) => c.id === 'E5').state, 'fail'); assert.equal(r5.foreign.length, 1);
+  // a stranger position seen open, then as its closing deal, is one item, not two
+  const r6 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ open: [{ ...pos, id: '888' }] }), now });
+  const r7 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ history: [{ positionId: '888', symbol: 'XAUUSD', side: 'buy', lots: 0.01, closedAt: iso(START + 3 * DAY) }] }), prev: { exec: r6 }, now: now + DAY });
+  assert.equal(r7.foreign.length, 1); assert.equal(r7.checks.find((c) => c.id === 'E5').n, 1);
 });

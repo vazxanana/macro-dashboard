@@ -15,7 +15,7 @@ import { buildDecay } from './decay.mjs';
 import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
 import { buildBook } from './book.mjs';
 import { buildExpect } from './expect.mjs';
-import { buildForward, loadProtocol } from './forward.mjs';
+import { buildForward, loadProtocol, stopSwitch } from './forward.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -23,7 +23,7 @@ import { d1AdxFeat } from './adx.mjs';
 import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
-import { cycleTrades, cycleText } from './mosha-cycle.mjs';
+import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
 import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
@@ -360,6 +360,13 @@ config.userRules = config.userRules || [];
 const OWNER_SHADOW_K = ['replica', 'mosha-bo', 'gtl', 'gmp', 'nq-open'];
 const ownerSh = (k) => !!(config.ownerShadow || {})[k];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
+// Forward-test protocol (owner, 12 Nov 2026: "Yes to all", docs/owner-decisions.md item 43 adopted): when the last reading of the
+// forward tracker (coach.json forward, council/forward.mjs) reports a crossed stop line (S1-S4), Gold trend and Gold daily engulf
+// join config.ownerShadow (their NEW trades are paper shadows; trades already open or pending run to their own exits with their
+// stops), once, with a `by: 'user'` history line quoting the protocol, and one alert below. Never undone here; execution checks
+// (E1-E5) never switch anything.
+try { const sw = stopSwitch(config, (rd('coach.json', {}) || {}).forward, now); if (sw) console.log('forward-test protocol: stop line', sw.lines.join(', '), 'crossed: the book goes back to a paper shadow'); }
+catch (e) { console.log('forward stop switch failed:', e.message); }
 // Owner rules are never undone by the Coach (7 Nov). Normalise the older string form (gold-m30 stored src: 'user',
 // since: '<iso>') into the per-field objects the Coach reads, and mark the owner's "Scalp outside Asia" session rule.
 for (const fl of Object.values(config.filters || {})) {
@@ -795,7 +802,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const tr14 = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
         const atr14 = (i) => { let a = 0; for (let j = i - 13; j <= i; j++) a += tr14(j); return a / 14; };
         // gold-trend-fast-shadow (owner, 7 Nov): the fast leg's new trades are shadow (blockedBy owner-shadow) and still managed here
-        const sh = LEG.k === 'gtrend5' && !!config.goldTrendFastShadow;
+        // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts gtrend in config.ownerShadow (stopSwitch): new trades shadow
+        const sh = (LEG.k === 'gtrend5' && !!config.goldTrendFastShadow) || ownerSh(LEG.k);
         const open = trades.find((x) => x.k === LEG.k && x.market === key && (!x.shadow || (x.blockedBy || []).includes('owner-shadow')) && x.status === 'open');
         if (n > GT.n + 15) {
           if (open) {
@@ -873,7 +881,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (key === 'xau' && config.goldEG) {
       try {
         const EG = config.goldEG, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
-        const mine = trades.filter((x) => x.k === 'geg' && x.market === key && !x.shadow);
+        // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts geg in config.ownerShadow (stopSwitch): new orders are paper
+        // shadows; the system's own orders (live, or shadow by the owner) keep the zone cancel and the cap as one stream
+        const egSh = ownerSh('geg'), mine = trades.filter((x) => x.k === 'geg' && x.market === key && ownStream(x));
         // cancel waiting orders whose zone was body-closed through (EF) on a newly closed day
         for (const tr of mine.filter((x) => x.status === 'pending')) if (tr.zone && last.time > (tr.lastD || 0) && last.close < tr.zone[0]) { tr.status = 'expired'; tr.closed = now; tr.R = 0; tr.exit = 'zone failed'; }
         for (const tr of mine.filter((x) => x.status === 'pending')) tr.lastD = last.time;
@@ -890,7 +900,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
             const entry = +base.high.toFixed(dp), stop = +(base.low - EG.pad).toFixed(dp), r0 = entry - stop;
             if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', h: '1d', side: 'buy',
               entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: EG.life * 86400, maxHold: EG.hold * 3600, noBe: true, entryMode: 'limit',
-              zone: [+base.low.toFixed(dp), +base.high.toFixed(dp)], lastD: last.time, feat: { sma: +sma.toFixed(2), conf: last.close }, shadow: false, blockedBy: [],
+              zone: [+base.low.toFixed(dp), +base.high.toFixed(dp)], lastD: last.time, feat: { sma: +sma.toFixed(2), conf: last.close }, shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],
               feed: FEED, note: `Gold daily engulf: daily close ${last.close} above the high ${base.high} of the red candle of ${new Date(base.time * 1000).toISOString().slice(0, 10)} (zone ${base.low}-${base.high}), close above the ${EG.sma}-day average ${sma.toFixed(2)}. Limit buy at the zone high ${entry} for ${EG.life} days (cancelled by a daily close under ${base.low}); stop ${stop}; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out ${EG.hold / 24} days after the fill.` });
           } else if (base && !up) state.blocked = 'below 20-day average';
         }
@@ -989,16 +999,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     // Mosha cycle (11 Nov 2026, owner; user rule mosha-cycle, council/mosha-cycle.mjs): H4 move, H1 ChoCh = the pullback starts,
     // M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme). A main paper
-    // system; a signal whose target is under 1R away, a second open trade of the same leg, or a limit already past its stop is a shadow.
+    // system; a signal whose target is under 1R away, a second open trade of the same leg, or a limit already past its stop is a shadow,
+    // and so is every new one while the owner lists 'mcycle' in config.ownerShadow (cycleBlockers; a trade already open stays live).
     if (key === 'xau' && config.moshaCycle) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
       try {
         const C = cycleTrades({ E4: ev('4h', 14400), E1: ev('1h', 3600), E15: ev('15m', 900), E5: ev('5m', 300), h1: src['1h'].bars.slice(0, -1) }, now);
-        snapshot.moshaCycle = { state: C.state, text: cycleText(C.state), open: trades.filter((x) => x.k === 'mcycle' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length };
+        snapshot.moshaCycle = { state: C.state, text: cycleText(C.state), open: trades.filter((x) => x.k === 'mcycle' && ownStream(x) && (x.status === 'open' || x.status === 'pending')).length, ...(ownerSh('mcycle') ? { shadow: true } : {}) };
         for (const o of C.trades.filter((x) => x.fresh)) {
           const id = `xau-mcycle-${o.leg}-${o.h4.t}`; if (trades.some((x) => x.id === id)) continue;
-          const d = o.side === 'sell' ? -1 : 1, busy = trades.some((x) => x.k === 'mcycle' && x.leg === o.leg && !x.shadow && (x.status === 'open' || x.status === 'pending'));
-          const blk = [!o.room && 'room', busy && 'cap', !(d < 0 ? price < o.stop : price > o.stop) && 'price'].filter(Boolean);
+          const d = o.side === 'sell' ? -1 : 1, blk = cycleBlockers(o, trades, price, ownerSh('mcycle'));   // owner-shadow (12 Nov): like Mosha BO; the cap reads the system's own stream
           const t1 = o.t1 != null && o.room ? o.t1 : +(o.entry + d * 2 * o.r0).toFixed(2);
           trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mcycle', name: o.leg === 'pull' ? 'Mosha cycle (pullback)' : 'Mosha cycle (main)', leg: o.leg,
             pair: `H4 → H1 ChoCh → ${o.tf === '5m' ? 'M5' : 'M15'}`, h: o.tf, side: o.side, entry: o.entry, stop: o.stop, t1, rr: o.room ? o.rr : 2, buf: 0.3,
@@ -2194,6 +2204,13 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
       if (Object.keys(e).length < tried) { state.moshaArmedSent = ma.mark; wr('state.json', state); }
       for (const [c, m] of Object.entries(e)) snapshot.errors[`moshaArmed_${c}`] = m; }
   } catch (err) { snapshot.errors.moshaArmed = String(err.message || err); }
+  // Forward-test protocol (12 Nov 2026): one alert when a crossed stop line sent the book back to a paper shadow (config.forwardStop,
+  // written once by stopSwitch); marked in state.forwardStopSent once a channel took it, so a restart never resends
+  try { const fs0 = config.forwardStop;
+    if (!quiet && fs0 && fs0.alert && state.forwardStopSent !== fs0.at) { const e = await sendAlerts([fs0.alert], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
+      if (Object.keys(e).length < tried) { state.forwardStopSent = fs0.at; wr('state.json', state); }
+      for (const [c, m] of Object.entries(e)) snapshot.errors[`forwardStop_${c}`] = m; }
+  } catch (err) { snapshot.errors.forwardStop = String(err.message || err); }
   // Coach proposal digest (7 Nov, council/alerts.mjs): one message when the set of proposals changes, else at most a daily
   // reminder; marked in coach.json proposalsSent once a channel took it, so a restart never resends. Never applies anything.
   try { const cj = rd('coach.json', {}), dg = quiet ? null : proposalDigest(cj.proposals, cj.proposalsSent, now);
@@ -2225,10 +2242,11 @@ try { const cj = rd('coach.json', {});
     for (const [c, m] of Object.entries(e)) snapshot.errors[`decay_${c}`] = m; }
 } catch (e) { console.log('decay monitor failed:', e.message); }
 // Forward tracker (12 Nov, council/forward.mjs): the live paper book (Gold trend + Gold daily engulf) against the forward-test
-// protocol PROPOSED in research/proposals/2026-11-12-path-to-live.md (bands, stop lines S1-S4, execution checks E1-E5 on the
-// demo copies), on the decay monitor's 6-hour slot. Not adopted (owner decision 43): a measurement only; a crossed line or a
-// failed check is only reported. Its own slot check, so the first round after a deploy writes the first reading. Without the
-// protocol file (a runner without research/) the last reading is kept, never overwritten by an error.
+// protocol of research/proposals/2026-11-12-path-to-live.md (bands, stop lines S1-S4, execution checks E1-E5 on the demo
+// copies), on the decay monitor's 6-hour slot. Adopted by the owner on 12 Nov 2026 (decision 43): the reading changes nothing
+// itself; a crossed stop line is acted on at the start of the next round (stopSwitch, above), a failed check is only reported.
+// Its own slot check, so the first round after a deploy writes the first reading. Without the protocol file (a runner without
+// research/) the last reading is kept, never overwritten by an error.
 try { const cj = rd('coach.json', {}), pr = (!cj.forward || cj.forward.slot !== CC_SLOT) ? loadProtocol() : null;
   if (pr) { const ma = rd('ctrader/mirror-accounts.json', { groups: [] }), mirrors = (Array.isArray(ma && ma.groups) ? ma.groups : []).map((g) => ({ account: g.account, books: g.books || [], state: (rd('ctrader/' + g.file, {}) || {}).state || {} }));
     cj.forward = { ...buildForward({ trades, snapshot, mirrors, accounts: rd('ctrader/accounts.json', null), protocol: pr, prev: cj.forward }, { now }), slot: CC_SLOT };

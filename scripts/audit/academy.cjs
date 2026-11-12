@@ -906,6 +906,10 @@ async function startServer(port = PORT, flags = []) {
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll on a decision with the mentor controls open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (decision)', small.length === 0, small.slice(0, 4).join(' ; '));
       taps = await p.evaluate(TAPS); check('390 px, touch: every control is at least 44 px tall (decision)', taps.length === 0, taps.slice(0, 5).join(' ; '));
+      { // simple view: the "What if" card folds to its heading like the other folded cards (12 Nov 2026), and opens from it
+        const f0 = await p.evaluate(SHOWN + `(['whatif','whatif-run'])`), ex0 = await p.getAttribute('#whatif > :first-child > .pc-t', 'aria-expanded').catch(() => null);
+        await unfold(p, 'whatif'); const f1 = await p.evaluate(SHOWN + `(['whatif-run'])`);
+        check('phone, simple view: the "What if" card is folded to its heading and opens from its chevron', f0.join() === 'whatif' && ex0 === 'false' && f1.join() === 'whatif-run' && (await p.getAttribute('#whatif > :first-child > .pc-t', 'aria-expanded')) === 'true', f0.join() + ' | ' + ex0 + ' | ' + f1.join()); }
       await p.tap('#whatif-run'); await p.waitForSelector('#whatif-table', { timeout: 30000 }); await p.evaluate(() => document.getElementById('whatif').scrollIntoView());
       w = await p.evaluate(() => document.documentElement.scrollWidth); check('390 px: no sideways scroll with the "What if" table open', w <= 390, w);
       small = await p.evaluate(SMALL); check('390 px: every text is 12 px or more (what if)', small.length === 0, small.slice(0, 4).join(' ; '));
@@ -921,6 +925,12 @@ async function startServer(port = PORT, flags = []) {
         const ch = await p.$('#mentor [data-choice="BUY"], #mentor [data-choice="SELL"]'); if (ch) { await ch.tap(); await p.waitForFunction(() => !document.getElementById('m-entry').disabled); }
         await p.tap('#m-more'); const m2 = await p.evaluate(SHOWN + `(['m-entry','m-stop','m-target','m-bias','m-edge','a-kind','a-arm'])`);
         check('phone, simple view: changing the answer to a trade shows its entry, stop and target, and "more" shows bias, edge and marks', !!ch && m2.length === 7, m2.join()); await p.tap('#m-more'); }
+      { // a saved verdict draws the "What if" card again: it stays as the learner left it (open, then folded), with one chevron
+        const saveVerdict = async () => { await p.tap('#mentor [data-choice="approve"]'); await p.evaluate(() => { document.getElementById('m-msg').textContent = ''; }); await p.tap('#m-save'); await p.waitForFunction(() => /Correction saved/.test(document.getElementById('m-msg').textContent), null, { timeout: 15000 }); };
+        const st = () => p.evaluate(() => { const w = document.getElementById('whatif'); return [w.querySelectorAll(':scope > :first-child > .pc-t').length, w.classList.contains('pm-open'), !!document.getElementById('whatif-run') && document.getElementById('whatif-run').getClientRects().length > 0, !!document.getElementById('whatif-table')]; });
+        await saveVerdict(); const a = await st();
+        await p.tap('#whatif > :first-child > .pc-t'); await saveVerdict(); const c = await st();
+        check('phone, simple view: a redraw of the "What if" card (a verdict saved) keeps it open when it was open and folded when it was folded, with one chevron', a.join() === '1,true,true,false' && c.join() === '1,false,false,false', a.join() + ' | ' + c.join()); }
       check('reduced motion is respected (no transition left running)', await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.btn')).transitionDuration) <= 0.001));
       // ... and no transition is STARTED either: with a tiny non-zero duration on `*` a theme change ran down the tree one level a
       // frame, and text kept the old theme's colour on the new background for several frames (shared.cjs). Read in the same task
