@@ -70,11 +70,17 @@ test('rules 2 and 3 write one key each: the financing start and the mirror\'s ma
 test('the two systems that stay live are byte for byte what they were: Gold trend / Gold trend fast loop and the daily engulf block', () => {
   const legs = seg(TRADER, "    for (const LEG of [{ cfg: config.goldTrend, k: 'gtrend'", '} catch (e) { snapshot.errors[LEG.snap] = String(e.message || e); }');
   const eg = seg(TRADER, "    if (key === 'xau' && config.goldEG) {", '} catch (e) { snapshot.errors.goldEG = String(e.message || e); }');
-  assert.equal(sha(legs), 'ee3dfa27f9788c2917ec79a2b01e52c1dbf255161511b2a0c51519a6f57e573e', 'the trend legs changed: that is a rule change the owner did not approve');
-  assert.equal(sha(eg), '511e46164b69e41191d05b3e6d5b1b2b655f66b4191e89ec26e5cefe77544ac0', 'the daily engulf changed: that is a rule change the owner did not approve');
-  assert.ok(legs.includes("const sh = LEG.k === 'gtrend5' && !!config.goldTrendFastShadow;"), 'only the fast leg is a shadow there');
-  assert.ok(eg.includes('shadow: false, blockedBy: [],'), 'a daily engulf order is a live paper order');
-  assert.ok(!/ownerSh\(/.test(legs + eg), 'neither reads the owner-shadow switch');
+  // 12 Nov 2026 (owner: "Yes to all", item 43 adopted the forward-test protocol): the ONLY change since 11 Nov is that both read the
+  // owner-shadow switch for NEW trades (a crossed stop line puts them in config.ownerShadow, council/forward.mjs stopSwitch); with
+  // those lines put back as they were, each block is byte for byte the 11 Nov one (tests/forward-stop.test.mjs has the switch)
+  const L_NEW = "        // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts gtrend in config.ownerShadow (stopSwitch): new trades shadow\n        const sh = (LEG.k === 'gtrend5' && !!config.goldTrendFastShadow) || ownerSh(LEG.k);";
+  const E_NEW = "        // forward-test protocol (owner, 12 Nov 2026): a crossed stop line puts geg in config.ownerShadow (stopSwitch): new orders are paper\n        // shadows; the system's own orders (live, or shadow by the owner) keep the zone cancel and the cap as one stream\n        const egSh = ownerSh('geg'), mine = trades.filter((x) => x.k === 'geg' && x.market === key && ownStream(x));";
+  assert.ok(legs.includes(L_NEW) && eg.includes(E_NEW) && eg.includes("shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],"));
+  const legs0 = legs.replace(L_NEW, "        const sh = LEG.k === 'gtrend5' && !!config.goldTrendFastShadow;");
+  const eg0 = eg.replace(E_NEW, "        const mine = trades.filter((x) => x.k === 'geg' && x.market === key && !x.shadow);").replace("shadow: egSh, blockedBy: egSh ? ['owner-shadow'] : [],", 'shadow: false, blockedBy: [],');
+  assert.equal(sha(legs0), 'ee3dfa27f9788c2917ec79a2b01e52c1dbf255161511b2a0c51519a6f57e573e', 'the trend legs changed beyond the owner switch: that is a rule change the owner did not approve');
+  assert.equal(sha(eg0), '511e46164b69e41191d05b3e6d5b1b2b655f66b4191e89ec26e5cefe77544ac0', 'the daily engulf changed beyond the owner switch: that is a rule change the owner did not approve');
+  assert.ok(!/ownerSh\(/.test(legs0 + eg0), 'apart from those lines neither reads the owner-shadow switch');
 });
 
 test('the five systems: a new trade is shadow with blockedBy owner-shadow only when the config says so; the entry, stop and exit text is untouched', () => {
@@ -195,7 +201,8 @@ test('what to expect: live flags, shadow dates and the financing figures reach c
   assert.deepEqual(ex.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
   for (const id of SHADOWED) assert.equal(ex.systems.find((s) => s.id === id).shadowSince, SHADOW_11NOV);
   const g = ex.systems.find((s) => s.id === 'gtrend');
-  assert.deepEqual([g.fin.before.exp, g.honest.exp], [0.489, 0.398]); assert.match(g.line, /^Expect \+0\.40R a trade after financing/);
+  // since 12 Nov 2026 (item 42): every unit, the add included, from the book study's unit records (research/edge/supported-book)
+  assert.deepEqual([g.fin.before.exp, g.honest.exp, g.honest.n], [0.436, 0.313, 74]); assert.match(g.line, /^Expect \+0\.31R a position after financing on every unit/);
   // the replica, Mosha BO and the momentum pullback: their buys are charged too since the follow-up of 11 Nov (small: they hold hours, not weeks)
   const rp = ex.systems.find((s) => s.id === 'replica'); assert.ok(rp.fin.perTrade > 0 && rp.fin.perTrade < 0.02); assert.match(rp.line, /after financing/);
   assert.equal(ex.systems.find((s) => s.id === 'nq-open').fin, null); assert.doesNotMatch(ex.systems.find((s) => s.id === 'nq-open').line, /financing/);
@@ -312,7 +319,7 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
   assert.equal(none.find((r) => r.id === 'mer-gtl-live').status, 'live', 'without the rule in the config the page changes nothing');
   // the Systems pane says which systems are live, since when, and that financing is in the costs
   const card = PAGE.slice(PAGE.indexOf('id="ms-sys-book"'), PAGE.indexOf('id="ms-edge"'));
-  assert.match(card, /Which systems trade live · since 11 Nov 2026/); assert.match(card, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\) and Gold daily engulf\./);
+  assert.match(card, /Which systems trade live · since 11 Nov 2026/); assert.match(card, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle \(not a tested edge/);   // 12 Nov: the Mosha cycle named (owner's choice of 11 Nov)
   for (const n of ['Gold replica', 'Gold momentum pullback', 'NQ New York open run', 'Gold H4 trendline', 'Mosha BO']) assert.ok(card.includes(n), n);
   assert.match(card, /stays in the main record as the live trade it was/); assert.match(card, /none reaches t 2 after costs/);
   assert.match(card, /Costs now include overnight financing<\/b> on gold buys: 0\.0148% of the price/); assert.match(card, /trades closed before keep the cost they were recorded with/);
@@ -328,11 +335,11 @@ test('the owner\'s decisions are on record: three approved with the owner\'s wor
   const item = (n) => { const a = doc.indexOf(`\n### [`, doc.search(new RegExp(`^### \\[.\\] ${n}\\. `, 'm')) - 1), b = doc.indexOf('\n### [', a + 5); return doc.slice(a, b < 0 ? undefined : b); };
   const five = [37, 38, 39, 40, 41].map(item), box = (n) => heads.find((m) => +m[2] === n)[1];
   for (const t of five.slice(0, 3)) { assert.match(t, /\*\*Status \(11 Nov 2026\): approved\.\*\*/); assert.match(t, /"yes anything that is better for the system and that applies it"/); }
-  assert.deepEqual([37, 38, 39, 40, 41, 33].map(box), ['x', 'x', 'x', ' ', ' ', ' ']);
+  assert.deepEqual([37, 38, 39, 40, 41, 33].map(box), ['x', 'x', 'x', ' ', '~', ' ']);   // 41 answered on 12 Nov 2026; the account reset is the owner's
   assert.match(five[0], /Gold trend.*Gold daily engulf/s); assert.match(five[0], /keeps running as a live trade to its own exit, with its\s+stop/); assert.match(five[1], /financing/i); assert.match(five[1], /History is not rewritten/);
   assert.match(five[2], /forex and crypto/); assert.match(five[2], /200 trades/); assert.match(five[2], /Off-switch/); assert.match(five[2], /does \*\*not\*\* switch back by itself/);
   assert.match(five[3], /Mosha BO/); assert.match(five[3], /item 33/); assert.match(five[3], /\*\*Status \(11 Nov 2026\): open\*\*/);
-  assert.match(five[4], /10-lot gold buy/); assert.match(five[4], /13:37 UTC/); assert.match(five[4], /4,427/); assert.match(five[4], /\*\*Status \(11 Nov 2026\): open\.\*\*/); assert.match(five[4], /has not answered/);
+  assert.match(five[4], /10-lot gold buy/); assert.match(five[4], /13:37 UTC/); assert.match(five[4], /4,427/); assert.match(five[4], /\*\*Status \(12 Nov 2026\): answered; the reset is yours to do\.\*\*/); assert.match(five[4], /"Yes to all": you placed the 10-lot buy yourself/); assert.match(five[4], /Nothing in this repository resets a demo balance/);
   assert.match(item(33), /see item 40/);
   const mx = rd('MERIDIAN-X.md'); assert.match(mx, /Gold trend/); assert.match(mx, /paper shadow/i); assert.match(mx, /11 Nov/); assert.match(mx, /financing/i);
 });
