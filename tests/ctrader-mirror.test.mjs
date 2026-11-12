@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -909,5 +909,64 @@ test('a replica research trade without a stop is never sent; a failed-filter one
 
 test('the mirror\'s entry point reads research.json for the replica book', () => {
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
-  assert.match(src, /research\.json/); assert.match(src, /replicaOwn \? replicaCandidates\(research, own\) : \[\]/);
+  assert.match(src, /research\.json/); assert.match(src, /replicaOwn \? replicaCandidates\(research, own, replicaMarkets\(cfg\)\) : \[\]/);
+});
+
+// ---- 11 Nov 2026 (owner on the edge review: stop copying the replica's forex and crypto paper trades until that stream is positive
+// before costs over 200 trades; Trader user rule replica-mirror-gold-only -> config.json mirrorReplica) -------------------------------
+test('replica research trades outside the configured markets are never opened; gold ones and every other candidate are unchanged', async () => {
+  const cfg = { mirrorReplica: { markets: ['xau'], since: NOW - 10, until: { n: 200, grossR: 0 } } };
+  assert.deepEqual(replicaMarkets(cfg), ['xau']);
+  assert.equal(replicaMarkets({}), null, 'no rule in the config: every market, as before'); assert.equal(replicaMarkets({ mirrorReplica: null }), null, 'the off-switch');
+  assert.equal(replicaMarkets(null), null); assert.equal(replicaMarkets({ mirrorReplica: { markets: 'xau' } }), null, 'a malformed list is no list');
+  const gold = rep({ id: 'xau-replica-1794182743-b', market: 'xau', label: 'XAU/USD', dec: 2, entry: 4000, stop: 3990, stop0: 3990, t1: 4020 });
+  const research = [rep(), rep({ id: 'btc-replica-9-s', market: 'btc', side: 'sell', entry: 100000, stop: 101000, t1: 98000 }), gold];
+  const c = replicaCandidates(research, [], replicaMarkets(cfg));
+  assert.deepEqual(c.map((t) => [t.id, !!t.noCopy]), [['eurusd-replica-1794182743-b', true], ['btc-replica-9-s', true], ['xau-replica-1794182743-b', false]]);
+  assert.ok(c.every((t) => t.stop != null && bookOf(t) === 'replica'), 'the records stay in the list with their stops: only the opening is held');
+  assert.deepEqual(replicaCandidates(research, []).map((t) => !!t.noCopy), [false, false, false], 'without a list nothing is held');
+  // the replica account's round: the forex record sends no order of any kind; the same record without the rule does
+  let b = broker(), r = await mirrorRound({ env: ENV, trades: [c[0]], state: started, WS: b.WS, now: NOW, openBooks: ['replica'], shadows: true });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0, 'no market order and no limit order'); assert.equal(b.positions.size, 0);
+  assert.ok(!r.state.map[c[0].id] && !(r.state.orders || {})[c[0].id]);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep()]), state: started, WS: b.WS, now: NOW, openBooks: ['replica'], shadows: true });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 1, 'control: the unheld record is opened');
+  // a pending record of a held market gets no resting limit either
+  b = broker(); r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ status: 'pending', filled: null })], [], ['xau']), state: started, WS: b.WS, now: NOW, openBooks: ['replica'], shadows: true });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0);
+  // a council trade, an ICT candidate and a live gold replica never carry the mark
+  assert.ok(![tr(), ...ictCandidates([{ id: 'nq-b-1', market: 'nq', side: 'buy', entry: 1, stop: 0.5, aset: true, status: 'open' }])].some((t) => t.noCopy));
+});
+
+test('a forex replica position copied BEFORE the rule keeps its stop, follows a moved stop and is closed with its record (never orphaned)', async () => {
+  // before the rule: copied as on 10 Nov
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep()]), state: started, WS: b.WS, now: NOW, openBooks: ['replica'] });
+  const id = rep().id; assert.equal(r.state.map[id].status, 'open'); assert.equal(b.positions.size, 1);
+  const stop0 = [...b.positions.values()][0].stopLoss; assert.ok(stop0 > 0, 'it has a stop');
+  // the rule starts: the record is still passed (noCopy), nothing new is sent, the position and its stop stay
+  const G = ['xau']; let n0 = b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length;
+  r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep()], [], G), state: r.state, WS: b.WS, now: NOW + 240, openBooks: ['replica'] });
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, n0); assert.equal(b.o.closes, 0, 'not closed by the rule');
+  assert.equal(r.state.map[id].status, 'open'); assert.equal([...b.positions.values()][0].stopLoss, stop0, 'the stop is untouched');
+  // the Trader moves the record's stop to break-even: the demo stop follows, and only tightens
+  r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: 1.1 })], [], G), state: r.state, WS: b.WS, now: NOW + 480, openBooks: ['replica'] });
+  assert.equal(b.amends.length, 1); assert.ok([...b.positions.values()][0].stopLoss > stop0, 'a buy\'s stop only moved up');
+  // a position found without a stop is given the council's stop at once (the stop guard still covers a held market)
+  for (const p of b.positions.values()) delete p.stopLoss;
+  r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: 1.1 })], [], G), state: r.state, WS: b.WS, now: NOW + 720, openBooks: ['replica'] });
+  assert.ok(b.positions.size === 0 || [...b.positions.values()][0].stopLoss > 0, 'never left without a stop: the stop is set again, or the position is closed');
+  // the record closes: so does the demo position
+  if (b.positions.size) { r = await mirrorRound({ env: ENV, trades: replicaCandidates([rep({ stop: 1.1, status: 'win', R: 2 })], [], G), state: r.state, WS: b.WS, now: NOW + 960, openBooks: ['replica'] });
+    assert.equal(r.state.map[id].status, 'closed by council'); }
+  assert.equal(b.positions.size, 0);
+});
+
+test('the rule lives in the config the Trader writes, with its condition and its off-switch written next to it', () => {
+  const trader = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8'), src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
+  assert.match(trader, /\{ id: 'replica-mirror-gold-only', apply: \(c\) => \{ c\.mirrorReplica = \{ markets: \['xau'\], since: Math\.floor\(Date\.now\(\) \/ 1000\), until: \{ n: 200, grossR: 0, text: /);
+  assert.match(trader, /Off-switch: a user rule setting\s*\n?\s*\/\/ c\.mirrorReplica = null/);
+  assert.match(trader, /snapshot\.mirrorReplica = \{ markets: mr\.markets, since: mr\.since \|\| null, closed: a\.closed, grossR: a\.R, need: u\.n, met: a\.closed >= u\.n && a\.R > u\.grossR \}/, 'the Trader counts the condition; nothing resumes by itself');
+  assert.doesNotMatch(trader, /mirrorReplica = null;|delete c\.mirrorReplica/, 'no code path lifts the rule on its own');
+  assert.match(src, /&& !t\.noCopy && \(OPEN\.has\(t\.status\)/, 'the only place the mirror opens anything skips a held record');
+  assert.match(src, /200 or more forex and crypto replica paper trades/);
 });

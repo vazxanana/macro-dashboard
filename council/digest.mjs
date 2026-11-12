@@ -298,7 +298,7 @@ export function loadScoreboard(file = new URL('../market-structure.html', import
 }
 export function scoreboardRows(D, now, SB = loadScoreboard()) {
   const rd = D.rd || (() => null);
-  return SB.build({ trades: D.trades, config: rd('config.json'), coach: D.coach, backtest: rd('backtest.json'), replay: rd('research/replay-2w.json'), mirror: D.mirror,
+  return SB.build({ trades: D.trades, config: rd('config.json'), coach: D.coach, backtest: rd('backtest.json'), replay: rd('research/replay-2w.json'), snapshot: rd('snapshot.json'), mirror: D.mirror,
     ictReplay: rd('ict/replay.json'), ictTrades: D.ictTrades, ictShadow: rd('ict/shadow.json'), robust: D.robust, macro: D.forecast, now });
 }
 

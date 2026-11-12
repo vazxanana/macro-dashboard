@@ -38,7 +38,15 @@ module.exports = async (req, res) => {
         try { await webpush.sendNotification(d.sub, payload, { TTL: 3600, urgency: 'high' }); sent++; }
         catch (e) { if (e.statusCode === 404 || e.statusCode === 410) { dead = true; break; } console.warn(`[alerts] push ${e.statusCode || e.message}`); }
       }
-      if (dead) { gone++; await save(id, null, blobs); } else await save(id, keep.length || d.tv ? { ...d, alerts: keep, at: Date.now() } : null, blobs);
+      if (dead) { gone++; await save(id, null, blobs); continue; }
+      // The candles and the pushes took seconds. If the device saved its list meanwhile, its newest record decides what is kept
+      // (less the alerts just sent); a device that removed itself is not written back (11 Nov 2026). When the store cannot be
+      // read again, the record read at the start is used, as before.
+      let cur = d, left = keep, files = blobs;
+      try { const a2 = await all(), nb = a2.by.get(id); if (!nb) continue;
+        if (nb.url !== by.get(id).url) { const d2 = await read(nb); if (d2 && typeof d2 === 'object' && d2.sub && Array.isArray(d2.alerts || [])) { const key = (a) => `${a.id}|${a.price}|${a.dir}`, sentKeys = new Set(hit.map((h) => key(h.a))); cur = d2; left = (d2.alerts || []).filter(whole).filter((a) => !sentKeys.has(key(a))); } }
+        files = a2.blobs; } catch (e) { /* the earlier record stands */ }
+      await save(id, left.length || cur.tv ? { ...cur, alerts: left, at: Date.now() } : null, files);
     } catch (e) { console.warn(`[alerts] device skipped: ${e.message}`); } }
     console.log(JSON.stringify({ devices: devs.length, sent, gone }));
     return res.status(200).json({ devices: devs.length, sent, gone });

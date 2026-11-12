@@ -14,6 +14,9 @@
 // Entry styles: every signal also gets a twin entered at market (setup '<k>@mkt'), and resting orders that never fill
 // are kept as 0R rows (fill = 0), so the Coach can compare the two entry styles signal by signal.
 // Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
+// Overnight financing (11 Nov 2026, owner approved): a long gold trade also carries `fin`, the Trader's own charge
+// (council/fills.mjs financing: rollovers held through x the broker's rate x entry / r0) for the live exit (R_none), in its own
+// column, so net = R_none - cost - fin. The other exit variants close at other times and are not charged here.
 // Fills and exits (8 Nov): the Trader's rules, shared from council/fills.mjs (replayBar): a stop the candle opened beyond fills at
 // the open (first, break-even and trailing stops), a limit fill + target in one candle is missed, candles while spot gold / forex
 // is shut (Fri 17:00 - Sun 17:00 New York) are ignored.
@@ -28,7 +31,7 @@ import { krakenData as krakenLoad, krakenGap, basisSeries, aggregate } from './k
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
-import { spreadOf, costOf, spotClosed, spotSkip, replayBar } from './fills.mjs';
+import { spreadOf, costOf, spotClosed, spotSkip, replayBar, replayFin, FIN } from './fills.mjs';
 import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
@@ -521,21 +524,23 @@ const out = {
   // status (after m15c1; adx / adxBand follow it, so older column indexes hold): 'closed', 'unfilled' (a resting order that never filled, 0R) or 'open'
   // (still running at the end of the window: R columns null; fill 1 once its entry filled, 0 while the order still rests)
   trades: all.concat(twins, unfilled, stillOpen).map((x) => { const op = x.status === 'open' || x.status === 'pending', st = op ? 'open' : x.status === 'closed' ? 'closed' : 'unfilled';
-    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.filter((v) => !v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null, x.feat.newsT1 ?? null, x.feat.newsMin ?? null, ...x.v.filter((v) => v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2))]; }),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx), then newsT1 / newsMin (news research tag, council/events.mjs), then R_pt1 (paper exit comparison, research/meridian-exits.md), appended last so older indexes hold
+    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.filter((v) => !v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null, x.feat.newsT1 ?? null, x.feat.newsMin ?? null, ...x.v.filter((v) => v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2)), op ? null : +replayFin(x).toFixed(3)]; }),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1', 'fin'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx), then newsT1 / newsMin (news research tag, council/events.mjs), then R_pt1 (paper exit comparison, research/meridian-exits.md), then fin (overnight financing of the R_none exit in R, gold longs; fills.mjs replayFin), appended last so older indexes hold
   twins: twins.length, unfilled: unfilled.length, open: stillOpen.length,
+  financing: (() => { const a = all.map((x) => replayFin(x)).filter((f) => f > 0); return { rate: FIN.xau.long, asOf: FIN.xau.asOf, of: 'R_none', trades: a.length, R: +a.reduce((q, f) => q + f, 0).toFixed(2) }; })(),   // what overnight financing took from the live-style trades (column fin)
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 // research (BT_DUMP): every filled live-style trade (no market twins) with its levels, cost and the replay's own result, for exit studies
 if (process.env.BT_DUMP) fs.writeFileSync(path.join(process.env.BT_DUMP, 'trades.json'), JSON.stringify({ from: out.from, to: out.to, source: meta.source, trades: all.concat(stillOpen.filter((x) => !x.twin && x.filled)).map((x) => ({
-  m: x.m, k: x.k, side: x.side, entry: x.entry, stop: x.stop, t1: x.t1, t2: x.t2, rr: x.rr, opened: x.opened, filled: x.filled, r0: x.r0, cost: x.cost, feat: x.feat, status: x.status, R: Object.fromEntries(x.v.map((v) => [v.n, v.R])), gapR: Object.fromEntries(x.v.filter((v) => v.gapR).map((v) => [v.n, v.gapR])) })) }));
+  m: x.m, k: x.k, side: x.side, entry: x.entry, stop: x.stop, t1: x.t1, t2: x.t2, rr: x.rr, opened: x.opened, filled: x.filled, r0: x.r0, cost: x.cost, fin: +replayFin(x).toFixed(3), closed: x.v[0].closed ?? null, feat: x.feat, status: x.status, R: Object.fromEntries(x.v.map((v) => [v.n, v.R])), gapR: Object.fromEntries(x.v.filter((v) => v.gapR).map((v) => [v.n, v.gapR])) })) }));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
 console.log('overall', JSON.stringify(out.overall));
+console.log(`financing (gold longs held over a rollover, R_none exit): ${out.financing.trades} trades, ${out.financing.R}R`);
 for (const [k, v] of Object.entries(out.bySetup)) console.log(k.padEnd(9), Object.entries(v).map(([n, s]) => `${n} n${s.n} wr${s.wr} exp${s.exp}`).join(' | '));
 for (const [k, v] of Object.entries(out.byRR)) console.log('rr ' + k.padEnd(7), `n${v.none.n} exp${v.none.exp} be1 ${v.be1.exp}`);
-for (const k of setups) { const a = all.filter((x) => x.k === k), m = (arr) => arr.length ? (arr.reduce((q, x) => q + x.v[0].R - x.cost, 0) / arr.length).toFixed(2) : '-';
+for (const k of setups) { const a = all.filter((x) => x.k === k), m = (arr) => arr.length ? (arr.reduce((q, x) => q + x.v[0].R - x.cost - replayFin(x), 0) / arr.length).toFixed(2) : '-';
   console.log(k.padEnd(9), '| M15 CHoCH, 1-candle swing: yes', m(a.filter((x) => x.feat.m15c1 === 'yes')), 'n' + a.filter((x) => x.feat.m15c1 === 'yes').length, 'no', m(a.filter((x) => x.feat.m15c1 === 'no')));
   console.log(k.padEnd(9), '| trader\'s M15 CHoCH within 1 h: yes', m(a.filter((x) => x.feat.m15c === 'yes')), 'n' + a.filter((x) => x.feat.m15c === 'yes').length, 'no', m(a.filter((x) => x.feat.m15c === 'no')));
   if (k === 'swing') console.log(k.padEnd(9), '| D1 ADX 19.4-29.2 (paper tag): in', m(a.filter((x) => x.feat.adxBand === true)), 'n' + a.filter((x) => x.feat.adxBand === true).length, 'out', m(a.filter((x) => x.feat.adxBand === false)), 'n' + a.filter((x) => x.feat.adxBand === false).length);

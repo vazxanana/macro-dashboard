@@ -1,0 +1,461 @@
+{
+ "built": "2026-11-12",
+ "rule": "paper research only: no live rule, size, filter, stop or config changes; nothing here is a study verdict",
+ "source": "research/edge/supported-book/legs.json (S2 = gtrend + geg, untouched 2006-07 to 2017-12, net of $0.30 a unit and financing on every unit)",
+ "book": {
+  "positions": 330,
+  "years": 11.49,
+  "perYearTrades": 28.71,
+  "perPosition": 0.18,
+  "sd": 1.726,
+  "tPosition": 1.89,
+  "tDaily": 1.86,
+  "total": 59.3,
+  "perYear": 5.16,
+  "ddClosed": 19.8,
+  "ddWeekdays": 988,
+  "ddRegained": false,
+  "ddMarked": 22.1,
+  "ddTenYears95": 34.1,
+  "maxUnits": 4,
+  "months": 138
+ },
+ "prove": {
+  "tradesForT2": 369,
+  "yearsForT2": 12.9,
+  "yearsForT2Daily": 13.3
+ },
+ "bands": {
+  "10": {
+   "lo": -0.72,
+   "hi": 1.08
+  },
+  "29": {
+   "lo": -0.35,
+   "hi": 0.71
+  },
+  "57": {
+   "lo": -0.2,
+   "hi": 0.56
+  },
+  "86": {
+   "lo": -0.13,
+   "hi": 0.49
+  }
+ },
+ "gates": {
+  "protocolMonths": 36,
+  "ddStop": 21.9,
+  "floor": {
+   "6": -7.3,
+   "12": -9.7,
+   "24": -12,
+   "36": -12.1,
+   "60": -10.6
+  },
+  "draws": 20000,
+  "seed": 12,
+  "method": "month-block bootstrap of the untouched daily book R; \"none\" and \"negative\" take 1x and 2x the mean R a position off every position"
+ },
+ "worlds": {
+  "expected": {
+   "perYear": 5.16,
+   "horizons": {
+    "6": {
+     "trades": 14,
+     "cum": {
+      "p5": -7.3,
+      "p50": 1.2,
+      "p95": 17.2
+     },
+     "pLoss": 0.425,
+     "dd": {
+      "p50": 4.2,
+      "p95": 8.8
+     },
+     "belowFloor": 0.05,
+     "ddStopHit": 0
+    },
+    "12": {
+     "trades": 29,
+     "cum": {
+      "p5": -9.7,
+      "p50": 3.5,
+      "p95": 24.5
+     },
+     "pLoss": 0.351,
+     "dd": {
+      "p50": 6.3,
+      "p95": 12.9
+     },
+     "belowFloor": 0.05,
+     "ddStopHit": 0
+    },
+    "24": {
+     "trades": 57,
+     "cum": {
+      "p5": -12,
+      "p50": 8.8,
+      "p95": 37
+     },
+     "pLoss": 0.262,
+     "dd": {
+      "p50": 9.1,
+      "p95": 18.3
+     },
+     "belowFloor": 0.05,
+     "ddStopHit": 0.016
+    },
+    "36": {
+     "trades": 86,
+     "cum": {
+      "p5": -12.1,
+      "p50": 14.1,
+      "p95": 47.7
+     },
+     "pLoss": 0.205,
+     "dd": {
+      "p50": 11,
+      "p95": 21.9
+     },
+     "belowFloor": 0.05,
+     "ddStopHit": 0.05
+    },
+    "60": {
+     "trades": 144,
+     "cum": {
+      "p5": -10.6,
+      "p50": 24.6,
+      "p95": 66.9
+     },
+     "pLoss": 0.133,
+     "dd": {
+      "p50": 13.7,
+      "p95": 26.7
+     },
+     "belowFloor": 0.05,
+     "ddStopHit": 0.128
+    }
+   },
+   "stoppedIn36": 0.12
+  },
+  "none": {
+   "perYear": 0,
+   "horizons": {
+    "6": {
+     "trades": 14,
+     "cum": {
+      "p5": -9.9,
+      "p50": -1.3,
+      "p95": 14.3
+     },
+     "pLoss": 0.582,
+     "dd": {
+      "p50": 5.5,
+      "p95": 11.2
+     },
+     "belowFloor": 0.133,
+     "ddStopHit": 0
+    },
+    "12": {
+     "trades": 29,
+     "cum": {
+      "p5": -14.6,
+      "p50": -1.5,
+      "p95": 18.9
+     },
+     "pLoss": 0.563,
+     "dd": {
+      "p50": 8.7,
+      "p95": 17
+     },
+     "belowFloor": 0.167,
+     "ddStopHit": 0.006
+    },
+    "24": {
+     "trades": 57,
+     "cum": {
+      "p5": -22,
+      "p50": -1.5,
+      "p95": 26.1
+     },
+     "pLoss": 0.539,
+     "dd": {
+      "p50": 13.4,
+      "p95": 26.1
+     },
+     "belowFloor": 0.215,
+     "ddStopHit": 0.126
+    },
+    "36": {
+     "trades": 86,
+     "cum": {
+      "p5": -27.2,
+      "p50": -1.3,
+      "p95": 31.6
+     },
+     "pLoss": 0.529,
+     "dd": {
+      "p50": 17.1,
+      "p95": 33.1
+     },
+     "belowFloor": 0.265,
+     "ddStopHit": 0.288
+    },
+    "60": {
+     "trades": 144,
+     "cum": {
+      "p5": -35.7,
+      "p50": -1.1,
+      "p95": 40.3
+     },
+     "pLoss": 0.52,
+     "dd": {
+      "p50": 23.1,
+      "p95": 44.4
+     },
+     "belowFloor": 0.341,
+     "ddStopHit": 0.547
+    }
+   },
+   "stoppedIn36": 0.425
+  },
+  "negative": {
+   "perYear": -5.16,
+   "horizons": {
+    "6": {
+     "trades": 14,
+     "cum": {
+      "p5": -12.6,
+      "p50": -3.7,
+      "p95": 11.5
+     },
+     "pLoss": 0.714,
+     "dd": {
+      "p50": 7,
+      "p95": 13.7
+     },
+     "belowFloor": 0.264,
+     "ddStopHit": 0
+    },
+    "12": {
+     "trades": 29,
+     "cum": {
+      "p5": -19.9,
+      "p50": -6.6,
+      "p95": 13.6
+     },
+     "pLoss": 0.729,
+     "dd": {
+      "p50": 11.8,
+      "p95": 21.6
+     },
+     "belowFloor": 0.363,
+     "ddStopHit": 0.047
+    },
+    "24": {
+     "trades": 57,
+     "cum": {
+      "p5": -32.2,
+      "p50": -11.7,
+      "p95": 15.5
+     },
+     "pLoss": 0.776,
+     "dd": {
+      "p50": 19.5,
+      "p95": 35.1
+     },
+     "belowFloor": 0.491,
+     "ddStopHit": 0.4
+    },
+    "36": {
+     "trades": 86,
+     "cum": {
+      "p5": -42.7,
+      "p50": -16.6,
+      "p95": 15.8
+     },
+     "pLoss": 0.812,
+     "dd": {
+      "p50": 26.3,
+      "p95": 46.6
+     },
+     "belowFloor": 0.599,
+     "ddStopHit": 0.664
+    },
+    "60": {
+     "trades": 144,
+     "cum": {
+      "p5": -61.4,
+      "p50": -26.8,
+      "p95": 13.8
+     },
+     "pLoss": 0.869,
+     "dd": {
+      "p50": 38.9,
+      "p95": 66.6
+     },
+     "belowFloor": 0.758,
+     "ddStopHit": 0.899
+    }
+   },
+   "stoppedIn36": 0.768
+  }
+ },
+ "risk": [
+  {
+   "risk": 0.001,
+   "perYearPct": 0.52,
+   "ddClosedPct": 1.98,
+   "ddMarkedPct": 2.21,
+   "ddTenYears95Pct": 3.41,
+   "yearsUnder": 3.8,
+   "maxOpenPct": 0.4
+  },
+  {
+   "risk": 0.0025,
+   "perYearPct": 1.29,
+   "ddClosedPct": 4.96,
+   "ddMarkedPct": 5.53,
+   "ddTenYears95Pct": 8.53,
+   "yearsUnder": 3.8,
+   "maxOpenPct": 1
+  },
+  {
+   "risk": 0.005,
+   "perYearPct": 2.58,
+   "ddClosedPct": 9.92,
+   "ddMarkedPct": 11.05,
+   "ddTenYears95Pct": 17.07,
+   "yearsUnder": 3.8,
+   "maxOpenPct": 2
+  },
+  {
+   "risk": 0.01,
+   "perYearPct": 5.16,
+   "ddClosedPct": 19.83,
+   "ddMarkedPct": 22.1,
+   "ddTenYears95Pct": 34.14,
+   "yearsUnder": 3.8,
+   "maxOpenPct": 4
+  }
+ ],
+ "size": {
+  "gtrend": {
+   "first": {
+    "units": 134,
+    "stopShare": 2.326,
+    "stopUsd": 93.1,
+    "minLotRiskUsd": 93.1,
+    "microRiskUsd": 930.5,
+    "costR": 0.003,
+    "finNightR": 0.006,
+    "medianNights": 12.5,
+    "account": {
+     "0.001": 93050,
+     "0.0025": 37220,
+     "0.005": 18610,
+     "0.01": 9305
+    },
+    "accountMicro": {
+     "0.001": 930505,
+     "0.0025": 372202,
+     "0.005": 186101,
+     "0.01": 93050
+    }
+   },
+   "add": {
+    "units": 63,
+    "stopShare": 2.255,
+    "stopUsd": 90.2,
+    "minLotRiskUsd": 90.2,
+    "microRiskUsd": 902,
+    "costR": 0.003,
+    "finNightR": 0.007,
+    "medianNights": 10,
+    "account": {
+     "0.001": 90196,
+     "0.0025": 36078,
+     "0.005": 18039,
+     "0.01": 9020
+    },
+    "accountMicro": {
+     "0.001": 901958,
+     "0.0025": 360783,
+     "0.005": 180392,
+     "0.01": 90196
+    }
+   },
+   "recent": {
+    "units": 13,
+    "stopShare": 3.409,
+    "stopUsd": 136.4,
+    "minLotRiskUsd": 136.4,
+    "microRiskUsd": 1363.7,
+    "costR": 0.002,
+    "finNightR": 0.004,
+    "medianNights": 15,
+    "account": {
+     "0.001": 136373,
+     "0.0025": 54549,
+     "0.005": 27275,
+     "0.01": 13637
+    },
+    "accountMicro": {
+     "0.001": 1363733,
+     "0.0025": 545493,
+     "0.005": 272747,
+     "0.01": 136373
+    }
+   }
+  },
+  "geg": {
+   "first": {
+    "units": 451,
+    "stopShare": 0.979,
+    "stopUsd": 39.2,
+    "minLotRiskUsd": 39.2,
+    "microRiskUsd": 391.8,
+    "costR": 0.008,
+    "finNightR": 0.015,
+    "medianNights": 2,
+    "account": {
+     "0.001": 39178,
+     "0.0025": 15671,
+     "0.005": 7836,
+     "0.01": 3918
+    },
+    "accountMicro": {
+     "0.001": 391780,
+     "0.0025": 156712,
+     "0.005": 78356,
+     "0.01": 39178
+    }
+   },
+   "add": null,
+   "recent": {
+    "units": 42,
+    "stopShare": 1.21,
+    "stopUsd": 48.4,
+    "minLotRiskUsd": 48.4,
+    "microRiskUsd": 484,
+    "costR": 0.006,
+    "finNightR": 0.012,
+    "medianNights": 1,
+    "account": {
+     "0.001": 48403,
+     "0.0025": 19361,
+     "0.005": 9681,
+     "0.01": 4840
+    },
+    "accountMicro": {
+     "0.001": 484032,
+     "0.0025": 193613,
+     "0.005": 96806,
+     "0.01": 48403
+    }
+   }
+  }
+ },
+ "gold": 4000
+}

@@ -68,7 +68,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 - The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
-- Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
+- Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
@@ -85,7 +85,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-36 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-46 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -165,6 +165,112 @@ Header (6 Nov): Settings and Alerts are icon buttons; the account area `#ms-me` 
 name) opens a menu to change photo (resized, stored per user in localStorage `ms-photo-<user>`), display name
 (`ms-name-<user>`) and log in/out. Default portrait: a gold monogram for named users, a silhouette for guests. The sign-in page is
 branded "Aurum Desk" with a gold chart background (no system names on it).
+
+## Supported book, financing in the costs, replica mirror gold only (11 Nov 2026, owner on the edge review)
+The owner was shown `research/proposals/2026-11-11-edge-review.md` and answered "yes anything that is better for the system and
+that applies it": approval (absolute rule 3) of exactly its three recommended changes, nothing wider (docs/owner-decisions.md
+items 37-39; 40 and 41 are open). Each is a Trader `USER_RULES` entry, so it reaches council-data `config.json` the way every
+owner rule has: applied once on the first round after deploy, logged in `config.history` (`by: 'user'`). No entry rule, filter,
+size, stop or exit of any system changed; nothing of ICT was touched.
+- **1. `supported-book` → `config.ownerShadow = { replica, 'mosha-bo', gtl, gmp, 'nq-open': <unix start> }`.** Live on paper:
+  **Gold trend (`gtrend`) and Gold daily engulf (`geg`) only** (their Trader blocks are pinned by sha256 in
+  `tests/supported-book.test.mjs`). The five listed are **paper shadows**, the 7 Nov `gold-trend-fast-shadow` precedent: the same
+  block pushes the same record with `shadow: true, blockedBy ['owner-shadow']` (`ownerSh(k)` in trader.mjs; Mosha BO adds
+  `'owner-shadow'` to its blocker list; the momentum pullback keeps its 6 Nov `['test']`; the NQ open run's record is marked
+  AFTER the sha256-pinned push, like the regime tag), managed by the same loop, never alerted, no futures ticket, not in
+  `mt5/signals.csv`, no "Mosha armed" heads-up. **A trade already open as live stays live to its own exit with its stop**: the
+  management loop never reads the switch. `fills.mjs` `ownStream(x)` (live, or shadow with blockedBy exactly `['owner-shadow']` /
+  `['test']`) is "the system's own trades": the replica's cap / daily stop / equity filter, the trendline's one-position rule,
+  Mosha's cap, the decay monitor's forward record (`recordOf`) and the regime tag's META read it, so each shadowed system keeps
+  one continuous record (live trades before, owner-shadow trades after) and a trade another rule blocked is never in it.
+  `council/decay.mjs` `SYSTEMS`: `shadow: true, since` on the five (`SHADOW_11NOV`; `shadowSince` in coach.json decay / expect, shown
+  as "shadow since 11 Nov"); live = gtrend, geg, ict-a. To put one back: a new user rule deleting its key from `ownerShadow`.
+  **The page needed no list change**: `SYS_K`, `NQ_SYS`, `SYSG`, `GUEST_DATA` and `api/_guestcut.js` take a row only when it is
+  not `shadow`, so the five systems' new trades drop out of "main" by their own flag and the trades they took live before stay
+  main (history is not relabelled). The scoreboard reads `config.ownerShadow` (`OWNER_SH`: status "shadow", "paper shadow by the
+  owner since <date>"); the Systems pane opens with `#ms-sys-book` ("Which systems trade live · since 11 Nov 2026", class `adm`).
+  Still true and said to the owner: the system replay (`research/replay-2w.json`, ends 3 Nov) keeps its replica / NQ rows, so the
+  guest's replay curve is the systems that were main then; `council/book.mjs` `IDEAS` (a paper comparison) is unchanged; the
+  Academy still teaches the seven rules. On the cTrader mirror a shadow trade of the five goes to the shadow book's account
+  (`bookOf`; the gold replica stays on the replica book), as Gold trend fast does.
+- **2. `count-financing` → `config.financingFrom`.** `council/fills.mjs` `FIN` (named constant with source and date: gold longs
+  0.000148 of price a rollover, the demo broker's XAUUSD `swap.long` of 11 Nov 2026), `nights(t, c)` (Mon-Fri 22:00 UTC, Wednesday
+  three: the study's function, compared on 3,000 holds), `financing(t)` = nights x rate x entry / r0 per unit. `tradeCost` adds it
+  to `costR` (records get `finR`, `nights`), so `Rnet`, `snapshot.costs` (`fin` per book, `financing` block), the digest, week
+  pane, scoreboard and decay record carry it with no change of their own. **costR is stamped once at the close**
+  (`annotateCosts`), so it applies to trades closed from the first round after deploy; no closed trade was recosted (a dry run on
+  the live files changed none). Gold longs only: shorts credited nothing, no other market charged (no rate measured). "What to
+  expect": `research/edge/expectations/build.mjs` charges the four long-only gold systems' study positions (expect-base `fin`,
+  `financing`; gtrend +0.489 → +0.398, geg +0.186 → +0.141, gtl +0.048 → +0.013, gtrend5 +0.372 → +0.289, equal to
+  `research/edge/trend-breadth/result.json` `partA`, tested). The replica, Mosha BO, the momentum pullback, the decay baselines,
+  the council replay rows and the engine's 30-day replay were done the same evening: next section. Today's rate is used for
+  every past year. Never change `FIN` without a source.
+- **3. `replica-mirror-gold-only` → `config.mirrorReplica = { markets: ['xau'], since, until: { n: 200, grossR: 0, text } }`.**
+  `ctrader-mirror.mjs` `replicaMarkets(cfg)` / `replicaCandidates(research, own, markets)`: a replica research trade of a market
+  outside the list gets `noCopy: true` and the one place that opens anything (`fresh`) skips it. **It stays in the trade list on
+  purpose**: a position copied before the rule keeps following its record (stop guard, stop moves, the close), never orphaned.
+  Gold replica copies and every other book are unchanged. Condition (in the config and counted every round in
+  `snapshot.mirrorReplica { closed, grossR, need, met }`): 200 or more forex / crypto replica paper trades closed since the rule,
+  total R before costs above zero. **Nothing resumes by itself**; off-switch: a user rule setting `c.mirrorReplica = null`.
+- Tests: `tests/supported-book.test.mjs` (17), `tests/ctrader-mirror.test.mjs` (3 new), `tests/expect.test.mjs`,
+  `tests/decay.test.mjs`. Changed on purpose: `tests/academy-edges.test.mjs` (the seven edges are the systems live until 11 Nov),
+  `tests/trend-breadth.test.mjs` (the Trader and fills.mjs may now NAME the study as the rate's source; none imports it).
+- Open for the owner: item 41 (a 10-lot gold buy on the Replica demo account, 11 Nov 13:37 UTC, not placed by the mirror: reset
+  the account before reading its record).
+
+## Financing, the rest: baselines, replay rows, the engine replay, the page between two readings (11 Nov 2026)
+The loose ends of the section above, inside the same approval (the approved cost model made the same everywhere). No entry
+rule, filter, size, stop or exit changed; no stored trade or cost was rewritten; nothing of ICT was touched.
+- **One rule for a backtest row**: a gold BUY pays `nights(entry, exit) x FIN.xau.long x entry price / initial risk`, first unit
+  only; a sell pays nothing and is credited nothing; no other market is charged. Three helpers in `council/fills.mjs`, all on
+  `financing()`: `rowFinancing(x)` (a replay / study row with no stamped cost; risk = `r0`, else the first stop `stop0`, else
+  `stop`; a row with `costR` / `Rnet` gets 0, so a closed forward trade is never recosted) and `replayFin(tr, v)` (one engine
+  replay trade, for one exit variant).
+- **Decay baselines** (`council/decay-base.json`, `research/edge/decay-monitor/run.mjs`; `financing` block, per system `fin`
+  `{ perTrade, nights, charged, before }`). Before → after, R a trade: Gold trend +1.640 → +1.504 (0.136R a position, 22.8
+  nights), Gold trend fast +1.064 → +0.940, daily engulf +0.198 → +0.139, H4 trendline +0.106 → +0.068, momentum pullback
+  +0.043 → +0.032, Mosha BO −0.064 → −0.093, replica +0.877 → +0.865; NQ, ICT, crypto unchanged. Drawdown limits a little
+  wider (Gold trend 6.88R → 7.47R, daily engulf 22.28R → 25.49R). **No decay status changed** on council-data of 11 Nov.
+  - The rebuild records (`research/edge/robustness/out/*.json`) hold t / R / gross / side only. **Never edit
+    `research/edge/robustness/systems.mjs` or `lib.mjs` for a reason like this: their bytes are the Academy's version of the
+    momentum pullback edge** (`academy/edges.mjs` `ruleSource`; a changed byte means regenerating Academy data).
+    `research/edge/decay-monitor/positions.mjs` instead loads that file's own functions (the text above its main part, the shared
+    `simTrade` wrapped), runs them, refuses to write unless every position equals the committed record, and writes
+    `positions.json` (`[t, o, c, e, r0, side]` per position, row for row with the record). Candles: `research/candles/xau-histdata`
+    from `origin/council-data` (`git show`, no network) + the Mosha event cache (`systems.mjs mosha` once, about 2 minutes).
+  - The council replay rows (`research/replay-2w.json`) are read through `decay.mjs` `replayNet` (= `merNet` less
+    `rowFinancing` x size) in `recordOf` AND in the baseline build, so a record and its baseline are costed alike. Forward
+    trades keep `merNet`. coach.json `decay.financing` says a reading's baselines carry the charge.
+- **"What to expect"**: the replica (−0.052 → −0.057R on 2017-22, t −0.19), Mosha BO (+0.137 → +0.121R on 2006-17, t 0.48) and
+  the momentum pullback (−0.043 → −0.052R on 2018-22, t −1.05) are charged too (their records do allow it: `mosha-oos`
+  positions carry side / times / r0, `replica-oos/positions.json` lines up with `sizing/inputs.json`, gmp from positions.json).
+  The four long-only gold systems are unchanged; every system's "backtest" block follows the new baselines.
+- **Engine replay** (`council/backtest.mjs`): a new LAST column `fin` (financing of the live exit `R_none`, in R; `null` for an
+  open row) and `backtest.json` `financing { rate, asOf, of, trades, R }`. **The `cost` column is still the spread alone**:
+  `trader.mjs`'s Coach statistics (which move live filters) subtract `cost` only, on purpose, so financing can never move a
+  live filter (a test pins that line). Readers that judge `R_none` take `fin` off: the scoreboard's 30-day rows, the
+  Analyst's Scalp table, `proposals.mjs` (proposals only). A fresh 90-day gold replay (13 Aug - 11 Nov 2026, OANDA, 776
+  live-style trades): R_none −69.99R, spread 31.18R, financing 3.73R on 77 buys held over a rollover; net −101.17R → −104.90R
+  (−0.130 → −0.135R a trade). The forex rows carry 0. The 8 Nov "pinned" 90-day file is not in the repository (the window
+  rolls with the clock), so this is a new run, not a re-cost of that one.
+- **Scoreboard system-replay rows** (`#ms-sb-js` `nightsOf` / `finOf`, a mirror of `fills.mjs` compared on 2,000 holds in the
+  test): a gold buy of `research/replay-2w.json` pays at the rate the Trader publishes in `snapshot.costs.financing.perNight`
+  (no rate in the page; no rate on file = nothing charged, and the row does not say "after financing"). On 11 Nov: Gold trend
+  +37.0R → +34.0R (t 2.49 → 2.36), Gold trend fast +66.8R → +62.6R, replica +186.0R → +183.4R, others under 0.5R; **no
+  verdict moved** (`r.v` unchanged for all 43 rows). `digest.mjs` hands the snapshot to the same function.
+- **Between two Coach readings** (`#ms-decay-js` `MS_BOOK_NOW(coach, config)`): coach.json `decay` / `expect` are rebuilt
+  every 6 hours, so after an owner's supported-book rule they said "8 live systems" for up to 6 hours. The page marks a
+  system listed in `config.ownerShadow` as shadow in its own copy (`bookLate`, display only, before the `ms:council` event)
+  and both cards add "This reading was made before your decision…". The financing clauses of the two footnotes
+  (`#ms-decay-fin`, `#ms-expect-fin`) follow the reading in hand (an older one says its figures are before financing).
+- **Wording**: the Academy's seven edges are "the seven Meridian systems that were live until 11 Nov 2026"
+  (`academy/edges.mjs` comment, `docs/academy/ARCHITECTURE.md`, `MERIDIAN-X.md`); no Academy logic, data or page file changed.
+- Not done, on purpose: `council/fidelity.mjs` and `research/portfolio.mjs` (research tools) still read `cost` only; the add
+  unit of a trend position is not charged in any backtest (the records do not carry its entry); the quoted worst drawdowns
+  of the gold systems (`gold-systems` RESULT.md) are before financing; `research/replay-2w.json` itself is not rewritten.
+- Tests: `tests/financing-rest.test.mjs` (11), `tests/expect.test.mjs` (`finCheck`). Changed on purpose:
+  `tests/backtest-oanda.test.mjs` (the last column), `tests/research-ledger.test.mjs` (the decay-monitor's build date),
+  `tests/supported-book.test.mjs` (the replica's `fin`, the footnote).
 
 ## Loss review (6 Nov 2026, owner request)
 
@@ -536,8 +642,58 @@ Profile 4.3 → 1.0. Rules to keep:
 - Tests: `tests/qa-sweep.test.mjs` ("simple phone view": the head script on fake media, the CSS scope, the gates, `MS_PS`
   pure pieces); the smoke test's phone owner run fails when the Desk does not open simple or Home's first screen holds more
   than 9 blocks / 3 open rows.
-- Not done: Charts, the Council's other panes (Trades is 2 screens of tiles and a table, Research is long), the guest page,
-  Setup, Scanner, Journal; `backtest.html`, `academy.html`, `macro-desk.html`, `gold-trading.html` have no simple view.
+- Not done in this first pass: Charts, the Council's other panes, Setup, Scanner (second pass, below); the guest page and
+  Journal (still as they were). The other pages got their own simple views the same day (their sections).
+
+**Second pass (11 Nov 2026, owner: "Need more")**: the rest of the Desk, same key, switch, style block and fold helpers
+(never a second mechanism). Order worked in, by how likely a phone opens it: Charts, Council → Trades, This week, Review,
+Systems, Research, Macro, then Setup, Scanner, the Gold playbook, LIT and Crypto desks. Measured at 390 x 844 as the owner,
+screens before → after: Trades 2.1 → 1.3, This week 6.9 → 1.9, Review 3.1 → 2.6, Systems 5.5 → 1.5, Research 37.9 → 1.4,
+Macro 7.6 → 2.7, Setup 5.7 → 2.9, Scanner 3.2 → 1.4, Gold playbook 2.7 → 1.6, LIT 16.4 → 1.2, Crypto 5.0 → 2.9; on Charts
+the chart started at 314 px and ended 110 px under the tab bar, now 255 px and above it.
+- **Charts**: row 1 the markets and **More** (`#ps-ch-more`, `.ps-cmore`), row 2 the timeframes, then the chart, sized to end
+  above the tab bar. Behind More (`#v-charts[data-ps-more]`): the markup switch, indicators, Context and its strip. Hidden is
+  not switched off: the markup in use is named on the button ("ICT · More"), and the script never touches `setMode`,
+  drawings or the watchlist. Every Charts rule is `html[data-phone="simple"]:not([data-role="public"]) #v-charts …`: a guest's
+  chart page (the lock, Clean only) is untouched, and `html[data-role="public"] .ps-cmore` is never drawn (a test reads both).
+- **An answer block per pane** (`.ps-ans`, static markup, filled from sums the pane already worked out; pure functions on
+  `MS_PS`): Trades `#ps-t-ans` = `tradesAnswer(window.MS_TRADES)`: "Forward record: −2.05R on 5 closed trades · 1 won", and the
+  backtest replay in its own sentence ("not traded and kept apart"); **forward and replay are never one figure**. The pane
+  hands `MS_TRADES` over (`ms:trades`; tab, open, `fwdSplit`'s fwd / rp; never for a guest). This week `#ps-w-ans` =
+  `weekAnswer(MS_WEEK_NOW, MS_WEEK_DEC)` (`ms:week`, from `renderHead` / `renderDec`): Meridian live after costs, the ICT desk
+  in its own sentence ("a separate edge"), then how many decisions wait; the decisions card comes right under it
+  (`order`, `.wk-col { display: contents }`), the tiles fold to "The week in numbers". Review `#ps-r-ans` =
+  `reviewAnswer(n)` from the Review tab's own badge (losses of the last 24 h not reviewed, live and shadow together, said so)
+  with "Show only the ones to review" (presses the pane's own To review filter).
+- **Cards fold to a row with two lines** (`.ps-fold.ps-two`, `rowText`): the heading up to its first " · ", and one line: the
+  rest of the heading, or the first sentence of the card's own summary once drawn (`.sb-sum`, `.dc-sum`, `.ex-sum`, `.bk-sum`,
+  `.md-verdict`; never a line the account's gate hides). `DESKS` now also lists `ms-cp-systems` (keeps `#ms-sys-book`,
+  **"Which systems trade live": open and first**, `order: -1`), `ms-cp-review` (keeps the loss review), `ms-cp-research`
+  (every card a row), `ms-cp-macro` (keeps Next day; the veteran's discussion inside it is the static row `vet`),
+  `ms-cp-week` (keeps the decisions), `v-setup` (folds the playbook check; price and levels are the static row `kv`),
+  `v-gold` and `v-lit` (keep the first card), `v-crypto` (keeps the chart and the setups). A made row copies its card's
+  `adm` / `own` class.
+- **Lists**: Trades shows the latest five rows, Setup the first three possible trades, Scanner the first four markets (the
+  page sorts ready ones first); "Show all n …" (`.ps-more`, `lists()`, `[data-ps-all]` on the card). One fold row may fold
+  several parts (`[data-ps="tnum"]`: the Trades note, tiles and curve).
+- **No fold after the paint** (the first pass's flaw): (1) the observer that folds a card drawn late runs `desks()` at once
+  (before the next paint) instead of 120 ms later, falling back to the timer if it is ever called more than 12 times in half a
+  second; (2) a desk a member lands on (ICT, Mosha) was painted with every card open until the script at the end of this
+  long page ran: `html[data-phone="simple"]:not([data-ps-ready])` holds the same cards back from the first paint and the
+  script sets `data-ps-ready` as its first statement (so a failure below shows the cards, never hides them). Open cards while
+  the ICT desk loads: 10 then 3 before, 2 then 3 now; Luxus's landing 5 then 1 → 1. A desk that draws its cards again (LIT)
+  keeps the rows a person opened (`OPENED`).
+- Verified: every drawn element's box and all visible text, build before against build after, 0 differences at 1440, 1024 and
+  700 px (owner), in the Full view at 390 px (owner, Fred, Orlando, Luxus, Carlos) and for a guest at 390 and 1440 px; per
+  role, the text visible in the simple view with every fold opened is the text of before plus the view's own labels and
+  sentences (figures the role already saw); AA, 12 px, 44 px and no cut-off at 360 / 390 / 430 in the three themes.
+- Tests: `tests/qa-sweep.test.mjs` ("simple phone view 2": six tests); the smoke test's phone owner run opens `#charts` and
+  `#setup` too and fails when a view does not lead as described (chart under the tab bar, Trades tiles unfolded or more than
+  five rows, a Systems card other than "Which systems trade live" open, an open Research card, This week without its
+  sentence, more than four Scanner markets).
+- Left: Journal (1.6 screens, its two cards are what it is for), Users and NQ SDV (one screen), the guest page; the Council's
+  status line and tab bar above every pane (about 230 px); the loss review's intro paragraph and three filter rows; a
+  landing on a hash still paints Home for a frame before the router shows the view (seen while measuring, not the fold).
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
 `vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
@@ -647,7 +803,7 @@ Shadow audit (8 Nov, `research/edge/shadow-audit`): the shadow book's −300R we
 `duplicate` (`dupOf`, `void`; no tally counts that status). Near-stop market fills (the engine's stop floor is checked on the planned entry,
 not the fill) is a proposal for the owner. Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
 paper trades pay the costs study's CFD round trip (0.04% of price, `CFD_CRYPTO` in `council/fills.mjs`) instead of Kraken spot fees.
-Gold fidelity (8 Nov, research/edge/gold-fidelity): `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
+Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also carries overnight financing on gold longs, `FIN` / `financing`, section "Supported book, financing".) `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
 "Manage open trades" step for one candle as pure functions (trail, beAt, maxHold, pyramid add included), used by that replay;
 `tests/fills-live.test.mjs` lifts the Trader's loop text out of trader.mjs and checks parity, so a change to the live loop must be
 mirrored there. A pyramid add inherits its parent's `shadow` flag (a blocked Mosha chain's add is not a live trade).
@@ -764,6 +920,7 @@ edge (cap 2 years; > 50 years = "cannot be proven"), the regime note, and the fo
 10 trades (`out`: above / below). Card `#ms-expect` (research pane, next to `#ms-decay`; `<style id="ms-ex-css">` + `<script id="ms-ex-js">`,
 phone blocks under 760 px); the daily digest (`expectLine` in `waiting()`) names a live system only when it leaves its band. Expectations
 only: never a rule, size or filter. Tests: `tests/expect.test.mjs` (maths against each study's result.json, digest, trader and page wiring).
+Since 11 Nov 2026 every gold buy in these figures is after overnight financing (the four long-only gold systems, and the buys of the replica, Mosha BO and the momentum pullback) and five systems are marked shadow (sections "Supported book, financing" and "Financing, the rest").
 Re-run the build after a study changes.
 
 ## Daily owner digest (8 Nov 2026, owner: one message instead of many alerts)
@@ -1597,6 +1754,33 @@ with an `MCP_KEYS` entry the stored user list was not read before `ictLevel`, so
 built-in ICT level whatever the Users page said; the list is read first for every key (an explicit key is still a grant while
 the list cannot be read). The same file re-checks: a foreign Origin on every state-changing endpoint, `/cdata` path handling,
 the Mosha assistant's key against every other endpoint, who teaches, who writes whose record, where `ictApply` can come from.
+Blob freshness audit (11 Nov 2026, after the Academy lost a verdict to a stale read; `tests/blob-fresh.test.mjs`, lagging fake
+Blob service `tests/fixtures/blob-lag.mjs`). The Blob CDN serves a file that was OVERWRITTEN IN PLACE with its old bytes for
+up to a minute; a read with `?cache=0` asks the origin. Every reader / writer under `api/` was read:
+- **Overwritten in place, read through the CDN until now** (old data on another instance, and its next save dropped what was
+  stored in between): `notify.js` (notices/list.json), `profile.js` (profiles/<key>.json), `sounds.js` (sounds/config.json),
+  `mosha.js` (mosha/trades.json), `mosha-lessons.js` (mosha/lessons.json, mosha/book.json). Each store now reads through
+  `fresh(url)` (`?cache=0`), as `_academy-store.js` does. A lesson's picture is written once under its own name and may come
+  from the CDN. **Rule: a module that writes with `allowOverwrite: true` reads with `cache=0`** (a test lists the six files).
+- **Not affected, a new file name per save** (`addRandomSuffix: true`: a new URL, no CDN copy can exist; the reader takes the
+  newest from the listing): the user list (`users.js` writes, `_accounts.js` `blobUsers` reads: sign-in, `/api/me`, profile,
+  users, ctrader-link, the connectors), price alerts (`_alerts.js`), cTrader link tokens, TradingView alerts, run reports, the
+  bridge ping. So a changed password, a removed member or a removed permission is never honoured from a stale Blob read.
+- **What does lag by design**: `S.fromRequest(…, { cacheMs: 60e3 })` keeps the user list a minute per instance (and up to 10
+  minutes while the list cannot be read) for READS on `/cdata`, notifications, the Mosha log and lessons. The one WRITE path
+  that used it, a teacher's POST to `/api/mosha-lessons`, now checks the list as it is (a removed account, a new password or
+  teaching switched off is refused on the next call); `handle` takes `d.deps` for tests.
+- **Two small guards where real time passes between a read and its write** (not locks): `mosha-lessons.js` reads the list again
+  after a picture upload (a lesson stored meanwhile is kept; a lesson removed meanwhile answers 404 and the picture is taken
+  away); `alert-cron.js` reads a device's record again before saving it after the candles and pushes (an alert the device
+  added meanwhile is kept, a device that removed itself is not written back).
+- **Academy store**: its "own copy for a minute" shortcut is now used only while the listed ETag is the one its write returned
+  (the upload-time rule, the fallback, let a write by another instance within 1.5 s go unseen for a minute and be dropped).
+- **Still open, everywhere a file is overwritten in place**: two instances that both read and both write inside the same few
+  milliseconds can lose one write (single-writer in practice: the owner, one teacher, one page at a time). The Blob client
+  (2.8.2) has a conditional write (`put(…, { ifMatch: <listed etag> })`); it is not used because it could not be tried against
+  the real service from the build sandbox and a wrong ETag form would refuse every save. Try it on a preview deployment first.
+- Not verified against the real Blob service: that `cache=0` reads are read-your-writes, and that the listing is.
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
@@ -1679,6 +1863,30 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   n or t (done the same day, paragraph above); `research/macro-veteran/START_HERE.md` (shown in the veteran
   library) names an assistant product in its title and headings and has words run together in its source; the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
+- **Gold terminal, simple phone view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the
+  phone"; display only, no number, score or rule changed, the locked features untouched). At 640 px and under the head script sets
+  `html[data-phone="simple"]` unless this device chose Full (localStorage `ms-phone` = "full": the Desk's key and its "Phone view:
+  Simple | Full" wording, so one choice covers both; the switch `#gxPv` sits above the footer and in the More sheet). Every rule of
+  the simple view hangs on that attribute, which a wider screen never gets; the new elements (`.gx-po`, `.gx-bar`, `.gx-pv`) are
+  `display: none` otherwise. What the simple view does: (1) Dashboard = hero, a shorter 5 min chart, then one line each for the
+  daily bias (`details[data-fold="pbias"]`, summary `#gxFoldBias`; the bias strip `#dash-bias-strip` is MOVED into it through
+  `data-pv-slot` and put back for Full, never copied) and the macro score (the setup fold first, phone title from `data-pt`), the
+  other folds, no shortcut tiles; (2) the two tab rows give way to a bottom bar `#gxBar` (Dashboard, Daily Bias, Charts = Multi-TF,
+  Red Folder, More) and the sheet `<dialog id="gxMore">` (the other eight tabs, light / dark, price alerts, the view switch);
+  `switchTab` tells it the tab (`window.gxPhoneTab`); (3) the header is one swipeable line of prices (none on the dashboard, where
+  the hero has the price); (4) every block marked `data-pf="Title"` is wrapped at run time in the page's own `.gx-fold`
+  (`details.gx-fold.gx-pf`, state in `gxFolds` through the one writer `window.gxFoldBind`) with a one-line summary: `data-pf-s`
+  text, or the live text of the elements `data-pf-q` names inside the block (an Edge Lab idea's line is its own status pills, word
+  for word; the Edge Lab note and each tab's answer block carry no `data-pf` and stay open); `undo()` takes every block out again,
+  so Full view and a rotated phone are the page as it was; (5) Multi-TF shows one timeframe (`#gxTf` Daily | H4 | M15,
+  `#tab-mtf[data-ptf]`, `data-ptf-w` on the three widgets, localStorage `gxPhoneTf`), each chart with its structure readout.
+  A chart made while its block is hidden starts 600 px wide and stretched a `1fr` grid column past the screen: the simple view's
+  `.mtf-grid` is `minmax(0, 1fr)`. To fold a new block on phones give it `data-pf` (and `data-pf-s` or `data-pf-q`); the block
+  itself must not be re-created by a render (its inside may be). Measured at 390 x 844: Daily Bias 8.2 → 1.8 screens, Live Analysis
+  9.2 → 1.1, Sessions 7.4 → 1.7, Edge Lab 14.1 → 1.7; at 1440 px and in the phone's Full view every element's box is unchanged
+  (0 of about 2,300 and 2,070 compared differ). Not folded: Edge Tracker (its cards are re-rendered by the page), Backtest Lab (short; its
+  "Honest assumptions" stay open). Tests: `tests/side-pages.test.mjs` ("phone simple view"); the smoke test opens each tab's folds
+  on the phone and fails on a block or chart past the screen or a tab with no phone button.
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -2043,8 +2251,8 @@ in the smoke test (it would depend on live data). Left: the Council status line'
 at the gradient's darkest point, light only), outside this pass.
 
 ## MeridianX Academy (10 Nov 2026, owner's build directive; on `main` since the owner's "Deploy everything" of 10 Nov)
-Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven live Meridian systems (the seven edges
-of `council/decay.mjs`; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.
+Owner-only page `/academy` (`academy.html`): a discretionary-trading school on top of the seven Meridian systems that were live until 11 Nov 2026 (the seven edges
+of `council/decay.mjs`; five of them are paper shadows since that day, see "Supported book"; ICT stays separate). Edges produce candidates, the deterministic decision engine decides, the risk engine allows.
 Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as built), `TRAINING.md`, `RESEARCH.md`; the running state is
 `MERIDIANX_BUILD_PROGRESS.md`. Rules that must hold in any change:
 - **No look-ahead.** A decision only ever sees `MXR.snapshot` (bars closed at or before t; the guard throws otherwise). Outcomes live in
@@ -2176,6 +2384,41 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   place and resume, Blind reload and the 409, the conflicting-lessons link in a browser. Not done: an edited, unsaved lesson
   draft is lost on reload (above); the Session tab's last lesson-saved count can be one short after a reload until the next
   decision saves the sitting.
+- **The phone's simple view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone";
+  page markup, CSS, page code, audit and tests only: no decision, lesson, policy or API logic changed, and it adds **no API
+  call**). The site's one convention, as on the Desk, the Macro desk and ChronosTrade, so one choice covers every page: at
+  640 px and under the page head sets `html[data-phone="simple"]` before the first paint unless localStorage `ms-phone` is
+  `full` (no key = simple; the attribute is never set on a wider screen); the switch "Phone view: Simple | Full" (`#pv` at
+  the foot of the page, `setPhoneView`, then the head's `msPhoneSet()`) writes it, and Full is the phone page as it was.
+  **Storage allowlist**: `PREFS` is now `mxacEdge`, `mxacFold`, `ms-phone`, with a third helper `prefDel` (same allowlist)
+  because that key means "simple" by being absent; the pin tests list the three writes and the one removal, and the page
+  head only reads (still never a decision, a draft or an API answer). Every rule is in ONE block at the end of
+  `assets/academy.css`, inside `@media (max-width: 640px)` and under the simple attribute (a test reads every selector), so
+  a wider screen and the full view read none of it. Three inert-elsewhere pieces, all in `assets/academy-ui.js` ("the phone's simple view"):
+  `.pm-host > .pm` + `button.pmore` (parts that wait behind a "more" button: `moreToggle`, `moreBtn`), `.pcard` + `pfold`
+  (a card folds to its heading with a chevron; on `kit.pfold` for the sections; open state kept for the visit in `PF`) and
+  `TAB_MORE` (`#tab-more`). What the simple view shows: before a replay the hero is its title and the setup is the edge
+  cards (name and market), the days with the preview, train / exam, "More options" and a full-width Start ("About this
+  edge" and "Lessons in force and saved sessions" are buttons); during a replay the hero and the long setup card step
+  aside and the screen is the chart, Play / Step / speeds / "More" (Restart, Jump, Save and Resume session, the feed note,
+  the keyboard line and the legend) and the line that says the clock stopped with two full-width buttons; then the
+  decision, the verdict, the lesson, the proof and "What if" come straight after the chart (CSS `order`; the DOM is
+  unchanged) and Paper account, Higher timeframe, Running thesis, Replay log and "Test on new setups" are folded cards.
+  Decision card: levels in one row, "Setup facts and versions" behind a button, the analyst block hidden only while it is
+  switched off (`:has(#an-off)`). Verdict form: answers two by two, entry / stop / target only when the answer is changed
+  to a trade (`:has(input:enabled)`), "Bias, another edge, marks on the chart" behind a button, full-width Save: one
+  screen. Tab bar: Train, Session, Blind arena, Progress, Lessons and "More" (Research, Models, Costs, Audit; it stays
+  open while one of them is on screen). Sections open on their headline card and fold the rest (`PHONE_FOLD` in
+  `assets/academy-tabs.js`: Lessons keeps the list; Progress keeps "Where things stand"; Research keeps the policy table;
+  Models keeps the registry). Measured at 390 x 844: setup 3.2 -> 1.9 screens, a replay 2.9 -> 1.5, stopped on a setup
+  6.7 -> 4.0 (decision card 1,323 -> 992 px, verdict form 985 -> 577 px), Progress 2.9 -> 1.5, Research 4.3 -> 1.9,
+  Models 5.3 -> 1.3. Proof that nothing else moved: the box, font size, colour and display of every drawn element of
+  `<main>` at 1440 px, and at 390 px in the full view, equal the build before (ten page states; the only differences are two
+  new ids, the 76 px switch at the foot of the phone page and replay-clock text). Session and Blind keep their own
+  round-3 layout (only the tab bar and the hero change there). The audit's phone part runs in the simple view (helpers
+  `tabTo`, `unfold`) and adds 12 checks, the full view and the remembered choice among them; its Models check counts buttons
+  other than the fold chevron. Not done: the What-if card is not folded (its body is redrawn by the page code), and an
+  open fold is forgotten on reload on purpose (nothing more goes into storage).
 - **"The correction was not saved: no such attempt for this edge"** (11 Nov 2026, the owner hit it on the live site on a
   verdict on "attempt 2"). Cause, in `api/_academy-store.js`: the Blob backend read a file through the Blob CDN, which serves
   an overwritten file with its OLD bytes for up to a minute. One function instance remembers its own writes, but ANOTHER
@@ -2206,6 +2449,9 @@ limits, stop moves and closes follow the record). A record also in trades.json i
 side + time, never twice); one whose own filter failed (`pass: false`) counts as a shadow (config.json `mirrorShadow: false`
 leaves it out). They are copied only while the replica book has a demo account different from the council's
 (`replicaHasOwnAccount`), so they can never land on the council account. Demo only. Tests: `tests/ctrader-mirror.test.mjs`.
+**Since 11 Nov 2026 (owner) no NEW copy is opened for the replica's forex and crypto research trades** (`config.mirrorReplica`,
+`noCopy`; gold unchanged, positions already copied managed to their close): section "Supported book, financing in the costs,
+replica mirror gold only".
 Reconciliation (same day, owner: "check all the trades from the edges opened match everything on cTrader"):
 `node council/ctrader-reconcile.mjs <council-data dir>` reads files only (no broker contact) and lists, for every open or
 pending trade of every book, whether its demo account holds the copy and whether side, stop and target match; then every demo
@@ -2254,6 +2500,123 @@ cells are negative; the pipeline's own H4 closing-price structure filter does no
 no rule for them: its stacks built on the engulfing-failure signal, the abbreviated signals, an M1 entry and an exit by signal.
 Never call this method an edge; do not automate it; a further test needs those signals written down as rules by the owner and its
 own pre-registration. Nothing live changed. Tests: `tests/msnr-entry.test.mjs`.
+
+## Edge review, and the trend-breadth / financing study (11 Nov 2026, owner: "now our edges, we need more improvement so we start make money")
+An evidence review, a ranked plan and one study; no live rule, size, filter, stop or council member changed. The owner's
+document is `research/proposals/2026-11-11-edge-review.md` (one row per system, where the R goes, five actions, five
+decisions). What it found, from council-data of 11 Nov and the committed studies:
+- **No system has an out-of-sample t of 2 after costs.** Nearest: Gold trend (+0.49R a position on 2006-17, n 75, t 1.77),
+  Gold trend fast (+0.37R, n 129, t 1.92), Gold daily engulf (+0.19R, n 256, t 1.89). Flat or negative out of sample: H4
+  trendline, Mosha BO, replica, momentum pullback, NQ open run, ICT A-setups. Forward: 5 main-system trades, −2.05R gross.
+- Costs took 157R from the shadow book in eleven days (804 trades, +133.0R gross, −24.2R net). The replica's forward paper
+  trades on ten markets: 568 closed, −0.08R a trade before costs; their demo copies fill 0.08R worse (n 121, t 3.9).
+- `research/edge/honest-book` (7-8 Nov) was never put to the owner as a decision: it is decision 1 of the proposal (live
+  paper book = Gold trend + Gold daily engulf, the rest as shadows). Not added to `docs/owner-decisions.md` here (other
+  work was renumbering nothing but adding items the same day): add the proposal's five decisions there as new items.
+- Seen and reported, not acted on: a 10-lot gold buy on the Replica demo account (closed 11 Nov 13:37 UTC, −$4,427) that
+  is not in the mirror's records (the mirror's cap is 5 lots); the day's loss stop then refused the replica copies.
+**`research/edge/trend-breadth/`** (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json):
+- **Part A, financing** (accounting, no rule tested). No cost model in the repository counts overnight financing
+  (`council/fills.mjs` and the studies count spread and slippage). The demo broker charges a long gold position 5.903 pips
+  of 0.1 a night (`ctrader/symbols.json`; the demo deals show −$0.59 an ounce a night), about 0.0148 % of price, 5.3 % a
+  year. On the recorded positions of `gold-systems-oos`, untouched 2006-17, first unit only: Gold trend +0.489R → +0.398R
+  (t 1.77 → 1.49), Gold trend fast +0.372R → +0.289R (t 1.92 → 1.53), daily engulf +0.186R → +0.141R (t 1.89 → 1.46),
+  H4 trendline +0.048R → +0.013R (t 0.83 → 0.23: "does not survive at today's rate" by the pre-registered reading). About
+  2.8R a year across gtrend, geg and gtl; with the add unit the trend legs pay about a third more. The broker's past rates
+  are not known (a half-rate column is shown). Adding financing to `fills.mjs` / `expect-base.json` is a proposal, not done.
+- **Part B, breadth: harness not validated, nothing interpreted.** The live Gold trend rule on the council's daily candle
+  cache (four pre-registered sets: other metals, 17 equity indices, energies and agriculturals, currency majors both
+  sides; monthly-sum t, Holm). The parity gate on gold passed on 2006-17 (72 positions against 75, gross +0.517R against
+  +0.506R) and missed on 2018-26 (+1.644R against +1.347R; the gate allows 0.15R). Cause (post-hoc): the live rule buys
+  again INSIDE a day after a stop-out while the last closed day is still an unused breakout (nine such positions in
+  2018-26, eight losers); daily candles cannot place them, so a daily harness flatters the rule. The four sets' figures
+  are in result.json under `uninterpreted`; never quote them as a finding. A real breadth test needs hourly candles and
+  its own pre-registration (done the same day: `trend-breadth-h1`, section "Book study" below). **Any daily-candle replay of gtrend / gtrend5 has this bias.**
+- To repeat: `node research/edge/trend-breadth/run.mjs fetch <dir>` (git show from `origin/council-data`, no network), then
+  `… full <dir>`. Tests: `tests/trend-breadth.test.mjs`.
+
+## Book study: the supported book as a book, the add, and trend breadth on hourly candles (11 Nov 2026, owner: "we need more improvement so we start make money")
+Three pre-registered studies on the book the owner approved that day (Gold trend + Gold daily engulf). Research only: no
+live rule, size, filter, stop, config or council member changed. The owner's document is
+`research/proposals/2026-11-11-book-study.md` (one decision: `docs/owner-decisions.md` item 42). All three verdicts are
+FAIL or "nothing to change": **never quote the book as proven, never call it an edge.**
+- **`research/edge/supported-book/`** (PREREGISTRATION.md first; `run.mjs`, `legs.json`, RESULT.md, result.json). The
+  committed `gold-systems-oos` engine (not edited) run once more on the same candles; its unit-level output for `gtrend`,
+  `gtrend5`, `geg` is `legs.json` (963 units: fill, close, entry, r0, gross R, `of` for an add), gated against all 813
+  committed positions (0 mismatches). Book = daily series booked on the close day, fixed 1R a unit, $0.30 a unit and
+  **financing on every unit** by `council/fills.mjs` `nights` x `FIN.xau.long` (imported). One question: on untouched
+  2006-07 to 2017-12, is the two-system book's t on daily book R at least 2 (both halves positive, positive at x2 costs)?
+  **FAIL on the t: +59.3R, +5.16R a year (330 positions, t 1.86; 90 % bootstrap +0.3 to +10.3R a year)**; halves +55.3R
+  (2006-11) and +4.0R (2012-17); x2 costs +48.7R. Worst drawdown 19.8R closed / 22.1R marked to market, from March 2014,
+  not regained by the end of 2017 (988 weekdays); worst year 2013 −8.1R; 6 of 12 years positive; a unit open on 37 % of
+  weekdays; the legs' daily correlation 0.01 (monthly 0.21). Financing took 20.5R (1.8R a year): the t is 2.43 without
+  it and 2.15 at half the rate. With every unit charged Gold trend is +0.313R a position (n 74, t 1.20), not the +0.398R
+  (t 1.49) of the first-unit table; the engulf +0.141R (n 256, t 1.46). At 0.25 % a unit: about +1.3 % a year with a 5 %
+  drawdown. With Gold trend fast added (S3): +86.4R, t 1.77, drawdown 29.5R (same return ÷ drawdown, 2.9 against 3.0).
+  2018-26 and 2020-26 are built-on years for these rules (all in sample; +13.4R and +15.1R a year): shown, never evidence.
+  Tests: `tests/supported-book-study.test.mjs` (`tests/supported-book.test.mjs` is the Trader's own-rule test).
+- **`research/edge/book-sizing/`** (the comparison was fixed in the supported-book pre-registration before any result):
+  the Gold trend pyramid add on (as live) against off, same records and functions. Exact, because the add never changes
+  the first unit's stop or exit. Untouched 2006-17, return ÷ closed drawdown: ON 2.99 (+59.3R on 19.8R, t 1.86), OFF 2.87
+  (+54.3R on 18.9R, t 1.94); paired month bootstrap P(OFF better) 0.535, 90 % interval −0.99 to +0.99: **within noise, no
+  proposal, the add stays.** The add units alone: 34, +5.0R, +0.148R, t 0.60 on untouched data against +1.08R (n 29,
+  t 2.45) on the built-on years. No other sizing question is left worth a test (weights between systems: `sizing`,
+  `portfolio-v2`). Tests: `tests/book-sizing.test.mjs`.
+- **`research/edge/trend-breadth-h1/`** (PREREGISTRATION.md first; `markets.mjs`, `fetch.mjs`, `run.mjs`): the live Gold
+  trend rule on OANDA H1 + D1 candles (`node --use-env-proxy fetch.mjs <dir>`: H1 is served from January 2004, gold and
+  silver from March 2006; 23 MB kept out of git). Harness: one run at every H1 close, entries and adds at the next H1
+  open, stops by `stopFill`, `spotSkip` hours for metals and currencies, so the re-entry inside a day is placed.
+  **Parity gate on gold passed**: 75 of 75 positions (+0.526R against +0.506R gross) on 2006-17 and 59 of 59 (+1.286R
+  against +1.347R) on 2018-26. Thirteen markets fixed before any run (`xag`; `nas100 spx500 us30 de40 jp225`; `eurusd
+  gbpusd usdjpy audusd usdcad`, both sides; `wtico bco`), costs and financing as `trend-breadth`, t on calendar-month
+  sums, Holm over 14 tests (13 markets + the pool), confirmation closed 2020-26, replication 2005-19. **FAIL, 0 of 14**:
+  pool −0.059R a position net on 2020-26 (n 827, t −0.89; +0.040R before any cost) and −0.028R on 2005-19 (n 1,690,
+  t −0.52); currencies −0.201R (n 422, t −2.91); best market Brent +0.586R (n 39, t 1.64, Holm p 0.71) which lost on
+  2005-19. So the rule is not a general trend rule: read and size the gold record as one bet on gold rising with a
+  trailing exit; do not propose it on another market without new, pre-registered evidence. The hourly harness is the one
+  to reuse for any future replay of `gtrend` on a market without M5 history. Tests: `tests/trend-breadth-h1.test.mjs`.
+- Not done, said to the owner: the broker's past financing rates are unknown (today's rate, the highest of the sample,
+  is charged for every year); the other markets' financing is assumed, not measured; `council/expect-base.json` still
+  charges the first unit only (item 42).
+
+## Path to live: no lever left on the gold book, the forward-test protocol, what real money would mean (12 Nov 2026)
+Owner: "keep improving dont stop reach our goal". A proposal and its arithmetic; **no study was run, on purpose**, and no
+live rule, size, filter, stop, config, council member or demo-only code changed. The owner's document is
+`research/proposals/2026-11-12-path-to-live.md` (decisions: `docs/owner-decisions.md` items 43-46, all open).
+- **The research on the two-system book is exhausted.** The proposal's section 1 is one table of every lever tested on the
+  gold book (book, systems, Gold Macro Score as size step and as gate, real yields, volatility / trend / own-record
+  switches, move-size forecast, 12 exits, 10 entries, limit against market entry, sizing rules, weights, the add, Gold trend
+  fast, 13 other markets, weekend, calendar, news, costs, the random-entry control) with its study, n and t: none is
+  open. The Gold Macro Score's record (weekly IC +0.149, t 3.24) is in sample for the score, and `macroscore-overlay`
+  already put it on the gold longs and the gold books: do not run it again on the same positions. The two near misses
+  (the engulf only when gold's six-month trend is up, `regime-switch` second-half t 1.43; another zone candle for the
+  engulf, `geg-variants`, 1 of 5 fixed tests missed) have no third stretch of gold history to be confirmed on. **Do not
+  pre-register another gate, exit, entry or size on 2006-17 for these systems** (a dozen studies and over sixty
+  comparisons have read it) unless the owner asks for it knowing this (item 44).
+- **`research/proposals/2026-11-12-path-to-live.mjs` → `…-path-to-live.json`** (deterministic, no network; imports the
+  supported-book study's functions and `council/expect.mjs`; not a study, no verdict, not published to the Edge lab). From
+  the untouched S2 book (330 positions, 28.7 a year, +0.180R a position, sd 1.73): t 2 on a forward record needs 369
+  positions, about 13 years. A month-block bootstrap (138 months, 20,000 draws, seeded) in three worlds (as measured
+  +5.2R a year; no edge; −5.2R a year, by taking 1x / 2x the mean off every position) gives the forward bands and the
+  **pre-committed stop lines**: forward closed drawdown over 21.9R (the 95th percentile of three years as measured), or
+  the total under −9.7R / −12.0R / −12.1R at 12 / 24 / 36 months (the 5 % lines). Their power, said in the proposal:
+  stopped within three years 12 % as measured (false alarm), 43 % with no edge, 77 % when losing. Execution checks E1-E5
+  on the first 30 demo copies (a stop on every copy, 28 of 30 copied, fills within 0.03R of paper and never over 0.05R
+  worse, financing within a fifth of `FIN`, no order the mirror did not place). A stop line sends the book back to a paper
+  shadow by the owner's rule; it never closes a trade. Nothing computes these lines in the council yet: adopting the
+  protocol (item 43) is a document decision, a page card or a digest line would be a later build.
+- **Risk table** (untouched book, simple %): 0.1 / 0.25 / 0.5 / 1 % a unit → +0.5 / +1.3 / +2.6 / +5.2 % a year, worst
+  drawdown 2.0 / 5.0 / 9.9 / 19.8 % closed (22.1R marked), 3.8 years under water, 1-in-20 ten-year drawdown 34.1R. The
+  broker's minimum gold lot is 1 ounce: a unit risks $39-48 (engulf) to $93-136 (trend) at $4,000 gold, so 0.25 % a trade
+  needs about $55,000.
+- **What enforces demo-only, listed for the owner, none of it touched**: `council/ctrader-mirror.mjs` (`DEMO_HOST`,
+  `CTRADER_ENV` must be `demo`, the account's own `isLive` must be false before account auth), the same in
+  `ctrader-suite.mjs`, `ctrader-account.mjs`, `ctrader-symbols.mjs`. **Found: the two bridge programs
+  (`mt5/CouncilBridge.mq5`, `ctrader/CouncilBridge.cs`) print whether the account is a demo but do not refuse a real one**
+  (item 45; not changed here: programs that place orders are the owner's call).
+- Tests: `tests/path-to-live.test.mjs` (the json equals the script's output; every figure of the proposal against it and
+  against the supported-book result; the bootstrap on a hand-made series; items 43-46 open; the proposal never recommends
+  a live step; the mirror's three locks are still in the file).
 
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live

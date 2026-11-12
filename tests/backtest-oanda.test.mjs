@@ -56,7 +56,8 @@ test('gold replay: every timeframe from OANDA, no Kraken fallback, no PAXG shift
     // the loader paged 1m/1h/4h/1d by from/to, every call for xau
     for (const tf of ['1m', '1h', '4h', '1d']) assert.ok(calls.some((q) => q.tf === tf && q.from && q.to && q.sym === 'xau'), `paged ${tf}`);
     assert.ok(calls.filter((q) => q.tf === '1m').every((q) => +q.to - +q.from <= 4999 * 60), 'at most 4,999 1m candles a call');
-    assert.deepEqual(bt.tradeCols.slice(-6), ['status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1'], 'news research tag after adx/adxBand, then the paper exit R_pt1');
+    assert.deepEqual(bt.tradeCols.slice(-7), ['status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1', 'fin'], 'news research tag after adx/adxBand, then the paper exit R_pt1, then (11 Nov 2026) the overnight financing of the live exit');
+    { const fi = bt.tradeCols.indexOf('fin'), si = bt.tradeCols.indexOf('status'); assert.ok(bt.trades.every((r) => r[si] === 'open' ? r[fi] === null : Number.isFinite(r[fi]) && r[fi] >= 0), 'fin: a number for every finished row, never negative'); assert.equal(bt.financing.of, 'R_none'); }
     { // R_pt1 (paper exit, half off at +1R): null while open, otherwise between -1 and the 10R cap (below -1 only through a stop gapped
       // past at the candle's open, which the first stop of R_none then shows too); the live columns are unaffected by it
       const pi = bt.tradeCols.indexOf('R_pt1'), si = bt.tradeCols.indexOf('status'), ni = bt.tradeCols.indexOf('R_none');

@@ -32,7 +32,7 @@ export function coachProposals(b, config, at = new Date().toISOString(), opt = {
   // filled trades as the Trader takes them (no market-entry twins, no unfilled orders), judged after costs
   const rows = b.trades.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])))
     .filter((t) => t.fill !== 0 && t.status !== 'open' && !String(t.setup).includes('@') && t.R_none != null && isFinite(t.R_none))
-    .map((t) => ({ ...t, R: +(t.R_none - (hasCost ? t.cost || 0 : 0)).toFixed(3) }));
+    .map((t) => ({ ...t, R: +(t.R_none - (hasCost ? t.cost || 0 : 0) - (+t.fin || 0)).toFixed(3) }));   // fin: the replay's overnight financing column (gold buys), absent in an older file
   const t0 = Date.parse(b.from) / 1000, t1 = Date.parse(b.to) / 1000;
   const midOf = (A) => isFinite(t0) && isFinite(t1) && t1 > t0 ? (t0 + t1) / 2 : A.map((t) => t.opened).sort((x, y) => x - y)[A.length >> 1];
   const halves = (A) => { const mid = midOf(A), a = A.filter((t) => t.opened < mid), z = A.filter((t) => t.opened >= mid); return { h1: { n: a.length, exp: r2(mean(a)) }, h2: { n: z.length, exp: r2(mean(z)) } }; };

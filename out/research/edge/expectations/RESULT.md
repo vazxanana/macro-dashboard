@@ -2,6 +2,8 @@
 
 > **Clock correction, 10 Nov 2026.** `council/expect-base.json` was rebuilt on the corrected candle clock. The "backtest" block of four systems moved (Mosha BO, gold H4 trendline, daily engulf, momentum pullback); every untouched-data ("honest") figure except one trade of the momentum pullback is identical. Details: the last section of this page.
 
+> **Financing and the supported book, 11 Nov 2026.** `council/expect-base.json` was rebuilt after the owner approved the edge review's decisions (docs/owner-decisions.md items 37 and 38). The figures of the four long-only gold systems are now AFTER overnight financing, by the method and rate of `research/edge/trend-breadth` Part A; five systems are marked shadow. The table below is the 8 Nov table, before financing. Details: the last section, "Financing (11 Nov 2026)".
+
 Paper research only. No live rule, size, filter or mirror setting was changed. This folder builds `council/expect-base.json`,
 which the Trader's Coach build turns into coach.json `expect` (pure `council/expect.mjs`, every 6 hours with the edge-decay
 reading) and the Council research pane shows as the card **What to expect** next to the edge-decay statuses.
@@ -82,3 +84,58 @@ The HistData M1 files were read on the wrong clock in part of every year. The pr
 | Gold replica, gold trend N20 / N5, NQ open run, ICT A-setups, crypto trend | council replays, daily candles, OANDA | unchanged | identical |
 
 The momentum pullback's own two windows also moved by one trade: untouched 2018-22 window 633 trades at −0.043R became 634 at −0.043R; built-on 2023-26 window 370 at +0.185R (t 2.74) became 370 at +0.191R (t 2.80). No other untouched-data figure changed: they come from OANDA and daily-candle studies that never read the HistData files.
+
+## Financing (11 Nov 2026)
+
+The owner approved counting overnight financing in the paper costs and in these expectations ("yes anything that is better for
+the system and that applies it", on `research/proposals/2026-11-11-edge-review.md`). `build.mjs` now charges every recorded
+position of Gold trend, Gold trend fast, Gold daily engulf and the Gold H4 trendline (`gold-systems-oos/result.json`
+`positions`; Gold trend and the engulf were read from `sizing/inputs.json` before, the same 134 and 451 records) with
+nights x 0.0148 % x gold's daily close on the entry day / the position's initial risk: the rollover count (`nights`) and the rate
+(`FIN.xau.long`) are those of `council/fills.mjs`, the same as `trend-breadth` Part A, first unit only. Nothing else in the method
+changed; the other six systems' figures are identical to the 10 Nov file.
+
+| System | Untouched window | n | Before financing: R a trade (t) | Financing a position | After: R a trade (t) | Built-on window after |
+|---|---|---|---|---|---|---|
+| Gold trend | 2006-17 | 75 | +0.489 (1.77) | 0.090R, 14.3 nights | **+0.398 (1.49)** | +1.23R |
+| Gold trend fast (shadow) | 2006-17 | 129 | +0.372 (1.92) | 0.083R, 14.6 nights | **+0.289 (1.53)** | +0.88R |
+| Gold daily engulf | 2006-17 | 256 | +0.186 (1.89) | 0.045R, 3.7 nights | **+0.141 (1.46)** | +0.23R |
+| Gold H4 trendline (shadow) | 2006-17 | 402 | +0.048 (0.83) | 0.035R, 3.0 nights | **+0.013 (0.23)** | +0.13R |
+
+These equal Part A of `research/edge/trend-breadth/result.json` (tests/expect.test.mjs compares them). Each system's entry in the
+file carries `fin` (what financing took per position, the mean nights, the figure before it); the other systems carry
+`fin: null`, and the file's `financing.notComputed` says why: the replica's, Mosha BO's and the momentum pullback's study records
+carry no per-position risk, so their figures are still before financing (it would lower them); the NQ open run is out before
+the rollover.
+
+Limits: today's rate applied to every past year (the repository has no history of the broker's rate; at half the rate the
+figures sit about halfway back); the add units are not charged (Part A puts the true cost of the trend legs about a third
+higher); the "backtest" block, which comes from the decay monitor's baselines, is unchanged and does not carry financing.
+
+`live` in the file now follows the owner's decision of the same day (item 37): Gold trend, Gold daily engulf and the ICT
+A-setups; the gold replica, Mosha BO, the H4 trendline, the momentum pullback and the NQ open run carry `shadowSince`
+`2026-11-11`. An expectation is not a rule: nothing here changes a trade.
+
+### Follow-up, the same day: the replica, Mosha BO, the momentum pullback and the "backtest" block
+
+The three systems left at `fin: null` above are now charged as well. What the note above said was missing is in the records
+after all: `mosha-oos/result.json` `positions` carry the side, entry and exit time and `r0`; the replica's
+`replica-oos/positions.json` (side, legs with their size and risk) lines up row for row with `sizing/inputs.json` (entry and
+close time, 341 of 341); and the momentum pullback's entry price, risk and exit time are read from the rebuild's own functions
+(`research/edge/decay-monitor/positions.json`). Same method: a buy pays nights x 0.0148 % x price / risk on its first unit (gold's
+daily close on the entry day for the replica and Mosha BO, the rebuild's own entry price for the momentum pullback); a sell
+pays nothing and is credited nothing. These three trade both sides and hold hours, so the charge is small.
+
+| System | Untouched window | n | Before: R a trade (t) | Financing a position | After: R a trade (t) | Built-on window, before → after |
+|---|---|---|---|---|---|---|
+| Gold replica (shadow) | 2017-22 | 115 | −0.052 (−0.17) | 0.005R, 0.2 nights | **−0.057 (−0.19)** | +0.579 → +0.567 |
+| Mosha BO (shadow) | 2006-17 | 62 | +0.137 (0.55) | 0.016R, 1.0 nights | **+0.121 (0.48)** | +0.253 → +0.216 |
+| Gold momentum pullback (shadow) | 2018-22 | 634 | −0.043 (−0.86) | 0.009R, 0.2 nights | **−0.052 (−1.05)** | +0.191 → +0.178 |
+
+No verdict changes: all three were flat or negative on untouched data and still are. The four long-only gold systems' figures
+are identical to the table above. The "backtest" block now carries financing too, because the decay monitor's baselines were
+rebuilt with it (`research/edge/decay-monitor/RESULT.md`, last section): Gold trend +1.64 → +1.50R a trade, Gold trend fast
++1.06 → +0.94R, daily engulf +0.20 → +0.14R, H4 trendline +0.11 → +0.07R, momentum pullback +0.04 → +0.03R, Mosha BO
+−0.06 → −0.09R, replica +0.88 → +0.86R; the drawdown bands' lower ends follow (Gold trend 6.9R → 7.5R, daily engulf
+22.3R → 25.5R). `financing.notComputed` now names only the NQ open run (out before the rollover), ICT and crypto (no rate
+measured). Tests: `tests/expect.test.mjs` recomputes the three from their records with the study's own night counter.

@@ -31,7 +31,7 @@ One sign-in. The switch at the top of every page reads **Desk | Macro | ChronosT
 - A **bell** in the header shows notices from the owner.
 
 **Other pages**
-- **Academy** (`/academy`, owner only): a trading school built on the council's seven systems. See below.
+- **Academy** (`/academy`, owner only): a trading school built on seven of the council's systems (the seven that traded live until 11 Nov 2026). See below.
 - **Gold terminal** (`/gold`): live gold price, chart and macro drivers.
 - **Edge lab**: every research study with its verdict.
 - `/macro`: today's macro read on one screen. `/veteran/`: the veteran's library.
@@ -54,13 +54,26 @@ takes over by itself. When the owner's always-on server is running, it runs the 
   changed since last week.
 - **ICT desk tracker** (about every 35 minutes): a separate method, described below.
 
-**The council's own systems** (all on paper): Gold replica, Mosha BO, Gold trend, Gold H4 trendline, Gold daily engulf,
-Gold momentum pullback and the NQ New York open run. "Gold trend fast" and "Crypto trend" are followed only as shadows
-(recorded, never alerted). The old scalp engine was retired on 4 Nov after it showed no edge.
+**The council's own systems** (all on paper). Since 11 Nov 2026, by your decision on that day's review of the edges, two
+trade live on paper: **Gold trend** (the 20-day breakout) and **Gold daily engulf**. The other five are followed as
+**paper shadows** from that date (the same rules and stops, every trade recorded and managed, never alerted, no futures
+ticket): Gold replica, Gold momentum pullback, the NQ New York open run, Gold H4 trendline and Mosha BO. "Gold trend fast"
+and "Crypto trend" have been shadows since 7 Nov. A trade one of them took live before its date stays in the record as the
+live trade it was. None of the nine has proven an edge on data it was not built on; the two that stay live are the nearest
+(positive on 2006-17, not yet beyond luck). The old scalp engine was retired on 4 Nov after it showed no edge.
+
+**Costs.** Every closed paper trade is shown before and after costs: the spread, slippage on market orders and, for
+trades closed since 11 Nov 2026, the **overnight financing** a gold buy pays for each night it is held (0.0148% of the
+price a night at the demo broker's rate of that day, about 5.3% a year). Trades closed before that date keep the cost
+they were recorded with. The backtests those records are measured against (the edge-decay baselines, "What to expect",
+the scoreboard's replay rows) carry the same financing charge on gold buys.
 
 **Demo accounts.** Trades are copied at the same time to **cTrader demo accounts**, one per book (council, ICT, shadows,
 LIT, replica), with the same stop and target. A copied position never sits without a stop: if the broker refuses the stop,
-the position is closed at once. Nothing is ever copied to a live account.
+the position is closed at once. Nothing is ever copied to a live account. Since 11 Nov 2026 the Replica demo account takes
+no new copies of the replica's forex and crypto paper trades (that stream was losing before costs); gold replica copies
+continue, and positions already copied are managed to their close. It is looked at again once 200 of those paper trades
+have closed with a positive total before costs.
 
 ## Alerts on your phone
 
@@ -120,7 +133,8 @@ All of this is reading only: nothing trades or sizes on it. His record is still 
 
 ## The Academy (owner only)
 
-A school on top of the council's seven systems. You pick a system and a period, the market is replayed, and the clock
+A school on top of seven of the council's systems: the seven that traded live on paper until 11 Nov 2026 (two still do, five
+are paper shadows since; the school teaches all seven rules as before). You pick a system and a period, the market is replayed, and the clock
 stops at each setup. A fixed, rule-based engine gives its answer (take or wait); you agree or correct it, and a correction
 becomes a written lesson that is then checked on setups it has never seen. Other tabs show lessons, progress, a blind test,
 research and costs. An optional "analyst" can give a second opinion in words through your own assistant; no paid service is
@@ -190,7 +204,7 @@ Each study is written down before it runs and judged against that plan. Of 69 st
 
 **Did not fail, but not proven**
 - **Gold trend and Gold trend fast**: positive after costs on 2006-17 data they were not built on (about +0.5R and +0.4R a
-  position), but just short of the bar for "robust", and much weaker than in recent years. They depend on gold trending.
+  position; +0.40R and +0.29R once overnight financing is counted), but just short of the bar for "robust", and much weaker than in recent years. They depend on gold trending.
 - **Gold Macro Score**: a real but small lean for gold over the next 4 weeks; a reading only. Used as a filter on our
   trades, it **failed**.
 - **ICT "skip Fridays"**: passed, weakly. Running as a paper shadow.
@@ -202,7 +216,7 @@ Each study is written down before it runs and judged against that plan. Of 69 st
 **Failed (no change made)**
 - **Mosha written as fixed rules** (five studies, 33 tests, gold 2006-26): none profitable. The best version broke even;
   the rest lost. No simple condition picked out the winners.
-- **Mosha BO, the live paper system**: rebuilt on earlier years it makes nothing (owner decision 33).
+- **Mosha BO**: rebuilt on earlier years it makes nothing; a paper shadow since 11 Nov (owner decisions 33 and 37).
 - **ICT A-setup rule on 2008-17**, data it never saw: about break-even after costs. The ICT desk stays paper only.
 - **ICT rule changes, filters and new markets** (exits, sessions, macro regime, trend side, grades, more markets): none
   passed, apart from the two weak passes above.
