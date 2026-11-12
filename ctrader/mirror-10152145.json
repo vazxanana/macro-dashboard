@@ -11240,6 +11240,32 @@
     "positionId": "48792989",
     "volume": 1000,
     "status": "open"
+   },
+   "usdcad-scalp-1794489401": {
+    "symbol": "USDCAD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-12T13:21:36.000Z",
+    "councilEntry": 1.42446,
+    "stop": 1.42546,
+    "t1": 1.4224600000000003,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.42446,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.98,
+    "margin": 4,
+    "shadow": true,
+    "fillPrice": 1.42446,
+    "slipR": 0,
+    "lagSec": 276,
+    "positionId": "48792993",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -11247,7 +11273,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9907.64 · 33 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9907.64 · 34 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -11256,26 +11282,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "usdcad-scalp-1794489401": {
-    "orderId": "34001348",
-    "symbol": "USDCAD",
-    "side": "sell",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.42446,
-    "stop": 1.42546,
-    "t1": 1.4224600000000003,
-    "placedAt": "2026-11-12T13:17:52.000Z",
-    "expires": "2026-11-12T16:16:41.000Z",
-    "riskCash": 1.98,
-    "margin": 4,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "eth-intraday-1794489493": {
     "orderId": "34001469",
     "symbol": "ETHUSD",
@@ -11299,14 +11305,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9907.64,
-  "lastRun": "2026-11-12T13:18:51.000Z"
+  "lastRun": "2026-11-12T13:21:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T09:54:59.000Z",
-   "msg": "moved GBPUSD 48133872 protection: stop 1.3460067 -> 1.3461767, target 1.31791 -> 1.31808 (council position)",
-   "trade": "gbpusd-position-1794325881"
-  },
   {
    "at": "2026-11-12T09:54:59.000Z",
    "msg": "moved GBPUSD 48396692 protection: stop 1.3354439 -> 1.3356139, target 1.31778 -> 1.31795 (council position)",
@@ -12801,6 +12802,11 @@
    "at": "2026-11-12T13:18:51.000Z",
    "msg": "placed sell limit ETHUSD 0.02 lot at 2010.34 (council intraday, valid to 2026-11-13T01:18Z)",
    "trade": "eth-intraday-1794489493"
+  },
+  {
+   "at": "2026-11-12T13:21:36.000Z",
+   "msg": "limit filled: USDCAD position 48792993 at the broker",
+   "trade": "usdcad-scalp-1794489401"
   }
  ],
  "limits": {
@@ -12879,11 +12885,11 @@
   ]
  },
  "execution": {
-  "n": 376,
+  "n": 377,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 145,
+  "medianLagSec": 147,
   "bySymbol": {
    "SOLUSD": {
     "n": 21,
@@ -12906,8 +12912,8 @@
     "meanSlipR": 0.008
    },
    "USDCAD": {
-    "n": 53,
-    "meanSlipR": -0.058
+    "n": 54,
+    "meanSlipR": -0.057
    },
    "USDCHF": {
     "n": 53,
