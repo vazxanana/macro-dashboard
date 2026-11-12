@@ -9474,6 +9474,32 @@
     "stopCheckedAt": "2026-11-12T02:28:24.000Z",
     "brokerStop": 0.68432,
     "closedAt": "2026-11-12T02:31:22.000Z"
+   },
+   "usdchf-intraday-1794451145": {
+    "symbol": "USDCHF",
+    "side": "buy",
+    "setup": "intraday",
+    "openedAt": "2026-11-12T02:48:33.000Z",
+    "councilEntry": 0.83316,
+    "stop": 0.83162,
+    "t1": 0.83624,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.83316,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.96,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 0.83316,
+    "slipR": 0,
+    "lagSec": 568,
+    "positionId": "48619366",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -9481,7 +9507,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9820.16 · 31 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9820.16 · 32 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9512,26 +9538,6 @@
      "pending"
     ]
    },
-   "usdchf-intraday-1794451145": {
-    "orderId": "33972371",
-    "symbol": "USDCHF",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "intraday",
-    "limitPrice": 0.83316,
-    "stop": 0.83162,
-    "t1": 0.83624,
-    "placedAt": "2026-11-12T02:40:04.000Z",
-    "expires": "2026-11-12T14:39:05.000Z",
-    "riskCash": 1.96,
-    "margin": 2,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "xau-m30m1-1794451345": {
     "orderId": "33972630",
     "symbol": "XAUUSD",
@@ -9556,14 +9562,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9820.16,
-  "lastRun": "2026-11-12T02:46:03.000Z"
+  "lastRun": "2026-11-12T02:48:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T08:02:57.000Z",
-   "msg": "placed buy limit USDCHF 0.03 lot at 0.82758 (council scalp, valid to 2026-11-11T11:01Z)",
-   "trade": "usdchf-scalp-1794384097"
-  },
   {
    "at": "2026-11-11T08:04:27.000Z",
    "msg": "limit filled: USDCAD position 48349985 at the broker",
@@ -11058,6 +11059,11 @@
    "at": "2026-11-12T02:43:25.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 3978.89 (council m30m1, valid to 2026-11-12T08:42Z)",
    "trade": "xau-m30m1-1794451345"
+  },
+  {
+   "at": "2026-11-12T02:48:33.000Z",
+   "msg": "limit filled: USDCHF position 48619366 at the broker",
+   "trade": "usdchf-intraday-1794451145"
   }
  ],
  "limits": {
@@ -11136,11 +11142,11 @@
   ]
  },
  "execution": {
-  "n": 320,
+  "n": 321,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 142.5,
+  "medianLagSec": 143,
   "bySymbol": {
    "SOLUSD": {
     "n": 20,
@@ -11167,7 +11173,7 @@
     "meanSlipR": -0.055
    },
    "USDCHF": {
-    "n": 44,
+    "n": 45,
     "meanSlipR": 0.035
    },
    "AUDUSD": {
