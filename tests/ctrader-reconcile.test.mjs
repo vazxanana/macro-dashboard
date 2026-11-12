@@ -65,3 +65,21 @@ test('the reconciliation only reads: no broker session, no write', () => {
   const src = fs.readFileSync(new URL('../council/ctrader-reconcile.mjs', import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
   assert.ok(!/writeFile|writeAtomic|session\(|WebSocket|fetch\(|mirrorRound/.test(src));
 });
+
+test('owner rule replica-mirror-gold-only (11 Nov 2026): an uncopied forex / crypto replica trade carries the mirror\'s reason, not a mismatch', async () => {
+  const { replicaRuleWhy } = await import('../council/ctrader-reconcile.mjs');
+  const rep = (id, market, o) => ({ id, k: 'replica', market, side: 'buy', entry: 2000, stop: 1980, t1: 2040, status: 'open', opened: 5, pass: true, ...o });
+  const cfg = { mirrorReplica: { markets: ['xau'], since: 1794434536, until: { n: 200, grossR: 0 } } };
+  const d = base({ 'research.json': [rep('eth-replica-1-b', 'eth'), rep('eurusd-replica-2-b', 'eurusd', { entry: 1.1, stop: 1.098, t1: 1.105 }), rep('xau-replica-3-b', 'xau', { entry: 4000, stop: 3990, t1: 4020 })], 'config.json': cfg });
+  const r = reconcile(data(d)), by = Object.fromEntries(r.rows.map((x) => [x.id, x]));
+  assert.equal(replicaRuleWhy(cfg), 'owner rule: replica gold only since 2026-11-11');
+  for (const id of ['eth-replica-1-b', 'eurusd-replica-2-b']) { assert.equal(by[id].state, 'not copied'); assert.equal(by[id].why, 'owner rule: replica gold only since 2026-11-11'); assert.deepEqual(by[id].issues, []); }
+  // a gold replica trade left uncopied is still a gap (the rule keeps gold), and the exit code logic is unchanged: any issue fails
+  assert.match(by['xau-replica-3-b'].issues.join(), /no copy and no recorded reason/);
+  // a recorded skip / wait reason still wins over the rule's line; a copy made before the rule is reconciled as before
+  d['ctrader/mirror-3.json'] = { state: { skipped: { 'eth-replica-1-b': 'none of ETHUSD found at the broker' } } };
+  assert.equal(Object.fromEntries(reconcile(data(d)).rows.map((x) => [x.id, x]))['eth-replica-1-b'].why, 'skipped: none of ETHUSD found at the broker');
+  // without the rule in config.json the old behaviour stands (no reason = a mismatch)
+  const r2 = reconcile(data({ ...d, 'config.json': {}, 'ctrader/mirror-3.json': { state: {} } }));
+  assert.match(Object.fromEntries(r2.rows.map((x) => [x.id, x]))['eurusd-replica-2-b'].issues.join(), /no copy and no recorded reason/);
+});

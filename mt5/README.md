@@ -1,5 +1,7 @@
 # MT5 bridge (CouncilBridge.mq5)
 
+**Demo accounts only (12 Nov 2026, owner decision 45).** Every program in this folder checks the platform's own account-type flag (`AccountInfoInteger(ACCOUNT_TRADE_MODE) == ACCOUNT_TRADE_MODE_DEMO`) when it starts and again right before every order it sends. On a real or contest account it prints why in the log and stops itself (`ExpertRemove()`; `OnInit` returns `INIT_FAILED`) without sending anything.
+
 Mirrors the council's paper trades on a MetaTrader 5 account. The council bot keeps running on GitHub Actions
 exactly as before; every run it also writes `mt5/signals.csv` on the `council-data` branch (our live systems only:
 gold replica, Mosha BO, crypto trend, with their adds; the NQ open run is included but the feed is ~10 min late,
