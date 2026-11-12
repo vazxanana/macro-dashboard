@@ -8429,8 +8429,8 @@
     "setup": "rintra",
     "openedAt": "2026-11-11T18:24:10.000Z",
     "councilEntry": 0.83334,
-    "stop": 0.83441,
-    "t1": 0.829825,
+    "stop": 0.83416,
+    "t1": 0.829575,
     "adopted": false,
     "alerted": [
      "open",
@@ -8450,8 +8450,8 @@
     "volume": 300000,
     "status": "open",
     "rr": 7.82,
-    "amended": 11,
-    "amendedAt": "2026-11-12T12:29:05.000Z"
+    "amended": 12,
+    "amendedAt": "2026-11-12T12:31:49.000Z"
    },
    "xau-scalp-1794423257": {
     "positionId": "48528746",
@@ -10768,7 +10768,7 @@
     "lots": 0.07,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T12:21:25.000Z",
     "councilEntry": 1.10905,
     "stop": 1.1085500000000001,
@@ -10782,10 +10782,12 @@
     "slipR": -0.58,
     "lagSec": 2245,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T12:21:25.000Z",
-    "brokerStop": 1.10849
+    "brokerStop": 1.10849,
+    "closedAt": "2026-11-12T12:31:49.000Z"
    },
    "btc-rscalp-1794485574": {
     "positionId": "48771103",
@@ -10847,22 +10849,17 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9831.68 · 39 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9829.45 · 38 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
-   "usdchf-rscalp-1794483451": "price 0.83258 has run 7.00R from the council entry 0.83188: a different trade now"
+   "xrp-scalp-1794486256": "none of XRPUSD found at the broker"
   },
   "wait": {
-   "xrp-scalp-1794486256": {
-    "why": "40 mirror positions already open",
-    "n": 0,
-    "at": "2026-11-12T12:29:05.000Z"
-   },
    "xau-scalp-1794486476": {
-    "why": "40 mirror positions already open",
+    "why": "no current council price to place the limit against",
     "n": 0,
-    "at": "2026-11-12T12:29:05.000Z"
+    "at": "2026-11-12T12:31:49.000Z"
    }
   },
   "paused": {},
@@ -10891,30 +10888,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9831.68,
-  "lastRun": "2026-11-12T12:29:05.000Z"
+  "balance": 9829.45,
+  "lastRun": "2026-11-12T12:31:49.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T08:42:11.000Z",
-   "msg": "moved USDCAD 48333306 protection: stop 1.41787 -> 1.41858, target 1.42729 -> 1.428 (council intraday)",
-   "trade": "usdcad-intraday-1794379562"
-  },
-  {
-   "at": "2026-11-12T08:42:11.000Z",
-   "msg": "moved USDCAD 48445193 protection: stop 1.42299 -> 1.4237, target 1.42815 -> 1.42886 (council scalp)",
-   "trade": "usdcad-scalp-1794407102"
-  },
-  {
-   "at": "2026-11-12T08:42:11.000Z",
-   "msg": "moved USDCAD 48467224 protection: stop 1.42326 -> 1.42397, target 1.42802 -> 1.42873 (council intraday)",
-   "trade": "usdcad-intraday-1794409920"
-  },
-  {
-   "at": "2026-11-12T08:42:11.000Z",
-   "msg": "moved USDCHF 48520033 protection: stop 0.8338599999999999 -> 0.8338, target 0.829275 -> 0.829215 (council rintra)",
-   "trade": "usdchf-rintra-1794420863"
-  },
   {
    "at": "2026-11-12T08:42:11.000Z",
    "msg": "moved USDCAD 48598990 protection: stop 1.42428 -> 1.42499, target 1.42722 -> 1.42793 (council scalp)",
@@ -12393,6 +12370,26 @@
   {
    "at": "2026-11-12T12:29:05.000Z",
    "msg": "not mirrored yet xau-scalp-1794486476: 40 mirror positions already open (will retry)",
+   "trade": "xau-scalp-1794486476"
+  },
+  {
+   "at": "2026-11-12T12:31:49.000Z",
+   "msg": "EURUSD position 48768012 closed at the broker",
+   "trade": "eurusd-scalp-1794483451"
+  },
+  {
+   "at": "2026-11-12T12:31:49.000Z",
+   "msg": "moved USDCHF 48520033 protection: stop 0.83441 -> 0.83416, target 0.829825 -> 0.829575 (council rintra)",
+   "trade": "usdchf-rintra-1794420863"
+  },
+  {
+   "at": "2026-11-12T12:31:49.000Z",
+   "msg": "not mirrored xrp-scalp-1794486256: none of XRPUSD found at the broker",
+   "trade": "xrp-scalp-1794486256"
+  },
+  {
+   "at": "2026-11-12T12:31:49.000Z",
+   "msg": "not mirrored yet xau-scalp-1794486476: no current council price to place the limit against (will retry)",
    "trade": "xau-scalp-1794486476"
   }
  ],
