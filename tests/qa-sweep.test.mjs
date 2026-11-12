@@ -774,7 +774,7 @@ test('simple phone view 2: Charts puts the rarely used rows behind "More", and a
   for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
   assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
   // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
-  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips\) \{ display: none !important; \}/);
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips, \.cycle\) \{ display: none !important; \}/);
   assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
   // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
   assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
@@ -786,6 +786,48 @@ test('simple phone view 2: the smoke test checks what each view leads with on th
   const smoke = src('scripts/audit/smoke.cjs');
   for (const t of ['the chart ends', 'Trades does not lead with the forward record', '"Which systems trade live" is not first', 'Research: open cards', 'This week does not lead with its sentence', 'Review does not lead with what is not reviewed', 'Scanner shows']) assert.ok(smoke.includes(t), t);
   assert.match(smoke, /const INNER = \{ '\/market-structure\.html': \['#charts', '#setup', '#council\/overview'/);
+});
+
+// ---- Open items of the 11 Nov sweep, done 12 Nov 2026 (branch desk-open-qa) ----
+test('a viewer\'s #council/<pane> shows the overview and the address says #council (it kept the refused pane\'s name)', () => {
+  const html = src('market-structure.html'), i = html.indexOf('  function setPane(p, push = true) {'), set = html.slice(i, i + 900);
+  // the panes an account may open: a viewer, and a member whose council permission is off, have the overview only
+  assert.match(set, /if \(!CPANES\.includes\(p\) \|\| \(PUB && !CPUB\.includes\(p\)\) \|\| VIEWER \|\| \(!PUB && window\.MS_PERMS && window\.MS_PERMS\.council === false\)\) p = 'overview';/);
+  const j = html.indexOf('  function showView(hx) {'), show = html.slice(j, html.indexOf('VIEWS.forEach((k) =>', j));
+  assert.match(show, /if \(v === 'council'\) \{ setPane\(sub \|\| CPANE\.cur, false\); if \(sub && sub !== CPANE\.cur && location\.hash === HX\) try \{ history\.replaceState\(null, '', location\.pathname \+ location\.search \+ \(CPANE\.cur === 'overview' \? '#council' : '#council\/' \+ CPANE\.cur\)\); \} catch \(e\) \{\} \}/,
+    'replaceState like a refused view: no second hashchange, and Back does not return to the refused link');
+  // only a pane that was not shown is rewritten, so a deep link the page honours (#council/week/<date>) stays as it is
+  assert.doesNotMatch(show, /history\.pushState/);
+});
+
+test('calendar cells: a figure of 10R or more keeps to six characters, so it fits a 390 px day cell at 12 px (Council and guest)', () => {
+  assert.equal(hc.calR(-9.87), '−9.87R'); assert.equal(hc.calR(2), '+2.00R'); assert.equal(hc.calR(0), '0.00R');
+  assert.equal(hc.calR(-12.34), '−12.3R'); assert.equal(hc.calR(-10), '−10.0R'); assert.equal(hc.calR(24.5), '+24.5R'); assert.equal(hc.calR(-9.996), '−10.0R', 'rounds up into the next width');
+  assert.equal(hc.calR(-99.6), '−99.6R'); assert.equal(hc.calR(-99.96), '−100R'); assert.equal(hc.calR(-137.2), '−137R'); assert.equal(hc.calR(NaN), '—');
+  for (const v of [-0.004, 1.5, -9.994, -9.996, 12.34, -55.55, 99.94, -99.95, 137.2, -999.4]) assert.ok(hc.calR(v).length <= 6, `${v} → ${hc.calR(v)}`);
+  // the day and week cells use it; the cell's aria-label keeps two decimals (fR), so nothing is lost for a screen reader
+  assert.equal((deskHtml.match(/<span class="cr">\$\{calR\((R|wkR)\)\}<\/span>/g) || []).length, 3, 'two day cells (Council, guest) and the week cell');
+  assert.doesNotMatch(deskHtml, /<span class="cr">\$\{fR\(/);
+  assert.match(deskHtml, /aria-label="\$\{d\}: \$\{has \? fR\(R\) : 'no trades'\}"/); assert.match(deskHtml, /aria-label="\$\{d\}: \$\{arr\.length \? `\$\{fR\(R\)\}, \$\{arr\.length\} trades`/);
+  // 12 px on a phone in both calendars (the guest's was 9.5 px), with the room six characters need
+  const css = styles(deskHtml);
+  assert.match(css, /@media \(max-width: 560px\) \{ #v-council \.cal \{ gap: 2px; \} #v-council \.cal-d \{ padding-inline: 2px; \} [^\n]*#v-council \.cal-d \.cr \{ font: 600 12px var\(--sans\); letter-spacing: -\.5px;/);
+  assert.match(css, /@media \(max-width: 560px\) \{ :is\(#v-guest, \.g-merged\) \.cal \{ gap: 2px; \} :is\(#v-guest, \.g-merged\) \.cal-d \{ padding-inline: 2px; \} :is\(#v-guest, \.g-merged\) \.cal-d \.cn \{ padding-left: 2px; font-size: 12px; \} :is\(#v-guest, \.g-merged\) \.cal-d \.cr \{ font: 600 12px var\(--sans\); letter-spacing: -\.5px;/);
+});
+
+test('Council status line: the amber warning takes the badge ink and passes AA on its tint over the page\'s gradient (light, dark, midnight)', () => {
+  const css = styles(deskHtml), block = (sel) => [...css.matchAll(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{([^}]*)\\}', 'g'))].map((m) => m[1]).join(' ');
+  assert.match(css, /#v-council #ms-c-status \.c-warn \{ color: var\(--warn-ink\); background: color-mix\(in srgb, var\(--c-warn\) 14%, transparent\); \}/);
+  assert.doesNotMatch(css, /#ms-c-status \.c-warn \{[^}]*(color: #|opacity)/, 'never a hex or opacity on the status warning');
+  const light = block(':root[data-theme="light"]'), base = block(':root'), mid = block(':root[data-theme="midnight"]');
+  const rgbOf = (h) => h.replace('#', '').match(/../g).map((x) => parseInt(x, 16));
+  // the darkest point behind the pill: the page under the gradient's gold glow, then the pill's 14 % tint of --c-warn
+  const behind = (bg, warn, glow) => over(`rgba(${rgbOf(warn).join(',')},.14)`, over(`rgba(227,179,65,${glow})`, bg));
+  const lw = /--c-warn: (#[0-9a-f]{6}); \}/.exec(css.slice(css.indexOf(':root[data-theme="light"] #v-council {')))[1];
+  const lBg = behind(tok(light, 'bg'), lw, 0.05);
+  assert.ok(ratio(tok(light, 'warn-ink'), lBg) >= 4.5, `light: ${ratio(tok(light, 'warn-ink'), lBg).toFixed(2)}`);
+  assert.ok(ratio(lw, lBg) < 4.5, 'the old colour (--c-warn as text) is what failed');
+  for (const [name, bg, glow] of [['dark', '#08090c', 0.05], ['midnight', tok(mid, 'bg'), 0.1]]) { const on = behind(bg, '#f2b33d', glow); assert.ok(ratio(tok(base, 'warn-ink'), on) >= 4.5, `${name}: ${ratio(tok(base, 'warn-ink'), on).toFixed(2)}`); }
 });
 
 // ── Forward record of the live book (12 Nov 2026): the card on Council → Systems (council/forward.mjs, coach.json forward) ──
@@ -813,4 +855,51 @@ test('forward card: every text at least 12 px and every colour a theme token (no
 test('forward card: an older coach.json with no forward field reads correctly, and the card fetches nothing', () => {
   assert.match(FW_JS, /No reading yet: the first one comes with the next Coach rebuild \(every 6 hours\)\./);
   assert.doesNotMatch(FW_JS, /fetch\(|msData/, 'reads the copy the page already loaded');
+});
+
+// ── Post-merge QA sweep (12 Nov 2026, the ~20 PRs merged since 11 Nov 21:00 UTC): one check per fix ──
+const Q12 = src('market-structure.html');
+const Q12_CSS = styles(Q12);
+
+test('QA 12 Nov: on a phone the market-cycle strip waits behind "More" with the markup it reads (it pushed the chart 135 px down, 3.6 s after load)', () => {
+  const rule = /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(([^)]*)\) \{ display: none !important; \}/.exec(Q12_CSS);
+  assert.ok(rule, 'the "More" rule of the Charts simple view');
+  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.pa-chips', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
+  assert.match(Q12, /<div class="cycle" id="ms-cycle"/, 'the strip is still the .cycle child of the charts toolbar');
+  assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context and the market cycle"/);
+  assert.match(src('scripts/audit/smoke.cjs'), /the market-cycle strip is not behind "More"/);
+});
+
+test('QA 12 Nov: the Mosha cycle (a live main paper system) says where it stands in "Which systems trade live", not inside the Gold replica card (a paper shadow, folded on phones)', () => {
+  const book = Q12.slice(Q12.indexOf('id="ms-sys-book"'), Q12.indexOf('id="ms-fwd"'));
+  assert.match(book, /<p class="ms-note" id="ms-rep-mcycle"><\/p>/);
+  const rep = Q12.slice(Q12.indexOf('Gold replica · paper shadow since 11 Nov'), Q12.indexOf('id="ms-rep-kpi"'));
+  assert.doesNotMatch(rep, /ms-rep-mcycle/);
+  assert.equal((Q12.match(/id="ms-rep-mcycle"/g) || []).length, 1);
+});
+
+test('QA 12 Nov: card headings and texts say which systems are live as the Systems card does (crypto trend is a shadow since 7 Nov; the analyst studies live trades, no longer "the seven edges")', () => {
+  assert.match(Q12, /Pairs · crypto trend \(paper shadow since 7 Nov\) · forex research only/);
+  assert.doesNotMatch(Q12, /crypto trend \(live paper\)/);
+  const ea = Q12.slice(Q12.indexOf('id="ms-ea"'), Q12.indexOf('id="ms-ea-sum"'));
+  assert.doesNotMatch(ea, /seven edges/);
+  assert.match(ea, /When a live trade of one of our systems opens \(a paper shadow is not studied\)/);
+});
+
+test('QA 12 Nov: the analyst card asks its API only for the roles it answers (owner, reviewers): a viewer made a refused call every 5 minutes', () => {
+  const js = /<script id="ms-ea-js">([\s\S]*?)<\/script>/.exec(Q12)[1];
+  assert.match(js, /dataset\.role === 'public' \|\| document\.documentElement\.dataset\.role === 'viewer'\) return;[^\n]*\n\s*load\(\);/);
+});
+
+test('QA 12 Nov: the browser Trader saves no journal entry and shows no "It\'s in your journal" toast to a member without the Journal (viewers; Luxus landed on the Mosha desk with "Trader saved Retrace buy")', () => {
+  const body = Q12.slice(Q12.indexOf('function autoTrade(list, price) {'), Q12.indexOf("jAdd(tr, 'Auto paper trade · browser Trader')"));
+  assert.match(body, /if \(\/\(\^\|\\s\)journal\(\\s\|\$\)\/\.test\(document\.documentElement\.dataset\.deny \|\| ''\)\) return;/);
+  // the gate it reads: the viewer defaults deny the journal (msPerms)
+  assert.match(Q12, /viewer: \{[^}]*journal: false/);
+});
+
+test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on the light panel was 1.8:1)', () => {
+  assert.match(Q12_CSS, /:root\[data-theme="light"\] \.ms-toast b \{ color: var\(--gold-ink\) !important; \}/);
+  const light = /:root\[data-theme="light"\] \{ --buy-ink:[^}]*\}/.exec(Q12_CSS)[0];
+  assert.ok(ratio(tok(light, 'gold-ink'), '#ffffff') >= 4.5);
 });

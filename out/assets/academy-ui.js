@@ -1433,6 +1433,10 @@
     whatIfCard(box, { idp: 'whatif', edge: S.setup.edge, cand: cur.cand, attemptId: cur.first.row.id, mode: cur.exam ? 'exam' : 'train', resultId: cur.exam && cur.exam.row ? cur.exam.row.id : null,
       engine: lv(cur.latest.decision), mentor: k && k.verdict !== 'approve' && k.action ? lv(k) : null, costs: S.setup.costs, outcome: cur.exam ? (cur.exam.row && cur.exam.row.outcome) || null : undefined, judged: cur.exam ? undefined : !!k,
       chart: { tf: S.setup.tf, show: (bars) => { S.future = { bars }; draw(); }, clear: () => { S.future = null; draw(); } } });
+    // phones, simple view: the card folds to its heading like the other folded cards. whatIfCard empties the box and builds it
+    // again (a new setup, a verdict, a saved lesson), so the chevron is put back after each build, and PF (keyed by the box's
+    // id) keeps it open or folded as the learner left it this visit. Inert on a wider screen and in the full view.
+    if (!box.hidden) pfold(box, 'What if');
   }
 
   // ---- tests on new setups ----------------------------------------------------------------------------------------------

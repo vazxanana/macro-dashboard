@@ -162,9 +162,21 @@
     .tb.more-open.more-up .tb-ovf { top: auto; bottom: calc(100% + 6px); } .tb.more-up .tb-ovf .ddp { top: auto; bottom: calc(100% + 6px); }
     .tb.more-open .tb-ovf .tbg { display: flex; } .tb.more-open .il span { display: inline; } .tb.more-open .dd > summary.ib.il { width: auto; padding: 0 10px 0 9px; } .tb.more-open .tb-view::before { content: "View"; font-size: 11px; color: var(--ink-faint); padding: 0 6px; } }
   /* phones (touch, a narrow chart card), 11 Nov: one row of 44 px controls: timeframe · undo · next · play · skip day · More.
-     Speed and Jump sit in More (a floating bar also sends Skip day there); every control in More and in the dropdowns is 44 px. */
+     Speed and Jump sit in More (a floating bar also sends Skip day there); every control in More and in the dropdowns is 44 px.
+     Touch tablets (12 Nov 2026): a coarse pointer gets 44 px controls at ANY width (block below); a touch chart card up to 860 px
+     (a 768 px tablet held upright) cannot hold them all in one row, so it takes this phone row and the More sheet too; the
+     first rules repeat the narrow card's More layout for touch cards of 641-860 px. A mouse keeps the 32 px layout of pass 11. */
   .tb-spd2, .tb-jump2 { display: none !important; } .tb.more-open .tb-tools::before, .tb.more-open .tb-view::before { font-size: 12px !important; }
-  @media (pointer: coarse) { @container cc (max-width: 640px) {
+  @media (pointer: coarse) {
+    .tb .ib, .tb .dd > summary.ib { width: 44px; height: 44px; min-height: 44px; } .tb .speed button { min-width: 44px; min-height: 44px; } .tb.float .grip { width: 44px; }
+    .tb .ddp button, .tb .ddp label, .tb .jumpp .jump input, .tb .jumpp .jump .btn.sm { min-height: 44px !important; }
+    @container cc (max-width: 1040px) { .tb .il span { display: none; } .tb .dd > summary.ib.il { width: 44px; padding: 0; justify-content: center; } }
+  }
+  @media (pointer: coarse) { @container cc (max-width: 860px) {
+    .tb .tb-morebtn { display: inline-grid; margin-left: auto; } .tb .tb-rp .tbsep { display: none; }
+    .tb-ovf { display: none; } .tb.more-open .tb-ovf { display: flex; flex-direction: column; gap: 8px; position: absolute; right: 0; top: calc(100% + 6px); z-index: 25; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+    .tb.more-open.more-up .tb-ovf { top: auto; bottom: calc(100% + 6px); } .tb.more-up .tb-ovf .ddp { top: auto; bottom: calc(100% + 6px); }
+    .tb.more-open .tb-ovf .tbg { display: flex; } .tb.more-open .il span { display: inline; } .tb.more-open .tb-view::before { content: "View"; padding: 0 6px; color: var(--ink-faint); }
     .tb { gap: 4px; } .tb .ib, .tb .dd > summary.ib, .tb .tb-rp .ib { width: 44px; height: 44px; min-height: 44px; } .tb .tfdd { height: 44px; } .tb details.tfdd > summary.ib { width: auto; min-width: 44px; padding: 0 5px 0 9px; }
     .tb .tb-rp .speed, .tb #jumpdd > summary { display: none; } .tb #skipday { display: inline-grid; } .tb.float #skipday { display: none; }
     .tb #jumpdd { position: static; width: 0; margin-left: -2px; } .tb #jumpdd > .ddp { left: 0; right: auto; width: min(100%, 320px); min-width: 0; } .tb .jumpp .jump { padding: 0; } .tb .jumpp .jump input { min-height: 44px; font-size: 16px; width: auto; } .tb .jumpp .jump .btn.sm { min-height: 44px; min-width: 56px; }
@@ -173,8 +185,7 @@
     .tb-spd2::before { content: "Speed"; font-size: 12px; color: var(--ink-faint); padding: 0 6px; } .tb-spd2 .speed { display: flex; flex: 1; gap: 2px; } .tb .tb-spd2 .speed button { flex: 1; min-width: 44px; min-height: 44px; font-size: 13px; padding: 0; }
     .tb.more-open .tb-ovf .ib.il, .tb.more-open .tb-ovf .dd > summary.ib.il { width: auto; height: 44px; padding: 0 12px 0 10px; gap: 8px; display: inline-flex; align-items: center; justify-content: flex-start; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--ink-dim); }
     .tb.more-open .tb-tools::before { content: none; } .tb.more-open .tb-jump2 .ib.il, .tb.more-open .tb-skip2 .ib.il { flex: 1; } .tb.more-open .tb-ovf .tb-tools .dd { flex: 1; } .tb.more-open .tb-ovf .tb-tools .dd > summary.ib.il { width: 100%; padding: 0 8px; justify-content: center; gap: 6px; }
-    .tb .ddp button, .tb .ddp label { min-height: 44px !important; }
-    .tb.float .grip { width: 44px; } .chartc .tb.float { max-width: calc(100% - 12px); }
+    .chartc .tb.float { max-width: calc(100% - 12px); }
   } }
   .tb .grip { display: none; cursor: grab; color: var(--ink-faint); width: 22px; } .tb .grip svg { fill: currentColor; stroke: none; } .tb.float .grip { display: inline-grid; } .tb.float .grip:active { cursor: grabbing; }
   .tb[data-dock="top"] { margin: 0 0 10px; }  .tb[data-dock="bottom"] { margin-top: 10px; }
@@ -317,6 +328,11 @@
   .pf-tb span { position: relative; display: block; padding: 0 8px; font: 600 12px/22px var(--mono); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .pf-tb.thin { height: 10px; overflow: visible; } .pf-tb.thin i { border-radius: 5px; } .pf-tb u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
   .pf-gs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; } .pfg { display: grid; justify-items: center; text-align: center; gap: 1px; padding: 6px 4px 8px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); min-width: 0; } .pfg svg { max-width: 100%; height: auto; } .pfg b { font-size: 12.5px; line-height: 1.25; } .pfg span { font: 500 12px var(--mono); color: var(--ink-dim); } .pfg em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--ink); } .pfg:focus-visible { outline: 2px solid var(--accent); }
   .g-bg { fill: none; stroke: var(--line-strong); stroke-width: 12; stroke-linecap: round; } .g-fill { fill: none; stroke-width: 12; stroke-linecap: round; } .g-fill.ok { stroke: var(--buy); } .g-fill.mid { stroke: var(--gold); } .g-fill.bad { stroke: var(--sell); } .g-v { font: 700 18px var(--mono); fill: var(--ink); } .g-s { font: 12px var(--sans); fill: var(--ink-faint); }
+  /* the challenge log's day table (12 Nov 2026): seven columns of money do not fit a phone, so it scrolls inside its own box with
+     the day held at the left edge; the page itself never gets wider. 12 px at least, in the simple and the Full phone view alike */
+  .pflog-t { overflow-x: auto; overscroll-behavior-x: contain; max-width: 100%; border-radius: 6px; } .pflog-t:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pflog-t table { font-size: 12.5px; } .pflog-t th { font-size: 12px; } .pflog-t td.n, .pflog-t th.n, .pflog-t td:first-child { white-space: nowrap; }
+  .pflog-t :is(th, td):first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
   .pfg.ok em { color: var(--buy); } .pfg.bad em { color: var(--sell); } .pfg.none { align-content: center; gap: 4px; } .pfg.none span { font-family: var(--sans); }
   .pf-days { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; } .pf-days i { width: 18px; height: 10px; border-radius: 3px; background: var(--neutral-soft); border: 1px solid var(--line-strong); } .pf-days i.on { background: var(--accent); border-color: var(--accent); } .pf-days i.min { box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px var(--ink-faint); } .pf-days small { font-size: 12px; color: var(--ink-faint); }
   /* phones: one compact toast at a time, over the header band, never over the chart; taps go through it */
@@ -1223,7 +1239,7 @@
       setH('pflog', `<div class="empty ea">${ICO}<b>No challenge yet</b><span>Start one in the Prop-firm challenge card: each day's starting equity, low, high and result is logged here.</span><button type="button" class="btn pri" data-ea="pf">Go to the challenge card</button></div>`); return; }
     const P = ch.progress || {}, F = ch.firm, ph = F.phases[ch.phase], st = ch.status; setH('pf-status', `<span class="pill ${st === 'live' ? 'live' : st === 'failed' ? 'bad' : 'ok'}">${esc(F.name)} · ${esc(ph.name)} · ${st}</span>`);
     setH('pf', pfView(ch));
-    if (!force && !tabOn('log')) return; const days = Object.entries(ch.days); setH('pflog', `<p><b>${esc(F.name)}</b> · started ${when(ch.startedAt)} · ${esc(st)}${ch.reason ? ' · ' + esc(ch.reason) : ''}</p>${ch.history.map((h) => `<p>${when(h.t)} · ${esc(h.event)}${h.phase ? ' ' + esc(h.phase) : ''}${h.why ? ': ' + esc(h.why) : ''}</p>`).join('')}<table><thead><tr><th>Day</th><th class="n">Start eq.</th><th class="n">Low</th><th class="n">High</th><th class="n">End balance</th><th class="n">Trades</th><th class="n">Net</th></tr></thead><tbody>${days.map(([k, d]) => `<tr><td>${k}</td><td class="n">${money(d.startEq)}</td><td class="n">${money(d.low)}</td><td class="n">${money(d.high)}</td><td class="n">${money(d.endBalance)}</td><td class="n">${d.trades}</td><td class="n ${cls(d.net)}">${money(d.net)}</td></tr>`).join('') || '<tr><td colspan="7" class="hint">No bars yet.</td></tr>'}</tbody></table>`); }
+    if (!force && !tabOn('log')) return; const days = Object.entries(ch.days); setH('pflog', `<p><b>${esc(F.name)}</b> · started ${when(ch.startedAt)} · ${esc(st)}${ch.reason ? ' · ' + esc(ch.reason) : ''}</p>${ch.history.map((h) => `<p>${when(h.t)} · ${esc(h.event)}${h.phase ? ' ' + esc(h.phase) : ''}${h.why ? ': ' + esc(h.why) : ''}</p>`).join('')}<div class="pflog-t" role="region" aria-label="Challenge log, day by day" tabindex="0"><table><thead><tr><th>Day</th><th class="n">Start eq.</th><th class="n">Low</th><th class="n">High</th><th class="n">End balance</th><th class="n">Trades</th><th class="n">Net</th></tr></thead><tbody>${days.map(([k, d]) => `<tr><td>${k}</td><td class="n">${money(d.startEq)}</td><td class="n">${money(d.low)}</td><td class="n">${money(d.high)}</td><td class="n">${money(d.endBalance)}</td><td class="n">${d.trades}</td><td class="n ${cls(d.net)}">${money(d.net)}</td></tr>`).join('') || '<tr><td colspan="7" class="hint">No bars yet.</td></tr>'}</tbody></table></div>`); }
 
   // ---- journal, stats, calendar ----
   // ---- journal (review pass, 9 Nov): one row per trade (partial closes merged with BT.trades), filters, sortable columns,
