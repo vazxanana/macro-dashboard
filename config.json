@@ -637,6 +637,12 @@
    "by": "repair",
    "change": "Trades: 5 exact duplicate records marked duplicate (5 scalp of intraday; 1 live; +1.76R gross counted twice); no stat counts them",
    "why": "Two setups produced the same order (same market, side, second, entry, stop and target) and it was recorded and counted twice. Owner, 12 Nov 2026: count duplicates once. The Trader records such an order once from now on."
+  },
+  {
+   "at": "2026-11-12T23:43:15.000Z",
+   "by": "user",
+   "change": "Shadow cut (owner): new shadow signals of Scalp, Intraday, Retrace scalp and Retrace intraday are no longer recorded on any market; open and pending ones run to their exits",
+   "why": "research/edge/shadow-best (pre-registered, 12 Nov): 32 (setup, market) streams on 2020-26, net of costs: none positive in both 2020-23 and 2024-26 with t >= 2 (0 kept; placebo 0). The family: -0.227R a trade in sample (n 61,469), -0.223R out of sample (n 46,266); about -0.04R before costs, so the loss is the cost of many small trades."
   }
  ],
  "btAt": "2026-11-12T22:45:54.026Z",
@@ -687,7 +693,8 @@
   "supported-book",
   "count-financing",
   "replica-mirror-gold-only",
-  "mosha-cycle"
+  "mosha-cycle",
+  "shadow-best"
  ],
  "target": {},
  "targetBy": {},
@@ -702,7 +709,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-12T23:41:53.000Z",
+   "at": "2026-11-12T23:43:15.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -871,5 +878,16 @@
    "text": "forex and crypto replica paper trades closed since the rule: 200 or more, total R before costs above zero; then the owner decides"
   }
  },
- "moshaCycle": true
+ "moshaCycle": true,
+ "shadowCut": {
+  "setups": [
+   "scalp",
+   "intraday",
+   "rscalp",
+   "rintra"
+  ],
+  "keep": [],
+  "since": 1794526995,
+  "study": "research/edge/shadow-best"
+ }
 }
