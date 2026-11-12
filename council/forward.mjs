@@ -41,6 +41,7 @@ export function loadProtocol(file = PROTOCOL_FILE) { try { return JSON.parse(fs.
 
 const num = (v) => typeof v === 'number' && Number.isFinite(v);
 const r2 = (v) => Math.round(v * 100) / 100;
+const r6 = (v) => Math.round(v * 1e6) / 1e6;   // judging a line: drop float noise of summed R, keep everything a record carries
 const fillT = (x) => (num(+x.filled) ? +x.filled : num(+x.opened) ? +x.opened : NaN);
 // the digest's merNet: after costs (financing included in Rnet / costR since 11 Nov)
 export const netR = (x) => (num(x.Rnet) ? x.Rnet : num(x.costR) && num(x.R) ? x.R - x.costR * (x.size || 1) : x.R);
@@ -81,20 +82,21 @@ export function record(rows, price) {
   const marked = cum + floating;
   return { n: closed.filter((x) => !x.addOf).length, units: closed.length, open: open.filter((x) => !x.addOf).length, openUnits: open.length, priced,
     total: r2(cum), floating: r2(floating), marked: r2(marked), peak: r2(peak), dd: r2(peak - cum), ddMax: r2(ddMax),
-    ddMarked: r2(Math.max(ddMax, peak - marked)), firstAt: closed.length ? +closed[0].closed : null, lastAt: closed.length ? +closed[closed.length - 1].closed : null, path, closed };
+    ddMarked: r2(Math.max(ddMax, peak - marked)), ddRaw: ddMax, firstAt: closed.length ? +closed[0].closed : null, lastAt: closed.length ? +closed[closed.length - 1].closed : null, path, closed };
 }
 
 // S1-S4: S1 every round (the closed record's worst drawdown from its own high); S2-S4 at their checkpoint (the total of the
-// positions closed by that date); before it the line is shown with today's figure and "checked on <date>"
+// positions closed by that date); before it the line is shown with today's figure and "checked on <date>". Each line is judged on
+// the unrounded figure (review, 12 Nov 2026: a drawdown of 21.904R is "more than 21.9R" although it shows as 21.90R)
 export function stopLines(protocol, rec, now, start = START) {
-  const G = (protocol && protocol.gates) || {}, out = [];
-  if (num(G.ddStop)) out.push({ id: 'S1', rule: 'Drawdown from the forward record’s own high', line: G.ddStop, value: rec.ddMax, state: rec.ddMax > G.ddStop ? 'crossed' : 'clear', every: true });
+  const G = (protocol && protocol.gates) || {}, out = [], dd = r6(num(rec.ddRaw) ? rec.ddRaw : rec.ddMax);
+  if (num(G.ddStop)) out.push({ id: 'S1', rule: 'Drawdown from the forward record’s own high', line: G.ddStop, value: rec.ddMax, state: dd > G.ddStop ? 'crossed' : 'clear', every: true });
   const F = G.floor || {};
   [12, 24, 36].forEach((m, i) => {
     if (!num(F[m])) return;
     const due = addMonths(start, m), reached = now >= due;
-    const value = reached ? r2(rec.closed.filter((x) => +x.closed <= due).reduce((s, x) => s + netR(x), 0)) : rec.total;
-    out.push({ id: 'S' + (i + 2), rule: `Total after ${m} months`, months: m, line: F[m], due, dueDay: day(due), value, state: !reached ? 'later' : value < F[m] ? 'crossed' : 'clear' });
+    const raw = reached ? r6(rec.closed.filter((x) => +x.closed <= due).reduce((s, x) => s + netR(x), 0)) : null, value = reached ? r2(raw) : rec.total;
+    out.push({ id: 'S' + (i + 2), rule: `Total after ${m} months`, months: m, line: F[m], due, dueDay: day(due), value, state: !reached ? 'later' : raw < F[m] ? 'crossed' : 'clear' });
   });
   return out;
 }
@@ -159,17 +161,23 @@ export function execChecks({ rows, mirrors, accounts, prev, now, start = START, 
   { const F = C.map((c) => c.fin).filter((f) => f && f.model > 0), ch = F.reduce((a, f) => a + f.charged, 0), mo = F.reduce((a, f) => a + f.model, 0), ratio = mo > 0 ? Math.round(ch / mo * 1000) / 1000 : null;
     checks.push({ id: 'E4', label: 'Financing charged on gold buys against the cost model', state: !F.length ? 'nodata' : !full ? 'running' : ratio <= 1 + EXEC.finTol ? 'pass' : 'fail', n: F.length, ratio, charged: r2(ch), model: r2(mo),
       text: !F.length ? 'Not measurable yet: no copy of a gold buy has been held over a rollover with its swap in the account files.' : `Charged $${r2(ch)} against $${r2(mo)} by the model (${Math.round(ratio * 100)} %) on ${F.length} gold buy cop${F.length === 1 ? 'y' : 'ies'}.` }); }
-  // E5 nothing on the book's account the mirror did not place (since the clock start)
-  const foreign = Array.isArray(P.foreign) ? P.foreign.slice() : [];
+  // E5 nothing on the book's account the mirror did not place (since the clock start). A flag carried from an earlier reading is
+  // dropped once a mirror record holds it (review, 12 Nov 2026: the account file and the mirror state are written at different
+  // moments, so a limit that filled in between was flagged for good); a resting limit the mirror has since adopted is matched by
+  // its position record (viaLimit: symbol, side, limit price); a position and its closing deal are one item, not two.
+  const known = new Set(), orders = new Set(), limits = new Set(), lk = (sym, side, px) => `${sym}|${side}|${num(+px) ? +(+px).toFixed(6) : ''}`;
+  for (const g of mirrors || []) { const st = g.state || {};
+    for (const m of Object.values(st.map || {})) { if (m && m.positionId != null) known.add(String(m.positionId)); if (m && m.viaLimit && m.limitPrice != null) limits.add(lk(m.symbol, m.side, m.limitPrice)); }
+    for (const o of Object.values(st.orders || {})) if (o && o.orderId != null) orders.add(String(o.orderId)); }
+  for (const c of Object.values(carried)) if (c && c.positionId) known.add(String(c.positionId));
+  const held = (f) => (f.kind === 'order' ? orders.has(String(f.id)) || (f.price != null && limits.has(lk(f.symbol, f.side, f.price))) : known.has(String(f.id)));
+  const key = (f) => (f.kind === 'order' ? 'order:' : 'pos:') + f.id;
+  const foreign = (Array.isArray(P.foreign) ? P.foreign : []).filter((f) => f && !held(f)).reduce((a, f) => (a.some((x) => key(x) === key(f)) ? a : a.concat([f])), []);
   if (A) {
-    const known = new Set(), orders = new Set();
-    for (const g of mirrors || []) { const st = g.state || {}; for (const m of Object.values(st.map || {})) if (m && m.positionId != null) known.add(String(m.positionId));
-      for (const o of Object.values(st.orders || {})) if (o && o.orderId != null) orders.add(String(o.orderId)); }
-    for (const c of Object.values(carried)) if (c && c.positionId) known.add(String(c.positionId));
-    const seen = new Set(foreign.map((f) => f.kind + ':' + f.id)), add = (f) => { if (!seen.has(f.kind + ':' + f.id)) { seen.add(f.kind + ':' + f.id); foreign.push(f); } };
-    for (const p of A.open || []) if (Date.parse(p.openedAt) / 1000 >= start && !known.has(String(p.id))) add({ kind: 'position', id: String(p.id), symbol: p.symbol, side: p.side, lots: p.lots, at: p.openedAt });
-    for (const o of A.orders || []) if (!orders.has(String(o.id))) add({ kind: 'order', id: String(o.id), symbol: o.symbol, side: o.side });
-    for (const d of A.history || []) if (Date.parse(d.closedAt) / 1000 >= start && !known.has(String(d.positionId))) add({ kind: 'deal', id: String(d.positionId), symbol: d.symbol, side: d.side, lots: d.lots, at: d.closedAt });
+    const seen = new Set(foreign.map(key)), add = (f) => { if (!held(f) && !seen.has(key(f))) { seen.add(key(f)); foreign.push(f); } };
+    for (const p of A.open || []) if (Date.parse(p.openedAt) / 1000 >= start) add({ kind: 'position', id: String(p.id), symbol: p.symbol, side: p.side, lots: p.lots, at: p.openedAt });
+    for (const o of A.orders || []) add({ kind: 'order', id: String(o.id), symbol: o.symbol, side: o.side, price: o.price ?? null });
+    for (const d of A.history || []) if (Date.parse(d.closedAt) / 1000 >= start) add({ kind: 'deal', id: String(d.positionId), symbol: d.symbol, side: d.side, lots: d.lots, at: d.closedAt });
   }
   checks.push({ id: 'E5', label: 'Nothing on the account the mirror did not place', state: foreign.length ? 'fail' : !A ? 'nodata' : full ? 'pass' : 'running', n: foreign.length,
     text: foreign.length ? `${foreign.length} on the Council demo account with no mirror record: ${foreign.slice(0, 3).map((f) => `${f.kind} ${f.id} ${f.symbol || ''} ${f.side || ''}`.trim()).join('; ')}.` : !A ? 'The account file is not there.' : 'None since the clock start.' });

@@ -2749,6 +2749,16 @@ Before 12 Nov this section described a measurement against a PROPOSED protocol; 
 - Tests: `tests/forward.test.mjs` (10: json bands and interpolation, every stop line, drawdown maths, shadows / replay / other
   systems / pre-start excluded, E1-E5 on fake mirror and account files, carry, digest line, Trader and page wiring),
   `tests/ctrader-reconcile.test.mjs` (the owner-rule reason), `tests/qa-sweep.test.mjs` ("forward card": 3).
+- **Review (12 Nov 2026)**, two fixes in `council/forward.mjs`, each proven by a test that failed first (`tests/forward.test.mjs`
+  "review: …"): (1) S1-S4 are judged on the unrounded figure (`ddRaw`, the raw checkpoint sum, float noise dropped at 1e-6): a
+  drawdown of 21.904R is "more than 21.9R" and was read as 21.90R, clear; displayed values stay at cents. (2) E5: a carried flag
+  is dropped once a mirror record holds it (the account file and the mirror state are written at different moments, so a limit
+  that filled in between was flagged for good), an account order matching a mirror position adopted from a limit (`viaLimit`:
+  symbol, side, limit price) is the mirror's, and a stranger position and its closing deal count once. Checked and left as
+  is, said to the owner: S1 steps trade by trade within a day while the 21.9R line was drawn on daily book R (UTC close day), so
+  the tracker can only read a drawdown as deeper, never shallower; E4 passes a demo that charges far LESS than the model (the
+  protocol only names "over a fifth more" as a fail); an order the mirror cancelled after an older account read has no record
+  left and would still be flagged.
 
 ## Gold carry: what a gold buy costs to hold, route by route (12 Nov 2026, item 46's "ask what your broker charges")
 `research/edge/gold-carry/` (PREREGISTRATION.md committed first; `run.mjs`, `rates.json`, `basis.json`, RESULT.md, result.json).

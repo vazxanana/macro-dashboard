@@ -177,3 +177,47 @@ test('council loop checks out the forward protocol file', async () => {
   const rel = PROTOCOL_FILE.pathname.split('/macro-dashboard/').pop().replace(/^.*?(research\/)/, '$1');
   assert.ok(dirs.some((d) => rel.startsWith(d + '/')), `council.yml sparse-checkout must include the folder of ${rel}; has ${dirs.join(', ')}`);
 });
+
+// review of 12 Nov 2026: two defects found against the protocol's own wording, each proven here first
+test('review: a stop line is judged on the unrounded figure ("more than 21.9R", "below -9.7R"), never after rounding to cents', () => {
+  const G = P.gates, due = (() => { const d = new Date(START * 1000); d.setUTCMonth(d.getUTCMonth() + 12); return d.getTime() / 1000; })();
+  // a drawdown of 21.904R is more than 21.9R; rounded to 21.90 it read as clear
+  let rec = record(bookTrades([T({ Rnet: -(G.ddStop + 0.004), filled: START + DAY, closed: START + DAY + 60 })]));
+  assert.equal(stopLines(P, rec, START + 40 * DAY)[0].state, 'crossed');
+  // exactly on the line is not more than it
+  rec = record(bookTrades([T({ Rnet: -G.ddStop, filled: START + DAY, closed: START + DAY + 60 })]));
+  assert.equal(stopLines(P, rec, START + 40 * DAY)[0].state, 'clear');
+  // a 12-month total of -9.704R is below -9.7R
+  rec = record(bookTrades([T({ Rnet: G.floor[12] - 0.004, filled: START + DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'crossed');
+  rec = record(bookTrades([T({ Rnet: G.floor[12], filled: START + DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'clear');
+  // a total that is exactly the line once summed (float noise such as -9.700000000000001) is not below it
+  rec = record(bookTrades([T({ Rnet: G.floor[12] - 0.1, filled: START + DAY, closed: due - 2 * DAY }), T({ Rnet: 0.1, filled: START + 2 * DAY, closed: due - DAY })]));
+  assert.equal(stopLines(P, rec, due + DAY)[1].state, 'clear');
+});
+
+test('review: E5 counts only what no mirror record holds: a flag the mirror later accounts for is dropped, and a filled limit is the mirror\'s', () => {
+  const now = START + 5 * DAY, iso = (t) => new Date(t * 1000).toISOString();
+  // reading 1: the account file shows a position the mirror state does not hold yet (a limit that filled between the mirror's round
+  // and the account read); reading 2: the mirror has adopted it under its position id -> no longer "not placed by the mirror"
+  const pos = { id: '777', symbol: 'XAUUSD', side: 'buy', lots: 0.01, sl: 3950, openedAt: iso(START + 2 * DAY) };
+  const r1 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ open: [pos] }), now });
+  assert.equal(r1.checks.find((c) => c.id === 'E5').state, 'fail');
+  const r2 = execChecks({ rows: [], mirrors: mirrorsOf({ map: { 'xau-mcycle-main-1': { positionId: '777', viaLimit: true, symbol: 'XAUUSD', side: 'buy', limitPrice: 3990, status: 'open' } } }),
+    accounts: acct({ open: [pos] }), prev: { exec: r1 }, now: now + DAY });
+  assert.equal(r2.checks.find((c) => c.id === 'E5').state, 'running'); assert.deepEqual(r2.foreign, []);
+  // an account file read before the mirror's round still lists the resting limit that has since filled: the mirror moved it from
+  // `orders` to its position record (viaLimit, the same symbol, side and limit price), so it is the mirror's order
+  const r3 = execChecks({ rows: [], mirrors: mirrorsOf({ map: { 'xau-geg-1': { positionId: '778', viaLimit: true, symbol: 'XAUUSD', side: 'buy', limitPrice: 3990.5, status: 'open' } } }),
+    accounts: acct({ orders: [{ id: '555', symbol: 'XAUUSD', side: 'buy', type: 2, price: 3990.5 }] }), now });
+  assert.equal(r3.checks.find((c) => c.id === 'E5').state, 'running');
+  // a real stranger stays flagged, reading after reading
+  const r4 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ orders: [{ id: '556', symbol: 'XAUUSD', side: 'buy', price: 3000 }] }), now });
+  const r5 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct(), prev: { exec: r4 }, now: now + DAY });
+  assert.equal(r5.checks.find((c) => c.id === 'E5').state, 'fail'); assert.equal(r5.foreign.length, 1);
+  // a stranger position seen open, then as its closing deal, is one item, not two
+  const r6 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ open: [{ ...pos, id: '888' }] }), now });
+  const r7 = execChecks({ rows: [], mirrors: mirrorsOf({}), accounts: acct({ history: [{ positionId: '888', symbol: 'XAUUSD', side: 'buy', lots: 0.01, closedAt: iso(START + 3 * DAY) }] }), prev: { exec: r6 }, now: now + DAY });
+  assert.equal(r7.foreign.length, 1); assert.equal(r7.checks.find((c) => c.id === 'E5').n, 1);
+});
