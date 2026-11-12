@@ -1,8 +1,10 @@
 // Forward tracker of the live paper book (12 Nov 2026): how the book the owner kept live on 11 Nov 2026 (Gold trend + Gold daily
-// engulf, docs/owner-decisions.md item 37) stands against the forward-test protocol PROPOSED in
-// research/proposals/2026-11-12-path-to-live.md (section 3). The protocol is NOT adopted (item 43 is open): this is a
-// MEASUREMENT only. It changes no rule, size, filter, stop, trade, mirror setting or config, and when a stop line is crossed or an
-// execution check fails it only says so (coach.json `forward`, the Systems pane card, one Home line, one digest line).
+// engulf, docs/owner-decisions.md item 37) stands against the forward-test protocol of research/proposals/2026-11-12-path-to-live.md
+// (section 3), ADOPTED by the owner on 12 Nov 2026 ("Yes to all": item 43). The reading itself changes nothing (coach.json
+// `forward`, the Systems pane card, one Home line, one digest line). The protocol's one consequence is `stopSwitch` below, which
+// the Trader applies as an owner rule: a crossed stop line (S1-S4) sends the book back to a paper shadow (config.ownerShadow), once,
+// with a dated history line and one alert; it never closes or changes an open trade or its stop, and never puts the book back by
+// itself. A failed execution check (E1-E5) is only reported.
 //
 // Pure: every input is handed in (trades.json, snapshot.json, the mirror states, ctrader/accounts.json, the proposal's json,
 // the previous reading) and the clock is `now`. The band and stop-line numbers are READ from the proposal's json, never typed
@@ -11,7 +13,8 @@
 //
 // What counts: the two systems' OWN forward trades (`alertable` = not a shadow, `ownStream`), filled at or after the protocol's
 // clock start, never a replay row; R after costs including overnight financing (the stamped `Rnet`, as the digest's merNet);
-// closed positions only for the record, open ones marked to the snapshot's price (before costs) for the marked drawdown.
+// closed positions only for the record, open ones marked to the snapshot's price (before costs) for the marked drawdown. The
+// Mosha cycle (`mcycle`, a main paper system by the owner's choice of 11 Nov) is NOT part of the protocol's book and is not counted.
 import fs from 'node:fs';
 import { alertable } from './alerts.mjs';
 import { ownStream, FIN, nights } from './fills.mjs';
@@ -19,10 +22,11 @@ import { ownStream, FIN, nights } from './fills.mjs';
 export const PROTOCOL_FILE = new URL('../research/proposals/2026-11-12-path-to-live.json', import.meta.url);
 export const PROTOCOL_DOC = 'research/proposals/2026-11-12-path-to-live.md';
 export const DECISION = 43;
-export const LABEL = 'proposed protocol, not adopted: your decision 43';
+export const ADOPTED = '2026-11-12';
+export const LABEL = 'protocol adopted by the owner, 12 Nov 2026 (decision 43)';
 // section 3: "Clock start: 12 Nov 2026 (the first full day after item 37)"
 export const START = Date.UTC(2026, 10, 12) / 1000;
-// the book of the protocol: the json's source line names it "S2 = gtrend + geg" (a test reads it)
+// the book of the protocol: the json's source line names it "S2 = gtrend + geg" (a test reads it). Not the Mosha cycle.
 export const BOOK = { gtrend: 'Gold trend', geg: 'Gold daily engulf' };
 // section 3's execution table: the first 30 demo copies; E2 at least 28 of 30 (3 misses fail); E3 within 0.03R, fail worse than
 // 0.05R; E4 within a fifth of the cost model's rate; E1 and E5: any case fails
@@ -192,13 +196,13 @@ export function buildForward({ trades, snapshot, mirrors, accounts, protocol, pr
   const status = crossed.length ? 'stop' : rec.n < min ? 'few' : where === 'below' ? 'below' : 'ok';
   const span = rec.n ? `${rec.n} position${rec.n === 1 ? '' : 's'} closed, ${day(start)} to ${day(rec.lastAt)}` : `no position closed since ${day(start)}`;
   const head = { stop: 'A stop line is crossed', few: 'Too few trades to say', below: 'Below the expected range', ok: 'On track' }[status];
-  const alerts = crossed.map((s) => `Forward book: stop line ${s.id} crossed (${s.rule.toLowerCase()} ${s.id === 'S1' ? `${s.value}R, line more than ${s.line}R` : `${s.value}R, line below ${s.line}R`}); proposed protocol, not adopted (decision 43), nothing was changed.`)
-    .concat(failed.map((c) => `Forward book: execution check ${c.id} fails (${c.label.toLowerCase()}): ${c.text} Proposed protocol, not adopted (decision 43), nothing was changed.`));
+  const alerts = crossed.map((s) => `Forward book: stop line ${s.id} crossed (${s.rule.toLowerCase()} ${s.id === 'S1' ? `${s.value}R, line more than ${s.line}R` : `${s.value}R, line below ${s.line}R`}); by the protocol you adopted on 12 Nov 2026 (decision 43) the book goes back to a paper shadow; no open trade is closed and every stop stays.`)
+    .concat(failed.map((c) => `Forward book: execution check ${c.id} fails (${c.label.toLowerCase()}): ${c.text} Reported only (protocol adopted 12 Nov 2026, decision 43): nothing was changed.`));
   // the chart: the band at the checkpoints up to the horizon shown, and the closed record by month
   const show = Math.max(12, Math.ceil(months / 6) * 6);
   const H = protocol.worlds.expected.horizons, bandPts = [[0, 0, 0, 0]].concat(Object.keys(H).map(Number).filter((k) => num(k) && k <= Math.max(show, 6)).sort((a, c) => a - c).map((k) => [k, H[k].cum.p5, H[k].cum.p50, H[k].cum.p95]));
   if (bandPts[bandPts.length - 1][0] < show) { const e = bandAt(protocol, show); bandPts.push([show, e.p5, e.p50, e.p95]); }
-  return { at, v: 1, label: LABEL, decision: DECISION, doc: PROTOCOL_DOC,
+  return { at, v: 1, label: LABEL, decision: DECISION, adopted: ADOPTED, doc: PROTOCOL_DOC,
     protocol: { built: protocol.built, start: day(start), minPositions: min, ddStop: protocol.gates.ddStop, floor: protocol.gates.floor, months: protocol.gates.protocolMonths },
     book: Object.keys(BOOK), names: Object.values(BOOK), status, head, sentence: `${head}: ${span}, ${rec.total >= 0 ? '+' : '−'}${Math.abs(rec.total).toFixed(2)}R after costs.`,
     record: { n: rec.n, units: rec.units, open: rec.open, total: rec.total, floating: rec.floating, marked: rec.marked, peak: rec.peak, dd: rec.dd, ddMax: rec.ddMax, ddMarked: rec.ddMarked,
@@ -211,5 +215,33 @@ export function forwardLine(fw) {
   const A = fw && Array.isArray(fw.alerts) ? fw.alerts : [];
   if (!A.length) return null;
   const s = (fw.stops || []).filter((x) => x.state === 'crossed').map((x) => x.id), e = ((fw.exec && fw.exec.checks) || []).filter((c) => c.state === 'fail').map((c) => c.id);
-  return `Forward book (proposed protocol, not adopted: decision 43): ${s.length ? `stop line ${s.join(', ')} crossed` : ''}${s.length && e.length ? '; ' : ''}${e.length ? `execution check ${e.join(', ')} fails` : ''}. Nothing was changed; see Council, Systems.`;
+  return `Forward book (protocol adopted 12 Nov 2026: decision 43): ${s.length ? `stop line ${s.join(', ')} crossed` : ''}${s.length && e.length ? '; ' : ''}${e.length ? `execution check ${e.join(', ')} fails` : ''}. ${s.length ? 'The book goes back to a paper shadow (no open trade closed, every stop kept)' : 'Reported only, nothing was changed'}; see Council, Systems.`;
+}
+
+// ─── the protocol's consequence (owner, 12 Nov 2026: item 43 adopted) ───
+// Section 3: "any one: the book goes back to a paper shadow and you are told; no trade is closed by it, every open trade keeps its
+// stop and runs to its own exit". Applied by the Trader at the start of a round, from the LAST reading in coach.json, as an owner
+// rule: Gold trend and Gold daily engulf join config.ownerShadow (the supported-book switch of 11 Nov: their NEW trades are paper
+// shadows, blockedBy owner-shadow; trades already open or pending run to their own exits with their stops), config.forwardStop
+// records why, and config.history gets one `by: 'user'` line quoting the protocol. ONCE: a config that already has `forwardStop`
+// is left alone, and nothing here ever removes a system from ownerShadow (putting the book back is the owner's, by a new rule).
+// Execution checks never switch anything. Returns null when nothing is done; else { lines, history, alert }.
+export const SWITCH_K = ['gtrend', 'geg'];
+export const QUOTE = 'any one: the book goes back to a paper shadow and you are told; no trade is closed by it, every open trade keeps its stop and runs to its own exit';
+export function stopSwitch(config, fw, now = Date.now() / 1000) {
+  if (!config || typeof config !== 'object' || config.forwardStop || !fw || fw.error || !Array.isArray(fw.stops)) return null;
+  const crossed = fw.stops.filter((s) => s && s.state === 'crossed' && /^S[1-4]$/.test(s.id));
+  if (!crossed.length) return null;
+  const at = Math.floor(now), iso = new Date(at * 1000).toISOString(), lines = crossed.map((s) => s.id);
+  const what = crossed.map((s) => `${s.id} ${s.rule.toLowerCase()} ${s.id === 'S1' ? `${s.value}R, line more than ${s.line}R` : `${s.value}R, line below ${s.line}R`}`).join('; ');
+  config.ownerShadow = { ...(config.ownerShadow || {}) };
+  for (const k of SWITCH_K) if (!config.ownerShadow[k]) config.ownerShadow[k] = at;
+  const alert = { title: 'Forward book: stop line crossed, the book goes back to a paper shadow',
+    msg: `Stop line ${lines.join(', ')} of the forward-test protocol you adopted on 12 Nov 2026 is crossed (${what}). From this round Gold trend and Gold daily engulf trade as paper shadows. No open trade was closed and every stop stays; nothing goes back by itself: putting the book back is your decision.` };
+  config.forwardStop = { at, iso, lines, reading: fw.at || null, systems: SWITCH_K.slice(), what, alert };
+  const history = { at: iso, by: 'user', change: `Forward-test protocol: stop line ${lines.join(', ')} crossed; Gold trend and Gold daily engulf go back to paper shadows (new trades only; open trades run to their own exits with their stops)`,
+    why: `Protocol adopted by the owner on 12 Nov 2026 ("Yes to all", docs/owner-decisions.md item 43; research/proposals/2026-11-12-path-to-live.md section 3): "${QUOTE}". Crossed: ${what}.` };
+  if (!Array.isArray(config.history)) config.history = [];
+  config.history.push(history);
+  return { lines, history, alert };
 }

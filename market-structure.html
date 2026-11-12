@@ -927,6 +927,7 @@
   .loss-g[open] > summary::before { transform: rotate(45deg); }                                             /* 43 */
   .ms-toast { background: var(--panel-raised) !important; color: var(--ink) !important; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; padding: 12px 14px !important; box-shadow: var(--sh-2) !important; font-size: 13px !important; animation: toastIn .22s cubic-bezier(.16,1,.3,1); }
   .ms-toast b { text-transform: none !important; letter-spacing: 0 !important; color: var(--gold) !important; font-size: 12.5px !important; }   /* 45, 68 */
+  :root[data-theme="light"] .ms-toast b { color: var(--gold-ink) !important; }   /* the brand gold as text on the light panel was 1.8:1 (QA 12 Nov) */
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
   .tv::backdrop { background: rgba(4,6,10,.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }   /* 46 */
   .tv[open] { animation: dlgIn .22s cubic-bezier(.16,1,.3,1); }                                              /* 67 */
@@ -3151,7 +3152,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </style>
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
-      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context">More</button>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -3233,16 +3234,17 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
       <div class="card adm" id="ms-sys-book">
         <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
-        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): the two that stay live are the nearest, not proven.</p>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle (not a tested edge: no study to measure it against, so it has no row in the decay and expectation cards). <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
+        <p class="ms-note" id="ms-rep-mcycle"></p>
         <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
       </div>
       <div class="card c-fwd adm" id="ms-fwd">
-        <div class="ms-k"><span role="heading" aria-level="2">Forward record of the live book · Gold trend and Gold daily engulf</span><span class="fw-tag">Proposed protocol · not adopted</span><span class="ms-note" id="ms-fwd-at"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Forward record of the live book · Gold trend and Gold daily engulf</span><span class="fw-tag">Protocol adopted · 12 Nov 2026</span><span class="ms-note" id="ms-fwd-at"></span></div>
         <p class="fw-sum" id="ms-fwd-sum">Waiting for the Coach…</p>
         <div class="fw-legend" aria-hidden="true"><span><i class="fw-sw fw-sw-band"></i>Expected range, 5 % to 95 %</span><span><i class="fw-sw fw-sw-mid"></i>Middle of the range</span><span><i class="fw-sw fw-sw-rec"></i>Forward total, after costs</span><span><i class="fw-sw fw-sw-stop"></i>Stop lines S2 to S4</span></div>
-        <div class="fw-chart" id="ms-fwd-chart" role="img" aria-label="Forward total of the live book against the range the proposed protocol expects"></div>
+        <div class="fw-chart" id="ms-fwd-chart" role="img" aria-label="Forward total of the live book against the range the adopted protocol expects"></div>
         <div class="fw-wrap" tabindex="0" role="region" aria-label="Stop lines and execution checks, scrolls sideways"><table class="fw-t"><thead><tr><th class="fw-l" scope="col">Line or check</th><th class="fw-l" scope="col">Where it stands</th><th class="fw-l" scope="col">State</th></tr></thead><tbody id="ms-fwd-b"></tbody></table></div>
-        <p class="ms-note fw-foot" id="ms-fwd-foot">The forward-test protocol of <b>research/proposals/2026-11-12-path-to-live.md</b> (section 3) is a proposal: you have not adopted it (<a href="https://github.com/vazxanana/macro-dashboard/blob/main/docs/owner-decisions.md" target="_blank" rel="noopener">your decision 43</a>, open). This card only measures the book against it, every 6 hours with the Coach: it changes no rule, size, stop, trade or mirror setting, and a crossed line or a failed check is only reported here, on Home and in the daily digest. Counted: the two systems' own paper trades filled from 12 Nov 2026, after costs and overnight financing; the bands and lines are the proposal's own figures.</p>
+        <p class="ms-note fw-foot" id="ms-fwd-foot">The forward-test protocol of <b>research/proposals/2026-11-12-path-to-live.md</b> (section 3) was adopted by you on 12 Nov 2026 (<a href="https://github.com/vazxanana/macro-dashboard/blob/main/docs/owner-decisions.md" target="_blank" rel="noopener">your decision 43</a>: “Yes to all”). This card measures the book against it every 6 hours with the Coach. If a stop line (S1 to S4) is crossed, the Trader sends Gold trend and Gold daily engulf back to paper shadows at its next round, once, and you are told: no open trade is closed, every stop stays, and nothing goes back by itself. A failed execution check (E1 to E5) is only reported, here, on Home and in the daily digest. Counted: the two systems' own paper trades filled from 12 Nov 2026, after costs and overnight financing; the bands and lines are the proposal's own figures. The Mosha cycle, a main paper system since 11 Nov by your choice, is not part of the protocol's book and is not counted here.</p>
       </div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
@@ -3270,7 +3272,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </details>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note" id="ms-rep-w1"></p>
-        <p class="ms-note" id="ms-rep-mosha"></p><p class="ms-note" id="ms-rep-mcycle"></p>
+        <p class="ms-note" id="ms-rep-mosha"></p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
         <p class="ms-note" id="ms-rep-track-txt"></p>
@@ -3278,7 +3280,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-pairs adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (paper shadow since 7 Nov) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
           <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
@@ -3316,7 +3318,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           @media (pointer: coarse) { #ms-ea details summary { min-height: 44px; display: flex; align-items: center; } }
         </style>
         <div class="ms-k" role="heading" aria-level="2">AI second opinion · each entry, judged blind</div>
-        <p class="ms-note">When a live trade of the seven edges opens, a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
+        <p class="ms-note">When a live trade of one of our systems opens (a paper shadow is not studied), a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
         <div class="ea-sum" id="ms-ea-sum">Loading…</div>
         <div class="ea-wrap"><table class="ea-tb" id="ms-ea-list" hidden><thead><tr><th>Entry (UTC)</th><th>System</th><th>Trade</th><th>AI said</th><th>Result</th></tr></thead><tbody></tbody></table></div>
       </div>
@@ -3342,7 +3344,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
         <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
         <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it; since 12 Nov 2026 Gold trend and Gold trend fast pay it on every unit, the add included (a position = its first unit and its add)</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
       </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
@@ -6765,6 +6767,7 @@ function msNextSetup(bars, A) {
   const marketClosed = () => { if (INST.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };   // incl. the first hour after the Sunday reopen
   function autoTrade(list, price) {
     if (!JEL || PUB || marketClosed()) return;   // never for a guest: no journal to save to, and the toast named a setup
+    if (/(^|\s)journal(\s|$)/.test(document.documentElement.dataset.deny || '')) return;   // nor for a member who cannot open the Journal (viewers): the toast said "It's in your journal" (QA 12 Nov)
     const now = Date.now() / 1000; let added = 0;
     for (const t of list) {
       const id = `${instKey}|${t.sig}`;
@@ -13276,6 +13279,10 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   W.MS_BOOK_NOW = bookNow;
   var LATE = ' This reading was made before your decision on which systems trade live; the list here already follows that decision, and the next reading (within 6 hours) is built on it.';
   W.MS_BOOK_LATE = LATE;
+  // a main paper system with no study behind it (12 Nov 2026): the Mosha cycle trades live on paper by the owner's choice of 11 Nov
+  // but has no baseline, so it has no row here or in "What to expect"; the count of live systems says so instead of missing it
+  function noBase(config) { return config && config.moshaCycle && !(config.ownerShadow || {}).mcycle ? ' The Mosha cycle also trades live on paper (your choice of 11 Nov) but has no study to measure it against, so it is not listed here.' : ''; }
+  W.MS_NO_BASE = noBase;
   function render() {
     var body = $('ms-decay-b'), sum = $('ms-decay-sum'); if (!body || !sum) return;
     var C = W.MS_COUNCIL, D = C && C.coach && C.coach.decay; if (C) bookNow(C.coach, C.config);
@@ -13289,7 +13296,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     sum.innerHTML = '<b>' + T.live.length + '</b> live systems: <b class="' + (dec.length ? 'neg' : '') + '">' + dec.length + ' decaying</b>' + names(dec) + ', ' + wat.length + ' on watch' + names(wat)
       + ', ' + T.healthy.length + ' healthy' + (T.few.length ? ', ' + T.few.length + ' with too few trades to judge' + names(T.few) : '') + '.'
       + (T.shadowFlag.length ? ' Shadow, not traded live: ' + T.shadowFlag.map(function (s) { return esc(s.name) + ' ' + esc(s.status === 'watch' ? 'on watch' : s.status); }).join(', ') + '.' : '')
-      + ' Status only: nothing here changes a rule.' + (D.bookLate ? esc(LATE) : '');
+      + ' Status only: nothing here changes a rule.' + (D.bookLate ? esc(LATE) : '') + esc(noBase(C && C.config));
     // the footnote says whether THIS reading's backtests carry overnight financing (decay.financing, from the baseline file)
     var ff = $('ms-decay-fin'); if (ff) ff.textContent = D.financing ? 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge'
       : 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests of this reading do not carry it yet, the next reading does';
@@ -13380,9 +13387,9 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var above = judged.filter(function (s) { return s.forward.out === 'above'; }), below = judged.filter(function (s) { return s.forward.out === 'below'; });
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
     sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
-      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.' + (D.bookLate ? esc(W.MS_BOOK_LATE || '') : '');
+      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.' + (D.bookLate ? esc(W.MS_BOOK_LATE || '') : '') + esc(W.MS_NO_BASE ? W.MS_NO_BASE(W.MS_COUNCIL && W.MS_COUNCIL.config) : '');
     // the footnote says whether THIS reading is after overnight financing (a system's `fin`); one made before 11 Nov's change is not
-    var ff = $('ms-expect-fin'); if (ff) ff.textContent = S.some(function (s) { return s.fin; }) ? 'since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker\u2019s rate of that day: a system\u2019s Per trade cell says so and gives the figure before it'
+    var ff = $('ms-expect-fin'); if (ff) ff.textContent = S.some(function (s) { return s.fin; }) ? 'since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker\u2019s rate of that day: a system\u2019s Per trade cell says so and gives the figure before it' + (S.some(function (s) { return s.fin && s.fin.everyUnit; }) ? '; since 12 Nov 2026 Gold trend and Gold trend fast pay it on every unit, the add included (a position = its first unit and its add)' : '')
       : 'this reading was made before overnight financing was counted (11 Nov 2026): its figures are before financing, the next reading carries it';
     var at = $('ms-expect-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
     var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
@@ -13391,7 +13398,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       var h = s.honest || {}, pt = s.perTrade || {}, py = s.perYear || {}, d = s.dd || {}, sh = s.live ? '' : ' ex-shadow';
       return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
         + '<td class="ex-l ex-val" data-l="Forward so far">' + fwdCell(s) + '</td>'
-        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small>' + (s.fin && s.fin.before && num(s.fin.before.exp) ? '<small>after financing; ' + fR(s.fin.before.exp) + ' before</small>' : '') + '</td>'
+        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small>' + (s.fin && s.fin.before && num(s.fin.before.exp) ? '<small>after financing' + (s.fin.everyUnit ? ' on every unit' : '') + '; ' + fR(s.fin.before.exp) + ' before</small>' : '') + '</td>'
         + '<td class="ex-val" data-l="In a year"><b class="' + cls(py.exp) + '">' + fR(py.exp, 1) + '</b><small>' + esc(fBand(py.lo, py.hi)) + '</small></td>'
         + '<td class="ex-val" data-l="Drawdown"><b class="neg">' + esc(fDD(d.lo, d.hi)) + '</b><small>worst seen −' + esc(num(d.worst) ? (d.worst < 10 ? d.worst.toFixed(1) : d.worst.toFixed(0)) : '—') + 'R</small></td>'
         + '<td class="ex-val" data-l="Trades a year"><b>' + (num(py.trades) ? Math.round(py.trades) : '—') + '</b><small>backtest ' + fR(s.backtest && s.backtest.exp) + ' a trade</small></td>'
@@ -13406,7 +13413,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 </script>
 <style id="ms-fw-css">
 /* Forward record of the live book (#ms-fwd, 12 Nov 2026): coach.json forward (council/forward.mjs), against the forward-test protocol
-   PROPOSED in research/proposals/2026-11-12-path-to-live.md (owner decision 43, open). Systems pane, admin only; self-contained.
+   of research/proposals/2026-11-12-path-to-live.md (owner decision 43, adopted 12 Nov 2026). Systems pane, admin only; self-contained.
    Colours: the band and the record are theme tokens (accent / ink), the stop marks the sell ink; every colour has its word in the legend. */
 .c-pane > .c-fwd { grid-column: 1 / -1; min-width: 0; }
 .c-fwd .fw-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--line); font: 600 12px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-dim); white-space: nowrap; }
@@ -13452,7 +13459,8 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 <script id="ms-fw-js">
 // Forward record of the live book (12 Nov 2026): renders coach.json `forward` (council/forward.mjs, written by the Trader on the
 // decay monitor's 6-hour slot) into #ms-fwd. Reads the copy the page already loaded (window.MS_COUNCIL, event ms:council); fetches
-// nothing; changes nothing. The protocol it measures against is PROPOSED, not adopted (owner decision 43).
+// nothing; changes nothing. The protocol it measures against was adopted by the owner on 12 Nov 2026 (decision 43): a crossed stop line
+// is acted on by the Trader (council/forward.mjs stopSwitch), not by this page.
 (function (W) {
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -13503,10 +13511,10 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       + (num(r.marked) && r.marked !== r.total ? '<circle class="fw-mark" cx="' + nowX.toFixed(1) + '" cy="' + Y(r.marked).toFixed(1) + '" r="3.5"><title>With open trades marked to the price: ' + fR(r.marked) + '</title></circle>' : '')
       + '<circle class="fw-now" cx="' + nowX.toFixed(1) + '" cy="' + Y(r.total).toFixed(1) + '" r="4"><title>Forward total now: ' + fR(r.total) + '</title></circle>'
       + ticks + '</svg>';
-    host.setAttribute('aria-label', 'Forward total ' + fR(r.total) + ' after ' + (num(r.months) ? r.months.toFixed(1) : '0') + ' months, against an expected range of ' + fR(F.band && F.band.p5, 1) + ' to ' + fR(F.band && F.band.p95, 1) + ' for that time (proposed protocol, not adopted)');
+    host.setAttribute('aria-label', 'Forward total ' + fR(r.total) + ' after ' + (num(r.months) ? r.months.toFixed(1) : '0') + ' months, against an expected range of ' + fR(F.band && F.band.p5, 1) + ' to ' + fR(F.band && F.band.p95, 1) + ' for that time (protocol adopted 12 Nov 2026)');
   }
   function rows(F) {
-    var out = '<tr class="fw-sec"><td colspan="3">Stop lines (any one would send the book back to a paper shadow, if you adopt the protocol)</td></tr>';
+    var out = '<tr class="fw-sec"><td colspan="3">Stop lines (any one sends the book back to a paper shadow, by the protocol you adopted on 12 Nov 2026)</td></tr>';
     (F.stops || []).forEach(function (s) {
       var dd = function (v, d) { return num(v) ? Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '\u2014'; };
       var val = s.id === 'S1' ? 'Worst drawdown so far ' + dd(s.value) + (F.record && num(F.record.ddMarked) && F.record.ddMarked !== s.value ? ' (' + dd(F.record.ddMarked) + ' with open trades marked to the price)' : '') + '; the line: more than ' + dd(s.line, 1)
@@ -13599,7 +13607,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       return r.json();
     }).then(function (j) { if (j) render(j); }).catch(function () { sum.textContent = 'Could not be loaded: no connection.'; });
   }
-  if (document.documentElement.dataset.role === 'public') return;
+  if (document.documentElement.dataset.role === 'public' || document.documentElement.dataset.role === 'viewer') return;   // the API answers the owner and reviewers only
   load(); setInterval(function () { if (!document.hidden) load(); }, 5 * 60e3);
 })();
 </script>
@@ -13997,9 +14005,9 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     arr(co.ictWatch).filter(function (w) { return w && w.flag; }).forEach(function (w) { out.push({ k: 'ict', tone: 'you', title: w.label || 'ICT filter ' + w.value, detail: w.why || '', href: '#council/systems', act: 'Adopt the filter or leave the A-rule as it is.' }); });
     var seen = {}; arr(rc).filter(function (c) { return c && /^live/.test(c.status) && !seen[c.id] && (seen[c.id] = 1); }).forEach(function (c) { out.push({ k: 'robust', tone: c.to === 'robust' ? 'you' : 'warn', title: c.name + ': ' + c.was + ' → ' + c.to, detail: arr(c.why).join('; '), act: 'A live system’s evidence changed grade.' }); });
     // the forward record of the live book (coach.json forward, council/forward.mjs): ONE line, only when a stop line of the proposed
-    // protocol is crossed or an execution check fails (decision 43 is open: nothing was changed)
+    // protocol (adopted 12 Nov 2026, decision 43) is crossed or an execution check fails
     var FW = co.forward; if (FW && Array.isArray(FW.alerts) && FW.alerts.length) { var fs = arr(FW.stops).filter(function (x) { return x && x.state === 'crossed'; }).map(function (x) { return x.id; }), fe = arr(FW.exec && FW.exec.checks).filter(function (x) { return x && x.state === 'fail'; }).map(function (x) { return x.id; });
-      out.push({ k: 'forward', tone: 'bad', title: 'Forward book: ' + [fs.length ? 'stop line ' + fs.join(', ') + ' crossed' : '', fe.length ? 'check ' + fe.join(', ') + ' fails' : ''].filter(Boolean).join(', '), detail: FW.alerts.join(' '), href: '#council/systems', act: 'The protocol is proposed, not adopted (your decision 43): nothing was changed.' }); }
+      out.push({ k: 'forward', tone: 'bad', title: 'Forward book: ' + [fs.length ? 'stop line ' + fs.join(', ') + ' crossed' : '', fe.length ? 'check ' + fe.join(', ') + ' fails' : ''].filter(Boolean).join(', '), detail: FW.alerts.join(' '), href: '#council/systems', act: fs.length ? 'By the protocol you adopted (decision 43) the book goes back to a paper shadow; no open trade is closed. Putting it back is your decision.' : 'Reported only (protocol adopted 12 Nov 2026, decision 43): nothing was changed.' }); }
     var H = D.health; if (H && (H.status === 'bad' || H.status === 'warn')) out.push({ k: 'data', tone: H.status === 'bad' ? 'bad' : 'warn', title: 'Data feeds ' + (H.status === 'bad' ? 'bad' : 'shaky'), detail: H.summary || '', act: 'Check the Data chip on the Overview.' });
     var wp = (D.config && D.config.wouldPause) || {}, P = Object.keys(wp).filter(function (k) { var t = Date.parse(wp[k] && wp[k].at) / 1000; return num(t) && now - t <= WEEK; });
     if (P.length && D.config && D.config.noPause) out.push({ k: 'pause', tone: 'warn', title: 'The Coach would pause ' + P.length + ' setup' + (P.length > 1 ? 's or markets' : ' or market'), detail: P.map(function (k) { return k + ': ' + wp[k].why; }).join('; '), act: 'Your “No pauses” rule keeps them trading; nothing to do unless you want a pause.' });
@@ -14656,7 +14664,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips) { display: none !important; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
