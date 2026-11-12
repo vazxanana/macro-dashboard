@@ -221,11 +221,16 @@ test('the page talks to the Academy API and the candle proxy only: no broker, no
   // Browser storage (11 Nov 2026, round 2): until then the page used none at all. It now keeps two DISPLAY preferences of the
   // device (the edge used last, which parts of the decision card are open) and nothing else: one reader and one writer, both
   // refusing any key outside the list, and no caller passes them a decision, a result, a lesson or an API answer.
-  assert.equal((ui.match(/localStorage/g) || []).length, 2, 'localStorage is touched in prefGet and prefSet only');
-  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/);
+  // (11 Nov 2026: a third helper, prefDel, because the site's phone-view key means "simple" by being absent.)
+  assert.equal((ui.match(/localStorage/g) || []).length, 3, 'localStorage is touched in prefGet, prefSet and prefDel only');
+  // 11 Nov 2026, the phone's simple view: the list grew by exactly one key, `ms-phone`, the display preference the Desk, the
+  // Macro desk and ChronosTrade share ("full", or no key for the simple view).
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold', 'ms-phone'\];/);
+  assert.match(ui, /function prefDel\(k\) \{ if \(PREFS\.indexOf\(k\) < 0\) return; try \{ root\.localStorage\.removeItem\(k\); \}/);
+  assert.deepEqual([...ui.matchAll(/prefDel\(([^;]*?)\);/g)].map((m) => m[1]).filter((x) => x !== 'k'), ["'ms-phone'"], 'the one removal: the phone view going back to simple');
   assert.match(ui, /function prefGet\(k\) \{ if \(PREFS\.indexOf\(k\) < 0\) return null; try \{ return root\.localStorage\.getItem\(k\); \}/);
   assert.match(ui, /function prefSet\(k, v\) \{ if \(PREFS\.indexOf\(k\) < 0\) return; try \{ root\.localStorage\.setItem\(k, String\(v\)\.slice\(0, 400\)\); \}/);
-  assert.deepEqual([...ui.matchAll(/prefSet\(([^;]*?)\);/g)].map((m) => m[1]).filter((x) => !/^k, v$/.test(x)).sort(), ["'mxacEdge', String(id)", "'mxacFold', JSON.stringify(v)"], 'the two writes: an edge id, and the open flags of the card');
+  assert.deepEqual([...ui.matchAll(/prefSet\(([^;]*?)\);/g)].map((m) => m[1]).filter((x) => !/^k, v$/.test(x)).sort(), ["'ms-phone', 'full'", "'mxacEdge', String(id)", "'mxacFold', JSON.stringify(v)"], 'the three writes: an edge id, the open flags of the card, and the fixed word "full" for the phone view');
   for (const f of ['assets/academy-tabs.js', 'assets/academy-analyst.js']) assert.ok(!/localStorage|sessionStorage/.test(src(f)), f + ' keeps nothing in the browser');
   // POSTs are queued: the store has no compare-and-swap
   assert.match(ui, /const p = chain\.then\(run, run\); chain = p\.catch\(\(\) => \{\}\); return p;/);
@@ -619,7 +624,47 @@ test('page wiring of round 3: Session saves its place and guards a verdict, Blin
   assert.equal((blind.match(/id: 'bl-next'/g) || []).length, 2, '"Next setup" is built only where an answer is already stored (both answers shown, or the server said it had one)');
   // the lesson draft on resume: made again from stored things, never from the browser
   assert.match(ui, /S\.cur\.lesson = MXA\.lessons\.fromCorrection\(S\.cur\.first\.decision, Object\.assign\(\{\}, S\.cur\.correction, \{ sessionId: S\.sessionId \}\), f\);/);
-  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold'\];/, 'the storage allowlist did not grow');
+  assert.match(ui, /const PREFS = \['mxacEdge', 'mxacFold', 'ms-phone'\];/, 'the storage allowlist holds display preferences only (the site\'s phone view joined on 11 Nov 2026): no draft, no decision');
   assert.match(ui, /delete CACHE\.pool\[st\.edge\.id \+ '\|exam'\]; if \(!firstSave\) await keepPlace\(\);/, 'the exam list is dropped after an exam setup (it sat inside a comment in round 2)');
   assert.match(css, /\.card\.folded > :not\(\.c-h\):not\(\.fold-bar\) \{ display: none; \}/);
+});
+
+// ==== the phone's simple view (11 Nov 2026) ===================================================================================
+test('phone simple view: every rule sits inside the 640 px query under the shared simple attribute, so a wider screen and the full view read none', () => {
+  const css = src('assets/academy.css'), at = css.indexOf('/* ==== The phone\'s simple view'); assert.ok(at > 0, 'the block is there');
+  assert.ok(!css.slice(0, at).includes('data-phone'), 'nothing before the block reads the attribute');
+  const block = css.slice(at), open = block.indexOf('@media (max-width: 640px) {'); assert.ok(open > 0);
+  // outside the query: only "these are not drawn"
+  const before = block.slice(block.indexOf('*/') + 2, open).trim(); assert.equal(before, 'button.pmore, .pv { display: none; }');
+  const body = block.slice(open + '@media (max-width: 640px) {'.length, block.lastIndexOf('}'));
+  assert.equal(block.slice(block.lastIndexOf('}') + 1).trim(), '', 'the query closes the file');
+  const rules = body.replace(/\/\*[^]*?\*\//g, '').split('\n').map((l) => l.trim()).filter(Boolean); assert.ok(rules.length > 40);
+  for (const line of rules) {
+    assert.ok(!/@media/.test(line), 'no nested query');
+    // every selector of every rule on the line: the switch (.pv, offered in both phone views) or under the simple attribute
+    for (const rule of line.split('}').map((r) => r.trim()).filter(Boolean)) for (const sel of rule.slice(0, rule.indexOf('{')).split(/,(?![^(]*\))/).map((x) => x.trim())) assert.ok(/^\.pv\b/.test(sel) || sel.startsWith('html[data-phone="simple"] '), 'scoped: ' + sel);
+  }
+  assert.ok(!/animation|infinite/.test(body), 'no animation is added'); assert.ok(!/font(-size)?:[^;]*(?<![\d.])(1[01]|\d)(\.\d+)?px/.test(body), 'no text under 12 px');
+});
+
+test('phone simple view: the page sets the view before the first paint, the switch writes one of two words, and nothing is asked of the API', () => {
+  const html = src('academy.html'), ui = src('assets/academy-ui.js'), tabs = src('assets/academy-tabs.js');
+  // the site's convention (the Desk, the Macro desk, ChronosTrade): key ms-phone = "full", else simple; attribute only on a phone
+  assert.match(html, /function set\(\) \{ var full = false; try \{ full = localStorage\.getItem\('ms-phone'\) === 'full'; \} catch \(e\) \{\} if \(mq && mq\.matches && !full\) R\.dataset\.phone = 'simple'; else delete R\.dataset\.phone; \}/, 'simple on a phone unless Full was chosen; a blocked storage means simple; never set on a wider screen');
+  assert.match(html, /matchMedia\('\(max-width: 640px\)'\)/);
+  assert.ok(html.indexOf("getItem('ms-phone')") < html.indexOf('href="/assets/academy.css"'), 'set in the head, before the stylesheet paints');
+  assert.ok(!/localStorage\.(setItem|removeItem)/.test(html), 'the page head only reads: every write goes through the allowlisted helper');
+  assert.match(html, /<div class="pv" id="pv"><span id="pv-l">Phone view<\/span>.*data-pv="simple"[^>]*>Simple<\/button>.*data-pv="full"[^>]*>Full<\/button>/);
+  const block = ui.slice(ui.indexOf("// ---- the phone's simple view"), ui.indexOf('// ---- tabs ---'));
+  assert.ok(block.length > 500); assert.ok(!/api\(|api\.|fetch|decide|lessons\.|attempt/.test(block), 'the simple view calls nothing and decides nothing');
+  assert.match(block, /if \(v === 'full'\) prefSet\('ms-phone', 'full'\); else prefDel\('ms-phone'\);/);
+  assert.match(block, /const TAB_MORE = \['research', 'models', 'costs', 'audit'\];/, 'Train, Session, Blind arena, Progress and Lessons stay in the bar');
+  // nothing is removed from the page: the parts that wait are still built, only marked
+  for (const id of ['edge-info', 'lessons-box', 'resume-box', 'c-restart', 'sess-save', 'sess-resume']) assert.match(html, new RegExp('class="[^"]*\\bpm\\b[^"]*" id="' + id + '"'), id + ' waits behind a "more" button');
+  for (const id of ['htf-card', 'log-card', 'acct-card', 'thesis-card', 'exam']) assert.match(html, new RegExp('class="card[^"]*\\bpcard\\b[^"]*" id="' + id + '"'), id + ' folds to its heading');
+  for (const id of ['edge-more', 'setup-more', 'ctl-more']) assert.match(html, new RegExp('class="btn[^"]* pmore" id="' + id + '" aria-expanded="false"'));
+  assert.match(ui, /moreBtn\(box, 'm-more', /); assert.match(ui, /moreBtn\(box, 'dec-more', /);
+  assert.match(ui, /role: 'tab', id: 'tab-' \+ id, class: TAB_MORE\.indexOf\(id\) >= 0 \? 'tab-2' : null,/, 'every section keeps its tab; the seldom-used ones are only marked');
+  assert.match(tabs, /const PHONE_FOLD = \['ls-check', 'ls-drafts-card', 'pg-agree', 'pg-rvn', 'pg-mistakes', 'pg-queue', 'pg-attempts', 'rs-studies', 'rs-notebook', 'md-training'\];/);
+  assert.match(tabs, /PHONE_FOLD\.indexOf\(id\) >= 0 && K\.pfold \? K\.pfold\(c, title\) : c;/, 'a folded card is the same card, with a chevron in its heading');
 });

@@ -3100,7 +3100,8 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-now" id="ms-td-now">Loading charts…</div>
         <div class="ms-note ms-feed-wide" id="ms-feed-note"></div>
       </div>
-      <div class="ms-kv">
+      <button type="button" class="ps-only ps-fold" data-ps-for="kv" aria-expanded="false"><span>Price and key levels</span><span class="ps-f-s" id="ps-s-kv"></span></button>
+      <div class="ms-kv" data-ps="kv">
         <div><span>Spot price</span><b id="ms-td-price">—</b></div>
         <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
         <div style="display:block;border:0"><span class="lv-h">Key levels · H4 <em id="ms-lvl-count">Tap a bell to get alerted</em></span><ul class="ms-levels" id="ms-levels"></ul></div>
@@ -3122,6 +3123,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <div class="card">
       <div class="ms-k">Possible trades <span class="ms-tr-tools"><span class="seg ms-fseg" id="ms-tr-filter" role="group" aria-label="Filter trades"><button type="button" data-f="all" data-label="All">All</button><button type="button" data-f="ready" data-label="Ready">Ready</button><button type="button" data-f="main" data-label="Main">Main</button><button type="button" data-f="retrace" data-label="Retrace">Retrace</button></span><span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></span></div>
       <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
+      <button type="button" class="ps-only ps-more" id="ps-st-more" aria-controls="ms-trades" aria-expanded="false" hidden>Show all</button>
       <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn own" id="ms-log">Log selected trade</button></div>
     </div>
   </section>
@@ -3135,7 +3137,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
-      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context">More</button>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -3172,6 +3174,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <div class="card" id="ms-scan-card">
       <div class="ms-k">Scanner · all markets <span class="ms-scan-meta"><span id="ms-scan-meta">Starts after the charts load</span><button type="button" class="ms-tbtn" id="ms-scan-btn">Scan now</button></span></div>
       <div class="ms-scan" id="ms-scan"></div>
+      <button type="button" class="ps-only ps-more" id="ps-sc-more" aria-controls="ms-scan" aria-expanded="false" hidden>Show all</button>
       <div class="ms-note" style="margin-top:10px">Every market runs the same Mosha rules on D1, H4, H1, M15, M5 and M1, refreshed every 5 minutes. Tap a market to open it. With Alerts on, you're told when any market turns Ready.</div>
     </div>
   </section>
@@ -3200,17 +3203,25 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
     </div>
     <div class="c-grid c-pane c-pane-trades" id="ms-cp-trades" role="tabpanel" aria-labelledby="ms-cn-trades" data-pane="trades" hidden>
+      <div class="ps-only ps-ans ps-t-ans" id="ps-t-ans"><p class="ps-k" id="ps-t-k">Paper trades, before costs</p><h2 class="ps-a" id="ps-t-a">Loading the trades…</h2><p class="ps-a-s" id="ps-t-s"></p></div>
       <div class="card c-trader">
         <div class="ms-k"><span role="heading" aria-level="2">Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
         <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow" class="adm">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all" class="adm">Everything <small>incl. older strategies</small></button></div>
-        <p class="ms-note" id="ms-c-tabnote"></p>
-        <div class="c-kpi" id="ms-c-kpi"></div>
-        <div class="c-eq" id="ms-c-eq"></div>
+        <button type="button" class="ps-only ps-fold" data-ps-for="tnum" aria-expanded="false"><span>Numbers and curve</span><span class="ps-f-s" id="ps-s-tnum"></span></button>
+        <p class="ms-note" id="ms-c-tabnote" data-ps="tnum"></p>
+        <div class="c-kpi" id="ms-c-kpi" data-ps="tnum"></div>
+        <div class="c-eq" id="ms-c-eq" data-ps="tnum"></div>
         <div class="ms-bt-wrap t-scroll"><table class="ms-bt-t c-t"><thead><tr><th>Opened <small id="ms-c-tz"></small></th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
+        <button type="button" class="ps-only ps-more" id="ps-tr-more" aria-controls="ms-c-trades" aria-expanded="false" hidden>Show all</button>
       </div>
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
+      <div class="card adm" id="ms-sys-book">
+        <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): the two that stay live are the nearest, not proven.</p>
+        <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
+      </div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
@@ -3219,7 +3230,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
       </div>
       <div class="card c-nq adm">
-        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · our system (paper)</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · paper shadow since 11 Nov (our system before)</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
           <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
@@ -3229,7 +3240,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
       <div class="card c-rep adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · trades only when gold is volatile</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · paper shadow since 11 Nov · trades only when gold is volatile</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (judged on 2023 onwards): at +1.5R a second unit is added with its stop at the first entry (since 6 Nov; the 5 Nov replay quoted above added at +2R; it shows as a separate “Replica add” trade, counted as 2R of risk); at +2R the stop moves to breakeven; after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
           <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
@@ -3254,6 +3265,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
     </div>
     <div class="c-grid c-pane c-pane-review adm" id="ms-cp-review" role="tabpanel" aria-labelledby="ms-cn-review" data-pane="review" hidden>
+      <div class="ps-only ps-ans ps-r-ans adm" id="ps-r-ans"><p class="ps-k">Loss review · the last 24 hours</p><h2 class="ps-a" id="ps-r-a">Loading the losses…</h2><p class="ps-a-s" id="ps-r-s"></p><button type="button" class="ps-only ps-more" id="ps-r-todo" aria-pressed="false" hidden>Show only the ones to review</button></div>
       <div class="card adm c-loss" id="ms-loss">
         <div class="ms-k"><span role="heading" aria-level="2">Loss review · why the setup failed</span></div>
         <p class="ms-note">Every losing trade, stacked by the strategy that took it (worst first). Open one, draw on its chart, tick the reasons and write why it failed. The council counts your reasons with its own trade reviews (stop hunt, stop too tight, late entry and news change its rules directly) and tests the rule ideas you write.</p>
@@ -3282,13 +3294,13 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
         <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
-        <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
+        <p class="ms-note dc-foot">Each system's record after costs (<span id="ms-decay-fin">overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge</span>) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
       <div class="card c-expect adm" id="ms-expect">
         <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
         <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
         <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs, on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
       </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
@@ -3353,7 +3365,8 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <p class="md-foot" id="ms-md-dxy"></p>
           <p class="md-foot md-score" id="ms-md-score"></p>
           <!-- Macro veteran (8 Nov 2026, owner): council/veteran.mjs discusses the strategist's view topic by topic; macro/veteran.json -->
-          <section class="md-vet" id="ms-md-vet" aria-labelledby="ms-md-vet-t" hidden>
+          <button type="button" class="ps-only ps-fold ps-two" data-ps-for="vet" aria-expanded="false"><span>Macro veteran · the discussion</span><span class="ps-f-s" id="ps-s-vet"></span></button>
+          <section class="md-vet" id="ms-md-vet" aria-labelledby="ms-md-vet-t" data-ps="vet" hidden>
             <h3 id="ms-md-vet-t">Macro veteran · the discussion <small id="ms-md-vet-at"></small></h3>
             <p class="md-vet-verdict" id="ms-md-vet-verdict"></p>
             <ul class="md-vet-list" id="ms-md-vet-list"></ul>
@@ -3412,7 +3425,9 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </div>
         <ul class="wk-pills" id="ms-wk-pills" aria-label="Status"></ul>
       </header>
-      <div class="wk-tiles" id="ms-wk-tiles" aria-label="The week in numbers"></div>
+      <div class="ps-only ps-ans ps-w-ans" id="ps-w-ans"><p class="ps-k" id="ps-w-k">Paper results, after costs</p><h2 class="ps-a" id="ps-w-a">Loading the week…</h2><p class="ps-a-s" id="ps-w-s"></p></div>
+      <button type="button" class="ps-only ps-fold" data-ps-for="wnum" aria-expanded="false"><span>The week in numbers</span><span class="ps-f-s" id="ps-s-wnum"></span></button>
+      <div class="wk-tiles" id="ms-wk-tiles" aria-label="The week in numbers" data-ps="wnum"></div>
       <div class="wk-col">
         <div class="card wk-pnl">
           <div class="ms-k"><span role="heading" aria-level="3">Paper P&amp;L by system · after costs</span></div>
@@ -6845,6 +6860,7 @@ function msNextSetup(bars, A) {
       const m1 = panes['1m']; if (m1 && m1.bars) topDown();
     }
     renderCouncil();
+    try { if (window.MS_BOOK_NOW) window.MS_BOOK_NOW(COUNCIL.coach, COUNCIL.config); } catch (e) {}   // a 6-hourly reading older than the owner's live / shadow decision follows it at once (display only)
     try { window.MS_COUNCIL = COUNCIL; document.dispatchEvent(new CustomEvent('ms:council')); } catch (e) {}   // edge scoreboard (#ms-sb) reads the same copy
   }
   // the Data chip's per-market list (renderCouncil re-draws the status line on every load, so the open state lives in COUNCIL.dhOpen)
@@ -7573,6 +7589,7 @@ function msNextSetup(bars, A) {
     set('ms-c-trades', tableList.length ? tableList.slice(0, LIM).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)} <small>${esc(x.pair)}</small>`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${PUB ? '' : esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${x.paper && !x.replay ? 'Paper · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss' || x.status === 'be') ? ` ${rTxt(x.R)}` : ''}${liveR(x)}${pmChip(x)}${x.shadow && x.blockedBy && x.blockedBy.length ? ` <small>${esc(x.blockedBy.join(', '))}</small>` : ''}${tab === 'journal' && x.exit ? ` <small>${esc(x.exit)}</small>` : ''}</td></tr>`).join('')
         + (tableList.length > LIM ? `<tr class="more"><td colspan="8"><button type="button" class="ms-tbtn c-more" id="ms-c-more">Show more (${tableList.length - LIM} left of ${tableList.length})</button></td></tr>` : '')
       : `<tr><td colspan="8" class="empty">${tab === 'shadow' ? 'No shadow trade yet.' : tab === 'journal' ? 'No closed system trade yet.' : `No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.`}</td></tr>`);
+    if (!PUB) { try { window.MS_TRADES = { tab, open: open.length, fwd: SP.fwd, rp: SP.rp, rows: tableList.length }; document.dispatchEvent(new CustomEvent('ms:trades')); } catch (e) {} }   // the simple phone view's one sentence (#ms-ps-js)
     });
     // Trade reviews: every loss studied — our system's error, or just the market?
     paneDo('review', () => {
@@ -12372,11 +12389,23 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast && !c.goldTrendFastShadow; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
   var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
   var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;
+  // supported-book (owner, 11 Nov 2026): config.ownerShadow[k] = unix time from which the system's new trades are paper shadows
+  var OWNER_SH = function (c, k) { var o = c && c.ownerShadow; return o && o[k] ? +o[k] || 1 : 0; };
+  var shWhy = function (t) { return 'paper shadow by the owner' + (t > 1 ? ' since ' + new Date(t * 1000).toISOString().slice(0, 10) : '') + ': same rule, recorded, never alerted; its earlier live trades stay in its record'; };
   var num = function (v) { return typeof v === 'number' && isFinite(v); };
   var closedSt = function (s) { return s === 'win' || s === 'loss' || s === 'be'; };
   var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); };
   var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+  // Overnight financing of a system replay row (11 Nov 2026, owner approved the cost): the replay's R is after the spread only, so a
+  // gold buy also pays what the Trader charges a closed trade (council/fills.mjs nights / financing / rowFinancing, mirrored here;
+  // tests/scoreboard.test.mjs compares the two), at the rate the Trader publishes in snapshot.costs.financing.perNight. With no
+  // rate on file (an older snapshot) nothing is charged and the row does not say "after financing". A row with a stamped cost: 0.
+  var nightsOf = function (t, c) { var n = 0, d, w; if (!num(t) || !num(c)) return 0;
+    for (d = Math.floor(t / 86400) * 86400 + 79200; d < c; d += 86400) { if (d <= t) continue; w = new Date(d * 1000).getUTCDay(); if (w >= 1 && w <= 5) n += w === 3 ? 3 : 1; } return n; };
+  var finOf = function (x, rates) { var rate = rates && x && x.side !== 'sell' ? +rates[x.market] : 0; if (!(rate > 0) || num(x.Rnet) || num(x.costR)) return 0;
+    var r0 = +x.r0 || Math.abs(x.entry - (x.stop0 != null ? x.stop0 : x.stop)), nn = nightsOf(x.filled != null ? x.filled : x.opened, x.closed);
+    return nn > 0 && x.entry > 0 && r0 > 0 ? nn * rate * x.entry / r0 * (x.rawR != null && x.size ? x.size : 1) : 0; };
   // one closed trade as a curve point: R after costs where recorded (Rnet), plus what the equity-curve tooltip shows (#ms-eq-js)
   var tp = function (x, t) { var o = { t: t, R: num(x.Rnet) ? +x.Rnet : +x.R, g: +x.R, m: x.short || x.label || x.market, sd: x.side, st: x.status, o: x.opened };
     if (num(x.costR)) o.c = x.costR; if (x.shadow) o.sh = 1; if (x.grade && x.grade.letter) o.gr = x.grade.letter; if (x.id != null) o.id = String(x.id); return o; };   // id: the readout opens the trade (#ms-trv-js)
@@ -12509,6 +12538,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var RP = D.replay && Array.isArray(D.replay.trades) ? D.replay.trades.filter(function (x) { return x.k !== 'nq-open' || x.session === 'nyflip'; }) : [];
     RP.forEach(function (x) { if (x && x.k && !names[x.k]) names[x.k] = x.name || x.k; });
     var status = function (k) {
+      if ((SYS_K.indexOf(k) >= 0 || k === 'nq-open') && OWNER_SH(cfg, k)) return ['shadow', shWhy(OWNER_SH(cfg, k))];
       if (SYS_K.indexOf(k) >= 0) return SYS_ON[k] && !SYS_ON[k](cfg) ? ['failed', 'switched off in the council config'] : ['live', 'main system, trades live on paper'];
       if (k === 'nq-open') return ['live', 'main system (NQ New York open run), forward paper'];
       var f = F[k] || {};
@@ -12522,6 +12552,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       var P = props.filter(function (p) { return p.setup === k && ASK.test(p.kind); });
       if (P.length) return { n: P.length, text: P.map(function (p) { return cap(p.label || p.kind); }).join(' · '), href: '#council/systems' };
       if (st === 'failed') return { text: 'Nothing · switched off' };
+      if (st === 'shadow' && (SYS_K.indexOf(k) >= 0 || k === 'nq-open')) return { text: 'Nothing · you moved it to shadow; its forward record decides' };
       if (st === 'live') return { text: SYS_K.indexOf(k) >= 0 || k === 'nq-open' ? 'Nothing pending' : 'Nothing pending · the guard moves it back at −0.30R a trade over 20+' };
       return { text: 'Nothing yet · the Coach proposes a live slot at 100+ replay trades, +0.10R a trade, both halves up', shadow: 1 };
     };
@@ -12543,12 +12574,13 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       var BG = {}; BR.forEach(function (t) { (BG[t.setup] = BG[t.setup] || []).push(t); });
       Object.keys(BG).forEach(function (k) {
         var f = F[k] || {}, A = f.off ? BG[k] : BG[k].filter(function (t) { return passesLive(t, f); });
-        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { return { t: t.opened, R: t.R_none - (+t.cost || 0), g: t.R_none, c: +t.cost || 0, m: t.market, sd: t.side, st: t.R_none > 0 ? 'win' : t.R_none < 0 ? 'loss' : 'be' }; }));
+        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { var c = (+t.cost || 0) + (+t.fin || 0); return { t: t.opened, R: t.R_none - c, g: t.R_none, c: c, m: t.market, sd: t.side, st: t.R_none > 0 ? 'win' : t.R_none < 0 ? 'loss' : 'be' }; }));   // fin: the replay's own financing column (gold buys held over a rollover), absent in an older file
       });
     }
     // system replays (research/replay-2w.json): the main systems over years of history
-    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; (RG[x.k] = RG[x.k] || []).push(tp(x, x.closed)); });
-    Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : ''), 'sysreplay', RG[k]); });
+    var FR = D.snapshot && D.snapshot.costs && D.snapshot.costs.financing && D.snapshot.costs.financing.perNight || null, RF = {};
+    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; var p = tp(x, x.closed), f = finOf(x, FR); if (f > 0) { p.R -= f; p.c = (p.c || 0) + f; RF[x.k] = 1; } (RG[x.k] = RG[x.k] || []).push(p); });
+    Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : '') + (RF[k] ? ', after financing' : ''), 'sysreplay', RG[k]); });
 
     // ICT desk
     var IR = D.ictReplay || {}, IT = Array.isArray(D.ictTrades) ? D.ictTrades : [], IS = D.ictShadow || {};
@@ -12607,7 +12639,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   }
   // the approvals waiting for the owner (all Coach proposals that need an OK)
   function waiting(coach) { return (coach && Array.isArray(coach.proposals) ? coach.proposals : []).filter(function (p) { return ASK.test(p.kind); }); }
-  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, shown: shown, FWD_MIN: FWD_MIN, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting };
+  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, shown: shown, FWD_MIN: FWD_MIN, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting, nightsOf: nightsOf, finOf: finOf };
   W.MS_SB = API;
   if (typeof document === 'undefined' || !document.getElementById) return;
 
@@ -12634,7 +12666,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     if (!visible() || !W.MS_COUNCIL || !W.MS_COUNCIL.at) return;
     loadExtra().then(function (x) {
       var C = W.MS_COUNCIL;
-      SB.rows = build({ trades: C.trades, config: C.config, coach: C.coach, backtest: C.backtest, replay: C.replay, mirror: C.mirror, ictReplay: x.ictReplay, ictTrades: x.ictTrades, ictShadow: x.ictShadow, robust: x.robust, macro: x.macro, now: Date.now() / 1000 });
+      SB.rows = build({ trades: C.trades, config: C.config, coach: C.coach, backtest: C.backtest, replay: C.replay, snapshot: C.snap, mirror: C.mirror, ictReplay: x.ictReplay, ictTrades: x.ictTrades, ictShadow: x.ictShadow, robust: x.robust, macro: x.macro, now: Date.now() / 1000 });
       SB.hasRobust = !!x.robust; SB.coach = C.coach; SB.at = [C.backtest && C.backtest.at, x.ictReplay && x.ictReplay.at].filter(Boolean);
       render();
     });
@@ -13120,23 +13152,44 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     return { live: live, decaying: live.filter(is('decaying')), watch: live.filter(is('watch')), healthy: live.filter(is('healthy')), few: live.filter(function (s) { return s.few; }),
       shadowFlag: (S || []).filter(function (s) { return s && !s.live && !s.few && (s.status === 'decaying' || s.status === 'watch'); }) }; }
   W.MS_DECAY_TALLY = tally;
+  // Which systems are live NOW (11 Nov 2026). coach.json `decay` and `expect` are rebuilt every 6 hours, so for up to 6 hours after
+  // an owner's supported-book decision they still carry the old live flags ("8 live systems" beside a card that names two).
+  // The Trader's config says what is true at once: a system listed in config.ownerShadow is a paper shadow from that time. This
+  // marks such a row in the page's own copy (live false, shadowSince, bookLate) and counts them; a reading built after the
+  // decision already says so and is left alone. Display only: nothing is written anywhere. Idempotent.
+  function bookNow(coach, config) {
+    var o = config && config.ownerShadow, n = 0; if (!coach || !o || typeof o !== 'object') return 0;
+    [coach.decay, coach.expect].forEach(function (B) { if (!B || !Array.isArray(B.systems)) return; var k = 0;
+      B.systems.forEach(function (s) { if (!s || !o[s.id]) return; if (s.bookLate) { k++; return; } if (s.live !== true) return;
+        s.live = false; s.bookLate = true; k++; var t = +o[s.id]; if (t > 1e9 && !s.shadowSince) s.shadowSince = new Date(t * 1000).toISOString().slice(0, 10); });
+      B.bookLate = k; n += k; });
+    return n;
+  }
+  W.MS_BOOK_NOW = bookNow;
+  var LATE = ' This reading was made before your decision on which systems trade live; the list here already follows that decision, and the next reading (within 6 hours) is built on it.';
+  W.MS_BOOK_LATE = LATE;
   function render() {
     var body = $('ms-decay-b'), sum = $('ms-decay-sum'); if (!body || !sum) return;
-    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.decay;
+    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.decay; if (C) bookNow(C.coach, C.config);
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'Edge-decay monitor: ' + D.error : 'No edge-decay reading yet: the Coach writes one every 6 hours.'; body.innerHTML = ''; return; }
     var S = D.systems, T = tally(S), dec = T.decaying, wat = T.watch;
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
+    // a shadow system says since when (shadowSince, council/decay.mjs): its earlier live trades are still in its record
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     // the sentence counts what the rows say: a system with too few trades to judge is not "healthy", and a shadow system
     // the monitor calls decaying or on watch is named too (11 Nov: "8 healthy" stood over a "Too few" row and a "Decaying" one)
     sum.innerHTML = '<b>' + T.live.length + '</b> live systems: <b class="' + (dec.length ? 'neg' : '') + '">' + dec.length + ' decaying</b>' + names(dec) + ', ' + wat.length + ' on watch' + names(wat)
       + ', ' + T.healthy.length + ' healthy' + (T.few.length ? ', ' + T.few.length + ' with too few trades to judge' + names(T.few) : '') + '.'
       + (T.shadowFlag.length ? ' Shadow, not traded live: ' + T.shadowFlag.map(function (s) { return esc(s.name) + ' ' + esc(s.status === 'watch' ? 'on watch' : s.status); }).join(', ') + '.' : '')
-      + ' Status only: nothing here changes a rule.';
+      + ' Status only: nothing here changes a rule.' + (D.bookLate ? esc(LATE) : '');
+    // the footnote says whether THIS reading's backtests carry overnight financing (decay.financing, from the baseline file)
+    var ff = $('ms-decay-fin'); if (ff) ff.textContent = D.financing ? 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge'
+      : 'overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026; the backtests of this reading do not carry it yet, the next reading does';
     var at = $('ms-decay-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
     body.innerHTML = S.slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ((ORDER[a.status] || 0) - (ORDER[b.status] || 0)); }).map(function (s) {
       var st = s.few ? 'few' : s.status, r = s.roll || {}, c = s.cusRef || {}, z = s.cusZero || {}, d = s.dd || {};
       var rec = (s.nLive || 0) + ' forward' + (s.nReplay ? ' + ' + s.nReplay + ' replay' : '') + (s.nHist ? ' + ' + s.nHist + ' rebuild' : '');
-      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
+      return '<tr class="' + (s.live ? '' : 'dc-shadow') + '"><td class="dc-l dc-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · backtest ' + fR(s.ref) + ' a trade</small></td>'
         + '<td class="dc-l"><span class="dc-st st-' + esc(st) + '">' + (s.few ? 'Too few' : LBL[s.status] || esc(s.status)) + '</span></td>'
         + '<td>' + (r.n ? cR(r.exp) + ' <small class="dc-n">(' + r.n + ')</small>' : '<small class="dc-n">—</small>') + '</td>'
         + '<td>' + meter(c.s, c.h) + '</td><td>' + esc(num(z.s) ? z.s : '—') + '</td>'
@@ -13212,21 +13265,25 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   }
   function render() {
     var body = $('ms-expect-b'), sum = $('ms-expect-sum'); if (!body || !sum) return;
-    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.expect;
+    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.expect; if (C && W.MS_BOOK_NOW) W.MS_BOOK_NOW(C.coach, C.config);
     if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'What to expect: ' + D.error : 'No expectations yet: the Coach writes them every 6 hours with the edge-decay reading.'; body.innerHTML = ''; return; }
     var S = D.systems.filter(function (s) { return s && !s.error; }), live = S.filter(function (s) { return s.live; });
     var posEdge = live.filter(function (s) { return s.perTrade && s.perTrade.lo > 0; }), judged = live.filter(function (s) { return s.forward && s.forward.judged; });
     var above = judged.filter(function (s) { return s.forward.out === 'above'; }), below = judged.filter(function (s) { return s.forward.out === 'below'; });
     var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
     sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
-      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.';
+      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.' + (D.bookLate ? esc(W.MS_BOOK_LATE || '') : '');
+    // the footnote says whether THIS reading is after overnight financing (a system's `fin`); one made before 11 Nov's change is not
+    var ff = $('ms-expect-fin'); if (ff) ff.textContent = S.some(function (s) { return s.fin; }) ? 'since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker\u2019s rate of that day: a system\u2019s Per trade cell says so and gives the figure before it'
+      : 'this reading was made before overnight financing was counted (11 Nov 2026): its figures are before financing, the next reading carries it';
     var at = $('ms-expect-at'); if (at && D.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(D.at, 6) : new Date(D.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
+    var since = function (s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.shadowSince || ''); return m ? ' since ' + (+m[3]) + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m[2] - 1] : ''; };
     var ORD = function (s) { return !s.live ? 3 : s.forward && s.forward.out === 'below' ? 0 : s.forward && s.forward.out === 'above' ? 1 : 2; };
     body.innerHTML = S.slice().sort(function (a, b) { return ORD(a) - ORD(b); }).map(function (s) {
       var h = s.honest || {}, pt = s.perTrade || {}, py = s.perYear || {}, d = s.dd || {}, sh = s.live ? '' : ' ex-shadow';
-      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
+      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow' + since(s)) + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
         + '<td class="ex-l ex-val" data-l="Forward so far">' + fwdCell(s) + '</td>'
-        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small></td>'
+        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small>' + (s.fin && s.fin.before && num(s.fin.before.exp) ? '<small>after financing; ' + fR(s.fin.before.exp) + ' before</small>' : '') + '</td>'
         + '<td class="ex-val" data-l="In a year"><b class="' + cls(py.exp) + '">' + fR(py.exp, 1) + '</b><small>' + esc(fBand(py.lo, py.hi)) + '</small></td>'
         + '<td class="ex-val" data-l="Drawdown"><b class="neg">' + esc(fDD(d.lo, d.hi)) + '</b><small>worst seen −' + esc(num(d.worst) ? (d.worst < 10 ? d.worst.toFixed(1) : d.worst.toFixed(0)) : '—') + 'R</small></td>'
         + '<td class="ex-val" data-l="Trades a year"><b>' + (num(py.trades) ? Math.round(py.trades) : '—') + '</b><small>backtest ' + fR(s.backtest && s.backtest.exp) + ' a trade</small></td>'
@@ -13745,6 +13802,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       + tile('ICT desk A-setups, net', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
       + tile('Shadow book, net', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
       + tile('Rule changes', String(nR.length), nR.length ? 'you ' + cnt.you + ' · Coach ' + cnt.coach + (cnt.fix ? ' · fixes ' + cnt.fix : '') : 'none this week', false);
+    try { var pk = function (t) { return { n: t.n, net: t.n ? t.net : 0, w: t.w, l: t.l, rp: t.rp || 0 }; }; W.MS_WEEK_NOW = { title: $('ms-wk-title').textContent, live: pk(t1), ict: pk(t2), shadow: pk(t3), rules: nR.length }; document.dispatchEvent(new CustomEvent('ms:week')); } catch (e) {}   // the simple phone view's one sentence (#ms-ps-js)
   }
 
   // ─── P&L by system ───
@@ -13771,7 +13829,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
         + '<span class="wk-val">' + fR(r.net) + (r.ck ? '' : '<small>gross</small>') + '</span></button>' + x + '</li>';
     }).join('');
     $('ms-wk-tot').innerHTML = GL[st.g] + ' total after costs <b class="' + (bk.net > 0.004 ? 'pos' : bk.net < -0.004 ? 'neg' : '') + '">' + fR(bk.net) + '</b> over ' + plural(bk.n, 'trade') + ' (' + bk.w + ' won, ' + bk.l + ' lost; gross ' + fR(bk.R) + ').';
-    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
+    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade, and overnight financing on gold buys closed since 11 Nov 2026' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
   }
 
   // ─── best and worst ───
@@ -13820,6 +13878,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   // ─── now: decisions, open positions, edge decay, robustness ───
   function renderDec(D, rc, now) {
     var L = decisions(D, now, rc);
+    try { W.MS_WEEK_DEC = L.length; document.dispatchEvent(new CustomEvent('ms:week')); } catch (e) {}
     if (!L.length) { $('ms-wk-dec').innerHTML = '<p class="wk-clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>Nothing waiting on you.</p>'; return; }
     $('ms-wk-dec').innerHTML = '<ul class="wk-list">' + L.map(function (d, i) {
       var id = 'ms-wk-d-' + i, k = 'd:' + d.k + ':' + d.title.slice(0, 40), open = !!st.open[k];
@@ -14288,6 +14347,62 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   html[data-phone="simple"] #ms-active-card .ps-more { width: 100%; border: 0; border-top: 1px solid var(--line-soft, var(--line)); background: none; cursor: pointer; padding: 0 4px; }
   html[data-phone="simple"] .ps-only.ps-more:not([hidden]) { display: flex; }
 
+  /* A desk a member lands on (ICT, Mosha): the script that folds its cards runs after the first paint of a page this long, so the
+     cards were drawn open and folded a moment later. Until the script has run (html[data-ps-ready]) this rule holds back the
+     same cards the script folds; the script then takes over (rows, open state). */
+  html[data-phone="simple"]:not([data-ps-ready]) #v-ict .card.ict-card:not(.ict-open-c):not(#ict-sig) { display: none !important; }
+  html[data-phone="simple"]:not([data-ps-ready]) #v-mosha .card:not(#mo-teach):not(#mo-lessons):not(#mo-todo):not(#mo-rec) { display: none !important; }
+  html[data-phone="simple"][data-mosha="teach"]:not([data-role="owner"]):not([data-ps-ready]) #mo-rec { display: none !important; }
+
+  /* ── second pass (11 Nov, owner: "Need more"): Charts, the other Council panes, Setup, Scanner and the remaining desks ── */
+  /* a fold row with two lines: the card's heading, under it one line of what the card holds */
+  html[data-phone="simple"] :is(#v-council, #v-setup, #v-gold, #v-lit, #v-crypto) .ps-fold { grid-column: 1 / -1; }
+  .ps-fold.ps-two { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; min-height: 60px; padding: 10px 2px; }
+  .ps-fold.ps-two > span:first-child { white-space: normal; }
+  .ps-fold.ps-two .ps-f-s { grid-column: 1; grid-row: 2; text-align: left; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.4; }
+  .ps-fold.ps-two .ps-f-s:empty { display: none; }
+  .ps-fold.ps-two::after { grid-column: 2; grid-row: 1 / span 2; }
+  .ps-fold.ps-two[aria-expanded="true"] .ps-f-s { display: none; }
+  html[data-phone="simple"] :is(#ms-cp-trades, #v-scanner, #v-setup, #ps-r-ans) .ps-more { width: 100%; border: 0; border-top: 1px solid var(--line-soft, var(--line)); background: none; cursor: pointer; padding: 0 4px; }
+  html[data-phone="simple"] #v-council .c-head .h-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* Charts: the chart owns the first screen. Row 1 the markets and "More", row 2 the timeframes; markup, indicators and the
+     market context sit behind "More" (nothing is switched off: the markup chosen stays on the chart and is named on the button) */
+  html[data-role="public"] .ps-cmore { display: none !important; }   /* guests: their chart page is unchanged */
+  .ps-cmore { align-items: center; gap: 7px; min-height: 44px; min-width: 44px; margin: 0; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); font: 600 13px var(--sans); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ps-cmore::after { content: ""; width: 7px; height: 7px; margin-bottom: 3px; border-right: 2px solid var(--ink-dim); border-bottom: 2px solid var(--ink-dim); transform: rotate(45deg); }
+  .ps-cmore[aria-expanded="true"]::after { transform: rotate(225deg); margin-bottom: -3px; }
+  .ps-cmore:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  html[data-phone="simple"][data-mk="ict"] .ps-cmore::before { content: "ICT ·"; color: var(--ink-dim); font-weight: 500; }
+  html[data-phone="simple"][data-mk="clean"] .ps-cmore::before { content: "Clean ·"; color: var(--ink-dim); font-weight: 500; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips) { display: none !important; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
+
+  /* Council → Trades: the forward record in one sentence, then the latest five rows */
+  .ps-t-ans { padding: 2px 2px 0; min-height: 0; }
+  html[data-phone="simple"] #ms-cp-trades .c-trader:not([data-ps-all]) #ms-c-trades > tr:nth-child(n+6) { display: none; }
+  /* Council → Review: what is not reviewed yet */
+  .ps-r-ans { padding: 2px 2px 0; min-height: 0; }
+  .ps-r-ans .ps-more { margin-top: 10px; }
+  /* Council → This week: the net in words, what waits on the owner, then everything else one row each */
+  .ps-w-ans { padding: 2px 2px 0; min-height: 0; }
+  html[data-phone="simple"] #ms-cp-week .wk-col { display: contents; }
+  html[data-phone="simple"] #ms-cp-week > .wk-head { order: -4; }
+  html[data-phone="simple"] #ps-w-ans { order: -3; }
+  html[data-phone="simple"] #ms-cp-week .wk-dec { order: -2; }
+  html[data-phone="simple"] #ms-cp-week .wk-pills { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+  html[data-phone="simple"] #ms-cp-week .wk-pills > li { flex: none; }
+  /* Council → Systems: which systems trade live stays open and first */
+  html[data-phone="simple"] #ms-sys-book { order: -1; }
+  /* Setup: the first three possible trades */
+  html[data-phone="simple"] #v-setup .card:not([data-ps-all]) #ms-trades > .ms-trade:nth-child(n+4) { display: none; }
+  /* Scanner: the first four markets (the ready ones are sorted first) */
+  html[data-phone="simple"] #ms-scan-card:not([data-ps-all]) #ms-scan > a:nth-child(n+5) { display: none; }
+
   @media (prefers-reduced-motion: reduce) { .ps-fold::after { transition: none; } }
 }
 </style>
@@ -14297,6 +14412,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
 // and fetches nothing. Display only. Pure pieces on window.MS_PS for tests/qa-sweep.test.mjs.
 (function () {
   var R = document.documentElement, $ = function (id) { return document.getElementById(id); };
+  R.dataset.psReady = '1';   // from here the script folds the desk cards itself (#ms-ps-css held them back until now)
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var rT = function (v) { return typeof v === 'number' && isFinite(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(2) + 'R' : '—'; };
   var cls = function (v) { return v > 0.004 ? 'pos' : v < -0.004 ? 'neg' : ''; };
@@ -14329,7 +14445,39 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
     if (losses > 0) L.push(losses === 1 ? '1 loss to review' : losses + ' losses to review');
     return L;
   }
-  window.MS_PS = { answer: answer, openRows: openRows, rowHTML: rowHTML, needs: needs, rT: rT };
+  // ── second pass: the Council's other panes. Each answer is one sentence from sums the pane already worked out ──
+  // Trades: the forward paper record of the tab on screen; the backtest replay is its own sentence, never one figure with it
+  var TABS = { live: 'Live · our system', shadow: 'Shadow · setups a rule blocked', journal: 'Journal · closed system trades', all: 'All trades' };
+  function tradesAnswer(T) {
+    if (!T || !T.fwd) return null; var f = T.fwd, r = T.rp || { n: 0 }, o = T.open || 0;
+    return { k: (TABS[T.tab] || TABS.live) + ' · paper, before costs',
+      head: f.n ? 'Forward record: <b class="' + cls(f.R) + '">' + rT(f.R) + '</b><small>on ' + pl(f.n, 'closed trade') + ' · ' + f.w + ' won</small>' : 'No forward trade closed yet',
+      sub: (o ? pl(o, 'trade') + ' open or waiting for ' + (o === 1 ? 'its' : 'their') + ' entry. ' : '') + (r.n ? 'Backtest replay, not traded and kept apart: <b class="' + cls(r.R) + '">' + rT(r.R) + '</b> over ' + pl(r.n, 'trade') + '.' : ''),
+      fold: f.n ? Math.round(f.w / f.n * 100) + '% won, ' + f.w + ' of ' + f.n : '' };
+  }
+  // This week: Meridian live after costs; the ICT desk is a separate edge and gets its own sentence; then what waits
+  function weekAnswer(N, dec) {
+    if (!N || !N.live) return null; var a = N.live, i = N.ict || { n: 0 }, sh = N.shadow || { n: 0, net: 0 };
+    return { k: (N.title || 'This week') + ' · paper, after costs',
+      head: a.n ? 'Meridian live: <b class="' + cls(a.net) + '">' + rT(a.net) + '</b><small>on ' + pl(a.n, 'closed trade') + ' · ' + a.w + ' won, ' + a.l + ' lost</small>' : 'No Meridian live trade closed',
+      sub: 'ICT desk A-setups, a separate edge: ' + (i.n ? '<b class="' + cls(i.net) + '">' + rT(i.net) + '</b> on ' + pl(i.n, 'trade') + (i.rp ? (i.rp === i.n ? ', all from the desk replay' : ', ' + i.rp + ' from the desk replay') : '') : 'none closed') + '.'
+        + (dec == null ? '' : '<span class="ps-a-f">' + (dec ? (dec === 1 ? '1 decision waits' : dec + ' decisions wait') + ' on you, listed below.' : 'Nothing waits on you.') + '</span>'),
+      fold: (sh.n ? 'shadow book ' + rT(sh.net) : 'no shadow trade closed') + ' · ' + pl(N.rules || 0, 'rule change') };
+  }
+  // Review: the losses of the last 24 hours nobody reviewed yet (the Review tab's own count: live and shadow paper trades)
+  function reviewAnswer(n) {
+    return { head: n ? '<b>' + n + '</b> ' + (n === 1 ? 'loss' : 'losses') + ' to review<small>closed in the last 24 hours, live and shadow paper trades together</small>' : 'No new loss to review<small>none closed in the last 24 hours without a review</small>',
+      sub: 'Open a strategy below, then a trade, and say why it failed.' };
+  }
+  // a folded card's row: its heading up to the first " · ", and one line of what it holds (the rest of the heading, or the
+  // first sentence of the card's own summary once it is drawn)
+  function rowText(head, small, live) {
+    var t = String(head || '').replace(/\s+/g, ' ').trim(), s = String(small || '').replace(/\s+/g, ' ').trim(), k = t.indexOf(' · ');
+    if (k > 0) { if (!s) s = t.slice(k + 3); t = t.slice(0, k); }
+    var l = String(live || '').replace(/\s+/g, ' ').trim(); if (l && !/^(Loading|Waiting)\b/.test(l)) s = l.split(/(?<=[.!?])\s/)[0];
+    return { t: t.replace(/[·:\s]+$/, '').slice(0, 64), s: s.replace(/^[·\s]+/, '').slice(0, 150) };
+  }
+  window.MS_PS = { answer: answer, openRows: openRows, rowHTML: rowHTML, needs: needs, rT: rT, tradesAnswer: tradesAnswer, weekAnswer: weekAnswer, reviewAnswer: reviewAnswer, rowText: rowText };
 
   var set = function (id, html) { var e = $(id); if (e && e._h !== html) { e._h = html; e.innerHTML = html; } return e; };
   function drawToday() {
@@ -14371,18 +14519,25 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
     var S = { 'ps-s-mk': mkT, 'ps-s-setup': tx('h-head'), 'ps-s-ring': tx('h-ring-n'), 'ps-s-ready': tx('h-ready') };
     for (var id in S) { var e = $(id); if (e && S[id] && e.textContent !== S[id]) e.textContent = S[id]; }
     // a fold row follows its section: no row for a section the page keeps hidden (no data yet, not on this site)
-    [].forEach.call(document.querySelectorAll('.ps-fold[data-ps-for]'), function (b) { var t = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (t) { if (!t.id) t.id = 'ps-t-' + b.dataset.psFor; b.setAttribute('aria-controls', t.id); if (b.hidden !== t.hidden) b.hidden = t.hidden; } });
+    [].forEach.call(document.querySelectorAll('.ps-fold[data-ps-for]'), function (b) { var t = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (t) { if (!t.id) t.id = 'ps-t-' + b.dataset.psFor; b.setAttribute('aria-controls', t.id); if (b.hidden !== t.hidden) b.hidden = t.hidden; if (obs && !t._pso && !b.classList.contains('ps-dyn')) { t._pso = 1; obs.observe(t, { attributes: true, attributeFilter: ['hidden'] }); } } });
+    vetSum();
   }
+  function vetSum() { var vv = $('ms-md-vet-verdict'), vs = $('ps-s-vet'); if (vv && vs) { var vt = rowText('', '', vv.textContent).s; if (vs.textContent !== vt) vs.textContent = vt; } }
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
     if (R.dataset.phone === 'simple' && t.closest('#v-mosha, #v-ict, #v-profile')) setTimeout(desks, 400);   // a card renamed by what was tapped (the Mosha desk's language)
     var f = t.closest('.ps-fold[data-ps-for]');
-    if (f) { var sec = document.querySelector('[data-ps="' + f.dataset.psFor + '"]'); if (!sec) return; var open = !sec.hasAttribute('data-ps-open');
-      if (open) sec.setAttribute('data-ps-open', ''); else sec.removeAttribute('data-ps-open'); f.setAttribute('aria-expanded', String(open));
+    if (f) { var secs = document.querySelectorAll('[data-ps="' + f.dataset.psFor + '"]'); if (!secs.length) return; var open = !secs[0].hasAttribute('data-ps-open');   // one row may fold several parts (the Trades tiles and curve)
+      [].forEach.call(secs, function (sec) { if (open) sec.setAttribute('data-ps-open', ''); else sec.removeAttribute('data-ps-open'); }); f.setAttribute('aria-expanded', String(open));
+      if (f._psk) { if (open) OPENED[f._psk] = 1; else delete OPENED[f._psk]; }
       if (open) setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 0);   // a chart drawn while folded has no width
       return; }
     if (t.closest('#ps-act-more')) { var card = $('ms-active-card'); if (card) { if (card.hasAttribute('data-ps-all')) card.removeAttribute('data-ps-all'); else card.setAttribute('data-ps-all', ''); drawOpen(); } return; }
-    var sw = t.closest('#ps-sw button[data-v]'); if (sw && window.msPhoneView) { window.msPhoneView(sw.dataset.v); window.scrollTo(0, 0); }
+    var sw = t.closest('#ps-sw button[data-v]'); if (sw && window.msPhoneView) { window.msPhoneView(sw.dataset.v); window.scrollTo(0, 0); return; }
+    // second pass: Charts "More", "Show all" on the Trades table and the Scanner, "only the ones to review"
+    var cm = t.closest('#ps-ch-more'); if (cm) { var V = $('v-charts'), on = V && !V.hasAttribute('data-ps-more'); if (V) { if (on) V.setAttribute('data-ps-more', ''); else V.removeAttribute('data-ps-more'); } cm.setAttribute('aria-expanded', String(!!on)); return; }
+    var mb = t.closest('#ps-tr-more, #ps-sc-more, #ps-st-more'); if (mb) { var host = mb.closest('.card'); if (host) { if (host.hasAttribute('data-ps-all')) host.removeAttribute('data-ps-all'); else host.setAttribute('data-ps-all', ''); } lists(); return; }
+    if (t.closest('#ps-r-todo')) { var cur = document.querySelector('#ms-loss-f button[data-todo="1"]'), was = !!cur && cur.getAttribute('aria-pressed') === 'true', go = document.querySelector('#ms-loss-f button[data-todo="' + (was ? '0' : '1') + '"]'); if (go) go.click(); drawReview(); }
   });
   // The long desk views (ICT, Mosha, Profile): every card but the ones a person comes for folds to a row with the card's own
   // heading. The rows are put in only while the simple view is on and taken out again with it, so the page of a wider screen
@@ -14390,31 +14545,53 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   var DESKS = [
     { v: 'v-ict', sel: '.card.ict-card', keep: function (c) { return c.classList.contains('ict-open-c') || c.id === 'ict-sig'; } },
     { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && c.id === 'mo-rec'); } },
-    { v: 'v-profile', sel: '.card', keep: function (c, i) { return i === 0; } }
+    { v: 'v-profile', sel: '.card', keep: function (c, i) { return i === 0; } },
+    // second pass. Council panes: a row has two lines (heading, one line of what the card holds)
+    { v: 'ms-cp-systems', sel: '.card', two: 1, keep: function (c) { return c.id === 'ms-sys-book'; } },   // which systems trade live: open and first
+    { v: 'ms-cp-review', sel: '.card', two: 1, keep: function (c) { return c.id === 'ms-loss'; } },
+    { v: 'ms-cp-research', sel: '.card', two: 1, keep: function () { return false; } },
+    { v: 'ms-cp-macro', sel: '.card', two: 1, keep: function (c) { return c.classList.contains('md-next'); } },
+    { v: 'ms-cp-week', sel: '.card', two: 1, keep: function (c) { return c.classList.contains('wk-dec'); } },
+    { v: 'v-setup', sel: '.card', two: 1, keep: function (c) { return c.id !== 'ms-pb'; } },
+    { v: 'v-gold', sel: '.card', keep: function (c, i) { return i === 0; } },
+    { v: 'v-lit', sel: '.card', deep: 1, keep: function (c, i) { return i === 0; } },
+    { v: 'v-crypto', sel: '.card', keep: function (c, i) { return i < 2; } }
   ];
-  function titleOf(c) {
+  var OPENED = {};   // rows the person opened, by view and heading: a desk that draws its cards again (LIT) keeps them open
+  function titleOf(c, two) {
     var h = c.querySelector('.ict-h, .ms-k, h2, h3, summary'), t = '', s = '';
     if (h) { var sp = h.matches('.ms-k') ? (h.querySelector(':scope > span, :scope > h2, :scope > h3') || h) : h, n = sp.firstChild;
       while (n && !(n.nodeType === 3 && n.nodeValue.trim()) && !(n.nodeType === 1 && !/^(SMALL|BUTTON|A|INPUT|SELECT)$/.test(n.tagName) && n.textContent.trim())) n = n.nextSibling;
       t = n ? n.textContent.replace(/\s+/g, ' ').trim() : ''; var sm = sp.querySelector('small'); s = sm ? sm.textContent.replace(/\s+/g, ' ').trim() : ''; }
     if (!t) t = (c.getAttribute('aria-label') || '').trim();
+    if (two) { if (!s && h) { var s2 = h.querySelector(':scope > small'); s = s2 ? s2.textContent : ''; }
+      var lv = c.querySelector('.sb-sum, .dc-sum, .ex-sum, .bk-sum, .md-verdict'); if (lv && getComputedStyle(lv).display === 'none') lv = null;   // never a line the account's own gate hides
+      var X = rowText(t, s, lv ? lv.textContent : ''); return { t: X.t, s: X.s, h: h, live: lv }; }
     return { t: t.replace(/[·:\s]+$/, '').slice(0, 44), s: s.replace(/^[·\s]+/, '').slice(0, 80), h: h };
   }
-  var seq = 0, obs = typeof MutationObserver === 'function' ? new MutationObserver(function (L) { L.forEach(function (m) { var b = rowOf(m.target); if (b && b.hidden !== m.target.hidden) b.hidden = m.target.hidden; }); }) : null;
+  var seq = 0, obs = typeof MutationObserver === 'function' ? new MutationObserver(function (L) { L.forEach(function (m) { var k = m.target.getAttribute('data-ps'), b = k ? document.querySelector('.ps-fold[data-ps-for="' + k + '"]') : null; if (b && b.hidden !== m.target.hidden) b.hidden = m.target.hidden; if (k === 'vet') vetSum(); }); }) : null;
   function rowOf(c) { var k = c.getAttribute('data-ps'); return k ? document.querySelector('.ps-dyn[data-ps-for="' + k + '"]') : null; }
-  var late = 0, obs2 = typeof MutationObserver === 'function' ? new MutationObserver(function () { clearTimeout(late); late = setTimeout(desks, 120); }) : null;
+  // a card that is drawn late (its heading arrives with its data) folds in the same frame it is drawn: the observer runs before
+  // the next paint, so nothing is seen open and then folded (it used to fold 120 ms later, a layout shift on the ICT desk).
+  // Should another script and this one ever answer each other in a loop, it falls back to the timer.
+  var late = 0, runs = 0, runsT = 0, obs2 = typeof MutationObserver === 'function' ? new MutationObserver(function () {
+    var now = typeof performance === 'object' ? performance.now() : Date.now(); if (now - runsT > 500) { runsT = now; runs = 0; }
+    if (++runs <= 12) desks(); else { clearTimeout(late); late = setTimeout(desks, 120); } }) : null;
   function desks() {
     var simple = R.dataset.phone === 'simple';
     DESKS.forEach(function (D) {
       var v = $(D.v); if (!v) return;
       if (!simple) { [].forEach.call(v.querySelectorAll('.ps-dyn'), function (b) { var c = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (c) { c.removeAttribute('data-ps'); c.removeAttribute('data-ps-open'); } b.remove(); }); return; }
+      if (obs2 && !v._psw) { v._psw = 1; obs2.observe(v, { childList: true, subtree: !!D.deep }); }   // cards a desk draws later
       [].filter.call(v.querySelectorAll(D.sel), function (c) { return !c.closest('dialog') && !c.parentElement.closest('.card'); }).forEach(function (c, i) {
         var b = rowOf(c); if (b && b.nextElementSibling !== c) c.parentNode.insertBefore(b, c);   // the desk moved the card (the teacher's order): its row follows
         if (!b) { if (c.hasAttribute('data-ps') || D.keep(c, i) || (!c.hidden && getComputedStyle(c).display === 'none')) return; }
-        var T = titleOf(c); if (!T.t) { if (obs2 && !c._psw) { c._psw = 1; obs2.observe(c, { childList: true }); } return; }   // a card still empty: looked at again when it is drawn
+        var T = titleOf(c, D.two); if (!T.t) { if (obs2 && !c._psw) { c._psw = 1; obs2.observe(c, { childList: true }); } return; }   // a card still empty: looked at again when it is drawn
         if (!b) { var key = 'd' + (++seq); if (!c.id) c.id = 'ps-t-' + key; c.setAttribute('data-ps', key);
-          b = document.createElement('button'); b.type = 'button'; b.className = 'ps-only ps-fold ps-dyn'; b.dataset.psFor = key; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', c.id);
-          b.innerHTML = '<span></span><span class="ps-f-s"></span>'; b.hidden = c.hidden; c.parentNode.insertBefore(b, c); if (obs) obs.observe(c, { attributes: true, attributeFilter: ['hidden'] });
+          b = document.createElement('button'); b.type = 'button'; b.className = 'ps-only ps-fold ps-dyn' + (D.two ? ' ps-two' : '') + (c.classList.contains('adm') ? ' adm' : '') + (c.classList.contains('own') ? ' own' : ''); b.dataset.psFor = key; b._psk = D.v + '|' + T.t;   /* the row keeps its card's gate */ b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', c.id);
+          b.innerHTML = '<span></span><span class="ps-f-s"></span>'; b.hidden = c.hidden; c.parentNode.insertBefore(b, c); if (OPENED[b._psk]) { c.setAttribute('data-ps-open', ''); b.setAttribute('aria-expanded', 'true'); }
+          if (obs2 && T.live) obs2.observe(T.live, { childList: true, characterData: true, subtree: true });
+          if (obs) obs.observe(c, { attributes: true, attributeFilter: ['hidden'] });
           if (obs2 && !c.parentNode._psw) { c.parentNode._psw = 1; obs2.observe(c.parentNode, { childList: true }); }
           if (obs2 && T.h) obs2.observe(T.h, { childList: true, characterData: true, subtree: true }); }   // a heading that is rewritten (the Mosha desk in French) renames its row
         if (b.firstChild.textContent !== T.t) b.firstChild.textContent = T.t; if (b.lastChild.textContent !== T.s) b.lastChild.textContent = T.s;
@@ -14426,9 +14603,31 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   document.addEventListener('ms:phone', function () { sync(); drawNeed(); try { window.dispatchEvent(new Event('resize')); } catch (e) {} });
   document.addEventListener('ms:today', drawToday);
   document.addEventListener('ms:live', drawOpen);
-  document.addEventListener('ms:council', function () { drawNeed(); sums(); });
-  sync(); sums(); drawToday(); drawOpen(); drawNeed();
-  setTimeout(function () { sums(); drawNeed(); desks(); }, 2500);
+  document.addEventListener('ms:council', function () { drawNeed(); sums(); drawReview(); });
+  // ── second pass: Trades, This week, Review, and the two "Show all" lists ──
+  var FEW = { 3: 'three', 4: 'four', 5: 'five' };
+  function lists() {
+    [['ps-tr-more', '#ms-c-trades > tr[data-tid]', 5, 'trades', window.MS_TRADES && window.MS_TRADES.rows, 'latest'], ['ps-sc-more', '#ms-scan > a', 4, 'markets', 0, 'first'], ['ps-st-more', '#ms-trades > .ms-trade', 3, 'possible trades', 0, 'first']].forEach(function (L) {
+      var b = $(L[0]), host = b && b.closest('.card'); if (!b) return; var k = document.querySelectorAll(L[1]).length, all = host.hasAttribute('data-ps-all');
+      var tx = all ? 'Show the ' + L[5] + ' ' + FEW[L[2]] : 'Show all ' + Math.max(k, L[4] || 0) + ' ' + L[3]; if (b.hidden !== (k <= L[2])) b.hidden = k <= L[2]; if (b.textContent !== tx) b.textContent = tx; b.setAttribute('aria-expanded', String(all)); });
+  }
+  function drawTrades() { var a = tradesAnswer(window.MS_TRADES); if (!a) return; set('ps-t-k', esc(a.k)); set('ps-t-a', a.head); set('ps-t-s', a.sub); set('ps-s-tnum', esc(a.fold)); lists(); }
+  function drawWeek() { var a = weekAnswer(window.MS_WEEK_NOW, window.MS_WEEK_DEC); if (!a) return; set('ps-w-k', esc(a.k)); set('ps-w-a', a.head); set('ps-w-s', a.sub); set('ps-s-wnum', esc(a.fold)); }
+  function drawReview() {
+    var nb = $('ms-cn-n-review'), el = $('ps-r-a'), C = window.MS_COUNCIL; if (!nb || !el || !C || !C.at) return;
+    var n = parseInt(nb.title, 10) || parseInt(nb.textContent, 10) || 0, a = reviewAnswer(n); set('ps-r-a', a.head); set('ps-r-s', a.sub);
+    var b = $('ps-r-todo'), cur = document.querySelector('#ms-loss-f button[data-todo="1"]'), on = !!cur && cur.getAttribute('aria-pressed') === 'true';
+    if (b) { b.hidden = !n && !on; b.textContent = on ? 'Show every loss again' : 'Show only the ones to review'; b.setAttribute('aria-pressed', String(on)); }
+  }
+  document.addEventListener('ms:trades', drawTrades);
+  document.addEventListener('ms:week', drawWeek);
+  if (typeof MutationObserver === 'function') {
+    var o3 = new MutationObserver(lists); ['ms-c-trades', 'ms-scan', 'ms-trades'].forEach(function (id) { var e = $(id); if (e) o3.observe(e, { childList: true }); });
+    var nb0 = $('ms-cn-n-review'); if (nb0) new MutationObserver(drawReview).observe(nb0, { childList: true, characterData: true, subtree: true });
+    var px = $('ms-td-price'), kv = $('ps-s-kv'); if (px && kv) new MutationObserver(function () { var v = px.textContent.trim(); if (v !== '—' && kv.textContent !== v) kv.textContent = v; }).observe(px, { childList: true, characterData: true, subtree: true });
+  }
+  sync(); sums(); drawToday(); drawOpen(); drawNeed(); drawTrades(); drawWeek(); drawReview(); lists();
+  setTimeout(function () { sums(); drawNeed(); desks(); drawReview(); lists(); }, 2500);
 })();
 </script>
 <script id="ms-desk-js">
