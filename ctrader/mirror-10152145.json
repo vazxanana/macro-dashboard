@@ -11297,6 +11297,33 @@
     ],
     "stopCheckedAt": "2026-11-12T13:23:54.000Z",
     "brokerStop": 2103.63
+   },
+   "btc-intraday-1794489777": {
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "setup": "intraday",
+    "openedAt": "2026-11-12T13:32:56.000Z",
+    "councilEntry": 72657.2,
+    "stop": 73085.58857142857,
+    "t1": 71800.42285714285,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 72657.2,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 4.28,
+    "margin": 72.45,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 72661.28,
+    "slipR": -0.01,
+    "lagSec": 116,
+    "positionId": "48795622",
+    "volume": 1,
+    "status": "open"
    }
   },
   "day": {
@@ -11304,7 +11331,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9909.31 · 33 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9909.31 · 34 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker"
@@ -11314,27 +11341,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "btc-intraday-1794489777": {
-    "orderId": "34001933",
-    "symbol": "BTCUSD",
-    "side": "sell",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "intraday",
-    "limitPrice": 72657.2,
-    "stop": 73085.58857142857,
-    "t1": 71800.42285714285,
-    "placedAt": "2026-11-12T13:23:54.000Z",
-    "expires": "2026-11-13T01:22:57.000Z",
-    "riskCash": 4.28,
-    "margin": 72.45,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "usdcad-rintra-1794489777": {
     "orderId": "34001935",
     "symbol": "USDCAD",
@@ -11358,14 +11364,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9909.31,
-  "lastRun": "2026-11-12T13:29:58.000Z"
+  "lastRun": "2026-11-12T13:32:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T09:56:34.000Z",
-   "msg": "opened sell XAUUSD 0.01 lot (council gmp)",
-   "trade": "xau-gmp-1794470400"
-  },
   {
    "at": "2026-11-12T10:06:21.000Z",
    "msg": "moved EURUSD 47373484 protection: stop 1.0798795 -> 1.0794395, target 1.16354 -> 1.1631 (council rswing)",
@@ -12860,6 +12861,11 @@
    "at": "2026-11-12T13:23:54.000Z",
    "msg": "placed sell limit USDCAD 0.02 lot at 1.42413 (council rintra, valid to 2026-11-13T01:22Z)",
    "trade": "usdcad-rintra-1794489777"
+  },
+  {
+   "at": "2026-11-12T13:32:56.000Z",
+   "msg": "limit filled: BTCUSD position 48795622 at the broker",
+   "trade": "btc-intraday-1794489777"
   }
  ],
  "limits": {
@@ -12938,18 +12944,18 @@
   ]
  },
  "execution": {
-  "n": 378,
+  "n": 379,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 145,
+  "medianLagSec": 143,
   "bySymbol": {
    "SOLUSD": {
     "n": 21,
     "meanSlipR": 0.077
    },
    "BTCUSD": {
-    "n": 24,
+    "n": 25,
     "meanSlipR": 0.002
    },
    "ETHUSD": {
