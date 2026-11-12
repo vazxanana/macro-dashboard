@@ -843,6 +843,32 @@ not studied) and the page (`risk0`: Active trades, the trade table's live R, the
 Open for the owner (item 51): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
 side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
 
+## One order, recorded once (12 Nov 2026, owner approved: "count duplicates once")
+Plumbing only: no entry rule, filter, size, stop, exit or pinned block changed. Two setup keys built on shared structure can
+give the SAME order in one round; it was recorded and counted twice. `council/dedupe.mjs` (pure) defines an **exact duplicate**:
+equal market, side, `opened` second, entry, stop AND target `t1` (prices within `DUP_TOL` 1e-9 of the entry, float noise only;
+neither a pyramid add). Every price the Trader manages by is equal, so the R is equal by construction. Only difference left: a
+resting limit's life (`WAIT` by timeframe, Scalp 3 h vs Intraday 12 h); the kept record's applies (no pending twin of 1-12 Nov
+filled after 3 h).
+- **Trader**: `recordOnce(trades, tr, now)` right before the setup loop's `trades.push(tr)`: the twin becomes status
+  `'duplicate'`, `dupOf`, `void`, `voidWhy`, `shadow: true` + blocker `duplicate`, `R: null`, closed at once (never managed,
+  alerted, copied or counted). **The live record is kept over a shadow** (an earlier shadow of this round becomes the
+  duplicate), else the first. Every tally reads `win/loss/be` only (digest, `alertable`-based books, fills costs, book, decay,
+  forward, page `sysClosed`), so the status drops it; `forward.mjs` `DONE` and `api/_edge-analyst.js` already skip it.
+- **Repair** `council/repairs.mjs` `voidExactTwins` (key `void-exact-twins-2026-11-12`, once, marks, never deletes; R kept;
+  an open / pending duplicate closed at the repair's time): on council-data of 12 Nov **5 records**, all Scalp copies of an
+  Intraday order (audusd 1 Nov live +2.11R, audusd 3 Nov -1R, usdcad 9 Nov -1R, gbpusd 12 Nov +1.65R, audusd 12 Nov open):
+  +1.76R gross / +1.19R after costs counted twice; 1 of them live (legacy engine, 1 Nov).
+- **Mirror** (`ctrader-mirror.mjs` `fresh`): `dropTwins` drops a duplicate record, a trade whose twin is already copied on
+  any account (`st.map`, `st.orders`, `exclude`), and the second twin of a round. Test fixtures in
+  `tests/ctrader-mirror.test.mjs` give trades of another id another second (`secOf`).
+- **Not duplicates, left as two trades** (rule questions for the owner, reported 12 Nov): the same entry, stop and second
+  with ANOTHER target (6 pairs on 1-12 Nov: Position vs Swing / Retrace swing, Intraday vs Retrace scalp, Retrace intraday vs
+  Retrace scalp; BTC 4 Nov Position -1R vs Retrace +0.43R), and same market + side within 15 minutes (109 pairs of records
+  opened 9-12 Nov: 53 the same setup re-firing, 50 another setup with other levels, 3 exact, 3 other target; 1 involves a live
+  record). Never fold those into `sameOrder`.
+- Tests: `tests/dedupe.test.mjs` (7), `tests/ctrader-mirror.test.mjs` (one round test).
+
 ## Edge scoreboard (7 Nov 2026, owner: "where is the edge across both systems, at a glance")
 Admin card `#ms-sb` at the top of the Council research pane (deep link `#council/scoreboard`, Home quick link). Script `#ms-sb-js` at the
 end of `market-structure.html`; pure functions on `window.MS_SB`, tested in `tests/scoreboard.test.mjs`. One row per stream: Meridian

@@ -17,7 +17,8 @@ import { buildBook } from './book.mjs';
 import { buildExpect } from './expect.mjs';
 import { buildForward, loadProtocol, stopSwitch } from './forward.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
-import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
+import { voidRoundedReplicas, historyCatchUp, voidM30Twins, voidExactTwins, recostCrypto } from './repairs.mjs';
+import { recordOnce } from './dedupe.mjs';   // 12 Nov 2026 (owner approved): one order is recorded once
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, foldWeekend, gegFresh } from './fills.mjs';
@@ -470,6 +471,8 @@ let research = rd('research.json', []);
 // One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines;
 // 8 Nov: the pre-dedupe m30m1 copies of Scalp entries get status 'duplicate' (research/edge/shadow-audit)
 voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO); voidM30Twins(trades, config, nowISO);
+// 12 Nov 2026 (owner approved, "count duplicates once"): past exact duplicates (council/dedupe.mjs) get status 'duplicate'
+voidExactTwins(trades, config, nowISO);
 // 7 Nov: closed crypto trades re-costed under the CFD model (#568); annotateCosts below recomputes costR / Rnet this round
 recostCrypto(trades, MARKETS, config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
@@ -1250,6 +1253,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
       }
       // m30m1 (M30 → M1) fires on the same M1 entry as the Scalp: the same trade recorded twice (6 Nov, 29 of 31). Keep one.
       if (t.k === 'm30m1' && trades.some((x) => x.market === key && x.k !== 'm30m1' && x.side === tr.side && x.opened === tr.opened && x.entry === tr.entry)) continue;
+      // 12 Nov 2026 (owner approved, "count duplicates once"): two setups giving the SAME order this round (same market, side,
+      // second, entry, stop and target; council/dedupe.mjs) record it once: the second (or the shadow one, when the other is
+      // live) is kept with status 'duplicate' + dupOf, never managed, alerted, copied or counted. Other targets stay two trades.
+      recordOnce(trades, tr, now);
       trades.push(tr);
     }
   } catch (e) { snapshot.errors[key] = String(e.message || e); }
