@@ -43,15 +43,18 @@
   },
   "intraday": {
    "since": {
-    "session:asia": "2026-11-04T12:04:20.000Z"
+    "session:asia": "2026-11-04T12:04:20.000Z",
+    "cf": "2026-11-12T11:35:21.000Z"
    },
    "src": {
-    "maxRR": "user"
+    "maxRR": "user",
+    "cf": "backtest"
    },
    "maxRR": 10,
    "noSession": [
     "asia"
-   ]
+   ],
+   "cf": "bo"
   },
   "rintra": {
    "since": {
@@ -622,9 +625,15 @@
    "by": "user",
    "change": "Gold: the Mosha cycle trades as a main paper system: H4 move, H1 ChoCh = the pullback starts, M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme); limit at the broken level, stop past its origin",
    "why": "Owner, 11 Nov: 'H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot', chosen as a main system. Not a tested edge: the mechanical studies of this cycle (mosha-retrace break-even, mosha-cycle -0.22R) did not pass; this is the owner's call, judged on its forward record."
+  },
+  {
+   "at": "2026-11-12T11:35:21.000Z",
+   "by": "coach-backtest",
+   "change": "intraday: only a continuation BO as the confirming break (backtest)",
+   "why": "226 trades over the last 30 days: a continuation BO as the confirming break +0.28R each, a CHoCH as the confirming break -0.42R (gap t = 3.0); true in both halves."
   }
  ],
- "btAt": "2026-11-11T22:52:54.740Z",
+ "btAt": "2026-11-12T11:33:40.101Z",
  "beSrc": "backtest",
  "userRules": [
   "rintra-origin",
@@ -687,7 +696,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-12T11:32:44.000Z",
+   "at": "2026-11-12T11:35:21.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -699,12 +708,12 @@
    "why": "market: -1.00R per trade over 6 trades"
   },
   "position": {
-   "at": "2026-11-11T22:54:21.000Z",
-   "why": "backtest: 21 trades at -0.89R each"
+   "at": "2026-11-12T11:35:21.000Z",
+   "why": "backtest: 20 trades at -0.88R each"
   },
   "rscalp": {
-   "at": "2026-11-07T21:45:40.000Z",
-   "why": "backtest: 546 trades at -1.56R each"
+   "at": "2026-11-12T11:35:21.000Z",
+   "why": "backtest: 548 trades at -0.32R each"
   },
   "rswing": {
    "at": "2026-11-07T19:43:55.000Z",
@@ -828,7 +837,8 @@
  "focusSetups": [],
  "cryptoTrendShadow": true,
  "coachChanged": {
-  "intraday:d1": "2026-11-07T21:26:49.000Z"
+  "intraday:d1": "2026-11-07T21:26:49.000Z",
+  "intraday:cf": "2026-11-12T11:35:21.000Z"
  },
  "goldTrendFastShadow": true,
  "nqRegimeShadow": {
