@@ -42,8 +42,20 @@ namespace cAlgo.Robots
         private readonly Dictionary<string, DateTime> _lastBar = new Dictionary<string, DateTime>();
         private string[] _syms = new string[0];
 
+        // Paper and demo only (absolute rule 2; owner, 12 Nov 2026, docs/owner-decisions.md item 45): this program refuses an account
+        // that is not a demo. Checked on start and right before every order it sends; on a refusal it says why and stops itself
+        // without sending anything. Account.IsLive is the platform's own account-type flag (true for a live account).
+        private bool DemoOnly()
+        {
+            if (!Account.IsLive) return true;
+            Print("CryptoTrend refused: account {0} is a LIVE account. This program runs on demo accounts only; it stops now and sends nothing.", Account.Number);
+            Stop();
+            return false;
+        }
+
         protected override void OnStart()
         {
+            if (!DemoOnly()) return;
             _syms = SymbolList.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Where(s => s.Length > 0).ToArray();
             foreach (var s in _syms)
                 if (!Symbols.Exists(s)) Print("CryptoTrend: symbol {0} not found at this broker, skipped", s);
@@ -56,6 +68,7 @@ namespace cAlgo.Robots
 
         protected override void OnTimer()
         {
+            if (!DemoOnly()) return;
             foreach (var s in _syms)
             {
                 try { CheckSymbol(s); }
@@ -122,6 +135,7 @@ namespace cAlgo.Robots
             if (OpenRiskPct() + RiskPct > MaxOpenRiskPct) { Print("CryptoTrend {0} {1}: open-risk cap {2}% reached, skipped", sym.Name, lab, MaxOpenRiskPct); return; }
             Print("CryptoTrend {0} {1} BUY {2} units at ~{3}, stop {4} ({5} ATR) - {6}", sym.Name, lab, vol, entry, Math.Round(entry - dist, sym.Digits), AtrMult, why);
             if (DryRun) return;
+            if (!DemoOnly()) return;
             var res = ExecuteMarketOrder(TradeType.Buy, sym.Name, vol, lab, dist / sym.PipSize, null, "first");
             if (!res.IsSuccessful) Print("CryptoTrend {0} {1}: order failed {2}", sym.Name, lab, res.Error);
         }
@@ -133,6 +147,7 @@ namespace cAlgo.Robots
             if (OpenRiskPct() + RiskPct > MaxOpenRiskPct) { Print("CryptoTrend {0} {1}: open-risk cap reached, add skipped", sym.Name, labAdd); return; }
             Print("CryptoTrend {0} {1} ADD {2} units at ~{3}, own stop 1R below - {4}", sym.Name, labAdd, vol, sym.Ask, why);
             if (DryRun) return;
+            if (!DemoOnly()) return;
             var res = ExecuteMarketOrder(TradeType.Buy, sym.Name, vol, labAdd, r0 / sym.PipSize, null, "add of " + first.Id);
             if (!res.IsSuccessful) Print("CryptoTrend {0} {1}: add failed {2}", sym.Name, labAdd, res.Error);
         }

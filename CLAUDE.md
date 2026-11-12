@@ -85,7 +85,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-47 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-48 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -215,8 +215,15 @@ size, stop or exit of any system changed; nothing of ICT was touched.
 - Tests: `tests/supported-book.test.mjs` (17), `tests/ctrader-mirror.test.mjs` (3 new), `tests/expect.test.mjs`,
   `tests/decay.test.mjs`. Changed on purpose: `tests/academy-edges.test.mjs` (the seven edges are the systems live until 11 Nov),
   `tests/trend-breadth.test.mjs` (the Trader and fills.mjs may now NAME the study as the rate's source; none imports it).
-- Open for the owner: item 41 (a 10-lot gold buy on the Replica demo account, 11 Nov 13:37 UTC, not placed by the mirror: reset
-  the account before reading its record).
+- Item 41 (a 10-lot gold buy on the Replica demo account, 11 Nov 13:37 UTC, not placed by the mirror): answered 12 Nov 2026, the
+  owner placed it; the owner resets that account in the broker's own app before its record is read (nothing in the repo resets a
+  demo balance; `council/ctrader-reset.json` resets the mirror's records on EVERY account, so it is not the tool for this).
+- **Since 12 Nov 2026 the live paper book also includes the Mosha cycle (`mcycle`)** by the owner's choice of 11 Nov, kept on
+  12 Nov ("Yes to all"; docs/owner-decisions.md item 48; section "Mosha cycle: a main paper system"). It is not in
+  `council/decay.mjs` / expectations (no base study): the decay and "What to expect" cards say so in their first line
+  (`MS_NO_BASE`, shown while `config.moshaCycle` is on and `mcycle` is not in `ownerShadow`), and `#ms-sys-book` names it. The
+  forward-test book (`council/forward.mjs` `BOOK`) stays Gold trend + Gold daily engulf only. Its Trader block does not read
+  `ownerShadow` yet. Never invent a baseline for it.
 
 ## Financing, the rest: baselines, replay rows, the engine replay, the page between two readings (11 Nov 2026)
 The loose ends of the section above, inside the same approval (the approved cost model made the same everywhere). No entry
@@ -921,6 +928,16 @@ edge (cap 2 years; > 50 years = "cannot be proven"), the regime note, and the fo
 phone blocks under 760 px); the daily digest (`expectLine` in `waiting()`) names a live system only when it leaves its band. Expectations
 only: never a rule, size or filter. Tests: `tests/expect.test.mjs` (maths against each study's result.json, digest, trader and page wiring).
 Since 11 Nov 2026 every gold buy in these figures is after overnight financing (the four long-only gold systems, and the buys of the replica, Mosha BO and the momentum pullback) and five systems are marked shadow (sections "Supported book, financing" and "Financing, the rest").
+**Every unit of the trend legs (12 Nov 2026, item 42 approved):** Gold trend and Gold trend fast come from the book study's unit
+records (`research/edge/supported-book/legs.json`) through that study's own `positions()` (imported): net of $0.30 a unit and
+financing on EVERY unit at its own entry and risk, and a window holds the positions CLOSED in it (`cut` by `day`, the study's
+rule): gtrend +0.313R a position (n 74, t 1.20; was +0.398 / 75 / 1.49), gtrend5 +0.211R (n 128, t 1.17; was +0.289), equal to
+`supported-book/result.json` `W1` `bySystem` (tested). Of gtrend's 0.085R drop about 0.040R is the add's financing and 0.045R the
+close-day window (one Dec 2017 winner closed in 2018). expect-base `fin.everyUnit`, `units`; the line reads "a position after
+financing on every unit"; the page's footnote and Per trade cell say so. geg (no add), gtl and the rest unchanged. **The decay
+baselines were not changed**: their 2018-26 records (`decay-monitor/positions.json`, from the robustness rebuild whose bytes are
+the Academy's) carry no add entry, so Gold trend / fast baselines still charge the first unit only (an understatement of the add's
+share, roughly 0.03-0.04R a position judging by the 2006-17 figures).
 Re-run the build after a study changes.
 
 ## Daily owner digest (8 Nov 2026, owner: one message instead of many alerts)
@@ -2582,7 +2599,10 @@ FAIL or "nothing to change": **never quote the book as proven, never call it an 
 ## Path to live: no lever left on the gold book, the forward-test protocol, what real money would mean (12 Nov 2026)
 Owner: "keep improving dont stop reach our goal". A proposal and its arithmetic; **no study was run, on purpose**, and no
 live rule, size, filter, stop, config, council member or demo-only code changed. The owner's document is
-`research/proposals/2026-11-12-path-to-live.md` (decisions: `docs/owner-decisions.md` items 43-46, all open).
+`research/proposals/2026-11-12-path-to-live.md` (decisions: `docs/owner-decisions.md` items 43-46, all answered by the owner on
+12 Nov 2026, "Yes to all": the protocol adopted, no more tests on this book, the bridges refuse a non-demo account, paper and demo
+only until at least November 2027).
+- **Rule (owner, 12 Nov 2026, item 44): no further gate, exit, entry or size is tested on this book's 2006-17 window.**
 - **The research on the two-system book is exhausted.** The proposal's section 1 is one table of every lever tested on the
   gold book (book, systems, Gold Macro Score as size step and as gate, real yields, volatility / trend / own-record
   switches, move-size forecast, 12 exits, 10 entries, limit against market entry, sizing rules, weights, the add, Gold trend
@@ -2613,16 +2633,30 @@ live rule, size, filter, stop, config, council member or demo-only code changed.
   `CTRADER_ENV` must be `demo`, the account's own `isLive` must be false before account auth), the same in
   `ctrader-suite.mjs`, `ctrader-account.mjs`, `ctrader-symbols.mjs`. **Found: the two bridge programs
   (`mt5/CouncilBridge.mq5`, `ctrader/CouncilBridge.cs`) print whether the account is a demo but do not refuse a real one**
-  (item 45; not changed here: programs that place orders are the owner's call).
+  (item 45). **Done 12 Nov 2026 (approved):** every order-sending program in `mt5/` and `ctrader/` (the two bridges, `NQOpenRun.mq5`,
+  `CryptoTrend.cs`, `CryptoScalper.cs`) has `DemoOnly()`: MetaTrader `AccountInfoInteger(ACCOUNT_TRADE_MODE) ==
+  ACCOUNT_TRADE_MODE_DEMO` (else Print + `ExpertRemove()`, `OnInit` returns `INIT_FAILED`), cTrader `!Account.IsLive` (else Print
+  + `Stop()`), checked on start, on every poll / tick and on the line right before every order call. Not compiled (no platform in
+  the sandbox; the platforms' docs were not reachable either: the flags are the ones the files already printed). A new order call
+  in these folders must sit right under `if (!DemoOnly()) return;` (`tests/bridge-demo.test.mjs` reads every call).
 - Tests: `tests/path-to-live.test.mjs` (the json equals the script's output; every figure of the proposal against it and
-  against the supported-book result; the bootstrap on a hand-made series; items 43-46 open; the proposal never recommends
+  against the supported-book result; the bootstrap on a hand-made series; items 43-46 answered; the proposal never recommends
   a live step; the mirror's three locks are still in the file).
 
-## Forward record of the live book against the proposed protocol (12 Nov 2026)
-A MEASUREMENT of the live paper book (Gold trend + Gold daily engulf) against the forward-test protocol PROPOSED in
-`research/proposals/2026-11-12-path-to-live.md` section 3. The owner has not adopted it (docs/owner-decisions.md item 43,
-open): every surface says "proposed protocol, not adopted: your decision 43". It changes no rule, size, filter, stop, trade,
-mirror setting or config, and a crossed line or a failed check is only reported, never acted on.
+## Forward record of the live book against the forward-test protocol (12 Nov 2026; protocol adopted the same day)
+A measurement of the live paper book (Gold trend + Gold daily engulf; NOT the Mosha cycle) against the forward-test protocol of
+`research/proposals/2026-11-12-path-to-live.md` section 3, **adopted by the owner on 12 Nov 2026** ("Yes to all",
+docs/owner-decisions.md item 43): every surface says "adopted by the owner, 12 Nov 2026". The reading changes nothing itself.
+**The protocol's one consequence** (`council/forward.mjs` `stopSwitch`, applied by the Trader right after the `USER_RULES` loop,
+from the LAST reading in coach.json): a crossed stop line S1-S4 adds `gtrend` and `geg` to `config.ownerShadow` (the 11 Nov
+supported-book switch: their NEW trades are `shadow: true, blockedBy ['owner-shadow']`; the gtrend leg reads `ownerSh(LEG.k)`,
+the engulf block `egSh`, its zone cancel and cap read `ownStream`), writes `config.forwardStop { at, lines, reading, systems,
+what, alert }` and ONE `by: 'user'` history line quoting the protocol, and the alerts step sends one message (marked in
+`state.forwardStopSent`). Once (a config with `forwardStop` is left alone); it never removes a system from `ownerShadow`
+(putting the book back is the owner's, by a new rule); trades already open or pending run to their own exits with their stops
+(the management loop never reads the switch). A failed execution check E1-E5 is only reported. The 11 Nov sha256 pins of the two
+blocks (`tests/supported-book.test.mjs`) now pin the block with those lines put back. Tests: `tests/forward-stop.test.mjs` (7).
+Before 12 Nov this section described a measurement against a PROPOSED protocol; what follows is that build, wording updated.
 - **`council/forward.mjs`** (pure; inputs handed in, clock `now`). Counted: `alertable` (not a shadow) and `ownStream` trades of
   `BOOK` = gtrend, geg (the json's "S2 = gtrend + geg"), filled at or after `START` (12 Nov 2026 00:00 UTC, the proposal's
   "Clock start"), never a replay row, never a pending / expired / void record; R = the digest's `merNet` (after costs including
@@ -2649,7 +2683,7 @@ mirror setting or config, and a crossed line or a failed check is only reported,
   `<script id="ms-fw-js">` after `#ms-ex-js` (reads `MS_COUNCIL.coach.forward`, fetches nothing): the one sentence first (`.fw-sum`:
   "On track / Too few trades to say / Below the expected range / A stop line is crossed", n and dates), the band chart (accent
   band, dashed middle, the record in ink, stop lines S2-S4 as sell-ink dots; a legend word for each), S1-S4 and E1-E5 as rows
-  with their state in words, the "not adopted" tag and a link to item 43. An older coach.json without `forward` reads "No
+  with their state in words, the "Protocol adopted · 12 Nov 2026" tag and a link to item 43. An older coach.json without `forward` reads "No
   reading yet: the first one comes with the next Coach rebuild". Simple phone view: the Systems pane's existing fold helper
   makes it a two-line row (`.fw-sum` added to its summary selector; no new mechanism). Home's "things wait on you" and the
   daily digest's "Waiting on you" get ONE line only when `alerts` is non-empty (`MS_WEEK.decisions` item `k: 'forward'`,
@@ -3030,6 +3064,37 @@ What was done, and the rules to keep:
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
 
+## Gold playbook study: the weekly-bull daily rejection long, out of its own sample (11 Nov 2026, owner: "keep improving and follow our strategy and learn more about it")
+`research/edge/gold-drd-long/` (PREREGISTRATION.md pushed first, then `run.mjs`, RESULT.md, result.json). The gold playbook
+skill's best edge (weekly structure bullish + a 17:00 New York day closing above the previous low in the top 30% of its range
+→ buy the next open, stop $0.30 under its low, 3R, 10 days) was found on November 2022 to October 2026 only. Tested on OANDA mid
+H1 gold March 2006 to October 2022, net of $0.35, against the same trade on every bullish-week day. The code reproduces the
+skill's window (294 trades, PF 2.17 vs its 271 / 2.20). **Verdict: FAIL**: out of sample +0.141R a trade, PF 1.22 (n 910),
+profitable in 2006-19 and 2020-22, but lift over the baseline +0.10R, t 1.58 (bar t >= 2); worst drawdown -77R; it follows
+gold's trend year by year (losing 2012-15, 2017-19, 2021). The mirror short has no edge. Not an edge of its own; the `#gold`
+view's wording stays the skill's; nothing live changed. Tests: `tests/gold-drd-long.test.mjs`.
+
+## Gold playbook study 2: the Daily-regime filter on that long (12 Nov 2026, owner: "Keep improve")
+`research/edge/gold-drd-er/` (PREREGISTRATION.md pushed first; `run.mjs` imports gold-drd-long's rule, trade and statistics
+unchanged). The one follow-up gold-drd-long named: skip the signal when the 20-day efficiency ratio of the 17:00 New York daily
+closes (up to and including the signal day) is under 0.2. **Verdict: FAIL**: on 2006 to October 2022 the trending-Daily signals
+made +0.139R a trade more than the choppy ones, Welch t 1.29 (bar t >= 2), and the difference reversed in 2020-22 (-0.10R) and
+is flat in the skill's window. The other two checks passed: filtered PF 1.33 / 1.35 in both halves, worst drawdown -30.9R against
+-77.4R (496 of 910 trades kept). A risk tool on this rule at most, not a better selection; not a council rule, nothing live
+changed. ER >= 0.3 and the signed ER looked better but were chosen after the fact: their own pre-registration on other data or
+nothing. Tests: `tests/gold-drd-er.test.mjs`.
+
+## Gold playbook study 3: that long and its two cuts on silver (12 Nov 2026, owner: "Keep improving")
+`research/edge/gold-drd-silver/` (PREREGISTRATION.md pushed first; imports gold-drd-long's days / weeks / statistics and
+gold-drd-er's ER; buffer $0.004 and cost $0.03 scaled for silver). The two cuts gold-drd-er found after the fact (ER20 >= 0.3, and
+ER20 >= 0.2 with the close up over 20 days) tested on a market they were not chosen on, OANDA mid H1 XAG 2006 to Nov 2026.
+**Verdict: PASS on the pre-registered bar, and not robust**: T1 every signal +0.097R (n 1,146, PF 1.14), T2 ER >= 0.3 +0.176R
+(n 450, PF 1.28, -49R worst drawdown against -107R), T3 signed +0.186R (n 531, PF 1.29), all PF > 1 in both halves, Holm p
+0.018-0.029. But t counts overlapping trades as independent: on monthly sums t is 1.15-1.43, and without 2025 each stream is
+about +0.04 to +0.10R with t near 1. Evidence the cuts are not pure curve-fit, not a proven edge; not a council rule, nothing live
+changed. A next test would hold one position at a time on gold and silver together, judged on monthly sums, with its own
+pre-registration. Tests: `tests/gold-drd-silver.test.mjs`.
+
 ## Mosha cycle: a main paper system (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot"; chose "main system")
 `council/mosha-cycle.mjs` (pure: `cycleState`, `cycleTrades`, `cycleText`) + the Trader block after Mosha BO (user rule
 `mosha-cycle`, `config.moshaCycle`; records `k: 'mcycle'`, ids `xau-mcycle-<leg>-<H4 break time>`). Gold only. From the BO
@@ -3044,7 +3109,7 @@ a stop on the losing side (the function returns nothing without one). A main sys
 it like any non-shadow trade. Not yet in the decay monitor, expectations or book weights (no base study). **Not a tested
 edge**: the mechanical studies of this cycle (mosha-retrace, mosha-cycle) did not pass; the owner chose to trade it on paper
 and judge its forward record. `snapshot.moshaCycle` → `#ms-rep-mcycle` under the Mosha BO chain line. Tests:
-`tests/mosha-cycle.test.mjs`.
+`tests/mosha-cycle.test.mjs`. Owner, 12 Nov 2026: keep it as a main paper system ("Yes to all"; docs/owner-decisions.md item 48).
 12 Nov 2026: owner-shadowable like the others: `cycleBlockers(o, trades, price, ownerSh('mcycle'))` (pure, in mosha-cycle.mjs)
 adds `'owner-shadow'` when `config.ownerShadow.mcycle` is set (none today: live records unchanged, pinned against the old
 blockers); the one-per-leg cap and `snapshot.moshaCycle.open` count `ownStream`, not `!x.shadow`; a trade already open stays
@@ -3067,7 +3132,7 @@ live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`test
   per verdict n / wins / R, taking every trade vs following the answer (SKIP 0, REDUCE ½); "Too few to judge" under
   `MIN_JUDGE` 20 closed; at 20+ "a forward comparison, not a tested edge". Card `#ms-ea` (`adm`) in the Council review pane,
   `<style id="ms-ea-css">` + `<script id="ms-ea-js">`.
-- **Money**: a paid key, the owner's exception to absolute rule 5 (docs/owner-decisions.md item 47). Shares the provider
+- **Money**: a paid key, the owner's exception to absolute rule 5 (docs/owner-decisions.md item 47; owner, 12 Nov 2026: keep, "Yes to all"). Shares the provider
   settings (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`); own budgets `EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
   `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12; `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` stops it. No key = no call.
 - Paper only: it changes no rule, size, filter or trade, imports nothing of the council or the mirror (test), and no council

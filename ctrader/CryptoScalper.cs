@@ -44,8 +44,20 @@ namespace cAlgo.Robots
 
         private class Sig { public int C; public double E, Stop, R0; }
 
+        // Paper and demo only (absolute rule 2; owner, 12 Nov 2026, docs/owner-decisions.md item 45): this program refuses an account
+        // that is not a demo. Checked on start and right before every order it sends; on a refusal it says why and stops itself
+        // without sending anything. Account.IsLive is the platform's own account-type flag (true for a live account).
+        private bool DemoOnly()
+        {
+            if (!Account.IsLive) return true;
+            Print("CryptoScalper refused: account {0} is a LIVE account. This program runs on demo accounts only; it stops now and sends nothing.", Account.Number);
+            Stop();
+            return false;
+        }
+
         protected override void OnStart()
         {
+            if (!DemoOnly()) return;
             _syms = SymbolList.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
             foreach (var s in _syms.Where(s => !Symbols.Exists(s))) Print("CryptoScalper: symbol {0} not found, skipped", s);
             _syms = _syms.Where(s => Symbols.Exists(s)).ToArray();
@@ -57,6 +69,7 @@ namespace cAlgo.Robots
 
         protected override void OnTimer()
         {
+            if (!DemoOnly()) return;
             if (Server.Time.Date != _day) { _day = Server.Time.Date; _dayEquity = Account.Equity; }
             foreach (var s in _syms)
             {
@@ -102,6 +115,7 @@ namespace cAlgo.Robots
                 if (vol <= 0) { Print("CryptoScalper {0}: stop too wide for {1}% risk at the minimum volume", name, RiskPct); continue; }
                 Print("CryptoScalper {0} {1} {2} units at ~{3}, stop {4} (iFVG after a sweep; R = {5})", name, side > 0 ? "BUY" : "SELL", vol, px, Math.Round(stopPx, sym.Digits), Math.Round(dist, sym.Digits));
                 if (DryRun) return;
+                if (!DemoOnly()) return;
                 var res = ExecuteMarketOrder(side > 0 ? TradeType.Buy : TradeType.Sell, name, vol, Lab, dist / sym.PipSize, null, "r0=" + dist.ToString("R"));
                 if (!res.IsSuccessful) Print("CryptoScalper {0}: order failed {1}", name, res.Error);
                 return;
