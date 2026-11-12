@@ -1,0 +1,481 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// Mosha Markups: the same marks the macro-dashboard market-structure charts draw (market-structure.html / council/engine.mjs).
+// A line-by-line port of msAnalyze: BO lines (BO Buy / BO Sell / BO Structure), the Origin of the move, the VR, the 50% line
+// (main vs internal structure), CF swings inside the Origin, plus the higher-timeframe Origin and the London / New York opens.
+// Like the page it analyses the last 500 candles with a 6-candle swing, and redraws on every new candle.
+//@version=6
+indicator("Mosha Markups", shorttitle = "Mosha", overlay = true, max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
+
+// ─── Inputs ───
+N        = input.int(6, "Swing size (candles each side)", minval = 2, maxval = 20, group = "Engine", tooltip = "The page uses 6.")
+NBARS    = input.int(500, "Candles analysed", minval = 100, maxval = 3000, group = "Engine", tooltip = "The page analyses the last 500 candles.")
+detail   = input.bool(false, "Detail mode (more history, every CF)", group = "Display")
+showBO   = input.bool(true, "BO lines", group = "Display")
+showOrig = input.bool(true, "Origin", group = "Display")
+showCF   = input.bool(true, "CF", group = "Display")
+showVR   = input.bool(true, "VR and the 50% line", group = "Display")
+showSess = input.bool(true, "London / New York opens (M15 and below)", group = "Display")
+showTbl  = input.bool(true, "Readout", group = "Display")
+showHTF  = input.bool(true, "Higher-timeframe Origin", group = "Higher timeframe")
+htfIn    = input.timeframe("", "Higher timeframe (empty = automatic)", group = "Higher timeframe", tooltip = "Automatic: M1/M5 → M15, M15 → H1, H1 → H4, H4 → D1, D1 → W1, like the page.")
+
+// ─── Colours (the page's palette) ───
+C_SELL_FILL = color.new(#f23645, 80)
+C_SELL_EDGE = color.new(#b22833, 15)
+C_SELL_CF   = color.new(#f23645, 70)
+C_SELL_LINE = #f23645
+C_BUY_FILL  = color.new(#089981, 84)
+C_BUY_EDGE  = color.new(#067a67, 15)
+C_BUY_CF    = color.new(#089981, 72)
+C_BUY_LINE  = #089981
+C_VR_FILL   = color.new(#ff9800, 82)
+C_VR_EDGE   = color.new(#e08600, 10)
+C_MID       = #9aa4b8
+C_HTF       = color.new(#2962ff, 15)
+C_NONE      = color.new(color.black, 100)
+
+// ─── Engine types ───
+type CF
+    int   i
+    float p
+    bool  post
+    float lo
+    float hi
+
+type Ev
+    int   dir
+    float level
+    int   fromIdx
+    int   breakIdx
+    bool  structure
+    int   start
+    float top
+    float bot
+    int   protIdx
+    float prot
+    int   vrI = -1
+    float vrP = na
+    int   endIdx = -1
+    float vrLo = na
+    float vrHi = na
+    int   vrConfirm = -1
+    array<CF> cfs
+
+type Res
+    array<Ev> evs
+    int   trend
+    int   extI
+    float extP
+    bool  extFixed
+    int   n
+
+// ─── Engine helpers (array based, same as the JS) ───
+maxIn(array<float> H, int a, int b) =>
+    float m = -1e300
+    int k = a
+    if a <= b
+        for j = a to b
+            if H.get(j) > m
+                m := H.get(j)
+                k := j
+    [m, k]
+
+minIn(array<float> L, int a, int b) =>
+    float m = 1e300
+    int k = a
+    if a <= b
+        for j = a to b
+            if L.get(j) < m
+                m := L.get(j)
+                k := j
+    [m, k]
+
+pivH(array<float> H, int j, int w, int n) =>
+    bool ok = true
+    for k = 1 to w
+        if j - k < 0 or j + k >= n
+            ok := false
+            break
+        if H.get(j - k) > H.get(j) or H.get(j + k) >= H.get(j)
+            ok := false
+            break
+    ok
+
+pivL(array<float> L, int j, int w, int n) =>
+    bool ok = true
+    for k = 1 to w
+        if j - k < 0 or j + k >= n
+            ok := false
+            break
+        if L.get(j - k) < L.get(j) or L.get(j + k) <= L.get(j)
+            ok := false
+            break
+    ok
+
+makeEv(array<float> H, array<float> L, int dir, float level, int fromIdx, int i, bool structure) =>
+    int start = fromIdx
+    float top = na
+    float bot = na
+    int topIdx = fromIdx
+    int botIdx = fromIdx
+    if dir < 0
+        [pt, pti] = maxIn(H, fromIdx, i)
+        h = pt - level
+        if i - 1 >= pti + 1
+            float mx = H.get(i)   // running max of H[j+1..i]
+            for j = i - 1 to pti + 1 by -1
+                if L.get(j) <= level + 0.15 * h and mx >= level + 0.5 * h
+                    start := j
+                    break
+                mx := math.max(mx, H.get(j))
+        [t, ti] = maxIn(H, start, i)
+        top := t
+        topIdx := ti
+        bot := level
+        botIdx := fromIdx
+    else
+        [pb, pbi] = minIn(L, fromIdx, i)
+        h = level - pb
+        if i - 1 >= pbi + 1
+            float mn = L.get(i)   // running min of L[j+1..i]
+            for j = i - 1 to pbi + 1 by -1
+                if H.get(j) >= level - 0.15 * h and mn <= level - 0.5 * h
+                    start := j
+                    break
+                mn := math.min(mn, L.get(j))
+        [b, bi] = minIn(L, start, i)
+        bot := b
+        botIdx := bi
+        top := level
+        topIdx := fromIdx
+    Ev.new(dir, level, fromIdx, i, structure, start, top, bot, dir < 0 ? topIdx : botIdx, dir < 0 ? top : bot, cfs = array.new<CF>())
+
+analyze(array<float> H, array<float> L, array<float> C, int N) =>
+    int n = H.size()
+    evs = array.new<Ev>()
+    int trend = 0
+    int extI = -1
+    float extP = na
+    bool extFixed = false
+    int protI = -1
+    float protP = na
+    int phI = -1
+    float phP = na
+    int plI = -1
+    float plP = na
+    if n > 0
+        for i = 0 to n - 1
+            cj = i - N
+            if cj >= 0
+                if pivH(H, cj, N, n)
+                    phI := cj
+                    phP := H.get(cj)
+                if pivL(L, cj, N, n)
+                    plI := cj
+                    plP := L.get(cj)
+            if trend == 0
+                if phI >= 0 and C.get(i) > phP
+                    e = makeEv(H, L, 1, phP, phI, i, false)
+                    evs.push(e)
+                    trend := 1
+                    protP := e.bot
+                    protI := e.protIdx
+                    extI := i
+                    extP := H.get(i)
+                    extFixed := false
+                else if plI >= 0 and C.get(i) < plP
+                    e = makeEv(H, L, -1, plP, plI, i, false)
+                    evs.push(e)
+                    trend := -1
+                    protP := e.top
+                    protI := e.protIdx
+                    extI := i
+                    extP := L.get(i)
+                    extFixed := false
+                continue
+            if trend < 0
+                if C.get(i) > protP
+                    prev = evs.last()
+                    e = makeEv(H, L, 1, protP, protI, i, true)
+                    evs.push(e)
+                    trend := 1
+                    if prev.endIdx == -1
+                        prev.endIdx := i
+                    protP := e.bot
+                    protI := e.protIdx
+                    extI := i
+                    extP := H.get(i)
+                    extFixed := false
+                    continue
+                if not extFixed
+                    if L.get(i) < extP
+                        extI := i
+                        extP := L.get(i)
+                    else if i - extI >= N
+                        extFixed := true
+                        le = evs.last()
+                        le.vrI := extI
+                        le.vrP := extP
+                if extFixed and C.get(i) < extP
+                    e = makeEv(H, L, -1, extP, extI, i, false)
+                    evs.push(e)
+                    protP := e.top
+                    protI := e.protIdx
+                    extI := i
+                    extP := L.get(i)
+                    extFixed := false
+            else
+                if C.get(i) < protP
+                    prev = evs.last()
+                    e = makeEv(H, L, -1, protP, protI, i, true)
+                    evs.push(e)
+                    trend := -1
+                    if prev.endIdx == -1
+                        prev.endIdx := i
+                    protP := e.top
+                    protI := e.protIdx
+                    extI := i
+                    extP := L.get(i)
+                    extFixed := false
+                    continue
+                if not extFixed
+                    if H.get(i) > extP
+                        extI := i
+                        extP := H.get(i)
+                    else if i - extI >= N
+                        extFixed := true
+                        le = evs.last()
+                        le.vrI := extI
+                        le.vrP := extP
+                if extFixed and C.get(i) > extP
+                    e = makeEv(H, L, 1, extP, extI, i, false)
+                    evs.push(e)
+                    protP := e.bot
+                    protI := e.protIdx
+                    extI := i
+                    extP := H.get(i)
+                    extFixed := false
+    // Origin invalidation, VR box, CF swings
+    int w = math.max(2, math.round(N / 2.0))
+    int ne = evs.size()
+    if ne > 0
+        for k = 0 to ne - 1
+            e = evs.get(k)
+            h = e.top - e.bot
+            if e.breakIdx + 1 <= n - 1
+                for j = e.breakIdx + 1 to n - 1
+                    if e.endIdx != -1
+                        break
+                    if (e.dir < 0 and C.get(j) > e.top) or (e.dir > 0 and C.get(j) < e.bot)
+                        e.endIdx := j
+            if e.vrI >= 0
+                // the VR runs from the extreme to the last internal swing before it; a close back through that swing confirms it
+                int nextBrk = k + 1 < ne ? evs.get(k + 1).breakIdx : n - 1
+                float lvl = na
+                if e.vrI - 1 >= e.breakIdx + 1
+                    for j = e.vrI - 1 to e.breakIdx + 1 by -1
+                        bool isP = e.dir < 0 ? pivH(H, j, 2, n) : pivL(L, j, 2, n)
+                        if isP
+                            lvl := e.dir < 0 ? H.get(j) : L.get(j)
+                            break
+                if not na(lvl) and (e.dir < 0 ? lvl >= e.level : lvl <= e.level)
+                    lvl := na
+                if not na(lvl)
+                    int lim = math.min(nextBrk, n - 1)
+                    if e.vrI + 1 <= lim
+                        for j = e.vrI + 1 to lim
+                            if e.dir < 0 ? C.get(j) > lvl : C.get(j) < lvl
+                                e.vrConfirm := j
+                                break
+                    e.vrLo := e.dir < 0 ? e.vrP : lvl
+                    e.vrHi := e.dir < 0 ? lvl : e.vrP
+                else
+                    d = math.max(0.3 * h, math.abs(e.level - e.vrP) * 0.25)
+                    e.vrLo := e.dir < 0 ? e.vrP : e.vrP - d
+                    e.vrHi := e.dir < 0 ? e.vrP + d : e.vrP
+            int stopJ = math.min(n - 1 - w, k + 1 < ne ? evs.get(k + 1).breakIdx : n - 1)
+            if e.start + 1 <= stopJ
+                for j = e.start + 1 to stopJ
+                    bool isPiv = e.dir < 0 ? pivH(H, j, w, n) : pivL(L, j, w, n)
+                    if not isPiv
+                        continue
+                    px = e.dir < 0 ? H.get(j) : L.get(j)
+                    if px < e.bot - 0.02 * h or px > e.top + 0.02 * h
+                        continue
+                    post = j > e.breakIdx
+                    if post and e.vrI >= 0 and j < e.vrI
+                        continue
+                    lo = e.dir < 0 ? math.max(e.bot, px - 0.35 * h) : px
+                    hi = e.dir < 0 ? px : math.min(e.top, px + 0.35 * h)
+                    e.cfs.push(CF.new(j, px, post, lo, hi))
+                    if e.cfs.size() > 4
+                        e.cfs.shift()
+    Res.new(evs, trend, extI, extP, extFixed, n)
+
+// ─── Candle history (the last NBARS candles), chart timeframe ───
+var array<float> aH = array.new<float>()
+var array<float> aL = array.new<float>()
+var array<float> aC = array.new<float>()
+var array<int>   aT = array.new<int>()
+aH.push(high)
+aL.push(low)
+aC.push(close)
+aT.push(time)
+if aH.size() > NBARS
+    aH.shift()
+    aL.shift()
+    aC.shift()
+    aT.shift()
+
+// ─── Higher timeframe candles (completed ones only, no repainting) ───
+autoHTF() =>
+    s = timeframe.in_seconds()
+    s <= 300 ? "15" : s <= 900 ? "60" : s <= 3600 ? "240" : s <= 14400 ? "D" : "W"
+htf = htfIn != "" ? htfIn : autoHTF()
+useHTF = showHTF and timeframe.in_seconds(htf) > timeframe.in_seconds()
+[hH, hL, hC, hT] = request.security(syminfo.tickerid, htf, [high[1], low[1], close[1], time[1]], lookahead = barmerge.lookahead_on)
+var array<float> bH = array.new<float>()
+var array<float> bL = array.new<float>()
+var array<float> bC = array.new<float>()
+var array<int>   bT = array.new<int>()
+if useHTF and not na(hT) and (bT.size() == 0 or hT != bT.last())
+    bH.push(hH)
+    bL.push(hL)
+    bC.push(hC)
+    bT.push(hT)
+    if bH.size() > NBARS
+        bH.shift()
+        bL.shift()
+        bC.shift()
+        bT.shift()
+
+// ─── Drawing ───
+tAt(array<int> T, int idx, int msPerBar) =>
+    int n = T.size()
+    idx <= n - 1 ? T.get(math.max(0, idx)) : T.get(n - 1) + (idx - (n - 1)) * msPerBar
+
+fmt(float v) => str.tostring(v, format.mintick)
+
+var array<box>   gBoxes  = array.new<box>()
+var array<line>  gLines  = array.new<line>()
+var array<label> gLabels = array.new<label>()
+
+clearAll() =>
+    for b in gBoxes
+        b.delete()
+    for l in gLines
+        l.delete()
+    for l in gLabels
+        l.delete()
+    gBoxes.clear()
+    gLines.clear()
+    gLabels.clear()
+
+addLabel(int t, float p, string txt, color col, bool above, string align) =>
+    gLabels.push(label.new(t, p, txt, xloc = xloc.bar_time, style = above ? label.style_label_down : label.style_label_up, color = C_NONE, textcolor = col, size = size.small, textalign = align))
+
+var table tbl = table.new(position.top_right, 2, 6, bgcolor = color.new(#131722, 15), border_width = 0, frame_color = color.new(#2a2e39, 0), frame_width = 1)
+var bool wasInOrigin = false
+var int lastAlertBreak = -1
+
+if barstate.islast and aH.size() >= 40
+    clearAll()
+    ms = timeframe.in_seconds() * 1000
+    R = analyze(aH, aL, aC, N)
+    n = R.n
+    ne = R.evs.size()
+    low_tf = timeframe.in_seconds() <= 900
+    if ne > 0
+        nBO = detail ? (low_tf ? 8 : 14) : (low_tf ? 3 : 5)
+        nRecent = detail ? 2 : 1
+        nText = detail ? 5 : 2
+        k0 = math.max(0, ne - nBO)
+        seen = array.new<int>()
+        for k = k0 to ne - 1
+            e = R.evs.get(k)
+            sell = e.dir < 0
+            cLine = sell ? C_SELL_LINE : C_BUY_LINE
+            cFill = sell ? C_SELL_FILL : C_BUY_FILL
+            cEdge = sell ? C_SELL_EDGE : C_BUY_EDGE
+            cCF = sell ? C_SELL_CF : C_BUY_CF
+            if showBO
+                gLines.push(line.new(tAt(aT, e.fromIdx, ms), e.level, tAt(aT, e.breakIdx, ms), e.level, xloc = xloc.bar_time, color = cLine, width = 2))
+                if k >= ne - nText
+                    txt = e.structure ? "BO Structure" : sell ? "BO Sell" : "BO Buy"
+                    addLabel(tAt(aT, e.breakIdx, ms), e.level, txt, cLine, not sell, text.align_center)
+            if k < ne - nRecent
+                continue
+            int endI = e.endIdx != -1 ? e.endIdx : n + 26
+            if showOrig
+                gBoxes.push(box.new(tAt(aT, e.start, ms), e.top, tAt(aT, endI, ms), e.bot, xloc = xloc.bar_time, border_color = cEdge, bgcolor = cFill))
+                addLabel(tAt(aT, e.endIdx == -1 ? n + 1 : e.start + 1, ms), sell ? e.bot : e.top, "Origin " + fmt(e.bot) + "–" + fmt(e.top), cLine, sell, text.align_left)
+            if showCF
+                for f in e.cfs
+                    if seen.includes(f.i) or (not detail and not f.post)
+                        continue
+                    seen.push(f.i)
+                    gBoxes.push(box.new(tAt(aT, f.i - 1, ms), f.hi, tAt(aT, f.i + 3, ms), f.lo, xloc = xloc.bar_time, border_color = cEdge, bgcolor = cCF))
+                    addLabel(tAt(aT, f.i + 1, ms), sell ? f.hi : f.lo, f.post ? "CF ✓" : "CF", cLine, sell, text.align_center)
+            if showVR
+                isLast = k == ne - 1
+                int vI = e.vrI >= 0 ? e.vrI : isLast ? R.extI : -1
+                float vP = e.vrI >= 0 ? e.vrP : isLast ? R.extP : na
+                if vI >= 0 and not na(vP) and (sell ? vP < e.bot : vP > e.top)
+                    mid = ((sell ? e.top : e.bot) + vP) / 2
+                    gLines.push(line.new(tAt(aT, vI, ms), mid, tAt(aT, endI, ms), mid, xloc = xloc.bar_time, color = C_MID, style = line.style_dashed, width = 1))
+                    addLabel(tAt(aT, endI, ms), mid, "50% " + fmt(mid) + (sell ? " · main ↑ internal ↓" : " · internal ↑ main ↓"), C_MID, sell, text.align_right)
+                if e.vrI >= 0 and not na(e.vrLo)
+                    gBoxes.push(box.new(tAt(aT, e.vrI - 2, ms), e.vrHi, tAt(aT, math.min(endI, e.vrI + 14), ms), e.vrLo, xloc = xloc.bar_time, border_color = C_VR_EDGE, bgcolor = C_VR_FILL))
+                    addLabel(tAt(aT, e.vrI, ms), sell ? e.vrLo : e.vrHi, "VR", C_VR_EDGE, not sell, text.align_center)
+    // higher-timeframe Origin: a dashed blue box while it is still valid
+    string htfTxt = ""
+    if useHTF and bH.size() >= 40
+        RH = analyze(bH, bL, bC, N)
+        if RH.evs.size() > 0
+            he = RH.evs.last()
+            if he.endIdx == -1
+                gBoxes.push(box.new(bT.get(he.start), he.top, tAt(aT, n + 26, ms), he.bot, xloc = xloc.bar_time, border_color = C_HTF, border_style = line.style_dashed, bgcolor = C_NONE))
+                hl = (htf == "D" ? "D1" : htf == "W" ? "W1" : htf == "240" ? "H4" : htf == "60" ? "H1" : htf == "15" ? "M15" : htf) + " Origin"
+                addLabel(tAt(aT, n + 26, ms), he.top, hl, C_HTF, false, text.align_right)
+                htfTxt := hl + " " + fmt(he.bot) + "–" + fmt(he.top) + (he.dir < 0 ? " (sell)" : " (buy)")
+    // readout and alerts
+    if ne > 0
+        e = R.evs.last()
+        sell = e.dir < 0
+        boTxt = (e.structure ? "BO Structure " : sell ? "BO Sell " : "BO Buy ") + fmt(e.level)
+        inOrigin = close <= e.top and close >= e.bot and e.endIdx == -1
+        float vP = e.vrI >= 0 ? e.vrP : R.extP
+        bool past = sell ? vP < e.bot : vP > e.top
+        float mid = past ? ((sell ? e.top : e.bot) + vP) / 2 : na
+        string where = na(mid) ? "–" : (sell ? close > mid : close < mid) ? "main structure" : "internal structure"
+        if showTbl
+            cl = sell ? C_SELL_LINE : C_BUY_LINE
+            table.cell(tbl, 0, 0, "Mosha", text_color = color.white, text_size = size.small)
+            table.cell(tbl, 1, 0, sell ? "Sell side" : "Buy side", text_color = cl, text_size = size.small)
+            table.cell(tbl, 0, 1, "Last BO", text_color = color.gray, text_size = size.small)
+            table.cell(tbl, 1, 1, boTxt, text_color = cl, text_size = size.small)
+            table.cell(tbl, 0, 2, "Origin", text_color = color.gray, text_size = size.small)
+            table.cell(tbl, 1, 2, (e.endIdx == -1 ? "" : "broken · ") + fmt(e.bot) + "–" + fmt(e.top) + (inOrigin ? " · price inside" : ""), text_color = color.white, text_size = size.small)
+            table.cell(tbl, 0, 3, e.vrI >= 0 ? "VR" : "Extreme", text_color = color.gray, text_size = size.small)
+            table.cell(tbl, 1, 3, fmt(vP) + (e.vrI >= 0 ? (e.vrConfirm >= 0 ? " · confirmed" : " · in") : " · VR not in yet"), text_color = color.new(#ff9800, 0), text_size = size.small)
+            table.cell(tbl, 0, 4, "50% line", text_color = color.gray, text_size = size.small)
+            table.cell(tbl, 1, 4, na(mid) ? "–" : fmt(mid) + " · price in " + where, text_color = C_MID, text_size = size.small)
+            table.cell(tbl, 0, 5, "HTF", text_color = color.gray, text_size = size.small)
+            table.cell(tbl, 1, 5, htfTxt == "" ? "–" : htfTxt, text_color = C_HTF, text_size = size.small)
+        if barstate.isconfirmed
+            if e.breakIdx == n - 1 and lastAlertBreak != aT.get(n - 1)
+                lastAlertBreak := aT.get(n - 1)
+                alert("Mosha " + syminfo.ticker + " " + timeframe.period + ": " + boTxt, alert.freq_once_per_bar_close)
+            if inOrigin and not wasInOrigin
+                alert("Mosha " + syminfo.ticker + " " + timeframe.period + ": price is in the Origin " + fmt(e.bot) + "–" + fmt(e.top) + ", wait for the lower-timeframe CF", alert.freq_once_per_bar_close)
+            wasInOrigin := inOrigin
+
+// ─── London / New York opens on M15 and below (08:00 London, 08:00 New York, like the page) ───
+var array<line> sessLines = array.new<line>()
+isOpen(string tz) => hour(time, tz) == 8 and minute(time, tz) == 0
+if showSess and timeframe.in_seconds() <= 900 and barstate.isnew
+    for tz in array.from("Europe/London", "America/New_York")
+        if isOpen(tz)
+            sessLines.push(line.new(bar_index, close, bar_index, close * 1.0001, extend = extend.both, color = tz == "Europe/London" ? color.new(#2962ff, 40) : color.new(#ab47bc, 35), style = line.style_dotted))
+    while sessLines.size() > 4
+        sessLines.shift().delete()
