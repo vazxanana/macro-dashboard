@@ -36,6 +36,10 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
     loop free to run.
 12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
     keeps the demo broker's rate and the comparison waits for the November 2027 review.
+13. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
+    first open-run trade reaches +2R; that one is booked about +1R and may be closed early.
+14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
+    its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
 
 Answered on 12 Nov 2026 ("Yes to all"), nothing more needed from you: items 42 to 47 and the new item 48 (the Mosha cycle stays
 a main paper system). The forward-test protocol (item 43) is now in force: if one of its stop lines is crossed, Gold trend and
@@ -47,7 +51,8 @@ Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading 
 and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
 **Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, 40 open, 41
 answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov
-2026** (43-48, all answered on 12 Nov), **The cost of holding a gold buy, 12 Nov 2026** (49, open).
+2026** (43-48, all answered on 12 Nov), **The cost of holding a gold buy, 12 Nov 2026** (49, open), **The NQ open run's trail, 12 Nov 2026** (50, open),
+**Moved stops on the demo mirror, 12 Nov 2026** (51, open).
 
 ---
 
@@ -1019,3 +1024,27 @@ figure or demo-mirror setting.
   makes the trail follow the rule it was tested with; no stop is ever loosened and no closed result is rewritten.
 - **If nothing is decided.** Harmless until the first open-run trade reaches +2R; that one is booked about +1R and may be
   closed early.
+
+## Moved stops on the demo mirror, 12 Nov 2026
+
+### [ ] 51. The demo mirror can copy a trade whose stop already locks a profit with its stop on the losing side
+
+- **Status (12 Nov 2026): open, waiting for you.** Found in an audit that followed item 50 (the NQ open run's trail; this
+  item comes after it) and confirmed with tests; nothing in the mirror's copy decisions was changed.
+- **Context.** The audit looked for every other place that reads "1R" from a stop that has already moved. The Trader's
+  own trade management, the costs and financing, the daily replay and the ICT desk are sound; four readers (fill quality,
+  the digest, the AI second opinion, some figures on the Desk and the reconciliation report) were fixed, display and
+  measurement only. Two decisions of the demo mirror remain. (a) When a trade is copied after its trail has moved its stop
+  past the entry, the copy's stop is placed the same distance on the LOSING side of its fill: the council's trade can no
+  longer lose, the copy can. It happens for an ICT A-setup copied late (after a wait: market closed, a cap, the daily loss
+  stop), and for a council trade only when no fresh council price is on file. (b) The check that refuses a late copy
+  "more than 1R into the trade" measures 1R from the moved stop, so a Gold trend position whose stop the daily ratchet has
+  lifted is refused when it is well under 1R in. Nothing of the kind has happened yet (council-data of 12 Nov, all five
+  demo accounts). Write-up, proof and the two small changes: `research/proposals/2026-11-12-moved-stop-audit.md` (tests
+  `tests/moved-stop-audit.test.mjs` and the "item 51" tests in `tests/ctrader-mirror.test.mjs`).
+- **Options.** (a) and (b): never copy a trade whose stop is already past its entry, and measure the late-copy check in
+  the trade's opening risk. (a) only. (b) only. Leave both.
+- **Recommended.** (a) and (b). Both only decide which trades the demo account opens; no council trade, stop or result
+  changes, and no stop is ever loosened (the change in (a) removes the copies whose stop would be).
+- **If nothing is decided.** The first ICT A-setup copied after its trail passed the entry gets a demo stop on the losing
+  side, and some catch-up copies of ratcheted gold trend positions are refused.

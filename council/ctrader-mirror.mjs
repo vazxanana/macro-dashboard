@@ -49,6 +49,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
+import { openRisk as riskAtOpen } from './fills.mjs';   // the risk a trade OPENED with (12 Nov 2026, moved-stop audit): fill quality in R (renamed: riskVolume and the round have their own openRisk = cash at risk)
 import { writeAtomic } from './jsonio.mjs';   // state files: a killed run never leaves one cut short (the live runner's child timeout)
 
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
@@ -406,11 +407,14 @@ const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVA
 // The ICT desk's prices are CME futures (NQ / ES / YM / RTY / GC) while the demo fills the cash index / spot gold CFD: fill - entry
 // there is the futures-cash basis (often several R), not slippage, so those fills keep the price and the delay only.
 const otherInstrument = (t) => String(t.id).startsWith('ict:');
+// 12 Nov 2026 (moved-stop audit): R is the trade's OPENING risk (fills.mjs openRisk, imported as riskAtOpen: its stamped r0). A copy made after the
+// council's stop moved (a gold trend ratchet, a late catch-up copy) used to divide by the distance to the moved stop, which
+// overstated slipR (the forward protocol's E3 check and executionStats read it). The fill price and delay are unchanged.
 export function fillQuality(t, price, now) {
-  const px = +price, risk = Math.abs(t.entry - t.stop);
-  if (!(px > 0) || !(risk > 0)) return {};
+  const px = +price, risk = riskAtOpen(t);
+  if (!(px > 0) || !(Math.abs(t.entry - t.stop) > 0 || risk > 0)) return {};
   const sign = t.side === 'sell' ? -1 : 1, when = t.filled || t.opened, lagSec = Number.isFinite(+when) ? Math.max(0, Math.round(now - when)) : null;
-  if (otherInstrument(t)) return { fillPrice: px, lagSec };
+  if (otherInstrument(t) || !(risk > 0)) return { fillPrice: px, lagSec };   // opening risk unknown (moved, no r0 on file): no slipR
   return { fillPrice: px, slipR: +((sign * (px - t.entry)) / risk).toFixed(3), lagSec };
 }
 export function executionStats(map, { since = 0 } = {}) {

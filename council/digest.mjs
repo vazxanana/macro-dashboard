@@ -42,6 +42,7 @@ import { expectLine } from './expect.mjs';
 import { forwardLine } from './forward.mjs';
 import { researchLines } from './research-ledger.mjs';
 import { writeAtomic } from './jsonio.mjs';
+import { openRisk } from './fills.mjs';
 
 export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
@@ -82,7 +83,9 @@ const closedAt = (x) => x.closed || x.exitAt || null;
 // Meridian after costs: the Trader's Rnet; older records without it: R − costR × size; none recorded: the raw R
 export const merNet = (x) => Number.isFinite(x.Rnet) ? x.Rnet : Number.isFinite(x.costR) ? x.R - x.costR * (x.size || 1) : x.R;
 // ICT after costs: R (already × size) less the micro round trip in R of the signal's initial risk
-const r0Of = (x) => +x.r0 || Math.abs(x.entry - (x.stop0 != null ? x.stop0 : x.stop));
+// 12 Nov 2026 (moved-stop audit): the OPENING risk (fills.mjs openRisk). An NQ open-run record has no r0 and its runner trails
+// the stop: |entry - stop| after a move put "floating" in the trailed unit (a stop past the entry gave a huge figure); 0 = unknown
+const r0Of = (x) => openRisk(x) || 0;
 export const ictNet = (x) => { if (Number.isFinite(x.Rnet)) return x.Rnet; const r0 = r0Of(x), c = ICT_COST_PTS[x.market] || 0;
   return r0 > 0 ? x.R - c / r0 * (x.size || 1) : x.R; };
 // closed trades with a close in (from, to]: { n, w, l, R, net }

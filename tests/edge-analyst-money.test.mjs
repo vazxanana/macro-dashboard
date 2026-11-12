@@ -202,9 +202,12 @@ test('a record with no opening risk whose stop has trailed is not studied with t
   // NQ open-run records carry no r0 / stop0, and the Trader trails their `stop` after +2R (trailMoved)
   const at = T0 / 1000 + 3600;
   const nq = { id: 'nq-nyflip-2026-11-11', k: 'nq-open', session: 'nyflip', market: 'nq', side: 'buy', entry: 25000, stop: 25040, trailMoved: true, t1: 25600, tp1: 25120, opened: at, filled: at, status: 'open', dec: 2 };
-  assert.equal(E.stopAtEntry(nq), null, 'the opening stop is unknown');
+  // since the moved-stop audit (#786) the open run's opening risk is read from its 2R mark (half the distance to tp1)
+  assert.equal(E.stopAtEntry(nq), 24940, 'the opening stop comes from the 2R mark');
+  const { tp1, ...noMark } = nq;
+  assert.equal(E.stopAtEntry(noMark), null, 'with no 2R mark the opening stop is unknown');
   assert.equal(E.stopAtEntry({ ...nq, trailMoved: false, stop: 24940 }), 24940, 'an unmoved stop is the opening one');
-  const R = rig({ research: [nq] }); await R.store.put('state.json', { since: at - 10 }); R.clock.t = (at + 1800) * 1000;
+  const R = rig({ research: [noMark] }); await R.store.put('state.json', { since: at - 10 }); R.clock.t = (at + 1800) * 1000;
   await scanOnce(R);
   assert.equal(R.prov.calls, 0); assert.ok(!R.prov.bodies.some((b) => JSON.stringify(b).includes('25040')));
 });

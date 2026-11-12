@@ -330,7 +330,11 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
 
 test('the owner\'s decisions are on record: three approved with the owner\'s words, two open, numbers never reused', () => {
   const doc = rd('docs/owner-decisions.md'), heads = [...doc.matchAll(/^### \[(.)\] (\d+)\. (.*)$/gm)], nums = heads.map((m) => +m[2]);
-  assert.deepEqual(nums.slice().sort((a, b) => a - b), nums.map((_, i) => i + 1), 'every number 1..n once: none renumbered, none reused');
+  // a number taken by an item written on another branch may be reserved in the file with <!-- reserved item N: … --> until
+  // that branch merges; it is still never reused, and nothing is renumbered once on main.
+  const reserved = [...doc.matchAll(/<!-- reserved item (\d+):/g)].map((m) => +m[1]), all = [...new Set(nums.concat(reserved))];
+  assert.equal(new Set(nums).size, nums.length, 'no number twice');
+  assert.deepEqual(all.sort((a, b) => a - b), all.map((_, i) => i + 1), 'every number 1..n once: none renumbered, none reused');
   assert.deepEqual(nums.slice(36, 41), [37, 38, 39, 40, 41], 'the five items of the edge review follow item 36 in order (later items are added after them: 42, the book study)');
   const item = (n) => { const a = doc.indexOf(`\n### [`, doc.search(new RegExp(`^### \\[.\\] ${n}\\. `, 'm')) - 1), b = doc.indexOf('\n### [', a + 5); return doc.slice(a, b < 0 ? undefined : b); };
   const five = [37, 38, 39, 40, 41].map(item), box = (n) => heads.find((m) => +m[2] === n)[1];
