@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS, feedOnlyMove, adjOf } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -1018,4 +1018,29 @@ test('moved-stop audit, item 51 (b): the late-copy check reads "R" from the move
   // the same trade before the ratchet is copied
   const b2 = broker(); await mirrorRound({ env: ENV, trades: [tr({ id: 'eurusd-ratchet-2', stop: 1.098, r0: 0.002, opened: NOW - 7200, filled: NOW - 7200 })], state: started, WS: b2.WS, now: NOW, marks: { eurusd: 1.1016 } });
   assert.equal(markets(b2).length, 1);
+});
+
+// ---- 12 Nov 2026 (owner approved): one feed per market. A feed adoption moves the council's numbers by one offset
+// (council/feed.mjs, feedAdj); the broker stop is NOT amended for that alone. A real move after it still goes.
+test('one feed: a feed-only offset leaves the broker stop alone; a break-even on top of it is sent; the reconciliation reads the shift', async () => {
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  const pid = r.state.map['eurusd-intraday-1'].positionId; b.positions.get(pid).stopLoss = 1.098; b.positions.get(pid).takeProfit = 1.105;
+  // the Trader adopted the trade onto the other feed: target -0.0002, stop -0.0002 would loosen it so it stayed (feedAdj.stop 0) ...
+  r = await mirrorRound({ env: ENV, trades: [tr({ t1: 1.1048, feedAdj: { stop: 0, t1: -0.0002 } })], state: r.state, WS: b.WS, now: NOW + 240 });
+  assert.equal(b.amends.length, 0, 'target moved by the feed offset only: nothing sent');
+  let m = r.state.map['eurusd-intraday-1']; assert.equal(m.t1, 1.1048); assert.deepEqual(m.feedAdj, { stop: 0, t1: -0.0002 }); assert.equal(m.feedOnly, 1); assert.deepEqual(m.brokerShift, { stop: 0, t1: -0.0002 });
+  // ... and a second adoption the other way tightened the stop by +0.0003 (feedAdj.stop 0.0003)
+  r = await mirrorRound({ env: ENV, trades: [tr({ stop: 1.0983, t1: 1.1051, feedAdj: { stop: 0.0003, t1: 0.0001 } })], state: r.state, WS: b.WS, now: NOW + 480 });
+  assert.equal(b.amends.length, 0, 'still no amend'); m = r.state.map['eurusd-intraday-1']; assert.equal(m.stop, 1.0983); assert.equal(m.feedOnly, 2);
+  assert.equal(b.positions.get(pid).stopLoss, 1.098, 'the broker stop is where it was');
+  r = await mirrorRound({ env: ENV, trades: [tr({ stop: 1.0983, t1: 1.1051, feedAdj: { stop: 0.0003, t1: 0.0001 } })], state: r.state, WS: b.WS, now: NOW + 720 });
+  assert.equal(b.amends.length, 0); assert.equal(r.state.map['eurusd-intraday-1'].feedOnly, 2, 'nothing to do once the copy took the new numbers');
+  // break-even: a real council move -> sent as the council's absolute level, the shift is cleared
+  r = await mirrorRound({ env: ENV, trades: [tr({ stop: 1.1, be: true, t1: 1.1051, feedAdj: { stop: 0.0003, t1: 0.0001 } })], state: r.state, WS: b.WS, now: NOW + 960 });
+  assert.equal(b.amends.length, 1); assert.equal(b.amends[0].stopLoss, 1.1); m = r.state.map['eurusd-intraday-1']; assert.equal(m.brokerShift, undefined); assert.equal(m.amended, 1);
+  // pure pieces
+  assert.equal(feedOnlyMove({ stop: 2, t1: 3 }, { stop: 2, t1: 3 }, 1e-6), false, 'no adjustment: not feed-only');
+  assert.equal(feedOnlyMove({ stop: 2.5, t1: 3, feedAdj: { stop: 0.5, t1: 0 } }, { stop: 2, t1: 3 }, 1e-6), true);
+  assert.equal(feedOnlyMove({ stop: 2.7, t1: 3, feedAdj: { stop: 0.5, t1: 0 } }, { stop: 2, t1: 3 }, 1e-6), false, 'a real move on top of the offset');
+  assert.deepEqual(adjOf({}), { stop: 0, t1: 0 });
 });
