@@ -8239,7 +8239,8 @@
     "t1": 1.42604,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42434,
@@ -8253,9 +8254,10 @@
     "lagSec": 61,
     "positionId": "48493280",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T16:34:30.000Z",
-    "brokerStop": 1.42349
+    "brokerStop": 1.42349,
+    "closedAt": "2026-11-12T02:38:40.000Z"
    },
    "eurusd-rscalp-1794409682": {
     "symbol": "EURUSD",
@@ -8267,7 +8269,8 @@
     "t1": 1.11109,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.10898,
@@ -8281,7 +8284,8 @@
     "lagSec": 7155,
     "positionId": "48464186",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T02:38:40.000Z"
    },
    "gbpusd-scalp-1794417165": {
     "symbol": "GBPUSD",
@@ -8877,7 +8881,8 @@
     "t1": 1.331115,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.32794,
@@ -8891,9 +8896,10 @@
     "lagSec": 41,
     "positionId": "48559742",
     "volume": 100000,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-11T23:02:43.000Z",
-    "brokerStop": 1.32632
+    "brokerStop": 1.32632,
+    "closedAt": "2026-11-12T02:38:40.000Z"
    },
    "usdcad-rintra-1794438249": {
     "symbol": "USDCAD",
@@ -9475,7 +9481,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9820.13 · 34 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9820.16 · 31 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9548,25 +9554,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9820.13,
-  "lastRun": "2026-11-12T02:36:16.000Z"
+  "balance": 9820.16,
+  "lastRun": "2026-11-12T02:38:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T07:48:06.000Z",
-   "msg": "limit filled at once: USDCHF position 48347186 at the broker at 0.8275",
-   "trade": "usdchf-scalp-1794383223"
-  },
-  {
-   "at": "2026-11-11T07:50:39.000Z",
-   "msg": "cancelled USDCAD limit order 33914211 for usdcad-scalp-1794382203: the council ended it: missed",
-   "trade": "usdcad-scalp-1794382203"
-  },
-  {
-   "at": "2026-11-11T07:55:05.000Z",
-   "msg": "limit filled: USDCAD position 48346849 at the broker",
-   "trade": "usdcad-scalp-1794383071"
-  },
   {
    "at": "2026-11-11T07:57:43.000Z",
    "msg": "BTCUSD position 48227161 closed at the broker",
@@ -11051,6 +11042,21 @@
    "at": "2026-11-12T02:31:22.000Z",
    "msg": "placed sell limit AUDUSD 0.02 lot at 0.68442 (council intraday, valid to 2026-11-12T14:30Z)",
    "trade": "audusd-intraday-1794450613"
+  },
+  {
+   "at": "2026-11-12T02:38:40.000Z",
+   "msg": "USDCAD position 48493280 closed at the broker",
+   "trade": "usdcad-scalp-1794414809"
+  },
+  {
+   "at": "2026-11-12T02:38:40.000Z",
+   "msg": "EURUSD position 48464186 closed at the broker",
+   "trade": "eurusd-rscalp-1794409682"
+  },
+  {
+   "at": "2026-11-12T02:38:40.000Z",
+   "msg": "GBPUSD position 48559742 closed at the broker",
+   "trade": "gbpusd-rscalp-1794438122"
   }
  ],
  "limits": {
