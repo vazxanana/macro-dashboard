@@ -9481,7 +9481,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9820.16 · 31 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9820.16 · 31 open · 4 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9551,18 +9551,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdchf-intraday-1794451145": {
+    "orderId": "33972371",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 0.83316,
+    "stop": 0.83162,
+    "t1": 0.83624,
+    "placedAt": "2026-11-12T02:40:04.000Z",
+    "expires": "2026-11-12T14:39:05.000Z",
+    "riskCash": 1.96,
+    "margin": 2,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9820.16,
-  "lastRun": "2026-11-12T02:38:40.000Z"
+  "lastRun": "2026-11-12T02:40:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T07:57:43.000Z",
-   "msg": "BTCUSD position 48227161 closed at the broker",
-   "trade": "btc-scalp-1794346855"
-  },
   {
    "at": "2026-11-11T07:57:43.000Z",
    "msg": "BTCUSD position 48274419 closed at the broker",
@@ -11057,6 +11072,11 @@
    "at": "2026-11-12T02:38:40.000Z",
    "msg": "GBPUSD position 48559742 closed at the broker",
    "trade": "gbpusd-rscalp-1794438122"
+  },
+  {
+   "at": "2026-11-12T02:40:04.000Z",
+   "msg": "placed buy limit USDCHF 0.01 lot at 0.83316 (council intraday, valid to 2026-11-12T14:39Z)",
+   "trade": "usdchf-intraday-1794451145"
   }
  ],
  "limits": {
