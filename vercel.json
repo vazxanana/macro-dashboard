@@ -207,6 +207,10 @@
     {
       "path": "/api/alert-cron",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/edge-analyst?job=scan",
+      "schedule": "*/10 * * * *"
     }
   ],
   "functions": {
@@ -237,6 +241,9 @@
     },
     "api/alert-cron.js": {
       "maxDuration": 60
+    },
+    "api/edge-analyst.js": {
+      "maxDuration": 120
     },
     "api/pine.js": {
       "maxDuration": 15
