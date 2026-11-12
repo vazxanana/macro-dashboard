@@ -117,3 +117,31 @@ test('internal breaks: every close beyond a labelled swing, closed candles only,
   assert.match(html, /data-show="ibos" checked/); assert.match(html, /show: \{ bo: true, hist: true, ibos: true,/);
   assert.match(html, /text: `iBO \$\{sell \? '▼' : '▲'\}`/); assert.doesNotMatch(html, /'iChoCh'/, 'an internal break is an i.BO, never a ChoCh (Mosha)'); assert.match(html, /!major\.has\(e\.level\)/);
 });
+
+// The Mosha layer (12 Nov 2026, owner: "build the mosha layer"): the storyline of the timeframe above read on this one.
+const msMosha = new Function(`${fn('msMosha')}; return msMosha;`)();
+const bar = (time, high, low) => ({ time, high, low });
+const H4S = { dir: -1, level: 4100, t: 100, ext: 3950 };
+const path = [bar(110, 4090, 4060), bar(120, 4070, 4000), bar(130, 4040, 4010), bar(140, 4050, 4030), bar(150, 4045, 4020), bar(160, 4035, 4015)];
+test('Mosha: no break against the HTF BO yet, waiting for the VR; barriers are the breaks with it', () => {
+  const M = msMosha(H4S, { events: [{ dir: -1, level: 4050, t: 115, fromT: 105, top: 4080, bot: 4050 }], bars: path });
+  assert.equal(M.state, 'wait-vr'); assert.deepEqual(M.barriers, [{ level: 4050, t: 115 }]);
+});
+test('Mosha: the VR box runs from the extreme the BO made to the level the VR broke; then the CF zone, stop, target', () => {
+  const ev = [{ dir: 1, level: 4035, t: 140, fromT: 125, top: 4030, bot: 4000 }, { dir: -1, level: 4025, t: 160, fromT: 145, top: 4050, bot: 4030 }];
+  const M = msMosha(H4S, { events: ev, bars: path.concat([bar(170, 4031, 4012), bar(180, 4020, 3995)]) }, 0.3);
+  assert.equal(M.vr.ext, 4000); assert.equal(M.vr.lo, 4000); assert.equal(M.vr.hi, 4035);
+  assert.equal(M.case, 2, 'the CF level sits inside the VR box');
+  assert.deepEqual([M.trade.entry, M.trade.stop, M.trade.target], [4030, 4050.3, 4000]);
+  assert.ok(M.trade.stop > M.trade.entry, 'a sell has its stop above the entry');
+  assert.equal(M.trade.status, 'target'); assert.equal(M.trade.fillT, 170);
+});
+test('Mosha: a CF that breaks through the VR extreme is case 3 and targets the HTF extreme; stop first when one candle holds both', () => {
+  const ev = [{ dir: 1, level: 4035, t: 140, fromT: 125, top: 4030, bot: 4000 }, { dir: -1, level: 3990, t: 160, fromT: 145, top: 4040, bot: 4020 }];
+  const M = msMosha(H4S, { events: ev, bars: path.concat([bar(170, 4045, 3940)]) });
+  assert.equal(M.case, 3); assert.equal(M.trade.target, 3950); assert.equal(M.trade.status, 'stopped');
+});
+test('Mosha layer wired: its own switch, Meridian markup only, said to be display only', () => {
+  assert.match(html, /data-show="mosha" checked/); assert.match(html, /mosha: true/); assert.match(html, /G\.show\.mosha !== false/);
+  assert.match(html, /function moshaNow\(/); assert.match(html, /not a tested rule \(the mechanical Mosha studies failed\)/);
+});
