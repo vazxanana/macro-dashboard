@@ -172,3 +172,27 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news'\]/);
   assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
 });
+
+// 12 Nov 2026, owner: "after iBOs and BO mark zone for entry, barrier / EG unmitigated, fresh supply or demand OB"
+const msZones = new Function(`${fn('msZones')}; return msZones;`)();
+const C = (time, open, high, low, close) => ({ time, open, high, low, close });
+test('fresh zones: the last opposite candle before a break up is the demand OB; a touch mitigates it, a close through breaks it', () => {
+  const B = [C(0, 105, 106, 100, 101), C(1, 101, 102, 98, 99), C(2, 99, 103, 98.5, 102.5), C(3, 102.5, 108, 102, 107.5), C(4, 107.5, 110, 106, 109)];
+  let [z] = msZones(B, [{ dir: 1, fromIdx: 0, breakIdx: 3, kind: 'ibo' }]);
+  assert.equal(z.i, 1, 'the red candle at the leg low'); assert.deepEqual([z.lo, z.hi, z.fresh, z.kind], [98, 102, true, 'ibo']);
+  [z] = msZones(B.concat([C(5, 109, 109.5, 101.5, 104)]), [{ dir: 1, fromIdx: 0, breakIdx: 3 }]);
+  assert.equal(z.fresh, false); assert.equal(z.touchIdx, 5); assert.equal(z.brokenIdx, null);
+  [z] = msZones(B.concat([C(5, 109, 109.5, 96, 97)]), [{ dir: 1, fromIdx: 0, breakIdx: 3 }]);
+  assert.equal(z.brokenIdx, 5);
+  [z] = msZones(B.concat([C(5, 109, 109.5, 101.5, 104)]), [{ dir: 1, fromIdx: 0, breakIdx: 3 }], 5);
+  assert.equal(z.fresh, true, 'a forming candle never mitigates');
+});
+test('fresh zones: a break down takes the last green candle as the supply OB; one zone per candle', () => {
+  const B = [C(0, 100, 101, 99, 100.5), C(1, 100.5, 104, 100, 103.5), C(2, 103.5, 104.5, 101, 101.5), C(3, 101.5, 102, 95, 95.5)];
+  const Z2 = msZones(B, [{ dir: -1, fromIdx: 0, breakIdx: 3 }, { dir: -1, fromIdx: 1, breakIdx: 3 }]);
+  assert.equal(Z2.length, 1); assert.equal(Z2[0].i, 1); assert.deepEqual([Z2[0].lo, Z2[0].hi], [100, 104.5]);
+});
+test('fresh zones wired: own layer, BO and iBO breaks, the three nearest to price a side', () => {
+  assert.match(html, /data-show="zones" checked/); assert.match(html, /zones: true/); assert.match(html, /G\.show\.zones !== false/);
+  assert.match(html, /msZones\(bars, brk, nc\)\.filter\(\(z\) => z\.fresh\)/); assert.match(html, /\.slice\(0, 3\)\.forEach\(\(z\) => \{ const dem = d > 0;/);
+});

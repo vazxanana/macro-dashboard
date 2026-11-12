@@ -1311,6 +1311,16 @@ Display only (`market-structure.html`); the council's own engine copy in `counci
   `G.show.ibos`); a level the major structure already draws is skipped. **After a pullback the first ChoCh back with the timeframe
   above starts the continuation** (owner): the cycle line reads "<TF> continuation starts", the chip "continuation".
 
+## Meridian markup: fresh entry zones after BO / iBO (12 Nov 2026, owner: "after iBOs and BO mark zone for entry, barrier / EG unmitigated, fresh supply or demand OB")
+Display only, Meridian markup only (layer "Fresh entry zones (OB after BO / iBO)", `G.show.zones`). `msZones(bars, breaks, closedN)`
+(pure, next to `msInternal`): for every major BO (`A.events`) and iBO (`msInternal`), the order block = the last candle against the
+break at or before the leg's origin (break up: the last red candle at or before the lowest low of the leg; break down: the last
+green one at or before the highest high; else the origin candle), wick to wick and out to the origin's extreme; one zone per
+candle. **Fresh** while no CLOSED candle after the break has traded into it; the first touch mitigates it (`touchIdx`), a close
+through its far side breaks it (`brokenIdx`); only fresh zones are drawn, the three nearest to price a side, dashed boxes out to the right
+edge labelled "Demand / Supply OB · fresh · BO|iBO <range>". Not a tested rule (the skill's 14-year engulf tests found no edge in
+zone mechanics alone). Tests: `tests/market-cycle.test.mjs` ("fresh zones").
+
 ## Meridian markup: the Mosha layer (12 Nov 2026, owner: "build the mosha layer")
 Display only, Meridian markup only (layer "Mosha storyline (VR, CF, barriers)", `G.show.mosha`, orange); no rule, trade or
 alert reads it and it is not a tested rule (the mechanical Mosha studies failed). `msMosha(htf, ltf, buf)` (pure, next to
