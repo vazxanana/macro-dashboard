@@ -20,7 +20,7 @@ import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+import { costModel, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, spreadOf, minStopDist, fillCheck, fillCheckText } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
@@ -1240,11 +1240,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (mkt) {
         // fill at the market price, never at a better level than was available
         if (mktEntry) tr.entryMode = 'market';
-        tr.entry = price; tr.status = 'open'; tr.filled = now;
-        tr.drift = driftR(tr.side, t.entry, price, t.stop);   // stale-signal shadow stat (8 Nov): fill vs the setup's planned entry, in R
-        const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
-        if (!(r > 0) || (t.sell ? price >= tr.stop : price <= tr.stop) || rw <= 0) { tr.status = 'skipped'; tr.note = 'Price already past the stop or target when the signal came in.'; }
-        else tr.rr = +(rw / r).toFixed(2);
+        // near-stop fills (12 Nov 2026, owner approved, docs/owner-decisions.md item 52): the engine's minimum stop is checked
+        // again on the price we would really get; inside it, or past the stop / target, the order is not opened (never a trade:
+        // no fill time, R 0, the stop untouched, the planned entry kept; the price it would have filled at is in fillPx)
+        const floor = minStopDist(src[def.l].bars, spreadOf(M, price), CFG.minRisk), skip = fillCheck(tr.side, price, tr.stop, tr.t1, floor);
+        if (skip) { tr.status = 'skipped'; tr.reason = skip; tr.fillPx = price; tr.minStop = +floor.toPrecision(5); tr.closed = now; tr.R = 0; tr.note = fillCheckText(skip, M, price, floor); }
+        else {
+          tr.entry = price; tr.status = 'open'; tr.filled = now; tr.r0 = Math.abs(price - tr.stop);
+          tr.drift = driftR(tr.side, t.entry, price, t.stop);   // stale-signal shadow stat (8 Nov): fill vs the setup's planned entry, in R
+          tr.rr = +(((tr.t1 - tr.entry) * (t.sell ? -1 : 1)) / tr.r0).toFixed(2);
+        }
       }
       // m30m1 (M30 → M1) fires on the same M1 entry as the Scalp: the same trade recorded twice (6 Nov, 29 of 31). Keep one.
       if (t.k === 'm30m1' && trades.some((x) => x.market === key && x.k !== 'm30m1' && x.side === tr.side && x.opened === tr.opened && x.entry === tr.entry)) continue;

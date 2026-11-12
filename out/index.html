@@ -7517,7 +7517,7 @@ function msNextSetup(bars, A) {
   }
   // council trade history as chart markers (7 Nov loop): entries (arrows) and exits (dots with the R result) on H4 / H1 / M15
   function councilMarkers() {
-    let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
+    let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired' && x.status !== 'skipped').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
     if (G.showCT === false || G.mode !== 'meridian') T = [];
     ctTargets(['4h', '1h', '15m']).forEach(([id, P]) => { if (!P || !P.series || P.rp || !P.bars || !P.bars.length) return;
       const tf = TFS.find((t) => t.id === id), have = new Set(P.bars.map((b) => b.time)), bt = (t) => Math.floor(t / tf.sec) * tf.sec + TZ, mk = [];
