@@ -14,6 +14,7 @@
 // (also when the stop guard had to set the stop itself) and that is what is expected. An ICT copy carries the desk's stop distance (futures levels, a cash CFD at the broker).
 import fs from 'node:fs';
 import path from 'node:path';
+import { openRisk } from './fills.mjs';   // the risk a trade OPENED with (12 Nov 2026, moved-stop audit)
 import { bookOf, ictCandidates, replicaCandidates, replicaHasOwnAccount, replicaMarkets, SYMBOLS } from './ctrader-mirror.mjs';
 
 const rd = (dir, f, d) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return d; } };
@@ -67,7 +68,7 @@ export function reconcile(dir) {
     if (m.status !== 'open' && m.status !== 'sent') {
       row.state = `copy ${m.status}`;
       if (open && m.status === 'closed at broker') {   // the broker's own stop or target was reached first (bid / ask and its own feed), or it was closed by hand
-        const d = (A.history || []).find((x) => String(x.positionId) === String(m.positionId)), tol = Math.max(Math.abs(t.entry - t.stop) * 0.08, Math.pow(10, -(m.digits ?? 2)) * 5);
+        const d = (A.history || []).find((x) => String(x.positionId) === String(m.positionId)), tol = Math.max((openRisk(t) || Math.abs(t.entry - t.stop)) * 0.08, Math.pow(10, -(m.digits ?? 2)) * 5);
         const wantSL = m.brokerStop ?? (m.fillPrice != null && m.mark != null ? m.fillPrice + (m.stop - m.mark) : m.stop), wantTP = m.t1 == null ? null : m.fillPrice != null && m.mark != null ? m.fillPrice + (m.t1 - m.mark) : m.t1;
         row.brokerClose = d ? { exit: d.exit, at: d.closedAt, net: d.net, how: near(d.exit, wantSL, tol) ? 'at its stop' : wantTP != null && near(d.exit, wantTP, tol) ? 'at its target' : 'away from its stop and target (closed by hand, or a level moved since)' } : { how: 'no deal found in the account history' };
         row.note = `the broker closed the copy ${row.brokerClose.how}${d ? ` (${d.exit}, ${d.closedAt.slice(0, 16)}Z, ${d.net >= 0 ? '+' : ''}${d.net})` : ''}; the council's paper trade is still open`;
@@ -80,13 +81,16 @@ export function reconcile(dir) {
     if (bp.side !== t.side) row.issues.push(`side ${bp.side} at the broker`);
     if (bp.sl == null) row.issues.push('the demo position has NO stop');
     else if (String(t.id).startsWith('ict:')) {   // futures levels at the desk, a cash CFD at the broker: the stop DISTANCE is what is copied
-      const want = Math.abs(t.entry - t.stop), got = Math.abs((m.fillPrice ?? bp.entry) - bp.sl), moved = t.stop !== (t.stop0 ?? t.stop);
+      // moved (12 Nov 2026, moved-stop audit): an ICT record without stop0 (older ones) still tells by its r0 whether the stop moved;
+      // a trailed stop past the entry used to be reported as "on the wrong side of the entry"
+      const want = Math.abs(t.entry - t.stop), got = Math.abs((m.fillPrice ?? bp.entry) - bp.sl), r0 = openRisk(t),
+        moved = t.stop0 != null ? t.stop !== t.stop0 : !!(t.trailMoved || t.beMoved) || (r0 > 0 && Math.abs(want - r0) > Math.max(tol, r0 * 0.001));
       if (!moved && Math.abs(want - got) > Math.max(tol, want * 0.02)) row.issues.push(`stop distance ${got.toFixed(2)} against the desk's ${want.toFixed(2)}`);
       if ((t.side === 'buy') !== (bp.sl < bp.entry) && !moved) row.issues.push('the stop is on the wrong side of the entry');
     } else {
       // distances from the fill until the council moves a level (or for a limit copy: absolute levels from the start)
       const rel = m.levelsFrom === 'mark' && m.mark != null && m.fillPrice != null && !m.amended && !m.viaLimit && !m.stopSetBy, moved = Math.abs((+t.stop) - (+m.stop)) > tol;
-      const wantSL = rel ? m.fillPrice + (m.stop - m.mark) : moved ? null : +t.stop, wantTP = t.t1 == null || t.rr >= 50 ? null : rel ? m.fillPrice + (m.t1 - m.mark) : +t.t1, tolR = Math.max(tol * 3, Math.abs(t.entry - t.stop) * 0.03);
+      const wantSL = rel ? m.fillPrice + (m.stop - m.mark) : moved ? null : +t.stop, wantTP = t.t1 == null || t.rr >= 50 ? null : rel ? m.fillPrice + (m.t1 - m.mark) : +t.t1, tolR = Math.max(tol * 3, (openRisk(t) || Math.abs(t.entry - t.stop)) * 0.03);
       row.basis = rel ? +(m.fillPrice - m.mark).toFixed(m.digits ?? 2) : null;
       if (moved) row.note = `the council moved its stop ${m.stop} -> ${t.stop}; the mirror follows on its next round`;
       else if (!near(bp.sl, wantSL, tolR)) row.issues.push(`stop ${bp.sl}, expected ${(+wantSL).toFixed(m.digits ?? 2)} (${rel ? 'the council\'s distance from the fill' : 'the council\'s level'})`);

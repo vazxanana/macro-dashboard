@@ -807,6 +807,20 @@ Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also 
 "Manage open trades" step for one candle as pure functions (trail, beAt, maxHold, pyramid add included), used by that replay;
 `tests/fills-live.test.mjs` lifts the Trader's loop text out of trader.mjs and checks parity, so a change to the live loop must be
 mirrored there. A pyramid add inherits its parent's `shadow` flag (a blocked Mosha chain's add is not a live trade).
+**Moved-stop audit (12 Nov 2026, after item 48; `research/proposals/2026-11-12-moved-stop-audit.md`, item 49).** 1R is the risk a
+trade OPENED with, never `|entry - stop|` once a trail, break-even or ratchet has moved the stop. Every Trader loop but the NQ
+open run's (item 48) reads a stamped `r0`: pushed with the record for every system whose stop moves (also outside the loop: the
+gold trend and crypto ratchets, the LIT swing break-even), stamped on the first managed candle otherwise (`tr.r0 || (tr.r0 =
+...)` before any move); a test lists every `.stop = ` in trader.mjs, so a new stop move must be audited. Readers use
+`fills.mjs` `openRisk(x)` (`r0`; else `|entry - stop|` while unmoved; else `stop0`; else the NQ open run's 2R mark / 2; else
+null = leave the figure out): the mirror's `fillQuality` (imported as `riskAtOpen`: the round has a local `openRisk` = cash),
+the reconciliation report, the digest's floating R; copies in `api/_edge-analyst.js` (`stopAtEntry`; an unknown opening stop is
+not studied) and the page (`risk0`: Active trades, the trade table's live R, the guest trade card, "R now"), compared by
+`tests/moved-stop-audit.test.mjs`. On the replica `stop0` is the level BEFORE the round-number step, not the opening stop.
+Open for the owner (item 49): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
+side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
+Item 48 lives on branch `nq-open-r0`; `docs/owner-decisions.md` reserves its number with `<!-- reserved item 48: … -->` (read by
+`tests/supported-book.test.mjs`): remove that line when item 48 is merged.
 
 ## Edge scoreboard (7 Nov 2026, owner: "where is the edge across both systems, at a glance")
 Admin card `#ms-sb` at the top of the Council research pane (deep link `#council/scoreboard`, Home quick link). Script `#ms-sb-js` at the

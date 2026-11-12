@@ -161,6 +161,22 @@ export function staleStats(trades, X = STALE_R) {
 // missing candles). afterFill: the candle started after the fill (on the fill candle the open came before the fill: use the stop)
 export const stopFill = (b, sell, stop, afterFill = true) => !afterFill ? stop : sell ? Math.max(stop, b.open) : Math.min(stop, b.open);
 export const exitR = (sell, entry, px, r0) => +(((sell ? entry - px : px - entry)) / r0).toFixed(2);
+// The risk a trade OPENED with (12 Nov 2026, moved-stop audit: research/proposals/2026-11-12-moved-stop-audit.md). For READERS
+// (displays, the digest, the mirror's fill quality, reconciliation): never a management loop. 1R is the record's stamped r0;
+// without one, |entry - stop| only while the stop has not moved (no trailMoved / beMoved: the stop IS the opening stop, also
+// for a replica row whose stop0 is the level before its round-number step); once it moved, the first stop stop0, else for the
+// NQ open run (no r0 on file, docs/owner-decisions.md item 48) half the distance to its 2R mark tp1; else null (unknown: a
+// reader shows nothing rather than a figure in the trailed unit). api/_edge-analyst.js and market-structure.html carry a copy
+// (tests/moved-stop-audit.test.mjs compares them).
+export function openRisk(x) {
+  if (!x) return null;
+  const pos = (d) => (Number.isFinite(d) && d > 0 ? d : null);
+  if (+x.r0 > 0) return +x.r0;
+  if (!(x.trailMoved || x.beMoved)) return pos(Math.abs(x.entry - x.stop));
+  if (x.stop0 != null && Number.isFinite(+x.stop0)) return pos(Math.abs(x.entry - x.stop0));
+  if (x.k === 'nq-open' && x.tp1 != null && Number.isFinite(+x.tp1)) return pos(Math.abs(x.tp1 - x.entry) / 2);
+  return null;
+}
 // a resting limit order whose fill candle also reaches the target (without the stop) and did not open through the entry: the order
 // of the two inside the candle is unknown. Target first = the order is missed (0R); entry first = a win. Resolved as missed.
 export function fillBarAmbiguous(b, sell, entry, stop, t1) {

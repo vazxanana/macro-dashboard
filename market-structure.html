@@ -7000,6 +7000,10 @@ function msNextSetup(bars, A) {
   // One way to write an R figure in the Home and Council templates (11 Nov): a sign, the minus glyph, two decimals ("−1.00R",
   // never "-1R" beside "−1.05R"); rTxt(v, 1) for the few one-decimal totals. A value that is not a number reads "—".
   const rTxt = (v, d = 2) => { v = +v; if (!isFinite(v)) return '—'; const z = Math.abs(v) < 0.5 * Math.pow(10, -d); return `${z ? '' : v > 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}R`; };
+  // 1R of a trade = the risk it OPENED with (12 Nov 2026, moved-stop audit; a copy of council/fills.mjs openRisk, compared by
+  // tests/moved-stop-audit.test.mjs): once a trail or break-even has moved the stop, |entry - stop| is not 1R any more (a stop at
+  // the entry divided by zero: "+InfinityR now"). null = unknown: the figure is left out.
+  const risk0 = (x) => { if (!x) return null; const pos = (d) => (Number.isFinite(d) && d > 0 ? d : null); if (+x.r0 > 0) return +x.r0; if (!(x.trailMoved || x.beMoved)) return pos(Math.abs(x.entry - x.stop)); if (x.stop0 != null && Number.isFinite(+x.stop0)) return pos(Math.abs(x.entry - x.stop0)); if (x.k === 'nq-open' && x.tp1 != null && Number.isFinite(+x.tp1)) return pos(Math.abs(x.tp1 - x.entry) / 2); return null; };
   // forward (paper, as it happened) against replay (backtest over past candles) in a list of closed system trades: the Trades
   // pane and the Home tile say both apart, so a backtest total is never read as traded profit
   const fwdSplit = (closed) => { const mk = (a) => ({ n: a.length, w: a.filter((x) => x.status === 'win').length, R: a.reduce((q, x) => q + (+x.R || 0), 0), from: a.length ? Math.min(...a.map((x) => x.opened || Infinity)) : null });
@@ -7182,7 +7186,7 @@ function msNextSetup(bars, A) {
     const ACC = 50000, CONTRACT = (x) => x.market === 'xau' ? 100 : x.market === 'nq' ? 1 : ['btc', 'eth', 'sol', 'xrp'].includes(x.market) ? 1 : 100000;
     const pctOf = (x) => (x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25;
     const items = A.length ? A.map((x) => {
-      const s = x.side === 'sell' ? -1 : 1, r0 = x.r0 || Math.abs(x.entry - x.stop), size = x.size || 1, px = nowPrice(x), d = { dec: x.dec != null ? x.dec : 2 };
+      const s = x.side === 'sell' ? -1 : 1, r0 = risk0(x), size = x.size || 1, px = nowPrice(x), d = { dec: x.dec != null ? x.dec : 2 };
       const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && (cnt(x) || x.shadow)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); } if (fl != null && x.shadow) { shTot += fl; shN++; }
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; if (cnt(x)) risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
@@ -7302,7 +7306,7 @@ function msNextSetup(bars, A) {
       // empty states (11 Nov 2026): the card used to vanish, leaving "The desk's gold trade" over nothing
       card.hidden = false;
       if (!x) { card.innerHTML = `<p class="g-s-note" role="status">${!COUNCIL.at ? "Loading the desk's gold trade…" : !COUNCIL.trades ? "The desk's trades could not be loaded right now. The page tries again every few minutes." : 'No gold trade is open or waiting right now. The next one appears here, and on the gold charts above, when the desk places it.'}</p>`; return; }
-      const tgt = x.tp1 != null ? x.tp1 : x.t1, f = (v) => (+v).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), R = Math.abs(x.entry - x.stop), rr = tgt != null && R ? Math.abs(tgt - x.entry) / R : null;
+      const tgt = x.tp1 != null ? x.tp1 : x.t1, f = (v) => (+v).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), R = risk0(x), rr = tgt != null && R ? Math.abs(tgt - x.entry) / R : null;
       const fl = last != null && x.status === 'open' && R ? ((x.side === 'buy' ? 1 : -1) * (last - x.entry)) / R : null;
       const st = x.status === 'pending' ? 'Waiting for the entry' : x.status === 'open' ? 'Open now' : x.status === 'win' ? 'Closed · won' : x.status === 'loss' ? 'Closed · lost' : x.status === 'be' ? 'Closed · break-even' : 'Closed';
       const when = new Date(((x.filled || x.opened) || 0) * 1000), ago = when.getTime() ? when.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
@@ -7745,7 +7749,7 @@ function msNextSetup(bars, A) {
   const PM_NAME = { news: 'news spike', gap: 'gap through the stop', noise: 'stop too tight', hunt: 'stop hunted', gaveback: 'gave back profit', late: 'late entry', against: 'against D1', 'retrace-fail': 'retracement never came', reversal: 'real reversal', normal: 'normal loss', becost: 'break-even cost a win', besaved: 'break-even saved it', leftmoney: 'left money', clean: 'clean win' };
   // live result of an open council trade at the last Trader scan price
   const liveR = (x) => { if (x.status !== 'open') return ''; const m = COUNCIL.snap && COUNCIL.snap.markets && COUNCIL.snap.markets[x.market]; if (!m || !m.price) return '';
-    const r = (m.price - x.entry) * (x.side === 'sell' ? -1 : 1) / Math.abs(x.entry - x.stop); return isFinite(r) ? ` <b class="${r >= 0 ? 'pos' : 'neg'}">${rTxt(r)}</b>` : ''; };
+    const r0 = risk0(x), r = r0 ? (m.price - x.entry) * (x.side === 'sell' ? -1 : 1) / r0 : NaN; return isFinite(r) ? ` <b class="${r >= 0 ? 'pos' : 'neg'}">${rTxt(r)}</b>` : ''; };
   const pmChip = (x) => !PUB && x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
   // ─── Tap a council trade: see it on a chart (entry, stop, target, where it filled and where it exited) ───
   const TV = { chart: null, series: null, lines: [], pv: [], req: 0, mode: 'after', ov: null, ctx: null };
@@ -8400,7 +8404,7 @@ function msNextSetup(bars, A) {
     const card = document.getElementById('ms-c-here-card'); if (card) card.hidden = !list.length;
     if (!list.length) { el.innerHTML = ''; return; }
     el.innerHTML = list.map((x) => {
-      const s = x.side === 'sell' ? -1 : 1, r = Math.abs(x.entry - x.stop), live = x.status === 'open' && price ? (price - x.entry) * s / r : null;
+      const s = x.side === 'sell' ? -1 : 1, r = risk0(x), live = x.status === 'open' && price && r ? (price - x.entry) * s / r : null;
       return `<div class="c-here"><span class="ms-chip ${s < 0 ? 'ms-chip-sell' : 'ms-chip-buy'}">${s < 0 ? 'SELL' : 'BUY'}</span><b>${esc(x.name)}</b><small>${esc(x.pair)}</small>` +
         `<span class="c-here-l">Entry <b>${fmt(x.entry)}</b> · Stop <b class="neg">${fmt(x.stop)}</b> · Target <b class="pos">${fmt(x.t1)}</b></span>` +
         `<span class="c-here-r ${live == null ? '' : live >= 0 ? 'pos' : 'neg'}">${live == null ? 'Waiting for fill' : `${live >= 0 ? '+' : ''}${live.toFixed(2)}R now`}</span></div>`;

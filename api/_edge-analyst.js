@@ -46,18 +46,29 @@ function candidates(trades, research, done, now, since) {
     if (!x || typeof x !== 'object' || x.shadow || x.addOf || !LIVE.includes(x.k) || seen.has(x.id)) continue;
     if (x.status === 'pending' || x.status === 'missed' || x.status === 'expired' || x.status === 'duplicate' || x.void) continue;
     const t = entryT(x); if (!t || t < since || now - t > NEW_WINDOW_S || t > now) continue;
-    if (!INST[x.market] || num(x.entry) == null) continue;
+    if (!INST[x.market] || num(x.entry) == null || stopAtEntry(x) == null) continue;
     out.push(x);
   }
   return out.sort((a, b) => entryT(a) - entryT(b));
 }
 
-// the stop the trade OPENED with (the record's `stop` may have been trailed or moved to break-even since)
+// the risk the trade OPENED with: a copy of council/fills.mjs openRisk (this module is CommonJS; tests/moved-stop-audit.test.mjs
+// compares the two). 12 Nov 2026 (moved-stop audit): an NQ open-run record has no r0 and its runner trails the stop, so a record
+// first studied after the trail moved was shown the TRAILED stop as the stop it opened with
+function openRisk(x) {
+  if (!x) return null;
+  const pos = (d) => (Number.isFinite(d) && d > 0 ? d : null);
+  if (+x.r0 > 0) return +x.r0;
+  if (!(x.trailMoved || x.beMoved)) return pos(Math.abs(x.entry - x.stop));
+  if (x.stop0 != null && Number.isFinite(+x.stop0)) return pos(Math.abs(x.entry - x.stop0));
+  if (x.k === 'nq-open' && x.tp1 != null && Number.isFinite(+x.tp1)) return pos(Math.abs(x.tp1 - x.entry) / 2);
+  return null;
+}
+// the stop the trade OPENED with (the record's `stop` may have been trailed or moved to break-even since); null = unknown,
+// and such a trade is not studied (candidates)
 function stopAtEntry(x) {
-  const s = x.side === 'sell' ? -1 : 1;
-  if (num(x.r0) != null && x.r0 > 0) return x.entry - s * x.r0;
-  if (num(x.stop0) != null) return x.stop0;
-  return num(x.stop);
+  const s = x.side === 'sell' ? -1 : 1, r0 = num(x.entry) != null ? openRisk(x) : null;
+  return r0 != null ? x.entry - s * r0 : null;
 }
 
 // only fields known at the entry; never an outcome (R, exit, closed, mfe, mae, pm, trail moves, status beyond "open")
@@ -144,4 +155,4 @@ function stats(rows) {
     note: closed.length >= MIN_JUDGE ? 'A forward comparison, not a tested edge.' : `Too few to judge: ${closed.length} of ${MIN_JUDGE} closed trades.` };
 }
 
-module.exports = { EDGES, LIVE, INST, FRAMES, VERDICTS, NEW_WINDOW_S, PER_RUN, MIN_JUDGE, SYSTEM, candidates, stopAtEntry, entryFacts, cutCandles, releasesAround, buildRequest, parseAnswer, resultOf, stats, entryT };
+module.exports = { EDGES, LIVE, INST, FRAMES, VERDICTS, NEW_WINDOW_S, PER_RUN, MIN_JUDGE, SYSTEM, candidates, openRisk, stopAtEntry, entryFacts, cutCandles, releasesAround, buildRequest, parseAnswer, resultOf, stats, entryT };
