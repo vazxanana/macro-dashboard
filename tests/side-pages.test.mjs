@@ -204,6 +204,21 @@ test('gold terminal Dashboard: the seasonal tile and feed row and the signal pan
   assert.match(g, /const SEASONAL = \[0, 10, 11, 1\];\n\s+if \(SEASONAL\.includes\(month\)\) s\+\+;/);
 });
 
+// 12 Nov 2026, the last two: the Live Analysis setup card's "72% Confidence" was the macro score (out of 40) rescaled to a percent,
+// not a measured chance; the Daily Bias tab called a zone + M15 engulfing "the highest-probability setup on the platform", and
+// the supply / demand alert "the highest-probability reaction", with no study behind either. Display text only.
+test('gold terminal: the setup card shows its score, the bias tab and zone alert claim no probability', () => {
+  const g = fs.readFileSync(new URL('../gold-trading.html', import.meta.url), 'utf8');
+  assert.match(g, /<div class="dir-conf" id="setupConf">Score —\/40<\/div>/);
+  assert.match(g, /confEl\.textContent = 'Score ' \+ macroScore \+ '\/40 · not tested here';/);
+  assert.ok(!/% Confidence/.test(g), 'no "n% Confidence" anywhere on the page');
+  assert.ok(!/highest-probability|high-probability/i.test(g), 'no probability claim without a study');
+  assert.match(g, /this setup is not tested in this repository, and no win rate or edge is claimed for it\./);
+  assert.match(g, /first touch \(an untested idea, not a tested edge\)\. Watch for the trigger\./);
+  // the score behind the card is computed as before
+  assert.match(g, /const macroConf  = Math\.round\(\(macroScore \/ 40\) \* 100\);\n\s+const isLong  = macroConf >= 60;\n\s+const isShort = macroConf <= 40;/);
+});
+
 // 11 Nov 2026, simpler phone version (owner: "on the mobile there's too much"): the gold terminal's simple view is the default at
 // 640 px and under, hangs on one attribute a wider screen never gets, keeps every tab and block reachable, and Full view undoes it.
 test('gold terminal, phone simple view: default on phones only, every tab reachable, blocks fold and unfold, locked charts kept', () => {

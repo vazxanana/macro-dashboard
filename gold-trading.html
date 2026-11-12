@@ -3414,7 +3414,7 @@
         </table>
       </div>
       <div style="margin-top:10px;font-size:var(--fs-xs);color:var(--text-tertiary);line-height:1.6;">
-        Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade INTO these zones in the bias direction — an engulfing printed inside one (watch the M15 execution view above) is the highest-probability setup on the platform.
+        Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the stronger this page reads the zone. The idea is to trade into these zones in the bias direction on an engulfing printed inside one (watch the M15 execution view above); this setup is not tested in this repository, and no win rate or edge is claimed for it.
       </div>
     </div>
 
@@ -3451,7 +3451,7 @@
       <div class="setup-direction" id="setupDir">
         <div class="dir-arrow" id="setupArrow">↑</div>
         <div class="dir-label" id="setupLabel">LONG</div>
-        <div class="dir-conf" id="setupConf">72% Confidence</div>
+        <div class="dir-conf" id="setupConf">Score —/40</div>
       </div>
 
       <!-- Entry & Stop -->
@@ -5492,7 +5492,7 @@
       arrowEl.textContent = '→';
       labelEl.textContent = 'WAIT';
     }
-    confEl.textContent = conf + '% Confidence';
+    confEl.textContent = 'Score ' + macroScore + '/40 · not tested here';
 
     // ── Key level offsets (% of price, calibrated to gold volatility) ────────
     // Gold daily ATR ≈ 0.8–1.2% of price
@@ -7458,7 +7458,7 @@
           if (!_alertMemo[k] || Date.now() - _alertMemo[k] > 12 * 3600e3) {
             _alertMemo[k] = Date.now();
             sendNotif('Gold tapped an unmitigated ' + (z.bull ? 'demand' : 'supply') + ' block',
-              `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} first touch — the highest-probability reaction. Hunt the trigger.`);
+              `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} first touch (an untested idea, not a tested edge). Watch for the trigger.`);
           }
         }
       }
