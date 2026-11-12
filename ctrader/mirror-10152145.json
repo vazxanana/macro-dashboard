@@ -9467,7 +9467,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.42548,
@@ -9481,10 +9482,11 @@
     "lagSec": 353,
     "positionId": "48613819",
     "volume": 300000,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 2,
     "amended": 5,
-    "amendedAt": "2026-11-12T09:02:46.000Z"
+    "amendedAt": "2026-11-12T09:02:46.000Z",
+    "closedAt": "2026-11-12T09:05:51.000Z"
    },
    "audusd-rintra-1794450443": {
     "positionId": "48615658",
@@ -10243,7 +10245,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9856.35 · 30 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9855.7 · 29 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -10296,15 +10298,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9856.35,
-  "lastRun": "2026-11-12T09:02:46.000Z"
+  "balance": 9855.7,
+  "lastRun": "2026-11-12T09:05:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T16:30:48.000Z",
-   "msg": "limit filled at once: USDCHF position 48492368 at the broker at 0.83269",
-   "trade": "usdchf-scalp-1794414574"
-  },
   {
    "at": "2026-11-11T16:34:30.000Z",
    "msg": "placed buy limit USDCAD 0.03 lot at 1.42434 (council scalp, valid to 2026-11-11T19:33Z)",
@@ -11799,6 +11796,11 @@
    "at": "2026-11-12T09:02:46.000Z",
    "msg": "placed buy limit AUDUSD 0.02 lot at 0.68234 (council rscalp, valid to 2026-11-12T12:01Z)",
    "trade": "audusd-rscalp-1794474066"
+  },
+  {
+   "at": "2026-11-12T09:05:51.000Z",
+   "msg": "USDCAD position 48613819 closed at the broker",
+   "trade": "usdcad-intraday-1794449923"
   }
  ],
  "limits": {
