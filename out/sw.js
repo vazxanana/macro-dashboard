@@ -8,7 +8,7 @@
 // - The build (scripts/pwa.mjs) writes VERSION (hash of everything served), so every deploy is a new worker; it takes over at once
 //   (skipWaiting + clients.claim) and deletes the caches of older versions. KILL (build env MX_SW_KILL=1) turns every fetch
 //   rule off and deletes the caches, keeping push notifications working.
-const VERSION = '677e9c8d9054';
+const VERSION = '02b7f3c86205';
 const KILL = false;
 const SHELL = 'mx-shell-' + VERSION;
 const ASSETS = 'mx-assets-' + VERSION;

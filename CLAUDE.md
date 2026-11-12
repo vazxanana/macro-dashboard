@@ -622,9 +622,14 @@ the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three
   holding its place while loading (layout shift 0.62 → 0 on a phone), and no dead Macro / This week tabs for a member without the
   council permission. Add new Home / Council size fixes there, never a second block.
 - Tests: `tests/qa-sweep.test.mjs` ("Home and Council reading pass"), `tests/week-report.test.mjs` (`decayCount`).
-- Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); Home's week / month
-  figures are before costs while the week pane is after costs; the trade chart dialog still writes raw R ("Loss -1R"); the
+- Seen, left alone: the scoreboard's verdict chip "Edge" on replay-only streams (n and t are in the row); the
   replica track chart's axis uses a hyphen; "Journal · No trades yet" on Home while the council has trades (the owner's own journal).
+- Done 12 Nov 2026 (two of the items above): **the trade chart dialog** (`#ms-tv`: title, key, chart labels, Before / After
+  pills, ticket text, the review's strategy line) writes every R through `rTxt` ("Loss −1.00R", "Best +0.61R", "Now −0.51R") and
+  a planned reward:risk through `rrTxt` ("Planned target 8.04R", "target 2.00R at …"; `MS_HC.rrTxt`); council-written text in it
+  (post-mortem, lesson, note) goes through `mnTxt`. **Costs basis named**: Home's Today / This week / This month sublines say
+  "before costs" (tooltips too), the week pane's tiles are "…, after costs" (was "net") and Meridian live's gross is "before
+  costs". No sum changed. Tests: `tests/qa-sweep.test.mjs` ("trade chart dialog", "Home strip says before costs").
 
 ## Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
 `market-structure.html` only; the other pages are untouched. On a screen up to 640 px the Desk opens in its **simple view**
