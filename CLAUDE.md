@@ -2983,6 +2983,22 @@ What was done, and the rules to keep:
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
 
+## Mosha cycle: a main paper system (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot"; chose "main system")
+`council/mosha-cycle.mjs` (pure: `cycleState`, `cycleTrades`, `cycleText`) + the Trader block after Mosha BO (user rule
+`mosha-cycle`, `config.moshaCycle`; records `k: 'mcycle'`, ids `xau-mcycle-<leg>-<H4 break time>`). Gold only. From the BO
+events the Trader already builds (closed candles): the last H4 BO = the move (origin edge `far`, broken level), the first H1 BO
+the other way after it = the H1 ChoCh, the pullback started; `ext` = the move's extreme on H1 candles up to that ChoCh.
+Leg `pull`: the first M15 or M5 BO with the pullback after the ChoCh → limit at the broken level, stop $0.30 past its origin,
+target the H4 50% (`p50`). Leg `main`: after it, the first M15 / M5 structure flip back with the H4 → same entry and stop
+rules, target the H4 extreme `ext`. Valid 24 h, out after 72 h, no break-even; one open trade per leg. Shadow (`blockedBy`)
+when the target is under 1R (`room`), the leg already has a trade (`cap`) or price is past the stop (`price`). Every trade has
+a stop on the losing side (the function returns nothing without one). A main system: in `SYS_K` / `MAIN` / `SYSG` / `SYS_ON`
+(page) and `api/_guestcut.js`, the Trader's `SYSK` and retire list; alerts, futures tickets and the council demo account take
+it like any non-shadow trade. Not yet in the decay monitor, expectations or book weights (no base study). **Not a tested
+edge**: the mechanical studies of this cycle (mosha-retrace, mosha-cycle) did not pass; the owner chose to trade it on paper
+and judge its forward record. `snapshot.moshaCycle` → `#ms-rep-mcycle` under the Mosha BO chain line. Tests:
+`tests/mosha-cycle.test.mjs`.
+
 ## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
 `api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
 (`api/_academy-llm.js`) and store (`api/_academy-store.js`, `blobBackend(env, { root })`; own folder `edge-analyst/`, preview
