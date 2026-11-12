@@ -11324,7 +11324,8 @@
     "t1": 71800.42285714285,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 72657.2,
@@ -11339,7 +11340,11 @@
     "lagSec": 116,
     "positionId": "48795622",
     "volume": 1,
-    "status": "open"
+    "status": "closed by council",
+    "closedAt": "2026-11-12T14:24:39.000Z",
+    "exitPrice": 71837.12,
+    "councilExit": 71800.42285714285,
+    "councilR": 2
    },
    "audusd-rscalp-1794491028": {
     "symbol": "AUDUSD",
@@ -11547,10 +11552,11 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9986.48 · 34 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9986.48 · 33 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
-   "xrp-intraday-1794489777": "none of XRPUSD found at the broker"
+   "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
+   "xrp-scalp-1794493418": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -11581,19 +11587,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9986.48,
-  "lastRun": "2026-11-12T14:22:13.000Z"
+  "lastRun": "2026-11-12T14:24:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T11:28:21.000Z",
-   "msg": "placed sell limit GBPUSD 0.01 lot at 1.3269 (council scalp, valid to 2026-11-12T14:27Z)",
-   "trade": "gbpusd-scalp-1794482833"
-  },
-  {
-   "at": "2026-11-12T11:36:43.000Z",
-   "msg": "not mirrored yet xau-m30m1-1794483321: 40 mirror positions already open (will retry)",
-   "trade": "xau-m30m1-1794483321"
-  },
   {
    "at": "2026-11-12T11:38:43.000Z",
    "msg": "limit filled: GBPUSD position 48757460 at the broker",
@@ -13083,6 +13079,16 @@
    "at": "2026-11-12T14:22:13.000Z",
    "msg": "limit filled at once: USDCHF position 48837134 at the broker at 0.83242",
    "trade": "usdchf-scalp-1794493275"
+  },
+  {
+   "at": "2026-11-12T14:24:39.000Z",
+   "msg": "closed BTCUSD position 48795622 (council: win)",
+   "trade": "btc-intraday-1794489777"
+  },
+  {
+   "at": "2026-11-12T14:24:39.000Z",
+   "msg": "not mirrored xrp-scalp-1794493418: none of XRPUSD found at the broker",
+   "trade": "xrp-scalp-1794493418"
   }
  ],
  "limits": {
