@@ -3979,9 +3979,22 @@ const VIEWER = document.documentElement.dataset.role === 'viewer';   // Orlando 
 // candle is left out of every structure reading, so a wick or a not-yet-closed body through a level never draws a BO, a ChoCh,
 // a VR or a moved extreme; it counts once that candle has closed beyond the level.
 function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; while (k > 0 && bars[k - 1].time - shift + sec > now) k--; return k; }
-// internal structure (iBO / iChoCh): msAnalyze on 2-a-side swings over the closed candles; display only
-const MS_IPIV = 2;
-function msInternal(bars, closedN) { return msAnalyze(bars.slice(0, closedN), MS_IPIV).events; }
+// internal structure (iBO / iChoCh), display only (12 Nov 2026, owner's marked chart): on the same swings the chart labels
+// HH / HL / LH / LL (N candles a side, confirmed N candles later), every close beyond the last swing high or low that is not
+// broken yet is an internal break: with the internal trend = iBO, against it = iChoCh (that flips the internal trend).
+// Closed candles only (closedN); a swing is used only once it is confirmed, and each swing is broken once.
+const MS_IPIV = 6;
+function msInternal(bars, closedN, N = MS_IPIV) {
+  const n = Math.min(closedN, bars.length), H = bars.map((b) => b.high), L = bars.map((b) => b.low), C = bars.map((b) => b.close), out = [];
+  const piv = (j, hi) => { for (let k = 1; k <= N; k++) { if (j - k < 0 || j + k >= n) return false; if (hi ? (H[j - k] > H[j] || H[j + k] >= H[j]) : (L[j - k] < L[j] || L[j + k] <= L[j])) return false; } return true; };
+  let sh = null, sl = null, trend = 0;
+  for (let i = 0; i < n; i++) {
+    const j = i - N; if (j >= 0) { if (piv(j, true)) sh = { i: j, p: H[j] }; if (piv(j, false)) sl = { i: j, p: L[j] }; }
+    if (sh && C[i] > sh.p) { out.push({ dir: 1, level: sh.p, fromIdx: sh.i, breakIdx: i, structure: trend < 0 }); trend = 1; sh = null; }
+    if (sl && C[i] < sl.p) { out.push({ dir: -1, level: sl.p, fromIdx: sl.i, breakIdx: i, structure: trend > 0 }); trend = -1; sl = null; }
+  }
+  return out;
+}
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -4643,12 +4656,12 @@ function msNextSetup(bars, A) {
     if (G.show.bo && G.show.hist !== false) A.events.slice(0, A.events.length - evs.length).forEach((e) => {
       const sell = e.dir < 0; items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: (sell ? Z.sell : Z.buy).line, w: 1, dash: true, text: e.structure ? 'ChoCh' : 'BOS', below: sell });
     });
-    // internal breaks (12 Nov 2026, owner: "I'd like to have the iBOS as well (internal BOS) lines", "I mean iBO"): the same engine on small
-    // swings (2 candles a side, closed candles only, a close beyond the swing) inside the last three major legs; iBO = with the
-    // internal trend, iChoCh = the internal trend flipped. Thin dotted lines; a level the major structure already draws is skipped
+    // internal breaks (12 Nov 2026, owner: "I'd like the iBOS as well", "I mean iBO", and a marked chart): every close beyond a
+    // labelled swing (msInternal, the chart's own HH / HL / LH / LL swings) over the whole loaded history; iBO = with the internal
+    // trend, iChoCh = the internal trend flipped. Thin dotted lines; a level the major structure already draws is skipped
     if (G.show.ibos !== false) {
-      const major = new Set(A.events.map((e) => e.level)), from = A.events.length ? A.events[Math.max(0, A.events.length - 3)].fromIdx : 0;
-      msInternal(bars, A.n || n).filter((e) => e.breakIdx >= from && !major.has(e.level)).forEach((e) => {
+      const major = new Set(A.events.map((e) => e.level));
+      msInternal(bars, A.n || n, PIVOT).filter((e) => !major.has(e.level)).forEach((e) => {
         const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: e.structure ? 'iChoCh' : 'iBO', below: sell });
       });
     }

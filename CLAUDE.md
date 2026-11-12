@@ -1219,8 +1219,10 @@ Display only (`market-structure.html`); the council's own engine copy in `counci
   `CAP` 6,000 (`P.loadOlder`); refreshes ask for 300 and join them (`mergeBars`) so older candles stay. Every earlier break is
   drawn as a thin dashed BOS / ChoCh line (layer "Earlier breaks", `G.show.hist`). The cycle line joins the BO line of the same
   break; a higher-timeframe target already traded through reads "reached, no close beyond". Tests: `tests/market-cycle.test.mjs`.
-- **Internal breaks (iBO / iChoCh)** (owner: "I'd like the iBOS as well", "I mean iBO"): `msInternal` = `msAnalyze` on 2-a-side
-  swings (`MS_IPIV`) over the closed candles, drawn inside the last three major legs as thin dotted lines (layer "Internal breaks",
+- **Internal breaks (iBO / iChoCh)** (owner: "I'd like the iBOS as well", "I mean iBO", then a marked chart): `msInternal` = every
+  close beyond the last unbroken swing high / low of the chart's OWN labelled swings (HH / HL / LH / LL, `PIVOT` a side, used once
+  confirmed, each broken once), closed candles only, over the whole loaded history; with the internal trend iBO, against it iChoCh
+  (flips the internal trend). Thin dotted lines (layer "Internal breaks",
   `G.show.ibos`); a level the major structure already draws is skipped. **After a pullback the first ChoCh back with the timeframe
   above starts the continuation** (owner): the cycle line reads "<TF> continuation starts", the chip "continuation".
 
