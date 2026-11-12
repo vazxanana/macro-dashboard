@@ -81,7 +81,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
-- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9, 11 and 12 Nov).
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
@@ -2222,6 +2222,28 @@ was found. Fixed:
   3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
   12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
+
+## Post-merge QA sweep (12 Nov 2026, the ~20 PRs merged since 11 Nov 21:00 UTC, two sessions in parallel)
+Every page at 360 / 390 px (touch; simple view and Full view) and 1440 px, in dark / light / midnight, as owner, Fred, Orlando,
+Luxus, Carlos, a guest and signed out (stubbed /api/me, council-data from `origin/council-data`, the guest files cut by
+`api/_guestcut.js` as the server does). No page error, sideways scroll, cut-off view or dead in-page link; guests saw only
+main-system rows; the guest-cut lists match the page's `SYS_K` / `SYSG` (Mosha cycle included). Fixed (display / wiring only):
+- **Charts, simple view**: the market-cycle strip (`#ms-cycle`, #761) arrived 3.6 s after load between the timeframes and the
+  chart: the chart started at 390 px instead of 255 and the page shifted (CLS 0.11 a load). It now waits behind "More" with the
+  markup it reads (`.cycle` in the "More" rule; the button's label names it); the smoke test fails when it shows on a phone.
+  Desktop keeps the strip (a 0.03 shift when it arrives, left).
+- **The Mosha cycle's status line** (`#ms-rep-mcycle`, #763) sat inside the "Gold replica · paper shadow" card, folded on
+  phones: the only live system without a line in sight. It is now in "Which systems trade live".
+- **Live / shadow wording across the two sessions**: the Pairs card said "crypto trend (live paper)" (a shadow since 7 Nov);
+  the AI second opinion card (#760) said it studies "the seven edges" (it studies live trades; five of the seven are shadows).
+- **Viewers**: the browser Trader saved auto paper trades to a viewer's local journal and toasted "Trader saved … It's in your
+  journal" (Luxus on landing; viewers cannot open the Journal): `autoTrade` stands down when the Journal is denied. The analyst
+  card no longer calls `/api/edge-analyst` for a viewer (refused every 5 minutes). Toast titles use `--gold-ink` on light (1.8:1).
+- Seen, left: the week pane's "Meridian live" (council/alerts.mjs `alertable`: every non-shadow NQ paper session, after
+  costs, −0.41R on 5 this week) and Home's "this week" (main systems, before costs, −3.05R on 3) count different things under
+  similar words (a definition, not display); text under 12 px and 32-40 px controls on Setup, Scanner, Crypto, LIT and in the
+  header (older than these PRs); the first-visit gate-to-reload shift for members (one load); ChronosTrade's session form at
+  35 px on a phone's first visit. Tests: `tests/qa-sweep.test.mjs` ("QA 12 Nov", six tests), `scripts/audit/smoke.cjs`.
 
 ## Browser audits: false failures traced to their causes (11 Nov 2026)
 The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
