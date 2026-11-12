@@ -290,7 +290,8 @@ test('the paper cost of a closed trade includes its financing, from the first cl
 
 // ─── the page, the guest files and the docs agree ───
 test('the page: the system lists a guest is cut by are unchanged (history stays main, by its own shadow flag), and the scoreboard calls the five shadows', () => {
-  assert.ok(PAGE.includes("const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];"));
+  // 'mcycle' (owner, 11 Nov: the Mosha cycle trades with the main system) joined the list after this test was written
+  assert.ok(PAGE.includes("const SYS_K = ['replica', 'mosha-bo', 'mcycle', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];"));
   assert.ok(PAGE.includes("const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);"));
   // every "main" reader takes a row only when it is not a shadow: a trade the five systems take after the rule is out by its own flag
   assert.ok(PAGE.includes("trades: (v) => Array.isArray(v) ? v.filter((x) => x && !x.shadow && SYS_K.includes(x.k)).map(guestRow) : v,"));
