@@ -34,12 +34,12 @@ export function liveRuleSection({ snapshot, config, backtest, now = Math.floor(D
     const now_ = c ? `${c.state} ${c.side}${c.state === 'READY' && side !== 'either' && c.side !== side ? ' (blocked: wrong side)' : ''}` : '—';
     const a = bt.filter((t) => t.market === key);
     if (!(f.noMarket || []).includes(key) && !(config.replicaLive || []).includes(key)) tot = tot.concat(a);   // total: only markets the Scalp trades live
-    const R = a.reduce((s, t) => s + t.R_none - (t.cost || 0), 0);
-    const rep = a.length ? `${a.length} trades, ${Math.round(100 * a.filter((t) => t.R_none - (t.cost || 0) > 0).length / a.length)}% won, ${sgn(R / a.length)}R a trade` : 'no trades';
+    const R = a.reduce((s, t) => s + t.R_none - (t.cost || 0) - (t.fin || 0), 0);
+    const rep = a.length ? `${a.length} trades, ${Math.round(100 * a.filter((t) => t.R_none - (t.cost || 0) - (t.fin || 0) > 0).length / a.length)}% won, ${sgn(R / a.length)}R a trade` : 'no trades';
     out.push(`| ${m.label} | ${dir(d1)} (${src}) | ${would} | ${now_} | ${rep} |`);
   }
-  const RT = tot.reduce((s, t) => s + t.R_none - (t.cost || 0), 0);
-  out.push('', `Replay total on the markets it trades live: ${tot.length} trades, ${sgn(tot.length ? RT / tot.length : 0)}R a trade (${sgn(RT)}R), after spread. Each signal still has to clear reward:risk ≥ ${config.minRR}, the 2-trades-per-market cap and the 3-hour re-entry rule.`, END);
+  const RT = tot.reduce((s, t) => s + t.R_none - (t.cost || 0) - (t.fin || 0), 0);
+  out.push('', `Replay total on the markets it trades live: ${tot.length} trades, ${sgn(tot.length ? RT / tot.length : 0)}R a trade (${sgn(RT)}R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ ${config.minRR}, the 2-trades-per-market cap and the 3-hour re-entry rule.`, END);
   return out.join('\n');
 }
 

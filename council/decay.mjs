@@ -23,7 +23,7 @@
 // (council/digest.mjs decayLine) adds one line only when a live system is decaying.
 import fs from 'node:fs';
 import { merNet, ictNet } from './digest.mjs';
-import { ownStream } from './fills.mjs';
+import { ownStream, rowFinancing } from './fills.mjs';
 
 export const DK = {
   q: 0.95,          // control limit: 95th percentile of a year's highest CUSUM under the baseline (≈ 1 false alarm in 20 years)
@@ -146,6 +146,10 @@ export function fold(list, net) {
   for (const a of adds) { const q = out.get(a.addOf), t = a.closed || a.exitAt || a.opened; if (q) { q.R += net(a); q.t = Math.max(q.t, t); } else out.set(a.id, { id: a.id, t, R: net(a), opened: a.opened }); }
   return [...out.values()].filter((p) => Number.isFinite(p.R) && Number.isFinite(p.t));
 }
+// A council replay row after costs AND overnight financing (11 Nov 2026): the replay's R is after the spread only, so a long gold
+// row pays the Trader's own financing (fills.mjs rowFinancing) when it is read, here and in the baseline build
+// (research/edge/decay-monitor/run.mjs), so the record under watch and its baseline are costed alike. Nothing stored changes.
+export const replayNet = (x) => merNet(x) - rowFinancing(x).finR * (x.rawR != null && x.size ? x.size : 1);
 const closed = (x) => x && DONE.has(x.status) && Number.isFinite(+x.R) && (x.closed || x.exitAt);
 // the council's replay up to the first forward trade, then the forward record (where they overlap, the forward record counts)
 export function joinRecord(replay, live, hist = []) {
@@ -166,7 +170,7 @@ export function recordOf(sys, D, b = {}) {
   const rp = ((D.replay && D.replay.trades) || []).filter((x) => mine(x) && closed(x));
   const fwd = sys.session ? (Array.isArray(D.research) ? D.research : []) : (Array.isArray(D.trades) ? D.trades : []);
   const lv = fwd.filter((x) => mine(x) && closed(x) && (sys.shadow ? ownStream(x) : !x.shadow));
-  return joinRecord(fold(rp, merNet), fold(lv, merNet), hist);
+  return joinRecord(fold(rp, replayNet), fold(lv, merNet), hist);
 }
 
 // ─── all systems: coach.json `decay` ───
@@ -180,5 +184,5 @@ export function buildDecay(D, { now = Math.floor(Date.now() / 1000), base = load
     systems.push({ id: sys.id, name: sys.name, desk: sys.desk, live: !sys.shadow, ...(sys.shadow && sys.since ? { shadowSince: sys.since } : {}), base: b.src, ...a });
   }
   const ids = (st) => systems.filter((s) => s.live && s.status === st).map((s) => s.id);
-  return { at, v: 1, baseAt: base.at, rule: 'status and alert only: the monitor never changes a rule; the owner decides', systems, decaying: ids('decaying'), watch: ids('watch') };
+  return { at, v: 1, baseAt: base.at, ...(base.financing ? { financing: { asOf: base.financing.asOf, rate: base.financing.rate, systems: base.financing.systems } } : {}), rule: 'status and alert only: the monitor never changes a rule; the owner decides', systems, decaying: ids('decaying'), watch: ids('watch') };
 }
