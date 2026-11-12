@@ -9843,7 +9843,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9782.21 · 36 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9782.21 · 36 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -9874,18 +9874,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdcad-scalp-1794468360": {
+    "orderId": "33983668",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.42618,
+    "stop": 1.42562,
+    "t1": 1.4272999999999998,
+    "placedAt": "2026-11-12T07:26:58.000Z",
+    "expires": "2026-11-12T10:26:00.000Z",
+    "riskCash": 1.96,
+    "margin": 8,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9782.21,
-  "lastRun": "2026-11-12T07:25:32.000Z"
+  "lastRun": "2026-11-12T07:26:58.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T11:12:06.000Z",
-   "msg": "placed buy limit USDCAD 0.05 lot at 1.42226 (council scalp, valid to 2026-11-11T14:11Z)",
-   "trade": "usdcad-scalp-1794395464"
-  },
   {
    "at": "2026-11-11T11:12:06.000Z",
    "msg": "limit filled at once: USDCAD position 48391350 at the broker at 1.42224",
@@ -11380,6 +11395,11 @@
    "at": "2026-11-12T07:14:45.000Z",
    "msg": "opened sell AUDUSD 0.03 lot (council scalp)",
    "trade": "audusd-scalp-1794467396"
+  },
+  {
+   "at": "2026-11-12T07:26:58.000Z",
+   "msg": "placed buy limit USDCAD 0.04 lot at 1.42618 (council scalp, valid to 2026-11-12T10:26Z)",
+   "trade": "usdcad-scalp-1794468360"
   }
  ],
  "limits": {
