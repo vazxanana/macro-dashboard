@@ -1310,9 +1310,14 @@ alert reads it and it is not a tested rule (the mechanical Mosha studies failed)
 `msCycle`; `moshaNow(id, bars)` feeds it): the last BO of the timeframe above (D1 for H4, H4 for H1, H1 for M15, M15 for M5)
 read on this chart. VR = the first break of this chart AGAINST it after the BO, box from the extreme the BO made to the level
 the VR broke (wicks); CF = the first break back WITH it after the VR, its origin is the CF zone. Case 1 CF clear of the VR box,
-2 inside it, 3 through the VR's extreme ("read one TF lower"). Entry where price pulls back into the zone, stop past the zone
-($0.30 on gold), target the VR's extreme (the HTF extreme in case 3 or once price is past it); status waiting / in the zone /
-stopped / target reached (stop first when one candle holds both). Barriers = the breaks with the BO since it (last four).
+2 inside it, 3 through the VR's extreme ("read one TF lower"). **The entry is an EG** (owner, 12 Nov 2026: "i want eg as
+entry"; the engulf definition of the EG/EF skill, close-beyond): price pulls back into the CF zone, then a CLOSED candle closes
+beyond the last opposite candle (sell: below the low of the last green candle; buy: above the high of the last red one; one or
+more candles later, a wick never counts). Entry at that close (pill "EG ▼ entry"), stop past the pullback's extreme ($0.30 on
+gold), target the VR's extreme (the HTF extreme in case 3 or once price is past it). A close through the zone's far side before
+an EG = the zone failed (EF), no trade. States: wait for the pullback / in the zone, wait for an EG / in the trade / stopped /
+target reached (stop first when one candle holds both); closed candles only (`msClosedN`). Barriers = the breaks with the BO
+since it (last four). The 14-year engulf tests in the skill found no edge in the engulf mechanics alone: display only.
 Tests: `tests/market-cycle.test.mjs` ("Mosha").
 
 ## Meridian markup: the market cycle (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … H4 tells retracement of daily, M15 retracement of H1, M5 of M15")
