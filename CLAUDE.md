@@ -539,6 +539,15 @@ trade is pushed as `nq-nyflipt-<day>` (session `nyflip-trend`, `shadow: true`, `
 managed by the same nq-open loop. The live rule is untouched (the test pins its block by sha256). The shadow never alerts or gets a
 futures ticket (`alertable` skips research shadows), is not "our system" on the page (`nqSys` / `nqLive`), and lands in the week
 report's shadow book as "NQ open run, trend-on only (shadow)"; `snapshot.nqRegime` carries the latest tag, shown on the NQ card.
+**12 Nov 2026, defect found, fix proposed (item 50)**: the open-trade loop (`for (const r of openNq)`, OUTSIDE the pinned push)
+reads `r0 = |entry - stop|` on every run, and the `nq-runner` trail moves `stop`, so after a trail move (from the next run on) a
+trailing-stop exit books about +1.00R whatever the profit, a time exit is divided by the larger distance, mfe stops growing,
+and the trail's new stop `entry ± (mfe − 1) x r0` jumps past the rule's level (it can be put next to the price). The records
+carry no `r0` / `stop0`. Effect so far: none (no `nq-open` record in research.json's whole history ever had `trailMoved`; the
+only two runner records, 9 Nov, stopped at −1.05R); `research/replay-2w.json` rows come from another program that keeps the
+opening stop and are unaffected. The fix (stamp the opening risk as a new field `r0`, from `tp1` / 2 for a record already
+trailed) changes where the trail puts the stop, so it is a proposal: `research/proposals/2026-11-12-nq-open-r0.md`. Never
+compute an NQ open-run R from the current stop. Test: `tests/nq-open-r0.test.mjs` (lifts the loop from the trader's text).
 
 ## LIT paper shadow stream (8 Nov 2026, owner: "leave it as paper shadow or just LIT")
 `council/lit.mjs` (pure; tests/lit-shadow.test.mjs) is a verbatim port of the LIT study's detector (research/edge/lit run.mjs: #596
