@@ -86,3 +86,17 @@ test('chart type: candles, a line of closes, or both, kept per device', () => {
   assert.match(html, /P\.setLine = \(B\) =>/); assert.match(html, /series\.setData\(P\.view\(P\.bars\)\); P\.setLine\(P\.bars\); P\.setStyle\(\);/);
   assert.match(html, /if \(p\.setStyle\) p\.setStyle\(\)/, 'a theme change keeps the chart type');
 });
+
+// 12 Nov 2026, owner: "it needs to show more previous data"
+test('more history: 1,500 candles at load, older ones on scroll back, a refresh keeps them, every earlier break marked', () => {
+  assert.match(html, /const BARS = 1500, PIVOT = 6, CAP = 6000;/);
+  const line = html.split('\n').find((l) => l.includes('const mergeBars = '));
+  const mergeBars = new Function('CAP', `${line.trim()} return mergeBars;`)(6000);
+  const bar = (t) => ({ time: t, close: t });
+  assert.deepEqual(mergeBars([1, 2, 3, 4].map(bar), [3, 4, 5].map(bar)).map((b) => b.time), [1, 2, 3, 4, 5], 'old kept, fresh wins from its first candle');
+  assert.deepEqual(mergeBars(null, [5].map(bar)).map((b) => b.time), [5]);
+  assert.match(html, /P\.raw = r\.src === G\.source \? mergeBars\(P\.raw, r\.bars\) : r\.bars;/);
+  assert.match(html, /P\.loadOlder = async function/); assert.match(html, /from=\$\{first - 2000 \* tf\.sec\}&to=\$\{first - 1\}/);
+  assert.match(html, /r\.from < 25 && P\.fitted && P\.vis !== false\) P\.loadOlder\(\)/);
+  assert.match(html, /data-show="hist" checked/); assert.match(html, /text: e\.structure \? 'ChoCh' : 'BOS'/);
+});

@@ -5087,6 +5087,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="ms-tog ms-tog-g">
             <div class="tog-g"><div class="tog-h">Meridian markup</div>
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
+            <label><input type="checkbox" id="ms-show-hist" data-show="hist" checked><i style="border-top:1px dashed #f23645;height:0;border-radius:0"></i>Earlier breaks (BOS / ChoCh)</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
@@ -6347,7 +6348,9 @@ function msNextSetup(bars, A) {
     { id: '5m',  label: 'M5',  role: 'Entry timing',            sec: 300,   binance: '5m',  kraken: 5,   poll: 20e3 },
     { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
   ];
-  const BARS = 500, PIVOT = 6;
+  const BARS = 1500, PIVOT = 6, CAP = 6000;   // 12 Nov 2026: 1,500 candles a timeframe at load (was 500); scrolling back loads older ones up to CAP
+  const POLL_N = 300;   // a refresh asks for the latest 300 and joins them to what is loaded (mergeBars), so older history stays
+  const mergeBars = (old, fresh) => { if (!old || !old.length || !fresh || !fresh.length) return fresh; const t0 = fresh[0].time; return old.filter((b) => b.time < t0).concat(fresh).slice(-CAP); };
   const INSTRUMENTS = {
     xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
     xag:    { group: 'Metals', md: 'xag', label: 'XAG/USD', name: 'Silver',   binance: null, kraken: null, dec: 3, size: 'units', unit: 'oz', color: '#9aa4b2' },
@@ -6389,7 +6392,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -6780,6 +6783,11 @@ function msNextSetup(bars, A) {
     if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
     const recent = A.events.slice(D ? -2 : -1), seen = new Set();
     const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
+    // earlier breaks (12 Nov 2026, owner: "it needs to show more previous data", the way Photon marks every break): every older
+    // break in the loaded candles as a thin dashed line, BOS (with the trend) or ChoCh (the trend flipped); the recent ones above
+    if (G.show.bo && G.show.hist !== false) A.events.slice(0, A.events.length - evs.length).forEach((e) => {
+      const sell = e.dir < 0; items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: (sell ? Z.sell : Z.buy).line, w: 1, dash: true, text: e.structure ? 'ChoCh' : 'BOS', below: sell });
+    });
     evs.forEach((e, k) => {
       const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
       if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
@@ -6919,6 +6927,21 @@ function msNextSetup(bars, A) {
       try { lineS.applyOptions({ visible: m !== 'candles', color: m === 'both' ? 'rgba(41,98,255,.85)' : '#2962ff', lineWidth: m === 'both' ? 1.5 : 2 }); } catch (e) {}
       try { series.applyOptions(m === 'line' ? { upColor: T, downColor: T, borderUpColor: T, borderDownColor: T, wickUpColor: T, wickDownColor: T } : candleCols()); } catch (e) {} };
     P.setLine = (B) => { try { lineS.setData(closeLine(B)); } catch (e) {} };
+    // older candles when the chart is scrolled back to its first candles (12 Nov 2026, owner: "it needs to show more previous data"):
+    // OANDA windows of up to 2,000 candles before the first one loaded, up to CAP; the view stays on the same candles
+    P.loadOlder = async function () {
+      if (P._old || P._noOlder || !P.raw || P.raw.length < 40 || P.raw.length >= CAP || P.rp || G.csv || G.source !== 'OANDA') return;
+      P._old = true;
+      try {
+        const first = P.raw[0].time, b = await mdBars(INST, tf, `from=${first - 2000 * tf.sec}&to=${first - 1}`);
+        const add = (b || []).filter((x) => x.time < first).slice(-(CAP - P.raw.length));
+        if (!add.length) { P._noOlder = true; return; }
+        const ts = chart.timeScale(), r = ts.getVisibleLogicalRange();
+        P.raw = add.concat(P.raw); P.rebuild(true);
+        if (r) ts.setVisibleLogicalRange({ from: r.from + add.length, to: r.to + add.length });
+      } catch (e) { /* the next scroll tries again */ } finally { P._old = false; }
+    };
+    chart.timeScale().subscribeVisibleLogicalRangeChange((r) => { if (r && r.from < 25 && P.fitted && P.vis !== false) P.loadOlder(); });
     // charts upgrade (7 Nov): faint symbol watermark, quiet dashed crosshair, OHLC readout that follows the cursor
     chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
       crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } } });
@@ -7248,7 +7271,7 @@ function msNextSetup(bars, A) {
       if (!P.raw) return;
       const last = P.raw[P.raw.length - 1];
       if (k.time === last.time) Object.assign(last, k);
-      else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > BARS + 50) P.raw.shift(); }
+      else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > CAP) P.raw.shift(); }
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
@@ -8105,7 +8128,8 @@ function msNextSetup(bars, A) {
     if (polling || G.csv) return; polling = true; setStatus();
     ACTIVE.forEach((tf) => {
       const tick = async () => {
-        try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+        try { const I = INST, r = await fetchBars(tf, I, POLL_N); const P = panes[tf.id]; if (I !== INST) throw 0;
+          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
         if (!G.csv) setTimeout(tick, iv());
       };
