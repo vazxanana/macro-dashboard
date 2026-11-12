@@ -5811,8 +5811,8 @@
     "status": "open",
     "openedAt": "2026-11-10T17:54:35.000Z",
     "councilEntry": 0.68544,
-    "stop": 0.6932807,
-    "t1": 0.6696986,
+    "stop": 0.6935907,
+    "t1": 0.6700086,
     "riskCash": 7.86,
     "margin": 1.37,
     "minLot": true,
@@ -5829,8 +5829,8 @@
     "stopCheckedAt": "2026-11-10T17:54:35.000Z",
     "brokerStop": 0.69331,
     "rr": 2,
-    "amended": 4,
-    "amendedAt": "2026-11-12T08:31:47.000Z"
+    "amended": 5,
+    "amendedAt": "2026-11-12T08:48:29.000Z"
    },
    "gbpusd-rscalp-1794334972": {
     "symbol": "GBPUSD",
@@ -9632,8 +9632,8 @@
     "setup": "intraday",
     "openedAt": "2026-11-12T05:32:29.000Z",
     "councilEntry": 0.68348,
-    "stop": 0.6849,
-    "t1": 0.68058,
+    "stop": 0.68521,
+    "t1": 0.68089,
     "adopted": false,
     "alerted": [
      "open",
@@ -9653,8 +9653,8 @@
     "volume": 100000,
     "status": "open",
     "rr": 2,
-    "amended": 4,
-    "amendedAt": "2026-11-12T08:31:47.000Z"
+    "amended": 5,
+    "amendedAt": "2026-11-12T08:48:29.000Z"
    },
    "xau-scalp-1794462771": {
     "symbol": "XAUUSD",
@@ -10142,7 +10142,7 @@
     "lots": 0.05,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-12T08:36:58.000Z",
     "councilEntry": 1.42556,
     "stop": 1.4260599999999999,
@@ -10156,11 +10156,16 @@
     "slipR": 0,
     "lagSec": 67,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T08:36:58.000Z",
     "brokerStop": 1.42606,
-    "amendFails": 2
+    "amendFails": 2,
+    "closedAt": "2026-11-12T08:48:29.000Z",
+    "exitPrice": 1.42552,
+    "councilExit": 1.42619,
+    "councilR": 0.16
    },
    "audusd-scalp-1794472705": {
     "positionId": "48715812",
@@ -10173,8 +10178,8 @@
     "status": "open",
     "openedAt": "2026-11-12T08:39:46.000Z",
     "councilEntry": 0.68194,
-    "stop": 0.6824399999999999,
-    "t1": 0.68088,
+    "stop": 0.68275,
+    "t1": 0.68119,
     "riskCash": 1.96,
     "margin": 4.09,
     "shadow": true,
@@ -10184,10 +10189,14 @@
     "slipR": -0.02,
     "lagSec": 81,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "stopCheckedAt": "2026-11-12T08:39:46.000Z",
-    "brokerStop": 0.68245
+    "brokerStop": 0.68245,
+    "rr": 2.12,
+    "amended": 1,
+    "amendedAt": "2026-11-12T08:48:29.000Z"
    }
   },
   "day": {
@@ -10195,7 +10204,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9797.54 · 34 open",
+  "status": "ok · demo Fusion Markets · balance 9797.54 · 33 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -10208,29 +10217,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9797.54,
-  "lastRun": "2026-11-12T08:44:29.000Z"
+  "lastRun": "2026-11-12T08:48:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:38:42.000Z",
-   "msg": "opened sell USDCHF 0.03 lot (council rscalp)",
-   "trade": "usdchf-rscalp-1794407857"
-  },
-  {
-   "at": "2026-11-11T14:41:18.000Z",
-   "msg": "placed buy limit ETHUSD 0.16 lot at 2054.2 (council rscalp, valid to 2026-11-11T17:40Z)",
-   "trade": "eth-rscalp-1794408007"
-  },
-  {
-   "at": "2026-11-11T14:41:18.000Z",
-   "msg": "limit filled at once: ETHUSD position 48450870 at the broker at 2053.79",
-   "trade": "eth-rscalp-1794408007"
-  },
-  {
-   "at": "2026-11-11T14:53:36.000Z",
-   "msg": "closed USDCAD position 48448521 (council: loss)",
-   "trade": "usdcad-scalp-1794407707"
-  },
   {
    "at": "2026-11-11T14:56:03.000Z",
    "msg": "placed sell limit USDCAD 0.04 lot at 1.42436 (council rscalp, valid to 2026-11-11T17:54Z)",
@@ -11710,6 +11699,26 @@
    "at": "2026-11-12T08:44:29.000Z",
    "msg": "stop move for usdcad-rscalp-1794472551 on USDCAD 48715118 failed: TRADING_BAD_STOPS: New TP for SELL position should be <= current ASK price. current ASK: 1.42556, TP: 1.42619 (retried next round)",
    "trade": "usdcad-rscalp-1794472551"
+  },
+  {
+   "at": "2026-11-12T08:48:29.000Z",
+   "msg": "closed USDCAD position 48715118 (council: win)",
+   "trade": "usdcad-rscalp-1794472551"
+  },
+  {
+   "at": "2026-11-12T08:48:29.000Z",
+   "msg": "moved AUDUSD 48181010 protection: stop 0.6932807 -> 0.6935907, target 0.6696986 -> 0.6700086 (council swing)",
+   "trade": "audusd-swing-1794333208"
+  },
+  {
+   "at": "2026-11-12T08:48:29.000Z",
+   "msg": "moved AUDUSD 48659864 protection: stop 0.6849 -> 0.68521, target 0.68058 -> 0.68089 (council intraday)",
+   "trade": "audusd-intraday-1794461258"
+  },
+  {
+   "at": "2026-11-12T08:48:29.000Z",
+   "msg": "moved AUDUSD 48715812 protection: stop 0.6824399999999999 -> 0.68275, target 0.68088 -> 0.68119 (council scalp)",
+   "trade": "audusd-scalp-1794472705"
   }
  ],
  "limits": {
