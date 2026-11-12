@@ -5110,6 +5110,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-ha"><i style="background:linear-gradient(90deg,rgba(8,153,129,.8) 33%,rgba(8,153,129,.45) 33% 66%,rgba(242,54,69,.8) 66%)"></i>Heikin Ashi</label>
             <label><input type="checkbox" id="ms-show-log"><i style="background:none;border-bottom:2px solid #8a94a8;border-radius:0 0 0 10px;height:8px"></i>Log scale</label>
+            <label class="cmp-row">Chart type <select id="ms-cs" aria-label="Chart type: candles, a line of closing prices, or both"><option value="candles">Candles</option><option value="line">Line (closes)</option><option value="both">Candles + line</option></select></label>
             <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label></div>
           </div>
           <div class="menu-h">Display</div>
@@ -6154,6 +6155,15 @@ function msAnalyze(bars, N) {
     return e;
   }
 
+  // a low that failed to break the low becomes the new low (12 Nov 2026, owner): a wick through the protected swing with no close
+  // beyond it is a sweep, not a BO; the protected level (and the Origin edge it is) moves to that wick, and only a close beyond
+  // the new level is the BO. Page markup only: the council's own copy of this engine (council/trader.mjs) is unchanged.
+  function sweepProt(dir, i) {
+    prot = { p: dir > 0 ? L[i] : H[i], i, swept: true };
+    const e = events[events.length - 1];
+    if (e && e.dir === dir && e.endIdx === null) { if (dir > 0) e.bot = prot.p; else e.top = prot.p; e.protIdx = i; e.prot = prot.p; e.swept = (e.swept || 0) + 1; }
+  }
+
   for (let i = 0; i < n; i++) {
     const cj = i - N;
     if (cj >= 0) { if (pivH(cj,N)) lastPH = { i: cj, p: H[cj] }; if (pivL(cj,N)) lastPL = { i: cj, p: L[cj] }; }
@@ -6177,6 +6187,7 @@ function msAnalyze(bars, N) {
         prot = { p: e.bot, i: e.protIdx }; ext = { i, p: H[i], fixed: false };
         continue;
       }
+      if (H[i] > prot.p) sweepProt(-1, i);   // traded above the protected high without a close above: that high is the new one
       if (!ext.fixed) {
         if (L[i] < ext.p) ext = { i, p: L[i], fixed: false };
         else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
@@ -6193,6 +6204,7 @@ function msAnalyze(bars, N) {
         prot = { p: e.top, i: e.protIdx }; ext = { i, p: L[i], fixed: false };
         continue;
       }
+      if (L[i] < prot.p) sweepProt(1, i);   // traded below the protected low without a close below: that low is the new one
       if (!ext.fixed) {
         if (H[i] > ext.p) ext = { i, p: H[i], fixed: false };
         else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
@@ -6378,7 +6390,7 @@ function msNextSetup(bars, A) {
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
   const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
-    offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
+    offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
@@ -6893,11 +6905,20 @@ function msNextSetup(bars, A) {
       localization: { priceFormatter: (p) => fmt(p) },
     });
     const series = chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineStyle: LW.LineStyle.Dotted, priceFormat: { type: 'price', precision: INST.dec, minMove: Math.pow(10, -INST.dec) } });
+    // chart type (12 Nov 2026, owner: "change to line chart, and use both together"): a line of closing prices, alone or over the
+    // candles. The candle series stays (the markup is drawn on it); in Line mode its candles are made invisible.
+    const lineS = chart.addLineSeries({ color: '#2962ff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true, visible: false });
+    const closeLine = (B) => B.map((b) => ({ time: b.time, value: b.close }));
     const overlay = new Overlay(); series.attachPrimitive(overlay);
     const ON = new Set([overlay]);   // primitives attached right now: attach and detach happen once, whatever the click count
     const attach = (pr) => { if (!pr || ON.has(pr)) return; try { series.attachPrimitive(pr); ON.add(pr); } catch (e) {} };
     const detach = (pr) => { if (!pr || !ON.has(pr)) return; try { series.detachPrimitive(pr); } catch (e) {} ON.delete(pr); };
     const P = { tf, el, chart, series, overlay, raw: null, bars: null, A: null, S: null, fitted: false, priceLines: [], pv: [] };
+    P.lineS = lineS;
+    P.setStyle = function () { const m = G.cs, T = 'rgba(0,0,0,0)';
+      try { lineS.applyOptions({ visible: m !== 'candles', color: m === 'both' ? 'rgba(41,98,255,.85)' : '#2962ff', lineWidth: m === 'both' ? 1.5 : 2 }); } catch (e) {}
+      try { series.applyOptions(m === 'line' ? { upColor: T, downColor: T, borderUpColor: T, borderDownColor: T, wickUpColor: T, wickDownColor: T } : candleCols()); } catch (e) {} };
+    P.setLine = (B) => { try { lineS.setData(closeLine(B)); } catch (e) {} };
     // charts upgrade (7 Nov): faint symbol watermark, quiet dashed crosshair, OHLC readout that follows the cursor
     chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
       crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } } });
@@ -7110,7 +7131,7 @@ function msNextSetup(bars, A) {
     { const bar = document.createElement('div'); bar.className = 'rp-bar'; bar.hidden = true;
       bar.innerHTML = '<button type="button" data-rp="-1" aria-label="One candle back">◀</button><button type="button" data-rp="play" aria-label="Play">▶</button><button type="button" data-rp="1" aria-label="One candle forward">▶|</button><span class="rp-t"></span><button type="button" data-rp="x" aria-label="Exit replay">Exit</button>';
       el.appendChild(bar); let timer = null;
-      const show = () => { const B = P.bars.slice(0, P.rp.i); series.setData(P.view(B)); if (lgHover === false) { const lb = B[B.length - 1]; if (lb) lg.innerHTML = `<span class="k">Replay</span><span class="k">O</span><b>${fmt(lb.open)}</b><span class="k">H</span><b>${fmt(lb.high)}</b><span class="k">L</span><b>${fmt(lb.low)}</b><span class="k">C</span><b>${fmt(lb.close)}</b>`; } try { vol.setData([]); } catch (e) {} const b = B[B.length - 1];
+      const show = () => { const B = P.bars.slice(0, P.rp.i); series.setData(P.view(B)); P.setLine(B); if (lgHover === false) { const lb = B[B.length - 1]; if (lb) lg.innerHTML = `<span class="k">Replay</span><span class="k">O</span><b>${fmt(lb.open)}</b><span class="k">H</span><b>${fmt(lb.high)}</b><span class="k">L</span><b>${fmt(lb.low)}</b><span class="k">C</span><b>${fmt(lb.close)}</b>`; } try { vol.setData([]); } catch (e) {} const b = B[B.length - 1];
         bar.querySelector('.rp-t').textContent = b ? `${new Date((b.time - TZ) * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${P.rp.i}/${P.bars.length}` : ''; };
       const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
       const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
@@ -7130,7 +7151,7 @@ function msNextSetup(bars, A) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
-      series.setData(P.view(P.bars));
+      series.setData(P.view(P.bars)); P.setLine(P.bars); P.setStyle();
       P.setLog();
       P.setVol(); P.setEma(); P.setShade(); P.setVwap(); if (P.drawTl) P.drawTl(); if (P.setInd) P.setInd();
       P.analyze();
@@ -7237,7 +7258,7 @@ function msNextSetup(bars, A) {
       if (!P.vis && !P.rp) { P._stale = true; const now = Date.now(); if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); } return; }
       P.tickEma(b); P.tickShade(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
-      if (!P.rp) series.update(P.viewBar(b));
+      if (!P.rp) { series.update(P.viewBar(b)); try { lineS.update({ time: b.time, value: b.close }); } catch (e) {} }
       if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
       if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); if (G.showVwap === true && !P.rp) P.setVwap(); if (P._ind.length && !P.rp) P.setInd(); }
@@ -7246,7 +7267,7 @@ function msNextSetup(bars, A) {
     P.vis = true;
     P.resync = function () {
       if (!P._stale || !P.bars || !P.bars.length || P.rp) return; P._stale = false;
-      try { series.setData(P.view(P.bars)); P.setVol(); P.setEma(); P.setShade(); if (G.showVwap === true) P.setVwap(); if (P._ind && P._ind.length) P.setInd(); } catch (e) {}
+      try { series.setData(P.view(P.bars)); P.setLine(P.bars); P.setVol(); P.setEma(); P.setShade(); if (G.showVwap === true) P.setVwap(); if (P._ind && P._ind.length) P.setInd(); } catch (e) {}
       P.legend();
     };
     if (window.IntersectionObserver) new IntersectionObserver((es) => { const v = es[es.length - 1].isIntersecting; if (v === P.vis) return; P.vis = v; if (v && P._stale) requestAnimationFrame(P.resync); }, { rootMargin: '120px 0px' }).observe(el);
@@ -7491,6 +7512,7 @@ function msNextSetup(bars, A) {
       else { try { m = JSON.parse(localStorage.getItem('ms-lay-mine') || 'null'); } catch (e) { m = null; } if (!m) { flash(b, 'Save one first'); return; } }
       apply(m); box.querySelectorAll('[data-lay]').forEach((x) => x.classList.toggle('on', x === b)); if (window.msTrack) try { window.msTrack('layout', { k }); } catch (e) {} }); } }
   { const v = document.getElementById('ms-show-log'); if (v) { v.checked = !!G.log; v.addEventListener('change', () => { G.log = v.checked; try { localStorage.setItem('ms-log', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setLog && P.setLog()); }); } }
+  { const v = document.getElementById('ms-cs'); if (v) { v.value = G.cs; v.addEventListener('change', () => { G.cs = ['line', 'both'].includes(v.value) ? v.value : 'candles'; try { localStorage.setItem('ms-cs', G.cs); } catch (e) {} Object.values(panes).forEach((P) => P.setStyle && P.setStyle()); }); } }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} lyAll('setVol'); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
@@ -8155,7 +8177,7 @@ function msNextSetup(bars, A) {
     root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
     // owner (7 Nov): on the white (Light) theme the candles are monochrome, like a printed chart: grey up candles and black
     // down candles with black borders and wicks; the dark themes keep the green / red candles
-    { const K = candleCols(); Object.values(panes).forEach((p) => { try { p.series.applyOptions(K); if (p.setVol) p.setVol(); } catch (e) {} });
+    { const K = candleCols(); Object.values(panes).forEach((p) => { try { p.series.applyOptions(K); if (p.setStyle) p.setStyle(); if (p.setVol) p.setVol(); } catch (e) {} });
       try { [GV.series, TV.series].forEach((s2) => { if (s2) s2.applyOptions(K); }); } catch (e) { /* trade viewers not set up yet */ } }
     if (typeof drawHLines === 'function') setTimeout(drawHLines, 0);
     if (window.msSplitTheme) window.msSplitTheme();
