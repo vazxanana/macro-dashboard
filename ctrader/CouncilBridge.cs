@@ -57,8 +57,20 @@ namespace cAlgo.Robots
             public long Opened, Filled, ValidFor;
         }
 
+        // Paper and demo only (absolute rule 2; owner, 12 Nov 2026, docs/owner-decisions.md item 45): this program refuses an account
+        // that is not a demo. Checked on start and right before every order it sends; on a refusal it says why and stops itself
+        // without sending anything. Account.IsLive is the platform's own account-type flag (true for a live account).
+        private bool DemoOnly()
+        {
+            if (!Account.IsLive) return true;
+            Print("CouncilBridge refused: account {0} is a LIVE account. This program runs on demo accounts only; it stops now and sends nothing.", Account.Number);
+            Stop();
+            return false;
+        }
+
         protected override void OnStart()
         {
+            if (!DemoOnly()) return;
             Print("CouncilBridge started. Account {0}, {1}", Account.Number, Account.IsLive ? "LIVE/contest" : "demo");
             if (StartBalance <= 0) { var v = LocalStorage.GetString("CB.startBalance", LocalStorageScope.Instance); if (string.IsNullOrEmpty(v)) { LocalStorage.SetString("CB.startBalance", Account.Balance.ToString(CultureInfo.InvariantCulture), LocalStorageScope.Instance); LocalStorage.Flush(LocalStorageScope.Instance); } }
             _blockedForever = LocalStorage.GetString("CB.blockedForever", LocalStorageScope.Instance) == "1";
@@ -68,6 +80,7 @@ namespace cAlgo.Robots
         {
             try
             {
+                if (!DemoOnly()) return;
                 if (!GuardsOk()) return;
                 var sigs = Fetch(); if (sigs == null) return;
                 foreach (var s in sigs) Handle(s);
@@ -202,6 +215,7 @@ namespace cAlgo.Robots
             {
                 if (s.ValidFor > 0 && now > s.Opened + s.ValidFor) { _skipped.Add(s.Id); return; }
                 DateTime? exp = s.ValidFor > 0 ? (DateTime?)new DateTime(1970, 1, 1).AddSeconds(s.Opened + s.ValidFor) : null;
+                if (!DemoOnly()) return;
                 var r = PlaceLimitOrder(buy ? TradeType.Buy : TradeType.Sell, symName, units, Math.Round(s.Entry, sym.Digits), LabelPrefix + s.Id, sl, tp > 0 ? (double?)tp : null, exp, s.Id);   // absolute stop / target prices
                 if (r.IsSuccessful) Print("CouncilBridge: limit {0} {1} {2} @ {3} {4}", s.Side, symName, units, s.Entry, s.Id); else { Print("CouncilBridge: limit failed {0}: {1}", s.Id, r.Error); _skipped.Add(s.Id); }
                 return;
@@ -215,6 +229,7 @@ namespace cAlgo.Robots
                 if (buy ? sl >= px : sl <= px) { _skipped.Add(s.Id); return; }
                 // stop and target as absolute prices: place with pips from the current price, then set the exact levels
                 double slP = Math.Abs(px - sl) / sym.PipSize, tpP = tp > 0 ? Math.Abs(tp - px) / sym.PipSize : 0;
+                if (!DemoOnly()) return;
                 var r = ExecuteMarketOrder(buy ? TradeType.Buy : TradeType.Sell, symName, units, LabelPrefix + s.Id, slP, tpP > 0 ? (double?)tpP : null, s.Id);
                 if (r.IsSuccessful && r.Position != null) { r.Position.ModifyStopLossPrice(sl); if (tp > 0) r.Position.ModifyTakeProfitPrice(tp); Print("CouncilBridge: market {0} {1} {2} {3}", s.Side, symName, units, s.Id); }
                 else { Print("CouncilBridge: market order failed {0}: {1}", s.Id, r.Error); _skipped.Add(s.Id); }

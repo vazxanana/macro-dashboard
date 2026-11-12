@@ -5,7 +5,7 @@ Item numbers never change (other documents point to them). An item that is settl
 Everything is paper and demo only; no item below puts real money at risk.
 
 How to read the boxes: `[ ]` open, `[x]` decided or done, `[~]` partly done (what is left is said in its status line).
-Every item has a "Status, 11 Nov" line: that line is the current truth; the text under it is the original write-up.
+Every item has a dated "Status" line (11 or 12 Nov): that line is the current truth; the text under it is the original write-up.
 
 ## What needs you now (most important first)
 
@@ -26,20 +26,28 @@ Every item has a "Status, 11 Nov" line: that line is the current truth; the text
    GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
 8. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
-9. **A 10-lot gold buy on the Replica demo account that the mirror did not place (item 41).** If nothing is decided:
-   that account's balance and record do not measure the replica, and nobody knows who has its password.
-   (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with items 37 and 40.)
+9. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
+   2026); the reset is the one thing left and only you can do it. If nothing is done: that account's balance and record do
+   not measure the replica. (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with
+   items 37 and 40.)
 10. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
     being recorded and copied to the demo shadow account.
 11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
     loop free to run.
+12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
+    keeps the demo broker's rate and the comparison waits for the November 2027 review.
+
+Answered on 12 Nov 2026 ("Yes to all"), nothing more needed from you: items 42 to 47 and the new item 48 (the Mosha cycle stays
+a main paper system). The forward-test protocol (item 43) is now in force: if one of its stop lines is crossed, Gold trend and
+Gold daily engulf go back to paper shadows by themselves and you get one message; putting them back is your decision.
 
 Everything else below is smaller, or already answered and only needs a tick.
 
 Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading on paper and demo** (9-14), **Reliability
 and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
-**Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, two open),
-**The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov 2026** (43-46).
+**Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, 40 open, 41
+answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov
+2026** (43-48, all answered on 12 Nov), **The cost of holding a gold buy, 12 Nov 2026** (49, open).
 
 ---
 
@@ -796,9 +804,16 @@ financing in the costs, replica mirror gold only (11 Nov 2026)".
   live on paper again, say so: it is one line (item 37, "To undo").
 - **If nothing is decided.** It stays a paper shadow, recorded and judged on its forward record.
 
-### [ ] 41. Who placed the 10-lot gold buy on the Replica demo account that closed 11 Nov 13:37 UTC for -$4,427? Reset the account before reading its record
+### [~] 41. Who placed the 10-lot gold buy on the Replica demo account that closed 11 Nov 13:37 UTC for -$4,427? Reset the account before reading its record
 
-- **Status (11 Nov 2026): open.** The owner has not answered.
+- **Status (12 Nov 2026): answered; the reset is yours to do.** Shown items 41 to 46 with their recommendations, you answered
+  "Yes to all": you placed the 10-lot buy yourself, so option (a) applies and the password does not need changing. **Left for you:**
+  reset the Replica demo account in the broker's own cTrader app (close anything still open there, then reset or top up the
+  demo balance) before its record is read. Nothing in this repository resets a demo balance, and nothing should: the mirror
+  only opens, moves and closes its own copies. When it is done, tell me the time: the Replica account's record is then read
+  from that moment. (The mirror's own reset switch, `council/ctrader-reset.json`, starts the copy records afresh on every
+  demo account at once, not just this one, so it is not used for this unless you ask for it.)
+- Earlier status (11 Nov 2026): open; not answered.
 - **Context.** On 11 Nov at 13:37 UTC a 10-lot gold buy on the Replica demo account closed with a loss of $4,427 (entry
   4,040.45, exit 4,036.12), which took the account from about $10,017 to $5,545. It is not in the mirror's records, and the
   mirror cannot send more than 5 lots: it was not a copied trade and looks placed by hand. Nothing real was lost (a demo
@@ -818,9 +833,18 @@ run as a book (+5.2R a year on 2006-17 after all costs, 330 positions, t 1.86: p
 20R lasting almost four years), the trend leg's add on against off (no difference the data can see), and the Gold trend
 rule on thirteen other markets with hourly candles (0 of 14 tests pass). One decision came out of them.
 
-### [ ] 42. "What to expect": count financing on the trend legs' add unit as well
+### [x] 42. "What to expect": count financing on the trend legs' add unit as well
 
-- **Status (11 Nov 2026): open.** Proposed by the book study; nothing was changed.
+- **Status (12 Nov 2026): approved and done.** Your words: "Yes to all" (option (a)). "What to expect" now charges overnight
+  financing on every unit of Gold trend and Gold trend fast, the add included, from the book study's unit records
+  (`research/edge/supported-book/legs.json`, the study's own position function): on untouched 2006-17 Gold trend is
+  **+0.31R a position** (n 74, t 1.20; was +0.40R, t 1.49) and Gold trend fast **+0.21R** (n 128, t 1.17; was +0.29R), equal
+  to the book study's figures. Of Gold trend's drop of 0.085R, about 0.04R is the add's own financing and about 0.045R is
+  counting the positions that CLOSED in 2006-17 (as the book study does) instead of those that opened in it: one big winner
+  opened in December 2017 and closed in 2018. The daily engulf has no add and is unchanged (+0.14R). No trade, size or rule
+  changed. The edge-decay baselines were not changed: their 2018-26 records do not carry the add's entry price, so their
+  financing still covers the first unit only (said in `CLAUDE.md`).
+- Earlier status (11 Nov 2026): open; proposed by the book study.
 - **Context.** Since item 38 the "What to expect" figures charge overnight financing on a position's first unit only,
   because the study records then on file did not carry the add unit. The book study committed unit-level records
   (`research/edge/supported-book/legs.json`). With every unit charged, on untouched 2006-17: Gold trend +0.31R a position
@@ -839,9 +863,15 @@ From `research/proposals/2026-11-12-path-to-live.md`, written after "we need mor
 study was run), then says what a forward test can and cannot show and what a first step with real money would mean.
 Nothing was changed: no rule, size, filter, stop, setting, and no code that keeps the desk on paper and demo accounts.
 
-### [ ] 43. Adopt the forward-test protocol for the live paper book, with its stop lines fixed now
+### [x] 43. Adopt the forward-test protocol for the live paper book, with its stop lines fixed now
 
-- **Status (12 Nov 2026): open.** Proposed; nothing was changed.
+- **Status (12 Nov 2026): adopted.** Your words: "Yes to all" (option (a), the lines as written). From 12 Nov 2026 the
+  Forward record card (Council → Systems), Home and the daily digest say "adopted". What the protocol now does in the code:
+  if a stop line (S1 to S4) is crossed, the Trader's next round puts Gold trend and Gold daily engulf back to paper shadows,
+  once (the same switch as item 37: their new trades are recorded and managed, never alerted), writes a dated line in the
+  council's rule history quoting the protocol, and sends you one message. No open or waiting trade is closed or changed,
+  every stop stays, and nothing goes back by itself: putting the book back is your decision. A failed execution check (E1
+  to E5) is only reported. The Mosha cycle (item 48) is not part of this book and is not counted.
 - **Context.** The book (Gold trend + Gold daily engulf) measured +5.2R a year on untouched 2006-17 after all costs (330
   positions, t 1.86: positive, not proven), with a worst drawdown of about 20R lasting almost four years. At 29 positions a
   year a forward record needs about 13 years to prove a book that good. In one to three years it can only catch a broken
@@ -851,15 +881,17 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   0.05R on average; financing within a fifth of the cost model; no order the mirror did not place); dated notes at 6, 12,
   24 and 36 months from 12 Nov 2026. These lines stop a losing book three times in four within three years, a book with no
   edge less than half the time, and a good book one time in eight by bad luck.
-- **Options.** (a) Adopt it as written. (b) Adopt it with other lines (say which, before the first checkpoint). (c) No
+- **Options (as asked).** (a) Adopt it as written. (b) Adopt it with other lines (say which, before the first checkpoint). (c) No
   protocol.
 - **Recommended.** (a). No trade changes today; no open trade is ever closed by a stop line (each keeps its stop and runs
   to its own exit).
 - **If nothing is decided.** The record runs without pre-set lines, and any later judgement of it is made after seeing it.
 
-### [ ] 44. Stop testing new gates, exits, entries and sizes on this book
+### [x] 44. Stop testing new gates, exits, entries and sizes on this book
 
-- **Status (12 Nov 2026): open.** Proposed; nothing was changed.
+- **Status (12 Nov 2026): agreed.** Your words: "Yes to all" (option (a)). No further gate, exit, entry or size is tested on
+  this book's 2006-17 window; research time goes to the forward record, the execution checks and anything new you bring.
+  Written as a rule in `CLAUDE.md` ("Path to live"). Nothing in the code changed.
 - **Context.** Twenty-odd studies have put a macro gate, the Gold Macro Score, real yields, volatility and trend
   switches, twelve exits, ten entries, three sizing rules, system weights, the add, thirteen other markets, the weekend,
   the calendar and news releases on these systems. None passed its own bar (the table is section 1 of the proposal). The
@@ -870,9 +902,15 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
 - **Recommended.** (a).
 - **If nothing is decided.** The next "improvement" found on the same years may be put to you as if it were evidence.
 
-### [ ] 45. Make the two bridge programs refuse an account that is not a demo
+### [x] 45. Make the two bridge programs refuse an account that is not a demo
 
-- **Status (12 Nov 2026): open.** Found while listing what keeps the desk on demo accounts; nothing was changed.
+- **Status (12 Nov 2026): approved and done.** Your words: "Yes to all" (option (a)). Both bridges (`mt5/CouncilBridge.mq5`,
+  `ctrader/CouncilBridge.cs`) and the three other programs that send orders (`mt5/NQOpenRun.mq5`, `ctrader/CryptoTrend.cs`,
+  `ctrader/CryptoScalper.cs`) now check the platform's own account-type flag when they start and again right before every
+  order (MetaTrader 5: the account's trade mode must be "demo"; cTrader: the account must not be live). On a real or contest
+  account they print why and stop themselves without sending anything. **Not verified:** these programs cannot be compiled
+  here (no MetaTrader or cTrader in the build environment), and the platforms' documentation could not be reached from it;
+  the flags used are the ones the files already printed. Rebuild each program once in its platform before attaching it.
 - **Context.** The demo mirror refuses a real account three separate ways. The two bridge programs the owner can download
   from the site (`mt5/CouncilBridge.mq5` for MetaTrader 5, `ctrader/CouncilBridge.cs` for cTrader) do not: they read the
   live signal file and place its orders on whatever account they are attached to, and only print whether it is a demo.
@@ -883,9 +921,11 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   touches programs that place orders.
 - **If nothing is decided.** A bridge attached to a real account would trade it.
 
-### [ ] 46. Real money: keep the paper-and-demo rule, and look again no earlier than November 2027
+### [x] 46. Real money: keep the paper-and-demo rule, and look again no earlier than November 2027
 
-- **Status (12 Nov 2026): open.** Nothing was changed and nothing can be without you: absolute rule 2 forbids it.
+- **Status (12 Nov 2026): agreed.** Your words: "Yes to all" (option (a)). Absolute rule 2 stays: paper and demo accounts only.
+  Look again no earlier than November 2027, at the protocol's 12-month checkpoint, and only with the execution checks E1 to
+  E5 passed. Nothing changed. The one free step meanwhile: ask your broker what it charges overnight on a gold buy.
 - **Context.** At 0.25 % risk a trade the book's measured rate is about +1.3 % a year (between +0.1 % and +2.6 %) with a
   drawdown of about 5 % lasting almost four years; at 1 % a trade +5.2 % a year with a drawdown of 20 to 22 %. The
   broker's smallest gold order (1 ounce) risks $39 to $136 a unit, so 0.25 % a trade needs an account of about $55,000;
@@ -899,9 +939,12 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   against two other brokers. That charge is the book's largest cost (1.8R of every year) and the only one that differs
   between brokers; at half today's rate the book's test would have passed.
 - **If nothing is decided.** Nothing changes: paper and demo only.
-### [ ] 47. The AI second opinion on each edge entry uses a paid key
 
-- **Status (11 Nov 2026).** Built on your request ("have an ai to study the trade decisions in the edge", answered "each
+### [x] 47. The AI second opinion on each edge entry uses a paid key
+
+- **Status (12 Nov 2026): keep.** Asked whether it should stay, you answered "Yes to all": it stays on, within its own budget
+  ($0.50 a day, $5 a month, $25 in total, 12 calls a day), as your recorded exception to the "no paid services" rule.
+- **Earlier status (11 Nov 2026).** Built on your request ("have an ai to study the trade decisions in the edge", answered "each
   entry, blind" and "an API key, automatic"). It uses the key already set for the Academy ("the key is the same as academy
   so no need to setup anything"), so it runs from its first deploy; it studies entries made after its first run.
 - **Context.** Absolute rule 5 says no paid services. You chose a paid language-model key for this one feature, so it is
@@ -912,3 +955,44 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   reduce or skip. The trade happens either way; the answer is put beside the result. It changes no rule, size or trade.
 - **Options.** (a) Keep it on (nothing to set). (b) Switch it off: `EDGE_ANALYST=off` in Vercel.
 - **If nothing is decided.** It runs within its budget.
+
+### [x] 48. The Mosha cycle trades as a main paper system (pull request #763)
+
+- **Status (12 Nov 2026): keep.** Asked whether it should stay, you answered "Yes to all". The Mosha cycle (H4 move, H1 ChoCh =
+  the pullback starts, M15 / M5 entry; your choice of 11 Nov, "main system") stays a main paper system, alerted and copied to
+  the Council demo account like Gold trend and Gold daily engulf.
+- **Said plainly.** It is not a tested edge: the two mechanical studies of this cycle did not pass (`mosha-retrace` broke
+  even, `mosha-cycle` -0.22R a trade), and there is no study to measure its forward record against, so it has no row in the
+  edge-decay and "What to expect" cards (the cards say so) and it is not part of the forward-test book of item 43. Its own
+  forward record is what will judge it.
+- **To undo.** Ask for it to become a paper shadow. Unlike the systems of item 37, its block in the Trader does not read the
+  council's `ownerShadow` setting yet, so that takes a small Trader change plus an owner rule (not done: you chose to keep it).
+
+## The cost of holding a gold buy, 12 Nov 2026
+
+From `research/proposals/2026-11-12-gold-carry.md` and the pre-registered study `research/edge/gold-carry`, the comparison
+item 46 asked for: what a gold buy costs to hold overnight at the demo broker, at other brokers, as micro gold futures and as
+an ETF, and what the paper book's figures are at each. Nothing was changed: no rule, size, filter, stop, setting, cost
+figure or demo-mirror setting.
+
+### [ ] 49. Keep the paper book's holding cost at the demo broker's rate; pick a future broker partly by its gold overnight charge
+
+- **Status (12 Nov 2026): open.**
+- **Context.** Holding a gold buy costs 5.4 % a year at the demo broker (it charges about 1.5 points over the dollar's
+  overnight rate). In a September 2026 survey of 32 retail accounts every one charged a gold buy; the three named sit at
+  4.7 % (IC Markets Raw), 5.7 % (Afterprime) and 7.8 % (Pepperstone UK). Micro gold futures carried about 3.6 % a year over
+  2026 and about 2.2 % in the last four weeks (uncertain, up to 3.8 %), plus about $2 a contract each way and a roll every
+  two months. A gold ETF costs 0.1-0.4 % on the statement, about 4 % counting the interest its cash no longer earns. On
+  2006-17 the book makes +5.2R a year (t 1.86) at the demo rate, +5.4R (t 1.94) at IC Markets', +5.5R (t 1.96) as futures
+  with their fees, +5.6R (t 2.02) as an ETF counted honestly: the route is worth a third to a half of an R a year, not a
+  proven book. The paper cost model is the charge the demo account really pays, and the forward-test protocol's check E4
+  (item 43) compares the two. Broker, CME and ETF figures come from web search summaries (pages not opened, dated in the
+  study); one MGC contract (10 ounces) risks about $390 to $1,360 at today's stops.
+- **Options.** (a) Keep the demo broker's rate as the paper cost (no change), and write into item 46's November 2027 review
+  that a broker is chosen partly by its gold overnight charge: about 4.7 % a year or less, or micro gold futures if the
+  account is large enough for 10-ounce contracts. (b) Charge the paper book a cheaper route's rate now. (c) Move the demo
+  mirror to another broker or to futures now.
+- **Recommended.** (a). (b) would make the paper record look better than the demo account that copies it and break check
+  E4; (c) saves at most about 0.7 point a year for a new setup, and futures contracts are too large for the account.
+- **If nothing is decided.** Nothing changes: the paper book keeps the demo rate, and the comparison stays on file for the
+  2027 review.

@@ -43,6 +43,16 @@ async function bridgePing(req) {
   await put(`bridge/ping-${client}.json`, JSON.stringify({ at: new Date().toISOString(), ua: ua.slice(0, 80) }), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok });
   if (old.length) await del(old, { token: tok }).catch(() => {});
 }
+// Conditional answers (12 Nov 2026): a strong ETag from the exact bytes sent, tagged with the variant ('c' = the guest cut,
+// 'f' = the whole file), so a visitor's ETag can never match what a member is sent (or the other way round). If-None-Match equal
+// to the ETag of what would be sent NOW gets 304 with no body and the same Cache-Control / Vary / CORS / ETag headers as the 200.
+const crypto = require('node:crypto');
+function etagOf(body, variant) { return `"${variant}-${crypto.createHash('sha256').update(body).digest('base64url').slice(0, 32)}"`; }
+function matches(inm, tag) {
+  if (!inm) return false;
+  const s = String(inm).trim(); if (s === '*') return true;
+  return s.split(',').some((x) => x.trim().replace(/^W\//, '') === tag);   // If-None-Match uses the weak comparison (RFC 9110 13.1.2)
+}
 async function handle(req, res, d = {}) {
   const env = d.env || process.env;
   if (req.method && req.method !== 'GET' && req.method !== 'HEAD') { res.setHeader('Allow', 'GET, HEAD'); return res.status(405).json({ error: 'GET' }); }   // reads only (no GitHub call, no bridge ping)
@@ -80,6 +90,9 @@ async function handle(req, res, d = {}) {
       res.setHeader('Access-Control-Allow-Origin', '*');
     } else res.setHeader('Cache-Control', 'private, no-store');
     if (p === 'mt5/signals.csv' && !d.fetch) await bridgePing(req).catch(() => {});   // awaited: a frozen function would drop it
+    const tag = etagOf(body, cutFile && !member ? 'c' : 'f');
+    res.setHeader('ETag', tag);
+    if (matches(req.headers && req.headers['if-none-match'], tag)) return res.status(304).end();   // unchanged: no body
     return res.status(200).send(body);
   } catch (e) { return res.status(502).json({ error: 'data source unavailable' }); }
 }
@@ -88,3 +101,4 @@ module.exports.handle = handle;
 module.exports.readFile = readFile;
 module.exports.GUEST_OK = GUEST_OK;
 module.exports.PRIVATE = PRIVATE;
+module.exports.etagOf = etagOf;

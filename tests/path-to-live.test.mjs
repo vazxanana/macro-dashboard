@@ -1,6 +1,6 @@
 // The path-to-live proposal (research/proposals/2026-11-12-path-to-live.md) and the arithmetic behind it
 // (…-path-to-live.mjs → …-path-to-live.json): the committed numbers are the script's own output, the page quotes them,
-// the bootstrap does what it says on hand-made months, the owner's items are on record and open, the page never
+// the bootstrap does what it says on hand-made months, the owner's items are on record (answered 12 Nov 2026), the page never
 // recommends a live step, and the demo-only locks it lists are still in the mirror. Offline.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -123,13 +123,16 @@ test('it never recommends a live step, and lists what keeps the desk on demo acc
   for (const f of ['../council/ctrader-suite.mjs', '../council/ctrader-account.mjs', '../council/ctrader-symbols.mjs']) assert.match(rd(f), /demo/);
 });
 
-test('the four decisions are on record as open items 43 to 46', () => {
+// 12 Nov 2026: the owner answered "Yes to all": the four are ticked with the owner's words and the recommended option (a)
+test('the four decisions are on record as items 43 to 46, answered by the owner on 12 Nov 2026 ("Yes to all")', () => {
   const doc = rd('../docs/owner-decisions.md'), heads = [...doc.matchAll(/^### \[(.)\] (\d+)\. (.*)$/gm)];
   const at = (n) => heads.find((m) => +m[2] === n);
-  for (const n of [43, 44, 45, 46]) { assert.ok(at(n), `item ${n}`); assert.equal(at(n)[1], ' ', `item ${n} is open`); }
+  for (const n of [43, 44, 45, 46]) { assert.ok(at(n), `item ${n}`); assert.equal(at(n)[1], 'x', `item ${n} is answered`); }
   assert.match(at(43)[3], /forward-test protocol/); assert.match(at(44)[3], /Stop testing/); assert.match(at(45)[3], /bridge programs refuse/); assert.match(at(46)[3], /keep the paper-and-demo rule/);
-  const tail = doc.slice(doc.indexOf('## The path to real money, 12 Nov 2026'));
-  assert.equal((tail.match(/\*\*Status \(12 Nov 2026\): open\.\*\*/g) || []).length, 4);
+  // the section of items 43-48 only (later sections, e.g. item 49 of 12 Nov 2026, have their own status)
+  const from = doc.indexOf('## The path to real money, 12 Nov 2026'), next = doc.indexOf('\n## ', from + 5), tail = doc.slice(from, next < 0 ? undefined : next);
+  assert.equal((tail.match(/\*\*Status \(12 Nov 2026\): (adopted|agreed|approved and done)\.\*\* Your words: "Yes to all" \(option \(a\)/g) || []).length, 4);
+  assert.doesNotMatch(tail, /\*\*Status \(12 Nov 2026\): open\.\*\*/);
   assert.match(tail, new RegExp(`${J.gates.ddStop}R`)); assert.match(tail, /-9\.7R after 12 months, -12\.0R after 24 or -12\.1R after 36/);
   has('They are items 43 to 46 of `docs/owner-decisions.md`.');
 });
