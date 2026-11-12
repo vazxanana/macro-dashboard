@@ -11928,6 +11928,34 @@
     "positionId": "48908687",
     "volume": 1,
     "status": "open"
+   },
+   "eurusd-rscalp-1794498960": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-12T15:57:05.000Z",
+    "councilEntry": 1.10636,
+    "stop": 1.10526,
+    "t1": 1.10664,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.10636,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.99,
+    "margin": 2.21,
+    "shadow": true,
+    "fillPrice": 1.10632,
+    "slipR": -0.036,
+    "lagSec": 65,
+    "positionId": "48911885",
+    "volume": 100000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-12T15:57:05.000Z",
+    "brokerStop": 1.10526
    }
   },
   "day": {
@@ -11935,7 +11963,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.73 · 31 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.73 · 32 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -11946,9 +11974,9 @@
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 282.88, 2.8% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 282.09, 2.8% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T15:54:38.000Z"
+    "at": "2026-11-12T15:57:05.000Z"
    }
   },
   "paused": {},
@@ -12000,24 +12028,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.73,
-  "lastRun": "2026-11-12T15:54:38.000Z"
+  "lastRun": "2026-11-12T15:57:05.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:34:45.000Z",
-   "msg": "moved GBPUSD 48709438 protection: stop 1.328312 -> 1.328102, target 1.30033 -> 1.30012 (council position)",
-   "trade": "gbpusd-position-1794471647"
-  },
-  {
-   "at": "2026-11-12T12:34:45.000Z",
-   "msg": "moved GBPUSD 48709449 protection: stop 1.328312 -> 1.328102, target 1.31396 -> 1.31375 (council swing)",
-   "trade": "gbpusd-swing-1794471647"
-  },
-  {
-   "at": "2026-11-12T12:34:45.000Z",
-   "msg": "moved AUDUSD 48728650 protection: stop 0.68164 -> 0.68182, target 0.68368 -> 0.68386 (council rintra)",
-   "trade": "audusd-rintra-1794474883"
-  },
   {
    "at": "2026-11-12T12:34:45.000Z",
    "msg": "moved XAUUSD 48739368 protection: stop 3965.03 -> 3965.915, target 3731.61 -> 3732.495 (council gmp)",
@@ -13502,6 +13515,21 @@
    "at": "2026-11-12T15:54:38.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 282.88, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T15:57:05.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 282.09, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T15:57:05.000Z",
+   "msg": "placed buy limit EURUSD 0.01 lot at 1.10636 (council rscalp, valid to 2026-11-12T18:56Z)",
+   "trade": "eurusd-rscalp-1794498960"
+  },
+  {
+   "at": "2026-11-12T15:57:05.000Z",
+   "msg": "limit filled at once: EURUSD position 48911885 at the broker at 1.10632",
+   "trade": "eurusd-rscalp-1794498960"
   }
  ],
  "limits": {
@@ -13580,11 +13608,11 @@
   ]
  },
  "execution": {
-  "n": 399,
+  "n": 400,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 140,
+  "medianLagSec": 139.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 24,
@@ -13599,7 +13627,7 @@
     "meanSlipR": 0.062
    },
    "EURUSD": {
-    "n": 47,
+    "n": 48,
     "meanSlipR": -0.033
    },
    "GBPUSD": {
