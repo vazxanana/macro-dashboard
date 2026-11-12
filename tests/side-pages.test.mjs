@@ -170,6 +170,40 @@ test('gold terminal Edge Lab tab: rule ideas, no unsourced figures, study figure
   assert.ok(!/<script[^>]+src="(?!https:\/\/(cdn\.jsdelivr\.net|unpkg\.com))[^"]*"/.test(tab));
 });
 
+// 12 Nov 2026, wording pass 2: the Dashboard's seasonal feed row, the Live Analysis tab's seasonal tile and the rest of the
+// Dashboard's signal panel claim no edge, win rate or percentage chance. No study in this repository tests gold's month of the
+// year (the seasonality study tested clock and calendar windows; its ten tests are in its RESULT.md), so the seasonal idea is
+// said to be untested. Display only: the scores (seasS, computeEdgeScore, computeMacroScore) are computed as before.
+test('gold terminal Dashboard: the seasonal tile and feed row and the signal panel are untested ideas, no edge or % chance', () => {
+  const g = fs.readFileSync(new URL('../gold-trading.html', import.meta.url), 'utf8');
+  const dash = g.slice(g.indexOf('<div id="tab-dashboard"'), g.indexOf('<!-- end tab-dashboard -->'));
+  const dtext = dash.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  assert.ok(!/\bedge\b/i.test(dtext.replace(/Edge lab page|not tested edges|tested edge/gi, '')), 'the Dashboard markup says "edge" for an untested idea');
+  assert.match(dash, /<div class="kpi-label">Rule ideas on<\/div>/);
+  assert.match(dash, /<div class="dash-widget-title">Rule ideas, not tested edges<\/div>/);
+  assert.match(dash, /id="dash-signals-note">Conditions of untested ideas, on or off right now\. None is a tested edge; the tested results are on the <a href="\.\/edge-lab\.html">Edge lab page<\/a>\.<\/p>/);
+  // the script that writes the Dashboard: no "% Confidence", no "Edge" titles, no "Strong confluence" advice
+  const js = g.slice(g.indexOf('function renderDashboard()'), g.indexOf('// ─── SCALP DESK'));
+  assert.ok(js.length > 2000);
+  for (const re of [/% Confidence/, /\['Confidence'/, /title: '[^']*Edge'/, /Strong confluence|Low — wait/, /Strong season/, /'80%'/, /md\.conf\s*\+\s*'%'/, /\$\{md\.conf\}%/, /decoupling regime active/, /pct: 'Active'/])
+    assert.ok(!re.test(js), 'the Dashboard script still writes ' + re);
+  assert.match(js, /title: 'Seasonal tendency', desc: \(SEAS\.includes\(month\)\?'Inside the Nov–Feb window':'Outside the Nov–Feb window'\) \+ ' · not tested here'/);
+  assert.match(js, /title: 'DXY idea',\s+desc: 'Always counted as on · not read from live data'/);
+  assert.match(js, /\['Tested here\?', 'No'\]/);
+  assert.match(js, /cSubEl\.textContent = 'A count of untested ideas, not a signal';/);
+  // the Live Analysis tile
+  assert.match(g, /<div class="metric-label">Seasonal tendency \(not tested here\)<\/div>/);
+  assert.match(g, /' · a seasonal tendency, not tested here';/);
+  assert.ok(!/Seasonal Edge|Strong seasonal window|Weak seasonal window/.test(g), 'old seasonal wording is gone');
+  // the source checked: the seasonality study has no month-of-year test, and none of its ten tests passed
+  const seas = fs.readFileSync(new URL('../research/edge/seasonality/RESULT.md', import.meta.url), 'utf8');
+  assert.match(seas, /## Verdict: nothing passes\./);
+  assert.ok(!/month of the year|monthly seasonal|Nov(ember)?[–-]Feb/i.test(seas), 'the study does not test the month of the year');
+  // the numbers behind the display are untouched
+  assert.match(g, /const seasS = \[10,11,0,1\]\.includes\(month\) \? 9 : \[2,5\]\.includes\(month\) \? 5 : 7;/);
+  assert.match(g, /const SEASONAL = \[0, 10, 11, 1\];\n\s+if \(SEASONAL\.includes\(month\)\) s\+\+;/);
+});
+
 // 11 Nov 2026, simpler phone version (owner: "on the mobile there's too much"): the gold terminal's simple view is the default at
 // 640 px and under, hangs on one attribute a wider screen never gets, keeps every tab and block reachable, and Full view undoes it.
 test('gold terminal, phone simple view: default on phones only, every tab reachable, blocks fold and unfold, locked charts kept', () => {
@@ -208,7 +242,7 @@ test('gold terminal, phone simple view: default on phones only, every tab reacha
   // dashboard: the daily bias in one line, the macro score line next; the bias strip is moved, not copied
   assert.match(h, /<details class="gx-fold gx-po" data-fold="pbias">\s*<summary><span class="gx-fold-t">Daily bias<\/span><span class="gx-fold-s" id="gxFoldBias">/);
   assert.match(h, /data-pv-slot="#dash-bias-strip"/); assert.equal((h.match(/id="dash-bias-strip"/g) || []).length, 1);
-  assert.match(h, /data-pt="Macro score and trade setup">Trade setup, macro score and edge signals</);
+  assert.match(h, /data-pt="Macro score and trade setup">Trade setup, macro score and rule ideas</);
   // Multi-TF: one timeframe at a time, each chart with its structure readout; the locked display preference is untouched
   const mtf = tab('mtf'); assert.match(mtf, /class="tab-panel" data-ptf="d"/);
   for (const [k, id] of [['d', 'mtfDaily'], ['h4', 'mtfH4'], ['m15', 'mtfM15']]) { const a = mtf.indexOf(`data-ptf-w="${k}"`), w = mtf.slice(a, a + 1400); assert.ok(a > 0 && w.includes(`id="${id}"`) && w.includes(`id="${id}Struct"`), k + ' chart and its readout');
