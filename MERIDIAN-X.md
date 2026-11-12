@@ -31,7 +31,7 @@ One sign-in. The switch at the top of every page reads **Desk | Macro | ChronosT
 - A **bell** in the header shows notices from the owner.
 
 **Other pages**
-- **Academy** (`/academy`, owner only): a trading school built on the council's seven systems. See below.
+- **Academy** (`/academy`, owner only): a trading school built on seven of the council's systems (the seven that traded live until 11 Nov 2026). See below.
 - **Gold terminal** (`/gold`): live gold price, chart and macro drivers.
 - **Edge lab**: every research study with its verdict.
 - `/macro`: today's macro read on one screen. `/veteran/`: the veteran's library.
@@ -65,7 +65,8 @@ live trade it was. None of the nine has proven an edge on data it was not built 
 **Costs.** Every closed paper trade is shown before and after costs: the spread, slippage on market orders and, for
 trades closed since 11 Nov 2026, the **overnight financing** a gold buy pays for each night it is held (0.0148% of the
 price a night at the demo broker's rate of that day, about 5.3% a year). Trades closed before that date keep the cost
-they were recorded with.
+they were recorded with. The backtests those records are measured against (the edge-decay baselines, "What to expect",
+the scoreboard's replay rows) carry the same financing charge on gold buys.
 
 **Demo accounts.** Trades are copied at the same time to **cTrader demo accounts**, one per book (council, ICT, shadows,
 LIT, replica), with the same stop and target. A copied position never sits without a stop: if the broker refuses the stop,
@@ -132,7 +133,8 @@ All of this is reading only: nothing trades or sizes on it. His record is still 
 
 ## The Academy (owner only)
 
-A school on top of the council's seven systems. You pick a system and a period, the market is replayed, and the clock
+A school on top of seven of the council's systems: the seven that traded live on paper until 11 Nov 2026 (two still do, five
+are paper shadows since; the school teaches all seven rules as before). You pick a system and a period, the market is replayed, and the clock
 stops at each setup. A fixed, rule-based engine gives its answer (take or wait); you agree or correct it, and a correction
 becomes a written lesson that is then checked on setups it has never seen. Other tabs show lessons, progress, a blind test,
 research and costs. An optional "analyst" can give a second opinion in words through your own assistant; no paid service is

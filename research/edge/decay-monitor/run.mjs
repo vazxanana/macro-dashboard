@@ -21,8 +21,9 @@
 // Writes result.json next to this file and prints the tables used in RESULT.md.
 import fs from 'node:fs';
 import path from 'node:path';
-import { makeBase, assess, describe, rng, DK, fold, SYSTEMS } from '../../../council/decay.mjs';
+import { makeBase, assess, describe, rng, DK, fold, SYSTEMS, replayNet } from '../../../council/decay.mjs';
 import { merNet, ictNet } from '../../../council/digest.mjs';
+import { FIN, nights, rowFinancing } from '../../../council/fills.mjs';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname), ROOT = path.resolve(HERE, '../../..'), EDGE = path.resolve(HERE, '..');
 const CD = process.argv[2] || 'data';
@@ -36,30 +37,49 @@ const sec = (s) => Math.floor(Date.parse(s.length <= 10 ? s + 'T00:00:00Z' : s +
 // ─── 1. baselines ───
 const replay = rdC('research/replay-2w.json'), ictReplay = rdC('ict/replay.json');
 const done = (x) => ['win', 'loss', 'be'].includes(x.status) && Number.isFinite(+x.R) && x.closed;
-const rp = (k, s) => fold(replay.trades.filter((x) => x.k === k && (!s || x.session === s) && done(x)), merNet).sort((a, b) => a.t - b.t);
+// council replay rows, costed as the monitor reads them (decay.mjs replayNet: after the spread and, for a long gold row, overnight
+// financing); R0 = before financing
+const rp = (k, s) => { const L = replay.trades.filter((x) => x.k === k && (!s || x.session === s) && done(x)), a = fold(L, replayNet).sort((x, y) => x.t - y.t), b = new Map(fold(L, merNet).map((p) => [p.id, p.R])), nn = new Map(L.map((x) => [x.id, rowFinancing(x).nights]));
+  return a.map((p) => ({ ...p, R0: b.get(p.id), fin: b.get(p.id) - p.R, nn: nn.get(p.id) || 0 })); };
 // ICT A-setups 2018-26, net R at x1 costs per position (research/edge/sizing/inputs.json, cols entry/close/market/net1/...)
 const ictHist = () => { const j = rdE('sizing/inputs.json'), T = j.systems['ict-a'], c = j.cols.indexOf('net1'), yr = (t) => new Date(t * 1000).getUTCFullYear();
   return T.filter((r) => yr(r[1]) >= 2018).map((r) => ({ t: r[1], R: r[c] })).sort((a, b) => a.t - b.t); };
 const rb = (f, key) => { const j = rdE(`robustness/out/${f}.json`), T = key ? j.trades[key] : j.trades; return T.map((x) => ({ t: x.t, R: x.R })).sort((a, b) => a.t - b.t); };
+// Overnight financing (11 Nov 2026, owner approved; the method and rate of research/edge/trend-breadth Part A and of
+// research/edge/expectations/build.mjs): every long gold position of a research rebuild pays
+// nights(entry, exit) x FIN.xau.long x its entry price / its initial risk, on the first unit only (the add's entry is not
+// recorded). Entry time, exit time, entry price and risk come from positions.json (positions.mjs: the rebuild's own functions,
+// checked position by position against the record; Gold trend's exit time is the start of its exit day, so the count is the
+// daily rollovers held through). A short pays nothing and is credited nothing. R = net after financing, R0 = before it.
+const POS = rdE('decay-monitor/positions.json').systems;
+const rbFin = (f, key) => { const j = rdE(`robustness/out/${f}.json`), T = key ? j.trades[key] : j.trades, P = POS[key || f];
+  if (!P || P.length !== T.length) throw new Error(`${key || f}: positions.json does not match the rebuild record (run positions.mjs)`);
+  return T.map((x, i) => { const [t, o, c, e, r0, side] = P[i]; if (t !== x.t || side !== x.side || !(e > 0 && r0 > 0 && c >= o)) throw new Error(`${key || f}: position ${i} of positions.json does not match the record`);
+    const nn = side > 0 ? nights(o, c) : 0, fin = nn * FIN.xau.long * e / r0; return { t: x.t, R: x.R - fin, R0: x.R, fin, nn }; }).sort((a, b) => a.t - b.t); };
 const SRC = {
   replica: { rec: rp('replica'), maxDD: 40.2, ddAllow: 40, src: `council replay ${replay.from} to ${replay.to} (research/replay-2w.json)`, note: 'regime bet: worst 8-year drawdown −40.2R (gold-systems), owner allows 30-40R (#512)' },
-  'mosha-bo': { rec: rb('mosha'), maxDD: 10.7, src: 'Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)', hist: true },
-  gtrend: { rec: rb('gtrend', 'gtrend20'), maxDD: 3.7, src: 'gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)' },
-  gtrend5: { rec: rb('gtrend', 'gtrend5'), maxDD: 6.6, src: 'gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)' },
-  gtl: { rec: rb('gtl'), maxDD: 14.1, src: 'gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)' },
-  geg: { rec: rb('geg'), maxDD: 10.2, src: 'gold daily engulf 2018-26 rebuild (robustness/out/geg.json)' },
-  gmp: { rec: rb('gmp'), maxDD: 40, src: 'gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)' },
+  'mosha-bo': { rec: rbFin('mosha'), maxDD: 10.7, src: 'Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)', hist: true },
+  gtrend: { rec: rbFin('gtrend', 'gtrend20'), maxDD: 3.7, src: 'gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)' },
+  gtrend5: { rec: rbFin('gtrend', 'gtrend5'), maxDD: 6.6, src: 'gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)' },
+  gtl: { rec: rbFin('gtl'), maxDD: 14.1, src: 'gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)' },
+  geg: { rec: rbFin('geg'), maxDD: 10.2, src: 'gold daily engulf 2018-26 rebuild (robustness/out/geg.json)' },
+  gmp: { rec: rbFin('gmp'), maxDD: 40, src: 'gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)' },
   'nq-open': { rec: rp('nq-open', 'nyflip'), maxDD: 20, src: `council replay ${replay.from} to ${replay.to}, session nyflip`, note: 'regime bet: 2018-26 rebuild worst drawdown −20R (#511)' },
   // ICT A: the 2018-26 rebuild (#526, 1,787 positions, +0.093R), not the 15-month desk replay the monitor itself reads (+0.20R):
   // a baseline taken from the record under watch is circular, and the replay runs hotter than the rule's long record
   'ict-a': { rec: ictHist(), maxDD: 31.3, src: 'ICT A-setups 2018-26 rebuild, GC/NQ/ES/YM (#526; record in research/edge/sizing/inputs.json)', note: 'desk replay 2025-08+ runs +0.20R a trade against this +0.09R: the monitor reads the replay and forward record against the long baseline' },
   trend: { rec: rb('crypto'), maxDD: 10.0, src: 'crypto trend v3 2017-26 rebuild (robustness/out/crypto.json)', note: 'shadow since 7 Nov (#508)' },
 };
-const base = { at: new Date().toISOString(), q: DK.q, method: 'research/edge/decay-monitor/run.mjs', systems: {} };
+const base = { at: new Date().toISOString(), q: DK.q, method: 'research/edge/decay-monitor/run.mjs',
+  financing: { rate: FIN.xau.long, asOf: FIN.xau.asOf, src: FIN.xau.src, method: 'rollovers Mon-Fri 22:00 UTC (Wednesday three) x rate x entry price / r0 per position, first unit only (council/fills.mjs nights)', systems: ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'],
+    replay: 'Gold replica: the council replay rows, costed as the monitor reads them (council/decay.mjs replayNet)',
+    notComputed: 'NQ open run: out before the rollover, none; ICT and crypto: no rate measured' }, systems: {} };
 for (const s of SYSTEMS) {
   const S = SRC[s.id], R = S.rec.map((p) => p.R);
   const b = makeBase(R, { perYear: perYear(S.rec.map((p) => p.t)), maxDD: S.maxDD, ddAllow: S.ddAllow, src: S.src, note: S.note });
   b.from = day(S.rec[0].t); b.to = day(S.rec.at(-1).t);
+  // what financing took from this baseline, and the figure before it (only the systems whose record carries it)
+  if (S.rec[0].R0 != null && S.rec.some((p) => p.fin > 0)) { const d0 = describe(S.rec.map((p) => p.R0)); b.fin = { perTrade: +(S.rec.reduce((q, p) => q + p.fin, 0) / S.rec.length).toFixed(3), nights: +(S.rec.reduce((q, p) => q + p.nn, 0) / S.rec.length).toFixed(2), charged: S.rec.filter((p) => p.fin > 0).length, before: { ref: +d0.mean.toFixed(3), sd: +d0.sd.toFixed(3) } }; }
   // no council replay of this rule: the last two years of the rebuild stand in front of the forward record
   if (S.hist) b.hist = S.rec.filter((p) => p.t >= S.rec.at(-1).t - 2 * YEAR).map((p) => [p.t, +p.R.toFixed(3)]);
   base.systems[s.id] = b;

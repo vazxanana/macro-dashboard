@@ -60,15 +60,20 @@ const SEED = [
   ['avoid', 'No VR, no trade: when price only slides under a level without forming a VR, wait for the pullback to give one.'],
 ].map(([kind, text], i) => ({ id: `seed-${String(i + 1).padStart(2, '0')}`, kind, text, by: 'assistant', name: READER.name, at: '2026-11-10T00:00:00.000Z', status: 'proposed', from: [], was: null, edited: null }));
 
+// Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the two JSON files are overwritten in place, and the CDN serves an overwritten
+// file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
+// what was stored in between (11 Nov 2026, the Academy store's bug; same fix).
+// A picture is written once under its own name and never overwritten, so it may come from the CDN.
+const fresh = (url) => { const u = new URL(url); u.searchParams.set('cache', '0'); return u.toString(); };
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'mosha/lessons.json', K = 'mosha/book.json', IMG = 'mosha/shots/';
   const find = async (path) => { const { blobs } = await B().list({ prefix: path, token }); return blobs.find((x) => x.pathname === path) || null; };
-  const read = async (b) => { const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(10000) }); if (!r.ok) throw new Error(`mosha lessons read ${r.status}`); return r; };
+  const read = async (b, origin) => { const r = await F(origin ? fresh(b.url) : b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(10000) }); if (!r.ok) throw new Error(`mosha lessons read ${r.status}`); return r; };
   const json = (path, list) => B().put(path, JSON.stringify(list), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token });
   return {
-    async get() { const b = await find(P); if (!b) return []; const j = await (await read(b)).json(); return Array.isArray(j) ? j : []; },   // a failed read throws: a save must never overwrite the lessons with an empty list
+    async get() { const b = await find(P); if (!b) return []; const j = await (await read(b, true)).json(); return Array.isArray(j) ? j : []; },   // a failed read throws: a save must never overwrite the lessons with an empty list
     async put(list) { await json(P, list); },
-    async getBook() { const b = await find(K); if (!b) return null; const j = await (await read(b)).json(); return Array.isArray(j) ? j : null; },   // null = never stored: the desk's first lines stand
+    async getBook() { const b = await find(K); if (!b) return null; const j = await (await read(b, true)).json(); return Array.isArray(j) ? j : null; },   // null = never stored: the desk's first lines stand
     async putBook(list) { await json(K, list); },
     async putImg(id, type, buf) { await B().put(`${IMG}${id}.${TYPES[type]}`, buf, { access: 'private', addRandomSuffix: false, allowOverwrite: false, contentType: type, token }); },
     async getImg(id, type) { const b = await find(`${IMG}${id}.${TYPES[type]}`); if (!b) return null; return Buffer.from(await (await read(b)).arrayBuffer()); },
@@ -200,7 +205,10 @@ function scoreOf(lessons, book) {
 async function handle(req, res, d = {}) {
   const env = d.env || process.env; res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
   if (!env.BLOB_READ_WRITE_TOKEN && !d.store) return res.status(503).json({ error: 'storage not set up' });
-  const store = d.store || blobStore(env), who = d.who || ((r) => S.fromRequest(r, env, S.defaultDeps(env), { cacheMs: 60e3 })), now = d.now || Date.now();
+  const store = d.store || blobStore(env), now = d.now || Date.now();
+  // Reading may use the minute-old copy of the user list; a WRITE checks the account against the list as it is now, so a member
+  // removed, or whose teaching was switched off, a moment ago cannot still send a lesson or change the book (11 Nov 2026).
+  const who = d.who || ((r) => S.fromRequest(r, env, d.deps || S.defaultDeps(env), r.method === 'GET' ? { cacheMs: 60e3 } : {}));
   try {
     if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     let q = req.query; if (!q || typeof q !== 'object') { try { q = Object.fromEntries(new URL(req.url || '/', 'http://x').searchParams); } catch (e) { q = {}; } }
@@ -222,7 +230,7 @@ async function handle(req, res, d = {}) {
       if (!owner) return res.status(403).json({ error: 'only the owner sees the assistant\'s key' });
       const key = readerKey(env); return res.status(200).json({ key, off: off(env), host: String((req.headers && req.headers.host) || 'meridianx.dev').replace(/[^A-Za-z0-9.:-]/g, '').slice(0, 120) });
     }
-    const list = (await store.get()).map(norm);
+    let list = (await store.get()).map(norm);
     if (req.method === 'GET' && q.img != null) {
       const id = String(q.img); if (!ID_RE.test(id)) return res.status(400).json({ error: 'bad picture id' });
       let shot = null; for (const l of list) { shot = l.shots.find((s) => s.img === id); if (shot) break; }
@@ -312,7 +320,13 @@ async function handle(req, res, d = {}) {
       if (l && l.shots.length >= MAX_SHOTS) return res.status(400).json({ error: `a lesson holds ${MAX_SHOTS} pictures: start a new one` });
       if (!l && list.length >= KEEP) return res.status(400).json({ error: `the desk holds ${KEEP} lessons: remove old ones first` });
       const img = has ? newId(now) : null;
-      if (has) await store.putImg(img, im.type, im.buf);   // the picture first: a lesson never points at a picture that is not there
+      if (has) {
+        await store.putImg(img, im.type, im.buf);   // the picture first: a lesson never points at a picture that is not there
+        // The upload took a moment. The list is read again before it is written, so a lesson or an answer another instance stored
+        // meanwhile is not overwritten (11 Nov 2026). Not a lock: two saves in the same few milliseconds can still cross.
+        try { list = (await store.get()).map(norm); } catch (e) { try { await store.delImg(img, im.type); } catch (e2) { /* left behind, never served */ } throw e; }
+        if (a.lesson) { l = find(a.lesson); if (!l || !mine(l)) { try { await store.delImg(img, im.type); } catch (e2) { /* left behind, never served */ } return res.status(404).json({ error: 'no such lesson' }); } }
+      }
       if (!l) { l = { id: newId(now), by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, edited: null, title: nameOf(title, caption, note), note, lang: langOf(a.lang) || 'en', trade: tr.trade, chart: null, shots: [], thread: [] }; list.push(l); }
       else { l.edited = stamp; if (note) l.note = note; if (langOf(a.lang)) l.lang = a.lang; }
       if (has) l.shots.push({ img, type: im.type, caption, at: stamp, bytes: im.buf.length });

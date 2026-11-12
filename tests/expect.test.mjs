@@ -14,6 +14,23 @@ const GOLD = rdE('honest-book/gold-1d.json').bars;
 const sys = (id) => BASE.systems.find((s) => s.id === id);
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b}`);
 
+// Financing of the Gold replica, Mosha BO and the momentum pullback, recomputed here from their study records with the STUDY's own
+// night counter and rate (research/edge/trend-breadth), independently of research/edge/expectations/build.mjs: per window
+// { n, before, after, fin, nights }. A buy pays nights x rate x price / risk on its first unit; a sell pays nothing.
+function finCheck(id) {
+  const sec = (x) => Date.parse(x.length <= 10 ? x + 'T00:00:00Z' : x + ':00Z') / 1000, px = (t) => { let v = GOLD[0][1]; for (const b of GOLD) { if (b[0] <= t) v = b[1]; else break; } return v; };
+  const charge = (buy, t, c, price, r0, size = 1) => buy ? studyNights(t, c) * STUDY.FIN_GOLD * price / r0 * size : 0;
+  let rec, win;
+  if (id === 'replica') { const S = rdE('sizing/inputs.json'), P = rdE('replica-oos/positions.json'), cN = S.cols.indexOf('net1'); win = [['2017-01-01', '2022-12-31'], ['2023-01-01', '2026-11-06']];
+    rec = S.systems.replica.map((r, i) => { assert.equal(sec(P[i].at), r[0], 'replica records line up'); const l = P[i].legs[0]; return { t: r[0], R: r[cN], f: charge(P[i].side === 'buy', r[0], r[1], px(r[0]), l[2], l[1]), nn: P[i].side === 'buy' ? studyNights(r[0], r[1]) : 0 }; }); }
+  else if (id === 'mosha-bo') { win = [['2006-07-01', '2017-12-31'], ['2018-01-01', '2026-11-06']];
+    rec = rdE('mosha-oos/result.json').positions.map((p) => ({ t: sec(p.t), R: p.n, f: charge(p.side === 'buy', sec(p.t), sec(p.c), px(sec(p.t)), p.r0), nn: p.side === 'buy' ? studyNights(sec(p.t), sec(p.c)) : 0 })); }
+  else { const T = rdE('robustness/out/gmp.json').trades, P = rdE('decay-monitor/positions.json').systems.gmp; win = [['2018-01-01', '2022-12-31'], ['2023-01-01', '2026-10-31']];
+    rec = T.map((x, i) => { assert.equal(P[i][0], x.t); return { t: x.t, R: x.R, f: charge(x.side > 0, P[i][1], P[i][2], P[i][3], P[i][4]), nn: x.side > 0 ? studyNights(P[i][1], P[i][2]) : 0 }; }); }
+  const of = ([a, b]) => { const w = rec.filter((p) => p.t >= sec(a) && p.t < sec(b) + 86400), m = (f) => w.reduce((q, p) => q + f(p), 0) / w.length; return { n: w.length, before: m((p) => p.R), after: m((p) => p.R - p.f), fin: m((p) => p.f), nights: m((p) => p.nn) }; };
+  return { oos: of(win[0]), built: of(win[1]) };
+}
+
 // ─── the maths ───
 test('bands: the estimate narrows with n, a year widens with the trade count; formats read as the owner does', () => {
   const b = seBand(0.5, 2, 100);   // ± 1.645 · 2 / 10
@@ -32,7 +49,7 @@ test('trades until a verdict: n = (2 sd / exp)², converted at the trade rate, c
   assert.deepEqual(nVerdict(0, 1.3, 80), { n: null, years: null, within: false });
   assert.match(verdictText({ honest: nVerdict(-0.02, 1.3, 80), backtest: nVerdict(0.33, 1.56, 78) }, { exp: -0.02 }, { exp: 0.33 }), /^90 trades \(about 14 months\) if it repeats its backtest \(\+0\.33R a trade\); an edge of −0\.02R a trade out of sample cannot be proven$/);
   assert.match(verdictText({ honest: nVerdict(0.009, 2.04, 18.6), backtest: nVerdict(0.009, 2.04, 18.5) }, { exp: 0.009 }, { exp: 0.009 }), /^no verdict within 2 years: an edge of \+0\.01R a trade out of sample cannot be proven$/);
-  assert.match(buildExpect({ systems: [] }).systems.find((s) => s.id === 'mosha-bo').verdict.text, /^no verdict within 2 years: an edge of \+0\.14R a trade out of sample cannot be proven$/, 'Mosha: 833 trades = 155 years > 50: not provable');
+  assert.match(buildExpect({ systems: [] }).systems.find((s) => s.id === 'mosha-bo').verdict.text, /^no verdict within 2 years: an edge of \+0\.12R a trade out of sample cannot be proven$/, 'Mosha (after financing on its buys): far over 50 years of trades, not provable');
 });
 test('forward record against the honest band for its own n: above / below / inside, and not placed under 10 trades', () => {
   const h = { exp: -0.05, sd: 3.26 };
@@ -66,8 +83,9 @@ test('gold systems: 2006-17 out of sample and 2018-26 match gold-systems-oos bef
     assert.equal(G.systems[k].verdict.verdict, 'regime-bound'); assert.match(s.regime, /regime-bound/); assert.match(s.regime, /financing/);
   }
   assert.equal(partA('gtl', 'untouched').survives, false); assert.match(sys('gtl').regime, /does not survive financing/);
-  for (const id of ['replica', 'mosha-bo', 'gmp', 'nq-open', 'ict-a', 'trend']) assert.equal(sys(id).fin, null, `${id}: no financing in its figures, and the file says so`);
-  assert.match(BASE.financing.notComputed, /replica/i); assert.equal(BASE.financing.rate, 0.000148);
+  for (const id of ['nq-open', 'ict-a', 'trend']) assert.equal(sys(id).fin, null, `${id}: no financing in its figures, and the file says so`);
+  assert.match(BASE.financing.notComputed, /NQ open run/); assert.doesNotMatch(BASE.financing.notComputed, /replica|Mosha|pullback/i); assert.equal(BASE.financing.rate, 0.000148);
+  assert.deepEqual(BASE.financing.systems, ['gtrend', 'gtrend5', 'geg', 'gtl', 'replica', 'mosha-bo', 'gmp']);
   assert.deepEqual(BASE.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a'], 'live since 11 Nov: Gold trend, Gold daily engulf (and the separate ICT desk)');
   near(sys('gtrend').honest.perYear, 75 / 11.5, 0.05, 'gtrend trades a year over the 11.5-year window');
 });
@@ -79,9 +97,13 @@ test('NQ open run: 2004-22 untouched and 2023-26 built on match research/edge/nq
 });
 test('gold replica: 2017-22 out of sample and 2023-26 in sample match research/edge/replica-oos result.json', () => {
   const R = rdE('replica-oos/result.json').periods.x1, s = sys('replica');
-  assert.equal(s.honest.n, R.oos.n); near(s.honest.exp, R.oos.exp, 0.0015, 'oos exp'); near(s.honest.t, R.oos.t, 0.011, 'oos t'); near(s.honest.maxDD, -R.oos.maxDD, 0.011, 'oos maxDD');
-  assert.equal(s.builtOn.n, R.is.n); near(s.builtOn.exp, R.is.exp, 0.0015, 'is exp');
-  assert.match(s.regime, /fails out of sample/);
+  // the study's figures are before financing; the file's are after it on the buys (11 Nov 2026) and keep the study's as `before`
+  assert.equal(s.honest.n, R.oos.n); near(s.fin.before.exp, R.oos.exp, 0.0015, 'oos exp before financing'); near(s.fin.before.t, R.oos.t, 0.011, 'oos t before financing');
+  assert.ok(s.honest.maxDD >= -R.oos.maxDD - 0.011 && s.honest.maxDD < -R.oos.maxDD + 1, 'oos maxDD: the study\'s, a little deeper after financing');
+  const f = finCheck('replica'); near(s.honest.exp, f.oos.after, 0.0011, 'oos exp after financing'); near(s.fin.perTrade, f.oos.fin, 0.0011, 'financing a position'); near(s.fin.nights, f.oos.nights, 0.011, 'nights');
+  assert.ok(s.honest.exp < R.oos.exp && R.oos.exp - s.honest.exp < 0.02, 'a day-trading system pays little');
+  assert.equal(s.builtOn.n, R.is.n); near(s.builtOn.exp, f.built.after, 0.0011, 'is exp after financing'); near(f.built.before, R.is.exp, 0.0015, 'is exp before financing');
+  assert.match(s.regime, /fails out of sample/); assert.match(s.regime, /after financing/);
 });
 test('ICT A-setups: 2008-17 and the 2018-26 reference match research/edge/ict-oos-2008 result.json', () => {
   const I = rdE('ict-oos-2008/result.json'), s = sys('ict-a');
@@ -91,9 +113,14 @@ test('ICT A-setups: 2008-17 and the 2018-26 reference match research/edge/ict-oo
 });
 test('Mosha BO: 2006-17 out of sample and the 2018-26 calibration match research/edge/mosha-oos result.json; crypto trend: the decayed window of crypto-trend-decay', () => {
   const M = rdE('mosha-oos/result.json').system.periods, m = sys('mosha-bo');
-  assert.equal(m.honest.n, M.oos.x1.n); near(m.honest.exp, M.oos.x1.mean, 0.0015, 'mosha oos mean'); near(m.honest.t, M.oos.x1.t, 0.011, 'mosha oos t'); near(m.honest.maxDD, -M.oos.x1.maxDD, 0.011, 'mosha oos maxDD');
-  assert.equal(m.builtOn.n, M.cal.x1.n); near(m.builtOn.exp, M.cal.x1.mean, 0.0015, 'mosha cal mean');
-  assert.match(m.regime, /null result/);
+  assert.equal(m.honest.n, M.oos.x1.n); near(m.fin.before.exp, M.oos.x1.mean, 0.0015, 'mosha oos mean before financing'); near(m.fin.before.t, M.oos.x1.t, 0.011, 'mosha oos t before financing');
+  assert.ok(m.honest.maxDD >= -M.oos.x1.maxDD - 0.011 && m.honest.maxDD < -M.oos.x1.maxDD + 1.5, 'mosha oos maxDD: the study\'s, a little deeper after financing');
+  const f = finCheck('mosha-bo'); near(m.honest.exp, f.oos.after, 0.0011, 'mosha oos mean after financing'); near(m.fin.perTrade, f.oos.fin, 0.0011, 'mosha financing a position');
+  assert.equal(m.builtOn.n, M.cal.x1.n); near(f.built.before, M.cal.x1.mean, 0.0015, 'mosha cal mean before financing'); near(m.builtOn.exp, f.built.after, 0.0011, 'mosha cal mean after financing');
+  assert.match(m.regime, /null result/); assert.match(m.regime, /after financing/);
+  // the momentum pullback: its rebuild record, a buy charged on its own entry price and risk (research/edge/decay-monitor/positions.json)
+  const g = sys('gmp'), gf = finCheck('gmp'); near(g.honest.exp, gf.oos.after, 0.0011, 'gmp 2018-22 after financing'); near(g.fin.before.exp, gf.oos.before, 0.0011, 'gmp before'); near(g.fin.perTrade, gf.oos.fin, 0.0011, 'gmp financing');
+  assert.ok(g.fin.perTrade > 0 && g.fin.perTrade < 0.03); near(g.builtOn.exp, gf.built.after, 0.0011, 'gmp 2023-26 after financing');
   const C = rdE('crypto-trend-decay/result.json'), c = sys('trend'), w = C.windows['2024-26 H2 (2025-06-01..2026-10-31)'].net;
   assert.equal(c.honest.n, w.n); near(c.honest.exp, w.exp, 0.0015, 'trend exp'); near(c.honest.t, w.t, 0.011, 'trend t');
   assert.equal(c.live, false); assert.equal(sys('gtrend5').live, false, 'gold trend fast is shadow');
@@ -120,7 +147,7 @@ test('buildExpect: one entry per system with bands, drawdown, verdict, regime no
   const r = E.systems.find((s) => s.id === 'replica');
   assert.equal(r.forward.out, 'above'); assert.equal(r.live, true); assert.ok(r.perTrade.lo < r.perTrade.exp && r.perTrade.exp < r.perTrade.hi);
   near(r.perYear.exp, r.perTrade.exp * r.perYear.trades, 0.02, 'year exp = per trade × trades a year');
-  assert.ok(r.dd.lo <= r.dd.hi && r.dd.hi === 40.2, 'replica: the 8-year worst drawdown −40.2R caps the band'); assert.match(r.verdict.text, /59 trades/); assert.match(r.line, /^Expect −0\.05R a trade/);
+  assert.ok(r.dd.lo <= r.dd.hi && r.dd.hi === 40.2, 'replica: the 8-year worst drawdown −40.2R caps the band'); assert.match(r.verdict.text, /60 trades/); assert.match(r.line, /^Expect −0\.06R a trade after financing/);
   assert.equal(E.systems.find((s) => s.id === 'nq-open').forward.out, 'below');
   const g = E.systems.find((s) => s.id === 'gtrend'); assert.equal(g.forward.judged, false); assert.equal(g.forward.out, null); assert.match(g.line, /too few to place/);
   assert.equal(E.systems.find((s) => s.id === 'trend').forward.out, 'above');
@@ -132,7 +159,7 @@ test('digest: one line only when a live forward record leaves its band; waiting(
   assert.equal(expectLine(buildExpect({ systems: [dsys('replica', 'Gold replica', { n: 24, exp: 0.9, R: 21.6 })] })), null);
   const E = buildExpect({ systems: [dsys('replica', 'Gold replica', { n: 120, exp: 1.1, R: 132 }), dsys('trend', 'Crypto trend', { n: 40, exp: 4, R: 160 }, false)] });
   const l = expectLine(E);
-  assert.match(l, /^Expectations: Gold replica \+1\.10R a trade over 120, above its band −0\.54 to \+0\.44R\. What the untouched data said to expect; no rule changed\.$/);
+  assert.match(l, /^Expectations: Gold replica \+1\.10R a trade over 120, above its band −0\.55 to \+0\.43R\. What the untouched data said to expect; no rule changed\.$/);
   const W = waiting({ coach: { expect: E }, health: { at: new Date().toISOString(), status: 'ok' } }, Math.floor(Date.now() / 1000), {});
   assert.deepEqual(W, [l]);
   assert.deepEqual(waiting({ coach: {}, health: { at: new Date().toISOString(), status: 'ok' } }, Math.floor(Date.now() / 1000), {}), []);
