@@ -1207,6 +1207,25 @@ stacked; Clean detaches both overlays, their price lines and markers (indicators
 layers are four named groups (Meridian markup, Council, Levels and time, Chart); Telegram sits behind a disclosure. The header carries a
 centred "Macro desk" button (`.hdr-macro`, animated conic border, hidden for the public role) linking to /macro-desk.
 
+## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
+Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.
+- **A BO needs a close** ("if it doesn't close it is not a BO"): panes, split chart and scanner analyse closed candles only
+  (`msClosedN`); the forming candle never draws a BO, ChoCh, VR or moved extreme.
+- **A low that failed to break the low becomes the new low**: in `msAnalyze` a wick through the protected swing with no close
+  beyond it moves the protected level and the Origin edge to that wick (`sweepProt`); only a close beyond the new level is a BO.
+- **Chart type** (Settings → Chart, `#ms-cs`, localStorage `ms-cs`): Candles, Line (closes) or Candles + line; the markup stays
+  on the candle series (invisible candles in Line mode, `P.setStyle`, re-applied on a theme change).
+- **More history**: `BARS` 1,500 a timeframe at load (was 500); scrolling to the first candles loads older OANDA windows up to
+  `CAP` 6,000 (`P.loadOlder`); refreshes ask for 300 and join them (`mergeBars`) so older candles stay. Every earlier break is
+  drawn as a thin dashed BOS / ChoCh line (layer "Earlier breaks", `G.show.hist`). The cycle line joins the BO line of the same
+  break; a higher-timeframe target already traded through reads "reached, no close beyond". Tests: `tests/market-cycle.test.mjs`.
+- **Internal breaks (iBO)** (owner: "I'd like the iBOS as well", "I mean iBO", then a marked chart): `msInternal` = every
+  close beyond the last unbroken swing high / low of the chart's OWN labelled swings (HH / HL / LH / LL, `PIVOT` a side, used once
+  confirmed, each broken once), closed candles only, over the whole loaded history; every one labelled iBO ▲ / ▼ (Mosha: a break of an internal swing
+  is an i.BO, never a ChoCh; the external structure keeps the bias). Thin dotted lines (layer "Internal breaks",
+  `G.show.ibos`); a level the major structure already draws is skipped. **After a pullback the first ChoCh back with the timeframe
+  above starts the continuation** (owner): the cycle line reads "<TF> continuation starts", the chip "continuation".
+
 ## Meridian markup: the market cycle (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … H4 tells retracement of daily, M15 retracement of H1, M5 of M15")
 `msCycle(legs)` (pure, top level of `market-structure.html` next to `msAnalyze`; `cycleNow()` builds the legs of D1 / H4 / H1 /
 M15 / M5 from each pane's own analysis): for each timeframe and the one under it, `move` (the lower one still agrees), `pullback`

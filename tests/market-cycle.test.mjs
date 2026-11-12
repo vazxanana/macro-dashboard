@@ -86,3 +86,34 @@ test('chart type: candles, a line of closes, or both, kept per device', () => {
   assert.match(html, /P\.setLine = \(B\) =>/); assert.match(html, /series\.setData\(P\.view\(P\.bars\)\); P\.setLine\(P\.bars\); P\.setStyle\(\);/);
   assert.match(html, /if \(p\.setStyle\) p\.setStyle\(\)/, 'a theme change keeps the chart type');
 });
+
+// 12 Nov 2026, owner: "it needs to show more previous data"
+test('more history: 1,500 candles at load, older ones on scroll back, a refresh keeps them, every earlier break marked', () => {
+  assert.match(html, /const BARS = 1500, PIVOT = 6, CAP = 6000;/);
+  const line = html.split('\n').find((l) => l.includes('const mergeBars = '));
+  const mergeBars = new Function('CAP', `${line.trim()} return mergeBars;`)(6000);
+  const bar = (t) => ({ time: t, close: t });
+  assert.deepEqual(mergeBars([1, 2, 3, 4].map(bar), [3, 4, 5].map(bar)).map((b) => b.time), [1, 2, 3, 4, 5], 'old kept, fresh wins from its first candle');
+  assert.deepEqual(mergeBars(null, [5].map(bar)).map((b) => b.time), [5]);
+  assert.match(html, /P\.raw = r\.src === G\.source \? mergeBars\(P\.raw, r\.bars\) : r\.bars;/);
+  assert.match(html, /P\.loadOlder = async function/); assert.match(html, /from=\$\{first - 2000 \* tf\.sec\}&to=\$\{first - 1\}/);
+  assert.match(html, /r\.from < 25 && P\.fitted && P\.vis !== false\) P\.loadOlder\(\)/);
+  assert.match(html, /data-show="hist" checked/); assert.match(html, /text: e\.structure \? 'ChoCh' : 'BOS'/);
+});
+
+// 12 Nov 2026, owner: internal BO lines ("I mean iBO"); after a pullback the first ChoCh back = the continuation starts
+test('the first ChoCh back after the pullback is labelled the start of the continuation', () => {
+  assert.match(html, /\$\{r\.pl\} continuation starts/); assert.match(html, /the H4 continuation has started/);
+});
+test('internal breaks: every close beyond a labelled swing, closed candles only, iChoCh flips the internal trend', () => {
+  const msInternal = new Function(`${fn('msInternal')}; return msInternal;`)();
+  // swing high 10 at 3, swing low 5 at 8, a close above 10 (iBO up), then a swing low 7 at 14 and a close under it (iChoCh down)
+  const P = [6, 7, 8, 10, 8, 7, 6, 5.5, 5, 6, 7, 8, 9, 11, 7, 8, 9, 10, 9, 8, 6, 6, 6];
+  const B = P.map((c, i) => ({ time: i, open: c, high: c, low: c, close: c }));
+  const ev = msInternal(B, B.length, 2);
+  assert.deepEqual(ev.map((e) => [e.dir, e.level, e.structure]), [[1, 10, false], [-1, 7, true]]);
+  assert.equal(ev[0].fromIdx, 3); assert.equal(ev[0].breakIdx, 13);
+  assert.equal(msInternal(B, 20, 2).length, 1, 'a candle past the closed count is never read');
+  assert.match(html, /data-show="ibos" checked/); assert.match(html, /show: \{ bo: true, hist: true, ibos: true,/);
+  assert.match(html, /text: `iBO \$\{sell \? '▼' : '▲'\}`/); assert.doesNotMatch(html, /'iChoCh'/, 'an internal break is an i.BO, never a ChoCh (Mosha)'); assert.match(html, /!major\.has\(e\.level\)/);
+});

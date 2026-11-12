@@ -2912,6 +2912,8 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="ms-tog ms-tog-g">
             <div class="tog-g"><div class="tog-h">Meridian markup</div>
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
+            <label><input type="checkbox" id="ms-show-ibos" data-show="ibos" checked><i style="border-top:1px dotted #089981;height:0;border-radius:0"></i>Internal breaks (iBO)</label>
+            <label><input type="checkbox" id="ms-show-hist" data-show="hist" checked><i style="border-top:1px dashed #f23645;height:0;border-radius:0"></i>Earlier breaks (BOS / ChoCh)</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
@@ -3977,6 +3979,22 @@ const VIEWER = document.documentElement.dataset.role === 'viewer';   // Orlando 
 // candle is left out of every structure reading, so a wick or a not-yet-closed body through a level never draws a BO, a ChoCh,
 // a VR or a moved extreme; it counts once that candle has closed beyond the level.
 function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; while (k > 0 && bars[k - 1].time - shift + sec > now) k--; return k; }
+// internal structure (iBO), display only (12 Nov 2026, owner's marked chart): on the same swings the chart labels
+// HH / HL / LH / LL (N candles a side, confirmed N candles later), every close beyond the last swing high or low that is not
+// broken yet is an internal break: every one an iBO with its direction (structure = it went against the previous internal break).
+// Closed candles only (closedN); a swing is used only once it is confirmed, and each swing is broken once.
+const MS_IPIV = 6;
+function msInternal(bars, closedN, N = MS_IPIV) {
+  const n = Math.min(closedN, bars.length), H = bars.map((b) => b.high), L = bars.map((b) => b.low), C = bars.map((b) => b.close), out = [];
+  const piv = (j, hi) => { for (let k = 1; k <= N; k++) { if (j - k < 0 || j + k >= n) return false; if (hi ? (H[j - k] > H[j] || H[j + k] >= H[j]) : (L[j - k] < L[j] || L[j + k] <= L[j])) return false; } return true; };
+  let sh = null, sl = null, trend = 0;
+  for (let i = 0; i < n; i++) {
+    const j = i - N; if (j >= 0) { if (piv(j, true)) sh = { i: j, p: H[j] }; if (piv(j, false)) sl = { i: j, p: L[j] }; }
+    if (sh && C[i] > sh.p) { out.push({ dir: 1, level: sh.p, fromIdx: sh.i, breakIdx: i, structure: trend < 0 }); trend = 1; sh = null; }
+    if (sl && C[i] < sl.p) { out.push({ dir: -1, level: sl.p, fromIdx: sl.i, breakIdx: i, structure: trend > 0 }); trend = -1; sl = null; }
+  }
+  return out;
+}
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -4198,7 +4216,9 @@ function msNextSetup(bars, A) {
     { id: '5m',  label: 'M5',  role: 'Entry timing',            sec: 300,   binance: '5m',  kraken: 5,   poll: 20e3 },
     { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
   ];
-  const BARS = 500, PIVOT = 6;
+  const BARS = 1500, PIVOT = 6, CAP = 6000;   // 12 Nov 2026: 1,500 candles a timeframe at load (was 500); scrolling back loads older ones up to CAP
+  const POLL_N = 300;   // a refresh asks for the latest 300 and joins them to what is loaded (mergeBars), so older history stays
+  const mergeBars = (old, fresh) => { if (!old || !old.length || !fresh || !fresh.length) return fresh; const t0 = fresh[0].time; return old.filter((b) => b.time < t0).concat(fresh).slice(-CAP); };
   const INSTRUMENTS = {
     xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
     xag:    { group: 'Metals', md: 'xag', label: 'XAG/USD', name: 'Silver',   binance: null, kraken: null, dec: 3, size: 'units', unit: 'oz', color: '#9aa4b2' },
@@ -4240,7 +4260,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, hist: true, ibos: true, origin: true, cf: true, vr: true, next: true, htf: true, cycle: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.cs = ['line', 'both'].includes(localStorage.getItem('ms-cs')) ? localStorage.getItem('ms-cs') : 'candles'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
     if (document.documentElement.dataset.mode !== 'admin') G.mode = 'clean';   // guests: candles only; Meridian and ICT are members' (8 Nov)
   const $ = (id) => document.getElementById(id);
@@ -4631,6 +4651,21 @@ function msNextSetup(bars, A) {
     if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
     const recent = A.events.slice(D ? -2 : -1), seen = new Set();
     const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
+    // earlier breaks (12 Nov 2026, owner: "it needs to show more previous data", the way Photon marks every break): every older
+    // break in the loaded candles as a thin dashed line, BOS (with the trend) or ChoCh (the trend flipped); the recent ones above
+    if (G.show.bo && G.show.hist !== false) A.events.slice(0, A.events.length - evs.length).forEach((e) => {
+      const sell = e.dir < 0; items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: (sell ? Z.sell : Z.buy).line, w: 1, dash: true, text: e.structure ? 'ChoCh' : 'BOS', below: sell });
+    });
+    // internal breaks (12 Nov 2026, owner: "I'd like the iBOS as well", "I mean iBO", and a marked chart): every close beyond a
+    // labelled swing (msInternal, the chart's own HH / HL / LH / LL swings) over the whole loaded history, every one an iBO with its
+    // direction: in Mosha's terms a break of an internal swing is an i.BO, never a ChoCh (the external structure keeps the bias).
+    // Thin dotted lines; a level the major structure already draws is skipped
+    if (G.show.ibos !== false) {
+      const major = new Set(A.events.map((e) => e.level));
+      msInternal(bars, A.n || n, PIVOT).filter((e) => !major.has(e.level)).forEach((e) => {
+        const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: `iBO ${sell ? '▼' : '▲'}`, below: sell });
+      });
+    }
     evs.forEach((e, k) => {
       const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
       if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
@@ -4673,7 +4708,7 @@ function msNextSetup(bars, A) {
       CY.filter((r) => r.child === tf.id && r.choch).forEach((r) => {
         const up = r.dir < 0, i0 = at(r.choch.fromT), i1 = at(r.choch.t);
         items.lines.push({ l1: i0, l2: Math.min(n + 6, i1 + 14), p: r.choch.level, color: CYC, w: 2, text: `ChoCh ${up ? '▲' : '▼'} · ${r.pl} ${r.phase === 'resumed' ? 'pulled back here' : 'pullback starts'}`, below: !up });
-        if (r.resume) { const tx = `ChoCh ${up ? '▼' : '▲'} · back with ${r.pl}`, same = items.lines.find((x) => x.bo && x.p === r.resume.level);
+        if (r.resume) { const tx = `ChoCh ${up ? '▼' : '▲'} · ${r.pl} continuation starts`, same = items.lines.find((x) => x.bo && x.p === r.resume.level);
           if (same) same.text = same.text ? `${same.text} · ${tx}` : tx;   // the same break as this chart's BO: one line, one label
           else items.lines.push({ l1: at(r.resume.fromT), l2: Math.min(n + 6, at(r.resume.t) + 14), p: r.resume.level, color: CYC, w: 2, text: tx, below: up }); }
       });
@@ -4770,6 +4805,21 @@ function msNextSetup(bars, A) {
       try { lineS.applyOptions({ visible: m !== 'candles', color: m === 'both' ? 'rgba(41,98,255,.85)' : '#2962ff', lineWidth: m === 'both' ? 1.5 : 2 }); } catch (e) {}
       try { series.applyOptions(m === 'line' ? { upColor: T, downColor: T, borderUpColor: T, borderDownColor: T, wickUpColor: T, wickDownColor: T } : candleCols()); } catch (e) {} };
     P.setLine = (B) => { try { lineS.setData(closeLine(B)); } catch (e) {} };
+    // older candles when the chart is scrolled back to its first candles (12 Nov 2026, owner: "it needs to show more previous data"):
+    // OANDA windows of up to 2,000 candles before the first one loaded, up to CAP; the view stays on the same candles
+    P.loadOlder = async function () {
+      if (P._old || P._noOlder || !P.raw || P.raw.length < 40 || P.raw.length >= CAP || P.rp || G.csv || G.source !== 'OANDA') return;
+      P._old = true;
+      try {
+        const first = P.raw[0].time, b = await mdBars(INST, tf, `from=${first - 2000 * tf.sec}&to=${first - 1}`);
+        const add = (b || []).filter((x) => x.time < first).slice(-(CAP - P.raw.length));
+        if (!add.length) { P._noOlder = true; return; }
+        const ts = chart.timeScale(), r = ts.getVisibleLogicalRange();
+        P.raw = add.concat(P.raw); P.rebuild(true);
+        if (r) ts.setVisibleLogicalRange({ from: r.from + add.length, to: r.to + add.length });
+      } catch (e) { /* the next scroll tries again */ } finally { P._old = false; }
+    };
+    chart.timeScale().subscribeVisibleLogicalRangeChange((r) => { if (r && r.from < 25 && P.fitted && P.vis !== false) P.loadOlder(); });
     // charts upgrade (7 Nov): faint symbol watermark, quiet dashed crosshair, OHLC readout that follows the cursor
     chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
       crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } } });
@@ -5099,7 +5149,7 @@ function msNextSetup(bars, A) {
       if (!P.raw) return;
       const last = P.raw[P.raw.length - 1];
       if (k.time === last.time) Object.assign(last, k);
-      else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > BARS + 50) P.raw.shift(); }
+      else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > CAP) P.raw.shift(); }
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
@@ -5278,12 +5328,12 @@ function msNextSetup(bars, A) {
     const CY = G.cycle = cycleNow(), r4 = CY.find((r) => r.parent === '4h' && r.child === '1h');
     if (!CY.some((r) => r.phase !== 'none')) { el.hidden = true; return; }
     const ar = (d) => (d < 0 ? '▼' : '▲'), way = (d) => (d < 0 ? 'down' : 'up');
-    const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'pullback over'}</b> <small>(${r.cl})</small></span>`;
+    const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'continuation'}</b> <small>(${r.cl})</small></span>`;
     let say = '';
     if (r4 && r4.target) { const T = r4.target, hl = r4.dir < 0 ? 'low' : 'high';
       say = r4.phase === 'move' ? `H4 is moving ${way(r4.dir)} and H1 agrees: no pullback yet. An H1 ChoCh ${ar(-r4.dir)} would start it.`
-        : r4.phase === 'pullback' ? `H1 ChoCh ${ar(-r4.dir)} at ${fmt(r4.choch.level)} (${ftime(r4.choch.t)}): the H4 move ${way(r4.dir)} is pulling back. Pullback target: H4 50% ${fmt(T.p50)}, then the H4 origin ${fmt(T.origin)}. When M15 / M5 break back ${way(r4.dir)}, the pullback is over: target the H4 ${hl} ${fmt(T.ext)}.`
-        : `H1 broke back ${way(r4.dir)} at ${fmt(r4.resume.level)} (${ftime(r4.resume.t)}): the H4 pullback is over. Target the H4 ${hl} ${fmt(T.ext)}.`; }
+        : r4.phase === 'pullback' ? `H1 ChoCh ${ar(-r4.dir)} at ${fmt(r4.choch.level)} (${ftime(r4.choch.t)}): the H4 move ${way(r4.dir)} is pulling back. Pullback target: H4 50% ${fmt(T.p50)}, then the H4 origin ${fmt(T.origin)}. The first M15 / M5 ChoCh back ${way(r4.dir)} starts the continuation: target the H4 ${hl} ${fmt(T.ext)}.`
+          : `H1 ChoCh ${ar(r4.dir)} at ${fmt(r4.resume.level)} (${ftime(r4.resume.t)}), the first after the pullback: the H4 continuation has started. Target the H4 ${hl} ${fmt(T.ext)}.`; }
     el.hidden = false;
     el.innerHTML = `<div class="cy-row"><span class="cy-h">Market cycle</span>${CY.map(chip).join('')}</div>${say ? `<p class="cy-say">${say} <small>A reading of structure, not a tested rule.</small></p>` : ''}`;
   }
@@ -5956,7 +6006,8 @@ function msNextSetup(bars, A) {
     if (polling || G.csv) return; polling = true; setStatus();
     ACTIVE.forEach((tf) => {
       const tick = async () => {
-        try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+        try { const I = INST, r = await fetchBars(tf, I, POLL_N); const P = panes[tf.id]; if (I !== INST) throw 0;
+          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
         if (!G.csv) setTimeout(tick, iv());
       };
