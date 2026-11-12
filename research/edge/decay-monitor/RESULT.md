@@ -248,3 +248,50 @@ The HistData M1 files were read on the wrong clock in part of every year. The pr
 | Gold replica, gold trend N20 / N5, NQ open run, ICT A-setups, crypto trend | council replays, daily candles, OANDA | unchanged | identical |
 
 These are monitoring baselines, not trading rules: the decay monitor compares each live system's forward record with them. **The one to look at is Mosha BO.** Its baseline expectancy is now slightly negative (−0.064R a trade on 157 trades, against +0.009R on 147) and its worst drawdown is 46R, not 39R. A monitor that watches for "worse than the baseline" is watching against a baseline that was never good; that was already true at +0.009R.
+
+## Overnight financing in the baselines (11 Nov 2026)
+
+The owner approved counting overnight financing in the paper costs on 11 Nov 2026 (`council/fills.mjs` `FIN`, `nights`,
+`financing`: a gold buy pays 0.0148 % of its entry price for each rollover held, Monday to Friday 22:00 UTC, three on
+Wednesday). The forward trades the monitor reads carry it from that day, so the baselines they are measured against now carry
+it too. Nothing in the monitor or its settings changed. A control run before any change reproduced the 10 Nov
+`council/decay-base.json` exactly, so the differences below are the financing and nothing else.
+
+- **The research rebuilds** (Gold trend, Gold trend fast, H4 trendline, daily engulf, momentum pullback, Mosha BO): every
+  buy pays nights x rate x its entry price / its initial risk, on the first unit only. The rebuild records hold only the
+  result, so `positions.mjs` reads each position's entry time, exit time, entry price and risk by running the rebuild's own
+  functions again (`research/edge/robustness/systems.mjs`, not edited: its bytes are part of the Academy's version of the
+  momentum pullback edge) and refuses to write unless every position equals the committed record (2018-26 gold candles from
+  `origin/council-data`; all 1,796 positions matched). A sell pays nothing and is credited nothing.
+- **The council replay rows** (Gold replica; and every gold replay row the monitor reads in front of a forward record): their
+  R is after the spread only, so `council/decay.mjs` `replayNet` charges a gold buy the Trader's own financing when the row
+  is read (`fills.mjs` `rowFinancing`: entry, first stop, fill and close of the row). The baseline build uses the same
+  function, so the record under watch and its baseline are costed alike. No stored row is changed, and a forward trade keeps
+  the cost stamped at its close.
+
+| System | n | Before: R a trade | Financing a position (nights held) | After: R a trade | Control limit h | Drawdown limit |
+|---|---|---|---|---|---|---|
+| Gold trend | 40 | +1.640 | 0.136R (22.8) | **+1.504** | 2.86 → 2.92 | 6.88R → 7.47R |
+| Gold trend fast (shadow) | 74 | +1.064 | 0.124R (22.5) | **+0.940** | 2.92 → 3.04 | 9.23R → 10.63R |
+| Gold daily engulf | 217 | +0.198 | 0.059R (4.7) | **+0.139** | 6.98 → 6.99 | 22.28R → 25.49R |
+| Gold H4 trendline (shadow) | 304 | +0.106 | 0.038R (2.7) | **+0.068** | 9.08 → 9.07 | 20.96R → 23.86R |
+| Gold momentum pullback (shadow) | 1,004 | +0.043 | 0.011R (0.2; 171 buys held over a rollover) | **+0.032** | 14.57 → 14.48 | 49.67R → 52.66R |
+| Mosha BO (shadow) | 157 | −0.064 | 0.029R (1.2; 77 buys) | **−0.093** | 5.99 → 5.97 | 45.99R → 49.45R |
+| Gold replica (shadow) | 212 | +0.877 | 0.012R (0.5; 61 buys) | **+0.865** | 11.55 → 11.63 | 40.2R (the owner's allowance) |
+| NQ open run, ICT A-setups, crypto trend | | unchanged | none (NQ is out before the rollover; no rate measured for the others) | identical | | |
+
+**No status changed.** On council-data of 11 Nov 2026 22:00 UTC every system reads as before (nine healthy or too few to
+judge, crypto trend decaying), with the old and with the new baselines, and with the replay rows charged or not. The largest
+move in a CUSUM is the replica's (8.13 → 8.21 of a limit 11.63); Gold trend 0.30 → 0.30 of 2.92, the daily engulf
+3.08 → 3.00 of 6.99.
+
+Limits. Today's rate for every past year (no history of the broker's rate exists here). First unit only: the add unit of a
+trend position is not charged, so the trend baselines are still a little high (Part A of `research/edge/trend-breadth` puts
+the true cost about a third higher). The quoted worst historical drawdowns (3.7R, 6.6R, 14.1R, 10.2R from
+`research/edge/gold-systems`) are before financing; where the charged record's own drawdown is deeper it is used (Gold trend
+3.78R). The backtests of the monitor in sections 1 to 3 are unchanged except the replica's out-of-sample timeline, which is
+read against the baseline 0.012R lower (first "decaying" still at trade 82, 5 Oct 2022). The simulation table moved by a few
+points (`result.json`). To repeat: extract `research/candles/xau-histdata` from `origin/council-data` into a folder, run
+`research/edge/robustness/systems.mjs mosha` once with `ROB_DATA` set to it (the event cache, about two minutes), then
+`ROB_DATA=<folder> node research/edge/decay-monitor/positions.mjs` and `node research/edge/decay-monitor/run.mjs <council-data>`.
+Tests: `tests/financing-rest.test.mjs`.

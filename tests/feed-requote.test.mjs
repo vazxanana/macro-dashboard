@@ -141,9 +141,9 @@ test('the Trader is wired: feed tag on every record, re-quote before the manage 
   const src = read('../council/trader.mjs');
   assert.match(src, /import \{ feedTag, requoteMarket, feedChangeText, feedDecision \} from '\.\/feed\.mjs'/);
   assert.match(src, /const FEED = feedTag\(feed\);/);
-  // every trade / research record literal carries the tag: 10 trades.push({ … }) literals, the engine's tr, the add, 2 research pushes
-  assert.equal((src.match(/trades\.push\(\{/g) || []).length, 10, 'trades.push literals');
-  assert.equal((src.match(/feed: FEED/g) || []).length, 15, '13 record literals + state.feedLast + the LIT shadow stream\'s litStep (council/lit.mjs stamps its records)');
+  // every trade / research record literal carries the tag: 11 trades.push({ … }) literals (the Mosha cycle since 11 Nov), the engine's tr, the add, 2 research pushes
+  assert.equal((src.match(/trades\.push\(\{/g) || []).length, 11, 'trades.push literals');
+  assert.equal((src.match(/feed: FEED/g) || []).length, 16, '14 record literals + state.feedLast + the LIT shadow stream\'s litStep (council/lit.mjs stamps its records)');
   assert.match(src, /shadow, blockedBy, feed: FEED, note: shadow \?/);
   // the re-quote runs after the candles are loaded and before anything can fill, stop or target a trade
   const iq = src.indexOf('requoteMarket({ trades, key, feed, src, price, now'), im = src.indexOf('Manage open trades on this market'), ir = src.indexOf('if (config.retireLegacy)');

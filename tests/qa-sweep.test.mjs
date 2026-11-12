@@ -612,7 +612,7 @@ test('simple phone view: every part it adds is .ps-only, and a fold row keeps th
   assert.ok(top.length >= 14);
   for (const m of top) assert.match(m[2], /\bps-only\b/, m[0].slice(0, 90));
   const folds = [...DESK.matchAll(/<button type="button" class="(ps-only ps-fold[^"]*)" data-ps-for="([\w-]+)" aria-expanded="false">/g)];
-  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse'], 'Home: everything under the summary folds');
+  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse', 'kv', 'tnum', 'vet', 'wnum'], 'Home: everything under the summary folds; second pass: the Setup levels, the Trades tiles and curve, the veteran\'s discussion, the week tiles');
   for (const [, cls, key] of folds) { const t = new RegExp(`<\\w+\\b[^>]*\\bclass="([^"]*)"[^>]*\\bdata-ps="${key}"`).exec(DESK); assert.ok(t, `no section for the ${key} row`);
     for (const gate of ['adm', 'own', 'pubonly']) assert.equal(new RegExp(`\\b${gate}\\b`).test(cls), new RegExp(`\\b${gate}\\b`).test(t[1]), `${key}: the row and its section differ on "${gate}"`); }
   // what waits on the person and the owner-only places keep their gates
@@ -656,4 +656,136 @@ test('simple phone view: the smoke test counts the phone Home first screen, and 
   const smoke = src('scripts/audit/smoke.cjs');
   assert.match(smoke, /simple phone view: Home's first screen holds/);
   assert.match(DESK, /if \(vis\.length > 5\) \{\s*var keep = vis\.slice\(\)\.sort\([^\n]*\.slice\(0, 4\);/, 'at most five in the bar: four places and More');
+});
+
+// ── Simple phone view, second pass (11 Nov 2026, owner: "Need more"): Charts, the other Council panes, Setup, Scanner, the
+// Gold playbook, LIT and Crypto desks. Same key, same switch, same style block and fold helpers as the first pass. ──
+const psApi = () => { const none = () => null, w = { addEventListener() {}, MS_WEEK: null }, el = { dataset: {} };
+  vm.runInNewContext(PS_JS, { window: w, document: { documentElement: el, getElementById: none, querySelector: none, querySelectorAll: () => [], addEventListener() {} }, addEventListener() {}, setTimeout() {}, clearTimeout() {}, getComputedStyle: () => ({}), encodeURIComponent, Date, isFinite, parseInt, String, Math });
+  return w.MS_PS; };
+
+test('simple phone view 2: Trades leads with the forward record; the backtest replay is its own sentence, never one figure', () => {
+  const P = psApi(), a = P.tradesAnswer({ tab: 'live', open: 1, fwd: { n: 5, w: 1, R: -2.05 }, rp: { n: 710, w: 300, R: 499.97 }, rows: 716 });
+  assert.equal(a.k, 'Live · our system · paper, before costs');
+  assert.equal(a.head, 'Forward record: <b class="neg">−2.05R</b><small>on 5 closed trades · 1 won</small>');
+  assert.equal(a.sub, '1 trade open or waiting for its entry. Backtest replay, not traded and kept apart: <b class="pos">+499.97R</b> over 710 trades.');
+  assert.equal(a.fold, '20% won, 1 of 5');
+  assert.doesNotMatch(a.head, /499|710|715/, 'the headline is the forward record alone');
+  const none = P.tradesAnswer({ tab: 'shadow', open: 0, fwd: { n: 0, w: 0, R: 0 }, rp: { n: 0, w: 0, R: 0 } });
+  assert.deepEqual([none.k, none.head, none.sub], ['Shadow · setups a rule blocked · paper, before costs', 'No forward trade closed yet', '']);
+  assert.equal(P.tradesAnswer(null), null);
+  // the pane hands its own sums over (what its tiles show), never for a guest
+  assert.match(DESK, /if \(!PUB\) \{ try \{ window\.MS_TRADES = \{ tab, open: open\.length, fwd: SP\.fwd, rp: SP\.rp, rows: tableList\.length \}; document\.dispatchEvent\(new CustomEvent\('ms:trades'\)\); \}/);
+  assert.match(PS_CSS, /html\[data-phone="simple"\] #ms-cp-trades \.c-trader:not\(\[data-ps-all\]\) #ms-c-trades > tr:nth-child\(n\+6\) \{ display: none; \}/, 'the latest five rows, the rest behind "Show all"');
+  assert.match(DESK, /<div class="ps-only ps-ans ps-t-ans" id="ps-t-ans">/);
+  assert.match(DESK, /<button type="button" class="ps-only ps-more" id="ps-tr-more" aria-controls="ms-c-trades"/);
+});
+
+test('simple phone view 2: This week leads with Meridian live after costs, the ICT desk in its own sentence, then what waits', () => {
+  const P = psApi(), N = { title: 'This week', live: { n: 5, net: -0.41, w: 1, l: 4 }, ict: { n: 4, net: 3.73, w: 3, l: 1, rp: 2 }, shadow: { n: 297, net: -13.66 }, rules: 3 };
+  const a = P.weekAnswer(N, 2);
+  assert.equal(a.k, 'This week · paper, after costs');
+  assert.equal(a.head, 'Meridian live: <b class="neg">−0.41R</b><small>on 5 closed trades · 1 won, 4 lost</small>');
+  assert.equal(a.sub, 'ICT desk A-setups, a separate edge: <b class="pos">+3.73R</b> on 4 trades, 2 from the desk replay.<span class="ps-a-f">2 decisions wait on you, listed below.</span>');
+  assert.equal(a.fold, 'shadow book −13.66R · 3 rule changes');
+  assert.doesNotMatch(a.head, /3\.73|13\.66/, 'ICT and the shadow book are never added into the headline');
+  const b = P.weekAnswer({ title: 'Last week', live: { n: 0 }, ict: { n: 2, net: 1, rp: 2 }, shadow: { n: 0 }, rules: 1 }, 0);
+  assert.deepEqual([b.k, b.head], ['Last week · paper, after costs', 'No Meridian live trade closed']);
+  assert.match(b.sub, /on 2 trades, all from the desk replay\.<span class="ps-a-f">Nothing waits on you\.<\/span>$/);
+  assert.equal(b.fold, 'no shadow trade closed · 1 rule change');
+  assert.doesNotMatch(P.weekAnswer(N, null).sub, /ps-a-f/, 'no word on decisions before the list is drawn');
+  assert.match(DESK, /W\.MS_WEEK_NOW = \{ title: \$\('ms-wk-title'\)\.textContent, live: pk\(t1\), ict: pk\(t2\), shadow: pk\(t3\), rules: nR\.length \};/);
+  assert.match(DESK, /try \{ W\.MS_WEEK_DEC = L\.length; document\.dispatchEvent\(new CustomEvent\('ms:week'\)\); \} catch \(e\) \{\}/);
+  assert.match(PS_CSS, /html\[data-phone="simple"\] #ms-cp-week \.wk-dec \{ order: -2; \}/, 'the decisions card comes right after the sentence');
+});
+
+test('simple phone view 2: Review leads with what is not reviewed; a folded card is its heading and one line', () => {
+  const P = psApi();
+  assert.match(P.reviewAnswer(69).head, /^<b>69<\/b> losses to review<small>closed in the last 24 hours, live and shadow paper trades together<\/small>$/);
+  assert.match(P.reviewAnswer(1).head, /^<b>1<\/b> loss to review/);
+  assert.match(P.reviewAnswer(0).head, /^No new loss to review/);
+  assert.match(DESK, /<div class="ps-only ps-ans ps-r-ans adm" id="ps-r-ans">/, 'inside the admin pane and gated like it');
+  // the row of a folded card
+  assert.deepEqual({ ...P.rowText('Edge scoreboard · every strategy stream', '', 'Loading the scoreboard…') }, { t: 'Edge scoreboard', s: 'every strategy stream' });
+  assert.deepEqual({ ...P.rowText('Edge scoreboard · every strategy stream', '', '45 streams, 30 with 20+ trades: 11 edge (all backtest only), 1 promising, 7 losing. Strongest evidence: Replica, +0.88R a trade.') },
+    { t: 'Edge scoreboard', s: '45 streams, 30 with 20+ trades: 11 edge (all backtest only), 1 promising, 7 losing.' }, 'the card\'s own summary, first sentence: "backtest only" travels with the count');
+  assert.deepEqual({ ...P.rowText('Gold playbook check', "from the owner's skills", '') }, { t: 'Gold playbook check', s: "from the owner's skills" });
+  assert.deepEqual({ ...P.rowText('Edge decay · early warning', '', 'Waiting for the Coach…') }, { t: 'Edge decay', s: 'early warning' });
+});
+
+test('simple phone view 2: which views fold, what stays open, and the rows keep their gates', () => {
+  // Systems keeps "Which systems trade live" open and first; Research folds every card; This week keeps the decisions
+  assert.match(PS_JS, /\{ v: 'ms-cp-systems', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.id === 'ms-sys-book'; \} \}/);
+  assert.match(PS_CSS, /html\[data-phone="simple"\] #ms-sys-book \{ order: -1; \}/);
+  assert.match(DESK, /<div class="card adm" id="ms-sys-book">\s*<div class="ms-k"><span role="heading" aria-level="2">Which systems trade live/);
+  assert.match(PS_JS, /\{ v: 'ms-cp-research', sel: '\.card', two: 1, keep: function \(\) \{ return false; \} \}/);
+  assert.match(PS_JS, /\{ v: 'ms-cp-week', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.classList\.contains\('wk-dec'\); \} \}/);
+  assert.match(PS_JS, /\{ v: 'ms-cp-review', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.id === 'ms-loss'; \} \}/);
+  for (const v of ['ms-cp-macro', 'v-setup', 'v-gold', 'v-lit', 'v-crypto']) assert.match(PS_JS, new RegExp(`\\{ v: '${v}', sel: '\\.card'`), v);
+  // a row made for a card carries the card's own gate, and its one line is never a line the account's gate hides
+  assert.match(PS_JS, /\(c\.classList\.contains\('adm'\) \? ' adm' : ''\) \+ \(c\.classList\.contains\('own'\) \? ' own' : ''\)/);
+  assert.match(PS_JS, /if \(lv && getComputedStyle\(lv\)\.display === 'none'\) lv = null;/);
+  // a card drawn late folds before the next paint (it folded 120 ms later: a layout shift on the ICT desk); a loop falls back to the timer
+  assert.match(PS_JS, /if \(\+\+runs <= 12\) desks\(\); else \{ clearTimeout\(late\); late = setTimeout\(desks, 120\); \}/);
+  // a desk that draws its cards again keeps the rows a person opened
+  assert.match(PS_JS, /if \(OPENED\[b\._psk\]\) \{ c\.setAttribute\('data-ps-open', ''\); b\.setAttribute\('aria-expanded', 'true'\); \}/);
+  // one row may fold several parts (the Trades note, tiles and curve)
+  assert.equal([...DESK.matchAll(/\bdata-ps="tnum"/g)].length, 3);
+  assert.match(PS_JS, /var secs = document\.querySelectorAll\('\[data-ps="' \+ f\.dataset\.psFor \+ '"\]'\);/);
+  assert.match(PS_CSS, /html\[data-phone="simple"\] #v-setup \.card:not\(\[data-ps-all\]\) #ms-trades > \.ms-trade:nth-child\(n\+4\) \{ display: none; \}/, 'Setup: three possible trades, the rest behind "Show all"');
+  // a desk a member lands on: its cards are held back until the script folds them (nothing drawn open, then folded)
+  assert.match(PS_CSS, /html\[data-phone="simple"\]:not\(\[data-ps-ready\]\) #v-ict \.card\.ict-card:not\(\.ict-open-c\):not\(#ict-sig\) \{ display: none !important; \}/);
+  assert.match(PS_JS, /R\.dataset\.psReady = '1';/);
+  assert.ok(PS_JS.indexOf("R.dataset.psReady = '1';") < PS_JS.indexOf('function answer('), 'set first: if anything below fails the cards are shown, never left hidden');
+  // Scanner: the ready markets are sorted first by the page, so the first four are the ones to see
+  assert.match(PS_CSS, /html\[data-phone="simple"\] #ms-scan-card:not\(\[data-ps-all\]\) #ms-scan > a:nth-child\(n\+5\) \{ display: none; \}/);
+  assert.match(DESK, /rows\.sort\(\(a, b\) => rank\(a\) - rank\(b\) \|\| keys\.indexOf\(a\.k\) - keys\.indexOf\(b\.k\)\);/);
+  assert.doesNotMatch(PS_JS, /\bfetch\(|msData|XMLHttpRequest|localStorage/, 'it fetches nothing and stores nothing');
+});
+
+test('simple phone view 2: Charts puts the rarely used rows behind "More", and a guest\'s chart page is untouched', () => {
+  assert.match(DESK, /id="ms-cx-tog"[^>]*>Context<\/button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false"[^>]*>More<\/button>/);
+  const rules = [...PS_CSS.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => m[1].trim()).filter((sel) => /#v-charts/.test(sel));
+  assert.ok(rules.length >= 5);
+  for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
+  assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
+  // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips\) \{ display: none !important; \}/);
+  assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
+  // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
+  assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
+  assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="clean"\] \.ps-cmore::before \{ content: "Clean ·";/);
+  assert.doesNotMatch(PS_JS, /setMode|data-mk|ms-mode/, 'the simple view never changes the markup');
+});
+
+test('simple phone view 2: the smoke test checks what each view leads with on the phone', () => {
+  const smoke = src('scripts/audit/smoke.cjs');
+  for (const t of ['the chart ends', 'Trades does not lead with the forward record', '"Which systems trade live" is not first', 'Research: open cards', 'This week does not lead with its sentence', 'Review does not lead with what is not reviewed', 'Scanner shows']) assert.ok(smoke.includes(t), t);
+  assert.match(smoke, /const INNER = \{ '\/market-structure\.html': \['#charts', '#setup', '#council\/overview'/);
+});
+
+// ── Forward record of the live book (12 Nov 2026): the card on Council → Systems (council/forward.mjs, coach.json forward) ──
+const FW_HTML = src('market-structure.html');
+const FW_CSS = (() => { const m = /<style id="ms-fw-css">([\s\S]*?)<\/style>/.exec(FW_HTML); return m ? m[1] : ''; })();
+const FW_JS = (() => { const m = /<script id="ms-fw-js">([\s\S]*?)<\/script>/.exec(FW_HTML); return m ? m[1] : ''; })();
+
+test('forward card: admin only like its neighbours, right under "Which systems trade live", labelled as a proposal you have not adopted', () => {
+  const pane = FW_HTML.slice(FW_HTML.indexOf('id="ms-cp-systems"'), FW_HTML.indexOf('id="ms-cp-review"'));
+  assert.match(pane, /<div class="card adm" id="ms-sys-book">[\s\S]*?<\/div>\n      <div class="card c-fwd adm" id="ms-fwd">/);
+  assert.match(pane, /Proposed protocol · not adopted/); assert.match(pane, /your decision 43<\/a>, open/);
+  assert.match(pane, /changes no rule, size, stop, trade or mirror setting/);
+});
+
+test('forward card: every text at least 12 px and every colour a theme token (no hex), a word beside every colour', () => {
+  assert.ok(FW_CSS.length > 0 && FW_JS.length > 0);
+  for (const m of FW_CSS.matchAll(/font(?:-size)?:\s*(?:\d+\s+)?([\d.]+)px/g)) assert.ok(+m[1] >= 12, `font ${m[0]}`);
+  assert.doesNotMatch(FW_CSS, /#[0-9a-f]{3,6}\b/i, 'colours come from tokens');
+  assert.match(FW_CSS, /var\(--buy-ink\)/); assert.match(FW_CSS, /var\(--sell-ink\)/);
+  for (const w of ['Expected range, 5 % to 95 %', 'Middle of the range', 'Forward total, after costs', 'Stop lines S2 to S4']) assert.ok(FW_HTML.includes(w), w);
+  for (const w of ['Not reached', 'Crossed', 'Checked later', 'Passes', 'Fails', 'Not measurable yet']) assert.ok(FW_JS.includes(w), w);
+});
+
+test('forward card: an older coach.json with no forward field reads correctly, and the card fetches nothing', () => {
+  assert.match(FW_JS, /No reading yet: the first one comes with the next Coach rebuild \(every 6 hours\)\./);
+  assert.doesNotMatch(FW_JS, /fetch\(|msData/, 'reads the copy the page already loaded');
 });

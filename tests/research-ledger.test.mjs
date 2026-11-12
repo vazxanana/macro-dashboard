@@ -46,7 +46,7 @@ test('every committed study gets a row: a verdict from the set, a headline, its 
   assert.ok(by['decay-monitor'].headline.length > 10, 'a report without a Verdict line still gets its opening sentence');
   assert.deepEqual(by['ict-oos-2008'].systems, ['ICT desk']); assert.deepEqual(by['nq-open-exits'].systems, ['NQ open run']);
   assert.ok(by['decay-monitor'].cites.includes(508) && by['decay-monitor'].cites.includes(511), 'PRs cited in RESULT.md');
-  assert.equal(by['ict-sessions'].built, '2026-11-07', 'built from the result (built / at / generated) or the report title date'); assert.equal(by['decay-monitor'].built, '2026-11-10');   // its baselines were rebuilt on the corrected candle clock on 10 Nov
+  assert.equal(by['ict-sessions'].built, '2026-11-07', 'built from the result (built / at / generated) or the report title date'); assert.equal(by['decay-monitor'].built, '2026-11-11');   // its baselines were rebuilt on the corrected candle clock on 10 Nov, and with overnight financing on 11 Nov
   assert.equal(by['ict-markets'].report, false); assert.ok(by['ict-markets'].headline.length > 5);
   const counts = rows.reduce((o, r) => ({ ...o, [r.verdict]: (o[r.verdict] || 0) + 1 }), {});
   assert.ok(counts.fail > counts.pass, 'the record so far: mostly null results');

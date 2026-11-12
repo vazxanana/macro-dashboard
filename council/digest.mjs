@@ -39,6 +39,7 @@ import vm from 'node:vm';
 import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLine } from './alerts.mjs';
 import { usHolidays } from './datacheck.mjs';
 import { expectLine } from './expect.mjs';
+import { forwardLine } from './forward.mjs';
 import { researchLines } from './research-ledger.mjs';
 import { writeAtomic } from './jsonio.mjs';
 
@@ -251,6 +252,10 @@ export function waiting(D, now, prev) {
   // What to expect (coach.json expect, council/expect.mjs): a live system whose forward record left the band the untouched-data study gives it
   const el = expectLine(D.coach && D.coach.expect);
   if (el) out.push(el);
+  // Forward tracker (coach.json forward, council/forward.mjs): one line, only when a stop line of the proposed protocol is crossed
+  // or an execution check fails; never otherwise
+  const fl = forwardLine(D.coach && D.coach.forward);
+  if (fl) out.push(fl);
   return out;
 }
 
@@ -298,7 +303,7 @@ export function loadScoreboard(file = new URL('../market-structure.html', import
 }
 export function scoreboardRows(D, now, SB = loadScoreboard()) {
   const rd = D.rd || (() => null);
-  return SB.build({ trades: D.trades, config: rd('config.json'), coach: D.coach, backtest: rd('backtest.json'), replay: rd('research/replay-2w.json'), mirror: D.mirror,
+  return SB.build({ trades: D.trades, config: rd('config.json'), coach: D.coach, backtest: rd('backtest.json'), replay: rd('research/replay-2w.json'), snapshot: rd('snapshot.json'), mirror: D.mirror,
     ictReplay: rd('ict/replay.json'), ictTrades: D.ictTrades, ictShadow: rd('ict/shadow.json'), robust: D.robust, macro: D.forecast, now });
 }
 
