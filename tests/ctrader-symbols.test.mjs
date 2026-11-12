@@ -27,7 +27,7 @@ const PX = { 41: [4000.10, 4000.40], 1: [1.10000, 1.10006], 5: [1.38000, 1.38010
 const ticks = (px, now) => { const pts = [[now - 2000, px], [now - 9000, px - 0.5], [now - 60000, px + 0.25]].map(([t, p]) => [t, Math.round(p * 1e5)]);
   return pts.map(([t, p], i) => (i ? { timestamp: t - pts[i - 1][0], tick: p - pts[i - 1][1] } : { timestamp: t, tick: p })); };
 
-function fakeBroker({ live = false, deposit = 1, quiet = false } = {}) {
+function fakeBroker({ live = false, deposit = 1, quiet = false, px = PX, full = FULL } = {}) {
   const sent = [];
   class WS { constructor(url) { this.url = url; setTimeout(() => this.onopen(), 0); }
     send(text) { const m = JSON.parse(text); sent.push({ url: this.url, ...m }); const P = _t.PT, p = m.payload;
@@ -39,9 +39,9 @@ function fakeBroker({ live = false, deposit = 1, quiet = false } = {}) {
         case P.TRADER_REQ: return r(P.TRADER_RES, { trader: { balance: 5000000, moneyDigits: 2, depositAssetId: deposit, leverageInCents: 50000 } });
         case P.ASSET_LIST_REQ: return r(P.ASSET_LIST_RES, { asset: ASSETS });
         case P.SYMBOLS_LIST_REQ: return r(P.SYMBOLS_LIST_RES, { symbol: LIGHT });
-        case P.SYMBOL_BY_ID_REQ: return r(P.SYMBOL_BY_ID_RES, { symbol: p.symbolId.map((id) => ({ symbolId: id, ...FULL[id] })) });
-        case P.GET_TICKDATA_REQ: { if (quiet || !PX[p.symbolId]) return r(P.GET_TICKDATA_RES, { tickData: [], hasMore: false });
-          return r(P.GET_TICKDATA_RES, { tickData: ticks(PX[p.symbolId][p.type === 2 ? 1 : 0], p.toTimestamp), hasMore: false }); }
+        case P.SYMBOL_BY_ID_REQ: return r(P.SYMBOL_BY_ID_RES, { symbol: p.symbolId.map((id) => ({ symbolId: id, ...full[id] })) });
+        case P.GET_TICKDATA_REQ: { if (quiet || !px[p.symbolId]) return r(P.GET_TICKDATA_RES, { tickData: [], hasMore: false });
+          return r(P.GET_TICKDATA_RES, { tickData: ticks(px[p.symbolId][p.type === 2 ? 1 : 0], p.toTimestamp), hasMore: false }); }
         case P.SYMBOLS_FOR_CONVERSION_REQ: { // the chain from the quote asset to the account currency, through USD
           const L = (id) => LIGHT.find((x) => x.symbolId === id), via = { 4: [L(5)], 1: [] }[p.firstAssetId] || [];
           return r(P.SYMBOLS_FOR_CONVERSION_RES, { symbol: p.lastAssetId === 6 ? [...via, L(6)] : via }); }
@@ -171,4 +171,25 @@ test('real Fusion specs: the mirror lot for a 0.20% (1R) ICT trade at $50k, and 
   for (const [n, e] of Object.entries(REAL.symbols)) if (e.sample && e.sample.lots != null) assert.ok(e.sample.risked <= REAL.sample.riskCash + 1e-9, n);
   // no spread while the market is shut: the Trader keeps its default cost
   assert.equal(costModel({ xau: { group: 'Metals', spot: true } }, { symbols: SYMBOLS, brokerInfo: REAL }).xau.src, 'default');
+});
+
+// ---- raw-spread quotes (12 Nov 2026): bid = ask is not a spread of 0; the last positive one is kept with its time; commission ----
+test('a bid = ask quote never writes spread 0: measured, then kept with its own time, else default; commission round trip', async () => {
+  const flat = { ...PX, 1: [1.10000, 1.10000] }, full = { ...FULL, 1: { ...FX, commissionType: 1, preciseTradingCommissionRate: 2250000000 }, 41: { ...FULL[41], commissionType: 1, preciseTradingCommissionRate: 1200000000 }, 5: { ...FX, commissionType: 2, preciseTradingCommissionRate: 500000000 }, 101: { ...FULL[101], preciseTradingCommissionRate: 0 } };
+  const a = await run(fakeBroker({ px: flat, full }));
+  const e = a.symbols.EURUSD;
+  assert.deepEqual([e.spread, e.spreadAt, e.spreadSrc, e.quoteSpread], [null, null, 'default', 0]);
+  assert.equal(e.commissionRT, 0.000045); assert.equal(a.symbols.XAUUSD.commissionRT, 0.000024);   // 22.5 and 12 USD a million, a side
+  assert.equal(a.symbols.USDCAD.commissionRT, null); assert.equal(a.symbols.US100.commissionRT, 0);   // another commission type is not guessed; none = 0
+  assert.equal(a.symbols.XAUUSD.spreadSrc, 'measured'); assert.equal(a.symbols.XAUUSD.spread, 0.3);
+  const b = await run(fakeBroker({ full }), { prev: a, now: NOW + 600e3 });        // a positive quote: measured
+  assert.deepEqual([b.symbols.EURUSD.spread, b.symbols.EURUSD.spreadSrc], [0.00006, 'measured']);
+  const c = await run(fakeBroker({ px: flat, full }), { prev: b, now: NOW + 1200e3 });   // bid = ask again: the 0.6 pip is kept, with its time
+  assert.deepEqual([c.symbols.EURUSD.spread, c.symbols.EURUSD.spreadAt, c.symbols.EURUSD.spreadSrc, c.symbols.EURUSD.quoteSpread], [0.00006, b.symbols.EURUSD.spreadAt, 'kept', 0]);
+  assert.deepEqual(c.symbols.EURUSD.spreadLog.map((x) => x[1]), [0, 0.00006, 0]);
+  const d = await run(fakeBroker({ px: flat, full }), { prev: c, now: NOW + 8 * 86400e3 });   // kept at most 7 days
+  assert.deepEqual([d.symbols.EURUSD.spread, d.symbols.EURUSD.spreadSrc], [null, 'default']);
+  // a file written before this change (spread 0) is never carried as a spread
+  const old = { symbols: { EURUSD: { spread: 0, spreadAt: new Date(NOW - 60e3).toISOString() } } };
+  assert.equal((await run(fakeBroker({ px: flat, full }), { prev: old })).symbols.EURUSD.spreadSrc, 'default');
 });
