@@ -9260,7 +9260,7 @@
     "lots": 0.07,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T00:28:55.000Z",
     "councilEntry": 2059.99,
     "stop": 2033.077906,
@@ -9274,10 +9274,12 @@
     "slipR": 0.085,
     "lagSec": 115,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T00:28:55.000Z",
-    "brokerStop": 2036.15
+    "brokerStop": 2036.15,
+    "closedAt": "2026-11-12T05:19:53.000Z"
    },
    "xau-rscalp-1794443505": {
     "positionId": "48581948",
@@ -9560,7 +9562,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9820.16 · 34 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9818.33 · 33 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9593,15 +9595,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9820.16,
-  "lastRun": "2026-11-12T05:17:33.000Z"
+  "balance": 9818.33,
+  "lastRun": "2026-11-12T05:19:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T08:10:23.000Z",
-   "msg": "limit filled: USDCAD position 48351152 at the broker",
-   "trade": "usdcad-rscalp-1794384409"
-  },
   {
    "at": "2026-11-11T08:12:53.000Z",
    "msg": "placed buy limit USDCHF 0.02 lot at 0.82787 (council scalp, valid to 2026-11-11T11:11Z)",
@@ -11096,6 +11093,11 @@
    "at": "2026-11-12T03:58:45.000Z",
    "msg": "not mirrored xrp-rscalp-1794455875: none of XRPUSD found at the broker",
    "trade": "xrp-rscalp-1794455875"
+  },
+  {
+   "at": "2026-11-12T05:19:53.000Z",
+   "msg": "ETHUSD position 48581227 closed at the broker",
+   "trade": "eth-rscalp-1794443123"
   }
  ],
  "limits": {
