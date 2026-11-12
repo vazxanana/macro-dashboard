@@ -10431,6 +10431,32 @@
     "amended": 1,
     "amendedAt": "2026-11-12T10:12:46.000Z",
     "closedAt": "2026-11-12T10:19:41.000Z"
+   },
+   "usdchf-rintra-1794478719": {
+    "symbol": "USDCHF",
+    "side": "sell",
+    "setup": "rintra",
+    "openedAt": "2026-11-12T10:24:42.000Z",
+    "councilEntry": 0.83152,
+    "stop": 0.83244,
+    "t1": 0.829275,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.83152,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.97,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 0.83152,
+    "slipR": 0,
+    "lagSec": 363,
+    "positionId": "48743719",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -10438,7 +10464,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9853.54 · 31 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9853.54 · 32 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -10488,19 +10514,19 @@
      "pending"
     ]
    },
-   "usdchf-rintra-1794478719": {
-    "orderId": "33991870",
-    "symbol": "USDCHF",
+   "usdcad-rintra-1794479019": {
+    "orderId": "33992110",
+    "symbol": "USDCAD",
     "side": "sell",
     "volume": 100000,
     "lots": 0.01,
     "digits": 5,
     "setup": "rintra",
-    "limitPrice": 0.83152,
-    "stop": 0.83244,
-    "t1": 0.829275,
-    "placedAt": "2026-11-12T10:19:41.000Z",
-    "expires": "2026-11-12T22:18:39.000Z",
+    "limitPrice": 1.4247,
+    "stop": 1.42664,
+    "t1": 1.42226,
+    "placedAt": "2026-11-12T10:24:42.000Z",
+    "expires": "2026-11-12T22:23:39.000Z",
     "riskCash": 1.97,
     "margin": 2,
     "shadow": true,
@@ -10511,19 +10537,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9853.54,
-  "lastRun": "2026-11-12T10:22:13.000Z"
+  "lastRun": "2026-11-12T10:24:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T07:37:07.000Z",
-   "msg": "opened sell USDCAD 0.04 lot (council rscalp)",
-   "trade": "usdcad-rscalp-1794468962"
-  },
-  {
-   "at": "2026-11-12T07:41:29.000Z",
-   "msg": "USDCHF position 48674178 closed at the broker",
-   "trade": "usdchf-scalp-1794464003"
-  },
   {
    "at": "2026-11-12T07:41:29.000Z",
    "msg": "USDCAD position 48696143 closed at the broker",
@@ -12013,6 +12029,16 @@
    "at": "2026-11-12T10:22:13.000Z",
    "msg": "cancelled AUDUSD limit order 33991740 for audusd-rscalp-1794478545: the council ended it: missed",
    "trade": "audusd-rscalp-1794478545"
+  },
+  {
+   "at": "2026-11-12T10:24:42.000Z",
+   "msg": "limit filled: USDCHF position 48743719 at the broker",
+   "trade": "usdchf-rintra-1794478719"
+  },
+  {
+   "at": "2026-11-12T10:24:42.000Z",
+   "msg": "placed sell limit USDCAD 0.01 lot at 1.4247 (council rintra, valid to 2026-11-12T22:23Z)",
+   "trade": "usdcad-rintra-1794479019"
   }
  ],
  "limits": {
@@ -12091,11 +12117,11 @@
   ]
  },
  "execution": {
-  "n": 350,
+  "n": 351,
   "meanSlipR": -0.013,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 138.5,
+  "medianLagSec": 139,
   "bySymbol": {
    "SOLUSD": {
     "n": 20,
@@ -12122,7 +12148,7 @@
     "meanSlipR": -0.054
    },
    "USDCHF": {
-    "n": 49,
+    "n": 50,
     "meanSlipR": 0.028
    },
    "AUDUSD": {
