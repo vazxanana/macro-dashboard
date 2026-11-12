@@ -9704,7 +9704,8 @@
     "t1": 1.3239,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.32546,
@@ -9718,7 +9719,8 @@
     "lagSec": 210,
     "positionId": "48681305",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T07:03:24.000Z"
    }
   },
   "day": {
@@ -9726,7 +9728,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9786.03 · 37 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9784.33 · 36 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -9760,15 +9762,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9786.03,
-  "lastRun": "2026-11-12T07:02:00.000Z"
+  "balance": 9784.33,
+  "lastRun": "2026-11-12T07:03:24.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T09:35:12.000Z",
-   "msg": "opened buy USDCAD 0.03 lot (council scalp)",
-   "trade": "usdcad-scalp-1794389649"
-  },
   {
    "at": "2026-11-11T09:39:10.000Z",
    "msg": "USDCAD position 48346849 closed at the broker",
@@ -11263,6 +11260,11 @@
    "at": "2026-11-12T06:57:04.000Z",
    "msg": "not mirrored xrp-scalp-1794466566: none of XRPUSD found at the broker",
    "trade": "xrp-scalp-1794466566"
+  },
+  {
+   "at": "2026-11-12T07:03:24.000Z",
+   "msg": "GBPUSD position 48681305 closed at the broker",
+   "trade": "gbpusd-scalp-1794465892"
   }
  ],
  "limits": {
