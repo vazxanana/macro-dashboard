@@ -9895,6 +9895,33 @@
     "stopCheckedAt": "2026-11-12T07:29:41.000Z",
     "brokerStop": 0.83272,
     "closedAt": "2026-11-12T07:34:39.000Z"
+   },
+   "usdcad-rscalp-1794468962": {
+    "positionId": "48698788",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "rscalp",
+    "status": "open",
+    "openedAt": "2026-11-12T07:37:07.000Z",
+    "councilEntry": 1.42575,
+    "stop": 1.42644,
+    "t1": 1.4256199999999999,
+    "riskCash": 1.96,
+    "margin": 8,
+    "shadow": true,
+    "mark": 1.42575,
+    "levelsFrom": "mark",
+    "fillPrice": 1.42572,
+    "slipR": 0.043,
+    "lagSec": 65,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-12T07:37:07.000Z",
+    "brokerStop": 1.42641
    }
   },
   "day": {
@@ -9902,7 +9929,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9801.82 · 35 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9801.82 · 36 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -9937,14 +9964,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9801.82,
-  "lastRun": "2026-11-12T07:34:39.000Z"
+  "lastRun": "2026-11-12T07:37:07.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T11:33:24.000Z",
-   "msg": "cancelled USDCHF limit order 33924689 for usdchf-scalp-1794396569: the council filled it on its feed first",
-   "trade": "usdchf-scalp-1794396569"
-  },
   {
    "at": "2026-11-11T11:33:24.000Z",
    "msg": "opened buy USDCHF 0.02 lot (council scalp)",
@@ -11439,6 +11461,11 @@
    "at": "2026-11-12T07:34:39.000Z",
    "msg": "USDCHF position 48697022 closed at the broker",
    "trade": "usdchf-scalp-1794468520"
+  },
+  {
+   "at": "2026-11-12T07:37:07.000Z",
+   "msg": "opened sell USDCAD 0.04 lot (council rscalp)",
+   "trade": "usdcad-rscalp-1794468962"
   }
  ],
  "limits": {
@@ -11517,11 +11544,11 @@
   ]
  },
  "execution": {
-  "n": 335,
+  "n": 336,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 147,
+  "medianLagSec": 145,
   "bySymbol": {
    "SOLUSD": {
     "n": 20,
@@ -11544,8 +11571,8 @@
     "meanSlipR": 0.026
    },
    "USDCAD": {
-    "n": 49,
-    "meanSlipR": -0.057
+    "n": 50,
+    "meanSlipR": -0.055
    },
    "USDCHF": {
     "n": 48,
