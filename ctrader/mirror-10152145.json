@@ -11194,7 +11194,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9907.64 · 31 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9907.64 · 31 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -11222,23 +11222,54 @@
     "alerted": [
      "pending"
     ]
+   },
+   "sol-position-1794489401": {
+    "orderId": "34001347",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "position",
+    "limitPrice": 81.26,
+    "stop": 85.87210714285713,
+    "t1": 72.03578571428575,
+    "placedAt": "2026-11-12T13:17:52.000Z",
+    "expires": "2026-11-17T13:16:41.000Z",
+    "riskCash": 46.12,
+    "margin": 82.25,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "usdcad-scalp-1794489401": {
+    "orderId": "34001348",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.42446,
+    "stop": 1.42546,
+    "t1": 1.4224600000000003,
+    "placedAt": "2026-11-12T13:17:52.000Z",
+    "expires": "2026-11-12T16:16:41.000Z",
+    "riskCash": 1.98,
+    "margin": 4,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9907.64,
-  "lastRun": "2026-11-12T13:15:20.000Z"
+  "lastRun": "2026-11-12T13:17:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T09:52:26.000Z",
-   "msg": "moved EURUSD 47373484 protection: stop 1.0799195 -> 1.0794095, target 1.16358 -> 1.16307 (council rswing)",
-   "trade": "eurusd-rswing-1793610380"
-  },
-  {
-   "at": "2026-11-12T09:52:26.000Z",
-   "msg": "moved EURUSD 47373487 protection: stop 1.0806047 -> 1.0800947, target 1.133435 -> 1.132925 (council rswing)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-12T09:52:26.000Z",
    "msg": "moved USDCHF 48520033 protection: stop 0.8339 -> 0.83391, target 0.829315 -> 0.829325 (council rintra)",
@@ -12728,6 +12759,16 @@
    "at": "2026-11-12T13:15:20.000Z",
    "msg": "opened sell GBPUSD 0.01 lot (council scalp)",
    "trade": "gbpusd-scalp-1794488950"
+  },
+  {
+   "at": "2026-11-12T13:17:52.000Z",
+   "msg": "placed sell limit SOLUSD 0.01 lot at 81.26 (council position, valid to 2026-11-17T13:16Z)",
+   "trade": "sol-position-1794489401"
+  },
+  {
+   "at": "2026-11-12T13:17:52.000Z",
+   "msg": "placed sell limit USDCAD 0.02 lot at 1.42446 (council scalp, valid to 2026-11-12T16:16Z)",
+   "trade": "usdcad-scalp-1794489401"
   }
  ],
  "limits": {
