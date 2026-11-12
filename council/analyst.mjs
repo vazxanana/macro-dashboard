@@ -420,6 +420,9 @@ export function goldSystemsSection({ snapshot, config, trades = [], research = [
   { const m = st('moshaBo'), w = sn.goldW1;
     const what = !config.moshaBo ? '—' : m ? moshaChainText(m, w).replace(/^Mosha BO chain(?: complete)?: /, '') : w == null ? 'waiting for the Trader' : `weekly structure ${w > 0 ? 'bullish: buys only' : 'bearish: sells only'}`;
     rows.push(['Mosha BO', book('mosha-bo', config.moshaBo), what, on('mosha-bo')]); }
+  // Mosha cycle: H4 move, H1 ChoCh = the pullback, M15 / M5 trade the pullback then the ChoCh back (snapshot.moshaCycle, council/mosha-cycle.mjs)
+  { const c = sn.moshaCycle, what = !config.moshaCycle ? '—' : c && c.text ? c.text.replace(/^Mosha cycle: /, '') : 'waiting for the Trader';
+    rows.push(['Mosha cycle', book('mcycle', config.moshaCycle), what, on('mcycle')]); }
   // Gold trend (N-day breakout, long only): a daily close above the N-day high enters; the state has the high and the last close
   for (const [name, key, cfgKey, k, sh] of [['Gold trend', 'goldTrend', 'goldTrend', 'gtrend', false], ['Gold trend fast', 'goldTrendFast', 'goldTrendFast', 'gtrend5', !!config.goldTrendFastShadow]]) {
     const c = config[cfgKey], x = st(key); if (!c) { rows.push([name, 'off', '—', '—']); continue; }

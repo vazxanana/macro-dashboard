@@ -330,8 +330,8 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
 
 test('the owner\'s decisions are on record: three approved with the owner\'s words, two open, numbers never reused', () => {
   const doc = rd('docs/owner-decisions.md'), heads = [...doc.matchAll(/^### \[(.)\] (\d+)\. (.*)$/gm)], nums = heads.map((m) => +m[2]);
-  // a number taken by an item written on another branch is reserved in the file (12 Nov 2026: item 49, branch nq-open-r0, before
-  // item 50): <!-- reserved item 49: … -->. It may be missing here; it is still never reused, and nothing is renumbered.
+  // a number taken by an item written on another branch may be reserved in the file with <!-- reserved item N: … --> until
+  // that branch merges; it is still never reused, and nothing is renumbered once on main.
   const reserved = [...doc.matchAll(/<!-- reserved item (\d+):/g)].map((m) => +m[1]), all = [...new Set(nums.concat(reserved))];
   assert.equal(new Set(nums).size, nums.length, 'no number twice');
   assert.deepEqual(all.sort((a, b) => a - b), all.map((_, i) => i + 1), 'every number 1..n once: none renumbered, none reused');

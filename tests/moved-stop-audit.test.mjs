@@ -1,5 +1,5 @@
 // node --test tests/moved-stop-audit.test.mjs — the moved-stop audit (12 Nov 2026; research/proposals/2026-11-12-moved-stop-audit.md).
-// The NQ open run's loop recomputes 1R from a stop its trail has already moved (docs/owner-decisions.md item 49). This file checks
+// The NQ open run's loop recomputes 1R from a stop its trail has already moved (docs/owner-decisions.md item 50). This file checks
 // every OTHER place that computes a trade's risk, R, mfe / mae or a trail level after the stop can have moved, on hand-made
 // candles, one management call per candle (as the live runner and the quick pass run the Trader: one run per new candle).
 // Offline. ICT (Fred's edge) is only read, never edited: its tracker and replay use the stored r0 throughout.
@@ -157,7 +157,7 @@ test('reconciliation: an ICT copy whose trail moved past the entry is not called
   assert.ok(row); assert.deepEqual(row.issues, [], 'before: "the stop is on the wrong side of the entry" and a stop distance mismatch');
 });
 
-test('Trader text: every stop assignment is in a loop that reads a stamped r0, except the NQ open run (item 49); the research loops never move a stop', () => {
+test('Trader text: every stop assignment is in a loop that reads a stamped r0, except the NQ open run (item 50); the research loops never move a stop', () => {
   const src = rd('council/trader.mjs');
   const moves = [...src.matchAll(/\b(\w+)\.stop = /g)].map((m) => m[1]);
   // tr (generic loop: trail, Coach break-even, beAt), open + gAdd (gold trend ratchet), open (crypto trend midpoint ratchet), r (NQ open run)
@@ -169,7 +169,7 @@ test('Trader text: every stop assignment is in a loop that reads a stamped r0, e
     const a = src.indexOf(head), z = src.indexOf('r.checked = bars.at(-1).time;', a); assert.ok(a > 0 && z > a, head);
     assert.doesNotMatch(src.slice(a, z), /r\.stop = |trailMoved|beMoved/, 'no stop move inside');
   }
-  // the NQ open run: the defect of item 49, still as found (a fix there is the owner's decision; tests/nq-open-r0 on its branch)
+  // the NQ open run: the defect of item 50, still as found (a fix there is the owner's decision; tests/nq-open-r0 on its branch)
   assert.match(src, /for \(const r of openNq\) \{\n {6}const s = r\.side === 'sell', r0 = Math\.abs\(r\.entry - r\.stop\);/);
 });
 

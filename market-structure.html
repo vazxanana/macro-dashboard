@@ -927,6 +927,7 @@
   .loss-g[open] > summary::before { transform: rotate(45deg); }                                             /* 43 */
   .ms-toast { background: var(--panel-raised) !important; color: var(--ink) !important; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; padding: 12px 14px !important; box-shadow: var(--sh-2) !important; font-size: 13px !important; animation: toastIn .22s cubic-bezier(.16,1,.3,1); }
   .ms-toast b { text-transform: none !important; letter-spacing: 0 !important; color: var(--gold) !important; font-size: 12.5px !important; }   /* 45, 68 */
+  :root[data-theme="light"] .ms-toast b { color: var(--gold-ink) !important; }   /* the brand gold as text on the light panel was 1.8:1 (QA 12 Nov) */
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
   .tv::backdrop { background: rgba(4,6,10,.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }   /* 46 */
   .tv[open] { animation: dlgIn .22s cubic-bezier(.16,1,.3,1); }                                              /* 67 */
@@ -3151,7 +3152,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </style>
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
-      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context">More</button>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -3234,6 +3235,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="card adm" id="ms-sys-book">
         <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
         <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle (not a tested edge: no study to measure it against, so it has no row in the decay and expectation cards). <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
+        <p class="ms-note" id="ms-rep-mcycle"></p>
         <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
       </div>
       <div class="card c-fwd adm" id="ms-fwd">
@@ -3270,7 +3272,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </details>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note" id="ms-rep-w1"></p>
-        <p class="ms-note" id="ms-rep-mosha"></p><p class="ms-note" id="ms-rep-mcycle"></p>
+        <p class="ms-note" id="ms-rep-mosha"></p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
         <p class="ms-note" id="ms-rep-track-txt"></p>
@@ -3278,7 +3280,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-pairs adm">
-        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (paper shadow since 7 Nov) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
           <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
@@ -3316,7 +3318,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           @media (pointer: coarse) { #ms-ea details summary { min-height: 44px; display: flex; align-items: center; } }
         </style>
         <div class="ms-k" role="heading" aria-level="2">AI second opinion · each entry, judged blind</div>
-        <p class="ms-note">When a live trade of the seven edges opens, a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
+        <p class="ms-note">When a live trade of one of our systems opens (a paper shadow is not studied), a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
         <div class="ea-sum" id="ms-ea-sum">Loading…</div>
         <div class="ea-wrap"><table class="ea-tb" id="ms-ea-list" hidden><thead><tr><th>Entry (UTC)</th><th>System</th><th>Trade</th><th>AI said</th><th>Result</th></tr></thead><tbody></tbody></table></div>
       </div>
@@ -6765,6 +6767,7 @@ function msNextSetup(bars, A) {
   const marketClosed = () => { if (INST.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };   // incl. the first hour after the Sunday reopen
   function autoTrade(list, price) {
     if (!JEL || PUB || marketClosed()) return;   // never for a guest: no journal to save to, and the toast named a setup
+    if (/(^|\s)journal(\s|$)/.test(document.documentElement.dataset.deny || '')) return;   // nor for a member who cannot open the Journal (viewers): the toast said "It's in your journal" (QA 12 Nov)
     const now = Date.now() / 1000; let added = 0;
     for (const t of list) {
       const id = `${instKey}|${t.sig}`;
@@ -7000,6 +7003,8 @@ function msNextSetup(bars, A) {
   // One way to write an R figure in the Home and Council templates (11 Nov): a sign, the minus glyph, two decimals ("−1.00R",
   // never "-1R" beside "−1.05R"); rTxt(v, 1) for the few one-decimal totals. A value that is not a number reads "—".
   const rTxt = (v, d = 2) => { v = +v; if (!isFinite(v)) return '—'; const z = Math.abs(v) < 0.5 * Math.pow(10, -d); return `${z ? '' : v > 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}R`; };
+  // a planned reward:risk is not a result: "target 2.00R", never "2R" or "+2.00R" (trade chart dialog, 12 Nov)
+  const rrTxt = (v) => (v == null || v === '' || !isFinite(+v) ? '—' : `target ${(+v).toFixed(2)}R`);
   // 1R of a trade = the risk it OPENED with (12 Nov 2026, moved-stop audit; a copy of council/fills.mjs openRisk, compared by
   // tests/moved-stop-audit.test.mjs): once a trail or break-even has moved the stop, |entry - stop| is not 1R any more (a stop at
   // the entry divided by zero: "+InfinityR now"). null = unknown: the figure is left out.
@@ -7013,7 +7018,10 @@ function msNextSetup(bars, A) {
   const stampTxt = (iso, everyH, now = Date.now()) => { const d = new Date(iso); if (isNaN(d)) return '';
     const txt = d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }), ageH = (now - d) / 36e5;
     return everyH && ageH > 2 * everyH ? `Stale: ${txt}, ${ageH >= 48 ? Math.round(ageH / 24) + ' days' : Math.round(ageH) + ' h'} old (written every ${everyH} h)` : txt; };
-  window.MS_HC = { rTxt, fwdSplit, stampTxt, mnTxt: (s) => mnTxt(s) };
+  // a calendar day / week cell holds six characters at 12 px on a 390 px phone (12 Nov 2026): "−9.87R" fits, "−12.34R" was cut
+  // off. From 10R one decimal ("−12.3R"), from 100R none ("−137R"); the cell's aria-label and the day's detail keep two decimals.
+  const calR = (v) => { v = +v; if (!isFinite(v)) return '—'; const a = Math.abs(v); return rTxt(v, a >= 99.95 ? 0 : a >= 9.995 ? 1 : 2); };
+  window.MS_HC = { rTxt, rrTxt, fwdSplit, stampTxt, calR, mnTxt: (s) => mnTxt(s) };
   const sysClosed = () => { const ok = (x) => !x.shadow && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null;
     const live = (COUNCIL.trades || []).filter((x) => SYS_K.includes(x.k) && ok(x)), rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => nqSys(x) && ok(x));
     const nqF = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ok(x)); const seen = new Set();
@@ -7049,7 +7057,7 @@ function msNextSetup(bars, A) {
     for (let d = 1; d <= days; d++) {
       const k = `${GCAL.y}-${GCAL.m}-${d}`, has = byDay.has(k), R = byDay.get(k) || 0, isT = now.getFullYear() === GCAL.y && now.getMonth() === GCAL.m && now.getDate() === d; const isF = new Date(GCAL.y, GCAL.m, d) > now;
       if (has) { mR += R; if (R > 0) up++; else if (R < 0) dn++; }
-      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}${isF ? ' fut' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
+      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}${isF ? ' fut' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${calR(R)}</span>` : ''}</div>`;
     }
     el.innerHTML = html;
     document.getElementById('g-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${up + dn ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}">${fR(mR)}</small>` : ''}`;
@@ -7136,9 +7144,9 @@ function msNextSetup(bars, A) {
       if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
       const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d; const isF = new Date(CAL.y, CAL.m, d) > now;
       const col = (lead + d - 1) % 7; wkR += R; wkN += arr.length;
-      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${isF ? ' fut' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
+      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${isF ? ' fut' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${calR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
       if (col === 6 || d === days) { if (col < 6) html += '<div class="cal-d out"></div>'.repeat(6 - col); wkI++;
-        html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${fR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
+        html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${calR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
     }
     el.innerHTML = html;
     document.getElementById('ms-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${mN ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}" title="Month total over ${mN} trades">${fR(mR)}</small>` : ''}`;
@@ -7391,7 +7399,8 @@ function msNextSetup(bars, A) {
       return `<svg class="h-spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Month so far, cumulative R by day: ${fR(c)}"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="z"/><path d="${d}" class="${c >= 0 ? 'up' : 'dn'}"/></svg>`; })();
     // guests: an order still waiting for its entry is not "open" (the strip said "1 open" beside a card saying "Waiting for the entry")
     const gOpen = () => { const A = activeTrades().filter((x) => !x.tracker), o = A.filter((x) => x.status === 'open').length, w = A.length - o; return `${o} open${w ? ` · ${w} waiting for ${w === 1 ? 'its' : 'their'} entry` : ''}`; };
-    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} system trade${S.n === 1 ? '' : 's'}${S.on ? ` · shadow ${fR(S.oR)} over ${S.on}` : ''}`;
+    // members also see the week pane, whose figures are after costs: these are before costs and say so (12 Nov)
+    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} system trade${S.n === 1 ? '' : 's'}, before costs${S.on ? ` · shadow ${fR(S.oR)} over ${S.on}` : ''}`;
     const prev = (window.TODAY_PREV = window.TODAY_PREV || {});
     el.innerHTML = COUNCIL.trades ? [
       PUB ? cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? gOpen() : 'loading', F ? cls(F.liveTot || 0) : '')
@@ -7816,7 +7825,7 @@ function msNextSetup(bars, A) {
     const size = x.market === instKey && typeof sizeText === 'function' ? sizeText(risk, x.entry) : '';
     const mt5 = `${sym} ${type} ${f(x.entry)} SL ${f(x.stop)}${tp != null ? ` TP ${f(tp)}` : ''}`;
     const ct = `${buy ? 'Buy' : 'Sell'} ${x.status === 'open' ? 'market' : type.split(' ').slice(1).join(' ').toLowerCase() + ' order'} ${sym} @ ${f(x.entry)} | Stop loss ${f(x.stop)}${tp != null ? ` | Take profit ${f(tp)}` : ''}`;
-    const txt = [`Council ${x.name || x.k} · ${I.label || x.label} · ${buy ? 'BUY' : 'SELL'}${x.shadow ? ' (shadow)' : ''}`, `Entry ${f(x.entry)}${x.status === 'pending' ? ' (pending)' : ''}`, `Stop ${f(x.stop)} (risk ${f(risk)})`, tp != null ? `Target ${f(tp)}${x.rr ? ` (${x.rr}R)` : ''}` : 'Target: trailing', size ? `Size at your risk setting: ${size}` : '', 'Paper / research signal, not advice.'].filter(Boolean).join('\n');
+    const txt = [`Council ${x.name || x.k} · ${I.label || x.label} · ${buy ? 'BUY' : 'SELL'}${x.shadow ? ' (shadow)' : ''}`, `Entry ${f(x.entry)}${x.status === 'pending' ? ' (pending)' : ''}`, `Stop ${f(x.stop)} (risk ${f(risk)})`, tp != null ? `Target ${f(tp)}${x.rr ? ` (${rrTxt(x.rr)})` : ''}` : 'Target: trailing', size ? `Size at your risk setting: ${size}` : '', 'Paper / research signal, not advice.'].filter(Boolean).join('\n');
     el.hidden = false;
     el.innerHTML = `<b class="tk-h">Ticket</b><code class="tk-l" title="MT5 order">${esc(mt5)}</code>${size ? `<span class="tk-sz">Size ${esc(size)}</span>` : ''}<span class="tk-b"><button type="button" data-tk="mt5">Copy MT5</button><button type="button" data-tk="ct">Copy cTrader</button><button type="button" data-tk="txt">Copy text</button><a href="${window.msTvUrl ? window.msTvUrl(x.market, '15m') : '#'}" target="_blank" rel="noopener">TradingView</a></span>`;
     const val = { mt5, ct, txt };
@@ -7838,14 +7847,15 @@ function msNextSetup(bars, A) {
     const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
     // the first stop: a trade whose stop moved (break-even or trail) keeps its first risk in r0 (trade viewer, 7 Nov: trailed trades drew the moved stop as the stop)
     const r0 = x.r0 || (x.beMoved || x.trailMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.stop0 != null && isFinite(x.stop0) ? +x.stop0 : (x.beMoved || x.trailMoved) && r0 ? x.entry - s * r0 : x.stop;
-    const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? `Loss ${x.R != null && x.R !== -1 ? `${x.R}R${x.exit ? ` (${x.exit})` : ''}` : '−1R'}` : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
+    // every R through rTxt (12 Nov: the title read "Loss -1R" / "Win +2R" beside "−1.05R" elsewhere)
+    const res = x.status === 'win' ? `Win ${rTxt(x.R)}` : x.status === 'loss' ? `Loss ${rTxt(x.R != null ? x.R : -1)}${x.R != null && x.R !== -1 && x.exit ? ` (${x.exit})` : ''}` : x.status === 'be' ? `Break-even ${rTxt(0)}` : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = PUB ? `${x.label} ${x.side === 'sell' ? 'sell' : 'buy'}` : `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
-    document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
+    document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${mnTxt(esc(x.pm.detail))} <br>Lesson: ${mnTxt(esc(x.pm.lesson))}${x.shadow && x.note ? `<br>${mnTxt(esc(x.note))}` : ''}` : mnTxt(esc(x.note || ''));
     // the conditions at the signal, the ones the Coach learns from (D1, structure, the CHoCH rule, session) and the entry style
     const ft = x.feat || {}, cond = [ft.d1 && `${ft.d1 === 'with' ? 'With' : 'Against'} D1`, ft.struct && ft.struct !== 'n/a' && `${ft.struct === 'main' ? 'Main' : 'Internal'} structure`,
       ft.cf && (ft.cf === 'choch' ? 'CF is a CHoCH' : 'CF is a continuation BO'), ft.choch && (ft.choch === 'yes' ? 'Fresh M15/M5 CHoCH' : 'No fresh M15/M5 CHoCH'), ft.m15c && (ft.m15c === 'yes' ? 'Your M15 CHoCH within the hour' : 'No M15 CHoCH (yours) within the hour'),
       ft.session && (SESSION_NAME[ft.session] || ft.session), x.entryMode === 'market' && 'Market entry'].filter(Boolean);
-    document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}${x.t1 == null || !isFinite(x.t1) ? `<span><i style="background:${UPC}"></i>Target <b>none</b> (trend trade: rides until its exit rule)</span>` : `<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span>`}${x.rr != null && isFinite(x.rr) ? `<span>Reward:risk <b>${x.rr}R</b></span>` : ''}${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}${x.t1 == null || !isFinite(x.t1) ? `<span><i style="background:${UPC}"></i>Target <b>none</b> (trend trade: rides until its exit rule)</span>` : `<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span>`}${x.rr != null && isFinite(x.rr) ? `<span title="Planned reward for 1R of risk, not a result">Planned <b>${rrTxt(x.rr)}</b></span>` : ''}${x.mfe != null ? `<span>Best <b>${rTxt(x.mfe)}</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     tradeTicket(x, PUB);
     { const nb = document.getElementById('ms-tv-nb'), T = window.MS_TRV; if (nb) { nb.innerHTML = PUB || !T ? '' : T.nbHtml(x, !!(x.pm && x.pm.title) && !x.shadow); nb.hidden = !nb.innerHTML; } }   // note + blockers (#ms-trv-js)
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
@@ -7930,18 +7940,18 @@ function msNextSetup(bars, A) {
       const r0v = Math.abs(x.entry - C.stop0) || 1, rwP = !noTgt && Math.abs(x.t1 - x.entry) <= 4.5 * r0v ? x.t1 : aim, endI = before ? tgtIdx : (iX > iE ? iX : n - 1 + 2);
       items.boxes.push({ kind: 'rw', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, rwP), hi: Math.max(x.entry, rwP), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
       items.boxes.push({ kind: 'rk', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, C.stop0), hi: Math.max(x.entry, C.stop0), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
-      items.labels.push({ l: iE, dx: 6, p: rwP, dy: sell ? 14 : -5, text: `${((rwP - x.entry) * s / r0v).toFixed(1)}R · ${f(rwP)}`, color: '#089981' }, { l: iE, dx: 6, p: C.stop0, dy: sell ? -5 : 14, text: `−1R · ${f(C.stop0)}`, color: '#f23645' });
-      if (!before && x.status === 'open') { const L = (window.MS_LIVE && window.MS_LIVE.items || []).find((i) => i.x.id === x.id); if (L && L.fl != null) items.labels.push({ l: n - 1, p: data[n - 1].close, pill: true, bg: L.fl >= 0 ? '#089981' : '#f23645', dy: (L.fl >= 0) === (s > 0) ? -22 : 22, text: `Now ${L.fl >= 0 ? '+' : ''}${L.fl.toFixed(2)}R` }); }
+      items.labels.push({ l: iE, dx: 6, p: rwP, dy: sell ? 14 : -5, text: `${rrTxt((rwP - x.entry) * s / r0v)} · ${f(rwP)}`, color: '#089981' }, { l: iE, dx: 6, p: C.stop0, dy: sell ? -5 : 14, text: `${rTxt(-1)} · ${f(C.stop0)}`, color: '#f23645' });
+      if (!before && x.status === 'open') { const L = (window.MS_LIVE && window.MS_LIVE.items || []).find((i) => i.x.id === x.id); if (L && L.fl != null) items.labels.push({ l: n - 1, p: data[n - 1].close, pill: true, bg: L.fl >= 0 ? '#089981' : '#f23645', dy: (L.fl >= 0) === (s > 0) ? -22 : 22, text: `Now ${rTxt(L.fl)}` }); }
     }
     if (iE >= 0 && before) {
       items.path = [{ l: iE, p: x.entry }, { l: tgtIdx, p: aim }];   // dashed arrow: the predicted move
-      items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + aim) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: noTgt ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then ride the trend (no fixed target)` : trailing ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then trail` : `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${x.rr}R)` });
+      items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + aim) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: noTgt ? `Prediction: ${sell ? 'SELL' : 'BUY'}, ${rrTxt(2)} at ${f(aim)}, then ride the trend (no fixed target)` : trailing ? `Prediction: ${sell ? 'SELL' : 'BUY'}, ${rrTxt(2)} at ${f(aim)}, then trail` : `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${rrTxt(x.rr)})` });
     }
     if (iE >= 0) {
       items.vlines.push({ l: iE, color: '#2962ff', text: before ? 'Signal (now)' : 'Signal' });
       if (!before && iX > 0 && ['win', 'loss', 'be'].includes(x.status)) {
         const px = x.status === 'win' && !x.exit && !noTgt ? x.t1 : x.status === 'loss' && !x.exit ? C.stop0 : x.entry + s * (x.R || 0) * Math.abs(x.entry - C.stop0);
-        items.labels.push({ l: iX, p: px, pill: true, bg: x.R > 0 ? '#089981' : x.R < 0 ? '#f23645' : '#8a94a8', dy: (px > x.entry) ? -30 : 30, text: `Result: ${x.R > 0 ? 'win' : x.R < 0 ? 'loss' : 'break-even'} ${x.R > 0 ? '+' : ''}${x.R}R${x.exit ? ` · out after ${x.exit}` : ''}` });
+        items.labels.push({ l: iX, p: px, pill: true, bg: x.R > 0 ? '#089981' : x.R < 0 ? '#f23645' : '#8a94a8', dy: (px > x.entry) ? -30 : 30, text: `Result: ${x.R > 0 ? 'win' : x.R < 0 ? 'loss' : 'break-even'} ${rTxt(x.R)}${x.exit ? ` · out after ${x.exit}` : ''}` });
       }
     }
     if (TV.ov) TV.ov.set(items);
@@ -8128,7 +8138,7 @@ function msNextSetup(bars, A) {
     if (!RV.raf) RV.raf = requestAnimationFrame(rvDraw);
     if (!show) { RV.strokes = []; return; }
     const ft = x.feat || {};
-    document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, ${x.t1 == null ? 'no fixed target (trend exit)' : `target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })}${x.rr != null ? ` (${x.rr}R)` : ''}`} · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}${(COUNCIL.anRev || {})[x.id] ? `<br><small>Analyst post-mortem: <b>${esc(COUNCIL.anRev[x.id].title)}</b> · ${esc(COUNCIL.anRev[x.id].text)}</small>` : ''}`;
+    document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, ${x.t1 == null ? 'no fixed target (trend exit)' : `target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })}${x.rr != null ? ` (${rrTxt(x.rr)})` : ''}`} · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}${(COUNCIL.anRev || {})[x.id] ? `<br><small>Analyst post-mortem: <b>${esc(COUNCIL.anRev[x.id].title)}</b> · ${mnTxt(esc(COUNCIL.anRev[x.id].text))}</small>` : ''}`;
     document.getElementById('ms-rv-tags').innerHTML = RV_TAGS.map(([t, n]) => `<button type="button" data-tag="${t}" aria-pressed="${RV.tags.has(t)}" class="${RV.tags.has(t) ? 'on' : ''}">${esc(n)}</button>`).join('');
     document.getElementById('ms-rv-text').value = r.text || ''; document.getElementById('ms-rv-lesson').value = r.lesson || '';
     document.getElementById('ms-rv-msg').textContent = r.at && !r.draft ? `Saved ${new Date(r.at * 1000).toLocaleString()}${r.by && r.by !== 'owner' ? ` by ${r.by}` : ''}` : '';
@@ -8315,7 +8325,7 @@ function msNextSetup(bars, A) {
     const tt = document.getElementById('ms-to-top');
     if (tt) { addEventListener('scroll', () => { tt.hidden = scrollY < 900; }, { passive: true }); tt.addEventListener('click', () => { scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); const m = document.getElementById('ms-main-start'); if (m) m.focus({ preventScroll: true }); }); }
     // what each Today figure means
-    const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
+    const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R, before costs', 'This week': 'Closed since Monday, in R, before costs (the This week pane counts after costs)', 'This month': 'Closed since the 1st, in R, before costs' };
     // perf (8 Nov): one pass per frame however many DOM changes arrive (the observer used to run on every mutation batch)
     // perf (9 Nov): live ticks rewrite the chart legends, countdowns and the header price several times a second; those changes can
     // never add a KPI, a scroll box or a "Loading…" label, so the page-wide observers below skip batches made only of them
@@ -8431,7 +8441,8 @@ function msNextSetup(bars, A) {
   const CPANE = { cur: 'overview' };
   try { const p0 = localStorage.getItem('msCpane'); if (CPANES.includes(p0)) CPANE.cur = p0; } catch (e) {}
   function setPane(p, push = true) {
-    if (!CPANES.includes(p) || (PUB && !CPUB.includes(p)) || VIEWER) p = 'overview';
+    // a viewer, and a member whose council permission is off, has the overview only (the other panes are hidden by CSS for them)
+    if (!CPANES.includes(p) || (PUB && !CPUB.includes(p)) || VIEWER || (!PUB && window.MS_PERMS && window.MS_PERMS.council === false)) p = 'overview';
     const changed = CPANE.cur !== p; CPANE.cur = p;
     try { localStorage.setItem('msCpane', p); } catch (e) {}
     CPANES.forEach((k) => { const el = document.getElementById('ms-cp-' + k), b = document.getElementById('ms-cn-' + k); if (el) el.hidden = k !== p; if (b) { b.setAttribute('aria-selected', String(k === p)); b.tabIndex = k === p ? 0 : -1; } });
@@ -8472,7 +8483,9 @@ function msNextSetup(bars, A) {
     if (v === 'mosha' && window.renderMosha) setTimeout(window.renderMosha, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
-    if (v === 'council') setPane(sub || CPANE.cur, false);
+    // a pane this account may not open (#council/trades for a viewer) shows the overview: the address says so too (12 Nov 2026;
+    // it kept the refused pane's name), as for a refused view above
+    if (v === 'council') { setPane(sub || CPANE.cur, false); if (sub && sub !== CPANE.cur && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + (CPANE.cur === 'overview' ? '#council' : '#council/' + CPANE.cur)); } catch (e) {} }
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     document.documentElement.dataset.view = v;
     if (PUB) { const btn = document.getElementById('ms-mk-btn'); if (btn && typeof INST !== 'undefined' && INST) { btn.textContent = v === 'charts' ? INST.label : 'XAU/USD'; btn.title = v === 'charts' ? `Market: ${INST.label} · ${INST.name} (click to change)` : 'Gold'; } }
@@ -10820,7 +10833,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-head p#ms-c-status { gap: 6px 10px; margin-top: 8px; font-size: 13px; }
 #v-council #ms-c-status .c-ok, #v-council #ms-c-status .c-warn, #v-council #ms-c-status .c-bad { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 999px; font: 600 12.5px var(--sans); }
 #v-council #ms-c-status .c-ok { color: color-mix(in srgb, var(--buy) 85%, var(--ink)); background: color-mix(in srgb, var(--buy) 11%, transparent); }
-#v-council #ms-c-status .c-warn { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council #ms-c-status .c-warn { color: var(--warn-ink); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }   /* the badge ink (12 Nov 2026): --c-warn on its own tint over the page's gradient was 4.1-4.5:1 in light */
 #v-council #ms-c-status .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
 #v-council #ms-c-status .c-meta { flex-basis: 100%; display: block; margin: 0; color: var(--ink-dim); font-size: 12.5px; }
 #v-council #ms-c-status .c-meta::before { content: none; }
@@ -11677,6 +11690,9 @@ html[data-role="public"] #v-charts::before { content: "Guest view: candles, your
 :is(#v-guest, .g-merged) .cal > :nth-child(7n+6):not(.cal-h):not(.win):not(.loss), :is(#v-guest, .g-merged) .cal > :nth-child(7n+7):not(.cal-h):not(.win):not(.loss) { opacity: 1; background: transparent; }
 :is(#v-guest, .g-merged) .cal .cal-d.fut .cn { opacity: 1; }
 :is(#v-guest, .g-merged) .cal .cal-d.fut:not(.today) .cn { color: var(--ink-faint); }
+/* a guest's calendar on a phone (12 Nov 2026): the day figure was 9.5 px; 12 px like the Council's, with the cell's inner padding
+   trimmed so six characters fit (calR writes a figure of 10R or more with fewer decimals) */
+@media (max-width: 560px) { :is(#v-guest, .g-merged) .cal { gap: 2px; } :is(#v-guest, .g-merged) .cal-d { padding-inline: 2px; } :is(#v-guest, .g-merged) .cal-d .cn { padding-left: 2px; font-size: 12px; } :is(#v-guest, .g-merged) .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.5px; font-variant-numeric: tabular-nums; } }
 :is(#v-guest, .g-merged) .cal-d.loss .cr { color: color-mix(in srgb, var(--sell-ink) 82%, var(--ink)); } :is(#v-guest, .g-merged) .cal-d.win .cr { color: color-mix(in srgb, var(--buy-ink) 82%, var(--ink)); }
 :is(#v-guest, .g-merged) .g-s-fl { margin-left: auto; font: 650 14px var(--sans); font-variant-numeric: tabular-nums; } :is(#v-guest, .g-merged) .g-s-fl.pos { color: var(--buy); } :is(#v-guest, .g-merged) .g-s-fl.neg { color: var(--sell); }
 :is(#v-guest, .g-merged) .g-s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
@@ -13608,7 +13624,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
       return r.json();
     }).then(function (j) { if (j) render(j); }).catch(function () { sum.textContent = 'Could not be loaded: no connection.'; });
   }
-  if (document.documentElement.dataset.role === 'public') return;
+  if (document.documentElement.dataset.role === 'public' || document.documentElement.dataset.role === 'viewer') return;   // the API answers the owner and reviewers only
   load(); setInterval(function () { if (!document.hidden) load(); }, 5 * 60e3);
 })();
 </script>
@@ -14085,9 +14101,9 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var tile = function (lbl, v, sub, isR) { var d = isR && num(v) && Math.abs(v) >= 0.005 ? '<i class="dir ' + (v > 0 ? 'up' : 'dn') + '" aria-hidden="true"></i>' : '';
       return '<div class="wk-tile"><small>' + lbl + '</small><b>' + d + (isR ? fR(v) : esc(v)) + '</b><span>' + sub + '</span></div>'; };
     var t1 = B.merLive, t2 = B.ictA, t3 = B.books.shadow;
-    $('ms-wk-tiles').innerHTML = tile('Meridian live, net', t1.n ? t1.net : 0, t1.n ? plural(t1.n, 'trade') + ' · ' + t1.w + 'W ' + t1.l + 'L · gross ' + fR(t1.R) : 'no closed trades', true)
-      + tile('ICT desk A-setups, net', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
-      + tile('Shadow book, net', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
+    $('ms-wk-tiles').innerHTML = tile('Meridian live, after costs', t1.n ? t1.net : 0, t1.n ? plural(t1.n, 'trade') + ' · ' + t1.w + 'W ' + t1.l + 'L · before costs ' + fR(t1.R) : 'no closed trades', true)
+      + tile('ICT desk A-setups, after costs', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
+      + tile('Shadow book, after costs', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
       + tile('Rule changes', String(nR.length), nR.length ? 'you ' + cnt.you + ' · Coach ' + cnt.coach + (cnt.fix ? ' · fixes ' + cnt.fix : '') : 'none this week', false);
     try { var pk = function (t) { return { n: t.n, net: t.n ? t.net : 0, w: t.w, l: t.l, rp: t.rp || 0 }; }; W.MS_WEEK_NOW = { title: $('ms-wk-title').textContent, live: pk(t1), ict: pk(t2), shadow: pk(t3), rules: nR.length }; document.dispatchEvent(new CustomEvent('ms:week')); } catch (e) {}   // the simple phone view's one sentence (#ms-ps-js)
   }
@@ -14494,7 +14510,7 @@ html[data-role="public"] .cx-tog { display: none !important; }
 #v-council :is(#ms-sleeve td small, .c-pane-research .c-t thead th small, #ms-cp-macro .md-mv-pct small) { font-size: 12px; }
 #v-council .c-kpi span { font-size: 12px; letter-spacing: .3px; }
 #v-council .cal b.neg, #v-council .cal b.pos { font-size: 12px; }
-@media (max-width: 560px) { #v-council .cal-d { padding-inline: 2px; } #v-council .cal-d .cn { padding-left: 2px; } #v-council .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.3px; font-variant-numeric: tabular-nums; } }   /* six characters in a 44 px day cell */
+@media (max-width: 560px) { #v-council .cal { gap: 2px; } #v-council .cal-d { padding-inline: 2px; } #v-council .cal-d .cn { padding-left: 2px; } #v-council .cal-d .cr { font: 600 12px var(--sans); letter-spacing: -.5px; font-variant-numeric: tabular-nums; } }   /* six characters in a day cell at 390 px (12 Nov 2026: "−9.87R" needed 39 px in a 38 px box; calR keeps every figure to six) */
 /* one column (phones, tablets): the Active trades list holds its place while the data loads, so the calendar under it does not
    jump down the screen when the trades land (layout shift 0.62 on a phone) */
 @media (max-width: 1000px) { #v-council #ms-active:empty { min-height: 80vh; } }
@@ -14665,7 +14681,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips) { display: none !important; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 

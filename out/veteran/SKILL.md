@@ -39,7 +39,7 @@ Lead with the conclusion, then evidence, mechanism, strongest counterargument, c
 
 ## Using the files
 
-Run the supplied `outputs/scripts/` commands from this folder; the original `outputs/` and `work/` paths are retained. Node.js 20+ is needed for the offline evaluators. Schema validation additionally needs the Ajv packages described in the guide. Dependencies, caches and the original Codex spreadsheet runtime are not bundled. Use the prebuilt workbook or an available verified spreadsheet engine for changes.
+Run the supplied `outputs/scripts/` commands from this folder; the original `outputs/` and `work/` paths are retained. Node.js 20+ is needed for the offline evaluators. Schema validation additionally needs the Ajv packages described in the guide. Dependencies, caches and the original assistant's spreadsheet runtime are not bundled. Use the prebuilt workbook or an available verified spreadsheet engine for changes.
 
 The `work/` tree includes one-time repair/registration programs, provisional leads, synthetic future rehearsals and failed access attempts. Read their purpose before execution; do not run all scripts or treat test-generated resolutions as real records. Current `outputs/` files are the main reference layer. Older delivery ZIPs are omitted as duplicates; their hashes are in the inventory. This standalone bundle includes the current library. Historical validator scripts that require an old ZIP need that separate original archive.
 
