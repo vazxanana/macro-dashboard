@@ -12230,7 +12230,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.14 · 37 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.14 · 37 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -12238,9 +12238,9 @@
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 273.23, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 273.51, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T17:36:49.000Z"
+    "at": "2026-11-12T17:38:52.000Z"
    }
   },
   "paused": {},
@@ -12267,23 +12267,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794505034": {
+    "orderId": "34022530",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.32311,
+    "stop": 1.32361,
+    "t1": 1.32213,
+    "placedAt": "2026-11-12T17:38:20.000Z",
+    "expires": "2026-11-12T20:37:14.000Z",
+    "riskCash": 1.99,
+    "margin": 7.94,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.14,
-  "lastRun": "2026-11-12T17:36:49.000Z"
+  "lastRun": "2026-11-12T17:38:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T12:53:11.000Z",
-   "msg": "moved GBPUSD 48503620 protection: stop 1.32854 -> 1.32855, target 1.3247 -> 1.32471 (council scalp)",
-   "trade": "gbpusd-scalp-1794417165"
-  },
-  {
-   "at": "2026-11-12T12:53:11.000Z",
-   "msg": "moved GBPUSD 48709438 protection: stop 1.328202 -> 1.328212, target 1.30022 -> 1.30023 (council position)",
-   "trade": "gbpusd-position-1794471647"
-  },
   {
    "at": "2026-11-12T12:53:11.000Z",
    "msg": "moved GBPUSD 48709449 protection: stop 1.328202 -> 1.328212, target 1.31385 -> 1.31386 (council swing)",
@@ -13773,6 +13783,16 @@
    "at": "2026-11-12T17:36:49.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 273.23, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T17:38:20.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 273.51, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T17:38:20.000Z",
+   "msg": "placed sell limit GBPUSD 0.03 lot at 1.32311 (council scalp, valid to 2026-11-12T20:37Z)",
+   "trade": "gbpusd-scalp-1794505034"
   }
  ],
  "limits": {
