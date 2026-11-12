@@ -763,3 +763,29 @@ test('simple phone view 2: the smoke test checks what each view leads with on th
   for (const t of ['the chart ends', 'Trades does not lead with the forward record', '"Which systems trade live" is not first', 'Research: open cards', 'This week does not lead with its sentence', 'Review does not lead with what is not reviewed', 'Scanner shows']) assert.ok(smoke.includes(t), t);
   assert.match(smoke, /const INNER = \{ '\/market-structure\.html': \['#charts', '#setup', '#council\/overview'/);
 });
+
+// ── Forward record of the live book (12 Nov 2026): the card on Council → Systems (council/forward.mjs, coach.json forward) ──
+const FW_HTML = src('market-structure.html');
+const FW_CSS = (() => { const m = /<style id="ms-fw-css">([\s\S]*?)<\/style>/.exec(FW_HTML); return m ? m[1] : ''; })();
+const FW_JS = (() => { const m = /<script id="ms-fw-js">([\s\S]*?)<\/script>/.exec(FW_HTML); return m ? m[1] : ''; })();
+
+test('forward card: admin only like its neighbours, right under "Which systems trade live", labelled as a proposal you have not adopted', () => {
+  const pane = FW_HTML.slice(FW_HTML.indexOf('id="ms-cp-systems"'), FW_HTML.indexOf('id="ms-cp-review"'));
+  assert.match(pane, /<div class="card adm" id="ms-sys-book">[\s\S]*?<\/div>\n      <div class="card c-fwd adm" id="ms-fwd">/);
+  assert.match(pane, /Proposed protocol · not adopted/); assert.match(pane, /your decision 43<\/a>, open/);
+  assert.match(pane, /changes no rule, size, stop, trade or mirror setting/);
+});
+
+test('forward card: every text at least 12 px and every colour a theme token (no hex), a word beside every colour', () => {
+  assert.ok(FW_CSS.length > 0 && FW_JS.length > 0);
+  for (const m of FW_CSS.matchAll(/font(?:-size)?:\s*(?:\d+\s+)?([\d.]+)px/g)) assert.ok(+m[1] >= 12, `font ${m[0]}`);
+  assert.doesNotMatch(FW_CSS, /#[0-9a-f]{3,6}\b/i, 'colours come from tokens');
+  assert.match(FW_CSS, /var\(--buy-ink\)/); assert.match(FW_CSS, /var\(--sell-ink\)/);
+  for (const w of ['Expected range, 5 % to 95 %', 'Middle of the range', 'Forward total, after costs', 'Stop lines S2 to S4']) assert.ok(FW_HTML.includes(w), w);
+  for (const w of ['Not reached', 'Crossed', 'Checked later', 'Passes', 'Fails', 'Not measurable yet']) assert.ok(FW_JS.includes(w), w);
+});
+
+test('forward card: an older coach.json with no forward field reads correctly, and the card fetches nothing', () => {
+  assert.match(FW_JS, /No reading yet: the first one comes with the next Coach rebuild \(every 6 hours\)\./);
+  assert.doesNotMatch(FW_JS, /fetch\(|msData/, 'reads the copy the page already loaded');
+});
