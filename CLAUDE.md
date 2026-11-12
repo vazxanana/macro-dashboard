@@ -1558,7 +1558,8 @@ browser and then put in the audit:
   (`#jump2` opens the same `#jumpdd` panel under the bar; no focus on touch, it threw the date picker up) are in More with Layers /
   Layout / Draw and View; a floating bar (grip 44 px) also sends Skip day into More (`#skipday2`). It was 30 × 32 px buttons,
   22 × 28 px speed pills, a More button cut to 16 px at 360 and a wrapped "Skip to the next day". A mouse on a narrow window keeps
-  the 32 px layout of pass 11. Not done: touch tablets wider than 640 px keep 32 px buttons.
+  the 32 px layout of pass 11. Touch tablets (done 12 Nov 2026, section "Touch tablets and the challenge log" below): a coarse
+  pointer gets 44 px toolbar controls at any width, and a touch chart card up to 860 px takes this phone row and More sheet.
 - **A challenge across switches, proven** (tests "challenge across switches (1) (2) (3)", audit 32): (1) switching away and back
   between steps is field-for-field the session that never switched, through the breach; (2) steps on any timeframe, forming
   candles included, equal the engine fed each step's own interval once; (3) against a session that never left its timeframe, one
@@ -1604,13 +1605,36 @@ event `ms:phone`, and "Phone view: Simple | Full" (`#ps-sw`) at the foot of the 
   148 → 49, cards 6 → 3 (Statistics 18 → 4), chart 439 → 592 px. Frame times on the phone profile (220 trades, 8 s each,
   2 runs before and after): p50 16.7 ms and p95 16.7-16.8 ms at 1x and at 12x on both; with 4x CPU throttle p50 16.7 ms,
   p95 33-50 ms on both. No change beyond noise.
-- Not done: the session form itself is still long on a first visit (the first-run card leads through it); the challenge log's
-  day table is still wider than a phone (as in Full); touch tablets keep the full page. The audit's older phone checks now run
+- Not done: the session form itself is still long on a first visit (the first-run card leads through it); touch tablets keep the
+  full page (with 44 px toolbar controls since 12 Nov 2026). The challenge log's day table fits a phone since 12 Nov 2026 (next
+  section), in Simple and Full alike. The audit's older phone checks now run
   in the simple view (the default) and all pass unchanged; Full is checked by section 34.
 - Tests: `tests/backtest-phone.test.mjs` (key and attribute, every rule scoped, folds point at real cards, the code only reads,
   link colour AA on light). Audit: section 34 (first screen, one-line cards, a quick Buy keeps its stop, the result line against
   the account's numbers, Journal in one tap, headlines, draft opens the Trade card, AA in three themes, Full and back, reload,
   wider than 640 px): 241 checks.
+
+Touch tablets and the challenge log (12 Nov 2026, quality round: the two items the phone passes left open; display only, no engine,
+order, stop or account code touched).
+- **44 px on touch at any width**: one `@media (pointer: coarse)` block with no container condition makes every replay toolbar
+  control 44 px (`.tb .ib`, the dropdown summaries, the speed pills, the floating grip, dropdown items and the jump field); inside it,
+  a touch chart card up to 1040 px drops the Layers / Layout / Draw labels to 44 px icons. The phone toolbar block now reads
+  `@media (pointer: coarse) { @container cc (max-width: 860px)` (it was 640) and starts with a copy of the narrow card's More layout
+  for touch cards of 641-860 px: one row (timeframe, undo, next, play, skip day, the time, More) and Speed, Jump, Chart tools and
+  View in the More sheet. A mouse keeps pass 11 (32 px; More from 640 px of card). New touch rules go there, never into the simple
+  view's block. Measured with touch emulation, before -> after: 768 x 1024 15 of 16 controls under 44 px -> 0 of 6 in the row and
+  0 in the sheet (all 44 px, sheet on screen); 1024 x 1366 (and 1024 x 768, 1366 x 1024) 16 of 17 under 44 px -> 0 of 17 in one
+  row, toolbar 958 px of 958, nothing past the card; a 44 px row without the change needed 752 px of 702 (768) and 969 of 958
+  (1024). Mouse at 600 and 1440 px and the 390 px phone: unchanged.
+- **The challenge log's day table** (`renderPF`): the table sits in `<div class="pflog-t" role="region" tabindex="0">`, which
+  scrolls sideways inside the card (`overflow-x: auto`); the Day column stays at the left edge (`position: sticky`, card
+  background) and money cells do not wrap; 12.5 px cells, 12 px heads (the page's generic `th` is 11 px). Written outside the
+  simple view's block, so Full gets it too. Before: a 541 px table cut off by the card at 360 / 390 / 430 px in both views (up to
+  267 px unreachable), 11 px heads; after: the box ends inside the card, scrolls 185-267 px, the day column at 0 px after a
+  scroll, 12 px minimum, AA 5.76:1 or better in dark / light / midnight, no sideways page.
+- Tests: `tests/backtest-phone.test.mjs` (two tests: the touch blocks, the mouse layout untouched, nothing in the simple view's
+  block; the table's box), `tests/backtest.test.mjs` (the phone block's new heading). Audit: section 35 (768 x 1024 and
+  1024 x 1366 touch, a 600 px mouse, the day table at 360 / 390 Full / 430): 247 checks.
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
