@@ -1,6 +1,6 @@
 // node --test tests/nq-open-r0.test.mjs — the NQ open-run management loop in council/trader.mjs measures R from |entry - stop|
 // on every Trader run, and the runner trail moves `stop`, so once the stop has trailed, the loop's "1R" is no longer the
-// opening risk (research/proposals/2026-11-12-nq-open-r0.md, docs/owner-decisions.md item 48). The loop is lifted from the
+// opening risk (research/proposals/2026-11-12-nq-open-r0.md, docs/owner-decisions.md item 49). The loop is lifted from the
 // trader's own text and run on hand-made one-minute candles; the "proposed" loop is the same text with the one-line change
 // of the proposal. Offline. Nothing here edits the trader: the proposal waits for the owner.
 import test from 'node:test';
@@ -14,7 +14,7 @@ const M1 = '    for (const r of openNq) {\n', M2 = '    if (NQ_ON.ny && ny.m >= 
 const LOOP = TRADER.slice(TRADER.indexOf(M1), TRADER.indexOf(M2));
 const OLD = "      const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);\n";
 // the proposal's change, word for word (research/proposals/2026-11-12-nq-open-r0.md, "The proposed diff")
-const NEW = "      // the OPENING risk (12 Nov 2026, item 48): the runner trail moves r.stop, so |entry - stop| is no longer 1R once it has moved\n"
+const NEW = "      // the OPENING risk (12 Nov 2026, item 49): the runner trail moves r.stop, so |entry - stop| is no longer 1R once it has moved\n"
   + "      if (!(r.r0 > 0)) r.r0 = r.trailMoved && r.tp1 != null ? Math.abs(r.tp1 - r.entry) / 2 : Math.abs(r.entry - r.stop);\n"
   + "      const s = r.side === 'sell', r0 = r.r0;\n";
 const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });

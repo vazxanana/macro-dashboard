@@ -1,5 +1,10 @@
 # The path to real money: what is left to improve, and how a forward test would be judged (12 Nov 2026)
 
+**Answered 12 Nov 2026.** The owner was shown items 43 to 46 and answered "Yes to all": the protocol of section 3 is adopted
+as written (stop lines in force from 12 Nov 2026; a crossed line sends the book back to a paper shadow, see
+`council/forward.mjs` `stopSwitch`), no further tests on this book's 2006-17 window, the bridges refuse a non-demo account,
+and paper and demo only until at least November 2027. The text below is the proposal as it was put.
+
 Paper research for the owner, after "now our edges, we need more improvement so we start make money" and "keep improving
 dont stop reach our goal". Nothing here changes a live rule, a size, a filter, a stop, `config.json`, any council member or
 any code that keeps the desk on paper and demo accounts. Nothing here recommends putting real money on the book now.
