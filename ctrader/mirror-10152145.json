@@ -12065,7 +12065,8 @@
     "t1": 72584.6,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 71599.9,
@@ -12080,9 +12081,10 @@
     "lagSec": 66,
     "positionId": "48915696",
     "volume": 1,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-12T16:00:58.000Z",
-    "brokerStop": 71119.07
+    "brokerStop": 71119.07,
+    "closedAt": "2026-11-12T23:23:51.000Z"
    },
    "usdchf-rscalp-1794499406": {
     "positionId": "48918012",
@@ -12387,7 +12389,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10088.41 · 5 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10083.6 · 4 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker",
@@ -12396,9 +12398,9 @@
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 268.79, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 270.15, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-12T23:21:57.000Z"
+    "at": "2026-11-12T23:23:51.000Z"
    }
   },
   "paused": {},
@@ -12428,20 +12430,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10088.41,
-  "lastRun": "2026-11-12T23:21:57.000Z"
+  "balance": 10083.6,
+  "lastRun": "2026-11-12T23:23:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T14:36:20.000Z",
-   "msg": "opened buy USDCAD 0.01 lot (council intraday)",
-   "trade": "usdcad-intraday-1794494117"
-  },
-  {
-   "at": "2026-11-12T14:38:46.000Z",
-   "msg": "limit filled: GBPUSD position 48848070 at the broker",
-   "trade": "gbpusd-scalp-1794494117"
-  },
   {
    "at": "2026-11-12T14:38:46.000Z",
    "msg": "USDCHF position 48837134 closed at the broker",
@@ -13930,6 +13922,16 @@
   {
    "at": "2026-11-12T23:21:57.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 268.79, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-12T23:23:51.000Z",
+   "msg": "BTCUSD position 48915696 closed at the broker",
+   "trade": "btc-rscalp-1794499192"
+  },
+  {
+   "at": "2026-11-12T23:23:51.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 270.15, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
   }
  ],
