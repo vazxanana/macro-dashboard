@@ -3104,11 +3104,25 @@ What was done, and the rules to keep:
   app script, which the browser still parses under the sign-in card; the five Mosha scripts (65 KB compressed) load for every
   visitor; fonts swap at about 1.5 s on this profile (a 0.04 shift on the owner's home); candles are 90 requests, 470 KB.
   Open for the writers' owners: a slim companion to `ict/replay.json` without the 72-candle `path` arrays (the sign-in card
-  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry; and ETag / 304 answers
-  from `/cdata` so an unchanged file costs no bytes on a refresh.
+  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry. ETag / 304 answers
+  from `/cdata`: done 12 Nov 2026 (section "/cdata conditional answers").
 - Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
+
+## /cdata conditional answers (12 Nov 2026)
+`api/data.js` answers conditional requests. Every 200 carries a strong `ETag` = `"<variant>-<sha256 of the exact bytes sent,
+base64url, 32 chars>"` (`etagOf`), variant `c` for the guest cut and `f` for a whole file (a member's copy of a guest file, a
+protected file, `mt5/signals.csv`), so a visitor's and a member's ETag for the same file can never be equal, even if the bytes
+were. `If-None-Match` (a list, `W/` prefixes and `*` accepted, the weak comparison of RFC 9110) that matches the ETag of what
+would be sent NOW gets `304` with no body and exactly the 200's headers (Cache-Control, Vary, CORS, Content-Type, ETag). The
+decision is made after the session check and the cut, so a member holding a visitor's ETag (or a visitor holding a member's,
+or the member mark without a valid session) never matches and gets the full answer of its own variant; errors (401, 404, 502,
+503) carry no ETag. No byte a visitor or a member receives changed, and no Cache-Control / Vary / CORS rule changed. HEAD gets
+the same headers. The broker bridges send no `If-None-Match` and get the csv as before. Note: the Desk's `msData` fetches with
+`cache: 'no-store'` and a per-minute `?v=`, and member answers are `private, no-store`, so the page itself does not revalidate
+yet; the gain is for clients that do (a browser's normal cache on a visitor's public answer, scripts). Making `msData`
+revalidate is a separate page change. Tests: `tests/cdata-etag.test.mjs`.
 
 ## Gold playbook study: the weekly-bull daily rejection long, out of its own sample (11 Nov 2026, owner: "keep improving and follow our strategy and learn more about it")
 `research/edge/gold-drd-long/` (PREREGISTRATION.md pushed first, then `run.mjs`, RESULT.md, result.json). The gold playbook
