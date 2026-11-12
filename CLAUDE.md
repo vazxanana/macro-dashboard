@@ -81,11 +81,12 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
-- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9 and 11 Nov).
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9, 11 and 12 Nov).
+- Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study, Gold carry (cost of holding a gold buy, 12 Nov). QA: Post-merge QA sweeps (9 and 11 Nov).
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-48 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-49 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -2223,6 +2224,28 @@ was found. Fixed:
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones; a calendar day of −10R or worse would not fit its cell at
   12 px on a 390 px phone; a viewer's `#council/<pane>` keeps the pane name in the address while the overview shows.
 
+## Post-merge QA sweep (12 Nov 2026, the ~20 PRs merged since 11 Nov 21:00 UTC, two sessions in parallel)
+Every page at 360 / 390 px (touch; simple view and Full view) and 1440 px, in dark / light / midnight, as owner, Fred, Orlando,
+Luxus, Carlos, a guest and signed out (stubbed /api/me, council-data from `origin/council-data`, the guest files cut by
+`api/_guestcut.js` as the server does). No page error, sideways scroll, cut-off view or dead in-page link; guests saw only
+main-system rows; the guest-cut lists match the page's `SYS_K` / `SYSG` (Mosha cycle included). Fixed (display / wiring only):
+- **Charts, simple view**: the market-cycle strip (`#ms-cycle`, #761) arrived 3.6 s after load between the timeframes and the
+  chart: the chart started at 390 px instead of 255 and the page shifted (CLS 0.11 a load). It now waits behind "More" with the
+  markup it reads (`.cycle` in the "More" rule; the button's label names it); the smoke test fails when it shows on a phone.
+  Desktop keeps the strip (a 0.03 shift when it arrives, left).
+- **The Mosha cycle's status line** (`#ms-rep-mcycle`, #763) sat inside the "Gold replica · paper shadow" card, folded on
+  phones: the only live system without a line in sight. It is now in "Which systems trade live".
+- **Live / shadow wording across the two sessions**: the Pairs card said "crypto trend (live paper)" (a shadow since 7 Nov);
+  the AI second opinion card (#760) said it studies "the seven edges" (it studies live trades; five of the seven are shadows).
+- **Viewers**: the browser Trader saved auto paper trades to a viewer's local journal and toasted "Trader saved … It's in your
+  journal" (Luxus on landing; viewers cannot open the Journal): `autoTrade` stands down when the Journal is denied. The analyst
+  card no longer calls `/api/edge-analyst` for a viewer (refused every 5 minutes). Toast titles use `--gold-ink` on light (1.8:1).
+- Seen, left: the week pane's "Meridian live" (council/alerts.mjs `alertable`: every non-shadow NQ paper session, after
+  costs, −0.41R on 5 this week) and Home's "this week" (main systems, before costs, −3.05R on 3) count different things under
+  similar words (a definition, not display); text under 12 px and 32-40 px controls on Setup, Scanner, Crypto, LIT and in the
+  header (older than these PRs); the first-visit gate-to-reload shift for members (one load); ChronosTrade's session form at
+  35 px on a phone's first visit. Tests: `tests/qa-sweep.test.mjs` ("QA 12 Nov", six tests), `scripts/audit/smoke.cjs`.
+
 ## Browser audits: false failures traced to their causes (11 Nov 2026)
 The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
 any audit change:
@@ -2699,6 +2722,29 @@ Before 12 Nov this section described a measurement against a PROPOSED protocol; 
   systems / pre-start excluded, E1-E5 on fake mirror and account files, carry, digest line, Trader and page wiring),
   `tests/ctrader-reconcile.test.mjs` (the owner-rule reason), `tests/qa-sweep.test.mjs` ("forward card": 3).
 
+## Gold carry: what a gold buy costs to hold, route by route (12 Nov 2026, item 46's "ask what your broker charges")
+`research/edge/gold-carry/` (PREREGISTRATION.md committed first; `run.mjs`, `rates.json`, `basis.json`, RESULT.md, result.json).
+Cost accounting only: **no rule tested** (item 44 holds), no rule, size, filter, stop, config, `FIN` or mirror setting changed.
+The owner's document is `research/proposals/2026-11-12-gold-carry.md` (decision: `docs/owner-decisions.md` item 49, open).
+- Each route is an annual rate charged per `nights` rollover (rate / 365, Wednesday three) on every unit of the supported
+  book's `legs.json`, taken off gross R; the supported-book study's own `positions` / `bookStats` are imported (not edited).
+  Gate: the `demo` route (`FIN.xau.long` x 365 = 5.40 %) reproduces supported-book x1F1 and `none` x1F0 exactly.
+- Untouched 2006-17, S2 (330 positions): demo CFD 5.40 % → +5.16R a year, t 1.86; IC Markets Raw 4.69 % → +5.39, t 1.94;
+  Afterprime 5.72 % → +5.05, t 1.83; Pepperstone UK 7.79 % → +4.37, t 1.60; micro gold futures 2.20 % + $2.12 a round trip
+  and a roll → +5.51, t 1.96 (8.1R of fees, about half the carry saved); GLDM counting the interest its cash would earn
+  3.98 % → +5.62, t 2.02. Break-even: t 2 at a flat 4.1 % a year. Holds: median 4 nights a position (Gold trend 12.5,
+  engulf 2). **Not a new verdict on the book** (the supported-book FAIL stands; a cost picked after seeing it proves nothing).
+- Futures carry measured from council-data `research/probe/cnbc-gc` (the files are `GCZ26`'s own prints, asked as `@GC.1`)
+  against OANDA spot, 198 weekdays of 2026: 3.6 % over the year (lease about 0 to June), 2.2 % over the last 20 days, 3.8 %
+  if the expiry is taken as 1 Dec: the late figure is fragile near expiry.
+- History rows use FRED `DGS2` from the council's `macro/cache.json` (the overnight rate before Aug 2025 and gold's lease
+  rate are not reachable from the build sandbox: FRED, Treasury, NY Fed, CME, broker and issuer hosts are refused); broker,
+  CME and ETF figures are web search summaries, each with source and date, pages not opened. One figure (DLSM, 0.34 %) is
+  below the cash rate and is listed, not relied on.
+- Why the paper cost stays `FIN`: it is what the demo account really pays, and protocol check E4 (item 43) compares the two.
+- To repeat: `node --use-env-proxy research/edge/gold-carry/run.mjs fetch`, then `node research/edge/gold-carry/run.mjs`.
+  Tests: `tests/gold-carry.test.mjs`.
+
 ## Mosha level reversal study (10 Nov 2026, owner: "This is how I was expecting Mosha to work")
 The owner showed a gold sell of that morning (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R, target reached). The live
 Mosha BO (H4 BO, H1 BO against, M15 BO back, weekly direction) is a different trade: it could not have taken it (wrong side, M15
@@ -3058,11 +3104,25 @@ What was done, and the rules to keep:
   app script, which the browser still parses under the sign-in card; the five Mosha scripts (65 KB compressed) load for every
   visitor; fonts swap at about 1.5 s on this profile (a 0.04 shift on the owner's home); candles are 90 requests, 470 KB.
   Open for the writers' owners: a slim companion to `ict/replay.json` without the 72-candle `path` arrays (the sign-in card
-  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry; and ETag / 304 answers
-  from `/cdata` so an unchanged file costs no bytes on a refresh.
+  needs `totals` only, the scoreboard and week report no paths), which also needs a `GUEST_OK` entry. ETag / 304 answers
+  from `/cdata`: done 12 Nov 2026 (section "/cdata conditional answers").
 - Tests: `tests/desk-load.test.mjs` (the helper with a fake fetch and clock, the build step, the wiring). The page smoke test
   fails when the Desk asks for a council-data file twice during a load or a signed-out visitor asks for a file outside the
   guest list, and has a fourth run, "phone, guest" (`ms-guest` set), since the sign-in card alone no longer runs the app.
+
+## /cdata conditional answers (12 Nov 2026)
+`api/data.js` answers conditional requests. Every 200 carries a strong `ETag` = `"<variant>-<sha256 of the exact bytes sent,
+base64url, 32 chars>"` (`etagOf`), variant `c` for the guest cut and `f` for a whole file (a member's copy of a guest file, a
+protected file, `mt5/signals.csv`), so a visitor's and a member's ETag for the same file can never be equal, even if the bytes
+were. `If-None-Match` (a list, `W/` prefixes and `*` accepted, the weak comparison of RFC 9110) that matches the ETag of what
+would be sent NOW gets `304` with no body and exactly the 200's headers (Cache-Control, Vary, CORS, Content-Type, ETag). The
+decision is made after the session check and the cut, so a member holding a visitor's ETag (or a visitor holding a member's,
+or the member mark without a valid session) never matches and gets the full answer of its own variant; errors (401, 404, 502,
+503) carry no ETag. No byte a visitor or a member receives changed, and no Cache-Control / Vary / CORS rule changed. HEAD gets
+the same headers. The broker bridges send no `If-None-Match` and get the csv as before. Note: the Desk's `msData` fetches with
+`cache: 'no-store'` and a per-minute `?v=`, and member answers are `private, no-store`, so the page itself does not revalidate
+yet; the gain is for clients that do (a browser's normal cache on a visitor's public answer, scripts). Making `msData`
+revalidate is a separate page change. Tests: `tests/cdata-etag.test.mjs`.
 
 ## Gold playbook study: the weekly-bull daily rejection long, out of its own sample (11 Nov 2026, owner: "keep improving and follow our strategy and learn more about it")
 `research/edge/gold-drd-long/` (PREREGISTRATION.md pushed first, then `run.mjs`, RESULT.md, result.json). The gold playbook
