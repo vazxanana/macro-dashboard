@@ -2912,7 +2912,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="ms-tog ms-tog-g">
             <div class="tog-g"><div class="tog-h">Meridian markup</div>
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
-            <label><input type="checkbox" id="ms-show-ibos" data-show="ibos" checked><i style="border-top:1px dotted #089981;height:0;border-radius:0"></i>Internal breaks (iBO / iChoCh)</label>
+            <label><input type="checkbox" id="ms-show-ibos" data-show="ibos" checked><i style="border-top:1px dotted #089981;height:0;border-radius:0"></i>Internal breaks (iBO)</label>
             <label><input type="checkbox" id="ms-show-hist" data-show="hist" checked><i style="border-top:1px dashed #f23645;height:0;border-radius:0"></i>Earlier breaks (BOS / ChoCh)</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
@@ -3979,9 +3979,9 @@ const VIEWER = document.documentElement.dataset.role === 'viewer';   // Orlando 
 // candle is left out of every structure reading, so a wick or a not-yet-closed body through a level never draws a BO, a ChoCh,
 // a VR or a moved extreme; it counts once that candle has closed beyond the level.
 function msClosedN(bars, sec, now, shift = 0) { let k = (bars || []).length; while (k > 0 && bars[k - 1].time - shift + sec > now) k--; return k; }
-// internal structure (iBO / iChoCh), display only (12 Nov 2026, owner's marked chart): on the same swings the chart labels
+// internal structure (iBO), display only (12 Nov 2026, owner's marked chart): on the same swings the chart labels
 // HH / HL / LH / LL (N candles a side, confirmed N candles later), every close beyond the last swing high or low that is not
-// broken yet is an internal break: with the internal trend = iBO, against it = iChoCh (that flips the internal trend).
+// broken yet is an internal break: every one an iBO with its direction (structure = it went against the previous internal break).
 // Closed candles only (closedN); a swing is used only once it is confirmed, and each swing is broken once.
 const MS_IPIV = 6;
 function msInternal(bars, closedN, N = MS_IPIV) {
@@ -4657,12 +4657,13 @@ function msNextSetup(bars, A) {
       const sell = e.dir < 0; items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: (sell ? Z.sell : Z.buy).line, w: 1, dash: true, text: e.structure ? 'ChoCh' : 'BOS', below: sell });
     });
     // internal breaks (12 Nov 2026, owner: "I'd like the iBOS as well", "I mean iBO", and a marked chart): every close beyond a
-    // labelled swing (msInternal, the chart's own HH / HL / LH / LL swings) over the whole loaded history; iBO = with the internal
-    // trend, iChoCh = the internal trend flipped. Thin dotted lines; a level the major structure already draws is skipped
+    // labelled swing (msInternal, the chart's own HH / HL / LH / LL swings) over the whole loaded history, every one an iBO with its
+    // direction: in Mosha's terms a break of an internal swing is an i.BO, never a ChoCh (the external structure keeps the bias).
+    // Thin dotted lines; a level the major structure already draws is skipped
     if (G.show.ibos !== false) {
       const major = new Set(A.events.map((e) => e.level));
       msInternal(bars, A.n || n, PIVOT).filter((e) => !major.has(e.level)).forEach((e) => {
-        const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: e.structure ? 'iChoCh' : 'iBO', below: sell });
+        const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: `iBO ${sell ? '▼' : '▲'}`, below: sell });
       });
     }
     evs.forEach((e, k) => {

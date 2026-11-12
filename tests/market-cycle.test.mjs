@@ -115,5 +115,5 @@ test('internal breaks: every close beyond a labelled swing, closed candles only,
   assert.equal(ev[0].fromIdx, 3); assert.equal(ev[0].breakIdx, 13);
   assert.equal(msInternal(B, 20, 2).length, 1, 'a candle past the closed count is never read');
   assert.match(html, /data-show="ibos" checked/); assert.match(html, /show: \{ bo: true, hist: true, ibos: true,/);
-  assert.match(html, /text: e\.structure \? 'iChoCh' : 'iBO'/); assert.match(html, /!major\.has\(e\.level\)/);
+  assert.match(html, /text: `iBO \$\{sell \? '▼' : '▲'\}`/); assert.doesNotMatch(html, /'iChoCh'/, 'an internal break is an i.BO, never a ChoCh (Mosha)'); assert.match(html, /!major\.has\(e\.level\)/);
 });
