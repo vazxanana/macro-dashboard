@@ -67,7 +67,7 @@ test('forward record against the honest band for its own n: above / below / insi
 test('gold systems: 2006-17 out of sample and 2018-26 match gold-systems-oos before financing and trend-breadth Part A after it', () => {
   const G = rdE('gold-systems-oos/result.json'), A = rdE('trend-breadth/result.json').partA;
   const partA = (k, w) => A.find((r) => r.sys === k && r.window.startsWith(w));
-  for (const [id, k] of [['gtrend', 'gtrend'], ['gtrend5', 'gtrend5'], ['gtl', 'gtl'], ['geg', 'geg']]) {
+  for (const [id, k] of [['gtl', 'gtl'], ['geg', 'geg']]) {
     const s = sys(id), o = G.systems[k].periods.oos.x1, c = G.systems[k].periods.cal.x1, a = partA(k, 'untouched'), a2 = partA(k, '2018-01');
     assert.equal(s.honest.n, o.n, `${id} oos n`); assert.equal(s.honest.n, a.n);
     near(s.honest.exp, a.afterF1, 0.0011, `${id} oos mean after financing`); near(s.honest.t, a.tF1, 0.011, `${id} oos t after financing`);
@@ -87,7 +87,30 @@ test('gold systems: 2006-17 out of sample and 2018-26 match gold-systems-oos bef
   assert.match(BASE.financing.notComputed, /NQ open run/); assert.doesNotMatch(BASE.financing.notComputed, /replica|Mosha|pullback/i); assert.equal(BASE.financing.rate, 0.000148);
   assert.deepEqual(BASE.financing.systems, ['gtrend', 'gtrend5', 'geg', 'gtl', 'replica', 'mosha-bo', 'gmp']);
   assert.deepEqual(BASE.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a'], 'live since 11 Nov: Gold trend, Gold daily engulf (and the separate ICT desk)');
-  near(sys('gtrend').honest.perYear, 75 / 11.5, 0.05, 'gtrend trades a year over the 11.5-year window');
+  near(sys('gtrend').honest.perYear, 74 / 11.5, 0.05, 'gtrend positions a year over the 11.5-year window');
+});
+// Since 12 Nov 2026 (owner approved docs/owner-decisions.md item 42) Gold trend and Gold trend fast pay financing on EVERY unit, the
+// add included: their figures are the book study's own (research/edge/supported-book/result.json, untouched 2006-17, per system),
+// built from its unit records (legs.json) through its position function: positions closed in the window, net of $0.30 a unit
+// and financing on each unit at its own entry price and risk.
+test('Gold trend and Gold trend fast: every unit charged, equal to the supported-book study per system; built-on window recomputed from the same units', async () => {
+  const SB = rdE('supported-book/result.json').windows.W1, { positions } = await import('../research/edge/supported-book/run.mjs'), L = rdE('supported-book/legs.json').units;
+  for (const [id, book] of [['gtrend', 'S2'], ['gtrend5', 'S3']]) {
+    const s = sys(id), b = SB[book].x1F1.bySystem[id];
+    assert.equal(s.honest.n, b.positions, `${id} positions`); near(s.honest.exp, b.perPosition, 0.0006, `${id} R a position after financing on every unit`); near(s.honest.t, b.tPosition, 0.006, `${id} t`);
+    near(s.honest.R, b.total, 0.051, `${id} total`); near(s.fin.perTrade * s.honest.n, b.financing, 0.06, `${id} financing over the window`);
+    assert.equal(s.fin.everyUnit, true); assert.equal(s.units, 'research/edge/supported-book/legs.json (every unit)');
+    near(s.fin.before.exp - s.fin.perTrade, s.honest.exp, 0.0011, `${id}: after = before less financing`);
+    // more than the first-unit charge of 11 Nov (the add pays too), never less
+    const A = rdE('trend-breadth/result.json').partA.find((r) => r.sys === id && r.window.startsWith('untouched')); assert.ok(s.fin.perTrade > A.fin, `${id}: every unit costs more than the first unit alone`);
+    const P = positions(L.filter((u) => u.sys === id)).filter((p) => p.day >= '2018-01-01' && p.day <= '2026-11-06');
+    assert.equal(s.builtOn.n, P.length); near(s.builtOn.exp, P.reduce((q, p) => q + p.n, 0) / P.length, 0.0011, `${id} built-on mean`);
+    assert.match(s.regime, /a position after financing on every unit on 2006-17/);
+  }
+  assert.deepEqual([sys('gtrend').honest.exp, sys('gtrend5').honest.exp], [0.313, 0.211], 'the figures item 42 gave the owner');
+  assert.deepEqual(BASE.financing.everyUnit, ['gtrend', 'gtrend5']);
+  // the daily engulf has no add: unchanged, and equal to the book study's per-system figure too
+  near(sys('geg').honest.exp, SB.S2.x1F1.bySystem.geg.perPosition, 0.0006, 'geg'); assert.equal(sys('geg').honest.n, SB.S2.x1F1.bySystem.geg.positions);
 });
 test('NQ open run: 2004-22 untouched and 2023-26 built on match research/edge/nq-open-oos result.json', () => {
   const N = rdE('nq-open-oos/result.json'), s = sys('nq-open');

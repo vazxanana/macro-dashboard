@@ -44,6 +44,16 @@ input double  InpMaxSlipR     = 0.5;     // a market signal is not taken if pric
 input int     InpSlippagePts  = 50;      // deviation in points for market orders
 
 CTrade trade;
+
+// Paper and demo only (absolute rule 2; owner, 12 Nov 2026, docs/owner-decisions.md item 45): this program refuses an account that
+// is not a demo (a real or contest account). Checked on start and right before every order it sends; on a refusal it says why and
+// removes itself without sending anything. ACCOUNT_TRADE_MODE is the platform's own account-type flag.
+bool DemoOnly() {
+  if (AccountInfoInteger(ACCOUNT_TRADE_MODE) == ACCOUNT_TRADE_MODE_DEMO) return true;
+  Print("CouncilBridge refused: account ", AccountInfoInteger(ACCOUNT_LOGIN), " is not a demo account (real or contest). This program runs on demo accounts only; it stops now and sends nothing.");
+  ExpertRemove();
+  return false;
+}
 string GV_PREFIX = "CB.";
 bool   g_blocked_forever = false;
 
@@ -217,6 +227,7 @@ void handle(Sig &s) {
     double px = priceNorm(sym, s.entry);
     if (s.validFor > 0 && nowT > s.opened + s.validFor) { gvSet("m." + s.id, 1); return; }
     datetime exp = s.validFor > 0 ? (datetime)(s.opened + s.validFor) : 0;
+    if (!DemoOnly()) return;
     bool ok = buy ? trade.BuyLimit(lots, px, sym, sl, tp, exp > 0 ? ORDER_TIME_SPECIFIED : ORDER_TIME_GTC, exp, s.id) : trade.SellLimit(lots, px, sym, sl, tp, exp > 0 ? ORDER_TIME_SPECIFIED : ORDER_TIME_GTC, exp, s.id);
     if (ok && trade.ResultOrder() > 0) { gvSet("t." + s.id, (double)trade.ResultOrder()); Print("CouncilBridge: limit ", s.side, " ", sym, " ", lots, " @ ", px, " ", s.id); }
     else { Print("CouncilBridge: limit failed ", s.id, " ", trade.ResultRetcodeDescription()); gvSet("m." + s.id, 1); }
@@ -230,6 +241,7 @@ void handle(Sig &s) {
     if (r0 <= 0 || MathAbs(px - s.entry) > InpMaxSlipR * r0) { gvSet("m." + s.id, 1); Print("CouncilBridge: price moved, skipped ", s.id); return; }
     if (buy ? sl >= px : sl <= px) { gvSet("m." + s.id, 1); return; }
     trade.SetDeviationInPoints(InpSlippagePts);
+    if (!DemoOnly()) return;
     bool ok = buy ? trade.Buy(lots, sym, 0, sl, tp, s.id) : trade.Sell(lots, sym, 0, sl, tp, s.id);
     if (ok && trade.ResultDeal() > 0) {
       // find the position opened by this deal
@@ -244,6 +256,7 @@ void handle(Sig &s) {
 
 //--- events ---------------------------------------------------------
 int OnInit() {
+  if (!DemoOnly()) return INIT_FAILED;
   trade.SetExpertMagicNumber(InpMagic); trade.SetDeviationInPoints(InpSlippagePts); trade.SetTypeFillingBySymbol(_Symbol);
   g_blocked_forever = gvGet("blockedForever") >= 1;
   EventSetTimer(MathMax(5, InpPollSec));
@@ -252,6 +265,7 @@ int OnInit() {
 }
 void OnDeinit(const int reason) { EventKillTimer(); }
 void OnTimer() {
+  if (!DemoOnly()) return;
   if (!TerminalInfoInteger(TERMINAL_CONNECTED)) return;
   guardsOk();   // evaluates the daily / max loss even when no signal is new
   Sig sigs[]; if (!fetchSignals(sigs)) return;
