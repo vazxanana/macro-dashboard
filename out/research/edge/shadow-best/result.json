@@ -1,0 +1,1537 @@
+{
+ "study": "shadow-best",
+ "title": "Which engine shadow streams are worth keeping",
+ "built": "2026-11-12",
+ "preregistration": "research/edge/shadow-best/PREREGISTRATION.md",
+ "system": "Engine shadow setups (scalp, intraday, rscalp, rintra) per market",
+ "verdict": "FAIL, 0 of 32 cells: no engine shadow stream is worth keeping",
+ "keep": [],
+ "rule": {
+  "minOosN": 100,
+  "minT": 2,
+  "alpha": 0.05
+ },
+ "windows": {
+  "IS": [
+   "2020-01",
+   "2023-12"
+  ],
+  "OOS": [
+   "2024-01",
+   "2026-10"
+  ]
+ },
+ "markets": {
+  "audusd": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 18260,
+   "openAtEnd": 4
+  },
+  "btc": {
+   "base": "5m",
+   "from": "2022-03-01",
+   "trades": 1942,
+   "openAtEnd": 1
+  },
+  "eth": {
+   "base": "5m",
+   "from": "2022-03-01",
+   "trades": 1809,
+   "openAtEnd": 1
+  },
+  "eurusd": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 16169,
+   "openAtEnd": 2
+  },
+  "gbpusd": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 16905,
+   "openAtEnd": 1
+  },
+  "sol": {
+   "base": "5m",
+   "from": "2022-03-01",
+   "trades": 2156,
+   "openAtEnd": 2
+  },
+  "usdcad": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 17839,
+   "openAtEnd": 2
+  },
+  "usdchf": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 16995,
+   "openAtEnd": 3
+  },
+  "xau": {
+   "base": "1m",
+   "from": "2020-01-01",
+   "trades": 14082,
+   "openAtEnd": 4
+  },
+  "xrp": {
+   "base": "5m",
+   "from": "2022-03-01",
+   "trades": 1578,
+   "openAtEnd": 0
+  }
+ },
+ "trades": 107735,
+ "family": {
+  "IS": {
+   "n": 61469,
+   "perTrade": -0.2266
+  },
+  "OOS": {
+   "n": 46266,
+   "perTrade": -0.2234
+  },
+  "ISgross": {
+   "n": 61469,
+   "perTrade": -0.0432
+  },
+  "OOSgross": {
+   "n": 46266,
+   "perTrade": -0.0373
+  }
+ },
+ "bothWindowsPositive": [],
+ "placebo": {
+  "runs": 40,
+  "totalKeeps": 0,
+  "partitionsWithKeep": 0,
+  "maxT": -0.291,
+  "meanBothPositive": 0,
+  "per": [
+   {
+    "j": 1,
+    "keeps": 0,
+    "maxT": -0.838,
+    "bothPos": 0
+   },
+   {
+    "j": 2,
+    "keeps": 0,
+    "maxT": -1.31,
+    "bothPos": 0
+   },
+   {
+    "j": 3,
+    "keeps": 0,
+    "maxT": -0.724,
+    "bothPos": 0
+   },
+   {
+    "j": 4,
+    "keeps": 0,
+    "maxT": -1.142,
+    "bothPos": 0
+   },
+   {
+    "j": 5,
+    "keeps": 0,
+    "maxT": -1.903,
+    "bothPos": 0
+   },
+   {
+    "j": 6,
+    "keeps": 0,
+    "maxT": -0.567,
+    "bothPos": 0
+   },
+   {
+    "j": 7,
+    "keeps": 0,
+    "maxT": -0.98,
+    "bothPos": 0
+   },
+   {
+    "j": 8,
+    "keeps": 0,
+    "maxT": -1.758,
+    "bothPos": 0
+   },
+   {
+    "j": 9,
+    "keeps": 0,
+    "maxT": -1.18,
+    "bothPos": 0
+   },
+   {
+    "j": 10,
+    "keeps": 0,
+    "maxT": -0.912,
+    "bothPos": 0
+   },
+   {
+    "j": 11,
+    "keeps": 0,
+    "maxT": -2.115,
+    "bothPos": 0
+   },
+   {
+    "j": 12,
+    "keeps": 0,
+    "maxT": -2.138,
+    "bothPos": 0
+   },
+   {
+    "j": 13,
+    "keeps": 0,
+    "maxT": -0.873,
+    "bothPos": 0
+   },
+   {
+    "j": 14,
+    "keeps": 0,
+    "maxT": -0.884,
+    "bothPos": 0
+   },
+   {
+    "j": 15,
+    "keeps": 0,
+    "maxT": -0.424,
+    "bothPos": 0
+   },
+   {
+    "j": 16,
+    "keeps": 0,
+    "maxT": -0.581,
+    "bothPos": 0
+   },
+   {
+    "j": 17,
+    "keeps": 0,
+    "maxT": -1.133,
+    "bothPos": 0
+   },
+   {
+    "j": 18,
+    "keeps": 0,
+    "maxT": -0.321,
+    "bothPos": 0
+   },
+   {
+    "j": 19,
+    "keeps": 0,
+    "maxT": -1.189,
+    "bothPos": 0
+   },
+   {
+    "j": 20,
+    "keeps": 0,
+    "maxT": -1.101,
+    "bothPos": 0
+   },
+   {
+    "j": 21,
+    "keeps": 0,
+    "maxT": -1.444,
+    "bothPos": 0
+   },
+   {
+    "j": 22,
+    "keeps": 0,
+    "maxT": -0.358,
+    "bothPos": 0
+   },
+   {
+    "j": 23,
+    "keeps": 0,
+    "maxT": -1.418,
+    "bothPos": 0
+   },
+   {
+    "j": 24,
+    "keeps": 0,
+    "maxT": -0.902,
+    "bothPos": 0
+   },
+   {
+    "j": 25,
+    "keeps": 0,
+    "maxT": -1.078,
+    "bothPos": 0
+   },
+   {
+    "j": 26,
+    "keeps": 0,
+    "maxT": -1.382,
+    "bothPos": 0
+   },
+   {
+    "j": 27,
+    "keeps": 0,
+    "maxT": -1.761,
+    "bothPos": 0
+   },
+   {
+    "j": 28,
+    "keeps": 0,
+    "maxT": -1.122,
+    "bothPos": 0
+   },
+   {
+    "j": 29,
+    "keeps": 0,
+    "maxT": -0.879,
+    "bothPos": 0
+   },
+   {
+    "j": 30,
+    "keeps": 0,
+    "maxT": -1.674,
+    "bothPos": 0
+   },
+   {
+    "j": 31,
+    "keeps": 0,
+    "maxT": -1.82,
+    "bothPos": 0
+   },
+   {
+    "j": 32,
+    "keeps": 0,
+    "maxT": -0.912,
+    "bothPos": 0
+   },
+   {
+    "j": 33,
+    "keeps": 0,
+    "maxT": -2.107,
+    "bothPos": 0
+   },
+   {
+    "j": 34,
+    "keeps": 0,
+    "maxT": -0.291,
+    "bothPos": 0
+   },
+   {
+    "j": 35,
+    "keeps": 0,
+    "maxT": -1.477,
+    "bothPos": 0
+   },
+   {
+    "j": 36,
+    "keeps": 0,
+    "maxT": -0.999,
+    "bothPos": 0
+   },
+   {
+    "j": 37,
+    "keeps": 0,
+    "maxT": -0.866,
+    "bothPos": 0
+   },
+   {
+    "j": 38,
+    "keeps": 0,
+    "maxT": -0.779,
+    "bothPos": 0
+   },
+   {
+    "j": 39,
+    "keeps": 0,
+    "maxT": -0.796,
+    "bothPos": 0
+   },
+   {
+    "j": 40,
+    "keeps": 0,
+    "maxT": -0.574,
+    "bothPos": 0
+   }
+  ]
+ },
+ "cells": [
+  {
+   "k": "scalp",
+   "m": "xau",
+   "IS": {
+    "n": 4191,
+    "net": -0.2658,
+    "gross": -0.0578,
+    "total": -1113.919,
+    "months": 48,
+    "t": -7.604,
+    "p": 1
+   },
+   "OOS": {
+    "n": 3310,
+    "net": -0.1018,
+    "gross": 0.0216,
+    "total": -337.009,
+    "months": 34,
+    "t": -2.435,
+    "p": 0.9898
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "xau",
+   "IS": {
+    "n": 901,
+    "net": -0.0991,
+    "gross": -0.0034,
+    "total": -89.301,
+    "months": 48,
+    "t": -1.29,
+    "p": 0.8983
+   },
+   "OOS": {
+    "n": 725,
+    "net": -0.0317,
+    "gross": 0.0235,
+    "total": -22.962,
+    "months": 34,
+    "t": -0.387,
+    "p": 0.6496
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "xau",
+   "IS": {
+    "n": 2215,
+    "net": -0.2481,
+    "gross": -0.03,
+    "total": -549.503,
+    "months": 48,
+    "t": -8.344,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1832,
+    "net": -0.2486,
+    "gross": -0.11,
+    "total": -455.382,
+    "months": 34,
+    "t": -7.33,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "xau",
+   "IS": {
+    "n": 484,
+    "net": -0.1214,
+    "gross": -0.0111,
+    "total": -58.736,
+    "months": 48,
+    "t": -1.784,
+    "p": 0.9595
+   },
+   "OOS": {
+    "n": 424,
+    "net": 0.0141,
+    "gross": 0.0745,
+    "total": 5.964,
+    "months": 34,
+    "t": 0.139,
+    "p": 0.4451
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": true,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "scalp",
+   "m": "eurusd",
+   "IS": {
+    "n": 5174,
+    "net": -0.2209,
+    "gross": -0.0105,
+    "total": -1143.186,
+    "months": 48,
+    "t": -6.578,
+    "p": 1
+   },
+   "OOS": {
+    "n": 3499,
+    "net": -0.2849,
+    "gross": -0.0523,
+    "total": -996.978,
+    "months": 34,
+    "t": -7.382,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "eurusd",
+   "IS": {
+    "n": 1193,
+    "net": -0.242,
+    "gross": -0.1468,
+    "total": -288.69,
+    "months": 48,
+    "t": -4.295,
+    "p": 1
+   },
+   "OOS": {
+    "n": 757,
+    "net": -0.166,
+    "gross": -0.057,
+    "total": -125.657,
+    "months": 34,
+    "t": -1.985,
+    "p": 0.9722
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "eurusd",
+   "IS": {
+    "n": 2675,
+    "net": -0.2341,
+    "gross": -0.0121,
+    "total": -626.217,
+    "months": 48,
+    "t": -8.961,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1797,
+    "net": -0.2858,
+    "gross": -0.0488,
+    "total": -513.527,
+    "months": 34,
+    "t": -8.466,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "eurusd",
+   "IS": {
+    "n": 656,
+    "net": -0.1345,
+    "gross": -0.012,
+    "total": -88.248,
+    "months": 48,
+    "t": -2.92,
+    "p": 0.9973
+   },
+   "OOS": {
+    "n": 418,
+    "net": -0.1697,
+    "gross": -0.0337,
+    "total": -70.932,
+    "months": 34,
+    "t": -2.523,
+    "p": 0.9917
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "scalp",
+   "m": "gbpusd",
+   "IS": {
+    "n": 5131,
+    "net": -0.2026,
+    "gross": -0.0338,
+    "total": -1039.481,
+    "months": 48,
+    "t": -6.914,
+    "p": 1
+   },
+   "OOS": {
+    "n": 3643,
+    "net": -0.2678,
+    "gross": -0.0616,
+    "total": -975.747,
+    "months": 34,
+    "t": -7.035,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "gbpusd",
+   "IS": {
+    "n": 1252,
+    "net": -0.1419,
+    "gross": -0.0744,
+    "total": -177.631,
+    "months": 48,
+    "t": -2.449,
+    "p": 0.9909
+   },
+   "OOS": {
+    "n": 837,
+    "net": -0.1315,
+    "gross": -0.0462,
+    "total": -110.052,
+    "months": 34,
+    "t": -1.942,
+    "p": 0.9696
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "gbpusd",
+   "IS": {
+    "n": 2855,
+    "net": -0.1902,
+    "gross": -0.0002,
+    "total": -543.136,
+    "months": 48,
+    "t": -5.593,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1991,
+    "net": -0.2171,
+    "gross": 0.0147,
+    "total": -432.228,
+    "months": 34,
+    "t": -4.733,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "gbpusd",
+   "IS": {
+    "n": 750,
+    "net": -0.0954,
+    "gross": -0.0038,
+    "total": -71.527,
+    "months": 48,
+    "t": -1.869,
+    "p": 0.9661
+   },
+   "OOS": {
+    "n": 446,
+    "net": -0.0757,
+    "gross": 0.0423,
+    "total": -33.768,
+    "months": 34,
+    "t": -1.265,
+    "p": 0.8926
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "scalp",
+   "m": "audusd",
+   "IS": {
+    "n": 5900,
+    "net": -0.3071,
+    "gross": -0.0906,
+    "total": -1812.148,
+    "months": 48,
+    "t": -11.877,
+    "p": 1
+   },
+   "OOS": {
+    "n": 4096,
+    "net": -0.3027,
+    "gross": -0.0533,
+    "total": -1239.893,
+    "months": 34,
+    "t": -7.149,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "audusd",
+   "IS": {
+    "n": 1308,
+    "net": -0.1898,
+    "gross": -0.0948,
+    "total": -248.246,
+    "months": 48,
+    "t": -3.421,
+    "p": 0.9994
+   },
+   "OOS": {
+    "n": 850,
+    "net": -0.1083,
+    "gross": 0.0129,
+    "total": -92.051,
+    "months": 34,
+    "t": -1.599,
+    "p": 0.9404
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "audusd",
+   "IS": {
+    "n": 2936,
+    "net": -0.2407,
+    "gross": -0.003,
+    "total": -706.569,
+    "months": 48,
+    "t": -8.133,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1973,
+    "net": -0.287,
+    "gross": -0.019,
+    "total": -566.169,
+    "months": 34,
+    "t": -10.162,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "audusd",
+   "IS": {
+    "n": 748,
+    "net": -0.1158,
+    "gross": 0.0113,
+    "total": -86.584,
+    "months": 48,
+    "t": -2.639,
+    "p": 0.9944
+   },
+   "OOS": {
+    "n": 449,
+    "net": -0.2357,
+    "gross": -0.0731,
+    "total": -105.817,
+    "months": 34,
+    "t": -3.421,
+    "p": 0.9992
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "scalp",
+   "m": "usdcad",
+   "IS": {
+    "n": 5694,
+    "net": -0.2581,
+    "gross": -0.0646,
+    "total": -1469.676,
+    "months": 48,
+    "t": -10.596,
+    "p": 1
+   },
+   "OOS": {
+    "n": 3943,
+    "net": -0.3004,
+    "gross": -0.0656,
+    "total": -1184.545,
+    "months": 34,
+    "t": -8.593,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "usdcad",
+   "IS": {
+    "n": 1270,
+    "net": -0.1677,
+    "gross": -0.0881,
+    "total": -212.921,
+    "months": 48,
+    "t": -2.967,
+    "p": 0.9976
+   },
+   "OOS": {
+    "n": 870,
+    "net": -0.1213,
+    "gross": -0.0085,
+    "total": -105.52,
+    "months": 34,
+    "t": -1.854,
+    "p": 0.9636
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "usdcad",
+   "IS": {
+    "n": 2931,
+    "net": -0.2246,
+    "gross": -0.0072,
+    "total": -658.245,
+    "months": 48,
+    "t": -8.116,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1967,
+    "net": -0.2423,
+    "gross": 0.022,
+    "total": -476.605,
+    "months": 34,
+    "t": -6.974,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "usdcad",
+   "IS": {
+    "n": 694,
+    "net": -0.1673,
+    "gross": -0.0379,
+    "total": -116.097,
+    "months": 48,
+    "t": -2.855,
+    "p": 0.9968
+   },
+   "OOS": {
+    "n": 470,
+    "net": -0.1865,
+    "gross": -0.0362,
+    "total": -87.652,
+    "months": 34,
+    "t": -2.619,
+    "p": 0.9934
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "scalp",
+   "m": "usdchf",
+   "IS": {
+    "n": 5405,
+    "net": -0.3285,
+    "gross": -0.1042,
+    "total": -1775.414,
+    "months": 48,
+    "t": -12.831,
+    "p": 1
+   },
+   "OOS": {
+    "n": 3732,
+    "net": -0.3136,
+    "gross": -0.0736,
+    "total": -1170.349,
+    "months": 34,
+    "t": -8.102,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "usdchf",
+   "IS": {
+    "n": 1290,
+    "net": -0.1485,
+    "gross": -0.0455,
+    "total": -191.573,
+    "months": 48,
+    "t": -2.625,
+    "p": 0.9942
+   },
+   "OOS": {
+    "n": 860,
+    "net": -0.144,
+    "gross": -0.0243,
+    "total": -123.882,
+    "months": 34,
+    "t": -1.556,
+    "p": 0.9353
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rscalp",
+   "m": "usdchf",
+   "IS": {
+    "n": 2774,
+    "net": -0.2563,
+    "gross": -0.0106,
+    "total": -710.895,
+    "months": 48,
+    "t": -8.819,
+    "p": 1
+   },
+   "OOS": {
+    "n": 1898,
+    "net": -0.2611,
+    "gross": -0.0027,
+    "total": -495.495,
+    "months": 34,
+    "t": -8.201,
+    "p": 1
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "usdchf",
+   "IS": {
+    "n": 612,
+    "net": -0.1956,
+    "gross": -0.0481,
+    "total": -119.736,
+    "months": 48,
+    "t": -3.193,
+    "p": 0.9987
+   },
+   "OOS": {
+    "n": 424,
+    "net": -0.2328,
+    "gross": -0.0817,
+    "total": -98.716,
+    "months": 34,
+    "t": -3.67,
+    "p": 0.9996
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "btc",
+   "IS": {
+    "n": 360,
+    "net": 0.002,
+    "gross": 0.0489,
+    "total": 0.707,
+    "months": 48,
+    "t": 0.016,
+    "p": 0.4935
+   },
+   "OOS": {
+    "n": 884,
+    "net": -0.1471,
+    "gross": -0.0772,
+    "total": -130.034,
+    "months": 34,
+    "t": -1.676,
+    "p": 0.9484
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": true,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "btc",
+   "IS": {
+    "n": 174,
+    "net": -0.091,
+    "gross": -0.0248,
+    "total": -15.833,
+    "months": 48,
+    "t": -0.896,
+    "p": 0.8125
+   },
+   "OOS": {
+    "n": 524,
+    "net": -0.1714,
+    "gross": -0.0796,
+    "total": -89.805,
+    "months": 34,
+    "t": -3.626,
+    "p": 0.9995
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "eth",
+   "IS": {
+    "n": 378,
+    "net": 0.0789,
+    "gross": 0.1192,
+    "total": 29.839,
+    "months": 48,
+    "t": 0.949,
+    "p": 0.1737
+   },
+   "OOS": {
+    "n": 751,
+    "net": -0.0402,
+    "gross": 0.0033,
+    "total": -30.168,
+    "months": 34,
+    "t": -0.489,
+    "p": 0.6859
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": true,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "eth",
+   "IS": {
+    "n": 235,
+    "net": -0.143,
+    "gross": -0.0858,
+    "total": -33.614,
+    "months": 48,
+    "t": -1.767,
+    "p": 0.9582
+   },
+   "OOS": {
+    "n": 445,
+    "net": -0.0865,
+    "gross": -0.0336,
+    "total": -38.485,
+    "months": 34,
+    "t": -1.437,
+    "p": 0.9199
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "sol",
+   "IS": {
+    "n": 502,
+    "net": -0.0495,
+    "gross": -0.0235,
+    "total": -24.826,
+    "months": 48,
+    "t": -0.661,
+    "p": 0.7441
+   },
+   "OOS": {
+    "n": 885,
+    "net": -0.1264,
+    "gross": -0.0886,
+    "total": -111.831,
+    "months": 34,
+    "t": -2.097,
+    "p": 0.9781
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "sol",
+   "IS": {
+    "n": 254,
+    "net": -0.1018,
+    "gross": -0.0669,
+    "total": -25.85,
+    "months": 48,
+    "t": -1.374,
+    "p": 0.9121
+   },
+   "OOS": {
+    "n": 515,
+    "net": -0.1067,
+    "gross": -0.0595,
+    "total": -54.949,
+    "months": 34,
+    "t": -2.634,
+    "p": 0.9936
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "intraday",
+   "m": "xrp",
+   "IS": {
+    "n": 332,
+    "net": 0.1258,
+    "gross": 0.1616,
+    "total": 41.752,
+    "months": 48,
+    "t": 0.678,
+    "p": 0.2505
+   },
+   "OOS": {
+    "n": 630,
+    "net": -0.0841,
+    "gross": -0.0404,
+    "total": -53.007,
+    "months": 34,
+    "t": -1.023,
+    "p": 0.8431
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": true,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  },
+  {
+   "k": "rintra",
+   "m": "xrp",
+   "IS": {
+    "n": 195,
+    "net": -0.0188,
+    "gross": 0.0339,
+    "total": -3.673,
+    "months": 48,
+    "t": -0.168,
+    "p": 0.5665
+   },
+   "OOS": {
+    "n": 421,
+    "net": -0.0337,
+    "gross": 0.0219,
+    "total": -14.193,
+    "months": 34,
+    "t": -0.583,
+    "p": 0.7179
+   },
+   "holmP": 1,
+   "checks": {
+    "isPos": false,
+    "oosPos": false,
+    "oosN": true,
+    "oosT": false,
+    "holm": false
+   },
+   "failed": [
+    "isPos",
+    "oosPos",
+    "oosT",
+    "holm"
+   ],
+   "keep": false
+  }
+ ]
+}

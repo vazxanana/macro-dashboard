@@ -32,6 +32,7 @@ import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';
 import { readJson, writeAtomic } from './jsonio.mjs';
+import { dropShadow, FAMILY as CUT_FAMILY } from './shadow-cut.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -330,6 +331,14 @@ const USER_RULES = [
   { id: 'mosha-cycle', apply: (c) => { c.moshaCycle = true; },
     change: "Gold: the Mosha cycle trades as a main paper system: H4 move, H1 ChoCh = the pullback starts, M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme); limit at the broken level, stop past its origin",
     why: "Owner, 11 Nov: 'H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot', chosen as a main system. Not a tested edge: the mechanical studies of this cycle (mosha-retrace break-even, mosha-cycle -0.22R) did not pass; this is the owner's call, judged on its forward record." },
+  // 12 Nov 2026 (owner: "filter the best shadows", "yes apply the cut when it's done"): research/edge/shadow-best tested
+  // every (setup, market) stream of the four engine setups on 2020-26 net of costs: 0 of 32 kept (31 of 32 negative
+  // out of sample; a random placebo keeps none either). So no NEW shadow signal of scalp, intraday, rscalp or rintra is
+  // recorded on any market (council/shadow-cut.mjs). Trades already open or pending run to their exits with their stops.
+  // Off-switch: a user rule setting c.shadowCut = null; a stream comes back only through a new pre-registered study.
+  { id: 'shadow-best', apply: (c) => { c.shadowCut = { setups: CUT_FAMILY.slice(), keep: [], since: Math.floor(Date.now() / 1000), study: 'research/edge/shadow-best' }; },
+    change: 'Shadow cut (owner): new shadow signals of Scalp, Intraday, Retrace scalp and Retrace intraday are no longer recorded on any market; open and pending ones run to their exits',
+    why: 'research/edge/shadow-best (pre-registered, 12 Nov): 32 (setup, market) streams on 2020-26, net of costs: none positive in both 2020-23 and 2024-26 with t >= 2 (0 kept; placebo 0). The family: -0.227R a trade in sample (n 61,469), -0.223R out of sample (n 46,266); about -0.04R before costs, so the loss is the cost of many small trades.' },
   // 11 Nov, owner on the edge review's decisions (research/proposals/2026-11-11-edge-review.md): "yes anything that is better for the
   // system and that applies it". Three rules, nothing wider.
   // (1) The live paper book is Gold trend (20-day) and Gold daily engulf only. The gold replica, the momentum pullback (a test
@@ -1269,6 +1278,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // 12 Nov 2026 (owner approved, "count duplicates once"): two setups giving the SAME order this round (same market, side,
       // second, entry, stop and target; council/dedupe.mjs) record it once: the second (or the shadow one, when the other is
       // live) is kept with status 'duplicate' + dupOf, never managed, alerted, copied or counted. Other targets stay two trades.
+      // shadow cut (owner, 12 Nov 2026; council/shadow-cut.mjs): a shadow signal of an engine setup whose (setup, market)
+      // stream did not pass research/edge/shadow-best is not recorded; live trades and the kept streams are
+      if (dropShadow(config.shadowCut, t.k, key, tr.shadow)) { const d = (snapshot.shadowCut = snapshot.shadowCut || { dropped: {} }).dropped; d[t.k] = (d[t.k] || 0) + 1; continue; }
       recordOnce(trades, tr, now);
       trades.push(tr);
     }
