@@ -965,8 +965,8 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   even, `mosha-cycle` -0.22R a trade), and there is no study to measure its forward record against, so it has no row in the
   edge-decay and "What to expect" cards (the cards say so) and it is not part of the forward-test book of item 43. Its own
   forward record is what will judge it.
-- **To undo.** Ask for it to become a paper shadow. Unlike the systems of item 37, its block in the Trader does not read the
-  council's `ownerShadow` setting yet, so that takes a small Trader change plus an owner rule (not done: you chose to keep it).
+- **To undo.** Ask for it to become a paper shadow: an owner rule adding `mcycle` to the council's `ownerShadow` setting, as for
+  the systems of item 37 (since pull request #780 its block in the Trader reads that setting; nothing changes until you ask).
 
 ## The cost of holding a gold buy, 12 Nov 2026
 
