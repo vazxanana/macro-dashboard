@@ -129,7 +129,8 @@ test('the four decisions are on record as items 43 to 46, answered by the owner 
   const at = (n) => heads.find((m) => +m[2] === n);
   for (const n of [43, 44, 45, 46]) { assert.ok(at(n), `item ${n}`); assert.equal(at(n)[1], 'x', `item ${n} is answered`); }
   assert.match(at(43)[3], /forward-test protocol/); assert.match(at(44)[3], /Stop testing/); assert.match(at(45)[3], /bridge programs refuse/); assert.match(at(46)[3], /keep the paper-and-demo rule/);
-  const tail = doc.slice(doc.indexOf('## The path to real money, 12 Nov 2026'));
+  // the section of items 43-48 only (later sections, e.g. item 49 of 12 Nov 2026, have their own status)
+  const from = doc.indexOf('## The path to real money, 12 Nov 2026'), next = doc.indexOf('\n## ', from + 5), tail = doc.slice(from, next < 0 ? undefined : next);
   assert.equal((tail.match(/\*\*Status \(12 Nov 2026\): (adopted|agreed|approved and done)\.\*\* Your words: "Yes to all" \(option \(a\)/g) || []).length, 4);
   assert.doesNotMatch(tail, /\*\*Status \(12 Nov 2026\): open\.\*\*/);
   assert.match(tail, new RegExp(`${J.gates.ddStop}R`)); assert.match(tail, /-9\.7R after 12 months, -12\.0R after 24 or -12\.1R after 36/);

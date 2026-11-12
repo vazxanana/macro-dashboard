@@ -34,6 +34,8 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
     being recorded and copied to the demo shadow account.
 11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
     loop free to run.
+12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
+    keeps the demo broker's rate and the comparison waits for the November 2027 review.
 
 Answered on 12 Nov 2026 ("Yes to all"), nothing more needed from you: items 42 to 47 and the new item 48 (the Mosha cycle stays
 a main paper system). The forward-test protocol (item 43) is now in force: if one of its stop lines is crossed, Gold trend and
@@ -45,7 +47,7 @@ Grouped: **Security** (1-8 and 26; 7, 8 and 26 are Fred's connector), **Trading 
 and data** (15-16), **Council proposals the study already answered** (17-18), **The research candle clock** (19-25),
 **Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, 40 open, 41
 answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov
-2026** (43-48, all answered on 12 Nov).
+2026** (43-48, all answered on 12 Nov), **The cost of holding a gold buy, 12 Nov 2026** (49, open).
 
 ---
 
@@ -965,3 +967,32 @@ Nothing was changed: no rule, size, filter, stop, setting, and no code that keep
   forward record is what will judge it.
 - **To undo.** Ask for it to become a paper shadow: an owner rule adding `mcycle` to the council's `ownerShadow` setting, as for
   the systems of item 37 (since pull request #780 its block in the Trader reads that setting; nothing changes until you ask).
+
+## The cost of holding a gold buy, 12 Nov 2026
+
+From `research/proposals/2026-11-12-gold-carry.md` and the pre-registered study `research/edge/gold-carry`, the comparison
+item 46 asked for: what a gold buy costs to hold overnight at the demo broker, at other brokers, as micro gold futures and as
+an ETF, and what the paper book's figures are at each. Nothing was changed: no rule, size, filter, stop, setting, cost
+figure or demo-mirror setting.
+
+### [ ] 49. Keep the paper book's holding cost at the demo broker's rate; pick a future broker partly by its gold overnight charge
+
+- **Status (12 Nov 2026): open.**
+- **Context.** Holding a gold buy costs 5.4 % a year at the demo broker (it charges about 1.5 points over the dollar's
+  overnight rate). In a September 2026 survey of 32 retail accounts every one charged a gold buy; the three named sit at
+  4.7 % (IC Markets Raw), 5.7 % (Afterprime) and 7.8 % (Pepperstone UK). Micro gold futures carried about 3.6 % a year over
+  2026 and about 2.2 % in the last four weeks (uncertain, up to 3.8 %), plus about $2 a contract each way and a roll every
+  two months. A gold ETF costs 0.1-0.4 % on the statement, about 4 % counting the interest its cash no longer earns. On
+  2006-17 the book makes +5.2R a year (t 1.86) at the demo rate, +5.4R (t 1.94) at IC Markets', +5.5R (t 1.96) as futures
+  with their fees, +5.6R (t 2.02) as an ETF counted honestly: the route is worth a third to a half of an R a year, not a
+  proven book. The paper cost model is the charge the demo account really pays, and the forward-test protocol's check E4
+  (item 43) compares the two. Broker, CME and ETF figures come from web search summaries (pages not opened, dated in the
+  study); one MGC contract (10 ounces) risks about $390 to $1,360 at today's stops.
+- **Options.** (a) Keep the demo broker's rate as the paper cost (no change), and write into item 46's November 2027 review
+  that a broker is chosen partly by its gold overnight charge: about 4.7 % a year or less, or micro gold futures if the
+  account is large enough for 10-ounce contracts. (b) Charge the paper book a cheaper route's rate now. (c) Move the demo
+  mirror to another broker or to futures now.
+- **Recommended.** (a). (b) would make the paper record look better than the demo account that copies it and break check
+  E4; (c) saves at most about 0.7 point a year for a new setup, and futures contracts are too large for the account.
+- **If nothing is decided.** Nothing changes: the paper book keeps the demo rate, and the comparison stays on file for the
+  2027 review.

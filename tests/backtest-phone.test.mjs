@@ -89,3 +89,35 @@ test('the view\'s link colour passes AA on the light panel (the accent itself is
   assert.ok(ratio(m[1], '#ffffff') >= 4.6, ratio(m[1], '#ffffff').toFixed(2));
   const blk = css.slice(css.indexOf('/* Simple phone view (11 Nov 2026, owner')); assert.ok(!/[^-]color: var\(--accent\)/.test(blk), 'no text of the view uses the bare accent');
 });
+
+// 12 Nov 2026: the two items the phone pass left open. Touch tablets wider than 640 px kept 32 px toolbar buttons, and the
+// challenge log's day table was wider than a phone (541 px, cut off at 360 / 390 / 430 in both phone views). Measured in a
+// browser (768 x 1024 and 1024 x 1366 touch: every toolbar control 44 px, nothing past the chart card); pinned here on the text.
+test('touch at any width: 44 px toolbar controls; a touch card up to 860 px takes the phone row and the More sheet; a mouse keeps 32 px', () => {
+  const at = css.indexOf('Touch tablets (12 Nov 2026)'); assert.ok(at > 0);
+  const top = rules(css.slice(at, css.indexOf('/* Simple phone view (11 Nov 2026, owner')));
+  const any = top.find(([sel, body]) => sel === '@media (pointer: coarse)' && /\.tb \.ib, \.tb \.dd > summary\.ib \{ width: 44px; height: 44px; min-height: 44px; \}/.test(body)); assert.ok(any, 'one touch block with no container condition: any width');
+  assert.match(any[1], /\.tb \.speed button \{ min-width: 44px; min-height: 44px; \}/); assert.match(any[1], /\.tb \.ddp button, \.tb \.ddp label, \.tb \.jumpp \.jump input, \.tb \.jumpp \.jump \.btn\.sm \{ min-height: 44px !important; \}/);
+  assert.match(any[1], /@container cc \(max-width: 1040px\) \{ \.tb \.il span \{ display: none; \} \.tb \.dd > summary\.ib\.il \{ width: 44px;/, 'labels give way before the row runs out (44 px icons, not the 32 px of a mouse)');
+  const row = top.find(([sel, body]) => sel === '@media (pointer: coarse)' && /@container cc \(max-width: 860px\)/.test(body)); assert.ok(row, 'the phone row and More sheet reach touch cards up to 860 px');
+  const inner = rules(row[1])[0][1];
+  for (const r of [/\.tb \.tb-morebtn \{ display: inline-grid; margin-left: auto; \}/, /\.tb-ovf \{ display: none; \}/, /\.tb\.more-open \.tb-ovf \{ display: flex;/, /\.tb \.tb-rp \.speed, \.tb #jumpdd > summary \{ display: none; \}/, /\.tb #skipday \{ display: inline-grid; \}/]) assert.match(inner, r);
+  // the mouse layout of pass 11 is untouched: its 32 px rule and its 640 px More query are still there, outside any touch block
+  assert.match(css, /\.tb \.ib, \.tb \.dd > summary\.ib \{ width: 32px; height: 32px; min-height: 32px; padding: 0; \}/);
+  assert.match(css, /\n  @container cc \(max-width: 640px\) \{ \.tb \.now \{ display: none; \} \.tb \.tb-morebtn \{ display: inline-grid; margin-left: auto; \}/);
+  // no touch rule of the toolbar landed in the simple view's block, and none of them is text under 12 px
+  const ps = css.slice(css.indexOf('/* Simple phone view (11 Nov 2026, owner')); assert.ok(!/pointer: coarse/.test(ps));
+  for (const m of (any[1] + row[1]).matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) assert.ok(+m[1] >= 12, m[0]);
+});
+
+test('the challenge log\'s day table scrolls inside its own box at phone width, the day held at the left, 12 px at least, in both phone views', () => {
+  assert.match(html, /<div class="pflog-t" role="region" aria-label="Challenge log, day by day" tabindex="0"><table><thead><tr><th>Day<\/th>/);
+  assert.match(html, /No bars yet\.<\/td><\/tr>'\}<\/tbody><\/table><\/div>`\); \}/, 'the box closes around the whole table');
+  assert.match(css, /\.pflog-t \{ overflow-x: auto; overscroll-behavior-x: contain; max-width: 100%;/);
+  assert.match(css, /\.pflog-t :is\(th, td\):first-child \{ position: sticky; left: 0; z-index: 1; background: var\(--panel\); \}/);
+  assert.match(css, /\.pflog-t table \{ font-size: 12\.5px; \} \.pflog-t th \{ font-size: 12px; \}/, 'the generic th is 11 px: not in this table');
+  assert.match(css, /\.pflog-t:focus-visible \{ outline: 2px solid var\(--accent\);/, 'a keyboard can scroll it and sees where it is');
+  // written outside the simple view's block, so the Full view on a phone gets it too
+  const at = css.indexOf('/* Simple phone view (11 Nov 2026, owner'); assert.ok(css.indexOf('.pflog-t {') > 0 && css.indexOf('.pflog-t {') < at);
+  assert.ok(!css.slice(at).includes('pflog-t'));
+});
