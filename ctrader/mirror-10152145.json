@@ -5811,8 +5811,8 @@
     "status": "open",
     "openedAt": "2026-11-10T17:54:35.000Z",
     "councilEntry": 0.68544,
-    "stop": 0.6932507,
-    "t1": 0.6696686,
+    "stop": 0.6934707,
+    "t1": 0.6698886,
     "riskCash": 7.86,
     "margin": 1.37,
     "minLot": true,
@@ -5829,8 +5829,8 @@
     "stopCheckedAt": "2026-11-10T17:54:35.000Z",
     "brokerStop": 0.69331,
     "rr": 2,
-    "amended": 6,
-    "amendedAt": "2026-11-12T08:54:36.000Z"
+    "amended": 7,
+    "amendedAt": "2026-11-12T08:59:21.000Z"
    },
    "gbpusd-rscalp-1794334972": {
     "symbol": "GBPUSD",
@@ -9634,8 +9634,8 @@
     "setup": "intraday",
     "openedAt": "2026-11-12T05:32:29.000Z",
     "councilEntry": 0.68348,
-    "stop": 0.68487,
-    "t1": 0.68055,
+    "stop": 0.68509,
+    "t1": 0.68077,
     "adopted": false,
     "alerted": [
      "open",
@@ -9655,8 +9655,8 @@
     "volume": 100000,
     "status": "open",
     "rr": 2,
-    "amended": 6,
-    "amendedAt": "2026-11-12T08:54:36.000Z"
+    "amended": 7,
+    "amendedAt": "2026-11-12T08:59:21.000Z"
    },
    "xau-scalp-1794462771": {
     "symbol": "XAUUSD",
@@ -10182,8 +10182,8 @@
     "status": "open",
     "openedAt": "2026-11-12T08:39:46.000Z",
     "councilEntry": 0.68194,
-    "stop": 0.68241,
-    "t1": 0.68085,
+    "stop": 0.68263,
+    "t1": 0.68107,
     "riskCash": 1.96,
     "margin": 4.09,
     "shadow": true,
@@ -10199,8 +10199,8 @@
     "stopCheckedAt": "2026-11-12T08:39:46.000Z",
     "brokerStop": 0.68245,
     "rr": 2.12,
-    "amended": 2,
-    "amendedAt": "2026-11-12T08:54:36.000Z"
+    "amended": 3,
+    "amendedAt": "2026-11-12T08:59:21.000Z"
    },
    "audusd-intraday-1794473600": {
     "symbol": "AUDUSD",
@@ -10212,7 +10212,8 @@
     "t1": 0.68088,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.68192,
@@ -10226,9 +10227,13 @@
     "lagSec": 76,
     "positionId": "48719632",
     "volume": 300000,
-    "status": "open",
+    "status": "closed by council",
     "stopCheckedAt": "2026-11-12T08:54:36.000Z",
-    "brokerStop": 0.68244
+    "brokerStop": 0.68244,
+    "closedAt": "2026-11-12T08:59:21.000Z",
+    "exitPrice": 0.68225,
+    "councilExit": null,
+    "councilR": 0
    }
   },
   "day": {
@@ -10236,7 +10241,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9859.49 · 32 open",
+  "status": "ok · demo Fusion Markets · balance 9859.49 · 31 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker",
@@ -10249,29 +10254,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9859.49,
-  "lastRun": "2026-11-12T08:57:21.000Z"
+  "lastRun": "2026-11-12T08:59:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T15:16:33.000Z",
-   "msg": "moved USDCAD 48333306 protection: stop 1.41838 -> 1.41785, target 1.4278 -> 1.42727 (council intraday)",
-   "trade": "usdcad-intraday-1794379562"
-  },
-  {
-   "at": "2026-11-11T15:16:33.000Z",
-   "msg": "moved USDCAD 48445193 protection: stop 1.4235 -> 1.42297, target 1.42866 -> 1.42813 (council scalp)",
-   "trade": "usdcad-scalp-1794407102"
-  },
-  {
-   "at": "2026-11-11T15:16:33.000Z",
-   "msg": "moved USDCAD 48457580 protection: stop 1.42546 -> 1.42493, target 1.422005 -> 1.421475 (council rscalp)",
-   "trade": "usdcad-rscalp-1794408898"
-  },
-  {
-   "at": "2026-11-11T15:16:33.000Z",
-   "msg": "moved USDCAD 48467224 protection: stop 1.42377 -> 1.42324, target 1.42853 -> 1.428 (council intraday)",
-   "trade": "usdcad-intraday-1794409920"
-  },
   {
    "at": "2026-11-11T15:23:43.000Z",
    "msg": "closed GBPUSD position 48440625 (council: loss)",
@@ -11751,6 +11736,26 @@
    "at": "2026-11-12T08:57:21.000Z",
    "msg": "moved USDCAD 48613819 protection: stop 1.42533 -> 1.42484, target 1.42797 -> 1.42748 (council intraday)",
    "trade": "usdcad-intraday-1794449923"
+  },
+  {
+   "at": "2026-11-12T08:59:21.000Z",
+   "msg": "closed AUDUSD position 48719632 (council: cancelled)",
+   "trade": "audusd-intraday-1794473600"
+  },
+  {
+   "at": "2026-11-12T08:59:21.000Z",
+   "msg": "moved AUDUSD 48181010 protection: stop 0.6932507 -> 0.6934707, target 0.6696686 -> 0.6698886 (council swing)",
+   "trade": "audusd-swing-1794333208"
+  },
+  {
+   "at": "2026-11-12T08:59:21.000Z",
+   "msg": "moved AUDUSD 48659864 protection: stop 0.68487 -> 0.68509, target 0.68055 -> 0.68077 (council intraday)",
+   "trade": "audusd-intraday-1794461258"
+  },
+  {
+   "at": "2026-11-12T08:59:21.000Z",
+   "msg": "moved AUDUSD 48715812 protection: stop 0.68241 -> 0.68263, target 0.68085 -> 0.68107 (council scalp)",
+   "trade": "audusd-scalp-1794472705"
   }
  ],
  "limits": {
