@@ -1,5 +1,6 @@
 #!/bin/sh
-# Vercel build (vercel.json buildCommand must stay under 256 characters, so the steps live here).
+# Builds out/. Run it locally and commit out/ (CI fails when out/ is stale). Vercel no longer runs it:
+# vercel.json buildCommand only checks out/ exists and serves the committed copy (12 Nov 2026, build minutes cost).
 set -e
 mkdir -p out/macro
 cp -r market-structure.html gold-trading.html manifest.json app.webmanifest sw.js offline.html icon-192.png icon-512.png icons robots.txt assets out/

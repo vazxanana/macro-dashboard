@@ -719,7 +719,7 @@ the chart started at 314 px and ended 110 px under the tab bar, now 255 px and a
   landing on a hash still paints Home for a frame before the router shows the view (seen while measuring, not the fold).
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
-`vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
+`vercel.json` (since 12 Nov 2026 Vercel does NOT build: it serves the committed `out/`, which CI's build job checks against `sh scripts/build.sh`; the build cost about $60 of $99 over 7-12 Nov. Never put the build back into `buildCommand`; `/macro-dashboard/*` rewritten to the root so index.html's asset paths
 work, `/gold`, `/macro-desk`, `/backtest`, `/cdata`, `/md/*`, `/api/mcp/<key>` rewrites, no-cache on HTML). The first stage's
 `api/kick.js` (Vercel crons dispatching the GitHub workflows) is gone: the crons now call `api/run.js` directly (below) and
 `/api/alert-cron`; `CRON_SECRET` guards them (compared in constant time); never commit it. GitHub Pages keeps deploying in
