@@ -3746,7 +3746,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T14:22:18.000Z",
     "councilEntry": 3908.45,
     "stop": 3879.5,
@@ -3761,10 +3761,12 @@
     "slipR": -0.086,
     "lagSec": 63,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T14:22:18.000Z",
-    "brokerStop": 3877
+    "brokerStop": 3877,
+    "closedAt": "2026-11-12T14:57:29.000Z"
    }
   },
   "day": {
@@ -3772,7 +3774,7 @@
    "startBalance": 5543.45
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5503.43 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 5472.03 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -3780,15 +3782,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5503.43,
-  "lastRun": "2026-11-12T14:55:05.000Z"
+  "balance": 5472.03,
+  "lastRun": "2026-11-12T14:57:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T08:24:26.000Z",
-   "msg": "SOLUSD position 47940898 closed at the broker",
-   "trade": "sol-replica-1794283567-b"
-  },
   {
    "at": "2026-11-10T08:31:06.000Z",
    "msg": "GBPUSD position 47954205 closed at the broker",
@@ -5282,6 +5279,11 @@
   {
    "at": "2026-11-12T14:22:18.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794493275-b"
+  },
+  {
+   "at": "2026-11-12T14:57:29.000Z",
+   "msg": "XAUUSD position 48837187 closed at the broker",
    "trade": "xau-replica-1794493275-b"
   }
  ],
