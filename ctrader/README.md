@@ -1,5 +1,7 @@
 # cTrader bridge (CouncilBridge.cs) — IC Markets or any cTrader broker
 
+**Demo accounts only (12 Nov 2026, owner decision 45).** Every program in this folder checks the platform's own account-type flag (`Account.IsLive`) when it starts and again right before every order it sends. On a real account it prints why in the log and stops itself (`Stop()`) without sending anything.
+
 Same behaviour as the MT5 Expert Advisor (`mt5/README.md`): it polls `mt5/signals.csv` on the council-data branch
 every 30 s and mirrors the council's paper trades (gold replica, Mosha BO, crypto trend, their adds) with the same
 prop-firm guards (daily loss stop, max-drawdown floor, open-risk cap) and the same sizing (risk % of equity per
