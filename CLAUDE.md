@@ -70,7 +70,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
-  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
+  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets.
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
@@ -78,7 +78,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
-- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
+- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, One feed per market (12 Nov), Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
@@ -87,7 +87,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-52 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-53 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -824,7 +824,7 @@ forex): 249 of 9,230 rows changed, R_none −131 → −182R; most gap R is the 
 Shadow audit (8 Nov, `research/edge/shadow-audit`): the shadow book's −300R week was costs, not trading (+92.6R gross; 300R of Kraken fees on
 139 crypto scalps). One repair: `council/repairs.mjs` `voidM30Twins` gives the 29 pre-dedupe m30m1 copies of Scalp entries status
 `duplicate` (`dupOf`, `void`; no tally counts that status). Near-stop market fills (the engine's stop floor is checked on the planned entry,
-not the fill) is a proposal for the owner. Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
+not the fill): done 12 Nov 2026, section "Near-stop market fills". Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
 paper trades pay the costs study's CFD round trip (0.04% of price, `CFD_CRYPTO` in `council/fills.mjs`) instead of Kraken spot fees.
 Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also carries overnight financing on gold longs, `FIN` / `financing`, section "Supported book, financing".) `manageLive` / `addUnit` / `expireOrder` / `sizeR` in fills.mjs are the Trader's
 "Manage open trades" step for one candle as pure functions (trail, beAt, maxHold, pyramid add included), used by that replay;
@@ -843,6 +843,58 @@ not studied) and the page (`risk0`: Active trades, the trade table's live R, the
 Open for the owner (item 51): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
 side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
 
+## Forex spreads: a raw-spread account, measured (12 Nov 2026, owner approved the cost-measurement fix)
+council-data `ctrader/symbols.json` showed `spread: 0` on EUR/USD, GBP/USD, AUD/USD (and at times USD/CAD, USD/CHF), so
+`council/fills.mjs` charged its assumed 1-pip default. **Cause: not a decoding bug.** The demo (Fusion Markets) is a raw-spread
+account: its majors are quoted bid = ask on 93-99 % of the reads of 8-12 Nov outside the rollover (GBP/USD 83-89 %), and wide
+only at the 17:00 New York rollover (USD/CAD and USD/CHF exactly 2.0 pips there, which the file then showed). The cost is a
+commission: `commissionType` 1 = USD per million USD of notional, a side, 22.5 on forex and 12 on gold (`preciseTradingCommissionRate`
+/ 1e8), matching the demo's own deals (0.07 lot EUR/USD paid 0.34 a round trip). The mirror's demo fills of every account
+confirm it: forex fills sit 0.0-0.1 pip from the council's (OANDA mid) entry, median 0 (n 61-81 a pair).
+- `council/ctrader-symbols.mjs` `spreadFields`: `spread` is only ever POSITIVE: measured this run (`spreadSrc 'measured'`), else
+  the last positive one kept up to `SPREAD_KEEP_DAYS` 7 with its own `spreadAt` (`'kept'`), else null (`'default'`); an old file's
+  0 is never carried. `quoteSpread` / `quoteSpreadAt` = this run's ask - bid as quoted (0 allowed). `spreadLog` = the last 300
+  fresh reads (14 days, zeros included) and `spreadTypical { n, median, mean, zeroShare, from, to }` over reads outside 21:00-22:59
+  UTC (`rolloverHour`). `commissionRT` = round trip as a fraction of the price (type 1 only; 0 where none; null for another type).
+- `council/fills.mjs` `costModel`: quoted spread = `spreadTypical.median` once `MIN_QUOTES` 20 reads exist (a median of 0 only
+  when the commission is known), else a positive broker spread, else the default; **a 0 from anywhere else is missing**
+  (`tradeCost` too). The commission (`commissionRT x entry`) is charged on top. Slippage stays half a spread, of the DEFAULT
+  spread when the quoted one is 0 (assumed, not measured: no exit-slippage evidence is read yet). Entry slippage reads every
+  demo account's fills (`mirrorMaps`: mirror.json + the files in `mirror-accounts.json`; before, the council account only, which
+  holds no forex). `src` / a trade's `costSrc` name the basis: `quotes | broker | default`, then `+commission`, `+mirror`.
+- **Effect** (report only; `costR` is stamped once at the close and no stored trade was recosted): the shadow book's forex trades
+  closed 9-12 Nov (265, +41.26R gross) carry 65.10R of stamped cost; the measured model gives 33.85R (0.246R → 0.128R a trade, a
+  5-pip scalp pays about 0.6 pip instead of 2), so net −23.8R would read about +7.4R. Gold moves little (live: 3 trades 0.09R →
+  0.02R; shadow 1.59R → 1.42R: median spread $0.06 + $0.09 commission instead of the last single read).
+- Left as it was, on purpose: the mirror's stop-inside-the-spread guard reads `spread` (now the last positive, often the nightly
+  rollover read: more conservative, never a looser stop); the page's broker table shows "—" for a null spread. After deploy the
+  quote median needs about 20 rounds (~4 h) before it is used; until then a kept rollover spread or the default applies.
+- Tests: `tests/forex-spread.test.mjs` (5, on `tests/fixtures/ctrader/symbols-raw-12nov.json`: the real 12 Nov file and every
+  distinct quote of 8-12 Nov), `tests/ctrader-symbols.test.mjs` (bid = ask, kept, 7-day limit, commission). The pinned
+  `tests/fixtures/ctrader/symbols.json` is unchanged.
+
+## Near-stop market fills (12 Nov 2026, owner approved: docs/owner-decisions.md item 53, fix 2 of the week review)
+The engine (`buildSetup` / `buildRetrace`) widens every planned stop to the minimum stop `max(CFG.minRisk x ATR(14) of the
+lower timeframe, 5 spreads)` from the PLANNED entry; a READY setup the Trader takes at market (price through the entry, or
+`config.entry[k] === 'market'`) used to fill at the price of the moment whatever its distance to the stop (9-12 Nov: 7 fills
+within half the planned risk, an AUD/USD buy 0.4 pip above its stop booked about -6R after costs).
+- `council/fills.mjs`: `atrN` (= engine `atr` = review `atrOf`), `minStopDist(bars, spread, minRisk)` (the engine's floor),
+  `fillCheck(side, px, stop, t1, floor)` -> `'past-stop'` / `'past-target'` / `NEAR_STOP` (`'fill-near-stop'`, distance under
+  the floor; a fill exactly at the floor opens) / null, `fillCheckText`.
+- Trader, "Take new Ready setups", the `if (mkt)` step: the floor from `src[def.l].bars`, `spreadOf(M, price)`, `CFG.minRisk`
+  (the same inputs the engine used a moment before). A refused fill is pushed as `status: 'skipped'`, `reason`, `fillPx` (the
+  price it would have filled at), `minStop`, `closed: now`, `R: 0`, the planned entry and the stop untouched, NO `filled`,
+  `r0` or `drift` (a past-stop / past-target skip is now the same; before, it carried the fill time and price). An opened fill
+  now stamps `r0` (the opening risk) at once. `state.seen` already holds the signal, so it is not taken again.
+- Replay (`council/backtest.mjs`): the market fill at the signal and the `@mkt` twin use the same `fillCheck` (refused = no row).
+- Never a trade: tallies count win / loss / be only (`DONE` in fills / digest / decay / book, the page's `done`), `forward.mjs`
+  leaves `skipped` out of the book, the mirror copies only open / pending, the edge analyst and the Desk's chart markers skip
+  it; the page shows it as "Skipped". `fidelity.mjs` names the reason.
+- Before the change (council-data of 12 Nov, `minRisk` as it stood at each trade from config history, ATR from `ctx.atr`):
+  65 of 332 recorded engine market fills inside the floor (2 live, 2-3 Nov; the rest shadow), +10.2R before costs, -28.9R
+  after; since 9 Nov 33, +1.7R / -18.6R. Stored trades were not rewritten.
+- Tests: `tests/near-stop-fill.test.mjs` (lifts the Trader's market-fill block as text and runs it; the engine's floor
+  formula is pinned there, so a change to it must change `minStopDist` too).
 ## One order, recorded once (12 Nov 2026, owner approved: "count duplicates once")
 Plumbing only: no entry rule, filter, size, stop, exit or pinned block changed. Two setup keys built on shared structure can
 give the SAME order in one round; it was recorded and counted twice. `council/dedupe.mjs` (pure) defines an **exact duplicate**:
@@ -3338,6 +3390,39 @@ live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`test
   take a day past its budget by that one call's difference; two INSTANCES writing `cost.json` at the same moment can still
   lose a reservation (the store's documented limit; the cron runs every 10 min with a 120 s limit); `ACADEMY_LLM_STOP=1` does
   not stop this feature (`llmEnv` replaces it; only `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` do).
+
+## One feed per market (12 Nov 2026, plumbing fix, owner approved)
+council-data 9-12 Nov: the Trader's gold / forex candle feed flipped OANDA -> Kraken -> OANDA for a few minutes at a time (189
+switch events in the trade notes: gold 43, AUD/USD 35, USD/CAD 35, EUR/USD 31, GBP/USD 25, USD/CHF 20; 112 on 12 Nov alone; gold's 21
+Kraken episodes lasted 3 minutes in the median, 24 at most). The 8 Nov hysteresis (`feedDecision`) fell to Kraken on the 2nd
+missed read and went back on the 1st good one, and every switch re-based every open position's stop / target / 2R mark by a
+one-minute basis between two feeds (`requoteMarket`): 914 re-base notes on 107 trades, 435 of them loosening the stop, 38 shadow
+orders cancelled and 19 re-quotes; the 12 Nov Gold daily engulf took 18 re-bases (stop ended 3893.955 against the rule's 3895.27,
+$1.32 looser) and its demo copy 18 amends; the H4 trendline's stop ended 4053.235 against 4054.72 while its broker stop sat at
+4055.22. 100 demo copies of re-based trades took 727 amends. No stored trade was rewritten for this (20 open shadow records still
+carry their old `feedBasis`). Now (`council/feed.mjs`, `council/trader.mjs`, `council/ctrader-mirror.mjs`):
+- **Hysteresis both ways**: `FEED_MISSES` 3 missed reads in a row before a market leaves OANDA (the rounds in between skip the
+  market, as before), `FEED_BACK` 3 good reads in a row before it returns (`state.feedOk`); a timeframe that does not answer is
+  asked once more (1.5 s) before the round counts a miss. First round and crypto unchanged.
+- **A record is managed only by its own feed's candles**: the manage loop skips `tr.feed !== FEED` (one line at its top; the
+  lifted-loop tests in `fills-live`, `supported-book` and `one-feed` run it); retire-legacy too.
+- **Held, not re-based**: while a market is on its fallback, records priced on the primary are HELD (`feedHeld`, one note per
+  episode, `snapshot.feedHeld`): never filled, stopped, re-quoted, cancelled or re-based by the fallback; `checked` stays, so on the
+  return the gap is read from OANDA itself.
+- **Adoption = ONE offset that never loosens a stop**: a record priced on the fallback is adopted when the primary returns, and a
+  primary record held over `ADOPT_AFTER_S` (6 h) is adopted by the fallback. The basis is measured on the record's OWN feed's last
+  minute (`state.feedLastBy[key][feed]`), targets / 2R mark move by it, the stop (and `midStop`) only when that tightens it
+  (`shiftStop`); logged in `feedMoves` and the note; `feedAdj { stop, t1 }` sums what offsets did. Pending orders: re-derived (geg)
+  or cancelled on adoption only, as before.
+- **Mirror**: `feedOnlyMove(t, m, tick)` = the council's levels differ from the copy's only by `feedAdj` since the copy: the copy
+  takes the new numbers, `m.brokerShift` records the gap, nothing is sent to the broker. A real move (break-even, trail) is sent as
+  before and clears the shift; `ctrader-reconcile.mjs` reads `brokerShift`.
+- **Visible**: `state.feedSwitch` → `snapshot.feedSwitches[market] = { n, since, last24h, last7d, lastAt }` (`countSwitch`,
+  `switchSummary`); `snapshot.feedChanges` keeps the per-switch log, now with `held`.
+- Not changed, said: a gold trend daily ratchet or a geg zone cancel can still read the fallback's daily candle during an episode
+  (both sha256-pinned blocks; a ratchet only tightens); the open shadow records' past re-bases stay; why the proxy misses reads
+  (rate limit, a slow timeframe) was not traced, only absorbed. Tests: `tests/one-feed.test.mjs` (6), `tests/feed-hysteresis.test.mjs`,
+  `tests/feed-requote.test.mjs`, `tests/ctrader-mirror.test.mjs` ("one feed").
 
 ## Gold daily engulf reads trading days (12 Nov 2026, owner approved fidelity fix, docs/owner-decisions.md item 52)
 On 10 Nov 2026 the engulf (`geg`) took its zone from OANDA's Sunday 8 Nov daily candle, the ~2-hour stub between the 22:00 UTC

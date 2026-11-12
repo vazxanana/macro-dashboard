@@ -91,28 +91,33 @@ test('a pending order whose rule cannot be re-derived is cancelled with the reas
   assert.equal(rederiveGeg(GEG(), OANDA_D1, EG, 4070.59, 2).entry, 3971.36); assert.equal(rederiveGeg(GEG(), OANDA_D1, null, 4070.59, 2), null);
 });
 
-test('mid-session switch: open positions keep the fill, stop / target / 2R mark move by the measured basis, R stays in the trade\'s frame', () => {
+test('adoption of a fallback-priced position by the primary feed: ONE offset, target moved by it, the stop only when that tightens it (12 Nov 2026)', () => {
   // round 1 on Kraken: the trader saves the last closed minute; round 2 the feed is OANDA (8 dollars lower)
   const kr = feedOf(BASIS, T0 - 240), lastK = kr['1m'].bars.at(-2), prev = { feed: 'kraken', t: lastK.time, close: lastK.close };
   const oa = feedOf(0);
   const sell = { id: 's', market: 'xau', k: 'replica', side: 'sell', status: 'open', entry: 4080, stop: 4090, t1: 3980, tp1: 4060, r0: 10, trail: [2, 2], feed: 'kraken', opened: T0 - 7200, filled: T0 - 7200, note: 'Gold replica (v5)' };
   const buy = { id: 'b', market: 'xau', k: 'gtrend', side: 'buy', status: 'open', entry: 4000, stop: 3950, t1: 400000, r0: 50, feed: 'kraken', opened: T0 - 86400, filled: T0 - 86400 };
   const trades = [sell, buy];
-  // on the OANDA frame the price is 8 lower: a sell stop at 4090 (Kraken) would be untouched by OANDA 4085 ticks, but a buy stop at 3950 (Kraken) is 3942 on OANDA
   const q = requoteMarket({ trades, key: 'xau', feed: 'OANDA', src: oa, price: 4070, now: T0, config: {}, prev, oandaMarket: true });
-  assert.equal(q.from, 'kraken'); near(q.basis, -BASIS); assert.equal(q.rebased, 2); assert.equal(q.kept, 0);
+  assert.equal(q.from, 'kraken'); near(q.basis, -BASIS); assert.equal(q.rebased, 2); assert.equal(q.kept, 0); assert.equal(q.held, 0);
+  // the sell: -8 lowers its stop, which tightens it: applied
   assert.equal(sell.entry, 4080); near(sell.stop, 4082); near(sell.t1, 3972); near(sell.tp1, 4052); near(sell.feedBasis, -BASIS); assert.equal(sell.feed, 'oanda'); assert.equal(sell.r0, 10);
-  assert.match(sell.note, /Feed changed kraken → oanda .*basis -8 measured on the switch minute \(same candle\); stop 4082, 2R mark 4052 and target re-based by it, entry kept at 4080/);
-  assert.equal(buy.entry, 4000); near(buy.stop, 3942); near(buy.feedBasis, -BASIS); assert.equal(buy.t1, 399992);
-  // the Trader's management maths (E = entry + feedBasis): a stop hit on the new frame is still -1R, a stop at the entry is 0R
+  assert.deepEqual(sell.feedAdj, { stop: -8, t1: -8 }); assert.equal(sell.feedMoves.length, 1); assert.deepEqual(sell.feedMoves[0].stop, [4090, 4082]);
+  assert.match(sell.note, /Feed changed kraken → oanda .*one offset -8 measured on the last kraken minute \(same candle\); target and 2R mark \(4052\) moved by it, stop 4090 → 4082, entry kept at 4080/);
+  // the buy: -8 would LOWER its stop (looser): the stop stays where it is (absolute rule 1), the target moves
+  assert.equal(buy.entry, 4000); assert.equal(buy.stop, 3950); near(buy.feedBasis, -BASIS); assert.equal(buy.t1, 399992);
+  assert.deepEqual(buy.feedAdj, { stop: 0, t1: -8 }); assert.match(buy.note, /stop kept at 3950 \(the offset would have loosened it\)/);
+  // the management maths (E = entry + feedBasis): the sell's stop on the new frame is still -1R, the buy's kept stop is better than -1R
   const E = sell.entry + sell.feedBasis, exitR = (s, e, px, r0) => +(((s ? e - px : px - e)) / r0).toFixed(2);
   assert.equal(exitR(true, E, sell.stop, sell.r0), -1); near(E, 4072);
-  const Eb = buy.entry + buy.feedBasis; assert.equal(exitR(false, Eb, buy.stop, buy.r0), -1);
+  assert.ok(exitR(false, buy.entry + buy.feedBasis, buy.stop, buy.r0) > -1);
   assert.equal(feedChangeText({ from: 'kraken', to: 'oanda', rebased: 2, basis: -8, kept: 1 }), 'feed changed kraken → oanda: 2 open re-based (basis -8), 1 open kept (no basis)');
-  // the feed flips back later: the basis accumulates to 0 and the marks return to the Kraken frame
-  const oaLast = oa['1m'].bars.at(-2), prev2 = { feed: 'oanda', t: oaLast.time, close: oaLast.close };
+  // the feed falls back later: the now OANDA-priced positions are HELD, nothing moves
+  const oaLast = oa['1m'].bars.at(-2), prev2 = { feed: 'oanda', t: oaLast.time, close: oaLast.close }, snap = JSON.stringify(trades.map(({ note, feedHeld, ...r }) => r));
   const q2 = requoteMarket({ trades, key: 'xau', feed: 'Kraken', src: feedOf(BASIS, T0 + 240), price: 4078, now: T0 + 240, config: {}, prev: prev2, oandaMarket: true });
-  near(q2.basis, BASIS); near(sell.feedBasis, 0); near(sell.stop, 4090); near(buy.stop, 3950); assert.equal(sell.feed, 'kraken');
+  assert.equal(q2.from, null); assert.equal(q2.held, 2); assert.deepEqual(q2.heldIds, ['s', 'b']); assert.equal(q2.rebased, 0);
+  assert.equal(JSON.stringify(trades.map(({ note, feedHeld, ...r }) => r)), snap, 'held records keep every level');
+  assert.equal(sell.feedHeld, T0 + 240); assert.equal(sell.feed, 'oanda'); assert.match(sell.note, /Held .*waits for it \(never filled, stopped or re-based by kraken candles\)/);
 });
 
 test('no overlapping minute (a switch over the weekend, or before this code): the open position keeps its marks and says so', () => {
@@ -139,7 +144,7 @@ test('futures tickets follow: a cancelled limit sends a cancel, a re-quoted limi
 
 test('the Trader is wired: feed tag on every record, re-quote before the manage loop, entry read in the feed frame, switches on the snapshot', () => {
   const src = read('../council/trader.mjs');
-  assert.match(src, /import \{ feedTag, requoteMarket, feedChangeText, feedDecision \} from '\.\/feed\.mjs'/);
+  assert.match(src, /import \{ feedTag, requoteMarket, feedChangeText, feedDecision, countSwitch, switchSummary \} from '\.\/feed\.mjs'/);
   assert.match(src, /const FEED = feedTag\(feed\);/);
   // every trade / research record literal carries the tag: 11 trades.push({ … }) literals (the Mosha cycle since 11 Nov), the engine's tr, the add, 2 research pushes
   assert.equal((src.match(/trades\.push\(\{/g) || []).length, 11, 'trades.push literals');

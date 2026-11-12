@@ -181,6 +181,21 @@ export function cancelStep(p) {
 }
 // an SL/TP amendment is done on any non-error execution event (the broker answers ORDER_REPLACED or ORDER_ACCEPTED for the
 // protective orders); REJECTED / CANCEL_REJECTED is an error
+// One feed per market (12 Nov 2026, owner approved): when the Trader adopts a position onto another candle feed it applies ONE
+// offset to its levels (council/feed.mjs, never loosening the stop) and sums what that did in t.feedAdj { stop, t1 }. That is a
+// change of price frame, not a council stop move: the broker's stop stays where it is. feedOnlyMove(t, m, tick) is true when the
+// council's levels differ from the copy's ONLY by feed offsets since the copy (m.feedAdj = the sum the copy was made / last moved
+// with); a real move (break-even, trail, a re-planned target) on top of it is not feed-only and is sent as before. m.brokerShift
+// = how far the broker's levels sit from m.stop / m.t1 after feed-only moves (cleared by the next real amend; read by the
+// reconciliation report).
+export function adjOf(x) { const a = x && x.feedAdj; return { stop: +((a && a.stop) || 0), t1: +((a && a.t1) || 0) }; }
+export function feedOnlyMove(t, m, tick) {
+  const ta = adjOf(t), ma = adjOf(m);
+  if (ta.stop === ma.stop && ta.t1 === ma.t1) return false;
+  const sOk = t.stop == null || m.stop == null || Math.abs((+t.stop - ta.stop) - (+m.stop - ma.stop)) < tick;
+  const tOk = t.t1 == null || m.t1 == null || Math.abs((+t.t1 - ta.t1) - (+m.t1 - ma.t1)) < tick;
+  return sOk && tOk;
+}
 export function amendStep(p) {
   const x = execType(p.executionType);
   if ([EXEC.ORDER_REJECTED, EXEC.ORDER_CANCEL_REJECTED].includes(x)) { const e = new Error(String(p.errorCode || 'ORDER_REJECTED')); e.code = p.errorCode || ''; return e; }
@@ -516,7 +531,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       const o = st.orders[t.id] || null;
       // (bug hunt 9 Nov) a filled limit holds the levels the order was placed with: saved as such, so a council level that moved since
       // (a re-quote) is seen by step 2c and sent to the broker
-      st.map[t.id] = { ...(m || { symbol: o ? o.symbol : t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: o && o.stop != null ? o.stop : t.stop, t1: o && o.t1 !== undefined ? o.t1 : t.t1, adopted: !o, alerted: unanswered || o ? [] : ['open'],
+      st.map[t.id] = { ...(m || { symbol: o ? o.symbol : t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: o && o.stop != null ? o.stop : t.stop, t1: o && o.t1 !== undefined ? o.t1 : t.t1, ...(!o && t.feedAdj ? { feedAdj: adjOf(t) } : {}), adopted: !o, alerted: unanswered || o ? [] : ['open'],
           ...(o ? { viaLimit: true, limitPrice: o.limitPrice, digits: o.digits, lots: o.lots, riskCash: o.riskCash, ...(o.margin != null ? { margin: o.margin } : {}), ...(o.minLot ? { minLot: true } : {}), ...(o.shadow ? { shadow: true } : {}),
             ...fillQuality(t, p.price ?? o.limitPrice, now) } : {}) }),
         positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume) || (o && o.volume), status: 'open' };
@@ -644,6 +659,8 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       const wantT1 = t.t1 != null && !(t.rr >= 50) ? +t.t1 : null, hadT1 = m.t1 != null && !(m.rr >= 50) ? +m.t1 : null;
       const stopMoved = t.stop != null && m.stop != null && Math.abs(+t.stop - +m.stop) >= tick, t1Moved = (wantT1 == null) !== (hadT1 == null) || (wantT1 != null && hadT1 != null && Math.abs(wantT1 - hadT1) >= tick);
       if (!stopMoved && !t1Moved) continue;
+      // a feed adoption alone (12 Nov 2026): the copy takes the council's new numbers as its reference, the broker is not touched
+      if (feedOnlyMove(t, m, tick)) { const ta = adjOf(t), ma = adjOf(m), bs = m.brokerShift || { stop: 0, t1: 0 }; m.brokerShift = { stop: +(bs.stop + ta.stop - ma.stop).toFixed(d + 1), t1: +(bs.t1 + ta.t1 - ma.t1).toFixed(d + 1) }; m.stop = t.stop; m.t1 = t.t1; m.feedAdj = ta; m.feedOnly = (m.feedOnly || 0) + 1; say(`${id}: the council's levels moved by a feed offset only (stop ${t.stop}); the broker stop on ${m.symbol} ${m.positionId} is left where it is`, { trade: id }); continue; }
       if ((m.amendFails || 0) >= AMEND_TRIES) continue;
       const isIct = String(id).startsWith('ict:'), bSL = p.stopLoss != null ? +p.stopLoss : null, bTP = p.takeProfit != null ? +p.takeProfit : null;
       const req = { ctidTraderAccountId: ctid, positionId: Number(m.positionId) };
@@ -652,7 +669,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       else { req.stopLoss = at(t.stop); if (wantT1 != null) req.takeProfit = at(wantT1); }
       try {
         await s.send(PT.AMEND_POSITION_SLTP_REQ, req, PT.EXECUTION_EVENT, amendStep);
-        const from = { stop: m.stop, t1: m.t1 }; m.stop = t.stop; m.t1 = t.t1; m.rr = t.rr; m.amended = (m.amended || 0) + 1; m.amendedAt = iso; delete m.amendFails;
+        const from = { stop: m.stop, t1: m.t1 }; m.stop = t.stop; m.t1 = t.t1; m.rr = t.rr; if (t.feedAdj) m.feedAdj = adjOf(t); delete m.brokerShift; m.amended = (m.amended || 0) + 1; m.amendedAt = iso; delete m.amendFails;
         out.sent.push({ type: 'amend', trade: id }); say(`moved ${m.symbol} ${m.positionId} protection: stop ${from.stop} -> ${t.stop}${t1Moved ? `, target ${from.t1} -> ${wantT1 == null ? 'none' : t.t1}` : ''} (council ${t.k || 'ict'})`, { trade: id });
         alert('amend', id, m, () => ({ stopFrom: from.stop, stop: t.stop, t1From: from.t1, t1: wantT1, brokerStop: req.stopLoss, brokerT1: req.takeProfit ?? null, why: t.beAt || t.be ? 'break-even / trail' : 'the council moved its levels' }));
       } catch (e) { m.amendFails = (m.amendFails || 0) + 1; say(`stop move for ${id} on ${m.symbol} ${m.positionId} failed: ${e.message}${m.amendFails >= AMEND_TRIES ? ` (${m.amendFails} tries, giving up)` : ' (retried next round)'}`, { trade: id }); }
@@ -744,7 +761,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}), ...(mark ? { mark, levelsFrom: 'mark' } : {}),
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, ...(t.feedAdj ? { feedAdj: adjOf(t) } : {}), riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}), ...(mark ? { mark, levelsFrom: 'mark' } : {}),
             ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });

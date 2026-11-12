@@ -1067,3 +1067,22 @@ figure or demo-mirror setting.
 - **Not changed.** Gold trend and Gold trend fast keep the raw daily candles: the same study found the fold worse for them.
   The forward-test bands (item 43) and "What to expect" were built on the raw-candle engulf; the two rules are within noise
   of each other, so the bands stay. No closed trade was recosted or relabelled.
+## Market fills near the stop, 12 Nov 2026
+
+### [x] 53. Check the minimum stop again on the price a market entry really fills at
+
+- **Status (12 Nov 2026): approved.** You answered "yes" to the week review's plumbing fixes; this is fix 2 of that review
+  ("Stop floor on the fill"), the proposal first named in the 8 Nov fills audit ("near-stop market fills").
+- **Context.** The engine never plans a stop closer to the entry than its minimum stop (the larger of `minRisk` x the lower
+  timeframe's ATR and 5 spreads). A setup the Trader takes at market fills at the price of the moment, which can sit much
+  nearer the stop than the planned entry. 9-12 Nov: in 7 trades the fill was within half the planned risk of the stop; one
+  AUD/USD buy filled 0.4 pip above its stop and booked about -6R after costs (1R was 0.4 pip, so the costs were 5R).
+- **What changed.** The same minimum stop is checked on the fill (`council/fills.mjs` `fillCheck`, used by the Trader and the
+  daily replay). Inside it, or on / past the stop or target, the order is not opened: the record is kept as `skipped` with the
+  reason `fill-near-stop` (or `past-stop` / `past-target`), never filled, R 0, never counted as a trade, never copied to a demo
+  account. No stop is moved; no stored trade was rewritten.
+- **What it would have done before.** On council-data of 12 Nov: 65 of 332 recorded engine market fills (63 closed, 2 of them
+  live, of 2-3 Nov; the rest shadow trades) were inside the floor: +10.2R before costs, -28.9R after. Since 9 Nov: 33 fills,
+  +1.7R before costs, -18.6R after. Of the 7 trades above, 5 would have been skipped (-7.7R after costs, one of them a +3.65R
+  winner) and 2 opened (their fill was still outside the floor).
+- **To undo.** Ask for it; the check is one line in the Trader's market-entry step and two in the replay.

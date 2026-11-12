@@ -44,7 +44,7 @@ function candidates(trades, research, done, now, since) {
   const pool = (trades || []).concat((research || []).filter((x) => x && x.k === 'nq-open' && x.session === 'nyflip'));
   for (const x of pool) {
     if (!x || typeof x !== 'object' || x.shadow || x.addOf || !LIVE.includes(x.k) || seen.has(x.id)) continue;
-    if (x.status === 'pending' || x.status === 'missed' || x.status === 'expired' || x.status === 'duplicate' || x.void) continue;
+    if (x.status === 'pending' || x.status === 'missed' || x.status === 'expired' || x.status === 'duplicate' || x.status === 'skipped' || x.void) continue;
     const t = entryT(x); if (!t || t < since || now - t > NEW_WINDOW_S || t > now) continue;
     if (!INST[x.market] || num(x.entry) == null || stopAtEntry(x) == null) continue;
     out.push(x);
