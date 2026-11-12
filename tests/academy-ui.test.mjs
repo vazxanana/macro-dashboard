@@ -668,3 +668,45 @@ test('phone simple view: the page sets the view before the first paint, the swit
   assert.match(tabs, /const PHONE_FOLD = \['ls-check', 'ls-drafts-card', 'pg-agree', 'pg-rvn', 'pg-mistakes', 'pg-queue', 'pg-attempts', 'rs-studies', 'rs-notebook', 'md-training'\];/);
   assert.match(tabs, /PHONE_FOLD\.indexOf\(id\) >= 0 && K\.pfold \? K\.pfold\(c, title\) : c;/, 'a folded card is the same card, with a chevron in its heading');
 });
+
+// ==== the What-if card folds on the phone, and a redraw of its body keeps the fold (12 Nov 2026) ===========================
+test('phone simple view: the What-if card folds to its heading, and a redraw of its body neither unfolds it nor loses the state', () => {
+  const ui = src('assets/academy-ui.js'), css = src('assets/academy.css');
+  // wiring: the Train tab's card is folded after every build, by the same helper as the other folded cards (no second mechanism)
+  const rw = ui.slice(ui.indexOf('function renderWhatIf() {'), ui.indexOf('// ---- tests on new setups'));
+  assert.match(rw, /whatIfCard\(box, \{ idp: 'whatif',[^]*\}\);\s*\/\/[^]*if \(!box\.hidden\) pfold\(box, 'What if'\);\s*\}/, 'folded after the card is built');
+  assert.equal((ui.match(/pfold\(/g) || []).length, 3, 'defined once, called for the static cards and for What if');
+  assert.doesNotMatch(ui.slice(ui.indexOf('function whatIfCard(box, o)'), ui.indexOf('function renderWhatIf() {')), /pfold/, 'the exam list\'s own What-if (inside a folded card) is not folded twice');
+  assert.doesNotMatch(css.slice(0, css.indexOf('/* ==== The phone\'s simple view')), /\.pcard/, 'the fold is styled only inside the simple view: a wider screen and the full view are unchanged');
+  // behaviour: the real pfold and clear, on a tiny DOM, through redraws as whatIfCard does them (empty the box, build it again)
+  const fnSrc = ui.slice(ui.indexOf('  const PF = {};'), ui.indexOf('  function setPhoneView('));
+  const clearSrc = ui.slice(ui.indexOf('  const clear = (n)'), ui.indexOf('\n', ui.indexOf('  const clear = (n)')));
+  class Cls { constructor() { this.s = new Set(); } add(c) { this.s.add(c); } contains(c) { return this.s.has(c); } toggle(c, on) { if (on === undefined) on = !this.s.has(c); if (on) this.s.add(c); else this.s.delete(c); return on; } }
+  class N {
+    constructor(tag, text) { this.tag = tag; this.children = []; this.parent = null; this.classList = new Cls(); this.attrs = {}; this.id = ''; this.text = text; this.onclick = null; }
+    get firstChild() { return this.children[0] || null; } get firstElementChild() { return this.children.find((c) => c.tag !== '#text') || null; }
+    get textContent() { return this.text != null ? this.text : this.children.map((c) => c.textContent).join(''); }
+    appendChild(c) { c.parent = this; this.children.push(c); return c; } removeChild(c) { this.children.splice(this.children.indexOf(c), 1); c.parent = null; return c; }
+    setAttribute(k, v) { this.attrs[k] = String(v); } getAttribute(k) { return this.attrs[k]; }
+    all() { return this.children.flatMap((c) => [c, ...c.all()]); }
+    querySelector(sel) {
+      if (sel === ':scope > * > .pc-t') return this.children.flatMap((c) => c.children).find((g) => g.classList.contains('pc-t')) || null;
+      if (sel === 'b') return this.all().find((c) => c.tag === 'b') || null; throw new Error('unexpected selector ' + sel);
+    }
+  }
+  const el = (tag, props, ...kids) => { const n = new N(tag); for (const [k, v] of Object.entries(props || {})) { if (k === 'class') v.split(' ').forEach((c) => n.classList.add(c)); else if (k === 'text') n.appendChild(new N('#text', v)); else if (k === 'onclick') n.onclick = v; else if (k === 'id') n.id = v; else n.setAttribute(k, v); } for (const k of kids) n.appendChild(typeof k === 'string' ? new N('#text', k) : k); return n; };
+  const { pfold, clear } = new Function('el', fnSrc + '\n' + clearSrc + '\nreturn { pfold, clear };')(el);
+  const box = new N('div'); box.id = 'whatif'; box.classList.add('card');
+  const build = (sub) => { clear(box); box.appendChild(el('h2', { class: 'c-h' }, 'What if', el('small', { text: sub }))); box.appendChild(el('p', { text: 'body' })); box.appendChild(el('div', { class: 'f-actions' })); pfold(box, 'What if'); };
+  const chev = () => box.children[0].children.filter((c) => c.classList.contains('pc-t'));
+  build('first setup');
+  assert.ok(box.classList.contains('pcard'), 'a folded card'); assert.ok(!box.classList.contains('pm-open'), 'folded at first');
+  assert.equal(chev().length, 1); assert.equal(chev()[0].getAttribute('aria-expanded'), 'false'); assert.equal(chev()[0].getAttribute('aria-label'), 'Show: What if');
+  chev()[0].onclick(); assert.ok(box.classList.contains('pm-open'), 'the chevron opens it'); assert.equal(chev()[0].getAttribute('aria-label'), 'Hide: What if');
+  build('a verdict was saved'); build('a lesson was saved');
+  assert.ok(box.classList.contains('pm-open'), 'still open after its body is drawn again'); assert.equal(chev().length, 1, 'one chevron, never two');
+  assert.equal(chev()[0].getAttribute('aria-expanded'), 'true');
+  pfold(box, 'What if'); assert.equal(chev().length, 1, 'folding twice without a redraw adds nothing');
+  chev()[0].onclick(); build('the next setup');
+  assert.ok(!box.classList.contains('pm-open'), 'folded again by the learner: a redraw keeps it folded'); assert.equal(chev()[0].getAttribute('aria-expanded'), 'false');
+});

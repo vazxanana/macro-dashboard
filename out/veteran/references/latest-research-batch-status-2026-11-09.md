@@ -1,6 +1,6 @@
 # Research increment — 9 November 2026
 
-The historical CPI-to-rates work now has a reproducible result, following the 8 November Claude delivery. The previously shared V1.2 ZIP remains unchanged; these newer files belong in the next cumulative batch.
+The historical CPI-to-rates work now has a reproducible result, following the 8 November assistant delivery. The previously shared V1.2 ZIP remains unchanged; these newer files belong in the next cumulative batch.
 
 ## New completed work
 
