@@ -9349,7 +9349,8 @@
     "t1": 4146.92,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3991.41,
@@ -9364,7 +9365,8 @@
     "lagSec": 369,
     "positionId": "48587271",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T06:48:22.000Z"
    },
    "usdcad-scalp-1794447126": {
     "positionId": "48598990",
@@ -9618,7 +9620,8 @@
     "t1": 4000.73,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3979.43,
@@ -9633,7 +9636,8 @@
     "lagSec": 133,
     "positionId": "48666921",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-12T06:48:22.000Z"
    },
    "usdchf-scalp-1794464003": {
     "positionId": "48674178",
@@ -9689,6 +9693,32 @@
     "status": "open",
     "stopCheckedAt": "2026-11-12T06:36:42.000Z",
     "brokerStop": 0.68388
+   },
+   "gbpusd-scalp-1794465892": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "scalp",
+    "openedAt": "2026-11-12T06:48:22.000Z",
+    "councilEntry": 1.32546,
+    "stop": 1.32624,
+    "t1": 1.3239,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.32546,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 1.96,
+    "margin": 5.3,
+    "shadow": true,
+    "fillPrice": 1.32546,
+    "slipR": 0,
+    "lagSec": 210,
+    "positionId": "48681305",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -9696,7 +9726,7 @@
    "startBalance": 9822.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9818.33 · 38 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9786.03 · 37 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-scalp-1794420442": "none of XRPUSD found at the broker"
@@ -9726,48 +9756,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "gbpusd-scalp-1794465892": {
-    "orderId": "33980930",
-    "symbol": "GBPUSD",
-    "side": "sell",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.32546,
-    "stop": 1.32624,
-    "t1": 1.3239,
-    "placedAt": "2026-11-12T06:46:00.000Z",
-    "expires": "2026-11-12T09:44:52.000Z",
-    "riskCash": 1.96,
-    "margin": 5.3,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9818.33,
-  "lastRun": "2026-11-12T06:46:00.000Z"
+  "balance": 9786.03,
+  "lastRun": "2026-11-12T06:48:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T08:33:57.000Z",
-   "msg": "ETHUSD position 48340419 closed at the broker",
-   "trade": "eth-rscalp-1794381427"
-  },
-  {
-   "at": "2026-11-11T08:46:46.000Z",
-   "msg": "opened buy AUDUSD 0.02 lot (council scalp)",
-   "trade": "audusd-scalp-1794386733"
-  },
-  {
-   "at": "2026-11-11T09:18:28.000Z",
-   "msg": "AUDUSD position 48358809 closed at the broker",
-   "trade": "audusd-scalp-1794386733"
-  },
   {
    "at": "2026-11-11T09:32:43.000Z",
    "msg": "opened buy USDCHF 0.01 lot (council scalp)",
@@ -11252,6 +11247,21 @@
    "at": "2026-11-12T06:46:00.000Z",
    "msg": "placed sell limit GBPUSD 0.02 lot at 1.32546 (council scalp, valid to 2026-11-12T09:44Z)",
    "trade": "gbpusd-scalp-1794465892"
+  },
+  {
+   "at": "2026-11-12T06:48:22.000Z",
+   "msg": "limit filled: GBPUSD position 48681305 at the broker",
+   "trade": "gbpusd-scalp-1794465892"
+  },
+  {
+   "at": "2026-11-12T06:48:22.000Z",
+   "msg": "XAUUSD position 48587271 closed at the broker",
+   "trade": "xau-intraday-1794445042"
+  },
+  {
+   "at": "2026-11-12T06:48:22.000Z",
+   "msg": "XAUUSD position 48666921 closed at the broker",
+   "trade": "xau-scalp-1794462771"
   }
  ],
  "limits": {
@@ -11330,11 +11340,11 @@
   ]
  },
  "execution": {
-  "n": 328,
+  "n": 329,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 145,
+  "medianLagSec": 147,
   "bySymbol": {
    "SOLUSD": {
     "n": 20,
@@ -11353,8 +11363,8 @@
     "meanSlipR": -0.021
    },
    "GBPUSD": {
-    "n": 45,
-    "meanSlipR": 0.027
+    "n": 46,
+    "meanSlipR": 0.026
    },
    "USDCAD": {
     "n": 47,
