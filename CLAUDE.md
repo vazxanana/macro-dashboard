@@ -3040,6 +3040,16 @@ profitable in 2006-19 and 2020-22, but lift over the baseline +0.10R, t 1.58 (ba
 gold's trend year by year (losing 2012-15, 2017-19, 2021). The mirror short has no edge. Not an edge of its own; the `#gold`
 view's wording stays the skill's; nothing live changed. Tests: `tests/gold-drd-long.test.mjs`.
 
+## Gold playbook study 2: the Daily-regime filter on that long (12 Nov 2026, owner: "Keep improve")
+`research/edge/gold-drd-er/` (PREREGISTRATION.md pushed first; `run.mjs` imports gold-drd-long's rule, trade and statistics
+unchanged). The one follow-up gold-drd-long named: skip the signal when the 20-day efficiency ratio of the 17:00 New York daily
+closes (up to and including the signal day) is under 0.2. **Verdict: FAIL**: on 2006 to October 2022 the trending-Daily signals
+made +0.139R a trade more than the choppy ones, Welch t 1.29 (bar t >= 2), and the difference reversed in 2020-22 (-0.10R) and
+is flat in the skill's window. The other two checks passed: filtered PF 1.33 / 1.35 in both halves, worst drawdown -30.9R against
+-77.4R (496 of 910 trades kept). A risk tool on this rule at most, not a better selection; not a council rule, nothing live
+changed. ER >= 0.3 and the signed ER looked better but were chosen after the fact: their own pre-registration on other data or
+nothing. Tests: `tests/gold-drd-er.test.mjs`.
+
 ## Mosha cycle: a main paper system (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot"; chose "main system")
 `council/mosha-cycle.mjs` (pure: `cycleState`, `cycleTrades`, `cycleText`) + the Trader block after Mosha BO (user rule
 `mosha-cycle`, `config.moshaCycle`; records `k: 'mcycle'`, ids `xau-mcycle-<leg>-<H4 break time>`). Gold only. From the BO
