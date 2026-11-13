@@ -102,3 +102,15 @@ test('a skipped record is never a trade: the mirror copies only open / pending, 
   assert.match(read('../api/_edge-analyst.js'), /x\.status === 'skipped'/);
   assert.match(read('../market-structure.html'), /x\.status !== 'expired' && x\.status !== 'skipped'\)/);
 });
+
+// 13 Nov 2026: the lifted block above is handed spreadOf as a parameter, so it ran green while council/trader.mjs never
+// imported it (every engine market fill threw "spreadOf is not defined" and dropped the rest of that market's round).
+// Every helper the block is handed must be imported (or defined) in the Trader itself.
+test('every helper the market-fill block uses is imported by the Trader', () => {
+  const src = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
+  const imports = new Set([...src.matchAll(/^import \{([^}]+)\} from/gm)].flatMap((m) => m[1].split(',').map((s) => s.trim().split(/\s+as\s+/).pop())));
+  for (const name of ['minStopDist', 'spreadOf', 'fillCheck', 'fillCheckText', 'driftR']) {
+    const defined = new RegExp(`(?:const|let|function)\\s+${name}\\b`).test(src);
+    assert.ok(imports.has(name) || defined, `${name} is used in the market-fill block but not imported in council/trader.mjs`);
+  }
+});
