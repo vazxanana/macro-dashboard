@@ -1312,7 +1312,15 @@ d, breaks)` (pure, next to `msInternal`) = the range of the LAST internal (else 
 high the drop came from to the lowest low since, whatever the depth of the pullback before it (no 50% pullback is needed first;
 `reached` = price has since traded back to its 50%). While the move runs, `msPath(row, px, iv)` retraces to the INTERNAL 50%
 first ("Retrace to internal 50%"), none once it is reached; a chart with no cycle row (M5, M1) draws the internal path alone
-("Break of the internal low / high"). A thin dashed "Internal 50%" line shows outside the clean look. Display only, not a tested rule.
+("Break of the internal low / high"). A thin dashed "Internal 50%" line shows (in the clean look too since 13 Nov). Display only, not a tested rule.
+Same day, the owner's marked H1 chart ("Show me the entry zones on the internal 50%", "check the marking"): the internal high
+was anchored on a major break's origin many swings back (4,148.7 on H1 instead of the lower high 4,000.7); `msInternalLeg` now
+takes the last swing high (the chart's own `PIVOT`) after the PREVIOUS break that way and before this one (`startIdx`), else the
+highest point there. `msEntryZones(bars, closedN, iv, zones)` (pure, next to it) = the order block the leg came from (last
+candle against the move at or before the internal high, out to that high) plus fresh same-way `msZones` inside the leg, cut at
+the 50%, gone once a candle trades into it or the 50% is reached; at most two, nearest the 50% first. Drawn as solid boxes
+"Sell / Buy zone · above / below internal 50% lo–hi", in the clean look too; "Internal high / low" lines outside it. On 13 Nov:
+H1 3,968.8–4,000.7 over a 50% at 3,926.7, H4 4,040.6–4,067.1 (the owner's 4,068 mark). Display only, not a tested rule.
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

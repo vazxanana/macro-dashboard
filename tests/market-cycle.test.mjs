@@ -259,3 +259,29 @@ test('retrace path prefers the internal 50% while the move runs, and none once i
   assert.equal(q.length, 1); assert.equal(q[0].to, 4000);
   assert.equal(msPath({ dir: -1, phase: 'pullback', target: T, choch: { level: 4020 } }, 4020, iv)[0].word, 'Retrace to 50%');
 });
+
+// 13 Nov 2026, the owner's marked H1 chart: "Show me the entry zones on the internal 50%" and "check the marking"
+const ezSrc = html.slice(html.indexOf('function msEntryZones'), html.indexOf('function msAnalyze'));
+const msEntryZones = new Function(`${ezSrc}; return msEntryZones;`)();
+const OC = (o, h, l, c) => ({ open: o, high: h, low: l, close: c });
+test('internal leg: the internal high is the pullback since the previous break, never a major origin far back', () => {
+  // 0-2 drop from 120, break at 3; pullback to 104 (5); a major break at 8 whose origin is candle 0 (120)
+  const bars = [K(120, 110), K(112, 100), K(102, 95), K(99, 90), K(98, 92), K(104, 96), K(101, 94), K(96, 88), K(90, 80), K(86, 81)];
+  const iv = msInternalLeg(bars, 10, -1, [{ dir: -1, fromIdx: 1, breakIdx: 3 }, { dir: -1, fromIdx: 0, breakIdx: 8 }]);
+  assert.equal(iv.from, 104, 'the lower high after the previous break, not 120'); assert.equal(iv.to, 80); assert.equal(iv.p50, 92); assert.equal(iv.startIdx, 4);
+});
+test('entry zones on the internal 50%: the leg\'s order block in the premium half, cut at the 50%, gone once traded into', () => {
+  const bars = [OC(100, 101, 99, 100), OC(100, 104, 99, 103), OC(103, 104, 97, 98), OC(98, 99, 90, 91), OC(91, 92, 80, 81), OC(81, 86, 80, 85)];
+  const iv = { dir: -1, from: 104, to: 80, p50: 92, fromIdx: 1, toIdx: 4, startIdx: 0, reached: false };
+  assert.deepEqual(msEntryZones(bars, 6, iv, []), [{ dir: -1, lo: 99, hi: 104, i: 1, kind: 'origin' }]);
+  assert.deepEqual(msEntryZones(bars.concat([OC(85, 99.5, 84, 90)]), 7, iv, []), [], 'mitigated once a candle trades into it');
+  assert.deepEqual(msEntryZones(bars, 6, { ...iv, reached: true }, []), []);
+  const z = msEntryZones(bars, 6, iv, [{ dir: -1, lo: 88, hi: 95, i: 3, breakIdx: 4, kind: 'ibo', fresh: true }]);
+  assert.deepEqual(z.map((x) => [x.lo, x.hi]), [[92, 95], [99, 104]], 'a zone across the 50% is cut at it, nearest first');
+  const up = [OC(100, 101, 99, 100), OC(100, 101, 96, 97), OC(97, 104, 96, 103), OC(103, 120, 102, 119), OC(119, 121, 115, 116)];
+  assert.deepEqual(msEntryZones(up, 5, { dir: 1, from: 96, to: 121, p50: 108.5, fromIdx: 1, toIdx: 4, startIdx: 0, reached: false }, []), [{ dir: 1, lo: 96, hi: 101, i: 1, kind: 'origin' }]);
+});
+test('entry zones are wired: drawn in the clean look too, with the internal 50% line', () => {
+  assert.match(html, /msEntryZones\(bars, nc, iv, zs\)/); assert.match(html, /zone · \$\{sell \? 'above' : 'below'\} internal 50%/);
+  assert.doesNotMatch(html, /if \(iv && !CL\) items\.lines\.push/, 'the internal 50% line shows in the clean look');
+});
