@@ -12768,7 +12768,10 @@ function gpStats(T) {
   function renderCal(A) {
     var took = ls.get('msGpTook', {}), src = ST.calSrc, byDay = {}, today = nyp(Date.now() / 1000).d;
     var T = A.T.filter(function (x) { return !x.pending && (src !== 'took' || took[x.d]); });
-    T.forEach(function (x) { var k = x.open ? today : x.exitD; (byDay[k] = byDay[k] || []).push(x); });
+    // closed trades only, on the day they closed (13 Nov 2026, owner: "he counts the trades open as profit for the day, he
+    // shouldn't, only trades closed"); an open trade's floating R is never a day's result, it is named under the calendar
+    var openT = T.filter(function (x) { return x.open; });
+    T.forEach(function (x) { if (x.open) return; (byDay[x.exitD] = byDay[x.exitD] || []).push(x); });
     if (!ST.cal) { var lk = Object.keys(byDay).sort().pop() || today; ST.cal = { y: +lk.slice(0, 4), m: +lk.slice(5, 7) - 1 }; }
     var y = ST.cal.y, m = ST.cal.m, mm = y + '-' + String(m + 1).padStart(2, '0'), first = new Date(Date.UTC(y, m, 1)), days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
     var mon = T.filter(function (x) { return !x.open && x.exitD.slice(0, 7) === mm; }), mR = mon.reduce(function (a, x) { return a + x.R; }, 0);
@@ -12776,17 +12779,18 @@ function gpStats(T) {
     var mlab = first.toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
     $('gp-cal-m').innerHTML = esc(mlab) + ' <small class="' + (mR > 0 ? 'pos' : mR < 0 ? 'neg' : '') + '">' + (mon.length ? sR(mR) + ' · ' + mon.length + ' closed' : 'no closed trades') + '</small>';
     var months = {}; yr.forEach(function (x) { var k = x.exitD.slice(5, 7); months[k] = (months[k] || 0) + x.R; }); var up = Object.keys(months).filter(function (k) { return months[k] > 0; }).length;
-    $('gp-cal-y').textContent = y + ': ' + (yr.length ? sR(yR) + ' from ' + yr.length + ' closed trades, ' + Math.round(wins / yr.length * 100) + '% winners, ' + up + ' of ' + Object.keys(months).length + ' months up' : 'no closed trades') + (src === 'took' ? ' (only the ones you ticked)' : ' (every signal, backtest + live)') + '.';
+    $('gp-cal-y').textContent = y + ': ' + (yr.length ? sR(yR) + ' from ' + yr.length + ' closed trades, ' + Math.round(wins / yr.length * 100) + '% winners, ' + up + ' of ' + Object.keys(months).length + ' months up' : 'no closed trades') + (src === 'took' ? ' (only the ones you ticked)' : ' (every signal, backtest + live)') + '.'
+      + (openT.length ? ' ' + openT.length + ' open trade' + (openT.length > 1 ? 's are' : ' is') + ' not counted until ' + (openT.length > 1 ? 'they close' : 'it closes') + ' (floating ' + sR(openT.reduce(function (q, x) { return q + x.R; }, 0)) + ').' : '');
     var vals = Object.keys(byDay).filter(function (k) { return k.slice(0, 7) === mm; }).map(function (k) { return Math.abs(byDay[k].reduce(function (s, x) { return s + x.R; }, 0)); }), mx = Math.max.apply(null, [3].concat(vals));
     var html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) { return '<div class="ict-cal-h">' + d + '</div>'; }).join('') + new Array(lead + 1).join('<div></div>');
     for (var d = 1; d <= days; d++) {
-      var k = mm + '-' + String(d).padStart(2, '0'), a = byDay[k] || [], R = a.reduce(function (s, x) { return s + x.R; }, 0), heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, op = a.filter(function (x) { return x.open; }).length, tk = a.filter(function (x) { return took[x.d]; }).length;
+      var k = mm + '-' + String(d).padStart(2, '0'), a = byDay[k] || [], R = a.reduce(function (s, x) { return s + x.R; }, 0), heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, tk = a.filter(function (x) { return took[x.d]; }).length;
       html += '<button type="button" class="ict-cal-d' + (a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : '') : '') + (ST.calDay === k ? ' sel' : '') + (k === today ? ' today' : '') + ((lead + d - 1) % 7 >= 5 ? ' we' : '') + '" data-gk="' + k + '" style="--heat:' + heat.toFixed(2) + '"' + (a.length ? '' : ' disabled')
-        + ' aria-label="' + d + ' ' + esc(mlab) + ': ' + (a.length ? sR(R) + ', ' + a.length + ' trades' : 'no trades') + '"><span class="d">' + d + '</span>' + (a.length ? '<b>' + sR(R) + '</b><small>' + (op ? op + ' open' : a.length + (a.length > 1 ? ' trades' : ' trade')) + (tk && src !== 'took' ? ' · <span class="tk">' + tk + ' taken</span>' : '') + '</small>' : '') + '</button>';
+        + ' aria-label="' + d + ' ' + esc(mlab) + ': ' + (a.length ? sR(R) + ', ' + a.length + ' trades' : 'no trades') + '"><span class="d">' + d + '</span>' + (a.length ? '<b>' + sR(R) + '</b><small>' + (a.length + (a.length > 1 ? ' trades' : ' trade')) + (tk && src !== 'took' ? ' · <span class="tk">' + tk + ' taken</span>' : '') + '</small>' : '') + '</button>';
     }
     $('gp-cal').innerHTML = html;
     var sel = ST.calDay && byDay[ST.calDay], off = ST.off;
-    $('gp-cal-day').innerHTML = sel ? sel.map(function (x) { return '<li><span class="ms-chip ms-chip-buy">BUY</span><b>' + esc(dLbl(x.d)) + ' signal</b><span class="m">' + f2(x.e + off) + ' → ' + (x.open ? 'open' : x.how) + '</span><b class="' + (x.R > 0 ? 'pos' : 'neg') + '">' + sR(x.R) + (x.open ? ' floating' : '') + '</b><small>' + (took[x.d] ? 'you took it' : 'not ticked') + ' · held from ' + esc(dLbl(x.entryD)) + '</small></li>'; }).join('') : '';
+    $('gp-cal-day').innerHTML = sel ? sel.map(function (x) { return '<li><span class="ms-chip ms-chip-buy">BUY</span><b>' + esc(dLbl(x.d)) + ' signal</b><span class="m">' + f2(x.e + off) + ' → ' + x.how + '</span><b class="' + (x.R > 0 ? 'pos' : 'neg') + '">' + sR(x.R) + '</b><small>' + (took[x.d] ? 'you took it' : 'not ticked') + ' · held from ' + esc(dLbl(x.entryD)) + '</small></li>'; }).join('') : '';
   }
   var TW = [
     ['Rule as written (top 30%, 3R, 10 days)', '+63.7R / −11.9', '+95.2R / −14.6', 'kept'],
