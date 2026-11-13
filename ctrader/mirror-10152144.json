@@ -304,7 +304,7 @@
     "status": "open",
     "openedAt": "2026-11-12T20:07:52.000Z",
     "councilEntry": 7617.25,
-    "stop": 7675.25,
+    "stop": 7617.25,
     "t1": null,
     "riskCash": 20.07,
     "margin": 25.84,
@@ -312,11 +312,15 @@
     "fillPrice": 7594.42,
     "lagSec": 43,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "stopCheckedAt": "2026-11-12T20:07:52.000Z",
     "brokerStop": 7652.42,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "rr": 99,
+    "amended": 1,
+    "amendedAt": "2026-11-13T15:26:04.000Z"
    },
    "ict:rty-b-1794524400": {
     "positionId": "49110961",
@@ -432,6 +436,30 @@
     "amended": 1,
     "amendedAt": "2026-11-13T14:11:24.000Z",
     "closedAt": "2026-11-13T14:33:48.000Z"
+   },
+   "ict:rty-s-1794578400": {
+    "positionId": "49523528",
+    "symbol": "US2000",
+    "side": "sell",
+    "volume": 37,
+    "lots": 0.37,
+    "digits": 2,
+    "setup": "ict-A",
+    "status": "open",
+    "openedAt": "2026-11-13T15:26:04.000Z",
+    "councilEntry": 2775.2,
+    "stop": 2829,
+    "t1": null,
+    "riskCash": 19.99,
+    "margin": 10.25,
+    "shadow": true,
+    "fillPrice": 2765.99,
+    "lagSec": 23,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-13T15:26:04.000Z",
+    "brokerStop": 2819.79
    }
   },
   "day": {
@@ -439,7 +467,7 @@
    "startBalance": 10032.74
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9993.34 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 9993.34 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -448,7 +476,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 9993.34,
-  "lastRun": "2026-11-13T15:24:06.000Z"
+  "lastRun": "2026-11-13T15:26:04.000Z"
  },
  "log": [
   {
@@ -1373,6 +1401,16 @@
    "at": "2026-11-13T15:03:55.000Z",
    "msg": "NAS100 position 48889942 closed at the broker",
    "trade": "ict:nq-b-1794492000"
+  },
+  {
+   "at": "2026-11-13T15:26:04.000Z",
+   "msg": "moved US500 49046231 protection: stop 7675.25 -> 7617.25 (council ict-A)",
+   "trade": "ict:es-s-1794510000"
+  },
+  {
+   "at": "2026-11-13T15:26:04.000Z",
+   "msg": "opened sell US2000 0.37 lot (council ict-A)",
+   "trade": "ict:rty-s-1794578400"
   }
  ],
  "limits": {
@@ -1452,6 +1490,6 @@
  },
  "execution": {
   "n": 0,
-  "medianLagSec": 27
+  "medianLagSec": 26.5
  }
 }
