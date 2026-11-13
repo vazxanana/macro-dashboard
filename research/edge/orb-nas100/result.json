@@ -1,0 +1,386 @@
+{
+ "study": "orb-nas100",
+ "built": "2026-11-13",
+ "preregistration": "research/edge/orb-nas100/PREREGISTRATION.md",
+ "claim": "Zarattini, Barbon and Aziz (SSRN 2023/2024): 5-minute opening range breakout on QQQ, sample January 2016 to February 2023",
+ "rule": "side of the 09:30-09:35 New York M5 candle (doji = no trade); entry at the 09:35 open; stop at the other end of that candle; target 10R; stop first when one candle holds both; out at the 15:55 candle close",
+ "verdict": "FAIL: 0 of 2 markets pass in 2021 → now; NAS100 +0.075R a trade net (n 1460, monthly t +1.27, gross +0.135R), SPX500 −0.053R a trade net (n 1456, monthly t −0.79, gross +0.138R)",
+ "decision": {
+  "byMarket": {
+   "nas100": {
+    "p": 0.102,
+    "pHolm": 0.204,
+    "checks": {
+     "positive": true,
+     "t2": false,
+     "placebo": true,
+     "holm": false
+    },
+    "pass": false
+   },
+   "spx500": {
+    "p": 0.785,
+    "pHolm": 0.785,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "placebo": true,
+     "holm": false
+    },
+    "pass": false
+   }
+  },
+  "verdict": "FAIL"
+ },
+ "markets": {
+  "nas100": {
+   "candles": 770832,
+   "from": "2015-12-01",
+   "to": "2026-11-12",
+   "costPts": 2,
+   "skips": {
+    "holiday": 103,
+    "early": 21,
+    "missing": 3,
+    "doji": 7,
+    "norisk": 0
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.215,
+    "median": -0.297,
+    "values": [
+     -0.221,
+     -0.285,
+     -0.327,
+     -0.261,
+     -0.298,
+     -0.319,
+     -0.344,
+     -0.267,
+     -0.215,
+     -0.409,
+     -0.263,
+     -0.255,
+     -0.237,
+     -0.347,
+     -0.384,
+     -0.375,
+     -0.207,
+     -0.367,
+     -0.189,
+     -0.217,
+     -0.29,
+     -0.252,
+     -0.243,
+     -0.277,
+     -0.275,
+     -0.308,
+     -0.323,
+     -0.26,
+     -0.351,
+     -0.32,
+     -0.387,
+     -0.347,
+     -0.223,
+     -0.303,
+     -0.345,
+     -0.311,
+     -0.299,
+     -0.394,
+     -0.266,
+     -0.297
+    ]
+   },
+   "windows": {
+    "A": {
+     "n": 1241,
+     "win": 0.228,
+     "netR": -0.027,
+     "grossR": 0.21,
+     "costR": 0.236,
+     "total": -33.06,
+     "months": 60,
+     "t": -0.36,
+     "grossT": 2.97,
+     "stops": 933,
+     "targets": 40,
+     "time": 268,
+     "maxDD": -143.05,
+     "medianRiskPts": 11.6,
+     "longs": 647
+    },
+    "B": {
+     "n": 1460,
+     "win": 0.249,
+     "netR": 0.075,
+     "grossR": 0.135,
+     "costR": 0.06,
+     "total": 110.22,
+     "months": 71,
+     "t": 1.27,
+     "grossT": 2.27,
+     "stops": 1084,
+     "targets": 29,
+     "time": 347,
+     "maxDD": -49.27,
+     "medianRiskPts": 41,
+     "longs": 739
+    },
+    "Bp": {
+     "n": 922,
+     "win": 0.252,
+     "netR": 0.085,
+     "grossR": 0.143,
+     "costR": 0.058,
+     "total": 78.54,
+     "months": 45,
+     "t": 1.04,
+     "grossT": 1.73,
+     "stops": 682,
+     "targets": 23,
+     "time": 217,
+     "maxDD": -49.27,
+     "medianRiskPts": 42.6,
+     "longs": 469
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 249,
+     "netR": 0.049,
+     "total": 12.18
+    },
+    "2017": {
+     "n": 247,
+     "netR": -0.411,
+     "total": -101.41
+    },
+    "2018": {
+     "n": 247,
+     "netR": 0.16,
+     "total": 39.44
+    },
+    "2019": {
+     "n": 249,
+     "netR": 0.026,
+     "total": 6.55
+    },
+    "2020": {
+     "n": 249,
+     "netR": 0.041,
+     "total": 10.19
+    },
+    "2021": {
+     "n": 251,
+     "netR": 0.093,
+     "total": 23.37
+    },
+    "2022": {
+     "n": 249,
+     "netR": 0.118,
+     "total": 29.43
+    },
+    "2023": {
+     "n": 247,
+     "netR": 0.059,
+     "total": 14.68
+    },
+    "2024": {
+     "n": 249,
+     "netR": 0.025,
+     "total": 6.21
+    },
+    "2025": {
+     "n": 247,
+     "netR": 0.182,
+     "total": 45.04
+    },
+    "2026": {
+     "n": 217,
+     "netR": -0.039,
+     "total": -8.51
+    }
+   },
+   "trades": 2701
+  },
+  "spx500": {
+   "candles": 753827,
+   "from": "2015-12-01",
+   "to": "2026-11-12",
+   "costPts": 1,
+   "skips": {
+    "holiday": 103,
+    "early": 21,
+    "missing": 2,
+    "doji": 49,
+    "norisk": 5
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.468,
+    "median": -0.581,
+    "values": [
+     -0.591,
+     -0.57,
+     -0.589,
+     -0.504,
+     -0.598,
+     -0.599,
+     -0.502,
+     -0.509,
+     -0.493,
+     -0.623,
+     -0.417,
+     -0.506,
+     -0.677,
+     -0.645,
+     -0.476,
+     -0.484,
+     -0.607,
+     -0.618,
+     -0.589,
+     -0.506,
+     -0.531,
+     -0.575,
+     -0.602,
+     -0.553,
+     -0.57,
+     -0.608,
+     -0.619,
+     -0.468,
+     -0.586,
+     -0.577,
+     -0.64,
+     -0.561,
+     -0.615,
+     -0.543,
+     -0.572,
+     -0.461,
+     -0.609,
+     -0.654,
+     -0.631,
+     -0.587
+    ]
+   },
+   "windows": {
+    "A": {
+     "n": 1199,
+     "win": 0.194,
+     "netR": -0.382,
+     "grossR": 0.086,
+     "costR": 0.468,
+     "total": -458.14,
+     "months": 60,
+     "t": -4.88,
+     "grossT": 1.16,
+     "stops": 945,
+     "targets": 43,
+     "time": 211,
+     "maxDD": -476.89,
+     "medianRiskPts": 3,
+     "longs": 591
+    },
+    "B": {
+     "n": 1456,
+     "win": 0.201,
+     "netR": -0.053,
+     "grossR": 0.138,
+     "costR": 0.191,
+     "total": -76.78,
+     "months": 71,
+     "t": -0.79,
+     "grossT": 2.08,
+     "stops": 1153,
+     "targets": 54,
+     "time": 249,
+     "maxDD": -143.66,
+     "medianRiskPts": 6.9,
+     "longs": 753
+    },
+    "Bp": {
+     "n": 919,
+     "win": 0.194,
+     "netR": -0.089,
+     "grossR": 0.094,
+     "costR": 0.183,
+     "total": -81.4,
+     "months": 45,
+     "t": -1.04,
+     "grossT": 1.1,
+     "stops": 735,
+     "targets": 35,
+     "time": 149,
+     "maxDD": -132.48,
+     "medianRiskPts": 6.9,
+     "longs": 489
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 242,
+     "netR": -0.462,
+     "total": -111.86
+    },
+    "2017": {
+     "n": 229,
+     "netR": -0.807,
+     "total": -184.75
+    },
+    "2018": {
+     "n": 239,
+     "netR": -0.222,
+     "total": -53.04
+    },
+    "2019": {
+     "n": 242,
+     "netR": -0.151,
+     "total": -36.44
+    },
+    "2020": {
+     "n": 247,
+     "netR": -0.292,
+     "total": -72.05
+    },
+    "2021": {
+     "n": 249,
+     "netR": 0.039,
+     "total": 9.7
+    },
+    "2022": {
+     "n": 249,
+     "netR": 0.075,
+     "total": 18.62
+    },
+    "2023": {
+     "n": 246,
+     "netR": 0.021,
+     "total": 5.27
+    },
+    "2024": {
+     "n": 247,
+     "netR": -0.347,
+     "total": -85.62
+    },
+    "2025": {
+     "n": 247,
+     "netR": -0.019,
+     "total": -4.72
+    },
+    "2026": {
+     "n": 218,
+     "netR": -0.092,
+     "total": -20.04
+    }
+   },
+   "trades": 2655
+  }
+ },
+ "reading": "**Reading.** Before costs the opening candle does point the day: in 2021 → now both markets make about +0.14R a trade gross (NAS100 t 2.27, SPX500 t 2.08 on monthly sums). After a CFD trader's round trip it is gone or too small to tell from luck: NAS100 keeps +0.075R a trade (+110R over 1,460 trades, t 1.27, Holm p 0.20), SPX500 loses (−0.053R). The part after the paper's sample (March 2023 → now) is no better (NAS100 +0.085R, t 1.04; SPX500 −0.089R). In 2016-2020, when the opening ranges were a few points wide, costs took 0.24R (NAS100) and 0.47R (SPX500) a trade and both lose (SPX500 −458R). Not an edge; no proposal is written and nothing live changes.",
+ "notes": [
+  "Post hoc, about the placebo: it is easy to beat by construction, so beating it says little. A random side that goes AGAINST the opening candle enters at the 09:35 open, which sits near the candle's close, i.e. near the end that becomes its stop: in 2021 → now its median risk is 10 points on NAS100 (41 with the candle) and 2 points on SPX500 (6.9), so the round trip costs it far more in R (net −0.74R and −1.11R a trade on those days; −0.12R and −0.16R before costs). The decisive checks that fail are the t and Holm, not the placebo.",
+  "The paper's sample is recalled as January 2016 to February 2023 (its abstract, not re-read). Window B overlaps it for 26 months; the after-sample line (March 2023 → now) was fixed in the pre-registration and is descriptive.",
+  "The paper trades QQQ shares with commissions of a cent a share and leverage up to 4x; this study trades the OANDA NAS100 / SPX500 CFDs at a fixed 1R a trade with the round trips of pre-fomc-drift (2 and 1 points). A cheaper venue (the ETF or a micro future) would keep more of the gross +0.14R; that is a different study and would need its own pre-registration.",
+  "This is not the council's NQ New York open run (nq-open), which is a different rule and is unchanged."
+ ]
+}
