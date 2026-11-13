@@ -21,7 +21,7 @@ import { voidRoundedReplicas, historyCatchUp, voidM30Twins, voidExactTwins, reco
 import { recordOnce } from './dedupe.mjs';   // 12 Nov 2026 (owner approved): one order is recorded once
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, mirrorMaps, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, foldWeekend, gegFresh, minStopDist, fillCheck, fillCheckText } from './fills.mjs';
+import { costModel, mirrorMaps, annotateCosts, costSummary, FIN, ownStream, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip, foldWeekend, gegFresh, minStopDist, fillCheck, fillCheckText, spreadOf } from './fills.mjs';
 // Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
 import { moshaChain } from './mosha.mjs';
 import { cycleTrades, cycleText, cycleBlockers } from './mosha-cycle.mjs';
