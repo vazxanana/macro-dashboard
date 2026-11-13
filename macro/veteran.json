@@ -1,12 +1,12 @@
 {
  "v": 1,
- "at": "2026-11-13T20:41:20.000Z",
+ "at": "2026-11-13T21:49:28.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-13T20:41:04.000Z",
+ "strategistAt": "2026-11-13T21:49:17.000Z",
  "shock": {
   "shock": "Positive growth / demand news",
   "clues": [
-   "10Y real +13 bp",
+   "10Y real +22 bp",
    "HY −12 bp",
    "VIX −9.5 on the week"
   ],
@@ -18,9 +18,9 @@
   {
    "k": "real",
    "name": "Real-rate opportunity cost",
-   "obs": "10Y TIPS 2.78%, +13 bp on the week, −10 bp over 4 weeks",
-   "lean": 1,
-   "asOf": "2026-11-10",
+   "obs": "10Y TIPS 2.86%, +22 bp on the week, +2 bp over 4 weeks",
+   "lean": 0,
+   "asOf": "2026-11-12",
    "stale": false,
    "cannot": "The level alone does not forecast daily returns; the regime-dependent sensitivity is read from changes, and a nominal yield move is not a real-yield move."
   },
@@ -45,9 +45,9 @@
   {
    "k": "policy",
    "name": "Central-bank path",
-   "obs": "2Y 4.73%, +12 bp on the week, −6 bp over 4 weeks · 10Y−3M 0.78%",
+   "obs": "2Y 4.86%, +28 bp on the week, +4 bp over 4 weeks · 10Y−3M 0.78%",
    "lean": 0,
-   "asOf": "2026-11-10",
+   "asOf": "2026-11-12",
    "stale": false,
    "cannot": "The 2Y mixes expected policy and term premium; a cut that was priced is not a dovish surprise, and the reaction to a decision is the signal, not the decision."
   },
@@ -89,28 +89,28 @@
   }
  ],
  "tally": {
-  "sum": -1,
+  "sum": -2,
   "observed": 7,
-  "lean": 0
+  "lean": -1
  },
  "debate": [
   {
    "topic": "Direction for gold",
-   "macro": "Gold Macro Score −0.73 → AUCTION (no macro edge); next-day P(up) 50%",
-   "veteran": "7 of 8 channels observed; tally −1 → neutral",
-   "stance": "agree",
+   "macro": "Gold Macro Score −0.90 → AUCTION (no macro edge); next-day P(up) 50%",
+   "veteran": "7 of 8 channels observed; tally −2 → against gold",
+   "stance": "qualify",
    "why": "The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.",
    "m": 0,
-   "v": 0
+   "v": -1
   },
   {
    "topic": "Real yields",
-   "macro": "10Y TIPS 2.78%, rising (vote down); score z (4-week fall) −0.18",
-   "veteran": "10Y TIPS 2.78%, +13 bp on the week, −10 bp over 4 weeks",
-   "stance": "disagree",
+   "macro": "10Y TIPS 2.86%, rising (vote down); score z (4-week fall) −0.55",
+   "veteran": "10Y TIPS 2.86%, +22 bp on the week, +2 bp over 4 weeks",
+   "stance": "qualify",
    "why": "The strategist reads the level (a high TIPS yield is bearish); the driver map says short-horizon direction comes from changes, and the 4-week change is not rising. Both are true: a high level caps the upside, a falling change sets the near-term lean.",
    "m": -1,
-   "v": 1
+   "v": 0
   },
   {
    "topic": "US dollar",
@@ -142,7 +142,7 @@
   {
    "topic": "Regime",
    "macro": "Dollar Smile right side (US outperformance) · liquidity flat · normal volatility",
-   "veteran": "Positive growth / demand news (low confidence) · clues: 10Y real +13 bp, HY −12 bp, VIX −9.5 on the week",
+   "veteran": "Positive growth / demand news (low confidence) · clues: 10Y real +22 bp, HY −12 bp, VIX −9.5 on the week",
    "stance": "agree",
    "why": "Strongest competing explanation: Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
    "m": null,
@@ -152,12 +152,12 @@
  "verdict": {
   "bias": "AUCTION",
   "conviction": null,
-  "note": "No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only.",
-  "agree": 4,
-  "qualify": 1,
-  "disagree": 1,
+  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size.",
+  "agree": 3,
+  "qualify": 3,
+  "disagree": 0,
   "invalidation": [
-   "10Y TIPS real yield above 2.93% (+15 bp from 2.78%) ends the real-rate support",
+   "10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support",
    "DXY above 104.8 (+1.5%) says the dollar channel has turned",
    "a weekly close below the 10-week average 4130 removes the trend tiebreaker"
   ],
@@ -168,12 +168,12 @@
   "claimType": "descriptive association",
   "shock": "Positive growth / demand news",
   "surprise": "No scheduled red-folder release inside 72 hours; the week's moves are judged against their own 1-week windows",
-  "observed": "10Y real +13 bp · HY −12 bp · VIX −9.5 on the week",
+  "observed": "10Y real +22 bp · HY −12 bp · VIX −9.5 on the week",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold weakens if higher real yields dominate, holds if currency or portfolio demand offsets.",
   "alternative": "Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
-  "falsifier": "10Y TIPS real yield above 2.93% (+15 bp from 2.78%) ends the real-rate support; DXY above 104.8 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4130 removes the trend tiebreaker",
+  "falsifier": "10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 104.8 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4130 removes the trend tiebreaker",
   "nextReview": "Friday close (the score is weekly)",
   "forecastId": "xau-4w-2026-11-07",
   "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-16..2026-11-12, n 3085)"
@@ -642,14 +642,14 @@
     },
     {
      "src": "CME FedWatch / 2Y (policy path)",
-     "read": "2Y 4.73%, +12 bp on the week, −6 bp over 4 weeks · 10Y−3M 0.78% (as of 2026-11-10)",
+     "read": "2Y 4.86%, +28 bp on the week, +4 bp over 4 weeks · 10Y−3M 0.78% (as of 2026-11-12)",
      "says": "neutral for gold. The direction of repricing is the signal, not the level",
      "limit": "The 2Y mixes expected policy and term premium; a cut that was priced is not a dovish surprise, and the reaction to a decision is the signal, not the decision."
     },
     {
      "src": "TIPS real yield (opportunity cost)",
-     "read": "10Y TIPS 2.78%, +13 bp on the week, −10 bp over 4 weeks (as of 2026-11-10)",
-     "says": "supportive for gold",
+     "read": "10Y TIPS 2.86%, +22 bp on the week, +2 bp over 4 weeks (as of 2026-11-12)",
+     "says": "neutral for gold",
      "limit": "The level alone does not forecast daily returns; the regime-dependent sensitivity is read from changes, and a nominal yield move is not a real-yield move."
     },
     {
@@ -666,7 +666,7 @@
     },
     {
      "src": "Council strategist: Gold Macro Score",
-     "read": "score -0.73 (tested 2007-26, 4-week horizon)",
+     "read": "score -0.90 (tested 2007-26, 4-week horizon)",
      "says": "no tested edge (auction)",
      "limit": "Never a sell signal: a negative score did not predict falls."
     }
@@ -877,7 +877,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 58% on average, came true 0%."
  },
  "briefing": {
-  "at": "2026-11-13T20:41:20.000Z",
+  "at": "2026-11-13T21:49:28.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -885,11 +885,11 @@
     "lean": 1,
     "fx": null,
     "k": "analogs",
-    "score": 2,
-    "title": "The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 55%)",
+    "score": 1.7,
+    "title": "The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%)",
     "evidence": [
      {
-      "text": "20-session median +2.40% (middle half +1.0% to +6.0%); 5-session median +1.32%, up 90%",
+      "text": "20-session median +2.26% (middle half −0.4% to +6.3%); 5-session median +1.32%, up 85%",
       "asOf": "2026-11-12",
       "source": "council daily candles + FRED weekly history, analogs since 2007-01-19"
      }
@@ -903,7 +903,7 @@
     "fx": null,
     "k": "price",
     "score": 1.26,
-    "title": "Gold below its 10-week average (−6.0%); Gold Macro Score −0.73 (AUCTION)",
+    "title": "Gold below its 10-week average (−6.0%); Gold Macro Score −0.90 (AUCTION)",
     "evidence": [
      {
       "text": "gold 3880.76 vs 10-week average 4130; −29.6% from the 52-week closing high",
@@ -911,7 +911,7 @@
       "source": "council daily gold candles (OANDA)"
      },
      {
-      "text": "Gold Macro Score −0.73 → AUCTION (no macro edge)",
+      "text": "Gold Macro Score −0.90 → AUCTION (no macro edge)",
       "asOf": "2026-11-13",
       "source": "council/macroscore.mjs (tested 2007-26, 4-week horizon)"
      }
@@ -956,46 +956,36 @@
    {
     "rank": 5,
     "lean": 0,
-    "fx": null,
-    "k": "stress",
-    "score": 0.4,
-    "title": "Stress gauges calm (VIX 19)",
-    "evidence": [
-     {
-      "text": "VIX 18.7, VIX/VIX3M 0.93 (normal)",
-      "asOf": "2026-11-12",
-      "source": "Cboe via FRED VIXCLS / VXVCLS"
-     },
-     {
-      "text": "HY OAS 3.20%, −28 bp on the week",
-      "asOf": "2026-11-12",
-      "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
-     },
-     {
-      "text": "SOFR − EFFR 2 bp",
-      "asOf": "2026-11-12",
-      "source": "NY Fed SOFR / EFFR via FRED"
-     }
-    ],
-    "why": "No stress premium: gold trades on rates and the dollar.",
-    "change": "VIX above 25 or an inverted VIX curve"
-   },
-   {
-    "rank": 6,
-    "lean": 1,
     "fx": "Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.",
     "k": "real",
-    "score": 0.3,
-    "title": "Real yields fell 10 bp in 4 weeks (10Y TIPS 2.78%)",
+    "score": 0.55,
+    "title": "Real yields flat 8 bp in 4 weeks (10Y TIPS 2.86%)",
     "evidence": [
      {
-      "text": "10Y TIPS 2.78%, −10 bp over 4 weeks (z +0.2 vs every week since 2007-01-19)",
-      "asOf": "2026-11-10",
+      "text": "10Y TIPS 2.86%, +8 bp over 4 weeks (z +0.6 vs every week since 2007-01-19)",
+      "asOf": "2026-11-12",
       "source": "FRED DFII10 (US Treasury real par curve)"
      }
     ],
     "why": "Real yields are gold's opportunity cost: a falling 4-week change is the strongest single input of the tested Gold Macro Score (2007-26). A high level caps the upside; the change sets the near-term lean.",
-    "change": "10Y TIPS back above 2.93% (+15 bp)"
+    "change": "10Y TIPS back above 3.01% (+15 bp)"
+   },
+   {
+    "rank": 6,
+    "lean": 0,
+    "fx": "A falling US 2Y against a steady EA 2Y narrows the rate gap: EUR/USD support.",
+    "k": "policy",
+    "score": 0.45,
+    "title": "Policy path: the 2Y rose 9 bp in 4 weeks (4.86%)",
+    "evidence": [
+     {
+      "text": "2Y Treasury 4.86%, +9 bp over 4 weeks",
+      "asOf": "2026-11-12",
+      "source": "FRED DGS2 (US Treasury par curve)"
+     }
+    ],
+    "why": "The 2Y is the market's read of the policy path: cuts being priced (a falling 2Y) support gold; a priced cut is not a dovish surprise, the change is the signal.",
+    "change": "the 2Y down 15 bp"
    }
   ],
   "hypotheses": [
@@ -1044,24 +1034,24 @@
     "p": 0.63,
     "claim": "Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13",
     "base": {
-     "p": 0.71,
-     "analog": 0.7,
-     "k": 14,
+     "p": 0.64,
+     "analog": 0.6,
+     "k": 12,
      "n": 20,
      "all": 0.72,
      "allN": 1022
     },
     "invalid": "any daily close outside $3,800-$4,013",
-    "why": "14 of 20 analogs stayed inside the same distances for 5 sessions vs 72% of all weeks: a contained week is the more likely path.",
+    "why": "12 of 20 analogs stayed inside the same distances for 5 sessions vs 72% of all weeks: a contained week is the more likely path.",
     "src": "veteran hypothesis",
     "claimType": "prospective prediction",
-    "pRaw": 0.71,
+    "pRaw": 0.64,
     "level": null,
     "issued": "2026-11-09",
     "hit": null,
     "live": {
      "claim": "Gold's daily closes stay between $3,800 (round number) and $4,013 (20-day average) every day through 2026-11-19",
-     "p": 0.71
+     "p": 0.64
     }
    },
    {
@@ -1075,25 +1065,25 @@
     "p": 0.56,
     "claim": "DXY closes 2026-12-04 below 102.36 (the latest close)",
     "base": {
-     "p": 0.56,
-     "analog": 0.6,
-     "k": 12,
+     "p": 0.66,
+     "analog": 0.75,
+     "k": 15,
      "n": 20,
      "all": 0.49,
      "allN": 1022
     },
     "invalid": "DXY above 104.82 (+1.5%) on a close",
-    "why": "12 of 20 analogs saw the DXY lower 20 sessions on vs 49% of all weeks. Gold usually moves the other way, except in stress (both bid).",
+    "why": "15 of 20 analogs saw the DXY lower 20 sessions on vs 49% of all weeks. Gold usually moves the other way, except in stress (both bid).",
     "src": "veteran hypothesis",
     "claimType": "prospective prediction",
-    "pRaw": 0.56,
+    "pRaw": 0.66,
     "lo": null,
     "hi": null,
     "issued": "2026-11-09",
     "hit": null,
     "live": {
      "claim": "DXY closes 2026-12-10 below 103.27 (the latest close)",
-     "p": 0.56
+     "p": 0.66
     }
    }
   ],
@@ -1202,16 +1192,16 @@
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
       "dist": 2.62,
       "side": "above",
-      "near": 1
+      "near": 0
      },
      {
-      "price": 3973.9,
+      "price": 3968.5,
       "label": "Analogs' median after 20 sessions",
       "kind": "analog",
-      "why": "Where the median of the 20 closest analogs would take gold in 20 sessions (+2.40%); descriptive.",
-      "dist": 2.4,
+      "why": "Where the median of the 20 closest analogs would take gold in 20 sessions (+2.26%); descriptive.",
+      "dist": 2.26,
       "side": "above",
-      "near": 1
+      "near": 0
      },
      {
       "price": 3932,
@@ -1284,9 +1274,9 @@
      "text": "as of 2026-11-12 close"
     },
     "mark": {
-     "px": 3872.5,
-     "at": "2026-11-13T20:41:04.000Z",
-     "dist": -0.21
+     "px": 3880.965,
+     "at": "2026-11-13T21:49:17.000Z",
+     "dist": 0.01
     }
    },
    "dxy": {
@@ -1324,22 +1314,13 @@
       "near": 0
      },
      {
-      "price": 102.691,
-      "label": "Analogs' median after 20 sessions",
-      "kind": "analog",
-      "why": "The 20 analogs' median DXY move (−0.56%).",
-      "dist": -0.56,
-      "side": "below",
-      "near": 1
-     },
-     {
       "price": 102.544,
       "label": "October high (closing)",
       "kind": "month",
       "why": "Last month's extreme: the monthly range desks use to judge whether the month opened in balance or in trend.",
       "dist": -0.7,
       "side": "below",
-      "near": 2
+      "near": 1
      },
      {
       "price": 102.359,
@@ -1357,7 +1338,16 @@
       "why": "The short-term trend line most desks watch; pullbacks in a trend tend to be judged against it.",
       "dist": -1.17,
       "side": "below",
-      "near": 0
+      "near": 1
+     },
+     {
+      "price": 102.01,
+      "label": "Analogs' median after 20 sessions",
+      "kind": "analog",
+      "why": "The 20 analogs' median DXY move (−1.22%).",
+      "dist": -1.22,
+      "side": "below",
+      "near": 2
      },
      {
       "price": 101.805,
@@ -1366,7 +1356,7 @@
       "why": "The nearest swing low below: resting sell stops sit just under it; a break there can run lower.",
       "dist": -1.42,
       "side": "below",
-      "near": 3
+      "near": 4
      },
      {
       "price": 101.731,
@@ -1427,8 +1417,8 @@
    "asOf": "2026-11-12",
    "now": {
     "t": 1794441600,
-    "ry4w": 4,
-    "y2_4w": -1,
+    "ry4w": 12,
+    "y2_4w": 12,
     "dxy4w": 1.423,
     "gold4w": -5.672,
     "vs10w": -6.041,
@@ -1471,8 +1461,8 @@
     }
    },
    "zNow": {
-    "ry4w": 0.18,
-    "y2_4w": -0.04,
+    "ry4w": 0.55,
+    "y2_4w": 0.56,
     "dxy4w": 0.71,
     "gold4w": -1.48,
     "vs10w": -1.8,
@@ -1483,8 +1473,8 @@
    "top": [
     {
      "date": "2026-06-19",
-     "sim": 74,
-     "dist": 0.348,
+     "sim": 73,
+     "dist": 0.361,
      "f": {
       "t": 1781827200,
       "ry4w": 5,
@@ -1527,54 +1517,9 @@
      ]
     },
     {
-     "date": "2008-09-12",
-     "sim": 64,
-     "dist": 0.55,
-     "f": {
-      "t": 1221177600,
-      "ry4w": 13,
-      "y2_4w": -17,
-      "dxy4w": 2.605,
-      "gold4w": -5.808,
-      "vs10w": -10.2,
-      "offHigh": -24.585,
-      "pos13w": 7,
-      "eqVol": 22.96
-     },
-     "entry": 778.5,
-     "gold5": 12.25,
-     "gold20": 14.19,
-     "max20": 16.69,
-     "min20": 0.4,
-     "dxy5": -0.9,
-     "dxy20": 3.5,
-     "path": [
-      0.4,
-      0.64,
-      11.65,
-      10.64,
-      12.25,
-      12.4,
-      16.19,
-      13.66,
-      13.56,
-      13.35,
-      12.88,
-      12.56,
-      16.69,
-      11.92,
-      11.48,
-      7.12,
-      7.29,
-      6.27,
-      10.76,
-      14.19
-     ]
-    },
-    {
      "date": "2013-11-22",
      "sim": 62,
-     "dist": 0.616,
+     "dist": 0.604,
      "f": {
       "t": 1385078400,
       "ry4w": 22,
@@ -1617,144 +1562,54 @@
      ]
     },
     {
-     "date": "2011-12-16",
-     "sim": 61,
-     "dist": 0.64,
+     "date": "2008-09-12",
+     "sim": 60,
+     "dist": 0.659,
      "f": {
-      "t": 1323993600,
-      "ry4w": -10,
-      "y2_4w": -5,
-      "dxy4w": 1.375,
-      "gold4w": -5.691,
-      "vs10w": -6.916,
-      "offHigh": -16.253,
-      "pos13w": 11,
-      "eqVol": 22.32
+      "t": 1221177600,
+      "ry4w": 13,
+      "y2_4w": -17,
+      "dxy4w": 2.605,
+      "gold4w": -5.808,
+      "vs10w": -10.2,
+      "offHigh": -24.585,
+      "pos13w": 7,
+      "eqVol": 22.96
      },
-     "entry": 1603.3,
-     "gold5": 0.23,
-     "gold20": 2.45,
-     "max20": 2.45,
-     "min20": -3.35,
-     "dxy5": -0.2,
-     "dxy20": 1.09,
+     "entry": 778.5,
+     "gold5": 12.25,
+     "gold20": 14.19,
+     "max20": 16.69,
+     "min20": 0.4,
+     "dxy5": -0.9,
+     "dxy20": 3.5,
      "path": [
-      -0.6,
-      0.96,
-      0.6,
-      0.29,
-      0.23,
-      0,
-      -0.83,
-      -2.95,
-      -3.35,
-      -2.39,
-      -2.39,
-      -1.93,
-      0.18,
-      0.52,
-      1.1,
-      0.89,
-      0.6,
-      0.53,
-      1.99,
-      2.45
-     ]
-    },
-    {
-     "date": "2015-11-27",
-     "sim": 59,
-     "dist": 0.698,
-     "f": {
-      "t": 1448582400,
-      "ry4w": -1,
-      "y2_4w": 17,
-      "dxy4w": 2.284,
-      "gold4w": -4.699,
-      "vs10w": -5.935,
-      "offHigh": -17.677,
-      "pos13w": 0,
-      "eqVol": 13.01
-     },
-     "entry": 1057.292,
-     "gold5": 2.73,
-     "gold20": 1.55,
-     "max20": 2.73,
-     "min20": -0.4,
-     "dxy5": -1.86,
-     "dxy20": -1.89,
-     "path": [
-      0.67,
-      1.21,
-      -0.3,
-      0.57,
-      2.73,
-      2.46,
-      1.32,
-      1.79,
-      1.44,
-      1.41,
-      1.66,
-      1.43,
-      0.42,
-      0.39,
-      1.17,
-      -0.4,
-      0.86,
-      0.76,
-      1.91,
-      1.55
-     ]
-    },
-    {
-     "date": "2012-05-11",
-     "sim": 59,
-     "dist": 0.705,
-     "f": {
-      "t": 1336694400,
-      "ry4w": -3,
-      "y2_4w": 0,
-      "dxy4w": 0.902,
-      "gold4w": -3.785,
-      "vs10w": -4.225,
-      "offHigh": -17.276,
-      "pos13w": 0,
-      "eqVol": 11.57
-     },
-     "entry": 1580.843,
-     "gold5": 0.78,
-     "gold20": 2.35,
-     "max20": 2.75,
-     "min20": -2.39,
-     "dxy5": 0.81,
-     "dxy20": 2.92,
-     "path": [
-      -1.41,
-      -2.38,
-      -2.39,
-      -0.35,
-      0.78,
-      0.87,
-      0.86,
-      -0.83,
-      -1.4,
-      -1.53,
-      -0.5,
-      -0.41,
-      -0.37,
-      -1.75,
-      -1.04,
-      -1.27,
-      2.75,
-      2.28,
-      2.46,
-      2.35
+      0.4,
+      0.64,
+      11.65,
+      10.64,
+      12.25,
+      12.4,
+      16.19,
+      13.66,
+      13.56,
+      13.35,
+      12.88,
+      12.56,
+      16.69,
+      11.92,
+      11.48,
+      7.12,
+      7.29,
+      6.27,
+      10.76,
+      14.19
      ]
     },
     {
      "date": "2013-05-17",
-     "sim": 58,
-     "dist": 0.711,
+     "sim": 60,
+     "dist": 0.668,
      "f": {
       "t": 1368748800,
       "ry4w": 28,
@@ -1797,99 +1652,54 @@
      ]
     },
     {
-     "date": "2014-10-31",
-     "sim": 58,
-     "dist": 0.737,
+     "date": "2015-11-27",
+     "sim": 60,
+     "dist": 0.668,
      "f": {
-      "t": 1414713600,
-      "ry4w": -9,
-      "y2_4w": -7,
-      "dxy4w": 1.886,
-      "gold4w": -3.844,
-      "vs10w": -4.378,
-      "offHigh": -15.397,
+      "t": 1448582400,
+      "ry4w": -1,
+      "y2_4w": 17,
+      "dxy4w": 2.284,
+      "gold4w": -4.699,
+      "vs10w": -5.935,
+      "offHigh": -17.677,
       "pos13w": 0,
-      "eqVol": 16.72
+      "eqVol": 13.01
      },
-     "entry": 1166.466,
-     "gold5": 0.95,
-     "gold20": 2.99,
-     "max20": 3.02,
-     "min20": -2.22,
-     "dxy5": 0.56,
-     "dxy20": 0.86,
+     "entry": 1057.292,
+     "gold5": 2.73,
+     "gold20": 1.55,
+     "max20": 2.73,
+     "min20": -0.4,
+     "dxy5": -1.86,
+     "dxy20": -1.89,
      "path": [
-      -0.11,
-      0.23,
-      -1.96,
-      -2.22,
-      0.95,
-      0.37,
-      -0.95,
+      0.67,
+      1.21,
+      -0.3,
+      0.57,
+      2.73,
+      2.46,
+      1.32,
+      1.79,
+      1.44,
+      1.41,
+      1.66,
+      1.43,
+      0.42,
+      0.39,
+      1.17,
       -0.4,
-      -0.62,
-      -0.47,
-      1.88,
-      1.36,
-      1.7,
-      2.47,
-      1.35,
-      2.3,
-      3,
-      3.02,
-      2.64,
-      2.99
-     ]
-    },
-    {
-     "date": "2013-10-11",
-     "sim": 57,
-     "dist": 0.744,
-     "f": {
-      "t": 1381449600,
-      "ry4w": -30,
-      "y2_4w": -10,
-      "dxy4w": 0.213,
-      "gold4w": -7.009,
-      "vs10w": -5.948,
-      "offHigh": -25.572,
-      "pos13w": 0,
-      "eqVol": 11.02
-     },
-     "entry": 1273.022,
-     "gold5": 3.36,
-     "gold20": 3.13,
-     "max20": 6.3,
-     "min20": -0.06,
-     "dxy5": -0.92,
-     "dxy20": 0.43,
-     "path": [
-      -0.06,
-      0.19,
-      0.65,
-      3.38,
-      3.36,
-      3.51,
-      3.35,
-      5.22,
-      4.67,
-      5.8,
-      6.1,
-      5.98,
-      6.3,
-      5.54,
-      5.15,
-      3.95,
-      3.39,
-      3.23,
-      3.32,
-      3.13
+      0.86,
+      0.76,
+      1.91,
+      1.55
      ]
     },
     {
      "date": "2021-03-05",
-     "sim": 57,
-     "dist": 0.755,
+     "sim": 60,
+     "dist": 0.676,
      "f": {
       "t": 1614902400,
       "ry4w": 36,
@@ -1932,99 +1742,54 @@
      ]
     },
     {
-     "date": "2015-07-24",
-     "sim": 57,
-     "dist": 0.758,
+     "date": "2011-12-30",
+     "sim": 58,
+     "dist": 0.724,
      "f": {
-      "t": 1437696000,
-      "ry4w": -6,
-      "y2_4w": -2,
-      "dxy4w": 0.809,
-      "gold4w": -5.922,
-      "vs10w": -5.774,
-      "offHigh": -15.514,
+      "t": 1325203200,
+      "ry4w": -7,
+      "y2_4w": 0,
+      "dxy4w": 2.219,
+      "gold4w": -9.431,
+      "vs10w": -7.549,
+      "offHigh": -18.037,
       "pos13w": 6,
-      "eqVol": 11.71
+      "eqVol": 18.3
      },
-     "entry": 1097.515,
-     "gold5": -0.19,
-     "gold20": 1.84,
-     "max20": 2.43,
-     "min20": -1.19,
-     "dxy5": -0.09,
-     "dxy20": -0.29,
+     "entry": 1564.962,
+     "gold5": 3.36,
+     "gold20": 7.31,
+     "max20": 7.31,
+     "min20": 0.48,
+     "dxy5": 1.31,
+     "dxy20": -0.57,
      "path": [
-      -0.28,
-      -0.13,
-      0.02,
-      -0.76,
-      -0.19,
-      -0.38,
-      -1.19,
-      -1.05,
-      -1.13,
-      -0.74,
-      -0.3,
-      -0.5,
-      0.77,
-      1.03,
-      2.43,
-      1.55,
-      1.6,
-      1.54,
-      1.79,
-      1.84
-     ]
-    },
-    {
-     "date": "2022-07-15",
-     "sim": 57,
-     "dist": 0.758,
-     "f": {
-      "t": 1657843200,
-      "ry4w": -10,
-      "y2_4w": -4,
-      "dxy4w": 3.646,
-      "gold4w": -7.034,
-      "vs10w": -6.125,
-      "offHigh": -16.458,
-      "pos13w": 0,
-      "eqVol": 19.02
-     },
-     "entry": 1710.385,
-     "gold5": 1.01,
-     "gold20": 4.9,
-     "max20": 4.9,
-     "min20": -0.87,
-     "dxy5": -1.16,
-     "dxy20": -1.32,
-     "path": [
-      -0.12,
-      -0.02,
-      -0.87,
-      0.46,
-      1.01,
-      0.84,
-      0.51,
-      0.45,
-      1.66,
-      2.61,
-      3.27,
-      3.03,
-      3.63,
-      2.71,
-      3.12,
-      4.86,
-      3.82,
-      3.76,
-      4.61,
-      4.9
+      0.48,
+      2.64,
+      2.98,
+      3.57,
+      3.36,
+      3.06,
+      2.99,
+      4.49,
+      4.96,
+      5.29,
+      4.76,
+      4.45,
+      5.07,
+      5.72,
+      6.07,
+      5.77,
+      6.49,
+      6.49,
+      6.33,
+      7.31
      ]
     },
     {
      "date": "2016-12-23",
-     "sim": 56,
-     "dist": 0.784,
+     "sim": 57,
+     "dist": 0.756,
      "f": {
       "t": 1482451200,
       "ry4w": 11,
@@ -2067,99 +1832,99 @@
      ]
     },
     {
-     "date": "2022-10-28",
-     "sim": 55,
-     "dist": 0.825,
+     "date": "2012-05-11",
+     "sim": 57,
+     "dist": 0.762,
      "f": {
-      "t": 1666915200,
-      "ry4w": -17,
-      "y2_4w": 19,
-      "dxy4w": -0.261,
-      "gold4w": -4.312,
-      "vs10w": -1.865,
-      "offHigh": -19.544,
-      "pos13w": 11,
-      "eqVol": 27.97
+      "t": 1336694400,
+      "ry4w": -3,
+      "y2_4w": 0,
+      "dxy4w": 0.902,
+      "gold4w": -3.785,
+      "vs10w": -4.225,
+      "offHigh": -17.276,
+      "pos13w": 0,
+      "eqVol": 11.57
      },
-     "entry": 1643.525,
-     "gold5": 2.27,
-     "gold20": 5.95,
-     "max20": 8.36,
-     "min20": -0.83,
-     "dxy5": 0,
-     "dxy20": -3.38,
+     "entry": 1580.843,
+     "gold5": 0.78,
+     "gold20": 2.35,
+     "max20": 2.75,
+     "min20": -2.39,
+     "dxy5": 0.81,
+     "dxy20": 2.92,
      "path": [
-      -0.67,
-      0.2,
-      -0.59,
+      -1.41,
+      -2.38,
+      -2.39,
+      -0.35,
+      0.78,
+      0.87,
+      0.86,
       -0.83,
-      2.27,
-      1.78,
-      1.87,
-      4.15,
-      3.83,
-      6.62,
-      7.77,
-      7.3,
-      7.67,
-      8.36,
-      7.94,
-      7.1,
-      6.53,
-      6.62,
-      5.78,
-      5.95
+      -1.4,
+      -1.53,
+      -0.5,
+      -0.41,
+      -0.37,
+      -1.75,
+      -1.04,
+      -1.27,
+      2.75,
+      2.28,
+      2.46,
+      2.35
      ]
     },
     {
-     "date": "2014-01-03",
-     "sim": 53,
-     "dist": 0.884,
+     "date": "2022-07-08",
+     "sim": 57,
+     "dist": 0.769,
      "f": {
-      "t": 1388707200,
-      "ry4w": -2,
-      "y2_4w": 11,
-      "dxy4w": 1.277,
-      "gold4w": -1.376,
-      "vs10w": -0.288,
-      "offHigh": -23.45,
-      "pos13w": 28,
-      "eqVol": 9.45
+      "t": 1657238400,
+      "ry4w": 33,
+      "y2_4w": 6,
+      "dxy4w": 1.975,
+      "gold4w": -4.994,
+      "vs10w": -4.784,
+      "offHigh": -14.751,
+      "pos13w": 1,
+      "eqVol": 22.54
      },
-     "entry": 1234.279,
-     "gold5": 1.14,
-     "gold20": 1.5,
-     "max20": 3.34,
-     "min20": -0.64,
-     "dxy5": -0.28,
-     "dxy20": -0.19,
+     "entry": 1742.105,
+     "gold5": -1.99,
+     "gold20": 0.84,
+     "max20": 1.74,
+     "min20": -2.68,
+     "dxy5": 0.91,
+     "dxy20": -0.47,
      "path": [
-      0.29,
-      -0.39,
-      -0.64,
-      -0.43,
-      1.14,
-      1.18,
-      1.62,
-      0.75,
-      0.56,
-      0.65,
-      1.59,
-      1.79,
-      1.72,
-      0.72,
-      0.24,
-      2.31,
-      2.88,
-      3.34,
-      1.95,
-      1.5
+      -0.51,
+      -0.96,
+      -0.57,
+      -1.74,
+      -1.99,
+      -1.82,
+      -1.94,
+      -1.84,
+      -2.68,
+      -1.37,
+      -0.83,
+      -1,
+      -1.32,
+      -1.38,
+      -0.19,
+      0.74,
+      1.39,
+      1.16,
+      1.74,
+      0.84
      ]
     },
     {
      "date": "2013-07-12",
-     "sim": 53,
-     "dist": 0.89,
+     "sim": 56,
+     "dist": 0.785,
      "f": {
       "t": 1373587200,
       "ry4w": 46,
@@ -2202,9 +1967,99 @@
      ]
     },
     {
+     "date": "2015-07-31",
+     "sim": 55,
+     "dist": 0.815,
+     "f": {
+      "t": 1438300800,
+      "ry4w": -3,
+      "y2_4w": 3,
+      "dxy4w": 0.95,
+      "gold4w": -5.31,
+      "vs10w": -5.166,
+      "offHigh": -15.799,
+      "pos13w": 5,
+      "eqVol": 9.74
+     },
+     "entry": 1093.334,
+     "gold5": 0.09,
+     "gold20": 4.85,
+     "max20": 6.38,
+     "min20": -0.81,
+     "dxy5": 0.19,
+     "dxy20": -3.77,
+     "path": [
+      -0.81,
+      -0.68,
+      -0.75,
+      -0.36,
+      0.09,
+      -0.12,
+      1.15,
+      1.42,
+      2.82,
+      1.94,
+      1.99,
+      1.93,
+      2.18,
+      2.23,
+      3.7,
+      5.72,
+      6.2,
+      6.38,
+      5.53,
+      4.85
+     ]
+    },
+    {
+     "date": "2022-10-28",
+     "sim": 55,
+     "dist": 0.833,
+     "f": {
+      "t": 1666915200,
+      "ry4w": -17,
+      "y2_4w": 19,
+      "dxy4w": -0.261,
+      "gold4w": -4.312,
+      "vs10w": -1.865,
+      "offHigh": -19.544,
+      "pos13w": 11,
+      "eqVol": 27.97
+     },
+     "entry": 1643.525,
+     "gold5": 2.27,
+     "gold20": 5.95,
+     "max20": 8.36,
+     "min20": -0.83,
+     "dxy5": 0,
+     "dxy20": -3.38,
+     "path": [
+      -0.67,
+      0.2,
+      -0.59,
+      -0.83,
+      2.27,
+      1.78,
+      1.87,
+      4.15,
+      3.83,
+      6.62,
+      7.77,
+      7.3,
+      7.67,
+      8.36,
+      7.94,
+      7.1,
+      6.53,
+      6.62,
+      5.78,
+      5.95
+     ]
+    },
+    {
      "date": "2026-07-31",
-     "sim": 53,
-     "dist": 0.898,
+     "sim": 55,
+     "dist": 0.833,
      "f": {
       "t": 1785456000,
       "ry4w": 21,
@@ -2247,9 +2102,99 @@
      ]
     },
     {
+     "date": "2014-10-31",
+     "sim": 54,
+     "dist": 0.836,
+     "f": {
+      "t": 1414713600,
+      "ry4w": -9,
+      "y2_4w": -7,
+      "dxy4w": 1.886,
+      "gold4w": -3.844,
+      "vs10w": -4.378,
+      "offHigh": -15.397,
+      "pos13w": 0,
+      "eqVol": 16.72
+     },
+     "entry": 1166.466,
+     "gold5": 0.95,
+     "gold20": 2.99,
+     "max20": 3.02,
+     "min20": -2.22,
+     "dxy5": 0.56,
+     "dxy20": 0.86,
+     "path": [
+      -0.11,
+      0.23,
+      -1.96,
+      -2.22,
+      0.95,
+      0.37,
+      -0.95,
+      -0.4,
+      -0.62,
+      -0.47,
+      1.88,
+      1.36,
+      1.7,
+      2.47,
+      1.35,
+      2.3,
+      3,
+      3.02,
+      2.64,
+      2.99
+     ]
+    },
+    {
+     "date": "2026-04-03",
+     "sim": 54,
+     "dist": 0.848,
+     "f": {
+      "t": 1775088000,
+      "ry4w": 19,
+      "y2_4w": 28,
+      "dxy4w": 0.633,
+      "gold4w": -10.017,
+      "vs10w": -5.268,
+      "offHigh": -15.173,
+      "pos13w": 25,
+      "eqVol": 19.17
+     },
+     "entry": 4610.87,
+     "gold5": 3.01,
+     "gold20": -0.33,
+     "max20": 4.91,
+     "min20": -0.33,
+     "dxy5": -1.54,
+     "dxy20": -1.64,
+     "path": [
+      1.05,
+      4.83,
+      2.28,
+      3.32,
+      3.01,
+      1.31,
+      3.19,
+      4.91,
+      4.61,
+      3.92,
+      4.79,
+      3.13,
+      4.58,
+      2.76,
+      2.54,
+      1.83,
+      2.14,
+      1.5,
+      1.76,
+      -0.33
+     ]
+    },
+    {
      "date": "2009-04-17",
-     "sim": 52,
-     "dist": 0.927,
+     "sim": 54,
+     "dist": 0.865,
      "f": {
       "t": 1239926400,
       "ry4w": 27,
@@ -2293,8 +2238,8 @@
     },
     {
      "date": "2011-10-07",
-     "sim": 52,
-     "dist": 0.933,
+     "sim": 53,
+     "dist": 0.879,
      "f": {
       "t": 1317945600,
       "ry4w": 19,
@@ -2337,48 +2282,93 @@
      ]
     },
     {
-     "date": "2026-05-01",
-     "sim": 52,
-     "dist": 0.941,
+     "date": "2014-01-03",
+     "sim": 53,
+     "dist": 0.887,
      "f": {
-      "t": 1777593600,
-      "ry4w": -8,
-      "y2_4w": 4,
-      "dxy4w": -0.835,
-      "gold4w": -2.162,
-      "vs10w": -3.199,
-      "offHigh": -16.314,
-      "pos13w": 21,
-      "eqVol": 12.01
+      "t": 1388707200,
+      "ry4w": -2,
+      "y2_4w": 11,
+      "dxy4w": 1.277,
+      "gold4w": -1.376,
+      "vs10w": -0.288,
+      "offHigh": -23.45,
+      "pos13w": 28,
+      "eqVol": 9.45
      },
-     "entry": 4613.965,
-     "gold5": 2.21,
-     "gold20": -2.04,
-     "max20": 3.33,
-     "min20": -2.7,
-     "dxy5": -0.34,
-     "dxy20": 0.96,
+     "entry": 1234.279,
+     "gold5": 1.14,
+     "gold20": 1.5,
+     "max20": 3.34,
+     "min20": -0.64,
+     "dxy5": -0.28,
+     "dxy20": -0.19,
      "path": [
-      -2.05,
-      -0.44,
-      1.84,
-      1.96,
-      2.21,
-      1.69,
-      3.33,
-      2.24,
+      0.29,
+      -0.39,
+      -0.64,
+      -0.43,
+      1.14,
+      1.18,
+      1.62,
+      0.75,
+      0.56,
+      0.65,
+      1.59,
       1.79,
-      0.83,
-      -1.59,
-      -1.66,
-      -0.69,
-      -2.7,
-      -1.46,
-      -1.7,
-      -2.26,
-      -1.02,
-      -1.17,
-      -2.04
+      1.72,
+      0.72,
+      0.24,
+      2.31,
+      2.88,
+      3.34,
+      1.95,
+      1.5
+     ]
+    },
+    {
+     "date": "2013-09-13",
+     "sim": 53,
+     "dist": 0.901,
+     "f": {
+      "t": 1379030400,
+      "ry4w": 12,
+      "y2_4w": 9,
+      "dxy4w": 0.138,
+      "gold4w": -2.39,
+      "vs10w": -1.83,
+      "offHigh": -24.245,
+      "pos13w": 54,
+      "eqVol": 10.14
+     },
+     "entry": 1330.142,
+     "gold5": -0.31,
+     "gold20": -0.72,
+     "max20": 2.85,
+     "min20": -3.08,
+     "dxy5": -0.83,
+     "dxy20": -1.57,
+     "path": [
+      -1.29,
+      -1.76,
+      2.85,
+      2.68,
+      -0.31,
+      -0.02,
+      -0.23,
+      -0.36,
+      0.16,
+      -0.45,
+      0.49,
+      0.77,
+      -0.11,
+      -3.08,
+      -1.13,
+      -1.01,
+      -1.45,
+      -1.23,
+      -0.52,
+      -0.72
      ]
     }
    ],
@@ -2386,38 +2376,38 @@
     "gold5": {
      "n": 20,
      "median": 1.32,
-     "q25": 0.83,
-     "q75": 2.75,
-     "min": -1.26,
+     "q25": 0.71,
+     "q75": 2.87,
+     "min": -1.99,
      "max": 12.25,
-     "up": 0.9
+     "up": 0.85
     },
     "gold20": {
      "n": 20,
-     "median": 2.4,
-     "q25": 0.99,
-     "q75": 6.01,
+     "median": 2.26,
+     "q25": -0.38,
+     "q75": 6.27,
      "min": -2.11,
      "max": 14.23,
-     "up": 0.75
+     "up": 0.7
     },
     "dxy5": {
      "n": 20,
-     "median": -0.25,
-     "q25": -0.9,
-     "q75": -0.07,
+     "median": -0.17,
+     "q25": -0.85,
+     "q75": 0.26,
      "min": -2.07,
-     "max": 0.81,
-     "up": 0.15
+     "max": 1.31,
+     "up": 0.3
     },
     "dxy20": {
      "n": 20,
-     "median": -0.56,
-     "q25": -1.76,
-     "q75": 0.88,
+     "median": -1.22,
+     "q25": -2.26,
+     "q75": -0.14,
      "min": -4.65,
      "max": 3.5,
-     "up": 0.4
+     "up": 0.25
     }
    },
    "base": {
@@ -2464,9 +2454,9 @@
     "n": 6,
     "gold20": {
      "n": 6,
-     "median": 1.8,
-     "q25": -1.86,
-     "q75": 5.69,
+     "median": 0.26,
+     "q25": -1.06,
+     "q75": 4.67,
      "min": -2.11,
      "max": 14.23,
      "up": 0.5
@@ -2534,7 +2524,7 @@
  },
  "events": [],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). No major release is scheduled this week. Watch $3,891 above and $3,853 below (levels as of the 12 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). No major release is scheduled this week. Watch $3,900 above and $3,853 below (levels as of the 12 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.57,
@@ -2545,9 +2535,9 @@
    "confidence": "low",
    "meter": 0.020000000000000018,
    "channels": {
-    "up": 1,
+    "up": 0,
     "down": 2,
-    "flat": 4,
+    "flat": 5,
     "unobserved": 1,
     "total": 8
    },
@@ -2558,16 +2548,16 @@
    "px": 3880.765,
    "asOf": "2026-11-12",
    "above": {
-    "price": 3891.3,
-    "label": "Last week's low",
-    "dist": 0.27,
+    "price": 3900,
+    "label": "Round number",
+    "dist": 0.5,
     "distNow": 0.49
    },
    "below": {
     "price": 3852.6,
     "label": "13-week low",
     "dist": -0.73,
-    "distNow": -0.51
+    "distNow": -0.73
    },
    "fresh": {
     "asOf": "2026-11-12",
@@ -2576,9 +2566,9 @@
     "text": "as of 2026-11-12 close"
    },
    "mark": {
-    "px": 3872.5,
-    "at": "2026-11-13T20:41:04.000Z",
-    "dist": -0.21
+    "px": 3880.965,
+    "at": "2026-11-13T21:49:17.000Z",
+    "dist": 0.01
    },
    "broken": null
   },
@@ -2589,7 +2579,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-13 20:41 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 4 agree, 1 qualify, 1 disagree (Real yields); qualified: Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Fails if 10Y TIPS real yield above 2.93% (+15 bp from 2.78%) ends the real-rate support; DXY above 104.8 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4130 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 55%) | 2. Gold below its 10-week average (−6.0%); Gold Macro Score −0.73 (AUCTION) | 3. Dollar firmer over 4 weeks (DXY 103.27, +1.18%) | H1 (58%): If gold holds above $3,853 (13-week low), it closes at or above $3,900 (round number) by 2026-11-19 before any close below $3,853 | H2 (71%): Gold's daily closes stay between $3,800 (round number) and $4,013 (20-day average) every day through 2026-11-19 | H3 (56%): DXY closes 2026-12-10 below 103.27 (the latest close) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). No major release is scheduled this week. Watch $3,891 above and $3,853 below (levels as of the 12 Nov close).",
+ "brief": "Macro veteran, 2026-11-13 21:49 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Real yields, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 104.8 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4130 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 2. Gold below its 10-week average (−6.0%); Gold Macro Score −0.90 (AUCTION) | 3. Dollar firmer over 4 weeks (DXY 103.27, +1.18%) | H1 (58%): If gold holds above $3,853 (13-week low), it closes at or above $3,900 (round number) by 2026-11-19 before any close below $3,853 | H2 (64%): Gold's daily closes stay between $3,800 (round number) and $4,013 (20-day average) every day through 2026-11-19 | H3 (66%): DXY closes 2026-12-10 below 103.27 (the latest close) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). No major release is scheduled this week. Watch $3,900 above and $3,853 below (levels as of the 12 Nov close).",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
