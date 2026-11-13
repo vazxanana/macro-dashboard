@@ -52,6 +52,7 @@ paper system with a measured, clearly negative record.
 | 34 | Sell in May (Halloween effect) on nine indices (published effect) | 11 year-pairs | winter minus summer +1.26 % a year (t 0.32); winter-only Sharpe 0.21 against 0.31 holding | #851 |
 | 35 | Crypto weekend long / Monday short (published effect) | ~147 a leg (2024 →) | weekend long BTC +0.000R, ETH +0.063R; Monday short −0.076 / −0.139R; each flips sign between windows | #852 |
 | 36 | 52-week-high rotation across 11 equity indices (published effect) | 130 months | excess +0.046 % a month (t 0.38); negative in 2008-15; 7 of 40 random picks did as well | #853 |
+| 37 | Copper/gold ratio as a risk-on signal for US indices | 565 weeks | on-weeks minus off-weeks −0.20 % a week (t −0.92); Sharpe 0.14 against 0.62 for holding | #854 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
