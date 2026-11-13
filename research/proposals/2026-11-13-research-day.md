@@ -36,6 +36,7 @@ paper system with a measured, clearly negative record.
 | 18 | One-week cross-sectional reversal in G10 FX (published effect) | 7 currencies, 2016 → | Sharpe −0.51, t −1.60; flat even before costs; 29 of 40 placebos | #834 |
 | 19 | Intraday momentum: first half-hour predicts the last (published effect) | 2,672 / 2,682 | SPX −0.159R, NAS100 −0.093R a trade net (t −9.1 / −5.5); about zero before costs; the effect faded after 2015 | #835 |
 | 20 | Overnight drift: hold US indices from close to open (published effect) | 2,722 nights each | net −0.009 / +0.001 / −0.010R a night (t −1.4 / 0.2 / −1.4); positive before costs, spread and financing take it all | #836 |
+| 21 | 5-minute opening range breakout on NAS100 / SPX500 (published effect) | 1,460 / 1,456 (2021 →) | NAS100 +0.075R net (t 1.27), SPX −0.053R; the first candle does point the day before costs (≈ +0.14R), the CFD round trip takes it | #837 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
