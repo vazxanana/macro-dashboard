@@ -1306,6 +1306,13 @@ a solid purple leg back with the move to its extreme ("then ▼ 3,852.6"); a leg
 names the step and its level (`msStage`): "1 Move ▼ · no pullback yet", "2 Pullback ▲ · 50% at …" (or "past 50%, origin …"),
 "3 Continuation ▼ · from …"; M5 / M1 read the stage of the timeframe above them ("In M15 continuation"); the tooltip says which
 ChoCh / break and the levels. From 1200 px the tag keeps its full width.
+Same day, the owner's shared lesson (the 50% rule: "we keep updating the low until price reaches at least 50%"; "we don't need
+to wait for the external 50% retracement, we can use the internal structure"): `msInternalLeg(bars, closedN, d, breaks)` (pure,
+next to `msInternal`) = the leg from the last internal (else major) break in the move's direction, its low updated with every new
+low until a candle trades back to 50% (`reached`), then a new low starts the next leg from that retrace's high. While the move
+runs, `msPath(row, px, iv)` retraces to the INTERNAL 50% first ("Retrace to internal 50%"), none once it is reached; a chart with
+no cycle row (M5, M1) draws the internal path alone ("Break of the internal low / high"). A thin dashed "Internal 50%" line shows
+outside the clean look. Display only, not a tested rule.
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

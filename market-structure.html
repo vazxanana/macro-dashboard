@@ -4050,6 +4050,29 @@ function msInternal(bars, closedN, N = MS_IPIV) {
   }
   return out;
 }
+// The internal leg and its 50% (13 Nov 2026, the owner's shared lesson: "according to the 50% rule we keep updating the low until
+// price reaches at least 50%"; "we don't need to wait for the external 50% retracement, we can use the internal structure").
+// From the last internal break in direction d (msInternal), or the last major one: the leg runs from the high the drop came from
+// (d < 0; mirrored for d > 0) and its low keeps moving with every new low until a candle trades back to 50% of the leg; then the
+// leg is fixed (`reached`), and a new low beyond it starts the next leg from the highest point of that retrace (the internal
+// high). Closed candles only. Returns { dir, from, to, p50, fromIdx, toIdx, reached } or null. Display only, not a tested rule.
+function msInternalLeg(bars, closedN, d, breaks) {
+  const n = Math.min(closedN, bars.length), e = (breaks || []).filter((x) => x.dir === d && x.breakIdx < n).pop();
+  if (!d || !e) return null;
+  const hiOf = (b) => (d < 0 ? b.high : -b.low), loOf = (b) => (d < 0 ? b.low : -b.high);
+  let fi = e.fromIdx; for (let j = e.fromIdx; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[fi])) fi = j;
+  let top = hiOf(bars[fi]), ti = fi, bot = Infinity, bi = fi, reached = false, peak = -Infinity, pi = fi;
+  for (let j = fi + 1; j < n; j++) { const b = bars[j], lo = loOf(b), hi = hiOf(b);
+    if (-lo > -bot) {   // a new low (in the leg's direction)
+      if (reached) { top = peak; ti = pi; reached = false; }
+      bot = lo; bi = j; peak = -Infinity; continue; }
+    if (hi > peak) { peak = hi; pi = j; }
+    if (isFinite(bot) && hi >= bot + 0.5 * (top - bot)) reached = true;
+  }
+  if (!isFinite(bot)) return null;
+  const s = d < 0 ? 1 : -1, from = s * top, to = s * bot;
+  return { dir: d, from, to, p50: (from + to) / 2, fromIdx: ti, toIdx: bi, reached };
+}
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -4194,14 +4217,16 @@ function msAnalyze(bars, N) {
 // past it), then back with the move to its extreme. Moving: a possible retrace to the 50% of the move, then on to the extreme.
 // Continuation: a possible retest of the level it broke back through, then the extreme. Only a level still ahead of price is a
 // leg; a reading of structure, not a tested rule.
-function msPath(r, px) {
+function msPath(r, px, iv) {
   if (!r || !r.target || !r.dir || r.phase === 'none' || !isFinite(px)) return null;
   const T = r.target, d = r.dir, ahead = (k, a, b) => isFinite(b) && (k < 0 ? b < a : b > a), legs = [];
   let turn = null, word = '';
   if (r.phase === 'pullback') {
     if (ahead(-d, px, T.p50)) { turn = T.p50; word = 'Retrace to 50%'; } else if (ahead(-d, px, T.origin)) { turn = T.origin; word = 'Retrace to origin'; }
     if (turn == null) return null;
-  } else if (r.phase === 'move') { if (ahead(-d, px, T.p50)) { turn = T.p50; word = 'Possible retrace to 50%'; } }
+  } else if (iv && iv.dir === d && !iv.reached && ahead(-d, px, iv.p50)) { turn = iv.p50; word = 'Retrace to internal 50%'; }
+  else if (iv && iv.dir === d && iv.reached) { /* the internal retrace is done: the next leg is with the move */ }
+  else if (r.phase === 'move') { if (ahead(-d, px, T.p50)) { turn = T.p50; word = 'Possible retrace to 50%'; } }
   else if (r.resume && ahead(-d, px, r.resume.level)) { turn = r.resume.level; word = 'Possible retest'; }
   if (turn != null) legs.push({ from: px, to: turn, dir: -d, kind: 'retrace', word });
   const s = turn != null ? turn : px;
@@ -4893,7 +4918,16 @@ function msNextSetup(bars, A) {
     // parent is this chart): moving / continuation -> its extreme; pulling back -> its 50%, then its origin once past the 50%.
     // A reading of structure, not a tested rule; nothing reads it.
     // 13 Nov, later: two legs (msPath): the dashed amber retrace first, then the solid purple leg back with the move.
-    if (own) { const path = msPath((G.cycle = cycleNow()).find((r) => r.parent === tf.id), bars[n - 1].close);
+    // and the internal leg (msInternalLeg): its 50% is the nearer retrace while the move runs; a chart with no cycle row (M5, M1)
+    // gets the internal path alone: retrace to the internal 50%, then the break of the internal low / high.
+    if (own) { const row = (G.cycle = cycleNow()).find((r) => r.parent === tf.id), nc = A.n || n, px = bars[n - 1].close;
+      const iv = msInternalLeg(bars, nc, row && row.dir ? row.dir : A.trend, msInternal(bars, nc, PIVOT).concat(A.events).sort((a, b) => a.breakIdx - b.breakIdx));
+      let path = msPath(row, px, iv);
+      if (!path && !row && iv) { const a = (k, x, y) => (k < 0 ? y < x : y > x);
+        path = iv.reached ? (a(iv.dir, px, iv.to) ? [{ from: px, to: iv.to, dir: iv.dir, kind: 'with', word: 'Break of the internal low' }] : null)
+          : a(-iv.dir, px, iv.p50) ? [{ from: px, to: iv.p50, dir: -iv.dir, kind: 'retrace', word: 'Retrace to internal 50%' }].concat(a(iv.dir, iv.p50, iv.to) ? [{ from: iv.p50, to: iv.to, dir: iv.dir, kind: 'with', word: 'then' }] : []) : null;
+        if (path && iv.dir > 0) path.forEach((g) => { g.word = g.word.replace('internal low', 'internal high'); }); }
+      if (iv && !CL) items.lines.push({ l1: iv.fromIdx, l2: n + 9, p: iv.p50, color: 'rgba(224,138,30,.55)', w: 1, dash: true, text: `Internal 50% ${fmt(iv.p50)}${iv.reached ? ' · reached' : ''}`, below: iv.dir > 0 });
       (path || []).forEach((g, k) => { const a = k ? n + 9 : n - 1, b = k || path.length === 1 ? (k ? n + 20 : n + 16) : n + 9;
         items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.word} ${g.dir < 0 ? '▼' : '▲'} ${fmt(g.to)}` }); }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
