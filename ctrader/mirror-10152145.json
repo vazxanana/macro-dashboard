@@ -12441,6 +12441,34 @@
     ],
     "stopCheckedAt": "2026-11-13T03:00:15.000Z",
     "brokerStop": 82.065
+   },
+   "usdcad-position-1794566576": {
+    "positionId": "49407625",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "position",
+    "status": "open",
+    "openedAt": "2026-11-13T10:49:14.000Z",
+    "councilEntry": 1.42654,
+    "stop": 1.4223289642857144,
+    "t1": 1.434962071428571,
+    "riskCash": 3.08,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "mark": 1.42672,
+    "levelsFrom": "mark",
+    "fillPrice": 1.4268,
+    "slipR": 0.062,
+    "lagSec": 314,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-13T10:49:14.000Z",
+    "brokerStop": 1.42241
    }
   },
   "day": {
@@ -12448,16 +12476,16 @@
    "startBalance": 10083.6
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10107.7 · 4 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10107.7 · 5 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-intraday-1794489777": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 253.46, 2.5% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 253.76, 2.5% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-13T10:46:42.000Z"
+    "at": "2026-11-13T10:49:14.000Z"
    }
   },
   "paused": {},
@@ -12484,49 +12512,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdcad-position-1794566576": {
-    "orderId": "34054950",
-    "symbol": "USDCAD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "position",
-    "limitPrice": 1.42654,
-    "stop": 1.4223289642857144,
-    "t1": 1.434962071428571,
-    "placedAt": "2026-11-13T10:43:58.000Z",
-    "expires": "2026-11-18T10:42:56.000Z",
-    "riskCash": 2.95,
-    "margin": 2,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10107.7,
-  "lastRun": "2026-11-13T10:46:42.000Z"
+  "lastRun": "2026-11-13T10:49:14.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T23:23:51.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 270.15, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-12T23:25:45.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 270.45, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-12T23:26:41.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 269.28, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-12T23:28:52.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 269.74, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14011,6 +14003,21 @@
    "at": "2026-11-13T10:46:42.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 253.46, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-13T10:49:14.000Z",
+   "msg": "cancelled USDCAD limit order 34054950 for usdcad-position-1794566576: the council filled it on its feed first",
+   "trade": "usdcad-position-1794566576"
+  },
+  {
+   "at": "2026-11-13T10:49:14.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 253.76, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-13T10:49:14.000Z",
+   "msg": "opened buy USDCAD 0.01 lot (council position)",
+   "trade": "usdcad-position-1794566576"
   }
  ],
  "limits": {
@@ -14089,11 +14096,11 @@
   ]
  },
  "execution": {
-  "n": 414,
+  "n": 415,
   "meanSlipR": -0.01,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 139.5,
+  "medianLagSec": 140,
   "bySymbol": {
    "SOLUSD": {
     "n": 25,
@@ -14116,8 +14123,8 @@
     "meanSlipR": -0.003
    },
    "USDCAD": {
-    "n": 58,
-    "meanSlipR": -0.048
+    "n": 59,
+    "meanSlipR": -0.046
    },
    "USDCHF": {
     "n": 58,
