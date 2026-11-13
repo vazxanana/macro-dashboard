@@ -1,42 +1,24 @@
 {
- "at": "2026-11-12T22:45:57.353Z",
+ "at": "2026-11-13T11:15:54.944Z",
  "source": "OANDA spot 5m (meridianx.dev/md) vs the live Trader's Kraken-era trades (feed kraken or untagged; trades managed on OANDA since 7 Nov 16:01 UTC are counted as sameFeed, not judged)",
  "note": "Same entry/stop/target walked through spot candles, stop first inside a candle; break-even moves ignored. 5m candles cannot order a stop and target inside one candle.",
  "markets": {
   "xau": {
-   "n": 118,
-   "sameFeed": 52,
-   "same": 111,
+   "n": 111,
+   "sameFeed": 56,
+   "same": 106,
    "liveWinSpotLoss": 2,
    "liveWinSpotNever": 0,
-   "liveLossSpotWin": 5,
+   "liveLossSpotWin": 3,
    "liveLossSpotNever": 0,
-   "liveR": 19.47,
-   "spotR": 61.15,
+   "liveR": 26.47,
+   "spotR": 51.01,
    "liveOnly": {
-    "n": 11,
-    "liveR": -8,
-    "spotR": 9.14
+    "n": 9,
+    "liveR": -6,
+    "spotR": -6
    },
    "examples": [
-    {
-     "id": "xau-rscalp-1793563759",
-     "side": "buy",
-     "entry": 3889.73,
-     "stop": 3888.7,
-     "t1": 3898.01,
-     "live": "loss",
-     "spot": "win"
-    },
-    {
-     "id": "xau-rscalp-1793566748",
-     "side": "buy",
-     "entry": 3876.159902,
-     "stop": 3875.259902,
-     "t1": 3882.549902,
-     "live": "loss",
-     "spot": "win"
-    },
     {
      "id": "xau-rscalp-1793638731",
      "side": "sell",
@@ -63,35 +45,44 @@
      "t1": 3938.04,
      "live": "loss",
      "spot": "win"
+    },
+    {
+     "id": "xau-scalp-1793795439",
+     "side": "buy",
+     "entry": 4046.2400000000002,
+     "stop": 4033.03,
+     "t1": 4072.6600000000003,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "xau-rscalp-1793963716",
+     "side": "buy",
+     "entry": 4066.2,
+     "stop": 4065.2499999999995,
+     "t1": 4067.44,
+     "live": "win",
+     "spot": "loss"
     }
    ],
-   "from": "2026-10-30T19:50:00.000Z"
+   "from": "2026-11-02T10:10:00.000Z"
   },
   "eurusd": {
-   "n": 33,
+   "n": 30,
    "sameFeed": 46,
-   "same": 27,
+   "same": 25,
    "liveWinSpotLoss": 5,
-   "liveWinSpotNever": 1,
+   "liveWinSpotNever": 0,
    "liveLossSpotWin": 0,
    "liveLossSpotNever": 0,
-   "liveR": 4.26,
-   "spotR": -17.69,
+   "liveR": 2.34,
+   "spotR": -15.69,
    "liveOnly": {
-    "n": 2,
-    "liveR": 2.92,
-    "spotR": -1
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
    },
    "examples": [
-    {
-     "id": "eurusd-position-1793610380",
-     "side": "buy",
-     "entry": 1.12262,
-     "stop": 1.0799294642857142,
-     "t1": 1.29,
-     "live": "win",
-     "spot": "open"
-    },
     {
      "id": "eurusd-rscalp-1793799233",
      "side": "sell",
@@ -127,35 +118,35 @@
      "t1": 1.1167499999999997,
      "live": "win",
      "spot": "loss"
+    },
+    {
+     "id": "eurusd-scalp-1793959312",
+     "side": "sell",
+     "entry": 1.11672,
+     "stop": 1.1176,
+     "t1": 1.11457,
+     "live": "win",
+     "spot": "loss"
     }
    ],
-   "from": "2026-11-02T06:40:00.000Z"
+   "from": "2026-11-02T19:10:00.000Z"
   },
   "gbpusd": {
-   "n": 42,
-   "sameFeed": 52,
-   "same": 39,
-   "liveWinSpotLoss": 3,
+   "n": 39,
+   "sameFeed": 54,
+   "same": 37,
+   "liveWinSpotLoss": 2,
    "liveWinSpotNever": 0,
    "liveLossSpotWin": 0,
    "liveLossSpotNever": 0,
-   "liveR": -9.11,
-   "spotR": -22.78,
+   "liveR": -13.52,
+   "spotR": -19.78,
    "liveOnly": {
     "n": 1,
     "liveR": -1,
     "spotR": -1
    },
    "examples": [
-    {
-     "id": "gbpusd-rscalp-1793611014",
-     "side": "sell",
-     "entry": 1.34409,
-     "stop": 1.34409,
-     "t1": 1.34114,
-     "live": "win",
-     "spot": "loss"
-    },
     {
      "id": "gbpusd-rscalp-1793694611",
      "side": "sell",
@@ -175,42 +166,24 @@
      "spot": "loss"
     }
    ],
-   "from": "2026-11-02T06:40:00.000Z"
+   "from": "2026-11-02T19:10:00.000Z"
   },
   "audusd": {
-   "n": 79,
-   "sameFeed": 51,
-   "same": 70,
-   "liveWinSpotLoss": 3,
+   "n": 69,
+   "sameFeed": 52,
+   "same": 62,
+   "liveWinSpotLoss": 1,
    "liveWinSpotNever": 0,
    "liveLossSpotWin": 6,
    "liveLossSpotNever": 0,
-   "liveR": 0.5,
-   "spotR": 15.1,
+   "liveR": -6.08,
+   "spotR": 11.62,
    "liveOnly": {
     "n": 0,
     "liveR": 0,
     "spotR": 0
    },
    "examples": [
-    {
-     "id": "audusd-rscalp-1793621427",
-     "side": "buy",
-     "entry": 0.70094,
-     "stop": 0.7004400000000001,
-     "t1": 0.70119,
-     "live": "win",
-     "spot": "loss"
-    },
-    {
-     "id": "audusd-rintra-1793626672",
-     "side": "buy",
-     "entry": 0.70106,
-     "stop": 0.70013,
-     "t1": 0.70162,
-     "live": "win",
-     "spot": "loss"
-    },
     {
      "id": "audusd-scalp-1793732967",
      "side": "sell",
@@ -237,20 +210,38 @@
      "t1": 0.69908,
      "live": "loss",
      "spot": "win"
+    },
+    {
+     "id": "audusd-scalp-1793793229",
+     "side": "buy",
+     "entry": 0.7014,
+     "stop": 0.70093,
+     "t1": 0.7024,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "audusd-scalp-1793907102",
+     "side": "sell",
+     "entry": 0.69411,
+     "stop": 0.69513,
+     "t1": 0.69207,
+     "live": "loss",
+     "spot": "win"
     }
    ],
-   "from": "2026-11-02T06:40:00.000Z"
+   "from": "2026-11-02T19:10:00.000Z"
   },
   "usdcad": {
-   "n": 44,
-   "sameFeed": 44,
-   "same": 35,
+   "n": 43,
+   "sameFeed": 45,
+   "same": 34,
    "liveWinSpotLoss": 7,
    "liveWinSpotNever": 0,
    "liveLossSpotWin": 2,
    "liveLossSpotNever": 0,
-   "liveR": 3.35,
-   "spotR": -14.86,
+   "liveR": 4.35,
+   "spotR": -13.86,
    "liveOnly": {
     "n": 0,
     "liveR": 0,
@@ -303,51 +294,24 @@
      "spot": "win"
     }
    ],
-   "from": "2026-11-02T06:40:00.000Z"
+   "from": "2026-11-02T19:10:00.000Z"
   },
   "usdchf": {
-   "n": 53,
-   "sameFeed": 57,
-   "same": 34,
-   "liveWinSpotLoss": 13,
+   "n": 47,
+   "sameFeed": 59,
+   "same": 31,
+   "liveWinSpotLoss": 11,
    "liveWinSpotNever": 0,
-   "liveLossSpotWin": 6,
+   "liveLossSpotWin": 5,
    "liveLossSpotNever": 0,
-   "liveR": 33.27,
-   "spotR": -1.68,
+   "liveR": 26.82,
+   "spotR": -6.37,
    "liveOnly": {
-    "n": 2,
-    "liveR": 1.23,
-    "spotR": 1.4
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
    },
    "examples": [
-    {
-     "id": "usdchf-intraday-1793624114",
-     "side": "sell",
-     "entry": 0.81985,
-     "stop": 0.8223,
-     "t1": 0.81396,
-     "live": "loss",
-     "spot": "win"
-    },
-    {
-     "id": "usdchf-swing-1793632492",
-     "side": "sell",
-     "entry": 0.82021,
-     "stop": 0.8266315000000001,
-     "t1": 0.805867,
-     "live": "win",
-     "spot": "loss"
-    },
-    {
-     "id": "usdchf-rscalp-1793642923",
-     "side": "buy",
-     "entry": 0.81861,
-     "stop": 0.8180000000000001,
-     "t1": 0.81918,
-     "live": "win",
-     "spot": "loss"
-    },
     {
      "id": "usdchf-scalp-1793647091",
      "side": "sell",
@@ -365,15 +329,42 @@
      "t1": 0.8166000000000002,
      "live": "win",
      "spot": "loss"
+    },
+    {
+     "id": "usdchf-intraday-1793650072",
+     "side": "sell",
+     "entry": 0.81838,
+     "stop": 0.8191499999999999,
+     "t1": 0.8163300000000001,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "usdchf-scalp-1793651038",
+     "side": "sell",
+     "entry": 0.81861,
+     "stop": 0.81897,
+     "t1": 0.8160000000000002,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "usdchf-intraday-1793686566",
+     "side": "sell",
+     "entry": 0.81856,
+     "stop": 0.81989,
+     "t1": 0.81516,
+     "live": "loss",
+     "spot": "win"
     }
    ],
-   "from": "2026-11-02T06:40:00.000Z"
+   "from": "2026-11-02T19:10:00.000Z"
   }
  },
  "forex": {
-  "n": 251,
-  "liveR": 32.27,
-  "spotR": -41.91
+  "n": 228,
+  "liveR": 13.91,
+  "spotR": -44.08
  },
  "errors": {}
 }
