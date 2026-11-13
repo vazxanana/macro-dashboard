@@ -29,10 +29,11 @@ paper system with a measured, clearly negative record.
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
-
 | 14 | Gold/silver ratio mean reversion | 18 / 16 | −0.98 % / −1.27 % a trade, t −1.20 / −2.03; loses before costs | #829 |
 | 15 | Pre-FOMC announcement drift on US indices (published effect) | 86 (2016 →) | SPX +0.044R a trade, t 1.35, under its placebo; NAS100 t 2.45 but under its placebo too: mostly the indices' own drift | #831 |
 | 16 | G10 FX carry (published effect) | — | **not run**: interest-rate data (FRED and others) not reachable from the build sandbox | #830 |
+| 17 | One-week time-series momentum in crypto (published effect) | 4 coins, 2022 → | long/flat Sharpe 0.37 (t 0.77), long/short 0.20, below buy-and-hold 0.44; worked 2018-21, faded since | #833 |
+| 18 | One-week cross-sectional reversal in G10 FX (published effect) | 7 currencies, 2016 → | Sharpe −0.51, t −1.60; flat even before costs; 29 of 40 placebos | #834 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
