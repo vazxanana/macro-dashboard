@@ -56,6 +56,7 @@ paper system with a measured, clearly negative record.
 | 38 | Dual momentum: SPX500 or gold or flat (published effect) | 131 months | Sharpe 0.36 / 0.41 against 0.65 for a plain 50/50; worked in 2008-15, flipped since | #855 |
 | 39 | Bitcoin / Ether long only above the 200-day average (published) | 2022 → | beat holding on Sharpe and drawdown (BTC 0.61 vs 0.08) but best bootstrap P 0.93, Holm p 0.27, and trailed holding in 2018-21; mostly the 15 %/yr swap it avoids while flat | #856 |
 | 40 | **Turnaround Tuesday** on US indices | 81 (NAS100 > 1 %) | **one cell of four passes, narrowly**: NAS100 after a Monday down more than 1 %, +0.098R a trade, t 2.33 (Holm p 0.039), 2008-15 t 2.12; the other three cells fail. One pass in about 40 studies is what chance gives: a replication on six other indices is running before anyone acts on it | #857 |
+| 41 | WTI around the weekly US crude inventory report (fade / follow) | 304 / 306 (2021 →) | −0.096 / −0.013R a trade (t −0.2 / −0.1); both negative in 2016-20 | #858 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
