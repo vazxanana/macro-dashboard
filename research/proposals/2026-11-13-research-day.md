@@ -63,6 +63,8 @@ paper system with a measured, clearly negative record.
 | 45 | The turnaround rule (#40), frozen, on US30, US2000, DE40, EU50, UK100, JP225 | 411 pooled | +0.052R a trade, month t 1.69 (bar 2); all six positive, none at t 2; 2008-15 t 1.03. The NAS100 pass does not replicate | #862 |
 | 46 | Gold and NAS100 after the payrolls release: follow or fade the first 15 minutes | 77 / 40 / 77 / 39 (2020 →) | 0 of 4; following loses on both (gold −0.235R, t −2.33); the gold fade +0.096R, t 0.51, too few trades | #863 |
 | 47 | Gold: fade the Sunday reopen gap back to Friday's close | 41 / 38 (2020 →) | −0.109 / −0.110R a trade (t −0.8); small gaps fill but are too small to trade, larger ones mostly do not fill | #864 |
+| 48 | Month- and quarter-end stock/bond rebalancing flow on SPX500 / NAS100 (published effect) | 93 / 30 a market (2016 →) | 0 of 4; +0.013 / +0.006R on all months (t 0.2 / 0.1), negative on quarter-ends; at the median of a random side | #865 |
+| 49 | Crypto: buy after a sharp three-day drop (published short-term reversal) | ~109 (2022 →) | 0 of 4; day-3 −0.095R, day-7 −0.124R a trade (month t −1.7); loses before costs and in 2018-21 | #866 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
