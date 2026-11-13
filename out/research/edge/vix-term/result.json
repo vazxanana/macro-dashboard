@@ -1,0 +1,43 @@
+{
+ "topic": "vix-term",
+ "data": "not reachable",
+ "fetch": {
+  "at": "2026-11-13T22:41:12.568Z",
+  "files": {
+   "VIX": {
+    "ok": false,
+    "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+    "error": "Request was cancelled."
+   },
+   "VIX3M": {
+    "ok": false,
+    "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX3M_History.csv",
+    "error": "Request was cancelled."
+   }
+  }
+ },
+ "note": "Cboe VIX / VIX3M history could not be fetched from this environment; per the pre-registration no other source is used and no number is reported.",
+ "params": {
+  "atrN": 20,
+  "atrK": 2,
+  "cost": {
+   "spx500": 1,
+   "nas100": 4
+  },
+  "finSpread": 0.025,
+  "W1": [
+   "2008-01-01",
+   "2015-12-31"
+  ],
+  "W2": [
+   "2016-01-01",
+   null
+  ],
+  "draws": 2000,
+  "seed": 20261113,
+  "pBar": 0.9
+ },
+ "prereg": "PREREGISTRATION.md",
+ "verdict": "INCONCLUSIVE",
+ "why": "data not reachable"
+}
