@@ -4050,26 +4050,20 @@ function msInternal(bars, closedN, N = MS_IPIV) {
   }
   return out;
 }
-// The internal leg and its 50% (13 Nov 2026, the owner's shared lesson: "according to the 50% rule we keep updating the low until
-// price reaches at least 50%"; "we don't need to wait for the external 50% retracement, we can use the internal structure").
-// From the last internal break in direction d (msInternal), or the last major one: the leg runs from the high the drop came from
-// (d < 0; mirrored for d > 0) and its low keeps moving with every new low until a candle trades back to 50% of the leg; then the
-// leg is fixed (`reached`), and a new low beyond it starts the next leg from the highest point of that retrace (the internal
-// high). Closed candles only. Returns { dir, from, to, p50, fromIdx, toIdx, reached } or null. Display only, not a tested rule.
+// The internal leg and its 50% (13 Nov 2026, the owner's shared lesson, read again with the owner: "price doesn't need to reach
+// the 50%"; "we don't need to wait for the external 50% retracement, we can use the internal structure"). Every internal
+// break in direction d starts its own range, whatever the depth of the pullback before it: from the last such break
+// (msInternal, else the last major one) the leg runs from the high the drop came from (the internal high, d < 0; mirrored for
+// d > 0) to the lowest low since; its 50% is where the next pullback can be traded. `reached` = a candle has traded back to that
+// 50% since the low. Closed candles only. Returns { dir, from, to, p50, fromIdx, toIdx, reached } or null. Display only.
 function msInternalLeg(bars, closedN, d, breaks) {
   const n = Math.min(closedN, bars.length), e = (breaks || []).filter((x) => x.dir === d && x.breakIdx < n).pop();
   if (!d || !e) return null;
   const hiOf = (b) => (d < 0 ? b.high : -b.low), loOf = (b) => (d < 0 ? b.low : -b.high);
-  let fi = e.fromIdx; for (let j = e.fromIdx; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[fi])) fi = j;
-  let top = hiOf(bars[fi]), ti = fi, bot = Infinity, bi = fi, reached = false, peak = -Infinity, pi = fi;
-  for (let j = fi + 1; j < n; j++) { const b = bars[j], lo = loOf(b), hi = hiOf(b);
-    if (-lo > -bot) {   // a new low (in the leg's direction)
-      if (reached) { top = peak; ti = pi; reached = false; }
-      bot = lo; bi = j; peak = -Infinity; continue; }
-    if (hi > peak) { peak = hi; pi = j; }
-    if (isFinite(bot) && hi >= bot + 0.5 * (top - bot)) reached = true;
-  }
-  if (!isFinite(bot)) return null;
+  let ti = e.fromIdx; for (let j = e.fromIdx; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[ti])) ti = j;
+  let bi = e.breakIdx; for (let j = e.breakIdx; j < n; j++) if (loOf(bars[j]) < loOf(bars[bi])) bi = j;
+  const top = hiOf(bars[ti]), bot = loOf(bars[bi]), mid = bot + 0.5 * (top - bot);
+  let reached = false; for (let j = bi + 1; j < n; j++) if (hiOf(bars[j]) >= mid) { reached = true; break; }
   const s = d < 0 ? 1 : -1, from = s * top, to = s * bot;
   return { dir: d, from, to, p50: (from + to) / 2, fromIdx: ti, toIdx: bi, reached };
 }

@@ -239,17 +239,16 @@ test('retrace path and cycle stage are wired: arrows on the chart, a stage in ev
 const legSrc = html.slice(html.indexOf('function msInternalLeg'), html.indexOf('function msAnalyze'));
 const msInternalLeg = new Function(`${legSrc}; return msInternalLeg;`)();
 const K = (h, l) => ({ high: h, low: l });
-test('internal leg: the low keeps moving until price trades back to 50%, then a new low starts the next leg from the retrace high', () => {
-  // drop from 100 to 90, new lows to 80 (no 50% retrace yet), back to 91 (past 50% of 100-80 = 90), then a new low 78
-  const bars = [K(100, 98), K(99, 95), K(96, 90), K(92, 85), K(86, 80), K(88, 83), K(91, 86), K(89, 84), K(85, 78), K(80, 79)];
-  const br = [{ dir: -1, fromIdx: 0, breakIdx: 2 }];
-  const a = msInternalLeg(bars, 6, -1, br);   // through the bar that reached 88 only
+test('internal leg: every internal break starts its own range, no 50% pullback needed first', () => {
+  // drop from 100 to 80, a small pullback to 86 (under 50%), then a new internal break down: the range is 86 -> new low
+  const bars = [K(100, 98), K(99, 95), K(96, 90), K(92, 85), K(86, 80), K(86, 82), K(84, 81), K(82, 76), K(79, 75), K(78, 76)];
+  const a = msInternalLeg(bars, 7, -1, [{ dir: -1, fromIdx: 0, breakIdx: 2 }]);
   assert.equal(a.from, 100); assert.equal(a.to, 80); assert.equal(a.p50, 90); assert.equal(a.reached, false);
-  const b = msInternalLeg(bars, 7, -1, br);   // the 91 bar reached the 50%
-  assert.equal(b.reached, true); assert.equal(b.to, 80);
-  const c = msInternalLeg(bars, 10, -1, br);  // new low 78: next leg from the retrace high 91
-  assert.equal(c.from, 91); assert.equal(c.to, 78); assert.equal(c.reached, false); assert.equal(c.p50, 84.5);
-  assert.equal(msInternalLeg(bars, 10, 1, br), null);
+  const c = msInternalLeg(bars, 10, -1, [{ dir: -1, fromIdx: 0, breakIdx: 2 }, { dir: -1, fromIdx: 4, breakIdx: 7 }]);
+  assert.equal(c.from, 86); assert.equal(c.to, 75); assert.equal(c.p50, 80.5); assert.equal(c.reached, false);
+  const r = msInternalLeg(bars.concat([K(81, 78)]), 11, -1, [{ dir: -1, fromIdx: 4, breakIdx: 7 }]);
+  assert.equal(r.reached, true);
+  assert.equal(msInternalLeg(bars, 10, 1, [{ dir: -1, fromIdx: 0, breakIdx: 2 }]), null);
 });
 test('retrace path prefers the internal 50% while the move runs, and none once it is reached', () => {
   const T = { p50: 4050, origin: 4100, far: 4150, ext: 4000 };
