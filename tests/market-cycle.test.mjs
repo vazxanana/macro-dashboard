@@ -169,7 +169,10 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   for (const v of ['candles', 'line', 'both']) assert.match(html, new RegExp(`data-cs="${v}"`));
   for (const id of ['ms-sty-bg', 'ms-sty-up', 'ms-sty-dn', 'ms-sty-ln']) assert.match(html, new RegExp(`id="${id}" value="#`));
   assert.match(html, /localStorage\.setItem\('ms-colors'/); assert.match(html, /function setCs\(m\)/);
-  assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news'\]/);
+  assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail'\]/);
+  // 13 Nov 2026, owner: "make the charts more cleaner": the clean look keeps the story and is on the first time a device opens the charts
+  for (const keep of ['ms-show-bo', 'ms-show-origin', 'ms-show-cf', 'ms-show-vr', 'ms-show-next', 'ms-show-plan']) assert.doesNotMatch(html.match(/const BUSY = \[[^\]]*\]/)[0], new RegExp(keep));
+  assert.match(html, /localStorage\.getItem\('ms-clean-v2'\); localStorage\.setItem\('ms-clean-v2', '1'\)/);
   assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
 });
 
