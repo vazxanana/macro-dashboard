@@ -58,6 +58,8 @@ paper system with a measured, clearly negative record.
 | 40 | **Turnaround Tuesday** on US indices | 81 (NAS100 > 1 %) | **one cell of four passes, narrowly**: NAS100 after a Monday down more than 1 %, +0.098R a trade, t 2.33 (Holm p 0.039), 2008-15 t 2.12; the other three cells fail. One pass in about 40 studies is what chance gives: a replication on six other indices is running before anyone acts on it | #857 |
 | 41 | WTI around the weekly US crude inventory report (fade / follow) | 304 / 306 (2021 →) | −0.096 / −0.013R a trade (t −0.2 / −0.1); both negative in 2016-20 | #858 |
 | 42 | Big S&P sessions spilling into the yen overnight (USD/JPY, AUD/JPY) | 725 each | −0.093 / +0.011R a trade (t −2.4 / 0.3); both negative in 2008-15 | #859 |
+| 43 | US indices after a volatility spike (5-day vol over 2x its median, below the 20-day average) | 216 / 165 (2016 →) | 5-day hold fails (+0.076R, t 1.96); 10-day hold passes its bar (+0.151R, t 2.53, Holm p 0.011) but is weak: 2008-15 +0.013R, t 1.68 by entry week (the three indices fire together), just over the placebo's 95th percentile. A paper shadow at most; the study leans to nothing | #860 |
+| 44 | Follow or fade the first 30 minutes after the FOMC statement (NAS100, SPX500, gold) | 54 each (2020 →) | 0 of 6; best fade NAS100 +0.095R (t 0.56), −0.313R in 2010-19 | #861 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
