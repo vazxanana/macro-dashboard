@@ -126,7 +126,8 @@
     .ms-ph { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid var(--ms-b); font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
     .ms-ph b { font-size: 13px; }
     .ms-ph .ms-role { color: var(--ms-mute); }
-    .ms-ph .ms-cy { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #8a3fb0; background: rgba(166,77,201,.12); white-space: nowrap; }
+    .ms-ph .ms-cy { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #8a3fb0; background: rgba(166,77,201,.12); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46ch; min-width: 0; }
+    @media (min-width: 1200px) { .ms-ph .ms-cy { flex-shrink: 0; max-width: none; } }
     html[data-theme="dark"] .ms-ph .ms-cy, html[data-theme="midnight"] .ms-ph .ms-cy, html[data-theme="pro"] .ms-ph .ms-cy { color: #d3a4ec; }
     .ms-ph .ms-cy.pullback { color: var(--warn-ink, #8a5a00); background: rgba(255,152,0,.14); }
     .ms-ph .ms-tbtn { margin-left: auto; padding: 2px 8px; font-size: 11px; }
@@ -4188,17 +4189,34 @@ function msAnalyze(bars, N) {
 // For each timeframe and the one under it: 'move' = the lower one still agrees (the move runs), 'pullback' = the lower one broke
 // against it after its break (its ChoCh: the pullback / retracement started), 'resumed' = the lower one then broke back with it
 // (the pullback is over). Targets: the pullback's = 50% of the move and the move's origin (the broken level); the move's = its extreme.
-// where a timeframe's cycle points next (13 Nov 2026): one row of msCycle (the timeframe as `parent`) and the last close ->
-// { dir, p, word, phase } or null. Moving / continuation: its extreme. Pulling back: its 50%, then its origin once past the 50%.
-// Only a target still ahead of the price is drawn. Display only.
-function msExpect(r, px) {
+// The path the cycle points to next (13 Nov 2026, owner: "better arrows showing where it might retrace"): one or two legs from
+// the last close, each { from, to, dir, kind: 'retrace' | 'with', word }. Pulling back: retrace to the 50% (or to the origin once
+// past it), then back with the move to its extreme. Moving: a possible retrace to the 50% of the move, then on to the extreme.
+// Continuation: a possible retest of the level it broke back through, then the extreme. Only a level still ahead of price is a
+// leg; a reading of structure, not a tested rule.
+function msPath(r, px) {
   if (!r || !r.target || !r.dir || r.phase === 'none' || !isFinite(px)) return null;
-  const T = r.target, ahead = (d, p) => isFinite(p) && (d < 0 ? p < px : p > px);
-  if (r.phase === 'pullback') { const d = -r.dir;
-    if (ahead(d, T.p50)) return { dir: d, p: T.p50, word: 'Pullback to 50%', phase: r.phase };
-    if (ahead(d, T.origin)) return { dir: d, p: T.origin, word: 'Pullback to origin', phase: r.phase };
-    return null; }
-  return ahead(r.dir, T.ext) ? { dir: r.dir, p: T.ext, word: r.phase === 'resumed' ? 'Continuation to' : 'Move to', phase: r.phase } : null;
+  const T = r.target, d = r.dir, ahead = (k, a, b) => isFinite(b) && (k < 0 ? b < a : b > a), legs = [];
+  let turn = null, word = '';
+  if (r.phase === 'pullback') {
+    if (ahead(-d, px, T.p50)) { turn = T.p50; word = 'Retrace to 50%'; } else if (ahead(-d, px, T.origin)) { turn = T.origin; word = 'Retrace to origin'; }
+    if (turn == null) return null;
+  } else if (r.phase === 'move') { if (ahead(-d, px, T.p50)) { turn = T.p50; word = 'Possible retrace to 50%'; } }
+  else if (r.resume && ahead(-d, px, r.resume.level)) { turn = r.resume.level; word = 'Possible retest'; }
+  if (turn != null) legs.push({ from: px, to: turn, dir: -d, kind: 'retrace', word });
+  const s = turn != null ? turn : px;
+  if (ahead(d, s, T.ext)) legs.push({ from: s, to: T.ext, dir: d, kind: 'with', word: turn != null ? 'then' : r.phase === 'resumed' ? 'Continuation to' : 'Move to' });
+  return legs.length ? legs : null;
+}
+// The stage of the cycle in words for a pane header: { step, text, tip } (step 1 move, 2 pullback, 3 continuation, 0 none).
+function msStage(r, px, fmt) {
+  const f = fmt || ((v) => String(v));
+  if (!r || !r.dir || r.phase === 'none' || !r.target) return null;
+  const ar = r.dir < 0 ? '▼' : '▲', back = r.dir < 0 ? '▲' : '▼', T = r.target;
+  if (r.phase === 'move') return { step: 1, text: `1 Move ${ar} · no pullback yet`, tip: `${r.pl} broke ${r.dir < 0 ? 'down' : 'up'} at ${f(T.origin)}; ${r.cl} has not broken against it yet.` };
+  if (r.phase === 'pullback') { const past = isFinite(px) && (r.dir < 0 ? px > T.p50 : px < T.p50);
+    return { step: 2, text: `2 Pullback ${back} · ${past ? `past 50%, origin ${f(T.origin)}` : `50% at ${f(T.p50)}`}`, tip: `${r.cl} ChoCh ${f(r.choch.level)} started the ${r.pl} pullback; 50% ${f(T.p50)}, origin ${f(T.origin)}, then the ${r.pl} extreme ${f(T.ext)}.` }; }
+  return { step: 3, text: `3 Continuation ${ar} · from ${f(r.resume.level)}`, tip: `${r.cl} broke back with ${r.pl} at ${f(r.resume.level)} after the pullback; ${r.pl} extreme ${f(T.ext)}.` };
 }
 function msCycle(legs) {
   const out = [];
@@ -4874,8 +4892,10 @@ function msNextSetup(bars, A) {
     // right now in each timeframe"): from the last close to where this timeframe's cycle points next (msCycle, the row whose
     // parent is this chart): moving / continuation -> its extreme; pulling back -> its 50%, then its origin once past the 50%.
     // A reading of structure, not a tested rule; nothing reads it.
-    if (own) { const ex = msExpect((G.cycle = cycleNow()).find((r) => r.parent === tf.id), bars[n - 1].close);
-      if (ex) items.segs.push({ l1: n - 1, p1: bars[n - 1].close, l2: n + 16, p2: ex.p, color: CYC, w: 2, arrow: true, dash: false, text: `${ex.word} ${ex.dir < 0 ? '▼' : '▲'} ${fmt(ex.p)}` }); }
+    // 13 Nov, later: two legs (msPath): the dashed amber retrace first, then the solid purple leg back with the move.
+    if (own) { const path = msPath((G.cycle = cycleNow()).find((r) => r.parent === tf.id), bars[n - 1].close);
+      (path || []).forEach((g, k) => { const a = k ? n + 9 : n - 1, b = k || path.length === 1 ? (k ? n + 20 : n + 16) : n + 9;
+        items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.word} ${g.dir < 0 ? '▼' : '▲'} ${fmt(g.to)}` }); }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
     if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
       M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
@@ -5482,7 +5502,7 @@ function msNextSetup(bars, A) {
   setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
   // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
   // market cycle: the legs of D1, H4, H1, M15 and M5 handed to msCycle, and its reading in words under the alignment strip
-  const CYC = '#a64dc9';
+  const CYC = '#a64dc9', RTR = '#e08a1e';
   // the Mosha storyline for a pane: the timeframe above's last BO with its trend, this pane's breaks after it (msMosha)
   function moshaNow(id, bars) {
     const up = { '4h': '1d', '1h': '4h', '15m': '1h', '5m': '15m' }[id], hp = up && panes[up], P = panes[id];
@@ -5509,10 +5529,14 @@ function msNextSetup(bars, A) {
   function cycleTags(CY) {
     document.querySelectorAll('#v-charts .ms-pane[data-tf]').forEach((pn) => { const id = pn.dataset.tf, ph = pn.querySelector('.ms-ph'); if (!ph || id === 'split') return;
       let tg = ph.querySelector('.ms-cy'); if (!tg) { tg = document.createElement('span'); tg.className = 'ms-cy'; const chip = ph.querySelector('.ms-chip'); ph.insertBefore(tg, chip ? chip.nextSibling : null); }
-      const r = CY.find((x) => x.parent === id), P = panes[id], d = r && r.dir ? r.dir : P && P.A ? P.A.trend : 0, ar = d < 0 ? '▼' : d > 0 ? '▲' : '';
-      const w = !r || r.phase === 'none' ? (d ? `Trend ${ar}` : '') : r.phase === 'move' ? `Moving ${ar}` : r.phase === 'pullback' ? `Pulling back ${d < 0 ? '▲' : '▼'}` : `Continuation ${ar}`;
-      tg.textContent = w; tg.hidden = !w; tg.className = 'ms-cy ' + (r ? r.phase : 'trend');
-      tg.title = r && r.phase !== 'none' ? `${r.pl} read on ${r.cl}: ${w.toLowerCase()}. A reading of structure, not a tested rule.` : 'This timeframe\'s own trend.'; });
+      const P = panes[id], px = P && P.bars && P.bars.length ? P.bars[P.bars.length - 1].close : NaN;
+      let r = CY.find((x) => x.parent === id), st = msStage(r, px, fmt), w, cls, tip;
+      if (st) { w = st.text; cls = ['', 'move', 'pullback', 'resumed'][st.step]; tip = st.tip; }
+      else { const up = CY.find((x) => x.child === id && x.phase !== 'none'), su = up && msStage(up, px, fmt);
+        if (su) { w = `In ${up.pl} ${su.text.replace(/^\d /, '').split(' · ')[0].toLowerCase()}`; cls = ['', 'move', 'pullback', 'resumed'][su.step]; tip = `${id.toUpperCase()} sits inside this ${up.pl} stage. ${su.tip}`; }
+        else { const d = r && r.dir ? r.dir : P && P.A ? P.A.trend : 0; w = d ? `Trend ${d < 0 ? '▼' : '▲'}` : ''; cls = 'trend'; tip = 'This timeframe\'s own trend.'; } }
+      tg.textContent = w; tg.hidden = !w; tg.className = 'ms-cy ' + cls;
+      tg.title = w ? `${tip} A reading of structure, not a tested rule.` : ''; });
   }
   function cycleStrip() {
     const el = document.getElementById('ms-cycle');

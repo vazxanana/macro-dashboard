@@ -203,19 +203,34 @@ test('fresh zones wired: own layer, BO and iBO breaks, the three nearest to pric
   assert.match(html, /msZones\(bars, brk, nc\)\.filter\(\(z\) => z\.fresh\)/); assert.match(html, /\.slice\(0, 3\)\.forEach\(\(z\) => \{ const dem = d > 0;/);
 });
 
-// 13 Nov 2026, owner: "it should show an arrow of the move he is expecting and which market cycle we are in right now in each timeframe"
-const msExpect = new Function(`${html.slice(html.indexOf('function msExpect'), html.indexOf('function msCycle'))}; return msExpect;`)();
-test('expected move: a move points at its extreme, a pullback at the 50% then the origin, never at a level already passed', () => {
+// 13 Nov 2026, owner: an arrow of the expected move and the cycle in each timeframe; then "better arrows showing where it might
+// retrace, and be more specific on market cycle"
+const pathSrc = html.slice(html.indexOf('function msPath'), html.indexOf('function msCycle'));
+const { msPath, msStage } = new Function(`${pathSrc}; return { msPath, msStage };`)();
+test('retrace path: retrace leg first, then the leg back with the move; never a level already passed', () => {
   const T = { p50: 4050, origin: 4100, far: 4150, ext: 4000 };
-  assert.deepEqual(msExpect({ dir: -1, phase: 'move', target: T }, 4030), { dir: -1, p: 4000, word: 'Move to', phase: 'move' });
-  assert.equal(msExpect({ dir: -1, phase: 'resumed', target: T }, 4030).word, 'Continuation to');
-  assert.deepEqual(msExpect({ dir: -1, phase: 'pullback', target: T }, 4020), { dir: 1, p: 4050, word: 'Pullback to 50%', phase: 'pullback' });
-  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4070).p, 4100);
-  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4120), null);
-  assert.equal(msExpect({ dir: -1, phase: 'move', target: T }, 3990), null);
-  assert.equal(msExpect({ dir: -1, phase: 'none', target: T }, 4030), null);
+  assert.deepEqual(msPath({ dir: -1, phase: 'pullback', target: T }, 4020), [
+    { from: 4020, to: 4050, dir: 1, kind: 'retrace', word: 'Retrace to 50%' }, { from: 4050, to: 4000, dir: -1, kind: 'with', word: 'then' }]);
+  assert.equal(msPath({ dir: -1, phase: 'pullback', target: T }, 4070)[0].to, 4100);
+  assert.equal(msPath({ dir: -1, phase: 'pullback', target: T }, 4120), null);
+  const mv = msPath({ dir: -1, phase: 'move', target: T }, 4030);
+  assert.equal(mv[0].word, 'Possible retrace to 50%'); assert.equal(mv[1].to, 4000);
+  assert.deepEqual(msPath({ dir: -1, phase: 'move', target: T }, 4060), [{ from: 4060, to: 4000, dir: -1, kind: 'with', word: 'Move to' }]);
+  const rs = msPath({ dir: -1, phase: 'resumed', target: T, resume: { level: 4035 } }, 4020);
+  assert.equal(rs[0].word, 'Possible retest'); assert.equal(rs[0].to, 4035); assert.equal(rs[1].to, 4000);
+  assert.equal(msPath({ dir: -1, phase: 'move', target: T }, 3990)[0].to, 4050);
+  assert.equal(msPath({ dir: -1, phase: 'none', target: T }, 4030), null);
 });
-test('expected move and cycle tag are wired: an arrow on the chart, a tag in every pane header', () => {
-  assert.match(html, /items\.segs\.push\(\{ l1: n - 1, p1: bars\[n - 1\]\.close, l2: n \+ 16, p2: ex\.p, color: CYC, w: 2, arrow: true/);
-  assert.match(html, /if \(sg\.arrow\)/); assert.match(html, /function cycleTags\(CY\)/); assert.match(html, /\.ms-ph \.ms-cy \{/);
+test('cycle stage: step, levels and a tooltip in words', () => {
+  const T = { p50: 4050, origin: 4100, far: 4150, ext: 4000 }, base = { dir: -1, pl: 'H4', cl: 'H1', target: T };
+  assert.equal(msStage({ ...base, phase: 'move' }, 4030).text, '1 Move ▼ · no pullback yet');
+  assert.equal(msStage({ ...base, phase: 'pullback', choch: { level: 4020 } }, 4030).text, '2 Pullback ▲ · 50% at 4050');
+  assert.equal(msStage({ ...base, phase: 'pullback', choch: { level: 4020 } }, 4070).text, '2 Pullback ▲ · past 50%, origin 4100');
+  assert.equal(msStage({ ...base, phase: 'resumed', resume: { level: 4035 } }, 4030).step, 3);
+  assert.equal(msStage({ ...base, phase: 'none' }, 4030), null);
+});
+test('retrace path and cycle stage are wired: arrows on the chart, a stage in every pane header', () => {
+  assert.match(html, /const path = msPath\(\(G\.cycle = cycleNow\(\)\)\.find\(\(r\) => r\.parent === tf\.id\), bars\[n - 1\]\.close\)/);
+  assert.match(html, /color: g\.kind === 'retrace' \? RTR : CYC, w: 2, arrow: true, dash: g\.kind === 'retrace'/);
+  assert.match(html, /if \(sg\.arrow\)/); assert.match(html, /function cycleTags\(CY\)/); assert.match(html, /msStage\(r, px, fmt\)/); assert.match(html, /\.ms-ph \.ms-cy \{/);
 });
