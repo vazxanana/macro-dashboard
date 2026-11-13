@@ -1,0 +1,416 @@
+{
+ "study": "mosha-bo-er",
+ "topic": "mosha-bo-er",
+ "title": "Mosha BO: the Daily regime filter, a market entry on the confirmation, and where the confirmation forms",
+ "built": "2026-11-13",
+ "preregistration": "research/edge/mosha-bo-er/PREREGISTRATION.md",
+ "system": "Mosha BO (live rule, a paper shadow since 11 Nov 2026), OANDA gold 2020 to now",
+ "rule": "paper research only: no live rule, size, filter, stop or config changes",
+ "verdict": "A (Daily ER20 >= 0.2): FAIL (halves, t, monthT, n, placebo, holm); B (market on the confirmation close): FAIL (halves, t, monthT, holm)",
+ "params": {
+  "FROM": 1577836800,
+  "SPLIT": 1704067200,
+  "ER_MIN": 0.2,
+  "ER_N": 20,
+  "COST": 0.3,
+  "T_MIN": 2,
+  "ALPHA": 0.05,
+  "MIN_KEPT": 30,
+  "MIN_BLOCKED": 10,
+  "PLACEBO": 40
+ },
+ "window": {
+  "from": "2020-01-01",
+  "split": "2024-01-01",
+  "candlesTo": "2026-11-13 22:00",
+  "parity": "live arm equals mosha-oos/run.mjs replay leg for leg"
+ },
+ "counts": {
+  "liveLegs": 576,
+  "marketLegs": 589,
+  "marketWrongSide": 0,
+  "limitPositions": 38,
+  "marketPositions": 41,
+  "both": 37,
+  "onlyMarket": 4,
+  "onlyLimit": 1
+ },
+ "A": {
+  "all": {
+   "all": {
+    "n": 38,
+    "avg": 0.1921,
+    "total": 7.299,
+    "t": 0.597,
+    "win": 0.421,
+    "gross": 0.2726,
+    "maxDD": 11.925
+   },
+   "h1": {
+    "n": 24,
+    "avg": -0.1765,
+    "total": -4.237,
+    "t": -0.561,
+    "win": 0.333,
+    "gross": -0.1065,
+    "maxDD": 11.925
+   },
+   "h2": {
+    "n": 14,
+    "avg": 0.824,
+    "total": 11.536,
+    "t": 1.229,
+    "win": 0.571,
+    "gross": 0.9225,
+    "maxDD": 4.212
+   }
+  },
+  "kept": {
+   "all": {
+    "n": 7,
+    "avg": 1.1489,
+    "total": 8.043,
+    "t": 1.335,
+    "win": 0.714,
+    "gross": 1.2336,
+    "maxDD": 1.034
+   },
+   "h1": {
+    "n": 4,
+    "avg": 1.4396,
+    "total": 5.758,
+    "t": 1.047,
+    "win": 0.75,
+    "gross": 1.5413,
+    "maxDD": 1.034
+   },
+   "h2": {
+    "n": 3,
+    "avg": 0.7614,
+    "total": 2.284,
+    "t": 0.675,
+    "win": 0.667,
+    "gross": 0.8233,
+    "maxDD": 1.032
+   }
+  },
+  "blocked": {
+   "all": {
+    "n": 31,
+    "avg": -0.024,
+    "total": -0.743,
+    "t": -0.071,
+    "win": 0.355,
+    "gross": 0.0556,
+    "maxDD": 10.891
+   },
+   "h1": {
+    "n": 20,
+    "avg": -0.4998,
+    "total": -9.995,
+    "t": -2.205,
+    "win": 0.25,
+    "gross": -0.436,
+    "maxDD": 10.891
+   },
+   "h2": {
+    "n": 11,
+    "avg": 0.8411,
+    "total": 9.252,
+    "t": 1.024,
+    "win": 0.545,
+    "gross": 0.9495,
+    "maxDD": 4.212
+   }
+  },
+  "noEr": 0,
+  "welchTrades": {
+   "diff": 1.1729,
+   "t": 1.268,
+   "df": 7.96,
+   "p": 0.1203
+  },
+  "welchMonths": {
+   "diff": 0.009,
+   "t": 0.054,
+   "df": 113.3,
+   "p": 0.4785
+  },
+  "placebo": {
+   "draws": 40,
+   "pass": 0,
+   "t95": 1.439,
+   "tMax": 1.53
+  },
+  "rules": {
+   "halves": false,
+   "t": false,
+   "monthT": false,
+   "dd": true,
+   "n": false,
+   "placebo": false,
+   "holm": false
+  },
+  "pHolm": 0.2406,
+  "pass": false
+ },
+ "B": {
+  "market": {
+   "all": {
+    "n": 41,
+    "avg": 0.1563,
+    "total": 6.408,
+    "t": 0.605,
+    "win": 0.463,
+    "gross": 0.228,
+    "maxDD": 9.001
+   },
+   "h1": {
+    "n": 25,
+    "avg": -0.0181,
+    "total": -0.453,
+    "t": -0.066,
+    "win": 0.44,
+    "gross": 0.0486,
+    "maxDD": 9.001
+   },
+   "h2": {
+    "n": 16,
+    "avg": 0.4288,
+    "total": 6.861,
+    "t": 0.847,
+    "win": 0.5,
+    "gross": 0.5084,
+    "maxDD": 4.251
+   }
+  },
+  "limit": {
+   "all": {
+    "n": 38,
+    "avg": 0.1921,
+    "total": 7.299,
+    "t": 0.597,
+    "win": 0.421,
+    "gross": 0.2726,
+    "maxDD": 11.925
+   },
+   "h1": {
+    "n": 24,
+    "avg": -0.1765,
+    "total": -4.237,
+    "t": -0.561,
+    "win": 0.333,
+    "gross": -0.1065,
+    "maxDD": 11.925
+   },
+   "h2": {
+    "n": 14,
+    "avg": 0.824,
+    "total": 11.536,
+    "t": 1.229,
+    "win": 0.571,
+    "gross": 0.9225,
+    "maxDD": 4.212
+   }
+  },
+  "welchTrades": {
+   "diff": -0.0358,
+   "t": -0.087,
+   "df": 72.279,
+   "p": 0.5345
+  },
+  "welchMonths": {
+   "diff": -0.0107,
+   "t": -0.057,
+   "df": 151.848,
+   "p": 0.5226
+  },
+  "rules": {
+   "halves": false,
+   "t": false,
+   "monthT": false,
+   "dd": true,
+   "holm": false
+  },
+  "pHolm": 0.5345,
+  "pass": false
+ },
+ "C": {
+  "limit": {
+   "case2": {
+    "all": {
+     "n": 7,
+     "avg": 1.2796,
+     "total": 8.957,
+     "t": 1.042,
+     "win": 0.571,
+     "gross": 1.4214,
+     "maxDD": 2.152
+    },
+    "h1": {
+     "n": 3,
+     "avg": 0.2284,
+     "total": 0.685,
+     "t": 0.359,
+     "win": 0.667,
+     "gross": 0.355,
+     "maxDD": 1.043
+    },
+    "h2": {
+     "n": 4,
+     "avg": 2.068,
+     "total": 8.272,
+     "t": 0.965,
+     "win": 0.5,
+     "gross": 2.2213,
+     "maxDD": 2.152
+    }
+   },
+   "beyond": {
+    "all": {
+     "n": 31,
+     "avg": -0.0535,
+     "total": -1.658,
+     "t": -0.192,
+     "win": 0.387,
+     "gross": 0.0132,
+     "maxDD": 12.61
+    },
+    "h1": {
+     "n": 21,
+     "avg": -0.2344,
+     "total": -4.922,
+     "t": -0.668,
+     "win": 0.286,
+     "gross": -0.1724,
+     "maxDD": 12.61
+    },
+    "h2": {
+     "n": 10,
+     "avg": 0.3264,
+     "total": 3.264,
+     "t": 0.729,
+     "win": 0.6,
+     "gross": 0.403,
+     "maxDD": 4.212
+    }
+   },
+   "unknown": 0,
+   "welch": {
+    "diff": 1.3331,
+    "t": 1.058,
+    "df": 6.627,
+    "p": 0.1635
+   }
+  },
+  "market": {
+   "case2": {
+    "all": {
+     "n": 8,
+     "avg": -0.1734,
+     "total": -1.387,
+     "t": -0.427,
+     "win": 0.5,
+     "gross": -0.0544,
+     "maxDD": 2.263
+    },
+    "h1": {
+     "n": 4,
+     "avg": 0.2108,
+     "total": 0.843,
+     "t": 0.481,
+     "win": 0.75,
+     "gross": 0.34,
+     "maxDD": 1.062
+    },
+    "h2": {
+     "n": 4,
+     "avg": -0.5575,
+     "total": -2.23,
+     "t": -0.806,
+     "win": 0.25,
+     "gross": -0.4487,
+     "maxDD": 2.23
+    }
+   },
+   "beyond": {
+    "all": {
+     "n": 33,
+     "avg": 0.2362,
+     "total": 7.795,
+     "t": 0.772,
+     "win": 0.455,
+     "gross": 0.2965,
+     "maxDD": 9.845
+    },
+    "h1": {
+     "n": 21,
+     "avg": -0.0617,
+     "total": -1.297,
+     "t": -0.193,
+     "win": 0.381,
+     "gross": -0.0069,
+     "maxDD": 9.845
+    },
+    "h2": {
+     "n": 12,
+     "avg": 0.7576,
+     "total": 9.092,
+     "t": 1.223,
+     "win": 0.583,
+     "gross": 0.8275,
+     "maxDD": 4.251
+    }
+   },
+   "unknown": 0,
+   "welch": {
+    "diff": -0.4096,
+    "t": -0.806,
+    "df": 16.091,
+    "p": 0.7839
+   }
+  }
+ },
+ "Bdetail": {
+  "marketOnlyChains": {
+   "n": 4,
+   "avg": 2.1379,
+   "total": 8.552,
+   "t": 1.462,
+   "win": 1,
+   "gross": 2.21,
+   "maxDD": 0
+  },
+  "sameChainsMarket": {
+   "n": 37,
+   "avg": -0.0579,
+   "total": -2.144,
+   "t": -0.26,
+   "win": 0.405,
+   "gross": 0.0138,
+   "maxDD": 9.352
+  },
+  "sameChainsLimit": {
+   "n": 37,
+   "avg": 0.2254,
+   "total": 8.34,
+   "t": 0.686,
+   "win": 0.432,
+   "gross": 0.307,
+   "maxDD": 10.884
+  },
+  "medianR0": {
+   "limit": 18.15,
+   "market": 18.48
+  },
+  "medianGapR": 0.073
+ },
+ "financing": {
+  "limit": 2.085,
+  "market": 1.975
+ },
+ "marked": {
+  "limit": 0,
+  "market": 0
+ }
+}
