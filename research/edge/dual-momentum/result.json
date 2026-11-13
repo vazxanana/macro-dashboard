@@ -1,0 +1,476 @@
+{
+ "built": "2026-11-13",
+ "prereg": "research/edge/dual-momentum/PREREGISTRATION.md",
+ "rule": "paper research only: a stand-alone monthly allocation rule (SPX500 / gold / flat); not a test, gate, size or exit of the gold book (owner decision 44 untouched); no live change",
+ "source": "G. Antonacci (2014), Dual Momentum Investing; 2016 on is after the book",
+ "params": {
+  "lookbacks": {
+   "L12": 252,
+   "L6": 126
+  },
+  "atrN": 20,
+  "atrK": 3,
+  "spread": {
+   "spx500": 0.5,
+   "xau": 0.3
+  },
+  "indexFinancing": "DGS2 + 2.5 % a year / 365 a night",
+  "goldFinancing": 0.000148,
+  "cashWhileFlat": 0,
+  "hurdle": "mean DGS2 over the lookback / 100 x L/252",
+  "dividendSensitivity": {
+   "spx500": 0.018,
+   "xau": 0
+  },
+  "draws": 2000,
+  "seed": 20261113,
+  "block": 6
+ },
+ "data": {
+  "calendar": "common SPX500 / XAU candles",
+  "candles": 5348,
+  "first": "2006-03-20",
+  "last": "2026-11-06",
+  "raw": {
+   "spx500": {
+    "candles": 6124,
+    "first": "2003-03-24",
+    "last": "2026-11-06"
+   },
+   "xau": {
+    "candles": 5364,
+    "first": "2006-03-20",
+    "last": "2026-11-06"
+   }
+  }
+ },
+ "windows": {
+  "W1": {
+   "label": "2008-15 (check)",
+   "from": "2008-01-01",
+   "to": "2015-12-31",
+   "L12": {
+    "lookbackDays": 252,
+    "rule": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.2806,
+     "cagr": 0.0314,
+     "vol": 0.1428,
+     "sharpe": 0.2828,
+     "maxDD": 0.3845
+    },
+    "mix": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.0056,
+     "cagr": 0.0007,
+     "vol": 0.1504,
+     "sharpe": 0.0798,
+     "maxDD": 0.3597
+    },
+    "bh": {
+     "spx500": {
+      "days": 2069,
+      "months": 96,
+      "total": 0.0802,
+      "cagr": 0.0097,
+      "vol": 0.2262,
+      "sharpe": 0.1542,
+      "maxDD": 0.5633
+     },
+     "xau": {
+      "days": 2069,
+      "months": 96,
+      "total": -0.1749,
+      "cagr": -0.0237,
+      "vol": 0.1954,
+      "sharpe": -0.022,
+      "maxDD": 0.5636
+     }
+    },
+    "vsMix": {
+     "months": 96,
+     "meanDiff": 0.0028,
+     "t": 0.8583
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "block": 6,
+     "months": 96,
+     "pBetter": 0.7705,
+     "diffP05": -0.2165,
+     "diffP50": 0.1798,
+     "diffP95": 0.5417
+    },
+    "share": {
+     "spx500": 0.3601,
+     "xau": 0.3441,
+     "flat": 0.2958
+    },
+    "monthEnds": 96,
+    "monthsHeld": {
+     "xau": 41,
+     "flat": 9,
+     "spx500": 46
+    },
+    "positions": 33,
+    "positionsBy": {
+     "spx500": 18,
+     "xau": 15
+    },
+    "switches": 35,
+    "stops": 31,
+    "openAtEnd": null
+   },
+   "L6": {
+    "lookbackDays": 126,
+    "rule": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.5169,
+     "cagr": 0.0535,
+     "vol": 0.1363,
+     "sharpe": 0.4407,
+     "maxDD": 0.2155
+    },
+    "mix": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.0056,
+     "cagr": 0.0007,
+     "vol": 0.1504,
+     "sharpe": 0.0798,
+     "maxDD": 0.3597
+    },
+    "bh": {
+     "spx500": {
+      "days": 2069,
+      "months": 96,
+      "total": 0.0802,
+      "cagr": 0.0097,
+      "vol": 0.2262,
+      "sharpe": 0.1542,
+      "maxDD": 0.5633
+     },
+     "xau": {
+      "days": 2069,
+      "months": 96,
+      "total": -0.1749,
+      "cagr": -0.0237,
+      "vol": 0.1954,
+      "sharpe": -0.022,
+      "maxDD": 0.5636
+     }
+    },
+    "vsMix": {
+     "months": 96,
+     "meanDiff": 0.0044,
+     "t": 1.1869
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "block": 6,
+     "months": 96,
+     "pBetter": 0.8595,
+     "diffP05": -0.1611,
+     "diffP50": 0.2876,
+     "diffP95": 0.702
+    },
+    "share": {
+     "spx500": 0.4036,
+     "xau": 0.3219,
+     "flat": 0.2745
+    },
+    "monthEnds": 96,
+    "monthsHeld": {
+     "xau": 37,
+     "flat": 10,
+     "spx500": 49
+    },
+    "positions": 37,
+    "positionsBy": {
+     "spx500": 20,
+     "xau": 17
+    },
+    "switches": 46,
+    "stops": 28,
+    "openAtEnd": null
+   }
+  },
+  "W2": {
+   "label": "2016 to now (decisive)",
+   "from": "2016-01-01",
+   "to": "2026-11-06",
+   "L12": {
+    "lookbackDays": 252,
+    "rule": {
+     "days": 2817,
+     "months": 131,
+     "total": 0.5624,
+     "cagr": 0.0417,
+     "vol": 0.139,
+     "sharpe": 0.3569,
+     "maxDD": 0.2847
+    },
+    "mix": {
+     "days": 2817,
+     "months": 131,
+     "total": 1.2541,
+     "cagr": 0.0773,
+     "vol": 0.1225,
+     "sharpe": 0.6548,
+     "maxDD": 0.2132
+    },
+    "bh": {
+     "spx500": {
+      "days": 2817,
+      "months": 131,
+      "total": 1.1116,
+      "cagr": 0.0709,
+      "vol": 0.1719,
+      "sharpe": 0.475,
+      "maxDD": 0.3358
+     },
+     "xau": {
+      "days": 2817,
+      "months": 131,
+      "total": 1.1348,
+      "cagr": 0.0719,
+      "vol": 0.1622,
+      "sharpe": 0.4997,
+      "maxDD": 0.3251
+     }
+    },
+    "vsMix": {
+     "months": 131,
+     "meanDiff": -0.0026,
+     "t": -0.9501
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "block": 6,
+     "months": 131,
+     "pBetter": 0.1125,
+     "diffP05": -0.5832,
+     "diffP50": -0.247,
+     "diffP95": 0.0915
+    },
+    "share": {
+     "spx500": 0.345,
+     "xau": 0.4029,
+     "flat": 0.252
+    },
+    "monthEnds": 131,
+    "monthsHeld": {
+     "spx500": 54,
+     "flat": 14,
+     "xau": 63
+    },
+    "positions": 41,
+    "positionsBy": {
+     "spx500": 19,
+     "xau": 22
+    },
+    "switches": 48,
+    "stops": 34,
+    "openAtEnd": null
+   },
+   "L6": {
+    "lookbackDays": 126,
+    "rule": {
+     "days": 2817,
+     "months": 131,
+     "total": 0.6793,
+     "cagr": 0.0486,
+     "vol": 0.1333,
+     "sharpe": 0.4149,
+     "maxDD": 0.2312
+    },
+    "mix": {
+     "days": 2817,
+     "months": 131,
+     "total": 1.2541,
+     "cagr": 0.0773,
+     "vol": 0.1225,
+     "sharpe": 0.6548,
+     "maxDD": 0.2132
+    },
+    "bh": {
+     "spx500": {
+      "days": 2817,
+      "months": 131,
+      "total": 1.1116,
+      "cagr": 0.0709,
+      "vol": 0.1719,
+      "sharpe": 0.475,
+      "maxDD": 0.3358
+     },
+     "xau": {
+      "days": 2817,
+      "months": 131,
+      "total": 1.1348,
+      "cagr": 0.0719,
+      "vol": 0.1622,
+      "sharpe": 0.4997,
+      "maxDD": 0.3251
+     }
+    },
+    "vsMix": {
+     "months": 131,
+     "meanDiff": -0.002,
+     "t": -0.7578
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "block": 6,
+     "months": 131,
+     "pBetter": 0.095,
+     "diffP05": -0.5911,
+     "diffP50": -0.2644,
+     "diffP95": 0.0671
+    },
+    "share": {
+     "spx500": 0.4026,
+     "xau": 0.3596,
+     "flat": 0.2378
+    },
+    "monthEnds": 131,
+    "monthsHeld": {
+     "flat": 10,
+     "xau": 55,
+     "spx500": 66
+    },
+    "positions": 48,
+    "positionsBy": {
+     "spx500": 27,
+     "xau": 21
+    },
+    "switches": 59,
+    "stops": 37,
+    "openAtEnd": null
+   }
+  }
+ },
+ "dividendSensitivity": {
+  "W1": {
+   "L12": {
+    "rule": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.3485,
+     "cagr": 0.0381,
+     "vol": 0.1428,
+     "sharpe": 0.3268,
+     "maxDD": 0.3845
+    },
+    "mix": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.081,
+     "cagr": 0.0098,
+     "vol": 0.1504,
+     "sharpe": 0.1383,
+     "maxDD": 0.3555
+    }
+   },
+   "L6": {
+    "rule": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.6072,
+     "cagr": 0.0611,
+     "vol": 0.1363,
+     "sharpe": 0.4924,
+     "maxDD": 0.2155
+    },
+    "mix": {
+     "days": 2069,
+     "months": 96,
+     "total": 0.081,
+     "cagr": 0.0098,
+     "vol": 0.1504,
+     "sharpe": 0.1383,
+     "maxDD": 0.3555
+    }
+   }
+  },
+  "W2": {
+   "L12": {
+    "rule": {
+     "days": 2817,
+     "months": 131,
+     "total": 0.6715,
+     "cagr": 0.0482,
+     "vol": 0.1391,
+     "sharpe": 0.4003,
+     "maxDD": 0.2691
+    },
+    "mix": {
+     "days": 2817,
+     "months": 131,
+     "total": 1.4856,
+     "cagr": 0.087,
+     "vol": 0.1225,
+     "sharpe": 0.7262,
+     "maxDD": 0.2094
+    }
+   },
+   "L6": {
+    "rule": {
+     "days": 2817,
+     "months": 131,
+     "total": 0.8172,
+     "cagr": 0.0562,
+     "vol": 0.1333,
+     "sharpe": 0.4679,
+     "maxDD": 0.2262
+    },
+    "mix": {
+     "days": 2817,
+     "months": 131,
+     "total": 1.4856,
+     "cagr": 0.087,
+     "vol": 0.1225,
+     "sharpe": 0.7262,
+     "maxDD": 0.2094
+    }
+   }
+  }
+ },
+ "pass": {
+  "L12": {
+   "checks": {
+    "w2Sharpe": false,
+    "w2Holm": false,
+    "w2Drawdown": false,
+    "w1Sharpe": true
+   },
+   "holm": {
+    "p": 0.8875,
+    "bar": 0.05,
+    "reject": false
+   },
+   "pass": false
+  },
+  "L6": {
+   "checks": {
+    "w2Sharpe": false,
+    "w2Holm": false,
+    "w2Drawdown": false,
+    "w1Sharpe": true
+   },
+   "holm": {
+    "p": 0.905,
+    "bar": 0.1,
+    "reject": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL"
+}
