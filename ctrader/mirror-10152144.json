@@ -381,18 +381,22 @@
     "status": "open",
     "openedAt": "2026-11-13T10:16:28.000Z",
     "councilEntry": 7625.25,
-    "stop": 7598,
+    "stop": 7625.25,
     "t1": null,
     "riskCash": 5,
     "margin": 13.69,
     "fillPrice": 7604.77,
     "lagSec": 29,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "stopCheckedAt": "2026-11-13T10:16:28.000Z",
     "brokerStop": 7577.52,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "rr": 99,
+    "amended": 1,
+    "amendedAt": "2026-11-13T14:11:24.000Z"
    },
    "ict:ym-b-1794564000": {
     "positionId": "49424997",
@@ -405,7 +409,7 @@
     "status": "open",
     "openedAt": "2026-11-13T11:31:20.000Z",
     "councilEntry": 52425,
-    "stop": 52287,
+    "stop": 52515,
     "t1": null,
     "riskCash": 19.98,
     "margin": 73.32,
@@ -413,11 +417,15 @@
     "fillPrice": 52326.29,
     "lagSec": 26,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "stopCheckedAt": "2026-11-13T11:31:20.000Z",
     "brokerStop": 52188.29,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "rr": 99,
+    "amended": 1,
+    "amendedAt": "2026-11-13T14:11:24.000Z"
    }
   },
   "day": {
@@ -434,7 +442,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 9990.38,
-  "lastRun": "2026-11-13T14:09:21.000Z"
+  "lastRun": "2026-11-13T14:11:24.000Z"
  },
  "log": [
   {
@@ -1333,6 +1341,16 @@
   {
    "at": "2026-11-13T11:31:20.000Z",
    "msg": "opened buy US30 0.14 lot (council ict-A)",
+   "trade": "ict:ym-b-1794564000"
+  },
+  {
+   "at": "2026-11-13T14:11:24.000Z",
+   "msg": "moved US500 49396395 protection: stop 7598 -> 7625.25 (council ict-A+)",
+   "trade": "ict:es-b-1794560400"
+  },
+  {
+   "at": "2026-11-13T14:11:24.000Z",
+   "msg": "moved US30 49424997 protection: stop 52287 -> 52515 (council ict-A)",
    "trade": "ict:ym-b-1794564000"
   }
  ],
