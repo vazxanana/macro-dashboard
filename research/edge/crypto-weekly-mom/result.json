@@ -1,0 +1,516 @@
+{
+ "built": "2026-11-13",
+ "verdict": "FAIL",
+ "system": "Weekly time-series momentum on BTC, ETH, SOL, XRP (Binance daily, CFD costs and financing)",
+ "prereg": "PREREGISTRATION.md",
+ "data": {
+  "btc": {
+   "from": "2017-08-17",
+   "to": "2026-10-31",
+   "candles": 3363
+  },
+  "eth": {
+   "from": "2017-08-17",
+   "to": "2026-10-31",
+   "candles": 3363
+  },
+  "sol": {
+   "from": "2020-08-11",
+   "to": "2026-10-31",
+   "candles": 2273
+  },
+  "xrp": {
+   "from": "2018-05-04",
+   "to": "2026-10-31",
+   "candles": 3103
+  }
+ },
+ "variants": {
+  "V1": {
+   "early": {
+    "weeks": 209,
+    "ann": 0.3489,
+    "vol": 0.3181,
+    "sharpe": 1.097,
+    "monthT": 2.01,
+    "months": 48,
+    "maxDD": -0.3253
+   },
+   "decisive": {
+    "weeks": 251,
+    "ann": 0.0955,
+    "vol": 0.2604,
+    "sharpe": 0.367,
+    "monthT": 0.77,
+    "months": 58,
+    "maxDD": -0.3598
+   },
+   "decisiveGross": {
+    "weeks": 251,
+    "ann": 0.1484,
+    "vol": 0.2614,
+    "sharpe": 0.568,
+    "monthT": 1.18,
+    "months": 58,
+    "maxDD": -0.3136
+   },
+   "decisiveTurnover": {
+    "weeks": 251,
+    "ann": 0.0984,
+    "vol": 0.2605,
+    "sharpe": 0.378,
+    "monthT": 0.8,
+    "months": 58,
+    "maxDD": -0.3579
+   },
+   "costs": {
+    "costPerYear": 0.0068,
+    "finPerYear": 0.0461
+   },
+   "exposure": 0.468,
+   "stops": 52,
+   "positions": 470,
+   "byYear": {
+    "2017": {
+     "weeks": 11,
+     "ann": 1.0909,
+     "vol": 0.3665,
+     "sharpe": 2.977,
+     "monthT": 2,
+     "months": 3,
+     "maxDD": -0.0617
+    },
+    "2018": {
+     "weeks": 53,
+     "ann": -0.1741,
+     "vol": 0.312,
+     "sharpe": -0.558,
+     "monthT": -0.59,
+     "months": 12,
+     "maxDD": -0.3004
+    },
+    "2019": {
+     "weeks": 52,
+     "ann": 0.2551,
+     "vol": 0.3686,
+     "sharpe": 0.692,
+     "monthT": 0.62,
+     "months": 12,
+     "maxDD": -0.2175
+    },
+    "2020": {
+     "weeks": 52,
+     "ann": 0.7095,
+     "vol": 0.3222,
+     "sharpe": 2.202,
+     "monthT": 2.07,
+     "months": 12,
+     "maxDD": -0.0971
+    },
+    "2021": {
+     "weeks": 52,
+     "ann": 0.6151,
+     "vol": 0.2532,
+     "sharpe": 2.429,
+     "monthT": 1.96,
+     "months": 12,
+     "maxDD": -0.0951
+    },
+    "2022": {
+     "weeks": 52,
+     "ann": -0.0584,
+     "vol": 0.2266,
+     "sharpe": -0.258,
+     "monthT": -0.28,
+     "months": 12,
+     "maxDD": -0.12
+    },
+    "2023": {
+     "weeks": 52,
+     "ann": 0.5016,
+     "vol": 0.3119,
+     "sharpe": 1.608,
+     "monthT": 1.69,
+     "months": 12,
+     "maxDD": -0.1292
+    },
+    "2024": {
+     "weeks": 53,
+     "ann": 0.3831,
+     "vol": 0.3109,
+     "sharpe": 1.232,
+     "monthT": 1.06,
+     "months": 12,
+     "maxDD": -0.1295
+    },
+    "2025": {
+     "weeks": 52,
+     "ann": -0.1176,
+     "vol": 0.24,
+     "sharpe": -0.49,
+     "monthT": -0.47,
+     "months": 12,
+     "maxDD": -0.1708
+    },
+    "2026": {
+     "weeks": 42,
+     "ann": -0.3158,
+     "vol": 0.1523,
+     "sharpe": -2.073,
+     "monthT": -2.41,
+     "months": 10,
+     "maxDD": -0.2334
+    }
+   },
+   "byCoin": {
+    "btc": {
+     "weeks": 251,
+     "ann": 0.0244,
+     "vol": 0.0816,
+     "sharpe": 0.298,
+     "monthT": 0.64,
+     "months": 58,
+     "maxDD": -0.1161
+    },
+    "eth": {
+     "weeks": 251,
+     "ann": 0.036,
+     "vol": 0.0831,
+     "sharpe": 0.433,
+     "monthT": 0.94,
+     "months": 58,
+     "maxDD": -0.11
+    },
+    "sol": {
+     "weeks": 251,
+     "ann": -0.001,
+     "vol": 0.0771,
+     "sharpe": -0.013,
+     "monthT": -0.03,
+     "months": 58,
+     "maxDD": -0.1356
+    },
+    "xrp": {
+     "weeks": 251,
+     "ann": 0.0362,
+     "vol": 0.1042,
+     "sharpe": 0.348,
+     "monthT": 0.62,
+     "months": 58,
+     "maxDD": -0.1278
+    }
+   },
+   "placebo": {
+    "sharpes": [
+     -0.208,
+     0.275,
+     0.175,
+     -0.101,
+     0.079,
+     0.61,
+     0.522,
+     0.019,
+     0.339,
+     0.227,
+     0.296,
+     0.065,
+     0.315,
+     0.392,
+     -0.121,
+     0.117,
+     0.239,
+     0.159,
+     0.203,
+     0.106,
+     0.336,
+     0.154,
+     0.142,
+     0.496,
+     0.255,
+     0.245,
+     0.034,
+     0.204,
+     0.734,
+     0.094,
+     -0.197,
+     -0.171,
+     0.341,
+     -0.165,
+     0.262,
+     0.23,
+     0.272,
+     0.343,
+     0.068,
+     0.022
+    ],
+    "beats": 35,
+    "of": 40,
+    "p95": 0.522
+   }
+  },
+  "V2": {
+   "early": {
+    "weeks": 209,
+    "ann": 0.323,
+    "vol": 0.3651,
+    "sharpe": 0.885,
+    "monthT": 1.79,
+    "months": 48,
+    "maxDD": -0.2966
+   },
+   "decisive": {
+    "weeks": 251,
+    "ann": 0.0644,
+    "vol": 0.3235,
+    "sharpe": 0.199,
+    "monthT": 0.51,
+    "months": 58,
+    "maxDD": -0.4425
+   },
+   "decisiveGross": {
+    "weeks": 251,
+    "ann": 0.1643,
+    "vol": 0.3242,
+    "sharpe": 0.507,
+    "monthT": 1.31,
+    "months": 58,
+    "maxDD": -0.3296
+   },
+   "decisiveTurnover": {
+    "weeks": 251,
+    "ann": 0.0709,
+    "vol": 0.3236,
+    "sharpe": 0.219,
+    "monthT": 0.56,
+    "months": 58,
+    "maxDD": -0.4364
+   },
+   "costs": {
+    "costPerYear": 0.0145,
+    "finPerYear": 0.0854
+   },
+   "exposure": 1,
+   "stops": 94,
+   "positions": 1004,
+   "byYear": {
+    "2017": {
+     "weeks": 11,
+     "ann": 0.3155,
+     "vol": 0.4123,
+     "sharpe": 0.765,
+     "monthT": 0.81,
+     "months": 3,
+     "maxDD": -0.1093
+    },
+    "2018": {
+     "weeks": 53,
+     "ann": 0.1155,
+     "vol": 0.413,
+     "sharpe": 0.28,
+     "monthT": 0.33,
+     "months": 12,
+     "maxDD": -0.2966
+    },
+    "2019": {
+     "weeks": 52,
+     "ann": 0.2162,
+     "vol": 0.4093,
+     "sharpe": 0.528,
+     "monthT": 0.46,
+     "months": 12,
+     "maxDD": -0.2643
+    },
+    "2020": {
+     "weeks": 52,
+     "ann": 0.4956,
+     "vol": 0.3515,
+     "sharpe": 1.41,
+     "monthT": 1.49,
+     "months": 12,
+     "maxDD": -0.182
+    },
+    "2021": {
+     "weeks": 52,
+     "ann": 0.4688,
+     "vol": 0.2767,
+     "sharpe": 1.694,
+     "monthT": 1.54,
+     "months": 12,
+     "maxDD": -0.1022
+    },
+    "2022": {
+     "weeks": 52,
+     "ann": 0.3387,
+     "vol": 0.2793,
+     "sharpe": 1.213,
+     "monthT": 1.3,
+     "months": 12,
+     "maxDD": -0.158
+    },
+    "2023": {
+     "weeks": 52,
+     "ann": 0.2181,
+     "vol": 0.3428,
+     "sharpe": 0.636,
+     "monthT": 0.87,
+     "months": 12,
+     "maxDD": -0.2138
+    },
+    "2024": {
+     "weeks": 53,
+     "ann": 0.1697,
+     "vol": 0.3375,
+     "sharpe": 0.503,
+     "monthT": 0.63,
+     "months": 12,
+     "maxDD": -0.1693
+    },
+    "2025": {
+     "weeks": 52,
+     "ann": -0.2761,
+     "vol": 0.3004,
+     "sharpe": -0.919,
+     "monthT": -0.86,
+     "months": 12,
+     "maxDD": -0.3169
+    },
+    "2026": {
+     "weeks": 42,
+     "ann": -0.1771,
+     "vol": 0.3625,
+     "sharpe": -0.488,
+     "monthT": -0.57,
+     "months": 10,
+     "maxDD": -0.3229
+    }
+   },
+   "byCoin": {
+    "btc": {
+     "weeks": 251,
+     "ann": -0.0014,
+     "vol": 0.1082,
+     "sharpe": -0.013,
+     "monthT": -0.03,
+     "months": 58,
+     "maxDD": -0.1313
+    },
+    "eth": {
+     "weeks": 251,
+     "ann": 0.054,
+     "vol": 0.1092,
+     "sharpe": 0.494,
+     "monthT": 1.22,
+     "months": 58,
+     "maxDD": -0.119
+    },
+    "sol": {
+     "weeks": 251,
+     "ann": -0.0161,
+     "vol": 0.11,
+     "sharpe": -0.146,
+     "monthT": -0.35,
+     "months": 58,
+     "maxDD": -0.2697
+    },
+    "xrp": {
+     "weeks": 251,
+     "ann": 0.0278,
+     "vol": 0.1239,
+     "sharpe": 0.225,
+     "monthT": 0.46,
+     "months": 58,
+     "maxDD": -0.149
+    }
+   },
+   "placebo": {
+    "sharpes": [
+     -0.665,
+     0.035,
+     -0.126,
+     -0.473,
+     -0.354,
+     0.781,
+     0.635,
+     -0.401,
+     0.185,
+     0.052,
+     0.033,
+     -0.348,
+     0.146,
+     0.26,
+     -0.418,
+     -0.197,
+     0.038,
+     -0.116,
+     0.04,
+     -0.144,
+     0.206,
+     -0.115,
+     -0.209,
+     0.523,
+     0.134,
+     -0.127,
+     -0.484,
+     -0.088,
+     0.986,
+     -0.146,
+     -0.743,
+     -0.929,
+     0.343,
+     -0.682,
+     -0.072,
+     -0.02,
+     -0.025,
+     0.078,
+     -0.107,
+     -0.34
+    ],
+    "beats": 33,
+    "of": 40,
+    "p95": 0.635
+   }
+  }
+ },
+ "bh": {
+  "early": {
+   "weeks": 209,
+   "ann": 0.9845,
+   "vol": 0.9058,
+   "sharpe": 1.087,
+   "monthT": 2,
+   "months": 48,
+   "maxDD": -0.8267
+  },
+  "decisive": {
+   "weeks": 251,
+   "ann": 0.2813,
+   "vol": 0.6361,
+   "sharpe": 0.442,
+   "monthT": 0.84,
+   "months": 58,
+   "maxDD": -0.7492
+  }
+ },
+ "tests": {
+  "V1": {
+   "beatsBH": false,
+   "over05": false,
+   "t2": false,
+   "holm": false,
+   "placebo": false,
+   "p": 0.2206,
+   "pHolm": 0.4413,
+   "pass": false
+  },
+  "V2": {
+   "beatsBH": false,
+   "over05": false,
+   "t2": false,
+   "holm": false,
+   "placebo": false,
+   "p": 0.305,
+   "pHolm": 0.4413,
+   "pass": false
+  }
+ }
+}
