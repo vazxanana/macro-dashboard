@@ -65,6 +65,7 @@ paper system with a measured, clearly negative record.
 | 47 | Gold: fade the Sunday reopen gap back to Friday's close | 41 / 38 (2020 →) | −0.109 / −0.110R a trade (t −0.8); small gaps fill but are too small to trade, larger ones mostly do not fill | #864 |
 | 48 | Month- and quarter-end stock/bond rebalancing flow on SPX500 / NAS100 (published effect) | 93 / 30 a market (2016 →) | 0 of 4; +0.013 / +0.006R on all months (t 0.2 / 0.1), negative on quarter-ends; at the median of a random side | #865 |
 | 49 | Crypto: buy after a sharp three-day drop (published short-term reversal) | ~109 (2022 →) | 0 of 4; day-3 −0.095R, day-7 −0.124R a trade (month t −1.7); loses before costs and in 2018-21 | #866 |
+| 50 | NR7 breakout (narrowest of 7 days) on gold, NAS100, SPX500, three forex majors (published) | 2,191 (2016 →) | +0.013R a trade (month t 0.38), negative at 2x spread; a random day does as well | #867 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
