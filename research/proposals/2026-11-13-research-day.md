@@ -53,6 +53,7 @@ paper system with a measured, clearly negative record.
 | 35 | Crypto weekend long / Monday short (published effect) | ~147 a leg (2024 →) | weekend long BTC +0.000R, ETH +0.063R; Monday short −0.076 / −0.139R; each flips sign between windows | #852 |
 | 36 | 52-week-high rotation across 11 equity indices (published effect) | 130 months | excess +0.046 % a month (t 0.38); negative in 2008-15; 7 of 40 random picks did as well | #853 |
 | 37 | Copper/gold ratio as a risk-on signal for US indices | 565 weeks | on-weeks minus off-weeks −0.20 % a week (t −0.92); Sharpe 0.14 against 0.62 for holding | #854 |
+| 38 | Dual momentum: SPX500 or gold or flat (published effect) | 131 months | Sharpe 0.36 / 0.41 against 0.65 for a plain 50/50; worked in 2008-15, flipped since | #855 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
