@@ -61,6 +61,7 @@ paper system with a measured, clearly negative record.
 | 43 | US indices after a volatility spike (5-day vol over 2x its median, below the 20-day average) | 216 / 165 (2016 →) | 5-day hold fails (+0.076R, t 1.96); 10-day hold passes its bar (+0.151R, t 2.53, Holm p 0.011) but is weak: 2008-15 +0.013R, t 1.68 by entry week (the three indices fire together), just over the placebo's 95th percentile. A paper shadow at most; the study leans to nothing | #860 |
 | 44 | Follow or fade the first 30 minutes after the FOMC statement (NAS100, SPX500, gold) | 54 each (2020 →) | 0 of 6; best fade NAS100 +0.095R (t 0.56), −0.313R in 2010-19 | #861 |
 | 45 | The turnaround rule (#40), frozen, on US30, US2000, DE40, EU50, UK100, JP225 | 411 pooled | +0.052R a trade, month t 1.69 (bar 2); all six positive, none at t 2; 2008-15 t 1.03. The NAS100 pass does not replicate | #862 |
+| 46 | Gold and NAS100 after the payrolls release: follow or fade the first 15 minutes | 77 / 40 / 77 / 39 (2020 →) | 0 of 4; following loses on both (gold −0.235R, t −2.33); the gold fade +0.096R, t 0.51, too few trades | #863 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
