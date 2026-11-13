@@ -34,6 +34,8 @@ paper system with a measured, clearly negative record.
 | 16 | G10 FX carry (published effect) | — | **not run**: interest-rate data (FRED and others) not reachable from the build sandbox | #830 |
 | 17 | One-week time-series momentum in crypto (published effect) | 4 coins, 2022 → | long/flat Sharpe 0.37 (t 0.77), long/short 0.20, below buy-and-hold 0.44; worked 2018-21, faded since | #833 |
 | 18 | One-week cross-sectional reversal in G10 FX (published effect) | 7 currencies, 2016 → | Sharpe −0.51, t −1.60; flat even before costs; 29 of 40 placebos | #834 |
+| 19 | Intraday momentum: first half-hour predicts the last (published effect) | 2,672 / 2,682 | SPX −0.159R, NAS100 −0.093R a trade net (t −9.1 / −5.5); about zero before costs; the effect faded after 2015 | #835 |
+| 20 | Overnight drift: hold US indices from close to open (published effect) | 2,722 nights each | net −0.009 / +0.001 / −0.010R a night (t −1.4 / 0.2 / −1.4); positive before costs, spread and financing take it all | #836 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
