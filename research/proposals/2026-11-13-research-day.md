@@ -39,6 +39,7 @@ paper system with a measured, clearly negative record.
 | 21 | 5-minute opening range breakout on NAS100 / SPX500 (published effect) | 1,460 / 1,456 (2021 →) | NAS100 +0.075R net (t 1.27), SPX −0.053R; the first candle does point the day before costs (≈ +0.14R), the CFD round trip takes it | #837 |
 | 22 | RSI(2) pullback above the 200-day average on US indices (published) | ~100 each (2016 →) | **near miss**: SPX +0.112R (month t 1.83), Dow +0.087R (month t 2.28, trade t 1.88), NAS100 +0.061R; Holm p 0.065; the three fire together (one bet) | #838 |
 | 23 | Volatility-managed exposure on US indices (published effect) | 130 months | Sharpe 0.40 / 0.46 against 0.51 for plain holding; only a shallower drawdown, at a lower return | #839 |
+| 24 | AUD/NZD daily z-score fade | 160 / 48 / 122 | −0.143 / +0.061 / −0.104R a trade (t −1.7 / 0.4 / −1.0); loses before costs and in 2008-15 | #840 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
