@@ -1,0 +1,1405 @@
+{
+ "topic": "cpi-follow",
+ "title": "US CPI: follow or fade the first 15 minutes, held to the New York close",
+ "system": "stand-alone event rule (not the supported gold book); XAU/USD, EUR/USD, USD/JPY, NAS100 OANDA mid M5",
+ "built": "2026-11-13",
+ "preregistration": "PREREGISTRATION.md",
+ "verdict": "FAIL",
+ "headline": "0 of 4 tests pass. Best on 2020-now: fade-11:00, +0.001R an event net (n 81, t 0.02); 2012-19 -0.098R (n 78).",
+ "params": {
+  "floor": 0.25,
+  "fadeK": 1,
+  "filterK": 0.5,
+  "look": 20,
+  "lookMin": 10,
+  "lookDays": 45,
+  "exits": {
+   "16:00": 960,
+   "11:00": 660
+  }
+ },
+ "windows": {
+  "decisive": "2020-01-01 to the run date",
+  "replication": "2012-01-01 to 2019-12-31"
+ },
+ "events": {
+  "used": 160,
+  "decisive": 82,
+  "replication": 78,
+  "first": "2012-02-17",
+  "last": "2026-11-10",
+  "droppedMemory": [
+   {
+    "d": "2012-01-19",
+    "spike": {
+     "eurusd": 1.85,
+     "usdjpy": 1.21
+    }
+   },
+   {
+    "d": "2012-04-13",
+    "spike": {
+     "eurusd": 1.07,
+     "usdjpy": 0.91
+    }
+   },
+   {
+    "d": "2012-07-17",
+    "spike": {
+     "eurusd": 0.82,
+     "usdjpy": 1.1
+    }
+   },
+   {
+    "d": "2012-10-16",
+    "spike": {
+     "eurusd": 0.97,
+     "usdjpy": 1.54
+    }
+   },
+   {
+    "d": "2012-11-15",
+    "spike": {
+     "eurusd": 0.88,
+     "usdjpy": 1.12
+    }
+   },
+   {
+    "d": "2013-02-21",
+    "spike": {
+     "eurusd": 1.13,
+     "usdjpy": 1.47
+    }
+   },
+   {
+    "d": "2013-07-16",
+    "spike": {
+     "eurusd": 1.2,
+     "usdjpy": 0.94
+    }
+   },
+   {
+    "d": "2013-09-17",
+    "spike": {
+     "eurusd": 1.19,
+     "usdjpy": 1.45
+    }
+   },
+   {
+    "d": "2013-10-30",
+    "spike": {
+     "eurusd": 0.91,
+     "usdjpy": 0.84
+    }
+   },
+   {
+    "d": "2013-12-17",
+    "spike": {
+     "eurusd": 1.94,
+     "usdjpy": 1.52
+    }
+   },
+   {
+    "d": "2014-02-20",
+    "spike": {
+     "eurusd": 1.49,
+     "usdjpy": 1.57
+    }
+   },
+   {
+    "d": "2014-03-18",
+    "spike": {
+     "eurusd": 0.54,
+     "usdjpy": 1.19
+    }
+   },
+   {
+    "d": "2014-11-20",
+    "spike": {
+     "eurusd": 1.66,
+     "usdjpy": 1.87
+    }
+   },
+   {
+    "d": "2015-06-18",
+    "spike": {
+     "eurusd": 1.54,
+     "usdjpy": 1.82
+    }
+   },
+   {
+    "d": "2015-09-16",
+    "spike": {
+     "eurusd": 1.78,
+     "usdjpy": 1.65
+    }
+   },
+   {
+    "d": "2016-06-16",
+    "spike": {
+     "eurusd": 1.9,
+     "usdjpy": 1.6
+    }
+   },
+   {
+    "d": "2016-12-15",
+    "spike": {
+     "eurusd": 1.02,
+     "usdjpy": 0.84
+    }
+   },
+   {
+    "d": "2017-03-15",
+    "spike": {
+     "eurusd": 1.37,
+     "usdjpy": 1.42
+    }
+   }
+  ],
+  "memoryUsed": 54,
+  "memoryListed": 72
+ },
+ "placeboPool": 1619,
+ "tests": [
+  {
+   "id": "follow-16:00",
+   "rule": "follow",
+   "exit": "16:00",
+   "p": 0.9839,
+   "decisive": {
+    "events": 81,
+    "eventR": -0.2,
+    "t": -2.18,
+    "trades": 321,
+    "tradeR": -0.191,
+    "tTrades": -2.37,
+    "gross": {
+     "events": 81,
+     "eventR": -0.09,
+     "t": -0.99,
+     "trades": 321,
+     "tradeR": -0.082,
+     "tTrades": -1.02
+    },
+    "cost2x": {
+     "events": 81,
+     "eventR": -0.311,
+     "t": -3.31,
+     "trades": 321,
+     "tradeR": -0.299,
+     "tTrades": -3.67
+    },
+    "skips": {
+     "flat": 1,
+     "nodata": 2,
+     "filter": 3,
+     "candles": 1
+    },
+    "stops": 166,
+    "medCostR": 0.055
+   },
+   "replication": {
+    "events": 78,
+    "eventR": -0.311,
+    "t": -2.48,
+    "trades": 306,
+    "tradeR": -0.304,
+    "tTrades": -2.62,
+    "gross": {
+     "events": 78,
+     "eventR": 0.007,
+     "t": 0.06,
+     "trades": 306,
+     "tradeR": 0.015,
+     "tTrades": 0.13
+    },
+    "skips": {
+     "filter": 1,
+     "flat": 3,
+     "nodata": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": 0.114,
+    "median": -0.185,
+    "values": [
+     -0.241,
+     0.042,
+     -0.267,
+     -0.394,
+     -0.237,
+     0.064,
+     -0.272,
+     -0.198,
+     -0.287,
+     -0.352,
+     -0.251,
+     -0.415,
+     0.134,
+     -0.523,
+     -0.172,
+     -0.452,
+     -0.101,
+     -0.095,
+     0.017,
+     -0.123,
+     -0.154,
+     -0.263,
+     -0.335,
+     0.064,
+     -0.11,
+     -0.092,
+     -0.216,
+     -0.108,
+     -0.398,
+     -0.22,
+     -0.48,
+     -0.254,
+     0.327,
+     -0.3,
+     0.056,
+     -0.123,
+     -0.141,
+     0.068,
+     -0.153,
+     0.113
+    ]
+   },
+   "perMarket": {
+    "xau": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.121,
+      "t": -0.76,
+      "trades": 80,
+      "tradeR": -0.121,
+      "tTrades": -0.76
+     },
+     "replication": {
+      "events": 77,
+      "eventR": 0.081,
+      "t": 0.32,
+      "trades": 77,
+      "tradeR": 0.081,
+      "tTrades": 0.32
+     }
+    },
+    "eurusd": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.311,
+      "t": -1.96,
+      "trades": 80,
+      "tradeR": -0.311,
+      "tTrades": -1.96
+     },
+     "replication": {
+      "events": 77,
+      "eventR": 0.128,
+      "t": 0.49,
+      "trades": 77,
+      "tradeR": 0.128,
+      "tTrades": 0.49
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "events": 81,
+      "eventR": -0.079,
+      "t": -0.54,
+      "trades": 81,
+      "tradeR": -0.079,
+      "tTrades": -0.54
+     },
+     "replication": {
+      "events": 78,
+      "eventR": -0.4,
+      "t": -2.69,
+      "trades": 78,
+      "tradeR": -0.4,
+      "tTrades": -2.69
+     }
+    },
+    "nas100": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.252,
+      "t": -1.41,
+      "trades": 80,
+      "tradeR": -0.252,
+      "tTrades": -1.41
+     },
+     "replication": {
+      "events": 74,
+      "eventR": -1.053,
+      "t": -4.61,
+      "trades": 74,
+      "tradeR": -1.053,
+      "tTrades": -4.61
+     }
+    }
+   },
+   "years": {
+    "2012": {
+     "events": 7,
+     "eventR": 0.334,
+     "t": 0.42,
+     "trades": 26,
+     "tradeR": 0.409,
+     "tTrades": 0.62
+    },
+    "2013": {
+     "events": 7,
+     "eventR": -0.95,
+     "t": -3.73,
+     "trades": 27,
+     "tradeR": -0.929,
+     "tTrades": -2.88
+    },
+    "2014": {
+     "events": 9,
+     "eventR": -0.528,
+     "t": -2.46,
+     "trades": 36,
+     "tradeR": -0.528,
+     "tTrades": -1.63
+    },
+    "2015": {
+     "events": 10,
+     "eventR": -0.012,
+     "t": -0.03,
+     "trades": 39,
+     "tradeR": 0.002,
+     "tTrades": 0.01
+    },
+    "2016": {
+     "events": 10,
+     "eventR": -0.606,
+     "t": -2.35,
+     "trades": 40,
+     "tradeR": -0.606,
+     "tTrades": -2.94
+    },
+    "2017": {
+     "events": 11,
+     "eventR": -0.415,
+     "t": -1.6,
+     "trades": 42,
+     "tradeR": -0.425,
+     "tTrades": -2.06
+    },
+    "2018": {
+     "events": 12,
+     "eventR": -0.427,
+     "t": -2.22,
+     "trades": 48,
+     "tradeR": -0.427,
+     "tTrades": -1.96
+    },
+    "2019": {
+     "events": 12,
+     "eventR": 0.06,
+     "t": 0.15,
+     "trades": 48,
+     "tradeR": 0.06,
+     "tTrades": 0.16
+    },
+    "2020": {
+     "events": 11,
+     "eventR": -0.326,
+     "t": -0.84,
+     "trades": 42,
+     "tradeR": -0.277,
+     "tTrades": -0.79
+    },
+    "2021": {
+     "events": 12,
+     "eventR": 0.071,
+     "t": 0.3,
+     "trades": 48,
+     "tradeR": 0.071,
+     "tTrades": 0.29
+    },
+    "2022": {
+     "events": 12,
+     "eventR": -0.172,
+     "t": -0.8,
+     "trades": 47,
+     "tradeR": -0.154,
+     "tTrades": -1.07
+    },
+    "2023": {
+     "events": 12,
+     "eventR": -0.063,
+     "t": -0.32,
+     "trades": 48,
+     "tradeR": -0.063,
+     "tTrades": -0.45
+    },
+    "2024": {
+     "events": 12,
+     "eventR": -0.198,
+     "t": -1.13,
+     "trades": 48,
+     "tradeR": -0.198,
+     "tTrades": -1.25
+    },
+    "2025": {
+     "events": 11,
+     "eventR": -0.101,
+     "t": -0.37,
+     "trades": 44,
+     "tradeR": -0.101,
+     "tTrades": -0.44
+    },
+    "2026": {
+     "events": 11,
+     "eventR": -0.654,
+     "t": -3.45,
+     "trades": 44,
+     "tradeR": -0.654,
+     "tTrades": -3.9
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "decisive": false,
+    "holm": false,
+    "replication": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  {
+   "id": "follow-11:00",
+   "rule": "follow",
+   "exit": "11:00",
+   "p": 0.9986,
+   "decisive": {
+    "events": 81,
+    "eventR": -0.248,
+    "t": -3.08,
+    "trades": 321,
+    "tradeR": -0.24,
+    "tTrades": -3.49,
+    "gross": {
+     "events": 81,
+     "eventR": -0.138,
+     "t": -1.72,
+     "trades": 321,
+     "tradeR": -0.131,
+     "tTrades": -1.92
+    },
+    "cost2x": {
+     "events": 81,
+     "eventR": -0.358,
+     "t": -4.35,
+     "trades": 321,
+     "tradeR": -0.349,
+     "tTrades": -4.96
+    },
+    "skips": {
+     "flat": 1,
+     "nodata": 2,
+     "filter": 3,
+     "candles": 1
+    },
+    "stops": 138,
+    "medCostR": 0.055
+   },
+   "replication": {
+    "events": 78,
+    "eventR": -0.411,
+    "t": -4.19,
+    "trades": 306,
+    "tradeR": -0.411,
+    "tTrades": -4.57,
+    "gross": {
+     "events": 78,
+     "eventR": -0.093,
+     "t": -0.98,
+     "trades": 306,
+     "tradeR": -0.092,
+     "tTrades": -1.12
+    },
+    "skips": {
+     "filter": 1,
+     "flat": 3,
+     "nodata": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": 0.075,
+    "median": -0.163,
+    "values": [
+     -0.416,
+     -0.2,
+     -0.392,
+     -0.243,
+     -0.122,
+     -0.09,
+     -0.512,
+     -0.117,
+     -0.167,
+     -0.171,
+     -0.276,
+     -0.355,
+     -0.059,
+     -0.421,
+     -0.175,
+     -0.283,
+     -0.138,
+     -0.138,
+     -0.032,
+     -0.095,
+     -0.12,
+     -0.159,
+     -0.182,
+     0.216,
+     -0.026,
+     -0.057,
+     -0.394,
+     -0.01,
+     -0.469,
+     -0.223,
+     -0.394,
+     -0.247,
+     0.19,
+     -0.36,
+     -0.14,
+     0.018,
+     -0.16,
+     0.001,
+     -0.22,
+     0.069
+    ]
+   },
+   "perMarket": {
+    "xau": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.139,
+      "t": -1.17,
+      "trades": 80,
+      "tradeR": -0.139,
+      "tTrades": -1.17
+     },
+     "replication": {
+      "events": 77,
+      "eventR": -0.086,
+      "t": -0.45,
+      "trades": 77,
+      "tradeR": -0.086,
+      "tTrades": -0.45
+     }
+    },
+    "eurusd": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.35,
+      "t": -2.39,
+      "trades": 80,
+      "tradeR": -0.35,
+      "tTrades": -2.39
+     },
+     "replication": {
+      "events": 77,
+      "eventR": -0.067,
+      "t": -0.38,
+      "trades": 77,
+      "tradeR": -0.067,
+      "tTrades": -0.38
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "events": 81,
+      "eventR": -0.208,
+      "t": -1.76,
+      "trades": 81,
+      "tradeR": -0.208,
+      "tTrades": -1.76
+     },
+     "replication": {
+      "events": 78,
+      "eventR": -0.363,
+      "t": -2.69,
+      "trades": 78,
+      "tradeR": -0.363,
+      "tTrades": -2.69
+     }
+    },
+    "nas100": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.262,
+      "t": -1.6,
+      "trades": 80,
+      "tradeR": -0.262,
+      "tTrades": -1.6
+     },
+     "replication": {
+      "events": 74,
+      "eventR": -1.159,
+      "t": -6.23,
+      "trades": 74,
+      "tradeR": -1.159,
+      "tTrades": -6.23
+     }
+    }
+   },
+   "years": {
+    "2012": {
+     "events": 7,
+     "eventR": -0.181,
+     "t": -0.4,
+     "trades": 26,
+     "tradeR": -0.15,
+     "tTrades": -0.36
+    },
+    "2013": {
+     "events": 7,
+     "eventR": -0.781,
+     "t": -2.48,
+     "trades": 27,
+     "tradeR": -0.753,
+     "tTrades": -2.37
+    },
+    "2014": {
+     "events": 9,
+     "eventR": -0.672,
+     "t": -3.25,
+     "trades": 36,
+     "tradeR": -0.672,
+     "tTrades": -2.48
+    },
+    "2015": {
+     "events": 10,
+     "eventR": 0.03,
+     "t": 0.08,
+     "trades": 39,
+     "tradeR": 0.038,
+     "tTrades": 0.13
+    },
+    "2016": {
+     "events": 10,
+     "eventR": -0.642,
+     "t": -2.92,
+     "trades": 40,
+     "tradeR": -0.642,
+     "tTrades": -3.61
+    },
+    "2017": {
+     "events": 11,
+     "eventR": -0.358,
+     "t": -1.96,
+     "trades": 42,
+     "tradeR": -0.391,
+     "tTrades": -2.36
+    },
+    "2018": {
+     "events": 12,
+     "eventR": -0.535,
+     "t": -3.12,
+     "trades": 48,
+     "tradeR": -0.535,
+     "tTrades": -3.44
+    },
+    "2019": {
+     "events": 12,
+     "eventR": -0.232,
+     "t": -0.8,
+     "trades": 48,
+     "tradeR": -0.232,
+     "tTrades": -0.81
+    },
+    "2020": {
+     "events": 11,
+     "eventR": -0.184,
+     "t": -0.48,
+     "trades": 42,
+     "tradeR": -0.128,
+     "tTrades": -0.4
+    },
+    "2021": {
+     "events": 12,
+     "eventR": -0.154,
+     "t": -0.69,
+     "trades": 48,
+     "tradeR": -0.154,
+     "tTrades": -0.69
+    },
+    "2022": {
+     "events": 12,
+     "eventR": -0.184,
+     "t": -1.18,
+     "trades": 47,
+     "tradeR": -0.173,
+     "tTrades": -1.58
+    },
+    "2023": {
+     "events": 12,
+     "eventR": -0.184,
+     "t": -1.11,
+     "trades": 48,
+     "tradeR": -0.184,
+     "tTrades": -1.6
+    },
+    "2024": {
+     "events": 12,
+     "eventR": -0.194,
+     "t": -1.23,
+     "trades": 48,
+     "tradeR": -0.194,
+     "tTrades": -1.51
+    },
+    "2025": {
+     "events": 11,
+     "eventR": -0.238,
+     "t": -1.14,
+     "trades": 44,
+     "tradeR": -0.238,
+     "tTrades": -1.17
+    },
+    "2026": {
+     "events": 11,
+     "eventR": -0.624,
+     "t": -4.39,
+     "trades": 44,
+     "tradeR": -0.624,
+     "tTrades": -5.81
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "decisive": false,
+    "holm": false,
+    "replication": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  {
+   "id": "fade-16:00",
+   "rule": "fade",
+   "exit": "16:00",
+   "p": 0.8422,
+   "decisive": {
+    "events": 81,
+    "eventR": -0.066,
+    "t": -1.01,
+    "trades": 321,
+    "tradeR": -0.068,
+    "tTrades": -1.17,
+    "gross": {
+     "events": 81,
+     "eventR": -0.012,
+     "t": -0.18,
+     "trades": 321,
+     "tradeR": -0.014,
+     "tTrades": -0.24
+    },
+    "cost2x": {
+     "events": 81,
+     "eventR": -0.121,
+     "t": -1.79,
+     "trades": 321,
+     "tradeR": -0.122,
+     "tTrades": -2.1
+    },
+    "skips": {
+     "flat": 1,
+     "nodata": 2,
+     "filter": 3,
+     "candles": 1
+    },
+    "stops": 72,
+    "medCostR": 0.032
+   },
+   "replication": {
+    "events": 78,
+    "eventR": 0.054,
+    "t": 0.5,
+    "trades": 306,
+    "tradeR": 0.046,
+    "tTrades": 0.54,
+    "gross": {
+     "events": 78,
+     "eventR": 0.204,
+     "t": 1.9,
+     "trades": 306,
+     "tradeR": 0.195,
+     "tTrades": 2.29
+    },
+    "skips": {
+     "filter": 1,
+     "flat": 3,
+     "nodata": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": 0.123,
+    "median": -0.087,
+    "values": [
+     -0.119,
+     -0.073,
+     -0.171,
+     0.26,
+     -0.104,
+     0.112,
+     -0.01,
+     -0.265,
+     -0.229,
+     0.102,
+     -0.256,
+     -0.024,
+     -0.122,
+     -0.194,
+     -0.311,
+     -0.293,
+     -0.036,
+     -0.119,
+     -0.251,
+     -0.009,
+     -0.041,
+     0.039,
+     -0.004,
+     -0.238,
+     -0.156,
+     -0.053,
+     0.119,
+     -0.181,
+     -0.218,
+     -0.042,
+     0.079,
+     -0.008,
+     -0.296,
+     -0.077,
+     0.193,
+     -0.096,
+     -0.376,
+     -0.035,
+     -0.19,
+     0.105
+    ]
+   },
+   "perMarket": {
+    "xau": {
+     "decisive": {
+      "events": 80,
+      "eventR": -0.079,
+      "t": -0.84,
+      "trades": 80,
+      "tradeR": -0.079,
+      "tTrades": -0.84
+     },
+     "replication": {
+      "events": 77,
+      "eventR": 0.063,
+      "t": 0.48,
+      "trades": 77,
+      "tradeR": 0.063,
+      "tTrades": 0.48
+     }
+    },
+    "eurusd": {
+     "decisive": {
+      "events": 80,
+      "eventR": 0.034,
+      "t": 0.24,
+      "trades": 80,
+      "tradeR": 0.034,
+      "tTrades": 0.24
+     },
+     "replication": {
+      "events": 77,
+      "eventR": 0.174,
+      "t": 1.05,
+      "trades": 77,
+      "tradeR": 0.174,
+      "tTrades": 1.05
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "events": 81,
+      "eventR": -0.236,
+      "t": -2.87,
+      "trades": 81,
+      "tradeR": -0.236,
+      "tTrades": -2.87
+     },
+     "replication": {
+      "events": 78,
+      "eventR": 0.163,
+      "t": 1.14,
+      "trades": 78,
+      "tradeR": 0.163,
+      "tTrades": 1.14
+     }
+    },
+    "nas100": {
+     "decisive": {
+      "events": 80,
+      "eventR": 0.011,
+      "t": 0.08,
+      "trades": 80,
+      "tradeR": 0.011,
+      "tTrades": 0.08
+     },
+     "replication": {
+      "events": 74,
+      "eventR": -0.228,
+      "t": -1,
+      "trades": 74,
+      "tradeR": -0.228,
+      "tTrades": -1
+     }
+    }
+   },
+   "years": {
+    "2012": {
+     "events": 7,
+     "eventR": 0.27,
+     "t": 0.82,
+     "trades": 26,
+     "tradeR": 0.226,
+     "tTrades": 0.85
+    },
+    "2013": {
+     "events": 7,
+     "eventR": 0.229,
+     "t": 0.84,
+     "trades": 27,
+     "tradeR": 0.205,
+     "tTrades": 0.69
+    },
+    "2014": {
+     "events": 9,
+     "eventR": 0.061,
+     "t": 0.19,
+     "trades": 36,
+     "tradeR": 0.061,
+     "tTrades": 0.21
+    },
+    "2015": {
+     "events": 10,
+     "eventR": 0.031,
+     "t": 0.1,
+     "trades": 39,
+     "tradeR": 0.022,
+     "tTrades": 0.08
+    },
+    "2016": {
+     "events": 10,
+     "eventR": -0.002,
+     "t": -0.01,
+     "trades": 40,
+     "tradeR": -0.002,
+     "tTrades": -0.01
+    },
+    "2017": {
+     "events": 11,
+     "eventR": 0.051,
+     "t": 0.18,
+     "trades": 42,
+     "tradeR": 0.054,
+     "tTrades": 0.29
+    },
+    "2018": {
+     "events": 12,
+     "eventR": 0.139,
+     "t": 0.55,
+     "trades": 48,
+     "tradeR": 0.139,
+     "tTrades": 0.76
+    },
+    "2019": {
+     "events": 12,
+     "eventR": -0.194,
+     "t": -0.73,
+     "trades": 48,
+     "tradeR": -0.194,
+     "tTrades": -0.94
+    },
+    "2020": {
+     "events": 11,
+     "eventR": -0.287,
+     "t": -0.97,
+     "trades": 42,
+     "tradeR": -0.29,
+     "tTrades": -0.9
+    },
+    "2021": {
+     "events": 12,
+     "eventR": -0.021,
+     "t": -0.11,
+     "trades": 48,
+     "tradeR": -0.021,
+     "tTrades": -0.16
+    },
+    "2022": {
+     "events": 12,
+     "eventR": 0.006,
+     "t": 0.04,
+     "trades": 47,
+     "tradeR": -0.011,
+     "tTrades": -0.1
+    },
+    "2023": {
+     "events": 12,
+     "eventR": -0.128,
+     "t": -1.04,
+     "trades": 48,
+     "tradeR": -0.128,
+     "tTrades": -1.53
+    },
+    "2024": {
+     "events": 12,
+     "eventR": 0.09,
+     "t": 0.56,
+     "trades": 48,
+     "tradeR": 0.09,
+     "tTrades": 0.72
+    },
+    "2025": {
+     "events": 11,
+     "eventR": -0.175,
+     "t": -1.29,
+     "trades": 44,
+     "tradeR": -0.175,
+     "tTrades": -1.5
+    },
+    "2026": {
+     "events": 11,
+     "eventR": 0.031,
+     "t": 0.2,
+     "trades": 44,
+     "tradeR": 0.031,
+     "tTrades": 0.28
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "decisive": false,
+    "holm": false,
+    "replication": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  {
+   "id": "fade-11:00",
+   "rule": "fade",
+   "exit": "11:00",
+   "p": 0.492,
+   "decisive": {
+    "events": 81,
+    "eventR": 0.001,
+    "t": 0.02,
+    "trades": 321,
+    "tradeR": 0,
+    "tTrades": 0.01,
+    "gross": {
+     "events": 81,
+     "eventR": 0.056,
+     "t": 1.12,
+     "trades": 321,
+     "tradeR": 0.055,
+     "tTrades": 1.24
+    },
+    "cost2x": {
+     "events": 81,
+     "eventR": -0.054,
+     "t": -1,
+     "trades": 321,
+     "tradeR": -0.054,
+     "tTrades": -1.19
+    },
+    "skips": {
+     "flat": 1,
+     "nodata": 2,
+     "filter": 3,
+     "candles": 1
+    },
+    "stops": 42,
+    "medCostR": 0.032
+   },
+   "replication": {
+    "events": 78,
+    "eventR": -0.098,
+    "t": -1.41,
+    "trades": 306,
+    "tradeR": -0.102,
+    "tTrades": -1.72,
+    "gross": {
+     "events": 78,
+     "eventR": 0.052,
+     "t": 0.76,
+     "trades": 306,
+     "tradeR": 0.047,
+     "tTrades": 0.8
+    },
+    "skips": {
+     "filter": 1,
+     "flat": 3,
+     "nodata": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": 0.103,
+    "median": -0.108,
+    "values": [
+     -0.062,
+     -0.107,
+     -0.127,
+     0.102,
+     -0.085,
+     0.02,
+     -0.029,
+     -0.231,
+     -0.133,
+     0.12,
+     -0.238,
+     -0.068,
+     -0.109,
+     -0.133,
+     -0.374,
+     -0.265,
+     0.006,
+     -0.227,
+     -0.15,
+     -0.077,
+     -0.068,
+     -0.009,
+     -0.172,
+     -0.252,
+     -0.204,
+     -0.105,
+     0.124,
+     -0.226,
+     -0.173,
+     -0.065,
+     -0.007,
+     -0.124,
+     -0.309,
+     -0.164,
+     0.007,
+     -0.127,
+     -0.303,
+     -0.027,
+     -0.094,
+     -0.077
+    ]
+   },
+   "perMarket": {
+    "xau": {
+     "decisive": {
+      "events": 80,
+      "eventR": 0.013,
+      "t": 0.18,
+      "trades": 80,
+      "tradeR": 0.013,
+      "tTrades": 0.18
+     },
+     "replication": {
+      "events": 77,
+      "eventR": -0.01,
+      "t": -0.11,
+      "trades": 77,
+      "tradeR": -0.01,
+      "tTrades": -0.11
+     }
+    },
+    "eurusd": {
+     "decisive": {
+      "events": 80,
+      "eventR": 0.02,
+      "t": 0.21,
+      "trades": 80,
+      "tradeR": 0.02,
+      "tTrades": 0.21
+     },
+     "replication": {
+      "events": 77,
+      "eventR": -0.024,
+      "t": -0.21,
+      "trades": 77,
+      "tradeR": -0.024,
+      "tTrades": -0.21
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "events": 81,
+      "eventR": -0.173,
+      "t": -2.62,
+      "trades": 81,
+      "tradeR": -0.173,
+      "tTrades": -2.62
+     },
+     "replication": {
+      "events": 78,
+      "eventR": -0.02,
+      "t": -0.24,
+      "trades": 78,
+      "tradeR": -0.02,
+      "tTrades": -0.24
+     }
+    },
+    "nas100": {
+     "decisive": {
+      "events": 80,
+      "eventR": 0.144,
+      "t": 1.28,
+      "trades": 80,
+      "tradeR": 0.144,
+      "tTrades": 1.28
+     },
+     "replication": {
+      "events": 74,
+      "eventR": -0.365,
+      "t": -2.19,
+      "trades": 74,
+      "tradeR": -0.365,
+      "tTrades": -2.19
+     }
+    }
+   },
+   "years": {
+    "2012": {
+     "events": 7,
+     "eventR": 0.109,
+     "t": 0.29,
+     "trades": 26,
+     "tradeR": 0.079,
+     "tTrades": 0.31
+    },
+    "2013": {
+     "events": 7,
+     "eventR": 0,
+     "t": 0,
+     "trades": 27,
+     "tradeR": -0.026,
+     "tTrades": -0.11
+    },
+    "2014": {
+     "events": 9,
+     "eventR": -0.075,
+     "t": -0.34,
+     "trades": 36,
+     "tradeR": -0.075,
+     "tTrades": -0.41
+    },
+    "2015": {
+     "events": 10,
+     "eventR": -0.089,
+     "t": -0.37,
+     "trades": 39,
+     "tradeR": -0.094,
+     "tTrades": -0.52
+    },
+    "2016": {
+     "events": 10,
+     "eventR": -0.313,
+     "t": -2.44,
+     "trades": 40,
+     "tradeR": -0.313,
+     "tTrades": -2.52
+    },
+    "2017": {
+     "events": 11,
+     "eventR": 0.001,
+     "t": 0.01,
+     "trades": 42,
+     "tradeR": 0.028,
+     "tTrades": 0.23
+    },
+    "2018": {
+     "events": 12,
+     "eventR": -0.062,
+     "t": -0.4,
+     "trades": 48,
+     "tradeR": -0.062,
+     "tTrades": -0.5
+    },
+    "2019": {
+     "events": 12,
+     "eventR": -0.246,
+     "t": -1.34,
+     "trades": 48,
+     "tradeR": -0.246,
+     "tTrades": -1.47
+    },
+    "2020": {
+     "events": 11,
+     "eventR": -0.269,
+     "t": -1.06,
+     "trades": 42,
+     "tradeR": -0.281,
+     "tTrades": -1.2
+    },
+    "2021": {
+     "events": 12,
+     "eventR": 0.104,
+     "t": 0.72,
+     "trades": 48,
+     "tradeR": 0.104,
+     "tTrades": 0.89
+    },
+    "2022": {
+     "events": 12,
+     "eventR": 0.068,
+     "t": 0.56,
+     "trades": 47,
+     "tradeR": 0.064,
+     "tTrades": 0.72
+    },
+    "2023": {
+     "events": 12,
+     "eventR": -0.005,
+     "t": -0.05,
+     "trades": 48,
+     "tradeR": -0.005,
+     "tTrades": -0.08
+    },
+    "2024": {
+     "events": 12,
+     "eventR": 0.059,
+     "t": 0.64,
+     "trades": 48,
+     "tradeR": 0.059,
+     "tTrades": 0.63
+    },
+    "2025": {
+     "events": 11,
+     "eventR": -0.016,
+     "t": -0.19,
+     "trades": 44,
+     "tradeR": -0.016,
+     "tTrades": -0.18
+    },
+    "2026": {
+     "events": 11,
+     "eventR": 0.046,
+     "t": 0.42,
+     "trades": 44,
+     "tradeR": 0.046,
+     "tTrades": 0.57
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "decisive": false,
+    "holm": false,
+    "replication": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ ]
+}
