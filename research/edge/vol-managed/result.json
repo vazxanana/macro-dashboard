@@ -1,0 +1,285 @@
+{
+ "study": "vol-managed",
+ "title": "Volatility-managed exposure on US index CFDs",
+ "built": "2026-11-13",
+ "params": {
+  "rvN": 22,
+  "cap": 2,
+  "atrN": 20,
+  "stopAtr": 3,
+  "spreadRT": 0.0003,
+  "finAdd": 0.025,
+  "dgs2Default": 0.03,
+  "dgs2LagDays": 7,
+  "disc": [
+   "2008-01",
+   "2015-12"
+  ],
+  "dec": [
+   "2016-01",
+   null
+  ],
+  "boot": {
+   "draws": 2000,
+   "block": 6,
+   "seed": 20261113
+  }
+ },
+ "variants": {},
+ "markets": {
+  "spx500": {
+   "name": "S&P 500",
+   "B": {
+    "c": 1,
+    "stops": 37,
+    "meanWeightDec": 1,
+    "capShareDec": 0,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.5376,
+     "cagr": 0.0673,
+     "maxDD": -0.291
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.027,
+     "cagr": -0.008,
+     "maxDD": -0.5002
+    }
+   },
+   "V": {
+    "c": 0.0015663913425904728,
+    "stops": 37,
+    "meanWeightDec": 1.2085,
+    "capShareDec": 0.2846,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.3131,
+     "cagr": 0.0333,
+     "maxDD": -0.1887
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.0131,
+     "cagr": -0.0061,
+     "maxDD": -0.2573
+    }
+   },
+   "S": {
+    "c": 0.040912274887303354,
+    "stops": 37,
+    "meanWeightDec": 1.1788,
+    "capShareDec": 0.1154,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.3929,
+     "cagr": 0.0443,
+     "maxDD": -0.2313
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.0876,
+     "cagr": 0.0032,
+     "maxDD": -0.2635
+    }
+   }
+  },
+  "nas100": {
+   "name": "Nasdaq 100",
+   "B": {
+    "c": 1,
+    "stops": 42,
+    "meanWeightDec": 1,
+    "capShareDec": 0,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.4844,
+     "cagr": 0.0776,
+     "maxDD": -0.439
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.373,
+     "cagr": 0.0524,
+     "maxDD": -0.4065
+    }
+   },
+   "V": {
+    "c": 0.002067536114225493,
+    "stops": 42,
+    "meanWeightDec": 0.9481,
+    "capShareDec": 0.1462,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.497,
+     "cagr": 0.0664,
+     "maxDD": -0.2121
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.2422,
+     "cagr": 0.0258,
+     "maxDD": -0.2011
+    }
+   },
+   "S": {
+    "c": 0.046433012495933054,
+    "stops": 42,
+    "meanWeightDec": 0.9832,
+    "capShareDec": 0.0385,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.5259,
+     "cagr": 0.0739,
+     "maxDD": -0.3067
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.3679,
+     "cagr": 0.0455,
+     "maxDD": -0.1953
+    }
+   }
+  },
+  "us30": {
+   "name": "Dow 30",
+   "B": {
+    "c": 1,
+    "stops": 39,
+    "meanWeightDec": 1,
+    "capShareDec": 0,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.4301,
+     "cagr": 0.0509,
+     "maxDD": -0.2705
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.1712,
+     "cagr": 0.0143,
+     "maxDD": -0.453
+    }
+   },
+   "V": {
+    "c": 0.001326829537163747,
+    "stops": 39,
+    "meanWeightDec": 1.1448,
+    "capShareDec": 0.2231,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.2461,
+     "cagr": 0.0239,
+     "maxDD": -0.3684
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.099,
+     "cagr": 0.0049,
+     "maxDD": -0.2171
+    }
+   },
+   "S": {
+    "c": 0.03740238311751366,
+    "stops": 39,
+    "meanWeightDec": 1.1135,
+    "capShareDec": 0.0615,
+    "dec": {
+     "months": 130,
+     "sharpe": 0.3324,
+     "cagr": 0.0355,
+     "maxDD": -0.2764
+    },
+    "disc": {
+     "months": 96,
+     "sharpe": 0.184,
+     "cagr": 0.0146,
+     "maxDD": -0.2348
+    }
+   }
+  }
+ },
+ "dec": [
+  "2016-01",
+  "2026-10"
+ ],
+ "disc": [
+  "2008-01",
+  "2015-12"
+ ],
+ "book": {
+  "B": {
+   "dec": {
+    "months": 130,
+    "from": "2016-01",
+    "to": "2026-10",
+    "sharpe": 0.5139,
+    "cagr": 0.067,
+    "maxDD": -0.3187
+   },
+   "disc": {
+    "months": 96,
+    "from": "2008-01",
+    "to": "2015-12",
+    "sharpe": 0.2072,
+    "cagr": 0.0203,
+    "maxDD": -0.4444
+   }
+  },
+  "V": {
+   "dec": {
+    "months": 130,
+    "sharpe": 0.4002,
+    "cagr": 0.043,
+    "maxDD": -0.1961
+   },
+   "disc": {
+    "months": 96,
+    "sharpe": 0.1341,
+    "cagr": 0.009,
+    "maxDD": -0.214
+   },
+   "dSharpeDec": -0.1137,
+   "dSharpeDisc": -0.0731,
+   "bootP": 0.2855,
+   "ddNotDeeper": true,
+   "checks": {
+    "dSharpePos": false,
+    "bootP09": false,
+    "holm": false,
+    "ddNotDeeper": true,
+    "discSameSign": false
+   },
+   "pass": false
+  },
+  "S": {
+   "dec": {
+    "months": 130,
+    "sharpe": 0.4629,
+    "cagr": 0.0528,
+    "maxDD": -0.245
+   },
+   "disc": {
+    "months": 96,
+    "sharpe": 0.2355,
+    "cagr": 0.0218,
+    "maxDD": -0.2257
+   },
+   "dSharpeDec": -0.051,
+   "dSharpeDisc": 0.0283,
+   "bootP": 0.3485,
+   "ddNotDeeper": true,
+   "checks": {
+    "dSharpePos": false,
+    "bootP09": false,
+    "holm": false,
+    "ddNotDeeper": true,
+    "discSameSign": true
+   },
+   "pass": false
+  }
+ },
+ "fallbackDays": 0,
+ "verdict": "FAIL",
+ "lastBar": "2026-11-06"
+}
