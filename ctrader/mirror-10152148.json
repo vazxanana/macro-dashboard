@@ -3776,7 +3776,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-12T19:08:53.000Z",
     "councilEntry": 3880.26,
     "stop": 3890.5,
@@ -3791,10 +3791,12 @@
     "slipR": 0.086,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-12T19:08:53.000Z",
-    "brokerStop": 3889.62
+    "brokerStop": 3889.62,
+    "closedAt": "2026-11-13T00:14:21.000Z"
    },
    "xau-replica-1794527800-b": {
     "positionId": "49103376",
@@ -3830,7 +3832,7 @@
    "startBalance": 5472.03
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5472.03 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 5461.9 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -3838,15 +3840,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5472.03,
-  "lastRun": "2026-11-13T00:11:47.000Z"
+  "balance": 5461.9,
+  "lastRun": "2026-11-13T00:14:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T08:36:26.000Z",
-   "msg": "AUDUSD position 47955397 closed at the broker",
-   "trade": "audusd-replica-1794297606-s"
-  },
   {
    "at": "2026-11-10T08:41:37.000Z",
    "msg": "opened buy AUDUSD 0.02 lot (council replica)",
@@ -5341,6 +5338,11 @@
    "at": "2026-11-12T23:57:28.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1794527800-b"
+  },
+  {
+   "at": "2026-11-13T00:14:21.000Z",
+   "msg": "XAUUSD position 49021922 closed at the broker",
+   "trade": "xau-replica-1794510467-s"
   }
  ],
  "limits": {
