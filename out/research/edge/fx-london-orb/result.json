@@ -1,0 +1,1035 @@
+{
+ "topic": "fx-london-orb",
+ "built": "2026-11-13",
+ "at": "2026-11-13T23:50:10.600Z",
+ "system": "London-open range breakout (07:00-08:00 London range, follow and fade), six forex majors, OANDA mid M5",
+ "window": {
+  "replication": "2016-01-01 to 2019-12-31",
+  "decisive": "2020-01-01 to 2026-11-12"
+ },
+ "params": {
+  "M5": 300,
+  "MIN_RANGE_BARS": 11,
+  "MED_N": 20,
+  "LO": 0.25,
+  "HI": 2,
+  "TGT": 1.5,
+  "FADE_PAD": 0.1,
+  "EPS": 1e-9,
+  "SPREAD_PIP": 0.3,
+  "COMM_SIDE": 0.0000225,
+  "SLIP_PIP": 0.5,
+  "SEEDS": 40,
+  "DATA_FROM": 1446336000,
+  "REP_FROM": 1451606400,
+  "DEC_FROM": 1577836800
+ },
+ "pairs": [
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "usdchf",
+  "eurjpy"
+ ],
+ "funnel": {
+  "eurusd": {
+   "candles": 821744,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2859,
+   "warmup": 20,
+   "narrow": 2,
+   "wide": 151,
+   "kept": 2686
+  },
+  "gbpusd": {
+   "candles": 821204,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2859,
+   "warmup": 20,
+   "narrow": 4,
+   "wide": 175,
+   "kept": 2660
+  },
+  "usdjpy": {
+   "candles": 822120,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2858,
+   "warmup": 20,
+   "narrow": 6,
+   "wide": 245,
+   "kept": 2587
+  },
+  "audusd": {
+   "candles": 818540,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2857,
+   "warmup": 20,
+   "narrow": 4,
+   "wide": 128,
+   "kept": 2705
+  },
+  "usdchf": {
+   "candles": 813417,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2857,
+   "warmup": 20,
+   "narrow": 3,
+   "wide": 167,
+   "kept": 2667
+  },
+  "eurjpy": {
+   "candles": 822238,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "days": 2859,
+   "warmup": 20,
+   "narrow": 1,
+   "wide": 211,
+   "kept": 2627
+  }
+ },
+ "costs": "spread 0.3 pip + commission 22.5 USD per million a side (2 x 22.5e-6 x price a round trip) + 0.5 pip slippage per market or stop fill",
+ "variants": {
+  "F1": {
+   "rule": "follow: stop orders at the range, stop the other side, exit 16:00 London",
+   "decisive": {
+    "n": 9875,
+    "median": -1.081,
+    "tGross": 3.74,
+    "net": -0.05,
+    "gross": 0.08,
+    "net2": -0.179,
+    "total": -490.53,
+    "win": 0.328,
+    "months": 83,
+    "t": -2.28
+   },
+   "replication": {
+    "n": 5847,
+    "median": -1.084,
+    "tGross": 0.96,
+    "net": -0.103,
+    "gross": 0.031,
+    "net2": -0.237,
+    "total": -604.29,
+    "win": 0.312,
+    "months": 48,
+    "t": -3.15
+   },
+   "byPair": {
+    "eurusd": {
+     "decisive": {
+      "n": 1670,
+      "median": -1.095,
+      "tGross": 2.31,
+      "net": -0.039,
+      "gross": 0.101,
+      "net2": -0.179,
+      "total": -65.14,
+      "win": 0.341,
+      "months": 83,
+      "t": -0.88
+     },
+     "replication": {
+      "n": 983,
+      "median": -1.095,
+      "tGross": -0.8,
+      "net": -0.18,
+      "gross": -0.044,
+      "net2": -0.316,
+      "total": -176.7,
+      "win": 0.296,
+      "months": 48,
+      "t": -3.13
+     }
+    },
+    "gbpusd": {
+     "decisive": {
+      "n": 1663,
+      "median": -1.071,
+      "tGross": 1.54,
+      "net": -0.044,
+      "gross": 0.061,
+      "net2": -0.148,
+      "total": -72.44,
+      "win": 0.33,
+      "months": 83,
+      "t": -1.1
+     },
+     "replication": {
+      "n": 966,
+      "median": -1.065,
+      "tGross": 2.2,
+      "net": 0.034,
+      "gross": 0.13,
+      "net2": -0.061,
+      "total": 33.32,
+      "win": 0.33,
+      "months": 48,
+      "t": 0.59
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "n": 1584,
+      "median": -1.074,
+      "tGross": 1.91,
+      "net": -0.044,
+      "gross": 0.087,
+      "net2": -0.174,
+      "total": -69.45,
+      "win": 0.319,
+      "months": 83,
+      "t": -0.95
+     },
+     "replication": {
+      "n": 955,
+      "median": -1.091,
+      "tGross": 0.59,
+      "net": -0.118,
+      "gross": 0.033,
+      "net2": -0.269,
+      "total": -112.75,
+      "win": 0.305,
+      "months": 48,
+      "t": -1.99
+     }
+    },
+    "audusd": {
+     "decisive": {
+      "n": 1675,
+      "median": -1.095,
+      "tGross": 1.29,
+      "net": -0.096,
+      "gross": 0.045,
+      "net2": -0.237,
+      "total": -160.64,
+      "win": 0.328,
+      "months": 83,
+      "t": -2.68
+     },
+     "replication": {
+      "n": 991,
+      "median": -1.083,
+      "tGross": 0.78,
+      "net": -0.111,
+      "gross": 0.039,
+      "net2": -0.262,
+      "total": -110.25,
+      "win": 0.346,
+      "months": 48,
+      "t": -2.23
+     }
+    },
+    "usdchf": {
+     "decisive": {
+      "n": 1655,
+      "median": -1.11,
+      "tGross": 1.39,
+      "net": -0.087,
+      "gross": 0.068,
+      "net2": -0.242,
+      "total": -144.27,
+      "win": 0.303,
+      "months": 83,
+      "t": -1.79
+     },
+     "replication": {
+      "n": 985,
+      "median": -1.117,
+      "tGross": -0.25,
+      "net": -0.177,
+      "gross": -0.017,
+      "net2": -0.336,
+      "total": -174.21,
+      "win": 0.282,
+      "months": 48,
+      "t": -2.57
+     }
+    },
+    "eurjpy": {
+     "decisive": {
+      "n": 1628,
+      "median": -1.06,
+      "tGross": 2.46,
+      "net": 0.013,
+      "gross": 0.116,
+      "net2": -0.09,
+      "total": 21.4,
+      "win": 0.346,
+      "months": 83,
+      "t": 0.28
+     },
+     "replication": {
+      "n": 967,
+      "median": -1.072,
+      "tGross": 0.74,
+      "net": -0.066,
+      "gross": 0.044,
+      "net2": -0.176,
+      "total": -63.71,
+      "win": 0.313,
+      "months": 48,
+      "t": -1.1
+     }
+    }
+   },
+   "years": {
+    "2016": {
+     "n": 1445,
+     "net": -0.024,
+     "total": -34.94
+    },
+    "2017": {
+     "n": 1468,
+     "net": -0.069,
+     "total": -101.58
+    },
+    "2018": {
+     "n": 1475,
+     "net": -0.184,
+     "total": -271.47
+    },
+    "2019": {
+     "n": 1459,
+     "net": -0.135,
+     "total": -196.3
+    },
+    "2020": {
+     "n": 1415,
+     "net": -0.021,
+     "total": -30.07
+    },
+    "2021": {
+     "n": 1486,
+     "net": -0.098,
+     "total": -145.84
+    },
+    "2022": {
+     "n": 1439,
+     "net": 0.024,
+     "total": 34.46
+    },
+    "2023": {
+     "n": 1436,
+     "net": -0.073,
+     "total": -105.42
+    },
+    "2024": {
+     "n": 1414,
+     "net": -0.114,
+     "total": -161.82
+    },
+    "2025": {
+     "n": 1442,
+     "net": -0.029,
+     "total": -41.43
+    },
+    "2026": {
+     "n": 1243,
+     "net": -0.033,
+     "total": -40.41
+    }
+   },
+   "exits": {
+    "stop": 6123,
+    "time": 3752
+   },
+   "p": 0.9887,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.039,
+    "p95": -0.026,
+    "min": -0.055,
+    "max": -0.025,
+    "beats": false
+   },
+   "pHolm": 1,
+   "tests": {
+    "decisive net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "2016-19 net R a trade > 0": false,
+    "Holm-adjusted p < 0.05": false,
+    "beats the placebo 95th percentile": false
+   },
+   "verdict": "FAIL"
+  },
+  "F2": {
+   "rule": "follow: as F1 with a 1.5R target, else 16:00 London",
+   "decisive": {
+    "n": 9875,
+    "median": -1.059,
+    "tGross": 3.04,
+    "net": -0.075,
+    "gross": 0.04,
+    "net2": -0.19,
+    "total": -739.94,
+    "win": 0.426,
+    "months": 83,
+    "t": -5.36
+   },
+   "replication": {
+    "n": 5847,
+    "median": -1.066,
+    "tGross": 0.59,
+    "net": -0.108,
+    "gross": 0.012,
+    "net2": -0.228,
+    "total": -630.3,
+    "win": 0.411,
+    "months": 48,
+    "t": -4.76
+   },
+   "byPair": {
+    "eurusd": {
+     "decisive": {
+      "n": 1670,
+      "median": -1.071,
+      "tGross": 2.21,
+      "net": -0.06,
+      "gross": 0.065,
+      "net2": -0.186,
+      "total": -101.02,
+      "win": 0.438,
+      "months": 83,
+      "t": -1.97
+     },
+     "replication": {
+      "n": 983,
+      "median": -1.081,
+      "tGross": -1.53,
+      "net": -0.178,
+      "gross": -0.055,
+      "net2": -0.301,
+      "total": -175.1,
+      "win": 0.388,
+      "months": 48,
+      "t": -4.71
+     }
+    },
+    "gbpusd": {
+     "decisive": {
+      "n": 1663,
+      "median": -1.052,
+      "tGross": 1.67,
+      "net": -0.049,
+      "gross": 0.045,
+      "net2": -0.143,
+      "total": -81.38,
+      "win": 0.431,
+      "months": 83,
+      "t": -1.81
+     },
+     "replication": {
+      "n": 966,
+      "median": -1.039,
+      "tGross": 3.29,
+      "net": 0.031,
+      "gross": 0.116,
+      "net2": -0.053,
+      "total": 30.37,
+      "win": 0.457,
+      "months": 48,
+      "t": 0.88
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "n": 1584,
+      "median": -1.054,
+      "tGross": 0.98,
+      "net": -0.088,
+      "gross": 0.029,
+      "net2": -0.204,
+      "total": -138.76,
+      "win": 0.421,
+      "months": 83,
+      "t": -2.86
+     },
+     "replication": {
+      "n": 955,
+      "median": -1.072,
+      "tGross": 0.01,
+      "net": -0.136,
+      "gross": 0,
+      "net2": -0.272,
+      "total": -129.52,
+      "win": 0.405,
+      "months": 48,
+      "t": -3.88
+     }
+    },
+    "audusd": {
+     "decisive": {
+      "n": 1675,
+      "median": -1.075,
+      "tGross": 0.89,
+      "net": -0.103,
+      "gross": 0.023,
+      "net2": -0.228,
+      "total": -171.77,
+      "win": 0.416,
+      "months": 83,
+      "t": -3.87
+     },
+     "replication": {
+      "n": 991,
+      "median": -1.062,
+      "tGross": 0.75,
+      "net": -0.105,
+      "gross": 0.028,
+      "net2": -0.239,
+      "total": -104.54,
+      "win": 0.421,
+      "months": 48,
+      "t": -2.8
+     }
+    },
+    "usdchf": {
+     "decisive": {
+      "n": 1655,
+      "median": -1.09,
+      "tGross": 0.7,
+      "net": -0.117,
+      "gross": 0.021,
+      "net2": -0.255,
+      "total": -193.58,
+      "win": 0.414,
+      "months": 83,
+      "t": -3.87
+     },
+     "replication": {
+      "n": 985,
+      "median": -1.096,
+      "tGross": -0.49,
+      "net": -0.164,
+      "gross": -0.021,
+      "net2": -0.306,
+      "total": -161.12,
+      "win": 0.395,
+      "months": 48,
+      "t": -3.74
+     }
+    },
+    "eurjpy": {
+     "decisive": {
+      "n": 1628,
+      "median": -1.043,
+      "tGross": 1.93,
+      "net": -0.033,
+      "gross": 0.06,
+      "net2": -0.126,
+      "total": -53.43,
+      "win": 0.438,
+      "months": 83,
+      "t": -1.05
+     },
+     "replication": {
+      "n": 967,
+      "median": -1.056,
+      "tGross": 0.14,
+      "net": -0.093,
+      "gross": 0.005,
+      "net2": -0.192,
+      "total": -90.39,
+      "win": 0.402,
+      "months": 48,
+      "t": -2.28
+     }
+    }
+   },
+   "years": {
+    "2016": {
+     "n": 1445,
+     "net": -0.067,
+     "total": -96.4
+    },
+    "2017": {
+     "n": 1468,
+     "net": -0.02,
+     "total": -28.81
+    },
+    "2018": {
+     "n": 1475,
+     "net": -0.176,
+     "total": -260.17
+    },
+    "2019": {
+     "n": 1459,
+     "net": -0.168,
+     "total": -244.93
+    },
+    "2020": {
+     "n": 1415,
+     "net": -0.057,
+     "total": -80.58
+    },
+    "2021": {
+     "n": 1486,
+     "net": -0.071,
+     "total": -105.49
+    },
+    "2022": {
+     "n": 1439,
+     "net": -0.009,
+     "total": -13.34
+    },
+    "2023": {
+     "n": 1436,
+     "net": -0.081,
+     "total": -116.96
+    },
+    "2024": {
+     "n": 1414,
+     "net": -0.141,
+     "total": -199.57
+    },
+    "2025": {
+     "n": 1442,
+     "net": -0.049,
+     "total": -70.52
+    },
+    "2026": {
+     "n": 1243,
+     "net": -0.123,
+     "total": -153.48
+    }
+   },
+   "exits": {
+    "stop": 5345,
+    "target": 3652,
+    "time": 878
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.063,
+    "p95": -0.054,
+    "min": -0.084,
+    "max": -0.05,
+    "beats": false
+   },
+   "pHolm": 1,
+   "tests": {
+    "decisive net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "2016-19 net R a trade > 0": false,
+    "Holm-adjusted p < 0.05": false,
+    "beats the placebo 95th percentile": false
+   },
+   "verdict": "FAIL"
+  },
+  "FADE": {
+   "rule": "fade the first close beyond the range, stop past the break candle + 0.1 x range, target the middle, exit 16:00 London",
+   "decisive": {
+    "n": 9739,
+    "median": -1.591,
+    "tGross": 0.08,
+    "net": -0.808,
+    "gross": 0.002,
+    "net2": -1.617,
+    "total": -7866.74,
+    "win": 0.214,
+    "months": 83,
+    "t": -22
+   },
+   "postHoc": {
+    "r0 >= 0.1 x range": {
+     "decisive": {
+      "n": 8989,
+      "median": -1.559,
+      "tGross": -0.25,
+      "net": -0.722,
+      "gross": -0.006,
+      "net2": -1.438,
+      "total": -6490.47,
+      "win": 0.222,
+      "months": 83,
+      "t": -22.01
+     },
+     "replication": {
+      "n": 5108,
+      "median": -1.505,
+      "tGross": 2.97,
+      "net": -0.584,
+      "gross": 0.096,
+      "net2": -1.265,
+      "total": -2984.92,
+      "win": 0.252,
+      "months": 48,
+      "t": -17.23
+     }
+    },
+    "r0 >= 0.25 x range": {
+     "decisive": {
+      "n": 1638,
+      "median": -1.278,
+      "tGross": 0.41,
+      "net": -0.385,
+      "gross": 0.016,
+      "net2": -0.786,
+      "total": -630.88,
+      "win": 0.345,
+      "months": 83,
+      "t": -9.72
+     },
+     "replication": {
+      "n": 1207,
+      "median": -1.283,
+      "tGross": -0.15,
+      "net": -0.402,
+      "gross": -0.008,
+      "net2": -0.797,
+      "total": -485.61,
+      "win": 0.343,
+      "months": 48,
+      "t": -7.57
+     }
+    }
+   },
+   "replication": {
+    "n": 5760,
+    "median": -1.555,
+    "tGross": 3.12,
+    "net": -0.805,
+    "gross": 0.11,
+    "net2": -1.72,
+    "total": -4636.86,
+    "win": 0.236,
+    "months": 48,
+    "t": -10.82
+   },
+   "byPair": {
+    "eurusd": {
+     "decisive": {
+      "n": 1650,
+      "median": -1.647,
+      "tGross": -0.21,
+      "net": -0.844,
+      "gross": -0.012,
+      "net2": -1.677,
+      "total": -1392.9,
+      "win": 0.213,
+      "months": 83,
+      "t": -13.8
+     },
+     "replication": {
+      "n": 973,
+      "median": -1.53,
+      "tGross": 2.9,
+      "net": -0.567,
+      "gross": 0.202,
+      "net2": -1.336,
+      "total": -551.59,
+      "win": 0.275,
+      "months": 48,
+      "t": -6.93
+     }
+    },
+    "gbpusd": {
+     "decisive": {
+      "n": 1643,
+      "median": -1.499,
+      "tGross": -1.66,
+      "net": -0.705,
+      "gross": -0.076,
+      "net2": -1.333,
+      "total": -1157.52,
+      "win": 0.201,
+      "months": 83,
+      "t": -12.92
+     },
+     "replication": {
+      "n": 960,
+      "median": -1.403,
+      "tGross": 1.02,
+      "net": -0.5,
+      "gross": 0.063,
+      "net2": -1.062,
+      "total": -479.61,
+      "win": 0.232,
+      "months": 48,
+      "t": -7.64
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "n": 1557,
+      "median": -1.525,
+      "tGross": -0.71,
+      "net": -0.786,
+      "gross": -0.038,
+      "net2": -1.534,
+      "total": -1223.95,
+      "win": 0.216,
+      "months": 83,
+      "t": -11.13
+     },
+     "replication": {
+      "n": 924,
+      "median": -1.577,
+      "tGross": 1.36,
+      "net": -0.995,
+      "gross": 0.114,
+      "net2": -2.103,
+      "total": -919.11,
+      "win": 0.245,
+      "months": 48,
+      "t": -4.57
+     }
+    },
+    "audusd": {
+     "decisive": {
+      "n": 1645,
+      "median": -1.732,
+      "tGross": 0.58,
+      "net": -0.939,
+      "gross": 0.031,
+      "net2": -1.909,
+      "total": -1544.86,
+      "win": 0.207,
+      "months": 83,
+      "t": -15.05
+     },
+     "replication": {
+      "n": 975,
+      "median": -1.726,
+      "tGross": 1.18,
+      "net": -1.033,
+      "gross": 0.118,
+      "net2": -2.185,
+      "total": -1007.52,
+      "win": 0.21,
+      "months": 48,
+      "t": -8.55
+     }
+    },
+    "usdchf": {
+     "decisive": {
+      "n": 1640,
+      "median": -1.729,
+      "tGross": 2.62,
+      "net": -0.893,
+      "gross": 0.152,
+      "net2": -1.938,
+      "total": -1464.14,
+      "win": 0.241,
+      "months": 83,
+      "t": -9.83
+     },
+     "replication": {
+      "n": 974,
+      "median": -1.733,
+      "tGross": 1.46,
+      "net": -1.105,
+      "gross": 0.125,
+      "net2": -2.336,
+      "total": -1076.67,
+      "win": 0.227,
+      "months": 48,
+      "t": -7.91
+     }
+    },
+    "eurjpy": {
+     "decisive": {
+      "n": 1604,
+      "median": -1.468,
+      "tGross": -1.02,
+      "net": -0.675,
+      "gross": -0.049,
+      "net2": -1.302,
+      "total": -1083.36,
+      "win": 0.207,
+      "months": 83,
+      "t": -11.93
+     },
+     "replication": {
+      "n": 954,
+      "median": -1.472,
+      "tGross": 0.57,
+      "net": -0.631,
+      "gross": 0.037,
+      "net2": -1.3,
+      "total": -602.36,
+      "win": 0.225,
+      "months": 48,
+      "t": -7.71
+     }
+    }
+   },
+   "years": {
+    "2016": {
+     "n": 1420,
+     "net": -0.624,
+     "total": -885.66
+    },
+    "2017": {
+     "n": 1447,
+     "net": -0.673,
+     "total": -974.55
+    },
+    "2018": {
+     "n": 1456,
+     "net": -0.608,
+     "total": -885.91
+    },
+    "2019": {
+     "n": 1437,
+     "net": -1.316,
+     "total": -1890.74
+    },
+    "2020": {
+     "n": 1397,
+     "net": -0.91,
+     "total": -1271.47
+    },
+    "2021": {
+     "n": 1474,
+     "net": -0.825,
+     "total": -1216.49
+    },
+    "2022": {
+     "n": 1423,
+     "net": -0.483,
+     "total": -686.82
+    },
+    "2023": {
+     "n": 1424,
+     "net": -0.738,
+     "total": -1050.79
+    },
+    "2024": {
+     "n": 1389,
+     "net": -0.894,
+     "total": -1242.04
+    },
+    "2025": {
+     "n": 1418,
+     "net": -0.869,
+     "total": -1232.36
+    },
+    "2026": {
+     "n": 1214,
+     "net": -0.961,
+     "total": -1166.79
+    }
+   },
+   "exits": {
+    "target": 2088,
+    "stop": 7650,
+    "time": 1
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.906,
+    "p95": -0.867,
+    "min": -0.937,
+    "max": -0.844,
+    "beats": true
+   },
+   "pHolm": 1,
+   "tests": {
+    "decisive net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "2016-19 net R a trade > 0": false,
+    "Holm-adjusted p < 0.05": false,
+    "beats the placebo 95th percentile": true
+   },
+   "verdict": "FAIL"
+  }
+ },
+ "verdict": "FAIL: 0 of 3 variants pass. F1 FAIL (2020 on -0.05R a trade net, n 9875, t -2.28; 2016-19 -0.103R, n 5847); F2 FAIL (2020 on -0.075R a trade net, n 9875, t -5.36; 2016-19 -0.108R, n 5847); FADE FAIL (2020 on -0.808R a trade net, n 9739, t -22; 2016-19 -0.805R, n 5760)",
+ "candidates": [
+  {
+   "rule": "F1: follow: stop orders at the range, stop the other side, exit 16:00 London",
+   "verdict": "FAIL",
+   "is": {
+    "n": 5847,
+    "median": -1.084,
+    "tGross": 0.96,
+    "net": -0.103,
+    "gross": 0.031,
+    "net2": -0.237,
+    "total": -604.29,
+    "win": 0.312,
+    "months": 48,
+    "t": -3.15
+   },
+   "oos": {
+    "n": 9875,
+    "median": -1.081,
+    "tGross": 3.74,
+    "net": -0.05,
+    "gross": 0.08,
+    "net2": -0.179,
+    "total": -490.53,
+    "win": 0.328,
+    "months": 83,
+    "t": -2.28
+   }
+  },
+  {
+   "rule": "F2: follow: as F1 with a 1.5R target, else 16:00 London",
+   "verdict": "FAIL",
+   "is": {
+    "n": 5847,
+    "median": -1.066,
+    "tGross": 0.59,
+    "net": -0.108,
+    "gross": 0.012,
+    "net2": -0.228,
+    "total": -630.3,
+    "win": 0.411,
+    "months": 48,
+    "t": -4.76
+   },
+   "oos": {
+    "n": 9875,
+    "median": -1.059,
+    "tGross": 3.04,
+    "net": -0.075,
+    "gross": 0.04,
+    "net2": -0.19,
+    "total": -739.94,
+    "win": 0.426,
+    "months": 83,
+    "t": -5.36
+   }
+  },
+  {
+   "rule": "FADE: fade the first close beyond the range, stop past the break candle + 0.1 x range, target the middle, exit 16:00 London",
+   "verdict": "FAIL",
+   "is": {
+    "n": 5760,
+    "median": -1.555,
+    "tGross": 3.12,
+    "net": -0.805,
+    "gross": 0.11,
+    "net2": -1.72,
+    "total": -4636.86,
+    "win": 0.236,
+    "months": 48,
+    "t": -10.82
+   },
+   "oos": {
+    "n": 9739,
+    "median": -1.591,
+    "tGross": 0.08,
+    "net": -0.808,
+    "gross": 0.002,
+    "net2": -1.617,
+    "total": -7866.74,
+    "win": 0.214,
+    "months": 83,
+    "t": -22
+   }
+  }
+ ]
+}
