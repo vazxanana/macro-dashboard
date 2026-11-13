@@ -5107,7 +5107,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-cycle" data-show="cycle" checked><i style="background:#a64dc9;height:2px"></i>Market cycle</label>
             <label><input type="checkbox" id="ms-show-zones" data-show="zones" checked><i style="background:rgba(41,98,255,.28);border:1px dashed #2962ff"></i>Fresh entry zones (OB after BO / iBO)</label>
-            <label><input type="checkbox" id="ms-show-mosha" data-show="mosha" checked><i style="background:#ff9800;height:2px"></i>Mosha storyline (VR, CF, barriers)</label>
+            <label><input type="checkbox" id="ms-show-mosha" data-show="mosha" checked><i style="background:#ff9800;height:2px"></i>Mosha storyline (VR, CF, barrier, expected move)</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed labels</label></div>
             <div class="tog-g"><div class="tog-h">Council</div>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Trades + history</label>
@@ -6350,20 +6350,25 @@ function msCycle(legs) {
   }
   return out;
 }
-// The Mosha layer (12 Nov 2026, owner: "build the mosha layer", after the M21 staircase and the S.CODE storyline). Display only,
-// Meridian markup only: no rule, trade or alert reads it, and it is not a tested rule (the mechanical Mosha studies failed).
-// The storyline of the timeframe above read on this one: the HTF BO, then the VR = the first break of this timeframe AGAINST it
-// after the BO (box from the extreme the BO made to the level the VR broke, wicks included), then the CF = the first break back
-// WITH the BO after the VR; its origin is the CF zone: entry where price pulls back into it, stop past the zone, target the
-// next barrier (the VR's extreme first, then the HTF extreme). Case 1 the CF is clear of the VR box, case 2 it sits inside it,
-// case 3 it broke through the VR's extreme (read the storyline again one timeframe lower). The staircase: every break with the
-// BO since it is a barrier price moves from and to.
+// The Mosha layer (12 Nov 2026, owner: "build the mosha layer", after the M21 staircase and the S.CODE storyline; redrawn
+// 13 Nov 2026 from the owner's M21 pictures "CF not touch Barrier", "CF Inside VR" and "CF Failed": "that the expected move
+// to follow"). Display only, Meridian markup only: no rule, trade or alert reads it, and it is not a tested rule (the
+// mechanical Mosha studies failed). The storyline of the timeframe above read on this one:
+// BO of the timeframe above (its broken level is the BARRIER) -> price makes its extreme -> VR = the range at that extreme,
+// put in by the first break of this timeframe AGAINST the BO (box from the extreme to the level that break took) -> CF = the
+// next break against the BO (the lower high under a VR of a BO buy; the higher low over a VR of a BO sell); its origin is the
+// CF zone. The expected move goes from the CF back to the barrier: case 1 the CF zone is clear of the barrier, case 2 it sits
+// inside the VR box (the move to the barrier is longer); a CF zone that already reaches the barrier leaves no move. CF failed
+// = a candle CLOSES back through the CF zone's far side: the expected move is then with the BO again, past the VR's extreme.
+// A close beyond the VR's extreme before any CF = the BO simply goes on. Entry, kept from 12 Nov ("i want eg as entry"): price
+// pulls back into the CF zone, then an EG (a closed candle beyond the last opposite candle, never a wick) in the CF's direction;
+// stop past the pullback's extreme; target the barrier.
 // htf = { dir, level, t, ext }; ltf = { events: [{ dir, level, t, fromT, top, bot }] oldest first, bars: [{ time, high, low }] }
 function msMosha(htf, ltf, buf) {
   if (!htf || !htf.dir || !ltf || !ltf.bars || !ltf.bars.length) return null;
-  const d = htf.dir, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
-  const out = { dir: d, htf, state: 'wait-vr', barriers: ev.filter((e) => e.dir === d).map((e) => ({ level: e.level, t: e.t })) };
-  const vi = ev.findIndex((e) => e.dir === -d);
+  const d = htf.dir, s = -d, L = htf.level, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
+  const out = { dir: d, side: s, htf, barrier: L, state: 'wait-vr' };
+  const vi = ev.findIndex((e) => e.dir === s);
   if (vi < 0) return out;
   const V = ev[vi], span = B.filter((b) => b.time >= htf.t && b.time <= V.t);
   if (!span.length) return out;
@@ -6371,37 +6376,37 @@ function msMosha(htf, ltf, buf) {
   const xt = span.find((b) => (d < 0 ? b.low : b.high) === x).time;
   out.vr = { level: V.level, t: V.t, fromT: Math.min(V.fromT, xt), ext: x, extT: xt, lo: Math.min(x, V.level), hi: Math.max(x, V.level) };
   out.state = 'wait-cf';
-  const C = ev.slice(vi + 1).find((e) => e.dir === d);
-  if (!C) return out;
-  const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot);
+  const rest = ev.slice(vi + 1), ci = rest.findIndex((e) => e.dir === s);
+  const gone = rest.findIndex((e) => e.dir === d && (d > 0 ? e.level >= x : e.level <= x));
+  if (gone >= 0 && (ci < 0 || gone < ci)) { out.state = 'bo-on'; return out; }   // closed beyond the VR's extreme: the BO goes on
+  if (ci < 0) return out;
+  const C = rest[ci], zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot);
   out.cf = { level: C.level, t: C.t, fromT: C.fromT, lo: zl, hi: zh };
-  out.case = (d < 0 ? C.level < out.vr.lo : C.level > out.vr.hi) ? 3 : (C.level >= out.vr.lo && C.level <= out.vr.hi) ? 2 : 1;
-  out.state = out.case === 3 ? 'case3' : 'cf';
-  // the entry is an EG (owner, 12 Nov 2026: "i want eg as entry"): price pulls back into the CF zone, then a candle CLOSES beyond
-  // the last opposite candle (sell: below the low of the last green candle; buy: above the high of the last red one; the close may
-  // come one or more candles later, a wick never counts). Entry at that close, stop past the pullback's extreme, target as before.
-  // A close through the zone's far side before any EG = the zone failed (EF): no trade.
+  const inVR = zh >= out.vr.lo && zl <= out.vr.hi, reaches = d > 0 ? zl <= L : zh >= L;
+  out.case = inVR ? 2 : reaches ? 0 : 1;
+  if (out.case === 0) { out.state = 'at-barrier'; return out; }
+  out.expect = { side: s, from: C.level, fromT: C.t, to: L };
+  out.state = 'cf';
   const after = B.filter((b) => b.time > C.t);
   let k0 = -1, base = null, eg = null;
   for (let k = 0; k < after.length; k++) { const b = after[k];
-    if (k0 < 0) { if (d < 0 ? b.high >= zl : b.low <= zh) k0 = k; else continue; }
-    if (d < 0 ? b.close > zh : b.close < zl) { out.state = 'failed'; return out; }
-    const opp = d < 0 ? b.close > b.open : b.close < b.open;
-    if (base && (d < 0 ? b.close < base.low : b.close > base.high)) { eg = { k, b, base }; break; }
+    if (s < 0 ? b.close > zh : b.close < zl) {   // CF failed: the expected move is with the BO again, past the VR's extreme
+      out.state = 'cf-failed'; out.failT = b.time; out.expect = { side: d, from: b.close, fromT: b.time, to: x, failed: true }; return out; }
+    if (k0 < 0) { if (s < 0 ? b.high >= zl : b.low <= zh) k0 = k; else continue; }
+    const opp = s < 0 ? b.close > b.open : b.close < b.open;
+    if (base && (s < 0 ? b.close < base.low : b.close > base.high)) { eg = { k, b, base }; break; }
     if (opp) base = b;
   }
-  if (k0 < 0) { out.state = out.case === 3 ? 'case3' : 'wait-pullback'; return out; }
+  if (k0 < 0) { out.state = 'wait-pullback'; return out; }
   if (!eg) { out.state = 'wait-eg'; return out; }
-  const leg = after.slice(k0, eg.k + 1), ext = d < 0 ? Math.max(...leg.map((x) => x.high)) : Math.min(...leg.map((x) => x.low));
-  const entry = eg.b.close, stop = d < 0 ? ext + b0 : ext - b0, risk = Math.abs(stop - entry);
+  const leg = after.slice(k0, eg.k + 1), ext = s < 0 ? Math.max(...leg.map((q) => q.high)) : Math.min(...leg.map((q) => q.low));
+  const entry = eg.b.close, stop = s < 0 ? ext + b0 : ext - b0, risk = Math.abs(stop - entry);
   out.eg = { t: eg.b.time, baseT: eg.base.time, lo: eg.base.low, hi: eg.base.high, entry };
   out.state = 'eg';
-  if (!(risk > 0)) return out;
-  const t1 = out.case === 3 || (d < 0 ? x >= entry : x <= entry) ? htf.ext : x;   // the VR's extreme, unless price is already past it
-  if (!isFinite(t1) || (d < 0 ? t1 >= entry : t1 <= entry)) return out;
-  const tr = out.trade = { side: d, entry, stop, target: t1, rr: Math.abs(t1 - entry) / risk, status: 'filled', fillT: eg.b.time };
+  if (!(risk > 0) || !isFinite(L) || (s < 0 ? L >= entry : L <= entry)) return out;   // already at or past the barrier: no move left
+  const tr = out.trade = { side: s, entry, stop, target: L, rr: Math.abs(L - entry) / risk, status: 'filled', fillT: eg.b.time };
   for (const b of after.slice(eg.k + 1)) {
-    const hitS = d < 0 ? b.high >= stop : b.low <= stop, hitT = d < 0 ? b.low <= t1 : b.high >= t1;
+    const hitS = s < 0 ? b.high >= stop : b.low <= stop, hitT = s < 0 ? b.low <= L : b.high >= L;
     if (hitS) { tr.status = 'stopped'; tr.endT = b.time; break; }   // stop first when one candle holds both
     if (hitT) { tr.status = 'target'; tr.endT = b.time; break; }
   }
@@ -6996,19 +7001,23 @@ function msNextSetup(bars, A) {
       });
     }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
-    if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
-      M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
+    if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, up = M.dir > 0, cs = M.side < 0, pl = M.htf.label;
+      // the barrier: the level the BO of the timeframe above broke (owner's M21 pictures)
+      if (isFinite(M.barrier)) items.lines.push({ l1: at(M.htf.t) - 4, l2: n + 20, p: M.barrier, color: 'rgba(255,152,0,.7)', w: 1, dash: true, text: `Barrier · ${pl} BO ${up ? 'buy' : 'sell'} ${fmt(M.barrier)}`, below: up });
       if (M.vr) { items.boxes.push({ kind: 'mvr', l1: at(M.vr.fromT), l2: Math.min(n + 4, at(M.vr.t) + 6), lo: M.vr.lo, hi: M.vr.hi, fill: 'rgba(255,152,0,.08)', stroke: 'rgba(255,152,0,.8)' });
-        items.labels.push({ l: at(M.vr.t), p: sell ? M.vr.hi : M.vr.lo, dy: sell ? -6 : 15, text: `VR vs ${pl} BO ${sell ? '▼' : '▲'}`, align: 'center', color: '#ff9800' }); }
-      if (M.cf) { const e = M.cf.t, i0 = at(M.cf.fromT), T = M.trade, live = T && (T.status === 'waiting' || T.status === 'filled');
-        items.boxes.push({ kind: 'mcf', l1: i0, l2: live ? n + 20 : Math.min(n + 4, at(T && T.endT ? T.endT : e) + 2), lo: M.cf.lo, hi: M.cf.hi, fill: sell ? 'rgba(242,54,69,.16)' : 'rgba(8,153,129,.16)', stroke: '#ff9800' });
-        items.labels.push({ l: at(e), p: sell ? M.cf.lo : M.cf.hi, dy: sell ? 15 : -6, text: `CF · case ${M.case}${M.case === 3 ? ' · read one TF lower' : ''}`, align: 'center', color: '#ff9800' });
-        if (!T && M.state !== 'case3') items.labels.push({ l: n + 2, dx: 4, p: sell ? M.cf.lo : M.cf.hi, dy: sell ? 15 : -6, text: { 'wait-pullback': 'Mosha: wait for the pullback into the CF zone', 'wait-eg': `Mosha: in the zone, wait for an EG ${sell ? '▼' : '▲'}`, failed: 'Mosha: CF zone closed through (EF), no trade' }[M.state] || '', color: '#ff9800' });
-        if (M.eg) { const ie = at(M.eg.t); items.labels.push({ l: ie, p: sell ? M.eg.hi : M.eg.lo, dy: sell ? -8 : 17, text: `EG ${sell ? '▼' : '▲'} entry ${fmt(M.eg.entry)}`, pill: true, bg: sell ? '#f23645' : '#089981' }); }
-        if (T) { const st = { filled: 'in the trade', stopped: 'stopped', target: 'target reached' }[T.status];
+        items.labels.push({ l: at(M.vr.t), p: up ? M.vr.hi : M.vr.lo, dy: up ? -6 : 15, text: `VR · after ${pl} BO ${up ? '▲' : '▼'}`, align: 'center', color: '#ff9800' }); }
+      const say = { 'wait-cf': 'Mosha: VR in, wait for the CF', 'bo-on': `Mosha: closed beyond the VR, the ${pl} BO goes on`, 'at-barrier': 'Mosha: the CF zone reaches the barrier, no move left', 'wait-pullback': 'Mosha: expected move to the barrier; wait for the pullback into the CF', 'wait-eg': `Mosha: in the CF zone, wait for an EG ${cs ? '▼' : '▲'}`, 'cf-failed': `Mosha: CF failed, expected move with the ${pl} BO ${up ? '▲' : '▼'} past the VR` }[M.state];
+      if (M.cf) { const T = M.trade, live = T && T.status === 'filled', i0 = at(M.cf.fromT);
+        items.boxes.push({ kind: 'mcf', l1: i0, l2: live || M.state !== 'eg' ? n + 20 : Math.min(n + 4, at(T && T.endT ? T.endT : M.cf.t) + 2), lo: M.cf.lo, hi: M.cf.hi, fill: cs ? 'rgba(242,54,69,.16)' : 'rgba(8,153,129,.16)', stroke: '#ff9800' });
+        items.labels.push({ l: at(M.cf.t), p: cs ? M.cf.lo : M.cf.hi, dy: cs ? 15 : -6, text: M.state === 'cf-failed' ? 'CF failed' : `CF · case ${M.case}${M.case === 2 ? ' · inside the VR' : M.case === 1 ? ' · clear of the barrier' : ''}`, align: 'center', color: '#ff9800' });
+        if (M.eg) items.labels.push({ l: at(M.eg.t), p: cs ? M.eg.hi : M.eg.lo, dy: cs ? -8 : 17, text: `EG ${cs ? '▼' : '▲'} entry ${fmt(M.eg.entry)}`, pill: true, bg: cs ? '#f23645' : '#089981' });
+        if (T) { const st = { filled: 'in the trade', stopped: 'stopped', target: 'barrier reached' }[T.status];
           items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.entry, color: '#ff9800', w: 1, text: '', below: false });
-          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.stop, color: 'rgba(242,54,69,.85)', w: 1, dash: true, text: `Mosha stop ${fmt(T.stop)}`, below: !sell });
-          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.target, color: 'rgba(8,153,129,.85)', w: 1, dash: true, text: `Mosha target ${fmt(T.target)} · ${T.rr.toFixed(1)}R · ${st}`, below: sell }); } } } }
+          items.lines.push({ l1: at(M.eg.t), l2: n + 20, p: T.stop, color: 'rgba(242,54,69,.85)', w: 1, dash: true, text: `Mosha stop ${fmt(T.stop)}`, below: !cs }); } }
+      // the expected move (the owner's dashed line): from the CF to the barrier, or with the BO past the VR once the CF failed
+      if (M.expect && !(M.trade && M.trade.status !== 'filled')) { const E = M.expect, ex = E.side < 0;
+        items.lines.push({ l1: Math.max(at(E.fromT), n - 30), l2: n + 20, p: E.to, color: E.failed ? 'rgba(8,153,129,.8)' : 'rgba(255,152,0,.9)', w: 1, dash: true, text: `Expected ${ex ? '▼' : '▲'} ${E.failed ? 'past the VR' : 'to the barrier'} ${fmt(E.to)}${M.trade ? ` · ${M.trade.rr.toFixed(1)}R` : ''}`, below: !ex }); }
+      if (say && !M.trade) items.labels.push({ l: n + 2, dx: 4, p: M.cf ? (cs ? M.cf.lo : M.cf.hi) : M.vr ? (up ? M.vr.hi : M.vr.lo) : bars[n - 1].close, dy: cs ? 15 : -6, text: say, color: '#ff9800' }); } }
     const pos = own && G.show.plan && G.plan;
     if (pos) {
       const pl = G.plan, l1 = n + 3, l2 = n + 20;

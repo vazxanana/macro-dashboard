@@ -1321,21 +1321,25 @@ through its far side breaks it (`brokenIdx`); only fresh zones are drawn, the th
 edge labelled "Demand / Supply OB · fresh · BO|iBO <range>". Not a tested rule (the skill's 14-year engulf tests found no edge in
 zone mechanics alone). Tests: `tests/market-cycle.test.mjs` ("fresh zones").
 
-## Meridian markup: the Mosha layer (12 Nov 2026, owner: "build the mosha layer")
-Display only, Meridian markup only (layer "Mosha storyline (VR, CF, barriers)", `G.show.mosha`, orange); no rule, trade or
-alert reads it and it is not a tested rule (the mechanical Mosha studies failed). `msMosha(htf, ltf, buf)` (pure, next to
-`msCycle`; `moshaNow(id, bars)` feeds it): the last BO of the timeframe above (D1 for H4, H4 for H1, H1 for M15, M15 for M5)
-read on this chart. VR = the first break of this chart AGAINST it after the BO, box from the extreme the BO made to the level
-the VR broke (wicks); CF = the first break back WITH it after the VR, its origin is the CF zone. Case 1 CF clear of the VR box,
-2 inside it, 3 through the VR's extreme ("read one TF lower"). **The entry is an EG** (owner, 12 Nov 2026: "i want eg as
-entry"; the engulf definition of the EG/EF skill, close-beyond): price pulls back into the CF zone, then a CLOSED candle closes
-beyond the last opposite candle (sell: below the low of the last green candle; buy: above the high of the last red one; one or
-more candles later, a wick never counts). Entry at that close (pill "EG ▼ entry"), stop past the pullback's extreme ($0.30 on
-gold), target the VR's extreme (the HTF extreme in case 3 or once price is past it). A close through the zone's far side before
-an EG = the zone failed (EF), no trade. States: wait for the pullback / in the zone, wait for an EG / in the trade / stopped /
-target reached (stop first when one candle holds both); closed candles only (`msClosedN`). Barriers = the breaks with the BO
-since it (last four). The 14-year engulf tests in the skill found no edge in the engulf mechanics alone: display only.
-Tests: `tests/market-cycle.test.mjs` ("Mosha").
+## Meridian markup: the Mosha layer (12 Nov 2026, owner: "build the mosha layer"; redrawn 13 Nov 2026 from the owner's pictures)
+Display only, Meridian markup only (layer "Mosha storyline (VR, CF, barrier, expected move)", `G.show.mosha`, orange); no rule,
+trade or alert reads it and it is not a tested rule (the mechanical Mosha studies failed). `msMosha(htf, ltf, buf)` (pure, next to
+`msCycle`; `moshaNow(id, bars)` feeds it, closed candles only): the last BO of the timeframe above (D1 for H4, H4 for H1, H1 for
+M15, M15 for M5) read on this chart. **13 Nov 2026**, the owner sent three M21 pictures ("CF not touch Barrier", "CF Inside VR",
+"CF Failed", both sides) and said of their dashed lines "that the expected move to follow". The layer follows them now:
+- **Barrier** = the level the BO of the timeframe above broke. **VR** = the range at the extreme the BO made, put in by this
+  chart's first break AGAINST the BO (box from the extreme to the level that break took). **CF** = the NEXT break against the BO
+  (the lower high under a buy BO's VR, the higher low over a sell BO's VR); its origin is the CF zone.
+- **Expected move** (dashed line) = from the CF back to the barrier, against the BO: case 1 the CF zone is clear of the barrier,
+  case 2 it sits inside the VR box; a CF zone that already reaches the barrier leaves no move (`at-barrier`).
+- **CF failed** = a closed candle back through the CF zone's far side: the expected move turns with the BO, past the VR's
+  extreme (`cf-failed`). A close beyond the VR's extreme before any CF = the BO goes on (`bo-on`).
+- Entry kept from 12 Nov ("i want eg as entry"): price pulls back into the CF zone, then an EG in the CF's direction (a closed
+  candle beyond the last opposite candle, never a wick); stop $0.30 past the pullback's extreme on gold; target the barrier.
+- Before 13 Nov the layer read it the other way (CF = the break back WITH the BO, trade with the BO to the VR's extreme, a case 3):
+  the owner's pictures replaced that reading. The open questions put to the owner (what exactly a failed CF is, a target past
+  the barrier in case 2) were not answered beyond "that the expected move to follow": change the layer when they are.
+Tests: `tests/market-cycle.test.mjs` ("Mosha": one per picture and the sell mirror).
 
 ## Meridian markup: the market cycle (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … H4 tells retracement of daily, M15 retracement of H1, M5 of M15")
 `msCycle(legs)` (pure, top level of `market-structure.html` next to `msAnalyze`; `cycleNow()` builds the legs of D1 / H4 / H1 /
