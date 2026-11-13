@@ -4056,16 +4056,41 @@ function msInternal(bars, closedN, N = MS_IPIV) {
 // (msInternal, else the last major one) the leg runs from the high the drop came from (the internal high, d < 0; mirrored for
 // d > 0) to the lowest low since; its 50% is where the next pullback can be traded. `reached` = a candle has traded back to that
 // 50% since the low. Closed candles only. Returns { dir, from, to, p50, fromIdx, toIdx, reached } or null. Display only.
-function msInternalLeg(bars, closedN, d, breaks) {
-  const n = Math.min(closedN, bars.length), e = (breaks || []).filter((x) => x.dir === d && x.breakIdx < n).pop();
+function msInternalLeg(bars, closedN, d, breaks, N = 6) {
+  const n = Math.min(closedN, bars.length), same = (breaks || []).filter((x) => x.dir === d && x.breakIdx < n), e = same[same.length - 1];
   if (!d || !e) return null;
+  // 13 Nov 2026 (the owner's marked H1 chart): the internal high is the last swing high (N candles a side, the chart's own
+  // swings) after the PREVIOUS break this way and before this one, else the highest point there; never further back. A major
+  // break's origin can sit many swings back (it gave 4,148.7 on 13 Nov instead of the lower high 4,000.7).
+  const prev = same.length > 1 ? same[same.length - 2].breakIdx + 1 : 0, start = Math.max(e.fromIdx, prev, 0);
   const hiOf = (b) => (d < 0 ? b.high : -b.low), loOf = (b) => (d < 0 ? b.low : -b.high);
-  let ti = e.fromIdx; for (let j = e.fromIdx; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[ti])) ti = j;
+  const piv = (j) => { for (let k = 1; k <= N; k++) { if (j - k < 0 || j + k >= n) return false; if (hiOf(bars[j - k]) > hiOf(bars[j]) || hiOf(bars[j + k]) >= hiOf(bars[j])) return false; } return true; };
+  let ti = -1; for (let j = e.breakIdx - 1; j >= start && ti < 0; j--) if (piv(j)) ti = j;
+  if (ti < 0) { ti = start; for (let j = start; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[ti])) ti = j; }
   let bi = e.breakIdx; for (let j = e.breakIdx; j < n; j++) if (loOf(bars[j]) < loOf(bars[bi])) bi = j;
   const top = hiOf(bars[ti]), bot = loOf(bars[bi]), mid = bot + 0.5 * (top - bot);
   let reached = false; for (let j = bi + 1; j < n; j++) if (hiOf(bars[j]) >= mid) { reached = true; break; }
   const s = d < 0 ? 1 : -1, from = s * top, to = s * bot;
-  return { dir: d, from, to, p50: (from + to) / 2, fromIdx: ti, toIdx: bi, reached };
+  return { dir: d, from, to, p50: (from + to) / 2, fromIdx: ti, toIdx: bi, reached, startIdx: start };
+}
+// Entry zones on the internal 50% (13 Nov 2026, owner: "Show me the entry zones on the internal 50%"): while price has not
+// traded back to the internal leg's 50%, the zones where the pullback can be sold (bought, d > 0) are in the leg's premium
+// (discount) half: the order block the leg came from (the last candle against the move at or before the internal high, wick
+// to wick, out to that high) and any fresh zone of the same direction inside the leg (`zones` = msZones output), each cut at
+// the 50%. Nearest to the 50% first, at most two. Closed candles only; display only, not a tested rule.
+function msEntryZones(bars, closedN, iv, zones) {
+  if (!iv || iv.reached) return [];
+  const n = Math.min(closedN, bars.length), d = iv.dir, sell = d < 0, out = [], s0 = iv.startIdx == null ? iv.fromIdx : iv.startIdx;
+  let zi = iv.fromIdx; for (let j = iv.fromIdx; j >= s0; j--) { const b = bars[j]; if (sell ? b.close > b.open : b.close < b.open) { zi = j; break; } }
+  const cand = [{ i: zi, lo: Math.min(bars[zi].low, sell ? Infinity : iv.from), hi: Math.max(bars[zi].high, sell ? iv.from : -Infinity), kind: 'origin' }]
+    .concat((zones || []).filter((z) => z.dir === d && z.fresh && z.breakIdx > s0 && z.i !== zi).map((z) => ({ i: z.i, lo: z.lo, hi: z.hi, kind: z.kind })));
+  for (const z of cand) {
+    const lo = sell ? Math.max(z.lo, iv.p50) : z.lo, hi = sell ? z.hi : Math.min(z.hi, iv.p50);
+    if (!(hi > lo) || (sell ? lo > iv.from : hi < iv.from)) continue;
+    let fresh = true; for (let k = iv.toIdx + 1; k < n; k++) if (sell ? bars[k].high >= lo : bars[k].low <= hi) { fresh = false; break; }
+    if (fresh) out.push({ dir: d, lo, hi, i: z.i, kind: z.kind });
+  }
+  return out.sort((a, b) => (sell ? a.lo - b.lo : b.hi - a.hi)).slice(0, 2);
 }
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
@@ -4915,13 +4940,19 @@ function msNextSetup(bars, A) {
     // and the internal leg (msInternalLeg): its 50% is the nearer retrace while the move runs; a chart with no cycle row (M5, M1)
     // gets the internal path alone: retrace to the internal 50%, then the break of the internal low / high.
     if (own) { const row = (G.cycle = cycleNow()).find((r) => r.parent === tf.id), nc = A.n || n, px = bars[n - 1].close;
-      const iv = msInternalLeg(bars, nc, row && row.dir ? row.dir : A.trend, msInternal(bars, nc, PIVOT).concat(A.events).sort((a, b) => a.breakIdx - b.breakIdx));
+      const iv = msInternalLeg(bars, nc, row && row.dir ? row.dir : A.trend, msInternal(bars, nc, PIVOT).concat(A.events).sort((a, b) => a.breakIdx - b.breakIdx), PIVOT);
       let path = msPath(row, px, iv);
       if (!path && !row && iv) { const a = (k, x, y) => (k < 0 ? y < x : y > x);
         path = iv.reached ? (a(iv.dir, px, iv.to) ? [{ from: px, to: iv.to, dir: iv.dir, kind: 'with', word: 'Break of the internal low' }] : null)
           : a(-iv.dir, px, iv.p50) ? [{ from: px, to: iv.p50, dir: -iv.dir, kind: 'retrace', word: 'Retrace to internal 50%' }].concat(a(iv.dir, iv.p50, iv.to) ? [{ from: iv.p50, to: iv.to, dir: iv.dir, kind: 'with', word: 'then' }] : []) : null;
         if (path && iv.dir > 0) path.forEach((g) => { g.word = g.word.replace('internal low', 'internal high'); }); }
-      if (iv && !CL) items.lines.push({ l1: iv.fromIdx, l2: n + 9, p: iv.p50, color: 'rgba(224,138,30,.55)', w: 1, dash: true, text: `Internal 50% ${fmt(iv.p50)}${iv.reached ? ' · reached' : ''}`, below: iv.dir > 0 });
+      if (iv) { const ic = 'rgba(224,138,30,.55)', sell = iv.dir < 0;   // the internal range: high / 50% / low, and the entry zones on its 50% (also in the clean look)
+        items.lines.push({ l1: iv.fromIdx, l2: n + 9, p: iv.p50, color: ic, w: 1, dash: true, text: (path || []).some((g) => g.to === iv.p50) ? '' : `Internal 50% ${fmt(iv.p50)}${iv.reached ? ' · reached' : ''}`, below: !sell });   // the arrow already names it
+        if (!CL) [[iv.from, sell ? 'Internal high' : 'Internal low', iv.fromIdx], [iv.to, sell ? 'Internal low' : 'Internal high', iv.toIdx]].forEach(([p, w, i]) => items.lines.push({ l1: i, l2: n + 9, p, color: ic, w: 1, dash: true, text: `${w} ${fmt(p)}`, below: (w === 'Internal low') }));
+        const zs = G.show.zones !== false ? msZones(bars, A.events.map((e) => ({ dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'bo' })).concat(msInternal(bars, nc, PIVOT).map((e) => ({ ...e, kind: 'ibo' }))), nc) : [];
+        msEntryZones(bars, nc, iv, zs).forEach((z, k) => { const c = sell ? Z.sell : Z.buy;
+          items.boxes.push({ kind: 'ez', open: true, l1: z.i, l2: n + 20, lo: z.lo, hi: z.hi, fill: sell ? 'rgba(242,54,69,.2)' : 'rgba(8,153,129,.2)', stroke: c.line });
+          if (!k) items.labels.push({ l: n + 20, dx: -4, align: 'right', p: sell ? z.hi : z.lo, dy: sell ? -5 : 14, text: `${sell ? 'Sell' : 'Buy'} zone · ${sell ? 'above' : 'below'} internal 50% ${fmt(z.lo)}–${fmt(z.hi)}`, color: c.line }); }); }
       (path || []).forEach((g, k) => { const a = k ? n + 9 : n - 1, b = k || path.length === 1 ? (k ? n + 20 : n + 16) : n + 9;
         items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.word} ${g.dir < 0 ? '▼' : '▲'} ${fmt(g.to)}` }); }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
