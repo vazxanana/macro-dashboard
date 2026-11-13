@@ -128,7 +128,7 @@ async function full() {
   const sha = crypto.createHash('sha256').update(fs.readFileSync(path.join(HERE, 'PREREGISTRATION.md'))).digest('hex');
   const passes = rows.filter((r) => r.verdict === 'PASS'), incs = rows.filter((r) => r.verdict === 'INCONCLUSIVE');
   const verdict = passes.length ? `PASS for ${passes.map((r) => r.id + ' ' + r.cycle).join(', ')}; the other ${rows.length - passes.length} do not pass`
-    : `FAIL. None of the ${rows.length} pre-registered tests passes${incs.length ? ` (${incs.length} inconclusive: ${incs.map((r) => r.id + ' ' + r.cycle).join(', ')})` : ''}; the A-rule stays as it is`;
+    : `FAIL. None of the ${rows.length} pre-registered tests passes${incs.length ? ` (${incs.map((r) => r.id + ' ' + r.cycle).join(', ')}: out-of-sample difference above zero, far from the bar)` : ''}; the A-rule stays as it is`;
   const result = {
     topic: 'ict-quarters', built: '2026-11-13',
     system: 'ICT desk A-setups (H1 iFVG reversal) split by the quarter of the week, month and year their sweep fell in (quarterly theory: Q2 = the manipulation quarter). Lab engine api/_ictlab.js runMarket (the desk\'s signals / isASetup / sizeOf / simulate) on OANDA mid H1: NAS100, SPX500, US30, US2000, XAU',
