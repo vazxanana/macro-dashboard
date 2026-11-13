@@ -50,6 +50,7 @@ paper system with a measured, clearly negative record.
 | 32 | Fade the opening gap on NAS100 / SPX500 | 852 / 913 (2021 →) | −0.059 / −0.121R a trade (t −1.8 / −4.4); gaps do fill, but the stop is hit about as often | #849 |
 | 33 | Gold after an extreme day: fade it or follow it for three days | 27 / 28 (2020 →) | +0.053 / +0.040R a trade (t 0.1 / 0.2); both negative in 2006-19; about three events a year | #850 |
 | 34 | Sell in May (Halloween effect) on nine indices (published effect) | 11 year-pairs | winter minus summer +1.26 % a year (t 0.32); winter-only Sharpe 0.21 against 0.31 holding | #851 |
+| 35 | Crypto weekend long / Monday short (published effect) | ~147 a leg (2024 →) | weekend long BTC +0.000R, ETH +0.063R; Monday short −0.076 / −0.139R; each flips sign between windows | #852 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
