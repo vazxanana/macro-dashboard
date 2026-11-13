@@ -1291,6 +1291,8 @@ once per device the first time the charts open (`ms-clean-v2`, run after the lay
 back exactly what was on (`ms-clean`). The Style button reads "Candles · clean" while it is on. Display only. While it is on (`html[data-clean="1"]`,
 `merItems` `CL`) a chart writes one "BO" on its last break and one "CF" on its last CF, and `#ms-clean-css` hides the market-cycle
 line, the range / alignment strip, the Context button, each chart's role word and its readout under the chart (owner: "too much labels").
+Same day, owner: "its missing ibos": iBO lines stay in the clean look (only the last one keeps the word "iBO"); a device already
+clean switches them on once (`ms-clean-v3`).
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

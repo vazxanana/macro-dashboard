@@ -4783,6 +4783,8 @@ function msNextSetup(bars, A) {
       msInternal(bars, A.n || n, PIVOT).filter((e) => !major.has(e.level)).forEach((e) => {
         const sell = e.dir < 0; items.lines.push({ ibos: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: sell ? 'rgba(242,54,69,.7)' : 'rgba(8,153,129,.7)', w: 1, dash: true, text: `iBO ${sell ? '▼' : '▲'}`, below: sell });
       });
+      // clean look (13 Nov 2026, owner: "its missing ibos"): every iBO line stays, only the last one keeps its word
+      if (CL) { const ib = items.lines.filter((l) => l.ibos); ib.slice(0, -1).forEach((l) => { l.text = ''; }); if (ib.length) ib[ib.length - 1].text = 'iBO'; }
     }
     // fresh entry zones (msZones): the unmitigated order block of each BO / iBO, the three nearest to price a side, out to the right edge
     if (own && G.show.zones !== false) {
@@ -5595,7 +5597,7 @@ function msNextSetup(bars, A) {
     // 13 Nov 2026, owner: "make the charts more cleaner", then "too much labels just keep bo vr and cf": the clean look keeps the
     // BO lines, VR and CF and hides everything else, and it is ON the first time a device opens the charts
     // (ms-clean-v2 marks that this was done once; "Clean look" again brings back exactly what was on before)
-    const BUSY = ['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'];
+    const BUSY = ['ms-show-hist', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'];
     const cb = $('ms-sty-clean'); let was = null; try { was = JSON.parse(localStorage.getItem('ms-clean') || 'null'); } catch (e) {}
     const mark = () => { cb.setAttribute('aria-pressed', String(!!was)); document.documentElement.dataset.clean = was ? '1' : ''; const n = $('ms-sty-now'); if (n) n.textContent = CS_NAME[G.cs] + (was ? ' · clean' : ''); };
     const setBox = (id, on) => { const x = $(id); if (x && x.checked !== on) { x.checked = on; x.dispatchEvent(new Event('change', { bubbles: true })); } };
@@ -5607,7 +5609,10 @@ function msNextSetup(bars, A) {
       try { was ? localStorage.setItem('ms-clean', JSON.stringify(was)) : localStorage.removeItem('ms-clean'); } catch (e) {} mark(); });
     { let v2 = null; try { v2 = localStorage.getItem('ms-clean-v2'); localStorage.setItem('ms-clean-v2', '1'); } catch (e) { v2 = '1'; }
       // after this script's set-up: the layer checkboxes get their change handlers (and their state from msPrefs) further down
-      if (!v2) setTimeout(() => { if (was) { Object.entries(was).forEach(([id, on]) => setBox(id, on)); was = null; } cb.click(); }, 0); }
+      if (!v2) setTimeout(() => { if (was) { Object.entries(was).forEach(([id, on]) => setBox(id, on)); was = null; } cb.click(); }, 0);
+      // iBO came back into the clean look (13 Nov 2026, owner: "its missing ibos"): a device already clean switches it on once
+      else { let v3 = null; try { v3 = localStorage.getItem('ms-clean-v3'); localStorage.setItem('ms-clean-v3', '1'); } catch (e) { v3 = '1'; }
+        if (!v3 && was && 'ms-show-ibos' in was) { delete was['ms-show-ibos']; try { localStorage.setItem('ms-clean', JSON.stringify(was)); } catch (e) {} setTimeout(() => setBox('ms-show-ibos', true), 0); } } }
     mark(); }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} lyAll('setVol'); }); } }
