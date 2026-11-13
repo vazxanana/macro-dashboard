@@ -1285,7 +1285,8 @@ stacked; Clean detaches both overlays, their price lines and markers (indicators
 layers are four named groups (Meridian markup, Council, Levels and time, Chart); Telegram sits behind a disclosure. The header carries a
 centred "Macro desk" button (`.hdr-macro`, animated conic border, hidden for the public role) linking to /macro-desk.
 **Clean look by default** (13 Nov 2026, owner: "make the charts more cleaner"): the Style popover's "Clean look" (`#ms-sty-clean`,
-`BUSY`) now hides every layer but the trade's story (BO lines, Origin, VR, CF, Next setup, Selected trade stay) and is switched ON
+`BUSY`) now hides every layer but BO lines, VR and CF (owner, same day: "too much labels just keep bo vr and cf"; the 50% line
+follows Origin and the Invalidation price line follows Next setup, so both go with them) and is switched ON
 once per device the first time the charts open (`ms-clean-v2`, run after the layer checkboxes are wired); "Clean look" again brings
 back exactly what was on (`ms-clean`). The Style button reads "Candles · clean" while it is on. Display only.
 

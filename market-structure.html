@@ -3179,7 +3179,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button></div>
         <div class="sty-h">Markup</div>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps the BO, its origin, VR, CF, the next setup and your trade; hides the rest (iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps only the BO, VR and CF; hides the rest (origin, next setup, trade lines, iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
       </div></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
       <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
@@ -4808,7 +4808,7 @@ function msNextSetup(bars, A) {
       const vrPt = e.vr ? e.vr : (e === A.last && A.ext ? { i: A.ext.i, p: A.ext.p } : null);
       if (G.show.vr && vrPt && (sell ? vrPt.p < e.bot : vrPt.p > e.top)) {
         const mid = ((sell ? e.top : e.bot) + vrPt.p) / 2;
-        items.lines.push({ l1: vrPt.i, l2: end, p: mid, color: '#9aa4b8', w: 1, dash: true, text: `50% ${fmt(mid)} · ${sell ? 'main ↑ internal ↓' : 'internal ↑ main ↓'}`, below: !sell });
+        if (G.show.origin !== false) items.lines.push({ l1: vrPt.i, l2: end, p: mid, color: '#9aa4b8', w: 1, dash: true, text: `50% ${fmt(mid)} · ${sell ? 'main ↑ internal ↓' : 'internal ↑ main ↓'}`, below: !sell });
       }
       if (G.show.vr && e.vrBox) {
         items.boxes.push({ kind: 'vr', l1: e.vr.i - 2, l2: Math.min(end, e.vr.i + 14), lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
@@ -5247,7 +5247,7 @@ function msNextSetup(bars, A) {
       P.pv = items.path.map((q) => q.p).concat(tf.id === '5m' ? P5pv : []);
       overlay.set(items);
       P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
-      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: plT('Invalidation', el.clientWidth), lineVisible: G.show.detail }));
+      if (S && G.show.next !== false) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: plT('Invalidation', el.clientWidth), lineVisible: G.show.detail }));
       P.planLinesDraw();
     };
     P.planLines = [];
@@ -5588,10 +5588,10 @@ function msNextSetup(bars, A) {
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
-    // 13 Nov 2026, owner: "make the charts more cleaner": the clean look keeps the trade's story (the BO, its origin, VR, CF, the
-    // next setup and the selected trade) and hides everything else, and it is ON the first time a device opens the charts
+    // 13 Nov 2026, owner: "make the charts more cleaner", then "too much labels just keep bo vr and cf": the clean look keeps the
+    // BO lines, VR and CF and hides everything else, and it is ON the first time a device opens the charts
     // (ms-clean-v2 marks that this was done once; "Clean look" again brings back exactly what was on before)
-    const BUSY = ['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail'];
+    const BUSY = ['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'];
     const cb = $('ms-sty-clean'); let was = null; try { was = JSON.parse(localStorage.getItem('ms-clean') || 'null'); } catch (e) {}
     const mark = () => { cb.setAttribute('aria-pressed', String(!!was)); const n = $('ms-sty-now'); if (n) n.textContent = CS_NAME[G.cs] + (was ? ' · clean' : ''); };
     const setBox = (id, on) => { const x = $(id); if (x && x.checked !== on) { x.checked = on; x.dispatchEvent(new Event('change', { bubbles: true })); } };
@@ -6487,7 +6487,7 @@ function msNextSetup(bars, A) {
     if (B && B.length > 40) try {
       if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
       else { const kc = msClosedN(B, tf.sec, Date.now() / 1000, TZ), A = msAnalyze(kc < B.length ? B.slice(0, kc) : B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
-        if (S) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
+        if (S && G.show.next !== false) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
         const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); }
         // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
         if (own && tf.id === '5m') { const keep = P5pv; try { replicaItems(items, B); } catch (e) {} P5pv = keep; } }
