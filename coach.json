@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-13T06:01:25.000Z",
+  "at": "2026-11-13T12:00:19.000Z",
   "v": 1,
   "baseAt": "2026-11-11T22:19:46.138Z",
   "financing": {
@@ -456,28 +456,28 @@
     "desk": "ICT",
     "live": true,
     "base": "ICT A-setups 2018-26 rebuild, GC/NQ/ES/YM (#526; record in research/edge/sizing/inputs.json)",
-    "n": 238,
-    "nLive": 2,
+    "n": 239,
+    "nLive": 3,
     "nReplay": 236,
     "nHist": 0,
     "from": 1754596800,
-    "to": 1794408000,
+    "to": 1794553200,
     "ref": 0.093,
     "sd": 1.517,
     "fwd": {
-     "n": 2,
-     "exp": 0.56,
-     "R": 1.13
+     "n": 3,
+     "exp": 0.32,
+     "R": 0.97
     },
     "roll": {
      "n": 30,
      "W": 30,
      "exp": 0.95,
-     "t": 2.47,
-     "R": 28.39
+     "t": 2.48,
+     "R": 28.48
     },
     "cusRef": {
-     "s": 0.63,
+     "s": 0.7,
      "h": 16.52,
      "max": 6.33
     },
@@ -486,14 +486,14 @@
      "h": 16.52
     },
     "dd": {
-     "cur": 1.02,
+     "cur": 1.17,
      "max": 11.13,
      "limit": 53.14,
      "hist": 31.32
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades +0.95R a trade, CUSUM 0.63 of 16.52"
+     "in line with its backtest: last 30 trades +0.95R a trade, CUSUM 0.7 of 16.52"
     ]
    },
    {
@@ -546,14 +546,14 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-13T06"
+  "slot": "2026-11-13T12"
  },
  "book": {
-  "at": "2026-11-13T06:01:25.000Z",
+  "at": "2026-11-13T12:00:19.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
-  "to": "2026-11-12",
+  "to": "2026-11-13",
   "rule": "Paper comparison only. The live book is traded as it is; the proposed weights are applied to the same closed trades after the fact. Nothing here changes a rule, a size, a filter or a trade: the owner decides.",
   "budget": {
    "M": 9,
@@ -579,27 +579,27 @@
    "note": "Expect the clean-half numbers, not the 2018-26 ones: a Sharpe of about 0.3 a year and drawdowns of about 81-189R at this book's budget of 9R (9-21R per 1R of budget)."
   },
   "cost": "after costs: trades.json Rnet; ICT the CME micro round trip (digest.mjs merNet / ictNet)",
-  "nTrades": 28,
-  "nDays": 6,
+  "nTrades": 29,
+  "nDays": 7,
   "ictReplay": 8,
-  "ictForward": 2,
+  "ictForward": 3,
   "live": {
-   "R": 14.53,
-   "dd": 2.34,
-   "ddCur": 2.34,
+   "R": 14.38,
+   "dd": 2.5,
+   "ddCur": 2.5,
    "sharpe": null,
    "worstDay": -1.32,
    "bestDay": 9.02
   },
   "proposed": {
-   "R": 31.63,
-   "dd": 3.13,
-   "ddCur": 3.13,
+   "R": 31.34,
+   "dd": 3.41,
+   "ddCur": 3.41,
    "sharpe": null,
    "worstDay": -1.83,
    "bestDay": 16.23
   },
-  "diff": 17.1,
+  "diff": 16.96,
   "corr": 0.99,
   "byIdea": [
    {
@@ -692,11 +692,11 @@
     "desk": "ICT",
     "gold": false,
     "streams": 1,
-    "n": 10,
+    "n": 11,
     "w": 0.2,
     "m": 1.8,
-    "live": 18.98,
-    "prop": 34.17
+    "live": 18.83,
+    "prop": 33.89
    },
    {
     "id": "other",
@@ -759,12 +759,20 @@
     "prop": -1.296,
     "cumLive": 14.535,
     "cumProp": 31.625
+   },
+   {
+    "d": "2026-11-13",
+    "n": 1,
+    "live": -0.159,
+    "prop": -0.286,
+    "cumLive": 14.376,
+    "cumProp": 31.339
    }
   ],
-  "slot": "2026-11-13T06"
+  "slot": "2026-11-13T12"
  },
  "expect": {
-  "at": "2026-11-13T06:01:25.000Z",
+  "at": "2026-11-13T12:00:19.000Z",
   "v": 1,
   "baseAt": "2026-11-12T09:34:49.973Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1413,15 +1421,15 @@
     },
     "regime": "fails out of sample: −0.01R a trade on 2008-17 (2,235 A-setups, GC/NQ/ES/YM; index sells against a bull market lost); +0.09R on 2018-26 (#526)",
     "forward": {
-     "n": 2,
-     "exp": 0.56,
-     "R": 1.13,
-     "lo": -1.61,
-     "hi": 1.58,
+     "n": 3,
+     "exp": 0.32,
+     "R": 0.97,
+     "lo": -1.32,
+     "hi": 1.29,
      "judged": false,
      "out": null
     },
-    "line": "Expect −0.01R a trade (−0.06 to +0.04R) over about 223 trades a year, so −37 to +31R in a year; plan for a drawdown of −53 to −83R. Forward so far +0.56R a trade over 2: too few to place. Verdict: no verdict within 2 years: an edge of −0.01R a trade out of sample cannot be proven; even its backtest edge (+0.09R) would need 1,065 trades, about 5.3 years."
+    "line": "Expect −0.01R a trade (−0.06 to +0.04R) over about 223 trades a year, so −37 to +31R in a year; plan for a drawdown of −53 to −83R. Forward so far +0.32R a trade over 3: too few to place. Verdict: no verdict within 2 years: an edge of −0.01R a trade out of sample cannot be proven; even its backtest edge (+0.09R) would need 1,065 trades, about 5.3 years."
    },
    {
     "id": "trend",
@@ -1487,10 +1495,10 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-13T06"
+  "slot": "2026-11-13T12"
  },
  "forward": {
-  "at": "2026-11-13T06:01:25.000Z",
+  "at": "2026-11-13T12:00:19.000Z",
   "v": 1,
   "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
   "decision": 43,
@@ -1534,7 +1542,7 @@
    "ddMarked": 1,
    "firstAt": 1794491160,
    "lastAt": 1794491160,
-   "months": 0.04,
+   "months": 0.05,
    "from": "2026-11-12",
    "path": [
     [
@@ -1544,10 +1552,10 @@
    ]
   },
   "band": {
-   "months": 0.04110008365655183,
-   "p5": -0.05,
+   "months": 0.049288539052399424,
+   "p5": -0.06,
    "p50": 0.01,
-   "p95": 0.12,
+   "p95": 0.14,
    "clamp": false,
    "where": "below",
    "show": 12
@@ -1678,7 +1686,7 @@
    "foreign": []
   },
   "alerts": [],
-  "slot": "2026-11-13T06"
+  "slot": "2026-11-13T12"
  },
  "ledger": [
   {
@@ -2539,7 +2547,7 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-13T06",
+ "ledgerSlot": "2026-11-13T12",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
  "date": "2026-11-13",
  "at": "2026-11-13T00:00:59.000Z",
@@ -2745,7 +2753,7 @@
    "Against the D1 trend (125×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-13T06",
+ "fslot": "2026-11-13T12",
  "notes": [
   "No change today: not enough evidence to move a rule."
  ],
