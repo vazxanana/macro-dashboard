@@ -48,6 +48,7 @@ paper system with a measured, clearly negative record.
 | 30 | Month-end US dollar rebalancing flow into the London fix (published effect) | 130 month-ends | −0.090R per event net (t −1.06), about zero before costs; month-end looks like any other day | #846 |
 | 31 | Gold Asian-range breakout into London (breakout and fade) | 1,169 / 484 | +0.015 / −0.012R a trade (t 0.5 / −0.1); both lose in 2010-19; $0.30 takes the little there is | #848 |
 | 32 | Fade the opening gap on NAS100 / SPX500 | 852 / 913 (2021 →) | −0.059 / −0.121R a trade (t −1.8 / −4.4); gaps do fill, but the stop is hit about as often | #849 |
+| 33 | Gold after an extreme day: fade it or follow it for three days | 27 / 28 (2020 →) | +0.053 / +0.040R a trade (t 0.1 / 0.2); both negative in 2006-19; about three events a year | #850 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
