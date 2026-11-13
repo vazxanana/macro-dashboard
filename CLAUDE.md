@@ -1293,6 +1293,12 @@ back exactly what was on (`ms-clean`). The Style button reads "Candles · clean"
 line, the range / alignment strip, the Context button, each chart's role word and its readout under the chart (owner: "too much labels").
 Same day, owner: "its missing ibos": iBO lines stay in the clean look (only the last one keeps the word "iBO"); a device already
 clean switches them on once (`ms-clean-v3`).
+**Expected move and cycle tag** (13 Nov 2026, owner: "an arrow of the move he is expecting and which market cycle we are in right
+now in each timeframe"): every Meridian chart with a cycle reading draws a purple arrow from the last close to `msExpect(row,
+close)` (pure, next to `msCycle`; the row whose parent is that chart: moving / continuation -> its extreme, pulling back -> its
+50% then its origin, only a target still ahead of price) labelled "Move to ▼ 3,852.6" etc.; each pane header carries `.ms-cy`
+(`cycleTags`, refreshed with the cycle strip every 10 s): "Moving ▼", "Pulling back ▲", "Continuation ▼", or "Trend ▼" where no
+lower timeframe reads it (M5, M1). On in the clean look too. Display only, a reading of structure, not a tested rule.
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

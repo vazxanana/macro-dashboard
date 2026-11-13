@@ -202,3 +202,20 @@ test('fresh zones wired: own layer, BO and iBO breaks, the three nearest to pric
   assert.match(html, /data-show="zones" checked/); assert.match(html, /zones: true/); assert.match(html, /G\.show\.zones !== false/);
   assert.match(html, /msZones\(bars, brk, nc\)\.filter\(\(z\) => z\.fresh\)/); assert.match(html, /\.slice\(0, 3\)\.forEach\(\(z\) => \{ const dem = d > 0;/);
 });
+
+// 13 Nov 2026, owner: "it should show an arrow of the move he is expecting and which market cycle we are in right now in each timeframe"
+const msExpect = new Function(`${html.slice(html.indexOf('function msExpect'), html.indexOf('function msCycle'))}; return msExpect;`)();
+test('expected move: a move points at its extreme, a pullback at the 50% then the origin, never at a level already passed', () => {
+  const T = { p50: 4050, origin: 4100, far: 4150, ext: 4000 };
+  assert.deepEqual(msExpect({ dir: -1, phase: 'move', target: T }, 4030), { dir: -1, p: 4000, word: 'Move to', phase: 'move' });
+  assert.equal(msExpect({ dir: -1, phase: 'resumed', target: T }, 4030).word, 'Continuation to');
+  assert.deepEqual(msExpect({ dir: -1, phase: 'pullback', target: T }, 4020), { dir: 1, p: 4050, word: 'Pullback to 50%', phase: 'pullback' });
+  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4070).p, 4100);
+  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4120), null);
+  assert.equal(msExpect({ dir: -1, phase: 'move', target: T }, 3990), null);
+  assert.equal(msExpect({ dir: -1, phase: 'none', target: T }, 4030), null);
+});
+test('expected move and cycle tag are wired: an arrow on the chart, a tag in every pane header', () => {
+  assert.match(html, /items\.segs\.push\(\{ l1: n - 1, p1: bars\[n - 1\]\.close, l2: n \+ 16, p2: ex\.p, color: CYC, w: 2, arrow: true/);
+  assert.match(html, /if \(sg\.arrow\)/); assert.match(html, /function cycleTags\(CY\)/); assert.match(html, /\.ms-ph \.ms-cy \{/);
+});

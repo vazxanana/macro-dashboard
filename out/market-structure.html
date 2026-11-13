@@ -131,6 +131,9 @@
     .ms-ph { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid var(--ms-b); font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
     .ms-ph b { font-size: 13px; }
     .ms-ph .ms-role { color: var(--ms-mute); }
+    .ms-ph .ms-cy { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #8a3fb0; background: rgba(166,77,201,.12); white-space: nowrap; }
+    html[data-theme="dark"] .ms-ph .ms-cy, html[data-theme="midnight"] .ms-ph .ms-cy, html[data-theme="pro"] .ms-ph .ms-cy { color: #d3a4ec; }
+    .ms-ph .ms-cy.pullback { color: var(--warn-ink, #8a5a00); background: rgba(255,152,0,.14); }
     .ms-ph .ms-tbtn { margin-left: auto; padding: 2px 8px; font-size: 11px; }
     .ms-legend { position: absolute; left: 10px; top: 44px; z-index: 3; display: flex; flex-wrap: wrap; gap: 3px 9px; font: 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; pointer-events: none; color: var(--ms-mute); }
     .ms-legend b { font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -6334,6 +6337,18 @@ function msAnalyze(bars, N) {
 // For each timeframe and the one under it: 'move' = the lower one still agrees (the move runs), 'pullback' = the lower one broke
 // against it after its break (its ChoCh: the pullback / retracement started), 'resumed' = the lower one then broke back with it
 // (the pullback is over). Targets: the pullback's = 50% of the move and the move's origin (the broken level); the move's = its extreme.
+// where a timeframe's cycle points next (13 Nov 2026): one row of msCycle (the timeframe as `parent`) and the last close ->
+// { dir, p, word, phase } or null. Moving / continuation: its extreme. Pulling back: its 50%, then its origin once past the 50%.
+// Only a target still ahead of the price is drawn. Display only.
+function msExpect(r, px) {
+  if (!r || !r.target || !r.dir || r.phase === 'none' || !isFinite(px)) return null;
+  const T = r.target, ahead = (d, p) => isFinite(p) && (d < 0 ? p < px : p > px);
+  if (r.phase === 'pullback') { const d = -r.dir;
+    if (ahead(d, T.p50)) return { dir: d, p: T.p50, word: 'Pullback to 50%', phase: r.phase };
+    if (ahead(d, T.origin)) return { dir: d, p: T.origin, word: 'Pullback to origin', phase: r.phase };
+    return null; }
+  return ahead(r.dir, T.ext) ? { dir: r.dir, p: T.ext, word: r.phase === 'resumed' ? 'Continuation to' : 'Move to', phase: r.phase } : null;
+}
 function msCycle(legs) {
   const out = [];
   for (let k = 0; k + 1 < (legs || []).length; k++) {
@@ -6617,6 +6632,9 @@ function msNextSetup(bars, A) {
       if ([x1, x2, y1, y2].some((v) => v === null)) return;
       ctx.strokeStyle = sg.color; ctx.lineWidth = sg.w || 1.5; ctx.setLineDash(sg.dash ? [5, 4] : []);
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+      if (sg.arrow) { const a = Math.atan2(y2 - y1, x2 - x1), h = 10; ctx.fillStyle = sg.color; ctx.beginPath(); ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - h * Math.cos(a - 0.45), y2 - h * Math.sin(a - 0.45)); ctx.lineTo(x2 - h * Math.cos(a + 0.45), y2 - h * Math.sin(a + 0.45)); ctx.closePath(); ctx.fill();
+        if (sg.text) texts.push({ pr: 0.5, x: x2 + 8, y: y2 + (y2 > y1 ? 14 : -6), align: 'left', text: sg.text, color: sg.color }); }
     });
     it.lines.forEach((ln, k) => {
       const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
@@ -7001,6 +7019,12 @@ function msNextSetup(bars, A) {
           items.lines.push({ l1: n - 30, l2: n + 26, p: T.ext, color: CYC, dash: true, w: 1, text: `${r.pl} target · ${lo ? 'low' : 'high'} ${fmt(T.ext)}${hit ? ' · reached, no close beyond' : ''}`, below: !lo }); }
       });
     }
+    // the expected move (13 Nov 2026, owner: "it should show an arrow of the move he is expecting and which market cycle we are in
+    // right now in each timeframe"): from the last close to where this timeframe's cycle points next (msCycle, the row whose
+    // parent is this chart): moving / continuation -> its extreme; pulling back -> its 50%, then its origin once past the 50%.
+    // A reading of structure, not a tested rule; nothing reads it.
+    if (own) { const ex = msExpect((G.cycle = cycleNow()).find((r) => r.parent === tf.id), bars[n - 1].close);
+      if (ex) items.segs.push({ l1: n - 1, p1: bars[n - 1].close, l2: n + 16, p2: ex.p, color: CYC, w: 2, arrow: true, dash: false, text: `${ex.word} ${ex.dir < 0 ? '▼' : '▲'} ${fmt(ex.p)}` }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
     if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
       M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
@@ -7629,9 +7653,21 @@ function msNextSetup(bars, A) {
     });
     return msCycle(legs);
   }
+  // which part of the cycle each timeframe is in, in its chart header (13 Nov 2026, owner): Moving / Pulling back / Continuation,
+  // the direction, and which lower timeframe says so; a timeframe with no lower reading shows its own trend
+  function cycleTags(CY) {
+    document.querySelectorAll('#v-charts .ms-pane[data-tf]').forEach((pn) => { const id = pn.dataset.tf, ph = pn.querySelector('.ms-ph'); if (!ph || id === 'split') return;
+      let tg = ph.querySelector('.ms-cy'); if (!tg) { tg = document.createElement('span'); tg.className = 'ms-cy'; const chip = ph.querySelector('.ms-chip'); ph.insertBefore(tg, chip ? chip.nextSibling : null); }
+      const r = CY.find((x) => x.parent === id), P = panes[id], d = r && r.dir ? r.dir : P && P.A ? P.A.trend : 0, ar = d < 0 ? '▼' : d > 0 ? '▲' : '';
+      const w = !r || r.phase === 'none' ? (d ? `Trend ${ar}` : '') : r.phase === 'move' ? `Moving ${ar}` : r.phase === 'pullback' ? `Pulling back ${d < 0 ? '▲' : '▼'}` : `Continuation ${ar}`;
+      tg.textContent = w; tg.hidden = !w; tg.className = 'ms-cy ' + (r ? r.phase : 'trend');
+      tg.title = r && r.phase !== 'none' ? `${r.pl} read on ${r.cl}: ${w.toLowerCase()}. A reading of structure, not a tested rule.` : 'This timeframe\'s own trend.'; });
+  }
   function cycleStrip() {
-    const el = document.getElementById('ms-cycle'); if (!el) return;
-    const CY = G.cycle = cycleNow(), r4 = CY.find((r) => r.parent === '4h' && r.child === '1h');
+    const el = document.getElementById('ms-cycle');
+    const CY = G.cycle = cycleNow(); try { cycleTags(CY); } catch (e) {}
+    if (!el) return;
+    const r4 = CY.find((r) => r.parent === '4h' && r.child === '1h');
     if (!CY.some((r) => r.phase !== 'none')) { el.hidden = true; return; }
     const ar = (d) => (d < 0 ? '▼' : '▲'), way = (d) => (d < 0 ? 'down' : 'up');
     const chip = (r) => r.phase === 'none' ? '' : `<span class="cy-c ${r.phase}" title="${r.cl} read against ${r.pl}">${r.pl} ${ar(r.dir)} <b>${r.phase === 'move' ? 'moving' : r.phase === 'pullback' ? 'pulling back' : 'continuation'}</b> <small>(${r.cl})</small></span>`;
