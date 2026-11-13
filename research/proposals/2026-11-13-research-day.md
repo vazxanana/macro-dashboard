@@ -41,6 +41,7 @@ paper system with a measured, clearly negative record.
 | 23 | Volatility-managed exposure on US indices (published effect) | 130 months | Sharpe 0.40 / 0.46 against 0.51 for plain holding; only a shallower drawdown, at a lower return | #839 |
 | 24 | AUD/NZD daily z-score fade | 160 / 48 / 122 | −0.143 / +0.061 / −0.104R a trade (t −1.7 / 0.4 / −1.0); loses before costs and in 2008-15 | #840 |
 | 25 | 10-month moving-average timing on indices + gold (published effect) | 135 positions | book Sharpe 0.40 against 0.63 for holding; only the drawdown is smaller (14.9 % vs 26.7 %) | #841 |
+| 26 | Bitcoin / Ether hour-of-day returns (published effect) | 1,035 a leg (2024 →) | long 20:00 UTC −0.064 / −0.048R a trade; short 01:00 UTC −0.016 / −0.007R; the late-UTC strength exists before costs but flipped sign between windows | #842 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
