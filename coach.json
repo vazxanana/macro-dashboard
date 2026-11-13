@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-12T18:00:10.000Z",
+  "at": "2026-11-13T00:00:59.000Z",
   "v": 1,
   "baseAt": "2026-11-11T22:19:46.138Z",
   "financing": {
@@ -546,10 +546,10 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-12T18"
+  "slot": "2026-11-13T00"
  },
  "book": {
-  "at": "2026-11-12T18:00:10.000Z",
+  "at": "2026-11-13T00:00:59.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
@@ -579,27 +579,27 @@
    "note": "Expect the clean-half numbers, not the 2018-26 ones: a Sharpe of about 0.3 a year and drawdowns of about 81-189R at this book's budget of 9R (9-21R per 1R of budget)."
   },
   "cost": "after costs: trades.json Rnet; ICT the CME micro round trip (digest.mjs merNet / ictNet)",
-  "nTrades": 27,
+  "nTrades": 28,
   "nDays": 6,
   "ictReplay": 8,
   "ictForward": 2,
   "live": {
-   "R": 14.85,
-   "dd": 2.02,
-   "ddCur": 2.02,
+   "R": 14.53,
+   "dd": 2.34,
+   "ddCur": 2.34,
    "sharpe": null,
-   "worstDay": -1.02,
+   "worstDay": -1.32,
    "bestDay": 9.02
   },
   "proposed": {
-   "R": 32.2,
-   "dd": 2.55,
-   "ddCur": 2.55,
+   "R": 31.63,
+   "dd": 3.13,
+   "ddCur": 3.13,
    "sharpe": null,
    "worstDay": -1.83,
    "bestDay": 16.23
   },
-  "diff": 17.35,
+  "diff": 17.1,
   "corr": 0.99,
   "byIdea": [
    {
@@ -680,11 +680,11 @@
     "desk": "Meridian",
     "gold": false,
     "streams": 1,
-    "n": 7,
+    "n": 8,
     "w": 0.2,
     "m": 1.8,
-    "live": 0.67,
-    "prop": 1.21
+    "live": 0.35,
+    "prop": 0.63
    },
    {
     "id": "ict-a",
@@ -754,17 +754,17 @@
    },
    {
     "d": "2026-11-12",
-    "n": 1,
-    "live": -1,
-    "prop": -0.72,
-    "cumLive": 14.855,
-    "cumProp": 32.201
+    "n": 2,
+    "live": -1.32,
+    "prop": -1.296,
+    "cumLive": 14.535,
+    "cumProp": 31.625
    }
   ],
-  "slot": "2026-11-12T18"
+  "slot": "2026-11-13T00"
  },
  "expect": {
-  "at": "2026-11-12T18:00:10.000Z",
+  "at": "2026-11-13T00:00:59.000Z",
   "v": 1,
   "baseAt": "2026-11-12T09:34:49.973Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1487,7 +1487,198 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-12T18"
+  "slot": "2026-11-13T00"
+ },
+ "forward": {
+  "at": "2026-11-13T00:00:59.000Z",
+  "v": 1,
+  "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
+  "decision": 43,
+  "adopted": "2026-11-12",
+  "doc": "research/proposals/2026-11-12-path-to-live.md",
+  "protocol": {
+   "built": "2026-11-12",
+   "start": "2026-11-12",
+   "minPositions": 10,
+   "ddStop": 21.9,
+   "floor": {
+    "6": -7.3,
+    "12": -9.7,
+    "24": -12,
+    "36": -12.1,
+    "60": -10.6
+   },
+   "months": 36
+  },
+  "book": [
+   "gtrend",
+   "geg"
+  ],
+  "names": [
+   "Gold trend",
+   "Gold daily engulf"
+  ],
+  "status": "few",
+  "head": "Too few trades to say",
+  "sentence": "Too few trades to say: 1 position closed, 2026-11-12 to 2026-11-12, −1.00R after costs.",
+  "record": {
+   "n": 1,
+   "units": 1,
+   "open": 0,
+   "total": -1,
+   "floating": 0,
+   "marked": -1,
+   "peak": 0,
+   "dd": 1,
+   "ddMax": 1,
+   "ddMarked": 1,
+   "firstAt": 1794491160,
+   "lastAt": 1794491160,
+   "months": 0.03,
+   "from": "2026-11-12",
+   "path": [
+    [
+     0.02,
+     -1
+    ]
+   ]
+  },
+  "band": {
+   "months": 0.03287664461175755,
+   "p5": -0.04,
+   "p50": 0.01,
+   "p95": 0.09,
+   "clamp": false,
+   "where": "below",
+   "show": 12
+  },
+  "bandPts": [
+   [
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    6,
+    -7.3,
+    1.2,
+    17.2
+   ],
+   [
+    12,
+    -9.7,
+    3.5,
+    24.5
+   ]
+  ],
+  "stops": [
+   {
+    "id": "S1",
+    "rule": "Drawdown from the forward record’s own high",
+    "line": 21.9,
+    "value": 1,
+    "state": "clear",
+    "every": true
+   },
+   {
+    "id": "S2",
+    "rule": "Total after 12 months",
+    "months": 12,
+    "line": -9.7,
+    "due": 1825977600,
+    "dueDay": "2027-11-12",
+    "value": -1,
+    "state": "later"
+   },
+   {
+    "id": "S3",
+    "rule": "Total after 24 months",
+    "months": 24,
+    "line": -12,
+    "due": 1857600000,
+    "dueDay": "2028-11-12",
+    "value": -1,
+    "state": "later"
+   },
+   {
+    "id": "S4",
+    "rule": "Total after 36 months",
+    "months": 36,
+    "line": -12.1,
+    "due": 1889136000,
+    "dueDay": "2029-11-12",
+    "value": -1,
+    "state": "later"
+   }
+  ],
+  "exec": {
+   "window": 30,
+   "trades": 1,
+   "copied": 1,
+   "checks": [
+    {
+     "id": "E1",
+     "label": "A stop at the broker on every copy",
+     "state": "running",
+     "n": 1,
+     "bad": 0,
+     "text": "1 of 1 copies so far held a stop from the fill."
+    },
+    {
+     "id": "E2",
+     "label": "Paper trades of the book that reached the demo",
+     "state": "running",
+     "n": 1,
+     "of": 1,
+     "misses": [],
+     "text": "1 of 1 copied."
+    },
+    {
+     "id": "E3",
+     "label": "Average fill against paper, in R",
+     "state": "running",
+     "n": 1,
+     "avg": -0.002,
+     "text": "Average 0.002R better than paper over 1 copy (positive = worse)."
+    },
+    {
+     "id": "E4",
+     "label": "Financing charged on gold buys against the cost model",
+     "state": "nodata",
+     "n": 0,
+     "ratio": null,
+     "charged": 0,
+     "model": 0,
+     "text": "Not measurable yet: no copy of a gold buy has been held over a rollover with its swap in the account files."
+    },
+    {
+     "id": "E5",
+     "label": "Nothing on the account the mirror did not place",
+     "state": "running",
+     "n": 0,
+     "text": "None since the clock start."
+    }
+   ],
+   "copies": {
+    "xau-geg-1793664000": {
+     "id": "xau-geg-1793664000",
+     "k": "geg",
+     "fill": 1794442140,
+     "account": "49478137",
+     "positionId": "48142419",
+     "status": "closed at broker",
+     "slipR": -0.002,
+     "copied": true,
+     "noStop": false,
+     "noStopWhy": null,
+     "due": true
+    }
+   },
+   "foreign": []
+  },
+  "alerts": [],
+  "slot": "2026-11-13T00"
  },
  "ledger": [
   {
@@ -2348,10 +2539,10 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-12T18",
+ "ledgerSlot": "2026-11-13T00",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
- "date": "2026-11-12",
- "at": "2026-11-12T00:02:13.000Z",
+ "date": "2026-11-13",
+ "at": "2026-11-13T00:00:59.000Z",
  "stats": {
   "rscalp": {
    "n": 6,
@@ -2361,11 +2552,11 @@
    "exp": -0.83
   },
   "scalp": {
-   "n": 16,
-   "w": 1,
-   "wr": 0.0625,
-   "R": -9.89,
-   "exp": -0.62
+   "n": 15,
+   "w": 0,
+   "wr": 0,
+   "R": -12,
+   "exp": -0.8
   },
   "intraday": {
    "n": 5,
@@ -2402,14 +2593,14 @@
    "R": 1,
    "exp": 0.5
   },
-  "gtl": {
-   "n": 1,
+  "geg": {
+   "n": 2,
    "w": 0,
    "wr": 0,
-   "R": -1,
+   "R": -2,
    "exp": -1
   },
-  "geg": {
+  "gtl": {
    "n": 1,
    "w": 0,
    "wr": 0,
@@ -2419,61 +2610,61 @@
  },
  "last14": {
   "n": 38,
-  "w": 6,
-  "wr": 0.15789473684210525,
-  "R": -17.37,
-  "exp": -0.46
+  "w": 5,
+  "wr": 0.13157894736842105,
+  "R": -20.48,
+  "exp": -0.54
  },
  "lessons": {
-  "n": 879,
-  "losses": 543,
-  "system": 270,
-  "market": 273,
+  "n": 993,
+  "losses": 611,
+  "system": 315,
+  "market": 296,
   "byCause": {
    "retrace-fail": {
-    "n": 51,
-    "R": -51,
+    "n": 60,
+    "R": -60,
     "verdict": "market",
     "title": "The retracement never came",
     "lesson": "Retracement trades work best right after a strong HTF VR; skip them when the HTF move is still impulsive.",
     "live": 4,
-    "shadow": 47
+    "shadow": 56
    },
    "hunt": {
-    "n": 40,
-    "R": -40.07,
+    "n": 50,
+    "R": -50.08,
     "verdict": "system",
     "title": "Right idea, stopped out first",
     "lesson": "Put the stop past the next swing or the liquidity just beyond the CF, or wait for the sweep before entering.",
     "live": 1,
-    "shadow": 39
+    "shadow": 49
    },
    "leftmoney": {
-    "n": 177,
-    "R": 436.52,
+    "n": 199,
+    "R": 470.09,
     "verdict": "system",
     "title": "Target left money on the table",
     "lesson": "Consider holding part of the position for the next target.",
     "live": 2,
-    "shadow": 175
+    "shadow": 197
    },
    "reversal": {
-    "n": 47,
-    "R": -47,
+    "n": 54,
+    "R": -54,
     "verdict": "market",
     "title": "The market turned for real",
     "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
     "live": 1,
-    "shadow": 46
+    "shadow": 53
    },
    "clean": {
-    "n": 131,
-    "R": 249.42,
+    "n": 153,
+    "R": 292.1,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 4,
-    "shadow": 127
+    "shadow": 149
    },
    "becost": {
     "n": 3,
@@ -2485,22 +2676,22 @@
     "shadow": 1
    },
    "normal": {
-    "n": 112,
-    "R": -112.04,
+    "n": 118,
+    "R": -118.06,
     "verdict": "market",
     "title": "Normal loss",
     "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
-    "live": 3,
-    "shadow": 109
+    "live": 4,
+    "shadow": 114
    },
    "late": {
-    "n": 9,
-    "R": -9,
+    "n": 11,
+    "R": -11,
     "verdict": "system",
     "title": "Late entry",
     "lesson": "Take signals within the first few candles after the CF.",
     "live": 1,
-    "shadow": 8
+    "shadow": 10
    },
    "besaved": {
     "n": 7,
@@ -2512,22 +2703,22 @@
     "shadow": 4
    },
    "against": {
-    "n": 107,
-    "R": -107,
+    "n": 125,
+    "R": -125.03,
     "verdict": "system",
     "title": "Against the D1 trend",
     "lesson": "Favour trades with the D1 trend, or demand more reward:risk against it.",
     "live": 7,
-    "shadow": 100
+    "shadow": 118
    },
    "gaveback": {
-    "n": 124,
-    "R": -124.05,
+    "n": 139,
+    "R": -139.05,
     "verdict": "system",
     "title": "Gave back the profit",
     "lesson": "Move the stop to break-even or take a partial at +1R.",
     "live": 3,
-    "shadow": 121
+    "shadow": 136
    },
    "gap": {
     "n": 31,
@@ -2539,215 +2730,23 @@
     "shadow": 31
    },
    "news": {
-    "n": 40,
-    "R": -40,
+    "n": 43,
+    "R": -43,
     "verdict": "market",
     "title": "News spike",
     "lesson": "Avoid holding scalps and intraday trades through high-impact news: check the calendar before entering.",
     "live": 7,
-    "shadow": 33
+    "shadow": 36
    }
   },
   "top": [
-   "Target left money on the table (177×): Consider holding part of the position for the next target.",
-   "Gave back the profit (124×): Move the stop to break-even or take a partial at +1R.",
-   "Against the D1 trend (107×): Favour trades with the D1 trend, or demand more reward:risk against it."
+   "Target left money on the table (199×): Consider holding part of the position for the next target.",
+   "Gave back the profit (139×): Move the stop to break-even or take a partial at +1R.",
+   "Against the D1 trend (125×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-12T18",
+ "fslot": "2026-11-13T00",
  "notes": [
-  "intraday: only a continuation BO as the confirming break (backtest): 226 trades over the last 30 days: a continuation BO as the confirming break +0.28R each, a CHoCH as the confirming break -0.42R (gap t = 3.0); true in both halves."
- ],
- "proposalsBt": "2026-11-12T22:45:54.026Z",
- "forward": {
-  "at": "2026-11-12T18:00:10.000Z",
-  "v": 1,
-  "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
-  "decision": 43,
-  "adopted": "2026-11-12",
-  "doc": "research/proposals/2026-11-12-path-to-live.md",
-  "protocol": {
-   "built": "2026-11-12",
-   "start": "2026-11-12",
-   "minPositions": 10,
-   "ddStop": 21.9,
-   "floor": {
-    "6": -7.3,
-    "12": -9.7,
-    "24": -12,
-    "36": -12.1,
-    "60": -10.6
-   },
-   "months": 36
-  },
-  "book": [
-   "gtrend",
-   "geg"
-  ],
-  "names": [
-   "Gold trend",
-   "Gold daily engulf"
-  ],
-  "status": "few",
-  "head": "Too few trades to say",
-  "sentence": "Too few trades to say: 1 position closed, 2026-11-12 to 2026-11-12, −1.00R after costs.",
-  "record": {
-   "n": 1,
-   "units": 1,
-   "open": 0,
-   "total": -1,
-   "floating": 0,
-   "marked": -1,
-   "peak": 0,
-   "dd": 1,
-   "ddMax": 1,
-   "ddMarked": 1,
-   "firstAt": 1794491160,
-   "lastAt": 1794491160,
-   "months": 0.02,
-   "from": "2026-11-12",
-   "path": [
-    [
-     0.02,
-     -1
-    ]
-   ]
-  },
-  "band": {
-   "months": 0.024644459654726596,
-   "p5": -0.03,
-   "p50": 0,
-   "p95": 0.07,
-   "clamp": false,
-   "where": "below",
-   "show": 12
-  },
-  "bandPts": [
-   [
-    0,
-    0,
-    0,
-    0
-   ],
-   [
-    6,
-    -7.3,
-    1.2,
-    17.2
-   ],
-   [
-    12,
-    -9.7,
-    3.5,
-    24.5
-   ]
-  ],
-  "stops": [
-   {
-    "id": "S1",
-    "rule": "Drawdown from the forward record’s own high",
-    "line": 21.9,
-    "value": 1,
-    "state": "clear",
-    "every": true
-   },
-   {
-    "id": "S2",
-    "rule": "Total after 12 months",
-    "months": 12,
-    "line": -9.7,
-    "due": 1825977600,
-    "dueDay": "2027-11-12",
-    "value": -1,
-    "state": "later"
-   },
-   {
-    "id": "S3",
-    "rule": "Total after 24 months",
-    "months": 24,
-    "line": -12,
-    "due": 1857600000,
-    "dueDay": "2028-11-12",
-    "value": -1,
-    "state": "later"
-   },
-   {
-    "id": "S4",
-    "rule": "Total after 36 months",
-    "months": 36,
-    "line": -12.1,
-    "due": 1889136000,
-    "dueDay": "2029-11-12",
-    "value": -1,
-    "state": "later"
-   }
-  ],
-  "exec": {
-   "window": 30,
-   "trades": 1,
-   "copied": 1,
-   "checks": [
-    {
-     "id": "E1",
-     "label": "A stop at the broker on every copy",
-     "state": "running",
-     "n": 1,
-     "bad": 0,
-     "text": "1 of 1 copies so far held a stop from the fill."
-    },
-    {
-     "id": "E2",
-     "label": "Paper trades of the book that reached the demo",
-     "state": "running",
-     "n": 1,
-     "of": 1,
-     "misses": [],
-     "text": "1 of 1 copied."
-    },
-    {
-     "id": "E3",
-     "label": "Average fill against paper, in R",
-     "state": "running",
-     "n": 1,
-     "avg": -0.002,
-     "text": "Average 0.002R better than paper over 1 copy (positive = worse)."
-    },
-    {
-     "id": "E4",
-     "label": "Financing charged on gold buys against the cost model",
-     "state": "nodata",
-     "n": 0,
-     "ratio": null,
-     "charged": 0,
-     "model": 0,
-     "text": "Not measurable yet: no copy of a gold buy has been held over a rollover with its swap in the account files."
-    },
-    {
-     "id": "E5",
-     "label": "Nothing on the account the mirror did not place",
-     "state": "running",
-     "n": 0,
-     "text": "None since the clock start."
-    }
-   ],
-   "copies": {
-    "xau-geg-1793664000": {
-     "id": "xau-geg-1793664000",
-     "k": "geg",
-     "fill": 1794442140,
-     "account": "49478137",
-     "positionId": "48142419",
-     "status": "closed at broker",
-     "slipR": -0.002,
-     "copied": true,
-     "noStop": false,
-     "noStopWhy": null,
-     "due": true
-    }
-   },
-   "foreign": []
-  },
-  "alerts": [],
-  "slot": "2026-11-12T18"
- }
+  "No change today: not enough evidence to move a rule."
+ ]
 }
