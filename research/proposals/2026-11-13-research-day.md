@@ -71,6 +71,7 @@ paper system with a measured, clearly negative record.
 | 53 | Gold/silver H1 divergence ("SMT" as a plain rule): fade or follow gold's unconfirmed new high / low | 2,519 / 2,325 (2020 →) | −0.084 / −0.075R a trade (month t −3.4 / −2.9); flat before costs; gold-only new highs do as well, so silver adds nothing | #870 |
 | 54 | Follow or fade the first 15 minutes after US CPI (gold, EUR/USD, USD/JPY, NAS100) | 81 events (2020 →) | 0 of 4; following loses (−0.20 / −0.25R an event, as on random days), fading is flat (+0.001R) | #871 |
 | 55 | The last hour into the US close after a big day: fade or follow (NAS100, SPX500, US30) | 2,664 (2016 →) | −0.077 / −0.065R a trade (month t −5.2 / −4.3); near zero before costs; every market loses in both windows | #872 |
+| 56 | The RSI(2) rule (#22), frozen, on gold and silver | 137 (2016 →) | −0.077R a trade (month t −1.8); loses before costs; random uptrend days do better; silver lost every year | #873 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
