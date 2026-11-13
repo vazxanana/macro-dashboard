@@ -1,0 +1,226 @@
+{
+ "topic": "fx-month-end",
+ "built": "2026-11-13",
+ "title": "Month-end US dollar rebalancing flow into the London 4 pm fix",
+ "system": "Last London business day of each month: sign of S&P 500 month-to-date return minus the mean of DAX, FTSE and Nikkei month-to-date returns at 10:00 London; US outperformed = short USD on EUR/USD, GBP/USD, AUD/USD, USD/JPY, USD/CHF, USD/CAD from the 10:00 London H1 open to the 16:00 London close, else long USD; 1.5 x ATR(24 H1) stop on every leg, equal risk, net of the measured raw-spread costs",
+ "verdict": "FAIL",
+ "checks": {
+  "base": {
+   "meanPos": false,
+   "t": false,
+   "holm": false,
+   "n": true,
+   "check2008": false,
+   "placebo": false
+  },
+  "variant": {
+   "meanPos": true,
+   "t": false,
+   "holm": false,
+   "n": false,
+   "check2008": false
+  }
+ },
+ "clock": "London time with daylight saving; signal from OANDA daily index candles that closed by 10:00 London (00:00 UTC days, so the previous UTC day); entry at the 10:00 London H1 open, exit at the 16:00 London close",
+ "params": {
+  "STOP_K": 1.5,
+  "ATR_N": 24,
+  "ENTRY_H": 10,
+  "EXIT_H": 16,
+  "PLACEBO_PER_YEAR": 40,
+  "RESAMPLES": 2000,
+  "PASS_T": 2,
+  "MIN_N": 100
+ },
+ "windows": {
+  "check": [
+   "2008-01-01",
+   "2015-12-31"
+  ],
+  "decisive": [
+   "2016-01-01",
+   "2026-10-31"
+  ]
+ },
+ "costs": {
+  "eurusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "gbpusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "audusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdjpy": {
+   "src": "default+commission (not in the fixture)",
+   "pip": 0.01,
+   "spreadPips": 1,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdchf": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdcad": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  }
+ },
+ "variantGapMedian": 0.0151,
+ "base": {
+  "decisive": {
+   "n": 130,
+   "meanR": -0.0903,
+   "sdR": 0.9717,
+   "t": -1.059,
+   "pOneSided": 0.8553,
+   "totalR": -11.738,
+   "maxDDR": -19.667,
+   "winShare": 0.362,
+   "grossMeanR": -0.009,
+   "grossT": -0.106,
+   "costMeanR": 0.0813,
+   "stoppedShare": 0.546,
+   "usOutperformShare": 0.538,
+   "perPairMeanR": {
+    "eurusd": -0.1721,
+    "gbpusd": 0.0886,
+    "audusd": -0.0619,
+    "usdjpy": -0.0827,
+    "usdchf": -0.1124,
+    "usdcad": -0.2013
+   },
+   "from": "2016-01-29",
+   "to": "2026-10-30"
+  },
+  "check": {
+   "n": 96,
+   "meanR": -0.0782,
+   "sdR": 0.9557,
+   "t": -0.802,
+   "pOneSided": 0.7886,
+   "totalR": -7.507,
+   "maxDDR": -15.182,
+   "winShare": 0.375,
+   "grossMeanR": -0.0104,
+   "grossT": -0.106,
+   "costMeanR": 0.0678,
+   "stoppedShare": 0.549,
+   "usOutperformShare": 0.583,
+   "perPairMeanR": {
+    "eurusd": -0.0297,
+    "gbpusd": -0.1303,
+    "audusd": -0.1869,
+    "usdjpy": 0.0711,
+    "usdchf": -0.0153,
+    "usdcad": -0.1781
+   },
+   "from": "2008-01-31",
+   "to": "2015-12-31"
+  }
+ },
+ "variant": {
+  "decisive": {
+   "n": 72,
+   "meanR": 0.0151,
+   "sdR": 0.9811,
+   "t": 0.13,
+   "pOneSided": 0.4482,
+   "totalR": 1.084,
+   "maxDDR": -13.01,
+   "winShare": 0.417,
+   "grossMeanR": 0.0932,
+   "grossT": 0.804,
+   "costMeanR": 0.0781,
+   "stoppedShare": 0.507,
+   "usOutperformShare": 0.556,
+   "perPairMeanR": {
+    "eurusd": -0.1643,
+    "gbpusd": 0.2276,
+    "audusd": -0.08,
+    "usdjpy": 0.1921,
+    "usdchf": -0.014,
+    "usdcad": -0.0711
+   },
+   "from": "2016-02-29",
+   "to": "2026-06-30"
+  },
+  "check": {
+   "n": 48,
+   "meanR": -0.1461,
+   "sdR": 0.9125,
+   "t": -1.109,
+   "pOneSided": 0.8664,
+   "totalR": -7.014,
+   "maxDDR": -10.504,
+   "winShare": 0.313,
+   "grossMeanR": -0.0779,
+   "grossT": -0.591,
+   "costMeanR": 0.0682,
+   "stoppedShare": 0.545,
+   "usOutperformShare": 0.625,
+   "perPairMeanR": {
+    "eurusd": -0.0558,
+    "gbpusd": -0.4033,
+    "audusd": -0.2142,
+    "usdjpy": 0.0379,
+    "usdchf": 0.0498,
+    "usdcad": -0.2911
+   },
+   "from": "2008-01-31",
+   "to": "2015-12-31"
+  }
+ },
+ "missing": {
+  "check": [],
+  "decisive": []
+ },
+ "placebo": {
+  "events": 424,
+  "meanR": -0.0795,
+  "resamples": 2000,
+  "p95": 0.0525,
+  "p50": -0.0803
+ },
+ "byYearR": {
+  "2008": -1.719,
+  "2009": -5.865,
+  "2010": 1.397,
+  "2011": 12.306,
+  "2012": -2.641,
+  "2013": -6.374,
+  "2014": -0.878,
+  "2015": -3.729,
+  "2016": 0.123,
+  "2017": 4.424,
+  "2018": -5.832,
+  "2019": 0.141,
+  "2020": -0.013,
+  "2021": -7.96,
+  "2022": -2.066,
+  "2023": -0.09,
+  "2024": -2.321,
+  "2025": 0.743,
+  "2026": 1.117
+ }
+}
