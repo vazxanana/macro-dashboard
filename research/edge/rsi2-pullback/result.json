@@ -1,0 +1,539 @@
+{
+ "built": "2026-11-13",
+ "title": "The 2-day RSI pullback on US index CFDs, out of the book's sample",
+ "verdict": "FAIL",
+ "system": "Long when close > SMA200 and Wilder RSI(2) < 10 (OANDA daily close), fill next open; exit next open after the first close > SMA5; stop 3 x ATR(20)",
+ "costs": {
+  "spreadPoints": {
+   "spx500": 1,
+   "nas100": 3,
+   "us30": 4
+  },
+  "financing": "DGS2 + 2.5 % a year, per calendar night"
+ },
+ "src": "OANDA mid daily candles, council-data research/daily/<key>.json; DGS2 from council-data macro/cache.json",
+ "windows": {
+  "A": [
+   "2008-01-01",
+   "2015-12-31"
+  ],
+  "B": [
+   "2016-01-01",
+   "2099-12-31"
+  ]
+ },
+ "markets": {
+  "spx500": {
+   "cost": 1,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06",
+    "days": 6124
+   },
+   "A": {
+    "from": "2008-01-01",
+    "to": "2015-12-31",
+    "n": 67,
+    "avgRet": 0.559,
+    "avgGross": 0.661,
+    "avgR": 0.134,
+    "totalR": 8.95,
+    "wr": 74.63,
+    "tTrades": 3.15,
+    "tMonths": 3.23,
+    "stops": 4,
+    "avgHold": 2.76,
+    "avgNights": 3.85,
+    "finPct": 0.033,
+    "ddR": -1.47
+   },
+   "B": {
+    "from": "2016-01-01",
+    "to": "2026-11-06",
+    "n": 99,
+    "avgRet": 0.318,
+    "avgGross": 0.402,
+    "avgR": 0.112,
+    "totalR": 11.14,
+    "wr": 81.82,
+    "tTrades": 2.02,
+    "tMonths": 1.83,
+    "stops": 10,
+    "avgHold": 2.86,
+    "avgNights": 4.03,
+    "finPct": 0.058,
+    "ddR": -2.88,
+    "placebo": {
+     "seeds": 40,
+     "mean": 0.042,
+     "p95": 0.233
+    },
+    "p": 0.0217
+   },
+   "years": {
+    "2004": {
+     "n": 6,
+     "sumRet": 0.88,
+     "sumR": 0.23
+    },
+    "2005": {
+     "n": 10,
+     "sumRet": 1.5,
+     "sumR": 0.71
+    },
+    "2006": {
+     "n": 9,
+     "sumRet": 2.82,
+     "sumR": 1.45
+    },
+    "2007": {
+     "n": 8,
+     "sumRet": -6.91,
+     "sumR": -2.53
+    },
+    "2009": {
+     "n": 7,
+     "sumRet": 11.01,
+     "sumR": 2
+    },
+    "2010": {
+     "n": 8,
+     "sumRet": 5.14,
+     "sumR": 1.02
+    },
+    "2011": {
+     "n": 8,
+     "sumRet": -1.77,
+     "sumR": -0.4
+    },
+    "2012": {
+     "n": 13,
+     "sumRet": 10.08,
+     "sumR": 2.74
+    },
+    "2013": {
+     "n": 8,
+     "sumRet": 5.23,
+     "sumR": 1.58
+    },
+    "2014": {
+     "n": 12,
+     "sumRet": 3.57,
+     "sumR": 0.77
+    },
+    "2015": {
+     "n": 11,
+     "sumRet": 4.22,
+     "sumR": 1.25
+    },
+    "2016": {
+     "n": 7,
+     "sumRet": 5.55,
+     "sumR": 1.91
+    },
+    "2017": {
+     "n": 7,
+     "sumRet": 4.59,
+     "sumR": 2.52
+    },
+    "2018": {
+     "n": 12,
+     "sumRet": -2.79,
+     "sumR": -0.84
+    },
+    "2019": {
+     "n": 6,
+     "sumRet": 0.8,
+     "sumR": -0.05
+    },
+    "2020": {
+     "n": 8,
+     "sumRet": -4.35,
+     "sumR": -0.99
+    },
+    "2021": {
+     "n": 12,
+     "sumRet": 9.67,
+     "sumR": 2.71
+    },
+    "2022": {
+     "n": 2,
+     "sumRet": -3.92,
+     "sumR": -1
+    },
+    "2023": {
+     "n": 10,
+     "sumRet": -1.41,
+     "sumR": -0.3
+    },
+    "2024": {
+     "n": 13,
+     "sumRet": 7.8,
+     "sumR": 2.5
+    },
+    "2025": {
+     "n": 9,
+     "sumRet": 5.36,
+     "sumR": 1.55
+    },
+    "2026": {
+     "n": 13,
+     "sumRet": 10.18,
+     "sumR": 3.12
+    }
+   },
+   "checks": {
+    "positive": true,
+    "tTrades": true,
+    "tMonths": false,
+    "placebo": true,
+    "holm": false
+   },
+   "holmP": 0.0651,
+   "pass": false
+  },
+  "nas100": {
+   "cost": 3,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06",
+    "days": 6124
+   },
+   "A": {
+    "from": "2008-01-01",
+    "to": "2015-12-31",
+    "n": 75,
+    "avgRet": 0.444,
+    "avgGross": 0.597,
+    "avgR": 0.104,
+    "totalR": 7.82,
+    "wr": 77.33,
+    "tTrades": 2.02,
+    "tMonths": 1.97,
+    "stops": 5,
+    "avgHold": 3.19,
+    "avgNights": 4.47,
+    "finPct": 0.039,
+    "ddR": -2.59
+   },
+   "B": {
+    "from": "2016-01-01",
+    "to": "2026-11-06",
+    "n": 99,
+    "avgRet": 0.292,
+    "avgGross": 0.382,
+    "avgR": 0.061,
+    "totalR": 6.03,
+    "wr": 67.68,
+    "tTrades": 1.24,
+    "tMonths": 1.29,
+    "stops": 12,
+    "avgHold": 3.15,
+    "avgNights": 4.35,
+    "finPct": 0.062,
+    "ddR": -2.67,
+    "placebo": {
+     "seeds": 40,
+     "mean": 0.09,
+     "p95": 0.477
+    },
+    "p": 0.1073
+   },
+   "years": {
+    "2004": {
+     "n": 8,
+     "sumRet": 1.25,
+     "sumR": 0.33
+    },
+    "2005": {
+     "n": 16,
+     "sumRet": 4.18,
+     "sumR": 1.29
+    },
+    "2006": {
+     "n": 8,
+     "sumRet": -1.49,
+     "sumR": -0.41
+    },
+    "2007": {
+     "n": 10,
+     "sumRet": 3.29,
+     "sumR": 0.62
+    },
+    "2008": {
+     "n": 3,
+     "sumRet": -3.86,
+     "sumR": -0.73
+    },
+    "2009": {
+     "n": 10,
+     "sumRet": 11.19,
+     "sumR": 1.78
+    },
+    "2010": {
+     "n": 7,
+     "sumRet": 0.21,
+     "sumR": 0.31
+    },
+    "2011": {
+     "n": 8,
+     "sumRet": -9.49,
+     "sumR": -2.22
+    },
+    "2012": {
+     "n": 10,
+     "sumRet": 6.91,
+     "sumR": 1.35
+    },
+    "2013": {
+     "n": 10,
+     "sumRet": 6.96,
+     "sumR": 1.94
+    },
+    "2014": {
+     "n": 12,
+     "sumRet": 8.19,
+     "sumR": 2.04
+    },
+    "2015": {
+     "n": 15,
+     "sumRet": 13.16,
+     "sumR": 3.35
+    },
+    "2016": {
+     "n": 7,
+     "sumRet": -9.52,
+     "sumR": -2.16
+    },
+    "2017": {
+     "n": 11,
+     "sumRet": 9.16,
+     "sumR": 3.09
+    },
+    "2018": {
+     "n": 8,
+     "sumRet": -2.75,
+     "sumR": -1.18
+    },
+    "2019": {
+     "n": 6,
+     "sumRet": 4.56,
+     "sumR": 0.71
+    },
+    "2020": {
+     "n": 6,
+     "sumRet": 3.82,
+     "sumR": 0.44
+    },
+    "2021": {
+     "n": 12,
+     "sumRet": 8.66,
+     "sumR": 2.23
+    },
+    "2022": {
+     "n": 2,
+     "sumRet": -6.04,
+     "sumR": -0.99
+    },
+    "2023": {
+     "n": 11,
+     "sumRet": 6.33,
+     "sumR": 1.21
+    },
+    "2024": {
+     "n": 13,
+     "sumRet": 8.05,
+     "sumR": 1.43
+    },
+    "2025": {
+     "n": 10,
+     "sumRet": -4.65,
+     "sumR": -0.87
+    },
+    "2026": {
+     "n": 13,
+     "sumRet": 11.32,
+     "sumR": 2.11
+    }
+   },
+   "checks": {
+    "positive": true,
+    "tTrades": false,
+    "tMonths": false,
+    "placebo": false,
+    "holm": false
+   },
+   "holmP": 0.1073,
+   "pass": false
+  },
+  "us30": {
+   "cost": 4,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06",
+    "days": 6101
+   },
+   "A": {
+    "from": "2008-01-01",
+    "to": "2015-12-31",
+    "n": 67,
+    "avgRet": 0.228,
+    "avgGross": 0.293,
+    "avgR": 0.052,
+    "totalR": 3.45,
+    "wr": 70.15,
+    "tTrades": 1.22,
+    "tMonths": 1.39,
+    "stops": 9,
+    "avgHold": 3.06,
+    "avgNights": 4.4,
+    "finPct": 0.036,
+    "ddR": -4.03
+   },
+   "B": {
+    "from": "2016-01-01",
+    "to": "2026-11-06",
+    "n": 102,
+    "avgRet": 0.288,
+    "avgGross": 0.364,
+    "avgR": 0.087,
+    "totalR": 8.82,
+    "wr": 77.45,
+    "tTrades": 1.88,
+    "tMonths": 2.28,
+    "stops": 11,
+    "avgHold": 2.94,
+    "avgNights": 4.23,
+    "finPct": 0.063,
+    "ddR": -1.71,
+    "placebo": {
+     "seeds": 40,
+     "mean": 0.005,
+     "p95": 0.175
+    },
+    "p": 0.0301
+   },
+   "years": {
+    "2004": {
+     "n": 10,
+     "sumRet": 2.54,
+     "sumR": 0.79
+    },
+    "2005": {
+     "n": 5,
+     "sumRet": -0.67,
+     "sumR": -0.18
+    },
+    "2006": {
+     "n": 12,
+     "sumRet": 0.77,
+     "sumR": 0.63
+    },
+    "2007": {
+     "n": 9,
+     "sumRet": 1.94,
+     "sumR": 0.21
+    },
+    "2009": {
+     "n": 3,
+     "sumRet": 4.32,
+     "sumR": 1.01
+    },
+    "2010": {
+     "n": 9,
+     "sumRet": 5.93,
+     "sumR": 1.48
+    },
+    "2011": {
+     "n": 9,
+     "sumRet": 3.01,
+     "sumR": 1.11
+    },
+    "2012": {
+     "n": 11,
+     "sumRet": 1,
+     "sumR": 0.55
+    },
+    "2013": {
+     "n": 8,
+     "sumRet": -1.04,
+     "sumR": -0.7
+    },
+    "2014": {
+     "n": 16,
+     "sumRet": -2.56,
+     "sumR": -1.3
+    },
+    "2015": {
+     "n": 11,
+     "sumRet": 4.62,
+     "sumR": 1.31
+    },
+    "2016": {
+     "n": 6,
+     "sumRet": 3.38,
+     "sumR": 1.41
+    },
+    "2017": {
+     "n": 8,
+     "sumRet": 3.03,
+     "sumR": 1.63
+    },
+    "2018": {
+     "n": 12,
+     "sumRet": 7.73,
+     "sumR": 1.06
+    },
+    "2019": {
+     "n": 5,
+     "sumRet": 0.22,
+     "sumR": -0.09
+    },
+    "2020": {
+     "n": 8,
+     "sumRet": -4.44,
+     "sumR": -0.73
+    },
+    "2021": {
+     "n": 13,
+     "sumRet": 8.56,
+     "sumR": 2.2
+    },
+    "2022": {
+     "n": 4,
+     "sumRet": -1.39,
+     "sumR": -0.54
+    },
+    "2023": {
+     "n": 11,
+     "sumRet": 1.22,
+     "sumR": 0.39
+    },
+    "2024": {
+     "n": 14,
+     "sumRet": 1.75,
+     "sumR": 0.35
+    },
+    "2025": {
+     "n": 8,
+     "sumRet": 2.73,
+     "sumR": 0.9
+    },
+    "2026": {
+     "n": 13,
+     "sumRet": 6.6,
+     "sumR": 2.23
+    }
+   },
+   "checks": {
+    "positive": true,
+    "tTrades": false,
+    "tMonths": true,
+    "placebo": true,
+    "holm": false
+   },
+   "holmP": 0.0651,
+   "pass": false
+  }
+ }
+}
