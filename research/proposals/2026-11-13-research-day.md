@@ -45,6 +45,7 @@ paper system with a measured, clearly negative record.
 | 27 | Gold: fade a raid of last week's high / low (market-maker school) | 233 / 190 / 235 | −0.014 / +0.116 / +0.162R a trade (t −0.1 / 0.6 / 0.8); all three lose in 2008-19 | #843 |
 | 28 | The RSI(2) rule (#22), frozen, on six non-US indices | 521 pooled | +0.027R a trade (month t 0.85); the sign holds, the size does not: the US near miss reads as noise | #844 |
 | 29 | Pre-holiday session on US indices (published effect) | 99 holidays | +0.023R a holiday net (t 1.02); before costs the S&P day just clears t 2, spread + financing take half | #845 |
+| 30 | Month-end US dollar rebalancing flow into the London fix (published effect) | 130 month-ends | −0.090R per event net (t −1.06), about zero before costs; month-end looks like any other day | #846 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
