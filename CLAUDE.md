@@ -1288,7 +1288,9 @@ centred "Macro desk" button (`.hdr-macro`, animated conic border, hidden for the
 `BUSY`) now hides every layer but BO lines, VR and CF (owner, same day: "too much labels just keep bo vr and cf"; the 50% line
 follows Origin and the Invalidation price line follows Next setup, so both go with them) and is switched ON
 once per device the first time the charts open (`ms-clean-v2`, run after the layer checkboxes are wired); "Clean look" again brings
-back exactly what was on (`ms-clean`). The Style button reads "Candles · clean" while it is on. Display only.
+back exactly what was on (`ms-clean`). The Style button reads "Candles · clean" while it is on. Display only. While it is on (`html[data-clean="1"]`,
+`merItems` `CL`) a chart writes one "BO" on its last break and one "CF" on its last CF, and `#ms-clean-css` hides the market-cycle
+line, the range / alignment strip, the Context button, each chart's role word and its readout under the chart (owner: "too much labels").
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

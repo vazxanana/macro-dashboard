@@ -173,6 +173,9 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   // 13 Nov 2026, owner: "make the charts more cleaner": the clean look keeps BO, VR and CF only ("just keep bo vr and cf") and is on the first time a device opens the charts
   for (const keep of ['ms-show-bo', 'ms-show-cf', 'ms-show-vr']) assert.doesNotMatch(html.match(/const BUSY = \[[^\]]*\]/)[0], new RegExp(keep));
   assert.match(html, /localStorage\.getItem\('ms-clean-v2'\); localStorage\.setItem\('ms-clean-v2', '1'\)/);
+  // "too much labels": while clean, one BO word and one CF word per chart, and the strips and readouts around the charts are hidden
+  assert.match(html, /text: CL \? \(k === evs\.length - 1 \? 'BO' : ''\)/);
+  assert.match(html, /html\[data-clean="1"\] #v-charts :is\(#ms-cycle, #ms-adr, #ms-mtf, #ms-pa-chips, #ms-cx-tog, \.ms-ro, \.ms-role\)/);
   assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
 });
 

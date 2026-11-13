@@ -3168,6 +3168,8 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       @media (pointer: coarse) { .sty-btn, .sty-seg button, #ms-sty-pop .ms-tbtn { min-height: 44px; } .sty-c input { width: 52px; height: 40px; } }
       </style>
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
+      <style id="ms-clean-css">/* clean look (13 Nov 2026, owner: "too much labels"): only the charts with BO, VR and CF */
+        html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-pa-chips, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
       <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
       <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
         <div class="sty-h">Chart type</div>
@@ -4761,6 +4763,8 @@ function msNextSetup(bars, A) {
   // Split screen's free chart; own = the page's market (its plan and higher-timeframe origins apply), f = price formatter
   function merItems(bars, A, S, tf, items, f, own) { const n = bars.length; const fmt = f;
     const D = G.show.detail, low = tf.sec <= 900;
+    // clean look (13 Nov 2026, owner: "too much labels"): one "BO" word on the last break and one "CF" on the last CF, nothing more
+    const CL = document.documentElement.dataset.clean === '1';
     if (low) items.vlines = markerLines(bars, tf, D);
     if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
     const recent = A.events.slice(D ? -2 : -1), seen = new Set();
@@ -4793,7 +4797,7 @@ function msNextSetup(bars, A) {
     }
     evs.forEach((e, k) => {
       const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
-      if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
+      if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: CL ? (k === evs.length - 1 ? 'BO' : '') : k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
       if (!recent.includes(e)) return;
       const end = e.endIdx !== null ? e.endIdx : n + 26;
       if (G.show.origin) {
@@ -4803,7 +4807,7 @@ function msNextSetup(bars, A) {
       if (G.show.cf) e.cf.forEach((f) => {
         if (seen.has(f.i) || (!D && !f.post)) return; seen.add(f.i);
         items.boxes.push({ kind: 'cf', l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
-        items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
+        if (!CL || (e === recent[recent.length - 1] && f === e.cf[e.cf.length - 1])) items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: CL ? 'CF' : f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
       });
       const vrPt = e.vr ? e.vr : (e === A.last && A.ext ? { i: A.ext.i, p: A.ext.p } : null);
       if (G.show.vr && vrPt && (sell ? vrPt.p < e.bot : vrPt.p > e.top)) {
@@ -5593,11 +5597,13 @@ function msNextSetup(bars, A) {
     // (ms-clean-v2 marks that this was done once; "Clean look" again brings back exactly what was on before)
     const BUSY = ['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'];
     const cb = $('ms-sty-clean'); let was = null; try { was = JSON.parse(localStorage.getItem('ms-clean') || 'null'); } catch (e) {}
-    const mark = () => { cb.setAttribute('aria-pressed', String(!!was)); const n = $('ms-sty-now'); if (n) n.textContent = CS_NAME[G.cs] + (was ? ' · clean' : ''); };
+    const mark = () => { cb.setAttribute('aria-pressed', String(!!was)); document.documentElement.dataset.clean = was ? '1' : ''; const n = $('ms-sty-now'); if (n) n.textContent = CS_NAME[G.cs] + (was ? ' · clean' : ''); };
     const setBox = (id, on) => { const x = $(id); if (x && x.checked !== on) { x.checked = on; x.dispatchEvent(new Event('change', { bubbles: true })); } };
     cb.addEventListener('click', () => {
+      document.documentElement.dataset.clean = was ? '' : '1';   // read by merItems while the boxes below redraw the panes
       if (!was) { was = {}; BUSY.forEach((id) => { const x = $(id); if (x) { was[id] = x.checked; setBox(id, false); } }); }
       else { Object.entries(was).forEach(([id, on]) => setBox(id, on)); was = null; }
+      Object.values(panes).forEach((p) => p.A && p.draw());
       try { was ? localStorage.setItem('ms-clean', JSON.stringify(was)) : localStorage.removeItem('ms-clean'); } catch (e) {} mark(); });
     { let v2 = null; try { v2 = localStorage.getItem('ms-clean-v2'); localStorage.setItem('ms-clean-v2', '1'); } catch (e) { v2 = '1'; }
       // after this script's set-up: the layer checkboxes get their change handlers (and their state from msPrefs) further down
