@@ -38,6 +38,8 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
     keeps the demo broker's rate and the comparison waits for the November 2027 review.
 13. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
     first open-run trade reaches +2R; that one is booked about +1R and may be closed early.
+14. **The Mosha cycle loses in its own backtest (item 54).** If nothing is decided: it stays a main paper system, alerted
+    and copied to the Council demo account, although its 2020-26 backtest lost −0.57R a trade (t −3.99, every year negative).
 14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
     its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
 
@@ -1086,3 +1088,17 @@ figure or demo-mirror setting.
   +1.7R before costs, -18.6R after. Of the 7 trades above, 5 would have been skipped (-7.7R after costs, one of them a +3.65R
   winner) and 2 opened (their fill was still outside the floor).
 - **To undo.** Ask for it; the check is one line in the Trader's market-entry step and two in the replay.
+
+## The Mosha cycle's own backtest, 13 Nov 2026
+
+### [ ] 54. Put the Mosha cycle back to a paper shadow
+
+- **Status (13 Nov 2026): open, waiting on you.** Proposal: `research/proposals/2026-11-13-mcycle-shadow.md`.
+- **Context.** You kept the Mosha cycle as a main paper system on 12 Nov (item 48) with no study behind it. Its first study,
+  `research/edge/mcycle-base/` (the live code run unchanged on gold 2020 → now, after costs, pre-registered), lost
+  −0.574R a trade over 115 trades, t −3.99 on calendar months, in both halves (−0.52R and −0.64R) and every year; worst
+  drawdown 66R; still −0.51R a trade before costs.
+- **Recommendation.** Make it a paper shadow again: an owner rule adding `mcycle` to `config.ownerShadow` (its block reads
+  that setting since pull request #780). An open trade stays live to its own exit with its stop.
+- **If nothing is decided.** It keeps trading as a main paper system and its alerts and demo copies continue.
+
