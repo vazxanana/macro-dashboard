@@ -1299,6 +1299,13 @@ close)` (pure, next to `msCycle`; the row whose parent is that chart: moving / c
 50% then its origin, only a target still ahead of price) labelled "Move to ▼ 3,852.6" etc.; each pane header carries `.ms-cy`
 (`cycleTags`, refreshed with the cycle strip every 10 s): "Moving ▼", "Pulling back ▲", "Continuation ▼", or "Trend ▼" where no
 lower timeframe reads it (M5, M1). On in the clean look too. Display only, a reading of structure, not a tested rule.
+Same day, owner: "better arrows showing where it might retrace, and be more specific on market cycle": the arrow is now a two-leg
+path (`msPath`, pure, next to `msCycle`; `msExpect` is gone): a dashed amber retrace leg first (pulling back: to the 50%, or the
+origin once past it; moving: "Possible retrace to 50%"; continuation: "Possible retest" of the level it broke back through), then
+a solid purple leg back with the move to its extreme ("then ▼ 3,852.6"); a leg only to a level still ahead of price. The pane tag
+names the step and its level (`msStage`): "1 Move ▼ · no pullback yet", "2 Pullback ▲ · 50% at …" (or "past 50%, origin …"),
+"3 Continuation ▼ · from …"; M5 / M1 read the stage of the timeframe above them ("In M15 continuation"); the tooltip says which
+ChoCh / break and the levels. From 1200 px the tag keeps its full width.
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.
