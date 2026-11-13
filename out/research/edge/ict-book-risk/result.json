@@ -1,0 +1,458 @@
+{
+ "topic": "ict-book-risk",
+ "built": "2026-11-13",
+ "system": "ICT desk A-setup book (NQ, ES, YM, RTY, GC pooled): four book-level risk rules against the book as the desk runs it. Lab engine api/_ictlab.js runMarket (the desk's signals / isASetup / sizeOf / simulate) on OANDA mid H1: NAS100, SPX500, US30, US2000, XAU",
+ "preregistered": "PREREGISTRATION.md (committed and pushed alone before run.mjs ran)",
+ "planSha256": "06ef65095640c2d0f6935087d41fd61484440f28e74bc7067c0310960b08a80d",
+ "window": {
+  "from": "2020-01-01",
+  "to": "2026-10-31",
+  "is": "2020-01-01 to 2023-12-31",
+  "oos": "2024-01-01 to 2026-10-31",
+  "candlesTo": "2026-11-09"
+ },
+ "sources": {
+  "nq": {
+   "src": "OANDA nas100 H1 (mid)",
+   "h1": 43928,
+   "sha256": "f278156441fee79f",
+   "unresolved": 0,
+   "gaps": 0
+  },
+  "es": {
+   "src": "OANDA spx500 H1 (mid)",
+   "h1": 43930,
+   "sha256": "6e28ea2a687f057b",
+   "unresolved": 0,
+   "gaps": 0
+  },
+  "ym": {
+   "src": "OANDA us30 H1 (mid)",
+   "h1": 43932,
+   "sha256": "2ab3193ace02e409",
+   "unresolved": 0,
+   "gaps": 0
+  },
+  "rty": {
+   "src": "OANDA us2000 H1 (mid)",
+   "h1": 43916,
+   "sha256": "74d99f67a9ae32fc",
+   "unresolved": 0,
+   "gaps": 0
+  },
+  "gc": {
+   "src": "OANDA xau H1 (mid)",
+   "h1": 44011,
+   "sha256": "40c6ab0d59734203",
+   "unresolved": 0,
+   "gaps": 0
+  }
+ },
+ "costs": "lab COST round trip: NQ 1.5, ES 0.5, YM 3, RTY 0.4 points, gold 0.5; net R = size x (R - cost / risk); live sizing (sizeOf)",
+ "params": {
+  "lossStop": -2,
+  "maxOpen": 2,
+  "volDays": 60,
+  "wMin": 0.3333333333333333,
+  "wMax": 3,
+  "draws": 2000,
+  "seed": 20261113,
+  "alpha": 0.1,
+  "pMin": 0.9
+ },
+ "testsJudged": 4,
+ "multipleTesting": "Holm over the 4 rules on p = 1 - P(better) of the paired monthly block bootstrap, alpha 0.10",
+ "verdict": "FAIL. None of the 4 pre-registered book rules passes; the A-setup book stays sized as it is",
+ "baseline": {
+  "all": {
+   "n": 1707,
+   "R": 179.51,
+   "exp": 0.105,
+   "wr": 0.383,
+   "maxDD": 33.31,
+   "rdd": 5.389,
+   "sharpe": 0.912,
+   "t": 2.78
+  },
+  "is": {
+   "n": 1028,
+   "R": 86.49,
+   "exp": 0.084,
+   "wr": 0.375,
+   "maxDD": 33.31,
+   "rdd": 2.596,
+   "sharpe": 0.677,
+   "t": 1.73
+  },
+  "oos": {
+   "n": 679,
+   "R": 93.02,
+   "exp": 0.137,
+   "wr": 0.396,
+   "maxDD": 18.33,
+   "rdd": 5.075,
+   "sharpe": 1.364,
+   "t": 2.28
+  },
+  "years": {
+   "2020": {
+    "n": 229,
+    "R": 37.5
+   },
+   "2021": {
+    "n": 260,
+    "R": 14.55
+   },
+   "2022": {
+    "n": 272,
+    "R": 36.13
+   },
+   "2023": {
+    "n": 267,
+    "R": -1.69
+   },
+   "2024": {
+    "n": 234,
+    "R": 25.1
+   },
+   "2025": {
+    "n": 237,
+    "R": 43.2
+   },
+   "2026": {
+    "n": 208,
+    "R": 24.73
+   }
+  }
+ },
+ "candidates": [
+  {
+   "rule": "R1: One position per same-side index cluster (first signal wins; gold apart)",
+   "test": "R1",
+   "verdict": "FAIL",
+   "checks": {
+    "isRddBetter": false,
+    "oosRddBetter": false,
+    "oosSharpeNotLower": false,
+    "bootstrap": false,
+    "holm": false
+   },
+   "is": {
+    "n": 747,
+    "R": 52.15,
+    "exp": 0.07,
+    "wr": 0.375,
+    "maxDD": 29.48,
+    "rdd": 1.769,
+    "sharpe": 0.609,
+    "t": 1.24
+   },
+   "oos": {
+    "n": 516,
+    "R": 56.19,
+    "exp": 0.109,
+    "wr": 0.399,
+    "maxDD": 12.54,
+    "rdd": 4.483,
+    "sharpe": 1.194,
+    "t": 1.66
+   },
+   "all": {
+    "n": 1263,
+    "R": 108.34,
+    "exp": 0.086,
+    "wr": 0.385,
+    "maxDD": 29.48,
+    "rdd": 3.675,
+    "sharpe": 0.814,
+    "t": 2.01
+   },
+   "years": {
+    "2020": {
+     "n": 160,
+     "R": 31.08
+    },
+    "2021": {
+     "n": 201,
+     "R": 2.01
+    },
+    "2022": {
+     "n": 181,
+     "R": 21.4
+    },
+    "2023": {
+     "n": 205,
+     "R": -2.34
+    },
+    "2024": {
+     "n": 182,
+     "R": 15.89
+    },
+    "2025": {
+     "n": 179,
+     "R": 38.56
+    },
+    "2026": {
+     "n": 155,
+     "R": 1.74
+    }
+   },
+   "skipped": 444,
+   "skippedR": 71.17,
+   "bootstrap": {
+    "pBetter": 0.33,
+    "draws": 2000,
+    "seed": 20261113,
+    "holmP": 1
+   }
+  },
+  {
+   "rule": "R2: Daily loss stop: no new entry after -2R closed that New York trading day",
+   "test": "R2",
+   "verdict": "FAIL",
+   "checks": {
+    "isRddBetter": false,
+    "oosRddBetter": true,
+    "oosSharpeNotLower": true,
+    "bootstrap": false,
+    "holm": false
+   },
+   "is": {
+    "n": 1008,
+    "R": 85.57,
+    "exp": 0.085,
+    "wr": 0.374,
+    "maxDD": 35.34,
+    "rdd": 2.422,
+    "sharpe": 0.66,
+    "t": 1.73
+   },
+   "oos": {
+    "n": 658,
+    "R": 97.63,
+    "exp": 0.148,
+    "wr": 0.395,
+    "maxDD": 17.09,
+    "rdd": 5.713,
+    "sharpe": 1.417,
+    "t": 2.41
+   },
+   "all": {
+    "n": 1666,
+    "R": 183.21,
+    "exp": 0.11,
+    "wr": 0.382,
+    "maxDD": 35.34,
+    "rdd": 5.185,
+    "sharpe": 0.918,
+    "t": 2.86
+   },
+   "years": {
+    "2020": {
+     "n": 224,
+     "R": 39.08
+    },
+    "2021": {
+     "n": 257,
+     "R": 17.44
+    },
+    "2022": {
+     "n": 266,
+     "R": 32.38
+    },
+    "2023": {
+     "n": 261,
+     "R": -3.32
+    },
+    "2024": {
+     "n": 227,
+     "R": 25.84
+    },
+    "2025": {
+     "n": 228,
+     "R": 45.38
+    },
+    "2026": {
+     "n": 203,
+     "R": 26.42
+    }
+   },
+   "skipped": 41,
+   "skippedR": -3.7,
+   "bootstrap": {
+    "pBetter": 0.6225,
+    "draws": 2000,
+    "seed": 20261113,
+    "holmP": 1
+   }
+  },
+  {
+   "rule": "R3: At most 2 open positions in the book",
+   "test": "R3",
+   "verdict": "FAIL",
+   "checks": {
+    "isRddBetter": false,
+    "oosRddBetter": true,
+    "oosSharpeNotLower": true,
+    "bootstrap": false,
+    "holm": false
+   },
+   "is": {
+    "n": 857,
+    "R": 69.15,
+    "exp": 0.081,
+    "wr": 0.379,
+    "maxDD": 27.2,
+    "rdd": 2.542,
+    "sharpe": 0.692,
+    "t": 1.52
+   },
+   "oos": {
+    "n": 583,
+    "R": 82.14,
+    "exp": 0.141,
+    "wr": 0.41,
+    "maxDD": 14.2,
+    "rdd": 5.786,
+    "sharpe": 1.465,
+    "t": 2.16
+   },
+   "all": {
+    "n": 1440,
+    "R": 151.29,
+    "exp": 0.105,
+    "wr": 0.392,
+    "maxDD": 27.2,
+    "rdd": 5.561,
+    "sharpe": 0.966,
+    "t": 2.55
+   },
+   "years": {
+    "2020": {
+     "n": 191,
+     "R": 32.68
+    },
+    "2021": {
+     "n": 225,
+     "R": 11.16
+    },
+    "2022": {
+     "n": 215,
+     "R": 29.87
+    },
+    "2023": {
+     "n": 226,
+     "R": -4.56
+    },
+    "2024": {
+     "n": 206,
+     "R": 19.22
+    },
+    "2025": {
+     "n": 199,
+     "R": 36.35
+    },
+    "2026": {
+     "n": 178,
+     "R": 26.57
+    }
+   },
+   "skipped": 267,
+   "skippedR": 28.23,
+   "bootstrap": {
+    "pBetter": 0.513,
+    "draws": 2000,
+    "seed": 20261113,
+    "holmP": 1
+   }
+  },
+  {
+   "rule": "R4: Inverse-volatility weight per market (60 trading days of daily R, mean weight 1, clipped 1/3 to 3)",
+   "test": "R4",
+   "verdict": "FAIL",
+   "checks": {
+    "isRddBetter": true,
+    "oosRddBetter": false,
+    "oosSharpeNotLower": false,
+    "bootstrap": false,
+    "holm": false
+   },
+   "is": {
+    "n": 1028,
+    "R": 97.31,
+    "exp": 0.095,
+    "wr": 0.375,
+    "maxDD": 34.59,
+    "rdd": 2.813,
+    "sharpe": 0.761,
+    "t": 1.86
+   },
+   "oos": {
+    "n": 679,
+    "R": 82.79,
+    "exp": 0.122,
+    "wr": 0.396,
+    "maxDD": 22.25,
+    "rdd": 3.721,
+    "sharpe": 1.093,
+    "t": 2
+   },
+   "all": {
+    "n": 1707,
+    "R": 180.1,
+    "exp": 0.106,
+    "wr": 0.383,
+    "maxDD": 34.59,
+    "rdd": 5.206,
+    "sharpe": 0.886,
+    "t": 2.7
+   },
+   "years": {
+    "2020": {
+     "n": 229,
+     "R": 40.98
+    },
+    "2021": {
+     "n": 260,
+     "R": 20.82
+    },
+    "2022": {
+     "n": 272,
+     "R": 41.72
+    },
+    "2023": {
+     "n": 267,
+     "R": -6.21
+    },
+    "2024": {
+     "n": 234,
+     "R": 16.7
+    },
+    "2025": {
+     "n": 237,
+     "R": 43.02
+    },
+    "2026": {
+     "n": 208,
+     "R": 23.07
+    }
+   },
+   "skipped": 0,
+   "skippedR": 0,
+   "bootstrap": {
+    "pBetter": 0.4115,
+    "draws": 2000,
+    "seed": 20261113,
+    "holmP": 1
+   },
+   "weights": {
+    "min": 0.3333,
+    "median": 0.9955,
+    "max": 2.6386,
+    "clippedLow": 20,
+    "clippedHigh": 0
+   }
+  }
+ ],
+ "notes": "Pre-registered (sha256 above). IS = entries 2020-23, OOS = entries 2024-01-01 to 2026-10-31. OANDA cash CFDs stand in for the futures the desk trades. A rule only skips a trade or scales its size; every trade keeps the engine's own stop. Paper research: nothing under ict/ or the ICT rule book changes."
+}
