@@ -169,9 +169,9 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   for (const v of ['candles', 'line', 'both']) assert.match(html, new RegExp(`data-cs="${v}"`));
   for (const id of ['ms-sty-bg', 'ms-sty-up', 'ms-sty-dn', 'ms-sty-ln']) assert.match(html, new RegExp(`id="${id}" value="#`));
   assert.match(html, /localStorage\.setItem\('ms-colors'/); assert.match(html, /function setCs\(m\)/);
-  assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-ibos', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'\]/);
+  assert.match(html, /const BUSY = \['ms-show-hist', 'ms-show-vol', 'ms-show-shade', 'ms-show-kl', 'ms-show-news', 'ms-show-zones', 'ms-show-mosha', 'ms-show-cycle', 'ms-show-htf', 'ms-show-sess', 'ms-show-ct', 'ms-show-replica', 'ms-show-detail', 'ms-show-origin', 'ms-show-next', 'ms-show-plan'\]/);
   // 13 Nov 2026, owner: "make the charts more cleaner": the clean look keeps BO, VR and CF only ("just keep bo vr and cf") and is on the first time a device opens the charts
-  for (const keep of ['ms-show-bo', 'ms-show-cf', 'ms-show-vr']) assert.doesNotMatch(html.match(/const BUSY = \[[^\]]*\]/)[0], new RegExp(keep));
+  for (const keep of ['ms-show-bo', 'ms-show-cf', 'ms-show-vr', 'ms-show-ibos']) assert.doesNotMatch(html.match(/const BUSY = \[[^\]]*\]/)[0], new RegExp(keep));
   assert.match(html, /localStorage\.getItem\('ms-clean-v2'\); localStorage\.setItem\('ms-clean-v2', '1'\)/);
   // "too much labels": while clean, one BO word and one CF word per chart, and the strips and readouts around the charts are hidden
   assert.match(html, /text: CL \? \(k === evs\.length - 1 \? 'BO' : ''\)/);
@@ -201,4 +201,21 @@ test('fresh zones: a break down takes the last green candle as the supply OB; on
 test('fresh zones wired: own layer, BO and iBO breaks, the three nearest to price a side', () => {
   assert.match(html, /data-show="zones" checked/); assert.match(html, /zones: true/); assert.match(html, /G\.show\.zones !== false/);
   assert.match(html, /msZones\(bars, brk, nc\)\.filter\(\(z\) => z\.fresh\)/); assert.match(html, /\.slice\(0, 3\)\.forEach\(\(z\) => \{ const dem = d > 0;/);
+});
+
+// 13 Nov 2026, owner: "it should show an arrow of the move he is expecting and which market cycle we are in right now in each timeframe"
+const msExpect = new Function(`${html.slice(html.indexOf('function msExpect'), html.indexOf('function msCycle'))}; return msExpect;`)();
+test('expected move: a move points at its extreme, a pullback at the 50% then the origin, never at a level already passed', () => {
+  const T = { p50: 4050, origin: 4100, far: 4150, ext: 4000 };
+  assert.deepEqual(msExpect({ dir: -1, phase: 'move', target: T }, 4030), { dir: -1, p: 4000, word: 'Move to', phase: 'move' });
+  assert.equal(msExpect({ dir: -1, phase: 'resumed', target: T }, 4030).word, 'Continuation to');
+  assert.deepEqual(msExpect({ dir: -1, phase: 'pullback', target: T }, 4020), { dir: 1, p: 4050, word: 'Pullback to 50%', phase: 'pullback' });
+  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4070).p, 4100);
+  assert.equal(msExpect({ dir: -1, phase: 'pullback', target: T }, 4120), null);
+  assert.equal(msExpect({ dir: -1, phase: 'move', target: T }, 3990), null);
+  assert.equal(msExpect({ dir: -1, phase: 'none', target: T }, 4030), null);
+});
+test('expected move and cycle tag are wired: an arrow on the chart, a tag in every pane header', () => {
+  assert.match(html, /items\.segs\.push\(\{ l1: n - 1, p1: bars\[n - 1\]\.close, l2: n \+ 16, p2: ex\.p, color: CYC, w: 2, arrow: true/);
+  assert.match(html, /if \(sg\.arrow\)/); assert.match(html, /function cycleTags\(CY\)/); assert.match(html, /\.ms-ph \.ms-cy \{/);
 });
