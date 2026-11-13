@@ -69,6 +69,7 @@ paper system with a measured, clearly negative record.
 | 51 | London-open range breakout on six forex pairs (follow or fade) | 9,875 (2020 →) | 0 of 3; follow +0.08R gross but −0.050R net (t −2.3) and worse than random entries; fade −0.81R | #868 |
 | 52 | G10 currency momentum, monthly: buy the 2 strongest, sell the 2 weakest against USD (published) | 130 months (2016 →) | −0.244 / −0.152R a month (t −1.8 / −1.1); flat before costs; random picks do as well (carry not measurable) | #869 |
 | 53 | Gold/silver H1 divergence ("SMT" as a plain rule): fade or follow gold's unconfirmed new high / low | 2,519 / 2,325 (2020 →) | −0.084 / −0.075R a trade (month t −3.4 / −2.9); flat before costs; gold-only new highs do as well, so silver adds nothing | #870 |
+| 54 | Follow or fade the first 15 minutes after US CPI (gold, EUR/USD, USD/JPY, NAS100) | 81 events (2020 →) | 0 of 4; following loses (−0.20 / −0.25R an event, as on random days), fading is flat (+0.001R) | #871 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
