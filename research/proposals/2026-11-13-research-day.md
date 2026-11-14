@@ -216,6 +216,7 @@ paper system with a measured, clearly negative record.
 | 198 | Gold around the Chinese Lunar New Year and Golden Week (`gold-china-holidays`) | **FAIL**: long in the 10 days before the Lunar New Year, 2017-26, +0.224R a trade net (n 10, t 1.38, Holm p 0.81), beat 31 of 40 placebo seeds; the shut week and after it, and Golden Week, no better (t ≤ 0.71). Gold's trend, not the holiday | #1011 |
 | 199 | MMXM previous-day raid model on gold (`mmxm-pdhl-raid-gold`) | **FAIL**: 12 trades in 8.8 years; New York + midnight filter 2021-26 −0.131R a trade net (n 7, t −0.32), London and silver SMT worse; placebo 24 of 40. The M15 shift within 2 h after the raid is rare (35 of 515 raids) | #1012 |
 | 200 | Volatility squeeze breakout on gold, Bollinger inside Keltner (`gold-squeeze`) | **FAIL**, 0 of 3: H4 release 2021-26 −0.086R a trade net (n 108, t −0.58; 2016-20 +0.230R did not repeat), D1 −0.479R, with the 50-period slope −0.231R; all under the random-entry placebo median | #1013 |
+| 201 | Round-number levels on gold, $100 and $50 (`gold-round-numbers`) | **FAIL**, 0 of 3: fading the first touch of a $100 level 2021-26 −0.090R a trade net (n 344, t −1.37), $50 levels −0.219R (worst of 41 grids), following a close through $100 −0.062R; no better than random levels with the same spacing | #1014 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
