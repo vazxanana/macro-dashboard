@@ -61,6 +61,7 @@ paper system with a measured, clearly negative record.
 | 295 | Gold after three white soldiers / three black crows (daily, 10-day hold) | **FAIL, 0 of 3**: follow OOS +0.122R net (n 32, t 0.58), +0.110R over the same-side baseline (t 0.50); fade −0.106R; looser bodies +0.009R; buys ride gold's rise, sells lose | #1108 |
 | 296 | Daily 1-2-3 structure flip on gold (higher low then close above the swing high), 10-day hold | **FAIL, 0 of 3**: both sides +0.024R OOS (n 93, t 0.22), lost IS; longs +0.121R below buying every 10th day (+0.219R); shorts −0.146R | #1109 |
 | 297 | Fading gold's month-to-date move at mid-month (day 10, 5-day hold, both sides) | **FAIL, 0 of 3**: OOS −0.097R (n 118, t −1.47), beat 7 of 40 placebos; if anything gold kept going with the month's move; T2/T3 negative too | #1110 |
+| 298 | Gold after an outside week with a strong close (top/bottom third), 10-day hold | **FAIL, 0 of 3**: OOS −0.065R (n 42, t −0.44), IS −0.182R; same as every strong-close week (Welch t −0.27); buys ride gold's rise, sells lose | #1111 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
