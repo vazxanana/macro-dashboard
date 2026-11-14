@@ -188,6 +188,7 @@ paper system with a measured, clearly negative record.
 | 170 | The untested backlog (`research/proposals/2026-11-14-untested-backlog.md`) | 247 tested topics listed; data reach checked again on 14 Nov. Seven untested hypotheses are ranked: (1) FOMC even-week cycle on US indices; (2) CPI and payrolls announcement-day premium on indices and bonds; 3 is held, 4-7 low priority. Its reading: the space reachable with free mid-price data is close to exhausted | #989 |
 | 171 | FOMC-cycle even weeks on US indices (`fomc-even-week`) | **FAIL**: US500 2017-now even minus odd weeks −0.028 % a day net, t −0.73 (77 cycles), beats 14 of 40 placebos; 2008-16 was positive (t 1.74) and the sign flipped after 2016 on all three indices | #990 |
 | 172 | Announcement-day premium, CPI and payrolls days (`announcement-premium`) | **FAIL**, 0 of 5: SPX500 2017-26 release days −0.080 % a day net vs other days (n 224, t −0.93, placebo median); no premium even gross on any index or bond CFD (largest |t| 1.33) | #991 |
+| 173 | Pre-holiday day on non-US indices, local calendars (`local-preholiday`) | **FAIL**: 9 indices pooled 2017-26, +0.022R net over ordinary days (230 dates, Welch t 1.01, Holm p 1.00); loses at 2x costs; same small pre-cost sign as the US `pre-holiday` study, eaten by spread and financing | #992 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
