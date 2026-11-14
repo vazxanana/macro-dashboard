@@ -122,6 +122,7 @@ paper system with a measured, clearly negative record.
 | 104 | Gold's Asian session after the New York cash-session move (fade / follow / fade big days) | FAIL, 0 of 3: every stream within 0.02R of zero before costs, the $0.30 round trip takes it below; correlation −0.004 since 2016, so no index-style reversal in gold | #923 |
 | 105 | IBS frozen replication (#895's rule, byte for byte) on DE40, UK100, EU50, FR40, JP225, AU200, HK33 | DOES NOT REPLICATE: pooled 2016-now −0.041R a trade (n 3543, t −1.97), all seven negative, placebo 19 of 40; it was there in 2005-15 and has faded | #924 |
 | 106 | Pre-FOMC drift in gold and a short-USD basket (T−24h to T−15min, 1 ATR stop) | FAIL 0 of 2: 2016-now gold +0.070R (t 1.26), basket +0.061R (t 1.32), Holm p 0.19; gold negative in 2008-15; not above the placebo's 95th percentile | #925 |
+| 107 | A sharp M15 move in US 10-year bonds leading gold and USD/JPY for one hour | FAIL 0 of 3: real lead before costs (gross t 2.0-2.9 since 2016, beats same-hour placebo) but net −0.07 to −0.12R a trade; one hour of it is smaller than the cost | #926 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
