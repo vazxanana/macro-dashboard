@@ -124,6 +124,7 @@ paper system with a measured, clearly negative record.
 | 106 | Pre-FOMC drift in gold and a short-USD basket (T−24h to T−15min, 1 ATR stop) | FAIL 0 of 2: 2016-now gold +0.070R (t 1.26), basket +0.061R (t 1.32), Holm p 0.19; gold negative in 2008-15; not above the placebo's 95th percentile | #925 |
 | 107 | A sharp M15 move in US 10-year bonds leading gold and USD/JPY for one hour | FAIL 0 of 3: real lead before costs (gross t 2.0-2.9 since 2016, beats same-hour placebo) but net −0.07 to −0.12R a trade; one hour of it is smaller than the cost | #926 |
 | 108 | China's 01:15 UTC yuan fix: follow / fade USD/CNH, AUD/USD as a proxy (2-hour hold) | FAIL 0 of 3: net −0.04 to −1.34R a trade; before costs both follow and fade are positive (a shape of the trade, not the fix), and 01:15 is not set apart from 25 other Asian quarter hours | #927 |
+| 109 | Frozen replication of the forex Sunday-gap fade (#880 rule G): six new crosses 2020-now, #880's majors 2010-15 | PARTLY: crosses +0.238R a trade (n 294, month t 2.99, Holm p 0.003, holds at 2x cost) but 228 of those weekends overlap #880's and 2026 carries much of it; majors 2010-15 flat (+0.003R) | #928 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
