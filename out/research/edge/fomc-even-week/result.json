@@ -1,0 +1,1209 @@
+{
+ "study": "fomc-even-week",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/fomc-even-week/PREREGISTRATION.md",
+ "source": "Federal Reserve FOMC meeting calendars (scheduled meetings), 2008-2021 as in research/edge/pre-fomc-drift/events.mjs; 2022 on from council/events.mjs",
+ "meetings": 151,
+ "unscheduled": [
+  "2008-01-22",
+  "2008-10-08",
+  "2010-05-09",
+  "2020-03-03",
+  "2020-03-15"
+ ],
+ "rule": "long from the close before each week of the FOMC cycle to the close of its last day (week w = days 5w-1..5w+3 after the statement day), stop entry - 2 x ATR(20); weeks 2, 4, 6 against weeks 1, 3, 5; week 0 not used",
+ "costs": {
+  "points": {
+   "spx500": 1,
+   "nas100": 2,
+   "us30": 3
+  },
+  "financingYear": 0.06
+ },
+ "units": "% of price a day",
+ "markets": {
+  "spx500": {
+   "from": "2003-03-24",
+   "to": "2026-11-06",
+   "days": 6124,
+   "updated": "2026-11-07T22:49:05.000Z",
+   "drop": {
+    "noDay0": [
+     "2026-12-09"
+    ],
+    "cut": 121,
+    "data": 0,
+    "hole": 0,
+    "unscheduled": 7
+   },
+   "windows": {
+    "IS": {
+     "cycles": 72,
+     "Dnet": 0.1031,
+     "tNet": 1.74,
+     "Dgross": 0.103,
+     "tGross": 1.73,
+     "even": {
+      "windows": 166,
+      "netDay": 0.033,
+      "grossDay": 0.0677,
+      "monthT": 0.83,
+      "months": 107,
+      "stops": 27
+     },
+     "odd": {
+      "windows": 200,
+      "netDay": -0.0648,
+      "grossDay": -0.0302,
+      "monthT": -2.06,
+      "months": 108,
+      "stops": 39
+     },
+     "x2": {
+      "cycles": 72,
+      "Dnet": 0.1032,
+      "tNet": 1.75,
+      "Dgross": 0.103,
+      "tGross": 1.73,
+      "even": {
+       "windows": 166,
+       "netDay": -0.0017,
+       "grossDay": 0.0677,
+       "monthT": -0.04,
+       "months": 107,
+       "stops": 27
+      },
+      "odd": {
+       "windows": 200,
+       "netDay": -0.0995,
+       "grossDay": -0.0302,
+       "monthT": -3.18,
+       "months": 108,
+       "stops": 39
+      }
+     },
+     "S1": {
+      "cycles": 72,
+      "Dnet": 0.0863,
+      "tNet": 1.49,
+      "Dgross": 0.0865,
+      "tGross": 1.48,
+      "even": {
+       "windows": 149,
+       "netDay": 0.0134,
+       "grossDay": 0.0485,
+       "monthT": 0.33,
+       "months": 103,
+       "stops": 27
+      },
+      "odd": {
+       "windows": 180,
+       "netDay": -0.0832,
+       "grossDay": -0.0483,
+       "monthT": -1.84,
+       "months": 108,
+       "stops": 39
+      }
+     },
+     "S2": {
+      "cycles": 72,
+      "Dnet": 0.1182,
+      "tNet": 2.02,
+      "Dgross": 0.1185,
+      "tGross": 2.01,
+      "even": {
+       "windows": 168,
+       "netDay": 0.0363,
+       "grossDay": 0.0711,
+       "monthT": 0.95,
+       "months": 107,
+       "stops": 27
+      },
+      "odd": {
+       "windows": 202,
+       "netDay": -0.0763,
+       "grossDay": -0.0417,
+       "monthT": -2.19,
+       "months": 108,
+       "stops": 41
+      }
+     }
+    },
+    "OOS": {
+     "cycles": 77,
+     "Dnet": -0.0281,
+     "tNet": -0.73,
+     "Dgross": -0.0278,
+     "tGross": -0.71,
+     "even": {
+      "windows": 184,
+      "netDay": 0.009,
+      "grossDay": 0.0346,
+      "monthT": 0.34,
+      "months": 115,
+      "stops": 34
+     },
+     "odd": {
+      "windows": 222,
+      "netDay": 0.0403,
+      "grossDay": 0.0656,
+      "monthT": 1.49,
+      "months": 115,
+      "stops": 47
+     },
+     "x2": {
+      "cycles": 77,
+      "Dnet": -0.0285,
+      "tNet": -0.74,
+      "Dgross": -0.0278,
+      "tGross": -0.71,
+      "even": {
+       "windows": 184,
+       "netDay": -0.0166,
+       "grossDay": 0.0346,
+       "monthT": -0.64,
+       "months": 115,
+       "stops": 34
+      },
+      "odd": {
+       "windows": 222,
+       "netDay": 0.0151,
+       "grossDay": 0.0656,
+       "monthT": 0.56,
+       "months": 115,
+       "stops": 47
+      }
+     },
+     "S1": {
+      "cycles": 77,
+      "Dnet": -0.0649,
+      "tNet": -1.59,
+      "Dgross": -0.0651,
+      "tGross": -1.58,
+      "even": {
+       "windows": 160,
+       "netDay": -0.0074,
+       "grossDay": 0.0185,
+       "monthT": -0.29,
+       "months": 115,
+       "stops": 25
+      },
+      "odd": {
+       "windows": 189,
+       "netDay": 0.0477,
+       "grossDay": 0.0737,
+       "monthT": 1.67,
+       "months": 115,
+       "stops": 33
+      }
+     },
+     "S2": {
+      "cycles": 77,
+      "Dnet": -0.0334,
+      "tNet": -0.86,
+      "Dgross": -0.0331,
+      "tGross": -0.84,
+      "even": {
+       "windows": 186,
+       "netDay": -0.0016,
+       "grossDay": 0.0238,
+       "monthT": -0.06,
+       "months": 116,
+       "stops": 36
+      },
+      "odd": {
+       "windows": 223,
+       "netDay": 0.0361,
+       "grossDay": 0.0613,
+       "monthT": 1.32,
+       "months": 116,
+       "stops": 48
+      }
+     },
+     "p": 0.7673,
+     "pHolm": 1
+    },
+    "FULL": {
+     "cycles": 149,
+     "Dnet": 0.0353,
+     "tNet": 1,
+     "Dgross": 0.0354,
+     "tGross": 1,
+     "even": {
+      "windows": 350,
+      "netDay": 0.0204,
+      "grossDay": 0.0503,
+      "monthT": 0.88,
+      "months": 222,
+      "stops": 61
+     },
+     "odd": {
+      "windows": 422,
+      "netDay": -0.0095,
+      "grossDay": 0.0202,
+      "monthT": -0.46,
+      "months": 223,
+      "stops": 86
+     },
+     "x2": {
+      "cycles": 149,
+      "Dnet": 0.0352,
+      "tNet": 1,
+      "Dgross": 0.0354,
+      "tGross": 1,
+      "even": {
+       "windows": 350,
+       "netDay": -0.0095,
+       "grossDay": 0.0503,
+       "monthT": -0.41,
+       "months": 222,
+       "stops": 61
+      },
+      "odd": {
+       "windows": 422,
+       "netDay": -0.0392,
+       "grossDay": 0.0202,
+       "monthT": -1.89,
+       "months": 223,
+       "stops": 86
+      }
+     },
+     "S1": {
+      "cycles": 149,
+      "Dnet": 0.0082,
+      "tNet": 0.23,
+      "Dgross": 0.0081,
+      "tGross": 0.23,
+      "even": {
+       "windows": 309,
+       "netDay": 0.0026,
+       "grossDay": 0.033,
+       "monthT": 0.11,
+       "months": 218,
+       "stops": 52
+      },
+      "odd": {
+       "windows": 369,
+       "netDay": -0.0161,
+       "grossDay": 0.0142,
+       "monthT": -0.6,
+       "months": 223,
+       "stops": 72
+      }
+     },
+     "S2": {
+      "cycles": 149,
+      "Dnet": 0.0399,
+      "tNet": 1.13,
+      "Dgross": 0.0402,
+      "tGross": 1.14,
+      "even": {
+       "windows": 354,
+       "netDay": 0.0164,
+       "grossDay": 0.0462,
+       "monthT": 0.7,
+       "months": 223,
+       "stops": 63
+      },
+      "odd": {
+       "windows": 425,
+       "netDay": -0.0173,
+       "grossDay": 0.0123,
+       "monthT": -0.78,
+       "months": 224,
+       "stops": 89
+      }
+     }
+    }
+   },
+   "byYear": {
+    "2008": {
+     "cycles": 8,
+     "Dnet": 0.0065
+    },
+    "2009": {
+     "cycles": 8,
+     "Dnet": 0.2324
+    },
+    "2010": {
+     "cycles": 8,
+     "Dnet": 0.4305
+    },
+    "2011": {
+     "cycles": 8,
+     "Dnet": 0.2588
+    },
+    "2012": {
+     "cycles": 8,
+     "Dnet": 0.0133
+    },
+    "2013": {
+     "cycles": 8,
+     "Dnet": -0.0835
+    },
+    "2014": {
+     "cycles": 8,
+     "Dnet": -0.2251
+    },
+    "2015": {
+     "cycles": 8,
+     "Dnet": 0.1254
+    },
+    "2016": {
+     "cycles": 8,
+     "Dnet": 0.1698
+    },
+    "2017": {
+     "cycles": 8,
+     "Dnet": -0.0175
+    },
+    "2018": {
+     "cycles": 8,
+     "Dnet": -0.1199
+    },
+    "2019": {
+     "cycles": 8,
+     "Dnet": -0.116
+    },
+    "2020": {
+     "cycles": 7,
+     "Dnet": -0.3648
+    },
+    "2021": {
+     "cycles": 8,
+     "Dnet": -0.0074
+    },
+    "2022": {
+     "cycles": 8,
+     "Dnet": -0.0127
+    },
+    "2023": {
+     "cycles": 8,
+     "Dnet": 0.1739
+    },
+    "2024": {
+     "cycles": 8,
+     "Dnet": 0.0886
+    },
+    "2025": {
+     "cycles": 8,
+     "Dnet": -0.0144
+    },
+    "2026": {
+     "cycles": 6,
+     "Dnet": 0.0987
+    }
+   }
+  },
+  "nas100": {
+   "from": "2003-03-24",
+   "to": "2026-11-06",
+   "days": 6124,
+   "updated": "2026-11-07T22:49:05.000Z",
+   "drop": {
+    "noDay0": [
+     "2026-12-09"
+    ],
+    "cut": 121,
+    "data": 0,
+    "hole": 0,
+    "unscheduled": 7
+   },
+   "windows": {
+    "IS": {
+     "cycles": 72,
+     "Dnet": 0.1207,
+     "tNet": 1.87,
+     "Dgross": 0.1203,
+     "tGross": 1.85,
+     "even": {
+      "windows": 166,
+      "netDay": 0.0579,
+      "grossDay": 0.0943,
+      "monthT": 1.35,
+      "months": 107,
+      "stops": 31
+     },
+     "odd": {
+      "windows": 200,
+      "netDay": -0.0487,
+      "grossDay": -0.0119,
+      "monthT": -1.38,
+      "months": 108,
+      "stops": 34
+     },
+     "x2": {
+      "cycles": 72,
+      "Dnet": 0.121,
+      "tNet": 1.88,
+      "Dgross": 0.1203,
+      "tGross": 1.85,
+      "even": {
+       "windows": 166,
+       "netDay": 0.0216,
+       "grossDay": 0.0943,
+       "monthT": 0.51,
+       "months": 107,
+       "stops": 31
+      },
+      "odd": {
+       "windows": 200,
+       "netDay": -0.0855,
+       "grossDay": -0.0119,
+       "monthT": -2.44,
+       "months": 108,
+       "stops": 34
+      }
+     },
+     "S1": {
+      "cycles": 72,
+      "Dnet": 0.1174,
+      "tNet": 1.79,
+      "Dgross": 0.1178,
+      "tGross": 1.79,
+      "even": {
+       "windows": 149,
+       "netDay": 0.0604,
+       "grossDay": 0.098,
+       "monthT": 1.34,
+       "months": 103,
+       "stops": 22
+      },
+      "odd": {
+       "windows": 180,
+       "netDay": -0.0616,
+       "grossDay": -0.0245,
+       "monthT": -1.43,
+       "months": 108,
+       "stops": 37
+      }
+     },
+     "S2": {
+      "cycles": 72,
+      "Dnet": 0.133,
+      "tNet": 2.06,
+      "Dgross": 0.133,
+      "tGross": 2.05,
+      "even": {
+       "windows": 168,
+       "netDay": 0.0588,
+       "grossDay": 0.0953,
+       "monthT": 1.41,
+       "months": 107,
+       "stops": 31
+      },
+      "odd": {
+       "windows": 202,
+       "netDay": -0.0614,
+       "grossDay": -0.0247,
+       "monthT": -1.56,
+       "months": 108,
+       "stops": 36
+      }
+     }
+    },
+    "OOS": {
+     "cycles": 77,
+     "Dnet": -0.0395,
+     "tNet": -0.74,
+     "Dgross": -0.0387,
+     "tGross": -0.72,
+     "even": {
+      "windows": 184,
+      "netDay": 0.0202,
+      "grossDay": 0.0446,
+      "monthT": 0.59,
+      "months": 115,
+      "stops": 30
+     },
+     "odd": {
+      "windows": 222,
+      "netDay": 0.0628,
+      "grossDay": 0.0864,
+      "monthT": 1.67,
+      "months": 115,
+      "stops": 50
+     },
+     "x2": {
+      "cycles": 77,
+      "Dnet": -0.0403,
+      "tNet": -0.76,
+      "Dgross": -0.0387,
+      "tGross": -0.72,
+      "even": {
+       "windows": 184,
+       "netDay": -0.0043,
+       "grossDay": 0.0446,
+       "monthT": -0.13,
+       "months": 115,
+       "stops": 30
+      },
+      "odd": {
+       "windows": 222,
+       "netDay": 0.0391,
+       "grossDay": 0.0864,
+       "monthT": 1.05,
+       "months": 115,
+       "stops": 50
+      }
+     },
+     "S1": {
+      "cycles": 77,
+      "Dnet": -0.1306,
+      "tNet": -2.15,
+      "Dgross": -0.1313,
+      "tGross": -2.15,
+      "even": {
+       "windows": 160,
+       "netDay": -0.0373,
+       "grossDay": -0.0134,
+       "monthT": -0.95,
+       "months": 115,
+       "stops": 30
+      },
+      "odd": {
+       "windows": 189,
+       "netDay": 0.0829,
+       "grossDay": 0.1073,
+       "monthT": 2.19,
+       "months": 115,
+       "stops": 34
+      }
+     },
+     "S2": {
+      "cycles": 77,
+      "Dnet": -0.0453,
+      "tNet": -0.85,
+      "Dgross": -0.0446,
+      "tGross": -0.83,
+      "even": {
+       "windows": 186,
+       "netDay": 0.0076,
+       "grossDay": 0.0319,
+       "monthT": 0.21,
+       "months": 116,
+       "stops": 32
+      },
+      "odd": {
+       "windows": 223,
+       "netDay": 0.0575,
+       "grossDay": 0.0811,
+       "monthT": 1.52,
+       "months": 116,
+       "stops": 51
+      }
+     },
+     "p": 0.77035,
+     "pHolm": 1
+    },
+    "FULL": {
+     "cycles": 149,
+     "Dnet": 0.0379,
+     "tNet": 0.9,
+     "Dgross": 0.0381,
+     "tGross": 0.9,
+     "even": {
+      "windows": 350,
+      "netDay": 0.0381,
+      "grossDay": 0.0682,
+      "monthT": 1.4,
+      "months": 222,
+      "stops": 61
+     },
+     "odd": {
+      "windows": 422,
+      "netDay": 0.0099,
+      "grossDay": 0.0398,
+      "monthT": 0.38,
+      "months": 223,
+      "stops": 84
+     },
+     "x2": {
+      "cycles": 149,
+      "Dnet": 0.0377,
+      "tNet": 0.9,
+      "Dgross": 0.0381,
+      "tGross": 0.9,
+      "even": {
+       "windows": 350,
+       "netDay": 0.008,
+       "grossDay": 0.0682,
+       "monthT": 0.3,
+       "months": 222,
+       "stops": 61
+      },
+      "odd": {
+       "windows": 422,
+       "netDay": -0.0199,
+       "grossDay": 0.0398,
+       "monthT": -0.77,
+       "months": 223,
+       "stops": 84
+      }
+     },
+     "S1": {
+      "cycles": 149,
+      "Dnet": -0.0107,
+      "tNet": -0.24,
+      "Dgross": -0.0109,
+      "tGross": -0.24,
+      "even": {
+       "windows": 309,
+       "netDay": 0.0098,
+       "grossDay": 0.0403,
+       "monthT": 0.33,
+       "months": 218,
+       "stops": 52
+      },
+      "odd": {
+       "windows": 369,
+       "netDay": 0.0124,
+       "grossDay": 0.043,
+       "monthT": 0.43,
+       "months": 223,
+       "stops": 71
+      }
+     },
+     "S2": {
+      "cycles": 149,
+      "Dnet": 0.0409,
+      "tNet": 0.97,
+      "Dgross": 0.0412,
+      "tGross": 0.97,
+      "even": {
+       "windows": 354,
+       "netDay": 0.0319,
+       "grossDay": 0.062,
+       "monthT": 1.16,
+       "months": 223,
+       "stops": 63
+      },
+      "odd": {
+       "windows": 425,
+       "netDay": 0.001,
+       "grossDay": 0.0309,
+       "monthT": 0.04,
+       "months": 224,
+       "stops": 87
+      }
+     }
+    }
+   },
+   "byYear": {
+    "2008": {
+     "cycles": 8,
+     "Dnet": 0.1296
+    },
+    "2009": {
+     "cycles": 8,
+     "Dnet": 0.195
+    },
+    "2010": {
+     "cycles": 8,
+     "Dnet": 0.3424
+    },
+    "2011": {
+     "cycles": 8,
+     "Dnet": 0.2358
+    },
+    "2012": {
+     "cycles": 8,
+     "Dnet": 0.1608
+    },
+    "2013": {
+     "cycles": 8,
+     "Dnet": -0.1487
+    },
+    "2014": {
+     "cycles": 8,
+     "Dnet": -0.1988
+    },
+    "2015": {
+     "cycles": 8,
+     "Dnet": 0.1675
+    },
+    "2016": {
+     "cycles": 8,
+     "Dnet": 0.2026
+    },
+    "2017": {
+     "cycles": 8,
+     "Dnet": -0.1869
+    },
+    "2018": {
+     "cycles": 8,
+     "Dnet": -0.1361
+    },
+    "2019": {
+     "cycles": 8,
+     "Dnet": -0.1424
+    },
+    "2020": {
+     "cycles": 7,
+     "Dnet": -0.4766
+    },
+    "2021": {
+     "cycles": 8,
+     "Dnet": -0.0104
+    },
+    "2022": {
+     "cycles": 8,
+     "Dnet": 0.0167
+    },
+    "2023": {
+     "cycles": 8,
+     "Dnet": 0.2015
+    },
+    "2024": {
+     "cycles": 8,
+     "Dnet": 0.1703
+    },
+    "2025": {
+     "cycles": 8,
+     "Dnet": 0.0323
+    },
+    "2026": {
+     "cycles": 6,
+     "Dnet": 0.1222
+    }
+   }
+  },
+  "us30": {
+   "from": "2003-03-24",
+   "to": "2026-11-06",
+   "days": 6101,
+   "updated": "2026-11-07T22:49:05.000Z",
+   "drop": {
+    "noDay0": [
+     "2026-12-09"
+    ],
+    "cut": 121,
+    "data": 0,
+    "hole": 0,
+    "unscheduled": 7
+   },
+   "windows": {
+    "IS": {
+     "cycles": 72,
+     "Dnet": 0.064,
+     "tNet": 1.18,
+     "Dgross": 0.0636,
+     "tGross": 1.17,
+     "even": {
+      "windows": 166,
+      "netDay": 0.0261,
+      "grossDay": 0.0513,
+      "monthT": 0.7,
+      "months": 107,
+      "stops": 29
+     },
+     "odd": {
+      "windows": 200,
+      "netDay": -0.0359,
+      "grossDay": -0.0105,
+      "monthT": -1.28,
+      "months": 108,
+      "stops": 35
+     },
+     "x2": {
+      "cycles": 72,
+      "Dnet": 0.0644,
+      "tNet": 1.19,
+      "Dgross": 0.0636,
+      "tGross": 1.17,
+      "even": {
+       "windows": 166,
+       "netDay": 0.0009,
+       "grossDay": 0.0513,
+       "monthT": 0.03,
+       "months": 107,
+       "stops": 29
+      },
+      "odd": {
+       "windows": 200,
+       "netDay": -0.0614,
+       "grossDay": -0.0105,
+       "monthT": -2.21,
+       "months": 108,
+       "stops": 35
+      }
+     },
+     "S1": {
+      "cycles": 72,
+      "Dnet": 0.0388,
+      "tNet": 0.75,
+      "Dgross": 0.0389,
+      "tGross": 0.75,
+      "even": {
+       "windows": 149,
+       "netDay": -0.0005,
+       "grossDay": 0.0252,
+       "monthT": -0.01,
+       "months": 103,
+       "stops": 25
+      },
+      "odd": {
+       "windows": 180,
+       "netDay": -0.0475,
+       "grossDay": -0.0221,
+       "monthT": -1.33,
+       "months": 108,
+       "stops": 35
+      }
+     },
+     "S2": {
+      "cycles": 72,
+      "Dnet": 0.0781,
+      "tNet": 1.46,
+      "Dgross": 0.078,
+      "tGross": 1.45,
+      "even": {
+       "windows": 168,
+       "netDay": 0.0297,
+       "grossDay": 0.0549,
+       "monthT": 0.83,
+       "months": 107,
+       "stops": 29
+      },
+      "odd": {
+       "windows": 202,
+       "netDay": -0.0457,
+       "grossDay": -0.0204,
+       "monthT": -1.49,
+       "months": 108,
+       "stops": 37
+      }
+     }
+    },
+    "OOS": {
+     "cycles": 77,
+     "Dnet": -0.052,
+     "tNet": -1.39,
+     "Dgross": -0.0522,
+     "tGross": -1.38,
+     "even": {
+      "windows": 184,
+      "netDay": -0.0093,
+      "grossDay": 0.0131,
+      "monthT": -0.33,
+      "months": 115,
+      "stops": 31
+     },
+     "odd": {
+      "windows": 222,
+      "netDay": 0.0485,
+      "grossDay": 0.071,
+      "monthT": 2.02,
+      "months": 115,
+      "stops": 39
+     },
+     "x2": {
+      "cycles": 77,
+      "Dnet": -0.0519,
+      "tNet": -1.4,
+      "Dgross": -0.0522,
+      "tGross": -1.38,
+      "even": {
+       "windows": 184,
+       "netDay": -0.0317,
+       "grossDay": 0.0131,
+       "monthT": -1.15,
+       "months": 115,
+       "stops": 31
+      },
+      "odd": {
+       "windows": 222,
+       "netDay": 0.026,
+       "grossDay": 0.071,
+       "monthT": 1.09,
+       "months": 115,
+       "stops": 39
+      }
+     },
+     "S1": {
+      "cycles": 77,
+      "Dnet": -0.0433,
+      "tNet": -1.11,
+      "Dgross": -0.0434,
+      "tGross": -1.11,
+      "even": {
+       "windows": 160,
+       "netDay": 0.001,
+       "grossDay": 0.0238,
+       "monthT": 0.04,
+       "months": 115,
+       "stops": 25
+      },
+      "odd": {
+       "windows": 189,
+       "netDay": 0.0338,
+       "grossDay": 0.0567,
+       "monthT": 1.26,
+       "months": 115,
+       "stops": 33
+      }
+     },
+     "S2": {
+      "cycles": 77,
+      "Dnet": -0.0567,
+      "tNet": -1.5,
+      "Dgross": -0.0569,
+      "tGross": -1.5,
+      "even": {
+       "windows": 186,
+       "netDay": -0.0198,
+       "grossDay": 0.0025,
+       "monthT": -0.67,
+       "months": 116,
+       "stops": 33
+      },
+      "odd": {
+       "windows": 223,
+       "netDay": 0.0441,
+       "grossDay": 0.0666,
+       "monthT": 1.81,
+       "months": 116,
+       "stops": 40
+      }
+     },
+     "p": 0.91774,
+     "pHolm": 1
+    },
+    "FULL": {
+     "cycles": 149,
+     "Dnet": 0.004,
+     "tNet": 0.12,
+     "Dgross": 0.0038,
+     "tGross": 0.11,
+     "even": {
+      "windows": 350,
+      "netDay": 0.0075,
+      "grossDay": 0.0312,
+      "monthT": 0.33,
+      "months": 222,
+      "stops": 60
+     },
+     "odd": {
+      "windows": 422,
+      "netDay": 0.0085,
+      "grossDay": 0.0324,
+      "monthT": 0.46,
+      "months": 223,
+      "stops": 74
+     },
+     "x2": {
+      "cycles": 149,
+      "Dnet": 0.0043,
+      "tNet": 0.13,
+      "Dgross": 0.0038,
+      "tGross": 0.11,
+      "even": {
+       "windows": 350,
+       "netDay": -0.0162,
+       "grossDay": 0.0312,
+       "monthT": -0.72,
+       "months": 222,
+       "stops": 60
+      },
+      "odd": {
+       "windows": 422,
+       "netDay": -0.0154,
+       "grossDay": 0.0324,
+       "monthT": -0.84,
+       "months": 223,
+       "stops": 74
+      }
+     },
+     "S1": {
+      "cycles": 149,
+      "Dnet": -0.0037,
+      "tNet": -0.11,
+      "Dgross": -0.0037,
+      "tGross": -0.11,
+      "even": {
+       "windows": 309,
+       "netDay": 0.0003,
+       "grossDay": 0.0245,
+       "monthT": 0.01,
+       "months": 218,
+       "stops": 50
+      },
+      "odd": {
+       "windows": 369,
+       "netDay": -0.0058,
+       "grossDay": 0.0182,
+       "monthT": -0.26,
+       "months": 223,
+       "stops": 68
+      }
+     },
+     "S2": {
+      "cycles": 149,
+      "Dnet": 0.0084,
+      "tNet": 0.26,
+      "Dgross": 0.0083,
+      "tGross": 0.25,
+      "even": {
+       "windows": 354,
+       "netDay": 0.0037,
+       "grossDay": 0.0273,
+       "monthT": 0.16,
+       "months": 223,
+       "stops": 62
+      },
+      "odd": {
+       "windows": 425,
+       "netDay": 0.0014,
+       "grossDay": 0.0252,
+       "monthT": 0.07,
+       "months": 224,
+       "stops": 77
+      }
+     }
+    }
+   },
+   "byYear": {
+    "2008": {
+     "cycles": 8,
+     "Dnet": -0.0595
+    },
+    "2009": {
+     "cycles": 8,
+     "Dnet": 0.1744
+    },
+    "2010": {
+     "cycles": 8,
+     "Dnet": 0.3922
+    },
+    "2011": {
+     "cycles": 8,
+     "Dnet": 0.2094
+    },
+    "2012": {
+     "cycles": 8,
+     "Dnet": 0.0122
+    },
+    "2013": {
+     "cycles": 8,
+     "Dnet": -0.125
+    },
+    "2014": {
+     "cycles": 8,
+     "Dnet": -0.1961
+    },
+    "2015": {
+     "cycles": 8,
+     "Dnet": 0.0354
+    },
+    "2016": {
+     "cycles": 8,
+     "Dnet": 0.1329
+    },
+    "2017": {
+     "cycles": 8,
+     "Dnet": 0.0241
+    },
+    "2018": {
+     "cycles": 8,
+     "Dnet": -0.1597
+    },
+    "2019": {
+     "cycles": 8,
+     "Dnet": -0.1386
+    },
+    "2020": {
+     "cycles": 7,
+     "Dnet": -0.2858
+    },
+    "2021": {
+     "cycles": 8,
+     "Dnet": -0.0392
+    },
+    "2022": {
+     "cycles": 8,
+     "Dnet": -0.0513
+    },
+    "2023": {
+     "cycles": 8,
+     "Dnet": 0.1184
+    },
+    "2024": {
+     "cycles": 8,
+     "Dnet": 0.1124
+    },
+    "2025": {
+     "cycles": 8,
+     "Dnet": -0.1485
+    },
+    "2026": {
+     "cycles": 6,
+     "Dnet": 0.0423
+    }
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "shift": [
+   5,
+   20
+  ],
+  "means": [
+   -0.0089,
+   -0.009,
+   -0.0426,
+   -0.0555,
+   0.0443,
+   0.0786,
+   -0.0376,
+   -0.0575,
+   -0.0307,
+   -0.0509,
+   0.0384,
+   0.0146,
+   0.0146,
+   0.0557,
+   -0.0404,
+   -0.0391,
+   0.0807,
+   -0.013,
+   -0.0185,
+   0.048,
+   0.0286,
+   -0.1033,
+   0.0283,
+   0.0186,
+   -0.0792,
+   0.0031,
+   0.0078,
+   0.0367,
+   0.0606,
+   -0.0635,
+   0.1513,
+   0.0663,
+   0.0144,
+   -0.0088,
+   -0.036,
+   0.0803,
+   0.0741,
+   -0.0277,
+   -0.0334,
+   -0.0476
+  ],
+  "mean": 0.0035,
+  "max": 0.1513,
+  "beaten": 14
+ },
+ "checks": {
+  "oos": false,
+  "isSign": true,
+  "x2": false,
+  "placebo": false
+ },
+ "pHolmBar": 0.02275,
+ "verdict": "FAIL",
+ "confirm": {
+  "nas100": false,
+  "us30": false
+ }
+}
