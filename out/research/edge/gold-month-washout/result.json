@@ -1,0 +1,984 @@
+{
+ "study": "gold-month-washout",
+ "built": "2026-11-14",
+ "dataCommit": "c721916f3",
+ "preregCommit": "9c052f4e3",
+ "params": {
+  "LO": 0.1,
+  "HI": 0.9,
+  "LOOKM": 12,
+  "ATR_N": 20,
+  "MULT": 3,
+  "HOLD": 10,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "IS": {
+   "from": "2007-01",
+   "to": "2016-12"
+  },
+  "OOS": {
+   "from": "2017-01",
+   "to": "2026-10"
+  }
+ },
+ "fin": 0.000148,
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 3: buying the month after a washout month made +0.108R a trade net 2017-26 (n 164 in 8 traded months, month t 0.59, over baseline +0.068R, t 0.39)",
+ "days": 5369,
+ "firstDay": "2006-03-20",
+ "lastDay": "2026-11-13",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "Long after a washout month (close in the bottom tenth of its range) (primary)",
+   "ev": "wash",
+   "side": 1,
+   "is": {
+    "trades": 120,
+    "signalMonths": 6,
+    "months": 120,
+    "won": 0.383,
+    "stopped": 0.217,
+    "medStop": 47.02,
+    "grossR": -0.228,
+    "netR": -0.284,
+    "costR": 0.012,
+    "finR": 0.043,
+    "monthGross": -0.228,
+    "monthGrossT": -2.06,
+    "monthNet": -0.284,
+    "monthNetT": -2.3,
+    "totalNet": -34.03,
+    "worstDD": -37.35,
+    "excessR": -0.289,
+    "monthExcess": -0.289,
+    "monthExcessT": -2.41
+   },
+   "oos": {
+    "trades": 164,
+    "signalMonths": 8,
+    "months": 118,
+    "won": 0.494,
+    "stopped": 0.079,
+    "medStop": 63.53,
+    "grossR": 0.169,
+    "netR": 0.108,
+    "costR": 0.011,
+    "finR": 0.05,
+    "monthGross": 0.235,
+    "monthGrossT": 0.91,
+    "monthNet": 0.15,
+    "monthNetT": 0.59,
+    "totalNet": 17.71,
+    "worstDD": -15.84,
+    "excessR": 0.068,
+    "monthExcess": 0.095,
+    "monthExcessT": 0.39,
+    "x2Net": 0.065,
+    "x2T": 0.26
+   },
+   "pOne": 0.278,
+   "placebo": {
+    "months": 7,
+    "p5": -1.18,
+    "p50": 0.34,
+    "p95": 1.55,
+    "max": 2.52,
+    "below": 21
+   },
+   "signals": [
+    {
+     "month": "2010-01",
+     "clv": 0.076,
+     "ret": -0.015,
+     "next": "2010-02",
+     "n": 20,
+     "net": 3.31,
+     "excess": 1.18
+    },
+    {
+     "month": "2014-03",
+     "clv": 0.02,
+     "ret": -0.032,
+     "next": "2014-04",
+     "n": 21,
+     "net": -3.23,
+     "excess": -1.91
+    },
+    {
+     "month": "2014-07",
+     "clv": 0.041,
+     "ret": -0.033,
+     "next": "2014-08",
+     "n": 21,
+     "net": -11.04,
+     "excess": -9.72
+    },
+    {
+     "month": "2014-09",
+     "clv": 0.042,
+     "ret": -0.061,
+     "next": "2014-10",
+     "n": 23,
+     "net": -7.73,
+     "excess": -6.29
+    },
+    {
+     "month": "2016-08",
+     "clv": 0.089,
+     "ret": -0.03,
+     "next": "2016-09",
+     "n": 22,
+     "net": -9.86,
+     "excess": -11.5
+    },
+    {
+     "month": "2016-11",
+     "clv": 0.015,
+     "ret": -0.081,
+     "next": "2016-12",
+     "n": 22,
+     "net": 1.81,
+     "excess": 0.18
+    },
+    {
+     "month": "2017-09",
+     "clv": 0.061,
+     "ret": -0.031,
+     "next": "2017-10",
+     "n": 22,
+     "net": -2.8,
+     "excess": -4.5
+    },
+    {
+     "month": "2018-04",
+     "clv": 0.092,
+     "ret": -0.008,
+     "next": "2018-05",
+     "n": 23,
+     "net": -7.19,
+     "excess": -4.49
+    },
+    {
+     "month": "2019-09",
+     "clv": 0.099,
+     "ret": -0.031,
+     "next": "2019-10",
+     "n": 23,
+     "net": -4.07,
+     "excess": -8.33
+    },
+    {
+     "month": "2020-11",
+     "clv": 0.071,
+     "ret": -0.053,
+     "next": "2020-12",
+     "n": 22,
+     "net": 4.65,
+     "excess": 2.62
+    },
+    {
+     "month": "2022-06",
+     "clv": 0.051,
+     "ret": -0.016,
+     "next": "2022-07",
+     "n": 21,
+     "net": 3.11,
+     "excess": 3.56
+    },
+    {
+     "month": "2022-08",
+     "clv": 0.031,
+     "ret": -0.032,
+     "next": "2022-09",
+     "n": 22,
+     "net": -5.46,
+     "excess": -4.99
+    },
+    {
+     "month": "2023-09",
+     "clv": 0.022,
+     "ret": -0.047,
+     "next": "2023-10",
+     "n": 22,
+     "net": 22.18,
+     "excess": 20.73
+    }
+   ],
+   "holmP": 0.555,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "excessT2": false,
+    "isSameSign": false,
+    "x2Positive": true,
+    "placebo38": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "name": "Long after the worst month of the past year",
+   "ev": "worst",
+   "side": 1,
+   "is": {
+    "trades": 250,
+    "signalMonths": 12,
+    "months": 120,
+    "won": 0.528,
+    "stopped": 0.096,
+    "medStop": 67.77,
+    "grossR": 0.063,
+    "netR": 0.024,
+    "costR": 0.009,
+    "finR": 0.03,
+    "monthGross": 0.132,
+    "monthGrossT": 0.64,
+    "monthNet": 0.05,
+    "monthNetT": 0.24,
+    "totalNet": 6.01,
+    "worstDD": -10.43,
+    "excessR": 0.073,
+    "monthExcess": 0.151,
+    "monthExcessT": 0.7
+   },
+   "oos": {
+    "trades": 254,
+    "signalMonths": 12,
+    "months": 118,
+    "won": 0.531,
+    "stopped": 0.047,
+    "medStop": 81,
+    "grossR": 0.192,
+    "netR": 0.139,
+    "costR": 0.008,
+    "finR": 0.045,
+    "monthGross": 0.414,
+    "monthGrossT": 1.55,
+    "monthNet": 0.299,
+    "monthNetT": 1.15,
+    "totalNet": 35.3,
+    "worstDD": -18.75,
+    "excessR": 0.106,
+    "monthExcess": 0.228,
+    "monthExcessT": 0.93,
+    "x2Net": 0.185,
+    "x2T": 0.73
+   },
+   "pOne": 0.125,
+   "placebo": {
+    "months": 11,
+    "p5": -0.91,
+    "p50": 0.53,
+    "p95": 1.99,
+    "max": 2.25,
+    "below": 28
+   },
+   "signals": [
+    {
+     "month": "2008-03",
+     "clv": 0.112,
+     "ret": -0.056,
+     "next": "2008-04",
+     "n": 22,
+     "net": -7.45,
+     "excess": -6.97
+    },
+    {
+     "month": "2008-08",
+     "clv": 0.402,
+     "ret": -0.09,
+     "next": "2008-09",
+     "n": 22,
+     "net": 10.57,
+     "excess": 11.05
+    },
+    {
+     "month": "2008-10",
+     "clv": 0.172,
+     "ret": -0.168,
+     "next": "2008-11",
+     "n": 20,
+     "net": 3.93,
+     "excess": 4.37
+    },
+    {
+     "month": "2009-12",
+     "clv": 0.149,
+     "ret": -0.07,
+     "next": "2010-01",
+     "n": 20,
+     "net": -10.18,
+     "excess": -12.31
+    },
+    {
+     "month": "2011-01",
+     "clv": 0.21,
+     "ret": -0.062,
+     "next": "2011-02",
+     "n": 20,
+     "net": 11.48,
+     "excess": 9.04
+    },
+    {
+     "month": "2011-09",
+     "clv": 0.234,
+     "ret": -0.111,
+     "next": "2011-10",
+     "n": 21,
+     "net": 6.57,
+     "excess": 4.01
+    },
+    {
+     "month": "2013-04",
+     "clv": 0.547,
+     "ret": -0.076,
+     "next": "2013-05",
+     "n": 23,
+     "net": -6.52,
+     "excess": -0.86
+    },
+    {
+     "month": "2013-06",
+     "clv": 0.223,
+     "ret": -0.11,
+     "next": "2013-07",
+     "n": 23,
+     "net": 5.32,
+     "excess": 10.98
+    },
+    {
+     "month": "2014-09",
+     "clv": 0.042,
+     "ret": -0.061,
+     "next": "2014-10",
+     "n": 23,
+     "net": -7.73,
+     "excess": -6.29
+    },
+    {
+     "month": "2015-07",
+     "clv": 0.228,
+     "ret": -0.066,
+     "next": "2015-08",
+     "n": 21,
+     "net": 3.63,
+     "excess": 6.6
+    },
+    {
+     "month": "2015-11",
+     "clv": 0.128,
+     "ret": -0.068,
+     "next": "2015-12",
+     "n": 22,
+     "net": 1.87,
+     "excess": 4.98
+    },
+    {
+     "month": "2016-11",
+     "clv": 0.015,
+     "ret": -0.081,
+     "next": "2016-12",
+     "n": 22,
+     "net": 1.81,
+     "excess": 0.18
+    },
+    {
+     "month": "2018-06",
+     "clv": 0.118,
+     "ret": -0.035,
+     "next": "2018-07",
+     "n": 22,
+     "net": -14.68,
+     "excess": -12.1
+    },
+    {
+     "month": "2019-09",
+     "clv": 0.099,
+     "ret": -0.031,
+     "next": "2019-10",
+     "n": 23,
+     "net": -4.07,
+     "excess": -8.33
+    },
+    {
+     "month": "2019-11",
+     "clv": 0.259,
+     "ret": -0.032,
+     "next": "2019-12",
+     "n": 22,
+     "net": 21.05,
+     "excess": 16.97
+    },
+    {
+     "month": "2020-09",
+     "clv": 0.271,
+     "ret": -0.041,
+     "next": "2020-10",
+     "n": 22,
+     "net": -1.5,
+     "excess": -3.53
+    },
+    {
+     "month": "2020-11",
+     "clv": 0.071,
+     "ret": -0.053,
+     "next": "2020-12",
+     "n": 22,
+     "net": 4.65,
+     "excess": 2.62
+    },
+    {
+     "month": "2021-02",
+     "clv": 0.111,
+     "ret": -0.061,
+     "next": "2021-03",
+     "n": 23,
+     "net": 1.42,
+     "excess": 3.27
+    },
+    {
+     "month": "2021-06",
+     "clv": 0.106,
+     "ret": -0.073,
+     "next": "2021-07",
+     "n": 22,
+     "net": -4.13,
+     "excess": -2.36
+    },
+    {
+     "month": "2023-02",
+     "clv": 0.135,
+     "ret": -0.053,
+     "next": "2023-03",
+     "n": 23,
+     "net": 22.36,
+     "excess": 20.84
+    },
+    {
+     "month": "2024-11",
+     "clv": 0.503,
+     "ret": -0.035,
+     "next": "2024-12",
+     "n": 22,
+     "net": -1.65,
+     "excess": -6.52
+    },
+    {
+     "month": "2026-03",
+     "clv": 0.452,
+     "ret": -0.11,
+     "next": "2026-04",
+     "n": 21,
+     "net": -1.4,
+     "excess": 0.92
+    },
+    {
+     "month": "2026-06",
+     "clv": 0.105,
+     "ret": -0.118,
+     "next": "2026-07",
+     "n": 23,
+     "net": 5.96,
+     "excess": 8.5
+    }
+   ],
+   "holmP": 0.375,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "excessT2": false,
+    "isSameSign": true,
+    "x2Positive": true,
+    "placebo38": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "name": "Short after a month closing in the top tenth of its range",
+   "ev": "top",
+   "side": -1,
+   "is": {
+    "trades": 377,
+    "signalMonths": 18,
+    "months": 120,
+    "won": 0.401,
+    "stopped": 0.231,
+    "medStop": 56.57,
+    "grossR": -0.157,
+    "netR": -0.169,
+    "costR": 0.012,
+    "finR": 0,
+    "monthGross": -0.492,
+    "monthGrossT": -1.67,
+    "monthNet": -0.529,
+    "monthNetT": -1.78,
+    "totalNet": -63.54,
+    "worstDD": -74.63,
+    "excessR": 0.001,
+    "monthExcess": 0.002,
+    "monthExcessT": 0.01
+   },
+   "oos": {
+    "trades": 435,
+    "signalMonths": 20,
+    "months": 118,
+    "won": 0.402,
+    "stopped": 0.308,
+    "medStop": 81.18,
+    "grossR": -0.185,
+    "netR": -0.194,
+    "costR": 0.009,
+    "finR": 0,
+    "monthGross": -0.683,
+    "monthGrossT": -1.67,
+    "monthNet": -0.716,
+    "monthNetT": -1.74,
+    "totalNet": -84.49,
+    "worstDD": -109.88,
+    "excessR": 0,
+    "monthExcess": 0,
+    "monthExcessT": 0,
+    "x2Net": -0.749,
+    "x2T": -1.81
+   },
+   "pOne": 0.959,
+   "placebo": {
+    "months": 20,
+    "p5": -2.57,
+    "p50": -1.47,
+    "p95": 0,
+    "max": 0.32,
+    "below": 14
+   },
+   "signals": [
+    {
+     "month": "2007-01",
+     "clv": 0.956,
+     "ret": 0.025,
+     "next": "2007-02",
+     "n": 20,
+     "net": 0.14,
+     "excess": 5.65
+    },
+    {
+     "month": "2007-09",
+     "clv": 0.968,
+     "ret": 0.105,
+     "next": "2007-10",
+     "n": 23,
+     "net": -18.92,
+     "excess": -12.59
+    },
+    {
+     "month": "2007-10",
+     "clv": 0.986,
+     "ret": 0.073,
+     "next": "2007-11",
+     "n": 22,
+     "net": 0.1,
+     "excess": 6.15
+    },
+    {
+     "month": "2008-02",
+     "clv": 0.971,
+     "ret": 0.053,
+     "next": "2008-03",
+     "n": 21,
+     "net": 7.51,
+     "excess": 8.38
+    },
+    {
+     "month": "2008-12",
+     "clv": 0.942,
+     "ret": 0.078,
+     "next": "2009-01",
+     "n": 22,
+     "net": -8.28,
+     "excess": -3.4
+    },
+    {
+     "month": "2009-01",
+     "clv": 0.985,
+     "ret": 0.052,
+     "next": "2009-02",
+     "n": 20,
+     "net": -0.69,
+     "excess": 3.75
+    },
+    {
+     "month": "2009-05",
+     "clv": 0.988,
+     "ret": 0.104,
+     "next": "2009-06",
+     "n": 22,
+     "net": 8.41,
+     "excess": 13.29
+    },
+    {
+     "month": "2009-07",
+     "clv": 0.906,
+     "ret": 0.027,
+     "next": "2009-08",
+     "n": 21,
+     "net": -6.24,
+     "excess": -1.58
+    },
+    {
+     "month": "2010-04",
+     "clv": 0.964,
+     "ret": 0.06,
+     "next": "2010-05",
+     "n": 21,
+     "net": -4.54,
+     "excess": 0.3
+    },
+    {
+     "month": "2010-08",
+     "clv": 0.974,
+     "ret": 0.057,
+     "next": "2010-09",
+     "n": 22,
+     "net": -20.41,
+     "excess": -15.34
+    },
+    {
+     "month": "2011-02",
+     "clv": 0.92,
+     "ret": 0.059,
+     "next": "2011-03",
+     "n": 23,
+     "net": -5.47,
+     "excess": -1.31
+    },
+    {
+     "month": "2011-04",
+     "clv": 0.964,
+     "ret": 0.092,
+     "next": "2011-05",
+     "n": 22,
+     "net": -2.03,
+     "excess": 1.95
+    },
+    {
+     "month": "2011-07",
+     "clv": 0.963,
+     "ret": 0.084,
+     "next": "2011-08",
+     "n": 23,
+     "net": -17.04,
+     "excess": -12.88
+    },
+    {
+     "month": "2012-01",
+     "clv": 0.935,
+     "ret": 0.109,
+     "next": "2012-02",
+     "n": 21,
+     "net": 4.74,
+     "excess": 5.22
+    },
+    {
+     "month": "2012-08",
+     "clv": 0.989,
+     "ret": 0.049,
+     "next": "2012-09",
+     "n": 20,
+     "net": -9.12,
+     "excess": -8.66
+    },
+    {
+     "month": "2014-06",
+     "clv": 0.967,
+     "ret": 0.062,
+     "next": "2014-07",
+     "n": 23,
+     "net": 5.54,
+     "excess": 4.82
+    },
+    {
+     "month": "2016-04",
+     "clv": 0.959,
+     "ret": 0.05,
+     "next": "2016-05",
+     "n": 22,
+     "net": 5.55,
+     "excess": 8.81
+    },
+    {
+     "month": "2017-05",
+     "clv": 0.908,
+     "ret": 0,
+     "next": "2017-06",
+     "n": 22,
+     "net": 13.97,
+     "excess": 17.73
+    },
+    {
+     "month": "2017-07",
+     "clv": 0.944,
+     "ret": 0.02,
+     "next": "2017-08",
+     "n": 23,
+     "net": -18.09,
+     "excess": -14.16
+    },
+    {
+     "month": "2017-08",
+     "clv": 0.935,
+     "ret": 0.042,
+     "next": "2017-09",
+     "n": 21,
+     "net": 11,
+     "excess": 14.59
+    },
+    {
+     "month": "2017-12",
+     "clv": 0.946,
+     "ret": 0.023,
+     "next": "2018-01",
+     "n": 23,
+     "net": -7.13,
+     "excess": -6.93
+    },
+    {
+     "month": "2018-12",
+     "clv": 0.966,
+     "ret": 0.049,
+     "next": "2019-01",
+     "n": 23,
+     "net": -8.59,
+     "excess": -3.96
+    },
+    {
+     "month": "2019-05",
+     "clv": 0.96,
+     "ret": 0.017,
+     "next": "2019-06",
+     "n": 20,
+     "net": -14.17,
+     "excess": -10.15
+    },
+    {
+     "month": "2020-06",
+     "clv": 0.974,
+     "ret": 0.031,
+     "next": "2020-07",
+     "n": 23,
+     "net": -20.38,
+     "excess": -15.36
+    },
+    {
+     "month": "2020-07",
+     "clv": 0.968,
+     "ret": 0.108,
+     "next": "2020-08",
+     "n": 21,
+     "net": 2.57,
+     "excess": 7.15
+    },
+    {
+     "month": "2020-12",
+     "clv": 0.936,
+     "ret": 0.067,
+     "next": "2021-01",
+     "n": 20,
+     "net": 6.71,
+     "excess": 5.98
+    },
+    {
+     "month": "2021-05",
+     "clv": 0.968,
+     "ret": 0.077,
+     "next": "2021-06",
+     "n": 22,
+     "net": 14.58,
+     "excess": 13.78
+    },
+    {
+     "month": "2021-12",
+     "clv": 0.979,
+     "ret": 0.031,
+     "next": "2022-01",
+     "n": 21,
+     "net": -1.11,
+     "excess": -0.39
+    },
+    {
+     "month": "2022-11",
+     "clv": 0.923,
+     "ret": 0.086,
+     "next": "2022-12",
+     "n": 22,
+     "net": -9.83,
+     "excess": -9.08
+    },
+    {
+     "month": "2023-11",
+     "clv": 0.901,
+     "ret": 0.028,
+     "next": "2023-12",
+     "n": 21,
+     "net": -5.51,
+     "excess": -3.78
+    },
+    {
+     "month": "2024-03",
+     "clv": 0.984,
+     "ret": 0.092,
+     "next": "2024-04",
+     "n": 22,
+     "net": -2.49,
+     "excess": 2.62
+    },
+    {
+     "month": "2025-01",
+     "clv": 0.905,
+     "ret": 0.066,
+     "next": "2025-02",
+     "n": 20,
+     "net": -4.78,
+     "excess": 4.2
+    },
+    {
+     "month": "2025-03",
+     "clv": 0.972,
+     "ret": 0.092,
+     "next": "2025-04",
+     "n": 21,
+     "net": -10.32,
+     "excess": -0.89
+    },
+    {
+     "month": "2025-08",
+     "clv": 0.962,
+     "ret": 0.048,
+     "next": "2025-09",
+     "n": 22,
+     "net": -21.75,
+     "excess": -11.87
+    },
+    {
+     "month": "2025-09",
+     "clv": 0.98,
+     "ret": 0.121,
+     "next": "2025-10",
+     "n": 23,
+     "net": -6.36,
+     "excess": 3.97
+    },
+    {
+     "month": "2025-11",
+     "clv": 0.907,
+     "ret": 0.053,
+     "next": "2025-12",
+     "n": 23,
+     "net": -14.21,
+     "excess": -3.89
+    },
+    {
+     "month": "2026-02",
+     "clv": 0.997,
+     "ret": 0.078,
+     "next": "2026-03",
+     "n": 22,
+     "net": 11.41,
+     "excess": 10.47
+    }
+   ],
+   "holmP": 0.959,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "excessT2": false,
+    "isSameSign": false,
+    "x2Positive": false,
+    "placebo38": false
+   },
+   "pass": false
+  }
+ ],
+ "baseline": {
+  "long": {
+   "is": {
+    "trades": 2602,
+    "signalMonths": 121,
+    "months": 120,
+    "won": 0.503,
+    "stopped": 0.147,
+    "medStop": 55.96,
+    "grossR": 0.061,
+    "netR": 0.012,
+    "costR": 0.011,
+    "finR": 0.038,
+    "monthGross": 1.318,
+    "monthGrossT": 1.47,
+    "monthNet": 0.25,
+    "monthNetT": 0.28,
+    "totalNet": 30.05,
+    "worstDD": -145.95
+   },
+   "oos": {
+    "trades": 2555,
+    "signalMonths": 119,
+    "months": 118,
+    "won": 0.515,
+    "stopped": 0.126,
+    "medStop": 71.36,
+    "grossR": 0.134,
+    "netR": 0.078,
+    "costR": 0.009,
+    "finR": 0.047,
+    "monthGross": 2.904,
+    "monthGrossT": 3.02,
+    "monthNet": 1.687,
+    "monthNetT": 1.77,
+    "totalNet": 199.06,
+    "worstDD": -64.77
+   }
+  },
+  "short": {
+   "is": {
+    "trades": 2602,
+    "signalMonths": 121,
+    "months": 120,
+    "won": 0.442,
+    "stopped": 0.171,
+    "medStop": 55.96,
+    "grossR": -0.058,
+    "netR": -0.07,
+    "costR": 0.011,
+    "finR": 0,
+    "monthGross": -1.265,
+    "monthGrossT": -1.37,
+    "monthNet": -1.512,
+    "monthNetT": -1.63,
+    "totalNet": -181.49,
+    "worstDD": -273.67
+   },
+   "oos": {
+    "trades": 2552,
+    "signalMonths": 119,
+    "months": 118,
+    "won": 0.418,
+    "stopped": 0.212,
+    "medStop": 71.36,
+    "grossR": -0.129,
+    "netR": -0.138,
+    "costR": 0.009,
+    "finR": 0,
+    "monthGross": -2.786,
+    "monthGrossT": -3.29,
+    "monthNet": -2.989,
+    "monthNetT": -3.53,
+    "totalNet": -352.69,
+    "worstDD": -381.26
+   }
+  }
+ }
+}
