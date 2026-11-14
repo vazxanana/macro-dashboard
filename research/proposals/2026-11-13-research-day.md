@@ -197,6 +197,8 @@ paper system with a measured, clearly negative record.
 | 179 | Index activity cross-section, abnormal quote count and Amihud (`activity-xs`) | **FAIL**: weekly long-short over 14 index CFDs loses; abnormal activity 2017-26 −1.13R a month net (t −5.26, gross −0.36R), beats 4 of 40 placebos; the #993 index line does not carry over to a cross-section | #995 |
 | 180 | Cross-sectional same-month seasonality (`xs-seasonality`) | **FAIL**: four groups 2017-26 −0.75R a month net (t −2.03, gross +0.26R; Holm p 0.13); financing 0.041R a trade against +0.013R gross; beats 34 of 40 other-month placebos | #996 |
 | 181 | Betting against beta within commodities and FX (`xs-bab`) | **FAIL**, 0 of 4: primary book 2017-26 −0.167 % a month net (t −0.52), +0.236 % gross; about 2x gross exposure so financing and spread take it; indices lose even gross | #997 |
+| 182 | 52-week-high nearness ranking on commodities and FX (`high52-cmdfx`) | **FAIL**, 0 of 4: combined book 2017-26 −0.029R a month net (t −1.12), +0.027R gross; beats 40 of 40 random picks but FX financing takes it; correlation 0.63 with 12-1 momentum | #998 |
+| 183 | Month-end rebalancing flow (`rebalance-flow`, rerun asked) | **Not run, duplicate**: the 13 Nov `rebalance-flow` branch already failed 0 of 4 (SPX500 +0.013R net, t 0.24); a rerun with moved knobs would be selection after the fact | — |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
