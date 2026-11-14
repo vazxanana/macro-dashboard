@@ -102,6 +102,7 @@ paper system with a measured, clearly negative record.
 | 336 | Gold TD setup (9-count exhaustion): buy after a buy setup, sell after a sell setup | **FAIL, 0 of 3**: buy setup = drift (OOS excess −0.010R, t −0.09); sell setup lost in every window (OOS −0.265R); perfected buy positive only in 2017-21; n 28-48 a window | #1149 |
 | 337 | Gold doji reversal: fade a doji at the end of a ≥ 1 ATR five-day move | **FAIL, 0 of 3**: +0.023R net OOS (t 0.22), −0.072R IS; excess over the every-day trade +0.090R OOS (t 0.89), negative IS | #1150 |
 | 338 | Gold Aroon(25) crosses: buy the up-cross, sell the down-cross | **FAIL, 0 of 3**: up-cross buy +0.108R net OOS = drift (excess −0.005R, t −0.03); down-cross sell flipped sign (IS t 1.67, OOS −1.24); only ~5 signals a year | #1151 |
+| 339 | Gold intraday efficiency: follow a day whose hourly path was unusually straight | **FAIL, 0 of 3**: next-day continuation excess over the same-side trade −0.010R OOS (t −0.46), −0.035R IS; 5-day hold worse than the baseline in both windows | #1152 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
