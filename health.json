@@ -1,5 +1,5 @@
 {
- "at": "2026-11-14T21:22:38.000Z",
+ "at": "2026-11-14T21:42:12.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T21:20:00.000Z",
+     "last": "2026-11-14T21:40:00.000Z",
      "staleMin": 0,
      "maxJump": 4.82,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T21:20:00.000Z",
+     "last": "2026-11-14T21:40:00.000Z",
      "staleMin": 0,
      "maxJump": 6.51,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T21:20:00.000Z",
+     "last": "2026-11-14T21:40:00.000Z",
      "staleMin": 0,
      "maxJump": 3.93,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T21:20:00.000Z",
+     "last": "2026-11-14T21:40:00.000Z",
      "staleMin": 0,
      "maxJump": 4.3,
      "clipped": 0,
@@ -229,15 +229,27 @@
     },
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
-     "status": "ok",
-     "ageMin": 3,
-     "issues": []
+     "status": "warn",
+     "ageMin": 23,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "warn",
+       "detail": "not updated for 23 min (expected 1 min (between rounds); flag after 20 min)"
+      }
+     ]
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
-     "status": "ok",
-     "ageMin": 3,
-     "issues": []
+     "status": "warn",
+     "ageMin": 22,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "warn",
+       "detail": "not updated for 22 min (expected 1 min; flag after 20 min)"
+      }
+     ]
     },
     "ctrader/mirror-10152144.json": {
      "label": "cTrader mirror 10152144 (ctrader/mirror-10152144.json)",
@@ -306,12 +318,17 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 39,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "input",
        "sev": "warn",
        "detail": "fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no data\")"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:gold OANDA failed (fetch failed), Kraken ok (721 days)"
       },
       {
        "kind": "source",
@@ -323,13 +340,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 39,
+     "ageMin": 0,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 39,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "stale",
@@ -356,7 +373,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1282,
+     "ageMin": 1301,
      "issues": []
     },
     "digest.json": {
@@ -367,31 +384,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 72,
+     "ageMin": 92,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 640,
+     "ageMin": 659,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 639,
+     "ageMin": 659,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 639,
+     "ageMin": 659,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 276,
+     "ageMin": 296,
      "issues": []
     },
     "research/ledger.json": {
@@ -412,19 +429,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 455,
+     "ageMin": 474,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 244,
+     "ageMin": 264,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 656,
+     "ageMin": 675,
      "issues": [
       {
        "kind": "stale",
@@ -451,13 +468,16 @@
    }
   }
  },
- "summary": "Council data files: Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
+ "summary": "Council data files: cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
  "brief": {
   "status": "warn",
-  "line": "3 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no dat",
+  "line": "6 warnings: cTrader demo account (ctrader/account.json): not updated for 23 min (expected 1 min (between rounds); flag after 20 min)",
   "bad": [],
   "warn": [
+   "cTrader demo account (ctrader/account.json): not updated for 23 min (expected 1 min (between rounds); flag after 20 min)",
+   "cTrader demo accounts (ctrader/accounts.json): not updated for 22 min (expected 1 min; flag after 20 min)",
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no data\")",
+   "Macro forecast (macro/forecast.json): bars:gold OANDA failed (fetch failed), Kraken ok (721 days)",
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
    "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)"
   ],
