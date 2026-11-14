@@ -1,0 +1,392 @@
+{
+ "study": "gotobi-limit-entry",
+ "built": "2026-11-14",
+ "kind": "execution study on a frozen rule (no edge verdict, no live proposal)",
+ "reading": "NOT CAPTURABLE",
+ "readingBy": "E1 k=2 strict",
+ "rule": "Frozen T2 of research/edge/gotobi (#878): on gotobi days sell USD/JPY, buy back at 06:00 UTC; stop D = 1.5 x the 20-business-day median absolute move of the 00:55-06:00 window (M5); net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side. Only the entry differs between rows.",
+ "frozen": {
+  "file": "frozen.mjs",
+  "from": "origin/gotobi-timing:research/edge/gotobi-timing/frozen.mjs",
+  "sha256": "645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32"
+ },
+ "data": {
+  "m1": "OANDA mid M1 through the /md/bars proxy, 00:40-06:15 UTC on each gotobi day (gotobi-timing's cache)",
+  "m5": "OANDA mid M5 (#878's file) for the stop distance D",
+  "from": "2016-01-01",
+  "lastDay": "2026-11-11",
+  "m1Candles": 255344
+ },
+ "variants": {
+  "E1": {
+   "place": "00:53 M1 close",
+   "liveMinutes": [
+    "00:54",
+    "00:55",
+    "00:56",
+    "00:57"
+   ],
+   "ks": [
+    0,
+    1,
+    2
+   ],
+   "strictThroughPips": 0.3,
+   "fillPrice": "the limit"
+  },
+  "E2": "00:54 M1 open, market",
+  "E3": "00:55 M1 open, market"
+ },
+ "bar": {
+  "capturable": {
+   "keep": 0.7,
+   "dayMonthT": 2,
+   "fill": "strict"
+  },
+  "partly": {
+   "keep": 0.4,
+   "fill": "strict"
+  }
+ },
+ "gate": {
+  "n": 771,
+  "netR": 0.1481,
+  "t": 2.74,
+  "expect": {
+   "n": 771,
+   "netR": 0.1481,
+   "t": 2.74
+  },
+  "pass": true
+ },
+ "universe": 771,
+ "rows": [
+  {
+   "id": "E1 k=0 lenient",
+   "name": "Sell limit at the 00:53 close + 0 pips, lenient fill",
+   "variant": "E1",
+   "k": 0,
+   "fill": "lenient",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 65,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 686,
+    "00:55": 13,
+    "00:56": 6,
+    "00:57": 1
+   },
+   "e3OnMissedDays": 0.228,
+   "e3OnFilledDays": 0.1407,
+   "filled": 706,
+   "fillRate": 0.9157,
+   "perTrade": {
+    "n": 706,
+    "netR": 0.0368,
+    "grossR": 0.1475,
+    "costR": 0.1107,
+    "totalR": 25.97,
+    "tradeT": 0.82,
+    "months": 131,
+    "t": 0.74,
+    "win": 0.4788,
+    "stopShare": 0.3074,
+    "stopPips": 20
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.0337,
+    "totalR": 25.97,
+    "months": 131,
+    "t": 0.74
+   },
+   "keep": 0.2275
+  },
+  {
+   "id": "E1 k=0 strict",
+   "name": "Sell limit at the 00:53 close + 0 pips, strict fill",
+   "variant": "E1",
+   "k": 0,
+   "fill": "strict",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 122,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 601,
+    "00:55": 34,
+    "00:56": 11,
+    "00:57": 3
+   },
+   "e3OnMissedDays": 0.2138,
+   "e3OnFilledDays": 0.1357,
+   "filled": 649,
+   "fillRate": 0.8418,
+   "perTrade": {
+    "n": 649,
+    "netR": 0.0076,
+    "grossR": 0.1166,
+    "costR": 0.109,
+    "totalR": 4.96,
+    "tradeT": 0.16,
+    "months": 131,
+    "t": 0.15,
+    "win": 0.47,
+    "stopShare": 0.3174,
+    "stopPips": 20.4
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.0064,
+    "totalR": 4.96,
+    "months": 131,
+    "t": 0.15
+   },
+   "keep": 0.0432
+  },
+  {
+   "id": "E1 k=1 lenient",
+   "name": "Sell limit at the 00:53 close + 1 pip, lenient fill",
+   "variant": "E1",
+   "k": 1,
+   "fill": "lenient",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 204,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 499,
+    "00:55": 40,
+    "00:56": 17,
+    "00:57": 11
+   },
+   "e3OnMissedDays": 0.218,
+   "e3OnFilledDays": 0.1229,
+   "filled": 567,
+   "fillRate": 0.7354,
+   "perTrade": {
+    "n": 567,
+    "netR": 0.0136,
+    "grossR": 0.1193,
+    "costR": 0.1056,
+    "totalR": 7.72,
+    "tradeT": 0.28,
+    "months": 130,
+    "t": 0.25,
+    "win": 0.4744,
+    "stopShare": 0.3157,
+    "stopPips": 21.3
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.01,
+    "totalR": 7.72,
+    "months": 131,
+    "t": 0.25
+   },
+   "keep": 0.0675
+  },
+  {
+   "id": "E1 k=1 strict",
+   "name": "Sell limit at the 00:53 close + 1 pip, strict fill",
+   "variant": "E1",
+   "k": 1,
+   "fill": "strict",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 240,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 446,
+    "00:55": 54,
+    "00:56": 19,
+    "00:57": 12
+   },
+   "e3OnMissedDays": 0.2119,
+   "e3OnFilledDays": 0.1192,
+   "filled": 531,
+   "fillRate": 0.6887,
+   "perTrade": {
+    "n": 531,
+    "netR": -0.0077,
+    "grossR": 0.0954,
+    "costR": 0.1031,
+    "totalR": -4.08,
+    "tradeT": -0.15,
+    "months": 127,
+    "t": -0.13,
+    "win": 0.4614,
+    "stopShare": 0.322,
+    "stopPips": 21.9
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": -0.0053,
+    "totalR": -4.08,
+    "months": 131,
+    "t": -0.13
+   },
+   "keep": -0.0358
+  },
+  {
+   "id": "E1 k=2 lenient",
+   "name": "Sell limit at the 00:53 close + 2 pips, lenient fill",
+   "variant": "E1",
+   "k": 2,
+   "fill": "lenient",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 318,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 373,
+    "00:55": 49,
+    "00:56": 20,
+    "00:57": 11
+   },
+   "e3OnMissedDays": 0.1562,
+   "e3OnFilledDays": 0.1424,
+   "filled": 453,
+   "fillRate": 0.5875,
+   "perTrade": {
+    "n": 453,
+    "netR": 0.0401,
+    "grossR": 0.1407,
+    "costR": 0.1007,
+    "totalR": 18.15,
+    "tradeT": 0.7,
+    "months": 123,
+    "t": 0.67,
+    "win": 0.4724,
+    "stopShare": 0.3113,
+    "stopPips": 22.5
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.0235,
+    "totalR": 18.15,
+    "months": 131,
+    "t": 0.67
+   },
+   "keep": 0.1587
+  },
+  {
+   "id": "E1 k=2 strict",
+   "name": "Sell limit at the 00:53 close + 2 pips, strict fill",
+   "variant": "E1",
+   "k": 2,
+   "fill": "strict",
+   "misses": {
+    "no-order": 0,
+    "no-fill": 351,
+    "no-exit": 0
+   },
+   "fillsByMinute": {
+    "00:54": 331,
+    "00:55": 55,
+    "00:56": 24,
+    "00:57": 10
+   },
+   "e3OnMissedDays": 0.1568,
+   "e3OnFilledDays": 0.1408,
+   "filled": 420,
+   "fillRate": 0.5447,
+   "perTrade": {
+    "n": 420,
+    "netR": 0.0147,
+    "grossR": 0.1137,
+    "costR": 0.099,
+    "totalR": 6.19,
+    "tradeT": 0.25,
+    "months": 122,
+    "t": 0.24,
+    "win": 0.4595,
+    "stopShare": 0.319,
+    "stopPips": 22.9
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.008,
+    "totalR": 6.19,
+    "months": 131,
+    "t": 0.24
+   },
+   "keep": 0.054
+  },
+  {
+   "id": "E2",
+   "name": "Market sell at the 00:54 M1 open (one minute early)",
+   "variant": "E2",
+   "filled": 771,
+   "fillRate": 1,
+   "perTrade": {
+    "n": 771,
+    "netR": 0.072,
+    "grossR": 0.1846,
+    "costR": 0.1126,
+    "totalR": 55.5,
+    "tradeT": 1.6,
+    "months": 131,
+    "t": 1.46,
+    "win": 0.4877,
+    "stopShare": 0.297,
+    "stopPips": 19.5
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.072,
+    "totalR": 55.5,
+    "months": 131,
+    "t": 1.46
+   },
+   "keep": 0.4862
+  },
+  {
+   "id": "E3",
+   "name": "Market sell at the 00:55 M1 open (the ideal, gotobi-timing's base)",
+   "variant": "E3",
+   "filled": 771,
+   "fillRate": 1,
+   "perTrade": {
+    "n": 771,
+    "netR": 0.1481,
+    "grossR": 0.2607,
+    "costR": 0.1126,
+    "totalR": 114.16,
+    "tradeT": 2.9,
+    "months": 131,
+    "t": 2.74,
+    "win": 0.5136,
+    "stopShare": 0.2763,
+    "stopPips": 19.5
+   },
+   "perDay": {
+    "days": 771,
+    "netPerDay": 0.1481,
+    "totalR": 114.16,
+    "months": 131,
+    "t": 2.74
+   },
+   "keep": 1
+  }
+ ],
+ "rise0053to0055": {
+  "meanPips": 0.29,
+  "medianPips": 0.2,
+  "aboveShare": 0.5214
+ },
+ "notes": [
+  "The fill rules are on M1 highs: a high may have lasted a moment and a real queue may not have reached the order, so even the strict rule (0.3 pip through) is an estimate, not a measured broker fill. Mid prices: a real sell limit fills on the bid, about half a spread lower.",
+  "A fill is credited at the limit price even when the candle opened above it (no price improvement), and a stop reached inside the fill candle counts as stopped (the order inside the candle is unknown). Both are the worse case.",
+  "The frozen costs (spread plus 0.5 pip slippage a side) are charged on the limit fills too: no rebate is taken for a resting order.",
+  "What the misses cost: on the days E1 k=0 strict did not fill, E3 made +0.2138R a trade; on the days it filled, E3 made +0.1357R. A limit above the market fills on the days the price ticks up into the fix, which are not a random half of the days.",
+  "Read after the reading, descriptive only: most fills come in the 00:54 candle, before the fix minute. The 00:55 open sits on average +0.29 pips from the 00:53 close (median +0.20, above it on 52.1 % of days), and E2 (00:54 market) already loses about half of E3. A limit near the 00:53 close sells at roughly the 00:54 price, not the 00:55 one; a higher limit fills less often and misses days E3 made money on.",
+  "Month t on per-day net R is a measure of noise, not a test: no Holm, no placebo. Nothing here is chosen; any live use would need its own proposal and the owner."
+ ]
+}
