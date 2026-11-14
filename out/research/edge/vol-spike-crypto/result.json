@@ -1,0 +1,948 @@
+{
+ "built": "2026-11-14",
+ "title": "The frozen vol-spike rebound on crypto",
+ "verdict": "FAIL",
+ "system": "#860's rule frozen (frozen.mjs, byte for byte) on UTC daily crypto candles, seven days a week: long when 5-day realised vol > 2 x its prior 120-day median and close < SMA20, fill next open, hold 10 days, stop 3 x ATR(20)",
+ "costs": {
+  "avgCostR": 0.024,
+  "avgNights": 12.12
+ },
+ "src": "Binance spot UTC daily candles, council-data research/candles/crypto1d/<COIN>USDT_1d.json.gz",
+ "windows": {
+  "W": [
+   "2017-01-01",
+   "2019-12-31"
+  ],
+  "D": [
+   "2020-01-01",
+   "2099-12-31"
+  ]
+ },
+ "coinSets": {
+  "primary": [
+   "btc",
+   "eth",
+   "sol",
+   "xrp"
+  ],
+  "reportedOnly": [
+   "ada",
+   "bnb",
+   "doge",
+   "link",
+   "ltc",
+   "trx"
+  ]
+ },
+ "gate": {
+  "what": "frozen study() on #860's data (council-data research/daily spx500 / nas100 / us30 + macro/cache.json DGS2) against #860's committed result.json holds['10']",
+  "source": "origin/vol-spike-rebound",
+  "equal": true,
+  "published": {
+   "B": {
+    "n": 165,
+    "avgR": 0.151,
+    "tTrades": 2.53
+   },
+   "A": {
+    "n": 122,
+    "avgR": 0.013
+   }
+  }
+ },
+ "checks": {
+  "n": true,
+  "nW": true,
+  "positive": false,
+  "monthT": false,
+  "replication": false,
+  "positive2x": false
+ },
+ "lastDay": "2026-10-31",
+ "primary": {
+  "D": {
+   "base": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 112,
+    "avgRet": -0.185,
+    "avgGross": 0.353,
+    "avgR": -0.031,
+    "totalR": -3.43,
+    "wr": 49.11,
+    "tTrades": -0.56,
+    "tMonths": -0.42,
+    "stops": 13,
+    "avgNights": 12.12,
+    "ddR": -7.7,
+    "p": 0.713926
+   },
+   "x2": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 112,
+    "avgRet": -0.723,
+    "avgGross": 0.353,
+    "avgR": -0.055,
+    "totalR": -6.16,
+    "wr": 45.54,
+    "tTrades": -1.02,
+    "tMonths": -0.75,
+    "stops": 13,
+    "avgNights": 12.12,
+    "ddR": -10.1,
+    "p": 0.8462
+   },
+   "zero": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 112,
+    "avgRet": 0.353,
+    "avgGross": 0.353,
+    "avgR": -0.006,
+    "totalR": -0.7,
+    "wr": 52.68,
+    "tTrades": -0.11,
+    "tMonths": -0.09,
+    "stops": 13,
+    "avgNights": 12.12,
+    "ddR": -6.86,
+    "p": 0.545567
+   }
+  },
+  "W": {
+   "base": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 28,
+    "avgRet": -0.375,
+    "avgGross": 0.187,
+    "avgR": -0.102,
+    "totalR": -2.87,
+    "wr": 46.43,
+    "tTrades": -1.36,
+    "tMonths": -0.99,
+    "stops": 2,
+    "avgNights": 12.71,
+    "ddR": -4.88,
+    "p": 0.913524
+   },
+   "x2": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 28,
+    "avgRet": -0.938,
+    "avgGross": 0.187,
+    "avgR": -0.125,
+    "totalR": -3.51,
+    "wr": 42.86,
+    "tTrades": -1.66,
+    "tMonths": -1.19,
+    "stops": 2,
+    "avgNights": 12.71,
+    "ddR": -5.21,
+    "p": 0.951939
+   },
+   "zero": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 28,
+    "avgRet": 0.187,
+    "avgGross": 0.187,
+    "avgR": -0.079,
+    "totalR": -2.22,
+    "wr": 50,
+    "tTrades": -1.06,
+    "tMonths": -0.79,
+    "stops": 2,
+    "avgNights": 12.71,
+    "ddR": -4.56,
+    "p": 0.855293
+   }
+  }
+ },
+ "hold5": {
+  "D": {
+   "base": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 136,
+    "avgRet": -0.278,
+    "avgGross": 0.022,
+    "avgR": -0.012,
+    "totalR": -1.59,
+    "wr": 49.26,
+    "tTrades": -0.32,
+    "tMonths": -0.22,
+    "stops": 11,
+    "avgNights": 6.33,
+    "ddR": -8.25,
+    "p": 0.624897
+   },
+   "x2": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 136,
+    "avgRet": -0.579,
+    "avgGross": 0.022,
+    "avgR": -0.024,
+    "totalR": -3.32,
+    "wr": 47.06,
+    "tTrades": -0.67,
+    "tMonths": -0.46,
+    "stops": 11,
+    "avgNights": 6.33,
+    "ddR": -8.75,
+    "p": 0.748362
+   },
+   "zero": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 136,
+    "avgRet": 0.022,
+    "avgGross": 0.022,
+    "avgR": 0.001,
+    "totalR": 0.15,
+    "wr": 52.21,
+    "tTrades": 0.03,
+    "tMonths": 0.02,
+    "stops": 11,
+    "avgNights": 6.33,
+    "ddR": -7.74,
+    "p": 0.488176
+   }
+  },
+  "W": {
+   "base": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 33,
+    "avgRet": -0.883,
+    "avgGross": -0.568,
+    "avgR": -0.087,
+    "totalR": -2.87,
+    "wr": 39.39,
+    "tTrades": -1.25,
+    "tMonths": -1.09,
+    "stops": 2,
+    "avgNights": 6.7,
+    "ddR": -4.37,
+    "p": 0.895166
+   },
+   "x2": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 33,
+    "avgRet": -1.199,
+    "avgGross": -0.568,
+    "avgR": -0.099,
+    "totalR": -3.28,
+    "wr": 36.36,
+    "tTrades": -1.43,
+    "tMonths": -1.22,
+    "stops": 2,
+    "avgNights": 6.7,
+    "ddR": -4.59,
+    "p": 0.923614
+   },
+   "zero": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 33,
+    "avgRet": -0.568,
+    "avgGross": -0.568,
+    "avgR": -0.074,
+    "totalR": -2.45,
+    "wr": 39.39,
+    "tTrades": -1.08,
+    "tMonths": -0.95,
+    "stops": 2,
+    "avgNights": 6.7,
+    "ddR": -4.16,
+    "p": 0.859432
+   }
+  }
+ },
+ "others": {
+  "D": {
+   "base": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 197,
+    "avgRet": 2.363,
+    "avgGross": 2.897,
+    "avgR": 0.054,
+    "totalR": 10.63,
+    "wr": 53.3,
+    "tTrades": 0.96,
+    "tMonths": 0.85,
+    "stops": 21,
+    "avgNights": 12.02,
+    "ddR": -8.48,
+    "p": 0.168112
+   },
+   "x2": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 197,
+    "avgRet": 1.829,
+    "avgGross": 2.897,
+    "avgR": 0.029,
+    "totalR": 5.74,
+    "wr": 48.22,
+    "tTrades": 0.52,
+    "tMonths": 0.45,
+    "stops": 21,
+    "avgNights": 12.02,
+    "ddR": -9.61,
+    "p": 0.301504
+   },
+   "zero": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 197,
+    "avgRet": 2.897,
+    "avgGross": 2.897,
+    "avgR": 0.079,
+    "totalR": 15.53,
+    "wr": 55.84,
+    "tTrades": 1.4,
+    "tMonths": 1.24,
+    "stops": 21,
+    "avgNights": 12.02,
+    "ddR": -7.73,
+    "p": 0.0806723
+   }
+  },
+  "W": {
+   "base": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 26,
+    "avgRet": 2.112,
+    "avgGross": 2.696,
+    "avgR": 0.002,
+    "totalR": 0.06,
+    "wr": 46.15,
+    "tTrades": 0.03,
+    "tMonths": 0.02,
+    "stops": 1,
+    "avgNights": 13.23,
+    "ddR": -2.98,
+    "p": 0.488979
+   },
+   "x2": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 26,
+    "avgRet": 1.528,
+    "avgGross": 2.696,
+    "avgR": -0.019,
+    "totalR": -0.49,
+    "wr": 46.15,
+    "tTrades": -0.21,
+    "tMonths": -0.18,
+    "stops": 1,
+    "avgNights": 13.23,
+    "ddR": -3.14,
+    "p": 0.58256
+   },
+   "zero": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 26,
+    "avgRet": 2.696,
+    "avgGross": 2.696,
+    "avgR": 0.024,
+    "totalR": 0.61,
+    "wr": 53.85,
+    "tTrades": 0.26,
+    "tMonths": 0.23,
+    "stops": 1,
+    "avgNights": 13.23,
+    "ddR": -2.82,
+    "p": 0.395614
+   }
+  }
+ },
+ "dd": {
+  "zero": -6.86,
+  "base": -7.7,
+  "x2": -10.1
+ },
+ "coins": {
+  "btc": {
+   "set": "primary",
+   "sym": "BTCUSDT",
+   "data": {
+    "from": "2017-08-17",
+    "to": "2026-10-31",
+    "days": 3363,
+    "missing": 0
+   },
+   "ready": "2017-12-20",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 30,
+    "avgRet": -0.548,
+    "avgGross": -0.014,
+    "avgR": -0.078,
+    "totalR": -2.34,
+    "wr": 43.33,
+    "tTrades": -0.68,
+    "tMonths": -0.79,
+    "stops": 4,
+    "avgNights": 12.03,
+    "ddR": -3.23,
+    "p": 0.753219,
+    "avgR0": -0.043,
+    "avgR2x": -0.113,
+    "ddBase": -3.23,
+    "holm": {
+     "adj": 1,
+     "pass": false
+    }
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 11,
+    "avgRet": -0.7,
+    "avgGross": -0.145,
+    "avgR": -0.151,
+    "totalR": -1.66,
+    "wr": 45.45,
+    "tTrades": -1.13,
+    "tMonths": -1,
+    "stops": 1,
+    "avgNights": 12.55,
+    "ddR": -2.44,
+    "p": 0.871367,
+    "avgR0": -0.128,
+    "avgR2x": -0.174,
+    "ddBase": -2.44
+   }
+  },
+  "eth": {
+   "set": "primary",
+   "sym": "ETHUSDT",
+   "data": {
+    "from": "2017-08-17",
+    "to": "2026-10-31",
+    "days": 3363,
+    "missing": 0
+   },
+   "ready": "2017-12-20",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 23,
+    "avgRet": -0.732,
+    "avgGross": -0.171,
+    "avgR": -0.054,
+    "totalR": -1.23,
+    "wr": 47.83,
+    "tTrades": -0.61,
+    "tMonths": -0.65,
+    "stops": 2,
+    "avgNights": 12.7,
+    "ddR": -1.9,
+    "p": 0.729005,
+    "avgR0": -0.03,
+    "avgR2x": -0.077,
+    "ddBase": -1.9,
+    "holm": {
+     "adj": 1,
+     "pass": false
+    }
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 11,
+    "avgRet": -1.421,
+    "avgGross": -0.873,
+    "avgR": -0.128,
+    "totalR": -1.41,
+    "wr": 36.36,
+    "tTrades": -1.02,
+    "tMonths": -1.06,
+    "stops": 1,
+    "avgNights": 12.36,
+    "ddR": -2.19,
+    "p": 0.846473,
+    "avgR0": -0.108,
+    "avgR2x": -0.148,
+    "ddBase": -2.19
+   }
+  },
+  "sol": {
+   "set": "primary",
+   "sym": "SOLUSDT",
+   "data": {
+    "from": "2020-08-11",
+    "to": "2026-10-31",
+    "days": 2273,
+    "missing": 0
+   },
+   "ready": "2020-12-14",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 21,
+    "avgRet": 0.91,
+    "avgGross": 1.451,
+    "avgR": 0.021,
+    "totalR": 0.44,
+    "wr": 52.38,
+    "tTrades": 0.16,
+    "tMonths": 0.14,
+    "stops": 2,
+    "avgNights": 12.19,
+    "ddR": -3.22,
+    "p": 0.43666,
+    "avgR0": 0.037,
+    "avgR2x": 0.004,
+    "ddBase": -3.22,
+    "holm": {
+     "adj": 1,
+     "pass": false
+    }
+   },
+   "W": {
+    "n": 0,
+    "avgR0": null,
+    "avgR2x": null,
+    "ddBase": 0
+   }
+  },
+  "xrp": {
+   "set": "primary",
+   "sym": "XRPUSDT",
+   "data": {
+    "from": "2018-05-04",
+    "to": "2026-10-31",
+    "days": 3103,
+    "missing": 0
+   },
+   "ready": "2018-09-06",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 38,
+    "avgRet": -0.172,
+    "avgGross": 0.352,
+    "avgR": -0.008,
+    "totalR": -0.3,
+    "wr": 52.63,
+    "tTrades": -0.08,
+    "tMonths": -0.08,
+    "stops": 5,
+    "avgNights": 11.79,
+    "ddR": -4.6,
+    "p": 0.531001,
+    "avgR0": 0.013,
+    "avgR2x": -0.028,
+    "ddBase": -4.6,
+    "holm": {
+     "adj": 1,
+     "pass": false
+    }
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 6,
+    "avgRet": 2.137,
+    "avgGross": 2.739,
+    "avgR": 0.034,
+    "totalR": 0.21,
+    "wr": 66.67,
+    "tTrades": 0.29,
+    "tMonths": 0.31,
+    "stops": 0,
+    "avgNights": 13.67,
+    "ddR": -0.31,
+    "p": 0.387768,
+    "avgR0": 0.062,
+    "avgR2x": 0.007,
+    "ddBase": -0.31
+   }
+  },
+  "ada": {
+   "set": "reported only",
+   "sym": "ADAUSDT",
+   "data": {
+    "from": "2018-04-17",
+    "to": "2026-10-31",
+    "days": 3120,
+    "missing": 0
+   },
+   "ready": "2018-08-20",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 34,
+    "avgRet": -2.233,
+    "avgGross": -1.686,
+    "avgR": -0.108,
+    "totalR": -3.68,
+    "wr": 44.12,
+    "tTrades": -1.21,
+    "tMonths": -1.13,
+    "stops": 3,
+    "avgNights": 12.35,
+    "ddR": -5.76,
+    "p": 0.886712,
+    "avgR0": -0.088,
+    "avgR2x": -0.129,
+    "ddBase": -5.76
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 5,
+    "avgRet": -1.461,
+    "avgGross": -0.878,
+    "avgR": -0.063,
+    "totalR": -0.32,
+    "wr": 40,
+    "tTrades": -0.49,
+    "tMonths": -0.52,
+    "stops": 0,
+    "avgNights": 13.2,
+    "ddR": -0.6,
+    "p": 0.686962,
+    "avgR0": -0.04,
+    "avgR2x": -0.086,
+    "ddBase": -0.6
+   }
+  },
+  "bnb": {
+   "set": "reported only",
+   "sym": "BNBUSDT",
+   "data": {
+    "from": "2017-11-06",
+    "to": "2026-10-31",
+    "days": 3282,
+    "missing": 0
+   },
+   "ready": "2018-03-11",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 32,
+    "avgRet": 2.738,
+    "avgGross": 3.24,
+    "avgR": 0.074,
+    "totalR": 2.36,
+    "wr": 65.63,
+    "tTrades": 0.56,
+    "tMonths": 0.58,
+    "stops": 6,
+    "avgNights": 11.25,
+    "ddR": -2.09,
+    "p": 0.286839,
+    "avgR0": 0.1,
+    "avgR2x": 0.048,
+    "ddBase": -2.09
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 7,
+    "avgRet": -5.318,
+    "avgGross": -4.773,
+    "avgR": -0.228,
+    "totalR": -1.6,
+    "wr": 28.57,
+    "tTrades": -1.18,
+    "tMonths": -1.02,
+    "stops": 1,
+    "avgNights": 12.29,
+    "ddR": -2.1,
+    "p": 0.880305,
+    "avgR0": -0.206,
+    "avgR2x": -0.25,
+    "ddBase": -2.1
+   }
+  },
+  "doge": {
+   "set": "reported only",
+   "sym": "DOGEUSDT",
+   "data": {
+    "from": "2019-07-05",
+    "to": "2026-10-31",
+    "days": 2676,
+    "missing": 0
+   },
+   "ready": "2019-11-07",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 32,
+    "avgRet": 8.831,
+    "avgGross": 9.38,
+    "avgR": 0.162,
+    "totalR": 5.19,
+    "wr": 31.25,
+    "tTrades": 0.63,
+    "tMonths": 0.63,
+    "stops": 2,
+    "avgNights": 12.38,
+    "ddR": -2.33,
+    "p": 0.265983,
+    "avgR0": 0.183,
+    "avgR2x": 0.142,
+    "ddBase": -2.33
+   },
+   "W": {
+    "n": 0,
+    "avgR0": null,
+    "avgR2x": null,
+    "ddBase": 0
+   }
+  },
+  "link": {
+   "set": "reported only",
+   "sym": "LINKUSDT",
+   "data": {
+    "from": "2019-01-16",
+    "to": "2026-10-31",
+    "days": 2846,
+    "missing": 0
+   },
+   "ready": "2019-05-21",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 26,
+    "avgRet": 0.304,
+    "avgGross": 0.839,
+    "avgR": 0.02,
+    "totalR": 0.52,
+    "wr": 57.69,
+    "tTrades": 0.37,
+    "tMonths": 0.42,
+    "stops": 1,
+    "avgNights": 12.04,
+    "ddR": -1.15,
+    "p": 0.355315,
+    "avgR0": 0.037,
+    "avgR2x": 0.003,
+    "ddBase": -1.15
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 4,
+    "avgRet": 21.534,
+    "avgGross": 22.129,
+    "avgR": 0.4,
+    "totalR": 1.6,
+    "wr": 75,
+    "tTrades": 1.18,
+    "tMonths": 1.06,
+    "stops": 0,
+    "avgNights": 13.5,
+    "ddR": -0.02,
+    "p": 0.118238,
+    "avgR0": 0.414,
+    "avgR2x": 0.386,
+    "ddBase": -0.02
+   }
+  },
+  "ltc": {
+   "set": "reported only",
+   "sym": "LTCUSDT",
+   "data": {
+    "from": "2017-12-13",
+    "to": "2026-10-31",
+    "days": 3245,
+    "missing": 0
+   },
+   "ready": "2018-04-17",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 32,
+    "avgRet": 2.343,
+    "avgGross": 2.88,
+    "avgR": 0.127,
+    "totalR": 4.06,
+    "wr": 59.38,
+    "tTrades": 1.31,
+    "tMonths": 1.38,
+    "stops": 3,
+    "avgNights": 12.09,
+    "ddR": -1.99,
+    "p": 0.0952996,
+    "avgR0": 0.148,
+    "avgR2x": 0.106,
+    "ddBase": -1.99
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 7,
+    "avgRet": -0.181,
+    "avgGross": 0.422,
+    "avgR": -0.005,
+    "totalR": -0.03,
+    "wr": 42.86,
+    "tTrades": -0.04,
+    "tMonths": -0.04,
+    "stops": 0,
+    "avgNights": 13.71,
+    "ddR": -0.65,
+    "p": 0.517727,
+    "avgR0": 0.019,
+    "avgR2x": -0.029,
+    "ddBase": -0.65
+   }
+  },
+  "trx": {
+   "set": "reported only",
+   "sym": "TRXUSDT",
+   "data": {
+    "from": "2018-06-11",
+    "to": "2026-10-31",
+    "days": 3065,
+    "missing": 0
+   },
+   "ready": "2018-10-14",
+   "D": {
+    "from": "2020-01-01",
+    "to": "2026-10-31",
+    "n": 41,
+    "avgRet": 2.153,
+    "avgGross": 2.686,
+    "avgR": 0.053,
+    "totalR": 2.17,
+    "wr": 60.98,
+    "tTrades": 0.54,
+    "tMonths": 0.52,
+    "stops": 6,
+    "avgNights": 12,
+    "ddR": -3.03,
+    "p": 0.295403,
+    "avgR0": 0.092,
+    "avgR2x": 0.014,
+    "ddBase": -3.03
+   },
+   "W": {
+    "from": "2017-01-01",
+    "to": "2019-12-31",
+    "n": 3,
+    "avgRet": 4.858,
+    "avgGross": 5.473,
+    "avgR": 0.136,
+    "totalR": 0.41,
+    "wr": 66.67,
+    "tTrades": 0.6,
+    "tMonths": 0.67,
+    "stops": 0,
+    "avgNights": 14,
+    "ddR": -0.29,
+    "p": 0.273378,
+    "avgR0": 0.154,
+    "avgR2x": 0.119,
+    "ddBase": -0.29
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "seedFrom": 7001,
+  "what": "signal days below SMA20 without a spike, fill in D, same count per coin",
+  "mean": 0.023,
+  "p95": 0.164,
+  "beats": 11,
+  "values": [
+   0.109,
+   0.071,
+   0.007,
+   0.017,
+   0.026,
+   -0.032,
+   0.011,
+   0.031,
+   0.163,
+   0.146,
+   0.062,
+   0.036,
+   -0.017,
+   0.061,
+   0.052,
+   0.003,
+   -0.139,
+   -0.003,
+   -0.034,
+   -0.039,
+   0.033,
+   -0.005,
+   0.058,
+   -0.071,
+   -0.121,
+   -0.029,
+   -0.032,
+   0.016,
+   -0.033,
+   0.13,
+   -0.063,
+   -0.008,
+   0.089,
+   0.026,
+   0.174,
+   0.046,
+   -0.002,
+   0.257,
+   -0.036,
+   -0.046
+  ],
+  "underP95": true
+ },
+ "years": {
+  "2017": {
+   "n": 1,
+   "sumR": 0.15
+  },
+  "2018": {
+   "n": 15,
+   "sumR": -2.27
+  },
+  "2019": {
+   "n": 12,
+   "sumR": -0.75
+  },
+  "2020": {
+   "n": 17,
+   "sumR": -1.22
+  },
+  "2021": {
+   "n": 12,
+   "sumR": 0.3
+  },
+  "2022": {
+   "n": 23,
+   "sumR": -5.93
+  },
+  "2023": {
+   "n": 9,
+   "sumR": 2.92
+  },
+  "2024": {
+   "n": 18,
+   "sumR": 0.67
+  },
+  "2025": {
+   "n": 21,
+   "sumR": -3.42
+  },
+  "2026": {
+   "n": 12,
+   "sumR": 3.25
+  }
+ }
+}
