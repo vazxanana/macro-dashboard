@@ -872,7 +872,7 @@ confirm it: forex fills sit 0.0-0.1 pip from the council's (OANDA mid) entry, me
 - Tests: `tests/forex-spread.test.mjs` (5, on `tests/fixtures/ctrader/symbols-raw-12nov.json`: the real 12 Nov file and every
   distinct quote of 8-12 Nov), `tests/ctrader-symbols.test.mjs` (bid = ask, kept, 7-day limit, commission). The pinned
   `tests/fixtures/ctrader/symbols.json` is unchanged.
-- **Yen watch list (14 Nov 2026, proposed, docs/owner-decisions.md item 55):** `WATCH` (USDJPY, GBPJPY, AUDJPY, CADJPY, CHFJPY)
+- **Yen watch list (14 Nov 2026, proposed, docs/owner-decisions.md item 54):** `WATCH` (USDJPY, GBPJPY, AUDJPY, CADJPY, CHFJPY)
   read only into `symbols.json` `watch` (never `symbols` / `markets`: the mirror, cost model and data health never see them),
   with tick-history spreads around 00:55 / 06:00 UTC (`windows`); `council/yen-spread.mjs` splits them gotobi / other. Not wired
   into any rule, page or alert. Tests: `tests/ctrader-symbols.test.mjs` ("watch list"), `tests/yen-spread.test.mjs`.

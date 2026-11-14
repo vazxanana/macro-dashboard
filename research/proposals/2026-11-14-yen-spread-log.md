@@ -1,6 +1,6 @@
 # Proposal: record the demo broker's yen-pair spreads at 00:55 and 06:00 UTC (14 Nov 2026)
 
-For the owner to approve (docs/owner-decisions.md item 55). Branch `yen-spread-log`; nothing is merged until you say so,
+For the owner to approve (docs/owner-decisions.md item 54). Branch `yen-spread-log`; nothing is merged until you say so,
 because it touches council code (`council/ctrader-symbols.mjs`, which runs in every council round).
 
 ## Why
