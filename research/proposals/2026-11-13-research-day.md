@@ -100,6 +100,7 @@ paper system with a measured, clearly negative record.
 | 334 | Gold extreme timing: follow a day that closed with its extreme in its last four hours | **FAIL, 0 of 3**: excess over the every-day trade +0.063R IS (t 2.65) but −0.024R OOS (t −1.11); gross negative OOS too | #1147 |
 | 335 | Gold month-end rebalancing: trade gold's last three days against its month-to-date lead over the S&P | **FAIL, 0 of 3**: OOS excess over the same-side month-end trade −0.055R (t −0.79), negative IS too; Holm p 1.00 | #1148 |
 | 336 | Gold TD setup (9-count exhaustion): buy after a buy setup, sell after a sell setup | **FAIL, 0 of 3**: buy setup = drift (OOS excess −0.010R, t −0.09); sell setup lost in every window (OOS −0.265R); perfected buy positive only in 2017-21; n 28-48 a window | #1149 |
+| 337 | Gold doji reversal: fade a doji at the end of a ≥ 1 ATR five-day move | **FAIL, 0 of 3**: +0.023R net OOS (t 0.22), −0.072R IS; excess over the every-day trade +0.090R OOS (t 0.89), negative IS | #1150 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
