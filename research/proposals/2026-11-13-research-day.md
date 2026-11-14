@@ -206,6 +206,7 @@ paper system with a measured, clearly negative record.
 | 188 | Stock-bond correlation filter on index longs (`stock-bond-corr`) | **FAIL**, 0 of 3: holding only while the 60-day correlation is negative cut US500 Sharpe −0.254 net 2017-26 (t −1.54), return 3.0 % vs 7.6 % a year, drawdown unchanged; random masks did as well 27-33 of 40 | #1001 |
 | 189 | Quarterly futures roll and expiry windows on indices (`index-roll-week`) | **FAIL**, 0 of 8, Holm p 1.00: SPX500 roll window 2017-26 −0.114R a trade net (n 39, t −1.08), beats 5 of 40 placebos; the expiry week's in-sample gain did not repeat | #1002 |
 | 190 | ICT A-setups whose sweep runs into an open NWOG/NDOG (`ict-nwog`) | **FAIL**, 0 of 3, Holm p 1.00: WITH-gap A-setups 2024-26 +0.029R a trade net (n 50, t 0.20) vs +0.138R for the rest; the in-sample lead (+0.427R, t 1.57) gone; one of the two items CLAUDE.md listed as untested is now tested | #1003 |
+| 191 | SMT divergence at the sweep on ICT index A-setups (`ict-smt`) | **FAIL**, 0 of 3: SMT A-setups 2024-26 −0.158R a trade net (n 149, monthly t −1.91); without SMT +0.211R (n 367, t 2.14); the gap below every placebo but small in sample (t −0.46). "Skip SMT setups" is a post-hoc lead: replication on 2008-19 started | #1004 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
