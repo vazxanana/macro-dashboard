@@ -149,6 +149,7 @@ paper system with a measured, clearly negative record.
 | 131 | Gotobi fade re-costed at the real spread at the 09:55 Tokyo fix (Dukascopy bid/ask) | NOT MEASURABLE: Dukascopy refused by the sandbox's proxy (30 of 30 requests). A GitHub runner has reached Dukascopy before, so #949 and this can run there unchanged (owner decision). gotobi-cost's break-even (USD/JPY 3.73 pips, t 2 at 1.95) still rests on unmeasured spreads | #950 |
 | 132 | Second frozen replication of the vol-spike rebound (#860): seven unused index CFDs plus earlier years | DOES NOT REPLICATE: +0.062R a trade net (n 475) but month t 1.17 (bar 2); same direction as #860, about 40 % taken by costs; no market passes Holm. Fisher with #860 now p 0.017, far from the family's Bonferroni line | #951 |
 | 133 | 2-day RSI pullback (#838) on US index years before its window | NOT MEASURABLE: OANDA starts 2003-03-24, leaving 4.0 years of entries (floor 5), no financing rate before 2006, and 2004-07 lies inside the rule's own 2009 development sample. Still no replication on unused years | #952 |
+| 134 | Turnaround Tuesday (#857/#862) on index years before both studies' windows | NOT MEASURABLE: index candles start March 2003, at most 4.7 unused years before 2008 (floor 5); gate reproduced both studies exactly. Still no replication on unused years | #953 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
