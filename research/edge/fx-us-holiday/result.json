@@ -1,0 +1,2074 @@
+{
+ "built": "2026-11-14",
+ "study": "fx-us-holiday",
+ "title": "The US dollar on the day before a US market holiday",
+ "verdict": "FAIL",
+ "system": "Research only (US dollar basket, seven pairs)",
+ "headline": "Fails: the dollar basket on the day before a US holiday, long USD (learned 2005-14), makes +0.015R a holiday out of sample (n 109, t +0.53).",
+ "data": {
+  "src": "OANDA mid daily candles (UTC days, close 00:00 UTC = 19:00 / 20:00 New York), council-data research/daily/<key>.json (git show), weekend folded into Monday (council/fills.mjs foldWeekend)",
+  "first": "2002-10-24",
+  "last": "2026-11-06",
+  "basketDays": 6254,
+  "skipped": 128,
+  "holidays": 198,
+  "missingPre": [],
+  "missingPost": []
+ },
+ "windows": {
+  "inSample": [
+   "2005-01-03",
+   "2014-12-31"
+  ],
+  "outOfSample": [
+   "2015-01-01",
+   "2026-11-06"
+  ]
+ },
+ "rule": {
+  "stopAtr": 1.5,
+  "atrN": 20,
+  "side": "long USD",
+  "sideNote": "the sign of the in-sample mean gross long-USD basket % on pre-holiday days, applied out of sample",
+  "sideAfter": "long USD"
+ },
+ "costs": {
+  "spreadPip": 0.3,
+  "commissionRT": 0.000045,
+  "note": "one raw-spread round trip per leg; 2x doubles spread, commission and the rate markup; 0 = no spread, no commission (financing kept)"
+ },
+ "financing": {
+  "source": {
+   "eur": "broker",
+   "gbp": "broker",
+   "aud": "broker",
+   "nzd": "rates",
+   "jpy": "rates",
+   "cad": "broker",
+   "chf": "broker"
+  },
+  "swapsAt": "2026-11-14T03:13:45.026Z",
+  "markupPct": 1,
+  "note": "today's broker swaps for EUR, GBP, AUD, CAD, CHF on every year; NZD and JPY from the fx-carry rate table less the markup; three nights on a Wednesday candle; holiday value-date days not modelled"
+ },
+ "pre": {
+  "side": "long USD",
+  "inSample": {
+   "n": 89,
+   "grossPctLongUsd": 0.0115,
+   "grossR": 0.0093,
+   "netR": 0.0034,
+   "t": 0.1174,
+   "monthT": 0.1186,
+   "months": 80,
+   "netR0": 0.009,
+   "netR2": -0.0028,
+   "t2": -0.0942,
+   "netPct": 0.0029,
+   "costR": 0.0059,
+   "won": 0.5056,
+   "legStops": 13,
+   "totalR": 0.3065,
+   "welchVsOrdinaryT": 0.4056,
+   "ordinaryGrossPctLongUsd": -0.0067,
+   "perLegGrossPctLongUsd": {
+    "eur": 0.0635,
+    "gbp": -0.061,
+    "aud": -0.015,
+    "nzd": -0.0125,
+    "jpy": 0.0538,
+    "cad": -0.0007,
+    "chf": 0.0526
+   }
+  },
+  "outOfSample": {
+   "n": 109,
+   "grossPctLongUsd": 0.0197,
+   "grossR": 0.0207,
+   "netR": 0.0149,
+   "t": 0.5263,
+   "monthT": 0.5187,
+   "months": 99,
+   "netR0": 0.0217,
+   "netR2": 0.0072,
+   "t2": 0.2555,
+   "netPct": 0.0127,
+   "costR": 0.0058,
+   "won": 0.5321,
+   "legStops": 12,
+   "totalR": 1.6199,
+   "welchVsOrdinaryT": 0.5467,
+   "ordinaryGrossPctLongUsd": 0.0001,
+   "perLegGrossPctLongUsd": {
+    "eur": 0.0751,
+    "gbp": 0.005,
+    "aud": -0.0046,
+    "nzd": 0.0113,
+    "jpy": 0.0287,
+    "cad": -0.0093,
+    "chf": 0.0319
+   }
+  },
+  "byTypeOutOfSample": [
+   {
+    "name": "Christmas Day",
+    "n": 11,
+    "netR": -0.0658,
+    "t": -1.3759
+   },
+   {
+    "name": "Good Friday",
+    "n": 12,
+    "netR": 0.0836,
+    "t": 1.1517
+   },
+   {
+    "name": "Independence Day",
+    "n": 12,
+    "netR": -0.1423,
+    "t": -1.5085
+   },
+   {
+    "name": "Juneteenth",
+    "n": 5,
+    "netR": 0.2106,
+    "t": 1.4128
+   },
+   {
+    "name": "Labor Day",
+    "n": 12,
+    "netR": 0.097,
+    "t": 1.4704
+   },
+   {
+    "name": "Martin Luther King Day",
+    "n": 12,
+    "netR": 0.166,
+    "t": 1.8426
+   },
+   {
+    "name": "Memorial Day",
+    "n": 12,
+    "netR": 0.0032,
+    "t": 0.0309
+   },
+   {
+    "name": "New Year's Day",
+    "n": 10,
+    "netR": -0.0009,
+    "t": -0.0109
+   },
+   {
+    "name": "Presidents' Day",
+    "n": 12,
+    "netR": 0.0193,
+    "t": 0.3403
+   },
+   {
+    "name": "Thanksgiving Day",
+    "n": 11,
+    "netR": -0.1293,
+    "t": -1.0994
+   }
+  ]
+ },
+ "after": {
+  "reportedOnly": true,
+  "side": "long USD",
+  "inSample": {
+   "n": 88,
+   "grossPctLongUsd": 0.0225,
+   "grossR": 0.002,
+   "netR": -0.0039,
+   "t": -0.1047,
+   "monthT": -0.1033,
+   "months": 80,
+   "netR0": 0.0017,
+   "netR2": -0.0102,
+   "t2": -0.2723,
+   "netPct": 0.0142,
+   "costR": 0.0059,
+   "won": 0.5682,
+   "legStops": 32,
+   "totalR": -0.3447,
+   "welchVsOrdinaryT": 0.4776,
+   "ordinaryGrossPctLongUsd": -0.0067,
+   "perLegGrossPctLongUsd": {
+    "eur": -0.0038,
+    "gbp": 0.0264,
+    "aud": -0.0729,
+    "nzd": 0.0227,
+    "jpy": 0.1231,
+    "cad": 0.0008,
+    "chf": 0.0609
+   }
+  },
+  "outOfSample": {
+   "n": 110,
+   "grossPctLongUsd": 0.1078,
+   "grossR": 0.0954,
+   "netR": 0.0892,
+   "t": 2.647,
+   "monthT": 2.5002,
+   "months": 99,
+   "netR0": 0.0961,
+   "netR2": 0.0815,
+   "t2": 2.4192,
+   "netPct": 0.1006,
+   "costR": 0.0062,
+   "won": 0.6273,
+   "legStops": 23,
+   "totalR": 9.8075,
+   "welchVsOrdinaryT": 2.5909,
+   "ordinaryGrossPctLongUsd": 0.0001,
+   "perLegGrossPctLongUsd": {
+    "eur": 0.1019,
+    "gbp": 0.1098,
+    "aud": 0.1189,
+    "nzd": 0.1357,
+    "jpy": 0.0672,
+    "cad": 0.1241,
+    "chf": 0.0968
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "need": 38,
+  "realNetR": 0.0149,
+  "beaten": 26,
+  "ordinaryDays": 2761,
+  "seedNetR": [
+   0.0065,
+   -0.0025,
+   -0.0032,
+   -0.0145,
+   -0.0458,
+   -0.0015,
+   -0.0473,
+   -0.0545,
+   -0.0754,
+   0.0931,
+   0.0037,
+   0.0193,
+   0.0523,
+   0.0329,
+   0.0431,
+   0.0313,
+   -0.0452,
+   -0.0282,
+   -0.0469,
+   0.0532,
+   -0.0166,
+   -0.01,
+   -0.0132,
+   0.0288,
+   -0.021,
+   0.0232,
+   -0.0443,
+   -0.025,
+   0.0474,
+   0.0333,
+   -0.0055,
+   0.011,
+   -0.0352,
+   -0.0089,
+   0.0409,
+   0.0219,
+   -0.0166,
+   0.0007,
+   -0.0071,
+   0.0195
+  ]
+ },
+ "tests": {
+  "T1": false,
+  "T2": true,
+  "T3": true,
+  "T4": false
+ },
+ "trades": [
+  {
+   "ymd": "2005-01-14",
+   "hol": "2005-01-17",
+   "name": "Martin Luther King Day",
+   "entry": "2005-01-13",
+   "grossPctLongUsd": 0.6025,
+   "netR": 0.4962,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-02-18",
+   "hol": "2005-02-21",
+   "name": "Presidents' Day",
+   "entry": "2005-02-17",
+   "grossPctLongUsd": -0.1684,
+   "netR": -0.1187,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-03-24",
+   "hol": "2005-03-25",
+   "name": "Good Friday",
+   "entry": "2005-03-23",
+   "grossPctLongUsd": 0.3318,
+   "netR": 0.2329,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-05-27",
+   "hol": "2005-05-30",
+   "name": "Memorial Day",
+   "entry": "2005-05-26",
+   "grossPctLongUsd": -0.5428,
+   "netR": -0.4692,
+   "stops": 1
+  },
+  {
+   "ymd": "2005-07-01",
+   "hol": "2005-07-04",
+   "name": "Independence Day",
+   "entry": "2005-06-30",
+   "grossPctLongUsd": 1.216,
+   "netR": 0.9239,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-09-02",
+   "hol": "2005-09-05",
+   "name": "Labor Day",
+   "entry": "2005-09-01",
+   "grossPctLongUsd": -0.2592,
+   "netR": -0.2126,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-11-23",
+   "hol": "2005-11-24",
+   "name": "Thanksgiving Day",
+   "entry": "2005-11-22",
+   "grossPctLongUsd": -0.0929,
+   "netR": -0.0725,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-12-23",
+   "hol": "2005-12-26",
+   "name": "Christmas Day",
+   "entry": "2005-12-22",
+   "grossPctLongUsd": -0.0439,
+   "netR": -0.0302,
+   "stops": 0
+  },
+  {
+   "ymd": "2005-12-30",
+   "hol": "2006-01-02",
+   "name": "New Year's Day",
+   "entry": "2005-12-29",
+   "grossPctLongUsd": -0.0243,
+   "netR": -0.0339,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-01-13",
+   "hol": "2006-01-16",
+   "name": "Martin Luther King Day",
+   "entry": "2006-01-12",
+   "grossPctLongUsd": -0.6091,
+   "netR": -0.4815,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-02-17",
+   "hol": "2006-02-20",
+   "name": "Presidents' Day",
+   "entry": "2006-02-16",
+   "grossPctLongUsd": 0.022,
+   "netR": -0.021,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-04-13",
+   "hol": "2006-04-14",
+   "name": "Good Friday",
+   "entry": "2006-04-12",
+   "grossPctLongUsd": 0.2082,
+   "netR": 0.1064,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-05-26",
+   "hol": "2006-05-29",
+   "name": "Memorial Day",
+   "entry": "2006-05-25",
+   "grossPctLongUsd": 0.5764,
+   "netR": 0.3147,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-07-03",
+   "hol": "2006-07-04",
+   "name": "Independence Day",
+   "entry": "2006-06-30",
+   "grossPctLongUsd": 0.0449,
+   "netR": 0.0321,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-09-01",
+   "hol": "2006-09-04",
+   "name": "Labor Day",
+   "entry": "2006-08-31",
+   "grossPctLongUsd": -0.1471,
+   "netR": -0.1381,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-11-22",
+   "hol": "2006-11-23",
+   "name": "Thanksgiving Day",
+   "entry": "2006-11-21",
+   "grossPctLongUsd": -0.6685,
+   "netR": -0.7226,
+   "stops": 4
+  },
+  {
+   "ymd": "2006-12-22",
+   "hol": "2006-12-25",
+   "name": "Christmas Day",
+   "entry": "2006-12-21",
+   "grossPctLongUsd": 0.1894,
+   "netR": 0.1759,
+   "stops": 0
+  },
+  {
+   "ymd": "2006-12-29",
+   "hol": "2007-01-01",
+   "name": "New Year's Day",
+   "entry": "2006-12-28",
+   "grossPctLongUsd": 0.065,
+   "netR": 0.0742,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-01-12",
+   "hol": "2007-01-15",
+   "name": "Martin Luther King Day",
+   "entry": "2007-01-11",
+   "grossPctLongUsd": -0.4014,
+   "netR": -0.4136,
+   "stops": 1
+  },
+  {
+   "ymd": "2007-02-16",
+   "hol": "2007-02-19",
+   "name": "Presidents' Day",
+   "entry": "2007-02-15",
+   "grossPctLongUsd": -0.1459,
+   "netR": -0.1171,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-04-05",
+   "hol": "2007-04-06",
+   "name": "Good Friday",
+   "entry": "2007-04-04",
+   "grossPctLongUsd": -0.2128,
+   "netR": -0.2328,
+   "stops": 1
+  },
+  {
+   "ymd": "2007-05-25",
+   "hol": "2007-05-28",
+   "name": "Memorial Day",
+   "entry": "2007-05-24",
+   "grossPctLongUsd": -0.0254,
+   "netR": -0.0062,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-07-03",
+   "hol": "2007-07-04",
+   "name": "Independence Day",
+   "entry": "2007-07-02",
+   "grossPctLongUsd": 0.2129,
+   "netR": 0.212,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-08-31",
+   "hol": "2007-09-03",
+   "name": "Labor Day",
+   "entry": "2007-08-30",
+   "grossPctLongUsd": 0.089,
+   "netR": 0.0794,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-11-21",
+   "hol": "2007-11-22",
+   "name": "Thanksgiving Day",
+   "entry": "2007-11-20",
+   "grossPctLongUsd": 0.419,
+   "netR": 0.0914,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-12-24",
+   "hol": "2007-12-25",
+   "name": "Christmas Day",
+   "entry": "2007-12-21",
+   "grossPctLongUsd": -0.1599,
+   "netR": -0.0682,
+   "stops": 0
+  },
+  {
+   "ymd": "2007-12-31",
+   "hol": "2008-01-01",
+   "name": "New Year's Day",
+   "entry": "2007-12-28",
+   "grossPctLongUsd": 0.6567,
+   "netR": 0.4369,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-01-18",
+   "hol": "2008-01-21",
+   "name": "Martin Luther King Day",
+   "entry": "2008-01-17",
+   "grossPctLongUsd": 0.0712,
+   "netR": 0.0685,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-02-15",
+   "hol": "2008-02-18",
+   "name": "Presidents' Day",
+   "entry": "2008-02-14",
+   "grossPctLongUsd": -0.108,
+   "netR": -0.0459,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-03-20",
+   "hol": "2008-03-21",
+   "name": "Good Friday",
+   "entry": "2008-03-19",
+   "grossPctLongUsd": 0.9117,
+   "netR": 0.4366,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-05-23",
+   "hol": "2008-05-26",
+   "name": "Memorial Day",
+   "entry": "2008-05-22",
+   "grossPctLongUsd": -0.1478,
+   "netR": -0.0898,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-07-03",
+   "hol": "2008-07-04",
+   "name": "Independence Day",
+   "entry": "2008-07-02",
+   "grossPctLongUsd": 0.7807,
+   "netR": 0.5254,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-08-29",
+   "hol": "2008-09-01",
+   "name": "Labor Day",
+   "entry": "2008-08-28",
+   "grossPctLongUsd": 0.3502,
+   "netR": 0.197,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-11-26",
+   "hol": "2008-11-27",
+   "name": "Thanksgiving Day",
+   "entry": "2008-11-25",
+   "grossPctLongUsd": 0.1994,
+   "netR": 0.1052,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-12-24",
+   "hol": "2008-12-25",
+   "name": "Christmas Day",
+   "entry": "2008-12-23",
+   "grossPctLongUsd": -0.6215,
+   "netR": -0.1899,
+   "stops": 0
+  },
+  {
+   "ymd": "2008-12-31",
+   "hol": "2009-01-01",
+   "name": "New Year's Day",
+   "entry": "2008-12-30",
+   "grossPctLongUsd": 0.0092,
+   "netR": 0.0187,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-01-16",
+   "hol": "2009-01-19",
+   "name": "Martin Luther King Day",
+   "entry": "2009-01-15",
+   "grossPctLongUsd": -0.4844,
+   "netR": -0.1404,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-02-13",
+   "hol": "2009-02-16",
+   "name": "Presidents' Day",
+   "entry": "2009-02-12",
+   "grossPctLongUsd": 0.032,
+   "netR": 0.0212,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-04-09",
+   "hol": "2009-04-10",
+   "name": "Good Friday",
+   "entry": "2009-04-08",
+   "grossPctLongUsd": -0.0348,
+   "netR": 0.0093,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-05-22",
+   "hol": "2009-05-25",
+   "name": "Memorial Day",
+   "entry": "2009-05-21",
+   "grossPctLongUsd": -0.3762,
+   "netR": -0.1522,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-07-02",
+   "hol": "2009-07-03",
+   "name": "Independence Day",
+   "entry": "2009-07-01",
+   "grossPctLongUsd": 1.144,
+   "netR": 0.4312,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-09-04",
+   "hol": "2009-09-07",
+   "name": "Labor Day",
+   "entry": "2009-09-03",
+   "grossPctLongUsd": -0.6178,
+   "netR": -0.2918,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-11-25",
+   "hol": "2009-11-26",
+   "name": "Thanksgiving Day",
+   "entry": "2009-11-24",
+   "grossPctLongUsd": -1.0311,
+   "netR": -0.6019,
+   "stops": 1
+  },
+  {
+   "ymd": "2009-12-24",
+   "hol": "2009-12-25",
+   "name": "Christmas Day",
+   "entry": "2009-12-23",
+   "grossPctLongUsd": -0.222,
+   "netR": -0.1157,
+   "stops": 0
+  },
+  {
+   "ymd": "2009-12-31",
+   "hol": "2010-01-01",
+   "name": "New Year's Day",
+   "entry": "2009-12-30",
+   "grossPctLongUsd": -0.0465,
+   "netR": -0.0324,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-01-15",
+   "hol": "2010-01-18",
+   "name": "Martin Luther King Day",
+   "entry": "2010-01-14",
+   "grossPctLongUsd": 0.4692,
+   "netR": 0.3114,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-02-12",
+   "hol": "2010-02-15",
+   "name": "Presidents' Day",
+   "entry": "2010-02-11",
+   "grossPctLongUsd": 0.1793,
+   "netR": 0.1077,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-04-01",
+   "hol": "2010-04-02",
+   "name": "Good Friday",
+   "entry": "2010-03-31",
+   "grossPctLongUsd": -0.2067,
+   "netR": -0.1521,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-05-28",
+   "hol": "2010-05-31",
+   "name": "Memorial Day",
+   "entry": "2010-05-27",
+   "grossPctLongUsd": 0.4898,
+   "netR": 0.1882,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-07-02",
+   "hol": "2010-07-05",
+   "name": "Independence Day",
+   "entry": "2010-07-01",
+   "grossPctLongUsd": 0.0907,
+   "netR": 0.0252,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-09-03",
+   "hol": "2010-09-06",
+   "name": "Labor Day",
+   "entry": "2010-09-02",
+   "grossPctLongUsd": -0.5867,
+   "netR": -0.3405,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-11-24",
+   "hol": "2010-11-25",
+   "name": "Thanksgiving Day",
+   "entry": "2010-11-23",
+   "grossPctLongUsd": -0.2914,
+   "netR": -0.1724,
+   "stops": 0
+  },
+  {
+   "ymd": "2010-12-23",
+   "hol": "2010-12-24",
+   "name": "Christmas Day",
+   "entry": "2010-12-22",
+   "grossPctLongUsd": -0.2663,
+   "netR": -0.1836,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-01-14",
+   "hol": "2011-01-17",
+   "name": "Martin Luther King Day",
+   "entry": "2011-01-13",
+   "grossPctLongUsd": 0.2058,
+   "netR": 0.1404,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-02-18",
+   "hol": "2011-02-21",
+   "name": "Presidents' Day",
+   "entry": "2011-02-17",
+   "grossPctLongUsd": -0.2861,
+   "netR": -0.1914,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-04-21",
+   "hol": "2011-04-22",
+   "name": "Good Friday",
+   "entry": "2011-04-20",
+   "grossPctLongUsd": -0.4962,
+   "netR": -0.3726,
+   "stops": 1
+  },
+  {
+   "ymd": "2011-05-27",
+   "hol": "2011-05-30",
+   "name": "Memorial Day",
+   "entry": "2011-05-26",
+   "grossPctLongUsd": -0.8931,
+   "netR": -0.5238,
+   "stops": 1
+  },
+  {
+   "ymd": "2011-07-01",
+   "hol": "2011-07-04",
+   "name": "Independence Day",
+   "entry": "2011-06-30",
+   "grossPctLongUsd": -0.2122,
+   "netR": -0.1359,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-09-02",
+   "hol": "2011-09-05",
+   "name": "Labor Day",
+   "entry": "2011-09-01",
+   "grossPctLongUsd": 0.2081,
+   "netR": 0.1194,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-11-23",
+   "hol": "2011-11-24",
+   "name": "Thanksgiving Day",
+   "entry": "2011-11-22",
+   "grossPctLongUsd": 0.9882,
+   "netR": 0.481,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-12-23",
+   "hol": "2011-12-26",
+   "name": "Christmas Day",
+   "entry": "2011-12-22",
+   "grossPctLongUsd": 0.0587,
+   "netR": 0.0393,
+   "stops": 0
+  },
+  {
+   "ymd": "2011-12-30",
+   "hol": "2012-01-02",
+   "name": "New Year's Day",
+   "entry": "2011-12-29",
+   "grossPctLongUsd": -0.44,
+   "netR": -0.3698,
+   "stops": 1
+  },
+  {
+   "ymd": "2012-01-13",
+   "hol": "2012-01-16",
+   "name": "Martin Luther King Day",
+   "entry": "2012-01-12",
+   "grossPctLongUsd": 0.3924,
+   "netR": 0.3171,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-02-17",
+   "hol": "2012-02-20",
+   "name": "Presidents' Day",
+   "entry": "2012-02-16",
+   "grossPctLongUsd": 0.2285,
+   "netR": 0.1853,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-04-05",
+   "hol": "2012-04-06",
+   "name": "Good Friday",
+   "entry": "2012-04-04",
+   "grossPctLongUsd": 0.1212,
+   "netR": 0.0938,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-05-25",
+   "hol": "2012-05-28",
+   "name": "Memorial Day",
+   "entry": "2012-05-24",
+   "grossPctLongUsd": 0.0747,
+   "netR": 0.0528,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-07-03",
+   "hol": "2012-07-04",
+   "name": "Independence Day",
+   "entry": "2012-07-02",
+   "grossPctLongUsd": -0.1485,
+   "netR": -0.0994,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-08-31",
+   "hol": "2012-09-03",
+   "name": "Labor Day",
+   "entry": "2012-08-30",
+   "grossPctLongUsd": -0.5151,
+   "netR": -0.5492,
+   "stops": 1
+  },
+  {
+   "ymd": "2012-11-21",
+   "hol": "2012-11-22",
+   "name": "Thanksgiving Day",
+   "entry": "2012-11-20",
+   "grossPctLongUsd": 0.005,
+   "netR": -0.0416,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-12-24",
+   "hol": "2012-12-25",
+   "name": "Christmas Day",
+   "entry": "2012-12-21",
+   "grossPctLongUsd": 0.154,
+   "netR": 0.1514,
+   "stops": 0
+  },
+  {
+   "ymd": "2012-12-31",
+   "hol": "2013-01-01",
+   "name": "New Year's Day",
+   "entry": "2012-12-28",
+   "grossPctLongUsd": -0.0674,
+   "netR": -0.1314,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-01-18",
+   "hol": "2013-01-21",
+   "name": "Martin Luther King Day",
+   "entry": "2013-01-17",
+   "grossPctLongUsd": 0.3286,
+   "netR": 0.3381,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-02-15",
+   "hol": "2013-02-18",
+   "name": "Presidents' Day",
+   "entry": "2013-02-14",
+   "grossPctLongUsd": 0.2697,
+   "netR": 0.2239,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-03-28",
+   "hol": "2013-03-29",
+   "name": "Good Friday",
+   "entry": "2013-03-27",
+   "grossPctLongUsd": -0.1683,
+   "netR": -0.1295,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-05-24",
+   "hol": "2013-05-27",
+   "name": "Memorial Day",
+   "entry": "2013-05-23",
+   "grossPctLongUsd": -0.3688,
+   "netR": -0.2375,
+   "stops": 1
+  },
+  {
+   "ymd": "2013-07-03",
+   "hol": "2013-07-04",
+   "name": "Independence Day",
+   "entry": "2013-07-02",
+   "grossPctLongUsd": -0.5121,
+   "netR": -0.3259,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-08-30",
+   "hol": "2013-09-02",
+   "name": "Labor Day",
+   "entry": "2013-08-29",
+   "grossPctLongUsd": 0.0779,
+   "netR": 0.038,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-11-27",
+   "hol": "2013-11-28",
+   "name": "Thanksgiving Day",
+   "entry": "2013-11-26",
+   "grossPctLongUsd": 0.2764,
+   "netR": 0.2321,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-12-24",
+   "hol": "2013-12-25",
+   "name": "Christmas Day",
+   "entry": "2013-12-23",
+   "grossPctLongUsd": 0.0562,
+   "netR": 0.042,
+   "stops": 0
+  },
+  {
+   "ymd": "2013-12-31",
+   "hol": "2014-01-01",
+   "name": "New Year's Day",
+   "entry": "2013-12-30",
+   "grossPctLongUsd": -0.0429,
+   "netR": -0.0564,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-01-17",
+   "hol": "2014-01-20",
+   "name": "Martin Luther King Day",
+   "entry": "2014-01-16",
+   "grossPctLongUsd": 0.3513,
+   "netR": 0.3115,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-02-14",
+   "hol": "2014-02-17",
+   "name": "Presidents' Day",
+   "entry": "2014-02-13",
+   "grossPctLongUsd": -0.276,
+   "netR": -0.2307,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-04-17",
+   "hol": "2014-04-18",
+   "name": "Good Friday",
+   "entry": "2014-04-16",
+   "grossPctLongUsd": 0.2405,
+   "netR": 0.2366,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-05-23",
+   "hol": "2014-05-26",
+   "name": "Memorial Day",
+   "entry": "2014-05-22",
+   "grossPctLongUsd": 0.0829,
+   "netR": 0.0988,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-07-03",
+   "hol": "2014-07-04",
+   "name": "Independence Day",
+   "entry": "2014-07-02",
+   "grossPctLongUsd": 0.2976,
+   "netR": 0.3645,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-08-29",
+   "hol": "2014-09-01",
+   "name": "Labor Day",
+   "entry": "2014-08-28",
+   "grossPctLongUsd": 0.2113,
+   "netR": 0.2801,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-11-26",
+   "hol": "2014-11-27",
+   "name": "Thanksgiving Day",
+   "entry": "2014-11-25",
+   "grossPctLongUsd": -0.181,
+   "netR": -0.144,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-12-24",
+   "hol": "2014-12-25",
+   "name": "Christmas Day",
+   "entry": "2014-12-23",
+   "grossPctLongUsd": -0.1165,
+   "netR": -0.0879,
+   "stops": 0
+  },
+  {
+   "ymd": "2014-12-31",
+   "hol": "2015-01-01",
+   "name": "New Year's Day",
+   "entry": "2014-12-30",
+   "grossPctLongUsd": 0.3012,
+   "netR": 0.2127,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-01-16",
+   "hol": "2015-01-19",
+   "name": "Martin Luther King Day",
+   "entry": "2015-01-15",
+   "grossPctLongUsd": 0.4602,
+   "netR": 0.3495,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-02-13",
+   "hol": "2015-02-16",
+   "name": "Presidents' Day",
+   "entry": "2015-02-12",
+   "grossPctLongUsd": -0.127,
+   "netR": -0.0711,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-04-02",
+   "hol": "2015-04-03",
+   "name": "Good Friday",
+   "entry": "2015-04-01",
+   "grossPctLongUsd": -0.3478,
+   "netR": -0.1554,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-05-22",
+   "hol": "2015-05-25",
+   "name": "Memorial Day",
+   "entry": "2015-05-21",
+   "grossPctLongUsd": 0.7029,
+   "netR": 0.432,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-07-02",
+   "hol": "2015-07-03",
+   "name": "Independence Day",
+   "entry": "2015-07-01",
+   "grossPctLongUsd": -0.2452,
+   "netR": -0.1586,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-09-04",
+   "hol": "2015-09-07",
+   "name": "Labor Day",
+   "entry": "2015-09-03",
+   "grossPctLongUsd": 0.4641,
+   "netR": 0.2138,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-11-25",
+   "hol": "2015-11-26",
+   "name": "Thanksgiving Day",
+   "entry": "2015-11-24",
+   "grossPctLongUsd": 0.0222,
+   "netR": 0.0203,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-12-24",
+   "hol": "2015-12-25",
+   "name": "Christmas Day",
+   "entry": "2015-12-23",
+   "grossPctLongUsd": -0.4023,
+   "netR": -0.2824,
+   "stops": 0
+  },
+  {
+   "ymd": "2015-12-31",
+   "hol": "2016-01-01",
+   "name": "New Year's Day",
+   "entry": "2015-12-30",
+   "grossPctLongUsd": 0.2449,
+   "netR": 0.1526,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-01-15",
+   "hol": "2016-01-18",
+   "name": "Martin Luther King Day",
+   "entry": "2016-01-14",
+   "grossPctLongUsd": 0.3861,
+   "netR": 0.2473,
+   "stops": 1
+  },
+  {
+   "ymd": "2016-02-12",
+   "hol": "2016-02-15",
+   "name": "Presidents' Day",
+   "entry": "2016-02-11",
+   "grossPctLongUsd": 0.3372,
+   "netR": 0.1642,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-03-24",
+   "hol": "2016-03-25",
+   "name": "Good Friday",
+   "entry": "2016-03-23",
+   "grossPctLongUsd": 0.1664,
+   "netR": 0.0873,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-05-27",
+   "hol": "2016-05-30",
+   "name": "Memorial Day",
+   "entry": "2016-05-26",
+   "grossPctLongUsd": 0.5498,
+   "netR": 0.4294,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-07-01",
+   "hol": "2016-07-04",
+   "name": "Independence Day",
+   "entry": "2016-06-30",
+   "grossPctLongUsd": -0.337,
+   "netR": -0.2032,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-09-02",
+   "hol": "2016-09-05",
+   "name": "Labor Day",
+   "entry": "2016-09-01",
+   "grossPctLongUsd": -0.018,
+   "netR": -0.023,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-11-23",
+   "hol": "2016-11-24",
+   "name": "Thanksgiving Day",
+   "entry": "2016-11-22",
+   "grossPctLongUsd": 0.7018,
+   "netR": 0.4608,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-12-23",
+   "hol": "2016-12-26",
+   "name": "Christmas Day",
+   "entry": "2016-12-22",
+   "grossPctLongUsd": 0.1519,
+   "netR": 0.1134,
+   "stops": 0
+  },
+  {
+   "ymd": "2016-12-30",
+   "hol": "2017-01-02",
+   "name": "New Year's Day",
+   "entry": "2016-12-29",
+   "grossPctLongUsd": 0.2159,
+   "netR": 0.1295,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-01-13",
+   "hol": "2017-01-16",
+   "name": "Martin Luther King Day",
+   "entry": "2017-01-12",
+   "grossPctLongUsd": -0.2035,
+   "netR": -0.1667,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-02-17",
+   "hol": "2017-02-20",
+   "name": "Presidents' Day",
+   "entry": "2017-02-16",
+   "grossPctLongUsd": 0.3224,
+   "netR": 0.2678,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-04-13",
+   "hol": "2017-04-14",
+   "name": "Good Friday",
+   "entry": "2017-04-12",
+   "grossPctLongUsd": 0.2414,
+   "netR": 0.2521,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-05-26",
+   "hol": "2017-05-29",
+   "name": "Memorial Day",
+   "entry": "2017-05-25",
+   "grossPctLongUsd": 0.0235,
+   "netR": 0.0498,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-07-03",
+   "hol": "2017-07-04",
+   "name": "Independence Day",
+   "entry": "2017-06-30",
+   "grossPctLongUsd": 0.5008,
+   "netR": 0.4739,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-09-01",
+   "hol": "2017-09-04",
+   "name": "Labor Day",
+   "entry": "2017-08-31",
+   "grossPctLongUsd": 0.0406,
+   "netR": 0.0072,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-11-22",
+   "hol": "2017-11-23",
+   "name": "Thanksgiving Day",
+   "entry": "2017-11-21",
+   "grossPctLongUsd": -0.6055,
+   "netR": -0.5998,
+   "stops": 1
+  },
+  {
+   "ymd": "2017-12-22",
+   "hol": "2017-12-25",
+   "name": "Christmas Day",
+   "entry": "2017-12-21",
+   "grossPctLongUsd": -0.0406,
+   "netR": -0.0449,
+   "stops": 0
+  },
+  {
+   "ymd": "2017-12-29",
+   "hol": "2018-01-01",
+   "name": "New Year's Day",
+   "entry": "2017-12-28",
+   "grossPctLongUsd": -0.2327,
+   "netR": -0.2669,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-01-12",
+   "hol": "2018-01-15",
+   "name": "Martin Luther King Day",
+   "entry": "2018-01-11",
+   "grossPctLongUsd": -0.4771,
+   "netR": -0.5721,
+   "stops": 2
+  },
+  {
+   "ymd": "2018-02-16",
+   "hol": "2018-02-19",
+   "name": "Presidents' Day",
+   "entry": "2018-02-15",
+   "grossPctLongUsd": 0.4514,
+   "netR": 0.3178,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-03-29",
+   "hol": "2018-03-30",
+   "name": "Good Friday",
+   "entry": "2018-03-28",
+   "grossPctLongUsd": -0.0825,
+   "netR": -0.0696,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-05-25",
+   "hol": "2018-05-28",
+   "name": "Memorial Day",
+   "entry": "2018-05-24",
+   "grossPctLongUsd": 0.3285,
+   "netR": 0.2788,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-07-03",
+   "hol": "2018-07-04",
+   "name": "Independence Day",
+   "entry": "2018-07-02",
+   "grossPctLongUsd": -0.3732,
+   "netR": -0.3389,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-08-31",
+   "hol": "2018-09-03",
+   "name": "Labor Day",
+   "entry": "2018-08-30",
+   "grossPctLongUsd": 0.3944,
+   "netR": 0.3495,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-11-21",
+   "hol": "2018-11-22",
+   "name": "Thanksgiving Day",
+   "entry": "2018-11-20",
+   "grossPctLongUsd": -0.2305,
+   "netR": -0.1899,
+   "stops": 0
+  },
+  {
+   "ymd": "2018-12-24",
+   "hol": "2018-12-25",
+   "name": "Christmas Day",
+   "entry": "2018-12-21",
+   "grossPctLongUsd": -0.4326,
+   "netR": -0.4205,
+   "stops": 1
+  },
+  {
+   "ymd": "2018-12-31",
+   "hol": "2019-01-01",
+   "name": "New Year's Day",
+   "entry": "2018-12-28",
+   "grossPctLongUsd": -0.2751,
+   "netR": -0.2574,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-01-18",
+   "hol": "2019-01-21",
+   "name": "Martin Luther King Day",
+   "entry": "2019-01-17",
+   "grossPctLongUsd": 0.3314,
+   "netR": 0.2508,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-02-15",
+   "hol": "2019-02-18",
+   "name": "Presidents' Day",
+   "entry": "2019-02-14",
+   "grossPctLongUsd": -0.3017,
+   "netR": -0.2697,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-04-18",
+   "hol": "2019-04-19",
+   "name": "Good Friday",
+   "entry": "2019-04-17",
+   "grossPctLongUsd": 0.3448,
+   "netR": 0.4028,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-05-24",
+   "hol": "2019-05-27",
+   "name": "Memorial Day",
+   "entry": "2019-05-23",
+   "grossPctLongUsd": -0.296,
+   "netR": -0.3551,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-07-03",
+   "hol": "2019-07-04",
+   "name": "Independence Day",
+   "entry": "2019-07-02",
+   "grossPctLongUsd": -0.1675,
+   "netR": -0.1921,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-08-30",
+   "hol": "2019-09-02",
+   "name": "Labor Day",
+   "entry": "2019-08-29",
+   "grossPctLongUsd": 0.1879,
+   "netR": 0.21,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-11-27",
+   "hol": "2019-11-28",
+   "name": "Thanksgiving Day",
+   "entry": "2019-11-26",
+   "grossPctLongUsd": 0.0807,
+   "netR": 0.1097,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-12-24",
+   "hol": "2019-12-25",
+   "name": "Christmas Day",
+   "entry": "2019-12-23",
+   "grossPctLongUsd": 0.0091,
+   "netR": 0.0107,
+   "stops": 0
+  },
+  {
+   "ymd": "2019-12-31",
+   "hol": "2020-01-01",
+   "name": "New Year's Day",
+   "entry": "2019-12-30",
+   "grossPctLongUsd": -0.3271,
+   "netR": -0.3999,
+   "stops": 1
+  },
+  {
+   "ymd": "2020-01-17",
+   "hol": "2020-01-20",
+   "name": "Martin Luther King Day",
+   "entry": "2020-01-16",
+   "grossPctLongUsd": 0.3055,
+   "netR": 0.3963,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-02-14",
+   "hol": "2020-02-17",
+   "name": "Presidents' Day",
+   "entry": "2020-02-13",
+   "grossPctLongUsd": 0.0704,
+   "netR": 0.0817,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-04-09",
+   "hol": "2020-04-10",
+   "name": "Good Friday",
+   "entry": "2020-04-08",
+   "grossPctLongUsd": -0.6514,
+   "netR": -0.207,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-05-22",
+   "hol": "2020-05-25",
+   "name": "Memorial Day",
+   "entry": "2020-05-21",
+   "grossPctLongUsd": 0.3091,
+   "netR": 0.2127,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-07-02",
+   "hol": "2020-07-03",
+   "name": "Independence Day",
+   "entry": "2020-07-01",
+   "grossPctLongUsd": -0.076,
+   "netR": -0.0411,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-09-04",
+   "hol": "2020-09-07",
+   "name": "Labor Day",
+   "entry": "2020-09-03",
+   "grossPctLongUsd": -0.1432,
+   "netR": -0.1212,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-11-25",
+   "hol": "2020-11-26",
+   "name": "Thanksgiving Day",
+   "entry": "2020-11-24",
+   "grossPctLongUsd": -0.1422,
+   "netR": -0.127,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-12-24",
+   "hol": "2020-12-25",
+   "name": "Christmas Day",
+   "entry": "2020-12-23",
+   "grossPctLongUsd": 0.0479,
+   "netR": 0.0822,
+   "stops": 0
+  },
+  {
+   "ymd": "2020-12-31",
+   "hol": "2021-01-01",
+   "name": "New Year's Day",
+   "entry": "2020-12-30",
+   "grossPctLongUsd": 0.1708,
+   "netR": 0.2005,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-01-15",
+   "hol": "2021-01-18",
+   "name": "Martin Luther King Day",
+   "entry": "2021-01-14",
+   "grossPctLongUsd": 0.6317,
+   "netR": 0.496,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-02-12",
+   "hol": "2021-02-15",
+   "name": "Presidents' Day",
+   "entry": "2021-02-11",
+   "grossPctLongUsd": 0.0213,
+   "netR": 0.0382,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-04-01",
+   "hol": "2021-04-02",
+   "name": "Good Friday",
+   "entry": "2021-03-31",
+   "grossPctLongUsd": -0.2997,
+   "netR": -0.269,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-05-28",
+   "hol": "2021-05-31",
+   "name": "Memorial Day",
+   "entry": "2021-05-27",
+   "grossPctLongUsd": 0.1903,
+   "netR": 0.1548,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-07-02",
+   "hol": "2021-07-05",
+   "name": "Independence Day",
+   "entry": "2021-07-01",
+   "grossPctLongUsd": -0.6283,
+   "netR": -0.6304,
+   "stops": 1
+  },
+  {
+   "ymd": "2021-09-03",
+   "hol": "2021-09-06",
+   "name": "Labor Day",
+   "entry": "2021-09-02",
+   "grossPctLongUsd": -0.3126,
+   "netR": -0.3122,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-11-24",
+   "hol": "2021-11-25",
+   "name": "Thanksgiving Day",
+   "entry": "2021-11-23",
+   "grossPctLongUsd": 0.3278,
+   "netR": 0.2732,
+   "stops": 0
+  },
+  {
+   "ymd": "2021-12-23",
+   "hol": "2021-12-24",
+   "name": "Christmas Day",
+   "entry": "2021-12-22",
+   "grossPctLongUsd": -0.1019,
+   "netR": -0.0921,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-01-14",
+   "hol": "2022-01-17",
+   "name": "Martin Luther King Day",
+   "entry": "2022-01-13",
+   "grossPctLongUsd": 0.4489,
+   "netR": 0.4183,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-02-18",
+   "hol": "2022-02-21",
+   "name": "Presidents' Day",
+   "entry": "2022-02-17",
+   "grossPctLongUsd": 0.1805,
+   "netR": 0.1805,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-04-14",
+   "hol": "2022-04-15",
+   "name": "Good Friday",
+   "entry": "2022-04-13",
+   "grossPctLongUsd": 0.5579,
+   "netR": 0.4793,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-05-27",
+   "hol": "2022-05-30",
+   "name": "Memorial Day",
+   "entry": "2022-05-26",
+   "grossPctLongUsd": -0.3426,
+   "netR": -0.2061,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-06-17",
+   "hol": "2022-06-20",
+   "name": "Juneteenth",
+   "entry": "2022-06-16",
+   "grossPctLongUsd": 0.9449,
+   "netR": 0.5891,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-07-01",
+   "hol": "2022-07-04",
+   "name": "Independence Day",
+   "entry": "2022-06-30",
+   "grossPctLongUsd": 0.4193,
+   "netR": 0.2372,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-09-02",
+   "hol": "2022-09-05",
+   "name": "Labor Day",
+   "entry": "2022-09-01",
+   "grossPctLongUsd": -0.0817,
+   "netR": -0.0526,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-11-23",
+   "hol": "2022-11-24",
+   "name": "Thanksgiving Day",
+   "entry": "2022-11-22",
+   "grossPctLongUsd": -1.1743,
+   "netR": -0.5331,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-12-23",
+   "hol": "2022-12-26",
+   "name": "Christmas Day",
+   "entry": "2022-12-22",
+   "grossPctLongUsd": -0.1547,
+   "netR": -0.0896,
+   "stops": 0
+  },
+  {
+   "ymd": "2022-12-30",
+   "hol": "2023-01-02",
+   "name": "New Year's Day",
+   "entry": "2022-12-29",
+   "grossPctLongUsd": -0.4134,
+   "netR": -0.234,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-01-13",
+   "hol": "2023-01-16",
+   "name": "Martin Luther King Day",
+   "entry": "2023-01-12",
+   "grossPctLongUsd": -0.1241,
+   "netR": -0.0481,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-02-17",
+   "hol": "2023-02-20",
+   "name": "Presidents' Day",
+   "entry": "2023-02-16",
+   "grossPctLongUsd": -0.1784,
+   "netR": -0.1279,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-04-06",
+   "hol": "2023-04-07",
+   "name": "Good Friday",
+   "entry": "2023-04-05",
+   "grossPctLongUsd": 0.3525,
+   "netR": 0.2058,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-05-26",
+   "hol": "2023-05-29",
+   "name": "Memorial Day",
+   "entry": "2023-05-25",
+   "grossPctLongUsd": -0.0291,
+   "netR": -0.0412,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-06-16",
+   "hol": "2023-06-19",
+   "name": "Juneteenth",
+   "entry": "2023-06-15",
+   "grossPctLongUsd": 0.128,
+   "netR": 0.0856,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-07-03",
+   "hol": "2023-07-04",
+   "name": "Independence Day",
+   "entry": "2023-06-30",
+   "grossPctLongUsd": -0.037,
+   "netR": -0.0223,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-09-01",
+   "hol": "2023-09-04",
+   "name": "Labor Day",
+   "entry": "2023-08-31",
+   "grossPctLongUsd": 0.5269,
+   "netR": 0.4913,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-11-22",
+   "hol": "2023-11-23",
+   "name": "Thanksgiving Day",
+   "entry": "2023-11-21",
+   "grossPctLongUsd": 0.3405,
+   "netR": 0.2825,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-12-22",
+   "hol": "2023-12-25",
+   "name": "Christmas Day",
+   "entry": "2023-12-21",
+   "grossPctLongUsd": -0.0293,
+   "netR": -0.0493,
+   "stops": 0
+  },
+  {
+   "ymd": "2023-12-29",
+   "hol": "2024-01-01",
+   "name": "New Year's Day",
+   "entry": "2023-12-28",
+   "grossPctLongUsd": 0.0545,
+   "netR": 0.0665,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-01-12",
+   "hol": "2024-01-15",
+   "name": "Martin Luther King Day",
+   "entry": "2024-01-11",
+   "grossPctLongUsd": 0.1431,
+   "netR": 0.1493,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-02-16",
+   "hol": "2024-02-19",
+   "name": "Presidents' Day",
+   "entry": "2024-02-15",
+   "grossPctLongUsd": 0.0048,
+   "netR": 0.0097,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-03-28",
+   "hol": "2024-03-29",
+   "name": "Good Friday",
+   "entry": "2024-03-27",
+   "grossPctLongUsd": -0.0217,
+   "netR": -0.055,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-05-24",
+   "hol": "2024-05-27",
+   "name": "Memorial Day",
+   "entry": "2024-05-23",
+   "grossPctLongUsd": -0.2823,
+   "netR": -0.3255,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-06-18",
+   "hol": "2024-06-19",
+   "name": "Juneteenth",
+   "entry": "2024-06-17",
+   "grossPctLongUsd": -0.1473,
+   "netR": -0.1398,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-07-03",
+   "hol": "2024-07-04",
+   "name": "Independence Day",
+   "entry": "2024-07-02",
+   "grossPctLongUsd": -0.3614,
+   "netR": -0.4255,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-08-30",
+   "hol": "2024-09-02",
+   "name": "Labor Day",
+   "entry": "2024-08-29",
+   "grossPctLongUsd": 0.3641,
+   "netR": 0.2548,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-11-27",
+   "hol": "2024-11-28",
+   "name": "Thanksgiving Day",
+   "entry": "2024-11-26",
+   "grossPctLongUsd": -0.7046,
+   "netR": -0.5181,
+   "stops": 1
+  },
+  {
+   "ymd": "2024-12-24",
+   "hol": "2024-12-25",
+   "name": "Christmas Day",
+   "entry": "2024-12-23",
+   "grossPctLongUsd": 0.0206,
+   "netR": 0.0082,
+   "stops": 0
+  },
+  {
+   "ymd": "2024-12-31",
+   "hol": "2025-01-01",
+   "name": "New Year's Day",
+   "entry": "2024-12-30",
+   "grossPctLongUsd": 0.4131,
+   "netR": 0.3689,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-01-17",
+   "hol": "2025-01-20",
+   "name": "Martin Luther King Day",
+   "entry": "2025-01-16",
+   "grossPctLongUsd": 0.4538,
+   "netR": 0.4434,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-02-14",
+   "hol": "2025-02-17",
+   "name": "Presidents' Day",
+   "entry": "2025-02-13",
+   "grossPctLongUsd": -0.4102,
+   "netR": -0.3062,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-04-17",
+   "hol": "2025-04-18",
+   "name": "Good Friday",
+   "entry": "2025-04-16",
+   "grossPctLongUsd": -0.0267,
+   "netR": -0.0232,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-05-23",
+   "hol": "2025-05-26",
+   "name": "Memorial Day",
+   "entry": "2025-05-22",
+   "grossPctLongUsd": -1.0049,
+   "netR": -0.7568,
+   "stops": 1
+  },
+  {
+   "ymd": "2025-06-18",
+   "hol": "2025-06-19",
+   "name": "Juneteenth",
+   "entry": "2025-06-17",
+   "grossPctLongUsd": -0.0472,
+   "netR": -0.0221,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-07-03",
+   "hol": "2025-07-04",
+   "name": "Independence Day",
+   "entry": "2025-07-02",
+   "grossPctLongUsd": 0.2065,
+   "netR": 0.1542,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-08-29",
+   "hol": "2025-09-01",
+   "name": "Labor Day",
+   "entry": "2025-08-28",
+   "grossPctLongUsd": -0.065,
+   "netR": -0.0739,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-11-26",
+   "hol": "2025-11-27",
+   "name": "Thanksgiving Day",
+   "entry": "2025-11-25",
+   "grossPctLongUsd": -0.5613,
+   "netR": -0.6007,
+   "stops": 1
+  },
+  {
+   "ymd": "2025-12-24",
+   "hol": "2025-12-25",
+   "name": "Christmas Day",
+   "entry": "2025-12-23",
+   "grossPctLongUsd": 0.0334,
+   "netR": 0.0407,
+   "stops": 0
+  },
+  {
+   "ymd": "2025-12-31",
+   "hol": "2026-01-01",
+   "name": "New Year's Day",
+   "entry": "2025-12-30",
+   "grossPctLongUsd": 0.1957,
+   "netR": 0.2312,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-01-16",
+   "hol": "2026-01-19",
+   "name": "Martin Luther King Day",
+   "entry": "2026-01-15",
+   "grossPctLongUsd": 0.0038,
+   "netR": 0.0276,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-02-13",
+   "hol": "2026-02-16",
+   "name": "Presidents' Day",
+   "entry": "2026-02-12",
+   "grossPctLongUsd": -0.0617,
+   "netR": -0.0528,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-04-02",
+   "hol": "2026-04-03",
+   "name": "Good Friday",
+   "entry": "2026-04-01",
+   "grossPctLongUsd": 0.4388,
+   "netR": 0.3552,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-05-22",
+   "hol": "2026-05-25",
+   "name": "Memorial Day",
+   "entry": "2026-05-21",
+   "grossPctLongUsd": 0.1656,
+   "netR": 0.1655,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-06-18",
+   "hol": "2026-06-19",
+   "name": "Juneteenth",
+   "entry": "2026-06-17",
+   "grossPctLongUsd": 0.4274,
+   "netR": 0.5403,
+   "stops": 0
+  },
+  {
+   "ymd": "2026-07-02",
+   "hol": "2026-07-03",
+   "name": "Independence Day",
+   "entry": "2026-07-01",
+   "grossPctLongUsd": -0.4555,
+   "netR": -0.5613,
+   "stops": 2
+  },
+  {
+   "ymd": "2026-09-04",
+   "hol": "2026-09-07",
+   "name": "Labor Day",
+   "entry": "2026-09-03",
+   "grossPctLongUsd": 0.1834,
+   "netR": 0.2208,
+   "stops": 0
+  }
+ ]
+}
