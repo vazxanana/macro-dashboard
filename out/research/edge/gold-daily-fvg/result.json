@@ -1,0 +1,418 @@
+{
+ "built": "2026-11-14",
+ "data": {
+  "from": "2006-03-19",
+  "to": "2026-11-13",
+  "h1": 125704,
+  "days": 5351,
+  "gaps": {
+   "buy": 426,
+   "sell": 295
+  },
+  "retested": 585,
+  "dead": 0,
+  "skippedRisk": 33,
+  "src": "OANDA mid H1 XAU_USD via the site proxy"
+ },
+ "params": {
+  "minGap": 0.25,
+  "buf": 0.5,
+  "watch": 20,
+  "rr": 2,
+  "hold": 10,
+  "minRisk": 10,
+  "cost": 0.6,
+  "baseStop": 1,
+  "atrN": 14,
+  "seed": 20261114,
+  "draws": 40
+ },
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ]
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 216,
+    "buys": 114,
+    "sells": 102,
+    "gross": 0,
+    "net": -0.05,
+    "net2x": -0.101,
+    "costR": 0.029,
+    "finR": 0.021,
+    "costShare": 114.36,
+    "totalNet": -10.8,
+    "win": 36.6,
+    "stops": 125,
+    "targets": 56,
+    "times": 35,
+    "medianStop": 21.2,
+    "medianHoldDays": 5.3,
+    "tNet": -0.57,
+    "tGross": 0.01,
+    "months": 120,
+    "dd": -18.2
+   },
+   "oos": {
+    "n": 212,
+    "buys": 129,
+    "sells": 83,
+    "gross": 0.139,
+    "net": 0.076,
+    "net2x": 0.012,
+    "costR": 0.024,
+    "finR": 0.039,
+    "costShare": 0.46,
+    "totalNet": 16,
+    "win": 42.9,
+    "stops": 109,
+    "targets": 58,
+    "times": 45,
+    "medianStop": 27.2,
+    "medianHoldDays": 6,
+    "tNet": 0.97,
+    "tGross": 1.76,
+    "months": 119,
+    "dd": -14.2,
+    "p": 0.332,
+    "holm": 0.6641
+   }
+  },
+  "T2": {
+   "is": {
+    "n": 132,
+    "buys": 132,
+    "sells": 0,
+    "gross": 0.027,
+    "net": -0.043,
+    "net2x": -0.113,
+    "costR": 0.03,
+    "finR": 0.04,
+    "costShare": 2.61,
+    "totalNet": -5.7,
+    "win": 37.9,
+    "stops": 78,
+    "targets": 38,
+    "times": 16,
+    "medianStop": 20.96,
+    "medianHoldDays": 3.9,
+    "tNet": -0.4,
+    "tGross": 0.25,
+    "months": 120,
+    "dd": -21
+   },
+   "oos": {
+    "n": 139,
+    "buys": 139,
+    "sells": 0,
+    "gross": 0.234,
+    "net": 0.148,
+    "net2x": 0.061,
+    "costR": 0.024,
+    "finR": 0.063,
+    "costShare": 0.37,
+    "totalNet": 20.5,
+    "win": 45.3,
+    "stops": 71,
+    "targets": 44,
+    "times": 24,
+    "medianStop": 27.57,
+    "medianHoldDays": 5.1,
+    "tNet": 1.28,
+    "tGross": 1.99,
+    "months": 118,
+    "dd": -16.9,
+    "p": 0.2005,
+    "holm": 0.6016
+   }
+  },
+  "T3": {
+   "is": {
+    "n": 113,
+    "buys": 0,
+    "sells": 113,
+    "gross": -0.113,
+    "net": -0.142,
+    "net2x": -0.172,
+    "costR": 0.029,
+    "finR": 0,
+    "costShare": null,
+    "totalNet": -16.1,
+    "win": 31,
+    "stops": 69,
+    "targets": 25,
+    "times": 19,
+    "medianStop": 20.87,
+    "medianHoldDays": 6.3,
+    "tNet": -1.21,
+    "tGross": -0.96,
+    "months": 120,
+    "dd": -25.8
+   },
+   "oos": {
+    "n": 91,
+    "buys": 0,
+    "sells": 91,
+    "gross": -0.067,
+    "net": -0.091,
+    "net2x": -0.115,
+    "costR": 0.024,
+    "finR": 0,
+    "costShare": null,
+    "totalNet": -8.3,
+    "win": 37.4,
+    "stops": 50,
+    "targets": 17,
+    "times": 24,
+    "medianStop": 27.42,
+    "medianHoldDays": 7.3,
+    "tNet": -0.83,
+    "tGross": -0.61,
+    "months": 119,
+    "dd": -12.3,
+    "p": 0.4065,
+    "holm": 0.6641
+   }
+  }
+ },
+ "baseline": {
+  "buy": {
+   "is": {
+    "n": 525,
+    "buys": 525,
+    "sells": 0,
+    "gross": 0.095,
+    "net": 0.003,
+    "net2x": -0.088,
+    "costR": 0.033,
+    "finR": 0.058,
+    "costShare": 0.96,
+    "totalNet": 1.8,
+    "win": 38.5,
+    "stops": 309,
+    "targets": 162,
+    "times": 54,
+    "medianStop": 19.04,
+    "medianHoldDays": 4.8,
+    "tNet": 0.05,
+    "tGross": 1.5,
+    "months": 120,
+    "dd": -48.9
+   },
+   "oos": {
+    "n": 512,
+    "buys": 512,
+    "sells": 0,
+    "gross": 0.198,
+    "net": 0.107,
+    "net2x": 0.016,
+    "costR": 0.028,
+    "finR": 0.063,
+    "costShare": 0.46,
+    "totalNet": 54.9,
+    "win": 42.6,
+    "stops": 278,
+    "targets": 173,
+    "times": 61,
+    "medianStop": 23.99,
+    "medianHoldDays": 4.6,
+    "tNet": 1.67,
+    "tGross": 3.07,
+    "months": 118,
+    "dd": -25
+   }
+  },
+  "sell": {
+   "is": {
+    "n": 529,
+    "buys": 0,
+    "sells": 529,
+    "gross": -0.049,
+    "net": -0.083,
+    "net2x": -0.117,
+    "costR": 0.034,
+    "finR": 0,
+    "costShare": null,
+    "totalNet": -43.9,
+    "win": 33.5,
+    "stops": 337,
+    "targets": 144,
+    "times": 48,
+    "medianStop": 18.2,
+    "medianHoldDays": 5,
+    "tNet": -1.44,
+    "tGross": -0.86,
+    "months": 121,
+    "dd": -76
+   },
+   "oos": {
+    "n": 544,
+    "buys": 0,
+    "sells": 544,
+    "gross": -0.188,
+    "net": -0.215,
+    "net2x": -0.242,
+    "costR": 0.027,
+    "finR": 0,
+    "costShare": null,
+    "totalNet": -116.9,
+    "win": 29.4,
+    "stops": 363,
+    "targets": 121,
+    "times": 60,
+    "medianStop": 24.37,
+    "medianHoldDays": 4.3,
+    "tNet": -3.53,
+    "tGross": -3.1,
+    "months": 118,
+    "dd": -129.9
+   }
+  }
+ },
+ "yearsT1": {
+  "2007": {
+   "n": 11,
+   "net": -4.68
+  },
+  "2008": {
+   "n": 24,
+   "net": 1.12
+  },
+  "2009": {
+   "n": 23,
+   "net": -0.16
+  },
+  "2010": {
+   "n": 25,
+   "net": -12.61
+  },
+  "2011": {
+   "n": 25,
+   "net": 9.57
+  },
+  "2012": {
+   "n": 22,
+   "net": 6.72
+  },
+  "2013": {
+   "n": 22,
+   "net": -6.39
+  },
+  "2014": {
+   "n": 22,
+   "net": 3.52
+  },
+  "2015": {
+   "n": 18,
+   "net": 0.55
+  },
+  "2016": {
+   "n": 24,
+   "net": -8.46
+  },
+  "2017": {
+   "n": 20,
+   "net": 3.07
+  },
+  "2018": {
+   "n": 13,
+   "net": 1.92
+  },
+  "2019": {
+   "n": 21,
+   "net": -3.39
+  },
+  "2020": {
+   "n": 25,
+   "net": -5.07
+  },
+  "2021": {
+   "n": 17,
+   "net": 2.65
+  },
+  "2022": {
+   "n": 22,
+   "net": 4.13
+  },
+  "2023": {
+   "n": 24,
+   "net": 0.24
+  },
+  "2024": {
+   "n": 25,
+   "net": 0.41
+  },
+  "2025": {
+   "n": 25,
+   "net": 14.82
+  },
+  "2026": {
+   "n": 20,
+   "net": -2.75
+  }
+ },
+ "placebo": {
+  "draws": 40,
+  "seed": 20261114,
+  "tOOS": [
+   1.45,
+   -2.85,
+   -1.13,
+   1.94,
+   -1.21,
+   1.83,
+   -0.22,
+   0.89,
+   1.07,
+   0.51,
+   1.09,
+   0.79,
+   0.52,
+   -0.13,
+   0.48,
+   -1.3,
+   0.54,
+   -0.29,
+   0.51,
+   0.08,
+   1.23,
+   1.3,
+   -1.12,
+   0.52,
+   1.09,
+   1.13,
+   -2.04,
+   -0.96,
+   -0.33,
+   -0.79,
+   -0.17,
+   -1.16,
+   -0.18,
+   -0.57,
+   -0.28,
+   1.42,
+   -0.68,
+   -0.78,
+   -0.28,
+   0.34
+  ],
+  "median": 0.08,
+  "p95": 1.83,
+  "atOrAbove": 10
+ },
+ "checks": {
+  "oosT": false,
+  "isSign": false,
+  "cost2x": true,
+  "placebo": false
+ },
+ "verdict": "FAIL"
+}
