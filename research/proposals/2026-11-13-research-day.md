@@ -226,6 +226,7 @@ paper system with a measured, clearly negative record.
 | 208 | The weekly-open profile on gold, ICT/MMXM (`gold-weekly-open`) | **FAIL**, 0 of 3: buy below the weekly open on Tue-Wed after an up week 2021-26 +0.066R a trade net (n 79, t 0.57), a random anchor did +0.049R; mirror sell −0.178R; fade back to the open −0.131R (only 39 of 167 reached it) | #1021 |
 | 209 | Inside-week and Monday-range breakouts on gold (`gold-inside-week`) | **FAIL**, 0 of 3: inside-week breakout 2017-26 +0.177R a trade net (n 67, t 0.94) but 2008-16 −0.087R, the gain is buys in rising gold; narrowest week of four +0.077R; Monday range held to Wednesday −0.193R (n 19, flips sign) | #1022 |
 | 210 | Treasury bond moves leading gold (`gold-bond-lead`) | **FAIL**, 0 of 3: after a 10-year bond up week with gold lagging, long gold 2017-26 +0.088R a trade net (n 30, t 0.46), the lag adds nothing; mirror short −0.119R; 2-year daily −0.048R. Same-week link real, no forward lead at hour, day or week | #1023 |
+| 211 | Session VWAP reversion and trend on gold (`gold-vwap`) | **FAIL**, 0 of 3: fade a 2 sd close back to VWAP 2021-26 −0.310R a trade net (n 1,061, t −4.97), worse than random sides; follow −0.138R; first VWAP touch after 1.5 sd −0.113R (beat all placebo seeds, still loses after costs); all within 0.08R of zero before costs | #1024 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
