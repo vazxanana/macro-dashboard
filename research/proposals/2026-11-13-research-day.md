@@ -262,6 +262,7 @@ paper system with a measured, clearly negative record.
 | 244 | Gold volatility breakout on an independent feed (HistData M1, 2018-26) | **PASS, not an OANDA artifact**: same side as OANDA on 99.7 % of common days, daily R correlation 0.91, gross t 4.21; net t 1.57 on its own (2018-26 is not the evidence; 2007-15 is) | #1057 |
 | 245 | Gold volatility breakout risk profile (descriptive) | 2007-26 +0.072R a trade (n 3,706); worst drawdown −42.9R (2016-20, 4.4 years under water); 12-month band −14.9 to +44.3R; stop lines S1-S4 set (any line within 36 months: 12 % false alarm, 51 % catch of no edge); t ≥ 2 forward needs ~7.8 years; negative at 2x costs | #1058 |
 | 246 | Gold weekly volatility breakout (week open ± k × prior week range) | **FAIL, 0 of 3**: T1 +0.054R OOS (n 396, t 0.92), +0.005R IS; buys carry it (gold drift), sells −0.040R; the daily breakout does not carry over to weeks | #1059 |
+| 247 | Gold volatility breakout parameter stability (k 0.2-1.0, exit times, day anchor) | **BROAD**: net positive at 7 of 8 k (gross t 6.4-7.2 for k 0.3-0.7), exits 16-24 UTC all positive, beats every placebo; no new setting chosen. Cautions: ~0 at 2x costs, 2016-20 weak, a 17:00 NY day cut drops net to +0.019R | #1060 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
