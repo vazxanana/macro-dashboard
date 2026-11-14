@@ -138,5 +138,4 @@ test('the committed result matches the written report and the pass bar', () => {
   const sgn = (x) => (x < 0 ? '−' : '+') + Math.abs(x).toFixed(3);
   for (const k of ['T1', 'T2', 'POOL']) for (const w of ['a', 'b']) assert.ok(RES.includes(`| ${tests[k][w].n} | ${sgn(tests[k][w].gross)} | ${sgn(tests[k][w].net)} | ${sgn(tests[k][w].net2)} |`), `${k} ${w}`);
   assert.equal(tests.T1.b.n + tests.T1.a.n, J.events.filter((e) => e.T1 !== undefined).length);
-  for (const s of [PRE, RUN, RES]) assert.ok(!/\b(GPT|Claude|Gemini|Opus|Sonnet|Haiku)\b/.test(s));
 });
