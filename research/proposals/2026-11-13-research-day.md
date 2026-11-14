@@ -49,6 +49,7 @@ paper system with a measured, clearly negative record.
 | 283 | Gold quarter open as support / resistance / magnet | **FAIL, 0 of 3**: holds −0.249R OOS (n 28), magnet −0.200R (t −2.00), breaks +0.143R from 8 buys in 2022-26; real level worse than nearby random levels | #1096 |
 | 284 | Gold tight five-day box breakout (stop at the other side) | **FAIL, 0 of 3**: 2R target −0.299R OOS (n 80, t −2.03), 58 of 80 stopped back through the box; 1 of 40 placebos beaten | #1097 |
 | 285 | Gold 3-month strength vs the S&P 500 as a monthly long/short gold switch | **FAIL, 0 of 3**: switch −0.060R OOS (t −0.68); sells lost −0.192R while buying every month made +0.132R; the signal runs the wrong way within noise | #1098 |
+| 286 | Gold daily Heikin-Ashi colour flip after a run, both sides | **FAIL, 0 of 3**: run 3+ −0.028R OOS (t −0.70), flat before costs; run 5+ +0.033R but lost in sample; 10-day hold −0.075R | #1099 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
