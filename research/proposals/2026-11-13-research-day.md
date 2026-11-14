@@ -218,6 +218,7 @@ paper system with a measured, clearly negative record.
 | 200 | Volatility squeeze breakout on gold, Bollinger inside Keltner (`gold-squeeze`) | **FAIL**, 0 of 3: H4 release 2021-26 −0.086R a trade net (n 108, t −0.58; 2016-20 +0.230R did not repeat), D1 −0.479R, with the 50-period slope −0.231R; all under the random-entry placebo median | #1013 |
 | 201 | Round-number levels on gold, $100 and $50 (`gold-round-numbers`) | **FAIL**, 0 of 3: fading the first touch of a $100 level 2021-26 −0.090R a trade net (n 344, t −1.37), $50 levels −0.219R (worst of 41 grids), following a close through $100 −0.062R; no better than random levels with the same spacing | #1014 |
 | 202 | Gold after an all-time or 52-week closing high (`gold-record-high`) | **FAIL**, 0 of 3: long 20 days after an all-time high 2017-26 +0.319R a trade net (n 17, t 0.93), after a 52-week high +0.285R (n 30, t 1.21); random days of the same years did as well (37 of 40 seeds); the fade −0.404R | #1015 |
+| 203 | Gold's late New York move (13:30-16:30) into the Asia session (`gold-late-ny`) | **FAIL**, 0 of 3: follow 2021-26 −0.045R a trade net (n 1,445, t −2.57), large moves only −0.029R, fade −0.065R; every stream within 0.02R of zero before costs; same answer as `gold-us-asia` | #1016 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
