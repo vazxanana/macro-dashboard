@@ -68,6 +68,8 @@ paper system with a measured, clearly negative record.
 | 302 | "Frog in the pan" momentum on gold (continuous 60-day moves, 20-day hold) | **FAIL, 0 of 2**: continuous both sides +0.151R OOS (n 96, t 1.04), 36 of 40 placebos; vs every signal +0.061R; continuous minus discrete within noise | #1115 |
 | 303 | Gold after the yuan's own move against the dollar (China hedging demand) | **FAIL, 0 of 3**: both sides +0.029R OOS (n 50, t 0.15), 21 of 40 placebos; buys after a weak yuan +0.155R, below buying on any day (+0.225R); IS signs opposite | #1116 |
 | 304 | Gold after a large 4-week move in the US yield-curve slope (2s30s, steepening = long) | **FAIL, 0 of 3**: OOS +0.083R (n 58, t 0.43), 26 of 40 placebos; longs ≈ any gold long (+0.204 vs +0.179R); 2s10s and 5-day variants lose | #1117 |
+| 305 | EUR/CHF stress (franc bid) as a 4-week lead for gold | **FAIL, 0 of 3**: both sides −0.285R OOS (n 33, t −1.34); stress buys below buying any week; unwind sells −0.676R; gold's own 4-week sign beats it | #1118 |
+| 306 | US–German 10-year rate gap as a lead for gold (dollar-weakening side) | **FAIL, 0 of 3**: both sides +0.003R OOS (n 100, t 0.03), within 0.06R of zero gross in both windows; 18 of 40 placebos at or above | #1119 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
