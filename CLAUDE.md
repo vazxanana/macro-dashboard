@@ -1330,6 +1330,15 @@ newer higher low no longer replaces it: it drew 3,889.5 instead of the owner's 3
 other side at once = the lowest low (highest high) from the candle after the broken swing to the break (the owner's 3,904.7,
 which the swing rule missed because the impulse candle before it had a lower wick); a later swing the other way still
 replaces it. Pinned on the real candles (`tests/fixtures/xau-m15-oanda-2026-11-13.json`).
+14 Nov 2026, M21's lesson read by the owner ("if we had cf to buy we could but only had vr, while m1 sell had vr and cf, that's
+why he should [sell], market will tell us what he wants us to do"): the M1 chart reads BOTH sides from the open of the last
+closed H1 candle (`msSides(bars, closedN, from, N = 3)`, pure, next to `msMosha`): a sell VR = the box from the highest high to
+the last swing low before it, its CF = the first close below that box, the CF zone = the last green candle at or before the
+highest point between the high and the CF; a buy mirrors it on the lowest low. The side with a VR and a CF is the trade, a VR
+alone is not; both with a CF: the later one (`pick`). Drawn on M1 under the VR layer (clean look too): a grey box for the closed
+H1 candle, a "VR ▲/▼" box per side, the CF zone ("CF ▼ · wait for the pullback" / "pulled back") and one line top right
+("Buy: VR + CF · Sell: VR only", the traded side first). Display only, not a tested rule; M21's own hour was not found in our
+candles (13 Nov 2024 has no big bullish H1 candle), so it is checked on hand-made candles and the live chart.
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.
