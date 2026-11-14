@@ -1089,7 +1089,7 @@ figure or demo-mirror setting.
 
 ## Yen-pair spreads for the gotobi question, 14 Nov 2026
 
-### [ ] 54. Record the demo broker's yen-pair spreads at 00:55 and 06:00 UTC (read only)
+### [ ] 55. Record the demo broker's yen-pair spreads at 00:55 and 06:00 UTC (read only)
 
 - **Status (14 Nov 2026): open, waiting for your approval to merge.** Branch `yen-spread-log`; write-up
   `research/proposals/2026-11-14-yen-spread-log.md`. Nothing runs until you merge it.

@@ -1,5 +1,5 @@
 // Yen-pair spreads at the gotobi minutes (14 Nov 2026; proposal research/proposals/2026-11-14-yen-spread-log.md, owner-decisions
-// item 54). Pure reader of ctrader/symbols.json `watch` (council/ctrader-symbols.mjs): the quoted spreads around 00:55 and 06:00 UTC
+// item 55). Pure reader of ctrader/symbols.json `watch` (council/ctrader-symbols.mjs): the quoted spreads around 00:55 and 06:00 UTC
 // (+-3 minutes) on weekdays, split gotobi days / other days, in pips. Two sources per symbol: `windows` (the broker's own bid / ask
 // tick history read after each window: `atTarget`, the spread in force at the minute) and `spreadLog` reads of council rounds that
 // happened to fall inside a window. Not wired into any rule, page, alert or cost model.
