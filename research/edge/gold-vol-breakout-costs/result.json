@@ -1,0 +1,1180 @@
+{
+ "study": "gold-vol-breakout-costs",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-vol-breakout-costs/PREREGISTRATION.md",
+ "planSha256": "02ade046c5c49dd3c17d5e04aff06e7b9d9e3fafed6577812cd4cea817517a9a",
+ "original": {
+  "study": "gold-vol-breakout",
+  "runSha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f",
+  "how": "run.mjs copied verbatim as original.mjs (as gold-vol-breakout-replicate did); its functions imported, none changed"
+ },
+ "claim": "cost accounting: what T1 earns under measured and assumed round-trip costs and stop-entry slippage, and its break-even cost; no rule tested",
+ "rule": "O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange and sell stop O − 0.5 × prevRange live 00:00-20:55 UTC, first filled wins (a gap fills at the open; both in one candle: the level nearer its open); stop back at O (worst case in the fill candle); out at the 20:55 candle close",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy; 5206 weekdays built 2006-11-01 → 2026-11-12; D1 = complete UTC days folded with council/fills.mjs foldWeekend",
+ "dataEnd": "2026-11-12",
+ "windows": {
+  "W1": [
+   "2007-01-01",
+   "2011-12-31"
+  ],
+  "W2": [
+   "2012-01-01",
+   "2015-12-31"
+  ],
+  "W3": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "W4": [
+   "2021-01-01",
+   "2026-11-12"
+  ],
+  "POOLED": [
+   "2007-01-01",
+   "2026-11-12"
+  ]
+ },
+ "demo": {
+  "commit": "4400129e1c405ed82e87715f9dd265751b76be7a",
+  "spread": 0.07,
+  "quotes": 110,
+  "from": "2026-11-12T23:08:51Z",
+  "to": "2026-11-13T21:58:59Z",
+  "price": 3884.75,
+  "commissionRT": 0.000024,
+  "frac": 0.00004201917755325311
+ },
+ "era": [
+  [
+   "2012-01-01",
+   0.5
+  ],
+  [
+   "2020-01-01",
+   0.35
+  ],
+  [
+   "9999-12-31",
+   0.3
+  ]
+ ],
+ "routes": {
+  "D": "demo measured, proportional to price",
+  "D$": "demo measured, today's dollars",
+  "S": "studies' model, $0.30 spread + half-spread slippage each side",
+  "P": "pessimistic by era (assumption): $1.00 / $0.70 / $0.60"
+ },
+ "slips": [
+  0,
+  0.05,
+  0.1,
+  0.2
+ ],
+ "medK": 12,
+ "medianM": 1.08,
+ "gate": {
+  "rows": {
+   "main": {
+    "w": [
+     "2007-01-01",
+     "2015-12-31"
+    ],
+    "got": {
+     "n": 1657,
+     "netR": 0.111,
+     "grossR": 0.203,
+     "t": 3.19,
+     "grossT": 5.96,
+     "net2R": 0.018,
+     "total": 183.68
+    },
+    "want": {
+     "n": 1657,
+     "netR": 0.111,
+     "grossR": 0.203,
+     "t": 3.19,
+     "grossT": 5.96,
+     "net2R": 0.018,
+     "total": 183.68
+    },
+    "ok": true
+   },
+   "H1": {
+    "w": [
+     "2007-01-01",
+     "2011-12-31"
+    ],
+    "got": {
+     "n": 929,
+     "netR": 0.12,
+     "grossR": 0.217,
+     "t": 2.83,
+     "grossT": 5.33,
+     "net2R": 0.023,
+     "total": 111.22
+    },
+    "want": {
+     "n": 929,
+     "netR": 0.12,
+     "grossR": 0.217,
+     "t": 2.83,
+     "grossT": 5.33,
+     "net2R": 0.023,
+     "total": 111.22
+    },
+    "ok": true
+   },
+   "H2": {
+    "w": [
+     "2012-01-01",
+     "2015-12-31"
+    ],
+    "got": {
+     "n": 728,
+     "netR": 0.1,
+     "grossR": 0.186,
+     "t": 1.7,
+     "grossT": 3.2,
+     "net2R": 0.013,
+     "total": 72.46
+    },
+    "want": {
+     "n": 728,
+     "netR": 0.1,
+     "grossR": 0.186,
+     "t": 1.7,
+     "grossT": 3.2,
+     "net2R": 0.013,
+     "total": 72.46
+    },
+    "ok": true
+   },
+   "pooled": {
+    "w": [
+     "2007-01-01",
+     "2026-11-12"
+    ],
+    "got": {
+     "n": 3713,
+     "netR": 0.073,
+     "grossR": 0.155,
+     "t": 3.35,
+     "grossT": 7.24,
+     "net2R": -0.009,
+     "total": 272.23
+    },
+    "want": {
+     "n": 3713,
+     "netR": 0.073,
+     "grossR": 0.155,
+     "t": 3.35,
+     "grossT": 7.24,
+     "net2R": -0.009,
+     "total": 272.23
+    },
+    "ok": true
+   }
+  },
+  "sameNet": true,
+  "maxDiff": 0
+ },
+ "breakEven": {
+  "W1": {
+   "n": 929,
+   "grossR": 0.217,
+   "grossT": 5.33,
+   "medianStop": 7.87,
+   "usd": {
+    "be": 1.341,
+    "t2": 0.808
+   },
+   "frac": {
+    "be": 0.001375062788558492,
+    "t2": 0.000823109288008354
+   }
+  },
+  "W2": {
+   "n": 728,
+   "grossR": 0.186,
+   "grossT": 3.2,
+   "medianStop": 7.62,
+   "usd": {
+    "be": 1.288,
+    "t2": 0.481
+   },
+   "frac": {
+    "be": 0.0009518730145725156,
+    "t2": 0.0003562352087780887
+   }
+  },
+  "W3": {
+   "n": 935,
+   "grossR": 0.111,
+   "grossT": 2.87,
+   "medianStop": 6.49,
+   "usd": {
+    "be": 0.652,
+    "t2": 0.194
+   },
+   "frac": {
+    "be": 0.00048597223834941506,
+    "t2": 0.00014540508859514146
+   }
+  },
+  "W4": {
+   "n": 1121,
+   "grossR": 0.121,
+   "grossT": 3.21,
+   "medianStop": 13.49,
+   "usd": {
+    "be": 1.476,
+    "t2": 0.536
+   },
+   "frac": {
+    "be": 0.0006702106982283962,
+    "t2": 0.00024776220880924865
+   }
+  },
+  "POOLED": {
+   "n": 3713,
+   "grossR": 0.155,
+   "grossT": 7.24,
+   "medianStop": 8.57,
+   "usd": {
+    "be": 1.137,
+    "t2": 0.813
+   },
+   "frac": {
+    "be": 0.0008176111620262649,
+    "t2": 0.0005846795351126542
+   }
+  }
+ },
+ "grid": {
+  "D": {
+   "0": {
+    "W1": {
+     "n": 929,
+     "netR": 0.21,
+     "grossR": 0.217,
+     "total": 195.12,
+     "t": 5.15,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.178,
+     "grossR": 0.186,
+     "total": 129.69,
+     "t": 3.06,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.102,
+     "grossR": 0.111,
+     "total": 95.03,
+     "t": 2.62,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.113,
+     "grossR": 0.121,
+     "total": 126.76,
+     "t": 3,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.147,
+     "grossR": 0.155,
+     "total": 546.6,
+     "t": 6.85,
+     "grossT": 7.24
+    }
+   },
+   "0.05": {
+    "W1": {
+     "n": 929,
+     "netR": 0.203,
+     "grossR": 0.217,
+     "total": 188.16,
+     "t": 4.95,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.171,
+     "grossR": 0.186,
+     "total": 124.71,
+     "t": 2.94,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.095,
+     "grossR": 0.111,
+     "total": 88.59,
+     "t": 2.44,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.106,
+     "grossR": 0.121,
+     "total": 118.91,
+     "t": 2.81,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.14,
+     "grossR": 0.155,
+     "total": 520.36,
+     "t": 6.52,
+     "grossT": 7.24
+    }
+   },
+   "0.1": {
+    "W1": {
+     "n": 929,
+     "netR": 0.195,
+     "grossR": 0.217,
+     "total": 181.2,
+     "t": 4.75,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.164,
+     "grossR": 0.186,
+     "total": 119.73,
+     "t": 2.82,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.088,
+     "grossR": 0.111,
+     "total": 82.15,
+     "t": 2.26,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.099,
+     "grossR": 0.121,
+     "total": 111.06,
+     "t": 2.62,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.133,
+     "grossR": 0.155,
+     "total": 494.13,
+     "t": 6.18,
+     "grossT": 7.24
+    }
+   },
+   "0.2": {
+    "W1": {
+     "n": 929,
+     "netR": 0.18,
+     "grossR": 0.217,
+     "total": 167.27,
+     "t": 4.35,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.151,
+     "grossR": 0.186,
+     "total": 109.77,
+     "t": 2.59,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.074,
+     "grossR": 0.111,
+     "total": 69.26,
+     "t": 1.9,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.085,
+     "grossR": 0.121,
+     "total": 95.36,
+     "t": 2.25,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.119,
+     "grossR": 0.155,
+     "total": 441.66,
+     "t": 5.51,
+     "grossT": 7.24
+    }
+   }
+  },
+  "D$": {
+   "0": {
+    "W1": {
+     "n": 929,
+     "netR": 0.202,
+     "grossR": 0.217,
+     "total": 187.25,
+     "t": 4.93,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.172,
+     "grossR": 0.186,
+     "total": 124.88,
+     "t": 2.94,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.094,
+     "grossR": 0.111,
+     "total": 87.72,
+     "t": 2.41,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.111,
+     "grossR": 0.121,
+     "total": 123.98,
+     "t": 2.93,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.141,
+     "grossR": 0.155,
+     "total": 523.83,
+     "t": 6.56,
+     "grossT": 7.24
+    }
+   },
+   "0.05": {
+    "W1": {
+     "n": 929,
+     "netR": 0.194,
+     "grossR": 0.217,
+     "total": 180.29,
+     "t": 4.73,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.165,
+     "grossR": 0.186,
+     "total": 119.9,
+     "t": 2.83,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.087,
+     "grossR": 0.111,
+     "total": 81.28,
+     "t": 2.23,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.104,
+     "grossR": 0.121,
+     "total": 116.13,
+     "t": 2.74,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.134,
+     "grossR": 0.155,
+     "total": 497.6,
+     "t": 6.22,
+     "grossT": 7.24
+    }
+   },
+   "0.1": {
+    "W1": {
+     "n": 929,
+     "netR": 0.187,
+     "grossR": 0.217,
+     "total": 173.33,
+     "t": 4.53,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.158,
+     "grossR": 0.186,
+     "total": 114.92,
+     "t": 2.71,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.08,
+     "grossR": 0.111,
+     "total": 74.83,
+     "t": 2.05,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.097,
+     "grossR": 0.121,
+     "total": 108.28,
+     "t": 2.55,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.127,
+     "grossR": 0.155,
+     "total": 471.36,
+     "t": 5.89,
+     "grossT": 7.24
+    }
+   },
+   "0.2": {
+    "W1": {
+     "n": 929,
+     "netR": 0.172,
+     "grossR": 0.217,
+     "total": 159.4,
+     "t": 4.14,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.144,
+     "grossR": 0.186,
+     "total": 104.96,
+     "t": 2.48,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.066,
+     "grossR": 0.111,
+     "total": 61.95,
+     "t": 1.7,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.083,
+     "grossR": 0.121,
+     "total": 92.58,
+     "t": 2.18,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.113,
+     "grossR": 0.155,
+     "total": 418.89,
+     "t": 5.22,
+     "grossT": 7.24
+    }
+   }
+  },
+  "S": {
+   "0": {
+    "W1": {
+     "n": 929,
+     "netR": 0.12,
+     "grossR": 0.217,
+     "total": 111.22,
+     "t": 2.83,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.1,
+     "grossR": 0.186,
+     "total": 72.46,
+     "t": 1.7,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.009,
+     "grossR": 0.111,
+     "total": 8.27,
+     "t": 0.22,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "total": 80.27,
+     "t": 1.86,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.073,
+     "grossR": 0.155,
+     "total": 272.23,
+     "t": 3.35,
+     "grossT": 7.24
+    }
+   },
+   "0.05": {
+    "W1": {
+     "n": 929,
+     "netR": 0.112,
+     "grossR": 0.217,
+     "total": 104.25,
+     "t": 2.64,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.093,
+     "grossR": 0.186,
+     "total": 67.48,
+     "t": 1.59,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": 0.002,
+     "grossR": 0.111,
+     "total": 1.83,
+     "t": 0.05,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.065,
+     "grossR": 0.121,
+     "total": 72.42,
+     "t": 1.68,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.066,
+     "grossR": 0.155,
+     "total": 245.99,
+     "t": 3.02,
+     "grossT": 7.24
+    }
+   },
+   "0.1": {
+    "W1": {
+     "n": 929,
+     "netR": 0.105,
+     "grossR": 0.217,
+     "total": 97.29,
+     "t": 2.46,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.086,
+     "grossR": 0.186,
+     "total": 62.5,
+     "t": 1.47,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.005,
+     "grossR": 0.111,
+     "total": -4.61,
+     "t": -0.12,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.058,
+     "grossR": 0.121,
+     "total": 64.58,
+     "t": 1.49,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.059,
+     "grossR": 0.155,
+     "total": 219.76,
+     "t": 2.7,
+     "grossT": 7.24
+    }
+   },
+   "0.2": {
+    "W1": {
+     "n": 929,
+     "netR": 0.09,
+     "grossR": 0.217,
+     "total": 83.36,
+     "t": 2.08,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.072,
+     "grossR": 0.186,
+     "total": 52.54,
+     "t": 1.24,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.019,
+     "grossR": 0.111,
+     "total": -17.5,
+     "t": -0.47,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.044,
+     "grossR": 0.121,
+     "total": 48.88,
+     "t": 1.13,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.045,
+     "grossR": 0.155,
+     "total": 167.29,
+     "t": 2.04,
+     "grossT": 7.24
+    }
+   }
+  },
+  "P": {
+   "0": {
+    "W1": {
+     "n": 929,
+     "netR": 0.055,
+     "grossR": 0.217,
+     "total": 51.18,
+     "t": 1.25,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.085,
+     "grossR": 0.186,
+     "total": 61.92,
+     "t": 1.46,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.006,
+     "grossR": 0.111,
+     "total": -5.83,
+     "t": -0.16,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "total": 80.27,
+     "t": 1.86,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.051,
+     "grossR": 0.155,
+     "total": 187.55,
+     "t": 2.29,
+     "grossT": 7.24
+    }
+   },
+   "0.05": {
+    "W1": {
+     "n": 929,
+     "netR": 0.048,
+     "grossR": 0.217,
+     "total": 44.22,
+     "t": 1.08,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.078,
+     "grossR": 0.186,
+     "total": 56.94,
+     "t": 1.34,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.013,
+     "grossR": 0.111,
+     "total": -12.27,
+     "t": -0.33,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.065,
+     "grossR": 0.121,
+     "total": 72.42,
+     "t": 1.68,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.043,
+     "grossR": 0.155,
+     "total": 161.31,
+     "t": 1.96,
+     "grossT": 7.24
+    }
+   },
+   "0.1": {
+    "W1": {
+     "n": 929,
+     "netR": 0.04,
+     "grossR": 0.217,
+     "total": 37.25,
+     "t": 0.9,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.071,
+     "grossR": 0.186,
+     "total": 51.96,
+     "t": 1.22,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.02,
+     "grossR": 0.111,
+     "total": -18.72,
+     "t": -0.5,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.058,
+     "grossR": 0.121,
+     "total": 64.58,
+     "t": 1.49,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.036,
+     "grossR": 0.155,
+     "total": 135.08,
+     "t": 1.64,
+     "grossT": 7.24
+    }
+   },
+   "0.2": {
+    "W1": {
+     "n": 929,
+     "netR": 0.025,
+     "grossR": 0.217,
+     "total": 23.33,
+     "t": 0.56,
+     "grossT": 5.33
+    },
+    "W2": {
+     "n": 728,
+     "netR": 0.058,
+     "grossR": 0.186,
+     "total": 42.01,
+     "t": 0.99,
+     "grossT": 3.2
+    },
+    "W3": {
+     "n": 935,
+     "netR": -0.034,
+     "grossR": 0.111,
+     "total": -31.6,
+     "t": -0.84,
+     "grossT": 2.87
+    },
+    "W4": {
+     "n": 1121,
+     "netR": 0.044,
+     "grossR": 0.121,
+     "total": 48.88,
+     "t": 1.13,
+     "grossT": 3.21
+    },
+    "POOLED": {
+     "n": 3713,
+     "netR": 0.022,
+     "grossR": 0.155,
+     "total": 82.61,
+     "t": 1,
+     "grossT": 7.24
+    }
+   }
+  }
+ },
+ "conditions": {
+  "C1": {
+   "W1": {
+    "route": "D",
+    "slip": 0,
+    "p": 0,
+    "pHolm": 0,
+    "placeboBeaten": 40,
+    "placeboMedian": 0.047,
+    "placeboP95": 0.09
+   },
+   "W2": {
+    "route": "D",
+    "slip": 0,
+    "p": 0.001,
+    "pHolm": 0.009,
+    "placeboBeaten": 40,
+    "placeboMedian": 0.024,
+    "placeboP95": 0.077
+   },
+   "W3": {
+    "route": "D",
+    "slip": 0,
+    "p": 0.004,
+    "pHolm": 0.027,
+    "placeboBeaten": 40,
+    "placeboMedian": 0,
+    "placeboP95": 0.054
+   },
+   "W4": {
+    "route": "D",
+    "slip": 0,
+    "p": 0.001,
+    "pHolm": 0.009,
+    "placeboBeaten": 40,
+    "placeboMedian": 0.005,
+    "placeboP95": 0.04
+   },
+   "POOLED": {
+    "route": "D",
+    "slip": 0,
+    "p": 0,
+    "pHolm": 0,
+    "placeboBeaten": 40,
+    "placeboMedian": 0.019,
+    "placeboP95": 0.043
+   }
+  },
+  "C2": {
+   "W1": {
+    "route": "P",
+    "slip": 0.1,
+    "p": 0.183,
+    "pHolm": 0.366,
+    "placeboBeaten": 40,
+    "placeboMedian": -0.102,
+    "placeboP95": -0.06
+   },
+   "W2": {
+    "route": "P",
+    "slip": 0.1,
+    "p": 0.111,
+    "pHolm": 0.333,
+    "placeboBeaten": 40,
+    "placeboMedian": -0.07,
+    "placeboP95": -0.017
+   },
+   "W3": {
+    "route": "P",
+    "slip": 0.1,
+    "p": 0.691,
+    "pHolm": 0.691,
+    "placeboBeaten": 40,
+    "placeboMedian": -0.109,
+    "placeboP95": -0.055
+   },
+   "W4": {
+    "route": "P",
+    "slip": 0.1,
+    "p": 0.068,
+    "pHolm": 0.271,
+    "placeboBeaten": 40,
+    "placeboMedian": -0.044,
+    "placeboP95": -0.01
+   },
+   "POOLED": {
+    "route": "P",
+    "slip": 0.1,
+    "p": 0.05,
+    "pHolm": 0.252,
+    "placeboBeaten": 40,
+    "placeboMedian": -0.08,
+    "placeboP95": -0.055
+   }
+  }
+ },
+ "sessions": {
+  "W1": {
+   "Asia": {
+    "n": 173,
+    "share": 0.186,
+    "grossR": 0.599,
+    "netD": 0.589,
+    "netP": 0.334,
+    "meanStop": 7.68,
+    "medM": 0.62
+   },
+   "London": {
+    "n": 288,
+    "share": 0.31,
+    "grossR": 0.179,
+    "netD": 0.173,
+    "netP": 0.007,
+    "meanStop": 8.66,
+    "medM": 0.79
+   },
+   "New York": {
+    "n": 468,
+    "share": 0.504,
+    "grossR": 0.098,
+    "netD": 0.093,
+    "netP": -0.048,
+    "meanStop": 10.06,
+    "medM": 1.27
+   }
+  },
+  "W2": {
+   "Asia": {
+    "n": 199,
+    "share": 0.273,
+    "grossR": 0.417,
+    "netD": 0.407,
+    "netP": 0.277,
+    "meanStop": 7.02,
+    "medM": 0.72
+   },
+   "London": {
+    "n": 214,
+    "share": 0.294,
+    "grossR": 0.215,
+    "netD": 0.206,
+    "netP": 0.098,
+    "meanStop": 8.01,
+    "medM": 0.85
+   },
+   "New York": {
+    "n": 315,
+    "share": 0.433,
+    "grossR": 0.021,
+    "netD": 0.015,
+    "netP": -0.077,
+    "meanStop": 9.87,
+    "medM": 1.27
+   }
+  },
+  "W3": {
+   "Asia": {
+    "n": 267,
+    "share": 0.286,
+    "grossR": 0.251,
+    "netD": 0.239,
+    "netP": 0.09,
+    "meanStop": 6.39,
+    "medM": 0.64
+   },
+   "London": {
+    "n": 265,
+    "share": 0.283,
+    "grossR": 0.116,
+    "netD": 0.106,
+    "netP": -0.015,
+    "meanStop": 7.8,
+    "medM": 0.72
+   },
+   "New York": {
+    "n": 403,
+    "share": 0.431,
+    "grossR": 0.016,
+    "netD": 0.008,
+    "netP": -0.096,
+    "meanStop": 8.7,
+    "medM": 0.95
+   }
+  },
+  "W4": {
+   "Asia": {
+    "n": 346,
+    "share": 0.309,
+    "grossR": 0.357,
+    "netD": 0.348,
+    "netP": 0.289,
+    "meanStop": 21.43,
+    "medM": 1.68
+   },
+   "London": {
+    "n": 299,
+    "share": 0.267,
+    "grossR": -0.025,
+    "netD": -0.033,
+    "netP": -0.089,
+    "meanStop": 17.55,
+    "medM": 1.4
+   },
+   "New York": {
+    "n": 476,
+    "share": 0.425,
+    "grossR": 0.041,
+    "netD": 0.034,
+    "netP": -0.019,
+    "meanStop": 20.87,
+    "medM": 2.04
+   }
+  },
+  "POOLED": {
+   "Asia": {
+    "n": 985,
+    "share": 0.265,
+    "grossR": 0.383,
+    "netD": 0.373,
+    "netP": 0.24,
+    "meanStop": 12.03,
+    "medM": 0.89
+   },
+   "London": {
+    "n": 1066,
+    "share": 0.287,
+    "grossR": 0.113,
+    "netD": 0.105,
+    "netP": -0.007,
+    "meanStop": 10.81,
+    "medM": 0.91
+   },
+   "New York": {
+    "n": 1662,
+    "share": 0.448,
+    "grossR": 0.047,
+    "netD": 0.041,
+    "netP": -0.057,
+    "meanStop": 12.79,
+    "medM": 1.35
+   }
+  }
+ },
+ "verdict": "ACCOUNTING (no rule tested): T1 pooled 2007-26 stays positive with month t ≥ 2 at measured demo costs (+0.147R, t +6.85) and does not at pessimistic costs + 0.10 slippage (+0.036R, t +1.64)",
+ "reading": "No rule was tested; the same 3713 pooled trades were charged under each cost assumption. Before costs T1 makes +0.155R a trade pooled 2007-26 (gross month t +7.24); it breaks even at $1.14 a round trip and keeps month t 2 up to $0.81 (8.18 bp / 5.85 bp of price). By window, t-2 cost: 2007-11 $0.81, 2012-15 $0.48, 2016-20 $0.19, 2021-26 $0.54. At the measured demo cost (0.42 bp of price, no slippage) pooled +0.147R (t +6.85); with 0.10 × M slippage +0.133R (t +6.18). At the studies' $0.60 +0.073R (t +3.35). Pessimistic by era with 0.10 × M +0.036R (t +1.64); 2007-11 +0.040R, 2016-20 −0.020R. Cautions, said plainly: the demo figure is one day of quotes on one demo account in November 2026 and carries no gold slippage measurement; it is applied to 2007-26 as a share of price, which assumes today's relative spread held then. At 2007 prices that share is about $0.03 a round trip, far under any retail gold spread of the time; the same figure in today's dollars (route D$) gives +0.141R (t +6.56). The era spreads are assumptions, not measurements. The thinnest window is 2016-20 (gross t +2.87, month t 2 only up to $0.19 a round trip): it is flat or negative at $0.60 and under P. Fills in Asia hours (985 of 3713) carry most of the gross (+0.383R a trade against +0.047R for New York fills), and Asia is where spreads are widest, which no route here charges separately. Whether T1 is worth anything therefore turns on the cost actually paid: an all-in round trip (slippage included) under $0.81 keeps the pooled month t over 2, under $0.48-0.54 keeps it in 2012-15 and 2021-26, and 2016-20 needs under $0.19. Nothing live changes; a forward paper record is the owner's decision."
+}
