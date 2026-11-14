@@ -110,6 +110,7 @@ paper system with a measured, clearly negative record.
 | 92 | Index at its 52-week high, long 20 days (SPX500 + 5 indices; short when >20 % below) | FAIL, 0 of 3: near the high the indices did slightly worse than on ordinary days (D −0.08R / −0.23R), Holm p 1.00; cross-sectional twin `high52-rotation` failed too | #911 |
 | 93 | Gotobi fix-minute profile on the independent HistData M1 feed (frozen rule, 2018-26) | **FEED-CONFIRMED**: gate reproduces #894 exactly; 00:55 is again the best entry (+0.127R), one minute late keeps 35 %, per-day correlation with OANDA 0.99+ at every minute: the 00:55 spike is in the market, not one feed's data | #912 |
 | 94 | US cash session leads the Tokyo / Hong Kong session (JP225, HK33, trade from the Asian open) | FAIL, 0 of 3: −0.041R a trade net on JP225 and HK33 (t −5.3 / −3.9); the US move is already in the opening gap, and the Asian session then slightly reverses (worse than random signs) | #913 |
+| 95 | US index midday turn: fade or follow the 09:30-11:30 NY move over 11:30-14:00 (NAS100, SPX500) | FAIL, 0 of 4: no turn (fading loses even before costs); a slight continuation (+0.016R gross) smaller than the ~0.03R round trip; every random midday window loses its cost | #914 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
