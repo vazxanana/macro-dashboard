@@ -266,6 +266,8 @@ paper system with a measured, clearly negative record.
 | 248 | The gold volatility breakout on NAS100 / SPX500 (2016-26) | **FAIL, 0 of 2**: NAS100 gross +0.055R (t 2.58) but net −0.004R; SPX500 net −0.036R; the gold result looks gold-specific, not a general intraday breakout effect | #1061 |
 | 249 | Cost vs stop size across 44 gold studies (descriptive synthesis) | Costs explain only part of the failures: cost R falls as the stop widens (rank −0.83), gross R barely rises (0.29); most rules had no gross effect to lose; 9 gross-positive windows killed by cost all had $1.8-4.6 stops; only the vol breakout reaches gross t ≥ 2 in both windows | #1062 |
 | 250 | Gold intraday momentum (morning move → last hour) | **FAIL, 0 of 3**: gross +0.000 to +0.008R a trade, net −0.018 to −0.025R OOS; the morning move does not predict the last hour by a tradable amount | #1063 |
+| 251 | Gold H1 Bollinger fade in quiet markets (ADX filter) | **FAIL, 0 of 3**: about flat before costs OOS (T1 −0.007R), −0.21R net; no better than a random side | #1064 |
+| 252 | Gold H4 Supertrend (always in the market) | **FAIL, 0 of 3**: T1 +0.018R OOS net (t 0.39); buys-only T2 +0.138R (t 1.80) is gold's rise (corr 0.49 with holding gold, random buys median t 1.20); all lose in 2017-22 | #1065 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
