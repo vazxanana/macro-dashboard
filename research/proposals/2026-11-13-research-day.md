@@ -87,6 +87,7 @@ paper system with a measured, clearly negative record.
 | 321 | Gold liquidation day: buy gold after gold, stocks and Treasuries all fall ≥ 1 sd | **FAIL, 0 of 3**: worse than buying any day in both windows; OOS excess T1 −0.244R (t −1.33), negative before costs too | #1134 |
 | 322 | Gold momentum by equity-correlation regime (haven vs risk) | **FAIL, 0 of 3**: following gold's 10-day move earns nothing in either regime; haven OOS −0.059R (t −0.61), risk +0.017R (t 0.21), difference t −0.60 | #1135 |
 | 323 | Gold week exhaustion: fade a week that already moved ≥ 0.75 × its normal range by day 1-3 | **FAIL, 0 of 3**: OOS net −0.014R (excess t +0.20); buys after a down week 0.085R worse than an ordinary buy; noise against the same-weekday baseline | #1136 |
+| 324 | Gold staircase: 3+ days of higher highs and higher lows (or the mirror) | **FAIL, 0 of 3**: buy after an up staircase +0.021R OOS = drift (excess −0.013R, t −0.17); sell after a down staircase +0.016R; buying the turn −0.079R | #1137 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
