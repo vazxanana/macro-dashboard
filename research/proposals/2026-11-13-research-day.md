@@ -202,6 +202,7 @@ paper system with a measured, clearly negative record.
 | 184 | Intraday momentum on US index CFDs (`index-intraday-momentum`) | **Not run, duplicate**: 13 Nov `intraday-momentum` already failed (SPX500 2016-now −0.159R net, t −9.09; gross −0.012R); the paper's slope gone after 2015 | — |
 | 185 | ICT quarterly theory split of A-setups (`ict-quarters`, rerun asked) | **Not run, duplicate**: 13 Nov `ict-quarters` already failed 0 of 3 (week, month, year quarter vs the rest, OOS t −0.64 to 0.49); quarter of the day close to `claude/ict-sessions` (FAIL) | — |
 | 186 | Five-year price value on indices and commodities (`value-everywhere`) | **FAIL**, 0 of 4: primary 2017-26 −0.072R a month net (t −2.97), −0.038R in sample; at the placebo median; indices lose gross (short nas100 every month, as #941); commodity in-sample gain gone OOS | #999 |
+| 187 | Monthly intermarket lead: US500, copper, dollar (`intermarket-lead`) | **FAIL**, 0 of 3, Holm p 1.00: US500 → 10 indices 2017-26 −1.13R a month net (t −1.79), loses gross; copper = own momentum (difference t 0.00); dollar → metals +0.07R (t 0.27) | #1000 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
