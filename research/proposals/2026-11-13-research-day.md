@@ -265,6 +265,7 @@ paper system with a measured, clearly negative record.
 | 247 | Gold volatility breakout parameter stability (k 0.2-1.0, exit times, day anchor) | **BROAD**: net positive at 7 of 8 k (gross t 6.4-7.2 for k 0.3-0.7), exits 16-24 UTC all positive, beats every placebo; no new setting chosen. Cautions: ~0 at 2x costs, 2016-20 weak, a 17:00 NY day cut drops net to +0.019R | #1060 |
 | 248 | The gold volatility breakout on NAS100 / SPX500 (2016-26) | **FAIL, 0 of 2**: NAS100 gross +0.055R (t 2.58) but net −0.004R; SPX500 net −0.036R; the gold result looks gold-specific, not a general intraday breakout effect | #1061 |
 | 249 | Cost vs stop size across 44 gold studies (descriptive synthesis) | Costs explain only part of the failures: cost R falls as the stop widens (rank −0.83), gross R barely rises (0.29); most rules had no gross effect to lose; 9 gross-positive windows killed by cost all had $1.8-4.6 stops; only the vol breakout reaches gross t ≥ 2 in both windows | #1062 |
+| 250 | Gold intraday momentum (morning move → last hour) | **FAIL, 0 of 3**: gross +0.000 to +0.008R a trade, net −0.018 to −0.025R OOS; the morning move does not predict the last hour by a tradable amount | #1063 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
