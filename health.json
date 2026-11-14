@@ -1,5 +1,5 @@
 {
- "at": "2026-11-14T15:36:42.000Z",
+ "at": "2026-11-14T15:58:25.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T15:35:00.000Z",
+     "last": "2026-11-14T15:55:00.000Z",
      "staleMin": 0,
      "maxJump": 6.07,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T15:35:00.000Z",
+     "last": "2026-11-14T15:55:00.000Z",
      "staleMin": 0,
      "maxJump": 9.62,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T15:35:00.000Z",
+     "last": "2026-11-14T15:55:00.000Z",
      "staleMin": 0,
      "maxJump": 5.98,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T15:35:00.000Z",
+     "last": "2026-11-14T15:55:00.000Z",
      "staleMin": 0,
      "maxJump": 5.17,
      "clipped": 0,
@@ -193,7 +193,13 @@
      "label": "Trader snapshot (snapshot.json)",
      "status": "ok",
      "ageMin": 1,
-     "issues": []
+     "issues": [
+      {
+       "kind": "source",
+       "sev": "note",
+       "detail": "Trader errors this round: lit"
+      }
+     ]
     },
     "state.json": {
      "label": "Trader state (state.json)",
@@ -272,7 +278,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 10,
+     "ageMin": 11,
      "issues": [
       {
        "kind": "source",
@@ -306,7 +312,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 21,
+     "ageMin": 43,
      "issues": [
       {
        "kind": "input",
@@ -323,13 +329,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 21,
+     "ageMin": 43,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 21,
+     "ageMin": 43,
      "issues": [
       {
        "kind": "stale",
@@ -356,7 +362,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 936,
+     "ageMin": 958,
      "issues": []
     },
     "digest.json": {
@@ -367,31 +373,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 131,
+     "ageMin": 6,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 294,
+     "ageMin": 315,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 294,
+     "ageMin": 315,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 294,
+     "ageMin": 315,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 293,
+     "ageMin": 315,
      "issues": []
     },
     "research/ledger.json": {
@@ -412,19 +418,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 109,
+     "ageMin": 131,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 1101,
+     "ageMin": 1122,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 310,
+     "ageMin": 332,
      "issues": [
       {
        "kind": "stale",
@@ -461,7 +467,7 @@
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
    "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)"
   ],
-  "notes": 2
+  "notes": 3
  },
  "alert": {
   "streak": {},
