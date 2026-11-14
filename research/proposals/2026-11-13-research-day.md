@@ -237,6 +237,7 @@ paper system with a measured, clearly negative record.
 | 219 | H4 regime switch on gold: breakout in trends, band fade in ranges (`gold-regime-switch`) | **FAIL**, 0 of 3: switch 2021-26 −0.094R a trade net (n 400, t −1.19, below the shuffled-label median), trend-only breakout −0.020R, range-only fade −0.177R; the fade loses in every regime and the trend label does not help the breakout | #1032 |
 | 220 | Gold's three-day drift into CPI and payrolls (`gold-pre-cpi`) | **FAIL**, 0 of 3, one near miss: long 3 days into payrolls 2022-26 +0.088R a trade net (n 47, t 2.07, Holm p 0.067, 37 of 40 placebos); into CPI +0.024R; fading the move after the print −0.027R. Payrolls being replicated on pre-2022 dates | #1033 |
 | 221 | Gold weekly momentum / reversal | FAIL, 0 of 3: one-week momentum +0.029R OOS (n 513, month t 0.95, Holm p 0.51), below always-long (+0.045R); loses at 2x costs | #1034 |
+| 222 | Gold hourly tick-volume spikes | FAIL, 0 of 3: best (strong-close continuation) +0.061R OOS (n 339, t 1.02, Holm p 0.46), −0.17R in sample; fade and follow swap sign between windows | #1035 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
