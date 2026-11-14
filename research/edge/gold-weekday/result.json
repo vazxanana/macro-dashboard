@@ -1,0 +1,384 @@
+{
+ "built": "2026-11-14",
+ "data": {
+  "src": "OANDA mid H1 XAU_USD via the site proxy (fetch.mjs), 17:00 New York days (gold-drd-long days())",
+  "from": "2006-03-20",
+  "to": "2026-11-12",
+  "days": 5351,
+  "h1": 125704
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippagePerOrder": 0.15,
+  "roundTrip": 0.6,
+  "stop": "1 x ATR(20) of the 20 days before",
+  "financing": {
+   "rate": 0.000148,
+   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
+   "side": "longs only"
+  }
+ },
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ]
+ },
+ "choice": {
+  "weekday": "Friday",
+  "side": 1,
+  "isLongGross": {
+   "Monday": -0.026,
+   "Tuesday": 0.006,
+   "Wednesday": 0.033,
+   "Thursday": -0.007,
+   "Friday": 0.111
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "T1 short every Monday session",
+   "weekday": "Monday",
+   "side": -1,
+   "oos": {
+    "n": 506,
+    "gross": 0.023,
+    "net": -0.005,
+    "net2x": -0.033,
+    "cost": 0.028,
+    "fin": 0,
+    "nights": 0,
+    "total": -2.52,
+    "win": 47.23,
+    "stops": 45,
+    "months": 118,
+    "t": -0.19,
+    "tGross": 0.88,
+    "dd": -11.84
+   },
+   "is": {
+    "n": 519,
+    "gross": 0.035,
+    "net": 0.001,
+    "net2x": -0.033,
+    "cost": 0.034,
+    "fin": 0,
+    "nights": 0,
+    "total": 0.45,
+    "win": 48.36,
+    "stops": 40,
+    "months": 120,
+    "t": 0.03,
+    "tGross": 1.23,
+    "dd": -15.34
+   },
+   "p": 0.5753,
+   "placebo": {
+    "beaten": 39,
+    "of": 40,
+    "p5": -0.108,
+    "median": -0.062,
+    "p95": -0.022,
+    "mean": -0.059
+   },
+   "years": {
+    "2007": {
+     "n": 52,
+     "net": -0.039
+    },
+    "2008": {
+     "n": 52,
+     "net": -0.101
+    },
+    "2009": {
+     "n": 52,
+     "net": 0.058
+    },
+    "2010": {
+     "n": 52,
+     "net": -0.097
+    },
+    "2011": {
+     "n": 52,
+     "net": -0.037
+    },
+    "2012": {
+     "n": 52,
+     "net": -0.025
+    },
+    "2013": {
+     "n": 52,
+     "net": 0.117
+    },
+    "2014": {
+     "n": 52,
+     "net": 0.046
+    },
+    "2015": {
+     "n": 52,
+     "net": 0.127
+    },
+    "2016": {
+     "n": 51,
+     "net": -0.042
+    },
+    "2017": {
+     "n": 50,
+     "net": -0.045
+    },
+    "2018": {
+     "n": 52,
+     "net": -0.015
+    },
+    "2019": {
+     "n": 52,
+     "net": -0.021
+    },
+    "2020": {
+     "n": 52,
+     "net": 0.007
+    },
+    "2021": {
+     "n": 52,
+     "net": -0.051
+    },
+    "2022": {
+     "n": 51,
+     "net": 0.182
+    },
+    "2023": {
+     "n": 50,
+     "net": -0.02
+    },
+    "2024": {
+     "n": 52,
+     "net": 0.022
+    },
+    "2025": {
+     "n": 52,
+     "net": -0.137
+    },
+    "2026": {
+     "n": 45,
+     "net": -0.01
+    }
+   },
+   "holm": 0.5753,
+   "checks": {
+    "n": true,
+    "oos": false,
+    "is": true,
+    "cost2x": false,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "T2 long every Friday session (chosen in sample)",
+   "weekday": "Friday",
+   "side": 1,
+   "oos": {
+    "n": 500,
+    "gross": 0.088,
+    "net": 0.06,
+    "net2x": 0.033,
+    "cost": 0.028,
+    "fin": 0,
+    "nights": 0,
+    "total": 30.23,
+    "win": 54.6,
+    "stops": 60,
+    "months": 118,
+    "t": 2.1,
+    "tGross": 3.05,
+    "dd": -5.87
+   },
+   "is": {
+    "n": 520,
+    "gross": 0.111,
+    "net": 0.072,
+    "net2x": 0.032,
+    "cost": 0.034,
+    "fin": 0.006,
+    "nights": 295,
+    "total": 37.21,
+    "win": 53.85,
+    "stops": 61,
+    "months": 120,
+    "t": 2.24,
+    "tGross": 3.44,
+    "dd": -11.14
+   },
+   "p": 0.0179,
+   "placebo": {
+    "beaten": 38,
+    "of": 40,
+    "p5": -0.025,
+    "median": 0.009,
+    "p95": 0.058,
+    "mean": 0.012
+   },
+   "years": {
+    "2007": {
+     "n": 52,
+     "net": 0.29
+    },
+    "2008": {
+     "n": 52,
+     "net": -0.003
+    },
+    "2009": {
+     "n": 53,
+     "net": 0.052
+    },
+    "2010": {
+     "n": 52,
+     "net": 0.092
+    },
+    "2011": {
+     "n": 52,
+     "net": 0.156
+    },
+    "2012": {
+     "n": 52,
+     "net": 0.091
+    },
+    "2013": {
+     "n": 52,
+     "net": -0.114
+    },
+    "2014": {
+     "n": 52,
+     "net": 0.042
+    },
+    "2015": {
+     "n": 52,
+     "net": 0.063
+    },
+    "2016": {
+     "n": 51,
+     "net": 0.048
+    },
+    "2017": {
+     "n": 51,
+     "net": 0.11
+    },
+    "2018": {
+     "n": 51,
+     "net": 0.028
+    },
+    "2019": {
+     "n": 51,
+     "net": 0.023
+    },
+    "2020": {
+     "n": 50,
+     "net": 0.101
+    },
+    "2021": {
+     "n": 50,
+     "net": -0.007
+    },
+    "2022": {
+     "n": 51,
+     "net": -0.009
+    },
+    "2023": {
+     "n": 51,
+     "net": 0.164
+    },
+    "2024": {
+     "n": 51,
+     "net": 0.143
+    },
+    "2025": {
+     "n": 51,
+     "net": 0.044
+    },
+    "2026": {
+     "n": 45,
+     "net": -0.006
+    }
+   },
+   "holm": 0.0357,
+   "checks": {
+    "n": true,
+    "oos": true,
+    "is": true,
+    "cost2x": true,
+    "placebo": true
+   },
+   "pass": true
+  }
+ },
+ "byWeekday": {
+  "Monday": {
+   "is": {
+    "n": 519,
+    "longGross": -0.026,
+    "tGross": -1.05
+   },
+   "oos": {
+    "n": 506,
+    "longGross": -0.003,
+    "tGross": -0.11
+   }
+  },
+  "Tuesday": {
+   "is": {
+    "n": 520,
+    "longGross": 0.006,
+    "tGross": 0.23
+   },
+   "oos": {
+    "n": 512,
+    "longGross": 0.035,
+    "tGross": 1.25
+   }
+  },
+  "Wednesday": {
+   "is": {
+    "n": 520,
+    "longGross": 0.033,
+    "tGross": 1.25
+   },
+   "oos": {
+    "n": 509,
+    "longGross": 0.051,
+    "tGross": 1.77
+   }
+  },
+  "Thursday": {
+   "is": {
+    "n": 519,
+    "longGross": -0.007,
+    "tGross": -0.21
+   },
+   "oos": {
+    "n": 511,
+    "longGross": 0.024,
+    "tGross": 0.81
+   }
+  },
+  "Friday": {
+   "is": {
+    "n": 520,
+    "longGross": 0.111,
+    "tGross": 3.44
+   },
+   "oos": {
+    "n": 500,
+    "longGross": 0.088,
+    "tGross": 3.05
+   }
+  }
+ },
+ "verdict": "FAIL",
+ "passAlone": [
+  "T2"
+ ]
+}
