@@ -1,0 +1,231 @@
+{
+ "study": "gold-vol-target",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "data": {
+  "file": "origin/council-data:research/daily/xau.json",
+  "first": "2006-03-20",
+  "last": "2026-11-06",
+  "weekdays": 5364
+ },
+ "params": {
+  "target": 0.15,
+  "cap": 2,
+  "perOz": 0.45,
+  "fin": 0.000148,
+  "block": 6,
+  "draws": 5000,
+  "seed": 20261114,
+  "placebo": 40,
+  "is": [
+   "2008-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ],
+  "finSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "strategies": {
+  "M20-is": {
+   "months": 108,
+   "sharpe": -0.124,
+   "t": -0.373,
+   "annual": -0.0245,
+   "maxDD": 0.9488,
+   "worstYear": {
+    "year": "2013",
+    "r": -0.407
+   },
+   "avgW": 1.006,
+   "costYr": 0.0022,
+   "finYr": 0.0544,
+   "grossYr": 0.032,
+   "atCap": 0.011
+  },
+  "K20-is": {
+   "months": 108,
+   "sharpe": -0.005,
+   "t": -0.014,
+   "annual": -0.0009,
+   "maxDD": 0.7234,
+   "worstYear": {
+    "year": "2013",
+    "r": -0.3674
+   },
+   "avgW": 1.006,
+   "costYr": 0.0004,
+   "finYr": 0.0544,
+   "grossYr": 0.0539,
+   "k": 1.006
+  },
+  "M20-oos": {
+   "months": 118,
+   "sharpe": 0.606,
+   "t": 1.9,
+   "annual": 0.1077,
+   "maxDD": 0.3248,
+   "worstYear": {
+    "year": "2021",
+    "r": -0.1117
+   },
+   "avgW": 1.207,
+   "costYr": 0.0019,
+   "finYr": 0.0653,
+   "grossYr": 0.1748,
+   "atCap": 0.033
+  },
+  "K20-oos": {
+   "months": 118,
+   "sharpe": 0.531,
+   "t": 1.666,
+   "annual": 0.0978,
+   "maxDD": 0.3946,
+   "worstYear": {
+    "year": "2026",
+    "r": -0.1575
+   },
+   "avgW": 1.207,
+   "costYr": 0.0002,
+   "finYr": 0.0653,
+   "grossYr": 0.1633,
+   "k": 1.207
+  },
+  "M60-is": {
+   "months": 108,
+   "sharpe": -0.044,
+   "t": -0.131,
+   "annual": -0.0077,
+   "maxDD": 0.7773,
+   "worstYear": {
+    "year": "2013",
+    "r": -0.3645
+   },
+   "avgW": 0.941,
+   "costYr": 0.0008,
+   "finYr": 0.0509,
+   "grossYr": 0.0439,
+   "atCap": 0
+  },
+  "K60-is": {
+   "months": 108,
+   "sharpe": -0.005,
+   "t": -0.014,
+   "annual": -0.0009,
+   "maxDD": 0.6765,
+   "worstYear": {
+    "year": "2013",
+    "r": -0.3436
+   },
+   "avgW": 0.941,
+   "costYr": 0.0004,
+   "finYr": 0.0509,
+   "grossYr": 0.0504,
+   "k": 0.941
+  },
+  "M60-oos": {
+   "months": 118,
+   "sharpe": 0.628,
+   "t": 1.97,
+   "annual": 0.1032,
+   "maxDD": 0.2788,
+   "worstYear": {
+    "year": "2018",
+    "r": -0.1209
+   },
+   "avgW": 1.141,
+   "costYr": 0.0006,
+   "finYr": 0.0617,
+   "grossYr": 0.1655,
+   "atCap": 0
+  },
+  "K60-oos": {
+   "months": 118,
+   "sharpe": 0.531,
+   "t": 1.666,
+   "annual": 0.0924,
+   "maxDD": 0.3729,
+   "worstYear": {
+    "year": "2026",
+    "r": -0.1488
+   },
+   "avgW": 1.141,
+   "costYr": 0.0002,
+   "finYr": 0.0617,
+   "grossYr": 0.1543,
+   "k": 1.141
+  }
+ },
+ "tests": {
+  "T1": {
+   "lookback": 20,
+   "stat": "Sharpe(M) - Sharpe(K), monthly, annualised",
+   "oos": 0.0747,
+   "is": -0.1198,
+   "oos2x": 0.0537,
+   "p": 0.236,
+   "retDiff": 0.0099,
+   "retDiffT": 0.432,
+   "memmel": 0.585,
+   "pHolm": 0.588,
+   "checks": {
+    "oosPos": false,
+    "isSame": false,
+    "cost2x": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "lookback": 60,
+   "stat": "Sharpe(M) - Sharpe(K), monthly, annualised",
+   "oos": 0.0972,
+   "is": -0.0391,
+   "oos2x": 0.0736,
+   "p": 0.2034,
+   "retDiff": 0.0107,
+   "retDiffT": 0.531,
+   "memmel": 0.81,
+   "pHolm": 0.588,
+   "checks": {
+    "oosPos": false,
+    "isSame": false,
+    "cost2x": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "lookback": 20,
+   "stat": "maxDD(K) - maxDD(M), fraction of capital",
+   "oos": 0.0698,
+   "is": -0.2254,
+   "oos2x": 0.0023,
+   "p": 0.196,
+   "retDiff": 0.0099,
+   "retDiffT": 0.432,
+   "pHolm": 0.588,
+   "checks": {
+    "oosPos": false,
+    "isSame": false,
+    "cost2x": true
+   },
+   "pass": false
+  }
+ },
+ "placebo": {
+  "T1": {
+   "mean": -0.04,
+   "min": -0.2267,
+   "max": 0.1921,
+   "atLeastReal": 5,
+   "n": 40
+  },
+  "T3": {
+   "mean": -0.032,
+   "min": -0.2284,
+   "max": 0.0945,
+   "atLeastReal": 3,
+   "n": 40
+  }
+ }
+}
