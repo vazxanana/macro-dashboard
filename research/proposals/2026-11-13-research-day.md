@@ -46,6 +46,8 @@ paper system with a measured, clearly negative record.
 | 280 | Gold intraday periodicity (each 4-hour block traded on its own recent sign) | **FAIL, 0 of 3**: −0.072 to −0.092R OOS (t −5 to −13), below a random block of the same day; costs 0.08-0.10R a trade; T3 gross hint reversed (IS t +2.73 → OOS −2.55) | #1093 |
 | 281 | Gold first 50 % pullback after the 08:30-09:00 New York impulse | **FAIL, 0 of 3**: 1.5R target −0.172R OOS (t −4.06), flat before costs; both sides lose; median stop $3-4 so costs 0.17-0.20R a trade | #1094 |
 | 282 | Gold 17:00 NY close vs the 15:00 London PM fix as a next-day signal | **FAIL, 0 of 3**: follow −0.031R OOS (t −2.14), large signals −0.035R, fade −0.013R; within 0.04R of zero before costs; in-sample hints reversed | #1095 |
+| 283 | Gold quarter open as support / resistance / magnet | **FAIL, 0 of 3**: holds −0.249R OOS (n 28), magnet −0.200R (t −2.00), breaks +0.143R from 8 buys in 2022-26; real level worse than nearby random levels | #1096 |
+| 284 | Gold tight five-day box breakout (stop at the other side) | **FAIL, 0 of 3**: 2R target −0.299R OOS (n 80, t −2.03), 58 of 80 stopped back through the box; 1 of 40 placebos beaten | #1097 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
