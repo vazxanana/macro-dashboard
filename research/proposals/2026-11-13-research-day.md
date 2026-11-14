@@ -75,12 +75,13 @@ paper system with a measured, clearly negative record.
 | 57 | **Your market-cycle rule as an entry** on NAS100, SPX500, US30 (H4 bias, H1 pullback finished, trade with the H4) | 1,174 / 2,907 (2016 →) | −0.227 / −0.155R a trade (month t −4.3 / −5.6), negative before costs; random entries in the same H4 direction did better in 39 of 40 seeds: waiting for the pullback to finish makes it worse | #874 |
 | 58 | Gold session drift: short London afternoon + New York, long Asia with a 50-day trend filter | 1,718 / 1,063 / 683 (2020 →) | 0 of 3; best +0.023R a trade (t 1.37), every positive stream negative in 2008-19; the Asia gain is real before costs but under $0.30 | #875 |
 | 59 | Big NAS100 sessions spilling into BTC / ETH overnight (follow or fade) | 764 (2022 →) | 0 of 2; −0.043 / −0.070R a trade, at the placebo's middle; 2018-20 replication could not be run (no older crypto intraday data reachable) | #876 |
+| 60 | **Your market-cycle rule as an entry** on five forex majors (the index rule, unchanged) | 1,892 / 4,677 (2016 →) | −0.135 / −0.089R a trade (month t −4.5 / −4.3), every pair negative in both windows; random entries with the same H4 bias do better | #877 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
 
 ## What the evidence says
-1. **The course setups, written as mechanical rules, do not make money on gold after costs.** Today adds MSNR-style
+1. **The course setups, written as mechanical rules, do not make money on gold after costs, and your market-cycle rule (H4 bias, wait for the H1 pullback to finish) loses on indices (#57) and forex (#60) as well.** Today adds MSNR-style
    direction (#1), Mosha (#4, and the cycle's −0.57R), 411 (#5), EKF (#7), MMXM (#10) and ICT timing (#3) to the earlier
    list. Your playbook reached the same conclusion: any bigger edge is in the trader's selection, which only a journal of
    your own trades can measure (item 27).
