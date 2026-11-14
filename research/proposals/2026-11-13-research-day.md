@@ -37,6 +37,7 @@ paper system with a measured, clearly negative record.
 | 271 | Gold 20-day trend agreeing in six currencies (USD, EUR, GBP, JPY, CHF, AUD) | **FAIL, 0 of 3**: both sides +0.034R OOS (t 0.52); sells only −0.149R (t −2.68); 60-day +0.209R (t 1.24) but 17.9R of 21.8R from 5 trades in 2025; USD gold alone does as well | #1084 |
 | 272 | Gold after a wide day (range ≥ 1.75 ATR) closing at its extreme | **FAIL, 0 of 3**: with the close 5 days +0.250R IS (t 3.14) → +0.074R OOS (t 0.91), below random same-month same-side trades (+0.141R); fade and 20-day hold lose | #1085 |
 | 273 | Gold after a yen surge day (USD/JPY move beyond 1.5 sd) | **FAIL, 0 of 3**: buy after a surge +0.023R OOS (t 0.35), below a buy on any day (+0.044R); mirror sell −0.140R; placebo 4-16 of 40 | #1086 |
+| 274 | Gold after a weekly close at a 13-week low / high | **FAIL, 0 of 3**: buy 4 weeks +0.043R OOS (n 25, t 0.20), worse than random weeks; any 4-week buy made +0.145R; fading a 13-week high −0.333R (t −2.65) | #1087 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
