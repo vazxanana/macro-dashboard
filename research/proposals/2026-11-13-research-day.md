@@ -109,6 +109,7 @@ paper system with a measured, clearly negative record.
 | 91 | Fade the move into the London 16:00 FX fix (6 USD majors, exit 17:00 / 16:30) | FAIL, 0 of 3: a real reversal before costs (+0.04R, month t ~3 in both windows, strongest 2014-17) but the round trip costs ~0.12R: −0.08R a trade net, every pair negative | #910 |
 | 92 | Index at its 52-week high, long 20 days (SPX500 + 5 indices; short when >20 % below) | FAIL, 0 of 3: near the high the indices did slightly worse than on ordinary days (D −0.08R / −0.23R), Holm p 1.00; cross-sectional twin `high52-rotation` failed too | #911 |
 | 93 | Gotobi fix-minute profile on the independent HistData M1 feed (frozen rule, 2018-26) | **FEED-CONFIRMED**: gate reproduces #894 exactly; 00:55 is again the best entry (+0.127R), one minute late keeps 35 %, per-day correlation with OANDA 0.99+ at every minute: the 00:55 spike is in the market, not one feed's data | #912 |
+| 94 | US cash session leads the Tokyo / Hong Kong session (JP225, HK33, trade from the Asian open) | FAIL, 0 of 3: −0.041R a trade net on JP225 and HK33 (t −5.3 / −3.9); the US move is already in the opening gap, and the Asian session then slightly reverses (worse than random signs) | #913 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
