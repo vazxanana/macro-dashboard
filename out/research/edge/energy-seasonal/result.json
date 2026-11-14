@@ -1,0 +1,2427 @@
+{
+ "built": "2026-11-14",
+ "title": "Energy seasonal windows",
+ "data": {
+  "src": "council-data research/daily (OANDA mid daily, weekend stubs folded)",
+  "files": {
+   "wtico": {
+    "inst": "WTICO_USD",
+    "updated": "2026-11-07T22:49:10.000Z",
+    "last": "2026-11-06"
+   },
+   "bco": {
+    "inst": "BCO_USD",
+    "updated": "2026-11-07T22:49:10.000Z",
+    "last": "2026-11-06"
+   },
+   "natgas": {
+    "inst": "NATGAS_USD",
+    "updated": "2026-11-07T22:49:11.000Z",
+    "last": "2026-11-06"
+   }
+  },
+  "dgs2": "council-data macro/cache.json score.fred.DGS2 (weekly)",
+  "brokerEnergySymbols": []
+ },
+ "params": {
+  "ATR_N": 20,
+  "STOP_K": 3,
+  "VOL_FRAC": 0.25,
+  "VOL_N": 20,
+  "EXIT_H": 21,
+  "CARRY": 2.5,
+  "SEEDS": 40,
+  "MIN_POS": 7,
+  "spread": {
+   "wtico": 0.03,
+   "bco": 0.03,
+   "natgas": 0.005
+  },
+  "decisive": [
+   2016,
+   2026
+  ],
+  "replication": [
+   2008,
+   2015
+  ]
+ },
+ "rows": {
+  "T1": {
+   "name": "Crude driving season (WTI)",
+   "market": "WTICO_USD",
+   "side": "long",
+   "window": "2/15 -> 4/30 (month/day)",
+   "decisive": {
+    "n": 11,
+    "avg": 0.959,
+    "sd": 2.317,
+    "t": 1.37,
+    "df": 10,
+    "pos": 7,
+    "gross": 1.041,
+    "preFin": 1.035,
+    "tPreFin": 1.47,
+    "finR": 0.077,
+    "spreadR": 0.006,
+    "stopped": 4,
+    "worst": -1.055,
+    "best": 6.886
+   },
+   "replication": {
+    "n": 8,
+    "avg": 0.928,
+    "sd": 1.756,
+    "t": 1.5,
+    "df": 7,
+    "pos": 5,
+    "gross": 0.999,
+    "preFin": 0.994,
+    "tPreFin": 1.58,
+    "finR": 0.066,
+    "spreadR": 0.005,
+    "stopped": 2,
+    "worst": -1.02,
+    "best": 4.061
+   },
+   "p": 0.1003,
+   "placebo": {
+    "distinct": 38,
+    "p95": 1.388,
+    "median": 0.013,
+    "max": 1.602,
+    "rank": 33,
+    "seeds": [
+     {
+      "seed": 1,
+      "offset": 51,
+      "n": 11,
+      "avg": 0.713
+     },
+     {
+      "seed": 2,
+      "offset": 158,
+      "n": 11,
+      "avg": -0.198
+     },
+     {
+      "seed": 3,
+      "offset": 121,
+      "n": 11,
+      "avg": -0.037
+     },
+     {
+      "seed": 4,
+      "offset": 64,
+      "n": 11,
+      "avg": 0.213
+     },
+     {
+      "seed": 5,
+      "offset": 152,
+      "n": 11,
+      "avg": -0.079
+     },
+     {
+      "seed": 6,
+      "offset": 128,
+      "n": 11,
+      "avg": -0.004
+     },
+     {
+      "seed": 7,
+      "offset": 317,
+      "n": 10,
+      "avg": 0.365
+     },
+     {
+      "seed": 8,
+      "offset": 281,
+      "n": 10,
+      "avg": -0.448
+     },
+     {
+      "seed": 9,
+      "offset": 252,
+      "n": 10,
+      "avg": 0.013
+     },
+     {
+      "seed": 10,
+      "offset": 157,
+      "n": 11,
+      "avg": -0.252
+     },
+     {
+      "seed": 11,
+      "offset": 361,
+      "n": 10,
+      "avg": 1.602
+     },
+     {
+      "seed": 12,
+      "offset": 108,
+      "n": 11,
+      "avg": 0.014
+     },
+     {
+      "seed": 13,
+      "offset": 7,
+      "n": 11,
+      "avg": 0.92
+     },
+     {
+      "seed": 14,
+      "offset": 57,
+      "n": 11,
+      "avg": 0.633
+     },
+     {
+      "seed": 15,
+      "offset": 91,
+      "n": 11,
+      "avg": -0.092
+     },
+     {
+      "seed": 16,
+      "offset": 359,
+      "n": 10,
+      "avg": 1.339
+     },
+     {
+      "seed": 17,
+      "offset": 81,
+      "n": 11,
+      "avg": -0.313
+     },
+     {
+      "seed": 18,
+      "offset": 260,
+      "n": 10,
+      "avg": -0.379
+     },
+     {
+      "seed": 19,
+      "offset": 21,
+      "n": 11,
+      "avg": 1.144
+     },
+     {
+      "seed": 20,
+      "offset": 44,
+      "n": 11,
+      "avg": 1.097
+     },
+     {
+      "seed": 21,
+      "offset": 346,
+      "n": 10,
+      "avg": 0.86
+     },
+     {
+      "seed": 22,
+      "offset": 330,
+      "n": 10,
+      "avg": 0.5
+     },
+     {
+      "seed": 23,
+      "offset": 204,
+      "n": 11,
+      "avg": -0.34
+     },
+     {
+      "seed": 24,
+      "offset": 134,
+      "n": 11,
+      "avg": -0.085
+     },
+     {
+      "seed": 25,
+      "offset": 354,
+      "n": 10,
+      "avg": 1.536
+     },
+     {
+      "seed": 26,
+      "offset": 74,
+      "n": 11,
+      "avg": -0.042
+     },
+     {
+      "seed": 27,
+      "offset": 148,
+      "n": 11,
+      "avg": -0.159
+     },
+     {
+      "seed": 28,
+      "offset": 26,
+      "n": 11,
+      "avg": 0.548
+     },
+     {
+      "seed": 29,
+      "offset": 43,
+      "n": 11,
+      "avg": 0.951
+     },
+     {
+      "seed": 30,
+      "offset": 238,
+      "n": 10,
+      "avg": -0.151
+     },
+     {
+      "seed": 31,
+      "offset": 337,
+      "n": 10,
+      "avg": 0.556
+     },
+     {
+      "seed": 32,
+      "offset": 278,
+      "n": 10,
+      "avg": -0.179
+     },
+     {
+      "seed": 33,
+      "offset": 263,
+      "n": 10,
+      "avg": -0.347
+     },
+     {
+      "seed": 34,
+      "offset": 280,
+      "n": 10,
+      "avg": -0.469
+     },
+     {
+      "seed": 35,
+      "offset": 220,
+      "n": 11,
+      "avg": 0.339
+     },
+     {
+      "seed": 36,
+      "offset": 333,
+      "n": 10,
+      "avg": 0.311
+     },
+     {
+      "seed": 37,
+      "offset": 206,
+      "n": 11,
+      "avg": -0.464
+     },
+     {
+      "seed": 38,
+      "offset": 1,
+      "n": 11,
+      "avg": 1.388
+     },
+     {
+      "seed": 39,
+      "offset": 206,
+      "n": 11,
+      "avg": -0.464
+     },
+     {
+      "seed": 40,
+      "offset": 44,
+      "n": 11,
+      "avg": 1.097
+     }
+    ]
+   },
+   "years": [
+    {
+     "year": 2008,
+     "entryDay": "2008-02-15",
+     "exitDay": "2008-04-30",
+     "entry": 95.185,
+     "stop": 87.29935,
+     "exit": 114.971,
+     "how": "close",
+     "gross": 2.509,
+     "preFin": 2.505,
+     "finR": 0.106,
+     "net": 2.399,
+     "nights": 73,
+     "dgs2": 1.91
+    },
+    {
+     "year": 2009,
+     "entryDay": "2009-02-17",
+     "exitDay": "2009-04-30",
+     "entry": 37.571,
+     "stop": 28.3211,
+     "exit": 49.723,
+     "how": "close",
+     "gross": 1.314,
+     "preFin": 1.311,
+     "finR": 0.029,
+     "net": 1.282,
+     "nights": 74,
+     "dgs2": 0.97
+    },
+    {
+     "year": 2010,
+     "entryDay": "2010-02-16",
+     "exitDay": "2010-04-30",
+     "entry": 74.052,
+     "stop": 66.7473,
+     "exit": 85.5,
+     "how": "close",
+     "gross": 1.567,
+     "preFin": 1.563,
+     "finR": 0.07,
+     "net": 1.494,
+     "nights": 75,
+     "dgs2": 0.84
+    },
+    {
+     "year": 2011,
+     "entryDay": "2011-02-15",
+     "exitDay": "2011-04-29",
+     "entry": 84.674,
+     "stop": 77.7767,
+     "exit": 113.295,
+     "how": "close",
+     "gross": 4.15,
+     "preFin": 4.145,
+     "finR": 0.085,
+     "net": 4.061,
+     "nights": 75,
+     "dgs2": 0.85
+    },
+    {
+     "year": 2012,
+     "entryDay": "2012-02-15",
+     "exitDay": "2012-04-30",
+     "entry": 100.839,
+     "stop": 94.15785,
+     "exit": 104.562,
+     "how": "close",
+     "gross": 0.557,
+     "preFin": 0.553,
+     "finR": 0.086,
+     "net": 0.467,
+     "nights": 75,
+     "dgs2": 0.27
+    },
+    {
+     "year": 2013,
+     "entryDay": "2013-02-15",
+     "exitDay": "2013-02-21",
+     "entry": 97.277,
+     "stop": 93.1982,
+     "exit": 93.1982,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.007,
+     "finR": 0.011,
+     "net": -1.018,
+     "nights": 6,
+     "dgs2": 0.29
+    },
+    {
+     "year": 2014,
+     "entryDay": "2014-02-17",
+     "exitDay": "2014-04-30",
+     "entry": 100.614,
+     "stop": 96.2241,
+     "exit": 100.155,
+     "how": "close",
+     "gross": -0.105,
+     "preFin": -0.111,
+     "finR": 0.127,
+     "net": -0.239,
+     "nights": 72,
+     "dgs2": 0.32
+    },
+    {
+     "year": 2015,
+     "entryDay": "2015-02-16",
+     "exitDay": "2015-03-16",
+     "entry": 52.828,
+     "stop": 44.80945,
+     "exit": 44.809450000000005,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.004,
+     "finR": 0.016,
+     "net": -1.02,
+     "nights": 28,
+     "dgs2": 0.66
+    },
+    {
+     "year": 2016,
+     "entryDay": "2016-02-15",
+     "exitDay": "2016-04-29",
+     "entry": 28.838,
+     "stop": 21.9254,
+     "exit": 44.888,
+     "how": "close",
+     "gross": 2.322,
+     "preFin": 2.318,
+     "finR": 0.028,
+     "net": 2.29,
+     "nights": 76,
+     "dgs2": 0.71
+    },
+    {
+     "year": 2017,
+     "entryDay": "2017-02-15",
+     "exitDay": "2017-03-09",
+     "entry": 52.886,
+     "stop": 49.3049,
+     "exit": 49.304899999999996,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.008,
+     "finR": 0.036,
+     "net": -1.044,
+     "nights": 24,
+     "dgs2": 1.2
+    },
+    {
+     "year": 2018,
+     "entryDay": "2018-02-15",
+     "exitDay": "2018-04-30",
+     "entry": 60.832,
+     "stop": 55.88815,
+     "exit": 68.546,
+     "how": "close",
+     "gross": 1.56,
+     "preFin": 1.554,
+     "finR": 0.11,
+     "net": 1.444,
+     "nights": 72,
+     "dgs2": 2.05
+    },
+    {
+     "year": 2019,
+     "entryDay": "2019-02-15",
+     "exitDay": "2019-04-30",
+     "entry": 54.529,
+     "stop": 49.38325,
+     "exit": 63.444,
+     "how": "close",
+     "gross": 1.732,
+     "preFin": 1.727,
+     "finR": 0.105,
+     "net": 1.622,
+     "nights": 72,
+     "dgs2": 2.52
+    },
+    {
+     "year": 2020,
+     "entryDay": "2020-02-18",
+     "exitDay": "2020-02-27",
+     "entry": 51.95,
+     "stop": 46.964,
+     "exit": 46.964,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.006,
+     "finR": 0.012,
+     "net": -1.018,
+     "nights": 11,
+     "dgs2": 1.42
+    },
+    {
+     "year": 2021,
+     "entryDay": "2021-02-15",
+     "exitDay": "2021-04-30",
+     "entry": 59.999,
+     "stop": 56.1779,
+     "exit": 63.431,
+     "how": "close",
+     "gross": 0.898,
+     "preFin": 0.89,
+     "finR": 0.085,
+     "net": 0.805,
+     "nights": 76,
+     "dgs2": 0.11
+    },
+    {
+     "year": 2022,
+     "entryDay": "2022-02-15",
+     "exitDay": "2022-04-29",
+     "entry": 94.981,
+     "stop": 86.2405,
+     "exit": 104.611,
+     "how": "close",
+     "gross": 1.102,
+     "preFin": 1.098,
+     "finR": 0.089,
+     "net": 1.009,
+     "nights": 75,
+     "dgs2": 1.5
+    },
+    {
+     "year": 2023,
+     "entryDay": "2023-02-15",
+     "exitDay": "2023-03-14",
+     "entry": 78.809,
+     "stop": 70.89845,
+     "exit": 70.89845,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.004,
+     "finR": 0.052,
+     "net": -1.055,
+     "nights": 27,
+     "dgs2": 4.5
+    },
+    {
+     "year": 2024,
+     "entryDay": "2024-02-15",
+     "exitDay": "2024-04-30",
+     "entry": 76.526,
+     "stop": 70.12175,
+     "exit": 81.806,
+     "how": "close",
+     "gross": 0.824,
+     "preFin": 0.82,
+     "finR": 0.167,
+     "net": 0.653,
+     "nights": 73,
+     "dgs2": 4.48
+    },
+    {
+     "year": 2025,
+     "entryDay": "2025-02-17",
+     "exitDay": "2025-03-05",
+     "entry": 70.829,
+     "stop": 65.41415,
+     "exit": 65.41414999999998,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.006,
+     "finR": 0.039,
+     "net": -1.044,
+     "nights": 16,
+     "dgs2": 4.26
+    },
+    {
+     "year": 2026,
+     "entryDay": "2026-02-16",
+     "exitDay": "2026-04-30",
+     "entry": 63.05,
+     "stop": 56.64725,
+     "exit": 107.936,
+     "how": "close",
+     "gross": 7.01,
+     "preFin": 7.006,
+     "finR": 0.119,
+     "net": 6.886,
+     "nights": 75,
+     "dgs2": 3.4
+    }
+   ],
+   "skipped": [],
+   "weekdaysOnly": {
+    "moved": [
+     2020
+    ],
+    "n": 11,
+    "avg": 0.959,
+    "t": 1.37,
+    "pos": 7
+   },
+   "pHolm": 0.3446
+  },
+  "T2": {
+   "name": "Crude driving season (Brent)",
+   "market": "BCO_USD",
+   "side": "long",
+   "window": "2/15 -> 4/30 (month/day)",
+   "decisive": {
+    "n": 11,
+    "avg": 1.08,
+    "sd": 2.456,
+    "t": 1.46,
+    "df": 10,
+    "pos": 7,
+    "gross": 1.173,
+    "preFin": 1.167,
+    "tPreFin": 1.56,
+    "finR": 0.087,
+    "spreadR": 0.006,
+    "stopped": 4,
+    "worst": -1.06,
+    "best": 7.361
+   },
+   "replication": {
+    "n": 8,
+    "avg": 0.677,
+    "sd": 1.706,
+    "t": 1.12,
+    "df": 7,
+    "pos": 5,
+    "gross": 0.75,
+    "preFin": 0.745,
+    "tPreFin": 1.22,
+    "finR": 0.068,
+    "spreadR": 0.005,
+    "stopped": 3,
+    "worst": -1.082,
+    "best": 3.321
+   },
+   "p": 0.0875,
+   "placebo": {
+    "distinct": 37,
+    "p95": 1.218,
+    "median": -0.107,
+    "max": 1.284,
+    "rank": 37,
+    "seeds": [
+     {
+      "seed": 1,
+      "offset": 44,
+      "n": 11,
+      "avg": 1.218
+     },
+     {
+      "seed": 2,
+      "offset": 102,
+      "n": 11,
+      "avg": -0.209
+     },
+     {
+      "seed": 3,
+      "offset": 144,
+      "n": 11,
+      "avg": -0.404
+     },
+     {
+      "seed": 4,
+      "offset": 132,
+      "n": 11,
+      "avg": -0.171
+     },
+     {
+      "seed": 5,
+      "offset": 191,
+      "n": 11,
+      "avg": 0.152
+     },
+     {
+      "seed": 6,
+      "offset": 25,
+      "n": 11,
+      "avg": 0.799
+     },
+     {
+      "seed": 7,
+      "offset": 29,
+      "n": 11,
+      "avg": 0.805
+     },
+     {
+      "seed": 8,
+      "offset": 105,
+      "n": 11,
+      "avg": -0.238
+     },
+     {
+      "seed": 9,
+      "offset": 59,
+      "n": 11,
+      "avg": 0.38
+     },
+     {
+      "seed": 10,
+      "offset": 50,
+      "n": 11,
+      "avg": 0.867
+     },
+     {
+      "seed": 11,
+      "offset": 122,
+      "n": 11,
+      "avg": -0.024
+     },
+     {
+      "seed": 12,
+      "offset": 144,
+      "n": 11,
+      "avg": -0.404
+     },
+     {
+      "seed": 13,
+      "offset": 171,
+      "n": 11,
+      "avg": -0.107
+     },
+     {
+      "seed": 14,
+      "offset": 241,
+      "n": 10,
+      "avg": -0.258
+     },
+     {
+      "seed": 15,
+      "offset": 71,
+      "n": 11,
+      "avg": -0.102
+     },
+     {
+      "seed": 16,
+      "offset": 54,
+      "n": 11,
+      "avg": 0.616
+     },
+     {
+      "seed": 17,
+      "offset": 281,
+      "n": 10,
+      "avg": -0.494
+     },
+     {
+      "seed": 18,
+      "offset": 127,
+      "n": 11,
+      "avg": -0.197
+     },
+     {
+      "seed": 19,
+      "offset": 219,
+      "n": 11,
+      "avg": 0.466
+     },
+     {
+      "seed": 20,
+      "offset": 307,
+      "n": 10,
+      "avg": 0.371
+     },
+     {
+      "seed": 21,
+      "offset": 283,
+      "n": 10,
+      "avg": -0.498
+     },
+     {
+      "seed": 22,
+      "offset": 27,
+      "n": 11,
+      "avg": 0.558
+     },
+     {
+      "seed": 23,
+      "offset": 126,
+      "n": 11,
+      "avg": -0.284
+     },
+     {
+      "seed": 24,
+      "offset": 296,
+      "n": 10,
+      "avg": -0.296
+     },
+     {
+      "seed": 25,
+      "offset": 155,
+      "n": 11,
+      "avg": -0.46
+     },
+     {
+      "seed": 26,
+      "offset": 166,
+      "n": 11,
+      "avg": -0.175
+     },
+     {
+      "seed": 27,
+      "offset": 360,
+      "n": 10,
+      "avg": 1.284
+     },
+     {
+      "seed": 28,
+      "offset": 18,
+      "n": 11,
+      "avg": 1.284
+     },
+     {
+      "seed": 29,
+      "offset": 146,
+      "n": 11,
+      "avg": -0.388
+     },
+     {
+      "seed": 30,
+      "offset": 340,
+      "n": 10,
+      "avg": 0.48
+     },
+     {
+      "seed": 31,
+      "offset": 37,
+      "n": 11,
+      "avg": 0.733
+     },
+     {
+      "seed": 32,
+      "offset": 74,
+      "n": 11,
+      "avg": 0.015
+     },
+     {
+      "seed": 33,
+      "offset": 345,
+      "n": 10,
+      "avg": 0.748
+     },
+     {
+      "seed": 34,
+      "offset": 223,
+      "n": 11,
+      "avg": 0.12
+     },
+     {
+      "seed": 35,
+      "offset": 291,
+      "n": 10,
+      "avg": -0.293
+     },
+     {
+      "seed": 36,
+      "offset": 253,
+      "n": 10,
+      "avg": -0.199
+     },
+     {
+      "seed": 37,
+      "offset": 65,
+      "n": 11,
+      "avg": -0.262
+     },
+     {
+      "seed": 38,
+      "offset": 112,
+      "n": 11,
+      "avg": -0.165
+     },
+     {
+      "seed": 39,
+      "offset": 171,
+      "n": 11,
+      "avg": -0.107
+     },
+     {
+      "seed": 40,
+      "offset": 291,
+      "n": 10,
+      "avg": -0.293
+     }
+    ]
+   },
+   "years": [
+    {
+     "year": 2008,
+     "entryDay": "2008-02-15",
+     "exitDay": "2008-04-30",
+     "entry": 94.891,
+     "stop": 87.30565,
+     "exit": 112.195,
+     "how": "close",
+     "gross": 2.281,
+     "preFin": 2.277,
+     "finR": 0.11,
+     "net": 2.167,
+     "nights": 73,
+     "dgs2": 1.91
+    },
+    {
+     "year": 2009,
+     "entryDay": "2009-02-16",
+     "exitDay": "2009-04-30",
+     "entry": 43.119,
+     "stop": 34.97385,
+     "exit": 50.37,
+     "how": "close",
+     "gross": 0.89,
+     "preFin": 0.887,
+     "finR": 0.038,
+     "net": 0.849,
+     "nights": 75,
+     "dgs2": 0.97
+    },
+    {
+     "year": 2010,
+     "entryDay": "2010-02-15",
+     "exitDay": "2010-04-30",
+     "entry": 72.077,
+     "stop": 65.0099,
+     "exit": 87.268,
+     "how": "close",
+     "gross": 2.15,
+     "preFin": 2.145,
+     "finR": 0.071,
+     "net": 2.074,
+     "nights": 76,
+     "dgs2": 0.84
+    },
+    {
+     "year": 2011,
+     "entryDay": "2011-02-15",
+     "exitDay": "2011-04-29",
+     "entry": 103.6,
+     "stop": 97.01245,
+     "exit": 126.221,
+     "how": "close",
+     "gross": 3.434,
+     "preFin": 3.429,
+     "finR": 0.108,
+     "net": 3.321,
+     "nights": 75,
+     "dgs2": 0.85
+    },
+    {
+     "year": 2012,
+     "entryDay": "2012-02-15",
+     "exitDay": "2012-04-30",
+     "entry": 118.195,
+     "stop": 112.2109,
+     "exit": 119.674,
+     "how": "close",
+     "gross": 0.247,
+     "preFin": 0.242,
+     "finR": 0.112,
+     "net": 0.13,
+     "nights": 75,
+     "dgs2": 0.27
+    },
+    {
+     "year": 2013,
+     "entryDay": "2013-02-15",
+     "exitDay": "2013-02-21",
+     "entry": 118.857,
+     "stop": 114.9867,
+     "exit": 114.9867,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.008,
+     "finR": 0.014,
+     "net": -1.022,
+     "nights": 6,
+     "dgs2": 0.29
+    },
+    {
+     "year": 2014,
+     "entryDay": "2014-02-17",
+     "exitDay": "2014-03-20",
+     "entry": 109.8,
+     "stop": 106.03635,
+     "exit": 106.03635,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.008,
+     "finR": 0.074,
+     "net": -1.082,
+     "nights": 33,
+     "dgs2": 0.32
+    },
+    {
+     "year": 2015,
+     "entryDay": "2015-02-16",
+     "exitDay": "2015-03-16",
+     "entry": 60.738,
+     "stop": 52.8828,
+     "exit": 52.8828,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.004,
+     "finR": 0.019,
+     "net": -1.023,
+     "nights": 28,
+     "dgs2": 0.66
+    },
+    {
+     "year": 2016,
+     "entryDay": "2016-02-15",
+     "exitDay": "2016-04-29",
+     "entry": 32.616,
+     "stop": 25.88475,
+     "exit": 47.367,
+     "how": "close",
+     "gross": 2.191,
+     "preFin": 2.187,
+     "finR": 0.032,
+     "net": 2.155,
+     "nights": 76,
+     "dgs2": 0.71
+    },
+    {
+     "year": 2017,
+     "entryDay": "2017-02-15",
+     "exitDay": "2017-03-09",
+     "entry": 55.144,
+     "stop": 51.5575,
+     "exit": 51.5575,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.008,
+     "finR": 0.037,
+     "net": -1.046,
+     "nights": 24,
+     "dgs2": 1.2
+    },
+    {
+     "year": 2018,
+     "entryDay": "2018-02-15",
+     "exitDay": "2018-04-30",
+     "entry": 64.662,
+     "stop": 60.19905,
+     "exit": 75.32,
+     "how": "close",
+     "gross": 2.388,
+     "preFin": 2.381,
+     "finR": 0.13,
+     "net": 2.251,
+     "nights": 72,
+     "dgs2": 2.05
+    },
+    {
+     "year": 2019,
+     "entryDay": "2019-02-15",
+     "exitDay": "2019-04-30",
+     "entry": 64.95,
+     "stop": 59.7678,
+     "exit": 72.139,
+     "how": "close",
+     "gross": 1.387,
+     "preFin": 1.381,
+     "finR": 0.124,
+     "net": 1.257,
+     "nights": 72,
+     "dgs2": 2.52
+    },
+    {
+     "year": 2020,
+     "entryDay": "2020-02-18",
+     "exitDay": "2020-02-27",
+     "entry": 57.593,
+     "stop": 52.0628,
+     "exit": 52.0628,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.005,
+     "finR": 0.012,
+     "net": -1.018,
+     "nights": 11,
+     "dgs2": 1.42
+    },
+    {
+     "year": 2021,
+     "entryDay": "2021-02-15",
+     "exitDay": "2021-04-30",
+     "entry": 63.299,
+     "stop": 59.69315,
+     "exit": 67.325,
+     "how": "close",
+     "gross": 1.117,
+     "preFin": 1.108,
+     "finR": 0.095,
+     "net": 1.013,
+     "nights": 76,
+     "dgs2": 0.11
+    },
+    {
+     "year": 2022,
+     "entryDay": "2022-02-15",
+     "exitDay": "2022-04-29",
+     "entry": 96.315,
+     "stop": 88.6239,
+     "exit": 107.566,
+     "how": "close",
+     "gross": 1.463,
+     "preFin": 1.459,
+     "finR": 0.103,
+     "net": 1.356,
+     "nights": 75,
+     "dgs2": 1.5
+    },
+    {
+     "year": 2023,
+     "entryDay": "2023-02-15",
+     "exitDay": "2023-03-14",
+     "entry": 85.163,
+     "stop": 77.2544,
+     "exit": 77.2544,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.004,
+     "finR": 0.056,
+     "net": -1.06,
+     "nights": 27,
+     "dgs2": 4.5
+    },
+    {
+     "year": 2024,
+     "entryDay": "2024-02-15",
+     "exitDay": "2024-04-30",
+     "entry": 81.525,
+     "stop": 75.5409,
+     "exit": 86.687,
+     "how": "close",
+     "gross": 0.863,
+     "preFin": 0.858,
+     "finR": 0.19,
+     "net": 0.667,
+     "nights": 73,
+     "dgs2": 4.48
+    },
+    {
+     "year": 2025,
+     "entryDay": "2025-02-17",
+     "exitDay": "2025-03-05",
+     "entry": 74.779,
+     "stop": 69.9721,
+     "exit": 69.9721,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.006,
+     "finR": 0.046,
+     "net": -1.052,
+     "nights": 16,
+     "dgs2": 4.26
+    },
+    {
+     "year": 2026,
+     "entryDay": "2026-02-16",
+     "exitDay": "2026-04-30",
+     "entry": 68.14,
+     "stop": 61.70155,
+     "exit": 116.391,
+     "how": "close",
+     "gross": 7.494,
+     "preFin": 7.49,
+     "finR": 0.128,
+     "net": 7.361,
+     "nights": 75,
+     "dgs2": 3.4
+    }
+   ],
+   "skipped": [],
+   "weekdaysOnly": {
+    "moved": [
+     2020
+    ],
+    "n": 11,
+    "avg": 1.08,
+    "t": 1.46,
+    "pos": 7
+   },
+   "pHolm": 0.3446
+  },
+  "T3": {
+   "name": "Natural gas winter build",
+   "market": "NATGAS_USD",
+   "side": "long",
+   "window": "9/1 -> 10/31 (month/day)",
+   "decisive": {
+    "n": 11,
+    "avg": 0.108,
+    "sd": 1.324,
+    "t": 0.27,
+    "df": 10,
+    "pos": 5,
+    "gross": 0.18,
+    "preFin": 0.163,
+    "tPreFin": 0.4,
+    "finR": 0.055,
+    "spreadR": 0.017,
+    "stopped": 5,
+    "worst": -1.217,
+    "best": 2.113
+   },
+   "replication": {
+    "n": 8,
+    "avg": -0.131,
+    "sd": 1.619,
+    "t": -0.23,
+    "df": 7,
+    "pos": 2,
+    "gross": -0.081,
+    "preFin": -0.094,
+    "tPreFin": -0.16,
+    "finR": 0.036,
+    "spreadR": 0.013,
+    "stopped": 5,
+    "worst": -1.067,
+    "best": 3.227
+   },
+   "p": 0.3963,
+   "placebo": {
+    "distinct": 35,
+    "p95": 0.741,
+    "median": 0.299,
+    "max": 0.985,
+    "rank": 13,
+    "seeds": [
+     {
+      "seed": 1,
+      "offset": 259,
+      "n": 10,
+      "avg": 0.985
+     },
+     {
+      "seed": 2,
+      "offset": 178,
+      "n": 11,
+      "avg": 0.291
+     },
+     {
+      "seed": 3,
+      "offset": 161,
+      "n": 11,
+      "avg": 0.138
+     },
+     {
+      "seed": 4,
+      "offset": 277,
+      "n": 10,
+      "avg": 0.563
+     },
+     {
+      "seed": 5,
+      "offset": 199,
+      "n": 11,
+      "avg": 0.37
+     },
+     {
+      "seed": 6,
+      "offset": 236,
+      "n": 11,
+      "avg": 0.435
+     },
+     {
+      "seed": 7,
+      "offset": 199,
+      "n": 11,
+      "avg": 0.37
+     },
+     {
+      "seed": 8,
+      "offset": 121,
+      "n": 11,
+      "avg": 0.714
+     },
+     {
+      "seed": 9,
+      "offset": 233,
+      "n": 11,
+      "avg": 0.305
+     },
+     {
+      "seed": 10,
+      "offset": 354,
+      "n": 10,
+      "avg": -0.529
+     },
+     {
+      "seed": 11,
+      "offset": 352,
+      "n": 10,
+      "avg": -0.327
+     },
+     {
+      "seed": 12,
+      "offset": 75,
+      "n": 11,
+      "avg": 0.45
+     },
+     {
+      "seed": 13,
+      "offset": 104,
+      "n": 11,
+      "avg": 0.741
+     },
+     {
+      "seed": 14,
+      "offset": 244,
+      "n": 11,
+      "avg": 0.029
+     },
+     {
+      "seed": 15,
+      "offset": 363,
+      "n": 10,
+      "avg": -0.446
+     },
+     {
+      "seed": 16,
+      "offset": 195,
+      "n": 11,
+      "avg": 0.406
+     },
+     {
+      "seed": 17,
+      "offset": 342,
+      "n": 10,
+      "avg": -0.354
+     },
+     {
+      "seed": 18,
+      "offset": 277,
+      "n": 10,
+      "avg": 0.563
+     },
+     {
+      "seed": 19,
+      "offset": 145,
+      "n": 11,
+      "avg": 0.294
+     },
+     {
+      "seed": 20,
+      "offset": 104,
+      "n": 11,
+      "avg": 0.741
+     },
+     {
+      "seed": 21,
+      "offset": 130,
+      "n": 11,
+      "avg": 0.364
+     },
+     {
+      "seed": 22,
+      "offset": 37,
+      "n": 11,
+      "avg": -0.573
+     },
+     {
+      "seed": 23,
+      "offset": 210,
+      "n": 11,
+      "avg": 0.751
+     },
+     {
+      "seed": 24,
+      "offset": 186,
+      "n": 11,
+      "avg": 0.201
+     },
+     {
+      "seed": 25,
+      "offset": 267,
+      "n": 10,
+      "avg": 0.663
+     },
+     {
+      "seed": 26,
+      "offset": 288,
+      "n": 10,
+      "avg": 0.109
+     },
+     {
+      "seed": 27,
+      "offset": 138,
+      "n": 11,
+      "avg": -0.021
+     },
+     {
+      "seed": 28,
+      "offset": 7,
+      "n": 11,
+      "avg": -0.418
+     },
+     {
+      "seed": 29,
+      "offset": 180,
+      "n": 11,
+      "avg": 0.196
+     },
+     {
+      "seed": 30,
+      "offset": 252,
+      "n": 10,
+      "avg": 0.649
+     },
+     {
+      "seed": 31,
+      "offset": 280,
+      "n": 10,
+      "avg": -0.107
+     },
+     {
+      "seed": 32,
+      "offset": 306,
+      "n": 10,
+      "avg": 0.037
+     },
+     {
+      "seed": 33,
+      "offset": 279,
+      "n": 10,
+      "avg": 0.465
+     },
+     {
+      "seed": 34,
+      "offset": 181,
+      "n": 11,
+      "avg": 0.102
+     },
+     {
+      "seed": 35,
+      "offset": 314,
+      "n": 10,
+      "avg": -0.393
+     },
+     {
+      "seed": 36,
+      "offset": 327,
+      "n": 10,
+      "avg": -0.566
+     },
+     {
+      "seed": 37,
+      "offset": 75,
+      "n": 11,
+      "avg": 0.45
+     },
+     {
+      "seed": 38,
+      "offset": 225,
+      "n": 11,
+      "avg": 0.593
+     },
+     {
+      "seed": 39,
+      "offset": 240,
+      "n": 11,
+      "avg": 0.466
+     },
+     {
+      "seed": 40,
+      "offset": 161,
+      "n": 11,
+      "avg": 0.138
+     }
+    ]
+   },
+   "years": [
+    {
+     "year": 2008,
+     "entryDay": "2008-09-02",
+     "exitDay": "2008-10-27",
+     "entry": 7.46,
+     "stop": 6.0236,
+     "exit": 6.023599999999999,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.003,
+     "finR": 0.038,
+     "net": -1.042,
+     "nights": 55,
+     "dgs2": 2.36
+    },
+    {
+     "year": 2009,
+     "entryDay": "2009-09-01",
+     "exitDay": "2009-10-30",
+     "entry": 2.667,
+     "stop": 2.1264,
+     "exit": 4.432,
+     "how": "close",
+     "gross": 3.265,
+     "preFin": 3.256,
+     "finR": 0.029,
+     "net": 3.227,
+     "nights": 61,
+     "dgs2": 1.01
+    },
+    {
+     "year": 2010,
+     "entryDay": "2010-09-01",
+     "exitDay": "2010-10-22",
+     "entry": 3.745,
+     "stop": 3.2935,
+     "exit": 3.2935,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.011,
+     "finR": 0.037,
+     "net": -1.048,
+     "nights": 53,
+     "dgs2": 0.56
+    },
+    {
+     "year": 2011,
+     "entryDay": "2011-09-01",
+     "exitDay": "2011-09-22",
+     "entry": 4.082,
+     "stop": 3.70205,
+     "exit": 3.7020500000000003,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.013,
+     "finR": 0.017,
+     "net": -1.03,
+     "nights": 21,
+     "dgs2": 0.2
+    },
+    {
+     "year": 2012,
+     "entryDay": "2012-09-06",
+     "exitDay": "2012-10-31",
+     "entry": 2.781,
+     "stop": 2.3721,
+     "exit": 3.415,
+     "how": "close",
+     "gross": 1.551,
+     "preFin": 1.538,
+     "finR": 0.027,
+     "net": 1.511,
+     "nights": 53,
+     "dgs2": 0.22
+    },
+    {
+     "year": 2013,
+     "entryDay": "2013-09-02",
+     "exitDay": "2013-10-31",
+     "entry": 3.6,
+     "stop": 3.3066,
+     "exit": 3.464,
+     "how": "close",
+     "gross": -0.464,
+     "preFin": -0.481,
+     "finR": 0.059,
+     "net": -0.54,
+     "nights": 61,
+     "dgs2": 0.39
+    },
+    {
+     "year": 2014,
+     "entryDay": "2014-09-01",
+     "exitDay": "2014-10-16",
+     "entry": 4.038,
+     "stop": 3.73005,
+     "exit": 3.7300500000000003,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.016,
+     "finR": 0.05,
+     "net": -1.067,
+     "nights": 47,
+     "dgs2": 0.48
+    },
+    {
+     "year": 2015,
+     "entryDay": "2015-09-01",
+     "exitDay": "2015-10-01",
+     "entry": 2.665,
+     "stop": 2.449,
+     "exit": 2.4490000000000003,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.023,
+     "finR": 0.035,
+     "net": -1.058,
+     "nights": 32,
+     "dgs2": 0.72
+    },
+    {
+     "year": 2016,
+     "entryDay": "2016-09-01",
+     "exitDay": "2016-10-31",
+     "entry": 2.855,
+     "stop": 2.58305,
+     "exit": 2.714,
+     "how": "close",
+     "gross": -0.518,
+     "preFin": -0.537,
+     "finR": 0.056,
+     "net": -0.593,
+     "nights": 58,
+     "dgs2": 0.84
+    },
+    {
+     "year": 2017,
+     "entryDay": "2017-09-01",
+     "exitDay": "2017-10-09",
+     "entry": 3.024,
+     "stop": 2.80575,
+     "exit": 2.80575,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.023,
+     "finR": 0.053,
+     "net": -1.076,
+     "nights": 36,
+     "dgs2": 1.35
+    },
+    {
+     "year": 2018,
+     "entryDay": "2018-09-03",
+     "exitDay": "2018-09-07",
+     "entry": 2.91,
+     "stop": 2.7723,
+     "exit": 2.7723000000000004,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.036,
+     "finR": 0.018,
+     "net": -1.054,
+     "nights": 6,
+     "dgs2": 2.62
+    },
+    {
+     "year": 2019,
+     "entryDay": "2019-09-02",
+     "exitDay": "2019-10-31",
+     "entry": 2.286,
+     "stop": 2.06895,
+     "exit": 2.506,
+     "how": "close",
+     "gross": 1.014,
+     "preFin": 0.991,
+     "finR": 0.07,
+     "net": 0.92,
+     "nights": 61,
+     "dgs2": 1.5
+    },
+    {
+     "year": 2020,
+     "entryDay": "2020-09-01",
+     "exitDay": "2020-09-17",
+     "entry": 2.555,
+     "stop": 2.17775,
+     "exit": 2.17775,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.013,
+     "finR": 0.009,
+     "net": -1.022,
+     "nights": 18,
+     "dgs2": 0.14
+    },
+    {
+     "year": 2021,
+     "entryDay": "2021-09-01",
+     "exitDay": "2021-10-29",
+     "entry": 4.391,
+     "stop": 3.9341,
+     "exit": 5.381,
+     "how": "close",
+     "gross": 2.167,
+     "preFin": 2.156,
+     "finR": 0.043,
+     "net": 2.113,
+     "nights": 60,
+     "dgs2": 0.22
+    },
+    {
+     "year": 2022,
+     "entryDay": "2022-09-01",
+     "exitDay": "2022-09-19",
+     "entry": 9.234,
+     "stop": 7.6086,
+     "exit": 7.608599999999999,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.003,
+     "finR": 0.015,
+     "net": -1.018,
+     "nights": 16,
+     "dgs2": 3.37
+    },
+    {
+     "year": 2023,
+     "entryDay": "2023-09-01",
+     "exitDay": "2023-10-31",
+     "entry": 2.666,
+     "stop": 2.26535,
+     "exit": 3.273,
+     "how": "close",
+     "gross": 1.515,
+     "preFin": 1.503,
+     "finR": 0.078,
+     "net": 1.425,
+     "nights": 58,
+     "dgs2": 4.87
+    },
+    {
+     "year": 2024,
+     "entryDay": "2024-09-02",
+     "exitDay": "2024-10-31",
+     "entry": 2.046,
+     "stop": 1.73205,
+     "exit": 2.344,
+     "how": "close",
+     "gross": 0.949,
+     "preFin": 0.933,
+     "finR": 0.07,
+     "net": 0.863,
+     "nights": 61,
+     "dgs2": 3.91
+    },
+    {
+     "year": 2025,
+     "entryDay": "2025-09-01",
+     "exitDay": "2025-10-31",
+     "entry": 2.902,
+     "stop": 2.54215,
+     "exit": 3.6,
+     "how": "close",
+     "gross": 1.94,
+     "preFin": 1.926,
+     "finR": 0.083,
+     "net": 1.842,
+     "nights": 62,
+     "dgs2": 3.59
+    },
+    {
+     "year": 2026,
+     "entryDay": "2026-09-01",
+     "exitDay": "2026-10-26",
+     "entry": 2.928,
+     "stop": 2.65905,
+     "exit": 2.636,
+     "how": "gap",
+     "gross": -1.086,
+     "preFin": -1.104,
+     "finR": 0.112,
+     "net": -1.217,
+     "nights": 55,
+     "dgs2": 4.34
+    }
+   ],
+   "skipped": [],
+   "weekdaysOnly": {
+    "moved": [],
+    "n": 11,
+    "avg": 0.108,
+    "t": 0.27,
+    "pos": 5
+   },
+   "pHolm": 0.3963
+  },
+  "T4": {
+   "name": "Natural gas spring weakness (short)",
+   "market": "NATGAS_USD",
+   "side": "short",
+   "window": "2/1 -> 3/31 (month/day)",
+   "decisive": {
+    "n": 11,
+    "avg": 0.413,
+    "sd": 0.933,
+    "t": 1.47,
+    "df": 10,
+    "pos": 7,
+    "gross": 0.43,
+    "preFin": 0.42,
+    "tPreFin": 1.49,
+    "finR": 0.007,
+    "spreadR": 0.01,
+    "stopped": 2,
+    "worst": -1.019,
+    "best": 1.551
+   },
+   "replication": {
+    "n": 8,
+    "avg": 0.212,
+    "sd": 0.931,
+    "t": 0.64,
+    "df": 7,
+    "pos": 6,
+    "gross": 0.238,
+    "preFin": 0.229,
+    "tPreFin": 0.69,
+    "finR": 0.017,
+    "spreadR": 0.009,
+    "stopped": 2,
+    "worst": -1.038,
+    "best": 1.77
+   },
+   "p": 0.0862,
+   "placebo": {
+    "distinct": 36,
+    "p95": 0.218,
+    "median": -0.358,
+    "max": 0.3,
+    "rank": 40,
+    "seeds": [
+     {
+      "seed": 1,
+      "offset": 354,
+      "n": 10,
+      "avg": -0.288
+     },
+     {
+      "seed": 2,
+      "offset": 82,
+      "n": 11,
+      "avg": -0.59
+     },
+     {
+      "seed": 3,
+      "offset": 339,
+      "n": 10,
+      "avg": -0.511
+     },
+     {
+      "seed": 4,
+      "offset": 314,
+      "n": 10,
+      "avg": -0.159
+     },
+     {
+      "seed": 5,
+      "offset": 273,
+      "n": 10,
+      "avg": -0.723
+     },
+     {
+      "seed": 6,
+      "offset": 50,
+      "n": 11,
+      "avg": -0.016
+     },
+     {
+      "seed": 7,
+      "offset": 289,
+      "n": 10,
+      "avg": -0.183
+     },
+     {
+      "seed": 8,
+      "offset": 354,
+      "n": 10,
+      "avg": -0.288
+     },
+     {
+      "seed": 9,
+      "offset": 106,
+      "n": 11,
+      "avg": -0.576
+     },
+     {
+      "seed": 10,
+      "offset": 329,
+      "n": 10,
+      "avg": 0.166
+     },
+     {
+      "seed": 11,
+      "offset": 99,
+      "n": 11,
+      "avg": -0.34
+     },
+     {
+      "seed": 12,
+      "offset": 261,
+      "n": 10,
+      "avg": -0.582
+     },
+     {
+      "seed": 13,
+      "offset": 113,
+      "n": 11,
+      "avg": -0.861
+     },
+     {
+      "seed": 14,
+      "offset": 104,
+      "n": 11,
+      "avg": -0.535
+     },
+     {
+      "seed": 15,
+      "offset": 317,
+      "n": 10,
+      "avg": -0.305
+     },
+     {
+      "seed": 16,
+      "offset": 178,
+      "n": 11,
+      "avg": 0.156
+     },
+     {
+      "seed": 17,
+      "offset": 200,
+      "n": 11,
+      "avg": -0.6
+     },
+     {
+      "seed": 18,
+      "offset": 167,
+      "n": 11,
+      "avg": 0.015
+     },
+     {
+      "seed": 19,
+      "offset": 113,
+      "n": 11,
+      "avg": -0.861
+     },
+     {
+      "seed": 20,
+      "offset": 161,
+      "n": 11,
+      "avg": -0.045
+     },
+     {
+      "seed": 21,
+      "offset": 42,
+      "n": 11,
+      "avg": -0.089
+     },
+     {
+      "seed": 22,
+      "offset": 196,
+      "n": 11,
+      "avg": -0.449
+     },
+     {
+      "seed": 23,
+      "offset": 38,
+      "n": 11,
+      "avg": 0.26
+     },
+     {
+      "seed": 24,
+      "offset": 99,
+      "n": 11,
+      "avg": -0.34
+     },
+     {
+      "seed": 25,
+      "offset": 182,
+      "n": 11,
+      "avg": -0.123
+     },
+     {
+      "seed": 26,
+      "offset": 223,
+      "n": 11,
+      "avg": -0.582
+     },
+     {
+      "seed": 27,
+      "offset": 319,
+      "n": 10,
+      "avg": -0.497
+     },
+     {
+      "seed": 28,
+      "offset": 34,
+      "n": 11,
+      "avg": 0.218
+     },
+     {
+      "seed": 29,
+      "offset": 231,
+      "n": 11,
+      "avg": -0.674
+     },
+     {
+      "seed": 30,
+      "offset": 196,
+      "n": 11,
+      "avg": -0.449
+     },
+     {
+      "seed": 31,
+      "offset": 123,
+      "n": 11,
+      "avg": -0.377
+     },
+     {
+      "seed": 32,
+      "offset": 248,
+      "n": 11,
+      "avg": -0.626
+     },
+     {
+      "seed": 33,
+      "offset": 269,
+      "n": 10,
+      "avg": -0.76
+     },
+     {
+      "seed": 34,
+      "offset": 136,
+      "n": 11,
+      "avg": -0.444
+     },
+     {
+      "seed": 35,
+      "offset": 310,
+      "n": 10,
+      "avg": 0.3
+     },
+     {
+      "seed": 36,
+      "offset": 10,
+      "n": 11,
+      "avg": 0.169
+     },
+     {
+      "seed": 37,
+      "offset": 190,
+      "n": 11,
+      "avg": -0.324
+     },
+     {
+      "seed": 38,
+      "offset": 197,
+      "n": 11,
+      "avg": -0.549
+     },
+     {
+      "seed": 39,
+      "offset": 241,
+      "n": 11,
+      "avg": -0.569
+     },
+     {
+      "seed": 40,
+      "offset": 154,
+      "n": 11,
+      "avg": 0.041
+     }
+    ]
+   },
+   "years": [
+    {
+     "year": 2008,
+     "entryDay": "2008-02-01",
+     "exitDay": "2008-02-18",
+     "entry": 8.092,
+     "stop": 8.87425,
+     "exit": 8.87425,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.006,
+     "finR": 0.002,
+     "net": -1.008,
+     "nights": 15,
+     "dgs2": 2.09
+    },
+    {
+     "year": 2009,
+     "entryDay": "2009-02-02",
+     "exitDay": "2009-03-31",
+     "entry": 4.364,
+     "stop": 5.2481,
+     "exit": 3.731,
+     "how": "close",
+     "gross": 0.716,
+     "preFin": 0.71,
+     "finR": 0.012,
+     "net": 0.698,
+     "nights": 57,
+     "dgs2": 0.94
+    },
+    {
+     "year": 2010,
+     "entryDay": "2010-02-01",
+     "exitDay": "2010-03-31",
+     "entry": 5.28,
+     "stop": 6.0951,
+     "exit": 3.818,
+     "how": "close",
+     "gross": 1.794,
+     "preFin": 1.788,
+     "finR": 0.017,
+     "net": 1.77,
+     "nights": 58,
+     "dgs2": 0.82
+    },
+    {
+     "year": 2011,
+     "entryDay": "2011-02-01",
+     "exitDay": "2011-03-31",
+     "entry": 4.391,
+     "stop": 4.90715,
+     "exit": 4.337,
+     "how": "close",
+     "gross": 0.105,
+     "preFin": 0.095,
+     "finR": 0.027,
+     "net": 0.068,
+     "nights": 60,
+     "dgs2": 0.54
+    },
+    {
+     "year": 2012,
+     "entryDay": "2012-02-01",
+     "exitDay": "2012-03-30",
+     "entry": 2.406,
+     "stop": 2.8905,
+     "exit": 2.046,
+     "how": "close",
+     "gross": 0.743,
+     "preFin": 0.733,
+     "finR": 0.019,
+     "net": 0.714,
+     "nights": 60,
+     "dgs2": 0.22
+    },
+    {
+     "year": 2013,
+     "entryDay": "2013-02-01",
+     "exitDay": "2013-03-13",
+     "entry": 3.314,
+     "stop": 3.6473,
+     "exit": 3.6473,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.015,
+     "finR": 0.023,
+     "net": -1.038,
+     "nights": 38,
+     "dgs2": 0.27
+    },
+    {
+     "year": 2014,
+     "entryDay": "2014-02-03",
+     "exitDay": "2014-03-31",
+     "entry": 4.856,
+     "stop": 5.59445,
+     "exit": 4.506,
+     "how": "close",
+     "gross": 0.474,
+     "preFin": 0.467,
+     "finR": 0.022,
+     "net": 0.445,
+     "nights": 56,
+     "dgs2": 0.34
+    },
+    {
+     "year": 2015,
+     "entryDay": "2015-02-02",
+     "exitDay": "2015-03-31",
+     "entry": 2.668,
+     "stop": 3.21895,
+     "exit": 2.63,
+     "how": "close",
+     "gross": 0.069,
+     "preFin": 0.06,
+     "finR": 0.015,
+     "net": 0.045,
+     "nights": 57,
+     "dgs2": 0.47
+    },
+    {
+     "year": 2016,
+     "entryDay": "2016-02-01",
+     "exitDay": "2016-03-31",
+     "entry": 2.197,
+     "stop": 2.50465,
+     "exit": 1.902,
+     "how": "close",
+     "gross": 0.959,
+     "preFin": 0.943,
+     "finR": 0.021,
+     "net": 0.922,
+     "nights": 61,
+     "dgs2": 0.76
+    },
+    {
+     "year": 2017,
+     "entryDay": "2017-02-01",
+     "exitDay": "2017-03-31",
+     "entry": 3.102,
+     "stop": 3.5217,
+     "exit": 3.122,
+     "how": "close",
+     "gross": -0.048,
+     "preFin": -0.06,
+     "finR": 0.016,
+     "net": -0.075,
+     "nights": 60,
+     "dgs2": 1.22
+    },
+    {
+     "year": 2018,
+     "entryDay": "2018-02-01",
+     "exitDay": "2018-03-29",
+     "entry": 3.174,
+     "stop": 3.6327,
+     "exit": 2.718,
+     "how": "close",
+     "gross": 0.994,
+     "preFin": 0.983,
+     "finR": 0.004,
+     "net": 0.979,
+     "nights": 56,
+     "dgs2": 2.13
+    },
+    {
+     "year": 2019,
+     "entryDay": "2019-02-01",
+     "exitDay": "2019-03-29",
+     "entry": 2.904,
+     "stop": 3.4953,
+     "exit": 2.658,
+     "how": "close",
+     "gross": 0.416,
+     "preFin": 0.408,
+     "finR": 0,
+     "net": 0.408,
+     "nights": 56,
+     "dgs2": 2.52
+    },
+    {
+     "year": 2020,
+     "entryDay": "2020-02-03",
+     "exitDay": "2020-03-31",
+     "entry": 1.859,
+     "stop": 2.08985,
+     "exit": 1.598,
+     "how": "close",
+     "gross": 1.131,
+     "preFin": 1.109,
+     "finR": 0.015,
+     "net": 1.094,
+     "nights": 57,
+     "dgs2": 1.33
+    },
+    {
+     "year": 2021,
+     "entryDay": "2021-02-01",
+     "exitDay": "2021-02-16",
+     "entry": 2.736,
+     "stop": 3.13245,
+     "exit": 3.13245,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.013,
+     "finR": 0.007,
+     "net": -1.019,
+     "nights": 15,
+     "dgs2": 0.11
+    },
+    {
+     "year": 2022,
+     "entryDay": "2022-02-01",
+     "exitDay": "2022-03-31",
+     "entry": 5.129,
+     "stop": 6.03965,
+     "exit": 5.646,
+     "how": "close",
+     "gross": -0.568,
+     "preFin": -0.573,
+     "finR": 0.012,
+     "net": -0.586,
+     "nights": 60,
+     "dgs2": 1.15
+    },
+    {
+     "year": 2023,
+     "entryDay": "2023-02-01",
+     "exitDay": "2023-03-31",
+     "entry": 2.875,
+     "stop": 3.64105,
+     "exit": 2.068,
+     "how": "close",
+     "gross": 1.053,
+     "preFin": 1.047,
+     "finR": 0,
+     "net": 1.047,
+     "nights": 60,
+     "dgs2": 4.19
+    },
+    {
+     "year": 2024,
+     "entryDay": "2024-02-01",
+     "exitDay": "2024-03-28",
+     "entry": 2.314,
+     "stop": 2.8651,
+     "exit": 1.632,
+     "how": "close",
+     "gross": 1.238,
+     "preFin": 1.228,
+     "finR": 0,
+     "net": 1.228,
+     "nights": 56,
+     "dgs2": 4.34
+    },
+    {
+     "year": 2025,
+     "entryDay": "2025-02-03",
+     "exitDay": "2025-02-19",
+     "entry": 3.539,
+     "stop": 4.33745,
+     "exit": 4.33745,
+     "how": "stop",
+     "gross": -1,
+     "preFin": -1.006,
+     "finR": 0,
+     "net": -1.006,
+     "nights": 16,
+     "dgs2": 4.22
+    },
+    {
+     "year": 2026,
+     "entryDay": "2026-02-02",
+     "exitDay": "2026-03-31",
+     "entry": 4.896,
+     "stop": 6.1491,
+     "exit": 2.947,
+     "how": "close",
+     "gross": 1.555,
+     "preFin": 1.551,
+     "finR": 0,
+     "net": 1.551,
+     "nights": 57,
+     "dgs2": 3.52
+    }
+   ],
+   "skipped": [],
+   "weekdaysOnly": {
+    "moved": [],
+    "n": 11,
+    "avg": 0.413,
+    "t": 1.47,
+    "pos": 7
+   },
+   "pHolm": 0.3446
+  }
+ },
+ "tests": {
+  "T1": {
+   "meanPositive": true,
+   "holm": false,
+   "years": true,
+   "replication": true,
+   "placebo": false,
+   "pass": false
+  },
+  "T2": {
+   "meanPositive": true,
+   "holm": false,
+   "years": true,
+   "replication": true,
+   "placebo": false,
+   "pass": false
+  },
+  "T3": {
+   "meanPositive": true,
+   "holm": false,
+   "years": false,
+   "replication": false,
+   "placebo": false,
+   "pass": false
+  },
+  "T4": {
+   "meanPositive": true,
+   "holm": false,
+   "years": true,
+   "replication": true,
+   "placebo": true,
+   "pass": false
+  }
+ },
+ "passed": [],
+ "verdict": "FAIL"
+}
