@@ -194,6 +194,7 @@ paper system with a measured, clearly negative record.
 | 176 | Volume premium replication on crypto (`volume-premium-crypto`) | **Blocked, not run**: the crypto daily caches keep OHLC only and every Binance host is refused by the network policy; needs `data.binance.vision` allowed, or a free Actions job keeping the volume column | — |
 | 177 | 52-week-high ranking, cross-section (`high52-xs`) | **Not run, duplicate on indices**: `high52-rotation` #853 (FAIL, OOS t 0.38) and `index-52w-high` #911; commodities and FX untested, run as `high52-cmdfx` | — |
 | 178 | Volume-conditioned reversal of big daily moves (`volume-reversal`) | **FAIL**: low-activity fades pooled 32 CFDs 2017-26 −0.20R a month net (t −0.59, Holm p 1.00), −1.09R in sample, beat 35 of 40 placebos (bar 38); low minus high t 2.36 is mostly trade count, +0.03R a trade | #994 |
+| 179 | Index activity cross-section, abnormal quote count and Amihud (`activity-xs`) | **FAIL**: weekly long-short over 14 index CFDs loses; abnormal activity 2017-26 −1.13R a month net (t −5.26, gross −0.36R), beats 4 of 40 placebos; the #993 index line does not carry over to a cross-section | #995 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
