@@ -106,6 +106,7 @@ paper system with a measured, clearly negative record.
 | 340 | Gold absorption ("effort without result"): buy a heavy-activity narrow-range day after a decline, sell after an advance | **FAIL, 0 of 3**: buy excess +0.180R OOS (t 1.62, Holm p 0.12, 40/40 placebos) but −0.026R IS; n 62 OOS; sell side flat | #1153 |
 | 341 | Gold-driven vs dollar-driven days: follow a strong move seen in USD, EUR and GBP; fade a USD-only rise | **FAIL, 0 of 3**: gold-driven buy +0.092R net OOS but excess over buying any day only +0.048R (t 1.09), wrong sign IS; dollar-driven days ~3 a year | #1154 |
 | 342 | Gold smash-day reversal: buy-stop above a day that closed below the prior low (and mirror) | **FAIL, 0 of 3**: worse than the same order after any day on both sides and windows (long OOS excess −0.206R, t −1.91; short −0.186R); negative before costs | #1155 |
+| 343 | Gold point-and-figure (0.5% box, 3-box reversal): double-top buy / double-bottom sell | **FAIL, 0 of 3**: double-top buy +0.098R net OOS but −0.015R vs buying any day (t −0.15); sell and 20-day hold also no better than their baselines | #1156 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
