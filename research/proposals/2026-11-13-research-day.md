@@ -276,6 +276,8 @@ paper system with a measured, clearly negative record.
 | 258 | Gold vol breakout: keep the opposite order after a stop-out (stop-and-reverse) | **FAIL, 0 of 3**: the reverse trade loses −0.181R a trade OOS (n 219, t −2.29), −0.097R IS; adding it cuts the day from +0.044 to +0.023R and deepens drawdown −39R → −59R. Base rule unchanged | #1071 |
 | 259 | Proposal: the gold volatility breakout, forward record options (owner decision) | Gathers #1049-#1071; options (a) paper shadow, (b) paper + own cTrader demo account with execution checks, (c) nothing; none recommended, nothing built until the owner chooses | #1072 |
 | 260 | Gold around Indian festival demand (Dhanteras, Akshaya Tritiya) | **FAIL, 0 of 3**: best OOS t 0.88 (Dhanteras run-up +0.362R, n 10), barely above an average 10-day long; ~10 events a window, so "not shown" | #1073 |
+| 261 | Gold pre-holiday replication on XAU/EUR and HistData | **PASS 3 of 4, not independent** (same holidays/years; event correlation 0.71-1.00): XAU/EUR T1 +0.137R (t 3.27), HistData T1 +0.116R (t 2.05, by a hair); same weak spots (2007-16 in euros, 2022-26 on HistData). Forward check over the next 10 NYSE holidays pre-registered, pass line T1 mean > 0 | #1074 |
+| 262 | Gold vol breakout beside the gold book (descriptive) | 2007-17: monthly correlation −0.04; side by side +22.4R a year, worst drawdown 32.4R = 59 % of the two added; 2018-26 ratio 0.81. No sizing proposal, book unchanged | #1075 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
