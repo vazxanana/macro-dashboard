@@ -191,6 +191,7 @@ paper system with a measured, clearly negative record.
 | 173 | Pre-holiday day on non-US indices, local calendars (`local-preholiday`) | **FAIL**: 9 indices pooled 2017-26, +0.022R net over ordinary days (230 dates, Welch t 1.01, Holm p 1.00); loses at 2x costs; same small pre-cost sign as the US `pre-holiday` study, eaten by spread and financing | #992 |
 | 174 | Overnight vs intraday "tug of war" on US indices (`overnight-tug`) | **Not run, duplicate**: claim (a) failed in `overnight-drift` #836 / `index-overnight` #891, claim (b) in `gap-fill` #849 / `eu-gap-fade` #916; the untested variants would be selection after the fact | — |
 | 175 | High-volume return premium, OANDA quote counts (`volume-premium`) | **FAIL**: pooled 32 CFDs 2017-26 high-volume minus all days +2.69R a month net, t 1.99, Holm p 0.186; high-volume longs alone +0.006R a trade, negative at 2x costs. Indices alone t 3.52 OOS / 4.06 IS (relative only, a +0.022R long): a hypothesis needing its own pre-registration | #993 |
+| 176 | Volume premium replication on crypto (`volume-premium-crypto`) | **Blocked, not run**: the crypto daily caches keep OHLC only and every Binance host is refused by the network policy; needs `data.binance.vision` allowed, or a free Actions job keeping the volume column | — |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
