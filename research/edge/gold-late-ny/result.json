@@ -1,0 +1,275 @@
+{
+ "tests": {
+  "T1": {
+   "name": "Follow the late-NY move into Asia (every signal day)",
+   "is": {
+    "n": 1229,
+    "buys": 615,
+    "sells": 614,
+    "gross": 0.0158,
+    "avg": -0.0768,
+    "total": -94.33,
+    "avgX2": -0.1693,
+    "tX2": -8.97,
+    "wr": 44.1,
+    "stopped": 123,
+    "dd": -97.72,
+    "months": 60,
+    "tGross": 0.85,
+    "t": -4.23,
+    "p": 1,
+    "medStop": 6.1,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1166,
+     "p50": -0.0912,
+     "p95": -0.0676,
+     "beats": 31
+    }
+   },
+   "oos": {
+    "n": 1445,
+    "buys": 732,
+    "sells": 713,
+    "gross": 0.002,
+    "avg": -0.0452,
+    "total": -65.35,
+    "avgX2": -0.0924,
+    "tX2": -4.99,
+    "wr": 47.3,
+    "stopped": 161,
+    "dd": -73.82,
+    "months": 71,
+    "tGross": 0.11,
+    "t": -2.57,
+    "p": 0.9938,
+    "medStop": 12.03,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.0799,
+     "p50": -0.0516,
+     "p95": -0.0277,
+     "beats": 26
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "holm": false,
+    "isSame": false,
+    "x2": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "Follow, sizeable late-NY moves only (|move| > 0.5x its 20-day mean size)",
+   "is": {
+    "n": 756,
+    "buys": 374,
+    "sells": 382,
+    "gross": 0.0065,
+    "avg": -0.0868,
+    "total": -65.63,
+    "avgX2": -0.1801,
+    "tX2": -8.08,
+    "wr": 43.9,
+    "stopped": 87,
+    "dd": -67.35,
+    "months": 60,
+    "tGross": 0.29,
+    "t": -3.99,
+    "p": 0.9999,
+    "medStop": 6.09,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1215,
+     "p50": -0.1004,
+     "p95": -0.0561,
+     "beats": 24
+    }
+   },
+   "oos": {
+    "n": 906,
+    "buys": 456,
+    "sells": 450,
+    "gross": 0.0188,
+    "avg": -0.0289,
+    "total": -26.16,
+    "avgX2": -0.0766,
+    "tX2": -3.28,
+    "wr": 48,
+    "stopped": 100,
+    "dd": -31.89,
+    "months": 71,
+    "tGross": 0.83,
+    "t": -1.27,
+    "p": 0.896,
+    "medStop": 11.99,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.0848,
+     "p50": -0.0559,
+     "p95": -0.0245,
+     "beats": 37
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "holm": false,
+    "isSame": false,
+    "x2": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "Fade the late-NY move in Asia (every signal day)",
+   "is": {
+    "n": 1229,
+    "buys": 614,
+    "sells": 615,
+    "gross": -0.0173,
+    "avg": -0.1099,
+    "total": -135.02,
+    "avgX2": -0.2024,
+    "tX2": -9.36,
+    "wr": 43.5,
+    "stopped": 149,
+    "dd": -141.17,
+    "months": 60,
+    "tGross": -0.98,
+    "t": -5.7,
+    "p": 1,
+    "medStop": 6.1,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1166,
+     "p50": -0.0912,
+     "p95": -0.0676,
+     "beats": 5
+    }
+   },
+   "oos": {
+    "n": 1445,
+    "buys": 713,
+    "sells": 732,
+    "gross": -0.0182,
+    "avg": -0.0654,
+    "total": -94.44,
+    "avgX2": -0.1125,
+    "tX2": -5.74,
+    "wr": 45.3,
+    "stopped": 180,
+    "dd": -106.39,
+    "months": 71,
+    "tGross": -0.97,
+    "t": -3.46,
+    "p": 0.9995,
+    "medStop": 12.03,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.0799,
+     "p50": -0.0516,
+     "p95": -0.0277,
+     "beats": 9
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "holm": false,
+    "isSame": false,
+    "x2": false,
+    "n": true
+   },
+   "pass": false
+  }
+ },
+ "built": "2026-11-14",
+ "data": {
+  "src": "OANDA mid M15 XAU/USD via /md/bars",
+  "first": "2015-12-01",
+  "last": "2026-11-13",
+  "candles": 258908
+ },
+ "signals": 2729,
+ "windows": 2816,
+ "candidates": 2674,
+ "skip": {
+  "weekend": 0,
+  "shut": 146,
+  "noSignal": 1,
+  "flat": 3,
+  "noWindow": 10,
+  "look": 0
+ },
+ "windowDates": {
+  "is": [
+   "2016-01-04",
+   "2020-12-31"
+  ],
+  "oos": [
+   "2021-01-01",
+   "2026-11-12"
+  ]
+ },
+ "cost": {
+  "spread": 0.3,
+  "slip": 0.15,
+  "roundTrip": 0.6,
+  "financing": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "descriptive": {
+  "is": {
+   "n": 1229,
+   "corrWindow": -0.0567,
+   "corrBetween": 0.0413
+  },
+  "oos": {
+   "n": 1445,
+   "corrWindow": -0.0934,
+   "corrBetween": 0.1428
+  },
+  "T1byWeekday": {
+   "Mon": {
+    "n": 506,
+    "gross": 0.0131,
+    "net": -0.0542
+   },
+   "Tue": {
+    "n": 557,
+    "gross": -0.0298,
+    "net": -0.0974
+   },
+   "Wed": {
+    "n": 553,
+    "gross": 0.043,
+    "net": -0.0252
+   },
+   "Thu": {
+    "n": 535,
+    "gross": 0.0087,
+    "net": -0.06
+   },
+   "Fri": {
+    "n": 523,
+    "gross": 0.0071,
+    "net": -0.0612
+   }
+  }
+ },
+ "passed": [],
+ "verdict": "FAIL: 0 of 3 tests pass"
+}
