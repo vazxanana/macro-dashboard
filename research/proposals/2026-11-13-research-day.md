@@ -83,6 +83,7 @@ paper system with a measured, clearly negative record.
 | 65 | Monthly options-expiry week on SPX500 / NAS100 (published effect) | 130 each (2016 →) | 0 of 4; expiry-week longs −0.016 / +0.026R, week-after shorts lose (−0.11 / −0.15R); no better than the month's other weeks | #882 |
 | 66 | The London 4 pm fix on six forex majors: follow the run into it or fade after it | 3,510 (2020 →) | 0 of 2; about zero before costs, −0.15 / −0.16R a trade after (month t −7 / −10) | #883 |
 | 67 | Following 2-sd stretches of non-US index spreads (DE40/UK100, EU50/UK100, JP225/AU200, DE40/FR40) | FAIL, 0 of 5: −0.107R net (n 244, t −1.56) 2016-now, −0.072R 2009-15; ~+0.02R before costs, financing turns it negative | #884 |
+| 68 | AUD/JPY and NZD/JPY long only while the S&P is above its 200d and calm | FAIL, 0 of 3: T1 −0.154R (n 52, t −1.30), T2 −0.102R, trend-only −0.053R; all below their placebo median | #886 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
