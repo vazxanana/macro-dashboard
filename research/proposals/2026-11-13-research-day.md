@@ -92,6 +92,7 @@ paper system with a measured, clearly negative record.
 | 326 | Gold day range used: fade (or follow) a day that has already travelled its normal range by 15:00 UTC, to 21:00 | **FAIL, 0 of 3**: fade −0.126R net OOS (excess −0.067R, t −1.96; also negative IS); following the extreme +0.059R excess in both windows but t 1.65, Holm p 0.15, loses at 2× costs | #1139 |
 | 327 | Gold in the inflation regime: long gold while stocks and bonds move together (63-day correlation > 0) | **FAIL, 0 of 3**: OOS excess over gold's drift +0.019R (t 0.16); IS −0.056R; the plain OOS gain is gold's 2017-26 rise | #1140 |
 | 328 | Gold by silver-to-gold volatility ratio: buy when silver is calm against gold, sell when wild | **FAIL, 0 of 3**: buy signal 0.091R worse than an ordinary buy OOS (t −1.29); sell −0.185R net; combined excess t −1.46 | #1141 |
+| 329 | Gold MAX (lottery) effect: sell after an unusually large one-day gain in the last 20 days | **FAIL, 0 of 3**: sells lose about as much as selling any day (OOS excess +0.015R, t 0.18); buy after calm (LOW) +0.162R OOS but lost IS, excess t 1.09, 2025 gave half | #1142 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
