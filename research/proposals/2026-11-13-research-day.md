@@ -78,6 +78,7 @@ paper system with a measured, clearly negative record.
 | 60 | **Your market-cycle rule as an entry** on five forex majors (the index rule, unchanged) | 1,892 / 4,677 (2016 →) | −0.135 / −0.089R a trade (month t −4.5 / −4.3), every pair negative in both windows; random entries with the same H4 bias do better | #877 |
 | 61 | **Gotobi**: USD/JPY and EUR/JPY around the 09:55 Tokyo fix on Japanese settlement days (published) | 771 (2016 →) | **one cell of four passes**: sell USD/JPY at the fix, buy back 15:00 Tokyo, +0.148R a trade, month t 2.74, Holm p 0.012, 2010-15 +0.131R (t 2.45), beats all 40 placebos; thin over costs (+0.035R at 2x costs). A frozen replication on four other yen crosses and pre-2010 history is running before anyone acts | #878 |
 | 62 | Energy seasonality: crude long Feb-Apr, natural gas Sep-Oct long and Feb-Mar short | ~11 years each | 0 of 4; crude +0.96 / +1.08R a year (t 1.4) but 2026 carries it; Holm p 0.35 | #879 |
+| 63 | Forex: fade the Sunday reopen gap on six majors (the gold rule, unchanged) | 243 / 222 (2020 →) | near miss, FAIL: rule G +0.194R a trade (month t 2.14, Holm needed ~2.28), but 2026 carries it and 2016-19 is about zero; rule H −0.015R | #880 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
