@@ -41,6 +41,45 @@ const FRESH_QUOTE = 15 * 60;   // a quote older than this (market shut) keeps th
 //                spreads widen): what a fill outside the rollover really pays.
 //   commissionRT the broker's round-trip commission as a fraction of the price (2 x rate a side / 1e6; commission type 1 only,
 //                0 where the broker charges none, null where the type is another one).
+// Watch list (14 Nov 2026, proposal research/proposals/2026-11-14-yen-spread-log.md, owner-decisions item 54): yen pairs the
+// mirror does NOT trade, read only for their quoted spread and commission (the gotobi cost question: is a USD/JPY round trip at
+// 00:55 and 06:00 UTC under about 2 pips). They go to symbols.json `watch`, never to `symbols` / `markets`, so the mirror's
+// specFor, the Trader's costModel and datahealth (all read `symbols`) never see them. Nothing trades or alerts on them.
+export const WATCH = ['USDJPY', 'GBPJPY', 'AUDJPY', 'CADJPY', 'CHFJPY'];
+// Windows: the quoted spread is measured from the broker's own bid and ask tick history around the two gotobi minutes (00:55 and
+// 06:00 UTC, +-WIN_HALF seconds) of each weekday, once the window has passed (a council round runs every ~11 minutes, so a round
+// rarely lands inside a 6-minute window by itself). Up to WIN_PER_RUN windows a run, the last WIN_BACK_DAYS days, WIN_KEEP kept.
+export const WIN_MINUTES = [[0, 55], [6, 0]], WIN_HALF = 180, WIN_BACK_DAYS = 3, WIN_PER_RUN = 4, WIN_KEEP = 400;
+// every tick of a ProtoOATickData list (relative-encoded as in lastTick), oldest first, [ms, price]
+export function decodeTicks(list) {
+  let ts = 0, px = 0; const o = [];
+  (list || []).forEach((d, i) => { ts = i ? ts + Number(d.timestamp) : Number(d.timestamp); px = i ? px + Number(d.tick) : Number(d.tick);
+    if (Number.isFinite(ts) && Number.isFinite(px)) o.push([ts, px / 1e5]); });
+  return o.sort((a, b) => a[0] - b[0]);
+}
+// ask - bid at every tick of either side inside the window (each side's last price at or before that moment), and at the target
+export function windowSpread(bids, asks, targetSec) {
+  const ev = [...bids.map((x) => [x[0], 'b', x[1]]), ...asks.map((x) => [x[0], 'a', x[1]])].sort((x, y) => x[0] - y[0]);
+  let b = null, a = null, atTarget = null; const v = [];
+  for (const [t, k, p] of ev) {
+    if (t > targetSec * 1000 && atTarget == null && b != null && a != null) atTarget = +(a - b).toPrecision(6);
+    if (k === 'b') b = p; else a = p;
+    if (b != null && a != null) v.push(+(a - b).toPrecision(6));
+  }
+  if (atTarget == null && b != null && a != null && ev.length && ev[ev.length - 1][0] <= targetSec * 1000) atTarget = +(a - b).toPrecision(6);
+  const g = v.filter((x) => x >= 0);
+  return { n: g.length, atTarget: atTarget != null && atTarget >= 0 ? atTarget : null, median: g.length ? +med0(g).toPrecision(6) : null,
+    min: g.length ? Math.min(...g) : null, max: g.length ? Math.max(...g) : null };
+}
+// the window targets (unix sec) of the last backDays weekdays (UTC) that have ended and are not in `have`, oldest first
+export function dueWindows(nowSec, have = new Set(), backDays = WIN_BACK_DAYS) {
+  const o = [], day0 = Math.floor(nowSec / 86400) * 86400;
+  for (let d = backDays; d >= 0; d--) {
+    const day = day0 - d * 86400, w = new Date(day * 1000).getUTCDay(); if (w === 0 || w === 6) continue;
+    for (const [h, m] of WIN_MINUTES) { const t = day + h * 3600 + m * 60; if (t + WIN_HALF + 60 <= nowSec && !have.has(t)) o.push(t); }
+  }
+  return o;
+}
 export const SPREAD_KEEP_DAYS = 7, SPREAD_LOG = 300, SPREAD_LOG_DAYS = 14;
 export const rolloverHour = (sec) => { const h = new Date(sec * 1000).getUTCHours(); return h === 21 || h === 22; };
 const med0 = (a) => { const v = a.slice().sort((x, y) => x - y), n = v.length; return n ? (n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2) : null; };
@@ -204,8 +243,29 @@ export async function symbolSpecs({ env, tokens = null, prev = null, history = n
       if (e.observed && e.valuePerPoint) e.observed.matches = Math.abs(e.observed.perPointPerLot / e.valuePerPoint - 1) <= 0.05;
       out[name] = e;
     }
+    // the watch list: same read session, same quote reader, same spread fields; no margin, conversion or sample (nothing is sized)
+    const watch = {}, prevWatch = (prev && prev.watch) || {}, wl = WATCH.map((n) => [n, light.get(normName(n))]).filter(([, L]) => L);
+    const wspec = wl.length ? await soft('watch specs', () => s.send(P.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: wl.map(([, L]) => Number(L.symbolId)) })) : null;
+    const wfull = new Map(((wspec && wspec.symbol) || []).map((x) => [String(x.symbolId), x]));
+    for (const n of WATCH) {
+      const L = light.get(normName(n)); if (!L) { watch[n] = null; continue; }
+      const x = wfull.get(String(L.symbolId)) || {}, before = prevWatch[n] || {}, q = await quote(L.symbolId), fresh = q && nowSec - Math.floor(q.ts / 1000) <= FRESH_QUOTE;
+      watch[n] = { watchOnly: true, symbolId: Number(L.symbolId), base: assetName.get(String(L.baseAssetId)) || null, quote: assetName.get(String(L.quoteAssetId)) || null,
+        digits: num(x.digits), pipPosition: num(x.pipPosition) ?? before.pipPosition ?? null,
+        commission: { type: x.commissionType ?? null, preciseRate: num(x.preciseTradingCommissionRate) },
+        bid: q ? q.bid : before.bid ?? null, ask: q ? q.ask : before.ask ?? null, quoteAt: q ? new Date(q.ts).toISOString() : before.quoteAt ?? null,
+        ...spreadFields(q, fresh, before, nowSec), commissionRT: commissionRT(x) };
+      let wins = (Array.isArray(before.windows) ? before.windows : []).filter((w) => w && Number.isFinite(w.t));
+      for (const t of dueWindows(nowSec, new Set(wins.map((w) => w.t))).slice(0, WIN_PER_RUN)) {
+        const side = async (type) => { await sleep(250); return soft(`watch ticks ${n}`, () => s.send(P.GET_TICKDATA_REQ, { ctidTraderAccountId: ctid, symbolId: Number(L.symbolId), type, fromTimestamp: (t - WIN_HALF) * 1000, toTimestamp: (t + WIN_HALF) * 1000 })); };
+        const rb = await side(1), ra = rb && await side(2);
+        if (!rb || !ra) break;   // a failed read is tried again next run, never recorded as empty
+        wins.push({ t, at: new Date(t * 1000).toISOString(), ...windowSpread(decodeTicks(rb.tickData), decodeTicks(ra.tickData), t), ...(rb.hasMore || ra.hasMore ? { partial: true } : {}) });
+      }
+      watch[n].windows = wins.sort((p, q2) => p.t - q2.t).slice(-WIN_KEEP);
+    }
     const file = { at, source: 'council/ctrader-symbols.mjs', broker: acc.broker || null, account: { currency: deposit, leverage: trader.leverageInCents ? trader.leverageInCents / 100 : null },
-      markets, missing, symbols: out, errors };
+      markets, missing, symbols: out, watch, errors };
     for (const e of Object.values(out)) e.impliedPrice = impliedPrice(e, file.account.leverage);
     // the sample trade, sized by the mirror's own riskVolume with these specs
     file.sample = { balance: SAMPLE.balance, riskPct: +(SAMPLE.risk * 100).toFixed(3), riskCash: +(SAMPLE.balance * SAMPLE.risk).toFixed(2), maxLots: LIMITS.maxLots, maxMarginPct: LIMITS.maxMarginShare * 100 };

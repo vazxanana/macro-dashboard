@@ -1086,3 +1086,22 @@ figure or demo-mirror setting.
   +1.7R before costs, -18.6R after. Of the 7 trades above, 5 would have been skipped (-7.7R after costs, one of them a +3.65R
   winner) and 2 opened (their fill was still outside the floor).
 - **To undo.** Ask for it; the check is one line in the Trader's market-entry step and two in the replay.
+
+## Yen-pair spreads for the gotobi question, 14 Nov 2026
+
+### [ ] 54. Record the demo broker's yen-pair spreads at 00:55 and 06:00 UTC (read only)
+
+- **Status (14 Nov 2026): open, waiting for your approval to merge.** Branch `yen-spread-log`; write-up
+  `research/proposals/2026-11-14-yen-spread-log.md`. Nothing runs until you merge it.
+- **Context.** The gotobi fade (sell USD/JPY at 00:55 UTC on Japanese settlement days, buy back at 06:00 UTC; #878, #889)
+  stays significant only while its round-trip cost (spread + 2 x slippage) is under about 1.95 pips, commission on top
+  (#893, branch `gotobi-cost`). Nothing records a yen pair's bid and ask today, so that cost cannot be measured.
+- **What it does.** The cTrader symbol dump also reads, through its read-only demo session, USD/JPY, GBP/JPY, AUD/JPY, CAD/JPY
+  and CHF/JPY: the quoted spread and commission as for the majors, and after each weekday the broker's own bid / ask ticks
+  around 00:55 and 06:00 UTC. It writes them to `ctrader/symbols.json` under a new key `watch`; what the mirror and the cost
+  model read is unchanged, so the mirror can never trade a yen pair from it (tests). `council/yen-spread.mjs` prints the
+  reads split gotobi / other days. No order, rule, alert or page.
+- **How long.** About six gotobi days a month: about two months for ~12 gotobi reads at each minute.
+- **Options.** (a) Merge it (recommended: the only way to measure the cost the fade depends on, at no risk). (b) Leave it;
+  the gotobi fade stays unmeasured on cost.
+- **To undo.** Delete the `watch` part of `council/ctrader-symbols.mjs`; the file's `watch` key is then simply not written.
