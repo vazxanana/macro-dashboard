@@ -1,0 +1,485 @@
+{
+ "asOf": "2026-11-14",
+ "kind": "arithmetic, not evidence: no market data, no trade record, no rule tested",
+ "method": {
+  "draws": 20000,
+  "seed": 1114,
+  "nMax": 1000,
+  "tBar": 2,
+  "power": 0.8,
+  "oneSided": true,
+  "rng": "mulberry32"
+ },
+ "cost": {
+  "usd": 0.6,
+  "stopUsd": 4,
+  "stopRange": [
+   3,
+   5
+  ],
+  "R": 0.15,
+  "rangeR": [
+   0.12,
+   0.2
+  ]
+ },
+ "tail": {
+  "median": 4,
+  "sigma": 1,
+  "cap": 30
+ },
+ "tailShare15": 0.093,
+ "cases": [
+  {
+   "id": "w2",
+   "name": "Every win 2R",
+   "meanWin": 2,
+   "rows": [
+    {
+     "winRate": 0.15,
+     "expectancy": -0.7,
+     "sd": 1.07,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.2,
+     "expectancy": -0.55,
+     "sd": 1.2,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.25,
+     "expectancy": -0.4,
+     "sd": 1.3,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.3,
+     "expectancy": -0.25,
+     "sd": 1.37,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.35,
+     "expectancy": -0.1,
+     "sd": 1.43,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.4,
+     "expectancy": 0.05,
+     "sd": 1.47,
+     "tradesNeeded": null,
+     "why": "over 1000",
+     "normalApprox": 6977,
+     "powerAt": {
+      "20": 0.02,
+      "50": 0.032,
+      "100": 0.041,
+      "200": 0.064
+     }
+    },
+    {
+     "winRate": 0.45,
+     "expectancy": 0.2,
+     "sd": 1.49,
+     "tradesNeeded": 441,
+     "normalApprox": 450,
+     "powerAt": {
+      "20": 0.058,
+      "50": 0.13,
+      "100": 0.242,
+      "200": 0.469
+     }
+    },
+    {
+     "winRate": 0.5,
+     "expectancy": 0.35,
+     "sd": 1.5,
+     "tradesNeeded": 141,
+     "normalApprox": 149,
+     "powerAt": {
+      "20": 0.129,
+      "50": 0.333,
+      "100": 0.622,
+      "200": 0.91
+     }
+    }
+   ],
+   "luck": {
+    "winRate": 0.3833,
+    "expectancy": 0,
+    "sd": 1.46,
+    "falseAlarm": {
+     "20": 0.0155,
+     "50": 0.0186,
+     "100": 0.0189
+    }
+   }
+  },
+  {
+   "id": "w3",
+   "name": "Every win 3R",
+   "meanWin": 3,
+   "rows": [
+    {
+     "winRate": 0.15,
+     "expectancy": -0.55,
+     "sd": 1.43,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.2,
+     "expectancy": -0.35,
+     "sd": 1.6,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.25,
+     "expectancy": -0.15,
+     "sd": 1.73,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.3,
+     "expectancy": 0.05,
+     "sd": 1.83,
+     "tradesNeeded": null,
+     "why": "over 1000",
+     "normalApprox": 10853,
+     "powerAt": {
+      "20": 0.017,
+      "50": 0.022,
+      "100": 0.033,
+      "200": 0.039
+     }
+    },
+    {
+     "winRate": 0.35,
+     "expectancy": 0.25,
+     "sd": 1.91,
+     "tradesNeeded": 452,
+     "normalApprox": 471,
+     "powerAt": {
+      "20": 0.055,
+      "50": 0.12,
+      "100": 0.231,
+      "200": 0.417
+     }
+    },
+    {
+     "winRate": 0.4,
+     "expectancy": 0.45,
+     "sd": 1.96,
+     "tradesNeeded": 147,
+     "normalApprox": 154,
+     "powerAt": {
+      "20": 0.127,
+      "50": 0.32,
+      "100": 0.619,
+      "200": 0.891
+     }
+    },
+    {
+     "winRate": 0.45,
+     "expectancy": 0.65,
+     "sd": 1.99,
+     "tradesNeeded": 74,
+     "normalApprox": 76,
+     "powerAt": {
+      "20": 0.249,
+      "50": 0.604,
+      "100": 0.905,
+      "200": 0.996
+     }
+    },
+    {
+     "winRate": 0.5,
+     "expectancy": 0.85,
+     "sd": 2,
+     "tradesNeeded": 43,
+     "normalApprox": 45,
+     "powerAt": {
+      "20": 0.409,
+      "50": 0.841,
+      "100": 0.989,
+      "200": 1
+     }
+    }
+   ],
+   "luck": {
+    "winRate": 0.2875,
+    "expectancy": 0,
+    "sd": 1.81,
+    "falseAlarm": {
+     "20": 0.0124,
+     "50": 0.0143,
+     "100": 0.0177
+    }
+   }
+  },
+  {
+   "id": "w5",
+   "name": "Every win 5R",
+   "meanWin": 5,
+   "rows": [
+    {
+     "winRate": 0.15,
+     "expectancy": -0.25,
+     "sd": 2.14,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.2,
+     "expectancy": 0.05,
+     "sd": 2.4,
+     "tradesNeeded": null,
+     "why": "over 1000",
+     "normalApprox": 18605,
+     "powerAt": {
+      "20": 0.01,
+      "50": 0.015,
+      "100": 0.021,
+      "200": 0.034
+     }
+    },
+    {
+     "winRate": 0.25,
+     "expectancy": 0.35,
+     "sd": 2.6,
+     "tradesNeeded": 425,
+     "normalApprox": 445,
+     "powerAt": {
+      "20": 0.039,
+      "50": 0.095,
+      "100": 0.205,
+      "200": 0.46
+     }
+    },
+    {
+     "winRate": 0.3,
+     "expectancy": 0.65,
+     "sd": 2.75,
+     "tradesNeeded": 134,
+     "normalApprox": 145,
+     "powerAt": {
+      "20": 0.115,
+      "50": 0.315,
+      "100": 0.621,
+      "200": 0.929
+     }
+    },
+    {
+     "winRate": 0.35,
+     "expectancy": 0.95,
+     "sd": 2.86,
+     "tradesNeeded": 65,
+     "normalApprox": 74,
+     "powerAt": {
+      "20": 0.238,
+      "50": 0.62,
+      "100": 0.918,
+      "200": 0.999
+     }
+    },
+    {
+     "winRate": 0.4,
+     "expectancy": 1.25,
+     "sd": 2.94,
+     "tradesNeeded": 44,
+     "normalApprox": 45,
+     "powerAt": {
+      "20": 0.407,
+      "50": 0.843,
+      "100": 0.991,
+      "200": 1
+     }
+    },
+    {
+     "winRate": 0.45,
+     "expectancy": 1.55,
+     "sd": 2.98,
+     "tradesNeeded": 29,
+     "normalApprox": 30,
+     "powerAt": {
+      "20": 0.584,
+      "50": 0.958,
+      "100": 1,
+      "200": 1
+     }
+    },
+    {
+     "winRate": 0.5,
+     "expectancy": 1.85,
+     "sd": 3,
+     "tradesNeeded": 21,
+     "normalApprox": 22,
+     "powerAt": {
+      "20": 0.749,
+      "50": 0.994,
+      "100": 1,
+      "200": 1
+     }
+    }
+   ],
+   "luck": {
+    "winRate": 0.1917,
+    "expectancy": 0,
+    "sd": 2.36,
+    "falseAlarm": {
+     "20": 0.0068,
+     "50": 0.0095,
+     "100": 0.0115
+    }
+   }
+  },
+  {
+   "id": "tail",
+   "name": "Heavy tail: median 4R, 1 win in 11 of 15R or more (capped at 30R)",
+   "meanWin": 6.231,
+   "rows": [
+    {
+     "winRate": 0.15,
+     "expectancy": -0.065,
+     "sd": 3.57,
+     "tradesNeeded": null,
+     "why": "no edge after costs: nothing to find"
+    },
+    {
+     "winRate": 0.2,
+     "expectancy": 0.296,
+     "sd": 4.06,
+     "tradesNeeded": null,
+     "why": "over 1000",
+     "normalApprox": 1521,
+     "powerAt": {
+      "20": 0.004,
+      "50": 0.014,
+      "100": 0.039,
+      "200": 0.103
+     }
+    },
+    {
+     "winRate": 0.25,
+     "expectancy": 0.658,
+     "sd": 4.47,
+     "tradesNeeded": 330,
+     "normalApprox": 374,
+     "powerAt": {
+      "20": 0.015,
+      "50": 0.07,
+      "100": 0.222,
+      "200": 0.537
+     }
+    },
+    {
+     "winRate": 0.3,
+     "expectancy": 1.019,
+     "sd": 4.82,
+     "tradesNeeded": 152,
+     "normalApprox": 181,
+     "powerAt": {
+      "20": 0.044,
+      "50": 0.217,
+      "100": 0.559,
+      "200": 0.911
+     }
+    },
+    {
+     "winRate": 0.35,
+     "expectancy": 1.381,
+     "sd": 5.11,
+     "tradesNeeded": 90,
+     "normalApprox": 111,
+     "powerAt": {
+      "20": 0.103,
+      "50": 0.45,
+      "100": 0.851,
+      "200": 0.994
+     }
+    },
+    {
+     "winRate": 0.4,
+     "expectancy": 1.742,
+     "sd": 5.37,
+     "tradesNeeded": 61,
+     "normalApprox": 77,
+     "powerAt": {
+      "20": 0.196,
+      "50": 0.688,
+      "100": 0.971,
+      "200": 1
+     }
+    },
+    {
+     "winRate": 0.45,
+     "expectancy": 2.104,
+     "sd": 5.59,
+     "tradesNeeded": 45,
+     "normalApprox": 58,
+     "powerAt": {
+      "20": 0.321,
+      "50": 0.861,
+      "100": 0.997,
+      "200": 1
+     }
+    },
+    {
+     "winRate": 0.5,
+     "expectancy": 2.465,
+     "sd": 5.78,
+     "tradesNeeded": 34,
+     "normalApprox": 45,
+     "powerAt": {
+      "20": 0.482,
+      "50": 0.955,
+      "100": 1,
+      "200": 1
+     }
+    }
+   ],
+   "luck": {
+    "winRate": 0.159,
+    "expectancy": 0,
+    "sd": 3.67,
+    "falseAlarm": {
+     "20": 0.0009,
+     "50": 0.0022,
+     "100": 0.0037
+    }
+   }
+  }
+ ],
+ "barAt": {
+  "case": "tail",
+  "winRate": 0.3,
+  "sd": 4.82,
+  "avgR": {
+   "20": 2.16,
+   "50": 1.36,
+   "100": 0.96,
+   "200": 0.68
+  }
+ },
+ "examples": {
+  "R": [
+   2.8,
+   4.6,
+   2.1,
+   16.4,
+   5.6
+  ],
+  "n": 5,
+  "meanAfterCost": 6.15,
+  "note": "chosen by the owner after the fact: not an estimate of anything"
+ }
+}
