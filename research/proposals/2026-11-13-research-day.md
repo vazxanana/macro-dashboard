@@ -223,6 +223,7 @@ paper system with a measured, clearly negative record.
 | 205 | Gold around the turn of the month (`gold-turn-of-month`) | **FAIL**, 0 of 3: long TD−2 to TD+3 2017-26 +0.117R a trade net (n 118, t 1.80, Holm p 0.11) but 0.000R in 2008-16 and losing in 2012-15: gold's own rise; month-end short flat. Hint only: the last 3 days weaker in both halves, too small for the spread | #1018 |
 | 206 | Gold opening-range breakout at the COMEX open, 08:20-08:50 New York (`gold-comex-orb`) | **FAIL**, 0 of 3: breakout 2021-26 +0.006R a trade net (n 1,407, t 0.20; gross t 2.43, beats random-hour placebo) but 2016-20 −0.155R; narrow ranges +0.064R (t 1.30), negative at 2x costs; fade loses before costs | #1019 |
 | 207 | Big oil or copper days leading gold (`gold-oil-lead`) | **FAIL**, 0 of 3: after a ±2 sd WTI day, gold the same way 2017-26 −0.028R a trade net (n 126, t −0.47), the other way +0.022R, after a copper day +0.067R (t 1.07, sign flips from 2006-16); all inside the placebo spread | #1020 |
+| 208 | The weekly-open profile on gold, ICT/MMXM (`gold-weekly-open`) | **FAIL**, 0 of 3: buy below the weekly open on Tue-Wed after an up week 2021-26 +0.066R a trade net (n 79, t 0.57), a random anchor did +0.049R; mirror sell −0.178R; fade back to the open −0.131R (only 39 of 167 reached it) | #1021 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
