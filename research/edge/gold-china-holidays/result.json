@@ -1,0 +1,2014 @@
+{
+ "built": "2026-11-14",
+ "study": "gold-china-holidays",
+ "title": "Spot gold around the Shanghai Gold Exchange's long Chinese holidays",
+ "verdict": "FAIL",
+ "headline": "Fails: long gold the 10 days before the Lunar New Year closure makes +0.224R a year net out of sample 2017-26 (n 10, t +1.38).",
+ "system": "Research only (long spot gold on calendar windows; not a gold-book system, owner item 44)",
+ "data": {
+  "src": "OANDA mid daily candles (UTC days), council-data research/daily/xau.json (git show), weekend folded into Monday (council/fills.mjs foldWeekend)",
+  "first": "2006-03-20",
+  "last": "2026-11-06",
+  "candles": 5364,
+  "missing": [],
+  "dropped": []
+ },
+ "dates": {
+  "lny": [
+   {
+    "year": 2008,
+    "first": "2008-02-06",
+    "reopen": "2008-02-13",
+    "src": "notice",
+    "note": "holiday 6-12 Feb"
+   },
+   {
+    "year": 2009,
+    "first": "2009-01-26",
+    "reopen": "2009-02-02",
+    "src": "notice",
+    "note": "holiday 25-31 Jan (25 Jan a Sunday)"
+   },
+   {
+    "year": 2010,
+    "first": "2010-02-15",
+    "reopen": "2010-02-22",
+    "src": "notice",
+    "note": "holiday 13-19 Feb (Sat-Fri)"
+   },
+   {
+    "year": 2011,
+    "first": "2011-02-02",
+    "reopen": "2011-02-09",
+    "src": "notice",
+    "note": "holiday 2-8 Feb"
+   },
+   {
+    "year": 2012,
+    "first": "2012-01-23",
+    "reopen": "2012-01-30",
+    "src": "notice",
+    "note": "holiday 22-28 Jan (Sun-Sat)"
+   },
+   {
+    "year": 2013,
+    "first": "2013-02-11",
+    "reopen": "2013-02-18",
+    "src": "notice",
+    "note": "holiday 9-15 Feb (Sat-Fri)"
+   },
+   {
+    "year": 2014,
+    "first": "2014-01-31",
+    "reopen": "2014-02-07",
+    "src": "notice",
+    "note": "holiday 31 Jan-6 Feb; the eve, 30 Jan, was a working day"
+   },
+   {
+    "year": 2015,
+    "first": "2015-02-18",
+    "reopen": "2015-02-25",
+    "src": "notice",
+    "note": "holiday 18-24 Feb"
+   },
+   {
+    "year": 2016,
+    "first": "2016-02-08",
+    "reopen": "2016-02-15",
+    "src": "notice",
+    "note": "holiday 7-13 Feb (Sun-Sat)"
+   },
+   {
+    "year": 2017,
+    "first": "2017-01-27",
+    "reopen": "2017-02-03",
+    "src": "notice",
+    "note": "holiday 27 Jan-2 Feb"
+   },
+   {
+    "year": 2018,
+    "first": "2018-02-15",
+    "reopen": "2018-02-22",
+    "src": "notice",
+    "note": "holiday 15-21 Feb"
+   },
+   {
+    "year": 2019,
+    "first": "2019-02-04",
+    "reopen": "2019-02-11",
+    "src": "notice",
+    "note": "holiday 4-10 Feb"
+   },
+   {
+    "year": 2020,
+    "first": "2020-01-24",
+    "reopen": "2020-02-03",
+    "src": "checked",
+    "note": "holiday 24-30 Jan, extended to 2 Feb (virus); the central bank reopened the interbank gold market with the others on 3 Feb"
+   },
+   {
+    "year": 2021,
+    "first": "2021-02-11",
+    "reopen": "2021-02-18",
+    "src": "notice",
+    "note": "holiday 11-17 Feb"
+   },
+   {
+    "year": 2022,
+    "first": "2022-01-31",
+    "reopen": "2022-02-07",
+    "src": "notice",
+    "note": "holiday 31 Jan-6 Feb"
+   },
+   {
+    "year": 2023,
+    "first": "2023-01-23",
+    "reopen": "2023-01-30",
+    "src": "notice",
+    "note": "holiday 21-27 Jan (Sat-Fri)"
+   },
+   {
+    "year": 2024,
+    "first": "2024-02-12",
+    "reopen": "2024-02-19",
+    "src": "checked",
+    "note": "SGE shut 10-17 Feb; it traded on the eve, Fri 9 Feb (no night session), unlike the stock exchanges"
+   },
+   {
+    "year": 2025,
+    "first": "2025-01-28",
+    "reopen": "2025-02-05",
+    "src": "notice",
+    "note": "holiday 28 Jan-4 Feb (the eve official from 2025)"
+   },
+   {
+    "year": 2026,
+    "first": "2026-02-16",
+    "reopen": "2026-02-24",
+    "src": "checked",
+    "note": "SGE shut 15-23 Feb (Sun-Mon), no night session on Fri 13 Feb, open 24 Feb"
+   }
+  ],
+  "golden": [
+   {
+    "year": 2008,
+    "first": "2008-09-29",
+    "reopen": "2008-10-06",
+    "src": "notice",
+    "note": "holiday 29 Sep-5 Oct"
+   },
+   {
+    "year": 2009,
+    "first": "2009-10-01",
+    "reopen": "2009-10-09",
+    "src": "notice",
+    "note": "holiday 1-8 Oct with Mid-Autumn"
+   },
+   {
+    "year": 2010,
+    "first": "2010-10-01",
+    "reopen": "2010-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2011,
+    "first": "2011-10-03",
+    "reopen": "2011-10-10",
+    "src": "notice",
+    "note": "holiday 1-7 Oct (Sat-Fri)"
+   },
+   {
+    "year": 2012,
+    "first": "2012-10-01",
+    "reopen": "2012-10-08",
+    "src": "notice",
+    "note": "holiday 30 Sep-7 Oct with Mid-Autumn"
+   },
+   {
+    "year": 2013,
+    "first": "2013-10-01",
+    "reopen": "2013-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2014,
+    "first": "2014-10-01",
+    "reopen": "2014-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2015,
+    "first": "2015-10-01",
+    "reopen": "2015-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2016,
+    "first": "2016-10-03",
+    "reopen": "2016-10-10",
+    "src": "notice",
+    "note": "holiday 1-7 Oct (Sat-Fri)"
+   },
+   {
+    "year": 2017,
+    "first": "2017-10-02",
+    "reopen": "2017-10-09",
+    "src": "notice",
+    "note": "holiday 1-8 Oct with Mid-Autumn (Sun-Sun)"
+   },
+   {
+    "year": 2018,
+    "first": "2018-10-01",
+    "reopen": "2018-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2019,
+    "first": "2019-10-01",
+    "reopen": "2019-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2020,
+    "first": "2020-10-01",
+    "reopen": "2020-10-09",
+    "src": "notice",
+    "note": "holiday 1-8 Oct with Mid-Autumn"
+   },
+   {
+    "year": 2021,
+    "first": "2021-10-01",
+    "reopen": "2021-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2022,
+    "first": "2022-10-03",
+    "reopen": "2022-10-10",
+    "src": "notice",
+    "note": "holiday 1-7 Oct (Sat-Fri)"
+   },
+   {
+    "year": 2023,
+    "first": "2023-09-29",
+    "reopen": "2023-10-09",
+    "src": "notice",
+    "note": "holiday 29 Sep-6 Oct with Mid-Autumn"
+   },
+   {
+    "year": 2024,
+    "first": "2024-10-01",
+    "reopen": "2024-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   },
+   {
+    "year": 2025,
+    "first": "2025-10-01",
+    "reopen": "2025-10-09",
+    "src": "notice",
+    "note": "holiday 1-8 Oct with Mid-Autumn"
+   },
+   {
+    "year": 2026,
+    "first": "2026-10-01",
+    "reopen": "2026-10-08",
+    "src": "notice",
+    "note": "holiday 1-7 Oct"
+   }
+  ],
+  "checked": [
+   "2020-01-24",
+   "2024-02-12",
+   "2026-02-16"
+  ]
+ },
+ "rule": {
+  "side": "long XAU/USD",
+  "stopAtr": 3,
+  "atrN": 20,
+  "pre": 10,
+  "post": 5,
+  "cost": "$0.60 an ounce round trip ($0.30 spread + half a spread of slippage on each order)",
+  "financing": {
+   "rate": 0.000148,
+   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+  }
+ },
+ "windows": {
+  "is": [
+   2008,
+   2016
+  ],
+  "oos": [
+   2017,
+   2026
+  ]
+ },
+ "tests": {
+  "T1": {
+   "name": "Lunar New Year, 10 days before the closure (claim a)",
+   "is": {
+    "n": 9,
+    "grossPct": 1.0091,
+    "grossR": 0.1691,
+    "tGross": 0.623,
+    "costR": 0.0105,
+    "finR": 0.0423,
+    "netR": 0.1164,
+    "t": 0.4298,
+    "p": 0.6787,
+    "netR2": 0.1059,
+    "t2": 0.3913,
+    "won": 0.5556,
+    "stops": 1,
+    "totalR": 1.0473
+   },
+   "oos": {
+    "n": 10,
+    "grossPct": 1.1239,
+    "grossR": 0.2949,
+    "tGross": 1.805,
+    "costR": 0.0106,
+    "finR": 0.0603,
+    "netR": 0.224,
+    "t": 1.3787,
+    "p": 0.2013,
+    "netR2": 0.2134,
+    "t2": 1.3138,
+    "won": 0.7,
+    "stops": 0,
+    "totalR": 2.2401,
+    "holmP": 0.8052
+   },
+   "all": {
+    "n": 19,
+    "grossPct": 1.0695,
+    "grossR": 0.2353,
+    "tGross": 1.5599,
+    "costR": 0.0106,
+    "finR": 0.0518,
+    "netR": 0.173,
+    "t": 1.1525,
+    "p": 0.2642,
+    "netR2": 0.1625,
+    "t2": 1.0827,
+    "won": 0.6316,
+    "stops": 1,
+    "totalR": 3.2874
+   }
+  },
+  "T2": {
+   "name": "Lunar New Year, while Shanghai is shut (claim b predicts <= 0)",
+   "is": {
+    "n": 9,
+    "grossPct": 1.8798,
+    "grossR": 0.3292,
+    "tGross": 1.4848,
+    "costR": 0.0101,
+    "finR": 0.0214,
+    "netR": 0.2977,
+    "t": 1.3396,
+    "p": 0.2172,
+    "netR2": 0.2876,
+    "t2": 1.2935,
+    "won": 0.7778,
+    "stops": 1,
+    "totalR": 2.6793
+   },
+   "oos": {
+    "n": 10,
+    "grossPct": 0.6238,
+    "grossR": 0.1251,
+    "tGross": 0.6849,
+    "costR": 0.0101,
+    "finR": 0.0301,
+    "netR": 0.0849,
+    "t": 0.4655,
+    "p": 0.6526,
+    "netR2": 0.0748,
+    "t2": 0.4095,
+    "won": 0.5,
+    "stops": 0,
+    "totalR": 0.849,
+    "holmP": 1
+   },
+   "all": {
+    "n": 19,
+    "grossPct": 1.2188,
+    "grossR": 0.2218,
+    "tGross": 1.5799,
+    "costR": 0.0101,
+    "finR": 0.026,
+    "netR": 0.1857,
+    "t": 1.3204,
+    "p": 0.2032,
+    "netR2": 0.1756,
+    "t2": 1.2475,
+    "won": 0.6316,
+    "stops": 1,
+    "totalR": 3.5283
+   }
+  },
+  "T3": {
+   "name": "Lunar New Year, 5 days after the reopening (claim c)",
+   "is": {
+    "n": 9,
+    "grossPct": -0.014,
+    "grossR": -0.0309,
+    "tGross": -0.188,
+    "costR": 0.0098,
+    "finR": 0.019,
+    "netR": -0.0597,
+    "t": -0.3657,
+    "p": 0.7241,
+    "netR2": -0.0695,
+    "t2": -0.4258,
+    "won": 0.3333,
+    "stops": 1,
+    "totalR": -0.537
+   },
+   "oos": {
+    "n": 10,
+    "grossPct": 0.5773,
+    "grossR": 0.1513,
+    "tGross": 0.9531,
+    "costR": 0.0101,
+    "finR": 0.029,
+    "netR": 0.1122,
+    "t": 0.7095,
+    "p": 0.496,
+    "netR2": 0.102,
+    "t2": 0.6456,
+    "won": 0.7,
+    "stops": 0,
+    "totalR": 1.1215,
+    "holmP": 1
+   },
+   "all": {
+    "n": 19,
+    "grossPct": 0.2972,
+    "grossR": 0.065,
+    "tGross": 0.5753,
+    "costR": 0.01,
+    "finR": 0.0243,
+    "netR": 0.0308,
+    "t": 0.2742,
+    "p": 0.7871,
+    "netR2": 0.0208,
+    "t2": 0.1853,
+    "won": 0.5263,
+    "stops": 1,
+    "totalR": 0.5845
+   }
+  },
+  "T4": {
+   "name": "Golden Week, the three windows pooled (secondary)",
+   "is": {
+    "n": 27,
+    "grossPct": 0.5621,
+    "grossR": 0.1331,
+    "tGross": 1.1024,
+    "costR": 0.0106,
+    "finR": 0.0295,
+    "netR": 0.093,
+    "t": 0.7748,
+    "p": 0.4455,
+    "netR2": 0.0824,
+    "t2": 0.6875,
+    "won": 0.5926,
+    "stops": 2,
+    "totalR": 2.5104
+   },
+   "oos": {
+    "n": 30,
+    "grossPct": 0.3301,
+    "grossR": 0.1058,
+    "tGross": 0.8623,
+    "costR": 0.0088,
+    "finR": 0.0347,
+    "netR": 0.0624,
+    "t": 0.5075,
+    "p": 0.6156,
+    "netR2": 0.0536,
+    "t2": 0.4353,
+    "won": 0.5,
+    "stops": 3,
+    "totalR": 1.8712,
+    "holmP": 1
+   },
+   "all": {
+    "n": 57,
+    "grossPct": 0.44,
+    "grossR": 0.1187,
+    "tGross": 1.3884,
+    "costR": 0.0097,
+    "finR": 0.0322,
+    "netR": 0.0769,
+    "t": 0.9004,
+    "p": 0.3718,
+    "netR2": 0.0672,
+    "t2": 0.7874,
+    "won": 0.5439,
+    "stops": 5,
+    "totalR": 4.3817
+   },
+   "byWindow": {
+    "pre": {
+     "is": {
+      "n": 9,
+      "grossPct": 0.6493,
+      "grossR": 0.1052,
+      "tGross": 0.3953,
+      "costR": 0.0111,
+      "finR": 0.0465,
+      "netR": 0.0476,
+      "t": 0.1791,
+      "p": 0.8623,
+      "netR2": 0.0364,
+      "t2": 0.1373,
+      "won": 0.4444,
+      "stops": 1,
+      "totalR": 0.4283
+     },
+     "oos": {
+      "n": 10,
+      "grossPct": -0.9038,
+      "grossR": -0.1975,
+      "tGross": -0.8766,
+      "costR": 0.0091,
+      "finR": 0.0531,
+      "netR": -0.2598,
+      "t": -1.156,
+      "p": 0.2774,
+      "netR2": -0.2689,
+      "t2": -1.1938,
+      "won": 0.2,
+      "stops": 2,
+      "totalR": -2.5976
+     },
+     "all": {
+      "n": 19,
+      "grossPct": -0.1681,
+      "grossR": -0.0541,
+      "tGross": -0.315,
+      "costR": 0.0101,
+      "finR": 0.05,
+      "netR": -0.1142,
+      "t": -0.6653,
+      "p": 0.5143,
+      "netR2": -0.1242,
+      "t2": -0.7236,
+      "won": 0.3158,
+      "stops": 3,
+      "totalR": -2.1694
+     }
+    },
+    "shut": {
+     "is": {
+      "n": 9,
+      "grossPct": 0.2367,
+      "grossR": 0.1241,
+      "tGross": 0.6166,
+      "costR": 0.0107,
+      "finR": 0.0203,
+      "netR": 0.0931,
+      "t": 0.4702,
+      "p": 0.6508,
+      "netR2": 0.0825,
+      "t2": 0.417,
+      "won": 0.6667,
+      "stops": 1,
+      "totalR": 0.8383
+     },
+     "oos": {
+      "n": 10,
+      "grossPct": 0.5019,
+      "grossR": 0.0902,
+      "tGross": 0.5743,
+      "costR": 0.0088,
+      "finR": 0.0246,
+      "netR": 0.0569,
+      "t": 0.3663,
+      "p": 0.7226,
+      "netR2": 0.0481,
+      "t2": 0.3087,
+      "won": 0.6,
+      "stops": 1,
+      "totalR": 0.5689
+     },
+     "all": {
+      "n": 19,
+      "grossPct": 0.3763,
+      "grossR": 0.1063,
+      "tGross": 0.8666,
+      "costR": 0.0097,
+      "finR": 0.0225,
+      "netR": 0.0741,
+      "t": 0.6124,
+      "p": 0.5479,
+      "netR2": 0.0644,
+      "t2": 0.5322,
+      "won": 0.6316,
+      "stops": 2,
+      "totalR": 1.4072
+     }
+    },
+    "post": {
+     "is": {
+      "n": 9,
+      "grossPct": 0.8004,
+      "grossR": 0.1699,
+      "tGross": 0.9734,
+      "costR": 0.0099,
+      "finR": 0.0218,
+      "netR": 0.1382,
+      "t": 0.7968,
+      "p": 0.4486,
+      "netR2": 0.1283,
+      "t2": 0.7416,
+      "won": 0.6667,
+      "stops": 0,
+      "totalR": 1.2439
+     },
+     "oos": {
+      "n": 10,
+      "grossPct": 1.3923,
+      "grossR": 0.4248,
+      "tGross": 1.9266,
+      "costR": 0.0086,
+      "finR": 0.0262,
+      "netR": 0.39,
+      "t": 1.7812,
+      "p": 0.1086,
+      "netR2": 0.3814,
+      "t2": 1.7446,
+      "won": 0.7,
+      "stops": 0,
+      "totalR": 3.9
+     },
+     "all": {
+      "n": 19,
+      "grossPct": 1.1119,
+      "grossR": 0.3041,
+      "tGross": 2.1442,
+      "costR": 0.0092,
+      "finR": 0.0241,
+      "netR": 0.2707,
+      "t": 1.9226,
+      "p": 0.0705,
+      "netR2": 0.2615,
+      "t2": 1.8601,
+      "won": 0.6842,
+      "stops": 0,
+      "totalR": 5.1439
+     }
+    }
+   }
+  }
+ },
+ "vsOrdinary": {
+  "is": {
+   "n": 9,
+   "ordinary": 1743,
+   "ordinaryNetR": -0.0426,
+   "t": 0.5861
+  },
+  "oos": {
+   "n": 10,
+   "ordinary": 1887,
+   "ordinaryNetR": 0.0446,
+   "t": 1.0981
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "need": 36,
+  "years": [
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025,
+   2026
+  ],
+  "ordinaryWindows": 3630,
+  "realNetR": 0.224,
+  "beaten": 31,
+  "seedNetR": [
+   0.121,
+   -0.1652,
+   0.3364,
+   -0.5307,
+   0.2704,
+   0.1597,
+   0.0903,
+   0.0913,
+   0.0631,
+   0.0445,
+   0.3061,
+   0.1209,
+   0.0152,
+   -0.2708,
+   0.0994,
+   -0.0091,
+   0.2143,
+   0.1144,
+   0.192,
+   -0.1356,
+   0.0126,
+   0.2672,
+   0.272,
+   0.2857,
+   0.0357,
+   0.2056,
+   0.0164,
+   0.0977,
+   0.0945,
+   0.258,
+   -0.2307,
+   -0.1475,
+   0.2788,
+   0.1306,
+   -0.2267,
+   0.1321,
+   -0.1577,
+   0.3912,
+   0.172,
+   0.135
+  ]
+ },
+ "bar": {
+  "tOos": false,
+  "sameSign": true,
+  "cost2": true,
+  "placebo": false
+ },
+ "trades": [
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2008,
+   "entry": "2008-01-22",
+   "exit": "2008-02-05",
+   "grossPct": -0.3024,
+   "grossR": -0.0458,
+   "netR": -0.0874,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2009,
+   "entry": "2009-01-09",
+   "exit": "2009-01-23",
+   "grossPct": 5.3468,
+   "grossR": 0.6461,
+   "netR": 0.6126,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2010,
+   "entry": "2010-01-29",
+   "exit": "2010-02-12",
+   "grossPct": 1.1536,
+   "grossR": 0.2079,
+   "netR": 0.1606,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2011,
+   "entry": "2011-01-18",
+   "exit": "2011-01-27",
+   "grossPct": -3.6394,
+   "grossR": -1,
+   "netR": -1.0527,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2012,
+   "entry": "2012-01-06",
+   "exit": "2012-01-20",
+   "grossPct": 3.0266,
+   "grossR": 0.5183,
+   "netR": 0.4765,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2013,
+   "entry": "2013-01-25",
+   "exit": "2013-02-08",
+   "grossPct": 0.5151,
+   "grossR": 0.1525,
+   "netR": 0.0805,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2014,
+   "entry": "2014-01-16",
+   "exit": "2014-01-30",
+   "grossPct": 0.2177,
+   "grossR": 0.0586,
+   "netR": -0.0102,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2015,
+   "entry": "2015-02-03",
+   "exit": "2015-02-17",
+   "grossPct": -4.1198,
+   "grossR": -0.7963,
+   "netR": -0.8455,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2016,
+   "entry": "2016-01-22",
+   "exit": "2016-02-05",
+   "grossPct": 6.884,
+   "grossR": 1.7807,
+   "netR": 1.7129,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2017,
+   "entry": "2017-01-12",
+   "exit": "2017-01-26",
+   "grossPct": -0.6634,
+   "grossR": -0.2126,
+   "netR": -0.2951,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2018,
+   "entry": "2018-01-31",
+   "exit": "2018-02-14",
+   "grossPct": 0.6396,
+   "grossR": 0.2106,
+   "netR": 0.1277,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2019,
+   "entry": "2019-01-18",
+   "exit": "2019-02-01",
+   "grossPct": 2.7829,
+   "grossR": 1.1565,
+   "netR": 1.051,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2020,
+   "entry": "2020-01-09",
+   "exit": "2020-01-23",
+   "grossPct": 0.531,
+   "grossR": 0.1729,
+   "netR": 0.0928,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2021,
+   "entry": "2021-01-27",
+   "exit": "2021-02-10",
+   "grossPct": 0.113,
+   "grossR": 0.0226,
+   "netR": -0.0254,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2022,
+   "entry": "2022-01-14",
+   "exit": "2022-01-28",
+   "grossPct": -1.4453,
+   "grossR": -0.4953,
+   "netR": -0.5776,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2023,
+   "entry": "2023-01-06",
+   "exit": "2023-01-20",
+   "grossPct": 3.2126,
+   "grossR": 0.863,
+   "netR": 0.7987,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2024,
+   "entry": "2024-01-26",
+   "exit": "2024-02-09",
+   "grossPct": 0.2878,
+   "grossR": 0.0868,
+   "netR": 0.0153,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2025,
+   "entry": "2025-01-13",
+   "exit": "2025-01-27",
+   "grossPct": 2.7719,
+   "grossR": 0.8569,
+   "netR": 0.7859,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "pre",
+   "year": 2026,
+   "entry": "2026-01-30",
+   "exit": "2026-02-13",
+   "grossPct": 3.0089,
+   "grossR": 0.2876,
+   "netR": 0.2666,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2008,
+   "entry": "2008-02-05",
+   "exit": "2008-02-12",
+   "grossPct": 2.323,
+   "grossR": 0.3092,
+   "netR": 0.2864,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2009,
+   "entry": "2009-01-23",
+   "exit": "2009-01-30",
+   "grossPct": 3.1095,
+   "grossR": 0.355,
+   "netR": 0.3356,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2010,
+   "entry": "2010-02-12",
+   "exit": "2010-02-19",
+   "grossPct": 2.3798,
+   "grossR": 0.4076,
+   "netR": 0.3805,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2011,
+   "entry": "2011-02-01",
+   "exit": "2011-02-08",
+   "grossPct": 1.5025,
+   "grossR": 0.3369,
+   "netR": 0.3036,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2012,
+   "entry": "2012-01-20",
+   "exit": "2012-01-27",
+   "grossPct": 4.33,
+   "grossR": 1.0124,
+   "netR": 0.9798,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2013,
+   "entry": "2013-02-08",
+   "exit": "2013-02-15",
+   "grossPct": -2.8078,
+   "grossR": -1,
+   "netR": -1.0444,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2014,
+   "entry": "2014-01-30",
+   "exit": "2014-02-06",
+   "grossPct": 0.944,
+   "grossR": 0.2225,
+   "netR": 0.1867,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2015,
+   "entry": "2015-02-17",
+   "exit": "2015-02-24",
+   "grossPct": -0.3792,
+   "grossR": -0.0714,
+   "netR": -0.1002,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2016,
+   "entry": "2016-02-05",
+   "exit": "2016-02-12",
+   "grossPct": 5.5164,
+   "grossR": 1.3903,
+   "netR": 1.3513,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2017,
+   "entry": "2017-01-26",
+   "exit": "2017-02-02",
+   "grossPct": 2.2185,
+   "grossR": 0.6246,
+   "netR": 0.5812,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2018,
+   "entry": "2018-02-14",
+   "exit": "2018-02-21",
+   "grossPct": -1.9957,
+   "grossR": -0.5506,
+   "netR": -0.5914,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2019,
+   "entry": "2019-02-01",
+   "exit": "2019-02-08",
+   "grossPct": -0.2791,
+   "grossR": -0.1215,
+   "netR": -0.1863,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2020,
+   "entry": "2020-01-23",
+   "exit": "2020-01-31",
+   "grossPct": 1.8566,
+   "grossR": 0.5251,
+   "netR": 0.4808,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2021,
+   "entry": "2021-02-10",
+   "exit": "2021-02-17",
+   "grossPct": -3.4672,
+   "grossR": -0.7868,
+   "netR": -0.8177,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2022,
+   "entry": "2022-01-28",
+   "exit": "2022-02-04",
+   "grossPct": 0.9106,
+   "grossR": 0.2744,
+   "netR": 0.2331,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2023,
+   "entry": "2023-01-20",
+   "exit": "2023-01-27",
+   "grossPct": 0.0867,
+   "grossR": 0.0254,
+   "netR": -0.0141,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2024,
+   "entry": "2024-02-09",
+   "exit": "2024-02-16",
+   "grossPct": -0.5518,
+   "grossR": -0.1772,
+   "netR": -0.22,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2025,
+   "entry": "2025-01-27",
+   "exit": "2025-02-04",
+   "grossPct": 3.631,
+   "grossR": 1.1753,
+   "netR": 1.1299,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "shut",
+   "year": 2026,
+   "entry": "2026-02-13",
+   "exit": "2026-02-23",
+   "grossPct": 3.8287,
+   "grossR": 0.2626,
+   "netR": 0.2536,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2008,
+   "entry": "2008-02-12",
+   "exit": "2008-02-19",
+   "grossPct": 2.4201,
+   "grossR": 0.3486,
+   "netR": 0.3241,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2009,
+   "entry": "2009-01-30",
+   "exit": "2009-02-06",
+   "grossPct": -1.7568,
+   "grossR": -0.1949,
+   "netR": -0.2136,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2010,
+   "entry": "2010-02-19",
+   "exit": "2010-02-26",
+   "grossPct": -0.1501,
+   "grossR": -0.0258,
+   "netR": -0.0529,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2011,
+   "entry": "2011-02-08",
+   "exit": "2011-02-15",
+   "grossPct": 0.6715,
+   "grossR": 0.1517,
+   "netR": 0.1183,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2012,
+   "entry": "2012-01-27",
+   "exit": "2012-02-03",
+   "grossPct": -0.7186,
+   "grossR": -0.1711,
+   "netR": -0.204,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2013,
+   "entry": "2013-02-15",
+   "exit": "2013-02-20",
+   "grossPct": -3.1135,
+   "grossR": -1,
+   "netR": -1.0215,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2014,
+   "entry": "2014-02-06",
+   "exit": "2014-02-13",
+   "grossPct": 3.4889,
+   "grossR": 0.832,
+   "netR": 0.7959,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2015,
+   "entry": "2015-02-24",
+   "exit": "2015-03-03",
+   "grossPct": -0.0237,
+   "grossR": -0.0047,
+   "netR": -0.0355,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2016,
+   "entry": "2016-02-12",
+   "exit": "2016-02-19",
+   "grossPct": -0.9441,
+   "grossR": -0.2135,
+   "netR": -0.2479,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2017,
+   "entry": "2017-02-02",
+   "exit": "2017-02-09",
+   "grossPct": 0.9792,
+   "grossR": 0.2771,
+   "netR": 0.2338,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2018,
+   "entry": "2018-02-21",
+   "exit": "2018-02-28",
+   "grossPct": -0.7077,
+   "grossR": -0.1889,
+   "netR": -0.2286,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2019,
+   "entry": "2019-02-08",
+   "exit": "2019-02-15",
+   "grossPct": 0.514,
+   "grossR": 0.2386,
+   "netR": 0.1693,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2020,
+   "entry": "2020-01-31",
+   "exit": "2020-02-07",
+   "grossPct": -1.2322,
+   "grossR": -0.3244,
+   "netR": -0.3616,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2021,
+   "entry": "2021-02-17",
+   "exit": "2021-02-24",
+   "grossPct": 1.4017,
+   "grossR": 0.3245,
+   "netR": 0.2927,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2022,
+   "entry": "2022-02-04",
+   "exit": "2022-02-11",
+   "grossPct": 2.8214,
+   "grossR": 0.9215,
+   "netR": 0.8769,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2023,
+   "entry": "2023-01-27",
+   "exit": "2023-02-03",
+   "grossPct": -3.218,
+   "grossR": -0.859,
+   "netR": -0.8949,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2024,
+   "entry": "2024-02-16",
+   "exit": "2024-02-23",
+   "grossPct": 1.1,
+   "grossR": 0.3553,
+   "netR": 0.3122,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2025,
+   "entry": "2025-02-04",
+   "exit": "2025-02-11",
+   "grossPct": 2.0125,
+   "grossR": 0.6172,
+   "netR": 0.579,
+   "exitKind": "close"
+  },
+  {
+   "kind": "lny",
+   "win": "post",
+   "year": 2026,
+   "entry": "2026-02-23",
+   "exit": "2026-03-02",
+   "grossPct": 2.1024,
+   "grossR": 0.151,
+   "netR": 0.1427,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2008,
+   "entry": "2008-09-12",
+   "exit": "2008-09-26",
+   "grossPct": 14.7943,
+   "grossR": 1.7004,
+   "netR": 1.6676,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2009,
+   "entry": "2009-09-16",
+   "exit": "2009-09-30",
+   "grossPct": -0.8666,
+   "grossR": -0.1956,
+   "netR": -0.2556,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2010,
+   "entry": "2010-09-16",
+   "exit": "2010-09-30",
+   "grossPct": 2.6064,
+   "grossR": 0.8601,
+   "netR": 0.7762,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2011,
+   "entry": "2011-09-16",
+   "exit": "2011-09-23",
+   "grossPct": -9.8048,
+   "grossR": -1,
+   "netR": -1.0124,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2012,
+   "entry": "2012-09-14",
+   "exit": "2012-09-28",
+   "grossPct": 0.1015,
+   "grossR": 0.0291,
+   "netR": -0.04,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2013,
+   "entry": "2013-09-16",
+   "exit": "2013-09-30",
+   "grossPct": 1.1963,
+   "grossR": 0.2018,
+   "netR": 0.1591,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2014,
+   "entry": "2014-09-16",
+   "exit": "2014-09-30",
+   "grossPct": -2.1928,
+   "grossR": -0.6776,
+   "netR": -0.7567,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2015,
+   "entry": "2015-09-16",
+   "exit": "2015-09-30",
+   "grossPct": -0.42,
+   "grossR": -0.1005,
+   "netR": -0.1629,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2016,
+   "entry": "2016-09-16",
+   "exit": "2016-09-30",
+   "grossPct": 0.4294,
+   "grossR": 0.129,
+   "netR": 0.053,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2017,
+   "entry": "2017-09-15",
+   "exit": "2017-09-29",
+   "grossPct": -3.0167,
+   "grossR": -0.8352,
+   "netR": -0.9052,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2018,
+   "entry": "2018-09-14",
+   "exit": "2018-09-28",
+   "grossPct": -0.1072,
+   "grossR": -0.0369,
+   "netR": -0.1256,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2019,
+   "entry": "2019-09-16",
+   "exit": "2019-09-30",
+   "grossPct": -1.6315,
+   "grossR": -0.3618,
+   "netR": -0.4167,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2020,
+   "entry": "2020-09-16",
+   "exit": "2020-09-23",
+   "grossPct": -5.0334,
+   "grossR": -1,
+   "netR": -1.0178,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2021,
+   "entry": "2021-09-16",
+   "exit": "2021-09-30",
+   "grossPct": -0.0439,
+   "grossR": -0.0125,
+   "netR": -0.0814,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2022,
+   "entry": "2022-09-16",
+   "exit": "2022-09-30",
+   "grossPct": -0.8687,
+   "grossR": -0.217,
+   "netR": -0.2777,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2023,
+   "entry": "2023-09-14",
+   "exit": "2023-09-28",
+   "grossPct": -2.1997,
+   "grossR": -1,
+   "netR": -1.1017,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2024,
+   "entry": "2024-09-16",
+   "exit": "2024-09-30",
+   "grossPct": 2.012,
+   "grossR": 0.5934,
+   "netR": 0.5254,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2025,
+   "entry": "2025-09-16",
+   "exit": "2025-09-30",
+   "grossPct": 4.5633,
+   "grossR": 1.2628,
+   "netR": 1.201,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "pre",
+   "year": 2026,
+   "entry": "2026-09-16",
+   "exit": "2026-09-30",
+   "grossPct": -2.7118,
+   "grossR": -0.3678,
+   "netR": -0.3978,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2008,
+   "entry": "2008-09-26",
+   "exit": "2008-10-03",
+   "grossPct": -4.9502,
+   "grossR": -0.4097,
+   "netR": -0.424,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2009,
+   "entry": "2009-09-30",
+   "exit": "2009-10-08",
+   "grossPct": 4.1854,
+   "grossR": 0.9512,
+   "netR": 0.9108,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2010,
+   "entry": "2010-09-30",
+   "exit": "2010-10-07",
+   "grossPct": 2.1218,
+   "grossR": 0.6908,
+   "netR": 0.6422,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2011,
+   "entry": "2011-09-30",
+   "exit": "2011-10-07",
+   "grossPct": 0.8798,
+   "grossR": 0.0766,
+   "netR": 0.0643,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2012,
+   "entry": "2012-09-28",
+   "exit": "2012-10-05",
+   "grossPct": 0.4793,
+   "grossR": 0.1351,
+   "netR": 0.0964,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2013,
+   "entry": "2013-09-30",
+   "exit": "2013-10-07",
+   "grossPct": -0.409,
+   "grossR": -0.0626,
+   "netR": -0.0853,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2014,
+   "entry": "2014-09-30",
+   "exit": "2014-10-07",
+   "grossPct": 0.1717,
+   "grossR": 0.0462,
+   "netR": 0.005,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2015,
+   "entry": "2015-09-30",
+   "exit": "2015-10-07",
+   "grossPct": 2.6841,
+   "grossR": 0.6893,
+   "netR": 0.6489,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2016,
+   "entry": "2016-09-30",
+   "exit": "2016-10-04",
+   "grossPct": -3.0329,
+   "grossR": -1,
+   "netR": -1.0199,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2017,
+   "entry": "2017-09-29",
+   "exit": "2017-10-06",
+   "grossPct": -0.2872,
+   "grossR": -0.0798,
+   "netR": -0.1216,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2018,
+   "entry": "2018-09-28",
+   "exit": "2018-10-05",
+   "grossPct": 0.8818,
+   "grossR": 0.31,
+   "netR": 0.2559,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2019,
+   "entry": "2019-09-30",
+   "exit": "2019-10-07",
+   "grossPct": 1.2545,
+   "grossR": 0.2652,
+   "netR": 0.2347,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2020,
+   "entry": "2020-09-30",
+   "exit": "2020-10-08",
+   "grossPct": 0.401,
+   "grossR": 0.0867,
+   "netR": 0.0542,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2021,
+   "entry": "2021-09-30",
+   "exit": "2021-10-07",
+   "grossPct": 0.1132,
+   "grossR": 0.0271,
+   "netR": -0.0059,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2022,
+   "entry": "2022-09-30",
+   "exit": "2022-10-07",
+   "grossPct": 2.05,
+   "grossR": 0.4421,
+   "netR": 0.4119,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2023,
+   "entry": "2023-09-28",
+   "exit": "2023-10-02",
+   "grossPct": -2.3741,
+   "grossR": -1,
+   "netR": -1.0198,
+   "exitKind": "stop"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2024,
+   "entry": "2024-09-30",
+   "exit": "2024-10-07",
+   "grossPct": 0.2766,
+   "grossR": 0.075,
+   "netR": 0.0407,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2025,
+   "entry": "2025-09-30",
+   "exit": "2025-10-08",
+   "grossPct": 3.8506,
+   "grossR": 0.945,
+   "netR": 0.9048,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "shut",
+   "year": 2026,
+   "entry": "2026-09-30",
+   "exit": "2026-10-07",
+   "grossPct": -1.1477,
+   "grossR": -0.1688,
+   "netR": -0.1862,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2008,
+   "entry": "2008-10-03",
+   "exit": "2008-10-10",
+   "grossPct": 1.8078,
+   "grossR": 0.1256,
+   "netR": 0.1134,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2009,
+   "entry": "2009-10-08",
+   "exit": "2009-10-15",
+   "grossPct": 0.2276,
+   "grossR": 0.05,
+   "netR": 0.0147,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2010,
+   "entry": "2010-10-07",
+   "exit": "2010-10-14",
+   "grossPct": 3.2687,
+   "grossR": 0.9499,
+   "netR": 0.9067,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2011,
+   "entry": "2011-10-07",
+   "exit": "2011-10-14",
+   "grossPct": 2.6087,
+   "grossR": 0.2383,
+   "netR": 0.2255,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2012,
+   "entry": "2012-10-05",
+   "exit": "2012-10-12",
+   "grossPct": -1.503,
+   "grossR": -0.4371,
+   "netR": -0.4771,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2013,
+   "entry": "2013-10-07",
+   "exit": "2013-10-14",
+   "grossPct": -3.8536,
+   "grossR": -0.5697,
+   "netR": -0.5918,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2014,
+   "entry": "2014-10-07",
+   "exit": "2014-10-14",
+   "grossPct": 1.586,
+   "grossR": 0.4113,
+   "netR": 0.3716,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2015,
+   "entry": "2015-10-07",
+   "exit": "2015-10-14",
+   "grossPct": 3.5051,
+   "grossR": 0.8818,
+   "netR": 0.8426,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2016,
+   "entry": "2016-10-07",
+   "exit": "2016-10-14",
+   "grossPct": -0.4435,
+   "grossR": -0.1207,
+   "netR": -0.1618,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2017,
+   "entry": "2017-10-06",
+   "exit": "2017-10-13",
+   "grossPct": 2.0653,
+   "grossR": 0.609,
+   "netR": 0.5646,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2018,
+   "entry": "2018-10-05",
+   "exit": "2018-10-12",
+   "grossPct": 1.2766,
+   "grossR": 0.4353,
+   "netR": 0.383,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2019,
+   "entry": "2019-10-07",
+   "exit": "2019-10-14",
+   "grossPct": -0.0573,
+   "grossR": -0.0127,
+   "netR": -0.0445,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2020,
+   "entry": "2020-10-08",
+   "exit": "2020-10-15",
+   "grossPct": 0.5948,
+   "grossR": 0.1274,
+   "netR": 0.0984,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2021,
+   "entry": "2021-10-07",
+   "exit": "2021-10-14",
+   "grossPct": 2.2995,
+   "grossR": 0.5682,
+   "netR": 0.5341,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2022,
+   "entry": "2022-10-07",
+   "exit": "2022-10-14",
+   "grossPct": -2.9823,
+   "grossR": -0.6085,
+   "netR": -0.6369,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2023,
+   "entry": "2023-10-06",
+   "exit": "2023-10-13",
+   "grossPct": 5.4707,
+   "grossR": 1.8832,
+   "netR": 1.8363,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2024,
+   "entry": "2024-10-07",
+   "exit": "2024-10-14",
+   "grossPct": 0.2427,
+   "grossR": 0.067,
+   "netR": 0.0321,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2025,
+   "entry": "2025-10-08",
+   "exit": "2025-10-15",
+   "grossPct": 4.9272,
+   "grossR": 1.1659,
+   "netR": 1.1378,
+   "exitKind": "close"
+  },
+  {
+   "kind": "golden",
+   "win": "post",
+   "year": 2026,
+   "entry": "2026-10-07",
+   "exit": "2026-10-14",
+   "grossPct": 0.0857,
+   "grossR": 0.0132,
+   "netR": -0.005,
+   "exitKind": "close"
+  }
+ ]
+}
