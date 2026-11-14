@@ -1,0 +1,218 @@
+{
+ "study": "gold-index-dispersion",
+ "built": "2026-11-14",
+ "data": {
+  "first": "2006-03-20",
+  "last": "2026-11-13",
+  "candles": 5369,
+  "noReading": 90,
+  "markets": [
+   "au200",
+   "ch20",
+   "de40",
+   "eu50",
+   "fr40",
+   "hk33",
+   "jp225",
+   "nas100",
+   "sg30",
+   "spx500",
+   "uk100",
+   "us2000",
+   "us30"
+  ],
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "atr": "2 x ATR(20)",
+  "look": 250,
+  "pct": 0.9,
+  "minMarkets": 10,
+  "holds": {
+   "T1": 5,
+   "T2": 1,
+   "T3": 3
+  },
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ]
+ },
+ "events": {
+  "is": 286,
+  "oos": 261
+ },
+ "tests": {
+  "T1": {
+   "hold": 5,
+   "is": {
+    "n": 123,
+    "excess": 0.036,
+    "tExcess": 0.5,
+    "p": 0.3106,
+    "months": 72,
+    "net": 0.03,
+    "tNet": 0.4,
+    "gross": 0.075,
+    "tGross": 1.01,
+    "baseline": -0.006,
+    "win": 51.22,
+    "stops": 24,
+    "total": 3.63,
+    "excess2x": 0.038,
+    "net2x": -0.016
+   },
+   "oos": {
+    "n": 128,
+    "excess": -0.037,
+    "tExcess": -0.64,
+    "p": 0.7376,
+    "months": 77,
+    "net": 0.004,
+    "tNet": 0.07,
+    "gross": 0.055,
+    "tGross": 0.96,
+    "baseline": 0.041,
+    "win": 50.78,
+    "stops": 21,
+    "total": 0.52,
+    "excess2x": -0.036,
+    "net2x": -0.047
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 8,
+    "mean": -0.012,
+    "max": 0.09,
+    "min": -0.123
+   },
+   "holm": 0.7376,
+   "checks": {
+    "oosExcessT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false,
+    "oosNetPos": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "hold": 1,
+   "is": {
+    "n": 205,
+    "excess": 0.009,
+    "tExcess": 0.33,
+    "p": 0.3717,
+    "months": 72,
+    "net": -0.007,
+    "tNet": -0.28,
+    "gross": 0.015,
+    "tGross": 0.53,
+    "baseline": -0.016,
+    "win": 48.29,
+    "stops": 3,
+    "total": -1.52,
+    "excess2x": 0.011,
+    "net2x": -0.029
+   },
+   "oos": {
+    "n": 198,
+    "excess": 0.015,
+    "tExcess": 0.63,
+    "p": 0.2641,
+    "months": 78,
+    "net": 0.013,
+    "tNet": 0.54,
+    "gross": 0.034,
+    "tGross": 1.46,
+    "baseline": -0.003,
+    "win": 50,
+    "stops": 5,
+    "total": 2.5,
+    "excess2x": 0.016,
+    "net2x": -0.009
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 33,
+    "mean": -0.003,
+    "max": 0.053,
+    "min": -0.048
+   },
+   "holm": 0.5282,
+   "checks": {
+    "oosExcessT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": true,
+    "oosNetPos": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "hold": 3,
+   "is": {
+    "n": 155,
+    "excess": 0.032,
+    "tExcess": 0.64,
+    "p": 0.2615,
+    "months": 71,
+    "net": 0.021,
+    "tNet": 0.41,
+    "gross": 0.055,
+    "tGross": 1.08,
+    "baseline": -0.011,
+    "win": 52.26,
+    "stops": 16,
+    "total": 3.2,
+    "excess2x": 0.034,
+    "net2x": -0.014
+   },
+   "oos": {
+    "n": 152,
+    "excess": 0.059,
+    "tExcess": 1.2,
+    "p": 0.1176,
+    "months": 78,
+    "net": 0.08,
+    "tNet": 1.62,
+    "gross": 0.115,
+    "tGross": 2.34,
+    "baseline": 0.021,
+    "win": 53.95,
+    "stops": 9,
+    "total": 12.11,
+    "excess2x": 0.06,
+    "net2x": 0.044
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 38,
+    "mean": 0,
+    "max": 0.078,
+    "min": -0.063
+   },
+   "holm": 0.3528,
+   "checks": {
+    "oosExcessT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": true,
+    "oosNetPos": true,
+    "placebo": true
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
