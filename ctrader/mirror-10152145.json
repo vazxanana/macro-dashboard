@@ -12535,7 +12535,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "position",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-13T23:32:55.000Z",
     "councilEntry": 77.85,
     "stop": 82.44810714285714,
@@ -12550,10 +12550,15 @@
     "slipR": 0.01,
     "lagSec": 115,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-13T23:32:55.000Z",
-    "brokerStop": 82.36
+    "brokerStop": 82.36,
+    "closedAt": "2026-11-14T21:19:28.000Z",
+    "exitPrice": 69.618,
+    "councilExit": 68.6537857142857,
+    "councilR": 2
    },
    "sol-position-1794664898": {
     "positionId": "49652115",
@@ -12594,7 +12599,7 @@
    "startBalance": 10087.14
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10113.88 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10113.88 · 6 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -12602,7 +12607,7 @@
    "xau-position-1794495673": {
     "why": "XAUUSD: even the minimum lot (0.01) risks 261.89, 2.6% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-14T21:17:25.000Z"
+    "at": "2026-11-14T21:19:28.000Z"
    }
   },
   "paused": {},
@@ -12611,14 +12616,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10113.88,
-  "lastRun": "2026-11-14T21:17:25.000Z"
+  "lastRun": "2026-11-14T21:19:28.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T10:39:32.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 250.93, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-13T10:41:04.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 252.22, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14113,6 +14113,11 @@
    "at": "2026-11-14T19:25:28.000Z",
    "msg": "closed SOLUSD position 49652115 (council: win)",
    "trade": "sol-position-1794664898"
+  },
+  {
+   "at": "2026-11-14T21:19:28.000Z",
+   "msg": "closed SOLUSD position 49646625 (council: win)",
+   "trade": "sol-position-1794610812"
   }
  ],
  "limits": {
