@@ -1,0 +1,86 @@
+{
+ "topic": "weekend-gap-duka",
+ "built": "2026-11-14",
+ "at": "2026-11-14T02:24:21.932Z",
+ "system": "Forex Sunday-gap fade Rule G (#880, frozen) on Dukascopy bid / ask: the reopen spread and bid / ask fills",
+ "prereg": "research/edge/weekend-gap-duka/PREREGISTRATION.md",
+ "frozen": {
+  "file": "frozen.mjs",
+  "of": "research/edge/fx-weekend-gap/run.mjs (branch fx-weekend-gap, #880)",
+  "sha256": "3dfd1dd71f1c1bb2512c5ee0f26573bcb38944f152634ccd622efc1b7002b273"
+ },
+ "sets": {
+  "M": [
+   "EURUSD",
+   "GBPUSD",
+   "USDJPY",
+   "AUDUSD",
+   "USDCHF",
+   "EURJPY"
+  ],
+  "X": [
+   "EURGBP",
+   "GBPJPY",
+   "AUDJPY",
+   "EURAUD",
+   "GBPAUD",
+   "EURCHF"
+  ],
+  "N": [
+   "NZDUSD",
+   "USDCAD",
+   "CADJPY",
+   "NZDJPY",
+   "AUDNZD",
+   "AUDCAD"
+  ]
+ },
+ "coverage": {
+  "reachable": false,
+  "probe": [
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/02/10/BID_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   },
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/02/10/ASK_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   },
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/EURUSD/2012/01/08/ASK_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   },
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/USDJPY/2024/02/10/ASK_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   },
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/AUDNZD/2024/02/10/ASK_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   },
+   {
+    "url": "https://datafeed.dukascopy.com/datafeed/EURGBP/2010/00/10/ASK_candles_min_1.bi5",
+    "status": null,
+    "error": "fetch failed: Request was cancelled.",
+    "ok": false
+   }
+  ],
+  "proxy": "egress proxy refused CONNECT to datafeed.dukascopy.com:443, www.dukascopy.com:443 and freeserv.dukascopy.com:443 (403, connect_rejected); plain http did not resolve (ENOTFOUND)",
+  "local": "no Dukascopy forex bid / ask file in the repository, the council-data branch (only research/candles/nq-duka-*.json.gz, NQ) or on this machine"
+ },
+ "measurementA": null,
+ "testB": null,
+ "feedCheck": null,
+ "placebo": null,
+ "verdict": "NOT MEASURABLE (inconclusive: Dukascopy is not reachable from this runner)"
+}
