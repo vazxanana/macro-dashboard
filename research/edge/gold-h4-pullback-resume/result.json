@@ -1,0 +1,788 @@
+{
+ "built": "2026-11-14",
+ "data": {
+  "src": "OANDA mid H1 XAU_USD (site proxy copy), H4 built on 17:00 New York blocks (DST correct); OANDA mid M5 for fills inside each hour",
+  "from": "2006-03-19",
+  "to": "2026-11-13",
+  "h1": 125704,
+  "h4": 32770,
+  "m5": 1431423,
+  "m5From": "2006-11-01",
+  "hoursWithM5": 121865,
+  "triggers": 1476,
+  "triggersLong": 743
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippagePerOrder": 0.15,
+  "roundTrip": 0.6,
+  "financing": {
+   "rate": 0.000148,
+   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
+   "side": "buys only"
+  }
+ },
+ "rule": {
+  "N": 20,
+  "recent": 30,
+  "fib": 0.382,
+  "look": 5,
+  "buffer": 0.3,
+  "minRR": 1.5,
+  "fixedR": 2,
+  "holdH1": 48
+ },
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ]
+ },
+ "seed": 20261114,
+ "tests": {
+  "T1": {
+   "name": "T1 both sides, target the leg extreme (>= 1.5R away)",
+   "oos": {
+    "n": 443,
+    "gross": -0.036,
+    "net": -0.161,
+    "net2x": -0.286,
+    "cost": 0.107,
+    "fin": 0.018,
+    "total": -71.15,
+    "win": 29.12,
+    "stops": 309,
+    "targets": 95,
+    "times": 39,
+    "longs": 221,
+    "medianStop": 6.68,
+    "months": 118,
+    "t": -1.78,
+    "tGross": -0.4,
+    "t2x": -3.12,
+    "dd": -104.68
+   },
+   "is": {
+    "n": 404,
+    "gross": -0.012,
+    "net": -0.151,
+    "net2x": -0.29,
+    "cost": 0.128,
+    "fin": 0.011,
+    "total": -60.92,
+    "win": 28.47,
+    "stops": 285,
+    "targets": 87,
+    "times": 32,
+    "longs": 179,
+    "medianStop": 5.36,
+    "months": 120,
+    "t": -1.53,
+    "tGross": -0.12,
+    "t2x": -2.97,
+    "dd": -83.85
+   },
+   "p": 0.9625,
+   "bySide": {
+    "oosLong": {
+     "n": 221,
+     "gross": -0.036,
+     "net": -0.178,
+     "net2x": -0.32,
+     "cost": 0.106,
+     "fin": 0.036,
+     "total": -39.32,
+     "win": 31.22,
+     "stops": 150,
+     "targets": 46,
+     "times": 25,
+     "longs": 221,
+     "medianStop": 6.61,
+     "months": 118,
+     "t": -1.53,
+     "tGross": -0.3,
+     "t2x": -2.8,
+     "dd": -55.51
+    },
+    "oosShort": {
+     "n": 222,
+     "gross": -0.036,
+     "net": -0.143,
+     "net2x": -0.251,
+     "cost": 0.108,
+     "fin": 0,
+     "total": -31.83,
+     "win": 27.03,
+     "stops": 159,
+     "targets": 49,
+     "times": 14,
+     "longs": 0,
+     "medianStop": 6.74,
+     "months": 118,
+     "t": -1.14,
+     "tGross": -0.29,
+     "t2x": -1.96,
+     "dd": -52.11
+    },
+    "isLong": {
+     "n": 179,
+     "gross": -0.034,
+     "net": -0.182,
+     "net2x": -0.329,
+     "cost": 0.123,
+     "fin": 0.025,
+     "total": -32.51,
+     "win": 27.37,
+     "stops": 129,
+     "targets": 39,
+     "times": 11,
+     "longs": 179,
+     "medianStop": 5.84,
+     "months": 120,
+     "t": -1.46,
+     "tGross": -0.28,
+     "t2x": -2.64,
+     "dd": -47.24
+    },
+    "isShort": {
+     "n": 225,
+     "gross": 0.006,
+     "net": -0.126,
+     "net2x": -0.258,
+     "cost": 0.132,
+     "fin": 0,
+     "total": -28.41,
+     "win": 29.33,
+     "stops": 156,
+     "targets": 48,
+     "times": 21,
+     "longs": 0,
+     "medianStop": 5.08,
+     "months": 120,
+     "t": -1.05,
+     "tGross": 0.05,
+     "t2x": -2.19,
+     "dd": -55.75
+    }
+   },
+   "placebo": {
+    "beaten": 39,
+    "of": 40,
+    "p5": -0.366,
+    "median": -0.265,
+    "p95": -0.197,
+    "mean": -0.267
+   },
+   "years": {
+    "2007": {
+     "n": 37,
+     "gross": 0.432,
+     "net": 0.216
+    },
+    "2008": {
+     "n": 43,
+     "gross": 0.013,
+     "net": -0.109
+    },
+    "2009": {
+     "n": 32,
+     "gross": -0.276,
+     "net": -0.406
+    },
+    "2010": {
+     "n": 39,
+     "gross": -0.252,
+     "net": -0.387
+    },
+    "2011": {
+     "n": 44,
+     "gross": -0.262,
+     "net": -0.353
+    },
+    "2012": {
+     "n": 46,
+     "gross": 0.379,
+     "net": 0.227
+    },
+    "2013": {
+     "n": 46,
+     "gross": -0.213,
+     "net": -0.32
+    },
+    "2014": {
+     "n": 39,
+     "gross": -0.409,
+     "net": -0.555
+    },
+    "2015": {
+     "n": 37,
+     "gross": 0.295,
+     "net": 0.143
+    },
+    "2016": {
+     "n": 41,
+     "gross": 0.151,
+     "net": -0.001
+    },
+    "2017": {
+     "n": 41,
+     "gross": -0.015,
+     "net": -0.21
+    },
+    "2018": {
+     "n": 50,
+     "gross": 0.054,
+     "net": -0.139
+    },
+    "2019": {
+     "n": 43,
+     "gross": -0.235,
+     "net": -0.434
+    },
+    "2020": {
+     "n": 41,
+     "gross": 0.269,
+     "net": 0.157
+    },
+    "2021": {
+     "n": 53,
+     "gross": -0.345,
+     "net": -0.472
+    },
+    "2022": {
+     "n": 47,
+     "gross": -0.157,
+     "net": -0.278
+    },
+    "2023": {
+     "n": 37,
+     "gross": -0.319,
+     "net": -0.429
+    },
+    "2024": {
+     "n": 38,
+     "gross": -0.303,
+     "net": -0.387
+    },
+    "2025": {
+     "n": 46,
+     "gross": 0.714,
+     "net": 0.643
+    },
+    "2026": {
+     "n": 47,
+     "gross": -0.057,
+     "net": -0.092
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": true,
+    "n": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "T2 both sides, target 2R fixed",
+   "oos": {
+    "n": 681,
+    "gross": 0.054,
+    "net": -0.051,
+    "net2x": -0.155,
+    "cost": 0.091,
+    "fin": 0.014,
+    "total": -34.4,
+    "win": 37.15,
+    "stops": 405,
+    "targets": 204,
+    "times": 72,
+    "longs": 345,
+    "medianStop": 8.14,
+    "months": 118,
+    "t": -0.98,
+    "tGross": 1.03,
+    "t2x": -2.97,
+    "dd": -48.34
+   },
+   "is": {
+    "n": 662,
+    "gross": 0.065,
+    "net": -0.052,
+    "net2x": -0.17,
+    "cost": 0.106,
+    "fin": 0.011,
+    "total": -34.62,
+    "win": 38.22,
+    "stops": 389,
+    "targets": 196,
+    "times": 77,
+    "longs": 336,
+    "medianStop": 6.58,
+    "months": 120,
+    "t": -1,
+    "tGross": 1.24,
+    "t2x": -3.27,
+    "dd": -57.28
+   },
+   "p": 0.8365,
+   "bySide": {
+    "oosLong": {
+     "n": 345,
+     "gross": 0.047,
+     "net": -0.068,
+     "net2x": -0.184,
+     "cost": 0.089,
+     "fin": 0.027,
+     "total": -23.59,
+     "win": 37.1,
+     "stops": 205,
+     "targets": 100,
+     "times": 40,
+     "longs": 345,
+     "medianStop": 8.23,
+     "months": 118,
+     "t": -1.02,
+     "tGross": 0.7,
+     "t2x": -2.76,
+     "dd": -38.89
+    },
+    "oosShort": {
+     "n": 336,
+     "gross": 0.06,
+     "net": -0.032,
+     "net2x": -0.124,
+     "cost": 0.092,
+     "fin": 0,
+     "total": -10.81,
+     "win": 37.2,
+     "stops": 200,
+     "targets": 104,
+     "times": 32,
+     "longs": 0,
+     "medianStop": 8.05,
+     "months": 118,
+     "t": -0.42,
+     "tGross": 0.78,
+     "t2x": -1.64,
+     "dd": -25.77
+    },
+    "isLong": {
+     "n": 336,
+     "gross": 0.056,
+     "net": -0.066,
+     "net2x": -0.188,
+     "cost": 0.099,
+     "fin": 0.023,
+     "total": -22.15,
+     "win": 38.1,
+     "stops": 197,
+     "targets": 96,
+     "times": 43,
+     "longs": 336,
+     "medianStop": 7.11,
+     "months": 120,
+     "t": -0.94,
+     "tGross": 0.79,
+     "t2x": -2.66,
+     "dd": -32.62
+    },
+    "isShort": {
+     "n": 326,
+     "gross": 0.075,
+     "net": -0.038,
+     "net2x": -0.152,
+     "cost": 0.113,
+     "fin": 0,
+     "total": -12.47,
+     "win": 38.34,
+     "stops": 192,
+     "targets": 100,
+     "times": 34,
+     "longs": 0,
+     "medianStop": 5.86,
+     "months": 120,
+     "t": -0.52,
+     "tGross": 1.01,
+     "t2x": -2.11,
+     "dd": -36.36
+    }
+   },
+   "placebo": {
+    "beaten": 40,
+    "of": 40,
+    "p5": -0.206,
+    "median": -0.153,
+    "p95": -0.1,
+    "mean": -0.152
+   },
+   "years": {
+    "2007": {
+     "n": 59,
+     "gross": 0.281,
+     "net": 0.095
+    },
+    "2008": {
+     "n": 68,
+     "gross": 0.025,
+     "net": -0.076
+    },
+    "2009": {
+     "n": 61,
+     "gross": -0.013,
+     "net": -0.124
+    },
+    "2010": {
+     "n": 67,
+     "gross": -0.043,
+     "net": -0.161
+    },
+    "2011": {
+     "n": 84,
+     "gross": -0.088,
+     "net": -0.179
+    },
+    "2012": {
+     "n": 65,
+     "gross": 0.108,
+     "net": -0.014
+    },
+    "2013": {
+     "n": 61,
+     "gross": 0.26,
+     "net": 0.163
+    },
+    "2014": {
+     "n": 65,
+     "gross": -0.187,
+     "net": -0.309
+    },
+    "2015": {
+     "n": 64,
+     "gross": 0.161,
+     "net": 0.042
+    },
+    "2016": {
+     "n": 68,
+     "gross": 0.221,
+     "net": 0.099
+    },
+    "2017": {
+     "n": 67,
+     "gross": 0.102,
+     "net": -0.062
+    },
+    "2018": {
+     "n": 82,
+     "gross": 0.123,
+     "net": -0.038
+    },
+    "2019": {
+     "n": 66,
+     "gross": 0.243,
+     "net": 0.085
+    },
+    "2020": {
+     "n": 65,
+     "gross": 0.012,
+     "net": -0.072
+    },
+    "2021": {
+     "n": 77,
+     "gross": -0.015,
+     "net": -0.125
+    },
+    "2022": {
+     "n": 70,
+     "gross": -0.103,
+     "net": -0.197
+    },
+    "2023": {
+     "n": 59,
+     "gross": 0.075,
+     "net": -0.018
+    },
+    "2024": {
+     "n": 64,
+     "gross": 0.022,
+     "net": -0.049
+    },
+    "2025": {
+     "n": 68,
+     "gross": 0.219,
+     "net": 0.162
+    },
+    "2026": {
+     "n": 63,
+     "gross": -0.153,
+     "net": -0.181
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": true,
+    "n": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "T3 buys only, target the leg extreme (>= 1.5R away)",
+   "oos": {
+    "n": 221,
+    "gross": -0.036,
+    "net": -0.178,
+    "net2x": -0.32,
+    "cost": 0.106,
+    "fin": 0.036,
+    "total": -39.32,
+    "win": 31.22,
+    "stops": 150,
+    "targets": 46,
+    "times": 25,
+    "longs": 221,
+    "medianStop": 6.61,
+    "months": 118,
+    "t": -1.53,
+    "tGross": -0.3,
+    "t2x": -2.8,
+    "dd": -55.51
+   },
+   "is": {
+    "n": 181,
+    "gross": -0.023,
+    "net": -0.172,
+    "net2x": -0.32,
+    "cost": 0.123,
+    "fin": 0.026,
+    "total": -31.05,
+    "win": 27.62,
+    "stops": 130,
+    "targets": 40,
+    "times": 11,
+    "longs": 181,
+    "medianStop": 5.84,
+    "months": 120,
+    "t": -1.4,
+    "tGross": -0.19,
+    "t2x": -2.61,
+    "dd": -45.78
+   },
+   "p": 0.937,
+   "bySide": {
+    "oosLong": {
+     "n": 221,
+     "gross": -0.036,
+     "net": -0.178,
+     "net2x": -0.32,
+     "cost": 0.106,
+     "fin": 0.036,
+     "total": -39.32,
+     "win": 31.22,
+     "stops": 150,
+     "targets": 46,
+     "times": 25,
+     "longs": 221,
+     "medianStop": 6.61,
+     "months": 118,
+     "t": -1.53,
+     "tGross": -0.3,
+     "t2x": -2.8,
+     "dd": -55.51
+    },
+    "oosShort": {
+     "n": 0,
+     "gross": null,
+     "net": null,
+     "net2x": null,
+     "cost": null,
+     "fin": null,
+     "total": 0,
+     "win": null,
+     "stops": 0,
+     "targets": 0,
+     "times": 0,
+     "longs": 0,
+     "medianStop": null,
+     "months": 118,
+     "t": 0,
+     "tGross": 0,
+     "t2x": 0,
+     "dd": 0
+    },
+    "isLong": {
+     "n": 181,
+     "gross": -0.023,
+     "net": -0.172,
+     "net2x": -0.32,
+     "cost": 0.123,
+     "fin": 0.026,
+     "total": -31.05,
+     "win": 27.62,
+     "stops": 130,
+     "targets": 40,
+     "times": 11,
+     "longs": 181,
+     "medianStop": 5.84,
+     "months": 120,
+     "t": -1.4,
+     "tGross": -0.19,
+     "t2x": -2.61,
+     "dd": -45.78
+    },
+    "isShort": {
+     "n": 0,
+     "gross": null,
+     "net": null,
+     "net2x": null,
+     "cost": null,
+     "fin": null,
+     "total": 0,
+     "win": null,
+     "stops": 0,
+     "targets": 0,
+     "times": 0,
+     "longs": 0,
+     "medianStop": null,
+     "months": 120,
+     "t": 0,
+     "tGross": 0,
+     "t2x": 0,
+     "dd": 0
+    }
+   },
+   "placebo": {
+    "beaten": 25,
+    "of": 40,
+    "p5": -0.395,
+    "median": -0.242,
+    "p95": -0.087,
+    "mean": -0.219
+   },
+   "years": {
+    "2007": {
+     "n": 19,
+     "gross": 0.579,
+     "net": 0.364
+    },
+    "2008": {
+     "n": 22,
+     "gross": 0.065,
+     "net": -0.049
+    },
+    "2009": {
+     "n": 14,
+     "gross": -0.322,
+     "net": -0.443
+    },
+    "2010": {
+     "n": 17,
+     "gross": 0.006,
+     "net": -0.121
+    },
+    "2011": {
+     "n": 18,
+     "gross": -0.214,
+     "net": -0.309
+    },
+    "2012": {
+     "n": 18,
+     "gross": 0.089,
+     "net": -0.076
+    },
+    "2013": {
+     "n": 22,
+     "gross": -0.038,
+     "net": -0.166
+    },
+    "2014": {
+     "n": 21,
+     "gross": -0.084,
+     "net": -0.253
+    },
+    "2015": {
+     "n": 12,
+     "gross": -0.23,
+     "net": -0.419
+    },
+    "2016": {
+     "n": 18,
+     "gross": -0.256,
+     "net": -0.427
+    },
+    "2017": {
+     "n": 19,
+     "gross": 0.096,
+     "net": -0.096
+    },
+    "2018": {
+     "n": 25,
+     "gross": -0.006,
+     "net": -0.22
+    },
+    "2019": {
+     "n": 27,
+     "gross": -0.237,
+     "net": -0.446
+    },
+    "2020": {
+     "n": 23,
+     "gross": 0.41,
+     "net": 0.276
+    },
+    "2021": {
+     "n": 23,
+     "gross": -0.43,
+     "net": -0.569
+    },
+    "2022": {
+     "n": 28,
+     "gross": -0.135,
+     "net": -0.271
+    },
+    "2023": {
+     "n": 21,
+     "gross": -0.301,
+     "net": -0.413
+    },
+    "2024": {
+     "n": 20,
+     "gross": -0.181,
+     "net": -0.277
+    },
+    "2025": {
+     "n": 19,
+     "gross": 1.246,
+     "net": 1.163
+    },
+    "2026": {
+     "n": 16,
+     "gross": -0.791,
+     "net": -0.845
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "oosNet": false,
+    "oosT": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passAlone": []
+}
