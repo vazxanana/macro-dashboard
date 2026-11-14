@@ -90,6 +90,7 @@ paper system with a measured, clearly negative record.
 | 324 | Gold staircase: 3+ days of higher highs and higher lows (or the mirror) | **FAIL, 0 of 3**: buy after an up staircase +0.021R OOS = drift (excess −0.013R, t −0.17); sell after a down staircase +0.016R; buying the turn −0.079R | #1137 |
 | 325 | Gold around the two Eids: long into Eid al-Fitr / al-Adha, short after | **FAIL, 0 of 3**: OOS excess over the same-year hold Fitr +0.375R (t 0.93), Adha +0.279R (t 0.55, opposite sign IS), post-Eid short −0.179R (t −1.45); 10 events a window, so 'not shown', not 'absent' | #1138 |
 | 326 | Gold day range used: fade (or follow) a day that has already travelled its normal range by 15:00 UTC, to 21:00 | **FAIL, 0 of 3**: fade −0.126R net OOS (excess −0.067R, t −1.96; also negative IS); following the extreme +0.059R excess in both windows but t 1.65, Holm p 0.15, loses at 2× costs | #1139 |
+| 327 | Gold in the inflation regime: long gold while stocks and bonds move together (63-day correlation > 0) | **FAIL, 0 of 3**: OOS excess over gold's drift +0.019R (t 0.16); IS −0.056R; the plain OOS gain is gold's 2017-26 rise | #1140 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
