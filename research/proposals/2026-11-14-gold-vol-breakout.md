@@ -57,7 +57,7 @@ Costs are the studies' $0.60 a round trip per ounce unless said. "t" is on calen
 −0.036R, n 2,015); on silver, `silver-vol-breakout` #1051 (−0.084R, n 2,015, t −3.04: positive before costs, gross t 3.37,
 eaten by costs); a filter on the H4 side, `gold-vol-breakout-h4-side` #1067 (did not beat the plain rule in the second half
 or the placebo). So it is **not a general breakout effect**: it is a property of gold's own daily path, and nothing found
-so far improves it. `gold-vol-breakout-reverse` has a pre-registration on its branch and no result yet.
+so far improves it. `gold-vol-breakout-reverse` (#1071) failed too: keeping the opposite order after a stop-out loses −0.181R a trade out of sample (t −2.29).
 
 ### What the evidence does not show
 
