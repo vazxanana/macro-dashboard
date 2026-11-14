@@ -1,0 +1,729 @@
+{
+ "study": "gold-momentum-acceleration",
+ "built": "2026-11-14",
+ "dataCommit": "2ad23e383",
+ "prereg": "da83cf932",
+ "params": {
+  "ATR_N": 20,
+  "ATR_MULT": 2,
+  "HOLD_W": 4,
+  "SD_WEEKS": 52,
+  "Z": 1,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "IS": {
+   "from": "2007-01",
+   "to": "2016-12"
+  },
+  "OOS": {
+   "from": "2017-01",
+   "to": "2026-10"
+  }
+ },
+ "fin": 0.000148,
+ "verdict": "FAIL",
+ "headline": "FAIL: 13-week acceleration added +0.029R a trade over the same-side baseline 2017-26 (n 76, month t 0.21); own net -0.015R",
+ "weeks": 1077,
+ "firstWeek": "2006-03-20",
+ "lastWeek": "2026-11-02",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "13-week acceleration, excess over the same-side baseline (primary)",
+   "sig": "acc13",
+   "f": "excess",
+   "is": {
+    "trades": 68,
+    "longs": 31,
+    "months": 120,
+    "won": 0.382,
+    "stopped": 0.544,
+    "grossR": -0.164,
+    "netR": -0.221,
+    "excessR": -0.165,
+    "costR": 0.015,
+    "finR": 0.041,
+    "costShare": null,
+    "medianStop": 38.24,
+    "monthGrossT": -1.16,
+    "month": -0.094,
+    "monthT": -1.2,
+    "total": -11.24,
+    "worstDD": -20.25
+   },
+   "oos": {
+    "trades": 76,
+    "longs": 37,
+    "months": 118,
+    "won": 0.434,
+    "stopped": 0.461,
+    "grossR": 0.057,
+    "netR": -0.015,
+    "excessR": 0.029,
+    "costR": 0.014,
+    "finR": 0.057,
+    "costShare": 1.258,
+    "medianStop": 48.69,
+    "monthGrossT": 0.4,
+    "month": 0.019,
+    "monthT": 0.21,
+    "total": 2.22,
+    "worstDD": -11.51,
+    "x2": 0.019,
+    "x2T": 0.21
+   },
+   "legs": {
+    "is": {
+     "long": {
+      "trades": 31,
+      "grossR": -0.025,
+      "netR": -0.13,
+      "excessR": -0.146,
+      "monthT": -0.72,
+      "total": -4.53
+     },
+     "short": {
+      "trades": 37,
+      "grossR": -0.281,
+      "netR": -0.297,
+      "excessR": -0.181,
+      "monthT": -0.98,
+      "total": -6.71
+     }
+    },
+    "oos": {
+     "long": {
+      "trades": 37,
+      "grossR": 0.222,
+      "netR": 0.09,
+      "excessR": -0.097,
+      "monthT": -0.42,
+      "total": -3.59
+     },
+     "short": {
+      "trades": 39,
+      "grossR": -0.1,
+      "netR": -0.114,
+      "excessR": 0.149,
+      "monthT": 0.91,
+      "total": 5.81
+     }
+    }
+   },
+   "pOne": 0.417,
+   "sameMomentumShare": 0.833,
+   "placebo": {
+    "p5": -1.99,
+    "p50": 0.04,
+    "p95": 1.62,
+    "max": 1.76,
+    "below": 24
+   },
+   "years": {
+    "2007": {
+     "n": 3,
+     "net": 2.33,
+     "excess": 2.28
+    },
+    "2008": {
+     "n": 4,
+     "net": 0.71,
+     "excess": 1.18
+    },
+    "2009": {
+     "n": 5,
+     "net": -2.16,
+     "excess": -1.98
+    },
+    "2010": {
+     "n": 8,
+     "net": -4.13,
+     "excess": -3.73
+    },
+    "2011": {
+     "n": 9,
+     "net": -2.34,
+     "excess": -1.82
+    },
+    "2012": {
+     "n": 5,
+     "net": -0.11,
+     "excess": 0.07
+    },
+    "2013": {
+     "n": 9,
+     "net": 1.66,
+     "excess": 2.3
+    },
+    "2014": {
+     "n": 9,
+     "net": -7,
+     "excess": -6.35
+    },
+    "2015": {
+     "n": 6,
+     "net": -3.07,
+     "excess": -2.91
+    },
+    "2016": {
+     "n": 10,
+     "net": -0.91,
+     "excess": -0.28
+    },
+    "2017": {
+     "n": 7,
+     "net": -4.1,
+     "excess": -4.06
+    },
+    "2018": {
+     "n": 7,
+     "net": 5.75,
+     "excess": 6.24
+    },
+    "2019": {
+     "n": 13,
+     "net": 0.4,
+     "excess": 0.66
+    },
+    "2020": {
+     "n": 7,
+     "net": 2.21,
+     "excess": 2.7
+    },
+    "2021": {
+     "n": 5,
+     "net": -1.27,
+     "excess": -1.31
+    },
+    "2022": {
+     "n": 6,
+     "net": 3.69,
+     "excess": 3.92
+    },
+    "2023": {
+     "n": 6,
+     "net": -0.13,
+     "excess": 0.1
+    },
+    "2024": {
+     "n": 9,
+     "net": -7.57,
+     "excess": -7.46
+    },
+    "2025": {
+     "n": 10,
+     "net": -0.27,
+     "excess": 0.11
+    },
+    "2026": {
+     "n": 6,
+     "net": 0.18,
+     "excess": 1.31
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": false,
+    "x2Positive": true,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "name": "13-week acceleration, own net R",
+   "sig": "acc13",
+   "f": "net",
+   "is": {
+    "trades": 68,
+    "longs": 31,
+    "months": 120,
+    "won": 0.382,
+    "stopped": 0.544,
+    "grossR": -0.164,
+    "netR": -0.221,
+    "excessR": null,
+    "costR": 0.015,
+    "finR": 0.041,
+    "costShare": null,
+    "medianStop": 38.24,
+    "monthGrossT": -1.16,
+    "month": -0.125,
+    "monthT": -1.57,
+    "total": -15.02,
+    "worstDD": -23.39
+   },
+   "oos": {
+    "trades": 76,
+    "longs": 37,
+    "months": 118,
+    "won": 0.434,
+    "stopped": 0.461,
+    "grossR": 0.057,
+    "netR": -0.015,
+    "excessR": null,
+    "costR": 0.014,
+    "finR": 0.057,
+    "costShare": 1.258,
+    "medianStop": 48.69,
+    "monthGrossT": 0.4,
+    "month": -0.009,
+    "monthT": -0.1,
+    "total": -1.11,
+    "worstDD": -12.83,
+    "x2": -0.055,
+    "x2T": -0.62
+   },
+   "legs": {
+    "is": {
+     "long": {
+      "trades": 31,
+      "grossR": -0.025,
+      "netR": -0.13,
+      "excessR": -0.146,
+      "monthT": -0.72,
+      "total": -4.53
+     },
+     "short": {
+      "trades": 37,
+      "grossR": -0.281,
+      "netR": -0.297,
+      "excessR": -0.181,
+      "monthT": -0.98,
+      "total": -6.71
+     }
+    },
+    "oos": {
+     "long": {
+      "trades": 37,
+      "grossR": 0.222,
+      "netR": 0.09,
+      "excessR": -0.097,
+      "monthT": -0.42,
+      "total": -3.59
+     },
+     "short": {
+      "trades": 39,
+      "grossR": -0.1,
+      "netR": -0.114,
+      "excessR": 0.149,
+      "monthT": 0.91,
+      "total": 5.81
+     }
+    }
+   },
+   "pOne": 0.54,
+   "sameMomentumShare": 0.833,
+   "placebo": {
+    "p5": -2.32,
+    "p50": -0.31,
+    "p95": 1.32,
+    "max": 1.52,
+    "below": 22
+   },
+   "years": {
+    "2007": {
+     "n": 3,
+     "net": 2.33,
+     "excess": 2.28
+    },
+    "2008": {
+     "n": 4,
+     "net": 0.71,
+     "excess": 1.18
+    },
+    "2009": {
+     "n": 5,
+     "net": -2.16,
+     "excess": -1.98
+    },
+    "2010": {
+     "n": 8,
+     "net": -4.13,
+     "excess": -3.73
+    },
+    "2011": {
+     "n": 9,
+     "net": -2.34,
+     "excess": -1.82
+    },
+    "2012": {
+     "n": 5,
+     "net": -0.11,
+     "excess": 0.07
+    },
+    "2013": {
+     "n": 9,
+     "net": 1.66,
+     "excess": 2.3
+    },
+    "2014": {
+     "n": 9,
+     "net": -7,
+     "excess": -6.35
+    },
+    "2015": {
+     "n": 6,
+     "net": -3.07,
+     "excess": -2.91
+    },
+    "2016": {
+     "n": 10,
+     "net": -0.91,
+     "excess": -0.28
+    },
+    "2017": {
+     "n": 7,
+     "net": -4.1,
+     "excess": -4.06
+    },
+    "2018": {
+     "n": 7,
+     "net": 5.75,
+     "excess": 6.24
+    },
+    "2019": {
+     "n": 13,
+     "net": 0.4,
+     "excess": 0.66
+    },
+    "2020": {
+     "n": 7,
+     "net": 2.21,
+     "excess": 2.7
+    },
+    "2021": {
+     "n": 5,
+     "net": -1.27,
+     "excess": -1.31
+    },
+    "2022": {
+     "n": 6,
+     "net": 3.69,
+     "excess": 3.92
+    },
+    "2023": {
+     "n": 6,
+     "net": -0.13,
+     "excess": 0.1
+    },
+    "2024": {
+     "n": 9,
+     "net": -7.57,
+     "excess": -7.46
+    },
+    "2025": {
+     "n": 10,
+     "net": -0.27,
+     "excess": 0.11
+    },
+    "2026": {
+     "n": 6,
+     "net": 0.18,
+     "excess": 1.31
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": false,
+    "x2Positive": false,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "name": "26-week acceleration, excess over the same-side baseline",
+   "sig": "acc26",
+   "f": "excess",
+   "is": {
+    "trades": 44,
+    "longs": 21,
+    "months": 120,
+    "won": 0.5,
+    "stopped": 0.386,
+    "grossR": 0.389,
+    "netR": 0.331,
+    "excessR": 0.384,
+    "costR": 0.015,
+    "finR": 0.043,
+    "costShare": 0.148,
+    "medianStop": 40.68,
+    "monthGrossT": 1.78,
+    "month": 0.141,
+    "monthT": 1.76,
+    "total": 16.9,
+    "worstDD": -3.98
+   },
+   "oos": {
+    "trades": 61,
+    "longs": 28,
+    "months": 118,
+    "won": 0.361,
+    "stopped": 0.525,
+    "grossR": -0.062,
+    "netR": -0.135,
+    "excessR": -0.078,
+    "costR": 0.015,
+    "finR": 0.057,
+    "costShare": null,
+    "medianStop": 43.58,
+    "monthGrossT": -0.34,
+    "month": -0.04,
+    "monthT": -0.44,
+    "total": -4.77,
+    "worstDD": -9.65,
+    "x2": -0.043,
+    "x2T": -0.47
+   },
+   "legs": {
+    "is": {
+     "long": {
+      "trades": 21,
+      "grossR": 0.364,
+      "netR": 0.258,
+      "excessR": 0.242,
+      "monthT": 0.71,
+      "total": 5.08
+     },
+     "short": {
+      "trades": 23,
+      "grossR": 0.412,
+      "netR": 0.398,
+      "excessR": 0.514,
+      "monthT": 1.82,
+      "total": 11.82
+     }
+    },
+    "oos": {
+     "long": {
+      "trades": 28,
+      "grossR": 0.178,
+      "netR": 0.037,
+      "excessR": -0.15,
+      "monthT": -0.48,
+      "total": -4.21
+     },
+     "short": {
+      "trades": 33,
+      "grossR": -0.265,
+      "netR": -0.28,
+      "excessR": -0.017,
+      "monthT": -0.09,
+      "total": -0.56
+     }
+    }
+   },
+   "pOne": 0.67,
+   "sameMomentumShare": 0.914,
+   "placebo": {
+    "p5": -1.46,
+    "p50": -0.21,
+    "p95": 1.05,
+    "max": 1.23,
+    "below": 16
+   },
+   "years": {
+    "2007": {
+     "n": 1,
+     "net": -1.03,
+     "excess": -1.05
+    },
+    "2008": {
+     "n": 8,
+     "net": 6.42,
+     "excess": 6.94
+    },
+    "2009": {
+     "n": 4,
+     "net": -2.01,
+     "excess": -2.07
+    },
+    "2010": {
+     "n": 3,
+     "net": -1.26,
+     "excess": -1.04
+    },
+    "2011": {
+     "n": 1,
+     "net": 1.49,
+     "excess": 1.48
+    },
+    "2012": {
+     "n": 4,
+     "net": 0.61,
+     "excess": 0.94
+    },
+    "2013": {
+     "n": 7,
+     "net": 4.48,
+     "excess": 5.29
+    },
+    "2014": {
+     "n": 4,
+     "net": 2.31,
+     "excess": 2.38
+    },
+    "2015": {
+     "n": 3,
+     "net": -1.52,
+     "excess": -1.18
+    },
+    "2016": {
+     "n": 9,
+     "net": 5.1,
+     "excess": 5.21
+    },
+    "2017": {
+     "n": 10,
+     "net": -7.31,
+     "excess": -6.48
+    },
+    "2018": {
+     "n": 7,
+     "net": 0.16,
+     "excess": 2
+    },
+    "2019": {
+     "n": 8,
+     "net": 2.75,
+     "excess": 1.25
+    },
+    "2020": {
+     "n": 4,
+     "net": -4.07,
+     "excess": -3.92
+    },
+    "2021": {
+     "n": 6,
+     "net": -1.83,
+     "excess": -0.7
+    },
+    "2022": {
+     "n": 4,
+     "net": -0.08,
+     "excess": 0.98
+    },
+    "2023": {
+     "n": 9,
+     "net": -2.35,
+     "excess": -2.69
+    },
+    "2024": {
+     "n": 5,
+     "net": 2.64,
+     "excess": 2.15
+    },
+    "2025": {
+     "n": 1,
+     "net": 1.11,
+     "excess": 0.93
+    },
+    "2026": {
+     "n": 7,
+     "net": 0.78,
+     "excess": 1.72
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": true,
+    "x2Positive": false,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  }
+ ],
+ "base": {
+  "is": {
+   "long": {
+    "trades": 508,
+    "longs": 508,
+    "months": 120,
+    "won": 0.413,
+    "stopped": 0.484,
+    "grossR": 0.124,
+    "netR": 0.016,
+    "excessR": null,
+    "costR": 0.017,
+    "finR": 0.091,
+    "costShare": 0.868,
+    "medianStop": 37.54,
+    "monthGrossT": 1.29,
+    "month": 0.069,
+    "monthT": 0.17,
+    "total": 8.26,
+    "worstDD": -77.54
+   },
+   "short": {
+    "trades": 508,
+    "longs": 0,
+    "months": 120,
+    "won": 0.378,
+    "stopped": 0.53,
+    "grossR": -0.099,
+    "netR": -0.116,
+    "excessR": null,
+    "costR": 0.017,
+    "finR": 0,
+    "costShare": null,
+    "medianStop": 37.54,
+    "monthGrossT": -1.17,
+    "month": -0.49,
+    "monthT": -1.36,
+    "total": -58.78,
+    "worstDD": -108.04
+   }
+  },
+  "oos": {
+   "long": {
+    "trades": 513,
+    "longs": 513,
+    "months": 118,
+    "won": 0.47,
+    "stopped": 0.402,
+    "grossR": 0.32,
+    "netR": 0.187,
+    "excessR": null,
+    "costR": 0.014,
+    "finR": 0.118,
+    "costShare": 0.414,
+    "medianStop": 47.81,
+    "monthGrossT": 2.97,
+    "month": 0.815,
+    "monthT": 1.78,
+    "total": 96.18,
+    "worstDD": -31.82
+   },
+   "short": {
+    "trades": 512,
+    "longs": 0,
+    "months": 118,
+    "won": 0.344,
+    "stopped": 0.557,
+    "grossR": -0.249,
+    "netR": -0.263,
+    "excessR": null,
+    "costR": 0.014,
+    "finR": 0,
+    "costShare": null,
+    "medianStop": 47.78,
+    "monthGrossT": -3.24,
+    "month": -1.142,
+    "monthT": -3.42,
+    "total": -134.75,
+    "worstDD": -153.02
+   }
+  }
+ }
+}
