@@ -34,6 +34,7 @@ paper system with a measured, clearly negative record.
 | 268 | Gold three-timeframe EMA(20) alignment (H1, H4, D1 agree) | **FAIL, 0 of 3**: both sides −0.023R OOS (t −2.19); buys only +0.006R (t 0.38, tracks gold's rise); D1-turn exit −0.004R; ~9 h holds pay more in costs than the gross tilt | #1081 |
 | 269 | Replicate the gold Friday-long lead (#1078) | **FAIL on the second feed**: not a payroll effect (other Fridays t 2.44), holds on XAU/EUR (t 2.51), but HistData 2018-26 t 1.69 (OANDA same years 1.76: window, not feed). A lead only; forward check on the next 52 Fridays from 20 Nov | #1082 |
 | 270 | Commodity currencies (AUD, NZD, CAD, ZAR) as a lead for gold, dollar removed | **FAIL, 0 of 3**: OOS −0.101 / −0.063 / −0.057R a trade, negative before costs; placebo 10-17 of 40 | #1083 |
+| 271 | Gold 20-day trend agreeing in six currencies (USD, EUR, GBP, JPY, CHF, AUD) | **FAIL, 0 of 3**: both sides +0.034R OOS (t 0.52); sells only −0.149R (t −2.68); 60-day +0.209R (t 1.24) but 17.9R of 21.8R from 5 trades in 2025; USD gold alone does as well | #1084 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
