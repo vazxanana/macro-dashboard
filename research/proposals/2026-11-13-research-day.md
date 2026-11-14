@@ -72,6 +72,7 @@ paper system with a measured, clearly negative record.
 | 54 | Follow or fade the first 15 minutes after US CPI (gold, EUR/USD, USD/JPY, NAS100) | 81 events (2020 →) | 0 of 4; following loses (−0.20 / −0.25R an event, as on random days), fading is flat (+0.001R) | #871 |
 | 55 | The last hour into the US close after a big day: fade or follow (NAS100, SPX500, US30) | 2,664 (2016 →) | −0.077 / −0.065R a trade (month t −5.2 / −4.3); near zero before costs; every market loses in both windows | #872 |
 | 56 | The RSI(2) rule (#22), frozen, on gold and silver | 137 (2016 →) | −0.077R a trade (month t −1.8); loses before costs; random uptrend days do better; silver lost every year | #873 |
+| 57 | **Your market-cycle rule as an entry** on NAS100, SPX500, US30 (H4 bias, H1 pullback finished, trade with the H4) | 1,174 / 2,907 (2016 →) | −0.227 / −0.155R a trade (month t −4.3 / −5.6), negative before costs; random entries in the same H4 direction did better in 39 of 40 seeds: waiting for the pullback to finish makes it worse | #874 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
