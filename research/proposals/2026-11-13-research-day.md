@@ -93,6 +93,7 @@ paper system with a measured, clearly negative record.
 | 75 | Gotobi cost accounting (no rule tested) | break-even ~3.7 pips round trip on USD/JPY, t stays ≥ 2 up to ~1.95 pips (assumed 1.3); published all-day spreads (USD/JPY 0.08 pip) keep t 2.99, but nothing measured at 00:55 / 06:00 UTC: recording yen bid/ask at those minutes is the deciding step (needs the owner) | #893 |
 | 76 | Gotobi fade on an independent feed (HistData USD/JPY M1, frozen rule) | **FEED-ROBUST**: +0.127R (n 623, t 2.34) vs OANDA +0.143R (t 2.66) on 2018-26; per-trade correlation 0.997; still gone at 2x cost on both feeds | #894 |
 | 77 | IBS reversal: buy US500 / NAS100 / US30 at the close when it sits in the bottom 20 % of the day's range | FAIL, 0 of 4: pooled +0.020R (t 0.64) 2016-now; real before costs (+0.05 to +0.10R) but spread and financing take most; US500 strong 2005-15 (t 2.66), faded since | #895 |
+| 78 | Follow the first hour after ECB (EUR/USD) and BoJ (USD/JPY) decisions | FAIL, 0 of 2: ECB a near miss, +0.631R (n 71, t 1.51), positive 2010-17 and at 2x cost but 18 big time exits carry it; BoJ flat (+0.064R); pre-2025 dates from memory | #896 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
