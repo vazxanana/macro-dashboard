@@ -1,0 +1,878 @@
+{
+ "study": "gold-weekly-vol-breakout",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-weekly-vol-breakout/PREREGISTRATION.md",
+ "planSha256": "763944f5a6dcca227e3d867c881ac9f85afd991d9de34e46a19d21287cbc8178",
+ "claim": "a move of k × the previous week's range away from the week's open continues to Friday 20:55 UTC on spot gold (weekly volatility breakout)",
+ "rule": "O = open of the week's first M5 candle (Sunday reopen); prevRange = high − low of all the previous week's candles; buy stop O + k × prevRange and sell stop O − k × prevRange live to the Friday 20:55 UTC candle, first filled wins (a gap fills at the open; both in one candle: the level nearer its open); stop at O (fill and stop in one candle: the stop); out at the close of the Friday 20:55 candle; T1 k 0.5, T2 k 0.3, T3 k 0.5 buys only; weeks with fewer than 600 candles (or a previous week with fewer) skipped",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy, 2006-11-01 → 2026-11-13; 1046 complete weeks, last Monday 2026-11-09",
+ "dataEnd": "2026-11-09",
+ "cost": 0.6,
+ "finRate": 0.000148,
+ "windows": {
+  "IS": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "OOS": [
+   "2017-01-01",
+   "2026-11-09"
+  ]
+ },
+ "verdict": "FAIL, 0 of 3: gold week open ± 0.5 × prior week range breakout 2017 → now +0.054R a trade net (n 396, month t +0.92); 2007-16 +0.005R",
+ "decision": {
+  "T1": {
+   "p": 0.179,
+   "pHolm": 0.358,
+   "placeboBeaten": 34,
+   "checks": {
+    "netPos": true,
+    "t2": false,
+    "holm": false,
+    "isPos": true,
+    "cost2x": true,
+    "placebo": false,
+    "n30": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "p": 0.352,
+   "pHolm": 0.358,
+   "placeboBeaten": 37,
+   "checks": {
+    "netPos": true,
+    "t2": false,
+    "holm": false,
+    "isPos": true,
+    "cost2x": false,
+    "placebo": false,
+    "n30": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "p": 0.071,
+   "pHolm": 0.212,
+   "placeboBeaten": 0,
+   "checks": {
+    "netPos": true,
+    "t2": false,
+    "holm": false,
+    "isPos": true,
+    "cost2x": true,
+    "placebo": false,
+    "n30": true
+   },
+   "pass": false
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "k 0.5, both sides",
+   "k": 0.5,
+   "sides": "both",
+   "eligibleWeeks": 1037,
+   "skips": {
+    "nofill": 233
+   },
+   "IS": {
+    "n": 408,
+    "win": 0.458,
+    "netR": 0.005,
+    "grossR": 0.057,
+    "net2R": -0.047,
+    "costR": 0.052,
+    "finR": 0.017,
+    "total": 2.08,
+    "months": 120,
+    "t": 0.11,
+    "grossT": 1.2,
+    "t2x": -1,
+    "stops": 138,
+    "time": 270,
+    "maxDD": -19.81,
+    "medianStop": 18.41,
+    "buys": {
+     "n": 193,
+     "netR": 0.078
+    },
+    "sells": {
+     "n": 215,
+     "netR": -0.06
+    },
+    "byYear": {
+     "2007": {
+      "n": 41,
+      "netR": -0.005,
+      "total": -0.19
+     },
+     "2008": {
+      "n": 39,
+      "netR": 0.012,
+      "total": 0.46
+     },
+     "2009": {
+      "n": 41,
+      "netR": -0.158,
+      "total": -6.46
+     },
+     "2010": {
+      "n": 43,
+      "netR": -0.204,
+      "total": -8.76
+     },
+     "2011": {
+      "n": 42,
+      "netR": 0.118,
+      "total": 4.96
+     },
+     "2012": {
+      "n": 41,
+      "netR": 0.029,
+      "total": 1.17
+     },
+     "2013": {
+      "n": 39,
+      "netR": 0.185,
+      "total": 7.2
+     },
+     "2014": {
+      "n": 40,
+      "netR": 0.02,
+      "total": 0.81
+     },
+     "2015": {
+      "n": 40,
+      "netR": -0.042,
+      "total": -1.66
+     },
+     "2016": {
+      "n": 42,
+      "netR": 0.108,
+      "total": 4.54
+     }
+    }
+   },
+   "OOS": {
+    "n": 396,
+    "win": 0.432,
+    "netR": 0.054,
+    "grossR": 0.105,
+    "net2R": 0.003,
+    "costR": 0.051,
+    "finR": 0.021,
+    "total": 21.33,
+    "months": 119,
+    "t": 0.92,
+    "grossT": 1.8,
+    "t2x": 0.05,
+    "stops": 120,
+    "time": 276,
+    "maxDD": -22.5,
+    "medianStop": 22.05,
+    "buys": {
+     "n": 213,
+     "netR": 0.135
+    },
+    "sells": {
+     "n": 183,
+     "netR": -0.04
+    },
+    "byYear": {
+     "2017": {
+      "n": 46,
+      "netR": 0.134,
+      "total": 6.15
+     },
+     "2018": {
+      "n": 41,
+      "netR": -0.233,
+      "total": -9.56
+     },
+     "2019": {
+      "n": 39,
+      "netR": -0.13,
+      "total": -5.08
+     },
+     "2020": {
+      "n": 36,
+      "netR": 0.532,
+      "total": 19.14
+     },
+     "2021": {
+      "n": 34,
+      "netR": -0.154,
+      "total": -5.24
+     },
+     "2022": {
+      "n": 38,
+      "netR": -0.059,
+      "total": -2.25
+     },
+     "2023": {
+      "n": 39,
+      "netR": 0.097,
+      "total": 3.8
+     },
+     "2024": {
+      "n": 42,
+      "netR": -0.043,
+      "total": -1.79
+     },
+     "2025": {
+      "n": 43,
+      "netR": 0.308,
+      "total": 13.24
+     },
+     "2026": {
+      "n": 38,
+      "netR": 0.077,
+      "total": 2.94
+     }
+    }
+   }
+  },
+  "T2": {
+   "name": "k 0.3, both sides",
+   "k": 0.3,
+   "sides": "both",
+   "eligibleWeeks": 1037,
+   "skips": {
+    "nofill": 41
+   },
+   "IS": {
+    "n": 502,
+    "win": 0.369,
+    "netR": 0.069,
+    "grossR": 0.15,
+    "net2R": -0.013,
+    "costR": 0.081,
+    "finR": 0.026,
+    "total": 34.52,
+    "months": 120,
+    "t": 0.94,
+    "grossT": 2.03,
+    "t2x": -0.17,
+    "stops": 272,
+    "time": 230,
+    "maxDD": -22.94,
+    "medianStop": 12.01,
+    "buys": {
+     "n": 242,
+     "netR": 0.134
+    },
+    "sells": {
+     "n": 260,
+     "netR": 0.008
+    },
+    "byYear": {
+     "2007": {
+      "n": 52,
+      "netR": 0.125,
+      "total": 6.5
+     },
+     "2008": {
+      "n": 50,
+      "netR": 0.143,
+      "total": 7.16
+     },
+     "2009": {
+      "n": 52,
+      "netR": -0.177,
+      "total": -9.19
+     },
+     "2010": {
+      "n": 52,
+      "netR": -0.009,
+      "total": -0.47
+     },
+     "2011": {
+      "n": 49,
+      "netR": 0.232,
+      "total": 11.35
+     },
+     "2012": {
+      "n": 51,
+      "netR": -0.027,
+      "total": -1.36
+     },
+     "2013": {
+      "n": 48,
+      "netR": 0.41,
+      "total": 19.68
+     },
+     "2014": {
+      "n": 49,
+      "netR": -0.094,
+      "total": -4.62
+     },
+     "2015": {
+      "n": 51,
+      "netR": -0.191,
+      "total": -9.76
+     },
+     "2016": {
+      "n": 48,
+      "netR": 0.317,
+      "total": 15.22
+     }
+    }
+   },
+   "OOS": {
+    "n": 494,
+    "win": 0.344,
+    "netR": 0.032,
+    "grossR": 0.107,
+    "net2R": -0.043,
+    "costR": 0.075,
+    "finR": 0.029,
+    "total": 15.8,
+    "months": 119,
+    "t": 0.38,
+    "grossT": 1.27,
+    "t2x": -0.52,
+    "stops": 282,
+    "time": 212,
+    "maxDD": -41.3,
+    "medianStop": 14.57,
+    "buys": {
+     "n": 242,
+     "netR": 0.205
+    },
+    "sells": {
+     "n": 252,
+     "netR": -0.134
+    },
+    "byYear": {
+     "2017": {
+      "n": 52,
+      "netR": 0.278,
+      "total": 14.47
+     },
+     "2018": {
+      "n": 51,
+      "netR": -0.336,
+      "total": -17.15
+     },
+     "2019": {
+      "n": 47,
+      "netR": -0.252,
+      "total": -11.84
+     },
+     "2020": {
+      "n": 51,
+      "netR": 0.603,
+      "total": 30.74
+     },
+     "2021": {
+      "n": 47,
+      "netR": -0.283,
+      "total": -13.28
+     },
+     "2022": {
+      "n": 50,
+      "netR": -0.066,
+      "total": -3.32
+     },
+     "2023": {
+      "n": 50,
+      "netR": 0.076,
+      "total": 3.8
+     },
+     "2024": {
+      "n": 50,
+      "netR": -0.092,
+      "total": -4.59
+     },
+     "2025": {
+      "n": 52,
+      "netR": 0.366,
+      "total": 19.06
+     },
+     "2026": {
+      "n": 44,
+      "netR": -0.048,
+      "total": -2.1
+     }
+    }
+   }
+  },
+  "T3": {
+   "name": "k 0.5, buys only",
+   "k": 0.5,
+   "sides": "buy",
+   "eligibleWeeks": 1037,
+   "skips": {
+    "nofill": 586
+   },
+   "IS": {
+    "n": 220,
+    "win": 0.527,
+    "netR": 0.128,
+    "grossR": 0.2,
+    "net2R": 0.056,
+    "costR": 0.072,
+    "finR": 0.035,
+    "total": 28.18,
+    "months": 107,
+    "t": 1.96,
+    "grossT": 3.02,
+    "t2x": 0.87,
+    "stops": 61,
+    "time": 159,
+    "maxDD": -8.76,
+    "medianStop": 17.59,
+    "buys": {
+     "n": 220,
+     "netR": 0.128
+    },
+    "sells": {
+     "n": 0,
+     "netR": null
+    },
+    "byYear": {
+     "2007": {
+      "n": 25,
+      "netR": 0.188,
+      "total": 4.69
+     },
+     "2008": {
+      "n": 23,
+      "netR": 0.021,
+      "total": 0.49
+     },
+     "2009": {
+      "n": 21,
+      "netR": 0.259,
+      "total": 5.44
+     },
+     "2010": {
+      "n": 29,
+      "netR": 0.079,
+      "total": 2.29
+     },
+     "2011": {
+      "n": 20,
+      "netR": 0.448,
+      "total": 8.96
+     },
+     "2012": {
+      "n": 21,
+      "netR": 0.221,
+      "total": 4.63
+     },
+     "2013": {
+      "n": 17,
+      "netR": -0.293,
+      "total": -4.98
+     },
+     "2014": {
+      "n": 20,
+      "netR": 0.076,
+      "total": 1.52
+     },
+     "2015": {
+      "n": 16,
+      "netR": 0.125,
+      "total": 2
+     },
+     "2016": {
+      "n": 28,
+      "netR": 0.112,
+      "total": 3.14
+     }
+    }
+   },
+   "OOS": {
+    "n": 231,
+    "win": 0.463,
+    "netR": 0.111,
+    "grossR": 0.18,
+    "net2R": 0.042,
+    "costR": 0.069,
+    "finR": 0.038,
+    "total": 25.67,
+    "months": 108,
+    "t": 1.47,
+    "grossT": 2.37,
+    "t2x": 0.56,
+    "stops": 64,
+    "time": 167,
+    "maxDD": -15.37,
+    "medianStop": 21.08,
+    "buys": {
+     "n": 231,
+     "netR": 0.111
+    },
+    "sells": {
+     "n": 0,
+     "netR": null
+    },
+    "byYear": {
+     "2017": {
+      "n": 26,
+      "netR": 0.192,
+      "total": 4.99
+     },
+     "2018": {
+      "n": 21,
+      "netR": -0.226,
+      "total": -4.76
+     },
+     "2019": {
+      "n": 28,
+      "netR": -0.103,
+      "total": -2.88
+     },
+     "2020": {
+      "n": 22,
+      "netR": 0.511,
+      "total": 11.24
+     },
+     "2021": {
+      "n": 19,
+      "netR": -0.311,
+      "total": -5.92
+     },
+     "2022": {
+      "n": 23,
+      "netR": -0.237,
+      "total": -5.45
+     },
+     "2023": {
+      "n": 23,
+      "netR": 0.133,
+      "total": 3.05
+     },
+     "2024": {
+      "n": 25,
+      "netR": 0.207,
+      "total": 5.18
+     },
+     "2025": {
+      "n": 31,
+      "netR": 0.387,
+      "total": 11.98
+     },
+     "2026": {
+      "n": 13,
+      "netR": 0.633,
+      "total": 8.23
+     }
+    }
+   }
+  }
+ },
+ "comparison": {
+  "IS": {
+   "n": 522,
+   "win": 0.429,
+   "netR": -0.03,
+   "grossR": 0.039,
+   "net2R": -0.1,
+   "costR": 0.069,
+   "finR": 0.037,
+   "total": -15.8,
+   "months": 120,
+   "t": -0.56,
+   "grossT": 0.71,
+   "t2x": -1.87,
+   "stops": 230,
+   "time": 292,
+   "maxDD": -41.86,
+   "medianStop": 20.29,
+   "buys": {
+    "n": 522,
+    "netR": -0.03
+   },
+   "sells": {
+    "n": 0,
+    "netR": null
+   },
+   "byYear": {
+    "2007": {
+     "n": 53,
+     "netR": 0.177,
+     "total": 9.38
+    },
+    "2008": {
+     "n": 52,
+     "netR": -0.114,
+     "total": -5.94
+    },
+    "2009": {
+     "n": 52,
+     "netR": -0.038,
+     "total": -1.96
+    },
+    "2010": {
+     "n": 52,
+     "netR": 0.034,
+     "total": 1.79
+    },
+    "2011": {
+     "n": 52,
+     "netR": 0.094,
+     "total": 4.88
+    },
+    "2012": {
+     "n": 53,
+     "netR": -0.13,
+     "total": -6.89
+    },
+    "2013": {
+     "n": 52,
+     "netR": -0.217,
+     "total": -11.26
+    },
+    "2014": {
+     "n": 52,
+     "netR": -0.119,
+     "total": -6.17
+    },
+    "2015": {
+     "n": 52,
+     "netR": -0.177,
+     "total": -9.23
+    },
+    "2016": {
+     "n": 52,
+     "netR": 0.184,
+     "total": 9.59
+    }
+   }
+  },
+  "OOS": {
+   "n": 515,
+   "win": 0.468,
+   "netR": 0.084,
+   "grossR": 0.161,
+   "net2R": 0.007,
+   "costR": 0.077,
+   "finR": 0.05,
+   "total": 43.33,
+   "months": 119,
+   "t": 1.38,
+   "grossT": 2.62,
+   "t2x": 0.12,
+   "stops": 201,
+   "time": 314,
+   "maxDD": -21.59,
+   "medianStop": 24.46,
+   "buys": {
+    "n": 515,
+    "netR": 0.084
+   },
+   "sells": {
+    "n": 0,
+    "netR": null
+   },
+   "byYear": {
+    "2017": {
+     "n": 52,
+     "netR": 0.178,
+     "total": 9.26
+    },
+    "2018": {
+     "n": 53,
+     "netR": -0.225,
+     "total": -11.92
+    },
+    "2019": {
+     "n": 52,
+     "netR": 0.052,
+     "total": 2.71
+    },
+    "2020": {
+     "n": 52,
+     "netR": 0.383,
+     "total": 19.91
+    },
+    "2021": {
+     "n": 52,
+     "netR": -0.232,
+     "total": -12.07
+    },
+    "2022": {
+     "n": 52,
+     "netR": -0.108,
+     "total": -5.6
+    },
+    "2023": {
+     "n": 52,
+     "netR": 0.188,
+     "total": 9.78
+    },
+    "2024": {
+     "n": 53,
+     "netR": 0.138,
+     "total": 7.3
+    },
+    "2025": {
+     "n": 52,
+     "netR": 0.609,
+     "total": 31.67
+    },
+    "2026": {
+     "n": 45,
+     "netR": -0.171,
+     "total": -7.71
+    }
+   }
+  }
+ },
+ "placebo": {
+  "T1": {
+   "seeds": 40,
+   "entry": "random 5-minute mark, week start to Thursday 20:55 UTC",
+   "means": [
+    -0.063,
+    -0.073,
+    0.051,
+    0.096,
+    -0.005,
+    0.056,
+    -0.02,
+    0.04,
+    -0.076,
+    -0.024,
+    -0.049,
+    -0.023,
+    0.008,
+    -0.047,
+    -0.011,
+    -0.008,
+    0.075,
+    0.023,
+    -0.025,
+    0.047,
+    -0.022,
+    0.055,
+    0.118,
+    -0.021,
+    -0.014,
+    0.001,
+    -0.03,
+    -0.015,
+    -0.027,
+    -0.089,
+    0.083,
+    -0.031,
+    0.011,
+    -0.005,
+    -0.004,
+    0.003,
+    -0.036,
+    0.027,
+    -0.189,
+    -0.047
+   ],
+   "min": -0.189,
+   "max": 0.118,
+   "median": -0.012,
+   "p95": 0.084
+  },
+  "T2": {
+   "seeds": 40,
+   "entry": "random 5-minute mark, week start to Thursday 20:55 UTC",
+   "means": [
+    -0.029,
+    -0.059,
+    0.004,
+    0,
+    0.006,
+    -0.104,
+    -0.012,
+    -0.174,
+    0.003,
+    -0.054,
+    -0.138,
+    -0.026,
+    -0.082,
+    -0.004,
+    0.002,
+    -0.107,
+    -0.033,
+    -0.089,
+    -0.072,
+    0.037,
+    -0.043,
+    -0.001,
+    -0.014,
+    -0.098,
+    -0.092,
+    0.015,
+    -0.027,
+    0.006,
+    0.074,
+    -0.033,
+    0.019,
+    -0.144,
+    -0.031,
+    -0.023,
+    -0.082,
+    0.016,
+    -0.071,
+    0.003,
+    0.042,
+    -0.12
+   ],
+   "min": -0.174,
+   "max": 0.074,
+   "median": -0.028,
+   "p95": 0.037
+  },
+  "T3": {
+   "seeds": 40,
+   "entry": "random 5-minute mark, week start to Thursday 20:55 UTC",
+   "means": [
+    0.57,
+    0.556,
+    0.498,
+    0.362,
+    0.363,
+    0.439,
+    0.478,
+    0.445,
+    0.313,
+    0.471,
+    0.499,
+    0.456,
+    0.494,
+    0.515,
+    0.447,
+    0.37,
+    0.469,
+    0.419,
+    0.469,
+    0.533,
+    0.463,
+    0.504,
+    0.374,
+    0.508,
+    0.409,
+    0.492,
+    0.461,
+    0.512,
+    0.521,
+    0.446,
+    0.488,
+    0.522,
+    0.411,
+    0.494,
+    0.397,
+    0.468,
+    0.429,
+    0.446,
+    0.491,
+    0.438
+   ],
+   "min": 0.313,
+   "max": 0.57,
+   "median": 0.469,
+   "p95": 0.534
+  }
+ },
+ "reading": "The primary rule (T1) does not pass the pre-registered bar (failed: t2, holm, placebo). Out of sample: T1 +0.054R net (n 396, t +0.92; gross +0.105R, t +1.80; 2007-16 +0.005R, t +0.11; 34 of 40 placebos beaten; failed: t2, holm, placebo); T2 +0.032R net (n 494, t +0.38; gross +0.107R, t +1.27; 2007-16 +0.069R, t +0.94; 37 of 40 placebos beaten; failed: t2, holm, cost2x, placebo); T3 +0.111R net (n 231, t +1.47; gross +0.180R, t +2.37; 2007-16 +0.128R, t +1.96; 0 of 40 placebos beaten; failed: t2, holm, placebo). On weeks the median stop is $22.05 out of sample (18.41 in sample); costs and financing take 0.051R a trade on T1, of which financing 0.021R. The comparison (long every week from the open, same stop) made +0.084R a trade net out of sample (n 515, t +1.38) and −0.030R in sample. On T1 the buys made +0.135R a trade and the sells −0.040R out of sample, which is gold's rise more than the breakout. The placebo as pre-registered draws its entries from the weeks the test filled; for the buys-only T3 those are weeks in which price rose half a range above the open, so random buys earlier in the same week catch that rise (placebo median far above T3): a flaw of that placebo's design, said here and not repaired after the result; T3 fails on its t and Holm p in any case. Not an edge; nothing live changes and no proposal is written."
+}
