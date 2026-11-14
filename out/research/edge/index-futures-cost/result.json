@@ -1,0 +1,918 @@
+{
+ "study": "index-futures-cost",
+ "title": "The same index trades on CME micro futures (cost accounting)",
+ "built": "2026-11-14",
+ "verdictClass": "INCONCLUSIVE",
+ "system": "index-overnight, index-ibs and turn-of-month trades re-costed as MES / MNQ / MYM (not a council system)",
+ "sources": {
+  "overnight": "branch index-overnight (PR #891), research/edge/index-overnight/result.json",
+  "ibs": "branch index-ibs (PR #895), research/edge/index-ibs/result.json",
+  "tom": "branch turn-of-month (PR #826), research/edge/turn-of-month/result.json"
+ },
+ "model": {
+  "contracts": {
+   "spx500": {
+    "root": "MES",
+    "pv": 5,
+    "tick": 0.25,
+    "allIn": 1,
+    "div": "spx"
+   },
+   "nas100": {
+    "root": "MNQ",
+    "pv": 2,
+    "tick": 0.25,
+    "allIn": 1.37,
+    "div": "ndx"
+   },
+   "us30": {
+    "root": "MYM",
+    "pv": 0.5,
+    "tick": 1,
+    "allIn": 5.5,
+    "div": "dji"
+   }
+  },
+  "ticksSide": 1,
+  "commSide": 0.62,
+  "rate": "FRED DGS2 weekly as of the entry date (rates.json, from research/edge/gold-carry/rates.json); 3.85 % before 2006",
+  "divYield": "rates.json divYield, from memory, not verified"
+ },
+ "gates": {
+  "G1": "each study's unchanged run.mjs re-run in a temporary directory wrote a result.json byte-identical to its branch's (checked by hand when rows.json.gz was written: index-overnight, index-ibs, turn-of-month)",
+  "G2G3": "passed",
+  "failures": []
+ },
+ "studies": {
+  "overnight": {
+   "tests": {
+    "T1": {
+     "market": "US500 → MES",
+     "decisive": {
+      "n": 2721,
+      "gross": 0.023,
+      "cfdNet": -0.022,
+      "fut": 0.001,
+      "f2": -0.006,
+      "f3": -0.004,
+      "cfdDiv": -0.017,
+      "cfdSpread": 0.027,
+      "cfdFin": 0.017,
+      "tickR": 0.013,
+      "commR": 0.007,
+      "carryR": 0.002,
+      "rollR": 0,
+      "fut2x": -0.019,
+      "t_gross": 2.87,
+      "t_cfdNet": -2.86,
+      "t_fut": 0.08,
+      "t_f2": -0.79,
+      "t_f3": -0.54,
+      "t_cfdDiv": -2.23,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -59.49,
+       "fut": 1.58
+      },
+      "medStopPct": 1.166,
+      "meanDays": 1.17,
+      "placebo": {
+       "cfd": [
+        -0.032,
+        -0.018,
+        -0.009
+       ],
+       "fut": [
+        -0.023,
+        -0.009,
+        0
+       ]
+      }
+     },
+     "replication": {
+      "n": 2743,
+      "gross": 0.014,
+      "cfdNet": -0.025,
+      "fut": -0.029,
+      "f2": -0.044,
+      "f3": -0.035,
+      "cfdDiv": -0.02,
+      "cfdSpread": 0.025,
+      "cfdFin": 0.015,
+      "tickR": 0.029,
+      "commR": 0.015,
+      "carryR": 0,
+      "rollR": 0,
+      "fut2x": -0.073,
+      "t_gross": 2.29,
+      "t_cfdNet": -3.96,
+      "t_fut": -4.66,
+      "t_f2": -6.95,
+      "t_f3": -5.48,
+      "t_cfdDiv": -3.14,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -68.62,
+       "fut": -80.27
+      },
+      "medStopPct": 1.194,
+      "meanDays": 1.17,
+      "placebo": {
+       "cfd": [
+        -0.03,
+        -0.018,
+        -0.006
+       ],
+       "fut": [
+        -0.046,
+        -0.034,
+        -0.022
+       ]
+      }
+     }
+    },
+    "T2": {
+     "market": "NAS100 → MNQ",
+     "decisive": {
+      "n": 2721,
+      "gross": 0.026,
+      "cfdNet": -0.006,
+      "fut": 0.015,
+      "f2": 0.013,
+      "f3": 0.013,
+      "cfdDiv": -0.004,
+      "cfdSpread": 0.02,
+      "cfdFin": 0.013,
+      "tickR": 0.004,
+      "commR": 0.005,
+      "carryR": 0.003,
+      "rollR": 0,
+      "fut2x": 0.007,
+      "t_gross": 3.54,
+      "t_cfdNet": -0.84,
+      "t_fut": 2.02,
+      "t_f2": 1.78,
+      "t_f3": 1.8,
+      "t_cfdDiv": -0.6,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -16.36,
+       "fut": 40.44
+      },
+      "medStopPct": 1.594,
+      "meanDays": 1.17,
+      "placebo": {
+       "cfd": [
+        -0.023,
+        -0.008,
+        0
+       ],
+       "fut": [
+        -0.011,
+        0.004,
+        0.013
+       ]
+      }
+     },
+     "replication": {
+      "n": 2743,
+      "gross": 0.028,
+      "cfdNet": -0.004,
+      "fut": -0.008,
+      "f2": -0.015,
+      "f3": -0.01,
+      "cfdDiv": -0.002,
+      "cfdSpread": 0.02,
+      "cfdFin": 0.011,
+      "tickR": 0.015,
+      "commR": 0.019,
+      "carryR": 0.002,
+      "rollR": 0,
+      "fut2x": -0.041,
+      "t_gross": 4.65,
+      "t_cfdNet": -0.69,
+      "t_fut": -1.31,
+      "t_f2": -2.55,
+      "t_f3": -1.62,
+      "t_cfdDiv": -0.38,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -11.05,
+       "fut": -21.37
+      },
+      "medStopPct": 1.463,
+      "meanDays": 1.17,
+      "placebo": {
+       "cfd": [
+        -0.022,
+        -0.013,
+        0.004
+       ],
+       "fut": [
+        -0.034,
+        -0.025,
+        -0.008
+       ]
+      }
+     }
+    }
+   },
+   "pooled": {
+    "decisive": {
+     "months": 130,
+     "meanMonthFut": 0.323,
+     "tFut": 1.05,
+     "tCfd": -1.93
+    },
+    "replication": {
+     "months": 131,
+     "meanMonthFut": -0.776,
+     "tFut": -3.13,
+     "tCfd": -2.47
+    }
+   },
+   "conditions": {
+    "T1": {
+     "n": true,
+     "tDecisive": false,
+     "replication": false,
+     "holm": false,
+     "placebo": true,
+     "twiceCost": false,
+     "pass": false,
+     "core": false,
+     "holmP": 0.468
+    },
+    "T2": {
+     "n": true,
+     "tDecisive": true,
+     "replication": false,
+     "holm": true,
+     "placebo": true,
+     "twiceCost": true,
+     "pass": false,
+     "core": false,
+     "holmP": 0.043
+    }
+   },
+   "pooledOk": false,
+   "verdictOnFutures": "FAIL",
+   "published": "FAIL"
+  },
+  "ibs": {
+   "tests": {
+    "T1": {
+     "market": "SPX500 → MES",
+     "decisive": {
+      "n": 472,
+      "gross": 0.062,
+      "cfdNet": 0.013,
+      "fut": 0.042,
+      "f2": 0.036,
+      "f3": 0.036,
+      "cfdDiv": 0.019,
+      "cfdSpread": 0.033,
+      "cfdFin": 0.016,
+      "tickR": 0.012,
+      "commR": 0.006,
+      "carryR": 0.003,
+      "rollR": 0,
+      "fut2x": 0.024,
+      "t_gross": 1.72,
+      "t_cfdNet": 0.37,
+      "t_fut": 1.16,
+      "t_f2": 0.99,
+      "t_f3": 1.01,
+      "t_cfdDiv": 0.52,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 6.36,
+       "fut": 19.71
+      },
+      "medStopPct": 1.289,
+      "meanDays": 1.42,
+      "placebo": {
+       "cfd": [
+        33,
+        -0.073,
+        -0.013,
+        0.03
+       ],
+       "fut": [
+        33,
+        -0.042,
+        0.016,
+        0.059
+       ]
+      }
+     },
+     "replication": {
+      "n": 521,
+      "gross": 0.115,
+      "cfdNet": 0.071,
+      "fut": 0.073,
+      "f2": 0.06,
+      "f3": 0.068,
+      "cfdDiv": 0.077,
+      "cfdSpread": 0.03,
+      "cfdFin": 0.014,
+      "tickR": 0.027,
+      "commR": 0.014,
+      "carryR": 0.001,
+      "rollR": 0,
+      "fut2x": 0.032,
+      "t_gross": 4.31,
+      "t_cfdNet": 2.66,
+      "t_fut": 2.75,
+      "t_f2": 2.23,
+      "t_f3": 2.53,
+      "t_cfdDiv": 2.89,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 37.16,
+       "fut": 38.29
+      },
+      "medStopPct": 1.348,
+      "meanDays": 1.44
+     }
+    },
+    "T2": {
+     "market": "NAS100 → MNQ",
+     "decisive": {
+      "n": 473,
+      "gross": 0.096,
+      "cfdNet": 0.056,
+      "fut": 0.086,
+      "f2": 0.084,
+      "f3": 0.084,
+      "cfdDiv": 0.058,
+      "cfdSpread": 0.029,
+      "cfdFin": 0.012,
+      "tickR": 0.003,
+      "commR": 0.004,
+      "carryR": 0.004,
+      "rollR": 0,
+      "fut2x": 0.079,
+      "t_gross": 2.89,
+      "t_cfdNet": 1.65,
+      "t_fut": 2.56,
+      "t_f2": 2.51,
+      "t_f3": 2.5,
+      "t_cfdDiv": 1.7,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 26.37,
+       "fut": 40.47
+      },
+      "medStopPct": 1.87,
+      "meanDays": 1.47,
+      "placebo": {
+       "cfd": [
+        40,
+        -0.069,
+        -0.019,
+        0.043
+       ],
+       "fut": [
+        40,
+        -0.038,
+        0.012,
+        0.075
+       ]
+      }
+     },
+     "replication": {
+      "n": 513,
+      "gross": 0.051,
+      "cfdNet": 0.01,
+      "fut": 0.016,
+      "f2": 0.009,
+      "f3": 0.014,
+      "cfdDiv": 0.012,
+      "cfdSpread": 0.031,
+      "cfdFin": 0.011,
+      "tickR": 0.014,
+      "commR": 0.018,
+      "carryR": 0.003,
+      "rollR": 0,
+      "fut2x": -0.017,
+      "t_gross": 1.82,
+      "t_cfdNet": 0.34,
+      "t_fut": 0.56,
+      "t_f2": 0.3,
+      "t_f3": 0.49,
+      "t_cfdDiv": 0.4,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 4.97,
+       "fut": 8.13
+      },
+      "medStopPct": 1.604,
+      "meanDays": 1.46
+     }
+    },
+    "T3": {
+     "market": "US30 → MYM",
+     "decisive": {
+      "n": 469,
+      "gross": 0.049,
+      "cfdNet": -0.011,
+      "fut": 0.034,
+      "f2": 0.031,
+      "f3": 0.027,
+      "cfdDiv": -0.004,
+      "cfdSpread": 0.043,
+      "cfdFin": 0.017,
+      "tickR": 0.006,
+      "commR": 0.007,
+      "carryR": 0.002,
+      "rollR": 0,
+      "fut2x": 0.021,
+      "t_gross": 1.44,
+      "t_cfdNet": -0.31,
+      "t_fut": 1.01,
+      "t_f2": 0.92,
+      "t_f3": 0.81,
+      "t_cfdDiv": -0.12,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -5,
+       "fut": 15.94
+      },
+      "medStopPct": 1.212,
+      "meanDays": 1.44,
+      "placebo": {
+       "cfd": [
+        32,
+        -0.081,
+        -0.04,
+        0.013
+       ],
+       "fut": [
+        32,
+        -0.036,
+        0.005,
+        0.057
+       ]
+      }
+     },
+     "replication": {
+      "n": 514,
+      "gross": 0.094,
+      "cfdNet": 0.041,
+      "fut": 0.066,
+      "f2": 0.06,
+      "f3": 0.059,
+      "cfdDiv": 0.048,
+      "cfdSpread": 0.04,
+      "cfdFin": 0.014,
+      "tickR": 0.013,
+      "commR": 0.016,
+      "carryR": -0.001,
+      "rollR": 0,
+      "fut2x": 0.037,
+      "t_gross": 3.39,
+      "t_cfdNet": 1.46,
+      "t_fut": 2.38,
+      "t_f2": 2.14,
+      "t_f3": 2.12,
+      "t_cfdDiv": 1.71,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 20.89,
+       "fut": 34.04
+      },
+      "medStopPct": 1.268,
+      "meanDays": 1.4
+     }
+    },
+    "P": {
+     "market": "pooled",
+     "decisive": {
+      "n": 1414,
+      "gross": 0.069,
+      "cfdNet": 0.02,
+      "fut": 0.054,
+      "f2": 0.05,
+      "f3": 0.049,
+      "cfdDiv": 0.024,
+      "cfdSpread": 0.035,
+      "cfdFin": 0.015,
+      "tickR": 0.007,
+      "commR": 0.006,
+      "carryR": 0.003,
+      "rollR": 0,
+      "fut2x": 0.041,
+      "t_gross": 2.3,
+      "t_cfdNet": 0.64,
+      "t_fut": 1.78,
+      "t_f2": 1.67,
+      "t_f3": 1.63,
+      "t_cfdDiv": 0.8,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 27.73,
+       "fut": 76.12
+      },
+      "medStopPct": 1.439,
+      "meanDays": 1.44,
+      "placebo": {
+       "cfd": [
+        40,
+        -0.055,
+        -0.029,
+        0.011
+       ],
+       "fut": [
+        39,
+        -0.019,
+        0.006,
+        0.047
+       ]
+      }
+     },
+     "replication": {
+      "n": 1548,
+      "gross": 0.087,
+      "cfdNet": 0.041,
+      "fut": 0.052,
+      "f2": 0.043,
+      "f3": 0.047,
+      "cfdDiv": 0.046,
+      "cfdSpread": 0.033,
+      "cfdFin": 0.013,
+      "tickR": 0.018,
+      "commR": 0.016,
+      "carryR": 0.001,
+      "rollR": 0,
+      "fut2x": 0.018,
+      "t_gross": 3.52,
+      "t_cfdNet": 1.63,
+      "t_fut": 2.09,
+      "t_f2": 1.71,
+      "t_f3": 1.89,
+      "t_cfdDiv": 1.83,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 63.03,
+       "fut": 80.45
+      },
+      "medStopPct": 1.425,
+      "meanDays": 1.43
+     }
+    }
+   },
+   "conditions": {
+    "T1": {
+     "holmP": 0.247,
+     "checks": {
+      "a": true,
+      "b": true,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "pass": false
+    },
+    "T2": {
+     "holmP": 0.016,
+     "checks": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "pass": true
+    },
+    "T3": {
+     "holmP": 0.247,
+     "checks": {
+      "a": true,
+      "b": true,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "pass": false
+    },
+    "P": {
+     "checks": {
+      "b": true,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "pass": false
+    }
+   },
+   "verdictOnFutures": "PASS",
+   "published": "FAIL"
+  },
+  "tom": {
+   "tests": {
+    "spx500": {
+     "market": "SPX500 → MES",
+     "is": {
+      "n": 93,
+      "gross": -0.021,
+      "cfdNet": -0.113,
+      "fut": -0.055,
+      "f2": -0.074,
+      "f3": -0.088,
+      "cfdDiv": -0.079,
+      "cfdSpread": 0.04,
+      "cfdFin": 0.052,
+      "tickR": 0.037,
+      "commR": 0.018,
+      "carryR": -0.022,
+      "rollR": 0,
+      "fut2x": -0.11,
+      "t_gross": -0.08,
+      "t_cfdNet": -0.42,
+      "t_fut": -0.2,
+      "t_f2": -0.27,
+      "t_f3": -0.33,
+      "t_cfdDiv": -0.3,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -10.48,
+       "fut": -5.1
+      },
+      "medStopPct": 2.882,
+      "meanDays": 5.85,
+      "tt_gross": -0.08,
+      "tt_cfdNet": -0.42,
+      "tt_fut": -0.2,
+      "tt_f2": -0.27,
+      "tt_f3": -0.33,
+      "tt_cfdDiv": -0.3
+     },
+     "oos": {
+      "n": 129,
+      "gross": 0.102,
+      "cfdNet": -0.015,
+      "fut": 0.068,
+      "f2": 0.061,
+      "f3": 0.042,
+      "cfdDiv": 0.01,
+      "cfdSpread": 0.04,
+      "cfdFin": 0.077,
+      "tickR": 0.014,
+      "commR": 0.007,
+      "carryR": 0.013,
+      "rollR": 0,
+      "fut2x": 0.047,
+      "t_gross": 0.63,
+      "t_cfdNet": -0.1,
+      "t_fut": 0.42,
+      "t_f2": 0.37,
+      "t_f3": 0.26,
+      "t_cfdDiv": 0.06,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -1.98,
+       "fut": 8.73
+      },
+      "medStopPct": 2.334,
+      "meanDays": 5.66,
+      "tt_gross": 0.63,
+      "tt_cfdNet": -0.1,
+      "tt_fut": 0.42,
+      "tt_f2": 0.37,
+      "tt_f3": 0.26,
+      "tt_cfdDiv": 0.06,
+      "placebo": {
+       "cfd": [
+        15,
+        0.033
+       ],
+       "fut": [
+        15,
+        0.112
+       ]
+      },
+      "days": {
+       "diff": 0.006,
+       "t": 0.11
+      }
+     }
+    },
+    "us30": {
+     "market": "US30 → MYM",
+     "is": {
+      "n": 93,
+      "gross": -0.091,
+      "cfdNet": -0.193,
+      "fut": -0.099,
+      "f2": -0.107,
+      "f3": -0.139,
+      "cfdDiv": -0.153,
+      "cfdSpread": 0.05,
+      "cfdFin": 0.052,
+      "tickR": 0.016,
+      "commR": 0.02,
+      "carryR": -0.028,
+      "rollR": 0,
+      "fut2x": -0.135,
+      "t_gross": -0.38,
+      "t_cfdNet": -0.81,
+      "t_fut": -0.42,
+      "t_f2": -0.45,
+      "t_f3": -0.58,
+      "t_cfdDiv": -0.64,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -17.91,
+       "fut": -9.19
+      },
+      "medStopPct": 2.603,
+      "meanDays": 5.86,
+      "tt_gross": -0.38,
+      "tt_cfdNet": -0.81,
+      "tt_fut": -0.42,
+      "tt_f2": -0.45,
+      "tt_f3": -0.58,
+      "tt_cfdDiv": -0.64
+     },
+     "oos": {
+      "n": 129,
+      "gross": 0.107,
+      "cfdNet": -0.022,
+      "fut": 0.084,
+      "f2": 0.08,
+      "f3": 0.052,
+      "cfdDiv": 0.01,
+      "cfdSpread": 0.05,
+      "cfdFin": 0.079,
+      "tickR": 0.007,
+      "commR": 0.008,
+      "carryR": 0.008,
+      "rollR": 0,
+      "fut2x": 0.068,
+      "t_gross": 0.7,
+      "t_cfdNet": -0.14,
+      "t_fut": 0.55,
+      "t_f2": 0.53,
+      "t_f3": 0.34,
+      "t_cfdDiv": 0.06,
+      "rolls": 0,
+      "total": {
+       "cfdNet": -2.81,
+       "fut": 10.78
+      },
+      "medStopPct": 2.354,
+      "meanDays": 5.73,
+      "tt_gross": 0.7,
+      "tt_cfdNet": -0.14,
+      "tt_fut": 0.55,
+      "tt_f2": 0.53,
+      "tt_f3": 0.34,
+      "tt_cfdDiv": 0.06,
+      "placebo": {
+       "cfd": [
+        17,
+        -0.014
+       ],
+       "fut": [
+        17,
+        0.088
+       ]
+      },
+      "days": {
+       "diff": 0.009,
+       "t": 0.17
+      }
+     }
+    },
+    "nas100": {
+     "market": "NAS100 → MNQ",
+     "is": {
+      "n": 93,
+      "gross": 0.245,
+      "cfdNet": 0.143,
+      "fut": 0.2,
+      "f2": 0.189,
+      "f3": 0.185,
+      "cfdDiv": 0.158,
+      "cfdSpread": 0.05,
+      "cfdFin": 0.052,
+      "tickR": 0.022,
+      "commR": 0.027,
+      "carryR": -0.003,
+      "rollR": 0,
+      "fut2x": 0.152,
+      "t_gross": 0.92,
+      "t_cfdNet": 0.53,
+      "t_fut": 0.75,
+      "t_f2": 0.71,
+      "t_f3": 0.69,
+      "t_cfdDiv": 0.59,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 13.3,
+       "fut": 18.61
+      },
+      "medStopPct": 3.272,
+      "meanDays": 5.87,
+      "tt_gross": 0.92,
+      "tt_cfdNet": 0.53,
+      "tt_fut": 0.75,
+      "tt_f2": 0.71,
+      "tt_f3": 0.69,
+      "tt_cfdDiv": 0.59
+     },
+     "oos": {
+      "n": 129,
+      "gross": 0.389,
+      "cfdNet": 0.26,
+      "fut": 0.35,
+      "f2": 0.348,
+      "f3": 0.338,
+      "cfdDiv": 0.272,
+      "cfdSpread": 0.05,
+      "cfdFin": 0.079,
+      "tickR": 0.005,
+      "commR": 0.006,
+      "carryR": 0.027,
+      "rollR": 0,
+      "fut2x": 0.339,
+      "t_gross": 1.86,
+      "t_cfdNet": 1.24,
+      "t_fut": 1.68,
+      "t_f2": 1.67,
+      "t_f3": 1.62,
+      "t_cfdDiv": 1.3,
+      "rolls": 0,
+      "total": {
+       "cfdNet": 33.49,
+       "fut": 45.21
+      },
+      "medStopPct": 3.124,
+      "meanDays": 5.8,
+      "tt_gross": 1.86,
+      "tt_cfdNet": 1.24,
+      "tt_fut": 1.68,
+      "tt_f2": 1.67,
+      "tt_f3": 1.62,
+      "tt_cfdDiv": 1.3,
+      "placebo": {
+       "cfd": [
+        34,
+        0.101
+       ],
+       "fut": [
+        34,
+        0.188
+       ]
+      },
+      "days": {
+       "diff": 0.011,
+       "t": 0.17
+      }
+     }
+    }
+   },
+   "conditions": {
+    "spx500": {
+     "t1": false,
+     "t2": false,
+     "t3": false,
+     "holmP": 0.582,
+     "pass": false
+    },
+    "us30": {
+     "t1": false,
+     "t2": false,
+     "t3": false,
+     "holmP": 0.582,
+     "pass": false
+    },
+    "nas100": {
+     "t1": false,
+     "t2": false,
+     "t3": false,
+     "holmP": 0.14,
+     "pass": false
+    }
+   },
+   "verdictOnFutures": "FAIL",
+   "published": "FAIL"
+  }
+ },
+ "verdict": "INCONCLUSIVE (cost accounting, no rule tested; no study's verdict changes): on CME micro futures the same trades net index-overnight US500 +0.001R / NAS100 +0.015R a trade (CFD −0.022 / −0.006), index-ibs SPX500 +0.042 / NAS100 +0.086 / US30 +0.034R (CFD +0.013 / +0.056 / −0.011), turn-of-month SPX500 +0.068 % / NAS100 +0.350 % (CFD −0.015 / +0.260), 2016 on; under each study's own bar with futures costs: index-overnight FAIL, index-ibs PASS, turn-of-month FAIL.",
+ "reading": [
+  "- **Where the CFD money went, and what futures keep of it.** On the decisive windows the CFD route paid 0.044R (US500 overnight), 0.033R (NAS100 overnight) and 0.041-0.060R (IBS) a trade in spread and financing; the same trades on micros pay 0.011-0.022R in ticks, commission and carry. Overnight financing is the line that disappears: the futures carry is (r − q), and the dividend offsets most of the rate, so it costs 0.002-0.004R a one-night trade. The ticks and the commission are fixed in points, so they are cheap at 2016-26 index levels and dear at 2005-15 levels (US500 overnight 0.044R on futures against 0.040R on the CFD in 2005-15).",
+  "- **Against each study's own bar, with futures costs in place of CFD costs**: index-overnight still FAILS (NAS100 meets every condition on 2016-26, +0.015R, t 2.02, Holm p 0.043, but loses on 2005-15, −0.008R; US500 +0.001R, t 0.08); turn-of-month still FAILS (no market reaches t 2: SPX500 +0.068 %, t 0.42; NAS100 +0.350 %, t 1.68; its T3, turn days against the rest, is before costs and fails whatever the cost); **index-ibs T2 (NAS100) meets all five of its conditions**: +0.086R a trade on 2016-now (n 473, month-sum t 2.56, Holm p 0.016), 2005-15 +0.016R (t 0.56), above 40 of 40 placebo seeds. The all-in sensitivity F2 gives +0.084R, t 2.51; q = 0 gives +0.084R. SPX500, US30 and the pooled test still fall short of t 2.",
+  "- **That is not a new verdict and not an edge.** It is a different instrument chosen after the CFD result was seen, on the same 2005-26 history the rule was judged on, with three studies and nine tests looked at here; the NAS100 IBS long never replicated on 2005-15 on any cost basis (gross +0.051R, t 1.82; futures t 0.56); micros did not exist before May 2019 (from June 2019 on, post hoc: +0.073R, t 2.08, n 347); and one MNQ at these stops risked a median of about $1,090 in 2026, so 0.25 % a trade needs an account of about $435,000. index-ibs's own pre-registration said a PASS would at most go to the owner as a forward paper shadow, never a live rule; the most this result can support is that question, put with its own pre-registration and judged only on a forward record. No proposal is written here.",
+  "- **The CFD figures were also a little harsher than the CFD itself**: they leave out the dividend a CFD long is credited, worth 0.002-0.007R a one- or two-night trade and 0.01-0.03 % of price a turn-of-month hold. With it the CFD nets move up a little (column \"CFD + div\") and futures are still ahead on every decisive window."
+ ],
+ "limits": [
+  "- **Micro index futures started trading in May 2019.** Every figure before that assumes the micro tick and fee schedule anyway (a hypothetical instrument). The E-minis (ES, NQ, YM) existed with the same tick in points and ten times the dollars a point, so a tenth of the commission in points, but one E-mini risks ten times a micro (about $4,000-11,000 at these stops in 2026).",
+  "- **Whole contracts are ignored**: every trade is 1R, as in the studies. In 2026 one MES at these stops risked about $320-590 (median $430-470), one MNQ $740-1,430 (median $1,000-1,090), one MYM $280-420 (10th to 90th percentile of the trades): at 0.25 % a trade that is an account of $110,000 (MYM) to $435,000 (MNQ). A smaller account cannot hold these trades on micros at the studies' risk.",
+  "- **The price path is the OANDA CFD mid**, taken as the cash index; a future trades the same points plus a basis. The 16:00 and 09:30 prices of a future are not the cash index's and the futures spread outside the cash session is wider than one tick (the overnight leg enters at 16:00 and exits at 09:30, both inside or at the edge of the cash session). Slippage beyond one tick a side is in F2 only.",
+  "- **r is a 2-year Treasury yield**, not the 3-month rate a front future discounts; q is a yearly approximation from memory. The carry is a few thousandths of an R for one-day holds, so neither moves a figure here by more than about 0.005R.",
+  "- **Commission $0.62 a side** is the repository's figure; brokers charge from about $0.25 to over $1 a side a micro, plus exchange and regulatory fees.",
+  "- Nothing here touches a stop: every trade keeps the stop its study gave it. Paper only; nothing live changed and no proposal is written."
+ ]
+}
