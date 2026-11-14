@@ -243,6 +243,7 @@ paper system with a measured, clearly negative record.
 | 225 | Pre-payrolls gold long, replicated on 2006-21 (the #1033 near miss) | **FAIL**: −0.024R a trade net (n 156, month t −0.97, 14 of 40 placebos); pooled 2006-26 +0.002R (t 0.08). The 2022-26 near miss was the best of three tests in a strong gold market: lead closed | #1038 |
 | 226 | Gold and the dollar rising on the same day | FAIL, 0 of 3: buy-and-hold-3-days +0.120R OOS (n 92, month t 1.23, 34 of 40 placebos; positive in both windows and at 2x costs, but ~10 trades a year cannot be told from luck) | #1039 |
 | 227 | Daily floor pivots on gold (P, R1, S1) | FAIL, 0 of 3: fade R1/S1 −0.151R OOS (t −3.83), break −0.050R, P bounce −0.081R; real levels beat no more random shifted levels than chance (same as `pivot-points` on ten other markets) | #1040 |
+| 228 | Measured move / ABCD targets on gold H4 | FAIL, 0 of 3: target D −0.043R OOS (n 231, month t −0.97); D reached on 67.1 % of trades vs 66.7 % for random sides (small planned reward:risk), so the pattern adds no direction | #1041 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
