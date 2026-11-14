@@ -1,0 +1,3036 @@
+{
+ "built": "2026-11-14",
+ "source": "research/proposals/2026-11-13-research-day.md on branch research-day-13nov; each study read from origin/<branch>",
+ "rows": [
+  {
+   "row": 1,
+   "pr": 815,
+   "branch": "cycle-gate-study",
+   "topic": "cycle-gate",
+   "role": "family",
+   "window": "2020 → now",
+   "what": "Welch t kept vs blocked, 11 systems x 3 gates (Holm over 33)",
+   "verdict": "FAIL, 0 of 11 systems: the cycle gate (G2) does not improve any system's trades measurably on 2020 → now",
+   "tests": [
+    {
+     "test": "gtrend G2",
+     "kind": "t",
+     "t": -0.169,
+     "p": null,
+     "n": 40,
+     "path": "tests.0.welch.t"
+    },
+    {
+     "test": "gtrend G1",
+     "kind": null,
+     "t": null,
+     "p": null,
+     "n": 48,
+     "path": "tests.1.welch.t",
+     "why": "no t or p stored for this test (not computed: too few blocked trades)"
+    },
+    {
+     "test": "gtrend G3",
+     "kind": "t",
+     "t": 0.564,
+     "p": null,
+     "n": 12,
+     "path": "tests.2.welch.t"
+    },
+    {
+     "test": "geg G2",
+     "kind": "t",
+     "t": 0.986,
+     "p": null,
+     "n": 72,
+     "path": "tests.3.welch.t"
+    },
+    {
+     "test": "geg G1",
+     "kind": "t",
+     "t": 1.895,
+     "p": null,
+     "n": 106,
+     "path": "tests.4.welch.t"
+    },
+    {
+     "test": "geg G3",
+     "kind": "t",
+     "t": 0.04,
+     "p": null,
+     "n": 49,
+     "path": "tests.5.welch.t"
+    },
+    {
+     "test": "gtrend5 G2",
+     "kind": "t",
+     "t": 0.356,
+     "p": null,
+     "n": 66,
+     "path": "tests.6.welch.t"
+    },
+    {
+     "test": "gtrend5 G1",
+     "kind": null,
+     "t": null,
+     "p": null,
+     "n": 77,
+     "path": "tests.7.welch.t",
+     "why": "no t or p stored for this test (not computed: too few blocked trades)"
+    },
+    {
+     "test": "gtrend5 G3",
+     "kind": "t",
+     "t": -0.833,
+     "p": null,
+     "n": 18,
+     "path": "tests.8.welch.t"
+    },
+    {
+     "test": "gtl G2",
+     "kind": "t",
+     "t": -0.924,
+     "p": null,
+     "n": 137,
+     "path": "tests.9.welch.t"
+    },
+    {
+     "test": "gtl G1",
+     "kind": "t",
+     "t": -1.065,
+     "p": null,
+     "n": 140,
+     "path": "tests.10.welch.t"
+    },
+    {
+     "test": "gtl G3",
+     "kind": "t",
+     "t": -1.947,
+     "p": null,
+     "n": 50,
+     "path": "tests.11.welch.t"
+    },
+    {
+     "test": "gmp G2",
+     "kind": "t",
+     "t": -0.611,
+     "p": null,
+     "n": 482,
+     "path": "tests.12.welch.t"
+    },
+    {
+     "test": "gmp G1",
+     "kind": "t",
+     "t": -0.612,
+     "p": null,
+     "n": 536,
+     "path": "tests.13.welch.t"
+    },
+    {
+     "test": "gmp G3",
+     "kind": "t",
+     "t": -0.964,
+     "p": null,
+     "n": 318,
+     "path": "tests.14.welch.t"
+    },
+    {
+     "test": "replica G2",
+     "kind": "t",
+     "t": -0.132,
+     "p": null,
+     "n": 68,
+     "path": "tests.15.welch.t"
+    },
+    {
+     "test": "replica G1",
+     "kind": "t",
+     "t": -1.592,
+     "p": null,
+     "n": 89,
+     "path": "tests.16.welch.t"
+    },
+    {
+     "test": "replica G3",
+     "kind": "t",
+     "t": 1.13,
+     "p": null,
+     "n": 39,
+     "path": "tests.17.welch.t"
+    },
+    {
+     "test": "mosha-bo G2",
+     "kind": "t",
+     "t": 0.635,
+     "p": null,
+     "n": 37,
+     "path": "tests.18.welch.t"
+    },
+    {
+     "test": "mosha-bo G1",
+     "kind": "t",
+     "t": 0.492,
+     "p": null,
+     "n": 45,
+     "path": "tests.19.welch.t"
+    },
+    {
+     "test": "mosha-bo G3",
+     "kind": "t",
+     "t": -1.326,
+     "p": null,
+     "n": 23,
+     "path": "tests.20.welch.t"
+    },
+    {
+     "test": "scalp G2",
+     "kind": "t",
+     "t": 0.209,
+     "p": null,
+     "n": 29581,
+     "path": "tests.21.welch.t"
+    },
+    {
+     "test": "scalp G1",
+     "kind": "t",
+     "t": 0.226,
+     "p": null,
+     "n": 34006,
+     "path": "tests.22.welch.t"
+    },
+    {
+     "test": "scalp G3",
+     "kind": "t",
+     "t": -1.355,
+     "p": null,
+     "n": 14525,
+     "path": "tests.23.welch.t"
+    },
+    {
+     "test": "intraday G2",
+     "kind": "t",
+     "t": -1.089,
+     "p": null,
+     "n": 7276,
+     "path": "tests.24.welch.t"
+    },
+    {
+     "test": "intraday G1",
+     "kind": "t",
+     "t": -1.499,
+     "p": null,
+     "n": 9409,
+     "path": "tests.25.welch.t"
+    },
+    {
+     "test": "intraday G3",
+     "kind": "t",
+     "t": 0.659,
+     "p": null,
+     "n": 4608,
+     "path": "tests.26.welch.t"
+    },
+    {
+     "test": "rscalp G2",
+     "kind": "t",
+     "t": 0.2,
+     "p": null,
+     "n": 5875,
+     "path": "tests.27.welch.t"
+    },
+    {
+     "test": "rscalp G1",
+     "kind": "t",
+     "t": 0.456,
+     "p": null,
+     "n": 9712,
+     "path": "tests.28.welch.t"
+    },
+    {
+     "test": "rscalp G3",
+     "kind": "t",
+     "t": 0.433,
+     "p": null,
+     "n": 5515,
+     "path": "tests.29.welch.t"
+    },
+    {
+     "test": "rintra G2",
+     "kind": "t",
+     "t": 0.882,
+     "p": null,
+     "n": 758,
+     "path": "tests.30.welch.t"
+    },
+    {
+     "test": "rintra G1",
+     "kind": "t",
+     "t": -0.3,
+     "p": null,
+     "n": 1071,
+     "path": "tests.31.welch.t"
+    },
+    {
+     "test": "rintra G3",
+     "kind": "t",
+     "t": 0.956,
+     "p": null,
+     "n": 669,
+     "path": "tests.32.welch.t"
+    }
+   ]
+  },
+  {
+   "row": 2,
+   "pr": 816,
+   "branch": "drd-metals-book",
+   "topic": "drd-metals-book",
+   "role": "family",
+   "window": "A (2006-26), monthly sums",
+   "what": "monthly t of stream A, T1-T3 (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": 0.67,
+     "p": null,
+     "n": 486,
+     "path": "streams.T1.monthlyA.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": 1.47,
+     "p": null,
+     "n": 236,
+     "path": "streams.T2.monthlyA.t"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": 1.09,
+     "p": null,
+     "n": 244,
+     "path": "streams.T3.monthlyA.t"
+    }
+   ]
+  },
+  {
+   "row": 3,
+   "pr": 817,
+   "branch": "ict-quarters",
+   "topic": "ict-quarters",
+   "role": "family",
+   "window": "out of sample 2024 →",
+   "what": "Welch t favoured quarter vs the rest, out of sample (Holm over 3)",
+   "verdict": "FAIL. None of the 3 pre-registered tests passes (T2 month: out-of-sample difference above zero, far from the bar); the A",
+   "tests": [
+    {
+     "test": "T1 week",
+     "kind": "t",
+     "t": -0.01,
+     "p": null,
+     "n": 152,
+     "path": "candidates.0.vsRest.oos.t"
+    },
+    {
+     "test": "T2 month",
+     "kind": "t",
+     "t": 0.49,
+     "p": null,
+     "n": 143,
+     "path": "candidates.1.vsRest.oos.t"
+    },
+    {
+     "test": "T3 year",
+     "kind": "t",
+     "t": -0.64,
+     "p": null,
+     "n": 182,
+     "path": "candidates.2.vsRest.oos.t"
+    }
+   ]
+  },
+  {
+   "row": "finding",
+   "pr": 818,
+   "branch": "mcycle-base-study",
+   "topic": "mcycle-base",
+   "role": "family",
+   "window": "2020 → now",
+   "what": "month-sum t of the combined live stream (one test)",
+   "verdict": "FAIL: the live Mosha cycle rule, run as the Trader runs it, made −0.574R a trade after costs over 115 trades on spot gol",
+   "tests": [
+    {
+     "test": "combined",
+     "kind": "t",
+     "t": -3.99,
+     "p": null,
+     "n": 115,
+     "path": "legs.combined.all.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 4,
+   "pr": 819,
+   "branch": "mosha-bo-er",
+   "topic": "mosha-bo-er",
+   "role": "family",
+   "window": "2020 → now",
+   "what": "Welch t on positions (Holm over A, B)",
+   "verdict": "A (Daily ER20 >= 0.2): FAIL (halves, t, monthT, n, placebo, holm); B (market on the confirmation close): FAIL (halves, t",
+   "tests": [
+    {
+     "test": "A ER20 filter",
+     "kind": "t",
+     "t": 1.268,
+     "p": null,
+     "n": 7,
+     "path": "A.welchTrades.t"
+    },
+    {
+     "test": "B market entry",
+     "kind": "t",
+     "t": -0.087,
+     "p": null,
+     "n": 41,
+     "path": "B.welchTrades.t"
+    }
+   ]
+  },
+  {
+   "row": 5,
+   "pr": 820,
+   "branch": "tl-third-touch",
+   "topic": "tl-third-touch",
+   "role": "family",
+   "window": "2020-26",
+   "what": "T1 month-sum t, T2 Welch t vs control (Holm over 2)",
+   "verdict": "FAIL: trendline -0.441R a trade net 2020-26 (n 42, month t -2.87; 2020-23 -0.258R n 25, 2024-26 -0.709R n 17); control -",
+   "tests": [
+    {
+     "test": "T1 trendline",
+     "kind": "t",
+     "t": -2.87,
+     "p": null,
+     "n": 42,
+     "path": "tests.T1.t"
+    },
+    {
+     "test": "T2 vs control",
+     "kind": "t",
+     "t": -1.59,
+     "p": null,
+     "n": 42,
+     "path": "tests.T2.welch"
+    }
+   ]
+  },
+  {
+   "row": 6,
+   "pr": 821,
+   "branch": "shadow-best-raw",
+   "topic": "shadow-best-raw",
+   "role": "family",
+   "window": "out of sample 2024-26 (measured costs, 1x)",
+   "what": "OOS month-sum t of 32 cells (Holm over 32)",
+   "verdict": "FAIL, 0 of 32 cells at the measured costs (0 of 32 at 2x): the cut was not decided on wrong costs",
+   "tests": [
+    {
+     "test": "scalp xau",
+     "kind": "t",
+     "t": -0.692,
+     "p": null,
+     "n": 3310,
+     "path": "cells.0.OOS.t"
+    },
+    {
+     "test": "intraday xau",
+     "kind": "t",
+     "t": -0.07,
+     "p": null,
+     "n": 725,
+     "path": "cells.1.OOS.t"
+    },
+    {
+     "test": "rscalp xau",
+     "kind": "t",
+     "t": -5.099,
+     "p": null,
+     "n": 1832,
+     "path": "cells.2.OOS.t"
+    },
+    {
+     "test": "rintra xau",
+     "kind": "t",
+     "t": 0.486,
+     "p": null,
+     "n": 424,
+     "path": "cells.3.OOS.t"
+    },
+    {
+     "test": "scalp eurusd",
+     "kind": "t",
+     "t": -5.61,
+     "p": null,
+     "n": 3499,
+     "path": "cells.4.OOS.t"
+    },
+    {
+     "test": "intraday eurusd",
+     "kind": "t",
+     "t": -1.529,
+     "p": null,
+     "n": 757,
+     "path": "cells.5.OOS.t"
+    },
+    {
+     "test": "rscalp eurusd",
+     "kind": "t",
+     "t": -6.301,
+     "p": null,
+     "n": 1797,
+     "path": "cells.6.OOS.t"
+    },
+    {
+     "test": "rintra eurusd",
+     "kind": "t",
+     "t": -1.809,
+     "p": null,
+     "n": 418,
+     "path": "cells.7.OOS.t"
+    },
+    {
+     "test": "scalp gbpusd",
+     "kind": "t",
+     "t": -5.685,
+     "p": null,
+     "n": 3643,
+     "path": "cells.8.OOS.t"
+    },
+    {
+     "test": "intraday gbpusd",
+     "kind": "t",
+     "t": -1.578,
+     "p": null,
+     "n": 837,
+     "path": "cells.9.OOS.t"
+    },
+    {
+     "test": "rscalp gbpusd",
+     "kind": "t",
+     "t": -3.522,
+     "p": null,
+     "n": 1991,
+     "path": "cells.10.OOS.t"
+    },
+    {
+     "test": "rintra gbpusd",
+     "kind": "t",
+     "t": -0.711,
+     "p": null,
+     "n": 446,
+     "path": "cells.11.OOS.t"
+    },
+    {
+     "test": "scalp audusd",
+     "kind": "t",
+     "t": -4.54,
+     "p": null,
+     "n": 4096,
+     "path": "cells.12.OOS.t"
+    },
+    {
+     "test": "intraday audusd",
+     "kind": "t",
+     "t": -0.691,
+     "p": null,
+     "n": 850,
+     "path": "cells.13.OOS.t"
+    },
+    {
+     "test": "rscalp audusd",
+     "kind": "t",
+     "t": -6.401,
+     "p": null,
+     "n": 1973,
+     "path": "cells.14.OOS.t"
+    },
+    {
+     "test": "rintra audusd",
+     "kind": "t",
+     "t": -2.407,
+     "p": null,
+     "n": 449,
+     "path": "cells.15.OOS.t"
+    },
+    {
+     "test": "scalp usdcad",
+     "kind": "t",
+     "t": -7.028,
+     "p": null,
+     "n": 3943,
+     "path": "cells.16.OOS.t"
+    },
+    {
+     "test": "intraday usdcad",
+     "kind": "t",
+     "t": -1.394,
+     "p": null,
+     "n": 870,
+     "path": "cells.17.OOS.t"
+    },
+    {
+     "test": "rscalp usdcad",
+     "kind": "t",
+     "t": -5.269,
+     "p": null,
+     "n": 1967,
+     "path": "cells.18.OOS.t"
+    },
+    {
+     "test": "rintra usdcad",
+     "kind": "t",
+     "t": -2.128,
+     "p": null,
+     "n": 470,
+     "path": "cells.19.OOS.t"
+    },
+    {
+     "test": "scalp usdchf",
+     "kind": "t",
+     "t": -5.93,
+     "p": null,
+     "n": 3732,
+     "path": "cells.20.OOS.t"
+    },
+    {
+     "test": "intraday usdchf",
+     "kind": "t",
+     "t": -0.992,
+     "p": null,
+     "n": 860,
+     "path": "cells.21.OOS.t"
+    },
+    {
+     "test": "rscalp usdchf",
+     "kind": "t",
+     "t": -5.115,
+     "p": null,
+     "n": 1898,
+     "path": "cells.22.OOS.t"
+    },
+    {
+     "test": "rintra usdchf",
+     "kind": "t",
+     "t": -2.734,
+     "p": null,
+     "n": 424,
+     "path": "cells.23.OOS.t"
+    },
+    {
+     "test": "intraday btc",
+     "kind": "t",
+     "t": -1.676,
+     "p": null,
+     "n": 884,
+     "path": "cells.24.OOS.t"
+    },
+    {
+     "test": "rintra btc",
+     "kind": "t",
+     "t": -3.626,
+     "p": null,
+     "n": 524,
+     "path": "cells.25.OOS.t"
+    },
+    {
+     "test": "intraday eth",
+     "kind": "t",
+     "t": -0.489,
+     "p": null,
+     "n": 751,
+     "path": "cells.26.OOS.t"
+    },
+    {
+     "test": "rintra eth",
+     "kind": "t",
+     "t": -1.437,
+     "p": null,
+     "n": 445,
+     "path": "cells.27.OOS.t"
+    },
+    {
+     "test": "intraday sol",
+     "kind": "t",
+     "t": -2.097,
+     "p": null,
+     "n": 885,
+     "path": "cells.28.OOS.t"
+    },
+    {
+     "test": "rintra sol",
+     "kind": "t",
+     "t": -2.634,
+     "p": null,
+     "n": 515,
+     "path": "cells.29.OOS.t"
+    },
+    {
+     "test": "intraday xrp",
+     "kind": "t",
+     "t": -1.023,
+     "p": null,
+     "n": 630,
+     "path": "cells.30.OOS.t"
+    },
+    {
+     "test": "rintra xrp",
+     "kind": "t",
+     "t": -0.583,
+     "p": null,
+     "n": 421,
+     "path": "cells.31.OOS.t"
+    }
+   ]
+  },
+  {
+   "row": 7,
+   "pr": 822,
+   "branch": "engulf-ladder",
+   "topic": "engulf-ladder",
+   "role": "family",
+   "window": "2020-26",
+   "what": "T1 month t; T2, T3 Welch t (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1 ladder",
+     "kind": "t",
+     "t": -0.59,
+     "p": null,
+     "n": 140,
+     "path": "T1.month.t"
+    },
+    {
+     "test": "T2 sideways vs momentum",
+     "kind": "t",
+     "t": 0.55,
+     "p": null,
+     "n": 69,
+     "path": "T2.t"
+    },
+    {
+     "test": "T3 50% vs edge",
+     "kind": "t",
+     "t": 0.45,
+     "p": null,
+     "n": 140,
+     "path": "T3.t"
+    }
+   ]
+  },
+  {
+   "row": 8,
+   "pr": 823,
+   "branch": "gold-tsmom",
+   "topic": "gold-tsmom",
+   "role": "family",
+   "window": "confirmation (monthly)",
+   "what": "t of monthly returns, two variants (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "long/short",
+     "kind": "t",
+     "t": 0.84,
+     "p": null,
+     "n": 129,
+     "path": "variants.ls.conf.t"
+    },
+    {
+     "test": "long/flat",
+     "kind": "t",
+     "t": 1.03,
+     "p": null,
+     "n": 129,
+     "path": "variants.lf.conf.t"
+    }
+   ]
+  },
+  {
+   "row": 9,
+   "pr": 824,
+   "branch": "ict-book-risk",
+   "topic": "ict-book-risk",
+   "role": "family",
+   "window": "out of sample",
+   "what": "bootstrap P(better), four book rules (Holm over 4); p = 1 - P",
+   "verdict": "FAIL. None of the 4 pre-registered book rules passes; the A-setup book stays sized as it is",
+   "tests": [
+    {
+     "test": "R1",
+     "kind": "p",
+     "t": null,
+     "p": 0.6699999999999999,
+     "n": 516,
+     "path": "1 - candidates.0.bootstrap.pBetter"
+    },
+    {
+     "test": "R2",
+     "kind": "p",
+     "t": null,
+     "p": 0.37749999999999995,
+     "n": 658,
+     "path": "1 - candidates.1.bootstrap.pBetter"
+    },
+    {
+     "test": "R3",
+     "kind": "p",
+     "t": null,
+     "p": 0.487,
+     "n": 583,
+     "path": "1 - candidates.2.bootstrap.pBetter"
+    },
+    {
+     "test": "R4",
+     "kind": "p",
+     "t": null,
+     "p": 0.5885,
+     "n": 679,
+     "path": "1 - candidates.3.bootstrap.pBetter"
+    }
+   ]
+  },
+  {
+   "row": 10,
+   "pr": 825,
+   "branch": "swing-day3",
+   "topic": "swing-day3",
+   "role": "family",
+   "window": "2020 →",
+   "what": "stored one-sided p of T1-T3 (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -0.01,
+     "p": null,
+     "n": 262,
+     "path": "T1.monthly.t"
+    },
+    {
+     "test": "T2",
+     "kind": "p",
+     "t": null,
+     "p": 0.4902,
+     "n": null,
+     "path": "tests.T2.p"
+    },
+    {
+     "test": "T3",
+     "kind": "p",
+     "t": null,
+     "p": 0.7642,
+     "n": null,
+     "path": "tests.T3.p"
+    }
+   ]
+  },
+  {
+   "row": 11,
+   "pr": 826,
+   "branch": "turn-of-month",
+   "topic": "turn-of-month",
+   "role": "family",
+   "window": "out of sample (decisive)",
+   "what": "out-of-sample t per market (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "spx500",
+     "kind": "t",
+     "t": -0.1,
+     "p": null,
+     "n": 129,
+     "path": "markets.spx500.oos.t"
+    },
+    {
+     "test": "us30",
+     "kind": "t",
+     "t": -0.14,
+     "p": null,
+     "n": 129,
+     "path": "markets.us30.oos.t"
+    },
+    {
+     "test": "nas100",
+     "kind": "t",
+     "t": 1.24,
+     "p": null,
+     "n": 129,
+     "path": "markets.nas100.oos.t"
+    }
+   ]
+  },
+  {
+   "row": 12,
+   "pr": 827,
+   "branch": "vix-term",
+   "topic": "vix-term",
+   "role": "excluded",
+   "why": "not run (Cboe not reachable)",
+   "tests": []
+  },
+  {
+   "row": 13,
+   "pr": 828,
+   "branch": "tsmom-portfolio",
+   "topic": "tsmom-portfolio",
+   "role": "family",
+   "window": "confirmation 2008-17 (monthly)",
+   "what": "monthly t of the book (one test)",
+   "verdict": "{\"pass\":false,\"c1\":false,\"c2\":false,\"c3\":false}",
+   "tests": [
+    {
+     "test": "book",
+     "kind": "t",
+     "t": -0.82,
+     "p": null,
+     "n": 120,
+     "path": "confirmation.t"
+    }
+   ]
+  },
+  {
+   "row": 14,
+   "pr": 829,
+   "branch": "gold-silver-ratio",
+   "topic": "gold-silver-ratio",
+   "role": "family",
+   "window": "confirmation 2006-17",
+   "what": "t of trades (one test)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "ratio fade",
+     "kind": "t",
+     "t": -1.2,
+     "p": null,
+     "n": 18,
+     "path": "windows.2006-17.tStrict"
+    }
+   ]
+  },
+  {
+   "row": 16,
+   "pr": 830,
+   "branch": "fx-carry",
+   "topic": "fx-carry",
+   "role": "family",
+   "window": "decisive (revision 2)",
+   "what": "monthly t, two tests (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": 0.34,
+     "p": null,
+     "n": null,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -0.05,
+     "p": null,
+     "n": null,
+     "path": "tests.T2.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 15,
+   "pr": 831,
+   "branch": "pre-fomc-drift",
+   "topic": "pre-fomc-drift",
+   "role": "family",
+   "window": "B 2016 → (SPX500 decides)",
+   "what": "SPX500 t in window B (one test; NAS100 and gold descriptive)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "spx500",
+     "kind": "t",
+     "t": 1.35,
+     "p": null,
+     "n": 86,
+     "path": "markets.spx500.windows.B.t"
+    }
+   ]
+  },
+  {
+   "row": 17,
+   "pr": 833,
+   "branch": "crypto-weekly-mom",
+   "topic": "crypto-weekly-mom",
+   "role": "family",
+   "window": "decisive 2022 →",
+   "what": "month t, two variants (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "V1 long/flat",
+     "kind": "t",
+     "t": 0.77,
+     "p": null,
+     "n": null,
+     "path": "variants.V1.decisive.monthT"
+    },
+    {
+     "test": "V2 long/short",
+     "kind": "t",
+     "t": 0.51,
+     "p": null,
+     "n": null,
+     "path": "variants.V2.decisive.monthT"
+    }
+   ]
+  },
+  {
+   "row": 18,
+   "pr": 834,
+   "branch": "fx-reversal",
+   "topic": "fx-reversal",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month-sum t (one test)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "reversal",
+     "kind": "t",
+     "t": -1.598,
+     "p": null,
+     "n": 566,
+     "path": "decisive.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 19,
+   "pr": 835,
+   "branch": "intraday-momentum",
+   "topic": "intraday-momentum",
+   "role": "family",
+   "window": "B (decisive)",
+   "what": "t per market (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "spx500",
+     "kind": "t",
+     "t": -9.0907,
+     "p": null,
+     "n": 2672,
+     "path": "markets.spx500.B.t"
+    },
+    {
+     "test": "nas100",
+     "kind": "t",
+     "t": -5.4521,
+     "p": null,
+     "n": 2682,
+     "path": "markets.nas100.B.t"
+    }
+   ]
+  },
+  {
+   "row": 20,
+   "pr": 836,
+   "branch": "overnight-drift",
+   "topic": "overnight-drift",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t per index (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "spx500",
+     "kind": "t",
+     "t": -1.39,
+     "p": null,
+     "n": 2722,
+     "path": "markets.spx500.dec.night.t"
+    },
+    {
+     "test": "nas100",
+     "kind": "t",
+     "t": 0.2,
+     "p": null,
+     "n": 2722,
+     "path": "markets.nas100.dec.night.t"
+    },
+    {
+     "test": "us30",
+     "kind": "t",
+     "t": -1.44,
+     "p": null,
+     "n": 2722,
+     "path": "markets.us30.dec.night.t"
+    }
+   ]
+  },
+  {
+   "row": 21,
+   "pr": 837,
+   "branch": "orb-nas100",
+   "topic": "orb-nas100",
+   "role": "family",
+   "window": "B 2021 →",
+   "what": "monthly t per market (Holm over 2)",
+   "verdict": "FAIL: 0 of 2 markets pass in 2021 → now; NAS100 +0.075R a trade net (n 1460, monthly t +1.27, gross +0.135R), SPX500 −0.",
+   "tests": [
+    {
+     "test": "nas100",
+     "kind": "t",
+     "t": 1.27,
+     "p": null,
+     "n": 1460,
+     "path": "markets.nas100.windows.B.t"
+    },
+    {
+     "test": "spx500",
+     "kind": "t",
+     "t": -0.79,
+     "p": null,
+     "n": 1456,
+     "path": "markets.spx500.windows.B.t"
+    }
+   ]
+  },
+  {
+   "row": 22,
+   "pr": 838,
+   "branch": "rsi2-pullback",
+   "topic": "rsi2-pullback",
+   "role": "family",
+   "window": "B 2016 →",
+   "what": "stored one-sided p of the trade t per market (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "spx500",
+     "kind": "p",
+     "t": null,
+     "p": 0.0217,
+     "n": 99,
+     "path": "markets.spx500.B.p"
+    },
+    {
+     "test": "nas100",
+     "kind": "p",
+     "t": null,
+     "p": 0.1073,
+     "n": 99,
+     "path": "markets.nas100.B.p"
+    },
+    {
+     "test": "us30",
+     "kind": "p",
+     "t": null,
+     "p": 0.0301,
+     "n": 102,
+     "path": "markets.us30.B.p"
+    }
+   ]
+  },
+  {
+   "row": 23,
+   "pr": 839,
+   "branch": "vol-managed",
+   "topic": "vol-managed",
+   "role": "family",
+   "window": "2016-01 → 2026-10",
+   "what": "bootstrap P of the Sharpe difference, two variants (Holm over 2); p = 1 - P",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "V c/variance",
+     "kind": "p",
+     "t": null,
+     "p": 0.7150000000000001,
+     "n": null,
+     "path": "RESULT.md: bootstrap P 0.285"
+    },
+    {
+     "test": "S c/volatility",
+     "kind": "p",
+     "t": null,
+     "p": 0.652,
+     "n": null,
+     "path": "RESULT.md: bootstrap P 0.348"
+    }
+   ]
+  },
+  {
+   "row": 24,
+   "pr": 840,
+   "branch": "audnzd-revert",
+   "topic": "audnzd-revert",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t, three variants (Holm over 3)",
+   "verdict": "FAIL, 0 of 3 variants: the AUD/NZD z-score fade is not an edge after costs",
+   "tests": [
+    {
+     "test": "variant 1",
+     "kind": "t",
+     "t": -1.72,
+     "p": null,
+     "n": 160,
+     "path": "variants.0.dec.monthT"
+    },
+    {
+     "test": "variant 2",
+     "kind": "t",
+     "t": 0.43,
+     "p": null,
+     "n": 48,
+     "path": "variants.1.dec.monthT"
+    },
+    {
+     "test": "variant 3",
+     "kind": "t",
+     "t": -1.03,
+     "p": null,
+     "n": 122,
+     "path": "variants.2.dec.monthT"
+    }
+   ]
+  },
+  {
+   "row": 25,
+   "pr": 841,
+   "branch": "sma10-timing",
+   "topic": "sma10-timing",
+   "role": "family",
+   "window": "2016 → (decisive)",
+   "what": "bootstrap P(better return / drawdown) of the book (one test); p = 1 - P",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "book",
+     "kind": "p",
+     "t": null,
+     "p": 0.862,
+     "n": null,
+     "path": "1 - windows.W2.book.boot.pBetter"
+    }
+   ]
+  },
+  {
+   "row": 26,
+   "pr": 842,
+   "branch": "crypto-hour",
+   "topic": "crypto-hour",
+   "role": "family",
+   "window": "decisive 2024 →",
+   "what": "month t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "test 1",
+     "kind": "t",
+     "t": -7.24,
+     "p": null,
+     "n": 1035,
+     "path": "tests.0.monthT"
+    },
+    {
+     "test": "test 2",
+     "kind": "t",
+     "t": -4.98,
+     "p": null,
+     "n": 1035,
+     "path": "tests.1.monthT"
+    },
+    {
+     "test": "test 3",
+     "kind": "t",
+     "t": -1.2,
+     "p": null,
+     "n": 1035,
+     "path": "tests.2.monthT"
+    },
+    {
+     "test": "test 4",
+     "kind": "t",
+     "t": -0.5,
+     "p": null,
+     "n": 1035,
+     "path": "tests.3.monthT"
+    }
+   ]
+  },
+  {
+   "row": 27,
+   "pr": 843,
+   "branch": "gold-week-raid",
+   "topic": "gold-week-raid",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t, three rules (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "R1",
+     "kind": "t",
+     "t": -0.09,
+     "p": null,
+     "n": 233,
+     "path": "rules.R1.dec.tMonth"
+    },
+    {
+     "test": "R2",
+     "kind": "t",
+     "t": 0.64,
+     "p": null,
+     "n": 190,
+     "path": "rules.R2.dec.tMonth"
+    },
+    {
+     "test": "R3",
+     "kind": "t",
+     "t": 0.76,
+     "p": null,
+     "n": 235,
+     "path": "rules.R3.dec.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 28,
+   "pr": 844,
+   "branch": "rsi2-replicate",
+   "topic": "rsi2-replicate",
+   "role": "replication",
+   "of": 838,
+   "window": "B 2016 →",
+   "what": "pooled month t (frozen rule, six non-US indices)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "pooled",
+     "kind": "t",
+     "t": 0.85,
+     "p": null,
+     "n": 521,
+     "path": "pool.B.tMonthsR"
+    }
+   ]
+  },
+  {
+   "row": 29,
+   "pr": 845,
+   "branch": "pre-holiday",
+   "topic": "pre-holiday",
+   "role": "family",
+   "window": "out of sample (decisive)",
+   "what": "T1 pooled t; T4 pre-holiday vs ordinary days (Welch t)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1 pooled",
+     "kind": "t",
+     "t": 1.02,
+     "p": null,
+     "n": 99,
+     "path": "pooled.oos.t"
+    },
+    {
+     "test": "T4 vs ordinary days",
+     "kind": "t",
+     "t": 1.03,
+     "p": null,
+     "n": null,
+     "path": "daysOOS.t"
+    }
+   ]
+  },
+  {
+   "row": 30,
+   "pr": 846,
+   "branch": "fx-month-end",
+   "topic": "fx-month-end",
+   "role": "family",
+   "window": "decisive",
+   "what": "t on events, base and variant (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "base",
+     "kind": "t",
+     "t": -1.059,
+     "p": null,
+     "n": 130,
+     "path": "base.decisive.t"
+    },
+    {
+     "test": "variant",
+     "kind": "t",
+     "t": 0.13,
+     "p": null,
+     "n": 72,
+     "path": "variant.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 31,
+   "pr": 848,
+   "branch": "gold-asia-break",
+   "topic": "gold-asia-break",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "month t, breakout and fade (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "breakout",
+     "kind": "t",
+     "t": 0.526,
+     "p": null,
+     "n": 1169,
+     "path": "rules.B.decisive.tMonth"
+    },
+    {
+     "test": "fade",
+     "kind": "t",
+     "t": -0.136,
+     "p": null,
+     "n": 484,
+     "path": "rules.F.decisive.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 32,
+   "pr": 849,
+   "branch": "gap-fill",
+   "topic": "gap-fill",
+   "role": "family",
+   "window": "B 2021 →",
+   "what": "monthly t, four tests (Holm over 4)",
+   "verdict": "FAIL: 0 of 4 tests pass in 2021 → now; NAS100 fade of every gap −0.059R a trade net (n 852, monthly t −1.84, gross −0.01",
+   "tests": [
+    {
+     "test": "nas100 all",
+     "kind": "t",
+     "t": -1.84,
+     "p": null,
+     "n": 852,
+     "path": "markets.nas100.tests.all.windows.B.t"
+    },
+    {
+     "test": "nas100 against",
+     "kind": "t",
+     "t": -0.94,
+     "p": null,
+     "n": 431,
+     "path": "markets.nas100.tests.against.windows.B.t"
+    },
+    {
+     "test": "spx500 all",
+     "kind": "t",
+     "t": -4.37,
+     "p": null,
+     "n": 913,
+     "path": "markets.spx500.tests.all.windows.B.t"
+    },
+    {
+     "test": "spx500 against",
+     "kind": "t",
+     "t": -3.7,
+     "p": null,
+     "n": 472,
+     "path": "markets.spx500.tests.against.windows.B.t"
+    }
+   ]
+  },
+  {
+   "row": 33,
+   "pr": 850,
+   "branch": "gold-shock-revert",
+   "topic": "gold-shock-revert",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "trade t, revert and continue on gold (Holm over 2; silver reported)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "revert",
+     "kind": "t",
+     "t": 0.14,
+     "p": null,
+     "n": 27,
+     "path": "gold.rules.R.decisive.t"
+    },
+    {
+     "test": "continue",
+     "kind": "t",
+     "t": 0.16,
+     "p": null,
+     "n": 28,
+     "path": "gold.rules.C.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 34,
+   "pr": 851,
+   "branch": "sell-in-may",
+   "topic": "sell-in-may",
+   "role": "family",
+   "window": "decisive pairs 2016-26",
+   "what": "pooled winter-minus-summer t (one test)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "pooled",
+     "kind": "t",
+     "t": 0.3233,
+     "p": null,
+     "n": 11,
+     "path": "pooled.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 35,
+   "pr": 852,
+   "branch": "crypto-weekend",
+   "topic": "crypto-weekend",
+   "role": "family",
+   "window": "decisive 2024 →",
+   "what": "month t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "test 1",
+     "kind": "t",
+     "t": 0,
+     "p": null,
+     "n": 147,
+     "path": "tests.0.monthT"
+    },
+    {
+     "test": "test 2",
+     "kind": "t",
+     "t": 0.61,
+     "p": null,
+     "n": 147,
+     "path": "tests.1.monthT"
+    },
+    {
+     "test": "test 3",
+     "kind": "t",
+     "t": -0.57,
+     "p": null,
+     "n": 148,
+     "path": "tests.2.monthT"
+    },
+    {
+     "test": "test 4",
+     "kind": "t",
+     "t": -1.09,
+     "p": null,
+     "n": 148,
+     "path": "tests.3.monthT"
+    }
+   ]
+  },
+  {
+   "row": 36,
+   "pr": 853,
+   "branch": "high52-rotation",
+   "topic": "high52-rotation",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "Newey-West t of monthly excess (one test)",
+   "verdict": "{\"pass\":false,\"c1\":false,\"c2\":false,\"c3\":true,\"c4\":false}",
+   "tests": [
+    {
+     "test": "excess",
+     "kind": "t",
+     "t": 0.36,
+     "p": null,
+     "n": 130,
+     "path": "decisive.excess.t"
+    }
+   ]
+  },
+  {
+   "row": 37,
+   "pr": 854,
+   "branch": "copper-gold",
+   "topic": "copper-gold",
+   "role": "family",
+   "window": "W2 2016 →",
+   "what": "Welch t on-minus-off weeks (one test)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "equal weight",
+     "kind": "t",
+     "t": -0.9186,
+     "p": null,
+     "n": 565,
+     "path": "signal.W2.ew.t"
+    }
+   ]
+  },
+  {
+   "row": 38,
+   "pr": 855,
+   "branch": "dual-momentum",
+   "topic": "dual-momentum",
+   "role": "family",
+   "window": "W2 2016 →",
+   "what": "bootstrap P, two lookbacks (Holm at 0.10); p = 1 - P (stored as holm.p)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "L12",
+     "kind": "p",
+     "t": null,
+     "p": 0.8875,
+     "n": null,
+     "path": "pass.L12.holm.p"
+    },
+    {
+     "test": "L6",
+     "kind": "p",
+     "t": null,
+     "p": 0.905,
+     "n": null,
+     "path": "pass.L6.holm.p"
+    }
+   ]
+  },
+  {
+   "row": 39,
+   "pr": 856,
+   "branch": "crypto-sma200",
+   "topic": "crypto-sma200",
+   "role": "family",
+   "window": "decisive 2022 →",
+   "what": "bootstrap P, four tests (Holm over 4); p = 1 - P",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "btc-sma200",
+     "kind": "p",
+     "t": null,
+     "p": 0.06799999999999995,
+     "n": null,
+     "path": "tests.0.p"
+    },
+    {
+     "test": "btc-sma100",
+     "kind": "p",
+     "t": null,
+     "p": 0.16049999999999998,
+     "n": null,
+     "path": "tests.1.p"
+    },
+    {
+     "test": "eth-sma200",
+     "kind": "p",
+     "t": null,
+     "p": 0.14300000000000002,
+     "n": null,
+     "path": "tests.2.p"
+    },
+    {
+     "test": "eth-sma100",
+     "kind": "p",
+     "t": null,
+     "p": 0.27849999999999997,
+     "n": null,
+     "path": "tests.3.p"
+    }
+   ]
+  },
+  {
+   "row": 40,
+   "pr": 857,
+   "branch": "turnaround-tuesday",
+   "topic": "turnaround-tuesday",
+   "role": "family",
+   "window": "out of sample 2016 →",
+   "what": "trade t per cell (Holm over 4)",
+   "verdict": "PASS",
+   "tests": [
+    {
+     "test": "spx500-r1",
+     "kind": "t",
+     "t": 0.54,
+     "p": null,
+     "n": 237,
+     "path": "cells.spx500-r1.oos.t"
+    },
+    {
+     "test": "spx500-r2",
+     "kind": "t",
+     "t": 1.1,
+     "p": null,
+     "n": 51,
+     "path": "cells.spx500-r2.oos.t"
+    },
+    {
+     "test": "nas100-r1",
+     "kind": "t",
+     "t": 1.23,
+     "p": null,
+     "n": 224,
+     "path": "cells.nas100-r1.oos.t"
+    },
+    {
+     "test": "nas100-r2",
+     "kind": "t",
+     "t": 2.33,
+     "p": null,
+     "n": 81,
+     "path": "cells.nas100-r2.oos.t"
+    }
+   ]
+  },
+  {
+   "row": 41,
+   "pr": 858,
+   "branch": "oil-wednesday",
+   "topic": "oil-wednesday",
+   "role": "family",
+   "window": "decisive 2021 →",
+   "what": "net t, follow and fade (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "fade",
+     "kind": "t",
+     "t": -0.21,
+     "p": null,
+     "n": 304,
+     "path": "rules.F.decisive.net.t"
+    },
+    {
+     "test": "follow",
+     "kind": "t",
+     "t": -0.13,
+     "p": null,
+     "n": 306,
+     "path": "rules.C.decisive.net.t"
+    }
+   ]
+  },
+  {
+   "row": 42,
+   "pr": 859,
+   "branch": "risk-spill-jpy",
+   "topic": "risk-spill-jpy",
+   "role": "family",
+   "window": "decisive",
+   "what": "t per pair (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "usdjpy",
+     "kind": "t",
+     "t": -2.36206,
+     "p": null,
+     "n": 725,
+     "path": "pairs.usdjpy.dec.t"
+    },
+    {
+     "test": "audjpy",
+     "kind": "t",
+     "t": 0.254533,
+     "p": null,
+     "n": 725,
+     "path": "pairs.audjpy.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 43,
+   "pr": 860,
+   "branch": "vol-spike-rebound",
+   "topic": "vol-spike-rebound",
+   "role": "family",
+   "window": "B 2016 →",
+   "what": "stored one-sided p of the trade t, 5- and 10-day holds (Holm over 2)",
+   "verdict": "PASS",
+   "tests": [
+    {
+     "test": "5-day hold",
+     "kind": "p",
+     "t": null,
+     "p": 0.0253,
+     "n": 216,
+     "path": "holds.5.B.p"
+    },
+    {
+     "test": "10-day hold",
+     "kind": "p",
+     "t": null,
+     "p": 0.0057,
+     "n": 165,
+     "path": "holds.10.B.p"
+    }
+   ]
+  },
+  {
+   "row": 44,
+   "pr": 861,
+   "branch": "fomc-follow",
+   "topic": "fomc-follow",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "trade t, six tests (Holm over 6)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "nas100 F",
+     "kind": "t",
+     "t": -0.24,
+     "p": null,
+     "n": 54,
+     "path": "tests.0.t"
+    },
+    {
+     "test": "nas100 R",
+     "kind": "t",
+     "t": 0.56,
+     "p": null,
+     "n": 54,
+     "path": "tests.1.t"
+    },
+    {
+     "test": "spx500 F",
+     "kind": "t",
+     "t": -0.85,
+     "p": null,
+     "n": 54,
+     "path": "tests.2.t"
+    },
+    {
+     "test": "spx500 R",
+     "kind": "t",
+     "t": -0.83,
+     "p": null,
+     "n": 54,
+     "path": "tests.3.t"
+    },
+    {
+     "test": "xau F",
+     "kind": "t",
+     "t": 0.28,
+     "p": null,
+     "n": 54,
+     "path": "tests.4.t"
+    },
+    {
+     "test": "xau R",
+     "kind": "t",
+     "t": -0.93,
+     "p": null,
+     "n": 54,
+     "path": "tests.5.t"
+    }
+   ]
+  },
+  {
+   "row": 45,
+   "pr": 862,
+   "branch": "turnaround-replicate",
+   "topic": "turnaround-replicate",
+   "role": "replication",
+   "of": 857,
+   "window": "out of sample",
+   "what": "pooled month t (frozen rule, six indices)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "pooled",
+     "kind": "t",
+     "t": 1.69,
+     "p": null,
+     "n": 411,
+     "path": "pool.oos.month.t"
+    }
+   ]
+  },
+  {
+   "row": 46,
+   "pr": 863,
+   "branch": "nfp-follow",
+   "topic": "nfp-follow",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "trade t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "F-xau",
+     "kind": "t",
+     "t": -2.333,
+     "p": null,
+     "n": 77,
+     "path": "tests.F-xau.dec.t"
+    },
+    {
+     "test": "R-xau",
+     "kind": "t",
+     "t": 0.512,
+     "p": null,
+     "n": 40,
+     "path": "tests.R-xau.dec.t"
+    },
+    {
+     "test": "F-nas100",
+     "kind": "t",
+     "t": -1.695,
+     "p": null,
+     "n": 77,
+     "path": "tests.F-nas100.dec.t"
+    },
+    {
+     "test": "R-nas100",
+     "kind": "t",
+     "t": -0.771,
+     "p": null,
+     "n": 39,
+     "path": "tests.R-nas100.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 47,
+   "pr": 864,
+   "branch": "gold-weekend-gap",
+   "topic": "gold-weekend-gap",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "trade t, rules G and H (the stored p)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "G",
+     "kind": "t",
+     "t": -0.7821,
+     "p": null,
+     "n": 41,
+     "path": "rules.G.dec.t"
+    },
+    {
+     "test": "H",
+     "kind": "t",
+     "t": -0.7567,
+     "p": null,
+     "n": 38,
+     "path": "rules.H.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 48,
+   "pr": 865,
+   "branch": "rebalance-flow",
+   "topic": "rebalance-flow",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "trade t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "A",
+     "kind": "t",
+     "t": 0.24,
+     "p": null,
+     "n": 93,
+     "path": "tests.A.dec.t"
+    },
+    {
+     "test": "B",
+     "kind": "t",
+     "t": -0.22,
+     "p": null,
+     "n": 30,
+     "path": "tests.B.dec.t"
+    },
+    {
+     "test": "C",
+     "kind": "t",
+     "t": 0.11,
+     "p": null,
+     "n": 93,
+     "path": "tests.C.dec.t"
+    },
+    {
+     "test": "D",
+     "kind": "t",
+     "t": -0.29,
+     "p": null,
+     "n": 30,
+     "path": "tests.D.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 49,
+   "pr": 866,
+   "branch": "crypto-reversal",
+   "topic": "crypto-reversal",
+   "role": "family",
+   "window": "decisive 2022 →",
+   "what": "month t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "day3",
+     "kind": "t",
+     "t": -1.661,
+     "p": null,
+     "n": 109,
+     "path": "tests.0.decisive.tMonths"
+    },
+    {
+     "test": "day3-sma200",
+     "kind": "t",
+     "t": -0.268,
+     "p": null,
+     "n": 25,
+     "path": "tests.1.decisive.tMonths"
+    },
+    {
+     "test": "day7",
+     "kind": "t",
+     "t": -1.729,
+     "p": null,
+     "n": 106,
+     "path": "tests.2.decisive.tMonths"
+    },
+    {
+     "test": "day7-sma200",
+     "kind": "t",
+     "t": 0.696,
+     "p": null,
+     "n": 23,
+     "path": "tests.3.decisive.tMonths"
+    }
+   ]
+  },
+  {
+   "row": 50,
+   "pr": 867,
+   "branch": "nr7-breakout",
+   "topic": "nr7-breakout",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "pooled t, two variants",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "A",
+     "kind": "t",
+     "t": 0.38,
+     "p": null,
+     "n": 2191,
+     "path": "variants.A.windows.decisive.pooled.t"
+    },
+    {
+     "test": "B",
+     "kind": "t",
+     "t": 0.29,
+     "p": null,
+     "n": 2191,
+     "path": "variants.B.windows.decisive.pooled.t"
+    }
+   ]
+  },
+  {
+   "row": 51,
+   "pr": 868,
+   "branch": "fx-london-orb",
+   "topic": "fx-london-orb",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "t, three variants (Holm over 3)",
+   "verdict": "FAIL: 0 of 3 variants pass. F1 FAIL (2020 on -0.05R a trade net, n 9875, t -2.28; 2016-19 -0.103R, n 5847); F2 FAIL (202",
+   "tests": [
+    {
+     "test": "F1",
+     "kind": "t",
+     "t": -2.28,
+     "p": null,
+     "n": 9875,
+     "path": "variants.F1.decisive.t"
+    },
+    {
+     "test": "F2",
+     "kind": "t",
+     "t": -5.36,
+     "p": null,
+     "n": 9875,
+     "path": "variants.F2.decisive.t"
+    },
+    {
+     "test": "FADE",
+     "kind": "t",
+     "t": -22,
+     "p": null,
+     "n": 9739,
+     "path": "variants.FADE.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 52,
+   "pr": 869,
+   "branch": "fx-xs-momentum",
+   "topic": "fx-xs-momentum",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "net monthly t, two lookbacks (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "lookback 21",
+     "kind": "t",
+     "t": -1.13,
+     "p": null,
+     "n": 130,
+     "path": "lookbacks.21.decisive.net.t"
+    },
+    {
+     "test": "lookback 63",
+     "kind": "t",
+     "t": -1.79,
+     "p": null,
+     "n": 130,
+     "path": "lookbacks.63.decisive.net.t"
+    }
+   ]
+  },
+  {
+   "row": 53,
+   "pr": 870,
+   "branch": "gold-silver-divergence",
+   "topic": "gold-silver-divergence",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "month t, fade and follow",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "fade",
+     "kind": "t",
+     "t": -3.36,
+     "p": null,
+     "n": 2519,
+     "path": "variants.fade.decisive.tMonth"
+    },
+    {
+     "test": "follow",
+     "kind": "t",
+     "t": -2.94,
+     "p": null,
+     "n": 2325,
+     "path": "variants.follow.decisive.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 54,
+   "pr": 871,
+   "branch": "cpi-follow",
+   "topic": "cpi-follow",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "follow-16:00",
+     "kind": "t",
+     "t": -2.18,
+     "p": null,
+     "n": null,
+     "path": "tests.0.decisive.t"
+    },
+    {
+     "test": "follow-11:00",
+     "kind": "t",
+     "t": -3.08,
+     "p": null,
+     "n": null,
+     "path": "tests.1.decisive.t"
+    },
+    {
+     "test": "fade-16:00",
+     "kind": "t",
+     "t": -1.01,
+     "p": null,
+     "n": null,
+     "path": "tests.2.decisive.t"
+    },
+    {
+     "test": "fade-11:00",
+     "kind": "t",
+     "t": 0.02,
+     "p": null,
+     "n": null,
+     "path": "tests.3.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 55,
+   "pr": 872,
+   "branch": "last-hour",
+   "topic": "last-hour",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, fade and follow (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "fade",
+     "kind": "t",
+     "t": -5.2237,
+     "p": null,
+     "n": 2664,
+     "path": "variants.fade.D.tMonths"
+    },
+    {
+     "test": "follow",
+     "kind": "t",
+     "t": -4.3297,
+     "p": null,
+     "n": 2664,
+     "path": "variants.follow.D.tMonths"
+    }
+   ]
+  },
+  {
+   "row": 56,
+   "pr": 873,
+   "branch": "metals-rsi2",
+   "topic": "metals-rsi2",
+   "role": "replication",
+   "of": 838,
+   "window": "B 2016 →",
+   "what": "pooled month t (frozen rule, gold and silver)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "pooled",
+     "kind": "t",
+     "t": -1.79,
+     "p": null,
+     "n": 137,
+     "path": "pooled.B.tMonths"
+    }
+   ]
+  },
+  {
+   "row": 57,
+   "pr": 874,
+   "branch": "index-cycle",
+   "topic": "index-cycle",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, exits A and B (Holm over 2)",
+   "verdict": "FAIL: 0 of 2 exits pass; exit A (H4 extreme) -0.227R a trade net on 2016-26 (n 1174, monthly t -4.26; 2010-15 -0.414R, n",
+   "tests": [
+    {
+     "test": "exit A",
+     "kind": "t",
+     "t": -4.26,
+     "p": null,
+     "n": 1174,
+     "path": "verdict text"
+    },
+    {
+     "test": "exit B",
+     "kind": "t",
+     "t": -5.6,
+     "p": null,
+     "n": 2907,
+     "path": "verdict text"
+    }
+   ]
+  },
+  {
+   "row": 58,
+   "pr": 875,
+   "branch": "gold-session-drift",
+   "topic": "gold-session-drift",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "t, three tests (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -0.27,
+     "p": null,
+     "n": 1718,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": 1.37,
+     "p": null,
+     "n": 1063,
+     "path": "tests.T2.decisive.t"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": 0.96,
+     "p": null,
+     "n": 683,
+     "path": "tests.T3.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 59,
+   "pr": 876,
+   "branch": "nas-crypto-spill",
+   "topic": "nas-crypto-spill",
+   "role": "family",
+   "window": "decisive 2022 →",
+   "what": "month t, follow and fade (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "follow",
+     "kind": "t",
+     "t": -0.491565,
+     "p": null,
+     "n": 764,
+     "path": "variants.follow.month.t"
+    },
+    {
+     "test": "fade",
+     "kind": "t",
+     "t": -0.772654,
+     "p": null,
+     "n": 764,
+     "path": "variants.fade.month.t"
+    }
+   ]
+  },
+  {
+   "row": 60,
+   "pr": 877,
+   "branch": "fx-cycle",
+   "topic": "fx-cycle",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, exits A and B (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "exit A",
+     "kind": "t",
+     "t": -4.48,
+     "p": null,
+     "n": 1892,
+     "path": "exits.A.decisive.tMonth"
+    },
+    {
+     "test": "exit B",
+     "kind": "t",
+     "t": -4.27,
+     "p": null,
+     "n": 4677,
+     "path": "exits.B.decisive.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 61,
+   "pr": 878,
+   "branch": "gotobi",
+   "topic": "gotobi",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, four tests (Holm over 4)",
+   "verdict": "PASS (T2)",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": 0.93,
+     "p": null,
+     "n": 760,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": 2.74,
+     "p": null,
+     "n": 771,
+     "path": "tests.T2.decisive.t"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": 2.2,
+     "p": null,
+     "n": 765,
+     "path": "tests.T3.decisive.t"
+    },
+    {
+     "test": "T4",
+     "kind": "t",
+     "t": 1.84,
+     "p": null,
+     "n": 771,
+     "path": "tests.T4.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 62,
+   "pr": 879,
+   "branch": "energy-seasonal",
+   "topic": "energy-seasonal",
+   "role": "family",
+   "window": "2016-26 (11 years)",
+   "what": "t over years, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1 WTI long",
+     "kind": "t",
+     "t": 1.37,
+     "p": null,
+     "n": 11,
+     "path": "RESULT.md"
+    },
+    {
+     "test": "T2 Brent long",
+     "kind": "t",
+     "t": 1.46,
+     "p": null,
+     "n": 11,
+     "path": "RESULT.md"
+    },
+    {
+     "test": "T3 natgas long",
+     "kind": "t",
+     "t": 0.27,
+     "p": null,
+     "n": 11,
+     "path": "RESULT.md"
+    },
+    {
+     "test": "T4 natgas short",
+     "kind": "t",
+     "t": 1.47,
+     "p": null,
+     "n": 11,
+     "path": "RESULT.md"
+    }
+   ]
+  },
+  {
+   "row": 63,
+   "pr": 880,
+   "branch": "fx-weekend-gap",
+   "topic": "fx-weekend-gap",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "month t, rules G and H",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "G",
+     "kind": "t",
+     "t": 2.1411,
+     "p": null,
+     "n": 243,
+     "path": "rules.G.dec.tMonth"
+    },
+    {
+     "test": "H",
+     "kind": "t",
+     "t": -0.1617,
+     "p": null,
+     "n": 222,
+     "path": "rules.H.dec.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 64,
+   "pr": 881,
+   "branch": "index-pair",
+   "topic": "index-pair",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, two pairs (Holm over 2)",
+   "verdict": "FAIL, 0 of 2 pairs: fading a 2-sd stretch of the US index spreads is not an edge after costs",
+   "tests": [
+    {
+     "test": "pair 1",
+     "kind": "t",
+     "t": -2.01,
+     "p": null,
+     "n": 71,
+     "path": "pairs.0.dec.monthT"
+    },
+    {
+     "test": "pair 2",
+     "kind": "t",
+     "t": -2.21,
+     "p": null,
+     "n": 71,
+     "path": "pairs.1.dec.monthT"
+    }
+   ]
+  },
+  {
+   "row": 65,
+   "pr": 882,
+   "branch": "opex-week",
+   "topic": "opex-week",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "t, four tests (Holm over 4)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -0.32,
+     "p": null,
+     "n": 130,
+     "path": "tests.T1.dec.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -2.04,
+     "p": null,
+     "n": 130,
+     "path": "tests.T2.dec.t"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": 0.5,
+     "p": null,
+     "n": 130,
+     "path": "tests.T3.dec.t"
+    },
+    {
+     "test": "T4",
+     "kind": "t",
+     "t": -2.92,
+     "p": null,
+     "n": 130,
+     "path": "tests.T4.dec.t"
+    }
+   ]
+  },
+  {
+   "row": 66,
+   "pr": 883,
+   "branch": "london-fix",
+   "topic": "london-fix",
+   "role": "family",
+   "window": "decisive 2020 →",
+   "what": "month t, follow and fade (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -7.44,
+     "p": null,
+     "n": 3510,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -10.32,
+     "p": null,
+     "n": 3510,
+     "path": "tests.T2.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 67,
+   "pr": 884,
+   "branch": "index-spread-momentum",
+   "topic": "index-spread-momentum",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "pooled month t (one test)",
+   "verdict": "FAIL, 0 of 5 pre-registered checks: following a 2-sd stretch of these non-US index spreads is not an edge after costs",
+   "tests": [
+    {
+     "test": "pooled",
+     "kind": "t",
+     "t": -1.56,
+     "p": null,
+     "n": 244,
+     "path": "pooled.dec.monthT"
+    }
+   ]
+  },
+  {
+   "row": 68,
+   "pr": 886,
+   "branch": "risk-cross",
+   "topic": "risk-cross",
+   "role": "family",
+   "window": "2016 → (charged financing)",
+   "what": "monthly t, three tests",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1 AUD/JPY",
+     "kind": "t",
+     "t": -1.3,
+     "p": null,
+     "n": 52,
+     "path": "RESULT.md"
+    },
+    {
+     "test": "T2 NZD/JPY",
+     "kind": "t",
+     "t": -0.94,
+     "p": null,
+     "n": 52,
+     "path": "RESULT.md"
+    },
+    {
+     "test": "T3 trend only",
+     "kind": "t",
+     "t": -0.24,
+     "p": null,
+     "n": 30,
+     "path": "RESULT.md"
+    }
+   ]
+  },
+  {
+   "row": 69,
+   "pr": 887,
+   "branch": "eth-btc-ratio",
+   "topic": "eth-btc-ratio",
+   "role": "family",
+   "window": "decisive 2022 →",
+   "what": "t, two tests (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "test 1",
+     "kind": "t",
+     "t": 0.682,
+     "p": null,
+     "n": null,
+     "path": "tests.0.decisive.t"
+    },
+    {
+     "test": "test 2",
+     "kind": "t",
+     "t": 0.348,
+     "p": null,
+     "n": null,
+     "path": "tests.1.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 70,
+   "pr": 888,
+   "branch": "crypto-cycle",
+   "topic": "crypto-cycle",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t, exits A and B (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "exit A",
+     "kind": "t",
+     "t": -1.8,
+     "p": null,
+     "n": 830,
+     "path": "exits.A.decisive.tMonth"
+    },
+    {
+     "test": "exit B",
+     "kind": "t",
+     "t": -1.79,
+     "p": null,
+     "n": 1717,
+     "path": "exits.B.decisive.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 71,
+   "pr": 889,
+   "branch": "gotobi-replicate",
+   "topic": "gotobi-replicate",
+   "role": "replication",
+   "of": 878,
+   "window": "R1 crosses 2010 →, R2 USD/JPY 2005-09",
+   "what": "month t",
+   "verdict": "REPLICATES",
+   "tests": [
+    {
+     "test": "R1 crosses pooled",
+     "kind": "t",
+     "t": 2.75,
+     "p": null,
+     "n": 4784,
+     "path": "r1.pooled.all.t"
+    },
+    {
+     "test": "R2 USD/JPY 2005-09",
+     "kind": "t",
+     "t": 3.8,
+     "p": null,
+     "n": 355,
+     "path": "r2.all.t"
+    }
+   ]
+  },
+  {
+   "row": 72,
+   "pr": 890,
+   "branch": "crypto-weekend-reversal",
+   "topic": "crypto-weekend-reversal",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t, five tests (Holm over 5)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1-BTC",
+     "kind": "t",
+     "t": -0.08,
+     "p": null,
+     "n": 19,
+     "path": "tests.T1-BTC.all.tMonth"
+    },
+    {
+     "test": "T1-ETH",
+     "kind": "t",
+     "t": -0.24,
+     "p": null,
+     "n": 27,
+     "path": "tests.T1-ETH.all.tMonth"
+    },
+    {
+     "test": "T2-BTC",
+     "kind": "t",
+     "t": -0.71,
+     "p": null,
+     "n": 19,
+     "path": "tests.T2-BTC.all.tMonth"
+    },
+    {
+     "test": "T2-ETH",
+     "kind": "t",
+     "t": -1.69,
+     "p": null,
+     "n": 27,
+     "path": "tests.T2-ETH.all.tMonth"
+    },
+    {
+     "test": "POOL",
+     "kind": "t",
+     "t": -0.19,
+     "p": null,
+     "n": 46,
+     "path": "tests.POOL.all.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 73,
+   "pr": 891,
+   "branch": "index-overnight",
+   "topic": "index-overnight",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month-sum t, T1 and T2 (Holm over 2; T3 a control)",
+   "verdict": "FAIL: the overnight long after spread and financing, 2016-26: US500 −0.022R a trade (n 2721, month-sum t −2.86), NAS100 ",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -2.86,
+     "p": null,
+     "n": 2721,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -0.84,
+     "p": null,
+     "n": 2721,
+     "path": "tests.T2.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 74,
+   "pr": 892,
+   "branch": "tsmom",
+   "topic": "tsmom",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, five tests (Holm over 5)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -1.44,
+     "p": null,
+     "n": null,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -0.39,
+     "p": null,
+     "n": null,
+     "path": "tests.T2.decisive.t"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": -0.78,
+     "p": null,
+     "n": null,
+     "path": "tests.T3.decisive.t"
+    },
+    {
+     "test": "T4",
+     "kind": "t",
+     "t": -1.86,
+     "p": null,
+     "n": null,
+     "path": "tests.T4.decisive.t"
+    },
+    {
+     "test": "T5",
+     "kind": "t",
+     "t": -0.36,
+     "p": null,
+     "n": null,
+     "path": "tests.T5.decisive.t"
+    }
+   ]
+  },
+  {
+   "row": 75,
+   "pr": 893,
+   "branch": "gotobi-cost",
+   "topic": "gotobi-cost",
+   "role": "excluded",
+   "why": "cost accounting, no rule tested",
+   "tests": []
+  },
+  {
+   "row": 76,
+   "pr": 894,
+   "branch": "gotobi-feed",
+   "topic": "gotobi-feed",
+   "role": "replication",
+   "of": 878,
+   "window": "HistData USD/JPY 2018-26",
+   "what": "month t on the independent feed",
+   "verdict": "FEED-ROBUST",
+   "tests": [
+    {
+     "test": "HistData USD/JPY",
+     "kind": "t",
+     "t": 2.34,
+     "p": null,
+     "n": 623,
+     "path": "hist.all.t"
+    }
+   ]
+  },
+  {
+   "row": 77,
+   "pr": 895,
+   "branch": "index-ibs",
+   "topic": "index-ibs",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, three tests (Holm over 3)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": 0.37,
+     "p": null,
+     "n": 472,
+     "path": "tests.T1.decisive.monthT"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": 1.65,
+     "p": null,
+     "n": 473,
+     "path": "tests.T2.decisive.monthT"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": -0.31,
+     "p": null,
+     "n": 469,
+     "path": "tests.T3.decisive.monthT"
+    }
+   ]
+  },
+  {
+   "row": 78,
+   "pr": 896,
+   "branch": "ecb-boj-days",
+   "topic": "ecb-boj-days",
+   "role": "family",
+   "window": "decisive",
+   "what": "month t, ECB and BoJ (Holm over 2)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "ECB EUR/USD",
+     "kind": "t",
+     "t": 1.51,
+     "p": null,
+     "n": 71,
+     "path": "tests.0.monthT"
+    },
+    {
+     "test": "BoJ USD/JPY",
+     "kind": "t",
+     "t": 0.22,
+     "p": null,
+     "n": 67,
+     "path": "tests.1.monthT"
+    }
+   ]
+  },
+  {
+   "row": 79,
+   "pr": 897,
+   "branch": "yen-spread-log",
+   "topic": null,
+   "role": "excluded",
+   "why": "build (spread log), not a study",
+   "tests": []
+  },
+  {
+   "row": 80,
+   "pr": 898,
+   "branch": "index-weekend-gap",
+   "topic": "index-weekend-gap",
+   "role": "family",
+   "window": "decisive 2016 →",
+   "what": "month t, T1-T3 and pooled",
+   "verdict": "FAIL: pooled −0.126R a trade after costs on 2016-26 (n 102, month-sum t −1.59), −0.067R on 2008-15 (n 42)",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -1.2788,
+     "p": null,
+     "n": 38,
+     "path": "tests.T1.dec.tMonth"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": -1.5184,
+     "p": null,
+     "n": 30,
+     "path": "tests.T2.dec.tMonth"
+    },
+    {
+     "test": "T3",
+     "kind": "t",
+     "t": -1.6925,
+     "p": null,
+     "n": 34,
+     "path": "tests.T3.dec.tMonth"
+    },
+    {
+     "test": "P",
+     "kind": "t",
+     "t": -1.588,
+     "p": null,
+     "n": 102,
+     "path": "tests.P.dec.tMonth"
+    }
+   ]
+  },
+  {
+   "row": 81,
+   "pr": 899,
+   "branch": "commodity-fx-lead",
+   "topic": "commodity-fx-lead",
+   "role": "family",
+   "window": "decisive",
+   "what": "month-sum t, T1 and T2 (Holm over 2; pooled not in the family)",
+   "verdict": "FAIL",
+   "tests": [
+    {
+     "test": "T1",
+     "kind": "t",
+     "t": -0.2949,
+     "p": null,
+     "n": 366,
+     "path": "tests.T1.decisive.t"
+    },
+    {
+     "test": "T2",
+     "kind": "t",
+     "t": 0.8858,
+     "p": null,
+     "n": 375,
+     "path": "tests.T2.decisive.t"
+    }
+   ]
+  }
+ ]
+}

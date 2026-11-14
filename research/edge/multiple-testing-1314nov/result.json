@@ -1,0 +1,5465 @@
+{
+ "built": "2026-11-14",
+ "verdict": "no decisive test of the day survives a correction across all 248 (Holm 0, BH q 0.10 0); gotobi T2: (a) BH q 0.7068 fails q 0.10, (b) Holm 0.7618 fails; with its frozen USD/JPY 2005-09 replication, Fisher p 3.6e-6 (independence assumed)",
+ "studies": 82,
+ "excluded": [
+  {
+   "pr": 827,
+   "branch": "vix-term",
+   "why": "not run (Cboe not reachable)"
+  },
+  {
+   "pr": 893,
+   "branch": "gotobi-cost",
+   "why": "cost accounting, no rule tested"
+  },
+  {
+   "pr": 897,
+   "branch": "yen-spread-log",
+   "why": "build (spread log), not a study"
+  }
+ ],
+ "unparsed": [
+  {
+   "id": "#815 cycle-gate: gtrend G1",
+   "why": "no t or p stored for this test (not computed: too few blocked trades)"
+  },
+  {
+   "id": "#815 cycle-gate: gtrend5 G1",
+   "why": "no t or p stored for this test (not computed: too few blocked trades)"
+  }
+ ],
+ "family": {
+  "N": 248,
+  "alpha": 0.05,
+  "bonferroni": {
+   "p": 0.00020161290322580645,
+   "t": 3.5379635142828914
+  },
+  "t2": {
+   "observed": 6,
+   "expected": 5.6420322127508715,
+   "range95": [
+    2,
+    11
+   ],
+   "share": 0.022750129890124482
+  },
+  "tNeg2": {
+   "observed": 47,
+   "expected": 5.6420322127508715
+  },
+  "pBelow05": {
+   "observed": 11,
+   "expected": 12.4
+  },
+  "holmPass": [],
+  "bh05": [],
+  "bh10": [],
+  "by10": [],
+  "smallest": [
+   {
+    "id": "#878 gotobi: T2",
+    "t": 2.74,
+    "p": 0.003072,
+    "holm": 0.7618,
+    "bh": 0.7068,
+    "by": 1,
+    "n": 771
+   },
+   {
+    "id": "#860 vol-spike-rebound: 10-day hold",
+    "t": 2.5302,
+    "p": 0.0057,
+    "holm": 1,
+    "bh": 0.7068,
+    "by": 1,
+    "n": 165
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r2",
+    "t": 2.33,
+    "p": 0.009903,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 81
+   },
+   {
+    "id": "#878 gotobi: T3",
+    "t": 2.2,
+    "p": 0.013903,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 765
+   },
+   {
+    "id": "#880 fx-weekend-gap: G",
+    "t": 2.1411,
+    "p": 0.016133,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 243
+   },
+   {
+    "id": "#838 rsi2-pullback: spx500",
+    "t": 2.0198,
+    "p": 0.0217,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 99
+   },
+   {
+    "id": "#860 vol-spike-rebound: 5-day hold",
+    "t": 1.9549,
+    "p": 0.0253,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 216
+   },
+   {
+    "id": "#815 cycle-gate: geg G1",
+    "t": 1.895,
+    "p": 0.029046,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 106
+   },
+   {
+    "id": "#838 rsi2-pullback: us30",
+    "t": 1.8793,
+    "p": 0.0301,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 102
+   },
+   {
+    "id": "#878 gotobi: T4",
+    "t": 1.84,
+    "p": 0.032884,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 771
+   },
+   {
+    "id": "#895 index-ibs: T2",
+    "t": 1.65,
+    "p": 0.049471,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 473
+   },
+   {
+    "id": "#896 ecb-boj-days: ECB EUR/USD",
+    "t": 1.51,
+    "p": 0.065522,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71
+   }
+  ],
+  "rows": [
+   {
+    "id": "#815 cycle-gate: gtrend G2",
+    "t": -0.169,
+    "p": 0.567102,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 40,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend G3",
+    "t": 0.564,
+    "p": 0.286377,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 12,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G2",
+    "t": 0.986,
+    "p": 0.162067,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 72,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G1",
+    "t": 1.895,
+    "p": 0.029046,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 106,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G3",
+    "t": 0.04,
+    "p": 0.484047,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 49,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend5 G2",
+    "t": 0.356,
+    "p": 0.36092,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 66,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend5 G3",
+    "t": -0.833,
+    "p": 0.797578,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 18,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G2",
+    "t": -0.924,
+    "p": 0.822257,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 137,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G1",
+    "t": -1.065,
+    "p": 0.856562,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G3",
+    "t": -1.947,
+    "p": 0.974233,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 50,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G2",
+    "t": -0.611,
+    "p": 0.7294,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 482,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G1",
+    "t": -0.612,
+    "p": 0.729731,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 536,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G3",
+    "t": -0.964,
+    "p": 0.832477,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 318,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G2",
+    "t": -0.132,
+    "p": 0.552508,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 68,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G1",
+    "t": -1.592,
+    "p": 0.944308,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 89,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G3",
+    "t": 1.13,
+    "p": 0.129238,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 39,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G2",
+    "t": 0.635,
+    "p": 0.262714,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 37,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G1",
+    "t": 0.492,
+    "p": 0.31136,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 45,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G3",
+    "t": -1.326,
+    "p": 0.90758,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 23,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G2",
+    "t": 0.209,
+    "p": 0.417224,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 29581,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G1",
+    "t": 0.226,
+    "p": 0.410601,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 34006,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G3",
+    "t": -1.355,
+    "p": 0.912291,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 14525,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G2",
+    "t": -1.089,
+    "p": 0.861923,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 7276,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G1",
+    "t": -1.499,
+    "p": 0.933063,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9409,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G3",
+    "t": 0.659,
+    "p": 0.254948,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4608,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G2",
+    "t": 0.2,
+    "p": 0.42074,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 5875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G1",
+    "t": 0.456,
+    "p": 0.324195,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9712,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G3",
+    "t": 0.433,
+    "p": 0.332507,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 5515,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G2",
+    "t": 0.882,
+    "p": 0.188888,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 758,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G1",
+    "t": -0.3,
+    "p": 0.617911,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1071,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G3",
+    "t": 0.956,
+    "p": 0.169536,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 669,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T1",
+    "t": 0.67,
+    "p": 0.251429,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 486,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T2",
+    "t": 1.47,
+    "p": 0.070781,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 236,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T3",
+    "t": 1.09,
+    "p": 0.137857,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 244,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T1 week",
+    "t": -0.01,
+    "p": 0.503989,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 152,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T2 month",
+    "t": 0.49,
+    "p": 0.312067,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 143,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T3 year",
+    "t": -0.64,
+    "p": 0.738914,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 182,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#818 mcycle-base: combined",
+    "t": -3.99,
+    "p": 0.999967,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 115,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#819 mosha-bo-er: A ER20 filter",
+    "t": 1.268,
+    "p": 0.102399,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 7,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#819 mosha-bo-er: B market entry",
+    "t": -0.087,
+    "p": 0.534664,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 41,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#820 tl-third-touch: T1 trendline",
+    "t": -2.87,
+    "p": 0.997948,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 42,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#820 tl-third-touch: T2 vs control",
+    "t": -1.59,
+    "p": 0.944083,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 42,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp xau",
+    "t": -0.692,
+    "p": 0.755531,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3310,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday xau",
+    "t": -0.07,
+    "p": 0.527903,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp xau",
+    "t": -5.099,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1832,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra xau",
+    "t": 0.486,
+    "p": 0.313484,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 424,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp eurusd",
+    "t": -5.61,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3499,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday eurusd",
+    "t": -1.529,
+    "p": 0.936868,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 757,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp eurusd",
+    "t": -6.301,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1797,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra eurusd",
+    "t": -1.809,
+    "p": 0.964775,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 418,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp gbpusd",
+    "t": -5.685,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3643,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday gbpusd",
+    "t": -1.578,
+    "p": 0.942717,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 837,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp gbpusd",
+    "t": -3.522,
+    "p": 0.999786,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1991,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra gbpusd",
+    "t": -0.711,
+    "p": 0.761458,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 446,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp audusd",
+    "t": -4.54,
+    "p": 0.999997,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4096,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday audusd",
+    "t": -0.691,
+    "p": 0.755217,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 850,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp audusd",
+    "t": -6.401,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1973,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra audusd",
+    "t": -2.407,
+    "p": 0.991958,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 449,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp usdcad",
+    "t": -7.028,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3943,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday usdcad",
+    "t": -1.394,
+    "p": 0.918341,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 870,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp usdcad",
+    "t": -5.269,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1967,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra usdcad",
+    "t": -2.128,
+    "p": 0.983331,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 470,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp usdchf",
+    "t": -5.93,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3732,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday usdchf",
+    "t": -0.992,
+    "p": 0.839401,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 860,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp usdchf",
+    "t": -5.115,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1898,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra usdchf",
+    "t": -2.734,
+    "p": 0.996871,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 424,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday btc",
+    "t": -1.676,
+    "p": 0.953131,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 884,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra btc",
+    "t": -3.626,
+    "p": 0.999856,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 524,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday eth",
+    "t": -0.489,
+    "p": 0.687579,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 751,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra eth",
+    "t": -1.437,
+    "p": 0.924641,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 445,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday sol",
+    "t": -2.097,
+    "p": 0.982003,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 885,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra sol",
+    "t": -2.634,
+    "p": 0.995781,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 515,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday xrp",
+    "t": -1.023,
+    "p": 0.846846,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 630,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra xrp",
+    "t": -0.583,
+    "p": 0.720053,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 421,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T1 ladder",
+    "t": -0.59,
+    "p": 0.722405,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T2 sideways vs momentum",
+    "t": 0.55,
+    "p": 0.29116,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 69,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T3 50% vs edge",
+    "t": 0.45,
+    "p": 0.326355,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#823 gold-tsmom: long/short",
+    "t": 0.84,
+    "p": 0.200454,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#823 gold-tsmom: long/flat",
+    "t": 1.03,
+    "p": 0.151505,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#824 ict-book-risk: R1",
+    "t": -0.4399,
+    "p": 0.67,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 516,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R2",
+    "t": 0.3121,
+    "p": 0.3775,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 658,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R3",
+    "t": 0.0326,
+    "p": 0.487,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 583,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R4",
+    "t": -0.2237,
+    "p": 0.5885,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 679,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#825 swing-day3: T1",
+    "t": -0.01,
+    "p": 0.503989,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 262,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#825 swing-day3: T2",
+    "t": 0.0246,
+    "p": 0.4902,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#825 swing-day3: T3",
+    "t": -0.7199,
+    "p": 0.7642,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#826 turn-of-month: spx500",
+    "t": -0.1,
+    "p": 0.539828,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#826 turn-of-month: us30",
+    "t": -0.14,
+    "p": 0.55567,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#826 turn-of-month: nas100",
+    "t": 1.24,
+    "p": 0.107488,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#828 tsmom-portfolio: book",
+    "t": -0.82,
+    "p": 0.793892,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 120,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#829 gold-silver-ratio: ratio fade",
+    "t": -1.2,
+    "p": 0.88493,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 18,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#830 fx-carry: T1",
+    "t": 0.34,
+    "p": 0.366928,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#830 fx-carry: T2",
+    "t": -0.05,
+    "p": 0.519939,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#831 pre-fomc-drift: spx500",
+    "t": 1.35,
+    "p": 0.088508,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 86,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#833 crypto-weekly-mom: V1 long/flat",
+    "t": 0.77,
+    "p": 0.22065,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#833 crypto-weekly-mom: V2 long/short",
+    "t": 0.51,
+    "p": 0.305026,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#834 fx-reversal: reversal",
+    "t": -1.598,
+    "p": 0.944979,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 566,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#835 intraday-momentum: spx500",
+    "t": -9.0907,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2672,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#835 intraday-momentum: nas100",
+    "t": -5.4521,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2682,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: spx500",
+    "t": -1.39,
+    "p": 0.917736,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: nas100",
+    "t": 0.2,
+    "p": 0.42074,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: us30",
+    "t": -1.44,
+    "p": 0.925066,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#837 orb-nas100: nas100",
+    "t": 1.27,
+    "p": 0.102042,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1460,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#837 orb-nas100: spx500",
+    "t": -0.79,
+    "p": 0.785236,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1456,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#838 rsi2-pullback: spx500",
+    "t": 2.0198,
+    "p": 0.0217,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 99,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#838 rsi2-pullback: nas100",
+    "t": 1.241,
+    "p": 0.1073,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 99,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#838 rsi2-pullback: us30",
+    "t": 1.8793,
+    "p": 0.0301,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 102,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#839 vol-managed: V c/variance",
+    "t": -0.5681,
+    "p": 0.715,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#839 vol-managed: S c/volatility",
+    "t": -0.3907,
+    "p": 0.652,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 1",
+    "t": -1.72,
+    "p": 0.957284,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 160,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 2",
+    "t": 0.43,
+    "p": 0.333598,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 48,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 3",
+    "t": -1.03,
+    "p": 0.848495,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 122,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#841 sma10-timing: book",
+    "t": -1.0893,
+    "p": 0.862,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#842 crypto-hour: test 1",
+    "t": -7.24,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 2",
+    "t": -4.98,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 3",
+    "t": -1.2,
+    "p": 0.88493,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 4",
+    "t": -0.5,
+    "p": 0.691462,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R1",
+    "t": -0.09,
+    "p": 0.535856,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 233,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R2",
+    "t": 0.64,
+    "p": 0.261086,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 190,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R3",
+    "t": 0.76,
+    "p": 0.223627,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 235,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#845 pre-holiday: T1 pooled",
+    "t": 1.02,
+    "p": 0.153864,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 99,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#845 pre-holiday: T4 vs ordinary days",
+    "t": 1.03,
+    "p": 0.151505,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#846 fx-month-end: base",
+    "t": -1.059,
+    "p": 0.8552,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#846 fx-month-end: variant",
+    "t": 0.13,
+    "p": 0.448283,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 72,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#848 gold-asia-break: breakout",
+    "t": 0.526,
+    "p": 0.299444,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1169,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#848 gold-asia-break: fade",
+    "t": -0.136,
+    "p": 0.554089,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 484,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: nas100 all",
+    "t": -1.84,
+    "p": 0.967116,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 852,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: nas100 against",
+    "t": -0.94,
+    "p": 0.826391,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 431,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: spx500 all",
+    "t": -4.37,
+    "p": 0.999994,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 913,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: spx500 against",
+    "t": -3.7,
+    "p": 0.999892,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 472,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#850 gold-shock-revert: revert",
+    "t": 0.14,
+    "p": 0.44433,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#850 gold-shock-revert: continue",
+    "t": 0.16,
+    "p": 0.436441,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 28,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#851 sell-in-may: pooled",
+    "t": 0.3233,
+    "p": 0.373234,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 1",
+    "t": 0,
+    "p": 0.5,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 147,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 2",
+    "t": 0.61,
+    "p": 0.270931,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 147,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 3",
+    "t": -0.57,
+    "p": 0.715661,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 148,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 4",
+    "t": -1.09,
+    "p": 0.862143,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 148,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#853 high52-rotation: excess",
+    "t": 0.36,
+    "p": 0.359424,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#854 copper-gold: equal weight",
+    "t": -0.9186,
+    "p": 0.820848,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 565,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#855 dual-momentum: L12",
+    "t": -1.2133,
+    "p": 0.8875,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#855 dual-momentum: L6",
+    "t": -1.3106,
+    "p": 0.905,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: btc-sma200",
+    "t": 1.4909,
+    "p": 0.068,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: btc-sma100",
+    "t": 0.9924,
+    "p": 0.1605,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: eth-sma200",
+    "t": 1.0669,
+    "p": 0.143,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: eth-sma100",
+    "t": 0.5873,
+    "p": 0.2785,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: spx500-r1",
+    "t": 0.54,
+    "p": 0.294598,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 237,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: spx500-r2",
+    "t": 1.1,
+    "p": 0.135666,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 51,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r1",
+    "t": 1.23,
+    "p": 0.109349,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 224,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r2",
+    "t": 2.33,
+    "p": 0.009903,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 81,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#858 oil-wednesday: fade",
+    "t": -0.21,
+    "p": 0.583166,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 304,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#858 oil-wednesday: follow",
+    "t": -0.13,
+    "p": 0.551717,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 306,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#859 risk-spill-jpy: usdjpy",
+    "t": -2.3621,
+    "p": 0.990913,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#859 risk-spill-jpy: audjpy",
+    "t": 0.2545,
+    "p": 0.399542,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#860 vol-spike-rebound: 5-day hold",
+    "t": 1.9549,
+    "p": 0.0253,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 216,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#860 vol-spike-rebound: 10-day hold",
+    "t": 2.5302,
+    "p": 0.0057,
+    "holm": 1,
+    "bh": 0.7068,
+    "by": 1,
+    "n": 165,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#861 fomc-follow: nas100 F",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: nas100 R",
+    "t": 0.56,
+    "p": 0.28774,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: spx500 F",
+    "t": -0.85,
+    "p": 0.802337,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: spx500 R",
+    "t": -0.83,
+    "p": 0.796731,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: xau F",
+    "t": 0.28,
+    "p": 0.389739,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: xau R",
+    "t": -0.93,
+    "p": 0.823814,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: F-xau",
+    "t": -2.333,
+    "p": 0.990176,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 77,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: R-xau",
+    "t": 0.512,
+    "p": 0.304325,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 40,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: F-nas100",
+    "t": -1.695,
+    "p": 0.954962,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 77,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: R-nas100",
+    "t": -0.771,
+    "p": 0.779647,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 39,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#864 gold-weekend-gap: G",
+    "t": -0.7821,
+    "p": 0.782922,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 41,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#864 gold-weekend-gap: H",
+    "t": -0.7567,
+    "p": 0.775385,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 38,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: A",
+    "t": 0.24,
+    "p": 0.405165,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 93,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: B",
+    "t": -0.22,
+    "p": 0.587064,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: C",
+    "t": 0.11,
+    "p": 0.456205,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 93,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: D",
+    "t": -0.29,
+    "p": 0.614092,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day3",
+    "t": -1.661,
+    "p": 0.951643,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 109,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day3-sma200",
+    "t": -0.268,
+    "p": 0.60565,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 25,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day7",
+    "t": -1.729,
+    "p": 0.958095,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 106,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day7-sma200",
+    "t": 0.696,
+    "p": 0.243214,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 23,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#867 nr7-breakout: A",
+    "t": 0.38,
+    "p": 0.351973,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2191,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#867 nr7-breakout: B",
+    "t": 0.29,
+    "p": 0.385908,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2191,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: F1",
+    "t": -2.28,
+    "p": 0.988696,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: F2",
+    "t": -5.36,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: FADE",
+    "t": -22,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9739,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#869 fx-xs-momentum: lookback 21",
+    "t": -1.13,
+    "p": 0.870762,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#869 fx-xs-momentum: lookback 63",
+    "t": -1.79,
+    "p": 0.963273,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#870 gold-silver-divergence: fade",
+    "t": -3.36,
+    "p": 0.99961,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2519,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#870 gold-silver-divergence: follow",
+    "t": -2.94,
+    "p": 0.998359,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2325,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: follow-16:00",
+    "t": -2.18,
+    "p": 0.985371,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: follow-11:00",
+    "t": -3.08,
+    "p": 0.998965,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: fade-16:00",
+    "t": -1.01,
+    "p": 0.843752,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: fade-11:00",
+    "t": 0.02,
+    "p": 0.492022,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#872 last-hour: fade",
+    "t": -5.2237,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2664,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#872 last-hour: follow",
+    "t": -4.3297,
+    "p": 0.999993,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2664,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#874 index-cycle: exit A",
+    "t": -4.26,
+    "p": 0.99999,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1174,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#874 index-cycle: exit B",
+    "t": -5.6,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2907,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T1",
+    "t": -0.27,
+    "p": 0.60642,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1718,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T2",
+    "t": 1.37,
+    "p": 0.085343,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1063,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T3",
+    "t": 0.96,
+    "p": 0.168528,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 683,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#876 nas-crypto-spill: follow",
+    "t": -0.4916,
+    "p": 0.688487,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 764,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#876 nas-crypto-spill: fade",
+    "t": -0.7727,
+    "p": 0.780136,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 764,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#877 fx-cycle: exit A",
+    "t": -4.48,
+    "p": 0.999996,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1892,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#877 fx-cycle: exit B",
+    "t": -4.27,
+    "p": 0.99999,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4677,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T1",
+    "t": 0.93,
+    "p": 0.176186,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 760,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T2",
+    "t": 2.74,
+    "p": 0.003072,
+    "holm": 0.7618,
+    "bh": 0.7068,
+    "by": 1,
+    "n": 771,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T3",
+    "t": 2.2,
+    "p": 0.013903,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 765,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T4",
+    "t": 1.84,
+    "p": 0.032884,
+    "holm": 1,
+    "bh": 0.8155,
+    "by": 1,
+    "n": 771,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T1 WTI long",
+    "t": 1.37,
+    "p": 0.085343,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T2 Brent long",
+    "t": 1.46,
+    "p": 0.072145,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T3 natgas long",
+    "t": 0.27,
+    "p": 0.39358,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T4 natgas short",
+    "t": 1.47,
+    "p": 0.070781,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#880 fx-weekend-gap: G",
+    "t": 2.1411,
+    "p": 0.016133,
+    "holm": 1,
+    "bh": 0.8002,
+    "by": 1,
+    "n": 243,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#880 fx-weekend-gap: H",
+    "t": -0.1617,
+    "p": 0.564229,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 222,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#881 index-pair: pair 1",
+    "t": -2.01,
+    "p": 0.977784,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#881 index-pair: pair 2",
+    "t": -2.21,
+    "p": 0.986447,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T1",
+    "t": -0.32,
+    "p": 0.625516,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T2",
+    "t": -2.04,
+    "p": 0.979325,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T3",
+    "t": 0.5,
+    "p": 0.308538,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T4",
+    "t": -2.92,
+    "p": 0.99825,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#883 london-fix: T1",
+    "t": -7.44,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3510,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#883 london-fix: T2",
+    "t": -10.32,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3510,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#884 index-spread-momentum: pooled",
+    "t": -1.56,
+    "p": 0.94062,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 244,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T1 AUD/JPY",
+    "t": -1.3,
+    "p": 0.9032,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 52,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T2 NZD/JPY",
+    "t": -0.94,
+    "p": 0.826391,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 52,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T3 trend only",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#887 eth-btc-ratio: test 1",
+    "t": 0.682,
+    "p": 0.247619,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#887 eth-btc-ratio: test 2",
+    "t": 0.348,
+    "p": 0.36392,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#888 crypto-cycle: exit A",
+    "t": -1.8,
+    "p": 0.96407,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 830,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#888 crypto-cycle: exit B",
+    "t": -1.79,
+    "p": 0.963273,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1717,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T1-BTC",
+    "t": -0.08,
+    "p": 0.531881,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 19,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T1-ETH",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T2-BTC",
+    "t": -0.71,
+    "p": 0.761148,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 19,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T2-ETH",
+    "t": -1.69,
+    "p": 0.954486,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: POOL",
+    "t": -0.19,
+    "p": 0.575345,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 46,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#891 index-overnight: T1",
+    "t": -2.86,
+    "p": 0.997882,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2721,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#891 index-overnight: T2",
+    "t": -0.84,
+    "p": 0.799546,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2721,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T1",
+    "t": -1.44,
+    "p": 0.925066,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T2",
+    "t": -0.39,
+    "p": 0.651732,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T3",
+    "t": -0.78,
+    "p": 0.782305,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T4",
+    "t": -1.86,
+    "p": 0.968557,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T5",
+    "t": -0.36,
+    "p": 0.640576,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T1",
+    "t": 0.37,
+    "p": 0.355691,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 472,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T2",
+    "t": 1.65,
+    "p": 0.049471,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 473,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T3",
+    "t": -0.31,
+    "p": 0.62172,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 469,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#896 ecb-boj-days: ECB EUR/USD",
+    "t": 1.51,
+    "p": 0.065522,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#896 ecb-boj-days: BoJ USD/JPY",
+    "t": 0.22,
+    "p": 0.412936,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 67,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T1",
+    "t": -1.2788,
+    "p": 0.899516,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 38,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T2",
+    "t": -1.5184,
+    "p": 0.935543,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T3",
+    "t": -1.6925,
+    "p": 0.954725,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 34,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: P",
+    "t": -1.588,
+    "p": 0.943857,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 102,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#899 commodity-fx-lead: T1",
+    "t": -0.2949,
+    "p": 0.615965,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 366,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#899 commodity-fx-lead: T2",
+    "t": 0.8858,
+    "p": 0.187863,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 375,
+    "pFrom": "t (normal, one-sided)"
+   }
+  ]
+ },
+ "withReplications": {
+  "N": 254,
+  "alpha": 0.05,
+  "bonferroni": {
+   "p": 0.00019685039370078743,
+   "t": 3.544270728079298
+  },
+  "t2": {
+   "observed": 9,
+   "expected": 5.778532992091618,
+   "range95": [
+    2,
+    11
+   ],
+   "share": 0.022750129890124482
+  },
+  "tNeg2": {
+   "observed": 47,
+   "expected": 5.778532992091618
+  },
+  "pBelow05": {
+   "observed": 15,
+   "expected": 12.700000000000001
+  },
+  "holmPass": [
+   "#889 gotobi-replicate: R2 USD/JPY 2005-09"
+  ],
+  "bh05": [
+   "#889 gotobi-replicate: R2 USD/JPY 2005-09"
+  ],
+  "bh10": [
+   "#889 gotobi-replicate: R2 USD/JPY 2005-09"
+  ],
+  "by10": [],
+  "smallest": [
+   {
+    "id": "#889 gotobi-replicate: R2 USD/JPY 2005-09",
+    "t": 3.8,
+    "p": 0.000072,
+    "holm": 0.0184,
+    "bh": 0.0184,
+    "by": 0.1124,
+    "n": 355
+   },
+   {
+    "id": "#889 gotobi-replicate: R1 crosses pooled",
+    "t": 2.75,
+    "p": 0.00298,
+    "holm": 0.7539,
+    "bh": 0.2601,
+    "by": 1,
+    "n": 4784
+   },
+   {
+    "id": "#878 gotobi: T2",
+    "t": 2.74,
+    "p": 0.003072,
+    "holm": 0.7741,
+    "bh": 0.2601,
+    "by": 1,
+    "n": 771
+   },
+   {
+    "id": "#860 vol-spike-rebound: 10-day hold",
+    "t": 2.5302,
+    "p": 0.0057,
+    "holm": 1,
+    "bh": 0.362,
+    "by": 1,
+    "n": 165
+   },
+   {
+    "id": "#894 gotobi-feed: HistData USD/JPY",
+    "t": 2.34,
+    "p": 0.009642,
+    "holm": 1,
+    "bh": 0.4192,
+    "by": 1,
+    "n": 623
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r2",
+    "t": 2.33,
+    "p": 0.009903,
+    "holm": 1,
+    "bh": 0.4192,
+    "by": 1,
+    "n": 81
+   },
+   {
+    "id": "#878 gotobi: T3",
+    "t": 2.2,
+    "p": 0.013903,
+    "holm": 1,
+    "bh": 0.5045,
+    "by": 1,
+    "n": 765
+   },
+   {
+    "id": "#880 fx-weekend-gap: G",
+    "t": 2.1411,
+    "p": 0.016133,
+    "holm": 1,
+    "bh": 0.5122,
+    "by": 1,
+    "n": 243
+   },
+   {
+    "id": "#838 rsi2-pullback: spx500",
+    "t": 2.0198,
+    "p": 0.0217,
+    "holm": 1,
+    "bh": 0.6124,
+    "by": 1,
+    "n": 99
+   },
+   {
+    "id": "#860 vol-spike-rebound: 5-day hold",
+    "t": 1.9549,
+    "p": 0.0253,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 216
+   },
+   {
+    "id": "#815 cycle-gate: geg G1",
+    "t": 1.895,
+    "p": 0.029046,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 106
+   },
+   {
+    "id": "#838 rsi2-pullback: us30",
+    "t": 1.8793,
+    "p": 0.0301,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 102
+   }
+  ],
+  "rows": [
+   {
+    "id": "#815 cycle-gate: gtrend G2",
+    "t": -0.169,
+    "p": 0.567102,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 40,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend G3",
+    "t": 0.564,
+    "p": 0.286377,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 12,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G2",
+    "t": 0.986,
+    "p": 0.162067,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 72,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G1",
+    "t": 1.895,
+    "p": 0.029046,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 106,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: geg G3",
+    "t": 0.04,
+    "p": 0.484047,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 49,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend5 G2",
+    "t": 0.356,
+    "p": 0.36092,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 66,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtrend5 G3",
+    "t": -0.833,
+    "p": 0.797578,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 18,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G2",
+    "t": -0.924,
+    "p": 0.822257,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 137,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G1",
+    "t": -1.065,
+    "p": 0.856562,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gtl G3",
+    "t": -1.947,
+    "p": 0.974233,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 50,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G2",
+    "t": -0.611,
+    "p": 0.7294,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 482,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G1",
+    "t": -0.612,
+    "p": 0.729731,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 536,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: gmp G3",
+    "t": -0.964,
+    "p": 0.832477,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 318,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G2",
+    "t": -0.132,
+    "p": 0.552508,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 68,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G1",
+    "t": -1.592,
+    "p": 0.944308,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 89,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: replica G3",
+    "t": 1.13,
+    "p": 0.129238,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 39,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G2",
+    "t": 0.635,
+    "p": 0.262714,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 37,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G1",
+    "t": 0.492,
+    "p": 0.31136,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 45,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: mosha-bo G3",
+    "t": -1.326,
+    "p": 0.90758,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 23,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G2",
+    "t": 0.209,
+    "p": 0.417224,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 29581,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G1",
+    "t": 0.226,
+    "p": 0.410601,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 34006,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: scalp G3",
+    "t": -1.355,
+    "p": 0.912291,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 14525,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G2",
+    "t": -1.089,
+    "p": 0.861923,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 7276,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G1",
+    "t": -1.499,
+    "p": 0.933063,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9409,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: intraday G3",
+    "t": 0.659,
+    "p": 0.254948,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4608,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G2",
+    "t": 0.2,
+    "p": 0.42074,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 5875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G1",
+    "t": 0.456,
+    "p": 0.324195,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9712,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rscalp G3",
+    "t": 0.433,
+    "p": 0.332507,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 5515,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G2",
+    "t": 0.882,
+    "p": 0.188888,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 758,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G1",
+    "t": -0.3,
+    "p": 0.617911,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1071,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#815 cycle-gate: rintra G3",
+    "t": 0.956,
+    "p": 0.169536,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 669,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T1",
+    "t": 0.67,
+    "p": 0.251429,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 486,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T2",
+    "t": 1.47,
+    "p": 0.070781,
+    "holm": 1,
+    "bh": 0.9162,
+    "by": 1,
+    "n": 236,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#816 drd-metals-book: T3",
+    "t": 1.09,
+    "p": 0.137857,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 244,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T1 week",
+    "t": -0.01,
+    "p": 0.503989,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 152,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T2 month",
+    "t": 0.49,
+    "p": 0.312067,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 143,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#817 ict-quarters: T3 year",
+    "t": -0.64,
+    "p": 0.738914,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 182,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#818 mcycle-base: combined",
+    "t": -3.99,
+    "p": 0.999967,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 115,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#819 mosha-bo-er: A ER20 filter",
+    "t": 1.268,
+    "p": 0.102399,
+    "holm": 1,
+    "bh": 0.9919,
+    "by": 1,
+    "n": 7,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#819 mosha-bo-er: B market entry",
+    "t": -0.087,
+    "p": 0.534664,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 41,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#820 tl-third-touch: T1 trendline",
+    "t": -2.87,
+    "p": 0.997948,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 42,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#820 tl-third-touch: T2 vs control",
+    "t": -1.59,
+    "p": 0.944083,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 42,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp xau",
+    "t": -0.692,
+    "p": 0.755531,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3310,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday xau",
+    "t": -0.07,
+    "p": 0.527903,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp xau",
+    "t": -5.099,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1832,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra xau",
+    "t": 0.486,
+    "p": 0.313484,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 424,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp eurusd",
+    "t": -5.61,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3499,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday eurusd",
+    "t": -1.529,
+    "p": 0.936868,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 757,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp eurusd",
+    "t": -6.301,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1797,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra eurusd",
+    "t": -1.809,
+    "p": 0.964775,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 418,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp gbpusd",
+    "t": -5.685,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3643,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday gbpusd",
+    "t": -1.578,
+    "p": 0.942717,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 837,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp gbpusd",
+    "t": -3.522,
+    "p": 0.999786,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1991,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra gbpusd",
+    "t": -0.711,
+    "p": 0.761458,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 446,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp audusd",
+    "t": -4.54,
+    "p": 0.999997,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4096,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday audusd",
+    "t": -0.691,
+    "p": 0.755217,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 850,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp audusd",
+    "t": -6.401,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1973,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra audusd",
+    "t": -2.407,
+    "p": 0.991958,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 449,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp usdcad",
+    "t": -7.028,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3943,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday usdcad",
+    "t": -1.394,
+    "p": 0.918341,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 870,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp usdcad",
+    "t": -5.269,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1967,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra usdcad",
+    "t": -2.128,
+    "p": 0.983331,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 470,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: scalp usdchf",
+    "t": -5.93,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3732,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday usdchf",
+    "t": -0.992,
+    "p": 0.839401,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 860,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rscalp usdchf",
+    "t": -5.115,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1898,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra usdchf",
+    "t": -2.734,
+    "p": 0.996871,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 424,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday btc",
+    "t": -1.676,
+    "p": 0.953131,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 884,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra btc",
+    "t": -3.626,
+    "p": 0.999856,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 524,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday eth",
+    "t": -0.489,
+    "p": 0.687579,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 751,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra eth",
+    "t": -1.437,
+    "p": 0.924641,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 445,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday sol",
+    "t": -2.097,
+    "p": 0.982003,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 885,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra sol",
+    "t": -2.634,
+    "p": 0.995781,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 515,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: intraday xrp",
+    "t": -1.023,
+    "p": 0.846846,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 630,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#821 shadow-best-raw: rintra xrp",
+    "t": -0.583,
+    "p": 0.720053,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 421,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T1 ladder",
+    "t": -0.59,
+    "p": 0.722405,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T2 sideways vs momentum",
+    "t": 0.55,
+    "p": 0.29116,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 69,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#822 engulf-ladder: T3 50% vs edge",
+    "t": 0.45,
+    "p": 0.326355,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 140,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#823 gold-tsmom: long/short",
+    "t": 0.84,
+    "p": 0.200454,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#823 gold-tsmom: long/flat",
+    "t": 1.03,
+    "p": 0.151505,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#824 ict-book-risk: R1",
+    "t": -0.4399,
+    "p": 0.67,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 516,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R2",
+    "t": 0.3121,
+    "p": 0.3775,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 658,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R3",
+    "t": 0.0326,
+    "p": 0.487,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 583,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#824 ict-book-risk: R4",
+    "t": -0.2237,
+    "p": 0.5885,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 679,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#825 swing-day3: T1",
+    "t": -0.01,
+    "p": 0.503989,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 262,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#825 swing-day3: T2",
+    "t": 0.0246,
+    "p": 0.4902,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#825 swing-day3: T3",
+    "t": -0.7199,
+    "p": 0.7642,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#826 turn-of-month: spx500",
+    "t": -0.1,
+    "p": 0.539828,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#826 turn-of-month: us30",
+    "t": -0.14,
+    "p": 0.55567,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#826 turn-of-month: nas100",
+    "t": 1.24,
+    "p": 0.107488,
+    "holm": 1,
+    "bh": 0.9919,
+    "by": 1,
+    "n": 129,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#828 tsmom-portfolio: book",
+    "t": -0.82,
+    "p": 0.793892,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 120,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#829 gold-silver-ratio: ratio fade",
+    "t": -1.2,
+    "p": 0.88493,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 18,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#830 fx-carry: T1",
+    "t": 0.34,
+    "p": 0.366928,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#830 fx-carry: T2",
+    "t": -0.05,
+    "p": 0.519939,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#831 pre-fomc-drift: spx500",
+    "t": 1.35,
+    "p": 0.088508,
+    "holm": 1,
+    "bh": 0.9774,
+    "by": 1,
+    "n": 86,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#833 crypto-weekly-mom: V1 long/flat",
+    "t": 0.77,
+    "p": 0.22065,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#833 crypto-weekly-mom: V2 long/short",
+    "t": 0.51,
+    "p": 0.305026,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#834 fx-reversal: reversal",
+    "t": -1.598,
+    "p": 0.944979,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 566,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#835 intraday-momentum: spx500",
+    "t": -9.0907,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2672,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#835 intraday-momentum: nas100",
+    "t": -5.4521,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2682,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: spx500",
+    "t": -1.39,
+    "p": 0.917736,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: nas100",
+    "t": 0.2,
+    "p": 0.42074,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#836 overnight-drift: us30",
+    "t": -1.44,
+    "p": 0.925066,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2722,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#837 orb-nas100: nas100",
+    "t": 1.27,
+    "p": 0.102042,
+    "holm": 1,
+    "bh": 0.9919,
+    "by": 1,
+    "n": 1460,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#837 orb-nas100: spx500",
+    "t": -0.79,
+    "p": 0.785236,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1456,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#838 rsi2-pullback: spx500",
+    "t": 2.0198,
+    "p": 0.0217,
+    "holm": 1,
+    "bh": 0.6124,
+    "by": 1,
+    "n": 99,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#838 rsi2-pullback: nas100",
+    "t": 1.241,
+    "p": 0.1073,
+    "holm": 1,
+    "bh": 0.9919,
+    "by": 1,
+    "n": 99,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#838 rsi2-pullback: us30",
+    "t": 1.8793,
+    "p": 0.0301,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 102,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#839 vol-managed: V c/variance",
+    "t": -0.5681,
+    "p": 0.715,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#839 vol-managed: S c/volatility",
+    "t": -0.3907,
+    "p": 0.652,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 1",
+    "t": -1.72,
+    "p": 0.957284,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 160,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 2",
+    "t": 0.43,
+    "p": 0.333598,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 48,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#840 audnzd-revert: variant 3",
+    "t": -1.03,
+    "p": 0.848495,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 122,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#841 sma10-timing: book",
+    "t": -1.0893,
+    "p": 0.862,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#842 crypto-hour: test 1",
+    "t": -7.24,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 2",
+    "t": -4.98,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 3",
+    "t": -1.2,
+    "p": 0.88493,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#842 crypto-hour: test 4",
+    "t": -0.5,
+    "p": 0.691462,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1035,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R1",
+    "t": -0.09,
+    "p": 0.535856,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 233,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R2",
+    "t": 0.64,
+    "p": 0.261086,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 190,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#843 gold-week-raid: R3",
+    "t": 0.76,
+    "p": 0.223627,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 235,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#844 rsi2-replicate: pooled",
+    "t": 0.85,
+    "p": 0.197663,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 521,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#845 pre-holiday: T1 pooled",
+    "t": 1.02,
+    "p": 0.153864,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 99,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#845 pre-holiday: T4 vs ordinary days",
+    "t": 1.03,
+    "p": 0.151505,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#846 fx-month-end: base",
+    "t": -1.059,
+    "p": 0.8552,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#846 fx-month-end: variant",
+    "t": 0.13,
+    "p": 0.448283,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 72,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#848 gold-asia-break: breakout",
+    "t": 0.526,
+    "p": 0.299444,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1169,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#848 gold-asia-break: fade",
+    "t": -0.136,
+    "p": 0.554089,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 484,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: nas100 all",
+    "t": -1.84,
+    "p": 0.967116,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 852,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: nas100 against",
+    "t": -0.94,
+    "p": 0.826391,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 431,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: spx500 all",
+    "t": -4.37,
+    "p": 0.999994,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 913,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#849 gap-fill: spx500 against",
+    "t": -3.7,
+    "p": 0.999892,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 472,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#850 gold-shock-revert: revert",
+    "t": 0.14,
+    "p": 0.44433,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#850 gold-shock-revert: continue",
+    "t": 0.16,
+    "p": 0.436441,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 28,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#851 sell-in-may: pooled",
+    "t": 0.3233,
+    "p": 0.373234,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 1",
+    "t": 0,
+    "p": 0.5,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 147,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 2",
+    "t": 0.61,
+    "p": 0.270931,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 147,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 3",
+    "t": -0.57,
+    "p": 0.715661,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 148,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#852 crypto-weekend: test 4",
+    "t": -1.09,
+    "p": 0.862143,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 148,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#853 high52-rotation: excess",
+    "t": 0.36,
+    "p": 0.359424,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#854 copper-gold: equal weight",
+    "t": -0.9186,
+    "p": 0.820848,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 565,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#855 dual-momentum: L12",
+    "t": -1.2133,
+    "p": 0.8875,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#855 dual-momentum: L6",
+    "t": -1.3106,
+    "p": 0.905,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: btc-sma200",
+    "t": 1.4909,
+    "p": 0.068,
+    "holm": 1,
+    "bh": 0.9162,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: btc-sma100",
+    "t": 0.9924,
+    "p": 0.1605,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: eth-sma200",
+    "t": 1.0669,
+    "p": 0.143,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#856 crypto-sma200: eth-sma100",
+    "t": 0.5873,
+    "p": 0.2785,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: spx500-r1",
+    "t": 0.54,
+    "p": 0.294598,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 237,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: spx500-r2",
+    "t": 1.1,
+    "p": 0.135666,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 51,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r1",
+    "t": 1.23,
+    "p": 0.109349,
+    "holm": 1,
+    "bh": 0.9919,
+    "by": 1,
+    "n": 224,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#857 turnaround-tuesday: nas100-r2",
+    "t": 2.33,
+    "p": 0.009903,
+    "holm": 1,
+    "bh": 0.4192,
+    "by": 1,
+    "n": 81,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#858 oil-wednesday: fade",
+    "t": -0.21,
+    "p": 0.583166,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 304,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#858 oil-wednesday: follow",
+    "t": -0.13,
+    "p": 0.551717,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 306,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#859 risk-spill-jpy: usdjpy",
+    "t": -2.3621,
+    "p": 0.990913,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#859 risk-spill-jpy: audjpy",
+    "t": 0.2545,
+    "p": 0.399542,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 725,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#860 vol-spike-rebound: 5-day hold",
+    "t": 1.9549,
+    "p": 0.0253,
+    "holm": 1,
+    "bh": 0.6371,
+    "by": 1,
+    "n": 216,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#860 vol-spike-rebound: 10-day hold",
+    "t": 2.5302,
+    "p": 0.0057,
+    "holm": 1,
+    "bh": 0.362,
+    "by": 1,
+    "n": 165,
+    "pFrom": "stored one-sided p (t is its normal equivalent)"
+   },
+   {
+    "id": "#861 fomc-follow: nas100 F",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: nas100 R",
+    "t": 0.56,
+    "p": 0.28774,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: spx500 F",
+    "t": -0.85,
+    "p": 0.802337,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: spx500 R",
+    "t": -0.83,
+    "p": 0.796731,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: xau F",
+    "t": 0.28,
+    "p": 0.389739,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#861 fomc-follow: xau R",
+    "t": -0.93,
+    "p": 0.823814,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 54,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#862 turnaround-replicate: pooled",
+    "t": 1.69,
+    "p": 0.045514,
+    "holm": 1,
+    "bh": 0.8258,
+    "by": 1,
+    "n": 411,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: F-xau",
+    "t": -2.333,
+    "p": 0.990176,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 77,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: R-xau",
+    "t": 0.512,
+    "p": 0.304325,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 40,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: F-nas100",
+    "t": -1.695,
+    "p": 0.954962,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 77,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#863 nfp-follow: R-nas100",
+    "t": -0.771,
+    "p": 0.779647,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 39,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#864 gold-weekend-gap: G",
+    "t": -0.7821,
+    "p": 0.782922,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 41,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#864 gold-weekend-gap: H",
+    "t": -0.7567,
+    "p": 0.775385,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 38,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: A",
+    "t": 0.24,
+    "p": 0.405165,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 93,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: B",
+    "t": -0.22,
+    "p": 0.587064,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: C",
+    "t": 0.11,
+    "p": 0.456205,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 93,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#865 rebalance-flow: D",
+    "t": -0.29,
+    "p": 0.614092,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day3",
+    "t": -1.661,
+    "p": 0.951643,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 109,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day3-sma200",
+    "t": -0.268,
+    "p": 0.60565,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 25,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day7",
+    "t": -1.729,
+    "p": 0.958095,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 106,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#866 crypto-reversal: day7-sma200",
+    "t": 0.696,
+    "p": 0.243214,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 23,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#867 nr7-breakout: A",
+    "t": 0.38,
+    "p": 0.351973,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2191,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#867 nr7-breakout: B",
+    "t": 0.29,
+    "p": 0.385908,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2191,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: F1",
+    "t": -2.28,
+    "p": 0.988696,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: F2",
+    "t": -5.36,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9875,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#868 fx-london-orb: FADE",
+    "t": -22,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 9739,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#869 fx-xs-momentum: lookback 21",
+    "t": -1.13,
+    "p": 0.870762,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#869 fx-xs-momentum: lookback 63",
+    "t": -1.79,
+    "p": 0.963273,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#870 gold-silver-divergence: fade",
+    "t": -3.36,
+    "p": 0.99961,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2519,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#870 gold-silver-divergence: follow",
+    "t": -2.94,
+    "p": 0.998359,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2325,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: follow-16:00",
+    "t": -2.18,
+    "p": 0.985371,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: follow-11:00",
+    "t": -3.08,
+    "p": 0.998965,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: fade-16:00",
+    "t": -1.01,
+    "p": 0.843752,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#871 cpi-follow: fade-11:00",
+    "t": 0.02,
+    "p": 0.492022,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#872 last-hour: fade",
+    "t": -5.2237,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2664,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#872 last-hour: follow",
+    "t": -4.3297,
+    "p": 0.999993,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2664,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#873 metals-rsi2: pooled",
+    "t": -1.79,
+    "p": 0.963273,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 137,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#874 index-cycle: exit A",
+    "t": -4.26,
+    "p": 0.99999,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1174,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#874 index-cycle: exit B",
+    "t": -5.6,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2907,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T1",
+    "t": -0.27,
+    "p": 0.60642,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1718,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T2",
+    "t": 1.37,
+    "p": 0.085343,
+    "holm": 1,
+    "bh": 0.9774,
+    "by": 1,
+    "n": 1063,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#875 gold-session-drift: T3",
+    "t": 0.96,
+    "p": 0.168528,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 683,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#876 nas-crypto-spill: follow",
+    "t": -0.4916,
+    "p": 0.688487,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 764,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#876 nas-crypto-spill: fade",
+    "t": -0.7727,
+    "p": 0.780136,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 764,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#877 fx-cycle: exit A",
+    "t": -4.48,
+    "p": 0.999996,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1892,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#877 fx-cycle: exit B",
+    "t": -4.27,
+    "p": 0.99999,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 4677,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T1",
+    "t": 0.93,
+    "p": 0.176186,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 760,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T2",
+    "t": 2.74,
+    "p": 0.003072,
+    "holm": 0.7741,
+    "bh": 0.2601,
+    "by": 1,
+    "n": 771,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T3",
+    "t": 2.2,
+    "p": 0.013903,
+    "holm": 1,
+    "bh": 0.5045,
+    "by": 1,
+    "n": 765,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#878 gotobi: T4",
+    "t": 1.84,
+    "p": 0.032884,
+    "holm": 1,
+    "bh": 0.6425,
+    "by": 1,
+    "n": 771,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T1 WTI long",
+    "t": 1.37,
+    "p": 0.085343,
+    "holm": 1,
+    "bh": 0.9774,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T2 Brent long",
+    "t": 1.46,
+    "p": 0.072145,
+    "holm": 1,
+    "bh": 0.9162,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T3 natgas long",
+    "t": 0.27,
+    "p": 0.39358,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#879 energy-seasonal: T4 natgas short",
+    "t": 1.47,
+    "p": 0.070781,
+    "holm": 1,
+    "bh": 0.9162,
+    "by": 1,
+    "n": 11,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#880 fx-weekend-gap: G",
+    "t": 2.1411,
+    "p": 0.016133,
+    "holm": 1,
+    "bh": 0.5122,
+    "by": 1,
+    "n": 243,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#880 fx-weekend-gap: H",
+    "t": -0.1617,
+    "p": 0.564229,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 222,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#881 index-pair: pair 1",
+    "t": -2.01,
+    "p": 0.977784,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#881 index-pair: pair 2",
+    "t": -2.21,
+    "p": 0.986447,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T1",
+    "t": -0.32,
+    "p": 0.625516,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T2",
+    "t": -2.04,
+    "p": 0.979325,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T3",
+    "t": 0.5,
+    "p": 0.308538,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#882 opex-week: T4",
+    "t": -2.92,
+    "p": 0.99825,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 130,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#883 london-fix: T1",
+    "t": -7.44,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3510,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#883 london-fix: T2",
+    "t": -10.32,
+    "p": 1,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 3510,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#884 index-spread-momentum: pooled",
+    "t": -1.56,
+    "p": 0.94062,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 244,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T1 AUD/JPY",
+    "t": -1.3,
+    "p": 0.9032,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 52,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T2 NZD/JPY",
+    "t": -0.94,
+    "p": 0.826391,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 52,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#886 risk-cross: T3 trend only",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#887 eth-btc-ratio: test 1",
+    "t": 0.682,
+    "p": 0.247619,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#887 eth-btc-ratio: test 2",
+    "t": 0.348,
+    "p": 0.36392,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#888 crypto-cycle: exit A",
+    "t": -1.8,
+    "p": 0.96407,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 830,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#888 crypto-cycle: exit B",
+    "t": -1.79,
+    "p": 0.963273,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 1717,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#889 gotobi-replicate: R1 crosses pooled",
+    "t": 2.75,
+    "p": 0.00298,
+    "holm": 0.7539,
+    "bh": 0.2601,
+    "by": 1,
+    "n": 4784,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#889 gotobi-replicate: R2 USD/JPY 2005-09",
+    "t": 3.8,
+    "p": 0.000072,
+    "holm": 0.0184,
+    "bh": 0.0184,
+    "by": 0.1124,
+    "n": 355,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T1-BTC",
+    "t": -0.08,
+    "p": 0.531881,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 19,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T1-ETH",
+    "t": -0.24,
+    "p": 0.594835,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T2-BTC",
+    "t": -0.71,
+    "p": 0.761148,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 19,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: T2-ETH",
+    "t": -1.69,
+    "p": 0.954486,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 27,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#890 crypto-weekend-reversal: POOL",
+    "t": -0.19,
+    "p": 0.575345,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 46,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#891 index-overnight: T1",
+    "t": -2.86,
+    "p": 0.997882,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2721,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#891 index-overnight: T2",
+    "t": -0.84,
+    "p": 0.799546,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 2721,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T1",
+    "t": -1.44,
+    "p": 0.925066,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T2",
+    "t": -0.39,
+    "p": 0.651732,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T3",
+    "t": -0.78,
+    "p": 0.782305,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T4",
+    "t": -1.86,
+    "p": 0.968557,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#892 tsmom: T5",
+    "t": -0.36,
+    "p": 0.640576,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": null,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#894 gotobi-feed: HistData USD/JPY",
+    "t": 2.34,
+    "p": 0.009642,
+    "holm": 1,
+    "bh": 0.4192,
+    "by": 1,
+    "n": 623,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T1",
+    "t": 0.37,
+    "p": 0.355691,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 472,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T2",
+    "t": 1.65,
+    "p": 0.049471,
+    "holm": 1,
+    "bh": 0.8377,
+    "by": 1,
+    "n": 473,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#895 index-ibs: T3",
+    "t": -0.31,
+    "p": 0.62172,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 469,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#896 ecb-boj-days: ECB EUR/USD",
+    "t": 1.51,
+    "p": 0.065522,
+    "holm": 1,
+    "bh": 0.9162,
+    "by": 1,
+    "n": 71,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#896 ecb-boj-days: BoJ USD/JPY",
+    "t": 0.22,
+    "p": 0.412936,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 67,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T1",
+    "t": -1.2788,
+    "p": 0.899516,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 38,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T2",
+    "t": -1.5184,
+    "p": 0.935543,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 30,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: T3",
+    "t": -1.6925,
+    "p": 0.954725,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 34,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#898 index-weekend-gap: P",
+    "t": -1.588,
+    "p": 0.943857,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 102,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#899 commodity-fx-lead: T1",
+    "t": -0.2949,
+    "p": 0.615965,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 366,
+    "pFrom": "t (normal, one-sided)"
+   },
+   {
+    "id": "#899 commodity-fx-lead: T2",
+    "t": 0.8858,
+    "p": 0.187863,
+    "holm": 1,
+    "bh": 1,
+    "by": 1,
+    "n": 375,
+    "pFrom": "t (normal, one-sided)"
+   }
+  ]
+ },
+ "perStudyPostHoc": {
+  "note": "post hoc, not pre-registered: one p per study (its smallest p x its number of tests)",
+  "S": 74,
+  "holmPass": [],
+  "bh10": [],
+  "gotobi": {
+   "p": 0.012288,
+   "holm": 0.897,
+   "bh": 0.4546
+  },
+  "smallest": [
+   {
+    "id": "#860 vol-spike-rebound",
+    "t": 2.2768,
+    "p": 0.0114,
+    "holm": 0.8436,
+    "bh": 0.4546,
+    "by": 1,
+    "n": 165
+   },
+   {
+    "id": "#878 gotobi",
+    "t": 2.248,
+    "p": 0.012288,
+    "holm": 0.897,
+    "bh": 0.4546,
+    "by": 1,
+    "n": 771
+   },
+   {
+    "id": "#880 fx-weekend-gap",
+    "t": 1.8485,
+    "p": 0.032266,
+    "holm": 1,
+    "bh": 0.7328,
+    "by": 1,
+    "n": 243
+   },
+   {
+    "id": "#857 turnaround-tuesday",
+    "t": 1.7552,
+    "p": 0.039612,
+    "holm": 1,
+    "bh": 0.7328,
+    "by": 1,
+    "n": 81
+   },
+   {
+    "id": "#838 rsi2-pullback",
+    "t": 1.5133,
+    "p": 0.0651,
+    "holm": 1,
+    "bh": 0.9635,
+    "by": 1,
+    "n": 99
+   }
+  ]
+ },
+ "gotobi": {
+  "test": "#878 gotobi: T2",
+  "t": 2.74,
+  "n": 771,
+  "p": 0.003072,
+  "holmWithin4": 0.0123,
+  "a_bh10": {
+   "q": 0.7068,
+   "pass": false,
+   "rank": 1,
+   "N": 248
+  },
+  "b_holm": {
+   "pAdj": 0.7618,
+   "pass": false,
+   "bonferroniP": 0.000202,
+   "bonferroniT": 3.538
+  },
+  "withReplications": {
+   "bh": 0.2601,
+   "holm": 0.7741,
+   "N": 254
+  },
+  "fisher": {
+   "set": [
+    {
+     "id": "#878 gotobi: T2",
+     "t": 2.74,
+     "p": 0.003072
+    },
+    {
+     "id": "#889 gotobi-replicate: R2 USD/JPY 2005-09",
+     "t": 3.8,
+     "n": 355,
+     "p": 0.000072
+    },
+    {
+     "id": "#894 gotobi-feed: HistData USD/JPY",
+     "t": 2.34,
+     "n": 623,
+     "p": 0.009642
+    }
+   ],
+   "primary": {
+    "x": 39.9222,
+    "df": 6,
+    "p": 4.718338204428682e-7,
+    "z": 4.903
+   },
+   "newDaysOnly": {
+    "x": 30.6389,
+    "df": 4,
+    "p": 0.0000036270045778326725,
+    "z": 4.4861
+   },
+   "leftOut": {
+    "id": "#889 gotobi-replicate: R1 crosses pooled",
+    "t": 2.75,
+    "why": "the crosses correlate 0.5-0.8 with the USD/JPY leg on the same days"
+   },
+   "caveat": "The HistData run covers the same 2018-26 days as the OANDA decisive window (per-trade correlation 0.997): it confirms the feed, not new history, so the three-p Fisher overstates the evidence. The two-p version (original + USD/JPY 2005-09) is the one with new days.",
+   "vsBonferroni": {
+    "primaryBelow": true,
+    "newDaysBelow": true
+   }
+  }
+ }
+}
