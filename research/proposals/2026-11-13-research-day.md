@@ -204,6 +204,7 @@ paper system with a measured, clearly negative record.
 | 186 | Five-year price value on indices and commodities (`value-everywhere`) | **FAIL**, 0 of 4: primary 2017-26 −0.072R a month net (t −2.97), −0.038R in sample; at the placebo median; indices lose gross (short nas100 every month, as #941); commodity in-sample gain gone OOS | #999 |
 | 187 | Monthly intermarket lead: US500, copper, dollar (`intermarket-lead`) | **FAIL**, 0 of 3, Holm p 1.00: US500 → 10 indices 2017-26 −1.13R a month net (t −1.79), loses gross; copper = own momentum (difference t 0.00); dollar → metals +0.07R (t 0.27) | #1000 |
 | 188 | Stock-bond correlation filter on index longs (`stock-bond-corr`) | **FAIL**, 0 of 3: holding only while the 60-day correlation is negative cut US500 Sharpe −0.254 net 2017-26 (t −1.54), return 3.0 % vs 7.6 % a year, drawdown unchanged; random masks did as well 27-33 of 40 | #1001 |
+| 189 | Quarterly futures roll and expiry windows on indices (`index-roll-week`) | **FAIL**, 0 of 8, Holm p 1.00: SPX500 roll window 2017-26 −0.114R a trade net (n 39, t −1.08), beats 5 of 40 placebos; the expiry week's in-sample gain did not repeat | #1002 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
