@@ -137,6 +137,7 @@ paper system with a measured, clearly negative record.
 | 119 | Second frozen replication of the forex Sunday-gap fade (#880 rule G): #928's crosses 2010-19, six untraded pairs 2016-now | PARTLY: new pairs +0.153R a trade (n 481, month t 3.19, Holm p 0.001; every year positive, AUD/NZD half of it, gone at 2x cost); crosses 2010-19 +0.061R (t 1.02), 81 % from 2015. Real since 2016 on several pair sets, near zero before, cost-fragile | #938 |
 | 120 | Month-end rise in US Treasuries (10y, 30y CFDs, last 3 trading days) | FAIL 0 of 2: positive in both windows and above the placebo, but t 0.3-1.1 net; real before costs (10y gross t 2.31, best of 18 day-of-month windows on every US maturity), two-thirds eaten by spread and financing | #939 |
 | 121 | Weekly cross-sectional reversal on 9 currencies (a second look at #834's 7-major version) | FAIL: −0.024R a week 2016-now (t −1.97), flat before costs; at the median of random picks. Two versions now failed; no third | #940 |
+| 122 | 3-year reversal across 17 national stock indices (long worst 3, short best 3, 12-month overlapping cohorts) | FAIL: −0.047R a month 2016-now (NW t −3.80), −0.026R 2006-15; below 39 of 40 random rankings; past winners (NAS100) kept winning | #941 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
