@@ -1,0 +1,1633 @@
+{
+ "study": "tsmom",
+ "title": "Time-series momentum across asset classes",
+ "built": "2026-11-14",
+ "prereg": "ce86df944",
+ "verdict": "FAIL",
+ "system": "Time-series momentum (12-1 month sign, 1R = 2 x ATR(63) stop, equal risk, monthly) on 25 OANDA markets: indices, bonds, commodities, forex; net of trading costs and financing",
+ "window": {
+  "decisive": [
+   "2016-01",
+   "2026-10"
+  ],
+  "replication": [
+   "2008-01",
+   "2015-12"
+  ]
+ },
+ "params": {
+  "SKIP": 21,
+  "LOOK": 252,
+  "ATR": 63,
+  "STOP_ATR": 2,
+  "STALE_D": 7,
+  "MARKUP": 2.5,
+  "FX_MARKUP": 1,
+  "SEEDS": 40,
+  "T_BAR": 2,
+  "ALPHA": 0.05,
+  "DECISIVE": [
+   "2016-01",
+   "2026-10"
+  ],
+  "REPLICATION": [
+   "2008-01",
+   "2015-12"
+  ],
+  "LATEST_START": "2008-01-01"
+ },
+ "costs": {
+  "fx": 0.00015,
+  "index": 0.0003,
+  "mid": 0.001,
+  "wide": 0.002,
+  "bond": 0.001,
+  "xauRoundTrip": 0.3
+ },
+ "markets": {
+  "used": [
+   "nas100",
+   "spx500",
+   "us30",
+   "de40",
+   "uk100",
+   "jp225",
+   "au200",
+   "usb10y",
+   "de10yb",
+   "uk10yb",
+   "xau",
+   "xag",
+   "bco",
+   "wtico",
+   "natgas",
+   "corn",
+   "wheat",
+   "soybn",
+   "eurusd",
+   "gbpusd",
+   "usdjpy",
+   "audusd",
+   "usdcad",
+   "usdchf",
+   "nzdusd"
+  ],
+  "dropped": [],
+  "first": {
+   "nas100": "2003-03-24",
+   "spx500": "2003-03-24",
+   "us30": "2003-03-24",
+   "de40": "2003-03-25",
+   "uk100": "2003-03-24",
+   "jp225": "2003-03-14",
+   "au200": "2004-03-18",
+   "usb10y": "2003-03-21",
+   "de10yb": "2003-03-07",
+   "uk10yb": "2003-06-27",
+   "xau": "2006-03-20",
+   "xag": "2006-03-20",
+   "bco": "2003-08-19",
+   "wtico": "2003-01-23",
+   "natgas": "2003-01-31",
+   "corn": "2003-03-17",
+   "wheat": "2003-03-17",
+   "soybn": "2003-03-17",
+   "eurusd": "2002-05-07",
+   "gbpusd": "2002-05-07",
+   "usdjpy": "2002-05-07",
+   "audusd": "2002-05-07",
+   "usdcad": "2002-05-08",
+   "usdchf": "2002-05-07",
+   "nzdusd": "2002-09-24"
+  }
+ },
+ "dataTo": "2026-11-06",
+ "tests": {
+  "T1": {
+   "name": "All 25 markets",
+   "markets": 25,
+   "decisive": {
+    "months": 130,
+    "positions": 3250,
+    "perMonth": -1.3887,
+    "sd": 11.0222,
+    "t": -1.44,
+    "sharpe": -0.44,
+    "total": -180.53,
+    "dd": -231.98,
+    "win": 0.395,
+    "stops": 1607,
+    "long": 1853,
+    "short": 1397,
+    "grossPerPos": 0.0334,
+    "costPerPos": 0.0274,
+    "finPerPos": 0.0616,
+    "gross": {
+     "months": 130,
+     "positions": 3250,
+     "perMonth": 0.8352,
+     "sd": 11.3382,
+     "t": 0.84,
+     "sharpe": 0.26,
+     "total": 108.57,
+     "dd": -85.6,
+     "win": 0.411,
+     "stops": 1607,
+     "long": 1853,
+     "short": 1397,
+     "grossPerPos": 0.0334,
+     "costPerPos": 0.0274,
+     "finPerPos": 0.0616
+    },
+    "noFin": {
+     "months": 130,
+     "positions": 3250,
+     "perMonth": 0.1506,
+     "sd": 11.3236,
+     "t": 0.15,
+     "sharpe": 0.05,
+     "total": 19.58,
+     "dd": -117.6,
+     "win": 0.408,
+     "stops": 1607,
+     "long": 1853,
+     "short": 1397,
+     "grossPerPos": 0.0334,
+     "costPerPos": 0.0274,
+     "finPerPos": 0.0616
+    },
+    "x2": {
+     "months": 130,
+     "positions": 3250,
+     "perMonth": -3.6126,
+     "sd": 10.762,
+     "t": -3.83,
+     "sharpe": -1.16,
+     "total": -469.64,
+     "dd": -484.97,
+     "win": 0.374,
+     "stops": 1607,
+     "long": 1853,
+     "short": 1397,
+     "grossPerPos": 0.0334,
+     "costPerPos": 0.0274,
+     "finPerPos": 0.0616
+    },
+    "placebo": {
+     "p5": -4.19,
+     "p50": -2.92,
+     "p95": -1.88,
+     "max": -1.28,
+     "meanP50": -2.0627,
+     "meanP95": -1.3582,
+     "above": 2
+    }
+   },
+   "replication": {
+    "months": 96,
+    "positions": 2397,
+    "perMonth": 0.2879,
+    "sd": 12.4502,
+    "t": 0.23,
+    "sharpe": 0.08,
+    "total": 27.64,
+    "dd": -104.64,
+    "win": 0.42,
+    "stops": 1144,
+    "long": 1357,
+    "short": 1040,
+    "grossPerPos": 0.0829,
+    "costPerPos": 0.0235,
+    "finPerPos": 0.0479,
+    "gross": {
+     "months": 96,
+     "positions": 2397,
+     "perMonth": 2.0706,
+     "sd": 12.6204,
+     "t": 1.61,
+     "sharpe": 0.57,
+     "total": 198.78,
+     "dd": -76.07,
+     "win": 0.431,
+     "stops": 1144,
+     "long": 1357,
+     "short": 1040,
+     "grossPerPos": 0.0829,
+     "costPerPos": 0.0235,
+     "finPerPos": 0.0479
+    },
+    "noFin": {
+     "months": 96,
+     "positions": 2397,
+     "perMonth": 1.4843,
+     "sd": 12.6156,
+     "t": 1.15,
+     "sharpe": 0.41,
+     "total": 142.49,
+     "dd": -79.34,
+     "win": 0.429,
+     "stops": 1144,
+     "long": 1357,
+     "short": 1040,
+     "grossPerPos": 0.0829,
+     "costPerPos": 0.0235,
+     "finPerPos": 0.0479
+    },
+    "x2": {
+     "months": 96,
+     "positions": 2397,
+     "perMonth": -1.4947,
+     "sd": 12.2977,
+     "t": -1.19,
+     "sharpe": -0.42,
+     "total": -143.49,
+     "dd": -209.19,
+     "win": 0.404,
+     "stops": 1144,
+     "long": 1357,
+     "short": 1040,
+     "grossPerPos": 0.0829,
+     "costPerPos": 0.0235,
+     "finPerPos": 0.0479
+    },
+    "placebo": {
+     "p5": -1.82,
+     "p50": -0.85,
+     "p95": 0.12,
+     "max": 0.52,
+     "meanP50": -0.7398,
+     "meanP95": 0.097,
+     "above": 1
+    }
+   },
+   "p": 0.9251,
+   "holm": 1,
+   "cond": {
+    "c1": false,
+    "c2": true,
+    "c3": false,
+    "c4": true,
+    "c5": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "Indices",
+   "markets": 7,
+   "decisive": {
+    "months": 130,
+    "positions": 910,
+    "perMonth": -0.185,
+    "sd": 5.3816,
+    "t": -0.39,
+    "sharpe": -0.12,
+    "total": -24.05,
+    "dd": -77.36,
+    "win": 0.414,
+    "stops": 430,
+    "long": 683,
+    "short": 227,
+    "grossPerPos": 0.0784,
+    "costPerPos": 0.0116,
+    "finPerPos": 0.0932,
+    "gross": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": 0.5488,
+     "sd": 5.6528,
+     "t": 1.11,
+     "sharpe": 0.34,
+     "total": 71.34,
+     "dd": -46.76,
+     "win": 0.435,
+     "stops": 430,
+     "long": 683,
+     "short": 227,
+     "grossPerPos": 0.0784,
+     "costPerPos": 0.0116,
+     "finPerPos": 0.0932
+    },
+    "noFin": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": 0.4674,
+     "sd": 5.6491,
+     "t": 0.94,
+     "sharpe": 0.29,
+     "total": 60.76,
+     "dd": -50.26,
+     "win": 0.434,
+     "stops": 430,
+     "long": 683,
+     "short": 227,
+     "grossPerPos": 0.0784,
+     "costPerPos": 0.0116,
+     "finPerPos": 0.0932
+    },
+    "x2": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": -0.9187,
+     "sd": 5.1438,
+     "t": -2.04,
+     "sharpe": -0.62,
+     "total": -119.43,
+     "dd": -125.48,
+     "win": 0.391,
+     "stops": 430,
+     "long": 683,
+     "short": 227,
+     "grossPerPos": 0.0784,
+     "costPerPos": 0.0116,
+     "finPerPos": 0.0932
+    },
+    "placebo": {
+     "p5": -2.53,
+     "p50": -1.64,
+     "p95": -0.85,
+     "max": -0.3,
+     "meanP50": -0.5614,
+     "meanP95": -0.3309,
+     "above": 1
+    }
+   },
+   "replication": {
+    "months": 96,
+    "positions": 670,
+    "perMonth": -0.0901,
+    "sd": 6.2495,
+    "t": -0.14,
+    "sharpe": -0.05,
+    "total": -8.65,
+    "dd": -55.19,
+    "win": 0.424,
+    "stops": 317,
+    "long": 457,
+    "short": 213,
+    "grossPerPos": 0.0463,
+    "costPerPos": 0.0099,
+    "finPerPos": 0.0493,
+    "gross": {
+     "months": 96,
+     "positions": 670,
+     "perMonth": 0.3234,
+     "sd": 6.3307,
+     "t": 0.5,
+     "sharpe": 0.18,
+     "total": 31.04,
+     "dd": -44.92,
+     "win": 0.428,
+     "stops": 317,
+     "long": 457,
+     "short": 213,
+     "grossPerPos": 0.0463,
+     "costPerPos": 0.0099,
+     "finPerPos": 0.0493
+    },
+    "noFin": {
+     "months": 96,
+     "positions": 670,
+     "perMonth": 0.2539,
+     "sd": 6.3322,
+     "t": 0.39,
+     "sharpe": 0.14,
+     "total": 24.38,
+     "dd": -46.36,
+     "win": 0.428,
+     "stops": 317,
+     "long": 457,
+     "short": 213,
+     "grossPerPos": 0.0463,
+     "costPerPos": 0.0099,
+     "finPerPos": 0.0493
+    },
+    "x2": {
+     "months": 96,
+     "positions": 670,
+     "perMonth": -0.5035,
+     "sd": 6.1765,
+     "t": -0.8,
+     "sharpe": -0.28,
+     "total": -48.34,
+     "dd": -88.26,
+     "win": 0.416,
+     "stops": 317,
+     "long": 457,
+     "short": 213,
+     "grossPerPos": 0.0463,
+     "costPerPos": 0.0099,
+     "finPerPos": 0.0493
+    },
+    "placebo": {
+     "p5": -2.84,
+     "p50": -1.51,
+     "p95": -0.36,
+     "max": 0.36,
+     "meanP50": -0.6186,
+     "meanP95": -0.1531,
+     "above": 1
+    }
+   },
+   "p": 0.6517,
+   "holm": 1,
+   "cond": {
+    "c1": false,
+    "c2": false,
+    "c3": false,
+    "c4": true,
+    "c5": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "Bonds",
+   "markets": 3,
+   "decisive": {
+    "months": 130,
+    "positions": 390,
+    "perMonth": -0.2394,
+    "sd": 3.4787,
+    "t": -0.78,
+    "sharpe": -0.24,
+    "total": -31.12,
+    "dd": -61.72,
+    "win": 0.415,
+    "stops": 185,
+    "long": 152,
+    "short": 238,
+    "grossPerPos": 0.1401,
+    "costPerPos": 0.1004,
+    "finPerPos": 0.1195,
+    "gross": {
+     "months": 130,
+     "positions": 390,
+     "perMonth": 0.4203,
+     "sd": 3.5826,
+     "t": 1.34,
+     "sharpe": 0.41,
+     "total": 54.64,
+     "dd": -23.64,
+     "win": 0.449,
+     "stops": 185,
+     "long": 152,
+     "short": 238,
+     "grossPerPos": 0.1401,
+     "costPerPos": 0.1004,
+     "finPerPos": 0.1195
+    },
+    "noFin": {
+     "months": 130,
+     "positions": 390,
+     "perMonth": 0.1192,
+     "sd": 3.5807,
+     "t": 0.38,
+     "sharpe": 0.12,
+     "total": 15.49,
+     "dd": -33.57,
+     "win": 0.441,
+     "stops": 185,
+     "long": 152,
+     "short": 238,
+     "grossPerPos": 0.1401,
+     "costPerPos": 0.1004,
+     "finPerPos": 0.1195
+    },
+    "x2": {
+     "months": 130,
+     "positions": 390,
+     "perMonth": -0.8991,
+     "sd": 3.4318,
+     "t": -2.99,
+     "sharpe": -0.91,
+     "total": -116.88,
+     "dd": -127.3,
+     "win": 0.349,
+     "stops": 185,
+     "long": 152,
+     "short": 238,
+     "grossPerPos": 0.1401,
+     "costPerPos": 0.1004,
+     "finPerPos": 0.1195
+    },
+    "placebo": {
+     "p5": -4.37,
+     "p50": -2.93,
+     "p95": -1.59,
+     "max": -1.1,
+     "meanP50": -0.6494,
+     "meanP95": -0.3888,
+     "above": 0
+    }
+   },
+   "replication": {
+    "months": 96,
+    "positions": 288,
+    "perMonth": -0.8431,
+    "sd": 2.7883,
+    "t": -2.96,
+    "sharpe": -1.05,
+    "total": -80.93,
+    "dd": -81.97,
+    "win": 0.351,
+    "stops": 156,
+    "long": 200,
+    "short": 88,
+    "grossPerPos": -0.0588,
+    "costPerPos": 0.0871,
+    "finPerPos": 0.1351,
+    "gross": {
+     "months": 96,
+     "positions": 288,
+     "perMonth": -0.1763,
+     "sd": 2.8939,
+     "t": -0.6,
+     "sharpe": -0.21,
+     "total": -16.93,
+     "dd": -28.91,
+     "win": 0.392,
+     "stops": 156,
+     "long": 200,
+     "short": 88,
+     "grossPerPos": -0.0588,
+     "costPerPos": 0.0871,
+     "finPerPos": 0.1351
+    },
+    "noFin": {
+     "months": 96,
+     "positions": 288,
+     "perMonth": -0.4377,
+     "sd": 2.8966,
+     "t": -1.48,
+     "sharpe": -0.52,
+     "total": -42.02,
+     "dd": -50.56,
+     "win": 0.378,
+     "stops": 156,
+     "long": 200,
+     "short": 88,
+     "grossPerPos": -0.0588,
+     "costPerPos": 0.0871,
+     "finPerPos": 0.1351
+    },
+    "x2": {
+     "months": 96,
+     "positions": 288,
+     "perMonth": -1.5098,
+     "sd": 2.6945,
+     "t": -5.49,
+     "sharpe": -1.94,
+     "total": -144.94,
+     "dd": -144.94,
+     "win": 0.295,
+     "stops": 156,
+     "long": 200,
+     "short": 88,
+     "grossPerPos": -0.0588,
+     "costPerPos": 0.0871,
+     "finPerPos": 0.1351
+    },
+    "placebo": {
+     "p5": -4.44,
+     "p50": -2.62,
+     "p95": -0.91,
+     "max": -0.31,
+     "meanP50": -0.6199,
+     "meanP95": -0.2263,
+     "above": 24
+    }
+   },
+   "p": 0.7823,
+   "holm": 1,
+   "cond": {
+    "c1": false,
+    "c2": false,
+    "c3": false,
+    "c4": true,
+    "c5": false
+   },
+   "pass": false
+  },
+  "T4": {
+   "name": "Commodities",
+   "markets": 8,
+   "decisive": {
+    "months": 130,
+    "positions": 1040,
+    "perMonth": -0.8008,
+    "sd": 4.9025,
+    "t": -1.86,
+    "sharpe": -0.57,
+    "total": -104.11,
+    "dd": -121.8,
+    "win": 0.374,
+    "stops": 538,
+    "long": 582,
+    "short": 458,
+    "grossPerPos": -0.0332,
+    "costPerPos": 0.0288,
+    "finPerPos": 0.0381,
+    "gross": {
+     "months": 130,
+     "positions": 1040,
+     "perMonth": -0.2657,
+     "sd": 4.9674,
+     "t": -0.61,
+     "sharpe": -0.19,
+     "total": -34.54,
+     "dd": -80.25,
+     "win": 0.387,
+     "stops": 538,
+     "long": 582,
+     "short": 458,
+     "grossPerPos": -0.0332,
+     "costPerPos": 0.0288,
+     "finPerPos": 0.0381
+    },
+    "noFin": {
+     "months": 130,
+     "positions": 1040,
+     "perMonth": -0.4962,
+     "sd": 4.9684,
+     "t": -1.14,
+     "sharpe": -0.35,
+     "total": -64.51,
+     "dd": -93.8,
+     "win": 0.383,
+     "stops": 538,
+     "long": 582,
+     "short": 458,
+     "grossPerPos": -0.0332,
+     "costPerPos": 0.0288,
+     "finPerPos": 0.0381
+    },
+    "x2": {
+     "months": 130,
+     "positions": 1040,
+     "perMonth": -1.3359,
+     "sd": 4.843,
+     "t": -3.15,
+     "sharpe": -0.96,
+     "total": -173.67,
+     "dd": -187.22,
+     "win": 0.361,
+     "stops": 538,
+     "long": 582,
+     "short": 458,
+     "grossPerPos": -0.0332,
+     "costPerPos": 0.0288,
+     "finPerPos": 0.0381
+    },
+    "placebo": {
+     "p5": -3.13,
+     "p50": -1.83,
+     "p95": -0.61,
+     "max": -0.12,
+     "meanP50": -0.6496,
+     "meanP95": -0.2178,
+     "above": 20
+    }
+   },
+   "replication": {
+    "months": 96,
+    "positions": 767,
+    "perMonth": 1.0121,
+    "sd": 5.8177,
+    "t": 1.7,
+    "sharpe": 0.6,
+    "total": 97.16,
+    "dd": -38.21,
+    "win": 0.455,
+    "stops": 347,
+    "long": 374,
+    "short": 393,
+    "grossPerPos": 0.1831,
+    "costPerPos": 0.025,
+    "finPerPos": 0.0314,
+    "gross": {
+     "months": 96,
+     "positions": 767,
+     "perMonth": 1.4632,
+     "sd": 5.8947,
+     "t": 2.43,
+     "sharpe": 0.86,
+     "total": 140.46,
+     "dd": -35.43,
+     "win": 0.464,
+     "stops": 347,
+     "long": 374,
+     "short": 393,
+     "grossPerPos": 0.1831,
+     "costPerPos": 0.025,
+     "finPerPos": 0.0314
+    },
+    "noFin": {
+     "months": 96,
+     "positions": 767,
+     "perMonth": 1.2631,
+     "sd": 5.8868,
+     "t": 2.1,
+     "sharpe": 0.74,
+     "total": 121.26,
+     "dd": -36.82,
+     "win": 0.462,
+     "stops": 347,
+     "long": 374,
+     "short": 393,
+     "grossPerPos": 0.1831,
+     "costPerPos": 0.025,
+     "finPerPos": 0.0314
+    },
+    "x2": {
+     "months": 96,
+     "positions": 767,
+     "perMonth": 0.561,
+     "sd": 5.7432,
+     "t": 0.96,
+     "sharpe": 0.34,
+     "total": 53.86,
+     "dd": -45.53,
+     "win": 0.442,
+     "stops": 347,
+     "long": 374,
+     "short": 393,
+     "grossPerPos": 0.1831,
+     "costPerPos": 0.025,
+     "finPerPos": 0.0314
+    },
+    "placebo": {
+     "p5": -0.55,
+     "p50": 0.84,
+     "p95": 2.33,
+     "max": 2.6,
+     "meanP50": 0.3545,
+     "meanP95": 0.9685,
+     "above": 7
+    }
+   },
+   "p": 0.9686,
+   "holm": 1,
+   "cond": {
+    "c1": false,
+    "c2": true,
+    "c3": false,
+    "c4": false,
+    "c5": false
+   },
+   "pass": false
+  },
+  "T5": {
+   "name": "Forex",
+   "markets": 7,
+   "decisive": {
+    "months": 130,
+    "positions": 910,
+    "perMonth": -0.1635,
+    "sd": 5.2462,
+    "t": -0.36,
+    "sharpe": -0.11,
+    "total": -21.25,
+    "dd": -61.56,
+    "win": 0.391,
+    "stops": 454,
+    "long": 436,
+    "short": 474,
+    "grossPerPos": 0.0188,
+    "costPerPos": 0.0102,
+    "finPerPos": 0.032,
+    "gross": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": 0.1318,
+     "sd": 5.2559,
+     "t": 0.29,
+     "sharpe": 0.09,
+     "total": 17.14,
+     "dd": -50.57,
+     "win": 0.4,
+     "stops": 454,
+     "long": 436,
+     "short": 474,
+     "grossPerPos": 0.0188,
+     "costPerPos": 0.0102,
+     "finPerPos": 0.032
+    },
+    "noFin": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": 0.0603,
+     "sd": 5.2546,
+     "t": 0.13,
+     "sharpe": 0.04,
+     "total": 7.84,
+     "dd": -52.74,
+     "win": 0.398,
+     "stops": 454,
+     "long": 436,
+     "short": 474,
+     "grossPerPos": 0.0188,
+     "costPerPos": 0.0102,
+     "finPerPos": 0.032
+    },
+    "x2": {
+     "months": 130,
+     "positions": 910,
+     "perMonth": -0.4588,
+     "sd": 5.2537,
+     "t": -1,
+     "sharpe": -0.3,
+     "total": -59.65,
+     "dd": -79.75,
+     "win": 0.385,
+     "stops": 454,
+     "long": 436,
+     "short": 474,
+     "grossPerPos": 0.0188,
+     "costPerPos": 0.0102,
+     "finPerPos": 0.032
+    },
+    "placebo": {
+     "p5": -1.48,
+     "p50": -0.19,
+     "p95": 0.59,
+     "max": 0.98,
+     "meanP50": -0.0633,
+     "meanP95": 0.1904,
+     "above": 23
+    }
+   },
+   "replication": {
+    "months": 96,
+    "positions": 672,
+    "perMonth": 0.209,
+    "sd": 5.4392,
+    "t": 0.38,
+    "sharpe": 0.13,
+    "total": 20.06,
+    "dd": -36.39,
+    "win": 0.405,
+    "stops": 324,
+    "long": 326,
+    "short": 346,
+    "grossPerPos": 0.0658,
+    "costPerPos": 0.0079,
+    "finPerPos": 0.028,
+    "gross": {
+     "months": 96,
+     "positions": 672,
+     "perMonth": 0.4604,
+     "sd": 5.4878,
+     "t": 0.82,
+     "sharpe": 0.29,
+     "total": 44.2,
+     "dd": -27.79,
+     "win": 0.414,
+     "stops": 324,
+     "long": 326,
+     "short": 346,
+     "grossPerPos": 0.0658,
+     "costPerPos": 0.0079,
+     "finPerPos": 0.028
+    },
+    "noFin": {
+     "months": 96,
+     "positions": 672,
+     "perMonth": 0.4049,
+     "sd": 5.4872,
+     "t": 0.72,
+     "sharpe": 0.26,
+     "total": 38.87,
+     "dd": -28.87,
+     "win": 0.414,
+     "stops": 324,
+     "long": 326,
+     "short": 346,
+     "grossPerPos": 0.0658,
+     "costPerPos": 0.0079,
+     "finPerPos": 0.028
+    },
+    "x2": {
+     "months": 96,
+     "positions": 672,
+     "perMonth": -0.0424,
+     "sd": 5.3962,
+     "t": -0.08,
+     "sharpe": -0.03,
+     "total": -4.07,
+     "dd": -53.05,
+     "win": 0.396,
+     "stops": 324,
+     "long": 326,
+     "short": 346,
+     "grossPerPos": 0.0658,
+     "costPerPos": 0.0079,
+     "finPerPos": 0.028
+    },
+    "placebo": {
+     "p5": -0.7,
+     "p50": 0.23,
+     "p95": 1.24,
+     "max": 1.74,
+     "meanP50": 0.102,
+     "meanP95": 0.5298,
+     "above": 16
+    }
+   },
+   "p": 0.6406,
+   "holm": 1,
+   "cond": {
+    "c1": false,
+    "c2": true,
+    "c3": false,
+    "c4": false,
+    "c5": false
+   },
+   "pass": false
+  }
+ },
+ "perMarket": {
+  "nas100": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": 24.11,
+    "perMonth": 0.1855,
+    "t": 1.57,
+    "grossPerPos": 0.2756,
+    "costPerPos": 0.0096,
+    "finPerPos": 0.0806,
+    "stops": 57
+   },
+   "replication": {
+    "positions": 96,
+    "total": 2.24,
+    "perMonth": 0.0233,
+    "t": 0.18,
+    "grossPerPos": 0.082,
+    "costPerPos": 0.0095,
+    "finPerPos": 0.0492,
+    "stops": 50
+   }
+  },
+  "spx500": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": 12.46,
+    "perMonth": 0.0959,
+    "t": 0.82,
+    "grossPerPos": 0.2162,
+    "costPerPos": 0.0129,
+    "finPerPos": 0.1074,
+    "stops": 58
+   },
+   "replication": {
+    "positions": 96,
+    "total": -4.47,
+    "perMonth": -0.0465,
+    "t": -0.39,
+    "grossPerPos": 0.0186,
+    "costPerPos": 0.0108,
+    "finPerPos": 0.0544,
+    "stops": 46
+   }
+  },
+  "us30": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": -1.83,
+    "perMonth": -0.0141,
+    "t": -0.12,
+    "grossPerPos": 0.1097,
+    "costPerPos": 0.0132,
+    "finPerPos": 0.1106,
+    "stops": 60
+   },
+   "replication": {
+    "positions": 96,
+    "total": -3.13,
+    "perMonth": -0.0326,
+    "t": -0.27,
+    "grossPerPos": 0.038,
+    "costPerPos": 0.0117,
+    "finPerPos": 0.0589,
+    "stops": 45
+   }
+  },
+  "de40": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": -11.21,
+    "perMonth": -0.0862,
+    "t": -0.8,
+    "grossPerPos": 0.0065,
+    "costPerPos": 0.0108,
+    "finPerPos": 0.0819,
+    "stops": 64
+   },
+   "replication": {
+    "positions": 96,
+    "total": 4.7,
+    "perMonth": 0.0489,
+    "t": 0.42,
+    "grossPerPos": 0.1012,
+    "costPerPos": 0.0086,
+    "finPerPos": 0.0437,
+    "stops": 38
+   }
+  },
+  "uk100": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": -20.36,
+    "perMonth": -0.1566,
+    "t": -1.61,
+    "grossPerPos": -0.0373,
+    "costPerPos": 0.0128,
+    "finPerPos": 0.1065,
+    "stops": 63
+   },
+   "replication": {
+    "positions": 96,
+    "total": -3.78,
+    "perMonth": -0.0393,
+    "t": -0.34,
+    "grossPerPos": 0.0235,
+    "costPerPos": 0.0103,
+    "finPerPos": 0.0526,
+    "stops": 43
+   }
+  },
+  "jp225": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": -6.07,
+    "perMonth": -0.0467,
+    "t": -0.39,
+    "grossPerPos": 0.0254,
+    "costPerPos": 0.0091,
+    "finPerPos": 0.063,
+    "stops": 64
+   },
+   "replication": {
+    "positions": 96,
+    "total": 1.47,
+    "perMonth": 0.0154,
+    "t": 0.11,
+    "grossPerPos": 0.0564,
+    "costPerPos": 0.0079,
+    "finPerPos": 0.0331,
+    "stops": 47
+   }
+  },
+  "au200": {
+   "class": "indices",
+   "decisive": {
+    "positions": 130,
+    "total": -21.15,
+    "perMonth": -0.1627,
+    "t": -1.76,
+    "grossPerPos": -0.0474,
+    "costPerPos": 0.0129,
+    "finPerPos": 0.1024,
+    "stops": 64
+   },
+   "replication": {
+    "positions": 94,
+    "total": -5.68,
+    "perMonth": -0.0592,
+    "t": -0.44,
+    "grossPerPos": 0.0038,
+    "costPerPos": 0.0109,
+    "finPerPos": 0.0533,
+    "stops": 48
+   }
+  },
+  "usb10y": {
+   "class": "bonds",
+   "decisive": {
+    "positions": 130,
+    "total": -28.36,
+    "perMonth": -0.2182,
+    "t": -1.86,
+    "grossPerPos": 0.0331,
+    "costPerPos": 0.1152,
+    "finPerPos": 0.1361,
+    "stops": 69
+   },
+   "replication": {
+    "positions": 96,
+    "total": -21.99,
+    "perMonth": -0.2291,
+    "t": -1.9,
+    "grossPerPos": 0.0086,
+    "costPerPos": 0.091,
+    "finPerPos": 0.1467,
+    "stops": 47
+   }
+  },
+  "de10yb": {
+   "class": "bonds",
+   "decisive": {
+    "positions": 130,
+    "total": -3.13,
+    "perMonth": -0.0241,
+    "t": -0.2,
+    "grossPerPos": 0.2033,
+    "costPerPos": 0.1041,
+    "finPerPos": 0.1232,
+    "stops": 56
+   },
+   "replication": {
+    "positions": 96,
+    "total": -29.63,
+    "perMonth": -0.3087,
+    "t": -2.4,
+    "grossPerPos": -0.0771,
+    "costPerPos": 0.0922,
+    "finPerPos": 0.1394,
+    "stops": 54
+   }
+  },
+  "uk10yb": {
+   "class": "bonds",
+   "decisive": {
+    "positions": 130,
+    "total": 0.37,
+    "perMonth": 0.0029,
+    "t": 0.02,
+    "grossPerPos": 0.184,
+    "costPerPos": 0.0818,
+    "finPerPos": 0.0993,
+    "stops": 60
+   },
+   "replication": {
+    "positions": 96,
+    "total": -29.31,
+    "perMonth": -0.3053,
+    "t": -2.46,
+    "grossPerPos": -0.1079,
+    "costPerPos": 0.0782,
+    "finPerPos": 0.1193,
+    "stops": 55
+   }
+  },
+  "xau": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -10.53,
+    "perMonth": -0.081,
+    "t": -0.7,
+    "grossPerPos": 0.0085,
+    "costPerPos": 0.0071,
+    "finPerPos": 0.0824,
+    "stops": 68
+   },
+   "replication": {
+    "positions": 96,
+    "total": 25.47,
+    "perMonth": 0.2653,
+    "t": 1.78,
+    "grossPerPos": 0.3237,
+    "costPerPos": 0.0075,
+    "finPerPos": 0.0509,
+    "stops": 40
+   }
+  },
+  "xag": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": 11.5,
+    "perMonth": 0.0884,
+    "t": 0.68,
+    "grossPerPos": 0.1498,
+    "costPerPos": 0.0216,
+    "finPerPos": 0.0397,
+    "stops": 63
+   },
+   "replication": {
+    "positions": 96,
+    "total": 36.55,
+    "perMonth": 0.3807,
+    "t": 2.61,
+    "grossPerPos": 0.4265,
+    "costPerPos": 0.0174,
+    "finPerPos": 0.0283,
+    "stops": 33
+   }
+  },
+  "bco": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -10.01,
+    "perMonth": -0.077,
+    "t": -0.75,
+    "grossPerPos": -0.036,
+    "costPerPos": 0.0173,
+    "finPerPos": 0.0237,
+    "stops": 65
+   },
+   "replication": {
+    "positions": 96,
+    "total": 23.27,
+    "perMonth": 0.2424,
+    "t": 1.78,
+    "grossPerPos": 0.2976,
+    "costPerPos": 0.0212,
+    "finPerPos": 0.034,
+    "stops": 40
+   }
+  },
+  "wtico": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -13.05,
+    "perMonth": -0.1004,
+    "t": -0.99,
+    "grossPerPos": -0.0604,
+    "costPerPos": 0.016,
+    "finPerPos": 0.0239,
+    "stops": 67
+   },
+   "replication": {
+    "positions": 96,
+    "total": 14.79,
+    "perMonth": 0.1541,
+    "t": 1.17,
+    "grossPerPos": 0.2048,
+    "costPerPos": 0.019,
+    "finPerPos": 0.0317,
+    "stops": 40
+   }
+  },
+  "natgas": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": 7.53,
+    "perMonth": 0.0579,
+    "t": 0.43,
+    "grossPerPos": 0.0878,
+    "costPerPos": 0.0118,
+    "finPerPos": 0.0181,
+    "stops": 62
+   },
+   "replication": {
+    "positions": 96,
+    "total": -11.79,
+    "perMonth": -0.1228,
+    "t": -1.04,
+    "grossPerPos": -0.0898,
+    "costPerPos": 0.0131,
+    "finPerPos": 0.0198,
+    "stops": 50
+   }
+  },
+  "corn": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -45.81,
+    "perMonth": -0.3524,
+    "t": -3.59,
+    "grossPerPos": -0.2524,
+    "costPerPos": 0.0555,
+    "finPerPos": 0.0445,
+    "stops": 75
+   },
+   "replication": {
+    "positions": 96,
+    "total": 13.02,
+    "perMonth": 0.1356,
+    "t": 0.99,
+    "grossPerPos": 0.2049,
+    "costPerPos": 0.04,
+    "finPerPos": 0.0293,
+    "stops": 43
+   }
+  },
+  "wheat": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -29.16,
+    "perMonth": -0.2243,
+    "t": -2.18,
+    "grossPerPos": -0.1535,
+    "costPerPos": 0.0396,
+    "finPerPos": 0.0312,
+    "stops": 71
+   },
+   "replication": {
+    "positions": 96,
+    "total": -1.66,
+    "perMonth": -0.0173,
+    "t": -0.13,
+    "grossPerPos": 0.0405,
+    "costPerPos": 0.0344,
+    "finPerPos": 0.0234,
+    "stops": 48
+   }
+  },
+  "soybn": {
+   "class": "commodities",
+   "decisive": {
+    "positions": 130,
+    "total": -14.58,
+    "perMonth": -0.1122,
+    "t": -1.01,
+    "grossPerPos": -0.0094,
+    "costPerPos": 0.0616,
+    "finPerPos": 0.0411,
+    "stops": 67
+   },
+   "replication": {
+    "positions": 95,
+    "total": -2.49,
+    "perMonth": -0.0259,
+    "t": -0.18,
+    "grossPerPos": 0.0556,
+    "costPerPos": 0.0479,
+    "finPerPos": 0.0339,
+    "stops": 53
+   }
+  },
+  "eurusd": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": -13.89,
+    "perMonth": -0.1069,
+    "t": -1.03,
+    "grossPerPos": -0.0664,
+    "costPerPos": 0.0115,
+    "finPerPos": 0.029,
+    "stops": 68
+   },
+   "replication": {
+    "positions": 96,
+    "total": -10.74,
+    "perMonth": -0.1118,
+    "t": -0.87,
+    "grossPerPos": -0.0761,
+    "costPerPos": 0.0083,
+    "finPerPos": 0.0274,
+    "stops": 50
+   }
+  },
+  "gbpusd": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": -6.96,
+    "perMonth": -0.0535,
+    "t": -0.5,
+    "grossPerPos": -0.0182,
+    "costPerPos": 0.0096,
+    "finPerPos": 0.0256,
+    "stops": 65
+   },
+   "replication": {
+    "positions": 96,
+    "total": -15.08,
+    "perMonth": -0.1571,
+    "t": -1.17,
+    "grossPerPos": -0.1104,
+    "costPerPos": 0.0094,
+    "finPerPos": 0.0373,
+    "stops": 52
+   }
+  },
+  "usdjpy": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": 7.18,
+    "perMonth": 0.0553,
+    "t": 0.44,
+    "grossPerPos": 0.0818,
+    "costPerPos": 0.0104,
+    "finPerPos": 0.0162,
+    "stops": 67
+   },
+   "replication": {
+    "positions": 96,
+    "total": 29.23,
+    "perMonth": 0.3045,
+    "t": 1.98,
+    "grossPerPos": 0.3551,
+    "costPerPos": 0.0084,
+    "finPerPos": 0.0422,
+    "stops": 36
+   }
+  },
+  "audusd": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": 5.84,
+    "perMonth": 0.045,
+    "t": 0.39,
+    "grossPerPos": 0.0761,
+    "costPerPos": 0.0084,
+    "finPerPos": 0.0227,
+    "stops": 64
+   },
+   "replication": {
+    "positions": 96,
+    "total": 8.43,
+    "perMonth": 0.0878,
+    "t": 0.62,
+    "grossPerPos": 0.1028,
+    "costPerPos": 0.0067,
+    "finPerPos": 0.0083,
+    "stops": 45
+   }
+  },
+  "usdcad": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": -4.05,
+    "perMonth": -0.0311,
+    "t": -0.29,
+    "grossPerPos": 0.0268,
+    "costPerPos": 0.0126,
+    "finPerPos": 0.0454,
+    "stops": 63
+   },
+   "replication": {
+    "positions": 96,
+    "total": 13.77,
+    "perMonth": 0.1435,
+    "t": 0.89,
+    "grossPerPos": 0.1958,
+    "costPerPos": 0.009,
+    "finPerPos": 0.0433,
+    "stops": 45
+   }
+  },
+  "usdchf": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": -6.97,
+    "perMonth": -0.0536,
+    "t": -0.48,
+    "grossPerPos": 0.0175,
+    "costPerPos": 0.011,
+    "finPerPos": 0.0602,
+    "stops": 64
+   },
+   "replication": {
+    "positions": 96,
+    "total": 2.11,
+    "perMonth": 0.022,
+    "t": 0.17,
+    "grossPerPos": 0.059,
+    "costPerPos": 0.0077,
+    "finPerPos": 0.0293,
+    "stops": 46
+   }
+  },
+  "nzdusd": {
+   "class": "forex",
+   "decisive": {
+    "positions": 130,
+    "total": -2.41,
+    "perMonth": -0.0186,
+    "t": -0.16,
+    "grossPerPos": 0.0142,
+    "costPerPos": 0.008,
+    "finPerPos": 0.0247,
+    "stops": 63
+   },
+   "replication": {
+    "positions": 96,
+    "total": -7.67,
+    "perMonth": -0.0799,
+    "t": -0.65,
+    "grossPerPos": -0.0658,
+    "costPerPos": 0.0061,
+    "finPerPos": 0.008,
+    "stops": 50
+   }
+  }
+ },
+ "byYear": {
+  "2008": {
+   "positions": 300,
+   "net": 60.43,
+   "gross": 78.82
+  },
+  "2009": {
+   "positions": 299,
+   "net": -52.95,
+   "gross": -38.15
+  },
+  "2010": {
+   "positions": 300,
+   "net": 35.68,
+   "gross": 56.68
+  },
+  "2011": {
+   "positions": 298,
+   "net": -27.61,
+   "gross": -9.7
+  },
+  "2012": {
+   "positions": 300,
+   "net": -45.5,
+   "gross": -23.9
+  },
+  "2013": {
+   "positions": 300,
+   "net": 55.71,
+   "gross": 83.49
+  },
+  "2014": {
+   "positions": 300,
+   "net": -11.4,
+   "gross": 16.4
+  },
+  "2015": {
+   "positions": 300,
+   "net": 13.29,
+   "gross": 35.13
+  },
+  "2016": {
+   "positions": 300,
+   "net": -71.4,
+   "gross": -49.21
+  },
+  "2017": {
+   "positions": 300,
+   "net": -42.02,
+   "gross": -7.73
+  },
+  "2018": {
+   "positions": 300,
+   "net": -20.84,
+   "gross": 7.73
+  },
+  "2019": {
+   "positions": 300,
+   "net": -4.21,
+   "gross": 24.26
+  },
+  "2020": {
+   "positions": 300,
+   "net": -36.74,
+   "gross": -11.72
+  },
+  "2021": {
+   "positions": 300,
+   "net": 6.07,
+   "gross": 33.66
+  },
+  "2022": {
+   "positions": 300,
+   "net": 22.01,
+   "gross": 32.77
+  },
+  "2023": {
+   "positions": 300,
+   "net": -48.31,
+   "gross": -27.73
+  },
+  "2024": {
+   "positions": 300,
+   "net": -5.83,
+   "gross": 25.45
+  },
+  "2025": {
+   "positions": 300,
+   "net": 4.54,
+   "gross": 37.67
+  },
+  "2026": {
+   "positions": 250,
+   "net": 16.22,
+   "gross": 43.45
+  }
+ },
+ "headline": "All 25 markets pooled: −1.389R a month net in 2016-26 (t −1.44, Sharpe −0.44, worst drawdown −232.0R, 3250 positions) and +0.288R in 2008-15 (t +0.23); 0 of 5 tests pass.",
+ "reading": [
+  "T1 (all markets): −1.389R a month net in 2016-26 (t −1.44, 3250 positions, worst drawdown −232.0R) and +0.288R in 2008-15 (t +0.23); before any cost +0.835R (t +0.84) and +2.071R (t +1.61).",
+  "The 2 x ATR(63) stop was hit on 1607 of 3250 positions in 2016-26 and 1144 of 2397 in 2008-15: over a month a 2-ATR stop is close to the typical move, so about half the positions are stopped before the month ends (the published rule has no stop; this one is the brief's).",
+  "Costs a position, 2016-26: trading 0.027R, financing 0.062R, against a gross +0.033R.",
+  "Placebo (40 random-sign books, same entries, stops and costs): T1 decisive t median −2.92, 95th percentile −1.88; 2 of 40 placebos reached the real t.",
+  "T2 Indices: −0.185R a month 2016-26 (t −0.39), −0.090R 2008-15 (t −0.14).",
+  "T3 Bonds: −0.239R a month 2016-26 (t −0.78), −0.843R 2008-15 (t −2.96).",
+  "T4 Commodities: −0.801R a month 2016-26 (t −1.86), +1.012R 2008-15 (t +1.70).",
+  "T5 Forex: −0.164R a month 2016-26 (t −0.36), +0.209R 2008-15 (t +0.38).",
+  "Not an edge on these markets with these costs. Never call it one; nothing live changes, and a variant needs its own pre-registration on other data."
+ ]
+}
