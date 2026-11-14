@@ -59,6 +59,7 @@ paper system with a measured, clearly negative record.
 | 293 | Gold outside (engulfing) month, followed through the next month | **FAIL, 0 of 3**: outside month +0.208R OOS on 10 trades (t 0.59), lost IS; body-engulf +0.627R (n 17, t 1.88, Holm p 0.09) rides gold's rise; T2 as registered measured nothing | #1106 |
 | 294 | Fading the break of a tight five-day gold box (follow-up to #1097) | **FAIL, 0 of 3**: 2007-16 −0.234R (n 99, t −1.51), 72 of 99 stopped beyond the edge; midpoint target −0.354R (t −3.63); tight box gives no edge either way | #1107 |
 | 295 | Gold after three white soldiers / three black crows (daily, 10-day hold) | **FAIL, 0 of 3**: follow OOS +0.122R net (n 32, t 0.58), +0.110R over the same-side baseline (t 0.50); fade −0.106R; looser bodies +0.009R; buys ride gold's rise, sells lose | #1108 |
+| 296 | Daily 1-2-3 structure flip on gold (higher low then close above the swing high), 10-day hold | **FAIL, 0 of 3**: both sides +0.024R OOS (n 93, t 0.22), lost IS; longs +0.121R below buying every 10th day (+0.219R); shorts −0.146R | #1109 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
