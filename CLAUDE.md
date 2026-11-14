@@ -2500,6 +2500,7 @@ any audit change:
 - `academy.cjs`: every dev server it starts is stopped however the audit ends (`ACADEMY_PORTS` names its ports: one implementation,
   the one in the file's header). ChronosTrade's "closing a trade takes under 150 ms" is the middle of five closes.
 - Tests: `tests/audit-shared.test.mjs` (the helper on a fake page and a fake fetch, the 0s rule on every page, the Desk's handler).
+- **14 Nov 2026, ChronosTrade 7d** ("a limit the price already passed fills at market"): from 00:00 UTC on 14 Nov it failed on every run. Cause: the quick start's day (now − 30 days, 07:00 UTC) became 15 Oct, when gold only rose for 120 candles, so a buy limit 0.3 under the price was never reached. The check now looks ahead with →, goes back with ← (Undo), and drafts a buy limit under the price if it fell or a sell limit over it if it rose. A move under 0.3 either way in 60 candles fails with a message.
 ## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
 Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
 1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),

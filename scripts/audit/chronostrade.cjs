@@ -90,13 +90,26 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     await p.click('#dr-flip'); await p.waitForTimeout(80); const b = await p.evaluate(() => ({ side: document.getElementById('dr-title').textContent, e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
     check('flip to sell mirrors the stop and target around the entry', /sell/i.test(b.side) && Math.abs((b.s - b.e) - (a.e - a.s)) < 0.02 && Math.abs((b.e - b.t) - (a.t - a.e)) < 0.02, JSON.stringify([a, b]));
     await p.keyboard.press('Shift+B'); check('asking for the other side flips the open draft back', /buy/i.test(await txt(p, '#dr-title')) && Math.abs(await p.$eval('#o-stop', (e) => +e.value) - a.s) < 0.02); await p.keyboard.press('Escape'); }
-  // 7d. a limit the price has already passed fills at market, same stop distance and R:R
-  { await p.keyboard.press('Shift+B'); const q0 = await p.$eval('#o-price', (e) => +e.value), le = +(q0 - 0.3).toFixed(2); await p.fill('#o-price', String(le)); await p.fill('#o-stop', String((le - 4).toFixed(2))); await p.fill('#o-target', String((le + 8).toFixed(2))); await p.waitForTimeout(60);
-    const t0 = await txt(p, '#dr-type'); const last = async () => +((await txt(p, '#px-now')).match(/[\d.]+/) || [0])[0]; let q1 = await last();
-    await p.evaluate(() => document.activeElement && document.activeElement.blur()); for (let k = 0; k < 120 && q1 >= le - 0.01; k++) { await p.keyboard.press('ArrowRight'); q1 = await last(); }
-    await p.click('#place'); await p.waitForTimeout(120);
-    const f = await p.evaluate(() => { const c = document.querySelector('#open .pos-card'); return c && !/waiting/.test(c.textContent) ? { stop: +c.querySelector('input[data-f=stop]').value, tgt: +c.querySelector('input[data-f=target]').value, entry: +c.querySelector('.pos-l b').textContent.replace(/,/g, '') } : null; });
-    check('a buy limit the price already passed fills at market, same stop distance and R:R', /limit/.test(t0) && q1 < le && f && Math.abs(f.entry - q1) < 0.02 && Math.abs((f.entry - f.stop) - 4) < 0.03 && Math.abs((f.tgt - f.entry) - 8) < 0.03 && /passed your limit/.test(await txt(p, '#toasts')) && !(await txt(p, '#o-err')), `${t0} ${le} -> ${q1} ${JSON.stringify(f)} ${await txt(p, '#o-err')}`);
+  // 7d. a limit the price has already passed fills at market, same stop distance and R:R, whichever way the replayed candles go.
+  // The quick start's day is relative to today: on 13 Nov 2026 it became a day on which gold only rose, so a buy limit under the
+  // price was never reached and the check measured nothing. Now: look ahead with → (no draft open), take the same steps back with
+  // ← (Undo, 60 deep), then draft a buy limit 0.3 under the price if it fell, or a sell limit 0.3 over it if it rose (the page's
+  // typeOf / D.type0 treat both alike), and step forward until the price is through it. A price that moved less than 0.3 either
+  // way in 60 candles, or an Undo that does not bring the replay back, is a FAILURE, never a pass.
+  { const last = async () => +((await txt(p, '#px-now')).match(/[\d.]+/) || [0])[0];
+    await p.evaluate(() => document.activeElement && document.activeElement.blur());
+    const a0 = await last(), n0 = await barN(p); let k = 0, qa = a0; while (k < 60 && Math.abs(qa - a0) < 0.31) { await p.keyboard.press('ArrowRight'); k++; qa = await last(); }
+    for (let i = 0; i < k; i++) await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
+    const sd = qa <= a0 - 0.31 ? 1 : qa >= a0 + 0.31 ? -1 : 0, back = (await last()) === a0 && (await barN(p)) === n0;
+    const name = 'a limit the price already passed fills at market, same stop distance and R:R';
+    if (!sd || !back) check(name, false, !back ? `Undo did not bring the replay back to bar ${n0} at ${a0}` : `price moved less than 0.3 either way in ${k} candles (${a0} -> ${qa}): nothing to test`);
+    else { const side = sd > 0 ? 'buy' : 'sell'; await p.keyboard.press(sd > 0 ? 'Shift+B' : 'Shift+S'); const q0 = await p.$eval('#o-price', (e) => +e.value), le = +(q0 - sd * 0.3).toFixed(2);
+      await p.fill('#o-price', String(le)); await p.fill('#o-stop', String((le - sd * 4).toFixed(2))); await p.fill('#o-target', String((le + sd * 8).toFixed(2))); await p.waitForTimeout(60);
+      const t0 = await txt(p, '#dr-type'); let q1 = await last(); const past = () => (q1 - le) * sd < -0.01;
+      await p.evaluate(() => document.activeElement && document.activeElement.blur()); for (let j = 0; j < 120 && !past(); j++) { await p.keyboard.press('ArrowRight'); q1 = await last(); }
+      await p.click('#place'); await p.waitForTimeout(120);
+      const f = await p.evaluate(() => { const c = document.querySelector('#open .pos-card'); return c && !/waiting/.test(c.textContent) ? { side: c.querySelector('.badge').textContent, stop: +c.querySelector('input[data-f=stop]').value, tgt: +c.querySelector('input[data-f=target]').value, entry: +c.querySelector('.pos-l b').textContent.replace(/,/g, '') } : null; });
+      check(`${name} (a ${side} limit; the price ${sd > 0 ? 'fell' : 'rose'})`, /limit/.test(t0) && past() && f && f.side.includes(side) && Math.abs(f.entry - q1) < 0.02 && Math.abs((f.entry - f.stop) * sd - 4) < 0.03 && Math.abs((f.tgt - f.entry) * sd - 8) < 0.03 && /passed your limit/.test(await txt(p, '#toasts')) && !(await txt(p, '#o-err')), `${side} ${t0} ${le} -> ${q1} ${JSON.stringify(f)} ${await txt(p, '#o-err')}`); }
     if (await p.$('#open [data-act=close]')) await p.click('#open [data-act=close]'); if (await p.$('#open [data-act=cancel]')) await p.click('#open [data-act=cancel]'); await p.waitForTimeout(100); }
   // 8. play / pause / speed / skip day / jump
   await p.click('.speed [data-sp="80"]'); const bp = await barN(p); await p.click('#play'); await p.waitForTimeout(1500); await p.click('#play'); const ba = await barN(p); check('play advances bars and pauses', ba > bp + 5 && !(await p.$eval('#play', (e) => e.classList.contains('playing'))), `${bp}→${ba}`);
