@@ -114,6 +114,7 @@ paper system with a measured, clearly negative record.
 | 348 | `gold-trix` (#1161) | TRIX(9) signal-line cross, 5-day hold | FAIL, 0 of 3: OOS long excess over every day −0.020R a trade (n 106, t −0.25) after +0.129R in sample; the long's +0.042R net is gold's drift (baseline +0.062R); placebo 15 of 40 |
 | 349 | `gold-ultimate-oscillator` (#1162) | Ultimate Oscillator 35 / 65 fade, 5-day hold | FAIL, 0 of 3: OOS both sides −0.095R a trade net, excess −0.021R (n 117, t −0.27); the long's +0.062R is gold's drift; placebo 7 of 40 |
 | 350 | `gold-index-dispersion` (#1163) | Buy gold after a day of wide dispersion across 13 equity indices | FAIL, 0 of 3: primary 5-day hold OOS excess −0.037R a trade (n 128, t −0.64), placebo 8 of 40; the 3-day hold's +0.059R (t 1.20) is far from the bar |
+| 351 | `gold-yield-shock` (#1164) | Trade gold against its reaction to a US 10-year yield shock day (1.5 sd) | FAIL, 0 of 3: buy after a yield-up shock OOS excess +0.003R a trade (n 124, t 0.04); the sell after a yield-down shock −0.021R; placebo 23 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
