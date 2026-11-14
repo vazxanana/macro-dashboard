@@ -250,6 +250,7 @@ paper system with a measured, clearly negative record.
 | 232 | Premium / discount in gold's 20-day range | FAIL, 0 of 3: buy bottom quarter +0.009R OOS (n 138), worse than buying any day (+0.078R); sell top quarter −0.220R; random days beat every test | #1045 |
 | 233 | Gold daily volatility breakout (open ± 0.5 x previous range) | **FAIL, near miss**: +0.072R net OOS (n 1,121, month t 1.86, Holm p 0.094), gross t 2.87 in sample and 3.21 out of sample, beats all 40 placebos, positive at 2x costs; but flat net in sample and the OOS gain is 2025-26. Replication on 2006-15 running | #1046 |
 | 234 | Gold H4 pin bar at a 20-candle extreme | FAIL, 0 of 3: both sides 2R −0.065R OOS (n 156, t −0.63), about zero before costs; the in-sample positives of the other two did not repeat | #1047 |
+| 235 | MACD and 50/200 crosses on gold daily | FAIL, 0 of 3: MACD long-only +0.253R OOS (n 100, t 1.53) but random long entries made +0.120R (gold's rise); stop-and-reverse +0.045R; 50/200 cross only 7 trades | #1048 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
