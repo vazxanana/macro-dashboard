@@ -236,6 +236,7 @@ paper system with a measured, clearly negative record.
 | 218 | Raschke's daily Turtle Soup on gold (`gold-daily-turtle-soup`) | **FAIL**, 0 of 3: classic fade of a failed new 20-day extreme 2017-26 −0.181R a trade net (n 156, t −1.75; flat before costs, tight stops), Plus One +0.153R (n 56, t 0.89, flips sign from 2007-16), longs only −0.167R | #1031 |
 | 219 | H4 regime switch on gold: breakout in trends, band fade in ranges (`gold-regime-switch`) | **FAIL**, 0 of 3: switch 2021-26 −0.094R a trade net (n 400, t −1.19, below the shuffled-label median), trend-only breakout −0.020R, range-only fade −0.177R; the fade loses in every regime and the trend label does not help the breakout | #1032 |
 | 220 | Gold's three-day drift into CPI and payrolls (`gold-pre-cpi`) | **FAIL**, 0 of 3, one near miss: long 3 days into payrolls 2022-26 +0.088R a trade net (n 47, t 2.07, Holm p 0.067, 37 of 40 placebos); into CPI +0.024R; fading the move after the print −0.027R. Payrolls being replicated on pre-2022 dates | #1033 |
+| 221 | Gold weekly momentum / reversal | FAIL, 0 of 3: one-week momentum +0.029R OOS (n 513, month t 0.95, Holm p 0.51), below always-long (+0.045R); loses at 2x costs | #1034 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
