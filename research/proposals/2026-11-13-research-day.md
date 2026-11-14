@@ -210,6 +210,7 @@ paper system with a measured, clearly negative record.
 | 192 | 5-minute opening range breakout at European and Asian index opens (`intl-index-orb`) | **FAIL**, 0 of 8: European book 2021-now −0.260R a trade net (n 5875, t −5.54), gross only +0.046R (vs +0.14R at the NY open); DAX flat; Nikkei gross +0.199R but negative net | #1005 |
 | 193 | Classic candlestick reversal patterns across 28 CFDs (`candle-patterns`) | **FAIL**, 0 of 14: six patterns at a 10-day extreme 2017-26 −0.048R a trade net (n 3231, t −2.09), about zero gross; the filter adds nothing; the hammer's small gross tilt is taken by costs | #1006 |
 | 194 | Round-number stall and break on index CFDs (`index-round-numbers`) | **FAIL**, 0 of 2, Holm p 1: stall fade 2021-26 −0.072R a trade net (t −1.94), loses gross too; break −0.008R net (+0.046R gross), no better than random levels (11th of 41) | #1007 |
+| 195 | Classic daily pivot points, fade and break (`pivot-points`) | **FAIL**, 0 of 8: R1/S1 fade 2021-26 −0.144R a trade net (n 11,294, t −13.05), about zero gross, real levels 39th of 41 vs shifted ones; the break's small gross gain lost after costs. Gold left out (owner priority now gold: separate gold studies running) | #1008 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
