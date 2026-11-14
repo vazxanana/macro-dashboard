@@ -1,0 +1,601 @@
+{
+ "study": "tokyo-fix-daily",
+ "built": "2026-11-14",
+ "verdict": "UNCLEAR",
+ "question": "Is the 09:55 Tokyo fix-minute effect of the gotobi fade special to gotobi days, or there on every Tokyo business day?",
+ "rule": "Frozen T2 of research/edge/gotobi (#878) on M1 as research/edge/gotobi-timing (#908): sell USD/JPY at 00:55 UTC, buy back at 06:00 UTC; stop 1.5 x the 20-business-day median absolute move of that window (M5); net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side.",
+ "frozen": {
+  "file": "frozen.mjs",
+  "from": "origin/gotobi-timing:research/edge/gotobi-timing/frozen.mjs",
+  "sha256": "645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32"
+ },
+ "data": {
+  "m1": "OANDA mid M1 through the /md/bars proxy, 00:00-06:15 UTC of every Tokyo business day",
+  "m5": "OANDA mid M5 (#878's file) for the stop distance D",
+  "from": "2010-01-01",
+  "firstDay": "2010-01-04",
+  "lastDay": "2026-11-11",
+  "m1Candles": 1497207
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-01",
+   "2026-11-11"
+  ],
+  "replication": [
+   "2010-01-01",
+   "2015-12-31"
+  ]
+ },
+ "reading": {
+  "gotobiSpecific": "T1 <= 0 net or month t < 1, AND T2 Welch t >= 2 (gotobi > non-gotobi) with Holm p <= 0.05",
+  "everyDay": "T1 > 0 with month t >= 2 and Holm p <= 0.05",
+  "unclear": "otherwise"
+ },
+ "liveProposal": "none",
+ "gate": {
+  "n": 771,
+  "netR": 0.1481,
+  "want": {
+   "n": 771,
+   "netR": 0.1481,
+   "nTol": 8,
+   "rTol": 0.01
+  },
+  "pass": true
+ },
+ "T1": {
+  "n": 1870,
+  "netR": -0.0629,
+  "grossR": 0.0493,
+  "costR": 0.1122,
+  "totalR": -117.56,
+  "tradeT": -2.42,
+  "months": 131,
+  "t": -2.37,
+  "win": 0.4267,
+  "stopShare": 0.3225,
+  "stopPips": 19.4,
+  "pOneSided": 0.9911,
+  "holmP": 1
+ },
+ "T2": {
+  "gotobi": {
+   "n": 771,
+   "mean": 0.332,
+   "sd": 4.5208,
+   "up": 0.5318
+  },
+  "other": {
+   "n": 1871,
+   "mean": 0.3792,
+   "sd": 4.0959,
+   "up": 0.5516
+  },
+  "diff": -0.0471,
+  "t": -0.25,
+  "inR": {
+   "gotobi": {
+    "n": 771,
+    "mean": 0.0127,
+    "sd": 0.2238,
+    "up": 0.5318
+   },
+   "other": {
+    "n": 1871,
+    "mean": 0.0184,
+    "sd": 0.2257,
+    "up": 0.5516
+   }
+  },
+  "after": {
+   "gotobi": {
+    "n": 771,
+    "mean": -1.3359,
+    "sd": 3.6544,
+    "up": 0.3372
+   },
+   "other": {
+    "n": 1871,
+    "mean": -0.1873,
+    "sd": 2.7835,
+    "up": 0.4741
+   }
+  },
+  "pOneSided": 0.5987,
+  "holmP": 1
+ },
+ "T3": {
+  "monthsGotobi": 131,
+  "monthsOther": 131,
+  "gotobiMonthMean": 0.1531,
+  "otherMonthMean": -0.0633,
+  "diff": 0.2165,
+  "t": 3.61
+ },
+ "decisive": {
+  "t1": {
+   "n": 1870,
+   "netR": -0.0629,
+   "grossR": 0.0493,
+   "costR": 0.1122,
+   "totalR": -117.56,
+   "tradeT": -2.42,
+   "months": 131,
+   "t": -2.37,
+   "win": 0.4267,
+   "stopShare": 0.3225,
+   "stopPips": 19.4
+  },
+  "gotobi": {
+   "n": 771,
+   "netR": 0.1481,
+   "grossR": 0.2607,
+   "costR": 0.1126,
+   "totalR": 114.16,
+   "tradeT": 2.9,
+   "months": 131,
+   "t": 2.74,
+   "win": 0.5136,
+   "stopShare": 0.2763,
+   "stopPips": 19.5
+  },
+  "t2": {
+   "gotobi": {
+    "n": 771,
+    "mean": 0.332,
+    "sd": 4.5208,
+    "up": 0.5318
+   },
+   "other": {
+    "n": 1871,
+    "mean": 0.3792,
+    "sd": 4.0959,
+    "up": 0.5516
+   },
+   "diff": -0.0471,
+   "t": -0.25,
+   "inR": {
+    "gotobi": {
+     "n": 771,
+     "mean": 0.0127,
+     "sd": 0.2238,
+     "up": 0.5318
+    },
+    "other": {
+     "n": 1871,
+     "mean": 0.0184,
+     "sd": 0.2257,
+     "up": 0.5516
+    }
+   },
+   "after": {
+    "gotobi": {
+     "n": 771,
+     "mean": -1.3359,
+     "sd": 3.6544,
+     "up": 0.3372
+    },
+    "other": {
+     "n": 1871,
+     "mean": -0.1873,
+     "sd": 2.7835,
+     "up": 0.4741
+    }
+   }
+  },
+  "t3": {
+   "monthsGotobi": 131,
+   "monthsOther": 131,
+   "gotobiMonthMean": 0.1531,
+   "otherMonthMean": -0.0633,
+   "diff": 0.2165,
+   "t": 3.61
+  }
+ },
+ "replication": {
+  "t1": {
+   "n": 1040,
+   "netR": 0.0085,
+   "grossR": 0.1206,
+   "costR": 0.1121,
+   "totalR": 8.86,
+   "tradeT": 0.25,
+   "months": 72,
+   "t": 0.26,
+   "win": 0.4779,
+   "stopShare": 0.2923,
+   "stopPips": 17.2
+  },
+  "gotobi": {
+   "n": 425,
+   "netR": 0.1305,
+   "grossR": 0.2426,
+   "costR": 0.1121,
+   "totalR": 55.46,
+   "tradeT": 2.36,
+   "months": 72,
+   "t": 2.45,
+   "win": 0.5271,
+   "stopShare": 0.2729,
+   "stopPips": 17.5
+  },
+  "t2": {
+   "gotobi": {
+    "n": 425,
+    "mean": 0.1976,
+    "sd": 2.2537,
+    "up": 0.5153
+   },
+   "other": {
+    "n": 1040,
+    "mean": -0.0698,
+    "sd": 2.4114,
+    "up": 0.4663
+   },
+   "diff": 0.2675,
+   "t": 2.02,
+   "inR": {
+    "gotobi": {
+     "n": 425,
+     "mean": 0.0126,
+     "sd": 0.1508,
+     "up": 0.5153
+    },
+    "other": {
+     "n": 1040,
+     "mean": -0.0082,
+     "sd": 0.1555,
+     "up": 0.4663
+    }
+   },
+   "after": {
+    "gotobi": {
+     "n": 423,
+     "mean": -0.4163,
+     "sd": 2.0473,
+     "up": 0.3972
+    },
+    "other": {
+     "n": 1033,
+     "mean": -0.2051,
+     "sd": 1.9305,
+     "up": 0.4376
+    }
+   }
+  },
+  "t3": {
+   "monthsGotobi": 72,
+   "monthsOther": 72,
+   "gotobiMonthMean": 0.128,
+   "otherMonthMean": 0.0112,
+   "diff": 0.1168,
+   "t": 1.87
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "rank": 38,
+  "days": 1874,
+  "marks": 57,
+  "minute": {
+   "p95": 0.0665,
+   "median": 0.011,
+   "max": 0.0892,
+   "otherFix": 0.3792,
+   "gotobiFix": 0.332,
+   "otherAbove": true,
+   "gotobiAbove": true,
+   "values": [
+    -0.0007,
+    0.0276,
+    0.0665,
+    -0.002,
+    -0.0573,
+    -0.0134,
+    0.0116,
+    -0.0129,
+    0.0317,
+    0.0193,
+    0.034,
+    -0.0362,
+    -0.0698,
+    0.0473,
+    -0.0943,
+    0.057,
+    0.0277,
+    -0.0239,
+    0.0047,
+    0.0264,
+    0.0006,
+    0.071,
+    -0.0541,
+    0.049,
+    0.0126,
+    -0.0591,
+    -0.0328,
+    0.0324,
+    0.0202,
+    0.0104,
+    -0.0074,
+    -0.0281,
+    0.0363,
+    -0.0228,
+    0.0274,
+    0.02,
+    0.0229,
+    -0.0237,
+    -0.0229,
+    0.0892
+   ]
+  },
+  "trade": {
+   "p95": -0.1205,
+   "median": -0.1345,
+   "max": -0.1144,
+   "t1": -0.0629,
+   "t1Above": true,
+   "values": [
+    -0.1458,
+    -0.121,
+    -0.1586,
+    -0.1303,
+    -0.1229,
+    -0.1383,
+    -0.1331,
+    -0.1446,
+    -0.1169,
+    -0.1336,
+    -0.1354,
+    -0.1434,
+    -0.1555,
+    -0.1323,
+    -0.1348,
+    -0.1357,
+    -0.1341,
+    -0.1286,
+    -0.152,
+    -0.1295,
+    -0.1211,
+    -0.1205,
+    -0.1222,
+    -0.1278,
+    -0.1615,
+    -0.1448,
+    -0.1329,
+    -0.1237,
+    -0.127,
+    -0.1639,
+    -0.1221,
+    -0.151,
+    -0.1461,
+    -0.1372,
+    -0.1588,
+    -0.1361,
+    -0.1343,
+    -0.1144,
+    -0.1393,
+    -0.1364
+   ]
+  }
+ },
+ "noTrade": {
+  "gotobi": 12,
+  "other": 5
+ },
+ "byYear": {
+  "2010": {
+   "gotobi": {
+    "n": 71,
+    "netR": 0.2081
+   },
+   "other": {
+    "n": 174,
+    "netR": 0.0172
+   },
+   "fixGotobi": 0.2592,
+   "fixOther": 0.2885
+  },
+  "2011": {
+   "gotobi": {
+    "n": 72,
+    "netR": 0.2197
+   },
+   "other": {
+    "n": 173,
+    "netR": 0.1096
+   },
+   "fixGotobi": 0.8403,
+   "fixOther": 0.1763
+  },
+  "2012": {
+   "gotobi": {
+    "n": 71,
+    "netR": 0.1852
+   },
+   "other": {
+    "n": 175,
+    "netR": -0.02
+   },
+   "fixGotobi": -0.2366,
+   "fixOther": -0.1766
+  },
+  "2013": {
+   "gotobi": {
+    "n": 70,
+    "netR": 0.1788
+   },
+   "other": {
+    "n": 173,
+    "netR": 0.0783
+   },
+   "fixGotobi": 0.0286,
+   "fixOther": -0.1566
+  },
+  "2014": {
+   "gotobi": {
+    "n": 70,
+    "netR": 0.0281
+   },
+   "other": {
+    "n": 173,
+    "netR": -0.1665
+   },
+   "fixGotobi": -0.18,
+   "fixOther": -0.1723
+  },
+  "2015": {
+   "gotobi": {
+    "n": 71,
+    "netR": -0.0389
+   },
+   "other": {
+    "n": 172,
+    "netR": 0.0331
+   },
+   "fixGotobi": 0.4577,
+   "fixOther": -0.3808
+  },
+  "2016": {
+   "gotobi": {
+    "n": 72,
+    "netR": 0.2828
+   },
+   "other": {
+    "n": 172,
+    "netR": -0.0395
+   },
+   "fixGotobi": 1.9903,
+   "fixOther": -0.6994
+  },
+  "2017": {
+   "gotobi": {
+    "n": 71,
+    "netR": 0.0537
+   },
+   "other": {
+    "n": 175,
+    "netR": 0.1251
+   },
+   "fixGotobi": 0.1282,
+   "fixOther": 0.1326
+  },
+  "2018": {
+   "gotobi": {
+    "n": 71,
+    "netR": -0.0395
+   },
+   "other": {
+    "n": 173,
+    "netR": -0.0855
+   },
+   "fixGotobi": 0.0972,
+   "fixOther": 0.3399
+  },
+  "2019": {
+   "gotobi": {
+    "n": 70,
+    "netR": 0.308
+   },
+   "other": {
+    "n": 169,
+    "netR": -0.1781
+   },
+   "fixGotobi": 0.1371,
+   "fixOther": 0.3538
+  },
+  "2020": {
+   "gotobi": {
+    "n": 70,
+    "netR": 0.2021
+   },
+   "other": {
+    "n": 172,
+    "netR": 0.0103
+   },
+   "fixGotobi": 0.6114,
+   "fixOther": -0.2779
+  },
+  "2021": {
+   "gotobi": {
+    "n": 71,
+    "netR": 0.0446
+   },
+   "other": {
+    "n": 174,
+    "netR": -0.0382
+   },
+   "fixGotobi": -0.4986,
+   "fixOther": 0.4414
+  },
+  "2022": {
+   "gotobi": {
+    "n": 72,
+    "netR": 0.4069
+   },
+   "other": {
+    "n": 170,
+    "netR": -0.0968
+   },
+   "fixGotobi": -0.2889,
+   "fixOther": 0.7298
+  },
+  "2023": {
+   "gotobi": {
+    "n": 71,
+    "netR": -0.0113
+   },
+   "other": {
+    "n": 174,
+    "netR": -0.093
+   },
+   "fixGotobi": 0.4944,
+   "fixOther": 0.746
+  },
+  "2024": {
+   "gotobi": {
+    "n": 71,
+    "netR": 0.2168
+   },
+   "other": {
+    "n": 173,
+    "netR": -0.2023
+   },
+   "fixGotobi": 1.269,
+   "fixOther": 0.9538
+  },
+  "2025": {
+   "gotobi": {
+    "n": 70,
+    "netR": 0.3123
+   },
+   "other": {
+    "n": 172,
+    "netR": -0.0381
+   },
+   "fixGotobi": 0.1186,
+   "fixOther": 0.4064
+  },
+  "2026": {
+   "gotobi": {
+    "n": 62,
+    "netR": -0.191
+   },
+   "other": {
+    "n": 146,
+    "netR": -0.0599
+   },
+   "fixGotobi": -0.5323,
+   "fixOther": 1.1603
+  }
+ },
+ "notes": [
+  "Data: OANDA mid USD/JPY M1, 00:00-06:15 UTC of every Tokyo business day, first day with candles 2010-01-04, through 2026-11-11 (1497207 candles); D from #878's M5 file through the frozen stopDist. Days without a trade (missing candles or no D): gotobi 12, other 5 over both windows.",
+  "Replication 2010-15: T1 +0.0085R a trade (opposite sign as 2016-now), T2 difference +0.268 pips, Welch t +2.02 (opposite sign), T3 +0.1168R (same sign).",
+  "Known before the study and said in the pre-registration: #878's M5 run already showed the fade on every non-gotobi day of 2016-now at −0.0628R a trade (n 1,870, month t −2.37). The M1 figure here is −0.0629R (n 1870).",
+  "T2 is a minute move in pips, not a trade: no cost applies. Its Welch t treats every day as independent; days are about a day apart and a one-minute move has little autocorrelation, so this is the plain reading the pre-registration fixed.",
+  "Read after the verdict, descriptive and not tested (the pre-registration named the minute after the fix as descriptive only): in 2016-now the minute INTO the fix rises about the same on both kinds of day (gotobi +0.332 pips, other days +0.379), while the minute AFTER it falls −1.336 pips on gotobi days against −0.187 on other days. So the gotobi difference, if it is real, is in the fall after 09:55, not in the rise before it; a test of that needs its own pre-registration on other data.",
+  "The placebo is reported, not part of the reading: it shows whether the fix minute on ordinary days stands out from ordinary minutes of the same morning (a one-minute move into a 5-minute mark), and whether the 00:55 sell on ordinary days beats a sell at an ordinary mark of the morning.",
+  "No live proposal: this study only describes where the gotobi fade's effect comes from. Whether the gotobi fade itself is ever traded is an owner decision outside it, and the timing study (#908) already showed it needs a fill at the 00:55:00 price."
+ ]
+}
