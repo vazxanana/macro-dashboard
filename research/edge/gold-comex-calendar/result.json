@@ -1,0 +1,310 @@
+{
+ "study": "gold-comex-calendar",
+ "built": "2026-11-14",
+ "data": {
+  "first": "2006-03-20",
+  "last": "2026-11-06",
+  "candles": 5364,
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "atr": "2 x ATR(20)",
+  "hold": 5,
+  "fin": 0.000148,
+  "IS": [
+   "2008-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ]
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 108,
+    "net": -0.014,
+    "gross": 0.001,
+    "tNet": -0.21,
+    "tGross": 0.02,
+    "p": 0.5839,
+    "months": 108,
+    "win": 50.93,
+    "stops": 19,
+    "total": -1.54,
+    "net2x": -0.03,
+    "opposite": {
+     "n": 108,
+     "net": -0.148,
+     "gross": -0.101,
+     "tNet": -2.16,
+     "tGross": -1.46,
+     "p": 0.9836,
+     "months": 108,
+     "win": 38.89,
+     "stops": 27,
+     "total": -16.01
+    },
+    "vsOthers": {
+     "nEvent": 108,
+     "nOther": 2161,
+     "eventBp": -7.7,
+     "otherBp": 7.43,
+     "diffBp": -15.12,
+     "t": -0.57
+    }
+   },
+   "oos": {
+    "n": 118,
+    "net": -0.13,
+    "gross": -0.116,
+    "tNet": -2.13,
+    "tGross": -1.91,
+    "p": 0.9823,
+    "months": 118,
+    "win": 44.07,
+    "stops": 23,
+    "total": -15.36,
+    "net2x": -0.144,
+    "opposite": {
+     "n": 118,
+     "net": 0.081,
+     "gross": 0.137,
+     "tNet": 1.13,
+     "tGross": 1.91,
+     "p": 0.1307,
+     "months": 118,
+     "win": 51.69,
+     "stops": 16,
+     "total": 9.5
+    },
+    "vsOthers": {
+     "nEvent": 118,
+     "nOther": 2355,
+     "eventBp": 29.32,
+     "otherBp": 24.71,
+     "diffBp": 4.61,
+     "t": 0.21
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 16,
+    "mean": -0.108,
+    "max": 0.007,
+    "min": -0.209
+   },
+   "side": "short",
+   "holm": 1,
+   "checks": {
+    "oosNetPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "is": {
+    "n": 108,
+    "net": -0.033,
+    "gross": 0.016,
+    "tNet": -0.5,
+    "tGross": 0.25,
+    "p": 0.692,
+    "months": 108,
+    "win": 47.22,
+    "stops": 13,
+    "total": -3.57,
+    "net2x": -0.083,
+    "opposite": {
+     "n": 108,
+     "net": -0.011,
+     "gross": 0.004,
+     "tNet": -0.17,
+     "tGross": 0.06,
+     "p": 0.5661,
+     "months": 108,
+     "win": 46.3,
+     "stops": 15,
+     "total": -1.22
+    },
+    "vsOthers": {
+     "nEvent": 108,
+     "nOther": 2161,
+     "eventBp": -5.31,
+     "otherBp": 7.31,
+     "diffBp": -12.62,
+     "t": -0.53
+    }
+   },
+   "oos": {
+    "n": 118,
+    "net": 0.05,
+    "gross": 0.104,
+    "tNet": 0.67,
+    "tGross": 1.39,
+    "p": 0.2517,
+    "months": 118,
+    "win": 53.39,
+    "stops": 21,
+    "total": 5.86,
+    "net2x": -0.005,
+    "opposite": {
+     "n": 118,
+     "net": -0.101,
+     "gross": -0.087,
+     "tNet": -1.53,
+     "tGross": -1.32,
+     "p": 0.9353,
+     "months": 118,
+     "win": 39.83,
+     "stops": 24,
+     "total": -11.89
+    },
+    "vsOthers": {
+     "nEvent": 118,
+     "nOther": 2355,
+     "eventBp": 27.76,
+     "otherBp": 24.79,
+     "diffBp": 2.97,
+     "t": 0.15
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 11,
+    "mean": 0.07,
+    "max": 0.195,
+    "min": -0.102
+   },
+   "side": "long",
+   "holm": 0.7551,
+   "checks": {
+    "oosNetPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "is": {
+    "n": 54,
+    "net": 0.005,
+    "gross": 0.02,
+    "tNet": 0.06,
+    "tGross": 0.25,
+    "p": 0.4767,
+    "months": 54,
+    "win": 51.85,
+    "stops": 5,
+    "total": 0.26,
+    "net2x": -0.011,
+    "opposite": {
+     "n": 54,
+     "net": -0.115,
+     "gross": -0.066,
+     "tNet": -1.34,
+     "tGross": -0.77,
+     "p": 0.9065,
+     "months": 54,
+     "win": 37.04,
+     "stops": 7,
+     "total": -6.22
+    },
+    "vsOthers": {
+     "nEvent": 54,
+     "nOther": 1070,
+     "eventBp": 7.41,
+     "otherBp": -0.64,
+     "diffBp": 8.05,
+     "t": 0.26
+    }
+   },
+   "oos": {
+    "n": 59,
+    "net": -0.044,
+    "gross": -0.03,
+    "tNet": -0.47,
+    "tGross": -0.32,
+    "p": 0.6812,
+    "months": 59,
+    "win": 47.46,
+    "stops": 7,
+    "total": -2.62,
+    "net2x": -0.058,
+    "opposite": {
+     "n": 59,
+     "net": 0.003,
+     "gross": 0.059,
+     "tNet": 0.04,
+     "tGross": 0.64,
+     "p": 0.485,
+     "months": 59,
+     "win": 45.76,
+     "stops": 8,
+     "total": 0.2
+    },
+    "vsOthers": {
+     "nEvent": 59,
+     "nOther": 1176,
+     "eventBp": 5.07,
+     "otherBp": 27.8,
+     "diffBp": -22.73,
+     "t": -0.88
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 29,
+    "mean": -0.096,
+    "max": 0.089,
+    "min": -0.323
+   },
+   "control": {
+    "is": {
+     "activeN": 54,
+     "inactiveN": 54,
+     "activeBp": 7.41,
+     "inactiveBp": 50.43,
+     "diffBp": -43.01,
+     "t": -0.95
+    },
+    "oos": {
+     "activeN": 59,
+     "inactiveN": 59,
+     "activeBp": 5.07,
+     "inactiveBp": -36.79,
+     "diffBp": 41.86,
+     "t": 1.24
+    }
+   },
+   "side": "short",
+   "holm": 1,
+   "checks": {
+    "oosNetPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "dropped": {
+  "T1": 0,
+  "T2": 0,
+  "T3": 0
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
