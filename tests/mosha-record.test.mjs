@@ -76,3 +76,32 @@ test('who sees it: the owner and readers, never a teacher who is not the owner',
   assert.match(JS, /box\.hidden = !shown\(\); if \(box\.hidden\) return;/, 'no candle is read for a card nobody may see');
   assert.doesNotMatch(JS, /fetch\('\/api/, 'no second read of the lessons, no write anywhere');
 });
+
+// Browser check of 14 Nov: a trade still open on our candles (neither level reached) was asked for again after every draw, and each
+// check ends in a draw: hundreds of candle requests a second for as long as the desk was open. Now once per read of the lessons.
+test('an open trade is read once per read of the lessons, not on every draw', { timeout: 5000 }, async () => {
+  const vm = await import('node:vm');
+  const box = { hidden: false, innerHTML: '' }, calls = [];
+  const sandbox = { MS_MOSHA: D, console, setTimeout, Date, Math, JSON, encodeURIComponent, isFinite, Array, String, Object, Promise,
+    document: { getElementById: (id) => (id === 'mo-lux' ? box : null), documentElement: { dataset: { role: 'owner', mosha: 'read' } } },
+    fetch: (u) => { calls.push(u); return new Promise((r) => setTimeout(() => r({ ok: true, json: () => Promise.resolve({ bars: bars([[4101, 4099], [4102, 4098], [4103, 4097]]) }) }), 1)); } };
+  sandbox.window = sandbox; vm.createContext(sandbox); vm.runInContext(JS, sandbox);
+  const settle = async () => { for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 20)); };
+  const l = lesson({ id: 'open1' }), ds = sandbox.document.documentElement.dataset;
+  try {
+    sandbox.msMoshaRecord([l]); await settle();
+    assert.equal(calls.length, 1, 'one candle request for one open trade');
+    assert.match(box.innerHTML, /open on our candles/i);
+    sandbox.msMoshaRecord([l]); await settle();
+    assert.equal(calls.length, 2, 'read again once on the next read of the lessons');
+  } finally { ds.role = 'viewer'; ds.mosha = 'teach'; await settle(); }   // a card nobody may see draws nothing: ends a loop if there is one
+});
+
+// Browser check of 14 Nov, 390 px: the record's rows had no cell classes, so the desk's phone card grid (made for the log's rows)
+// put the side chip over the entry time and the levels without their names. The rows now carry the log's classes and labels.
+test('a record row is the log card on a phone: time, side, labelled levels, result across', () => {
+  const row = R.judge(lesson(), { ok: true, filled: true, outcome: 'target', when: T0 + 900, R: 3 });
+  assert.equal(row.status, 'closed');
+  for (const c of ['mo-c-time', 'mo-c-side', 'mo-c-res']) { assert.match(JS, new RegExp('class="' + c + '"')); assert.match(PAGE, new RegExp('#v-mosha \\.mo-t \\.' + c)); }
+  for (const l of ['Entry', 'Stop', 'Target']) assert.match(JS, new RegExp('data-l="' + l + '"'));
+});

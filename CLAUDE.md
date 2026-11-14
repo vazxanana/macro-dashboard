@@ -3303,6 +3303,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   `setAt`); the page cannot send them (`tradeOf` builds a fresh object), older lessons keep none until their levels change; the
   record judges `setAt` against the outcome candle and marks rows without it "levels not time-stamped (older lesson)". Tests:
   `tests/mosha-trade-stamp.test.mjs`.
+  **Browser check (14 Nov 2026)**: a trade still open on our candles was read again after every draw (hundreds of `/md/bars`
+  requests a second while the desk was open); now once per read of the lessons (`S.tried`, cleared by `msMoshaRecord`). The rows
+  carry the log's cell classes (`mo-c-time`, `mo-c-side`, `mo-c-res`, `data-l`), so on a phone they are the log's cards (the side
+  chip sat over the entry time). Tests in `tests/mosha-record.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 

@@ -85,7 +85,7 @@
   var cls = function (v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : ''; };
   var utc = function (s) { return s ? new Date(s * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : '—'; };
   var px = function (v) { return v == null ? '—' : String(+(+v).toFixed(5)); };
-  var S = { lessons: null, err: null, checks: {}, busy: false };
+  var S = { lessons: null, err: null, checks: {}, tried: {}, busy: false };
   var keyOf = function (l) { var t = l.trade; return [l.id, t.market, t.side, t.at, t.entry, t.stop, t.target, t.exit, t.exitAt].join('|'); };
   function shown() { return visible(document.documentElement.dataset); }
 
@@ -97,10 +97,12 @@
         return bars && bars.length ? D.replay(asTrade(t), bars, 300) : { ok: false, why: 'no candles came back for that time' }; })
       .catch(function () { return { ok: false, why: 'the candle feed did not answer' }; });
   }
-  // one candle request at a time, only for lessons not checked yet (an open trade is read again on the next load)
+  // one candle request at a time, only for lessons not checked yet. A trade still open on our candles is read again on the next
+  // read of the lessons (msMoshaRecord), never on every draw: `tried` holds what this read already asked for (a draw follows each
+  // check, so without it an open trade was asked for again and again, about 300 requests a second).
   function checkAll(use) {
-    if (S.busy) return; var todo = use.filter(function (l) { var c = S.checks[keyOf(l)]; return !c || (c.ok && c.filled && c.outcome === 'neither'); }).slice(0, 60);
-    if (!todo.length) return; S.busy = true;
+    if (S.busy) return; var todo = use.filter(function (l) { var k = keyOf(l), c = S.checks[k]; return !S.tried[k] && (!c || (c.ok && c.filled && c.outcome === 'neither')); }).slice(0, 60);
+    if (!todo.length) return; S.busy = true; todo.forEach(function (l) { S.tried[keyOf(l)] = 1; });
     var next = function (i) { if (i >= todo.length) { S.busy = false; draw(); return; } fetchCheck(todo[i]).then(function (c) { S.checks[keyOf(todo[i])] = c; if (i % 4 === 3) draw(); next(i + 1); }); };
     next(0);
   }
@@ -114,8 +116,9 @@
     var res = r.status === 'closed' ? '<b class="' + cls(r.R) + '">' + fR(r.R) + '</b><small>' + (r.by === 'candles' ? (r.R < 0 ? 'stop first on our candles' : 'target on our candles') : 'his exit (neither level on our candles)') + ' · ' + utc(r.out) + '</small>'
       : r.status === 'open' ? 'Open on our candles' : r.status === 'pending' ? 'Reading our candles…' : esc(r.why || '');
     var his = r.his != null ? '<small>He sent: exit ' + fR(r.his) + (r.hisAt ? ' at ' + utc(r.hisAt) : '') + '</small>' : '';
-    return '<tr><td><span class="mo-when">' + utc(r.at) + '</span><small>' + esc(r.market.toUpperCase()) + (r.stamped ? ' · levels set ' + utc(r.setAt) : ' · sent ' + utc(r.sent) + ' · levels not time-stamped (older lesson)') + '</small></td><td><span class="chip ' + r.side + '">' + r.side.toUpperCase() + '</span></td>' +
-      '<td class="n">' + px(r.entry) + '</td><td class="n">' + px(r.stop) + '</td><td class="n">' + px(r.target) + '</td><td>' + res + his + '</td></tr>';
+    // the cells carry the log's classes and labels, so on a phone (under 760 px) the row becomes the log's card, not a squeezed grid
+    return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.at) + '</span><small>' + esc(r.market.toUpperCase()) + (r.stamped ? ' · levels set ' + utc(r.setAt) : ' · sent ' + utc(r.sent) + ' · levels not time-stamped (older lesson)') + '</small></td><td class="mo-c-side"><span class="chip ' + r.side + '">' + r.side.toUpperCase() + '</span></td>' +
+      '<td class="n" data-l="Entry">' + px(r.entry) + '</td><td class="n" data-l="Stop">' + px(r.stop) + '</td><td class="n" data-l="Target">' + px(r.target) + '</td><td class="mo-c-res">' + res + his + '</td></tr>';
   }
   function table(rows, cap) { return rows.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="' + esc(cap) + '"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th></tr></thead><tbody>' + rows.map(rowHTML).join('') + '</tbody></table></div>' : ''; }
   function draw() {
@@ -139,5 +142,5 @@
     checkAll(srt.use);
   }
   // called by assets/mosha-teach.js each time the lessons are read
-  root.msMoshaRecord = function (lessons, err) { S.lessons = Array.isArray(lessons) ? lessons : S.lessons; S.err = lessons ? null : err || null; draw(); };
+  root.msMoshaRecord = function (lessons, err) { S.tried = {}; S.lessons = Array.isArray(lessons) ? lessons : S.lessons; S.err = lessons ? null : err || null; draw(); };
 })(typeof window !== 'undefined' ? window : globalThis);
