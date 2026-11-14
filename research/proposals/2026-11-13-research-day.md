@@ -126,6 +126,7 @@ paper system with a measured, clearly negative record.
 | 108 | China's 01:15 UTC yuan fix: follow / fade USD/CNH, AUD/USD as a proxy (2-hour hold) | FAIL 0 of 3: net −0.04 to −1.34R a trade; before costs both follow and fade are positive (a shape of the trade, not the fix), and 01:15 is not set apart from 25 other Asian quarter hours | #927 |
 | 109 | Frozen replication of the forex Sunday-gap fade (#880 rule G): six new crosses 2020-now, #880's majors 2010-15 | PARTLY: crosses +0.238R a trade (n 294, month t 2.99, Holm p 0.003, holds at 2x cost) but 228 of those weekends overlap #880's and 2026 carries much of it; majors 2010-15 flat (+0.003R) | #928 |
 | 110 | Tokyo first-hour range breakout on USD/JPY, AUD/USD, NZD/USD (hold to 06:00 UTC) | FAIL 0 of 3: about zero before costs, −0.07 to −0.09R a trade after; the breakout side is no better than a coin flip | #929 |
+| 111 | Buy the Swiss franc for 5 days after a sharp S&P 500 fall (short USD/CHF, EUR/CHF, AUD/CHF) | FAIL 0 of 3: negative after costs in both windows, below random entry days on every pair | #930 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
