@@ -26,6 +26,7 @@ paper system with a measured, clearly negative record.
 | 8 | Gold 12-month time-series momentum (published effect) | 129 months | Sharpe 0.26 / 0.31, below buy-and-hold | #823 |
 | 9 | ICT A-setup book risk caps (cluster, day stop, max open, inverse vol) | 1,707 | 0 of 4: each helps one half and hurts the other | #824 |
 | 10 | MMXM Day-3 swing failure on gold (+ silver SMT, midnight open) | 262 | −0.001R a trade, t −0.01; SMT made it worse | #825 |
+| 263 | Gold vol breakout on platinum and palladium (2005-26) | **FAIL, 0 of 2**: positive before costs (XPT gross t 3.11, XPD t 4.24) but spreads take several times the edge (net −0.285R / −0.643R); a precious-metals move, tradable only on gold | #1076 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
