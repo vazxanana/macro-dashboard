@@ -220,6 +220,7 @@ paper system with a measured, clearly negative record.
 | 202 | Gold after an all-time or 52-week closing high (`gold-record-high`) | **FAIL**, 0 of 3: long 20 days after an all-time high 2017-26 +0.319R a trade net (n 17, t 0.93), after a 52-week high +0.285R (n 30, t 1.21); random days of the same years did as well (37 of 40 seeds); the fade −0.404R | #1015 |
 | 203 | Gold's late New York move (13:30-16:30) into the Asia session (`gold-late-ny`) | **FAIL**, 0 of 3: follow 2021-26 −0.045R a trade net (n 1,445, t −2.57), large moves only −0.029R, fade −0.065R; every stream within 0.02R of zero before costs; same answer as `gold-us-asia` | #1016 |
 | 204 | Replication of the ICT SMT split on 2008-19 (`ict-smt-2008`) | **FAIL**: the 2024-26 lead does not replicate; no-SMT A-setups −0.040R a trade net (n 1,936) vs SMT −0.021R (n 628), difference −0.019R (Welch t −0.30), sign flips between 2008-13 and 2014-19, placebo 24 of 40. The one lead of the day is closed | #1017 |
+| 205 | Gold around the turn of the month (`gold-turn-of-month`) | **FAIL**, 0 of 3: long TD−2 to TD+3 2017-26 +0.117R a trade net (n 118, t 1.80, Holm p 0.11) but 0.000R in 2008-16 and losing in 2012-15: gold's own rise; month-end short flat. Hint only: the last 3 days weaker in both halves, too small for the spread | #1018 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
