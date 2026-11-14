@@ -101,6 +101,7 @@ paper system with a measured, clearly negative record.
 | 83 | The ECB first-hour rule, frozen, on BoE / BoC / SNB / RBA / RBNZ | FAIL: pooled +0.208R (n 320, t 1.77), 2010-17 negative; the ECB near miss (#896) did not repeat on independent decisions; dates from memory | #901 |
 | 84 | Currencies weaken in their own business hours (sell EUR/GBP 07-12 UTC, buy USD/JPY 00-06, sell AUD 22-05) | FAIL, 0 of 4: pooled −0.076R (t −4.31); European sells +0.06R gross but costs 0.10-0.13R take it; Tokyo/Sydney no effect | #902 |
 | 85 | The whole day against multiple testing (248 decisive tests of #815-#899, Holm and BH across all) | **0 of 248 survive**: 6 tests at t ≥ 2 against 5.6 expected by chance, 11 at p < 0.05 against 12.4; gotobi T2 alone BH q 0.71, but with its 2005-09 replication (Fisher p 3.6e-6) it clears the family's Bonferroni line: the raw gotobi effect is the day's one result that is not chance, and its edge after costs still waits on the measured spread (#897) | #904 |
+| 86 | Gold as a safe haven: buy gold the open after an SPX500 / NAS100 shock day (> 2 sd down), hold 1 or 5 days | FAIL, 0 of 3: shock-day excess over ordinary days +0.04R / −0.01R / +0.06R (t ≤ 0.54, Holm p 0.88); the 2016-26 profits are gold's own trend | #905 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
