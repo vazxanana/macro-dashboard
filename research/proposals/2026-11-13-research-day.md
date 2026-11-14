@@ -88,6 +88,7 @@ paper system with a measured, clearly negative record.
 | 70 | The owner's market-cycle rule (H4 BO, H1 pullback, H1 BO back) on BTC, ETH, SOL | FAIL, 0 of 2: −0.079R (n 830, t −1.80) to H4 extreme, −0.055R at 2R; random same-bias entries did better; third market where it fails | #888 |
 | 71 | Gotobi replication: the frozen #878 rule on GBP/JPY, AUD/JPY, CAD/JPY, CHF/JPY and USD/JPY 2005-09 | **REPLICATES**: pooled crosses +0.099R (t 2.75), USD/JPY 2005-09 +0.261R (t 3.80), all placebos beaten; cost-sensitive (≈0 at 2x cost), crosses correlate 0.5-0.8 with the USD/JPY leg | #889 |
 | 72 | Fading crypto weekend moves over 1 ATR (BTC, ETH; Monday 13:30 or Sunday 22:00 entry) | FAIL, 0 of 5: pooled −0.032R (n 46, t −0.19); rare signal, below the minimum n; 2017-21 daily check says big weekend moves continue | #890 |
+| 73 | US index overnight drift: long US500 / NAS100 from the 16:00 NY close to the 09:30 open | FAIL, 0 of 2: real before costs (+0.02-0.03R, gross month t +2.3 to +4.7) but the 0.03 % spread and financing take it all: US500 −0.022R (t −2.86), NAS100 −0.006R | #891 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
