@@ -1,0 +1,876 @@
+{
+ "study": "us-asia-lead",
+ "title": "US cash session leading the Asian index session: JP225 and HK33 from the Asian open",
+ "built": "2026-11-14",
+ "verdict": "FAIL: the Asian session in the US cash session's direction, entered at the Asian open, after a 0.04 % round trip, 2016-26: JP225 −0.041R a trade (n 2679, month-sum t −5.31), JP225 on strong US days −0.051R (n 826, t −3.39), HK33 −0.041R (n 2530, t −3.92); before costs −0.017R, −0.026R, −0.018R",
+ "verdictClass": "FAIL",
+ "data": {
+  "source": "OANDA mid M15 via /md/bars",
+  "span": {
+   "spx500": {
+    "candles": 509220,
+    "first": "2005-01-02",
+    "last": "2026-11-13"
+   },
+   "jp225": {
+    "candles": 440507,
+    "first": "2005-01-03",
+    "last": "2026-11-13"
+   },
+   "hk33": {
+    "candles": 229874,
+    "first": "2005-01-03",
+    "last": "2026-11-13"
+   }
+  },
+  "usSignals": 5493
+ },
+ "params": {
+  "ATR_N": 20,
+  "STOP_ATR": 1,
+  "COST": 0.0004,
+  "SD_N": 20,
+  "SEEDS": 40,
+  "MIN_N": 100,
+  "MIN_N_T2": 50
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-01",
+   "2026-11-13"
+  ],
+  "replication": [
+   "2005-01-01",
+   "2015-12-31"
+  ]
+ },
+ "holmSet": [
+  "T1",
+  "T2",
+  "T3"
+ ],
+ "tests": {
+  "T1": {
+   "market": "JP225",
+   "strongOnly": false,
+   "session": "00:00-06:00 UTC",
+   "dropped": {
+    "data": 1544,
+    "atr": 0
+   },
+   "decisive": {
+    "n": 2679,
+    "months": 131,
+    "buys": 1484,
+    "sells": 1195,
+    "win": 0.437,
+    "grossR": -0.017,
+    "costR": 0.025,
+    "netR": -0.041,
+    "net2R": -0.066,
+    "tGross": -2.16,
+    "t": -5.31,
+    "total": -111.01,
+    "maxDD": 111.35,
+    "stops": 87,
+    "medStopPct": 1.662,
+    "gapR": 0.009,
+    "gapN": 2678,
+    "byYear": {
+     "2016": {
+      "n": 246,
+      "netR": -0.038,
+      "total": -9.46
+     },
+     "2017": {
+      "n": 243,
+      "netR": -0.041,
+      "total": -10.01
+     },
+     "2018": {
+      "n": 244,
+      "netR": -0.046,
+      "total": -11.25
+     },
+     "2019": {
+      "n": 246,
+      "netR": -0.045,
+      "total": -11.17
+     },
+     "2020": {
+      "n": 244,
+      "netR": 0.008,
+      "total": 2.05
+     },
+     "2021": {
+      "n": 251,
+      "netR": -0.062,
+      "total": -15.44
+     },
+     "2022": {
+      "n": 245,
+      "netR": -0.015,
+      "total": -3.7
+     },
+     "2023": {
+      "n": 246,
+      "netR": -0.057,
+      "total": -13.97
+     },
+     "2024": {
+      "n": 249,
+      "netR": -0.021,
+      "total": -5.21
+     },
+     "2025": {
+      "n": 247,
+      "netR": -0.07,
+      "total": -17.41
+     },
+     "2026": {
+      "n": 218,
+      "netR": -0.071,
+      "total": -15.45
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 1484,
+      "buys": 1484,
+      "sells": 0,
+      "win": 0.443,
+      "grossR": -0.015,
+      "costR": 0.024,
+      "netR": -0.04,
+      "net2R": -0.064,
+      "tGross": -1.63,
+      "t": -4.34,
+      "total": -58.68,
+      "maxDD": 59.02,
+      "stops": 47,
+      "medStopPct": 1.659,
+      "gapR": 0.011,
+      "gapN": 1484
+     },
+     "sell": {
+      "n": 1195,
+      "buys": 0,
+      "sells": 1195,
+      "win": 0.428,
+      "grossR": -0.019,
+      "costR": 0.025,
+      "netR": -0.044,
+      "net2R": -0.068,
+      "tGross": -1.66,
+      "t": -3.77,
+      "total": -52.33,
+      "maxDD": 55.24,
+      "stops": 40,
+      "medStopPct": 1.669,
+      "gapR": 0.008,
+      "gapN": 1194
+     }
+    },
+    "corr": {
+     "n": 2697,
+     "usVsGap": 0.006,
+     "usVsSession": -0.059
+    },
+    "cashGap": {
+     "n": 2696,
+     "usVsCashGap": 0.576,
+     "hit": 0.687,
+     "usVsSession": -0.059
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.034,
+      "p50": -0.02,
+      "p95": -0.012,
+      "rankOfReal": 1,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.033,
+      "p50": -0.021,
+      "p95": -0.011,
+      "rankOfReal": 0,
+      "above95": false
+     }
+    },
+    "p": 1,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 1239,
+    "months": 69,
+    "buys": 670,
+    "sells": 569,
+    "win": 0.466,
+    "grossR": -0.005,
+    "costR": 0.023,
+    "netR": -0.028,
+    "net2R": -0.051,
+    "tGross": -0.36,
+    "t": -2.16,
+    "total": -34.22,
+    "maxDD": 34.75,
+    "stops": 50,
+    "medStopPct": 1.737,
+    "gapR": -0.012,
+    "gapN": 1238,
+    "byYear": {
+     "2010": {
+      "n": 118,
+      "netR": -0.057,
+      "total": -6.74
+     },
+     "2011": {
+      "n": 159,
+      "netR": -0.048,
+      "total": -7.7
+     },
+     "2012": {
+      "n": 227,
+      "netR": 0.033,
+      "total": 7.48
+     },
+     "2013": {
+      "n": 246,
+      "netR": -0.041,
+      "total": -10.11
+     },
+     "2014": {
+      "n": 242,
+      "netR": -0.012,
+      "total": -2.94
+     },
+     "2015": {
+      "n": 247,
+      "netR": -0.058,
+      "total": -14.21
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 670,
+      "buys": 670,
+      "sells": 0,
+      "win": 0.448,
+      "grossR": -0.025,
+      "costR": 0.023,
+      "netR": -0.048,
+      "net2R": -0.071,
+      "tGross": -1.74,
+      "t": -3.33,
+      "total": -31.89,
+      "maxDD": 32.01,
+      "stops": 31,
+      "medStopPct": 1.754,
+      "gapR": -0.016,
+      "gapN": 669
+     },
+     "sell": {
+      "n": 569,
+      "buys": 0,
+      "sells": 569,
+      "win": 0.487,
+      "grossR": 0.019,
+      "costR": 0.023,
+      "netR": -0.004,
+      "net2R": -0.027,
+      "tGross": 0.96,
+      "t": -0.21,
+      "total": -2.33,
+      "maxDD": 13.14,
+      "stops": 19,
+      "medStopPct": 1.731,
+      "gapR": -0.006,
+      "gapN": 569
+     }
+    },
+    "corr": {
+     "n": 1250,
+     "usVsGap": -0.077,
+     "usVsSession": -0.073
+    },
+    "cashGap": {
+     "n": 1163,
+     "usVsCashGap": 0.573,
+     "hit": 0.702,
+     "usVsSession": -0.074
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.043,
+      "p50": -0.024,
+      "p95": -0.002,
+      "rankOfReal": 15,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.046,
+      "p50": -0.025,
+      "p95": -0.01,
+      "rankOfReal": 15,
+      "above95": false
+     }
+    }
+   }
+  },
+  "T2": {
+   "market": "JP225",
+   "strongOnly": true,
+   "session": "00:00-06:00 UTC",
+   "dropped": {
+    "data": 1544,
+    "atr": 0
+   },
+   "decisive": {
+    "n": 826,
+    "months": 131,
+    "buys": 452,
+    "sells": 374,
+    "win": 0.437,
+    "grossR": -0.026,
+    "costR": 0.025,
+    "netR": -0.051,
+    "net2R": -0.076,
+    "tGross": -1.74,
+    "t": -3.39,
+    "total": -42.11,
+    "maxDD": 43.01,
+    "stops": 37,
+    "medStopPct": 1.665,
+    "gapR": 0.011,
+    "gapN": 825,
+    "byYear": {
+     "2016": {
+      "n": 70,
+      "netR": -0.059,
+      "total": -4.11
+     },
+     "2017": {
+      "n": 73,
+      "netR": -0.028,
+      "total": -2.06
+     },
+     "2018": {
+      "n": 76,
+      "netR": -0.129,
+      "total": -9.83
+     },
+     "2019": {
+      "n": 67,
+      "netR": -0.041,
+      "total": -2.72
+     },
+     "2020": {
+      "n": 67,
+      "netR": -0.076,
+      "total": -5.12
+     },
+     "2021": {
+      "n": 86,
+      "netR": -0.012,
+      "total": -1.07
+     },
+     "2022": {
+      "n": 80,
+      "netR": -0.001,
+      "total": -0.05
+     },
+     "2023": {
+      "n": 89,
+      "netR": -0.02,
+      "total": -1.8
+     },
+     "2024": {
+      "n": 74,
+      "netR": -0.027,
+      "total": -2.01
+     },
+     "2025": {
+      "n": 78,
+      "netR": -0.1,
+      "total": -7.77
+     },
+     "2026": {
+      "n": 66,
+      "netR": -0.085,
+      "total": -5.58
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 452,
+      "buys": 452,
+      "sells": 0,
+      "win": 0.458,
+      "grossR": -0.023,
+      "costR": 0.025,
+      "netR": -0.048,
+      "net2R": -0.073,
+      "tGross": -1.16,
+      "t": -2.42,
+      "total": -21.78,
+      "maxDD": 23.18,
+      "stops": 23,
+      "medStopPct": 1.613,
+      "gapR": 0.009,
+      "gapN": 452
+     },
+     "sell": {
+      "n": 374,
+      "buys": 0,
+      "sells": 374,
+      "win": 0.412,
+      "grossR": -0.03,
+      "costR": 0.024,
+      "netR": -0.054,
+      "net2R": -0.078,
+      "tGross": -1.36,
+      "t": -2.44,
+      "total": -20.33,
+      "maxDD": 21.77,
+      "stops": 14,
+      "medStopPct": 1.734,
+      "gapR": 0.013,
+      "gapN": 373
+     }
+    },
+    "corr": {
+     "n": 825,
+     "usVsGap": -0.007,
+     "usVsSession": -0.091
+    },
+    "cashGap": {
+     "n": 826,
+     "usVsCashGap": 0.702,
+     "hit": 0.849,
+     "usVsSession": -0.091
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.044,
+      "p50": -0.021,
+      "p95": 0.001,
+      "rankOfReal": 1,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.045,
+      "p50": -0.023,
+      "p95": 0.007,
+      "rankOfReal": 0,
+      "above95": false
+     }
+    },
+    "p": 1,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 378,
+    "months": 69,
+    "buys": 187,
+    "sells": 191,
+    "win": 0.437,
+    "grossR": -0.029,
+    "costR": 0.023,
+    "netR": -0.053,
+    "net2R": -0.076,
+    "tGross": -1.24,
+    "t": -2.19,
+    "total": -19.86,
+    "maxDD": 19.86,
+    "stops": 20,
+    "medStopPct": 1.732,
+    "gapR": -0.026,
+    "gapN": 378,
+    "byYear": {
+     "2010": {
+      "n": 32,
+      "netR": -0.116,
+      "total": -3.72
+     },
+     "2011": {
+      "n": 51,
+      "netR": -0.082,
+      "total": -4.2
+     },
+     "2012": {
+      "n": 66,
+      "netR": -0.001,
+      "total": -0.06
+     },
+     "2013": {
+      "n": 73,
+      "netR": -0.018,
+      "total": -1.35
+     },
+     "2014": {
+      "n": 85,
+      "netR": -0.059,
+      "total": -5.02
+     },
+     "2015": {
+      "n": 71,
+      "netR": -0.077,
+      "total": -5.5
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 187,
+      "buys": 187,
+      "sells": 0,
+      "win": 0.401,
+      "grossR": -0.049,
+      "costR": 0.023,
+      "netR": -0.072,
+      "net2R": -0.095,
+      "tGross": -1.49,
+      "t": -2.17,
+      "total": -13.48,
+      "maxDD": 13.84,
+      "stops": 7,
+      "medStopPct": 1.723,
+      "gapR": -0.022,
+      "gapN": 187
+     },
+     "sell": {
+      "n": 191,
+      "buys": 0,
+      "sells": 191,
+      "win": 0.471,
+      "grossR": -0.01,
+      "costR": 0.023,
+      "netR": -0.033,
+      "net2R": -0.057,
+      "tGross": -0.25,
+      "t": -0.83,
+      "total": -6.37,
+      "maxDD": 7.28,
+      "stops": 13,
+      "medStopPct": 1.732,
+      "gapR": -0.03,
+      "gapN": 191
+     }
+    },
+    "corr": {
+     "n": 378,
+     "usVsGap": -0.122,
+     "usVsSession": -0.136
+    },
+    "cashGap": {
+     "n": 356,
+     "usVsCashGap": 0.681,
+     "hit": 0.851,
+     "usVsSession": -0.124
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.061,
+      "p50": -0.015,
+      "p95": 0.008,
+      "rankOfReal": 5,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.064,
+      "p50": -0.014,
+      "p95": 0.014,
+      "rankOfReal": 4,
+      "above95": false
+     }
+    }
+   }
+  },
+  "T3": {
+   "market": "HK33",
+   "strongOnly": false,
+   "session": "01:30-08:00 UTC",
+   "dropped": {
+    "data": 1822,
+    "atr": 0
+   },
+   "decisive": {
+    "n": 2530,
+    "months": 131,
+    "buys": 1390,
+    "sells": 1140,
+    "win": 0.475,
+    "grossR": -0.018,
+    "costR": 0.023,
+    "netR": -0.041,
+    "net2R": -0.064,
+    "tGross": -1.76,
+    "t": -3.92,
+    "total": -104.07,
+    "maxDD": 104.93,
+    "stops": 155,
+    "medStopPct": 1.906,
+    "gapR": -0.245,
+    "gapN": 12,
+    "byYear": {
+     "2016": {
+      "n": 231,
+      "netR": -0.072,
+      "total": -16.69
+     },
+     "2017": {
+      "n": 233,
+      "netR": -0.046,
+      "total": -10.81
+     },
+     "2018": {
+      "n": 230,
+      "netR": -0.024,
+      "total": -5.53
+     },
+     "2019": {
+      "n": 229,
+      "netR": -0.058,
+      "total": -13.37
+     },
+     "2020": {
+      "n": 230,
+      "netR": -0.035,
+      "total": -8.04
+     },
+     "2021": {
+      "n": 237,
+      "netR": -0.048,
+      "total": -11.26
+     },
+     "2022": {
+      "n": 232,
+      "netR": 0.008,
+      "total": 1.83
+     },
+     "2023": {
+      "n": 232,
+      "netR": -0.074,
+      "total": -17.12
+     },
+     "2024": {
+      "n": 235,
+      "netR": -0.007,
+      "total": -1.72
+     },
+     "2025": {
+      "n": 234,
+      "netR": -0.038,
+      "total": -8.84
+     },
+     "2026": {
+      "n": 207,
+      "netR": -0.061,
+      "total": -12.53
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 1390,
+      "buys": 1390,
+      "sells": 0,
+      "win": 0.471,
+      "grossR": -0.023,
+      "costR": 0.023,
+      "netR": -0.045,
+      "net2R": -0.068,
+      "tGross": -1.75,
+      "t": -3.52,
+      "total": -63.09,
+      "maxDD": 64.51,
+      "stops": 91,
+      "medStopPct": 1.913,
+      "gapR": -0.265,
+      "gapN": 8
+     },
+     "sell": {
+      "n": 1140,
+      "buys": 0,
+      "sells": 1140,
+      "win": 0.481,
+      "grossR": -0.013,
+      "costR": 0.023,
+      "netR": -0.036,
+      "net2R": -0.059,
+      "tGross": -0.87,
+      "t": -2.34,
+      "total": -40.98,
+      "maxDD": 44.82,
+      "stops": 64,
+      "medStopPct": 1.9,
+      "gapR": -0.205,
+      "gapN": 4
+     }
+    },
+    "corr": {
+     "n": 12,
+     "usVsGap": -0.38,
+     "usVsSession": 0.381
+    },
+    "cashGap": {
+     "n": 2434,
+     "usVsCashGap": 0.452,
+     "hit": 0.649,
+     "usVsSession": -0.076
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.037,
+      "p50": -0.024,
+      "p95": -0.006,
+      "rankOfReal": 1,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.035,
+      "p50": -0.025,
+      "p95": -0.008,
+      "rankOfReal": 1,
+      "above95": false
+     }
+    },
+    "p": 1,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 1114,
+    "months": 58,
+    "buys": 599,
+    "sells": 515,
+    "win": 0.455,
+    "grossR": -0.029,
+    "costR": 0.028,
+    "netR": -0.057,
+    "net2R": -0.085,
+    "tGross": -1.72,
+    "t": -3.39,
+    "total": -63.23,
+    "maxDD": 63.36,
+    "stops": 90,
+    "medStopPct": 1.446,
+    "gapR": null,
+    "gapN": 0,
+    "byYear": {
+     "2011": {
+      "n": 197,
+      "netR": -0.075,
+      "total": -14.82
+     },
+     "2012": {
+      "n": 227,
+      "netR": -0.025,
+      "total": -5.69
+     },
+     "2013": {
+      "n": 227,
+      "netR": -0.097,
+      "total": -21.99
+     },
+     "2014": {
+      "n": 229,
+      "netR": -0.023,
+      "total": -5.23
+     },
+     "2015": {
+      "n": 234,
+      "netR": -0.066,
+      "total": -15.5
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 599,
+      "buys": 599,
+      "sells": 0,
+      "win": 0.427,
+      "grossR": -0.045,
+      "costR": 0.028,
+      "netR": -0.073,
+      "net2R": -0.101,
+      "tGross": -2.17,
+      "t": -3.54,
+      "total": -43.69,
+      "maxDD": 44.22,
+      "stops": 48,
+      "medStopPct": 1.435,
+      "gapR": null,
+      "gapN": 0
+     },
+     "sell": {
+      "n": 515,
+      "buys": 0,
+      "sells": 515,
+      "win": 0.487,
+      "grossR": -0.01,
+      "costR": 0.028,
+      "netR": -0.038,
+      "net2R": -0.066,
+      "tGross": -0.41,
+      "t": -1.53,
+      "total": -19.54,
+      "maxDD": 20.66,
+      "stops": 42,
+      "medStopPct": 1.455,
+      "gapR": null,
+      "gapN": 0
+     }
+    },
+    "corr": {
+     "n": 0,
+     "usVsGap": null,
+     "usVsSession": null
+    },
+    "cashGap": {
+     "n": 1075,
+     "usVsCashGap": 0.6,
+     "hit": 0.711,
+     "usVsSession": -0.039
+    },
+    "placebo": {
+     "sign": {
+      "p5": -0.05,
+      "p50": -0.035,
+      "p95": -0.019,
+      "rankOfReal": 2,
+      "above95": false
+     },
+     "other": {
+      "p5": -0.051,
+      "p50": -0.033,
+      "p95": -0.01,
+      "rankOfReal": 1,
+      "above95": false
+     }
+    }
+   }
+  }
+ },
+ "conditions": {
+  "T1": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  },
+  "T2": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  },
+  "T3": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  }
+ }
+}
