@@ -1,5 +1,5 @@
 {
- "at": "2026-11-14T02:28:18.000Z",
+ "at": "2026-11-14T02:46:36.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -83,9 +83,9 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T02:25:00.000Z",
+     "last": "2026-11-14T02:45:00.000Z",
      "staleMin": 0,
-     "maxJump": 4.86,
+     "maxJump": 7.78,
      "clipped": 0,
      "issues": []
     },
@@ -94,9 +94,9 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T02:25:00.000Z",
+     "last": "2026-11-14T02:45:00.000Z",
      "staleMin": 0,
-     "maxJump": 4.27,
+     "maxJump": 8.97,
      "clipped": 0,
      "issues": []
     },
@@ -105,9 +105,9 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T02:25:00.000Z",
+     "last": "2026-11-14T02:45:00.000Z",
      "staleMin": 0,
-     "maxJump": 3.91,
+     "maxJump": 4.06,
      "clipped": 0,
      "issues": []
     },
@@ -116,9 +116,9 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T02:25:00.000Z",
+     "last": "2026-11-14T02:45:00.000Z",
      "staleMin": 0,
-     "maxJump": 4.34,
+     "maxJump": 4.47,
      "clipped": 0,
      "issues": []
     }
@@ -306,7 +306,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 37,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "input",
@@ -317,19 +317,24 @@
        "kind": "source",
        "sev": "warn",
        "detail": "next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases"
+      },
+      {
+       "kind": "source",
+       "sev": "note",
+       "detail": "rss:Fed failed (HTTP 404)"
       }
      ]
     },
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 37,
+     "ageMin": 0,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 37,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "stale",
@@ -356,7 +361,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 148,
+     "ageMin": 166,
      "issues": []
     },
     "digest.json": {
@@ -367,31 +372,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 158,
+     "ageMin": 17,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 912,
+     "ageMin": 931,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 912,
+     "ageMin": 931,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 912,
+     "ageMin": 931,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 912,
+     "ageMin": 930,
      "issues": []
     },
     "research/ledger.json": {
@@ -412,19 +417,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 694,
+     "ageMin": 712,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 312,
+     "ageMin": 331,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 8859,
+     "ageMin": 8877,
      "issues": [
       {
        "kind": "stale",
@@ -461,7 +466,7 @@
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
    "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)"
   ],
-  "notes": 2
+  "notes": 3
  },
  "alert": {
   "streak": {},
