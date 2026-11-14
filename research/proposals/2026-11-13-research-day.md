@@ -260,6 +260,7 @@ paper system with a measured, clearly negative record.
 | 242 | Gold daily inside-day breakout | FAIL, 0 of 3: in sample +0.112R (t 2.53) did not carry over; OOS +0.028R (n 367, t 0.62), negative at 2x costs | #1055 |
 | 243 | Gold volatility breakout under realistic costs (accounting) | Break-even $1.14 a round trip pooled 2007-26; month t stays ≥ 2 below $0.81 (only $0.19 in 2016-20). Measured demo cost: +0.147R (t 6.85); pessimistic era costs + slippage: +0.036R (t 1.64). Asia-session fills (00-07 UTC, widest spreads) carry most of the gross (+0.383R vs London +0.113R, NY +0.047R) | #1056 |
 | 244 | Gold volatility breakout on an independent feed (HistData M1, 2018-26) | **PASS, not an OANDA artifact**: same side as OANDA on 99.7 % of common days, daily R correlation 0.91, gross t 4.21; net t 1.57 on its own (2018-26 is not the evidence; 2007-15 is) | #1057 |
+| 245 | Gold volatility breakout risk profile (descriptive) | 2007-26 +0.072R a trade (n 3,706); worst drawdown −42.9R (2016-20, 4.4 years under water); 12-month band −14.9 to +44.3R; stop lines S1-S4 set (any line within 36 months: 12 % false alarm, 51 % catch of no edge); t ≥ 2 forward needs ~7.8 years; negative at 2x costs | #1058 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
