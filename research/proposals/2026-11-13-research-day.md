@@ -131,7 +131,18 @@ environment (the saved "macro-dashboard" environment; a new session on it).
    your own trades can measure (item 27).
 2. **Published effects mostly do not survive on these instruments with retail costs.** Spot CFDs pay financing and miss the
    futures carry the papers earn (#8, #13); the calendar effects (#11) did not repeat after publication.
-3. **What stays live is the gold book (Gold trend + Gold daily engulf) under the forward-test protocol (item 43)**, judged by
+3. **Taken together, the day is what chance would give.** Across 248 decisive tests (#904), 6 reached t ≥ 2 against 5.6
+   expected and none survives Holm or BH. The overnight follow-ups (rows 84-104) added only FAILs, PARTLY replications
+   (#920) and mechanism notes.
+4. **The one effect that is not chance, gotobi, cannot be captured.** Selling USD/JPY at the 09:55 Tokyo fix on settlement
+   days replicates (#889), survives a second feed (#912) and is the only result to clear the family's Bonferroni line with
+   its replication (#904). But it lives in one minute: one minute late keeps a third (#908), a resting limit keeps 5 %
+   (#915), and the rise into the fix happens on every day; only the drop after it is gotobi-specific (#917). A copy that
+   cannot fill at 00:55:00 has nothing to trade, so the yen spread log (#897) is now low priority.
+5. **Fix and gap reversals are real but smaller than retail costs.** The London 16:00 fix (#910) and the ECB 14:10
+   concertation (#921) both reverse before costs in both windows (gross t 2.5-3.1), and costs take two to three times
+   the effect; index and gold session reversals (#913, #916, #923) are absent or cost-sized.
+6. **What stays live is the gold book (Gold trend + Gold daily engulf) under the forward-test protocol (item 43)**, judged by
    its own stop lines, not by new tests on its history (item 44).
 
 ## Recommended next steps (none taken without you)
