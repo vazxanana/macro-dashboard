@@ -1,0 +1,12025 @@
+{
+ "topic": "fx-weekend-gap",
+ "built": "2026-11-14",
+ "at": "2026-11-14T00:05:50.583Z",
+ "system": "Forex majors Sunday-open gap fade: enter toward Friday's close after the reopen, target Friday's close, 1R stop, out Monday 12:00 New York (six pairs, OANDA mid M5)",
+ "prereg": "research/edge/fx-weekend-gap/PREREGISTRATION.md",
+ "copiedFrom": "research/edge/gold-weekend-gap (branch gold-weekend-gap)",
+ "pairs": [
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "usdchf",
+  "eurjpy"
+ ],
+ "candles": {
+  "eurusd": {
+   "m5": 821744,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  },
+  "gbpusd": {
+   "m5": 821204,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  },
+  "usdjpy": {
+   "m5": 822120,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  },
+  "audusd": {
+   "m5": 818540,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  },
+  "usdchf": {
+   "m5": 813417,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  },
+  "eurjpy": {
+   "m5": 822238,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55"
+  }
+ },
+ "window": {
+  "replication": "2016-01-01 to 2019-12-31",
+  "decisive": "2020-01-01 to 2026-11-12"
+ },
+ "params": {
+  "M5": 300,
+  "ATR_N": 20,
+  "DAY_MIN": 12,
+  "GAP_MIN": 0.25,
+  "GAP_MAX": 1.5,
+  "R0_MIN": 0.1,
+  "N_MIN": 80,
+  "SPREAD_PIPS": 0.3,
+  "COMM_SIDE": 0.0000225,
+  "SLIP_PIPS": 1,
+  "SLIP2_PIPS": 2,
+  "ALPHA": 0.02275,
+  "SEEDS": 40,
+  "DATA_FROM": 1446336000,
+  "REP": [
+   1451606400,
+   1577836800
+  ],
+  "DEC_FROM": 1577836800
+ },
+ "verdict": "FAIL",
+ "posthoc": {
+  "G": {
+   "dec2020to2025": {
+    "n": 172,
+    "win": 0.593,
+    "gross": 0.1747,
+    "net": 0.0788,
+    "net2": 0.0098,
+    "t": 1.1165,
+    "total": 13.5491,
+    "maxDD": 11.6851,
+    "months": 39,
+    "tMonth": 0.7746,
+    "medR0Pips": 35.1,
+    "medCostR": 0.0777,
+    "nights": 0,
+    "exits": {
+     "target": 89,
+     "stop": 60,
+     "time": 23
+    }
+   },
+   "dec2026": {
+    "n": 71,
+    "win": 0.8028,
+    "gross": 0.5774,
+    "net": 0.4732,
+    "net2": 0.3982,
+    "t": 5.6636,
+    "total": 33.5971,
+    "maxDD": 5.0005,
+    "months": 10,
+    "tMonth": 3.1162,
+    "medR0Pips": 27.7,
+    "medCostR": 0.1002,
+    "nights": 0,
+    "exits": {
+     "stop": 9,
+     "target": 47,
+     "time": 15
+    }
+   },
+   "weeks": 97,
+   "tWeek": 2.4673
+  },
+  "H": {
+   "dec2020to2025": {
+    "n": 157,
+    "win": 0.5032,
+    "gross": -0.0211,
+    "net": -0.1306,
+    "net2": -0.2096,
+    "t": -1.7256,
+    "total": -20.4999,
+    "maxDD": 24.2505,
+    "months": 36,
+    "tMonth": -1.1903,
+    "medR0Pips": 33.8,
+    "medCostR": 0.0814,
+    "nights": 0,
+    "exits": {
+     "target": 66,
+     "stop": 71,
+     "time": 20
+    }
+   },
+   "dec2026": {
+    "n": 65,
+    "win": 0.7231,
+    "gross": 0.3785,
+    "net": 0.2659,
+    "net2": 0.1854,
+    "t": 2.539,
+    "total": 17.2809,
+    "maxDD": 4.2878,
+    "months": 9,
+    "tMonth": 2.2106,
+    "medR0Pips": 31.1,
+    "medCostR": 0.0955,
+    "nights": 0,
+    "exits": {
+     "stop": 15,
+     "target": 37,
+     "time": 13
+    }
+   },
+   "weeks": 86,
+   "tWeek": -0.1807
+  }
+ },
+ "weeks": {
+  "byPair": {
+   "eurusd": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 23,
+    "eligibleDec": 44
+   },
+   "gbpusd": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 32,
+    "eligibleDec": 37
+   },
+   "usdjpy": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 38,
+    "eligibleDec": 37
+   },
+   "audusd": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 29,
+    "eligibleDec": 48
+   },
+   "usdchf": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 19,
+    "eligibleDec": 34
+   },
+   "eurjpy": {
+    "total": 567,
+    "used": 557,
+    "skipped": {
+     "friday": 3,
+     "reopen": 7
+    },
+    "eligibleRep": 32,
+    "eligibleDec": 48
+   }
+  },
+  "eligibleRep": 173,
+  "eligibleDec": 248
+ },
+ "rules": {
+  "G": {
+   "noTrade": {
+    "filled": 2,
+    "small": 3
+   },
+   "rep": {
+    "n": 173,
+    "win": 0.5896,
+    "gross": 0.1467,
+    "net": 0.0343,
+    "net2": -0.0466,
+    "t": 0.4877,
+    "total": 5.9421,
+    "maxDD": 13.5827,
+    "months": 39,
+    "tMonth": 0.394,
+    "medR0Pips": 27.1,
+    "medCostR": 0.1023,
+    "nights": 0,
+    "exits": {
+     "target": 85,
+     "stop": 61,
+     "time": 26,
+     "stop (gap)": 1
+    }
+   },
+   "dec": {
+    "n": 243,
+    "win": 0.6543,
+    "gross": 0.2923,
+    "net": 0.194,
+    "net2": 0.1233,
+    "t": 3.423,
+    "total": 47.1462,
+    "maxDD": 11.6851,
+    "months": 49,
+    "tMonth": 2.1411,
+    "medR0Pips": 33,
+    "medCostR": 0.082,
+    "nights": 0,
+    "exits": {
+     "target": 136,
+     "stop": 69,
+     "time": 38
+    }
+   },
+   "byPair": {
+    "eurusd": {
+     "rep": {
+      "n": 23,
+      "win": 0.5217,
+      "gross": 0.0101,
+      "net": -0.1157,
+      "net2": -0.2053,
+      "t": -0.6008,
+      "total": -2.6609,
+      "maxDD": 6.5138,
+      "months": 16,
+      "tMonth": -0.607,
+      "medR0Pips": 23.6,
+      "medCostR": 0.1201,
+      "nights": 0,
+      "exits": {
+       "time": 4,
+       "target": 10,
+       "stop": 9
+      }
+     },
+     "dec": {
+      "n": 43,
+      "win": 0.6047,
+      "gross": 0.183,
+      "net": 0.0893,
+      "net2": 0.0224,
+      "t": 0.6421,
+      "total": 3.8394,
+      "maxDD": 7.3015,
+      "months": 25,
+      "tMonth": 0.5764,
+      "medR0Pips": 33.3,
+      "medCostR": 0.0847,
+      "nights": 0,
+      "exits": {
+       "target": 21,
+       "stop": 15,
+       "time": 7
+      }
+     }
+    },
+    "gbpusd": {
+     "rep": {
+      "n": 32,
+      "win": 0.4688,
+      "gross": -0.0889,
+      "net": -0.1731,
+      "net2": -0.2315,
+      "t": -0.9797,
+      "total": -5.5395,
+      "maxDD": 7.7524,
+      "months": 22,
+      "tMonth": -0.8874,
+      "medR0Pips": 40.7,
+      "medCostR": 0.0831,
+      "nights": 0,
+      "exits": {
+       "stop": 17,
+       "target": 14,
+       "time": 1
+      }
+     },
+     "dec": {
+      "n": 37,
+      "win": 0.6486,
+      "gross": 0.2706,
+      "net": 0.1818,
+      "net2": 0.1202,
+      "t": 1.1623,
+      "total": 6.7253,
+      "maxDD": 6.1916,
+      "months": 27,
+      "tMonth": 1.0309,
+      "medR0Pips": 38.7,
+      "medCostR": 0.0751,
+      "nights": 0,
+      "exits": {
+       "stop": 13,
+       "target": 21,
+       "time": 3
+      }
+     }
+    },
+    "usdjpy": {
+     "rep": {
+      "n": 38,
+      "win": 0.6053,
+      "gross": 0.1932,
+      "net": 0.0846,
+      "net2": 0.0069,
+      "t": 0.5614,
+      "total": 3.2164,
+      "maxDD": 7.0039,
+      "months": 29,
+      "tMonth": 0.5271,
+      "medR0Pips": 30.3,
+      "medCostR": 0.0986,
+      "nights": 0,
+      "exits": {
+       "target": 19,
+       "time": 7,
+       "stop": 12
+      }
+     },
+     "dec": {
+      "n": 37,
+      "win": 0.5676,
+      "gross": 0.1919,
+      "net": 0.1095,
+      "net2": 0.0527,
+      "t": 0.7638,
+      "total": 4.0509,
+      "maxDD": 4.6615,
+      "months": 27,
+      "tMonth": 0.6777,
+      "medR0Pips": 43.3,
+      "medCostR": 0.0665,
+      "nights": 0,
+      "exits": {
+       "target": 18,
+       "time": 9,
+       "stop": 10
+      }
+     }
+    },
+    "audusd": {
+     "rep": {
+      "n": 29,
+      "win": 0.7241,
+      "gross": 0.4276,
+      "net": 0.2938,
+      "net2": 0.192,
+      "t": 1.929,
+      "total": 8.5205,
+      "maxDD": 3.0199,
+      "months": 24,
+      "tMonth": 1.8108,
+      "medR0Pips": 21,
+      "medCostR": 0.1252,
+      "nights": 0,
+      "exits": {
+       "target": 18,
+       "stop": 6,
+       "time": 5
+      }
+     },
+     "dec": {
+      "n": 45,
+      "win": 0.6667,
+      "gross": 0.3415,
+      "net": 0.2179,
+      "net2": 0.1232,
+      "t": 1.6776,
+      "total": 9.8072,
+      "maxDD": 3.0817,
+      "months": 29,
+      "tMonth": 1.6506,
+      "medR0Pips": 27,
+      "medCostR": 0.0972,
+      "nights": 0,
+      "exits": {
+       "stop": 11,
+       "time": 8,
+       "target": 26
+      }
+     }
+    },
+    "usdchf": {
+     "rep": {
+      "n": 19,
+      "win": 0.5789,
+      "gross": 0.1504,
+      "net": 0.0099,
+      "net2": -0.0927,
+      "t": 0.0433,
+      "total": 0.1879,
+      "maxDD": 5.0399,
+      "months": 16,
+      "tMonth": 0.038,
+      "medR0Pips": 19.5,
+      "medCostR": 0.141,
+      "nights": 0,
+      "exits": {
+       "target": 10,
+       "stop": 7,
+       "time": 1,
+       "stop (gap)": 1
+      }
+     },
+     "dec": {
+      "n": 34,
+      "win": 0.6471,
+      "gross": 0.2834,
+      "net": 0.155,
+      "net2": 0.0596,
+      "t": 0.9749,
+      "total": 5.2695,
+      "maxDD": 5.9461,
+      "months": 26,
+      "tMonth": 1.0027,
+      "medR0Pips": 21.2,
+      "medCostR": 0.1335,
+      "nights": 0,
+      "exits": {
+       "stop": 11,
+       "target": 20,
+       "time": 3
+      }
+     }
+    },
+    "eurjpy": {
+     "rep": {
+      "n": 32,
+      "win": 0.625,
+      "gross": 0.1683,
+      "net": 0.0693,
+      "net2": 0.0001,
+      "t": 0.4342,
+      "total": 2.2177,
+      "maxDD": 4.0419,
+      "months": 25,
+      "tMonth": 0.4565,
+      "medR0Pips": 30.9,
+      "medCostR": 0.107,
+      "nights": 0,
+      "exits": {
+       "stop": 10,
+       "time": 8,
+       "target": 14
+      }
+     },
+     "dec": {
+      "n": 47,
+      "win": 0.766,
+      "gross": 0.448,
+      "net": 0.3714,
+      "net2": 0.3199,
+      "t": 3.1535,
+      "total": 17.4539,
+      "maxDD": 2.4213,
+      "months": 35,
+      "tMonth": 3.0491,
+      "medR0Pips": 50.9,
+      "medCostR": 0.0583,
+      "nights": 0,
+      "exits": {
+       "stop": 9,
+       "target": 30,
+       "time": 8
+      }
+     }
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 47,
+     "net": -0.0075,
+     "total": -0.3503
+    },
+    "2017": {
+     "n": 51,
+     "net": -0.0096,
+     "total": -0.4903
+    },
+    "2018": {
+     "n": 34,
+     "net": 0.2325,
+     "total": 7.9043
+    },
+    "2019": {
+     "n": 41,
+     "net": -0.0274,
+     "total": -1.1216
+    },
+    "2020": {
+     "n": 38,
+     "net": -0.2728,
+     "total": -10.3649
+    },
+    "2021": {
+     "n": 12,
+     "net": 0.6761,
+     "total": 8.1136
+    },
+    "2022": {
+     "n": 25,
+     "net": 0.3595,
+     "total": 8.9884
+    },
+    "2023": {
+     "n": 18,
+     "net": -0.2939,
+     "total": -5.2896
+    },
+    "2024": {
+     "n": 31,
+     "net": 0.203,
+     "total": 6.2943
+    },
+    "2025": {
+     "n": 48,
+     "net": 0.121,
+     "total": 5.8073
+    },
+    "2026": {
+     "n": 71,
+     "net": 0.4732,
+     "total": 33.5971
+    }
+   },
+   "p": 0.0161,
+   "checks": {
+    "netPos": true,
+    "net2Pos": true,
+    "holm": false,
+    "nMin": true,
+    "repSame": true
+   },
+   "pass": false
+  },
+  "H": {
+   "noTrade": {
+    "filled": 32,
+    "small": 11
+   },
+   "rep": {
+    "n": 156,
+    "win": 0.5128,
+    "gross": 0.0329,
+    "net": -0.0905,
+    "net2": -0.1795,
+    "t": -1.1849,
+    "total": -14.1241,
+    "maxDD": 21.5507,
+    "months": 38,
+    "tMonth": -0.9299,
+    "medR0Pips": 27.3,
+    "medCostR": 0.1055,
+    "nights": 0,
+    "exits": {
+     "target": 70,
+     "stop": 67,
+     "time": 19
+    }
+   },
+   "dec": {
+    "n": 222,
+    "win": 0.5676,
+    "gross": 0.0959,
+    "net": -0.0145,
+    "net2": -0.0939,
+    "t": -0.2311,
+    "total": -3.219,
+    "maxDD": 24.2505,
+    "months": 45,
+    "tMonth": -0.1617,
+    "medR0Pips": 33,
+    "medCostR": 0.0842,
+    "nights": 0,
+    "exits": {
+     "target": 103,
+     "stop": 86,
+     "time": 33
+    }
+   },
+   "byPair": {
+    "eurusd": {
+     "rep": {
+      "n": 21,
+      "win": 0.381,
+      "gross": -0.2312,
+      "net": -0.3761,
+      "net2": -0.4793,
+      "t": -1.8086,
+      "total": -7.8991,
+      "maxDD": 9.5467,
+      "months": 15,
+      "tMonth": -1.666,
+      "medR0Pips": 20.4,
+      "medCostR": 0.1362,
+      "nights": 0,
+      "exits": {
+       "stop": 12,
+       "target": 8,
+       "time": 1
+      }
+     },
+     "dec": {
+      "n": 43,
+      "win": 0.5581,
+      "gross": 0.0704,
+      "net": -0.0372,
+      "net2": -0.1139,
+      "t": -0.2667,
+      "total": -1.5984,
+      "maxDD": 9.4424,
+      "months": 25,
+      "tMonth": -0.2174,
+      "medR0Pips": 29.2,
+      "medCostR": 0.095,
+      "nights": 0,
+      "exits": {
+       "stop": 16,
+       "target": 18,
+       "time": 9
+      }
+     }
+    },
+    "gbpusd": {
+     "rep": {
+      "n": 28,
+      "win": 0.3571,
+      "gross": -0.2509,
+      "net": -0.3459,
+      "net2": -0.4117,
+      "t": -1.8776,
+      "total": -9.6858,
+      "maxDD": 10.5677,
+      "months": 19,
+      "tMonth": -1.6177,
+      "medR0Pips": 32.6,
+      "medCostR": 0.0901,
+      "nights": 0,
+      "exits": {
+       "stop": 17,
+       "target": 10,
+       "time": 1
+      }
+     },
+     "dec": {
+      "n": 35,
+      "win": 0.6,
+      "gross": 0.1511,
+      "net": 0.0662,
+      "net2": 0.0074,
+      "t": 0.3994,
+      "total": 2.3185,
+      "maxDD": 6.0719,
+      "months": 26,
+      "tMonth": 0.3587,
+      "medR0Pips": 36.4,
+      "medCostR": 0.0798,
+      "nights": 0,
+      "exits": {
+       "stop": 14,
+       "target": 17,
+       "time": 4
+      }
+     }
+    },
+    "usdjpy": {
+     "rep": {
+      "n": 37,
+      "win": 0.5676,
+      "gross": 0.1775,
+      "net": 0.0516,
+      "net2": -0.0385,
+      "t": 0.3396,
+      "total": 1.9103,
+      "maxDD": 5.3257,
+      "months": 29,
+      "tMonth": 0.3181,
+      "medR0Pips": 30.7,
+      "medCostR": 0.0905,
+      "nights": 0,
+      "exits": {
+       "target": 18,
+       "time": 7,
+       "stop": 12
+      }
+     },
+     "dec": {
+      "n": 34,
+      "win": 0.4706,
+      "gross": -0.0772,
+      "net": -0.1678,
+      "net2": -0.23,
+      "t": -1.0362,
+      "total": -5.7052,
+      "maxDD": 8.2013,
+      "months": 26,
+      "tMonth": -0.9805,
+      "medR0Pips": 46.5,
+      "medCostR": 0.0636,
+      "nights": 0,
+      "exits": {
+       "target": 14,
+       "time": 4,
+       "stop": 16
+      }
+     }
+    },
+    "audusd": {
+     "rep": {
+      "n": 26,
+      "win": 0.5769,
+      "gross": 0.1181,
+      "net": -0.0391,
+      "net2": -0.1587,
+      "t": -0.2062,
+      "total": -1.0165,
+      "maxDD": 3.7193,
+      "months": 21,
+      "tMonth": -0.2023,
+      "medR0Pips": 19.5,
+      "medCostR": 0.1416,
+      "nights": 0,
+      "exits": {
+       "stop": 10,
+       "target": 13,
+       "time": 3
+      }
+     },
+     "dec": {
+      "n": 41,
+      "win": 0.5854,
+      "gross": 0.1559,
+      "net": 0.0168,
+      "net2": -0.0898,
+      "t": 0.1142,
+      "total": 0.6906,
+      "maxDD": 4.115,
+      "months": 28,
+      "tMonth": 0.1279,
+      "medR0Pips": 24.9,
+      "medCostR": 0.1042,
+      "nights": 0,
+      "exits": {
+       "stop": 15,
+       "time": 6,
+       "target": 20
+      }
+     }
+    },
+    "usdchf": {
+     "rep": {
+      "n": 15,
+      "win": 0.4667,
+      "gross": -0.0316,
+      "net": -0.1704,
+      "net2": -0.2718,
+      "t": -0.6646,
+      "total": -2.5561,
+      "maxDD": 5.8843,
+      "months": 14,
+      "tMonth": -0.6438,
+      "medR0Pips": 22.2,
+      "medCostR": 0.1237,
+      "nights": 0,
+      "exits": {
+       "target": 6,
+       "stop": 7,
+       "time": 2
+      }
+     },
+     "dec": {
+      "n": 28,
+      "win": 0.4643,
+      "gross": -0.134,
+      "net": -0.3102,
+      "net2": -0.4411,
+      "t": -1.711,
+      "total": -8.6869,
+      "maxDD": 9.5673,
+      "months": 20,
+      "tMonth": -1.6956,
+      "medR0Pips": 17.5,
+      "medCostR": 0.1579,
+      "nights": 0,
+      "exits": {
+       "stop": 15,
+       "target": 11,
+       "time": 2
+      }
+     }
+    },
+    "eurjpy": {
+     "rep": {
+      "n": 29,
+      "win": 0.6552,
+      "gross": 0.2705,
+      "net": 0.1767,
+      "net2": 0.1112,
+      "t": 1.0528,
+      "total": 5.1231,
+      "maxDD": 3.3222,
+      "months": 23,
+      "tMonth": 1.1383,
+      "medR0Pips": 31.6,
+      "medCostR": 0.0903,
+      "nights": 0,
+      "exits": {
+       "target": 15,
+       "time": 5,
+       "stop": 9
+      }
+     },
+     "dec": {
+      "n": 41,
+      "win": 0.6829,
+      "gross": 0.316,
+      "net": 0.2381,
+      "net2": 0.1863,
+      "t": 1.7871,
+      "total": 9.7624,
+      "maxDD": 4.4364,
+      "months": 30,
+      "tMonth": 1.5376,
+      "medR0Pips": 45.5,
+      "medCostR": 0.069,
+      "nights": 0,
+      "exits": {
+       "time": 8,
+       "target": 23,
+       "stop": 10
+      }
+     }
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 42,
+     "net": -0.2148,
+     "total": -9.0197
+    },
+    "2017": {
+     "n": 46,
+     "net": -0.1238,
+     "total": -5.6961
+    },
+    "2018": {
+     "n": 33,
+     "net": 0.1042,
+     "total": 3.4389
+    },
+    "2019": {
+     "n": 35,
+     "net": -0.0813,
+     "total": -2.8472
+    },
+    "2020": {
+     "n": 35,
+     "net": -0.6339,
+     "total": -22.1866
+    },
+    "2021": {
+     "n": 9,
+     "net": 0.6335,
+     "total": 5.7019
+    },
+    "2022": {
+     "n": 22,
+     "net": 0.3244,
+     "total": 7.1367
+    },
+    "2023": {
+     "n": 18,
+     "net": -0.3777,
+     "total": -6.7979
+    },
+    "2024": {
+     "n": 27,
+     "net": -0.1334,
+     "total": -3.6005
+    },
+    "2025": {
+     "n": 46,
+     "net": -0.0164,
+     "total": -0.7535
+    },
+    "2026": {
+     "n": 65,
+     "net": 0.2659,
+     "total": 17.2809
+    }
+   },
+   "p": 0.5642,
+   "checks": {
+    "netPos": false,
+    "net2Pos": false,
+    "holm": false,
+    "nMin": true,
+    "repSame": false
+   },
+   "pass": false
+  }
+ },
+ "fill": {
+  "pooled": {
+   "rep": [
+    {
+     "bin": "0-0.25",
+     "all": {
+      "n": 1047,
+      "filled": 976,
+      "rate": 0.9322
+     },
+     "up": {
+      "n": 486,
+      "filled": 442,
+      "rate": 0.9095
+     },
+     "down": {
+      "n": 541,
+      "filled": 514,
+      "rate": 0.9501
+     }
+    },
+    {
+     "bin": "0.25-0.5",
+     "all": {
+      "n": 121,
+      "filled": 86,
+      "rate": 0.7107
+     },
+     "up": {
+      "n": 48,
+      "filled": 31,
+      "rate": 0.6458
+     },
+     "down": {
+      "n": 73,
+      "filled": 55,
+      "rate": 0.7534
+     }
+    },
+    {
+     "bin": "0.5-1",
+     "all": {
+      "n": 43,
+      "filled": 14,
+      "rate": 0.3256
+     },
+     "up": {
+      "n": 20,
+      "filled": 6,
+      "rate": 0.3
+     },
+     "down": {
+      "n": 23,
+      "filled": 8,
+      "rate": 0.3478
+     }
+    },
+    {
+     "bin": "1-1.5",
+     "all": {
+      "n": 9,
+      "filled": 2,
+      "rate": 0.2222
+     },
+     "up": {
+      "n": 2,
+      "filled": 0,
+      "rate": 0
+     },
+     "down": {
+      "n": 7,
+      "filled": 2,
+      "rate": 0.2857
+     }
+    },
+    {
+     "bin": "1.5-up",
+     "all": {
+      "n": 4,
+      "filled": 0,
+      "rate": 0
+     },
+     "up": {
+      "n": 4,
+      "filled": 0,
+      "rate": 0
+     },
+     "down": {
+      "n": 0,
+      "filled": 0,
+      "rate": null
+     }
+    }
+   ],
+   "dec": [
+    {
+     "bin": "0-0.25",
+     "all": {
+      "n": 1867,
+      "filled": 1757,
+      "rate": 0.9411
+     },
+     "up": {
+      "n": 808,
+      "filled": 756,
+      "rate": 0.9356
+     },
+     "down": {
+      "n": 1022,
+      "filled": 964,
+      "rate": 0.9432
+     }
+    },
+    {
+     "bin": "0.25-0.5",
+     "all": {
+      "n": 156,
+      "filled": 110,
+      "rate": 0.7051
+     },
+     "up": {
+      "n": 58,
+      "filled": 38,
+      "rate": 0.6552
+     },
+     "down": {
+      "n": 98,
+      "filled": 72,
+      "rate": 0.7347
+     }
+    },
+    {
+     "bin": "0.5-1",
+     "all": {
+      "n": 87,
+      "filled": 40,
+      "rate": 0.4598
+     },
+     "up": {
+      "n": 26,
+      "filled": 4,
+      "rate": 0.1538
+     },
+     "down": {
+      "n": 61,
+      "filled": 36,
+      "rate": 0.5902
+     }
+    },
+    {
+     "bin": "1-1.5",
+     "all": {
+      "n": 5,
+      "filled": 2,
+      "rate": 0.4
+     },
+     "up": {
+      "n": 1,
+      "filled": 0,
+      "rate": 0
+     },
+     "down": {
+      "n": 4,
+      "filled": 2,
+      "rate": 0.5
+     }
+    },
+    {
+     "bin": "1.5-up",
+     "all": {
+      "n": 3,
+      "filled": 1,
+      "rate": 0.3333
+     },
+     "up": {
+      "n": 2,
+      "filled": 0,
+      "rate": 0
+     },
+     "down": {
+      "n": 1,
+      "filled": 1,
+      "rate": 1
+     }
+    }
+   ]
+  },
+  "byPair": {
+   "eurusd": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 180,
+       "filled": 168,
+       "rate": 0.9333
+      },
+      "up": {
+       "n": 77,
+       "filled": 72,
+       "rate": 0.9351
+      },
+      "down": {
+       "n": 98,
+       "filled": 91,
+       "rate": 0.9286
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 15,
+       "filled": 10,
+       "rate": 0.6667
+      },
+      "up": {
+       "n": 6,
+       "filled": 4,
+       "rate": 0.6667
+      },
+      "down": {
+       "n": 9,
+       "filled": 6,
+       "rate": 0.6667
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 7,
+       "filled": 3,
+       "rate": 0.4286
+      },
+      "up": {
+       "n": 3,
+       "filled": 1,
+       "rate": 0.3333
+      },
+      "down": {
+       "n": 4,
+       "filled": 2,
+       "rate": 0.5
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 309,
+       "filled": 284,
+       "rate": 0.9191
+      },
+      "up": {
+       "n": 145,
+       "filled": 135,
+       "rate": 0.931
+      },
+      "down": {
+       "n": 157,
+       "filled": 142,
+       "rate": 0.9045
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 25,
+       "filled": 18,
+       "rate": 0.72
+      },
+      "up": {
+       "n": 10,
+       "filled": 7,
+       "rate": 0.7
+      },
+      "down": {
+       "n": 15,
+       "filled": 11,
+       "rate": 0.7333
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 18,
+       "filled": 5,
+       "rate": 0.2778
+      },
+      "up": {
+       "n": 8,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 10,
+       "filled": 5,
+       "rate": 0.5
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ]
+   },
+   "gbpusd": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 172,
+       "filled": 156,
+       "rate": 0.907
+      },
+      "up": {
+       "n": 81,
+       "filled": 71,
+       "rate": 0.8765
+      },
+      "down": {
+       "n": 90,
+       "filled": 84,
+       "rate": 0.9333
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 21,
+       "filled": 14,
+       "rate": 0.6667
+      },
+      "up": {
+       "n": 10,
+       "filled": 7,
+       "rate": 0.7
+      },
+      "down": {
+       "n": 11,
+       "filled": 7,
+       "rate": 0.6364
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 10,
+       "filled": 3,
+       "rate": 0.3
+      },
+      "up": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      },
+      "down": {
+       "n": 8,
+       "filled": 2,
+       "rate": 0.25
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 316,
+       "filled": 303,
+       "rate": 0.9589
+      },
+      "up": {
+       "n": 147,
+       "filled": 140,
+       "rate": 0.9524
+      },
+      "down": {
+       "n": 163,
+       "filled": 157,
+       "rate": 0.9632
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 25,
+       "filled": 16,
+       "rate": 0.64
+      },
+      "up": {
+       "n": 9,
+       "filled": 6,
+       "rate": 0.6667
+      },
+      "down": {
+       "n": 16,
+       "filled": 10,
+       "rate": 0.625
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 12,
+       "filled": 7,
+       "rate": 0.5833
+      },
+      "up": {
+       "n": 2,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 10,
+       "filled": 7,
+       "rate": 0.7
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ]
+   },
+   "usdjpy": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 165,
+       "filled": 147,
+       "rate": 0.8909
+      },
+      "up": {
+       "n": 81,
+       "filled": 68,
+       "rate": 0.8395
+      },
+      "down": {
+       "n": 80,
+       "filled": 75,
+       "rate": 0.9375
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 26,
+       "filled": 19,
+       "rate": 0.7308
+      },
+      "up": {
+       "n": 9,
+       "filled": 6,
+       "rate": 0.6667
+      },
+      "down": {
+       "n": 17,
+       "filled": 13,
+       "rate": 0.7647
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 10,
+       "filled": 4,
+       "rate": 0.4
+      },
+      "up": {
+       "n": 6,
+       "filled": 1,
+       "rate": 0.1667
+      },
+      "down": {
+       "n": 4,
+       "filled": 3,
+       "rate": 0.75
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 2,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 315,
+       "filled": 292,
+       "rate": 0.927
+      },
+      "up": {
+       "n": 111,
+       "filled": 100,
+       "rate": 0.9009
+      },
+      "down": {
+       "n": 200,
+       "filled": 188,
+       "rate": 0.94
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 22,
+       "filled": 13,
+       "rate": 0.5909
+      },
+      "up": {
+       "n": 11,
+       "filled": 6,
+       "rate": 0.5455
+      },
+      "down": {
+       "n": 11,
+       "filled": 7,
+       "rate": 0.6364
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 14,
+       "filled": 4,
+       "rate": 0.2857
+      },
+      "up": {
+       "n": 4,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 10,
+       "filled": 4,
+       "rate": 0.4
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ]
+   },
+   "audusd": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 175,
+       "filled": 170,
+       "rate": 0.9714
+      },
+      "up": {
+       "n": 75,
+       "filled": 73,
+       "rate": 0.9733
+      },
+      "down": {
+       "n": 95,
+       "filled": 92,
+       "rate": 0.9684
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 21,
+       "filled": 18,
+       "rate": 0.8571
+      },
+      "up": {
+       "n": 3,
+       "filled": 3,
+       "rate": 1
+      },
+      "down": {
+       "n": 18,
+       "filled": 15,
+       "rate": 0.8333
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 6,
+       "filled": 2,
+       "rate": 0.3333
+      },
+      "up": {
+       "n": 4,
+       "filled": 1,
+       "rate": 0.25
+      },
+      "down": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 2,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 305,
+       "filled": 288,
+       "rate": 0.9443
+      },
+      "up": {
+       "n": 136,
+       "filled": 125,
+       "rate": 0.9191
+      },
+      "down": {
+       "n": 165,
+       "filled": 159,
+       "rate": 0.9636
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 31,
+       "filled": 22,
+       "rate": 0.7097
+      },
+      "up": {
+       "n": 7,
+       "filled": 3,
+       "rate": 0.4286
+      },
+      "down": {
+       "n": 24,
+       "filled": 19,
+       "rate": 0.7917
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 15,
+       "filled": 9,
+       "rate": 0.6
+      },
+      "up": {
+       "n": 4,
+       "filled": 1,
+       "rate": 0.25
+      },
+      "down": {
+       "n": 11,
+       "filled": 8,
+       "rate": 0.7273
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ]
+   },
+   "usdchf": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 184,
+       "filled": 180,
+       "rate": 0.9783
+      },
+      "up": {
+       "n": 98,
+       "filled": 95,
+       "rate": 0.9694
+      },
+      "down": {
+       "n": 84,
+       "filled": 83,
+       "rate": 0.9881
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 16,
+       "filled": 10,
+       "rate": 0.625
+      },
+      "up": {
+       "n": 8,
+       "filled": 4,
+       "rate": 0.5
+      },
+      "down": {
+       "n": 8,
+       "filled": 6,
+       "rate": 0.75
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 2,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 319,
+       "filled": 307,
+       "rate": 0.9624
+      },
+      "up": {
+       "n": 144,
+       "filled": 140,
+       "rate": 0.9722
+      },
+      "down": {
+       "n": 166,
+       "filled": 158,
+       "rate": 0.9518
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 25,
+       "filled": 20,
+       "rate": 0.8
+      },
+      "up": {
+       "n": 13,
+       "filled": 10,
+       "rate": 0.7692
+      },
+      "down": {
+       "n": 12,
+       "filled": 10,
+       "rate": 0.8333
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 9,
+       "filled": 4,
+       "rate": 0.4444
+      },
+      "up": {
+       "n": 3,
+       "filled": 2,
+       "rate": 0.6667
+      },
+      "down": {
+       "n": 6,
+       "filled": 2,
+       "rate": 0.3333
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ]
+   },
+   "eurjpy": {
+    "rep": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 171,
+       "filled": 155,
+       "rate": 0.9064
+      },
+      "up": {
+       "n": 74,
+       "filled": 63,
+       "rate": 0.8514
+      },
+      "down": {
+       "n": 94,
+       "filled": 89,
+       "rate": 0.9468
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 22,
+       "filled": 15,
+       "rate": 0.6818
+      },
+      "up": {
+       "n": 12,
+       "filled": 7,
+       "rate": 0.5833
+      },
+      "down": {
+       "n": 10,
+       "filled": 8,
+       "rate": 0.8
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 8,
+       "filled": 2,
+       "rate": 0.25
+      },
+      "up": {
+       "n": 4,
+       "filled": 2,
+       "rate": 0.5
+      },
+      "down": {
+       "n": 4,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      }
+     }
+    ],
+    "dec": [
+     {
+      "bin": "0-0.25",
+      "all": {
+       "n": 303,
+       "filled": 283,
+       "rate": 0.934
+      },
+      "up": {
+       "n": 125,
+       "filled": 116,
+       "rate": 0.928
+      },
+      "down": {
+       "n": 171,
+       "filled": 160,
+       "rate": 0.9357
+      }
+     },
+     {
+      "bin": "0.25-0.5",
+      "all": {
+       "n": 28,
+       "filled": 21,
+       "rate": 0.75
+      },
+      "up": {
+       "n": 8,
+       "filled": 6,
+       "rate": 0.75
+      },
+      "down": {
+       "n": 20,
+       "filled": 15,
+       "rate": 0.75
+      }
+     },
+     {
+      "bin": "0.5-1",
+      "all": {
+       "n": 19,
+       "filled": 11,
+       "rate": 0.5789
+      },
+      "up": {
+       "n": 5,
+       "filled": 1,
+       "rate": 0.2
+      },
+      "down": {
+       "n": 14,
+       "filled": 10,
+       "rate": 0.7143
+      }
+     },
+     {
+      "bin": "1-1.5",
+      "all": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "up": {
+       "n": 0,
+       "filled": 0,
+       "rate": null
+      },
+      "down": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      }
+     },
+     {
+      "bin": "1.5-up",
+      "all": {
+       "n": 2,
+       "filled": 1,
+       "rate": 0.5
+      },
+      "up": {
+       "n": 1,
+       "filled": 0,
+       "rate": 0
+      },
+      "down": {
+       "n": 1,
+       "filled": 1,
+       "rate": 1
+      }
+     }
+    ]
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "dec": {
+   "min": -0.2233,
+   "p5": -0.1973,
+   "median": -0.0985,
+   "p95": 0.0002,
+   "max": 0.0606
+  },
+  "ruleG": 0.194,
+  "aboveG": 0,
+  "runs": [
+   {
+    "seed": 1,
+    "dec": -0.0872,
+    "rep": -0.0895
+   },
+   {
+    "seed": 2,
+    "dec": -0.0985,
+    "rep": -0.2058
+   },
+   {
+    "seed": 3,
+    "dec": 0.0002,
+    "rep": -0.1698
+   },
+   {
+    "seed": 4,
+    "dec": 0.0606,
+    "rep": -0.09
+   },
+   {
+    "seed": 5,
+    "dec": -0.1889,
+    "rep": -0.1598
+   },
+   {
+    "seed": 6,
+    "dec": -0.1097,
+    "rep": -0.161
+   },
+   {
+    "seed": 7,
+    "dec": -0.0589,
+    "rep": -0.0696
+   },
+   {
+    "seed": 8,
+    "dec": -0.0569,
+    "rep": -0.0184
+   },
+   {
+    "seed": 9,
+    "dec": -0.0022,
+    "rep": -0.079
+   },
+   {
+    "seed": 10,
+    "dec": -0.1308,
+    "rep": -0.1048
+   },
+   {
+    "seed": 11,
+    "dec": -0.0264,
+    "rep": -0.16
+   },
+   {
+    "seed": 12,
+    "dec": -0.1768,
+    "rep": -0.1922
+   },
+   {
+    "seed": 13,
+    "dec": -0.1177,
+    "rep": -0.2572
+   },
+   {
+    "seed": 14,
+    "dec": -0.0701,
+    "rep": -0.1428
+   },
+   {
+    "seed": 15,
+    "dec": -0.0491,
+    "rep": -0.1682
+   },
+   {
+    "seed": 16,
+    "dec": -0.1077,
+    "rep": -0.107
+   },
+   {
+    "seed": 17,
+    "dec": -0.1729,
+    "rep": -0.1949
+   },
+   {
+    "seed": 18,
+    "dec": -0.142,
+    "rep": -0.2142
+   },
+   {
+    "seed": 19,
+    "dec": -0.0811,
+    "rep": -0.1284
+   },
+   {
+    "seed": 20,
+    "dec": -0.1973,
+    "rep": -0.1081
+   },
+   {
+    "seed": 21,
+    "dec": -0.012,
+    "rep": -0.1034
+   },
+   {
+    "seed": 22,
+    "dec": -0.0273,
+    "rep": -0.1159
+   },
+   {
+    "seed": 23,
+    "dec": -0.1148,
+    "rep": -0.0457
+   },
+   {
+    "seed": 24,
+    "dec": -0.0837,
+    "rep": -0.1438
+   },
+   {
+    "seed": 25,
+    "dec": -0.0331,
+    "rep": -0.0051
+   },
+   {
+    "seed": 26,
+    "dec": -0.0862,
+    "rep": -0.1226
+   },
+   {
+    "seed": 27,
+    "dec": -0.1993,
+    "rep": -0.0421
+   },
+   {
+    "seed": 28,
+    "dec": -0.1078,
+    "rep": -0.087
+   },
+   {
+    "seed": 29,
+    "dec": -0.1056,
+    "rep": -0.1332
+   },
+   {
+    "seed": 30,
+    "dec": -0.0981,
+    "rep": -0.1333
+   },
+   {
+    "seed": 31,
+    "dec": -0.0466,
+    "rep": -0.1913
+   },
+   {
+    "seed": 32,
+    "dec": -0.2233,
+    "rep": -0.0559
+   },
+   {
+    "seed": 33,
+    "dec": -0.0271,
+    "rep": -0.1243
+   },
+   {
+    "seed": 34,
+    "dec": -0.1462,
+    "rep": -0.2103
+   },
+   {
+    "seed": 35,
+    "dec": -0.1422,
+    "rep": -0.0876
+   },
+   {
+    "seed": 36,
+    "dec": -0.1215,
+    "rep": -0.2401
+   },
+   {
+    "seed": 37,
+    "dec": -0.1144,
+    "rep": -0.0761
+   },
+   {
+    "seed": 38,
+    "dec": -0.1734,
+    "rep": -0.1217
+   },
+   {
+    "seed": 39,
+    "dec": -0.1271,
+    "rep": -0.187
+   },
+   {
+    "seed": 40,
+    "dec": -0.0942,
+    "rep": -0.1744
+   }
+  ]
+ },
+ "robust": {
+  "G": true,
+  "H": false
+ },
+ "pass": false,
+ "trades": {
+  "G": [
+   [
+    "usdjpy",
+    "2016-01-15",
+    1,
+    116.86,
+    15.3,
+    117.013,
+    "target",
+    1,
+    0.8153,
+    0.6846
+   ],
+   [
+    "audusd",
+    "2016-01-15",
+    1,
+    0.6843,
+    20.1,
+    0.68631,
+    "target",
+    1,
+    0.8703,
+    0.7707
+   ],
+   [
+    "gbpusd",
+    "2016-02-19",
+    1,
+    1.42773,
+    124,
+    1.41533,
+    "stop",
+    -1,
+    -1.0237,
+    -1.0399
+   ],
+   [
+    "audusd",
+    "2016-03-04",
+    1,
+    0.74081,
+    32.7,
+    0.74408,
+    "target",
+    1,
+    0.9195,
+    0.8583
+   ],
+   [
+    "usdjpy",
+    "2016-04-15",
+    1,
+    108.257,
+    49.1,
+    108.748,
+    "target",
+    1,
+    0.9432,
+    0.9025
+   ],
+   [
+    "audusd",
+    "2016-04-15",
+    1,
+    0.76697,
+    54.6,
+    0.77243,
+    "target",
+    1,
+    0.9516,
+    0.9149
+   ],
+   [
+    "usdchf",
+    "2016-04-15",
+    1,
+    0.96556,
+    22.7,
+    0.96783,
+    "target",
+    1,
+    0.8795,
+    0.7914
+   ],
+   [
+    "eurjpy",
+    "2016-04-15",
+    1,
+    122.322,
+    39.2,
+    121.93,
+    "stop",
+    -1,
+    -1.0727,
+    -1.1237
+   ],
+   [
+    "gbpusd",
+    "2016-04-22",
+    -1,
+    1.44652,
+    61.8,
+    1.44034,
+    "target",
+    1,
+    0.9523,
+    0.9199
+   ],
+   [
+    "gbpusd",
+    "2016-06-03",
+    1,
+    1.44625,
+    55.5,
+    1.4407,
+    "stop",
+    -1,
+    -1.0532,
+    -1.0892
+   ],
+   [
+    "eurusd",
+    "2016-06-17",
+    -1,
+    1.13346,
+    58.2,
+    1.13176,
+    "time",
+    0.2921,
+    0.2438,
+    0.2094
+   ],
+   [
+    "gbpusd",
+    "2016-06-17",
+    -1,
+    1.44751,
+    117.3,
+    1.45924,
+    "stop",
+    -1,
+    -1.0252,
+    -1.0422
+   ],
+   [
+    "usdjpy",
+    "2016-06-17",
+    -1,
+    104.701,
+    57,
+    104.328,
+    "time",
+    0.6544,
+    0.6058,
+    0.5707
+   ],
+   [
+    "audusd",
+    "2016-06-17",
+    -1,
+    0.74348,
+    39.9,
+    0.74747,
+    "stop",
+    -1,
+    -1.066,
+    -1.1162
+   ],
+   [
+    "eurjpy",
+    "2016-06-17",
+    -1,
+    118.681,
+    121,
+    118.076,
+    "time",
+    0.5,
+    0.4766,
+    0.46
+   ],
+   [
+    "eurusd",
+    "2016-06-24",
+    1,
+    1.1021,
+    87.2,
+    1.10222,
+    "time",
+    0.0138,
+    -0.0183,
+    -0.0412
+   ],
+   [
+    "gbpusd",
+    "2016-06-24",
+    1,
+    1.34427,
+    229.4,
+    1.32133,
+    "stop",
+    -1,
+    -1.0127,
+    -1.0214
+   ],
+   [
+    "usdjpy",
+    "2016-06-24",
+    1,
+    101.595,
+    60.5,
+    102.2,
+    "target",
+    1,
+    0.9544,
+    0.9214
+   ],
+   [
+    "audusd",
+    "2016-06-24",
+    1,
+    0.7423,
+    50.3,
+    0.73727,
+    "stop",
+    -1,
+    -1.0524,
+    -1.0921
+   ],
+   [
+    "usdchf",
+    "2016-06-24",
+    -1,
+    0.97416,
+    20.4,
+    0.97212,
+    "target",
+    1,
+    0.8658,
+    0.7677
+   ],
+   [
+    "eurjpy",
+    "2016-06-24",
+    1,
+    111.982,
+    153.6,
+    112.06,
+    "time",
+    0.0508,
+    0.0325,
+    0.0195
+   ],
+   [
+    "audusd",
+    "2016-07-01",
+    1,
+    0.74514,
+    47,
+    0.74984,
+    "target",
+    1,
+    0.9439,
+    0.9014
+   ],
+   [
+    "usdjpy",
+    "2016-07-15",
+    -1,
+    105.353,
+    49.5,
+    105.848,
+    "stop",
+    -1,
+    -1.056,
+    -1.0964
+   ],
+   [
+    "eurjpy",
+    "2016-07-15",
+    -1,
+    116.43,
+    73.1,
+    117.161,
+    "stop",
+    -1,
+    -1.0386,
+    -1.066
+   ],
+   [
+    "usdjpy",
+    "2016-08-19",
+    -1,
+    100.71,
+    49,
+    100.22,
+    "target",
+    1,
+    0.9438,
+    0.903
+   ],
+   [
+    "audusd",
+    "2016-08-19",
+    1,
+    0.76074,
+    18.7,
+    0.76261,
+    "target",
+    1,
+    0.8587,
+    0.7517
+   ],
+   [
+    "usdchf",
+    "2016-08-19",
+    -1,
+    0.9614,
+    11.1,
+    0.96029,
+    "target",
+    1,
+    0.7538,
+    0.5736
+   ],
+   [
+    "eurjpy",
+    "2016-08-19",
+    -1,
+    113.959,
+    45.8,
+    113.501,
+    "target",
+    1,
+    0.9386,
+    0.8949
+   ],
+   [
+    "eurusd",
+    "2016-08-26",
+    1,
+    1.11838,
+    12.8,
+    1.11966,
+    "target",
+    1,
+    0.781,
+    0.6247
+   ],
+   [
+    "usdjpy",
+    "2016-08-26",
+    -1,
+    102.082,
+    25.6,
+    102.338,
+    "stop",
+    -1,
+    -1.1078,
+    -1.1859
+   ],
+   [
+    "gbpusd",
+    "2016-09-30",
+    1,
+    1.29276,
+    49.7,
+    1.28779,
+    "stop",
+    -1,
+    -1.058,
+    -1.0982
+   ],
+   [
+    "eurusd",
+    "2016-10-07",
+    1,
+    1.11937,
+    7.6,
+    1.12013,
+    "target",
+    1,
+    0.6311,
+    0.3679
+   ],
+   [
+    "usdjpy",
+    "2016-10-07",
+    -1,
+    103.248,
+    34,
+    102.908,
+    "target",
+    1,
+    0.9187,
+    0.8599
+   ],
+   [
+    "audusd",
+    "2016-10-07",
+    -1,
+    0.76099,
+    22.4,
+    0.75875,
+    "target",
+    1,
+    0.882,
+    0.7927
+   ],
+   [
+    "usdjpy",
+    "2016-10-28",
+    1,
+    104.443,
+    28.1,
+    104.724,
+    "target",
+    1,
+    0.9014,
+    0.8302
+   ],
+   [
+    "eurusd",
+    "2016-11-04",
+    1,
+    1.10836,
+    56.8,
+    1.10372,
+    "time",
+    -0.8169,
+    -0.8662,
+    -0.9014
+   ],
+   [
+    "gbpusd",
+    "2016-11-04",
+    1,
+    1.24597,
+    59.9,
+    1.23998,
+    "stop",
+    -1,
+    -1.0478,
+    -1.0811
+   ],
+   [
+    "usdjpy",
+    "2016-11-04",
+    -1,
+    103.91,
+    78.4,
+    104.61,
+    "time",
+    -0.8929,
+    -0.9282,
+    -0.9537
+   ],
+   [
+    "eurjpy",
+    "2016-11-04",
+    -1,
+    115.167,
+    30.9,
+    115.476,
+    "stop",
+    -1,
+    -1.0912,
+    -1.1559
+   ],
+   [
+    "eurusd",
+    "2016-11-11",
+    1,
+    1.08377,
+    18.6,
+    1.08191,
+    "stop",
+    -1,
+    -1.1499,
+    -1.2574
+   ],
+   [
+    "gbpusd",
+    "2016-11-11",
+    1,
+    1.25712,
+    30.3,
+    1.25409,
+    "stop",
+    -1,
+    -1.0946,
+    -1.1606
+   ],
+   [
+    "usdjpy",
+    "2016-11-25",
+    1,
+    112.918,
+    33.5,
+    112.583,
+    "stop",
+    -1,
+    -1.0838,
+    -1.1435
+   ],
+   [
+    "usdchf",
+    "2016-11-25",
+    1,
+    1.01284,
+    14,
+    1.01144,
+    "stop",
+    -1,
+    -1.1968,
+    -1.3397
+   ],
+   [
+    "eurusd",
+    "2016-12-02",
+    1,
+    1.05936,
+    72.9,
+    1.05207,
+    "stop",
+    -1,
+    -1.0381,
+    -1.0655
+   ],
+   [
+    "gbpusd",
+    "2016-12-02",
+    1,
+    1.26522,
+    80.8,
+    1.2733,
+    "target",
+    1,
+    0.9645,
+    0.9397
+   ],
+   [
+    "eurusd",
+    "2016-12-09",
+    1,
+    1.05406,
+    20.4,
+    1.0561,
+    "target",
+    1,
+    0.864,
+    0.766
+   ],
+   [
+    "audusd",
+    "2016-12-16",
+    1,
+    0.72872,
+    16.3,
+    0.73035,
+    "target",
+    1,
+    0.8388,
+    0.7161
+   ],
+   [
+    "gbpusd",
+    "2017-01-06",
+    1,
+    1.22553,
+    29.8,
+    1.22255,
+    "stop",
+    -1,
+    -1.0957,
+    -1.1628
+   ],
+   [
+    "eurusd",
+    "2017-01-13",
+    1,
+    1.06305,
+    12.9,
+    1.06176,
+    "stop",
+    -1,
+    -1.2154,
+    -1.3704
+   ],
+   [
+    "gbpusd",
+    "2017-01-13",
+    1,
+    1.20168,
+    167.3,
+    1.20429,
+    "time",
+    0.156,
+    0.139,
+    0.1271
+   ],
+   [
+    "audusd",
+    "2017-01-13",
+    1,
+    0.74865,
+    14.2,
+    0.75007,
+    "target",
+    1,
+    0.8143,
+    0.6735
+   ],
+   [
+    "eurjpy",
+    "2017-01-13",
+    1,
+    121.654,
+    20.6,
+    121.448,
+    "stop",
+    -1,
+    -1.1382,
+    -1.2353
+   ],
+   [
+    "eurusd",
+    "2017-01-27",
+    -1,
+    1.07154,
+    17.3,
+    1.07327,
+    "stop",
+    -1,
+    -1.1608,
+    -1.2764
+   ],
+   [
+    "gbpusd",
+    "2017-01-27",
+    -1,
+    1.25754,
+    26.9,
+    1.25485,
+    "target",
+    1,
+    0.8935,
+    0.8191
+   ],
+   [
+    "usdchf",
+    "2017-01-27",
+    1,
+    0.99737,
+    19.5,
+    0.99932,
+    "target",
+    1,
+    0.859,
+    0.7565
+   ],
+   [
+    "eurjpy",
+    "2017-03-03",
+    1,
+    120.96,
+    19.1,
+    120.769,
+    "stop",
+    -1,
+    -1.1489,
+    -1.2536
+   ],
+   [
+    "eurusd",
+    "2017-03-24",
+    -1,
+    1.08304,
+    32.6,
+    1.0863,
+    "stop",
+    -1,
+    -1.0855,
+    -1.1469
+   ],
+   [
+    "usdjpy",
+    "2017-03-24",
+    1,
+    110.905,
+    41.6,
+    110.489,
+    "stop",
+    -1,
+    -1.0673,
+    -1.1154
+   ],
+   [
+    "usdchf",
+    "2017-03-24",
+    1,
+    0.98956,
+    17.7,
+    0.98779,
+    "stop",
+    -1,
+    -1.1551,
+    -1.2681
+   ],
+   [
+    "usdchf",
+    "2017-04-14",
+    1,
+    1.0042,
+    14.4,
+    1.00564,
+    "target",
+    1,
+    0.8089,
+    0.67
+   ],
+   [
+    "gbpusd",
+    "2017-04-21",
+    -1,
+    1.28262,
+    14.3,
+    1.28405,
+    "stop",
+    -1,
+    -1.2012,
+    -1.3411
+   ],
+   [
+    "audusd",
+    "2017-04-21",
+    -1,
+    0.75724,
+    27.8,
+    0.75446,
+    "target",
+    1,
+    0.905,
+    0.8331
+   ],
+   [
+    "usdchf",
+    "2017-04-21",
+    1,
+    0.99168,
+    45.6,
+    0.99624,
+    "target",
+    1,
+    0.9398,
+    0.8959
+   ],
+   [
+    "usdjpy",
+    "2017-04-28",
+    1,
+    111.388,
+    12.1,
+    111.267,
+    "stop",
+    -1,
+    -1.2315,
+    -1.3968
+   ],
+   [
+    "audusd",
+    "2017-04-28",
+    1,
+    0.74742,
+    14.4,
+    0.74886,
+    "target",
+    1,
+    0.8169,
+    0.678
+   ],
+   [
+    "eurusd",
+    "2017-05-05",
+    -1,
+    1.10168,
+    17.9,
+    1.09989,
+    "target",
+    1,
+    0.8438,
+    0.7321
+   ],
+   [
+    "usdjpy",
+    "2017-05-05",
+    -1,
+    112.956,
+    27,
+    112.686,
+    "target",
+    1,
+    0.896,
+    0.8219
+   ],
+   [
+    "eurjpy",
+    "2017-05-05",
+    -1,
+    124.446,
+    47.9,
+    123.967,
+    "target",
+    1,
+    0.9403,
+    0.8985
+   ],
+   [
+    "gbpusd",
+    "2017-05-19",
+    1,
+    1.30049,
+    32.2,
+    1.29727,
+    "stop",
+    -1,
+    -1.0896,
+    -1.1517
+   ],
+   [
+    "eurjpy",
+    "2017-05-19",
+    1,
+    124.441,
+    25.4,
+    124.695,
+    "target",
+    1,
+    0.8874,
+    0.8087
+   ],
+   [
+    "gbpusd",
+    "2017-06-02",
+    1,
+    1.28647,
+    29.1,
+    1.28938,
+    "target",
+    1,
+    0.9011,
+    0.8323
+   ],
+   [
+    "audusd",
+    "2017-06-02",
+    1,
+    0.74269,
+    15.5,
+    0.74424,
+    "target",
+    1,
+    0.8301,
+    0.701
+   ],
+   [
+    "usdchf",
+    "2017-06-02",
+    -1,
+    0.96404,
+    17.4,
+    0.96578,
+    "stop",
+    -1,
+    -1.1571,
+    -1.2721
+   ],
+   [
+    "gbpusd",
+    "2017-06-09",
+    1,
+    1.27228,
+    21.6,
+    1.27444,
+    "target",
+    1,
+    0.867,
+    0.7744
+   ],
+   [
+    "usdjpy",
+    "2017-06-30",
+    1,
+    112.176,
+    23.6,
+    112.412,
+    "target",
+    1,
+    0.8812,
+    0.7964
+   ],
+   [
+    "eurjpy",
+    "2017-06-30",
+    1,
+    128.068,
+    34.1,
+    128.409,
+    "target",
+    1,
+    0.9157,
+    0.857
+   ],
+   [
+    "gbpusd",
+    "2017-08-25",
+    -1,
+    1.29154,
+    34.2,
+    1.28812,
+    "target",
+    1,
+    0.9158,
+    0.8573
+   ],
+   [
+    "eurusd",
+    "2017-09-01",
+    -1,
+    1.18834,
+    23.6,
+    1.1907,
+    "stop",
+    -1,
+    -1.1201,
+    -1.2049
+   ],
+   [
+    "usdjpy",
+    "2017-09-01",
+    1,
+    109.571,
+    68.5,
+    109.604,
+    "time",
+    0.0482,
+    0.0074,
+    -0.0218
+   ],
+   [
+    "audusd",
+    "2017-09-01",
+    1,
+    0.7949,
+    20.4,
+    0.79694,
+    "target",
+    1,
+    0.8697,
+    0.7717
+   ],
+   [
+    "usdchf",
+    "2017-09-01",
+    1,
+    0.96027,
+    47.4,
+    0.95553,
+    "stop",
+    -1,
+    -1.0576,
+    -1.0998
+   ],
+   [
+    "eurjpy",
+    "2017-09-01",
+    1,
+    130.165,
+    60.5,
+    130.608,
+    "time",
+    0.7322,
+    0.6845,
+    0.6515
+   ],
+   [
+    "usdjpy",
+    "2017-09-08",
+    -1,
+    108.162,
+    31.7,
+    108.479,
+    "stop",
+    -1,
+    -1.0879,
+    -1.151
+   ],
+   [
+    "usdchf",
+    "2017-09-08",
+    -1,
+    0.94685,
+    27.5,
+    0.9496,
+    "stop",
+    -1,
+    -1.0991,
+    -1.1719
+   ],
+   [
+    "eurjpy",
+    "2017-09-08",
+    -1,
+    130.009,
+    22.1,
+    130.23,
+    "stop",
+    -1,
+    -1.1305,
+    -1.221
+   ],
+   [
+    "eurusd",
+    "2017-09-15",
+    1,
+    1.1927,
+    20.6,
+    1.19476,
+    "target",
+    1,
+    0.8623,
+    0.7652
+   ],
+   [
+    "gbpusd",
+    "2017-09-15",
+    1,
+    1.35636,
+    24.6,
+    1.35882,
+    "target",
+    1,
+    0.8817,
+    0.8004
+   ],
+   [
+    "eurusd",
+    "2017-09-22",
+    1,
+    1.18994,
+    48.4,
+    1.1851,
+    "stop",
+    -1,
+    -1.0586,
+    -1.0999
+   ],
+   [
+    "eurjpy",
+    "2017-09-22",
+    1,
+    133.537,
+    27.1,
+    133.808,
+    "target",
+    1,
+    0.893,
+    0.8192
+   ],
+   [
+    "eurusd",
+    "2017-09-29",
+    1,
+    1.17963,
+    18.7,
+    1.1815,
+    "target",
+    1,
+    0.8486,
+    0.7417
+   ],
+   [
+    "usdjpy",
+    "2017-10-20",
+    -1,
+    113.855,
+    34.3,
+    113.667,
+    "time",
+    0.5481,
+    0.4661,
+    0.4078
+   ],
+   [
+    "eurjpy",
+    "2017-10-20",
+    -1,
+    133.964,
+    24.7,
+    133.717,
+    "target",
+    1,
+    0.8825,
+    0.8015
+   ],
+   [
+    "eurusd",
+    "2017-12-01",
+    1,
+    1.18656,
+    31.8,
+    1.18338,
+    "stop",
+    -1,
+    -1.0891,
+    -1.152
+   ],
+   [
+    "gbpusd",
+    "2017-12-01",
+    1,
+    1.34402,
+    43.1,
+    1.34833,
+    "target",
+    1,
+    0.9326,
+    0.8862
+   ],
+   [
+    "usdjpy",
+    "2017-12-01",
+    -1,
+    112.752,
+    50.6,
+    112.8,
+    "time",
+    -0.0949,
+    -0.1503,
+    -0.1899
+   ],
+   [
+    "audusd",
+    "2017-12-01",
+    1,
+    0.75955,
+    17.2,
+    0.76127,
+    "target",
+    1,
+    0.8464,
+    0.7301
+   ],
+   [
+    "usdchf",
+    "2017-12-01",
+    -1,
+    0.98081,
+    44.6,
+    0.98527,
+    "stop",
+    -1,
+    -1.0615,
+    -1.1063
+   ],
+   [
+    "eurjpy",
+    "2017-12-01",
+    -1,
+    133.771,
+    24.4,
+    134.015,
+    "stop",
+    -1,
+    -1.1189,
+    -1.2009
+   ],
+   [
+    "audusd",
+    "2018-01-12",
+    1,
+    0.79078,
+    8.4,
+    0.79162,
+    "target",
+    1,
+    0.6838,
+    0.4457
+   ],
+   [
+    "eurusd",
+    "2018-01-19",
+    -1,
+    1.22653,
+    44.2,
+    1.22211,
+    "target",
+    1,
+    0.9355,
+    0.8902
+   ],
+   [
+    "gbpusd",
+    "2018-01-19",
+    -1,
+    1.3891,
+    35.2,
+    1.39262,
+    "stop",
+    -1,
+    -1.0831,
+    -1.1399
+   ],
+   [
+    "usdjpy",
+    "2018-01-19",
+    1,
+    110.542,
+    27.6,
+    110.818,
+    "target",
+    1,
+    0.8986,
+    0.8262
+   ],
+   [
+    "usdchf",
+    "2018-01-19",
+    1,
+    0.9615,
+    26.7,
+    0.96382,
+    "time",
+    0.8689,
+    0.7666,
+    0.6917
+   ],
+   [
+    "eurjpy",
+    "2018-01-19",
+    -1,
+    135.591,
+    17.8,
+    135.413,
+    "target",
+    1,
+    0.8365,
+    0.7241
+   ],
+   [
+    "usdjpy",
+    "2018-02-23",
+    -1,
+    107.04,
+    16.4,
+    106.876,
+    "target",
+    1,
+    0.8304,
+    0.7084
+   ],
+   [
+    "eurjpy",
+    "2018-02-23",
+    -1,
+    131.595,
+    18.4,
+    131.411,
+    "target",
+    1,
+    0.8428,
+    0.7341
+   ],
+   [
+    "usdjpy",
+    "2018-03-02",
+    1,
+    105.532,
+    21.1,
+    105.743,
+    "target",
+    1,
+    0.8685,
+    0.7737
+   ],
+   [
+    "eurusd",
+    "2018-05-25",
+    -1,
+    1.16825,
+    33.5,
+    1.1716,
+    "stop",
+    -1,
+    -1.0843,
+    -1.1441
+   ],
+   [
+    "usdjpy",
+    "2018-05-25",
+    -1,
+    109.769,
+    37.3,
+    109.396,
+    "target",
+    1,
+    0.9251,
+    0.8715
+   ],
+   [
+    "usdchf",
+    "2018-05-25",
+    -1,
+    0.99188,
+    18.4,
+    0.99372,
+    "stop",
+    -1,
+    -1.1493,
+    -1.258
+   ],
+   [
+    "eurjpy",
+    "2018-05-25",
+    -1,
+    128.248,
+    81,
+    127.438,
+    "target",
+    1,
+    0.9645,
+    0.9398
+   ],
+   [
+    "usdjpy",
+    "2018-06-08",
+    1,
+    109.332,
+    20.8,
+    109.54,
+    "target",
+    1,
+    0.8658,
+    0.7696
+   ],
+   [
+    "gbpusd",
+    "2018-07-06",
+    -1,
+    1.33152,
+    32.2,
+    1.33474,
+    "stop",
+    -1,
+    -1.09,
+    -1.1521
+   ],
+   [
+    "eurusd",
+    "2018-08-10",
+    1,
+    1.13788,
+    33.1,
+    1.14119,
+    "target",
+    1,
+    0.915,
+    0.8546
+   ],
+   [
+    "usdjpy",
+    "2018-08-10",
+    1,
+    110.474,
+    38.4,
+    110.858,
+    "target",
+    1,
+    0.9272,
+    0.8751
+   ],
+   [
+    "audusd",
+    "2018-08-10",
+    1,
+    0.72756,
+    24.2,
+    0.72998,
+    "target",
+    1,
+    0.8914,
+    0.8088
+   ],
+   [
+    "eurjpy",
+    "2018-08-10",
+    1,
+    125.712,
+    79.6,
+    126.508,
+    "target",
+    1,
+    0.964,
+    0.9389
+   ],
+   [
+    "gbpusd",
+    "2018-08-31",
+    1,
+    1.29178,
+    42.5,
+    1.28753,
+    "stop",
+    -1,
+    -1.0678,
+    -1.1149
+   ],
+   [
+    "usdchf",
+    "2018-08-31",
+    -1,
+    0.97029,
+    15.9,
+    0.9687,
+    "target",
+    1,
+    0.8279,
+    0.7021
+   ],
+   [
+    "usdjpy",
+    "2018-09-21",
+    1,
+    112.454,
+    12.1,
+    112.575,
+    "target",
+    1,
+    0.7681,
+    0.6028
+   ],
+   [
+    "audusd",
+    "2018-09-21",
+    1,
+    0.72672,
+    22.2,
+    0.72624,
+    "time",
+    -0.2162,
+    -0.3346,
+    -0.4246
+   ],
+   [
+    "gbpusd",
+    "2018-10-12",
+    1,
+    1.30897,
+    61.7,
+    1.31514,
+    "target",
+    1,
+    0.9532,
+    0.9208
+   ],
+   [
+    "gbpusd",
+    "2018-11-02",
+    -1,
+    1.30117,
+    42.4,
+    1.29693,
+    "target",
+    1,
+    0.9319,
+    0.8848
+   ],
+   [
+    "gbpusd",
+    "2018-11-09",
+    1,
+    1.29249,
+    47.5,
+    1.28774,
+    "stop",
+    -1,
+    -1.0607,
+    -1.1028
+   ],
+   [
+    "audusd",
+    "2018-11-16",
+    1,
+    0.73132,
+    21,
+    0.72922,
+    "stop",
+    -1,
+    -1.1252,
+    -1.2204
+   ],
+   [
+    "eurusd",
+    "2018-11-30",
+    -1,
+    1.13478,
+    31.9,
+    1.1356,
+    "time",
+    -0.2571,
+    -0.3452,
+    -0.4079
+   ],
+   [
+    "usdjpy",
+    "2018-11-30",
+    -1,
+    113.664,
+    16.6,
+    113.498,
+    "target",
+    1,
+    0.8306,
+    0.7102
+   ],
+   [
+    "audusd",
+    "2018-11-30",
+    -1,
+    0.73786,
+    68.4,
+    0.73588,
+    "time",
+    0.2895,
+    0.251,
+    0.2218
+   ],
+   [
+    "eurjpy",
+    "2018-11-30",
+    -1,
+    128.981,
+    55.1,
+    128.946,
+    "time",
+    0.0635,
+    0.0112,
+    -0.0251
+   ],
+   [
+    "audusd",
+    "2018-12-07",
+    1,
+    0.71922,
+    12.6,
+    0.71796,
+    "stop",
+    -1,
+    -1.2082,
+    -1.367
+   ],
+   [
+    "usdjpy",
+    "2018-12-21",
+    1,
+    110.996,
+    22.5,
+    110.771,
+    "stop",
+    -1,
+    -1.1244,
+    -1.2133
+   ],
+   [
+    "eurjpy",
+    "2018-12-21",
+    1,
+    126.183,
+    25.5,
+    126.438,
+    "target",
+    1,
+    0.8875,
+    0.8091
+   ],
+   [
+    "eurusd",
+    "2019-03-01",
+    -1,
+    1.13776,
+    12.8,
+    1.13648,
+    "target",
+    1,
+    0.7803,
+    0.6241
+   ],
+   [
+    "gbpusd",
+    "2019-03-01",
+    -1,
+    1.32459,
+    40.7,
+    1.32052,
+    "target",
+    1,
+    0.9288,
+    0.8797
+   ],
+   [
+    "audusd",
+    "2019-03-01",
+    -1,
+    0.71047,
+    24.5,
+    0.70802,
+    "target",
+    1,
+    0.8931,
+    0.8114
+   ],
+   [
+    "gbpusd",
+    "2019-03-08",
+    1,
+    1.29744,
+    41.4,
+    1.30158,
+    "target",
+    1,
+    0.9303,
+    0.882
+   ],
+   [
+    "usdjpy",
+    "2019-03-08",
+    1,
+    111.062,
+    10.7,
+    110.955,
+    "stop",
+    -1,
+    -1.2617,
+    -1.4486
+   ],
+   [
+    "eurjpy",
+    "2019-03-08",
+    1,
+    124.74,
+    13.7,
+    124.877,
+    "target",
+    1,
+    0.7911,
+    0.6452
+   ],
+   [
+    "usdjpy",
+    "2019-03-29",
+    -1,
+    110.985,
+    13.5,
+    111.12,
+    "stop",
+    -1,
+    -1.2074,
+    -1.3555
+   ],
+   [
+    "audusd",
+    "2019-03-29",
+    -1,
+    0.71186,
+    22.2,
+    0.71166,
+    "time",
+    0.0901,
+    -0.0279,
+    -0.118
+   ],
+   [
+    "eurjpy",
+    "2019-03-29",
+    -1,
+    124.681,
+    33.6,
+    124.76,
+    "time",
+    -0.2351,
+    -0.3203,
+    -0.3798
+   ],
+   [
+    "eurusd",
+    "2019-05-03",
+    1,
+    1.11805,
+    20.8,
+    1.12013,
+    "target",
+    1,
+    0.8652,
+    0.7691
+   ],
+   [
+    "gbpusd",
+    "2019-05-03",
+    1,
+    1.31461,
+    28.5,
+    1.31176,
+    "stop",
+    -1,
+    -1.1015,
+    -1.1716
+   ],
+   [
+    "usdjpy",
+    "2019-05-03",
+    1,
+    110.646,
+    45,
+    110.858,
+    "time",
+    0.4711,
+    0.4089,
+    0.3645
+   ],
+   [
+    "audusd",
+    "2019-05-03",
+    1,
+    0.69723,
+    50.7,
+    0.69944,
+    "time",
+    0.4359,
+    0.3843,
+    0.3449
+   ],
+   [
+    "eurjpy",
+    "2019-05-03",
+    1,
+    123.687,
+    77.3,
+    124.122,
+    "time",
+    0.5627,
+    0.5258,
+    0.4999
+   ],
+   [
+    "usdjpy",
+    "2019-05-10",
+    1,
+    109.786,
+    16.7,
+    109.619,
+    "stop",
+    -1,
+    -1.1673,
+    -1.2871
+   ],
+   [
+    "eurjpy",
+    "2019-05-10",
+    1,
+    123.347,
+    19.1,
+    123.156,
+    "stop",
+    -1,
+    -1.1495,
+    -1.2542
+   ],
+   [
+    "audusd",
+    "2019-05-17",
+    -1,
+    0.69053,
+    37.5,
+    0.69128,
+    "time",
+    -0.2,
+    -0.2696,
+    -0.323
+   ],
+   [
+    "usdjpy",
+    "2019-06-07",
+    -1,
+    108.46,
+    26.5,
+    108.564,
+    "time",
+    -0.3925,
+    -0.4977,
+    -0.5731
+   ],
+   [
+    "eurjpy",
+    "2019-06-07",
+    -1,
+    122.836,
+    22.5,
+    122.786,
+    "time",
+    0.2222,
+    0.0954,
+    0.0065
+   ],
+   [
+    "usdjpy",
+    "2019-06-28",
+    -1,
+    108.205,
+    30.3,
+    108.508,
+    "stop",
+    -1,
+    -1.092,
+    -1.158
+   ],
+   [
+    "usdchf",
+    "2019-06-28",
+    -1,
+    0.97901,
+    27.7,
+    0.98181,
+    "stop (gap)",
+    -1.0108,
+    -1.1098,
+    -1.182
+   ],
+   [
+    "eurjpy",
+    "2019-06-28",
+    -1,
+    122.919,
+    22.2,
+    123.141,
+    "stop",
+    -1,
+    -1.1285,
+    -1.2186
+   ],
+   [
+    "usdchf",
+    "2019-08-02",
+    -1,
+    0.98338,
+    10.4,
+    0.98234,
+    "target",
+    1,
+    0.7363,
+    0.544
+   ],
+   [
+    "gbpusd",
+    "2019-08-09",
+    -1,
+    1.20541,
+    26.1,
+    1.2028,
+    "target",
+    1,
+    0.8911,
+    0.8145
+   ],
+   [
+    "usdjpy",
+    "2019-08-23",
+    1,
+    104.961,
+    44.5,
+    104.516,
+    "stop",
+    -1,
+    -1.0623,
+    -1.1072
+   ],
+   [
+    "audusd",
+    "2019-08-23",
+    1,
+    0.67386,
+    14.6,
+    0.6724,
+    "stop",
+    -1,
+    -1.1783,
+    -1.3153
+   ],
+   [
+    "usdchf",
+    "2019-08-23",
+    1,
+    0.97284,
+    19,
+    0.97474,
+    "target",
+    1,
+    0.8559,
+    0.7506
+   ],
+   [
+    "eurjpy",
+    "2019-08-23",
+    1,
+    116.999,
+    46,
+    117.459,
+    "target",
+    1,
+    0.9386,
+    0.8951
+   ],
+   [
+    "usdjpy",
+    "2019-08-30",
+    1,
+    106.085,
+    19.9,
+    106.284,
+    "target",
+    1,
+    0.8604,
+    0.7599
+   ],
+   [
+    "usdjpy",
+    "2019-09-13",
+    1,
+    107.595,
+    50.1,
+    108.096,
+    "target",
+    1,
+    0.9444,
+    0.9045
+   ],
+   [
+    "audusd",
+    "2019-09-13",
+    1,
+    0.68677,
+    12.5,
+    0.68802,
+    "target",
+    1,
+    0.7913,
+    0.6313
+   ],
+   [
+    "usdchf",
+    "2019-09-13",
+    1,
+    0.98792,
+    23,
+    0.99022,
+    "target",
+    1,
+    0.8807,
+    0.7937
+   ],
+   [
+    "eurjpy",
+    "2019-09-13",
+    1,
+    119.121,
+    60.1,
+    118.815,
+    "time",
+    -0.5092,
+    -0.5563,
+    -0.5896
+   ],
+   [
+    "usdjpy",
+    "2019-10-04",
+    1,
+    106.689,
+    23.3,
+    106.922,
+    "target",
+    1,
+    0.8807,
+    0.7948
+   ],
+   [
+    "audusd",
+    "2019-10-04",
+    1,
+    0.67563,
+    13.3,
+    0.6743,
+    "stop",
+    -1,
+    -1.1958,
+    -1.3462
+   ],
+   [
+    "eurjpy",
+    "2019-10-04",
+    1,
+    117.172,
+    20.8,
+    117.38,
+    "target",
+    1,
+    0.8641,
+    0.7679
+   ],
+   [
+    "gbpusd",
+    "2019-11-15",
+    -1,
+    1.2916,
+    12.8,
+    1.29288,
+    "stop",
+    -1,
+    -1.2251,
+    -1.3813
+   ],
+   [
+    "gbpusd",
+    "2019-11-22",
+    -1,
+    1.28521,
+    17.7,
+    1.28698,
+    "stop",
+    -1,
+    -1.1626,
+    -1.2756
+   ],
+   [
+    "gbpusd",
+    "2019-11-29",
+    1,
+    1.29152,
+    22.2,
+    1.29374,
+    "target",
+    1,
+    0.8702,
+    0.7801
+   ],
+   [
+    "audusd",
+    "2019-12-13",
+    -1,
+    0.68847,
+    9.9,
+    0.68748,
+    "target",
+    1,
+    0.7364,
+    0.5344
+   ],
+   [
+    "eurjpy",
+    "2019-12-13",
+    -1,
+    121.697,
+    10.9,
+    121.806,
+    "stop",
+    -1,
+    -1.2613,
+    -1.4447
+   ],
+   [
+    "usdjpy",
+    "2020-01-03",
+    1,
+    107.901,
+    20.9,
+    108.11,
+    "target",
+    1,
+    0.8667,
+    0.771
+   ],
+   [
+    "usdchf",
+    "2020-01-03",
+    1,
+    0.97098,
+    15.6,
+    0.96942,
+    "stop",
+    -1,
+    -1.1754,
+    -1.3037
+   ],
+   [
+    "usdjpy",
+    "2020-01-24",
+    1,
+    108.978,
+    30.1,
+    108.958,
+    "time",
+    -0.0664,
+    -0.1591,
+    -0.2256
+   ],
+   [
+    "audusd",
+    "2020-01-24",
+    1,
+    0.68136,
+    11.8,
+    0.68018,
+    "stop",
+    -1,
+    -1.2209,
+    -1.3904
+   ],
+   [
+    "eurjpy",
+    "2020-01-24",
+    1,
+    120.192,
+    28,
+    119.912,
+    "stop",
+    -1,
+    -1.1015,
+    -1.1729
+   ],
+   [
+    "gbpusd",
+    "2020-01-31",
+    1,
+    1.31768,
+    28.7,
+    1.31481,
+    "stop",
+    -1,
+    -1.1008,
+    -1.1705
+   ],
+   [
+    "eurusd",
+    "2020-02-14",
+    -1,
+    1.08416,
+    10.6,
+    1.0831,
+    "target",
+    1,
+    0.737,
+    0.5483
+   ],
+   [
+    "eurusd",
+    "2020-02-21",
+    1,
+    1.08252,
+    22.2,
+    1.08474,
+    "target",
+    1,
+    0.8745,
+    0.7844
+   ],
+   [
+    "usdjpy",
+    "2020-02-21",
+    1,
+    111.426,
+    12.3,
+    111.549,
+    "target",
+    1,
+    0.7722,
+    0.6096
+   ],
+   [
+    "audusd",
+    "2020-02-21",
+    1,
+    0.65916,
+    35.3,
+    0.66118,
+    "time",
+    0.5722,
+    0.4987,
+    0.442
+   ],
+   [
+    "usdchf",
+    "2020-02-21",
+    -1,
+    0.9799,
+    16,
+    0.9815,
+    "stop",
+    -1,
+    -1.1713,
+    -1.2963
+   ],
+   [
+    "eurjpy",
+    "2020-02-21",
+    1,
+    120.637,
+    39,
+    121.027,
+    "target",
+    1,
+    0.9271,
+    0.8758
+   ],
+   [
+    "eurusd",
+    "2020-02-28",
+    -1,
+    1.10436,
+    15.9,
+    1.10595,
+    "stop",
+    -1,
+    -1.1759,
+    -1.3017
+   ],
+   [
+    "gbpusd",
+    "2020-02-28",
+    1,
+    1.28092,
+    10,
+    1.28192,
+    "target",
+    1,
+    0.7124,
+    0.5124
+   ],
+   [
+    "usdjpy",
+    "2020-02-28",
+    1,
+    107.645,
+    41.9,
+    108.064,
+    "target",
+    1,
+    0.9335,
+    0.8858
+   ],
+   [
+    "audusd",
+    "2020-02-28",
+    1,
+    0.6478,
+    31.9,
+    0.65099,
+    "target",
+    1,
+    0.9188,
+    0.8561
+   ],
+   [
+    "usdchf",
+    "2020-02-28",
+    1,
+    0.96328,
+    21.2,
+    0.9654,
+    "target",
+    1,
+    0.8711,
+    0.7767
+   ],
+   [
+    "eurjpy",
+    "2020-02-28",
+    1,
+    118.899,
+    24.4,
+    118.655,
+    "stop",
+    -1,
+    -1.1162,
+    -1.1982
+   ],
+   [
+    "eurusd",
+    "2020-03-06",
+    -1,
+    1.13448,
+    60.9,
+    1.14057,
+    "stop",
+    -1,
+    -1.0461,
+    -1.079
+   ],
+   [
+    "gbpusd",
+    "2020-03-06",
+    -1,
+    1.30782,
+    30,
+    1.31082,
+    "stop",
+    -1,
+    -1.0963,
+    -1.163
+   ],
+   [
+    "audusd",
+    "2020-03-06",
+    1,
+    0.66036,
+    38.6,
+    0.6565,
+    "stop",
+    -1,
+    -1.0673,
+    -1.1191
+   ],
+   [
+    "usdchf",
+    "2020-03-06",
+    1,
+    0.93274,
+    49.4,
+    0.9278,
+    "stop",
+    -1,
+    -1.0551,
+    -1.0955
+   ],
+   [
+    "eurjpy",
+    "2020-03-06",
+    1,
+    118.339,
+    57.6,
+    117.763,
+    "stop",
+    -1,
+    -1.0492,
+    -1.0839
+   ],
+   [
+    "usdjpy",
+    "2020-03-13",
+    1,
+    107.13,
+    75.7,
+    106.373,
+    "stop",
+    -1,
+    -1.0368,
+    -1.0632
+   ],
+   [
+    "eurjpy",
+    "2020-03-13",
+    1,
+    118.632,
+    122.2,
+    119.854,
+    "target",
+    1,
+    0.9768,
+    0.9604
+   ],
+   [
+    "eurjpy",
+    "2020-03-27",
+    1,
+    119.726,
+    48.7,
+    119.239,
+    "stop",
+    -1,
+    -1.0583,
+    -1.0994
+   ],
+   [
+    "usdchf",
+    "2020-07-17",
+    -1,
+    0.94052,
+    18.9,
+    0.93863,
+    "target",
+    1,
+    0.8559,
+    0.7501
+   ],
+   [
+    "gbpusd",
+    "2020-09-04",
+    1,
+    1.3267,
+    13.3,
+    1.32537,
+    "stop",
+    -1,
+    -1.2178,
+    -1.3682
+   ],
+   [
+    "eurjpy",
+    "2020-10-16",
+    1,
+    123.434,
+    8.3,
+    123.517,
+    "target",
+    1,
+    0.656,
+    0.415
+   ],
+   [
+    "gbpusd",
+    "2020-12-04",
+    1,
+    1.34144,
+    25.5,
+    1.33889,
+    "stop",
+    -1,
+    -1.1139,
+    -1.1923
+   ],
+   [
+    "eurusd",
+    "2020-12-11",
+    -1,
+    1.21351,
+    22.9,
+    1.2158,
+    "stop",
+    -1,
+    -1.1243,
+    -1.2116
+   ],
+   [
+    "audusd",
+    "2020-12-11",
+    -1,
+    0.7553,
+    20.2,
+    0.75328,
+    "target",
+    1,
+    0.8693,
+    0.7703
+   ],
+   [
+    "usdchf",
+    "2020-12-11",
+    1,
+    0.88904,
+    10.6,
+    0.88798,
+    "stop",
+    -1,
+    -1.2547,
+    -1.4434
+   ],
+   [
+    "eurjpy",
+    "2020-12-11",
+    -1,
+    126.183,
+    16.7,
+    126.016,
+    "target",
+    1,
+    0.8283,
+    0.7085
+   ],
+   [
+    "eurusd",
+    "2020-12-18",
+    1,
+    1.22262,
+    30.1,
+    1.21961,
+    "stop",
+    -1,
+    -1.0947,
+    -1.1611
+   ],
+   [
+    "gbpusd",
+    "2020-12-18",
+    1,
+    1.34126,
+    109.9,
+    1.33027,
+    "stop",
+    -1,
+    -1.0264,
+    -1.0446
+   ],
+   [
+    "usdjpy",
+    "2020-12-18",
+    -1,
+    103.54,
+    23.2,
+    103.308,
+    "target",
+    1,
+    0.8808,
+    0.7946
+   ],
+   [
+    "audusd",
+    "2020-12-18",
+    1,
+    0.75891,
+    32.2,
+    0.75569,
+    "stop",
+    -1,
+    -1.082,
+    -1.1441
+   ],
+   [
+    "eurjpy",
+    "2021-01-08",
+    1,
+    126.907,
+    17.1,
+    127.078,
+    "target",
+    1,
+    0.8321,
+    0.7151
+   ],
+   [
+    "audusd",
+    "2021-01-29",
+    1,
+    0.76261,
+    18.2,
+    0.76079,
+    "stop",
+    -1,
+    -1.1452,
+    -1.2551
+   ],
+   [
+    "eurusd",
+    "2021-03-19",
+    1,
+    1.1877,
+    27.2,
+    1.19042,
+    "target",
+    1,
+    0.8958,
+    0.8223
+   ],
+   [
+    "gbpusd",
+    "2021-03-19",
+    1,
+    1.38406,
+    28.6,
+    1.38692,
+    "target",
+    1,
+    0.8978,
+    0.8279
+   ],
+   [
+    "usdjpy",
+    "2021-03-19",
+    1,
+    108.639,
+    24.5,
+    108.884,
+    "target",
+    1,
+    0.8862,
+    0.8045
+   ],
+   [
+    "audusd",
+    "2021-03-19",
+    1,
+    0.77102,
+    29.5,
+    0.77397,
+    "target",
+    1,
+    0.9103,
+    0.8425
+   ],
+   [
+    "eurjpy",
+    "2021-03-19",
+    1,
+    129.054,
+    55.7,
+    129.611,
+    "target",
+    1,
+    0.9483,
+    0.9124
+   ],
+   [
+    "usdjpy",
+    "2021-10-01",
+    1,
+    110.937,
+    11.4,
+    111.051,
+    "target",
+    1,
+    0.7545,
+    0.579
+   ],
+   [
+    "eurjpy",
+    "2021-10-01",
+    1,
+    128.676,
+    10,
+    128.776,
+    "target",
+    1,
+    0.7121,
+    0.5121
+   ],
+   [
+    "usdchf",
+    "2021-10-15",
+    -1,
+    0.92478,
+    18,
+    0.92298,
+    "target",
+    1,
+    0.8491,
+    0.738
+   ],
+   [
+    "usdjpy",
+    "2021-11-26",
+    -1,
+    113.545,
+    16.5,
+    113.38,
+    "target",
+    1,
+    0.8296,
+    0.7084
+   ],
+   [
+    "audusd",
+    "2021-11-26",
+    -1,
+    0.71312,
+    10.2,
+    0.7121,
+    "target",
+    1,
+    0.743,
+    0.547
+   ],
+   [
+    "gbpusd",
+    "2022-02-25",
+    1,
+    1.33358,
+    77.9,
+    1.34137,
+    "target",
+    1,
+    0.9628,
+    0.9371
+   ],
+   [
+    "audusd",
+    "2022-02-25",
+    1,
+    0.71856,
+    45.1,
+    0.72307,
+    "target",
+    1,
+    0.9418,
+    0.8975
+   ],
+   [
+    "usdchf",
+    "2022-02-25",
+    -1,
+    0.92779,
+    22.7,
+    0.92552,
+    "target",
+    1,
+    0.8803,
+    0.7922
+   ],
+   [
+    "eurusd",
+    "2022-04-08",
+    -1,
+    1.09138,
+    37.6,
+    1.08762,
+    "target",
+    1,
+    0.9258,
+    0.8726
+   ],
+   [
+    "usdchf",
+    "2022-04-08",
+    1,
+    0.9324,
+    17.4,
+    0.93414,
+    "target",
+    1,
+    0.8437,
+    0.7288
+   ],
+   [
+    "eurjpy",
+    "2022-04-22",
+    -1,
+    139.747,
+    89.7,
+    138.85,
+    "target",
+    1,
+    0.9673,
+    0.9451
+   ],
+   [
+    "usdchf",
+    "2022-04-29",
+    1,
+    0.97048,
+    29.2,
+    0.9734,
+    "target",
+    1,
+    0.9063,
+    0.8378
+   ],
+   [
+    "gbpusd",
+    "2022-08-26",
+    1,
+    1.17082,
+    37.5,
+    1.16707,
+    "stop",
+    -1,
+    -1.0754,
+    -1.1287
+   ],
+   [
+    "usdjpy",
+    "2022-08-26",
+    -1,
+    137.952,
+    42.4,
+    138.376,
+    "stop",
+    -1,
+    -1.0689,
+    -1.1161
+   ],
+   [
+    "eurusd",
+    "2022-09-02",
+    1,
+    0.99278,
+    28.6,
+    0.98992,
+    "stop",
+    -1,
+    -1.096,
+    -1.166
+   ],
+   [
+    "audusd",
+    "2022-09-02",
+    1,
+    0.67818,
+    30.1,
+    0.68026,
+    "time",
+    0.691,
+    0.6045,
+    0.538
+   ],
+   [
+    "eurjpy",
+    "2022-09-02",
+    1,
+    139.096,
+    50.9,
+    139.605,
+    "target",
+    1,
+    0.9425,
+    0.9032
+   ],
+   [
+    "eurusd",
+    "2022-09-09",
+    -1,
+    1.00992,
+    52.5,
+    1.01517,
+    "stop",
+    -1,
+    -1.0525,
+    -1.0906
+   ],
+   [
+    "gbpusd",
+    "2022-09-09",
+    -1,
+    1.16314,
+    40.3,
+    1.16717,
+    "stop",
+    -1,
+    -1.0701,
+    -1.1197
+   ],
+   [
+    "usdjpy",
+    "2022-09-09",
+    1,
+    142.156,
+    45.5,
+    142.611,
+    "target",
+    1,
+    0.9354,
+    0.8914
+   ],
+   [
+    "gbpusd",
+    "2022-09-23",
+    1,
+    1.08048,
+    43.6,
+    1.07612,
+    "stop",
+    -1,
+    -1.0639,
+    -1.1098
+   ],
+   [
+    "gbpusd",
+    "2022-10-21",
+    -1,
+    1.13888,
+    91.6,
+    1.12972,
+    "target",
+    1,
+    0.9693,
+    0.9475
+   ],
+   [
+    "eurusd",
+    "2022-11-04",
+    1,
+    0.99109,
+    48,
+    0.99589,
+    "target",
+    1,
+    0.9428,
+    0.9011
+   ],
+   [
+    "gbpusd",
+    "2022-11-04",
+    1,
+    1.13162,
+    58.7,
+    1.13749,
+    "target",
+    1,
+    0.9521,
+    0.9181
+   ],
+   [
+    "audusd",
+    "2022-11-04",
+    1,
+    0.64248,
+    46.4,
+    0.64712,
+    "target",
+    1,
+    0.9442,
+    0.9011
+   ],
+   [
+    "usdchf",
+    "2022-11-04",
+    -1,
+    0.99863,
+    43,
+    0.99433,
+    "target",
+    1,
+    0.9361,
+    0.8895
+   ],
+   [
+    "eurjpy",
+    "2022-11-04",
+    1,
+    145.642,
+    39,
+    146.032,
+    "target",
+    1,
+    0.9242,
+    0.8729
+   ],
+   [
+    "audusd",
+    "2022-11-25",
+    1,
+    0.6722,
+    30.2,
+    0.66918,
+    "stop",
+    -1,
+    -1.0862,
+    -1.1524
+   ],
+   [
+    "usdjpy",
+    "2022-12-16",
+    1,
+    135.975,
+    76.6,
+    136.741,
+    "target",
+    1,
+    0.962,
+    0.9359
+   ],
+   [
+    "eurjpy",
+    "2022-12-16",
+    1,
+    144.016,
+    74.3,
+    144.759,
+    "target",
+    1,
+    0.9603,
+    0.9334
+   ],
+   [
+    "usdjpy",
+    "2023-02-03",
+    -1,
+    132.245,
+    103.9,
+    132.756,
+    "time",
+    -0.4918,
+    -0.5197,
+    -0.5389
+   ],
+   [
+    "eurjpy",
+    "2023-02-03",
+    -1,
+    142.628,
+    100.2,
+    142.33,
+    "time",
+    0.2974,
+    0.268,
+    0.2481
+   ],
+   [
+    "eurusd",
+    "2023-03-10",
+    -1,
+    1.0682,
+    43.4,
+    1.07254,
+    "stop",
+    -1,
+    -1.0641,
+    -1.1102
+   ],
+   [
+    "gbpusd",
+    "2023-03-10",
+    -1,
+    1.20776,
+    44.6,
+    1.21222,
+    "stop",
+    -1,
+    -1.0638,
+    -1.1086
+   ],
+   [
+    "usdjpy",
+    "2023-03-10",
+    1,
+    134.443,
+    66.7,
+    133.776,
+    "stop",
+    -1,
+    -1.0436,
+    -1.0735
+   ],
+   [
+    "audusd",
+    "2023-03-10",
+    -1,
+    0.66142,
+    31.1,
+    0.66453,
+    "stop",
+    -1,
+    -1.0835,
+    -1.1478
+   ],
+   [
+    "eurusd",
+    "2023-03-17",
+    -1,
+    1.06844,
+    18.8,
+    1.06656,
+    "target",
+    1,
+    0.8521,
+    0.7457
+   ],
+   [
+    "gbpusd",
+    "2023-03-17",
+    -1,
+    1.22106,
+    28.4,
+    1.21822,
+    "target",
+    1,
+    0.8997,
+    0.8292
+   ],
+   [
+    "usdjpy",
+    "2023-03-31",
+    -1,
+    133.302,
+    47.2,
+    132.83,
+    "target",
+    1,
+    0.9386,
+    0.8962
+   ],
+   [
+    "eurjpy",
+    "2023-03-31",
+    -1,
+    144.526,
+    51.8,
+    144.008,
+    "target",
+    1,
+    0.943,
+    0.9044
+   ],
+   [
+    "usdjpy",
+    "2023-09-08",
+    1,
+    147.017,
+    78.5,
+    146.232,
+    "stop",
+    -1,
+    -1.0377,
+    -1.0632
+   ],
+   [
+    "eurjpy",
+    "2023-09-08",
+    1,
+    157.551,
+    61.1,
+    156.94,
+    "stop",
+    -1,
+    -1.0492,
+    -1.082
+   ],
+   [
+    "usdchf",
+    "2023-09-15",
+    1,
+    0.89626,
+    14,
+    0.89766,
+    "target",
+    1,
+    0.8069,
+    0.664
+   ],
+   [
+    "usdjpy",
+    "2023-09-29",
+    -1,
+    149.609,
+    24.1,
+    149.85,
+    "stop",
+    -1,
+    -1.1234,
+    -1.2064
+   ],
+   [
+    "eurusd",
+    "2023-10-06",
+    1,
+    1.05552,
+    32,
+    1.05232,
+    "stop",
+    -1,
+    -1.0867,
+    -1.1492
+   ],
+   [
+    "gbpusd",
+    "2023-10-06",
+    1,
+    1.22048,
+    33,
+    1.21718,
+    "stop",
+    -1,
+    -1.0863,
+    -1.1469
+   ],
+   [
+    "audusd",
+    "2023-10-06",
+    1,
+    0.63611,
+    23.5,
+    0.63846,
+    "target",
+    1,
+    0.8899,
+    0.8048
+   ],
+   [
+    "eurjpy",
+    "2023-10-06",
+    1,
+    157.25,
+    75.1,
+    156.732,
+    "time",
+    -0.6897,
+    -0.7298,
+    -0.7564
+   ],
+   [
+    "usdjpy",
+    "2024-04-12",
+    1,
+    153.084,
+    22.8,
+    153.312,
+    "target",
+    1,
+    0.8689,
+    0.7812
+   ],
+   [
+    "usdchf",
+    "2024-04-12",
+    1,
+    0.9123,
+    20.3,
+    0.91433,
+    "target",
+    1,
+    0.8665,
+    0.768
+   ],
+   [
+    "eurjpy",
+    "2024-04-12",
+    1,
+    162.808,
+    30.9,
+    163.117,
+    "target",
+    1,
+    0.9019,
+    0.8371
+   ],
+   [
+    "usdjpy",
+    "2024-04-26",
+    1,
+    157.912,
+    43.3,
+    158.345,
+    "target",
+    1,
+    0.9305,
+    0.8843
+   ],
+   [
+    "eurjpy",
+    "2024-04-26",
+    1,
+    168.833,
+    47.4,
+    169.307,
+    "target",
+    1,
+    0.9354,
+    0.8933
+   ],
+   [
+    "usdchf",
+    "2024-05-31",
+    -1,
+    0.90346,
+    12,
+    0.90226,
+    "target",
+    1,
+    0.7745,
+    0.6078
+   ],
+   [
+    "eurusd",
+    "2024-06-07",
+    1,
+    1.07699,
+    31.8,
+    1.07381,
+    "stop",
+    -1,
+    -1.0876,
+    -1.1505
+   ],
+   [
+    "eurjpy",
+    "2024-06-07",
+    1,
+    168.87,
+    47,
+    168.4,
+    "stop",
+    -1,
+    -1.0651,
+    -1.1077
+   ],
+   [
+    "eurusd",
+    "2024-06-28",
+    -1,
+    1.0744,
+    30.9,
+    1.07749,
+    "stop",
+    -1,
+    -1.0901,
+    -1.1548
+   ],
+   [
+    "eurjpy",
+    "2024-06-28",
+    -1,
+    172.708,
+    31.8,
+    173.026,
+    "stop",
+    -1,
+    -1.0968,
+    -1.1597
+   ],
+   [
+    "eurusd",
+    "2024-07-05",
+    1,
+    1.08044,
+    34,
+    1.08384,
+    "target",
+    1,
+    0.9181,
+    0.8592
+   ],
+   [
+    "gbpusd",
+    "2024-07-05",
+    1,
+    1.2797,
+    18,
+    1.2815,
+    "target",
+    1,
+    0.8402,
+    0.7291
+   ],
+   [
+    "audusd",
+    "2024-07-05",
+    1,
+    0.67372,
+    11.8,
+    0.6749,
+    "target",
+    1,
+    0.7794,
+    0.6099
+   ],
+   [
+    "eurjpy",
+    "2024-07-05",
+    1,
+    173.723,
+    57.3,
+    174.296,
+    "target",
+    1,
+    0.9462,
+    0.9113
+   ],
+   [
+    "eurusd",
+    "2024-07-12",
+    1,
+    1.08854,
+    21.6,
+    1.0907,
+    "target",
+    1,
+    0.8708,
+    0.7782
+   ],
+   [
+    "gbpusd",
+    "2024-07-12",
+    1,
+    1.29693,
+    19.1,
+    1.29884,
+    "target",
+    1,
+    0.849,
+    0.7443
+   ],
+   [
+    "audusd",
+    "2024-07-12",
+    1,
+    0.6773,
+    11.2,
+    0.67842,
+    "target",
+    1,
+    0.7674,
+    0.5889
+   ],
+   [
+    "usdchf",
+    "2024-08-02",
+    -1,
+    0.8606,
+    26.2,
+    0.85798,
+    "target",
+    1,
+    0.8974,
+    0.8211
+   ],
+   [
+    "usdjpy",
+    "2024-10-25",
+    -1,
+    153.207,
+    90.3,
+    153.213,
+    "time",
+    -0.0066,
+    -0.0398,
+    -0.0619
+   ],
+   [
+    "eurjpy",
+    "2024-10-25",
+    -1,
+    165.336,
+    90.4,
+    165.758,
+    "time",
+    -0.4668,
+    -0.5005,
+    -0.5226
+   ],
+   [
+    "eurusd",
+    "2024-11-01",
+    -1,
+    1.08826,
+    49,
+    1.08842,
+    "time",
+    -0.0327,
+    -0.0896,
+    -0.1304
+   ],
+   [
+    "gbpusd",
+    "2024-11-01",
+    -1,
+    1.29712,
+    52.2,
+    1.29415,
+    "time",
+    0.569,
+    0.5137,
+    0.4754
+   ],
+   [
+    "usdjpy",
+    "2024-11-01",
+    1,
+    152.382,
+    61.7,
+    151.765,
+    "stop",
+    -1,
+    -1.0484,
+    -1.0808
+   ],
+   [
+    "audusd",
+    "2024-11-01",
+    -1,
+    0.6607,
+    47.6,
+    0.65835,
+    "time",
+    0.4937,
+    0.4391,
+    0.3971
+   ],
+   [
+    "usdchf",
+    "2024-11-01",
+    1,
+    0.86752,
+    23,
+    0.86522,
+    "stop",
+    -1,
+    -1.117,
+    -1.2039
+   ],
+   [
+    "eurusd",
+    "2024-11-22",
+    -1,
+    1.04786,
+    60,
+    1.04777,
+    "time",
+    0.015,
+    -0.0312,
+    -0.0645
+   ],
+   [
+    "gbpusd",
+    "2024-11-22",
+    -1,
+    1.25914,
+    59.3,
+    1.25506,
+    "time",
+    0.688,
+    0.6397,
+    0.606
+   ],
+   [
+    "usdjpy",
+    "2024-11-22",
+    1,
+    154.249,
+    51.3,
+    153.736,
+    "stop",
+    -1,
+    -1.0584,
+    -1.0974
+   ],
+   [
+    "audusd",
+    "2024-11-22",
+    -1,
+    0.65344,
+    33.6,
+    0.65008,
+    "target",
+    1,
+    0.9228,
+    0.8633
+   ],
+   [
+    "usdchf",
+    "2024-11-22",
+    1,
+    0.89039,
+    37.2,
+    0.88667,
+    "stop",
+    -1,
+    -1.0726,
+    -1.1264
+   ],
+   [
+    "eurjpy",
+    "2024-11-22",
+    -1,
+    161.692,
+    43.2,
+    161.26,
+    "target",
+    1,
+    0.9299,
+    0.8836
+   ],
+   [
+    "usdchf",
+    "2025-01-17",
+    1,
+    0.9132,
+    18,
+    0.915,
+    "target",
+    1,
+    0.8494,
+    0.7383
+   ],
+   [
+    "eurjpy",
+    "2025-01-24",
+    1,
+    163.206,
+    49.4,
+    162.712,
+    "stop",
+    -1,
+    -1.0614,
+    -1.1019
+   ],
+   [
+    "eurusd",
+    "2025-01-31",
+    1,
+    1.02434,
+    117.2,
+    1.0276,
+    "time",
+    0.2782,
+    0.2546,
+    0.2375
+   ],
+   [
+    "gbpusd",
+    "2025-01-31",
+    1,
+    1.23168,
+    75.8,
+    1.23926,
+    "target",
+    1,
+    0.9623,
+    0.936
+   ],
+   [
+    "audusd",
+    "2025-01-31",
+    1,
+    0.61616,
+    49.2,
+    0.61124,
+    "stop",
+    -1,
+    -1.0524,
+    -1.093
+   ],
+   [
+    "usdchf",
+    "2025-01-31",
+    -1,
+    0.91481,
+    34.9,
+    0.9183,
+    "stop",
+    -1,
+    -1.0777,
+    -1.135
+   ],
+   [
+    "eurjpy",
+    "2025-01-31",
+    1,
+    158.657,
+    211.7,
+    158.961,
+    "time",
+    0.1436,
+    0.1294,
+    0.1199
+   ],
+   [
+    "eurusd",
+    "2025-02-07",
+    1,
+    1.02919,
+    35.1,
+    1.0327,
+    "target",
+    1,
+    0.9213,
+    0.8643
+   ],
+   [
+    "audusd",
+    "2025-02-07",
+    1,
+    0.62396,
+    33,
+    0.62726,
+    "target",
+    1,
+    0.9218,
+    0.8612
+   ],
+   [
+    "eurjpy",
+    "2025-02-07",
+    1,
+    155.767,
+    61.2,
+    156.379,
+    "target",
+    1,
+    0.951,
+    0.9183
+   ],
+   [
+    "eurusd",
+    "2025-02-28",
+    -1,
+    1.04048,
+    29.4,
+    1.04342,
+    "stop",
+    -1,
+    -1.0942,
+    -1.1622
+   ],
+   [
+    "eurjpy",
+    "2025-02-28",
+    -1,
+    156.81,
+    52.4,
+    156.286,
+    "target",
+    1,
+    0.9426,
+    0.9045
+   ],
+   [
+    "eurusd",
+    "2025-04-04",
+    1,
+    1.0893,
+    71.5,
+    1.09645,
+    "target",
+    1,
+    0.961,
+    0.933
+   ],
+   [
+    "gbpusd",
+    "2025-04-04",
+    1,
+    1.28454,
+    53.1,
+    1.28985,
+    "target",
+    1,
+    0.9458,
+    0.9081
+   ],
+   [
+    "usdjpy",
+    "2025-04-04",
+    1,
+    145.493,
+    152.1,
+    147.014,
+    "target",
+    1,
+    0.9806,
+    0.9674
+   ],
+   [
+    "audusd",
+    "2025-04-04",
+    1,
+    0.60023,
+    37.8,
+    0.59645,
+    "stop",
+    -1,
+    -1.068,
+    -1.1209
+   ],
+   [
+    "usdchf",
+    "2025-04-04",
+    1,
+    0.85521,
+    55.4,
+    0.84967,
+    "stop",
+    -1,
+    -1.0485,
+    -1.0846
+   ],
+   [
+    "eurusd",
+    "2025-04-11",
+    1,
+    1.13214,
+    38.6,
+    1.136,
+    "target",
+    1,
+    0.9272,
+    0.8754
+   ],
+   [
+    "usdjpy",
+    "2025-04-11",
+    -1,
+    143.957,
+    48.5,
+    143.472,
+    "target",
+    1,
+    0.9392,
+    0.898
+   ],
+   [
+    "usdchf",
+    "2025-04-11",
+    -1,
+    0.81916,
+    39.4,
+    0.81522,
+    "target",
+    1,
+    0.9323,
+    0.8815
+   ],
+   [
+    "eurusd",
+    "2025-05-09",
+    1,
+    1.11997,
+    49,
+    1.11507,
+    "stop",
+    -1,
+    -1.0572,
+    -1.098
+   ],
+   [
+    "gbpusd",
+    "2025-05-09",
+    1,
+    1.32631,
+    40.3,
+    1.32228,
+    "stop",
+    -1,
+    -1.0719,
+    -1.1215
+   ],
+   [
+    "usdjpy",
+    "2025-05-09",
+    -1,
+    146.193,
+    82,
+    147.013,
+    "stop",
+    -1,
+    -1.0361,
+    -1.0605
+   ],
+   [
+    "usdchf",
+    "2025-05-09",
+    -1,
+    0.83476,
+    32.6,
+    0.83802,
+    "stop",
+    -1,
+    -1.0821,
+    -1.1434
+   ],
+   [
+    "eurjpy",
+    "2025-06-13",
+    1,
+    166.15,
+    35,
+    166.5,
+    "target",
+    1,
+    0.9129,
+    0.8558
+   ],
+   [
+    "eurusd",
+    "2025-06-20",
+    1,
+    1.1458,
+    64.2,
+    1.15222,
+    "target",
+    1,
+    0.9561,
+    0.925
+   ],
+   [
+    "gbpusd",
+    "2025-06-20",
+    1,
+    1.34043,
+    45.1,
+    1.34494,
+    "target",
+    1,
+    0.9356,
+    0.8913
+   ],
+   [
+    "usdjpy",
+    "2025-06-20",
+    -1,
+    146.704,
+    61.2,
+    147.316,
+    "stop",
+    -1,
+    -1.0484,
+    -1.081
+   ],
+   [
+    "audusd",
+    "2025-06-20",
+    1,
+    0.64294,
+    19.8,
+    0.64096,
+    "stop",
+    -1,
+    -1.1308,
+    -1.2318
+   ],
+   [
+    "eurusd",
+    "2025-07-11",
+    1,
+    1.16702,
+    20.9,
+    1.16911,
+    "target",
+    1,
+    0.8648,
+    0.7691
+   ],
+   [
+    "eurjpy",
+    "2025-07-11",
+    1,
+    171.809,
+    54.1,
+    172.35,
+    "target",
+    1,
+    0.9432,
+    0.9062
+   ],
+   [
+    "usdjpy",
+    "2025-07-18",
+    1,
+    147.984,
+    86,
+    147.269,
+    "time",
+    -0.8314,
+    -0.8659,
+    -0.8891
+   ],
+   [
+    "eurjpy",
+    "2025-07-18",
+    1,
+    172.134,
+    89.4,
+    172.376,
+    "time",
+    0.2707,
+    0.2363,
+    0.2139
+   ],
+   [
+    "eurjpy",
+    "2025-07-25",
+    -1,
+    173.698,
+    31.8,
+    173.38,
+    "target",
+    1,
+    0.9031,
+    0.8402
+   ],
+   [
+    "usdjpy",
+    "2025-09-05",
+    -1,
+    148.186,
+    76.8,
+    147.592,
+    "time",
+    0.7734,
+    0.7348,
+    0.7088
+   ],
+   [
+    "eurjpy",
+    "2025-09-05",
+    -1,
+    173.574,
+    84,
+    173.426,
+    "time",
+    0.1762,
+    0.1395,
+    0.1157
+   ],
+   [
+    "gbpusd",
+    "2025-10-03",
+    1,
+    1.34409,
+    38.7,
+    1.34796,
+    "target",
+    1,
+    0.9249,
+    0.8733
+   ],
+   [
+    "audusd",
+    "2025-10-03",
+    1,
+    0.65838,
+    18.4,
+    0.66022,
+    "target",
+    1,
+    0.8589,
+    0.7502
+   ],
+   [
+    "usdchf",
+    "2025-10-03",
+    -1,
+    0.79658,
+    13.6,
+    0.79794,
+    "stop",
+    -1,
+    -1.1955,
+    -1.3425
+   ],
+   [
+    "usdjpy",
+    "2025-10-10",
+    -1,
+    151.882,
+    70.8,
+    152.26,
+    "time",
+    -0.5339,
+    -0.576,
+    -0.6043
+   ],
+   [
+    "audusd",
+    "2025-10-10",
+    -1,
+    0.65054,
+    31.9,
+    0.65182,
+    "time",
+    -0.4013,
+    -0.4825,
+    -0.5452
+   ],
+   [
+    "usdchf",
+    "2025-10-10",
+    -1,
+    0.80116,
+    19.8,
+    0.80314,
+    "stop",
+    -1,
+    -1.1344,
+    -1.2354
+   ],
+   [
+    "eurjpy",
+    "2025-10-10",
+    -1,
+    176.339,
+    63.3,
+    176.226,
+    "time",
+    0.1785,
+    0.1296,
+    0.098
+   ],
+   [
+    "usdchf",
+    "2025-10-17",
+    1,
+    0.79205,
+    15.5,
+    0.7936,
+    "target",
+    1,
+    0.8286,
+    0.6996
+   ],
+   [
+    "audusd",
+    "2025-10-24",
+    -1,
+    0.65388,
+    24.7,
+    0.65531,
+    "time",
+    -0.5789,
+    -0.684,
+    -0.7649
+   ],
+   [
+    "usdjpy",
+    "2025-11-07",
+    -1,
+    153.727,
+    31.7,
+    153.41,
+    "target",
+    1,
+    0.9056,
+    0.8425
+   ],
+   [
+    "usdchf",
+    "2025-12-12",
+    1,
+    0.79309,
+    28.9,
+    0.79598,
+    "target",
+    1,
+    0.9081,
+    0.8389
+   ],
+   [
+    "audusd",
+    "2025-12-26",
+    1,
+    0.67037,
+    11.5,
+    0.67152,
+    "target",
+    1,
+    0.7738,
+    0.5999
+   ],
+   [
+    "audusd",
+    "2026-01-02",
+    1,
+    0.66831,
+    11.9,
+    0.66712,
+    "stop",
+    -1,
+    -1.2185,
+    -1.3866
+   ],
+   [
+    "eurusd",
+    "2026-01-16",
+    1,
+    1.15802,
+    18.6,
+    1.15988,
+    "target",
+    1,
+    0.8483,
+    0.7408
+   ],
+   [
+    "gbpusd",
+    "2026-01-16",
+    1,
+    1.3354,
+    25.6,
+    1.33796,
+    "target",
+    1,
+    0.8867,
+    0.8086
+   ],
+   [
+    "audusd",
+    "2026-01-16",
+    1,
+    0.66716,
+    12,
+    0.66836,
+    "target",
+    1,
+    0.7833,
+    0.6166
+   ],
+   [
+    "eurjpy",
+    "2026-01-16",
+    1,
+    182.878,
+    49.7,
+    183.375,
+    "target",
+    1,
+    0.9372,
+    0.8969
+   ],
+   [
+    "eurusd",
+    "2026-01-23",
+    -1,
+    1.18636,
+    35.9,
+    1.18995,
+    "stop",
+    -1,
+    -1.0789,
+    -1.1346
+   ],
+   [
+    "gbpusd",
+    "2026-01-23",
+    -1,
+    1.36671,
+    21.7,
+    1.36454,
+    "target",
+    1,
+    0.8657,
+    0.7735
+   ],
+   [
+    "usdjpy",
+    "2026-01-23",
+    1,
+    154.862,
+    87.4,
+    153.988,
+    "stop",
+    -1,
+    -1.0343,
+    -1.0572
+   ],
+   [
+    "audusd",
+    "2026-01-23",
+    -1,
+    0.69234,
+    27.1,
+    0.69322,
+    "time",
+    -0.3247,
+    -0.4211,
+    -0.4949
+   ],
+   [
+    "usdchf",
+    "2026-01-23",
+    1,
+    0.77584,
+    44.1,
+    0.77536,
+    "time",
+    -0.1088,
+    -0.1689,
+    -0.2143
+   ],
+   [
+    "eurjpy",
+    "2026-01-23",
+    1,
+    183.747,
+    47.7,
+    183.27,
+    "stop",
+    -1,
+    -1.0656,
+    -1.1075
+   ],
+   [
+    "eurusd",
+    "2026-02-27",
+    1,
+    1.17705,
+    46.7,
+    1.17238,
+    "stop",
+    -1,
+    -1.0606,
+    -1.1034
+   ],
+   [
+    "gbpusd",
+    "2026-02-27",
+    1,
+    1.3408,
+    78.8,
+    1.33292,
+    "stop",
+    -1,
+    -1.0368,
+    -1.0622
+   ],
+   [
+    "audusd",
+    "2026-02-27",
+    1,
+    0.70452,
+    70.8,
+    0.7116,
+    "target",
+    1,
+    0.963,
+    0.9348
+   ],
+   [
+    "usdchf",
+    "2026-02-27",
+    1,
+    0.76747,
+    16.2,
+    0.76909,
+    "target",
+    1,
+    0.8367,
+    0.7132
+   ],
+   [
+    "eurjpy",
+    "2026-02-27",
+    1,
+    183.794,
+    63.4,
+    184.428,
+    "target",
+    1,
+    0.9507,
+    0.9191
+   ],
+   [
+    "eurusd",
+    "2026-03-06",
+    1,
+    1.15458,
+    71,
+    1.15916,
+    "time",
+    0.6451,
+    0.6054,
+    0.5772
+   ],
+   [
+    "gbpusd",
+    "2026-03-06",
+    1,
+    1.33384,
+    72.1,
+    1.33928,
+    "time",
+    0.7545,
+    0.7143,
+    0.6865
+   ],
+   [
+    "audusd",
+    "2026-03-06",
+    1,
+    0.69861,
+    43.9,
+    0.703,
+    "target",
+    1,
+    0.9404,
+    0.8949
+   ],
+   [
+    "usdchf",
+    "2026-03-06",
+    -1,
+    0.77948,
+    35,
+    0.77874,
+    "time",
+    0.2114,
+    0.1357,
+    0.0785
+   ],
+   [
+    "eurjpy",
+    "2026-03-06",
+    1,
+    182.566,
+    76.8,
+    183.334,
+    "target",
+    1,
+    0.9594,
+    0.9333
+   ],
+   [
+    "eurusd",
+    "2026-03-20",
+    1,
+    1.15378,
+    33.3,
+    1.15045,
+    "stop",
+    -1,
+    -1.0847,
+    -1.1447
+   ],
+   [
+    "eurjpy",
+    "2026-03-20",
+    1,
+    183.842,
+    39.9,
+    184.241,
+    "target",
+    1,
+    0.9216,
+    0.8715
+   ],
+   [
+    "eurusd",
+    "2026-04-10",
+    1,
+    1.16664,
+    58.6,
+    1.17096,
+    "time",
+    0.7372,
+    0.689,
+    0.6549
+   ],
+   [
+    "gbpusd",
+    "2026-04-10",
+    1,
+    1.33942,
+    65.8,
+    1.346,
+    "target",
+    1,
+    0.9559,
+    0.9255
+   ],
+   [
+    "usdjpy",
+    "2026-04-10",
+    -1,
+    159.603,
+    32.8,
+    159.746,
+    "time",
+    -0.436,
+    -0.528,
+    -0.589
+   ],
+   [
+    "audusd",
+    "2026-04-10",
+    1,
+    0.69942,
+    69.7,
+    0.70639,
+    "target",
+    1,
+    0.9625,
+    0.9338
+   ],
+   [
+    "usdchf",
+    "2026-04-10",
+    -1,
+    0.79147,
+    23.1,
+    0.78916,
+    "target",
+    1,
+    0.885,
+    0.7984
+   ],
+   [
+    "eurjpy",
+    "2026-04-10",
+    1,
+    186.225,
+    53,
+    186.755,
+    "target",
+    1,
+    0.9408,
+    0.9031
+   ],
+   [
+    "eurusd",
+    "2026-04-17",
+    1,
+    1.17408,
+    23,
+    1.17638,
+    "target",
+    1,
+    0.877,
+    0.7901
+   ],
+   [
+    "gbpusd",
+    "2026-04-17",
+    1,
+    1.34894,
+    29,
+    1.35184,
+    "target",
+    1,
+    0.8998,
+    0.8308
+   ],
+   [
+    "audusd",
+    "2026-04-17",
+    1,
+    0.71258,
+    41.6,
+    0.71674,
+    "target",
+    1,
+    0.937,
+    0.8889
+   ],
+   [
+    "eurusd",
+    "2026-04-24",
+    1,
+    1.16999,
+    18.8,
+    1.17187,
+    "target",
+    1,
+    0.8497,
+    0.7433
+   ],
+   [
+    "gbpusd",
+    "2026-04-24",
+    1,
+    1.35076,
+    23.2,
+    1.35308,
+    "target",
+    1,
+    0.8747,
+    0.7885
+   ],
+   [
+    "usdjpy",
+    "2026-04-24",
+    -1,
+    159.565,
+    21.7,
+    159.348,
+    "target",
+    1,
+    0.8609,
+    0.7688
+   ],
+   [
+    "audusd",
+    "2026-04-24",
+    1,
+    0.71311,
+    16.7,
+    0.71478,
+    "target",
+    1,
+    0.8431,
+    0.7233
+   ],
+   [
+    "usdchf",
+    "2026-04-24",
+    -1,
+    0.78672,
+    17.4,
+    0.78498,
+    "target",
+    1,
+    0.8475,
+    0.7325
+   ],
+   [
+    "eurusd",
+    "2026-05-01",
+    -1,
+    1.17478,
+    26.6,
+    1.17212,
+    "target",
+    1,
+    0.8937,
+    0.8185
+   ],
+   [
+    "gbpusd",
+    "2026-05-01",
+    -1,
+    1.36003,
+    25.3,
+    1.3575,
+    "target",
+    1,
+    0.8849,
+    0.8058
+   ],
+   [
+    "usdjpy",
+    "2026-05-01",
+    1,
+    156.756,
+    33.2,
+    157.088,
+    "target",
+    1,
+    0.9095,
+    0.8492
+   ],
+   [
+    "eurusd",
+    "2026-05-08",
+    1,
+    1.175,
+    35.2,
+    1.17852,
+    "target",
+    1,
+    0.9196,
+    0.8628
+   ],
+   [
+    "gbpusd",
+    "2026-05-08",
+    1,
+    1.35575,
+    74.9,
+    1.36324,
+    "target",
+    1,
+    0.9611,
+    0.9344
+   ],
+   [
+    "audusd",
+    "2026-05-08",
+    1,
+    0.72203,
+    27,
+    0.72473,
+    "target",
+    1,
+    0.9028,
+    0.8287
+   ],
+   [
+    "usdchf",
+    "2026-05-08",
+    -1,
+    0.77831,
+    18.8,
+    0.77731,
+    "time",
+    0.5319,
+    0.3909,
+    0.2846
+   ],
+   [
+    "eurjpy",
+    "2026-05-08",
+    1,
+    184.015,
+    63.1,
+    184.646,
+    "target",
+    1,
+    0.9504,
+    0.9187
+   ],
+   [
+    "eurusd",
+    "2026-05-22",
+    -1,
+    1.16394,
+    37.1,
+    1.16422,
+    "time",
+    -0.0755,
+    -0.1516,
+    -0.2055
+   ],
+   [
+    "gbpusd",
+    "2026-05-22",
+    -1,
+    1.34589,
+    27.7,
+    1.34866,
+    "stop",
+    -1,
+    -1.1049,
+    -1.1771
+   ],
+   [
+    "usdjpy",
+    "2026-05-22",
+    1,
+    158.817,
+    38.9,
+    158.899,
+    "time",
+    0.2108,
+    0.1333,
+    0.0819
+   ],
+   [
+    "audusd",
+    "2026-05-22",
+    -1,
+    0.71562,
+    28.1,
+    0.7173,
+    "time",
+    -0.5979,
+    -0.6912,
+    -0.7623
+   ],
+   [
+    "audusd",
+    "2026-06-05",
+    1,
+    0.70276,
+    17.6,
+    0.70452,
+    "target",
+    1,
+    0.8513,
+    0.7377
+   ],
+   [
+    "eurjpy",
+    "2026-06-05",
+    1,
+    184.481,
+    24.6,
+    184.727,
+    "target",
+    1,
+    0.8728,
+    0.7915
+   ],
+   [
+    "gbpusd",
+    "2026-06-19",
+    1,
+    1.31951,
+    39.4,
+    1.32345,
+    "target",
+    1,
+    0.9266,
+    0.8758
+   ],
+   [
+    "audusd",
+    "2026-07-17",
+    1,
+    0.69664,
+    15.2,
+    0.69816,
+    "target",
+    1,
+    0.8281,
+    0.6965
+   ],
+   [
+    "eurusd",
+    "2026-07-24",
+    -1,
+    1.13957,
+    25.1,
+    1.13706,
+    "target",
+    1,
+    0.8879,
+    0.8083
+   ],
+   [
+    "gbpusd",
+    "2026-07-24",
+    -1,
+    1.33478,
+    23.9,
+    1.33239,
+    "target",
+    1,
+    0.8786,
+    0.795
+   ],
+   [
+    "usdjpy",
+    "2026-07-24",
+    1,
+    163.587,
+    26.3,
+    163.714,
+    "time",
+    0.4829,
+    0.3674,
+    0.2914
+   ],
+   [
+    "audusd",
+    "2026-07-24",
+    -1,
+    0.70016,
+    17.9,
+    0.69924,
+    "time",
+    0.514,
+    0.3679,
+    0.2561
+   ],
+   [
+    "usdchf",
+    "2026-07-24",
+    1,
+    0.816,
+    21.6,
+    0.81816,
+    "target",
+    1,
+    0.8765,
+    0.7839
+   ],
+   [
+    "eurusd",
+    "2026-07-31",
+    -1,
+    1.15482,
+    17.6,
+    1.15306,
+    "target",
+    1,
+    0.8398,
+    0.7262
+   ],
+   [
+    "usdjpy",
+    "2026-07-31",
+    1,
+    157.172,
+    26.2,
+    157.434,
+    "target",
+    1,
+    0.8852,
+    0.8089
+   ],
+   [
+    "audusd",
+    "2026-07-31",
+    -1,
+    0.70456,
+    15.2,
+    0.70304,
+    "target",
+    1,
+    0.8278,
+    0.6962
+   ],
+   [
+    "usdchf",
+    "2026-08-28",
+    1,
+    0.80765,
+    17.1,
+    0.80936,
+    "target",
+    1,
+    0.8442,
+    0.7273
+   ],
+   [
+    "eurjpy",
+    "2026-09-04",
+    1,
+    181.181,
+    29.3,
+    181.474,
+    "target",
+    1,
+    0.8937,
+    0.8254
+   ],
+   [
+    "audusd",
+    "2026-09-18",
+    1,
+    0.71136,
+    11.4,
+    0.7125,
+    "target",
+    1,
+    0.7702,
+    0.5947
+   ],
+   [
+    "audusd",
+    "2026-09-25",
+    1,
+    0.70118,
+    12.6,
+    0.70244,
+    "target",
+    1,
+    0.7924,
+    0.6337
+   ],
+   [
+    "audusd",
+    "2026-10-09",
+    1,
+    0.69704,
+    13.8,
+    0.69842,
+    "target",
+    1,
+    0.8106,
+    0.6657
+   ],
+   [
+    "eurusd",
+    "2026-10-16",
+    1,
+    1.11958,
+    42.9,
+    1.12088,
+    "time",
+    0.303,
+    0.2377,
+    0.1911
+   ],
+   [
+    "audusd",
+    "2026-10-16",
+    -1,
+    0.69672,
+    21.2,
+    0.69884,
+    "stop",
+    -1,
+    -1.1233,
+    -1.2176
+   ],
+   [
+    "eurjpy",
+    "2026-10-16",
+    1,
+    176.885,
+    70.7,
+    177.592,
+    "target",
+    1,
+    0.9562,
+    0.9279
+   ],
+   [
+    "eurusd",
+    "2026-10-23",
+    -1,
+    1.12226,
+    19.4,
+    1.12032,
+    "target",
+    1,
+    0.8554,
+    0.7523
+   ],
+   [
+    "eurjpy",
+    "2026-10-23",
+    -1,
+    176.204,
+    46.4,
+    176.137,
+    "time",
+    0.1444,
+    0.0777,
+    0.0346
+   ]
+  ],
+  "H": [
+   [
+    "usdjpy",
+    "2016-01-15",
+    1,
+    116.911,
+    10.2,
+    117.013,
+    "target",
+    1,
+    0.7229,
+    0.5269
+   ],
+   [
+    "gbpusd",
+    "2016-02-19",
+    1,
+    1.42955,
+    105.8,
+    1.41897,
+    "stop",
+    -1,
+    -1.0278,
+    -1.0467
+   ],
+   [
+    "audusd",
+    "2016-03-04",
+    1,
+    0.742,
+    20.8,
+    0.73992,
+    "stop",
+    -1,
+    -1.1266,
+    -1.2228
+   ],
+   [
+    "usdjpy",
+    "2016-04-15",
+    1,
+    108.184,
+    56.4,
+    108.748,
+    "target",
+    1,
+    0.9506,
+    0.9151
+   ],
+   [
+    "audusd",
+    "2016-04-15",
+    1,
+    0.76642,
+    60.1,
+    0.77243,
+    "target",
+    1,
+    0.956,
+    0.9227
+   ],
+   [
+    "usdchf",
+    "2016-04-15",
+    1,
+    0.96631,
+    15.2,
+    0.96783,
+    "target",
+    1,
+    0.8201,
+    0.6885
+   ],
+   [
+    "eurjpy",
+    "2016-04-15",
+    1,
+    122.204,
+    51,
+    122.714,
+    "target",
+    1,
+    0.9441,
+    0.9049
+   ],
+   [
+    "gbpusd",
+    "2016-04-22",
+    -1,
+    1.44567,
+    53.3,
+    1.44034,
+    "target",
+    1,
+    0.9446,
+    0.9071
+   ],
+   [
+    "gbpusd",
+    "2016-06-03",
+    1,
+    1.4479,
+    39,
+    1.444,
+    "stop",
+    -1,
+    -1.0757,
+    -1.127
+   ],
+   [
+    "eurusd",
+    "2016-06-17",
+    -1,
+    1.13182,
+    41.8,
+    1.136,
+    "stop",
+    -1,
+    -1.0672,
+    -1.1151
+   ],
+   [
+    "gbpusd",
+    "2016-06-17",
+    -1,
+    1.4451,
+    93.2,
+    1.45442,
+    "stop",
+    -1,
+    -1.0317,
+    -1.0531
+   ],
+   [
+    "usdjpy",
+    "2016-06-17",
+    -1,
+    104.736,
+    60.5,
+    104.328,
+    "time",
+    0.6744,
+    0.6286,
+    0.5955
+   ],
+   [
+    "audusd",
+    "2016-06-17",
+    -1,
+    0.74276,
+    32.7,
+    0.74603,
+    "stop",
+    -1,
+    -1.0806,
+    -1.1417
+   ],
+   [
+    "eurjpy",
+    "2016-06-17",
+    -1,
+    118.542,
+    107.1,
+    118.076,
+    "time",
+    0.4351,
+    0.4087,
+    0.39
+   ],
+   [
+    "eurusd",
+    "2016-06-24",
+    1,
+    1.1042,
+    66.2,
+    1.09758,
+    "stop",
+    -1,
+    -1.0422,
+    -1.0725
+   ],
+   [
+    "gbpusd",
+    "2016-06-24",
+    1,
+    1.34197,
+    252.4,
+    1.31673,
+    "stop",
+    -1,
+    -1.0115,
+    -1.0194
+   ],
+   [
+    "usdjpy",
+    "2016-06-24",
+    1,
+    101.878,
+    32.2,
+    102.2,
+    "target",
+    1,
+    0.9143,
+    0.8522
+   ],
+   [
+    "audusd",
+    "2016-06-24",
+    1,
+    0.74303,
+    43,
+    0.73873,
+    "stop",
+    -1,
+    -1.0613,
+    -1.1078
+   ],
+   [
+    "usdchf",
+    "2016-06-24",
+    -1,
+    0.97319,
+    10.7,
+    0.97212,
+    "target",
+    1,
+    0.7441,
+    0.5572
+   ],
+   [
+    "eurjpy",
+    "2016-06-24",
+    1,
+    112.48,
+    103.8,
+    111.442,
+    "stop",
+    -1,
+    -1.027,
+    -1.0463
+   ],
+   [
+    "audusd",
+    "2016-07-01",
+    1,
+    0.74587,
+    39.7,
+    0.74984,
+    "target",
+    1,
+    0.9336,
+    0.8832
+   ],
+   [
+    "usdjpy",
+    "2016-07-15",
+    -1,
+    105.474,
+    61.6,
+    106.09,
+    "stop",
+    -1,
+    -1.045,
+    -1.0775
+   ],
+   [
+    "eurjpy",
+    "2016-07-15",
+    -1,
+    116.548,
+    84.9,
+    117.397,
+    "stop",
+    -1,
+    -1.0333,
+    -1.0568
+   ],
+   [
+    "usdjpy",
+    "2016-08-19",
+    -1,
+    100.658,
+    43.8,
+    100.22,
+    "target",
+    1,
+    0.9371,
+    0.8915
+   ],
+   [
+    "audusd",
+    "2016-08-19",
+    1,
+    0.76114,
+    14.7,
+    0.76261,
+    "target",
+    1,
+    0.8202,
+    0.6842
+   ],
+   [
+    "eurjpy",
+    "2016-08-19",
+    -1,
+    113.929,
+    42.8,
+    113.501,
+    "target",
+    1,
+    0.9343,
+    0.8876
+   ],
+   [
+    "eurusd",
+    "2016-08-26",
+    1,
+    1.11868,
+    9.8,
+    1.11966,
+    "target",
+    1,
+    0.7139,
+    0.5099
+   ],
+   [
+    "usdjpy",
+    "2016-08-26",
+    -1,
+    101.934,
+    10.8,
+    102.042,
+    "stop",
+    -1,
+    -1.2554,
+    -1.4406
+   ],
+   [
+    "gbpusd",
+    "2016-09-30",
+    1,
+    1.29432,
+    34.1,
+    1.29091,
+    "stop",
+    -1,
+    -1.0845,
+    -1.1432
+   ],
+   [
+    "usdjpy",
+    "2016-10-07",
+    -1,
+    103.144,
+    23.6,
+    102.908,
+    "target",
+    1,
+    0.8829,
+    0.7981
+   ],
+   [
+    "audusd",
+    "2016-10-07",
+    -1,
+    0.7595,
+    7.5,
+    0.76025,
+    "stop",
+    -1,
+    -1.3522,
+    -1.6189
+   ],
+   [
+    "usdjpy",
+    "2016-10-28",
+    1,
+    104.564,
+    16,
+    104.724,
+    "target",
+    1,
+    0.8268,
+    0.7018
+   ],
+   [
+    "eurusd",
+    "2016-11-04",
+    1,
+    1.10848,
+    55.6,
+    1.10372,
+    "time",
+    -0.8561,
+    -0.9065,
+    -0.9424
+   ],
+   [
+    "gbpusd",
+    "2016-11-04",
+    1,
+    1.24709,
+    48.7,
+    1.24222,
+    "stop",
+    -1,
+    -1.0588,
+    -1.0998
+   ],
+   [
+    "usdjpy",
+    "2016-11-04",
+    -1,
+    103.852,
+    72.6,
+    104.578,
+    "stop",
+    -1,
+    -1.0381,
+    -1.0657
+   ],
+   [
+    "eurjpy",
+    "2016-11-04",
+    -1,
+    115.125,
+    26.7,
+    115.392,
+    "stop",
+    -1,
+    -1.1055,
+    -1.1805
+   ],
+   [
+    "eurusd",
+    "2016-11-11",
+    1,
+    1.08389,
+    17.4,
+    1.08215,
+    "stop",
+    -1,
+    -1.1602,
+    -1.2752
+   ],
+   [
+    "gbpusd",
+    "2016-11-11",
+    1,
+    1.25757,
+    25.8,
+    1.25499,
+    "stop",
+    -1,
+    -1.1111,
+    -1.1886
+   ],
+   [
+    "usdjpy",
+    "2016-11-25",
+    1,
+    112.874,
+    37.9,
+    112.495,
+    "stop",
+    -1,
+    -1.0741,
+    -1.1269
+   ],
+   [
+    "gbpusd",
+    "2016-12-02",
+    1,
+    1.26334,
+    99.6,
+    1.2733,
+    "target",
+    1,
+    0.9712,
+    0.9511
+   ],
+   [
+    "eurusd",
+    "2016-12-09",
+    1,
+    1.05462,
+    14.8,
+    1.05314,
+    "stop",
+    -1,
+    -1.1875,
+    -1.3226
+   ],
+   [
+    "audusd",
+    "2016-12-16",
+    1,
+    0.72796,
+    23.9,
+    0.73035,
+    "target",
+    1,
+    0.8901,
+    0.8064
+   ],
+   [
+    "gbpusd",
+    "2017-01-06",
+    1,
+    1.22549,
+    30.2,
+    1.22247,
+    "stop",
+    -1,
+    -1.0944,
+    -1.1606
+   ],
+   [
+    "eurusd",
+    "2017-01-13",
+    1,
+    1.0623,
+    20.4,
+    1.06026,
+    "stop",
+    -1,
+    -1.1362,
+    -1.2342
+   ],
+   [
+    "gbpusd",
+    "2017-01-13",
+    1,
+    1.20465,
+    137.6,
+    1.20429,
+    "time",
+    -0.0262,
+    -0.0468,
+    -0.0614
+   ],
+   [
+    "audusd",
+    "2017-01-13",
+    1,
+    0.7485,
+    15.7,
+    0.75007,
+    "target",
+    1,
+    0.832,
+    0.7047
+   ],
+   [
+    "eurjpy",
+    "2017-01-13",
+    1,
+    121.546,
+    31.4,
+    121.232,
+    "stop",
+    -1,
+    -1.0907,
+    -1.1544
+   ],
+   [
+    "eurusd",
+    "2017-01-27",
+    -1,
+    1.07137,
+    15.6,
+    1.07293,
+    "stop",
+    -1,
+    -1.1783,
+    -1.3065
+   ],
+   [
+    "gbpusd",
+    "2017-01-27",
+    -1,
+    1.2566,
+    17.5,
+    1.25835,
+    "stop",
+    -1,
+    -1.1637,
+    -1.278
+   ],
+   [
+    "usdchf",
+    "2017-01-27",
+    1,
+    0.99774,
+    15.8,
+    0.99616,
+    "stop",
+    -1,
+    -1.174,
+    -1.3006
+   ],
+   [
+    "eurusd",
+    "2017-03-24",
+    -1,
+    1.08342,
+    36.4,
+    1.08706,
+    "stop",
+    -1,
+    -1.0766,
+    -1.1315
+   ],
+   [
+    "usdjpy",
+    "2017-03-24",
+    1,
+    110.93,
+    39.1,
+    110.539,
+    "stop",
+    -1,
+    -1.0716,
+    -1.1227
+   ],
+   [
+    "usdchf",
+    "2017-03-24",
+    1,
+    0.98946,
+    18.7,
+    0.98759,
+    "stop",
+    -1,
+    -1.1468,
+    -1.2538
+   ],
+   [
+    "gbpusd",
+    "2017-04-21",
+    -1,
+    1.28304,
+    18.5,
+    1.28119,
+    "target",
+    1,
+    0.8445,
+    0.7364
+   ],
+   [
+    "audusd",
+    "2017-04-21",
+    -1,
+    0.75724,
+    27.8,
+    0.75446,
+    "target",
+    1,
+    0.905,
+    0.8331
+   ],
+   [
+    "usdchf",
+    "2017-04-21",
+    1,
+    0.99123,
+    50.1,
+    0.99624,
+    "target",
+    1,
+    0.9452,
+    0.9053
+   ],
+   [
+    "usdjpy",
+    "2017-04-28",
+    1,
+    111.4,
+    10.9,
+    111.291,
+    "stop",
+    -1,
+    -1.257,
+    -1.4405
+   ],
+   [
+    "audusd",
+    "2017-04-28",
+    1,
+    0.74834,
+    5.2,
+    0.74886,
+    "target",
+    1,
+    0.4929,
+    0.1083
+   ],
+   [
+    "eurusd",
+    "2017-05-05",
+    -1,
+    1.10132,
+    14.3,
+    1.09989,
+    "target",
+    1,
+    0.8045,
+    0.6646
+   ],
+   [
+    "usdjpy",
+    "2017-05-05",
+    -1,
+    112.888,
+    20.2,
+    112.686,
+    "target",
+    1,
+    0.861,
+    0.762
+   ],
+   [
+    "eurjpy",
+    "2017-05-05",
+    -1,
+    124.31,
+    34.3,
+    123.967,
+    "target",
+    1,
+    0.9166,
+    0.8583
+   ],
+   [
+    "gbpusd",
+    "2017-05-19",
+    1,
+    1.30198,
+    17.3,
+    1.30025,
+    "stop",
+    -1,
+    -1.1668,
+    -1.2824
+   ],
+   [
+    "eurjpy",
+    "2017-05-19",
+    1,
+    124.548,
+    14.7,
+    124.695,
+    "target",
+    1,
+    0.8054,
+    0.6694
+   ],
+   [
+    "gbpusd",
+    "2017-06-02",
+    1,
+    1.28704,
+    23.4,
+    1.28938,
+    "target",
+    1,
+    0.877,
+    0.7915
+   ],
+   [
+    "audusd",
+    "2017-06-02",
+    1,
+    0.74326,
+    9.8,
+    0.74228,
+    "stop",
+    -1,
+    -1.2688,
+    -1.4729
+   ],
+   [
+    "usdchf",
+    "2017-06-02",
+    -1,
+    0.96327,
+    9.7,
+    0.96424,
+    "stop",
+    -1,
+    -1.2818,
+    -1.488
+   ],
+   [
+    "usdjpy",
+    "2017-06-30",
+    1,
+    112.214,
+    19.8,
+    112.412,
+    "target",
+    1,
+    0.8583,
+    0.7573
+   ],
+   [
+    "eurjpy",
+    "2017-06-30",
+    1,
+    128.176,
+    23.3,
+    128.409,
+    "target",
+    1,
+    0.8765,
+    0.7907
+   ],
+   [
+    "gbpusd",
+    "2017-08-25",
+    -1,
+    1.2911,
+    29.8,
+    1.28812,
+    "target",
+    1,
+    0.9033,
+    0.8362
+   ],
+   [
+    "eurusd",
+    "2017-09-01",
+    -1,
+    1.18789,
+    19.1,
+    1.1898,
+    "stop",
+    -1,
+    -1.1484,
+    -1.2531
+   ],
+   [
+    "usdjpy",
+    "2017-09-01",
+    1,
+    109.652,
+    60.4,
+    109.604,
+    "time",
+    -0.0795,
+    -0.1257,
+    -0.1588
+   ],
+   [
+    "audusd",
+    "2017-09-01",
+    1,
+    0.7951,
+    18.4,
+    0.79694,
+    "target",
+    1,
+    0.8556,
+    0.7469
+   ],
+   [
+    "usdchf",
+    "2017-09-01",
+    1,
+    0.95943,
+    55.8,
+    0.9575,
+    "time",
+    -0.3459,
+    -0.3948,
+    -0.4307
+   ],
+   [
+    "eurjpy",
+    "2017-09-01",
+    1,
+    130.252,
+    51.8,
+    130.608,
+    "time",
+    0.6873,
+    0.6315,
+    0.5929
+   ],
+   [
+    "usdjpy",
+    "2017-09-08",
+    -1,
+    108.23,
+    38.5,
+    108.615,
+    "stop",
+    -1,
+    -1.0724,
+    -1.1243
+   ],
+   [
+    "usdchf",
+    "2017-09-08",
+    -1,
+    0.9471,
+    30,
+    0.9501,
+    "stop",
+    -1,
+    -1.0909,
+    -1.1575
+   ],
+   [
+    "eurjpy",
+    "2017-09-08",
+    -1,
+    130.137,
+    34.9,
+    130.486,
+    "stop",
+    -1,
+    -1.0827,
+    -1.14
+   ],
+   [
+    "eurusd",
+    "2017-09-15",
+    1,
+    1.19344,
+    13.2,
+    1.19476,
+    "target",
+    1,
+    0.7851,
+    0.6336
+   ],
+   [
+    "eurusd",
+    "2017-09-22",
+    1,
+    1.19149,
+    32.9,
+    1.1882,
+    "stop",
+    -1,
+    -1.0862,
+    -1.147
+   ],
+   [
+    "eurjpy",
+    "2017-09-22",
+    1,
+    133.662,
+    14.6,
+    133.808,
+    "target",
+    1,
+    0.8013,
+    0.6643
+   ],
+   [
+    "eurusd",
+    "2017-09-29",
+    1,
+    1.1806,
+    9,
+    1.1815,
+    "target",
+    1,
+    0.6854,
+    0.4632
+   ],
+   [
+    "usdjpy",
+    "2017-10-20",
+    -1,
+    113.84,
+    32.8,
+    113.667,
+    "time",
+    0.5274,
+    0.4417,
+    0.3807
+   ],
+   [
+    "eurjpy",
+    "2017-10-20",
+    -1,
+    134.029,
+    31.2,
+    133.717,
+    "target",
+    1,
+    0.907,
+    0.8428
+   ],
+   [
+    "eurusd",
+    "2017-12-01",
+    1,
+    1.18692,
+    28.2,
+    1.1841,
+    "stop",
+    -1,
+    -1.1005,
+    -1.1714
+   ],
+   [
+    "usdjpy",
+    "2017-12-01",
+    -1,
+    112.744,
+    49.8,
+    112.8,
+    "time",
+    -0.1124,
+    -0.1688,
+    -0.209
+   ],
+   [
+    "audusd",
+    "2017-12-01",
+    1,
+    0.75932,
+    19.5,
+    0.76127,
+    "target",
+    1,
+    0.8645,
+    0.762
+   ],
+   [
+    "usdchf",
+    "2017-12-01",
+    -1,
+    0.98042,
+    40.7,
+    0.98449,
+    "stop",
+    -1,
+    -1.0674,
+    -1.1165
+   ],
+   [
+    "eurjpy",
+    "2017-12-01",
+    -1,
+    133.82,
+    29.3,
+    133.527,
+    "target",
+    1,
+    0.9009,
+    0.8327
+   ],
+   [
+    "eurusd",
+    "2018-01-19",
+    -1,
+    1.22591,
+    38,
+    1.22211,
+    "target",
+    1,
+    0.925,
+    0.8723
+   ],
+   [
+    "gbpusd",
+    "2018-01-19",
+    -1,
+    1.38884,
+    32.6,
+    1.3921,
+    "stop",
+    -1,
+    -1.0897,
+    -1.1511
+   ],
+   [
+    "usdjpy",
+    "2018-01-19",
+    1,
+    110.623,
+    19.5,
+    110.818,
+    "target",
+    1,
+    0.8565,
+    0.754
+   ],
+   [
+    "usdchf",
+    "2018-01-19",
+    1,
+    0.96144,
+    27.3,
+    0.96382,
+    "time",
+    0.8718,
+    0.7717,
+    0.6984
+   ],
+   [
+    "eurjpy",
+    "2018-01-19",
+    -1,
+    135.615,
+    20.2,
+    135.413,
+    "target",
+    1,
+    0.8559,
+    0.7569
+   ],
+   [
+    "usdjpy",
+    "2018-02-23",
+    -1,
+    107.059,
+    18.3,
+    106.876,
+    "target",
+    1,
+    0.848,
+    0.7387
+   ],
+   [
+    "eurjpy",
+    "2018-02-23",
+    -1,
+    131.566,
+    15.5,
+    131.411,
+    "target",
+    1,
+    0.8134,
+    0.6844
+   ],
+   [
+    "usdjpy",
+    "2018-03-02",
+    1,
+    105.612,
+    13.1,
+    105.481,
+    "stop",
+    -1,
+    -1.2119,
+    -1.3645
+   ],
+   [
+    "eurusd",
+    "2018-05-25",
+    -1,
+    1.16878,
+    38.8,
+    1.17266,
+    "stop",
+    -1,
+    -1.0728,
+    -1.1244
+   ],
+   [
+    "usdjpy",
+    "2018-05-25",
+    -1,
+    109.806,
+    41,
+    109.396,
+    "target",
+    1,
+    0.9319,
+    0.8831
+   ],
+   [
+    "usdchf",
+    "2018-05-25",
+    -1,
+    0.99226,
+    22.2,
+    0.99448,
+    "stop",
+    -1,
+    -1.1237,
+    -1.2138
+   ],
+   [
+    "eurjpy",
+    "2018-05-25",
+    -1,
+    128.338,
+    90,
+    127.438,
+    "target",
+    1,
+    0.968,
+    0.9458
+   ],
+   [
+    "usdjpy",
+    "2018-06-08",
+    1,
+    109.328,
+    21.2,
+    109.54,
+    "target",
+    1,
+    0.8683,
+    0.774
+   ],
+   [
+    "gbpusd",
+    "2018-07-06",
+    -1,
+    1.3314,
+    31,
+    1.3345,
+    "stop",
+    -1,
+    -1.0935,
+    -1.158
+   ],
+   [
+    "eurusd",
+    "2018-08-10",
+    1,
+    1.13878,
+    24.1,
+    1.14119,
+    "target",
+    1,
+    0.8833,
+    0.8003
+   ],
+   [
+    "usdjpy",
+    "2018-08-10",
+    1,
+    110.506,
+    35.2,
+    110.154,
+    "stop",
+    -1,
+    -1.0795,
+    -1.1363
+   ],
+   [
+    "audusd",
+    "2018-08-10",
+    1,
+    0.72843,
+    15.5,
+    0.72998,
+    "target",
+    1,
+    0.8305,
+    0.7014
+   ],
+   [
+    "eurjpy",
+    "2018-08-10",
+    1,
+    125.825,
+    68.3,
+    126.508,
+    "target",
+    1,
+    0.958,
+    0.9288
+   ],
+   [
+    "gbpusd",
+    "2018-08-31",
+    1,
+    1.29204,
+    39.9,
+    1.28805,
+    "stop",
+    -1,
+    -1.0722,
+    -1.1223
+   ],
+   [
+    "usdchf",
+    "2018-08-31",
+    -1,
+    0.97005,
+    13.5,
+    0.9687,
+    "target",
+    1,
+    0.7973,
+    0.6491
+   ],
+   [
+    "audusd",
+    "2018-09-21",
+    1,
+    0.7268,
+    21.4,
+    0.72624,
+    "time",
+    -0.2617,
+    -0.3844,
+    -0.4779
+   ],
+   [
+    "usdjpy",
+    "2018-09-21",
+    1,
+    112.514,
+    6.1,
+    112.575,
+    "target",
+    1,
+    0.5399,
+    0.2121
+   ],
+   [
+    "gbpusd",
+    "2018-10-12",
+    1,
+    1.31002,
+    51.2,
+    1.31514,
+    "target",
+    1,
+    0.9436,
+    0.9045
+   ],
+   [
+    "gbpusd",
+    "2018-11-02",
+    -1,
+    1.30102,
+    40.9,
+    1.29693,
+    "target",
+    1,
+    0.9295,
+    0.8806
+   ],
+   [
+    "gbpusd",
+    "2018-11-09",
+    1,
+    1.29279,
+    44.5,
+    1.28834,
+    "stop",
+    -1,
+    -1.0648,
+    -1.1097
+   ],
+   [
+    "audusd",
+    "2018-11-16",
+    1,
+    0.7312,
+    22.2,
+    0.72898,
+    "stop",
+    -1,
+    -1.1184,
+    -1.2085
+   ],
+   [
+    "eurusd",
+    "2018-11-30",
+    -1,
+    1.13314,
+    15.5,
+    1.13469,
+    "stop",
+    -1,
+    -1.1813,
+    -1.3103
+   ],
+   [
+    "usdjpy",
+    "2018-11-30",
+    -1,
+    113.724,
+    22.6,
+    113.498,
+    "target",
+    1,
+    0.8756,
+    0.7871
+   ],
+   [
+    "audusd",
+    "2018-11-30",
+    -1,
+    0.73618,
+    51.6,
+    0.73588,
+    "time",
+    0.0581,
+    0.0071,
+    -0.0316
+   ],
+   [
+    "eurjpy",
+    "2018-11-30",
+    -1,
+    128.867,
+    43.7,
+    128.946,
+    "time",
+    -0.1808,
+    -0.2467,
+    -0.2924
+   ],
+   [
+    "audusd",
+    "2018-12-07",
+    1,
+    0.71874,
+    17.4,
+    0.72048,
+    "target",
+    1,
+    0.8492,
+    0.7343
+   ],
+   [
+    "usdjpy",
+    "2018-12-21",
+    1,
+    111.036,
+    18.5,
+    110.851,
+    "stop",
+    -1,
+    -1.1513,
+    -1.2594
+   ],
+   [
+    "eurjpy",
+    "2018-12-21",
+    1,
+    126.206,
+    23.2,
+    126.438,
+    "target",
+    1,
+    0.8764,
+    0.7902
+   ],
+   [
+    "eurusd",
+    "2019-03-01",
+    -1,
+    1.13774,
+    12.6,
+    1.13648,
+    "target",
+    1,
+    0.7768,
+    0.6181
+   ],
+   [
+    "gbpusd",
+    "2019-03-01",
+    -1,
+    1.32326,
+    27.4,
+    1.32052,
+    "target",
+    1,
+    0.8943,
+    0.8213
+   ],
+   [
+    "audusd",
+    "2019-03-01",
+    -1,
+    0.70987,
+    18.5,
+    0.70802,
+    "target",
+    1,
+    0.8584,
+    0.7503
+   ],
+   [
+    "gbpusd",
+    "2019-03-08",
+    1,
+    1.29838,
+    32,
+    1.30158,
+    "target",
+    1,
+    0.9099,
+    0.8474
+   ],
+   [
+    "usdjpy",
+    "2019-03-29",
+    -1,
+    110.946,
+    9.6,
+    111.042,
+    "stop",
+    -1,
+    -1.2916,
+    -1.4999
+   ],
+   [
+    "audusd",
+    "2019-03-29",
+    -1,
+    0.71108,
+    14.4,
+    0.71252,
+    "stop",
+    -1,
+    -1.1819,
+    -1.3208
+   ],
+   [
+    "eurjpy",
+    "2019-03-29",
+    -1,
+    124.588,
+    24.3,
+    124.831,
+    "stop",
+    -1,
+    -1.1177,
+    -1.2
+   ],
+   [
+    "eurusd",
+    "2019-05-03",
+    1,
+    1.11796,
+    21.7,
+    1.12013,
+    "target",
+    1,
+    0.8708,
+    0.7787
+   ],
+   [
+    "gbpusd",
+    "2019-05-03",
+    1,
+    1.31598,
+    14.8,
+    1.3145,
+    "stop",
+    -1,
+    -1.1954,
+    -1.3306
+   ],
+   [
+    "usdjpy",
+    "2019-05-03",
+    1,
+    110.618,
+    47.8,
+    110.858,
+    "time",
+    0.5021,
+    0.4436,
+    0.4017
+   ],
+   [
+    "audusd",
+    "2019-05-03",
+    1,
+    0.69836,
+    39.4,
+    0.69944,
+    "time",
+    0.2741,
+    0.2078,
+    0.157
+   ],
+   [
+    "eurjpy",
+    "2019-05-03",
+    1,
+    123.668,
+    79.2,
+    124.122,
+    "time",
+    0.5732,
+    0.5372,
+    0.5119
+   ],
+   [
+    "usdjpy",
+    "2019-05-10",
+    1,
+    109.794,
+    15.9,
+    109.635,
+    "stop",
+    -1,
+    -1.1757,
+    -1.3015
+   ],
+   [
+    "eurjpy",
+    "2019-05-10",
+    1,
+    123.411,
+    12.7,
+    123.284,
+    "stop",
+    -1,
+    -1.2248,
+    -1.3823
+   ],
+   [
+    "audusd",
+    "2019-05-17",
+    -1,
+    0.69008,
+    33,
+    0.69338,
+    "stop",
+    -1,
+    -1.0791,
+    -1.1397
+   ],
+   [
+    "usdjpy",
+    "2019-06-07",
+    -1,
+    108.474,
+    27.9,
+    108.564,
+    "time",
+    -0.3226,
+    -0.4225,
+    -0.4942
+   ],
+   [
+    "eurjpy",
+    "2019-06-07",
+    -1,
+    122.872,
+    26.1,
+    122.786,
+    "time",
+    0.3295,
+    0.2202,
+    0.1436
+   ],
+   [
+    "usdjpy",
+    "2019-06-28",
+    -1,
+    108.22,
+    31.8,
+    108.418,
+    "time",
+    -0.6226,
+    -0.7103,
+    -0.7732
+   ],
+   [
+    "usdchf",
+    "2019-06-28",
+    -1,
+    0.97854,
+    23,
+    0.98084,
+    "stop",
+    -1,
+    -1.1191,
+    -1.2061
+   ],
+   [
+    "eurjpy",
+    "2019-06-28",
+    -1,
+    123.013,
+    31.6,
+    123.329,
+    "stop",
+    -1,
+    -1.0903,
+    -1.1536
+   ],
+   [
+    "usdjpy",
+    "2019-08-23",
+    1,
+    104.808,
+    59.8,
+    105.406,
+    "target",
+    1,
+    0.9537,
+    0.9202
+   ],
+   [
+    "audusd",
+    "2019-08-23",
+    1,
+    0.6737,
+    16.2,
+    0.67208,
+    "stop",
+    -1,
+    -1.1607,
+    -1.2841
+   ],
+   [
+    "usdchf",
+    "2019-08-23",
+    1,
+    0.97254,
+    22,
+    0.97474,
+    "target",
+    1,
+    0.8756,
+    0.7847
+   ],
+   [
+    "eurjpy",
+    "2019-08-23",
+    1,
+    116.84,
+    61.9,
+    117.459,
+    "target",
+    1,
+    0.9543,
+    0.922
+   ],
+   [
+    "usdjpy",
+    "2019-08-30",
+    1,
+    105.977,
+    30.7,
+    106.284,
+    "target",
+    1,
+    0.9095,
+    0.8444
+   ],
+   [
+    "usdjpy",
+    "2019-09-13",
+    1,
+    107.73,
+    36.6,
+    108.096,
+    "target",
+    1,
+    0.9239,
+    0.8693
+   ],
+   [
+    "audusd",
+    "2019-09-13",
+    1,
+    0.68657,
+    14.5,
+    0.68802,
+    "target",
+    1,
+    0.8201,
+    0.6821
+   ],
+   [
+    "usdchf",
+    "2019-09-13",
+    1,
+    0.98776,
+    24.6,
+    0.99022,
+    "target",
+    1,
+    0.8884,
+    0.8071
+   ],
+   [
+    "eurjpy",
+    "2019-09-13",
+    1,
+    119.276,
+    44.6,
+    118.83,
+    "stop",
+    -1,
+    -1.0636,
+    -1.1084
+   ],
+   [
+    "usdjpy",
+    "2019-10-04",
+    1,
+    106.678,
+    24.4,
+    106.922,
+    "target",
+    1,
+    0.8861,
+    0.8041
+   ],
+   [
+    "audusd",
+    "2019-10-04",
+    1,
+    0.67616,
+    8,
+    0.67536,
+    "stop",
+    -1,
+    -1.3255,
+    -1.5755
+   ],
+   [
+    "eurjpy",
+    "2019-10-04",
+    1,
+    117.109,
+    27.1,
+    117.38,
+    "target",
+    1,
+    0.8957,
+    0.8219
+   ],
+   [
+    "gbpusd",
+    "2019-11-15",
+    -1,
+    1.29166,
+    13.4,
+    1.293,
+    "stop",
+    -1,
+    -1.215,
+    -1.3643
+   ],
+   [
+    "gbpusd",
+    "2019-11-22",
+    -1,
+    1.28502,
+    15.8,
+    1.2866,
+    "stop",
+    -1,
+    -1.1822,
+    -1.3088
+   ],
+   [
+    "gbpusd",
+    "2019-11-29",
+    1,
+    1.2913,
+    24.4,
+    1.29374,
+    "target",
+    1,
+    0.8819,
+    0.8
+   ],
+   [
+    "usdjpy",
+    "2020-01-03",
+    1,
+    107.806,
+    30.4,
+    108.11,
+    "target",
+    1,
+    0.9084,
+    0.8426
+   ],
+   [
+    "usdchf",
+    "2020-01-03",
+    1,
+    0.9712,
+    13.4,
+    0.96986,
+    "stop",
+    -1,
+    -1.2043,
+    -1.3535
+   ],
+   [
+    "usdjpy",
+    "2020-01-24",
+    1,
+    108.911,
+    36.8,
+    108.958,
+    "time",
+    0.1277,
+    0.0519,
+    -0.0024
+   ],
+   [
+    "audusd",
+    "2020-01-24",
+    1,
+    0.68162,
+    9.2,
+    0.6807,
+    "stop",
+    -1,
+    -1.2833,
+    -1.5007
+   ],
+   [
+    "eurjpy",
+    "2020-01-24",
+    1,
+    120.142,
+    33,
+    120.062,
+    "time",
+    -0.2424,
+    -0.3285,
+    -0.3891
+   ],
+   [
+    "gbpusd",
+    "2020-01-31",
+    1,
+    1.31786,
+    26.9,
+    1.31517,
+    "stop",
+    -1,
+    -1.1075,
+    -1.1819
+   ],
+   [
+    "eurusd",
+    "2020-02-14",
+    -1,
+    1.08392,
+    8.2,
+    1.08474,
+    "stop",
+    -1,
+    -1.34,
+    -1.5839
+   ],
+   [
+    "eurusd",
+    "2020-02-21",
+    1,
+    1.08297,
+    17.7,
+    1.0812,
+    "stop",
+    -1,
+    -1.1575,
+    -1.2705
+   ],
+   [
+    "audusd",
+    "2020-02-21",
+    1,
+    0.65944,
+    32.5,
+    0.66118,
+    "time",
+    0.5354,
+    0.4555,
+    0.3939
+   ],
+   [
+    "usdchf",
+    "2020-02-21",
+    -1,
+    0.97951,
+    12.1,
+    0.98072,
+    "stop",
+    -1,
+    -1.2265,
+    -1.3918
+   ],
+   [
+    "eurjpy",
+    "2020-02-21",
+    1,
+    120.692,
+    33.5,
+    121.027,
+    "target",
+    1,
+    0.9151,
+    0.8554
+   ],
+   [
+    "eurusd",
+    "2020-02-28",
+    -1,
+    1.10467,
+    19,
+    1.10657,
+    "stop",
+    -1,
+    -1.1472,
+    -1.2525
+   ],
+   [
+    "usdjpy",
+    "2020-02-28",
+    1,
+    107.38,
+    68.4,
+    108.064,
+    "target",
+    1,
+    0.9593,
+    0.9301
+   ],
+   [
+    "audusd",
+    "2020-02-28",
+    1,
+    0.64785,
+    31.4,
+    0.65099,
+    "target",
+    1,
+    0.9175,
+    0.8538
+   ],
+   [
+    "usdchf",
+    "2020-02-28",
+    1,
+    0.96411,
+    12.9,
+    0.96282,
+    "stop",
+    -1,
+    -1.2119,
+    -1.367
+   ],
+   [
+    "eurjpy",
+    "2020-02-28",
+    1,
+    118.62,
+    52.3,
+    119.143,
+    "target",
+    1,
+    0.9458,
+    0.9076
+   ],
+   [
+    "eurusd",
+    "2020-03-06",
+    -1,
+    1.13517,
+    67.8,
+    1.14195,
+    "stop",
+    -1,
+    -1.0415,
+    -1.071
+   ],
+   [
+    "gbpusd",
+    "2020-03-06",
+    -1,
+    1.30827,
+    34.5,
+    1.31172,
+    "stop",
+    -1,
+    -1.0837,
+    -1.1417
+   ],
+   [
+    "audusd",
+    "2020-03-06",
+    1,
+    0.65974,
+    44.8,
+    0.65526,
+    "stop",
+    -1,
+    -1.058,
+    -1.1026
+   ],
+   [
+    "usdchf",
+    "2020-03-06",
+    1,
+    0.93223,
+    54.5,
+    0.92678,
+    "stop",
+    -1,
+    -1.0499,
+    -1.0866
+   ],
+   [
+    "eurjpy",
+    "2020-03-06",
+    1,
+    118.515,
+    40,
+    118.115,
+    "stop",
+    -1,
+    -1.0708,
+    -1.1208
+   ],
+   [
+    "usdjpy",
+    "2020-03-13",
+    1,
+    107.077,
+    81,
+    106.267,
+    "stop",
+    -1,
+    -1.0343,
+    -1.059
+   ],
+   [
+    "eurjpy",
+    "2020-03-27",
+    1,
+    119.861,
+    35.2,
+    119.509,
+    "stop",
+    -1,
+    -1.0807,
+    -1.1375
+   ],
+   [
+    "usdchf",
+    "2020-07-17",
+    -1,
+    0.94023,
+    16,
+    0.93863,
+    "target",
+    1,
+    0.8298,
+    0.7048
+   ],
+   [
+    "gbpusd",
+    "2020-09-04",
+    1,
+    1.3252,
+    28.3,
+    1.32237,
+    "stop",
+    -1,
+    -1.1023,
+    -1.173
+   ],
+   [
+    "audusd",
+    "2020-10-09",
+    1,
+    0.72278,
+    13,
+    0.72148,
+    "stop",
+    -1,
+    -1.2019,
+    -1.3558
+   ],
+   [
+    "gbpusd",
+    "2020-12-04",
+    1,
+    1.34192,
+    20.7,
+    1.33985,
+    "stop",
+    -1,
+    -1.1403,
+    -1.2369
+   ],
+   [
+    "eurusd",
+    "2020-12-11",
+    -1,
+    1.21344,
+    22.2,
+    1.21566,
+    "stop",
+    -1,
+    -1.1282,
+    -1.2183
+   ],
+   [
+    "audusd",
+    "2020-12-11",
+    -1,
+    0.75494,
+    16.6,
+    0.75328,
+    "target",
+    1,
+    0.841,
+    0.7205
+   ],
+   [
+    "eurjpy",
+    "2020-12-11",
+    -1,
+    126.132,
+    11.6,
+    126.248,
+    "stop",
+    -1,
+    -1.2472,
+    -1.4196
+   ],
+   [
+    "usdchf",
+    "2020-12-11",
+    1,
+    0.88835,
+    17.5,
+    0.8866,
+    "stop",
+    -1,
+    -1.1543,
+    -1.2686
+   ],
+   [
+    "eurusd",
+    "2020-12-18",
+    1,
+    1.22294,
+    26.9,
+    1.22025,
+    "stop",
+    -1,
+    -1.106,
+    -1.1803
+   ],
+   [
+    "gbpusd",
+    "2020-12-18",
+    1,
+    1.3432,
+    90.5,
+    1.33415,
+    "stop",
+    -1,
+    -1.0321,
+    -1.0542
+   ],
+   [
+    "usdjpy",
+    "2020-12-18",
+    -1,
+    103.391,
+    8.3,
+    103.474,
+    "stop",
+    -1,
+    -1.3332,
+    -1.5741
+   ],
+   [
+    "audusd",
+    "2020-12-18",
+    1,
+    0.76024,
+    18.9,
+    0.75835,
+    "stop",
+    -1,
+    -1.1398,
+    -1.2456
+   ],
+   [
+    "audusd",
+    "2021-01-29",
+    1,
+    0.76273,
+    17,
+    0.76103,
+    "stop",
+    -1,
+    -1.1555,
+    -1.2731
+   ],
+   [
+    "eurusd",
+    "2021-03-19",
+    1,
+    1.18807,
+    23.5,
+    1.19042,
+    "target",
+    1,
+    0.8794,
+    0.7943
+   ],
+   [
+    "gbpusd",
+    "2021-03-19",
+    1,
+    1.38382,
+    31,
+    1.38692,
+    "target",
+    1,
+    0.9057,
+    0.8412
+   ],
+   [
+    "usdjpy",
+    "2021-03-19",
+    1,
+    108.629,
+    25.5,
+    108.884,
+    "target",
+    1,
+    0.8906,
+    0.8122
+   ],
+   [
+    "audusd",
+    "2021-03-19",
+    1,
+    0.77186,
+    21.1,
+    0.77397,
+    "target",
+    1,
+    0.8745,
+    0.7797
+   ],
+   [
+    "eurjpy",
+    "2021-03-19",
+    1,
+    129.073,
+    53.8,
+    129.611,
+    "target",
+    1,
+    0.9465,
+    0.9093
+   ],
+   [
+    "usdjpy",
+    "2021-10-01",
+    1,
+    110.946,
+    10.5,
+    111.051,
+    "target",
+    1,
+    0.7334,
+    0.5429
+   ],
+   [
+    "eurjpy",
+    "2021-10-01",
+    1,
+    128.642,
+    13.4,
+    128.776,
+    "target",
+    1,
+    0.7852,
+    0.6359
+   ],
+   [
+    "usdchf",
+    "2021-10-15",
+    -1,
+    0.9247,
+    17.2,
+    0.92298,
+    "target",
+    1,
+    0.8421,
+    0.7258
+   ],
+   [
+    "gbpusd",
+    "2022-02-25",
+    1,
+    1.3342,
+    71.7,
+    1.34137,
+    "target",
+    1,
+    0.9595,
+    0.9317
+   ],
+   [
+    "audusd",
+    "2022-02-25",
+    1,
+    0.718,
+    50.7,
+    0.72307,
+    "target",
+    1,
+    0.9483,
+    0.9088
+   ],
+   [
+    "eurusd",
+    "2022-04-08",
+    -1,
+    1.091,
+    33.8,
+    1.08762,
+    "target",
+    1,
+    0.9174,
+    0.8583
+   ],
+   [
+    "usdchf",
+    "2022-04-08",
+    1,
+    0.93283,
+    13.1,
+    0.93414,
+    "target",
+    1,
+    0.7924,
+    0.6397
+   ],
+   [
+    "usdchf",
+    "2022-04-29",
+    1,
+    0.97258,
+    8.2,
+    0.9734,
+    "target",
+    1,
+    0.6661,
+    0.4222
+   ],
+   [
+    "gbpusd",
+    "2022-08-26",
+    1,
+    1.16952,
+    50.5,
+    1.17144,
+    "time",
+    0.3802,
+    0.3242,
+    0.2846
+   ],
+   [
+    "usdjpy",
+    "2022-08-26",
+    -1,
+    138.194,
+    66.6,
+    138.86,
+    "stop",
+    -1,
+    -1.0439,
+    -1.0739
+   ],
+   [
+    "eurusd",
+    "2022-09-02",
+    1,
+    0.99224,
+    34,
+    0.98884,
+    "stop",
+    -1,
+    -1.0808,
+    -1.1396
+   ],
+   [
+    "audusd",
+    "2022-09-02",
+    1,
+    0.67852,
+    26.7,
+    0.68026,
+    "time",
+    0.6517,
+    0.5541,
+    0.4792
+   ],
+   [
+    "eurjpy",
+    "2022-09-02",
+    1,
+    139.09,
+    51.5,
+    139.605,
+    "target",
+    1,
+    0.9432,
+    0.9044
+   ],
+   [
+    "eurusd",
+    "2022-09-09",
+    -1,
+    1.00917,
+    45,
+    1.01367,
+    "stop",
+    -1,
+    -1.0612,
+    -1.1056
+   ],
+   [
+    "gbpusd",
+    "2022-09-09",
+    -1,
+    1.16325,
+    41.4,
+    1.16739,
+    "stop",
+    -1,
+    -1.0682,
+    -1.1165
+   ],
+   [
+    "usdjpy",
+    "2022-09-09",
+    1,
+    142.399,
+    21.2,
+    142.611,
+    "target",
+    1,
+    0.8613,
+    0.7669
+   ],
+   [
+    "gbpusd",
+    "2022-09-23",
+    1,
+    1.08173,
+    31.1,
+    1.07862,
+    "stop",
+    -1,
+    -1.0896,
+    -1.1539
+   ],
+   [
+    "gbpusd",
+    "2022-10-21",
+    -1,
+    1.13918,
+    94.6,
+    1.12972,
+    "target",
+    1,
+    0.9703,
+    0.9491
+   ],
+   [
+    "eurusd",
+    "2022-11-04",
+    1,
+    0.99235,
+    35.4,
+    0.99589,
+    "target",
+    1,
+    0.9224,
+    0.8659
+   ],
+   [
+    "gbpusd",
+    "2022-11-04",
+    1,
+    1.13188,
+    56.1,
+    1.13749,
+    "target",
+    1,
+    0.9499,
+    0.9143
+   ],
+   [
+    "audusd",
+    "2022-11-04",
+    1,
+    0.64152,
+    56,
+    0.64712,
+    "target",
+    1,
+    0.9538,
+    0.9181
+   ],
+   [
+    "usdchf",
+    "2022-11-04",
+    -1,
+    0.99734,
+    30.1,
+    0.99433,
+    "target",
+    1,
+    0.9087,
+    0.8422
+   ],
+   [
+    "audusd",
+    "2022-11-25",
+    1,
+    0.67197,
+    32.5,
+    0.66872,
+    "stop",
+    -1,
+    -1.0801,
+    -1.1416
+   ],
+   [
+    "usdjpy",
+    "2022-12-16",
+    1,
+    136.17,
+    57.1,
+    136.741,
+    "target",
+    1,
+    0.949,
+    0.914
+   ],
+   [
+    "eurjpy",
+    "2022-12-16",
+    1,
+    144.268,
+    49.1,
+    144.759,
+    "target",
+    1,
+    0.9399,
+    0.8992
+   ],
+   [
+    "usdjpy",
+    "2023-02-03",
+    -1,
+    131.894,
+    68.8,
+    132.582,
+    "stop",
+    -1,
+    -1.0421,
+    -1.0711
+   ],
+   [
+    "eurjpy",
+    "2023-02-03",
+    -1,
+    142.312,
+    68.6,
+    142.33,
+    "time",
+    -0.0262,
+    -0.0691,
+    -0.0983
+   ],
+   [
+    "eurusd",
+    "2023-03-10",
+    -1,
+    1.06974,
+    58.8,
+    1.07334,
+    "time",
+    -0.6122,
+    -0.6595,
+    -0.6936
+   ],
+   [
+    "gbpusd",
+    "2023-03-10",
+    -1,
+    1.209,
+    57,
+    1.2147,
+    "stop",
+    -1,
+    -1.0499,
+    -1.085
+   ],
+   [
+    "usdjpy",
+    "2023-03-10",
+    1,
+    133.909,
+    120.1,
+    132.708,
+    "stop",
+    -1,
+    -1.0242,
+    -1.0408
+   ],
+   [
+    "audusd",
+    "2023-03-10",
+    -1,
+    0.66016,
+    18.5,
+    0.66201,
+    "stop",
+    -1,
+    -1.1404,
+    -1.2485
+   ],
+   [
+    "eurusd",
+    "2023-03-17",
+    -1,
+    1.06852,
+    19.6,
+    1.06656,
+    "target",
+    1,
+    0.8581,
+    0.7561
+   ],
+   [
+    "gbpusd",
+    "2023-03-17",
+    -1,
+    1.2206,
+    23.8,
+    1.21822,
+    "target",
+    1,
+    0.8803,
+    0.7962
+   ],
+   [
+    "usdjpy",
+    "2023-03-31",
+    -1,
+    133.292,
+    46.2,
+    132.83,
+    "target",
+    1,
+    0.9372,
+    0.8939
+   ],
+   [
+    "eurjpy",
+    "2023-03-31",
+    -1,
+    144.52,
+    51.2,
+    144.008,
+    "target",
+    1,
+    0.9424,
+    0.9033
+   ],
+   [
+    "usdjpy",
+    "2023-09-08",
+    1,
+    146.802,
+    100,
+    146.468,
+    "time",
+    -0.334,
+    -0.3636,
+    -0.3836
+   ],
+   [
+    "eurjpy",
+    "2023-09-08",
+    1,
+    157.324,
+    83.8,
+    157.347,
+    "time",
+    0.0274,
+    -0.0084,
+    -0.0323
+   ],
+   [
+    "usdchf",
+    "2023-09-15",
+    1,
+    0.89714,
+    5.2,
+    0.89662,
+    "stop",
+    -1,
+    -1.5199,
+    -1.9046
+   ],
+   [
+    "usdjpy",
+    "2023-09-29",
+    -1,
+    149.504,
+    13.6,
+    149.64,
+    "stop",
+    -1,
+    -1.2186,
+    -1.3656
+   ],
+   [
+    "eurusd",
+    "2023-10-06",
+    1,
+    1.0558,
+    29.2,
+    1.05288,
+    "stop",
+    -1,
+    -1.095,
+    -1.1635
+   ],
+   [
+    "gbpusd",
+    "2023-10-06",
+    1,
+    1.22028,
+    35,
+    1.21678,
+    "stop",
+    -1,
+    -1.0814,
+    -1.1385
+   ],
+   [
+    "audusd",
+    "2023-10-06",
+    1,
+    0.63563,
+    28.3,
+    0.63846,
+    "target",
+    1,
+    0.9086,
+    0.8379
+   ],
+   [
+    "eurjpy",
+    "2023-10-06",
+    1,
+    157.427,
+    57.4,
+    156.853,
+    "stop",
+    -1,
+    -1.0524,
+    -1.0873
+   ],
+   [
+    "usdjpy",
+    "2024-04-12",
+    1,
+    153.184,
+    12.8,
+    153.312,
+    "target",
+    1,
+    0.7665,
+    0.6102
+   ],
+   [
+    "eurjpy",
+    "2024-04-12",
+    1,
+    162.798,
+    31.9,
+    163.117,
+    "target",
+    1,
+    0.9049,
+    0.8422
+   ],
+   [
+    "usdjpy",
+    "2024-04-26",
+    1,
+    157.934,
+    41.1,
+    158.345,
+    "target",
+    1,
+    0.9267,
+    0.8781
+   ],
+   [
+    "eurjpy",
+    "2024-04-26",
+    1,
+    168.908,
+    39.9,
+    169.307,
+    "target",
+    1,
+    0.9233,
+    0.8732
+   ],
+   [
+    "eurusd",
+    "2024-06-07",
+    1,
+    1.07731,
+    28.6,
+    1.07445,
+    "stop",
+    -1,
+    -1.0974,
+    -1.1673
+   ],
+   [
+    "eurjpy",
+    "2024-06-07",
+    1,
+    168.881,
+    45.9,
+    168.422,
+    "stop",
+    -1,
+    -1.0667,
+    -1.1102
+   ],
+   [
+    "eurusd",
+    "2024-06-28",
+    -1,
+    1.07395,
+    26.4,
+    1.07659,
+    "stop",
+    -1,
+    -1.1054,
+    -1.1812
+   ],
+   [
+    "eurjpy",
+    "2024-06-28",
+    -1,
+    172.724,
+    33.4,
+    173.058,
+    "stop",
+    -1,
+    -1.0921,
+    -1.152
+   ],
+   [
+    "eurusd",
+    "2024-07-05",
+    1,
+    1.08187,
+    19.7,
+    1.08384,
+    "target",
+    1,
+    0.8585,
+    0.757
+   ],
+   [
+    "audusd",
+    "2024-07-05",
+    1,
+    0.67424,
+    6.6,
+    0.6749,
+    "target",
+    1,
+    0.6055,
+    0.3025
+   ],
+   [
+    "eurjpy",
+    "2024-07-05",
+    1,
+    173.916,
+    38,
+    173.536,
+    "stop",
+    -1,
+    -1.0811,
+    -1.1338
+   ],
+   [
+    "eurusd",
+    "2024-07-12",
+    1,
+    1.08892,
+    17.8,
+    1.0907,
+    "target",
+    1,
+    0.8433,
+    0.7309
+   ],
+   [
+    "gbpusd",
+    "2024-07-12",
+    1,
+    1.2979,
+    9.4,
+    1.29696,
+    "stop",
+    -1,
+    -1.3068,
+    -1.5196
+   ],
+   [
+    "audusd",
+    "2024-07-12",
+    1,
+    0.67724,
+    11.8,
+    0.67842,
+    "target",
+    1,
+    0.7793,
+    0.6098
+   ],
+   [
+    "usdjpy",
+    "2024-10-25",
+    -1,
+    152.946,
+    64.2,
+    153.588,
+    "stop",
+    -1,
+    -1.0465,
+    -1.0777
+   ],
+   [
+    "eurjpy",
+    "2024-10-25",
+    -1,
+    165.084,
+    65.2,
+    165.736,
+    "stop",
+    -1,
+    -1.0467,
+    -1.0773
+   ],
+   [
+    "eurusd",
+    "2024-11-01",
+    -1,
+    1.08816,
+    48,
+    1.08842,
+    "time",
+    -0.0542,
+    -0.1123,
+    -0.154
+   ],
+   [
+    "gbpusd",
+    "2024-11-01",
+    -1,
+    1.29648,
+    45.8,
+    1.29415,
+    "time",
+    0.5087,
+    0.4458,
+    0.4021
+   ],
+   [
+    "usdjpy",
+    "2024-11-01",
+    1,
+    152.44,
+    55.9,
+    151.881,
+    "stop",
+    -1,
+    -1.0534,
+    -1.0892
+   ],
+   [
+    "audusd",
+    "2024-11-01",
+    -1,
+    0.65907,
+    31.3,
+    0.65835,
+    "time",
+    0.23,
+    0.1471,
+    0.0832
+   ],
+   [
+    "usdchf",
+    "2024-11-01",
+    1,
+    0.86774,
+    20.8,
+    0.86566,
+    "stop",
+    -1,
+    -1.1294,
+    -1.2255
+   ],
+   [
+    "eurusd",
+    "2024-11-22",
+    -1,
+    1.04824,
+    63.8,
+    1.04777,
+    "time",
+    0.0737,
+    0.0302,
+    -0.0011
+   ],
+   [
+    "gbpusd",
+    "2024-11-22",
+    -1,
+    1.25867,
+    54.6,
+    1.25506,
+    "time",
+    0.6612,
+    0.6087,
+    0.572
+   ],
+   [
+    "usdjpy",
+    "2024-11-22",
+    1,
+    154.256,
+    50.6,
+    153.75,
+    "stop",
+    -1,
+    -1.0592,
+    -1.0987
+   ],
+   [
+    "audusd",
+    "2024-11-22",
+    -1,
+    0.65346,
+    33.8,
+    0.65008,
+    "target",
+    1,
+    0.9233,
+    0.8641
+   ],
+   [
+    "usdchf",
+    "2024-11-22",
+    1,
+    0.89134,
+    27.7,
+    0.88857,
+    "stop",
+    -1,
+    -1.0975,
+    -1.1697
+   ],
+   [
+    "eurjpy",
+    "2024-11-22",
+    -1,
+    161.698,
+    43.8,
+    161.26,
+    "target",
+    1,
+    0.9309,
+    0.8852
+   ],
+   [
+    "usdchf",
+    "2025-01-17",
+    1,
+    0.91427,
+    7.3,
+    0.915,
+    "target",
+    1,
+    0.6286,
+    0.3546
+   ],
+   [
+    "eurjpy",
+    "2025-01-24",
+    1,
+    163.324,
+    37.6,
+    162.948,
+    "stop",
+    -1,
+    -1.0807,
+    -1.1339
+   ],
+   [
+    "eurusd",
+    "2025-01-31",
+    1,
+    1.02508,
+    109.8,
+    1.0276,
+    "time",
+    0.2295,
+    0.2044,
+    0.1861
+   ],
+   [
+    "gbpusd",
+    "2025-01-31",
+    1,
+    1.23041,
+    88.5,
+    1.23926,
+    "target",
+    1,
+    0.9678,
+    0.9452
+   ],
+   [
+    "audusd",
+    "2025-01-31",
+    1,
+    0.61538,
+    57,
+    0.60968,
+    "stop",
+    -1,
+    -1.0452,
+    -1.0803
+   ],
+   [
+    "usdchf",
+    "2025-01-31",
+    -1,
+    0.91454,
+    32.2,
+    0.91776,
+    "stop",
+    -1,
+    -1.0842,
+    -1.1463
+   ],
+   [
+    "eurjpy",
+    "2025-01-31",
+    1,
+    158.924,
+    185,
+    158.961,
+    "time",
+    0.02,
+    0.0037,
+    -0.0071
+   ],
+   [
+    "eurusd",
+    "2025-02-07",
+    1,
+    1.02914,
+    35.6,
+    1.0327,
+    "target",
+    1,
+    0.9224,
+    0.8662
+   ],
+   [
+    "audusd",
+    "2025-02-07",
+    1,
+    0.62476,
+    25,
+    0.62726,
+    "target",
+    1,
+    0.8968,
+    0.8168
+   ],
+   [
+    "eurjpy",
+    "2025-02-07",
+    1,
+    156.019,
+    36,
+    156.379,
+    "target",
+    1,
+    0.9166,
+    0.8611
+   ],
+   [
+    "eurusd",
+    "2025-02-28",
+    -1,
+    1.04038,
+    28.4,
+    1.04322,
+    "stop",
+    -1,
+    -1.0975,
+    -1.1679
+   ],
+   [
+    "eurjpy",
+    "2025-02-28",
+    -1,
+    156.802,
+    51.6,
+    156.286,
+    "target",
+    1,
+    0.9418,
+    0.903
+   ],
+   [
+    "eurusd",
+    "2025-04-04",
+    1,
+    1.09168,
+    47.7,
+    1.09645,
+    "target",
+    1,
+    0.9415,
+    0.8996
+   ],
+   [
+    "gbpusd",
+    "2025-04-04",
+    1,
+    1.28417,
+    56.8,
+    1.28985,
+    "target",
+    1,
+    0.9493,
+    0.9141
+   ],
+   [
+    "usdjpy",
+    "2025-04-04",
+    1,
+    145.622,
+    139.2,
+    147.014,
+    "target",
+    1,
+    0.9788,
+    0.9644
+   ],
+   [
+    "audusd",
+    "2025-04-04",
+    1,
+    0.60047,
+    35.4,
+    0.59693,
+    "stop",
+    -1,
+    -1.0726,
+    -1.1291
+   ],
+   [
+    "usdchf",
+    "2025-04-04",
+    1,
+    0.85526,
+    54.9,
+    0.84977,
+    "stop",
+    -1,
+    -1.0489,
+    -1.0853
+   ],
+   [
+    "eurusd",
+    "2025-04-11",
+    1,
+    1.132,
+    40,
+    1.136,
+    "target",
+    1,
+    0.9298,
+    0.8798
+   ],
+   [
+    "usdjpy",
+    "2025-04-11",
+    -1,
+    143.773,
+    30.1,
+    143.472,
+    "target",
+    1,
+    0.9021,
+    0.8356
+   ],
+   [
+    "usdchf",
+    "2025-04-11",
+    -1,
+    0.81851,
+    32.9,
+    0.81522,
+    "target",
+    1,
+    0.9189,
+    0.8581
+   ],
+   [
+    "eurusd",
+    "2025-05-09",
+    1,
+    1.12138,
+    34.9,
+    1.11789,
+    "stop",
+    -1,
+    -1.0804,
+    -1.1377
+   ],
+   [
+    "gbpusd",
+    "2025-05-09",
+    1,
+    1.32732,
+    30.2,
+    1.3243,
+    "stop",
+    -1,
+    -1.0959,
+    -1.1622
+   ],
+   [
+    "usdjpy",
+    "2025-05-09",
+    -1,
+    146.158,
+    78.5,
+    146.943,
+    "stop",
+    -1,
+    -1.0377,
+    -1.0632
+   ],
+   [
+    "usdchf",
+    "2025-05-09",
+    -1,
+    0.83474,
+    32.4,
+    0.83798,
+    "stop",
+    -1,
+    -1.0826,
+    -1.1443
+   ],
+   [
+    "eurusd",
+    "2025-06-20",
+    1,
+    1.14742,
+    48,
+    1.15222,
+    "target",
+    1,
+    0.9413,
+    0.8997
+   ],
+   [
+    "gbpusd",
+    "2025-06-20",
+    1,
+    1.34075,
+    41.9,
+    1.34494,
+    "target",
+    1,
+    0.9307,
+    0.883
+   ],
+   [
+    "usdjpy",
+    "2025-06-20",
+    -1,
+    146.557,
+    46.5,
+    147.022,
+    "stop",
+    -1,
+    -1.0636,
+    -1.1067
+   ],
+   [
+    "audusd",
+    "2025-06-20",
+    1,
+    0.6425,
+    24.2,
+    0.64008,
+    "stop",
+    -1,
+    -1.107,
+    -1.1896
+   ],
+   [
+    "eurusd",
+    "2025-07-11",
+    1,
+    1.16698,
+    21.3,
+    1.16911,
+    "target",
+    1,
+    0.8674,
+    0.7735
+   ],
+   [
+    "eurjpy",
+    "2025-07-11",
+    1,
+    171.79,
+    56,
+    172.35,
+    "target",
+    1,
+    0.9451,
+    0.9094
+   ],
+   [
+    "usdjpy",
+    "2025-07-18",
+    1,
+    148.218,
+    62.6,
+    147.592,
+    "stop",
+    -1,
+    -1.0474,
+    -1.0793
+   ],
+   [
+    "eurjpy",
+    "2025-07-18",
+    1,
+    172.437,
+    59.1,
+    172.376,
+    "time",
+    -0.1032,
+    -0.1553,
+    -0.1891
+   ],
+   [
+    "eurjpy",
+    "2025-07-25",
+    -1,
+    173.708,
+    32.8,
+    173.38,
+    "target",
+    1,
+    0.906,
+    0.8451
+   ],
+   [
+    "usdjpy",
+    "2025-09-05",
+    -1,
+    147.992,
+    57.4,
+    148.566,
+    "stop",
+    -1,
+    -1.0517,
+    -1.0865
+   ],
+   [
+    "eurjpy",
+    "2025-09-05",
+    -1,
+    173.439,
+    70.5,
+    173.426,
+    "time",
+    0.0184,
+    -0.0253,
+    -0.0536
+   ],
+   [
+    "gbpusd",
+    "2025-10-03",
+    1,
+    1.34432,
+    36.4,
+    1.34796,
+    "target",
+    1,
+    0.9202,
+    0.8652
+   ],
+   [
+    "audusd",
+    "2025-10-03",
+    1,
+    0.65926,
+    9.6,
+    0.66022,
+    "target",
+    1,
+    0.7295,
+    0.5212
+   ],
+   [
+    "usdchf",
+    "2025-10-03",
+    -1,
+    0.79662,
+    14,
+    0.79802,
+    "stop",
+    -1,
+    -1.1899,
+    -1.3327
+   ],
+   [
+    "usdjpy",
+    "2025-10-10",
+    -1,
+    151.81,
+    63.6,
+    152.446,
+    "stop",
+    -1,
+    -1.0469,
+    -1.0784
+   ],
+   [
+    "audusd",
+    "2025-10-10",
+    -1,
+    0.64976,
+    24.1,
+    0.65217,
+    "stop",
+    -1,
+    -1.1076,
+    -1.1906
+   ],
+   [
+    "usdchf",
+    "2025-10-10",
+    -1,
+    0.80112,
+    19.4,
+    0.80306,
+    "stop",
+    -1,
+    -1.1371,
+    -1.2402
+   ],
+   [
+    "eurjpy",
+    "2025-10-10",
+    -1,
+    176.326,
+    62,
+    176.226,
+    "time",
+    0.1613,
+    0.1114,
+    0.0791
+   ],
+   [
+    "usdchf",
+    "2025-10-17",
+    1,
+    0.79276,
+    8.4,
+    0.7936,
+    "target",
+    1,
+    0.6837,
+    0.4456
+   ],
+   [
+    "audusd",
+    "2025-10-24",
+    -1,
+    0.6539,
+    24.9,
+    0.65531,
+    "time",
+    -0.5663,
+    -0.6705,
+    -0.7508
+   ],
+   [
+    "usdjpy",
+    "2025-11-07",
+    -1,
+    153.713,
+    30.3,
+    153.41,
+    "target",
+    1,
+    0.9013,
+    0.8353
+   ],
+   [
+    "audusd",
+    "2025-12-26",
+    1,
+    0.67096,
+    5.6,
+    0.67152,
+    "target",
+    1,
+    0.5354,
+    0.1782
+   ],
+   [
+    "audusd",
+    "2026-01-02",
+    1,
+    0.66855,
+    9.5,
+    0.6676,
+    "stop",
+    -1,
+    -1.2738,
+    -1.4843
+   ],
+   [
+    "eurusd",
+    "2026-01-16",
+    1,
+    1.15844,
+    14.4,
+    1.15988,
+    "target",
+    1,
+    0.8041,
+    0.6652
+   ],
+   [
+    "gbpusd",
+    "2026-01-16",
+    1,
+    1.33556,
+    24,
+    1.33796,
+    "target",
+    1,
+    0.8791,
+    0.7958
+   ],
+   [
+    "audusd",
+    "2026-01-16",
+    1,
+    0.66716,
+    12,
+    0.66836,
+    "target",
+    1,
+    0.7833,
+    0.6166
+   ],
+   [
+    "eurjpy",
+    "2026-01-16",
+    1,
+    182.898,
+    47.7,
+    183.375,
+    "target",
+    1,
+    0.9345,
+    0.8926
+   ],
+   [
+    "eurusd",
+    "2026-01-23",
+    -1,
+    1.189,
+    62.3,
+    1.18859,
+    "time",
+    0.0658,
+    0.0203,
+    -0.0118
+   ],
+   [
+    "gbpusd",
+    "2026-01-23",
+    -1,
+    1.36796,
+    34.2,
+    1.36454,
+    "target",
+    1,
+    0.9147,
+    0.8563
+   ],
+   [
+    "usdjpy",
+    "2026-01-23",
+    1,
+    154.599,
+    113.7,
+    153.462,
+    "stop",
+    -1,
+    -1.0263,
+    -1.0439
+   ],
+   [
+    "audusd",
+    "2026-01-23",
+    -1,
+    0.69322,
+    35.9,
+    0.69322,
+    "time",
+    0,
+    -0.0728,
+    -0.1285
+   ],
+   [
+    "usdchf",
+    "2026-01-23",
+    1,
+    0.7751,
+    51.5,
+    0.77536,
+    "time",
+    0.0505,
+    -0.0009,
+    -0.0398
+   ],
+   [
+    "eurjpy",
+    "2026-01-23",
+    1,
+    183.81,
+    41.4,
+    183.396,
+    "stop",
+    -1,
+    -1.0755,
+    -1.1238
+   ],
+   [
+    "eurusd",
+    "2026-02-27",
+    1,
+    1.17773,
+    39.9,
+    1.17374,
+    "stop",
+    -1,
+    -1.0709,
+    -1.1211
+   ],
+   [
+    "gbpusd",
+    "2026-02-27",
+    1,
+    1.34166,
+    70.2,
+    1.33464,
+    "stop",
+    -1,
+    -1.0414,
+    -1.0699
+   ],
+   [
+    "audusd",
+    "2026-02-27",
+    1,
+    0.7053,
+    63,
+    0.7116,
+    "target",
+    1,
+    0.9585,
+    0.9267
+   ],
+   [
+    "usdchf",
+    "2026-02-27",
+    1,
+    0.76743,
+    16.6,
+    0.76909,
+    "target",
+    1,
+    0.8406,
+    0.7202
+   ],
+   [
+    "eurjpy",
+    "2026-02-27",
+    1,
+    183.89,
+    53.8,
+    184.428,
+    "target",
+    1,
+    0.9419,
+    0.9047
+   ],
+   [
+    "eurusd",
+    "2026-03-06",
+    1,
+    1.15475,
+    69.3,
+    1.15916,
+    "time",
+    0.6364,
+    0.5957,
+    0.5668
+   ],
+   [
+    "gbpusd",
+    "2026-03-06",
+    1,
+    1.33426,
+    67.9,
+    1.33928,
+    "time",
+    0.7393,
+    0.6966,
+    0.6672
+   ],
+   [
+    "audusd",
+    "2026-03-06",
+    1,
+    0.6986,
+    44,
+    0.703,
+    "target",
+    1,
+    0.9406,
+    0.8951
+   ],
+   [
+    "usdchf",
+    "2026-03-06",
+    -1,
+    0.77942,
+    34.4,
+    0.77874,
+    "time",
+    0.1977,
+    0.1206,
+    0.0625
+   ],
+   [
+    "eurjpy",
+    "2026-03-06",
+    1,
+    182.565,
+    76.9,
+    183.334,
+    "target",
+    1,
+    0.9594,
+    0.9334
+   ],
+   [
+    "eurusd",
+    "2026-03-20",
+    1,
+    1.1542,
+    29.1,
+    1.15129,
+    "stop",
+    -1,
+    -1.0969,
+    -1.1656
+   ],
+   [
+    "eurjpy",
+    "2026-03-20",
+    1,
+    183.879,
+    36.2,
+    184.241,
+    "target",
+    1,
+    0.9136,
+    0.8584
+   ],
+   [
+    "eurusd",
+    "2026-04-10",
+    1,
+    1.16736,
+    51.4,
+    1.17096,
+    "time",
+    0.7004,
+    0.6454,
+    0.6065
+   ],
+   [
+    "gbpusd",
+    "2026-04-10",
+    1,
+    1.3408,
+    52,
+    1.346,
+    "target",
+    1,
+    0.9442,
+    0.9057
+   ],
+   [
+    "usdjpy",
+    "2026-04-10",
+    -1,
+    159.602,
+    32.7,
+    159.746,
+    "time",
+    -0.4404,
+    -0.5327,
+    -0.5938
+   ],
+   [
+    "audusd",
+    "2026-04-10",
+    1,
+    0.70098,
+    54.1,
+    0.70639,
+    "target",
+    1,
+    0.9517,
+    0.9147
+   ],
+   [
+    "usdchf",
+    "2026-04-10",
+    -1,
+    0.79098,
+    18.2,
+    0.7928,
+    "stop",
+    -1,
+    -1.1459,
+    -1.2558
+   ],
+   [
+    "eurjpy",
+    "2026-04-10",
+    1,
+    186.3,
+    45.5,
+    186.755,
+    "target",
+    1,
+    0.931,
+    0.8871
+   ],
+   [
+    "eurusd",
+    "2026-04-17",
+    1,
+    1.17322,
+    31.6,
+    1.17638,
+    "target",
+    1,
+    0.9105,
+    0.8472
+   ],
+   [
+    "gbpusd",
+    "2026-04-17",
+    1,
+    1.34835,
+    34.9,
+    1.35184,
+    "target",
+    1,
+    0.9167,
+    0.8594
+   ],
+   [
+    "audusd",
+    "2026-04-17",
+    1,
+    0.71182,
+    49.2,
+    0.71674,
+    "target",
+    1,
+    0.9467,
+    0.9061
+   ],
+   [
+    "eurusd",
+    "2026-04-24",
+    1,
+    1.17082,
+    10.5,
+    1.17187,
+    "target",
+    1,
+    0.7308,
+    0.5403
+   ],
+   [
+    "gbpusd",
+    "2026-04-24",
+    1,
+    1.35106,
+    20.2,
+    1.35308,
+    "target",
+    1,
+    0.856,
+    0.757
+   ],
+   [
+    "usdjpy",
+    "2026-04-24",
+    -1,
+    159.567,
+    21.9,
+    159.348,
+    "target",
+    1,
+    0.8622,
+    0.7709
+   ],
+   [
+    "usdchf",
+    "2026-04-24",
+    -1,
+    0.78584,
+    8.6,
+    0.78498,
+    "target",
+    1,
+    0.6914,
+    0.4589
+   ],
+   [
+    "eurusd",
+    "2026-05-01",
+    -1,
+    1.17414,
+    20.2,
+    1.17212,
+    "target",
+    1,
+    0.86,
+    0.761
+   ],
+   [
+    "gbpusd",
+    "2026-05-01",
+    -1,
+    1.3604,
+    29,
+    1.3575,
+    "target",
+    1,
+    0.8996,
+    0.8306
+   ],
+   [
+    "usdjpy",
+    "2026-05-01",
+    1,
+    156.75,
+    33.8,
+    157.088,
+    "target",
+    1,
+    0.9111,
+    0.8519
+   ],
+   [
+    "eurusd",
+    "2026-05-08",
+    1,
+    1.1763,
+    22.2,
+    1.17852,
+    "target",
+    1,
+    0.8726,
+    0.7825
+   ],
+   [
+    "gbpusd",
+    "2026-05-08",
+    1,
+    1.3569,
+    63.4,
+    1.36324,
+    "target",
+    1,
+    0.9541,
+    0.9225
+   ],
+   [
+    "audusd",
+    "2026-05-08",
+    1,
+    0.72198,
+    27.5,
+    0.72473,
+    "target",
+    1,
+    0.9045,
+    0.8318
+   ],
+   [
+    "usdchf",
+    "2026-05-08",
+    -1,
+    0.77771,
+    12.8,
+    0.77899,
+    "stop",
+    -1,
+    -1.207,
+    -1.3633
+   ],
+   [
+    "eurjpy",
+    "2026-05-08",
+    1,
+    184.367,
+    27.9,
+    184.646,
+    "target",
+    1,
+    0.8878,
+    0.8161
+   ],
+   [
+    "eurusd",
+    "2026-05-22",
+    -1,
+    1.16334,
+    31.1,
+    1.16422,
+    "time",
+    -0.283,
+    -0.3737,
+    -0.4381
+   ],
+   [
+    "gbpusd",
+    "2026-05-22",
+    -1,
+    1.34564,
+    25.2,
+    1.34816,
+    "stop",
+    -1,
+    -1.1153,
+    -1.1947
+   ],
+   [
+    "usdjpy",
+    "2026-05-22",
+    1,
+    158.892,
+    31.4,
+    158.899,
+    "time",
+    0.0223,
+    -0.0737,
+    -0.1374
+   ],
+   [
+    "audusd",
+    "2026-05-22",
+    -1,
+    0.71547,
+    26.6,
+    0.71813,
+    "stop",
+    -1,
+    -1.0986,
+    -1.1738
+   ],
+   [
+    "audusd",
+    "2026-06-05",
+    1,
+    0.70296,
+    15.6,
+    0.70452,
+    "target",
+    1,
+    0.8323,
+    0.7041
+   ],
+   [
+    "eurjpy",
+    "2026-06-05",
+    1,
+    184.524,
+    20.3,
+    184.727,
+    "target",
+    1,
+    0.8458,
+    0.7473
+   ],
+   [
+    "gbpusd",
+    "2026-06-19",
+    1,
+    1.31972,
+    37.3,
+    1.32345,
+    "target",
+    1,
+    0.9224,
+    0.8688
+   ],
+   [
+    "audusd",
+    "2026-07-17",
+    1,
+    0.69669,
+    14.7,
+    0.69816,
+    "target",
+    1,
+    0.8222,
+    0.6862
+   ],
+   [
+    "eurusd",
+    "2026-07-24",
+    -1,
+    1.1391,
+    20.4,
+    1.14114,
+    "stop",
+    -1,
+    -1.1379,
+    -1.2359
+   ],
+   [
+    "gbpusd",
+    "2026-07-24",
+    -1,
+    1.33417,
+    17.8,
+    1.33595,
+    "stop",
+    -1,
+    -1.1629,
+    -1.2753
+   ],
+   [
+    "usdjpy",
+    "2026-07-24",
+    1,
+    163.642,
+    20.8,
+    163.434,
+    "stop",
+    -1,
+    -1.146,
+    -1.2421
+   ],
+   [
+    "audusd",
+    "2026-07-24",
+    -1,
+    0.70026,
+    18.9,
+    0.69924,
+    "time",
+    0.5397,
+    0.4013,
+    0.2955
+   ],
+   [
+    "usdchf",
+    "2026-07-24",
+    1,
+    0.81593,
+    22.3,
+    0.81816,
+    "target",
+    1,
+    0.8804,
+    0.7907
+   ],
+   [
+    "eurusd",
+    "2026-07-31",
+    -1,
+    1.1549,
+    18.4,
+    1.15306,
+    "target",
+    1,
+    0.8468,
+    0.7381
+   ],
+   [
+    "audusd",
+    "2026-07-31",
+    -1,
+    0.70403,
+    9.9,
+    0.70502,
+    "stop",
+    -1,
+    -1.2643,
+    -1.4663
+   ],
+   [
+    "eurjpy",
+    "2026-09-04",
+    1,
+    181.277,
+    19.7,
+    181.474,
+    "target",
+    1,
+    0.8418,
+    0.7403
+   ],
+   [
+    "eurusd",
+    "2026-10-16",
+    1,
+    1.11976,
+    41.1,
+    1.12088,
+    "time",
+    0.2725,
+    0.2043,
+    0.1556
+   ],
+   [
+    "audusd",
+    "2026-10-16",
+    -1,
+    0.69635,
+    17.5,
+    0.6981,
+    "stop",
+    -1,
+    -1.1493,
+    -1.2636
+   ],
+   [
+    "eurjpy",
+    "2026-10-16",
+    1,
+    176.926,
+    66.6,
+    177.592,
+    "target",
+    1,
+    0.9535,
+    0.9235
+   ],
+   [
+    "eurusd",
+    "2026-10-23",
+    -1,
+    1.12162,
+    13,
+    1.12032,
+    "target",
+    1,
+    0.7843,
+    0.6304
+   ],
+   [
+    "eurjpy",
+    "2026-10-23",
+    -1,
+    176.182,
+    44.2,
+    176.137,
+    "time",
+    0.1018,
+    0.0318,
+    -0.0134
+   ]
+  ]
+ }
+}
