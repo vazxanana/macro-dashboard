@@ -1,0 +1,242 @@
+{
+ "study": "gold-spx-vol-regime",
+ "built": "2026-11-14",
+ "data": {
+  "gold": [
+   "2006-03-20",
+   "2026-11-13",
+   5369
+  ],
+  "spx": [
+   "2003-03-24",
+   "2026-11-13",
+   6129
+  ],
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "E1": "(SPX RV5/RV60) / (XAU RV5/RV60) crosses up through 1.5",
+  "E2": "SPX RV5 crosses above its 252-day median",
+  "E3": "SPX RV5 crosses below its 252-day median",
+  "cooldown": 5,
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "atr": "2 x ATR(20)",
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ]
+ },
+ "events": {
+  "E1": {
+   "is": 153,
+   "oos": 143,
+   "noGoldBar": []
+  },
+  "E2": {
+   "is": 131,
+   "oos": 138,
+   "noGoldBar": []
+  },
+  "E3": {
+   "is": 135,
+   "oos": 137,
+   "noGoldBar": []
+  }
+ },
+ "tests": {
+  "T1": {
+   "event": "E1",
+   "side": "long",
+   "hold": 5,
+   "is": {
+    "n": 153,
+    "ex": -0.068,
+    "tEx": -1.21,
+    "p": 0.8846,
+    "months": 96,
+    "net": -0.071,
+    "tNet": -1.21,
+    "gross": -0.021,
+    "tGross": -0.36,
+    "base": -0.002,
+    "win": 46.41,
+    "stops": 32,
+    "net2x": -0.12,
+    "ex2x": -0.069
+   },
+   "oos": {
+    "n": 143,
+    "ex": -0.01,
+    "tEx": -0.16,
+    "p": 0.5639,
+    "months": 93,
+    "net": 0.054,
+    "tNet": 0.86,
+    "gross": 0.109,
+    "tGross": 1.71,
+    "base": 0.064,
+    "win": 53.15,
+    "stops": 23,
+    "net2x": 0,
+    "ex2x": -0.011
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 13,
+    "mean": 0.009,
+    "max": 0.114,
+    "min": -0.105
+   },
+   "control": {
+    "seeds": 40,
+    "beaten": 14,
+    "mean": 0.01,
+    "max": 0.112,
+    "min": -0.187
+   },
+   "holm": 1,
+   "checks": {
+    "oosExPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false,
+    "control": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "event": "E2",
+   "side": "long",
+   "hold": 10,
+   "is": {
+    "n": 131,
+    "ex": -0.069,
+    "tEx": -0.8,
+    "p": 0.7865,
+    "months": 85,
+    "net": -0.069,
+    "tNet": -0.78,
+    "gross": 0.007,
+    "tGross": 0.08,
+    "base": -0.001,
+    "win": 45.04,
+    "stops": 53,
+    "net2x": -0.146,
+    "ex2x": -0.07
+   },
+   "oos": {
+    "n": 138,
+    "ex": -0.023,
+    "tEx": -0.23,
+    "p": 0.5913,
+    "months": 92,
+    "net": 0.077,
+    "tNet": 0.73,
+    "gross": 0.164,
+    "tGross": 1.54,
+    "base": 0.099,
+    "win": 45.65,
+    "stops": 42,
+    "net2x": -0.01,
+    "ex2x": -0.025
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 17,
+    "mean": -0.013,
+    "max": 0.155,
+    "min": -0.154
+   },
+   "control": {
+    "seeds": 40,
+    "beaten": 10,
+    "mean": 0.02,
+    "max": 0.187,
+    "min": -0.098
+   },
+   "holm": 1,
+   "checks": {
+    "oosExPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false,
+    "control": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "event": "E3",
+   "side": "short",
+   "hold": 10,
+   "is": {
+    "n": 135,
+    "ex": 0.076,
+    "tEx": 0.86,
+    "p": 0.1954,
+    "months": 94,
+    "net": -0.013,
+    "tNet": -0.14,
+    "gross": 0.005,
+    "tGross": 0.05,
+    "base": -0.089,
+    "win": 39.26,
+    "stops": 46,
+    "net2x": -0.031,
+    "ex2x": 0.076
+   },
+   "oos": {
+    "n": 137,
+    "ex": 0.022,
+    "tEx": 0.31,
+    "p": 0.3769,
+    "months": 93,
+    "net": -0.135,
+    "tNet": -1.7,
+    "gross": -0.12,
+    "tGross": -1.52,
+    "base": -0.157,
+    "win": 40.88,
+    "stops": 47,
+    "net2x": -0.149,
+    "ex2x": 0.022
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 30,
+    "mean": -0.001,
+    "max": 0.124,
+    "min": -0.119
+   },
+   "control": {
+    "seeds": 40,
+    "beaten": 25,
+    "mean": -0.001,
+    "max": 0.114,
+    "min": -0.124
+   },
+   "holm": 1,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false,
+    "placebo": false,
+    "control": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
