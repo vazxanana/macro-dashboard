@@ -112,6 +112,7 @@ paper system with a measured, clearly negative record.
 | 94 | US cash session leads the Tokyo / Hong Kong session (JP225, HK33, trade from the Asian open) | FAIL, 0 of 3: −0.041R a trade net on JP225 and HK33 (t −5.3 / −3.9); the US move is already in the opening gap, and the Asian session then slightly reverses (worse than random signs) | #913 |
 | 95 | US index midday turn: fade or follow the 09:30-11:30 NY move over 11:30-14:00 (NAS100, SPX500) | FAIL, 0 of 4: no turn (fading loses even before costs); a slight continuation (+0.016R gross) smaller than the ~0.03R round trip; every random midday window loses its cost | #914 |
 | 96 | Gotobi: can a resting sell limit placed before the fix capture the 00:55 result? (execution study) | **NOT CAPTURABLE**: best limit variant keeps 5 % of the 00:55 result on strict fills (23 % on touch fills, t ≤ 0.74); limits fill in the 00:54 candle and miss the best days; a market sell at 00:54 keeps 49 % (t 1.46). The gotobi effect is real (#889, #912) but not tradeable by a copy that cannot hit 00:55:00 | #915 |
+| 97 | Fade the European index opening gap after a US-led night (DE40, UK100 + EU50; tests #913's post-hoc reversal on new markets) | FAIL, 0 of 3: about zero before costs, −0.03 to −0.06R net; the US move is in the European gap and nothing is left for the session | #916 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
