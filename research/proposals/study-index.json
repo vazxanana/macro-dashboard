@@ -1,0 +1,6389 @@
+{
+ "title": "Study index: every pre-registered study, merged or not",
+ "regenerate": "git fetch origin && node scripts/study-index.mjs",
+ "main": {
+  "ref": "origin/main",
+  "sha": "c2102a57dd77a0129d50267d895ec5334b4e3171",
+  "at": "2026-11-13T22:13:07+00:00"
+ },
+ "branchesRead": 632,
+ "prsRead": 177,
+ "counts": {
+  "total": 246,
+  "merged": 82,
+  "unmerged": 164,
+  "verdict": {
+   "pass": 9,
+   "fail": 194,
+   "inc": 32,
+   "nm": 6,
+   "": 5
+  },
+  "replicate": 10,
+  "byClass": {
+   "gold": 42,
+   "indices": 53,
+   "forex": 39,
+   "rates": 10,
+   "commodities": 12,
+   "crypto": 13,
+   "cross-asset": 51,
+   "meta": 26
+  }
+ },
+ "unread": [
+  "ict-markets",
+  "macro-vol",
+  "news-filter",
+  "decay-monitor",
+  "expectations"
+ ],
+ "studies": [
+  {
+   "topic": "council-edge",
+   "title": "Council edge: gold replica, trend, trendline and engulf on OANDA gold 2020–26, three pre-registered changes, and the paper-record breakdown",
+   "rule": "x1 = $0.60 a unit round trip (spread 0.30 + 0.15 slippage each way, council/fills.mjs), x2 = $1.20.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. None of the three pre-registered changes passes; keep the live rules.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-09",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "cycle-gate",
+   "title": "The market-cycle gate",
+   "rule": "11 streams (gtrend, geg, gtrend5, gtl, gmp, replica, mosha-bo, scalp, intraday, rscalp, rintra) x 3 gates = 33 tests.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 11 systems. The primary gate G2 (trade only on the side of the last H4 break, and not while H1 is",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "mosha-bo-er",
+   "merged": false,
+   "pr": 819,
+   "draft": true,
+   "otherBranches": [
+    "cycle-gate-study"
+   ]
+  },
+  {
+   "topic": "drd-metals-book",
+   "title": "the weekly-bull daily rejection long as one book on gold and silver, one position at a time",
+   "rule": "research/edge/gold-drd-long/run.mjs: 17:00 New York days (days), weeks (weeks), weekly structure (weekState), signals (signals, threshold 0.7, longs), the trade (simulate: next day's first H1 open,…",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3. Held one position at a time across gold and silver and counted on calendar-month sums, no stream",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "drd-metals-book",
+   "merged": false,
+   "pr": 816,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "engulf-ladder",
+   "title": "Engulf ladder on gold (Daily → H4 → H1)",
+   "rule": "Engulf buy zone on a timeframe (Daily, H4 or H1): a red base candle (close < open).",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. T1, the ladder (limit at the 50 % of the H1 engulf, stop $0.30 past the H4 zone, 2R, 5 days), made",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "engulf-ladder",
+   "merged": false,
+   "pr": 822,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "geg-variants",
+   "title": "Gold daily engulf: entry-side variants",
+   "rule": "Data.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "NOT BETTER.",
+   "figures": {
+    "R": -0.02,
+    "Rper": "position"
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-asia-break",
+   "title": "Asian range breakout into London on gold",
+   "rule": "Skip the day when its range (high - low) is more than 2 x the median of the previous 20 used days' ranges (fewer than 20 previous used days: skip).",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, neither rule passes the pre-registered bar. Research only: no live rule, size, filter, stop or config changed.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-asia-break",
+   "merged": false,
+   "pr": 848,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-drd-er",
+   "title": "the Daily-regime filter on the weekly-bull daily rejection long",
+   "rule": "Last completed week's structure bullish (2-bar fractal swings, a weekly close above the last swing high); the signal day (17:00 New York) closes above the previous day's low and in the top 30% of…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). On March 2006 to",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-12",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-drd-long",
+   "title": "the playbook's weekly-bull daily rejection long, out of its own sample",
+   "rule": "Days end at 17:00 New York (built from OANDA mid H1 candles; hours of the weekend shut dropped). - Weekly structure: weeks built from those days, Monday to Friday.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). Out of the skill's",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-drd-silver",
+   "title": "the playbook's weekly-bull daily rejection long and its two Daily-regime cuts, on silver",
+   "rule": "17:00 New York days; weekly structure from 2-bar fractal weekly swings, bullish after a weekly close above the last swing high (the last COMPLETED week is used).",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "gold",
+   "verdict": "pass",
+   "verdictText": "PASS on the pre-registered bar, and not robust. All three tests pass as registered (mean net R > 0, Holm-adjusted",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-12",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-haven-shock",
+   "title": "Gold as a safe haven after equity shock days",
+   "rule": "After a US equity index has a daily close-to-close drop larger than twice its own trailing 20-day standard deviation of daily returns, does spot gold rise over the next 1 and 5 trading days more…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 3 tests pass.",
+   "figures": {
+    "n": 92,
+    "R": 0.108,
+    "Rper": "trade",
+    "t": -0.07
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-haven-shock",
+   "merged": false,
+   "pr": 905,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-month-of-year",
+   "title": "gold's month of the year, as the gold terminal encodes it",
+   "rule": "Written and pushed before any number of this study is computed.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests pass: the page's seasonal months are not reliably different from the rest of the year.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-month-of-year",
+   "merged": false,
+   "pr": 907,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-session-drift",
+   "title": "Gold session drift",
+   "rule": "Published and practitioner work says gold's gains come in Asian hours and its losses around the London fixes and New York hours.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests pass. No session of gold's day is a trade after costs on this test: the session short",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-session-drift",
+   "merged": false,
+   "pr": 875,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-shock-revert",
+   "title": "after an extreme gold day, does the next day revert or continue?",
+   "rule": "Written and pushed before any number of this study is computed.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither rule passes: reversal (R) +0.053R a trade net on 2020 → now (n 27, t 0.14), continuation (C)",
+   "figures": {
+    "n": 27,
+    "R": 0.053,
+    "Rper": "trade",
+    "t": 0.14
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-shock-revert",
+   "merged": false,
+   "pr": 850,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-silver-divergence",
+   "title": "intraday gold / silver divergence on H1, fade and follow",
+   "rule": "Written and pushed before any trade of this rule is computed.",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2. Neither trading against nor with a gold 24-hour extreme that silver does not confirm makes money",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-silver-divergence",
+   "merged": false,
+   "pr": 870,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-silver-ratio",
+   "title": "mean reversion of the gold / silver ratio, out of sample",
+   "rule": "Lt = ln(closexaut / closexagt). - zt = (Lt - mean) / sd, mean and sample standard deviation of L over the 250 days before t (t-250 .. t-1; today's value is not in its own window).",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, on all three pre-registered checks. Trading the gold / silver ratio back to its 250-day mean when it is two",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-silver-ratio",
+   "merged": false,
+   "pr": 829,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-systems",
+   "title": "Gold systems on 8 years of spot gold — robustness check",
+   "rule": "Data. - HistData XAUUSD M1, 2018-01-01 to 2026-10-30 (3.08 M bars, from council-data research/candles/xau-histdata). - The labels are New York wall-clock time with daylight saving; they are…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. No setting change is recommended.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-systems-oos",
+   "title": "Gold systems: out-of-sample test on 2006–2017",
+   "rule": "None of the four is robust, and none fails outright.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "inc",
+   "verdictText": "Gold trend (gtrend, N20 + add): regime-bound; Gold trend fast (gtrend5, N5 + add): regime-bound; Gold H4 trendline (gtl): regime-bound (at the edge of fails); Gold daily engulf (geg): regime-bound",
+   "figures": {
+    "n": 20
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-tsmom",
+   "title": "published time-series momentum on gold, out of sample",
+   "rule": "Month end = the last weekday candle of a calendar month.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). On the untouched",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-tsmom",
+   "merged": false,
+   "pr": 823,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-us-asia",
+   "title": "Gold: the Asian session after the New York cash session",
+   "rule": "Does gold's Asian session (00:00 → 07:00 UTC) continue or reverse the preceding New York cash-session move?",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 3 tests pass.",
+   "figures": {
+    "n": 1928,
+    "R": 0.02,
+    "t": -1.42
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-us-asia",
+   "merged": false,
+   "pr": 923,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-week-raid",
+   "title": "previous-week high / low raid and reversal on gold",
+   "rule": "When gold trades through the PREVIOUS week's high (or low) and an H1 candle then closes back inside last week's range, does fading the move toward last week's 50 % level make money net of costs?",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 rules on the pre-registered bar (PREREGISTRATION.md, committed before any candle was read). No rule",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-week-raid",
+   "merged": false,
+   "pr": 843,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-weekend",
+   "title": "Gold daily systems: weekend handling, current rule against the intended rule",
+   "rule": "The live gold daily systems treat the weekend differently from what was intended.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "inc",
+   "verdictText": "Gold trend N20 (gtrend, live): KEEP the current rule; Gold daily engulf (geg, live): ADOPT the intended rule, but the gain is within noise; Gold trend fast N5 (gtrend5, shadow): reference only",
+   "figures": {
+    "n": 20
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-weekend-gap",
+   "title": "Gold's Sunday-open gap: does it fill?",
+   "rule": "Rule G (fill): at the close of the reopen candle (the first M5 close after the reopen), enter toward Friday's close: buy when fc is above the entry, sell when below.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. Fading gold's Sunday reopen gap back to Friday's close lost money on 2020 to now (Rule G −0.109R a trade after $0.30, n 41, t −0.78; Rule H −0.110R, n 38, t −0.76).",
+   "figures": {
+    "n": 41,
+    "R": -0.109,
+    "Rper": "trade",
+    "t": -0.78
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-weekend-gap",
+   "merged": false,
+   "pr": 864,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gtrend-exits",
+   "title": "Gold trend exits and re-entries: 12 variants against the live chandelier, untouched 2006–17",
+   "rule": "Data.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL / keep the live exit. No exit or re-entry variant beats the live chandelier on the untouched 2006–17 window at x1 and x2 costs and then confirms on 2018–26.",
+   "figures": {
+    "n": 5,
+    "R": 1,
+    "t": 0.4
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-breadth",
+   "title": "ICT breadth test: the unchanged A-setup rule on markets the desk was never tuned on",
+   "rule": "No.",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar), for the primary set and for the secondary set. The desk's A-setup rule, unchanged, has",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-oos-2008",
+   "title": "ICT A-setups on 2008-2017: a clean out-of-sample test of the live rule",
+   "rule": "Not in 2008-17.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAILS (pre-registered bar). On ten years the rule had never seen, the unchanged live A-setup rule made",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-universe",
+   "title": "ICT universe: does the iFVG model work outside gold?",
+   "rule": "Same code as the desk: signals(), isASetup(), sizeOf() and MINGRADE from ict/tracker.mjs, and simulate() from ict/replay.mjs, including the post-#413 4-day gap guard.",
+   "markets": [
+    "gold",
+    "silver",
+    "ES",
+    "forex"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "No new market passes. Do not add any FX pair or silver to the ICT desk.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "macro-gold",
+   "title": "Macro gold rule: can real yields, known the day before, time gold?",
+   "rule": "At each weekday close, long gold to the next close if the DFII10 change over its last 20 observations is below zero. - A DFII10 value counts as known only from 24:00 UTC on the second weekday after…",
+   "markets": [
+    "gold",
+    "rates"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "no. Both pre-registered rules FAIL on untouched 2006–2017 gold.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "macroscore-overlay",
+   "title": "Gold Macro Score as a sizing overlay: the skill's rule on the council's gold systems, out of sample",
+   "rule": "council/macroscore.mjs (#592) ports the macro-agent-demo skill's Gold Macro Score (fall in the 10y real yield over 4 weeks, fall in the ICE dollar index over 4 weeks, fall in the 2Y over 13 weeks,…",
+   "markets": [
+    "gold",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered rule.",
+   "figures": {
+    "t": 3.24
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mcycle-base",
+   "title": "Mosha cycle (mcycle), the live rule's own backtest",
+   "rule": "council/mosha-cycle.mjs cycleTrades and cycleBlockers are IMPORTED and run unchanged (H4 move = last H4 BO; the H1 ChoCh = first H1 BO the other way; leg pull = first M15 / M5 BO with the pullback…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL: the live Mosha cycle rule, run as the Trader runs it, made −0.574R a trade after costs over 115 trades on spot gold from 2020 (t −3.99 on 82 calendar-month sums); in sample −0.523R (n 64), out of sample −0.638R…",
+   "figures": {
+    "n": 64,
+    "R": -0.574,
+    "Rper": "trade",
+    "t": -3.99
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "mcycle-base-study",
+   "merged": false,
+   "pr": 818,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-bo-er",
+   "title": "Mosha BO: the Daily regime filter, a market entry on the confirmation, and where the confirmation forms (result, 13 Nov 2026)",
+   "rule": "Written and committed alone, before any trade of this study was simulated or split.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "Arm A (Daily ER20 >= 0.2) FAIL; Arm B (market on the confirmation close) FAIL. On 38 live-rule Mosha BO positions",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "mosha-bo-er",
+   "merged": false,
+   "pr": 819,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-cycle",
+   "title": "Mosha cycle, second half (the buy at the barrier)",
+   "rule": "Constants: W4 = 3, W1 = 1, BASE = 3 candles, PAD = $0.30, LEVELAGE = 30 days, WAIT = 72 h, VALID = 24 h, HOLD = 72 h, MINR0 = $1.00, MINRR = 2.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. The buy at the barrier lost −0.22R a trade after costs over 132 trades on spot gold, 2020 to October 2026 (t −0.99, win rate 14.4 %); in sample −0.12R (n 74), out of sample −0.35R (n 58).",
+   "figures": {
+    "n": 74,
+    "R": -0.22,
+    "Rper": "trade",
+    "t": -0.99
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-level",
+   "title": "Mosha level reversal",
+   "rule": "Constants: W4 = 3 (H4 swing size), W5 = 1 (M5 swing size), TOL = 0.05 % of the level, PAD = $0.30, BASE = 3 candles, LEVELAGE = 30 days, EPISODE = 24 h, VALID = 24 h, HOLD = 72 h, MINR0 = $1.00,…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. The pre-registered rule lost −0.35R a trade after costs over 365 trades on spot gold, 2020 to October 2026 (t −3.10, win rate 14.5 %); in sample −0.50R (n 221), out of sample −0.12R (n 144).",
+   "figures": {
+    "n": 221,
+    "R": -0.353,
+    "Rper": "trade",
+    "t": -3.1
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-oos",
+   "title": "Mosha BO: out-of-sample test on 2006–2017",
+   "rule": "What the pre-registered tests say:",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "inc",
+   "verdictText": "REGIME-BOUND on the pre-registered rule, and in substance a null result.",
+   "figures": {
+    "n": 38,
+    "R": 0.14,
+    "Rper": "position",
+    "t": 0.55
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-retrace",
+   "title": "Mosha retracement chain",
+   "rule": "Constants: W4 = 3 (H4 swing size), W1 = 1 (H1 swing size: a three-candle swing), BASE = 3 candles, PAD = $0.30, LEVELAGE = 30 days, VALID = 24 h, HOLD = 72 h, MINR0 = $1.00, MINRR = 2.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered rule, and in substance break-even.",
+   "figures": {
+    "n": 249,
+    "R": 0.022,
+    "Rper": "trade",
+    "t": 0.17
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-select",
+   "title": "Mosha selection: which sweeps are worth taking? Result",
+   "rule": "Selected on discovery: 100 or more trades and mean net R > 0. - Validated: selected, and on validation 100 or more trades, mean net R > 0, and a one-sided p under 0.05 after the Holm correction over…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. None of the eighteen cells made money on the discovery years (2006-12), so none was selected, validated or confirmed.",
+   "figures": {
+    "R": -0.05,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "mosha-sweep",
+   "title": "Mosha sweep, VR and CF",
+   "rule": "Constants: WH = 2 (H1 swing size), W5 = 1 (M5 swing size: a three-candle swing), LEVELAGE = 10 days, EPISODE = 12 h, STAGE2 = 24 h, BASE = 3 candles, PAD = $0.30, MINR0 = $1.00, MINRR = 2, ZONEAGE =…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, both entries. Selling (or buying) at the CF lost −0.11R a trade after costs over 6,260 trades (t −4.62); entering on the return to the zone of the next break lost −0.21R a trade over 6,478 trades (t −7.36).",
+   "figures": {
+    "R": -0.109,
+    "Rper": "trade",
+    "t": -4.62
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "msnr-direction",
+   "title": "MSNR direction call",
+   "rule": "Written and committed on 11 Nov 2026, before any number of this study was computed.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 6 tests: the direction call says nothing measurable about gold's next 1, 5 or 20 daily closes beyond the base rate (largest t in 2020-26 +1.35; every test changes sign between 2007-19 and 2020-26).",
+   "figures": {
+    "n": 1768,
+    "t": 1.35
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "msnr-entry",
+   "title": "MSNR direction as a gate in front of the engulfing entry",
+   "rule": "Written and committed on 11 Nov 2026, before any trade of this study was simulated.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests: the engulfing entry taken with the direction call loses after costs in both windows (main test −0.110R a trade in 2020-26, n 795, t −2.51; −0.159R in 2007-19, n 1,269, t −4.63), the same entries…",
+   "figures": {
+    "n": 795,
+    "R": -0.11,
+    "Rper": "trade",
+    "t": -2.51
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "replica-oos",
+   "title": "Gold replica: out-of-sample test on 2017–2022",
+   "rule": "The two filters picked on 2023+ data are the D1 direction and the volatility gate.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL. The replica does not hold before 2023.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "swing-day3",
+   "title": "a daily three-candle swing failure on gold",
+   "rule": "Day 1, Day 2, Day 3 are three consecutive trading days. - Buy setup: Day 2's low is below Day 1's low AND Day 2 closes back inside Day 1's range (close >= Day 1 low and <= Day 1 high).",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests. The model (T1): n 262 trades, -0.001R a trade net of costs (PF 1.00), month-sum t -0.01 over 83",
+   "figures": {
+    "n": 262,
+    "R": -0.001,
+    "Rper": "trade",
+    "t": -0.01
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "swing-day3",
+   "merged": false,
+   "pr": 825,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "tl-third-touch",
+   "title": "Trendline third touch inside an engulf zone, gold",
+   "rule": "Written and committed on 13 Nov 2026, before any trade of this study was simulated and before any candle of it was read.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "fail",
+   "verdictText": "FAIL, on every condition: the trendline entry lost −0.441R a trade after costs over 2020-26 (n 42, month-sum t −2.87; 2020-23 −0.258R, n 25; 2024-26 −0.709R, n 17), worse than the same zones taken on their first touch…",
+   "figures": {
+    "n": 42,
+    "R": -0.441,
+    "Rper": "trade",
+    "t": -2.87
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "tl-third-touch",
+   "merged": false,
+   "pr": 820,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "trend-breadth",
+   "title": "Trend breadth and financing",
+   "rule": "For every recorded position of gtrend, gtrend5, gtl and geg:",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "gold",
+   "verdict": "nm",
+   "verdictText": "INCONCLUSIVE: overnight financing, which no cost model here counts, takes Gold trend from +0.49R to +0.40R a position on untouched 2006-17 (n 75, t 1.77 → 1.49), the daily engulf from +0.19R to +0.14R (n 256, t 1.89 →…",
+   "figures": {
+    "n": 75,
+    "R": 0.489,
+    "t": 1.774
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "eu-gap-fade",
+   "title": "Fading the overnight gap on European indices (DE40, UK100, EU50)",
+   "rule": "Constants: MEDN = 20, TRIG = 0.5, ATRN = 20, STOPATR = 1.0, COST = 0.0004 of the entry price a round trip.",
+   "markets": [
+    "DAX"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: fading the European index overnight gap from the 08:00 London open to the 16:30 close, stop 1 x ATR20, after a 0.04 % round trip, 2016 → now: DE40 −0.048R a trade (n 1964, month-sum t −4.06), UK100 + EU50 −0.031R…",
+   "figures": {
+    "n": 1964,
+    "R": -0.048,
+    "Rper": "trade",
+    "t": -4.06
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "eu-gap-fade",
+   "merged": false,
+   "pr": 916,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gap-fill",
+   "title": "Fading the opening gap on NAS100 and SPX500",
+   "rule": "1.",
+   "markets": [
+    "NQ",
+    "ES",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 4 tests pass in 2021 → now; NAS100 fade of every gap −0.059R a trade net (n 852, monthly t −1.84, gross −0.012R), SPX500 fade of every gap −0.121R a trade net (n 913, monthly t −4.37, gross −0.030R)",
+   "figures": {
+    "n": 852,
+    "R": -0.059,
+    "Rper": "trade",
+    "t": -1.84
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gap-fill",
+   "merged": false,
+   "pr": 849,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-jp225",
+   "title": "Gotobi on the Nikkei: the fade after the 09:55 Tokyo fix, moved to JP225",
+   "rule": "frozen.mjs in this folder is a byte-for-byte copy of research/edge/gotobi/run.mjs at commit 5f341e069 of branch gotobi (sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32,…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. Decisive window: n 760, −0.045R a trade net (+0.043 gross), month t −1.09; replication n 208, −0.024R; at 2x cost −0.134R; placebo 95th pct −0.057R.",
+   "figures": {
+    "n": 760,
+    "R": -0.045,
+    "Rper": "trade",
+    "t": -1.09
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-jp225",
+   "merged": false,
+   "pr": 959,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "high52-rotation",
+   "title": "52-week-high proximity rotation across equity indices",
+   "rule": "Decision at each month end m: the last daily candle of m (it must be within 5 calendar days of the month's last day, else the index is not eligible that month).",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar: decisive excess > 0 with Newey-West t >= 2 missed; 2008-15 excess > 0 missed; decisive Sharpe >= benchmark met; above the placebo's 95th percentile missed).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-06",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "high52-rotation",
+   "merged": false,
+   "pr": 853,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ibs-replicate",
+   "title": "the IBS daily reversal, frozen and replicated on seven other indices",
+   "rule": "IBS(d) < 0.2 → buy at close(d), sell at close(d+1) unless stopped; stop = entry - 1 x ATR(20). 1R = entry - stop.",
+   "markets": [
+    "NQ",
+    "ES",
+    "YM",
+    "forex",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "DOES NOT REPLICATE (fails the pre-registered reading).",
+   "figures": {
+    "n": 3543,
+    "R": -0.041,
+    "Rper": "trade",
+    "t": -1.97
+   },
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "ibs-replicate",
+   "merged": false,
+   "pr": 924,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-dipbuy-oos",
+   "title": "ICT dip-buy (the #431 NQ/ES proposal) on 2008-2017: out of sample, pre-registered",
+   "rule": "H2 (secondary): FAIL as well.",
+   "markets": [
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar).",
+   "figures": {
+    "n": 491,
+    "R": 0.021,
+    "Rper": "trade",
+    "t": 0.35
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-index-longonly",
+   "title": "ICT index long-only: a real edge, or just being long equities?",
+   "rule": "Same code as the desk: - signals(), isASetup(), sizeOf(), MINGRADE, RISKFLOOR and RISKCAP from ict/tracker.mjs. - simulate() from ict/replay.mjs (post-#413). - The data loader is copied from…",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "pass",
+   "verdictText": "PASS. The edge is real, but it is a dip-buying edge, not an all-weather long.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-macro",
+   "title": "Does the ICT A-setup edge depend on the macro regime?",
+   "rule": "Verdict: null result.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "null result. No regime filter passes.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-trend-side",
+   "title": "ICT index A-setups: sells only below the 200-day average (pre-registered test on 2018-26)",
+   "rule": "Index A-setups (NQ, ES, YM, RTY).",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "YM",
+    "RTY"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAILS. The filter came from the 2008-17 observation that the index rule's sells lost in the bull market.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-52w-high",
+   "title": "the 52-week-high anchor on equity indices",
+   "rule": "Signal (T1, T2): at the close of day i (i >= 252), close[i] >= 0.99 x max(close[i-252 .. i-1]).",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3. An index closing at or within 1 % of its prior 252-day closing high did NOT beat its own average over",
+   "figures": {
+    "n": 90,
+    "R": -0.084,
+    "Rper": "trade",
+    "t": -0.64
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-52w-high",
+   "merged": false,
+   "pr": 911,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-cycle",
+   "title": "The owner's market cycle as an entry on US indices",
+   "rule": "Constants: W4 = 3 (H4 swing: 3 candles a side), W1 = 1 (H1 swing: 1 candle a side, a three-candle swing, as mosha-retrace and mosha-cycle), ATRN = 14, BUF = 0.1 x ATR, MINR = 1, FIXEDR = 2, HOLD =…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 exits pass. Trading with the H4 move once the H1 pullback against it is over lost on NAS100, SPX500",
+   "figures": {
+    "n": 1174,
+    "R": -0.227,
+    "Rper": "trade",
+    "t": -4.26
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-cycle",
+   "merged": false,
+   "pr": 874,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-friday-pm",
+   "title": "US index CFDs into the Friday close",
+   "rule": "Do US stock indices fall in the last part of Friday's cash session, as traders flatten before the weekend?",
+   "markets": [
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: Friday 14:00-15:55 US500 short: OOS −0.180R a trade net (n 474, month t −4.44); OOS t −4.44 < 2, in sample −0.152R, −0.313R at 2x cost, beats 2/40 placebo seeds.",
+   "figures": {
+    "n": 474,
+    "R": -0.18,
+    "Rper": "trade",
+    "t": -4.44
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-friday-pm",
+   "merged": false,
+   "pr": 985,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-ibs",
+   "title": "the IBS daily reversal on US indices",
+   "rule": "Signal: IBS(d) < 0.2. - Entry: buy at close(d) (the CFD trades through the cash close).",
+   "markets": [
+    "NQ",
+    "ES",
+    "YM"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. Pre-registered in PREREGISTRATION.md (pushed alone first, commit 4274ca30b).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-ibs",
+   "merged": false,
+   "pr": 895,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-long-reversal",
+   "title": "long-term reversal across national stock indices",
+   "rule": "Month end of a market = its last candle of the calendar month.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. Buying the three national indices with the worst 36-month return and shorting the three best is not an edge after costs (decisive 2016-now -0.047R a month, Newey-West t -3.8).",
+   "figures": {
+    "R": -0.047,
+    "Rper": "month",
+    "t": -3.8
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-long-reversal",
+   "merged": false,
+   "pr": 941,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-low-vol",
+   "title": "the low-volatility anomaly across national stock indices",
+   "rule": "index-long-reversal (branch of the same name, FAIL): same 17 index CFDs, same cost model and stop, ranked by the 36-month return.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 tests pass: holding the three least volatile national indices against the three most volatile is not an edge after costs (T1 equal risk long / short -0.094R a month, NW t -2.69; T2 equal-volatility long…",
+   "figures": {
+    "R": -0.094,
+    "Rper": "month",
+    "t": -2.69
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-low-vol",
+   "merged": false,
+   "pr": 945,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-midday-turn",
+   "title": "The US cash-session midday turn on index CFDs",
+   "rule": "Does the move of a US index CFD over the first two hours of the New York cash session (09:30 to 11:30 New York time) predict the midday window that follows (11:30 to 14:00 New York) in the OPPOSITE…",
+   "markets": [
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. Decisive window 2016 → now: T1 NAS100 fade: n 2308, −0.042R a trade net (month-sum t −7.14), before costs −0.016R; Holm p 1.000.",
+   "figures": {
+    "n": 2308,
+    "R": -0.042,
+    "Rper": "trade",
+    "t": -7.14
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-midday-turn",
+   "merged": false,
+   "pr": 914,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-overnight",
+   "title": "Overnight drift on US index CFDs: close-to-open longs on US500 and NAS100",
+   "rule": "Constants: ATRN = 20 daily candles, STOPATR = 1.0, COST = 0.0003 of the entry price a round trip, FINADD = 2.5 % a year.",
+   "markets": [
+    "NQ"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: the overnight long after spread and financing, 2016-26: US500 −0.022R a trade (n 2721, month-sum t −2.86), NAS100 −0.006R (n 2721, t −0.84); before costs +0.023R and +0.026R (t +2.87, +3.54).",
+   "figures": {
+    "n": 2721,
+    "R": -0.022,
+    "Rper": "trade",
+    "t": -2.86
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-overnight",
+   "merged": false,
+   "pr": 891,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-pair",
+   "title": "US equity index pairs, log-spread z-score mean reversion",
+   "rule": "Two US equity indices with a long shared history are hedged against each other with a hedge ratio fitted on the past year.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 pairs: fading a 2-sd stretch of the US index spreads is not an edge after costs. Pre-registered in PREREGISTRATION.md (committed alone and pushed first).",
+   "figures": {
+    "n": 71,
+    "R": -0.775,
+    "Rper": "trade",
+    "t": -2.01
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-pair",
+   "merged": false,
+   "pr": 881,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-quarter-end",
+   "title": "quarter-end rebalancing flow on US500, by the quarter's stock-minus-bond return",
+   "rule": "For quarter q: P = TD-1 of the previous quarter, E = TD-6 of quarter q (entry), X = TD-1 of quarter q (exit), so the trade holds over the quarter's last 5 trading days. - Diff(q) = (SPX500 close(E)…",
+   "markets": [
+    "ES",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: on US500 out of sample (2015-26) the rule lost -0.101R a trade net (n 47, t -0.89), -0.119R at 2x cost, and beat only 24 of 40 random-window placebos (38 needed).",
+   "figures": {
+    "n": 47,
+    "R": -0.101,
+    "Rper": "trade",
+    "t": -0.89
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-quarter-end",
+   "merged": false,
+   "pr": 981,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-spread-momentum",
+   "title": "non-US equity index pairs, log-spread z-score momentum",
+   "rule": "Two non-US equity indices are hedged against each other with a hedge ratio fitted on the past year.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 5 pre-registered checks: following a 2-sd stretch of these non-US index spreads is not an edge after costs. Pre-registered in PREREGISTRATION.md (committed alone and pushed first).",
+   "figures": {
+    "n": 244,
+    "R": -0.107,
+    "Rper": "trade",
+    "t": -1.56
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-spread-momentum",
+   "merged": false,
+   "pr": 884,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-weekend-gap",
+   "title": "US index CFDs' Sunday-reopen gap fade",
+   "rule": "1.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: pooled −0.126R a trade after costs on 2016-26 (n 102, month-sum t −1.59), −0.067R on 2008-15 (n 42)",
+   "figures": {
+    "n": 102,
+    "R": -0.126,
+    "Rper": "trade",
+    "t": -1.59
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-weekend-gap",
+   "merged": false,
+   "pr": 898,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-xs-momentum",
+   "title": "Cross-sectional momentum across national stock indices (12-1, monthly)",
+   "rule": "The published claim (Asness, Moskowitz & Pedersen 2013, \"Value and momentum everywhere\", country equity index futures): the country stock indices that rose most over the past 12 months, skipping the…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar: OOS month-sum t >= 2 missed; IS net > 0 missed; OOS net > 0 at 2x costs missed; beats >= 38 of 40 placebo runs missed).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-xs-momentum",
+   "merged": false,
+   "pr": 974,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "intraday-momentum",
+   "title": "Market intraday momentum, out of sample",
+   "rule": "Signal r1 = P(10:00 today) / P(16:00 of the previous trading day) − 1.",
+   "markets": [
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. SPX500, 2016 → now: n 2672, −0.159R a trade net of costs, t −9.09 (before costs −0.012R, t −0.70); sign hit rate 48.5 % against a placebo 95th percentile of 51.2 %; Holm p 1.000.",
+   "figures": {
+    "n": 2672,
+    "R": -0.159,
+    "Rper": "trade",
+    "t": -9.09
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "intraday-momentum",
+   "merged": false,
+   "pr": 835,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "nq-open-exits",
+   "title": "NQ New York open run: five pre-registered exits, same entries. All fail; the live exit stays.",
+   "rule": "OANDA NAS100USD 1-minute mid candles via the site's keyless proxy: the #511 cache (09:30-11:05 ET plus the midnight price, clean years 2004-26, to 6 Nov 2026) plus the 11:05-12:05 ET candles fetched…",
+   "markets": [
+    "NQ"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, all six cells. The live exit is the best of the seven on 2023-26 and no variant beats it on 2004-22.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "nq-open-oos",
+   "title": "NQ New York open run: 22 years out of sample",
+   "rule": "nqOpenSweep(bars, day, 570, 0, 0.0008, 0.00011) + the nyflip block:",
+   "markets": [
+    "NQ"
+   ],
+   "assetClass": "indices",
+   "verdict": "inc",
+   "verdictText": "regime-dependent, not robust, not dead",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": [
+    "claude/bold-dijkstra-exmpgb"
+   ],
+   "revision": {
+    "branch": "claude/bold-dijkstra-exmpgb",
+    "pr": 593,
+    "verdict": "inc"
+   }
+  },
+  {
+   "topic": "open-run-breadth",
+   "title": "Open run breadth: does the NQ open run work on other index opens?",
+   "rule": "None of the three new markets passes even the 2023-26 half of the bar.",
+   "markets": [
+    "NQ"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "NQ-ONLY. The rule does not carry over to any other market, in either period",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "open-run-breadth-2",
+   "title": "Open run breadth 2: the NQ open run at seven more cash opens",
+   "rule": "Verdict: NQ-ONLY (FAIL): none of the seven cash opens (FTSE, Nikkei, Hang Seng, ASX 200, Euro Stoxx 50, CAC 40, Russell 2000) passes even the 2023-26 half of the bar, all seven lose after costs in…",
+   "markets": [
+    "NQ",
+    "RTY"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "NQ-ONLY (FAIL): none of the seven cash opens (FTSE, Nikkei, Hang Seng, ASX 200, Euro Stoxx 50, CAC 40, Russell 2000) passes even the 2023-26 half of the bar, all seven lose after costs in both windows, and the Russell,…",
+   "figures": {
+    "R": 0.01
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "opex-week",
+   "title": "the monthly options-expiry week on US indices, out of sample",
+   "rule": "Written and pushed before any trade or result of this study is computed.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests. Buying the week that ends on the monthly options expiration (the third Friday) made -0.016R a",
+   "figures": {
+    "R": -0.016
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "opex-week",
+   "merged": false,
+   "pr": 882,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "orb-nas100",
+   "title": "The 5-minute opening range breakout on NAS100 and SPX500, out of sample",
+   "rule": "1.",
+   "markets": [
+    "NQ",
+    "ES",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 2 markets pass in 2021 → now; NAS100 +0.075R a trade net (n 1460, monthly t +1.27, gross +0.135R), SPX500 −0.053R a trade net (n 1456, monthly t −0.79, gross +0.138R)",
+   "figures": {
+    "n": 1460,
+    "R": 0.075,
+    "Rper": "trade",
+    "t": 1.27
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "orb-nas100",
+   "merged": false,
+   "pr": 837,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "overnight-drift",
+   "title": "Overnight drift on US index CFDs",
+   "rule": "Cliff, Cooper and Gulen (2008, \"Return differences between trading and non-trading hours: like night and day\") and Lou, Polk and Skouras (2019, Journal of Financial Economics, \"A tug of war:…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL (0 of 3 indices pass; pre-registration in PREREGISTRATION.md, committed and pushed before any result).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "overnight-drift",
+   "merged": false,
+   "pr": 836,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "overnight-unused-markets",
+   "title": "Overnight drift on index CFDs no earlier study used",
+   "rule": "index-overnight's run.mjs is copied byte for byte as frozen.mjs (its sha256 is pinned in the test) and never edited.",
+   "markets": [
+    "RTY"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "REPLICATES (gross) / FAIL (net): 14 unused index CFDs pooled, 2016-26: +0.011R a trade before costs (n 36701, month-sum t +2.10; 2005-15 +0.027R, t +4.41), −0.025R after the frozen cost model (t −4.83).",
+   "figures": {
+    "n": 36701,
+    "R": 0.011,
+    "Rper": "trade",
+    "t": 2.1
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "overnight-unused-markets",
+   "merged": false,
+   "pr": 964,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "pre-holiday",
+   "title": "the pre-holiday effect on US indices, out of sample",
+   "rule": "Buy at the close of the trading day before P; sell at the close of P.",
+   "markets": [
+    "NQ",
+    "ES",
+    "YM",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). On 2016 to now,",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "pre-holiday",
+   "merged": false,
+   "pr": 845,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "rebalance-flow",
+   "title": "the month-end rebalancing flow on US indices, out of sample",
+   "rule": "For each month m: S = its TD-5, P = the previous month's TD-1 (the previous month-end). - Diff(m) = (SPX500 close(S) / SPX500 close(P) - 1) - (USB10Y close(S) / USB10Y close(P) - 1).",
+   "markets": [
+    "NQ",
+    "ES",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests. The rule (rank the month's SPX500-minus-10-year-note return at the fifth-to-last NYSE trading",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "rebalance-flow",
+   "merged": false,
+   "pr": 865,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "rsi2-early-years",
+   "title": "the 2-day RSI pullback on US index CFDs, the years before the original study",
+   "rule": "research/edge/rsi2-pullback (branch rsi2-pullback, 13 Nov 2026) tested the 2-day RSI pullback on SPX500, NAS100 and US30 (OANDA mid daily candles) on entries from 2008-01-01 (window A, reported) and…",
+   "markets": [
+    "gold",
+    "silver",
+    "NQ",
+    "ES",
+    "YM"
+   ],
+   "assetClass": "indices",
+   "verdict": "nm",
+   "verdictText": "NOT MEASURABLE (inconclusive: OANDA daily candles start 2003-03-24, so after the 200-day warm-up only 4.00 years",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "rsi2-early-years",
+   "merged": false,
+   "pr": 952,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "rsi2-pullback",
+   "title": "the 2-day RSI pullback on US index CFDs, out of the book's sample",
+   "rule": "The short-term oversold pullback popularised in 2009 for US stock indices (buy when the 2-day RSI is under 10 while price is above its 200-day average, sell on the first close above the 5-day…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, committed and pushed before any number was computed). No market",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "rsi2-pullback",
+   "merged": false,
+   "pr": 838,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "rsi2-replicate",
+   "title": "the 2-day RSI pullback, frozen, on six non-US indices",
+   "rule": "The functions candles, sma, rsi, atr, simulate, net, nights, rateAt, summary, tstat, monthSums, rng, placebo and pct are taken from research/edge/rsi2-pullback/run.mjs of the rsi2-pullback branch.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered single test (PREREGISTRATION.md, committed and pushed before any number was computed).",
+   "figures": {},
+   "replicate": true,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "rsi2-replicate",
+   "merged": false,
+   "pr": 844,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "rsi2-unused-markets",
+   "title": "the 2-day RSI pullback, frozen, on the OANDA index CFDs no earlier study used",
+   "rule": "frozen.mjs = research/edge/rsi2-pullback/run.mjs of origin/rsi2-pullback (commit 4e1b4e1dd), copied byte for byte; sha256 edade889f2825fa71d911e039bfe5b9fdaaf5677e7b2fd55742e742830d5ab65 (the same…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "DOES NOT REPLICATE (a fail of the pre-registered single test: -0.016R a trade after costs, month t -0.50, 0 of 4 checks).",
+   "figures": {
+    "R": -0.016,
+    "Rper": "trade",
+    "t": -0.5
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "rsi2-unused-markets",
+   "merged": false,
+   "pr": 955,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "santa-rally",
+   "title": "the Santa Claus rally window on index CFDs",
+   "rule": "Written and committed before any code was run on the candles or any number below was computed (14 Nov 2026).",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests pass: the Santa window does not beat an ordinary 7-day window of the same year.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "santa-rally",
+   "merged": false,
+   "pr": 922,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "sell-in-may",
+   "title": "the Halloween effect on equity index CFDs",
+   "rule": "Rule: long 1 unit of notional from the winter's start close to its end close, flat in summer.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, committed before any number was computed).",
+   "figures": {
+    "n": 11,
+    "t": 0.32
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "sell-in-may",
+   "merged": false,
+   "pr": 851,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "smallcap-january",
+   "title": "Small caps at the turn of the year: long US2000, short SPX500 on OANDA CFDs",
+   "rule": "Paper research only.",
+   "markets": [
+    "ES",
+    "RTY"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2. Long US2000 against short SPX500 at the turn of the year lost after costs in both samples and both",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "smallcap-january",
+   "merged": false,
+   "pr": 947,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "tsmom",
+   "title": "Time-series momentum across asset classes",
+   "rule": "At each rebalance: the last folded daily candle of a calendar month (UTC) in that market's file, index i, close C[i].",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL. All 25 markets pooled: −1.389R a month net in 2016-26 (t −1.44, Sharpe −0.44, worst drawdown −232.0R, 3250 positions) and +0.288R in 2008-15 (t +0.23); 0 of 5 tests pass.",
+   "figures": {
+    "R": -1.389,
+    "Rper": "month",
+    "t": -1.44
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "tsmom",
+   "merged": false,
+   "pr": 892,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "tsmom-portfolio",
+   "title": "Diversified time-series momentum portfolio",
+   "rule": "Rebalance: monthly.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar: 2008-17 Sharpe > 0.4 missed, t >= 2 missed; 2018-26 total > 0 missed).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-06",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "tsmom-portfolio",
+   "merged": false,
+   "pr": 828,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "turn-of-month",
+   "title": "the turn-of-the-month effect on US indices, out of sample",
+   "rule": "Buy at the close of TD-2 of every month.",
+   "markets": [
+    "NQ",
+    "ES",
+    "YM",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 markets, on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). On",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "turn-of-month",
+   "merged": false,
+   "pr": 826,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "turnaround-early-years",
+   "title": "Turnaround Tuesday on the years neither study used",
+   "rule": "frozen.mjs = research/edge/turnaround-tuesday/run.mjs of branch turnaround-tuesday, byte for byte, the file #862 froze under the same name: sha256…",
+   "markets": [
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "nm",
+   "verdictText": "NOT MEASURABLE (inconclusive: about 4.7 years of candles before 2008, under the 5-year floor). As",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "turnaround-early-years",
+   "merged": false,
+   "pr": 953,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "turnaround-replicate",
+   "title": "the NAS100 \"Turnaround Tuesday\" cell on six markets it never saw",
+   "rule": "frozen.mjs in this folder is research/edge/turnaround-tuesday/run.mjs of the branch turnaround-tuesday (commit 568a1c94b), copied byte for byte, sha256…",
+   "markets": [
+    "NQ",
+    "YM",
+    "RTY"
+   ],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any candle was read). The frozen rule (the",
+   "figures": {},
+   "replicate": true,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "turnaround-replicate",
+   "merged": false,
+   "pr": 862,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "turnaround-tuesday",
+   "title": "\"Turnaround Tuesday\" on US indices, out of sample",
+   "rule": "R1 (base): if close(M) < close(previous trading day), buy at close(M), sell at close(T).",
+   "markets": [
+    "NQ",
+    "ES",
+    "rates"
+   ],
+   "assetClass": "indices",
+   "verdict": "pass",
+   "verdictText": "PASS on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed), by one cell of",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "turnaround-tuesday",
+   "merged": false,
+   "pr": 857,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "turnaround-unused-markets",
+   "title": "Turnaround Tuesday on the index CFDs neither study used",
+   "rule": "frozen.mjs = research/edge/turnaround-tuesday/run.mjs of branch turnaround-tuesday, byte for byte, sha256 74527d362f9d65c996cdd4df25abadbbc6b723b9aa49141d6a29c88b19693871. - replicate.mjs =…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "DOES NOT REPLICATE: the frozen rule fails #862's bar on the eight index CFDs neither #857 nor #862 used. On the",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "turnaround-unused-markets",
+   "merged": false,
+   "pr": 958,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "us-asia-lead",
+   "title": "US cash session leading the Asian index session: JP225 and HK33 from the Asian open",
+   "rule": "Constants: ATRN = 20, STOPATR = 1.0, COST = 0.0004 of the entry price a round trip, SDN = 20.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL: the Asian session in the US cash session's direction, entered at the Asian open, after a 0.04 % round trip, 2016-26: JP225 −0.041R a trade (n 2679, month-sum t −5.31), JP225 on strong US days −0.051R (n 826, t…",
+   "figures": {
+    "n": 2679,
+    "R": -0.041,
+    "Rper": "trade",
+    "t": -5.31
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "us-asia-lead",
+   "merged": false,
+   "pr": 913,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vix-term",
+   "title": "Equity exposure timed by the VIX term structure",
+   "rule": "Day D = an OANDA SPX500 daily candle (UTC day).",
+   "markets": [
+    "ES"
+   ],
+   "assetClass": "indices",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE, data not reachable: the Cboe VIX and VIX3M history files could not be fetched from the build environment, so the pre-registered rule was not run and no Sharpe, drawdown or bootstrap figure exists.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vix-term",
+   "merged": false,
+   "pr": 827,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-managed",
+   "title": "volatility-managed exposure on US index CFDs",
+   "rule": "Months are calendar months.",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, committed before any number was computed).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-managed",
+   "merged": false,
+   "pr": 839,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-managed-index",
+   "title": "volatility-managed exposure on equity index CFDs",
+   "rule": "Written and committed alone, before run.mjs exists and before any return, Sharpe ratio or drawdown below was computed (14 Nov 2026).",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests pass: net of CFD costs, volatility scaling lowers the Sharpe ratio on the S&P 500 and on the four indices pooled.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-managed-index",
+   "merged": false,
+   "pr": 909,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-spike-rebound",
+   "title": "buy US index CFDs after a realised-volatility spike",
+   "rule": "Equity indices are often said to rebound after fear peaks: the usual form is \"buy when the VIX spikes\".",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "pass",
+   "verdictText": "PASS on the pre-registered bar (PREREGISTRATION.md, committed and pushed before any number was computed), by the",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-spike-rebound",
+   "merged": false,
+   "pr": 860,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-spike-replicate",
+   "title": "frozen replication of the vol-spike rebound on seven other index markets",
+   "rule": "frozen.mjs = #860's research/edge/vol-spike-rebound/run.mjs copied byte for byte (sha256 339077aa9b4193eed610095fd75862195cf259c7ed29f78d4a26ac8f71beb8c1, pinned in…",
+   "markets": [],
+   "assetClass": "indices",
+   "verdict": "inc",
+   "verdictText": "PARTLY. By the pre-registered reading (PREREGISTRATION.md, committed and pushed alone before any number): on the",
+   "figures": {},
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-spike-replicate",
+   "merged": false,
+   "pr": 920,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "audnzd-revert",
+   "title": "AUD/NZD daily z-score mean reversion",
+   "rule": "AUD/NZD is the standard range-bound cross (two closely linked economies, a narrow long-run range).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 variants: the AUD/NZD z-score fade is not an edge after costs. Pre-registered in PREREGISTRATION.md (committed alone first).",
+   "figures": {
+    "n": 48,
+    "R": 0.061,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "audnzd-revert",
+   "merged": false,
+   "pr": 840,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "chf-haven",
+   "title": "The Swiss franc after a sharp S&P 500 fall",
+   "rule": "Ranaldo and Söderlind (2010, Review of Finance, \"Safe haven currencies\") find that the Swiss franc appreciates when US stocks fall sharply.",
+   "markets": [
+    "ES",
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests. short USD/CHF −0.046R a trade net on 2016-26 (n 74, t −0.48, month t −0.52, fails: net R not above 0, negative before 2016, t under 2, month t under 2, Holm p over 0.05, placebo not beaten); short…",
+   "figures": {
+    "n": 74,
+    "R": -0.046,
+    "Rper": "trade",
+    "t": -0.48
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "chf-haven",
+   "merged": false,
+   "pr": 930,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "cnh-fix",
+   "title": "The PBoC USD/CNY fix at 01:15 UTC: following or fading USD/CNH's first quarter hour after it (result)",
+   "rule": "For each day:",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. No test is positive after costs in either window.",
+   "figures": {
+    "n": 1667,
+    "R": -0.548,
+    "Rper": "trade",
+    "t": -7.65
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "cnh-fix",
+   "merged": false,
+   "pr": 927,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ecb-ref-fix",
+   "title": "The ECB euro reference rate: fading the half hour into the 14:10 CET concertation (result)",
+   "rule": "For each market and day:",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. No test is positive after costs in either window.",
+   "figures": {
+    "n": 2018,
+    "R": -0.136,
+    "Rper": "trade",
+    "t": -2.93
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "ecb-ref-fix",
+   "merged": false,
+   "pr": 921,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-asia-london-reversal",
+   "title": "Asian-session move reversed in London, forex majors",
+   "rule": "Asia window: the M5 candles opening 00:00 to 06:55 UTC (84 candles).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. The pool made -0.048R a trade net out of sample (n 2250, month-sum t -3.24; gross -0.011R, at 2x costs -0.085R), in sample -0.031R (n 2183, t -2.58); placebo 95th percentile -0.022R (real above 4 of 40).",
+   "figures": {
+    "n": 2250,
+    "R": -0.048,
+    "Rper": "trade",
+    "t": -3.24
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-asia-london-reversal",
+   "merged": false,
+   "pr": 973,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-cycle",
+   "title": "The owner's market cycle as an entry on forex majors",
+   "rule": "Constants: W4 = 3 (H4 swing: 3 candles a side), W1 = 1 (H1 swing: 1 candle a side, a three-candle swing, as mosha-retrace and mosha-cycle), ATRN = 14, BUF = 0.1 x ATR, MINR = 1, FIXEDR = 2, HOLD =…",
+   "markets": [
+    "gold",
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither exit passed every pre-registered line.",
+   "figures": {
+    "n": 1892,
+    "R": -0.135,
+    "Rper": "trade",
+    "t": -4.48
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-cycle",
+   "merged": false,
+   "pr": 877,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-december-usd",
+   "title": "the year-end US dollar seasonal",
+   "rule": "Written and pushed before any number of this study is computed.",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3 tests pass: neither a weaker dollar in the second half of December nor a stronger dollar in the first",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-december-usd",
+   "merged": false,
+   "pr": 918,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-home-hours",
+   "title": "A currency weakens in its own home hours",
+   "rule": "All times UTC, fixed all year (no daylight-saving shift; the paper's sessions are written in GMT).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. No pair is positive after costs with a month-sum t of 2 in 2016-26 and positive in 2010-15.",
+   "figures": {
+    "n": 2703,
+    "R": -0.063,
+    "t": -1.69
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-home-hours",
+   "merged": false,
+   "pr": 902,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-london-orb",
+   "title": "London-open range breakout on forex majors",
+   "rule": "Written and committed on 13 Nov 2026, before any candle of the test was read for this study and before any trade was computed.",
+   "markets": [
+    "gold",
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 3 variants pass.",
+   "figures": {
+    "n": 9875,
+    "R": -0.05,
+    "Rper": "trade",
+    "t": -2.28
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-london-orb",
+   "merged": false,
+   "pr": 868,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-max-effect",
+   "title": "the MAX (lottery) effect across currencies, monthly rebalance",
+   "rule": "The MAX effect was published for stocks (Bali, Cakici and Whitelaw, 2011: stocks with the largest single daily return in the past month earn less the next month) and has been tested for currencies.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). Selling the two of the",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-max-effect",
+   "merged": false,
+   "pr": 969,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-month-end",
+   "title": "Month-end US dollar rebalancing flow into the London 4 pm fix",
+   "rule": "Signal at 10:00 London of the event day.",
+   "markets": [
+    "ES",
+    "DAX",
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither pre-registered rule passes.",
+   "figures": {
+    "R": -0.0903
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-month-end",
+   "merged": false,
+   "pr": 846,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-month-start",
+   "title": "the US dollar on the first two trading days of a month (2026-11-14)",
+   "rule": "Written and pushed before any number of this study is computed (no candle of this study has been read).",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: the dollar basket over the first two days of a month, short USD (learned 2005-14): out of sample −0.030R a month (n 143, t −0.74), placebo 16 of 40.",
+   "figures": {
+    "n": 143,
+    "R": -0.03,
+    "Rper": "month",
+    "t": -0.74
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-month-start",
+   "merged": false,
+   "pr": 982,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-ny-cut",
+   "title": "The 10:00 New York option cut, forex majors",
+   "rule": "Price at 09:00 (p9) = the open of the M5 candle that opens at exactly 09:00 New York.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Trading toward a round level from 09:00 to the 10:00 New York cut made -0.054R a trade net out of sample (n 3575, t -7.86).",
+   "figures": {
+    "n": 3575,
+    "R": -0.054,
+    "Rper": "trade",
+    "t": -7.86
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-ny-cut",
+   "merged": false,
+   "pr": 979,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-post-holiday-replicate",
+   "title": "the US dollar on the day after a US market holiday, replicated on other dollar pairs (2026-11-14)",
+   "rule": "Written and pushed alone, before any candle of this study is read (only research/daily/index.json, which holds row counts and dates, and ctrader/symbols.json, which holds no price history, were…",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: long USD on the day after a US holiday against six other currencies makes +0.026R a holiday net 2005-26 (n 198, t +1.00).",
+   "figures": {
+    "n": 198,
+    "R": 0.026,
+    "t": 1
+   },
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-post-holiday-replicate",
+   "merged": false,
+   "pr": 980,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-reversal",
+   "title": "cross-sectional 1-week reversal in G10 FX",
+   "rule": "Decision candle of a week: the last Monday-Friday candle of that UTC week (Monday to Sunday) that all seven series have, at the same timestamp.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 checks. On 2016 to 6 Nov 2026 (decisive) the reversal book lost 19.08 % net (566 weeks, annualised",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-reversal",
+   "merged": false,
+   "pr": 834,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-round-numbers",
+   "title": "Round numbers on forex majors (stall and break)",
+   "rule": "Fresh: level L was not touched by any candle opening in the 24 clock hours before the candle (weekend hours count as hours; a level is never fresh in the first 24 hours of the file). - Side: the…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 2 rules pass. T1 FAIL (2016 on -0.12R a trade net, n 5966, t -8.4; 2006-15 -0.151R, n 7383); T2 FAIL (2016 on -0.112R a trade net, n 9341, t -9.75; 2006-15 -0.114R, n 11867)",
+   "figures": {
+    "n": 5966,
+    "R": -0.12,
+    "Rper": "trade",
+    "t": -8.4
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-round-numbers",
+   "merged": false,
+   "pr": 931,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-tokyo-orb",
+   "title": "Tokyo-open range breakout on USD/JPY, AUD/USD and NZD/USD",
+   "rule": "Signal: the first M15 candle opening 01:00 to 05:30 UTC (so closing 01:15 to 05:45) whose close is above the range high (buy) or below the range low (sell).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 3 tests pass.",
+   "figures": {
+    "n": 862,
+    "R": -0.08,
+    "Rper": "trade",
+    "t": -3.9
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-tokyo-orb",
+   "merged": false,
+   "pr": 929,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-us-holiday",
+   "title": "the US dollar on the day before a US market holiday (2026-11-14)",
+   "rule": "NYSE full holidays, from ict/calendar.mjs cmeYear (read only), exactly as the pre-holiday study's dayKind: New Year's Day (Sunday -> Monday; a Saturday New Year is not observed on the Friday),…",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL: the long USD dollar basket on the day before a US holiday (side learned 2005-14) makes +0.015R a holiday out of sample (n 109, t +0.53).",
+   "figures": {
+    "n": 109,
+    "R": 0.015,
+    "t": 0.53
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-us-holiday",
+   "merged": false,
+   "pr": 975,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-value",
+   "title": "forex \"value\" as a five-year cross-sectional reversal, monthly rebalance",
+   "rule": "1.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed alone before any number was computed). Buying the two",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-value",
+   "merged": false,
+   "pr": 968,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-weekday",
+   "title": "day-of-week effects in the US dollar basket (2026-11-14)",
+   "rule": "Written and pushed before any number of this study is computed.",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any candle was read).",
+   "figures": {
+    "t": -0.71
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-weekday",
+   "merged": false,
+   "pr": 919,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-weekend-gap",
+   "title": "Forex majors' Sunday-open gap: does it fill?",
+   "rule": "Rule G (fill): at the close of the reopen candle (the first M5 close after the reopen), enter toward Friday's close: buy when fc is above the entry, sell when below.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Rule G (fade the gap at the reopen candle's close) made +0.194R a trade after costs on 2020 to now,",
+   "figures": {
+    "R": 0.194,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-weekend-gap",
+   "merged": false,
+   "pr": 880,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-weekend-gap-replicate",
+   "title": "Forex Sunday-open gap fade, Rule G frozen: replication",
+   "rule": "Written and committed before frozen.mjs, run.mjs and any candle of the new data were read for a result (14 Nov 2026).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "inc",
+   "verdictText": "PARTLY. Rule G, frozen byte for byte, made +0.238R a trade after costs on six forex crosses over 2020 to now",
+   "figures": {
+    "R": 0.238,
+    "Rper": "trade"
+   },
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-weekend-gap-replicate",
+   "merged": false,
+   "pr": 928,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-weekend-gap-replicate2",
+   "title": "Forex Sunday-open gap fade, Rule G frozen: second replication",
+   "rule": "Written and committed alone, before frozen.mjs, run.mjs, fetch.mjs exist and before any candle of the new data was read (14 Nov 2026).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "inc",
+   "verdictText": "PARTLY. Rule G, frozen byte for byte, held on six pairs neither earlier study traded, 2016 to now (S2: n 481,",
+   "figures": {
+    "n": 481
+   },
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-weekend-gap-replicate2",
+   "merged": false,
+   "pr": 938,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-weekly-reversal",
+   "title": "one-week cross-sectional reversal in nine currencies against the dollar",
+   "rule": "1.",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 1 of 5 checks (PREREGISTRATION.md, pushed alone before any number was computed). Buying the two currencies",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-weekly-reversal",
+   "merged": false,
+   "pr": 940,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-xs-momentum",
+   "title": "forex cross-sectional momentum, monthly rebalance",
+   "rule": "Does the published currency momentum effect (rank currencies against the dollar by their past return, buy the strongest, sell the weakest, rebalance monthly) make money on the council's own daily…",
+   "markets": [
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL on the pre-registered bar (PREREGISTRATION.md, pushed before any number was computed). Buying the two",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-xs-momentum",
+   "merged": false,
+   "pr": 869,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi",
+   "title": "Gotobi: USD/JPY and EUR/JPY into the 09:55 Tokyo fix on settlement days, and the fade after it",
+   "rule": "Written and pushed on 14 Nov 2026 before any trade of this rule was computed.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "pass",
+   "verdictText": "PASS (T2). T2 met all five pre-registered conditions.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi",
+   "merged": false,
+   "pr": 878,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-duka-spread",
+   "title": "Gotobi on bid and ask: the fade after the 09:55 Tokyo fix filled on the side that trades",
+   "rule": "frozen.mjs in this folder is a byte-for-byte copy of research/edge/gotobi-cost/frozen.mjs (branch gotobi-cost), itself research/edge/gotobi/run.mjs at commit 5f341e069 of branch gotobi, sha256…",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "nm",
+   "verdictText": "NOT MEASURABLE (inconclusive: Dukascopy's datafeed host refused every connection from this build sandbox, 30 of 30 probe files failed; no bid / ask candle could be read).",
+   "figures": {
+    "t": 2
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-duka-spread",
+   "merged": false,
+   "pr": 950,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-early-years",
+   "title": "Gotobi early years: the frozen T2 fade on yen pair-years no gotobi study has used",
+   "rule": "frozen.mjs will be a byte-for-byte copy of research/edge/gotobi-cost/frozen.mjs (branch gotobi-cost), itself research/edge/gotobi/run.mjs at commit 5f341e069 of branch gotobi: sha256…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "DOES NOT REPLICATE.",
+   "figures": {
+    "n": 2129,
+    "R": 0.053,
+    "Rper": "trade",
+    "t": 1.12
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-early-years",
+   "merged": false,
+   "pr": 957,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-feed",
+   "title": "Gotobi feed check: the frozen T2 fade on HistData USD/JPY M1 against OANDA, same days",
+   "rule": "frozen.mjs is a byte-for-byte copy of research/edge/gotobi-replicate/frozen.mjs (branch gotobi-replicate), itself the gotobi study's run.mjs; sha256…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "inc",
+   "verdictText": "FEED-ROBUST.",
+   "figures": {
+    "n": 623,
+    "R": 0.127,
+    "Rper": "trade",
+    "t": 2.34
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-feed",
+   "merged": false,
+   "pr": 894,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-limit-entry",
+   "title": "Gotobi fade: can a resting sell limit placed before the fix capture the 00:55 result?",
+   "rule": "CAPTURABLE: some E1 variant under the strict fill rule keeps at least 70 % of E3's net R per day, with month t >= 2. - PARTLY: otherwise, some E1 variant under the strict fill rule keeps at least 40…",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "NOT CAPTURABLE. Read on the strict fill rule as pre-registered: E1 k=2 strict keeps 5.4 % of E3's net R per day (+0.0080R against +0.1481R), month t +0.24, filling 54.5 % of days.",
+   "figures": {
+    "R": 0.008,
+    "t": 0.24
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-limit-entry",
+   "merged": false,
+   "pr": 915,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-replicate",
+   "title": "Gotobi replication: the fade after the 09:55 Tokyo fix on four other yen crosses, and on USD/JPY before 2010",
+   "rule": "frozen.mjs in this folder is a byte-for-byte copy of research/edge/gotobi/run.mjs at commit 5f341e069 of branch gotobi (sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32,…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "pass",
+   "verdictText": "REPLICATES. All four R1 conditions hold: pooled GBP/JPY, AUD/JPY, CAD/JPY, CHF/JPY 2010-01-01 to 2026-11-11, n 4784, +0.099R a trade net, month t +2.75, 4 of 4 crosses positive, placebo 95th percentile −0.016R.",
+   "figures": {
+    "n": 4784,
+    "R": 0.099,
+    "Rper": "trade",
+    "t": 2.75
+   },
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-replicate",
+   "merged": false,
+   "pr": 889,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-smile",
+   "title": "ICT A-setups x Dollar Smile: out-of-sample test of the #507 lead",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [
+    "dollar"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Null result.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "jp-fiscal-yearend",
+   "title": "the Japanese fiscal year-end yen seasonal",
+   "rule": "Written and pushed before any number of this study is computed.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 tests pass: USD/JPY did not fall in March before the Japanese fiscal year-end, and did not rise in the",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "jp-fiscal-yearend",
+   "merged": false,
+   "pr": 936,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "london-fix",
+   "title": "London fix: the run into the 16:00 WM/Reuters fix on six forex majors, and the fade after it",
+   "rule": "Written and pushed on 14 Nov 2026 before any trade of this rule was computed.",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither test met the pre-registered bar (T1 −0.152R a trade net, n 3510, month t −7.44; T2 −0.164R a trade net, n 3510, month t −10.32, 2020-now, six pairs pooled).",
+   "figures": {
+    "n": 3510,
+    "R": -0.152,
+    "Rper": "trade",
+    "t": -7.44
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "london-fix",
+   "merged": false,
+   "pr": 883,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "risk-spill-jpy",
+   "title": "risk spillover into the yen after a strong S&P 500 cash session",
+   "rule": "After a strong US cash-equity session, does the yen move with risk sentiment in the next Asian session: USD/JPY and AUD/JPY up after a big S&P 500 up day, down after a big down day?",
+   "markets": [
+    "ES",
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 pairs.",
+   "figures": {
+    "n": 725,
+    "R": -0.093,
+    "Rper": "trade",
+    "t": -2.36
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "risk-spill-jpy",
+   "merged": false,
+   "pr": 859,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "tokyo-fix-daily",
+   "title": "Tokyo fix every day: is the fix-minute effect special to gotobi days?",
+   "rule": "Written and pushed before any candle of this study is fetched or any figure of it computed.",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "inc",
+   "verdictText": "UNCLEAR. T1 (the frozen 00:55 sell / 06:00 buy-back on every non-gotobi Tokyo business day, 2016-now): −0.0629R a trade net, n 1870, month t −2.37.",
+   "figures": {
+    "n": 1870,
+    "R": -0.0629,
+    "Rper": "trade",
+    "t": -2.37
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "tokyo-fix-daily",
+   "merged": false,
+   "pr": 917,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-spike-replicate2",
+   "title": "second frozen replication of the vol-spike rebound, on markets and years neither study used",
+   "rule": "frozen.mjs = #860's research/edge/vol-spike-rebound/run.mjs, the same file #920 froze, copied byte for byte (sha256 339077aa9b4193eed610095fd75862195cf259c7ed29f78d4a26ac8f71beb8c1, pinned in…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "inc",
+   "verdictText": "DOES NOT REPLICATE. By the pre-registered bar (PREREGISTRATION.md, committed and pushed alone before any",
+   "figures": {},
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-spike-replicate2",
+   "merged": false,
+   "pr": 951,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "weekend-gap-late-entry",
+   "title": "Forex Sunday-gap fade entered later, after the reopen spread settles",
+   "rule": "Written and committed alone, before frozen.mjs, run.mjs and fetch.mjs exist and before any late-entry trade was computed (14 Nov 2026).",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. Entered one hour later (18:05 New York) Rule G loses on all four lines of the bar: −0.126R a trade after",
+   "figures": {
+    "R": -0.126,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "weekend-gap-late-entry",
+   "merged": false,
+   "pr": 954,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "wmr-fix-reversal",
+   "title": "The London 16:00 WM/Reuters fix: fading the hour into it (result)",
+   "rule": "For each pair and day:",
+   "markets": [],
+   "assetClass": "forex",
+   "verdict": "fail",
+   "verdictText": "FAIL. None of the three tests is positive after costs in either window: the fade loses about 0.08R a trade in",
+   "figures": {
+    "n": 12272,
+    "R": -0.083,
+    "Rper": "trade",
+    "t": -6.01
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "wmr-fix-reversal",
+   "merged": false,
+   "pr": 910,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-fomc-drift",
+   "title": "Treasuries after the FOMC, following the 2-year's reading of the decision",
+   "rule": "S = close of the USB02Y M5 candle ending at 16:00 New York on D minus the close of the USB02Y M5 candle ending at T − 5 min on D (13:55 for a 14:00 statement, 14:10 for 14:15, 12:25 for 12:30).",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither test passes the pre-registered bar. 2016 → now, net of costs: USB10Y −0.167R a trade (n 79, month t −2.09), USB30Y −0.117R (n 79, month t −1.44).",
+   "figures": {
+    "n": 79,
+    "R": -0.167,
+    "Rper": "trade",
+    "t": -2.09
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-fomc-drift",
+   "merged": false,
+   "pr": 906,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-intraday-momentum",
+   "title": "Intraday momentum in US Treasury CFDs",
+   "rule": "signalOf and trade are copied byte for byte from origin/intraday-momentum:research/edge/intraday-momentum/run.mjs (sha256 of each function's text pinned in the test); only the clock times passed to…",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL (the pooled 10-year + 30-year primary meets 1 of the 4 pre-registered lines).",
+   "figures": {
+    "n": 4983,
+    "R": -0.547,
+    "Rper": "trade",
+    "t": -23.81
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-intraday-momentum",
+   "merged": false,
+   "pr": 970,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-lead-intraday",
+   "title": "does a sharp M15 move in the US 10-year Treasury lead gold and USD/JPY over the next hour?",
+   "rule": "usb10y M15 return of candle i: r = closei / close{i-1} - 1, only when candle i-1 starts exactly 15 minutes before candle i (otherwise candle i has no return). - Volatility: the standard deviation of…",
+   "markets": [
+    "gold",
+    "forex",
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL. 0 of 3 tests pass. Every test loses after costs in both windows (decisive Holm p 1.00 for all three).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-lead-intraday",
+   "merged": false,
+   "pr": 926,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-month-end",
+   "title": "the month-end index-extension effect in US Treasuries, out of sample",
+   "rule": "T1: buy usb10y at the close of TD-4 of every month; sell at the close of TD-1 of the same month (three trading-day returns: TD-3, TD-2, TD-1).",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 tests. Long the 10-year note CFD from the close of the month's fourth-to-last US trading day to the",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-month-end",
+   "merged": false,
+   "pr": 939,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-month-end-futures",
+   "title": "the bond month-end rule at Treasury futures cost",
+   "rule": "Written and pushed alone, before any futures number of this study is computed.",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAILS AT FUTURES COST, 0 of 2 tests. The same frozen trades of bond-month-end (#939), re-costed as CBOT",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-month-end-futures",
+   "merged": false,
+   "pr": 943,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "bond-month-end-replicate",
+   "title": "the bond month-end rule, frozen, on four other bond CFDs",
+   "rule": "frozen.mjs = #939's research/edge/bond-month-end/run.mjs, copied byte for byte from origin/bond-month-end (sha256 624ac805a9b361949906bf5e0c94e576433d2d019e2e3470f9b57f5d8f630144, the same file #943…",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "DOES NOT REPLICATE. #939's frozen rule (long at the close of the month's fourth-to-last trading day, out at the",
+   "figures": {},
+   "replicate": true,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "bond-month-end-replicate",
+   "merged": false,
+   "pr": 961,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "event-risk",
+   "title": "Event risk manager: does skipping or flattening trades around CPI, NFP and FOMC help?",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL on all five pre-registered tests. Null result.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "fomc-follow",
+   "title": "Follow or fade the first 30 minutes after the FOMC statement",
+   "rule": "The statement is released at a fixed minute and the Chair's press conference starts 30 minutes later.",
+   "markets": [
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 6 tests. Best in 2020 → now: R (fade) on NAS100, n 54, +0.095R a trade net of costs, t +0.56, Holm p 1; 2010-19 −0.313R; placebo 95th percentile +0.171R.",
+   "figures": {
+    "n": 54,
+    "R": 0.095,
+    "Rper": "trade",
+    "t": 0.56
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fomc-follow",
+   "merged": false,
+   "pr": 861,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "pre-fomc-drift",
+   "title": "The pre-FOMC announcement drift, out of sample",
+   "rule": "Entry: buy at the close of the M5 candle that ends at T − 24 h (the close of the hourly candle 24 hours before a whole-hour release; for a 14:15 or 12:30 release, the same clock time the day before).",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL. SPX500, 2016 → now (the window that decides): n 86, +0.044R a trade net of costs, t +1.35; the 40-seed placebo's 95th percentile is +0.092R (the FOMC windows beat 22 of 40 seeds).",
+   "figures": {
+    "n": 86,
+    "R": 0.044,
+    "Rper": "trade",
+    "t": 1.35
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "pre-fomc-drift",
+   "merged": false,
+   "pr": 831,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "treasury-auction-cycle",
+   "title": "the Treasury auction cycle in bond CFD prices",
+   "rule": "TreasuryDirect (www.treasurydirect.gov) and Fiscal Data (api.fiscaldata.treasury.gov) were tried once on 14 Nov 2026 through the session proxy: both refused (connect rejected).",
+   "markets": [
+    "forex",
+    "rates"
+   ],
+   "assetClass": "rates",
+   "verdict": "fail",
+   "verdictText": "FAIL. Short usb10y from the close five US trading days before the 10-year note auction to the auction day's",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "treasury-auction-cycle",
+   "merged": false,
+   "pr": 978,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "brent-wti-spread",
+   "title": "Brent - WTI crude spread, log-spread z-score mean reversion",
+   "rule": "At each joined daily close i, from closes up to and including i only:",
+   "markets": [
+    "oil"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL: fading a 2-sd stretch of the Brent - WTI spread is not an edge after costs. Pre-registered in PREREGISTRATION.md (committed alone and pushed first).",
+   "figures": {
+    "n": 87,
+    "R": -0.199,
+    "Rper": "trade",
+    "t": -1.42
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "brent-wti-spread",
+   "merged": false,
+   "pr": 933,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "commodity-cycle",
+   "title": "The owner's market cycle as an entry on commodity CFDs (gold excluded)",
+   "rule": "frozen.mjs is research/edge/crypto-cycle/run.mjs of branch crypto-cycle (commit 0ac837fc0), copied byte for byte, sha256 a2c714701e2faf486c5a77677359cb815bb05babed277041cf085dd8a2905f5b (pinned in…",
+   "markets": [
+    "gold",
+    "forex",
+    "crypto"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither exit passed every pre-registered line.",
+   "figures": {
+    "n": 2425,
+    "R": -0.317,
+    "Rper": "trade",
+    "t": -10.07
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "commodity-cycle",
+   "merged": false,
+   "pr": 956,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "commodity-skewness",
+   "title": "Commodity cross-sectional skewness (12 months, most negative third long / most positive third short)",
+   "rule": "The published claim (Fernandez-Perez, Frijns, Fuertes & Miffre 2018, Journal of Banking & Finance, \"The skewness of commodity futures returns\"): commodities whose daily returns were most NEGATIVELY…",
+   "markets": [],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL. Out of sample 2016-06 to 2026-10: −0.060R a month net (125 months, Newey-West t −1.38).",
+   "figures": {
+    "R": -0.06,
+    "Rper": "month",
+    "t": -1.38
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "commodity-skewness",
+   "merged": false,
+   "pr": 971,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "commodity-xs-momentum",
+   "title": "Commodity cross-sectional momentum (12-1, top 3 / bottom 3)",
+   "rule": "The published claim (Miffre & Rallis 2007, Journal of Banking & Finance, \"Momentum strategies in commodity futures markets\"; Asness, Moskowitz & Pedersen 2013, \"Value and momentum everywhere\"): the…",
+   "markets": [],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL. 2016-01 to 2026-10: −0.071R a month net (130 months, Newey-West t −1.30, worst drawdown −13.33R); 2006-02 to 2015-12: +0.029R a month (119 months, t +0.69); the decisive mean sits at the random-ranking placebo's…",
+   "figures": {
+    "R": -0.071,
+    "Rper": "month",
+    "t": -1.3
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "commodity-xs-momentum",
+   "merged": false,
+   "pr": 935,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "energy-seasonal",
+   "title": "Energy seasonal windows",
+   "rule": "Published commodity seasonals say crude oil rises from mid-February into the US driving season, natural gas rises in September-October as storage fills before winter, and natural gas weakens in…",
+   "markets": [
+    "oil"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests pass. No calendar window here is an edge.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "energy-seasonal",
+   "merged": false,
+   "pr": 879,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "grain-seasonality",
+   "title": "Grain seasonality: the pre-harvest decline as a short on OANDA CFDs",
+   "rule": "Entry: sell at the open of the first trading day (weekday candle) of the window's first month. - Stop: fixed at entry + 3 x ATR(20).",
+   "markets": [],
+   "assetClass": "commodities",
+   "verdict": "pass",
+   "verdictText": "PASS on the pre-registered bar, by one test of three, and thin. T2 soybeans (short July to September) passes:",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "grain-seasonality",
+   "merged": false,
+   "pr": 934,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "metals-intraday-momentum",
+   "title": "Intraday momentum on gold, silver and crude oil",
+   "rule": "Signal r1 = P(open + 30 min) / P(open) − 1.",
+   "markets": [
+    "gold",
+    "silver",
+    "oil"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL (0 of 3 tests pass). T1 Gold, 2016 → now: n 2713, −0.157R a trade net of costs (before costs −0.015R), month-sum t −9.24, Holm p 1.000; 2007-2015 −0.103R (n 2238).",
+   "figures": {
+    "n": 2713,
+    "R": -0.157,
+    "Rper": "trade",
+    "t": -9.24
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "metals-intraday-momentum",
+   "merged": false,
+   "pr": 932,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "metals-rsi2",
+   "title": "the frozen 2-day RSI pullback on gold and silver",
+   "rule": "rsi2-pullback.mjs in this folder is research/edge/rsi2-pullback/run.mjs of the rsi2-pullback branch, copied unchanged (that branch is not merged into main; nothing is imported from a sibling branch).",
+   "markets": [
+    "gold",
+    "silver"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL — gold and silver together lose −0.077R a trade after costs in 2016-26 (n 137, month t −1.79), 4 of the 5 pre-registered checks fail.",
+   "figures": {
+    "n": 137,
+    "R": -0.077,
+    "Rper": "trade",
+    "t": -1.79
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "metals-rsi2",
+   "merged": false,
+   "pr": 873,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "natgas-storage-day",
+   "title": "the weekly US natural gas storage report, drift after the first half hour (natgas-storage-day)",
+   "rule": "Normal week: Thursday 10:30 New York. - Holiday weeks are left out of every test.",
+   "markets": [
+    "oil"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 checks hold: following the first half hour after the storage report is not an edge on natural gas.",
+   "figures": {
+    "n": 446,
+    "R": -0.078,
+    "Rper": "trade",
+    "t": -1.69
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "natgas-storage-day",
+   "merged": false,
+   "pr": 976,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "oil-wednesday",
+   "title": "the weekly US crude inventory report on WTI, fade or follow the first half hour (oil-wednesday)",
+   "rule": "Reaction candle = the M30 candle that opens at the release time (10:30-11:00, or 11:00-11:30 in a delayed week).",
+   "markets": [
+    "oil"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 rules pass: neither fading nor following the first half hour after the report is an edge on WTI.",
+   "figures": {
+    "n": 304,
+    "R": -0.096,
+    "Rper": "trade",
+    "t": -0.21
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "oil-wednesday",
+   "merged": false,
+   "pr": 858,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "post-holiday-metals",
+   "title": "the US dollar on the day after a US market holiday, read on dollar-priced metals (2026-11-14)",
+   "rule": "Written and pushed alone, before any candle of this study is read (only research/daily/index.json, which holds row counts and dates, was looked at).",
+   "markets": [
+    "dollar"
+   ],
+   "assetClass": "commodities",
+   "verdict": "fail",
+   "verdictText": "FAIL (T1, T2, T3, T4 not met): short gold and silver on the day after a US holiday makes −0.092R a holiday net 2006-26 (n 185, t −2.78).",
+   "figures": {
+    "n": 185,
+    "R": -0.092,
+    "t": -2.78
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "post-holiday-metals",
+   "merged": false,
+   "pr": 984,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "soybean-short-robust",
+   "title": "Soybean short: frozen robustness checks of the grain-seasonality pass",
+   "rule": "Written and committed before any new figure was computed (14 Nov 2026).",
+   "markets": [],
+   "assetClass": "commodities",
+   "verdict": "inc",
+   "verdictText": "FRAGILE. With the grain-seasonality soybean short frozen (that study's code, byte for byte), moving the July to",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "soybean-short-robust",
+   "merged": false,
+   "pr": 937,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-cycle",
+   "title": "The owner's market cycle as an entry on crypto",
+   "rule": "Constants: W4 = 3 (H4 swing: 3 candles a side), W1 = 1 (H1 swing: 1 candle a side, a three-candle swing, as mosha-retrace and mosha-cycle), ATRN = 14, BUF = 0.1 x ATR, MINR = 1, FIXEDR = 2, HOLD =…",
+   "markets": [
+    "gold",
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither exit passed every pre-registered line.",
+   "figures": {
+    "n": 830,
+    "R": -0.079,
+    "Rper": "trade",
+    "t": -1.8
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-cycle",
+   "merged": false,
+   "pr": 888,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-expiry",
+   "title": "Crypto monthly expiry",
+   "rule": "The expiry Friday of month m = the last Friday of the calendar month (UTC).",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL. After the monthly crypto expiry, BTC and ETH with the 7-day trend made +0.052R a trade net out of sample (n 56, month t 0.6), +0.086R in sample.",
+   "figures": {
+    "n": 56,
+    "R": 0.052,
+    "Rper": "trade",
+    "t": 0.6
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-expiry",
+   "merged": false,
+   "pr": 977,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-hour",
+   "title": "Bitcoin / Ether hour-of-day returns, out of sample",
+   "rule": "Every UTC day, each coin (BTC, ETH) separately: leg L buys at the open of the long hour, leg S sells at the open of the short hour; each is out at that hour's close (the open of the next hour)…",
+   "markets": [
+    "rates",
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests. The hours picked on 2022-23 (long 20:00 UTC, short 01:00 UTC) lost money after costs on",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-hour",
+   "merged": false,
+   "pr": 842,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-reversal",
+   "title": "crypto short-term reversal after a sharp three-day drop",
+   "rule": "Index the daily candles of a coin by i; c[i], o[i], h[i], l[i] its close, open, high, low. - Three-day return r3[i] = c[i] / c[i-3] - 1 (simple return). - Its trailing spread sd[i] = the sample…",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests pass. Buying BTC, ETH, SOL or XRP at the next open after a three-day return below −2 x its",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-reversal",
+   "merged": false,
+   "pr": 866,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-sma200",
+   "title": "Bitcoin / Ether long only above the 200-day average",
+   "rule": "Signal at each daily close d (UTC 24:00): close[d] > SMAN(close)[d], the simple mean of the N closes d-N+1 … d.",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests pass. Long BTC or ETH only while the daily close is above its 200-day (or 100-day) average,",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-sma200",
+   "merged": false,
+   "pr": 856,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-trend-decay",
+   "title": "Crypto trend v3: does the edge still hold?",
+   "rule": "council/trader.mjs lines 616-676 (user rules pairs-best + crypto-add, v3 of 5 Nov).",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "decayed. The rule earned well from 2017 to May 2025 (+3.7R a position before 2024, +2.2R from Jan 2024 to May 2025).",
+   "figures": {
+    "R": 3.7,
+    "Rper": "position"
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-weekend",
+   "title": "the weekend vs weekday split in Bitcoin and Ether",
+   "rule": "Rule W (long the weekend): buy at the open of the Friday 21:00 UTC 5-minute candle; out at Sunday 23:00 UTC (the close of the Sunday 22:55 candle) unless stopped first.",
+   "markets": [
+    "rates",
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests pass. Long the weekend (Friday 21:00 to Sunday 23:00 UTC) and short Monday (Monday 00:00 to",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-weekend",
+   "merged": false,
+   "pr": 852,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-weekend-reversal",
+   "title": "Crypto weekend reversal",
+   "rule": "1.",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL. 0 of 5 tests pass; T1-BTC -0.016R a trade (n 19, month t -0.08); T1-ETH -0.044R a trade (n 27, month t -0.24); T2-BTC -0.141R a trade (n 19, month t -0.71); T2-ETH -0.304R a trade (n 27, month t -1.69); POOL…",
+   "figures": {
+    "n": 19,
+    "R": -0.016,
+    "Rper": "trade",
+    "t": -0.08
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-weekend-reversal",
+   "merged": false,
+   "pr": 890,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-weekly-mom",
+   "title": "weekly time-series momentum in crypto, out of sample",
+   "rule": "Clock: every Monday 00:00 UTC (the open of Monday's daily candle).",
+   "markets": [
+    "rates",
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2. On 2022-26 (the decisive window, fully after the paper's sample) the one-week momentum book did",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-weekly-mom",
+   "merged": false,
+   "pr": 833,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "crypto-xs-momentum",
+   "title": "Cross-sectional momentum among coins (3-week look-back, weekly, top third / bottom third)",
+   "rule": "The published claim (Liu, Tsyvinski & Wu 2022, Journal of Finance, \"Common risk factors in cryptocurrency\"): coins that rose most over the past few weeks, ranked AGAINST EACH OTHER, keep…",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 1 of 4 conditions met: out of sample +0.0113R a week net (217 weeks, month-sum t +0.55), −0.0201R at 2x cost, above only 28 of 40 random rankings; in sample +0.0362R.",
+   "figures": {
+    "R": 0.0113,
+    "t": 0.55
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "crypto-xs-momentum",
+   "merged": false,
+   "pr": 986,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "eth-btc-ratio",
+   "title": "relative momentum between Ether and Bitcoin",
+   "rule": "ret4(coin)[i] = c[i] / c[i-28] - 1 (four weeks of daily closes). - Ratio q[i] = cETH[i] / cBTC[i]; ratio4[i] = q[i] / q[i-28] - 1. - ATR14[i] = simple mean of the true range of days i-13 … i (true…",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 tests pass. Trading the 4-week trend of the ETH/BTC ratio for one more week as an equal-notional",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "eth-btc-ratio",
+   "merged": false,
+   "pr": 887,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "nas-crypto-spill",
+   "title": "big NAS100 cash sessions into BTC / ETH overnight",
+   "rule": "After a big NAS100 cash session (09:30 to 16:00 New York), does crypto (BTC, ETH) carry the move overnight, until the next cash open?",
+   "markets": [
+    "NQ",
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 variants clear the checks that could be run.",
+   "figures": {
+    "n": 764,
+    "R": -0.043,
+    "Rper": "trade",
+    "t": -0.49
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "nas-crypto-spill",
+   "merged": false,
+   "pr": 876,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "vol-spike-crypto",
+   "title": "the frozen vol-spike rebound on crypto",
+   "rule": "frozen.mjs = #860's research/edge/vol-spike-rebound/run.mjs copied byte for byte (sha256 339077aa9b4193eed610095fd75862195cf259c7ed29f78d4a26ac8f71beb8c1, the file both replications froze; pinned in…",
+   "markets": [
+    "crypto"
+   ],
+   "assetClass": "crypto",
+   "verdict": "fail",
+   "verdictText": "FAIL. #860's rule, frozen byte for byte (buy after the 5-day realised volatility exceeds twice its prior 120-day",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "vol-spike-crypto",
+   "merged": false,
+   "pr": 962,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "cb-days-other",
+   "title": "Five other central banks: follow the first hour after the decision",
+   "rule": "ref = the close of the M5 candle ending at D; c60 = the close of the M5 candle ending at D + 60 min.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. Pooled over the five banks, 2018 → now: n 320, +0.208R a trade net, month t +1.77; 2010-17 −0.030R (n 273); placebo p95 +0.068R; at 2x cost +0.116R.",
+   "figures": {
+    "n": 320,
+    "R": 0.208,
+    "Rper": "trade",
+    "t": 1.77
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "cb-days-other",
+   "merged": false,
+   "pr": 901,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "commodity-fx-lead",
+   "title": "Does a big commodity day lead its commodity currency the next day?",
+   "rule": "Commodity move on day d: r(d) = ln(close(d) / close(d − 1)) of the commodity.",
+   "markets": [
+    "forex",
+    "oil"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: 0 of 2.",
+   "figures": {
+    "R": -0.009,
+    "Rper": "trade",
+    "t": -0.29
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "commodity-fx-lead",
+   "merged": false,
+   "pr": 899,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "confluence",
+   "title": "When MERIDIAN and ICT agree, is the edge larger?",
+   "rule": "Candles.",
+   "markets": [
+    "gold",
+    "NQ",
+    "forex"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL (no robust edge from confluence). We wrote no proposal.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "copper-gold",
+   "title": "The copper / gold ratio as a risk-on signal for US indices",
+   "rule": "Week end = the last daily candle of each Monday-Sunday UTC week (normally Friday).",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: in the decisive window (2016 to 23 Oct 2026, 565 weeks) the equal-weight SPX500 / NAS100 index rose LESS in the weeks after a rising 13-week copper / gold ratio than after a falling one: −0.20 % a week…",
+   "figures": {
+    "t": -0.92
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "copper-gold",
+   "merged": false,
+   "pr": 854,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "cot-positioning",
+   "title": "COT positioning: does large-speculator positioning predict 1- and 4-week returns?",
+   "rule": "Verdict: FAIL.",
+   "markets": [
+    "gold",
+    "forex"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. No pooled positioning signal (1-year or 3-year crowding, weekly flow, or 90/10 extremes) passed in and out of sample at 1 or 4 weeks.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-09",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "cpi-follow",
+   "title": "US CPI: follow or fade the first 15 minutes, held to the New York close",
+   "rule": "Candles: P = the 08:25 candle, W = the 08:30, 08:35 and 08:40 candles.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. 0 of 4 tests pass. Best on 2020-now: fade-11:00, +0.001R an event net (n 81, t 0.02); 2012-19 -0.098R (n 78).",
+   "figures": {
+    "n": 81,
+    "R": 0.001,
+    "t": 0.02
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "cpi-follow",
+   "merged": false,
+   "pr": 871,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "dual-momentum",
+   "title": "Dual momentum, gold against US stocks against cash",
+   "rule": "Month end = the last common candle of a calendar month (the last month only once a later month has begun). - Signal at month end i, for each asset, lookback L trading days (primary L = 252;…",
+   "markets": [
+    "gold",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither lookback passes the pre-registered bar.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "dual-momentum",
+   "merged": false,
+   "pr": 855,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ecb-boj-days",
+   "title": "ECB and BoJ decision days: follow the first hour",
+   "rule": "The literature on FOMC days finds that the dollar keeps drifting, for hours after the statement, in the direction of its first reaction.",
+   "markets": [
+    "forex",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 2 tests. 2018 → now: T1 ECB, EUR/USD: n 71, +0.631R a trade net, month t +1.51, Holm p 0.1315, 2010-17 +0.471R; T2 BoJ, USD/JPY: n 67, +0.064R a trade net, month t +0.22, Holm p 0.4121, 2010-17 +0.152R.",
+   "figures": {
+    "n": 71,
+    "R": 0.631,
+    "Rper": "trade",
+    "t": 1.51
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "ecb-boj-days",
+   "merged": false,
+   "pr": 896,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "event-reaction",
+   "title": "Gold's reaction to US CPI, NFP and FOMC releases",
+   "rule": "Paper research only.",
+   "markets": [
+    "gold",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 73 (47%, p 0.7586; 2018-21 31%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-lbma-fix",
+   "title": "Gold LBMA auctions: the run into the PM auction and the fade after it",
+   "rule": "Written and pushed on 14 Nov 2026 before any trade of this rule was computed.",
+   "markets": [
+    "gold",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: T1 FAIL (out of sample −0.020R a trade net, n 1472, month t -2.36; in sample −0.051R, n 1259); T2 FAIL (out of sample −0.163R a trade net, n 1472, month t -2.81; in sample −0.122R, n 1259).",
+   "figures": {
+    "n": 1472,
+    "R": -0.02,
+    "Rper": "trade",
+    "t": -2.36
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gold-lbma-fix",
+   "merged": false,
+   "pr": 960,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-minute-histdata",
+   "title": "Gotobi fade: the entry-minute grid on HistData M1 (is the 00:55 spike a feed artefact?)",
+   "rule": "frozen.mjs in this folder is research/edge/gotobi-feed/frozen.mjs of branch gotobi-feed, copied byte for byte (sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32, the same file…",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "FEED-CONFIRMED: on HistData too the 00:55 entry is the clear maximum (+0.127R a trade, +0.027R above the next row, 00:54) and one minute late keeps 35 % of it (+0.044R).",
+   "figures": {
+    "R": 0.127,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-minute-histdata",
+   "merged": false,
+   "pr": 912,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-timing",
+   "title": "Gotobi fade: how sensitive the result is to execution timing",
+   "rule": "frozen.mjs in this folder is research/edge/gotobi-replicate/frozen.mjs of branch gotobi-replicate, copied byte for byte (sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32,…",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "sensitivity report, no class (gate held): the result sits on the 00:55 entry minute; one minute late net R a trade is +0.048 against +0.148 at the base, month t +1.07; the exit minute hardly matters.",
+   "figures": {
+    "t": 1.07
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-timing",
+   "merged": false,
+   "pr": 908,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-book-risk",
+   "title": "ICT A-setup book: a book-level risk rule",
+   "rule": "The A-setups fire on four index futures that move together (NQ, ES, YM, RTY) and on gold; the desk sizes each signal on its own (sizeOf) and lets each market hold one position.",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "YM",
+    "RTY"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. None of the 4 pre-registered book rules passes; the A-setup book stays sized as it is.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "ict-book-risk",
+   "merged": false,
+   "pr": 824,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-breadth-2",
+   "title": "ICT breadth test, part 2: the unchanged A-setup rule on the nine markets #545 could not test",
+   "rule": "Verdict: FAIL (pre-registered bar), for the primary set (all nine new markets pooled) and for both secondary sets (seven indices; two metals).",
+   "markets": [
+    "RTY"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL (pre-registered bar), for the primary set (all nine new markets pooled) and for both secondary sets (seven",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-concepts",
+   "title": "New ICT entry concepts: turtle soup at equal highs/lows, \"lows that broke highs\", NWOG/NDOG fill (edge research, ict-concepts)",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. No concept becomes a paper candidate.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-equal-lows",
+   "title": "ICT A-setups: does it matter what the sweep took? Relative equal lows / highs vs a single low",
+   "rule": "Written on 11 Nov 2026, before any outcome of this split was computed.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. A-setups whose sweep took relative equal lows / highs made +0.092R a trade net out of sample (n 107, t 0.72) against +0.138R for the other A-setups (n 579, t 2.07): difference −0.046R, t −0.32.",
+   "figures": {
+    "n": 107,
+    "R": 0.092,
+    "Rper": "trade",
+    "t": 0.72
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-exits",
+   "title": "ICT iFVG exits: what to do after entry (edge research, ict-exits)",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. The live exit stays.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-exits-replay",
+   "title": "ict-exits-replay",
+   "rule": "",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "struct passes the gate on the replay (+0.058R a trade, t 1.44; halves +3.6R / +10.9R; better on ES, YM, RTY, GC, worse on NQ).",
+   "figures": {
+    "R": 0.058,
+    "Rper": "trade",
+    "t": 1.44
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": false,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-filters",
+   "title": "ICT iFVG filters: which hold up out-of-sample (2018 to Oct 2026)",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "pass",
+   "verdictText": "PASS, but weak. One simple filter passes every test: don't take A-setups on Fridays (New York day).",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-grades",
+   "title": "ICT grades: do the untraded B and C setups carry an edge, and does the grade order hold?",
+   "rule": "Verdict: H1 FAILS, H2 DOES NOT HOLD, H3 HURTS (all pre-registered bars).",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "H1 FAILS, H2 DOES NOT HOLD, H3 HURTS (all pre-registered bars). The B-setups the desk logs but does not trade",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-markets",
+   "title": "ict-markets",
+   "rule": "",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": false,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-quarters",
+   "title": "ICT A-setups by quarter of the week, month and year (quarterly theory, pre-registered)",
+   "rule": "Written on 13 Nov 2026, before any outcome of this split was computed.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. None of the three pre-registered tests passes.",
+   "figures": {
+    "n": 152,
+    "R": 0.134,
+    "Rper": "trade",
+    "t": -0.01
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "ict-quarters",
+   "merged": false,
+   "pr": 817,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-sessions",
+   "title": "When does the ICT A-setup edge live? Session, opening hours, weekday, post-halt",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "nothing passes. All four hypotheses FAIL the pre-registered bar; no shadow variant is added and no code outside this",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "ict-variants",
+   "title": "Five ICT A-setup variants from the skill, 2020 → Nov 2026, IS / OOS (pre-registered, 9 Nov 2026)",
+   "rule": "Per year avg R, win rate, PF, max DD and t for every row are in result.json (yearStats).",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "pass",
+   "verdictText": "PASS for one of nine on the corrected clock (10 Nov 2026), not strong. V3 htffvg on the index book passes the pre-registered bar (in-sample n 80, +0.273R, t 1.44; out-of-sample n 84, +0.355R, t 1.92).",
+   "figures": {
+    "n": 80,
+    "R": 0.273,
+    "t": 1.44
+   },
+   "replicate": false,
+   "built": "2026-11-09",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "last-hour",
+   "title": "Last hour into the US cash close on a big day",
+   "rule": "x = P(15:00) / P(09:30) − 1 (the open-to-15:00 move as a fraction).",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: neither fading nor following a big day into the cash close pays after costs (2016 → now, pooled: fade −0.077R, follow −0.065R a trade).",
+   "figures": {
+    "n": 2664,
+    "R": -0.077,
+    "t": -5.22
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "last-hour",
+   "merged": false,
+   "pr": 872,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "lit",
+   "title": "LIT (Liquidity Inducement Theory) on gold and NAS100, 2008-2026",
+   "rule": "Verdict: INCONCLUSIVE — under the skill's own defaults the rule produces too few trades to judge (XAUUSD 27 and NAS100 35 fills in 19 years, one order in five fills), and everything that can be…",
+   "markets": [
+    "gold",
+    "NQ"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE — under the skill's own defaults the rule produces too few trades to judge (XAUUSD 27 and NAS100 35 fills in 19 years, one order in five fills), and everything that can be measured is negative: the thicker…",
+   "figures": {
+    "n": 39,
+    "R": 0.7,
+    "Rper": "trade",
+    "t": -2.7
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "macro-vol",
+   "title": "macro-vol",
+   "rule": "",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": false,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "meridian-swing",
+   "title": "MERIDIAN Swing: do filters or exits give it an edge?",
+   "rule": "Candles.",
+   "markets": [
+    "gold",
+    "forex",
+    "crypto"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. Nothing is added as a shadow stream, and no live rule changes.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "news-filter",
+   "title": "news-filter",
+   "rule": "",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": false,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "nfp-follow",
+   "title": "NFP follow or fade, gold and NAS100 (2026-11-13)",
+   "rule": "1.",
+   "markets": [
+    "gold",
+    "NQ"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 4 tests pass the pre-registered bar (PREREGISTRATION.md, committed before any number was computed). Best on the decisive window: Fade · gold, +0.096R a trade net (n 40, t 0.512, Holm p 1).",
+   "figures": {
+    "n": 40,
+    "R": 0.096,
+    "Rper": "trade",
+    "t": 0.512
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "nfp-follow",
+   "merged": false,
+   "pr": 863,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "nr7-breakout",
+   "title": "NR7 breakout on gold, two US indices and three currency pairs",
+   "rule": "The narrowest-range-of-seven-days breakout (Toby Crabel, 1990: after a day whose range is the narrowest of the last seven, trade the break of that day's high or low the next day) is a published…",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "forex"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. Neither exit passes the pre-registered bar (PREREGISTRATION.md, committed before any trade was computed).",
+   "figures": {
+    "n": 2191,
+    "R": 0.013,
+    "Rper": "trade",
+    "t": 0.38
+   },
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "nr7-breakout",
+   "merged": false,
+   "pr": 867,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "portfolio",
+   "title": "Portfolio rules: caps, sizing, correlation and drawdown (edge research, paper only)",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "no rule change passes. The live caps hold up: a dollar cap of 2 and a 3-hour Scalp re-entry wait each scored best in-sample, and both held out-of-sample.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "portfolio-v2",
+   "title": "Portfolio v2: every council stream with a long history, weighted walk-forward (paper only, proposal)",
+   "rule": "Verdict.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "Passes the letter of the pre-registered bars, but is not an edge on untouched data: in the clean 2009-17 half no book",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "pre-fomc-gold-usd",
+   "title": "The pre-FOMC drift in gold and the US dollar",
+   "rule": "Entry: at the close of the M15 candle that ends at T − 24 h (14:00 New York the day before a 14:00 statement; for the 14:15 and 12:30 statements of 2008-2012, the same clock time the day before:…",
+   "markets": [
+    "gold",
+    "forex",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. 0 of 2 tests meet the pre-registered bar. T1 long gold, 2016 → now: n 86, +0.070R a trade net, t +1.26, Holm p 0.19; 2008-15 −0.049R (n 64).",
+   "figures": {
+    "n": 86,
+    "R": 0.07,
+    "Rper": "trade",
+    "t": 1.26
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "pre-fomc-gold-usd",
+   "merged": false,
+   "pr": 925,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "pre-release-drift",
+   "title": "Drift in the 24 hours before US CPI and payrolls (gold and the dollar)",
+   "rule": "Post-release follow-through after CPI and payrolls was tested (cpi-follow, nfp-follow: FAIL), and the 24 hours before FOMC statements too (pre-fomc-drift, pre-fomc-gold-usd, bond-fomc-drift: FAIL).",
+   "markets": [
+    "gold",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL (0 of 10 cells pass). Pre-registered in PREREGISTRATION.md (committed and pushed before any candle was fetched).",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "pre-release-drift",
+   "merged": false,
+   "pr": 963,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "regime",
+   "title": "Does market regime decide when MERIDIAN's setups work?",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "Scalp (live rule): FAIL.; Intraday: FAIL.; Swing: INCONCLUSIVE.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "regime-switch",
+   "title": "Regime switch: can a simple causal indicator tell in advance when the council's edges work?",
+   "rule": "Trades: unchanged outputs of the earlier studies (inputs.json, built by run.mjs build): - ICT A-setups from the ict-oos-2008 OANDA run (cached trades.json), net = size x (Rraw - costR), signal close…",
+   "markets": [
+    "gold",
+    "NQ"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL as a tradable regime switch. Two of 21 cells pass the letter of the bar (META on the NQ open run and the gold",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "risk-cross",
+   "title": "AUD/JPY and NZD/JPY held only while the S&P 500 is in a calm uptrend",
+   "rule": "On the SPX500 folded closes, for day d (using day d and earlier only): - sma200 = simple mean of the last 200 closes; up = close > sma200. - rv20 = sample standard deviation of the last 20…",
+   "markets": [
+    "ES",
+    "forex"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3. Holding AUD/JPY (T1) or NZD/JPY (T2) long while the S&P 500 is above its 200-day average and calm",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "risk-cross",
+   "merged": false,
+   "pr": 886,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "scalp-exits",
+   "title": "Scalp exits: which exit, entry and stop buffer work best for the live Scalp rule?",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. No exit rule found an edge.",
+   "figures": {
+    "R": 0.13,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "scalp-filters",
+   "title": "Scalp filters on 8 years of M1 (edge research: scalp-filters)",
+   "rule": "These are the live markets minus AUD/USD (gold, EUR/USD, GBP/USD, USD/CAD, USD/CHF).",
+   "markets": [
+    "gold",
+    "forex"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL. The Scalp has no robust edge on any of the 10 markets tested, under any single or pairwise filter.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "seasonality",
+   "title": "Structural seasonality on NQ, ES and gold",
+   "rule": "Paper research only.",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "nothing passes. No candidate shadow stream.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "setups-promote",
+   "title": "Which engine setups are worth promoting from shadow to live?",
+   "rule": "Four of the six testable rules point the right way out-of-sample.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "no engine setup has a robust edge on 2018–2026. Promote none to live.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "shadow-best",
+   "title": "Which shadow streams to keep",
+   "rule": "1.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 32 cells: no engine shadow stream is worth keeping",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-12",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "shadow-best-raw",
+   "title": "The shadow cut on the measured raw-spread costs",
+   "rule": "32 cells: xau, eurusd, gbpusd, audusd, usdcad, usdchf x scalp, intraday, rscalp, rintra (24), and btc, eth, sol, xrp x intraday, rintra (8).",
+   "markets": [
+    "gold",
+    "forex",
+    "crypto"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 32 cells at the measured costs (0 of 32 at 2x): the cut was not decided on wrong costs",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "shadow-best-raw",
+   "merged": false,
+   "pr": 821,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "shadow-scalp-filters",
+   "title": "Five filters on the shadow scalp / intraday setups",
+   "rule": "Each filter removes trades from the baseline family; everything is decided at the signal time t (opened), from the views the Trader has at t and the order's own levels.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE: the pre-registered bar passes 4 of 5, but a random filter of the same size passes it too (4 of 5 placebos)",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-12",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "sma10-timing",
+   "title": "The 10-month moving-average timing rule, out of sample",
+   "rule": "Month end = the last (folded) daily candle of a calendar month.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: on the equal-weight book (SPX500, NAS100, US30, gold), in the decisive window 2016 to 6 Nov 2026 the 10-month average rule cut the worst drawdown from 26.65 % to 14.93 % but earned 3.00 % a year against 8.50 %…",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-13",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "sma10-timing",
+   "merged": false,
+   "pr": 841,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "supported-book",
+   "title": "The supported book, run as a book",
+   "rule": "On data none of the rules saw, after spread, slippage and financing on every unit at today's rate, is the supported two-system book's return distinguishable from zero?",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: on untouched 2006-17, after costs and financing on every unit, the two-system book (Gold trend + Gold daily engulf) made +59.3R, +5.2R a year (330 positions, t 1.86 on daily book R, under the pre-registered 2),…",
+   "figures": {
+    "R": 59.3,
+    "t": 1.86
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "timing",
+   "title": "Edge research · timing — time-of-day windows for Scalp / Intraday",
+   "rule": "Engine.",
+   "markets": [
+    "gold",
+    "forex",
+    "dollar"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL — no time window passes. No window turns any of the four engine setups positive out of sample, so none meets the bar for a candidate.",
+   "figures": {
+    "R": -0.18,
+    "Rper": "trade"
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "trend-breadth-h1",
+   "title": "Trend breadth on hourly candles",
+   "rule": "Long only.",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL: the Gold trend rule does not carry to other markets: 0 of 14 tests pass; pooled over thirteen markets −0.059R a position net on 2020-26 (n 827, monthly t −0.89) and −0.028R on 2005-19 (n 1,690, t −0.52), and…",
+   "figures": {
+    "n": 827,
+    "R": -0.059,
+    "Rper": "position",
+    "t": -0.89
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "weekend-gap-duka",
+   "title": "Rule G on Dukascopy bid / ask, and the real Sunday-reopen spread",
+   "rule": "Signals exactly as frozen, on mid: the frozen weeks() and ruleG() run on the mid M5 candles (so fc, the gap, ATR, eligibility 0.25 ≤ |gap| / ATR ≤ 1.5, the side, r0 = |fc − entrymid|, the filled and…",
+   "markets": [],
+   "assetClass": "cross-asset",
+   "verdict": "nm",
+   "verdictText": "NOT MEASURABLE (inconclusive: Dukascopy is not reachable from this runner). No spread measured, no test run.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "weekend-gap-duka",
+   "merged": false,
+   "pr": 949,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "yield-fx-weekly",
+   "title": "Do weekly moves in US 2-year yields lead the dollar against low-yielding currencies?",
+   "rule": "For each pair separately, at every Friday candle (UTC weekday 5) of the folded usb02y file:",
+   "markets": [
+    "forex",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "cross-asset",
+   "verdict": "fail",
+   "verdictText": "FAIL, 0 of 3: a weekly 2-year Treasury move does not lead the dollar over the next week; decisive 2016-26 net a trade T1 USD/JPY +0.019R (n 301, t 0.43); T2 USD/CHF -0.015R (n 301, t -0.36); T3 EUR/USD +0.003R (n 301,…",
+   "figures": {
+    "n": 301,
+    "R": 0.019,
+    "t": 0.43
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "yield-fx-weekly",
+   "merged": false,
+   "pr": 942,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "academy-ml-review",
+   "title": "Academy scorer: training review",
+   "rule": "Rows: train pool, not flagged, filled, every needed timeframe present; sorted by signal time. - Expanding window.",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "No scorer passes: all 20 (the reference and the four pre-registered challenger configurations) are rejected challengers; none is promoted.",
+   "figures": {
+    "n": 206
+   },
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "academy-policy",
+   "title": "Academy decision policy against taking every setup: diagnosis and five candidates",
+   "rule": "Seven mechanical edges produce setups.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "no candidate passes. The shipped policy stays and the exam pool was not read.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "book-sizing",
+   "title": "Book sizing: the trend leg's pyramid add, on against off",
+   "rule": "The live Gold trend rule buys one more unit on the first daily close at least 1R above the entry, with the position's current stop (goldTrendAdd { atR: 1 }).",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "FAIL: within noise (no proposal, the live rule stays).",
+   "figures": {
+    "R": 59.3
+   },
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "coach-learning",
+   "title": "Does the Coach's self-learning help or hurt?",
+   "rule": "The engine's own signals, from two council 150-day replays (council/backtest.mjs, 6 Jun – 3 Nov 2026, 10 markets): - Primary: research/backtest-150d-m30.json, 12,493 filled trades of the setups the…",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "FAIL. No variant passes, so there is no proposal.md.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "cost-floor-map",
+   "title": "Cost floor map: the 13-14 Nov studies, what cost each pre-cost effect can carry",
+   "rule": "Committed and pushed alone, before collect.mjs, run.mjs, collected.json or result.json exist.",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "ACCOUNTING (no rule tested). This is accounting of committed results, not a test of any market: no data was fetched, no rule was run, no study's verdict changes, and no row below is an edge.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "cost-floor-map",
+   "merged": false,
+   "pr": 948,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "costs",
+   "title": "Are the cost assumptions realistic? Which edges survive realistic execution?",
+   "rule": "The harness runs council/engine.mjs (msAnalyze, buildSetup 'scalp') with the backtest's plumbing: - 5-minute steps, 720-candle views with the forming M15 candle; - READY with the CF at most 12…",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "FAIL. No rule passes as a candidate, but the answer to the question is clear.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "decay-monitor",
+   "title": "Edge-decay monitor: how it works and how it does on the record",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-11",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "expectations",
+   "title": "What to expect: the live systems on the data they never saw",
+   "rule": "Records.",
+   "markets": [
+    "gold",
+    "NQ",
+    "crypto"
+   ],
+   "assetClass": "meta",
+   "verdict": "",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": false,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "futures-roll",
+   "title": "Futures rolls in the ICT desk's CNBC candles (data integrity, 7 Nov 2026)",
+   "rule": "1. rollAdjust (ict/tracker.mjs, live + replay).",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "YM",
+    "RTY"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "real, but not where #505 suspected it. The H1 / 5m candles the desk uses never jump at a roll, so no roll step",
+   "figures": {
+    "R": 1.07
+   },
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "futures-route-map",
+   "title": "Futures route map: the cost-blocked tests of 13-14 Nov at exchange-futures cost (2026-11-14)",
+   "rule": "Roles as multiple-testing-update assigned them: family (a new hypothesis), replication (#889, #862, #928, #938, #920, #924; and bond-month-end-replicate, its own words), robustness (#894, #912,…",
+   "markets": [
+    "gold",
+    "NQ",
+    "ES",
+    "YM",
+    "forex",
+    "rates",
+    "crypto"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "ROUTE-SENSITIVE: 10 tests would pass at futures cost (Holm 0) (accounting, no rule tested: inconclusive as evidence for any rule). 4 of the 10 already passed their own bar at the CFD cost; 6 pass only at futures cost;…",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "futures-route-map",
+   "merged": false,
+   "pr": 972,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "fx-carry",
+   "title": "The FX carry trade on the G8 currencies, with a crash filter",
+   "rule": "Rebalance: the last folded daily candle of each calendar month (a weekday; UTC date).",
+   "markets": [
+    "forex",
+    "dollar",
+    "rates"
+   ],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "FAIL (neither test makes money with month-sum t ≥ 2 in 2016-26 AND makes money in 2006-15). T1 (carry, every month): +0.066R a month net in 2016-26 (n 130 months, 448 legs, t 0.34), +0.124R in 2006-15 (n 120, t 0.51).",
+   "figures": {
+    "n": 130,
+    "R": 0.066,
+    "Rper": "month",
+    "t": 0.34
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "fx-carry",
+   "merged": false,
+   "pr": 830,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-carry",
+   "title": "What it costs to hold a gold buy, route by route",
+   "rule": "Written and committed before any number below was computed (12 Nov 2026).",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE (cost accounting, no rule tested): holding the book's gold buys costs 5.4 % a year at the demo broker (book +5.16R a year, t 1.86, 330 positions, untouched 2006-17); the cheapest route that could be…",
+   "figures": {
+    "R": 5.16,
+    "Rper": "year",
+    "t": 1.86
+   },
+   "replicate": false,
+   "built": "2026-11-12",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gold-fidelity",
+   "title": "gold-fidelity",
+   "rule": "Four paper gold systems went live in council/trader.mjs on 4–7 Nov 2026 (Mosha BO 4 Nov 20:43, Gold trend 5 Nov 23:32, Gold H4 trendline 6 Nov 00:13, Gold daily engulf 6 Nov 09:15, Gold trend fast 7…",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "the forward record of the four gold daily/H4 systems is too thin to diff trade by trade (no live trade yet for Gold trend, Gold trend fast, the H4 trendline or Mosha BO; one pending engulf order), but everywhere it can…",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "gotobi-cost",
+   "title": "Gotobi cost: what the fade after the 09:55 Tokyo fix costs, and where it breaks even",
+   "rule": "frozen.mjs in this folder is a byte-for-byte copy of research/edge/gotobi/run.mjs at commit 5f341e069 of branch gotobi (sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32, the…",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "inconclusive on cost (cost accounting only, no rule tested).",
+   "figures": {
+    "R": 0.223,
+    "t": 4.13
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "gotobi-cost",
+   "merged": false,
+   "pr": 893,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "histdata-clock",
+   "title": "HistData M1 clock audit",
+   "rule": "Every rule gives one offset (4 or 5 hours) for a whole Monday-to-Friday week, because all of the clock changes fall on a Sunday while these markets are shut.",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "data audit, no trading rule tested. The HistData files are stamped on rule R4 (hybrid): New York time in 2018, Europe's summer-time dates from 2019.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-10",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "honest-book",
+   "title": "The honest book: three paper books on data none of the rules saw",
+   "rule": "Records.",
+   "markets": [
+    "gold",
+    "NQ",
+    "crypto"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "On the untouched 2006-17 window, book C (honest-positive + Gold trend fast N5) is best by return/drawdown (3.9), book B (honest-positive) is a hair behind (3.7) and the live book A is far behind (0.6); C against B is…",
+   "figures": {
+    "n": 5
+   },
+   "replicate": false,
+   "built": "2026-11-08",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "index-futures-cost",
+   "title": "The same index trades on CME micro futures",
+   "rule": "What do the same trades (byte-identical trade lists: same signals, entries, stops, exits, gross R) net on micro futures?",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE (cost accounting, no rule tested; no study's verdict changes): on CME micro futures the same trades net index-overnight US500 +0.001R / NAS100 +0.015R a trade (CFD −0.022 / −0.006), index-ibs SPX500 +0.042…",
+   "figures": {
+    "R": 0.001
+   },
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "index-futures-cost",
+   "merged": false,
+   "pr": 900,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "lead-forward-plan",
+   "title": "What a forward paper record could show for each open lead, and how long it would take",
+   "rule": "1.",
+   "markets": [
+    "gold",
+    "NQ",
+    "forex",
+    "rates"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "PLAN COMPUTED (no rule tested). This is accounting, not a test: no rule is tested, no rule is proposed, and nothing live changed.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "lead-forward-plan",
+   "merged": false,
+   "pr": 967,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "multiple-testing-1314nov",
+   "title": "multiple testing across the studies of 13-14 Nov 2026",
+   "rule": "Written and pushed alone, before any statistic of this check is collected or computed.",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "no decisive test of the day survives a correction across all 248 (Holm 0, BH q 0.10 0); gotobi T2: (a) BH q 0.7068 fails q 0.10, (b) Holm 0.7618 fails; with its frozen USD/JPY 2005-09 replication, Fisher p 3.6e-6…",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "multiple-testing-1314nov",
+   "merged": false,
+   "pr": 904,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "multiple-testing-update",
+   "title": "multiple testing, update of the 13-14 Nov count with the studies pushed since",
+   "rule": "The 248 family tests of #904 are taken exactly as stored in its inputs.json (same t / p, same ids); none is re-read. - For each new study: every pre-registered primary test in its DECISIVE window…",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "no test survives a correction across all 333 (the 248 of #904 plus 85 new): Holm 0, BH q 0.10 0; t >= 2 in 6 against 7.6 expected by chance; with an independent replication on other years, only the gotobi fade stays…",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "multiple-testing-update",
+   "merged": false,
+   "pr": 946,
+   "draft": true,
+   "otherBranches": []
+  },
+  {
+   "topic": "param-drift",
+   "title": "Parameter-drift audit: does the live code run what the studies tested?",
+   "rule": "Paper research only.",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "the live parameters of all seven systems equal the tested ones.",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": false,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "robustness",
+   "title": "Robustness audit: how much of the claimed edge is real?",
+   "rule": "> Clock correction, 10 Nov 2026.",
+   "markets": [
+    "gold"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "",
+   "figures": {},
+   "replicate": false,
+   "built": null,
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "shadow-audit",
+   "title": "shadow-audit",
+   "rule": "",
+   "markets": [],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "the shadow book's −300R week is 100% costs, not trading.",
+   "figures": {
+    "R": -287.94
+   },
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "shadow-cost",
+   "title": "Shadow streams at realistic costs: which ones cost at most 0.10R and still make money out of sample",
+   "rule": "Verdict: INCONCLUSIVE.",
+   "markets": [
+    "NQ"
+   ],
+   "assetClass": "meta",
+   "verdict": "inc",
+   "verdictText": "INCONCLUSIVE. No shadow stream passes as a whole.",
+   "figures": {
+    "R": 0.35,
+    "t": 2.5
+   },
+   "replicate": false,
+   "built": "2026-11-09",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "sizing",
+   "title": "Position sizing for the live systems: fixed 1R stays",
+   "rule": "Records.",
+   "markets": [
+    "gold",
+    "NQ"
+   ],
+   "assetClass": "meta",
+   "verdict": "fail",
+   "verdictText": "keep fixed 1R. No overlay passes the pre-registered bar.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-07",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": false
+   },
+   "branch": "main",
+   "merged": true,
+   "pr": null,
+   "otherBranches": []
+  },
+  {
+   "topic": "weekend-reopen-cost",
+   "title": "What a Sunday-reopen fade really costs: the spread at Rule G's entry and exit",
+   "rule": "frozen.mjs = #880's research/edge/fx-weekend-gap/run.mjs byte for byte (the same file #928 and #938 copied), sha256 3dfd1dd71f1c1bb2512c5ee0f26573bcb38944f152634ccd622efc1b7002b273, pinned by the…",
+   "markets": [
+    "forex"
+   ],
+   "assetClass": "meta",
+   "verdict": "nm",
+   "verdictText": "NOT MEASURABLE (inconclusive: a cost that could not be measured, not a failed rule). No real spread source covers the Sunday reopen for the pairs and years Rule G trades.",
+   "figures": {},
+   "replicate": false,
+   "built": "2026-11-14",
+   "files": {
+    "result": true,
+    "json": true,
+    "prereg": true
+   },
+   "branch": "weekend-reopen-cost",
+   "merged": false,
+   "pr": 944,
+   "draft": true,
+   "otherBranches": []
+  }
+ ]
+}
