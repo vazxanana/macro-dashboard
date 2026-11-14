@@ -1,0 +1,405 @@
+{
+ "built": "2026-11-14",
+ "study": "fx-weekday",
+ "title": "Day-of-week effects in the US dollar basket",
+ "verdict": "FAIL",
+ "passed": [],
+ "data": {
+  "src": "OANDA mid daily candles, council-data research/daily/<key>.json (git show), weekend folded into Monday (council/fills.mjs foldWeekend)",
+  "first": "2002-10-24",
+  "last": "2026-11-06",
+  "days": 6256,
+  "decisiveDays": 2828,
+  "replicationDays": 2864,
+  "skipped": 126
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-04",
+   "2026-11-06"
+  ],
+  "replication": [
+   "2005-01-04",
+   "2015-12-31"
+  ]
+ },
+ "costs": {
+  "spreadPip": 0.3,
+  "commissionRT": 0.000045,
+  "note": "one raw-spread round trip a day per leg; 2x check doubles spread, commission and the rate markup"
+ },
+ "financing": {
+  "source": {
+   "eur": "broker",
+   "gbp": "broker",
+   "aud": "broker",
+   "nzd": "rates",
+   "jpy": "rates",
+   "chf": "broker"
+  },
+  "swapsAt": "2026-11-14T01:14:58.513Z",
+  "ratesFrom": "origin/fx-carry research/edge/fx-carry/rates.json (approximate, from memory; see its about line)",
+  "markupPct": 1,
+  "note": "broker swaps of today applied to every year (EUR, GBP, AUD, CHF); NZD and JPY from the rate gap less the markup; Wednesday-labelled day pays three nights"
+ },
+ "weekdays": [
+  {
+   "wd": 1,
+   "day": "Monday",
+   "side": "short USD",
+   "decisive": {
+    "n": 566,
+    "grossPctLongUsd": -0.0088,
+    "restGrossPctLongUsd": 0.0038,
+    "welchT": -0.7071,
+    "p": 0.4795,
+    "monthT": -0.6891,
+    "months": 131,
+    "side": "short USD",
+    "grossPctSide": 0.0009,
+    "netPctSide": -0.0123,
+    "grossRSide": 0.0007,
+    "netRSide": -0.0083,
+    "netPctLongUsd": -0.0162,
+    "costPct": 0.0078,
+    "finPct": -0.0054,
+    "won": 0.4806,
+    "legStops": 26,
+    "x2": {
+     "netPctSide": -0.021,
+     "netRSide": -0.0141
+    },
+    "holmP": 1
+   },
+   "replication": {
+    "n": 573,
+    "grossPctLongUsd": 0.0339,
+    "restGrossPctLongUsd": -0.0059,
+    "welchT": 1.732,
+    "p": 0.0833,
+    "monthT": 1.792,
+    "months": 132,
+    "side": "short USD",
+    "grossPctSide": -0.0365,
+    "netPctSide": -0.0471,
+    "grossRSide": -0.0155,
+    "netRSide": -0.0215,
+    "netPctLongUsd": 0.0251,
+    "costPct": 0.0074,
+    "finPct": -0.0032,
+    "won": 0.4782,
+    "legStops": 27,
+    "x2": {
+     "netPctSide": -0.0555,
+     "netRSide": -0.026
+    }
+   },
+   "checks": {
+    "p1": false,
+    "p2": false,
+    "p3": false
+   },
+   "pass": false,
+   "x2": {
+    "p1": false,
+    "p3": false
+   }
+  },
+  {
+   "wd": 2,
+   "day": "Tuesday",
+   "side": "long USD",
+   "decisive": {
+    "n": 566,
+    "grossPctLongUsd": 0.0092,
+    "restGrossPctLongUsd": -0.0007,
+    "welchT": 0.5162,
+    "p": 0.6057,
+    "monthT": 0.2953,
+    "months": 131,
+    "side": "long USD",
+    "grossPctSide": 0.0092,
+    "netPctSide": 0.0018,
+    "grossRSide": 0.0088,
+    "netRSide": 0.0042,
+    "netPctLongUsd": 0.0018,
+    "costPct": 0.0078,
+    "finPct": 0.0004,
+    "won": 0.5141,
+    "legStops": 27,
+    "x2": {
+     "netPctSide": -0.0068,
+     "netRSide": -0.0016
+    },
+    "holmP": 1
+   },
+   "replication": {
+    "n": 572,
+    "grossPctLongUsd": -0.0094,
+    "restGrossPctLongUsd": 0.0049,
+    "welchT": -0.5784,
+    "p": 0.563,
+    "monthT": -0.6101,
+    "months": 132,
+    "side": "long USD",
+    "grossPctSide": -0.0094,
+    "netPctSide": -0.0183,
+    "grossRSide": -0.0026,
+    "netRSide": -0.0071,
+    "netPctLongUsd": -0.0183,
+    "costPct": 0.0074,
+    "finPct": -0.0014,
+    "won": 0.5087,
+    "legStops": 23,
+    "x2": {
+     "netPctSide": -0.0266,
+     "netRSide": -0.0116
+    }
+   },
+   "checks": {
+    "p1": false,
+    "p2": false,
+    "p3": true
+   },
+   "pass": false,
+   "x2": {
+    "p1": false,
+    "p3": false
+   }
+  },
+  {
+   "wd": 3,
+   "day": "Wednesday",
+   "side": "short USD",
+   "decisive": {
+    "n": 566,
+    "grossPctLongUsd": -0.0094,
+    "restGrossPctLongUsd": 0.0039,
+    "welchT": -0.6317,
+    "p": 0.5276,
+    "monthT": -0.7474,
+    "months": 131,
+    "side": "short USD",
+    "grossPctSide": 0.0058,
+    "netPctSide": -0.0181,
+    "grossRSide": 0.0023,
+    "netRSide": -0.0145,
+    "netPctLongUsd": -0.0161,
+    "costPct": 0.0078,
+    "finPct": -0.0161,
+    "won": 0.4735,
+    "legStops": 46,
+    "x2": {
+     "netPctSide": -0.0286,
+     "netRSide": -0.0213
+    },
+    "holmP": 1
+   },
+   "replication": {
+    "n": 574,
+    "grossPctLongUsd": -0.0067,
+    "restGrossPctLongUsd": 0.0042,
+    "welchT": -0.4456,
+    "p": 0.6559,
+    "monthT": -0.4694,
+    "months": 132,
+    "side": "short USD",
+    "grossPctSide": 0.0051,
+    "netPctSide": -0.0119,
+    "grossRSide": 0.0025,
+    "netRSide": -0.0075,
+    "netPctLongUsd": -0.0183,
+    "costPct": 0.0074,
+    "finPct": -0.0095,
+    "won": 0.4913,
+    "legStops": 28,
+    "x2": {
+     "netPctSide": -0.022,
+     "netRSide": -0.013
+    }
+   },
+   "checks": {
+    "p1": false,
+    "p2": false,
+    "p3": false
+   },
+   "pass": false,
+   "x2": {
+    "p1": false,
+    "p3": false
+   }
+  },
+  {
+   "wd": 4,
+   "day": "Thursday",
+   "side": "short USD",
+   "decisive": {
+    "n": 566,
+    "grossPctLongUsd": -0.0009,
+    "restGrossPctLongUsd": 0.0018,
+    "welchT": -0.1251,
+    "p": 0.9005,
+    "monthT": -0.0277,
+    "months": 131,
+    "side": "short USD",
+    "grossPctSide": -0.0005,
+    "netPctSide": -0.0136,
+    "grossRSide": -0.0021,
+    "netRSide": -0.0112,
+    "netPctLongUsd": -0.0083,
+    "costPct": 0.0078,
+    "finPct": -0.0054,
+    "won": 0.4823,
+    "legStops": 36,
+    "x2": {
+     "netPctSide": -0.0223,
+     "netRSide": -0.0169
+    },
+    "holmP": 1
+   },
+   "replication": {
+    "n": 574,
+    "grossPctLongUsd": -0.0111,
+    "restGrossPctLongUsd": 0.0053,
+    "welchT": -0.6865,
+    "p": 0.4924,
+    "monthT": -0.6968,
+    "months": 132,
+    "side": "short USD",
+    "grossPctSide": 0.0151,
+    "netPctSide": 0.0045,
+    "grossRSide": 0.0036,
+    "netRSide": -0.0024,
+    "netPctLongUsd": -0.0199,
+    "costPct": 0.0074,
+    "finPct": -0.0032,
+    "won": 0.4808,
+    "legStops": 37,
+    "x2": {
+     "netPctSide": -0.0039,
+     "netRSide": -0.0069
+    }
+   },
+   "checks": {
+    "p1": false,
+    "p2": false,
+    "p3": false
+   },
+   "pass": false,
+   "x2": {
+    "p1": false,
+    "p3": false
+   }
+  },
+  {
+   "wd": 5,
+   "day": "Friday",
+   "side": "long USD",
+   "decisive": {
+    "n": 564,
+    "grossPctLongUsd": 0.0162,
+    "restGrossPctLongUsd": -0.0025,
+    "welchT": 0.8845,
+    "p": 0.3764,
+    "monthT": 1.2402,
+    "months": 131,
+    "side": "long USD",
+    "grossPctSide": 0.0162,
+    "netPctSide": 0.0088,
+    "grossRSide": 0.007,
+    "netRSide": 0.0023,
+    "netPctLongUsd": 0.0088,
+    "costPct": 0.0078,
+    "finPct": 0.0004,
+    "won": 0.5,
+    "legStops": 31,
+    "x2": {
+     "netPctSide": 0.0001,
+     "netRSide": -0.0035
+    },
+    "holmP": 1
+   },
+   "replication": {
+    "n": 571,
+    "grossPctLongUsd": 0.0035,
+    "restGrossPctLongUsd": 0.0017,
+    "welchT": 0.0771,
+    "p": 0.9386,
+    "monthT": -0.0136,
+    "months": 132,
+    "side": "long USD",
+    "grossPctSide": 0.0035,
+    "netPctSide": -0.0053,
+    "grossRSide": -0.0001,
+    "netRSide": -0.0046,
+    "netPctLongUsd": -0.0053,
+    "costPct": 0.0074,
+    "finPct": -0.0014,
+    "won": 0.4939,
+    "legStops": 17,
+    "x2": {
+     "netPctSide": -0.0136,
+     "netRSide": -0.0092
+    }
+   },
+   "checks": {
+    "p1": false,
+    "p2": false,
+    "p3": true
+   },
+   "pass": false,
+   "x2": {
+    "p1": false,
+    "p3": false
+   }
+  }
+ ],
+ "placebo": {
+  "seeds": 40,
+  "realMaxAbsT": 0.8845,
+  "seedsWithHolmUnder05": 1,
+  "seedsMaxAbsTAtLeastReal": 35,
+  "seedMaxAbsT": [
+   1.9442,
+   1.8392,
+   2.1808,
+   1.811,
+   2.2206,
+   1.0969,
+   1.4156,
+   1.6118,
+   1.9041,
+   1.2353,
+   1.9927,
+   2.0129,
+   0.8071,
+   1.0095,
+   1.5382,
+   0.1969,
+   0.835,
+   1.7459,
+   1.1725,
+   1.5658,
+   1.5186,
+   1.3142,
+   1.3503,
+   1.5596,
+   1.5418,
+   2.4213,
+   2.0262,
+   1.0114,
+   1.9409,
+   0.4829,
+   1.2408,
+   1.3497,
+   2.6266,
+   0.8332,
+   2.0721,
+   2.1765,
+   1.1456,
+   1.1487,
+   1.3703,
+   1.9542
+  ]
+ }
+}
