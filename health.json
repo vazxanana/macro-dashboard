@@ -1,5 +1,5 @@
 {
- "at": "2026-11-14T08:50:05.000Z",
+ "at": "2026-11-14T09:09:54.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T08:50:00.000Z",
+     "last": "2026-11-14T09:05:00.000Z",
      "staleMin": 0,
      "maxJump": 5.22,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T08:50:00.000Z",
+     "last": "2026-11-14T09:05:00.000Z",
      "staleMin": 0,
      "maxJump": 4.75,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T08:50:00.000Z",
+     "last": "2026-11-14T09:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.18,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T08:50:00.000Z",
+     "last": "2026-11-14T09:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.24,
      "clipped": 0,
@@ -132,7 +132,7 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "closed",
-     "n": 996,
+     "n": 984,
      "last": "2026-11-13T21:55:00.000Z",
      "staleMin": 0,
      "maxJump": 4.48,
@@ -143,7 +143,7 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "closed",
-     "n": 996,
+     "n": 984,
      "last": "2026-11-13T21:55:00.000Z",
      "staleMin": 0,
      "maxJump": 4.58,
@@ -154,7 +154,7 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "closed",
-     "n": 996,
+     "n": 984,
      "last": "2026-11-13T21:55:00.000Z",
      "staleMin": 0,
      "maxJump": 4.22,
@@ -165,7 +165,7 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "closed",
-     "n": 996,
+     "n": 984,
      "last": "2026-11-13T21:55:00.000Z",
      "staleMin": 0,
      "maxJump": 4.1,
@@ -176,7 +176,7 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "closed",
-     "n": 997,
+     "n": 985,
      "last": "2026-11-13T23:10:00.000Z",
      "staleMin": 0,
      "maxJump": 2.26,
@@ -192,13 +192,13 @@
     "snapshot.json": {
      "label": "Trader snapshot (snapshot.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "state.json": {
      "label": "Trader state (state.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "trades.json": {
@@ -219,7 +219,7 @@
     "mt5/signals.csv": {
      "label": "MT5 / cTrader signal file (mt5/signals.csv)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "analysis/latest.md": {
@@ -236,7 +236,7 @@
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 1,
+     "ageMin": 2,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -356,7 +356,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 529,
+     "ageMin": 549,
      "issues": []
     },
     "digest.json": {
@@ -366,32 +366,38 @@
     },
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
-     "status": "ok",
-     "ageMin": 162,
-     "issues": []
+     "status": "warn",
+     "ageMin": 182,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "warn",
+       "detail": "not updated for 3.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+      }
+     ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 1294,
+     "ageMin": 1314,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 1294,
+     "ageMin": 1314,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 1294,
+     "ageMin": 1314,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 1294,
+     "ageMin": 1314,
      "issues": []
     },
     "research/ledger.json": {
@@ -412,19 +418,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 1075,
+     "ageMin": 1095,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 694,
+     "ageMin": 714,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 9241,
+     "ageMin": 9260,
      "issues": [
       {
        "kind": "stale",
@@ -451,15 +457,16 @@
    }
   }
  },
- "summary": "Council data files: Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
+ "summary": "Council data files: Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale, Loop watchdog (watchdog.json) stale",
  "brief": {
   "status": "warn",
-  "line": "3 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no dat",
+  "line": "4 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no dat",
   "bad": [],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no data\")",
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
-   "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)"
+   "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)",
+   "Loop watchdog (watchdog.json): not updated for 3.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
   ],
   "notes": 2
  },
