@@ -192,6 +192,8 @@ paper system with a measured, clearly negative record.
 | 174 | Overnight vs intraday "tug of war" on US indices (`overnight-tug`) | **Not run, duplicate**: claim (a) failed in `overnight-drift` #836 / `index-overnight` #891, claim (b) in `gap-fill` #849 / `eu-gap-fade` #916; the untested variants would be selection after the fact | — |
 | 175 | High-volume return premium, OANDA quote counts (`volume-premium`) | **FAIL**: pooled 32 CFDs 2017-26 high-volume minus all days +2.69R a month net, t 1.99, Holm p 0.186; high-volume longs alone +0.006R a trade, negative at 2x costs. Indices alone t 3.52 OOS / 4.06 IS (relative only, a +0.022R long): a hypothesis needing its own pre-registration | #993 |
 | 176 | Volume premium replication on crypto (`volume-premium-crypto`) | **Blocked, not run**: the crypto daily caches keep OHLC only and every Binance host is refused by the network policy; needs `data.binance.vision` allowed, or a free Actions job keeping the volume column | — |
+| 177 | 52-week-high ranking, cross-section (`high52-xs`) | **Not run, duplicate on indices**: `high52-rotation` #853 (FAIL, OOS t 0.38) and `index-52w-high` #911; commodities and FX untested, run as `high52-cmdfx` | — |
+| 178 | Volume-conditioned reversal of big daily moves (`volume-reversal`) | **FAIL**: low-activity fades pooled 32 CFDs 2017-26 −0.20R a month net (t −0.59, Holm p 1.00), −1.09R in sample, beat 35 of 40 placebos (bar 38); low minus high t 2.36 is mostly trade count, +0.03R a trade | #994 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
