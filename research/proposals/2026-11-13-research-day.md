@@ -80,6 +80,8 @@ paper system with a measured, clearly negative record.
 | 314 | Trading gold's clean 60-day trends (line-fit R² ≥ 0.70, 10-day hold, in the line's direction) | **FAIL, wrong sign**: excess over same-side baseline −0.126R IS (t −2.66) and −0.094R OOS (t −2.88), Holm p 0.014; fading clean trends is an idea for its own test on other data | #1127 |
 | 315 | Gold momentum acceleration (13-week return vs the 13 weeks before, 4-week hold) | **FAIL, 0 of 3**: excess over every-week trade +0.029R OOS (n 76, t 0.21) after −0.165R IS; 26-week flips sign; mostly plain momentum | #1128 |
 | 316 | Fading gold's 20-day extremes when On-Balance-Volume doesn't confirm | **FAIL, 0 of 3**: OOS −0.127R (n 135, t −1.35), IS −0.159R, loses before costs; fading confirmed extremes loses too, so OBV adds nothing | #1129 |
+| 317 | Gold back toward its one-year gold/Brent ratio (z beyond ±2, 20-day hold) | **FAIL, 0 of 3**: OOS −0.351R (n 14, t −1.44); only 26 signals in 20 years; shorts won IS, lost 7 of 8 in the 2018-26 rise | #1130 |
+| 318 | Following gold's FOMC statement-day move for 10 days | **FAIL, 0 of 2**: +0.239R IS (t 2.12) reversed to −0.114R OOS (t −0.98), 3 of 40 placebos; baselines near zero, so the reversal is real, not drift | #1131 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
