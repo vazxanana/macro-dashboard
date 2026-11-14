@@ -241,6 +241,7 @@ paper system with a measured, clearly negative record.
 | 223 | Gold daily reopen gap (17:00-18:00 NY) | FAIL, 0 of 3: gap median $0.35-0.57 (inside the spread on 30-44% of evenings); fade −0.077R, follow −0.034R OOS, midpoint target 24 trades in 11 years | #1036 |
 | 224 | Gold daily close streaks | FAIL, 0 of 3: buy after 3+ down −0.028R, sell after 3+ up −0.049R, buy after 4+ down −0.162R OOS (0 of 40 placebos beaten) | #1037 |
 | 225 | Pre-payrolls gold long, replicated on 2006-21 (the #1033 near miss) | **FAIL**: −0.024R a trade net (n 156, month t −0.97, 14 of 40 placebos); pooled 2006-26 +0.002R (t 0.08). The 2022-26 near miss was the best of three tests in a strong gold market: lead closed | #1038 |
+| 226 | Gold and the dollar rising on the same day | FAIL, 0 of 3: buy-and-hold-3-days +0.120R OOS (n 92, month t 1.23, 34 of 40 placebos; positive in both windows and at 2x costs, but ~10 trades a year cannot be told from luck) | #1039 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
