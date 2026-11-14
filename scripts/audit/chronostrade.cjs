@@ -175,8 +175,25 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.selectOption('#firm', 'ftmo2'); await p.click('#pf-start'); await p.click('dialog.msd button.pri').catch(() => {});
   await p.waitForFunction(() => /live/.test(document.getElementById('pf-status').textContent), null, { timeout: 10000 }).catch(() => {});   // the challenge starts when the confirm dialog has closed, not 200 ms after the click
   check('challenge starts at the firm size', /100,000/.test(await txt(p, '#bal')) && /live/.test(await txt(p, '#pf-status')), await txt(p, '#pf-status'));
-  let failed = false; for (let k = 0; k < 6 && !failed; k++) { await p.keyboard.press('Shift+B'); await p.fill('#o-risk', '6'); await p.dispatchEvent('#o-risk', 'input'); await p.click('[data-sl="bar"]'); await p.click('[data-tp="3"]'); await p.click('#place'); for (let i = 0; i < 80; i++) { await p.keyboard.press('ArrowRight'); if (!(await p.$('.pos-card'))) break; } failed = /failed/.test(await txt(p, '#pf-status')); }
-  check('daily loss / max loss trips the challenge', failed, await txt(p, '#pf'));
+  // Whichever way the replayed candles go (14 Nov 2026: it only ever bought, so a day on which every buy reached its 3R target
+  // could not breach). One 6% loss breaches FTMO's 5% daily loss. Each try: step once (so Undo has a snapshot that holds the
+  // challenge and no position), place a buy (stop at the candle's low, 3R) and step until it is closed or the challenge failed.
+  // No breach: Undo back to before that step (the trade is gone, the account and challenge as they were), try a sell the same
+  // way, and if neither is stopped move on and try again. Undo is checked against the account each time; no stop-out in
+  // `tries` rounds, or an Undo that does not restore the account, is a FAILURE with the reason, never a pass.
+  let failed = false, why = '', tries = 0; const acct = () => p.evaluate(() => { const a = window.ctAcct(); return { n: a.acct.closed.length, pos: a.acct.positions.length, ord: a.acct.orders.length, bal: a.acct.balance, st: a.ch && a.ch.status }; });
+  await p.evaluate(() => document.activeElement && document.activeElement.blur());
+  for (; tries < 8 && !failed && !why; tries++) {
+    for (const side of ['buy', 'sell']) { await p.keyboard.press('ArrowRight'); const a0 = await acct(), n0 = await barN(p);
+      if (a0.pos || a0.ord || a0.st !== 'live') { why = `not flat before the try: ${JSON.stringify(a0)}`; break; }
+      await p.keyboard.press(side === 'buy' ? 'Shift+B' : 'Shift+S'); await p.fill('#o-risk', '6'); await p.dispatchEvent('#o-risk', 'input'); await p.click('[data-sl="bar"]'); await p.click('[data-tp="3"]'); await p.click('#place');
+      await p.evaluate(() => document.activeElement && document.activeElement.blur()); let k = 0; for (; k < 55; k++) { await p.keyboard.press('ArrowRight'); const a = await acct(); if (a.st === 'failed' || !a.pos) break; }
+      if (/failed/.test(await txt(p, '#pf-status'))) { failed = true; break; }
+      for (let i = 0; i <= Math.min(k, 54) + 1; i++) await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
+      const a1 = await acct(); if (JSON.stringify(a1) !== JSON.stringify(a0) || (await barN(p)) !== n0 - 1) { why = `Undo did not restore the account before the ${side}: ${JSON.stringify([a0, n0, a1, await barN(p)])}`; break; } }
+    if (!failed && !why) for (let i = 0; i < 12; i++) await p.keyboard.press('ArrowRight'); }
+  if (!failed && !why) why = `no buy or sell at 6% risk was stopped out in ${tries} tries: nothing to breach`;
+  check('daily loss / max loss trips the challenge', failed, why || await txt(p, '#pf'));
   check('a breach flattens the account', (await p.$$('.pos-card')).length === 0, await txt(p, '#open'));
   { const v = await p.evaluate(() => { const q = (s) => document.querySelector(s); return { state: (q('#pf .pf-state') || {}).textContent || '', bad: !!q('#pf .pf-state.bad'), tb: !!q('#pf .pf-tb'), gauges: document.querySelectorAll('#pf .pfg svg').length, breached: /Breached/.test((q('#pf .pf-gs') || {}).textContent || ''), pips: document.querySelectorAll('#pf .pf-days i').length, phases: document.querySelectorAll('#pf .pf-ph li').length }; });
     check('challenge progress: failed in words, target bar, daily / max loss gauges (breached named), days as pips, phases', /Failed/.test(v.state) && v.bad && v.tb && v.gauges === 2 && v.breached && v.pips >= 4 && v.phases === 2, JSON.stringify(v)); }
