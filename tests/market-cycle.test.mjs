@@ -305,3 +305,20 @@ test('internal breaks on the owner\'s M15 chart: the low the leg came from, and 
   assert.deepEqual(ev, [[3904.735, '11-13T02:15', '11-13T05:45'], [3888.47, '11-13T06:45', '11-13T11:15']],
     '3,904.7: the low between the broken high and its break (the candle before had a lower wick); 3,888.5: the lowest low, not the newer higher low 3,889.5');
 });
+
+// 14 Nov 2026, the owner on M21's lesson: "if we had cf to buy we could but only had vr, while m1 sell had vr and cf, that's why
+// he should [sell], market will tell us what he wants us to do"
+test('M1 reads both sides inside the H1 candle: the side with a VR and a CF is the trade, a VR alone is not', () => {
+  const msSides = new Function(`${fn('msSides')}; return msSides;`)();
+  // closes: rally to 112 (a swing low at 104 before it), a drop that closes under 104 (sell CF), a pullback to 110 (into the CF zone)
+  const C = [100, 101, 103, 105, 104, 106, 108, 110, 112, 110, 108, 106, 103, 101, 99, 100, 102, 104, 106, 108, 110, 107, 103];
+  const B = C.map((c, i) => { const o = i ? C[i - 1] : c; return { time: 1000 * 3600 + i * 60, open: o, high: Math.max(o, c) + 0.2, low: Math.min(o, c) - 0.2, close: c }; });
+  const X = msSides(B, B.length, 1000 * 3600, 1);
+  assert.equal(X.sell.state, 'cf'); assert.equal(X.sell.vr.hi, 112.2); assert.equal(X.sell.vr.edge, 103.8);
+  assert.equal(X.sell.cf.i, 12, 'the first close under the VR (103 < 103.8)');
+  assert.equal(X.sell.cf.touched, true, 'the pullback came back into the CF zone');
+  assert.equal(X.buy.state, 'vr', 'the buy side has a VR but no close above it: no buy');
+  assert.equal(X.pick, -1);
+  assert.equal(msSides(B.slice(0, 10), 10, 1000 * 3600, 1).pick, 0, 'before the drop no side has a CF');
+  assert.match(html, /tf\.id === '1m' && G\.show\.vr !== false/); assert.match(html, /: VR \+ CF` : `\$\{nm\}: VR only`/); assert.match(html, /X\.pick > 0 \? \[w\(X\.buy, 'Buy'\)/);
+});
