@@ -96,6 +96,7 @@ paper system with a measured, clearly negative record.
 | 330 | Gold after an emerging-market currency stress day (USD/ZAR, MXN, TRY ≥ 1.5 sd) | **FAIL, 0 of 3**: the rebound buy went the wrong way OOS (excess −0.127R, t −2.37); next-day short a near miss (OOS excess t +2.14, Holm p 0.070, 40/40 placebos, but IS t 0.45): a hypothesis for new data at most | #1143 |
 | 331 | Gold illiquidity (Amihud ratio): buy the week after a high return-per-volume reading | **FAIL, 0 of 3**: illiquid buy +0.152R net OOS but excess over buying every week only +0.028R (t 0.82); illiquid-and-falling buy excess positive both windows (IS t 3.38, OOS t 1.83, n 42, Holm p 0.10) but fails | #1144 |
 | 332 | Gold volume profile: fade an open outside yesterday's value area back to the POC (or follow it) | **FAIL, 0 of 2**: fade −0.073R net IS (t −3.50), flat OOS (excess +0.008R, t 0.43); acceptance beat the every-day trade IS (t 2.38) but flipped sign OOS | #1145 |
+| 333 | Gold hikkake: trade the failure of a one-sided break of an inside day | **FAIL, 0 of 3**: +0.177R net IS (t 1.86) but −0.157R OOS (excess −0.172R, t −1.65); sign flipped, n 69 OOS | #1146 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
