@@ -47,6 +47,13 @@ Pass bar (each test): D > 0 in both windows, decisive Holm p < 0.05 (one-sided, 
 Only the Nikkei is positive in both windows on the long side (n 49 and 40); one index of six, with no correction, is what chance
 gives and is not a finding.
 
+## Related
+`research/edge/high52-rotation` (branch `high52-rotation`, FAIL) is the cross-sectional version of the same anchor: each month
+it holds the 3 of 11 index CFDs closest to their 52-week high against an equal-weight book of all eleven (2016-26 excess +0.046 %
+a month, Newey-West t 0.38; 2008-15 -0.138 %). This study is the per-index time-series version: does one index near its OWN high
+beat its OWN drift over the next 20 days (each index against the same trade on its other days, not against other indices). Different
+test, same answer; nothing was imported from it and its result was seen only after this study's pre-registration was pushed.
+
 ## What it means
 Buying an index near its 52-week high and holding 20 days earns about the index's drift before costs (the S&P 500 signal trade
 +0.222R gross against +0.255R on every other day in 2016-now) and less than the drift before 2016. The anchoring effect George and
