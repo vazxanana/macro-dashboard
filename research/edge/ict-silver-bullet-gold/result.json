@@ -1,0 +1,483 @@
+{
+ "study": "ict-silver-bullet-gold",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/ict-silver-bullet-gold/PREREGISTRATION.md",
+ "planSha256": "cb931deee1a774ac8175cfefcb7c27db5a2410e5c3f0cc1dd0256b707c0940ab",
+ "claim": "ICT \"silver bullet\": after a liquidity sweep, the first M5 fair value gap in a one-hour New York window, in the direction of the draw",
+ "rule": "draw = prior 17:00-NY day high/low and the Asian range (18:00-00:00 NY); the first side swept from 00:00 sets the side (buy side swept → sell); first M5 FVG (middle candle in the trade direction) whose third candle opens in the window up to 10 min before its end; limit at the near edge until the window ends; stop at the first candle's extreme; target the nearer of the opposite draw and 2R (skip under 1R of room); stop first; flat 16:00; one trade a day",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy, 2714 trading days 2016-01-04 → 2026-11-13; CME calendar from ict/calendar.mjs (full holidays and early closes skipped)",
+ "cost": 0.3,
+ "windows": {
+  "IS": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2026-11-13"
+  ]
+ },
+ "verdict": "FAIL, 0 of 3: AM silver bullet on gold 2021 → now −0.168R a trade net (n 401, month t −2.13, gross −0.078R); 2016-20 −0.253R",
+ "decision": {
+  "T1": {
+   "p": 0.983,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "p": 1,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "p": 0.984,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "AM 10:00-11:00",
+   "skips": {
+    "nofill": 386,
+    "nosweep": 611,
+    "latesweep": 186,
+    "opposite": 54,
+    "nogap": 713,
+    "room": 2,
+    "both": 1
+   },
+   "IS": {
+    "n": 360,
+    "win": 0.339,
+    "netR": -0.253,
+    "grossR": -0.036,
+    "net2R": -0.469,
+    "costR": 0.216,
+    "total": -90.94,
+    "months": 60,
+    "t": -3.42,
+    "grossT": -0.51,
+    "t2x": -5.94,
+    "stops": 225,
+    "targets": 99,
+    "time": 36,
+    "maxDD": -109.65,
+    "medianStop": 1.51,
+    "buys": {
+     "n": 177,
+     "netR": -0.133
+    },
+    "sells": {
+     "n": 183,
+     "netR": -0.369
+    },
+    "byYear": {
+     "2016": {
+      "n": 74,
+      "netR": -0.018,
+      "total": -1.32
+     },
+     "2017": {
+      "n": 83,
+      "netR": -0.361,
+      "total": -29.98
+     },
+     "2018": {
+      "n": 65,
+      "netR": -0.207,
+      "total": -13.45
+     },
+     "2019": {
+      "n": 67,
+      "netR": -0.446,
+      "total": -29.88
+     },
+     "2020": {
+      "n": 71,
+      "netR": -0.23,
+      "total": -16.3
+     }
+    }
+   },
+   "OOS": {
+    "n": 401,
+    "win": 0.334,
+    "netR": -0.168,
+    "grossR": -0.078,
+    "net2R": -0.258,
+    "costR": 0.09,
+    "total": -67.18,
+    "months": 71,
+    "t": -2.13,
+    "grossT": -0.98,
+    "t2x": -3.26,
+    "stops": 251,
+    "targets": 103,
+    "time": 47,
+    "maxDD": -75.47,
+    "medianStop": 3.72,
+    "buys": {
+     "n": 177,
+     "netR": -0.091
+    },
+    "sells": {
+     "n": 224,
+     "netR": -0.228
+    },
+    "byYear": {
+     "2021": {
+      "n": 69,
+      "netR": -0.223,
+      "total": -15.41
+     },
+     "2022": {
+      "n": 63,
+      "netR": -0.135,
+      "total": -8.5
+     },
+     "2023": {
+      "n": 68,
+      "netR": -0.133,
+      "total": -9.05
+     },
+     "2024": {
+      "n": 63,
+      "netR": -0.3,
+      "total": -18.91
+     },
+     "2025": {
+      "n": 72,
+      "netR": 0.019,
+      "total": 1.38
+     },
+     "2026": {
+      "n": 66,
+      "netR": -0.253,
+      "total": -16.68
+     }
+    }
+   }
+  },
+  "T2": {
+   "name": "PM 14:00-15:00",
+   "skips": {
+    "nosweep": 610,
+    "nogap": 767,
+    "nofill": 350,
+    "opposite": 118,
+    "latesweep": 26,
+    "missing": 1,
+    "both": 1
+   },
+   "IS": {
+    "n": 351,
+    "win": 0.362,
+    "netR": -0.377,
+    "grossR": 0.038,
+    "net2R": -0.791,
+    "costR": 0.414,
+    "total": -132.18,
+    "months": 59,
+    "t": -4.35,
+    "grossT": 0.45,
+    "t2x": -8,
+    "stops": 197,
+    "targets": 97,
+    "time": 57,
+    "maxDD": -137.5,
+    "medianStop": 0.86,
+    "buys": {
+     "n": 166,
+     "netR": -0.303
+    },
+    "sells": {
+     "n": 185,
+     "netR": -0.442
+    },
+    "byYear": {
+     "2016": {
+      "n": 72,
+      "netR": -0.247,
+      "total": -17.76
+     },
+     "2017": {
+      "n": 63,
+      "netR": -0.326,
+      "total": -20.52
+     },
+     "2018": {
+      "n": 63,
+      "netR": -0.422,
+      "total": -26.6
+     },
+     "2019": {
+      "n": 73,
+      "netR": -0.752,
+      "total": -54.87
+     },
+     "2020": {
+      "n": 80,
+      "netR": -0.155,
+      "total": -12.42
+     }
+    }
+   },
+   "OOS": {
+    "n": 490,
+    "win": 0.333,
+    "netR": -0.311,
+    "grossR": -0.058,
+    "net2R": -0.564,
+    "costR": 0.253,
+    "total": -152.37,
+    "months": 71,
+    "t": -5.49,
+    "grossT": -1.16,
+    "t2x": -8.11,
+    "stops": 303,
+    "targets": 128,
+    "time": 59,
+    "maxDD": -153.4,
+    "medianStop": 1.39,
+    "buys": {
+     "n": 220,
+     "netR": -0.324
+    },
+    "sells": {
+     "n": 270,
+     "netR": -0.3
+    },
+    "byYear": {
+     "2021": {
+      "n": 91,
+      "netR": -0.329,
+      "total": -29.9
+     },
+     "2022": {
+      "n": 79,
+      "netR": -0.39,
+      "total": -30.81
+     },
+     "2023": {
+      "n": 87,
+      "netR": -0.382,
+      "total": -33.19
+     },
+     "2024": {
+      "n": 82,
+      "netR": -0.293,
+      "total": -24
+     },
+     "2025": {
+      "n": 81,
+      "netR": -0.232,
+      "total": -18.8
+     },
+     "2026": {
+      "n": 70,
+      "netR": -0.224,
+      "total": -15.68
+     }
+    }
+   }
+  },
+  "T3": {
+   "name": "London 03:00-04:00",
+   "skips": {
+    "nogap": 379,
+    "nosweep": 611,
+    "latesweep": 1216,
+    "nofill": 167,
+    "missing": 1,
+    "both": 1
+   },
+   "IS": {
+    "n": 148,
+    "win": 0.351,
+    "netR": -0.289,
+    "grossR": 0.046,
+    "net2R": -0.624,
+    "costR": 0.335,
+    "total": -42.75,
+    "months": 53,
+    "t": -2.56,
+    "grossT": 0.47,
+    "t2x": -4.7,
+    "stops": 96,
+    "targets": 51,
+    "time": 1,
+    "maxDD": -54.4,
+    "medianStop": 0.99,
+    "buys": {
+     "n": 70,
+     "netR": -0.124
+    },
+    "sells": {
+     "n": 78,
+     "netR": -0.437
+    },
+    "byYear": {
+     "2016": {
+      "n": 25,
+      "netR": -0.221,
+      "total": -5.52
+     },
+     "2017": {
+      "n": 28,
+      "netR": -0.452,
+      "total": -12.67
+     },
+     "2018": {
+      "n": 32,
+      "netR": -0.422,
+      "total": -13.51
+     },
+     "2019": {
+      "n": 37,
+      "netR": -0.45,
+      "total": -16.67
+     },
+     "2020": {
+      "n": 26,
+      "netR": 0.215,
+      "total": 5.6
+     }
+    }
+   },
+   "OOS": {
+    "n": 191,
+    "win": 0.309,
+    "netR": -0.224,
+    "grossR": -0.073,
+    "net2R": -0.375,
+    "costR": 0.151,
+    "total": -42.83,
+    "months": 69,
+    "t": -2.15,
+    "grossT": -0.69,
+    "t2x": -3.57,
+    "stops": 132,
+    "targets": 59,
+    "time": 0,
+    "maxDD": -43.23,
+    "medianStop": 2.43,
+    "buys": {
+     "n": 81,
+     "netR": -0.318
+    },
+    "sells": {
+     "n": 110,
+     "netR": -0.155
+    },
+    "byYear": {
+     "2021": {
+      "n": 30,
+      "netR": -0.388,
+      "total": -11.63
+     },
+     "2022": {
+      "n": 32,
+      "netR": -0.219,
+      "total": -7.02
+     },
+     "2023": {
+      "n": 32,
+      "netR": 0.097,
+      "total": 3.09
+     },
+     "2024": {
+      "n": 34,
+      "netR": -0.317,
+      "total": -10.79
+     },
+     "2025": {
+      "n": 31,
+      "netR": -0.22,
+      "total": -6.83
+     },
+     "2026": {
+      "n": 32,
+      "netR": -0.301,
+      "total": -9.64
+     }
+    }
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "start": "00:30-14:55 NY",
+  "means": [
+   -0.173,
+   -0.167,
+   -0.331,
+   -0.216,
+   -0.23,
+   -0.235,
+   -0.166,
+   -0.173,
+   -0.218,
+   -0.138,
+   -0.125,
+   -0.231,
+   -0.034,
+   -0.227,
+   -0.233,
+   -0.24,
+   -0.347,
+   -0.245,
+   -0.276,
+   -0.207,
+   -0.106,
+   -0.261,
+   -0.256,
+   -0.219,
+   -0.099,
+   -0.215,
+   -0.208,
+   -0.273,
+   -0.267,
+   -0.205,
+   -0.334,
+   -0.365,
+   -0.219,
+   -0.225,
+   -0.142,
+   -0.232,
+   -0.242,
+   -0.154,
+   -0.253,
+   -0.245
+  ],
+  "min": -0.365,
+  "max": -0.034,
+  "median": -0.226,
+  "p95": -0.106
+ },
+ "reading": "The primary AM window does not pass the pre-registered bar (failed: netPos, t2, holm, isPos, cost2x, placebo). Out of sample it makes −0.168R a trade after $0.30 a round trip (n 401, month t −2.13; before costs −0.078R, t −0.98); costs take 0.090R a trade at a median stop of $3.72. Not an edge; nothing on the ICT desk or the council changes and no proposal is written."
+}
