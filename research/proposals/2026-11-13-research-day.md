@@ -200,6 +200,7 @@ paper system with a measured, clearly negative record.
 | 182 | 52-week-high nearness ranking on commodities and FX (`high52-cmdfx`) | **FAIL**, 0 of 4: combined book 2017-26 −0.029R a month net (t −1.12), +0.027R gross; beats 40 of 40 random picks but FX financing takes it; correlation 0.63 with 12-1 momentum | #998 |
 | 183 | Month-end rebalancing flow (`rebalance-flow`, rerun asked) | **Not run, duplicate**: the 13 Nov `rebalance-flow` branch already failed 0 of 4 (SPX500 +0.013R net, t 0.24); a rerun with moved knobs would be selection after the fact | — |
 | 184 | Intraday momentum on US index CFDs (`index-intraday-momentum`) | **Not run, duplicate**: 13 Nov `intraday-momentum` already failed (SPX500 2016-now −0.159R net, t −9.09; gross −0.012R); the paper's slope gone after 2015 | — |
+| 185 | ICT quarterly theory split of A-setups (`ict-quarters`, rerun asked) | **Not run, duplicate**: 13 Nov `ict-quarters` already failed 0 of 3 (week, month, year quarter vs the rest, OOS t −0.64 to 0.49); quarter of the day close to `claude/ict-sessions` (FAIL) | — |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
