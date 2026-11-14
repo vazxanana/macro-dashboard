@@ -108,6 +108,7 @@ paper system with a measured, clearly negative record.
 | 342 | Gold smash-day reversal: buy-stop above a day that closed below the prior low (and mirror) | **FAIL, 0 of 3**: worse than the same order after any day on both sides and windows (long OOS excess −0.206R, t −1.91; short −0.186R); negative before costs | #1155 |
 | 343 | Gold point-and-figure (0.5% box, 3-box reversal): double-top buy / double-bottom sell | **FAIL, 0 of 3**: double-top buy +0.098R net OOS but −0.015R vs buying any day (t −0.15); sell and 20-day hold also no better than their baselines | #1156 |
 | 344 | Gold money-flow gap (MFI minus the same oscillator without volume): buy a high gap, sell a low gap | **FAIL, 0 of 3**: every excess negative in both windows; primary buy +0.107R net OOS vs +0.113R buying any day (excess t −0.04) | #1157 |
+| 345 | `gold-elder-ray` (#1158) | Elder bull / bear power pullback on the EMA13, 3-day hold | FAIL, 0 of 3: OOS −0.082R a trade net (n 330, month t −1.55), −0.059R vs every day of its year (t −1.13); IS −0.003R; placebo beat 5 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
