@@ -91,6 +91,7 @@ paper system with a measured, clearly negative record.
 | 73 | US index overnight drift: long US500 / NAS100 from the 16:00 NY close to the 09:30 open | FAIL, 0 of 2: real before costs (+0.02-0.03R, gross month t +2.3 to +4.7) but the 0.03 % spread and financing take it all: US500 −0.022R (t −2.86), NAS100 −0.006R | #891 |
 | 74 | Time-series momentum (12-1 month sign) on 25 CFD markets, ATR-risked | FAIL, 0 of 5: pool −1.39R a month (t −1.44) 2016-26; +0.033R a position before costs, 0.027R trading cost and 0.062R financing; every class negative 2016-26 | #892 |
 | 75 | Gotobi cost accounting (no rule tested) | break-even ~3.7 pips round trip on USD/JPY, t stays ≥ 2 up to ~1.95 pips (assumed 1.3); published all-day spreads (USD/JPY 0.08 pip) keep t 2.99, but nothing measured at 00:55 / 06:00 UTC: recording yen bid/ask at those minutes is the deciding step (needs the owner) | #893 |
+| 76 | Gotobi fade on an independent feed (HistData USD/JPY M1, frozen rule) | **FEED-ROBUST**: +0.127R (n 623, t 2.34) vs OANDA +0.143R (t 2.66) on 2018-26; per-trade correlation 0.997; still gone at 2x cost on both feeds | #894 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
