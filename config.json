@@ -643,6 +643,12 @@
    "by": "user",
    "change": "Shadow cut (owner): new shadow signals of Scalp, Intraday, Retrace scalp and Retrace intraday are no longer recorded on any market; open and pending ones run to their exits",
    "why": "research/edge/shadow-best (pre-registered, 12 Nov): 32 (setup, market) streams on 2020-26, net of costs: none positive in both 2020-23 and 2024-26 with t >= 2 (0 kept; placebo 0). The family: -0.227R a trade in sample (n 61,469), -0.223R out of sample (n 46,266); about -0.04R before costs, so the loss is the cost of many small trades."
+  },
+  {
+   "at": "2026-11-14T16:47:46.000Z",
+   "by": "user",
+   "change": "Mosha cycle (owner, 14 Nov): new trades are paper shadows (same rule and stops, recorded and managed, never alerted, no demo copy on the council account); a trade already open runs to its exit",
+   "why": "Its two pre-registered studies, the live code run unchanged after costs: 2020-Nov 2026 -0.574R a trade (n 115, t -3.99, research/edge/mcycle-base), and untouched 2007-19 -0.175R a trade (n 244, t -1.50; break-even before costs, research/edge/mcycle-oos). Owner decision 54."
   }
  ],
  "btAt": "2026-11-14T10:43:06.601Z",
@@ -694,7 +700,8 @@
   "count-financing",
   "replica-mirror-gold-only",
   "mosha-cycle",
-  "shadow-best"
+  "shadow-best",
+  "mcycle-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -705,11 +712,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-14T16:46:12.000Z",
+   "at": "2026-11-14T16:47:46.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-14T16:46:12.000Z",
+   "at": "2026-11-14T16:47:46.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -864,7 +871,8 @@
   "mosha-bo": 1794434536,
   "gtl": 1794434536,
   "gmp": 1794434536,
-  "nq-open": 1794434536
+  "nq-open": 1794434536,
+  "mcycle": 1794674866
  },
  "financingFrom": "2026-11-11T22:02:16.419Z",
  "mirrorReplica": {
