@@ -120,6 +120,7 @@ paper system with a measured, clearly negative record.
 | 354 | `gold-bond-vol-spike` (#1167) | Buy gold after a US 10-year bond volatility spike (5-day vol ≥ 1.25 × 60-day) | FAIL, 0 of 3: 5-day hold OOS excess +0.049R a trade (n 112, t 0.77), in sample −0.010R; placebo 31 of 40 |
 | 355 | `gold-carry-crash` (#1168) | Buy gold after an AUD/JPY carry crash day (return < −1.5 sd) | FAIL, 0 of 3 (near miss): 5-day buy OOS net +0.195R a trade (t 2.22) but excess over the every-day buy +0.117R (n 141, t 1.42), Holm p 0.23; IS excess +0.047R; placebo 39 of 40 |
 | 356 | `gold-week-close-extreme` (#1169) | Follow a week that closed in the top / bottom tenth of its range, held one week | FAIL, 0 of 3: OOS +0.053R a trade net (n 121, t 0.80), excess over every day +0.024R (t 0.33); buys −0.015R vs every-day buys; placebo 31 of 40 |
+| 357 | `gold-session-agreement` (#1170) | Follow gold the next day when Asia, London and New York all moved the same way | FAIL, 0 of 3: OOS excess −0.001R a trade (n 640, t −0.05) after +0.060R (t 2.38) in sample; strong-agreement version +0.051R (t 1.46) all from 2017-21; placebo 25 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
