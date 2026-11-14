@@ -120,6 +120,7 @@ paper system with a measured, clearly negative record.
 | 102 | Fade the move into the ECB 14:10 CET concertation (EUR/USD; EUR crosses) | FAIL, 0 of 3: a real small reversal before costs on EUR/USD (+0.12 to +0.15R, gross t 2.5-3.1 in both windows), but costs ~0.26R: −0.13R net; crosses −0.30R. Same shape as the London 16:00 fix (#910): fix reversals exist and costs take them | #921 |
 | 103 | Santa Claus rally (last 5 December + first 2 January trading days) on SPX500, NAS100, DE40 + UK100 | FAIL, 0 of 3: no US effect since 2010 (−0.13 % / −0.48 % a year vs other windows); DE40 + UK100 +0.51 % (t 1.08, placebo 17 %); UK100 alone looks strong (t 2.48) but was picked after the fact | #922 |
 | 104 | Gold's Asian session after the New York cash-session move (fade / follow / fade big days) | FAIL, 0 of 3: every stream within 0.02R of zero before costs, the $0.30 round trip takes it below; correlation −0.004 since 2016, so no index-style reversal in gold | #923 |
+| 105 | IBS frozen replication (#895's rule, byte for byte) on DE40, UK100, EU50, FR40, JP225, AU200, HK33 | DOES NOT REPLICATE: pooled 2016-now −0.041R a trade (n 3543, t −1.97), all seven negative, placebo 19 of 40; it was there in 2005-15 and has faded | #924 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
