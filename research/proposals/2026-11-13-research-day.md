@@ -44,6 +44,7 @@ paper system with a measured, clearly negative record.
 | 278 | Gold RSI(14) divergence at swing highs / lows | **FAIL, 0 of 3**: H4 −0.094R OOS (t −1.36), H1 −0.102R (t −2.53), strict 70/30 −0.011R; before costs every stream within 0.06R of zero | #1091 |
 | 279 | Gold London-open displacement candle (M15 ≥ 2× average range) into New York | **FAIL, 0 of 3**: out 17:00 UTC −0.139R OOS (t −1.20), no better than the same-side baseline; median stop $3.85 so costs take 0.17R a trade | #1092 |
 | 280 | Gold intraday periodicity (each 4-hour block traded on its own recent sign) | **FAIL, 0 of 3**: −0.072 to −0.092R OOS (t −5 to −13), below a random block of the same day; costs 0.08-0.10R a trade; T3 gross hint reversed (IS t +2.73 → OOS −2.55) | #1093 |
+| 281 | Gold first 50 % pullback after the 08:30-09:00 New York impulse | **FAIL, 0 of 3**: 1.5R target −0.172R OOS (t −4.06), flat before costs; both sides lose; median stop $3-4 so costs 0.17-0.20R a trade | #1094 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
