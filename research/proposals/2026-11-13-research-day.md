@@ -230,6 +230,7 @@ paper system with a measured, clearly negative record.
 | 212 | Where gold closes in its day (IBS) as a next-day signal (`gold-ibs`) | **FAIL**, 0 of 3: buy after a close in the bottom 20 % 2017-26 +0.004R a trade net (n 353, t 0.18), 2008-16 −0.034R; short after a top-20 % close −0.077R; with the 200-day filter +0.008R. No close-location effect on gold | #1025 |
 | 213 | Gold/platinum and gold/palladium ratios as a signal for gold (`gold-platinum-ratio`) | **FAIL**, 0 of 3: platinum-ratio reversion 2017-26 −0.112R a trade net (n 67, t −1.13, mostly short gold in a rising market), palladium −0.011R, monthly gold-vs-platinum momentum +0.064R (t 0.64, inside placebo) | #1026 |
 | 214 | Volatility-targeted gold holding vs a constant one (`gold-vol-target`) | **FAIL**, 0 of 3: Sharpe gain 2017-26 +0.075 (20-day) / +0.097 (60-day), drawdown 32.5 % vs 39.5 %, but 2008-16 the reverse (Sharpe −0.120, drawdown 22.5 points deeper); Holm p 0.588; no separation from placebo shuffles | #1027 |
+| 215 | Dollar-index moves leading gold (`gold-dollar-lead`) | **FAIL**, 0 of 3: after a dollar down week >1 sd with gold lagging, long gold 2017-26 +0.174R a trade net (n 30, t 1.12, positive in both windows, far from t 2); mirror short −0.207R; daily −0.069R. With bond-lead, intermarket-lead and macro-gold: no dollar lead at day, week or month | #1028 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
