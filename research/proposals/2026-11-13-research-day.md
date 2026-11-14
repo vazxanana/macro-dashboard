@@ -71,6 +71,7 @@ paper system with a measured, clearly negative record.
 | 305 | EUR/CHF stress (franc bid) as a 4-week lead for gold | **FAIL, 0 of 3**: both sides −0.285R OOS (n 33, t −1.34); stress buys below buying any week; unwind sells −0.676R; gold's own 4-week sign beats it | #1118 |
 | 306 | US–German 10-year rate gap as a lead for gold (dollar-weakening side) | **FAIL, 0 of 3**: both sides +0.003R OOS (n 100, t 0.03), within 0.06R of zero gross in both windows; 18 of 40 placebos at or above | #1119 |
 | 307 | Broad commodity-price impulse (8-commodity basket) as a lead for gold | **FAIL, 0 of 3**: all three positive IS, negative OOS (4-week −0.100R, n 69, t −0.86); signal longs below plain long gold, shorts below shorting every week | #1120 |
+| 308 | Buying gold during an equity bear market (S&P 500 ≥ 10 % below its 52-week high) | **FAIL, 0 of 3**: OOS −0.238R a trade below a plain gold buy (n 35, t −0.96); 2022's tightening bear dominates; −20 % and Nasdaq variants no better | #1121 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
