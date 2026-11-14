@@ -1,0 +1,607 @@
+{
+ "study": "gold-lowvol-hold",
+ "built": "2026-11-14",
+ "data": {
+  "first": "2006-03-20",
+  "last": "2026-11-13",
+  "candles": 5369,
+  "firstDay": "2007-04-04",
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "stop": "3 x ATR(20)",
+  "rv": "sd of 20 daily log returns",
+  "pct": "share of the 252 previous rv20 below today's",
+  "quiet": "pct < 1/3",
+  "loud": "pct >= 2/3",
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ],
+  "tests": {
+   "T1": "buy on a quiet day (rv20 in the lowest third of the past year), out after 20 days",
+   "T2": "buy on a quiet day, out after 60 days (the wide exit)",
+   "T3": "buy on a loud day (rv20 in the top third), out after 20 days (contrast)"
+  }
+ },
+ "counts": {
+  "is": {
+   "days": 2535,
+   "quiet": 968,
+   "loud": 878
+  },
+  "oos": {
+   "days": 2552,
+   "quiet": 916,
+   "loud": 899
+  }
+ },
+ "tests": {
+  "T1": {
+   "offFile": 10,
+   "is": {
+    "n": 968,
+    "months": 77,
+    "net": -0.002,
+    "gross": 0.102,
+    "tNet": -0.02,
+    "excess": -0.084,
+    "tEx": -0.74,
+    "tExPlain": -0.81,
+    "p": 0.7677,
+    "excessGross": -0.074,
+    "tExGross": -0.64,
+    "win": 45.97,
+    "stops": 315,
+    "fin": 0.091,
+    "nights": 23.42,
+    "net2x": -0.107,
+    "excess2x": -0.094,
+    "baseline": 0.034
+   },
+   "oos": {
+    "n": 906,
+    "months": 80,
+    "net": 0.275,
+    "gross": 0.401,
+    "tNet": 1.76,
+    "excess": 0.152,
+    "tEx": 1.14,
+    "tExPlain": 1.14,
+    "p": 0.128,
+    "excessGross": 0.164,
+    "tExGross": 1.21,
+    "win": 53.75,
+    "stops": 284,
+    "fin": 0.114,
+    "nights": 23.9,
+    "net2x": 0.149,
+    "excess2x": 0.141,
+    "baseline": 0.145
+   },
+   "byYear": {
+    "2007": {
+     "n": 105,
+     "net": -0.142,
+     "base": 0.349,
+     "excess": -0.49
+    },
+    "2008": {
+     "n": 1,
+     "net": -1.025,
+     "base": -0.097,
+     "excess": -0.928
+    },
+    "2009": {
+     "n": 177,
+     "net": 0.476,
+     "base": 0.335,
+     "excess": 0.141
+    },
+    "2010": {
+     "n": 95,
+     "net": 0.526,
+     "base": 0.224,
+     "excess": 0.302
+    },
+    "2011": {
+     "n": 78,
+     "net": 0.174,
+     "base": 0.293,
+     "excess": -0.119
+    },
+    "2012": {
+     "n": 140,
+     "net": -0.055,
+     "base": -0.066,
+     "excess": 0.011
+    },
+    "2013": {
+     "n": 42,
+     "net": -0.897,
+     "base": -0.429,
+     "excess": -0.468
+    },
+    "2014": {
+     "n": 180,
+     "net": -0.194,
+     "base": -0.134,
+     "excess": -0.06
+    },
+    "2015": {
+     "n": 74,
+     "net": -0.579,
+     "base": -0.277,
+     "excess": -0.302
+    },
+    "2016": {
+     "n": 76,
+     "net": -0.146,
+     "base": 0.142,
+     "excess": -0.287
+    },
+    "2017": {
+     "n": 180,
+     "net": 0.2,
+     "base": 0.047,
+     "excess": 0.152
+    },
+    "2018": {
+     "n": 113,
+     "net": -0.222,
+     "base": -0.211,
+     "excess": -0.011
+    },
+    "2019": {
+     "n": 68,
+     "net": 1.098,
+     "base": 0.378,
+     "excess": 0.72
+    },
+    "2020": {
+     "n": 39,
+     "net": 1.385,
+     "base": 0.169,
+     "excess": 1.216
+    },
+    "2021": {
+     "n": 153,
+     "net": -0.205,
+     "base": -0.153,
+     "excess": -0.052
+    },
+    "2022": {
+     "n": 48,
+     "net": 0.263,
+     "base": 0.009,
+     "excess": 0.255
+    },
+    "2023": {
+     "n": 125,
+     "net": -0.138,
+     "base": 0.006,
+     "excess": -0.144
+    },
+    "2024": {
+     "n": 68,
+     "net": 0.512,
+     "base": 0.485,
+     "excess": 0.027
+    },
+    "2025": {
+     "n": 99,
+     "net": 1.244,
+     "base": 0.875,
+     "excess": 0.368
+    },
+    "2026": {
+     "n": 13,
+     "net": -0.94,
+     "base": -0.244,
+     "excess": -0.696
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 40,
+    "mean": -0.004,
+    "max": 0.066,
+    "min": -0.076
+   },
+   "hold": 20,
+   "lag": 1,
+   "state": "quiet",
+   "holm": 0.384,
+   "checks": {
+    "oosExT2": false,
+    "holm": false,
+    "oosNetPos": true,
+    "isSameSign": false,
+    "cost2x": true,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "offFile": 23,
+   "is": {
+    "n": 968,
+    "months": 77,
+    "net": 0.169,
+    "gross": 0.385,
+    "tNet": 0.62,
+    "excess": -0.008,
+    "tEx": -0.04,
+    "tExPlain": -0.05,
+    "p": 0.5157,
+    "excessGross": 0.001,
+    "tExGross": 0.01,
+    "win": 42.56,
+    "stops": 501,
+    "fin": 0.202,
+    "nights": 53.49,
+    "net2x": -0.047,
+    "excess2x": -0.017,
+    "baseline": 0.096
+   },
+   "oos": {
+    "n": 893,
+    "months": 78,
+    "net": 0.581,
+    "gross": 0.868,
+    "tNet": 1.71,
+    "excess": 0.212,
+    "tEx": 1.09,
+    "tExPlain": 1.05,
+    "p": 0.1403,
+    "excessGross": 0.234,
+    "tExGross": 1.11,
+    "win": 44.79,
+    "stops": 403,
+    "fin": 0.274,
+    "nights": 57.57,
+    "net2x": 0.295,
+    "excess2x": 0.191,
+    "baseline": 0.413
+   },
+   "byYear": {
+    "2007": {
+     "n": 105,
+     "net": 0.517,
+     "base": 1.156,
+     "excess": -0.639
+    },
+    "2008": {
+     "n": 1,
+     "net": -1.025,
+     "base": -0.339,
+     "excess": -0.686
+    },
+    "2009": {
+     "n": 177,
+     "net": 1.287,
+     "base": 0.763,
+     "excess": 0.524
+    },
+    "2010": {
+     "n": 95,
+     "net": 1.11,
+     "base": 0.674,
+     "excess": 0.437
+    },
+    "2011": {
+     "n": 78,
+     "net": 0.603,
+     "base": 0.369,
+     "excess": 0.233
+    },
+    "2012": {
+     "n": 140,
+     "net": -0.51,
+     "base": -0.287,
+     "excess": -0.223
+    },
+    "2013": {
+     "n": 42,
+     "net": -1.086,
+     "base": -0.71,
+     "excess": -0.376
+    },
+    "2014": {
+     "n": 180,
+     "net": -0.702,
+     "base": -0.547,
+     "excess": -0.155
+    },
+    "2015": {
+     "n": 74,
+     "net": -0.124,
+     "base": -0.271,
+     "excess": 0.147
+    },
+    "2016": {
+     "n": 76,
+     "net": -0.224,
+     "base": 0.147,
+     "excess": -0.371
+    },
+    "2017": {
+     "n": 180,
+     "net": -0.074,
+     "base": -0.253,
+     "excess": 0.178
+    },
+    "2018": {
+     "n": 113,
+     "net": -0.238,
+     "base": -0.135,
+     "excess": -0.103
+    },
+    "2019": {
+     "n": 68,
+     "net": 2.256,
+     "base": 1.17,
+     "excess": 1.085
+    },
+    "2020": {
+     "n": 39,
+     "net": 0.341,
+     "base": -0.081,
+     "excess": 0.421
+    },
+    "2021": {
+     "n": 153,
+     "net": -0.224,
+     "base": -0.164,
+     "excess": -0.06
+    },
+    "2022": {
+     "n": 48,
+     "net": 0.027,
+     "base": -0.104,
+     "excess": 0.131
+    },
+    "2023": {
+     "n": 125,
+     "net": -0.579,
+     "base": -0.197,
+     "excess": -0.383
+    },
+    "2024": {
+     "n": 68,
+     "net": 1.871,
+     "base": 1.522,
+     "excess": 0.349
+    },
+    "2025": {
+     "n": 99,
+     "net": 3.747,
+     "base": 2.677,
+     "excess": 1.069
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 40,
+    "mean": -0.007,
+    "max": 0.107,
+    "min": -0.152
+   },
+   "hold": 60,
+   "lag": 3,
+   "state": "quiet",
+   "holm": 0.384,
+   "checks": {
+    "oosExT2": false,
+    "holm": false,
+    "oosNetPos": true,
+    "isSameSign": false,
+    "cost2x": true,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "offFile": 0,
+   "is": {
+    "n": 878,
+    "months": 63,
+    "net": 0.029,
+    "gross": 0.098,
+    "tNet": 0.36,
+    "excess": 0.024,
+    "tEx": 0.28,
+    "tExPlain": 0.29,
+    "p": 0.3888,
+    "excessGross": 0.012,
+    "tExGross": 0.14,
+    "win": 51.48,
+    "stops": 211,
+    "fin": 0.06,
+    "nights": 25.05,
+    "net2x": -0.04,
+    "excess2x": 0.037,
+    "baseline": 0.034
+   },
+   "oos": {
+    "n": 899,
+    "months": 68,
+    "net": 0.017,
+    "gross": 0.105,
+    "tNet": 0.21,
+    "excess": -0.173,
+    "tEx": -1.99,
+    "tExPlain": -2.3,
+    "p": 0.9744,
+    "excessGross": -0.187,
+    "tExGross": -2.11,
+    "win": 46.5,
+    "stops": 132,
+    "fin": 0.082,
+    "nights": 26.02,
+    "net2x": -0.072,
+    "excess2x": -0.158,
+    "baseline": 0.145
+   },
+   "byYear": {
+    "2007": {
+     "n": 56,
+     "net": 0.689,
+     "base": 0.349,
+     "excess": 0.34
+    },
+    "2008": {
+     "n": 208,
+     "net": 0.035,
+     "base": -0.097,
+     "excess": 0.132
+    },
+    "2009": {
+     "n": 31,
+     "net": 0.107,
+     "base": 0.335,
+     "excess": -0.229
+    },
+    "2010": {
+     "n": 91,
+     "net": -0.016,
+     "base": 0.224,
+     "excess": -0.24
+    },
+    "2011": {
+     "n": 126,
+     "net": -0.171,
+     "base": 0.293,
+     "excess": -0.464
+    },
+    "2012": {
+     "n": 21,
+     "net": 0.018,
+     "base": -0.066,
+     "excess": 0.083
+    },
+    "2013": {
+     "n": 120,
+     "net": -0.182,
+     "base": -0.429,
+     "excess": 0.248
+    },
+    "2014": {
+     "n": 42,
+     "net": 0.448,
+     "base": -0.134,
+     "excess": 0.582
+    },
+    "2015": {
+     "n": 73,
+     "net": -0.34,
+     "base": -0.277,
+     "excess": -0.063
+    },
+    "2016": {
+     "n": 110,
+     "net": 0.242,
+     "base": 0.142,
+     "excess": 0.1
+    },
+    "2017": {
+     "n": 28,
+     "net": -0.738,
+     "base": 0.047,
+     "excess": -0.786
+    },
+    "2018": {
+     "n": 92,
+     "net": -0.225,
+     "base": -0.211,
+     "excess": -0.014
+    },
+    "2019": {
+     "n": 123,
+     "net": 0.136,
+     "base": 0.378,
+     "excess": -0.242
+    },
+    "2020": {
+     "n": 138,
+     "net": -0.031,
+     "base": 0.169,
+     "excess": -0.2
+    },
+    "2022": {
+     "n": 137,
+     "net": -0.007,
+     "base": 0.009,
+     "excess": -0.016
+    },
+    "2023": {
+     "n": 59,
+     "net": 0.034,
+     "base": 0.006,
+     "excess": 0.028
+    },
+    "2024": {
+     "n": 133,
+     "net": 0.213,
+     "base": 0.485,
+     "excess": -0.272
+    },
+    "2025": {
+     "n": 88,
+     "net": 0.313,
+     "base": 0.875,
+     "excess": -0.563
+    },
+    "2026": {
+     "n": 101,
+     "net": -0.129,
+     "base": -0.244,
+     "excess": 0.115
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 0,
+    "mean": 0,
+    "max": 0.058,
+    "min": -0.052
+   },
+   "hold": 20,
+   "lag": 1,
+   "state": "loud",
+   "holm": 0.9744,
+   "checks": {
+    "oosExT2": false,
+    "holm": false,
+    "oosNetPos": true,
+    "isSameSign": true,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "single": {
+  "is": {
+   "n": 77,
+   "net": -0.004,
+   "excess": -0.049,
+   "tEx": -0.48
+  },
+  "oos": {
+   "n": 77,
+   "net": 0.291,
+   "excess": 0.175,
+   "tEx": 1.32
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
