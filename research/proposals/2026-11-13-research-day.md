@@ -150,6 +150,7 @@ paper system with a measured, clearly negative record.
 | 132 | Second frozen replication of the vol-spike rebound (#860): seven unused index CFDs plus earlier years | DOES NOT REPLICATE: +0.062R a trade net (n 475) but month t 1.17 (bar 2); same direction as #860, about 40 % taken by costs; no market passes Holm. Fisher with #860 now p 0.017, far from the family's Bonferroni line | #951 |
 | 133 | 2-day RSI pullback (#838) on US index years before its window | NOT MEASURABLE: OANDA starts 2003-03-24, leaving 4.0 years of entries (floor 5), no financing rate before 2006, and 2004-07 lies inside the rule's own 2009 development sample. Still no replication on unused years | #952 |
 | 134 | Turnaround Tuesday (#857/#862) on index years before both studies' windows | NOT MEASURABLE: index candles start March 2003, at most 4.7 unused years before 2008 (floor 5); gate reproduced both studies exactly. Still no replication on unused years | #953 |
+| 135 | Weekend-gap fade (rule G) entered after the reopen spread settles: 18:05 New York (also 17:35, 19:05), 18 pairs | FAIL: about zero even before costs at +1 h (-0.005R, n 1,203), -0.126R net (month t -2.85); placebo-level from one hour on. The gap fill happens in the first hour, so waiting out the spread gives up the move. Rule G stands or falls on the real reopen spread, still unmeasured (#944, #949) | #954 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
