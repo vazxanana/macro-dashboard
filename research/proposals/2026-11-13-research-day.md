@@ -208,6 +208,7 @@ paper system with a measured, clearly negative record.
 | 190 | ICT A-setups whose sweep runs into an open NWOG/NDOG (`ict-nwog`) | **FAIL**, 0 of 3, Holm p 1.00: WITH-gap A-setups 2024-26 +0.029R a trade net (n 50, t 0.20) vs +0.138R for the rest; the in-sample lead (+0.427R, t 1.57) gone; one of the two items CLAUDE.md listed as untested is now tested | #1003 |
 | 191 | SMT divergence at the sweep on ICT index A-setups (`ict-smt`) | **FAIL**, 0 of 3: SMT A-setups 2024-26 −0.158R a trade net (n 149, monthly t −1.91); without SMT +0.211R (n 367, t 2.14); the gap below every placebo but small in sample (t −0.46). "Skip SMT setups" is a post-hoc lead: replication on 2008-19 started | #1004 |
 | 192 | 5-minute opening range breakout at European and Asian index opens (`intl-index-orb`) | **FAIL**, 0 of 8: European book 2021-now −0.260R a trade net (n 5875, t −5.54), gross only +0.046R (vs +0.14R at the NY open); DAX flat; Nikkei gross +0.199R but negative net | #1005 |
+| 193 | Classic candlestick reversal patterns across 28 CFDs (`candle-patterns`) | **FAIL**, 0 of 14: six patterns at a 10-day extreme 2017-26 −0.048R a trade net (n 3231, t −2.09), about zero gross; the filter adds nothing; the hammer's small gross tilt is taken by costs | #1006 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
