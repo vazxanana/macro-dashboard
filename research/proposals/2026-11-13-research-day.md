@@ -128,6 +128,7 @@ paper system with a measured, clearly negative record.
 | 362 | `gold-dxy-month-shock` (#1175) | Trade gold against the dollar index proxy's biggest move in 21 days, hold 5 days | FAIL, 0 of 3: OOS +0.103R a trade net (n 106, t 1.18), excess +0.145R (t 1.67) but IS −0.118R; gain is mostly buys in a rising-gold decade |
 | 363 | `gold-silver-reversal-day` (#1176) | Trade gold against a silver reversal day (silver spikes 0.5 ATR then closes back), hold 5 days | FAIL, 0 of 3: IS excess +0.093R (t 1.71), OOS −0.107R (n 198, t −1.86); sign flips between windows; placebo 6 of 40 |
 | 364 | `gold-euro-divergence` (#1177) | Trade XAU/USD when gold in euros makes a 20-day extreme that gold in dollars does not, hold 5 days | FAIL, 0 of 3: OOS +0.103R a trade net (n 121, t 1.38), excess +0.078R (t 1.13), Holm p 0.17; shorts lose in both windows; placebo 39 of 40 |
+| 365 | `gold-lowvol-hold` (#1178) | Buy gold on days its 20-day volatility is in the lowest third of the past year, hold 20 days with a 3 ATR stop | FAIL, 0 of 3: OOS excess +0.152R a trade (t 1.14, Newey-West), IS −0.084R; Holm p 0.38; loud-day buys −0.173R OOS (contrast, not judged) |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
