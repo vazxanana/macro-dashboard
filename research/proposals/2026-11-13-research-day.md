@@ -115,6 +115,7 @@ paper system with a measured, clearly negative record.
 | 97 | Fade the European index opening gap after a US-led night (DE40, UK100 + EU50; tests #913's post-hoc reversal on new markets) | FAIL, 0 of 3: about zero before costs, −0.03 to −0.06R net; the US move is in the European gap and nothing is left for the session | #916 |
 | 98 | Tokyo fix on every business day vs gotobi days (mechanism; frozen gotobi trade on USD/JPY M1, 2010-26) | **UNCLEAR**: the trade works only on gotobi days (non-gotobi −0.063R, t −2.37; gotobi minus other +0.22R a month, t 3.61), but the rise into the fix is about the same every day (+0.33 vs +0.38 pips); the gotobi difference shows after the fix (−1.34 vs −0.19 pips in the next minute, descriptive) | #917 |
 | 99 | Year-end US dollar seasonals (short USD basket 15-31 Dec; long USD first 10 January days; EUR/USD late December) | FAIL, 0 of 3: late-December short USD +28 bp a year over other windows (t 0.94, 9 of 16 years), placebo 23-38 %, Holm p 0.54; low power (16 years), so not large or regular, not proven absent | #918 |
+| 100 | Day-of-week effects in the US dollar (long-USD basket of six majors, each weekday vs the rest) | FAIL, 0 of 5: largest |t| 0.88 (Friday), Holm p 1.00 every day, no day keeps its sign across windows, all lose at 2x cost; 35 of 40 shuffled-label placebos look as strong | #919 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
