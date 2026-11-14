@@ -251,6 +251,9 @@ paper system with a measured, clearly negative record.
 | 233 | Gold daily volatility breakout (open ± 0.5 x previous range) | **FAIL, near miss**: +0.072R net OOS (n 1,121, month t 1.86, Holm p 0.094), gross t 2.87 in sample and 3.21 out of sample, beats all 40 placebos, positive at 2x costs; but flat net in sample and the OOS gain is 2025-26. Replication on 2006-15 running | #1046 |
 | 234 | Gold H4 pin bar at a 20-candle extreme | FAIL, 0 of 3: both sides 2R −0.065R OOS (n 156, t −0.63), about zero before costs; the in-sample positives of the other two did not repeat | #1047 |
 | 235 | MACD and 50/200 crosses on gold daily | FAIL, 0 of 3: MACD long-only +0.253R OOS (n 100, t 1.53) but random long entries made +0.120R (gold's rise); stop-and-reverse +0.045R; 50/200 cross only 7 trades | #1048 |
+| 236 | **Gold volatility breakout replicated on untouched 2007-15** (#1046's T1, unchanged) | **PASS, all 5 pre-registered checks**: +0.111R a trade net (n 1,657, month t 3.19), both halves positive, 40 of 40 placebos, +0.018R at 2x costs; pooled 2007-26 +0.073R (t 3.35). Caveats: costs decide it (pooled 2007-26 turns negative at 2x costs; 2007-15 spreads not measured), and 2015-24 was flat. Evidence the rule leans the right way, not yet a tradeable edge: a cost study or a paper forward record is the owner's call | #1049 |
+| 237 | Ichimoku cloud signals on gold (daily, H4) | FAIL, 0 of 3: TK cross +0.389R OOS (n 50, t 1.49) but 2025 alone gave most of it; H4 cloud breakout +0.018R after costs | #1050 |
+| 238 | Gold's volatility breakout on silver (robustness) | FAIL: gross positive in both windows (pooled +0.086R, t 3.37, 40 of 40 placebos) but silver's costs (0.17R a trade) exceed it: net −0.084R | #1051 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
