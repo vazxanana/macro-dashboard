@@ -74,6 +74,7 @@ paper system with a measured, clearly negative record.
 | 56 | The RSI(2) rule (#22), frozen, on gold and silver | 137 (2016 →) | −0.077R a trade (month t −1.8); loses before costs; random uptrend days do better; silver lost every year | #873 |
 | 57 | **Your market-cycle rule as an entry** on NAS100, SPX500, US30 (H4 bias, H1 pullback finished, trade with the H4) | 1,174 / 2,907 (2016 →) | −0.227 / −0.155R a trade (month t −4.3 / −5.6), negative before costs; random entries in the same H4 direction did better in 39 of 40 seeds: waiting for the pullback to finish makes it worse | #874 |
 | 58 | Gold session drift: short London afternoon + New York, long Asia with a 50-day trend filter | 1,718 / 1,063 / 683 (2020 →) | 0 of 3; best +0.023R a trade (t 1.37), every positive stream negative in 2008-19; the Asia gain is real before costs but under $0.30 | #875 |
+| 59 | Big NAS100 sessions spilling into BTC / ETH overnight (follow or fade) | 764 (2022 →) | 0 of 2; −0.043 / −0.070R a trade, at the placebo's middle; 2018-20 replication could not be run (no older crypto intraday data reachable) | #876 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
