@@ -1,62 +1,4979 @@
 {
- "built": "2026-11-13",
- "prereg": "research/edge/fx-carry/PREREGISTRATION.md",
- "verdict": "inconclusive: not run, data not reachable",
- "why": "FRED short-rate series missing for USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD (no fetched file): fred.stlouisfed.org could not be read from this environment",
- "series": {
-  "USD": {
-   "primary": "IR3TIB01USM156N",
-   "fallback": "IRSTCI01USM156N"
+ "study": "fx-carry",
+ "revision": 2,
+ "verdict": "FAIL",
+ "which": [],
+ "built": "2026-11-14",
+ "data": {
+  "src": "council-data research/daily/<key>.json (OANDA mid daily, weekends folded into Monday)",
+  "keys": [
+   "eurusd",
+   "gbpusd",
+   "audusd",
+   "nzdusd",
+   "usdjpy",
+   "usdcad",
+   "usdchf",
+   "spx500"
+  ],
+  "last": "2026-11-06",
+  "rates": "rates.json: central-bank policy rates written out from known decisions, approximate and from memory (no 2026 decision recorded)"
+ },
+ "windows": {
+  "decisive": [
+   "2016-01",
+   "2026-10"
+  ],
+  "replication": [
+   "2006-01",
+   "2015-12"
+  ]
+ },
+ "params": {
+  "ATR_N": 20,
+  "STOP_ATR": 2,
+  "SPREAD_PIP": 0.3,
+  "SLIP": 0.5,
+  "COMM_RT": 0.000045,
+  "MARKUP": 1,
+  "VOL_N": 20,
+  "VOL_YEAR": 252,
+  "SEEDS": 40,
+  "SEED0": 1000,
+  "DEC": [
+   "2016-01",
+   "2026-10"
+  ],
+  "REP": [
+   "2006-01",
+   "2015-12"
+  ],
+  "FIRST_REB": "2005-12",
+  "LAST_REB": "2026-09",
+  "T_BAR": 2,
+  "HOLM_BAR": 0.05,
+  "PLACEBO_BEAT": 38
+ },
+ "tests": {
+  "T1": {
+   "decisive": {
+    "months": 130,
+    "flat": 0,
+    "legs": 448,
+    "mean": 0.066,
+    "price": 0.019,
+    "carry": 0.073,
+    "cost": 0.025,
+    "sd": 2.232,
+    "t": 0.34,
+    "p": 0.3669,
+    "total": 8.63,
+    "pos": 0.523,
+    "maxDD": -21.74,
+    "exits": {
+     "stop": 227,
+     "month": 217,
+     "gap": 4
+    },
+    "r0pct": 1.51,
+    "perLeg": 0.019
+   },
+   "replication": {
+    "months": 120,
+    "flat": 0,
+    "legs": 440,
+    "mean": 0.124,
+    "price": 0.046,
+    "carry": 0.1,
+    "cost": 0.021,
+    "sd": 2.664,
+    "t": 0.51,
+    "p": 0.305,
+    "total": 14.93,
+    "pos": 0.508,
+    "maxDD": -25.25,
+    "exits": {
+     "month": 225,
+     "stop": 214,
+     "gap": 1
+    },
+    "r0pct": 2,
+    "perLeg": 0.034
+   },
+   "decisive2x": {
+    "months": 130,
+    "flat": 0,
+    "legs": 448,
+    "mean": -0.087,
+    "price": 0.019,
+    "carry": -0.055,
+    "cost": 0.051,
+    "sd": 2.209,
+    "t": -0.45,
+    "p": 0.6736,
+    "total": -11.32,
+    "pos": 0.508,
+    "maxDD": -24.31,
+    "exits": {
+     "stop": 227,
+     "month": 217,
+     "gap": 4
+    },
+    "r0pct": 1.51,
+    "perLeg": -0.025
+   },
+   "replication2x": {
+    "months": 120,
+    "flat": 0,
+    "legs": 440,
+    "mean": -0.007,
+    "price": 0.046,
+    "carry": -0.011,
+    "cost": 0.042,
+    "sd": 2.635,
+    "t": -0.03,
+    "p": 0.512,
+    "total": -0.8,
+    "pos": 0.475,
+    "maxDD": -26.87,
+    "exits": {
+     "month": 225,
+     "stop": 214,
+     "gap": 1
+    },
+    "r0pct": 2,
+    "perLeg": -0.002
+   },
+   "byYear": {
+    "2006": {
+     "R": 5,
+     "months": 12,
+     "legs": 48,
+     "carry": 3.08,
+     "price": 2.22
+    },
+    "2007": {
+     "R": 5.28,
+     "months": 12,
+     "legs": 48,
+     "carry": 3.15,
+     "price": 2.43
+    },
+    "2008": {
+     "R": -18,
+     "months": 12,
+     "legs": 40,
+     "carry": 1.77,
+     "price": -19.6
+    },
+    "2009": {
+     "R": 11.24,
+     "months": 12,
+     "legs": 36,
+     "carry": 0.54,
+     "price": 10.83
+    },
+    "2010": {
+     "R": 6,
+     "months": 12,
+     "legs": 36,
+     "carry": 1.19,
+     "price": 4.98
+    },
+    "2011": {
+     "R": -5.53,
+     "months": 12,
+     "legs": 40,
+     "carry": 0.48,
+     "price": -5.81
+    },
+    "2012": {
+     "R": 0.42,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.55,
+     "price": 0.19
+    },
+    "2013": {
+     "R": -3.53,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.37,
+     "price": -3.6
+    },
+    "2014": {
+     "R": 13.56,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.34,
+     "price": 13.61
+    },
+    "2015": {
+     "R": 0.48,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.45,
+     "price": 0.27
+    },
+    "2016": {
+     "R": -7.41,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.3,
+     "price": -7.42
+    },
+    "2017": {
+     "R": -10.21,
+     "months": 12,
+     "legs": 48,
+     "carry": 0.29,
+     "price": -10.14
+    },
+    "2018": {
+     "R": 4.31,
+     "months": 12,
+     "legs": 39,
+     "carry": 1.05,
+     "price": 3.56
+    },
+    "2019": {
+     "R": 7.17,
+     "months": 12,
+     "legs": 36,
+     "carry": 1.46,
+     "price": 6.07
+    },
+    "2020": {
+     "R": -1.43,
+     "months": 12,
+     "legs": 45,
+     "carry": -0.29,
+     "price": -0.8
+    },
+    "2021": {
+     "R": 8.32,
+     "months": 12,
+     "legs": 48,
+     "carry": -1.15,
+     "price": 9.86
+    },
+    "2022": {
+     "R": -0.66,
+     "months": 12,
+     "legs": 45,
+     "carry": 0.26,
+     "price": -0.64
+    },
+    "2023": {
+     "R": 0.24,
+     "months": 12,
+     "legs": 36,
+     "carry": 1.81,
+     "price": -1.34
+    },
+    "2024": {
+     "R": 2.3,
+     "months": 12,
+     "legs": 37,
+     "carry": 2.32,
+     "price": 0.26
+    },
+    "2025": {
+     "R": 1.6,
+     "months": 12,
+     "legs": 36,
+     "carry": 1.79,
+     "price": 0.05
+    },
+    "2026": {
+     "R": 4.4,
+     "months": 10,
+     "legs": 30,
+     "carry": 1.67,
+     "price": 2.96
+    }
+   },
+   "beat": 34,
+   "holm": 0.7338,
+   "c1": false,
+   "c2": true,
+   "c3": false,
+   "c4": false,
+   "c5": false,
+   "pass": false
   },
-  "EUR": {
-   "primary": "IR3TIB01EZM156N",
-   "fallback": "IRSTCI01EZM156N"
-  },
-  "GBP": {
-   "primary": "IR3TIB01GBM156N",
-   "fallback": "IRSTCI01GBM156N"
-  },
-  "JPY": {
-   "primary": "IR3TIB01JPM156N",
-   "fallback": "IRSTCI01JPM156N"
-  },
-  "AUD": {
-   "primary": "IR3TIB01AUM156N",
-   "fallback": "IRSTCI01AUM156N"
-  },
-  "CAD": {
-   "primary": "IR3TIB01CAM156N",
-   "fallback": "IRSTCI01CAM156N"
-  },
-  "CHF": {
-   "primary": "IR3TIB01CHM156N",
-   "fallback": "IRSTCI01CHM156N"
-  },
-  "NZD": {
-   "primary": "IR3TIB01NZM156N",
-   "fallback": "IRSTCI01NZM156N"
+  "T2": {
+   "decisive": {
+    "months": 130,
+    "flat": 59,
+    "legs": 243,
+    "mean": -0.008,
+    "price": -0.039,
+    "carry": 0.046,
+    "cost": 0.014,
+    "sd": 1.8,
+    "t": -0.05,
+    "p": 0.5199,
+    "total": -0.98,
+    "pos": 0.246,
+    "maxDD": -21.54,
+    "exits": {
+     "month": 110,
+     "stop": 131,
+     "gap": 2
+    },
+    "r0pct": 1.45,
+    "perLeg": -0.004
+   },
+   "replication": {
+    "months": 120,
+    "flat": 56,
+    "legs": 230,
+    "mean": 0.04,
+    "price": 0.002,
+    "carry": 0.05,
+    "cost": 0.011,
+    "sd": 2.04,
+    "t": 0.22,
+    "p": 0.4129,
+    "total": 4.81,
+    "pos": 0.267,
+    "maxDD": -13.61,
+    "exits": {
+     "month": 106,
+     "stop": 124
+    },
+    "r0pct": 1.94,
+    "perLeg": 0.021
+   },
+   "decisive2x": {
+    "months": 130,
+    "flat": 59,
+    "legs": 243,
+    "mean": -0.093,
+    "price": -0.039,
+    "carry": -0.026,
+    "cost": 0.029,
+    "sd": 1.783,
+    "t": -0.6,
+    "p": 0.7257,
+    "total": -12.13,
+    "pos": 0.246,
+    "maxDD": -24.11,
+    "exits": {
+     "month": 110,
+     "stop": 131,
+     "gap": 2
+    },
+    "r0pct": 1.45,
+    "perLeg": -0.05
+   },
+   "replication2x": {
+    "months": 120,
+    "flat": 56,
+    "legs": 230,
+    "mean": -0.03,
+    "price": 0.002,
+    "carry": -0.008,
+    "cost": 0.023,
+    "sd": 2.015,
+    "t": -0.16,
+    "p": 0.5636,
+    "total": -3.56,
+    "pos": 0.258,
+    "maxDD": -15.34,
+    "exits": {
+     "month": 106,
+     "stop": 124
+    },
+    "r0pct": 1.94,
+    "perLeg": -0.015
+   },
+   "byYear": {
+    "2006": {
+     "R": -0.83,
+     "months": 12,
+     "legs": 32,
+     "carry": 1.85,
+     "price": -2.48
+    },
+    "2007": {
+     "R": 3.08,
+     "months": 12,
+     "legs": 12,
+     "carry": 1.14,
+     "price": 2.02
+    },
+    "2008": {
+     "R": -6.75,
+     "months": 12,
+     "legs": 12,
+     "carry": 0.75,
+     "price": -7.44
+    },
+    "2009": {
+     "R": 8.47,
+     "months": 12,
+     "legs": 24,
+     "carry": 0.38,
+     "price": 8.18
+    },
+    "2010": {
+     "R": 1.86,
+     "months": 12,
+     "legs": 24,
+     "carry": 0.8,
+     "price": 1.18
+    },
+    "2011": {
+     "R": -5.73,
+     "months": 12,
+     "legs": 18,
+     "carry": 0.39,
+     "price": -6.02
+    },
+    "2012": {
+     "R": 0.48,
+     "months": 12,
+     "legs": 32,
+     "carry": 0.26,
+     "price": 0.43
+    },
+    "2013": {
+     "R": -2.29,
+     "months": 12,
+     "legs": 36,
+     "carry": 0.26,
+     "price": -2.33
+    },
+    "2014": {
+     "R": 14.28,
+     "months": 12,
+     "legs": 20,
+     "carry": -0.03,
+     "price": 14.49
+    },
+    "2015": {
+     "R": -7.76,
+     "months": 12,
+     "legs": 20,
+     "carry": 0.2,
+     "price": -7.86
+    },
+    "2016": {
+     "R": -9.48,
+     "months": 12,
+     "legs": 28,
+     "carry": 0.18,
+     "price": -9.48
+    },
+    "2017": {
+     "R": -7.79,
+     "months": 12,
+     "legs": 36,
+     "carry": 0.22,
+     "price": -7.75
+    },
+    "2018": {
+     "R": -0.77,
+     "months": 12,
+     "legs": 12,
+     "carry": 0.62,
+     "price": -1.3
+    },
+    "2019": {
+     "R": 1.84,
+     "months": 12,
+     "legs": 21,
+     "carry": 0.71,
+     "price": 1.36
+    },
+    "2020": {
+     "R": 3.83,
+     "months": 12,
+     "legs": 19,
+     "carry": -0.09,
+     "price": 4.07
+    },
+    "2021": {
+     "R": 6.26,
+     "months": 12,
+     "legs": 36,
+     "carry": -0.86,
+     "price": 7.41
+    },
+    "2022": {
+     "R": -1.18,
+     "months": 12,
+     "legs": 4,
+     "carry": 0.04,
+     "price": -1.2
+    },
+    "2023": {
+     "R": -0.87,
+     "months": 12,
+     "legs": 33,
+     "carry": 1.78,
+     "price": -2.45
+    },
+    "2024": {
+     "R": 1.2,
+     "months": 12,
+     "legs": 18,
+     "carry": 1.31,
+     "price": 0.04
+    },
+    "2025": {
+     "R": 4.55,
+     "months": 12,
+     "legs": 15,
+     "carry": 0.88,
+     "price": 3.77
+    },
+    "2026": {
+     "R": 1.44,
+     "months": 10,
+     "legs": 21,
+     "carry": 1.16,
+     "price": 0.45
+    }
+   },
+   "beat": 23,
+   "holm": 0.7338,
+   "c1": false,
+   "c2": true,
+   "c3": false,
+   "c4": false,
+   "c5": false,
+   "pass": false
   }
  },
- "fetchLog": {
-  "at": "2026-11-13T22:46:40.589Z",
-  "log": {
-   "IR3TIB01USM156N": "Request was cancelled.",
-   "IRSTCI01USM156N": "Request was cancelled.",
-   "IR3TIB01EZM156N": "Request was cancelled.",
-   "IRSTCI01EZM156N": "Request was cancelled.",
-   "IR3TIB01GBM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01GBM156N": "skipped: FRED unreachable this run",
-   "IR3TIB01JPM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01JPM156N": "skipped: FRED unreachable this run",
-   "IR3TIB01AUM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01AUM156N": "skipped: FRED unreachable this run",
-   "IR3TIB01CAM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01CAM156N": "skipped: FRED unreachable this run",
-   "IR3TIB01CHM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01CHM156N": "skipped: FRED unreachable this run",
-   "IR3TIB01NZM156N": "skipped: FRED unreachable this run",
-   "IRSTCI01NZM156N": "skipped: FRED unreachable this run"
+ "placebo": {
+  "T1": {
+   "means": [
+    -0.212,
+    -0.098,
+    -0.318,
+    -0.216,
+    0.113,
+    -0.082,
+    -0.072,
+    -0.164,
+    -0.044,
+    -0.274,
+    0.051,
+    -0.253,
+    -0.308,
+    -0.067,
+    -0.208,
+    -0.141,
+    -0.092,
+    -0.059,
+    0.046,
+    -0.155,
+    0.097,
+    -0.21,
+    0.06,
+    -0.291,
+    -0.192,
+    0.167,
+    0.103,
+    0.112,
+    -0.013,
+    -0.391,
+    -0.181,
+    -0.171,
+    0.041,
+    -0.133,
+    -0.078,
+    -0.08,
+    0.101,
+    -0.213,
+    -0.203,
+    -0.088
+   ],
+   "p5": -0.308,
+   "p50": -0.095,
+   "p95": 0.112,
+   "beat": 34
+  },
+  "T2": {
+   "means": [
+    -0.117,
+    -0.035,
+    -0.185,
+    -0.158,
+    -0.055,
+    0.125,
+    -0.029,
+    -0.104,
+    0.01,
+    -0.135,
+    0.066,
+    -0.038,
+    -0.192,
+    0.074,
+    0.01,
+    0.008,
+    -0.051,
+    0.044,
+    0.035,
+    0.043,
+    0.199,
+    -0.036,
+    0.139,
+    -0.22,
+    -0.105,
+    0.056,
+    0.118,
+    0.009,
+    0.017,
+    -0.227,
+    -0.023,
+    -0.015,
+    0.01,
+    -0.117,
+    -0.051,
+    0.037,
+    -0.021,
+    -0.03,
+    -0.074,
+    -0.102
+   ],
+   "p5": -0.193,
+   "p50": -0.026,
+   "p95": 0.126,
+   "beat": 23
   }
  },
- "rule": "paper research only; no live rule, size, filter, stop, config or mirror setting changed"
+ "holm": {
+  "T1": 0.7338,
+  "T2": 0.7338
+ },
+ "picks": {
+  "decisive": {
+   "usd": {
+    "long": 72,
+    "short": 0
+   },
+   "eur": {
+    "long": 0,
+    "short": 79
+   },
+   "gbp": {
+    "long": 30,
+    "short": 0
+   },
+   "jpy": {
+    "long": 0,
+    "short": 51
+   },
+   "aud": {
+    "long": 35,
+    "short": 0
+   },
+   "nzd": {
+    "long": 94,
+    "short": 0
+   },
+   "cad": {
+    "long": 29,
+    "short": 0
+   },
+   "chf": {
+    "long": 0,
+    "short": 130
+   }
+  },
+  "replication": {
+   "usd": {
+    "long": 0,
+    "short": 40
+   },
+   "eur": {
+    "long": 0,
+    "short": 41
+   },
+   "gbp": {
+    "long": 0,
+    "short": 0
+   },
+   "jpy": {
+    "long": 0,
+    "short": 79
+   },
+   "aud": {
+    "long": 120,
+    "short": 0
+   },
+   "nzd": {
+    "long": 120,
+    "short": 0
+   },
+   "cad": {
+    "long": 0,
+    "short": 0
+   },
+   "chf": {
+    "long": 0,
+    "short": 80
+   }
+  }
+ },
+ "t2flat": {
+  "decisive": 59,
+  "replication": 56
+ },
+ "months": [
+  {
+   "ym": "2006-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 0.394,
+   "carry": 0.097,
+   "price": 0.321,
+   "cost": 0.0238,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -1.131,
+   "carry": 0.273,
+   "price": -1.379,
+   "cost": 0.025,
+   "t2flat": true
+  },
+  {
+   "ym": "2006-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -1.839,
+   "carry": 0.216,
+   "price": -2.028,
+   "cost": 0.0268,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 2.4,
+   "carry": 0.156,
+   "price": 2.265,
+   "cost": 0.0222,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.473,
+   "carry": 0.082,
+   "price": -3.533,
+   "cost": 0.0218,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -0.879,
+   "carry": 0.241,
+   "price": -1.103,
+   "cost": 0.0179,
+   "t2flat": true
+  },
+  {
+   "ym": "2006-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 3.013,
+   "carry": 0.333,
+   "price": 2.703,
+   "cost": 0.0238,
+   "t2flat": true
+  },
+  {
+   "ym": "2006-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 4.834,
+   "carry": 0.388,
+   "price": 4.472,
+   "cost": 0.0259,
+   "t2flat": true
+  },
+  {
+   "ym": "2006-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -1.963,
+   "carry": 0.143,
+   "price": -2.079,
+   "cost": 0.0268,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 2.716,
+   "carry": 0.387,
+   "price": 2.355,
+   "cost": 0.0262,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.335,
+   "carry": 0.386,
+   "price": -3.689,
+   "cost": 0.0315,
+   "t2flat": false
+  },
+  {
+   "ym": "2006-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 4.265,
+   "carry": 0.384,
+   "price": 3.911,
+   "cost": 0.0302,
+   "t2flat": false
+  },
+  {
+   "ym": "2007-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 1.036,
+   "carry": 0.451,
+   "price": 0.616,
+   "cost": 0.0308,
+   "t2flat": false
+  },
+  {
+   "ym": "2007-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 0.026,
+   "carry": 0.264,
+   "price": -0.209,
+   "cost": 0.0289,
+   "t2flat": false
+  },
+  {
+   "ym": "2007-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.12,
+   "carry": 0.138,
+   "price": -3.229,
+   "cost": 0.0297,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 3.546,
+   "carry": 0.282,
+   "price": 3.286,
+   "cost": 0.0229,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 2.014,
+   "carry": 0.427,
+   "price": 1.614,
+   "cost": 0.0279,
+   "t2flat": false
+  },
+  {
+   "ym": "2007-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 6.048,
+   "carry": 0.544,
+   "price": 5.539,
+   "cost": 0.0352,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -2.539,
+   "carry": 0.183,
+   "price": -2.69,
+   "cost": 0.0318,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.898,
+   "carry": 0.125,
+   "price": -4,
+   "cost": 0.0231,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 2.898,
+   "carry": 0.159,
+   "price": 2.755,
+   "cost": 0.0162,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 3.051,
+   "carry": 0.316,
+   "price": 2.756,
+   "cost": 0.0206,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.961,
+   "carry": 0.061,
+   "price": -4,
+   "cost": 0.0218,
+   "t2flat": true
+  },
+  {
+   "ym": "2007-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 0.183,
+   "carry": 0.203,
+   "price": -0.005,
+   "cost": 0.0156,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.913,
+   "carry": 0.108,
+   "price": -4,
+   "cost": 0.021,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 0.016,
+   "carry": 0.199,
+   "price": -0.167,
+   "cost": 0.0158,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -3.513,
+   "carry": 0.246,
+   "price": -3.739,
+   "cost": 0.0198,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.381,
+   "carry": 0.264,
+   "price": 2.127,
+   "cost": 0.0102,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.554,
+   "carry": 0.243,
+   "price": 0.326,
+   "cost": 0.0147,
+   "t2flat": false
+  },
+  {
+   "ym": "2008-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.659,
+   "carry": 0.12,
+   "price": -1.764,
+   "cost": 0.0156,
+   "t2flat": false
+  },
+  {
+   "ym": "2008-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.643,
+   "carry": 0.374,
+   "price": -3,
+   "cost": 0.017,
+   "t2flat": false
+  },
+  {
+   "ym": "2008-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.468,
+   "carry": 0.067,
+   "price": -1.519,
+   "cost": 0.016,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.997,
+   "carry": 0.017,
+   "price": -3,
+   "cost": 0.0134,
+   "t2flat": false
+  },
+  {
+   "ym": "2008-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.984,
+   "carry": 0.024,
+   "price": -3,
+   "cost": 0.0075,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.622,
+   "carry": 0.041,
+   "price": -1.659,
+   "cost": 0.0044,
+   "t2flat": true
+  },
+  {
+   "ym": "2008-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": -0.147,
+   "carry": 0.069,
+   "price": -0.206,
+   "cost": 0.0099,
+   "t2flat": true
+  },
+  {
+   "ym": "2009-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.985,
+   "carry": 0.025,
+   "price": -3,
+   "cost": 0.0093,
+   "t2flat": true
+  },
+  {
+   "ym": "2009-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.316,
+   "carry": 0.038,
+   "price": 2.287,
+   "cost": 0.0083,
+   "t2flat": true
+  },
+  {
+   "ym": "2009-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.925,
+   "carry": 0.051,
+   "price": 2.883,
+   "cost": 0.0091,
+   "t2flat": true
+  },
+  {
+   "ym": "2009-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.516,
+   "carry": 0.053,
+   "price": 0.472,
+   "cost": 0.0091,
+   "t2flat": true
+  },
+  {
+   "ym": "2009-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 4.628,
+   "carry": 0.054,
+   "price": 4.585,
+   "cost": 0.0111,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.804,
+   "carry": 0.039,
+   "price": 0.775,
+   "cost": 0.0105,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.422,
+   "carry": 0.035,
+   "price": -1.447,
+   "cost": 0.0104,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.704,
+   "carry": 0.054,
+   "price": 0.662,
+   "cost": 0.0125,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.614,
+   "carry": 0.083,
+   "price": 2.544,
+   "cost": 0.0132,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.191,
+   "carry": 0.007,
+   "price": -1.184,
+   "cost": 0.0138,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.296,
+   "carry": 0.063,
+   "price": -0.346,
+   "cost": 0.0121,
+   "t2flat": false
+  },
+  {
+   "ym": "2009-12",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.626,
+   "carry": 0.042,
+   "price": 2.596,
+   "cost": 0.0124,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-01",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.55,
+   "carry": 0.109,
+   "price": -2.644,
+   "cost": 0.0143,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.631,
+   "carry": -0.007,
+   "price": -2.61,
+   "cost": 0.0136,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-03",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 3.771,
+   "carry": 0.093,
+   "price": 3.691,
+   "cost": 0.0135,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.738,
+   "carry": 0.164,
+   "price": 0.592,
+   "cost": 0.0177,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -3.008,
+   "carry": 0.01,
+   "price": -3,
+   "cost": 0.0174,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.698,
+   "carry": 0.069,
+   "price": -0.758,
+   "cost": 0.0089,
+   "t2flat": true
+  },
+  {
+   "ym": "2010-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.836,
+   "carry": 0.094,
+   "price": 2.755,
+   "cost": 0.0133,
+   "t2flat": true
+  },
+  {
+   "ym": "2010-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.926,
+   "carry": 0.088,
+   "price": -3,
+   "cost": 0.0142,
+   "t2flat": true
+  },
+  {
+   "ym": "2010-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 4.919,
+   "carry": 0.138,
+   "price": 4.796,
+   "cost": 0.0145,
+   "t2flat": true
+  },
+  {
+   "ym": "2010-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 1.967,
+   "carry": 0.187,
+   "price": 1.797,
+   "cost": 0.0171,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.303,
+   "carry": 0.111,
+   "price": 0.206,
+   "cost": 0.0146,
+   "t2flat": false
+  },
+  {
+   "ym": "2010-12",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 3.275,
+   "carry": 0.138,
+   "price": 3.152,
+   "cost": 0.0148,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-01",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.371,
+   "carry": -0.034,
+   "price": -1.318,
+   "cost": 0.0185,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.117,
+   "carry": 0.111,
+   "price": -0.211,
+   "cost": 0.0165,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-03",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.969,
+   "carry": 0.05,
+   "price": -3,
+   "cost": 0.0191,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 4.641,
+   "carry": 0.142,
+   "price": 4.514,
+   "cost": 0.014,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -3.009,
+   "carry": 0.008,
+   "price": -3,
+   "cost": 0.0166,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.904,
+   "carry": 0.112,
+   "price": -3,
+   "cost": 0.0154,
+   "t2flat": false
+  },
+  {
+   "ym": "2011-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 3.086,
+   "carry": 0.157,
+   "price": 2.947,
+   "cost": 0.0185,
+   "t2flat": true
+  },
+  {
+   "ym": "2011-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "usd",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.057,
+   "carry": -0.039,
+   "price": -2.002,
+   "cost": 0.0165,
+   "t2flat": true
+  },
+  {
+   "ym": "2011-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.797,
+   "carry": -0.017,
+   "price": 0.828,
+   "cost": 0.0142,
+   "t2flat": true
+  },
+  {
+   "ym": "2011-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.859,
+   "carry": 0.052,
+   "price": 1.823,
+   "cost": 0.0167,
+   "t2flat": true
+  },
+  {
+   "ym": "2011-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.646,
+   "carry": -0.014,
+   "price": -1.614,
+   "cost": 0.017,
+   "t2flat": true
+  },
+  {
+   "ym": "2011-12",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.844,
+   "carry": -0.05,
+   "price": -1.772,
+   "cost": 0.0214,
+   "t2flat": true
+  },
+  {
+   "ym": "2012-01",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.076,
+   "carry": 0.042,
+   "price": 2.061,
+   "cost": 0.0275,
+   "t2flat": true
+  },
+  {
+   "ym": "2012-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 6.361,
+   "carry": 0.101,
+   "price": 6.288,
+   "cost": 0.0276,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-03",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.009,
+   "carry": -0.068,
+   "price": -0.917,
+   "cost": 0.0242,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.248,
+   "carry": 0.115,
+   "price": -0.341,
+   "cost": 0.022,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.387,
+   "carry": -0.067,
+   "price": 1.48,
+   "cost": 0.0253,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 5.31,
+   "carry": 0.073,
+   "price": 5.263,
+   "cost": 0.0259,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.586,
+   "carry": 0.058,
+   "price": 0.55,
+   "cost": 0.0223,
+   "t2flat": true
+  },
+  {
+   "ym": "2012-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.248,
+   "carry": 0.122,
+   "price": -3.347,
+   "cost": 0.0226,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.038,
+   "carry": -0.008,
+   "price": -4,
+   "cost": 0.0293,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.037,
+   "carry": -0.012,
+   "price": -4,
+   "cost": 0.0246,
+   "t2flat": false
+  },
+  {
+   "ym": "2012-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.981,
+   "carry": 0.047,
+   "price": -0.999,
+   "cost": 0.0293,
+   "t2flat": true
+  },
+  {
+   "ym": "2012-12",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.736,
+   "carry": 0.146,
+   "price": -1.849,
+   "cost": 0.0324,
+   "t2flat": true
+  },
+  {
+   "ym": "2013-01",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.215,
+   "carry": 0.162,
+   "price": 0.086,
+   "cost": 0.034,
+   "t2flat": true
+  },
+  {
+   "ym": "2013-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.633,
+   "carry": -0.024,
+   "price": 2.685,
+   "cost": 0.0284,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-03",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 4.061,
+   "carry": 0.066,
+   "price": 4.02,
+   "cost": 0.0255,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.463,
+   "carry": 0.117,
+   "price": -1.553,
+   "cost": 0.0274,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.355,
+   "carry": -0.064,
+   "price": 0.443,
+   "cost": 0.0243,
+   "t2flat": true
+  },
+  {
+   "ym": "2013-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.991,
+   "carry": 0.028,
+   "price": -4,
+   "cost": 0.0189,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.807,
+   "carry": 0.015,
+   "price": -1.805,
+   "cost": 0.0171,
+   "t2flat": true
+  },
+  {
+   "ym": "2013-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.703,
+   "carry": -0.035,
+   "price": -0.649,
+   "cost": 0.019,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 3.182,
+   "carry": 0.041,
+   "price": 3.165,
+   "cost": 0.0247,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.441,
+   "carry": 0.047,
+   "price": -1.462,
+   "cost": 0.0268,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.226,
+   "carry": -0.029,
+   "price": -2.169,
+   "cost": 0.0277,
+   "t2flat": false
+  },
+  {
+   "ym": "2013-12",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.342,
+   "carry": 0.048,
+   "price": -2.365,
+   "cost": 0.0251,
+   "t2flat": false
+  },
+  {
+   "ym": "2014-01",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.345,
+   "carry": -0.018,
+   "price": 1.392,
+   "cost": 0.0295,
+   "t2flat": false
+  },
+  {
+   "ym": "2014-02",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.902,
+   "carry": 0.073,
+   "price": 0.855,
+   "cost": 0.0263,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-03",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 3.499,
+   "carry": 0.051,
+   "price": 3.478,
+   "cost": 0.0301,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.969,
+   "carry": -0.044,
+   "price": -1.894,
+   "cost": 0.031,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.673,
+   "carry": 0.136,
+   "price": -2.772,
+   "cost": 0.0372,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.084,
+   "carry": 0.071,
+   "price": 2.055,
+   "cost": 0.0414,
+   "t2flat": false
+  },
+  {
+   "ym": "2014-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": 2.776,
+   "carry": 0.038,
+   "price": 2.776,
+   "cost": 0.0385,
+   "t2flat": false
+  },
+  {
+   "ym": "2014-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": 1.503,
+   "carry": 0.039,
+   "price": 1.515,
+   "cost": 0.051,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": 6.585,
+   "carry": -0.073,
+   "price": 6.7,
+   "cost": 0.0421,
+   "t2flat": false
+  },
+  {
+   "ym": "2014-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": -1.703,
+   "carry": 0.118,
+   "price": -1.796,
+   "cost": 0.0256,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": -0.279,
+   "carry": 0.003,
+   "price": -0.262,
+   "cost": 0.0204,
+   "t2flat": true
+  },
+  {
+   "ym": "2014-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 4,
+   "R": 1.491,
+   "carry": -0.051,
+   "price": 1.564,
+   "cost": 0.0223,
+   "t2flat": false
+  },
+  {
+   "ym": "2015-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.152,
+   "carry": 0,
+   "price": 1.176,
+   "cost": 0.0249,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.634,
+   "carry": 0.073,
+   "price": 2.576,
+   "cost": 0.0148,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.936,
+   "carry": -0.006,
+   "price": 0.963,
+   "cost": 0.0203,
+   "t2flat": false
+  },
+  {
+   "ym": "2015-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.003,
+   "carry": 0.081,
+   "price": -0.063,
+   "cost": 0.0151,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.213,
+   "carry": 0.022,
+   "price": -2.218,
+   "cost": 0.0172,
+   "t2flat": false
+  },
+  {
+   "ym": "2015-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.704,
+   "carry": 0.062,
+   "price": -2.748,
+   "cost": 0.0184,
+   "t2flat": false
+  },
+  {
+   "ym": "2015-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.311,
+   "carry": 0.009,
+   "price": -0.301,
+   "cost": 0.0183,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.979,
+   "carry": 0.041,
+   "price": -4,
+   "cost": 0.0207,
+   "t2flat": false
+  },
+  {
+   "ym": "2015-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.251,
+   "carry": 0.018,
+   "price": -0.251,
+   "cost": 0.017,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.945,
+   "carry": 0.066,
+   "price": 0.9,
+   "cost": 0.0206,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 4.069,
+   "carry": -0.002,
+   "price": 4.092,
+   "cost": 0.0218,
+   "t2flat": true
+  },
+  {
+   "ym": "2015-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.2,
+   "carry": 0.084,
+   "price": 0.142,
+   "cost": 0.0262,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.716,
+   "carry": -0.002,
+   "price": -0.692,
+   "cost": 0.0217,
+   "t2flat": true
+  },
+  {
+   "ym": "2016-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.113,
+   "carry": 0.045,
+   "price": -1.139,
+   "cost": 0.0196,
+   "t2flat": true
+  },
+  {
+   "ym": "2016-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.197,
+   "carry": 0.046,
+   "price": 2.17,
+   "cost": 0.0186,
+   "t2flat": true
+  },
+  {
+   "ym": "2016-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.446,
+   "carry": 0.041,
+   "price": -0.466,
+   "cost": 0.0209,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.201,
+   "carry": -0.003,
+   "price": -1.174,
+   "cost": 0.024,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.096,
+   "carry": 0.055,
+   "price": 2.072,
+   "cost": 0.0305,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.484,
+   "carry": 0.033,
+   "price": 0.47,
+   "cost": 0.0195,
+   "t2flat": true
+  },
+  {
+   "ym": "2016-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.308,
+   "carry": 0.028,
+   "price": -2.311,
+   "cost": 0.0246,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.71,
+   "carry": 0.025,
+   "price": -0.707,
+   "cost": 0.0283,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.221,
+   "carry": -0.001,
+   "price": 1.25,
+   "cost": 0.0276,
+   "t2flat": true
+  },
+  {
+   "ym": "2016-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.014,
+   "carry": 0.017,
+   "price": -4,
+   "cost": 0.0312,
+   "t2flat": false
+  },
+  {
+   "ym": "2016-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.9,
+   "carry": 0.017,
+   "price": -2.895,
+   "cost": 0.0222,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 3.632,
+   "carry": 0.01,
+   "price": 3.647,
+   "cost": 0.0253,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.015,
+   "carry": 0.017,
+   "price": 2.022,
+   "cost": 0.024,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.012,
+   "carry": 0.019,
+   "price": -4,
+   "cost": 0.0308,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-04",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.681,
+   "carry": 0.031,
+   "price": -4.68,
+   "cost": 0.0324,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-05",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.896,
+   "carry": 0.022,
+   "price": -0.882,
+   "cost": 0.0357,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-06",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.851,
+   "carry": 0.02,
+   "price": 2.861,
+   "cost": 0.03,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-07",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.983,
+   "carry": 0.053,
+   "price": -4,
+   "cost": 0.0357,
+   "t2flat": true
+  },
+  {
+   "ym": "2017-08",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.969,
+   "carry": 0.059,
+   "price": -4,
+   "cost": 0.0273,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-09",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.248,
+   "carry": -0.008,
+   "price": -1.215,
+   "cost": 0.0261,
+   "t2flat": true
+  },
+  {
+   "ym": "2017-10",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.86,
+   "carry": 0.042,
+   "price": 0.844,
+   "cost": 0.026,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-11",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.595,
+   "carry": 0.002,
+   "price": -3.565,
+   "cost": 0.0321,
+   "t2flat": false
+  },
+  {
+   "ym": "2017-12",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.815,
+   "carry": 0.024,
+   "price": 2.825,
+   "cost": 0.0342,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-01",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 3.619,
+   "carry": -0.052,
+   "price": 3.708,
+   "cost": 0.0368,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-02",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.101,
+   "carry": 0.077,
+   "price": -0.154,
+   "cost": 0.0251,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-03",
+   "long": [
+    "nzd",
+    "aud"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.747,
+   "carry": -0.005,
+   "price": -0.717,
+   "cost": 0.0247,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-04",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 3.285,
+   "carry": 0.105,
+   "price": 3.202,
+   "cost": 0.0222,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-05",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.273,
+   "carry": 0.171,
+   "price": 1.127,
+   "cost": 0.0254,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-06",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.415,
+   "carry": 0.133,
+   "price": -0.526,
+   "cost": 0.0222,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-07",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.356,
+   "carry": 0.108,
+   "price": 0.271,
+   "cost": 0.0227,
+   "t2flat": false
+  },
+  {
+   "ym": "2018-08",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.256,
+   "carry": 0.172,
+   "price": -1.404,
+   "cost": 0.0249,
+   "t2flat": false
+  },
+  {
+   "ym": "2018-09",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -2.909,
+   "carry": 0.116,
+   "price": -3,
+   "cost": 0.0253,
+   "t2flat": false
+  },
+  {
+   "ym": "2018-10",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 3.037,
+   "carry": 0.223,
+   "price": 2.837,
+   "cost": 0.0237,
+   "t2flat": false
+  },
+  {
+   "ym": "2018-11",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.141,
+   "carry": -0.048,
+   "price": 1.215,
+   "cost": 0.0259,
+   "t2flat": true
+  },
+  {
+   "ym": "2018-12",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -2.976,
+   "carry": 0.048,
+   "price": -3,
+   "cost": 0.0231,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-01",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.26,
+   "carry": 0.256,
+   "price": 0.028,
+   "cost": 0.0234,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-02",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.062,
+   "carry": 0.249,
+   "price": -0.162,
+   "cost": 0.0254,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-03",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.326,
+   "carry": 0.256,
+   "price": 1.098,
+   "cost": 0.0291,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-04",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.77,
+   "carry": 0.269,
+   "price": 1.529,
+   "cost": 0.0287,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-05",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.29,
+   "carry": 0.252,
+   "price": -1.507,
+   "cost": 0.0346,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-06",
+   "long": [
+    "usd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.368,
+   "carry": -0.135,
+   "price": 1.537,
+   "cost": 0.0333,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-07",
+   "long": [
+    "usd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 3.03,
+   "carry": 0.138,
+   "price": 2.917,
+   "cost": 0.0249,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-08",
+   "long": [
+    "usd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -3.034,
+   "carry": -0.002,
+   "price": -3,
+   "cost": 0.032,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-09",
+   "long": [
+    "usd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.866,
+   "carry": 0.109,
+   "price": 1.782,
+   "cost": 0.025,
+   "t2flat": true
+  },
+  {
+   "ym": "2019-10",
+   "long": [
+    "usd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.424,
+   "carry": -0.002,
+   "price": -1.395,
+   "cost": 0.0269,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-11",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 2.025,
+   "carry": 0.171,
+   "price": 1.887,
+   "cost": 0.0335,
+   "t2flat": false
+  },
+  {
+   "ym": "2019-12",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 1.21,
+   "carry": -0.102,
+   "price": 1.355,
+   "cost": 0.0421,
+   "t2flat": false
+  },
+  {
+   "ym": "2020-01",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.02,
+   "carry": 0.229,
+   "price": -0.214,
+   "cost": 0.0345,
+   "t2flat": false
+  },
+  {
+   "ym": "2020-02",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.077,
+   "carry": 0.145,
+   "price": -0.032,
+   "cost": 0.0357,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-03",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -3.537,
+   "carry": -0.02,
+   "price": -3.484,
+   "cost": 0.033,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-04",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.783,
+   "carry": -0.04,
+   "price": 1.834,
+   "cost": 0.0115,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-05",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.55,
+   "carry": -0.061,
+   "price": -1.464,
+   "cost": 0.0238,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-06",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.949,
+   "carry": -0.065,
+   "price": 1.041,
+   "cost": 0.0274,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-07",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.196,
+   "carry": -0.071,
+   "price": 0.29,
+   "cost": 0.0232,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-08",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.308,
+   "carry": -0.079,
+   "price": -1.2,
+   "cost": 0.0295,
+   "t2flat": false
+  },
+  {
+   "ym": "2020-09",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.343,
+   "carry": -0.044,
+   "price": 0.415,
+   "cost": 0.0276,
+   "t2flat": false
+  },
+  {
+   "ym": "2020-10",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -3.169,
+   "carry": -0.084,
+   "price": -3.056,
+   "cost": 0.0291,
+   "t2flat": true
+  },
+  {
+   "ym": "2020-11",
+   "long": [
+    "aud",
+    "nzd"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 4.166,
+   "carry": -0.093,
+   "price": 4.293,
+   "cost": 0.0341,
+   "t2flat": false
+  },
+  {
+   "ym": "2020-12",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.645,
+   "carry": -0.104,
+   "price": 0.778,
+   "cost": 0.0295,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-01",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.724,
+   "carry": -0.13,
+   "price": 0.887,
+   "cost": 0.0327,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-02",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 2.538,
+   "carry": -0.107,
+   "price": 2.675,
+   "cost": 0.0296,
+   "t2flat": true
+  },
+  {
+   "ym": "2021-03",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 5.781,
+   "carry": -0.129,
+   "price": 5.942,
+   "cost": 0.0317,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-04",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.74,
+   "carry": -0.091,
+   "price": 0.86,
+   "cost": 0.0289,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-05",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.195,
+   "carry": -0.1,
+   "price": 0.327,
+   "cost": 0.0322,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-06",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 3.217,
+   "carry": -0.073,
+   "price": 3.323,
+   "cost": 0.0324,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-07",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -2.379,
+   "carry": -0.08,
+   "price": -2.268,
+   "cost": 0.0317,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-08",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.774,
+   "carry": -0.09,
+   "price": -0.653,
+   "cost": 0.031,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-09",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.576,
+   "carry": -0.088,
+   "price": -1.453,
+   "cost": 0.0355,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-10",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.407,
+   "carry": -0.106,
+   "price": 1.546,
+   "cost": 0.0333,
+   "t2flat": true
+  },
+  {
+   "ym": "2021-11",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.33,
+   "carry": -0.079,
+   "price": 0.444,
+   "cost": 0.0358,
+   "t2flat": false
+  },
+  {
+   "ym": "2021-12",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.888,
+   "carry": -0.082,
+   "price": -1.775,
+   "cost": 0.0311,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-01",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 0.304,
+   "carry": -0.09,
+   "price": 0.427,
+   "cost": 0.0339,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-02",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.464,
+   "carry": -0.062,
+   "price": -1.371,
+   "cost": 0.0319,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-03",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 1.474,
+   "carry": -0.032,
+   "price": 1.534,
+   "cost": 0.0285,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-04",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": 4.182,
+   "carry": -0.026,
+   "price": 4.233,
+   "cost": 0.0252,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-05",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -4.001,
+   "carry": 0.026,
+   "price": -4,
+   "cost": 0.0268,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-06",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "eur",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -0.923,
+   "carry": 0.066,
+   "price": -0.967,
+   "cost": 0.0216,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-07",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "eur"
+   ],
+   "legs": 3,
+   "R": 0.108,
+   "carry": 0.075,
+   "price": 0.049,
+   "cost": 0.0157,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-08",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.181,
+   "carry": 0.041,
+   "price": -1.2,
+   "cost": 0.0228,
+   "t2flat": false
+  },
+  {
+   "ym": "2022-09",
+   "long": [
+    "nzd",
+    "cad"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 4,
+   "R": -1.102,
+   "carry": 0.077,
+   "price": -1.156,
+   "cost": 0.0228,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-10",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.779,
+   "carry": 0.101,
+   "price": 2.692,
+   "cost": 0.0133,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-11",
+   "long": [
+    "cad",
+    "nzd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 0.891,
+   "carry": -0.02,
+   "price": 0.929,
+   "cost": 0.0172,
+   "t2flat": true
+  },
+  {
+   "ym": "2022-12",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.724,
+   "carry": 0.102,
+   "price": -1.815,
+   "cost": 0.0116,
+   "t2flat": true
+  },
+  {
+   "ym": "2023-01",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.913,
+   "carry": 0.103,
+   "price": -3,
+   "cost": 0.0157,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-02",
+   "long": [
+    "cad",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.279,
+   "carry": 0.169,
+   "price": 2.125,
+   "cost": 0.0144,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-03",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.479,
+   "carry": 0.07,
+   "price": -1.531,
+   "cost": 0.0169,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-04",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.382,
+   "carry": 0.125,
+   "price": -0.492,
+   "cost": 0.015,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-05",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.736,
+   "carry": 0.155,
+   "price": -0.872,
+   "cost": 0.0187,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-06",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.395,
+   "carry": 0.243,
+   "price": 2.171,
+   "cost": 0.0197,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-07",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.437,
+   "carry": 0.052,
+   "price": -1.469,
+   "cost": 0.02,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-08",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 1.118,
+   "carry": 0.324,
+   "price": 0.811,
+   "cost": 0.0171,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-09",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 3.868,
+   "carry": 0.399,
+   "price": 3.49,
+   "cost": 0.022,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-10",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.971,
+   "carry": 0.055,
+   "price": -3,
+   "cost": 0.0268,
+   "t2flat": false
+  },
+  {
+   "ym": "2023-11",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 1.109,
+   "carry": 0.026,
+   "price": 1.107,
+   "cost": 0.0234,
+   "t2flat": true
+  },
+  {
+   "ym": "2023-12",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -0.615,
+   "carry": 0.087,
+   "price": -0.68,
+   "cost": 0.0216,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-01",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.634,
+   "carry": 0.311,
+   "price": 2.342,
+   "cost": 0.0188,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-02",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 2.961,
+   "carry": 0.303,
+   "price": 2.678,
+   "cost": 0.0206,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-03",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.952,
+   "carry": 0.074,
+   "price": -3,
+   "cost": 0.0255,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-04",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 4.455,
+   "carry": 0.457,
+   "price": 4.024,
+   "cost": 0.0263,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-05",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.512,
+   "carry": -0.02,
+   "price": 0.554,
+   "cost": 0.0224,
+   "t2flat": true
+  },
+  {
+   "ym": "2024-06",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -3.058,
+   "carry": -0.029,
+   "price": -3,
+   "cost": 0.0291,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-07",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.836,
+   "carry": 0.19,
+   "price": -3,
+   "cost": 0.0258,
+   "t2flat": false
+  },
+  {
+   "ym": "2024-08",
+   "long": [
+    "nzd",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -3.01,
+   "carry": 0.013,
+   "price": -3,
+   "cost": 0.0234,
+   "t2flat": true
+  },
+  {
+   "ym": "2024-09",
+   "long": [
+    "usd",
+    "nzd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -2.186,
+   "carry": 0.145,
+   "price": -2.313,
+   "cost": 0.0171,
+   "t2flat": true
+  },
+  {
+   "ym": "2024-10",
+   "long": [
+    "nzd",
+    "gbp"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 4,
+   "R": 1.616,
+   "carry": 0.265,
+   "price": 1.374,
+   "cost": 0.0238,
+   "t2flat": true
+  },
+  {
+   "ym": "2024-11",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 0.498,
+   "carry": 0.351,
+   "price": 0.171,
+   "cost": 0.0244,
+   "t2flat": true
+  },
+  {
+   "ym": "2024-12",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": 3.671,
+   "carry": 0.261,
+   "price": 3.428,
+   "cost": 0.0178,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-01",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "chf",
+    "jpy"
+   ],
+   "legs": 3,
+   "R": -1.362,
+   "carry": 0.329,
+   "price": -1.67,
+   "cost": 0.0204,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-02",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.131,
+   "carry": 0.053,
+   "price": -1.165,
+   "cost": 0.0185,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-03",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.254,
+   "carry": -0.02,
+   "price": -0.214,
+   "cost": 0.019,
+   "t2flat": false
+  },
+  {
+   "ym": "2025-04",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -2.989,
+   "carry": 0.032,
+   "price": -3,
+   "cost": 0.0209,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-05",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.757,
+   "carry": 0.111,
+   "price": 0.658,
+   "cost": 0.0112,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-06",
+   "long": [
+    "usd",
+    "gbp"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.413,
+   "carry": 0.093,
+   "price": 0.335,
+   "cost": 0.0157,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-07",
+   "long": [
+    "usd",
+    "gbp"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 3.646,
+   "carry": 0.319,
+   "price": 3.345,
+   "cost": 0.0187,
+   "t2flat": false
+  },
+  {
+   "ym": "2025-08",
+   "long": [
+    "usd",
+    "gbp"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.354,
+   "carry": -0.013,
+   "price": -0.321,
+   "cost": 0.02,
+   "t2flat": false
+  },
+  {
+   "ym": "2025-09",
+   "long": [
+    "usd",
+    "gbp"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.328,
+   "carry": 0.255,
+   "price": -1.56,
+   "cost": 0.0228,
+   "t2flat": false
+  },
+  {
+   "ym": "2025-10",
+   "long": [
+    "usd",
+    "gbp"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 2.845,
+   "carry": 0.343,
+   "price": 2.524,
+   "cost": 0.0222,
+   "t2flat": false
+  },
+  {
+   "ym": "2025-11",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.432,
+   "carry": 0.127,
+   "price": 0.326,
+   "cost": 0.0214,
+   "t2flat": true
+  },
+  {
+   "ym": "2025-12",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.926,
+   "carry": 0.158,
+   "price": 0.791,
+   "cost": 0.0235,
+   "t2flat": true
+  },
+  {
+   "ym": "2026-01",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.262,
+   "carry": 0.171,
+   "price": -0.406,
+   "cost": 0.027,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-02",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.625,
+   "carry": 0.17,
+   "price": -0.777,
+   "cost": 0.0184,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-03",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 2.885,
+   "carry": 0.247,
+   "price": 2.659,
+   "cost": 0.0209,
+   "t2flat": true
+  },
+  {
+   "ym": "2026-04",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -0.329,
+   "carry": 0.122,
+   "price": -0.433,
+   "cost": 0.0187,
+   "t2flat": true
+  },
+  {
+   "ym": "2026-05",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.302,
+   "carry": 0.235,
+   "price": 0.089,
+   "cost": 0.0218,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-06",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 4.698,
+   "carry": 0.324,
+   "price": 4.401,
+   "cost": 0.0269,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-07",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.403,
+   "carry": 0.145,
+   "price": 0.286,
+   "cost": 0.0285,
+   "t2flat": true
+  },
+  {
+   "ym": "2026-08",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.584,
+   "carry": 0.04,
+   "price": -1.602,
+   "cost": 0.0222,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-09",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": 0.863,
+   "carry": 0.157,
+   "price": 0.735,
+   "cost": 0.0294,
+   "t2flat": false
+  },
+  {
+   "ym": "2026-10",
+   "long": [
+    "gbp",
+    "usd"
+   ],
+   "short": [
+    "jpy",
+    "chf"
+   ],
+   "legs": 3,
+   "R": -1.951,
+   "carry": 0.062,
+   "price": -1.988,
+   "cost": 0.0242,
+   "t2flat": false
+  }
+ ]
 }

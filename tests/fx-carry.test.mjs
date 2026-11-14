@@ -1,152 +1,122 @@
-// research/edge/fx-carry: the pre-registered carry rule, offline (no network, synthetic candles and rates).
-import { test } from 'node:test';
+// FX carry study (research/edge/fx-carry, pre-registration revision 2): the rate table, the ranking at the rebalance, ATR on
+// past candles only, the stop on the losing side, carry credited and charged by side and nights, costs, the book, and the
+// committed result against the pre-registered bar and the written report. Offline: no candle file is read here.
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import * as F from '../research/edge/fx-carry/run.mjs';
+import { RATES, CCYS, PAIRS, P, TESTS, rateAt, rank, atr, leg, carryR, sideOf, book, monthEnds, crashFlat, normP, holm, maxDD, verdictOf, report, rng, shuffled } from '../research/edge/fx-carry/run.mjs';
+import { nights } from '../council/fills.mjs';
 
-const DIR = new URL('../research/edge/fx-carry/', import.meta.url);
-const ut = (y, m, d = 1) => Date.UTC(y, m - 1, d) / 1000;
-// one flat series a month for every currency, from 2005-01 to 2026-12
-function fredFlat(levels, from = [2005, 1], to = [2026, 12]) {
-  const out = {};
-  for (const c of F.CCYS) {
-    const a = [];
-    for (let y = from[0], m = from[1]; y < to[0] || (y === to[0] && m <= to[1]); m === 12 ? (y++, m = 1) : m++) a.push({ t: ut(y, m), v: typeof levels[c] === 'function' ? levels[c](y, m) : levels[c] });
-    out[F.SERIES[c].primary] = a;
+const rd = (p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
+const PRE = rd('../research/edge/fx-carry/PREREGISTRATION.md'), R1 = rd('../research/edge/fx-carry/PREREGISTRATION-r1.md'), RES = rd('../research/edge/fx-carry/RESULT.md');
+const J = JSON.parse(rd('../research/edge/fx-carry/result.json'));
+const near = (a, b, e = 1e-9) => assert.ok(Math.abs(a - b) < e, `${a} vs ${b}`);
+const T0 = Date.UTC(2021, 0, 4) / 1000;   // a Monday
+const day = (i, o, h, l, c) => ({ time: T0 + i * 86400, open: o, high: h, low: l, close: c });
+const flat = (n, px = 1, rng = 0.01) => Array.from({ length: n }, (_, i) => day(i, px, px + rng / 2, px - rng / 2, px));
+
+test('revision 2 is the pre-registration in force; revision 1 is kept, marked superseded', () => {
+  assert.ok(PRE.includes('pre-registration (revision 2)') && PRE.includes('Revision 1 of this pre-registration (commit `cb793a37`'));
+  assert.ok(R1.startsWith('> **Superseded by revision 2**') && R1.includes('OECD Main Economic Indicators, 3-month interbank rate'));
+  for (const s of ['**Decisive window: holding months January 2016 to October 2026**', '2 x ATR(20)', '**0.3 pip**', 'a commission of **22.5 USD per', '**1.0 % a year broker markup is charged on every leg', 'Wednesday counts three', 'month-sum t >= 2.0', 'at least 38 of the 40 placebo means']) assert.ok(PRE.includes(s), s);
+  assert.deepEqual([P.STOP_ATR, P.ATR_N, P.SPREAD_PIP, P.SLIP, P.COMM_RT, P.MARKUP, P.SEEDS, P.PLACEBO_BEAT, P.VOL_N, P.VOL_YEAR], [2, 20, 0.3, 0.5, 0.000045, 1, 40, 38, 20, 252]);
+  assert.deepEqual(P.DEC, ['2016-01', '2026-10']); assert.deepEqual(P.REP, ['2006-01', '2015-12']); assert.deepEqual(Object.keys(TESTS), ['T1', 'T2']);
+});
+
+test('rates.json: says it is approximate and from memory; monthEnd equals the decisions; changes sorted', () => {
+  assert.match(RATES.about, /APPROXIMATE AND FROM MEMORY/); assert.deepEqual(RATES.order, CCYS);
+  for (const c of CCYS) { const ch = RATES.decisions[c].changes; assert.ok(RATES.decisions[c].check.length > 5); for (let i = 1; i < ch.length; i++) assert.ok(ch[i][0] > ch[i - 1][0], c); }
+  for (const [ym, v] of Object.entries(RATES.monthEnd)) { const [y, m] = ym.split('-').map(Number), last = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10); assert.deepEqual(v, CCYS.map((c) => rateAt(c, last)), ym); }
+  assert.equal(rateAt('usd', '2008-12-15'), 1); assert.equal(rateAt('usd', '2008-12-16'), 0.125);
+});
+
+test('the ranking uses only the rate in force at the rebalance; ties keep the list order', () => {
+  // the Fed moved on 16 Dec 2015: the rate the day before is the old one
+  assert.equal(rateAt('usd', '2015-12-15'), 0.125);
+  const fake = { decisions: Object.fromEntries(CCYS.map((c, i) => [c, { from: ['2000-01-01', c === 'chf' ? -1 : i], changes: c === 'chf' ? [['2020-06-02', 99]] : [] }])) };
+  assert.deepEqual(rank('2020-06-01', fake).long, ['cad', 'nzd']); assert.deepEqual(rank('2020-06-01', fake).short, ['usd', 'chf']);
+  assert.deepEqual(rank('2020-06-02', fake).long, ['chf', 'cad'], 'a decision counts from its own date');
+  const tie = { decisions: Object.fromEntries(CCYS.map((c) => [c, { from: ['2000-01-01', 0], changes: [] }])) };
+  assert.deepEqual(rank('2020-01-01', tie), { long: ['usd', 'eur'], short: ['cad', 'chf'], order: CCYS });
+});
+
+test('ATR reads past candles only: changing a later candle never changes it', () => {
+  const b = flat(40); b[25] = day(25, 1, 1.05, 0.98, 1.01);
+  const a = atr(b, 30), b2 = b.map((x) => ({ ...x })); b2[31] = day(31, 1, 3, 0.1, 2); b2[35] = day(35, 5, 9, 4, 6);
+  near(atr(b2, 30), a); assert.equal(atr(b, 19), null);
+  near(atr(flat(25), 22), 0.01);
+});
+
+test('every leg has its stop on the losing side; a gap exits at the open, a touch at the stop', () => {
+  for (const ccy of ['eur', 'jpy']) for (const dir of [1, -1]) {
+    const s = sideOf(ccy, dir), b = flat(45), l = leg(b, 25, 44, { ccy, side: s });
+    assert.ok(l.r0 > 0 && (s > 0 ? l.stop < l.entry : l.stop > l.entry)); near(l.r0, 0.02); assert.equal(l.kind, 'month');
   }
-  return out;
-}
-// daily candles on every weekday between two dates, price from fn(i)
-function daily(from, to, fn, spread = 0.001) {
-  const cs = []; let i = 0;
-  for (let t = from; t <= to; t += 86400) { const w = new Date(t * 1000).getUTCDay(); if (w === 0 || w === 6) continue;
-    const c = fn(i, t), o = i ? cs[i - 1].c : c; cs.push({ t, o, h: Math.max(o, c) + spread, l: Math.min(o, c) - spread, c }); i++; }
-  return cs;
-}
-
-test('series ids: one OECD 3-month interbank series per currency, with an overnight fallback', () => {
-  assert.equal(F.CCYS.length, 8);
-  assert.equal(F.SERIES.USD.primary, 'IR3TIB01USM156N');
-  assert.equal(F.SERIES.EUR.primary, 'IR3TIB01EZM156N');
-  assert.equal(F.SERIES.NZD.fallback, 'IRSTCI01NZM156N');
-  const pre = fs.readFileSync(new URL('PREREGISTRATION.md', DIR), 'utf8');
-  for (const c of F.CCYS) { assert.ok(pre.includes(F.SERIES[c].primary)); assert.ok(pre.includes(F.SERIES[c].fallback)); }
-  assert.deepEqual(Object.values(F.PAIRS).map((p) => p.key).sort(), ['audusd', 'eurusd', 'gbpusd', 'nzdusd', 'usdcad', 'usdchf', 'usdjpy']);
+  assert.equal(sideOf('jpy', 1), -1, 'long JPY = sell usdjpy'); assert.equal(sideOf('eur', 1), 1);
+  const b = flat(45); b[30] = day(30, 1, 1.001, 0.97, 0.99);   // long eurusd stop at 0.98 touched
+  const l = leg(b, 25, 44, { ccy: 'eur', side: 1 }); assert.equal(l.kind, 'stop'); near(l.exit, 0.98); near(l.price, -1); assert.equal(l.at, 30);
+  const g = flat(45); g[28] = day(28, 1.05, 1.06, 1.04, 1.05);   // short eurusd, opens above its 1.02 stop
+  const lg = leg(g, 25, 44, { ccy: 'eur', side: -1 }); assert.equal(lg.kind, 'gap'); near(lg.exit, 1.05); near(lg.price, -2.5);
 });
 
-test('ranking: top 2 long, bottom 2 short, ties by code, fewer than 6 known = flat', () => {
-  const rates = F.monthlyRates(fredFlat({ USD: 2, EUR: 1, GBP: 3, JPY: 0, AUD: 4, CAD: 2, CHF: -0.5, NZD: 5 }));
-  const r = F.rankMonth(rates, '2020-06');
-  assert.deepEqual(r.long, ['NZD', 'AUD']);
-  assert.deepEqual(r.short, ['JPY', 'CHF']);
-  const tie = F.rankMonth(F.monthlyRates(fredFlat({ USD: 1, EUR: 1, GBP: 1, JPY: 1, AUD: 1, CAD: 1, CHF: 1, NZD: 1 })), '2020-06');
-  assert.deepEqual(tie.long, ['AUD', 'CAD']); assert.deepEqual(tie.short, ['NZD', 'USD']);
-  const few = F.monthlyRates({ [F.SERIES.USD.primary]: [{ t: ut(2020, 1), v: 1 }], [F.SERIES.EUR.primary]: [{ t: ut(2020, 1), v: 2 }] });
-  assert.equal(F.rankMonth(few, '2020-06'), null);
+test('carry is credited and charged by side and by nights (Wednesday three), at the rates of each night, less 1 % on every leg', () => {
+  const t0 = Date.UTC(2023, 5, 30) / 1000 + 86400, t1 = Date.UTC(2023, 6, 31) / 1000 + 86400;   // end of June to end of July 2023
+  const n = nights(t0, t1), rU = rateAt('usd', '2023-07-10'), rA = rateAt('aud', '2023-07-10');
+  const long = carryR({ ccy: 'aud', side: 1, entry: 0.67, r0: 0.01, t0, t1 }), short = carryR({ ccy: 'aud', side: -1, entry: 0.67, r0: 0.01, t0, t1 });
+  assert.equal(long.nights, n); assert.equal(short.nights, n);
+  // the Fed moved on 26 Jul 2023; the sum over nights matches a hand count split at that date
+  const nA = nights(t0, Date.UTC(2023, 6, 26) / 1000 + 22 * 3600 - 1), nB = n - nA;
+  near(long.R, ((rA - rU - 1) * nA + (rA - 5.375 - 1) * nB) / 100 / 365 * 0.67 / 0.01);
+  near(short.R, ((rU - rA - 1) * nA + (5.375 - rA - 1) * nB) / 100 / 365 * 0.67 / 0.01);
+  assert.ok(long.R < 0 && short.R > 0, 'long AUD paid, short AUD earned while USD > AUD');
+  near(long.R + short.R, -2 * n / 100 / 365 * 0.67 / 0.01, 1e-9);   // the markup on both sides
+  const jl = carryR({ ccy: 'jpy', side: -1, entry: 140, r0: 2, t0, t1 });   // long JPY = sell usdjpy: base USD, quote JPY
+  near(jl.R, ((rateAt('jpy', '2023-07-10') - rU - 1) * nA + (rateAt('jpy', '2023-07-10') - 5.375 - 1) * nB) / 100 / 365 * 140 / 2);
+  const wed = Date.UTC(2023, 6, 5) / 1000;   // Wednesday: a Wednesday night counts three
+  assert.equal(carryR({ ccy: 'eur', side: 1, entry: 1, r0: 1, t0: wed, t1: wed + 86400 }).nights, 3);
 });
 
-test('publication lag: the month-end ranking never reads an observation dated less than two months back', () => {
-  // AUD jumps to the top from 2020-05 on; at the end of 2020-05 and 2020-06 it must still rank by its old (low) rate
-  const lv = { USD: 2, EUR: 1, GBP: 3, JPY: 0, CAD: 2.5, CHF: -0.5, NZD: 4, AUD: (y, m) => (y * 12 + m >= 2020 * 12 + 5 ? 9 : 0.1) };
-  const rates = F.monthlyRates(fredFlat(lv));
-  assert.ok(!F.rankMonth(rates, '2020-05').long.includes('AUD'));
-  assert.ok(!F.rankMonth(rates, '2020-06').long.includes('AUD'));
-  assert.ok(F.rankMonth(rates, '2020-07').long.includes('AUD'));
-  assert.equal(F.knownRate(rates.AUD, '2020-06').ym, '2020-04');
-  // a series that stops: the latest earlier known value, at most 6 months back
-  assert.equal(F.knownRate(rates.AUD, '2027-03').ym, '2026-12');
-  assert.equal(F.knownRate(rates.AUD, '2027-09'), null);
+test('costs: 0.3 pip spread + half a spread on each market order + 45 per million a round trip, doubled at 2x', () => {
+  const b = flat(45); const l = leg(b, 25, 44, { ccy: 'eur', side: 1 }), l2 = leg(b, 25, 44, { ccy: 'eur', side: 1, costMult: 2 });
+  near(l.cost, (0.6 * 0.0001 + 0.000045) / 0.02); near(l2.cost, 2 * l.cost);
+  const by = flat(45, 150, 1), ly = leg(by, 25, 44, { ccy: 'jpy', side: 1 }); near(ly.cost, (0.6 * 0.01 + 0.000045 * 150) / 2);
 });
 
-test('fallback series fills a month the primary lacks; the primary wins where both exist', () => {
-  const fred = { [F.SERIES.GBP.primary]: [{ t: ut(2021, 1), v: 0.1 }], [F.SERIES.GBP.fallback]: [{ t: ut(2021, 1), v: 0.05 }, { t: ut(2022, 3), v: 0.6 }] };
-  const m = F.monthlyRates(fred).GBP;
-  assert.deepEqual(m.get('2021-01'), { v: 0.1, src: 'primary' });
-  assert.deepEqual(m.get('2022-03'), { v: 0.6, src: 'fallback' });
+test('the book: a USD pick is a flat leg; the crash filter reads the S&P candles up to the rebalance', () => {
+  const mk = () => { const out = []; for (let t = Date.UTC(2005, 9, 3) / 1000; t < Date.UTC(2006, 2, 1) / 1000; t += 86400) { const w = new Date(t * 1000).getUTCDay(); if (w && w < 6) out.push({ time: t, open: 1, high: 1.005, low: 0.995, close: 1 }); } return out; };
+  const bars = {}, ends = {}; for (const p of Object.values(PAIRS)) { bars[p.key] = mk(); ends[p.key] = monthEnds(bars[p.key]); }
+  const data = { bars, ends, spx: mk() };
+  const saved = [P.FIRST_REB, P.LAST_REB]; P.FIRST_REB = '2005-12'; P.LAST_REB = '2006-01';
+  try {
+    const m = book(data); assert.equal(m.length, 2); assert.equal(m[0].ym, '2006-01');
+    assert.deepEqual(m[0].long, ['nzd', 'aud']); assert.deepEqual(m[0].short, ['chf', 'jpy']); assert.equal(m[0].legs.length, 4);
+    const m2 = book(data, { pick: () => ({ long: ['usd', 'eur'], short: ['gbp', 'cad'] }) }); assert.equal(m2[0].legs.length, 3);
+    near(m2[0].R, m2[0].legs.reduce((s, l) => s + l.net, 0));
+  } finally { [P.FIRST_REB, P.LAST_REB] = saved; }
+  assert.equal(crashFlat(data.spx, '2006-01-31').flat, null, 'too little S&P history: no reading');
+  const s = []; for (let i = 0; i < 300; i++) s.push({ time: T0 + i * 86400, open: 1, high: 1, low: 1, close: 1 + 0.001 * Math.sin(i) * (i > 280 ? 20 : 1) });
+  const ymd = new Date((T0 + 299 * 86400) * 1000).toISOString().slice(0, 10), s2 = [...s, { ...s[0], time: T0 + 300 * 86400, close: 50 }];
+  assert.equal(crashFlat(s, ymd).flat, true); assert.deepEqual(crashFlat(s2, ymd), crashFlat(s, ymd), 'a later candle is never read');
 });
 
-test('carry accrual: differential less the markup, by calendar days held, in R', () => {
-  // flat price 1.0, ATR known: true range 0.002 a day -> 1R = 3 x 0.002 = 0.006
-  const cs = daily(ut(2020, 1, 1), ut(2020, 3, 31), () => 1.0);
-  const ends = F.monthEnds(cs), i0 = ends.get('2020-01'), i1 = ends.get('2020-02');
-  const atr = F.atrAt(cs, i0); assert.ok(Math.abs(atr - 0.002) < 1e-12);
-  const opt = { ...F.P, commissionRT: 0, spreadPips: 0 };
-  const L = F.legResult(cs, i0, i1, 1, { rc: 5, ru: 1, pip: 0.0001, inv: false, opt });
-  const days = (cs[i1].t - cs[i0].t) / 86400;
-  assert.ok(Math.abs(L.carryR - ((5 - 1 - 1) / 100) * (days / 365) * 1.0 / 0.006) < 1e-9);
-  assert.equal(L.priceR, 0);
-  const S = F.legResult(cs, i0, i1, -1, { rc: 5, ru: 1, pip: 0.0001, inv: false, opt });
-  assert.ok(Math.abs(S.carryR - ((-(5 - 1) - 1) / 100) * (days / 365) / 0.006) < 1e-9, 'a short pays the differential and the markup');
-  // costs: 1 pip + commission per round trip, doubled at 2 x
-  const C = F.legResult(cs, i0, i1, 1, { rc: 1, ru: 1, pip: 0.0001, inv: false });
-  assert.ok(Math.abs(C.costR - (0.0001 / 1.0 + 0.000045) / 0.006) < 1e-12);
-  const C2 = F.legResult(cs, i0, i1, 1, { rc: 1, ru: 1, pip: 0.0001, inv: false, costMult: 2 });
-  assert.ok(Math.abs(C2.costR - 2 * C.costR) < 1e-12);
+test('statistics helpers', () => {
+  near(normP(0), 0.5, 1e-3); assert.ok(normP(2) < 0.025); assert.deepEqual(holm([['T1', 0.01], ['T2', 0.04]]), { T1: 0.02, T2: 0.04 });
+  assert.equal(maxDD([1, -2, 3, -4, 1]), -4);
+  const r = rng(1001), a = shuffled(r); assert.equal(new Set([...a.long, ...a.short]).size, 4);
+  assert.equal(verdictOf({ T1: { c1: false, c2: true }, T2: { c1: true, c2: false } }).verdict, 'FAIL');
+  assert.equal(verdictOf({ T1: { c1: true, c2: true, pass: false }, T2: { c1: false, c2: true } }).verdict, 'INCONCLUSIVE');
 });
 
-test('every leg has a stop 3 x ATR(20) away; a touch exits at the stop, a gap at the open, and only once', () => {
-  const base = daily(ut(2020, 1, 1), ut(2020, 1, 31), () => 1.0);
-  const i0 = base.length - 1, risk = 3 * F.atrAt(base, i0);
-  // touch: a candle whose low reaches 1 - risk - 0.0005, then recovers
-  const t0 = base[i0].t, mk = (t, o, h, l, c) => ({ t, o, h, l, c });
-  const touch = [...base, mk(t0 + 86400 * 3, 1.0, 1.001, 1 - risk - 0.0005, 0.999), mk(t0 + 86400 * 4, 0.999, 1.01, 0.998, 1.02)];
-  const L = F.legResult(touch, i0, touch.length - 1, 1, { rc: 0, ru: 0, pip: 0.0001, inv: false });
-  assert.equal(L.stopped, true); assert.ok(Math.abs(L.exit - (1 - risk)) < 1e-12); assert.ok(Math.abs(L.priceR + 1) < 1e-9);
-  const gap = [...base, mk(t0 + 86400 * 3, 1 - 2 * risk, 1 - 2 * risk + 0.001, 1 - 2 * risk - 0.001, 1 - 2 * risk)];
-  const G = F.legResult(gap, i0, gap.length - 1, 1, { rc: 0, ru: 0, pip: 0.0001, inv: false });
-  assert.ok(Math.abs(G.exit - (1 - 2 * risk)) < 1e-12); assert.ok(Math.abs(G.priceR + 2) < 1e-9);
-  // a short's stop is above
-  const up = [...base, mk(t0 + 86400 * 3, 1.0, 1 + risk + 0.0001, 0.999, 1.0)];
-  const S = F.legResult(up, i0, up.length - 1, -1, { rc: 0, ru: 0, pip: 0.0001, inv: false });
-  assert.equal(S.stopped, true); assert.ok(S.stop > S.entry);
-  // too few candles for ATR(20): no leg (never a position without a stop)
-  assert.equal(F.legResult(base.slice(0, 10), 9, 9, 1, {}), null);
-});
-
-test('inverted pairs: USD/JPY becomes USD per yen, highs and lows swapped', () => {
-  const c = F.candlesOf({ rows: [[ut(2020, 1, 2), 100, 110, 90, 105, 0]] }, true)[0];
-  assert.ok(Math.abs(c.c - 1 / 105) < 1e-15); assert.ok(Math.abs(c.h - 1 / 90) < 1e-15); assert.ok(Math.abs(c.l - 1 / 110) < 1e-15);
-});
-
-test('book: four legs, a USD leg is 0 R, the month result is the mean of the legs', () => {
-  const cs = (drift) => daily(ut(2019, 1, 1), ut(2020, 6, 30), (i) => 1 + drift * i + 0.002 * Math.sin(i));
-  const candles = { EUR: cs(0), GBP: cs(0), JPY: cs(-0.0002), AUD: cs(0.0002), CAD: cs(0), CHF: cs(-0.0001), NZD: cs(0.0001) };
-  const rates = F.monthlyRates(fredFlat({ USD: 0, EUR: 1, GBP: 1.5, JPY: 2, AUD: 4, CAD: 0.5, CHF: 0.2, NZD: 5 }));
-  const rows = F.runBook(candles, rates);
-  const r = rows.find((x) => x.ym === '2020-03');
-  assert.deepEqual(r.legs.map((l) => l.c), ['NZD', 'AUD', 'CHF', 'USD']);
-  assert.equal(r.legs.find((l) => l.c === 'USD').R, 0);
-  assert.ok(Math.abs(r.R - r.legs.reduce((a, l) => a + l.R, 0) / 4) < 1e-12);
-  assert.ok(r.legs.filter((l) => l.c !== 'USD').every((l) => l.s > 0 ? l.stop < l.entry : l.stop > l.entry));
-});
-
-test('volatility skip uses only months up to the one before the month held', () => {
-  const amp = { '2014-02': 0.0001, '2014-03': 0.02 }, cs = daily(ut(2010, 1, 1), ut(2014, 12, 31), (i, t) => 1 + (amp[new Date(t * 1000).toISOString().slice(0, 7)] || 0.0005) * Math.sin(i * 2));
-  const candles = { EUR: cs };
-  const skip = F.volSkipSet(candles, ['2014-03', '2014-04', '2014-05']);
-  assert.ok(!skip.has('2014-03'), 'the wild month itself is not known at its own start');
-  assert.ok(skip.has('2014-04'));
-});
-
-test('statistics and Holm', () => {
-  const s = F.stats([1, -1, 2, 0]);
-  assert.equal(s.n, 4); assert.equal(s.total, 2); assert.equal(s.maxDD, -1);
-  assert.deepEqual(F.holm([0.01, 0.04]), [0.02, 0.04]);
-  assert.deepEqual(F.holm([0.04, 0.01]), [0.04, 0.02]);
-});
-
-test('RESULT.md says what result.json says', () => {
-  const res = JSON.parse(fs.readFileSync(new URL('result.json', DIR), 'utf8'));
-  const md = fs.readFileSync(new URL('RESULT.md', DIR), 'utf8'), first = md.split('\n').find((l) => /\*\*Verdict/.test(l));
-  assert.ok(first, 'a verdict line');
-  assert.ok(first.toLowerCase().includes(String(res.verdict).toLowerCase()), `${first} vs ${res.verdict}`);
-  if (/not run/.test(res.verdict)) {
-    assert.ok(!res.streams, 'no statistic when the data was not reachable');
-    assert.ok(/no return, Sharpe, t or drawdown was computed/.test(md));
-  } else {
-    for (const k of ['base', 'volSkip']) for (const w of ['replication', 'decisive']) {
-      const s = res.streams[k].x1[w];
-      assert.ok(md.includes(s.sharpe.toFixed(2)) && md.includes(s.t.toFixed(2)), `${k} ${w} figures in RESULT.md`);
-    }
+test('the committed result follows the pre-registered bar, and RESULT.md is the report of result.json', () => {
+  assert.equal(J.revision, 2);
+  for (const [k, x] of Object.entries(J.tests)) {
+    assert.equal(x.c1, x.decisive.mean > 0 && x.decisive.t >= 2, k); assert.equal(x.c2, x.replication.mean > 0, k);
+    assert.equal(x.c3, x.holm < 0.05, k); assert.equal(x.beat, J.placebo[k].means.filter((m) => x.decisive.mean > m).length, k);
+    assert.equal(x.c4, x.beat >= 38); assert.equal(x.c5, x.decisive2x.mean > 0); assert.equal(x.pass, x.c1 && x.c2 && x.c3 && x.c4 && x.c5);
+    assert.equal(J.placebo[k].means.length, 40); assert.equal(x.decisive.months, 130); assert.equal(x.replication.months, 120);
+    near(x.decisive.mean, +(x.decisive.price + x.decisive.carry - x.decisive.cost).toFixed(3), 0.0021);
   }
+  assert.equal(J.verdict, verdictOf(J.tests).verdict);
+  assert.equal(RES, report(J));
+  assert.ok(RES.includes(`**Verdict: ${J.verdict}**`));
 });
