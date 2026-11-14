@@ -1,0 +1,559 @@
+{
+ "study": "bond-month-end-futures",
+ "built": "2026-11-14",
+ "verdict": "FAILS AT FUTURES COST",
+ "passed": 0,
+ "of": 2,
+ "tests": [
+  {
+   "test": "T1",
+   "market": "usb10y",
+   "contract": "ZN",
+   "holmP": 0.0561,
+   "pOneSided": 0.0281,
+   "checks": {
+    "decisivePositive": true,
+    "replicationPositive": true,
+    "tAtLeast2": false,
+    "holm": false,
+    "placebo": true
+   },
+   "pass": false
+  },
+  {
+   "test": "T2",
+   "market": "usb30y",
+   "contract": "ZB",
+   "holmP": 0.1611,
+   "pOneSided": 0.1611,
+   "checks": {
+    "decisivePositive": true,
+    "replicationPositive": true,
+    "tAtLeast2": false,
+    "holm": false,
+    "placebo": true
+   },
+   "pass": false
+  }
+ ],
+ "scenario": "cost scenario: #939 frozen trades re-costed as Treasury futures (ZN, ZB); not tradable on the current CFD demo accounts",
+ "gate": {
+  "pass": true,
+  "frozenSha256": "624ac805a9b361949906bf5e0c94e576433d2d019e2e3470f9b57f5d8f630144",
+  "dataCommit": "f6288251e85eb98814514be7f32c667f4f0667e3",
+  "g1": {
+   "usb10y": true,
+   "usb30y": true,
+   "tests": true
+  },
+  "g2": {
+   "usb10y": true,
+   "usb30y": true
+  },
+  "published": {
+   "T1": {
+    "n": 130,
+    "net": 0.036,
+    "t": 0.77,
+    "gross": 0.107,
+    "tGross": 2.31,
+    "win": 56.15,
+    "stops": 6,
+    "gapStops": 0,
+    "total": 4.66,
+    "costR": 0.034,
+    "finR": 0.036
+   },
+   "T2": {
+    "n": 130,
+    "net": 0.015,
+    "t": 0.32,
+    "gross": 0.061,
+    "tGross": 1.28,
+    "win": 58.46,
+    "stops": 12,
+    "gapStops": 0,
+    "total": 1.96,
+    "costR": 0.028,
+    "finR": 0.018
+   }
+  }
+ },
+ "costModel": {
+  "pointUsd": 1000,
+  "feeSide": 1,
+  "commissionSide": 0.85,
+  "financing": 0,
+  "rolls": "none (enter the most traded contract); extra round trip in Feb/May/Aug/Nov as a reported row"
+ },
+ "markets": {
+  "usb10y": {
+   "key": "usb10y",
+   "contract": "ZN",
+   "test": "T1",
+   "roundTripPts": 0.0193,
+   "tickPts": 0.015625,
+   "feesPts": 0.0037,
+   "gate": {
+    "placeboMeans": true,
+    "trades": 283,
+    "rowsMatch": true
+   },
+   "costPerTrade": {
+    "futuresR": 0.018,
+    "cfdSpreadR": 0.034,
+    "cfdFinR": 0.036,
+    "medianStopPts": 1.076
+   },
+   "decisive": {
+    "n": 130,
+    "net": 0.088,
+    "t": 1.91,
+    "gross": 0.107,
+    "tGross": 2.31,
+    "win": 58.46,
+    "cfdNet": 0.036,
+    "cfdT": 0.77
+   },
+   "replication": {
+    "n": 153,
+    "net": 0.052,
+    "t": 1.15,
+    "gross": 0.067,
+    "cfdNet": 0.008,
+    "cfdT": 0.18
+   },
+   "cost": {
+    "x0": {
+     "decisive": {
+      "n": 130,
+      "net": 0.107,
+      "t": 2.31
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.067,
+      "t": 1.49
+     }
+    },
+    "x1": {
+     "decisive": {
+      "n": 130,
+      "net": 0.088,
+      "t": 1.91
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.052,
+      "t": 1.15
+     }
+    },
+    "x2": {
+     "decisive": {
+      "n": 130,
+      "net": 0.07,
+      "t": 1.52
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.036,
+      "t": 0.81
+     }
+    }
+   },
+   "rollExtra": {
+    "decisive": {
+     "n": 130,
+     "net": 0.082,
+     "t": 1.78
+    },
+    "replication": {
+     "n": 153,
+     "net": 0.047,
+     "t": 1.03
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.022,
+     -0.069,
+     -0.068,
+     -0.171,
+     0.004,
+     0.007,
+     -0.022,
+     -0.072,
+     -0.07,
+     -0.131,
+     -0.043,
+     -0.012,
+     0.002,
+     0.011,
+     -0.011,
+     -0.063,
+     -0.041,
+     -0.037,
+     -0.002,
+     0.048,
+     0.001,
+     -0.138,
+     -0.084,
+     0.001,
+     -0.115,
+     -0.085,
+     0.003,
+     -0.092,
+     -0.026,
+     -0.04,
+     -0.008,
+     -0.02,
+     -0.089,
+     -0.09,
+     -0.033,
+     -0.129,
+     0.032,
+     0.018,
+     -0.056,
+     0.006
+    ],
+    "median": -0.035,
+    "p95": 0.019,
+    "beaten": 40,
+    "ruleMean": 0.088
+   },
+   "perYear": {
+    "2003": {
+     "n": 9,
+     "total": -3.24
+    },
+    "2004": {
+     "n": 12,
+     "total": -1.41
+    },
+    "2005": {
+     "n": 12,
+     "total": 0.43
+    },
+    "2006": {
+     "n": 12,
+     "total": 1.04
+    },
+    "2007": {
+     "n": 12,
+     "total": 1.66
+    },
+    "2008": {
+     "n": 12,
+     "total": 1.9
+    },
+    "2009": {
+     "n": 12,
+     "total": -0.53
+    },
+    "2010": {
+     "n": 12,
+     "total": 2.4
+    },
+    "2011": {
+     "n": 12,
+     "total": 1.02
+    },
+    "2012": {
+     "n": 12,
+     "total": 2.83
+    },
+    "2013": {
+     "n": 12,
+     "total": -0.22
+    },
+    "2014": {
+     "n": 12,
+     "total": 1.79
+    },
+    "2015": {
+     "n": 12,
+     "total": 0.27
+    },
+    "2016": {
+     "n": 12,
+     "total": 2.81
+    },
+    "2017": {
+     "n": 12,
+     "total": -1.43
+    },
+    "2018": {
+     "n": 12,
+     "total": 2.54
+    },
+    "2019": {
+     "n": 12,
+     "total": 2.15
+    },
+    "2020": {
+     "n": 12,
+     "total": 3.38
+    },
+    "2021": {
+     "n": 12,
+     "total": -0.6
+    },
+    "2022": {
+     "n": 12,
+     "total": 1.21
+    },
+    "2023": {
+     "n": 12,
+     "total": 0.13
+    },
+    "2024": {
+     "n": 12,
+     "total": 1.49
+    },
+    "2025": {
+     "n": 12,
+     "total": 0.8
+    },
+    "2026": {
+     "n": 10,
+     "total": -0.98
+    }
+   }
+  },
+  "usb30y": {
+   "key": "usb30y",
+   "contract": "ZB",
+   "test": "T2",
+   "roundTripPts": 0.035,
+   "tickPts": 0.03125,
+   "feesPts": 0.0037,
+   "gate": {
+    "placeboMeans": true,
+    "trades": 283,
+    "rowsMatch": true
+   },
+   "costPerTrade": {
+    "futuresR": 0.014,
+    "cfdSpreadR": 0.028,
+    "cfdFinR": 0.018,
+    "medianStopPts": 2.531
+   },
+   "decisive": {
+    "n": 130,
+    "net": 0.047,
+    "t": 0.99,
+    "gross": 0.061,
+    "tGross": 1.28,
+    "win": 59.23,
+    "cfdNet": 0.015,
+    "cfdT": 0.32
+   },
+   "replication": {
+    "n": 153,
+    "net": 0.079,
+    "t": 1.83,
+    "gross": 0.095,
+    "cfdNet": 0.049,
+    "cfdT": 1.14
+   },
+   "cost": {
+    "x0": {
+     "decisive": {
+      "n": 130,
+      "net": 0.061,
+      "t": 1.28
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.095,
+      "t": 2.19
+     }
+    },
+    "x1": {
+     "decisive": {
+      "n": 130,
+      "net": 0.047,
+      "t": 0.99
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.079,
+      "t": 1.83
+     }
+    },
+    "x2": {
+     "decisive": {
+      "n": 130,
+      "net": 0.033,
+      "t": 0.69
+     },
+     "replication": {
+      "n": 153,
+      "net": 0.063,
+      "t": 1.47
+     }
+    }
+   },
+   "rollExtra": {
+    "decisive": {
+     "n": 130,
+     "net": 0.042,
+     "t": 0.89
+    },
+    "replication": {
+     "n": 153,
+     "net": 0.074,
+     "t": 1.71
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.04,
+     -0.081,
+     -0.079,
+     -0.205,
+     0.002,
+     0.01,
+     -0.007,
+     -0.068,
+     -0.1,
+     -0.114,
+     -0.064,
+     -0.032,
+     0.013,
+     0.014,
+     -0.009,
+     -0.066,
+     -0.038,
+     -0.053,
+     0.01,
+     0.07,
+     -0.026,
+     -0.132,
+     -0.054,
+     0.006,
+     -0.096,
+     -0.079,
+     0.009,
+     -0.076,
+     -0.005,
+     -0.077,
+     -0.02,
+     -0.044,
+     -0.064,
+     -0.075,
+     -0.044,
+     -0.117,
+     0.017,
+     0.03,
+     -0.047,
+     0.009
+    ],
+    "median": -0.044,
+    "p95": 0.018,
+    "beaten": 39,
+    "ruleMean": 0.047
+   },
+   "perYear": {
+    "2003": {
+     "n": 9,
+     "total": -2.43
+    },
+    "2004": {
+     "n": 12,
+     "total": -0.33
+    },
+    "2005": {
+     "n": 12,
+     "total": 1.81
+    },
+    "2006": {
+     "n": 12,
+     "total": 0.99
+    },
+    "2007": {
+     "n": 12,
+     "total": 2.3
+    },
+    "2008": {
+     "n": 12,
+     "total": 1.14
+    },
+    "2009": {
+     "n": 12,
+     "total": -0.08
+    },
+    "2010": {
+     "n": 12,
+     "total": 2.89
+    },
+    "2011": {
+     "n": 12,
+     "total": 0.52
+    },
+    "2012": {
+     "n": 12,
+     "total": 2.24
+    },
+    "2013": {
+     "n": 12,
+     "total": -0.2
+    },
+    "2014": {
+     "n": 12,
+     "total": 2.23
+    },
+    "2015": {
+     "n": 12,
+     "total": 1
+    },
+    "2016": {
+     "n": 12,
+     "total": 1.55
+    },
+    "2017": {
+     "n": 12,
+     "total": -0.82
+    },
+    "2018": {
+     "n": 12,
+     "total": 3.03
+    },
+    "2019": {
+     "n": 12,
+     "total": 2.6
+    },
+    "2020": {
+     "n": 12,
+     "total": 1.05
+    },
+    "2021": {
+     "n": 12,
+     "total": -0.61
+    },
+    "2022": {
+     "n": 12,
+     "total": 0.65
+    },
+    "2023": {
+     "n": 12,
+     "total": -1.21
+    },
+    "2024": {
+     "n": 12,
+     "total": 1.82
+    },
+    "2025": {
+     "n": 12,
+     "total": 0.64
+    },
+    "2026": {
+     "n": 10,
+     "total": -2.62
+    }
+   }
+  }
+ }
+}
