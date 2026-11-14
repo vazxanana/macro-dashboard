@@ -1,0 +1,475 @@
+{
+ "built": "2026-11-14",
+ "data": {
+  "src": "council-data research/daily/xau.json (OANDA mid, UTC days), weekends folded (council/fills.mjs foldWeekend)",
+  "from": "2006-03-20",
+  "to": "2026-11-13",
+  "days": 5369
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippagePerOrder": 0.15,
+  "roundTrip": 0.6,
+  "financing": {
+   "rate": 0.000148,
+   "src": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A",
+   "side": "longs only"
+  }
+ },
+ "rule": {
+  "trigger": 0.1,
+  "buffer": 0.3,
+  "floorAtr": 0.5,
+  "hold": 3,
+  "atr": 20
+ },
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ]
+ },
+ "tests": {
+  "T1": {
+   "name": "T1 long after a bearish smash, excess over the same buy-stop after every day",
+   "measure": "excess net R",
+   "oos": {
+    "n": 93,
+    "mean": -0.206,
+    "mean2x": -0.197,
+    "gross": -0.145,
+    "net": -0.217,
+    "cost": 0.031,
+    "fin": 0.041,
+    "total": -19.14,
+    "win": 39.78,
+    "stops": 44,
+    "stopDay1": 32,
+    "months": 118,
+    "t": -1.91,
+    "tGross": -1.35
+   },
+   "is": {
+    "n": 94,
+    "mean": -0.155,
+    "mean2x": -0.147,
+    "gross": -0.132,
+    "net": -0.204,
+    "cost": 0.038,
+    "fin": 0.034,
+    "total": -14.56,
+    "win": 40.43,
+    "stops": 40,
+    "stopDay1": 24,
+    "months": 120,
+    "t": -1.43,
+    "tGross": -1.22
+   },
+   "p": 0.9719,
+   "placebo": {
+    "beaten": 2,
+    "of": 40,
+    "p5": -0.244,
+    "median": -0.059,
+    "p95": 0.122
+   },
+   "years": {
+    "2007": {
+     "n": 13,
+     "mean": -0.207
+    },
+    "2008": {
+     "n": 11,
+     "mean": -0.372
+    },
+    "2009": {
+     "n": 9,
+     "mean": 0.108
+    },
+    "2010": {
+     "n": 5,
+     "mean": 0.078
+    },
+    "2011": {
+     "n": 8,
+     "mean": 0.361
+    },
+    "2012": {
+     "n": 7,
+     "mean": -0.078
+    },
+    "2013": {
+     "n": 4,
+     "mean": -0.494
+    },
+    "2014": {
+     "n": 10,
+     "mean": -0.065
+    },
+    "2015": {
+     "n": 13,
+     "mean": -0.212
+    },
+    "2016": {
+     "n": 14,
+     "mean": -0.436
+    },
+    "2017": {
+     "n": 7,
+     "mean": -0.068
+    },
+    "2018": {
+     "n": 13,
+     "mean": -0.649
+    },
+    "2019": {
+     "n": 9,
+     "mean": -0.37
+    },
+    "2020": {
+     "n": 5,
+     "mean": 0.454
+    },
+    "2021": {
+     "n": 9,
+     "mean": 0.319
+    },
+    "2022": {
+     "n": 13,
+     "mean": -0.333
+    },
+    "2023": {
+     "n": 8,
+     "mean": -0.337
+    },
+    "2024": {
+     "n": 9,
+     "mean": -0.077
+    },
+    "2025": {
+     "n": 8,
+     "mean": 0.19
+    },
+    "2026": {
+     "n": 12,
+     "mean": -0.487
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "oos": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "T2 short after a bullish smash, excess over the same sell-stop after every day",
+   "measure": "excess net R",
+   "oos": {
+    "n": 151,
+    "mean": -0.186,
+    "mean2x": -0.185,
+    "gross": -0.362,
+    "net": -0.395,
+    "cost": 0.033,
+    "fin": 0,
+    "total": -28.05,
+    "win": 26.49,
+    "stops": 83,
+    "stopDay1": 59,
+    "months": 118,
+    "t": -2.45,
+    "tGross": -4.59
+   },
+   "is": {
+    "n": 132,
+    "mean": -0.292,
+    "mean2x": -0.292,
+    "gross": -0.338,
+    "net": -0.378,
+    "cost": 0.041,
+    "fin": 0,
+    "total": -38.5,
+    "win": 27.27,
+    "stops": 76,
+    "stopDay1": 44,
+    "months": 120,
+    "t": -3.06,
+    "tGross": -3.5
+   },
+   "p": 0.9929,
+   "placebo": {
+    "beaten": 0,
+    "of": 40,
+    "p5": -0.14,
+    "median": -0.029,
+    "p95": 0.1
+   },
+   "years": {
+    "2007": {
+     "n": 14,
+     "mean": -0.659
+    },
+    "2008": {
+     "n": 11,
+     "mean": -0.279
+    },
+    "2009": {
+     "n": 13,
+     "mean": -0.046
+    },
+    "2010": {
+     "n": 14,
+     "mean": -0.356
+    },
+    "2011": {
+     "n": 18,
+     "mean": -0.682
+    },
+    "2012": {
+     "n": 16,
+     "mean": -0.388
+    },
+    "2013": {
+     "n": 11,
+     "mean": 0.763
+    },
+    "2014": {
+     "n": 13,
+     "mean": -0.461
+    },
+    "2015": {
+     "n": 10,
+     "mean": -0.003
+    },
+    "2016": {
+     "n": 12,
+     "mean": -0.376
+    },
+    "2017": {
+     "n": 15,
+     "mean": -0.258
+    },
+    "2018": {
+     "n": 17,
+     "mean": -0.15
+    },
+    "2019": {
+     "n": 14,
+     "mean": -0.041
+    },
+    "2020": {
+     "n": 20,
+     "mean": -0.135
+    },
+    "2021": {
+     "n": 7,
+     "mean": -0.576
+    },
+    "2022": {
+     "n": 17,
+     "mean": -0.025
+    },
+    "2023": {
+     "n": 13,
+     "mean": -0.373
+    },
+    "2024": {
+     "n": 17,
+     "mean": -0.133
+    },
+    "2025": {
+     "n": 19,
+     "mean": -0.399
+    },
+    "2026": {
+     "n": 12,
+     "mean": 0.068
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "oos": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "T3 long after a bearish smash, absolute net R",
+   "measure": "net R",
+   "oos": {
+    "n": 93,
+    "mean": -0.217,
+    "mean2x": -0.288,
+    "gross": -0.145,
+    "net": -0.217,
+    "cost": 0.031,
+    "fin": 0.041,
+    "total": -20.16,
+    "win": 39.78,
+    "stops": 44,
+    "stopDay1": 32,
+    "months": 118,
+    "t": -2,
+    "tGross": -1.35
+   },
+   "is": {
+    "n": 94,
+    "mean": -0.204,
+    "mean2x": -0.276,
+    "gross": -0.132,
+    "net": -0.204,
+    "cost": 0.038,
+    "fin": 0.034,
+    "total": -19.16,
+    "win": 40.43,
+    "stops": 40,
+    "stopDay1": 24,
+    "months": 120,
+    "t": -1.85,
+    "tGross": -1.22
+   },
+   "p": 0.9772,
+   "placebo": {
+    "beaten": 2,
+    "of": 40,
+    "p5": -0.255,
+    "median": -0.07,
+    "p95": 0.111
+   },
+   "years": {
+    "2007": {
+     "n": 13,
+     "mean": -0.256
+    },
+    "2008": {
+     "n": 11,
+     "mean": -0.421
+    },
+    "2009": {
+     "n": 9,
+     "mean": 0.059
+    },
+    "2010": {
+     "n": 5,
+     "mean": 0.029
+    },
+    "2011": {
+     "n": 8,
+     "mean": 0.312
+    },
+    "2012": {
+     "n": 7,
+     "mean": -0.127
+    },
+    "2013": {
+     "n": 4,
+     "mean": -0.543
+    },
+    "2014": {
+     "n": 10,
+     "mean": -0.114
+    },
+    "2015": {
+     "n": 13,
+     "mean": -0.261
+    },
+    "2016": {
+     "n": 14,
+     "mean": -0.485
+    },
+    "2017": {
+     "n": 7,
+     "mean": -0.079
+    },
+    "2018": {
+     "n": 13,
+     "mean": -0.66
+    },
+    "2019": {
+     "n": 9,
+     "mean": -0.381
+    },
+    "2020": {
+     "n": 5,
+     "mean": 0.443
+    },
+    "2021": {
+     "n": 9,
+     "mean": 0.308
+    },
+    "2022": {
+     "n": 13,
+     "mean": -0.344
+    },
+    "2023": {
+     "n": 8,
+     "mean": -0.348
+    },
+    "2024": {
+     "n": 9,
+     "mean": -0.088
+    },
+    "2025": {
+     "n": 8,
+     "mean": 0.179
+    },
+    "2026": {
+     "n": 12,
+     "mean": -0.498
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "oos": false,
+    "is": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "baseline": {
+  "long_is": {
+   "n": 1240,
+   "gross": 0.031,
+   "net": -0.049,
+   "net2x": -0.129,
+   "t": -1.22
+  },
+  "long_oos": {
+   "n": 1280,
+   "gross": 0.069,
+   "net": -0.011,
+   "net2x": -0.091,
+   "t": -0.21
+  },
+  "short_is": {
+   "n": 1110,
+   "gross": -0.046,
+   "net": -0.086,
+   "net2x": -0.127,
+   "t": -1.83
+  },
+  "short_oos": {
+   "n": 1132,
+   "gross": -0.175,
+   "net": -0.209,
+   "net2x": -0.242,
+   "t": -5.54
+  }
+ },
+ "verdict": "FAIL",
+ "passAlone": []
+}
