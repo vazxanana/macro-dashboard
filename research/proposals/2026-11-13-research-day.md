@@ -225,6 +225,7 @@ paper system with a measured, clearly negative record.
 | 207 | Big oil or copper days leading gold (`gold-oil-lead`) | **FAIL**, 0 of 3: after a ±2 sd WTI day, gold the same way 2017-26 −0.028R a trade net (n 126, t −0.47), the other way +0.022R, after a copper day +0.067R (t 1.07, sign flips from 2006-16); all inside the placebo spread | #1020 |
 | 208 | The weekly-open profile on gold, ICT/MMXM (`gold-weekly-open`) | **FAIL**, 0 of 3: buy below the weekly open on Tue-Wed after an up week 2021-26 +0.066R a trade net (n 79, t 0.57), a random anchor did +0.049R; mirror sell −0.178R; fade back to the open −0.131R (only 39 of 167 reached it) | #1021 |
 | 209 | Inside-week and Monday-range breakouts on gold (`gold-inside-week`) | **FAIL**, 0 of 3: inside-week breakout 2017-26 +0.177R a trade net (n 67, t 0.94) but 2008-16 −0.087R, the gain is buys in rising gold; narrowest week of four +0.077R; Monday range held to Wednesday −0.193R (n 19, flips sign) | #1022 |
+| 210 | Treasury bond moves leading gold (`gold-bond-lead`) | **FAIL**, 0 of 3: after a 10-year bond up week with gold lagging, long gold 2017-26 +0.088R a trade net (n 30, t 0.46), the lag adds nothing; mirror short −0.119R; 2-year daily −0.048R. Same-week link real, no forward lead at hour, day or week | #1023 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
