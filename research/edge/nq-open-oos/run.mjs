@@ -17,7 +17,7 @@ const [OANDA, HIST, REPLAY] = process.argv.slice(2);
 const COST = 1;                                // points, round trip (task: about 1 point)
 const LATE = '2023-01-01';                     // the rule was built on 2023-26 data (robustness FIT 'nq-open')
 const yearOf = (d) => +d.slice(0, 4);
-const out = { generated: new Date().toISOString(), rule: 'council/trader.mjs nqOpenSweep(bars, day, 570, 0, 0.0008, 0.00011) + nyflip (midnight open ahead) + nqRun trail [2, 1], 10R cap, out 11:00 ET', cost: `${COST} point round trip` };
+const out = { generated: new Date().toISOString(), rule: 'council/trader.mjs nqOpenSweep(bars, day, 570, 0, 0.0008) + nyflip (midnight open ahead) + nqRun trail [2, 1], 10R cap, out 11:00 ET', cost: `${COST} point round trip` };
 
 // ── data quality by year ──
 function quality(days) {

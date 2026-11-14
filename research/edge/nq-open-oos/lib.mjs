@@ -1,5 +1,5 @@
 // NQ New York open run: the live rule from council/trader.mjs, copied (trader.mjs is a script, not a module).
-//   signal:  nqOpenSweep(bars, day, 570, 0, 0.0008, 0.00011)            (trader.mjs ~1808-1826)
+//   signal:  nqOpenSweep(bars, day, 570, 0, 0.0008)            (trader.mjs ~1808-1826)
 //   filter:  nyflip block, midnight (00:00 ET) open ahead of the trade   (trader.mjs ~1883-1905)
 //   manage:  open-trade loop (stop, 10R target, nqRun trail 2R/1R, 11:00 ET exit) (trader.mjs ~1840-1856, fills.mjs stopFill/exitR)
 // Paper research only; nothing here is imported by the council.
