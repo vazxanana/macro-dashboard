@@ -1,0 +1,565 @@
+{
+ "study": "gold-rv-term",
+ "built": "2026-11-14",
+ "data": {
+  "first": "2006-03-20",
+  "last": "2026-11-13",
+  "candles": 5369,
+  "fold": "UTC days, weekends folded into the next weekday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "stop": "2 x ATR(20) of the signal candle",
+  "hold": "10 trading days, entry at the next open",
+  "ratio": "sd of 5 / sd of 60 daily log close returns",
+  "side": "sign(close - close 60 candles earlier)",
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ],
+  "tests": {
+   "T1": "compression: RV5 / RV60 < 0.6, trade the 60-day trend",
+   "T2": "expansion: RV5 / RV60 > 1.2, trade the 60-day trend"
+  }
+ },
+ "baseline": {
+  "is_buy": {
+   "n": 1479,
+   "net": 0.01,
+   "gross": 0.084
+  },
+  "is_sell": {
+   "n": 1123,
+   "net": -0.068,
+   "gross": -0.051
+  },
+  "oos_buy": {
+   "n": 1674,
+   "net": 0.143,
+   "gross": 0.226
+  },
+  "oos_sell": {
+   "n": 878,
+   "net": -0.117,
+   "gross": -0.101
+  }
+ },
+ "tests": {
+  "T1": {
+   "signals": 1019,
+   "skipped": 730,
+   "offFile": 0,
+   "is": {
+    "n": 154,
+    "ex": 0.034,
+    "tEx": 0.42,
+    "p": 0.3374,
+    "months": 103,
+    "exGross": 0.036,
+    "tExGross": 0.44,
+    "net": -0.025,
+    "tNet": -0.29,
+    "gross": 0.024,
+    "win": 42.86,
+    "stops": 55,
+    "total": -3.82,
+    "longs": 84,
+    "medStop": 36.64,
+    "costShare": 0.0171,
+    "fin": 0.032,
+    "ex2x": 0.032,
+    "net2x": -0.074,
+    "bySide": {
+     "buy": {
+      "n": 84,
+      "ex": -0.035,
+      "tEx": -0.36,
+      "p": 0.6415,
+      "months": 67,
+      "exGross": -0.031,
+      "tExGross": -0.32,
+      "net": -0.073,
+      "tNet": -0.72,
+      "gross": 0.004,
+      "win": 45.24,
+      "stops": 27,
+      "total": -6.16,
+      "longs": 84,
+      "medStop": 34.82,
+      "costShare": 0.0181,
+      "fin": 0.059
+     },
+     "sell": {
+      "n": 70,
+      "ex": 0.116,
+      "tEx": 0.86,
+      "p": 0.1965,
+      "months": 53,
+      "exGross": 0.116,
+      "tExGross": 0.86,
+      "net": 0.033,
+      "tNet": 0.23,
+      "gross": 0.049,
+      "win": 40,
+      "stops": 28,
+      "total": 2.34,
+      "longs": 0,
+      "medStop": 39.11,
+      "costShare": 0.016,
+      "fin": 0
+     }
+    }
+   },
+   "oos": {
+    "n": 135,
+    "ex": 0.06,
+    "tEx": 0.76,
+    "p": 0.2248,
+    "months": 94,
+    "exGross": 0.063,
+    "tExGross": 0.79,
+    "net": 0.054,
+    "tNet": 0.63,
+    "gross": 0.112,
+    "win": 52.59,
+    "stops": 37,
+    "total": 7.27,
+    "longs": 81,
+    "medStop": 46.83,
+    "costShare": 0.0143,
+    "fin": 0.043,
+    "ex2x": 0.057,
+    "net2x": -0.004,
+    "bySide": {
+     "buy": {
+      "n": 81,
+      "ex": 0.005,
+      "tEx": 0.05,
+      "p": 0.4803,
+      "months": 59,
+      "exGross": 0.01,
+      "tExGross": 0.09,
+      "net": 0.129,
+      "tNet": 1.11,
+      "gross": 0.215,
+      "win": 59.26,
+      "stops": 18,
+      "total": 10.45,
+      "longs": 81,
+      "medStop": 49.15,
+      "costShare": 0.0132,
+      "fin": 0.072
+     },
+     "sell": {
+      "n": 54,
+      "ex": 0.141,
+      "tEx": 1.27,
+      "p": 0.1047,
+      "months": 44,
+      "exGross": 0.141,
+      "tExGross": 1.28,
+      "net": -0.059,
+      "tNet": -0.47,
+      "gross": -0.043,
+      "win": 42.59,
+      "stops": 19,
+      "total": -3.18,
+      "longs": 0,
+      "medStop": 44.83,
+      "costShare": 0.0161,
+      "fin": 0
+     }
+    }
+   },
+   "byYear": {
+    "2007": {
+     "n": 13,
+     "ex": -0.032,
+     "net": 0.104
+    },
+    "2008": {
+     "n": 20,
+     "ex": 0.067,
+     "net": -0.084
+    },
+    "2009": {
+     "n": 16,
+     "ex": -0.187,
+     "net": -0.237
+    },
+    "2010": {
+     "n": 15,
+     "ex": 0.26,
+     "net": 0.086
+    },
+    "2011": {
+     "n": 13,
+     "ex": -0.008,
+     "net": 0.215
+    },
+    "2012": {
+     "n": 17,
+     "ex": 0.092,
+     "net": 0.064
+    },
+    "2013": {
+     "n": 17,
+     "ex": 0.117,
+     "net": 0.266
+    },
+    "2014": {
+     "n": 14,
+     "ex": 0.04,
+     "net": -0.202
+    },
+    "2015": {
+     "n": 16,
+     "ex": 0.026,
+     "net": -0.307
+    },
+    "2016": {
+     "n": 13,
+     "ex": -0.084,
+     "net": -0.128
+    },
+    "2017": {
+     "n": 13,
+     "ex": 0.236,
+     "net": 0.089
+    },
+    "2018": {
+     "n": 15,
+     "ex": -0.134,
+     "net": 0.068
+    },
+    "2019": {
+     "n": 11,
+     "ex": 0.183,
+     "net": 0.143
+    },
+    "2020": {
+     "n": 18,
+     "ex": 0.282,
+     "net": 0.306
+    },
+    "2021": {
+     "n": 17,
+     "ex": -0.014,
+     "net": -0.163
+    },
+    "2022": {
+     "n": 11,
+     "ex": 0.306,
+     "net": 0.354
+    },
+    "2023": {
+     "n": 13,
+     "ex": -0.149,
+     "net": -0.17
+    },
+    "2024": {
+     "n": 12,
+     "ex": -0.089,
+     "net": -0.133
+    },
+    "2025": {
+     "n": 15,
+     "ex": 0.188,
+     "net": 0.309
+    },
+    "2026": {
+     "n": 10,
+     "ex": -0.304,
+     "net": -0.395
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 31,
+    "mean": -0.011,
+    "min": -0.195,
+    "max": 0.13
+   },
+   "control": {
+    "seeds": 40,
+    "beaten": 36,
+    "mean": -0.008,
+    "min": -0.124,
+    "max": 0.081
+   },
+   "holm": 0.4496,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false,
+    "placebo": false,
+    "control": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "signals": 1017,
+   "skipped": 772,
+   "offFile": 0,
+   "is": {
+    "n": 117,
+    "ex": 0.075,
+    "tEx": 0.88,
+    "p": 0.1904,
+    "months": 76,
+    "exGross": 0.074,
+    "tExGross": 0.87,
+    "net": 0.05,
+    "tNet": 0.57,
+    "gross": 0.099,
+    "win": 48.72,
+    "stops": 36,
+    "total": 5.9,
+    "longs": 66,
+    "medStop": 37.71,
+    "costShare": 0.0172,
+    "fin": 0.031,
+    "ex2x": 0.075,
+    "net2x": 0.002,
+    "bySide": {
+     "buy": {
+      "n": 66,
+      "ex": 0.025,
+      "tEx": 0.2,
+      "p": 0.4196,
+      "months": 46,
+      "exGross": 0.024,
+      "tExGross": 0.2,
+      "net": 0.041,
+      "tNet": 0.32,
+      "gross": 0.113,
+      "win": 45.45,
+      "stops": 21,
+      "total": 2.68,
+      "longs": 66,
+      "medStop": 37.64,
+      "costShare": 0.0172,
+      "fin": 0.055
+     },
+     "sell": {
+      "n": 51,
+      "ex": 0.139,
+      "tEx": 1.13,
+      "p": 0.1329,
+      "months": 35,
+      "exGross": 0.139,
+      "tExGross": 1.13,
+      "net": 0.063,
+      "tNet": 0.48,
+      "gross": 0.08,
+      "win": 52.94,
+      "stops": 15,
+      "total": 3.22,
+      "longs": 0,
+      "medStop": 38.33,
+      "costShare": 0.0172,
+      "fin": 0
+     }
+    }
+   },
+   "oos": {
+    "n": 128,
+    "ex": -0.048,
+    "tEx": -0.55,
+    "p": 0.7097,
+    "months": 83,
+    "exGross": -0.05,
+    "tExGross": -0.57,
+    "net": 0.067,
+    "tNet": 0.75,
+    "gross": 0.129,
+    "win": 50,
+    "stops": 35,
+    "total": 8.59,
+    "longs": 92,
+    "medStop": 48.94,
+    "costShare": 0.0137,
+    "fin": 0.048,
+    "ex2x": -0.046,
+    "net2x": 0.005,
+    "bySide": {
+     "buy": {
+      "n": 92,
+      "ex": -0.061,
+      "tEx": -0.57,
+      "p": 0.7143,
+      "months": 59,
+      "exGross": -0.063,
+      "tExGross": -0.58,
+      "net": 0.103,
+      "tNet": 0.91,
+      "gross": 0.183,
+      "win": 51.09,
+      "stops": 26,
+      "total": 9.45,
+      "longs": 92,
+      "medStop": 52.12,
+      "costShare": 0.013,
+      "fin": 0.067
+     },
+     "sell": {
+      "n": 36,
+      "ex": -0.013,
+      "tEx": -0.1,
+      "p": 0.5386,
+      "months": 29,
+      "exGross": -0.014,
+      "tExGross": -0.1,
+      "net": -0.024,
+      "tNet": -0.17,
+      "gross": -0.008,
+      "win": 47.22,
+      "stops": 9,
+      "total": -0.86,
+      "longs": 0,
+      "medStop": 46.9,
+      "costShare": 0.0155,
+      "fin": 0
+     }
+    }
+   },
+   "byYear": {
+    "2007": {
+     "n": 14,
+     "ex": -0.097,
+     "net": -0.054
+    },
+    "2008": {
+     "n": 15,
+     "ex": 0.042,
+     "net": -0.11
+    },
+    "2009": {
+     "n": 12,
+     "ex": 0.119,
+     "net": 0.234
+    },
+    "2010": {
+     "n": 11,
+     "ex": -0.157,
+     "net": -0.158
+    },
+    "2011": {
+     "n": 12,
+     "ex": -0.055,
+     "net": 0.181
+    },
+    "2012": {
+     "n": 6,
+     "ex": 0.746,
+     "net": 0.722
+    },
+    "2013": {
+     "n": 9,
+     "ex": 0.262,
+     "net": 0.364
+    },
+    "2014": {
+     "n": 17,
+     "ex": 0.076,
+     "net": -0.125
+    },
+    "2015": {
+     "n": 11,
+     "ex": 0.055,
+     "net": -0.124
+    },
+    "2016": {
+     "n": 10,
+     "ex": 0.171,
+     "net": 0.096
+    },
+    "2017": {
+     "n": 10,
+     "ex": -0.213,
+     "net": -0.289
+    },
+    "2018": {
+     "n": 14,
+     "ex": -0.007,
+     "net": 0.188
+    },
+    "2019": {
+     "n": 15,
+     "ex": -0.18,
+     "net": -0.025
+    },
+    "2020": {
+     "n": 12,
+     "ex": 0.188,
+     "net": 0.326
+    },
+    "2021": {
+     "n": 12,
+     "ex": -0.084,
+     "net": -0.226
+    },
+    "2022": {
+     "n": 17,
+     "ex": 0.106,
+     "net": 0.152
+    },
+    "2023": {
+     "n": 11,
+     "ex": 0.064,
+     "net": 0.062
+    },
+    "2024": {
+     "n": 13,
+     "ex": 0.072,
+     "net": 0.279
+    },
+    "2025": {
+     "n": 15,
+     "ex": -0.119,
+     "net": 0.402
+    },
+    "2026": {
+     "n": 9,
+     "ex": -0.457,
+     "net": -0.543
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 18,
+    "mean": -0.023,
+    "min": -0.162,
+    "max": 0.212
+   },
+   "control": {
+    "seeds": 40,
+    "beaten": 7,
+    "mean": 0.007,
+    "min": -0.232,
+    "max": 0.136
+   },
+   "holm": 0.7097,
+   "checks": {
+    "oosExPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false,
+    "placebo": false,
+    "control": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
