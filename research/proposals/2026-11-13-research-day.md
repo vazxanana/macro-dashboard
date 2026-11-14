@@ -50,6 +50,7 @@ paper system with a measured, clearly negative record.
 | 284 | Gold tight five-day box breakout (stop at the other side) | **FAIL, 0 of 3**: 2R target −0.299R OOS (n 80, t −2.03), 58 of 80 stopped back through the box; 1 of 40 placebos beaten | #1097 |
 | 285 | Gold 3-month strength vs the S&P 500 as a monthly long/short gold switch | **FAIL, 0 of 3**: switch −0.060R OOS (t −0.68); sells lost −0.192R while buying every month made +0.132R; the signal runs the wrong way within noise | #1098 |
 | 286 | Gold daily Heikin-Ashi colour flip after a run, both sides | **FAIL, 0 of 3**: run 3+ −0.028R OOS (t −0.70), flat before costs; run 5+ +0.033R but lost in sample; 10-day hold −0.075R | #1099 |
+| 287 | Gold after a long-wick weekly candle (wick > 60 % of range), both sides | **FAIL**: 10-day hold +0.115R IS → −0.070R OOS (n 73, t −0.55); 5-day +0.072R and buys-only +0.037R within noise; Holm p 1.00 | #1100 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
