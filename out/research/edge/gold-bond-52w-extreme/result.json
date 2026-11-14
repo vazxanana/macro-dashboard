@@ -1,0 +1,160 @@
+{
+ "study": "gold-bond-52w-extreme",
+ "built": "2026-11-14",
+ "data": {
+  "gold": [
+   "2006-03-20",
+   "2026-11-13",
+   5369
+  ],
+  "bond": [
+   "2003-03-21",
+   "2026-11-13",
+   6100
+  ],
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "q": 0.1,
+  "look": 253,
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "atr": "2 x ATR(20)",
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ]
+ },
+ "events": {
+  "lo": {
+   "is": 160,
+   "oos": 439
+  },
+  "hi": {
+   "is": 450,
+   "oos": 154
+  },
+  "noGoldBar": 2
+ },
+ "tests": {
+  "T1": {
+   "side": "long",
+   "hold": 1,
+   "zone": "lo",
+   "is": {
+    "n": 160,
+    "ex": -0.022,
+    "tEx": -0.72,
+    "p": 0.7601,
+    "months": 20,
+    "net": -0.056,
+    "tNet": -1.86,
+    "gross": -0.036,
+    "tGross": -1.26,
+    "base": -0.034,
+    "win": 45,
+    "stops": 2,
+    "net2x": -0.075,
+    "ex2x": -0.021,
+    "totalNetPerDay": -0.056
+   },
+   "oos": {
+    "n": 438,
+    "ex": 0.017,
+    "tEx": 0.87,
+    "p": 0.1949,
+    "months": 39,
+    "net": -0.001,
+    "tNet": -0.04,
+    "gross": 0.022,
+    "tGross": 1.11,
+    "base": -0.018,
+    "win": 49.09,
+    "stops": 3,
+    "net2x": -0.023,
+    "ex2x": 0.017,
+    "totalNetPerDay": -0.001
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 29,
+    "mean": 0.007,
+    "max": 0.039,
+    "min": -0.03
+   },
+   "holm": 0.309,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "side": "long",
+   "hold": 1,
+   "zone": "hi",
+   "is": {
+    "n": 449,
+    "ex": 0.02,
+    "tEx": 1.27,
+    "p": 0.1048,
+    "months": 49,
+    "net": 0.005,
+    "tNet": 0.34,
+    "gross": 0.027,
+    "tGross": 1.71,
+    "base": -0.015,
+    "win": 49,
+    "stops": 10,
+    "net2x": -0.017,
+    "ex2x": 0.022,
+    "totalNetPerDay": 0.005
+   },
+   "oos": {
+    "n": 154,
+    "ex": 0.033,
+    "tEx": 1.05,
+    "p": 0.1545,
+    "months": 16,
+    "net": 0.046,
+    "tNet": 1.47,
+    "gross": 0.068,
+    "tGross": 2.04,
+    "base": 0.013,
+    "win": 52.6,
+    "stops": 3,
+    "net2x": 0.024,
+    "ex2x": 0.036,
+    "totalNetPerDay": 0.046
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 36,
+    "mean": -0.004,
+    "max": 0.043,
+    "min": -0.053
+   },
+   "holm": 0.309,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": true,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
