@@ -12554,6 +12554,34 @@
     ],
     "stopCheckedAt": "2026-11-13T23:32:55.000Z",
     "brokerStop": 82.36
+   },
+   "sol-position-1794664898": {
+    "positionId": "49652115",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "position",
+    "status": "open",
+    "openedAt": "2026-11-14T14:02:21.000Z",
+    "councilEntry": 74.77,
+    "stop": 76.269,
+    "t1": 71.68199999999997,
+    "riskCash": 14.99,
+    "margin": 75.57,
+    "minLot": true,
+    "shadow": true,
+    "mark": 74.77,
+    "levelsFrom": "mark",
+    "fillPrice": 74.532,
+    "slipR": 0.159,
+    "lagSec": 43,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-14T14:02:21.000Z",
+    "brokerStop": 76.031
    }
   },
   "day": {
@@ -12561,7 +12589,7 @@
    "startBalance": 10087.14
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10087.14 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10087.14 · 8 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
@@ -12569,7 +12597,7 @@
    "xau-position-1794495673": {
     "why": "XAUUSD: even the minimum lot (0.01) risks 261.89, 2.6% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-14T13:59:50.000Z"
+    "at": "2026-11-14T14:02:21.000Z"
    }
   },
   "paused": {},
@@ -12578,14 +12606,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10087.14,
-  "lastRun": "2026-11-14T13:59:50.000Z"
+  "lastRun": "2026-11-14T14:02:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T10:19:37.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 248.84, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-13T10:22:05.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 248.68, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14080,6 +14103,11 @@
    "at": "2026-11-14T13:03:41.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 261.89, 2.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-14T14:02:21.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council position)",
+   "trade": "sol-position-1794664898"
   }
  ],
  "limits": {
@@ -14158,15 +14186,15 @@
   ]
  },
  "execution": {
-  "n": 418,
-  "meanSlipR": -0.01,
+  "n": 419,
+  "meanSlipR": -0.009,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
-  "medianLagSec": 139.5,
+  "medianLagSec": 139,
   "bySymbol": {
    "SOLUSD": {
-    "n": 26,
-    "meanSlipR": 0.072
+    "n": 27,
+    "meanSlipR": 0.075
    },
    "BTCUSD": {
     "n": 26,
