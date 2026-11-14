@@ -89,6 +89,7 @@ paper system with a measured, clearly negative record.
 | 71 | Gotobi replication: the frozen #878 rule on GBP/JPY, AUD/JPY, CAD/JPY, CHF/JPY and USD/JPY 2005-09 | **REPLICATES**: pooled crosses +0.099R (t 2.75), USD/JPY 2005-09 +0.261R (t 3.80), all placebos beaten; cost-sensitive (≈0 at 2x cost), crosses correlate 0.5-0.8 with the USD/JPY leg | #889 |
 | 72 | Fading crypto weekend moves over 1 ATR (BTC, ETH; Monday 13:30 or Sunday 22:00 entry) | FAIL, 0 of 5: pooled −0.032R (n 46, t −0.19); rare signal, below the minimum n; 2017-21 daily check says big weekend moves continue | #890 |
 | 73 | US index overnight drift: long US500 / NAS100 from the 16:00 NY close to the 09:30 open | FAIL, 0 of 2: real before costs (+0.02-0.03R, gross month t +2.3 to +4.7) but the 0.03 % spread and financing take it all: US500 −0.022R (t −2.86), NAS100 −0.006R | #891 |
+| 74 | Time-series momentum (12-1 month sign) on 25 CFD markets, ATR-risked | FAIL, 0 of 5: pool −1.39R a month (t −1.44) 2016-26; +0.033R a position before costs, 0.027R trading cost and 0.062R financing; every class negative 2016-26 | #892 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
