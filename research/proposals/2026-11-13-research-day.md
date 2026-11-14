@@ -55,6 +55,7 @@ paper system with a measured, clearly negative record.
 | 289 | Gold after its largest 5-day move of the past year (capitulation / blow-off) | **FAIL, 0 of 3**: reversal −0.472R IS → +0.215R OOS (n 20, t 0.77); continuation flips the other way; 9 capitulation buys indistinguishable from drift | #1102 |
 | 290 | Gold volatility-direction switch (rising ATR → 20-day breakout, falling → 5-day reversal) | **FAIL, 0 of 3**: switch −0.118R OOS (t −1.75), 3 of 40 placebos; reversal leg lost in both windows; breakout leg +0.120R but t 0.94 | #1103 |
 | 291 | Gold weekly stochastic %K(14) extremes, fade vs follow | **FAIL, 0 of 3**: fade −0.268R OOS (t −2.53; overbought weeks kept rising); follow +0.092R (t 0.75), +0.008R at 2× costs | #1104 |
+| 292 | Gold 60-day autocorrelation switch (5-day momentum vs reversal) | **FAIL, 0 of 3**: switch −0.015R OOS (t −0.43); momentum leg +0.116R (t 1.92, Holm p 0.08), little over plain momentum; reversal leg loses in both windows | #1105 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
