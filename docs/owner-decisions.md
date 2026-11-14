@@ -41,6 +41,8 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
 14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
     its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
 
+Answered on 14 Nov 2026: item 54, the Mosha cycle becomes a paper shadow ("Make it a paper shadow"; owner rule `mcycle-shadow`).
+
 Answered on 12 Nov 2026 ("Yes to all"), nothing more needed from you: items 42 to 47 and the new item 48 (the Mosha cycle stays
 a main paper system). The forward-test protocol (item 43) is now in force: if one of its stop lines is crossed, Gold trend and
 Gold daily engulf go back to paper shadows by themselves and you get one message; putting them back is your decision.
@@ -1086,3 +1088,20 @@ figure or demo-mirror setting.
   +1.7R before costs, -18.6R after. Of the 7 trades above, 5 would have been skipped (-7.7R after costs, one of them a +3.65R
   winner) and 2 opened (their fill was still outside the floor).
 - **To undo.** Ask for it; the check is one line in the Trader's market-entry step and two in the replay.
+
+## The Mosha cycle's own backtest, 13 Nov 2026
+
+### [x] 54. Put the Mosha cycle back to a paper shadow
+
+- **Status (14 Nov 2026): answered, "Make it a paper shadow".** Owner rule `mcycle-shadow` in `council/trader.mjs` adds `mcycle` to
+  `config.ownerShadow` on the first round after deploy. A second study, `research/edge/mcycle-oos` (pull request #1225), ran the
+  live code on untouched 2007-19: −0.175R a trade after costs (n 244, t −1.50), break-even before costs. Proposal:
+  `research/proposals/2026-11-13-mcycle-shadow.md`.
+- **Context.** You kept the Mosha cycle as a main paper system on 12 Nov (item 48) with no study behind it. Its first study,
+  `research/edge/mcycle-base/` (the live code run unchanged on gold 2020 → now, after costs, pre-registered), lost
+  −0.574R a trade over 115 trades, t −3.99 on calendar months, in both halves (−0.52R and −0.64R) and every year; worst
+  drawdown 66R; still −0.51R a trade before costs.
+- **Recommendation.** Make it a paper shadow again: an owner rule adding `mcycle` to `config.ownerShadow` (its block reads
+  that setting since pull request #780). An open trade stays live to its own exit with its stop.
+- **If nothing is decided.** It keeps trading as a main paper system and its alerts and demo copies continue.
+

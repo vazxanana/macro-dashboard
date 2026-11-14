@@ -3411,6 +3411,11 @@ and judge its forward record. `snapshot.moshaCycle` → `#ms-rep-mcycle` under t
 adds `'owner-shadow'` when `config.ownerShadow.mcycle` is set (none today: live records unchanged, pinned against the old
 blockers); the one-per-leg cap and `snapshot.moshaCycle.open` count `ownStream`, not `!x.shadow`; a trade already open stays
 live. The Analyst's "Live gold systems now" table has a "Mosha cycle" row (`tests/analyst-gold.test.mjs` now expects 9 systems).
+**14 Nov 2026, owner decision 54 ("Make it a paper shadow"):** owner rule `mcycle-shadow` adds `mcycle` to `config.ownerShadow`, so its
+new trades are paper shadows (`blockedBy ['owner-shadow']`, never alerted, no council demo copy); an open trade runs to its exit.
+Why: both studies of the live code fail after costs (`research/edge/mcycle-base` 2020-26 −0.574R, n 115, t −3.99;
+`research/edge/mcycle-oos` untouched 2007-19 −0.175R, n 244, t −1.50, break-even before costs). Undo: a rule deleting the key.
+Test: `tests/mcycle-shadow.test.mjs`.
 
 ## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
 `api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
