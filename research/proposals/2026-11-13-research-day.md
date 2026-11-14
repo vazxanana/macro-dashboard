@@ -132,6 +132,7 @@ paper system with a measured, clearly negative record.
 | 114 | Brent - WTI spread: fade a 2-sd stretch (60-day z), hold to the mean or 20 days | FAIL: −0.199R a trade 2016-now (n 87, t −1.42), −0.297R 2003-15; costs 0.26R a trade swamp a small gross gain; placebo middle of the pack | #933 |
 | 115 | Pre-harvest grain short (corn, soybeans Jul-Sep; wheat Jun-Aug), one trade a year | PASS on the bar, soybeans only: +0.520R a year 2016-26 (8 of 11 years, permutation p 0.012, Holm 0.036; July is the best of 12 start months in both windows); corn and wheat fail. Thin: 11 years, per-year t 1.38, a long-published pattern, costs assumed | #934 |
 | 116 | Cross-sectional momentum on 12 commodities (12-1 ranking, long top 3 / short bottom 3, monthly) | FAIL: −0.071R a month 2016-26 (t −1.30), +0.029R 2006-15; at the median of 40 random rankings; 6-1 and 3-1 variants no better | #935 |
+| 117 | Yen around Japan's 31 March fiscal year-end: short USD/JPY in March, long the first 10 days of April | FAIL 0 of 2: March has the wrong sign (USD/JPY rose; −0.319R a year 2016-26, stopped 9 of 22 years); April like any 10 days | #936 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
