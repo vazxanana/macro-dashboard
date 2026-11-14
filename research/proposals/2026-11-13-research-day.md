@@ -274,6 +274,7 @@ paper system with a measured, clearly negative record.
 | 256 | Gold quarter-end rebalancing fade (sell quarter winners / buy losers in the last 4 days) | **FAIL, 0 of 3**: −0.008R a trade OOS (n 39, t −0.06); gross within ±0.06R everywhere; small sample said plainly | #1069 |
 | 257 | Gold long into US market holidays (last day / last two days before) | **PASS T1 and T2 (fragile), FAIL T3**: T1 +0.133R OOS (t 2.35, Holm p 0.021, 40/40 placebos), T2 +0.216R (t 2.53); but IS weak (T1 t 0.52), OOS sits in 2017-21 (2022-26 t 0.78), t 1.74 without Christmas, ~9 events a year. Needs independent replication | #1070 |
 | 258 | Gold vol breakout: keep the opposite order after a stop-out (stop-and-reverse) | **FAIL, 0 of 3**: the reverse trade loses −0.181R a trade OOS (n 219, t −2.29), −0.097R IS; adding it cuts the day from +0.044 to +0.023R and deepens drawdown −39R → −59R. Base rule unchanged | #1071 |
+| 259 | Proposal: the gold volatility breakout, forward record options (owner decision) | Gathers #1049-#1071; options (a) paper shadow, (b) paper + own cTrader demo account with execution checks, (c) nothing; none recommended, nothing built until the owner chooses | #1072 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
