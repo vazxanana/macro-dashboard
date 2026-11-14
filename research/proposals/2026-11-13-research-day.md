@@ -56,6 +56,9 @@ paper system with a measured, clearly negative record.
 | 290 | Gold volatility-direction switch (rising ATR → 20-day breakout, falling → 5-day reversal) | **FAIL, 0 of 3**: switch −0.118R OOS (t −1.75), 3 of 40 placebos; reversal leg lost in both windows; breakout leg +0.120R but t 0.94 | #1103 |
 | 291 | Gold weekly stochastic %K(14) extremes, fade vs follow | **FAIL, 0 of 3**: fade −0.268R OOS (t −2.53; overbought weeks kept rising); follow +0.092R (t 0.75), +0.008R at 2× costs | #1104 |
 | 292 | Gold 60-day autocorrelation switch (5-day momentum vs reversal) | **FAIL, 0 of 3**: switch −0.015R OOS (t −0.43); momentum leg +0.116R (t 1.92, Holm p 0.08), little over plain momentum; reversal leg loses in both windows | #1105 |
+| 293 | Gold outside (engulfing) month, followed through the next month | **FAIL, 0 of 3**: outside month +0.208R OOS on 10 trades (t 0.59), lost IS; body-engulf +0.627R (n 17, t 1.88, Holm p 0.09) rides gold's rise; T2 as registered measured nothing | #1106 |
+| 294 | Fading the break of a tight five-day gold box (follow-up to #1097) | **FAIL, 0 of 3**: 2007-16 −0.234R (n 99, t −1.51), 72 of 99 stopped beyond the edge; midpoint target −0.354R (t −3.63); tight box gives no edge either way | #1107 |
+| 295 | Gold after three white soldiers / three black crows (daily, 10-day hold) | **FAIL, 0 of 3**: follow OOS +0.122R net (n 32, t 0.58), +0.110R over the same-side baseline (t 0.50); fade −0.106R; looser bodies +0.009R; buys ride gold's rise, sells lose | #1108 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
