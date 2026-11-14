@@ -339,6 +339,13 @@ const USER_RULES = [
   { id: 'shadow-best', apply: (c) => { c.shadowCut = { setups: CUT_FAMILY.slice(), keep: [], since: Math.floor(Date.now() / 1000), study: 'research/edge/shadow-best' }; },
     change: 'Shadow cut (owner): new shadow signals of Scalp, Intraday, Retrace scalp and Retrace intraday are no longer recorded on any market; open and pending ones run to their exits',
     why: 'research/edge/shadow-best (pre-registered, 12 Nov): 32 (setup, market) streams on 2020-26, net of costs: none positive in both 2020-23 and 2024-26 with t >= 2 (0 kept; placebo 0). The family: -0.227R a trade in sample (n 61,469), -0.223R out of sample (n 46,266); about -0.04R before costs, so the loss is the cost of many small trades.' },
+  // 14 Nov 2026, owner on decision 54 ("Make it a paper shadow"): the Mosha cycle's NEW trades are paper shadows, recorded and
+  // managed by the same block with blockedBy 'owner-shadow' (cycleBlockers reads config.ownerShadow.mcycle since #780); a trade
+  // already open or pending runs to its own exit with its stop. No entry, stop, target or other system changes.
+  // Undo: a new user rule deleting ownerShadow.mcycle.
+  { id: 'mcycle-shadow', apply: (c) => { c.ownerShadow = { ...(c.ownerShadow || {}) }; if (!c.ownerShadow.mcycle) c.ownerShadow.mcycle = Math.floor(Date.now() / 1000); },
+    change: 'Mosha cycle (owner, 14 Nov): new trades are paper shadows (same rule and stops, recorded and managed, never alerted, no demo copy on the council account); a trade already open runs to its exit',
+    why: 'Its two pre-registered studies, the live code run unchanged after costs: 2020-Nov 2026 -0.574R a trade (n 115, t -3.99, research/edge/mcycle-base), and untouched 2007-19 -0.175R a trade (n 244, t -1.50; break-even before costs, research/edge/mcycle-oos). Owner decision 54.' },
   // 11 Nov, owner on the edge review's decisions (research/proposals/2026-11-11-edge-review.md): "yes anything that is better for the
   // system and that applies it". Three rules, nothing wider.
   // (1) The live paper book is Gold trend (20-day) and Gold daily engulf only. The gold replica, the momentum pullback (a test

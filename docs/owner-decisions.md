@@ -38,10 +38,10 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
     keeps the demo broker's rate and the comparison waits for the November 2027 review.
 13. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
     first open-run trade reaches +2R; that one is booked about +1R and may be closed early.
-14. **The Mosha cycle loses in its own backtest (item 54).** If nothing is decided: it stays a main paper system, alerted
-    and copied to the Council demo account, although its 2020-26 backtest lost −0.57R a trade (t −3.99, every year negative).
 14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
     its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
+
+Answered on 14 Nov 2026: item 54, the Mosha cycle becomes a paper shadow ("Make it a paper shadow"; owner rule `mcycle-shadow`).
 
 Answered on 12 Nov 2026 ("Yes to all"), nothing more needed from you: items 42 to 47 and the new item 48 (the Mosha cycle stays
 a main paper system). The forward-test protocol (item 43) is now in force: if one of its stop lines is crossed, Gold trend and
@@ -1091,9 +1091,12 @@ figure or demo-mirror setting.
 
 ## The Mosha cycle's own backtest, 13 Nov 2026
 
-### [ ] 54. Put the Mosha cycle back to a paper shadow
+### [x] 54. Put the Mosha cycle back to a paper shadow
 
-- **Status (13 Nov 2026): open, waiting on you.** Proposal: `research/proposals/2026-11-13-mcycle-shadow.md`.
+- **Status (14 Nov 2026): answered, "Make it a paper shadow".** Owner rule `mcycle-shadow` in `council/trader.mjs` adds `mcycle` to
+  `config.ownerShadow` on the first round after deploy. A second study, `research/edge/mcycle-oos` (pull request #1225), ran the
+  live code on untouched 2007-19: −0.175R a trade after costs (n 244, t −1.50), break-even before costs. Proposal:
+  `research/proposals/2026-11-13-mcycle-shadow.md`.
 - **Context.** You kept the Mosha cycle as a main paper system on 12 Nov (item 48) with no study behind it. Its first study,
   `research/edge/mcycle-base/` (the live code run unchanged on gold 2020 → now, after costs, pre-registered), lost
   −0.574R a trade over 115 trades, t −3.99 on calendar months, in both halves (−0.52R and −0.64R) and every year; worst
