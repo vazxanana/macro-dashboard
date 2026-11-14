@@ -65,6 +65,7 @@ paper system with a measured, clearly negative record.
 | 299 | Gold CCI(20) ±100 trend and fade (daily) | **FAIL, 0 of 3**: trend both sides +0.064R OOS (n 133, t 0.45) vs placebo median +0.027R; buys only +0.351R (t 1.47, 37 of 40 placebos) = gold's rise; fade −0.033R | #1112 |
 | 300 | Gold daily three-candle gap traded on its first retest (2R target, 10 days) | **FAIL, 1 of 4 checks**: both sides +0.076R OOS (n 212, t 0.97), −0.050R IS; buys follow gold's rise, sells lose in both windows | #1113 |
 | 301 | Gold daily Parabolic SAR stop-and-reverse | **FAIL, near miss**: standard SAR +0.167R OOS (n 213, t 1.97, Holm p 0.073), +0.061R IS, beat 36 of 40 placebos (bar 38); gain is buys and 2022-26; slower SAR loses | #1114 |
+| 302 | "Frog in the pan" momentum on gold (continuous 60-day moves, 20-day hold) | **FAIL, 0 of 2**: continuous both sides +0.151R OOS (n 96, t 1.04), 36 of 40 placebos; vs every signal +0.061R; continuous minus discrete within noise | #1115 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
