@@ -6449,6 +6449,32 @@ function msCycle(legs) {
 // case 3 it broke through the VR's extreme (read the storyline again one timeframe lower). The staircase: every break with the
 // BO since it is a barrier price moves from and to.
 // htf = { dir, level, t, ext }; ltf = { events: [{ dir, level, t, fromT, top, bot }] oldest first, bars: [{ time, high, low }] }
+// Both sides inside the H1 candle (14 Nov 2026, the owner on M21's lesson: "if we had cf to buy we could but only had vr, while
+// m1 sell had vr and cf, that's why he should [sell], market will tell us what he wants us to do"). From `from` (the open of the
+// last closed H1 candle) to the last closed candle, each side is read on its own: a SELL VR = the box from the highest high to the
+// last swing low (N a side) before it (else the lowest low between `from` and the high); its CF = the first close below that box
+// after the high; the CF zone = the last green candle at or before the highest point between the high and the CF, out to that
+// point. A BUY mirrors it on the lowest low. A side with a CF is a trade; a side with a VR only is not. Both with a CF: the later
+// CF. `touched` = a closed candle has come back into the CF zone (the pullback). Display only, not a tested rule.
+function msSides(bars, closedN, from, N = 3) {
+  const n = Math.min(closedN, bars.length), i0 = bars.findIndex((b) => b.time >= from);
+  if (i0 < 0 || n - i0 < 5) return null;
+  const side = (d) => { const hi = (b) => (d < 0 ? b.high : -b.low), lo = (b) => (d < 0 ? b.low : -b.high), sg = d < 0 ? 1 : -1;
+    let x = i0; for (let j = i0; j < n; j++) if (hi(bars[j]) > hi(bars[x])) x = j;
+    let s = -1; for (let j = x - 1; j >= i0 && s < 0; j--) { let ok = j - N >= 0 && j + N < x + 1; for (let k = 1; ok && k <= N; k++) if (lo(bars[j - k]) < lo(bars[j]) || lo(bars[j + k]) <= lo(bars[j])) ok = false; if (ok) s = j; }
+    if (s < 0) { if (x === i0) return null; s = i0; for (let j = i0; j < x; j++) if (lo(bars[j]) < lo(bars[s])) s = j; }
+    const vr = { lo: Math.min(sg * hi(bars[x]), sg * lo(bars[s])), hi: Math.max(sg * hi(bars[x]), sg * lo(bars[s])), i0: Math.min(s, x), i1: x, edge: sg * lo(bars[s]) };
+    let c = -1; for (let j = x + 1; j < n; j++) if (d < 0 ? bars[j].close < vr.edge : bars[j].close > vr.edge) { c = j; break; }
+    if (c < 0) return { dir: d, state: 'vr', vr };
+    let h = x; for (let j = x + 1; j < c; j++) if (hi(bars[j]) > hi(bars[h])) h = j;
+    let z = h; for (let j = h; j >= x; j--) { const b = bars[j]; if (d < 0 ? b.close > b.open : b.close < b.open) { z = j; break; } }
+    const zone = { lo: Math.min(bars[z].low, d < 0 ? Infinity : bars[h].low), hi: Math.max(bars[z].high, d < 0 ? bars[h].high : -Infinity), i: z };
+    let touched = false; for (let j = c + 1; j < n; j++) if (d < 0 ? bars[j].high >= zone.lo : bars[j].low <= zone.hi) { touched = true; break; }
+    return { dir: d, state: 'cf', vr, cf: { i: c, zone, touched } };
+  };
+  const sell = side(-1), buy = side(1), cf = [sell, buy].filter((x) => x && x.state === 'cf').sort((a, b) => b.cf.i - a.cf.i);
+  return { sell, buy, pick: cf.length ? cf[0].dir : 0, i0 };
+}
 function msMosha(htf, ltf, buf) {
   if (!htf || !htf.dir || !ltf || !ltf.bars || !ltf.bars.length) return null;
   const d = htf.dir, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
@@ -7116,6 +7142,18 @@ function msNextSetup(bars, A) {
       (path || []).forEach((g, k) => { const a = k ? n + 9 : n - 1, b = k || path.length === 1 ? (k ? n + 20 : n + 16) : n + 9;
         items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.kind === 'retrace' ? 'Pullback' : 'Target'} ${fmt(g.to)}` }); }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
+    // M1 reads both sides inside the last closed H1 candle (msSides): the side with a VR and a CF is the trade, a VR alone is not
+    if (own && tf.id === '1m' && G.show.vr !== false) { const nc = A.n || n, h0 = Math.floor(bars[nc - 1].time / 3600) * 3600 - 3600, X = msSides(bars, nc, h0);
+      if (X) { const j1 = bars.findIndex((b) => b.time >= h0 + 3600), e = j1 < 0 ? nc - 1 : j1 - 1; let hl = -Infinity, ll = Infinity; for (let j = X.i0; j <= e; j++) { hl = Math.max(hl, bars[j].high); ll = Math.min(ll, bars[j].low); }
+        items.boxes.push({ kind: 'h1c', l1: X.i0, l2: e, lo: ll, hi: hl, fill: 'rgba(140,140,140,.10)', stroke: 'rgba(140,140,140,.45)' });
+        [X.sell, X.buy].forEach((sd) => { if (!sd) return; const sell = sd.dir < 0, col = sell ? 'rgba(242,54,69,' : 'rgba(8,153,129,';
+          items.boxes.push({ kind: 'svr', l1: sd.vr.i0, l2: sd.vr.i1 + 2, lo: sd.vr.lo, hi: sd.vr.hi, fill: col + '.07)', stroke: col + '.55)' });
+          items.labels.push({ l: sd.vr.i1, p: sell ? sd.vr.hi : sd.vr.lo, dy: sell ? -6 : 15, align: 'center', text: `VR ${sell ? '▼' : '▲'}`, color: col + '.9)' });
+          if (sd.cf) { const z = sd.cf.zone; items.boxes.push({ kind: 'oz', open: true, l1: z.i, l2: n + 20, lo: z.lo, hi: z.hi, fill: col + '.18)', stroke: col + '.9)' });
+            items.labels.push({ l: n + 20, dx: -4, align: 'right', p: sell ? z.hi : z.lo, dy: sell ? -5 : 14, text: `CF ${sell ? '▼' : '▲'} · ${sd.cf.touched ? 'pulled back' : 'wait for the pullback'}`, color: col + '.95)' }); } });
+        const w = (sd, nm) => !sd ? '' : sd.state === 'cf' ? `${nm}: VR + CF` : `${nm}: VR only`, top = Math.max(...bars.slice(X.i0, nc).map((b) => b.high));
+        const parts = X.pick > 0 ? [w(X.buy, 'Buy'), w(X.sell, 'Sell')] : [w(X.sell, 'Sell'), w(X.buy, 'Buy')];
+        items.labels.push({ l: n + 20, dx: -4, align: 'right', p: top, dy: -10, text: parts.filter(Boolean).join(' · '), color: X.pick < 0 ? Z.sell.line : X.pick > 0 ? Z.buy.line : 'rgba(140,140,140,.9)' }); } }
     if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
       M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
       if (M.vr) { items.boxes.push({ kind: 'mvr', l1: at(M.vr.fromT), l2: Math.min(n + 4, at(M.vr.t) + 6), lo: M.vr.lo, hi: M.vr.hi, fill: 'rgba(255,152,0,.08)', stroke: 'rgba(255,152,0,.8)' });
