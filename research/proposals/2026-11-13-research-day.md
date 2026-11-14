@@ -82,6 +82,8 @@ paper system with a measured, clearly negative record.
 | 316 | Fading gold's 20-day extremes when On-Balance-Volume doesn't confirm | **FAIL, 0 of 3**: OOS −0.127R (n 135, t −1.35), IS −0.159R, loses before costs; fading confirmed extremes loses too, so OBV adds nothing | #1129 |
 | 317 | Gold back toward its one-year gold/Brent ratio (z beyond ±2, 20-day hold) | **FAIL, 0 of 3**: OOS −0.351R (n 14, t −1.44); only 26 signals in 20 years; shorts won IS, lost 7 of 8 in the 2018-26 rise | #1130 |
 | 318 | Following gold's FOMC statement-day move for 10 days | **FAIL, 0 of 2**: +0.239R IS (t 2.12) reversed to −0.114R OOS (t −0.98), 3 of 40 placebos; baselines near zero, so the reversal is real, not drift | #1131 |
+| 319 | Fading clean trends (R² ≥ 0.70) on silver and platinum — replication of #1127 | **FAIL, 0 of 3, but the effect replicates**: excess over same-month fade silver +0.116R (t 4.55), platinum +0.080R (t 3.43), pooled t 5.50, both halves, 40/40 placebos; the fade trades still lose before costs, so it is information (e.g. not adding to the cleanest trend days, owner's call), not a trade | #1132 |
+| 320 | Gold Monday tell: follow a ≥ 0.5 ATR Monday move Tuesday to Friday | **FAIL, 0 of 3**: both sides −0.063R net OOS (excess t −0.73); up-Monday buy +0.071R = gold's drift (−0.009R over the every-week buy); down-Monday sell −0.216R | #1133 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
