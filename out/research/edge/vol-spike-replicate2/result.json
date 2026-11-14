@@ -1,0 +1,895 @@
+{
+ "built": "2026-11-14",
+ "title": "Second frozen replication of the vol-spike rebound, on markets and years neither study used",
+ "verdict": "DOES NOT REPLICATE",
+ "system": "#860's rule frozen (frozen.mjs, byte for byte): long when 5-day realised vol > 2 x its prior 120-day median and close < SMA20, fill next open, hold 10 trading days, stop 3 x ATR(20)",
+ "costs": {
+  "spreadPoints": {
+   "us2000": 0.5,
+   "ch20": 4,
+   "nl25": 0.3,
+   "es35": 8,
+   "cn50": 10,
+   "sg30": 0.4,
+   "in50": 6,
+   "spx500": 1,
+   "nas100": 3,
+   "us30": 4,
+   "de40": 2,
+   "uk100": 2,
+   "eu50": 2,
+   "fr40": 2,
+   "au200": 3,
+   "jp225": 10,
+   "hk33": 15
+  },
+  "financing": "DGS2 + 2.5 % a year per calendar night for every market (#860's method)"
+ },
+ "src": "OANDA mid daily candles, council-data research/daily/<key>.json; DGS2 from council-data macro/cache.json",
+ "set": {
+  "N": [
+   "us2000",
+   "ch20",
+   "nl25",
+   "es35",
+   "cn50",
+   "sg30",
+   "in50"
+  ],
+  "E": {
+   "spx500": "before 2008-01-01",
+   "nas100": "before 2008-01-01",
+   "us30": "before 2008-01-01",
+   "de40": "before 2005-01-01",
+   "uk100": "before 2005-01-01",
+   "eu50": "before 2005-01-01",
+   "fr40": "before 2005-01-01",
+   "au200": "before 2005-01-01",
+   "jp225": "before 2005-01-01",
+   "hk33": "before 2005-01-01"
+  },
+  "end": "2026-11-06"
+ },
+ "gate": {
+  "what": "#920's own replicate() (gate920.mjs, byte for byte) on its markets and data, against its committed result.json",
+  "source": "origin/vol-spike-replicate",
+  "fields": [
+   "reading",
+   "lastDay",
+   "R1",
+   "R2",
+   "R3",
+   "placebo",
+   "costs2x",
+   "markets"
+  ],
+  "equal": true,
+  "differ": [],
+  "published": {
+   "R1": {
+    "n": 278,
+    "avgR": 0.056,
+    "t": 1.2
+   },
+   "R2": {
+    "n": 303,
+    "avgR": -0.022,
+    "t": -0.52
+   },
+   "R3": {
+    "n": 105,
+    "avgR": 0.094,
+    "t": 1.48
+   }
+  }
+ },
+ "primary": {
+  "base": {
+   "from": "2003-09-01",
+   "to": "2026-11-06",
+   "n": 475,
+   "avgRet": 0.501,
+   "avgGross": 0.715,
+   "avgR": 0.062,
+   "totalR": 29.48,
+   "wr": 59.37,
+   "tTrades": 1.84,
+   "tMonths": 1.17,
+   "stops": 93,
+   "avgNights": 11.51,
+   "ddR": -23.67,
+   "p": 0.0328841
+  },
+  "x2": {
+   "from": "2003-09-01",
+   "to": "2026-11-06",
+   "n": 475,
+   "avgR": 0.022,
+   "totalR": 10.31,
+   "wr": 57.26,
+   "tTrades": 0.64,
+   "tMonths": 0.4,
+   "stops": 93,
+   "avgNights": 11.51,
+   "ddR": -26.15,
+   "p": 0.261086
+  },
+  "zero": {
+   "from": "2003-09-01",
+   "to": "2026-11-06",
+   "n": 475,
+   "avgR": 0.102,
+   "totalR": 48.66,
+   "wr": 60.84,
+   "tTrades": 3.02,
+   "tMonths": 1.94,
+   "stops": 93,
+   "avgNights": 11.51,
+   "ddR": -23.27,
+   "p": 0.00126387
+  }
+ },
+ "cells": {
+  "C1": {
+   "what": "N entries from 2016-01-01",
+   "base": {
+    "from": "2016-01-01",
+    "to": "2026-11-06",
+    "n": 239,
+    "avgRet": 0.737,
+    "avgGross": 0.943,
+    "avgR": 0.08,
+    "totalR": 19.1,
+    "wr": 61.92,
+    "tTrades": 1.68,
+    "tMonths": 1.02,
+    "stops": 48,
+    "avgNights": 11.11,
+    "ddR": -23.67,
+    "p": 0.0464787
+   },
+   "x2": {
+    "from": "2016-01-01",
+    "to": "2026-11-06",
+    "n": 239,
+    "avgR": 0.041,
+    "totalR": 9.71,
+    "wr": 59,
+    "tTrades": 0.86,
+    "tMonths": 0.51,
+    "stops": 48,
+    "avgNights": 11.11,
+    "ddR": -24.06,
+    "p": 0.194895
+   }
+  },
+  "C2": {
+   "what": "N entries before 2016 + all of E",
+   "base": {
+    "from": "2003-09-01",
+    "to": "2026-11-06",
+    "n": 236,
+    "avgRet": 0.263,
+    "avgGross": 0.484,
+    "avgR": 0.044,
+    "totalR": 10.38,
+    "wr": 56.78,
+    "tTrades": 0.92,
+    "tMonths": 0.61,
+    "stops": 45,
+    "avgNights": 11.92,
+    "ddR": -20.88,
+    "p": 0.178786
+   },
+   "x2": {
+    "from": "2003-09-01",
+    "to": "2026-11-06",
+    "n": 236,
+    "avgR": 0.003,
+    "totalR": 0.59,
+    "wr": 55.51,
+    "tTrades": 0.05,
+    "tMonths": 0.03,
+    "stops": 45,
+    "avgNights": 11.92,
+    "ddR": -26.15,
+    "p": 0.480061
+   }
+  }
+ },
+ "Q": {
+  "what": "C2 pooled with #920 R2 trades (other instruments before 2016)",
+  "r2rebuilt": {
+   "n": 303,
+   "avgR": -0.022
+  },
+  "base": {
+   "from": "2003-09-01",
+   "to": "2026-11-06",
+   "n": 539,
+   "avgRet": 0.011,
+   "avgGross": 0.211,
+   "avgR": 0.007,
+   "totalR": 3.67,
+   "wr": 55.66,
+   "tTrades": 0.21,
+   "tMonths": 0.1,
+   "stops": 118,
+   "avgNights": 11.62,
+   "ddR": -43.79,
+   "p": 0.416834
+  },
+  "x2": {
+   "from": "2003-09-01",
+   "to": "2026-11-06",
+   "n": 539,
+   "avgR": -0.028,
+   "totalR": -15.34,
+   "wr": 54.17,
+   "tTrades": -0.89,
+   "tMonths": -0.41,
+   "stops": 118,
+   "avgNights": 11.62,
+   "ddR": -54.76,
+   "p": 0.813267
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "seedFrom": 9001,
+  "mean": 0.003,
+  "p95": 0.06,
+  "beats": 38,
+  "values": [
+   -0.014,
+   0.035,
+   -0.01,
+   0.023,
+   0.002,
+   -0.036,
+   0.017,
+   0.029,
+   0.06,
+   0.037,
+   0.013,
+   0.029,
+   0.031,
+   0.009,
+   0.042,
+   0.011,
+   0.009,
+   0.005,
+   -0.05,
+   -0.064,
+   -0.025,
+   0.017,
+   -0.008,
+   -0.001,
+   0.01,
+   0.014,
+   -0.051,
+   -0.028,
+   0.066,
+   -0.008,
+   0.076,
+   -0.03,
+   0.016,
+   -0.035,
+   -0.016,
+   0.037,
+   0.004,
+   -0.019,
+   -0.051,
+   -0.014
+  ]
+ },
+ "fisher": {
+  "inputs": {
+   "original": {
+    "id": "#860 vol-spike-rebound: 10-day hold",
+    "cell": "US indices x 2016-26",
+    "t": 2.53,
+    "p": 0.0057
+   },
+   "r920": {
+    "R1": {
+     "t": 1.2,
+     "p": 0.11507
+    },
+    "R2": {
+     "t": -0.52,
+     "p": 0.698468
+    }
+   },
+   "C1": {
+    "t": 1.68,
+    "p": 0.0464787
+   },
+   "C2": {
+    "t": 0.92,
+    "p": 0.178786
+   },
+   "Q": {
+    "t": 0.21,
+    "p": 0.416834
+   }
+  },
+  "bonferroni": 0.00015015,
+  "preregistered": {
+   "ids": [
+    "#860",
+    "Q = C2 + #920 R2 pooled"
+   ],
+   "x": 12.0847,
+   "df": 4,
+   "p": 0.0167323,
+   "z": 2.1265,
+   "belowBonferroni": false
+  },
+  "pairedWeaker": {
+   "variants": [
+    {
+     "ids": [
+      "#860",
+      "#920 R2"
+     ],
+     "x": 11.0523,
+     "df": 4,
+     "p": 0.0259824,
+     "z": 1.9434,
+     "belowBonferroni": false
+    },
+    {
+     "ids": [
+      "#860",
+      "C2"
+     ],
+     "x": 13.7777,
+     "df": 4,
+     "p": 0.00803939,
+     "z": 2.4071,
+     "belowBonferroni": false
+    }
+   ],
+   "weaker": {
+    "ids": [
+     "#860",
+     "#920 R2"
+    ],
+    "x": 11.0523,
+    "df": 4,
+    "p": 0.0259824,
+    "z": 1.9434,
+    "belowBonferroni": false
+   }
+  },
+  "allCellsUpperBound": {
+   "ids": [
+    "#860",
+    "#920 R1",
+    "#920 R2",
+    "C1",
+    "C2"
+   ],
+   "x": 24.9574,
+   "df": 10,
+   "p": 0.00542685,
+   "z": 2.5474,
+   "belowBonferroni": false
+  },
+  "before": {
+   "p": 0.02598237694305985,
+   "what": "multiple-testing-update: #860 + #920 R2"
+  }
+ },
+ "markets": {
+  "us2000": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 0.5,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 75,
+   "avgR": 0.086,
+   "t": 1.05,
+   "wr": 58.67,
+   "stops": 12,
+   "dd": {
+    "zero": -6.47,
+    "base": -7.22,
+    "x2": -7.96
+   },
+   "avgR0": 0.113,
+   "avgR2x": 0.058,
+   "p": 0.146859,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "ch20": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 4,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 84,
+   "avgR": 0.166,
+   "t": 1.94,
+   "wr": 70.24,
+   "stops": 19,
+   "dd": {
+    "zero": -4.74,
+    "base": -4.8,
+    "x2": -4.85
+   },
+   "avgR0": 0.206,
+   "avgR2x": 0.126,
+   "p": 0.0261898,
+   "holm": {
+    "adj": 0.261898,
+    "pass": false
+   }
+  },
+  "nl25": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 0.3,
+   "data": {
+    "from": "2008-01-21",
+    "to": "2026-11-06"
+   },
+   "n": 75,
+   "avgR": 0.086,
+   "t": 1.03,
+   "wr": 62.67,
+   "stops": 15,
+   "dd": {
+    "zero": -4.81,
+    "base": -5.03,
+    "x2": -5.25
+   },
+   "avgR0": 0.122,
+   "avgR2x": 0.05,
+   "p": 0.151505,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "es35": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 8,
+   "data": {
+    "from": "2016-12-02",
+    "to": "2026-11-06"
+   },
+   "n": 32,
+   "avgR": -0.034,
+   "t": -0.23,
+   "wr": 53.13,
+   "stops": 9,
+   "dd": {
+    "zero": -4.86,
+    "base": -5.33,
+    "x2": -5.83
+   },
+   "avgR0": 0.006,
+   "avgR2x": -0.073,
+   "p": 0.590954,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "cn50": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 10,
+   "data": {
+    "from": "2011-08-30",
+    "to": "2026-11-06"
+   },
+   "n": 42,
+   "avgR": 0.08,
+   "t": 0.86,
+   "wr": 64.29,
+   "stops": 5,
+   "dd": {
+    "zero": -1.65,
+    "base": -1.69,
+    "x2": -2.07
+   },
+   "avgR0": 0.112,
+   "avgR2x": 0.047,
+   "p": 0.194895,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "sg30": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 0.4,
+   "data": {
+    "from": "2004-01-21",
+    "to": "2026-11-06"
+   },
+   "n": 86,
+   "avgR": -0.016,
+   "t": -0.19,
+   "wr": 52.33,
+   "stops": 23,
+   "dd": {
+    "zero": -7.53,
+    "base": -8.36,
+    "x2": -10.84
+   },
+   "avgR0": 0.033,
+   "avgR2x": -0.066,
+   "p": 0.575345,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "in50": {
+   "set": "N",
+   "cell": "all entries",
+   "cost": 6,
+   "data": {
+    "from": "2011-08-26",
+    "to": "2022-07-12"
+   },
+   "n": 35,
+   "avgR": 0.008,
+   "t": 0.06,
+   "wr": 51.43,
+   "stops": 6,
+   "dd": {
+    "zero": -3.73,
+    "base": -3.87,
+    "x2": -4.47
+   },
+   "avgR0": 0.045,
+   "avgR2x": -0.029,
+   "p": 0.476078,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "spx500": {
+   "set": "E",
+   "cell": "entries before 2008-01-01",
+   "cost": 1,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 12,
+   "avgR": 0.104,
+   "t": 0.61,
+   "wr": 58.33,
+   "stops": 0,
+   "dd": {
+    "zero": -0.71,
+    "base": -1.01,
+    "x2": -1.63
+   },
+   "avgR0": 0.176,
+   "avgR2x": 0.033,
+   "p": 0.270931,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "nas100": {
+   "set": "E",
+   "cell": "entries before 2008-01-01",
+   "cost": 3,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 10,
+   "avgR": -0.212,
+   "t": -1.06,
+   "wr": 30,
+   "stops": 2,
+   "dd": {
+    "zero": -2.95,
+    "base": -3.35,
+    "x2": -3.75
+   },
+   "avgR0": -0.144,
+   "avgR2x": -0.28,
+   "p": 0.855428,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "us30": {
+   "set": "E",
+   "cell": "entries before 2008-01-01",
+   "cost": 4,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 14,
+   "avgR": 0.001,
+   "t": 0.01,
+   "wr": 50,
+   "stops": 1,
+   "dd": {
+    "zero": -1,
+    "base": -1.52,
+    "x2": -2.36
+   },
+   "avgR0": 0.069,
+   "avgR2x": -0.067,
+   "p": 0.496011,
+   "holm": {
+    "adj": 1,
+    "pass": false
+   }
+  },
+  "de40": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 2,
+   "data": {
+    "from": "2003-03-25",
+    "to": "2026-11-06"
+   },
+   "n": 0,
+   "avgR": null,
+   "t": null,
+   "wr": null,
+   "stops": 0,
+   "dd": {
+    "zero": 0,
+    "base": 0,
+    "x2": 0
+   },
+   "avgR0": null,
+   "avgR2x": null,
+   "p": null
+  },
+  "uk100": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 2,
+   "data": {
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "n": 3,
+   "avgR": -0.122,
+   "t": -0.25,
+   "wr": 66.67,
+   "stops": 1,
+   "dd": {
+    "zero": -1,
+    "base": -1.02,
+    "x2": -1.05
+   },
+   "avgR0": -0.09,
+   "avgR2x": -0.155,
+   "p": 0.598706
+  },
+  "eu50": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 2,
+   "data": {
+    "from": "2003-09-22",
+    "to": "2026-11-06"
+   },
+   "n": 1,
+   "avgR": 1.34,
+   "t": null,
+   "wr": 100,
+   "stops": 0,
+   "dd": {
+    "zero": 0,
+    "base": 0,
+    "x2": 0
+   },
+   "avgR0": 1.376,
+   "avgR2x": 1.304,
+   "p": null
+  },
+  "fr40": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 2,
+   "data": {
+    "from": "2003-02-03",
+    "to": "2026-11-06"
+   },
+   "n": 0,
+   "avgR": null,
+   "t": null,
+   "wr": null,
+   "stops": 0,
+   "dd": {
+    "zero": 0,
+    "base": 0,
+    "x2": 0
+   },
+   "avgR0": null,
+   "avgR2x": null,
+   "p": null
+  },
+  "au200": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 3,
+   "data": {
+    "from": "2004-03-18",
+    "to": "2026-11-06"
+   },
+   "n": 0,
+   "avgR": null,
+   "t": null,
+   "wr": null,
+   "stops": 0,
+   "dd": {
+    "zero": 0,
+    "base": 0,
+    "x2": 0
+   },
+   "avgR0": null,
+   "avgR2x": null,
+   "p": null
+  },
+  "jp225": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 10,
+   "data": {
+    "from": "2003-03-14",
+    "to": "2026-11-06"
+   },
+   "n": 3,
+   "avgR": 0.55,
+   "t": 2.49,
+   "wr": 100,
+   "stops": 0,
+   "dd": {
+    "zero": 0,
+    "base": 0,
+    "x2": 0
+   },
+   "avgR0": 0.581,
+   "avgR2x": 0.52,
+   "p": 0.00638715
+  },
+  "hk33": {
+   "set": "E",
+   "cell": "entries before 2005-01-01",
+   "cost": 15,
+   "data": {
+    "from": "2003-02-04",
+    "to": "2026-11-06"
+   },
+   "n": 3,
+   "avgR": -0.084,
+   "t": -0.23,
+   "wr": 66.67,
+   "stops": 0,
+   "dd": {
+    "zero": -0.72,
+    "base": -0.77,
+    "x2": -0.81
+   },
+   "avgR0": -0.042,
+   "avgR2x": -0.125,
+   "p": 0.590954
+  }
+ },
+ "years": {
+  "2003": {
+   "n": 4,
+   "sumR": 3.3
+  },
+  "2004": {
+   "n": 15,
+   "sumR": 1.39
+  },
+  "2005": {
+   "n": 13,
+   "sumR": 5.27
+  },
+  "2006": {
+   "n": 18,
+   "sumR": -3.34
+  },
+  "2007": {
+   "n": 37,
+   "sumR": -5.77
+  },
+  "2008": {
+   "n": 31,
+   "sumR": -6
+  },
+  "2010": {
+   "n": 16,
+   "sumR": -1.07
+  },
+  "2011": {
+   "n": 28,
+   "sumR": -2.43
+  },
+  "2012": {
+   "n": 3,
+   "sumR": 0.62
+  },
+  "2013": {
+   "n": 21,
+   "sumR": 10.13
+  },
+  "2014": {
+   "n": 24,
+   "sumR": 0.68
+  },
+  "2015": {
+   "n": 26,
+   "sumR": 7.59
+  },
+  "2016": {
+   "n": 12,
+   "sumR": 2.92
+  },
+  "2017": {
+   "n": 8,
+   "sumR": 0.66
+  },
+  "2018": {
+   "n": 44,
+   "sumR": 1.78
+  },
+  "2019": {
+   "n": 19,
+   "sumR": 4.04
+  },
+  "2020": {
+   "n": 50,
+   "sumR": -10.04
+  },
+  "2021": {
+   "n": 19,
+   "sumR": 2.79
+  },
+  "2022": {
+   "n": 28,
+   "sumR": -2.39
+  },
+  "2023": {
+   "n": 3,
+   "sumR": 0.97
+  },
+  "2024": {
+   "n": 17,
+   "sumR": 3.96
+  },
+  "2025": {
+   "n": 20,
+   "sumR": 8.67
+  },
+  "2026": {
+   "n": 19,
+   "sumR": 5.73
+  }
+ }
+}
