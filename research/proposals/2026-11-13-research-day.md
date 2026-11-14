@@ -85,12 +85,13 @@ paper system with a measured, clearly negative record.
 | 67 | Following 2-sd stretches of non-US index spreads (DE40/UK100, EU50/UK100, JP225/AU200, DE40/FR40) | FAIL, 0 of 5: −0.107R net (n 244, t −1.56) 2016-now, −0.072R 2009-15; ~+0.02R before costs, financing turns it negative | #884 |
 | 68 | AUD/JPY and NZD/JPY long only while the S&P is above its 200d and calm | FAIL, 0 of 3: T1 −0.154R (n 52, t −1.30), T2 −0.102R, trend-only −0.053R; all below their placebo median | #886 |
 | 69 | ETH/BTC ratio trend (long one, short the other) and weekly ETH-or-BTC rotation | FAIL, 0 of 2: +0.014 / +0.018R a week (t 0.68 / 0.35) 2022-now; swap takes over half the gross; rotation no better than a random coin or BTC held | #887 |
+| 70 | The owner's market-cycle rule (H4 BO, H1 pullback, H1 BO back) on BTC, ETH, SOL | FAIL, 0 of 2: −0.079R (n 830, t −1.80) to H4 extreme, −0.055R at 2R; random same-bias entries did better; third market where it fails | #888 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
 
 ## What the evidence says
-1. **The course setups, written as mechanical rules, do not make money on gold after costs, and your market-cycle rule (H4 bias, wait for the H1 pullback to finish) loses on indices (#57) and forex (#60) as well.** Today adds MSNR-style
+1. **The course setups, written as mechanical rules, do not make money on gold after costs, and your market-cycle rule (H4 bias, wait for the H1 pullback to finish) loses on indices (#57), forex (#60) and crypto (#70) as well.** Today adds MSNR-style
    direction (#1), Mosha (#4, and the cycle's −0.57R), 411 (#5), EKF (#7), MMXM (#10) and ICT timing (#3) to the earlier
    list. Your playbook reached the same conclusion: any bigger edge is in the trader's selection, which only a journal of
    your own trades can measure (item 27).
