@@ -211,6 +211,8 @@ paper system with a measured, clearly negative record.
 | 193 | Classic candlestick reversal patterns across 28 CFDs (`candle-patterns`) | **FAIL**, 0 of 14: six patterns at a 10-day extreme 2017-26 −0.048R a trade net (n 3231, t −2.09), about zero gross; the filter adds nothing; the hammer's small gross tilt is taken by costs | #1006 |
 | 194 | Round-number stall and break on index CFDs (`index-round-numbers`) | **FAIL**, 0 of 2, Holm p 1: stall fade 2021-26 −0.072R a trade net (t −1.94), loses gross too; break −0.008R net (+0.046R gross), no better than random levels (11th of 41) | #1007 |
 | 195 | Classic daily pivot points, fade and break (`pivot-points`) | **FAIL**, 0 of 8: R1/S1 fade 2021-26 −0.144R a trade net (n 11,294, t −13.05), about zero gross, real levels 39th of 41 vs shifted ones; the break's small gross gain lost after costs. Gold left out (owner priority now gold: separate gold studies running) | #1008 |
+| 196 | Gold around the COMEX options expiry and first notice day (`gold-comex-calendar`) | **FAIL**, 0 of 3: short into options expiry 2017-26 −0.130R a trade net (n 118, t −2.13); the 5 days after it +0.050R (t 0.67); into first notice −0.044R; beat 16, 11 and 29 of 40 placebo seeds | #1009 |
+| 197 | ICT Silver Bullet entry on gold (`ict-silver-bullet-gold`) | **FAIL**, 0 of 3: AM window 2021-26 −0.168R a trade net (n 401, t −2.13), PM −0.311R, London −0.224R; flat before costs (stops of $0.9-3.7), no better than a random hour | #1010 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
