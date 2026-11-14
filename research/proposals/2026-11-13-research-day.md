@@ -246,6 +246,7 @@ paper system with a measured, clearly negative record.
 | 228 | Measured move / ABCD targets on gold H4 | FAIL, 0 of 3: target D −0.043R OOS (n 231, month t −0.97); D reached on 67.1 % of trades vs 66.7 % for random sides (small planned reward:risk), so the pattern adds no direction | #1041 |
 | 229 | OTE: limit at the 0.705 retracement after an H1 structure break on gold | FAIL, 0 of 3: target the leg extreme −0.230R OOS (n 740, month t −3.42), −0.094R before costs; no year 2016-26 net positive | #1042 |
 | 230 | Gold breaks of the previous day's high/low (continuation) | FAIL, 0 of 3: out at 20:00 −0.026R OOS (n 1120, t −0.64), +0.033R before costs; negative in sample too | #1043 |
+| 231 | Gold's previous-month high/low | FAIL, 0 of 3: nearest miss = buy a close above last month's high, +0.435R OOS (n 52, month t 2.06, Holm p 0.059), but 2024-26 made more than all of it and random levels nearby gave +0.382R; the raid does not reverse | #1044 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
