@@ -255,6 +255,7 @@ paper system with a measured, clearly negative record.
 | 237 | Ichimoku cloud signals on gold (daily, H4) | FAIL, 0 of 3: TK cross +0.389R OOS (n 50, t 1.49) but 2025 alone gave most of it; H4 cloud breakout +0.018R after costs | #1050 |
 | 238 | Gold's volatility breakout on silver (robustness) | FAIL: gross positive in both windows (pooled +0.086R, t 3.37, 40 of 40 placebos) but silver's costs (0.17R a trade) exceed it: net −0.084R | #1051 |
 | 239 | Silver leading gold intraday (M5) | FAIL, 0 of 3: silver leads by minutes (beats all placebos before costs) but the catch-up is +0.02 to +0.04R; net −0.11 to −0.13R a trade OOS | #1052 |
+| 240 | Gold 3-sd hourly return shocks, fade or follow | FAIL, 0 of 3: before costs within 0.1R of zero; fade −0.349R net OOS (stops ~$2, so $0.60 costs 0.3-0.4R) | #1053 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
