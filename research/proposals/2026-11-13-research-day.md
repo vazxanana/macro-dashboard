@@ -105,6 +105,7 @@ paper system with a measured, clearly negative record.
 | 87 | Treasuries after FOMC: follow the 2-year's decision-day move in USB10Y / USB30Y for 3 days | FAIL, 0 of 2: 2016-now −0.167R (t −2.09) / −0.117R; the 10-year spread (~0.15R) exceeds the gross move; mid-placebo, so no FOMC effect | #906 |
 | 88 | Gold's seasonal months, as the gold terminal's tile scores them (Nov-Feb strong, Mar/Jun weak) | FAIL, 0 of 3: Nov-Feb long +0.28R a position over other months (t 1.35, placebo 7.5 %), Holm p 0.27 each; the common Jan/Aug/Sep claim is weaker still (placebo 25-30 %); the tile's wording is the owner's call | #907 |
 | 89 | Gotobi fade: how sensitive it is to the minute of entry and exit (frozen #878 rule on M1, sensitivity report) | **ENTRY-FRAGILE**: gate reproduces #878 exactly (+0.148R, t 2.74); entering one minute late leaves +0.048R (t 1.07), two minutes +0.026R, three ~0; one or two minutes early also halves it; exit 05:55-06:05 changes nothing. A live copy that cannot fill at the 00:55:00 price keeps little of the effect | #908 |
+| 90 | Volatility-managed index exposure (weight 1/σ² or 1/σ vs constant, SPX500 + 3 indices) | FAIL, 0 of 3: Sharpe lower after costs in both windows (SPX500 −0.16 / −0.10), drawdowns cut by about a third (−22 % vs −34 %); placebo-like; financing and turnover take the before-cost lead | #909 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
