@@ -1,0 +1,937 @@
+{
+ "study": "index-overnight",
+ "title": "Overnight drift on US index CFDs: close-to-open longs on US500 and NAS100",
+ "built": "2026-11-14",
+ "verdict": "FAIL: the overnight long after spread and financing, 2016-26: US500 −0.022R a trade (n 2721, month-sum t −2.86), NAS100 −0.006R (n 2721, t −0.84); before costs +0.023R and +0.026R (t +2.87, +3.54)",
+ "verdictClass": "FAIL",
+ "data": {
+  "source": "OANDA mid M30 via /md/bars",
+  "span": {
+   "spx500": {
+    "candles": 258206,
+    "first": "2005-01-02",
+    "last": "2026-10-30"
+   },
+   "nas100": {
+    "candles": 258176,
+    "first": "2005-01-02",
+    "last": "2026-10-30"
+   }
+  },
+  "rates": "FRED DGS2 weekly (rates.json, copied from research/edge/gold-carry/rates.json)"
+ },
+ "params": {
+  "ATR_N": 20,
+  "STOP_ATR": 1,
+  "COST": 0.0003,
+  "FIN_ADD": 2.5,
+  "HOLD_PLACEBO": 27000,
+  "SEEDS": 40,
+  "MIN_N": 300
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-01",
+   "2026-10-31"
+  ],
+  "replication": [
+   "2005-01-01",
+   "2015-12-31"
+  ]
+ },
+ "tests": {
+  "T1": {
+   "market": "US500",
+   "leg": "overnight close-to-open",
+   "dropped": {
+    "data": 8,
+    "atr": 20
+   },
+   "decisive": {
+    "n": 2721,
+    "months": 130,
+    "win": 0.504,
+    "grossR": 0.023,
+    "spreadR": 0.027,
+    "finR": 0.017,
+    "netR": -0.022,
+    "net2R": -0.049,
+    "tGross": 2.87,
+    "t": -2.86,
+    "total": -59.49,
+    "maxDD": 59.6,
+    "stops": 131,
+    "medStopPct": 1.166,
+    "nights": 1.45,
+    "byYear": {
+     "2016": {
+      "n": 252,
+      "netR": -0.033,
+      "total": -8.28
+     },
+     "2017": {
+      "n": 251,
+      "netR": -0.007,
+      "total": -1.85
+     },
+     "2018": {
+      "n": 251,
+      "netR": -0.023,
+      "total": -5.71
+     },
+     "2019": {
+      "n": 252,
+      "netR": -0.002,
+      "total": -0.42
+     },
+     "2020": {
+      "n": 253,
+      "netR": 0.02,
+      "total": 5.08
+     },
+     "2021": {
+      "n": 252,
+      "netR": 0.004,
+      "total": 1
+     },
+     "2022": {
+      "n": 250,
+      "netR": -0.065,
+      "total": -16.14
+     },
+     "2023": {
+      "n": 250,
+      "netR": -0.06,
+      "total": -15.01
+     },
+     "2024": {
+      "n": 252,
+      "netR": 0.001,
+      "total": 0.29
+     },
+     "2025": {
+      "n": 250,
+      "netR": -0.035,
+      "total": -8.71
+     },
+     "2026": {
+      "n": 208,
+      "netR": -0.047,
+      "total": -9.75
+     }
+    },
+    "byWeekday": {
+     "Mon": {
+      "n": 508,
+      "grossR": 0.022,
+      "netR": -0.017
+     },
+     "Tue": {
+      "n": 561,
+      "grossR": 0.04,
+      "netR": 0.001
+     },
+     "Wed": {
+      "n": 557,
+      "grossR": 0.007,
+      "netR": -0.032
+     },
+     "Thu": {
+      "n": 549,
+      "grossR": 0.023,
+      "netR": -0.017
+     },
+     "Fri": {
+      "n": 546,
+      "grossR": 0.02,
+      "netR": -0.045
+     }
+    },
+    "weekend": {
+     "held": {
+      "n": 563,
+      "months": 130,
+      "win": 0.476,
+      "grossR": 0.023,
+      "spreadR": 0.027,
+      "finR": 0.037,
+      "netR": -0.041,
+      "net2R": -0.068,
+      "tGross": 1.07,
+      "t": -1.87,
+      "total": -23.05,
+      "maxDD": 28.15,
+      "stops": 38,
+      "medStopPct": 1.169,
+      "nights": 3.13
+     },
+     "weekday": {
+      "n": 2158,
+      "months": 130,
+      "win": 0.511,
+      "grossR": 0.022,
+      "spreadR": 0.027,
+      "finR": 0.012,
+      "netR": -0.017,
+      "net2R": -0.044,
+      "tGross": 2.87,
+      "t": -2.22,
+      "total": -36.44,
+      "maxDD": 36.54,
+      "stops": 93,
+      "medStopPct": 1.162,
+      "nights": 1.01
+     }
+    },
+    "placebo": {
+     "seeds": 40,
+     "hold": "7.5 h",
+     "meanNet": {
+      "p5": -0.032,
+      "p50": -0.018,
+      "p95": -0.009
+     },
+     "t": {
+      "p5": -3.75,
+      "p50": -2.3,
+      "p95": -1.03
+     },
+     "rankOfReal": 12
+    },
+    "p": 0.998,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 2743,
+    "months": 131,
+    "win": 0.487,
+    "grossR": 0.014,
+    "spreadR": 0.025,
+    "finR": 0.015,
+    "netR": -0.025,
+    "net2R": -0.05,
+    "tGross": 2.29,
+    "t": -3.96,
+    "total": -68.62,
+    "maxDD": 70.4,
+    "stops": 76,
+    "medStopPct": 1.194,
+    "nights": 1.45,
+    "byYear": {
+     "2005": {
+      "n": 232,
+      "netR": -0.016,
+      "total": -3.67
+     },
+     "2006": {
+      "n": 251,
+      "netR": -0.04,
+      "total": -10.06
+     },
+     "2007": {
+      "n": 251,
+      "netR": -0.026,
+      "total": -6.64
+     },
+     "2008": {
+      "n": 253,
+      "netR": -0.054,
+      "total": -13.71
+     },
+     "2009": {
+      "n": 252,
+      "netR": 0.002,
+      "total": 0.42
+     },
+     "2010": {
+      "n": 252,
+      "netR": -0.015,
+      "total": -3.67
+     },
+     "2011": {
+      "n": 252,
+      "netR": -0.027,
+      "total": -6.81
+     },
+     "2012": {
+      "n": 249,
+      "netR": -0.023,
+      "total": -5.62
+     },
+     "2013": {
+      "n": 250,
+      "netR": -0.014,
+      "total": -3.55
+     },
+     "2014": {
+      "n": 250,
+      "netR": -0.026,
+      "total": -6.6
+     },
+     "2015": {
+      "n": 251,
+      "netR": -0.035,
+      "total": -8.71
+     }
+    },
+    "byWeekday": {
+     "Tue": {
+      "n": 562,
+      "grossR": 0.013,
+      "netR": -0.022
+     },
+     "Wed": {
+      "n": 563,
+      "grossR": 0.012,
+      "netR": -0.023
+     },
+     "Thu": {
+      "n": 553,
+      "grossR": 0.037,
+      "netR": 0.001
+     },
+     "Fri": {
+      "n": 550,
+      "grossR": 0.007,
+      "netR": -0.049
+     },
+     "Mon": {
+      "n": 515,
+      "grossR": 0.003,
+      "netR": -0.032
+     }
+    },
+    "weekend": {
+     "held": {
+      "n": 568,
+      "months": 131,
+      "win": 0.445,
+      "grossR": 0.004,
+      "spreadR": 0.025,
+      "finR": 0.031,
+      "netR": -0.052,
+      "net2R": -0.077,
+      "tGross": 0.25,
+      "t": -3.25,
+      "total": -29.64,
+      "maxDD": 29.89,
+      "stops": 25,
+      "medStopPct": 1.201,
+      "nights": 3.13
+     },
+     "weekday": {
+      "n": 2175,
+      "months": 131,
+      "win": 0.498,
+      "grossR": 0.017,
+      "spreadR": 0.025,
+      "finR": 0.01,
+      "netR": -0.018,
+      "net2R": -0.043,
+      "tGross": 2.34,
+      "t": -2.45,
+      "total": -38.98,
+      "maxDD": 41.18,
+      "stops": 51,
+      "medStopPct": 1.191,
+      "nights": 1.01
+     }
+    },
+    "placebo": {
+     "seeds": 40,
+     "hold": "7.5 h",
+     "meanNet": {
+      "p5": -0.03,
+      "p50": -0.018,
+      "p95": -0.006
+     },
+     "t": {
+      "p5": -3.88,
+      "p50": -2.19,
+      "p95": -0.71
+     },
+     "rankOfReal": 7
+    }
+   }
+  },
+  "T2": {
+   "market": "NAS100",
+   "leg": "overnight close-to-open",
+   "dropped": {
+    "data": 8,
+    "atr": 20
+   },
+   "decisive": {
+    "n": 2721,
+    "months": 130,
+    "win": 0.523,
+    "grossR": 0.026,
+    "spreadR": 0.02,
+    "finR": 0.013,
+    "netR": -0.006,
+    "net2R": -0.026,
+    "tGross": 3.54,
+    "t": -0.84,
+    "total": -16.36,
+    "maxDD": 25.26,
+    "stops": 110,
+    "medStopPct": 1.594,
+    "nights": 1.45,
+    "byYear": {
+     "2016": {
+      "n": 252,
+      "netR": -0.022,
+      "total": -5.52
+     },
+     "2017": {
+      "n": 251,
+      "netR": 0.019,
+      "total": 4.76
+     },
+     "2018": {
+      "n": 251,
+      "netR": -0.015,
+      "total": -3.69
+     },
+     "2019": {
+      "n": 252,
+      "netR": 0.008,
+      "total": 1.9
+     },
+     "2020": {
+      "n": 253,
+      "netR": 0.029,
+      "total": 7.27
+     },
+     "2021": {
+      "n": 252,
+      "netR": -0.004,
+      "total": -0.9
+     },
+     "2022": {
+      "n": 250,
+      "netR": -0.059,
+      "total": -14.86
+     },
+     "2023": {
+      "n": 250,
+      "netR": -0.024,
+      "total": -6.07
+     },
+     "2024": {
+      "n": 252,
+      "netR": 0.019,
+      "total": 4.7
+     },
+     "2025": {
+      "n": 250,
+      "netR": 0.007,
+      "total": 1.63
+     },
+     "2026": {
+      "n": 208,
+      "netR": -0.027,
+      "total": -5.55
+     }
+    },
+    "byWeekday": {
+     "Mon": {
+      "n": 508,
+      "grossR": 0.028,
+      "netR": 0
+     },
+     "Tue": {
+      "n": 561,
+      "grossR": 0.051,
+      "netR": 0.022
+     },
+     "Wed": {
+      "n": 557,
+      "grossR": 0.018,
+      "netR": -0.011
+     },
+     "Thu": {
+      "n": 549,
+      "grossR": 0.015,
+      "netR": -0.014
+     },
+     "Fri": {
+      "n": 546,
+      "grossR": 0.019,
+      "netR": -0.027
+     }
+    },
+    "weekend": {
+     "held": {
+      "n": 564,
+      "months": 130,
+      "win": 0.493,
+      "grossR": 0.021,
+      "spreadR": 0.02,
+      "finR": 0.027,
+      "netR": -0.026,
+      "net2R": -0.046,
+      "tGross": 1.03,
+      "t": -1.28,
+      "total": -14.58,
+      "maxDD": 22.37,
+      "stops": 31,
+      "medStopPct": 1.591,
+      "nights": 3.13
+     },
+     "weekday": {
+      "n": 2157,
+      "months": 130,
+      "win": 0.531,
+      "grossR": 0.028,
+      "spreadR": 0.02,
+      "finR": 0.009,
+      "netR": -0.001,
+      "net2R": -0.02,
+      "tGross": 3.57,
+      "t": -0.11,
+      "total": -1.77,
+      "maxDD": 14.39,
+      "stops": 79,
+      "medStopPct": 1.595,
+      "nights": 1.01
+     }
+    },
+    "placebo": {
+     "seeds": 40,
+     "hold": "7.5 h",
+     "meanNet": {
+      "p5": -0.023,
+      "p50": -0.008,
+      "p95": 0
+     },
+     "t": {
+      "p5": -2.55,
+      "p50": -0.96,
+      "p95": 0.01
+     },
+     "rankOfReal": 27
+    },
+    "p": 0.8,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 2743,
+    "months": 131,
+    "win": 0.513,
+    "grossR": 0.028,
+    "spreadR": 0.02,
+    "finR": 0.011,
+    "netR": -0.004,
+    "net2R": -0.024,
+    "tGross": 4.65,
+    "t": -0.69,
+    "total": -11.05,
+    "maxDD": 20.19,
+    "stops": 57,
+    "medStopPct": 1.463,
+    "nights": 1.45,
+    "byYear": {
+     "2005": {
+      "n": 232,
+      "netR": -0.002,
+      "total": -0.41
+     },
+     "2006": {
+      "n": 251,
+      "netR": -0.016,
+      "total": -3.93
+     },
+     "2007": {
+      "n": 251,
+      "netR": 0.001,
+      "total": 0.17
+     },
+     "2008": {
+      "n": 253,
+      "netR": -0.031,
+      "total": -7.9
+     },
+     "2009": {
+      "n": 252,
+      "netR": 0.004,
+      "total": 1.04
+     },
+     "2010": {
+      "n": 252,
+      "netR": 0.007,
+      "total": 1.79
+     },
+     "2011": {
+      "n": 252,
+      "netR": -0.022,
+      "total": -5.52
+     },
+     "2012": {
+      "n": 249,
+      "netR": -0.006,
+      "total": -1.61
+     },
+     "2013": {
+      "n": 250,
+      "netR": 0.014,
+      "total": 3.52
+     },
+     "2014": {
+      "n": 250,
+      "netR": 0.009,
+      "total": 2.37
+     },
+     "2015": {
+      "n": 251,
+      "netR": -0.002,
+      "total": -0.57
+     }
+    },
+    "byWeekday": {
+     "Tue": {
+      "n": 562,
+      "grossR": 0.03,
+      "netR": 0.002
+     },
+     "Wed": {
+      "n": 563,
+      "grossR": 0.023,
+      "netR": -0.005
+     },
+     "Thu": {
+      "n": 553,
+      "grossR": 0.04,
+      "netR": 0.011
+     },
+     "Fri": {
+      "n": 550,
+      "grossR": 0.027,
+      "netR": -0.017
+     },
+     "Mon": {
+      "n": 515,
+      "grossR": 0.017,
+      "netR": -0.011
+     }
+    },
+    "weekend": {
+     "held": {
+      "n": 568,
+      "months": 131,
+      "win": 0.504,
+      "grossR": 0.026,
+      "spreadR": 0.02,
+      "finR": 0.024,
+      "netR": -0.019,
+      "net2R": -0.039,
+      "tGross": 1.74,
+      "t": -1.27,
+      "total": -10.63,
+      "maxDD": 11.75,
+      "stops": 19,
+      "medStopPct": 1.48,
+      "nights": 3.13
+     },
+     "weekday": {
+      "n": 2175,
+      "months": 131,
+      "win": 0.516,
+      "grossR": 0.028,
+      "spreadR": 0.02,
+      "finR": 0.008,
+      "netR": 0,
+      "net2R": -0.02,
+      "tGross": 4.06,
+      "t": -0.03,
+      "total": -0.42,
+      "maxDD": 15.09,
+      "stops": 38,
+      "medStopPct": 1.46,
+      "nights": 1.01
+     }
+    },
+    "placebo": {
+     "seeds": 40,
+     "hold": "7.5 h",
+     "meanNet": {
+      "p5": -0.022,
+      "p50": -0.013,
+      "p95": 0.004
+     },
+     "t": {
+      "p5": -2.94,
+      "p50": -1.49,
+      "p95": 0.48
+     },
+     "rankOfReal": 34
+    }
+   }
+  },
+  "T3": {
+   "market": "US500",
+   "leg": "cash session 09:30-16:00",
+   "dropped": {
+    "data": 7,
+    "atr": 20
+   },
+   "decisive": {
+    "n": 2722,
+    "months": 130,
+    "win": 0.517,
+    "grossR": 0.017,
+    "spreadR": 0.027,
+    "finR": 0,
+    "netR": -0.01,
+    "net2R": -0.037,
+    "tGross": 1.72,
+    "t": -0.99,
+    "total": -26.69,
+    "maxDD": 42.01,
+    "stops": 253,
+    "medStopPct": 1.166,
+    "nights": 0,
+    "byYear": {
+     "2016": {
+      "n": 252,
+      "netR": -0.007,
+      "total": -1.7
+     },
+     "2017": {
+      "n": 251,
+      "netR": -0.017,
+      "total": -4.27
+     },
+     "2018": {
+      "n": 251,
+      "netR": -0.044,
+      "total": -11.08
+     },
+     "2019": {
+      "n": 252,
+      "netR": 0,
+      "total": -0.07
+     },
+     "2020": {
+      "n": 253,
+      "netR": -0.015,
+      "total": -3.69
+     },
+     "2021": {
+      "n": 252,
+      "netR": -0.015,
+      "total": -3.8
+     },
+     "2022": {
+      "n": 250,
+      "netR": -0.038,
+      "total": -9.58
+     },
+     "2023": {
+      "n": 250,
+      "netR": 0.053,
+      "total": 13.3
+     },
+     "2024": {
+      "n": 252,
+      "netR": -0.013,
+      "total": -3.16
+     },
+     "2025": {
+      "n": 250,
+      "netR": -0.002,
+      "total": -0.39
+     },
+     "2026": {
+      "n": 209,
+      "netR": -0.011,
+      "total": -2.24
+     }
+    },
+    "byWeekday": {
+     "Mon": {
+      "n": 508,
+      "grossR": 0.065,
+      "netR": 0.038
+     },
+     "Tue": {
+      "n": 561,
+      "grossR": 0.003,
+      "netR": -0.024
+     },
+     "Wed": {
+      "n": 557,
+      "grossR": 0.002,
+      "netR": -0.025
+     },
+     "Thu": {
+      "n": 549,
+      "grossR": 0.006,
+      "netR": -0.021
+     },
+     "Fri": {
+      "n": 547,
+      "grossR": 0.014,
+      "netR": -0.013
+     }
+    }
+   },
+   "replication": {
+    "n": 2743,
+    "months": 131,
+    "win": 0.513,
+    "grossR": 0.005,
+    "spreadR": 0.025,
+    "finR": 0,
+    "netR": -0.02,
+    "net2R": -0.045,
+    "tGross": 0.49,
+    "t": -2.17,
+    "total": -55.54,
+    "maxDD": 61.16,
+    "stops": 273,
+    "medStopPct": 1.194,
+    "nights": 0,
+    "byYear": {
+     "2005": {
+      "n": 232,
+      "netR": -0.055,
+      "total": -12.86
+     },
+     "2006": {
+      "n": 251,
+      "netR": 0.006,
+      "total": 1.51
+     },
+     "2007": {
+      "n": 251,
+      "netR": -0.032,
+      "total": -8.04
+     },
+     "2008": {
+      "n": 253,
+      "netR": -0.048,
+      "total": -12.14
+     },
+     "2009": {
+      "n": 252,
+      "netR": 0.009,
+      "total": 2.2
+     },
+     "2010": {
+      "n": 252,
+      "netR": 0.006,
+      "total": 1.55
+     },
+     "2011": {
+      "n": 252,
+      "netR": -0.03,
+      "total": -7.58
+     },
+     "2012": {
+      "n": 249,
+      "netR": -0.003,
+      "total": -0.86
+     },
+     "2013": {
+      "n": 250,
+      "netR": 0.018,
+      "total": 4.52
+     },
+     "2014": {
+      "n": 250,
+      "netR": -0.039,
+      "total": -9.7
+     },
+     "2015": {
+      "n": 251,
+      "netR": -0.056,
+      "total": -14.13
+     }
+    },
+    "byWeekday": {
+     "Tue": {
+      "n": 562,
+      "grossR": 0.022,
+      "netR": -0.003
+     },
+     "Wed": {
+      "n": 564,
+      "grossR": 0.016,
+      "netR": -0.009
+     },
+     "Thu": {
+      "n": 552,
+      "grossR": 0.023,
+      "netR": -0.002
+     },
+     "Fri": {
+      "n": 550,
+      "grossR": -0.037,
+      "netR": -0.062
+     },
+     "Mon": {
+      "n": 515,
+      "grossR": -0.001,
+      "netR": -0.026
+     }
+    }
+   }
+  }
+ },
+ "holmSet": [
+  "T1",
+  "T2"
+ ],
+ "pooled": {
+  "decisive": {
+   "months": 130,
+   "meanMonthNet": -0.583,
+   "t": -1.93,
+   "tGross": 3.27,
+   "total": -75.85
+  },
+  "replication": {
+   "months": 131,
+   "meanMonthNet": -0.608,
+   "t": -2.47,
+   "tGross": 3.55,
+   "total": -79.67
+  }
+ },
+ "pooledOk": false,
+ "overnightVsSession": {
+  "decisive": {
+   "diffNetR": -0.012,
+   "diffGrossR": 0.006,
+   "welchMonthT": -0.97
+  },
+  "replication": {
+   "diffNetR": -0.005,
+   "diffGrossR": 0.009,
+   "welchMonthT": -0.42
+  }
+ },
+ "conditions": {
+  "T1": {
+   "n": true,
+   "tDecisive": false,
+   "replication": false,
+   "holm": false,
+   "placebo": false,
+   "twiceCost": false,
+   "pass": false,
+   "core": false
+  },
+  "T2": {
+   "n": true,
+   "tDecisive": false,
+   "replication": false,
+   "holm": false,
+   "placebo": false,
+   "twiceCost": false,
+   "pass": false,
+   "core": false
+  }
+ }
+}
