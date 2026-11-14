@@ -1,0 +1,1733 @@
+{
+ "topic": "pivot-points",
+ "built": "2026-11-14",
+ "at": "2026-11-14T07:23:18.579Z",
+ "system": "Classic floor-trader pivots (prior-day P, R1, S1, R2, S2): fade R1 / S1 to P, or follow a close beyond them to R2 / S2; ten markets, OANDA mid M5",
+ "window": {
+  "is": "2016-01-01 to 2020-12-31",
+  "oos": "2021-01-01 to 2026-11-13"
+ },
+ "params": {
+  "M5": 300,
+  "VALID": 0.8,
+  "ATR_N": 14,
+  "T1_STOP": 0.25,
+  "T2_STOP": 0.1,
+  "SEEDS": 40,
+  "U_LO": 0.3,
+  "U_HI": 0.7,
+  "MIN_N": 300,
+  "DATA_FROM": 1446336000,
+  "IS_FROM": 1451606400,
+  "OOS_FROM": 1609459200,
+  "END": 1794614400,
+  "EPS": 1e-12
+ },
+ "markets": [
+  "spx500",
+  "nas100",
+  "us30",
+  "de40",
+  "uk100",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "xag"
+ ],
+ "funnel": {
+  "spx500": {
+   "candles": 759523,
+   "from": "2015-11-01 23:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2750
+  },
+  "nas100": {
+   "candles": 776795,
+   "from": "2015-11-01 23:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2751
+  },
+  "us30": {
+   "candles": 776551,
+   "from": "2015-11-01 23:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2750
+  },
+  "de40": {
+   "candles": 618809,
+   "from": "2015-11-02 07:00",
+   "to": "2026-11-13 20:55",
+   "sessions": 2800
+  },
+  "uk100": {
+   "candles": 661084,
+   "from": "2015-11-02 01:00",
+   "to": "2026-11-13 20:55",
+   "sessions": 2766
+  },
+  "eurusd": {
+   "candles": 822008,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2861
+  },
+  "gbpusd": {
+   "candles": 821468,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2861
+  },
+  "usdjpy": {
+   "candles": 822384,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2861
+  },
+  "audusd": {
+   "candles": 818804,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2858
+  },
+  "xag": {
+   "candles": 767225,
+   "from": "2015-11-01 23:00",
+   "to": "2026-11-13 21:55",
+   "sessions": 2786
+  }
+ },
+ "costs": "round trip forex 0.015 %, indices 0.04 %, silver 0.10 % of the entry price, in R by each trade's own risk; no financing (every trade is flat before its session ends)",
+ "tests": {
+  "T1 all": {
+   "rule": "T1",
+   "group": "all",
+   "is": {
+    "n": 9277,
+    "gross": -0.01,
+    "net": -0.135,
+    "net2": -0.26,
+    "total": -1255.47,
+    "win": 0.403,
+    "months": 60,
+    "t": -9.71,
+    "tGross": -0.75,
+    "t2": -16.91
+   },
+   "oos": {
+    "n": 11294,
+    "gross": -0.03,
+    "net": -0.144,
+    "net2": -0.258,
+    "total": -1629.97,
+    "win": 0.399,
+    "months": 71,
+    "t": -13.05,
+    "tGross": -2.76,
+    "t2": -21.57
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.134,
+     -0.116,
+     -0.119,
+     -0.138,
+     -0.133,
+     -0.11,
+     -0.116,
+     -0.118,
+     -0.109,
+     -0.121,
+     -0.118,
+     -0.147,
+     -0.115,
+     -0.128,
+     -0.104,
+     -0.12,
+     -0.121,
+     -0.111,
+     -0.122,
+     -0.117,
+     -0.122,
+     -0.114,
+     -0.136,
+     -0.112,
+     -0.14,
+     -0.135,
+     -0.124,
+     -0.124,
+     -0.145,
+     -0.117,
+     -0.118,
+     -0.126,
+     -0.108,
+     -0.126,
+     -0.129,
+     -0.126,
+     -0.126,
+     -0.122,
+     -0.127,
+     -0.12
+    ],
+    "mean": -0.123,
+    "p95": -0.109,
+    "min": -0.147,
+    "max": -0.104,
+    "grossMean": -0.011,
+    "rank": 39,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T1 indices": {
+   "rule": "T1",
+   "group": "indices",
+   "is": {
+    "n": 3818,
+    "gross": -0.021,
+    "net": -0.175,
+    "net2": -0.328,
+    "total": -667.19,
+    "win": 0.403,
+    "months": 60,
+    "t": -8.52,
+    "tGross": -1.09,
+    "t2": -13.48
+   },
+   "oos": {
+    "n": 4880,
+    "gross": -0.002,
+    "net": -0.14,
+    "net2": -0.278,
+    "total": -682.32,
+    "win": 0.412,
+    "months": 71,
+    "t": -8.15,
+    "tGross": -0.09,
+    "t2": -14.87
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.172,
+     -0.146,
+     -0.154,
+     -0.184,
+     -0.156,
+     -0.155,
+     -0.126,
+     -0.15,
+     -0.147,
+     -0.141,
+     -0.142,
+     -0.174,
+     -0.148,
+     -0.157,
+     -0.14,
+     -0.139,
+     -0.158,
+     -0.149,
+     -0.163,
+     -0.162,
+     -0.174,
+     -0.151,
+     -0.175,
+     -0.142,
+     -0.172,
+     -0.139,
+     -0.132,
+     -0.176,
+     -0.166,
+     -0.167,
+     -0.145,
+     -0.164,
+     -0.156,
+     -0.126,
+     -0.155,
+     -0.139,
+     -0.155,
+     -0.156,
+     -0.154,
+     -0.154
+    ],
+    "mean": -0.154,
+    "p95": -0.132,
+    "min": -0.184,
+    "max": -0.126,
+    "grossMean": -0.016,
+    "rank": 8,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T1 forex": {
+   "rule": "T1",
+   "group": "forex",
+   "is": {
+    "n": 4451,
+    "gross": 0.003,
+    "net": -0.079,
+    "net2": -0.16,
+    "total": -349.75,
+    "win": 0.407,
+    "months": 60,
+    "t": -3.92,
+    "tGross": 0.16,
+    "t2": -7.97
+   },
+   "oos": {
+    "n": 5154,
+    "gross": -0.049,
+    "net": -0.133,
+    "net2": -0.216,
+    "total": -683.87,
+    "win": 0.392,
+    "months": 71,
+    "t": -7.86,
+    "tGross": -2.9,
+    "t2": -12.62
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.106,
+     -0.093,
+     -0.081,
+     -0.099,
+     -0.104,
+     -0.08,
+     -0.103,
+     -0.097,
+     -0.081,
+     -0.102,
+     -0.091,
+     -0.122,
+     -0.083,
+     -0.095,
+     -0.076,
+     -0.089,
+     -0.099,
+     -0.083,
+     -0.085,
+     -0.074,
+     -0.072,
+     -0.078,
+     -0.113,
+     -0.099,
+     -0.11,
+     -0.125,
+     -0.111,
+     -0.087,
+     -0.122,
+     -0.075,
+     -0.098,
+     -0.092,
+     -0.072,
+     -0.111,
+     -0.102,
+     -0.106,
+     -0.096,
+     -0.087,
+     -0.098,
+     -0.092
+    ],
+    "mean": -0.095,
+    "p95": -0.074,
+    "min": -0.125,
+    "max": -0.072,
+    "grossMean": -0.012,
+    "rank": 41,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T1 metals": {
+   "rule": "T1",
+   "group": "metals",
+   "is": {
+    "n": 1008,
+    "gross": -0.03,
+    "net": -0.237,
+    "net2": -0.443,
+    "total": -238.53,
+    "win": 0.383,
+    "months": 60,
+    "t": -6.43,
+    "tGross": -0.81,
+    "t2": -11.43
+   },
+   "oos": {
+    "n": 1260,
+    "gross": -0.063,
+    "net": -0.209,
+    "net2": -0.356,
+    "total": -263.77,
+    "win": 0.375,
+    "months": 71,
+    "t": -6.6,
+    "tGross": -1.96,
+    "t2": -11.08
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.122,
+     -0.112,
+     -0.161,
+     -0.147,
+     -0.18,
+     -0.084,
+     -0.138,
+     -0.098,
+     -0.095,
+     -0.127,
+     -0.151,
+     -0.167,
+     -0.141,
+     -0.169,
+     -0.101,
+     -0.186,
+     -0.087,
+     -0.104,
+     -0.14,
+     -0.146,
+     -0.156,
+     -0.139,
+     -0.098,
+     -0.061,
+     -0.16,
+     -0.16,
+     -0.151,
+     -0.108,
+     -0.172,
+     -0.128,
+     -0.112,
+     -0.142,
+     -0.098,
+     -0.187,
+     -0.157,
+     -0.165,
+     -0.153,
+     -0.157,
+     -0.154,
+     -0.126
+    ],
+    "mean": -0.136,
+    "p95": -0.086,
+    "min": -0.187,
+    "max": -0.061,
+    "grossMean": 0.01,
+    "rank": 41,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T2 all": {
+   "rule": "T2",
+   "group": "all",
+   "is": {
+    "n": 8359,
+    "gross": 0.071,
+    "net": -0.156,
+    "net2": -0.383,
+    "total": -1303.65,
+    "win": 0.349,
+    "months": 60,
+    "t": -8.12,
+    "tGross": 3.84,
+    "t2": -17.02
+   },
+   "oos": {
+    "n": 10307,
+    "gross": 0.028,
+    "net": -0.184,
+    "net2": -0.396,
+    "total": -1893.93,
+    "win": 0.33,
+    "months": 71,
+    "t": -9.62,
+    "tGross": 1.67,
+    "t2": -17.59
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.195,
+     -0.228,
+     -0.203,
+     -0.206,
+     -0.197,
+     -0.192,
+     -0.194,
+     -0.195,
+     -0.195,
+     -0.187,
+     -0.2,
+     -0.181,
+     -0.205,
+     -0.209,
+     -0.19,
+     -0.18,
+     -0.196,
+     -0.222,
+     -0.194,
+     -0.203,
+     -0.203,
+     -0.204,
+     -0.196,
+     -0.217,
+     -0.198,
+     -0.21,
+     -0.198,
+     -0.187,
+     -0.201,
+     -0.206,
+     -0.187,
+     -0.196,
+     -0.207,
+     -0.185,
+     -0.216,
+     -0.199,
+     -0.204,
+     -0.208,
+     -0.212,
+     -0.212
+    ],
+    "mean": -0.2,
+    "p95": -0.184,
+    "min": -0.228,
+    "max": -0.18,
+    "grossMean": 0.012,
+    "rank": 3,
+    "beats": true
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": true
+   },
+   "verdict": "FAIL"
+  },
+  "T2 indices": {
+   "rule": "T2",
+   "group": "indices",
+   "is": {
+    "n": 3378,
+    "gross": 0.126,
+    "net": -0.142,
+    "net2": -0.411,
+    "total": -481.03,
+    "win": 0.374,
+    "months": 60,
+    "t": -4.21,
+    "tGross": 3.85,
+    "t2": -10.35
+   },
+   "oos": {
+    "n": 4348,
+    "gross": 0.037,
+    "net": -0.214,
+    "net2": -0.464,
+    "total": -928.84,
+    "win": 0.345,
+    "months": 71,
+    "t": -8.26,
+    "tGross": 1.67,
+    "t2": -14.79
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.215,
+     -0.205,
+     -0.252,
+     -0.182,
+     -0.201,
+     -0.203,
+     -0.217,
+     -0.236,
+     -0.239,
+     -0.194,
+     -0.221,
+     -0.195,
+     -0.202,
+     -0.203,
+     -0.201,
+     -0.201,
+     -0.232,
+     -0.212,
+     -0.19,
+     -0.221,
+     -0.228,
+     -0.228,
+     -0.203,
+     -0.263,
+     -0.202,
+     -0.243,
+     -0.254,
+     -0.191,
+     -0.208,
+     -0.213,
+     -0.222,
+     -0.209,
+     -0.251,
+     -0.199,
+     -0.25,
+     -0.238,
+     -0.206,
+     -0.229,
+     -0.258,
+     -0.228
+    ],
+    "mean": -0.219,
+    "p95": -0.191,
+    "min": -0.263,
+    "max": -0.182,
+    "grossMean": 0.032,
+    "rank": 21,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T2 forex": {
+   "rule": "T2",
+   "group": "forex",
+   "is": {
+    "n": 4064,
+    "gross": 0.019,
+    "net": -0.136,
+    "net2": -0.292,
+    "total": -554.27,
+    "win": 0.329,
+    "months": 60,
+    "t": -4.75,
+    "tGross": 0.69,
+    "t2": -9.43
+   },
+   "oos": {
+    "n": 4801,
+    "gross": 0.009,
+    "net": -0.152,
+    "net2": -0.313,
+    "total": -729.81,
+    "win": 0.318,
+    "months": 71,
+    "t": -5.54,
+    "tGross": 0.34,
+    "t2": -10.73
+   },
+   "p": 1,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.156,
+     -0.226,
+     -0.15,
+     -0.191,
+     -0.19,
+     -0.152,
+     -0.157,
+     -0.138,
+     -0.135,
+     -0.141,
+     -0.163,
+     -0.147,
+     -0.177,
+     -0.186,
+     -0.166,
+     -0.13,
+     -0.145,
+     -0.204,
+     -0.163,
+     -0.173,
+     -0.16,
+     -0.158,
+     -0.162,
+     -0.166,
+     -0.186,
+     -0.156,
+     -0.121,
+     -0.175,
+     -0.185,
+     -0.184,
+     -0.147,
+     -0.166,
+     -0.166,
+     -0.142,
+     -0.172,
+     -0.145,
+     -0.193,
+     -0.166,
+     -0.163,
+     -0.184
+    ],
+    "mean": -0.165,
+    "p95": -0.135,
+    "min": -0.226,
+    "max": -0.121,
+    "grossMean": 0.001,
+    "rank": 13,
+    "beats": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": false
+   },
+   "verdict": "FAIL"
+  },
+  "T2 metals": {
+   "rule": "T2",
+   "group": "metals",
+   "is": {
+    "n": 917,
+    "gross": 0.096,
+    "net": -0.293,
+    "net2": -0.682,
+    "total": -268.35,
+    "win": 0.345,
+    "months": 60,
+    "t": -5.33,
+    "tGross": 1.88,
+    "t2": -10.54
+   },
+   "oos": {
+    "n": 1158,
+    "gross": 0.073,
+    "net": -0.203,
+    "net2": -0.479,
+    "total": -235.28,
+    "win": 0.327,
+    "months": 71,
+    "t": -3.74,
+    "tGross": 1.43,
+    "t2": -8.03
+   },
+   "p": 0.99991,
+   "placebo": {
+    "seeds": 40,
+    "means": [
+     -0.289,
+     -0.304,
+     -0.265,
+     -0.342,
+     -0.217,
+     -0.325,
+     -0.27,
+     -0.301,
+     -0.302,
+     -0.35,
+     -0.288,
+     -0.274,
+     -0.333,
+     -0.323,
+     -0.254,
+     -0.322,
+     -0.293,
+     -0.33,
+     -0.337,
+     -0.275,
+     -0.306,
+     -0.317,
+     -0.318,
+     -0.278,
+     -0.234,
+     -0.326,
+     -0.341,
+     -0.229,
+     -0.248,
+     -0.274,
+     -0.244,
+     -0.277,
+     -0.235,
+     -0.318,
+     -0.295,
+     -0.301,
+     -0.24,
+     -0.32,
+     -0.269,
+     -0.274
+    ],
+    "mean": -0.291,
+    "p95": -0.233,
+    "min": -0.35,
+    "max": -0.217,
+    "grossMean": -0.005,
+    "rank": 1,
+    "beats": true
+   },
+   "pHolm": 1,
+   "checks": {
+    "OOS n >= 300": true,
+    "OOS net > 0": false,
+    "OOS month t >= 2": false,
+    "Holm p < 0.05": false,
+    "IS net > 0": false,
+    "OOS net at 2x costs > 0": false,
+    "above placebo 95th pct": true
+   },
+   "verdict": "FAIL"
+  }
+ },
+ "byMarket": {
+  "T1": {
+   "spx500": {
+    "is": {
+     "n": 696,
+     "gross": 0.008,
+     "net": -0.172,
+     "net2": -0.352,
+     "total": -119.76,
+     "win": 0.424,
+     "months": 60,
+     "t": -4.36,
+     "tGross": 0.19,
+     "t2": -8.32
+    },
+    "oos": {
+     "n": 952,
+     "gross": -0.045,
+     "net": -0.189,
+     "net2": -0.332,
+     "total": -179.49,
+     "win": 0.39,
+     "months": 71,
+     "t": -5.68,
+     "tGross": -1.39,
+     "t2": -9.41
+    }
+   },
+   "nas100": {
+    "is": {
+     "n": 772,
+     "gross": -0.027,
+     "net": -0.159,
+     "net2": -0.291,
+     "total": -122.75,
+     "win": 0.387,
+     "months": 60,
+     "t": -3.74,
+     "tGross": -0.63,
+     "t2": -6.56
+    },
+    "oos": {
+     "n": 952,
+     "gross": -0.012,
+     "net": -0.115,
+     "net2": -0.217,
+     "total": -109.05,
+     "win": 0.408,
+     "months": 71,
+     "t": -3.17,
+     "tGross": -0.34,
+     "t2": -5.91
+    }
+   },
+   "us30": {
+    "is": {
+     "n": 720,
+     "gross": -0.024,
+     "net": -0.205,
+     "net2": -0.385,
+     "total": -147.44,
+     "win": 0.399,
+     "months": 60,
+     "t": -5.72,
+     "tGross": -0.7,
+     "t2": -9.58
+    },
+    "oos": {
+     "n": 1027,
+     "gross": 0.015,
+     "net": -0.132,
+     "net2": -0.278,
+     "total": -135.36,
+     "win": 0.427,
+     "months": 71,
+     "t": -3.33,
+     "tGross": 0.37,
+     "t2": -6.8
+    }
+   },
+   "de40": {
+    "is": {
+     "n": 805,
+     "gross": -0.029,
+     "net": -0.155,
+     "net2": -0.282,
+     "total": -124.97,
+     "win": 0.405,
+     "months": 60,
+     "t": -3.99,
+     "tGross": -0.74,
+     "t2": -7.07
+    },
+    "oos": {
+     "n": 972,
+     "gross": -0.016,
+     "net": -0.15,
+     "net2": -0.284,
+     "total": -145.67,
+     "win": 0.399,
+     "months": 71,
+     "t": -4.32,
+     "tGross": -0.45,
+     "t2": -8.13
+    }
+   },
+   "uk100": {
+    "is": {
+     "n": 825,
+     "gross": -0.03,
+     "net": -0.185,
+     "net2": -0.339,
+     "total": -152.26,
+     "win": 0.401,
+     "months": 60,
+     "t": -4.94,
+     "tGross": -0.79,
+     "t2": -8.66
+    },
+    "oos": {
+     "n": 977,
+     "gross": 0.048,
+     "net": -0.115,
+     "net2": -0.279,
+     "total": -112.74,
+     "win": 0.434,
+     "months": 71,
+     "t": -3.23,
+     "tGross": 1.3,
+     "t2": -7.84
+    }
+   },
+   "eurusd": {
+    "is": {
+     "n": 1117,
+     "gross": 0.011,
+     "net": -0.083,
+     "net2": -0.176,
+     "total": -92.16,
+     "win": 0.41,
+     "months": 60,
+     "t": -2.47,
+     "tGross": 0.31,
+     "t2": -5.27
+    },
+    "oos": {
+     "n": 1306,
+     "gross": -0.029,
+     "net": -0.126,
+     "net2": -0.222,
+     "total": -164.06,
+     "win": 0.394,
+     "months": 71,
+     "t": -3.68,
+     "tGross": -0.82,
+     "t2": -6.67
+    }
+   },
+   "gbpusd": {
+    "is": {
+     "n": 1120,
+     "gross": -0.025,
+     "net": -0.098,
+     "net2": -0.17,
+     "total": -109.7,
+     "win": 0.394,
+     "months": 60,
+     "t": -2.49,
+     "tGross": -0.64,
+     "t2": -4.35
+    },
+    "oos": {
+     "n": 1290,
+     "gross": -0.019,
+     "net": -0.106,
+     "net2": -0.193,
+     "total": -137.1,
+     "win": 0.411,
+     "months": 71,
+     "t": -3.48,
+     "tGross": -0.62,
+     "t2": -6.34
+    }
+   },
+   "usdjpy": {
+    "is": {
+     "n": 1093,
+     "gross": -0.003,
+     "net": -0.094,
+     "net2": -0.185,
+     "total": -102.64,
+     "win": 0.416,
+     "months": 60,
+     "t": -2.86,
+     "tGross": -0.09,
+     "t2": -5.56
+    },
+    "oos": {
+     "n": 1252,
+     "gross": -0.107,
+     "net": -0.19,
+     "net2": -0.273,
+     "total": -237.83,
+     "win": 0.37,
+     "months": 71,
+     "t": -6.5,
+     "tGross": -3.67,
+     "t2": -9.17
+    }
+   },
+   "audusd": {
+    "is": {
+     "n": 1121,
+     "gross": 0.031,
+     "net": -0.04,
+     "net2": -0.112,
+     "total": -45.26,
+     "win": 0.409,
+     "months": 60,
+     "t": -1.05,
+     "tGross": 0.81,
+     "t2": -2.89
+    },
+    "oos": {
+     "n": 1306,
+     "gross": -0.044,
+     "net": -0.111,
+     "net2": -0.178,
+     "total": -144.89,
+     "win": 0.393,
+     "months": 71,
+     "t": -3.58,
+     "tGross": -1.42,
+     "t2": -5.71
+    }
+   },
+   "xag": {
+    "is": {
+     "n": 1008,
+     "gross": -0.03,
+     "net": -0.237,
+     "net2": -0.443,
+     "total": -238.53,
+     "win": 0.383,
+     "months": 60,
+     "t": -6.43,
+     "tGross": -0.81,
+     "t2": -11.43
+    },
+    "oos": {
+     "n": 1260,
+     "gross": -0.063,
+     "net": -0.209,
+     "net2": -0.356,
+     "total": -263.77,
+     "win": 0.375,
+     "months": 71,
+     "t": -6.6,
+     "tGross": -1.96,
+     "t2": -11.08
+    }
+   }
+  },
+  "T2": {
+   "spx500": {
+    "is": {
+     "n": 614,
+     "gross": 0.193,
+     "net": -0.13,
+     "net2": -0.452,
+     "total": -79.61,
+     "win": 0.389,
+     "months": 60,
+     "t": -1.96,
+     "tGross": 2.88,
+     "t2": -6.3
+    },
+    "oos": {
+     "n": 848,
+     "gross": 0.135,
+     "net": -0.123,
+     "net2": -0.381,
+     "total": -104.61,
+     "win": 0.384,
+     "months": 71,
+     "t": -2.63,
+     "tGross": 2.92,
+     "t2": -7.56
+    }
+   },
+   "nas100": {
+    "is": {
+     "n": 667,
+     "gross": 0.146,
+     "net": -0.082,
+     "net2": -0.31,
+     "total": -54.61,
+     "win": 0.388,
+     "months": 60,
+     "t": -1.38,
+     "tGross": 2.55,
+     "t2": -4.82
+    },
+    "oos": {
+     "n": 818,
+     "gross": 0.123,
+     "net": -0.058,
+     "net2": -0.239,
+     "total": -47.58,
+     "win": 0.372,
+     "months": 71,
+     "t": -1.37,
+     "tGross": 3.02,
+     "t2": -5.22
+    }
+   },
+   "us30": {
+    "is": {
+     "n": 634,
+     "gross": 0.125,
+     "net": -0.185,
+     "net2": -0.495,
+     "total": -117.32,
+     "win": 0.38,
+     "months": 60,
+     "t": -2.61,
+     "tGross": 1.91,
+     "t2": -6.11
+    },
+    "oos": {
+     "n": 921,
+     "gross": -0.042,
+     "net": -0.304,
+     "net2": -0.565,
+     "total": -279.92,
+     "win": 0.329,
+     "months": 71,
+     "t": -6.58,
+     "tGross": -0.96,
+     "t2": -11.23
+    }
+   },
+   "de40": {
+    "is": {
+     "n": 713,
+     "gross": 0.059,
+     "net": -0.159,
+     "net2": -0.378,
+     "total": -113.62,
+     "win": 0.356,
+     "months": 60,
+     "t": -2.73,
+     "tGross": 0.99,
+     "t2": -6.46
+    },
+    "oos": {
+     "n": 882,
+     "gross": 0.089,
+     "net": -0.156,
+     "net2": -0.402,
+     "total": -138,
+     "win": 0.357,
+     "months": 71,
+     "t": -2.77,
+     "tGross": 1.68,
+     "t2": -6.51
+    }
+   },
+   "uk100": {
+    "is": {
+     "n": 750,
+     "gross": 0.118,
+     "net": -0.154,
+     "net2": -0.427,
+     "total": -115.86,
+     "win": 0.36,
+     "months": 60,
+     "t": -2.13,
+     "tGross": 1.69,
+     "t2": -5.49
+    },
+    "oos": {
+     "n": 879,
+     "gross": -0.105,
+     "net": -0.408,
+     "net2": -0.711,
+     "total": -358.74,
+     "win": 0.289,
+     "months": 71,
+     "t": -6.48,
+     "tGross": -1.83,
+     "t2": -10.09
+    }
+   },
+   "eurusd": {
+    "is": {
+     "n": 1008,
+     "gross": 0.065,
+     "net": -0.109,
+     "net2": -0.283,
+     "total": -109.88,
+     "win": 0.343,
+     "months": 60,
+     "t": -2.07,
+     "tGross": 1.27,
+     "t2": -5.2
+    },
+    "oos": {
+     "n": 1196,
+     "gross": 0.021,
+     "net": -0.164,
+     "net2": -0.35,
+     "total": -196.55,
+     "win": 0.317,
+     "months": 71,
+     "t": -3.47,
+     "tGross": 0.46,
+     "t2": -7.04
+    }
+   },
+   "gbpusd": {
+    "is": {
+     "n": 1010,
+     "gross": 0.061,
+     "net": -0.076,
+     "net2": -0.213,
+     "total": -76.93,
+     "win": 0.337,
+     "months": 60,
+     "t": -1.4,
+     "tGross": 1.15,
+     "t2": -3.8
+    },
+    "oos": {
+     "n": 1219,
+     "gross": -0.041,
+     "net": -0.211,
+     "net2": -0.381,
+     "total": -257.28,
+     "win": 0.304,
+     "months": 71,
+     "t": -3.84,
+     "tGross": -0.77,
+     "t2": -6.71
+    }
+   },
+   "usdjpy": {
+    "is": {
+     "n": 1010,
+     "gross": 0.01,
+     "net": -0.165,
+     "net2": -0.339,
+     "total": -166.41,
+     "win": 0.327,
+     "months": 60,
+     "t": -3.69,
+     "tGross": 0.22,
+     "t2": -7.28
+    },
+    "oos": {
+     "n": 1162,
+     "gross": 0.094,
+     "net": -0.065,
+     "net2": -0.224,
+     "total": -75.54,
+     "win": 0.358,
+     "months": 71,
+     "t": -1.34,
+     "tGross": 1.94,
+     "t2": -4.52
+    }
+   },
+   "audusd": {
+    "is": {
+     "n": 1036,
+     "gross": -0.059,
+     "net": -0.194,
+     "net2": -0.329,
+     "total": -201.04,
+     "win": 0.309,
+     "months": 60,
+     "t": -3.88,
+     "tGross": -1.2,
+     "t2": -6.4
+    },
+    "oos": {
+     "n": 1224,
+     "gross": -0.033,
+     "net": -0.164,
+     "net2": -0.294,
+     "total": -200.44,
+     "win": 0.294,
+     "months": 71,
+     "t": -3.9,
+     "tGross": -0.81,
+     "t2": -6.85
+    }
+   },
+   "xag": {
+    "is": {
+     "n": 917,
+     "gross": 0.096,
+     "net": -0.293,
+     "net2": -0.682,
+     "total": -268.35,
+     "win": 0.345,
+     "months": 60,
+     "t": -5.33,
+     "tGross": 1.88,
+     "t2": -10.54
+    },
+    "oos": {
+     "n": 1158,
+     "gross": 0.073,
+     "net": -0.203,
+     "net2": -0.479,
+     "total": -235.28,
+     "win": 0.327,
+     "months": 71,
+     "t": -3.74,
+     "tGross": 1.43,
+     "t2": -8.03
+    }
+   }
+  }
+ },
+ "years": {
+  "T1": {
+   "2016": {
+    "n": 1900,
+    "net": -0.096,
+    "total": -182.41
+   },
+   "2017": {
+    "n": 1841,
+    "net": -0.141,
+    "total": -259.19
+   },
+   "2018": {
+    "n": 1914,
+    "net": -0.147,
+    "total": -280.5
+   },
+   "2019": {
+    "n": 1846,
+    "net": -0.158,
+    "total": -291.01
+   },
+   "2020": {
+    "n": 1776,
+    "net": -0.136,
+    "total": -242.37
+   },
+   "2021": {
+    "n": 1921,
+    "net": -0.158,
+    "total": -304.47
+   },
+   "2022": {
+    "n": 1921,
+    "net": -0.119,
+    "total": -227.84
+   },
+   "2023": {
+    "n": 2010,
+    "net": -0.145,
+    "total": -290.74
+   },
+   "2024": {
+    "n": 1904,
+    "net": -0.144,
+    "total": -275.11
+   },
+   "2025": {
+    "n": 1896,
+    "net": -0.14,
+    "total": -265.87
+   },
+   "2026": {
+    "n": 1642,
+    "net": -0.162,
+    "total": -265.94
+   }
+  },
+  "T2": {
+   "2016": {
+    "n": 1699,
+    "net": -0.14,
+    "total": -237.92
+   },
+   "2017": {
+    "n": 1611,
+    "net": -0.176,
+    "total": -283.84
+   },
+   "2018": {
+    "n": 1733,
+    "net": -0.147,
+    "total": -255.34
+   },
+   "2019": {
+    "n": 1677,
+    "net": -0.205,
+    "total": -342.98
+   },
+   "2020": {
+    "n": 1639,
+    "net": -0.112,
+    "total": -183.57
+   },
+   "2021": {
+    "n": 1731,
+    "net": -0.21,
+    "total": -363.12
+   },
+   "2022": {
+    "n": 1777,
+    "net": -0.079,
+    "total": -140.97
+   },
+   "2023": {
+    "n": 1843,
+    "net": -0.203,
+    "total": -374.72
+   },
+   "2024": {
+    "n": 1724,
+    "net": -0.228,
+    "total": -393.62
+   },
+   "2025": {
+    "n": 1725,
+    "net": -0.21,
+    "total": -362.48
+   },
+   "2026": {
+    "n": 1507,
+    "net": -0.172,
+    "total": -259.02
+   }
+  }
+ },
+ "exits": {
+  "T1": {
+   "stop": 5779,
+   "target": 3071,
+   "time": 2444
+  },
+  "T2": {
+   "target": 2715,
+   "stop": 6510,
+   "time": 1082
+  }
+ },
+ "verdict": "FAIL: fading R1/S1 to P made -0.144R a trade net out of sample (n 11294, t -13.05; in sample -0.135R); placebo 95th pct -0.109R; 0 of 8 tests pass.",
+ "candidates": [
+  {
+   "rule": "T1 all: fade: limit at the first touch of R1 (sell) or S1 (buy), stop 0.25 x ATR(14) past the level, target P, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 9277,
+    "gross": -0.01,
+    "net": -0.135,
+    "net2": -0.26,
+    "total": -1255.47,
+    "win": 0.403,
+    "months": 60,
+    "t": -9.71,
+    "tGross": -0.75,
+    "t2": -16.91
+   },
+   "oos": {
+    "n": 11294,
+    "gross": -0.03,
+    "net": -0.144,
+    "net2": -0.258,
+    "total": -1629.97,
+    "win": 0.399,
+    "months": 71,
+    "t": -13.05,
+    "tGross": -2.76,
+    "t2": -21.57
+   }
+  },
+  {
+   "rule": "T1 indices: fade: limit at the first touch of R1 (sell) or S1 (buy), stop 0.25 x ATR(14) past the level, target P, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 3818,
+    "gross": -0.021,
+    "net": -0.175,
+    "net2": -0.328,
+    "total": -667.19,
+    "win": 0.403,
+    "months": 60,
+    "t": -8.52,
+    "tGross": -1.09,
+    "t2": -13.48
+   },
+   "oos": {
+    "n": 4880,
+    "gross": -0.002,
+    "net": -0.14,
+    "net2": -0.278,
+    "total": -682.32,
+    "win": 0.412,
+    "months": 71,
+    "t": -8.15,
+    "tGross": -0.09,
+    "t2": -14.87
+   }
+  },
+  {
+   "rule": "T1 forex: fade: limit at the first touch of R1 (sell) or S1 (buy), stop 0.25 x ATR(14) past the level, target P, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 4451,
+    "gross": 0.003,
+    "net": -0.079,
+    "net2": -0.16,
+    "total": -349.75,
+    "win": 0.407,
+    "months": 60,
+    "t": -3.92,
+    "tGross": 0.16,
+    "t2": -7.97
+   },
+   "oos": {
+    "n": 5154,
+    "gross": -0.049,
+    "net": -0.133,
+    "net2": -0.216,
+    "total": -683.87,
+    "win": 0.392,
+    "months": 71,
+    "t": -7.86,
+    "tGross": -2.9,
+    "t2": -12.62
+   }
+  },
+  {
+   "rule": "T1 metals: fade: limit at the first touch of R1 (sell) or S1 (buy), stop 0.25 x ATR(14) past the level, target P, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 1008,
+    "gross": -0.03,
+    "net": -0.237,
+    "net2": -0.443,
+    "total": -238.53,
+    "win": 0.383,
+    "months": 60,
+    "t": -6.43,
+    "tGross": -0.81,
+    "t2": -11.43
+   },
+   "oos": {
+    "n": 1260,
+    "gross": -0.063,
+    "net": -0.209,
+    "net2": -0.356,
+    "total": -263.77,
+    "win": 0.375,
+    "months": 71,
+    "t": -6.6,
+    "tGross": -1.96,
+    "t2": -11.08
+   }
+  },
+  {
+   "rule": "T2 all: break: first M5 close beyond R1 (buy) or S1 (sell), market at the next open, stop 0.1 x ATR(14) back past the level, target R2 / S2, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 8359,
+    "gross": 0.071,
+    "net": -0.156,
+    "net2": -0.383,
+    "total": -1303.65,
+    "win": 0.349,
+    "months": 60,
+    "t": -8.12,
+    "tGross": 3.84,
+    "t2": -17.02
+   },
+   "oos": {
+    "n": 10307,
+    "gross": 0.028,
+    "net": -0.184,
+    "net2": -0.396,
+    "total": -1893.93,
+    "win": 0.33,
+    "months": 71,
+    "t": -9.62,
+    "tGross": 1.67,
+    "t2": -17.59
+   }
+  },
+  {
+   "rule": "T2 indices: break: first M5 close beyond R1 (buy) or S1 (sell), market at the next open, stop 0.1 x ATR(14) back past the level, target R2 / S2, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 3378,
+    "gross": 0.126,
+    "net": -0.142,
+    "net2": -0.411,
+    "total": -481.03,
+    "win": 0.374,
+    "months": 60,
+    "t": -4.21,
+    "tGross": 3.85,
+    "t2": -10.35
+   },
+   "oos": {
+    "n": 4348,
+    "gross": 0.037,
+    "net": -0.214,
+    "net2": -0.464,
+    "total": -928.84,
+    "win": 0.345,
+    "months": 71,
+    "t": -8.26,
+    "tGross": 1.67,
+    "t2": -14.79
+   }
+  },
+  {
+   "rule": "T2 forex: break: first M5 close beyond R1 (buy) or S1 (sell), market at the next open, stop 0.1 x ATR(14) back past the level, target R2 / S2, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 4064,
+    "gross": 0.019,
+    "net": -0.136,
+    "net2": -0.292,
+    "total": -554.27,
+    "win": 0.329,
+    "months": 60,
+    "t": -4.75,
+    "tGross": 0.69,
+    "t2": -9.43
+   },
+   "oos": {
+    "n": 4801,
+    "gross": 0.009,
+    "net": -0.152,
+    "net2": -0.313,
+    "total": -729.81,
+    "win": 0.318,
+    "months": 71,
+    "t": -5.54,
+    "tGross": 0.34,
+    "t2": -10.73
+   }
+  },
+  {
+   "rule": "T2 metals: break: first M5 close beyond R1 (buy) or S1 (sell), market at the next open, stop 0.1 x ATR(14) back past the level, target R2 / S2, flat at session end",
+   "verdict": "FAIL",
+   "is": {
+    "n": 917,
+    "gross": 0.096,
+    "net": -0.293,
+    "net2": -0.682,
+    "total": -268.35,
+    "win": 0.345,
+    "months": 60,
+    "t": -5.33,
+    "tGross": 1.88,
+    "t2": -10.54
+   },
+   "oos": {
+    "n": 1158,
+    "gross": 0.073,
+    "net": -0.203,
+    "net2": -0.479,
+    "total": -235.28,
+    "win": 0.327,
+    "months": 71,
+    "t": -3.74,
+    "tGross": 1.43,
+    "t2": -8.03
+   }
+  }
+ ],
+ "reading": [
+  "## Reading",
+  "",
+  "- **Fade (T1, primary)**: gross R a trade is about zero in both windows (−0.010R in sample, −0.030R out of sample) and the real",
+  "  pivots rank 39th of 41 against the shifted ladders: price does not reverse at R1 / S1 more than at any nearby price. After",
+  "  costs every pool loses (out of sample −0.144R a trade, t −13.05). The cost is large in R because the fade's stop is only a",
+  "  quarter of a daily ATR.",
+  "- **Break (T2)**: before costs the break made a little (all markets +0.071R in sample, t 3.84; +0.028R out of sample, t 1.67),",
+  "  about what any intraday breakout earns; the real levels are not clearly better than the placebo's (rank 3 of 41 for all",
+  "  markets, 21 for indices). After costs it loses in every pool and window. Silver's T2 is above its placebo but loses −0.203R",
+  "  a trade net out of sample.",
+  "- Not an edge in either direction. Nothing live changed; no proposal is written."
+ ]
+}
