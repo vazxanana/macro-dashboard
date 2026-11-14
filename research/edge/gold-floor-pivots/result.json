@@ -1,0 +1,384 @@
+{
+ "topic": "gold-floor-pivots",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "passed": [],
+ "data": {
+  "src": "OANDA mid M5 XAU_USD via the site proxy (study cache, out of git)",
+  "from": "2016-01-01",
+  "to": "2026-11-13",
+  "days": 2806,
+  "isDays": 1291
+ },
+ "windows": {
+  "is": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "oos": [
+   "2021-01-01",
+   "2026-11-13"
+  ]
+ },
+ "rules": {
+  "costUsd": 0.6,
+  "finRateLong": 0.000148,
+  "minAway": 0.1,
+  "stops": {
+   "T1": 0.25,
+   "T2": 0.25,
+   "T3": 0.2
+  },
+  "window": "07:00-20:00 UTC",
+  "placebo": {
+   "seeds": 40,
+   "lo": 0.3,
+   "hi": 0.7,
+   "need": 38
+  }
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 693,
+    "gross": -0.011,
+    "net": -0.169,
+    "net2x": -0.327,
+    "fin": 0,
+    "totalNet": -117.05,
+    "winRate": 39.83,
+    "months": 60,
+    "tNet": -4.17,
+    "tGross": -0.28,
+    "stops": 347,
+    "targets": 163,
+    "time": 183
+   },
+   "oos": {
+    "n": 796,
+    "gross": -0.071,
+    "net": -0.151,
+    "net2x": -0.231,
+    "fin": 0,
+    "totalNet": -120.36,
+    "winRate": 39.82,
+    "months": 71,
+    "tNet": -3.83,
+    "tGross": -1.84,
+    "stops": 406,
+    "targets": 190,
+    "time": 200
+   },
+   "bySide": {
+    "is_buy": {
+     "n": 348,
+     "gross": -0.039,
+     "net": -0.199,
+     "net2x": -0.36,
+     "fin": 0,
+     "totalNet": -69.4,
+     "winRate": 39.66,
+     "months": 60,
+     "tNet": -3.63,
+     "tGross": -0.71,
+     "stops": 185,
+     "targets": 80,
+     "time": 83
+    },
+    "oos_buy": {
+     "n": 389,
+     "gross": -0.114,
+     "net": -0.196,
+     "net2x": -0.277,
+     "fin": 0,
+     "totalNet": -76.18,
+     "winRate": 38.3,
+     "months": 71,
+     "tNet": -3.08,
+     "tGross": -1.85,
+     "stops": 210,
+     "targets": 97,
+     "time": 82
+    },
+    "is_sell": {
+     "n": 345,
+     "gross": 0.017,
+     "net": -0.138,
+     "net2x": -0.293,
+     "fin": 0,
+     "totalNet": -47.65,
+     "winRate": 40,
+     "months": 60,
+     "tNet": -2.26,
+     "tGross": 0.29,
+     "stops": 162,
+     "targets": 83,
+     "time": 100
+    },
+    "oos_sell": {
+     "n": 407,
+     "gross": -0.03,
+     "net": -0.109,
+     "net2x": -0.188,
+     "fin": 0,
+     "totalNet": -44.18,
+     "winRate": 41.28,
+     "months": 71,
+     "tNet": -1.95,
+     "tGross": -0.53,
+     "stops": 196,
+     "targets": 93,
+     "time": 118
+    }
+   },
+   "p": 0.9999,
+   "holmP": 1,
+   "placebo": {
+    "beaten": 6,
+    "of": 40,
+    "mean": -0.097,
+    "p95": -0.015,
+    "min": -0.184,
+    "max": -0.012,
+    "grossMean": -0.015
+   },
+   "checks": {
+    "oosNet": false,
+    "tHolm": false,
+    "isNet": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "is": {
+    "n": 627,
+    "gross": 0.074,
+    "net": -0.061,
+    "net2x": -0.195,
+    "fin": 0,
+    "totalNet": -38.04,
+    "winRate": 38.6,
+    "months": 60,
+    "tNet": -1.44,
+    "tGross": 1.77,
+    "stops": 275,
+    "targets": 0,
+    "time": 352
+   },
+   "oos": {
+    "n": 744,
+    "gross": 0.018,
+    "net": -0.05,
+    "net2x": -0.119,
+    "fin": 0,
+    "totalNet": -37.5,
+    "winRate": 39.38,
+    "months": 71,
+    "tNet": -1.03,
+    "tGross": 0.37,
+    "stops": 323,
+    "targets": 0,
+    "time": 421
+   },
+   "bySide": {
+    "is_buy": {
+     "n": 321,
+     "gross": 0.123,
+     "net": -0.012,
+     "net2x": -0.146,
+     "fin": 0,
+     "totalNet": -3.7,
+     "winRate": 40.5,
+     "months": 60,
+     "tNet": -0.2,
+     "tGross": 2.06,
+     "stops": 135,
+     "targets": 0,
+     "time": 186
+    },
+    "oos_buy": {
+     "n": 378,
+     "gross": -0.01,
+     "net": -0.079,
+     "net2x": -0.147,
+     "fin": 0,
+     "totalNet": -29.81,
+     "winRate": 37.83,
+     "months": 71,
+     "tNet": -1.19,
+     "tGross": -0.15,
+     "stops": 173,
+     "targets": 0,
+     "time": 205
+    },
+    "is_sell": {
+     "n": 306,
+     "gross": 0.022,
+     "net": -0.112,
+     "net2x": -0.247,
+     "fin": 0,
+     "totalNet": -34.34,
+     "winRate": 36.6,
+     "months": 60,
+     "tNet": -1.54,
+     "tGross": 0.31,
+     "stops": 140,
+     "targets": 0,
+     "time": 166
+    },
+    "oos_sell": {
+     "n": 366,
+     "gross": 0.047,
+     "net": -0.021,
+     "net2x": -0.089,
+     "fin": 0,
+     "totalNet": -7.69,
+     "winRate": 40.98,
+     "months": 71,
+     "tNet": -0.3,
+     "tGross": 0.66,
+     "stops": 150,
+     "targets": 0,
+     "time": 216
+    }
+   },
+   "p": 0.8464,
+   "holmP": 1,
+   "placebo": {
+    "beaten": 10,
+    "of": 40,
+    "mean": -0.009,
+    "p95": 0.073,
+    "min": -0.098,
+    "max": 0.152,
+    "grossMean": 0.063
+   },
+   "checks": {
+    "oosNet": false,
+    "tHolm": false,
+    "isNet": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "is": {
+    "n": 504,
+    "gross": 0.028,
+    "net": -0.169,
+    "net2x": -0.366,
+    "fin": 0,
+    "totalNet": -85.15,
+    "winRate": 36.9,
+    "months": 60,
+    "tNet": -2.6,
+    "tGross": 0.45,
+    "stops": 287,
+    "targets": 89,
+    "time": 128
+   },
+   "oos": {
+    "n": 596,
+    "gross": 0.023,
+    "net": -0.081,
+    "net2x": -0.185,
+    "fin": 0,
+    "totalNet": -48.18,
+    "winRate": 36.58,
+    "months": 71,
+    "tNet": -1.48,
+    "tGross": 0.43,
+    "stops": 329,
+    "targets": 116,
+    "time": 151
+   },
+   "bySide": {
+    "is_buy": {
+     "n": 253,
+     "gross": 0.103,
+     "net": -0.094,
+     "net2x": -0.29,
+     "fin": 0,
+     "totalNet": -23.69,
+     "winRate": 40.32,
+     "months": 60,
+     "tNet": -1.12,
+     "tGross": 1.22,
+     "stops": 138,
+     "targets": 49,
+     "time": 66
+    },
+    "oos_buy": {
+     "n": 310,
+     "gross": 0.048,
+     "net": -0.057,
+     "net2x": -0.161,
+     "fin": 0,
+     "totalNet": -17.54,
+     "winRate": 37.42,
+     "months": 71,
+     "tNet": -0.8,
+     "tGross": 0.68,
+     "stops": 169,
+     "targets": 60,
+     "time": 81
+    },
+    "is_sell": {
+     "n": 251,
+     "gross": -0.047,
+     "net": -0.245,
+     "net2x": -0.443,
+     "fin": 0,
+     "totalNet": -61.46,
+     "winRate": 33.47,
+     "months": 60,
+     "tNet": -2.68,
+     "tGross": -0.55,
+     "stops": 149,
+     "targets": 40,
+     "time": 62
+    },
+    "oos_sell": {
+     "n": 286,
+     "gross": -0.004,
+     "net": -0.107,
+     "net2x": -0.21,
+     "fin": 0,
+     "totalNet": -30.64,
+     "winRate": 35.66,
+     "months": 71,
+     "tNet": -1.33,
+     "tGross": -0.05,
+     "stops": 160,
+     "targets": 56,
+     "time": 70
+    }
+   },
+   "p": 0.9283,
+   "holmP": 1,
+   "placebo": {
+    "beaten": 19,
+    "of": 40,
+    "mean": -0.081,
+    "p95": 0.013,
+    "min": -0.227,
+    "max": 0.026,
+    "grossMean": 0.02
+   },
+   "checks": {
+    "oosNet": false,
+    "tHolm": false,
+    "isNet": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  }
+ }
+}
