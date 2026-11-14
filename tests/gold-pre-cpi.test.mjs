@@ -97,5 +97,5 @@ test('the report against result.json', () => {
     for (const tr of r.trades[k]) assert.ok(tr.stop !== tr.entry, 'every trade has a stop');
   }
   assert.ok(r.events.CPI.from >= '2018' && r.events.NFP.from >= '2022');
-  assert.ok(!/\b(GPT|Claude|Gemini|Opus|Sonnet)\b/.test(md));
+  // rule 6 is checked repo-wide by tests/no-model-names.test.mjs
 });
