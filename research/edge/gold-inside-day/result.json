@@ -1,0 +1,1286 @@
+{
+ "study": "gold-inside-day",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "passed": 0,
+ "of": 3,
+ "rule": "Spot gold daily inside day (high < previous high, low > previous low); next day OCO buy stop at its high / sell stop at its low until 21:00 UTC, stop the other side. T1 exit 21:00 UTC; T2 1R target else 21:00 UTC; T3 T1 when range < 0.6 x ATR14. M5 path.",
+ "params": {
+  "COST": 0.6,
+  "MIN_CANDLES": 120,
+  "EXIT_H": 21,
+  "ATR_N": 14,
+  "TIGHT": 0.6,
+  "SEEDS": 40,
+  "MIN_OOS_N": 30,
+  "PLACEBO_BEAT": 38,
+  "IS": [
+   "2008-01-01",
+   "2017-01-01"
+  ],
+  "OOS": [
+   "2017-01-01",
+   "2100-01-01"
+  ],
+  "OOS_HALVES": [
+   [
+    "2017-01-01",
+    "2022-01-01"
+   ],
+   [
+    "2022-01-01",
+    "2100-01-01"
+   ]
+  ],
+  "finGoldLong": 0.000148
+ },
+ "prereg": "9ba0a894edceb218002d8b337a051da2b3cedd6a7eb9785a94d09045e72f0c0b",
+ "src": "OANDA mid XAU/USD M5 candles (1431423 candles, 2006-11-01 to 2026-11-13), daily candles built from them (5207 folded days, 5173 full)",
+ "dailyCheck": "Check only: of 5168 full days also in council-data research/daily/xau.json (folded the same way), 0 differ by more than $0.05 in high or low.",
+ "note": "A stand-alone rule, not a test of the gold book (item 44). Paper research; nothing live changed.",
+ "tests": {
+  "T1": {
+   "label": "inside day; OCO stops at its high / low the next day, stop the other side, exit 21:00 UTC",
+   "windows": {
+    "inSample": {
+     "from": "2008-01-01",
+     "to": "2016-12-31",
+     "n": 379,
+     "gross": 0.164,
+     "net": 0.112,
+     "net2": 0.059,
+     "totalNet": 42.4,
+     "win": 0.512,
+     "maxDD": -9.02,
+     "months": 108,
+     "t": 2.53,
+     "p": 0.0057,
+     "fillStops": 0,
+     "signals": 414,
+     "unfilled": 35,
+     "exits": {
+      "time": 304,
+      "stop": 75
+     },
+     "buys": {
+      "n": 206,
+      "gross": 0.199,
+      "net": 0.149,
+      "net2": 0.099,
+      "totalNet": 30.76,
+      "win": 0.544,
+      "maxDD": -10.84,
+      "months": 108,
+      "t": 2.5,
+      "p": 0.0062,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 173,
+      "gross": 0.123,
+      "net": 0.067,
+      "net2": 0.012,
+      "totalNet": 11.64,
+      "win": 0.474,
+      "maxDD": -11.59,
+      "months": 108,
+      "t": 0.95,
+      "p": 0.17,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2008": {
+       "n": 40,
+       "net": 0.279,
+       "total": 11.16
+      },
+      "2009": {
+       "n": 46,
+       "net": 0.147,
+       "total": 6.76
+      },
+      "2010": {
+       "n": 40,
+       "net": 0.099,
+       "total": 3.97
+      },
+      "2011": {
+       "n": 28,
+       "net": 0.351,
+       "total": 9.82
+      },
+      "2012": {
+       "n": 38,
+       "net": -0.031,
+       "total": -1.19
+      },
+      "2013": {
+       "n": 47,
+       "net": -0.057,
+       "total": -2.67
+      },
+      "2014": {
+       "n": 48,
+       "net": 0.139,
+       "total": 6.66
+      },
+      "2015": {
+       "n": 51,
+       "net": 0.01,
+       "total": 0.5
+      },
+      "2016": {
+       "n": 41,
+       "net": 0.18,
+       "total": 7.4
+      }
+     },
+     "medianRisk": 12.18
+    },
+    "outOfSample": {
+     "from": "2017-01-01",
+     "to": "2026-11-13",
+     "n": 367,
+     "gross": 0.072,
+     "net": 0.028,
+     "net2": -0.016,
+     "totalNet": 10.15,
+     "win": 0.455,
+     "maxDD": -13.38,
+     "months": 119,
+     "t": 0.62,
+     "p": 0.2684,
+     "fillStops": 0,
+     "signals": 392,
+     "unfilled": 25,
+     "exits": {
+      "time": 291,
+      "stop": 76
+     },
+     "buys": {
+      "n": 185,
+      "gross": 0.087,
+      "net": 0.042,
+      "net2": -0.002,
+      "totalNet": 7.83,
+      "win": 0.47,
+      "maxDD": -9.92,
+      "months": 119,
+      "t": 0.69,
+      "p": 0.2447,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 182,
+      "gross": 0.057,
+      "net": 0.013,
+      "net2": -0.031,
+      "totalNet": 2.32,
+      "win": 0.44,
+      "maxDD": -8.77,
+      "months": 119,
+      "t": 0.18,
+      "p": 0.4286,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 34,
+       "net": -0.273,
+       "total": -9.27
+      },
+      "2018": {
+       "n": 43,
+       "net": 0.082,
+       "total": 3.52
+      },
+      "2019": {
+       "n": 42,
+       "net": -0.062,
+       "total": -2.62
+      },
+      "2020": {
+       "n": 37,
+       "net": -0.022,
+       "total": -0.83
+      },
+      "2021": {
+       "n": 37,
+       "net": 0.186,
+       "total": 6.88
+      },
+      "2022": {
+       "n": 30,
+       "net": 0.01,
+       "total": 0.31
+      },
+      "2023": {
+       "n": 37,
+       "net": -0.112,
+       "total": -4.15
+      },
+      "2024": {
+       "n": 42,
+       "net": 0.094,
+       "total": 3.94
+      },
+      "2025": {
+       "n": 38,
+       "net": 0.243,
+       "total": 9.23
+      },
+      "2026": {
+       "n": 27,
+       "net": 0.117,
+       "total": 3.15
+      }
+     },
+     "medianRisk": 16.05
+    },
+    "oosFirstHalf": {
+     "from": "2017-01-01",
+     "to": "2021-12-31",
+     "n": 193,
+     "gross": 0.047,
+     "net": -0.012,
+     "net2": -0.071,
+     "totalNet": -2.33,
+     "win": 0.404,
+     "maxDD": -13.38,
+     "months": 60,
+     "t": -0.18,
+     "p": 0.5717,
+     "fillStops": 0,
+     "signals": 206,
+     "unfilled": 13,
+     "exits": {
+      "time": 150,
+      "stop": 43
+     },
+     "buys": {
+      "n": 98,
+      "gross": -0.009,
+      "net": -0.069,
+      "net2": -0.13,
+      "totalNet": -6.8,
+      "win": 0.408,
+      "maxDD": -7.14,
+      "months": 60,
+      "t": -0.96,
+      "p": 0.8308,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 95,
+      "gross": 0.105,
+      "net": 0.047,
+      "net2": -0.011,
+      "totalNet": 4.48,
+      "win": 0.4,
+      "maxDD": -8.77,
+      "months": 60,
+      "t": 0.4,
+      "p": 0.3431,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 34,
+       "net": -0.273,
+       "total": -9.27
+      },
+      "2018": {
+       "n": 43,
+       "net": 0.082,
+       "total": 3.52
+      },
+      "2019": {
+       "n": 42,
+       "net": -0.062,
+       "total": -2.62
+      },
+      "2020": {
+       "n": 37,
+       "net": -0.022,
+       "total": -0.83
+      },
+      "2021": {
+       "n": 37,
+       "net": 0.186,
+       "total": 6.88
+      }
+     },
+     "medianRisk": 11.04
+    },
+    "oosSecondHalf": {
+     "from": "2022-01-01",
+     "to": "2026-11-13",
+     "n": 174,
+     "gross": 0.099,
+     "net": 0.072,
+     "net2": 0.044,
+     "totalNet": 12.48,
+     "win": 0.511,
+     "maxDD": -7.29,
+     "months": 59,
+     "t": 1.22,
+     "p": 0.1111,
+     "fillStops": 0,
+     "signals": 186,
+     "unfilled": 12,
+     "exits": {
+      "time": 141,
+      "stop": 33
+     },
+     "buys": {
+      "n": 87,
+      "gross": 0.195,
+      "net": 0.168,
+      "net2": 0.142,
+      "totalNet": 14.63,
+      "win": 0.54,
+      "maxDD": -4.51,
+      "months": 59,
+      "t": 1.69,
+      "p": 0.0455,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 87,
+      "gross": 0.004,
+      "net": -0.025,
+      "net2": -0.053,
+      "totalNet": -2.16,
+      "win": 0.483,
+      "maxDD": -7.18,
+      "months": 59,
+      "t": -0.32,
+      "p": 0.6266,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2022": {
+       "n": 30,
+       "net": 0.01,
+       "total": 0.31
+      },
+      "2023": {
+       "n": 37,
+       "net": -0.112,
+       "total": -4.15
+      },
+      "2024": {
+       "n": 42,
+       "net": 0.094,
+       "total": 3.94
+      },
+      "2025": {
+       "n": 38,
+       "net": 0.243,
+       "total": 9.23
+      },
+      "2026": {
+       "n": 27,
+       "net": 0.117,
+       "total": 3.15
+      }
+     },
+     "medianRisk": 22.4
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "pool": 2140,
+    "perSeed": 392,
+    "p95": 0.047,
+    "median": 0.007,
+    "min": -0.069,
+    "max": 0.091,
+    "real": 0.028,
+    "beaten": 32,
+    "means": [
+     0.04,
+     0.024,
+     -0.069,
+     -0.016,
+     0.019,
+     -0.034,
+     -0.025,
+     -0.005,
+     0.054,
+     -0.022,
+     0.023,
+     -0.026,
+     0.014,
+     -0.002,
+     -0.025,
+     0.004,
+     -0.024,
+     0.039,
+     0.028,
+     -0.022,
+     0.036,
+     -0.025,
+     0.023,
+     -0.01,
+     0.044,
+     0.005,
+     -0.061,
+     0.043,
+     0.006,
+     -0.016,
+     0.009,
+     0.091,
+     0.015,
+     0.004,
+     -0.013,
+     0.021,
+     0.008,
+     0.026,
+     0.046,
+     0.025
+    ]
+   },
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm": false,
+    "isPositive": true,
+    "oos2xCosts": false,
+    "placebo": false,
+    "oosN30": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "label": "inside day; the same bracket, 1R target, else exit 21:00 UTC",
+   "windows": {
+    "inSample": {
+     "from": "2008-01-01",
+     "to": "2016-12-31",
+     "n": 379,
+     "gross": 0.118,
+     "net": 0.066,
+     "net2": 0.013,
+     "totalNet": 24.83,
+     "win": 0.53,
+     "maxDD": -10.12,
+     "months": 108,
+     "t": 1.71,
+     "p": 0.044,
+     "fillStops": 0,
+     "signals": 414,
+     "unfilled": 35,
+     "exits": {
+      "target": 115,
+      "time": 191,
+      "stop": 73
+     },
+     "buys": {
+      "n": 206,
+      "gross": 0.137,
+      "net": 0.087,
+      "net2": 0.037,
+      "totalNet": 17.98,
+      "win": 0.553,
+      "maxDD": -11.31,
+      "months": 108,
+      "t": 1.59,
+      "p": 0.0559,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 173,
+      "gross": 0.095,
+      "net": 0.04,
+      "net2": -0.016,
+      "totalNet": 6.85,
+      "win": 0.503,
+      "maxDD": -8.17,
+      "months": 108,
+      "t": 0.75,
+      "p": 0.227,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2008": {
+       "n": 40,
+       "net": 0.251,
+       "total": 10.03
+      },
+      "2009": {
+       "n": 46,
+       "net": 0.1,
+       "total": 4.58
+      },
+      "2010": {
+       "n": 40,
+       "net": 0.039,
+       "total": 1.57
+      },
+      "2011": {
+       "n": 28,
+       "net": 0.26,
+       "total": 7.27
+      },
+      "2012": {
+       "n": 38,
+       "net": 0.026,
+       "total": 1
+      },
+      "2013": {
+       "n": 47,
+       "net": -0.066,
+       "total": -3.11
+      },
+      "2014": {
+       "n": 48,
+       "net": 0.035,
+       "total": 1.67
+      },
+      "2015": {
+       "n": 51,
+       "net": -0.023,
+       "total": -1.2
+      },
+      "2016": {
+       "n": 41,
+       "net": 0.073,
+       "total": 3.01
+      }
+     },
+     "medianRisk": 12.18
+    },
+    "outOfSample": {
+     "from": "2017-01-01",
+     "to": "2026-11-13",
+     "n": 367,
+     "gross": 0.086,
+     "net": 0.042,
+     "net2": -0.003,
+     "totalNet": 15.24,
+     "win": 0.499,
+     "maxDD": -10.73,
+     "months": 119,
+     "t": 1.1,
+     "p": 0.1348,
+     "fillStops": 0,
+     "signals": 392,
+     "unfilled": 25,
+     "exits": {
+      "time": 192,
+      "target": 106,
+      "stop": 69
+     },
+     "buys": {
+      "n": 185,
+      "gross": 0.131,
+      "net": 0.086,
+      "net2": 0.042,
+      "totalNet": 15.97,
+      "win": 0.514,
+      "maxDD": -4.4,
+      "months": 119,
+      "t": 1.6,
+      "p": 0.0551,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 182,
+      "gross": 0.04,
+      "net": -0.004,
+      "net2": -0.048,
+      "totalNet": -0.73,
+      "win": 0.484,
+      "maxDD": -8.78,
+      "months": 119,
+      "t": -0.07,
+      "p": 0.5275,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 34,
+       "net": -0.201,
+       "total": -6.84
+      },
+      "2018": {
+       "n": 43,
+       "net": 0.103,
+       "total": 4.43
+      },
+      "2019": {
+       "n": 42,
+       "net": -0.013,
+       "total": -0.53
+      },
+      "2020": {
+       "n": 37,
+       "net": -0.025,
+       "total": -0.91
+      },
+      "2021": {
+       "n": 37,
+       "net": 0.121,
+       "total": 4.47
+      },
+      "2022": {
+       "n": 30,
+       "net": 0.08,
+       "total": 2.41
+      },
+      "2023": {
+       "n": 37,
+       "net": -0.003,
+       "total": -0.12
+      },
+      "2024": {
+       "n": 42,
+       "net": 0.061,
+       "total": 2.57
+      },
+      "2025": {
+       "n": 38,
+       "net": 0.188,
+       "total": 7.13
+      },
+      "2026": {
+       "n": 27,
+       "net": 0.098,
+       "total": 2.64
+      }
+     },
+     "medianRisk": 16.05
+    },
+    "oosFirstHalf": {
+     "from": "2017-01-01",
+     "to": "2021-12-31",
+     "n": 193,
+     "gross": 0.062,
+     "net": 0.003,
+     "net2": -0.056,
+     "totalNet": 0.62,
+     "win": 0.456,
+     "maxDD": -10.73,
+     "months": 60,
+     "t": 0.06,
+     "p": 0.4764,
+     "fillStops": 0,
+     "signals": 206,
+     "unfilled": 13,
+     "exits": {
+      "time": 102,
+      "target": 54,
+      "stop": 37
+     },
+     "buys": {
+      "n": 98,
+      "gross": 0.111,
+      "net": 0.05,
+      "net2": -0.01,
+      "totalNet": 4.94,
+      "win": 0.469,
+      "maxDD": -3.7,
+      "months": 60,
+      "t": 0.73,
+      "p": 0.2321,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 95,
+      "gross": 0.013,
+      "net": -0.046,
+      "net2": -0.104,
+      "totalNet": -4.33,
+      "win": 0.442,
+      "maxDD": -8.78,
+      "months": 60,
+      "t": -0.55,
+      "p": 0.7088,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 34,
+       "net": -0.201,
+       "total": -6.84
+      },
+      "2018": {
+       "n": 43,
+       "net": 0.103,
+       "total": 4.43
+      },
+      "2019": {
+       "n": 42,
+       "net": -0.013,
+       "total": -0.53
+      },
+      "2020": {
+       "n": 37,
+       "net": -0.025,
+       "total": -0.91
+      },
+      "2021": {
+       "n": 37,
+       "net": 0.121,
+       "total": 4.47
+      }
+     },
+     "medianRisk": 11.04
+    },
+    "oosSecondHalf": {
+     "from": "2022-01-01",
+     "to": "2026-11-13",
+     "n": 174,
+     "gross": 0.112,
+     "net": 0.084,
+     "net2": 0.057,
+     "totalNet": 14.62,
+     "win": 0.546,
+     "maxDD": -4.73,
+     "months": 59,
+     "t": 1.62,
+     "p": 0.053,
+     "fillStops": 0,
+     "signals": 186,
+     "unfilled": 12,
+     "exits": {
+      "time": 90,
+      "target": 52,
+      "stop": 32
+     },
+     "buys": {
+      "n": 87,
+      "gross": 0.153,
+      "net": 0.127,
+      "net2": 0.1,
+      "totalNet": 11.03,
+      "win": 0.563,
+      "maxDD": -4.4,
+      "months": 59,
+      "t": 1.49,
+      "p": 0.0684,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 87,
+      "gross": 0.07,
+      "net": 0.041,
+      "net2": 0.013,
+      "totalNet": 3.59,
+      "win": 0.529,
+      "maxDD": -6.39,
+      "months": 59,
+      "t": 0.5,
+      "p": 0.3079,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2022": {
+       "n": 30,
+       "net": 0.08,
+       "total": 2.41
+      },
+      "2023": {
+       "n": 37,
+       "net": -0.003,
+       "total": -0.12
+      },
+      "2024": {
+       "n": 42,
+       "net": 0.061,
+       "total": 2.57
+      },
+      "2025": {
+       "n": 38,
+       "net": 0.188,
+       "total": 7.13
+      },
+      "2026": {
+       "n": 27,
+       "net": 0.098,
+       "total": 2.64
+      }
+     },
+     "medianRisk": 22.4
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "pool": 2140,
+    "perSeed": 392,
+    "p95": 0.023,
+    "median": 0.002,
+    "min": -0.064,
+    "max": 0.043,
+    "real": 0.042,
+    "beaten": 39,
+    "means": [
+     0.021,
+     0.017,
+     -0.06,
+     -0.009,
+     0.023,
+     -0.029,
+     -0.007,
+     -0.025,
+     0.013,
+     -0.006,
+     0.012,
+     -0.034,
+     0.001,
+     0.007,
+     -0.031,
+     -0.02,
+     -0.024,
+     0.023,
+     0.012,
+     -0.008,
+     0.018,
+     -0.023,
+     0.026,
+     -0.011,
+     0.014,
+     -0.024,
+     -0.064,
+     0.017,
+     -0.046,
+     -0.05,
+     0.02,
+     0.043,
+     0.016,
+     0.009,
+     -0.015,
+     0.019,
+     -0.015,
+     0.016,
+     0.019,
+     0.002
+    ]
+   },
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm": false,
+    "isPositive": true,
+    "oos2xCosts": false,
+    "placebo": true,
+    "oosN30": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "label": "tight inside day (range < 0.6 x ATR14); the T1 bracket and exit",
+   "windows": {
+    "inSample": {
+     "from": "2008-01-01",
+     "to": "2016-12-31",
+     "n": 145,
+     "gross": 0.269,
+     "net": 0.201,
+     "net2": 0.134,
+     "totalNet": 29.16,
+     "win": 0.552,
+     "maxDD": -5.51,
+     "months": 108,
+     "t": 2.35,
+     "p": 0.0093,
+     "fillStops": 0,
+     "signals": 152,
+     "unfilled": 7,
+     "exits": {
+      "stop": 39,
+      "time": 106
+     },
+     "buys": {
+      "n": 67,
+      "gross": 0.272,
+      "net": 0.21,
+      "net2": 0.148,
+      "totalNet": 14.06,
+      "win": 0.597,
+      "maxDD": -3.48,
+      "months": 108,
+      "t": 1.78,
+      "p": 0.0372,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 78,
+      "gross": 0.266,
+      "net": 0.194,
+      "net2": 0.121,
+      "totalNet": 15.1,
+      "win": 0.513,
+      "maxDD": -6.34,
+      "months": 108,
+      "t": 1.44,
+      "p": 0.0745,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2008": {
+       "n": 15,
+       "net": 0.046,
+       "total": 0.69
+      },
+      "2009": {
+       "n": 17,
+       "net": 0.144,
+       "total": 2.45
+      },
+      "2010": {
+       "n": 12,
+       "net": -0.102,
+       "total": -1.22
+      },
+      "2011": {
+       "n": 8,
+       "net": 0.684,
+       "total": 5.47
+      },
+      "2012": {
+       "n": 15,
+       "net": 0.095,
+       "total": 1.43
+      },
+      "2013": {
+       "n": 22,
+       "net": 0.168,
+       "total": 3.7
+      },
+      "2014": {
+       "n": 22,
+       "net": 0.406,
+       "total": 8.93
+      },
+      "2015": {
+       "n": 19,
+       "net": 0.235,
+       "total": 4.47
+      },
+      "2016": {
+       "n": 15,
+       "net": 0.216,
+       "total": 3.24
+      }
+     },
+     "medianRisk": 9.22
+    },
+    "outOfSample": {
+     "from": "2017-01-01",
+     "to": "2026-11-13",
+     "n": 126,
+     "gross": 0.051,
+     "net": -0.004,
+     "net2": -0.06,
+     "totalNet": -0.57,
+     "win": 0.468,
+     "maxDD": -12.24,
+     "months": 119,
+     "t": -0.05,
+     "p": 0.5195,
+     "fillStops": 0,
+     "signals": 128,
+     "unfilled": 2,
+     "exits": {
+      "time": 85,
+      "stop": 41
+     },
+     "buys": {
+      "n": 65,
+      "gross": -0.001,
+      "net": -0.056,
+      "net2": -0.111,
+      "totalNet": -3.64,
+      "win": 0.462,
+      "maxDD": -10.38,
+      "months": 119,
+      "t": -0.47,
+      "p": 0.6799,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 61,
+      "gross": 0.106,
+      "net": 0.05,
+      "net2": -0.005,
+      "totalNet": 3.07,
+      "win": 0.475,
+      "maxDD": -6.04,
+      "months": 119,
+      "t": 0.37,
+      "p": 0.3553,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 13,
+       "net": -0.346,
+       "total": -4.5
+      },
+      "2018": {
+       "n": 11,
+       "net": 0.084,
+       "total": 0.93
+      },
+      "2019": {
+       "n": 14,
+       "net": -0.27,
+       "total": -3.79
+      },
+      "2020": {
+       "n": 13,
+       "net": -0.24,
+       "total": -3.12
+      },
+      "2021": {
+       "n": 12,
+       "net": 0.474,
+       "total": 5.69
+      },
+      "2022": {
+       "n": 9,
+       "net": 0.081,
+       "total": 0.73
+      },
+      "2023": {
+       "n": 19,
+       "net": -0.094,
+       "total": -1.79
+      },
+      "2024": {
+       "n": 8,
+       "net": 0.459,
+       "total": 3.67
+      },
+      "2025": {
+       "n": 13,
+       "net": 0.228,
+       "total": 2.96
+      },
+      "2026": {
+       "n": 14,
+       "net": -0.096,
+       "total": -1.34
+      }
+     },
+     "medianRisk": 12.72
+    },
+    "oosFirstHalf": {
+     "from": "2017-01-01",
+     "to": "2021-12-31",
+     "n": 63,
+     "gross": 0.001,
+     "net": -0.076,
+     "net2": -0.153,
+     "totalNet": -4.8,
+     "win": 0.381,
+     "maxDD": -12.24,
+     "months": 60,
+     "t": -0.51,
+     "p": 0.6946,
+     "fillStops": 0,
+     "signals": 64,
+     "unfilled": 1,
+     "exits": {
+      "time": 38,
+      "stop": 25
+     },
+     "buys": {
+      "n": 33,
+      "gross": -0.182,
+      "net": -0.26,
+      "net2": -0.338,
+      "totalNet": -8.58,
+      "win": 0.333,
+      "maxDD": -10.38,
+      "months": 60,
+      "t": -1.67,
+      "p": 0.9525,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 30,
+      "gross": 0.202,
+      "net": 0.126,
+      "net2": 0.05,
+      "totalNet": 3.79,
+      "win": 0.433,
+      "maxDD": -6.04,
+      "months": 60,
+      "t": 0.5,
+      "p": 0.3075,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2017": {
+       "n": 13,
+       "net": -0.346,
+       "total": -4.5
+      },
+      "2018": {
+       "n": 11,
+       "net": 0.084,
+       "total": 0.93
+      },
+      "2019": {
+       "n": 14,
+       "net": -0.27,
+       "total": -3.79
+      },
+      "2020": {
+       "n": 13,
+       "net": -0.24,
+       "total": -3.12
+      },
+      "2021": {
+       "n": 12,
+       "net": 0.474,
+       "total": 5.69
+      }
+     },
+     "medianRisk": 7.6
+    },
+    "oosSecondHalf": {
+     "from": "2022-01-01",
+     "to": "2026-11-13",
+     "n": 63,
+     "gross": 0.1,
+     "net": 0.067,
+     "net2": 0.034,
+     "totalNet": 4.23,
+     "win": 0.556,
+     "maxDD": -3.91,
+     "months": 59,
+     "t": 0.63,
+     "p": 0.2646,
+     "fillStops": 0,
+     "signals": 64,
+     "unfilled": 1,
+     "exits": {
+      "time": 47,
+      "stop": 16
+     },
+     "buys": {
+      "n": 32,
+      "gross": 0.186,
+      "net": 0.154,
+      "net2": 0.123,
+      "totalNet": 4.94,
+      "win": 0.594,
+      "maxDD": -3.03,
+      "months": 59,
+      "t": 0.86,
+      "p": 0.1953,
+      "fillStops": 0
+     },
+     "sells": {
+      "n": 31,
+      "gross": 0.012,
+      "net": -0.023,
+      "net2": -0.058,
+      "totalNet": -0.71,
+      "win": 0.516,
+      "maxDD": -3.5,
+      "months": 59,
+      "t": -0.2,
+      "p": 0.5803,
+      "fillStops": 0
+     },
+     "byYear": {
+      "2022": {
+       "n": 9,
+       "net": 0.081,
+       "total": 0.73
+      },
+      "2023": {
+       "n": 19,
+       "net": -0.094,
+       "total": -1.79
+      },
+      "2024": {
+       "n": 8,
+       "net": 0.459,
+       "total": 3.67
+      },
+      "2025": {
+       "n": 13,
+       "net": 0.228,
+       "total": 2.96
+      },
+      "2026": {
+       "n": 14,
+       "net": -0.096,
+       "total": -1.34
+      }
+     },
+     "medianRisk": 19.19
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "pool": 165,
+    "perSeed": 128,
+    "p95": 0.273,
+    "median": 0.122,
+    "min": -0.117,
+    "max": 0.316,
+    "real": -0.004,
+    "beaten": 3,
+    "means": [
+     0.057,
+     -0.117,
+     0.129,
+     0.215,
+     0.039,
+     0.058,
+     0.129,
+     0.273,
+     0.14,
+     0.17,
+     0.141,
+     0.16,
+     0.316,
+     -0.047,
+     -0.071,
+     0.213,
+     0.177,
+     0.203,
+     0.156,
+     0.285,
+     0.077,
+     0.209,
+     0.115,
+     0.12,
+     0.161,
+     0.002,
+     0.124,
+     0.117,
+     0.091,
+     0.035,
+     0.129,
+     0.1,
+     0.064,
+     0.099,
+     0.096,
+     0.004,
+     0.015,
+     0.214,
+     0.068,
+     0.144
+    ]
+   },
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm": false,
+    "isPositive": true,
+    "oos2xCosts": false,
+    "placebo": false,
+    "oosN30": true
+   },
+   "pass": false
+  }
+ }
+}
