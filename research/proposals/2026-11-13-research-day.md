@@ -82,6 +82,7 @@ paper system with a measured, clearly negative record.
 | 64 | US index pair spread reversion: US2000/NAS100 and SPX500/US30, fade a 2-sd z-score | 71 each (2016 →) | −0.775 / −0.846R a trade (month t −2.0 / −2.2); loses before costs; stretched spreads kept running | #881 |
 | 65 | Monthly options-expiry week on SPX500 / NAS100 (published effect) | 130 each (2016 →) | 0 of 4; expiry-week longs −0.016 / +0.026R, week-after shorts lose (−0.11 / −0.15R); no better than the month's other weeks | #882 |
 | 66 | The London 4 pm fix on six forex majors: follow the run into it or fade after it | 3,510 (2020 →) | 0 of 2; about zero before costs, −0.15 / −0.16R a trade after (month t −7 / −10) | #883 |
+| 67 | Following 2-sd stretches of non-US index spreads (DE40/UK100, EU50/UK100, JP225/AU200, DE40/FR40) | FAIL, 0 of 5: −0.107R net (n 244, t −1.56) 2016-now, −0.072R 2009-15; ~+0.02R before costs, financing turns it negative | #884 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
