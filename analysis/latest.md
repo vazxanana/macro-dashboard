@@ -52,7 +52,7 @@ Built by the Trader at 2026-11-14 03:21 UTC. ICT desk: the last 7 days; mirror: 
 
 **Dip-buy candidate (NQ/ES, paper only):** 5 signals in 7 days, 4 closed +2.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9802.66 · 2 open (checked 2026-11-14 03:19 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9802.66 · 2 open (checked 2026-11-14 03:21 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 
