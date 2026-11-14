@@ -128,6 +128,7 @@ paper system with a measured, clearly negative record.
 | 110 | Tokyo first-hour range breakout on USD/JPY, AUD/USD, NZD/USD (hold to 06:00 UTC) | FAIL 0 of 3: about zero before costs, −0.07 to −0.09R a trade after; the breakout side is no better than a coin flip | #929 |
 | 111 | Buy the Swiss franc for 5 days after a sharp S&P 500 fall (short USD/CHF, EUR/CHF, AUD/CHF) | FAIL 0 of 3: negative after costs in both windows, below random entry days on every pair | #930 |
 | 112 | Forex round numbers ("00" levels on four majors): fade the first touch, or follow the break | FAIL 0 of 2: both lose before and after costs in every window, pair and year; the real levels do worse than randomly shifted ones (stopped out more often either way) | #931 |
+| 113 | Intraday momentum on gold, silver, crude: the first half hour of the US floor session sets the side of the last half hour | FAIL 0 of 3: about zero before costs, −0.16 to −0.64R a trade after; hit rate no better than a coin | #932 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
