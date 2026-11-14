@@ -31,7 +31,7 @@ paper system with a measured, clearly negative record.
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
 | 14 | Gold/silver ratio mean reversion | 18 / 16 | −0.98 % / −1.27 % a trade, t −1.20 / −2.03; loses before costs | #829 |
 | 15 | Pre-FOMC announcement drift on US indices (published effect) | 86 (2016 →) | SPX +0.044R a trade, t 1.35, under its placebo; NAS100 t 2.45 but under its placebo too: mostly the indices' own drift | #831 |
-| 16 | G10 FX carry (published effect) | — | **not run**: interest-rate data (FRED and others) not reachable from the build sandbox | #830 |
+| 16 | G10 FX carry (published effect) | 448 legs (2016 →) | revision 2 run on an approximate policy-rate table (from memory, marked): **FAIL, 0 of 2**: +0.066R a month (t 0.34), 2006-15 +0.124R (t 0.51); carry ~+0.07R a month against 1.5 %-of-price stops; the S&P volatility filter made it worse | #830 |
 | 17 | One-week time-series momentum in crypto (published effect) | 4 coins, 2022 → | long/flat Sharpe 0.37 (t 0.77), long/short 0.20, below buy-and-hold 0.44; worked 2018-21, faded since | #833 |
 | 18 | One-week cross-sectional reversal in G10 FX (published effect) | 7 currencies, 2016 → | Sharpe −0.51, t −1.60; flat even before costs; 29 of 40 placebos | #834 |
 | 19 | Intraday momentum: first half-hour predicts the last (published effect) | 2,672 / 2,682 | SPX −0.159R, NAS100 −0.093R a trade net (t −9.1 / −5.5); about zero before costs; the effect faded after 2015 | #835 |
