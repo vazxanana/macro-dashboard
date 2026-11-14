@@ -76,6 +76,8 @@ paper system with a measured, clearly negative record.
 | 58 | Gold session drift: short London afternoon + New York, long Asia with a 50-day trend filter | 1,718 / 1,063 / 683 (2020 →) | 0 of 3; best +0.023R a trade (t 1.37), every positive stream negative in 2008-19; the Asia gain is real before costs but under $0.30 | #875 |
 | 59 | Big NAS100 sessions spilling into BTC / ETH overnight (follow or fade) | 764 (2022 →) | 0 of 2; −0.043 / −0.070R a trade, at the placebo's middle; 2018-20 replication could not be run (no older crypto intraday data reachable) | #876 |
 | 60 | **Your market-cycle rule as an entry** on five forex majors (the index rule, unchanged) | 1,892 / 4,677 (2016 →) | −0.135 / −0.089R a trade (month t −4.5 / −4.3), every pair negative in both windows; random entries with the same H4 bias do better | #877 |
+| 61 | **Gotobi**: USD/JPY and EUR/JPY around the 09:55 Tokyo fix on Japanese settlement days (published) | 771 (2016 →) | **one cell of four passes**: sell USD/JPY at the fix, buy back 15:00 Tokyo, +0.148R a trade, month t 2.74, Holm p 0.012, 2010-15 +0.131R (t 2.45), beats all 40 placebos; thin over costs (+0.035R at 2x costs). A frozen replication on four other yen crosses and pre-2010 history is running before anyone acts | #878 |
+| 62 | Energy seasonality: crude long Feb-Apr, natural gas Sep-Oct long and Feb-Mar short | ~11 years each | 0 of 4; crude +0.96 / +1.08R a year (t 1.4) but 2026 carries it; Holm p 0.35 | #879 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
