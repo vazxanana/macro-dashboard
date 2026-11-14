@@ -1,0 +1,5174 @@
+{
+ "study": "commodity-xs-momentum",
+ "built": "2026-11-14",
+ "rule": "12-1 cross-sectional, top 3 long / bottom 3 short, 1R = 2 x ATR(20) stop, monthly",
+ "params": {
+  "LOOK": 12,
+  "SKIP": 1,
+  "TOP": 3,
+  "MIN_RANKED": 10,
+  "ATR_N": 20,
+  "ATR_MULT": 2,
+  "COST_ABS": {
+   "xau": 0.3,
+   "xag": 0.03
+  },
+  "COST_FRAC": 0.0006,
+  "FIN_YEAR": 0.03,
+  "JUMP": 0.03,
+  "SEEDS": 40,
+  "NW_LAGS": 3
+ },
+ "universe": [
+  "xau",
+  "xag",
+  "xpt",
+  "xpd",
+  "xcu",
+  "bco",
+  "wtico",
+  "natgas",
+  "corn",
+  "wheat",
+  "soybn",
+  "sugar"
+ ],
+ "lastMonth": "2026-10",
+ "data": {
+  "xau": {
+   "first": "2006-03",
+   "last": "2026-11-06",
+   "candles": 5364
+  },
+  "xag": {
+   "first": "2006-03",
+   "last": "2026-11-06",
+   "candles": 5365
+  },
+  "xpt": {
+   "first": "2005-01",
+   "last": "2026-11-06",
+   "candles": 5645
+  },
+  "xpd": {
+   "first": "2005-01",
+   "last": "2026-11-06",
+   "candles": 5646
+  },
+  "xcu": {
+   "first": "2003-03",
+   "last": "2026-11-06",
+   "candles": 6092
+  },
+  "bco": {
+   "first": "2003-08",
+   "last": "2026-11-06",
+   "candles": 5976
+  },
+  "wtico": {
+   "first": "2003-01",
+   "last": "2026-11-06",
+   "candles": 6151
+  },
+  "natgas": {
+   "first": "2003-01",
+   "last": "2026-11-06",
+   "candles": 6142
+  },
+  "corn": {
+   "first": "2003-03",
+   "last": "2026-11-06",
+   "candles": 5985
+  },
+  "wheat": {
+   "first": "2003-03",
+   "last": "2026-11-06",
+   "candles": 5980
+  },
+  "soybn": {
+   "first": "2003-03",
+   "last": "2026-11-06",
+   "candles": 5980
+  },
+  "sugar": {
+   "first": "2003-03",
+   "last": "2026-11-06",
+   "candles": 5954
+  }
+ },
+ "windows": {
+  "decisive": {
+   "from": "2016-01",
+   "to": "2026-10"
+  },
+  "replication": {
+   "from": "2006-02",
+   "to": "2015-12"
+  }
+ },
+ "decisive": {
+  "from": "2016-01",
+  "to": "2026-10",
+  "gross": {
+   "n": 130,
+   "mean": -0.026,
+   "total": -3.33,
+   "tNW": -0.46,
+   "tPlain": -0.48,
+   "sharpe": -0.15,
+   "dd": -8.54,
+   "posPct": 43.1
+  },
+  "net": {
+   "n": 130,
+   "mean": -0.071,
+   "total": -9.29,
+   "tNW": -1.3,
+   "tPlain": -1.37,
+   "sharpe": -0.42,
+   "dd": -13.33,
+   "posPct": 40
+  },
+  "net2x": {
+   "n": 130,
+   "mean": -0.117,
+   "total": -15.26,
+   "tNW": -2.15,
+   "tPlain": -2.28,
+   "sharpe": -0.69,
+   "dd": -18.26,
+   "posPct": 38.5
+  },
+  "netNoJumps": {
+   "n": 130,
+   "mean": -0.104,
+   "total": -13.54,
+   "tNW": -1.84,
+   "tPlain": -1.92,
+   "sharpe": -0.58,
+   "dd": -16.9,
+   "posPct": 39.2
+  },
+  "legs": {
+   "n": 780,
+   "long": 390,
+   "short": 390,
+   "winPct": 38.2,
+   "stopped": 400,
+   "gapFills": 12,
+   "avgGross": -0.026,
+   "avgCost": 0.013,
+   "avgFin": 0.033,
+   "jumpLegs": 51,
+   "jumpNetR": 18.75
+  },
+  "missingLegs": 0
+ },
+ "replication": {
+  "from": "2006-02",
+  "to": "2015-12",
+  "gross": {
+   "n": 119,
+   "mean": 0.073,
+   "total": 8.7,
+   "tNW": 1.72,
+   "tPlain": 1.49,
+   "sharpe": 0.47,
+   "dd": -3.06,
+   "posPct": 48.7
+  },
+  "net": {
+   "n": 119,
+   "mean": 0.029,
+   "total": 3.43,
+   "tNW": 0.69,
+   "tPlain": 0.59,
+   "sharpe": 0.19,
+   "dd": -3.3,
+   "posPct": 47.1
+  },
+  "net2x": {
+   "n": 119,
+   "mean": -0.016,
+   "total": -1.85,
+   "tNW": -0.38,
+   "tPlain": -0.33,
+   "sharpe": -0.1,
+   "dd": -4.96,
+   "posPct": 45.4
+  },
+  "netNoJumps": {
+   "n": 119,
+   "mean": 0.022,
+   "total": 2.66,
+   "tNW": 0.52,
+   "tPlain": 0.46,
+   "sharpe": 0.15,
+   "dd": -3.3,
+   "posPct": 47.1
+  },
+  "legs": {
+   "n": 714,
+   "long": 357,
+   "short": 357,
+   "winPct": 40.2,
+   "stopped": 349,
+   "gapFills": 5,
+   "avgGross": 0.073,
+   "avgCost": 0.012,
+   "avgFin": 0.032,
+   "jumpLegs": 16,
+   "jumpNetR": 7.36
+  },
+  "missingLegs": 0
+ },
+ "placebo": {
+  "seeds": 40,
+  "real": -0.0715,
+  "p5": -0.1192,
+  "p50": -0.0703,
+  "p95": -0.0004,
+  "max": 0.0664,
+  "above": 20,
+  "runs": [
+   {
+    "seed": 1,
+    "mean": 0.0664,
+    "tNW": 1.18
+   },
+   {
+    "seed": 2,
+    "mean": -0.0972,
+    "tNW": -1.86
+   },
+   {
+    "seed": 3,
+    "mean": -0.1101,
+    "tNW": -2.37
+   },
+   {
+    "seed": 4,
+    "mean": -0.0717,
+    "tNW": -1.76
+   },
+   {
+    "seed": 5,
+    "mean": -0.0886,
+    "tNW": -2.46
+   },
+   {
+    "seed": 6,
+    "mean": -0.0533,
+    "tNW": -1.27
+   },
+   {
+    "seed": 7,
+    "mean": -0.0477,
+    "tNW": -1.07
+   },
+   {
+    "seed": 8,
+    "mean": -0.0794,
+    "tNW": -1.61
+   },
+   {
+    "seed": 9,
+    "mean": -0.0856,
+    "tNW": -2.19
+   },
+   {
+    "seed": 10,
+    "mean": -0.0392,
+    "tNW": -0.83
+   },
+   {
+    "seed": 11,
+    "mean": -0.052,
+    "tNW": -1.43
+   },
+   {
+    "seed": 12,
+    "mean": -0.0734,
+    "tNW": -1.98
+   },
+   {
+    "seed": 13,
+    "mean": -0.1094,
+    "tNW": -2.98
+   },
+   {
+    "seed": 14,
+    "mean": -0.098,
+    "tNW": -2.1
+   },
+   {
+    "seed": 15,
+    "mean": -0.0865,
+    "tNW": -2.06
+   },
+   {
+    "seed": 16,
+    "mean": -0.0772,
+    "tNW": -1.83
+   },
+   {
+    "seed": 17,
+    "mean": -0.029,
+    "tNW": -0.54
+   },
+   {
+    "seed": 18,
+    "mean": -0.0689,
+    "tNW": -1.52
+   },
+   {
+    "seed": 19,
+    "mean": -0.0322,
+    "tNW": -0.82
+   },
+   {
+    "seed": 20,
+    "mean": -0.1186,
+    "tNW": -2.96
+   },
+   {
+    "seed": 21,
+    "mean": -0.0216,
+    "tNW": -0.42
+   },
+   {
+    "seed": 22,
+    "mean": -0.0264,
+    "tNW": -0.61
+   },
+   {
+    "seed": 23,
+    "mean": -0.067,
+    "tNW": -1.82
+   },
+   {
+    "seed": 24,
+    "mean": -0.0475,
+    "tNW": -1.26
+   },
+   {
+    "seed": 25,
+    "mean": -0.0557,
+    "tNW": -1.41
+   },
+   {
+    "seed": 26,
+    "mean": -0.1095,
+    "tNW": -2.97
+   },
+   {
+    "seed": 27,
+    "mean": -0.0651,
+    "tNW": -1.67
+   },
+   {
+    "seed": 28,
+    "mean": -0.0015,
+    "tNW": -0.03
+   },
+   {
+    "seed": 29,
+    "mean": -0.1303,
+    "tNW": -2.94
+   },
+   {
+    "seed": 30,
+    "mean": -0.0491,
+    "tNW": -1.05
+   },
+   {
+    "seed": 31,
+    "mean": -0.0721,
+    "tNW": -1.72
+   },
+   {
+    "seed": 32,
+    "mean": -0.0551,
+    "tNW": -1.44
+   },
+   {
+    "seed": 33,
+    "mean": -0.1024,
+    "tNW": -2.59
+   },
+   {
+    "seed": 34,
+    "mean": -0.097,
+    "tNW": -2.45
+   },
+   {
+    "seed": 35,
+    "mean": -0.0829,
+    "tNW": -1.79
+   },
+   {
+    "seed": 36,
+    "mean": -0.1598,
+    "tNW": -4.13
+   },
+   {
+    "seed": 37,
+    "mean": -0.0605,
+    "tNW": -1.43
+   },
+   {
+    "seed": 38,
+    "mean": -0.1148,
+    "tNW": -3.18
+   },
+   {
+    "seed": 39,
+    "mean": 0.0196,
+    "tNW": 0.55
+   },
+   {
+    "seed": 40,
+    "mean": -0.003,
+    "tNW": -0.07
+   }
+  ]
+ },
+ "checks": {
+  "decisivePositive": false,
+  "replicationPositive": true,
+  "decisiveT2": false,
+  "fullDecisiveWindow": true,
+  "abovePlacebo95": false
+ },
+ "verdict": "FAIL",
+ "byYear": {
+  "2006": {
+   "months": 11,
+   "gross": 1.09,
+   "net": 0.63
+  },
+  "2007": {
+   "months": 12,
+   "gross": 0.29,
+   "net": -0.24
+  },
+  "2008": {
+   "months": 12,
+   "gross": 2.04,
+   "net": 1.68
+  },
+  "2009": {
+   "months": 12,
+   "gross": 2.05,
+   "net": 1.63
+  },
+  "2010": {
+   "months": 12,
+   "gross": -0.48,
+   "net": -0.92
+  },
+  "2011": {
+   "months": 12,
+   "gross": 0.71,
+   "net": 0.21
+  },
+  "2012": {
+   "months": 12,
+   "gross": -0.7,
+   "net": -1.29
+  },
+  "2013": {
+   "months": 12,
+   "gross": 2.66,
+   "net": 1.95
+  },
+  "2014": {
+   "months": 12,
+   "gross": 0.81,
+   "net": 0.08
+  },
+  "2015": {
+   "months": 12,
+   "gross": 0.24,
+   "net": -0.31
+  },
+  "2016": {
+   "months": 12,
+   "gross": -0.78,
+   "net": -1.34
+  },
+  "2017": {
+   "months": 12,
+   "gross": -1.19,
+   "net": -1.89
+  },
+  "2018": {
+   "months": 12,
+   "gross": -3.05,
+   "net": -3.69
+  },
+  "2019": {
+   "months": 12,
+   "gross": 0.02,
+   "net": -0.69
+  },
+  "2020": {
+   "months": 12,
+   "gross": 0.25,
+   "net": -0.18
+  },
+  "2021": {
+   "months": 12,
+   "gross": 0.67,
+   "net": 0.14
+  },
+  "2022": {
+   "months": 12,
+   "gross": -0.65,
+   "net": -1.03
+  },
+  "2023": {
+   "months": 12,
+   "gross": -1.99,
+   "net": -2.46
+  },
+  "2024": {
+   "months": 12,
+   "gross": -0.7,
+   "net": -1.3
+  },
+  "2025": {
+   "months": 12,
+   "gross": 5.66,
+   "net": 5.01
+  },
+  "2026": {
+   "months": 10,
+   "gross": -1.56,
+   "net": -1.86
+  }
+ },
+ "byMarket": {
+  "decisive": {
+   "xau": {
+    "long": 55,
+    "short": 14,
+    "netR": 24.68,
+    "grossR": 29.54
+   },
+   "xag": {
+    "long": 58,
+    "short": 29,
+    "netR": 3.32,
+    "grossR": 8.41
+   },
+   "xpt": {
+    "long": 20,
+    "short": 33,
+    "netR": -6.71,
+    "grossR": -4.36
+   },
+   "xpd": {
+    "long": 42,
+    "short": 41,
+    "netR": 5.9,
+    "grossR": 9.16
+   },
+   "xcu": {
+    "long": 21,
+    "short": 15,
+    "netR": -5.49,
+    "grossR": -3.53
+   },
+   "bco": {
+    "long": 42,
+    "short": 40,
+    "netR": -3.5,
+    "grossR": -0.37
+   },
+   "wtico": {
+    "long": 36,
+    "short": 41,
+    "netR": -17,
+    "grossR": -14.39
+   },
+   "natgas": {
+    "long": 42,
+    "short": 50,
+    "netR": -13.12,
+    "grossR": -10.66
+   },
+   "corn": {
+    "long": 17,
+    "short": 25,
+    "netR": -13.06,
+    "grossR": -10.61
+   },
+   "wheat": {
+    "long": 21,
+    "short": 29,
+    "netR": -28.55,
+    "grossR": -26.6
+   },
+   "soybn": {
+    "long": 7,
+    "short": 28,
+    "netR": -7.58,
+    "grossR": -5.37
+   },
+   "sugar": {
+    "long": 29,
+    "short": 45,
+    "netR": 5.36,
+    "grossR": 8.82
+   }
+  },
+  "replication": {
+   "xau": {
+    "long": 32,
+    "short": 13,
+    "netR": 3.12,
+    "grossR": 5.84
+   },
+   "xag": {
+    "long": 23,
+    "short": 25,
+    "netR": 19.41,
+    "grossR": 22.21
+   },
+   "xpt": {
+    "long": 7,
+    "short": 15,
+    "netR": -4.68,
+    "grossR": -3.44
+   },
+   "xpd": {
+    "long": 55,
+    "short": 19,
+    "netR": 9.62,
+    "grossR": 12.72
+   },
+   "xcu": {
+    "long": 27,
+    "short": 20,
+    "netR": 1.31,
+    "grossR": 3.26
+   },
+   "bco": {
+    "long": 16,
+    "short": 28,
+    "netR": 3.64,
+    "grossR": 5.59
+   },
+   "wtico": {
+    "long": 26,
+    "short": 44,
+    "netR": 0.21,
+    "grossR": 3.53
+   },
+   "natgas": {
+    "long": 29,
+    "short": 62,
+    "netR": -13.96,
+    "grossR": -11.18
+   },
+   "corn": {
+    "long": 45,
+    "short": 32,
+    "netR": -9.17,
+    "grossR": -5.88
+   },
+   "wheat": {
+    "long": 36,
+    "short": 32,
+    "netR": 2.73,
+    "grossR": 5.36
+   },
+   "soybn": {
+    "long": 31,
+    "short": 23,
+    "netR": 9.78,
+    "grossR": 12.58
+   },
+   "sugar": {
+    "long": 30,
+    "short": 44,
+    "netR": -1.46,
+    "grossR": 1.65
+   }
+  }
+ },
+ "variants": {
+  "6-1": {
+   "decisive": {
+    "from": "2016-01",
+    "to": "2026-10",
+    "gross": {
+     "n": 130,
+     "mean": 0.047,
+     "total": 6.06,
+     "tNW": 0.98,
+     "tPlain": 0.87,
+     "sharpe": 0.26,
+     "dd": -4.69,
+     "posPct": 47.7
+    },
+    "net": {
+     "n": 130,
+     "mean": 0,
+     "total": 0.01,
+     "tNW": 0,
+     "tPlain": 0,
+     "sharpe": 0,
+     "dd": -8.27,
+     "posPct": 45.4
+    },
+    "net2x": {
+     "n": 130,
+     "mean": -0.047,
+     "total": -6.05,
+     "tNW": -0.99,
+     "tPlain": -0.89,
+     "sharpe": -0.27,
+     "dd": -12.45,
+     "posPct": 40.8
+    },
+    "netNoJumps": {
+     "n": 130,
+     "mean": -0.052,
+     "total": -6.73,
+     "tNW": -0.97,
+     "tPlain": -0.96,
+     "sharpe": -0.29,
+     "dd": -13.97,
+     "posPct": 40
+    },
+    "legs": {
+     "n": 780,
+     "long": 390,
+     "short": 390,
+     "winPct": 40.8,
+     "stopped": 376,
+     "gapFills": 12,
+     "avgGross": 0.047,
+     "avgCost": 0.012,
+     "avgFin": 0.034,
+     "jumpLegs": 48,
+     "jumpNetR": 33.96
+    },
+    "missingLegs": 0
+   },
+   "replication": {
+    "from": "2006-02",
+    "to": "2015-12",
+    "gross": {
+     "n": 119,
+     "mean": -0.051,
+     "total": -6.08,
+     "tNW": -1.32,
+     "tPlain": -1.07,
+     "sharpe": -0.34,
+     "dd": -8.93,
+     "posPct": 36.1
+    },
+    "net": {
+     "n": 119,
+     "mean": -0.094,
+     "total": -11.16,
+     "tNW": -2.43,
+     "tPlain": -1.98,
+     "sharpe": -0.63,
+     "dd": -13.62,
+     "posPct": 34.5
+    },
+    "net2x": {
+     "n": 119,
+     "mean": -0.136,
+     "total": -16.24,
+     "tNW": -3.54,
+     "tPlain": -2.9,
+     "sharpe": -0.92,
+     "dd": -18.31,
+     "posPct": 33.6
+    },
+    "netNoJumps": {
+     "n": 119,
+     "mean": -0.106,
+     "total": -12.65,
+     "tNW": -2.73,
+     "tPlain": -2.28,
+     "sharpe": -0.72,
+     "dd": -14.92,
+     "posPct": 33.6
+    },
+    "legs": {
+     "n": 714,
+     "long": 357,
+     "short": 357,
+     "winPct": 35.9,
+     "stopped": 379,
+     "gapFills": 4,
+     "avgGross": -0.051,
+     "avgCost": 0.012,
+     "avgFin": 0.031,
+     "jumpLegs": 17,
+     "jumpNetR": 8.57
+    },
+    "missingLegs": 0
+   }
+  },
+  "3-1": {
+   "decisive": {
+    "from": "2016-01",
+    "to": "2026-10",
+    "gross": {
+     "n": 130,
+     "mean": -0.045,
+     "total": -5.85,
+     "tNW": -0.9,
+     "tPlain": -0.86,
+     "sharpe": -0.26,
+     "dd": -8.64,
+     "posPct": 43.1
+    },
+    "net": {
+     "n": 130,
+     "mean": -0.091,
+     "total": -11.84,
+     "tNW": -1.85,
+     "tPlain": -1.77,
+     "sharpe": -0.54,
+     "dd": -13.64,
+     "posPct": 38.5
+    },
+    "net2x": {
+     "n": 130,
+     "mean": -0.137,
+     "total": -17.84,
+     "tNW": -2.84,
+     "tPlain": -2.69,
+     "sharpe": -0.82,
+     "dd": -18.98,
+     "posPct": 33.1
+    },
+    "netNoJumps": {
+     "n": 130,
+     "mean": -0.124,
+     "total": -16.1,
+     "tNW": -2.51,
+     "tPlain": -2.35,
+     "sharpe": -0.72,
+     "dd": -18.53,
+     "posPct": 40
+    },
+    "legs": {
+     "n": 780,
+     "long": 390,
+     "short": 390,
+     "winPct": 38.5,
+     "stopped": 397,
+     "gapFills": 11,
+     "avgGross": -0.045,
+     "avgCost": 0.013,
+     "avgFin": 0.033,
+     "jumpLegs": 47,
+     "jumpNetR": 18.22
+    },
+    "missingLegs": 0
+   },
+   "replication": {
+    "from": "2006-02",
+    "to": "2015-12",
+    "gross": {
+     "n": 119,
+     "mean": 0.016,
+     "total": 1.87,
+     "tNW": 0.38,
+     "tPlain": 0.32,
+     "sharpe": 0.1,
+     "dd": -3.62,
+     "posPct": 47.1
+    },
+    "net": {
+     "n": 119,
+     "mean": -0.028,
+     "total": -3.28,
+     "tNW": -0.67,
+     "tPlain": -0.57,
+     "sharpe": -0.18,
+     "dd": -5.73,
+     "posPct": 43.7
+    },
+    "net2x": {
+     "n": 119,
+     "mean": -0.071,
+     "total": -8.44,
+     "tNW": -1.74,
+     "tPlain": -1.48,
+     "sharpe": -0.47,
+     "dd": -10.09,
+     "posPct": 39.5
+    },
+    "netNoJumps": {
+     "n": 119,
+     "mean": -0.035,
+     "total": -4.13,
+     "tNW": -0.8,
+     "tPlain": -0.69,
+     "sharpe": -0.22,
+     "dd": -6.46,
+     "posPct": 43.7
+    },
+    "legs": {
+     "n": 714,
+     "long": 357,
+     "short": 357,
+     "winPct": 39.6,
+     "stopped": 362,
+     "gapFills": 6,
+     "avgGross": 0.016,
+     "avgCost": 0.013,
+     "avgFin": 0.031,
+     "jumpLegs": 19,
+     "jumpNetR": 4.37
+    },
+    "missingLegs": 0
+   }
+  }
+ },
+ "months": [
+  {
+   "month": "2006-02",
+   "ranked": 10,
+   "long": [
+    "natgas",
+    "sugar",
+    "xcu"
+   ],
+   "short": [
+    "wheat",
+    "xpt",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.6694,
+   "net": -0.7144
+  },
+  {
+   "month": "2006-03",
+   "ranked": 10,
+   "long": [
+    "sugar",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "wheat",
+    "corn",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": 0.845,
+   "net": 0.7871
+  },
+  {
+   "month": "2006-04",
+   "ranked": 10,
+   "long": [
+    "sugar",
+    "xcu",
+    "xpd"
+   ],
+   "short": [
+    "corn",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 1.2906,
+   "net": 1.2412
+  },
+  {
+   "month": "2006-05",
+   "ranked": 10,
+   "long": [
+    "sugar",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "wheat",
+    "natgas",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.1281,
+   "net": -0.1737
+  },
+  {
+   "month": "2006-06",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "xpd",
+    "sugar"
+   ],
+   "short": [
+    "wheat",
+    "natgas",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.336,
+   "net": -0.3643
+  },
+  {
+   "month": "2006-07",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "xpd",
+    "sugar"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.1912,
+   "net": -0.2306
+  },
+  {
+   "month": "2006-08",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "sugar",
+    "xpd"
+   ],
+   "short": [
+    "corn",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.7288,
+   "net": 0.6799
+  },
+  {
+   "month": "2006-09",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "xpd",
+    "sugar"
+   ],
+   "short": [
+    "wtico",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.2355,
+   "net": 0.1862
+  },
+  {
+   "month": "2006-10",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "xpd",
+    "xpt"
+   ],
+   "short": [
+    "wtico",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.3947,
+   "net": -0.4218
+  },
+  {
+   "month": "2006-11",
+   "ranked": 10,
+   "long": [
+    "xcu",
+    "wheat",
+    "xpd"
+   ],
+   "short": [
+    "sugar",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.5353,
+   "net": -0.5643
+  },
+  {
+   "month": "2006-12",
+   "ranked": 10,
+   "long": [
+    "corn",
+    "xcu",
+    "wheat"
+   ],
+   "short": [
+    "wtico",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.2428,
+   "net": 0.2069
+  },
+  {
+   "month": "2007-01",
+   "ranked": 10,
+   "long": [
+    "corn",
+    "wheat",
+    "xcu"
+   ],
+   "short": [
+    "wtico",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.1357,
+   "net": -0.1712
+  },
+  {
+   "month": "2007-02",
+   "ranked": 10,
+   "long": [
+    "corn",
+    "wheat",
+    "xcu"
+   ],
+   "short": [
+    "wtico",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.1309,
+   "net": -0.1656
+  },
+  {
+   "month": "2007-03",
+   "ranked": 10,
+   "long": [
+    "corn",
+    "wheat",
+    "soybn"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.0271
+  },
+  {
+   "month": "2007-04",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "soybn"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.5944,
+   "net": 0.5369
+  },
+  {
+   "month": "2007-05",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "soybn",
+    "wheat"
+   ],
+   "short": [
+    "xcu",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.56,
+   "net": 0.5078
+  },
+  {
+   "month": "2007-06",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "soybn",
+    "natgas"
+   ],
+   "short": [
+    "xcu",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.205,
+   "net": -0.2555
+  },
+  {
+   "month": "2007-07",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "soybn"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.5443,
+   "net": -0.5784
+  },
+  {
+   "month": "2007-08",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "bco",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.7663,
+   "net": 0.7149
+  },
+  {
+   "month": "2007-09",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.7589,
+   "net": 0.7067
+  },
+  {
+   "month": "2007-10",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "xag",
+    "xcu",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.6592,
+   "net": -0.7088
+  },
+  {
+   "month": "2007-11",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.0528,
+   "net": -0.0919
+  },
+  {
+   "month": "2007-12",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "wtico",
+    "soybn"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.3387,
+   "net": 0.293
+  },
+  {
+   "month": "2008-01",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "corn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3195,
+   "net": -0.362
+  },
+  {
+   "month": "2008-02",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.8221,
+   "net": 0.7884
+  },
+  {
+   "month": "2008-03",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "bco"
+   ],
+   "short": [
+    "sugar",
+    "natgas",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.5116,
+   "net": 0.4767
+  },
+  {
+   "month": "2008-04",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "xpt"
+   ],
+   "short": [
+    "sugar",
+    "natgas",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.3941,
+   "net": -0.4237
+  },
+  {
+   "month": "2008-05",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "wtico",
+    "corn"
+   ],
+   "short": [
+    "sugar",
+    "xpd",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": 0.216,
+   "net": 0.1784
+  },
+  {
+   "month": "2008-06",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "soybn"
+   ],
+   "short": [
+    "sugar",
+    "xcu",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.5068,
+   "net": 0.468
+  },
+  {
+   "month": "2008-07",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "corn"
+   ],
+   "short": [
+    "xpd",
+    "sugar",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.2722,
+   "net": -0.3009
+  },
+  {
+   "month": "2008-08",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "natgas",
+    "soybn"
+   ],
+   "short": [
+    "xpd",
+    "sugar",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": 0.338,
+   "net": 0.3079
+  },
+  {
+   "month": "2008-09",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "natgas",
+    "bco"
+   ],
+   "short": [
+    "xpd",
+    "xcu",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.6829,
+   "net": 0.6545
+  },
+  {
+   "month": "2008-10",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "xcu",
+    "xpd",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.6389,
+   "net": 0.6174
+  },
+  {
+   "month": "2008-11",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "sugar",
+    "xau"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.2719,
+   "net": -0.293
+  },
+  {
+   "month": "2008-12",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "corn",
+    "xau"
+   ],
+   "short": [
+    "xcu",
+    "xpt",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.4173,
+   "net": -0.4358
+  },
+  {
+   "month": "2009-01",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "natgas"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.356,
+   "net": -0.3736
+  },
+  {
+   "month": "2009-02",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "sugar",
+    "corn"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.0957,
+   "net": -0.1229
+  },
+  {
+   "month": "2009-03",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "sugar",
+    "corn"
+   ],
+   "short": [
+    "xcu",
+    "wtico",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.5172,
+   "net": -0.54
+  },
+  {
+   "month": "2009-04",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "soybn"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": 0.4077,
+   "net": 0.3769
+  },
+  {
+   "month": "2009-05",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.9304,
+   "net": 0.8935
+  },
+  {
+   "month": "2009-06",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "soybn"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.3363,
+   "net": -0.3679
+  },
+  {
+   "month": "2009-07",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.1383,
+   "net": -0.1816
+  },
+  {
+   "month": "2009-08",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "soybn"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.8258,
+   "net": 0.7793
+  },
+  {
+   "month": "2009-09",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.3921,
+   "net": 0.3431
+  },
+  {
+   "month": "2009-10",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xpd",
+    "xag"
+   ],
+   "short": [
+    "corn",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.4378,
+   "net": -0.4691
+  },
+  {
+   "month": "2009-11",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xpt"
+   ],
+   "short": [
+    "corn",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.4794,
+   "net": 0.4409
+  },
+  {
+   "month": "2009-12",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xcu",
+    "xpd"
+   ],
+   "short": [
+    "corn",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.8976,
+   "net": 0.8513
+  },
+  {
+   "month": "2010-01",
+   "ranked": 12,
+   "long": [
+    "xcu",
+    "xpd",
+    "sugar"
+   ],
+   "short": [
+    "corn",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.6094,
+   "net": 0.5633
+  },
+  {
+   "month": "2010-02",
+   "ranked": 12,
+   "long": [
+    "xcu",
+    "sugar",
+    "xpd"
+   ],
+   "short": [
+    "corn",
+    "soybn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.0266
+  },
+  {
+   "month": "2010-03",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "soybn",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.9843,
+   "net": 0.9325
+  },
+  {
+   "month": "2010-04",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "sugar",
+    "xcu"
+   ],
+   "short": [
+    "soybn",
+    "wheat",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.4152,
+   "net": -0.4535
+  },
+  {
+   "month": "2010-05",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "wtico"
+   ],
+   "short": [
+    "soybn",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.1066,
+   "net": 0.0644
+  },
+  {
+   "month": "2010-06",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "xpt"
+   ],
+   "short": [
+    "corn",
+    "soybn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.5087,
+   "net": -0.5577
+  },
+  {
+   "month": "2010-07",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "sugar",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.0939,
+   "net": -0.1233
+  },
+  {
+   "month": "2010-08",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xag",
+    "natgas"
+   ],
+   "short": [
+    "wheat",
+    "sugar",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.3978,
+   "net": -0.434
+  },
+  {
+   "month": "2010-09",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wheat"
+   ],
+   "short": [
+    "bco",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.1196,
+   "net": -0.1513
+  },
+  {
+   "month": "2010-10",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "wtico",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2007,
+   "net": 0.1702
+  },
+  {
+   "month": "2010-11",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "xag"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.0974,
+   "net": -0.1296
+  },
+  {
+   "month": "2010-12",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "corn",
+    "sugar"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.248,
+   "net": 0.2241
+  },
+  {
+   "month": "2011-01",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xag",
+    "corn"
+   ],
+   "short": [
+    "sugar",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.7799,
+   "net": -0.8141
+  },
+  {
+   "month": "2011-02",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpd",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.8309,
+   "net": 0.7895
+  },
+  {
+   "month": "2011-03",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "corn",
+    "xag"
+   ],
+   "short": [
+    "xpt",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.5048,
+   "net": -0.538
+  },
+  {
+   "month": "2011-04",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "xag",
+    "sugar"
+   ],
+   "short": [
+    "wtico",
+    "xpt",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.1776,
+   "net": 0.1377
+  },
+  {
+   "month": "2011-05",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "sugar"
+   ],
+   "short": [
+    "xau",
+    "natgas",
+    "xpt"
+   ],
+   "legs": 6,
+   "gross": -0.2155,
+   "net": -0.2696
+  },
+  {
+   "month": "2011-06",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "bco"
+   ],
+   "short": [
+    "xau",
+    "xpt",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.2338,
+   "net": -0.2864
+  },
+  {
+   "month": "2011-07",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "xag",
+    "xpd"
+   ],
+   "short": [
+    "xau",
+    "xpt",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.6623,
+   "net": 0.616
+  },
+  {
+   "month": "2011-08",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "xpd"
+   ],
+   "short": [
+    "xpt",
+    "natgas",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.3872,
+   "net": -0.4265
+  },
+  {
+   "month": "2011-09",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "xpd"
+   ],
+   "short": [
+    "xpt",
+    "natgas",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 1.0242,
+   "net": 0.9825
+  },
+  {
+   "month": "2011-10",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "bco"
+   ],
+   "short": [
+    "wtico",
+    "xpt",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.1,
+   "net": 0.0646
+  },
+  {
+   "month": "2011-11",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "sugar",
+    "wheat",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": 0.2444,
+   "net": 0.199
+  },
+  {
+   "month": "2011-12",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "xcu",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.2123,
+   "net": -0.2413
+  },
+  {
+   "month": "2012-01",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "natgas",
+    "wheat",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.7545,
+   "net": 0.6969
+  },
+  {
+   "month": "2012-02",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xcu",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.3014,
+   "net": 0.2446
+  },
+  {
+   "month": "2012-03",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xcu",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.2283,
+   "net": 0.1687
+  },
+  {
+   "month": "2012-04",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "corn",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.3038,
+   "net": -0.3516
+  },
+  {
+   "month": "2012-05",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "soybn"
+   ],
+   "short": [
+    "xpd",
+    "xag",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.115,
+   "net": 0.0684
+  },
+  {
+   "month": "2012-06",
+   "ranked": 12,
+   "long": [
+    "soybn",
+    "xau",
+    "bco"
+   ],
+   "short": [
+    "wheat",
+    "xag",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.1319,
+   "net": -0.1715
+  },
+  {
+   "month": "2012-07",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "xau",
+    "soybn"
+   ],
+   "short": [
+    "xcu",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.9655,
+   "net": 0.9137
+  },
+  {
+   "month": "2012-08",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "xau"
+   ],
+   "short": [
+    "xpd",
+    "xag",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.0473,
+   "net": -0.0084
+  },
+  {
+   "month": "2012-09",
+   "ranked": 12,
+   "long": [
+    "soybn",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "xpd",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": -0.7511,
+   "net": -0.7868
+  },
+  {
+   "month": "2012-10",
+   "ranked": 12,
+   "long": [
+    "soybn",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.8425,
+   "net": -0.8718
+  },
+  {
+   "month": "2012-11",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "xpd",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.7139,
+   "net": -0.7564
+  },
+  {
+   "month": "2012-12",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "xau",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3672,
+   "net": -0.4349
+  },
+  {
+   "month": "2013-01",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "xag",
+    "soybn"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3838,
+   "net": -0.4456
+  },
+  {
+   "month": "2013-02",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "soybn",
+    "wheat"
+   ],
+   "short": [
+    "wtico",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.5382,
+   "net": 0.4779
+  },
+  {
+   "month": "2013-03",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "wtico",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.1862,
+   "net": -0.2359
+  },
+  {
+   "month": "2013-04",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "corn"
+   ],
+   "short": [
+    "wtico",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.8715,
+   "net": 0.8082
+  },
+  {
+   "month": "2013-05",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "corn"
+   ],
+   "short": [
+    "xag",
+    "xcu",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.4097,
+   "net": 0.3554
+  },
+  {
+   "month": "2013-06",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "corn",
+    "xpd"
+   ],
+   "short": [
+    "xau",
+    "sugar",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": 0.0268,
+   "net": -0.0218
+  },
+  {
+   "month": "2013-07",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wtico"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.3832,
+   "net": 0.3219
+  },
+  {
+   "month": "2013-08",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wtico",
+    "natgas"
+   ],
+   "short": [
+    "wheat",
+    "sugar",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": 0.0761,
+   "net": 0.0092
+  },
+  {
+   "month": "2013-09",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wtico"
+   ],
+   "short": [
+    "wheat",
+    "corn",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": -0.1433,
+   "net": -0.1948
+  },
+  {
+   "month": "2013-10",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "natgas",
+    "xpd"
+   ],
+   "short": [
+    "wheat",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.3794,
+   "net": -0.4358
+  },
+  {
+   "month": "2013-11",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "xpd",
+    "natgas"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.7828,
+   "net": 0.7164
+  },
+  {
+   "month": "2013-12",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "xpd",
+    "natgas"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.6675,
+   "net": 0.594
+  },
+  {
+   "month": "2014-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wtico"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.9207,
+   "net": -0.9695
+  },
+  {
+   "month": "2014-02",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "xpd"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.1424,
+   "net": 0.0867
+  },
+  {
+   "month": "2014-03",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "xpd"
+   ],
+   "short": [
+    "wheat",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.1562,
+   "net": -0.2067
+  },
+  {
+   "month": "2014-04",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "soybn"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.1103,
+   "net": 0.0362
+  },
+  {
+   "month": "2014-05",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.9169,
+   "net": 0.8228
+  },
+  {
+   "month": "2014-06",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.3705,
+   "net": 0.2757
+  },
+  {
+   "month": "2014-07",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "xpt"
+   ],
+   "short": [
+    "wheat",
+    "xag",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.9435,
+   "net": 0.8552
+  },
+  {
+   "month": "2014-08",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "xag"
+   ],
+   "short": [
+    "soybn",
+    "wheat",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.0948,
+   "net": -0.1466
+  },
+  {
+   "month": "2014-09",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "natgas",
+    "xcu"
+   ],
+   "short": [
+    "wheat",
+    "soybn",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 1.0247,
+   "net": 0.9681
+  },
+  {
+   "month": "2014-10",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "natgas",
+    "xpt"
+   ],
+   "short": [
+    "soybn",
+    "wheat",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.0251
+  },
+  {
+   "month": "2014-11",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wtico"
+   ],
+   "short": [
+    "soybn",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.401,
+   "net": -0.4395
+  },
+  {
+   "month": "2014-12",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "natgas",
+    "xcu"
+   ],
+   "short": [
+    "wheat",
+    "soybn",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.1269,
+   "net": -0.1732
+  },
+  {
+   "month": "2015-01",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "wheat"
+   ],
+   "short": [
+    "soybn",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.2954,
+   "net": 0.2568
+  },
+  {
+   "month": "2015-02",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.2114,
+   "net": -0.2395
+  },
+  {
+   "month": "2015-03",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xpt"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.2121,
+   "net": -0.2436
+  },
+  {
+   "month": "2015-04",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xcu"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.0109,
+   "net": -0.0624
+  },
+  {
+   "month": "2015-05",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.3434,
+   "net": -0.4009
+  },
+  {
+   "month": "2015-06",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "bco",
+    "natgas",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.5419,
+   "net": -0.5811
+  },
+  {
+   "month": "2015-07",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xcu"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": 0.7479,
+   "net": 0.704
+  },
+  {
+   "month": "2015-08",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.3154,
+   "net": -0.3597
+  },
+  {
+   "month": "2015-09",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "soybn"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": 0.8242,
+   "net": 0.7711
+  },
+  {
+   "month": "2015-10",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.0014,
+   "net": -0.0513
+  },
+  {
+   "month": "2015-11",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.1816,
+   "net": -0.2127
+  },
+  {
+   "month": "2015-12",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "corn",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.1883,
+   "net": 0.1107
+  },
+  {
+   "month": "2016-01",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "corn",
+    "xag"
+   ],
+   "short": [
+    "natgas",
+    "xpt",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.5681,
+   "net": 0.5093
+  },
+  {
+   "month": "2016-02",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "corn",
+    "wheat"
+   ],
+   "short": [
+    "xpd",
+    "bco",
+    "xpt"
+   ],
+   "legs": 6,
+   "gross": -0.3069,
+   "net": -0.3426
+  },
+  {
+   "month": "2016-03",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "sugar",
+    "wheat"
+   ],
+   "short": [
+    "wtico",
+    "xpd",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.0943,
+   "net": -0.1491
+  },
+  {
+   "month": "2016-04",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "corn"
+   ],
+   "short": [
+    "xpd",
+    "bco",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.209,
+   "net": 0.1642
+  },
+  {
+   "month": "2016-05",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "wheat"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.5151,
+   "net": -0.5543
+  },
+  {
+   "month": "2016-06",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "corn",
+    "soybn"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.352,
+   "net": 0.3068
+  },
+  {
+   "month": "2016-07",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "bco",
+    "natgas",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.7532,
+   "net": 0.6983
+  },
+  {
+   "month": "2016-08",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "soybn"
+   ],
+   "short": [
+    "bco",
+    "xcu",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.2186,
+   "net": -0.2659
+  },
+  {
+   "month": "2016-09",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "wtico",
+    "wheat",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.0338,
+   "net": -0.0864
+  },
+  {
+   "month": "2016-10",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "xcu",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.7934,
+   "net": -0.8427
+  },
+  {
+   "month": "2016-11",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "natgas",
+    "xag"
+   ],
+   "short": [
+    "xcu",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.272,
+   "net": -0.3222
+  },
+  {
+   "month": "2016-12",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "natgas",
+    "xag"
+   ],
+   "short": [
+    "bco",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.4263,
+   "net": -0.4601
+  },
+  {
+   "month": "2017-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "wtico"
+   ],
+   "short": [
+    "xpt",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.4707,
+   "net": -0.5031
+  },
+  {
+   "month": "2017-02",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "natgas",
+    "bco"
+   ],
+   "short": [
+    "xau",
+    "corn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.5277,
+   "net": -0.5701
+  },
+  {
+   "month": "2017-03",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "xpd"
+   ],
+   "short": [
+    "corn",
+    "xau",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 0.2215,
+   "net": 0.1522
+  },
+  {
+   "month": "2017-04",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "short": [
+    "xpt",
+    "xau",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.5413,
+   "net": -0.5989
+  },
+  {
+   "month": "2017-05",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpd",
+    "xcu"
+   ],
+   "short": [
+    "soybn",
+    "xpt",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": -0.8457,
+   "net": -0.891
+  },
+  {
+   "month": "2017-06",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "natgas",
+    "xcu"
+   ],
+   "short": [
+    "corn",
+    "wheat",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.1381,
+   "net": -0.19
+  },
+  {
+   "month": "2017-07",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "natgas"
+   ],
+   "short": [
+    "xag",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.0189,
+   "net": -0.045
+  },
+  {
+   "month": "2017-08",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "xcu",
+    "xpd"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2827,
+   "net": 0.2138
+  },
+  {
+   "month": "2017-09",
+   "ranked": 12,
+   "long": [
+    "xcu",
+    "xpd",
+    "wheat"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.726,
+   "net": 0.654
+  },
+  {
+   "month": "2017-10",
+   "ranked": 12,
+   "long": [
+    "xcu",
+    "xpd",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2502,
+   "net": 0.1837
+  },
+  {
+   "month": "2017-11",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "bco"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3393,
+   "net": -0.4142
+  },
+  {
+   "month": "2017-12",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "bco",
+    "xcu"
+   ],
+   "short": [
+    "soybn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.1728,
+   "net": 0.1137
+  },
+  {
+   "month": "2018-01",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xcu",
+    "bco"
+   ],
+   "short": [
+    "soybn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.0406,
+   "net": -0.1142
+  },
+  {
+   "month": "2018-02",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "bco",
+    "xcu"
+   ],
+   "short": [
+    "xpt",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.734,
+   "net": -0.7757
+  },
+  {
+   "month": "2018-03",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "soybn",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.3773,
+   "net": 0.3243
+  },
+  {
+   "month": "2018-04",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xag",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.4872,
+   "net": -0.5339
+  },
+  {
+   "month": "2018-05",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "xcu"
+   ],
+   "short": [
+    "xag",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3276,
+   "net": -0.4067
+  },
+  {
+   "month": "2018-06",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "wheat"
+   ],
+   "short": [
+    "xag",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.5969,
+   "net": -0.646
+  },
+  {
+   "month": "2018-07",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "xpd"
+   ],
+   "short": [
+    "xpt",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.1447,
+   "net": 0.0907
+  },
+  {
+   "month": "2018-08",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "xpd"
+   ],
+   "short": [
+    "xpt",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2083,
+   "net": 0.1562
+  },
+  {
+   "month": "2018-09",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "wheat"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.3618,
+   "net": -0.4135
+  },
+  {
+   "month": "2018-10",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "wheat"
+   ],
+   "short": [
+    "soybn",
+    "xpt",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.8528,
+   "net": -0.8924
+  },
+  {
+   "month": "2018-11",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "wheat"
+   ],
+   "short": [
+    "xag",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.5839,
+   "net": -0.6271
+  },
+  {
+   "month": "2018-12",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "xcu",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2061,
+   "net": 0.1462
+  },
+  {
+   "month": "2019-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wheat",
+    "xpd"
+   ],
+   "short": [
+    "wtico",
+    "xag",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.1167,
+   "net": -0.1794
+  },
+  {
+   "month": "2019-02",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.3989,
+   "net": -0.4605
+  },
+  {
+   "month": "2019-03",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "natgas",
+    "wheat"
+   ],
+   "short": [
+    "wtico",
+    "soybn",
+    "xpt"
+   ],
+   "legs": 6,
+   "gross": -0.3494,
+   "net": -0.4162
+  },
+  {
+   "month": "2019-04",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "sugar",
+    "natgas"
+   ],
+   "short": [
+    "xpt",
+    "wtico",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.829,
+   "net": -0.8711
+  },
+  {
+   "month": "2019-05",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "sugar",
+    "xau"
+   ],
+   "short": [
+    "corn",
+    "wtico",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": 0.2101,
+   "net": 0.1215
+  },
+  {
+   "month": "2019-06",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xpt"
+   ],
+   "short": [
+    "natgas",
+    "soybn",
+    "wheat"
+   ],
+   "legs": 6,
+   "gross": 1.4048,
+   "net": 1.3345
+  },
+  {
+   "month": "2019-07",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "corn",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.1864,
+   "net": -0.2476
+  },
+  {
+   "month": "2019-08",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "sugar",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.4584,
+   "net": 0.4093
+  },
+  {
+   "month": "2019-09",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "sugar"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.1639,
+   "net": -0.208
+  },
+  {
+   "month": "2019-10",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.4328,
+   "net": 0.3733
+  },
+  {
+   "month": "2019-11",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.0252
+  },
+  {
+   "month": "2019-12",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "sugar",
+    "xcu",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.5558,
+   "net": 0.4776
+  },
+  {
+   "month": "2020-01",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xcu",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 1.1652,
+   "net": 1.0966
+  },
+  {
+   "month": "2020-02",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xpt",
+    "xau"
+   ],
+   "short": [
+    "corn",
+    "xcu",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.1798,
+   "net": -0.2201
+  },
+  {
+   "month": "2020-03",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "xcu",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -1.0099,
+   "net": -1.0314
+  },
+  {
+   "month": "2020-04",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "wheat"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.6683,
+   "net": -0.6841
+  },
+  {
+   "month": "2020-05",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "wheat",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.2967,
+   "net": -0.3224
+  },
+  {
+   "month": "2020-06",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "wheat"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": -0.6352,
+   "net": -0.6558
+  },
+  {
+   "month": "2020-07",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "legs": 6,
+   "gross": 1.6746,
+   "net": 1.6224
+  },
+  {
+   "month": "2020-08",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.2301,
+   "net": -0.2526
+  },
+  {
+   "month": "2020-09",
+   "ranked": 12,
+   "long": [
+    "xpd",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.5616,
+   "net": 0.5173
+  },
+  {
+   "month": "2020-10",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpd",
+    "xau"
+   ],
+   "short": [
+    "corn",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.1666,
+   "net": 0.1206
+  },
+  {
+   "month": "2020-11",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpd",
+    "xau"
+   ],
+   "short": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.3275,
+   "net": -0.364
+  },
+  {
+   "month": "2020-12",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "natgas",
+    "xau"
+   ],
+   "short": [
+    "xpt",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.0289,
+   "net": -0.0068
+  },
+  {
+   "month": "2021-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xag",
+    "soybn"
+   ],
+   "short": [
+    "xpt",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.5201,
+   "net": -0.5541
+  },
+  {
+   "month": "2021-02",
+   "ranked": 12,
+   "long": [
+    "soybn",
+    "xag",
+    "xcu"
+   ],
+   "short": [
+    "sugar",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.0234,
+   "net": -0.0531
+  },
+  {
+   "month": "2021-03",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "soybn",
+    "natgas"
+   ],
+   "short": [
+    "bco",
+    "sugar",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.1997,
+   "net": -0.2424
+  },
+  {
+   "month": "2021-04",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "xau",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.1008,
+   "net": -0.1371
+  },
+  {
+   "month": "2021-05",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "corn"
+   ],
+   "short": [
+    "xpd",
+    "wheat",
+    "xau"
+   ],
+   "legs": 6,
+   "gross": 0.3686,
+   "net": 0.3211
+  },
+  {
+   "month": "2021-06",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "wheat",
+    "xau"
+   ],
+   "legs": 6,
+   "gross": 1.2265,
+   "net": 1.165
+  },
+  {
+   "month": "2021-07",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "natgas",
+    "soybn"
+   ],
+   "short": [
+    "xpt",
+    "wheat",
+    "xau"
+   ],
+   "legs": 6,
+   "gross": -0.6009,
+   "net": -0.6304
+  },
+  {
+   "month": "2021-08",
+   "ranked": 12,
+   "long": [
+    "corn",
+    "natgas",
+    "wtico"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "xau"
+   ],
+   "legs": 6,
+   "gross": 0.3551,
+   "net": 0.2929
+  },
+  {
+   "month": "2021-09",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "corn",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xau",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": 0.9816,
+   "net": 0.9196
+  },
+  {
+   "month": "2021-10",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "xag",
+    "xau"
+   ],
+   "legs": 6,
+   "gross": -0.066,
+   "net": -0.1099
+  },
+  {
+   "month": "2021-11",
+   "ranked": 12,
+   "long": [
+    "wtico",
+    "bco",
+    "natgas"
+   ],
+   "short": [
+    "xag",
+    "xau",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.5343,
+   "net": -0.5667
+  },
+  {
+   "month": "2021-12",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xau",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.2212,
+   "net": -0.2629
+  },
+  {
+   "month": "2022-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.7577,
+   "net": 0.7158
+  },
+  {
+   "month": "2022-02",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.01,
+   "net": -0.0293
+  },
+  {
+   "month": "2022-03",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xpd",
+    "xpt",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": 0.0301,
+   "net": 0.0028
+  },
+  {
+   "month": "2022-04",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "xag",
+    "xpd",
+    "xpt"
+   ],
+   "legs": 6,
+   "gross": 0.8161,
+   "net": 0.7865
+  },
+  {
+   "month": "2022-05",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "xag",
+    "xpt",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.7849,
+   "net": 0.7512
+  },
+  {
+   "month": "2022-06",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wheat",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "xag",
+    "xpt"
+   ],
+   "legs": 6,
+   "gross": -0.4234,
+   "net": -0.4535
+  },
+  {
+   "month": "2022-07",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wheat",
+    "bco"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.1773,
+   "net": -0.2045
+  },
+  {
+   "month": "2022-08",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "short": [
+    "xcu",
+    "xag",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.3037,
+   "net": 0.2692
+  },
+  {
+   "month": "2022-09",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "xpd",
+    "xag",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.7361,
+   "net": -0.7622
+  },
+  {
+   "month": "2022-10",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "soybn",
+    "corn"
+   ],
+   "short": [
+    "xcu",
+    "xpt",
+    "xag"
+   ],
+   "legs": 6,
+   "gross": -0.4894,
+   "net": -0.5265
+  },
+  {
+   "month": "2022-11",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "wheat",
+    "corn"
+   ],
+   "short": [
+    "xpt",
+    "xag",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.6732,
+   "net": -0.6961
+  },
+  {
+   "month": "2022-12",
+   "ranked": 12,
+   "long": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.8551,
+   "net": -0.8795
+  },
+  {
+   "month": "2023-01",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "corn",
+    "bco"
+   ],
+   "short": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "legs": 6,
+   "gross": -0.7857,
+   "net": -0.8141
+  },
+  {
+   "month": "2023-02",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "corn",
+    "xag"
+   ],
+   "short": [
+    "xcu",
+    "natgas",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.0613,
+   "net": -0.1024
+  },
+  {
+   "month": "2023-03",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "corn"
+   ],
+   "short": [
+    "wtico",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.8693,
+   "net": 0.8141
+  },
+  {
+   "month": "2023-04",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xpt",
+    "xau"
+   ],
+   "short": [
+    "wheat",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 1.1212,
+   "net": 1.0748
+  },
+  {
+   "month": "2023-05",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xpt",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.0327
+  },
+  {
+   "month": "2023-06",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xpt"
+   ],
+   "short": [
+    "wtico",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -1.0376,
+   "net": -1.0701
+  },
+  {
+   "month": "2023-07",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xpt"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.2766,
+   "net": 0.2344
+  },
+  {
+   "month": "2023-08",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.654,
+   "net": -0.6969
+  },
+  {
+   "month": "2023-09",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "sugar",
+    "xpt"
+   ],
+   "short": [
+    "corn",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.2007,
+   "net": -0.2419
+  },
+  {
+   "month": "2023-10",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "wheat",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.3227,
+   "net": -0.353
+  },
+  {
+   "month": "2023-11",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "xpd",
+    "wheat",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.542,
+   "net": 0.4919
+  },
+  {
+   "month": "2023-12",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.74,
+   "net": -0.7648
+  },
+  {
+   "month": "2024-01",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.1937,
+   "net": 0.1452
+  },
+  {
+   "month": "2024-02",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xag",
+    "xpt"
+   ],
+   "short": [
+    "wheat",
+    "corn",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.0734,
+   "net": -0.1244
+  },
+  {
+   "month": "2024-03",
+   "ranked": 12,
+   "long": [
+    "sugar",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "soybn",
+    "corn",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.7935,
+   "net": 0.736
+  },
+  {
+   "month": "2024-04",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "soybn",
+    "xpd",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": 0.3217,
+   "net": 0.2429
+  },
+  {
+   "month": "2024-05",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "bco",
+    "wtico"
+   ],
+   "short": [
+    "natgas",
+    "corn",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.7667,
+   "net": -0.7978
+  },
+  {
+   "month": "2024-06",
+   "ranked": 12,
+   "long": [
+    "xcu",
+    "wtico",
+    "bco"
+   ],
+   "short": [
+    "sugar",
+    "corn",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": -0.4211,
+   "net": -0.4539
+  },
+  {
+   "month": "2024-07",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xcu",
+    "xau"
+   ],
+   "short": [
+    "sugar",
+    "soybn",
+    "xpd"
+   ],
+   "legs": 6,
+   "gross": 0.5981,
+   "net": 0.5333
+  },
+  {
+   "month": "2024-08",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "short": [
+    "soybn",
+    "xpd",
+    "corn"
+   ],
+   "legs": 6,
+   "gross": -0.5697,
+   "net": -0.6087
+  },
+  {
+   "month": "2024-09",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "short": [
+    "natgas",
+    "xpd",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.1214,
+   "net": -0.1657
+  },
+  {
+   "month": "2024-10",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "short": [
+    "xpd",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2229,
+   "net": 0.1685
+  },
+  {
+   "month": "2024-11",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xau",
+    "xcu"
+   ],
+   "short": [
+    "sugar",
+    "soybn",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.5989,
+   "net": -0.6289
+  },
+  {
+   "month": "2024-12",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "xag",
+    "xcu"
+   ],
+   "short": [
+    "sugar",
+    "corn",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": -0.2819,
+   "net": -0.3438
+  },
+  {
+   "month": "2025-01",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xau",
+    "natgas"
+   ],
+   "short": [
+    "xpd",
+    "wheat",
+    "soybn"
+   ],
+   "legs": 6,
+   "gross": 0.0998,
+   "net": 0.0417
+  },
+  {
+   "month": "2025-02",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.2452,
+   "net": -0.2912
+  },
+  {
+   "month": "2025-03",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "soybn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.6533,
+   "net": 0.5916
+  },
+  {
+   "month": "2025-04",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "soybn",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.7279,
+   "net": 0.6834
+  },
+  {
+   "month": "2025-05",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wtico",
+    "soybn",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.2482,
+   "net": -0.2854
+  },
+  {
+   "month": "2025-06",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "natgas",
+    "xag"
+   ],
+   "short": [
+    "wheat",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.1032,
+   "net": -0.1423
+  },
+  {
+   "month": "2025-07",
+   "ranked": 12,
+   "long": [
+    "xau",
+    "natgas",
+    "xag"
+   ],
+   "short": [
+    "sugar",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": -0.5547,
+   "net": -0.6067
+  },
+  {
+   "month": "2025-08",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpt",
+    "xau"
+   ],
+   "short": [
+    "sugar",
+    "wtico",
+    "bco"
+   ],
+   "legs": 6,
+   "gross": 0.7354,
+   "net": 0.6794
+  },
+  {
+   "month": "2025-09",
+   "ranked": 12,
+   "long": [
+    "natgas",
+    "xpt",
+    "xau"
+   ],
+   "short": [
+    "wtico",
+    "bco",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 1.8816,
+   "net": 1.807
+  },
+  {
+   "month": "2025-10",
+   "ranked": 12,
+   "long": [
+    "xpt",
+    "xau",
+    "xag"
+   ],
+   "short": [
+    "wtico",
+    "wheat",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.7258,
+   "net": 0.6497
+  },
+  {
+   "month": "2025-11",
+   "ranked": 12,
+   "long": [
+    "xpt",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "wtico",
+    "wheat",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.4133,
+   "net": 0.376
+  },
+  {
+   "month": "2025-12",
+   "ranked": 12,
+   "long": [
+    "xpt",
+    "xag",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 1.5769,
+   "net": 1.511
+  },
+  {
+   "month": "2026-01",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "xpd"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.2355,
+   "net": 0.2
+  },
+  {
+   "month": "2026-02",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "xau"
+   ],
+   "short": [
+    "bco",
+    "wtico",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.7381,
+   "net": -0.758
+  },
+  {
+   "month": "2026-03",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "xpd"
+   ],
+   "short": [
+    "wtico",
+    "corn",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -1,
+   "net": -1.021
+  },
+  {
+   "month": "2026-04",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "xpd"
+   ],
+   "short": [
+    "wtico",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.3157,
+   "net": 0.2872
+  },
+  {
+   "month": "2026-05",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "wtico"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.7193,
+   "net": -0.7407
+  },
+  {
+   "month": "2026-06",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "bco"
+   ],
+   "short": [
+    "corn",
+    "sugar",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": -0.2548,
+   "net": -0.2874
+  },
+  {
+   "month": "2026-07",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xpt",
+    "bco"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.6378,
+   "net": 0.5995
+  },
+  {
+   "month": "2026-08",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xcu",
+    "xau"
+   ],
+   "short": [
+    "corn",
+    "xpd",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": 0.1871,
+   "net": 0.1499
+  },
+  {
+   "month": "2026-09",
+   "ranked": 12,
+   "long": [
+    "xag",
+    "xcu",
+    "bco"
+   ],
+   "short": [
+    "corn",
+    "natgas",
+    "sugar"
+   ],
+   "legs": 6,
+   "gross": -0.2253,
+   "net": -0.27
+  },
+  {
+   "month": "2026-10",
+   "ranked": 12,
+   "long": [
+    "wheat",
+    "xag",
+    "bco"
+   ],
+   "short": [
+    "sugar",
+    "xpd",
+    "natgas"
+   ],
+   "legs": 6,
+   "gross": 0.003,
+   "net": -0.0212
+  }
+ ]
+}
