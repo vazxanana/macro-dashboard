@@ -74,6 +74,8 @@ paper system with a measured, clearly negative record.
 | 308 | Buying gold during an equity bear market (S&P 500 ≥ 10 % below its 52-week high) | **FAIL, 0 of 3**: OOS −0.238R a trade below a plain gold buy (n 35, t −0.96); 2022's tightening bear dominates; −20 % and Nasdaq variants no better | #1121 |
 | 309 | Gold 20-day breakouts confirmed by silver, platinum and palladium | **FAIL, 0 of 3**: confirmed minus same-side baseline −0.063R OOS (n 100, t −0.55), negative IS too; unconfirmed breakouts did slightly better; 4 of 40 placebos | #1122 |
 | 310 | Gold catching up with the haven trades (yen, franc, Treasuries) — fade gold's residual | **FAIL, 0 of 3**: fade −0.004R OOS (n 159, t −0.07), costs exceed the gross edge; follow-the-havens variant +0.049R (t 0.81, 38 of 40 placebos) not a lead | #1123 |
+| 311 | Daily wick pressure on gold (trade the way recent wicks point) | **FAIL**: 5-day excess over every-day baseline −0.039R OOS (n 346, t −0.78); buys below any-day buys; 28 of 40 random-side shuffles as good or better | #1124 |
+| 312 | Gold over the lunar cycle (long around new moon, short around full moon) | **FAIL, 0 of 3**: both legs −0.026R OOS (n 243, t −0.40), 17 of 40 placebos; new-moon longs only ride gold's rise | #1125 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
