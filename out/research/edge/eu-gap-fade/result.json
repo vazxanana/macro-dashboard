@@ -1,0 +1,699 @@
+{
+ "study": "eu-gap-fade",
+ "title": "Fading the overnight gap on European indices (DE40, UK100, EU50)",
+ "built": "2026-11-14",
+ "verdict": "FAIL: fading the European index overnight gap from the 08:00 London open to the 16:30 close, stop 1 x ATR20, after a 0.04 % round trip, 2016 → now: DE40 −0.048R a trade (n 1964, month-sum t −4.06), UK100 + EU50 −0.031R (n 4010, t −3.18), DE40 on US-led gaps −0.063R (n 1283, t −4.09); before costs −0.019R, +0.002R, −0.034R",
+ "verdictClass": "FAIL",
+ "preregistration": "research/edge/eu-gap-fade/PREREGISTRATION.md",
+ "source": "us-asia-lead (#913): the post-hoc reversal of the US-led gap in the Asian session; JP225 / HK33 excluded for that reason",
+ "data": {
+  "source": "OANDA mid M15 via /md/bars",
+  "span": {
+   "de40": {
+    "candles": 357205,
+    "first": "2005-01-03",
+    "last": "2026-11-13"
+   },
+   "uk100": {
+    "candles": 359379,
+    "first": "2005-01-04",
+    "last": "2026-11-13"
+   },
+   "eu50": {
+    "candles": 317519,
+    "first": "2005-01-03",
+    "last": "2026-11-13"
+   },
+   "spx500": {
+    "candles": 509220,
+    "first": "2005-01-02",
+    "last": "2026-11-13"
+   }
+  },
+  "usSessions": 5493,
+  "dropped": {
+   "de40": {
+    "noTrigger": 1524,
+    "warmup": 20,
+    "atr": 0
+   },
+   "uk100": {
+    "noTrigger": 1442,
+    "warmup": 20,
+    "atr": 0
+   },
+   "eu50": {
+    "noTrigger": 1432,
+    "warmup": 20,
+    "atr": 0
+   }
+  }
+ },
+ "params": {
+  "MED_N": 20,
+  "TRIG": 0.5,
+  "ATR_N": 20,
+  "STOP_ATR": 1,
+  "COST": 0.0004,
+  "SEEDS": 40,
+  "MIN_N": 200,
+  "MIN_N_T3": 100
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-01",
+   "2099-12-31"
+  ],
+  "replication": [
+   "2000-01-01",
+   "2015-12-31"
+  ]
+ },
+ "holmSet": [
+  "T1",
+  "T2",
+  "T3"
+ ],
+ "tests": {
+  "T1": {
+   "markets": [
+    "DE40"
+   ],
+   "usLed": false,
+   "decisive": {
+    "n": 1964,
+    "months": 131,
+    "buys": 880,
+    "sells": 1084,
+    "win": 0.465,
+    "grossR": -0.019,
+    "costR": 0.03,
+    "netR": -0.048,
+    "net2R": -0.078,
+    "tGross": -1.6,
+    "t": -4.06,
+    "total": -95.16,
+    "maxDD": 100.52,
+    "stops": 184,
+    "medStopPct": 1.332,
+    "byYear": {
+     "2016": {
+      "n": 173,
+      "netR": -0.041,
+      "total": -7.16
+     },
+     "2017": {
+      "n": 177,
+      "netR": -0.017,
+      "total": -2.96
+     },
+     "2018": {
+      "n": 177,
+      "netR": -0.064,
+      "total": -11.29
+     },
+     "2019": {
+      "n": 168,
+      "netR": -0.003,
+      "total": -0.59
+     },
+     "2020": {
+      "n": 186,
+      "netR": -0.063,
+      "total": -11.71
+     },
+     "2021": {
+      "n": 178,
+      "netR": -0.084,
+      "total": -14.9
+     },
+     "2022": {
+      "n": 188,
+      "netR": 0.005,
+      "total": 0.92
+     },
+     "2023": {
+      "n": 183,
+      "netR": -0.106,
+      "total": -19.44
+     },
+     "2024": {
+      "n": 184,
+      "netR": -0.12,
+      "total": -22.07
+     },
+     "2025": {
+      "n": 188,
+      "netR": 0.01,
+      "total": 1.87
+     },
+     "2026": {
+      "n": 162,
+      "netR": -0.048,
+      "total": -7.82
+     }
+    },
+    "placebo": {
+     "p5": -0.045,
+     "p50": -0.027,
+     "p95": -0.011,
+     "rankOfReal": 2,
+     "above95": false
+    },
+    "p": 1,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 2032,
+    "months": 131,
+    "buys": 869,
+    "sells": 1163,
+    "win": 0.476,
+    "grossR": 0.004,
+    "costR": 0.026,
+    "netR": -0.022,
+    "net2R": -0.048,
+    "tGross": 0.29,
+    "t": -1.62,
+    "total": -45.01,
+    "maxDD": 53.12,
+    "stops": 170,
+    "medStopPct": 1.621,
+    "byYear": {
+     "2005": {
+      "n": 168,
+      "netR": -0.046,
+      "total": -7.81
+     },
+     "2006": {
+      "n": 188,
+      "netR": -0.067,
+      "total": -12.54
+     },
+     "2007": {
+      "n": 178,
+      "netR": 0,
+      "total": -0.08
+     },
+     "2008": {
+      "n": 185,
+      "netR": 0.035,
+      "total": 6.47
+     },
+     "2009": {
+      "n": 198,
+      "netR": 0.024,
+      "total": 4.69
+     },
+     "2010": {
+      "n": 191,
+      "netR": 0.071,
+      "total": 13.48
+     },
+     "2011": {
+      "n": 193,
+      "netR": 0.009,
+      "total": 1.68
+     },
+     "2012": {
+      "n": 169,
+      "netR": -0.038,
+      "total": -6.36
+     },
+     "2013": {
+      "n": 189,
+      "netR": -0.046,
+      "total": -8.77
+     },
+     "2014": {
+      "n": 189,
+      "netR": -0.076,
+      "total": -14.41
+     },
+     "2015": {
+      "n": 184,
+      "netR": -0.116,
+      "total": -21.36
+     }
+    },
+    "placebo": {
+     "p5": -0.044,
+     "p50": -0.023,
+     "p95": -0.008,
+     "rankOfReal": 24,
+     "above95": false
+    }
+   }
+  },
+  "T2": {
+   "markets": [
+    "UK100",
+    "EU50"
+   ],
+   "usLed": false,
+   "decisive": {
+    "n": 4010,
+    "months": 131,
+    "buys": 1864,
+    "sells": 2146,
+    "win": 0.472,
+    "grossR": 0.002,
+    "costR": 0.033,
+    "netR": -0.031,
+    "net2R": -0.063,
+    "tGross": 0.23,
+    "t": -3.18,
+    "total": -122.5,
+    "maxDD": 144.2,
+    "stops": 292,
+    "medStopPct": 1.228,
+    "byYear": {
+     "2016": {
+      "n": 364,
+      "netR": -0.011,
+      "total": -3.91
+     },
+     "2017": {
+      "n": 383,
+      "netR": -0.013,
+      "total": -5.1
+     },
+     "2018": {
+      "n": 355,
+      "netR": -0.091,
+      "total": -32.27
+     },
+     "2019": {
+      "n": 361,
+      "netR": -0.054,
+      "total": -19.41
+     },
+     "2020": {
+      "n": 370,
+      "netR": -0.028,
+      "total": -10.31
+     },
+     "2021": {
+      "n": 363,
+      "netR": -0.07,
+      "total": -25.32
+     },
+     "2022": {
+      "n": 369,
+      "netR": 0.02,
+      "total": 7.29
+     },
+     "2023": {
+      "n": 366,
+      "netR": -0.07,
+      "total": -25.68
+     },
+     "2024": {
+      "n": 374,
+      "netR": -0.024,
+      "total": -9
+     },
+     "2025": {
+      "n": 376,
+      "netR": -0.028,
+      "total": -10.46
+     },
+     "2026": {
+      "n": 329,
+      "netR": 0.035,
+      "total": 11.67
+     }
+    },
+    "byMarket": {
+     "UK100": {
+      "n": 1991,
+      "grossR": -0.004,
+      "netR": -0.04,
+      "t": -3.58
+     },
+     "EU50": {
+      "n": 2019,
+      "grossR": 0.009,
+      "netR": -0.022,
+      "t": -1.85
+     }
+    },
+    "placebo": {
+     "p5": -0.044,
+     "p50": -0.033,
+     "p95": -0.024,
+     "rankOfReal": 23,
+     "above95": false
+    },
+    "p": 0.999,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 4059,
+    "months": 131,
+    "buys": 1748,
+    "sells": 2311,
+    "win": 0.478,
+    "grossR": 0.003,
+    "costR": 0.03,
+    "netR": -0.027,
+    "net2R": -0.057,
+    "tGross": 0.26,
+    "t": -2.44,
+    "total": -109.63,
+    "maxDD": 109.63,
+    "stops": 311,
+    "medStopPct": 1.402,
+    "byYear": {
+     "2005": {
+      "n": 326,
+      "netR": -0.057,
+      "total": -18.48
+     },
+     "2006": {
+      "n": 362,
+      "netR": -0.004,
+      "total": -1.48
+     },
+     "2007": {
+      "n": 373,
+      "netR": -0.024,
+      "total": -9.13
+     },
+     "2008": {
+      "n": 359,
+      "netR": -0.014,
+      "total": -4.85
+     },
+     "2009": {
+      "n": 374,
+      "netR": 0.003,
+      "total": 1.19
+     },
+     "2010": {
+      "n": 391,
+      "netR": 0.039,
+      "total": 15.42
+     },
+     "2011": {
+      "n": 386,
+      "netR": 0.005,
+      "total": 1.97
+     },
+     "2012": {
+      "n": 365,
+      "netR": -0.006,
+      "total": -2.37
+     },
+     "2013": {
+      "n": 380,
+      "netR": -0.07,
+      "total": -26.65
+     },
+     "2014": {
+      "n": 374,
+      "netR": -0.07,
+      "total": -26.22
+     },
+     "2015": {
+      "n": 369,
+      "netR": -0.106,
+      "total": -39.03
+     }
+    },
+    "byMarket": {
+     "UK100": {
+      "n": 2016,
+      "grossR": -0.014,
+      "netR": -0.046,
+      "t": -3.84
+     },
+     "EU50": {
+      "n": 2043,
+      "grossR": 0.019,
+      "netR": -0.009,
+      "t": -0.68
+     }
+    },
+    "placebo": {
+     "p5": -0.042,
+     "p50": -0.028,
+     "p95": -0.014,
+     "rankOfReal": 22,
+     "above95": false
+    }
+   }
+  },
+  "T3": {
+   "markets": [
+    "DE40"
+   ],
+   "usLed": true,
+   "notUsLed": 1311,
+   "decisive": {
+    "n": 1283,
+    "months": 131,
+    "buys": 545,
+    "sells": 738,
+    "win": 0.465,
+    "grossR": -0.034,
+    "costR": 0.03,
+    "netR": -0.063,
+    "net2R": -0.093,
+    "tGross": -2.19,
+    "t": -4.09,
+    "total": -81.09,
+    "maxDD": 83.32,
+    "stops": 128,
+    "medStopPct": 1.345,
+    "byYear": {
+     "2016": {
+      "n": 111,
+      "netR": -0.09,
+      "total": -10.02
+     },
+     "2017": {
+      "n": 123,
+      "netR": 0.023,
+      "total": 2.79
+     },
+     "2018": {
+      "n": 119,
+      "netR": -0.095,
+      "total": -11.31
+     },
+     "2019": {
+      "n": 100,
+      "netR": -0.02,
+      "total": -2.03
+     },
+     "2020": {
+      "n": 131,
+      "netR": -0.12,
+      "total": -15.72
+     },
+     "2021": {
+      "n": 114,
+      "netR": -0.088,
+      "total": -10.02
+     },
+     "2022": {
+      "n": 133,
+      "netR": -0.013,
+      "total": -1.67
+     },
+     "2023": {
+      "n": 119,
+      "netR": -0.162,
+      "total": -19.31
+     },
+     "2024": {
+      "n": 124,
+      "netR": -0.085,
+      "total": -10.54
+     },
+     "2025": {
+      "n": 112,
+      "netR": 0.042,
+      "total": 4.68
+     },
+     "2026": {
+      "n": 97,
+      "netR": -0.082,
+      "total": -7.94
+     }
+    },
+    "placebo": {
+     "p5": -0.05,
+     "p50": -0.031,
+     "p95": -0.011,
+     "rankOfReal": 0,
+     "above95": false
+    },
+    "p": 1,
+    "pHolm": 1
+   },
+   "replication": {
+    "n": 1402,
+    "months": 131,
+    "buys": 595,
+    "sells": 807,
+    "win": 0.484,
+    "grossR": 0.017,
+    "costR": 0.026,
+    "netR": -0.009,
+    "net2R": -0.035,
+    "tGross": 0.99,
+    "t": -0.57,
+    "total": -13.31,
+    "maxDD": 30.31,
+    "stops": 113,
+    "medStopPct": 1.624,
+    "byYear": {
+     "2005": {
+      "n": 129,
+      "netR": 0.018,
+      "total": 2.3
+     },
+     "2006": {
+      "n": 124,
+      "netR": -0.034,
+      "total": -4.19
+     },
+     "2007": {
+      "n": 128,
+      "netR": 0.014,
+      "total": 1.8
+     },
+     "2008": {
+      "n": 135,
+      "netR": 0.058,
+      "total": 7.76
+     },
+     "2009": {
+      "n": 134,
+      "netR": -0.01,
+      "total": -1.37
+     },
+     "2010": {
+      "n": 129,
+      "netR": 0.061,
+      "total": 7.81
+     },
+     "2011": {
+      "n": 135,
+      "netR": 0.02,
+      "total": 2.65
+     },
+     "2012": {
+      "n": 122,
+      "netR": -0.036,
+      "total": -4.36
+     },
+     "2013": {
+      "n": 117,
+      "netR": -0.069,
+      "total": -8.05
+     },
+     "2014": {
+      "n": 131,
+      "netR": -0.072,
+      "total": -9.4
+     },
+     "2015": {
+      "n": 118,
+      "netR": -0.07,
+      "total": -8.28
+     }
+    },
+    "placebo": {
+     "p5": -0.047,
+     "p50": -0.027,
+     "p95": -0.004,
+     "rankOfReal": 36,
+     "above95": false
+    }
+   }
+  }
+ },
+ "conditions": {
+  "T1": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  },
+  "T2": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  },
+  "T3": {
+   "decisivePositive": false,
+   "replicationPositive": false,
+   "holm": false,
+   "n": true,
+   "pass": false
+  }
+ },
+ "describe": {
+  "de40": {
+   "decisive": {
+    "sessions": 2759,
+    "sessionVsGap": -0.03,
+    "usN": 2682,
+    "usVsGap": 0.38,
+    "usVsSession": -0.03,
+    "triggered": 1964
+   },
+   "replication": {
+    "sessions": 2781,
+    "sessionVsGap": -0.005,
+    "usN": 2709,
+    "usVsGap": 0.508,
+    "usVsSession": 0.01,
+    "triggered": 2032
+   }
+  },
+  "uk100": {
+   "decisive": {
+    "sessions": 2725,
+    "sessionVsGap": -0.041,
+    "usN": 2659,
+    "usVsGap": 0.354,
+    "usVsSession": -0.022,
+    "triggered": 1991
+   },
+   "replication": {
+    "sessions": 2744,
+    "sessionVsGap": 0.003,
+    "usN": 2681,
+    "usVsGap": 0.564,
+    "usVsSession": 0.017,
+    "triggered": 2016
+   }
+  },
+  "eu50": {
+   "decisive": {
+    "sessions": 2762,
+    "sessionVsGap": -0.018,
+    "usN": 2686,
+    "usVsGap": 0.397,
+    "usVsSession": -0.047,
+    "triggered": 2019
+   },
+   "replication": {
+    "sessions": 2752,
+    "sessionVsGap": -0.011,
+    "usN": 2682,
+    "usVsGap": 0.533,
+    "usVsSession": 0.013,
+    "triggered": 2043
+   }
+  }
+ },
+ "reading": "Not an edge, and the #913 observation does not carry over to Europe. The US cash session does lead the European open through the gap (correlation of the prior US session with the DE40 / UK100 / EU50 gap +0.35 to +0.56), but the European session that follows neither reverses nor extends it: the correlation of the gap with the session after it is −0.04 to +0.00, and of the US session with the European session −0.05 to +0.02. Fading the triggered gaps is about zero before costs (−0.019R to +0.017R a trade in the six cells; UK100 + EU50 +0.002R in 2016 → now) and every cell loses after the 0.04 % round trip (about 0.03R at a one-ATR stop; month-sum t −0.57 to −4.09). The US-led subset (T3), the one the #913 mechanism describes, is the worst in 2016 → now (−0.034R gross, −0.063R net, below all 40 random-side placebos) and does not replicate the small positive gross figure of 2005-15 (+0.017R). The reversal seen on JP225 / HK33 was most likely a feature of those two markets or of noise, not a general response to a US-led gap. Never call this an edge and never propose it as a council system; nothing live changed. Post hoc, not a test: no other exit, stop or trigger was tried."
+}
