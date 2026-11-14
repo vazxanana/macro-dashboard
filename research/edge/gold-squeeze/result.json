@@ -1,0 +1,522 @@
+{
+ "study": "gold-squeeze",
+ "title": "Gold volatility squeeze breakout (Bollinger inside Keltner, H4 and D1)",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "data": {
+  "h4": {
+   "n": 18331,
+   "from": 1433116800,
+   "to": 1794600000
+  },
+  "d1": {
+   "n": 2975,
+   "from": 1433116800,
+   "to": 1794528000
+  }
+ },
+ "params": {
+  "LEN": 20,
+  "BBK": 2,
+  "KCK": 1.5,
+  "MINRUN": 6,
+  "RECENT": 5,
+  "STOP_ATR": 1.5,
+  "SLOPE_LEN": 50,
+  "SLOPE_LAG": 10,
+  "SPREAD": 0.3,
+  "SLIP": 0.5,
+  "SEEDS": 40,
+  "IS": [
+   "2016-01-01",
+   "2021-01-01"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2100-01-01"
+  ]
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippageEachWay": 0.15,
+  "financingLong": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "tests": {
+  "T1": {
+   "tf": "4h",
+   "hold": 30,
+   "slope": false,
+   "label": "H4, both sides (primary)",
+   "skipped": 0,
+   "is": {
+    "n": 95,
+    "buys": 51,
+    "gross": 0.353,
+    "net": 0.23,
+    "net2": 0.106,
+    "fin": 0.048,
+    "totalNet": 21.83,
+    "win": 0.368,
+    "maxDD": -11.96,
+    "months": 60,
+    "t": 1.15,
+    "tGross": 1.72,
+    "p": 0.1251,
+    "heldMedian": 14,
+    "why": {
+     "mid": 53,
+     "stop": 33,
+     "time": 8,
+     "gap": 1
+    }
+   },
+   "oos": {
+    "n": 108,
+    "buys": 55,
+    "gross": -0.016,
+    "net": -0.086,
+    "net2": -0.157,
+    "fin": 0.034,
+    "totalNet": -9.33,
+    "win": 0.269,
+    "maxDD": -15.83,
+    "months": 71,
+    "t": -0.58,
+    "tGross": -0.1,
+    "p": 0.7186,
+    "heldMedian": 12,
+    "why": {
+     "mid": 52,
+     "stop": 47,
+     "time": 7,
+     "gap": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": -0.017,
+    "p95": 0.295,
+    "min": -0.29,
+    "max": 0.353
+   },
+   "years": {
+    "2016": {
+     "n": 21,
+     "net": 8.81
+    },
+    "2017": {
+     "n": 16,
+     "net": 12.23
+    },
+    "2018": {
+     "n": 20,
+     "net": -3.38
+    },
+    "2019": {
+     "n": 17,
+     "net": 11.54
+    },
+    "2020": {
+     "n": 21,
+     "net": -7.37
+    },
+    "2021": {
+     "n": 18,
+     "net": 1.18
+    },
+    "2022": {
+     "n": 16,
+     "net": -5.42
+    },
+    "2023": {
+     "n": 17,
+     "net": 5.19
+    },
+    "2024": {
+     "n": 19,
+     "net": -10.41
+    },
+    "2025": {
+     "n": 22,
+     "net": 4.63
+    },
+    "2026": {
+     "n": 16,
+     "net": -4.5
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 55,
+     "buys": 55,
+     "gross": 0.181,
+     "net": 0.076,
+     "net2": -0.029,
+     "fin": 0.067,
+     "totalNet": 4.19,
+     "win": 0.345,
+     "maxDD": -8.58,
+     "months": 71,
+     "t": 0.34,
+     "tGross": 0.8,
+     "p": 0.3664,
+     "heldMedian": 12,
+     "why": {
+      "mid": 26,
+      "stop": 25,
+      "time": 4
+     }
+    },
+    "sell": {
+     "n": 53,
+     "buys": 0,
+     "gross": -0.22,
+     "net": -0.255,
+     "net2": -0.291,
+     "fin": 0,
+     "totalNet": -13.52,
+     "win": 0.189,
+     "maxDD": -21.25,
+     "months": 71,
+     "t": -1.25,
+     "tGross": -1.08,
+     "p": 0.8941,
+     "heldMedian": 11,
+     "why": {
+      "mid": 26,
+      "stop": 22,
+      "time": 3,
+      "gap": 2
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": true,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "tf": "1d",
+   "hold": 20,
+   "slope": false,
+   "label": "D1, both sides",
+   "skipped": 0,
+   "is": {
+    "n": 15,
+    "buys": 9,
+    "gross": -0.091,
+    "net": -0.19,
+    "net2": -0.289,
+    "fin": 0.072,
+    "totalNet": -2.85,
+    "win": 0.267,
+    "maxDD": -3.55,
+    "months": 60,
+    "t": -0.56,
+    "tGross": -0.26,
+    "p": 0.7134,
+    "heldMedian": 8,
+    "why": {
+     "stop": 7,
+     "mid": 4,
+     "time": 4
+    }
+   },
+   "oos": {
+    "n": 17,
+    "buys": 11,
+    "gross": -0.391,
+    "net": -0.479,
+    "net2": -0.567,
+    "fin": 0.073,
+    "totalNet": -8.14,
+    "win": 0.235,
+    "maxDD": -11.54,
+    "months": 71,
+    "t": -1.81,
+    "tGross": -1.49,
+    "p": 0.965,
+    "heldMedian": 7,
+    "why": {
+     "time": 2,
+     "stop": 9,
+     "mid": 6
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": 0.014,
+    "p95": 0.67,
+    "min": -0.477,
+    "max": 0.787
+   },
+   "years": {
+    "2016": {
+     "n": 2,
+     "net": -1.43
+    },
+    "2017": {
+     "n": 1,
+     "net": -1.04
+    },
+    "2018": {
+     "n": 4,
+     "net": 0.32
+    },
+    "2019": {
+     "n": 4,
+     "net": 2.86
+    },
+    "2020": {
+     "n": 4,
+     "net": -3.54
+    },
+    "2021": {
+     "n": 5,
+     "net": 0.22
+    },
+    "2022": {
+     "n": 3,
+     "net": -3.19
+    },
+    "2023": {
+     "n": 2,
+     "net": -1.59
+    },
+    "2024": {
+     "n": 3,
+     "net": -1.49
+    },
+    "2025": {
+     "n": 3,
+     "net": -2.32
+    },
+    "2026": {
+     "n": 1,
+     "net": 0.22
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 11,
+     "buys": 11,
+     "gross": -0.322,
+     "net": -0.45,
+     "net2": -0.578,
+     "fin": 0.114,
+     "totalNet": -4.94,
+     "win": 0.273,
+     "maxDD": -6.92,
+     "months": 71,
+     "t": -1.42,
+     "tGross": -1.03,
+     "p": 0.9225,
+     "heldMedian": 9,
+     "why": {
+      "time": 1,
+      "stop": 5,
+      "mid": 5
+     }
+    },
+    "sell": {
+     "n": 6,
+     "buys": 0,
+     "gross": -0.517,
+     "net": -0.533,
+     "net2": -0.549,
+     "fin": 0,
+     "totalNet": -3.2,
+     "win": 0.167,
+     "maxDD": -4.62,
+     "months": 71,
+     "t": -1.26,
+     "tGross": -1.24,
+     "p": 0.8968,
+     "heldMedian": 7,
+     "why": {
+      "time": 1,
+      "stop": 4,
+      "mid": 1
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": false,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "tf": "4h",
+   "hold": 30,
+   "slope": true,
+   "label": "H4, with the SMA(50) slope",
+   "skipped": 0,
+   "is": {
+    "n": 54,
+    "buys": 29,
+    "gross": 0.409,
+    "net": 0.284,
+    "net2": 0.158,
+    "fin": 0.049,
+    "totalNet": 15.31,
+    "win": 0.389,
+    "maxDD": -5.83,
+    "months": 60,
+    "t": 1.03,
+    "tGross": 1.44,
+    "p": 0.1519,
+    "heldMedian": 15,
+    "why": {
+     "mid": 30,
+     "time": 4,
+     "stop": 19,
+     "gap": 1
+    }
+   },
+   "oos": {
+    "n": 68,
+    "buys": 38,
+    "gross": -0.158,
+    "net": -0.231,
+    "net2": -0.304,
+    "fin": 0.036,
+    "totalNet": -15.7,
+    "win": 0.25,
+    "maxDD": -18.96,
+    "months": 71,
+    "t": -1.31,
+    "tGross": -0.89,
+    "p": 0.9052,
+    "heldMedian": 11,
+    "why": {
+     "mid": 30,
+     "stop": 34,
+     "time": 4
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": 0.024,
+    "p95": 0.315,
+    "min": -0.37,
+    "max": 0.319
+   },
+   "years": {
+    "2016": {
+     "n": 11,
+     "net": 1.37
+    },
+    "2017": {
+     "n": 13,
+     "net": 11.03
+    },
+    "2018": {
+     "n": 14,
+     "net": 1.25
+    },
+    "2019": {
+     "n": 6,
+     "net": 0.78
+    },
+    "2020": {
+     "n": 10,
+     "net": 0.88
+    },
+    "2021": {
+     "n": 11,
+     "net": -4.37
+    },
+    "2022": {
+     "n": 12,
+     "net": -6.23
+    },
+    "2023": {
+     "n": 10,
+     "net": -1.53
+    },
+    "2024": {
+     "n": 12,
+     "net": -5.79
+    },
+    "2025": {
+     "n": 16,
+     "net": 5.71
+    },
+    "2026": {
+     "n": 7,
+     "net": -3.47
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 38,
+     "buys": 38,
+     "gross": 0.117,
+     "net": 0.014,
+     "net2": -0.089,
+     "fin": 0.065,
+     "totalNet": 0.54,
+     "win": 0.342,
+     "maxDD": -11.22,
+     "months": 71,
+     "t": 0.05,
+     "tGross": 0.43,
+     "p": 0.4792,
+     "heldMedian": 12,
+     "why": {
+      "mid": 16,
+      "stop": 20,
+      "time": 2
+     }
+    },
+    "sell": {
+     "n": 30,
+     "buys": 0,
+     "gross": -0.505,
+     "net": -0.541,
+     "net2": -0.577,
+     "fin": 0,
+     "totalNet": -16.23,
+     "win": 0.133,
+     "maxDD": -16.23,
+     "months": 71,
+     "t": -2.63,
+     "tGross": -2.5,
+     "p": 0.9957,
+     "heldMedian": 9,
+     "why": {
+      "mid": 14,
+      "stop": 14,
+      "time": 2
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": true,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ }
+}
