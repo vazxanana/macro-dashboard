@@ -1,0 +1,897 @@
+{
+ "topic": "weekend-reopen-cost",
+ "built": "2026-11-14",
+ "at": "2026-11-14T02:14:50.699Z",
+ "system": "Cost measurement: the bid / ask spread at the Sunday reopen entry and exits of the forex gap fade Rule G (#880, #928, #938), no rule tested",
+ "prereg": "research/edge/weekend-reopen-cost/PREREGISTRATION.md",
+ "frozenFrom": "research/edge/fx-weekend-gap/run.mjs (branch fx-weekend-gap)",
+ "frozenSha256": "3dfd1dd71f1c1bb2512c5ee0f26573bcb38944f152634ccd622efc1b7002b273",
+ "sources": {
+  "proxy": {
+   "usable": false,
+   "why": "api/bars.js asks OANDA for mid prices only (price M) and keeps c.mid; no bid or ask candles; not modified"
+  },
+  "broker": {
+   "usable": true,
+   "file": "council-data ctrader/symbols.json, every copy in its git history",
+   "reads": 3164,
+   "forexSymbols": [
+    "audusd",
+    "eurusd",
+    "gbpusd",
+    "usdcad",
+    "usdchf"
+   ],
+   "first": "2026-11-08 22:09",
+   "last": "2026-11-13 21:58",
+   "sundayReopens": 1
+  },
+  "other": {
+   "usable": false,
+   "why": "no other council-data file holds bid / ask with a time (HistData and Kraken candles carry one price; trades.json carries model costR only)"
+  }
+ },
+ "rule": {
+  "entry": "close of the first OANDA mid M5 candle starting at or after Sunday 17:00 New York (Sunday 17:05 New York)",
+  "exit": "stop or target on a later M5 candle, else the close of the last M5 candle ending by Monday 12:00 New York"
+ },
+ "params": {
+  "MIN_REOPENS": 20,
+  "YEAR_MIN": 5,
+  "NEAR_S": 600
+ },
+ "gate": {
+  "ok": true,
+  "tests": [
+   {
+    "study": "#880",
+    "test": "G 2020 to now",
+    "ok": true,
+    "maxNetDiff": 0.000094,
+    "stats": {
+     "n": 243,
+     "gross": 0.2923,
+     "net": 0.194,
+     "net2": 0.1233,
+     "t": 3.423,
+     "tMonth": 2.1411,
+     "total": 47.1462
+    },
+    "published": {
+     "n": 243,
+     "gross": 0.2923,
+     "net": 0.194,
+     "net2": 0.1233,
+     "t": 3.423,
+     "tMonth": 2.1411,
+     "total": 47.1462
+    }
+   },
+   {
+    "study": "#928",
+    "test": "R1",
+    "ok": true,
+    "maxNetDiff": 0.000075,
+    "stats": {
+     "n": 294,
+     "gross": 0.3649,
+     "net": 0.2385,
+     "net2": 0.1581,
+     "t": 4.7239,
+     "tMonth": 2.9878,
+     "total": 70.1316
+    },
+    "published": {
+     "n": 294,
+     "gross": 0.3649,
+     "net": 0.2385,
+     "net2": 0.1581,
+     "t": 4.7239,
+     "tMonth": 2.9878,
+     "total": 70.1316
+    }
+   },
+   {
+    "study": "#938",
+    "test": "S2",
+    "ok": true,
+    "maxNetDiff": 0.000091,
+    "stats": {
+     "n": 481,
+     "gross": 0.2931,
+     "net": 0.1532,
+     "net2": 0.0658,
+     "t": 3.7907,
+     "tMonth": 3.1876,
+     "total": 73.6738
+    },
+    "published": {
+     "n": 481,
+     "gross": 0.2931,
+     "net": 0.1532,
+     "net2": 0.0658,
+     "t": 3.7907,
+     "tMonth": 3.1876,
+     "total": 73.6738
+    }
+   },
+   {
+    "study": "#880",
+    "test": "G 2016-19",
+    "ok": true,
+    "maxNetDiff": 0.000089,
+    "stats": {
+     "n": 173,
+     "gross": 0.1467,
+     "net": 0.0343,
+     "net2": -0.0466,
+     "t": 0.4877,
+     "tMonth": 0.394,
+     "total": 5.9421
+    },
+    "published": {
+     "n": 173,
+     "gross": 0.1467,
+     "net": 0.0343,
+     "net2": -0.0466,
+     "t": 0.4877,
+     "tMonth": 0.394,
+     "total": 5.9421
+    }
+   },
+   {
+    "study": "#928",
+    "test": "R2",
+    "ok": true,
+    "maxNetDiff": 0.000079,
+    "stats": {
+     "n": 297,
+     "gross": 0.0883,
+     "net": 0.0026,
+     "net2": -0.0587,
+     "t": 0.047,
+     "tMonth": 0.0278,
+     "total": 0.7583
+    },
+    "published": {
+     "n": 297,
+     "gross": 0.0883,
+     "net": 0.0026,
+     "net2": -0.0587,
+     "t": 0.047,
+     "tMonth": 0.0278,
+     "total": 0.7583
+    }
+   },
+   {
+    "study": "#938",
+    "test": "S1",
+    "ok": true,
+    "maxNetDiff": 0.000095,
+    "stats": {
+     "n": 588,
+     "gross": 0.1792,
+     "net": 0.0608,
+     "net2": -0.0134,
+     "t": 1.5968,
+     "tMonth": 1.0216,
+     "total": 35.736
+    },
+    "published": {
+     "n": 588,
+     "gross": 0.1792,
+     "net": 0.0608,
+     "net2": -0.0134,
+     "t": 1.5968,
+     "tMonth": 1.0216,
+     "total": 35.736
+    }
+   }
+  ]
+ },
+ "measurement": {
+  "eurusd": {
+   "reopens": 1,
+   "withEntry": 1,
+   "measured": false,
+   "entry": {
+    "n": 1,
+    "median": 0.6,
+    "p90": 0.6
+   },
+   "exit": {
+    "n": 109,
+    "median": 0,
+    "p90": 0
+   },
+   "byYear": {
+    "2026": {
+     "reopens": 1,
+     "entry": {
+      "n": 1,
+      "median": 0.6,
+      "p90": 0.6
+     },
+     "exit": {
+      "n": 109,
+      "median": 0,
+      "p90": 0
+     }
+    }
+   }
+  },
+  "gbpusd": {
+   "reopens": 1,
+   "withEntry": 1,
+   "measured": false,
+   "entry": {
+    "n": 1,
+    "median": 1,
+    "p90": 1
+   },
+   "exit": {
+    "n": 109,
+    "median": 0,
+    "p90": 0.1
+   },
+   "byYear": {
+    "2026": {
+     "reopens": 1,
+     "entry": {
+      "n": 1,
+      "median": 1,
+      "p90": 1
+     },
+     "exit": {
+      "n": 109,
+      "median": 0,
+      "p90": 0.1
+     }
+    }
+   }
+  },
+  "audusd": {
+   "reopens": 1,
+   "withEntry": 1,
+   "measured": false,
+   "entry": {
+    "n": 1,
+    "median": 0.6,
+    "p90": 0.6
+   },
+   "exit": {
+    "n": 109,
+    "median": 0,
+    "p90": 0
+   },
+   "byYear": {
+    "2026": {
+     "reopens": 1,
+     "entry": {
+      "n": 1,
+      "median": 0.6,
+      "p90": 0.6
+     },
+     "exit": {
+      "n": 109,
+      "median": 0,
+      "p90": 0
+     }
+    }
+   }
+  },
+  "usdcad": {
+   "reopens": 1,
+   "withEntry": 1,
+   "measured": false,
+   "entry": {
+    "n": 1,
+    "median": 4.6,
+    "p90": 4.6
+   },
+   "exit": {
+    "n": 109,
+    "median": 0,
+    "p90": 0
+   },
+   "byYear": {
+    "2026": {
+     "reopens": 1,
+     "entry": {
+      "n": 1,
+      "median": 4.6,
+      "p90": 4.6
+     },
+     "exit": {
+      "n": 109,
+      "median": 0,
+      "p90": 0
+     }
+    }
+   }
+  },
+  "usdchf": {
+   "reopens": 1,
+   "withEntry": 1,
+   "measured": false,
+   "entry": {
+    "n": 1,
+    "median": 14.5,
+    "p90": 14.5
+   },
+   "exit": {
+    "n": 108,
+    "median": 0,
+    "p90": 0
+   },
+   "byYear": {
+    "2026": {
+     "reopens": 1,
+     "entry": {
+      "n": 1,
+      "median": 14.5,
+      "p90": 14.5
+     },
+     "exit": {
+      "n": 108,
+      "median": 0,
+      "p90": 0
+     }
+    }
+   }
+  }
+ },
+ "weekend": {
+  "eurusd": [
+   {
+    "sunday": "2026-11-08",
+    "entryAtUtc": "2026-11-08 22:05",
+    "entryRead": {
+     "atUtc": "2026-11-08 22:10",
+     "secAfterEntry": 308,
+     "pips": 0.6
+    },
+    "firstHour": [
+     [
+      "22:10",
+      0.6
+     ],
+     [
+      "22:17",
+      0.6
+     ],
+     [
+      "22:27",
+      0.6
+     ],
+     [
+      "22:30",
+      0.6
+     ],
+     [
+      "22:39",
+      0.6
+     ],
+     [
+      "22:53",
+      0.6
+     ],
+     [
+      "22:55",
+      0.6
+     ]
+    ],
+    "exitWindow": {
+     "n": 109,
+     "median": 0,
+     "p90": 0
+    },
+    "exitZeroShare": 0.9174
+   }
+  ],
+  "gbpusd": [
+   {
+    "sunday": "2026-11-08",
+    "entryAtUtc": "2026-11-08 22:05",
+    "entryRead": {
+     "atUtc": "2026-11-08 22:10",
+     "secAfterEntry": 309,
+     "pips": 1
+    },
+    "firstHour": [
+     [
+      "22:10",
+      1
+     ],
+     [
+      "22:18",
+      1
+     ],
+     [
+      "22:28",
+      1
+     ],
+     [
+      "22:30",
+      2.3
+     ],
+     [
+      "22:39",
+      1
+     ],
+     [
+      "22:53",
+      1
+     ],
+     [
+      "22:55",
+      1
+     ]
+    ],
+    "exitWindow": {
+     "n": 109,
+     "median": 0,
+     "p90": 0.1
+    },
+    "exitZeroShare": 0.8899
+   }
+  ],
+  "audusd": [
+   {
+    "sunday": "2026-11-08",
+    "entryAtUtc": "2026-11-08 22:05",
+    "entryRead": {
+     "atUtc": "2026-11-08 22:10",
+     "secAfterEntry": 306,
+     "pips": 0.6
+    },
+    "firstHour": [
+     [
+      "22:10",
+      0.6
+     ],
+     [
+      "22:18",
+      0.6
+     ],
+     [
+      "22:27",
+      0.6
+     ],
+     [
+      "22:30",
+      1.2
+     ],
+     [
+      "22:39",
+      0.6
+     ],
+     [
+      "22:52",
+      0.6
+     ],
+     [
+      "22:55",
+      0.6
+     ]
+    ],
+    "exitWindow": {
+     "n": 109,
+     "median": 0,
+     "p90": 0
+    },
+    "exitZeroShare": 0.9174
+   }
+  ],
+  "usdcad": [
+   {
+    "sunday": "2026-11-08",
+    "entryAtUtc": "2026-11-08 22:05",
+    "entryRead": {
+     "atUtc": "2026-11-08 22:10",
+     "secAfterEntry": 301,
+     "pips": 4.6
+    },
+    "firstHour": [
+     [
+      "22:10",
+      4.6
+     ],
+     [
+      "22:18",
+      2
+     ],
+     [
+      "22:28",
+      2
+     ],
+     [
+      "22:30",
+      2
+     ],
+     [
+      "22:39",
+      2
+     ],
+     [
+      "22:53",
+      2
+     ],
+     [
+      "22:55",
+      3
+     ]
+    ],
+    "exitWindow": {
+     "n": 109,
+     "median": 0,
+     "p90": 0
+    },
+    "exitZeroShare": 0.9266
+   }
+  ],
+  "usdchf": [
+   {
+    "sunday": "2026-11-08",
+    "entryAtUtc": "2026-11-08 22:05",
+    "entryRead": {
+     "atUtc": "2026-11-08 22:09",
+     "secAfterEntry": 253,
+     "pips": 14.5
+    },
+    "firstHour": [
+     [
+      "22:09",
+      14.5
+     ],
+     [
+      "22:17",
+      2
+     ],
+     [
+      "22:27",
+      2
+     ],
+     [
+      "22:30",
+      2
+     ],
+     [
+      "22:39",
+      2
+     ],
+     [
+      "22:53",
+      2
+     ],
+     [
+      "22:55",
+      2
+     ]
+    ],
+    "exitWindow": {
+     "n": 108,
+     "median": 0,
+     "p90": 0
+    },
+    "exitZeroShare": 0.9352
+   }
+  ]
+ },
+ "tests": [
+  {
+   "study": "#880",
+   "branch": "fx-weekend-gap",
+   "test": "G 2020 to now",
+   "headline": true,
+   "pairs": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "assumed": {
+    "audusd": 0.3,
+    "eurjpy": 0.3,
+    "eurusd": 0.3,
+    "gbpusd": 0.3,
+    "usdchf": 0.3,
+    "usdjpy": 0.3
+   },
+   "published": {
+    "n": 243,
+    "gross": 0.2923,
+    "net": 0.194,
+    "net2": 0.1233,
+    "t": 3.423,
+    "tMonth": 2.1411,
+    "total": 47.1462
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 5.79,
+    "tMonth2": 0.69,
+    "assumedMean": 0.3,
+    "medR0Pips": 33,
+    "entryIfExitZero": {
+     "netZero": 11.58,
+     "tMonth2": 1.38
+    }
+   }
+  },
+  {
+   "study": "#928",
+   "branch": "fx-weekend-gap-replicate",
+   "test": "R1",
+   "headline": true,
+   "pairs": [
+    "audjpy",
+    "euraud",
+    "eurchf",
+    "eurgbp",
+    "gbpaud",
+    "gbpjpy"
+   ],
+   "assumed": {
+    "audjpy": 0.6,
+    "euraud": 0.9,
+    "eurchf": 0.5,
+    "eurgbp": 0.4,
+    "gbpaud": 1.3,
+    "gbpjpy": 0.9
+   },
+   "published": {
+    "n": 294,
+    "gross": 0.3649,
+    "net": 0.2385,
+    "net2": 0.1581,
+    "t": 4.7239,
+    "tMonth": 2.9878,
+    "total": 70.1316
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audjpy",
+    "euraud",
+    "eurchf",
+    "eurgbp",
+    "gbpaud",
+    "gbpjpy"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 6.56,
+    "tMonth2": 2.66,
+    "assumedMean": 0.76,
+    "medR0Pips": 33.8,
+    "entryIfExitZero": {
+     "netZero": 13.12,
+     "tMonth2": 5.32
+    }
+   }
+  },
+  {
+   "study": "#938",
+   "branch": "fx-weekend-gap-replicate2",
+   "test": "S2",
+   "headline": true,
+   "pairs": [
+    "audcad",
+    "audnzd",
+    "cadjpy",
+    "nzdjpy",
+    "nzdusd",
+    "usdcad"
+   ],
+   "assumed": {
+    "audcad": 0.8,
+    "audnzd": 1,
+    "cadjpy": 0.8,
+    "nzdjpy": 1,
+    "nzdusd": 0.4,
+    "usdcad": 0.3
+   },
+   "published": {
+    "n": 481,
+    "gross": 0.2931,
+    "net": 0.1532,
+    "net2": 0.0658,
+    "t": 3.7907,
+    "tMonth": 3.1876,
+    "total": 73.6738
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audcad",
+    "audnzd",
+    "cadjpy",
+    "nzdjpy",
+    "nzdusd",
+    "usdcad"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 4.28,
+    "tMonth2": 2.13,
+    "assumedMean": 0.77,
+    "medR0Pips": 25.2,
+    "entryIfExitZero": {
+     "netZero": 8.56,
+     "tMonth2": 4.26
+    }
+   }
+  },
+  {
+   "study": "#880",
+   "branch": "fx-weekend-gap",
+   "test": "G 2016-19",
+   "headline": false,
+   "pairs": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "assumed": {
+    "audusd": 0.3,
+    "eurjpy": 0.3,
+    "eurusd": 0.3,
+    "gbpusd": 0.3,
+    "usdchf": 0.3,
+    "usdjpy": 0.3
+   },
+   "published": {
+    "n": 173,
+    "gross": 0.1467,
+    "net": 0.0343,
+    "net2": -0.0466,
+    "t": 0.4877,
+    "tMonth": 0.394,
+    "total": 5.9421
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 1.15,
+    "tMonth2": null,
+    "assumedMean": 0.3,
+    "medR0Pips": 27.1,
+    "entryIfExitZero": {
+     "netZero": 2.3,
+     "tMonth2": null
+    }
+   }
+  },
+  {
+   "study": "#928",
+   "branch": "fx-weekend-gap-replicate",
+   "test": "R2",
+   "headline": false,
+   "pairs": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "assumed": {
+    "audusd": 0.3,
+    "eurjpy": 0.3,
+    "eurusd": 0.3,
+    "gbpusd": 0.3,
+    "usdchf": 0.3,
+    "usdjpy": 0.3
+   },
+   "published": {
+    "n": 297,
+    "gross": 0.0883,
+    "net": 0.0026,
+    "net2": -0.0587,
+    "t": 0.047,
+    "tMonth": 0.0278,
+    "total": 0.7583
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audusd",
+    "eurjpy",
+    "eurusd",
+    "gbpusd",
+    "usdchf",
+    "usdjpy"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 0.38,
+    "tMonth2": null,
+    "assumedMean": 0.3,
+    "medR0Pips": 37.8,
+    "entryIfExitZero": {
+     "netZero": 0.76,
+     "tMonth2": null
+    }
+   }
+  },
+  {
+   "study": "#938",
+   "branch": "fx-weekend-gap-replicate2",
+   "test": "S1",
+   "headline": false,
+   "pairs": [
+    "audjpy",
+    "euraud",
+    "eurchf",
+    "eurgbp",
+    "gbpaud",
+    "gbpjpy"
+   ],
+   "assumed": {
+    "audjpy": 0.6,
+    "euraud": 0.9,
+    "eurchf": 0.5,
+    "eurgbp": 0.4,
+    "gbpaud": 1.3,
+    "gbpjpy": 0.9
+   },
+   "published": {
+    "n": 588,
+    "gross": 0.1792,
+    "net": 0.0608,
+    "net2": -0.0134,
+    "t": 1.5968,
+    "tMonth": 1.0216,
+    "total": 35.736
+   },
+   "measuredPairs": [],
+   "missing": [
+    "audjpy",
+    "euraud",
+    "eurchf",
+    "eurgbp",
+    "gbpaud",
+    "gbpjpy"
+   ],
+   "recostable": false,
+   "recost": null,
+   "breakEven": {
+    "netZero": 2.3,
+    "tMonth2": null,
+    "assumedMean": 0.78,
+    "medR0Pips": 36.4,
+    "entryIfExitZero": {
+     "netZero": 4.6,
+     "tMonth2": null
+    }
+   }
+  }
+ ],
+ "reading": "NOT MEASURABLE",
+ "verdict": "NOT MEASURABLE (inconclusive: the reopen cost could not be measured; no rule was tested)"
+}
