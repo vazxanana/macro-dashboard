@@ -108,6 +108,7 @@ paper system with a measured, clearly negative record.
 | 90 | Volatility-managed index exposure (weight 1/σ² or 1/σ vs constant, SPX500 + 3 indices) | FAIL, 0 of 3: Sharpe lower after costs in both windows (SPX500 −0.16 / −0.10), drawdowns cut by about a third (−22 % vs −34 %); placebo-like; financing and turnover take the before-cost lead | #909 |
 | 91 | Fade the move into the London 16:00 FX fix (6 USD majors, exit 17:00 / 16:30) | FAIL, 0 of 3: a real reversal before costs (+0.04R, month t ~3 in both windows, strongest 2014-17) but the round trip costs ~0.12R: −0.08R a trade net, every pair negative | #910 |
 | 92 | Index at its 52-week high, long 20 days (SPX500 + 5 indices; short when >20 % below) | FAIL, 0 of 3: near the high the indices did slightly worse than on ordinary days (D −0.08R / −0.23R), Holm p 1.00; cross-sectional twin `high52-rotation` failed too | #911 |
+| 93 | Gotobi fix-minute profile on the independent HistData M1 feed (frozen rule, 2018-26) | **FEED-CONFIRMED**: gate reproduces #894 exactly; 00:55 is again the best entry (+0.127R), one minute late keeps 35 %, per-day correlation with OANDA 0.99+ at every minute: the 00:55 spike is in the market, not one feed's data | #912 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
