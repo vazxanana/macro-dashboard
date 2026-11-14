@@ -1,0 +1,692 @@
+{
+ "topic": "fx-tokyo-orb",
+ "built": "2026-11-14",
+ "at": "2026-11-14T01:48:33.791Z",
+ "system": "Tokyo-open range breakout (00:00-01:00 UTC range, M15 close beyond it, exit 06:00 UTC), USD/JPY, AUD/USD, NZD/USD, OANDA mid M15",
+ "rule": "range = the four M15 candles 00:00-00:45 UTC; first M15 close beyond it from the 01:00-05:30 candles; enter at the next open; stop the other side of the range; no target; exit at the 06:00 UTC close",
+ "window": {
+  "replication": "2008-01-03 to 2015-12-31",
+  "decisive": "2016-01-01 to 2026-11-12"
+ },
+ "params": {
+  "M15": 900,
+  "RANGE_BARS": 4,
+  "VOL_N": 20,
+  "VOL_MIN": 0.5,
+  "ATR_N": 14,
+  "MIN_W": 0.25,
+  "EPS": 1e-9,
+  "SIG_FROM_H": 1,
+  "SIG_LAST": 19800,
+  "END_H": 6,
+  "SPREAD_PIP": 0.3,
+  "COMM_SIDE": 0.0000225,
+  "SLIP_PIP": 0.5,
+  "SEEDS": 40,
+  "N_MIN": 300,
+  "DATA_FROM": 1180656000,
+  "REP_FROM": 1199145600,
+  "DEC_FROM": 1451606400
+ },
+ "pairs": [
+  "usdjpy",
+  "audusd",
+  "nzdusd"
+ ],
+ "funnel": {
+  "usdjpy": {
+   "candles": 488398,
+   "from": "2007-06-01 00:00",
+   "to": "2026-11-13 21:45",
+   "days": 5045,
+   "warmup": 20,
+   "newyear": 19,
+   "thin": 210,
+   "narrow": 3165,
+   "kept": 1631,
+   "trades": 1318
+  },
+  "audusd": {
+   "candles": 488188,
+   "from": "2007-06-01 00:00",
+   "to": "2026-11-13 21:45",
+   "days": 5044,
+   "warmup": 20,
+   "newyear": 19,
+   "thin": 186,
+   "narrow": 3513,
+   "kept": 1306,
+   "trades": 1063
+  },
+  "nzdusd": {
+   "candles": 487962,
+   "from": "2007-06-01 00:00",
+   "to": "2026-11-13 21:45",
+   "days": 5043,
+   "warmup": 20,
+   "newyear": 19,
+   "thin": 227,
+   "narrow": 3595,
+   "kept": 1182,
+   "trades": 989
+  }
+ },
+ "costs": "spread 0.3 pip + commission 22.5 USD per million a side (2 x 22.5e-6 x price a round trip) + 0.5 pip slippage on the entry and on the exit (all market)",
+ "tests": {
+  "T1": {
+   "pair": "usdjpy",
+   "decisive": {
+    "n": 862,
+    "gross": -0.02,
+    "net": -0.08,
+    "net2": -0.14,
+    "total": -69.23,
+    "win": 0.413,
+    "months": 131,
+    "t": -3.9,
+    "tGross": -1,
+    "t2": -6.55
+   },
+   "replication": {
+    "n": 456,
+    "gross": -0.028,
+    "net": -0.088,
+    "net2": -0.148,
+    "total": -39.92,
+    "win": 0.417,
+    "months": 96,
+    "t": -2.96,
+    "tGross": -0.94,
+    "t2": -4.85
+   },
+   "years": {
+    "2008": {
+     "n": 54,
+     "net": -0.15,
+     "gross": -0.115,
+     "total": -8.1
+    },
+    "2009": {
+     "n": 57,
+     "net": -0.034,
+     "gross": 0.005,
+     "total": -1.93
+    },
+    "2010": {
+     "n": 49,
+     "net": -0.142,
+     "gross": -0.088,
+     "total": -6.96
+    },
+    "2011": {
+     "n": 71,
+     "net": -0.147,
+     "gross": -0.077,
+     "total": -10.44
+    },
+    "2012": {
+     "n": 61,
+     "net": -0.06,
+     "gross": 0.026,
+     "total": -3.68
+    },
+    "2013": {
+     "n": 51,
+     "net": 0.033,
+     "gross": 0.082,
+     "total": 1.68
+    },
+    "2014": {
+     "n": 64,
+     "net": -0.058,
+     "gross": 0.021,
+     "total": -3.74
+    },
+    "2015": {
+     "n": 49,
+     "net": -0.138,
+     "gross": -0.08,
+     "total": -6.75
+    },
+    "2016": {
+     "n": 78,
+     "net": -0.125,
+     "gross": -0.082,
+     "total": -9.74
+    },
+    "2017": {
+     "n": 61,
+     "net": -0.153,
+     "gross": -0.096,
+     "total": -9.34
+    },
+    "2018": {
+     "n": 92,
+     "net": -0.142,
+     "gross": -0.07,
+     "total": -13.03
+    },
+    "2019": {
+     "n": 86,
+     "net": -0.105,
+     "gross": -0.019,
+     "total": -9.02
+    },
+    "2020": {
+     "n": 91,
+     "net": 0.012,
+     "gross": 0.093,
+     "total": 1.05
+    },
+    "2021": {
+     "n": 66,
+     "net": -0.181,
+     "gross": -0.091,
+     "total": -11.92
+    },
+    "2022": {
+     "n": 90,
+     "net": 0.01,
+     "gross": 0.056,
+     "total": 0.91
+    },
+    "2023": {
+     "n": 54,
+     "net": -0.049,
+     "gross": -0.007,
+     "total": -2.66
+    },
+    "2024": {
+     "n": 78,
+     "net": -0.143,
+     "gross": -0.1,
+     "total": -11.14
+    },
+    "2025": {
+     "n": 102,
+     "net": 0.009,
+     "gross": 0.052,
+     "total": 0.94
+    },
+    "2026": {
+     "n": 64,
+     "net": -0.083,
+     "gross": -0.029,
+     "total": -5.28
+    }
+   },
+   "exits": {
+    "stop": 93,
+    "time": 769
+   },
+   "medR0Pips": 34.2,
+   "medCostR": 0.054,
+   "p": 0.99995,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.06,
+    "p95": -0.017,
+    "min": -0.097,
+    "max": -0.015,
+    "above": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "decisive n >= 300": true,
+    "decisive net R a trade > 0": false,
+    "replication net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "Holm-adjusted p < 0.05": false
+   },
+   "verdict": "FAIL"
+  },
+  "T2": {
+   "pair": "audusd",
+   "decisive": {
+    "n": 607,
+    "gross": -0.006,
+    "net": -0.08,
+    "net2": -0.153,
+    "total": -48.28,
+    "win": 0.418,
+    "months": 131,
+    "t": -3.24,
+    "tGross": -0.23,
+    "t2": -6.01
+   },
+   "replication": {
+    "n": 456,
+    "gross": -0.002,
+    "net": -0.047,
+    "net2": -0.092,
+    "total": -21.47,
+    "win": 0.467,
+    "months": 96,
+    "t": -1.73,
+    "tGross": -0.07,
+    "t2": -3.35
+   },
+   "years": {
+    "2008": {
+     "n": 46,
+     "net": -0.067,
+     "gross": -0.031,
+     "total": -3.1
+    },
+    "2009": {
+     "n": 54,
+     "net": -0.086,
+     "gross": -0.053,
+     "total": -4.62
+    },
+    "2010": {
+     "n": 61,
+     "net": -0.157,
+     "gross": -0.116,
+     "total": -9.56
+    },
+    "2011": {
+     "n": 62,
+     "net": 0.066,
+     "gross": 0.106,
+     "total": 4.12
+    },
+    "2012": {
+     "n": 55,
+     "net": -0.067,
+     "gross": -0.014,
+     "total": -3.7
+    },
+    "2013": {
+     "n": 63,
+     "net": -0.006,
+     "gross": 0.046,
+     "total": -0.39
+    },
+    "2014": {
+     "n": 61,
+     "net": -0.099,
+     "gross": -0.044,
+     "total": -6.05
+    },
+    "2015": {
+     "n": 54,
+     "net": 0.034,
+     "gross": 0.084,
+     "total": 1.82
+    },
+    "2016": {
+     "n": 58,
+     "net": -0.165,
+     "gross": -0.11,
+     "total": -9.58
+    },
+    "2017": {
+     "n": 67,
+     "net": -0.185,
+     "gross": -0.11,
+     "total": -12.39
+    },
+    "2018": {
+     "n": 50,
+     "net": -0.053,
+     "gross": 0.02,
+     "total": -2.64
+    },
+    "2019": {
+     "n": 69,
+     "net": -0.095,
+     "gross": -0.008,
+     "total": -6.52
+    },
+    "2020": {
+     "n": 77,
+     "net": -0.062,
+     "gross": 0.007,
+     "total": -4.78
+    },
+    "2021": {
+     "n": 48,
+     "net": -0.026,
+     "gross": 0.05,
+     "total": -1.26
+    },
+    "2022": {
+     "n": 47,
+     "net": -0.004,
+     "gross": 0.052,
+     "total": -0.21
+    },
+    "2023": {
+     "n": 36,
+     "net": 0.009,
+     "gross": 0.071,
+     "total": 0.34
+    },
+    "2024": {
+     "n": 58,
+     "net": -0.021,
+     "gross": 0.063,
+     "total": -1.23
+    },
+    "2025": {
+     "n": 49,
+     "net": -0.148,
+     "gross": -0.063,
+     "total": -7.25
+    },
+    "2026": {
+     "n": 48,
+     "net": -0.057,
+     "gross": 0.027,
+     "total": -2.76
+    }
+   },
+   "exits": {
+    "time": 535,
+    "stop": 72
+   },
+   "medR0Pips": 22.4,
+   "medCostR": 0.072,
+   "p": 0.9994,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.075,
+    "p95": -0.039,
+    "min": -0.131,
+    "max": -0.037,
+    "above": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "decisive n >= 300": true,
+    "decisive net R a trade > 0": false,
+    "replication net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "Holm-adjusted p < 0.05": false
+   },
+   "verdict": "FAIL"
+  },
+  "T3": {
+   "pair": "nzdusd",
+   "decisive": {
+    "n": 585,
+    "gross": 0.008,
+    "net": -0.07,
+    "net2": -0.148,
+    "total": -40.8,
+    "win": 0.434,
+    "months": 131,
+    "t": -2.63,
+    "tGross": 0.32,
+    "t2": -5.28
+   },
+   "replication": {
+    "n": 404,
+    "gross": -0.039,
+    "net": -0.092,
+    "net2": -0.145,
+    "total": -37.14,
+    "win": 0.401,
+    "months": 96,
+    "t": -2.91,
+    "tGross": -1.29,
+    "t2": -4.34
+   },
+   "years": {
+    "2008": {
+     "n": 46,
+     "net": -0.139,
+     "gross": -0.099,
+     "total": -6.37
+    },
+    "2009": {
+     "n": 44,
+     "net": -0.09,
+     "gross": -0.055,
+     "total": -3.98
+    },
+    "2010": {
+     "n": 57,
+     "net": -0.12,
+     "gross": -0.071,
+     "total": -6.84
+    },
+    "2011": {
+     "n": 60,
+     "net": 0.084,
+     "gross": 0.132,
+     "total": 5.04
+    },
+    "2012": {
+     "n": 49,
+     "net": -0.147,
+     "gross": -0.082,
+     "total": -7.18
+    },
+    "2013": {
+     "n": 43,
+     "net": 0.004,
+     "gross": 0.059,
+     "total": 0.19
+    },
+    "2014": {
+     "n": 64,
+     "net": -0.267,
+     "gross": -0.194,
+     "total": -17.07
+    },
+    "2015": {
+     "n": 41,
+     "net": -0.023,
+     "gross": 0.03,
+     "total": -0.93
+    },
+    "2016": {
+     "n": 52,
+     "net": -0.006,
+     "gross": 0.05,
+     "total": -0.33
+    },
+    "2017": {
+     "n": 54,
+     "net": 0.03,
+     "gross": 0.101,
+     "total": 1.64
+    },
+    "2018": {
+     "n": 62,
+     "net": -0.029,
+     "gross": 0.051,
+     "total": -1.79
+    },
+    "2019": {
+     "n": 63,
+     "net": -0.187,
+     "gross": -0.095,
+     "total": -11.75
+    },
+    "2020": {
+     "n": 68,
+     "net": -0.092,
+     "gross": -0.018,
+     "total": -6.28
+    },
+    "2021": {
+     "n": 35,
+     "net": -0.109,
+     "gross": -0.033,
+     "total": -3.8
+    },
+    "2022": {
+     "n": 50,
+     "net": -0.003,
+     "gross": 0.062,
+     "total": -0.16
+    },
+    "2023": {
+     "n": 45,
+     "net": -0.188,
+     "gross": -0.114,
+     "total": -8.47
+    },
+    "2024": {
+     "n": 58,
+     "net": -0.146,
+     "gross": -0.058,
+     "total": -8.46
+    },
+    "2025": {
+     "n": 45,
+     "net": 0.042,
+     "gross": 0.13,
+     "total": 1.91
+    },
+    "2026": {
+     "n": 53,
+     "net": -0.063,
+     "gross": 0.029,
+     "total": -3.32
+    }
+   },
+   "exits": {
+    "time": 507,
+    "stop": 78
+   },
+   "medR0Pips": 21,
+   "medCostR": 0.076,
+   "p": 0.99573,
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.061,
+    "p95": -0.03,
+    "min": -0.116,
+    "max": -0.023,
+    "above": false
+   },
+   "pHolm": 1,
+   "checks": {
+    "decisive n >= 300": true,
+    "decisive net R a trade > 0": false,
+    "replication net R a trade > 0": false,
+    "decisive month-sum t >= 2": false,
+    "Holm-adjusted p < 0.05": false
+   },
+   "verdict": "FAIL"
+  }
+ },
+ "pooled": {
+  "note": "reported, not judged",
+  "decisive": {
+   "n": 2054,
+   "gross": -0.008,
+   "net": -0.077,
+   "net2": -0.146,
+   "total": -158.31,
+   "win": 0.421,
+   "months": 131,
+   "t": -5.22,
+   "tGross": -0.54,
+   "t2": -9.41
+  },
+  "replication": {
+   "n": 1316,
+   "gross": -0.022,
+   "net": -0.075,
+   "net2": -0.128,
+   "total": -98.54,
+   "win": 0.429,
+   "months": 96,
+   "t": -3.82,
+   "tGross": -1.15,
+   "t2": -6.29
+  }
+ },
+ "verdict": "FAIL: 0 of 3 tests pass. T1 usdjpy FAIL (2016 on -0.08R a trade net, n 862, t -3.9; to 2015 -0.088R, n 456); T2 audusd FAIL (2016 on -0.08R a trade net, n 607, t -3.24; to 2015 -0.047R, n 456); T3 nzdusd FAIL (2016 on -0.07R a trade net, n 585, t -2.63; to 2015 -0.092R, n 404)",
+ "candidates": [
+  {
+   "rule": "T1 usdjpy: range = the four M15 candles 00:00-00:45 UTC; first M15 close beyond it from the 01:00-05:30 candles; enter at the next open; stop the other side of the range; no target; exit at the 06:00 UTC close",
+   "verdict": "FAIL",
+   "is": {
+    "n": 456,
+    "gross": -0.028,
+    "net": -0.088,
+    "net2": -0.148,
+    "total": -39.92,
+    "win": 0.417,
+    "months": 96,
+    "t": -2.96,
+    "tGross": -0.94,
+    "t2": -4.85
+   },
+   "oos": {
+    "n": 862,
+    "gross": -0.02,
+    "net": -0.08,
+    "net2": -0.14,
+    "total": -69.23,
+    "win": 0.413,
+    "months": 131,
+    "t": -3.9,
+    "tGross": -1,
+    "t2": -6.55
+   }
+  },
+  {
+   "rule": "T2 audusd: range = the four M15 candles 00:00-00:45 UTC; first M15 close beyond it from the 01:00-05:30 candles; enter at the next open; stop the other side of the range; no target; exit at the 06:00 UTC close",
+   "verdict": "FAIL",
+   "is": {
+    "n": 456,
+    "gross": -0.002,
+    "net": -0.047,
+    "net2": -0.092,
+    "total": -21.47,
+    "win": 0.467,
+    "months": 96,
+    "t": -1.73,
+    "tGross": -0.07,
+    "t2": -3.35
+   },
+   "oos": {
+    "n": 607,
+    "gross": -0.006,
+    "net": -0.08,
+    "net2": -0.153,
+    "total": -48.28,
+    "win": 0.418,
+    "months": 131,
+    "t": -3.24,
+    "tGross": -0.23,
+    "t2": -6.01
+   }
+  },
+  {
+   "rule": "T3 nzdusd: range = the four M15 candles 00:00-00:45 UTC; first M15 close beyond it from the 01:00-05:30 candles; enter at the next open; stop the other side of the range; no target; exit at the 06:00 UTC close",
+   "verdict": "FAIL",
+   "is": {
+    "n": 404,
+    "gross": -0.039,
+    "net": -0.092,
+    "net2": -0.145,
+    "total": -37.14,
+    "win": 0.401,
+    "months": 96,
+    "t": -2.91,
+    "tGross": -1.29,
+    "t2": -4.34
+   },
+   "oos": {
+    "n": 585,
+    "gross": 0.008,
+    "net": -0.07,
+    "net2": -0.148,
+    "total": -40.8,
+    "win": 0.434,
+    "months": 131,
+    "t": -2.63,
+    "tGross": 0.32,
+    "t2": -5.28
+   }
+  }
+ ]
+}
