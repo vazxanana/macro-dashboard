@@ -1,0 +1,337 @@
+{
+ "study": "gold-lunar-cycle",
+ "built": "2026-11-14",
+ "data": {
+  "first": "2006-03-20",
+  "last": "2026-11-06",
+  "candles": 5364,
+  "fold": "UTC days, weekends folded into the next weekday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "stop": "2 x ATR(20)",
+  "baseHold": 10,
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ],
+  "phases": "Meeus ch. 49 (periodic terms to 0.00017 day), TD taken as UTC",
+  "tests": {
+   "T1": "both legs: long last quarter -> first quarter, short first quarter -> last quarter (net R)",
+   "T2": "long legs (around the new moon) minus the every-day long baseline (excess R)",
+   "T3": "short legs (around the full moon) minus the every-day short baseline (excess R)"
+  }
+ },
+ "legs": {
+  "offFile": 2,
+  "empty": 0,
+  "holdDays": 10
+ },
+ "baseline": {
+  "is": {
+   "long": {
+    "n": 2602,
+    "net": 0.013,
+    "gross": 0.088,
+    "net2x": -0.061
+   },
+   "short": {
+    "n": 2602,
+    "net": -0.101,
+    "gross": -0.084,
+    "net2x": -0.118
+   }
+  },
+  "oos": {
+   "long": {
+    "n": 2547,
+    "net": 0.116,
+    "gross": 0.203,
+    "net2x": 0.03
+   },
+   "short": {
+    "n": 2547,
+    "net": -0.166,
+    "gross": -0.152,
+    "net2x": -0.18
+   }
+  }
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 247,
+    "mean": -0.013,
+    "net": -0.013,
+    "gross": 0.035,
+    "t": -0.21,
+    "tGross": 0.55,
+    "p": 0.5828,
+    "months": 120,
+    "win": 46.15,
+    "stops": 82,
+    "total": -3.27,
+    "longs": 124,
+    "costR": 0.048,
+    "costShare": 5.91,
+    "medianStop": 37.15,
+    "mean2x": -0.061
+   },
+   "oos": {
+    "n": 243,
+    "mean": -0.026,
+    "net": -0.026,
+    "gross": 0.027,
+    "t": -0.4,
+    "tGross": 0.41,
+    "p": 0.6547,
+    "months": 118,
+    "win": 40.33,
+    "stops": 78,
+    "total": -6.25,
+    "longs": 121,
+    "costR": 0.052,
+    "costShare": 6.45,
+    "medianStop": 48.29,
+    "mean2x": -0.078
+   },
+   "byYear": {
+    "2007": {
+     "n": 25,
+     "net": 0.25
+    },
+    "2008": {
+     "n": 24,
+     "net": -0.248
+    },
+    "2009": {
+     "n": 25,
+     "net": -0.16
+    },
+    "2010": {
+     "n": 25,
+     "net": -0.086
+    },
+    "2011": {
+     "n": 24,
+     "net": 0.072
+    },
+    "2012": {
+     "n": 25,
+     "net": 0.134
+    },
+    "2013": {
+     "n": 25,
+     "net": -0.108
+    },
+    "2014": {
+     "n": 25,
+     "net": -0.538
+    },
+    "2015": {
+     "n": 24,
+     "net": 0.486
+    },
+    "2016": {
+     "n": 25,
+     "net": 0.08
+    },
+    "2017": {
+     "n": 25,
+     "net": -0.174
+    },
+    "2018": {
+     "n": 25,
+     "net": 0.046
+    },
+    "2019": {
+     "n": 24,
+     "net": 0.043
+    },
+    "2020": {
+     "n": 25,
+     "net": -0.201
+    },
+    "2021": {
+     "n": 25,
+     "net": 0.242
+    },
+    "2022": {
+     "n": 25,
+     "net": -0.059
+    },
+    "2023": {
+     "n": 24,
+     "net": 0.045
+    },
+    "2024": {
+     "n": 25,
+     "net": -0.032
+    },
+    "2025": {
+     "n": 25,
+     "net": -0.232
+    },
+    "2026": {
+     "n": 20,
+     "net": 0.094
+    }
+   },
+   "opposite": {
+    "is": {
+     "n": 247,
+     "mean": -0.094,
+     "net": -0.094,
+     "gross": -0.047,
+     "t": -1.59,
+     "tGross": -0.8,
+     "p": 0.9429,
+     "months": 120,
+     "win": 42.91,
+     "stops": 90,
+     "total": -23.21,
+     "longs": 123,
+     "costR": 0.047,
+     "costShare": 5.72,
+     "medianStop": 37.15
+    },
+    "oos": {
+     "n": 243,
+     "mean": -0.021,
+     "net": -0.021,
+     "gross": 0.03,
+     "t": -0.3,
+     "tGross": 0.43,
+     "p": 0.6181,
+     "months": 118,
+     "win": 48.15,
+     "stops": 81,
+     "total": -5.16,
+     "longs": 122,
+     "costR": 0.052,
+     "costShare": 6.34,
+     "medianStop": 48.29
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 17,
+    "mean": -0.026,
+    "max": 0.066,
+    "min": -0.116
+   },
+   "holm": 1,
+   "checks": {
+    "oosPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "is": {
+    "n": 124,
+    "mean": 0.029,
+    "net": 0.042,
+    "gross": 0.121,
+    "t": 0.33,
+    "tGross": 1.37,
+    "p": 0.3701,
+    "months": 118,
+    "win": 50.81,
+    "stops": 36,
+    "total": 3.6,
+    "longs": 124,
+    "costR": 0.079,
+    "costShare": 9.68,
+    "medianStop": 37.49,
+    "mean2x": 0.025
+   },
+   "oos": {
+    "n": 121,
+    "mean": 0.03,
+    "net": 0.146,
+    "gross": 0.237,
+    "t": 0.29,
+    "tGross": 2.3,
+    "p": 0.3847,
+    "months": 117,
+    "win": 47.11,
+    "stops": 31,
+    "total": 3.61,
+    "longs": 121,
+    "costR": 0.091,
+    "costShare": 10.37,
+    "medianStop": 48.29,
+    "mean2x": 0.025
+   },
+   "holm": 1,
+   "checks": {
+    "oosPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "is": {
+    "n": 123,
+    "mean": 0.032,
+    "net": -0.069,
+    "gross": -0.052,
+    "t": 0.37,
+    "tGross": -0.6,
+    "p": 0.3566,
+    "months": 118,
+    "win": 41.46,
+    "stops": 46,
+    "total": 3.92,
+    "longs": 0,
+    "costR": 0.017,
+    "costShare": 2.08,
+    "medianStop": 37.15,
+    "mean2x": 0.032
+   },
+   "oos": {
+    "n": 122,
+    "mean": -0.03,
+    "net": -0.196,
+    "gross": -0.182,
+    "t": -0.37,
+    "tGross": -2.22,
+    "p": 0.6449,
+    "months": 117,
+    "win": 33.61,
+    "stops": 47,
+    "total": -3.69,
+    "longs": 0,
+    "costR": 0.014,
+    "costShare": 1.88,
+    "medianStop": 48.1,
+    "mean2x": -0.03
+   },
+   "holm": 1,
+   "checks": {
+    "oosPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": true,
+    "cost2x": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
