@@ -111,6 +111,7 @@ paper system with a measured, clearly negative record.
 | 345 | `gold-elder-ray` (#1158) | Elder bull / bear power pullback on the EMA13, 3-day hold | FAIL, 0 of 3: OOS −0.082R a trade net (n 330, month t −1.55), −0.059R vs every day of its year (t −1.13); IS −0.003R; placebo beat 5 of 40 |
 | 346 | `gold-h1-vortex` (#1159) | H1 Vortex crossover, both sides, 24 h hold | FAIL, 0 of 3: OOS −0.075R a trade net (n 2,330, month t −2.09); gross +0.045R eaten by ~0.12R costs; excess vs drift +0.057R (t 1.89); placebo beaten 29 of 40 (bar 38) |
 | 347 | `gold-double-seven` (#1160) | Double seven: buy the 7-day lowest close above the 200-day average, out at the 7-day high | FAIL, 0 of 3: OOS +0.057R a trade net but only +0.005R over every above-average day (n 115, t 0.08); sell side negative; placebo 18 of 40 |
+| 348 | `gold-trix` (#1161) | TRIX(9) signal-line cross, 5-day hold | FAIL, 0 of 3: OOS long excess over every day −0.020R a trade (n 106, t −0.25) after +0.129R in sample; the long's +0.042R net is gold's drift (baseline +0.062R); placebo 15 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
