@@ -134,6 +134,7 @@ paper system with a measured, clearly negative record.
 | 116 | Cross-sectional momentum on 12 commodities (12-1 ranking, long top 3 / short bottom 3, monthly) | FAIL: −0.071R a month 2016-26 (t −1.30), +0.029R 2006-15; at the median of 40 random rankings; 6-1 and 3-1 variants no better | #935 |
 | 117 | Yen around Japan's 31 March fiscal year-end: short USD/JPY in March, long the first 10 days of April | FAIL 0 of 2: March has the wrong sign (USD/JPY rose; −0.319R a year 2016-26, stopped 9 of 22 years); April like any 10 days | #936 |
 | 118 | Robustness of the soybean short (#934), rule frozen: window shifted ±5/±10 days, stop 2x/4x ATR | FRAGILE: a window 10 days later loses in 2016-26 (−0.041R a year, 4 of 11 years); −5 days barely positive; stops fine. Depends on the exact dates, not an edge | #937 |
+| 119 | Second frozen replication of the forex Sunday-gap fade (#880 rule G): #928's crosses 2010-19, six untraded pairs 2016-now | PARTLY: new pairs +0.153R a trade (n 481, month t 3.19, Holm p 0.001; every year positive, AUD/NZD half of it, gone at 2x cost); crosses 2010-19 +0.061R (t 1.02), 81 % from 2015. Real since 2016 on several pair sets, near zero before, cost-fragile | #938 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
