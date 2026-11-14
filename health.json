@@ -1,5 +1,5 @@
 {
- "at": "2026-11-14T23:24:38.000Z",
+ "at": "2026-11-14T23:43:24.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T23:20:00.000Z",
+     "last": "2026-11-14T23:40:00.000Z",
      "staleMin": 0,
      "maxJump": 4.82,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T23:20:00.000Z",
+     "last": "2026-11-14T23:40:00.000Z",
      "staleMin": 0,
      "maxJump": 6.51,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T23:20:00.000Z",
+     "last": "2026-11-14T23:40:00.000Z",
      "staleMin": 0,
      "maxJump": 3.93,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-14T23:20:00.000Z",
+     "last": "2026-11-14T23:40:00.000Z",
      "staleMin": 0,
      "maxJump": 4.3,
      "clipped": 0,
@@ -230,24 +230,24 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "bad",
-     "ageMin": 125,
+     "ageMin": 144,
      "issues": [
       {
        "kind": "stale",
        "sev": "bad",
-       "detail": "not updated for 2.1 h (expected 1 min (between rounds); alert after 45 min)"
+       "detail": "not updated for 2.4 h (expected 1 min (between rounds); alert after 45 min)"
       }
      ]
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "bad",
-     "ageMin": 125,
+     "ageMin": 144,
      "issues": [
       {
        "kind": "stale",
        "sev": "bad",
-       "detail": "not updated for 2.1 h (expected 1 min; alert after 45 min)"
+       "detail": "not updated for 2.4 h (expected 1 min; alert after 45 min)"
       }
      ]
     },
@@ -284,7 +284,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 9,
+     "ageMin": 10,
      "issues": [
       {
        "kind": "source",
@@ -318,27 +318,12 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 37,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "input",
        "sev": "warn",
        "detail": "fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no data\")"
-      },
-      {
-       "kind": "source",
-       "sev": "warn",
-       "detail": "bars:nq failed (HTTP 502)"
-      },
-      {
-       "kind": "source",
-       "sev": "warn",
-       "detail": "bars:gold OANDA failed (HTTP 502), Kraken ok (721 days)"
-      },
-      {
-       "kind": "source",
-       "sev": "warn",
-       "detail": "bars:usdcad OANDA failed (HTTP 502), Kraken ok (721 days)"
       },
       {
        "kind": "source",
@@ -350,13 +335,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 36,
+     "ageMin": 0,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 36,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "stale",
@@ -383,7 +368,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1404,
+     "ageMin": 1423,
      "issues": []
     },
     "digest.json": {
@@ -394,31 +379,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 28,
+     "ageMin": 47,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 762,
+     "ageMin": 780,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 761,
+     "ageMin": 780,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 761,
+     "ageMin": 780,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 398,
+     "ageMin": 417,
      "issues": []
     },
     "research/ledger.json": {
@@ -439,19 +424,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 577,
+     "ageMin": 596,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 366,
+     "ageMin": 385,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 778,
+     "ageMin": 797,
      "issues": [
       {
        "kind": "stale",
@@ -481,16 +466,13 @@
  "summary": "Council data files: cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
  "brief": {
   "status": "bad",
-  "line": "2 problems, 6 warnings: cTrader demo account (ctrader/account.json): not updated for 2.1 h (expected 1 min (between rounds); alert after 45 min)",
+  "line": "2 problems, 3 warnings: cTrader demo account (ctrader/account.json): not updated for 2.4 h (expected 1 min (between rounds); alert after 45 min)",
   "bad": [
-   "cTrader demo account (ctrader/account.json): not updated for 2.1 h (expected 1 min (between rounds); alert after 45 min)",
-   "cTrader demo accounts (ctrader/accounts.json): not updated for 2.1 h (expected 1 min; alert after 45 min)"
+   "cTrader demo account (ctrader/account.json): not updated for 2.4 h (expected 1 min (between rounds); alert after 45 min)",
+   "cTrader demo accounts (ctrader/accounts.json): not updated for 2.4 h (expected 1 min; alert after 45 min)"
   ],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1048 days old; over 120 the strategist drops it as \"no data\")",
-   "Macro forecast (macro/forecast.json): bars:nq failed (HTTP 502)",
-   "Macro forecast (macro/forecast.json): bars:gold OANDA failed (HTTP 502), Kraken ok (721 days)",
-   "Macro forecast (macro/forecast.json): bars:usdcad OANDA failed (HTTP 502), Kraken ok (721 days)",
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
    "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-03 (11 days ago; normally 3-10)"
   ],
@@ -498,8 +480,8 @@
  },
  "alert": {
   "streak": {
-   "files:ctrader/account.json": 5,
-   "files:ctrader/accounts.json": 5
+   "files:ctrader/account.json": 6,
+   "files:ctrader/accounts.json": 6
   },
   "sent": {
    "key": "files:ctrader/account.json|files:ctrader/accounts.json",
