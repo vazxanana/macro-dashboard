@@ -3287,6 +3287,27 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     owner's log form and prompts stay English. `scripts/mosha-lessons.mjs`: `lesson.txt` says under its heading whose move
     it is and why (`why`), `BOOK.md` counts the teacher's lines against the desk's, and `pull` prints first how many
     lessons wait for the desk, for the teacher, and are understood (`counts`, `countsText`).
+- **Luxus's record** (14 Nov 2026, owner: "Ask Luxus and log his trades"; display only): card `#mo-lux` under the record,
+  `assets/mosha-record.js` (`window.MS_MOSHA_REC`, fed by `msMoshaRecord(T.lessons)` from the teach cards' own read, no second
+  request). Counts a lesson of the teacher (`TEACHER`, as `api/mosha.js`) whose `trade` has market, side, `at`, entry, a stop on
+  the losing side and a target, never `src: 'replay'`. Outcome on our 5-minute candles through `MS_MOSHA.replay` (stop first when
+  one candle holds both); only where neither level is reached before his own exit does his exit stand; both are shown. In the
+  record only when the lesson's `at` is before the outcome (the start of the candle that reached the level, else his exit time);
+  otherwise "added afterwards", kept apart. **Timing caveat**: the server stamps no time on the levels themselves, so levels given or
+  changed later by `edit` carry the lesson's time (said on the card); proving it needs a server stamp, not added. R before costs in
+  the tiles, after $0.60 a round trip on gold (other markets before costs); `MS_MOSHA.verdict` / `MIN_JUDGE` 20. Hidden for a
+  teacher who is not the owner (CSS beside `#mo-rules` / `#mo-cycle`; no candle read then); owner-English, so not in the French
+  dictionary. Folds on the simple phone view through `desks()`. Tests: `tests/mosha-record.test.mjs`.
+  **Levels time-stamped by the server** (14 Nov 2026): `api/mosha-lessons.js` `stampTrade` stamps `trade.setAt` (unix s, server
+  clock) whenever an `add` or `edit` sets or changes market, side, `at`, entry, stop or target, keeps `firstAt` (first time levels
+  were set, kept on the lesson as `tradeFirstAt` if they are removed) and `exitSetAt` (an exit-only edit, which never moves
+  `setAt`); the page cannot send them (`tradeOf` builds a fresh object), older lessons keep none until their levels change; the
+  record judges `setAt` against the outcome candle and marks rows without it "levels not time-stamped (older lesson)". Tests:
+  `tests/mosha-trade-stamp.test.mjs`.
+  **Browser check (14 Nov 2026)**: a trade still open on our candles was read again after every draw (hundreds of `/md/bars`
+  requests a second while the desk was open); now once per read of the lessons (`S.tried`, cleared by `msMoshaRecord`). The rows
+  carry the log's cell classes (`mo-c-time`, `mo-c-side`, `mo-c-res`, `data-l`), so on a phone they are the log's cards (the side
+  chip sat over the entry time). Tests in `tests/mosha-record.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 

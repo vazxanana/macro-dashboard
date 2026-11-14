@@ -33,6 +33,7 @@
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js"></script>
 <script src="/assets/mosha-desk.js" defer></script>
+<script src="/assets/mosha-record.js" defer></script>
 <script src="/assets/mosha-replay.js" defer></script>
 <script src="/assets/mosha-i18n.js" defer></script>
 <script src="/assets/mosha-tutor.js" defer></script>
@@ -3726,6 +3727,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </div>
     <div class="mo-grid">
       <div class="card" id="mo-rec"><div class="ms-k"><span>Your record</span></div><div class="ct-empty">Loading the log…</div></div>
+      <div class="card" id="mo-lux"><div class="ms-k"><span>Luxus's record</span></div><div class="ct-empty">Loading the lessons…</div></div>
       <div class="card" id="mo-cycle"><div class="ms-k"><span>The cycle</span><small>as you described it</small></div>
         <ol class="mo-steps">
           <li><b>Top-down order.</b> H4 first, then H1 shows when the pullback starts, then M15 or M5 gives the trade.</li>
@@ -11902,7 +11904,9 @@ html[data-role="public"] .hdr-sw { display: none; }
 /* who is looking: the owner (the log is theirs), a teacher (the lessons come first on their page), a reader */
 /* Who teaches whom (11 Nov): the teacher never has the five studies' figures or the desk's own summary of "the cycle" put to him as
    his method. The owner and readers keep both cards; what the desk thinks it knows is in the book, marked unconfirmed, for him to judge. */
+/* Luxus's record (14 Nov 2026, assets/mosha-record.js): his own trades measured, for the owner and readers; never put to him. */
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-rules, html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-cycle { display: none; }
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lux { display: none; }
 html:not([data-role="owner"]) #v-mosha .mo-own, html[data-role="owner"] #v-mosha .mo-tch, html:not([data-mosha="teach"]) #v-mosha .mo-tch, html[data-role="owner"] #v-mosha .mo-rdr, html[data-mosha="teach"] #v-mosha .mo-rdr { display: none; }
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-todo { order: -6; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-teach { order: -3; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lessons { order: -2; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-book { order: -1; }
 #v-mosha .mo-tc-lv { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 10px; padding: 0 14px; } #v-mosha .mo-tc-lv > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font: 600 13px var(--sans); color: var(--ink-dim); } #v-mosha .mo-tc-lv > summary small { font-weight: 500; color: var(--ink-faint); } #v-mosha .mo-tc-lv > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

@@ -110,7 +110,7 @@
     fetch(URL_, { cache: 'no-store', credentials: 'same-origin' }).catch(function () { throw new Error(L('no connection: the lessons could not be read')); }).then(function (r) { return r.ok ? r.json() : r.json().catch(function () { return {}; }).then(function (j) { throw new Error(j.error ? L(j.error) : L('the lessons could not be read')); }); })
       .then(function (j) { T.lessons = Array.isArray(j.lessons) ? j.lessons : []; T.book = Array.isArray(j.book) ? j.book : []; T.score = j.score || null; T.canTeach = !!j.canTeach; T.who = j.who || null; T.err = null; firstLang(); })
       .catch(function (e) { T.err = e.message || L('the lessons could not be read'); })
-      .then(function () { T.loading = false; T.acting = false; draw(); });
+      .then(function () { T.loading = false; T.acting = false; draw(); if (root.msMoshaRecord) root.msMoshaRecord(T.lessons, T.err); });   // Luxus's record (assets/mosha-record.js) reads the same list
   }
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'; };
   // The desk's questions under one of its answers. Under its LAST answer the lesson's teacher answers each with one tap (Yes / No,

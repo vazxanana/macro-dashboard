@@ -127,6 +127,27 @@ function tradeOf(t, now) {
   if (TFS.includes(t.tf)) out.tf = t.tf; if (t.src === 'replay') out.src = 'replay';
   return { trade: out };
 }
+// When the levels were given (14 Nov 2026, Luxus's record): the server stamps them, the page cannot. `next` is a trade from
+// tradeOf (a fresh object, so no stamp the page sent survives), `prev` the stored one (or null), `first` a firstAt kept on the
+// lesson when its levels were removed. setAt = when the levels (market, side, at, entry, stop, target) were last set or changed;
+// firstAt = the first time any levels were set, never overwritten; exitSetAt = when his exit was last given. An edit that only
+// gives the exit keeps setAt. A stored trade without stamps (a lesson from before this) gets no setAt for levels it already had.
+const LEVELS = ['market', 'side', 'at', 'entry', 'stop', 'target'];
+function stampTrade(next, prev, nowS, first) {
+  if (!next) return null;
+  const same = !!prev && LEVELS.every((k) => (prev[k] ?? null) === (next[k] ?? null));
+  if (same) { if (Number.isFinite(prev.setAt)) next.setAt = prev.setAt; if (Number.isFinite(prev.firstAt)) next.firstAt = prev.firstAt; }
+  else {
+    next.setAt = nowS;
+    const f = prev ? prev.firstAt : first;
+    if (Number.isFinite(f)) next.firstAt = f; else if (!prev) next.firstAt = nowS;   // an older stored trade: its first time is unknown
+  }
+  if (next.exit != null) {
+    const sameExit = !!prev && prev.exit === next.exit && prev.exitAt === next.exitAt;
+    if (sameExit) { if (Number.isFinite(prev.exitSetAt)) next.exitSetAt = prev.exitSetAt; } else next.exitSetAt = nowS;
+  }
+  return next;
+}
 // The assistant's reading of a lesson for the replay chart: { chart } or { error }. Everything is checked: one candle request,
 // a known market, marks and steps inside the window, a position only with its stop on the losing side.
 function chartOf(c, lesson, now) {
@@ -315,6 +336,7 @@ async function handle(req, res, d = {}) {
       const title = clean(a.title, 80), note = clean(a.note, 2000), caption = clean(a.caption, 200);
       if (!l && !has && !note) return res.status(400).json({ error: 'write what the desk should learn, or send a picture' });
       const tr = l ? { trade: l.trade } : tradeOf(a.trade, now); if (tr.error) return res.status(400).json({ error: tr.error });
+      if (!l && tr.trade) stampTrade(tr.trade, null, Math.floor(now / 1000), null);
       const day = list.reduce((n, x) => n + x.shots.filter((s) => x.by === acct.u && now - Date.parse(s.at) < 86400e3).length, 0);
       if (has && !owner && day >= DAY_MAX) return res.status(429).json({ error: `that is ${DAY_MAX} pictures in a day: send the rest tomorrow` });
       if (l && l.shots.length >= MAX_SHOTS) return res.status(400).json({ error: `a lesson holds ${MAX_SHOTS} pictures: start a new one` });
@@ -335,7 +357,9 @@ async function handle(req, res, d = {}) {
     if (isObj(b.edit)) {
       const l = find(b.edit.id); if (!l) return res.status(404).json({ error: 'no such lesson' });
       if (!mine(l)) return res.status(403).json({ error: 'that lesson belongs to someone else' });
-      if (b.edit.trade !== undefined) { const tr = b.edit.trade === null ? { trade: null } : tradeOf(b.edit.trade, now); if (tr.error) return res.status(400).json({ error: tr.error }); l.trade = tr.trade; }
+      if (b.edit.trade !== undefined) { const tr = b.edit.trade === null ? { trade: null } : tradeOf(b.edit.trade, now); if (tr.error) return res.status(400).json({ error: tr.error });
+        if (!tr.trade && l.trade && Number.isFinite(l.trade.firstAt)) l.tradeFirstAt = l.trade.firstAt;   // levels removed: their first time is kept
+        l.trade = stampTrade(tr.trade, l.trade, Math.floor(now / 1000), Number.isFinite(l.tradeFirstAt) ? l.tradeFirstAt : null); }
       if (b.edit.title != null) l.title = clean(b.edit.title, 80) || l.title; if (b.edit.note != null) l.note = clean(b.edit.note, 2000);
       if (b.edit.img != null) { const s = l.shots.find((x) => x.img === String(b.edit.img)); if (!s) return res.status(404).json({ error: 'no such picture' }); s.caption = clean(b.edit.caption, 200); }
       l.edited = stamp; await store.put(list); return res.status(200).json({ ok: true, lesson: view(l) });
@@ -355,4 +379,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha lessons are unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, chartOf, askOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP, MAX_ASK });
+Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, stampTrade, chartOf, askOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP, MAX_ASK });

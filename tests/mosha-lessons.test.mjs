@@ -26,6 +26,8 @@ let tick = 0;
 const call = async (store, method, who, body, extra = {}) => { const out = { headers: {} }; const res = { setHeader(k, v) { out.headers[k.toLowerCase()] = v; }, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; }, send: (b) => { out.raw = b; return out; } };
   await L.handle({ method, body, query: extra.query || {}, headers: extra.headers || {} }, res, { env: ENV, store, who: async () => who, sameOrigin: extra.sameOrigin || (() => true), now: NOW + 1000 * ++tick }); return out; };
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' }, LUXUS = { u: 'luxus', name: 'Luxus', role: 'viewer', mosha: 'teach', home: 'mosha' }, FRED = { u: 'fred', name: 'Fred', role: 'reviewer' }, CARLOS = { u: 'carlos', name: 'Carlos', role: 'viewer' };
+// the server's time stamps on the levels (tests/mosha-trade-stamp.test.mjs checks them); the shape tests read the trade without them
+const noStamp = (t) => { const { setAt, firstAt, exitSetAt, ...rest } = t || {}; return rest; };
 const key = () => ({ headers: { authorization: `Bearer ${L.readerKey(ENV)}` } });
 
 test('Luxus: the Mosha desk is his main page and he may teach; the defaults survive a stored copy of his record', () => {
@@ -172,7 +174,7 @@ test('a lesson in words, and the trade\'s levels: every trade has a stop', async
   assert.equal((await call(s, 'POST', LUXUS, { add: { title: 'Never sell before the CF' } })).code, 400, 'words only need the words');
   const w = await call(s, 'POST', LUXUS, { add: { title: 'Never sell before the CF', note: 'A wick out of the VR is not a CF. Wait for the M5 candle to close.' } }); assert.equal(w.code, 200); assert.deepEqual([w.body.lesson.shots.length, w.body.img, w.body.lesson.state, s.img.size], [0, null, 'new', 0]);
   assert.equal((await call(s, 'POST', LUXUS, { add: { lesson: w.body.lesson.id, note: 'more words' } })).code, 400, 'more words go into the conversation, not into add');
-  const a = await call(s, 'POST', LUXUS, { add: { title: '2 Nov sell', caption: 'M5 vr', image: url('image/png', PNG), trade: T } }); assert.deepEqual(a.body.lesson.trade, { market: 'xau', side: 'sell', at: T.at, entry: 3908.27, stop: 3916.1, target: 3878.42 });
+  const a = await call(s, 'POST', LUXUS, { add: { title: '2 Nov sell', caption: 'M5 vr', image: url('image/png', PNG), trade: T } }); assert.deepEqual(noStamp(a.body.lesson.trade), { market: 'xau', side: 'sell', at: T.at, entry: 3908.27, stop: 3916.1, target: 3878.42 });
   const bad = async (o, re) => { const r = await call(s, 'POST', LUXUS, { add: { title: 'x', note: 'y', trade: { ...T, ...o } } }); assert.equal(r.code, 400, JSON.stringify(o)); assert.match(r.body.error, re); };
   await bad({ stop: '' }, /needs a stop/); await bad({ stop: 3900 }, /stop above the entry/); await bad({ side: 'buy' }, /stop below the entry/); await bad({ target: 3950 }, /target below the entry/); await bad({ side: 'short' }, /buy or sell/); await bad({ entry: '' }, /entry price/); await bad({ at: 0 }, /entry time/);
   assert.equal(s.peek().length, 2, 'a refused trade stores nothing');
@@ -257,7 +259,7 @@ test('backtest with him: a trade taken in a ChronosTrade replay goes to the desk
   const BT = rd('../backtest.html'), s = mk(), at = Date.UTC(2026, 10, 2, 7, 0) / 1000;
   const T = { market: 'nas100', side: 'buy', at, entry: 25010.5, stop: 24980.5, target: 25070.5, exit: 25070.5, exitAt: at + 5400, tf: '5m', src: 'replay' };
   const a = await call(s, 'POST', LUXUS, { add: { title: '2026-11-02 buy, Nasdaq 100 (replay)', note: 'Sweep of the Asia low, then the M5 CF.', caption: 'ChronosTrade replay', image: url('image/jpeg', JPG), trade: T } });
-  assert.equal(a.code, 200); assert.deepEqual(a.body.lesson.trade, { market: 'nas100', side: 'buy', at, entry: 25010.5, stop: 24980.5, target: 25070.5, exit: 25070.5, exitAt: at + 5400, R: 2, tf: '5m', src: 'replay' }, 'R is worked out on the server');
+  assert.equal(a.code, 200); assert.deepEqual(noStamp(a.body.lesson.trade), { market: 'nas100', side: 'buy', at, entry: 25010.5, stop: 24980.5, target: 25070.5, exit: 25070.5, exitAt: at + 5400, R: 2, tf: '5m', src: 'replay' }, 'R is worked out on the server');
   assert.equal(L.tradeOf({ ...T, exit: 24980.5 }, NOW).trade.R, -1); assert.equal(L.tradeOf({ ...T, side: 'sell', stop: 25040.5, target: 24950.5, exit: 24995.5 }, NOW).trade.R, 0.5);
   assert.match(L.tradeOf({ ...T, market: 'doge' }, NOW).error, /does not know that market/); assert.match(L.tradeOf({ ...T, exitAt: at - 60 }, NOW).error, /exit needs/); assert.match(L.tradeOf({ ...T, exit: 'x' }, NOW).error, /exit needs/);
   assert.match(L.tradeOf({ ...T, stop: 25010.5 }, NOW).error, /stop below the entry/, 'a stop moved to the entry is not a stop to learn: the page sends the one the trade was opened with');
