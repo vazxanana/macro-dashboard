@@ -117,6 +117,7 @@ paper system with a measured, clearly negative record.
 | 351 | `gold-yield-shock` (#1164) | Trade gold against its reaction to a US 10-year yield shock day (1.5 sd) | FAIL, 0 of 3: buy after a yield-up shock OOS excess +0.003R a trade (n 124, t 0.04); the sell after a yield-down shock −0.021R; placebo 23 of 40 |
 | 352 | `gold-hk-stress` (#1165) | Buy gold when Hong Kong equities fall far behind the S&P 500 over 5 days | FAIL, 0 of 3: primary OOS excess −0.028R a trade (n 149, t −0.48); the net gain since 2017 is gold's drift; placebo 11 of 40 |
 | 353 | `gold-ny-open-overnight-fail` (#1166) | Fade a failed raid of the overnight range in the US cash-open hour | FAIL, 0 of 3: OOS −0.247R a trade net (n 615, t −5.02), gross −0.057R; lift over baseline −0.009R; costs take ~0.2R on $2-3 stops; placebo 16 of 40 |
+| 354 | `gold-bond-vol-spike` (#1167) | Buy gold after a US 10-year bond volatility spike (5-day vol ≥ 1.25 × 60-day) | FAIL, 0 of 3: 5-day hold OOS excess +0.049R a trade (n 112, t 0.77), in sample −0.010R; placebo 31 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
