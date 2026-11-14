@@ -189,6 +189,8 @@ paper system with a measured, clearly negative record.
 | 171 | FOMC-cycle even weeks on US indices (`fomc-even-week`) | **FAIL**: US500 2017-now even minus odd weeks −0.028 % a day net, t −0.73 (77 cycles), beats 14 of 40 placebos; 2008-16 was positive (t 1.74) and the sign flipped after 2016 on all three indices | #990 |
 | 172 | Announcement-day premium, CPI and payrolls days (`announcement-premium`) | **FAIL**, 0 of 5: SPX500 2017-26 release days −0.080 % a day net vs other days (n 224, t −0.93, placebo median); no premium even gross on any index or bond CFD (largest |t| 1.33) | #991 |
 | 173 | Pre-holiday day on non-US indices, local calendars (`local-preholiday`) | **FAIL**: 9 indices pooled 2017-26, +0.022R net over ordinary days (230 dates, Welch t 1.01, Holm p 1.00); loses at 2x costs; same small pre-cost sign as the US `pre-holiday` study, eaten by spread and financing | #992 |
+| 174 | Overnight vs intraday "tug of war" on US indices (`overnight-tug`) | **Not run, duplicate**: claim (a) failed in `overnight-drift` #836 / `index-overnight` #891, claim (b) in `gap-fill` #849 / `eu-gap-fade` #916; the untested variants would be selection after the fact | — |
+| 175 | High-volume return premium, OANDA quote counts (`volume-premium`) | **FAIL**: pooled 32 CFDs 2017-26 high-volume minus all days +2.69R a month net, t 1.99, Holm p 0.186; high-volume longs alone +0.006R a trade, negative at 2x costs. Indices alone t 3.52 OOS / 4.06 IS (relative only, a +0.022R long): a hypothesis needing its own pre-registration | #993 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
