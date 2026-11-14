@@ -99,6 +99,7 @@ paper system with a measured, clearly negative record.
 | 333 | Gold hikkake: trade the failure of a one-sided break of an inside day | **FAIL, 0 of 3**: +0.177R net IS (t 1.86) but −0.157R OOS (excess −0.172R, t −1.65); sign flipped, n 69 OOS | #1146 |
 | 334 | Gold extreme timing: follow a day that closed with its extreme in its last four hours | **FAIL, 0 of 3**: excess over the every-day trade +0.063R IS (t 2.65) but −0.024R OOS (t −1.11); gross negative OOS too | #1147 |
 | 335 | Gold month-end rebalancing: trade gold's last three days against its month-to-date lead over the S&P | **FAIL, 0 of 3**: OOS excess over the same-side month-end trade −0.055R (t −0.79), negative IS too; Holm p 1.00 | #1148 |
+| 336 | Gold TD setup (9-count exhaustion): buy after a buy setup, sell after a sell setup | **FAIL, 0 of 3**: buy setup = drift (OOS excess −0.010R, t −0.09); sell setup lost in every window (OOS −0.265R); perfected buy positive only in 2017-21; n 28-48 a window | #1149 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
