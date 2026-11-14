@@ -1,0 +1,626 @@
+{
+ "study": "gotobi-minute-histdata",
+ "built": "2026-11-14",
+ "kind": "sensitivity report (no verdict about an edge, nothing chosen)",
+ "verdict": "FEED-CONFIRMED",
+ "rule": "Frozen T2 of research/edge/gotobi (#878): on gotobi days sell USD/JPY at 00:55 UTC, buy back at 06:00 UTC; stop 1.5 x the 20-business-day median absolute move of that window (M5 of the same feed); net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side. Here the entry minute moves, as #908.",
+ "frozen": {
+  "file": "frozen.mjs",
+  "from": "origin/gotobi-feed:research/edge/gotobi-feed/frozen.mjs",
+  "sha256": "645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32"
+ },
+ "data": {
+  "hist": {
+   "source": "HistData USD/JPY M1 (bid), council-data research/candles/USDJPY, git show",
+   "clock": "council/histdata.mjs histStampUtc",
+   "files": 18,
+   "first": "2018-01-02 00:00",
+   "last": "2026-10-30 06:59",
+   "m1": 962303,
+   "kept": "00:00-06:59 UTC"
+  },
+  "oanda": {
+   "source": "OANDA mid M1 (#908's file, 00:40-06:15 UTC on each gotobi day) and OANDA mid M5 (#878's file) for D",
+   "m1": 255344
+  }
+ },
+ "bar": {
+  "gate": {
+   "n": 623,
+   "netR": 0.1265,
+   "nTol": 6,
+   "rTol": 0.01,
+   "openShare": 0.99,
+   "lastDay": "2026-10-29"
+  },
+  "reading": {
+   "clearMaxMargin": 0.02,
+   "lateShareBelow": 0.5
+  }
+ },
+ "lastDay": "2026-10-29",
+ "window": [
+  "2018-01-01",
+  "2026-10-29"
+ ],
+ "days": 626,
+ "gate": {
+  "lastDay": "2026-10-29",
+  "m5": {
+   "n": 623,
+   "netR": 0.1265,
+   "grossR": 0.243,
+   "costR": 0.1166,
+   "totalR": 78.78,
+   "tradeT": 2.43,
+   "months": 106,
+   "t": 2.34,
+   "win": 0.5008,
+   "stopShare": 0.2745,
+   "stopPips": 19
+  },
+  "m1": {
+   "entry": "00:55",
+   "exit": "06:00",
+   "base": true,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.1265,
+   "grossR": 0.243,
+   "costR": 0.1166,
+   "totalR": 78.78,
+   "tradeT": 2.43,
+   "months": 106,
+   "t": 2.34,
+   "win": 0.5008,
+   "stopShare": 0.2745,
+   "stopPips": 19
+  },
+  "tolerance": {
+   "n": 6,
+   "netR": 0.01,
+   "openShare": 0.99
+  },
+  "onlyM5": [],
+  "onlyM1": [],
+  "open": {
+   "days": 625,
+   "equal": 625,
+   "share": 1,
+   "mismatches": []
+  },
+  "checks": {
+   "reproducesFeed": true,
+   "n": true,
+   "netR": true,
+   "open": true
+  },
+  "pass": true
+ },
+ "grid": [
+  {
+   "entry": "00:53",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.0963,
+   "grossR": 0.2128,
+   "costR": 0.1166,
+   "totalR": 59.97,
+   "tradeT": 1.83,
+   "months": 106,
+   "t": 1.7,
+   "win": 0.4831,
+   "stopShare": 0.2889,
+   "stopPips": 19
+  },
+  {
+   "entry": "00:54",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.0999,
+   "grossR": 0.2165,
+   "costR": 0.1166,
+   "totalR": 62.25,
+   "tradeT": 1.91,
+   "months": 106,
+   "t": 1.72,
+   "win": 0.4896,
+   "stopShare": 0.2857,
+   "stopPips": 19
+  },
+  {
+   "entry": "00:55",
+   "exit": "06:00",
+   "base": true,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.1265,
+   "grossR": 0.243,
+   "costR": 0.1166,
+   "totalR": 78.78,
+   "tradeT": 2.43,
+   "months": 106,
+   "t": 2.34,
+   "win": 0.5008,
+   "stopShare": 0.2745,
+   "stopPips": 19
+  },
+  {
+   "entry": "00:56",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.0443,
+   "grossR": 0.1608,
+   "costR": 0.1165,
+   "totalR": 27.6,
+   "tradeT": 0.92,
+   "months": 106,
+   "t": 0.88,
+   "win": 0.4767,
+   "stopShare": 0.2857,
+   "stopPips": 19
+  },
+  {
+   "entry": "00:57",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.0218,
+   "grossR": 0.1383,
+   "costR": 0.1165,
+   "totalR": 13.57,
+   "tradeT": 0.46,
+   "months": 106,
+   "t": 0.43,
+   "win": 0.4575,
+   "stopShare": 0.2889,
+   "stopPips": 19
+  },
+  {
+   "entry": "00:58",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 3,
+   "n": 623,
+   "netR": 0.0066,
+   "grossR": 0.1231,
+   "costR": 0.1165,
+   "totalR": 4.11,
+   "tradeT": 0.14,
+   "months": 106,
+   "t": 0.13,
+   "win": 0.4478,
+   "stopShare": 0.2937,
+   "stopPips": 19
+  },
+  {
+   "entry": "01:00",
+   "exit": "06:00",
+   "base": false,
+   "noTrade": 4,
+   "n": 622,
+   "netR": 0.0305,
+   "grossR": 0.1472,
+   "costR": 0.1166,
+   "totalR": 19,
+   "tradeT": 0.6,
+   "months": 106,
+   "t": 0.59,
+   "win": 0.4518,
+   "stopShare": 0.2846,
+   "stopPips": 19
+  }
+ ],
+ "reading": {
+  "word": "FEED-CONFIRMED",
+  "clearMax": true,
+  "lateHalf": true,
+  "margin": 0.0266,
+  "runnerUp": "00:54",
+  "lateShare": 0.3502,
+  "failed": []
+ },
+ "oanda": {
+  "available": true,
+  "days": 631,
+  "grid": [
+   {
+    "entry": "00:53",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.1004,
+    "grossR": 0.217,
+    "costR": 0.1166,
+    "totalR": 62.75,
+    "tradeT": 1.9,
+    "months": 106,
+    "t": 1.75,
+    "win": 0.4896,
+    "stopShare": 0.296,
+    "stopPips": 18.9
+   },
+   {
+    "entry": "00:54",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.1109,
+    "grossR": 0.2275,
+    "costR": 0.1166,
+    "totalR": 69.31,
+    "tradeT": 2.12,
+    "months": 106,
+    "t": 1.92,
+    "win": 0.4944,
+    "stopShare": 0.2848,
+    "stopPips": 18.9
+   },
+   {
+    "entry": "00:55",
+    "exit": "06:00",
+    "base": true,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.1431,
+    "grossR": 0.2597,
+    "costR": 0.1166,
+    "totalR": 89.44,
+    "tradeT": 2.76,
+    "months": 106,
+    "t": 2.66,
+    "win": 0.512,
+    "stopShare": 0.2656,
+    "stopPips": 18.9
+   },
+   {
+    "entry": "00:56",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.0508,
+    "grossR": 0.1674,
+    "costR": 0.1166,
+    "totalR": 31.74,
+    "tradeT": 1.05,
+    "months": 106,
+    "t": 1.01,
+    "win": 0.4784,
+    "stopShare": 0.2912,
+    "stopPips": 18.9
+   },
+   {
+    "entry": "00:57",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.0303,
+    "grossR": 0.1469,
+    "costR": 0.1166,
+    "totalR": 18.95,
+    "tradeT": 0.63,
+    "months": 106,
+    "t": 0.59,
+    "win": 0.4656,
+    "stopShare": 0.2896,
+    "stopPips": 18.9
+   },
+   {
+    "entry": "00:58",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 7,
+    "n": 624,
+    "netR": 0.0193,
+    "grossR": 0.1358,
+    "costR": 0.1164,
+    "totalR": 12.07,
+    "tradeT": 0.4,
+    "months": 106,
+    "t": 0.38,
+    "win": 0.4583,
+    "stopShare": 0.2917,
+    "stopPips": 19
+   },
+   {
+    "entry": "01:00",
+    "exit": "06:00",
+    "base": false,
+    "noTrade": 6,
+    "n": 625,
+    "netR": 0.0308,
+    "grossR": 0.1474,
+    "costR": 0.1166,
+    "totalR": 19.26,
+    "tradeT": 0.61,
+    "months": 106,
+    "t": 0.6,
+    "win": 0.4528,
+    "stopShare": 0.2848,
+    "stopPips": 18.9
+   }
+  ],
+  "compare": [
+   {
+    "entry": "00:53",
+    "days": 617,
+    "corrNetR": 0.9959,
+    "corrMovePips": 0.9963,
+    "sameSign": 0.9887,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.6
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.0973,
+     "grossR": 0.214,
+     "costR": 0.1167,
+     "totalR": 60.04,
+     "tradeT": 1.84,
+     "months": 106,
+     "t": 1.7,
+     "win": 0.483,
+     "stopShare": 0.2917,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.0921,
+     "grossR": 0.2089,
+     "costR": 0.1168,
+     "totalR": 56.84,
+     "tradeT": 1.73,
+     "months": 106,
+     "t": 1.6,
+     "win": 0.4846,
+     "stopShare": 0.2982,
+     "stopPips": 19
+    }
+   },
+   {
+    "entry": "00:54",
+    "days": 617,
+    "corrNetR": 0.9965,
+    "corrMovePips": 0.9993,
+    "sameSign": 0.9903,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.6
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.102,
+     "grossR": 0.2186,
+     "costR": 0.1167,
+     "totalR": 62.92,
+     "tradeT": 1.93,
+     "months": 106,
+     "t": 1.74,
+     "win": 0.4911,
+     "stopShare": 0.2885,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.1036,
+     "grossR": 0.2204,
+     "costR": 0.1168,
+     "totalR": 63.92,
+     "tradeT": 1.96,
+     "months": 106,
+     "t": 1.78,
+     "win": 0.4911,
+     "stopShare": 0.2869,
+     "stopPips": 19
+    }
+   },
+   {
+    "entry": "00:55",
+    "days": 617,
+    "corrNetR": 0.9966,
+    "corrMovePips": 0.9979,
+    "sameSign": 0.9887,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.9
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.1314,
+     "grossR": 0.2481,
+     "costR": 0.1167,
+     "totalR": 81.08,
+     "tradeT": 2.51,
+     "months": 106,
+     "t": 2.4,
+     "win": 0.5041,
+     "stopShare": 0.2755,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.1378,
+     "grossR": 0.2545,
+     "costR": 0.1168,
+     "totalR": 85,
+     "tradeT": 2.63,
+     "months": 106,
+     "t": 2.53,
+     "win": 0.5089,
+     "stopShare": 0.2674,
+     "stopPips": 19
+    }
+   },
+   {
+    "entry": "00:56",
+    "days": 617,
+    "corrNetR": 0.997,
+    "corrMovePips": 0.9995,
+    "sameSign": 0.9935,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.6
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.0453,
+     "grossR": 0.162,
+     "costR": 0.1167,
+     "totalR": 27.97,
+     "tradeT": 0.94,
+     "months": 106,
+     "t": 0.9,
+     "win": 0.4781,
+     "stopShare": 0.2885,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.0437,
+     "grossR": 0.1604,
+     "costR": 0.1167,
+     "totalR": 26.94,
+     "tradeT": 0.9,
+     "months": 106,
+     "t": 0.85,
+     "win": 0.4749,
+     "stopShare": 0.2934,
+     "stopPips": 19
+    }
+   },
+   {
+    "entry": "00:57",
+    "days": 617,
+    "corrNetR": 0.9992,
+    "corrMovePips": 0.9995,
+    "sameSign": 0.9951,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.7
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.0221,
+     "grossR": 0.1387,
+     "costR": 0.1167,
+     "totalR": 13.62,
+     "tradeT": 0.46,
+     "months": 106,
+     "t": 0.43,
+     "win": 0.4571,
+     "stopShare": 0.2917,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.024,
+     "grossR": 0.1407,
+     "costR": 0.1167,
+     "totalR": 14.78,
+     "tradeT": 0.5,
+     "months": 106,
+     "t": 0.46,
+     "win": 0.4619,
+     "stopShare": 0.2917,
+     "stopPips": 19
+    }
+   },
+   {
+    "entry": "00:58",
+    "days": 616,
+    "corrNetR": 0.9959,
+    "corrMovePips": 0.9991,
+    "sameSign": 0.9951,
+    "entryDiffPips": {
+     "medianAbs": 0.2,
+     "p95Abs": 0.7
+    },
+    "hist": {
+     "n": 616,
+     "netR": 0.0063,
+     "grossR": 0.1228,
+     "costR": 0.1165,
+     "totalR": 3.86,
+     "tradeT": 0.13,
+     "months": 106,
+     "t": 0.12,
+     "win": 0.4481,
+     "stopShare": 0.2971,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 616,
+     "netR": 0.0134,
+     "grossR": 0.13,
+     "costR": 0.1166,
+     "totalR": 8.26,
+     "tradeT": 0.28,
+     "months": 106,
+     "t": 0.26,
+     "win": 0.4529,
+     "stopShare": 0.2938,
+     "stopPips": 19.1
+    }
+   },
+   {
+    "entry": "01:00",
+    "days": 617,
+    "corrNetR": 0.992,
+    "corrMovePips": 0.9968,
+    "sameSign": 0.9951,
+    "entryDiffPips": {
+     "medianAbs": 0.3,
+     "p95Abs": 0.7
+    },
+    "hist": {
+     "n": 617,
+     "netR": 0.031,
+     "grossR": 0.1477,
+     "costR": 0.1167,
+     "totalR": 19.15,
+     "tradeT": 0.61,
+     "months": 106,
+     "t": 0.6,
+     "win": 0.4522,
+     "stopShare": 0.2869,
+     "stopPips": 19
+    },
+    "oanda": {
+     "n": 617,
+     "netR": 0.0256,
+     "grossR": 0.1423,
+     "costR": 0.1167,
+     "totalR": 15.78,
+     "tradeT": 0.5,
+     "months": 106,
+     "t": 0.49,
+     "win": 0.4473,
+     "stopShare": 0.2869,
+     "stopPips": 19
+    }
+   }
+  ]
+ },
+ "notes": [
+  "D, the day list, the side and the costs are frozen; the stop sits D above the actual (shifted) fill. D comes from the HistData M5 base window (00:55 -> 06:00 UTC), as #908 took D from its own feed's M5; on the OANDA side D is #878's, from the OANDA M5 file.",
+  "HistData is bid, OANDA mid: the entry prices differ by about half a spread; the move and the stop distance are not affected by a constant offset. Costs are the frozen model at every minute.",
+  "Month t is on calendar-month sums of net R (frozen monthT): a measure of each row's noise, not a test. No Holm, no placebo: nothing here is judged as an edge.",
+  "Entry at 00:53 / 00:54 is shown only to see whether the effect sits on the fix minute itself; no minute is an option.",
+  "Plain reading, after the gate: on HistData 00:53 +0.096R, 00:54 +0.100R, 00:55 +0.127R, 00:56 +0.044R, 00:57 +0.022R, 00:58 +0.007R, 01:00 +0.030R.",
+  "On the shared 2018-26 window the minutes before the fix keep more of the 00:55 figure than #908 showed on 2016-26 (HistData 00:54 keeps about four fifths, OANDA about three quarters, against about half on #908's longer window); after the fix both feeds drop at once. The reading condition is about 00:55 against every other row and 00:56 against 00:55 only.",
+  "Per-day net R correlates at 0.99 or more between the two feeds at every minute, so the minute profile is not a print of one feed. Whether it is the fix flow itself is not something a feed comparison can show; it only rules out an OANDA-only artefact.",
+  "OANDA on the same window: 00:53 +0.100R, 00:54 +0.111R, 00:55 +0.143R, 00:56 +0.051R, 00:57 +0.030R, 00:58 +0.019R, 01:00 +0.031R (#908 over 2016-01-01 to 2026-11-11: 00:55 +0.148R, 00:56 +0.048R)."
+ ]
+}
