@@ -1,0 +1,404 @@
+{
+ "study": "gold-vwap",
+ "title": "Gold session VWAP: fade, follow or pull back (OANDA M5, volume-weighted, 18:00 New York anchor)",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "data": {
+  "candles": 776427,
+  "from": 1448928000,
+  "to": 1794606900,
+  "days": 2714,
+  "skipped": {
+   "cme": 122,
+   "thin": 0
+  }
+ },
+ "params": {
+  "FADE": 2,
+  "STOP_FADE": 3,
+  "FOLLOW_STOP": 1,
+  "EXC": 1.5,
+  "PB_STOP": 1,
+  "PB_TGT": 1.5,
+  "MIN_DIST": 1,
+  "MIN_CANDLES": 150,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "Q": 0.95,
+  "FROM": "2016-01-01",
+  "TO": "2026-11-13",
+  "IS": [
+   "2016-01-01",
+   "2021-01-01"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2100-01-01"
+  ]
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippagePerMarketOrder": 0.15,
+  "financing": "none (flat by 16:00 New York)"
+ },
+ "tests": {
+  "T1": {
+   "label": "Fade the 2 sd close, target VWAP, stop 3 sd (primary)",
+   "skips": {
+    "stop under $1": 721,
+    "open beyond stop": 123
+   },
+   "is": {
+    "n": 599,
+    "buys": 309,
+    "gross": 0.083,
+    "net": -0.252,
+    "net2": -0.588,
+    "totalNet": -151.21,
+    "win": 0.306,
+    "maxDD": -157.55,
+    "months": 60,
+    "t": -3.91,
+    "tGross": 1.3,
+    "p": 1,
+    "why": {
+     "stop": 405,
+     "target": 168,
+     "time": 25,
+     "gap": 1
+    }
+   },
+   "oos": {
+    "n": 1061,
+    "buys": 484,
+    "gross": -0.079,
+    "net": -0.31,
+    "net2": -0.54,
+    "totalNet": -328.42,
+    "win": 0.253,
+    "maxDD": -362.71,
+    "months": 71,
+    "t": -4.97,
+    "tGross": -1.33,
+    "p": 1,
+    "why": {
+     "stop": 782,
+     "target": 243,
+     "time": 34,
+     "gap": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.285,
+    "q95": -0.222,
+    "max": -0.202,
+    "beats": 7
+   },
+   "byYear": {
+    "2016": {
+     "n": 138,
+     "net": -0.259,
+     "gross": 0.071
+    },
+    "2017": {
+     "n": 74,
+     "net": -0.464,
+     "gross": -0.073
+    },
+    "2018": {
+     "n": 101,
+     "net": -0.253,
+     "gross": 0.133
+    },
+    "2019": {
+     "n": 113,
+     "net": -0.303,
+     "gross": 0.053
+    },
+    "2020": {
+     "n": 173,
+     "net": -0.123,
+     "gross": 0.149
+    },
+    "2021": {
+     "n": 182,
+     "net": -0.245,
+     "gross": 0.061
+    },
+    "2022": {
+     "n": 173,
+     "net": -0.63,
+     "gross": -0.317
+    },
+    "2023": {
+     "n": 152,
+     "net": -0.446,
+     "gross": -0.131
+    },
+    "2024": {
+     "n": 185,
+     "net": -0.316,
+     "gross": -0.077
+    },
+    "2025": {
+     "n": 199,
+     "net": -0.285,
+     "gross": -0.143
+    },
+    "2026": {
+     "n": 170,
+     "net": 0.049,
+     "gross": 0.135
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "t2": false,
+    "isPos": false,
+    "costs2": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "label": "Follow the 2 sd close, stop 1 sd band, out 16:00 NY",
+   "skips": {
+    "stop under $1": 148
+   },
+   "is": {
+    "n": 1011,
+    "buys": 499,
+    "gross": 0.072,
+    "net": -0.228,
+    "net2": -0.528,
+    "totalNet": -230.17,
+    "win": 0.223,
+    "maxDD": -284.14,
+    "months": 60,
+    "t": -3.08,
+    "tGross": 1,
+    "p": 0.999,
+    "why": {
+     "time": 257,
+     "stop": 752,
+     "gap": 2
+    }
+   },
+   "oos": {
+    "n": 1345,
+    "buys": 710,
+    "gross": 0.038,
+    "net": -0.138,
+    "net2": -0.314,
+    "totalNet": -185.39,
+    "win": 0.222,
+    "maxDD": -253.05,
+    "months": 71,
+    "t": -1.96,
+    "tGross": 0.56,
+    "p": 0.9753,
+    "why": {
+     "time": 335,
+     "stop": 1007,
+     "gap": 3
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.178,
+    "q95": -0.088,
+    "max": -0.023,
+    "beats": 36
+   },
+   "byYear": {
+    "2016": {
+     "n": 217,
+     "net": -0.238,
+     "gross": 0.047
+    },
+    "2017": {
+     "n": 182,
+     "net": -0.437,
+     "gross": -0.084
+    },
+    "2018": {
+     "n": 188,
+     "net": -0.095,
+     "gross": 0.269
+    },
+    "2019": {
+     "n": 198,
+     "net": -0.394,
+     "gross": -0.069
+    },
+    "2020": {
+     "n": 226,
+     "net": -0.014,
+     "gross": 0.182
+    },
+    "2021": {
+     "n": 235,
+     "net": -0.328,
+     "gross": -0.096
+    },
+    "2022": {
+     "n": 239,
+     "net": 0.006,
+     "gross": 0.236
+    },
+    "2023": {
+     "n": 235,
+     "net": -0.516,
+     "gross": -0.269
+    },
+    "2024": {
+     "n": 232,
+     "net": -0.053,
+     "gross": 0.119
+    },
+    "2025": {
+     "n": 219,
+     "net": -0.004,
+     "gross": 0.093
+    },
+    "2026": {
+     "n": 185,
+     "net": 0.133,
+     "gross": 0.177
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "t2": false,
+    "isPos": false,
+    "costs2": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "label": "First VWAP touch after a 1.5 sd excursion, with the excursion, stop 1 sd, target 1.5 sd",
+   "skips": {
+    "no touch by 15:00": 453,
+    "stop under $1": 139
+   },
+   "is": {
+    "n": 920,
+    "buys": 454,
+    "gross": -0.059,
+    "net": -0.256,
+    "net2": -0.453,
+    "totalNet": -235.41,
+    "win": 0.384,
+    "maxDD": -249.12,
+    "months": 60,
+    "t": -6.6,
+    "tGross": -1.59,
+    "p": 1,
+    "why": {
+     "time": 77,
+     "stop": 531,
+     "target": 310,
+     "gap": 2
+    }
+   },
+   "oos": {
+    "n": 1177,
+    "buys": 611,
+    "gross": 0.006,
+    "net": -0.113,
+    "net2": -0.233,
+    "totalNet": -133.55,
+    "win": 0.417,
+    "maxDD": -172.2,
+    "months": 71,
+    "t": -3.07,
+    "tGross": 0.18,
+    "p": 0.9989,
+    "why": {
+     "stop": 656,
+     "target": 425,
+     "time": 94,
+     "gap": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.193,
+    "q95": -0.143,
+    "max": -0.13,
+    "beats": 40
+   },
+   "byYear": {
+    "2016": {
+     "n": 194,
+     "net": -0.196,
+     "gross": -0.013
+    },
+    "2017": {
+     "n": 161,
+     "net": -0.335,
+     "gross": -0.086
+    },
+    "2018": {
+     "n": 178,
+     "net": -0.341,
+     "gross": -0.103
+    },
+    "2019": {
+     "n": 179,
+     "net": -0.299,
+     "gross": -0.096
+    },
+    "2020": {
+     "n": 208,
+     "net": -0.141,
+     "gross": -0.011
+    },
+    "2021": {
+     "n": 212,
+     "net": -0.268,
+     "gross": -0.108
+    },
+    "2022": {
+     "n": 221,
+     "net": -0.08,
+     "gross": 0.067
+    },
+    "2023": {
+     "n": 214,
+     "net": -0.188,
+     "gross": -0.023
+    },
+    "2024": {
+     "n": 201,
+     "net": -0.11,
+     "gross": 0.002
+    },
+    "2025": {
+     "n": 175,
+     "net": -0.169,
+     "gross": -0.1
+    },
+    "2026": {
+     "n": 154,
+     "net": 0.213,
+     "gross": 0.244
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "t2": false,
+    "isPos": false,
+    "costs2": false,
+    "placebo": true,
+    "n": true
+   },
+   "pass": false
+  }
+ }
+}
