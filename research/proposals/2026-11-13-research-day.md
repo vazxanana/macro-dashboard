@@ -40,6 +40,8 @@ paper system with a measured, clearly negative record.
 | 274 | Gold after a weekly close at a 13-week low / high | **FAIL, 0 of 3**: buy 4 weeks +0.043R OOS (n 25, t 0.20), worse than random weeks; any 4-week buy made +0.145R; fading a 13-week high −0.333R (t −2.65) | #1087 |
 | 275 | Gold intraday realized skew (5-minute returns) as a 5-day signal | **FAIL, 0 of 3**: both sides +0.031R OOS (t 0.65); buys only +0.172R (t 2.26) but lose in sample and an any-day 5-day buy makes +0.091R; sells −0.109R | #1088 |
 | 276 | Fade gold beyond 2 sd from its 200-day average | **FAIL, 0 of 3**: both sides −0.200R OOS (t −1.52), sells −0.226R (40 of 66 stopped: gold kept rising), buys only 8 trades; every test below its any-day baseline | #1089 |
+| 277 | Gold H4 inside-bar breakout (OCO stops at the mother candle) | **FAIL, 0 of 3**: both sides 2R −0.011R OOS (n 1146, t −0.32); costs + financing 0.06R a trade erase a small buy-side drift | #1090 |
+| 278 | Gold RSI(14) divergence at swing highs / lows | **FAIL, 0 of 3**: H4 −0.094R OOS (t −1.36), H1 −0.102R (t −2.53), strict 70/30 −0.011R; before costs every stream within 0.06R of zero | #1091 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
