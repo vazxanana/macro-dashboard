@@ -30,6 +30,8 @@ paper system with a measured, clearly negative record.
 | 264 | Gold over the FOMC cycle (long even weeks, short odd weeks after a statement) | **FAIL, 0 of 2**: long weeks 2/4/6 lost 2007-16 (−0.050R), won 2017-26 (+0.136R, t 2.27, Holm 0.023 just over the bar) — gold's trend, since long in every week 1-6 also made +0.087R; short odd weeks lost both windows | #1077 |
 | 265 | Gold day-of-week effect (short Monday; best weekday picked in sample) | **FAIL** (short Monday −0.005R OOS); the in-sample pick, long Friday, passes alone OOS (+0.060R, t 2.10, Holm 0.036, 38/40) — a lead after 330+ tests, replication queued | #1078 |
 | 266 | Gold daily ADX / DMI trend rule (Wilder) | **FAIL, 0 of 3**: ADX>25 both sides +0.083R OOS (t 0.67), loses IS; long-only +0.411R (t 1.99) is gold's rise (random longs +0.146R); DI cross eaten by costs | #1079 |
+| 267 | Gold daily Bollinger band rules (close outside the 20-day, 2-sd band) | **FAIL, 0 of 3**: fades lose (sell above upper −0.242R OOS); buy-above-upper +0.349R OOS but t 1.60, 18.1R of 24.4R in 2024-26 | #1080 |
+| 268 | Gold three-timeframe EMA(20) alignment (H1, H4, D1 agree) | **FAIL, 0 of 3**: both sides −0.023R OOS (t −2.19); buys only +0.006R (t 0.38, tracks gold's rise); D1-turn exit −0.004R; ~9 h holds pay more in costs than the gross tilt | #1081 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
