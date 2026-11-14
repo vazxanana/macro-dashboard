@@ -272,6 +272,7 @@ paper system with a measured, clearly negative record.
 | 254 | Gold vol breakout taken only on the H4 trend's side (the owner's cycle idea as a filter) | **FAIL, 0 of 2**: helps 2007-16 (+0.152 vs +0.101R) but hurts 2017-26 (+0.025 vs +0.044R); random same-size subsets do as well (27/40 placebos) | #1067 |
 | 255 | Gold volatility breakout on gold priced in euros (XAU/EUR, 2006-26) | **PASS**: +0.067R a trade net (n 3,873, month t 3.50), both halves positive, positive at 2x costs, 40/40 placebos. Gold's own move, not the dollar, drives it; but it repeats XAU/USD (same side 86.5 %, corr 0.59), so not a second edge. 2017-26 alone t 1.66 | #1068 |
 | 256 | Gold quarter-end rebalancing fade (sell quarter winners / buy losers in the last 4 days) | **FAIL, 0 of 3**: −0.008R a trade OOS (n 39, t −0.06); gross within ±0.06R everywhere; small sample said plainly | #1069 |
+| 257 | Gold long into US market holidays (last day / last two days before) | **PASS T1 and T2 (fragile), FAIL T3**: T1 +0.133R OOS (t 2.35, Holm p 0.021, 40/40 placebos), T2 +0.216R (t 2.53); but IS weak (T1 t 0.52), OOS sits in 2017-21 (2022-26 t 0.78), t 1.74 without Christmas, ~9 events a year. Needs independent replication | #1070 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
