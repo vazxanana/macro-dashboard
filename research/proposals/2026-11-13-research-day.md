@@ -139,6 +139,7 @@ paper system with a measured, clearly negative record.
 | 121 | Weekly cross-sectional reversal on 9 currencies (a second look at #834's 7-major version) | FAIL: −0.024R a week 2016-now (t −1.97), flat before costs; at the median of random picks. Two versions now failed; no third | #940 |
 | 122 | 3-year reversal across 17 national stock indices (long worst 3, short best 3, 12-month overlapping cohorts) | FAIL: −0.047R a month 2016-now (NW t −3.80), −0.026R 2006-15; below 39 of 40 random rankings; past winners (NAS100) kept winning | #941 |
 | 123 | Weekly US 2-year yield move leading the dollar the next week (USD/JPY, USD/CHF, EUR/USD) | FAIL 0 of 3: about zero before costs in 2016-26, slightly the wrong way in 2004-15; no better than random weeks. Unlike the hourly lead (#926), there is no gross lead at a week | #942 |
+| 124 | Bond month-end (#939) re-costed at Treasury futures cost (scenario; the demo trades CFDs) | FAILS AT FUTURES COST, narrowly: 10-year +0.088R a trade 2016-26 (t 1.91, Holm 0.056), +0.052R 2003-15; futures cost a quarter of the CFD's. About 1R a year if real; not a reason to open a futures route alone | #943 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
