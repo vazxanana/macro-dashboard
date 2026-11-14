@@ -1,0 +1,440 @@
+{
+ "study": "gotobi-jp225",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "verdictLine": "Decisive window: n 760, −0.045R a trade net (+0.043 gross), month t −1.09; replication n 208, −0.024R; at 2x cost −0.134R; placebo 95th pct −0.057R.",
+ "rule": "Gotobi days (frozen gotobi run.mjs). Sell JP225 at the open of the 00:55 UTC M5 candle (09:55 Tokyo), buy back at 06:00 UTC (15:00 Tokyo); stop 1.5 x the 20-business-day median of the same window's absolute move; no target; R net of 0.04 % of the entry price a round trip.",
+ "mapping": "USD/JPY up = yen weaker = Nikkei up (positive link), so T2's USD/JPY sell maps to a JP225 sell (MAP_SIGN +1).",
+ "data": {
+  "source": "OANDA mid M5 through the /md/bars proxy (JP225_USD; USD/JPY for the secondary correlation)",
+  "first": "2010-04-12",
+  "lastDay": "2026-11-11"
+ },
+ "windows": {
+  "decisive": [
+   "2016-01-01",
+   "2026-11-11"
+  ],
+  "replication": [
+   "2013-01-01",
+   "2015-12-31"
+  ]
+ },
+ "costs": {
+  "roundTripFracOfPrice": 0.0004,
+  "x2": 2
+ },
+ "coverage": {
+  "2010": {
+   "days": 245,
+   "entry": 77,
+   "both": 74,
+   "dayShare": 0.302,
+   "slotShare": 0.2417,
+   "covered": false
+  },
+  "2011": {
+   "days": 245,
+   "entry": 91,
+   "both": 89,
+   "dayShare": 0.3633,
+   "slotShare": 0.2953,
+   "covered": false
+  },
+  "2012": {
+   "days": 248,
+   "entry": 213,
+   "both": 211,
+   "dayShare": 0.8508,
+   "slotShare": 0.8178,
+   "covered": false
+  },
+  "2013": {
+   "days": 245,
+   "entry": 241,
+   "both": 241,
+   "dayShare": 0.9837,
+   "slotShare": 0.9825,
+   "covered": true
+  },
+  "2014": {
+   "days": 244,
+   "entry": 241,
+   "both": 241,
+   "dayShare": 0.9877,
+   "slotShare": 0.9742,
+   "covered": true
+  },
+  "2015": {
+   "days": 244,
+   "entry": 243,
+   "both": 243,
+   "dayShare": 0.9959,
+   "slotShare": 0.9878,
+   "covered": true
+  },
+  "2016": {
+   "days": 245,
+   "entry": 243,
+   "both": 243,
+   "dayShare": 0.9918,
+   "slotShare": 0.9888,
+   "covered": true
+  },
+  "2017": {
+   "days": 247,
+   "entry": 245,
+   "both": 245,
+   "dayShare": 0.9919,
+   "slotShare": 0.9677,
+   "covered": true
+  },
+  "2018": {
+   "days": 245,
+   "entry": 243,
+   "both": 243,
+   "dayShare": 0.9918,
+   "slotShare": 0.9852,
+   "covered": true
+  },
+  "2019": {
+   "days": 241,
+   "entry": 236,
+   "both": 236,
+   "dayShare": 0.9793,
+   "slotShare": 0.968,
+   "covered": true
+  },
+  "2020": {
+   "days": 243,
+   "entry": 241,
+   "both": 241,
+   "dayShare": 0.9918,
+   "slotShare": 0.9903,
+   "covered": true
+  },
+  "2021": {
+   "days": 245,
+   "entry": 244,
+   "both": 244,
+   "dayShare": 0.9959,
+   "slotShare": 0.9957,
+   "covered": true
+  },
+  "2022": {
+   "days": 244,
+   "entry": 242,
+   "both": 241,
+   "dayShare": 0.9877,
+   "slotShare": 0.991,
+   "covered": true
+  },
+  "2023": {
+   "days": 246,
+   "entry": 245,
+   "both": 245,
+   "dayShare": 0.9959,
+   "slotShare": 0.9951,
+   "covered": true
+  },
+  "2024": {
+   "days": 245,
+   "entry": 243,
+   "both": 243,
+   "dayShare": 0.9918,
+   "slotShare": 0.9918,
+   "covered": true
+  },
+  "2025": {
+   "days": 243,
+   "entry": 241,
+   "both": 240,
+   "dayShare": 0.9877,
+   "slotShare": 0.9893,
+   "covered": true
+  },
+  "2026": {
+   "days": 208,
+   "entry": 208,
+   "both": 208,
+   "dayShare": 1,
+   "slotShare": 1,
+   "covered": true
+  }
+ },
+ "res": {
+  "coveredYears": [
+   2013,
+   2014,
+   2015,
+   2016,
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025,
+   2026
+  ],
+  "decisiveYears": [
+   2016,
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025,
+   2026
+  ],
+  "replicationYears": [
+   2013,
+   2014,
+   2015
+  ],
+  "noData": {
+   "gotobi": 25,
+   "other": 6
+  },
+  "gotobiDays": {
+   "decisive": 778,
+   "replication": 215
+  },
+  "decisive": {
+   "n": 760,
+   "netR": -0.0455,
+   "grossR": 0.0426,
+   "costR": 0.0881,
+   "totalR": -34.56,
+   "tradeT": -1.06,
+   "months": 131,
+   "t": -1.09,
+   "win": 0.4303,
+   "stopShare": 0.3184,
+   "stopPct": 0.4937,
+   "netX2": -0.1335
+  },
+  "replication": {
+   "n": 208,
+   "netR": -0.0238,
+   "grossR": 0.0498,
+   "costR": 0.0736,
+   "totalR": -4.95,
+   "tradeT": -0.32,
+   "months": 36,
+   "t": -0.33,
+   "win": 0.4279,
+   "stopShare": 0.274,
+   "stopPct": 0.5973,
+   "netX2": -0.0973
+  },
+  "placebo": {
+   "seeds": 40,
+   "poolDays": 1869,
+   "n": 760,
+   "p95": -0.0571,
+   "rank": 38,
+   "median": -0.099,
+   "beats": 40,
+   "values": [
+    -0.1096,
+    -0.0809,
+    -0.131,
+    -0.0543,
+    -0.1116,
+    -0.0682,
+    -0.0814,
+    -0.1112,
+    -0.0862,
+    -0.0678,
+    -0.1069,
+    -0.0535,
+    -0.0722,
+    -0.0813,
+    -0.1052,
+    -0.0867,
+    -0.1751,
+    -0.0966,
+    -0.0747,
+    -0.126,
+    -0.1646,
+    -0.1234,
+    -0.1329,
+    -0.1189,
+    -0.0744,
+    -0.0917,
+    -0.1014,
+    -0.1596,
+    -0.0832,
+    -0.1187,
+    -0.1284,
+    -0.1638,
+    -0.1076,
+    -0.0571,
+    -0.1069,
+    -0.0831,
+    -0.0919,
+    -0.0759,
+    -0.0585,
+    -0.1335
+   ]
+  },
+  "allDays": {
+   "n": 1869,
+   "netR": -0.0904,
+   "grossR": -0.0026,
+   "costR": 0.0877,
+   "totalR": -168.94,
+   "tradeT": -3.8,
+   "months": 131,
+   "t": -3.87,
+   "win": 0.4077,
+   "stopShare": 0.3157,
+   "stopPct": 0.4998,
+   "netX2": -0.1781
+  },
+  "byYear": {
+   "2013": {
+    "n": 69,
+    "netR": 0.0788,
+    "totalR": 5.44
+   },
+   "2014": {
+    "n": 68,
+    "netR": 0.0929,
+    "totalR": 6.32
+   },
+   "2015": {
+    "n": 71,
+    "netR": -0.2352,
+    "totalR": -16.7
+   },
+   "2016": {
+    "n": 71,
+    "netR": 0.0681,
+    "totalR": 4.84
+   },
+   "2017": {
+    "n": 70,
+    "netR": -0.1768,
+    "totalR": -12.37
+   },
+   "2018": {
+    "n": 70,
+    "netR": -0.0491,
+    "totalR": -3.44
+   },
+   "2019": {
+    "n": 68,
+    "netR": -0.3018,
+    "totalR": -20.52
+   },
+   "2020": {
+    "n": 69,
+    "netR": 0.1286,
+    "totalR": 8.87
+   },
+   "2021": {
+    "n": 70,
+    "netR": 0.1916,
+    "totalR": 13.41
+   },
+   "2022": {
+    "n": 71,
+    "netR": -0.0296,
+    "totalR": -2.1
+   },
+   "2023": {
+    "n": 71,
+    "netR": -0.0502,
+    "totalR": -3.57
+   },
+   "2024": {
+    "n": 70,
+    "netR": -0.1456,
+    "totalR": -10.19
+   },
+   "2025": {
+    "n": 68,
+    "netR": -0.0318,
+    "totalR": -2.16
+   },
+   "2026": {
+    "n": 62,
+    "netR": -0.1181,
+    "totalR": -7.32
+   }
+  },
+  "checks": {
+   "netPositive": false,
+   "monthT": false,
+   "replicationPositive": false,
+   "x2Positive": false,
+   "placebo": true
+  },
+  "pass": false,
+  "secondary": {
+   "decisive": {
+    "moveBp": {
+     "gotobi": {
+      "n": 760,
+      "mean": -1.7775
+     },
+     "other": {
+      "n": 1869,
+      "mean": 0.478
+     },
+     "diff": -2.2554,
+     "welchT": -0.6982
+    },
+    "corrAll": {
+     "n": 2628,
+     "r": 0.4932,
+     "t": 29.0551
+    },
+    "corrGotobi": {
+     "n": 760,
+     "r": 0.5877,
+     "t": 19.9968
+    }
+   },
+   "replication": {
+    "moveBp": {
+     "gotobi": {
+      "n": 208,
+      "mean": -8.6338
+     },
+     "other": {
+      "n": 517,
+      "mean": -0.3817
+     },
+     "diff": -8.2521,
+     "welchT": -1.2636
+    },
+    "corrAll": {
+     "n": 725,
+     "r": 0.6896,
+     "t": 25.6028
+    },
+    "corrGotobi": {
+     "n": 208,
+     "r": 0.655,
+     "t": 12.4397
+    }
+   }
+  }
+ },
+ "notes": [
+  "Data: OANDA mid M5 JP225 from 2010-04-12 through 2026-11-11, candles 00:00-06:55 UTC only. Gotobi trades lost to missing candles or a short lookback in covered years: 25 (other days 6).",
+  "JP225_USD is quoted in Nikkei index points (P&L in USD); the price is not converted at the FX rate, so its move is the index move.",
+  "Cost: 0.04 % of the entry price a round trip (about 18 points at 45,000: OANDA's typical daytime spread of about 8 points plus one Osaka mini tick of 5 points each way, the figure fixed in open-run-breadth-2), assumed, not measured. Intraday, no financing.",
+  "The month t is on calendar-month sums of net R; `tradeT` in result.json treats the trades of a month as independent and is for information only.",
+  "One test, so no Holm correction inside the study; it is one more line in the multiple-testing ledger.",
+  "Read after the verdict, not part of it: the gotobi trades beat ordinary days (−0.045R against −0.090R a trade; the placebo condition holds) and the gotobi move after the fix leans the predicted way (−2.26 bp against other days, Welch t −0.70), but before costs the trade makes only +0.043R, under its cost of 0.088R, and the plain-move difference is not apart from noise; ordinary days make −0.003R before costs, so the gotobi gap is about +0.045R a trade, beyond the 40 placebo draws but smaller than the cost. The Nikkei does move with USD/JPY in this window (r +0.493), so a fix flow of the size seen on USD/JPY would be expected to show; it does not, measurably."
+ ]
+}
