@@ -3297,6 +3297,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   the tiles, after $0.60 a round trip on gold (other markets before costs); `MS_MOSHA.verdict` / `MIN_JUDGE` 20. Hidden for a
   teacher who is not the owner (CSS beside `#mo-rules` / `#mo-cycle`; no candle read then); owner-English, so not in the French
   dictionary. Folds on the simple phone view through `desks()`. Tests: `tests/mosha-record.test.mjs`.
+  **Levels time-stamped by the server** (14 Nov 2026): `api/mosha-lessons.js` `stampTrade` stamps `trade.setAt` (unix s, server
+  clock) whenever an `add` or `edit` sets or changes market, side, `at`, entry, stop or target, keeps `firstAt` (first time levels
+  were set, kept on the lesson as `tradeFirstAt` if they are removed) and `exitSetAt` (an exit-only edit, which never moves
+  `setAt`); the page cannot send them (`tradeOf` builds a fresh object), older lessons keep none until their levels change; the
+  record judges `setAt` against the outcome candle and marks rows without it "levels not time-stamped (older lesson)". Tests:
+  `tests/mosha-trade-stamp.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 

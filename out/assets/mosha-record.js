@@ -4,9 +4,11 @@
 // that hides "What the fixed rules said" and "The cycle" from him). Owner-English on purpose: it is never shown to the teacher, so
 // it is not in the French dictionary.
 // What counts (the owner's log rule, `pre`): a lesson with whole levels (market, side, entry time, entry, a stop on the losing side,
-// a target), not from a ChronosTrade replay (`src: 'replay'` is practice on past candles), sent BEFORE the trade's outcome. The
-// stored data proves only when the LESSON was made (`at`): levels given or changed later by an edit carry no time of their own, so
-// the lesson's time stands for them (said on the card). A lesson made after the outcome is "added afterwards", never in the record.
+// a target), not from a ChronosTrade replay (`src: 'replay'` is practice on past candles), whose levels were given BEFORE the
+// trade's outcome. Since 14 Nov 2026 the server stamps the levels themselves (`trade.setAt`, moved by any change of market, side,
+// time, entry, stop or target; `exitSetAt` for his exit, which may come after the outcome: it is his close, not the levels). A
+// lesson stored before that has no `setAt`: the lesson's own time (`at`) stands for its levels and the row says "levels not
+// time-stamped (older lesson)". Levels set after the outcome are "added afterwards", never in the record.
 // Outcome: our 5-minute candles (MS_MOSHA.replay: entry traded within 30 minutes of the given time, the stop first when one
 // candle holds both); where neither level is reached before the teacher's own exit, his exit stands (a hand close).
 (function (root) {
@@ -43,15 +45,16 @@
   // `pre` = the lesson was made before it. An open trade is pre by nature (no outcome yet) but is not in the numbers.
   function judge(l, c) {
     var t = l.trade, sent = secOf(l.at), r0 = Math.abs(t.entry - t.stop), his = hisR(t);
-    var row = { id: l.id, title: l.title, sent: sent, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, his: his, hisAt: num(t.exitAt), status: 'pending', R: null, net: null, by: null, out: null, pre: null, cost: COST[t.market] != null };
+    var setAt = num(t.setAt), ref = setAt != null ? setAt : sent;   // when the levels are proven to exist
+    var row = { id: l.id, title: l.title, sent: sent, setAt: setAt, stamped: setAt != null, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, his: his, hisAt: num(t.exitAt), status: 'pending', R: null, net: null, by: null, out: null, pre: null, cost: COST[t.market] != null };
     if (!c) return row;
     if (!c.ok) { row.status = 'nocandles'; row.why = c.why; }
     else if (!c.filled) { row.status = 'unfilled'; row.why = c.why; }
     else if (c.outcome === 'stop' || c.outcome === 'target') { row.status = 'closed'; row.R = c.R; row.by = 'candles'; row.out = c.when; }
     else if (his != null && row.hisAt != null) { row.status = 'closed'; row.R = his; row.by = 'his exit'; row.out = row.hisAt; }
     else row.status = 'open';
-    if (row.status === 'closed') { row.pre = sent != null && sent < row.out; row.net = +(row.R - (COST[t.market] || 0) / r0).toFixed(3); }
-    else if (row.hisAt != null) row.pre = sent != null && sent < row.hisAt;   // an unchecked trade he closed: was the lesson before his exit?
+    if (row.status === 'closed') { row.pre = ref != null && ref < row.out; row.net = +(row.R - (COST[t.market] || 0) / r0).toFixed(3); }
+    else if (row.hisAt != null) row.pre = ref != null && ref < row.hisAt;   // an unchecked trade he closed: was the lesson before his exit?
     else row.pre = row.status === 'open' ? true : null;
     return row;
   }
@@ -111,7 +114,7 @@
     var res = r.status === 'closed' ? '<b class="' + cls(r.R) + '">' + fR(r.R) + '</b><small>' + (r.by === 'candles' ? (r.R < 0 ? 'stop first on our candles' : 'target on our candles') : 'his exit (neither level on our candles)') + ' · ' + utc(r.out) + '</small>'
       : r.status === 'open' ? 'Open on our candles' : r.status === 'pending' ? 'Reading our candles…' : esc(r.why || '');
     var his = r.his != null ? '<small>He sent: exit ' + fR(r.his) + (r.hisAt ? ' at ' + utc(r.hisAt) : '') + '</small>' : '';
-    return '<tr><td><span class="mo-when">' + utc(r.at) + '</span><small>' + esc(r.market.toUpperCase()) + ' · sent ' + utc(r.sent) + '</small></td><td><span class="chip ' + r.side + '">' + r.side.toUpperCase() + '</span></td>' +
+    return '<tr><td><span class="mo-when">' + utc(r.at) + '</span><small>' + esc(r.market.toUpperCase()) + (r.stamped ? ' · levels set ' + utc(r.setAt) : ' · sent ' + utc(r.sent) + ' · levels not time-stamped (older lesson)') + '</small></td><td><span class="chip ' + r.side + '">' + r.side.toUpperCase() + '</span></td>' +
       '<td class="n">' + px(r.entry) + '</td><td class="n">' + px(r.stop) + '</td><td class="n">' + px(r.target) + '</td><td>' + res + his + '</td></tr>';
   }
   function table(rows, cap) { return rows.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="' + esc(cap) + '"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th></tr></thead><tbody>' + rows.map(rowHTML).join('') + '</tbody></table></div>' : ''; }
@@ -131,8 +134,8 @@
     box.innerHTML = head + '<p class="mo-verdict mo-' + v.key + '">' + esc(vt) + '</p>' + tiles(g, R.net) + '<p class="ms-note">' + esc(net) + '</p>' +
       (R.pre.length ? '<details class="mo-fold"><summary>The ' + R.pre.length + ' trade' + (R.pre.length > 1 ? 's' : '') + ' in the record</summary>' + table(R.pre.slice().reverse(), 'Trades in the record') + '</details>' : '<div class="ct-empty">No trade in the record yet. A trade counts once Luxus sends it as a lesson with its entry, stop and target before its result, and our candles reach the stop or the target (or he sends his exit).</div>') +
       (R.open.length || R.other.length || R.pending.length ? '<details class="mo-fold"><summary>Open, not measurable or still being read</summary>' + table(R.open.concat(R.other, R.pending), 'Trades not in the record yet') + '</details>' : '') +
-      (R.post.length ? '<details class="mo-fold"><summary>Added afterwards, kept apart: ' + R.post.length + ', ' + fR(D.stats(R.post.map(function (r) { return r.R; })).total) + ' in total</summary><p class="ms-note">The lesson was made after the result on our candles (or after his exit), so it cannot measure how he chooses.</p>' + table(R.post, 'Added afterwards') + '</details>' : '') +
-      '<p class="ms-note mo-foot">' + esc((more.length ? more.join(' · ') + '. ' : '') + 'Timing is the lesson\'s own time: levels given or changed later by an edit carry no time of their own. Replay trades from ChronosTrade never count. A description of his trades, not a tested edge.') + '</p>';
+      (R.post.length ? '<details class="mo-fold"><summary>Added afterwards, kept apart: ' + R.post.length + ', ' + fR(D.stats(R.post.map(function (r) { return r.R; })).total) + ' in total</summary><p class="ms-note">The levels were given (or last changed) after the result on our candles (or after his exit), so they cannot measure how he chooses.</p>' + table(R.post, 'Added afterwards') + '</details>' : '') +
+      '<p class="ms-note mo-foot">' + esc((more.length ? more.join(' · ') + '. ' : '') + 'Timing is the time the server stamped on the levels when they were last given or changed (his exit may come later: it is his close). Lessons from before 14 Nov 2026 carry no such stamp: there the lesson\'s own time stands for the levels, which an edit may have given later. Replay trades from ChronosTrade never count. A description of his trades, not a tested edge.') + '</p>';
     checkAll(srt.use);
   }
   // called by assets/mosha-teach.js each time the lessons are read
