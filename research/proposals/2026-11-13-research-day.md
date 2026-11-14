@@ -96,6 +96,7 @@ paper system with a measured, clearly negative record.
 | 78 | Follow the first hour after ECB (EUR/USD) and BoJ (USD/JPY) decisions | FAIL, 0 of 2: ECB a near miss, +0.631R (n 71, t 1.51), positive 2010-17 and at 2x cost but 18 big time exits carry it; BoJ flat (+0.064R); pre-2025 dates from memory | #896 |
 | 79 | Read-only yen-pair spread log (build, not a study) | records the demo broker's USD/JPY and yen-cross spreads at 00:55 / 06:00 UTC each weekday, the measurement that decides the gotobi fade; **owner item 54 (shared number with #818: the second to merge becomes 55), waiting for approval to merge** | #897 |
 | 80 | Fade the Sunday reopen gap (> 0.5 ATR) on US500 / NAS100 / US30 back to Friday's close | FAIL, 0 of 4: pooled −0.126R (n 102, t −1.59), negative before costs too; big weekend gaps hold (7 of 80 filled 2016-26); below all 40 placebo runs | #898 |
+| 81 | Next-day lead: big WTI day → USD/CAD, big copper day → AUD/USD | FAIL, 0 of 2: pooled +0.012R (t 0.46); the link is same-day only (corr −0.33 to +0.53 same day, ~0 next day); 2006-15 negative | #899 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
