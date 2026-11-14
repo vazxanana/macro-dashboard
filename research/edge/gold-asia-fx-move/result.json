@@ -1,0 +1,300 @@
+{
+ "tests": {
+  "T1": {
+   "name": "USD/JPY falls in Asia (z <= -1.5): buy gold 07:00-20:00 UTC",
+   "fx": "usdjpy",
+   "is": {
+    "n": 184,
+    "buys": 184,
+    "sells": 0,
+    "gross": 0.11,
+    "net": 0.0735,
+    "net2": 0.0369,
+    "baseline": -0.0457,
+    "baselineGross": -0.0115,
+    "baseDays": 2538,
+    "excess": 0.1191,
+    "tGross": 2.14,
+    "t": 1.45,
+    "tExcess": 2.3,
+    "pExcess": 0.0107,
+    "total": 13.52,
+    "wr": 51.6,
+    "stopped": 16,
+    "medStop": 17.9,
+    "months": 120,
+    "placebo": {
+     "p5": -0.1095,
+     "p50": -0.0354,
+     "p95": 0.0248,
+     "max": 0.0282,
+     "beaten": 40,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.0962,
+     "p50": -0.0423,
+     "p95": 0.042,
+     "max": 0.0427,
+     "beaten": 40,
+     "of": 40
+    }
+   },
+   "oos": {
+    "n": 166,
+    "buys": 166,
+    "sells": 0,
+    "gross": -0.0137,
+    "net": -0.0422,
+    "net2": -0.0708,
+    "baseline": -0.0117,
+    "baselineGross": 0.0164,
+    "baseDays": 2474,
+    "excess": -0.0305,
+    "tGross": -0.32,
+    "t": -0.98,
+    "tExcess": -0.71,
+    "pExcess": 0.7616,
+    "total": -7.01,
+    "wr": 50.6,
+    "stopped": 20,
+    "medStop": 23.9,
+    "months": 118,
+    "placebo": {
+     "p5": -0.0708,
+     "p50": -0.0239,
+     "p95": 0.048,
+     "max": 0.051,
+     "beaten": 10,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.0683,
+     "p50": -0.0137,
+     "p95": 0.0738,
+     "max": 0.0797,
+     "beaten": 10,
+     "of": 40
+    }
+   },
+   "holmP": 0.7616,
+   "checks": {
+    "holm": false,
+    "netT": false,
+    "netPos": false,
+    "sameSignIS": true,
+    "x2": false,
+    "placebo": false,
+    "control": false,
+    "events": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "USD/JPY rises in Asia (z >= +1.5): sell gold 07:00-20:00 UTC",
+   "fx": "usdjpy",
+   "is": {
+    "n": 131,
+    "buys": 0,
+    "sells": 131,
+    "gross": 0.1238,
+    "net": 0.0895,
+    "net2": 0.0551,
+    "baseline": -0.008,
+    "baselineGross": 0.0262,
+    "baseDays": 2538,
+    "excess": 0.0975,
+    "tGross": 2.37,
+    "t": 1.75,
+    "tExcess": 1.9,
+    "pExcess": 0.029,
+    "total": 11.72,
+    "wr": 57.3,
+    "stopped": 9,
+    "medStop": 18.16,
+    "months": 120,
+    "placebo": {
+     "p5": -0.0599,
+     "p50": -0.0119,
+     "p95": 0.0874,
+     "max": 0.092,
+     "beaten": 39,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.0751,
+     "p50": -0.0161,
+     "p95": 0.0881,
+     "max": 0.0971,
+     "beaten": 39,
+     "of": 40
+    }
+   },
+   "oos": {
+    "n": 156,
+    "buys": 0,
+    "sells": 156,
+    "gross": 0.0539,
+    "net": 0.025,
+    "net2": -0.004,
+    "baseline": -0.0384,
+    "baselineGross": -0.0103,
+    "baseDays": 2474,
+    "excess": 0.0633,
+    "tGross": 0.99,
+    "t": 0.46,
+    "tExcess": 1.16,
+    "pExcess": 0.1223,
+    "total": 3.89,
+    "wr": 46.8,
+    "stopped": 10,
+    "medStop": 23.39,
+    "months": 118,
+    "placebo": {
+     "p5": -0.1296,
+     "p50": -0.0405,
+     "p95": 0.0602,
+     "max": 0.0734,
+     "beaten": 35,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.1127,
+     "p50": -0.0293,
+     "p95": 0.0414,
+     "max": 0.0624,
+     "beaten": 36,
+     "of": 40
+    }
+   },
+   "holmP": 0.3381,
+   "checks": {
+    "holm": false,
+    "netT": false,
+    "netPos": true,
+    "sameSignIS": true,
+    "x2": false,
+    "placebo": false,
+    "control": false,
+    "events": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "AUD/USD moves in Asia (|z| >= 1.5): gold the same way as AUD/USD, 07:00-20:00 UTC",
+   "fx": "audusd",
+   "is": {
+    "n": 329,
+    "buys": 170,
+    "sells": 159,
+    "gross": 0.0068,
+    "net": -0.0268,
+    "net2": -0.0605,
+    "baseline": -0.0275,
+    "baselineGross": 0.0067,
+    "baseDays": 2538,
+    "excess": 0.0007,
+    "tGross": 0.16,
+    "t": -0.61,
+    "tExcess": 0.02,
+    "pExcess": 0.4939,
+    "total": -8.82,
+    "wr": 44.7,
+    "stopped": 44,
+    "medStop": 19.01,
+    "months": 120,
+    "placebo": {
+     "p5": -0.0783,
+     "p50": -0.0228,
+     "p95": 0.0219,
+     "max": 0.0577,
+     "beaten": 18,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.0711,
+     "p50": -0.0183,
+     "p95": 0.026,
+     "max": 0.0276,
+     "beaten": 16,
+     "of": 40
+    }
+   },
+   "oos": {
+    "n": 302,
+    "buys": 148,
+    "sells": 154,
+    "gross": 0.0455,
+    "net": 0.0174,
+    "net2": -0.0106,
+    "baseline": -0.0253,
+    "baselineGross": 0.0027,
+    "baseDays": 2474,
+    "excess": 0.0427,
+    "tGross": 1.29,
+    "t": 0.5,
+    "tExcess": 1.21,
+    "pExcess": 0.1127,
+    "total": 5.26,
+    "wr": 50.7,
+    "stopped": 33,
+    "medStop": 23.94,
+    "months": 118,
+    "placebo": {
+     "p5": -0.081,
+     "p50": -0.021,
+     "p95": 0.0167,
+     "max": 0.0206,
+     "beaten": 39,
+     "of": 40
+    },
+    "control": {
+     "p5": -0.0796,
+     "p50": -0.0384,
+     "p95": 0.0232,
+     "max": 0.0361,
+     "beaten": 37,
+     "of": 40
+    }
+   },
+   "holmP": 0.3381,
+   "checks": {
+    "holm": false,
+    "netT": false,
+    "netPos": true,
+    "sameSignIS": true,
+    "x2": false,
+    "placebo": true,
+    "control": false,
+    "events": true
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": [],
+ "data": {
+  "gold": {
+   "from": "2006-06-01",
+   "to": "2026-10-30",
+   "h1": 124242,
+   "days": 5139
+  },
+  "usdjpy": {
+   "h1": 129220,
+   "zDays": 5235
+  },
+  "audusd": {
+   "h1": 129184,
+   "zDays": 5234
+  },
+  "src": "OANDA mid H1 via the site proxy (/md/bars)"
+ },
+ "costs": {
+  "roundTrip": 0.6,
+  "financing": "nights(entry, exit) x FIN.xau.long (0.000148) x entry on buys; a 07:00-20:00 UTC hold crosses no 22:00 UTC rollover, so 0",
+  "finSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "built": "2026-11-14",
+ "note": "A new stand-alone intraday rule on gold, not a gate, exit, entry or size of the gold book (owner item 44). Paper research only."
+}
