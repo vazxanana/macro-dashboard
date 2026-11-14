@@ -76,6 +76,7 @@ paper system with a measured, clearly negative record.
 | 310 | Gold catching up with the haven trades (yen, franc, Treasuries) — fade gold's residual | **FAIL, 0 of 3**: fade −0.004R OOS (n 159, t −0.07), costs exceed the gross edge; follow-the-havens variant +0.049R (t 0.81, 38 of 40 placebos) not a lead | #1123 |
 | 311 | Daily wick pressure on gold (trade the way recent wicks point) | **FAIL**: 5-day excess over every-day baseline −0.039R OOS (n 346, t −0.78); buys below any-day buys; 28 of 40 random-side shuffles as good or better | #1124 |
 | 312 | Gold over the lunar cycle (long around new moon, short around full moon) | **FAIL, 0 of 3**: both legs −0.026R OOS (n 243, t −0.40), 17 of 40 placebos; new-moon longs only ride gold's rise | #1125 |
+| 313 | Gold's move left unexplained by the dollar, rates and stocks (regression residual, fade or follow) | **FAIL, 0 of 3**: fade +0.017R excess OOS (n 86, t 0.14); follow +0.147R excess (t 1.24, Holm p 0.65, 36 of 40 placebos), mostly buys | #1126 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
