@@ -129,6 +129,8 @@ paper system with a measured, clearly negative record.
 | 111 | Buy the Swiss franc for 5 days after a sharp S&P 500 fall (short USD/CHF, EUR/CHF, AUD/CHF) | FAIL 0 of 3: negative after costs in both windows, below random entry days on every pair | #930 |
 | 112 | Forex round numbers ("00" levels on four majors): fade the first touch, or follow the break | FAIL 0 of 2: both lose before and after costs in every window, pair and year; the real levels do worse than randomly shifted ones (stopped out more often either way) | #931 |
 | 113 | Intraday momentum on gold, silver, crude: the first half hour of the US floor session sets the side of the last half hour | FAIL 0 of 3: about zero before costs, −0.16 to −0.64R a trade after; hit rate no better than a coin | #932 |
+| 114 | Brent - WTI spread: fade a 2-sd stretch (60-day z), hold to the mean or 20 days | FAIL: −0.199R a trade 2016-now (n 87, t −1.42), −0.297R 2003-15; costs 0.26R a trade swamp a small gross gain; placebo middle of the pack | #933 |
+| 115 | Pre-harvest grain short (corn, soybeans Jul-Sep; wheat Jun-Aug), one trade a year | PASS on the bar, soybeans only: +0.520R a year 2016-26 (8 of 11 years, permutation p 0.012, Holm 0.036; July is the best of 12 start months in both windows); corn and wheat fail. Thin: 11 years, per-year t 1.38, a long-published pattern, costs assumed | #934 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
