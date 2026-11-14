@@ -58,5 +58,65 @@
    "t": 1793923200,
    "close": 4070.59
   }
+ },
+ {
+  "record_id": "vet-2026-11-14-issued",
+  "forecast_id": "xau-4w-2026-11-14",
+  "record_type": "issued",
+  "recorded_at_utc": "2026-11-14T00:01:58.000Z",
+  "previous_record_id": null,
+  "week": "2026-11-14",
+  "forecast": {
+   "issued_at_utc": "2026-11-14T00:01:58.000Z",
+   "information_cutoff_utc": "2026-11-14T00:01:58.000Z",
+   "target": {
+    "variable": "XAU/USD daily close",
+    "instrument_or_population": "council daily gold candles (OANDA spot mid), research/daily/xau.json",
+    "unit": "USD per troy ounce",
+    "outcome_description": "The daily close 20 trading days after 2026-11-13 is above 3884.68 (the close of 2026-11-13)",
+    "observation_start_utc": "2026-11-13T00:00:00.000Z",
+    "deadline_utc": "2026-12-13T00:00:00.000Z",
+    "timezone_note": "UTC day candles; the deadline is the 20th trading-day close, about 28-30 calendar days on"
+   },
+   "horizon": "20 trading days",
+   "resolution_rule": {
+    "publisher": "council-data",
+    "dataset_or_instrument": "research/daily/xau.json",
+    "field_or_price_convention": "row close (index 4)",
+    "rule": "true if close[t0 + 20 rows] > close[t0]",
+    "revision_policy": "candles are not revised; a missing day leaves the record unresolved until the next close",
+    "specified_vintage": "2026-11-13"
+   },
+   "distribution": {
+    "kind": "binary_event",
+    "event_probability": 0.526
+   },
+   "comparator": {
+    "type": "model_rule",
+    "description": "Gold Macro Score rule: score −0.92 → tested 4-week up rate",
+    "probability_or_value": 0.52,
+    "sample_size": 1068,
+    "captured_at_utc": "2026-11-14T00:01:58.000Z",
+    "source_url": null,
+    "limitations": "tested hit rates are in-sample averages over 2007-26, not a live probability"
+   },
+   "base_rate": {
+    "probability": 0.566,
+    "description": "unconditional 20-day up rate, 2016-11-17..2026-11-13, n 3085"
+   },
+   "rationale": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size.",
+   "disconfirming_evidence": "10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 105.0 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4123 removes the trend tiebreaker",
+   "method_version": "veteran-1",
+   "author_or_model": "council/veteran.mjs (code port of gptmacro_v.1)",
+   "tags": [
+    "gold",
+    "paper-only",
+    "auction"
+   ]
+  },
+  "anchor": {
+   "t": 1794528000,
+   "close": 3884.685
+  }
  }
 ]
