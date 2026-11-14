@@ -88,6 +88,7 @@ paper system with a measured, clearly negative record.
 | 322 | Gold momentum by equity-correlation regime (haven vs risk) | **FAIL, 0 of 3**: following gold's 10-day move earns nothing in either regime; haven OOS −0.059R (t −0.61), risk +0.017R (t 0.21), difference t −0.60 | #1135 |
 | 323 | Gold week exhaustion: fade a week that already moved ≥ 0.75 × its normal range by day 1-3 | **FAIL, 0 of 3**: OOS net −0.014R (excess t +0.20); buys after a down week 0.085R worse than an ordinary buy; noise against the same-weekday baseline | #1136 |
 | 324 | Gold staircase: 3+ days of higher highs and higher lows (or the mirror) | **FAIL, 0 of 3**: buy after an up staircase +0.021R OOS = drift (excess −0.013R, t −0.17); sell after a down staircase +0.016R; buying the turn −0.079R | #1137 |
+| 325 | Gold around the two Eids: long into Eid al-Fitr / al-Adha, short after | **FAIL, 0 of 3**: OOS excess over the same-year hold Fitr +0.375R (t 0.93), Adha +0.279R (t 0.55, opposite sign IS), post-Eid short −0.179R (t −1.45); 10 events a window, so 'not shown', not 'absent' | #1138 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
