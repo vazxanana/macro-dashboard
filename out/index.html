@@ -6195,11 +6195,18 @@ function msZones(bars, breaks, closedN) {
 function msInternal(bars, closedN, N = MS_IPIV) {
   const n = Math.min(closedN, bars.length), H = bars.map((b) => b.high), L = bars.map((b) => b.low), C = bars.map((b) => b.close), out = [];
   const piv = (j, hi) => { for (let k = 1; k <= N; k++) { if (j - k < 0 || j + k >= n) return false; if (hi ? (H[j - k] > H[j] || H[j + k] >= H[j]) : (L[j - k] < L[j] || L[j + k] <= L[j])) return false; } return true; };
+  // 14 Nov 2026 (the owner's marked M15 chart, "many wrong markups"): (1) with the move, the level to break is the EXTREME of
+  // the move (in a fall the lowest swing low since the last break, never a newer higher low); (2) a break sets the level on the
+  // other side at once: the lowest low (highest high) between the broken swing and the break, the low the leg came from, even
+  // when the candle before it had a lower wick; a later swing the other way still replaces it.
+  const ext = (a, b, hi) => { let k = a; for (let j = a; j <= b; j++) if (hi ? H[j] > H[k] : L[j] < L[k]) k = j; return { i: k, p: hi ? H[k] : L[k] }; };
   let sh = null, sl = null, trend = 0;
   for (let i = 0; i < n; i++) {
-    const j = i - N; if (j >= 0) { if (piv(j, true)) sh = { i: j, p: H[j] }; if (piv(j, false)) sl = { i: j, p: L[j] }; }
-    if (sh && C[i] > sh.p) { out.push({ dir: 1, level: sh.p, fromIdx: sh.i, breakIdx: i, structure: trend < 0 }); trend = 1; sh = null; }
-    if (sl && C[i] < sl.p) { out.push({ dir: -1, level: sl.p, fromIdx: sl.i, breakIdx: i, structure: trend > 0 }); trend = -1; sl = null; }
+    const j = i - N; if (j >= 0) {
+      if (piv(j, true) && !(trend > 0 && sh && sh.p >= H[j])) sh = { i: j, p: H[j] };
+      if (piv(j, false) && !(trend < 0 && sl && sl.p <= L[j])) sl = { i: j, p: L[j] }; }
+    if (sh && C[i] > sh.p) { out.push({ dir: 1, level: sh.p, fromIdx: sh.i, breakIdx: i, structure: trend < 0 }); trend = 1; sl = ext(sh.i + 1, i, false); sh = null; }
+    if (sl && C[i] < sl.p) { out.push({ dir: -1, level: sl.p, fromIdx: sl.i, breakIdx: i, structure: trend > 0 }); trend = -1; sh = ext(sl.i + 1, i, true); sl = null; }
   }
   return out;
 }
@@ -7027,7 +7034,7 @@ function msNextSetup(bars, A) {
       const px = bars[n - 1].close;   // the three nearest to price a side (the next ones price can come back to)
       [1, -1].forEach((d) => fresh.filter((z) => z.dir === d).sort((a, b) => Math.abs((a.lo + a.hi) / 2 - px) - Math.abs((b.lo + b.hi) / 2 - px)).slice(0, 3).forEach((z) => { const dem = d > 0;
         items.boxes.push({ kind: 'oz', open: true, l1: z.i, l2: n + 20, lo: z.lo, hi: z.hi, fill: dem ? 'rgba(8,153,129,.13)' : 'rgba(242,54,69,.13)', stroke: dem ? 'rgba(8,153,129,.75)' : 'rgba(242,54,69,.75)', dash: true });
-        items.labels.push({ l: n + 20, dx: -4, align: 'right', p: dem ? z.lo : z.hi, dy: dem ? 14 : -5, text: `${dem ? 'Demand' : 'Supply'} OB · fresh · ${z.kind === 'ibo' ? 'iBO' : 'BO'} ${fmt(z.lo)}–${fmt(z.hi)}`, color: dem ? Z.buy.line : Z.sell.line });
+        items.labels.push({ l: n + 20, dx: -4, align: 'right', p: dem ? z.lo : z.hi, dy: dem ? 14 : -5, text: `${dem ? 'Demand' : 'Supply'} OB`, color: dem ? Z.buy.line : Z.sell.line });
       }));
     }
     evs.forEach((e, k) => {
@@ -7099,15 +7106,15 @@ function msNextSetup(bars, A) {
         path = iv.reached ? (a(iv.dir, px, iv.to) ? [{ from: px, to: iv.to, dir: iv.dir, kind: 'with', word: 'Break of the internal low' }] : null)
           : a(-iv.dir, px, iv.p50) ? [{ from: px, to: iv.p50, dir: -iv.dir, kind: 'retrace', word: 'Retrace to internal 50%' }].concat(a(iv.dir, iv.p50, iv.to) ? [{ from: iv.p50, to: iv.to, dir: iv.dir, kind: 'with', word: 'then' }] : []) : null;
         if (path && iv.dir > 0) path.forEach((g) => { g.word = g.word.replace('internal low', 'internal high'); }); }
-      if (iv) { const ic = 'rgba(224,138,30,.55)', sell = iv.dir < 0;   // the internal range: high / 50% / low, and the entry zones on its 50% (also in the clean look)
-        items.lines.push({ l1: iv.fromIdx, l2: n + 9, p: iv.p50, color: ic, w: 1, dash: true, text: (path || []).some((g) => g.to === iv.p50) ? '' : `Internal 50% ${fmt(iv.p50)}${iv.reached ? ' · reached' : ''}`, below: !sell });   // the arrow already names it
+      if (iv) { const ic = iv.reached ? 'rgba(224,138,30,.25)' : 'rgba(224,138,30,.55)', sell = iv.dir < 0;   // the internal range: high / 50% / low, and the entry zones on its 50% (also in the clean look)
+        items.lines.push({ l1: iv.fromIdx, l2: n + 9, p: iv.p50, color: ic, w: 1, dash: true, text: (path || []).some((g) => g.to === iv.p50) || iv.reached ? '' : '50%', below: !sell });   // the arrow already names it
         if (!CL) [[iv.from, sell ? 'Internal high' : 'Internal low', iv.fromIdx], [iv.to, sell ? 'Internal low' : 'Internal high', iv.toIdx]].forEach(([p, w, i]) => items.lines.push({ l1: i, l2: n + 9, p, color: ic, w: 1, dash: true, text: `${w} ${fmt(p)}`, below: (w === 'Internal low') }));
         const zs = G.show.zones !== false ? msZones(bars, A.events.map((e) => ({ dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'bo' })).concat(msInternal(bars, nc, PIVOT).map((e) => ({ ...e, kind: 'ibo' }))), nc) : [];
         msEntryZones(bars, nc, iv, zs).forEach((z, k) => { const c = sell ? Z.sell : Z.buy;
           items.boxes.push({ kind: 'ez', open: true, l1: z.i, l2: n + 20, lo: z.lo, hi: z.hi, fill: sell ? 'rgba(242,54,69,.2)' : 'rgba(8,153,129,.2)', stroke: c.line });
-          if (!k) items.labels.push({ l: n + 20, dx: -4, align: 'right', p: sell ? z.hi : z.lo, dy: sell ? -5 : 14, text: `${sell ? 'Sell' : 'Buy'} zone · ${sell ? 'above' : 'below'} internal 50% ${fmt(z.lo)}–${fmt(z.hi)}`, color: c.line }); }); }
+          if (!k) items.labels.push({ l: n + 20, dx: -4, align: 'right', p: sell ? z.hi : z.lo, dy: sell ? -5 : 14, text: `${sell ? 'Sell' : 'Buy'} zone`, color: c.line }); }); }
       (path || []).forEach((g, k) => { const a = k ? n + 9 : n - 1, b = k || path.length === 1 ? (k ? n + 20 : n + 16) : n + 9;
-        items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.word} ${g.dir < 0 ? '▼' : '▲'} ${fmt(g.to)}` }); }); }
+        items.segs.push({ l1: a, p1: g.from, l2: b, p2: g.to, color: g.kind === 'retrace' ? RTR : CYC, w: 2, arrow: true, dash: g.kind === 'retrace', text: `${g.kind === 'retrace' ? 'Pullback' : 'Target'} ${fmt(g.to)}` }); }); }
     // the Mosha layer (msMosha): the storyline of the timeframe above read on this one, with its CF zone, stop, target and barriers
     if (own && G.show.mosha !== false) { const M = moshaNow(tf.id, bars); if (M) { const at = (t) => { const i = bars.findIndex((b) => b.time >= t); return i < 0 ? n - 1 : i; }, sell = M.dir < 0, pl = M.htf.label;
       M.barriers.slice(-4).forEach((b, k, a) => items.lines.push({ l1: at(b.t) - 4, l2: n + 8, p: b.level, color: 'rgba(255,152,0,.55)', w: 1, dash: true, text: k === a.length - 1 ? `Barrier ${fmt(b.level)}` : '', below: !sell }));
@@ -7743,7 +7750,7 @@ function msNextSetup(bars, A) {
       let tg = ph.querySelector('.ms-cy'); if (!tg) { tg = document.createElement('span'); tg.className = 'ms-cy'; const chip = ph.querySelector('.ms-chip'); ph.insertBefore(tg, chip ? chip.nextSibling : null); }
       const P = panes[id], px = P && P.bars && P.bars.length ? P.bars[P.bars.length - 1].close : NaN;
       let r = CY.find((x) => x.parent === id), st = msStage(r, px, fmt), w, cls, tip;
-      if (st) { w = st.text; cls = ['', 'move', 'pullback', 'resumed'][st.step]; tip = st.tip; }
+      if (st) { w = st.text.split(' · ')[0].replace(/^\d /, ''); cls = ['', 'move', 'pullback', 'resumed'][st.step]; tip = `${st.text}. ${st.tip}`; }   // 14 Nov 2026, owner: fewer labels; the detail is in the tooltip
       else { const up = CY.find((x) => x.child === id && x.phase !== 'none'), su = up && msStage(up, px, fmt);
         if (su) { w = `In ${up.pl} ${su.text.replace(/^\d /, '').split(' · ')[0].toLowerCase()}`; cls = ['', 'move', 'pullback', 'resumed'][su.step]; tip = `${id.toUpperCase()} sits inside this ${up.pl} stage. ${su.tip}`; }
         else { const d = r && r.dir ? r.dir : P && P.A ? P.A.trend : 0; w = d ? `Trend ${d < 0 ? '▼' : '▲'}` : ''; cls = 'trend'; tip = 'This timeframe\'s own trend.'; } }

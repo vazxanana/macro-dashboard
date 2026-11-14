@@ -1321,6 +1321,15 @@ candle against the move at or before the internal high, out to that high) plus f
 the 50%, gone once a candle trades into it or the 50% is reached; at most two, nearest the 50% first. Drawn as solid boxes
 "Sell / Buy zone · above / below internal 50% lo–hi", in the clean look too; "Internal high / low" lines outside it. On 13 Nov:
 H1 3,968.8–4,000.7 over a 50% at 3,926.7, H4 4,040.6–4,067.1 (the owner's 4,068 mark). Display only, not a tested rule.
+14 Nov 2026, owner: "Less labels and simpler but easy to understand", then a marked M15 chart ("many wrong markups"). Labels:
+an arrow reads "Pullback <price>" (dashed amber) or "Target <price>" (purple), a zone "Sell zone" / "Buy zone", a fresh OB
+"Supply OB" / "Demand OB"; the internal 50% line says "50%" only when no arrow names it, nothing once reached (fainter line);
+the pane tag is one word ("Move ▼", "Pullback ▲", "Continuation ▼") with the step and levels in its tooltip. `msInternal`
+fixes: (1) with the move, the level to break is the move's EXTREME (in a fall the lowest swing low since the last break; a
+newer higher low no longer replaces it: it drew 3,889.5 instead of the owner's 3,888.5); (2) a break sets the level on the
+other side at once = the lowest low (highest high) from the candle after the broken swing to the break (the owner's 3,904.7,
+which the swing rule missed because the impulse candle before it had a lower wick); a later swing the other way still
+replaces it. Pinned on the real candles (`tests/fixtures/xau-m15-oanda-2026-11-13.json`).
 
 ## Meridian markup: closed candles, failed breaks, line chart, more history (12 Nov 2026, owner)
 Display only (`market-structure.html`); the council's own engine copy in `council/trader.mjs` is unchanged.

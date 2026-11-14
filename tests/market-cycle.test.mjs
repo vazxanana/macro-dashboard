@@ -282,6 +282,26 @@ test('entry zones on the internal 50%: the leg\'s order block in the premium hal
   assert.deepEqual(msEntryZones(up, 5, { dir: 1, from: 96, to: 121, p50: 108.5, fromIdx: 1, toIdx: 4, startIdx: 0, reached: false }, []), [{ dir: 1, lo: 96, hi: 101, i: 1, kind: 'origin' }]);
 });
 test('entry zones are wired: drawn in the clean look too, with the internal 50% line', () => {
-  assert.match(html, /msEntryZones\(bars, nc, iv, zs\)/); assert.match(html, /zone · \$\{sell \? 'above' : 'below'\} internal 50%/);
+  assert.match(html, /msEntryZones\(bars, nc, iv, zs\)/); assert.match(html, /text: `\$\{sell \? 'Sell' : 'Buy'\} zone`/);
   assert.doesNotMatch(html, /if \(iv && !CL\) items\.lines\.push/, 'the internal 50% line shows in the clean look');
+});
+
+// 14 Nov 2026, owner: "Less labels and simpler but easy to understand"
+test('chart labels are short: one word and a price, the detail in the pane tooltip', () => {
+  assert.match(html, /text: `\$\{g\.kind === 'retrace' \? 'Pullback' : 'Target'\} \$\{fmt\(g\.to\)\}`/);
+  assert.match(html, /text: `\$\{dem \? 'Demand' : 'Supply'\} OB`/);
+  assert.match(html, /w = st\.text\.split\(' · '\)\[0\]\.replace\(\/\^\\d \/, ''\)/);
+  assert.match(html, /tip = `\$\{st\.text\}\. \$\{st\.tip\}`/);
+  assert.doesNotMatch(html, /Sell' : 'Buy'\} zone · /); assert.doesNotMatch(html, /OB · fresh · /);
+});
+
+// 14 Nov 2026, the owner's marked M15 chart of 13 Nov ("many wrong markups"): two internal lows, both broken by a close
+test('internal breaks on the owner\'s M15 chart: the low the leg came from, and the lowest low of the fall', () => {
+  const msInternal = new Function(`${fn('msInternal')}; return msInternal;`)();
+  const F = JSON.parse(fs.readFileSync(new URL('./fixtures/xau-m15-oanda-2026-11-13.json', import.meta.url), 'utf8'));
+  const B = F.rows.map(([time, open, high, low, close]) => ({ time, open, high, low, close }));
+  const at = (i) => new Date(B[i].time * 1000).toISOString().slice(5, 16);
+  const ev = msInternal(B, B.length, 6).filter((e) => e.dir < 0 && at(e.breakIdx) >= '11-13T00').map((e) => [e.level, at(e.fromIdx), at(e.breakIdx)]);
+  assert.deepEqual(ev, [[3904.735, '11-13T02:15', '11-13T05:45'], [3888.47, '11-13T06:45', '11-13T11:15']],
+    '3,904.7: the low between the broken high and its break (the candle before had a lower wick); 3,888.5: the lowest low, not the newer higher low 3,889.5');
 });
