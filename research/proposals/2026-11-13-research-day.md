@@ -136,6 +136,7 @@ paper system with a measured, clearly negative record.
 | 118 | Robustness of the soybean short (#934), rule frozen: window shifted ±5/±10 days, stop 2x/4x ATR | FRAGILE: a window 10 days later loses in 2016-26 (−0.041R a year, 4 of 11 years); −5 days barely positive; stops fine. Depends on the exact dates, not an edge | #937 |
 | 119 | Second frozen replication of the forex Sunday-gap fade (#880 rule G): #928's crosses 2010-19, six untraded pairs 2016-now | PARTLY: new pairs +0.153R a trade (n 481, month t 3.19, Holm p 0.001; every year positive, AUD/NZD half of it, gone at 2x cost); crosses 2010-19 +0.061R (t 1.02), 81 % from 2015. Real since 2016 on several pair sets, near zero before, cost-fragile | #938 |
 | 120 | Month-end rise in US Treasuries (10y, 30y CFDs, last 3 trading days) | FAIL 0 of 2: positive in both windows and above the placebo, but t 0.3-1.1 net; real before costs (10y gross t 2.31, best of 18 day-of-month windows on every US maturity), two-thirds eaten by spread and financing | #939 |
+| 121 | Weekly cross-sectional reversal on 9 currencies (a second look at #834's 7-major version) | FAIL: −0.024R a week 2016-now (t −1.97), flat before costs; at the median of random picks. Two versions now failed; no third | #940 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
