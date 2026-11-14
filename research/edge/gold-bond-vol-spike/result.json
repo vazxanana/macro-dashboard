@@ -1,0 +1,370 @@
+{
+ "study": "gold-bond-vol-spike",
+ "built": "2026-11-14",
+ "data": {
+  "gold": [
+   "2006-03-20",
+   "2026-11-13",
+   5369
+  ],
+  "bond": [
+   "2003-03-21",
+   "2026-11-13",
+   6100
+  ],
+  "fold": "UTC days, weekends folded into Monday (fills.mjs foldWeekend)"
+ },
+ "rules": {
+  "k": 1.25,
+  "rv": "RV5 / RV60",
+  "cooldown": 5,
+  "cost": 0.6,
+  "cost2x": 1.2,
+  "atr": "2 x ATR(20)",
+  "fin": 0.000148,
+  "IS": [
+   "2007-01",
+   "2016-12"
+  ],
+  "OOS": [
+   "2017-01",
+   "2026-10"
+  ]
+ },
+ "events": {
+  "is": 117,
+  "oos": 112,
+  "noGoldBar": []
+ },
+ "tests": {
+  "T1": {
+   "side": "long",
+   "hold": 5,
+   "is": {
+    "n": 117,
+    "ex": -0.01,
+    "tEx": -0.16,
+    "p": 0.5626,
+    "months": 75,
+    "net": -0.01,
+    "tNet": -0.16,
+    "gross": 0.038,
+    "tGross": 0.57,
+    "base": 0,
+    "win": 52.14,
+    "stops": 26,
+    "net2x": -0.058,
+    "ex2x": -0.009,
+    "bondFell": {
+     "n": 61,
+     "ex": 0.001,
+     "tEx": 0.02,
+     "p": 0.4931,
+     "months": 48,
+     "net": -0.004,
+     "tNet": -0.04,
+     "gross": 0.045,
+     "tGross": 0.54,
+     "base": -0.005,
+     "win": 54.1,
+     "stops": 9
+    },
+    "bondRose": {
+     "n": 56,
+     "ex": -0.023,
+     "tEx": -0.23,
+     "p": 0.5911,
+     "months": 42,
+     "net": -0.018,
+     "tNet": -0.17,
+     "gross": 0.03,
+     "tGross": 0.29,
+     "base": 0.006,
+     "win": 50,
+     "stops": 17
+    }
+   },
+   "oos": {
+    "n": 112,
+    "ex": 0.049,
+    "tEx": 0.77,
+    "p": 0.2206,
+    "months": 82,
+    "net": 0.093,
+    "tNet": 1.41,
+    "gross": 0.146,
+    "tGross": 2.2,
+    "base": 0.044,
+    "win": 52.68,
+    "stops": 13,
+    "net2x": 0.041,
+    "ex2x": 0.051,
+    "bondFell": {
+     "n": 63,
+     "ex": -0.092,
+     "tEx": -1.22,
+     "p": 0.8857,
+     "months": 51,
+     "net": -0.061,
+     "tNet": -0.81,
+     "gross": -0.008,
+     "tGross": -0.1,
+     "base": 0.032,
+     "win": 44.44,
+     "stops": 10
+    },
+    "bondRose": {
+     "n": 49,
+     "ex": 0.231,
+     "tEx": 2.17,
+     "p": 0.0179,
+     "months": 44,
+     "net": 0.291,
+     "tNet": 2.61,
+     "gross": 0.343,
+     "tGross": 3.08,
+     "base": 0.06,
+     "win": 63.27,
+     "stops": 3
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 31,
+    "mean": -0.003,
+    "max": 0.127,
+    "min": -0.114
+   },
+   "holm": 0.4412,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "side": "long",
+   "hold": 10,
+   "is": {
+    "n": 117,
+    "ex": -0.093,
+    "tEx": -0.97,
+    "p": 0.8333,
+    "months": 75,
+    "net": -0.082,
+    "tNet": -0.85,
+    "gross": -0.009,
+    "tGross": -0.09,
+    "base": 0.011,
+    "win": 43.59,
+    "stops": 46,
+    "net2x": -0.155,
+    "ex2x": -0.091,
+    "bondFell": {
+     "n": 61,
+     "ex": -0.127,
+     "tEx": -1.04,
+     "p": 0.8478,
+     "months": 48,
+     "net": -0.123,
+     "tNet": -1.02,
+     "gross": -0.048,
+     "tGross": -0.4,
+     "base": 0.004,
+     "win": 47.54,
+     "stops": 23
+    },
+    "bondRose": {
+     "n": 56,
+     "ex": -0.056,
+     "tEx": -0.37,
+     "p": 0.6427,
+     "months": 42,
+     "net": -0.037,
+     "tNet": -0.24,
+     "gross": 0.034,
+     "tGross": 0.21,
+     "base": 0.019,
+     "win": 39.29,
+     "stops": 23
+    }
+   },
+   "oos": {
+    "n": 112,
+    "ex": 0,
+    "tEx": 0,
+    "p": 0.5018,
+    "months": 82,
+    "net": 0.079,
+    "tNet": 0.8,
+    "gross": 0.164,
+    "tGross": 1.64,
+    "base": 0.079,
+    "win": 49.11,
+    "stops": 29,
+    "net2x": -0.006,
+    "ex2x": 0.001,
+    "bondFell": {
+     "n": 63,
+     "ex": -0.102,
+     "tEx": -0.89,
+     "p": 0.8115,
+     "months": 51,
+     "net": -0.041,
+     "tNet": -0.35,
+     "gross": 0.044,
+     "tGross": 0.37,
+     "base": 0.061,
+     "win": 44.44,
+     "stops": 17
+    },
+    "bondRose": {
+     "n": 49,
+     "ex": 0.13,
+     "tEx": 0.84,
+     "p": 0.2021,
+     "months": 44,
+     "net": 0.233,
+     "tNet": 1.44,
+     "gross": 0.318,
+     "tGross": 1.95,
+     "base": 0.103,
+     "win": 55.1,
+     "stops": 12
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 20,
+    "mean": 0.012,
+    "max": 0.18,
+    "min": -0.111
+   },
+   "holm": 0.5018,
+   "checks": {
+    "oosExPos": false,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "side": "long",
+   "hold": 1,
+   "is": {
+    "n": 117,
+    "ex": -0.019,
+    "tEx": -0.61,
+    "p": 0.7275,
+    "months": 75,
+    "net": -0.034,
+    "tNet": -1.07,
+    "gross": -0.01,
+    "tGross": -0.31,
+    "base": -0.015,
+    "win": 42.74,
+    "stops": 1,
+    "net2x": -0.057,
+    "ex2x": -0.019,
+    "bondFell": {
+     "n": 61,
+     "ex": -0.065,
+     "tEx": -1.57,
+     "p": 0.9379,
+     "months": 48,
+     "net": -0.08,
+     "tNet": -1.9,
+     "gross": -0.056,
+     "tGross": -1.33,
+     "base": -0.015,
+     "win": 40.98,
+     "stops": 1
+    },
+    "bondRose": {
+     "n": 56,
+     "ex": 0.031,
+     "tEx": 0.7,
+     "p": 0.2441,
+     "months": 42,
+     "net": 0.017,
+     "tNet": 0.37,
+     "gross": 0.04,
+     "tGross": 0.89,
+     "base": -0.014,
+     "win": 44.64,
+     "stops": 0
+    }
+   },
+   "oos": {
+    "n": 112,
+    "ex": 0.034,
+    "tEx": 1.27,
+    "p": 0.1035,
+    "months": 82,
+    "net": 0.029,
+    "tNet": 1.06,
+    "gross": 0.052,
+    "tGross": 1.91,
+    "base": -0.005,
+    "win": 54.46,
+    "stops": 2,
+    "net2x": 0.006,
+    "ex2x": 0.034,
+    "bondFell": {
+     "n": 63,
+     "ex": 0.015,
+     "tEx": 0.41,
+     "p": 0.3401,
+     "months": 51,
+     "net": 0.006,
+     "tNet": 0.17,
+     "gross": 0.03,
+     "tGross": 0.81,
+     "base": -0.009,
+     "win": 50.79,
+     "stops": 2
+    },
+    "bondRose": {
+     "n": 49,
+     "ex": 0.059,
+     "tEx": 1.42,
+     "p": 0.0814,
+     "months": 44,
+     "net": 0.059,
+     "tNet": 1.41,
+     "gross": 0.08,
+     "tGross": 1.94,
+     "base": 0,
+     "win": 59.18,
+     "stops": 0
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beaten": 33,
+    "mean": 0,
+    "max": 0.064,
+    "min": -0.055
+   },
+   "holm": 0.3105,
+   "checks": {
+    "oosExPos": true,
+    "oosT2": false,
+    "holm": false,
+    "isSameSign": false,
+    "cost2x": true,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "verdict": "FAIL",
+ "passed": []
+}
