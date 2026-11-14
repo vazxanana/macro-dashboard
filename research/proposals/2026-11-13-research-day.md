@@ -238,6 +238,8 @@ paper system with a measured, clearly negative record.
 | 220 | Gold's three-day drift into CPI and payrolls (`gold-pre-cpi`) | **FAIL**, 0 of 3, one near miss: long 3 days into payrolls 2022-26 +0.088R a trade net (n 47, t 2.07, Holm p 0.067, 37 of 40 placebos); into CPI +0.024R; fading the move after the print −0.027R. Payrolls being replicated on pre-2022 dates | #1033 |
 | 221 | Gold weekly momentum / reversal | FAIL, 0 of 3: one-week momentum +0.029R OOS (n 513, month t 0.95, Holm p 0.51), below always-long (+0.045R); loses at 2x costs | #1034 |
 | 222 | Gold hourly tick-volume spikes | FAIL, 0 of 3: best (strong-close continuation) +0.061R OOS (n 339, t 1.02, Holm p 0.46), −0.17R in sample; fade and follow swap sign between windows | #1035 |
+| 223 | Gold daily reopen gap (17:00-18:00 NY) | FAIL, 0 of 3: gap median $0.35-0.57 (inside the spread on 30-44% of evenings); fade −0.077R, follow −0.034R OOS, midpoint target 24 trades in 11 years | #1036 |
+| 224 | Gold daily close streaks | FAIL, 0 of 3: buy after 3+ down −0.028R, sell after 3+ up −0.049R, buy after 4+ down −0.162R OOS (0 of 40 placebos beaten) | #1037 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
