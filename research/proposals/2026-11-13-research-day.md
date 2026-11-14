@@ -269,6 +269,7 @@ paper system with a measured, clearly negative record.
 | 251 | Gold H1 Bollinger fade in quiet markets (ADX filter) | **FAIL, 0 of 3**: about flat before costs OOS (T1 −0.007R), −0.21R net; no better than a random side | #1064 |
 | 252 | Gold H4 Supertrend (always in the market) | **FAIL, 0 of 3**: T1 +0.018R OOS net (t 0.39); buys-only T2 +0.138R (t 1.80) is gold's rise (corr 0.49 with holding gold, random buys median t 1.20); all lose in 2017-22 | #1065 |
 | 253 | The owner's market cycle, simplest form: H4 breakout trend + 38.2 % pullback + H1 resume, trade only with H4 | **FAIL, 0 of 3**: flat or negative before costs (T1 −0.036R OOS gross, −0.161R net); buys and sells both lose. With mosha-retrace / mosha-cycle / mcycle-base / fx- and index-cycle / cycle-gate, every definition of this idea tested so far fails | #1066 |
+| 254 | Gold vol breakout taken only on the H4 trend's side (the owner's cycle idea as a filter) | **FAIL, 0 of 2**: helps 2007-16 (+0.152 vs +0.101R) but hurts 2017-26 (+0.025 vs +0.044R); random same-size subsets do as well (27/40 placebos) | #1067 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
