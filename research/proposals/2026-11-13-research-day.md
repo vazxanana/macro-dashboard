@@ -135,6 +135,7 @@ paper system with a measured, clearly negative record.
 | 369 | `gold-aud-haven-day` (#1182) | Buy gold after a day it rose while AUD/USD fell (both ≥ 0.5 sd), hold 5 days | FAIL, 0 of 3: OOS +0.065R a trade net (n 103, t 0.95), excess −0.019R; the gain is gold's drift; placebo 24 of 40 |
 | 370 | `gold-month-handoff` (#1183) | At the month's last close, trade gold in the month's direction for the first 5 days of the next | FAIL, 0 of 3: OOS excess +0.006R a trade (n 118, t 0.07), IS −0.102R; sells after a down month lose in both windows; placebo 22 of 40 |
 | 371 | `gold-h4-day-open` (#1184) | Trade the rest of the New York day in the direction of its first H4 candle (17:00-21:00 NY) | FAIL, 0 of 3: follow OOS −0.024R a trade net (n 1,116, t −1.22), lift −0.002R; fading large first candles +0.032R (t 0.61); placebo 18 of 40 |
+| 372 | `gold-bond-52w-extreme` (#1185) | Buy gold for a day while the 30-year bond sits in the bottom (T1) or top (T2) tenth of its 52-week range | FAIL, 0 of 2: T1 OOS excess +0.017R (n 438, t 0.87), net −0.001R; T2 OOS +0.033R (n 154, t 1.05) but clustered in 16 months; Holm p 0.31; placebo 29 and 36 of 40 |
 | 11 | Turn of the month on US indices (published effect) | 129 | SPX −0.015 % a trade, t −0.10; turn days no different | #826 |
 | 12 | SPX timed by the VIX term structure (published effect) | — | **not run**: Cboe not reachable from the build sandbox | #827 |
 | 13 | Diversified time-series momentum, 20 markets (published effect) | 2 windows | Sharpe −0.26 / −0.26 after costs; 0.33-0.36 before | #828 |
