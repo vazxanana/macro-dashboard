@@ -81,6 +81,7 @@ paper system with a measured, clearly negative record.
 | 63 | Forex: fade the Sunday reopen gap on six majors (the gold rule, unchanged) | 243 / 222 (2020 →) | near miss, FAIL: rule G +0.194R a trade (month t 2.14, Holm needed ~2.28), but 2026 carries it and 2016-19 is about zero; rule H −0.015R | #880 |
 | 64 | US index pair spread reversion: US2000/NAS100 and SPX500/US30, fade a 2-sd z-score | 71 each (2016 →) | −0.775 / −0.846R a trade (month t −2.0 / −2.2); loses before costs; stretched spreads kept running | #881 |
 | 65 | Monthly options-expiry week on SPX500 / NAS100 (published effect) | 130 each (2016 →) | 0 of 4; expiry-week longs −0.016 / +0.026R, week-after shorts lose (−0.11 / −0.15R); no better than the month's other weeks | #882 |
+| 66 | The London 4 pm fix on six forex majors: follow the run into it or fade after it | 3,510 (2020 →) | 0 of 2; about zero before costs, −0.15 / −0.16R a trade after (month t −7 / −10) | #883 |
 
 Studies #12 and #16 are ready to run once `cdn.cboe.com` and `fred.stlouisfed.org` are allowed in the repository's
 environment (the saved "macro-dashboard" environment; a new session on it).
