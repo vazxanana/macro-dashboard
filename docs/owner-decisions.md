@@ -9,36 +9,39 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
 
 ## What needs you now (most important first)
 
-1. **Change every password, yours first (item 1).** If nothing is decided: the scrambled passwords stay readable in the
+1. **The site is down: move it to Cloudflare (item 55).** Vercel blocked the account and meridianx.dev answers "402". If
+   nothing is done: nobody can sign in, and the desk, the API and Fred's connector stay off (the council keeps trading on
+   paper on GitHub; only the public guest copy on GitHub Pages works). Steps: `docs/cloudflare.md`.
+2. **Change every password, yours first (item 1).** If nothing is decided: the scrambled passwords stay readable in the
    public repository's history, and a short one can be worked out and used to sign in as you.
-2. **Give Fred's connector its own limited key and protect the main branch (item 7).** If nothing is decided: his changes,
+3. **Give Fred's connector its own limited key and protect the main branch (item 7).** If nothing is decided: his changes,
    which now merge without your review (item 26), keep travelling on whatever key is set, possibly the council's own.
-3. **Thirteen ICT replay results built before a market's price history starts: keep or drop (item 29).** If nothing is
+4. **Thirteen ICT replay results built before a market's price history starts: keep or drop (item 29).** If nothing is
    decided: they stay in the ICT record (11 gold results worth +7.49R and 2 Russell 2000 results worth -2R) and the fix
    waits unmerged.
-4. **Mosha: who reads Luxus's lessons, and when (item 28).** If nothing is decided: his lessons are stored but nobody reads
+5. **Mosha: who reads Luxus's lessons, and when (item 28).** If nothing is decided: his lessons are stored but nobody reads
    or answers them until a session is started for it, and each new session needs a key set again.
-5. **Mosha: log your own trades (item 27).** If nothing is decided: the only evidence on Mosha stays the five failed
+6. **Mosha: log your own trades (item 27).** If nothing is decided: the only evidence on Mosha stays the five failed
    rule tests; your own selection is never measured.
-6. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
+7. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
    (they are the corrected ones; this is the outcome I recommend).
-7. **The "council stopped" alert can be hours late (items 15 and 31).** If nothing is decided: it keeps depending on
+8. **The "council stopped" alert can be hours late (items 15 and 31).** If nothing is decided: it keeps depending on
    GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
-8. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
+9. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
-9. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
+10. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
    2026); the reset is the one thing left and only you can do it. If nothing is done: that account's balance and record do
    not measure the replica. (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with
    items 37 and 40.)
-10. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
+11. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
     being recorded and copied to the demo shadow account.
-11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
+12. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
     loop free to run.
-12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
+13. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
     keeps the demo broker's rate and the comparison waits for the November 2027 review.
-13. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
+14. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
     first open-run trade reaches +2R; that one is booked about +1R and may be closed early.
-14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
+15. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
     its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
 
 Answered on 14 Nov 2026: item 54, the Mosha cycle becomes a paper shadow ("Make it a paper shadow"; owner rule `mcycle-shadow`).
@@ -54,7 +57,7 @@ and data** (15-16), **Council proposals the study already answered** (17-18), **
 **Mosha** (27-28), **Added 11 Nov 2026** (29-36), **The edge review of 11 Nov 2026** (37-41: three approved, 40 open, 41
 answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026** (42), **The path to real money, 12 Nov
 2026** (43-48, all answered on 12 Nov), **The cost of holding a gold buy, 12 Nov 2026** (49, open), **The NQ open run's trail, 12 Nov 2026** (50, open),
-**Moved stops on the demo mirror, 12 Nov 2026** (51, open).
+**Moved stops on the demo mirror, 12 Nov 2026** (51, open), **The site moves to Cloudflare, 15 Nov 2026** (55, open).
 
 ---
 
@@ -1105,3 +1108,26 @@ figure or demo-mirror setting.
   that setting since pull request #780). An open trade stays live to its own exit with its stop.
 - **If nothing is decided.** It keeps trading as a main paper system and its alerts and demo copies continue.
 
+## The site moves to Cloudflare, 15 Nov 2026
+
+### [ ] 55. Move meridianx.dev from Vercel to a free Cloudflare Worker
+
+- **Status (15 Nov 2026): OPEN.** The move is built (workflows "Deploy to Cloudflare" and "Copy Vercel Blob to R2", the
+  guide `docs/cloudflare.md`); it waits on the steps only you can do: a Cloudflare account, its token and account id as
+  GitHub secrets, the site's old secrets under the same names, and the domain's nameservers.
+- **Context.** Vercel blocked the account: meridianx.dev answers "402 Payment Required". The pages, the sign-in, `/cdata`,
+  price alerts, Fred's connector, the Academy and the Mosha desk are all off. The council is not affected: it runs on
+  GitHub Actions and keeps trading on paper and demo. The public guest copy on GitHub Pages
+  (https://vazxanana.github.io/macro-dashboard/market-structure.html) stays up, with no sign-in.
+- **What moves.** Everything Vercel served, as one Cloudflare Worker on the free plan (absolute rule 5: no paid service):
+  the built `out/` folder, the `api/` functions, and the private file store (Vercel Blob becomes the R2 bucket
+  `meridianx-blob`, same file names).
+- **What may not run on the free plan.** The backup council runner `/api/run` (GitHub Actions is the runner anyway), a long
+  backtest in Fred's connector (stopped for using too much time), the link-preview picture.
+- **Options.** (a) Do the steps in `docs/cloudflare.md` and keep meridianx.dev (recommended). (b) Use the free
+  `*.workers.dev` address only, and leave the domain for later. (c) Pay Vercel again (against absolute rule 5).
+- **What you lose if a secret cannot be read back from Vercel.** A new `SESSION_SECRET`: everyone signs in once more. New
+  VAPID keys: each phone switches its price alerts on again. If Vercel's Blob token no longer works: members added on the
+  Users page, photos, notices, sounds, price alerts, Mosha lessons and Academy history start empty (built-in accounts still
+  sign in).
+- **If nothing is decided.** The site stays down; only the guest copy on GitHub Pages works.
