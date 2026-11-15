@@ -921,3 +921,8 @@ test('15 Nov: Setup, Scanner, Crypto and LIT draw no text under 12 px and give t
   assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{[\s\S]*min-height: 44px/, 'touch targets are 44 px on touch screens');
   assert.doesNotMatch(css, /\.cx-ic/, 'the coin icon letters are left as they are');
 });
+
+test('15 Nov: each tab of the desk switch is a 44 px target on touch screens (was 32 px on every desk)', () => {
+  const css = styles(src('market-structure.html'));
+  assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{ \.desk-sw \{ padding: 2px; \} \.desk-sw a \{ min-height: 44px; \} \}/);
+});

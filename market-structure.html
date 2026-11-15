@@ -11913,6 +11913,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 @media (max-width: 430px) { .desk-sw a { padding: 0 8px; } .desk-sw a small { margin-left: 4px; padding: 1px 4px; } }
 .desk-sw a small { font-size: 12px; letter-spacing: 0; } :root[data-theme="light"] .desk-sw a small { color: #7a5200; }   /* "soon": 12 px, and AA on the light panel (was 10 px, 3.6:1) */
 #v-mosha .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #e0a526 16%, var(--panel)); box-shadow: inset 0 0 0 1px #c98f12; }
+@media (hover: none), (pointer: coarse) { .desk-sw { padding: 2px; } .desk-sw a { min-height: 44px; } }   /* 15 Nov 2026: each desk tab is a 44 px target on touch (was 32) */
 #v-mosha .mo-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; } #v-mosha .mo-wide { grid-column: 1 / -1; }
 #v-mosha .ms-k small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; } #v-mosha .ms-k .ms-tbtn { margin-left: auto; }
 #v-mosha .mo-verdict { margin: 4px 0 12px; font: 600 15px/1.4 var(--sans); color: var(--ink); } #v-mosha .mo-verdict.mo-pos { color: var(--buy); } #v-mosha .mo-verdict.mo-neg { color: var(--sell); } #v-mosha .mo-verdict.mo-few, #v-mosha .mo-verdict.mo-none { color: var(--ink-dim); }
