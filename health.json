@@ -1,10 +1,10 @@
 {
- "at": "2026-11-15T00:57:24.000Z",
+ "at": "2026-11-15T01:16:33.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
-   "status": "closed",
+   "status": "bad",
    "markets": {
     "xau": {
      "label": "XAU/USD",
@@ -20,13 +20,15 @@
     "eurusd": {
      "label": "EUR/USD",
      "sym": "eurusd",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-13T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.95,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 401: {\"errorMessage\":\"Insufficient authorization to perform request.\"}"
+      }
+     ]
     },
     "gbpusd": {
      "label": "GBP/USD",
@@ -53,13 +55,15 @@
     "usdcad": {
      "label": "USD/CAD",
      "sym": "usdcad",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-13T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.68,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 401: {\"errorMessage\":\"Insufficient authorization to perform request.\"}"
+      }
+     ]
     },
     "usdchf": {
      "label": "USD/CHF",
@@ -83,7 +87,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T00:55:00.000Z",
+     "last": "2026-11-15T01:15:00.000Z",
      "staleMin": 0,
      "maxJump": 4.82,
      "clipped": 0,
@@ -94,7 +98,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T00:55:00.000Z",
+     "last": "2026-11-15T01:15:00.000Z",
      "staleMin": 0,
      "maxJump": 6.51,
      "clipped": 0,
@@ -105,7 +109,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T00:55:00.000Z",
+     "last": "2026-11-15T01:15:00.000Z",
      "staleMin": 0,
      "maxJump": 3.93,
      "clipped": 0,
@@ -116,7 +120,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T00:55:00.000Z",
+     "last": "2026-11-15T01:15:00.000Z",
      "staleMin": 0,
      "maxJump": 4.3,
      "clipped": 0,
@@ -132,7 +136,7 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "closed",
-     "n": 817,
+     "n": 805,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.48,
@@ -143,7 +147,7 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "closed",
-     "n": 817,
+     "n": 805,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.58,
@@ -154,7 +158,7 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "closed",
-     "n": 817,
+     "n": 805,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.22,
@@ -165,7 +169,7 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "closed",
-     "n": 817,
+     "n": 805,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.1,
@@ -176,7 +180,7 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "closed",
-     "n": 819,
+     "n": 807,
      "last": "2026-11-14T16:35:00.000Z",
      "staleMin": 0,
      "maxJump": 2.26,
@@ -230,24 +234,24 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "bad",
-     "ageMin": 218,
+     "ageMin": 237,
      "issues": [
       {
        "kind": "stale",
        "sev": "bad",
-       "detail": "not updated for 3.6 h (expected 1 min (between rounds); alert after 45 min)"
+       "detail": "not updated for 3.9 h (expected 1 min (between rounds); alert after 45 min)"
       }
      ]
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "bad",
-     "ageMin": 218,
+     "ageMin": 237,
      "issues": [
       {
        "kind": "stale",
        "sev": "bad",
-       "detail": "not updated for 3.6 h (expected 1 min; alert after 45 min)"
+       "detail": "not updated for 3.9 h (expected 1 min; alert after 45 min)"
       }
      ]
     },
@@ -318,7 +322,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 18,
+     "ageMin": 38,
      "issues": [
       {
        "kind": "input",
@@ -335,13 +339,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 18,
+     "ageMin": 37,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 18,
+     "ageMin": 37,
      "issues": [
       {
        "kind": "stale",
@@ -368,7 +372,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 57,
+     "ageMin": 76,
      "issues": []
     },
     "digest.json": {
@@ -379,31 +383,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 60,
+     "ageMin": 79,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 854,
+     "ageMin": 873,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 854,
+     "ageMin": 873,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 854,
+     "ageMin": 873,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 491,
+     "ageMin": 510,
      "issues": []
     },
     "research/ledger.json": {
@@ -424,19 +428,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 670,
+     "ageMin": 689,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 459,
+     "ageMin": 478,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 871,
+     "ageMin": 890,
      "issues": [
       {
        "kind": "stale",
@@ -463,13 +467,15 @@
    }
   }
  },
- "summary": "Council data files: cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
+ "summary": "OANDA spot (md/bars): EUR/USD error, USD/CAD error · Council data files: cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
  "brief": {
   "status": "bad",
-  "line": "2 problems, 3 warnings: cTrader demo account (ctrader/account.json): not updated for 3.6 h (expected 1 min (between rounds); alert after 45 min)",
+  "line": "4 problems, 3 warnings: OANDA spot (md/bars) EUR/USD: unreachable: HTTP 502: OANDA 401: {\"errorMessage\":\"Insufficient authorization to perform request.\"}",
   "bad": [
-   "cTrader demo account (ctrader/account.json): not updated for 3.6 h (expected 1 min (between rounds); alert after 45 min)",
-   "cTrader demo accounts (ctrader/accounts.json): not updated for 3.6 h (expected 1 min; alert after 45 min)"
+   "OANDA spot (md/bars) EUR/USD: unreachable: HTTP 502: OANDA 401: {\"errorMessage\":\"Insufficient authorization to perform request.\"}",
+   "OANDA spot (md/bars) USD/CAD: unreachable: HTTP 502: OANDA 401: {\"errorMessage\":\"Insufficient authorization to perform request.\"}",
+   "cTrader demo account (ctrader/account.json): not updated for 3.9 h (expected 1 min (between rounds); alert after 45 min)",
+   "cTrader demo accounts (ctrader/accounts.json): not updated for 3.9 h (expected 1 min; alert after 45 min)"
   ],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1049 days old; over 120 the strategist drops it as \"no data\")",
@@ -480,8 +486,10 @@
  },
  "alert": {
   "streak": {
-   "files:ctrader/account.json": 10,
-   "files:ctrader/accounts.json": 10
+   "oanda:eurusd": 1,
+   "oanda:usdcad": 1,
+   "files:ctrader/account.json": 11,
+   "files:ctrader/accounts.json": 11
   },
   "sent": {
    "key": "files:ctrader/account.json|files:ctrader/accounts.json",
