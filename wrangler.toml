@@ -1,0 +1,33 @@
+# The site on Cloudflare (15 Nov 2026; Vercel blocked the account). One Worker: the built site from out/ and the api/ functions
+# (cf/worker.mjs). Deployed by .github/workflows/cloudflare.yml; owner guide docs/cloudflare.md. Free plan.
+name = "meridianx"
+main = "cf/worker.mjs"
+compatibility_date = "2025-10-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[assets]
+directory = "out"
+binding = "ASSETS"
+html_handling = "none"
+not_found_handling = "none"
+# Only these reach the Worker; every other file is served straight from the assets store (free, no Worker request).
+run_worker_first = ["/", "/api/*", "/cdata/*", "/md/*", "/gold", "/macro-desk", "/backtest", "/academy", "/macro", "/macro/", "/veteran", "/veteran/", "/macro-dashboard/*"]
+
+[[r2_buckets]]
+binding = "BLOB"
+bucket_name = "meridianx-blob"
+
+[triggers]
+crons = ["* * * * *", "*/10 * * * *"]
+
+[alias]
+"@vercel/blob" = "./cf/blob-r2.mjs"
+
+[observability]
+enabled = true
+
+[vars]
+# Not a secret: the functions check that a Blob token is set before they use storage; on Cloudflare storage is the R2 binding
+# BLOB (cf/blob-r2.mjs ignores the token).
+BLOB_READ_WRITE_TOKEN = "r2-binding"
