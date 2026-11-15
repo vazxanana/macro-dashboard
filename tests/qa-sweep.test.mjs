@@ -903,3 +903,21 @@ test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on
   const light = /:root\[data-theme="light"\] \{ --buy-ink:[^}]*\}/.exec(Q12_CSS)[0];
   assert.ok(ratio(tok(light, 'gold-ink'), '#ffffff') >= 4.5);
 });
+
+test('15 Nov: Setup, Scanner, Crypto and LIT draw no text under 12 px and give touch controls 44 px (#ms-sz-css, scoped to the four views)', () => {
+  const html = src('market-structure.html');
+  const m = /<style id="ms-sz-css">([\s\S]*?)<\/style>/.exec(html);
+  assert.ok(m, 'the #ms-sz-css block is in the page');
+  const css = m[1].replace(/\/\*[\s\S]*?\*\//g, '');
+  // every rule is scoped to one of the four views (nothing leaks to Home, Council, the desks or the guest page)
+  for (const [, sel] of css.matchAll(/([^{}@]+)\{[^{}]*\}/g)) {
+    const parts = []; let d = 0, cur = '';
+    for (const ch of sel) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { parts.push(cur); cur = ''; } else cur += ch; }
+    parts.push(cur);
+    for (const part of parts) assert.match(part.trim(), /^(:is\((#v-(setup|scanner|crypto|lit),?\s*)+\)|#v-(setup|scanner|crypto|lit)\b)/, 'rule not scoped to the four views: ' + part.trim());
+  }
+  for (const [, px] of css.matchAll(/font-size:\s*([\d.]+)px/g)) assert.ok(+px >= 12, 'font-size ' + px + 'px under 12');
+  for (const want of ['.ms-tag', '.ms-st', '.ms-al', '.lv-d', '.cx-tag', '.chip', '#ms-pb-ctx > div > span', '.ms-tr-g > span', 'small:not(']) assert.ok(css.includes(want), want + ' raised to 12 px');
+  assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{[\s\S]*min-height: 44px/, 'touch targets are 44 px on touch screens');
+  assert.doesNotMatch(css, /\.cx-ic/, 'the coin icon letters are left as they are');
+});

@@ -4802,6 +4802,20 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   #v-council #ms-cp-overview button { min-width: 44px; }
 }
 </style>
+<style id="ms-sz-css">
+/* Setup, Scanner, Crypto and LIT: no text under 12 px, 44 px touch targets (15 Nov 2026, the open item of the 12 Nov sweep).
+   Display only, scoped to the four views; the coin icon letters (.cx-ic) stay as they are. Add later size fixes for these views here. */
+:is(#v-setup, #v-scanner, #v-crypto, #v-lit) :is(#ms-td-bias, #ms-lvl-count, #ms-scan-meta, .ms-dot, .lv-h, .ms-al, .ms-chip, .ms-st,
+  .tr-d, .ms-q, .ms-tr-n, .ms-tag, .ms-tr-g > span, #ms-pb-ctx > div > span, #ps-t-kv > div > span, .ms-risk label, .lv-p, .lv-r, .lv-d, .cx-st, .chip, .cx-tag, th, i.u, i.d,
+  small:not(.ms-k small, .desk-sw small)) { font-size: 12px; }
+#v-setup .ms-tr-g > span { letter-spacing: .3px; }
+@media (hover: none), (pointer: coarse) {
+  :is(#v-setup, #v-scanner, #v-crypto, #v-lit) :is(#ms-scan-btn, #ms-risk, #ms-log, button.ms-bell) { min-height: 44px; }
+  #v-setup label:has(> input[type="checkbox"]) { min-height: 44px; display: flex; align-items: center; }
+  #v-setup label > input[type="checkbox"] { width: 20px; height: 20px; }
+  #v-crypto :is(.cx-seg, .cx-tf) button, #v-setup #ms-tr-filter button { min-height: 44px; }
+}
+</style>
 <style id="ms-ps-css">
 /* Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
    The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
