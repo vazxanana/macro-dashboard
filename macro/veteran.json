@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-14T23:43:23.000Z",
+ "at": "2026-11-15T00:39:10.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-14T23:43:12.000Z",
+ "strategistAt": "2026-11-15T00:38:59.000Z",
  "shock": {
   "shock": "Positive growth / demand news",
   "clues": [
@@ -66,7 +66,7 @@
    "obs": "COT managed money 104k net, −7k over 4 weeks, 34th percentile (positions as of 2026-11-03)",
    "lean": 0,
    "asOf": "2026-11-03",
-   "stale": false,
+   "stale": true,
    "cannot": "COT is a Tuesday snapshot of reportable futures, published Friday: crowding and fragility context, not direction. ETF tonnage and options dealer positioning are not observed by the council."
   },
   {
@@ -133,7 +133,7 @@
   {
    "topic": "Positioning",
    "macro": "104k net, −7k in 4 weeks, 34th pct, week of 2026-11-03 (vote down)",
-   "veteran": "COT managed money 104k net, −7k over 4 weeks, 34th percentile (positions as of 2026-11-03)",
+   "veteran": "COT managed money 104k net, −7k over 4 weeks, 34th percentile (positions as of 2026-11-03) (lagged more than 12 days)",
    "stance": "qualify",
    "why": "COT is crowding and fragility context on a Tuesday snapshot of reportable futures; the 2007-26 test found no 4-week edge in positioning, so it sizes and times, it never directs.",
    "m": null,
@@ -176,15 +176,15 @@
   "falsifier": "10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 105.0 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4123 removes the trend tiebreaker",
   "nextReview": "Friday close (the score is weekly)",
   "forecastId": "xau-4w-2026-11-14",
-  "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-17..2026-11-13, n 3085)"
+  "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-18..2026-11-13, n 3084)"
  },
  "base": {
-  "n": 3085,
+  "n": 3084,
   "upRate": 0.566,
-  "median": 0.55,
-  "q10": -3.62,
+  "median": 0.56,
+  "q10": -3.61,
   "q90": 5.93,
-  "from": "2016-11-17",
+  "from": "2016-11-18",
   "to": "2026-11-13",
   "horizon": 20
  },
@@ -449,7 +449,7 @@
    "horizon": 5,
    "by": "2026-11-20",
    "from": "$3,885",
-   "n": 3100,
+   "n": 3099,
    "list": [
     {
      "claim": "Gold closes 2026-11-20 above $3,885 (today's close)",
@@ -464,7 +464,7 @@
     {
      "claim": "Gold closes at or above $3,920 on some day by 2026-11-20",
      "p": 0.45,
-     "baseP": 0.467,
+     "baseP": 0.468,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3920,
@@ -526,7 +526,7 @@
     {
      "claim": "DXY closes 2026-11-20 above 103.45 (today's close)",
      "p": 0.52,
-     "baseP": 0.517,
+     "baseP": 0.516,
      "asset": "dxy",
      "kind": "closeAbove",
      "level": 103.45204,
@@ -539,7 +539,7 @@
    "horizon": 20,
    "by": "2026-12-11",
    "from": "$3,885",
-   "n": 3085,
+   "n": 3084,
    "list": [
     {
      "claim": "Gold closes 2026-12-11 above $3,885 (today's close)",
@@ -582,14 +582,14 @@
      "pRaw": 0.53
     },
     {
-     "claim": "Gold closes at or below $3,720 on some day by 2026-12-11 (stretch)",
-     "p": 0.17,
-     "baseP": 0.142,
+     "claim": "Gold closes at or below $3,730 on some day by 2026-12-11 (stretch)",
+     "p": 0.19,
+     "baseP": 0.161,
      "asset": "gold",
      "kind": "touchDown",
-     "level": 3720,
+     "level": 3730,
      "by": "2026-12-11",
-     "pRaw": 0.17
+     "pRaw": 0.19
     },
     {
      "claim": "Gold's 2026-12-11 close lands between $3,808 and $4,046",
@@ -597,7 +597,7 @@
      "baseP": 0.6,
      "asset": "gold",
      "kind": "range",
-     "lo": 3808.1267,
+     "lo": 3808.2169,
      "hi": 4046.2268,
      "by": "2026-12-11",
      "pRaw": 0.6
@@ -689,26 +689,70 @@
    "note": "Dated calls are issued once a week, from the last close before the week began; they are scored on every daily close after their issue date."
   },
   "record": {
-   "n": 1,
-   "open": 44,
-   "brier": 0.3364,
-   "expected": 0.58,
-   "hitRate": 0,
-   "high": null,
-   "low": null,
+   "n": 13,
+   "open": 34,
+   "brier": 0.3483,
+   "expected": 0.47,
+   "hitRate": 0.38,
+   "high": {
+    "n": 4,
+    "hit": 0,
+    "p": 0.61
+   },
+   "low": {
+    "n": 3,
+    "hit": 0.67,
+    "p": 0.15
+   },
    "weekly": [
     {
      "week": "2026-11-09",
-     "n": 1,
-     "hit": 0,
-     "expected": 0.58,
-     "cumN": 1,
-     "cumHit": 0,
-     "cumExpected": 0.58
+     "n": 13,
+     "hit": 0.38,
+     "expected": 0.47,
+     "cumN": 13,
+     "cumHit": 0.38,
+     "cumExpected": 0.47
     }
    ]
   },
   "recent": [
+   {
+    "id": "gold:range:4021.7784:2026-11-13",
+    "issued": "2026-11-12",
+    "claim": "Gold's 2026-11-13 close lands between $4,022 and $4,137",
+    "p": 0.6,
+    "asset": "gold",
+    "kind": "range",
+    "level": null,
+    "lo": 4021.7784,
+    "hi": 4136.8366,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "baseP": 0.6,
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.36
+   },
+   {
+    "id": "gold:range:4021.7241:2026-11-13",
+    "issued": "2026-11-11",
+    "claim": "Gold's 2026-11-13 close lands between $4,022 and $4,137",
+    "p": 0.6,
+    "asset": "gold",
+    "kind": "range",
+    "level": null,
+    "lo": 4021.7241,
+    "hi": 4136.8366,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "baseP": 0.6,
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.36
+   },
    {
     "id": "evt:2026-11-10:gold:dayUp",
     "issued": "2026-11-09",
@@ -726,6 +770,170 @@
     "hit": false,
     "resolvedAt": "2026-11-12",
     "brier": 0.3364
+   },
+   {
+    "id": "hyp:2026-11-07:H2",
+    "issued": "2026-11-09",
+    "claim": "Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13",
+    "p": 0.63,
+    "asset": "gold",
+    "kind": "stayInside",
+    "level": null,
+    "lo": 3891.3,
+    "hi": 4146.9,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "veteran hypothesis",
+    "base": {
+     "analog": 0.6,
+     "n": 20,
+     "all": 0.68
+    },
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.3969
+   },
+   {
+    "id": "hyp:2026-11-07:H1",
+    "issued": "2026-11-09",
+    "claim": "If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100",
+    "p": 0.52,
+    "asset": "gold",
+    "kind": "firstTouchDown",
+    "level": 4045.4,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "veteran hypothesis",
+    "guard": 4100,
+    "base": {
+     "analog": 0.55,
+     "n": 20,
+     "all": 0.45
+    },
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.2304
+   },
+   {
+    "id": "dxy:closeAbove:102.3593:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "DXY closes 2026-11-13 above 102.36 (today's close)",
+    "p": 0.52,
+    "asset": "dxy",
+    "kind": "closeAbove",
+    "level": 102.3593,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.2304
+   },
+   {
+    "id": "gold:bigMove:4070.59:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold moves 2.5% or more either way by 2026-11-13",
+    "p": 0.17,
+    "asset": "gold",
+    "kind": "bigMove",
+    "level": 4070.59,
+    "lo": null,
+    "hi": null,
+    "pct": 0.0254,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.6889
+   },
+   {
+    "id": "gold:range:4021.63:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold's 2026-11-13 close lands between $4,022 and $4,137",
+    "p": 0.6,
+    "asset": "gold",
+    "kind": "range",
+    "level": null,
+    "lo": 4021.63,
+    "hi": 4136.8366,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.36
+   },
+   {
+    "id": "gold:touchDown:3990:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold closes at or below $3,990 on some day by 2026-11-13 (stretch)",
+    "p": 0.15,
+    "asset": "gold",
+    "kind": "touchDown",
+    "level": 3990,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.7225
+   },
+   {
+    "id": "gold:touchDown:4050:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold closes at or below $4,050 on some day by 2026-11-13",
+    "p": 0.5,
+    "asset": "gold",
+    "kind": "touchDown",
+    "level": 4050,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.25
+   },
+   {
+    "id": "gold:touchUp:4170:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold closes at or above $4,170 on some day by 2026-11-13 (stretch)",
+    "p": 0.14,
+    "asset": "gold",
+    "kind": "touchUp",
+    "level": 4170,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.0196
+   },
+   {
+    "id": "gold:touchUp:4100:2026-11-13",
+    "issued": "2026-11-09",
+    "claim": "Gold closes at or above $4,100 on some day by 2026-11-13",
+    "p": 0.52,
+    "asset": "gold",
+    "kind": "touchUp",
+    "level": 4100,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "base rate + council tilt",
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.2704
    }
   ]
  },
@@ -733,18 +941,18 @@
   "status": "waiting",
   "state": "waiting",
   "k": 1,
-  "n": 1,
+  "n": 13,
   "weeks": 1,
   "need": {
    "scored": 30,
    "weeks": 4
   },
   "fit": {
-   "k": 0.915,
-   "kUnclamped": 0.915,
-   "informative": 1,
-   "sxx": 0.0019,
-   "sxy": -0.0236
+   "k": 1.128,
+   "kUnclamped": 1.128,
+   "informative": 3,
+   "sxx": 0.0093,
+   "sxy": 0.0489
   },
   "bins": [
    {
@@ -761,12 +969,12 @@
    {
     "lo": 0.1,
     "hi": 0.2,
-    "n": 0,
-    "stated": null,
-    "came": null,
+    "n": 3,
+    "stated": 0.153,
+    "came": 0.667,
     "ci": [
-     null,
-     null
+     0.208,
+     0.939
     ]
    },
    {
@@ -805,23 +1013,23 @@
    {
     "lo": 0.5,
     "hi": 0.6,
-    "n": 1,
-    "stated": 0.58,
-    "came": 0,
+    "n": 6,
+    "stated": 0.532,
+    "came": 0.5,
     "ci": [
-     0,
-     0.793
+     0.188,
+     0.812
     ]
    },
    {
     "lo": 0.6,
     "hi": 0.7,
-    "n": 0,
-    "stated": null,
-    "came": null,
+    "n": 4,
+    "stated": 0.608,
+    "came": 0,
     "ci": [
-     null,
-     null
+     0,
+     0.49
     ]
    },
    {
@@ -859,25 +1067,35 @@
    }
   ],
   "inTheLarge": {
-   "stated": 0.58,
-   "came": 0
+   "stated": 0.468,
+   "came": 0.385
   },
-  "brier": 0.3364,
-  "brierBase": 0.2873,
-  "nBase": 1,
+  "brier": 0.3483,
+  "brierBase": 0.3544,
+  "nBase": 5,
   "brierAdjusted": null,
   "bySource": {
+   "call": {
+    "n": 10,
+    "hit": 0.4,
+    "stated": 0.43
+   },
+   "hypothesis": {
+    "n": 2,
+    "hit": 0.5,
+    "stated": 0.57
+   },
    "event": {
     "n": 1,
     "hit": 0,
     "stated": 0.58
    }
   },
-  "line": "Not enough scored calls yet: 1 of 30, over 1 of 4 weeks. Probabilities are used as computed until then.",
-  "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 58% on average, came true 0%."
+  "line": "Not enough scored calls yet: 13 of 30, over 1 of 4 weeks. Probabilities are used as computed until then.",
+  "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-14T23:43:23.000Z",
+  "at": "2026-11-15T00:39:10.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1237,7 +1455,7 @@
       "near": 0
      },
      {
-      "price": 3808.1,
+      "price": 3808.2,
       "label": "Month call: 60% range low (2026-12-11)",
       "kind": "range60",
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
@@ -2501,10 +2719,76 @@
   },
   "method": "Insights are ranked by how unusual each reading is against its own history (z-scores of the 4-week changes), how close the scheduled release is, and how stretched positioning is. Hypothesis probabilities are the analogs' frequency of the same move, shrunk toward the frequency over all weeks (10 pseudo-cases), plus half the council tilt for gold, clamped 10-90%. Every hypothesis is recorded once a week in the calls ledger and scored on its date.",
   "record": {
-   "n": 0,
-   "open": 6
+   "n": 2,
+   "open": 4,
+   "brier": 0.3136,
+   "expected": 0.57,
+   "hitRate": 0.5,
+   "high": {
+    "n": 1,
+    "hit": 0,
+    "p": 0.63
+   },
+   "low": null,
+   "weekly": [
+    {
+     "week": "2026-11-09",
+     "n": 2,
+     "hit": 0.5,
+     "expected": 0.57,
+     "cumN": 2,
+     "cumHit": 0.5,
+     "cumExpected": 0.57
+    }
+   ]
   },
-  "recent": []
+  "recent": [
+   {
+    "id": "hyp:2026-11-07:H2",
+    "issued": "2026-11-09",
+    "claim": "Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13",
+    "p": 0.63,
+    "asset": "gold",
+    "kind": "stayInside",
+    "level": null,
+    "lo": 3891.3,
+    "hi": 4146.9,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "veteran hypothesis",
+    "base": {
+     "analog": 0.6,
+     "n": 20,
+     "all": 0.68
+    },
+    "hit": false,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.3969
+   },
+   {
+    "id": "hyp:2026-11-07:H1",
+    "issued": "2026-11-09",
+    "claim": "If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100",
+    "p": 0.52,
+    "asset": "gold",
+    "kind": "firstTouchDown",
+    "level": 4045.4,
+    "lo": null,
+    "hi": null,
+    "pct": null,
+    "by": "2026-11-13",
+    "src": "veteran hypothesis",
+    "guard": 4100,
+    "base": {
+     "analog": 0.55,
+     "n": 20,
+     "all": 0.45
+    },
+    "hit": true,
+    "resolvedAt": "2026-11-15",
+    "brier": 0.2304
+   }
+  ]
  },
  "events": [],
  "summary": {
@@ -2552,12 +2836,12 @@
   },
   "calibration": {
    "status": "waiting",
-   "line": "Not enough scored calls yet: 1 of 30, over 1 of 4 weeks. Probabilities are used as computed until then.",
+   "line": "Not enough scored calls yet: 13 of 30, over 1 of 4 weeks. Probabilities are used as computed until then.",
    "k": 1
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-14 23:43 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Real yields, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 105.0 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4123 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 2. Gold below its 10-week average (−5.8%); Gold Macro Score −0.92 (AUCTION) | 3. Dollar firmer over 4 weeks (DXY 103.45, +1.62%) | H1 (18%): If gold holds above $3,853 (last week's low), it closes at or above $4,000 (20-day average) by 2026-11-20 before any close below $3,853 | H2 (51%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-20 | H3 (66%): DXY closes 2026-12-11 below 103.45 (the latest close) At a glance: This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Watch $4,000 above and $3,853 below (levels as of the 13 Nov close).",
+ "brief": "Macro veteran, 2026-11-15 00:39 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Real yields, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.01% (+15 bp from 2.86%) ends the real-rate support; DXY above 105.0 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4123 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.67 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 2. Gold below its 10-week average (−5.8%); Gold Macro Score −0.92 (AUCTION) | 3. Dollar firmer over 4 weeks (DXY 103.45, +1.62%) | H1 (18%): If gold holds above $3,853 (last week's low), it closes at or above $4,000 (20-day average) by 2026-11-20 before any close below $3,853 | H2 (51%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-20 | H3 (66%): DXY closes 2026-12-11 below 103.45 (the latest close) At a glance: This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Watch $4,000 above and $3,853 below (levels as of the 13 Nov close).",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
@@ -2672,13 +2956,13 @@
    },
    {
     "area": "hypothesis",
-    "text": "Last week's H1 (52%): pending, due 2026-11-13 · If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100",
-    "dir": 0
+    "text": "Last week's H1 (52%): came true · If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100",
+    "dir": 1
    },
    {
     "area": "hypothesis",
-    "text": "Last week's H2 (63%): pending, due 2026-11-13 · Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13",
-    "dir": 0
+    "text": "Last week's H2 (63%): did not happen · Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13",
+    "dir": -1
    },
    {
     "area": "hypothesis",
