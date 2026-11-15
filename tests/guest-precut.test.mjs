@@ -113,11 +113,12 @@ test('a member never gets the precut copy; nobody reads guest/ paths directly', 
   }
 });
 
-test('the loop runs the script after a full round, keyed, never failing the round and not in the quick pass', () => {
+test('the loop runs the script in each full round before its save (one commit), keyed, never failing it, not in the quick pass', () => {
   const y = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   const line = y.split('\n').find((l) => l.includes('node scripts/guest-cut.mjs'));
-  assert.ok(line && /timeout 60/.test(line) && /\|\| echo/.test(line) && /datasync\.mjs data save .* guest /.test(line), line);
+  assert.ok(line && /timeout 60/.test(line) && /\|\| echo/.test(line) && !/datasync/.test(line), line);
   const at = y.indexOf(line);
-  assert.ok(at > y.indexOf('data save "Council run') && at < y.indexOf('Quick pass (8 Nov'));
+  assert.ok(at < y.indexOf('data save "Council run') && at < y.indexOf('Quick pass (8 Nov'));
+  assert.ok(y.indexOf('data save "Council run') - at < 1200, 'right before the round save');
   assert.match(y, /GUEST_ID_KEY: \$\{\{ secrets\.GUEST_ID_KEY \}\}/);
 });

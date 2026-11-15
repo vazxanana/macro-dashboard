@@ -153,14 +153,14 @@ jobs:
             # read by the site, the digest and the week pane. Every 3rd round, before the digest's round; a new study merged
             # while this run is up is also written at once by research-ledger.yml. Read only; never fails the round.
             if [ $((i % 3)) -eq 2 ]; then timeout 60 node council/research-ledger.mjs data || echo "Research ledger round $i failed"; fi
+            # Guest cuts (15 Nov): the guest copies of the five public files (api/_guestcut.js) made once a round into guest/, so
+            # /cdata serves a visitor a ready file instead of cutting 1-2 MB of JSON per request. Run before the round's save so it
+            # rides in the same commit (no extra push). Full rounds only, not the quick pass; never fails the round.
+            timeout 60 node scripts/guest-cut.mjs data || echo "Guest cuts round $i failed (visitors get the on-the-fly cut)"
             # commit + push (3 tries): a conflicting file keeps the council-data copy (another writer or the owner touched it; this
             # loop rebuilds its own files next round), the rest of the round is saved, a JSON file that does not parse is never
             # committed, and nothing is left half-rebased (8 Nov: an abort alone left the clone diverged, every push was rejected)
             node council/datasync.mjs data save "Council run $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Council data not pushed after round $i (next round retries)"
-            # Guest cuts (15 Nov): the guest copies of the five public files (api/_guestcut.js) made once a round into
-            # guest/, so /cdata serves a visitor a ready file instead of cutting 1-2 MB of JSON per request. Full rounds only (not
-            # the quick pass); always exits 0, never fails the round. GUEST_ID_KEY may be empty (ids then use the default key).
-            if timeout 60 node scripts/guest-cut.mjs data; then node council/datasync.mjs data save "Guest cuts $(date -u +%H:%MZ)" guest || echo "Guest cuts not pushed after round $i"; else echo "Guest cuts round $i failed"; fi
             # ICT replay trigger (11 Nov): ict-replay.yml has a daily cron, but GitHub fires this repository's schedules late or
             # not at all, so the desk could say "update pending" for days. After the round is saved, council/replay-due.mjs (read
             # only) says whether ict/replay.json is over 20 h old with no replay run active or started in the last 6 h; only then

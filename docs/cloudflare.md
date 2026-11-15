@@ -72,6 +72,7 @@ Then add the values the site used on Vercel, under the SAME names. Only add the 
 | `ACADEMY_LLM_KEY` | the paid second-opinion key (item 47) | Vercel, or your provider. Leave it out to keep it off. |
 | `RUN_MODE` | `live` lets the backup runner save | Leave it out (the backup runner is not used here). |
 | `MCP_KEYS` | extra connector keys | Vercel, only if you had set it. |
+| `GUEST_ID_KEY` | scrambles trade ids in what visitors see | New: any long random text. The council loop uses the same secret, so set it once. |
 
 Where Vercel still opens: the project → **Settings** → **Environment Variables**. A value marked "Sensitive" cannot be read
 back; make a new one then.

@@ -113,13 +113,14 @@ jobs:
           ACADEMY_LLM_KEY: ${{ secrets.ACADEMY_LLM_KEY }}
           RUN_MODE: ${{ secrets.RUN_MODE }}
           MCP_KEYS: ${{ secrets.MCP_KEYS }}
+          GUEST_ID_KEY: ${{ secrets.GUEST_ID_KEY }}
         run: |
           set +x
           set -o pipefail
           sent=0; skipped=""
           for name in SESSION_SECRET CRON_SECRET CTRADER_LINK_KEY OANDA_TOKEN OANDA_ENV GH_TOKEN GH_READ_TOKEN GH_MCP_TOKEN \
                       GH_DISPATCH_TOKEN VAPID_PUBLIC_KEY VAPID_PRIVATE_KEY TV_WEBHOOK_KEY MOSHA_ASSISTANT_KEY ACADEMY_LLM_KEY \
-                      RUN_MODE MCP_KEYS; do
+                      RUN_MODE MCP_KEYS GUEST_ID_KEY; do
             if [ -n "${!name}" ]; then
               printf '%s' "${!name}" | npx --yes "$WRANGLER" secret put "$name" > /dev/null
               echo "set $name"

@@ -3579,8 +3579,8 @@ out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 
 ## Guest cuts made by the loop (15 Nov 2026, the server functions move to a host with ~10 ms of CPU a request)
 Cutting the five guest files per visitor request (`api/_guestcut.js`: JSON.parse of trades.json ~1.6 MB, ict/replay.json ~2 MB)
 is too expensive there, so the council loop makes them once a round.
-- `scripts/guest-cut.mjs <council-data dir>` (council.yml, right after each FULL round's save, `timeout 60`, then its own
-  `datasync … save "Guest cuts …" guest`; never in the quick pass; always exits 0): for each of `G.CUT_FILES` writes
+- `scripts/guest-cut.mjs <council-data dir>` (council.yml, in each FULL round right before the round's save, so the cuts ride in
+  the same commit (no extra push); `timeout 60`; never in the quick pass; always exits 0): for each of `G.CUT_FILES` writes
   `guest/<same path>` = `G.cut(p, source, guestKey(env))` only when the bytes changed, and `guest/_index.json` = `{ at, keyed,
   files: { <p>: { srcSha, sha } } }` (hex sha256 of source and cut). A file missing or not parsing keeps its old cut and gets
   `{ error }` in the index. `writeIfChanged` / `writeAtomic` from `council/jsonio.mjs`.
@@ -3592,3 +3592,34 @@ is too expensive there, so the council loop makes them once a round.
   source is read and cut on the fly, as before. ETag variant `c`, Cache-Control, Vary, CORS, 304 and every member byte unchanged;
   a member never reads `guest/`. Any `/cdata` path starting `guest/` is a 404 for everyone (the cuts are only served in place of
   their source). Tests: `tests/guest-precut.test.mjs`; `tests/api-review.test.mjs` (a guest's trades.json now asks three files).
+
+## Cloudflare: the site's new host (15 Nov 2026, owner: "Transfer everything to github or cloudfare", chose "Both")
+Vercel blocked the owner's account (meridianx.dev answered 402). The council loop, the mirror and every trade run on GitHub
+Actions and were not affected. Two homes now: **GitHub Pages** (`deploy.yml`, unchanged) is the public guest copy at
+https://vazxanana.github.io/macro-dashboard/market-structure.html (no API there: no sign-in); **one Cloudflare Worker** (free
+plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; decision: `docs/owner-decisions.md` item 55.
+- `cf/worker.mjs` imports every `api/*.js` handler UNCHANGED and drives it through a Node-style adapter (`nodeReq`,
+  `NodeRes`: status / json / send / end / redirect / writeHead / write for the SSE price stream; the client IP comes only from
+  `cf-connecting-ip`, a client's x-real-ip / x-forwarded-for is dropped). `route()` = vercel.json's rewrites; `SEC` = its
+  headers; `CRONS` = price alerts every minute + the second opinion every 10 min. Never fork a handler for Cloudflare: change
+  the adapter or the shims.
+- **Not run on Cloudflare**: `api/run.js` (the BACKUP council runner; 503, GitHub Actions is the runner) and `api/og.mjs` (a
+  redirect to the 512 px icon). The free plan allows ~10 ms of CPU a request: Fred's connector backtest lab and a proposal's
+  syntax check (`node --check`, no child process in a Worker) may fail there; everything else was run on the Workers runtime.
+- **Storage**: `wrangler.toml` aliases `@vercel/blob` to `cf/blob-r2.mjs` (put / list / del on the R2 bucket `meridianx-blob`,
+  keyed by the Vercel pathname; random suffixes like Vercel's; a blob "URL" is `https://blob.r2.internal/<key>` and the Worker's
+  fetch wrapper answers it from the bucket, so `?cache=0` reads are exact). `BLOB_READ_WRITE_TOKEN = "r2-binding"` is a
+  placeholder var (the handlers check that a token is set). Moving the old data: `blob-to-r2.yml` / `scripts/blob-to-r2.mjs`.
+- **Academy data**: trade outcomes never go in the public assets; the deploy uploads `academy/data/*.json` (+
+  `ml/models/index.json` as `ml-index.json`) to R2 `academy-data/`, read by `cf/academy-data.mjs` through `academy.handle`'s
+  `d.data` hook.
+- **Static files** are served straight from the assets store (no Worker request) except the paths in `run_worker_first`;
+  `html_handling = "none"` keeps `.html` URLs as they are (the Worker maps `/`, `/macro/`, `/veteran/` to index.html and
+  `/gold`, `/macro-desk`, `/backtest`, `/academy` like vercel.json). Assets get Cloudflare's default revalidation, not the
+  immutable `?v=` rule.
+- **Deploy**: `cloudflare.yml` (push to main on served paths + manual): ends green with a notice until the owner adds
+  `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; then creates the bucket, uploads the Academy data, `wrangler@4.140.0
+  deploy`, and copies the listed GitHub secrets to the Worker (names only in the log).
+- Local run: `npx wrangler@4.140.0 dev --env-file <file with SESSION_SECRET=…>` (needs `node_modules`: `npm ci`).
+  Tests: `tests/cloudflare-worker.test.mjs` (routes vs vercel.json, every function run or named, the adapter, the R2 shim,
+  Academy outcomes not in out/).
