@@ -21,5 +21,14 @@ test('council.yml: the secret reaches the loop, MD_BASE moves only once the serv
   assert.match(y, /OANDA_TOKEN: \$\{\{ secrets\.OANDA_TOKEN \}\}/);
   const i = y.indexOf('node council/md-proxy.mjs 8790'), j = y.indexOf('export MD_BASE=http://127.0.0.1:8790/md/'), k = y.indexOf('for i in $(seq 1 $ROUNDS)');
   assert.ok(i > 0 && j > i && k > j, 'started before the rounds, MD_BASE set after it answered');
-  assert.match(y.slice(i, j), /curl -fsS/);
+  assert.match(y.slice(i, j), /curl -fs/);
+});
+test('the backtest, macro-gold and daily-cache workflows start the same service before their scripts, keyed', () => {
+  for (const [w, arg] of [['backtest', ''], ['macro-gold', ''], ['daily-cache', ' bars']]) {
+    const y = fs.readFileSync(new URL(`../.github/workflows/${w}.yml`, import.meta.url), 'utf8');
+    const i = y.indexOf(`run: sh scripts/own-candles.sh${arg}\n`); assert.ok(i > 0, w);
+    assert.match(y.slice(y.lastIndexOf('- name:', i), i), /OANDA_TOKEN: \$\{\{ secrets\.OANDA_TOKEN \}\}/, w);
+  }
+  const sh = fs.readFileSync(new URL('../scripts/own-candles.sh', import.meta.url), 'utf8');
+  assert.match(sh, /GITHUB_ENV/); assert.match(sh, /exit 0; \}/);
 });

@@ -62,6 +62,12 @@ jobs:
           key: duka-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: duka-
 
+      - name: Own OANDA candles (no website needed; scripts/own-candles.sh)
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
       - name: Backtest
         env:
           DUKA_CACHE: .duka-cache
