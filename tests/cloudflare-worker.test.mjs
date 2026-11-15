@@ -10,6 +10,12 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 // the Worker bundles the two bridge sources as text (wrangler.toml rules); Node needs the same rule to import it
 import { register } from 'node:module';
 register('data:text/javascript,' + encodeURIComponent("export async function load(url, ctx, next) { if (/\\.(mq5|cs)$/.test(url)) { const fs = await import('node:fs'); return { format: 'module', shortCircuit: true, source: 'export default ' + JSON.stringify(fs.readFileSync(new URL(url), 'utf8')) }; } return next(url, ctx); }"));
+// CI installs no packages (tests.yml): the Worker aliases '@vercel/blob' to cf/blob-r2.mjs (wrangler.toml), and the price-alert
+// cron needs 'web-push' only when it sends; the test gives require() the same two names, as small stand-ins
+import Module from 'node:module';
+const STUB = { '@vercel/blob': { put: async () => ({}), list: async () => ({ blobs: [] }), del: async () => {} }, 'web-push': { setVapidDetails() {}, sendNotification: async () => {} } };
+const load0 = Module._load;
+Module._load = function (req, parent, isMain) { if (Object.prototype.hasOwnProperty.call(STUB, req)) { try { return load0.call(this, req, parent, isMain); } catch (e) { return STUB[req]; } } return load0.call(this, req, parent, isMain); };
 const W = await import('../cf/worker.mjs');
 const B = await import('../cf/blob-r2.mjs');
 const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
