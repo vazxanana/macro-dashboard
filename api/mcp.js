@@ -298,10 +298,16 @@ async function deskUpdate(who, a) {
 function syntaxCheck(p, content) {
   if (/\.json$/.test(p)) { try { JSON.parse(content); } catch (e) { throw new Error(`${p} is not valid JSON: ${e.message}`); } return 'JSON ok'; }
   if (!/\.mjs$/.test(p)) return null;
+  // A host that cannot start a process (the Cloudflare Worker sets MCP_NO_EXEC, 15 Nov 2026; or the check itself fails to
+  // start): said so, never read as a syntax error. The pull request's checks run node --check before anything merges
+  // (tests.yml; for an applied change ict-apply.yml), so nothing unchecked reaches main.
+  const NOT_HERE = 'syntax not checked on this host; the pull request checks run node --check';
+  if (process.env.MCP_NO_EXEC === '1') return NOT_HERE;
   const f = pathM.join(os.tmpdir(), `mcp-check-${crypto.randomBytes(6).toString('hex')}.mjs`);
-  fs.writeFileSync(f, content);
+  try { fs.writeFileSync(f, content); } catch (e) { return NOT_HERE; }
   try { execFileSync(process.execPath, ['--check', f], { timeout: 10000, stdio: 'pipe' }); return 'node --check ok'; }
-  catch (e) { const msg = String((e.stderr && e.stderr.toString()) || e.message).split(f).join(p).split('\n').filter(Boolean).slice(0, 6).join('\n'); throw new Error(`syntax error in ${p}:\n${msg}`); }
+  catch (e) { if (typeof e.status !== 'number') return NOT_HERE;   // not started (no process here) or timed out: not a verdict
+    const msg = String((e.stderr && e.stderr.toString()) || e.message).split(f).join(p).split('\n').filter(Boolean).slice(0, 6).join('\n'); throw new Error(`syntax error in ${p}:\n${msg}`); }
   finally { try { fs.unlinkSync(f); } catch (e) {} }
 }
 // Everything checked before a single GitHub write; returns what the PR body reports. The same checks for a proposal and an

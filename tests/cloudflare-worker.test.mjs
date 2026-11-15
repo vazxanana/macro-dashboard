@@ -128,3 +128,13 @@ test('edge cache: public candles and a visitor\'s guest files only, kept for the
   const priv = new URL('https://x.dev/md/bars?p=1'); await W.edgeCached(R(priv), priv, async () => new Response('x', { headers: { 'Cache-Control': 'private, no-store' } }), null, cache);
   assert.ok(!store.has(priv.toString()), 'a private answer is never stored');
 });
+test('Fred\'s connector on a host without processes: the syntax check says so instead of refusing every change', async () => {
+  const { createRequire } = await import('node:module'); const req = createRequire(import.meta.url);
+  const { syntaxCheck } = req('../api/mcp.js').lib;
+  assert.equal(syntaxCheck('ict/x.mjs', 'export const a = 1;\n'), 'node --check ok');
+  assert.throws(() => syntaxCheck('ict/x.mjs', 'export const = ;\n'), /syntax error in ict\/x\.mjs/, 'a real error is still refused');
+  process.env.MCP_NO_EXEC = '1';
+  try { assert.match(syntaxCheck('ict/x.mjs', 'export const = ;\n'), /not checked on this host/); assert.throws(() => syntaxCheck('a.json', '{'), /not valid JSON/, 'JSON is still parsed'); }
+  finally { delete process.env.MCP_NO_EXEC; }
+  assert.match(toml, /MCP_NO_EXEC = "1"/);
+});

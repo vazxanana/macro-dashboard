@@ -33,3 +33,5 @@ enabled = true
 BLOB_READ_WRITE_TOKEN = "r2-binding"
 # a visitor gets the loop's ready guest copy up to a day old: cutting the big files here would pass the free plan's CPU limit
 GUEST_PRECUT_MAX_MIN = "1440"
+# a Worker cannot start node --check: Fred's connector says so and leaves the syntax check to the pull request's CI (api/mcp.js)
+MCP_NO_EXEC = "1"

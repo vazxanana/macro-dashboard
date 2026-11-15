@@ -3604,8 +3604,9 @@ plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; d
   headers; `CRONS` = price alerts every minute + the second opinion every 10 min. Never fork a handler for Cloudflare: change
   the adapter or the shims.
 - **Not run on Cloudflare**: `api/run.js` (the BACKUP council runner; 503, GitHub Actions is the runner) and `api/og.mjs` (a
-  redirect to the 512 px icon). The free plan allows ~10 ms of CPU a request: Fred's connector backtest lab and a proposal's
-  syntax check (`node --check`, no child process in a Worker) may fail there; everything else was run on the Workers runtime.
+  redirect to the 512 px icon). The free plan allows ~10 ms of CPU a request: Fred's connector backtest lab may fail there; a proposal's
+  syntax check (`node --check`) cannot run in a Worker, so `MCP_NO_EXEC = "1"` makes the connector say "syntax not checked
+  on this host" and the pull request's CI runs it (before: every .mjs change would have been refused as a syntax error); everything else was run on the Workers runtime.
 - **Storage**: `wrangler.toml` aliases `@vercel/blob` to `cf/blob-r2.mjs` (put / list / del on the R2 bucket `meridianx-blob`,
   keyed by the Vercel pathname; random suffixes like Vercel's; a blob "URL" is `https://blob.r2.internal/<key>` and the Worker's
   fetch wrapper answers it from the bucket, so `?cache=0` reads are exact). `BLOB_READ_WRITE_TOKEN = "r2-binding"` is a
