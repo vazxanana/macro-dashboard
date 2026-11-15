@@ -3436,6 +3436,15 @@ about +0.04 to +0.10R with t near 1. Evidence the cuts are not pure curve-fit, n
 changed. A next test would hold one position at a time on gold and silver together, judged on monthly sums, with its own
 pre-registration. Tests: `tests/gold-drd-silver.test.mjs`.
 
+## Gold playbook study 4: the two cuts on platinum and palladium (15 Nov 2026, the stop hook's "keep working")
+`research/edge/gold-drd-pgm/` (PREREGISTRATION.md pushed first; imports gold-drd-long / -er / -silver unchanged; costs 0.30 %
+of price on platinum and 0.20 % on palladium, the repository's figures; buffer 0.01 % of the signal day's low). Silver's lesson
+built in: the bar is the t of calendar-month sums (plus PF > 1 in both halves, > 0 at 2x costs and without the best year).
+**Verdict: FAIL, 0 of 4**: platinum T2 -0.164R (n 408, month t -1.50), T3 -0.183R (n 481, -1.88); palladium T2 +0.024R
+(n 402, +0.19), T3 +0.092R (n 525, +0.81, Holm p 0.84). Reported only: palladium every signal +0.162R (n 1,120, month t +2.06),
+mostly its 2016-20 rally. The cuts do not travel; do not test them on another market. Nothing live changed. Tests:
+`tests/gold-drd-pgm.test.mjs`.
+
 ## Mosha cycle: a main paper system (11 Nov 2026, owner: "H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot"; chose "main system")
 `council/mosha-cycle.mjs` (pure: `cycleState`, `cycleTrades`, `cycleText`) + the Trader block after Mosha BO (user rule
 `mosha-cycle`, `config.moshaCycle`; records `k: 'mcycle'`, ids `xau-mcycle-<leg>-<H4 break time>`). Gold only. From the BO
