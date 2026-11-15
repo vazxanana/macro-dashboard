@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-15T04:57:22.000Z",
+ "at": "2026-11-15T05:57:11.000Z",
  "target": "2026-11-16",
- "targetEvent": null,
+ "targetEvent": "USD Fed Chairman Warsh Speaks",
  "paperOnly": true,
  "regime": {
   "label": "Dollar Smile right side (US outperformance) · liquidity flat · normal volatility",
@@ -706,7 +706,918 @@
    }
   }
  },
- "playbook": [],
+ "playbook": [
+  {
+   "at": "2026-11-16T13:30:00.000Z",
+   "country": "CAD",
+   "title": "CPI m/m",
+   "type": "Other",
+   "consensus": "0.3%",
+   "previous": "0.1%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 0.4%, cool if ≤ 0.2%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-16T13:30:00.000Z",
+   "country": "CAD",
+   "title": "Median CPI y/y",
+   "type": "Other",
+   "consensus": "2.0%",
+   "previous": "1.9%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 2.1%, cool if ≤ 1.9%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-16T13:30:00.000Z",
+   "country": "CAD",
+   "title": "Trimmed CPI y/y",
+   "type": "Other",
+   "consensus": "1.9%",
+   "previous": "1.8%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 2.0%, cool if ≤ 1.8%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-16T17:00:00.000Z",
+   "country": "USD",
+   "title": "Fed Chairman Warsh Speaks",
+   "type": "Fed decision / Fed chair",
+   "consensus": null,
+   "previous": null,
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous print",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hawkish",
+     "odds": 0.25,
+     "when": "above the previous",
+     "moves": {
+      "gold": "down",
+      "eurusd": "down",
+      "usdjpy": "up",
+      "nq": "down",
+      "es": "down"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "dovish",
+     "odds": 0.25,
+     "when": "below the previous",
+     "moves": {
+      "gold": "up",
+      "eurusd": "up",
+      "usdjpy": "down",
+      "nq": "up",
+      "es": "up"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": "Two stages: the statement, then the press conference, which often reverses the first move."
+  },
+  {
+   "at": "2026-11-16T22:50:00.000Z",
+   "country": "AUD",
+   "title": "RBA Gov Bullock Speaks",
+   "type": "Other",
+   "consensus": null,
+   "previous": null,
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous print",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-17T02:00:00.000Z",
+   "country": "NZD",
+   "title": "Inflation Expectations q/q",
+   "type": "Other",
+   "consensus": null,
+   "previous": "2.34%",
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous 2.34%",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above 2.34%",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below 2.34%",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-17T13:30:00.000Z",
+   "country": "USD",
+   "title": "Core Retail Sales m/m",
+   "type": "Growth",
+   "consensus": "0.4%",
+   "previous": "0.9%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 0.5%, cool if ≤ 0.3%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "down",
+      "eurusd": "down",
+      "usdjpy": "up",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "up",
+      "eurusd": "up",
+      "usdjpy": "down",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": "Stocks: strong data can lift them (growth) or sink them (higher yields); follow the 10Y reaction. Bad news moves prices more than good news."
+  },
+  {
+   "at": "2026-11-17T13:30:00.000Z",
+   "country": "USD",
+   "title": "Retail Sales m/m",
+   "type": "Growth",
+   "consensus": "0.2%",
+   "previous": "0.8%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 0.3%, cool if ≤ 0.1%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "down",
+      "eurusd": "down",
+      "usdjpy": "up",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "up",
+      "eurusd": "up",
+      "usdjpy": "down",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": "Stocks: strong data can lift them (growth) or sink them (higher yields); follow the 10Y reaction. Bad news moves prices more than good news."
+  },
+  {
+   "at": "2026-11-18T07:00:00.000Z",
+   "country": "GBP",
+   "title": "CPI y/y",
+   "type": "Other",
+   "consensus": "3.6%",
+   "previous": "3.5%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 3.7%, cool if ≤ 3.5%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-18T07:30:00.000Z",
+   "country": "GBP",
+   "title": "BOE Gov Bailey Speaks",
+   "type": "Other",
+   "consensus": null,
+   "previous": null,
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous print",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-18T15:00:00.000Z",
+   "country": "GBP",
+   "title": "BOE Gov Bailey Speaks",
+   "type": "Other",
+   "consensus": null,
+   "previous": null,
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous print",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below the previous",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-18T19:00:00.000Z",
+   "country": "USD",
+   "title": "FOMC Meeting Minutes",
+   "type": "Fed decision / Fed chair",
+   "consensus": null,
+   "previous": null,
+   "actual": null,
+   "outcome": null,
+   "rule": "no consensus published: judge it against the previous print",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hawkish",
+     "odds": 0.25,
+     "when": "above the previous",
+     "moves": {
+      "gold": "down",
+      "eurusd": "down",
+      "usdjpy": "up",
+      "nq": "down",
+      "es": "down"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "dovish",
+     "odds": 0.25,
+     "when": "below the previous",
+     "moves": {
+      "gold": "up",
+      "eurusd": "up",
+      "usdjpy": "down",
+      "nq": "up",
+      "es": "up"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": "Two stages: the statement, then the press conference, which often reverses the first move."
+  },
+  {
+   "at": "2026-11-19T00:30:00.000Z",
+   "country": "AUD",
+   "title": "Employment Change",
+   "type": "Other",
+   "consensus": "25.2K",
+   "previous": "-39.3K",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 25.2K, cool if ≤ 25.2K, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  },
+  {
+   "at": "2026-11-19T00:30:00.000Z",
+   "country": "AUD",
+   "title": "Unemployment Rate",
+   "type": "Other",
+   "consensus": "4.7%",
+   "previous": "4.7%",
+   "actual": null,
+   "outcome": null,
+   "rule": "hot if ≥ 4.8%, cool if ≤ 4.6%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
+   "expMovePct": {
+    "gold": 1.28,
+    "eurusd": 0.3,
+    "usdjpy": 0.31,
+    "nq": 1.55,
+    "es": 0.91
+   },
+   "expBasis": {
+    "gold": "naive: mean absolute move of the last 20 days",
+    "eurusd": "naive: mean absolute move of the last 20 days",
+    "usdjpy": "naive: mean absolute move of the last 20 days",
+    "nq": "naive: mean absolute move of the last 20 days",
+    "es": "naive: mean absolute move of the last 20 days"
+   },
+   "scenarios": [
+    {
+     "name": "hot",
+     "odds": 0.25,
+     "when": "above consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    },
+    {
+     "name": "in line",
+     "odds": 0.5,
+     "when": "near consensus",
+     "moves": {
+      "gold": "little; the prevailing trend resumes",
+      "eurusd": "little; the prevailing trend resumes",
+      "usdjpy": "little; the prevailing trend resumes",
+      "nq": "little; the prevailing trend resumes",
+      "es": "little; the prevailing trend resumes"
+     }
+    },
+    {
+     "name": "cool",
+     "odds": 0.25,
+     "when": "below consensus",
+     "moves": {
+      "gold": "mixed",
+      "eurusd": "mixed",
+      "usdjpy": "mixed",
+      "nq": "mixed",
+      "es": "mixed"
+     }
+    }
+   ],
+   "oddsBasis": "prior (no surprise history yet)",
+   "note": null
+  }
+ ],
  "news": [
   {
    "src": "Fed",
@@ -3368,30 +4279,31 @@
   "fred:DFII10": "ok, last 2026-11-12",
   "fred:DGS2": "ok, last 2026-11-12",
   "fred:DGS10": "ok, last 2026-11-12",
-  "fred:VIXCLS": "ok, last 2026-11-12",
-  "fred:BAMLH0A0HYM2": "ok, last 2026-11-12",
   "fred:T10YIE": "ok, last 2026-11-13",
-  "fred:WALCL": "ok, last 2026-11-11",
-  "fred:DTWEXBGS": "ok, last 2026-11-06",
+  "fred:VIXCLS": "ok, last 2026-11-12",
   "fred:T10Y3M": "ok, last 2026-11-13",
-  "fred:VXVCLS": "ok, last 2026-11-12",
-  "fred:WTREGEN": "ok, last 2026-11-11",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-12",
+  "fred:DTWEXBGS": "ok, last 2026-11-06",
+  "fred:WALCL": "ok, last 2026-11-11",
   "fred:RRPONTSYD": "ok, last 2026-11-13",
-  "fred:EFFR": "ok, last 2026-11-12",
+  "fred:VXVCLS": "ok, last 2026-11-12",
   "fred:SOFR": "ok, last 2026-11-12",
+  "fred:EFFR": "ok, last 2026-11-12",
+  "fred:WTREGEN": "ok, last 2026-11-11",
   "fred:SWPT": "ok, last 2026-11-11",
   "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "ecb:2y": "ok, last 2026-11-12",
-  "bars:gbpusd": "OANDA ok (1400 days)",
-  "bars:eurusd": "OANDA ok (1400 days)",
+  "bars:gold": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
   "bars:nq": "OANDA ok (1400 days)",
+  "bars:gbpusd": "OANDA ok (1400 days)",
   "bars:usdcad": "OANDA ok (1400 days)",
   "bars:usdchf": "OANDA ok (1400 days)",
-  "bars:es": "OANDA ok (1400 days)",
+  "bars:eurusd": "OANDA ok (1400 days)",
   "bars:usdjpy": "OANDA ok (1400 days)",
-  "bars:gold": "OANDA ok (1400 days)",
-  "calendar:thisweek": "ok (106 events)",
+  "calendar:thisweek": "ok (119 events)",
   "calendar:nextweek": "failed (HTTP 404)",
+  "calendar:cache": "using the last good copy for the week that failed (106 cached events)",
   "rss:Fed": "ok (20 items)",
   "rss:BoJ": "ok (45 items)",
   "rss:ECB": "ok (15 items)",
@@ -3544,5 +4456,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Sun 15 Nov 04:57 UTC, for Mon 16 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · liquidity flat · normal volatility. Gold: 50% up (base rate 53%; macro tilt down 4 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.28% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.3% (20-day average). USD/JPY: 59% up (base rate 56%; macro tilt up 3 pts). Drivers lean up: real yields, us 10y yield trend. Expected move ±0.31% (20-day average). NQ (Nasdaq 100): 53% up (base rate 56%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.55% (20-day average). ES (S&P 500): 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.91% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.63): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.985% on average against 0.865% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Sun 15 Nov 05:57 UTC, for Mon 16 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · liquidity flat · normal volatility. Mon 16 Nov is an event day (USD Fed Chairman Warsh Speaks): expect bigger moves. Gold: 50% up (base rate 53%; macro tilt down 4 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.28% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.3% (20-day average). USD/JPY: 59% up (base rate 56%; macro tilt up 3 pts). Drivers lean up: real yields, us 10y yield trend. Expected move ±0.31% (20-day average). NQ (Nasdaq 100): 53% up (base rate 56%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.55% (20-day average). ES (S&P 500): 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.91% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.28%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.28%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.28%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.28%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.63): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.985% on average against 0.865% on other days, but no model turned that into a better forecast."
 }
