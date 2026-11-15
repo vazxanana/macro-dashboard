@@ -23,12 +23,13 @@ test('council.yml: the secret reaches the loop, MD_BASE moves only once the serv
   assert.ok(i > 0 && j > i && k > j, 'started before the rounds, MD_BASE set after it answered');
   assert.match(y.slice(i, j), /curl -fs/);
 });
-test('the backtest, macro-gold and daily-cache workflows start the same service before their scripts, keyed', () => {
-  for (const [w, arg] of [['backtest', ''], ['macro-gold', ''], ['daily-cache', ' bars']]) {
+test('the backtest and macro-gold workflows start the same service before their scripts, keyed (daily-cache stays keyless)', () => {
+  for (const [w, arg] of [['backtest', ''], ['macro-gold', '']]) {
     const y = fs.readFileSync(new URL(`../.github/workflows/${w}.yml`, import.meta.url), 'utf8');
     const i = y.indexOf(`run: sh scripts/own-candles.sh${arg}\n`); assert.ok(i > 0, w);
     assert.match(y.slice(y.lastIndexOf('- name:', i), i), /OANDA_TOKEN: \$\{\{ secrets\.OANDA_TOKEN \}\}/, w);
   }
+  assert.doesNotMatch(fs.readFileSync(new URL('../.github/workflows/daily-cache.yml', import.meta.url), 'utf8'), /secrets\./, 'the weekly cache stays keyless');
   const sh = fs.readFileSync(new URL('../scripts/own-candles.sh', import.meta.url), 'utf8');
   assert.match(sh, /GITHUB_ENV/); assert.match(sh, /exit 0; \}/);
 });

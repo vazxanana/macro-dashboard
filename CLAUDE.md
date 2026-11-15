@@ -3583,6 +3583,6 @@ the Kraken fallback (`snapshot.feed` all "Kraken"; one-feed rule: OANDA-priced r
 close limited the effect). `council/md-proxy.mjs` serves `/md/bars` on localhost through the site's own `api/bars.js` (the
 VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `OANDA_TOKEN` secret is set and moves `MD_BASE` /
 `ICT_MD_BARS` to it only once it answers, else the website's proxy as before. Needs the owner to add `OANDA_TOKEN` (and
-`OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml`, `macro-gold.yml` and `daily-cache.yml` start the
-same service through `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers; `bars` = the
-full-URL form daily-cache reads). The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
+`OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
+`scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
+(a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.

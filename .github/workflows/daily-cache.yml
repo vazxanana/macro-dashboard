@@ -51,12 +51,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Own OANDA candles (no website needed; scripts/own-candles.sh)
-        env:
-          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
-          OANDA_ENV: ${{ secrets.OANDA_ENV }}
-        run: sh scripts/own-candles.sh bars
-
       - name: Refresh the daily candles
         env:
           SYMS: ${{ github.event.inputs.symbols }}
