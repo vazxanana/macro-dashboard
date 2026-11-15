@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-15 10:41 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-15 10:44 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **london**.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 229 trades, +0.05R a trade (+10.76R)
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-15 10:41 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-15 10:44 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -43,13 +43,13 @@ Built by the Trader at 2026-11-15 10:41 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-15 10:41 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-15 10:44 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 5 signals (0 open, 5 closed, +0.52R, 20% won); 11 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 5 signals in 7 days, 4 closed +2.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-15 10:39 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-15 10:42 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -64,7 +64,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-15 10:41 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-15 10:44 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -171,23 +171,23 @@ Checked 2026-11-14 10:43 UTC; live signals 2026-11-01 to 2026-11-14.
 - **All markets:** 53% of comparable live signals found (603 matched of 1130); outcome sign agrees 97% on 498 closed pairs.
 - **Why live signals were missed:** feed differs 259, data feed 148, replay gap 55 (of 582).
 - **Feeds (replay / live):** xau OANDA / live Kraken+OANDA · btc Kraken / live Kraken · eth Kraken / live Kraken · audusd OANDA / live Kraken+OANDA · usdchf OANDA / live Kraken+OANDA · gbpusd OANDA / live Kraken+OANDA · xrp Kraken / live Kraken · sol Kraken / live Kraken · eurusd OANDA / live Kraken+OANDA · usdcad OANDA / live Kraken+OANDA.
-- **Live loop gaps (48 h):** 11-13 02:42 for 8 h, 11-13 12:00 for 11 h: no live signals were possible then.
+- **Live loop gaps (48 h):** 11-13 12:00 for 11 h: no live signals were possible then.
 <!-- fidelity:end -->
 
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-15 10:41 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-15 10:44 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
 | Gold replica | shadow (paper, owner 11 Nov) | gate closed: 1.86% average daily range under the 2.33% gate, so no new replica trade | nothing on |
-| Mosha BO | shadow (paper, owner 11 Nov) | H4 BO sell at 3908.67 (11-14 16:00 UTC); waiting for the H1 BO the other way (the retracement). Weekly structure agrees. | nothing on |
-| Mosha cycle | shadow (paper, owner 11 Nov) | H4 moving down from 3908.67; waiting for the H1 ChoCh that starts the pullback. | nothing on |
-| Gold trend | live | waiting for a daily close above the 20-day high 4195.30 (last close 3860.48) | nothing on |
-| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4189.73 (last close 3860.48) | paper only |
-| Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 3887.29; waiting for an H4 close above it | nothing on |
-| Gold daily engulf | live | daily close 3935.42 below the 20-day average 4079.72 | nothing on |
+| Mosha BO | shadow (paper, owner 11 Nov) | H4 BO sell at 3909.06 (11-14 16:00 UTC); waiting for the H1 BO the other way (the retracement). Weekly structure agrees. | nothing on |
+| Mosha cycle | shadow (paper, owner 11 Nov) | H4 moving down from 3909.06; waiting for the H1 ChoCh that starts the pullback. | nothing on |
+| Gold trend | live | waiting for a daily close above the 20-day high 4195.69 (last close 3860.87) | nothing on |
+| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4190.12 (last close 3860.87) | paper only |
+| Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 3887.68; waiting for an H4 close above it | nothing on |
+| Gold daily engulf | live | daily close 3935.81 below the 20-day average 4080.11 | nothing on |
 | Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; no pullback zone watched · paper test | nothing on |
 | NQ New York open run | shadow (paper, owner 11 Nov; research.json) | last session 2026-11-09: sell loss −1.05R; next at the 09:30 New York open | — |
 <!-- gold-systems:end -->
