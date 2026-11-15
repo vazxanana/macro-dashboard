@@ -3575,3 +3575,13 @@ out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 
   (`council/backtest.mjs`) and the Coach's backtest evidence still cover the setups. Off-switch: a user rule setting
   `c.shadowCut = null`; a stream comes back only through a new pre-registered study. Tests: `tests/shadow-cut.test.mjs`,
   `tests/shadow-best.test.mjs`.
+
+## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
+`MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
+website's proxy (meridianx.dev/md/). When Vercel blocked the account at 10:21 UTC on 15 Nov, every gold and forex market fell to
+the Kraken fallback (`snapshot.feed` all "Kraken"; one-feed rule: OANDA-priced records held, adopted after 6 h; the weekend
+close limited the effect). `council/md-proxy.mjs` serves `/md/bars` on localhost through the site's own `api/bars.js` (the
+VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `OANDA_TOKEN` secret is set and moves `MD_BASE` /
+`ICT_MD_BARS` to it only once it answers, else the website's proxy as before. Needs the owner to add `OANDA_TOKEN` (and
+`OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. Other workflows (backtest, daily cache, macro-gold,
+ICT replay fills) still read the website's proxy. Tests: `tests/md-proxy.test.mjs`.
