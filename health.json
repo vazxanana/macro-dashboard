@@ -1,5 +1,5 @@
 {
- "at": "2026-11-15T13:38:51.000Z",
+ "at": "2026-11-15T14:06:24.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
@@ -95,7 +95,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T13:35:00.000Z",
+     "last": "2026-11-15T14:05:00.000Z",
      "staleMin": 0,
      "maxJump": 4.09,
      "clipped": 0,
@@ -106,7 +106,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T13:35:00.000Z",
+     "last": "2026-11-15T14:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.87,
      "clipped": 0,
@@ -117,7 +117,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T13:35:00.000Z",
+     "last": "2026-11-15T14:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.91,
      "clipped": 0,
@@ -128,7 +128,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-15T13:35:00.000Z",
+     "last": "2026-11-15T14:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.21,
      "clipped": 0,
@@ -144,7 +144,7 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "closed",
-     "n": 661,
+     "n": 649,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.48,
@@ -155,7 +155,7 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "closed",
-     "n": 661,
+     "n": 649,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.58,
@@ -166,7 +166,7 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "closed",
-     "n": 661,
+     "n": 649,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.22,
@@ -177,7 +177,7 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "closed",
-     "n": 661,
+     "n": 649,
      "last": "2026-11-14T13:25:00.000Z",
      "staleMin": 0,
      "maxJump": 4.1,
@@ -188,7 +188,7 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "closed",
-     "n": 663,
+     "n": 651,
      "last": "2026-11-14T16:35:00.000Z",
      "staleMin": 0,
      "maxJump": 2.26,
@@ -199,7 +199,7 @@
   },
   "files": {
    "label": "Council data files",
-   "status": "warn",
+   "status": "bad",
    "markets": {
     "snapshot.json": {
      "label": "Trader snapshot (snapshot.json)",
@@ -272,25 +272,25 @@
     },
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
-     "status": "warn",
-     "ageMin": 24,
+     "status": "bad",
+     "ageMin": 51,
      "issues": [
       {
        "kind": "stale",
-       "sev": "warn",
-       "detail": "not updated for 24 min (expected 1 min (between rounds); flag after 20 min)"
+       "sev": "bad",
+       "detail": "not updated for 51 min (expected 1 min (between rounds); alert after 45 min)"
       }
      ]
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
-     "status": "warn",
-     "ageMin": 24,
+     "status": "bad",
+     "ageMin": 51,
      "issues": [
       {
        "kind": "stale",
-       "sev": "warn",
-       "detail": "not updated for 24 min (expected 1 min; flag after 20 min)"
+       "sev": "bad",
+       "detail": "not updated for 51 min (expected 1 min; alert after 45 min)"
       }
      ]
     },
@@ -327,7 +327,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 13,
+     "ageMin": 14,
      "issues": [
       {
        "kind": "source",
@@ -361,7 +361,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 27,
+     "ageMin": 55,
      "issues": [
       {
        "kind": "input",
@@ -418,13 +418,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 27,
+     "ageMin": 55,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 27,
+     "ageMin": 55,
      "issues": [
       {
        "kind": "stale",
@@ -451,7 +451,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 818,
+     "ageMin": 846,
      "issues": []
     },
     "digest.json": {
@@ -461,38 +461,32 @@
     },
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
-     "status": "warn",
-     "ageMin": 228,
-     "issues": [
-      {
-       "kind": "stale",
-       "sev": "warn",
-       "detail": "not updated for 3.8 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
-      }
-     ]
+     "status": "ok",
+     "ageMin": 17,
+     "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 130,
+     "ageMin": 157,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 130,
+     "ageMin": 157,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 130,
+     "ageMin": 157,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 130,
+     "ageMin": 157,
      "issues": []
     },
     "research/ledger.json": {
@@ -513,19 +507,19 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 229,
+     "ageMin": 256,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "ok",
-     "ageMin": 1220,
+     "ageMin": 1248,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 1632,
+     "ageMin": 1660,
      "issues": [
       {
        "kind": "stale",
@@ -552,17 +546,19 @@
    }
   }
  },
- "summary": "OANDA spot (md/bars): XAU/USD error, EUR/USD error, GBP/USD error, AUD/USD error, USD/CAD error, USD/CHF error · Council data files: Trader snapshot (snapshot.json) source, cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale, Loop watchdog (watchdog.json) stale",
+ "summary": "OANDA spot (md/bars): XAU/USD error, EUR/USD error, GBP/USD error, AUD/USD error, USD/CAD error, USD/CHF error · Council data files: cTrader demo account (ctrader/account.json) stale, cTrader demo accounts (ctrader/accounts.json) stale, Trader snapshot (snapshot.json) source, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale",
  "brief": {
   "status": "bad",
-  "line": "6 problems, 20 warnings: OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
+  "line": "8 problems, 17 warnings: OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
   "bad": [
    "OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
    "OANDA spot (md/bars) EUR/USD: unreachable: HTTP 402: [object Object]",
    "OANDA spot (md/bars) GBP/USD: unreachable: HTTP 402: [object Object]",
    "OANDA spot (md/bars) AUD/USD: unreachable: HTTP 402: [object Object]",
    "OANDA spot (md/bars) USD/CAD: unreachable: HTTP 402: [object Object]",
-   "OANDA spot (md/bars) USD/CHF: unreachable: HTTP 402: [object Object]"
+   "OANDA spot (md/bars) USD/CHF: unreachable: HTTP 402: [object Object]",
+   "cTrader demo account (ctrader/account.json): not updated for 51 min (expected 1 min (between rounds); alert after 45 min)",
+   "cTrader demo accounts (ctrader/accounts.json): not updated for 51 min (expected 1 min; alert after 45 min)"
   ],
   "warn": [
    "Trader snapshot (snapshot.json): XAU/USD read from Kraken, not OANDA (proxy fallback)",
@@ -571,21 +567,23 @@
    "Trader snapshot (snapshot.json): AUD/USD read from Kraken, not OANDA (proxy fallback)",
    "Trader snapshot (snapshot.json): USD/CAD read from Kraken, not OANDA (proxy fallback)",
    "Trader snapshot (snapshot.json): USD/CHF read from Kraken, not OANDA (proxy fallback)",
-   "cTrader demo account (ctrader/account.json): not updated for 24 min (expected 1 min (between rounds); flag after 20 min)",
-   "cTrader demo accounts (ctrader/accounts.json): not updated for 24 min (expected 1 min; flag after 20 min)",
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1049 days old; over 120 the strategist drops it as \"no data\")",
-   "Macro forecast (macro/forecast.json): bars:nq failed (HTTP 402)"
+   "Macro forecast (macro/forecast.json): bars:nq failed (HTTP 402)",
+   "Macro forecast (macro/forecast.json): bars:usdjpy failed (HTTP 402)",
+   "Macro forecast (macro/forecast.json): bars:es failed (HTTP 402)"
   ],
   "notes": 2
  },
  "alert": {
   "streak": {
-   "oanda:xau": 8,
-   "oanda:eurusd": 8,
-   "oanda:gbpusd": 8,
-   "oanda:audusd": 8,
-   "oanda:usdcad": 8,
-   "oanda:usdchf": 8
+   "oanda:xau": 9,
+   "oanda:eurusd": 9,
+   "oanda:gbpusd": 9,
+   "oanda:audusd": 9,
+   "oanda:usdcad": 9,
+   "oanda:usdchf": 9,
+   "files:ctrader/account.json": 1,
+   "files:ctrader/accounts.json": 1
   },
   "sent": {
    "key": "files:ctrader/account.json|files:ctrader/accounts.json|oanda:audusd|oanda:eurusd|oanda:gbpusd|oanda:usdcad|oanda:usdchf|oanda:xau",
