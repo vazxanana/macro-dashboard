@@ -3575,3 +3575,20 @@ out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 
   (`council/backtest.mjs`) and the Coach's backtest evidence still cover the setups. Off-switch: a user rule setting
   `c.shadowCut = null`; a stream comes back only through a new pre-registered study. Tests: `tests/shadow-cut.test.mjs`,
   `tests/shadow-best.test.mjs`.
+
+## Guest cuts made by the loop (15 Nov 2026, the server functions move to a host with ~10 ms of CPU a request)
+Cutting the five guest files per visitor request (`api/_guestcut.js`: JSON.parse of trades.json ~1.6 MB, ict/replay.json ~2 MB)
+is too expensive there, so the council loop makes them once a round.
+- `scripts/guest-cut.mjs <council-data dir>` (council.yml, right after each FULL round's save, `timeout 60`, then its own
+  `datasync … save "Guest cuts …" guest`; never in the quick pass; always exits 0): for each of `G.CUT_FILES` writes
+  `guest/<same path>` = `G.cut(p, source, guestKey(env))` only when the bytes changed, and `guest/_index.json` = `{ at, keyed,
+  files: { <p>: { srcSha, sha } } }` (hex sha256 of source and cut). A file missing or not parsing keeps its old cut and gets
+  `{ error }` in the index. `writeIfChanged` / `writeAtomic` from `council/jsonio.mjs`.
+- `api/data.js` `guestKey(env)` = env `GUEST_ID_KEY`, else `S.secret(env)` as before (both the script and the on-the-fly cut use
+  it; the loop has `secrets.GUEST_ID_KEY`, empty is fine). Give the site the same `GUEST_ID_KEY`: with different keys a
+  precut file and a fallback one carry different opaque ids (acceptable, ids only need to be opaque and stable).
+- For a visitor (a cut file, not a member) `precut()` reads `guest/_index.json` and `guest/<p>` together and serves the copy when
+  the index `at` is under `PRECUT_MAX_MS` (30 min) old, the entry has no error and the copy's sha256 equals the entry's; else the
+  source is read and cut on the fly, as before. ETag variant `c`, Cache-Control, Vary, CORS, 304 and every member byte unchanged;
+  a member never reads `guest/`. Any `/cdata` path starting `guest/` is a 404 for everyone (the cuts are only served in place of
+  their source). Tests: `tests/guest-precut.test.mjs`; `tests/api-review.test.mjs` (a guest's trades.json now asks three files).

@@ -53,12 +53,32 @@ function matches(inm, tag) {
   const s = String(inm).trim(); if (s === '*') return true;
   return s.split(',').some((x) => x.trim().replace(/^W\//, '') === tag);   // If-None-Match uses the weak comparison (RFC 9110 13.1.2)
 }
+// Guest cuts made by the council loop (15 Nov 2026, scripts/guest-cut.mjs): council-data guest/<p> holds the cut of each
+// G.CUT_FILES entry and guest/_index.json { at, files: { <p>: { srcSha, sha } | { error } } }. A visitor is served that copy
+// while the index is under PRECUT_MAX_MS old and the copy's sha256 equals the index's (index and copy are read at separate
+// moments); otherwise the source is cut here, as before. Keeps the per-request CPU tiny (two small reads, one hash).
+// The ids in a cut are HMACs under guestKey(env): GUEST_ID_KEY when set (the loop has it as a secret, the site should have the
+// same value), else the session secret as before. If the two sides hold different keys, a precut file and an on-the-fly one
+// carry different opaque ids; that is acceptable (ids only need to be opaque and stable within a file set, and a copy is
+// either all precut or the fallback for one file only while the loop is down).
+const PRECUT_MAX_MS = 30 * 60e3;
+function guestKey(env) { if (env.GUEST_ID_KEY) return String(env.GUEST_ID_KEY); return require('./_session').secret(env); }
+async function precut(p, env, fetchFn, now) {
+  try {
+    const [ix, cf] = await Promise.all([readFile('guest/_index.json', env, fetchFn), readFile('guest/' + p, env, fetchFn)]);
+    if (!ix.ok || !cf.ok) return null;
+    const index = JSON.parse(ix.buf.toString('utf8')), at = Date.parse(index && index.at), e = index && index.files && index.files[p];
+    if (!Number.isFinite(at) || now - at > PRECUT_MAX_MS || now - at < -5 * 60e3 || !e || e.error || !e.sha) return null;
+    return crypto.createHash('sha256').update(cf.buf).digest('hex') === e.sha ? cf.buf : null;
+  } catch (err) { return null; }
+}
 async function handle(req, res, d = {}) {
   const env = d.env || process.env;
   if (req.method && req.method !== 'GET' && req.method !== 'HEAD') { res.setHeader('Allow', 'GET, HEAD'); return res.status(405).json({ error: 'GET' }); }   // reads only (no GitHub call, no bridge ping)
   const p = String((req.query && req.query.p) || '').replace(/^\/+/, '');
   if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '' || s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
   if (PRIVATE.has(p.toLowerCase())) return res.status(404).json({ error: 'not found' });   // sealed secrets and hashes stay server-side
+  if (p.toLowerCase().startsWith('guest/')) return res.status(404).json({ error: 'not found' });   // the loop's cuts: served only in place of their source
   const guest = GUEST_OK.has(p), cutFile = guest && G.CUT_FILES.includes(p);
   const S = require('./_session');
   // Who is asking for a guest file that has a cut version. Only a request with NO session cookie and NO member mark (?m=1, which
@@ -78,11 +98,12 @@ async function handle(req, res, d = {}) {
   }
   const open = guest && !marked;   // publicly cacheable: a guest file asked for without a cookie or a member mark
   try {
-    const r = await readFile(p, env, d.fetch || fetch);
+    const pre = cutFile && !member ? await precut(p, env, d.fetch || fetch, d.now ? d.now() : Date.now()) : null;
+    const r = pre ? { ok: true, status: 200, buf: pre } : await readFile(p, env, d.fetch || fetch);
     if (!r.ok) { res.setHeader('Cache-Control', open ? 's-maxage=15' : 'private, no-store'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
     let body = r.buf;
     // not signed in: the cut copy (api/_guestcut.js). A file that does not parse, or a cut that throws, is a 503: never the full file.
-    if (cutFile && !member) { try { body = G.cut(p, r.buf, S.secret(env)); } catch (e) { res.setHeader('Cache-Control', 'private, no-store'); return res.status(503).json({ error: 'data not available right now' }); } }
+    if (cutFile && !member && !pre) { try { body = G.cut(p, r.buf, guestKey(env)); } catch (e) { res.setHeader('Cache-Control', 'private, no-store'); return res.status(503).json({ error: 'data not available right now' }); } }
     const ext = (p.split('.').pop() || '').toLowerCase();
     res.setHeader('Content-Type', { json: 'application/json; charset=utf-8', md: 'text/markdown; charset=utf-8', csv: 'text/csv; charset=utf-8', js: 'application/javascript; charset=utf-8' }[ext] || 'text/plain; charset=utf-8');
     if (open) {   // public: the edge serves every guest from one copy for 20 s
@@ -102,3 +123,5 @@ module.exports.readFile = readFile;
 module.exports.GUEST_OK = GUEST_OK;
 module.exports.PRIVATE = PRIVATE;
 module.exports.etagOf = etagOf;
+module.exports.guestKey = guestKey;
+module.exports.PRECUT_MAX_MS = PRECUT_MAX_MS;

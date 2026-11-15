@@ -175,7 +175,10 @@ test('/cdata: the sealed tokens and the user list are never read, whatever the s
   }
   assert.equal(asked.length, 0);
   for (const m of ['POST', 'PUT', 'DELETE', 'PATCH']) assert.equal((await get('trades.json', OWNER_C, m)).code, 405, m);
-  const pub = await get('trades.json', null); assert.equal(pub.code, 200); assert.equal(asked.length, 1); assert.match(asked[0], /council-data\/trades\.json/);
+  // a guest: the loop's precut copy and its index are asked first (15 Nov, guest cuts made by the loop); this fake has no
+  // usable index, so the source is read and cut; nothing else is asked
+  const pub = await get('trades.json', null); assert.equal(pub.code, 200);
+  assert.deepEqual(asked.map((u) => u.match(/council-data\/([^?]+)/)[1]).sort(), ['guest/_index.json', 'guest/trades.json', 'trades.json']);
   S._cache.users = null;
 });
 
