@@ -1,31 +1,10 @@
 {
- "proposals": [
-  {
-   "setup": "all",
-   "kind": "dataSource",
-   "value": "oanda:usdcad,eurusd,usdchf",
-   "markets": [
-    "usdcad",
-    "eurusd",
-    "usdchf"
-   ],
-   "label": "manage USD/CAD, EUR/USD, USD/CHF trades on OANDA spot candles",
-   "n": 107,
-   "liveR": 24.49,
-   "spotR": -27.03,
-   "exp": 0.48,
-   "why": "The same closed live trades re-judged on OANDA spot candles: +24.5R on Kraken candles vs −27.0R on spot over 107 trades (USD/CAD +0.21R live vs −0.25R spot (39); EUR/USD +0.08R live vs −0.52R spot (30); USD/CHF +0.36R live vs −0.04R spot (38)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
-   "spotAt": "2026-11-14T10:43:11.766Z",
-   "at": "2026-11-15T10:21:13.000Z"
-  }
- ],
- "proposalsKey": "v5|2026-11-14T10:43:06.601Z|2026-11-14T10:43:11.766Z|2026-11-15T09:50:03.802Z|{\"xau\":\"Kraken\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"Kraken\",\"gbpusd\":\"Kraken\",\"audusd\":\"Kraken\",\"usdcad\":\"Kraken\",\"usdchf\":\"Kraken\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposals": [],
+ "proposalsKey": "v5|2026-11-15T11:28:57.433Z|2026-11-15T11:28:59.134Z|2026-11-15T09:50:03.802Z|{\"xau\":\"Kraken\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"Kraken\",\"gbpusd\":\"Kraken\",\"audusd\":\"Kraken\",\"usdcad\":\"Kraken\",\"usdchf\":\"Kraken\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\",\"cf\":\"2026-11-12T11:35:21.000Z\"},\"src\":{\"maxRR\":\"user\",\"cf\":\"backtest\"},\"maxRR\":10,\"noSession\":[\"asia\"],\"cf\":\"bo\"},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsSent": {
-  "key": "all:dataSource:oanda:usdcad,eurusd,usdchf",
-  "at": "2026-11-15T10:21:13.000Z",
-  "items": [
-   "Manage USD/CAD, EUR/USD, USD/CHF trades on OANDA spot candles — live +0.23R vs spot −0.25R a trade over 107 trades"
-  ]
+  "key": "",
+  "at": "2026-11-15T11:32:34.000Z",
+  "items": []
  },
  "ictWatch": [
   {
@@ -50,7 +29,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: skip Fridays: the 35 A-setups it drops made −0.10R a trade (t -0.52; halves +0.09R / −0.29R); the 219 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-15T10:21:13.000Z"
+   "at": "2026-11-15T11:32:34.000Z"
   },
   {
    "setup": "ICT A",
@@ -74,7 +53,7 @@
    "keptExp": 0.34,
    "flag": false,
    "why": "ICT A-setups: only trades against or without H1 structure: the 76 A-setups it drops made +0.16R a trade (t 0.96; halves +0.35R / −0.04R); the 178 it keeps +0.34R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-15T10:21:13.000Z"
+   "at": "2026-11-15T11:32:34.000Z"
   }
  ],
  "decay": {
@@ -2778,5 +2757,5 @@
  "notes": [
   "No change today: not enough evidence to move a rule."
  ],
- "proposalsBt": "2026-11-14T10:43:06.601Z"
+ "proposalsBt": "2026-11-15T11:28:57.433Z"
 }
