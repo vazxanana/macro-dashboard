@@ -101,6 +101,7 @@ jobs:
       - name: ChronosTrade audit
         env:
           AUDIT_OUT: ${{ runner.temp }}/audit/
+          BARS_ORIGIN: ${{ vars.BARS_ORIGIN }}   # empty = meridianx.dev (scripts/audit/chronostrade.cjs)
         run: |
           mkdir -p "$AUDIT_OUT"
           if node scripts/audit/chronostrade.cjs > "$AUDIT_OUT/chronostrade-1.log" 2>&1; then cat "$AUDIT_OUT/chronostrade-1.log"; exit 0; fi

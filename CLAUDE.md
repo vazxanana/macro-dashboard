@@ -3629,6 +3629,8 @@ plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; d
   ChronosTrade's windows start where a session starts, so they rarely hit the cache: `fetchBars` (backtest.html) asks a window
   the server refuses with a 5xx again in halves, down to 1,000 candles (a loaded window is fetched as before; test
   `tests/backtest-window-split.test.mjs`).
+- The ChronosTrade audit reads live candles from `BARS_ORIGIN` (repository variable; empty = meridianx.dev), so CI can use the
+  Worker's workers.dev address while the domain moves.
 - Local run: `npx wrangler@4.140.0 dev --env-file <file with SESSION_SECRET=…>` (needs `node_modules`: `npm ci`).
   Tests: `tests/cloudflare-worker.test.mjs` (routes vs vercel.json, every function run or named, the adapter, the R2 shim,
   Academy outcomes not in out/).

@@ -117,6 +117,12 @@ Users page, profile photos, notices, sounds, price alerts, Mosha lessons and Aca
 3. In Cloudflare: **Workers & Pages** → **meridianx** → **Settings** → **Domains & Routes** → **Add** → **Custom domain**
    → `meridianx.dev`.
 
+## After the first deploy
+
+In GitHub, Settings → Secrets and variables → Actions → **Variables**, add `BARS_ORIGIN` = the Worker's address (for
+example `https://meridianx.<your-name>.workers.dev`). The site's automatic browser check reads live prices from there while
+meridianx.dev is not pointed at Cloudflare yet. Remove it once meridianx.dev works again.
+
 ## Meanwhile
 
 The GitHub Pages copy stays up as the public guest page:
