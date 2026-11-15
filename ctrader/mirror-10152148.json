@@ -3961,7 +3961,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-13T15:31:59.000Z",
     "councilEntry": 3876.59,
     "stop": 3900.86,
@@ -3977,10 +3977,15 @@
     "lagSec": 72,
     "alerted": [
      "open",
-     "closefail"
+     "closefail",
+     "close"
     ],
     "stopCheckedAt": "2026-11-13T15:31:59.000Z",
-    "brokerStop": 3901.12
+    "brokerStop": 3901.12,
+    "closedAt": "2026-11-15T23:03:28.000Z",
+    "exitPrice": 3880.87,
+    "councilExit": null,
+    "councilR": -0.45
    },
    "xau-replica-1794587098-b": {
     "positionId": "49547717",
@@ -3990,7 +3995,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-13T16:26:10.000Z",
     "councilEntry": 3883.41,
     "stop": 3866.55,
@@ -4005,10 +4010,15 @@
     "lagSec": 72,
     "alerted": [
      "open",
-     "closefail"
+     "closefail",
+     "close"
     ],
     "stopCheckedAt": "2026-11-13T16:26:10.000Z",
-    "brokerStop": 3865.22
+    "brokerStop": 3865.22,
+    "closedAt": "2026-11-15T23:03:28.000Z",
+    "exitPrice": 3880.81,
+    "councilExit": null,
+    "councilR": 0.24
    },
    "xau-replica-1794597418-s": {
     "positionId": "49606352",
@@ -4018,7 +4028,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-13T19:18:31.000Z",
     "councilEntry": 3880.16,
     "stop": 3891.59,
@@ -4034,10 +4044,15 @@
     "lagSec": 93,
     "alerted": [
      "open",
-     "closefail"
+     "closefail",
+     "close"
     ],
     "stopCheckedAt": "2026-11-13T19:18:31.000Z",
-    "brokerStop": 3892.02
+    "brokerStop": 3892.02,
+    "closedAt": "2026-11-15T23:03:28.000Z",
+    "exitPrice": 3880.72,
+    "councilExit": null,
+    "councilR": -0.64
    },
    "xau-replica-1794600656-b": {
     "positionId": "49618119",
@@ -4075,7 +4090,7 @@
    "startBalance": 5478.6
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5478.6 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 5478.6 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4084,24 +4099,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 5478.6,
-  "lastRun": "2026-11-15T23:00:43.000Z"
+  "lastRun": "2026-11-15T23:03:28.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T00:07:51.000Z",
-   "msg": "not mirrored xrp-replica-1794355612-b: none of XRPUSD found at the broker",
-   "trade": "xrp-replica-1794355612-b"
-  },
-  {
-   "at": "2026-11-11T00:10:07.000Z",
-   "msg": "AUDUSD position 48230907 closed at the broker",
-   "trade": "audusd-replica-1794352189-s"
-  },
-  {
-   "at": "2026-11-11T00:25:17.000Z",
-   "msg": "BTCUSD position 48236287 closed at the broker",
-   "trade": "btc-replica-1794354313-b"
-  },
   {
    "at": "2026-11-11T00:31:26.000Z",
    "msg": "USDCHF position 48230038 closed at the broker",
@@ -5585,6 +5585,21 @@
   {
    "at": "2026-11-15T23:00:43.000Z",
    "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
+   "trade": "xau-replica-1794597418-s"
+  },
+  {
+   "at": "2026-11-15T23:03:28.000Z",
+   "msg": "closed XAUUSD position 49525852 (council: loss)",
+   "trade": "xau-replica-1794583847-s"
+  },
+  {
+   "at": "2026-11-15T23:03:28.000Z",
+   "msg": "closed XAUUSD position 49547717 (council: win)",
+   "trade": "xau-replica-1794587098-b"
+  },
+  {
+   "at": "2026-11-15T23:03:28.000Z",
+   "msg": "closed XAUUSD position 49606352 (council: loss)",
    "trade": "xau-replica-1794597418-s"
   }
  ],
