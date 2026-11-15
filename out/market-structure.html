@@ -3652,6 +3652,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 @media (max-width: 430px) { .desk-sw a { padding: 0 8px; } .desk-sw a small { margin-left: 4px; padding: 1px 4px; } }
 .desk-sw a small { font-size: 12px; letter-spacing: 0; } :root[data-theme="light"] .desk-sw a small { color: #7a5200; }   /* "soon": 12 px, and AA on the light panel (was 10 px, 3.6:1) */
 #v-mosha .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #e0a526 16%, var(--panel)); box-shadow: inset 0 0 0 1px #c98f12; }
+@media (hover: none), (pointer: coarse) { .desk-sw { padding: 2px; } .desk-sw a { min-height: 44px; } }   /* 15 Nov 2026: each desk tab is a 44 px target on touch (was 32) */
 #v-mosha .mo-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; } #v-mosha .mo-wide { grid-column: 1 / -1; }
 #v-mosha .ms-k small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; } #v-mosha .ms-k .ms-tbtn { margin-left: auto; }
 #v-mosha .mo-verdict { margin: 4px 0 12px; font: 600 15px/1.4 var(--sans); color: var(--ink); } #v-mosha .mo-verdict.mo-pos { color: var(--buy); } #v-mosha .mo-verdict.mo-neg { color: var(--sell); } #v-mosha .mo-verdict.mo-few, #v-mosha .mo-verdict.mo-none { color: var(--ink-dim); }
@@ -4800,6 +4801,20 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   #v-council #ms-sb-h th button { min-height: 44px; min-width: 44px; }
   #v-council #ms-sb-b a, #ms-cp-macro .md-full { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
   #v-council #ms-cp-overview button { min-width: 44px; }
+}
+</style>
+<style id="ms-sz-css">
+/* Setup, Scanner, Crypto and LIT: no text under 12 px, 44 px touch targets (15 Nov 2026, the open item of the 12 Nov sweep).
+   Display only, scoped to the four views; the coin icon letters (.cx-ic) stay as they are. Add later size fixes for these views here. */
+:is(#v-setup, #v-scanner, #v-crypto, #v-lit) :is(#ms-td-bias, #ms-lvl-count, #ms-scan-meta, .ms-dot, .lv-h, .ms-al, .ms-chip, .ms-st,
+  .tr-d, .ms-q, .ms-tr-n, .ms-tag, .ms-tr-g > span, #ms-pb-ctx > div > span, #ps-t-kv > div > span, .ms-risk label, .lv-p, .lv-r, .lv-d, .cx-st, .chip, .cx-tag, th, i.u, i.d,
+  small:not(.ms-k small, .desk-sw small)) { font-size: 12px; }
+#v-setup .ms-tr-g > span { letter-spacing: .3px; }
+@media (hover: none), (pointer: coarse) {
+  :is(#v-setup, #v-scanner, #v-crypto, #v-lit) :is(#ms-scan-btn, #ms-risk, #ms-log, button.ms-bell) { min-height: 44px; }
+  #v-setup label:has(> input[type="checkbox"]) { min-height: 44px; display: flex; align-items: center; }
+  #v-setup label > input[type="checkbox"] { width: 20px; height: 20px; }
+  #v-crypto :is(.cx-seg, .cx-tf) button, #v-setup #ms-tr-filter button { min-height: 44px; }
 }
 </style>
 <style id="ms-ps-css">
@@ -12844,7 +12859,8 @@ function gpStats(T) {
       + ks.map(function (k, i) { var v = byY[k], h = Math.max(1, Math.abs(v) * sc), x = 5 + i * bw + bw * 0.2, ww = bw * 0.6, y = v >= 0 ? z - h : z;
         return '<rect class="' + (v >= 0 ? 'p' : 'n') + '" x="' + x + '" y="' + y + '" width="' + ww + '" height="' + h + '" rx="3"><title>' + k + ': ' + sR(v) + '</title></rect><text class="v" x="' + (x + ww / 2) + '" y="' + (v >= 0 ? y - 4 : y + h + 12) + '" text-anchor="middle">' + sR(v) + '</text><text x="' + (x + ww / 2) + '" y="' + (H2 - 4) + '" text-anchor="middle">' + k + '</text>'; }).join('') + '</svg>';
   }
-  // P&L calendar: closed trades by the New York day they closed (open trades on today's date with their floating R)
+  // P&L calendar: closed trades by the New York day they closed. A day's figure is closed trades only (owner, 15 Nov 2026: "count the
+  // closed trades of the day for the daily pnl"); an open trade is listed on today's date with its floating R but never added in.
   function renderCal(A) {
     var took = ls.get('msGpTook', {}), src = ST.calSrc, byDay = {}, today = nyp(Date.now() / 1000).d;
     var T = A.T.filter(function (x) { return !x.pending && (src !== 'took' || took[x.d]); });
@@ -12857,16 +12873,16 @@ function gpStats(T) {
     $('gp-cal-m').innerHTML = esc(mlab) + ' <small class="' + (mR > 0 ? 'pos' : mR < 0 ? 'neg' : '') + '">' + (mon.length ? sR(mR) + ' · ' + mon.length + ' closed' : 'no closed trades') + '</small>';
     var months = {}; yr.forEach(function (x) { var k = x.exitD.slice(5, 7); months[k] = (months[k] || 0) + x.R; }); var up = Object.keys(months).filter(function (k) { return months[k] > 0; }).length;
     $('gp-cal-y').textContent = y + ': ' + (yr.length ? sR(yR) + ' from ' + yr.length + ' closed trades, ' + Math.round(wins / yr.length * 100) + '% winners, ' + up + ' of ' + Object.keys(months).length + ' months up' : 'no closed trades') + (src === 'took' ? ' (only the ones you ticked)' : ' (every signal, backtest + live)') + '.';
-    var vals = Object.keys(byDay).filter(function (k) { return k.slice(0, 7) === mm; }).map(function (k) { return Math.abs(byDay[k].reduce(function (s, x) { return s + x.R; }, 0)); }), mx = Math.max.apply(null, [3].concat(vals));
+    var vals = Object.keys(byDay).filter(function (k) { return k.slice(0, 7) === mm; }).map(function (k) { return Math.abs(byDay[k].reduce(function (s, x) { return s + (x.open ? 0 : x.R); }, 0)); }), mx = Math.max.apply(null, [3].concat(vals));
     var html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) { return '<div class="ict-cal-h">' + d + '</div>'; }).join('') + new Array(lead + 1).join('<div></div>');
     for (var d = 1; d <= days; d++) {
-      var k = mm + '-' + String(d).padStart(2, '0'), a = byDay[k] || [], R = a.reduce(function (s, x) { return s + x.R; }, 0), heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, op = a.filter(function (x) { return x.open; }).length, tk = a.filter(function (x) { return took[x.d]; }).length;
-      html += '<button type="button" class="ict-cal-d' + (a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : '') : '') + (ST.calDay === k ? ' sel' : '') + (k === today ? ' today' : '') + ((lead + d - 1) % 7 >= 5 ? ' we' : '') + '" data-gk="' + k + '" style="--heat:' + heat.toFixed(2) + '"' + (a.length ? '' : ' disabled')
-        + ' aria-label="' + d + ' ' + esc(mlab) + ': ' + (a.length ? sR(R) + ', ' + a.length + ' trades' : 'no trades') + '"><span class="d">' + d + '</span>' + (a.length ? '<b>' + sR(R) + '</b><small>' + (op ? op + ' open' : a.length + (a.length > 1 ? ' trades' : ' trade')) + (tk && src !== 'took' ? ' · <span class="tk">' + tk + ' taken</span>' : '') + '</small>' : '') + '</button>';
+      var k = mm + '-' + String(d).padStart(2, '0'), a = byDay[k] || [], cl = a.filter(function (x) { return !x.open; }), R = cl.reduce(function (s, x) { return s + x.R; }, 0), heat = cl.length ? Math.min(1, Math.abs(R) / mx) : 0, op = a.length - cl.length, tk = a.filter(function (x) { return took[x.d]; }).length;
+      html += '<button type="button" class="ict-cal-d' + (cl.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : '') : '') + (ST.calDay === k ? ' sel' : '') + (k === today ? ' today' : '') + ((lead + d - 1) % 7 >= 5 ? ' we' : '') + '" data-gk="' + k + '" style="--heat:' + heat.toFixed(2) + '"' + (a.length ? '' : ' disabled')
+        + ' aria-label="' + d + ' ' + esc(mlab) + ': ' + (a.length ? (cl.length ? sR(R) + ' from ' + cl.length + ' closed' : 'nothing closed') + (op ? ', ' + op + ' open, not counted' : '') : 'no trades') + '"><span class="d">' + d + '</span>' + (a.length ? '<b>' + (cl.length ? sR(R) : '—') + '</b><small>' + (cl.length ? cl.length + ' closed' : '') + (cl.length && op ? ' · ' : '') + (op ? op + ' open' : '') + (tk && src !== 'took' ? ' · <span class="tk">' + tk + ' taken</span>' : '') + '</small>' : '') + '</button>';
     }
     $('gp-cal').innerHTML = html;
     var sel = ST.calDay && byDay[ST.calDay], off = ST.off;
-    $('gp-cal-day').innerHTML = sel ? sel.map(function (x) { return '<li><span class="ms-chip ms-chip-buy">BUY</span><b>' + esc(dLbl(x.d)) + ' signal</b><span class="m">' + f2(x.e + off) + ' → ' + (x.open ? 'open' : x.how) + '</span><b class="' + (x.R > 0 ? 'pos' : 'neg') + '">' + sR(x.R) + (x.open ? ' floating' : '') + '</b><small>' + (took[x.d] ? 'you took it' : 'not ticked') + ' · held from ' + esc(dLbl(x.entryD)) + '</small></li>'; }).join('') : '';
+    $('gp-cal-day').innerHTML = sel ? sel.map(function (x) { return '<li><span class="ms-chip ms-chip-buy">BUY</span><b>' + esc(dLbl(x.d)) + ' signal</b><span class="m">' + f2(x.e + off) + ' → ' + (x.open ? 'open' : x.how) + '</span><b class="' + (x.R > 0 ? 'pos' : 'neg') + '">' + sR(x.R) + (x.open ? ' floating, not counted' : '') + '</b><small>' + (took[x.d] ? 'you took it' : 'not ticked') + ' · held from ' + esc(dLbl(x.entryD)) + '</small></li>'; }).join('') : '';
   }
   var TW = [
     ['Rule as written (top 30%, 3R, 10 days)', '+63.7R / −11.9', '+95.2R / −14.6', 'kept'],
