@@ -101,7 +101,7 @@ export class NodeRes {
   redirect(a, b) { const [c, url] = typeof a === 'number' ? [a, b] : [302, a]; this.code = c; this.h.set('location', url); this.finish(null); return this; }
   // streaming (api/stream.js): the first write sends the head, later writes go straight to the browser
   write(chunk) {
-    if (this.done) return false;
+    if (this.done && !this.w) return false;   // already answered in one piece
     if (!this.w) { const ts = new TransformStream(); this.w = ts.writable.getWriter(); this.enc = new TextEncoder(); this.done = true; this.resolve(new Response(this.head ? null : ts.readable, { status: this.code, headers: this.h })); }
     this.w.write(typeof chunk === 'string' ? this.enc.encode(chunk) : chunk).catch(() => {});
     return true;

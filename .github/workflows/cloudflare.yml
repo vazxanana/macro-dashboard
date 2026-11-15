@@ -15,6 +15,8 @@ on:
       - 'council/engine.mjs'
       - 'wrangler.toml'
       - 'package.json'
+      - 'academy/**'
+      - 'ml/models/index.json'
       - '.github/workflows/cloudflare.yml'
   workflow_dispatch:
 
@@ -75,6 +77,18 @@ jobs:
             echo "::warning::Could not create the R2 bucket meridianx-blob (see above). The deploy will say whether it can bind it."
           fi
           rm -f r2.log
+
+      - name: Upload the Academy's data to the private bucket
+        if: steps.ready.outputs.ok == 'true'
+        # trade outcomes: never in the public assets (cf/academy-data.mjs reads them from R2)
+        run: |
+          set +x
+          n=0
+          for f in academy/data/*.json; do
+            npx --yes "$WRANGLER" r2 object put "meridianx-blob/academy-data/$(basename "$f")" --file "$f" --content-type application/json --remote > /dev/null && n=$((n + 1))
+          done
+          npx --yes "$WRANGLER" r2 object put meridianx-blob/academy-data/ml-index.json --file ml/models/index.json --content-type application/json --remote > /dev/null && n=$((n + 1))
+          echo "$n Academy files uploaded."
 
       - name: Deploy the Worker
         if: steps.ready.outputs.ok == 'true'

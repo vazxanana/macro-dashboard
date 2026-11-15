@@ -1,0 +1,111 @@
+// The site on Cloudflare (cf/worker.mjs, cf/blob-r2.mjs, wrangler.toml), offline: routes match vercel.json, every Vercel
+// function is either run or named as not run, the request / response adapter, the R2 stand-in for @vercel/blob, and the
+// Academy's outcome files never in the public assets.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const W = await import('../cf/worker.mjs');
+const B = await import('../cf/blob-r2.mjs');
+const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+const toml = fs.readFileSync(path.join(ROOT, 'wrangler.toml'), 'utf8');
+
+test('every vercel.json API rewrite routes to the same function', () => {
+  assert.deepEqual(W.route('/api/mcp/fred.abc'), { fn: 'mcp', q: { key: 'fred.abc' } });
+  assert.deepEqual(W.route('/api/academy-mcp/k1'), { fn: 'academy-mcp', q: { key: 'k1' } });
+  assert.deepEqual(W.route('/cdata/ict/replay.json'), { fn: 'data', q: { p: 'ict/replay.json' } });
+  assert.equal(W.route('/md/bars').fn, 'bars');
+  assert.equal(W.route('/md/stream').fn, 'stream');
+  assert.equal(W.route('/api/login').fn, 'login');
+  assert.equal(W.route('/assets/x.js'), null);
+  for (const r of vercel.rewrites) if (/^\/(api|cdata|md)\//.test(r.source)) assert.ok(W.route(r.source.replace(/:\w+\*?/g, 'x')), r.source);
+});
+test('every Vercel function is run on Cloudflare or named as not run', () => {
+  const fns = fs.readdirSync(path.join(ROOT, 'api')).filter((f) => !f.startsWith('_') && /\.m?js$/.test(f)).map((f) => f.replace(/\.m?js$/, ''));
+  const src = fs.readFileSync(path.join(ROOT, 'cf/worker.mjs'), 'utf8');
+  for (const f of fns) assert.ok(W.API[f] || f === 'run' || f === 'og', `api/${f} is neither run nor named`);
+  assert.match(src, /NOT_HERE = \{ run:/);
+  assert.match(src, /\/api\/og/);
+});
+test('crons: the price alerts and the second opinion, as in vercel.json; no council run', () => {
+  const paths = vercel.crons.map((c) => c.path);
+  assert.ok(paths.includes('/api/alert-cron') && paths.some((p) => p.startsWith('/api/edge-analyst')));
+  assert.deepEqual(W.CRONS['* * * * *'][0], 'alert-cron');
+  assert.deepEqual(W.CRONS['*/10 * * * *'], ['edge-analyst', { job: 'scan' }]);
+  for (const c of Object.keys(W.CRONS)) assert.ok(toml.includes(`"${c}"`), c);
+});
+test('wrangler.toml: the assets, the R2 bucket, the alias and the Worker-first paths', () => {
+  assert.match(toml, /directory = "out"/);
+  assert.match(toml, /bucket_name = "meridianx-blob"/);
+  assert.match(toml, /"@vercel\/blob" = "\.\/cf\/blob-r2\.mjs"/);
+  for (const p of ['/api/*', '/cdata/*', '/md/*', '/gold', '/macro-desk', '/backtest', '/academy']) assert.ok(toml.includes(`"${p}"`), p);
+  assert.match(toml, /compatibility_flags = \["nodejs_compat"\]/);
+});
+test('request adapter: headers, query, JSON body, the client IP only from Cloudflare', async () => {
+  const req = await W.nodeReq(new Request('https://x.dev/api/login?a=1', { method: 'POST', headers: { 'content-type': 'application/json', 'x-real-ip': '6.6.6.6', 'cf-connecting-ip': '1.2.3.4' }, body: '{"password":"p"}' }), { b: '2' });
+  assert.deepEqual(req.query, { a: '1', b: '2' });
+  assert.deepEqual(req.body, { password: 'p' });
+  assert.equal(req.headers['x-real-ip'], '1.2.3.4');
+  const spoof = await W.nodeReq(new Request('https://x.dev/api/me', { headers: { 'x-real-ip': '6.6.6.6', 'x-forwarded-for': '6.6.6.6' } }));
+  assert.equal(spoof.headers['x-real-ip'], undefined);
+  assert.equal(spoof.headers['x-forwarded-for'], undefined);
+  const bad = await W.nodeReq(new Request('https://x.dev/api/x', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{bad' }));
+  assert.equal(bad.body, '{bad');
+});
+test('response adapter: status, json, send, 304 / HEAD without a body, redirect, streaming', async () => {
+  let r = new W.NodeRes(); r.status(201).json({ a: 1 }); let x = await r.p;
+  assert.equal(x.status, 201); assert.deepEqual(await x.json(), { a: 1 });
+  r = new W.NodeRes(); r.setHeader('ETag', '"c-1"'); r.status(304).end(); x = await r.p; assert.equal(x.status, 304); assert.equal(x.body, null); assert.equal(x.headers.get('etag'), '"c-1"');
+  r = new W.NodeRes(true); r.status(200).send('hello'); x = await r.p; assert.equal(x.body, null);
+  r = new W.NodeRes(); r.redirect('/x'); x = await r.p; assert.equal(x.status, 302); assert.equal(x.headers.get('location'), '/x');
+  r = new W.NodeRes(); r.send(Buffer.from('ab')); x = await r.p; assert.equal(await x.text(), 'ab');
+  r = new W.NodeRes(); r.writeHead(200, { 'Content-Type': 'text/event-stream' }); r.write('a\n'); r.write('b\n'); r.end();
+  x = await r.p; assert.equal(x.headers.get('content-type'), 'text/event-stream'); assert.equal(await x.text(), 'a\nb\n');
+});
+test('a handler that throws answers 500 without its message', async () => {
+  W.API.__t = () => { throw new Error('secret detail'); };
+  const x = await W.runFn('__t', new Request('https://x.dev/api/__t'), {}, null); delete W.API.__t;
+  assert.equal(x.status, 500); assert.doesNotMatch(await x.text(), /secret detail/);
+  assert.equal((await W.runFn('run', new Request('https://x.dev/api/run'), {}, null)).status, 503);
+});
+// a fake R2 bucket with the calls cf/blob-r2.mjs uses
+function fakeR2() {
+  const m = new Map(); let n = 0;
+  const obj = (key) => { const v = m.get(key); return v && { key, size: v.data.length, uploaded: v.at, httpEtag: `"e${v.e}"`, httpMetadata: v.meta, body: v.data, text: async () => v.data }; };
+  return {
+    m,
+    async put(key, data, o = {}) { m.set(key, { data: typeof data === 'string' ? data : Buffer.from(data).toString(), at: new Date(), e: ++n, meta: o.httpMetadata || {} }); return obj(key); },
+    async head(key) { return obj(key) || null; },
+    async get(key) { return obj(key) || null; },
+    async delete(keys) { for (const k of [].concat(keys)) m.delete(k); },
+    async list({ prefix = '' } = {}) { return { objects: [...m.keys()].filter((k) => k.startsWith(prefix)).sort().map(obj), truncated: false }; },
+  };
+}
+test('blob stand-in: put / list / fetch / del keep the Vercel pathname, random suffix like Vercel', async () => {
+  const b = fakeR2(); B.useBucket(b);
+  const a = await B.put('notices/list.json', '[1]', { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json' });
+  assert.equal(a.pathname, 'notices/list.json'); assert.ok(a.url.startsWith(B.BASE)); assert.ok(a.etag);
+  const s = await B.put('users/1.json', '{}', { addRandomSuffix: true });
+  assert.match(s.pathname, /^users\/1-[a-z0-9]{21}\.json$/);
+  await assert.rejects(B.put('notices/list.json', 'x', { allowOverwrite: false }));
+  const l = await B.list({ prefix: 'notices/' });
+  assert.equal(l.blobs.length, 1); assert.ok(l.blobs[0].uploadedAt instanceof Date); assert.equal(l.hasMore, false);
+  const r = await fetch(l.blobs[0].url + '?cache=0', { headers: { Authorization: 'Bearer x' } });   // the Worker's fetch wrapper (imported above)
+  assert.equal(r.status, 200); assert.equal(await r.text(), '[1]');
+  assert.equal((await fetch(B.BASE + 'missing.json')).status, 404);
+  await B.del([l.blobs[0].url, s.url]); assert.equal(b.m.size, 0);
+});
+test('the Academy outcomes are not in the public site; the Worker reads them from the private bucket', async () => {
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [e.name]);
+  assert.ok(!walk(path.join(ROOT, 'out')).some((f) => /^(out|cand|feat)-[a-z-]+\.json$/.test(f)), 'an Academy data file is in out/');
+  const { academyData, PREFIX } = await import('../cf/academy-data.mjs');
+  const b = fakeR2(); await b.put(PREFIX + 'out-geg.json', '{"outcomes":[]}');
+  const d = academyData(b);
+  assert.deepEqual(await d.outcomes('geg'), { outcomes: [] });
+  assert.equal(await d.candidates('geg'), null);
+  assert.ok(Array.isArray(await d.edges()));
+  const wf = fs.readFileSync(path.join(ROOT, '.github/workflows/cloudflare.yml'), 'utf8');
+  assert.match(wf, /academy-data\/\$\(basename/);
+});

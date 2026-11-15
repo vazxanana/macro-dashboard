@@ -8,7 +8,7 @@ let bucket = null;
 export function useBucket(b) { bucket = b; }
 const need = () => { if (!bucket) throw new Error('blob store not configured (R2 binding BLOB)'); return bucket; };
 const keyOf = (u) => { const s = String(u || ''); return decodeURIComponent((s.startsWith(BASE) ? s.slice(BASE.length) : s.replace(/^https?:\/\/[^/]+\//, '')).split('?')[0]); };
-const rand = () => Array.from(crypto.getRandomValues(new Uint8Array(15)), (b) => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('').slice(0, 21);
+const rand = () => Array.from(crypto.getRandomValues(new Uint8Array(21)), (b) => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('').slice(0, 21);
 function suffixed(p) { const i = p.lastIndexOf('.'), j = p.lastIndexOf('/'); return i > j ? `${p.slice(0, i)}-${rand()}${p.slice(i)}` : `${p}-${rand()}`; }
 const rec = (o) => ({ url: BASE + o.key, downloadUrl: BASE + o.key + '?download=1', pathname: o.key, size: o.size, uploadedAt: o.uploaded instanceof Date ? o.uploaded : new Date(o.uploaded || Date.now()), etag: o.httpEtag || (o.etag ? `"${o.etag}"` : undefined), contentType: o.httpMetadata && o.httpMetadata.contentType });
 
