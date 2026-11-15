@@ -926,3 +926,10 @@ test('15 Nov: each tab of the desk switch is a 44 px target on touch screens (wa
   const css = styles(src('market-structure.html'));
   assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{ \.desk-sw \{ padding: 2px; \} \.desk-sw a \{ min-height: 44px; \} \}/);
 });
+
+test('15 Nov: ChronosTrade\'s session form is 44 px on touch (Hide, market, start, days, name, Load, saved sessions, Resume, New were 28-38 px on a phone)', () => {
+  const css = styles(src('backtest.html'));
+  const m = /@media \(pointer: coarse\) \{ #sess :is\(([^)]*)\) \{ min-height: 44px; \}/.exec(css);
+  assert.ok(m, 'the touch rule for the session form');
+  for (const id of ['#sess-toggle', '#sym', '#start', '#days', '#sname', '#load', '#sessions', '#resume', '#newsess']) assert.ok(m[1].includes(id), id);
+});

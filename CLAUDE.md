@@ -2490,7 +2490,8 @@ main-system rows; the guest-cut lists match the page's `SYS_K` / `SYSG` (Mosha c
   **Done 15 Nov 2026** for Setup, Scanner, Crypto and LIT: `<style id="ms-sz-css">` (after `#ms-hc-css`, every rule scoped to
   the four views) raises every text under 12 px to 12 (chips, status badges, tags, scanner rows, trade-card labels, the LIT and Crypto
   tables; the coin icon letters `.cx-ic` excepted) and gives their buttons and checkbox rows 44 px on touch; measured at 390 and
-  1440 px: none left, no view wider. The desk switch tabs are 44 px on touch on every desk (were 32); the header is unchanged. Test: `tests/qa-sweep.test.mjs` ("15 Nov"). Tests: `tests/qa-sweep.test.mjs` ("QA 12 Nov", six tests), `scripts/audit/smoke.cjs`.
+  1440 px: none left, no view wider. The desk switch tabs are 44 px on touch on every desk (were 32), and ChronosTrade's session form
+  too (backtest.html, a `(pointer: coarse)` rule on `#sess`; was 28-38 px); the header is unchanged. Test: `tests/qa-sweep.test.mjs` ("15 Nov"). Tests: `tests/qa-sweep.test.mjs` ("QA 12 Nov", six tests), `scripts/audit/smoke.cjs`.
 
 ## Browser audits: false failures traced to their causes (11 Nov 2026)
 The three browser audits (`scripts/audit/smoke.cjs`, `chronostrade.cjs`, `academy.cjs`) share `scripts/audit/shared.cjs`. Rules for
