@@ -31,8 +31,7 @@ Two more things, measured on 15 Nov 2026:
 - **What visitors see** comes from copies the council loop prepares every round. If the loop stops, visitors keep seeing the
   last copy for up to a day, instead of getting an error.
 - **The biggest candle requests** (5,000 candles at once, used when ChronosTrade loads a past window) are near the time limit.
-  The site keeps every answer for a while, so each window is prepared only once. If ChronosTrade ever fails to load a past
-  day, say so and the page will ask for smaller windows.
+  The site keeps every answer for a while, and if one is refused, ChronosTrade asks for it again in smaller pieces by itself.
 
 ## Step by step
 

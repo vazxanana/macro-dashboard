@@ -1093,7 +1093,24 @@
     renderHtf(); drawLines(); renderAccount(); renderOpen(); renderPF(); nowTxt(); setT('px-now', px() != null ? `last ${fmt(px())}` : ''); if (D && D.type === 'market') { const dl = px() - D.entry; if (dl) { D.entry = px(); D.stop = rnd(D.stop + dl); if (D.target != null) D.target = rnd(D.target + dl); setRef(); } syncDraft(); } else if (D) calc(); const c = cur(); if (c && !RV) { const pb = S.bars[S.idx - 2]; setH('legend', lgHTML(c, pb ? pb.close : null)); } ps(); CO.tick(); }
 
   // ---- data ----
-  async function fetchBars(sym, tf, from, to, onProgress) { const sec = TFS[tf], out = [], total = Math.ceil((to - from) / (4999 * sec)); let k = 0; for (let a = from; a < to; a += 4999 * sec) { const b = Math.min(to, a + 4999 * sec); if (onProgress) onProgress(++k, total); const r = await fetch(`${BASE}?sym=${sym}&tf=${tf}&from=${a}&to=${b}`); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`); const j = await r.json(); for (const x of j.bars || []) if (!x.live && (!out.length || x.time > out[out.length - 1].time)) out.push(x); } return out; }
+  // A window the server refuses with a 5xx is asked again in two halves, down to 500 candles (15 Nov 2026: on the Cloudflare
+  // free plan a 5,000-candle window can pass the ~10 ms CPU limit and answer 503; a window that loads is fetched as before).
+  async function fetchBars(sym, tf, from, to, onProgress) {
+    const sec = TFS[tf], out = [], total = Math.ceil((to - from) / (4999 * sec)); let k = 0;
+    const one = async (a, b) => {
+      const r = await fetch(`${BASE}?sym=${sym}&tf=${tf}&from=${a}&to=${b}`);
+      if (!r.ok) {
+        if (r.status >= 500 && (b - a) / sec > 1000) { const m = a + Math.floor((b - a) / sec / 2) * sec; return (await one(a, m)).concat(await one(m, b)); }
+        throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
+      }
+      return (await r.json()).bars || [];
+    };
+    for (let a = from; a < to; a += 4999 * sec) {
+      const b = Math.min(to, a + 4999 * sec); if (onProgress) onProgress(++k, total);
+      for (const x of await one(a, b)) if (!x.live && (!out.length || x.time > out[out.length - 1].time)) out.push(x);
+    }
+    return out;
+  }
   $('load').addEventListener('click', async () => {
     const sym = $('sym').value, tf = $('tf').value, st = Math.floor(new Date($('start').value + 'Z').getTime() / 1000), days = Math.min(120, Math.max(1, +$('days').value || 20));
     if (!st) { $('loadmsg').textContent = 'Pick a start.'; return; }

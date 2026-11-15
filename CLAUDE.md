@@ -3626,8 +3626,9 @@ plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; d
   in 1.8 ms, 1,500 in 2.7 ms, 5,000 in 11.4 ms (4.4 ms of it is parsing OANDA's own answer). `edgeCached` keeps public
   answers (candles, a visitor's guest files; never a request with a cookie, an Authorization header or the member mark) in
   Cloudflare's cache for their own s-maxage, so a window is converted once per location (local run: 0.59 s, then 6 ms).
-  A first 5,000-candle window (ChronosTrade's past windows) can still pass the limit; if Cloudflare refuses those, ask for
-  smaller windows in the page.
+  ChronosTrade's windows start where a session starts, so they rarely hit the cache: `fetchBars` (backtest.html) asks a window
+  the server refuses with a 5xx again in halves, down to 1,000 candles (a loaded window is fetched as before; test
+  `tests/backtest-window-split.test.mjs`).
 - Local run: `npx wrangler@4.140.0 dev --env-file <file with SESSION_SECRET=…>` (needs `node_modules`: `npm ci`).
   Tests: `tests/cloudflare-worker.test.mjs` (routes vs vercel.json, every function run or named, the adapter, the R2 shim,
   Academy outcomes not in out/).
