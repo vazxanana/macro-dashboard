@@ -26,6 +26,10 @@ import moshaLessons from '../api/mosha-lessons.js';
 import mcp from '../api/mcp.js';
 import ctraderLink from '../api/ctrader-link.js';
 import bridge from '../api/bridge.js';
+import MT5_BRIDGE from '../mt5/CouncilBridge.mq5';
+import CT_BRIDGE from '../ctrader/CouncilBridge.cs';
+const BRIDGE_SRC = { 'mt5/CouncilBridge.mq5': MT5_BRIDGE, 'ctrader/CouncilBridge.cs': CT_BRIDGE };
+bridge.setReader((f) => { if (BRIDGE_SRC[f] == null) throw new Error('missing'); return BRIDGE_SRC[f]; });   // no disk: the two sources bundled as text (wrangler.toml rules)
 import tvWebhook from '../api/tv-webhook.js';
 import pine from '../api/pine.js';
 import edgeAnalyst from '../api/edge-analyst.js';

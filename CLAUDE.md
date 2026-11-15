@@ -3611,6 +3611,9 @@ plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; d
   keyed by the Vercel pathname; random suffixes like Vercel's; a blob "URL" is `https://blob.r2.internal/<key>` and the Worker's
   fetch wrapper answers it from the bucket, so `?cache=0` reads are exact). `BLOB_READ_WRITE_TOKEN = "r2-binding"` is a
   placeholder var (the handlers check that a token is set). Moving the old data: `blob-to-r2.yml` / `scripts/blob-to-r2.mjs`.
+- **Bridge downloads**: `api/bridge.js` reads its two sources through `readSrc` (disk on Vercel); the Worker bundles
+  `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` as text (`[[rules]] Text`) and hands them over with `setReader`.
+  The Worker test registers the same text rule for Node.
 - **Academy data**: trade outcomes never go in the public assets; the deploy uploads `academy/data/*.json` (+
   `ml/models/index.json` as `ml-index.json`) to R2 `academy-data/`, read by `cf/academy-data.mjs` through `academy.handle`'s
   `d.data` hook.

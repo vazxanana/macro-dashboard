@@ -7,6 +7,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+// the Worker bundles the two bridge sources as text (wrangler.toml rules); Node needs the same rule to import it
+import { register } from 'node:module';
+register('data:text/javascript,' + encodeURIComponent("export async function load(url, ctx, next) { if (/\\.(mq5|cs)$/.test(url)) { const fs = await import('node:fs'); return { format: 'module', shortCircuit: true, source: 'export default ' + JSON.stringify(fs.readFileSync(new URL(url), 'utf8')) }; } return next(url, ctx); }"));
 const W = await import('../cf/worker.mjs');
 const B = await import('../cf/blob-r2.mjs');
 const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
@@ -137,4 +140,21 @@ test('Fred\'s connector on a host without processes: the syntax check says so in
   try { assert.match(syntaxCheck('ict/x.mjs', 'export const = ;\n'), /not checked on this host/); assert.throws(() => syntaxCheck('a.json', '{'), /not valid JSON/, 'JSON is still parsed'); }
   finally { delete process.env.MCP_NO_EXEC; }
   assert.match(toml, /MCP_NO_EXEC = "1"/);
+});
+test('the bridge sources the owner downloads are bundled in the Worker, byte for byte', async () => {
+  const { createRequire } = await import('node:module'); const req = createRequire(import.meta.url);
+  const bridge = req('../api/bridge.js');
+  assert.match(toml, /globs = \["\*\*\/\*\.mq5", "\*\*\/\*\.cs"\]/);
+  let txt;
+  // the Worker set the reader at import: read each file through the handler's own path
+  for (const [k, f] of Object.entries(bridge.FILES)) {
+    const S = req('../api/_session.js'), A = req('../api/_accounts.js'), env = { SESSION_SECRET: 'test-secret-0123456789abcdef' };
+    const old = process.env.SESSION_SECRET; process.env.SESSION_SECRET = env.SESSION_SECRET;
+    try {
+      const tok = S.issue(env, 'owner', A.OWNER_HASH, { u: 'owner', name: 'Owner', role: 'owner' });
+      const x = await W.runFn('bridge', new Request('https://x.dev/api/bridge', { method: 'POST', headers: { 'content-type': 'application/json', origin: 'https://x.dev', host: 'x.dev', cookie: `${S.COOKIE}=${tok}` }, body: JSON.stringify({ file: k }) }), {}, null);
+      txt = await x.text(); assert.equal(x.status, 200, k);
+      assert.equal(txt, fs.readFileSync(path.join(ROOT, f), 'utf8'), f);
+    } finally { if (old === undefined) delete process.env.SESSION_SECRET; else process.env.SESSION_SECRET = old; }
+  }
 });

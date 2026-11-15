@@ -21,6 +21,12 @@ bucket_name = "meridianx-blob"
 [triggers]
 crons = ["* * * * *", "*/10 * * * *"]
 
+# the bridge sources the owner downloads from the site (api/bridge.js), bundled as text
+[[rules]]
+type = "Text"
+globs = ["**/*.mq5", "**/*.cs"]
+fallthrough = true
+
 [alias]
 "@vercel/blob" = "./cf/blob-r2.mjs"
 
