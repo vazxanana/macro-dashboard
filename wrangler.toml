@@ -31,3 +31,5 @@ enabled = true
 # Not a secret: the functions check that a Blob token is set before they use storage; on Cloudflare storage is the R2 binding
 # BLOB (cf/blob-r2.mjs ignores the token).
 BLOB_READ_WRITE_TOKEN = "r2-binding"
+# a visitor gets the loop's ready guest copy up to a day old: cutting the big files here would pass the free plan's CPU limit
+GUEST_PRECUT_MAX_MIN = "1440"

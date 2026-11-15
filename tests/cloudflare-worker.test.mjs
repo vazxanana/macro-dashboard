@@ -109,3 +109,22 @@ test('the Academy outcomes are not in the public site; the Worker reads them fro
   const wf = fs.readFileSync(path.join(ROOT, '.github/workflows/cloudflare.yml'), 'utf8');
   assert.match(wf, /academy-data\/\$\(basename/);
 });
+test('edge cache: public candles and a visitor\'s guest files only, kept for their s-maxage, 304 on a matching ETag', async () => {
+  const route = (p) => W.route(p), R = (u, h = {}) => new Request(u, { headers: h });
+  assert.equal(W.cacheable(route('/md/bars'), R('https://x.dev/md/bars?sym=xau'), new URL('https://x.dev/md/bars?sym=xau')), true);
+  assert.equal(W.cacheable(route('/cdata/trades.json'), R('https://x.dev/cdata/trades.json'), new URL('https://x.dev/cdata/trades.json')), true);
+  assert.equal(W.cacheable(route('/cdata/trades.json'), R('https://x.dev/cdata/trades.json', { cookie: 'ms_session=a' }), new URL('https://x.dev/cdata/trades.json')), false, 'a cookie');
+  assert.equal(W.cacheable(route('/cdata/trades.json'), R('https://x.dev/cdata/trades.json?m=1'), new URL('https://x.dev/cdata/trades.json?m=1')), false, 'the member mark');
+  assert.equal(W.cacheable(route('/api/me'), R('https://x.dev/api/me'), new URL('https://x.dev/api/me')), false);
+  const store = new Map(), cache = { async match(k) { const v = store.get(k.url); return v ? v.clone() : undefined; }, async put(k, v) { store.set(k.url, v); } };
+  let runs = 0; const u = new URL('https://x.dev/md/bars?sym=xau&n=5');
+  const run = async () => { runs++; return new Response('{"bars":[]}', { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=20', ETag: '"e1"' } }); };
+  const a = await W.edgeCached(R(u), u, run, null, cache); assert.equal(a.headers.get('cache-control'), 'public, max-age=0, s-maxage=20');
+  await new Promise((r) => setTimeout(r, 5));
+  const b = await W.edgeCached(R(u), u, run, null, cache);
+  assert.equal(runs, 1, 'a hit runs no code'); assert.equal(await b.text(), '{"bars":[]}');
+  assert.equal(b.headers.get('cache-control'), 'public, max-age=0, s-maxage=20'); assert.equal(b.headers.get('x-mx-cc'), null);
+  assert.equal((await W.edgeCached(R(u, { 'if-none-match': '"e1"' }), u, run, null, cache)).status, 304);
+  const priv = new URL('https://x.dev/md/bars?p=1'); await W.edgeCached(R(priv), priv, async () => new Response('x', { headers: { 'Cache-Control': 'private, no-store' } }), null, cache);
+  assert.ok(!store.has(priv.toString()), 'a private answer is never stored');
+});

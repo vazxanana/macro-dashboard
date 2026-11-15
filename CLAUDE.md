@@ -3620,6 +3620,14 @@ plan) is the whole site with its functions. Owner guide: `docs/cloudflare.md`; d
 - **Deploy**: `cloudflare.yml` (push to main on served paths + manual): ends green with a notice until the owner adds
   `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; then creates the bucket, uploads the Academy data, `wrangler@4.140.0
   deploy`, and copies the listed GitHub secrets to the Worker (names only in the log).
+- **CPU, measured 15 Nov 2026** (Node, real council-data): cutting a guest file on the fly takes 13.7 ms (trades.json) and
+  19.8 ms (ict/replay.json), over the free plan's ~10 ms, so the Worker serves the loop's ready cuts up to a day old
+  (`GUEST_PRECUT_MAX_MIN = "1440"` in wrangler.toml; 30 min elsewhere) rather than cut them. Converting OANDA candles: 500
+  in 1.8 ms, 1,500 in 2.7 ms, 5,000 in 11.4 ms (4.4 ms of it is parsing OANDA's own answer). `edgeCached` keeps public
+  answers (candles, a visitor's guest files; never a request with a cookie, an Authorization header or the member mark) in
+  Cloudflare's cache for their own s-maxage, so a window is converted once per location (local run: 0.59 s, then 6 ms).
+  A first 5,000-candle window (ChronosTrade's past windows) can still pass the limit; if Cloudflare refuses those, ask for
+  smaller windows in the page.
 - Local run: `npx wrangler@4.140.0 dev --env-file <file with SESSION_SECRET=…>` (needs `node_modules`: `npm ci`).
   Tests: `tests/cloudflare-worker.test.mjs` (routes vs vercel.json, every function run or named, the adapter, the R2 shim,
   Academy outcomes not in out/).

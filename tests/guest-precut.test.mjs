@@ -90,6 +90,12 @@ test('a visitor gets the precut copy while fresh, without reading the source; th
   assert.equal(g.headers.etag, data.etagOf(fake, 'c')); assert.equal(g.headers['cache-control'], 'public, max-age=0, s-maxage=20, stale-while-revalidate=60');
   assert.equal(g.headers.vary, 'Cookie'); assert.equal(g.headers['access-control-allow-origin'], '*');
   assert.equal((await ask('trades.json', F, { env, now: NOW + 29 * 60e3 })).body.toString(), fake.toString(), '29 min: still fresh');
+  // GUEST_PRECUT_MAX_MIN (the Cloudflare Worker sets a day): the ready copy is served up to that age, capped at a week
+  const day = { ...env, GUEST_PRECUT_MAX_MIN: '1440' };
+  assert.equal((await ask('trades.json', F, { env: day, now: NOW + 23 * 3600e3 })).body.toString(), fake.toString(), 'a day: 23 h still served');
+  assert.equal(Buffer.compare((await ask('trades.json', F, { env: day, now: NOW + 25 * 3600e3 })).body, real('trades.json')), 0, 'a day: 25 h cut on the fly');
+  assert.equal(Buffer.compare((await ask('trades.json', F, { env: { ...env, GUEST_PRECUT_MAX_MIN: '999999' }, now: NOW + 8 * 86400e3 })).body, real('trades.json')), 0, 'capped at a week');
+  assert.match(fs.readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8'), /GUEST_PRECUT_MAX_MIN = "1440"/);
   // stale (31 min), missing index, missing copy, error entry, sha mismatch, broken index: cut on the fly
   const cases = { stale: [F, NOW + 31 * 60e3], noIndex: [{ ...F, 'guest/_index.json': undefined }, NOW], noCopy: [{ ...F, 'guest/trades.json': undefined }, NOW],
     error: [{ ...F, 'guest/_index.json': Buffer.from(JSON.stringify({ ...ix, files: { 'trades.json': { error: 'x' } } })) }, NOW],

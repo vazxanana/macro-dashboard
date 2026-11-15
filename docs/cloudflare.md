@@ -26,6 +26,14 @@ The free plan gives each request a small amount of computer time. Three things m
 
 The free plan also allows about 100,000 requests a day. The site uses far fewer.
 
+Two more things, measured on 15 Nov 2026:
+
+- **What visitors see** comes from copies the council loop prepares every round. If the loop stops, visitors keep seeing the
+  last copy for up to a day, instead of getting an error.
+- **The biggest candle requests** (5,000 candles at once, used when ChronosTrade loads a past window) are near the time limit.
+  The site keeps every answer for a while, so each window is prepared only once. If ChronosTrade ever fails to load a past
+  day, say so and the page will ask for smaller windows.
+
 ## Step by step
 
 ### 1. Make a free Cloudflare account

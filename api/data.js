@@ -62,13 +62,17 @@ function matches(inm, tag) {
 // carry different opaque ids; that is acceptable (ids only need to be opaque and stable within a file set, and a copy is
 // either all precut or the fallback for one file only while the loop is down).
 const PRECUT_MAX_MS = 30 * 60e3;
+// GUEST_PRECUT_MAX_MIN (minutes, at most a week) lengthens it. The Cloudflare Worker sets 1440 (wrangler.toml): there the free plan
+// allows ~10 ms of CPU a request and cutting trades.json / ict/replay.json on the fly takes 14-20 ms (measured 15 Nov 2026), so
+// a visitor is better served a ready copy up to a day old than an error while the loop is down.
+const precutMax = (env) => { const m = Number(env.GUEST_PRECUT_MAX_MIN); return m > 0 ? Math.min(m, 7 * 1440) * 60e3 : PRECUT_MAX_MS; };
 function guestKey(env) { if (env.GUEST_ID_KEY) return String(env.GUEST_ID_KEY); return require('./_session').secret(env); }
 async function precut(p, env, fetchFn, now) {
   try {
     const [ix, cf] = await Promise.all([readFile('guest/_index.json', env, fetchFn), readFile('guest/' + p, env, fetchFn)]);
     if (!ix.ok || !cf.ok) return null;
     const index = JSON.parse(ix.buf.toString('utf8')), at = Date.parse(index && index.at), e = index && index.files && index.files[p];
-    if (!Number.isFinite(at) || now - at > PRECUT_MAX_MS || now - at < -5 * 60e3 || !e || e.error || !e.sha) return null;
+    if (!Number.isFinite(at) || now - at > precutMax(env) || now - at < -5 * 60e3 || !e || e.error || !e.sha) return null;
     return crypto.createHash('sha256').update(cf.buf).digest('hex') === e.sha ? cf.buf : null;
   } catch (err) { return null; }
 }

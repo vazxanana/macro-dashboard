@@ -129,6 +129,32 @@ export async function runFn(name, request, extraQuery, ctx) {
   if (ctx && ctx.waitUntil) ctx.waitUntil(run);
   return res.p;
 }
+// Edge cache (Vercel's edge honoured s-maxage on a function's answer; a Worker's answer is not cached unless it says so).
+// Only public answers to requests without a cookie: candles (/md/bars) and a visitor's guest files (/cdata without the
+// member mark). Kept for the answer's own s-maxage; a hit runs no code, which keeps the big ones (5,000 candles take about
+// 11 ms of CPU to convert, the free plan allows ~10 ms) to one conversion per window per location.
+export function cacheable(r, request, url) {
+  if (request.method !== 'GET' || request.headers.has('cookie') || request.headers.has('authorization')) return false;
+  return r.fn === 'bars' || (r.fn === 'data' && !url.searchParams.has('m'));
+}
+const sMax = (cc) => { const m = /(?:^|,)\s*s-maxage=(\d+)/.exec(cc || ''); return /(^|,)\s*public\b/.test(cc || '') && m ? +m[1] : 0; };
+export async function edgeCached(request, url, run, ctx, cache = globalThis.caches && caches.default) {
+  if (!cache) return run();
+  const key = new Request(url.toString(), { method: 'GET' });
+  const hit = await cache.match(key).catch(() => null);
+  if (hit) {
+    const cc = hit.headers.get('x-mx-cc'), out = new Response(hit.body, hit); out.headers.delete('x-mx-cc'); if (cc) out.headers.set('Cache-Control', cc);
+    const inm = request.headers.get('if-none-match'), tag = out.headers.get('etag');
+    if (inm && tag && inm.split(',').some((x) => x.trim().replace(/^W\//, '') === tag)) return new Response(null, { status: 304, headers: out.headers });
+    return out;
+  }
+  const resp = await run(), cc = resp.headers.get('Cache-Control') || '', ttl = sMax(cc);
+  if (resp.status === 200 && ttl > 0) {
+    const copy = new Response(resp.clone().body, resp); copy.headers.set('x-mx-cc', cc); copy.headers.set('Cache-Control', `public, max-age=${ttl}`);
+    const put = cache.put(key, copy).catch(() => {}); if (ctx && ctx.waitUntil) ctx.waitUntil(put);
+  }
+  return resp;
+}
 function assetCache(path, url, resp) {
   if (!/^\/assets\//.test(path)) return resp;
   const r = new Response(resp.body, resp);
@@ -144,6 +170,7 @@ export async function handle(request, env, ctx) {
   const r = route(path);
   if (r) {
     if (request.method === 'OPTIONS' && !['mcp', 'academy-mcp'].includes(r.fn)) return withSec(new Response(null, { status: 204 }));
+    if (cacheable(r, request, url)) return withSec(await edgeCached(request, url, () => runFn(r.fn, request, r.q, ctx), ctx));
     return withSec(await runFn(r.fn, request, r.q, ctx));
   }
   if (!env.ASSETS) return new Response('no assets', { status: 500 });
