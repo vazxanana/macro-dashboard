@@ -4210,7 +4210,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T09:32:58.000Z",
     "councilEntry": 3861.19,
     "stop": 3870.5,
@@ -4225,10 +4225,12 @@
     "slipR": 0.433,
     "lagSec": 107,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T09:32:58.000Z",
-    "brokerStop": 3866.47
+    "brokerStop": 3866.47,
+    "closedAt": "2026-11-16T10:38:57.000Z"
    },
    "xau-replica-1794823313-b": {
     "positionId": "49841207",
@@ -4264,7 +4266,7 @@
    "startBalance": 5472.85
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5433.98 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 5424.57 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4272,15 +4274,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5433.98,
-  "lastRun": "2026-11-16T10:35:35.000Z"
+  "balance": 5424.57,
+  "lastRun": "2026-11-16T10:38:57.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T01:16:42.000Z",
-   "msg": "opened sell GBPUSD 0.03 lot (council replica)",
-   "trade": "gbpusd-replica-1794359735-s"
-  },
   {
    "at": "2026-11-11T01:29:35.000Z",
    "msg": "SOLUSD position 48246770 closed at the broker",
@@ -5775,6 +5772,11 @@
    "at": "2026-11-16T10:03:40.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1794823313-b"
+  },
+  {
+   "at": "2026-11-16T10:38:57.000Z",
+   "msg": "XAUUSD position 49834700 closed at the broker",
+   "trade": "xau-replica-1794821471-s"
   }
  ],
  "limits": {
