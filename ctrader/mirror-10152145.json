@@ -12714,6 +12714,33 @@
     "status": "open",
     "stopCheckedAt": "2026-11-16T14:51:52.000Z",
     "brokerStop": 3879.67
+   },
+   "xau-mcycle-pull-1794672000": {
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "setup": "mcycle",
+    "openedAt": "2026-11-16T14:58:30.000Z",
+    "councilEntry": 3882.05,
+    "stop": 3838.95,
+    "t1": 3968.25,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 3882.05,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 43.1,
+    "margin": 7.77,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 3882.03,
+    "slipR": 0,
+    "lagSec": 634,
+    "positionId": "49914308",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -12721,58 +12748,26 @@
    "startBalance": 10198.45
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10206.82 · 7 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10206.82 · 8 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 257.45, 2.5% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 263.26, 2.6% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-16T14:55:25.000Z"
+    "at": "2026-11-16T14:58:30.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "xau-mcycle-pull-1794672000": {
-    "orderId": "34149332",
-    "symbol": "XAUUSD",
-    "side": "buy",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "mcycle",
-    "limitPrice": 3882.05,
-    "stop": 3838.95,
-    "t1": 3968.25,
-    "placedAt": "2026-11-16T14:51:52.000Z",
-    "expires": "2026-11-17T14:47:56.000Z",
-    "riskCash": 43.1,
-    "margin": 7.77,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10206.82,
-  "lastRun": "2026-11-16T14:55:25.000Z"
+  "lastRun": "2026-11-16T14:58:30.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T23:56:28.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 244.70, 2.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-15T23:58:12.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 244.07, 2.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-16T00:02:06.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 243.48, 2.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14262,6 +14257,16 @@
    "at": "2026-11-16T14:55:25.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 257.45, 2.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-16T14:58:30.000Z",
+   "msg": "limit filled: XAUUSD position 49914308 at the broker",
+   "trade": "xau-mcycle-pull-1794672000"
+  },
+  {
+   "at": "2026-11-16T14:58:30.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 263.26, 2.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
   }
  ],
  "limits": {
@@ -14340,7 +14345,7 @@
   ]
  },
  "execution": {
-  "n": 423,
+  "n": 424,
   "meanSlipR": -0.013,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
@@ -14379,8 +14384,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 61,
-    "meanSlipR": -0.066
+    "n": 62,
+    "meanSlipR": -0.065
    }
   }
  }
