@@ -5,7 +5,8 @@ name: CI
 #   build:  sh scripts/build.sh must leave out/ (tracked) exactly as committed: rebuild and commit out/ with the change.
 #   pages:  the ChronosTrade end-to-end audit (scripts/audit/chronostrade.cjs) and a smoke test of every page
 #           (scripts/audit/smoke.cjs: no page errors, no sideways scroll at 390 px) against out/ served locally.
-#           Both read live candles through meridianx.dev /md/bars (as the audit always has); the smoke test also reads
+#           Both read live candles through the site's /md/bars (env MD_ORIGIN, default the Cloudflare Worker since 16 Nov 2026,
+#           when meridianx.dev answered 402); the smoke test also reads
 #           council-data from the public branch. /api/me is stubbed; nothing writes anywhere.
 #           The Academy audit (scripts/audit/academy.cjs) runs the learning loop on recorded candles, offline.
 #           The installable app audit (scripts/audit/pwa.cjs) runs with service workers on against its own server, offline.
