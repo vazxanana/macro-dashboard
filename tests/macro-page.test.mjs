@@ -9,7 +9,7 @@ const html = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'ut
 test('macro page: reads the members\' files, has every section, and the inline script parses', () => {
   for (const f of ['macro/forecast.json', 'macro/veteran.json', 'macro/cache.json', 'macro/veteran-ledger.json']) assert.ok(html.includes(`get('${f}')`), f);
   for (const id of ['strip', 'strat', 'vet', 'debate', 'insights', 'cot', 'gauges', 'news', 'events', 'src', 'ledger']) assert.ok(html.includes(`id="${id}"`), id);
-  assert.match(html, /<title>Macro desk · Meridian X<\/title>/); assert.match(html, /There is no insider information here/);
+  assert.match(html, /<title>Macro desk · Aureum Desk<\/title>/); assert.match(html, /There is no insider information here/);
   const s = html.slice(html.lastIndexOf('<script>') + 8, html.lastIndexOf('</script>')); new Function(s);
   assert.match(html, /@media \(max-width: 600px\)/); assert.match(html, /prefers-reduced-motion/);
 });

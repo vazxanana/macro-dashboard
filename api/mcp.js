@@ -3,7 +3,7 @@
 // the ICT with ChatGPT"). Guide for the helper: docs/fred-mcp.md.
 //
 // Transport: MCP Streamable HTTP, stateless JSON responses over POST (ChatGPT developer-mode connectors, Claude, Cursor).
-//   URL:  https://meridianx.dev/api/mcp/<key>  (vercel.json rewrites it to /api/mcp?key=<key>; under /api because the firewall rule
+//   URL:  https://aureumdesk.co.uk/api/mcp/<key>  (vercel.json rewrites it to /api/mcp?key=<key>; under /api because the firewall rule
 //         "Only reads outside the API" denies every POST elsewhere). Authorization: Bearer <key> works too.
 //   Protocol: protocol versions 2025-11-25 / 2025-06-18 / 2025-03-26 / 2024-11-05 negotiated in initialize; an unsupported
 //         MCP-Protocol-Version header → 400; notifications and client responses → 202 without a body; GET / DELETE → 405 (no SSE
@@ -599,12 +599,12 @@ async function call(who, name, a = {}) {
       const hit = (s) => q.every((w) => s.includes(w)), results = [];
       if (hit(`guide workflow rules desk how ${GUIDE.desk} ${GUIDE.rules.join(' ')}`.toLowerCase())) results.push({ id: 'guide:desk', title: 'ICT desk guide: model, rules, workflow', url: `https://github.com/${REPO}/blob/${MAIN}/docs/fred-mcp.md` });
       for (const s of S2) if (hit(`${s.n} ${s.title} ${s.text}`.toLowerCase())) results.push({ id: `rule:${s.n}`, title: `§${s.n} ${s.title}`, url: `https://github.com/${REPO}/blob/${MAIN}/.claude/skills/ICT/SKILL.md` });
-      for (const t of rows) { if (results.length >= 50) break; const b = brief(t); if (hit(JSON.stringify(b).toLowerCase())) results.push({ id: `trade:${t.id}`, title: `${b.market} ${b.side} ${b.signal} ${b.grade || ''} ${b.status} ${b.R ?? ''}R`.trim(), url: 'https://meridianx.dev/#ict' }); }
+      for (const t of rows) { if (results.length >= 50) break; const b = brief(t); if (hit(JSON.stringify(b).toLowerCase())) results.push({ id: `trade:${t.id}`, title: `${b.market} ${b.side} ${b.signal} ${b.grade || ''} ${b.status} ${b.R ?? ''}R`.trim(), url: 'https://aureumdesk.co.uk/#ict' }); }
       return { results: results.slice(0, 50) }; }
     case 'fetch': { const id = String(a.id || '');
       if (id === 'guide:desk') return { id, title: 'ICT desk guide', text: [GUIDE.desk, GUIDE.aSetup, 'Rules:', ...GUIDE.rules, 'Workflow:', ...GUIDE.workflow, GUIDE.params, GUIDE.data, GUIDE.limits].join('\n\n'), url: `https://github.com/${REPO}/blob/${MAIN}/docs/fred-mcp.md`, metadata: { kind: 'guide' } };
       if (id.startsWith('rule:')) { const s = sections(await skill()).find((x) => String(x.n) === id.slice(5)); if (!s) throw new Error('no such rule'); return { id, title: `§${s.n} ${s.title}`, text: s.text.trim(), url: `https://github.com/${REPO}/blob/${MAIN}/.claude/skills/ICT/SKILL.md`, metadata: { kind: 'rule', section: s.n } }; }
-      const tid = id.replace(/^trade:/, ''), t = (await allTrades('both')).find((x) => x.id === tid); if (!t) throw new Error('no such trade'); return { id, title: `${t.short} ${t.side} ${iso(t.signalAt)}`, text: JSON.stringify(t, null, 1), url: 'https://meridianx.dev/#ict', metadata: { kind: 'trade', ...brief(t) } }; }
+      const tid = id.replace(/^trade:/, ''), t = (await allTrades('both')).find((x) => x.id === tid); if (!t) throw new Error('no such trade'); return { id, title: `${t.short} ${t.side} ${iso(t.signalAt)}`, text: JSON.stringify(t, null, 1), url: 'https://aureumdesk.co.uk/#ict', metadata: { kind: 'trade', ...brief(t) } }; }
     default: throw new Error(`unknown tool ${name}`);
   }
 }
@@ -655,7 +655,7 @@ async function rpc(who, m, ctx = {}) {
 
 // browser origins allowed to call (no Origin = a server-side client such as ChatGPT, Claude or Cursor: allowed)
 // The site's own Cloudflare Worker address (16 Nov 2026): the Profile card asks /api/mcp for a member's link from it.
-const ORIGINS = [/^https:\/\/(chatgpt\.com|chat\.openai\.com|claude\.ai|claude\.com|meridianx\.dev|meridianx\.meridianx-cloudflare\.workers\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+const ORIGINS = [/^https:\/\/(chatgpt\.com|chat\.openai\.com|claude\.ai|claude\.com|meridianx\.dev|(www\.)?aureumdesk\.co\.uk|meridianx\.meridianx-cloudflare\.workers\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 const originOk = (o, env = process.env) => !o || ORIGINS.some((re) => re.test(o)) || String(env.MCP_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean).includes(o);
 const rpcErr = (res, code, rpcCode, message) => res.status(code).json({ jsonrpc: '2.0', id: null, error: { code: rpcCode, message } });
 

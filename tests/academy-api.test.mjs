@@ -53,7 +53,7 @@ test('auth: no session 401, a member 403, a cross-origin POST 403, the owner rea
   assert.equal((await post(c, attempt(), { sameOrigin: () => false })).code, 403);
   // the real same-origin check: a browser posting from another site
   const out = {}, res = { setHeader() {}, status(x) { out.code = x; return res; }, json(b) { out.body = b; return out; } };
-  await handle({ method: 'POST', headers: { origin: 'https://evil.example', host: 'meridianx.dev' }, body: attempt() }, res, { ...c.deps, sameOrigin: undefined });
+  await handle({ method: 'POST', headers: { origin: 'https://evil.example', host: 'aureumdesk.co.uk' }, body: attempt() }, res, { ...c.deps, sameOrigin: undefined });
   assert.equal(out.code, 403);
   assert.deepEqual(c.store.keys(), [], 'nothing was written by a refused request');
   const g = await get(c, { get: 'edges' }); assert.equal(g.code, 200); assert.equal(g.body.edges[0].id, 'replica'); assert.equal(g.headers['Cache-Control'], 'private, no-store');

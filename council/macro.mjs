@@ -8,7 +8,7 @@
 // sheet liquidity gauge (WALCL − RRP − TGA), the pre-FOMC drift, and the CPI / NFP / FOMC days of council/events.mjs.
 //
 // Finds its own data, free and keyless only: FRED fredgraph.csv, the Forex Factory calendar JSON (faireconomy), Fed and ECB
-// RSS, CFTC COT (Socrata), prices from the OANDA proxy (meridianx.dev/md/bars) with Kraken as a fallback. Every fetch has a
+// RSS, CFTC COT (Socrata), prices from the OANDA proxy (aureumdesk.co.uk/md/bars) with Kraken as a fallback. Every fetch has a
 // timeout; a failed source falls back to the last good copy in macro/cache.json, then to "no data" for its drivers.
 //
 // Honesty (deep-research report "Macro next day forecasting", 7 Nov): next-day direction is barely forecastable, most macro
@@ -36,7 +36,7 @@ import { EVENTS, HISTORY } from './events.mjs';
 import { goldMacroScore, scoreLine, dxyDaily, dailyRows, weeklyFrame, isoDay as isoW } from './macroscore.mjs';
 
 const DAY = 86400;
-export const MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
+export const MD_BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/';
 export const ASSETS = {
   gold:   { label: 'Gold', sym: 'xau', kraken: 'PAXGUSD' },
   eurusd: { label: 'EUR/USD', sym: 'eurusd', kraken: 'EURUSD' },
@@ -652,7 +652,7 @@ async function treasuryFallback(fetchImpl, now, data, src) {
     if (r10) { data.fred.DFII10 = r10; note('DFII10', 'Treasury real 10Y ok'); } }
   if (need('T10YIE') && y10 && data.fred.DFII10) { const b = by(data.fred.DFII10); data.fred.T10YIE = y10.filter((o) => b.has(o.t)).map((o) => ({ t: o.t, v: +(o.v - b.get(o.t)).toFixed(3) })); note('T10YIE', 'Treasury 10Y − real 10Y ok'); }
 }
-const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://meridianx.dev)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
+const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://aureumdesk.co.uk)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
 export async function gather(fetchImpl, now, cache = {}) {
   const src = {}, data = { fred: {}, bars: {}, cot: [], cal: [], rss: [] };
   const cosd = iso(now - 5 * 365 * DAY);

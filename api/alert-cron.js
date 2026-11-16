@@ -7,7 +7,7 @@ const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, audusd: 5, usdcad: 5, usdchf
 module.exports = async (req, res) => {
   if (!require('./_guard').bearerOk(req.headers && req.headers.authorization, process.env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });   // constant time
   const tok = process.env.OANDA_TOKEN; if (!tok || !process.env.VAPID_PRIVATE_KEY) return res.status(200).json({ skipped: 'not set up' });
-  webpush.setVapidDetails('https://meridianx.dev', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+  webpush.setVapidDetails('https://aureumdesk.co.uk', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
   const host = process.env.OANDA_ENV === 'live' ? 'api-fxtrade.oanda.com' : 'api-fxpractice.oanda.com', now = Math.floor(Date.now() / 1000);
   try {
     const { by, blobs } = await all(); if (!by.size) return res.status(200).json({ devices: 0 });

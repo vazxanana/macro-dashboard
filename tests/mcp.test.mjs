@@ -360,7 +360,7 @@ test('end to end: initialize → initialized → tools/list → tools/call (guid
 test('profile key: a member proves the password; the owner reserved name and unknown actions are refused', async () => {
   process.env.MCP_KEYS = 'fred:abcdefghijklmnopqrstuvwx';
   assert.deepEqual(L.PROFILE_USERS, ['fred']);
-  const mk = (body) => drive(handler, { method: 'POST', query: {}, headers: { host: 'meridianx.dev' }, body });
+  const mk = (body) => drive(handler, { method: 'POST', query: {}, headers: { host: 'aureumdesk.co.uk' }, body });
   assert.equal((await mk({ action: 'mykey', user: 'owner', pw: 'x' })).code, 403);
   assert.equal((await mk({ action: 'mykey', user: 'Bad Name!', pw: 'x' })).code, 403);
   assert.equal((await mk({ action: 'other' })).code, 400);

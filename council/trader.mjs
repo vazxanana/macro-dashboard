@@ -61,7 +61,7 @@ const MARKETS = {
 const TFS = [['1d', 1440, 86400], ['4h', 240, 14400], ['1h', 60, 3600], ['15m', 15, 900], ['5m', 5, 300], ['1m', 1, 60]];
 // gold also reads M30: the trader marks M30 structure, and M30 → M1 against D1 is the gold setup that held in the 150-day replay
 const M30_MARKETS = new Set(['xau']);
-const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';   // D1 trend source for spot markets (7 Nov)
+const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/';   // D1 trend source for spot markets (7 Nov)
 const TFS_M30 = TFS.slice(0, 3).concat([['30m', 30, 1800]], TFS.slice(3));
 LBL['30m'] = 'M30';
 const PAIRS_T = PAIRS.concat([{ k: 'm30m1', name: 'M30', h: '30m', l: '1m', e: 'M1', up: '1h' }]);

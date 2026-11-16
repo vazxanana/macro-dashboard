@@ -94,10 +94,12 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 build time (`src/routes.mjs`), the api/ handlers UNCHANGED through a Node-style adapter (`src/adapter.mjs`: Vercel's
 req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), crons alert-cron and
 edge-analyst. Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
-https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev moves when its nameservers do),
+https://aureumdesk.co.uk (+ www; the site's domain since 16 Nov 2026, a Cloudflare zone with the Worker as its custom domain) and
+https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev is no longer used),
 deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on push only for the two Cloudflare branches).
 The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker (`MD_BASE`, repository variable
-`MD_ORIGIN` overrides). Keep api/ handlers in Vercel's (req, res) shape so
+`MD_ORIGIN` overrides). Links, the bridges' default URL, the digest and the connectors' origin lists name aureumdesk.co.uk.
+A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily). Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
 fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
 stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
@@ -179,7 +181,7 @@ Today / week / month strip (`#g-today`, `renderToday()` with system-only numbers
 Header (6 Nov): Settings and Alerts are icon buttons; the account area `#ms-me` (oval photo, time-of-day greeting,
 name) opens a menu to change photo (resized, stored per user in localStorage `ms-photo-<user>`), display name
 (`ms-name-<user>`) and log in/out. Default portrait: a gold monogram for named users, a silhouette for guests. The sign-in page is
-branded "Aurum Desk" with a gold chart background (no system names on it).
+branded "Aureum Desk" (renamed from Meridian X on 16 Nov 2026) with a gold chart background (no system names on it).
 
 ## Supported book, financing in the costs, replica mirror gold only (11 Nov 2026, owner on the edge review)
 The owner was shown `research/proposals/2026-11-11-edge-review.md` and answered "yes anything that is better for the system and
@@ -2470,7 +2472,7 @@ was found. Fixed:
   delete through the styled dialog); home, charts and the council panes at 390 and 1440 px.
 - Checks: `tests/qa-sweep.test.mjs` ("Second pass": 8 tests), `scripts/audit/smoke.cjs` ("ICT desk text under 12 px").
 - Still open: light-theme status badges with their own colours (`.ms-st.near` amber on amber 1.8:1, `.ms-st.ready` white on green
-  3.6, the scanner's tags, the sidebar's gold "Aurum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
+  3.6, the scanner's tags, the sidebar's gold "Aureum"), about 190 texts under AA in light; the macro pane's "agree" / "disagree"
   words (3.5-3.6); ChronosTrade's 32-36 px toolbar buttons on phones. **Done 12 Nov 2026** (branch `desk-open-qa`, display only):
   a viewer's (or a member without the council permission) `#council/<pane>` is rewritten to `#council` with `replaceState` in
   `showView`, like a refused view; calendar day and week cells write a figure through `MS_HC.calR` (two decimals under 10R, one

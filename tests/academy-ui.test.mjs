@@ -197,7 +197,7 @@ test('a replay run reads its lists once: one stored attempt is the only call of 
 // ---- the page's static promises ---------------------------------------------------------------------------------------------
 test('academy.html: owner card, the nine sections, the scripts in order, built by the build script', () => {
   const html = src('academy.html'), ui = src('assets/academy-ui.js');
-  assert.match(html, /<title>MeridianX Academy<\/title>/); assert.match(html, /<h1>MeridianX Academy<\/h1>/);
+  assert.match(html, /<title>Aureum Academy<\/title>/); assert.match(html, /<h1>Aureum Academy<\/h1>/);
   assert.match(html, /The Academy is for the desk owner\. Sign in on the desk\./);
   for (const [id] of MXAC.TABS) assert.match(html, new RegExp(`<section id="ac-${id}" role="tabpanel"`), id);
   for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js fills it from stored data`);
@@ -209,7 +209,7 @@ test('academy.html: owner card, the nine sections, the scripts in order, built b
   assert.match(ui, /Passing the same trade shows recall, not generalisation\./);
   assert.match(src('scripts/build.sh'), /^cp .*\bacademy\.html\b.* out\/$/m);
   assert.ok(json('vercel.json').rewrites.some((r) => r.source === '/academy' && r.destination === '/academy.html'));
-  assert.equal(src('out/academy.html').includes('MeridianX Academy'), true, 'out/ carries the page');
+  assert.equal(src('out/academy.html').includes('Aureum Academy'), true, 'out/ carries the page');
 });
 
 test('the page talks to the Academy API and the candle proxy only: no broker, no order, no other service', () => {
@@ -252,7 +252,7 @@ test('academy.css: 12 px text at least, no endless animation, touch height from 
 
 // ---- the fixtures: real candles, small, complete ------------------------------------------------------------------------------
 test('fixtures: real recorded candles for one window, well formed, and several train and exam setups inside it', () => {
-  assert.equal(MAN.edge, 'gmp'); assert.match(MAN.source, /meridianx\.dev\/md\/bars/); assert.ok(TRAIN.length >= 3 && EXAM.length >= 3, `${TRAIN.length} train, ${EXAM.length} exam`);
+  assert.equal(MAN.edge, 'gmp'); assert.match(MAN.source, /(meridianx\.dev|aureumdesk\.co\.uk)\/md\/bars/); assert.ok(TRAIN.length >= 3 && EXAM.length >= 3, `${TRAIN.length} train, ${EXAM.length} exam`);
   assert.deepEqual(MAN.candidates, { train: TRAIN.length, exam: EXAM.length });
   let bytes = 0;
   for (const tf of MXAC.TFS) {

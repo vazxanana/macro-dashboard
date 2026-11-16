@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { injectHead, siteVersion, buildWorker, run } from '../scripts/pwa.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ORIGIN = 'https://meridianx.dev';
+const ORIGIN = 'https://aureumdesk.co.uk';
 const SRC = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
 
 // A fake worker global: Cache Storage in memory, fetch from the test, events captured.
@@ -173,7 +173,7 @@ test('injectHead: adds the missing app tags once, normalises manifest and Apple 
   assert.match(t, /<meta name="theme-color" content="#030607">/, 'a page keeps its own theme colour');
   assert.equal((t.match(/theme-color/g) || []).length, 1);
   assert.match(t, /<link rel="apple-touch-icon" href="\/icons\/apple-touch-icon\.png">/);
-  for (const re of [/apple-mobile-web-app-capable" content="yes"/, /name="mobile-web-app-capable" content="yes"/, /apple-mobile-web-app-title" content="Meridian X"/,
+  for (const re of [/apple-mobile-web-app-capable" content="yes"/, /name="mobile-web-app-capable" content="yes"/, /apple-mobile-web-app-title" content="Aureum Desk"/,
     /apple-mobile-web-app-status-bar-style" content="black"/, /<script src="\/assets\/pwa\.js" defer><\/script>/]) assert.match(t, re);
   assert.ok(t.indexOf('pwa.js') < t.indexOf('</head>'));
   assert.ok(t.endsWith('<body><script>var s = "<link rel=\\"manifest\\">";</script></body></html>'), 'the body is untouched');
@@ -224,7 +224,7 @@ const pngSize = (f) => { const b = fs.readFileSync(f); assert.equal(b.toString('
 
 test('manifest: installable (name, standalone, start_url in scope, 192 + 512 + maskable icons that exist at their sizes)', () => {
   const m = JSON.parse(fs.readFileSync(path.join(ROOT, 'app.webmanifest'), 'utf8'));
-  assert.equal(m.name, 'Meridian X');
+  assert.equal(m.name, 'Aureum Desk');
   assert.ok(m.short_name && m.short_name.length <= 12);
   assert.equal(m.display, 'standalone');
   assert.equal(m.id, '/');
@@ -284,10 +284,10 @@ test('push: the alert as sent; plain text, null, a bare string, a list or wrong 
 
 test('push: a notification link never leaves this site', async () => {
   const w = loadSw();
-  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://meridianx.dev/', '', null]) {
+  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://aureumdesk.co.uk/', '', null]) {
     assert.equal((await push(w, JSON.stringify({ url }))).data.url, '/#charts', String(url));
   }
-  assert.equal((await push(w, JSON.stringify({ url: 'https://meridianx.dev/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
+  assert.equal((await push(w, JSON.stringify({ url: 'https://aureumdesk.co.uk/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
   assert.equal((await push(w, JSON.stringify({ url: 'gold' }))).data.url, '/gold');
 });
 

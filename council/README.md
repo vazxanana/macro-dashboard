@@ -2,7 +2,7 @@
 
 A paper-trading desk with four members: the **Trader** trades, the **Coach** tunes the Trader's rules inside fixed limits,
 the **Analyst** writes a weekly brief, and the **Macro strategist** forecasts next-day macro odds and event days (paper only). No real money is involved. All results live on the `council-data` branch (never on
-`main`), and the site (meridianx.dev, **AI council** view) reads them from there.
+`main`), and the site (aureumdesk.co.uk, **AI council** view) reads them from there.
 
 ## The members
 
@@ -167,7 +167,7 @@ The Analyst brief and the Coach's AI review are the other two places the council
 
 ## Where to see it on the site
 
-AI council view (meridianx.dev). Tabs:
+AI council view (aureumdesk.co.uk). Tabs:
 
 | Tab | Card | Shows |
 |---|---|---|

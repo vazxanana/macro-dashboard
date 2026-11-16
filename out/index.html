@@ -7,24 +7,24 @@
 <link rel="manifest" href="/app.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Meridian X">
-<title>Aurum Desk</title>
+<meta name="apple-mobile-web-app-title" content="Aureum Desk">
+<title>Aureum Desk</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Meridian X trading desk: gold, indices, FX and crypto structure, the AI council's live paper trades, scalping and the ICT desk.">
+<meta name="description" content="Aureum Desk trading desk: gold, indices, FX and crypto structure, the AI council's live paper trades, scalping and the ICT desk.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Meridian X">
-<meta property="og:title" content="Meridian X · Trading desk">
+<meta property="og:site_name" content="Aureum Desk">
+<meta property="og:title" content="Aureum Desk · Trading">
 <meta property="og:description" content="Live market structure, the AI council's paper trades, crypto scalping and the ICT desk.">
-<meta property="og:url" content="https://meridianx.dev/">
-<meta property="og:image" content="https://meridianx.dev/api/og">
+<meta property="og:url" content="https://aureumdesk.co.uk/">
+<meta property="og:image" content="https://aureumdesk.co.uk/api/og">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Meridian X: live gold price and 2-day chart">
+<meta property="og:image:alt" content="Aureum Desk: live gold price and 2-day chart">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://meridianx.dev/api/og">
-<link rel="canonical" href="https://meridianx.dev/">
+<meta name="twitter:image" content="https://aureumdesk.co.uk/api/og">
+<link rel="canonical" href="https://aureumdesk.co.uk/">
 <style>@font-face{font-family:'Figtree';font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/fonts/figtree-latin-ext-f153aa07.woff2?v=f153aa07c1) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
 @font-face{font-family:'Figtree';font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/fonts/figtree-latin-8330490a.woff2?v=8330490a01) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-ext-9343de2c.woff2?v=9343de2ca5) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
@@ -37,12 +37,12 @@
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=b3db93e8b4"></script>
-<script src="/assets/mosha-desk.js?v=216811e631" defer></script>
+<script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
 <script src="/assets/mosha-i18n.js?v=08699888a9" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
-<script src="/assets/mosha-teach.js?v=a93900c2c3" defer></script>
+<script src="/assets/mosha-teach.js?v=83db733259" defer></script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
   :root {
@@ -1456,7 +1456,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
     if (btn.getAttribute('aria-busy') === 'true') return;
     err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
-    if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on meridianx.dev.'); return; }
+    if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on aureumdesk.co.uk.'); return; }
     btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
     var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 15000);
@@ -4987,7 +4987,7 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   </svg>
   <div class="gate-wrap">
   <aside class="gate-side" aria-label="About the desk">
-    <div class="gs-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span></div>
+    <div class="gs-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aureum Desk</span></div>
     <h2 class="gs-h">Your trading desk, <em>live</em>.</h2>
     <p class="gs-p">Market structure on every timeframe, an AI council paper-trading every setup, and dedicated desks for gold, crypto scalping and ICT.</p>
     <ul class="gs-list">
@@ -5008,12 +5008,12 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
     <div class="gs-tape" id="gs-tape" aria-hidden="true" hidden><div class="gs-tape-in" id="gs-tape-in"></div></div>
   </aside>
   <div class="gate-card">
-    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
+    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aureum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in to the desk</h1>
     <p class="gate-sub">Your password opens your own account.</p>
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
     <form id="ms-gate-f" method="post" action="#" novalidate>
-      <input class="gate-user" type="text" name="username" autocomplete="username" value="Aurum Desk" tabindex="-1" aria-hidden="true">
+      <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
       <label for="ms-gate-p">Password</label>
       <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
       <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>
@@ -5178,7 +5178,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <div class="me-card"><span class="me-av me-av-lg" id="ms-me-av2" aria-hidden="true"></span><div><b id="ms-me-name2">Guest</b><small id="ms-me-role">Guest</small></div></div>
           <div class="me-today" id="ms-me-today"></div>
           <a role="menuitem" class="me-link" id="ms-me-profile" href="#profile">Profile and demo accounts</a>
-          <a role="menuitem" class="me-link adm own" id="ms-me-academy" href="/academy">MeridianX Academy</a>
+          <a role="menuitem" class="me-link adm own" id="ms-me-academy" href="/academy">Aureum Academy</a>
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
@@ -5194,7 +5194,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 
   <span id="ms-main-start" tabindex="-1"></span>
   <div class="ms-offline-box" role="alert">
-    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through meridianx.dev, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
+    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through aureumdesk.co.uk, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
@@ -6150,7 +6150,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <p class="foot">Gold and forex candles from OANDA (spot, mid price); crypto from Binance and Kraken. Without OANDA the page falls back to exchange feeds, with gold aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
   <div class="ps-only ps-sw" id="ps-sw" role="group" aria-label="Phone view"><span>Phone view</span><span class="ps-sw-b"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
   <nav class="btab" aria-label="Main sections">
-    <a class="btab-brand" href="#home" aria-label="Aurum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span>Aurum</span></a>
+    <a class="btab-brand" href="#home" aria-label="Aureum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span>Aureum</span></a>
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
@@ -7372,7 +7372,7 @@ function msNextSetup(bars, A) {
         const w1 = x.measureText(`${CUR.label} · ${tf.label}`).width;
         if (L) { x.font = '600 15px ui-monospace, monospace'; x.fillStyle = L.close >= L.open ? '#2bd4a4' : '#ff5c7a'; x.fillText(fmt(L.close), 26 + w1, 27); }
         x.font = '12px Figtree, system-ui, sans-serif'; x.fillStyle = dim; x.textAlign = 'right';
-        x.fillText(`Meridian X · ${new Date().toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`, el.clientWidth - 14, 27);
+        x.fillText(`Aureum Desk · ${new Date().toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`, el.clientWidth - 14, 27);
         const blob = await new Promise((r) => out.toBlob(r, 'image/png')), name = `${CUR.label.replace(/\W+/g, '')}-${tf.label}-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.png`;
         const file = new File([blob], name, { type: 'image/png' });
         if (navigator.canShare && matchMedia('(pointer: coarse)').matches && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: `${CUR.label} ${tf.label}` }).catch(() => {}); return; }
@@ -7966,7 +7966,7 @@ function msNextSetup(bars, A) {
       if (!dlg) {
         dlg = document.createElement('dialog'); dlg.className = 'pa-dlg tva-dlg'; dlg.setAttribute('aria-labelledby', 'tvw-h');
         dlg.innerHTML = `<div class="pa-top"><h2 id="tvw-h">TradingView alerts in</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
-          <p class="pa-sub">Send any TradingView alert (your own indicators or strategies) to Meridian X: it is logged here and pushed to your devices.</p>
+          <p class="pa-sub">Send any TradingView alert (your own indicators or strategies) to Aureum Desk: it is logged here and pushed to your devices.</p>
           <form id="tvw-pw" class="pa-f" hidden><label class="pa-wide">Owner password<input type="password" id="tvw-pwi" autocomplete="current-password"></label><button type="submit" class="pa-go">Show the webhook</button></form>
           <h3 class="br-h3">1 · Webhook URL</h3><p class="tvw-row"><code id="tvw-url" class="tvw-url">…</code><button type="button" class="pa-del" id="tvw-cpu" disabled>Copy</button></p>
           <h3 class="br-h3">2 · Message (JSON, optional)</h3><p class="tvw-row"><code class="tvw-url">${esc(TPL)}</code><button type="button" class="pa-del" id="tvw-cpt">Copy</button></p>
@@ -7988,7 +7988,7 @@ function msNextSetup(bars, A) {
     if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
   // Broker bridge panel (7 Nov loop): what the MT5 / cTrader CouncilBridge EA sees (mt5/signals.csv), when a bridge last read it, setup + EA downloads
   { const btn = document.getElementById('ms-br-open'); let dlg;
-    const URL_ = 'https://meridianx.dev/cdata/mt5/signals.csv';
+    const URL_ = 'https://aureumdesk.co.uk/cdata/mt5/signals.csv';
     const ago = (s) => { const d = Date.now() / 1000 - s; return d < 90 ? 'just now' : d < 5400 ? `${Math.round(d / 60)} min ago` : d < 172800 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
     const load = async () => {
       const st = dlg.querySelector('#br-st'), li = dlg.querySelector('#br-list');
@@ -8023,7 +8023,7 @@ function msNextSetup(bars, A) {
           <ul class="pa-list" id="br-list"></ul>
           <h3 class="br-h3">Set up</h3>
           <ol class="tva-steps"><li>Download the EA: <button type="button" class="pa-del br-dl" data-f="mt5">MT5 (.mq5)</button> <button type="button" class="pa-del br-dl" data-f="ctrader">cTrader (.cs)</button></li>
-          <li>MT5: Tools → Options → Expert Advisors → tick <b>Allow WebRequest</b> and add <code>https://meridianx.dev</code>. cTrader: the cBot needs <b>Full access</b>.</li>
+          <li>MT5: Tools → Options → Expert Advisors → tick <b>Allow WebRequest</b> and add <code>https://aureumdesk.co.uk</code>. cTrader: the cBot needs <b>Full access</b>.</li>
           <li>Attach it to any chart; the signals address is already filled in: <code class="br-url">${URL_}</code> <button type="button" class="pa-del" id="br-cp">Copy</button></li>
           <li>Check the risk inputs (0.25% per trade by default, daily loss and max drawdown guards) before going live.</li></ol>
           <div class="tva-acts"><button type="button" class="pa-del" id="br-re">Refresh status</button></div>`;
@@ -8042,7 +8042,7 @@ function msNextSetup(bars, A) {
     const load = async () => { const k = dlg.querySelector('#tva-sym').value, sh = dlg.querySelector('#tva-sh').checked, ta = dlg.querySelector('#tva-src'), m = dlg.querySelector('#tva-msg');
       ta.value = 'Loading…'; m.textContent = '';
       try { const r = await fetch(`/api/pine?sym=${k}${sh ? '&shadow=1' : ''}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`server ${r.status}`); ta.value = await r.text(); const n = (ta.value.match(/(\d+) open\)/) || [])[1]; m.textContent = `${n || 0} open trade${n === '1' ? '' : 's'} in this snapshot.`; }
-      catch (e) { ta.value = ''; m.textContent = `Could not build the script (${e.message}). The add-on works on meridianx.dev.`; }
+      catch (e) { ta.value = ''; m.textContent = `Could not build the script (${e.message}). The add-on works on aureumdesk.co.uk.`; }
       dlg.querySelector('#tva-tv').href = window.msTvUrl ? window.msTvUrl(k, '1h') : 'https://www.tradingview.com/chart/'; };
     const open = () => {
       if (!dlg) {
@@ -8127,7 +8127,7 @@ function msNextSetup(bars, A) {
     function build() {
       dlg = document.createElement('dialog'); dlg.id = 'ms-pa'; dlg.className = 'pa-dlg'; dlg.setAttribute('aria-labelledby', 'pa-h');
       dlg.innerHTML = `<div class="pa-top"><h2 id="pa-h">Price alerts</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
-        <p class="pa-sub">Get a notification on this device when a market trades at your price, even with Meridian X closed. Checked every minute against OANDA prices.</p>
+        <p class="pa-sub">Get a notification on this device when a market trades at your price, even with Aureum Desk closed. Checked every minute against OANDA prices.</p>
         <form id="pa-f" class="pa-f" novalidate><label>Market<select id="pa-sym">${MDK.map((k) => `<option value="${k}">${INSTRUMENTS[k].label} · ${INSTRUMENTS[k].name}</option>`).join('')}</select></label>
         <label>Price<input id="pa-price" type="number" inputmode="decimal" step="any" required></label>
         <label class="pa-wide"><span>Note <small>(optional)</small></span><input id="pa-note" maxlength="60" placeholder="e.g. H4 origin top"></label>
@@ -8145,7 +8145,7 @@ function msNextSetup(bars, A) {
         const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k) || await quote(k);
         if (!(v > 0) || !Number.isFinite(v)) { msg.textContent = 'Type a price.'; return; }   // the server refuses a price that is not a finite number if (!n) { msg.textContent = 'No live price for this market right now; try again in a moment.'; return; }
         if (PA.list.length >= 20) { msg.textContent = 'Up to 20 alerts per device.'; return; }
-        if (!can()) { msg.textContent = ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first (Share → Add to Home Screen), open it from there and set the alert again.' : 'This browser cannot receive notifications.'; return; }
+        if (!can()) { msg.textContent = ios && !standalone ? 'On iPhone, add Aureum Desk to the Home Screen first (Share → Add to Home Screen), open it from there and set the alert again.' : 'This browser cannot receive notifications.'; return; }
         const a = { id: Math.random().toString(36).slice(2, 10), sym: k, price: v, dir: v >= n ? 'above' : 'below', note: dlg.querySelector('#pa-note').value.trim(), label: INSTRUMENTS[k].label, at: Math.floor(Date.now() / 1000) };
         btn.disabled = true; btn.textContent = 'Saving…'; msg.textContent = '';
         PA.list = PA.list.concat(a);
@@ -8155,14 +8155,14 @@ function msNextSetup(bars, A) {
     }
     try { PA.tv = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
     // TradingView alerts to this device (panel in Settings → TradingView alerts)
-    window.msTvPush = async (on) => { PA.tv = !!on; try { localStorage.setItem('ms-tv-push', on ? '1' : '0'); } catch (e) {} if (!can()) throw new Error(ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first and open it from there.' : 'This browser cannot receive notifications.'); await sync(); };
+    window.msTvPush = async (on) => { PA.tv = !!on; try { localStorage.setItem('ms-tv-push', on ? '1' : '0'); } catch (e) {} if (!can()) throw new Error(ios && !standalone ? 'On iPhone, add Aureum Desk to the Home Screen first and open it from there.' : 'This browser cannot receive notifications.'); await sync(); };
     window.msOpenAlerts = async (sym, atPrice) => {
       if (!dlg) build();
       const k = sym && INSTRUMENTS[sym] && INSTRUMENTS[sym].md ? sym : INSTRUMENTS[instKey].md ? instKey : 'xau';
       dlg.querySelector('#pa-sym').value = k; const n = nowPx(k) || await quote(k);
       if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec);
       if (atPrice > 0) dlg.querySelector('#pa-price').value = (+atPrice).toFixed(INSTRUMENTS[k].dec);
-      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Meridian X from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on meridianx.dev.';
+      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Aureum Desk from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on aureumdesk.co.uk.';
       hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
     };
     setTimeout(lines, 1500); setInterval(lines, 30e3);
@@ -10823,7 +10823,7 @@ function msNextSetup(bars, A) {
     const msg = document.getElementById('ms-u-msg'); if (US.busy) return; US.busy = true;
     try {
       // the owner's session saves (9 Nov); records go up without hashes and keep theirs on the server; `pw` sets a new password
-      if (!window.MS_USERS_API) throw new Error('Account changes are made on meridianx.dev.');
+      if (!window.MS_USERS_API) throw new Error('Account changes are made on aureumdesk.co.uk.');
       if (msg) msg.textContent = 'Saving…';
       // each failure names its reason (11 Nov): an ended session and a server error both used to read "check your connection"
       const OFF = () => new Error(navigator.onLine === false ? 'Not saved: you are offline. Connect and try again.' : 'Not saved: the server could not be reached. Check your connection and try again.'), ENDED = 'Not saved: your owner session has ended. Sign in again and retry.';
@@ -10886,7 +10886,7 @@ function msNextSetup(bars, A) {
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
     if (!skipFetch) US.remote = await window.msFetchUsers();
-    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on meridianx.dev';
+    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on aureumdesk.co.uk';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     // keyboard focus survives the redraw (11 Nov): it fell back to the top of the page after every save
     const ae = document.activeElement; if (ae && body.contains(ae) && ae.closest('tr')) US.fk = [ae.closest('tr').dataset.u, ae.dataset.act || '']; setTimeout(uRefocus, 0);
@@ -10930,7 +10930,7 @@ function msNextSetup(bars, A) {
 
   // ─── Design pass 100 (6 Nov): small behaviours ───
   { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', crypto: 'Crypto', gold: 'Gold playbook', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4', ict: 'ICT desk' };
-    const setTitle = () => { const v = document.querySelector('.view:not([hidden])'); const k = v ? v.id.replace('v-', '') : 'home'; document.title = `${NAMES[k] || 'Home'} · Aurum Desk`; };
+    const setTitle = () => { const v = document.querySelector('.view:not([hidden])'); const k = v ? v.id.replace('v-', '') : 'home'; document.title = `${NAMES[k] || 'Home'} · Aureum Desk`; };
     addEventListener('hashchange', () => setTimeout(setTitle, 0)); setTimeout(setTitle, 0);
     // card titles "Name · detail": the detail in a quieter tone
     document.querySelectorAll('.card > .ms-k').forEach((k) => { const t = k.firstElementChild && k.firstElementChild.tagName === 'SPAN' ? k.firstElementChild : null;
@@ -12063,7 +12063,7 @@ function msNextSetup(bars, A) {
     if (sel && document.getElementById('ms-mk-btn') && shown(document.getElementById('ms-mk-btn'))) [...sel.options].forEach((o) => out.push({ g: 'Markets', t: o.textContent.trim(), d: o.selected ? 'current' : (o.parentElement.label || ''), run: () => { if (!o.selected) location.href = '?s=' + o.value + location.hash; } }));
     const tb = document.getElementById('ms-theme');
     if (tb) [['dark', 'Dark'], ['light', 'Light'], ['midnight', 'Midnight'], ['pro', 'Pro']].forEach(([k, t]) => out.push({ g: 'Theme', t: t + ' theme', d: document.documentElement.dataset.theme === k ? 'current' : '', run: () => { for (let i = 0; i < 5 && document.documentElement.dataset.theme !== k; i++) tb.click(); } }));
-    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-tvw-open', 'TradingView alerts: webhook into Meridian X'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
+    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-tvw-open', 'TradingView alerts: webhook into Aureum Desk'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
     return out;
   };
   let all = [], cur = [], sel = 0;
@@ -13101,7 +13101,7 @@ function gpStats(T) {
   function linkForm(msg, ok) {
     const has = !!ls(sessKey());
     body().innerHTML = `<div class="ct-link"><p>Link your own cTrader account to see your balance, live floating P&amp;L, open trades and trade history here. The link is <b>view only</b>: it cannot place, change or close trades, and you can remove it any time.</p>
-      ${has ? '' : `<label>Your Aurum Desk password (to confirm it is you)<input type="password" id="ms-ct-pw" autocomplete="current-password"></label>`}
+      ${has ? '' : `<label>Your Aureum Desk password (to confirm it is you)<input type="password" id="ms-ct-pw" autocomplete="current-password"></label>`}
       <div><button type="button" class="ct-btn" id="ms-ct-go">Connect cTrader</button></div><div class="ct-msg${ok ? ' ok' : ''}" id="ms-ct-msg" role="status">${esc(msg || '')}</div>
       <p style="font-size:12px;color:var(--ink-faint)">You will sign in on cTrader's own page (id.ctrader.com) and choose which accounts to share. Your cTrader password never reaches this site.</p></div>`;
     const go = $('ms-ct-go'), pw = $('ms-ct-pw');
@@ -13153,7 +13153,7 @@ function gpStats(T) {
 
   async function load(showBusy) {
     if (state.busy || !active()) return;
-    if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
+    if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on aureumdesk.co.uk to link cTrader.</div>'; return; }
     // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
     if (document.documentElement.dataset.ct && !ls(sessKey())) {
       try {
@@ -13198,7 +13198,7 @@ function gpStats(T) {
     const me = userKey() !== 'owner' ? userKey() : null; if (!me || !document.documentElement.dataset.mcp || !MCP_API) { c.hidden = true; return; }
     c.hidden = false; const b = $('ms-pf-mcp-b'); if (b.dataset.ready) return; b.dataset.ready = '1';
     const steps = `<ol><li>In ChatGPT (web): Settings → Apps → Advanced settings → Developer mode on, then Create app.</li><li>Paste the URL above as the MCP server URL; Authentication: <b>None</b>.</li><li>Enable it in a chat and ask "call ict_guide" first, then for example "backtest NQ 2020-now with the stop band 0.3-0.6" or "compare skipping Fridays with the live rule".</li></ol><p class="ms-note" style="margin:10px 0 0">The URL is your key: keep it to yourself. Changes you propose become a draft pull request for the owner; nothing changes live until the owner merges. Paper trading only.</p>`;
-    b.innerHTML = `<label>Your Aurum Desk password (to show your connector URL)<input type="password" id="ms-mcp-pw" autocomplete="current-password"></label><div style="margin-top:10px"><button type="button" class="ct-btn" id="ms-mcp-go">Show my connector URL</button></div><div class="ct-msg" id="ms-mcp-msg" role="status"></div>`;
+    b.innerHTML = `<label>Your Aureum Desk password (to show your connector URL)<input type="password" id="ms-mcp-pw" autocomplete="current-password"></label><div style="margin-top:10px"><button type="button" class="ct-btn" id="ms-mcp-go">Show my connector URL</button></div><div class="ct-msg" id="ms-mcp-msg" role="status"></div>`;
     const go = $('ms-mcp-go'), pw = $('ms-mcp-pw');
     pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') go.click(); });
     go.addEventListener('click', async () => {
@@ -14526,7 +14526,7 @@ function gpStats(T) {
     }).join('');
   }
   function load() {
-    if (!/meridianx\.dev$|vercel\.app$|^localhost$|^127\./.test(location.hostname)) { sum.textContent = 'Available on meridianx.dev (it needs the site\'s server).'; return; }
+    if (!/^https?:$/.test(location.protocol) || /github\.io$/.test(location.hostname)) { sum.textContent = 'Available on aureumdesk.co.uk (it needs the site\'s server).'; return; }
     fetch('/api/edge-analyst', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
       if (r.status === 401 || r.status === 403) { sum.textContent = 'Sign in as the owner or a reviewer to see it.'; return null; }
       if (!r.ok) { sum.textContent = 'Could not be loaded (server ' + r.status + ').'; return null; }

@@ -102,7 +102,7 @@ test('finding 2: the owner\'s "remove" opens nothing else: no book change and no
 // who is not built in stayed on "read" for good). Now the stored list is read first, as it always was for a derived key.
 test('finding 3: an MCP_KEYS key does not skip the stored list: the member\'s ICT level is the owner\'s, from the first call', async () => {
   const handler = require('../api/mcp.js'), L = handler.lib, KEY = 'abcdefghijklmnopqrstuvwx', old = { keys: process.env.MCP_KEYS, load: L.IO.loadUsers };
-  const post = async (key) => { const r = res(); await handler({ method: 'POST', headers: { host: 'meridianx.dev' }, query: { key }, body: { jsonrpc: '2.0', id: 1, method: 'tools/list' } }, r); return r; };
+  const post = async (key) => { const r = res(); await handler({ method: 'POST', headers: { host: 'aureumdesk.co.uk' }, query: { key }, body: { jsonrpc: '2.0', id: 1, method: 'tools/list' } }, r); return r; };
   const cold = () => { L.GRANT.users = null; L.GRANT.at = 0; L.RL.clear(); };
   const quiet = console.log; console.log = () => {};
   try {
@@ -145,17 +145,17 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
       ['tv-webhook', require('../api/tv-webhook.js'), { list: true }, null],
     ];
     for (const [name, fn, body, opt] of cases) {
-      const r = res(); await fn({ method: 'POST', headers: { host: 'meridianx.dev', origin: 'https://evil.example', cookie: OWNER_C }, query: {}, body }, r, opt || undefined);
+      const r = res(); await fn({ method: 'POST', headers: { host: 'aureumdesk.co.uk', origin: 'https://evil.example', cookie: OWNER_C }, query: {}, body }, r, opt || undefined);
       assert.ok(r.code === 401 || r.code === 403, `${name}: ${r.code} ${JSON.stringify(r.body)}`);
       assert.equal(r.headers['set-cookie'], undefined, `${name}: no cookie set or cleared`);
       assert.doesNotMatch(JSON.stringify(r.body), /CouncilBridge|tv-key-fake/, `${name}: nothing handed over`);
     }
     assert.equal(wrote.length, 0, 'nothing was written'); assert.equal(BLOB.puts.length, 0);
     // the same cookie from the site itself is the owner (so the refusals above are the Origin check, not a bad cookie)
-    const ok = res(); await require('../api/notify.js').handle({ method: 'POST', headers: { host: 'meridianx.dev', origin: 'https://meridianx.dev', cookie: OWNER_C }, query: {}, body: { title: 'Hello' } }, ok, d);
+    const ok = res(); await require('../api/notify.js').handle({ method: 'POST', headers: { host: 'aureumdesk.co.uk', origin: 'https://aureumdesk.co.uk', cookie: OWNER_C }, query: {}, body: { title: 'Hello' } }, ok, d);
     assert.equal(ok.code, 200); assert.equal(wrote.length, 1);
     // an Origin that is not a URL ("null": a sandboxed frame) is foreign too
-    for (const origin of ['null', 'meridianx.dev', 'https://meridianx.dev.evil.example', 'http://meridianx.dev:8080']) assert.equal(S.sameOrigin({ headers: { host: 'meridianx.dev', origin } }), false, origin);
+    for (const origin of ['null', 'aureumdesk.co.uk', 'https://aureumdesk.co.uk.evil.example', 'http://aureumdesk.co.uk:8080']) assert.equal(S.sameOrigin({ headers: { host: 'aureumdesk.co.uk', origin } }), false, origin);
   } finally { for (const [k, v] of [['CTRADER_LINK_KEY', saved.k], ['BLOB_READ_WRITE_TOKEN', saved.b], ['TV_WEBHOOK_KEY', saved.t]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } G._reset(); resetBlob(); }
 });
 

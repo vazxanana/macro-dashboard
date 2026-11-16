@@ -115,12 +115,12 @@ test('every GET name and every POST action answers 403 for a signed-in member wh
 
 test('a POST from another origin is 403 for every action, even with the owner\'s session; other methods are 405', async () => {
   const store = ST.memoryStore(), { ids } = await fill(store), before = snapStore(store), bodies = validBodies(ids);
-  for (const origin of ['https://evil.example', 'https://meridianx.dev.evil.example', 'http://meridianx.dev:8080', 'null', 'not a url'])
-    for (const name of POSTS) { const r = await call('POST', bodies[name], { who: OWNER, store, sameOrigin: false, headers: { origin, host: 'meridianx.dev' } }); assert.equal(r.code, 403, `${name} from ${origin}`); assert.deepEqual(r.body, { error: 'not allowed' }); }
+  for (const origin of ['https://evil.example', 'https://aureumdesk.co.uk.evil.example', 'http://aureumdesk.co.uk:8080', 'null', 'not a url'])
+    for (const name of POSTS) { const r = await call('POST', bodies[name], { who: OWNER, store, sameOrigin: false, headers: { origin, host: 'aureumdesk.co.uk' } }); assert.equal(r.code, 403, `${name} from ${origin}`); assert.deepEqual(r.body, { error: 'not allowed' }); }
   assert.equal(snapStore(store), before, 'nothing was written');
   // the same site passes the origin check (and is then judged on its session)
-  assert.equal((await call('POST', bodies['lesson.save'], { who: OWNER, store, sameOrigin: false, headers: { origin: 'https://meridianx.dev', host: 'meridianx.dev' } })).code, 200);
-  assert.equal((await call('POST', bodies['lesson.save'], { who: null, store, sameOrigin: false, headers: { origin: 'https://meridianx.dev', host: 'meridianx.dev' } })).code, 401);
+  assert.equal((await call('POST', bodies['lesson.save'], { who: OWNER, store, sameOrigin: false, headers: { origin: 'https://aureumdesk.co.uk', host: 'aureumdesk.co.uk' } })).code, 200);
+  assert.equal((await call('POST', bodies['lesson.save'], { who: null, store, sameOrigin: false, headers: { origin: 'https://aureumdesk.co.uk', host: 'aureumdesk.co.uk' } })).code, 401);
   for (const method of ['PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']) { const r = await call(method, {}, { who: OWNER, store }); assert.equal(r.code, 405, method); assert.equal(r.headers.Allow, 'GET, POST'); }
   // the order of the locks: method, origin, session, owner. None of them reads the store or the body first.
   const h = src('api/academy.js'), a = h.indexOf('async function handle('), body = h.slice(a, h.indexOf('\n}\n', a));

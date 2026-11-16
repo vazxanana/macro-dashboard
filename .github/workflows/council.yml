@@ -28,6 +28,9 @@ on:
 # overrides it. The VPS runner (council/live.mjs) sets its own local MD_BASE and is not affected.
 env:
   MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
+  # The ICT tracker's paper silver market reads the same service (ict/tracker.mjs `MD_BARS`); set here, not in the tracker, so the
+  # tracker's code (and the ICT replay's ruleCode) does not change for an address.
+  ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
 
 permissions:
   contents: write

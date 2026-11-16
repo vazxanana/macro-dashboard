@@ -43,7 +43,7 @@ const NO_GUARD = { wait: () => 0, failed: () => {}, tooMany: (res, s) => res.sta
 function mk(o = {}) {
   const store = o.store || ST.memoryStore(); let clock = Date.UTC(2026, 10, 10, 12); const fetched = [];
   const env = o.env === undefined ? ENV : o.env;
-  const deps = { env, store, who: async () => OWNER, sameOrigin: () => true, data: DATA, now: () => (clock += 1000), fetch: async (u) => { fetched.push(String(u)); throw new Error('no network in this test'); }, sleep: async () => {}, host: 'meridianx.dev' };
+  const deps = { env, store, who: async () => OWNER, sameOrigin: () => true, data: DATA, now: () => (clock += 1000), fetch: async (u) => { fetched.push(String(u)); throw new Error('no network in this test'); }, sleep: async () => {}, host: 'aureumdesk.co.uk' };
   return { store, deps, env, fetched, mcp: { env, store, data: DATA, now: deps.now, guard: o.guard || NO_GUARD } };
 }
 async function call(ctx, method, payload) {
@@ -80,7 +80,7 @@ test('the key: derived from the session secret, shown to the owner only, switche
   assert.equal(CN.keyOf({ ...ENV, ACADEMY_CONNECTOR_SECRET: 'short' }), KEY, 'a short one is ignored');
   // the owner's session reads the address; every route of the Academy API is owner-only (tests/academy-security.test.mjs)
   const ctx = mk(), c = (await get(ctx, { get: 'connector' })).body;
-  assert.deepEqual(c, { available: true, url: `https://meridianx.dev/api/academy-mcp/${KEY}`, pending: 0 });
+  assert.deepEqual(c, { available: true, url: `https://aureumdesk.co.uk/api/academy-mcp/${KEY}`, pending: 0 });
   const offCtx = mk({ env: {} }); assert.deepEqual((await get(offCtx, { get: 'connector' })).body, { available: false, reason: 'the server has no session secret yet, so the connector has no key' });
   // the key is not the session secret and does not reveal it
   assert.ok(!KEY.includes('a-test-secret')); assert.ok(!src('api/academy-mcp.js').includes('SESSION_SECRET'));

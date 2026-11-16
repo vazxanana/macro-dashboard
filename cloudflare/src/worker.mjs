@@ -5,6 +5,7 @@
 import vercel from '../../vercel.json';
 import { run } from './adapter.mjs';
 import { rewrite, headersFor } from './routes.mjs';
+import { blobBackup } from './backup.mjs';
 
 import academyMcp from '../../api/academy-mcp.js';
 import academy from '../../api/academy.js';
@@ -87,5 +88,6 @@ export default {
     const req = new Request('https://cron.internal' + path, { headers: { authorization: `Bearer ${env.CRON_SECRET || ''}`, 'user-agent': 'cloudflare-cron' } });
     const r = await handle(req, env, ctx);
     console.log('cron', path, r.status);
+    if (event.cron === '*/10 * * * *') console.log('blob backup', JSON.stringify(await blobBackup(env).catch((e) => ({ error: String(e && e.message || e) }))));
   },
 };

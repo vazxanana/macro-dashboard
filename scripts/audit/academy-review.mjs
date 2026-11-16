@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // MeridianX Academy: the lead's independent end-to-end review on REAL historical candles (not the recorded fixtures, no fakes).
 //
-//   node --use-env-proxy scripts/audit/academy-review.mjs [--sample 6] [--base https://meridianx.dev] [--skip-server]
+//   node --use-env-proxy scripts/audit/academy-review.mjs [--sample 6] [--base https://aureumdesk.co.uk] [--skip-server]
 //
 // It reads live candles through the site's candle proxy (/md/bars), drives the real modules (MXR, MXA, MXK) and the real
 // API handler on a temporary file store, and starts the local server twice to prove that what was saved survives a restart.
@@ -28,7 +28,7 @@ const { handle } = require(path.join(ROOT, 'api/academy.js'));
 const { EDGES } = await import(path.join(ROOT, 'academy/edges.mjs'));
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
-const SAMPLE = +arg('--sample', 6), BASE = arg('--base', 'https://meridianx.dev'), SKIP_SERVER = process.argv.includes('--skip-server');
+const SAMPLE = +arg('--sample', 6), BASE = arg('--base', 'https://aureumdesk.co.uk'), SKIP_SERVER = process.argv.includes('--skip-server');
 const hosts = new Set(); let calls = 0;
 const netFetch = async (url, o) => { hosts.add(new URL(url, BASE).host); calls++; return fetch(url, o); };
 const results = []; let section = '';

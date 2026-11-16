@@ -92,7 +92,7 @@ test('daily cache workflow: weekly, free, writes research/daily to council-data 
   assert.ok(!/secrets\./.test(y), 'no secrets: the proxy is keyless');
   assert.ok(!y.includes('${{ github.event.inputs.symbols }} ') || y.includes('SYMS:'), 'inputs reach the shell through env');
   const s = fs.readFileSync(path.join(ROOT, 'scripts/daily-cache.mjs'), 'utf8');
-  assert.ok(s.includes('https://meridianx.dev/md/bars'));
+  assert.ok(s.includes('https://aureumdesk.co.uk/md/bars'));
 });
 
 test('daily cache: windows cover the range in ≤ 4999-day calls; merge keeps complete candles, newest wins, sorted', () => {

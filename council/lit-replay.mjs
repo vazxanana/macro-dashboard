@@ -71,7 +71,7 @@ export function simulateStudy(S5, M, ord, set) {
   return { filled: false, end: Math.min(n - 1, ord.jA + life - 1), kind: 'expired' };
 }
 
-const MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
+const MD_BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/';
 const DAYS = 90, WINDOW = 15 * 86400, FRESH = 20 * 3600, VERSION = 2;   // VERSION: a new shape or set re-runs the replay at once
 
 export async function fetchBars(days = DAYS, fetchFn = fetch, now = Math.floor(Date.now() / 1000)) {
