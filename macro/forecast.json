@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-16T16:07:19.000Z",
+ "at": "2026-11-16T17:35:40.000Z",
  "target": "2026-11-17",
  "targetEvent": "USD Core Retail Sales m/m",
  "paperOnly": true,
@@ -34,7 +34,7 @@
    "label": "Gold",
    "pUp": 0.507,
    "score": -0.6,
-   "last": 3842.37,
+   "last": 3851.95,
    "expMovePct": 1.16,
    "naiveMovePct": 1.16,
    "volModel": "naive",
@@ -95,7 +95,7 @@
    "label": "EUR/USD",
    "pUp": 0.459,
    "score": -0.583,
-   "last": 1.10035,
+   "last": 1.10034,
    "expMovePct": 0.31,
    "naiveMovePct": 0.31,
    "volModel": "naive",
@@ -620,201 +620,6 @@
   }
  },
  "playbook": [
-  {
-   "at": "2026-11-16T13:30:00.000Z",
-   "country": "CAD",
-   "title": "CPI m/m",
-   "type": "Other",
-   "consensus": "0.3%",
-   "previous": "0.1%",
-   "actual": null,
-   "outcome": null,
-   "rule": "hot if ≥ 0.4%, cool if ≤ 0.2%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
-   "expMovePct": {
-    "gold": 1.16,
-    "eurusd": 0.31,
-    "usdjpy": 0.2,
-    "nq": 0.2,
-    "es": 0.2
-   },
-   "expBasis": {
-    "gold": "naive: mean absolute move of the last 20 days",
-    "eurusd": "naive: mean absolute move of the last 20 days",
-    "usdjpy": "event prior (no price history)",
-    "nq": "event prior (no price history)",
-    "es": "event prior (no price history)"
-   },
-   "scenarios": [
-    {
-     "name": "hot",
-     "odds": 0.25,
-     "when": "above consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    },
-    {
-     "name": "in line",
-     "odds": 0.5,
-     "when": "near consensus",
-     "moves": {
-      "gold": "little; the prevailing trend resumes",
-      "eurusd": "little; the prevailing trend resumes",
-      "usdjpy": "little; the prevailing trend resumes",
-      "nq": "little; the prevailing trend resumes",
-      "es": "little; the prevailing trend resumes"
-     }
-    },
-    {
-     "name": "cool",
-     "odds": 0.25,
-     "when": "below consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    }
-   ],
-   "oddsBasis": "prior (no surprise history yet)",
-   "note": null
-  },
-  {
-   "at": "2026-11-16T13:30:00.000Z",
-   "country": "CAD",
-   "title": "Median CPI y/y",
-   "type": "Other",
-   "consensus": "2.0%",
-   "previous": "1.9%",
-   "actual": null,
-   "outcome": null,
-   "rule": "hot if ≥ 2.1%, cool if ≤ 1.9%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
-   "expMovePct": {
-    "gold": 1.16,
-    "eurusd": 0.31,
-    "usdjpy": 0.2,
-    "nq": 0.2,
-    "es": 0.2
-   },
-   "expBasis": {
-    "gold": "naive: mean absolute move of the last 20 days",
-    "eurusd": "naive: mean absolute move of the last 20 days",
-    "usdjpy": "event prior (no price history)",
-    "nq": "event prior (no price history)",
-    "es": "event prior (no price history)"
-   },
-   "scenarios": [
-    {
-     "name": "hot",
-     "odds": 0.25,
-     "when": "above consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    },
-    {
-     "name": "in line",
-     "odds": 0.5,
-     "when": "near consensus",
-     "moves": {
-      "gold": "little; the prevailing trend resumes",
-      "eurusd": "little; the prevailing trend resumes",
-      "usdjpy": "little; the prevailing trend resumes",
-      "nq": "little; the prevailing trend resumes",
-      "es": "little; the prevailing trend resumes"
-     }
-    },
-    {
-     "name": "cool",
-     "odds": 0.25,
-     "when": "below consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    }
-   ],
-   "oddsBasis": "prior (no surprise history yet)",
-   "note": null
-  },
-  {
-   "at": "2026-11-16T13:30:00.000Z",
-   "country": "CAD",
-   "title": "Trimmed CPI y/y",
-   "type": "Other",
-   "consensus": "1.9%",
-   "previous": "1.8%",
-   "actual": null,
-   "outcome": null,
-   "rule": "hot if ≥ 2.0%, cool if ≤ 1.8%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
-   "expMovePct": {
-    "gold": 1.16,
-    "eurusd": 0.31,
-    "usdjpy": 0.2,
-    "nq": 0.2,
-    "es": 0.2
-   },
-   "expBasis": {
-    "gold": "naive: mean absolute move of the last 20 days",
-    "eurusd": "naive: mean absolute move of the last 20 days",
-    "usdjpy": "event prior (no price history)",
-    "nq": "event prior (no price history)",
-    "es": "event prior (no price history)"
-   },
-   "scenarios": [
-    {
-     "name": "hot",
-     "odds": 0.25,
-     "when": "above consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    },
-    {
-     "name": "in line",
-     "odds": 0.5,
-     "when": "near consensus",
-     "moves": {
-      "gold": "little; the prevailing trend resumes",
-      "eurusd": "little; the prevailing trend resumes",
-      "usdjpy": "little; the prevailing trend resumes",
-      "nq": "little; the prevailing trend resumes",
-      "es": "little; the prevailing trend resumes"
-     }
-    },
-    {
-     "name": "cool",
-     "odds": 0.25,
-     "when": "below consensus",
-     "moves": {
-      "gold": "mixed",
-      "eurusd": "mixed",
-      "usdjpy": "mixed",
-      "nq": "mixed",
-      "es": "mixed"
-     }
-    }
-   ],
-   "oddsBasis": "prior (no surprise history yet)",
-   "note": null
-  },
   {
    "at": "2026-11-16T17:00:00.000Z",
    "country": "USD",
@@ -2828,30 +2633,30 @@
  },
  "sources": {
   "fred:DGS2": "ok, last 2026-11-12",
-  "fred:DGS10": "ok, last 2026-11-12",
   "fred:T10YIE": "ok, last 2026-11-13",
   "fred:BAMLH0A0HYM2": "ok, last 2026-11-13",
+  "fred:T10Y3M": "ok, last 2026-11-13",
+  "fred:VXVCLS": "ok, last 2026-11-13",
+  "fred:DFII10": "ok, last 2026-11-12",
   "fred:VIXCLS": "ok, last 2026-11-13",
   "fred:DTWEXBGS": "ok, last 2026-11-06",
-  "fred:DFII10": "ok, last 2026-11-12",
-  "fred:WALCL": "ok, last 2026-11-11",
-  "fred:T10Y3M": "ok, last 2026-11-13",
+  "fred:DGS10": "ok, last 2026-11-12",
   "fred:RRPONTSYD": "ok, last 2026-11-13",
   "fred:WTREGEN": "ok, last 2026-11-11",
-  "fred:VXVCLS": "ok, last 2026-11-13",
-  "fred:EFFR": "ok, last 2026-11-13",
-  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
+  "fred:WALCL": "ok, last 2026-11-11",
   "fred:SWPT": "ok, last 2026-11-11",
+  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "fred:SOFR": "ok, last 2026-11-13",
+  "fred:EFFR": "ok, last 2026-11-13",
   "ecb:2y": "ok, last 2026-11-13",
-  "bars:nq": "failed (HTTP 402)",
-  "bars:usdjpy": "failed (HTTP 402)",
   "bars:es": "failed (HTTP 402)",
-  "bars:gold": "OANDA failed (HTTP 402), Kraken ok (721 days)",
-  "bars:gbpusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
+  "bars:usdjpy": "failed (HTTP 402)",
+  "bars:nq": "failed (HTTP 402)",
   "bars:eurusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
-  "bars:usdcad": "OANDA failed (HTTP 402), Kraken ok (721 days)",
+  "bars:gold": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "bars:usdchf": "OANDA failed (HTTP 402), Kraken ok (721 days)",
+  "bars:usdcad": "OANDA failed (HTTP 402), Kraken ok (721 days)",
+  "bars:gbpusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "calendar:thisweek": "ok (120 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "calendar:cache": "using the last good copy for the week that failed (106 cached events)",
@@ -3007,5 +2812,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Mon 16 Nov 16:07 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Mon 16 Nov 17:35 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%; AUD RBA Gov Bullock Speaks Mon 16 Nov 22:50 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; NZD Inflation Expectations q/q Tue 17 Nov 02:00 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Core Retail Sales m/m Tue 17 Nov 13:30 UTC (consensus 0.4%, previous 0.9%): if hot, gold down, USD up, NQ mixed; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast."
 }
