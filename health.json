@@ -1,5 +1,5 @@
 {
- "at": "2026-11-16T06:22:00.000Z",
+ "at": "2026-11-16T06:51:29.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
@@ -95,7 +95,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T06:20:00.000Z",
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 1.99,
      "clipped": 0,
@@ -106,7 +106,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T06:20:00.000Z",
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 1.94,
      "clipped": 0,
@@ -117,9 +117,9 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T06:20:00.000Z",
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.59,
+     "maxJump": 1.99,
      "clipped": 0,
      "issues": []
     },
@@ -128,9 +128,9 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T06:20:00.000Z",
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.26,
+     "maxJump": 1.89,
      "clipped": 0,
      "issues": []
     }
@@ -144,8 +144,8 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "ok",
-     "n": 558,
-     "last": "2026-11-16T06:20:00.000Z",
+     "n": 564,
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 3.14,
      "clipped": 0,
@@ -155,8 +155,8 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "ok",
-     "n": 558,
-     "last": "2026-11-16T06:20:00.000Z",
+     "n": 564,
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 2.01,
      "clipped": 0,
@@ -166,8 +166,8 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "ok",
-     "n": 558,
-     "last": "2026-11-16T06:20:00.000Z",
+     "n": 564,
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 2,
      "clipped": 0,
@@ -177,8 +177,8 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "ok",
-     "n": 558,
-     "last": "2026-11-16T06:20:00.000Z",
+     "n": 564,
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 2.62,
      "clipped": 0,
@@ -188,8 +188,8 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "ok",
-     "n": 560,
-     "last": "2026-11-16T06:20:00.000Z",
+     "n": 566,
+     "last": "2026-11-16T06:50:00.000Z",
      "staleMin": 0,
      "maxJump": 7,
      "clipped": 0,
@@ -332,13 +332,13 @@
     "ict/snapshot.json": {
      "label": "ICT desk snapshot (ict/snapshot.json)",
      "status": "ok",
-     "ageMin": 30,
+     "ageMin": 15,
      "issues": []
     },
     "ict/shadow.json": {
      "label": "ICT shadow book (ict/shadow.json)",
      "status": "ok",
-     "ageMin": 30,
+     "ageMin": 15,
      "issues": []
     },
     "ict/trades.json": {
@@ -354,7 +354,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 29,
+     "ageMin": 59,
      "issues": [
       {
        "kind": "input",
@@ -406,13 +406,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 29,
+     "ageMin": 59,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 29,
+     "ageMin": 59,
      "issues": [
       {
        "kind": "stale",
@@ -439,7 +439,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 382,
+     "ageMin": 411,
      "issues": []
     },
     "digest.json": {
@@ -450,37 +450,37 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "warn",
-     "ageMin": 203,
+     "ageMin": 233,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 3.4 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+       "detail": "not updated for 3.9 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
       }
      ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 1133,
+     "ageMin": 1163,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 1133,
+     "ageMin": 1163,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 1133,
+     "ageMin": 1162,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 1133,
+     "ageMin": 1162,
      "issues": []
     },
     "research/ledger.json": {
@@ -501,25 +501,25 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 963,
+     "ageMin": 993,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "warn",
-     "ageMin": 2224,
+     "ageMin": 2253,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 37.1 h (expected at most every 20 h (council loop); flag after 30.0 h)"
+       "detail": "not updated for 37.6 h (expected at most every 20 h (council loop); flag after 30.0 h)"
       }
      ]
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 2635,
+     "ageMin": 2665,
      "issues": [
       {
        "kind": "stale",
@@ -574,12 +574,12 @@
  },
  "alert": {
   "streak": {
-   "oanda:xau": 45,
-   "oanda:eurusd": 45,
-   "oanda:gbpusd": 45,
-   "oanda:audusd": 45,
-   "oanda:usdcad": 45,
-   "oanda:usdchf": 45
+   "oanda:xau": 46,
+   "oanda:eurusd": 46,
+   "oanda:gbpusd": 46,
+   "oanda:audusd": 46,
+   "oanda:usdcad": 46,
+   "oanda:usdchf": 46
   },
   "sent": {
    "key": "oanda:audusd|oanda:eurusd|oanda:gbpusd|oanda:usdcad|oanda:usdchf|oanda:xau",
