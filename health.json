@@ -1,5 +1,5 @@
 {
- "at": "2026-11-16T20:47:03.000Z",
+ "at": "2026-11-16T21:17:09.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
@@ -95,9 +95,9 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T20:45:00.000Z",
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 1.98,
+     "maxJump": 1.69,
      "clipped": 0,
      "issues": []
     },
@@ -106,9 +106,9 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T20:45:00.000Z",
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 4.2,
+     "maxJump": 1.62,
      "clipped": 0,
      "issues": []
     },
@@ -117,9 +117,9 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T20:45:00.000Z",
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 3.05,
+     "maxJump": 2.54,
      "clipped": 0,
      "issues": []
     },
@@ -128,9 +128,9 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T20:45:00.000Z",
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.27,
+     "maxJump": 2.13,
      "clipped": 0,
      "issues": []
     }
@@ -144,10 +144,10 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "ok",
-     "n": 563,
-     "last": "2026-11-16T20:45:00.000Z",
+     "n": 557,
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.29,
+     "maxJump": 2,
      "clipped": 0,
      "issues": []
     },
@@ -155,10 +155,10 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "ok",
-     "n": 563,
-     "last": "2026-11-16T20:45:00.000Z",
+     "n": 557,
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.47,
+     "maxJump": 2.08,
      "clipped": 0,
      "issues": []
     },
@@ -166,10 +166,10 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "ok",
-     "n": 563,
-     "last": "2026-11-16T20:45:00.000Z",
+     "n": 557,
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.71,
+     "maxJump": 1.92,
      "clipped": 0,
      "issues": []
     },
@@ -177,10 +177,10 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "ok",
-     "n": 563,
-     "last": "2026-11-16T20:45:00.000Z",
+     "n": 557,
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 3.76,
+     "maxJump": 1.93,
      "clipped": 0,
      "issues": []
     },
@@ -188,10 +188,10 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "ok",
-     "n": 565,
-     "last": "2026-11-16T20:45:00.000Z",
+     "n": 559,
+     "last": "2026-11-16T21:15:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.28,
+     "maxJump": 1.55,
      "clipped": 0,
      "issues": []
     }
@@ -278,7 +278,7 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 3,
      "issues": []
     },
     "ctrader/accounts.json": {
@@ -320,7 +320,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 14,
+     "ageMin": 15,
      "issues": [
       {
        "kind": "source",
@@ -332,13 +332,13 @@
     "ict/snapshot.json": {
      "label": "ICT desk snapshot (ict/snapshot.json)",
      "status": "ok",
-     "ageMin": 15,
+     "ageMin": 1,
      "issues": []
     },
     "ict/shadow.json": {
      "label": "ICT shadow book (ict/shadow.json)",
      "status": "ok",
-     "ageMin": 15,
+     "ageMin": 1,
      "issues": []
     },
     "ict/trades.json": {
@@ -354,17 +354,12 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 58,
+     "ageMin": 0,
      "issues": [
       {
        "kind": "input",
        "sev": "warn",
        "detail": "fred:BSCICP03DEM665S last value 2024-01-01 (1050 days old; over 120 the strategist drops it as \"no data\")"
-      },
-      {
-       "kind": "source",
-       "sev": "warn",
-       "detail": "bars:usdjpy failed (HTTP 402)"
       },
       {
        "kind": "source",
@@ -379,7 +374,12 @@
       {
        "kind": "source",
        "sev": "warn",
-       "detail": "bars:gold OANDA failed (HTTP 402), Kraken ok (721 days)"
+       "detail": "bars:usdjpy failed (HTTP 402)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:gbpusd OANDA failed (HTTP 402), Kraken ok (721 days)"
       },
       {
        "kind": "source",
@@ -389,7 +389,7 @@
       {
        "kind": "source",
        "sev": "warn",
-       "detail": "bars:gbpusd OANDA failed (HTTP 402), Kraken ok (721 days)"
+       "detail": "bars:gold OANDA failed (HTTP 402), Kraken ok (721 days)"
       },
       {
        "kind": "source",
@@ -406,20 +406,14 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 58,
+     "ageMin": 0,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
-     "status": "warn",
-     "ageMin": 58,
-     "issues": [
-      {
-       "kind": "stale",
-       "sev": "warn",
-       "detail": "newest CFTC report is for 2026-11-03 (13 days ago; normally 3-10)"
-      }
-     ]
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
     },
     "macro/history.json": {
      "label": "Macro forecast log (macro/history.json)",
@@ -439,7 +433,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1247,
+     "ageMin": 1277,
      "issues": []
     },
     "digest.json": {
@@ -450,31 +444,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 58,
+     "ageMin": 23,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 538,
+     "ageMin": 568,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 538,
+     "ageMin": 568,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 538,
+     "ageMin": 568,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 537,
+     "ageMin": 568,
      "issues": []
     },
     "research/ledger.json": {
@@ -495,25 +489,25 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 262,
+     "ageMin": 292,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "warn",
-     "ageMin": 3089,
+     "ageMin": 3119,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 2.1 days (expected at most every 20 h (council loop); flag after 30.0 h)"
+       "detail": "not updated for 2.2 days (expected at most every 20 h (council loop); flag after 30.0 h)"
       }
      ]
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 3500,
+     "ageMin": 3530,
      "issues": [
       {
        "kind": "stale",
@@ -540,10 +534,10 @@
    }
   }
  },
- "summary": "OANDA spot (md/bars): XAU/USD error, EUR/USD error, GBP/USD error, AUD/USD error, USD/CAD error, USD/CHF error · Council data files: Trader snapshot (snapshot.json) source, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale, LIT replay (lit/replay.json) stale",
+ "summary": "OANDA spot (md/bars): XAU/USD error, EUR/USD error, GBP/USD error, AUD/USD error, USD/CAD error, USD/CHF error · Council data files: Trader snapshot (snapshot.json) source, Macro forecast (macro/forecast.json) input/source, LIT replay (lit/replay.json) stale",
  "brief": {
   "status": "bad",
-  "line": "6 problems, 17 warnings: OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
+  "line": "6 problems, 16 warnings: OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
   "bad": [
    "OANDA spot (md/bars) XAU/USD: unreachable: HTTP 402: [object Object]",
    "OANDA spot (md/bars) EUR/USD: unreachable: HTTP 402: [object Object]",
@@ -560,20 +554,20 @@
    "Trader snapshot (snapshot.json): USD/CAD read from Kraken, not OANDA (proxy fallback)",
    "Trader snapshot (snapshot.json): USD/CHF read from Kraken, not OANDA (proxy fallback)",
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1050 days old; over 120 the strategist drops it as \"no data\")",
-   "Macro forecast (macro/forecast.json): bars:usdjpy failed (HTTP 402)",
    "Macro forecast (macro/forecast.json): bars:nq failed (HTTP 402)",
-   "Macro forecast (macro/forecast.json): bars:es failed (HTTP 402)"
+   "Macro forecast (macro/forecast.json): bars:es failed (HTTP 402)",
+   "Macro forecast (macro/forecast.json): bars:usdjpy failed (HTTP 402)"
   ],
   "notes": 3
  },
  "alert": {
   "streak": {
-   "oanda:xau": 75,
-   "oanda:eurusd": 75,
-   "oanda:gbpusd": 75,
-   "oanda:audusd": 75,
-   "oanda:usdcad": 75,
-   "oanda:usdchf": 75
+   "oanda:xau": 76,
+   "oanda:eurusd": 76,
+   "oanda:gbpusd": 76,
+   "oanda:audusd": 76,
+   "oanda:usdcad": 76,
+   "oanda:usdchf": 76
   },
   "sent": {
    "key": "oanda:audusd|oanda:eurusd|oanda:gbpusd|oanda:usdcad|oanda:usdchf|oanda:xau",
