@@ -4240,7 +4240,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T10:03:40.000Z",
     "councilEntry": 3861.46,
     "stop": 3854.36,
@@ -4255,10 +4255,12 @@
     "slipR": -0.289,
     "lagSec": 107,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T10:03:40.000Z",
-    "brokerStop": 3852.31
+    "brokerStop": 3852.31,
+    "closedAt": "2026-11-16T11:12:20.000Z"
    },
    "xau-replica-1794826310-b": {
     "positionId": "49851602",
@@ -4294,7 +4296,7 @@
    "startBalance": 5472.85
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5424.57 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 5438.68 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4302,15 +4304,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5424.57,
-  "lastRun": "2026-11-16T11:09:16.000Z"
+  "balance": 5438.68,
+  "lastRun": "2026-11-16T11:12:20.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T01:29:35.000Z",
-   "msg": "ETHUSD position 48249113 closed at the broker",
-   "trade": "eth-replica-1794358841-s"
-  },
   {
    "at": "2026-11-11T01:30:49.000Z",
    "msg": "opened buy SOLUSD 0.01 lot (council replica)",
@@ -5805,6 +5802,11 @@
    "at": "2026-11-16T10:53:37.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1794826310-b"
+  },
+  {
+   "at": "2026-11-16T11:12:20.000Z",
+   "msg": "XAUUSD position 49841207 closed at the broker",
+   "trade": "xau-replica-1794823313-b"
   }
  ],
  "limits": {
