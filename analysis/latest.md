@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-16 05:48 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-16 05:50 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -20,7 +20,7 @@ Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 | SOL/USD | down (Kraken) | no (not live, asia session) | READY buy | 17 trades, 24% won, −0.38R a trade |
 | XRP/USD | down (Kraken) | no (not live, asia session) | IN ORIGIN buy | 44 trades, 55% won, +0.75R a trade |
 | EUR/USD | down (Kraken, OANDA failed) | no (not live, asia session) | IN ORIGIN buy | 3 trades, 33% won, −0.14R a trade |
-| GBP/USD | down (Kraken, OANDA failed) | no (not live, asia session) | READY buy | 18 trades, 39% won, +0.04R a trade |
+| GBP/USD | down (Kraken, OANDA failed) | no (not live, asia session) | IN ORIGIN buy | 18 trades, 39% won, +0.04R a trade |
 | AUD/USD | up (Kraken, OANDA failed) | no (not live, rule skips AUD/USD, asia session) | READY buy (blocked: wrong side) | 35 trades, 40% won, +0.11R a trade |
 | USD/CAD | up (Kraken, OANDA failed) | no (not live, asia session) | READY buy (blocked: wrong side) | 16 trades, 38% won, +0.09R a trade |
 | USD/CHF | up (Kraken, OANDA failed) | no (not live, asia session) | READY buy (blocked: wrong side) | 15 trades, 60% won, +0.73R a trade |
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 154 trades, +0.33R a trade (+51.47R)
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-16 05:48 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-16 05:50 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -43,13 +43,13 @@ Built by the Trader at 2026-11-16 05:48 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-16 05:48 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-16 05:50 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 4 signals (0 open, 4 closed, −1.65R, 0% won); 10 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 2 closed +1.86R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-16 05:46 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-16 05:50 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -64,7 +64,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-16 05:48 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-16 05:50 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -95,7 +95,7 @@ No 30-day results yet.
 <!-- macro:start -->
 ## Macro strategist
 
-Built by the Macro strategist at 2026-11-16 04:23 UTC for 2026-11-17 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **transitional dollar · liquidity flat · normal volatility**.
+Built by the Macro strategist at 2026-11-16 05:52 UTC for 2026-11-17 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **transitional dollar · liquidity flat · normal volatility**.
 
 Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading.
 
@@ -117,7 +117,7 @@ Next high-impact events:
 
 Lessons from the Macro veteran: no challenger has beaten its incumbent on the replay yet; v_ry4w hit 0.518 t 0.6 vs ry hit 0.494 t -0.21; v_d2_4w hit 0.563 t 1.77 vs dgs2 hit 0.536 t 1.39; v_dxy4w no record vs dxymom no record.
 
-Macro strategist, Mon 16 Nov 04:23 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast.
+Macro strategist, Mon 16 Nov 05:52 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast.
 <!-- macro:end -->
 
 <!-- postmortems:start -->
@@ -178,7 +178,7 @@ Checked 2026-11-15 11:28 UTC; live signals 2026-11-01 to 2026-11-15.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-16 05:48 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-16 05:50 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
@@ -196,7 +196,7 @@ Built by the Trader at 2026-11-16 05:48 UTC from its own snapshot and the live r
 <!-- veteran:start -->
 ## Macro veteran
 
-Built by the Macro veteran at 2026-11-16 04:23 UTC from the strategist's data (paper only; full view in macro/veteran.json). Shock fingerprint: **Positive growth / demand news** (low confidence). Consensus: **AUCTION**.
+Built by the Macro veteran at 2026-11-16 05:52 UTC from the strategist's data (paper only; full view in macro/veteran.json). Shock fingerprint: **Positive growth / demand news** (low confidence). Consensus: **AUCTION**.
 
 | Topic | Macro strategist | Macro veteran | Stance |
 |---|---|---|---|
