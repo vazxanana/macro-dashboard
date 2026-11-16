@@ -1,0 +1,25 @@
+{
+  // Meridian X on Cloudflare Workers (stage 1: static site + API through the adapter).
+  // Secrets (OANDA_TOKEN, CRON_SECRET, SESSION_SECRET, GH_* tokens, BLOB_READ_WRITE_TOKEN, VAPID_*,
+  // EDGE_CONFIG, ...) are set with `wrangler secret put`, never in this file.
+  "name": "meridianx",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "../out",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+  // The api/ handlers resolve their packages from the repository root; point them at this folder's copies.
+  "alias": {
+    "@vercel/blob": "./node_modules/@vercel/blob",
+    "web-push": "./node_modules/web-push"
+  },
+  "triggers": { "crons": ["* * * * *", "*/10 * * * *"] },
+  "limits": { "cpu_ms": 300000 },
+  "observability": { "enabled": true },
+  "workers_dev": true
+}
