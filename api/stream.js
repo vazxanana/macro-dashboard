@@ -8,6 +8,9 @@ module.exports = async (req, res) => {
   if (!tok) return res.status(503).json({ error: 'OANDA_TOKEN not set' });
   const live = process.env.OANDA_ENV === 'live', api = live ? 'api-fxtrade.oanda.com' : 'api-fxpractice.oanda.com', st = live ? 'stream-fxtrade.oanda.com' : 'stream-fxpractice.oanda.com';
   const H = { Authorization: `Bearer ${tok}`, 'Accept-Datetime-Format': 'UNIX' };
+  // OANDA_ACCOUNT_ID (optional) skips the account lookup: on 16 Nov 2026 /v3/accounts answered 504 for a new practice
+  // account while candles worked with the same token. Not secret (an account number), and only used to read prices.
+  if (!acct && process.env.OANDA_ACCOUNT_ID) acct = String(process.env.OANDA_ACCOUNT_ID).trim();
   try {
     if (!acct) { const r = await fetch(`https://${api}/v3/accounts`, { headers: H, signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`OANDA accounts ${r.status}`); acct = ((await r.json()).accounts || [])[0]?.id; if (!acct) throw new Error('no OANDA account'); }
   } catch (e) { return res.status(502).json({ error: String(e.message || e) }); }
