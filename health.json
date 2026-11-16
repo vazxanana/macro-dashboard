@@ -1,5 +1,5 @@
 {
- "at": "2026-11-16T15:06:57.000Z",
+ "at": "2026-11-16T15:37:23.000Z",
  "status": "bad",
  "feeds": {
   "oanda": {
@@ -95,7 +95,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T15:05:00.000Z",
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 6.15,
      "clipped": 0,
@@ -106,7 +106,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T15:05:00.000Z",
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 5.95,
      "clipped": 0,
@@ -117,7 +117,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T15:05:00.000Z",
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 5.47,
      "clipped": 0,
@@ -128,7 +128,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-16T15:05:00.000Z",
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 5.29,
      "clipped": 0,
@@ -144,8 +144,8 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "ok",
-     "n": 555,
-     "last": "2026-11-16T15:05:00.000Z",
+     "n": 561,
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 5.17,
      "clipped": 0,
@@ -155,8 +155,8 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "ok",
-     "n": 555,
-     "last": "2026-11-16T15:05:00.000Z",
+     "n": 561,
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 4.38,
      "clipped": 0,
@@ -166,8 +166,8 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "ok",
-     "n": 555,
-     "last": "2026-11-16T15:05:00.000Z",
+     "n": 561,
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 4.14,
      "clipped": 0,
@@ -177,8 +177,8 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "ok",
-     "n": 555,
-     "last": "2026-11-16T15:05:00.000Z",
+     "n": 561,
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 4.21,
      "clipped": 0,
@@ -188,8 +188,8 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "ok",
-     "n": 557,
-     "last": "2026-11-16T15:05:00.000Z",
+     "n": 563,
+     "last": "2026-11-16T15:35:00.000Z",
      "staleMin": 0,
      "maxJump": 2.97,
      "clipped": 0,
@@ -332,13 +332,13 @@
     "ict/snapshot.json": {
      "label": "ICT desk snapshot (ict/snapshot.json)",
      "status": "ok",
-     "ageMin": 31,
+     "ageMin": 16,
      "issues": []
     },
     "ict/shadow.json": {
      "label": "ICT shadow book (ict/shadow.json)",
      "status": "ok",
-     "ageMin": 31,
+     "ageMin": 16,
      "issues": []
     },
     "ict/trades.json": {
@@ -354,7 +354,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 30,
+     "ageMin": 61,
      "issues": [
       {
        "kind": "input",
@@ -406,13 +406,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 30,
+     "ageMin": 61,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "warn",
-     "ageMin": 30,
+     "ageMin": 61,
      "issues": [
       {
        "kind": "stale",
@@ -439,7 +439,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 907,
+     "ageMin": 937,
      "issues": []
     },
     "digest.json": {
@@ -450,37 +450,37 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "warn",
-     "ageMin": 252,
+     "ageMin": 282,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 4.2 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+       "detail": "not updated for 4.7 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
       }
      ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 198,
+     "ageMin": 228,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 198,
+     "ageMin": 228,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 198,
+     "ageMin": 228,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 197,
+     "ageMin": 228,
      "issues": []
     },
     "research/ledger.json": {
@@ -501,25 +501,25 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 285,
+     "ageMin": 316,
      "issues": []
     },
     "lit/replay.json": {
      "label": "LIT replay (lit/replay.json)",
      "status": "warn",
-     "ageMin": 2749,
+     "ageMin": 2779,
      "issues": [
       {
        "kind": "stale",
        "sev": "warn",
-       "detail": "not updated for 45.8 h (expected at most every 20 h (council loop); flag after 30.0 h)"
+       "detail": "not updated for 46.3 h (expected at most every 20 h (council loop); flag after 30.0 h)"
       }
      ]
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 3160,
+     "ageMin": 3191,
      "issues": [
       {
        "kind": "stale",
@@ -574,12 +574,12 @@
  },
  "alert": {
   "streak": {
-   "oanda:xau": 63,
-   "oanda:eurusd": 63,
-   "oanda:gbpusd": 63,
-   "oanda:audusd": 63,
-   "oanda:usdcad": 63,
-   "oanda:usdchf": 63
+   "oanda:xau": 64,
+   "oanda:eurusd": 64,
+   "oanda:gbpusd": 64,
+   "oanda:audusd": 64,
+   "oanda:usdcad": 64,
+   "oanda:usdchf": 64
   },
   "sent": {
    "key": "oanda:audusd|oanda:eurusd|oanda:gbpusd|oanda:usdcad|oanda:usdchf|oanda:xau",
