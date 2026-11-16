@@ -56,8 +56,9 @@ Chart grid lines use `--au-line`, chart text `--au-ink-3`, chart backgrounds tra
 - Sizes 12 / 13 / 14 / 16 / 20 / 26 / 34 / 44 px; display sizes letter-spacing -0.01em, line-height 1.15; body 1.5.
 - Wordmark: the coin mark, then `AUREUM` in the display serif, uppercase, letter-spacing .16em, then `DESK` in the UI font,
   weight 500, letter-spacing .24em, `--au-ink-2`.
-- Coin mark: a disc filled with `--au-gold-grad`, a thin inner ring (`#1A1305` at 12 % opacity) and a serif capital "A"
-  in `#1A1305`. In CSS (`.ms-coin`) and as `assets/aureum-mark.svg`; the app icons use the same mark on `#0B0A08`.
+- Coin mark: a disc filled with the bright gold gradient `linear-gradient(135deg, #F2D589 0%, #D4A84A 48%, #A87A2A 100%)`
+  in EVERY theme (not the theme's `--au-gold-grad`: the light theme's darker gold hides the letter), a thin inner ring
+  (`#1A1305` at 12 % opacity) and a serif capital "A" in `#1A1305`. In CSS (`.ms-coin`) and as `assets/aureum-mark.svg`; the app icons use the same mark on `#0B0A08`.
 
 ## 3. Shape, depth, controls
 
