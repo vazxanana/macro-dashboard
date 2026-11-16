@@ -27,7 +27,7 @@ async function render(req, res) {
   const el = h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '64px 80px', background: 'linear-gradient(160deg, #0f1420 0%, #08090c 70%)', color: '#eceef2', fontFamily: 'sans-serif' },
     h('div', { display: 'flex', alignItems: 'center', gap: 18 },
       h('div', { width: 44, height: 44, borderRadius: 22, background: 'radial-gradient(circle at 35% 30%, #ffe08a, #c99400 60%, #7a5a00)', display: 'flex' }),
-      h('div', { fontSize: 34, fontWeight: 700, letterSpacing: -0.5 }, 'Aurum Desk'),
+      h('div', { fontSize: 34, fontWeight: 700, letterSpacing: -0.5 }, 'Aureum Desk'),
       h('div', { fontSize: 24, color: '#8a94a8', marginLeft: 8 }, 'trading desk')),
     h('div', { display: 'flex', flexDirection: 'column', gap: 10 },
       h('div', { fontSize: 28, color: '#a4abb8' }, 'Gold · XAU/USD spot'),

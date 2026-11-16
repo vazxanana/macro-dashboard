@@ -277,7 +277,7 @@ test('academy-tabs.js: every section is registered, talks only to the Academy AP
 
 test('the Desk has one way into the Academy, for the owner only', () => {
   const desk = src('market-structure.html'), links = [...desk.matchAll(/<a\b[^>]*href="\/academy"[^>]*>([^<]*)<\/a>/g)];
-  assert.equal(links.length, 1, 'one link'); assert.match(links[0][0], /class="me-link adm own"/, 'in the account menu, hidden for guests (adm) and for viewers and reviewers (own)'); assert.equal(links[0][1], 'Aurum Academy');
+  assert.equal(links.length, 1, 'one link'); assert.match(links[0][0], /class="me-link adm own"/, 'in the account menu, hidden for guests (adm) and for viewers and reviewers (own)'); assert.equal(links[0][1], 'Aureum Academy');
   assert.match(desk, /html\[data-mode="public"\] \.adm\{display:none!important\}/); assert.match(desk, /html\[data-role="reviewer"\] \.own\{display:none!important\}/); assert.match(desk, /html\[data-role="viewer"\] \.own,/);
   assert.ok(src('out/market-structure.html').includes('id="ms-me-academy"'), 'out/ carries it');
 });

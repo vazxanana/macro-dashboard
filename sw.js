@@ -1,4 +1,4 @@
-// Aurum Desk service worker: installable app, offline page, price-alert notifications.
+// Aureum Desk service worker: installable app, offline page, price-alert notifications.
 // Safe by design (tests/pwa.test.mjs, CLAUDE.md "Installable app"):
 // - Pages (navigations): network only; when the network fails, the offline page. Pages are never cached, so a deploy shows at once.
 // - /api, /cdata, /md, /_vercel, other origins, non-GET, Range requests: not touched at all (the browser goes to the network as if
@@ -17,7 +17,7 @@ const OFFLINE = '/offline.html';
 const BYPASS = /^\/(?:macro-dashboard\/)?(?:api|cdata|md|_vercel)(?:\/|$)/;
 const ASSET = /^\/(?:macro-dashboard\/)?assets\//;
 const VER = /[?&]v=[0-9a-f]{6,64}(?:&|$)/;
-const FALLBACK = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · Aurum Desk</title>'
+const FALLBACK = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · Aureum Desk</title>'
   + '<body style="margin:0;display:grid;place-items:center;min-height:100vh;background:#08090c;color:#eceef2;font:16px system-ui,sans-serif;text-align:center;padding:16px">'
   + '<p>You\'re offline — prices and trades need a connection.<br><button onclick="location.reload()" style="margin-top:16px;font:inherit;padding:10px 20px">Try again</button></p>';
 

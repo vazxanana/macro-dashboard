@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     const name = `${t.side === 'buy' ? 'BUY' : 'SELL'} ${t.name || t.k}${t.status === 'pending' ? ' (pending)' : ''}${t.shadow ? ' · shadow' : ''}`;
     return `    f_trade(${Math.round((t.filled || t.opened) * 1000)}, ${num(t.entry)}, ${num(t.stop)}, ${num(t.t1)}, ${num(t.t2)}, ${q(name)}, ${t.side === 'buy'})`;
   });
-  const src = `// Aurum Desk · Council trades on ${NAME[sym] || sym.toUpperCase()} (snapshot ${at} UTC, ${open.length} open)
+  const src = `// Aureum Desk · Council trades on ${NAME[sym] || sym.toUpperCase()} (snapshot ${at} UTC, ${open.length} open)
 // Paste into TradingView: Pine Editor → New → replace everything → Save → Add to chart.
 // Pine scripts cannot load live data, so copy a fresh version from meridianx.dev when the council opens or closes trades.
 //@version=6

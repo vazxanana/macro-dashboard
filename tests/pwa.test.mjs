@@ -173,7 +173,7 @@ test('injectHead: adds the missing app tags once, normalises manifest and Apple 
   assert.match(t, /<meta name="theme-color" content="#030607">/, 'a page keeps its own theme colour');
   assert.equal((t.match(/theme-color/g) || []).length, 1);
   assert.match(t, /<link rel="apple-touch-icon" href="\/icons\/apple-touch-icon\.png">/);
-  for (const re of [/apple-mobile-web-app-capable" content="yes"/, /name="mobile-web-app-capable" content="yes"/, /apple-mobile-web-app-title" content="Aurum Desk"/,
+  for (const re of [/apple-mobile-web-app-capable" content="yes"/, /name="mobile-web-app-capable" content="yes"/, /apple-mobile-web-app-title" content="Aureum Desk"/,
     /apple-mobile-web-app-status-bar-style" content="black"/, /<script src="\/assets\/pwa\.js" defer><\/script>/]) assert.match(t, re);
   assert.ok(t.indexOf('pwa.js') < t.indexOf('</head>'));
   assert.ok(t.endsWith('<body><script>var s = "<link rel=\\"manifest\\">";</script></body></html>'), 'the body is untouched');
@@ -224,7 +224,7 @@ const pngSize = (f) => { const b = fs.readFileSync(f); assert.equal(b.toString('
 
 test('manifest: installable (name, standalone, start_url in scope, 192 + 512 + maskable icons that exist at their sizes)', () => {
   const m = JSON.parse(fs.readFileSync(path.join(ROOT, 'app.webmanifest'), 'utf8'));
-  assert.equal(m.name, 'Aurum Desk');
+  assert.equal(m.name, 'Aureum Desk');
   assert.ok(m.short_name && m.short_name.length <= 12);
   assert.equal(m.display, 'standalone');
   assert.equal(m.id, '/');

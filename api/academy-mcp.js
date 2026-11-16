@@ -1,4 +1,4 @@
-// Aurum Academy: the owner's assistant connector, served at /api/academy-mcp/<key> (vercel.json rewrite -> ?key=).
+// Aureum Academy: the owner's assistant connector, served at /api/academy-mcp/<key> (vercel.json rewrite -> ?key=).
 //
 // Owner, 10 Nov 2026: the analyst's second opinion should come from the owner's own assistant, with no API key and no bill.
 // The owner adds this address as a connector in their assistant app and says "answer my Academy questions". The assistant
@@ -29,7 +29,7 @@ const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
 const SHAPE = require('./_academy-analyst.js').SHAPE;   // the one answer shape: the same text the rules of every question carry
 const GUIDE = {
-  what: 'Aurum Academy is a paper-trading school. A deterministic engine decides BUY, SELL or WAIT on historical setups; you give a second opinion on a decision it has already stored. Replay and paper only: nothing here places an order.',
+  what: 'Aureum Academy is a paper-trading school. A deterministic engine decides BUY, SELL or WAIT on historical setups; you give a second opinion on a decision it has already stored. Replay and paper only: nothing here places an order.',
   workflow: [
     'Call academy_pending to see the questions that wait.',
     'For each one call academy_question with its id. It returns `rules` (how to judge and the exact answer shape) and `question` (the facts known at the decision time).',
@@ -48,7 +48,7 @@ const GUIDE = {
   ],
   answerShape: SHAPE,
 };
-const INSTR = 'Aurum Academy (replay and paper only). You are the analyst: a second opinion on historical trade decisions the owner queued on the Academy page. Call academy_guide once, then academy_pending, and for each question academy_question followed by academy_answer. Judge only from the facts in the question; you are never shown a result. Answer with one JSON object in the given shape; confidence is a word, never a probability. Nothing here places an order.';
+const INSTR = 'Aureum Academy (replay and paper only). You are the analyst: a second opinion on historical trade decisions the owner queued on the Academy page. Call academy_guide once, then academy_pending, and for each question academy_question followed by academy_answer. Judge only from the facts in the question; you are never shown a result. Answer with one JSON object in the given shape; confidence is a word, never a probability. Nothing here places an order.';
 
 const RO = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 const TOOLS = [
@@ -92,7 +92,7 @@ async function rpc(m, d) {
   const note = m.id === undefined || m.id === null; if (note && m.method.startsWith('notifications/')) return null;
   const ok = (result) => (note ? null : { jsonrpc: '2.0', id: m.id, result }), err = (code, message) => (note ? null : { jsonrpc: '2.0', id: m.id, error: { code, message } });
   switch (m.method) {
-    case 'initialize': { const want = m.params && m.params.protocolVersion; return ok({ protocolVersion: VERSIONS.includes(want) ? want : VERSIONS[0], capabilities: { tools: { listChanged: false } }, serverInfo: { name: 'meridianx-academy', title: 'Aurum Academy analyst', version: '1.0.0' }, instructions: INSTR }); }
+    case 'initialize': { const want = m.params && m.params.protocolVersion; return ok({ protocolVersion: VERSIONS.includes(want) ? want : VERSIONS[0], capabilities: { tools: { listChanged: false } }, serverInfo: { name: 'meridianx-academy', title: 'Aureum Academy analyst', version: '1.0.0' }, instructions: INSTR }); }
     case 'ping': return ok({});
     case 'tools/list': return ok({ tools: TOOLS });
     case 'tools/call': {
