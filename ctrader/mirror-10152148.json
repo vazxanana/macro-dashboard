@@ -4092,7 +4092,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T00:52:22.000Z",
     "councilEntry": 3895.88,
     "stop": 3886.48,
@@ -4107,10 +4107,12 @@
     "slipR": -0.386,
     "lagSec": 105,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T00:52:22.000Z",
-    "brokerStop": 3882.85
+    "brokerStop": 3882.85,
+    "closedAt": "2026-11-16T01:00:53.000Z"
    }
   },
   "day": {
@@ -4118,7 +4120,7 @@
    "startBalance": 5472.85
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5472.85 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 5462.72 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4126,15 +4128,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5472.85,
-  "lastRun": "2026-11-16T00:57:34.000Z"
+  "balance": 5462.72,
+  "lastRun": "2026-11-16T01:00:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T00:36:04.000Z",
-   "msg": "not mirrored xrp-replica-1794357299-s: none of XRPUSD found at the broker",
-   "trade": "xrp-replica-1794357299-s"
-  },
   {
    "at": "2026-11-11T00:36:04.000Z",
    "msg": "opened sell GBPUSD 0.05 lot (council replica)",
@@ -5628,6 +5625,11 @@
   {
    "at": "2026-11-16T00:52:22.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794790237-b"
+  },
+  {
+   "at": "2026-11-16T01:00:53.000Z",
+   "msg": "XAUUSD position 49691364 closed at the broker",
    "trade": "xau-replica-1794790237-b"
   }
  ],
