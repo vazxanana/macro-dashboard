@@ -8,22 +8,22 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-15 23:56 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-16 00:00 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
-Session now: **late**.
+Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
-| XAU/USD | down (Kraken, OANDA failed) | no (not live, trades the replica instead) | WAIT VR buy | 28 trades, 43% won, +0.69R a trade |
-| BTC/USD | up (Kraken) | no (not live) | IN ORIGIN buy | 27 trades, 37% won, +0.60R a trade |
-| ETH/USD | down (Kraken) | no (not live) | READY buy | 14 trades, 29% won, −0.29R a trade |
-| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN buy | 17 trades, 24% won, −0.38R a trade |
-| XRP/USD | down (Kraken) | no (not live) | IN ORIGIN buy | 44 trades, 55% won, +0.75R a trade |
-| EUR/USD | down (Kraken, OANDA failed) | no (not live) | IN ORIGIN buy | 3 trades, 33% won, −0.14R a trade |
-| GBP/USD | down (Kraken, OANDA failed) | no (not live) | READY buy | 18 trades, 39% won, +0.04R a trade |
-| AUD/USD | up (Kraken, OANDA failed) | no (not live, rule skips AUD/USD) | READY buy (blocked: wrong side) | 35 trades, 40% won, +0.11R a trade |
-| USD/CAD | up (Kraken, OANDA failed) | no (not live) | IN ORIGIN buy | 16 trades, 38% won, +0.09R a trade |
-| USD/CHF | up (Kraken, OANDA failed) | no (not live) | IN ORIGIN buy | 15 trades, 60% won, +0.73R a trade |
+| XAU/USD | down (Kraken, OANDA failed) | no (not live, trades the replica instead, asia session) | WAIT VR buy | 28 trades, 43% won, +0.69R a trade |
+| BTC/USD | up (Kraken) | no (not live, asia session) | IN ORIGIN buy | 27 trades, 37% won, +0.60R a trade |
+| ETH/USD | down (Kraken) | no (not live, asia session) | READY buy | 14 trades, 29% won, −0.29R a trade |
+| SOL/USD | down (Kraken) | no (not live, asia session) | IN ORIGIN buy | 17 trades, 24% won, −0.38R a trade |
+| XRP/USD | down (Kraken) | no (not live, asia session) | IN ORIGIN buy | 44 trades, 55% won, +0.75R a trade |
+| EUR/USD | down (Kraken, OANDA failed) | no (not live, asia session) | IN ORIGIN buy | 3 trades, 33% won, −0.14R a trade |
+| GBP/USD | down (Kraken, OANDA failed) | no (not live, asia session) | READY buy | 18 trades, 39% won, +0.04R a trade |
+| AUD/USD | up (Kraken, OANDA failed) | no (not live, rule skips AUD/USD, asia session) | READY buy (blocked: wrong side) | 35 trades, 40% won, +0.11R a trade |
+| USD/CAD | up (Kraken, OANDA failed) | no (not live, asia session) | IN ORIGIN buy | 16 trades, 38% won, +0.09R a trade |
+| USD/CHF | up (Kraken, OANDA failed) | no (not live, asia session) | IN ORIGIN buy | 15 trades, 60% won, +0.73R a trade |
 
 Replay total on the markets it trades live: 154 trades, +0.33R a trade (+51.47R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 154 trades, +0.33R a trade (+51.47R)
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-15 23:56 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-16 00:00 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -43,13 +43,13 @@ Built by the Trader at 2026-11-15 23:56 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-15 23:56 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-16 00:00 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 5 signals (0 open, 5 closed, +0.52R, 20% won); 11 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 5 signals in 7 days, 4 closed +2.31R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-15 23:56 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-15 23:58 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -64,7 +64,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-15 23:56 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-16 00:00 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -136,18 +136,18 @@ Built by the Analyst (last post-mortem 2026-11-15 13:32 UTC) from the live paper
 <!-- what-changed:start -->
 ## What changed
 
-Daily, for 2026-11-15 (UTC). Each setup's last 20 closed paper trades (live and shadow) against its whole record, in R after costs. The change is tested last 20 vs the trades before them (Welch t): |t| under 1 is noise, 1 to 2 a weak sign, 2 or more (with 20+ earlier trades) a fair one. Nothing here is an edge unless its n and t say so.
+Daily, for 2026-11-16 (UTC). Each setup's last 20 closed paper trades (live and shadow) against its whole record, in R after costs. The change is tested last 20 vs the trades before them (Welch t): |t| under 1 is noise, 1 to 2 a weak sign, 2 or more (with 20+ earlier trades) a fair one. Nothing here is an edge unless its n and t say so.
 
-**Last 24 h:** 11 trades closed (0 live), +21.79R (live +0.00R).
+**Last 24 h:** 7 trades closed (0 live), +18.52R (live +0.00R).
 
 | Setup | Trades (live) | All-time R a trade | Last 20 | 20 as of 24 h ago | Change | Confidence |
 |---|---|---|---|---|---|---|
 | Scalp (scalp) | 510 (15) | −0.01 (t -0.1) | −0.42 | −0.42 | **decaying** | low (t -1.3, 20 vs 490) |
 | Retrace (rscalp) | 282 (6) | −0.35 (t -3.7) | −0.10 | −0.10 | steady (within noise) | none (t 0.8) |
-| Intraday (intraday) | 99 (5) | +0.46 (t 2.7) | +1.01 | +0.70 | **improving** | low (t 1.8, 20 vs 79) |
+| Intraday (intraday) | 101 (5) | +0.50 (t 2.9) | +1.33 | +1.01 | **improving** | fair (t 3.0, 20 vs 81) |
 | Retrace (rintra) | 50 (5) | −0.10 (t -0.3) | −0.59 | −0.59 | **decaying** | low (t -1.4, 20 vs 30) |
+| Position (position) | 18 (1) | +1.44 (t 3.7) | +1.44 (only 18) | — | too few to compare | small sample (n 18) |
 | M30 (m30m1) | 16 (0) | +0.31 (t 0.5) | +0.31 (only 16) | — | too few to compare | small sample (n 16) |
-| Position (position) | 13 (1) | +0.88 (t 2.2) | +0.88 (only 13) | — | too few to compare | small sample (n 13) |
 | Swing (swing) | 9 (1) | +0.86 (t 1.7) | +0.86 (only 9) | — | too few to compare | small sample (n 9) |
 | Retrace (rswing) | 5 (0) | +0.09 (t 0.3) | +0.09 (only 5) | — | too few to compare | small sample (n 5) |
 | Replica (replica) | 2 (2) | +0.47 (t 0.3) | +0.47 (only 2) | — | too few to compare | small sample (n 2) |
@@ -156,11 +156,11 @@ Daily, for 2026-11-15 (UTC). Each setup's last 20 closed paper trades (live and 
 | Gold H4 trendline (gtl) | 1 (1) | −1.02 (t 0.0) | −1.02 (only 1) | — | too few to compare | small sample (n 1) |
 
 **Why:**
-- **Intraday** (intraday) is improving: +1.01R a trade over the last 20 vs +0.33R before; won 70% of the last 20 (was 42%); biggest mover: overlap session, 9 of the last 20 (was 28% of trades) at +1.61R a trade (was +0.42R a trade). Confidence low (t 1.8). Whole record: positive and unlikely to be luck (n 99, t 2.7), on paper.
+- **Intraday** (intraday) is improving: +1.33R a trade over the last 20 vs +0.29R before; won 80% of the last 20 (was 41%); biggest mover: with-D1 trades, 14 of the last 20 (was 47% of trades) at +1.27R a trade (was +0.23R a trade). Confidence fair (t 3.0). Whole record: positive and unlikely to be luck (n 101, t 2.9), on paper.
 - **Retrace** (rintra) is decaying: −0.59R a trade over the last 20 vs +0.23R before; won 30% of the last 20 (was 43%); biggest mover: asia session, 3 of the last 20 (was 40% of trades) at −2.73R a trade (was +1.01R a trade). Confidence low (t -1.4). Whole record: no proven edge (n 50, t -0.3).
 - **Scalp** (scalp) is decaying: −0.42R a trade over the last 20 vs +0.00R before; won 25% of the last 20 (was 33%); biggest mover: overlap session, 11 of the last 20 (was 21% of trades) at −0.84R a trade (was +0.12R a trade). Confidence low (t -1.3). Whole record: no proven edge (n 510, t -0.1).
 
-**Edge check:** intraday +0.46R a trade (n 99, t 2.7): positive with t ≥ 2 on paper (after modelled costs); live fills can still differ.
+**Edge check:** intraday +0.50R a trade (n 101, t 2.9): positive with t ≥ 2 on paper (after modelled costs); live fills can still differ.
 <!-- what-changed:end -->
 
 <!-- fidelity:start -->
@@ -178,16 +178,16 @@ Checked 2026-11-15 11:28 UTC; live signals 2026-11-01 to 2026-11-15.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-15 23:56 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-16 00:00 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
-| Gold replica | shadow (paper, owner 11 Nov) | gate closed: 1.88% average daily range under the 2.35% gate, so no new replica trade | nothing on |
-| Mosha BO | shadow (paper, owner 11 Nov) | H4 BO sell at 3865.28 (11-14 16:00 UTC); waiting for the H1 BO the other way (the retracement). Weekly structure agrees. | nothing on |
-| Mosha cycle | shadow (paper, owner 11 Nov) | H4 moving down from 3865.28; waiting for the H1 ChoCh that starts the pullback. | nothing on |
-| Gold trend | live | waiting for a daily close above the 20-day high 4151.90 (last close 3817.09) | nothing on |
-| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4146.34 (last close 3817.09) | paper only |
-| Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 3815.54; waiting for an H4 close above it | nothing on |
+| Gold replica | shadow (paper, owner 11 Nov) | gate closed: 1.95% average daily range under the 2.35% gate, so no new replica trade | nothing on |
+| Mosha BO | shadow (paper, owner 11 Nov) | H4 BO sell (11-14 16:00 UTC), H1 retracement BO (11-16 00:00 UTC); waiting for the M15 BO back sell. Weekly structure agrees. | nothing on |
+| Mosha cycle | shadow (paper, owner 11 Nov) | H1 ChoCh at 3898.98, the H4 move down is pulling back (target 50% 3867.19); M15 / M5 trade the pullback, then the ChoCh back with H4 (target 3778.27). | nothing on |
+| Gold trend | live | waiting for a daily close above the 20-day high 4151.90 (last close 3903.13) | nothing on |
+| Gold trend fast | shadow | waiting for a daily close above the 5-day high 4138.65 (last close 3903.13) | paper only |
+| Gold H4 trendline | shadow (paper, owner 11 Nov) | falling H4 line at 3806.09; waiting for an H4 close above it (blocked: direction) | nothing on |
 | Gold daily engulf | live | daily close 3892.03 below the 20-day average 4036.32 | nothing on |
 | Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; no pullback zone watched · paper test | nothing on |
 | NQ New York open run | shadow (paper, owner 11 Nov; research.json) | last session 2026-11-09: sell loss −1.05R; next at the 09:30 New York open | — |
