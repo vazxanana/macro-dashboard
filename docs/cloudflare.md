@@ -30,7 +30,7 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
 (1.4 KB), `/api/me`, `/api/status`, sign-in failing closed while the user list cannot be read, a missing page 404,
 `/api/run` 410, `/api/og` → the icon.
 
-## Stage 2 (needs the Cloudflare account: a session on the macro-dashboard environment, where the token is)
+## Stage 2 (needs the Cloudflare account; deployed from GitHub Actions or the owner's computer, see step 3)
 
 1. Upgrade the account to **Workers Paid** (Dashboard → Workers & Pages → Plans). The owner approved it.
 2. **Secrets.** Copy each value from Vercel (Project → Settings → Environment Variables) into the Worker with
@@ -44,8 +44,15 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `NTFY_TOPIC`, `TV_WEBHOOK_KEY`, `MCP_KEYS`, `MCP_ORIGINS`,
    `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
    `EDGE_ANALYST`, `RUN_MODE`, `COUNCIL_ALERTS`. Only those set on Vercel need copying.
-3. `npx wrangler deploy` → the site on `meridianx.<account>.workers.dev`. Storage still Vercel's Blob store and
+3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store and
    Edge Config, reached over HTTPS with the same tokens, so both sites read and write the same data.
+   **Deploy with GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`, free: the repo is public): add the
+   repository secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, then Actions →
+   "Cloudflare deploy" → Run workflow (or re-run its last run). It also runs on a push to the Cloudflare branches.
+   It sets no Worker secrets (step 2 stays the owner's) and never touches Vercel or DNS. A cloud assistant session
+   cannot deploy itself (16 Nov 2026): its network proxy puts the saved Cloudflare token on every request to
+   `api.cloudflare.com`, including the asset upload, which must carry the upload session's own key (401). Locally,
+   `npx wrangler login && npx wrangler deploy` in `cloudflare/` does the same.
 4. Side-by-side check on the workers.dev address: the smoke and ChronosTrade audits (`PORT` / base URL), sign-in
    as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, price alerts, the connectors.
 
