@@ -7,7 +7,7 @@
 // the same for every tab of the gold terminal; and no visible chart host (.vz) of a page may be left empty.
 // The ICT desk draws no text under 12 px.
 // On the phone the macro desk opens in its simple view: every folded section is opened and its charts must be drawn at their width.
-// Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
+// Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live proxy (env MD_ORIGIN, default the Cloudflare Worker);
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
 // A proxy fetch is tried three times (shared.cjs); one that still fails answers 503: the page's fallback path runs, which must
@@ -16,6 +16,7 @@
 // Desk load (11 Nov): while the Desk loads, no /cdata file may be requested twice (every reader shares window.msData), and a
 // visitor who is not signed in may only ask for the guest allowlist (GUEST_OK in api/data.js). A fourth run opens the Desk as a
 // guest who chose "Continue as guest": under the first-load sign-in card the app sleeps, so that card alone no longer runs it.
+const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';
 const { chromium } = require('playwright');
 const { fetchRetry, fetched } = require('./shared.cjs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
@@ -49,7 +50,7 @@ async function wire(ctx, account, seen) {
     if (/^\/api\/me$/.test(p)) return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ account }) });
     if (/^\/api\/sounds$/.test(p)) return r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' });
     if (/^\/api\//.test(p) || p === '/md/stream') return r.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
-    if (p === '/md/bars') { const x = await proxy('https://meridianx.dev' + p + u.search); return r.fulfill({ status: x.status, contentType: x.type, body: x.body }); }
+    if (p === '/md/bars') { const x = await proxy(MD_ORIGIN + p + u.search); return r.fulfill({ status: x.status, contentType: x.type, body: x.body }); }
     if (p.startsWith('/cdata/')) { seen.push(p.slice(7)); const x = await proxy(CDATA + p.slice(7)); return r.fulfill({ status: x.status, contentType: /\.json$/.test(p) ? 'application/json' : 'text/plain', body: x.body }); }
     // vercel.json rewrites
     const m = /^\/macro-dashboard(\/.*)$/.exec(p); if (m) return r.continue({ url: H + m[1] + u.search });

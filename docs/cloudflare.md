@@ -38,7 +38,8 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    Vercel by an assistant, and never pasted into a chat. Keep the SAME values for `SESSION_SECRET`,
    `CTRADER_LINK_KEY` and `CRON_SECRET`: the session key and every connector key (Fred's ICT connector, the Academy
    assistant, the Mosha assistant) are derived from them, so new values sign everyone out and change those keys.
-   Names the functions read: `OANDA_TOKEN` (`OANDA_ENV`), `CRON_SECRET`, `SESSION_SECRET`, `CTRADER_LINK_KEY`,
+   Names the functions read: `OANDA_TOKEN` (`OANDA_ENV`: `practice` or unset for a practice-account token, `live` only for a
+   live one; `OANDA_ACCOUNT_ID` optional, lets the live price stream skip OANDA's account lookup), `CRON_SECRET`, `SESSION_SECRET`, `CTRADER_LINK_KEY`,
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
    `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
    `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `NTFY_TOPIC`, `TV_WEBHOOK_KEY`, `MCP_KEYS`, `MCP_ORIGINS`,
@@ -56,14 +57,29 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
 4. Side-by-side check on the workers.dev address: the smoke and ChronosTrade audits (`PORT` / base URL), sign-in
    as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, price alerts, the connectors.
 
+**State on 16 Nov 2026 (stage 2 done):** the Worker is live at https://meridianx.meridianx-cloudflare.workers.dev, deployed by
+the Actions workflow after the owner added the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The
+Vercel project is gone from team `xau`, so old secret values could not be copied: `SESSION_SECRET`, `CRON_SECRET` and
+`CTRADER_LINK_KEY` are NEW values (everyone signs in again; Fred's connector, the Academy and Mosha assistant keys changed:
+new links from the Profile page). The Vercel Blob store `meridian-users` still answers, through `BLOB_READ_WRITE_TOKEN`.
+`OANDA_TOKEN` is a practice-account token (`OANDA_ENV` practice). Checked: every page and short address 200, no page error
+or sideways scroll (phone signed out, phone guest, desktop), guest `/cdata` cut, protected files 401, sign-in refuses a wrong
+password, `/md/bars` candles for gold, silver, NAS100 and forex. The live stream answered `OANDA accounts 504` until
+`OANDA_ACCOUNT_ID` is set. Not yet set: VAPID keys (price-alert pushes), `GH_MCP_TOKEN`, the cTrader client trio,
+`GH_READ_TOKEN`, `EDGE_CONFIG`, `TV_WEBHOOK_KEY`. The council reads candles from the Worker (`MD_BASE` in `council.yml`).
+The zone `meridianx.dev` is on Cloudflare's Free plan: one rate-limiting rule (10 s window) only, and a Skip rule cannot turn
+off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/cdata/mt5/signals.csv` without a browser).
+
 ## Stage 3 (code still to port; each a small change of its own)
 
 - **Academy** (`api/academy.js`) reads `academy/` files from disk; Workers have no project files. Bundle what it
   reads as modules, or move them to R2.
 - **Bridge downloads** (`api/bridge.js`) read `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` from disk:
   bundle them as text modules.
-- **Fred's connector**: `validateProposal` checks syntax with `node --check` in a child process; Workers have none.
-  Replace with a JavaScript parser (no new network access).
+- **Fred's connector** (done 16 Nov 2026): `validateProposal` checks a proposed module with `node --check` where a child
+  process can start, else (Workers) by parsing it with acorn (bundled: `cloudflare/package.json`, `wrangler.jsonc` alias).
+  The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
+  Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
 - **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
 - **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
   alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,

@@ -1,5 +1,5 @@
 // Run: sh scripts/build.sh && (cd out && python3 -m http.server 8766 &) ; node --use-env-proxy scripts/audit/chronostrade.cjs
-// Needs Playwright and network to meridianx.dev (candles come through the live /md/bars proxy). Not part of node --test.
+// Needs Playwright and network to the site's live /md/bars proxy (env MD_ORIGIN, default the Cloudflare Worker since 16 Nov 2026). Not part of node --test.
 // ChronosTrade end-to-end audit: every feature against real OANDA candles (through the live /md/bars proxy).
 const { chromium } = require('playwright');
 const { measured, settle, fetchRetry } = require('./shared.cjs');
@@ -14,7 +14,8 @@ const CONTRAST_ONB = String.raw`(() => { const lum = (c) => { const m = c.match(
 const aaBoth = async (pg) => { const out = []; for (const cs of ['dark', 'light']) { await pg.emulateMedia({ colorScheme: cs }); out.push(...(await measured(pg, CONTRAST_ONB, 'first-run or empty-state text')).map((x) => cs + ': ' + x)); } await pg.emulateMedia({ colorScheme: null }); return out; };
 const aaStats = (pg) => measured(pg, CONTRAST, 'analytics or journal text');
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
-const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), await p.route(/\/api\/mosha-lessons/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"lessons":[],"book":[],"canTeach":true,"who":"owner"}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const x = await fetchRetry(r.request().url().replace(H, 'https://meridianx.dev')); if (x.status !== 200) NET.push(x.status + (x.error ? ' ' + x.error : '')); r.fulfill({ status: x.status === 503 && x.error ? 502 : x.status, contentType: 'application/json', body: x.body }); }));
+const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';   // where live candles come from (meridianx.dev answered 402 after the Vercel project went away)
+const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), await p.route(/\/api\/mosha-lessons/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"lessons":[],"book":[],"canTeach":true,"who":"owner"}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const x = await fetchRetry(r.request().url().replace(H, MD_ORIGIN)); if (x.status !== 200) NET.push(x.status + (x.error ? ' ' + x.error : '')); r.fulfill({ status: x.status === 503 && x.error ? 502 : x.status, contentType: 'application/json', body: x.body }); }));
 const NET = [];   // candle requests that failed after three tries: named at the end, so a network failure is not read as a page fault
 // sign-in (9 Nov): the page asks /api/me (the session cookie lives on the server); the audit stubs the answer
 const me = (p, account) => p.route(/\/api\/me(\?|$)/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ account }) }));
@@ -470,7 +471,7 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const SEC = { '1m': 60, '2m': 120, '5m': 300, '10m': 600, '15m': 900, '30m': 1800, '1h': 3600, '2h': 7200, '4h': 14400, '1d': 86400 }, tfOf = (sec) => Object.keys(SEC).find((k) => SEC[k] === sec);
     // reference candles through fetchRetry (shared.cjs: three tries, one answer per URL per run); a window that still fails stops
     // the audit with that reason: a missing window must never read as "no candles"
-    const raw = async (q, tf, from, to) => { const sec = SEC[tf], out = []; for (let a = from; a < to; a += 4999 * sec) { const x = await fetchRetry(`https://meridianx.dev/md/bars?sym=nas100&tf=${tf}&from=${a}&to=${Math.min(to, a + 4999 * sec)}`); let j = null; try { j = x.status === 200 ? JSON.parse(x.body.toString()) : null; } catch (e) {}
+    const raw = async (q, tf, from, to) => { const sec = SEC[tf], out = []; for (let a = from; a < to; a += 4999 * sec) { const x = await fetchRetry(`${MD_ORIGIN}/md/bars?sym=nas100&tf=${tf}&from=${a}&to=${Math.min(to, a + 4999 * sec)}`); let j = null; try { j = x.status === 200 ? JSON.parse(x.body.toString()) : null; } catch (e) {}
       if (!j || !Array.isArray(j.bars)) { NET.push(x.status + (x.error ? ' ' + x.error : '')); throw new Error(`reference candles ${tf} could not be fetched (${x.status}${x.error ? ' ' + x.error : ''})`); } for (const c of j.bars) if (!c.live && c.time >= from && c.time < to && (!out.length || c.time > out[out.length - 1].time)) out.push(c); } return out; };
     const ohlc = (bs) => (bs.length ? { open: bs[0].open, high: Math.max(...bs.map((x) => x.high)), low: Math.min(...bs.map((x) => x.low)), close: bs[bs.length - 1].close } : null);
     const same = (a, o) => !!a && !!o && ['open', 'high', 'low', 'close'].every((k) => Math.abs(a[k] - o[k]) < 1e-9);
@@ -681,6 +682,6 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);
   console.log(`\n${R.filter((r) => r.ok).length} / ${R.length} passed`);
-  if (NET.length) console.log(`${process.env.GITHUB_ACTIONS ? '::warning::' : 'NOTE: '}ChronosTrade audit: ${NET.length} candle request(s) to meridianx.dev failed after three tries (${[...new Set(NET)].slice(0, 3).join(', ')}): failures above may be the network, not the page`);
+  if (NET.length) console.log(`${process.env.GITHUB_ACTIONS ? '::warning::' : 'NOTE: '}ChronosTrade audit: ${NET.length} candle request(s) to ${MD_ORIGIN} failed after three tries (${[...new Set(NET)].slice(0, 3).join(', ')}): failures above may be the network, not the page`);
   if (R.some((r) => !r.ok)) process.exitCode = 1; // CI (.github/workflows/ci.yml) fails on any FAIL
 })().catch((e) => { for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`); console.error('ABORTED:', e.message.split('\n')[0]); if (NET.length) console.error(`${NET.length} candle request(s) failed after three tries: ${[...new Set(NET)].slice(0, 3).join(', ')}`); process.exit(1); });

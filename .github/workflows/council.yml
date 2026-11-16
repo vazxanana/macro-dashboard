@@ -22,6 +22,13 @@ on:
       - 'council/**'
       - '.github/workflows/council.yml'
 
+# The OANDA candle service the Trader, data check and Macro strategist read (council/*.mjs `MD_BASE`). Since 16 Nov 2026 the
+# site runs on Cloudflare (docs/cloudflare.md) and meridianx.dev answered 402 until its domain moved, so the default is the
+# Worker's own address, which keeps working after the move. The repository variable MD_ORIGIN (scheme + host, no slash)
+# overrides it. The VPS runner (council/live.mjs) sets its own local MD_BASE and is not affected.
+env:
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
+
 permissions:
   contents: write
   actions: write

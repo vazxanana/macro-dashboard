@@ -295,14 +295,27 @@ async function deskUpdate(who, a) {
   }, 0);
   return { saved: true, id, review, note: 'Saved to the council data (ict/desk.json); the desk page shows it on its next load.' };
 }
-function syntaxCheck(p, content) {
+// .mjs: `node --check` in a child process. Where no child process can start (Cloudflare Workers, since 16 Nov 2026) the same
+// syntax check is made by parsing the module with acorn (bundled with the Worker: cloudflare/wrangler.jsonc alias). A syntax
+// error that node reports (stderr) is never re-checked: it is the answer. o.parser / o.noChild are for tests.
+function parseCheck(p, content, parser) {
+  const parse = parser || ((s) => require('acorn').parse(s, { ecmaVersion: 'latest', sourceType: 'module' }));
+  try { parse(content); return 'syntax parsed ok (acorn)'; } catch (e) { throw new Error(`syntax error in ${p}:\n${String(e.message || e).split('\n').slice(0, 6).join('\n')}`); }
+}
+function syntaxCheck(p, content, o = {}) {
   if (/\.json$/.test(p)) { try { JSON.parse(content); } catch (e) { throw new Error(`${p} is not valid JSON: ${e.message}`); } return 'JSON ok'; }
   if (!/\.mjs$/.test(p)) return null;
-  const f = pathM.join(os.tmpdir(), `mcp-check-${crypto.randomBytes(6).toString('hex')}.mjs`);
-  fs.writeFileSync(f, content);
-  try { execFileSync(process.execPath, ['--check', f], { timeout: 10000, stdio: 'pipe' }); return 'node --check ok'; }
-  catch (e) { const msg = String((e.stderr && e.stderr.toString()) || e.message).split(f).join(p).split('\n').filter(Boolean).slice(0, 6).join('\n'); throw new Error(`syntax error in ${p}:\n${msg}`); }
-  finally { try { fs.unlinkSync(f); } catch (e) {} }
+  if (o.noChild) return parseCheck(p, content, o.parser);
+  let f = null;
+  try {
+    f = pathM.join(os.tmpdir(), `mcp-check-${crypto.randomBytes(6).toString('hex')}.mjs`);
+    fs.writeFileSync(f, content);
+    execFileSync(process.execPath, ['--check', f], { timeout: 10000, stdio: 'pipe' }); return 'node --check ok';
+  } catch (e) {
+    const err = e && e.stderr && e.stderr.toString();
+    if (!err) return parseCheck(p, content, o.parser);   // no child process / temp file here: parse instead
+    const msg = err.split(f).join(p).split('\n').filter(Boolean).slice(0, 6).join('\n'); throw new Error(`syntax error in ${p}:\n${msg}`);
+  } finally { if (f) try { fs.unlinkSync(f); } catch (e) {} }
 }
 // Everything checked before a single GitHub write; returns what the PR body reports. The same checks for a proposal and an
 // applied change. o.deletes: paths a revert removes; o.revert: the restored state was on main before, so no new test is asked.
@@ -641,7 +654,8 @@ async function rpc(who, m, ctx = {}) {
 }
 
 // browser origins allowed to call (no Origin = a server-side client such as ChatGPT, Claude or Cursor: allowed)
-const ORIGINS = [/^https:\/\/(chatgpt\.com|chat\.openai\.com|claude\.ai|claude\.com|meridianx\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+// The site's own Cloudflare Worker address (16 Nov 2026): the Profile card asks /api/mcp for a member's link from it.
+const ORIGINS = [/^https:\/\/(chatgpt\.com|chat\.openai\.com|claude\.ai|claude\.com|meridianx\.dev|meridianx\.meridianx-cloudflare\.workers\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 const originOk = (o, env = process.env) => !o || ORIGINS.some((re) => re.test(o)) || String(env.MCP_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean).includes(o);
 const rpcErr = (res, code, rpcCode, message) => res.status(code).json({ jsonrpc: '2.0', id: null, error: { code: rpcCode, message } });
 
