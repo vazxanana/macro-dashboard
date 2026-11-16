@@ -90,7 +90,7 @@ if (fs.existsSync(`${DIR}/coach.json`)) {
   n0 = dcalls.length; const first = await round(T);
   check('digest: first send goes to ntfy and Telegram once', () => { assert.ok(first); assert.equal(dcalls.length - n0, 2); assert.match(first.ev.title, /^Coach suggests \(needs your OK on the site\)$/); });
   check('digest: sent marker saved in coach.json proposalsSent {key, at}', () => { const s = JSON.parse(fs.readFileSync(cf, 'utf8')).proposalsSent; assert.equal(s.key, first.mark.key); assert.ok(s.key); assert.ok(Date.parse(s.at)); });
-  check('digest: names the proposal and the site, no "stable" line', () => { assert.match(first.ev.msg, /skip EUR\/USD for Scalp — −0\.\d\dR over \d+ replay trades/); assert.match(first.ev.msg, /meridianx\.dev → Council → Systems/); assert.doesNotMatch(first.ev.msg, /stable/); });
+  check('digest: names the proposal and the site, no "stable" line', () => { assert.match(first.ev.msg, /skip EUR\/USD for Scalp — −0\.\d\dR over \d+ replay trades/); assert.match(first.ev.msg, /aureumdesk\.co\.uk → Council → Systems/); assert.doesNotMatch(first.ev.msg, /stable/); });
   n0 = dcalls.length; for (let i = 1; i <= 12; i++) await round(T + i * 300);
   check('digest: same set -> no resend over the next hour of rounds', () => assert.equal(dcalls.length, n0));
   n0 = dcalls.length; await round(T + 20 * 3600);
@@ -109,7 +109,7 @@ if (fs.existsSync(`${DIR}/coach.json`)) {
   check('digest: all withdrawn -> one "withdrawn" note, then silence', () => { assert.match(clr.ev.title, /withdrawn/); assert.equal(dcalls.length - n0, 2); });
   n0 = dcalls.length; await round(T + 80 * 3600);
   check('digest: nothing suggested -> no daily reminder', () => assert.equal(dcalls.length, n0));
-  check('digest: Telegram text is plain, carries the site link', () => { const t = dcalls.filter((c) => /telegram/.test(c.url)).at(0); assert.ok(!('parse_mode' in t.body)); assert.match(t.body.text, /https:\/\/meridianx\.dev\//); });
+  check('digest: Telegram text is plain, carries the site link', () => { const t = dcalls.filter((c) => /telegram/.test(c.url)).at(0); assert.ok(!('parse_mode' in t.body)); assert.match(t.body.text, /https:\/\/aureumdesk\.co\.uk\//); });
   fs.rmSync(tmp, { recursive: true, force: true });
   show('Sample: Coach digest (real coach.json)', [first.ev]);
   show('Sample: Coach digest after a change', [changed.ev]);

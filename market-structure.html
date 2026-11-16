@@ -14072,7 +14072,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     }).join('');
   }
   function load() {
-    if (!/meridianx\.dev$|vercel\.app$|^localhost$|^127\./.test(location.hostname)) { sum.textContent = 'Available on aureumdesk.co.uk (it needs the site\'s server).'; return; }
+    if (!/^https?:$/.test(location.protocol) || /github\.io$/.test(location.hostname)) { sum.textContent = 'Available on aureumdesk.co.uk (it needs the site\'s server).'; return; }
     fetch('/api/edge-analyst', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
       if (r.status === 401 || r.status === 403) { sum.textContent = 'Sign in as the owner or a reviewer to see it.'; return null; }
       if (!r.ok) { sum.textContent = 'Could not be loaded (server ' + r.status + ').'; return null; }
