@@ -19,6 +19,8 @@
     "web-push": "./node_modules/web-push",
     "acorn": "./node_modules/acorn"
   },
+  // A copy of the Vercel Blob store (src/backup.mjs, every 10 min until complete, then daily). An id, not a secret.
+  "kv_namespaces": [{ "binding": "BACKUP", "id": "ef06eea1b4834f3e913b3fbd82302039" }],
   "triggers": { "crons": ["* * * * *", "*/10 * * * *"] },
   "limits": { "cpu_ms": 300000 },
   "observability": { "enabled": true },
