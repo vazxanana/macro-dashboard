@@ -89,6 +89,16 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
 (1-53 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
+## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
+`cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
+build time (`src/routes.mjs`), the api/ handlers UNCHANGED through a Node-style adapter (`src/adapter.mjs`: Vercel's
+req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), crons alert-cron and
+edge-analyst. Stages, secrets list and what is still to port: `docs/cloudflare.md`. Nothing is deployed from this
+repository's CI; Vercel stays the live site until the domain moves. Keep api/ handlers in Vercel's (req, res) shape so
+both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
+fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads, the connector's
+syntax check and the preview image are stage 3. Never put a secret in `wrangler.jsonc`.
+
 ## Locked features — do NOT remove or replace in redesigns
 
 These live in `gold-trading.html` (the gold terminal). It stays self-contained: no build step, no external JS beyond the

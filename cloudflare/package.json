@@ -1,0 +1,16 @@
+{
+  "name": "meridianx-cloudflare",
+  "private": true,
+  "description": "The site on Cloudflare Workers: out/ as static assets, api/ handlers through a Node-style adapter",
+  "scripts": {
+    "dev": "wrangler dev",
+    "check": "wrangler deploy --dry-run --outdir dist"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.2",
+    "web-push": "3.6.7"
+  },
+  "devDependencies": {
+    "wrangler": "4.156.1"
+  }
+}
