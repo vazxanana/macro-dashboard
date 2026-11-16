@@ -8,16 +8,16 @@ const resOf = () => { const out = { headers: {} }; const res = { setHeader: (k, 
 
 test('logout refuses a cross-site POST (no forced sign-out) and still works same-site', async () => {
   const logout = req('../api/logout.js');
-  let { out, res } = resOf(); await logout({ method: 'POST', headers: { origin: 'https://evil.example', host: 'meridianx.dev' } }, res);
+  let { out, res } = resOf(); await logout({ method: 'POST', headers: { origin: 'https://evil.example', host: 'aureumdesk.co.uk' } }, res);
   assert.equal(out.code, 403); assert.equal(out.headers['Set-Cookie'], undefined);
-  ({ out, res } = resOf()); await logout({ method: 'POST', headers: { origin: 'https://meridianx.dev', host: 'meridianx.dev' } }, res);
+  ({ out, res } = resOf()); await logout({ method: 'POST', headers: { origin: 'https://aureumdesk.co.uk', host: 'aureumdesk.co.uk' } }, res);
   assert.equal(out.code, 200); assert.match(out.headers['Set-Cookie'], /Max-Age=0/);
 });
 
 test('sounds: cross-site POST refused; a JSON string body is read', async () => {
   const { handle } = req('../api/sounds.js'); let db = null; const store = { get: async () => db, put: async (v) => { db = v; } };
   const MP3 = 'data:audio/mpeg;base64,' + 'A'.repeat(40);
-  let { out, res } = resOf(); await handle({ method: 'POST', headers: { origin: 'https://evil.example', host: 'meridianx.dev' }, body: { ownerPw: 'right', kind: 'sl', data: MP3 } }, res, { env: {}, store, isOwner: (p) => p === 'right' });
+  let { out, res } = resOf(); await handle({ method: 'POST', headers: { origin: 'https://evil.example', host: 'aureumdesk.co.uk' }, body: { ownerPw: 'right', kind: 'sl', data: MP3 } }, res, { env: {}, store, isOwner: (p) => p === 'right' });
   assert.equal(out.code, 403); assert.equal(db, null);
   ({ out, res } = resOf()); await handle({ method: 'POST', headers: {}, body: JSON.stringify({ ownerPw: 'right', kind: 'sl', data: MP3, name: 'x.mp3' }) }, res, { env: {}, store, isOwner: (p) => p === 'right' });
   assert.equal(out.code, 200); assert.equal(db.sl.name, 'x.mp3');

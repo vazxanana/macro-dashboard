@@ -249,7 +249,7 @@ async function handle(req, res, d = {}) {
 
     if (req.method === 'GET' && q.get === 'reader') {
       if (!owner) return res.status(403).json({ error: 'only the owner sees the assistant\'s key' });
-      const key = readerKey(env); return res.status(200).json({ key, off: off(env), host: String((req.headers && req.headers.host) || 'meridianx.dev').replace(/[^A-Za-z0-9.:-]/g, '').slice(0, 120) });
+      const key = readerKey(env); return res.status(200).json({ key, off: off(env), host: String((req.headers && req.headers.host) || 'aureumdesk.co.uk').replace(/[^A-Za-z0-9.:-]/g, '').slice(0, 120) });
     }
     let list = (await store.get()).map(norm);
     if (req.method === 'GET' && q.img != null) {

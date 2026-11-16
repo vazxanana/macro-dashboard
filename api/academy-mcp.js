@@ -22,7 +22,7 @@ const CN = require('./_academy-connector.js');
 const AC = require('./academy.js');
 
 const VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];   // newest first; an unknown request gets the newest
-const ORIGINS = [/^https:\/\/(claude\.ai|claude\.com|chatgpt\.com|chat\.openai\.com|meridianx\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
+const ORIGINS = [/^https:\/\/(claude\.ai|claude\.com|chatgpt\.com|chat\.openai\.com|meridianx\.dev|(www\.)?aureumdesk\.co\.uk|meridianx\.meridianx-cloudflare\.workers\.dev)$/, /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/];
 const originOk = (o) => !o || ORIGINS.some((re) => re.test(o));
 const rpcErr = (res, code, rpcCode, message) => res.status(code).json({ jsonrpc: '2.0', id: null, error: { code: rpcCode, message } });
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);

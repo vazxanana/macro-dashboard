@@ -252,7 +252,7 @@ test('academy.css: 12 px text at least, no endless animation, touch height from 
 
 // ---- the fixtures: real candles, small, complete ------------------------------------------------------------------------------
 test('fixtures: real recorded candles for one window, well formed, and several train and exam setups inside it', () => {
-  assert.equal(MAN.edge, 'gmp'); assert.match(MAN.source, /meridianx\.dev\/md\/bars/); assert.ok(TRAIN.length >= 3 && EXAM.length >= 3, `${TRAIN.length} train, ${EXAM.length} exam`);
+  assert.equal(MAN.edge, 'gmp'); assert.match(MAN.source, /(meridianx\.dev|aureumdesk\.co\.uk)\/md\/bars/); assert.ok(TRAIN.length >= 3 && EXAM.length >= 3, `${TRAIN.length} train, ${EXAM.length} exam`);
   assert.deepEqual(MAN.candidates, { train: TRAIN.length, exam: EXAM.length });
   let bytes = 0;
   for (const tf of MXAC.TFS) {

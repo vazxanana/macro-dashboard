@@ -84,7 +84,7 @@ export async function sendAlerts(ev, { topic, tgTok, tgChat, fetchFn = fetch } =
 // `proposals`) changes, and a reminder at most once a day while it stays the same and is not empty. Suggestions only:
 // nothing is applied, the owner OKs them on the site. The last digest sent is kept in coach.json `proposalsSent`
 // ({ key, at, items }), so a restart never resends. A stability line counts only when it is flagged (a losing half).
-export const SITE = 'https://meridianx.dev/';
+export const SITE = 'https://aureumdesk.co.uk/';
 const fRm = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(+v).toFixed(2)}R`, cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 export const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote', 'dataSource', 'ictFilter'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
 const halvesTxt = (p) => p.h1 && p.h2 ? `halves ${fRm(p.h1.exp)} / ${fRm(p.h2.exp)}` : '';
@@ -110,7 +110,7 @@ export function proposalDigest(proposals, sent, now, { remindEvery = 86400 } = {
   if (!key) return { mark, ev: { title: 'Coach suggestions withdrawn', msg: `The Coach no longer suggests: ${(prev.items || []).join('; ') || prev.key}.\nNothing to OK on the site.\n${when(now)}`, tags: 'heavy_minus_sign', click: SITE } };
   const again = !!prev && prev.key === key;
   return { mark, ev: { title: `Coach suggests (needs your OK on the site)${again ? ' · reminder' : ''}`,
-    msg: `${items.map((s) => '• ' + s).join('\n')}\nOpen meridianx.dev → Council → Systems. Nothing changes until you OK it (paper only).\n${when(now)}`, tags: 'bulb', click: SITE } };
+    msg: `${items.map((s) => '• ' + s).join('\n')}\nOpen aureumdesk.co.uk → Council → Systems. Nothing changes until you OK it (paper only).\n${when(now)}`, tags: 'bulb', click: SITE } };
 }
 
 // Edge-decay change alert (8 Nov, council/decay.mjs): one message when the set of LIVE systems the monitor marks 'decaying'

@@ -32,7 +32,7 @@ test('the Worker bundles the parser and allows its own address on the connector'
   assert.equal(JSON.parse(fs.readFileSync(new URL('../cloudflare/package.json', import.meta.url), 'utf8')).dependencies.acorn, '8.15.0');
   const { originOk } = require('../api/mcp.js').lib;
   assert.equal(originOk('https://meridianx.meridianx-cloudflare.workers.dev', {}), true);
-  assert.equal(originOk('https://meridianx.dev', {}), true);
+  assert.equal(originOk('https://aureumdesk.co.uk', {}), true);
   assert.equal(originOk('https://other.meridianx-cloudflare.workers.dev', {}), false);
   assert.equal(originOk('https://evil.example', {}), false);
 });

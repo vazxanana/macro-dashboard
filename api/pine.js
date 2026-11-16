@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
   });
   const src = `// Aureum Desk · Council trades on ${NAME[sym] || sym.toUpperCase()} (snapshot ${at} UTC, ${open.length} open)
 // Paste into TradingView: Pine Editor → New → replace everything → Save → Add to chart.
-// Pine scripts cannot load live data, so copy a fresh version from meridianx.dev when the council opens or closes trades.
+// Pine scripts cannot load live data, so copy a fresh version from aureumdesk.co.uk when the council opens or closes trades.
 //@version=6
 indicator("Council trades · ${(NAME[sym] || sym.toUpperCase()).replace(/"/g, '')}", overlay = true, max_lines_count = 300, max_labels_count = 150)
 showStops   = input.bool(true, "Stops")

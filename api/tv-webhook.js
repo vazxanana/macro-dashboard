@@ -1,5 +1,5 @@
 // TradingView alerts in (7 Nov 2026). Point a TradingView alert's Webhook URL at
-//   https://meridianx.dev/api/tv-webhook?k=<TV_WEBHOOK_KEY>
+//   https://aureumdesk.co.uk/api/tv-webhook?k=<TV_WEBHOOK_KEY>
 // Each alert is stored (private Blob tvalerts/, newest 50 kept) and forwarded as a push notification to every device
 // that has price alerts on. The owner reads the URL and the log with the owner password:
 //   POST { ownerPw?, list: true } -> { url, alerts: [{ at, text, ticker, price }] }   (owner password or the owner's session cookie)
@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
   } catch (e) { console.error(`[tv] store ${e.message}`); }
   let sent = 0;
   if (process.env.VAPID_PRIVATE_KEY) {
-    webpush.setVapidDetails('https://meridianx.dev', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+    webpush.setVapidDetails('https://aureumdesk.co.uk', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
     try {
       const { by } = await all();
       const title = `TradingView${rec.ticker ? ` · ${rec.ticker}` : ''}${rec.side ? ` · ${String(rec.side).toUpperCase()}` : ''}`;

@@ -310,7 +310,7 @@ export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : 
 export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.filter((v) => !PAPER_VARIANTS.has(v) && !EXIT_VARIANTS.includes(v)).map((v) => [v, !!variantRule(v, g, mk, ctx)]));
 // OANDA mid candles for the paper-only markets via the site's market-data proxy (complete candles only, 17:00 New York hour dropped
 // like the futures feed); D1 = the 17:00 New York (FX/metals) day built from those H1 candles, stamped so time + 86400 = its close
-export const MD_BARS = process.env.ICT_MD_BARS || 'https://meridianx.dev/md/bars';
+export const MD_BARS = process.env.ICT_MD_BARS || 'https://aureumdesk.co.uk/md/bars';
 export async function mdBars(sym, tf, q) {
   const r = await fetch(`${MD_BARS}?sym=${encodeURIComponent(sym)}&tf=${tf}&${q}`, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
   const j = await r.json().catch(() => null);

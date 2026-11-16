@@ -4,7 +4,7 @@
 //   node council/datacheck.mjs <council-data dir>      (run from council.yml every 2nd round; never exits non-zero)
 //
 // Feeds (5-minute candles, the timeframe trades are managed on):
-//   oanda  — the site's OANDA proxy https://meridianx.dev/md/bars (MD_BASE): spot gold and the five forex pairs the Trader reads
+//   oanda  — the site's OANDA proxy https://aureumdesk.co.uk/md/bars (MD_BASE): spot gold and the five forex pairs the Trader reads
 //   kraken — api.kraken.com OHLC: the four crypto markets the Trader trades (it never trades Kraken gold/forex unless OANDA fails)
 //   cnbc   — ts-api.cnbc.com: the ICT desk's futures (ict/tracker.mjs MARKETS, first CNBC symbol; halt-hour bars dropped as the tracker does)
 // Checks per market: unreachable / too few candles, stale (open-market minutes since the last candle), gaps (missing open-market
@@ -140,7 +140,7 @@ async function getJSON(fetchFn, url, opt = {}) {
   if (j == null) throw new Error('not JSON');
   return j;
 }
-export async function fetchOanda(sym, { fetchFn = fetch, base = process.env.MD_BASE || 'https://meridianx.dev/md/', now } = {}) {
+export async function fetchOanda(sym, { fetchFn = fetch, base = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/', now } = {}) {
   const j = await getJSON(fetchFn, `${base}bars?sym=${sym}&tf=5m&n=300&r=${Math.floor(now / 60)}`);
   if (j.src !== 'OANDA') throw new Error(`answered from ${j.src || 'an unknown source'}, not OANDA`);
   if (!Array.isArray(j.bars)) throw new Error('no candles in the answer');

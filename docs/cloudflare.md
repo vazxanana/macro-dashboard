@@ -70,6 +70,10 @@ password, `/md/bars` candles for gold, silver, NAS100 and forex. The live stream
 The zone `meridianx.dev` is on Cloudflare's Free plan: one rate-limiting rule (10 s window) only, and a Skip rule cannot turn
 off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/cdata/mt5/signals.csv` without a browser).
 
+**Domain (16 Nov 2026):** the site is at https://aureumdesk.co.uk and www.aureumdesk.co.uk (zone in this account, active, the
+Worker as custom domain, certificate active). meridianx.dev is no longer used. **Backup:** every Vercel Blob file is copied into
+the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then again daily; nothing is deleted on either side.
+
 ## Stage 3 (code still to port; each a small change of its own)
 
 - **Academy** (`api/academy.js`) reads `academy/` files from disk; Workers have no project files. Bundle what it

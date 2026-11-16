@@ -2,7 +2,7 @@
 // Local server for the Academy page (academy.html): for runs on your own machine and for scripts/audit/academy.cjs.
 //
 //   sh scripts/build.sh && node scripts/academy-dev.mjs            recorded candles (tests/fixtures/academy), port 8770
-//   node --use-env-proxy scripts/academy-dev.mjs --live            real candles through https://meridianx.dev/md/bars
+//   node --use-env-proxy scripts/academy-dev.mjs --live            real candles through https://aureumdesk.co.uk/md/bars
 //   node scripts/academy-dev.mjs --guest                           answers /api/me as signed out (to see the owner-only card)
 //   node scripts/academy-dev.mjs --fake-llm                        the analyst answers from a FAKE provider (scripts/academy-fake-llm.cjs:
 //                                                                  a fixed rule, not a language model, no network, no cost). It is injected
@@ -40,7 +40,7 @@ const MXAC = require('../assets/academy-ui.js');
 
 const argv = process.argv.slice(2), flag = (n) => argv.includes('--' + n), opt = (n, d) => { const i = argv.indexOf('--' + n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const LIVE = flag('live'), GUEST = flag('guest'), RECORD = flag('record');
-const PORT = +(process.env.PORT || 8770), LIVE_BASE = 'https://meridianx.dev';
+const PORT = +(process.env.PORT || 8770), LIVE_BASE = 'https://aureumdesk.co.uk';
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 const readJson = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const manifest = () => (fs.existsSync(path.join(FIX, 'manifest.json')) ? readJson(path.join(FIX, 'manifest.json')) : null);

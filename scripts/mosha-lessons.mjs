@@ -18,7 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const BASE = (process.env.MOSHA_BASE || 'https://meridianx.dev').replace(/\/+$/, ''), URL_ = `${BASE}/api/mosha-lessons`, GAP = 2500;   // the site allows 30 API calls a minute
+const BASE = (process.env.MOSHA_BASE || 'https://aureumdesk.co.uk').replace(/\/+$/, ''), URL_ = `${BASE}/api/mosha-lessons`, GAP = 2500;   // the site allows 30 API calls a minute
 const headers = (extra = {}) => ({ ...(process.env.MOSHA_READER_KEY ? { Authorization: `Bearer ${process.env.MOSHA_READER_KEY}` } : {}), ...extra });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }, KIND = { term: 'Terms', step: 'Steps', rule: 'Rules', avoid: 'What to avoid' };

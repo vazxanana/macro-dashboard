@@ -94,10 +94,12 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 build time (`src/routes.mjs`), the api/ handlers UNCHANGED through a Node-style adapter (`src/adapter.mjs`: Vercel's
 req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), crons alert-cron and
 edge-analyst. Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
-https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev moves when its nameservers do),
+https://aureumdesk.co.uk (+ www; the site's domain since 16 Nov 2026, a Cloudflare zone with the Worker as its custom domain) and
+https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev is no longer used),
 deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on push only for the two Cloudflare branches).
 The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker (`MD_BASE`, repository variable
-`MD_ORIGIN` overrides). Keep api/ handlers in Vercel's (req, res) shape so
+`MD_ORIGIN` overrides). Links, the bridges' default URL, the digest and the connectors' origin lists name aureumdesk.co.uk.
+A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily). Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
 fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
 stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.

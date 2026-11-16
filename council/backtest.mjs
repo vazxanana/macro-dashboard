@@ -62,7 +62,7 @@ const VARIANTS = [['none', null, false], ['be1', 1, false], ['be15', 1.5, false]
 const newVariants = (stop) => VARIANTS.map(([n, be, t2, pt]) => ({ n, be, t2, pt, stop, beMoved: false, done: false, R: null, size: 1, booked: 0, best: 0 }));
 // D1 trend labels from OANDA spot for gold and forex (7 Nov), the same source the live trader and the site charts use, so the
 // replay's "with / against D1" means the same thing as the live trades'. Only the label; the D1 candles stay as loaded.
-const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
+const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/';
 async function oandaD1(key) { if (!OANDA_D1.has(key)) return null; try { const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=1d&n=1500`, { signal: AbortSignal.timeout(15000) }); const j = r.ok ? await r.json() : null;
   return j && j.src === 'OANDA' && Array.isArray(j.bars) && j.bars.length > 300 ? j.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })) : null; } catch (e) { return null; } }
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };

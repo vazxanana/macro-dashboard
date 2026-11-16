@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { injectHead, siteVersion, buildWorker, run } from '../scripts/pwa.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ORIGIN = 'https://meridianx.dev';
+const ORIGIN = 'https://aureumdesk.co.uk';
 const SRC = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
 
 // A fake worker global: Cache Storage in memory, fetch from the test, events captured.
@@ -284,10 +284,10 @@ test('push: the alert as sent; plain text, null, a bare string, a list or wrong 
 
 test('push: a notification link never leaves this site', async () => {
   const w = loadSw();
-  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://meridianx.dev/', '', null]) {
+  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://aureumdesk.co.uk/', '', null]) {
     assert.equal((await push(w, JSON.stringify({ url }))).data.url, '/#charts', String(url));
   }
-  assert.equal((await push(w, JSON.stringify({ url: 'https://meridianx.dev/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
+  assert.equal((await push(w, JSON.stringify({ url: 'https://aureumdesk.co.uk/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
   assert.equal((await push(w, JSON.stringify({ url: 'gold' }))).data.url, '/gold');
 });
 

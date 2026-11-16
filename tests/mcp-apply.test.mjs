@@ -20,7 +20,7 @@ const reset = () => { process.env.MCP_KEYS = `fred:${KEY}`; process.env.GH_READ_
 const withNet = async (net, fn) => { globalThis.fetch = net; try { return await fn(); } finally { globalThis.fetch = realFetch; } };
 const rpcCall = (name, args, ctx = { level: 'write', apply: true }, who = 'fred') => L.rpc(who, { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } }, ctx);
 const list = async (ctx) => (await L.rpc('fred', { jsonrpc: '2.0', id: 2, method: 'tools/list' }, ctx)).result.tools.map((t) => t.name);
-const post = (body, query = { key: KEY }) => drive(handler, { query, headers: { 'content-type': 'application/json', host: 'meridianx.dev' }, body });
+const post = (body, query = { key: KEY }) => drive(handler, { query, headers: { 'content-type': 'application/json', host: 'aureumdesk.co.uk' }, body });
 const J = (v, status = 200) => new Response(JSON.stringify(v), { status });
 const APPLY = ['ict_apply_change', 'ict_revert_change'];
 // the stored user list with the box ticked for Fred (lock 1), and main's members file naming him (lock 2)

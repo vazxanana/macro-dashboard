@@ -128,7 +128,7 @@ test('Mosha lessons: a write checks the account against the user list as it is n
   const builtIns = { luxus: { name: 'Luxus', hash: sha('lx-pw'), role: 'viewer' } }; let stored = { users: {} }, reads = 0;
   const deps = { builtIns, blobUsers: async () => { reads++; return stored; } }, cookie = `ms_session=${S.issue(ENV, 'luxus', sha('lx-pw'), S.account('luxus', builtIns.luxus))}`;
   const I = { env: ENV, deps, store: L.blobStore(W.env, W.io()), sameOrigin: () => true };
-  const go = async (method, body) => { const { out, res } = resOf(); await L.handle({ method, headers: { cookie, host: 'meridianx.dev' }, query: {}, body }, res, I); return out; };
+  const go = async (method, body) => { const { out, res } = resOf(); await L.handle({ method, headers: { cookie, host: 'aureumdesk.co.uk' }, query: {}, body }, res, I); return out; };
   S._cache.users = null; S._cache.at = 0;
   assert.equal((await go('GET')).body.canTeach, true); assert.equal((await go('POST', { add: { note: 'a lesson' } })).code, 200);
   stored = { users: { luxus: { ...builtIns.luxus, perms: { mosha: 'read' } } } };            // the owner switches his teaching off

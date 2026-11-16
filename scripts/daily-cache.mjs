@@ -1,5 +1,5 @@
 // Daily candle cache for research: keeps council-data research/daily/<sym>.json (OANDA D1 mid candles, full history, UTC days)
-// for every market in api/_oanda.js, through the site's own keyless proxy (meridianx.dev/md/bars; no monthly cost), so studies
+// for every market in api/_oanda.js, through the site's own keyless proxy (aureumdesk.co.uk/md/bars; no monthly cost), so studies
 // can read daily data from /cdata/research/daily/<sym>.json without hitting OANDA. Run weekly by .github/workflows/daily-cache.yml.
 //   node scripts/daily-cache.mjs <dataDir> [sym ...]          (dataDir = checkout of council-data; env MD_BASE overrides the proxy)
 // File shape (compact, ~50 bytes a day): { sym, inst, tf: "D", src: "OANDA", updated, cols: ["t","o","h","l","c","v"], rows: [[unixSec, o, h, l, c, volume], ...] }
@@ -63,7 +63,7 @@ export async function refresh(dir, sym, base, now = Math.floor(Date.now() / 1000
   return entry;
 }
 
-export async function main(argv = process.argv.slice(2), base = process.env.MD_BASE || 'https://meridianx.dev/md/bars') {
+export async function main(argv = process.argv.slice(2), base = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/bars') {
   const [root, ...only] = argv;
   if (!root) { console.error('usage: daily-cache.mjs <dataDir> [sym ...]'); process.exit(1); }
   const dir = path.join(root, 'research', 'daily'); fs.mkdirSync(dir, { recursive: true });
@@ -79,7 +79,7 @@ export async function main(argv = process.argv.slice(2), base = process.env.MD_B
     }
   }
   await Promise.all(Array.from({ length: 3 }, worker));   // 3 at a time: well inside the /md 900 requests a minute limit
-  idx.updated = new Date().toISOString(); idx.tf = 'D'; idx.src = 'OANDA via meridianx.dev/md/bars'; idx.cols = COLS;
+  idx.updated = new Date().toISOString(); idx.tf = 'D'; idx.src = 'OANDA via aureumdesk.co.uk/md/bars'; idx.cols = COLS;
   idx.symbols = Object.fromEntries(Object.entries(idx.symbols).sort());
   fs.writeFileSync(idxFile, JSON.stringify(idx, null, 1));
   console.log(`${syms.length - bad} ok, ${bad} failed`);

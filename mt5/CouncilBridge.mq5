@@ -5,7 +5,7 @@
 //| council bot publishes on the council-data branch every 4 min.    |
 //|                                                                  |
 //| Setup: Tools > Options > Expert Advisors > "Allow WebRequest for |
-//| listed URL" and add https://meridianx.dev |
+//| listed URL" and add https://aureumdesk.co.uk |
 //| Attach to any chart (one instance per account). Demo first.      |
 //+------------------------------------------------------------------+
 #property copyright "macro-dashboard council"
@@ -13,7 +13,7 @@
 #property strict
 #include <Trade\Trade.mqh>
 
-input string  InpUrl        = "https://meridianx.dev/cdata/mt5/signals.csv"; // signals file
+input string  InpUrl        = "https://aureumdesk.co.uk/cdata/mt5/signals.csv"; // signals file
 input int     InpPollSec    = 30;        // poll every N seconds
 input long    InpMagic      = 260511;    // magic number
 // symbols on this broker ("" = do not trade that market)
@@ -156,7 +156,7 @@ bool fetchSignals(Sig &out[]) {
   // raw.githubusercontent.com caches a file for up to 5 min; a changing query string bypasses that cache so a signal is seen within one bot round
   string url = InpUrl + (StringFind(InpUrl, "?") >= 0 ? "&" : "?") + "cb=" + IntegerToString((long)TimeGMT());
   int code = WebRequest("GET", url, "", 5000, data, result, headers);
-  if (code != 200) { Print("CouncilBridge: WebRequest ", code, " error ", GetLastError(), " (is https://meridianx.dev in the allowed URL list?)"); return false; }
+  if (code != 200) { Print("CouncilBridge: WebRequest ", code, " error ", GetLastError(), " (is https://aureumdesk.co.uk in the allowed URL list?)"); return false; }
   string txt = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
   string lines[]; int n = StringSplit(txt, '\n', lines); if (n < 2) return false;
   string head[]; int hi = -1;

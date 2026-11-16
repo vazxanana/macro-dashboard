@@ -126,7 +126,7 @@ test('runChecks reads every feed the bots use, the way they read it', async () =
   assert.deepEqual(Object.keys(h.feeds.oanda.markets), ['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']);
   assert.deepEqual(Object.keys(h.feeds.cnbc.markets), Object.keys(FEEDS.cnbc.markets));
   assert.ok(Object.keys(h.feeds.cnbc.markets).includes('gc'));
-  assert.ok(net.calls.some((u) => /meridianx\.dev\/md\/bars\?sym=xau&tf=5m&n=300&r=\d+/.test(u)));
+  assert.ok(net.calls.some((u) => /aureumdesk\.co\.uk\/md\/bars\?sym=xau&tf=5m&n=300&r=\d+/.test(u)));
   assert.ok(net.calls.some((u) => u === 'https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=5'));
   // CNBC 5M request starts on the hour (CNBC anchors bars at the start minute)
   const c = net.calls.find((u) => u.includes('%40ND.1/5M/')); assert.match(c, /\/5M\/\d{8}\d{2}0000\//);

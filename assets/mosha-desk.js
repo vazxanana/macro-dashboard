@@ -87,7 +87,7 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || (r.status === 401 ? L('Sign in first.') : r.status === 429 ? L('Too many requests: wait a minute, then open the desk again.') : L('The log is unavailable ({n}).', { n: r.status }))); return j; }); });
   }
   function load() {
-    if (!URL_API) { M.err = 'The trade log needs the live site (meridianx.dev): this copy has no server behind it.'; M.trades = []; draw(); return; }
+    if (!URL_API) { M.err = 'The trade log needs the live site (aureumdesk.co.uk): this copy has no server behind it.'; M.trades = []; draw(); return; }
     call('GET').then(function (j) { M.trades = j.trades || []; M.canWrite = !!j.canWrite; M.err = null; draw(); }).catch(function (e) { M.err = e.message; if (!M.trades) M.trades = []; draw(); });
   }
 

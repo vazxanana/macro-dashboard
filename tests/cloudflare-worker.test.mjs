@@ -7,7 +7,7 @@ import { rewrite, headersFor, match } from '../cloudflare/src/routes.mjs';
 import { run, queryOf, headersOf } from '../cloudflare/src/adapter.mjs';
 
 const vercel = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
-const U = (p) => new URL('https://meridianx.dev' + p);
+const U = (p) => new URL('https://aureumdesk.co.uk' + p);
 const rw = (p) => { const u = rewrite(vercel.rewrites, U(p)); return u.pathname + u.search; };
 
 test('cloudflare: rewrites are vercel.json\'s', () => {
@@ -62,7 +62,7 @@ test('cloudflare: every function of api/ is routed, retired or replaced on purpo
   assert.doesNotMatch(wr, /"vars"/);
 });
 
-const req = (p, init = {}) => new Request('https://meridianx.dev' + p, init);
+const req = (p, init = {}) => new Request('https://aureumdesk.co.uk' + p, init);
 
 test('cloudflare adapter: json, text, status, headers, redirect', async () => {
   let seen;

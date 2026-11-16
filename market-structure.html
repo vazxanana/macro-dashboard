@@ -17,14 +17,14 @@
 <meta property="og:site_name" content="Aureum Desk">
 <meta property="og:title" content="Aureum Desk · Trading">
 <meta property="og:description" content="Live market structure, the AI council's paper trades, crypto scalping and the ICT desk.">
-<meta property="og:url" content="https://meridianx.dev/">
-<meta property="og:image" content="https://meridianx.dev/api/og">
+<meta property="og:url" content="https://aureumdesk.co.uk/">
+<meta property="og:image" content="https://aureumdesk.co.uk/api/og">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Aureum Desk: live gold price and 2-day chart">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://meridianx.dev/api/og">
-<link rel="canonical" href="https://meridianx.dev/">
+<meta name="twitter:image" content="https://aureumdesk.co.uk/api/og">
+<link rel="canonical" href="https://aureumdesk.co.uk/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -1451,7 +1451,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
     if (btn.getAttribute('aria-busy') === 'true') return;
     err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
-    if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on meridianx.dev.'); return; }
+    if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on aureumdesk.co.uk.'); return; }
     btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
     var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 15000);
@@ -2988,7 +2988,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 
   <span id="ms-main-start" tabindex="-1"></span>
   <div class="ms-offline-box" role="alert">
-    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through meridianx.dev, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
+    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through aureumdesk.co.uk, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
@@ -5822,7 +5822,7 @@ function msNextSetup(bars, A) {
     if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
   // Broker bridge panel (7 Nov loop): what the MT5 / cTrader CouncilBridge EA sees (mt5/signals.csv), when a bridge last read it, setup + EA downloads
   { const btn = document.getElementById('ms-br-open'); let dlg;
-    const URL_ = 'https://meridianx.dev/cdata/mt5/signals.csv';
+    const URL_ = 'https://aureumdesk.co.uk/cdata/mt5/signals.csv';
     const ago = (s) => { const d = Date.now() / 1000 - s; return d < 90 ? 'just now' : d < 5400 ? `${Math.round(d / 60)} min ago` : d < 172800 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
     const load = async () => {
       const st = dlg.querySelector('#br-st'), li = dlg.querySelector('#br-list');
@@ -5857,7 +5857,7 @@ function msNextSetup(bars, A) {
           <ul class="pa-list" id="br-list"></ul>
           <h3 class="br-h3">Set up</h3>
           <ol class="tva-steps"><li>Download the EA: <button type="button" class="pa-del br-dl" data-f="mt5">MT5 (.mq5)</button> <button type="button" class="pa-del br-dl" data-f="ctrader">cTrader (.cs)</button></li>
-          <li>MT5: Tools → Options → Expert Advisors → tick <b>Allow WebRequest</b> and add <code>https://meridianx.dev</code>. cTrader: the cBot needs <b>Full access</b>.</li>
+          <li>MT5: Tools → Options → Expert Advisors → tick <b>Allow WebRequest</b> and add <code>https://aureumdesk.co.uk</code>. cTrader: the cBot needs <b>Full access</b>.</li>
           <li>Attach it to any chart; the signals address is already filled in: <code class="br-url">${URL_}</code> <button type="button" class="pa-del" id="br-cp">Copy</button></li>
           <li>Check the risk inputs (0.25% per trade by default, daily loss and max drawdown guards) before going live.</li></ol>
           <div class="tva-acts"><button type="button" class="pa-del" id="br-re">Refresh status</button></div>`;
@@ -5876,7 +5876,7 @@ function msNextSetup(bars, A) {
     const load = async () => { const k = dlg.querySelector('#tva-sym').value, sh = dlg.querySelector('#tva-sh').checked, ta = dlg.querySelector('#tva-src'), m = dlg.querySelector('#tva-msg');
       ta.value = 'Loading…'; m.textContent = '';
       try { const r = await fetch(`/api/pine?sym=${k}${sh ? '&shadow=1' : ''}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`server ${r.status}`); ta.value = await r.text(); const n = (ta.value.match(/(\d+) open\)/) || [])[1]; m.textContent = `${n || 0} open trade${n === '1' ? '' : 's'} in this snapshot.`; }
-      catch (e) { ta.value = ''; m.textContent = `Could not build the script (${e.message}). The add-on works on meridianx.dev.`; }
+      catch (e) { ta.value = ''; m.textContent = `Could not build the script (${e.message}). The add-on works on aureumdesk.co.uk.`; }
       dlg.querySelector('#tva-tv').href = window.msTvUrl ? window.msTvUrl(k, '1h') : 'https://www.tradingview.com/chart/'; };
     const open = () => {
       if (!dlg) {
@@ -5996,7 +5996,7 @@ function msNextSetup(bars, A) {
       dlg.querySelector('#pa-sym').value = k; const n = nowPx(k) || await quote(k);
       if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec);
       if (atPrice > 0) dlg.querySelector('#pa-price').value = (+atPrice).toFixed(INSTRUMENTS[k].dec);
-      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Aureum Desk from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on meridianx.dev.';
+      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Aureum Desk from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on aureumdesk.co.uk.';
       hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
     };
     setTimeout(lines, 1500); setInterval(lines, 30e3);
@@ -8657,7 +8657,7 @@ function msNextSetup(bars, A) {
     const msg = document.getElementById('ms-u-msg'); if (US.busy) return; US.busy = true;
     try {
       // the owner's session saves (9 Nov); records go up without hashes and keep theirs on the server; `pw` sets a new password
-      if (!window.MS_USERS_API) throw new Error('Account changes are made on meridianx.dev.');
+      if (!window.MS_USERS_API) throw new Error('Account changes are made on aureumdesk.co.uk.');
       if (msg) msg.textContent = 'Saving…';
       // each failure names its reason (11 Nov): an ended session and a server error both used to read "check your connection"
       const OFF = () => new Error(navigator.onLine === false ? 'Not saved: you are offline. Connect and try again.' : 'Not saved: the server could not be reached. Check your connection and try again.'), ENDED = 'Not saved: your owner session has ended. Sign in again and retry.';
@@ -8720,7 +8720,7 @@ function msNextSetup(bars, A) {
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
     if (!skipFetch) US.remote = await window.msFetchUsers();
-    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on meridianx.dev';
+    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on aureumdesk.co.uk';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     // keyboard focus survives the redraw (11 Nov): it fell back to the top of the page after every save
     const ae = document.activeElement; if (ae && body.contains(ae) && ae.closest('tr')) US.fk = [ae.closest('tr').dataset.u, ae.dataset.act || '']; setTimeout(uRefocus, 0);
@@ -11719,7 +11719,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 
   async function load(showBusy) {
     if (state.busy || !active()) return;
-    if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
+    if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on aureumdesk.co.uk to link cTrader.</div>'; return; }
     // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
     if (document.documentElement.dataset.ct && !ls(sessKey())) {
       try {
@@ -14072,7 +14072,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     }).join('');
   }
   function load() {
-    if (!/meridianx\.dev$|vercel\.app$|^localhost$|^127\./.test(location.hostname)) { sum.textContent = 'Available on meridianx.dev (it needs the site\'s server).'; return; }
+    if (!/meridianx\.dev$|vercel\.app$|^localhost$|^127\./.test(location.hostname)) { sum.textContent = 'Available on aureumdesk.co.uk (it needs the site\'s server).'; return; }
     fetch('/api/edge-analyst', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
       if (r.status === 401 || r.status === 403) { sum.textContent = 'Sign in as the owner or a reviewer to see it.'; return null; }
       if (!r.ok) { sum.textContent = 'Could not be loaded (server ' + r.status + ').'; return null; }

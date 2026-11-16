@@ -34,6 +34,6 @@ function keyOk(env, given) {
 }
 // why the connector cannot be used, or null
 const unavailable = (env = process.env) => (off(env) ? 'the connector is switched off on the server' : baseOf(env) ? null : 'the server has no session secret yet, so the connector has no key');
-const urlOf = (env, host) => { const k = keyOf(env), h = String(host || '').replace(/[^A-Za-z0-9.:-]/g, '').slice(0, 120) || 'meridianx.dev'; return k ? `https://${h}/api/academy-mcp/${k}` : null; };
+const urlOf = (env, host) => { const k = keyOf(env), h = String(host || '').replace(/[^A-Za-z0-9.:-]/g, '').slice(0, 120) || 'aureumdesk.co.uk'; return k ? `https://${h}/api/academy-mcp/${k}` : null; };
 
 module.exports = { NAME, keyOf, keyOk, unavailable, urlOf };
