@@ -76,8 +76,10 @@ off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/c
   reads as modules, or move them to R2.
 - **Bridge downloads** (`api/bridge.js`) read `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` from disk:
   bundle them as text modules.
-- **Fred's connector**: `validateProposal` checks syntax with `node --check` in a child process; Workers have none.
-  Replace with a JavaScript parser (no new network access).
+- **Fred's connector** (done 16 Nov 2026): `validateProposal` checks a proposed module with `node --check` where a child
+  process can start, else (Workers) by parsing it with acorn (bundled: `cloudflare/package.json`, `wrangler.jsonc` alias).
+  The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
+  Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
 - **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
 - **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
   alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,

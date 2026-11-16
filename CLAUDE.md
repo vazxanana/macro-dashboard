@@ -99,8 +99,8 @@ deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on pus
 The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker (`MD_BASE`, repository variable
 `MD_ORIGIN` overrides). Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
-fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads, the connector's
-syntax check and the preview image are stage 3. Never put a secret in `wrangler.jsonc`.
+fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
+stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
 
 ## Locked features — do NOT remove or replace in redesigns
 
