@@ -197,7 +197,7 @@ test('a replay run reads its lists once: one stored attempt is the only call of 
 // ---- the page's static promises ---------------------------------------------------------------------------------------------
 test('academy.html: owner card, the nine sections, the scripts in order, built by the build script', () => {
   const html = src('academy.html'), ui = src('assets/academy-ui.js');
-  assert.match(html, /<title>MeridianX Academy<\/title>/); assert.match(html, /<h1>MeridianX Academy<\/h1>/);
+  assert.match(html, /<title>Aurum Academy<\/title>/); assert.match(html, /<h1>Aurum Academy<\/h1>/);
   assert.match(html, /The Academy is for the desk owner\. Sign in on the desk\./);
   for (const [id] of MXAC.TABS) assert.match(html, new RegExp(`<section id="ac-${id}" role="tabpanel"`), id);
   for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js fills it from stored data`);
@@ -209,7 +209,7 @@ test('academy.html: owner card, the nine sections, the scripts in order, built b
   assert.match(ui, /Passing the same trade shows recall, not generalisation\./);
   assert.match(src('scripts/build.sh'), /^cp .*\bacademy\.html\b.* out\/$/m);
   assert.ok(json('vercel.json').rewrites.some((r) => r.source === '/academy' && r.destination === '/academy.html'));
-  assert.equal(src('out/academy.html').includes('MeridianX Academy'), true, 'out/ carries the page');
+  assert.equal(src('out/academy.html').includes('Aurum Academy'), true, 'out/ carries the page');
 });
 
 test('the page talks to the Academy API and the candle proxy only: no broker, no order, no other service', () => {

@@ -18,7 +18,7 @@ const TAGS = [
   [/<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*>/i, `<link rel="apple-touch-icon" href="${ICON}">`, true],
   [/<meta\b[^>]*\bname=["']apple-mobile-web-app-capable["'][^>]*>/i, '<meta name="apple-mobile-web-app-capable" content="yes">', false],
   [/<meta\b[^>]*\bname=["']mobile-web-app-capable["'][^>]*>/i, '<meta name="mobile-web-app-capable" content="yes">', false],
-  [/<meta\b[^>]*\bname=["']apple-mobile-web-app-title["'][^>]*>/i, '<meta name="apple-mobile-web-app-title" content="Meridian X">', false],
+  [/<meta\b[^>]*\bname=["']apple-mobile-web-app-title["'][^>]*>/i, '<meta name="apple-mobile-web-app-title" content="Aurum Desk">', false],
   [/<meta\b[^>]*\bname=["']apple-mobile-web-app-status-bar-style["'][^>]*>/i, '<meta name="apple-mobile-web-app-status-bar-style" content="black">', false],
   [/<script\b[^>]*\bsrc=["'][^"']*\/assets\/pwa\.js[^"']*["'][^>]*>/i, '<script src="/assets/pwa.js" defer></script>', false],
 ];
