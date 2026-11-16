@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-16T07:21:12.000Z",
+ "at": "2026-11-16T08:50:36.000Z",
  "target": "2026-11-17",
  "targetEvent": "USD Core Retail Sales m/m",
  "paperOnly": true,
@@ -34,7 +34,7 @@
    "label": "Gold",
    "pUp": 0.507,
    "score": -0.6,
-   "last": 3839.03,
+   "last": 3849.49,
    "expMovePct": 1.16,
    "naiveMovePct": 1.16,
    "volModel": "naive",
@@ -95,7 +95,7 @@
    "label": "EUR/USD",
    "pUp": 0.459,
    "score": -0.583,
-   "last": 1.10136,
+   "last": 1.10207,
    "expMovePct": 0.31,
    "naiveMovePct": 0.31,
    "volModel": "naive",
@@ -1468,6 +1468,27 @@
  ],
  "news": [
   {
+   "src": "ECB",
+   "title": "Boris Vujčić: Risks and resilience in the euro area financial system",
+   "link": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261116~db374b56ab.en.html",
+   "at": "2026-11-16T08:30:00.000Z",
+   "policy": false
+  },
+  {
+   "src": "BoJ",
+   "title": "Highlights of the Outlook for Economic Activity and Prices (October 2026)",
+   "link": "http://www.boj.or.jp/en/mopo/outlook/highlight/ten202610.htm",
+   "at": "2026-11-16T08:00:00.000Z",
+   "policy": false
+  },
+  {
+   "src": "BoJ",
+   "title": "BOJ Current Account Balances by Sector (Oct.)",
+   "link": "http://www.boj.or.jp/en/statistics/boj/other/cabs/cabs.xlsx",
+   "at": "2026-11-16T08:00:00.000Z",
+   "policy": false
+  },
+  {
    "src": "BoJ",
    "title": "Speech by Board Member TAKATA at a Meeting Held by the Tokushima Association of Corporate Executives (Economic Activity, Prices, and Monetary Policy in Japan: Japan's Money and Capital Market Transformation -- Will a Paradigm Shift Occur?)",
    "link": "http://www.boj.or.jp/en/about/press/koen_2026/ko261116a.htm",
@@ -1500,27 +1521,6 @@
    "title": "Federal Reserve announces revised tentative schedule of Federal Open Market Committee meetings in 2027",
    "link": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261112a.htm",
    "at": "2026-11-12T17:45:00.000Z",
-   "policy": false
-  },
-  {
-   "src": "Fed",
-   "title": "Federal Reserve Board issues enforcement action with former employee of United Community Bank",
-   "link": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20261112a.htm",
-   "at": "2026-11-12T16:00:00.000Z",
-   "policy": false
-  },
-  {
-   "src": "BoJ",
-   "title": "Japanese Government Bonds Held by the Bank of Japan",
-   "link": "http://www.boj.or.jp/en/statistics/boj/other/mei/release/2026/mei261110.xlsx",
-   "at": "2026-11-12T08:00:00.000Z",
-   "policy": false
-  },
-  {
-   "src": "BoJ",
-   "title": "Basic Figures on Fails (Oct.)",
-   "link": "http://www.boj.or.jp/en/statistics/set/bffail/sjgb2610.pdf",
-   "at": "2026-11-12T07:30:00.000Z",
    "policy": false
   }
  ],
@@ -2827,36 +2827,36 @@
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
+  "fred:DFII10": "ok, last 2026-11-12",
   "fred:DGS2": "ok, last 2026-11-12",
-  "fred:DGS10": "ok, last 2026-11-12",
   "fred:T10YIE": "ok, last 2026-11-13",
+  "fred:DGS10": "ok, last 2026-11-12",
   "fred:T10Y3M": "ok, last 2026-11-13",
   "fred:BAMLH0A0HYM2": "ok, last 2026-11-12",
-  "fred:DFII10": "ok, last 2026-11-12",
   "fred:VIXCLS": "ok, last 2026-11-12",
-  "fred:DTWEXBGS": "ok, last 2026-11-06",
   "fred:VXVCLS": "ok, last 2026-11-12",
+  "fred:DTWEXBGS": "ok, last 2026-11-06",
   "fred:RRPONTSYD": "ok, last 2026-11-13",
+  "fred:WALCL": "ok, last 2026-11-11",
   "fred:WTREGEN": "ok, last 2026-11-11",
   "fred:EFFR": "ok, last 2026-11-12",
-  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "fred:SOFR": "ok, last 2026-11-12",
-  "fred:WALCL": "ok, last 2026-11-11",
   "fred:SWPT": "ok, last 2026-11-11",
+  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "ecb:2y": "ok, last 2026-11-12",
-  "bars:usdjpy": "failed (HTTP 402)",
   "bars:nq": "failed (HTTP 402)",
+  "bars:usdjpy": "failed (HTTP 402)",
   "bars:es": "failed (HTTP 402)",
   "bars:gold": "OANDA failed (HTTP 402), Kraken ok (721 days)",
-  "bars:gbpusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "bars:eurusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "bars:usdcad": "OANDA failed (HTTP 402), Kraken ok (721 days)",
+  "bars:gbpusd": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "bars:usdchf": "OANDA failed (HTTP 402), Kraken ok (721 days)",
   "calendar:thisweek": "ok (120 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "calendar:cache": "using the last good copy for the week that failed (106 cached events)",
   "rss:Fed": "ok (20 items)",
-  "rss:BoJ": "ok (43 items)",
+  "rss:BoJ": "ok (44 items)",
   "rss:ECB": "ok (15 items)",
   "cot": "ok (98 weeks)",
   "score:DFII10": "ok, 5220 days to 2026-11-12",
@@ -3007,5 +3007,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Mon 16 Nov 07:21 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Mon 16 Nov 08:50 UTC, for Tue 17 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 51% up (base rate 53%; macro tilt down 2 pts). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±1.16% (20-day average). EUR/USD: 46% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 54% up (mirror of EUR/USD). Gold Macro Score -0.92 → AUCTION (no macro edge) (real yield 4w z -0.55, DXY 4w z -0.76, 2Y 13w z -1.49, curve 13w z -0.89; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.05 → -0.92; week to 2026-11-13; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: CAD CPI m/m Mon 16 Nov 13:30 UTC (consensus 0.3%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Median CPI y/y Mon 16 Nov 13:30 UTC (consensus 2.0%, previous 1.9%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; CAD Trimmed CPI y/y Mon 16 Nov 13:30 UTC (consensus 1.9%, previous 1.8%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.16%; USD Fed Chairman Warsh Speaks Mon 16 Nov 17:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.16%. Honesty check: on the 373-day walk-forward replay the gold calls hit 52% against a 52% base rate (Brier 0.2507 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.266% on other days, but no model turned that into a better forecast."
 }
