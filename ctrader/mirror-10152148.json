@@ -4416,7 +4416,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-16T17:03:59.000Z",
     "councilEntry": 3872.86,
     "stop": 3858.33,
@@ -4431,10 +4431,15 @@
     "slipR": -0.298,
     "lagSec": 108,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T17:03:59.000Z",
-    "brokerStop": 3854
+    "brokerStop": 3854,
+    "closedAt": "2026-11-16T17:56:55.000Z",
+    "exitPrice": 3855.88,
+    "councilExit": null,
+    "councilR": -1
    }
   },
   "day": {
@@ -4442,7 +4447,7 @@
    "startBalance": 5472.85
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5408.05 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 5408.05 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4451,14 +4456,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 5408.05,
-  "lastRun": "2026-11-16T17:53:51.000Z"
+  "lastRun": "2026-11-16T17:56:55.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T02:12:24.000Z",
-   "msg": "BTCUSD position 48259827 closed at the broker",
-   "trade": "btc-replica-1794360743-b"
-  },
   {
    "at": "2026-11-11T02:21:15.000Z",
    "msg": "opened sell EURUSD 0.04 lot (council replica)",
@@ -5952,6 +5952,11 @@
   {
    "at": "2026-11-16T17:03:59.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794848531-b"
+  },
+  {
+   "at": "2026-11-16T17:56:55.000Z",
+   "msg": "closed XAUUSD position 49959874 (council: loss)",
    "trade": "xau-replica-1794848531-b"
   }
  ],
