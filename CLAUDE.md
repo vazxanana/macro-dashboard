@@ -88,7 +88,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-53 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-56 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
@@ -3468,6 +3468,16 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   requests a second while the desk was open); now once per read of the lessons (`S.tried`, cleared by `msMoshaRecord`). The rows
   carry the log's cell classes (`mo-c-time`, `mo-c-side`, `mo-c-res`, `data-l`), so on a phone they are the log's cards (the side
   chip sat over the entry time). Tests in `tests/mosha-record.test.mjs`.
+- **Why the systems missed the owner's trades** (17 Nov 2026, owner: "I've been taking good trades on mosha so I don't
+  understand why u not catching them"; `research/proposals/2026-11-17-mosha-misses.md`, items 55-56; nothing live changed).
+  The owner's log `mosha/trades.json` was never written (0 logged, 0 `pre`) and no lesson carries levels, so the six shared
+  examples were replayed through the Trader's Mosha BO block and `mosha-cycle.mjs` on OANDA candles: 4 never signalled (the
+  engine's H1 break, 6 candles a side at the protected swing, came days later or never; the owner's turn is an M5 sweep, VR,
+  CF), 2 seen in the same move (an earlier entry stopped by the owner's sweep, then the one-per-leg cap; a Mosha BO signal
+  blocked by weekly + slow pullback, stop 5.5x wider). Mosha BO recorded nothing 1-17 Nov; the one cycle record came from
+  weekend candles of the fallback feed (item 56). The M5 trigger that would catch all six is the one `mosha-sweep` /
+  `mosha-select` already failed: never present a rule that catches these picked trades as evidence. Never commit the
+  owner's or Luxus's individual trades or lesson text (public repository): aggregate counts only.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

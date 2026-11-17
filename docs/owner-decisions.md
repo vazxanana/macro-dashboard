@@ -1105,3 +1105,32 @@ figure or demo-mirror setting.
   that setting since pull request #780). An open trade stays live to its own exit with its stop.
 - **If nothing is decided.** It keeps trading as a main paper system and its alerts and demo copies continue.
 
+
+## Why the council did not take your Mosha trades, 17 Nov 2026
+
+### [ ] 55. Mosha: the systems missed your trades because they wait for an H1 turn; your trigger is on M5
+
+- **Status (17 Nov 2026): open.** Proposal: `research/proposals/2026-11-17-mosha-misses.md`. Nothing live changed.
+- **Context.** You asked why the council does not catch the Mosha trades you take. Your trade log on the desk is empty (0 trades,
+  0 written before the outcome), and Luxus's lessons carry no levels, so six trades were compared: the five examples you shared
+  and one from Luxus's lessons. Four were never signalled: the council's Mosha systems wait for a break of major structure on
+  H1, and in those weeks it came days later or not at all, while your turn was an M5 sweep, VR and CF (two of the four trade the
+  retracement against the H4). Two were seen (same move, same side): one entry came before your sweep and was stopped by it, and
+  a Mosha BO signal 20 minutes after yours was blocked by the weekly and slow-pullback filters with a stop 5.5 times wider.
+  Mosha BO recorded nothing from 1 to 17 Nov; the Mosha cycle one trade, made from weekend data (item 56).
+- **Options.** (a) Keep the systems as they are (paper shadows) and measure your own selection: log each trade on the Mosha
+  desk before it closes (item 27); about 150 such trades can judge it. (b) Run one more pre-registered study, the cycle's H4 leg
+  and targets with your M5 trigger and a second entry per H4 move (written in the proposal, not run); its trigger was already
+  tested in `mosha-sweep` and `mosha-select` (no edge), so a pass is unlikely. (c) Both.
+- **Recommendation.** (a). A rule that catches these six trades proves nothing: they were picked after the fact.
+- **If nothing is decided.** The two systems stay paper shadows; your trades stay unmeasured.
+
+### [ ] 56. Mosha: the systems built structure from weekend candles of the fallback feed
+
+- **Status (17 Nov 2026): open.** Found while answering item 55; nothing changed.
+- **Context.** Gold's prices came from the fallback feed (a gold token on a crypto exchange, which trades on weekends) from
+  Sunday 15 Nov to Monday 16 Nov evening. The Mosha cycle read an H4 break on a Saturday candle and recorded a paper trade on it
+  (a $43 stop, a target behind the entry); spot gold has no such break. Other systems were not checked for this here.
+- **Recommendation.** Gold's two Mosha systems record nothing while gold is on the fallback feed (one condition at the top of
+  each block in the Trader; trades already open are managed as now). A plumbing fix: no rule changes on spot candles.
+- **If nothing is decided.** On the next fallback episode the Mosha systems may again record trades from weekend candles.
