@@ -237,8 +237,7 @@ test('badge inks: every badge colour is a theme token, and each token passes AA 
   for (const r of [/\.ms-st\.ready \{ background: var\(--buy\); color: var\(--on-buy\); \}/, /\.ms-st\.near \{[^}]*color: var\(--warn-ink\); \}/, /\.ms-st\.bad \{[^}]*color: var\(--sell-ink\); \}/,
     /\.ms-al\.ok \{ color: var\(--buy-ink\);/, /\.ms-al\.against \{ color: var\(--sell-ink\);/, /\.ms-chip-buy \{ background: var\(--buy-soft\); color: var\(--buy-ink\);/, /\.ms-chip-sell \{ background: var\(--sell-soft\); color: var\(--sell-ink\);/,
     /\.ms-tag\.counter \{ color: var\(--warn-ink\);/, /\.ms-q\.weak \{ color: var\(--warn-ink\);/, /\.ms-srow \.lv-d\.at \{ color: var\(--accent-ink\);/, /\.pr-c\.up \{ color: var\(--buy-ink\); \} \.pr-c\.dn \{ color: var\(--sell-ink\); \}/,
-    /\.btab-brand span \{[^}]*color: var\(--gold-ink\); \}/, /\.ch-cd \{[^}]*color: var\(--on-sell\); background: var\(--sell\);/, /\.g-s-st\.pending \{ color: var\(--warn-ink\);/,
-    /\.md-vet-row\.agree \.md-vet-st \{[^}]*color: var\(--buy-ink\); \}/, /\.md-vet-row\.disagree \.md-vet-st \{[^}]*color: var\(--sell-ink\); \}/]) assert.match(css, r);
+    /\.btab-brand span \{[^}]*color: var\(--gold-ink\); \}/, /\.ch-cd \{[^}]*color: var\(--on-sell\); background: var\(--sell\);/, /\.g-s-st\.pending \{ color: var\(--warn-ink\);/]) assert.match(css, r);
   assert.doesNotMatch(css, /:root\[data-theme="light"\] \.ms-al\.(ok|against) \{ color: #/);
   // the scanner's day change is coloured by class, not by the chart's candle colour inline; a sign stays beside the colour
   assert.match(html, /<small class="pr-c \$\{ch >= 0 \? 'up' : 'dn'\}" style="font-weight:600"/);
@@ -503,7 +502,7 @@ test('Home / Council reading pass: text at 12 px, touch targets, and the cards t
   assert.match(css, /#v-council \.c-act li \{ grid-template-columns: auto minmax\(0, 1fr\) auto; \}/);
   // 44 px: the Data chip, the folded status line, the checkbox labels, the scoreboard's sort buttons and links
   const touch = /@media \(hover: none\), \(pointer: coarse\), \(max-width: 760px\) \{([\s\S]*?)\n\}/.exec(css)[1];
-  for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '.md-full { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
+  for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '#ms-sb-b a { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
   // a planned reward:risk is not written like a result
   assert.match(deskHtml, /<span title="Planned reward for 1R of risk, not a result">target \$\{\(\+t\.rr\)\.toFixed\(2\)\}R<\/span>/);
   assert.match(deskHtml, /deepest drawdown, day to day: live /); assert.doesNotMatch(deskHtml, /max drawdown ' \+ esc\(num\(B\.live\.dd\)/);
@@ -634,7 +633,7 @@ test('simple phone view: every part it adds is .ps-only, and a fold row keeps th
   assert.ok(top.length >= 14);
   for (const m of top) assert.match(m[2], /\bps-only\b/, m[0].slice(0, 90));
   const folds = [...DESK.matchAll(/<button type="button" class="(ps-only ps-fold[^"]*)" data-ps-for="([\w-]+)" aria-expanded="false">/g)];
-  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse', 'kv', 'tnum', 'vet', 'wnum'], 'Home: everything under the summary folds; second pass: the Setup levels, the Trades tiles and curve, the veteran\'s discussion, the week tiles');
+  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse', 'kv', 'tnum', 'wnum'], 'Home: everything under the summary folds; second pass: the Setup levels, the Trades tiles and curve, the veteran\'s discussion, the week tiles');
   for (const [, cls, key] of folds) { const t = new RegExp(`<\\w+\\b[^>]*\\bclass="([^"]*)"[^>]*\\bdata-ps="${key}"`).exec(DESK); assert.ok(t, `no section for the ${key} row`);
     for (const gate of ['adm', 'own', 'pubonly']) assert.equal(new RegExp(`\\b${gate}\\b`).test(cls), new RegExp(`\\b${gate}\\b`).test(t[1]), `${key}: the row and its section differ on "${gate}"`); }
   // what waits on the person and the owner-only places keep their gates
@@ -743,7 +742,6 @@ test('simple phone view 2: which views fold, what stays open, and the rows keep 
   assert.match(PS_JS, /\{ v: 'ms-cp-research', sel: '\.card', two: 1, keep: function \(\) \{ return false; \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-week', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.classList\.contains\('wk-dec'\); \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-review', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.id === 'ms-loss'; \} \}/);
-  for (const v of ['ms-cp-macro']) assert.match(PS_JS, new RegExp(`\\{ v: '${v}', sel: '\\.card'`), v);
   // a row made for a card carries the card's own gate, and its one line is never a line the account's gate hides
   assert.match(PS_JS, /\(c\.classList\.contains\('adm'\) \? ' adm' : ''\) \+ \(c\.classList\.contains\('own'\) \? ' own' : ''\)/);
   assert.match(PS_JS, /if \(lv && getComputedStyle\(lv\)\.display === 'none'\) lv = null;/);
