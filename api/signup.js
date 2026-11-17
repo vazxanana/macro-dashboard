@@ -34,6 +34,10 @@ const AGAIN = 'Choose another password.';
 
 let CONNECT = null, BINDING = null;   // handed in by cloudflare/src/worker.mjs: the socket function (cloudflare:sockets connect) and env.EMAIL
 const useSmtp = (fn) => { CONNECT = typeof fn === 'function' ? fn : null; };
+let EMAIL_MESSAGE = null, LAST_MAIL_ERROR = null;
+const useEmailMessage = (C) => { EMAIL_MESSAGE = typeof C === 'function' ? C : null; };
+// an error's text without any email address in it (the provider may quote the recipient)
+const redact = (e) => String((e && (e.code ? e.code + ' ' : '') + (e.message || e)) || 'error').replace(/[^\s@<>"']+@[^\s@<>"']+/g, '<address>').slice(0, 200);
 const useMail = (b) => { BINDING = b && typeof b.send === 'function' ? b : null; };
 
 const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
@@ -75,7 +79,18 @@ function mailer(env, d) {
   if (d.send) return d.send;
   const binding = d.binding !== undefined ? d.binding : BINDING, connect = d.connect !== undefined ? d.connect : CONNECT;
   const from = M.oneLine(env.MAIL_FROM || 'desk@aureumdesk.co.uk'), user = env.GMAIL_USER, pass = env.GMAIL_APP_PASSWORD;
-  const viaCf = binding && typeof binding.send === 'function' ? (to, subject, text, html) => binding.send({ from: { email: M.address(from), name: 'Aureum Desk' }, to: M.address(to), subject: M.oneLine(subject).slice(0, 150), text: String(text || ''), ...(html ? { html } : {}) }) : null;
+  // The binding is tried in the shapes Cloudflare documents (17 Nov 2026: the first live send failed and the docs could not be read
+  // from the build sandbox): the Email Service object with `from` as { email, name }, the same with `from` as an address, and the
+  // older `send_email` call with a raw MIME message (EmailMessage of the Worker's email module, handed in by the Worker). Each failure
+  // is kept (`tries`) so the owner can see which shape the account takes.
+  const viaCf = binding && typeof binding.send === 'function' ? async (to, subject, text, html) => {
+    const f = M.address(from), t = M.address(to), sub = M.oneLine(subject).slice(0, 150), body = { to: t, subject: sub, text: String(text || ''), ...(html ? { html } : {}) }, tries = [];
+    const shapes = [['object', () => binding.send({ from: { email: f, name: 'Aureum Desk' }, ...body })], ['address', () => binding.send({ from: f, ...body })]];
+    if (EMAIL_MESSAGE) shapes.push(['mime', () => binding.send(new EMAIL_MESSAGE(f, t, M.build({ from: f, to: t, subject: sub, text, html, now: d.now ? d.now() : Date.now() })))]);
+    for (const [k, fn] of shapes) { try { return await fn(); } catch (e) { tries.push(`${k}: ${redact(e)}`); } }
+    LAST_MAIL_ERROR = { at: d.now ? d.now() : Date.now(), tries }; console.log('[signup] the Email Service binding failed:', tries.join(' | '));
+    throw Object.assign(new Error('email service failed'), { tries });
+  } : null;
   const viaGmail = connect && user && pass ? (to, subject, text, html) => M.sendMail({ connect, user, pass, to, subject, text, html, now: d.now ? d.now() : Date.now(), timeoutMs: 15000 }) : null;
   if (!viaCf && !viaGmail) return null;
   const send = !viaCf ? viaGmail : !viaGmail ? viaCf : async (...a) => { try { return await viaCf(...a); } catch (e) { console.log('[signup] the Email Service binding failed; trying Gmail'); return viaGmail(...a); } };
@@ -201,7 +216,7 @@ async function handle(req, res, d = {}) {
     try {
       await send(email, 'Confirm your email for Aureum Desk', `Hello ${name},\n\nConfirm your email for Aureum Desk with this link (it works for 24 hours, once):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
         html([`Hello ${name},`, 'Confirm your email for Aureum Desk. The link works for 24 hours, once. Then the owner approves your seat, and you sign in with the password you chose.', 'If you did not sign up, ignore this email.'], link, 'Confirm my email'));
-    } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.' }); }
+    } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.', why: e && e.tries ? e.tries : [redact(e)] }); }
     list.push(rec); await store.put(PENDING, list);
     return res.status(200).json({ ok: true, message: SENT });
   } catch (e) { console.error('[signup] failed'); return res.status(e.status === 503 ? 503 : 500).json({ error: 'Account storage is not available right now. Try again in a minute.' }); }
@@ -210,5 +225,7 @@ async function handle(req, res, d = {}) {
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports.useSmtp = useSmtp;
+module.exports.useEmailMessage = useEmailMessage;
+module.exports.lastMailError = () => LAST_MAIL_ERROR;
 module.exports.useMail = useMail;
 module.exports._t = { originOf, keyOf, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };

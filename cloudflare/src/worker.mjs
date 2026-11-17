@@ -3,6 +3,7 @@
 // - /api/<name> runs the unchanged handler api/<name>.js through ./adapter.mjs.
 // - Scheduled jobs call the same handlers as Vercel's crons did, with the cron secret.
 import vercel from '../../vercel.json';
+import { EmailMessage } from 'cloudflare:email';
 import { run } from './adapter.mjs';
 import { rewrite, headersFor } from './routes.mjs';
 import { blobBackup } from './backup.mjs';
@@ -52,6 +53,7 @@ export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };
 // here; the Email Service binding (env.EMAIL, a `send_email` binding) lives on the Worker's env, not process.env, and is handed
 // in on each request. Without either, or without their settings, sign-ups answer 503.
 signup.useSmtp(connect);
+signup.useEmailMessage(EmailMessage);
 
 const SECURITY = headersFor(vercel.headers, new URL('https://x/'));
 

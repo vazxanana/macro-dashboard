@@ -5357,7 +5357,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     if (r.ok) return { ok: j };
     if (r.status === 429) return { err: (j && j.error) || 'Too many tries. Wait a few minutes, then try again.' };
     if (r.status >= 500 && !(j && j.error)) return { err: 'This is unavailable right now. Try again in a minute.' };
-    return { err: (j && j.error) || 'That did not work. Check what you typed and try again.' };
+    return { err: ((j && j.error) || 'That did not work. Check what you typed and try again.') + (j && Array.isArray(j.why) && j.why.length ? ' Details: ' + j.why.join(' · ') : '') };   // the mail provider's own words (17 Nov 2026: the first live send failed)
   }
   // one submit pattern for the three forms: check, busy button, the answer in words
   function wire(p, check, body, ok) {
