@@ -94,6 +94,10 @@ jobs:
           echo "== workers.dev subdomain"
           api /workers/subdomain | jq -r '.result.subdomain // "could not read"' || true
           api /workers/scripts/meridianx/subdomain | jq -c '.result // .errors' || true
+          echo "== aureum bindings (name  type)"
+          api /workers/scripts/aureum/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          echo "== custom domains (hostname -> Worker)"
+          api /workers/domains | jq -r 'if .success then (.result[] | "\(.hostname) -> \(.service) (\(.environment))") else "could not read: \(.errors)" end' || true
           echo "== live deployment of meridianx (version  percentage)"
           api /workers/scripts/meridianx/deployments | jq -r 'if .success then ((.result.deployments // [])[0] | (.versions // [])[] | "\(.version_id)  \(.percentage)%") else "could not read: \(.errors)" end' || true
 
