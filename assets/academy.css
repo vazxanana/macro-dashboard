@@ -409,6 +409,187 @@ main.hero-min .ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; 
 .fold-bar .fold-sum { flex: 1 1 220px; font-size: 13.5px; color: var(--ink-dim); }
 .card.folded > :not(.c-h):not(.fold-bar) { display: none; }
 
+/* ================================================================================================================
+   Graphite (17 Nov 2026, docs/design/aureum-theme.md; owner: "do another one with other colors like grey"). One look for
+   every page of Aureum Desk: neutral greys, one steel-blue accent for focus, links and the active place, green / red / amber
+   only for meaning, a solid neutral primary button, no serif, flat cards with hairlines. The --au-* tokens are defined here
+   for the three themes (assets/mx-page.css may define them too, with the spec's values) and the Academy's older names point
+   at them, so every earlier rule follows. Display only: nothing here changes what is decided, stored or asked for.
+   Candle colours do not change: --ac-up / --ac-down keep the colours the charts had before (assets/academy-ui.js candleLook).
+   ================================================================================================================ */
+:root {
+  --au-bg: #121315; --au-surface: #1A1C1F; --au-surface-2: #23262A; --au-well: #16181B;
+  --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16);
+  --au-ink: #ECEDEF; --au-ink-2: #B4B8BF; --au-ink-3: #8E939B;
+  --au-accent: #9DB4D3; --au-primary: #E4E6E9; --au-on-primary: #121315;
+  --au-gain: #4CC38A; --au-loss: #F2726A; --au-warn: #E8B04B; --au-info: #9DB4D3;
+  --au-gold: var(--au-primary); --au-gold-grad: var(--au-primary); --au-gold-ink: var(--au-accent); --au-on-gold: var(--au-on-primary);
+  --au-font-ui: "Inter", "Figtree", system-ui, sans-serif;
+  --au-shadow: 0 1px 2px rgba(0,0,0,.25);
+  --ac-up: #2fbf8f; --ac-down: #f2576f;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
+  --au-bg: #F2F3F5; --au-surface: #FFFFFF; --au-surface-2: #E7E9EC; --au-well: #F7F8F9;
+  --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20);
+  --au-ink: #17191C; --au-ink-2: #474C54; --au-ink-3: #5B616A;
+  --au-accent: #2F5E9E; --au-primary: #25292E; --au-on-primary: #FFFFFF;
+  --au-gain: #0A7350; --au-loss: #B3261E; --au-warn: #8A5A00; --au-info: #2F5E9E;
+  --au-shadow: 0 1px 2px rgba(20,24,30,.06); --ac-up: #067a64; --ac-down: #c92643; } }
+:root[data-theme="light"] {
+  --au-bg: #F2F3F5; --au-surface: #FFFFFF; --au-surface-2: #E7E9EC; --au-well: #F7F8F9;
+  --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20);
+  --au-ink: #17191C; --au-ink-2: #474C54; --au-ink-3: #5B616A;
+  --au-accent: #2F5E9E; --au-primary: #25292E; --au-on-primary: #FFFFFF;
+  --au-gain: #0A7350; --au-loss: #B3261E; --au-warn: #8A5A00; --au-info: #2F5E9E;
+  --au-shadow: 0 1px 2px rgba(20,24,30,.06); --ac-up: #067a64; --ac-down: #c92643; }
+:root[data-theme="midnight"] { --au-bg: #0B0C0E; --au-surface: #131416; --au-surface-2: #1B1D20; --au-well: #0F1012; --ac-up: #34d6a0; --ac-down: #ff6b85; }
+/* the older names point at the tokens; this selector list weighs at least as much as each theme rule of mx-page.css and comes after it */
+:root, :root:not([data-theme="dark"]):not([data-theme="midnight"]), :root[data-theme] {
+  --bg: var(--au-bg); --panel: var(--au-surface); --panel-raised: var(--au-surface-2); --panel-hover: var(--au-surface-2);
+  --line: var(--au-line); --line-soft: var(--au-line); --line-strong: var(--au-line-strong);
+  --ink: var(--au-ink); --ink-dim: var(--au-ink-2); --ink-faint: var(--au-ink-3);
+  --accent: var(--au-accent); --accent-soft: color-mix(in srgb, var(--au-accent) 14%, transparent);
+  --buy: var(--au-gain); --sell: var(--au-loss);
+  --buy-soft: color-mix(in srgb, var(--au-gain) 14%, transparent); --sell-soft: color-mix(in srgb, var(--au-loss) 14%, transparent);
+  --gold: var(--au-warn); --gold-soft: color-mix(in srgb, var(--au-warn) 14%, transparent); --gold-ink: var(--au-ink-2);
+  --wait: var(--au-warn); --wait-soft: color-mix(in srgb, var(--au-warn) 14%, transparent);
+  --neutral-soft: var(--au-surface-2); --zero: var(--au-line-strong);
+  --on-accent: var(--au-on-primary); --sans: var(--au-font-ui);
+  --r: 12px; --r-sm: 8px; --ac-r: 12px; --ac-card: var(--au-surface); --ac-shadow: var(--au-shadow);
+}
+html, body { font-family: var(--au-font-ui); }
+body { background: var(--au-bg); }
+:focus-visible { outline: 2px solid var(--au-accent); outline-offset: 2px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--au-accent); outline-offset: 2px; border-color: var(--au-line-strong); box-shadow: none; }
+.seg label input:focus-visible + span { outline-color: var(--au-accent); }
+
+/* the top bar: the brushed-silver mark and the wordmark */
+.top { background: color-mix(in srgb, var(--au-bg) 90%, transparent); }
+.top .coin { position: relative; width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%); box-shadow: none; }
+.top .coin::after { content: "A"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 15px/1 var(--au-font-ui); color: #16181B; }
+.top .brand:not(.here) { font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 13px; }
+.top .brand.here { font-weight: 500; color: var(--au-ink-2); }
+
+/* the page header: a title and one sentence, flat; the same height on every section, so the tabs never move */
+.ac-hero, main.hero-min .ac-hero, main:has(#replay:not([hidden])) .ac-hero { display: block; padding: 24px 0 16px; margin: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.ac-hero h1, main.hero-min .ac-hero h1, main:has(#replay:not([hidden])) .ac-hero h1 { order: -1; margin: 0; font-size: 32px; font-weight: 650; line-height: 1.15; letter-spacing: -0.02em; }
+.ac-hero .ac-lede, main.hero-min .ac-hero .ac-lede, main:has(#replay:not([hidden])) .ac-hero .ac-lede { display: block; margin: 8px 0 0; max-width: 72ch; color: var(--au-ink-2); font-size: 14px; }
+.ac-badge { color: var(--au-ink-2); background: var(--au-surface-2); border-color: var(--au-line-strong); font-weight: 500; }
+.ac-badge::before { background: var(--au-accent); }
+/* the four steps: a quiet line under the sentence, only on Train before a replay */
+.ac-steps { margin-top: 16px; gap: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ac-steps li { padding: 10px 16px 0 0; border: 0; border-top: 2px solid var(--au-line-strong); border-radius: 0; background: none; color: var(--au-ink-3); font-size: 13px; }
+.ac-steps li:first-child { border-top-color: var(--au-accent); }
+.ac-steps li::before { width: auto; height: auto; display: block; margin: 0; border: 0; background: none; color: var(--au-ink-3); font-size: 12px; font-weight: 600; content: "Step " counter(st); }
+.ac-steps b { font-size: 14px; }
+.ac-steps li::before { font-family: var(--au-font-ui); }
+.ac-hero .ac-lede { flex: 1 1 100%; max-width: none; }
+/* wide screens: when the clock stops, the decision and the verdict lead the column beside the chart (the account and the thesis follow) */
+@media (min-width: 1081px) { #replay .ac-side { display: flex; flex-direction: column; } #decision { order: -5; } #mentor { order: -4; } #lesson { order: -3; } #prove { order: -2; } #whatif { order: -1; } }
+.hdr-sw { --hm-a: var(--au-accent); --hm-b: var(--au-ink-3); }
+main.hero-min .ac-steps, main:has(#replay:not([hidden])) .ac-steps { display: none; }
+@media (max-width: 620px) { .ac-steps { grid-template-columns: 1fr 1fr; row-gap: 12px; } .ac-hero h1 { font-size: 26px; } }
+
+/* tabs: the active place in steel blue */
+.ac-tabs { background: var(--au-surface); border-color: var(--au-line); border-radius: 12px; }
+.ac-tabs button { position: relative; color: var(--au-ink-2); }
+.ac-tabs button:hover { background: var(--au-surface-2); color: var(--au-ink); }
+.ac-tabs button[aria-selected="true"] { background: var(--au-surface-2); color: var(--au-ink); box-shadow: none; font-weight: 600; }
+.ac-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--au-accent); }
+.ac-tabs button[aria-selected="true"]::before { opacity: 1; color: var(--au-accent); }
+
+/* cards: flat with a hairline; titles in the page's own sans, heavier */
+.card { border: 1px solid var(--au-line); border-radius: 12px; box-shadow: var(--au-shadow); background: var(--au-surface); padding: 20px; }
+@media (max-width: 900px) { .card { padding: 16px; } }
+.card h2, .c-h { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+.card h2 small, .c-h small { font-weight: 400; font-size: 13px; color: var(--au-ink-3); letter-spacing: 0; }
+.card .note { font-size: 12.5px; color: var(--au-ink-3); }
+.card p.versions { font: 500 12px var(--mono); color: var(--au-ink-3); }
+.card .f-count { font-size: 13px; color: var(--au-ink-2); }
+
+/* buttons: secondary by default, one solid neutral primary */
+.btn { background: transparent; border: 1px solid var(--au-line-strong); color: var(--au-ink); border-radius: 8px; }
+.btn:not(.primary):hover:not([disabled]) { background: var(--au-surface-2); border-color: var(--au-line-strong); color: var(--au-ink); }
+.btn.primary, .btn.primary:hover { background: var(--au-primary); border-color: var(--au-primary); color: var(--au-on-primary); font-weight: 600; box-shadow: none; }
+.btn.primary:hover:not([disabled]) { filter: none; transform: none; box-shadow: none; }
+.btn[aria-pressed="true"], .btn.on { background: var(--au-surface-2); border-color: var(--au-accent); color: var(--au-ink); }
+.link, details.more > summary { color: var(--au-accent); }
+input, select, textarea { background: var(--au-well); border-color: var(--au-line-strong); color: var(--au-ink); }
+.seg { background: var(--au-well); border-color: var(--au-line); }
+.seg label input:checked + span, .seg.inline .btn[aria-pressed="true"], .seg.inline .btn.on { background: var(--au-surface-2); color: var(--au-ink); box-shadow: inset 0 0 0 1px var(--au-line-strong), inset 0 -2px 0 var(--au-accent); }
+.chip { background: var(--au-surface-2); border-color: var(--au-line); color: var(--au-ink-2); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--au-accent); color: var(--au-ink); }
+.pill { background: var(--au-surface-2); border-color: var(--au-line); color: var(--au-ink-2); }
+.tag { background: var(--au-surface-2); border-color: var(--au-line-strong); }
+
+/* the setup: numbered steps and edge cards */
+.stp-n { background: transparent; border: 1px solid var(--au-line-strong); color: var(--au-ink); font-family: var(--au-font-ui); font-size: 13px; }
+.card h3.stp-h { font-size: 16px; font-weight: 600; }
+.ecard { background: transparent; border-color: var(--au-line); border-radius: 12px; color: var(--au-ink-3); }
+.ecard:hover { background: var(--au-surface-2); border-color: var(--au-line-strong); transform: none; }
+.ecard-m { color: var(--au-ink-2); }
+.ecard[aria-pressed="true"] { background: var(--au-surface-2); border-color: var(--au-accent); box-shadow: inset 0 0 0 1px var(--au-accent); }
+.ecard[aria-pressed="true"]::after { background: var(--au-accent); }
+.edge-info, .preview, details.opts { background: var(--au-well); border-color: var(--au-line); }
+.chart { background: transparent; border-color: var(--au-line); }
+/* during a replay the setup is one row: title, summary, Change setup */
+#setup:has(#setup-body[hidden]) { padding-block: 12px; }
+#setup:has(#setup-body[hidden]) > .c-h { margin: 0; align-items: center; }
+
+/* the player */
+.ctl { background: var(--au-well); border-color: var(--au-line); border-radius: 12px; }
+.ctl .btn:not(.primary) { background: transparent; }
+.ctl .seg.inline { background: var(--au-surface); border-color: var(--au-line); }
+#clock-state { color: var(--au-ink); background: var(--au-surface-2); border-color: var(--au-line-strong); }
+.point-bar { background: var(--au-well); border-color: var(--au-line-strong); }
+.point-bar.warn, #continue-msg:not(:empty) { border-color: var(--au-warn); background: var(--wait-soft); }
+.log li::before { background: var(--au-ink-3); }
+.zones i { border-color: var(--au-accent); background: var(--accent-soft); }
+
+/* the paper account: two by two beside the chart */
+#acct { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.stats > div { background: var(--au-well); border-color: var(--au-line); }
+.stats dd { font-size: 20px; }
+
+/* the decision: the answer in the colour of its meaning, the levels as one strip, the detail as one grouped list */
+.act { border-radius: 8px; box-shadow: none; letter-spacing: .02em; }
+.act.buy { color: var(--au-gain); } .act.sell { color: var(--au-loss); } .act.wait { color: var(--au-warn); }
+.act.buy::before, .act.sell::before, .act.wait::before { color: inherit; }
+.dec-thesis { line-height: 1.55; }
+.kv.lvl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: auto auto; gap: 2px 0; margin: 12px 0 4px; padding: 10px 0; border-top: 1px solid var(--au-line); border-bottom: 1px solid var(--au-line); }
+.kv.lvl dt { padding: 0 12px; font-size: 12px; color: var(--au-ink-3); }
+.kv.lvl dd { padding: 0 12px; font: 600 16px var(--mono); color: var(--au-ink); font-variant-numeric: tabular-nums; }
+.kv.lvl dt:first-of-type, .kv.lvl dd:first-of-type { padding-left: 0; }
+.kv.lvl dt:not(:first-of-type), .kv.lvl dd:not(:first-of-type) { border-left: 1px solid var(--au-line); }
+details.dfold { margin: 0; border: 1px solid var(--au-line); border-radius: 0; }
+details.dfold:not(details.dfold + details.dfold) { margin-top: 12px; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+details.dfold + details.dfold { border-top: 0; }
+details.dfold:not(:has(+ details.dfold)) { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+details.dfold > summary { color: var(--au-ink); }
+details.dfold > summary::before { color: var(--au-ink-3); }
+.ev-list li { background: var(--au-well); }
+.an { border-top: 1px solid var(--au-line); }
+
+/* the verdict: a chosen answer reads its meaning; entry, stop and target show only for a changed trade */
+.choices .btn[aria-pressed="true"] { font-weight: 600; }
+.choices .btn[data-choice="approve"][aria-pressed="true"], .choices .btn[data-choice="BUY"][aria-pressed="true"] { color: var(--au-gain); background: var(--buy-soft); border-color: var(--au-gain); }
+.choices .btn[data-choice="reject"][aria-pressed="true"], .choices .btn[data-choice="SELL"][aria-pressed="true"] { color: var(--au-loss); background: var(--sell-soft); border-color: var(--au-loss); }
+.choices .btn[data-choice="WAIT"][aria-pressed="true"] { color: var(--au-warn); background: var(--wait-soft); border-color: var(--au-warn); }
+.choices + .lv:not(:has(input:enabled)), #mentor .choices + .lv:not(:has(input:enabled)) + .note { display: none; }
+.plain { border: 1px solid var(--au-line); background: var(--au-well); }
+
+/* lists, tables, notices */
+.plain-list li { background: var(--au-well); border-color: var(--au-line); }
+.plain-list li.none, .ac-empty { background: transparent; border-color: var(--au-line-strong); }
+th { background: var(--au-surface-2); color: var(--au-ink-3); }
+tbody tr:hover td { background: var(--au-well); }
+.well, .lsn { border-color: var(--au-line); }
+.resume-now { background: var(--au-surface-2); border-color: var(--au-line-strong); }
+.lsn.hit { outline-color: var(--au-accent); }
+.ac-net { background: var(--au-surface-2); }
+.bar i { background: var(--au-accent); }
+
 /* ==== The phone's simple view (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone") ====
    The default at 640 px and under. Every rule below sits inside that media query AND under html[data-phone="simple"] (the
    site's one phone-view attribute, set in the page head only at that width), so a wider screen never reads one of them and
@@ -439,7 +620,7 @@ button.pmore, .pv { display: none; }
 
   /* --- the hero is its title, and steps aside for a replay --- */
   html[data-phone="simple"] .ac-steps, html[data-phone="simple"] .ac-hero .ac-lede { display: none; }
-  html[data-phone="simple"] .ac-hero { grid-template-columns: minmax(0, 1fr); padding: 10px 16px; margin: 10px 0; border-radius: 16px; }
+  html[data-phone="simple"] .ac-hero { grid-template-columns: minmax(0, 1fr); padding: 10px 0; margin: 10px 0; border-radius: 16px; }
   html[data-phone="simple"] .ac-hero-t { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; } html[data-phone="simple"] .ac-hero h1 { order: -1; margin: 0; font-size: 19px; }
   html[data-phone="simple"] main:has(#ac-train:not([hidden]) #replay:not([hidden])) .ac-hero { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); border: 0; }
 
@@ -490,7 +671,7 @@ button.pmore, .pv { display: none; }
   html[data-phone="simple"] #decision > .kv:not(.pm) { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: auto auto; gap: 0 10px; padding: 8px 10px; border-radius: 12px; background: var(--neutral-soft); }
   html[data-phone="simple"] #decision > .kv:not(.pm) dt { font-size: 12px; } html[data-phone="simple"] #decision > .kv:not(.pm) dd { color: var(--ink); font-size: 14px; }
   html[data-phone="simple"] #decision:not(.pm-open) > #an-block:has(#an-off) { display: none; }   /* the analyst while it is switched off: one tap away; switched on, it stays in sight */
-  html[data-phone="simple"] #decision > .f-actions .btn.primary, html[data-phone="simple"] #m-save { width: 100%; justify-content: center; min-height: 48px; }
+  html[data-phone="simple"] #decision > .f-actions #continue, html[data-phone="simple"] #m-save { width: 100%; justify-content: center; min-height: 48px; }
 
   /* --- the verdict: four big answers, levels only when a trade is being changed, the why, save --- */
   html[data-phone="simple"] #mentor .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } html[data-phone="simple"] #mentor .choices .btn { justify-content: center; min-height: 48px; padding-inline: 6px; }
