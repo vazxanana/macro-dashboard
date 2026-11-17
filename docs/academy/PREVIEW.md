@@ -12,7 +12,7 @@ A preview is a separate deployment of one branch on its own Vercel URL. It is no
 
 ## What is already in place on the branch
 
-- **Opt-in build.** `scripts/vercel-ignore.sh` still skips every branch except `main`. It builds a preview for exactly one
+- **Opt-in build.** (Vercel only; the Vercel project and `scripts/vercel-ignore.sh` are gone since 17 Nov 2026, so this no longer applies.) `scripts/vercel-ignore.sh` skipped every branch except `main`. It builds a preview for exactly one
   branch, and only when the project variable `MX_PREVIEW_BRANCH` holds that branch's name. Unset, nothing changes. A branch
   can never be built as production through this switch (test: `tests/academy-preview.test.mjs`).
 - **Separate storage.** The Academy keeps its files under `academy/` on production and under `academy-preview/` on any

@@ -32,15 +32,15 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `trade-review` (+ `_trade-review`: the language-model part of the trade review), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `api/` | The site's functions, run by the Cloudflare Worker (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `trade-review` (+ `_trade-review`: the language-model part of the trade review), `status`, `bridge` (17 Nov 2026: `push`, `alert-cron`, `run.js`, `tv-webhook`, `pine`, `og.mjs`, `_flags` removed, section "Simplified") |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `trade-review` (after-the-fact check of the trades taken, proposals only), `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
 | `tests/` | `node:test`, offline; pinned council-data copies in `tests/fixtures/` |
-| `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`), `live/` (VPS runner install), `daily-cache.mjs`, `make-icons.mjs` |
+| `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`, `pwa.cjs`), `daily-cache.mjs`, `make-icons.mjs` |
 | `out/` | The built site, **committed** (CI fails when it is stale) |
 | `council-data` branch | Everything the bots write (trades.json, snapshot.json, `ict/`, `macro/`, `ctrader/`, health.json, digest.json, `research/…`); the site reads it through `/cdata`. Never commit bot output to `main` |
-| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `deploy.yml` (GitHub Pages copy), `ict-apply.yml` + `ict-apply-merge.yml` (applied ICT changes: on for Fred since 10 Nov), research / cache workflows (mostly manual) |
+| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `cloudflare-deploy.yml` (the site), `ict-apply.yml` + `ict-apply-merge.yml` (applied ICT changes: on for Fred since 10 Nov), research / cache workflows (mostly manual) |
 
 **Build, test, CI**
 ```sh
@@ -52,16 +52,16 @@ node ict/audit-test.mjs && node council/alerts-test.mjs && node council/proposal
 node --use-env-proxy scripts/audit/smoke.cjs && node --use-env-proxy scripts/audit/chronostrade.cjs
 ```
 CI on every PR and push to `main`: `tests.yml` (syntax, unit tests, pinned audits) and `ci.yml` (build matches `out/`, page smoke
-test, ChronosTrade audit). Keep new tests offline. Vercel deploys from `main` only when a served file changes
-(`scripts/vercel-ignore.sh`); GitHub Pages still gets a copy from `deploy.yml` (no API there, so no sign-in).
+test, ChronosTrade audit). Keep new tests offline. The site deploys to Cloudflare with `cloudflare-deploy.yml` (section "Cloudflare
+move"); the GitHub Pages copy (`deploy.yml`) and the Vercel deploy gate were removed on 17 Nov 2026.
 
 **How it runs**: `council.yml` is the loop (GitHub Actions, restarts itself every ~5 h). One round takes **about 11-12 minutes**
 (the members' work, then a 4-minute wait in which the Trader and the mirror run again every minute), so "every 2nd round" is
 ~23 min, "every 3rd" ~35 min (ICT desk, research ledger) and "every 6th" ~70 min (Macro strategist, veteran, COT). Older notes
-below that say "5-minute round" or "~25 min" predate the quick pass. The Vercel crons in `vercel.json` (`/api/run?job=council`
-every 4 min, `job=ict` at :04/:19/:34/:49, `/api/alert-cron` every minute) are the backup runner: the council job stands down
-while Actions saved in the last 10 min, and both only commit when `RUN_MODE` / Edge Config `runMode` says live. With the
-owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `watchdog.yml` pages when the loop stops.
+below that say "5-minute round" or "~25 min" predate the quick pass. The loop is the ONLY council runner: the Vercel backup runner
+(`api/run.js`, its crons and the Edge Config switches) and the never-installed VPS runner (`council/live.mjs`) were removed on 17 Nov
+2026 (section "Simplified"). The Worker's one cron (`*/10`) runs the Blob backup / store mirror, the edge analyst and the trade
+review. `watchdog.yml` pages when the loop stops.
 
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
@@ -79,7 +79,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
-- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, One feed per market (12 Nov), Reliability: tests and data
+- Running and reliability: Simplified (17 Nov 2026: what was removed), Vercel (stage 1 + Pro features; history), Council live runner (removed), Council quick pass, One feed per market (12 Nov), Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
@@ -93,8 +93,8 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
 build time (`src/routes.mjs`), the api/ handlers UNCHANGED through a Node-style adapter (`src/adapter.mjs`: Vercel's
-req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), crons alert-cron and
-edge-analyst. Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
+req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), one cron (`*/10`: edge analyst,
+trade review, backup, store mirror; the minute price-alert cron went on 17 Nov 2026). Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
 https://aureumdesk.co.uk (+ www; the site's domain since 16 Nov 2026, a Cloudflare zone with the Worker as its custom domain) and
 https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev is no longer used),
 deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on push only for the two Cloudflare branches).
@@ -109,7 +109,7 @@ cron) and, once switched, makes one final pass that never overwrites a write mad
 copy is recorded; a file the site wrote in D1 mode is never touched by the mirror. Never import `@vercel/blob` in
 `cloudflare/src` for the real store: use `vercel-blob-real`. Tests: `tests/cloudflare-store.test.mjs`. Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
-fails otherwise). `api/run.js` is retired there (child process, files); the preview image stays the site icon (below);
+fails otherwise). `/api/og` redirects to the static card `/icons/og-card.png` (17 Nov 2026; `api/run.js` and `api/og.mjs` are gone);
 the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
 **Bundled files (16 Nov 2026)**: what `api/academy.js` (per edge `academy/data/` cand / out / feat, calendar, research, eval,
 `ml/models/index.json`; the registry `academy/edges.mjs` as code) and `api/bridge.js` (the two EA sources) read from disk on Node
@@ -121,6 +121,35 @@ Worker with its next deploy. Upload 1,471 KiB (340 gzip) before, 4,022 KiB (671 
 Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `routes` (`custom_domain`), workers.dev stays
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
+
+## Simplified (17 Nov 2026, owner: "All")
+The owner approved removing what the site no longer uses or never used. Backend and plumbing (the pages' own calls and markup were
+a separate change). No trading rule, stop, stop guard, demo-only lock or ICT file changed. Older sections below still describe these
+parts as they were; this section wins.
+- **Hosting leftovers**: `netlify.toml`, `_redirects` (an early Netlify version), `.github/workflows/deploy.yml` (the GitHub Pages
+  copy), `scripts/vercel-ignore.sh`, and `vercel.json`'s `crons`, `ignoreCommand` and `buildCommand` (the Vercel project is gone since
+  16 Nov). `vercel.json` keeps its rewrites and headers (`cloudflare/src/routes.mjs` reads them) and the `functions` entries the tests
+  read (limits and bundled files of the live handlers).
+- **Backup council runner** `api/run.js` (the Worker answered it 410; GitHub Actions is the only runner) and the **Edge Config flags**
+  `api/_flags.js` (notice bar, run mode, pause). `api/status.js` now answers `{ at, bots: { council, ict } }` (age and `stale` only;
+  no `notice`, `noticeLevel`, `runMode`, `paused` or `lastRun`).
+- **Preview image** `api/og.mjs` and the `@vercel/og` dependency: the Worker redirects `/api/og` to `/icons/og-card.png`.
+- **TradingView**: `api/tv-webhook.js` and `api/pine.js`.
+- **Price alerts (Web Push)**: `api/push.js`, `api/alert-cron.js`, `api/_alerts.js`, the Worker's every-minute cron (`wrangler.jsonc`
+  triggers and `CRONS`: only `*/10` is left), the `web-push` dependency (root and `cloudflare/`), and the service worker's `push` /
+  `notificationclick` handlers. `sw.js` keeps install, the offline page, the asset cache and the kill switch (`tests/pwa.test.mjs`,
+  `scripts/audit/pwa.cjs`). Side effect: the store mirror's first-hour fast final pass after a `STORE=d1` switch ran on the minute
+  cron; it now runs on the 10-minute one (same result, later).
+- **Workflows**: `bars.yml` and `futures-roll-data.yml` removed; `macro-gold.yml` and `macroscore-overlay.yml` dispatch only (both
+  studies are complete); `kraken-backfill.yml` once a day at 01:43 UTC (was every 30 min; the 25-minute box is unchanged, so a coin's
+  Kraken cache catches up over more days).
+- **VPS live runner** `council/live.mjs`, `scripts/live/`, `tests/live.test.mjs` and `livefresh()` in `council.yml`: never installed;
+  the loop now runs the Trader and the mirror on every round and quick pass, exactly as it did with no heartbeat.
+- **LIT paper stream**: owner rule `lit-off` (`config.litShadow = false`, applied after `lit-shadow`) and `council/lit-replay.mjs`
+  (+ its test, its `council.yml` line and the `lit/replay.json` entry in `datahealth.mjs`) removed. No new LIT order is recorded; the
+  LIT block in `trader.mjs` still runs while a LIT record is open or pending (`litLeft`: the day-end hold and the swing break-even),
+  and the loop manages those records to their exits with their stops. `council/lit.mjs` stays (tests and the block import it).
+  `snapshot.lit.on` says whether the stream places orders. Undo: a user rule setting `c.litShadow = true`.
 
 ## Locked features — do NOT remove or replace in redesigns
 

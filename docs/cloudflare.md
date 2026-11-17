@@ -5,6 +5,12 @@ Owner's decision, 16 Nov 2026: move the whole site from Vercel to Cloudflare Wor
 ICT lab and the edge analyst). Vercel stays live and unchanged until the last stage; the domain moves only after
 every page and endpoint has been checked side by side.
 
+**Simplified, 17 Nov 2026** (owner: "All"; CLAUDE.md "Simplified"): removed `api/run.js`, `api/_flags.js` (Edge Config),
+`api/og.mjs` (`/api/og` now redirects to `/icons/og-card.png`), `api/tv-webhook.js`, `api/pine.js`, the price alerts
+(`api/push.js`, `api/alert-cron.js`, `api/_alerts.js`, the every-minute cron, `web-push`). The Worker has ONE cron, `*/10`.
+Secrets no longer read by anything: `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `TV_WEBHOOK_KEY`, `RUN_MODE`
+(they can be deleted from the Worker with `npx wrangler secret delete <NAME>`). Older text below is kept as history.
+
 ## How it works (`cloudflare/`)
 
 - `cloudflare/wrangler.jsonc`: one Worker, `meridianx`. `out/` (the committed build, checked by CI) is its static
@@ -18,8 +24,9 @@ every page and endpoint has been checked side by side.
   `x-real-ip` / `x-forwarded-for` from Cloudflare's `cf-connecting-ip` (what a client sends is dropped: the
   sign-in rate limit counts by that address).
 - `cloudflare/src/worker.mjs`: `/api/<name>` → `api/<name>.js`; everything else → `out/` (a path ending in `/`
-  gets `index.html`, `/macro` finds `/macro/index.html`). Crons: `* * * * *` → `/api/alert-cron`, `*/10 * * * *`
-  → `/api/edge-analyst?job=scan`, both with `Authorization: Bearer <CRON_SECRET>` as Vercel's crons sent.
+  gets `index.html`, `/macro` finds `/macro/index.html`). One cron, `*/10 * * * *` → `/api/edge-analyst?job=scan`, then
+  `/api/trade-review?job=review` (`CHAINED`), both with `Authorization: Bearer <CRON_SECRET>`, then the Blob backup and the
+  store mirror (until 17 Nov 2026 also `* * * * *` → `/api/alert-cron`, the price alerts).
 - `cloudflare/src/bundled.mjs`: the project files two handlers read from disk on Node (vercel.json `includeFiles`),
   bundled into the Worker as text modules (wrangler.jsonc `rules`: strings inside the Worker's script, never static
   assets): the Academy's generated data and the two bridge EA sources. It hands them over with `academy.useData` and
@@ -104,7 +111,8 @@ the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then agai
   process can start, else (Workers) by parsing it with acorn (bundled: `cloudflare/package.json`, `wrangler.jsonc` alias).
   The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
   Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
-- **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon, on purpose (checked 16 Nov 2026). The
+- **Link preview image** (`api/og.mjs`, @vercel/og; removed 17 Nov 2026, `/api/og` redirects to the static `/icons/og-card.png`):
+  answered with the site icon, on purpose (checked 16 Nov 2026). The
   bundler takes the pinned @vercel/og 0.11.1's Worker build (`dist/index.edge.js`, 2.1 MB with its resvg and yoga wasm),
   and that build starts fetching its font at module scope from `new URL('./Geist-Regular.ttf', import.meta.url)`: in
   workerd that throws "Invalid URL string" while the Worker starts (tried locally: the runtime failed to start), so every
@@ -114,9 +122,8 @@ the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then agai
 - **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
   alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,
   `notice`) → KV. One copy, then Vercel's Blob store is read-only.
-- **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
 - **Storage to Cloudflare**: the Blob store → the D1 file store below (built 17 Nov 2026, switch OFF until the lead
-  throws it); Edge Config (`runMode`, `paused`, `notice`) → KV, still to do.
+  throws it). Edge Config (`runMode`, `paused`, `notice`): not ported, removed with `api/_flags.js` on 17 Nov 2026.
 
 ## File store on D1 (17 Nov 2026; behind the Worker secret `STORE`, OFF by default)
 
@@ -160,7 +167,7 @@ real package unless the secret `STORE` is `d1` (case and spaces ignored); then t
 - Switch ON: ONE final pass copies the Vercel files written since the last mirror run: only a file newer than its D1 row and
   newer than any delete made here; the commit itself re-checks it, so a write made after the switch is never overwritten,
   even one made while the file is being copied. It also deletes copies of files Vercel deleted before the switch. It runs on
-  the minute cron during the first hour after the switch is seen (then the 10-minute one) and stops for good once complete
+  the 10-minute cron (until 17 Nov 2026 also the minute cron during the first hour after the switch) and stops for good once complete
   (`final pass done`).
 - A file the site wrote in D1 mode is never overwritten or deleted by the mirror, also after a switch back (`kept` count).
 - `STORE_MIRROR=off` (secret) stops the mirror in either mode (for example when Vercel's store is gone for good).
@@ -170,7 +177,7 @@ real package unless the secret `STORE` is `d1` (case and spaces ignored); then t
    dashboard): `store mirror` lines every 10 minutes until one reads `"complete":true` with a `ready` time.
 2. Right after a complete run (a quiet moment: no owner edits), set the secret: `npx wrangler secret put STORE` in
    `cloudflare/`, value `d1`. Secrets take effect at once (a new version).
-3. Within a minute the log shows `store mirror … "mode":"d1" … "complete":true`, then `final pass done`. Check: sign in as
+3. Within ten minutes (the next 10-minute cron) the log shows `store mirror … "mode":"d1" … "complete":true`, then `final pass done`. Check: sign in as
    a member, the notices, a profile photo, a Mosha lesson picture, the Users page.
 4. Later, when Vercel is closed: set `STORE_MIRROR=off`; keep `BLOB_READ_WRITE_TOKEN` (any value).
 
@@ -185,8 +192,8 @@ Not verified against the real services: the mirror's reads of the real Vercel st
 the store on the remote D1 database (checked on `wrangler dev --local`'s D1 with the real handlers: sign-in, a password
 change read back at once, notices, profile photo). Not covered: two writes to one file at the same instant still keep the
 last (as on Vercel).
-- **Retired**: the backup council runner (`api/run.js`, crons council / ict) starts the Trader as a child process
-  and writes files, which Workers do not allow. GitHub Actions and the VPS runner run the council.
+- **Removed** (17 Nov 2026): the backup council runner (`api/run.js`, crons council / ict), which started the Trader as a
+  child process (not allowed on Workers). GitHub Actions is the council's only runner.
 
 ## Stage 4: the domain
 
