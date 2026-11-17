@@ -32,8 +32,8 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
 | `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
-| `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `trade-review` (+ `_trade-review`: the language-model part of the trade review), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `trade-review` (after-the-fact check of the trades taken, proposals only), `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
 | `tests/` | `node:test`, offline; pinned council-data copies in `tests/fixtures/` |
@@ -70,7 +70,8 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
-  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets.
+  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets,
+  Trade review (17 Nov: the after-the-fact edge check and its optional language-model reviewer).
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
@@ -3709,3 +3710,58 @@ out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 
   (`council/backtest.mjs`) and the Coach's backtest evidence still cover the setups. Off-switch: a user rule setting
   `c.shadowCut = null`; a stream comes back only through a new pre-registered study. Tests: `tests/shadow-cut.test.mjs`,
   `tests/shadow-best.test.mjs`.
+
+## Trade review: the after-the-fact edge check and its optional language-model reviewer (17 Nov 2026, owner: "Check as well the edges and add an AI to check the actual trades and help the edge bots to trade better")
+Proposals only (absolute rule 3): nothing here changes `config.json`, a rule, a size, a stop or a filter, and no council member
+reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ict…` record or the ICT demo account is never counted.
+- **`council/trade-review.mjs`** (pure + `main(dir)`; council.yml every 6th round, `timeout 60`, never fails the loop) reads
+  trades.json, research.json, coach.json (decay / expect), config.json, the demo mirrors through `ctrader/mirror-accounts.json`
+  (books with `ict` skipped) and `reviews/analyst.json` + `reviews/losses.json`; writes council-data `research/trade-review.json`
+  (`hash` = content without its time; written when it changes, re-stamped at least every `REFRESH_S` 6 h; `datahealth.mjs` warns
+  at 12 h, bad at 48 h). One **stream** per system and book: `live` (not a shadow; the NQ open run's `nyflip` research rows as
+  `alertable` counts them), `shadow`, `research` (research.json's other forward paper streams: the replica's research trades,
+  NQ variants by session). Closed = win / loss / be with a finite R, never `void`, `replay` or a duplicate. Engine setups are
+  named apart (`SETUP_NAME`: three of them are "Retrace" on the records). Per stream, last 7 / 30 days and the whole record on
+  file: n, win rate, R before costs (`R`) and after (`merNet`, the digest's), t, cost per trade and share of gross wins (research
+  rows carry no cost: "no cost on record", never a made-up cost); where the R goes: exits by type (`exitType`: target / stop /
+  trail / breakeven / time), stops within `FAST_S` 30 min of the fill, trades that reached +1R and closed at a loss, MFE given
+  back, the paired counterfactual "close at +1R once reached" (`lock1R`, from the recorded MFE: approximate, said so), losses
+  whose target came after the stop (post-mortem `pm.after.hitT1`); demo slippage (`slipR`, positive = worse); session (the
+  council's UTC clock), 4-hour block, side and market splits, each against the rest by Welch t with a Student-t p.
+- **Flags** (`flagsOf`), every one with n and t: `losing` / `positive` (n >= 10, |t| >= 2 on R after costs), `costs` (gross > 0,
+  net < 0, cost >= 0.1R a trade), `weak-*` / `strong-*` splits (both sides >= 10 trades, |t| >= 2), `exit-lock1R` / `exit-runs`.
+  Splits carry `p` and `holm` (Holm over every split test of the file, `thresholds.splitTests`). **Proposals** (`proposalOf`):
+  skip session / hours / market, one side only, change exit, cut costs, move to shadow / keep off live; each with evidence (n,
+  mean, t, p, Holm, `inSample: true` and the warning) and `test` = the pre-registered study that would confirm it (`TEST_BASE`:
+  2020 → now, in sample 2020-2023 vs out of sample 2024 → now, net of the council cost model, OOS t >= 2 on month sums after
+  Holm, PREREGISTRATION.md first). `strong` = n >= 30, |t| >= 2 and (a split) Holm passed. One subset under two names (Asia =
+  00-04 UTC) is proposed once. Nothing is proposed for a live engine setup no longer in `config.focusSetups` (`retired`) or a
+  shadow the owner's shadow cut stopped recording (`stopped`): reported, not proposed.
+- **Language-model reviewer** (`api/_trade-review.js` pure, `api/trade-review.js` endpoint; the Academy's adapter
+  `api/_academy-llm.js`, own budgets `TRADE_REVIEW_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 2,
+  `TRADE_REVIEW=off` or `TRADE_REVIEW_LLM_STOP=1` stops it, no key = off and the page shows the rule-based review alone). Cron
+  `GET /api/trade-review?job=review` (Bearer `CRON_SECRET`): reads the file through `api/data.js` `readFile`, asks once per new
+  `hash` and at most every `MIN_GAP_S` 12 h; store `trade-review/` (`latest.json`, `state.json`, the adapter's `cost.json` /
+  `llm-cache.json`). The answer is checked in code (`parseAnswer`): unknown streams dropped, a proposal must name one of ITS
+  stream's own flag ids or it is dropped (`dropped` counted); its evidence and test are copied from the file, never the model's
+  numbers. A billed answer that fails the checks is stored as refused (never paid twice); a budget skip is retried. `GET` for
+  the owner or a reviewer: `{ enabled, reason, cost, ai }`. Cloudflare: handler `'trade-review'` in `HANDLERS`, run after the
+  10-minute cron through `CHAINED` (no new trigger; `wrangler.jsonc` unchanged); vercel.json cron `17 */6 * * *` kept for the
+  record. No connector queue (optional, not built).
+- **Page**: card `#ms-tr` (class `adm`) in Council → Review after `#ms-ea`; `<style id="ms-tr-css">` on the graphite tokens of
+  `docs/design/aureum-theme.md` with the page's tokens as fallbacks (`--au-ink, var(--ink)`); `<script id="ms-tr-js">` reads the
+  file through `msData` and `/api/trade-review` (owner / reviewer; viewers and guests read nothing), `window.MS_TR` pure pieces.
+  Live / Shadow / Research / All filter (localStorage `msTrBook`), a stream row opens its review, numbers, exits, splits, flags;
+  then the proposals with evidence and test; then the language-model review. The week pane's "Decisions waiting" lists the
+  file's **strong** proposals only (at most three, `k: 'review'`, `loadExtra` reads the file); the simple phone view folds the
+  card like the other review cards (`.tr-sum` is its summary line).
+- **First reading (council-data of 17 Nov 2026 07:14 UTC)**: 30 streams, 18 flags, 2 proposals. The live book's main systems
+  have too few closed trades to judge (Gold daily engulf 2, −2.06R after costs; H4 trendline 1; live replica 2, +0.95R; NQ open
+  run 1); the four legacy engine setups' live record of 1-4 Nov is −24.2R after costs on 31 trades (retired, nothing proposed).
+  Shadow book (stopped by the 12 Nov cut except Position / Swing / M30): +182.2R before costs, −6.3R after on 970 trades; the
+  scalps +114.2R gross, +7.9R after (costs 106.3R, 24 % of gross wins; 121 of 326 losses stopped within 30 min); Retrace scalp
+  −92.4R after costs (t −3.41); Intraday +48.3R (n 96, t 2.86, whose 2020-26 study `shadow-best` failed: a forward 15 days, not
+  an edge). Replica research trades: −85.7R before costs on 977 (t −1.91), buys −0.40R vs sells +0.25R a trade (t −7.21, Holm
+  passed: in sample over two weeks of one market regime), demo copies 0.065R a trade worse than paper (n 152, t 3.10).
+- Tests: `tests/trade-review.test.mjs` (9), `tests/trade-review-ai.test.mjs` (7); fixture `tests/fixtures/trade-review/`
+  (a made-up desk, `make.mjs` builds it).

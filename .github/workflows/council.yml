@@ -146,6 +146,10 @@ jobs:
             if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/veteran.mjs data || echo "Veteran round $i failed"; fi
             # COT positioning desk (8 Nov): CFTC speculators per market + tested signals → data/macro/cot.json (fetch cached 12 h)
             if [ $((i % 6)) -eq 1 ]; then timeout 90 node council/cot.mjs data || echo "COT round $i failed"; fi
+            # Trade review (17 Nov): the after-the-fact check of the trades taken, system by system (n, t, where the R goes, costs,
+            # demo slippage, session splits) and proposals only → data/research/trade-review.json. Reads files, fetches nothing,
+            # changes no rule; ICT is not read. Every 6th round (~70 min), capped at 60 s; a failure never stops the loop.
+            if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/trade-review.mjs data || echo "Trade review round $i failed"; fi
             # Data-quality monitor (7 Nov): the OANDA proxy, Kraken and the ICT desk's CNBC feed, every 2nd round (~11 min) → health.json
             # and one deduplicated phone alert when a feed goes bad. Read-only for the bots; never fails the round.
             if [ $((i % 2)) -eq 1 ]; then timeout 150 node council/datacheck.mjs data || echo "Data check round $i failed"; fi

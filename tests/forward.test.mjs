@@ -161,7 +161,7 @@ test('page: the card reads only fields forward.mjs writes, says the protocol is 
   for (const c of fw.exec.checks) for (const k of ['id', 'label', 'state', 'text']) assert.ok(k in c, 'check.' + k);
   for (const k of ['window', 'trades', 'checks']) assert.ok(k in fw.exec, 'exec.' + k);
   // the simple phone view folds it to its heading and its one sentence (the neighbours' helper, no new mechanism)
-  assert.match(html, /c\.querySelector\('\.sb-sum, \.dc-sum, \.ex-sum, \.bk-sum, \.fw-sum, \.md-verdict'\)/);
+  assert.match(html, /c\.querySelector\('\.sb-sum, \.dc-sum, \.ex-sum, \.bk-sum, \.fw-sum, \.tr-sum, \.md-verdict'\)/);
   // Home's "things wait on you" takes it from MS_WEEK.decisions, one item, only with alerts
   assert.match(html, /var FW = co\.forward; if \(FW && Array\.isArray\(FW\.alerts\) && FW\.alerts\.length\)/);
 });
