@@ -3955,3 +3955,12 @@ turns it negative; spreads are 9-21 %. Post hoc, financing at the rate alone (a 
 0.37. The 3- and 6-month look-backs are worse (OOS t −2.13, −1.42). Not an edge on CFDs, no paper shadow proposed, no owner
 decision. Nothing live changed. To repeat: `run.mjs fetch <dir>` (git, no network), `run.mjs run <dir>`. Test:
 `tests/tsmom-portfolio.test.mjs`.
+
+## Gold daily engulf on silver (17 Nov 2026, item 59's recommendation)
+`research/edge/geg-silver/` (PREREGISTRATION.md committed alone first; `fetch.mjs`, `run.mjs`, RESULT.md, result.json). The live
+`geg` rule (trading days via `foldWeekend`, the reopen freshness window, maxOpen 3, 10R, 2R / 1R trail, 240 h) on OANDA XAG/USD
+M5 + D1, buffer $0.30 -> $0.004, cost 0.10 % of price a round trip and 0.015 % a night on longs (assumed: no XAGUSD on the demo
+broker's file). Parity gate first: the harness reproduces `gold-weekend`'s gold engulf exactly (n 247 +0.207R, n 176 +0.326R).
+**Verdict: FAIL**: OOS 2024 on +0.098R a position (n 63, month-sum t 0.52), IS 2020-23 −0.158R (n 85), replication 2006-19
++0.060R (n 252, month t 0.55); one at a time is worse. No paper shadow, nothing live changed; do not test it on another
+market. Test: `tests/geg-silver.test.mjs`.
