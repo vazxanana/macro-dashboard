@@ -229,7 +229,7 @@ test('manifest: installable (name, standalone, start_url in scope, 192 + 512 + m
   assert.equal(m.display, 'standalone');
   assert.equal(m.id, '/');
   assert.ok(m.start_url.startsWith(m.scope));
-  assert.equal(m.theme_color, '#08090c'); assert.equal(m.background_color, '#08090c');   // the desk's dark --bg token
+  assert.equal(m.theme_color, '#121315'); assert.equal(m.background_color, '#121315');   // the graphite theme's dark --au-bg (docs/design/aureum-theme.md)
   for (const i of m.icons) {
     const [w, h] = pngSize(path.join(ROOT, i.src));
     assert.equal(`${w}x${h}`, i.sizes, i.src);

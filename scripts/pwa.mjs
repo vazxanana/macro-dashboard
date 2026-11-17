@@ -14,7 +14,7 @@ const ICON = '/icons/apple-touch-icon.png';
 // [find in <head>, tag, replace an existing one?]
 const TAGS = [
   [/<link\b[^>]*\brel=["']manifest["'][^>]*>/i, '<link rel="manifest" href="/app.webmanifest">', true],
-  [/<meta\b[^>]*\bname=["']theme-color["'][^>]*>/i, '<meta name="theme-color" content="#08090c">', false],
+  [/<meta\b[^>]*\bname=["']theme-color["'][^>]*>/i, '<meta name="theme-color" content="#121315">', false],
   [/<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*>/i, `<link rel="apple-touch-icon" href="${ICON}">`, true],
   [/<meta\b[^>]*\bname=["']apple-mobile-web-app-capable["'][^>]*>/i, '<meta name="apple-mobile-web-app-capable" content="yes">', false],
   [/<meta\b[^>]*\bname=["']mobile-web-app-capable["'][^>]*>/i, '<meta name="mobile-web-app-capable" content="yes">', false],
