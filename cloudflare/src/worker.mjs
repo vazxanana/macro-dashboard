@@ -50,7 +50,8 @@ export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };
 const SECURITY = headersFor(vercel.headers, new URL('https://x/'));
 
 async function api(name, request, url, env, ctx) {
-  if (name === 'og') return Response.redirect(new URL('/icon-512.png', url).href, 302);
+  // The link preview is the static card (17 Nov 2026: api/og.mjs removed); old links to /api/og still get a picture.
+  if (name === 'og') return Response.redirect(new URL('/icons/og-card.png', url).href, 302);
   const h = HANDLERS[name];
   if (!h) return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { 'content-type': 'application/json' } });
   return run(h, request, url, ctx);
