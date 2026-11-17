@@ -11,7 +11,11 @@ const lum = (hex) => { const v = hex.replace('#', '').match(/../g).map((x) => pa
 const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 // an rgba() over an opaque #rrggbb -> #rrggbb
 const over = (rgba, bg) => { const [r, g, b, a] = rgba.match(/[\d.]+/g).map(Number), B = bg.replace('#', '').match(/../g).map((x) => parseInt(x, 16)); return '#' + [r, g, b].map((c, i) => Math.round(c * a + B[i] * (1 - a)).toString(16).padStart(2, '0')).join(''); };
-const tok = (block, name) => { const m = new RegExp(`--${name}:\\s*([^;]+);`).exec(block); return m && m[1].trim(); };
+// a token's value; since 17 Nov 2026 (the graphite look) the older names point at --au-* tokens: a var() is followed in the same block,
+// then in the Desk's first :root block (where every token is defined), so each check below still measures the real colour
+const tok0 = (block, name) => { const m = new RegExp(`(?:^|[\\s{;])--${name}:\\s*([^;]+);`).exec(block); return m && m[1].trim(); };
+const DESK_ROOT = () => (/:root \{([^}]*)\}/.exec([...fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n')) || [])[1] || '';
+const tok = (block, name, depth = 0) => { let v = tok0(block, name); if (v == null) v = tok0(DESK_ROOT(), name); const m = v && /^var\(--([\w-]+)(?:,\s*([^)]+))?\)$/.exec(v); if (m && depth < 6) return tok(block, m[1], depth + 1) || (m[2] && m[2].trim()) || v; return v; };
 
 test('the Desk | Macro | ChronosTrade ring never animates forever, on any page (desk perf rule, 9 Nov)', () => {
   const files = { 'assets/mx-page.css': src('assets/mx-page.css') };
@@ -176,10 +180,15 @@ test('ICT desk on a phone: a signal with two executions keeps its chips inside t
   assert.match(css, /\.tv-h p\.ict-thru \{ display: block; overflow: visible; cursor: auto; \}/, 'the header clamps its other paragraphs to three lines on phones');
 });
 
-test('styled dialogs: the primary button is white on a fixed fill at AA in every theme (the themes\' --accent / --sell gave 3.2-4.5:1)', () => {
+// 17 Nov 2026 (graphite look): the primary is the page's solid neutral button, --au-primary with --au-on-primary on it (light on dark,
+// dark on light); the fallback pair is used where a page has no tokens. Both pairs are measured here, in every theme of the Desk.
+test('styled dialogs: the primary button reads at AA in every theme (the themes\' --accent / --sell gave 3.2-4.5:1)', () => {
   const js = src('assets/ms-dialog.js');
-  const pri = /\.msd button\.pri\{background:(#[0-9a-f]{6});border-color:\1;color:#fff\}/.exec(js), danger = /\.msd\.danger button\.pri,\.msd\.danger button\.pri:hover\{background:(#[0-9a-f]{6});/.exec(js);
-  assert.ok(pri && ratio('#ffffff', pri[1]) >= 4.5); assert.ok(danger && ratio('#ffffff', danger[1]) >= 4.5);
+  const pri = /\.msd button\.pri\{background:var\(--au-primary,(#[0-9a-f]{6})\);border-color:var\(--au-primary,\1\);color:var\(--au-on-primary,(#[0-9a-f]{3,6})\)\}/.exec(js), danger = /\.msd\.danger button\.pri,\.msd\.danger button\.pri:hover\{background:(#[0-9a-f]{6});border-color:\1;color:#fff\}/.exec(js);
+  const hex = (c) => (c.length === 4 ? '#' + [...c.slice(1)].map((x) => x + x).join('') : c);
+  assert.ok(pri && ratio(hex(pri[2]), pri[1]) >= 4.5, 'the fallback pair'); assert.ok(danger && ratio('#ffffff', danger[1]) >= 4.5);
+  const css = styles(src('market-structure.html')), block = (sel) => [...css.matchAll(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{([^}]*)\\}', 'g'))].map((m) => m[1]).join(' ');
+  for (const sel of [':root', ':root[data-theme="light"]', ':root[data-theme="midnight"]']) { const b = block(sel); assert.ok(ratio(tok(b, 'au-on-primary'), tok(b, 'au-primary')) >= 12, `${sel}: text on the primary fill`); }
   const own = /\.own-acts button\.pri \{ background: (#[0-9a-f]{6}); border-color: \1; color: #fff; \}/.exec(styles(src('market-structure.html')));
   assert.ok(own && ratio('#ffffff', own[1]) >= 4.5, 'the Desk\'s own dialogs (permissions, a lesson\'s levels)');
 });
