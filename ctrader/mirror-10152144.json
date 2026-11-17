@@ -563,7 +563,7 @@
     "lots": 0.03,
     "digits": 2,
     "setup": "ict-A+",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-17T12:11:54.000Z",
     "councilEntry": 27387.75,
     "stop": 27084.5,
@@ -573,11 +573,13 @@
     "fillPrice": 27298.02,
     "lagSec": 20,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-17T12:11:54.000Z",
     "brokerStop": 26994.77,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "closedAt": "2026-11-17T15:33:08.000Z"
    },
    "ict:es-b-1794913200": {
     "positionId": "50200672",
@@ -587,7 +589,7 @@
     "lots": 0.65,
     "digits": 2,
     "setup": "ict-A+",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-17T12:11:54.000Z",
     "councilEntry": 7440.5,
     "stop": 7394.75,
@@ -597,11 +599,13 @@
     "fillPrice": 7420.08,
     "lagSec": 20,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-17T12:11:54.000Z",
     "brokerStop": 7374.33,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "closedAt": "2026-11-17T15:33:08.000Z"
    }
   },
   "day": {
@@ -609,7 +613,7 @@
    "startBalance": 9974.19
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10014.24 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 9975.34 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -617,8 +621,8 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 10014.24,
-  "lastRun": "2026-11-17T15:31:33.000Z"
+  "balance": 9975.34,
+  "lastRun": "2026-11-17T15:33:08.000Z"
  },
  "log": [
   {
@@ -1602,6 +1606,16 @@
   {
    "at": "2026-11-17T12:11:54.000Z",
    "msg": "opened buy US500 0.65 lot (council ict-A+)",
+   "trade": "ict:es-b-1794913200"
+  },
+  {
+   "at": "2026-11-17T15:33:08.000Z",
+   "msg": "NAS100 position 50200669 closed at the broker",
+   "trade": "ict:nq-b-1794913200"
+  },
+  {
+   "at": "2026-11-17T15:33:08.000Z",
+   "msg": "US500 position 50200672 closed at the broker",
    "trade": "ict:es-b-1794913200"
   }
  ],
