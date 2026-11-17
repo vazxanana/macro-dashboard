@@ -577,13 +577,6 @@ test('ChronosTrade sounds on the profile: a save is said in words (the page call
   assert.match(DESK, /r\.status >= 500 \? 'The server could not save the sound \(error ' \+ r\.status \+ '\)\. Try again in a minute\.'/);
 });
 
-test('price alerts: failures in words, the message follows the last action, focus stays in the dialog after a delete', () => {
-  assert.match(DESK, /if \(!r\) throw new Error\(navigator\.onLine === false \? 'You are offline\. Connect and try again\.' : 'The server could not be reached\. Check your connection and try again\.'\);/);
-  assert.match(DESK, /try \{ await sync\(\); dlg\.querySelector\('#pa-msg'\)\.textContent = 'Alert deleted\.'; \}/);
-  assert.match(DESK, /if \(!\(v > 0\) \|\| !Number\.isFinite\(v\)\) \{ msg\.textContent = 'Type a price\.'; return; \}/, 'as api/push.js: a finite price only');
-  assert.match(DESK, /t = ds\[Math\.min\(at, ds\.length - 1\)\] \|\| dlg\.querySelector\('#pa-price'\); if \(t\) t\.focus\(\);/);
-});
-
 test('the palette knows the profile, its field has a name, and the demo-account rows work from the keyboard', () => {
   assert.match(DESK, /if \(window\.MS_ACCT && !has\('profile'\)\) out\.push\(\{ g: 'Pages', t: 'Profile and demo accounts', d: '#profile'/);
   assert.match(DESK, /<input id="cmdk-q" type="text" aria-label="Jump to a page, market or theme"/);
@@ -783,7 +776,7 @@ test('simple phone view 2: Charts puts the rarely used rows behind "More", and a
   for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
   assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
   // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
-  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips, \.cycle\) \{ display: none !important; \}/);
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle\) \{ display: none !important; \}/);
   assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
   // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
   assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
@@ -873,7 +866,7 @@ const Q12_CSS = styles(Q12);
 test('QA 12 Nov: on a phone the market-cycle strip waits behind "More" with the markup it reads (it pushed the chart 135 px down, 3.6 s after load)', () => {
   const rule = /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(([^)]*)\) \{ display: none !important; \}/.exec(Q12_CSS);
   assert.ok(rule, 'the "More" rule of the Charts simple view');
-  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.pa-chips', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
+  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
   assert.match(Q12, /<div class="cycle" id="ms-cycle"/, 'the strip is still the .cycle child of the charts toolbar');
   assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context and the market cycle"/);
   assert.match(src('scripts/audit/smoke.cjs'), /the market-cycle strip is not behind "More"/);

@@ -2899,10 +2899,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <details class="menu">
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
-          <button type="button" class="menu-pa" id="ms-pa-open">Price alerts <small>notify this device at a price</small></button>
           <button type="button" class="menu-pa menu-br" id="ms-br-open">Broker bridge <small>MT5 / cTrader mirror of the council</small></button>
-          <button type="button" class="menu-pa menu-tv" id="ms-tvw-open">TradingView alerts in <small>log TradingView alerts here, push to your phone</small></button>
-          <button type="button" class="menu-pa menu-tv" id="ms-tva-open">TradingView add-on <small>council trades on your TradingView chart</small></button>
           <div class="menu-h">Chart layers</div>
           <div class="ms-lay" id="ms-lay" role="group" aria-label="Chart layout presets"><button type="button" data-lay="clean" title="Candles, structure lines and key levels only">Clean</button><button type="button" data-lay="full" title="Every layer on">Full</button><button type="button" data-lay="mine" title="Your saved layout">Mine</button><button type="button" data-lay="save" class="sv" title="Save the current layers as Mine">Save as Mine</button><button type="button" data-lay="wipe" class="sv" title="Remove your lines, trend lines, Fibonacci and position plans on this market">Clear drawings</button></div>
           <div class="ms-tog ms-tog-g">
@@ -3137,7 +3134,6 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
       <nav class="wl" id="ms-wl" aria-label="Watchlist: switch market" hidden></nav>
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
-      <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <style id="ms-cycle-css">
       #ms-cycle { margin: 6px 0 2px; font-size: 13px; line-height: 1.5; }
@@ -3165,7 +3161,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </style>
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <style id="ms-clean-css">/* clean look (13 Nov 2026, owner: "too much labels"): only the charts with BO, VR and CF */
-        html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-pa-chips, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
+        html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
       <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
       <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
         <div class="sty-h">Chart type</div>
@@ -3180,7 +3176,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps only the BO, VR and CF; hides the rest (origin, next setup, trade lines, iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
       </div></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
-      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -5183,7 +5179,7 @@ function msNextSetup(bars, A) {
         // phones (7 Nov loop): the toolbar scrolls sideways inside the header; a fade shows there is more until the end is reached
         { const ovf = () => { const o = tl.scrollWidth > tl.clientWidth + 1; tl.classList.toggle('ovf', o); tl.classList.toggle('end', o && tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 2); };
           tl.addEventListener('scroll', ovf, { passive: true }); if (window.ResizeObserver) new ResizeObserver(ovf).observe(tl); setTimeout(ovf, 0); }
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
@@ -5195,7 +5191,6 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
-        tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
       }
       el.addEventListener('dblclick', () => P.fit()); }
@@ -5278,10 +5273,6 @@ function msNextSetup(bars, A) {
       addEventListener('mousemove', move); el.addEventListener('touchmove', move, { passive: false });
       addEventListener('mouseup', end); el.addEventListener('touchend', end);
       addEventListener('keydown', (ev) => { if (ev.key === 'Escape') P.clearMeasure(); }); }
-    // right-click (or Alt+click) on a chart: price alert at that price (7 Nov loop)
-    { const at = (ev) => { const r = el.getBoundingClientRect(), p = series.coordinateToPrice(ev.clientY - r.top); return p != null && isFinite(p) ? p : null; };
-      el.addEventListener('contextmenu', (ev) => { if (ev.target.closest && ev.target.closest('.ch-tools')) return; const p = at(ev); if (p == null || !window.msOpenAlerts) return; ev.preventDefault(); window.msOpenAlerts(instKey, p); });
-      el.addEventListener('click', (ev) => { if (!ev.altKey || P.measureOn) return; const p = at(ev); if (p != null && window.msOpenAlerts) { ev.preventDefault(); window.msOpenAlerts(instKey, p); } }); }
     // horizontal line tool (7 Nov loop): click to place, click a line (within 6 px) to remove; shared by all timeframes, saved per market
     el.addEventListener('click', (ev) => { if (!P.hlOn || ev.altKey) return; if (ev.target.closest && ev.target.closest('.ch-tools')) return;
       const r = el.getBoundingClientRect(), y = ev.clientY - r.top, pr = series.coordinateToPrice(y); if (pr == null || !isFinite(pr)) return;
@@ -5341,17 +5332,16 @@ function msNextSetup(bars, A) {
         P._pos.push(series.createPriceLine({ price: en + d * r, color: 'rgba(8,153,129,.6)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: false, title: '1R' }));
         P._pos.push(series.createPriceLine({ price: en + d * 2 * r, color: '#089981', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Target +2R · ${pct(en + d * 2 * r)}` }));
         P.posChip([en, st, en + d * 2 * r, buy, sz]); };
-      // action chip for the planned position (7 Nov loop): copy it as an MT5 / cTrader order, set a price alert at the entry, or clear it
+      // action chip for the planned position (7 Nov loop): copy it as an MT5 / cTrader order, or clear it
       P.posChip = function (q) { let c = el.querySelector('.pos-chip'); if (!q) { if (c) c.remove(); return; }
         if (!c) { c = document.createElement('div'); c.className = 'pos-chip'; el.appendChild(c); }
         const [en, st, tp, buy, sz] = q, f = (v) => (+v).toFixed(INST.dec), sym = String(INST.label || instKey).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
         const last = P.bars && P.bars.length ? P.bars[P.bars.length - 1].close : null, typ = last == null ? '' : (buy ? en < last : en > last) ? ' LIMIT' : ' STOP';
         const mt5 = `${sym} ${buy ? 'BUY' : 'SELL'}${typ} ${f(en)} SL ${f(st)} TP ${f(tp)}`;
         const ct = `${buy ? 'Buy' : 'Sell'}${typ ? typ.toLowerCase() + ' order' : ''} ${sym} @ ${f(en)} | Stop loss ${f(st)} | Take profit ${f(tp)}`;
-        c.innerHTML = `<b class="${buy ? 'up' : 'dn'}">${buy ? '▲ Long' : '▼ Short'}${typ}</b><span>${f(en)} · SL ${f(st)} · TP ${f(tp)}${sz ? ` · ${esc(sz)}` : ''}</span><button type="button" data-pc="mt5">Copy MT5</button><button type="button" data-pc="ct">cTrader</button><button type="button" data-pc="al">Alert at entry</button><button type="button" data-pc="x" aria-label="Remove the position plan">×</button>`;
+        c.innerHTML = `<b class="${buy ? 'up' : 'dn'}">${buy ? '▲ Long' : '▼ Short'}${typ}</b><span>${f(en)} · SL ${f(st)} · TP ${f(tp)}${sz ? ` · ${esc(sz)}` : ''}</span><button type="button" data-pc="mt5">Copy MT5</button><button type="button" data-pc="ct">cTrader</button><button type="button" data-pc="x" aria-label="Remove the position plan">×</button>`;
         c.onclick = async (ev) => { ev.stopPropagation(); const b = ev.target.closest('[data-pc]'); if (!b) return; const k = b.dataset.pc;
           if (k === 'x') { if (P.posTool) P.posTool(); return; }
-          if (k === 'al') { if (window.msOpenAlerts) window.msOpenAlerts(instKey, +f(en)); return; }
           const v = k === 'mt5' ? mt5 : ct; try { await navigator.clipboard.writeText(v); } catch (e) { msCopy(v); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Position ticket', { fmt: k }); }; };
       P.posTool = function () { let has = false; try { has = !!localStorage.getItem(QK); } catch (e) {}
         if (P.posOn) { P.posOn = false; E = null; mark(false); return; }
@@ -5824,44 +5814,6 @@ function msNextSetup(bars, A) {
     mark(); }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} lyAll('setVol'); }); } }
-  // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
-  { const btn = document.getElementById('ms-tvw-open'); let dlg;
-    const TPL = '{"ticker":"{{ticker}}","price":{{close}},"side":"buy","msg":"{{strategy.order.comment}} {{interval}}"}';
-    const load = async () => {
-      const m = dlg.querySelector('#tvw-msg'), ul = dlg.querySelector('#tvw-list'), u = dlg.querySelector('#tvw-url');
-      let pw = ''; try { pw = window.__tvwPw || ''; } catch (e) {}
-      m.textContent = 'Loading…';
-      try { const r = await fetch('/api/tv-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, list: true }) }); const j = await r.json();
-        if (r.status === 403) { window.__tvwPw = ''; dlg.querySelector('#tvw-pw').hidden = false; u.textContent = 'Owner password not accepted.'; m.textContent = ''; return; }
-        if (!r.ok) throw new Error(j.error || r.status);
-        dlg.querySelector('#tvw-pw').hidden = true; u.textContent = j.url; dlg.querySelector('#tvw-cpu').disabled = false; m.textContent = '';
-        ul.innerHTML = (j.alerts || []).length ? j.alerts.map((a) => `<li><span class="pa-arr ${/sell|short/i.test(a.side || '') ? 'below' : 'above'}">${/sell|short/i.test(a.side || '') ? '↓' : /buy|long/i.test(a.side || '') ? '↑' : '•'}</span><span class="pa-w"><b>${esc(a.ticker || 'Alert')}${a.price != null ? ` · ${esc(a.price)}` : ''}${a.side ? ` · ${esc(String(a.side).toUpperCase())}` : ''}</b><small>${esc(new Date(a.at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))} · ${esc(String(a.text || '').slice(0, 140))}</small></span></li>`).join('') : '<li class="pa-empty">No TradingView alerts received yet.</li>';
-      } catch (e) { m.textContent = `Could not load (${e.message}).`; }
-    };
-    const open = () => {
-      if (!dlg) {
-        dlg = document.createElement('dialog'); dlg.className = 'pa-dlg tva-dlg'; dlg.setAttribute('aria-labelledby', 'tvw-h');
-        dlg.innerHTML = `<div class="pa-top"><h2 id="tvw-h">TradingView alerts in</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
-          <p class="pa-sub">Send any TradingView alert (your own indicators or strategies) to Aureum Desk: it is logged here and pushed to your devices.</p>
-          <form id="tvw-pw" class="pa-f" hidden><label class="pa-wide">Owner password<input type="password" id="tvw-pwi" autocomplete="current-password"></label><button type="submit" class="pa-go">Show the webhook</button></form>
-          <h3 class="br-h3">1 · Webhook URL</h3><p class="tvw-row"><code id="tvw-url" class="tvw-url">…</code><button type="button" class="pa-del" id="tvw-cpu" disabled>Copy</button></p>
-          <h3 class="br-h3">2 · Message (JSON, optional)</h3><p class="tvw-row"><code class="tvw-url">${esc(TPL)}</code><button type="button" class="pa-del" id="tvw-cpt">Copy</button></p>
-          <ol class="tva-steps"><li>In TradingView: create an alert → Notifications → tick <b>Webhook URL</b> and paste the URL.</li><li>Paste the message above into the alert's Message box (plain text works too).</li><li>Keep the URL private: it is the key.</li></ol>
-          <label class="tva-ck tvw-ck"><input type="checkbox" id="tvw-push"> Push TradingView alerts to this device</label>
-          <p id="tvw-msg" class="pa-msg" role="status"></p><h3 class="br-h3">Recent alerts</h3><ul class="pa-list" id="tvw-list"></ul>`;
-        document.body.appendChild(dlg);
-        dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; window.__tvwPw = v; load(); };
-        const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { msCopy(t); } };
-        dlg.querySelector('#tvw-cpu').onclick = (e) => cp(dlg.querySelector('#tvw-url').textContent, e.target);
-        dlg.querySelector('#tvw-cpt').onclick = (e) => cp(TPL, e.target);
-        const ck = dlg.querySelector('#tvw-push'); try { ck.checked = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
-        ck.onchange = async () => { const m = dlg.querySelector('#tvw-msg'); m.textContent = 'Saving…'; try { await window.msTvPush(ck.checked); m.textContent = ck.checked ? 'This device will get TradingView alerts.' : 'This device will no longer get TradingView alerts.'; } catch (e) { ck.checked = !ck.checked; m.textContent = e.message || String(e); } };
-      }
-      dlg.showModal(); load();
-    };
-    window.msOpenTvAlerts = open;
-    if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
   // Broker bridge panel (7 Nov loop): what the MT5 / cTrader CouncilBridge EA sees (mt5/signals.csv), when a bridge last read it, setup + EA downloads
   { const btn = document.getElementById('ms-br-open'); let dlg;
     const URL_ = 'https://aureumdesk.co.uk/cdata/mt5/signals.csv';
@@ -5913,137 +5865,6 @@ function msNextSetup(bars, A) {
     };
     window.msOpenBridge = open;
     if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
-  // TradingView add-on (7 Nov loop): a Pine Script indicator with the council's open trades, generated by /api/pine
-  { const btn = document.getElementById('ms-tva-open'); let dlg;
-    const load = async () => { const k = dlg.querySelector('#tva-sym').value, sh = dlg.querySelector('#tva-sh').checked, ta = dlg.querySelector('#tva-src'), m = dlg.querySelector('#tva-msg');
-      ta.value = 'Loading…'; m.textContent = '';
-      try { const r = await fetch(`/api/pine?sym=${k}${sh ? '&shadow=1' : ''}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`server ${r.status}`); ta.value = await r.text(); const n = (ta.value.match(/(\d+) open\)/) || [])[1]; m.textContent = `${n || 0} open trade${n === '1' ? '' : 's'} in this snapshot.`; }
-      catch (e) { ta.value = ''; m.textContent = `Could not build the script (${e.message}). The add-on works on aureumdesk.co.uk.`; }
-      dlg.querySelector('#tva-tv').href = window.msTvUrl ? window.msTvUrl(k, '1h') : 'https://www.tradingview.com/chart/'; };
-    const open = () => {
-      if (!dlg) {
-        dlg = document.createElement('dialog'); dlg.className = 'pa-dlg tva-dlg'; dlg.setAttribute('aria-labelledby', 'tva-h');
-        const keys = Object.keys(INSTRUMENTS);
-        dlg.innerHTML = `<div class="pa-top"><h2 id="tva-h">TradingView add-on</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
-          <p class="pa-sub">A Pine Script indicator that draws the council's open trades (entry, stop, targets, labels) on your own TradingView chart.</p>
-          <div class="tva-row"><label>Market<select id="tva-sym">${keys.map((k) => `<option value="${k}"${k === instKey ? ' selected' : ''}>${INSTRUMENTS[k].label} · ${INSTRUMENTS[k].name}</option>`).join('')}</select></label>
-          <label class="tva-ck"><input type="checkbox" id="tva-sh"> Include shadow trades</label></div>
-          <textarea id="tva-src" class="tva-src" readonly spellcheck="false" aria-label="Pine Script"></textarea>
-          <div class="tva-acts"><button type="button" class="pa-go" id="tva-copy">Copy script</button><button type="button" class="pa-del" id="tva-dl">Download .pine</button><a class="pa-del" id="tva-tv" target="_blank" rel="noopener">Open TradingView</a></div>
-          <p id="tva-msg" class="pa-msg" role="status"></p>
-          <ol class="tva-steps"><li>Open the market on TradingView (button above).</li><li>Pine Editor → New → select all, paste, <b>Save</b>, then <b>Add to chart</b>.</li><li>When the council opens or closes trades, copy again and replace the code (Pine cannot load live data).</li></ol>`;
-        document.body.appendChild(dlg);
-        dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-        dlg.querySelector('#tva-sym').onchange = load; dlg.querySelector('#tva-sh').onchange = load;
-        dlg.querySelector('#tva-copy').onclick = async (e) => { const t = dlg.querySelector('#tva-src').value; if (!t) return; try { await navigator.clipboard.writeText(t); } catch (err) { const ta = dlg.querySelector('#tva-src'); ta.focus(); ta.select(); document.execCommand('copy'); } e.target.textContent = 'Copied ✓'; setTimeout(() => { e.target.textContent = 'Copy script'; }, 1600); window.msTrack && msTrack('TradingView add-on'); };
-        dlg.querySelector('#tva-dl').onclick = () => { const t = dlg.querySelector('#tva-src').value; if (!t) return; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'text/plain' })); a.download = `council-${dlg.querySelector('#tva-sym').value}.pine`; document.body.appendChild(a); a.click(); a.remove(); };
-      }
-      dlg.showModal(); load();
-    };
-    window.msOpenTvAddon = open;
-    if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
-  { const b = document.getElementById('ms-pa-open'); if (b) b.addEventListener('click', () => { const m = b.closest('details'); if (m) m.open = false; window.msOpenAlerts(); }); }
-  // ─── Price alerts (7 Nov): set a level, get a phone/desktop notification when it trades, even with the site closed.
-  // The list lives on this device (localStorage) and on Vercel (/api/push, private Blob) with its Web Push subscription;
-  // the /api/alert-cron Vercel cron checks OANDA prices every minute and sends the push. Alert levels show as dashed lines.
-  {
-    const PA = { list: [], key: null, sub: null };
-    const MDK = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
-    const can = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && !!MD.base;
-    const ios = /iP(hone|ad|od)/.test(navigator.userAgent), standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-    try { PA.list = JSON.parse(localStorage.getItem('ms-pa') || '[]'); } catch (e) {}
-    const store = () => { try { localStorage.setItem('ms-pa', JSON.stringify(PA.list)); } catch (e) {} };
-    const fx = (k, v) => { const d = (INSTRUMENTS[k] || {}).dec ?? 2; return (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); };
-    const nowPx = (k) => { if (k === instKey) { const m = panes['1m'] || panes['5m']; const r = m && m.raw; if (r && r.length) return r[r.length - 1].close; } return PA.px[k] || null; };
-    PA.px = {};
-    async function quote(k) { try { const j = await (await fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1m&n=1`, { cache: 'no-store' })).json(); const b = j.bars && j.bars[j.bars.length - 1]; if (b) PA.px[k] = b.close; } catch (e) {} return nowPx(k); }
-    function lines() {
-      Object.values(panes).forEach((P) => { (P._pal || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._pal = PA.list.filter((a) => a.sym === instKey).map((a) => P.series.createPriceLine({ price: a.price, color: '#e0a526', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: `🔔 ${a.dir === 'above' ? '↑' : '↓'}` })); });
-      const b = document.querySelectorAll('.ch-bell'); b.forEach((x) => x.classList.toggle('on', PA.list.some((a) => a.sym === instKey)));
-      // active alerts as chips under the Charts title (this market first); tap one to open the alerts dialog
-      const box = document.getElementById('ms-pa-chips');
-      if (box) { const L = PA.list.slice().sort((a, c) => (c.sym === instKey) - (a.sym === instKey)); box.hidden = !L.length;
-        box.innerHTML = L.length ? `<span class="pa-chips-k">Alerts</span>` + L.slice(0, 8).map((a) => { const n = nowPx(a.sym), d = n ? (a.price - n) / n * 100 : null;
-          return `<button type="button" class="pa-chip ${a.dir}" data-pa-sym="${a.sym}" title="${esc(a.note || '')}">${a.dir === 'above' ? '↑' : '↓'} ${(INSTRUMENTS[a.sym] || {}).label || a.sym} ${fx(a.sym, a.price)}${d != null ? ` <small>${d >= 0 ? '+' : '−'}${Math.abs(d).toFixed(2)}%</small>` : ''}</button>`; }).join('') + (L.length > 8 ? `<span class="pa-chips-k">+${L.length - 8}</span>` : '') : ''; }
-    }
-    async function subscribe() {
-      if (!PA.key) { const j = await (await fetch('/api/push?key=1')).json(); PA.key = j.key; }
-      if (!PA.key) throw new Error('Alerts are not set up on the server yet.');
-      const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
-      if (perm !== 'granted') throw new Error('Notifications are blocked for this site. Allow them in the browser settings, then try again.');
-      const reg = await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) { const raw = atob(PA.key.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - PA.key.length % 4) % 4)); sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from(raw, (c) => c.charCodeAt(0)) }); }
-      PA.sub = sub.toJSON(); return PA.sub;
-    }
-    async function sync() {
-      const sub = PA.sub || await subscribe();
-      // the reason in words (11 Nov): it showed the browser's "Failed to fetch" and "Server 500"
-      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list, tv: PA.tv === true }) }).catch(() => null);
-      if (!r) throw new Error(navigator.onLine === false ? 'You are offline. Connect and try again.' : 'The server could not be reached. Check your connection and try again.');
-      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(r.status >= 500 && !j.error ? `The server could not save it (error ${r.status}). Try again in a minute.` : j.error || `Server error ${r.status}`);
-    }
-    // on load: drop alerts the server already fired (it removes them after sending)
-    if (can() && PA.list.length && Notification.permission === 'granted') navigator.serviceWorker.getRegistration('/').then(async (reg) => {
-      const sub = reg && await reg.pushManager.getSubscription(); if (!sub) return; PA.sub = sub.toJSON();
-      const j = await (await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub: PA.sub, get: true }) })).json();
-      if (Array.isArray(j.alerts)) { const ids = new Set(j.alerts.map((a) => a.id)); PA.list = PA.list.filter((a) => ids.has(a.id)); store(); lines(); render(); }
-    }).catch(() => {});
-    let dlg;
-    function render() {
-      if (!dlg) return; const ul = dlg.querySelector('#pa-list');
-      ul.innerHTML = PA.list.length ? PA.list.map((a) => { const I = INSTRUMENTS[a.sym] || {}, n = nowPx(a.sym), dist = n ? (a.price - n) / n * 100 : null;
-        return `<li><span class="pa-arr ${a.dir}" aria-hidden="true">${a.dir === 'above' ? '↑' : '↓'}</span><span class="pa-w"><b>${I.label || a.sym} ${a.dir === 'above' ? 'rises to' : 'falls to'} ${fx(a.sym, a.price)}</b><small>${dist != null ? `${dist >= 0 ? '+' : '−'}${Math.abs(dist).toFixed(2)}% away` : ''}${a.note ? ` · ${esc(a.note)}` : ''}</small></span><button type="button" class="pa-del" data-id="${a.id}" aria-label="Delete this alert">Delete</button></li>`; }).join('')
-        : '<li class="pa-empty">No alerts yet. Set one above and you get a notification on this device when the price trades there.</li>';
-    }
-    function hint() {
-      const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k), h = dlg.querySelector('#pa-hint');
-      h.textContent = !n ? '' : !(v > 0) ? `Now ${fx(k, n)}` : `Alerts when ${INSTRUMENTS[k].label} ${v >= n ? 'rises' : 'falls'} to ${fx(k, v)} (now ${fx(k, n)}, ${((v - n) / n * 100).toFixed(2)}% away)`;
-    }
-    function build() {
-      dlg = document.createElement('dialog'); dlg.id = 'ms-pa'; dlg.className = 'pa-dlg'; dlg.setAttribute('aria-labelledby', 'pa-h');
-      dlg.innerHTML = `<div class="pa-top"><h2 id="pa-h">Price alerts</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
-        <p class="pa-sub">Get a notification on this device when a market trades at your price, even with Aureum Desk closed. Checked every minute against OANDA prices.</p>
-        <form id="pa-f" class="pa-f" novalidate><label>Market<select id="pa-sym">${MDK.map((k) => `<option value="${k}">${INSTRUMENTS[k].label} · ${INSTRUMENTS[k].name}</option>`).join('')}</select></label>
-        <label>Price<input id="pa-price" type="number" inputmode="decimal" step="any" required></label>
-        <label class="pa-wide"><span>Note <small>(optional)</small></span><input id="pa-note" maxlength="60" placeholder="e.g. H4 origin top"></label>
-        <p id="pa-hint" class="pa-hint" aria-live="polite"></p><button type="submit" class="pa-go">Create alert</button></form>
-        <p id="pa-msg" class="pa-msg" role="status"></p><ul id="pa-list" class="pa-list"></ul>`;
-      document.body.appendChild(dlg);
-      dlg.querySelector('.pa-x').onclick = () => dlg.close();
-      dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-      dlg.querySelector('#pa-sym').onchange = async (e) => { const k = e.target.value, n = await quote(k); if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec); hint(); };
-      dlg.querySelector('#pa-price').oninput = hint;
-      dlg.querySelector('#pa-list').onclick = async (e) => { const b = e.target.closest('.pa-del'); if (!b) return; const li = b.closest('li'), at = [...li.parentElement.children].indexOf(li); PA.list = PA.list.filter((a) => a.id !== b.dataset.id); store(); lines(); render();
-        { const ds = dlg.querySelectorAll('#pa-list .pa-del'), t = ds[Math.min(at, ds.length - 1)] || dlg.querySelector('#pa-price'); if (t) t.focus(); }   // focus stays in the list (it fell out of the dialog)
-        try { await sync(); dlg.querySelector('#pa-msg').textContent = 'Alert deleted.'; } catch (err) { dlg.querySelector('#pa-msg').textContent = `Deleted on this device. The server still has it until your next change here: ${err.message}`; } };
-      dlg.querySelector('#pa-f').onsubmit = async (e) => { e.preventDefault(); const msg = dlg.querySelector('#pa-msg'), btn = dlg.querySelector('.pa-go');
-        const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k) || await quote(k);
-        if (!(v > 0) || !Number.isFinite(v)) { msg.textContent = 'Type a price.'; return; }   // the server refuses a price that is not a finite number if (!n) { msg.textContent = 'No live price for this market right now; try again in a moment.'; return; }
-        if (PA.list.length >= 20) { msg.textContent = 'Up to 20 alerts per device.'; return; }
-        if (!can()) { msg.textContent = ios && !standalone ? 'On iPhone, add Aureum Desk to the Home Screen first (Share → Add to Home Screen), open it from there and set the alert again.' : 'This browser cannot receive notifications.'; return; }
-        const a = { id: Math.random().toString(36).slice(2, 10), sym: k, price: v, dir: v >= n ? 'above' : 'below', note: dlg.querySelector('#pa-note').value.trim(), label: INSTRUMENTS[k].label, at: Math.floor(Date.now() / 1000) };
-        btn.disabled = true; btn.textContent = 'Saving…'; msg.textContent = '';
-        PA.list = PA.list.concat(a);
-        try { await sync(); store(); msg.textContent = `Alert set: ${a.label} ${a.dir === 'above' ? 'rises' : 'falls'} to ${fx(k, v)}.`; dlg.querySelector('#pa-note').value = ''; window.msTrack && msTrack('Price alert'); }
-        catch (err) { PA.list = PA.list.filter((x) => x.id !== a.id); msg.textContent = err.message || String(err); }
-        finally { btn.disabled = false; btn.textContent = 'Create alert'; lines(); render(); } };
-    }
-    try { PA.tv = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
-    // TradingView alerts to this device (panel in Settings → TradingView alerts)
-    window.msTvPush = async (on) => { PA.tv = !!on; try { localStorage.setItem('ms-tv-push', on ? '1' : '0'); } catch (e) {} if (!can()) throw new Error(ios && !standalone ? 'On iPhone, add Aureum Desk to the Home Screen first and open it from there.' : 'This browser cannot receive notifications.'); await sync(); };
-    window.msOpenAlerts = async (sym, atPrice) => {
-      if (!dlg) build();
-      const k = sym && INSTRUMENTS[sym] && INSTRUMENTS[sym].md ? sym : INSTRUMENTS[instKey].md ? instKey : 'xau';
-      dlg.querySelector('#pa-sym').value = k; const n = nowPx(k) || await quote(k);
-      if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec);
-      if (atPrice > 0) dlg.querySelector('#pa-price').value = (+atPrice).toFixed(INSTRUMENTS[k].dec);
-      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Aureum Desk from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on aureumdesk.co.uk.';
-      hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
-    };
-    setTimeout(lines, 1500); setInterval(lines, 30e3);
-    document.addEventListener('click', (ev) => { const c = ev.target.closest && ev.target.closest('[data-pa-sym]'); if (c) window.msOpenAlerts(c.dataset.paSym); });
-  }
   const ACTIVE = TFS.filter((tf) => panes[tf.id]);
   // Crosshair sync: hovering a moment on one timeframe marks the same moment on the others (bar containing that time)
   (() => { const list = Object.values(panes); if (list.length < 2 || typeof list[0].chart.setCrosshairPosition !== 'function') return; let busy = false;
@@ -7400,7 +7221,7 @@ function msNextSetup(bars, A) {
     else if ((ev.key === 'f' || ev.key === 'F') && !ev.shiftKey && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
     else if (location.hash === '#charts' && !ev.shiftKey && !document.querySelector('dialog[open]')) {
       // drawing-tool keys (7 Nov loop): act on the chart under the mouse, or the only chart on screen
-      const TOOL = { h: '.ch-hl', t: '.ch-tl', b: '.ch-fib', p: '.ch-pos', m: '.ch-ruler', r: '.ch-rp', a: '.ch-bell' }[ev.key.toLowerCase()]; if (!TOOL) return;
+      const TOOL = { h: '.ch-hl', t: '.ch-tl', b: '.ch-fib', p: '.ch-pos', m: '.ch-ruler', r: '.ch-rp' }[ev.key.toLowerCase()]; if (!TOOL) return;
       const vis = [...document.querySelectorAll('.ms-pane')].filter((x) => x.offsetParent && x.getBoundingClientRect().bottom > 0 && x.getBoundingClientRect().top < innerHeight);
       const pane = (KB_PANE && vis.includes(KB_PANE)) ? KB_PANE : vis.length === 1 ? vis[0] : null; const b = pane && pane.querySelector(TOOL);
       if (b) { ev.preventDefault(); b.click(); }
@@ -9961,7 +9782,7 @@ function msNextSetup(bars, A) {
     if (sel && document.getElementById('ms-mk-btn') && shown(document.getElementById('ms-mk-btn'))) [...sel.options].forEach((o) => out.push({ g: 'Markets', t: o.textContent.trim(), d: o.selected ? 'current' : (o.parentElement.label || ''), run: () => { if (!o.selected) location.href = '?s=' + o.value + location.hash; } }));
     const tb = document.getElementById('ms-theme');
     if (tb) [['dark', 'Dark'], ['light', 'Light'], ['midnight', 'Midnight'], ['pro', 'Pro']].forEach(([k, t]) => out.push({ g: 'Theme', t: t + ' theme', d: document.documentElement.dataset.theme === k ? 'current' : '', run: () => { for (let i = 0; i < 5 && document.documentElement.dataset.theme !== k; i++) tb.click(); } }));
-    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-tvw-open', 'TradingView alerts: webhook into Aureum Desk'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
+    [['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
     return out;
   };
   let all = [], cur = [], sel = 0;
@@ -9976,7 +9797,7 @@ function msNextSetup(bars, A) {
     q.setAttribute('aria-activedescendant', cur.length ? 'cmdk-o' + sel : '');
     const el = document.getElementById('cmdk-o' + sel); if (el) el.scrollIntoView({ block: 'nearest' });
   };
-  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>F</kbd></span><span>Focus mode: open trades full screen (<kbd>Shift</kbd> <kbd>F</kbd> on Charts, where F fits the charts)</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><span><kbd>Alt</kbd> <kbd>1</kbd> – <kbd>8</kbd></span><span>Go to a page (Home, Setup, Charts… in menu order)</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span><h3>On a chart</h3><span><kbd>Shift</kbd> + drag</span><span>Measure price, % and time between two points (or the ruler button)</span><span>Right-click · <kbd>Alt</kbd> + click</span><span>Price alert at that price</span><span>Line button, then click</span><span>Draw a horizontal line (click it again to remove)</span><span><kbd>H</kbd> <kbd>T</kbd> <kbd>B</kbd> <kbd>P</kbd></span><span>Horizontal line · trend line · Fibonacci · position plan, on the chart under the mouse</span><span><kbd>M</kbd> <kbd>R</kbd> <kbd>A</kbd></span><span>Measure · bar replay · price alert</span><span><kbd>Esc</kbd></span><span>Cancel a drawing in progress</span><span>Double-click</span><span>Fit the chart</span><span>Camera button</span><span>Save the chart as an image</span><span>Hover</span><span>OHLC plus the cursor price and its distance from the last price</span>'; };
+  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>F</kbd></span><span>Focus mode: open trades full screen (<kbd>Shift</kbd> <kbd>F</kbd> on Charts, where F fits the charts)</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><span><kbd>Alt</kbd> <kbd>1</kbd> – <kbd>8</kbd></span><span>Go to a page (Home, Setup, Charts… in menu order)</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span><h3>On a chart</h3><span><kbd>Shift</kbd> + drag</span><span>Measure price, % and time between two points (or the ruler button)</span><span>Line button, then click</span><span>Draw a horizontal line (click it again to remove)</span><span><kbd>H</kbd> <kbd>T</kbd> <kbd>B</kbd> <kbd>P</kbd></span><span>Horizontal line · trend line · Fibonacci · position plan, on the chart under the mouse</span><span><kbd>M</kbd> <kbd>R</kbd></span><span>Measure · bar replay</span><span><kbd>Esc</kbd></span><span>Cancel a drawing in progress</span><span>Double-click</span><span>Fit the chart</span><span>Camera button</span><span>Save the chart as an image</span><span>Hover</span><span>OHLC plus the cursor price and its distance from the last price</span>'; };
   const open = (helpMode) => { if (document.documentElement.dataset.gate || document.documentElement.dataset.guest) return; all = items(); q.value = ''; sel = 0; showHelp(!!helpMode); render(); if (!dlg.open) dlg.showModal(); q.focus(); };
   const go = (i) => { const it = cur[i]; if (!it) return; dlg.close(); setTimeout(() => it.run(), 0); };
   q.addEventListener('input', () => { sel = 0; showHelp(false); render(); });
@@ -10930,8 +10751,6 @@ function gpStats(T) {
 </style>
 <style>
 /* price alerts (7 Nov) */
-.ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
-.ch-bell.on { color: #e0a526; }
 .ch-rp { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 3-6.7L3 8'/%3E%3Cpath d='M3 3v5h5M10 9l5 3-5 3z'/%3E%3C/svg%3E"); }
 .rp-bar { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 10px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
 .rp-bar[hidden] { display: none; }
@@ -10951,8 +10770,8 @@ function gpStats(T) {
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
 /* keyboard focus on the new tools and dialogs (7 Nov loop, accessibility) */
-.ch-b:focus-visible, .pa-x:focus-visible, .pa-del:focus-visible, .pa-go:focus-visible, .mtf-c:focus-visible, .menu-pa:focus-visible, .tv-tk .tk-b button:focus-visible, .tv-tk .tk-b a:focus-visible, .own-acts button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.pa-dlg select:focus-visible, .tva-row select:focus-visible, .cmp-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ch-b:focus-visible, .pa-x:focus-visible, .pa-del:focus-visible, .mtf-c:focus-visible, .menu-pa:focus-visible, .tv-tk .tk-b button:focus-visible, .tv-tk .tk-b a:focus-visible, .own-acts button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pa-dlg select:focus-visible, .cmp-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .ch-ms, .adr-bar i, .mtf-c { transition: none !important; } }
 .adr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 12px; font-size: 12.5px; color: var(--ink-dim); }
 .adr[hidden] { display: none; }
@@ -11023,12 +10842,6 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .wl-i b { font-weight: 700; } .wl-i span { color: var(--ink-dim); } .wl-i em { font-style: normal; font-weight: 600; } .wl-i em.up { color: var(--buy); } .wl-i em.dn { color: var(--sell); }
 .wl-i:hover { border-color: var(--accent); } .wl-i.cur { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
 .wl-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.pa-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 12px; }
-.pa-chips[hidden] { display: none; }
-.pa-chips-k { font-size: 12px; color: var(--ink-faint); margin-right: 2px; }
-.pa-chip { height: 28px; padding: 0 10px; border-radius: 99px; border: 1px solid color-mix(in srgb, #e0a526 40%, var(--line)); background: color-mix(in srgb, #e0a526 8%, var(--panel)); color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
-.pa-chip small { font-weight: 500; color: var(--ink-faint); margin-left: 2px; }
-.pa-chip:hover { border-color: #e0a526; } .pa-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .mtf-c { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-faint); font: inherit; font-size: 12px; cursor: pointer; }
 .mtf-c b { color: var(--ink); font-weight: 600; }
 .mtf-c.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); background: color-mix(in srgb, var(--buy) 8%, var(--panel)); }
@@ -11086,21 +10899,10 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .br-c b { font-size: 14px; } .br-c small { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
 .br-c.ok b { color: var(--buy); } .br-c.warn b { color: #e0a526; }
 .br-h3 { margin: 16px 0 4px; font-size: 14px; }
-.tvw-row { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
-.tvw-url { flex: 1; min-width: 0; font: 12px var(--mono, ui-monospace, monospace); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
-.tvw-row .pa-del { flex: none; }
-.tvw-ck { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13.5px; font-weight: 600; }
 .tva-steps code { font: 12px var(--mono, ui-monospace, monospace); background: var(--bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
 .tva-steps .pa-del { height: 28px; margin: 2px 0; }
-.menu-tv { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .tva-dlg { width: min(640px, calc(100vw - 24px)); }
-.tva-row { display: flex; gap: 14px; align-items: end; flex-wrap: wrap; margin-bottom: 12px; }
-.tva-row label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-dim); }
-.tva-row select { height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
-.tva-row .tva-ck { flex-direction: row; align-items: center; gap: 8px; height: 40px; font-weight: 500; }
-.tva-src { width: 100%; box-sizing: border-box; height: 210px; resize: vertical; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-dim); font: 11.5px/1.5 var(--mono, ui-monospace, monospace); white-space: pre; }
 .tva-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.tva-acts .pa-go { padding: 0 18px; }
 .tva-acts .pa-del { height: 44px; display: inline-flex; align-items: center; text-decoration: none; }
 .tva-steps { margin: 6px 0 0; padding-left: 20px; color: var(--ink-dim); font-size: 13px; line-height: 1.6; }
 .menu-pa small { font-weight: 400; color: var(--ink-faint); font-size: 12px; }
@@ -11113,15 +10915,6 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .pa-x { width: 36px; height: 36px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-dim); font-size: 22px; cursor: pointer; }
 .pa-x:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
 .pa-sub { margin: 6px 0 16px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; text-wrap: pretty; }
-.pa-f { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; align-items: end; }
-.pa-f label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-dim); }
-.pa-f label small { font-weight: 400; color: var(--ink-faint); }
-.pa-f .pa-wide, .pa-f .pa-hint, .pa-f .pa-go { grid-column: 1 / -1; }
-.pa-f select, .pa-f input { height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; min-width: 0; }
-.pa-f select:focus, .pa-f input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-.pa-hint { margin: -2px 0 0; min-height: 1.3em; font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.pa-go { height: 44px; border: 0; border-radius: 10px; background: #e0a526; color: #1a1300; font: inherit; font-weight: 700; cursor: pointer; }
-.pa-go:hover { filter: brightness(1.06); } .pa-go:disabled { opacity: .6; cursor: progress; }
 .pa-msg { margin: 10px 0 0; min-height: 1.2em; font-size: 13px; color: var(--ink-dim); }
 .pa-list { list-style: none; margin: 10px 0 0; padding: 0; border-top: 1px solid var(--line-soft, var(--line)); max-height: 260px; overflow-y: auto; }
 .pa-list li { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--line-soft, var(--line)); }
@@ -11134,7 +10927,6 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .pa-w small { font-size: 12px; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pa-del { height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12.5px; cursor: pointer; }
 .pa-del:hover { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, var(--line)); }
-@media (max-width: 480px) { .pa-f { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pa-dlg[open] { animation: none; } }
 .ch-cd { position: absolute; top: 0; right: 0; z-index: 4; pointer-events: none; height: 16px; display: flex; align-items: center; justify-content: center; font: 600 10.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--on-sell); background: var(--sell); border-radius: 0 0 3px 3px; opacity: .92; }
 .ch-cd.up { background: var(--buy); color: #04140f; } :root[data-theme="light"] .ch-cd.up { color: #fff; }   /* the light theme's green is dark enough for white (11 Nov) */
@@ -11143,7 +10935,7 @@ html[data-mk="clean"] .ict-strip { display: none; }
 html, body, button, input, select, textarea { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); }
 html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .h-head { letter-spacing: -0.02em; }
-code, pre, kbd, .tva-src, .tvw-url, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
+code, pre, kbd, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
 /* ═══ Charts chrome polish (7 Nov): one calm toolbar language for the Charts view. Same height, radius and type for the
    Indicators button, the Meridian / ICT switch and the view segment; grouped chart tools with dividers; clear active
    states; inset focus rings that the scrolling toolbars cannot clip; 44px touch targets on phones; a tidier indicator
@@ -12188,7 +11980,7 @@ html[data-role="public"] .mk-mode button[data-mk="meridian"]::after, html[data-r
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='10' width='16' height='11' rx='2'/%3E%3Cpath d='M8 10V7a4 4 0 018 0v3'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='10' width='16' height='11' rx='2'/%3E%3Cpath d='M8 10V7a4 4 0 018 0v3'/%3E%3C/svg%3E") center / contain no-repeat; }
 html[data-role="public"] .mk-mode button[data-mk="meridian"]:hover, html[data-role="public"] .mk-mode button[data-mk="ict"]:hover { color: var(--ink); border-color: #e0a526; }
 html[data-role="public"] #v-charts .sec-h { position: relative; }
-html[data-role="public"] #ms-mtf, html[data-role="public"] #ms-adr, html[data-role="public"] #ms-pa-chips, html[data-role="public"] #v-charts [id^="ms-r-"], html[data-role="public"] #v-charts .ms-chip[id^="ms-t-"], html[data-role="public"] #v-charts .ms-role { display: none !important; }
+html[data-role="public"] #ms-mtf, html[data-role="public"] #ms-adr, html[data-role="public"] #v-charts [id^="ms-r-"], html[data-role="public"] #v-charts .ms-chip[id^="ms-t-"], html[data-role="public"] #v-charts .ms-role { display: none !important; }
 .g-back { display: none; } html[data-role="public"] .g-back { display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); text-decoration: none; font: 600 12.5px var(--sans); white-space: nowrap; }
 html[data-role="public"] .g-back:hover { color: var(--ink); border-color: var(--line-strong); }
 html[data-role="public"] #v-charts::before { content: "Guest view: candles, your indicators and drawings on any market. Meridian and ICT markups, the council's trades and the setups are for members · sign in or ask for a seat."; display: block; margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; font-size: 13px; color: var(--ink-dim);
@@ -15085,7 +14877,6 @@ html[data-motion="off"] .ms-live-dot::after, html[data-motion="off"] .g-live i::
 #v-charts .sec-h::after { content: ""; order: 7; flex: 1 0 100%; height: 0; }
 #v-charts .sec-h > .adr { order: 8; margin: 0; }
 #v-charts .sec-h > .mtf { order: 9; margin: 0; }
-#v-charts .sec-h > .pa-chips { order: 10; }
 #v-charts .sec-h > .mk-mode, #v-charts .sec-h > .ind-open { position: relative; }
 @media (min-width: 701px) {
   #v-charts .sec-h > .mk-mode::before { content: ""; position: absolute; left: -6px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
@@ -15104,7 +14895,7 @@ html[data-motion="off"] .ms-live-dot::after, html[data-motion="off"] .g-live i::
   .cx-tog[aria-expanded="true"] { color: var(--ink); border-color: var(--line-strong); }
   .cx-tog[aria-expanded="true"]::after { transform: translateY(2px) rotate(-135deg); }
   .cx-tog:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  #v-charts:not(.cx-open) .sec-h > :is(.adr, .mtf, .pa-chips) { display: none !important; }
+  #v-charts:not(.cx-open) .sec-h > :is(.adr, .mtf) { display: none !important; }
   /* the chart's own header tools scroll sideways inside it; the pane itself never widens the page */
   #v-charts .ms-pane, #v-charts .ms-ph { min-width: 0; max-width: 100%; }
 }
@@ -15468,7 +15259,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .pa-chips, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
@@ -15546,8 +15337,8 @@ html.is-scrolled .top { box-shadow: 0 1px 0 var(--au-line), 0 8px 20px -14px rgb
 .me-pop .me-out { border-top-color: var(--au-line); }
 html[data-role="public"] .me .me-out { color: var(--au-accent); font-weight: 600; }
 /* Settings: the four tools are neutral rows (they were gold, green and two blue boxes) */
-.menu-pa, .menu-pa.menu-br, .menu-pa.menu-tv { background: var(--au-surface) !important; border: 1px solid var(--au-line) !important; color: var(--au-ink) !important; border-radius: var(--au-r-sm) !important; }
-.menu-pa:hover, .menu-pa.menu-br:hover, .menu-pa.menu-tv:hover { background: var(--au-surface-2) !important; border-color: var(--au-line-strong) !important; }
+.menu-pa, .menu-pa.menu-br { background: var(--au-surface) !important; border: 1px solid var(--au-line) !important; color: var(--au-ink) !important; border-radius: var(--au-r-sm) !important; }
+.menu-pa:hover, .menu-pa.menu-br:hover { background: var(--au-surface-2) !important; border-color: var(--au-line-strong) !important; }
 .menu-pa small { color: var(--au-ink-3) !important; }
 .menu-h { color: var(--au-ink-2); }
 
