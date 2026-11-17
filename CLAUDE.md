@@ -3409,6 +3409,15 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   chip sat over the entry time). Tests in `tests/mosha-record.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
+- **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
+  only, in `<style id="ms-mosha-css">`. `html` defines `--mo-*` aliases (each reads an `--au-*` token, falling back to the
+  page's older variable), and `#v-mosha, .mo-tut, .mo-lv-dlg, .mo-l-dlg` point the older names the rules use (`--panel`,
+  `--ink*`, `--line*`, `--accent`, `--gold*`, `--buy` / `--sell`, `--sans`) at them, so the desk and its three dialogs follow the
+  tokens with no rule rewritten; the desk's old gold marks (`--mo-gold`) are the steel-blue accent. Generic card, title and
+  button rules sit EARLY in the block (later, more specific rules such as the green "That is right" must still win); the
+  "last word" rules sit just before the light-theme `--buy` / `--sell` line (kept: it is AA and pinned). One primary button a
+  view ("Send to the desk"; the guide's tutorial button is secondary). Markup, ids, gates (`#mo-rules`, `#mo-cycle`, `#mo-lux`
+  hidden for the teacher) and the French dictionary unchanged.
 
 ## Desk load: one request per file, late loading (11 Nov 2026)
 Owner request: the Desk (`market-structure.html`) should load faster and steadier. Measured with Playwright on a phone profile
