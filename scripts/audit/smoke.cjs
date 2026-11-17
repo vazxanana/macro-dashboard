@@ -16,7 +16,7 @@
 // Desk load (11 Nov): while the Desk loads, no /cdata file may be requested twice (every reader shares window.msData), and a
 // visitor who is not signed in may only ask for the guest allowlist (GUEST_OK in api/data.js). A fourth run opens the Desk as a
 // guest who chose "Continue as guest": under the first-load sign-in card the app sleeps, so that card alone no longer runs it.
-const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';
+const MD_ORIGIN = process.env.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev';
 const { chromium } = require('playwright');
 const { fetchRetry, fetched } = require('./shared.cjs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;

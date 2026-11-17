@@ -2278,6 +2278,47 @@ line, magnet, resize box and lines"). Display only: a drawing never places, chan
   38 (strip, Alt+M, a box drawn with the magnet strong has both corners on candle O / H / L / C, corner resize, trend-line move,
   colour and width, Delete, Alt+V / Alt+J, the account untouched, a reload keeps them and loads an old-format drawing;
   screenshots `draw-strip.png`, `draw-selected.png`, `draw-magnet.png`).
+Split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time and when I
+draw in one should show on the others"). Display only: nothing here places, changes or refuses an order or moves a stop (a test
+reads the block `// ---- split charts move together and share drawings` for order calls, `.stop =` and `S.acct`).
+- **Time sync** (Layout menu `#splitdd` → "Sync charts" `[data-xsync]`, on by default, localStorage `btLab:splitSync` = '0' when
+  off, a display preference). Panning or zooming ANY chart (main or pane) sets every other chart's visible LOGICAL range to the
+  same TIME window: `BT.syncRange` maps a range through each chart's own shown candles (`BT.tfLogical` / `BT.tfTimeAt`: a
+  candle's start at its index, inside a candle in proportion, a weekend at the next candle, before the first / past the last one
+  index a timeframe step, so the right margin stays a margin). No echo loop: only the LEADER's range changes move the others
+  (`xsLead`: the chart a person presses, touches or wheels, while the press lasts and 1.5 s after for the chart's own glide
+  (0.6 s after a wheel), else the first chart); a range just set (`BT.syncEcho`, 400 ms, 0.02 bar) or within 60 ms (`lock`) is
+  not a change either; `XSING` guards re-entry. (A guard on the echo alone let the 5m pane lag the first chart by up to a
+  candle in the browser: the leader rule fixed it.) The replay's own scroll of the first chart carries the panes; a pane's
+  redraw (`xpDraw`) locks itself out for 80 ms and then takes the first chart's window again (`xsFrom(MCX, P.dc)`), so its
+  auto-scroll never drags the others. While the replay plays, a pane follows the first chart (panning a pane then is undone
+  by the next candle). A pane still
+  shows no candle past the moment (sync only moves the view). Lower-timeframe panes now hold 6,000 shown candles (`XSHOW * 12`,
+  was 1,000) and panes allow `minBarSpacing: 0.05`, so a 1m pane can show a 15m chart's whole window. The crosshair sync stays.
+- **Drawings on every pane**: each pane has its own overlay canvas (`.xpov` inside `.xp`) drawn by `xpOvAll()` at the end of
+  `drawOverlay` through the SAME `drawShapes(x, c, W, PH, main)` as the first chart (the old loop moved into it), with that
+  pane's mapping; on a pane a horizontal line is drawn on the canvas with its price pill. `scaleWatch` also keys on each pane's
+  price scale and range (`xpScaleKey`), so a pane's axis drag, zoom or auto-fit redraws it; a pane resize too.
+- **Draw on any pane**: one drawing context per chart (`MCX` for the first chart, `P.dc = xpCx(P)` per pane: `chart`, `series`,
+  `host`, `tX` / `xT` through the pane's candles, `bar` = the magnet candle `BT.closedBarAt`, closed by the moment on that
+  pane's own timeframe, `view`). `DCX` = the chart a gesture is on (`useCx` on a press, `onCx` on a move; a two-click tool
+  started on another chart starts again; nothing switches mid-drag); `paneH`, `Ypx`, `snapP`, `ptAt`, `geo`, `pickDraw`,
+  `locOf`, `hitShape`, `dStart` / `dMove` / `dEnd` take the context. Every tool, Alt+T / H / J / V / R, the magnet, select, move,
+  resize (a pane's horizontal line drags as a shape), Delete, the `#dsel` bar (placed over the chart where the selection was
+  made: `SELC`) and the right-click menu (`CMC`: Reset also fits that pane's price) work on a pane; the result goes into the one
+  `S.draw` (with `at` = the moment), so it shows on every chart at once. Selection and hover are shared across charts; the
+  preview and the magnet ring show on the chart the gesture is on. Orders, drafts, order lines and the edge lens stay on the
+  first chart; `ctDraw().geo` is still the first chart's geometry. Closing a pane ends a gesture or selection made on it (`xpGone`).
+- Pure helpers on `BT`: `tfLogical`, `tfTimeAt`, `syncRange`, `syncEcho`, `closedBarAt`. `ctSplit()` adds `sync`, `range` (the
+  first chart's window in times) and per pane `range`, `draw` (the geometry drawn there) and `host`; `window.ctPaneXY(i, t, p)` =
+  where the chart library puts a time and price on chart i (-1 = the first). Tests: `tests/backtest-split-sync.test.mjs`; audit
+  section 40 (15m + 5m + 1m: windows match, pan main and a pane, wheel zoom, a box and a trend line drawn on the main chart sit on
+  both panes within 1 px of `timeToCoordinate` / `priceToCoordinate`, a pane's price-axis drag, a box drawn on a pane lands in
+  `S.draw` and on the first chart, moved and deleted there, the account untouched, the replay steps on, Sync off and on;
+  screenshots `split-sync-drawings.png`, `split-three-charts.png`). The audit's session is 8 days (a 1m pane refuses over 40,000
+  candles; the 30-day quick start is too long for it). Its Layout note is hidden on a phone's More sheet (`@container cc (max-width:
+  640px)`), so the menu with Sync still opens on the screen at 360-430 px. Run with `MD_ORIGIN=https://aureumdesk.co.uk` while the
+  workers.dev origin answers "OANDA_TOKEN not set" (17 Nov 2026).
 
 ## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
 Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =

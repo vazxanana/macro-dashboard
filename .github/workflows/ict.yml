@@ -35,7 +35,7 @@ jobs:
           node-version: 22
       - name: Track the ICT signals
         env:
-          ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
+          ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
         run: node ict/tracker.mjs data/ict
       - name: Save to council-data
         run: |

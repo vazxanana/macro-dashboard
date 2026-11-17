@@ -14,7 +14,7 @@ const CONTRAST_ONB = String.raw`(() => { const lum = (c) => { const m = c.match(
 const aaBoth = async (pg) => { const out = []; for (const cs of ['dark', 'light']) { await pg.emulateMedia({ colorScheme: cs }); out.push(...(await measured(pg, CONTRAST_ONB, 'first-run or empty-state text')).map((x) => cs + ': ' + x)); } await pg.emulateMedia({ colorScheme: null }); return out; };
 const aaStats = (pg) => measured(pg, CONTRAST, 'analytics or journal text');
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
-const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';   // where live candles come from (aureumdesk.co.uk answered 402 after the Vercel project went away)
+const MD_ORIGIN = process.env.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev';   // where live candles come from (aureumdesk.co.uk answered 402 after the Vercel project went away)
 const route = async (p) => (await p.route(/\/api\/chronos-coach/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":false,"reason":"no language-model key configured"}' })), await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), await p.route(/\/api\/mosha-lessons/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"lessons":[],"book":[],"canTeach":true,"who":"owner"}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const x = await fetchRetry(r.request().url().replace(H, MD_ORIGIN)); if (x.status !== 200) NET.push(x.status + (x.error ? ' ' + x.error : '')); r.fulfill({ status: x.status === 503 && x.error ? 502 : x.status, contentType: 'application/json', body: x.body }); }));
 const NET = [];   // candle requests that failed after three tries: named at the end, so a network failure is not read as a page fault
 // sign-in (9 Nov): the page asks /api/me (the session cookie lives on the server); the audit stubs the answer
@@ -1007,6 +1007,79 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const nm = await u.evaluate(() => ({ st: document.getElementById('ln-st').textContent, h: document.getElementById('ln-edge').getBoundingClientRect().height }));
     check('lens: a market the edge does not read says so in words; the picker is 44 px on touch', (!other || /reads XAU only/.test(nm.st)) && nm.h >= 44, JSON.stringify({ other, ...nm }));
     await cx2.close(); }
+  // 40. split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time and when
+  // I draw in one should show on the others"): 15m + 5m + 1m; panning the first chart moves both panes to the same time window and
+  // panning a pane moves the first chart; a box and a trend line drawn on the first chart are drawn on each pane at the pixels the
+  // chart library gives for their times and prices; a box drawn on a pane lands in the one list and on the first chart; dragging a
+  // pane's price axis keeps the box on its prices; Sync off lets the charts move apart. Screenshots for the owner.
+  { const SPL = process.env.SPLIT_SHOTS || OUT; try { fs.mkdirSync(SPL, { recursive: true }); } catch (e) { /* exists */ }
+    const cx = await b.newContext({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 2 }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('split sync: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { if (!sessionStorage.getItem('d40')) { localStorage.clear(); sessionStorage.setItem('d40', '1'); } localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:split', JSON.stringify({ n: 3, tfs: ['5m', '1m', '1d'] })); } catch (e) {} });
+    await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.evaluate(() => { const d = new Date(Date.now() - 12 * 86400e3); d.setUTCHours(7, 0, 0, 0); document.getElementById('sym').value = 'xau'; document.getElementById('tf').value = '15m'; document.getElementById('start').value = d.toISOString().slice(0, 16); document.getElementById('days').value = '8'; document.getElementById('sname').value = ''; document.getElementById('load').click(); });   // 8 days: the 1m pane stays under its 40,000-candle limit await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    for (let i = 0; i < 60; i++) await t.keyboard.press('ArrowRight');
+    await t.waitForFunction(() => ctSplit().panes.length === 2 && ctSplit().panes.every((P) => P.n > 20 && !/Loading/.test(P.title)), null, { timeout: 90000 }).catch(() => {}); await settle(t); await t.waitForTimeout(300);
+    const acct0 = await t.evaluate(() => JSON.stringify(window.ctAcct().acct));
+    const s0 = await t.evaluate(() => ctSplit());
+    // windows match: each pane's visible time range equals the first chart's within one candle of the coarser chart (15 minutes)
+    const near = (a, b2, tol) => a && b2 && Math.abs(a.from - b2.from) <= tol && Math.abs(a.to - b2.to) <= tol;
+    const same = (s) => s.panes.every((P) => near(P.range, s.range, 900));
+    check('three charts (15m + 5m + 1m), Sync charts on by default, the panes show the first chart\'s time window', s0.n === 3 && s0.sync === true && s0.panes.map((P) => P.tf).join() === '5m,1m' && same(s0), JSON.stringify({ r: s0.range, p: s0.panes.map((P) => [P.tf, P.n, P.range]) }));
+    const ch = await t.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    // pan the first chart by dragging it to the right (earlier candles): both panes follow
+    await t.mouse.move(ch.x + ch.w * 0.5, ch.y + ch.h * 0.5); await t.mouse.down(); await t.mouse.move(ch.x + ch.w * 0.75, ch.y + ch.h * 0.5, { steps: 10 }); await t.mouse.up(); await t.waitForTimeout(400);
+    const s1 = await t.evaluate(() => ctSplit());
+    check('panning the first chart moves both panes to the same time window', s1.range.to < s0.range.to - 900 && same(s1), JSON.stringify({ before: s0.range, after: s1.range, p: s1.panes.map((P) => P.range) }));
+    // pan a pane (the 5m one) back: the first chart and the other pane follow
+    const p0 = s1.panes[0].host; await t.mouse.move(p0.x + p0.w * 0.4, p0.y + p0.h * 0.5); await t.mouse.down(); await t.mouse.move(p0.x + p0.w * 0.15, p0.y + p0.h * 0.5, { steps: 10 }); await t.mouse.up(); await t.waitForTimeout(400);
+    const s2 = await t.evaluate(() => ctSplit());
+    check('panning a pane moves the first chart and the other pane with it', s2.range.to > s1.range.to + 900 && same(s2), JSON.stringify({ before: s1.range, after: s2.range, p: s2.panes.map((P) => P.range) }));
+    // zoom the first chart (wheel): the panes keep the same time window
+    await t.mouse.move(ch.x + ch.w * 0.6, ch.y + ch.h * 0.5); await t.mouse.wheel(0, -300); await t.waitForTimeout(400);
+    const s3 = await t.evaluate(() => ctSplit());
+    check('zooming the first chart zooms the panes to the same time window', (s3.range.to - s3.range.from) < (s2.range.to - s2.range.from) && same(s3), JSON.stringify({ before: s2.range, after: s3.range, p: s3.panes.map((P) => P.range) }));
+    // a box and a trend line drawn on the first chart: drawn on each pane where the chart library puts their times and prices
+    await t.click('#dstrip [data-dt="r"]'); await t.mouse.move(ch.x + ch.w * 0.35, ch.y + ch.h * 0.3); await t.mouse.down(); await t.mouse.move(ch.x + ch.w * 0.5, ch.y + ch.h * 0.6, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(300);
+    await t.keyboard.press('Alt+KeyT'); await t.mouse.click(ch.x + ch.w * 0.55, ch.y + ch.h * 0.65); await t.mouse.click(ch.x + ch.w * 0.7, ch.y + ch.h * 0.35); await t.keyboard.press('Escape'); await t.waitForTimeout(400);
+    const geoCheck = () => t.evaluate(() => { const D = ctDraw(), s = ctSplit(), out = []; s.panes.forEach((P, i) => { for (const k of [0, 1]) { const d = D.list[k], g = P.draw.find((q) => q.k === k), a = ctPaneXY(i, d.t1, d.p1), z = ctPaneXY(i, d.t2, d.p2);
+        out.push({ i, k, type: d.type, g, a, z, ok: !!g && a.x != null && z.x != null && Math.abs(g.x1 - a.x) <= 1 && Math.abs(g.y1 - a.y) <= 1 && Math.abs(g.x2 - z.x) <= 1 && Math.abs(g.y2 - z.y) <= 1 }); } }); return { n: D.list.length, types: D.list.map((d) => d.type).join(), out }; });
+    const gc = await geoCheck();
+    check('a box and a trend line drawn on the first chart are drawn on both panes at the pixels of their times and prices (within 1 px)', gc.n === 2 && gc.types === 'r,t' && gc.out.length === 4 && gc.out.every((o) => o.ok), JSON.stringify(gc.out.filter((o) => !o.ok)).slice(0, 300));
+    await t.mouse.move(5, 5); await t.waitForTimeout(200); await t.screenshot({ path: SPL + 'split-sync-drawings.png' });
+    { const cr = await t.$eval('.chartc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }); await t.screenshot({ path: SPL + 'split-three-charts.png', clip: { x: Math.max(0, cr.x), y: Math.max(0, cr.y), width: Math.min(1600, cr.w), height: Math.min(1000 - cr.y, cr.h) } }); }
+    // drag the 1m pane's price axis (zoom the price scale): the box stays on its prices
+    const s4 = await t.evaluate(() => ctSplit()), p1 = s4.panes[1].host, ax = p1.x + p1.w + 18;
+    const y0 = (await t.evaluate(() => ctSplit().panes[1].draw.find((q) => q.k === 0))).y1;
+    await t.mouse.move(ax, p1.y + p1.h * 0.3); await t.mouse.down(); await t.mouse.move(ax, p1.y + p1.h * 0.6, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(400);
+    const gc2 = await geoCheck(), y1 = (gc2.out.find((o) => o.i === 1 && o.k === 0) || {}).g;
+    check('dragging a pane\'s price axis rescales it and the drawings stay on their prices there', y1 && Math.abs(y1.y1 - y0) > 3 && gc2.out.every((o) => o.ok), JSON.stringify({ y0, y1: y1 && y1.y1, bad: gc2.out.filter((o) => !o.ok) }).slice(0, 300));
+    // draw a box on the 5m pane: it lands in the one list and shows on the first chart and on the 1m pane
+    const pz = (await t.evaluate(() => ctSplit())).panes[0].host;
+    await t.keyboard.press('Alt+KeyR'); await t.mouse.move(pz.x + pz.w * 0.3, pz.y + pz.h * 0.25); await t.mouse.down(); await t.mouse.move(pz.x + pz.w * 0.55, pz.y + pz.h * 0.5, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(400);
+    const dp = await t.evaluate(() => { const D = ctDraw(), d = D.list[D.list.length - 1], s = ctSplit(), k = D.list.length - 1, m = D.geo[k], a = ctPaneXY(-1, d.t1, d.p1), z = ctPaneXY(-1, d.t2, d.p2);
+      return { n: D.list.length, d, sel: D.sel, main: m, a, z, onPane: s.panes.map((P) => !!P.draw.find((q) => q.k === k)), bar: !document.getElementById('dsel').hidden }; });
+    check('a box drawn on a pane goes into the one list of drawings, selected, and is drawn on the first chart (at its time and price) and the other pane', dp.n === 3 && dp.d.type === 'r' && dp.d.at > 0 && dp.sel === 2 && dp.bar && dp.main && Math.abs(dp.main.y1 - dp.a.y) <= 1 && Math.abs(dp.main.y2 - dp.z.y) <= 1 && dp.onPane.every(Boolean), JSON.stringify(dp).slice(0, 300));
+    // move it by its body on the pane: one change, seen on every chart
+    { const g = (await t.evaluate(() => ctSplit().panes[0].draw.find((q) => q.k === 2))), mx = pz.x + (g.x1 + g.x2) / 2, my = pz.y + (g.y1 + g.y2) / 2; await t.mouse.move(mx, my); await t.mouse.down(); await t.mouse.move(mx - 40, my + 30, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(400);
+      const mv = await t.evaluate(() => ctDraw().list[2]); check('moving that box by its body on the pane moves both points by the same time and price, the drawing keeps its moment', mv.t1 < dp.d.t1 && mv.t1 - dp.d.t1 === mv.t2 - dp.d.t2 && mv.p1 < dp.d.p1 && Math.abs((mv.p1 - dp.d.p1) - (mv.p2 - dp.d.p2)) < 0.02 && mv.at === dp.d.at && mv.editedAt > 0, JSON.stringify([dp.d, mv])); }
+    // Delete on the pane's selection removes it from every chart
+    await t.keyboard.press('Delete'); await t.waitForTimeout(300); const dl = await t.evaluate(() => ({ n: ctDraw().list.length, p: ctSplit().panes.map((P) => P.draw.length) }));
+    check('Delete removes the drawing selected on the pane from every chart', dl.n === 2 && dl.p.every((x) => x === 2), JSON.stringify(dl));
+    check('nothing here changed the account (positions, orders, closed trades)', (await t.evaluate(() => JSON.stringify(window.ctAcct().acct))) === acct0);
+    // the replay goes on: the panes follow the first chart's scroll, and no pane shows a candle past the moment
+    await t.evaluate(() => { const b2 = document.querySelector('[data-xsync]'); return b2 && b2.getAttribute('aria-pressed'); });
+    for (let i = 0; i < 6; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(500);
+    const s5 = await t.evaluate(() => ctSplit());
+    check('after the replay steps on, the panes still show the first chart\'s window and no candle past the moment', same(s5) && s5.panes.every((P) => P.last && P.last.time + P.sec <= s5.mom), JSON.stringify({ r: s5.range, p: s5.panes.map((P) => [P.range, P.last && P.last.time + P.sec, s5.mom]) }));
+    // Sync off (Layout menu): a pan of the first chart leaves the panes where they are; remembered on the device
+    await t.click('#splitdd summary'); await t.click('#splitdd [data-xsync]'); await t.keyboard.press('Escape'); await t.evaluate(() => { const d = document.getElementById('splitdd'); if (d) d.open = false; });
+    const s6 = await t.evaluate(() => ctSplit()); const dr6 = await t.evaluate(() => JSON.stringify(ctDraw().list)); await t.mouse.move(ch.x + ch.w * 0.15, ch.y + ch.h * 0.85); await t.mouse.down(); await t.mouse.move(ch.x + ch.w * 0.45, ch.y + ch.h * 0.85, { steps: 10 }); await t.mouse.up(); await t.waitForTimeout(400);   // clear of the drawings
+    check('the pan below the drawings moved none of them', (await t.evaluate(() => JSON.stringify(ctDraw().list))) === dr6);
+    const s7 = await t.evaluate(() => ({ s: ctSplit(), ls: localStorage.getItem('btLab:splitSync') }));
+    check('Sync charts off: the first chart moves alone, the panes stay; the choice is remembered', s7.s.sync === false && s7.ls === '0' && s7.s.range.to < s6.range.to - 900 && s7.s.panes.every((P, i) => near(P.range, s6.panes[i].range, 60)), JSON.stringify({ ls: s7.ls, r6: s6.range, r7: s7.s.range }));
+    await t.click('#splitdd summary'); await t.click('#splitdd [data-xsync]'); await t.evaluate(() => { const d = document.getElementById('splitdd'); if (d) d.open = false; }); await t.waitForTimeout(400);
+    check('Sync on again: the panes come back to the first chart\'s window', same(await t.evaluate(() => ctSplit())));
+    await cx.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);
