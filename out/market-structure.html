@@ -4920,6 +4920,34 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 .pz:hover { border-color: var(--au-line-strong); }
 /* phone header: the account button was cut off by 17 px at 390 px (7 px at 360): tighter gaps, nothing hidden */
 @media (max-width: 430px) { .top { gap: 6px; } .top .inst { padding-right: 10px; } .top-actions .nt-bell { margin-right: 0; } .top-actions #ms-me { margin-left: 0; } }
+/* Phone sign-in like the owner's Figma example (17 Nov 2026, "and the login as well, only for the phone"): up to 640 px the card is
+   the screen: the mark centred, "Welcome back" and one line, the password, quiet links, and a full-width pill Sign in at the
+   bottom of the first screen; the live strip and the proof scroll under it. The form is display: contents so its button can
+   sit last (submitting is unchanged). Still dark in every theme; wider screens unchanged. */
+@media (max-width: 640px) {
+  html[data-gate] .gate { padding: 0 0 max(24px, env(safe-area-inset-bottom)) !important; place-items: start center !important; }
+  html[data-gate] .gate-bg { opacity: .25; }
+  html[data-gate] .gate-wrap { width: 100% !important; gap: 8px !important; }
+  html[data-gate] .gate-card { display: flex !important; flex-direction: column; min-height: 100vh; min-height: 100dvh; box-sizing: border-box; width: 100% !important;
+    padding: max(20px, env(safe-area-inset-top)) 24px 24px !important; background: #121315 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; text-align: center; }
+  html[data-gate] .gate-card .gate-brand { order: 0; justify-content: center !important; margin: 18px 0 30px !important; flex-direction: column; gap: 10px; position: relative; }
+  html[data-gate] .gate-card .gate-brand > .ms-coin { transform: scale(1.6); margin: 12px 0 14px; }
+  html[data-gate] .gate-card > *, html[data-gate] .gate-card form > * { flex: none; }
+  html[data-gate] .gate-card .gate-x { position: absolute; top: -10px; right: -10px; }
+  html[data-gate] .gate-card h1 { order: 1; font-size: 26px !important; margin: 0 0 6px !important; }
+  html[data-gate] .gate-sub { order: 2; margin: 0 0 26px !important; }
+  html[data-gate] .gate-card form { display: contents !important; }
+  html[data-gate] .gate-card label[for="ms-gate-p"] { order: 3; text-align: left; font-size: 13px; color: var(--g-dim); margin: 0 0 6px 2px; }
+  html[data-gate] .gate-pw { order: 4; } html[data-gate] .gate-pw > input { min-height: 54px; border-radius: 14px !important; padding-left: 16px !important; }
+  html[data-gate] .gate-msg { order: 5; text-align: left; margin-top: 6px; min-height: 22px; }
+  html[data-gate] .gate-or { display: none !important; }
+  html[data-gate] .gate-guest { order: 6; display: inline-flex !important; align-self: center; width: auto !important; min-height: 44px; padding: 0 12px !important; margin-top: 18px; border: 0 !important; background: none !important; }
+  html[data-gate] .gate-guest > span { color: #9db4d3; font-size: 14px; } html[data-gate] .gate-guest > small { display: none; }
+  html[data-gate] .gate-note { order: 7; margin: 4px 0 28px !important; font-size: 13px; }
+  html[data-gate] .gate-go { order: 8; margin-top: auto !important; min-height: 54px; border-radius: 999px !important; font-size: 16px; }
+  html[data-gate] .gate-foot { order: 9; margin: 14px 0 0 !important; padding: 0 !important; border: 0 !important; background: none !important; align-items: center !important; }
+  html[data-gate] .gate-side { padding: 0 16px; }
+}
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -4986,6 +5014,8 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 // line fill as soon as their two small requests answer, not when the whole page has arrived.
 (function () {
   var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
+  try { if (!R.hasAttribute('data-gate') && R.dataset.role && R.dataset.role !== 'public') localStorage.setItem('ms-was-in', '1');
+    else if (R.hasAttribute('data-gate') && localStorage.getItem('ms-was-in') && matchMedia('(max-width: 640px)').matches) { var gt = document.getElementById('ms-gate-t'); if (gt) gt.textContent = 'Welcome back'; var gs = document.querySelector('.gate-sub'); if (gs) gs.textContent = 'Enter your password to continue.'; } } catch (e) {}
   var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
   function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
   if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }

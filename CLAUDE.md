@@ -2250,6 +2250,13 @@ name), CSS `/* Coach for results (17 Nov 2026)` … `/* end Coach for results */
   read-only view. Audit section 40 (seeded saved sessions; screenshots `coach2-leak.png`, `coach2-pattern-draft.png`,
   `coach2-plan-banner.png`, `coach2-plan-confirm.png`, `coach2-debrief.png`, `coach2-debrief-ai.png`).
 
+## Phone sign-in like the owner's Figma example (17 Nov 2026, owner: "and the login as well, only for the phone")
+Display only, up to 640 px, one block at the end of `#ms-shell-css`: the gate card is the screen (no frame), the mark centred,
+title and one line, the password with its eye, "Continue as guest" and the invitation as quiet centred text, a full-width pill
+Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` `display: contents` so the button can sit last;
+submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
+(no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
