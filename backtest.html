@@ -298,6 +298,8 @@
   kbd { font: 500 11px var(--mono); padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; color: var(--ink-dim); }
 
   .hdr-sw a[hidden] { display: none !important; }
+  /* 17 Nov 2026: the switch carries Desk (and Academy for the owner), so under 420 px the extra "Back to the desk" link gives way */
+  @media (max-width: 420px) { .top a.back { display: none; } }
   .hdr-sw { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; isolation: isolate; background: var(--panel); }
   .hdr-sw::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -2; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
   .hdr-sw::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
