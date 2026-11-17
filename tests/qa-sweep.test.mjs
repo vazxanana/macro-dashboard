@@ -578,10 +578,11 @@ test('the palette knows the profile, its field has a name, and the demo-account 
 });
 
 
-// ---- Guest: the browser trader does not run (11 Nov 2026) ----
-test('the browser trader never runs for a guest (it saved to a journal a guest does not have and named a setup in a toast)', () => {
+// ---- The browser Trader and its journal (removed 17 Nov 2026): no guest, viewer or member gets a browser-made paper trade ----
+test('the browser Trader and the browser journal are gone (it wrote to a local journal and toasted that it had)', () => {
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.match(html, /function autoTrade\(list, price\) \{\s*if \(!JEL \|\| PUB \|\| marketClosed\(\)\) return;/);
+  assert.doesNotMatch(html, /function autoTrade\(|function jAdd\(|id="v-journal"|href="#journal"|id="ms-log"/);
+  assert.match(html, /data-ct="journal">Closed <small>/, 'the council\'s closed trades stay on Council → Trades');
 });
 
 // ── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone") ──
@@ -884,13 +885,6 @@ test('QA 12 Nov: card headings and texts say which systems are live as the Syste
 test('QA 12 Nov: the analyst card asks its API only for the roles it answers (owner, reviewers): a viewer made a refused call every 5 minutes', () => {
   const js = /<script id="ms-ea-js">([\s\S]*?)<\/script>/.exec(Q12)[1];
   assert.match(js, /dataset\.role === 'public' \|\| document\.documentElement\.dataset\.role === 'viewer'\) return;[^\n]*\n\s*load\(\);/);
-});
-
-test('QA 12 Nov: the browser Trader saves no journal entry and shows no "It\'s in your journal" toast to a member without the Journal (viewers; Luxus landed on the Mosha desk with "Trader saved Retrace buy")', () => {
-  const body = Q12.slice(Q12.indexOf('function autoTrade(list, price) {'), Q12.indexOf("jAdd(tr, 'Auto paper trade · browser Trader')"));
-  assert.match(body, /if \(\/\(\^\|\\s\)journal\(\\s\|\$\)\/\.test\(document\.documentElement\.dataset\.deny \|\| ''\)\) return;/);
-  // the gate it reads: the viewer defaults deny the journal (msPerms)
-  assert.match(Q12, /viewer: \{[^}]*journal: false/);
 });
 
 test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on the light panel was 1.8:1)', () => {
