@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#08090c">
+<meta name="theme-color" content="#121315">
 <link rel="manifest" href="/app.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,7 +36,7 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
-<script src="/assets/ms-dialog.js?v=b3db93e8b4"></script>
+<script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -44,25 +44,64 @@
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
 <script src="/assets/mosha-teach.js?v=83db733259" defer></script>
 <style>
-  /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
+  /* ── Design tokens: the graphite look (17 Nov 2026, docs/design/aureum-theme.md). THE one place the Desk's colours, type, shape
+     and depth are defined, for dark (default), light ("paper grey") and midnight; "pro" uses dark. Every older variable name
+     points at an --au-* token so rules written before keep working; never redefine a token further down the page. ── */
   :root {
-    --bg: #0b0e14; --panel: #121722; --panel-raised: #0e131c; --line: #1e2533; --line-soft: #1a2130;
-    --ink: #e8ecf2; --ink-dim: #a9b2c3; --ink-faint: #8a94a8; --accent: #3d7bff; --buy: #2bd4a4; --sell: #ff5c7a;
-    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --mono: Figtree, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --au-bg: #121315; --au-surface: #1a1c1f; --au-surface-2: #23262a; --au-well: #16181b;
+    --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16); --au-line-soft: rgba(255,255,255,.05);
+    --au-ink: #ecedef; --au-ink-2: #b4b8bf; --au-ink-3: #8e939b;
+    --au-accent: #9db4d3; --au-primary: #e4e6e9; --au-on-primary: #121315;
+    --au-gain: #4cc38a; --au-loss: #f2726a; --au-warn: #e8b04b; --au-info: #9db4d3;
+    --au-shadow: 0 1px 2px rgba(0,0,0,.25); --au-shadow-pop: 0 16px 40px -12px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.3);
+    --au-mark: linear-gradient(135deg, #f4f5f7 0%, #b9bec6 55%, #8a9099 100%);
+    --au-font: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;   /* the spec names Inter first; the Desk self-hosts Figtree only */
+    --au-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --au-fs-12: 12px; --au-fs-13: 13px; --au-fs-14: 14px; --au-fs-16: 16px; --au-fs-20: 20px; --au-fs-26: 26px; --au-fs-32: 32px;
+    --au-sp-1: 4px; --au-sp-2: 8px; --au-sp-3: 12px; --au-sp-4: 16px; --au-sp-5: 24px; --au-sp-6: 32px; --au-sp-7: 48px;
+    --au-r-sm: 8px; --au-r: 12px; --au-r-lg: 16px; --au-r-pill: 999px;
+    --au-ease: cubic-bezier(.22,1,.36,1);
+    /* the 16 Nov names, kept: the gold of the black-and-gold look is now the neutral primary and the steel-blue accent */
+    --au-gold: var(--au-primary); --au-gold-grad: var(--au-primary); --au-gold-ink: var(--au-accent); --au-on-gold: var(--au-on-primary);
+    --au-ink2: var(--au-ink-2); --au-ink3: var(--au-ink-3); --au-font-ui: var(--au-font); --au-font-display: var(--au-font); --au-focus: var(--au-accent);
+    /* older names → tokens */
+    --bg: var(--au-bg); --panel: var(--au-surface); --panel-raised: var(--au-surface-2); --panel-hover: var(--au-surface-2); --panel-2: var(--au-well); --well: var(--au-well);
+    --line: var(--au-line); --line-soft: var(--au-line-soft); --line-strong: var(--au-line-strong);
+    --ink: var(--au-ink); --ink-dim: var(--au-ink-2); --ink-faint: var(--au-ink-3);
+    --accent: var(--au-accent); --accent-soft: color-mix(in srgb, var(--au-accent) 14%, transparent);
+    --buy: var(--au-gain); --sell: var(--au-loss); --warn: var(--au-warn);
+    --buy-soft: color-mix(in srgb, var(--au-gain) 14%, transparent); --sell-soft: color-mix(in srgb, var(--au-loss) 14%, transparent);
+    --gold: var(--au-accent); --gold-soft: color-mix(in srgb, var(--au-accent) 14%, transparent); --gold-line: color-mix(in srgb, var(--au-accent) 45%, transparent);
+    --neutral-soft: color-mix(in srgb, var(--au-ink) 6%, transparent);
+    --sans: var(--au-font); --mono: var(--au-font);
+    --r: var(--au-r); --r-sm: var(--au-r-sm);
+    --sh-1: var(--au-shadow); --sh-2: 0 8px 24px -12px rgba(0,0,0,.45); --sh-3: var(--au-shadow-pop);
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
     color-scheme: dark;
   }
-  /* Light tokens, 11 Nov 2026 (QA sweep): --buy / --sell / --ink-faint / --accent were 4.46-4.50:1 as text on the white panel, under AA
-     by a hair on 270 texts across the Desk. One step darker each; measured on every view at 390 and 1440 px: nothing got worse. */
+  /* Light ("paper grey"). Measured: ink-3 on surface-2 5.13:1, gain 4.82, warn 4.87, accent 5.37; white on accent / gain / loss 5.9-6.5. */
   :root[data-theme="light"] {
-    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #c9d0db;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #666d7a; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.10); --buy: #067a64; --sell: #c8243f; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
+    --au-bg: #f2f3f5; --au-surface: #ffffff; --au-surface-2: #e7e9ec; --au-well: #f7f8f9;
+    --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20); --au-line-soft: rgba(20,24,30,.06);
+    --au-ink: #17191c; --au-ink-2: #474c54; --au-ink-3: #5b616a;
+    --au-accent: #2f5e9e; --au-primary: #25292e; --au-on-primary: #ffffff;
+    --au-gain: #0a7350; --au-loss: #b3261e; --au-warn: #8a5a00; --au-info: #2f5e9e;
+    --au-shadow: 0 1px 2px rgba(20,24,30,.06); --au-shadow-pop: 0 16px 40px -14px rgba(20,24,30,.22), 0 1px 3px rgba(20,24,30,.08);
+    --bg: var(--au-bg); --panel: var(--au-surface); --panel-raised: var(--au-surface-2); --panel-hover: var(--au-surface-2);
+    --ink-faint: var(--au-ink-3); --accent: var(--au-accent); --buy: var(--au-gain); --sell: var(--au-loss); --buy-soft: rgba(10,115,80,.10); --sell-soft: rgba(179,38,30,.10);
+    --sh-2: 0 8px 24px -14px rgba(20,24,30,.18);
+    color-scheme: light;
   }
-  /* Badge inks, 11 Nov 2026: status badges, chips and pills measured on Charts and Scanner (every role, 390 and 1440 px). Text ON a tint of
-     its own colour needs a deeper ink than text on the panel (--buy-ink / --sell-ink / --warn-ink), text on a solid fill needs its own ink
-     (--on-buy / --on-sell), and the brand gold needs a readable ink on light (--gold-ink). Dark and midnight keep their theme colours. */
-  :root { --buy-ink: var(--buy); --sell-ink: var(--sell); --warn-ink: #f0a500; --gold-ink: #e3b341; --accent-ink: var(--accent); --on-buy: #04140f; --on-sell: #1c0409; }
-  :root[data-theme="light"] { --buy-ink: #05604f; --sell-ink: #a91c33; --warn-ink: #7a4f00; --gold-ink: #7a5600; --accent-ink: #1d4fd1; --on-buy: #ffffff; --on-sell: #ffffff; }
+  /* Midnight: a deeper graphite (not navy) */
+  :root[data-theme="midnight"] {
+    --au-bg: #0b0c0e; --au-surface: #131416; --au-surface-2: #1b1d20; --au-well: #0f1012;
+    color-scheme: dark;
+  }
+  /* Badge inks, 11 Nov 2026: text ON a tint of its own colour needs a deeper ink than text on the panel (--buy-ink / --sell-ink /
+     --warn-ink / --accent-ink), text on a solid fill its own ink (--on-buy / --on-sell). Light inks re-measured 17 Nov on the graphite
+     surfaces (each 4.5:1 or more on an 18 % tint over the page, the panel and a hovered row). */
+  :root { --buy-ink: var(--buy); --sell-ink: var(--sell); --warn-ink: #e8b04b; --gold-ink: #9db4d3; --accent-ink: var(--accent); --on-buy: #04140f; --on-sell: #1c0409; }
+  :root[data-theme="light"] { --buy-ink: #075c40; --sell-ink: #951c16; --warn-ink: #714900; --gold-ink: #24497c; --accent-ink: #24497c; --on-buy: #ffffff; --on-sell: #ffffff; }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
   body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -608,16 +647,8 @@
   }
 
   /* ═══ Design pass (4 Nov): one slim top bar, deeper neutral surfaces, hairline borders, Figtree, calmer colour ═══ */
-  :root, :root[data-theme="dark"] {
-    --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
-    --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
-    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #737b8a; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
-    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
-    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --r: 12px; --r-sm: 8px;
-  }
-  html, body { background: var(--bg); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
-  body { background: radial-gradient(1200px 500px at 50% -200px, rgba(91,140,255,.06), transparent 70%), var(--bg); background-attachment: fixed; }
+  /* (4 Nov tokens moved into the first <style> block, 17 Nov 2026: the graphite look) */
+  html, body { background: var(--bg); font: 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
   .ms-live.app { max-width: 1360px; gap: 16px; padding-top: 0; }
   ::selection { background: rgba(91,140,255,.3); }
 
@@ -810,7 +841,7 @@
   @media (min-width: 1180px) {
     .btab .btab-brand { display: flex !important; flex-direction: column; align-items: center; gap: 6px; min-height: 64px !important; margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); border-radius: 0 !important; background: none !important; box-shadow: none !important; }
     .btab-brand .ms-coin { width: 28px; height: 28px; }
-    .btab-brand span { font: 700 11px var(--sans); letter-spacing: .08em; color: var(--gold-ink); }
+    .btab-brand span { font: 700 12px var(--sans); letter-spacing: .08em; color: var(--gold-ink); }
     .btab a[aria-current="page"] svg { color: #e3b341; }
     .btab a[aria-current="page"]::after { content: ""; position: absolute; right: -9px; top: 50%; width: 3px; height: 22px; margin-top: -11px; border-radius: 3px; background: #e3b341; }
     .btab a { position: relative; }
@@ -888,9 +919,7 @@
 
   /* ═══════════ Design pass 100 (6 Nov) ═══════════
      Typography 1–10 · colour & surfaces 11–20 · layout 21–35 · components 36–60 · motion 61–70 · access 71–85 · details 86–100 */
-  :root { --gold: #e3b341; --gold-soft: rgba(227,179,65,.14); --gold-line: rgba(227,179,65,.45);
-    --sh-1: 0 1px 2px rgba(0,0,0,.35); --sh-2: 0 10px 28px -10px rgba(0,0,0,.6); --sh-3: 0 24px 60px -18px rgba(0,0,0,.7);
-    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --ink-faint: #858d9c; }   /* 11, 18, 24, 75 */
+  /* 11, 18, 24, 75: --gold, shadows, spacing and --ink-faint are tokens of the first <style> block since 17 Nov 2026 */
   /* typography */
   html, body { font-size: 14.5px; line-height: 1.55; }                                                     /* 1 */
   h1, h2, h3, .h-head, .ms-k { text-wrap: balance; }                                                       /* 2 */
@@ -900,16 +929,16 @@
   .ms-k { font-size: 15px; } .ms-k .k-sub { font: 500 12.5px var(--sans); color: var(--ink-faint); margin-left: 8px; }   /* 6 */
   .c-t th, .ms-bt-t th, .ms-j th { text-transform: none; letter-spacing: 0; font: 600 12px var(--sans); }  /* 7 */
   .c-t td.n, .ms-bt-t td.n, .ms-j td:nth-child(n+5) { font-family: var(--mono); font-size: 12.5px; }     /* 8 */
-  ::selection { background: var(--gold-soft); color: #fff; }                                               /* 9 */
+  ::selection { background: var(--accent-soft); color: var(--ink); }                                               /* 9 */
   a { color: var(--accent); text-underline-offset: 3px; } a:hover { text-decoration-thickness: 1.5px; }    /* 10 */
   /* colour & surfaces */
   .card, .tile { border-radius: 14px; }                                                                    /* 14 */
   .card { transition: border-color .15s ease-out; } .card:hover { border-color: var(--line-strong); }      /* 12, 61 */
-  body { background: radial-gradient(1100px 520px at 100% -10%, rgba(227,179,65,.05), transparent 65%), radial-gradient(900px 500px at -10% 110%, rgba(91,140,255,.05), transparent 70%), var(--bg); background-attachment: fixed; }  /* 15 */
-  :root { --buy: #34c99a; --sell: #f45f77; }                                                                /* 16 */
+  /* 15: the page background is flat --bg (graphite look, 17 Nov 2026) */
+  /* 16: --buy / --sell are tokens (first <style> block) */
   .chip.buy, .ms-chip-buy, .c-act .chip.buy { box-shadow: inset 0 0 0 1px rgba(52,201,154,.35); } .chip.sell, .ms-chip-sell, .c-act .chip.sell { box-shadow: inset 0 0 0 1px rgba(244,95,119,.35); }  /* 17 */
   .c-t td, .ms-bt-t td, .ms-j td, .cal-day li, .h-act-list li { border-color: var(--line-soft) !important; }   /* 19 */
-  :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }   /* 20, 72 */
+  :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--au-accent) !important; outline-offset: 2px; }   /* 20, 72 */
   .tv { box-shadow: var(--sh-3); border-radius: 16px; } .me-pop, .menu-body, .mk-pop { box-shadow: var(--sh-3) !important; }   /* 13 */
   /* layout */
   .ms-live.app { max-width: 1440px; }                                                                       /* 21 */
@@ -963,7 +992,7 @@
   .skip { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 10px 14px; border-radius: 10px; background: var(--gold); color: #17130a; font-weight: 600; text-decoration: none; }
   .skip:focus { top: 12px; }                                                                                 /* 71 */
   @media (max-width: 700px) { .seg button, .cal-seg button, .c-nav button, .cal-nav button, .tv-tf button { min-height: 40px; } .cal-nav button { width: 40px; height: 40px; } }   /* 73 */
-  @media (prefers-contrast: more) { :root { --line: rgba(255,255,255,.22); --line-strong: rgba(255,255,255,.35); --ink-dim: #d0d5de; --ink-faint: #b4bbc8; } }   /* 76 */
+  @media (prefers-contrast: more) { :root:not([data-theme="light"]) { --au-line: rgba(255,255,255,.22); --au-line-strong: rgba(255,255,255,.35); --au-ink-2: #d0d3d8; --au-ink-3: #b4b8bf; } :root[data-theme="light"] { --au-line: rgba(20,24,30,.22); --au-line-strong: rgba(20,24,30,.35); --au-ink-2: #2f3338; --au-ink-3: #3f444b; } }   /* 76 */
   @media (forced-colors: active) { .card, .tile, .c-nav button[aria-selected="true"], .seg button.on { border: 1px solid CanvasText; } .chip, .ms-chip { forced-color-adjust: none; } }   /* 77 */
   @media (prefers-reduced-transparency: reduce) { .top, .c-nav, .gate-card, .btab { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg) !important; } }   /* 80 */
   @media print { .btab, .top, .c-nav, .to-top, .ms-toasts, .gate, .h-quick { display: none !important; } body { background: #fff !important; color: #000; padding: 0 !important; } .card, .tile { border-color: #ccc; box-shadow: none; } }   /* 81 */
@@ -1481,9 +1510,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const get = (k) => { try { return localStorage.getItem(key(k)); } catch (e) { return null; } }, put = (k, v) => { try { v == null ? localStorage.removeItem(key(k)) : localStorage.setItem(key(k), v); } catch (e) { alert('This browser could not save it (storage full or blocked).'); } };
   const defName = who === 'guest' ? 'Guest' : who === 'owner' ? 'Admin' : who;
   const role = who === 'guest' ? 'Guest · public view' : who === 'owner' ? 'Owner · full access' : document.documentElement.dataset.role === 'viewer' ? 'Viewer · setups, calendar, active trades' : 'Reviewer · read-only, loss reviews';
-  // default portrait: an abstract gold bust, unique hue per person
+  // default portrait (graphite look, 17 Nov 2026): a silver bust for named users, a steel-grey one for guests
   const hue = who === 'guest' ? 215 : 38;   // gold monogram for named users, cool silhouette for guests
-  const svg = (id) => `<svg viewBox="0 0 40 46" aria-hidden="true"><defs><linearGradient id="avb${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue} 70% 58%)"/><stop offset="1" stop-color="hsl(${(hue + 40) % 360} 65% 30%)"/></linearGradient><linearGradient id="avf${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/></linearGradient></defs><rect width="40" height="46" fill="url(#avb${id})"/>${who === 'guest' ? `<circle cx="20" cy="17.5" r="7.5" fill="url(#avf${id})"/><path d="M5 46c1.5-9 7.5-14 15-14s13.5 5 15 14z" fill="url(#avf${id})"/>` : `<ellipse cx="20" cy="23" rx="15" ry="17.5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/><text x="20" y="30.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="21" font-style="italic" fill="url(#avf${id})">${esc1((get('name') || defName).trim().charAt(0).toUpperCase())}</text>`}</svg>`;
+  const svg = (id) => `<svg viewBox="0 0 40 46" aria-hidden="true"><defs><linearGradient id="avb${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue} 10% 70%)"/><stop offset="1" stop-color="hsl(${hue} 8% 34%)"/></linearGradient><linearGradient id="avf${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/></linearGradient></defs><rect width="40" height="46" fill="url(#avb${id})"/>${who === 'guest' ? `<circle cx="20" cy="17.5" r="7.5" fill="url(#avf${id})"/><path d="M5 46c1.5-9 7.5-14 15-14s13.5 5 15 14z" fill="url(#avf${id})"/>` : `<ellipse cx="20" cy="23" rx="15" ry="17.5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/><text x="20" y="30.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="21" font-style="italic" fill="url(#avf${id})">${esc1((get('name') || defName).trim().charAt(0).toUpperCase())}</text>`}</svg>`;
   function esc1(c) { return c.replace(/[&<>"']/g, ''); }
   const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night'; };
   const $ = (id) => document.getElementById(id);
@@ -1732,7 +1761,7 @@ td.st-dim { color: var(--ink-faint); }
 .ms-j-stats > span b.pos { color: var(--buy); } .ms-j-stats > span b.neg { color: var(--sell); }
 
 /* polish 26: dark theme faint text nudged to pass WCAG AA (4.43:1 -> ~5:1 on panels) */
-:root:not([data-theme="light"]) { --ink-faint: #7f8796; }
+/* (dark --ink-faint: a token since 17 Nov 2026) */
 
 /* polish 27: comfortable tap targets on phones (ICT filters, ICT selects, market picker) */
 @media (max-width: 600px) {
@@ -1756,19 +1785,7 @@ td.st-dim { color: var(--ink-faint); }
 /* polish 32: tablet top bar pushes the actions and profile to the right edge */
 @media (min-width: 601px) and (max-width: 1100px) { .top > .top-actions { margin-left: auto; } }
 
-/* new theme: Midnight, deep navy surfaces with Aurum gold as the accent */
-:root[data-theme="midnight"] {
-  --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
-  --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
-  --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0;
-  --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
-  --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
-  color-scheme: dark;
-}
-:root[data-theme="midnight"] body { background: radial-gradient(1100px 520px at 85% -220px, rgba(227,179,65,.10), transparent 70%), radial-gradient(900px 600px at 0% 0%, rgba(70,110,255,.10), transparent 70%), var(--bg); background-attachment: fixed; }
-:root[data-theme="midnight"] .card, :root[data-theme="midnight"] .tile { box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px -18px rgba(0,0,0,.6); }
-:root[data-theme="midnight"] ::selection { background: rgba(227,179,65,.3); }
-:root[data-theme="midnight"] .top { background: color-mix(in srgb, var(--bg) 80%, transparent); }
+/* Midnight: its tokens are in the first <style> block (a deeper graphite since 17 Nov 2026; was navy with a gold accent) */
 
 /* polish 34: Midnight details, gold-tinted Next box (was muddy), selected trade card in gold instead of the hard-coded blue */
 :root[data-theme="midnight"] .ms-now { background: color-mix(in srgb, var(--accent) 12%, var(--panel)) !important; border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -1778,11 +1795,7 @@ td.st-dim { color: var(--ink-faint); }
 #ms-alerts.is-on { background: #2962ff; color: #fff; border-color: #2962ff; }
 :root[data-theme="midnight"] #ms-alerts.is-on { background: var(--accent); color: #1a1405; border-color: var(--accent); }
 
-/* polish 36: sign-in screen in Midnight uses the navy palette */
-:root[data-theme="midnight"][data-gate] .gate { background: radial-gradient(900px 600px at 85% 15%, rgba(227,179,65,.18), transparent 65%), radial-gradient(800px 600px at 10% 100%, rgba(70,110,255,.16), transparent 70%), linear-gradient(180deg, #0a1228 0%, #050a1a 100%); }
-:root[data-theme="midnight"] .gate-card { background: rgba(13,22,48,.9) !important; border-color: rgba(150,175,255,.14); }
-:root[data-theme="midnight"] .gate-card input { background: #0a1330; border-color: rgba(150,175,255,.18); }
-:root[data-theme="midnight"] .gate-guest { border-color: rgba(150,175,255,.18); }
+/* polish 36 (navy sign-in screen) removed 17 Nov 2026: the sign-in card is graphite in every theme */
 
 /* polish 37: possible-trade cards, stop note reads as text not a mono badge; cards lift on hover */
 .ms-tr-q .ms-q { font: 500 11.5px/1.45 var(--sans); letter-spacing: 0; white-space: normal; padding: 6px 9px; border-radius: 8px; color: var(--ink-dim); }
@@ -1799,17 +1812,8 @@ td.st-dim { color: var(--ink-faint); }
 /* ── Pro theme: a trading-desk workspace. Graphite surfaces tinted a hair toward the brand gold hue (85°),
    hairline structure instead of glow and shadow, tighter radii, a muted gold used only for state,
    and buy/sell separated by lightness as well as hue so they survive colour-blindness. ── */
-:root[data-theme="pro"] {
-  --bg: oklch(0.155 0.004 85); --panel: oklch(0.19 0.004 85); --panel-raised: oklch(0.215 0.005 85); --panel-hover: oklch(0.235 0.005 85);
-  --line: oklch(0.275 0.005 85); --line-soft: oklch(0.235 0.005 85); --line-strong: oklch(0.36 0.006 85);
-  --ink: oklch(0.955 0.004 85); --ink-dim: oklch(0.79 0.006 85); --ink-faint: oklch(0.665 0.008 85);
-  --accent: oklch(0.80 0.115 85); --accent-soft: oklch(0.80 0.115 85 / 0.13);
-  --gold: oklch(0.80 0.115 85); --gold-soft: oklch(0.80 0.115 85 / 0.12); --gold-line: oklch(0.80 0.115 85 / 0.42);
-  --buy: oklch(0.78 0.14 165); --sell: oklch(0.67 0.19 25); --buy-soft: oklch(0.78 0.14 165 / 0.13); --sell-soft: oklch(0.67 0.19 25 / 0.13);
-  --r: 8px; --r-sm: 6px;
-  color-scheme: dark;
-}
-:root[data-theme="pro"] body { background: var(--bg); }
+/* (17 Nov 2026: pro takes the dark graphite tokens; its denser, squarer rules below stay) */
+:root[data-theme="pro"] { --r: 8px; --r-sm: 6px; }
 :root[data-theme="pro"] .top { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-color: var(--line); }
 :root[data-theme="pro"] .card { border-radius: 8px; box-shadow: none; }
 :root[data-theme="pro"] .tile { border-radius: 8px; box-shadow: none; }
@@ -1995,9 +1999,9 @@ html[data-deny~="journal"] .j-empty-go { display: none; }
 .pw-eye svg { width: 17px; height: 17px; }
 
 /* light theme: focus ring in a deeper gold so it meets 3:1 against white (was 1.95:1) */
-:root[data-theme="light"] :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: #9a6b00 !important; }
+:root[data-theme="light"] :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: var(--au-accent) !important; }
   /* pass 73: light theme text selection was white text on a pale gold wash (unreadable) */
-  :root[data-theme="light"] ::selection { background: rgba(154,107,0,.24); color: var(--ink); }
+  :root[data-theme="light"] ::selection { background: var(--accent-soft); color: var(--ink); }
   /* pass 74: phone Trader tabs (Live / Shadow / Journal / Everything) scroll sideways: fade the edge that hides more */
   @media (max-width: 700px) {
     .c-tabs[data-more~="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); }
@@ -2371,7 +2375,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .gs-list li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; color: #a6adbb; font-size: 14px; }
 .gs-list b { color: #eceef2; font-weight: 600; }
 .gs-i { width: 34px; height: 34px; border-radius: 10px; background: rgba(227,179,65,.10); border: 1px solid rgba(227,179,65,.28); position: relative; }
-.gs-i::after { content: ""; position: absolute; inset: 8px; background: #e9c46a; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.gs-i::after { content: ""; position: absolute; inset: 8px; background: #b4b8bf; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
 .gs-i1 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='9' cy='8' r='3'/%3E%3Ccircle cx='17' cy='9' r='2.4'/%3E%3Cpath d='M3 19c0-3 2.7-5 6-5s6 2 6 5M15 14.5c2.8-.3 6 1.2 6 4.5'/%3E%3C/svg%3E"); }
 .gs-i2 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 4v16M17 4v16'/%3E%3Crect x='5' y='8' width='4' height='7' rx='1'/%3E%3Crect x='15' y='6' width='4' height='9' rx='1'/%3E%3C/svg%3E"); }
 .gs-i3 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E"); }
@@ -2436,8 +2440,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 @media (max-width: 900px) { .gate-side::before { display: none; } }
 /* ── Home design pass (7 Nov): everything below is scoped to the Home view ── */
 /* light theme: green/red and the faint ink a step deeper on Home so small text clears 4.5:1 on white and on the tinted chips */
-:root[data-theme="light"] #v-home { --buy: #067a62; --sell: #c42340; --ink-faint: #5d6472; --hmk-amber: #8a5a00; }
-#v-home { --hmk-amber: #e0a63a; }
+#v-home { --hmk-amber: var(--warn-ink); }
 #v-home .h-top { padding-bottom: 2px; }
 #v-home .h-head { text-wrap: balance; }
 @media (max-width: 700px) { #v-home #h-head { min-height: 2lh; } }   /* desk load, 11 Nov: on a phone the headline is two lines once candles are read; the "Loading" line holds that room so the page under it does not jump */
@@ -2762,7 +2765,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     R.style.colorScheme = light ? 'light' : 'dark';
     if (cs) cs.setAttribute('content', light ? 'light' : 'dark');
     if (!tc) return;
-    var bg = 'gate' in R.dataset ? '#08090c' : getComputedStyle(R).getPropertyValue('--bg').trim();   // the sign-in page is always dark
+    var bg = 'gate' in R.dataset ? '#121315' : getComputedStyle(R).getPropertyValue('--bg').trim();   // the sign-in page is always dark
     if (!bg) return;
     try { cv = cv || document.createElement('canvas').getContext('2d'); cv.fillStyle = '#000'; cv.fillStyle = bg; cv.fillRect(0, 0, 1, 1); var d = cv.getImageData(0, 0, 1, 1).data; bg = '#' + [d[0], d[1], d[2]].map(function (x) { return x.toString(16).padStart(2, '0'); }).join(''); } catch (e) {}
     tc.setAttribute('content', bg);
@@ -3997,7 +4000,6 @@ html[data-gate] .gate { padding: max(24px, env(safe-area-inset-top)) 16px max(24
 @media (prefers-reduced-motion: reduce) { .gate-guest, .gate-eye { transition: none; } }
 
 /* ── guest page ── */
-:root[data-theme="light"] :is(#v-guest, .g-merged) { --buy: #067a62; --sell: #c42340; --ink-faint: #5d6472; }
 /* the live dot rings three times, then rests (no endless animation) */
 :is(#v-guest, .g-merged) .g-live i::after { animation-iteration-count: 3 !important; }
 :is(#v-guest, .g-merged) .g-h2 { margin-top: 18px; }
@@ -5147,6 +5149,150 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   @media (prefers-reduced-motion: reduce) { .ps-fold::after { transition: none; } }
 }
 </style>
+<style id="ms-shell-css">
+/* ── The graphite look for the Desk's frame (17 Nov 2026, docs/design/aureum-theme.md): the mark and wordmark, the header, the
+   navigation, the sign-in card, the guest page, Home, Profile and the menus. Last style block of the page on purpose: it restyles
+   the frame over the older passes with the tokens of the first <style> block. Display only; every gate class stays where it was.
+   Never mentions the simple phone view (that lives in #ms-ps-css only). ── */
+body { background: var(--au-bg); }
+:where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: var(--au-accent) !important; }
+/* the mark: a brushed-silver rounded square with a capital A, the same in every theme (assets/aureum-mark.svg is its twin) */
+.ms-coin { position: relative; display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 6px; background: var(--au-mark) !important; box-shadow: inset 0 0 0 1px rgba(22,24,27,.18) !important; container-type: size; }
+.ms-coin::before { content: "A"; color: #16181b; font: 700 13px/1 var(--au-font); font-size: 60cqh; letter-spacing: 0; }
+.top .ms-coin { width: 24px; height: 24px; border-radius: 7px; }
+.btab-brand .ms-coin { width: 28px !important; height: 28px !important; border-radius: 8px; }
+/* the wordmark: AUREUM 700 .14em, DESK 500 .22em in --au-ink-2 */
+.wm { display: inline-flex; align-items: baseline; gap: .5em; white-space: nowrap; text-transform: uppercase; line-height: 1; }
+.wm b { font: 700 14px/1 var(--au-font); letter-spacing: .14em; color: var(--au-ink); }
+.wm small { font: 500 12px/1 var(--au-font); letter-spacing: .22em; color: var(--au-ink-2); }
+.wm.wm-st { flex-direction: column; align-items: center; gap: 4px; }
+.wm.wm-st b { font-size: 12px; letter-spacing: .14em; } .wm.wm-st small { letter-spacing: .22em; }
+.hdr-wm { margin-right: 6px; flex-direction: row !important; } .hdr-wm b, .hdr-wm small { display: inline !important; }
+@media (min-width: 1180px) { html:not([data-role="public"]) .hdr-wm { display: none; } }
+@media (max-width: 760px) { .hdr-wm { display: none !important; } }
+
+/* ── header: a flat bar, quiet icon buttons, one neutral switch ── */
+.top { background: color-mix(in srgb, var(--au-bg) 92%, transparent) !important; border-bottom: 1px solid var(--au-line); }
+html.is-scrolled .top { box-shadow: 0 1px 0 var(--au-line), 0 8px 20px -14px rgba(0,0,0,.5); }
+.top .inst { color: var(--au-ink-2); font: 600 13px var(--au-font); border-radius: var(--au-r-sm); }
+.top .inst:hover { color: var(--au-ink); background: var(--au-surface-2); }
+.top-actions .ms-tbtn, .nt-bell { border-color: transparent !important; background: transparent !important; color: var(--au-ink-2); border-radius: var(--au-r-sm) !important; box-shadow: none !important; }
+.top-actions .ms-tbtn:hover, .nt-bell:hover, .top-actions details[open] > summary.ms-tbtn { background: var(--au-surface-2) !important; color: var(--au-ink); }
+.top-actions #ms-alerts.is-on, .top-actions #ms-alerts[aria-pressed="true"] { color: var(--au-accent); background: var(--accent-soft) !important; }
+.nt-bell[hidden] { display: none !important; }   /* the bell's own rule (inline-grid) beat [hidden]: it showed for guests, with nothing behind it */
+.nt-n { box-shadow: 0 0 0 2px var(--au-bg); }
+.hdr-open { border-radius: var(--au-r-pill); border-color: var(--au-line) !important; background: var(--au-surface) !important; color: var(--au-ink-2); }
+/* Desk | Macro | ChronosTrade: a plain segmented control, the place you are on a raised segment with an accent dot */
+.hdr-sw { background: var(--au-surface); border: 1px solid var(--au-line); }
+.hdr-sw::before, .hdr-sw::after { display: none !important; }
+.hdr-sw a { color: var(--au-ink-2); font-weight: 600; }
+.hdr-sw a.on, .hdr-sw a[aria-current="page"], .hdr-sw a.hdr-ct.on { color: var(--au-ink); background: var(--au-surface-2); box-shadow: inset 0 0 0 1px var(--au-line-strong); }
+.hdr-sw a.on i, .hdr-sw a[aria-current="page"] i, .hdr-sw a.hdr-ct.on i { background: var(--au-accent); box-shadow: none; }
+.hdr-sw a:not(.on):hover { color: var(--au-ink); background: var(--au-surface-2); } .hdr-sw a:not(.on):hover i { background: var(--au-ink-2); }
+/* account area and its menu */
+.me > summary:hover, .me[open] > summary { background: var(--au-surface-2); border-color: var(--au-line); }
+.me-av { background: var(--au-mark) !important; box-shadow: none !important; }
+.me > summary:hover .me-av { box-shadow: 0 0 0 2px var(--au-line-strong) !important; }
+.me-pop, .menu-body, .mk-pop { background: var(--au-surface) !important; border: 1px solid var(--au-line-strong) !important; border-radius: var(--au-r) !important; box-shadow: var(--au-shadow-pop) !important; }
+.me-pop button:hover, .me-pop button:focus-visible, .me-pop .me-link:hover, .me-pop .me-link:focus-visible { background: var(--au-surface-2); }
+.me-pop .me-out, html[data-role="public"] .me .me-out { color: var(--au-ink); }   /* red is for losses and sells only */
+.me-pop .me-out { border-top-color: var(--au-line); }
+html[data-role="public"] .me .me-out { color: var(--au-accent); font-weight: 600; }
+/* Settings: the four tools are neutral rows (they were gold, green and two blue boxes) */
+.menu-pa, .menu-pa.menu-br, .menu-pa.menu-tv { background: var(--au-surface) !important; border: 1px solid var(--au-line) !important; color: var(--au-ink) !important; border-radius: var(--au-r-sm) !important; }
+.menu-pa:hover, .menu-pa.menu-br:hover, .menu-pa.menu-tv:hover { background: var(--au-surface-2) !important; border-color: var(--au-line-strong) !important; }
+.menu-pa small { color: var(--au-ink-3) !important; }
+.menu-h { color: var(--au-ink-2); }
+
+/* ── navigation: the place you are = raised surface + a 2 px accent indicator; the rest in --au-ink-2 ── */
+.top .tabs { background: var(--au-surface); border-color: var(--au-line); }
+.top .tabs a { color: var(--au-ink-2); }
+.top .tabs a[aria-current="page"] { background: var(--au-surface-2); color: var(--au-ink); box-shadow: inset 0 -2px 0 var(--au-accent); }
+.btab { background: var(--au-bg) !important; border-color: var(--au-line) !important; }
+.btab a { color: var(--au-ink-2); }
+.btab a[aria-current="page"], .btab-more-btn.on { color: var(--au-ink) !important; }
+.btab a[aria-current="page"] svg, .btab-more-btn.on svg { color: var(--au-accent) !important; }
+@media (min-width: 1180px) {
+  .btab a[aria-current="page"] { background: var(--au-surface-2) !important; box-shadow: none !important; }
+  .btab a[aria-current="page"]::after { right: auto !important; left: -8px !important; width: 2px !important; border-radius: 2px !important; background: var(--au-accent) !important; }
+  .btab a:hover { background: var(--au-surface-2); color: var(--au-ink); }
+  .btab .btab-brand { border-bottom-color: var(--au-line) !important; }
+}
+@media (max-width: 1179px) {
+  .btab > a[aria-current="page"] svg, .btab-more-btn.on svg { background: var(--au-surface-2); border-radius: 999px; box-shadow: inset 0 2px 0 var(--au-accent); }
+}
+.btab-more { background: var(--au-surface) !important; border-color: var(--au-line-strong) !important; border-radius: var(--au-r-lg) !important; }
+.btab-more-list a { background: var(--au-surface-2); color: var(--au-ink-2); }
+.btab-more-list a[aria-current="page"] { color: var(--au-ink); background: var(--au-surface-2); box-shadow: inset 0 0 0 1px var(--au-accent); }
+
+/* ── surfaces: flat 12 px cards on hairlines ── */
+.card, .tile, .c-card { border-radius: var(--au-r) !important; border-color: var(--au-line); box-shadow: var(--au-shadow) !important; background: var(--au-surface); }
+.card:hover, .tile:hover { border-color: var(--au-line-strong); }
+.ms-k { font-weight: 600; }
+.h-head, .v-head .h-head, .c-head .h-head { font-family: var(--au-font); font-weight: 650; letter-spacing: -.02em; }
+.ms-note { color: var(--au-ink-3); }
+
+/* ── buttons: one solid neutral primary, hairline secondaries ── */
+.gate-go, .u-btn, .ct-btn, .nt-in button.pri, .own-acts button.pri, #v-profile .ms-tbtn.pri { background: var(--au-primary) !important; border-color: var(--au-primary) !important; color: var(--au-on-primary) !important; box-shadow: none !important; border-radius: var(--au-r-sm) !important; font-weight: 600; }
+.gate-go:hover, .u-btn:hover, .ct-btn:hover { filter: brightness(1.06); }
+#v-profile .pf-act .ms-tbtn, .gate-guest { background: transparent; border: 1px solid var(--au-line-strong) !important; color: var(--au-ink); border-radius: var(--au-r-sm); }
+#v-profile .pf-act .ms-tbtn:hover { background: var(--au-surface-2); }
+
+/* ── Home: the answer first, flat and calm (no wash, no coloured rule); the markets and the pulse below the open trades ── */
+#v-home::before { display: none !important; }
+#v-home .h-head { font-size: clamp(26px, 2.2vw, 32px); line-height: 1.15; }
+#v-home .h-date { font: 500 13px var(--au-font); color: var(--au-ink-2); letter-spacing: 0; }
+#v-home .h-today { border-radius: var(--au-r) !important; background: var(--au-surface); border-color: var(--au-line); box-shadow: var(--au-shadow) !important; }
+#v-home .h-today::before { display: none !important; }
+#v-home .h-kpi + .h-kpi { border-left-color: var(--au-line); }
+#v-home .h-kpi .h-kpi-k { font-weight: 500; color: var(--au-ink-2); }
+#v-home .h-kpi b { font-family: var(--au-font); font-weight: 650; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+#v-home .h-kpi-s { color: var(--au-ink-3); }
+/* jump-to links: quiet text links, not ten bordered pills */
+#v-home .h-quick { gap: 2px 4px; }
+#v-home .h-quick a { border-color: transparent !important; background: transparent !important; color: var(--au-ink-2); font-weight: 500; border-radius: var(--au-r-sm); }
+#v-home .h-quick a:hover { color: var(--au-ink); background: var(--au-surface-2) !important; transform: none; }
+#v-home .h-quick a[href="#council/overview"] { color: var(--au-ink); }
+#v-home .h-mk-h h2::before { display: none; }
+#v-home .h-mk a:hover, #v-home .h-mk [data-mk-card]:hover, #v-home a.tile:hover { transform: none; box-shadow: var(--au-shadow); border-color: var(--au-line-strong); }
+#v-home .tile.wide { background: var(--au-surface) !important; }
+#v-home .h-go .h-go-ico, #v-home .h-go-council .h-go-ico, #v-home .h-go-scanner .h-go-ico, #v-home .h-go-charts .h-go-ico, #v-home .h-go-journal .h-go-ico { background: var(--au-surface-2) !important; }
+#v-home .tile-k { font-weight: 600; color: var(--au-ink); }
+#v-home .h-act .c-link, #v-home .tile-go { color: var(--au-accent); }
+@media (min-width: 641px) {
+  /* the few things that matter first: today, then what is open and the setup; market cards and the pulse follow them */
+  #v-home > .h-mk { order: 2; }
+  #v-home > .h-pulse { order: 3; }
+  #v-home > .h-grid .h-main > .h-act { order: -1; }
+}
+
+/* ── sign-in card: graphite in every theme (the page behind it stays dark) ── */
+.gate { --g-ink: #ecedef; --g-dim: #b4b8bf; --g-faint: #9a9fa7; --g-gold: #e8b04b; --g-red: #f2857e; --g-line: rgba(255,255,255,.10); }
+html[data-gate] .gate { background: #121315 !important; }
+.gate-bg { filter: grayscale(1); opacity: .5; }
+.gate-card { background: rgba(26,28,31,.94) !important; border: 1px solid rgba(255,255,255,.10) !important; border-radius: 16px !important; box-shadow: 0 24px 60px -24px rgba(0,0,0,.7) !important; }
+.gate-card h1, .gs-h { font-family: var(--au-font) !important; font-weight: 650 !important; letter-spacing: -.02em !important; }
+.gs-h em { color: #ecedef !important; font-style: normal; }
+.gate .wm b { color: #ecedef; } .gate .wm small { color: #b4b8bf; }
+.gate input { background: #16181b !important; border-color: rgba(255,255,255,.16) !important; }
+.gate input:focus { border-color: #9db4d3 !important; box-shadow: 0 0 0 3px rgba(157,180,211,.22) !important; }
+.gate-eye:focus-visible, .gate-go:focus-visible, .gate-guest:focus-visible, .gate-x:focus-visible { outline: 2px solid #9db4d3 !important; }
+.gate-go { background: #e4e6e9 !important; color: #121315 !important; }
+.gate-go[aria-busy="true"], .gate-go:disabled { background: #cfd2d6 !important; }
+.gate-guest:hover { border-color: rgba(255,255,255,.28) !important; background: rgba(255,255,255,.04) !important; }
+.gs-i { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.12) !important; color: #b4b8bf !important; }
+.gs-pk, .gs-live { background: rgba(26,28,31,.82) !important; border-color: rgba(255,255,255,.10) !important; }
+
+/* ── guest page ── */
+:is(#v-guest, .g-merged) .g-join { background: var(--au-surface) !important; border: 1px solid var(--au-line) !important; }
+:is(#v-guest, .g-merged) .g-join-k { color: var(--au-ink-2) !important; }
+:is(#v-guest, .g-merged) .g-join-btn { box-shadow: none !important; }
+html[data-role="public"] #v-charts::before { background: var(--au-surface) !important; border-color: var(--au-line) !important; color: var(--au-ink-2); }
+
+/* ── Profile ── */
+#v-profile .pf-card { border-radius: var(--au-r) !important; }
+@media (prefers-reduced-motion: reduce) { .top-actions .ms-tbtn, .hdr-sw a, .btab a { transition: none !important; } }
+</style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -5167,7 +5313,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   </svg>
   <div class="gate-wrap">
   <aside class="gate-side" aria-label="About the desk">
-    <div class="gs-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aureum Desk</span></div>
+    <div class="gs-brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm"><b>Aureum</b><small>Desk</small></span></div>
     <h2 class="gs-h">Your trading desk, <em>live</em>.</h2>
     <p class="gs-p">Market structure on every timeframe, an AI council paper-trading every setup, and dedicated desks for gold, crypto scalping and ICT.</p>
     <ul class="gs-list">
@@ -5188,7 +5334,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
     <div class="gs-tape" id="gs-tape" aria-hidden="true" hidden><div class="gs-tape-in" id="gs-tape-in"></div></div>
   </aside>
   <div class="gate-card">
-    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aureum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
+    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm"><b>Aureum</b><small>Desk</small></span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in to the desk</h1>
     <p class="gate-sub">Your password opens your own account.</p>
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
@@ -5278,7 +5424,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <div class="ms-notice" id="ms-notice" role="status" hidden><span class="ms-notice-t" id="ms-notice-t"></span><button type="button" class="ms-notice-x" id="ms-notice-x" aria-label="Hide this notice">×</button></div>
 
   <header class="top">
-    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
+    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm hdr-wm"><b>Aureum</b><small>Desk</small></span><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span><span id="ms-hdr-spr" class="hdr-spr" hidden></span></div>
     <nav class="tabs" aria-label="Sections">
       <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#ict" class="dsk" data-desks>Desks</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a>
@@ -6330,7 +6476,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <p class="foot">Gold and forex candles from OANDA (spot, mid price); crypto from Binance and Kraken. Without OANDA the page falls back to exchange feeds, with gold aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
   <div class="ps-only ps-sw" id="ps-sw" role="group" aria-label="Phone view"><span>Phone view</span><span class="ps-sw-b"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="full" aria-pressed="false">Full</button></span></div>
   <nav class="btab" aria-label="Main sections">
-    <a class="btab-brand" href="#home" aria-label="Aureum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span>Aureum</span></a>
+    <a class="btab-brand" href="#home" aria-label="Aureum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span class="wm wm-st"><b>Aureum</b><small>Desk</small></span></a>
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
