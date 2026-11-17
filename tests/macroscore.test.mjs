@@ -58,11 +58,9 @@ test('dxyDaily: the ICE formula on the five pairs; dailyRows reads the council d
   assert.equal(d.length, 1); assert.ok(d[0].v > 95 && d[0].v < 105, `DXY ≈ 99 (got ${d[0].v})`);
   assert.equal(dxyDaily({ eurusd: one(1.16) }).length, 0, 'a day needs all five pairs');
 });
-test('wiring: the Macro member computes it, writes it in forecast.json, the brief and the Analyst block; the desk shows it', () => {
+test('wiring: the Macro member computes it, writes it in forecast.json, the brief and the Analyst block', () => {
   const m = fs.readFileSync(new URL('../council/macro.mjs', import.meta.url), 'utf8');
   assert.match(m, /const S = await scoreSeries\(fetchImpl, now, \{ dir, data, cache, src \}\), goldScore = goldMacroScore\(S, \{ asOf: now \}\);/);
   assert.match(m, /sources: src, goldScore \};/); assert.match(m, /if \(fc\.goldScore\) L\.push\(scoreLine\(fc\.goldScore\)\);/); assert.match(m, /scoreLine\(fc\.goldScore\)\.replace/);
   assert.match(m, /nc\.score = /);
-  const h = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.match(h, /id="ms-md-score"/); assert.match(h, /function renderScore\(f\)/); assert.match(h, /renderNext, renderScore, renderVet, renderSmile/);
 });

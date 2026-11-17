@@ -153,7 +153,7 @@ test('page wiring: Luxus lands on the Mosha desk, the desk opens on its own, the
   assert.match(PAGE, /html\[data-deny~="desks"\]:not\(\[data-ict\]\):not\(\[data-mosha\]\) \.dsk \{ display: none !important; \}/);
   assert.match(PAGE, /k === 'ict' \? !!document\.documentElement\.dataset\.ict : !PUB && !msDenied\(k\)/);
   assert.ok(PAGE.includes('<script src="/assets/mosha-teach.js" defer></script>')); assert.match(DESK, /if \(root\.msMoshaTeach\) root\.msMoshaTeach\(\)/);
-  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-lit"'));
+  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-profile"'));
   for (const id of ['mo-teach', 'mo-t-form', 'mo-t-file', 'mo-t-drop', 'mo-t-picks', 'mo-t-send', 'mo-t-msg', 'mo-lessons', 'mo-l-sub', 'mo-l-body', 'mo-l-key', 'mo-l-keybtn', 'mo-l-keyout', 'mo-book', 'mo-b-sub', 'mo-b-body']) assert.ok(sec.includes(`id="${id}"`), id);
   assert.match(sec, /id="mo-teach" hidden/); assert.match(sec, /id="mo-l-key" hidden/); assert.match(sec, /id="mo-t-file" accept="image\/png,image\/jpeg,image\/webp" multiple/); assert.match(sec, /id="mo-t-msg" role="status" aria-live="polite"/);
   assert.match(PAGE, /name="mosha" value="\$\{v\}"/); assert.match(PAGE, /if \(m\) perms\.mosha = m === 'off' \? false : m;/);

@@ -207,7 +207,7 @@ test('build step: worker version follows the site content, kill switch from the 
 
 test('built site: every page carries the app tags; the worker is stamped and not killed', () => {
   const out = path.join(ROOT, 'out');
-  const pages = ['index.html', 'market-structure.html', 'gold-trading.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'macro/index.html', 'veteran/index.html'];
+  const pages = ['index.html', 'market-structure.html', 'gold-trading.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'veteran/index.html'];
   for (const p of pages) {
     const head = fs.readFileSync(path.join(out, p), 'utf8').split(/<\/head>/i)[0];
     assert.match(head, /<link rel="manifest" href="\/app\.webmanifest">/, p);
@@ -338,7 +338,7 @@ test('built site: every page has each app tag exactly once, and every manifest s
   const out = path.join(ROOT, 'out');
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? (e.name === 'assets' ? [] : walk(path.join(d, e.name))) : /\.html$/.test(e.name) ? [path.join(d, e.name)] : []);
   const pages = walk(out).filter((f) => path.relative(out, f) !== 'offline.html');
-  assert.ok(pages.length >= 9, 'pages found: ' + pages.length);
+  assert.ok(pages.length >= 8, 'pages found: ' + pages.length);   // 8 since the /macro landing went (17 Nov 2026)
   const once = [/<link\b[^>]*\brel=["']manifest["'][^>]*>/gi, /<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-capable["'][^>]*>/gi, /<meta\b[^>]*\bname=["']mobile-web-app-capable["'][^>]*>/gi,
     /<meta\b[^>]*\bname=["']apple-mobile-web-app-title["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-status-bar-style["'][^>]*>/gi, /<script\b[^>]*\bsrc=["'][^"']*\/assets\/pwa\.js[^"']*["'][^>]*>/gi];
   for (const f of pages) {

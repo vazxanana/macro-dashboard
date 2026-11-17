@@ -14,10 +14,10 @@ test('macro page: reads the members\' files, has every section, and the inline s
   assert.match(html, /@media \(max-width: 600px\)/); assert.match(html, /prefers-reduced-motion/);
 });
 
-test('macro page: built, routed at /macro-desk, linked from the council Macro pane', () => {
+test('macro page: built, routed at /macro-desk, linked from the Council tab bar', () => {
   assert.match(fs.readFileSync(new URL('../scripts/build.sh', import.meta.url), 'utf8'), /macro-desk\.html out\//);
   const vj = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
   assert.ok(vj.rewrites.some((r) => r.source === '/macro-desk' && r.destination === '/macro-desk.html'));
   const ms = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.match(ms, /<a class="md-full" href="macro-desk\.html"/);
+  assert.match(ms, /<a class="adm c-nav-link" id="ms-cn-macro" href="\/macro-desk"/);
 });

@@ -8,7 +8,7 @@ const src = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const navOf = (html) => /<nav class="hdr-sw"[^>]*>([\s\S]*?)<\/nav>/.exec(html)[1];
 
 test('every page with the switch links the Academy, owner only', () => {
-  const pages = ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'index.html', 'scripts/veteran-library.html', 'academy.html'];
+  const pages = ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'scripts/veteran-library.html', 'academy.html'];
   for (const p of pages) {
     const nav = navOf(src(p));
     const a = /<a [^>]*href="\/academy"[^>]*>/.exec(nav);

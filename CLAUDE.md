@@ -25,12 +25,12 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Where things live**
 | Path | What |
 |---|---|
-| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Gold, Mosha, Crypto, LIT, NQ SDV), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
+| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Mosha), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
 | `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
 | `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
 | `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
-| `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
+| `edge-lab.html`, `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
 | `api/` | The site's functions, run by the Cloudflare Worker (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `trade-review` (+ `_trade-review`: the language-model part of the trade review), `status`, `bridge` (17 Nov 2026: `push`, `alert-cron`, `run.js`, `tv-webhook`, `pine`, `og.mjs`, `_flags` removed, section "Simplified") |
 | `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `trade-review` (after-the-fact check of the trades taken, proposals only), `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
@@ -66,7 +66,7 @@ review. `watchdog.yml` pages when the loop stops.
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
   Server-side sign-in, API hardening, Profile photo and name on the server.
-- The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
+- The Desk page: Simplified pages (17 Nov: what was removed and folded), Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
@@ -150,6 +150,38 @@ parts as they were; this section wins.
   LIT block in `trader.mjs` still runs while a LIT record is open or pending (`litLeft`: the day-end hold and the swing break-even),
   and the loop manages those records to their exits with their stops. `council/lit.mjs` stays (tests and the block import it).
   `snapshot.lit.on` says whether the stream places orders. Undo: a user rule setting `c.litShadow = true`.
+## Simplified pages (17 Nov 2026, owner: "All")
+The page side of the 17 Nov simplification (the backend side, push / alert-cron / tv-webhook / pine / run.js / flags / og, went in
+its own change). Removed from the Desk (`market-structure.html`, 1,843,985 → about 1,582,000 bytes) with their tests:
+- **Vercel Analytics / Speed Insights loader**: gone; `window.msTrack` is a no-op kept for its callers. **The Edge Config notice
+  bar** `#ms-notice`: gone; the "Council bot behind" pill (`#ms-botwarn`, `/api/status`) stays. **Link previews**:
+  `og:image` / `twitter:image` = `https://aureumdesk.co.uk/icons/og-card.png`.
+- **Desks**: the Gold playbook view `#gold` (`renderGold`, `gpDays`) and the Setup card `#ms-pb` (`renderPlaybook`), the LIT
+  desk `#lit` (`renderLit`, `litReplay`, `#ms-lit-css`), the NQ SDV placeholder `#sdv`, and the Crypto desk `#crypto` (the coins
+  stay markets on Charts). The desk switch is **ICT | Mosha**; `VIEWS`, `VIEW_PERM`, the Desks entry's `DESKS`, the simple phone
+  view's `DESKS` list and the palette names follow. The `desks` permission now opens the Mosha desk only.
+- **Council → Macro pane** (`#ms-cp-macro`, `#ms-md-css`, `#ms-md-js`, the Home quick link): the Council's tab bar keeps a plain
+  link `<a class="adm c-nav-link" id="ms-cn-macro" href="/macro-desk">` where the tab was (hidden for `data-deny~="macro"`).
+  The Macro desk page (`macro-desk.html`) is unchanged; `tests/macro-desk.test.mjs` checks the strategist's output only.
+- **Book weights card** `#ms-book` (`#ms-book-css`, `#ms-book-js`): gone; `council/book.mjs` and the digest's line are unchanged.
+  `MS_BOOK_NOW` (the decay script's "between two Coach readings") is not part of it and stays.
+- **Price alerts**: the dialog `#ms-pa`, Settings → Price alerts, the chart bell (and its key, right-click / Alt+click, the
+  position chip's "Alert at entry"), the alert chips `#ms-pa-chips`, the palette entries. **TradingView**: the webhook owner
+  dialog ("TradingView alerts in") and the Pine add-on. The `pa-*` dialog classes stay: the Broker bridge dialog uses them.
+  The Setup page's level bells (`#ms-levels`, in-page notifications) and the header's setup-alert toggle `#ms-alerts` stay.
+- **Journal**: the `#journal` view and its nav entries, the Home tile, the Setup button "Log selected trade" and the browser
+  Trader (`autoTrade`, `jAdd`, `journalTick`, the hidden `#ms-auto` toggle). The council's closed system trades are the Council →
+  Trades tab "Closed" (`data-ct="journal"`, the same `systemClosed()` list). A member's old localStorage `msJournal` is left
+  alone, unused. The `journal` permission key stays in `MS_PERM_KEYS` (stored records keep validating) but gates nothing and is
+  not offered in the permission dialog.
+- **The /macro landing** (`index.html`): deleted; `scripts/build.sh` no longer makes `out/macro/`. `/macro` should rewrite to the
+  Macro desk (`vercel.json`, owned by the backend change).
+Folded: the Council research pane leads with the Edge scoreboard; the edge-decay monitor `#ms-decay` and "What to expect"
+`#ms-expect` sit unchanged in one closed disclosure `<details class="c-dex adm" id="ms-dex">` "Decay and expectations" under it
+(`.c-dex:not([open]) > .c-dex-b { display: none }`; the simple phone view does not fold the cards inside it again; the smoke test
+counts the disclosure as one Research row). The forward card `#ms-fwd` stays the headline of Council → Systems. Home and the
+Council overview were already apart (Home: Today strip, open positions, sections; overview: active trades and the calendar), so
+nothing more was cut there. The sections below about these features are history: their headings say "(removed 17 Nov 2026)".
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -404,7 +436,8 @@ come from `/api/users`) and the ones added or changed on the page, which live in
 `disabled: true` removes one. A signed-in account is re-checked by `/api/me` after load and signed out if removed or if the
 password changed. Passwords must stay unique per account (the server refuses a duplicate).
 
-## Gold playbook check (6 Nov 2026, owner's skills)
+## Gold playbook check (6 Nov 2026, owner's skills) (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 
 Admin card `#ms-pb` on the Setup view (`renderPlaybook()`, called from `renderHome()`), from the owner's skill collection
 (gold-msnr-playbook §2-5, Mosha S.CODE, Zlankator, MMXM): context tiles (council Weekly structure `goldW1` vs the setup,
@@ -650,7 +683,8 @@ Same day, later (owner, #530; user rule `gold-trend-fast-shadow`, `config.goldTr
 paper shadows (`blockedBy owner-shadow`), still managed by the same loop, never alerted; `council/decay.mjs` lists it `shadow: true`.
 
 
-## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
+## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill") (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 Admin-only view `#gold` (`#v-gold`, nav "Gold playbook"; hidden for viewers and guests) for the owner's gold-master-playbook skill
 (kept locally only, never in this public repo). It shows the skill's tested edge in my own words: Weekly structure bullish (last
 completed W1 body close above the last 2-bar-fractal swing high) + a New York-close Daily candle closing above the prior day's low
@@ -852,6 +886,7 @@ Server-side login landed on 9 Nov (below); broker-order functions are a later st
 - **Web Analytics** (custom events: View {view}, Sign in {result}, Guest, Trade review) and **Speed Insights**, loaded from /_vercel/* only on the Vercel site. Fluid compute, skew protection (12 h) and preview-only deployment protection are on.
 
 ## Macro strategist (7 Nov 2026, owner: a council member for macro, paper only)
+(17 Nov 2026: the Desk's Council → Macro pane described below was removed; the Macro desk page is `macro-desk.html`.)
 `council/macro.mjs`, run by council.yml every 6th round (~70 min; "~25 min" when rounds were shorter; `timeout 180`, a failure never stops the loop). Mixes the
 15-driver stack of `gold-trading.html` (`computeDailyBias`, `dollarSmileRegime`, `refreshFundamentalsX`, ported, not imported)
 with the handbook knowledge encoded there, a VIX/VIX3M term-structure input, and net liquidity / the FOMC calendar as context.
@@ -1096,7 +1131,8 @@ daily-candle cache with the run's closed OANDA days for the DXY / gold; the Gold
 (`stale`) and is withheld past 28. `injectSection` drops a lone block marker. Tests: `tests/datasync.test.mjs` (local git
 repos), `tests/jsonio.test.mjs`, `tests/macro-reliability.test.mjs`, `tests/macroscore-stale.test.mjs`, `tests/analyst-report.test.mjs`.
 
-## Book weights, paper comparison (8 Nov 2026; portfolio-v2 proposal, owner undecided)
+## Book weights, paper comparison (8 Nov 2026; portfolio-v2 proposal, owner undecided) (removed 17 Nov 2026)
+The card is gone (section "Simplified pages"); council/book.mjs and the digest line stay.
 `council/book.mjs` (pure; tests `tests/book.test.mjs`): from the forward paper records (trades.json live + NQ open-run paper via
 `alertable`, after costs; ICT A-setups from ict/trades.json with ict/replay.json filling the days the forward tracker has no record
 of, replay copies dropped by id) it computes, day by day since `BK.from` (4 Nov, the legacy engine's retirement), the R of (a) the
@@ -1277,7 +1313,8 @@ READY green and IN ORIGIN amber (as Setup / Scanner), the LIT replay card escape
 escapes them), its setups table scrolls under a sticky header, the Gold playbook's cards say "could not be loaded" when no
 candles came (`.gp-fail`), and the Council calendar's today cell lost its gold outline (`#v-council .cal-d.today`).
 
-## LIT and NQ SDV desks (8 Nov 2026)
+## LIT and NQ SDV desks (8 Nov 2026) (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 The desk switch is ICT | Gold | Crypto | LIT | NQ SDV (soon). `#lit` (v-lit, `renderLit`, re-run when council-data lands) shows the paper
 shadow stream: record from trades with `k 'lit'` / ids `xau-lit-*`, the detector funnel and dropped-candidate counts from `snapshot.lit`,
 open / resting and closed tables. `#sdv` (v-sdv) is a placeholder that states the steps before a desk opens (pre-registration, 2020→now
@@ -2172,6 +2209,7 @@ week's first version is kept; `freezeHypotheses` shows the recorded one with the
 macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. Paper only.
 
 ## Side pages: /macro, /veteran/, Edge lab, gold terminal (9 Nov 2026, owner: "keep improving", "more visual, and simpler")
+(17 Nov 2026: the /macro landing page, `index.html`, was removed; its bullet below is history.)
 - Shared look: `assets/mx-page.css` (the desk's tokens per theme, top bar, Desk | Macro | ChronosTrade switch `.hdr-sw`, 44 px
   controls on touch screens via `--tap`) and `assets/mx-nav.js` (asks `/api/me` once, `window.MX_ME`; `[data-mx-members]` shows to
   signed-in members, `[data-mx-macro]` hides when `perms.macro === false`). Used by edge-lab.html, index.html and the veteran page.

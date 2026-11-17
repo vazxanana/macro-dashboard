@@ -108,7 +108,7 @@ test('page: every council-data reader goes through msData', () => {
   // the only direct fetches left: files nobody else reads, behind a button or a desk of their own
   const REST = PAGE.slice(0, PAGE.indexOf('/* ms-data:start */')) + PAGE.slice(PAGE.indexOf('/* ms-data:end */'));   // the helper's own fetch is the one request
   const direct = [...REST.matchAll(/fetch\([^\n]{0,60}MS_CDATA[^\n]{0,60}/g)].map((m) => m[0]);
-  const LEFT = ['mt5/signals.csv', 'ctrader/accounts.json', 'ctrader/account.json', 'lit/replay.json'];
+  const LEFT = ['mt5/signals.csv', 'ctrader/accounts.json', 'ctrader/account.json'];
   for (const d of direct) assert.ok(LEFT.some((f) => d.includes(f)), 'direct council-data fetch: ' + d);
   assert.equal(direct.length, LEFT.length);
   assert.ok(!/fetch\(\s*(`\$\{CDATA\}|CDATA \+|ROOT \+|base \+ f)/.test(PAGE), 'no reader builds its own council-data URL');

@@ -50,13 +50,10 @@ test('Edge lab: reads lab.json first, revalidates instead of re-downloading, rep
   assert.match(h, /class="hdr-sw" data-mx-members hidden/);
 });
 
-test('/macro: the 2024 demo bundle is gone; the page reads the council files and never blanks', () => {
-  const h = src('index.html');
-  assert.ok(!/index-C0AwpGdj|id="root"/.test(h)); assert.ok(!fs.existsSync(new URL('../assets/index-C0AwpGdj.js', import.meta.url)));
-  assert.match(h, /\/cdata\/macro\/forecast\.json/); assert.match(h, /\/veteran\/index\.json/); assert.match(h, /\/research\/edge\/index\.json/);
-  assert.match(h, /href="\/macro-dashboard\/assets\/mx-page\.css"/);
-  assert.match(h, /Sign in on the desk/); assert.match(h, /UTC/);
-  for (const c of scripts(h)) assert.doesNotThrow(() => new vm.Script(c));
+test('/macro: the landing page is gone (17 Nov 2026); /macro goes to the Macro desk, and the build makes no out/macro/', () => {
+  assert.ok(!fs.existsSync(new URL('../index.html', import.meta.url)), 'index.html (the /macro landing) removed');
+  assert.ok(!fs.existsSync(new URL('../assets/index-C0AwpGdj.js', import.meta.url)));
+  assert.doesNotMatch(src('scripts/build.sh'), /out\/macro|cp index\.html/);
 });
 
 test('/veteran/: the build publishes the library page next to index.json', () => {
