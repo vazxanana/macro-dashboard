@@ -1,7 +1,7 @@
 name: Cloudflare deploy
 
-# Stage 2 of the Cloudflare move (docs/cloudflare.md): deploys cloudflare/ (the Worker) with out/ as its
-# assets to the account's workers.dev address. It does NOT touch Vercel, DNS or the domain, and sets no
+# Deploys cloudflare/ (the Worker, docs/cloudflare.md) with out/ as its assets: the workers.dev address and the
+# two custom domains of wrangler.jsonc `routes` (aureumdesk.co.uk, www). It does not touch DNS and sets no
 # Worker secrets: those are copied by the owner with `wrangler secret put` (docs/cloudflare.md, stage 2).
 #
 # Needs two repository secrets (Settings -> Secrets and variables -> Actions):

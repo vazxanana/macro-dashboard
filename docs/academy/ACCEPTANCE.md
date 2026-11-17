@@ -7,15 +7,13 @@ order: the Academy is replay and paper only.
 
 Any of these:
 
-- **Production (since 10 Nov 2026):** sign in to the desk at `https://meridianx.dev` as the owner, then open `/academy`
+- **Production (since 10 Nov 2026):** sign in to the desk at `https://aureumdesk.co.uk` as the owner, then open `/academy`
   (account menu → "MeridianX Academy"). Live candles; the store starts empty and is yours alone.
 - **Local (always works, no deployment):**
   `sh scripts/build.sh && node --use-env-proxy scripts/academy-dev.mjs --live` then open `http://127.0.0.1:8770/academy`.
   This serves the built site with the real Academy API on a file store on your machine and live candles from the site's
   candle feed. Without `--live` (and without `--use-env-proxy`) it uses recorded real gold candles from 26 Apr to 17 May 2024
   and works offline.
-- **Preview on Vercel:** follow `docs/academy/PREVIEW.md` (one project variable, then open the preview URL and sign in as
-  the owner). A preview keeps its Academy files in its own folder; production is not touched.
 
 ## 1. Access
 

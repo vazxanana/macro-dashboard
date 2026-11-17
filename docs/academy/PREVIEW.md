@@ -1,5 +1,9 @@
 # A safe preview of the Academy
 
+**History (17 Nov 2026): this page no longer applies.** The Vercel project is gone (the site runs on a Cloudflare Worker
+since 16 Nov 2026) and `scripts/vercel-ignore.sh` was removed, so no preview of this kind can be made. The local run in
+`docs/academy/ACCEPTANCE.md` (step 0) is the way to try a branch. The text below is kept as it was.
+
 Status on 10 Nov 2026: **no preview exists yet.** The assistant's Vercel connection could see the team but not the project
 (zero projects, zero deployments listed), so it could not read the project's settings or start a deployment. Nothing was
 bypassed. What follows is ready on the branch and needs one owner action.

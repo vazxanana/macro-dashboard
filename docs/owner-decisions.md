@@ -30,8 +30,8 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
    2026); the reset is the one thing left and only you can do it. If nothing is done: that account's balance and record do
    not measure the replica. (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with
    items 37 and 40.)
-10. **Shadow streams and LIT (items 11 and 12).** If nothing is decided: streams that cost more than they can earn keep
-    being recorded and copied to the demo shadow account.
+10. **Shadow streams (item 11).** If nothing is decided: streams that cost more than they can earn keep being recorded and
+    copied to the demo shadow account. (LIT, item 12, was here: its paper stream stopped with your "All" of 17 Nov 2026.)
 11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
     loop free to run.
 12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
@@ -116,6 +116,9 @@ answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026
 
 ### [ ] 5. Vercel firewall rule for `/api/login`
 
+- **Status, 17 Nov: OPEN, and the place has moved.** The Vercel project is gone (16 Nov); the site runs on a Cloudflare Worker
+  at aureumdesk.co.uk, so such a rule would be a Cloudflare rate-limiting rule on that zone (docs/cloudflare.md). The in-memory
+  guard is unchanged.
 - **Status, 11 Nov: OPEN as far as the code shows** (a firewall rule is set in Vercel, not in the repository; not checked there).
 
 - **Context.** Password guessing is limited to 10 failures per 10 minutes per IP by `api/_guard.js`, but that table lives in
@@ -127,6 +130,9 @@ answered on 12 Nov with the reset left for you), **The book study of 11 Nov 2026
 
 ### [ ] 6. Who may see `/api/status`
 
+- **Status, 17 Nov: mostly answered by the 17 Nov simplification.** `/api/status` now answers only `{ at, bots: { council, ict } }`
+  (how old each bot's last round is, and whether it is behind): the run mode, the last error line, step and commit are gone with
+  the backup runner. What is left public is the two ages; making that session-only is still your choice.
 - **Status, 11 Nov: OPEN.** Still public with the run mode, the last error line and step.
 
 - **Context.** `/api/status` is public and edge-cached. Since 9 Nov it no longer carries error stacks, but it still tells anyone
@@ -255,8 +261,11 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 - [ ] **3e. Keep the five ICT shadows and the NQ trend-on shadow unchanged**, look again at 30 forward trades each.
   **Recommended: yes.**
 
-### [ ] 12. LIT: keep or retire
+### [x] 12. LIT: keep or retire
 
+- **Status, 17 Nov: answered by your "All" (17 Nov 2026).** Owner rule `lit-off`: the LIT paper stream places no new order;
+  open LIT records run to their exits with their stops. The LIT replay (`council/lit-replay.mjs`) and the LIT desk are removed;
+  the study stays. Undo: a user rule setting `litShadow` back on.
 - **Status, 11 Nov: OPEN.** Your 8 Nov choice (keep it as a paper shadow) stands until you say otherwise.
 
 - **Context.** The LIT study was inconclusive (27 gold fills in 19 years; what can be measured is negative), and LIT costs about
@@ -290,6 +299,9 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ### [ ] 15. Trigger the watchdog from a Vercel cron
 
+- **Status, 17 Nov: OPEN; option (a) needs rewording.** The Vercel project and its crons are gone. The site's host is now a
+  Cloudflare Worker with one 10-minute cron (`cloudflare/src/worker.mjs`); dispatching `watchdog.yml` from it would need a GitHub
+  token with Actions write as a Worker secret. Nothing like it is built.
 - **Status, 11 Nov: OPEN.** See also item 31 (the same weakness in the other timed jobs).
 
 - **Context.** `watchdog.yml` runs on a GitHub cron at :11 / :41 (GitHub fires this repo's crons only a few times a day) and after
@@ -524,6 +536,10 @@ conditions is what makes your trades win.
 
 ### [~] 28. Luxus teaches on the Mosha desk: who reads the lessons, and when
 
+- **Status, 17 Nov: unchanged, one fact moved.** The site is aureumdesk.co.uk on a Cloudflare Worker since 16 Nov, so a key
+  saved in the secure form must be saved for `aureumdesk.co.uk` (the script `scripts/mosha-lessons.mjs` asks that host); one
+  saved for meridianx.dev is no longer sent. `MOSHA_ASSISTANT_KEY` is now a Worker secret (`npx wrangler secret put`), which
+  applies at once, with no redeploy.
 - **Status, 11 Nov: the teaching side is built and Luxus is using it. What is open is the reading.**
   - **A correction.** The update of 10 Nov below says the assistant keeps its own key in the site's settings and a later
     session can use it again. That last part was wrong: the setting is stored as "sensitive", and Vercel never shows a
@@ -639,6 +655,10 @@ Open points that were written down elsewhere (developer notes, study results, op
 
 ### [ ] 31. Timed jobs depend on GitHub's timer, which often does not fire
 
+- **Status, 17 Nov: OPEN.** One fact below is no longer true: since 17 Nov 2026 nothing takes over when the council loop stops
+  (the website host's backup runner, `api/run.js`, was removed; GitHub Actions is the only runner, restarted by its own
+  watchdog job). The ICT replay is started by the council loop when it is due (CLAUDE.md "ICT replay: a trigger").
+
 - **Context.** GitHub runs this repository's timed jobs only a few times a day at best (measured 6 to 7 Nov: a 15-minute
   timer fired 3 times in 22 hours). The council loop does not depend on it (it restarts itself, and the website's host
   takes over if it stops). These do: the watchdog (item 15), the daily ICT replay (06:41 UTC), the weekly candle cache for
@@ -652,6 +672,10 @@ Open points that were written down elsewhere (developer notes, study results, op
 - **If nothing is decided.** They keep running whenever GitHub happens to fire them.
 
 ### [ ] 32. Public or private repository
+
+- **Status, 17 Nov: OPEN.** The GitHub Pages copy was removed on 17 Nov 2026 (the site is aureumdesk.co.uk on Cloudflare), so
+  "GitHub Pages goes dark" no longer costs anything. The "website's host" can no longer run the council (a Worker cannot start
+  the Trader), so going private means paid minutes or your own server.
 
 - **Context.** On 7 Nov you said you want the repository private. Two things pull the other way. The council's loop runs
   on GitHub's free minutes, which are free only for a public repository; private, the loop would need paid minutes or a

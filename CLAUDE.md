@@ -150,6 +150,19 @@ parts as they were; this section wins.
   LIT block in `trader.mjs` still runs while a LIT record is open or pending (`litLeft`: the day-end hold and the swing break-even),
   and the loop manages those records to their exits with their stops. `council/lit.mjs` stays (tests and the block import it).
   `snapshot.lit.on` says whether the stream places orders. Undo: a user rule setting `c.litShadow = true`.
+- **Cleanup (17 Nov 2026, owner: "keep doing some cleanup")**: no code was left that imports a removed file (every export of
+  `api/`, `council/` and `cloudflare/src` still has a caller; `out/` holds nothing the build does not make; both lockfiles are
+  without `web-push` / `@vercel/og`). What went was stale text: `council/README.md` (the ICT desk row named `api/run.js?job=ict`),
+  `council.yml` / `ci.yml` / `cloudflare-deploy.yml` comments (Pages, the Vercel fallback, the pwa audit's push checks, "does not
+  touch the domain"), `api/_oanda.js` (price alerts), `app.webmanifest` description (price alerts), `docs/cloudflare.md` (secrets
+  list without `EDGE_CONFIG` / `VAPID_*` / `TV_WEBHOOK_KEY` / `RUN_MODE`, the superseded R2 / KV storage plan, `/macro`),
+  `MERIDIAN-X.md` and `README.md` (domain, price alerts, removed desks, the backup runner and VPS), the Academy docs
+  (`ACCEPTANCE.md` domain, `PREVIEW.md` marked history, `LLM.md` / `ARCHITECTURE.md` Worker secrets), `MERIDIANX_BUILD_PROGRESS.md`,
+  `api/mcp.js` `serverInfo.websiteUrl` and `academy/gen/clock-check.mjs`'s default candle host (aureumdesk.co.uk), and dated
+  "Status, 17 Nov" lines on `docs/owner-decisions.md` items 5, 6, 12 (ticked: LIT stopped by "All"), 15, 28, 31 and 32.
+  Kept on purpose: the `/macro-dashboard/*` rewrite and its asset headers (old links; three tests pin them), `meridianx.dev` in
+  the connectors' `ORIGINS`, `ict/tracker.mjs` `MD_BARS` (Fred's; the workflows pass `ICT_MD_BARS`), research study code and
+  generated Academy data, and the `GH_DISPATCH_TOKEN` read-token fallback in `api/data.js` / `api/mcp.js`.
 ## Simplified pages (17 Nov 2026, owner: "All")
 The page side of the 17 Nov simplification (the backend side, push / alert-cron / tv-webhook / pine / run.js / flags / og, went in
 its own change). Removed from the Desk (`market-structure.html`, 1,843,985 → about 1,582,000 bytes) with their tests:

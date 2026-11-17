@@ -14,7 +14,7 @@ project has no key.** The request and response shapes were checked against the p
 
 | | A provider key (sections 3 to 8) | Your own assistant, through the connector (section 9) |
 |---|---|---|
-| What you set up | A paid API key and a budget in Vercel | One address pasted into your assistant app |
+| What you set up | A paid API key and a budget in the Worker's secrets | One address pasted into your assistant app |
 | Cost | Billed per answer by the provider | None from this site: it runs on your own assistant subscription |
 | When the answer comes | A few seconds after "Ask the analyst" | When you tell your assistant to answer the queue |
 | Checks on the answer | The same code for both (`parseAnswer`): section 2 | The same |
@@ -89,9 +89,9 @@ with `MXA.compare`. A lesson's own replay counters belong to the engine's replay
 **Paper only.** Nothing here places an order or imports council, mirror or broker code. No key, endpoint or model name
 reaches the browser. No model name is written in the repo: the model id comes from the environment only.
 
-## 3. Environment variables (Vercel → Project → Settings → Environment Variables)
+## 3. Environment variables (the Worker's secrets since 16 Nov 2026; the Vercel project is gone)
 
-Set values in Vercel only. Never commit a value. The three marked **required** switch the analyst on; with any of them
+Set values as the Worker's secrets (`npx wrangler secret put <NAME>` in `cloudflare/`; docs/cloudflare.md) only. Never commit a value. The three marked **required** switch the analyst on; with any of them
 missing it stays off.
 
 | Variable | Meaning |
@@ -122,7 +122,7 @@ missing it stays off.
 | `ACADEMY_LLM_SYSTEM_ROLE` | `chat` format only: `system` (default) or `developer`. |
 | `ACADEMY_LLM_JSON_SCHEMA` | `1` = also send the answer's JSON schema in the format's own structured-output field. Off by default: the answer is checked in code either way, and this path has never met a real provider. |
 
-Vercel reads environment variables at deploy time: redeploy after a change.
+A changed secret takes effect at once (a new Worker version); no redeploy is needed.
 
 ## 4. Budgets, and how to change them
 
@@ -141,7 +141,7 @@ No price is written in the code. Three cases:
 One analyst ask is about 5,000 to 7,000 input tokens. With the default prices (set high on purpose) and the default output
 cap, one ask reserves about $0.25, so the default daily budget allows only a few asks. **Set the two real prices first.** To give it
 more room, raise `ACADEMY_LLM_DAILY_USD`, `ACADEMY_LLM_MONTHLY_USD`, `ACADEMY_LLM_HARD_USD` or `ACADEMY_LLM_MAX_CALLS_DAY`
-and redeploy. To spend less per ask, lower `ACADEMY_LLM_ANALYST_MAX_TOKENS`; if answers then come back "cut off at the
+(a changed secret applies at once). To spend less per ask, lower `ACADEMY_LLM_ANALYST_MAX_TOKENS`; if answers then come back "cut off at the
 output cap", raise it again or lower the model's reasoning effort through `ACADEMY_LLM_BODY`.
 
 The same question is never billed twice. The cache key is the edge, the setup, the snapshot hash, the active lessons with
@@ -171,8 +171,8 @@ Each analyst answer also carries its own `costUsd`, token counts and provider, a
 
 ## 6. Turning it off at once
 
-Set `ACADEMY_LLM_STOP` to `1` in Vercel and redeploy. No call is made from then on; every ask answers "not sent". Removing
-`ACADEMY_LLM_KEY` also switches it off and shows the "Off" line. Without a redeploy: set the daily budget of the provider
+Set the secret `ACADEMY_LLM_STOP` to `1`. No call is made from then on; every ask answers "not sent". Removing
+`ACADEMY_LLM_KEY` also switches it off and shows the "Off" line. Outside the site: set the daily budget of the provider
 account to zero on the provider's side, or revoke the key there.
 
 ## 7. What has and has not been tested
@@ -196,7 +196,7 @@ Tested, offline, in `tests/academy-analyst.test.mjs` and `scripts/audit/academy.
 - the opt-in structured-output field (`ACADEMY_LLM_JSON_SCHEMA`);
 - a provider-side fallback to another model after a declined request (it can be asked for through `ACADEMY_LLM_BODY` and
   `ACADEMY_LLM_HEADERS` where a provider documents one; the ledger would still price the call at the two prices you set);
-- the function bundle on Vercel (the route loads `api/_academy-analyst.js` and `assets/academy-core.js`; if they are
+- the Worker's bundle (the route loads `api/_academy-analyst.js` and `assets/academy-core.js`; if they are
   missing the route answers "not part of this build" and every other route keeps working).
 
 **The fake provider.** `node scripts/academy-dev.mjs --fake-llm` serves labelled test answers from
@@ -207,7 +207,7 @@ The deployed function takes no injected dependency, so no environment variable a
 
 ## 8. First-run checklist for the owner
 
-1. In Vercel set `ACADEMY_LLM_KEY`, `ACADEMY_LLM_URL`, `ACADEMY_LLM_MODEL` (`<model id>`), `ACADEMY_LLM_FORMAT` and the
+1. As Worker secrets set `ACADEMY_LLM_KEY`, `ACADEMY_LLM_URL`, `ACADEMY_LLM_MODEL` (`<model id>`), `ACADEMY_LLM_FORMAT` and the
    two prices `ACADEMY_LLM_USD_PER_MTOK_IN` and `ACADEMY_LLM_USD_PER_MTOK_OUT`. Keep the default budgets for the first day.
 2. Redeploy. Open `/academy`, go to Costs: it should say On, with your provider label and your prices.
 3. In Train, start a replay and stop on one setup. The decision card shows "Analyst (language model)" with "Ask the

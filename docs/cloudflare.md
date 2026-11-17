@@ -1,4 +1,4 @@
-# Meridian X on Cloudflare: the move, stage by stage
+# Aureum Desk on Cloudflare: the move, stage by stage
 
 Owner's decision, 16 Nov 2026: move the whole site from Vercel to Cloudflare Workers, on the Workers Paid plan
 ($5 a month, approved the same day: the free plan's 10 ms of processing a request is too little for `/cdata`, the
@@ -24,7 +24,7 @@ Secrets no longer read by anything: `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PR
   `x-real-ip` / `x-forwarded-for` from Cloudflare's `cf-connecting-ip` (what a client sends is dropped: the
   sign-in rate limit counts by that address).
 - `cloudflare/src/worker.mjs`: `/api/<name>` → `api/<name>.js`; everything else → `out/` (a path ending in `/`
-  gets `index.html`, `/macro` finds `/macro/index.html`). One cron, `*/10 * * * *` → `/api/edge-analyst?job=scan`, then
+  gets `index.html`; `/macro` is a vercel.json rewrite to the Macro desk since 17 Nov 2026). One cron, `*/10 * * * *` → `/api/edge-analyst?job=scan`, then
   `/api/trade-review?job=review` (`CHAINED`), both with `Authorization: Bearer <CRON_SECRET>`, then the Blob backup and the
   store mirror (until 17 Nov 2026 also `* * * * *` → `/api/alert-cron`, the price alerts).
 - `cloudflare/src/bundled.mjs`: the project files two handlers read from disk on Node (vercel.json `includeFiles`),
@@ -54,12 +54,12 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    Names the functions read: `OANDA_TOKEN` (`OANDA_ENV`: `practice` or unset for a practice-account token, `live` only for a
    live one; `OANDA_ACCOUNT_ID` optional, lets the live price stream skip OANDA's account lookup), `CRON_SECRET`, `SESSION_SECRET`, `CTRADER_LINK_KEY`,
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
-   `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
-   `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `NTFY_TOPIC`, `TV_WEBHOOK_KEY`, `MCP_KEYS`, `MCP_ORIGINS`,
+   `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `STORE`, `STORE_MIRROR`, `MCP_KEYS`, `MCP_ORIGINS`,
    `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
-   `EDGE_ANALYST`, `RUN_MODE`, `COUNCIL_ALERTS`. Only those set on Vercel need copying.
-3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store and
-   Edge Config, reached over HTTPS with the same tokens, so both sites read and write the same data.
+   `EDGE_ANALYST`, `TRADE_REVIEW*`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
+   `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and
+   `COUNCIL_ALERTS` are read by the council on GitHub Actions, not by the Worker.)
+3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store, reached over HTTPS with the same tokens, so both sites read and write the same data.
    **Deploy with GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`, free: the repo is public): add the
    repository secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, then Actions →
    "Cloudflare deploy" → Run workflow (or re-run its last run). It also runs on a push to the Cloudflare branches.
@@ -68,7 +68,7 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `api.cloudflare.com`, including the asset upload, which must carry the upload session's own key (401). Locally,
    `npx wrangler login && npx wrangler deploy` in `cloudflare/` does the same.
 4. Side-by-side check on the workers.dev address: the smoke and ChronosTrade audits (`PORT` / base URL), sign-in
-   as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, price alerts, the connectors.
+   as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, the connectors.
 
 **State on 16 Nov 2026 (stage 2 done):** the Worker is live at https://meridianx.meridianx-cloudflare.workers.dev, deployed by
 the Actions workflow after the owner added the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The
@@ -78,8 +78,8 @@ new links from the Profile page). The Vercel Blob store `meridian-users` still a
 `OANDA_TOKEN` is a practice-account token (`OANDA_ENV` practice). Checked: every page and short address 200, no page error
 or sideways scroll (phone signed out, phone guest, desktop), guest `/cdata` cut, protected files 401, sign-in refuses a wrong
 password, `/md/bars` candles for gold, silver, NAS100 and forex. The live stream answered `OANDA accounts 504` until
-`OANDA_ACCOUNT_ID` is set. Not yet set: VAPID keys (price-alert pushes), `GH_MCP_TOKEN`, the cTrader client trio,
-`GH_READ_TOKEN`, `EDGE_CONFIG`, `TV_WEBHOOK_KEY`. The council reads candles from the Worker (`MD_BASE` in `council.yml`).
+`OANDA_ACCOUNT_ID` is set. Not yet set: `GH_MCP_TOKEN`, the cTrader client trio,
+`GH_READ_TOKEN` (VAPID keys, `EDGE_CONFIG` and `TV_WEBHOOK_KEY` were also unset; their functions were removed on 17 Nov 2026). The council reads candles from the Worker (`MD_BASE` in `council.yml`).
 The zone `meridianx.dev` is on Cloudflare's Free plan: one rate-limiting rule (10 s window) only, and a Skip rule cannot turn
 off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/cdata/mt5/signals.csv` without a browser).
 
@@ -119,9 +119,6 @@ the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then agai
   route of the site would fail, not only the image. The other routes (workers-og; satori with @resvg/resvg-wasm) add two
   or more packages and about 2 MB of wasm, plus a TTF font (the site's own fonts are woff2, which satori cannot read).
   Revisit if @vercel/og ships a Worker build that starts, or the preview is worth that weight.
-- **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
-  alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,
-  `notice`) → KV. One copy, then Vercel's Blob store is read-only.
 - **Storage to Cloudflare**: the Blob store → the D1 file store below (built 17 Nov 2026, switch OFF until the lead
   throws it). Edge Config (`runMode`, `paused`, `notice`): not ported, removed with `api/_flags.js` on 17 Nov 2026.
 
@@ -131,7 +128,7 @@ The Vercel account is blocked; its Blob store still answers and holds users, pro
 lessons and pictures, Academy files, price alerts, cTrader links, the TradingView log, run reports and the bridge ping.
 The site can keep them in the D1 database `aureum-data` (binding `STORE_DB` in `wrangler.jsonc`) instead.
 
-**How it works.** The 15 api/ modules that use `@vercel/blob` are unchanged. `wrangler.jsonc` aliases `@vercel/blob` to
+**How it works.** The api/ modules that use `@vercel/blob` (15 until 17 Nov 2026, 11 since) are unchanged. `wrangler.jsonc` aliases `@vercel/blob` to
 `src/store-blob.mjs` and the real package to `vercel-blob-real`. Every call (`put`, `list`, `del`, `head`, …) goes to the
 real package unless the secret `STORE` is `d1` (case and spaces ignored); then to `src/store-d1.mjs`:
 - Tables `store_blobs` (pathname, size, upload time in ms, content type, etag, chunk count, `src` = `vercel` for a copy the
@@ -195,7 +192,7 @@ last (as on Vercel).
 - **Removed** (17 Nov 2026): the backup council runner (`api/run.js`, crons council / ict), which started the Trader as a
   child process (not allowed on Workers). GitHub Actions is the council's only runner.
 
-## Stage 4: the domain
+## Stage 4: the domain (done 16 Nov 2026 with aureumdesk.co.uk instead; kept as the plan it was)
 
 Move meridianx.dev's DNS to Cloudflare, add the Worker as its custom domain, recreate the firewall rules (scanner
 paths, writes outside /api, rate limits: /cdata 600 / min, /api 30 / min, /md 900 / min per IP; no timed blocks;
