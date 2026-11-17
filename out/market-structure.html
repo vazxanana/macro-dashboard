@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Aureum Desk">
 <title>Aureum Desk</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/assets/aureum-mark.svg?v=0bdb0e5e4b">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Aureum Desk trading desk: gold, indices, FX and crypto structure, the AI council's live paper trades and the ICT desk.">
@@ -1427,8 +1427,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const defName = who === 'guest' ? 'Guest' : who === 'owner' ? 'Admin' : who;
   const role = who === 'guest' ? 'Guest · public view' : who === 'owner' ? 'Owner · full access' : document.documentElement.dataset.role === 'viewer' ? 'Viewer · setups, calendar, active trades' : 'Reviewer · read-only, loss reviews';
   // default portrait (graphite look, 17 Nov 2026): a silver bust for named users, a steel-grey one for guests
-  const hue = who === 'guest' ? 215 : 38;   // gold monogram for named users, cool silhouette for guests
-  const svg = (id) => `<svg viewBox="0 0 40 46" aria-hidden="true"><defs><linearGradient id="avb${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue} 10% 70%)"/><stop offset="1" stop-color="hsl(${hue} 8% 34%)"/></linearGradient><linearGradient id="avf${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/></linearGradient></defs><rect width="40" height="46" fill="url(#avb${id})"/>${who === 'guest' ? `<circle cx="20" cy="17.5" r="7.5" fill="url(#avf${id})"/><path d="M5 46c1.5-9 7.5-14 15-14s13.5 5 15 14z" fill="url(#avf${id})"/>` : `<ellipse cx="20" cy="23" rx="15" ry="17.5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/><text x="20" y="30.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="21" font-style="italic" fill="url(#avf${id})">${esc1((get('name') || defName).trim().charAt(0).toUpperCase())}</text>`}</svg>`;
+  const hue = who === 'guest' ? 215 : 216;   // a silver monogram for named users, a steel-grey silhouette for guests (no warm tint)
+  const svg = (id) => `<svg viewBox="0 0 40 46" aria-hidden="true"><defs><linearGradient id="avb${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue} 10% 70%)"/><stop offset="1" stop-color="hsl(${hue} 8% 34%)"/></linearGradient><linearGradient id="avf${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/></linearGradient></defs><rect width="40" height="46" fill="url(#avb${id})"/>${who === 'guest' ? `<circle cx="20" cy="17.5" r="7.5" fill="url(#avf${id})"/><path d="M5 46c1.5-9 7.5-14 15-14s13.5 5 15 14z" fill="url(#avf${id})"/>` : `<ellipse cx="20" cy="23" rx="15" ry="17.5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/><text x="20" y="30.5" text-anchor="middle" font-family="Inter, Figtree, system-ui, sans-serif" font-size="19" font-weight="650" fill="url(#avf${id})">${esc1((get('name') || defName).trim().charAt(0).toUpperCase())}</text>`}</svg>`;
   function esc1(c) { return c.replace(/[&<>"']/g, ''); }
   const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night'; };
   const $ = (id) => document.getElementById(id);
@@ -1470,6 +1470,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const sm = document.querySelector('#ms-me > summary'); if (sm) sm.setAttribute('aria-label', `${greet()}, ${name}. Account menu`);
     // the Profile card shows the same photo and name: it used to copy them 400 ms after the button press, before the member had chosen
     if ($('ms-pf-av') && $('ms-me-av2')) $('ms-pf-av').innerHTML = $('ms-me-av2').innerHTML; if ($('ms-pf-name') && who !== 'guest') $('ms-pf-name').textContent = name;
+    if ($('ms-pf-av')) $('ms-pf-av').innerHTML = $('ms-pf-av').innerHTML.replace(/(id="|url\(#)av/g, '$1pfav');   // its own gradient ids: a copy pointing at the hidden menu's drew an empty circle (17 Nov 2026)
   }
   document.addEventListener('DOMContentLoaded', () => {
     paint(); setInterval(paint, 60e3); pullProfile();
@@ -4471,7 +4472,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
 :is(#v-setup, #v-scanner) :is(#ms-td-bias, #ms-lvl-count, #ms-scan-meta, .ms-dot, .lv-h, .ms-al, .ms-chip, .ms-st,
   .tr-d, .ms-q, .ms-tr-n, .ms-tag, .ms-tr-g > span, #ps-t-kv > div > span, .ms-risk label, .lv-p, .lv-r, .lv-d, .chip, th, i.u, i.d,
   small:not(.ms-k small)) { font-size: 12px; }
-#v-setup .ms-tr-g > span { letter-spacing: .3px; }
+#v-setup .ms-tr-g > span { letter-spacing: 0; text-transform: none; }   /* sentence case (17 Nov 2026, design pass) */
 @media (hover: none), (pointer: coarse) {
   :is(#v-setup, #v-scanner) :is(#ms-scan-btn, #ms-risk, button.ms-bell) { min-height: 44px; }
   #v-setup label:has(> input[type="checkbox"]) { min-height: 44px; display: flex; align-items: center; }
@@ -4781,7 +4782,9 @@ html[data-role="public"] .me .me-out { color: var(--au-accent); font-weight: 600
 #v-home .h-mk-h h2::before { display: none; }
 #v-home .h-mk a:hover, #v-home .h-mk [data-mk-card]:hover, #v-home a.tile:hover { transform: none; box-shadow: var(--au-shadow); border-color: var(--au-line-strong); }
 #v-home .tile.wide { background: var(--au-surface) !important; }
-#v-home .h-go .h-go-ico, #v-home .h-go-council .h-go-ico, #v-home .h-go-scanner .h-go-ico, #v-home .h-go-charts .h-go-ico { background: var(--au-surface-2) !important; }
+/* the section icons (17 Nov 2026, design pass): an older rule painted the masked glyph in --au-surface-2 on its own --au-surface-2 square,
+   so each tile showed an empty box; the glyph is ink again, 16 px, centred in its square */
+#v-home .h-go .h-go-ico, #v-home .h-go-council .h-go-ico, #v-home .h-go-scanner .h-go-ico, #v-home .h-go-charts .h-go-ico { width: 16px; height: 16px; margin: -8px 0 0; border-radius: 0; background: var(--au-ink-2) !important; }
 #v-home .tile-k { font-weight: 600; color: var(--au-ink); }
 #v-home .h-act .c-link, #v-home .tile-go { color: var(--au-accent); }
 @media (min-width: 641px) {
@@ -4820,6 +4823,13 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 /* 17 Nov 2026, owner: the header switch is rectangular, not a pill (Desk | Macro | ChronosTrade | Academy) */
 .hdr-sw { border-radius: 8px !important; } .hdr-sw::before, .hdr-sw::after { border-radius: inherit !important; }
 .hdr-sw a { border-radius: 6px !important; } .hdr-sw a i { border-radius: 2px !important; }
+
+/* ── design pass (17 Nov 2026): what a look at the pages found ── */
+/* Market pulse: flat cards, the colour stays in the three trend bars (it was a red / green wash over every card) */
+.pz { background: var(--au-surface); }
+.pz:hover { border-color: var(--au-line-strong); }
+/* phone header: the account button was cut off by 17 px at 390 px (7 px at 360): tighter gaps, nothing hidden */
+@media (max-width: 430px) { .top { gap: 6px; } .top .inst { padding-right: 10px; } .top-actions .nt-bell { margin-right: 0; } .top-actions #ms-me { margin-left: 0; } }
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -11839,7 +11849,7 @@ function msNextSetup(bars, A) {
   window.msProfile = function () {
     if (document.documentElement.dataset.role === 'public' || !userKey()) return;
     MODE = 'page';
-    const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML; };
+    const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML.replace(/(id="|url\(#)av/g, '$1pfav'); };   // the portrait's gradients get ids of their own: a copy pointing at the hidden menu's drew nothing
     cp('ms-me-av2', 'ms-pf-av'); cp('ms-me-name2', 'ms-pf-name'); cp('ms-me-role', 'ms-pf-role'); cp('ms-me-today', 'ms-pf-today');
     ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
     if ($('ms-pf-theme') && $('ms-me-theme')) $('ms-pf-theme').textContent = $('ms-me-theme').textContent;
@@ -12909,9 +12919,9 @@ function msNextSetup(bars, A) {
     $('ms-tr-list').innerHTML = S.length ? S.map(function (s) { var a = s.windows.all, k = 's:' + s.key, nf = arr(s.flags).length;
       return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b><span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>' + (s.retired ? '<span class="tr-chip">no longer live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
         + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + fT(a.net.t) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
-      : '<li class="tr-body"><p>' + (J ? 'No ' + esc(BOOK[st.b] || '') + ' stream has a closed trade on file.' : 'Loading…') + '</p></li>';
+      : '<li class="tr-body"><p>' + (J ? 'No ' + esc(BOOK[st.b] || '') + ' stream has a closed trade on file.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
     var P = arr(J && J.proposals);
-    $('ms-tr-props').innerHTML = P.length ? P.map(propHTML).join('') : '<li class="tr-body"><p>' + (J ? 'No pattern in the trades reaches |t| ≥ 2 with enough trades: nothing to propose.' : 'Loading…') + '</p></li>';
+    $('ms-tr-props').innerHTML = P.length ? P.map(propHTML).join('') : '<li class="tr-body"><p>' + (J ? 'No pattern in the trades reaches |t| ≥ 2 with enough trades: nothing to propose.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
     $('ms-tr-ai').innerHTML = aiHTML(st.ai);
   }
   box.addEventListener('click', function (ev) { var b = ev.target.closest('#ms-tr-seg button'); if (!b) return; st.b = b.dataset.b; try { localStorage.setItem('msTrBook', st.b); } catch (e) {} render(); });
@@ -12922,7 +12932,7 @@ function msNextSetup(bars, A) {
   if (role === 'public' || role === 'viewer') return;   // admin card: the file and the API are for the owner and reviewers
   var SITE = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
   function load() {
-    if (W.msData) W.msData.json('research/trade-review.json').then(function (j) { st.J = j; render(); }).catch(function () { st.J = null; render(); });
+    if (W.msData) W.msData.json('research/trade-review.json').then(function (j) { st.J = j; st.done = true; render(); }).catch(function () { st.J = null; st.done = true; render(); });
     if (!SITE) { st.aiErr = 'Available on aureumdesk.co.uk (it needs the site\u2019s server).'; render(); return; }
     fetch('/api/trade-review', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
       if (r.status === 401 || r.status === 403) { st.aiErr = 'Sign in as the owner or a reviewer to see it.'; return null; }
