@@ -2193,6 +2193,18 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   "Honest assumptions" stay open). Tests: `tests/side-pages.test.mjs` ("phone simple view"); the smoke test opens each tab's folds
   on the phone and fails on a block or chart past the screen or a tab with no phone button.
 
+- **Gold terminal, graphite look** (16-17 Nov 2026, owner: "do another one with other colors like grey"; display only, the locked
+  features, the driver stack, every score and the candle colours untouched). One block `GRAPHITE (17 Nov 2026 …)` right before the
+  phone simple view's block defines the `docs/design/aureum-theme.md` tokens (`--au-*`) for light, dark and midnight and points every
+  older name at them (`--panel`, `--line`, `--text-*`, `--mint` = the steel-blue accent, `--accent-green/red/blue`, `--amber`,
+  `--gold-ink`; the starfield, teal arc and mint glows are off). Its rules start with `:root:root` only to rise above the older
+  theme layers; they set colour, font, border and shadow, never the simple view's layout (keep it so). `--gx-up` / `--gx-dn` (and
+  `-rgb`) are not touched, so `makeStructPrimitive`'s marks and the S/D zones look as before. The top bar's first link is the
+  wordmark (`.pnav-desk`: the text "Desk", `::before` "Aureum", `.ms-coin` silver mark, back to the Desk; the qa test reads its
+  text), then `.rail-brand` "/ Gold terminal". Charts read `--au-line` (grid) and `--au-ink-3` (text) in `gxPalette`. The two
+  infinite animations (hero live dot, session dot) run three times; the MTF legend no longer says "highest probability". Left:
+  the daily bias still shows its "60%" agreement figure (computeDailyBias's `conf`), and the theme / alert buttons are emoji.
+
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
 bias meter (his month "closes above today" call vs its 10-year base rate: supportive / against at ±`LEAN_PTS` 3 points, else neutral;
