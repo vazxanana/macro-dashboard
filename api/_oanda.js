@@ -1,4 +1,4 @@
-// OANDA instrument names for the page's market keys (shared by bars.js, stream.js, push.js and alert-cron.js).
+// OANDA instrument names for the page's market keys (shared by bars.js and stream.js).
 // One row per market: [page key (lowercase), OANDA instrument, display decimals (OANDA displayPrecision), group].
 // Every key below is served by /md/bars (candles), /md/stream (ticks) and the price alerts with the same rate limit (firewall
 // /md 900/min per IP), edge caching and candle shape; the weekly daily-cache.yml workflow keeps D1 history of every row in

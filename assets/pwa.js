@@ -1,6 +1,5 @@
-// Registers /sw.js (installable app, offline page, price-alert notifications) and keeps it current. scripts/pwa.mjs links this
-// file into every built page. Open any page with ?sw-reset to remove the worker and its caches on this device (price alerts on
-// that device then need turning on again).
+// Registers /sw.js (installable app, offline page) and keeps it current. scripts/pwa.mjs links this
+// file into every built page. Open any page with ?sw-reset to remove the worker and its caches on this device.
 (function () {
   'use strict';
   var sw = navigator.serviceWorker;

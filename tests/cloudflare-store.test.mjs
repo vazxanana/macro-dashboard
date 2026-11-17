@@ -319,7 +319,7 @@ test('notices (notify.js) and the profile (profile.js) on D1: written in place, 
   } finally { delete ENV.STORE; }
 });
 
-test('lesson pictures (mosha-lessons.js store) and price alerts (_alerts.js) on D1: chunked pictures, no overwrite, pages of devices', async () => {
+test('lesson pictures (mosha-lessons.js store) on D1: chunked pictures, no overwrite', async () => {
   await d1World();
   try {
     const ML = require('../api/mosha-lessons.js'), st = ML.blobStore(ENV), pic = crypto.randomBytes(Math.round(1.5 * 1024 * 1024));
@@ -328,12 +328,6 @@ test('lesson pictures (mosha-lessons.js store) and price alerts (_alerts.js) on 
     await assert.rejects(st.putImg('abc123', 'image/jpeg', pic), /already exists/, 'a picture is never overwritten');
     await st.put([{ id: 'l1', shots: [{ img: 'abc123', type: 'image/jpeg' }] }]); assert.equal((await st.get())[0].id, 'l1');
     await st.delImg('abc123', 'image/jpeg'); assert.equal(await st.getImg('abc123', 'image/jpeg'), null);
-    const AL = require('../api/_alerts.js');
-    for (const id of ['d1', 'd2', 'd3']) await AL.save(id, { sub: { endpoint: id }, alerts: [] }, []);
-    const { by, blobs } = await AL.all(); assert.equal(by.size, 3);
-    await AL.save('d1', { sub: { endpoint: 'd1' }, alerts: [{ id: 1 }] }, blobs);
-    const two = await AL.all(); assert.equal(two.blobs.length, 3, 'the device\'s older file was deleted');
-    assert.deepEqual((await AL.read(two.by.get('d1'))).alerts, [{ id: 1 }]);
   } finally { delete ENV.STORE; }
 });
 
@@ -355,7 +349,8 @@ test('wiring: the binding and aliases, the switch loads before any handler, the 
 
 test('coverage: the api/ modules use only list, put and del of @vercel/blob, with options the D1 store takes, and store no blob URL', () => {
   const files = fs.readdirSync('api').filter((f) => /\.m?js$/.test(f)).filter((f) => fs.readFileSync(`api/${f}`, 'utf8').includes("require('@vercel/blob')"));
-  assert.equal(files.length, 15, files.join(' '));
+  // 15 until 17 Nov 2026; run.js, status.js (runner reports), tv-webhook.js and _alerts.js (price alerts) were removed
+  assert.equal(files.length, 11, files.join(' '));
   const used = new Set(), opts = new Set();
   for (const f of files) {
     const t = fs.readFileSync(`api/${f}`, 'utf8');

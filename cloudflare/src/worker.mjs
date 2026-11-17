@@ -11,7 +11,6 @@ import './store-blob.mjs';   // first: the @vercel/blob the handlers load (the D
 
 import academyMcp from '../../api/academy-mcp.js';
 import academy from '../../api/academy.js';
-import alertCron from '../../api/alert-cron.js';
 import bars from '../../api/bars.js';
 import bridge from '../../api/bridge.js';
 import ctraderLink from '../../api/ctrader-link.js';
@@ -25,7 +24,6 @@ import moshaLessons from '../../api/mosha-lessons.js';
 import mosha from '../../api/mosha.js';
 import notify from '../../api/notify.js';
 import profile from '../../api/profile.js';
-import push from '../../api/push.js';
 import sounds from '../../api/sounds.js';
 import status from '../../api/status.js';
 import stream from '../../api/stream.js';
@@ -34,13 +32,14 @@ import users from '../../api/users.js';
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
-  'academy-mcp': academyMcp, academy, 'alert-cron': alertCron, bars, bridge, 'ctrader-link': ctraderLink, data,
+  'academy-mcp': academyMcp, academy, bars, bridge, 'ctrader-link': ctraderLink, data,
   'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify,
-  profile, push, sounds, status, stream, 'trade-review': tradeReview, users,
+  profile, sounds, status, stream, 'trade-review': tradeReview, users,
 };
 
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.
-export const CRONS = { '* * * * *': '/api/alert-cron', '*/10 * * * *': '/api/edge-analyst?job=scan' };
+// 17 Nov 2026: the every-minute price-alert cron went with the price alerts; the 10-minute one is left.
+export const CRONS = { '*/10 * * * *': '/api/edge-analyst?job=scan' };
 // Jobs run after a cron's own job, with the same secret (no new trigger: the plan's cron count stays). The trade reviewer
 // (17 Nov 2026) asks the language model at most once every 12 hours, and only for a new council-data reading.
 export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };

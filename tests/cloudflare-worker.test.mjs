@@ -55,10 +55,10 @@ test('cloudflare: every function of api/ is routed', () => {
   assert.doesNotMatch(src, /const GONE/);
   assert.match(src, /name === 'og'\) return Response\.redirect\(new URL\('\/icons\/og-card\.png'/);
   assert.ok(fs.existsSync('icons/og-card.png'));
-  // The cron secret is sent, and only the two jobs that work on Workers are scheduled.
+  // The cron secret is sent, and only the 10-minute job is scheduled (17 Nov 2026: the minute price-alert cron is gone).
   const wr = fs.readFileSync('cloudflare/wrangler.jsonc', 'utf8');
-  assert.match(wr, /"crons": \["\* \* \* \* \*", "\*\/10 \* \* \* \*"\]/);
-  assert.match(src, /'\* \* \* \* \*': '\/api\/alert-cron'/);
+  assert.match(wr, /"crons": \["\*\/10 \* \* \* \*"\]/);
+  assert.doesNotMatch(src, /alert-cron|'\* \* \* \* \*'/);
   assert.match(src, /'\*\/10 \* \* \* \*': '\/api\/edge-analyst\?job=scan'/);
   assert.match(src, /Bearer \$\{env\.CRON_SECRET/);
   // No secret in the config file.
