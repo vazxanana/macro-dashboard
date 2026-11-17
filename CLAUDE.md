@@ -2175,6 +2175,26 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   library) named an assistant product in its title and headings and had words run together in its source (done 12 Nov 2026: the
   names are neutral, the spacing mended, `tests/no-model-names.test.mjs` guards rule 6); the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
+- **Graphite look on the side pages and the Macro desk** (16-17 Nov 2026, owner: "do another one with other colors like grey";
+  spec `docs/design/aureum-theme.md`). `assets/mx-page.css` defines the `--au-*` tokens for dark / light / midnight and points every
+  older name at them (`--bg`, `--panel`, `--ink`, `--accent` = the steel-blue `--au-accent`, `--buy` / `--sell`, `--gold` = the
+  neutral `--au-primary`, `--gold-ink` = the accent), so the Academy, which loads the same file, follows it. Shared parts: the
+  wordmark (`.coin` = the silver "A" mark, `.wm-a` / `.wm-d`; under 420 px DESK stays only in the link's name), the switch
+  `.hdr-sw` (no conic ring: the active place raised with a 2 px accent underline), `.btn` (secondary), `.btn.gold` (the one
+  primary action, a solid neutral fill despite its old name), `.btn.quiet`, `.mx-head` / `.mx-lede` / `.mx-head-a` (title, one
+  sentence, the action on the right), `.mx-sh`, `.mx-card`, `.mx-chip` (filter toggles), `.foot .mx-fb`. Fonts: the pages' Google
+  link asks for `Inter:300..800` (vendored) instead of Figtree. `macro-desk.html` does not load mx-page.css: it keeps literal token
+  values per theme (a test reads its light blocks), so **keep the two in step**; its section titles and tile labels are sentence
+  case in the ink, the stale stamp uses `--au-warn`, the signed-out gate `#md-gate` is a card with the mark and one primary button
+  (same sentence). Edge lab: a filter bar `#flt` (search `#flt-q`, verdict chips `#flt-v`, order `#flt-s`: reading order /
+  newest first / A to Z; `decorate` / `applySort` / `applyFilter` run at the end of `render()` before `deepLink()`, which clears
+  the filter when the linked row is hidden; display only), rows stagger at most 12 x 30 ms, the "Running" dot pulses three times.
+  Veteran library: a 16 px body at about 72 characters, the facts as one quiet line, the document list folded on phones (opens
+  while searching, folds after a choice). /macro: the head action "Open the Macro desk" (members) and a "Tools" heading; tool dots
+  are neutral. offline.html: the same tokens inline, the mark drawn in CSS, the Desk's theme setting read. Measured: every text
+  token 4.5:1 or more on bg / surface / surface-2 in all three themes (lowest light gain on surface-2, 4.82); 72 page states
+  (5 pages x 360 / 390 / 430 / 1440 x three themes, signed in and out, folds open) with no text under 12 px, no touch target
+  under 44 px, no text under AA and no sideways scroll.
 - **Gold terminal, simple phone view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the
   phone"; display only, no number, score or rule changed, the locked features untouched). At 640 px and under the head script sets
   `html[data-phone="simple"]` unless this device chose Full (localStorage `ms-phone` = "full": the Desk's key and its "Phone view:
