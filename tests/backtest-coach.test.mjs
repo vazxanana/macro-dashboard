@@ -166,7 +166,8 @@ test('drawings: "entered away from your drawn levels" is a suggestion, and the "
 });
 
 test('page: new drawings carry the replay moment; drawings reach the coach', () => {
-  assert.match(page, /S\.draw\.push\(\{ type: 'h', price: rnd\(pp\), at: mom\(\) \}\)/);
-  assert.match(page, /S\.draw\.push\(\{ type: DT, t1: DP\.t, p1: DP\.p, t2: tt, p2: rnd\(pp\), at: mom\(\) \}\)/);
+  // every new shape (any tool, 17 Nov 2026) is stamped at the moment it is drawn, then pushed; a clone is a new drawing
+  assert.match(page, /const finish = \(pt\) => \{ const d = DT === 'h'[^\n]*\n\s*d\.at = mom\(\);[^\n]*S\.draw\.push\(d\)/);
+  assert.match(page, /c\.at = mom\(\); delete c\.editedAt;/);
   assert.equal((page.match(/draw: S\.draw, dec: S\.dec/g) || []).length, 2);
 });

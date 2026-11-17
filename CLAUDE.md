@@ -2142,8 +2142,44 @@ refused in live.json, never asked again). Limits: one live call in flight and on
 events in between get their free note only), `CHRONOS_LIVE_PER_DAY` 60 an account a UTC day (its own counter, memory, per
 instance), output cap `CHRONOS_LIVE_MAX_TOKENS` 1500. Playback never waits; "Pause the replay while the coach answers" (memory
 only, off) presses the play control and presses it again after. Tests: `tests/llm-stream.test.mjs` (4), `tests/chronos-live.test.mjs`
-(8); audit section 38 (toggle, panel off the quick bar, notes on entry / exit / draft with the AI off, the AI on with a stubbed
+(8); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft with the AI off, the AI on with a stubbed
 stream and a withdrawn answer, the 20 s rule, AA in three themes, phone strip).
+
+Drawing tools like TradingView (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend
+line, magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop
+(a test reads the page block `// ---- drawing tools like TradingView` for order calls, `.stop =` and `S.acct`).
+- **Tools** (main chart only; split panes never draw): cursor, trend line `t`, horizontal line `h`, horizontal ray `hr`,
+  vertical line `v`, box `r`. In the Draw menu (`#drawdd`, also in More on a phone) and a vertical strip `#dstrip` on the chart's
+  left edge (shown on a chart card over 640 px, over 860 px on touch; the position tags `#ptags` and the draft readout `#dchip`
+  move right by its width, `OG.sw`). Keys: **Alt+T** trend line, **Alt+H** horizontal line, **Alt+J** horizontal ray,
+  **Alt+V** vertical line, **Alt+R** box, **Alt+M** magnet (read from `e.code`, so a Mac's Option letters work); H / T / R alone
+  still pick a tool (T also teaches the Mosha desk for a teacher, as before); Delete / Backspace removes the selected drawing,
+  Esc lets go (or puts back a drag in progress). All listed in Help (`#hk`).
+- **Placing**: click, click, or press and drag (touch: press-drag or tap, tap); one click for h / hr / v. A new shape is selected.
+  The drawing layer takes the press (`dStart`, a capture listener on `#chart`), so the chart does not pan; Shift+drag and the
+  quick bar's drag button still place orders (they are checked first), and a trade's line under the pointer wins over a
+  drawing's body (a selected drawing's handle wins over it).
+- **Magnet** (`btLab:magnet`, per device: off / weak / strong): `BT.drawSnap` puts a point on the open / high / low / close of the
+  REPLAYED candle under it (`barAt`: never past the replay moment), nearest in pixels; weak within 12 px, strong always. It acts
+  when placing, resizing, moving (the first point snaps, the rest moves by the same change) and dragging a horizontal line. With
+  a tool on, a ring shows where the click will land.
+- **Editing**: a click selects (`pickDraw`: the selected one first, then the newest; handles 7 px, 22 px on touch). Handles:
+  a line's ends, a ray's start, a box's four corners (both coordinates) and four edge midpoints (one coordinate); the body moves
+  the whole shape through pixels (`BT.drawMove` with `timeToX` / `xToTime`, so a move keeps its shape across weekend gaps).
+  A horizontal line stays a price line (axis label) and drags as before; its release selects it (`hDone`). Cursors name the
+  action (`#chart[data-dcur]`). Floating bar `#dsel` above the selected drawing: five colours from tokens (`col`: draw / up /
+  dn / gold / ink, read from `CT` per theme), width 1-3 px (`w`), dashed (`ls`), extend right (`ext`, trend line), label (`lbl`,
+  trend line and box: price change, %, bars by `BT.barsBetween`, and the angle on screen; off by default), lock (`lock`: no
+  move, resize or delete until unlocked), clone, delete. 44 px on touch; 12 px text.
+- **Stored shape**: `S.draw` as before, points [time, price]; `BT.drawNorm` checks every shape on resume (old h / t / r and the
+  Mosha hand-over load unchanged; unknown fields and bad values dropped). `at` = the moment drawn, set only for a new shape or a
+  clone; a geometry edit stamps `editedAt` and keeps `at`; the trade coach still reads `at` only (`coachDraw` now also counts a
+  horizontal ray as a level; a vertical line is no level).
+- Pure helpers on `BT`: `drawNorm`, `drawSnap`, `drawGeom`, `drawHit`, `drawResize`, `drawMove`, `barsBetween`, `drawInfo`.
+  `window.ctDraw()` / `window.ctBarAt(t)` are the audit's read-only views. Tests: `tests/backtest-draw.test.mjs`; audit section
+  38 (strip, Alt+M, a box drawn with the magnet strong has both corners on candle O / H / L / C, corner resize, trend-line move,
+  colour and width, Delete, Alt+V / Alt+J, the account untouched, a reload keeps them and loads an old-format drawing;
+  screenshots `draw-strip.png`, `draw-selected.png`, `draw-magnet.png`).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other

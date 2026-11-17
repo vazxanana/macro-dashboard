@@ -311,10 +311,10 @@
   // through its two [time, price] points (extended both ways), no pixels. Levels = price lines, box edges, trend-line values.
   const AT_LEVEL = 0.5;   // within half an ATR of a drawn level = "at your level"
   function lineAt(d, t) { return d.t2 === d.t1 ? d.p2 : d.p1 + (d.p2 - d.p1) * (t - d.t1) / (d.t2 - d.t1); }
-  function coachDraw(draw, T, o, atr) { const list = (draw || []).filter((d) => d && ['h', 't', 'r'].includes(d.type) && !(d.at > T)); if (!list.length || !(atr > 0)) return list.length ? { n: list.length } : null;
+  function coachDraw(draw, T, o, atr) { const list = (draw || []).filter((d) => d && ['h', 'hr', 't', 'r'].includes(d.type) && !(d.at > T)); if (!list.length || !(atr > 0)) return list.length ? { n: list.length } : null;
     const dir = o.side === 'buy' ? 1 : -1, e = o.entry, at = o.at || T, lv = [], items = [];
     for (const d of list) {
-      if (d.type === 'h') { lv.push({ kind: 'line', price: d.price }); items.push({ kind: 'line', price: d.price, dAtr: r2s(Math.abs(e - d.price) / atr) }); }
+      if (d.type === 'h' || d.type === 'hr') { const pr = d.type === 'h' ? d.price : d.p1; lv.push({ kind: 'line', price: pr }); items.push({ kind: 'line', price: pr, dAtr: r2s(Math.abs(e - pr) / atr) }); }
       else if (d.type === 'r') { const hi = Math.max(d.p1, d.p2), lo = Math.min(d.p1, d.p2), inside = e >= lo && e <= hi; lv.push({ kind: 'box edge', price: hi }, { kind: 'box edge', price: lo }); items.push({ kind: 'box', hi, lo, inside, dAtr: inside ? 0 : r2s(Math.min(Math.abs(e - hi), Math.abs(e - lo)) / atr) }); }
       else { const v = lineAt(d, at), side = e > v ? 'above' : e < v ? 'below' : 'on'; lv.push({ kind: 'trend line', price: v }); items.push({ kind: 'trend line', value: r2s(v), side, respects: side === 'on' || (side === 'above') === (dir === 1), dAtr: r2s(Math.abs(e - v) / atr) }); } }
     const near = lv.slice().sort((x, y) => Math.abs(e - x.price) - Math.abs(e - y.price))[0], nearAtr = r2s(Math.abs(e - near.price) / atr), atLevel = nearAtr <= AT_LEVEL;
@@ -389,8 +389,64 @@
     if (out.lead) { const L = out.lead; L.text = `Your largest difference: ${L.label.toLowerCase()} (${L.name.charAt(0).toLowerCase() + L.name.slice(1)}) made ${sR(L.meanR)} a trade (n ${L.n}) against ${sR(L.restMeanR)} for the rest (n ${L.restN})${L.t != null ? `, Welch t ${L.t.toFixed(2)}` : ''}. Your record, not a tested edge.`; }
     return out; }
 
+
+  // ---- drawing tools (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend line,
+  // magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop.
+  // A shape is { type, …points, at, editedAt?, col?, w?, ls?, ext?, lock?, lbl? }; points are [time, price] like before:
+  //   h  horizontal line { price }          hr horizontal ray { t1, p1 } (from t1 to the right)
+  //   v  vertical line { t1 }               t  trend line { t1, p1, t2, p2 } (ext: extended to the right)
+  //   r  box { t1, p1, t2, p2 }             at = the replay moment it was drawn (the trade coach reads only at <= the entry);
+  // an edit keeps at and stamps editedAt. Older sessions and the Mosha hand-over store h / t / r without the style fields.
+  const DRAW_TYPES = ['h', 'hr', 'v', 't', 'r'], DRAW_COLS = ['draw', 'up', 'dn', 'gold', 'ink'];
+  const fin = (v) => typeof v === 'number' && Number.isFinite(v);
+  function drawNorm(list) { const out = []; for (const d of Array.isArray(list) ? list : []) { if (!d || !DRAW_TYPES.includes(d.type)) continue;
+      const need = d.type === 'h' ? ['price'] : d.type === 'v' ? ['t1'] : d.type === 'hr' ? ['t1', 'p1'] : ['t1', 'p1', 't2', 'p2']; if (!need.every((k) => fin(d[k]))) continue;
+      const o = { type: d.type }; for (const k of need) o[k] = d[k]; if (fin(d.at)) o.at = d.at; if (fin(d.editedAt)) o.editedAt = d.editedAt;
+      if (DRAW_COLS.includes(d.col) && d.col !== 'draw') o.col = d.col; if ([2, 3].includes(d.w)) o.w = d.w; if (d.ls === 'dash') o.ls = 'dash';
+      if (d.ext === true && d.type === 't') o.ext = true; if (d.lock === true) o.lock = true; if (d.lbl === true && (d.type === 't' || d.type === 'r')) o.lbl = true; out.push(o); }
+    return out; }
+  // magnet: the price snaps to the hovered candle's open / high / low / close nearest in pixels; weak (1) only within tol px,
+  // strong (2) always; off (0) leaves it. Y maps a price to its pixel row. A point with no candle under it is left alone.
+  function drawSnap(bar, price, Y, mode, tol = 12) { if (!mode || !bar || !fin(price)) return price; const yp = Y(price); if (yp == null) return price; let best = null, bd = Infinity;
+    for (const v of [bar.open, bar.high, bar.low, bar.close]) { const yy = Y(v); if (yy == null) continue; const dd = Math.abs(yy - yp); if (dd < bd) { bd = dd; best = v; } }
+    return best != null && (mode >= 2 || bd <= tol) ? best : price; }
+  // pixel geometry of a shape: X maps a time to x, Y a price to y, W / H the price pane. null when a point is off the scales.
+  function drawGeom(d, X, Y, W, H) { const g = { type: d.type, pts: [] };
+    if (d.type === 'h') { const y = Y(d.price); if (y == null) return null; Object.assign(g, { x1: 0, y1: y, x2: W, y2: y }); g.pts = [['a', W / 2, y]]; return g; }
+    if (d.type === 'v') { const x = X(d.t1); if (x == null) return null; Object.assign(g, { x1: x, y1: 0, x2: x, y2: H }); g.pts = [['a', x, H / 2]]; return g; }
+    const x1 = X(d.t1), y1 = Y(d.p1); if (x1 == null || y1 == null) return null;
+    if (d.type === 'hr') { Object.assign(g, { x1, y1, x2: Math.max(x1, W), y2: y1 }); g.pts = [['a', x1, y1]]; return g; }
+    const x2 = X(d.t2), y2 = Y(d.p2); if (x2 == null || y2 == null) return null; Object.assign(g, { x1, y1, x2, y2 });
+    if (d.type === 't') { g.pts = [['a', x1, y1], ['b', x2, y2]]; if (d.ext && x2 !== x1) { const k = (y2 - y1) / (x2 - x1), xe = x2 > x1 ? W : 0; g.xe = xe; g.ye = y2 + k * (xe - x2); } return g; }
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; g.pts = [['c11', x1, y1], ['c22', x2, y2], ['c12', x1, y2], ['c21', x2, y1], ['ep1', mx, y1], ['ep2', mx, y2], ['et1', x1, my], ['et2', x2, my]]; return g; }
+  const segD = (xp, yp, ax, ay, bx, by) => { const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy, u = L2 ? Math.max(0, Math.min(1, ((xp - ax) * dx + (yp - ay) * dy) / L2)) : 0; return Math.hypot(xp - (ax + u * dx), yp - (ay + u * dy)); };
+  // what the pointer is on: a handle ('a', 'b', a box corner 'c11' / 'c22' / 'c12' / 'c21' or edge 'ep1' / 'ep2' / 'et1' /
+  // 'et2') within hTol px, else the body (the line, the box's inside or outline) within tol px, else null
+  function drawHit(g, xp, yp, tol = 6, hTol = 7) { if (!g) return null; let best = null, bd = Infinity;
+    for (const [k, x, y] of g.pts) { const dd = Math.hypot(xp - x, yp - y); if (dd <= hTol && dd < bd) { bd = dd; best = k; } } if (best) return best;
+    if (g.type === 'h') return Math.abs(yp - g.y1) <= tol ? 'body' : null;
+    if (g.type === 'v') return Math.abs(xp - g.x1) <= tol && yp >= 0 && yp <= g.y2 ? 'body' : null;
+    if (g.type === 'r') return xp >= Math.min(g.x1, g.x2) - tol && xp <= Math.max(g.x1, g.x2) + tol && yp >= Math.min(g.y1, g.y2) - tol && yp <= Math.max(g.y1, g.y2) + tol ? 'body' : null;
+    const ex = g.xe != null ? g.xe : g.x2, ey = g.ye != null ? g.ye : g.y2; return segD(xp, yp, g.x1, g.y1, ex, ey) <= tol ? 'body' : null; }
+  // drag a handle to (t, p): a trend line's or ray's end, a box corner (both coordinates) or edge (one), a vertical line's time
+  function drawResize(d, part, t, p) { const o = { ...d };
+    if (d.type === 'h') { if (fin(p)) o.price = p; return o; } if (d.type === 'v') { if (fin(t)) o.t1 = t; return o; }
+    const set = (tk, pk) => { if (tk && fin(t)) o[tk] = t; if (pk && fin(p)) o[pk] = p; };
+    if (d.type === 'hr' || d.type === 't') { if (part === 'a') set('t1', 'p1'); else if (part === 'b' && d.type === 't') set('t2', 'p2'); return o; }
+    ({ c11: () => set('t1', 'p1'), c22: () => set('t2', 'p2'), c12: () => set('t1', 'p2'), c21: () => set('t2', 'p1'), ep1: () => set(null, 'p1'), ep2: () => set(null, 'p2'), et1: () => set('t1', null), et2: () => set('t2', null) }[part] || (() => {}))(); return o; }
+  // move the whole shape: every time through fT, every price through fP (the page maps them through pixels, so a move keeps
+  // its shape on screen across weekend gaps)
+  function drawMove(d, fT, fP) { const o = { ...d }; for (const k of ['t1', 't2']) if (fin(d[k])) o[k] = fT(d[k]); for (const k of ['p1', 'p2', 'price']) if (fin(d[k])) o[k] = fP(d[k]); return o; }
+  // bars from ta to tb: whole candles of the list (n replayed), extended at one per step past the last
+  function barsBetween(bars, n, sec, ta, tb) { if (!n) return 0; const a = Math.min(ta, tb), b = Math.max(ta, tb), lb = (t) => { let lo = 0, hi = n; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time < t) lo = m + 1; else hi = m; } return lo; };
+    const last = bars[n - 1].time, ix = (t) => t > last ? (n - 1) + Math.round((t - last) / sec) : lb(t); return ix(b) - ix(a); }
+  // the optional label: the move from the first point to the second in price, %, bars (and the angle on screen for a line)
+  function drawInfo(d, nBars, ang, dec = 2) { if (d.type !== 't' && d.type !== 'r') return ''; const dp = d.p2 - d.p1, pc = d.p1 ? dp / d.p1 * 100 : 0, sg = dp > 0 ? '+' : dp < 0 ? '−' : '';
+    const s = `${sg}${Math.abs(dp).toFixed(dec)} (${sg}${Math.abs(pc).toFixed(2)}%) · ${nBars} bar${nBars === 1 ? '' : 's'}`; return d.type === 't' && fin(ang) ? `${s} · ${Math.round(ang)}°` : s; }
+
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
     TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
-    COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits };
+    COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
+    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
