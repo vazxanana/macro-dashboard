@@ -75,6 +75,28 @@ jobs:
           done
           echo "$j" | jq -e '.result.bindings[] | select(.name == "ACADEMY_LLM_KEY" and .type == "plain_text")' >/dev/null 2>&1 && echo "::warning::ACADEMY_LLM_KEY is plain text: delete it and add it again as a Secret" || true
 
+      # 17 Nov 2026: the candle route answered "OANDA_TOKEN not set" on workers.dev while aureumdesk.co.uk served OANDA candles.
+      # Names and types only, never a value: every binding of meridianx, every Worker of the account, the workers.dev subdomain,
+      # and the versions the live deployment splits traffic between.
+      - name: Worker settings, Workers and deployment (names only; never a secret's value)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          api() { curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID$1" || true; }
+          echo "== meridianx bindings (name  type)"
+          api /workers/scripts/meridianx/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          for n in OANDA_TOKEN SESSION_SECRET GH_TOKEN GH_READ_TOKEN BLOB_READ_WRITE_TOKEN CRON_SECRET; do
+            api /workers/scripts/meridianx/settings | jq -e --arg n "$n" '.result.bindings[] | select(.name == $n)' >/dev/null 2>&1 || echo "::warning::$n is not set on the meridianx Worker"
+          done
+          echo "== Workers on the account"
+          api /workers/scripts | jq -r 'if .success then (.result[] | "\(.id)  modified \(.modified_on)") else "could not read: \(.errors)" end' || true
+          echo "== workers.dev subdomain"
+          api /workers/subdomain | jq -r '.result.subdomain // "could not read"' || true
+          api /workers/scripts/meridianx/subdomain | jq -c '.result // .errors' || true
+          echo "== live deployment of meridianx (version  percentage)"
+          api /workers/scripts/meridianx/deployments | jq -r 'if .success then ((.result.deployments // [])[0] | (.versions // [])[] | "\(.version_id)  \(.percentage)%") else "could not read: \(.errors)" end' || true
+
       - name: Deploy
         working-directory: cloudflare
         env:
