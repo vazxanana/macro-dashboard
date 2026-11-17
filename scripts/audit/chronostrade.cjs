@@ -731,6 +731,73 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       small += await t.evaluate(() => [...document.querySelectorAll('#vc-coach *, #tab-journal small.say')].filter((e) => e.getClientRects().length && e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
     check('coach card and journal sentence: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
     await cx.close(); }
+  // 38. live coach (17 Nov 2026): the toggle in the Trade card (off by default, remembered on the device), the docked panel on the
+  // chart (clear of the quick bar), free notes on an entry and an exit with the AI coach off on the server, "What do you see?"
+  // saying the AI is off, then the AI on (a stubbed streamed answer, and one withdrawn); a phone's one-line strip above the chart.
+  { const LIVE = process.env.LIVE_SHOTS || OUT; try { fs.mkdirSync(LIVE, { recursive: true }); } catch (e) { /* exists */ }
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('live: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    const tg0 = await t.evaluate(() => { const i = document.getElementById('lc-on'), c = document.getElementById('tradecard'); return { inCard: !!i && c.contains(i), on: i && i.checked, panel: document.getElementById('lc').hidden }; });
+    check('live coach: the toggle sits in the Trade card, off by default, no panel', tg0.inCard && !tg0.on && tg0.panel, JSON.stringify(tg0));
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 20; i++) await t.keyboard.press('ArrowRight');
+    await t.click('#lc-on'); await settle(t);
+    const on = await t.evaluate(() => ({ panel: !document.getElementById('lc').hidden && !!document.getElementById('lc').getClientRects().length, key: localStorage.getItem('btLab:liveCoach') }));
+    check('live coach: on shows the docked panel and remembers it on this device', on.panel && on.key === '1', JSON.stringify(on));
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('s'); await t.waitForTimeout(800);
+    let L = await t.evaluate(() => window.ctLive());
+    check('live coach: an entry gets a free note at once, with the coach\'s sentence (the AI is off on the server)', L.notes[0] && L.notes[0].tag === 'Sold' && /Selling in (Asia|London|New York)/.test(L.notes[0].text) && !L.notes.some((x) => /^ai/.test(x.k)), JSON.stringify(L.notes[0] || {}));
+    const ov = await t.evaluate(() => { const a = document.getElementById('lc').getBoundingClientRect(), q = document.getElementById('qtr').getBoundingClientRect(), c = document.getElementById('chart').getBoundingClientRect(); const hit = !(a.right <= q.left || a.left >= q.right || a.bottom <= q.top || a.top >= q.bottom); return { hit, inChart: a.left >= c.left - 1 && a.right <= c.right + 1 && a.top >= c.top - 1 && a.bottom <= c.bottom + 1 }; });
+    check('live coach: the panel sits on the chart and stays out of the quick bar', !ov.hit && ov.inChart, JSON.stringify(ov));
+    for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.waitForTimeout(800);
+    L = await t.evaluate(() => window.ctLive()); const A = await t.evaluate(() => window.ctAcct().acct.closed.slice(-1)[0]);
+    check('live coach: an exit gets a free note with its R, the same R as the journal', L.notes[0] && L.notes[0].tag === 'Closed' && A && L.notes[0].text.includes(Math.abs(A.R).toFixed(2) + 'R'), L.notes[0] && L.notes[0].text);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(300);
+    const st = await txt(t, '#lc .lc-st'); check('live coach: "What do you see?" with the AI off says so in words, no AI note', /The AI coach is off/.test(st) && !(await t.evaluate(() => window.ctLive().notes.some((x) => /^ai/.test(x.k)))), st);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('Shift+B'); await t.waitForFunction(() => window.ctLive().notes.some((x) => x.tag === 'Draft'), null, { timeout: 4000 }).catch(() => {});
+    L = await t.evaluate(() => window.ctLive()); check('live coach: a draft that stands still is noted with its sentence', L.notes.some((x) => x.tag === 'Draft' && /^Buying in /.test(x.text)), JSON.stringify(L.notes[0] || {}));
+    await t.keyboard.press('Escape');
+    const lcBox = await t.$eval('#lc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }), chb = await t.$eval('.chartc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    await t.screenshot({ path: LIVE + 'live-desktop.png', clip: { x: Math.max(0, chb.x), y: Math.max(0, chb.y), width: Math.min(1480, chb.w), height: Math.min(900, chb.h) } });
+    const LC_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#lc .lc-fold b, #lc .lc-n, #lc .lc-ask, #lc .lc-m b, #lc .lc-m time, #lc .lc-i p, #lc .lc-p, #lc .lc-by, #lc .lc-st, .lc-tg span, .lc-tg small')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await settle(t); bad.push(...(await measured(t, LC_AA, 'live coach text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#lc *, .lc-tg *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('live coach: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    await t.reload({ waitUntil: 'load' }); await t.waitForTimeout(500); check('live coach: remembered after a reload', await t.evaluate(() => document.getElementById('lc-on').checked && !document.getElementById('lc').hidden));
+    await t.click('#lc .lc-x'); check('live coach: × turns it off and forgets it', await t.evaluate(() => document.getElementById('lc').hidden && !localStorage.getItem('btLab:liveCoach')));
+    await cx.close();
+    // the AI on (stubbed): a streamed comment at an entry; a second one within 20 s is not asked; a withdrawn answer
+    const cx2 = await b.newContext({ viewport: { width: 1500, height: 950 } }), t2 = await cx2.newPage(); t2.on('pageerror', (e) => errs.push('live ai: ' + e.message));
+    await route(t2); await me(t2, OWNER); await t2.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} });
+    let posts = 0, mode = 'ok';
+    await t2.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true}' }); posts++; const body = JSON.parse(r.request().postData() || '{}');
+      const late = (body.bars || []).some((x) => x[0] + body.tf > body.moment); if (late) errs.push('live: a candle after the replay moment was sent');
+      const done = mode === 'ok' ? { t: 'done', state: 'ok', text: 'You sold with a 1.0 ATR stop in London. With fewer than 20 trades the sample is too small to judge.' } : { t: 'done', state: 'refused', withdrawn: true, message: "Withdrawn: the answer broke the coach's rules." };
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"You sold with "}\n\ndata: {"t":"text","d":"a 1.0 ATR stop."}\n\ndata: ${JSON.stringify(done)}\n\n` }); });
+    { const t = t2; await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400); await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.click('#lc-on'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 15; i++) await t.keyboard.press('ArrowRight'); await t.keyboard.press('s'); await t.waitForTimeout(1200);
+    L = await t.evaluate(() => window.ctLive()); const ai = L.notes.find((x) => /^ai/.test(x.k));
+    check('live coach, AI on: the entry gets a free note and a streamed AI comment', posts === 1 && ai && /too small to judge/.test(ai.text) && L.notes.some((x) => x.tag === 'Sold'), JSON.stringify(ai || {}) + ' posts ' + posts);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(300); check('live coach, AI on: a second ask within 20 s is not sent, the panel says when', posts === 1 && /every 20 s/.test(await txt(t, '#lc .lc-st')), await txt(t, '#lc .lc-st'));
+    await t.screenshot({ path: LIVE + 'live-desktop-ai.png', clip: { x: Math.max(0, lcBox.x - 20), y: Math.max(0, lcBox.y - 260), width: Math.min(700, lcBox.w + 300), height: Math.min(700, lcBox.h + 300) } }).catch(() => {});
+    mode = 'bad'; await t.waitForTimeout(21000);   // the 20 s rule is real time on the page
+    await t.click('#lc .lc-ask'); await t.waitForFunction(() => /Withdrawn/.test((window.ctLive().notes[0] || {}).text || ''), null, { timeout: 5000 }).catch(() => {});
+    L = await t.evaluate(() => window.ctLive()); check('live coach, AI on: an answer that fails the checks is withdrawn in words', posts === 2 && /^Withdrawn: the answer broke the coach's rules\.$/.test(L.notes[0].text), (L.notes[0] && L.notes[0].text) + ' posts ' + posts + ' st ' + (await txt(t, '#lc .lc-st'))); }
+    await cx2.close();
+    // the phone: a slim strip above the chart and its quick bar, one line, taps open it
+    const cp = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }); const m = await cp.newPage(); m.on('pageerror', (e) => errs.push('live phone: ' + e.message));
+    await route(m); await me(m, OWNER); await m.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:liveCoach', '1'); } catch (e) {} }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(400);
+    await m.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await m.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(m);
+    for (let i = 0; i < 3; i++) await m.tap('#step'); await m.tap('#qt-buy'); await m.waitForTimeout(900);
+    const ph = await m.evaluate(() => { const a = document.getElementById('lc').getBoundingClientRect(), q = document.getElementById('qtr').getBoundingClientRect(), c = document.getElementById('chart').getBoundingClientRect(), f = document.querySelector('#lc .lc-fold').getBoundingClientRect(), p = document.querySelector('#lc .lc-i p');
+      return { simple: document.documentElement.dataset.phone, above: a.bottom <= c.top + 1 && a.bottom <= q.top + 1, h: Math.round(a.height), fold: Math.round(f.height), line: p ? p.textContent : '', oneLine: p ? p.scrollHeight <= parseFloat(getComputedStyle(p).lineHeight) * 1.6 + 2 : false, over: document.documentElement.scrollWidth - innerWidth }; });
+    check('live coach on a phone: a slim strip above the chart and its quick bar, the latest note on one line, 44 px, no sideways page', ph.simple === 'simple' && ph.above && ph.h <= 110 && ph.fold >= 44 && /^Bought at /.test(ph.line) && ph.oneLine && ph.over <= 0, JSON.stringify(ph));
+    await m.screenshot({ path: LIVE + 'live-phone-strip.png' });
+    await m.tap('#lc .lc-fold'); await m.waitForTimeout(250); const exp = await m.evaluate(() => ({ open: document.getElementById('lc').classList.contains('open'), items: [...document.querySelectorAll('#lc .lc-i')].filter((e) => e.getClientRects().length).length, ask: document.querySelector('#lc .lc-ask').getBoundingClientRect().height }));
+    check('live coach on a phone: a tap opens the list, "What do you see?" is 44 px', exp.open && exp.items >= 1 && exp.ask >= 44, JSON.stringify(exp));
+    await m.screenshot({ path: LIVE + 'live-phone-open.png' });
+    await cp.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

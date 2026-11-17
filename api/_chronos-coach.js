@@ -12,9 +12,15 @@
 //            and, for a closed trade, the candles from the entry to the exit (it is after the fact). For an OPEN trade only
 //            candles closed by the replay moment: nothing after it, and no exit or result.
 //   session  the session's closed trades: the coach's splits (BT.coachSplits) and the last 40 trades' sentence and R. No candles.
+//   live     (17 Nov 2026, "the live coach") a short comment while the trader replays: at an entry, at an exit, or when asked
+//            "What do you see?". The chart as it stands at the replay moment: the last <= 60 candles that CLOSED by it (none after),
+//            the open positions (opening stop on the losing side, floating R), drafts, the drawings read against the price, the
+//            last 10 closed trades' R and sentences and the session's largest difference. The answer is 2-4 plain sentences
+//            (not the JSON card), checked by parseLive.
+// Smaller prompts (17 Nov 2026, "faster"): 60 candles before the entry (was 120), entry to exit capped at 120 (was 400).
 'use strict';
 
-const LIM = { before: 120, after: 400, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
+const LIM = { before: 60, after: 120, live: 60, livePos: 5, liveDrafts: 2, liveTrades: 10, liveText: 900, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
 const KINDS = ['good', 'risk', 'habit', 'idea'];
 const MIN_N = 20;
 const TFS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400, 604800];
@@ -72,7 +78,7 @@ function tradePayload(b) {
   else Object.assign(trade, { replayMomentUtc: new Date(moment * 1000).toISOString() });   // no exit, no result: the trade is not over
   // never a candle after the replay moment; after the fact only for a closed trade (entry to exit)
   const before = cleanBars(b.before, sec, { until: Math.min(openedAt, moment), max: LIM.before, dec });
-  const after = cleanBars(b.after, sec, { from: openedAt, until: closed ? Math.min(closedAt + sec, moment) : moment, max: LIM.after, first: true, dec });
+  const after = cleanBars(b.after, sec, { from: openedAt, until: closed ? Math.min(closedAt + sec, moment) : moment, max: LIM.after, first: closed, dec });   // an open trade: the latest candles
   return { kind: 'trade', trade, candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedBeforeEntry: before, [closed ? 'entryToExit' : 'sinceEntryClosedByNow']: after } };
 }
 // the session question -> { payload } or throws a 400
@@ -102,11 +108,57 @@ function systemText(lang) {
     `Answer with ONE JSON object and nothing else, exactly this shape: ${SHAPE}. 1 to 6 points; kind good = something done well, risk = a risk in this trade, habit = a pattern across trades, idea = something to try in the next replay.`,
   ].join('\n');
 }
+// the live question -> { payload } or throws a 400. Nothing after the replay moment: candles that end after it, positions or
+// drafts opened after it and trades closed after it are dropped here, whatever the page sent.
+const TRIGGERS = ['open', 'close', 'ask'];
+function livePayload(b) {
+  const trigger = TRIGGERS.includes(b.trigger) ? b.trigger : null; if (!trigger) throw bad('trigger must be open, close or ask');
+  const sec = TFS.includes(fin(b.tf)) ? fin(b.tf) : null; if (!sec) throw bad('unknown timeframe');
+  const moment = fin(b.moment); if (moment == null) throw bad('the replay moment is needed');
+  const dec = Math.max(0, Math.min(6, Math.round(fin(b.dec) ?? 5)));
+  const bars = cleanBars(b.bars, sec, { until: moment, max: LIM.live, dec });
+  if (!bars.length) throw bad('no closed candles');
+  const positions = [];
+  for (const p of (Array.isArray(b.positions) ? b.positions : []).slice(0, LIM.livePos)) {
+    if (!isObj(p)) continue; const side = p.side === 'buy' || p.side === 'sell' ? p.side : null, entry = fin(p.entry), stop0 = fin(p.stop0), stop = fin(p.stop), at = fin(p.openedAt);
+    if (!side || entry == null || stop0 == null || at == null || at > moment) continue;
+    // every trade has a stop (absolute rule 1): an opening stop at or past the entry is not a position the coach comments on
+    if ((side === 'buy' && !(stop0 < entry)) || (side === 'sell' && !(stop0 > entry))) throw bad('an opening stop must be on the losing side of its entry');
+    const target = fin(p.target);
+    positions.push({ side, entry: rd(entry, dec), openingStop: rd(stop0, dec), stopNow: stop == null ? null : rd(stop, dec), target: target == null ? null : rd(target, dec), openedAtUtc: new Date(at * 1000).toISOString(), floatingR: fin(p.floatR), coachSentence: str(p.sentence) });
+  }
+  const drafts = [];
+  for (const x of (Array.isArray(b.drafts) ? b.drafts : []).slice(0, LIM.liveDrafts)) {
+    if (!isObj(x)) continue; const side = x.side === 'buy' || x.side === 'sell' ? x.side : null, entry = fin(x.entry), stop = fin(x.stop), target = fin(x.target);
+    if (!side || entry == null || stop == null || (side === 'buy' ? !(stop < entry) : !(stop > entry))) continue;
+    drafts.push({ side, entry: rd(entry, dec), stop: rd(stop, dec), target: target == null ? null : rd(target, dec), coachSentence: str(x.sentence) });
+  }
+  const lastTrades = (Array.isArray(b.trades) ? b.trades : []).filter((t) => isObj(t) && !(fin(t.closedAt) > moment)).slice(-LIM.liveTrades)
+    .map((t) => ({ R: fin(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, sentence: str(t.sentence), flags: strList(t.flags, 4, 160) })).filter((t) => t.R != null || t.sentence);
+  const ev = isObj(b.event) && trigger !== 'ask' ? { kind: trigger, side: b.event.side === 'buy' || b.event.side === 'sell' ? b.event.side : null, ...(trigger === 'close' ? { R: fin(b.event.R), exitReason: str(b.event.reason, 40) } : {}), coachSentence: str(b.event.sentence), flags: strList(b.event.flags, 6, 160) } : null;
+  const closedN = Math.max(0, Math.round(fin(b.closedN) || 0));
+  return { kind: 'live', trigger, live: { market: str(b.market, 24), timeframeSec: sec, replayMomentUtc: new Date(moment * 1000).toISOString(), lastClose: bars[bars.length - 1][4],
+    event: ev, openPositions: positions, drafts, drawings: isObj(b.drawings) ? cleanVal(b.drawings) : null, closedTradesInSession: closedN, tooFewBelow: MIN_N, lastTrades, largestDifference: str(b.lead, 300) || null },
+    candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedByNow: bars } };
+}
+function liveSystem(lang) {
+  return [
+    'You are a calm trading coach watching a trader practise on a PAPER backtest replay in ChronosTrade. You see the chart as it stands at the replay moment and the trader\'s own positions, drafts, drawn levels and recent trades. Nothing you say places, changes or refuses an order.',
+    lang === 'fr' ? 'Answer in French. Keep the trading terms in English (stop, target, entry, R, ATR, trend, session names, timeframes such as H1, M15).' : 'Answer in plain English.',
+    'Write 2 to 4 short sentences of plain text: no list, no heading, no JSON. Comment on what the trader is doing relative to their own context: the trend, the levels and their drawn levels, the stop size, the reward to risk, and habits such as a trade soon after a loss or a close before the target. Ask at most one question.',
+    'Tie what you say to the numbers given. Never invent a price or a statistic. Never say what the next candle or the price will do as a fact: you may name what would change the picture.',
+    'Never present anything as a tested edge and never promise a result. With fewer than 20 closed trades in the session, say the sample is too small when you speak of habits.',
+    'Never suggest removing a stop, widening a stop, moving a stop further from the entry or trading without one. Every trade keeps a stop.',
+  ].join('\n');
+}
+const LIVE_ASK = { open: 'The trader just opened a position. Comment on it.', close: 'The trader just closed a position. Comment on it.', ask: 'The trader asks: "What do you see?" Comment on the chart and on what they are doing now.' };
 // -> { system, prompt, schema, payload } or throws a 400
 function buildRequest(b) {
   if (!isObj(b)) throw bad('bad request');
-  const kind = b.kind === 'trade' ? 'trade' : b.kind === 'session' ? 'session' : null; if (!kind) throw bad('kind must be trade or session');
-  const lang = b.lang === 'fr' ? 'fr' : 'en', payload = kind === 'trade' ? tradePayload(b) : sessionPayload(b);
+  const kind = b.kind === 'trade' ? 'trade' : b.kind === 'session' ? 'session' : b.kind === 'live' ? 'live' : null; if (!kind) throw bad('kind must be trade, session or live');
+  const lang = b.lang === 'fr' ? 'fr' : 'en';
+  if (kind === 'live') { const payload = livePayload(b); return { kind, lang, trigger: payload.trigger, system: liveSystem(lang), prompt: `${LIVE_ASK[payload.trigger]}\n\n${JSON.stringify(payload)}`, schema: null, payload }; }
+  const payload = kind === 'trade' ? tradePayload(b) : sessionPayload(b);
   return { kind, lang, system: systemText(lang), prompt: `${kind === 'trade' ? 'Review this trade.' : 'Review this replay session.'}\n\n${JSON.stringify(payload)}`, schema: SCHEMA, payload };
 }
 
@@ -134,4 +186,17 @@ function parseAnswer(text) {
   return { ok: true, answer: { summary, points, question } };
 }
 
-module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, buildRequest, parseAnswer, systemText, cleanBars, _t: { tradePayload, sessionPayload, cleanVal } };
+// a live comment: plain text, the same stop and claim rules, and no forecast stated as fact -> { ok, text } | { ok: false, why }
+const FORECAST_BAD = /\b(price|gold|it|the market|the next candle|this candle)\s+will\s+(definitely\s+|surely\s+|certainly\s+)?(go|rise|fall|drop|reach|hit|break|bounce|reverse|rally|close)\b/i;
+function parseLive(text) {
+  let s = String(text == null ? '' : text).replace(/```[a-z]*\s*|```/gi, '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim();
+  if (!s) return { ok: false, why: ['no text'] };
+  s = s.replace(/\n{3,}/g, '\n\n').slice(0, LIM.liveText);
+  const why = [], sentences = s.split(/(?<=[.!?;])\s+/);
+  if (sentences.some((x) => STOP_BAD.test(x) && !/\b(never|don'?t|do not|not|avoid|keep|ne\s+pas|jamais)\b/i.test(x))) why.push('stop advice the coach may not give');
+  if (CLAIM_BAD.test(s.replace(/\b(not|never|no)\s+(a\s+)?(guarantee[ds]?|proven edge|tested edge)\b/gi, ''))) why.push('a claim the coach may not make');
+  if (sentences.some((x) => FORECAST_BAD.test(x) && !/\b(if|could|may|might|would|whether|not|unless|si|pourrait)\b/i.test(x))) why.push('a forecast stated as fact');
+  return why.length ? { ok: false, why } : { ok: true, text: s };
+}
+
+module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, TRIGGERS, buildRequest, parseAnswer, parseLive, systemText, liveSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, cleanVal } };

@@ -333,3 +333,22 @@ effect at once.
 
 Check after setting them: the Council → Review cards and ChronosTrade's "How you trade" card stop saying "off"; each
 feature's cost appears in its own ledger (`GET /api/edge-analyst`, `/api/trade-review`, `/api/chronos-coach`).
+
+**ChronosTrade's coach: its own model, body and prices, streamed answers (17 Nov 2026).** The coach (one trade, the
+session, and the live coach's comments) streams its answers (`stream()` in the adapter: server-sent events, text only,
+thinking never handed over; the same budget, ledger, refusal and output-cap rules as `complete()`; a stream that breaks off
+after it started keeps its estimate as billed). It may be tuned without touching the edges, all optional, as Secrets:
+
+| Secret | Value |
+|---|---|
+| `CHRONOS_LLM_MODEL` | the provider's model id for the coach only (a faster one); unset = `ACADEMY_LLM_MODEL` |
+| `CHRONOS_LLM_BODY` | JSON body fields for the coach only; unset = `ACADEMY_LLM_BODY`. On the `messages` format the coach adds `{"output_config":{"effort":"low"}}` unless one of the two names an effort |
+| `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT` / `_CACHE_READ` / `_CACHE_WRITE` | the coach's prices when its model differs (the cache prices default from its own input price) |
+| `CHRONOS_LLM_MAX_TOKENS` | output cap of a trade / session question (default 4000) |
+| `CHRONOS_LIVE_MAX_TOKENS` | output cap of a live comment (default 1500) |
+| `CHRONOS_LIVE_PER_DAY` | live comments an account a UTC day (default 60; trade / session questions keep `CHRONOS_COACH_PER_DAY`, 20) |
+| `CHRONOS_LIVE_GAP_S` | seconds between two live comments (default 20) |
+| `CHRONOS_LLM_MAX_CALLS_DAY` | provider calls a day for the coach (default 100) |
+
+A provider that refuses the request itself (an effort or a model id it does not take) is shown on the page in words with the
+provider's own reason. `GET /api/chronos-coach` returns `lastMs` (time to the first text and in all, of the last call).

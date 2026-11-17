@@ -212,3 +212,8 @@ model id from the provider's model list, `ACADEMY_LLM_FORMAT` = `messages`, `ACA
 variables to what `wrangler.jsonc` lists unless `keep_vars` is on, so a plain-text variable added in the dashboard disappears
 at the next deploy; secrets survive deploys. Never write a value into `wrangler.jsonc`. Details and the per-feature budgets:
 docs/academy/LLM.md, section 11.
+ChronosTrade's coach can be tuned on its own (17 Nov 2026), also as Secrets: `CHRONOS_LLM_MODEL` (the provider's model id for
+the coach only), `CHRONOS_LLM_BODY` (JSON; the coach sends a low reasoning effort unless this or `ACADEMY_LLM_BODY` names one),
+`CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT`, and the live coach's `CHRONOS_LIVE_PER_DAY`, `CHRONOS_LIVE_GAP_S`,
+`CHRONOS_LIVE_MAX_TOKENS` (docs/academy/LLM.md, section 11). Its answers are streamed (`text/event-stream`); the Worker's adapter
+starts the response at the first `res.write`, so the words reach the page as the provider writes them.

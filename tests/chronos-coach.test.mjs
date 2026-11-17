@@ -41,7 +41,7 @@ test('an OPEN trade: no exit, no result, and no candle after the replay moment r
   const q = M.buildRequest(b), p = q.payload;
   assert.equal(p.trade.status, 'open'); assert.equal(p.trade.R, undefined); assert.equal(p.trade.exit, undefined); assert.equal(p.trade.net, undefined);
   const after = p.candles.sinceEntryClosedByNow; assert.equal(after.length, 20); assert.ok(after.every((x) => x[0] + SEC <= moment));
-  const times = [...q.prompt.matchAll(/\[(\d{10}),/g)].map((m) => +m[1]); assert.ok(times.length > 100); assert.ok(times.every((t) => t + SEC <= moment), 'the prompt carries no future candle');
+  const times = [...q.prompt.matchAll(/\[(\d{10}),/g)].map((m) => +m[1]); assert.ok(times.length > 60); assert.ok(times.every((t) => t + SEC <= moment), 'the prompt carries no future candle');
   // a closedAt after the moment does not make it closed
   const q2 = M.buildRequest({ ...b, trade: { ...b.trade, closedAt: moment + 3600, exit: 1, R: 3 } }); assert.equal(q2.payload.trade.status, 'open'); assert.equal(q2.payload.trade.R, undefined);
   assert.match(q.system, /never.*remov|removing a stop/i); assert.match(q.system, /fewer than 20 trades/); assert.match(q.system, /tested edge/);
@@ -114,7 +114,7 @@ test('endpoint: through the real adapter with a fake provider (reasoning block, 
   const fetch = async (url, o) => { bodies.push(JSON.parse(o.body)); return { ok: true, status: 200, headers: { get: () => null }, json: async () => ({ model: 'm-test', stop_reason: 'end_turn', content: [{ type: 'thinking', thinking: '' }, { type: 'text', text: OK }], usage: { input_tokens: 3000, output_tokens: 900 } }) }; };
   const r = res(); await H.handle(req(closedTrade()), r, d0({ fetch, env: { ...ENV, CHRONOS_LLM_DAILY_USD: '1' } }));
   assert.equal(r.body.state, 'ok'); assert.equal(bodies.length, 1); assert.equal(bodies[0].max_tokens, 4000);
-  assert.equal(H.llmEnv({ CHRONOS_LLM_STOP: '1' }).ACADEMY_LLM_STOP, '1'); assert.equal(H.llmEnv({}).ACADEMY_LLM_MAX_CALLS_DAY, '30'); assert.equal(H.llmEnv({}).ACADEMY_LLM_DAILY_USD, '0.5');
+  assert.equal(H.llmEnv({ CHRONOS_LLM_STOP: '1' }).ACADEMY_LLM_STOP, '1'); assert.equal(H.llmEnv({}).ACADEMY_LLM_MAX_CALLS_DAY, '100'); assert.equal(H.llmEnv({}).ACADEMY_LLM_DAILY_USD, '0.5');
 });
 
 test('wiring: both hosts, the page block is display only, the cards say what they are', () => {

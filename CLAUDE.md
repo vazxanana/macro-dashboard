@@ -2090,7 +2090,7 @@ the visit. Card label "AI coach · a language model's reading, not a tested edge
 storage, or GET failing) = the quiet line "The AI coach is off". Server rules (never trusts the page): POST only from the same
 origin, a signed-in member, every field checked and capped (`buildRequest`: side, a finite OPENING stop on the losing side or
 400, a known timeframe, strings trimmed, `ctx` cut to a fixed depth, flags / tags / mistakes capped); question `trade` = the
-trade, the last 120 candles that ENDED by its entry and, for a closed trade (closedAt by the replay `moment`), the candles from
+trade, the last 60 candles that ENDED by its entry (120 before 17 Nov 2026, "faster") and, for a closed trade (closedAt by the replay `moment`), the candles from
 entry to exit; an OPEN trade carries no exit or result and no candle that ends after the moment (`cleanBars` drops them);
 question `session` = `BT.coachSplits` output and the last 40 trades' sentence and R, no candles. System prompt: plain English
 (French with `lang: 'fr'`, trading terms in English), every point tied to the given numbers, never a tested edge or a promise,
@@ -2099,9 +2099,51 @@ question }` checked in code (`parseAnswer` also refuses stop-widening / removing
 "guaranteed" claims). Store `chronos-coach/answers.json` (+ the adapter's `cost.json`, `llm-cache.json`): an answered or
 billed-and-refused question (hash of account + prompt) is answered from it, never paid twice; a budget skip or an unbilled
 error is not stored. Limits: `CHRONOS_COACH_PER_DAY` 20 calls an account a UTC day (memory, per instance), budgets
-`CHRONOS_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 30, output cap `CHRONOS_LLM_MAX_TOKENS`
+`CHRONOS_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 100 (30 before the live coach), output cap `CHRONOS_LLM_MAX_TOKENS`
 4000; `CHRONOS_COACH=off` / `CHRONOS_LLM_STOP=1` stop it. Routed on the Worker (`HANDLERS['chronos-coach']`) and in
 vercel.json `functions`. Tests: `tests/chronos-coach.test.mjs`; audit section 37 (the off state with the stubbed API).
+**Faster (17 Nov 2026, owner: "he needs to be faster")**: answers are STREAMED. The adapter's `stream(req, d, onText)`
+(`api/_academy-llm.js`, 'messages' format: `stream: true`, server-sent events; `text_delta` handed over, thinking / signature
+deltas never; input usage from `message_start`, stop reason and output usage from `message_delta`, an `error` event = broke off)
+keeps `complete()`'s rules: the same reservation and correction to reported usage, refusal and output cap (a cut answer is never
+cached), an HTTP error before the stream is not billed; a stream that breaks off or times out after it started keeps its estimate
+as billed (`unconfirmed`) and is never an answer (`partial` holds what came). The 'chat' format makes one ordinary call. The page
+POSTs with `stream: true` and the endpoint answers `text/event-stream` (`data: {"t":"start"}`, `{"t":"text","d":…}` pieces, then
+`{"t":"done", …}` = the CHECKED result; every early answer stays JSON); the Worker adapter (`cloudflare/src/adapter.mjs`, the
+response starts with the first `res.write`) passes it through (test). The trade card shows the summary while the JSON is written.
+`req.cacheSystem` sends the system text as one block with `cache_control` (a text under the provider's minimum cacheable length is
+simply not cached). Prompts are smaller (60 candles before the entry, at most 120 after). The coach's own settings, read by
+`llmEnv` only for this feature: `CHRONOS_LLM_MODEL` (the provider's model id for the coach, else `ACADEMY_LLM_MODEL`),
+`CHRONOS_LLM_BODY` (JSON body fields, else `ACADEMY_LLM_BODY`; on the 'messages' format `output_config.effort: 'low'` is added
+unless one of the two names an effort), `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT` / `_CACHE_READ` / `_CACHE_WRITE`. A provider that
+refuses the request (a 4xx, e.g. an effort or model id it does not take) is said in words with the variables to check. Each call
+that reaches the model stores `ms { first, total }` (time to the first text, in all) on its row and `lastMs` in answers.json /
+live.json; GET returns `lastMs`.
+**Live coach (17 Nov 2026, owner: "I want him to be live while I backtest, him watching the screen and trades live")**: a "Live
+coach" toggle under the AI coach line in the Trade card (`#lc-on`, made by the page script; off by default; localStorage
+`btLab:liveCoach`, a display preference, the one storage key of its block; the Trade card is the dock in full screen) shows a docked
+panel `#lc` (`aside.lc`, appended to `.chartc`, over the price pane's lower left, placed from `#chart`'s box since `#panes` is
+`display: contents` with one chart; clear of the quick bar; collapsible; newest first; at most 60 notes in memory for the session
+view). Page block `// ---- Live coach (17 Nov 2026` … `// ---- end Live coach` (after the AI coach's), CSS `/* Live coach (17 Nov
+2026)` … `/* end Live coach */`, phone strip rules in the simple view's block (a one-line strip above the chart and its quick bar,
+`order: -1`, the chart 52 px shorter, a tap opens the list; it starts folded there). DISPLAY ONLY (a test reads the block for order
+calls, `.stop =`, `BT.coachStop`, `save()` and every storage key). A 300 ms watcher compares the account with its last look: (a)
+FREE notes, no API call: an entry (`coachSay`: the trade coach's sentence), a draft that stood still 1.2 s (`draftSay`), a stop
+moved (break-even, away from the entry with the risk growth, profit locked, trailing on; a trailing stop's own moves are not
+noted), a part close, an exit with its R and `BT.coachFlags`, the challenge's state and its daily / max loss buffers under 30 %; a
+new session or an undo re-baselines without notes. (b) AI comments (kind `live`, `trigger` open / close / ask) at an entry, at an
+exit and on "What do you see?": the chart at `mom()` (the last 60 candles that ENDED by it; `livePayload` drops any candle,
+position or trade after the moment again), positions with the OPENING stop (a losing-side stop or 400) and floating R, the draft,
+`BT.coachDraw` against the price, the last 10 closed trades' R / sentence / flags and the splits' lead; 2-4 plain sentences
+streamed into the note (`liveSystem`: calm coach, the trader's own context, at most one question, no forecast as fact, no promise,
+under 20 trades too small); `parseLive` refuses stop removing / widening advice, "proven / tested edge" / "guaranteed" and a
+forecast stated as fact ("price will fall"), and the note becomes "Withdrawn: the answer broke the coach's rules." (stored
+refused in live.json, never asked again). Limits: one live call in flight and one per `CHRONOS_LIVE_GAP_S` 20 s (page and server;
+events in between get their free note only), `CHRONOS_LIVE_PER_DAY` 60 an account a UTC day (its own counter, memory, per
+instance), output cap `CHRONOS_LIVE_MAX_TOKENS` 1500. Playback never waits; "Pause the replay while the coach answers" (memory
+only, off) presses the play control and presses it again after. Tests: `tests/llm-stream.test.mjs` (4), `tests/chronos-live.test.mjs`
+(8); audit section 38 (toggle, panel off the quick bar, notes on entry / exit / draft with the AI off, the AI on with a stubbed
+stream and a withdrawn answer, the 20 s rule, AA in three themes, phone strip).
 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other

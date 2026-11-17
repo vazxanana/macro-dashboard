@@ -237,6 +237,26 @@
   .ai-card li b { flex: none; min-width: 44px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--ink); text-align: center; }
   .ai-card .ai-q { margin: 8px 0 0; font-style: italic; color: var(--ink-dim); } .ai-card .ai-by { margin: 8px 0 0; font-size: 12px; color: var(--ink-faint); }
   @media (pointer: coarse) { .aic .ai-go { min-height: 44px; } }
+  /* Live coach (17 Nov 2026): a docked running commentary on the chart; display only. 12 px or more, AA on the theme tokens,
+     44 px controls on touch; the phone strip is in the simple view's block. */
+  .lc-tg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 8px; font-size: 13px; color: var(--ink); cursor: pointer; } .lc-tg input { width: 16px; height: 16px; min-height: 0; accent-color: var(--accent); } .lc-tg small { font-size: 12px; color: var(--ink-faint); }
+  .lc { position: absolute; z-index: 5; left: 12px; bottom: 60px; width: min(340px, calc(100% - 140px)); display: flex; flex-direction: column; border: 1px solid var(--line-strong); border-radius: 12px; background: color-mix(in srgb, var(--panel) 95%, transparent); box-shadow: 0 10px 28px rgba(0,0,0,.24); backdrop-filter: blur(6px); color: var(--ink); font-size: 12.5px; line-height: 1.4; }
+  .lc[hidden], .chartc.nodata .lc { display: none; }
+  .lc-h { display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 8px; } .lc-h button { min-height: 32px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--panel-raised); color: var(--ink); font: 600 12px var(--sans); cursor: pointer; padding: 0 9px; }
+  .lc-fold { display: flex; align-items: center; gap: 4px; border: 0 !important; background: none !important; padding: 0 4px !important; } .lc-fold b { font-size: 13px; } .lc-fold .lc-n { font-weight: 500; color: var(--ink-dim); } .lc-fold i { font-style: normal; color: var(--ink-dim); transition: transform .15s; } .lc:not(.open) .lc-fold i { transform: rotate(-90deg); }
+  .lc-ask { margin-left: auto; } .lc-x { min-width: 32px; padding: 0 !important; font-size: 16px !important; }
+  .lc-b { display: flex; flex-direction: column; min-height: 0; } .lc:not(.open) .lc-b { display: none; }
+  .lc-st { margin: 0 10px; font-size: 12px; color: var(--ink-dim); } .lc-st:empty { display: none; }
+  .lc-p { display: flex; gap: 6px; align-items: center; margin: 0 10px 4px; font-size: 12px; color: var(--ink-dim); cursor: pointer; } .lc-p input { width: 14px; height: 14px; min-height: 0; }
+  .lc-list { list-style: none; margin: 0; padding: 0 10px; max-height: min(260px, 36vh); overflow-y: auto; overscroll-behavior: contain; border-top: 1px solid var(--line-soft); }
+  .lc-i { padding: 6px 0 6px 9px; border-bottom: 1px solid var(--line-soft); border-left: 2px solid var(--line-strong); margin-left: 0; } .lc-i p { margin: 2px 0 0; font-size: 12.5px; color: var(--ink); }
+  .lc-m { display: flex; gap: 6px; align-items: baseline; font-size: 12px; color: var(--ink-dim); } .lc-m b { font-weight: 600; color: var(--ink); } .lc-m time { font-family: var(--mono); font-size: 12px; }
+  .lc-i.win { border-left-color: var(--buy); } .lc-i.loss { border-left-color: var(--sell); } .lc-i.warn { border-left-color: var(--au-warn, var(--sell)); } .lc-i.ai { border-left-color: var(--accent); } .lc-i.ai p { font-style: italic; } .lc-i.ai.off p { font-style: normal; color: var(--ink-dim); } .lc-i.wip p { color: var(--ink-dim); } .lc-i.lc-empty { border-left-color: transparent; } .lc-i.lc-empty p { color: var(--ink-dim); }
+  .lc-by { margin: 0; padding: 5px 10px 7px; font-size: 12px; color: var(--ink-faint); }
+  body.fs .lc { z-index: 30; }
+  @media (pointer: coarse) { .lc-h button { min-height: 44px; } .lc-x { min-width: 44px; } .lc-tg, .lc-p { min-height: 44px; } }
+  @media (max-width: 700px) { .lc { width: calc(100% - 24px); } }
+  /* end Live coach */
   .mist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 10px 0; } .mist-grid label, .mist-ok { display: flex; gap: 8px; align-items: center; font-size: 13px; } .mist-grid input, .mist-ok input { width: 16px; height: 16px; min-height: 0; accent-color: var(--sell); } .mist-ok input { accent-color: var(--buy); }
   img.shot { width: 72px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); cursor: zoom-in; display: block; } .shotd { max-width: min(96vw, 1100px); } .shotd img { width: 100%; border-radius: 8px; display: block; }
   .qb { display: flex; gap: 8px; align-items: end; } .qb .btn { flex: 1; min-height: 40px; font-size: 14px; } .qb kbd { margin-left: 6px; opacity: .7; } .riskl { display: grid; gap: 3px; font-size: 11.5px; color: var(--ink-faint); width: 86px; } .riskl input { min-height: 40px; }
@@ -531,6 +551,15 @@
     html[data-phone="simple"] #tab-cal .mo { display: flex; flex-wrap: wrap; align-items: center; } html[data-phone="simple"] #cal-sum { order: -1; flex: 0 0 100%; margin-bottom: 4px; font: 600 16px/1.35 var(--sans); color: var(--ink); }
     html[data-phone="simple"] #tab-cal .mo .btn { min-width: 44px; min-height: 44px; }
     html[data-phone="simple"] #tab-log.ps-has:not([data-ps-open]) #pflog { display: none; }
+    /* the live coach (17 Nov 2026): a slim strip above the chart and its quick bar, the latest note on one line; a tap opens the list */
+    html[data-phone="simple"] .lc { position: static; order: -1; width: auto; margin: 0 0 6px; box-shadow: none; backdrop-filter: none; border-radius: 10px; background: var(--au-well, var(--panel-raised)); }
+    html[data-phone="simple"] .lc-h button { min-height: 44px; } html[data-phone="simple"] .lc-x { min-width: 44px; }
+    html[data-phone="simple"] .chartc:has(.lc:not([hidden])) #panes[data-n="1"] > #chart { height: calc(100vh - 304px); height: calc(100dvh - 304px); }
+    html[data-phone="simple"] .lc:not(.open) .lc-b { display: block; } html[data-phone="simple"] .lc:not(.open) :is(.lc-st, .lc-p, .lc-by, .lc-m) { display: none; }
+    html[data-phone="simple"] .lc:not(.open) .lc-list { max-height: none; overflow: hidden; border: 0; padding: 0 10px 6px; }
+    html[data-phone="simple"] .lc:not(.open) .lc-i:not(:first-child) { display: none; } html[data-phone="simple"] .lc:not(.open) .lc-i { border-bottom: 0; padding: 0 0 0 8px; }
+    html[data-phone="simple"] .lc:not(.open) .lc-i p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+    html[data-phone="simple"] .lc.open .lc-list { max-height: 40vh; }
     @media (prefers-reduced-motion: reduce) { html[data-phone="simple"] .ps-fold > i { transition: none; } }
   }
 </style>
@@ -1612,20 +1641,33 @@
     return { kind: 'trade', lang: aiLang(), market: S.sym, tf: TFS[S.tf], dec: S.dec, moment: T,
       trade: { side: t.side, entry: t.entry, stop0: coachStop0(t), target: t.target, openedAt: t.openedAt, ...(closed ? { closedAt: t.closedAt, exit: t.exit, R: t.R, net: t.net, reason: t.reason } : {}), mfe: t.mfe, mae: t.mae,
         ctx: t.ctx || null, sentence: coachSay(t), flags: BT.coachFlags(t, S.acct.closed).map((f) => ({ text: f.text })), tags: t.tags || [], mistakes: t.mistakes || [], reviewed: !!t.reviewed, note: t.note || '' },
-      before: aiBars(-Infinity, Math.min(t.openedAt, T), 120, false), after: aiBars(t.openedAt, closed ? Math.min(t.closedAt + TFS[S.tf], T) : T, 400, true) }; }
+      before: aiBars(-Infinity, Math.min(t.openedAt, T), 60, false), after: aiBars(t.openedAt, closed ? Math.min(t.closedAt + TFS[S.tf], T) : T, 120, closed) }; }   /* the server keeps 60 before, at most 120 after */
   function aiSessionBody() { const RC = jRecs(), sp = BT.coachSplits(RC);
     return { kind: 'session', lang: aiLang(), splits: { n: sp.n, noCtx: sp.noCtx, lead: sp.lead ? sp.lead.text : '', features: sp.features },
       trades: BT.trades(RC).filter((t) => t.R != null).slice(-40).map((t) => ({ R: t.R, side: t.side, sentence: coachSay(t), mistakes: t.mistakes || [], tags: t.tags || [] })) }; }
   const AI_MSG = { 401: 'Sign in on the desk again, then ask.', 403: 'This page may not ask the coach.', 400: 'This trade cannot be sent to the coach.' };
+  // one question, the answer streamed (17 Nov 2026, "faster"): onText(piece) gets the text as the provider writes it; the result
+  // is the server's CHECKED one ({ state, … }), or { http } when the server answered an error status
+  async function aiPost(body, onText) {
+    const r = await fetch('/api/chronos-coach', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, stream: true }) });
+    if (!r.ok) return { http: r.status };
+    if (!/event-stream/.test(r.headers.get('content-type') || '') || !r.body) return await r.json().catch(() => null);
+    const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '', end = null;
+    for (;;) { const { value, done } = await rd.read(); if (done) break; buf += dec.decode(value, { stream: true }); let i;
+      while ((i = buf.indexOf('\n\n')) >= 0) { const m = buf.slice(0, i).match(/^data: ([\s\S]*)$/); buf = buf.slice(i + 2); if (!m) continue; let j = null; try { j = JSON.parse(m[1]); } catch (e) { continue; }
+        if (j.t === 'text' && onText) onText(String(j.d || '')); else if (j.t === 'done') end = j; } }
+    return end || { state: 'error', message: 'The answer broke off. Try again in a minute.' };
+  }
+  // the summary of a JSON card while it is still being written ("summary":"…), for the first words on screen
+  const aiPartial = (raw) => { const m = /"summary"\s*:\s*"((?:[^"\\]|\\.)*)/.exec(raw); if (!m) return ''; try { return JSON.parse('"' + m[1].replace(/\\$/, '') + '"'); } catch (e) { return m[1]; } };
   async function aiAsk(box, body, keep) { const go = box.querySelector('.ai-go'), st = box.querySelector('.ai-st'), out = box.querySelector('.ai-out'); if (!go || go.disabled) return;
-    go.disabled = true; st.className = 'ai-st'; st.textContent = 'Asking the coach… this can take up to a minute.'; out.innerHTML = '';
-    let msg = ''; try { const r = await fetch('/api/chronos-coach', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      const j = await r.json().catch(() => null);
-      if (!r.ok) msg = AI_MSG[r.status] || 'The coach could not be reached. Try again in a minute.';
+    go.disabled = true; st.className = 'ai-st'; st.textContent = 'Asking the coach…'; out.innerHTML = '';
+    let msg = '', raw = '', shown = ''; try { const j = await aiPost(body, (d) => { raw += d; const p = aiPartial(raw); if (p && p !== shown) { shown = p; st.textContent = 'The coach is writing…'; out.innerHTML = `<div class="ai-card ai-wip"><p class="ai-k">AI coach · writing</p><p class="ai-sum">${esc(p)}</p></div>`; } });
+      if (j && j.http) msg = AI_MSG[j.http] || 'The coach could not be reached. Try again in a minute.';
       else if (j && j.state === 'ok' && j.answer) { const h = aiCard(j.answer); out.innerHTML = h; keep(h); st.textContent = j.cached ? 'Answered before: the same answer, not asked again.' : ''; }
-      else msg = (j && j.message) || 'The coach gave no answer.';
+      else { out.innerHTML = ''; msg = (j && j.message) || 'The coach gave no answer.'; }
       if (j && j.state === 'off') { AIC.on = false; AIC.why = ''; } }
-    catch (e) { msg = 'No connection: the coach could not be reached.'; }
+    catch (e) { out.innerHTML = ''; msg = 'No connection: the coach could not be reached.'; }
     if (msg) { st.className = 'ai-st err'; st.textContent = msg; } go.disabled = false; }
   function aiTradeShow() { const box = $('ai-tr'), t = MT && BT.trades(recsOf(MT.id))[0]; if (!t) { if (box) box.hidden = true; return; } const k = shotKey(MT); aiPaint(box, AIT.get(k) || ''); box.dataset.k = k; }
   $('ai-tr').addEventListener('click', (e) => { if (!e.target.closest('.ai-go') || !MT) return; const t = BT.trades(recsOf(MT.id))[0], k = $('ai-tr').dataset.k; if (!t) return; aiAsk($('ai-tr'), aiTradeBody(t), (h) => AIT.set(k, h)); });
@@ -1635,6 +1677,95 @@
   function aiSsSync() { try { const box = $('ai-ss'); if (AIC.on === null || box.dataset.sid === String(S.id)) return; box._h = null; aiPaint(box, AIS.sid === S.id ? AIS.html : ''); box.dataset.sid = String(S.id); } catch (e) { /* before the block ran */ } }
   aiInit();
   // ---- end AI coach
+  // ---- Live coach (17 Nov 2026, owner: "I want him to be live while I backtest, him watching the screen and trades live").
+  // A docked panel on the chart: a running commentary, newest first. Free, instant notes written here from what the page already
+  // knows (an entry and the coach's sentence, a draft, a stop moved, an exit with its R and behaviour flags, the challenge), and
+  // a short comment by the AI coach at an entry, at an exit and on "What do you see?" (one in flight, at most one every 20 s; the
+  // server holds the same limits and cuts every candle after the replay moment again). DISPLAY ONLY: this block reads the account,
+  // the candles and the drafts and writes text; it never places, changes or refuses an order and never touches a stop. The one
+  // thing it stores is the toggle (LC_KEY, a display preference of this device); the notes live in memory for the session view.
+  const LC_KEY = 'btLab:liveCoach', LC_GAP = 20000, LC_MAX = 60;
+  const LC = { on: false, open: true, pause: false, notes: [], busy: false, lastAt: 0, base: null, sid: null, tick: 0, draftK: '', draftAt: 0, draftSaid: '', warned: {} };
+  try { LC.on = localStorage.getItem(LC_KEY) === '1'; } catch (e) { LC.on = false; }
+  if (document.documentElement.dataset.phone === 'simple') LC.open = false;   // the phone starts on the one-line strip
+  const lcCard = document.querySelector('.chartc'), lcEl = document.createElement('aside');
+  lcEl.className = 'lc open'; lcEl.id = 'lc'; lcEl.hidden = true; lcEl.setAttribute('aria-label', 'Live coach');
+  lcEl.innerHTML = `<div class="lc-h"><button type="button" class="lc-fold" aria-expanded="true" aria-controls="lc-list"><b>Coach</b><span class="lc-n"></span><i aria-hidden="true">▾</i></button><button type="button" class="lc-ask" title="Ask the AI coach about the chart right now">What do you see?</button><button type="button" class="lc-x" aria-label="Turn the live coach off" title="Turn the live coach off">×</button></div>`
+    + `<div class="lc-b"><p class="lc-st" role="status"></p><label class="lc-p"><input type="checkbox" id="lc-pause"> Pause the replay while the coach answers</label><ol class="lc-list" id="lc-list" aria-live="polite"></ol><p class="lc-by">Notes from your own numbers; AI comments are a language model's reading, not a tested edge. A paper replay: nothing here changes your account.</p></div>`;
+  lcCard.appendChild(lcEl);
+  const lcTop = $('ai-top'), lcTg = document.createElement('label'); lcTg.className = 'lc-tg'; lcTg.innerHTML = '<input type="checkbox" id="lc-on"> <span>Live coach</span> <small>a running commentary on the chart</small>';
+  lcTop.parentNode.insertBefore(lcTg, lcTop.nextSibling);
+  const lcHM = (t) => (t > 0 ? new Date(t * 1000).toISOString().slice(11, 16) : '');
+  const lcR = (v) => (v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R');
+  function lcDraw() { const L = $('lc-list'); if (!L) return; const n = LC.notes.length;
+    lcEl.querySelector('.lc-n').textContent = n ? ` · ${n}` : ''; lcEl.classList.toggle('open', LC.open); lcEl.querySelector('.lc-fold').setAttribute('aria-expanded', String(LC.open));
+    setH(L, n ? LC.notes.map((x) => `<li class="lc-i ${x.k}" data-id="${x.id}"><span class="lc-m"><b>${esc(x.tag)}</b>${x.t ? ` <time>${esc(lcHM(x.t))} UTC</time>` : ''}</span><p>${esc(x.text)}</p></li>`).join('') : '<li class="lc-i lc-empty"><p>Watching. Open a trade, draw a level or press "What do you see?".</p></li>'); }
+  function lcNote(k, tag, text, t) { const x = { id: ++LC.tick, k, tag, text, t: t || (S.bars.length ? nowT() : 0) }; LC.notes.unshift(x); if (LC.notes.length > LC_MAX) LC.notes.length = LC_MAX; lcDraw(); return x; }
+  function lcSet(x, text, k) { x.text = text; if (k) x.k = k; const li = lcEl.querySelector(`.lc-i[data-id="${x.id}"]`); if (li) { li.className = 'lc-i ' + x.k; li.querySelector('p').textContent = text; } }
+  const lcStatus = (m) => { const e = lcEl.querySelector('.lc-st'); if (e && e.textContent !== m) e.textContent = m; };
+  // the chart as it stands at the replay moment: candles that ENDED by it (never one after), positions, drafts, drawings, habits
+  function lcBody(trigger, ev) { const T = mom(), sec = TFS[S.tf], closedBars = [];
+    for (const b of S.bars) { if (b.time + sec > T) continue; closedBars.push(b); }
+    const last = closedBars.slice(-60), now = last.length ? last[last.length - 1].close : null, atr = BT.atrOf(closedBars.slice(-15));
+    const dr = BT.coachDraw(S.draw, T, { side: 'buy', entry: now, at: T }, atr), all = BT.trades(S.acct.closed).filter((t) => t.R != null), sp = BT.coachSplits(S.acct.closed);
+    return { kind: 'live', trigger, lang: aiLang(), market: S.sym, tf: sec, dec: S.dec, moment: T, bars: last.map((b) => [b.time, b.open, b.high, b.low, b.close]),
+      positions: S.acct.positions.filter((p) => p.openedAt <= T).map((p) => ({ side: p.side, entry: p.entry, stop0: coachStop0(p), stop: p.stop, target: p.target, openedAt: p.openedAt, floatR: p.r0 > 0 && now != null ? +(((now - p.entry) * (p.side === 'buy' ? 1 : -1)) / p.r0).toFixed(2) : null, sentence: coachSay(p) })),
+      drafts: D ? [{ side: D.side, entry: D.entry, stop: D.stop, target: D.target, sentence: draftSay() }] : [],
+      drawings: dr ? { n: dr.n, items: dr.items, near: dr.near, atLevel: dr.atLevel, inBox: dr.inBox } : null,
+      trades: all.filter((t) => t.closedAt <= T).slice(-10).map((t) => ({ R: t.R, side: t.side, closedAt: t.closedAt, sentence: coachSay(t), flags: BT.coachFlags(t, S.acct.closed).map((f) => f.text) })), closedN: all.length, lead: sp.lead ? sp.lead.text : '', event: ev || null }; }
+  // one AI comment: never two at once, at most one every 20 s; an event in between gets its free note only
+  async function lcAI(trigger, ev, asked) {
+    if (!LC.on || !AIC.on || !S.bars.length) { if (asked) lcStatus(AIC.on ? 'Load candles first.' : `The AI coach is off${AIC.why ? ` (${AIC.why})` : ''}: the free notes go on.`); return; }
+    const wait = Math.ceil((LC.lastAt + LC_GAP - Date.now()) / 1000);
+    if (LC.busy || wait > 0) { if (asked) lcStatus(LC.busy ? 'The coach is still answering.' : `One AI comment every 20 s: next in ${wait} s.`); return; }
+    LC.busy = true; LC.lastAt = Date.now(); lcStatus(''); const sid = S.id, paused = LC.pause && !!S.timer; if (paused) $('play').click();
+    const x = lcNote('ai wip', 'AI coach', 'Looking…'); let txt = '';
+    try { const j = await aiPost(lcBody(trigger, ev), (d) => { txt += d; lcSet(x, txt); });
+      if (j && j.http) lcSet(x, AI_MSG[j.http] || 'The coach could not be reached.', 'ai off');
+      else if (j && j.state === 'ok' && j.text) lcSet(x, j.text, 'ai');
+      else if (j && j.state === 'refused') lcSet(x, 'Withdrawn: the answer broke the coach\'s rules.', 'ai off');
+      else { lcSet(x, (j && j.withdrawn) ? 'Withdrawn: the answer broke off.' : (j && j.message) || 'The coach gave no answer.', 'ai off'); if (j && j.state === 'wait' && j.retryInS) LC.lastAt = Date.now() - LC_GAP + j.retryInS * 1000; }
+      if (j && j.state === 'off') { AIC.on = false; } }
+    catch (e) { lcSet(x, 'No connection: the coach could not be reached.', 'ai off'); }
+    LC.busy = false; if (paused && !S.timer && S.id === sid) $('play').click(); }
+  // what changed since the last look (every 300 ms while on): the free notes, and the AI at an entry or an exit
+  const lcSnap = () => ({ sid: S.id, closedN: S.acct.closed.length, pos: new Map(S.acct.positions.map((p) => [p.id, { stop: p.stop, be: !!p.beMoved, away: p.stopAway || 0, side: p.side, tr: !!p.trail }])) });
+  function lcWatch() { if (!LC.on || !S.acct) return; lcPlace();
+    const now = lcSnap(), B = LC.base; LC.base = now;
+    if (!B || B.sid !== now.sid || now.closedN < B.closedN) { LC.draftK = D ? 'x' : ''; LC.warned = {}; return; }   // a new session or an undo: look again from here, no notes
+    for (const p of S.acct.positions) { const o = B.pos.get(p.id);
+      if (!o) { const say = coachSay(p); lcNote('open', p.side === 'buy' ? 'Bought' : 'Sold', `${p.side === 'buy' ? 'Bought' : 'Sold'} at ${fmt(p.entry)}, stop ${fmt(coachStop0(p))}${p.target != null ? `, target ${fmt(p.target)}` : ''}. ${say}`, p.openedAt);
+        lcAI('open', { side: p.side, sentence: say, flags: BT.coachFlags(p, S.acct.closed).filter((f) => f.k === 'revenge' || f.k === 'size' || f.k === 'levels').map((f) => f.text) }); continue; }
+      if (p.trail && !o.tr) { lcNote('stop', 'Stop', `Trailing stop on: it now follows the price, ${fmt(p.stop)} for now.`); continue; }
+      if (o.stop !== p.stop && !(p.trail && o.tr)) { const d = (p.entry - p.stop) * (p.side === 'buy' ? 1 : -1);
+        lcNote('stop', 'Stop', p.beMoved && !o.be ? `Stop to break-even at ${fmt(p.stop)}: this trade can no longer lose.` : (p.stopAway || 0) > o.away ? `Stop moved away from the entry to ${fmt(p.stop)}: the risk grew by ${Math.round(p.stopAway * 100)}% over the plan.` : d < 0 ? `Stop moved to ${fmt(p.stop)}: profit locked in.` : `Stop moved to ${fmt(p.stop)}: ${p.r0 > 0 ? (d / p.r0).toFixed(2) + 'R' : 'less'} at risk now.`); } }
+    if (now.closedN > B.closedN) { const recs = S.acct.closed.slice(B.closedN), ids = [...new Set(recs.map((r) => r.id))];
+      for (const id of ids) { const t = BT.trades(S.acct.closed.filter((r) => r.id === id))[0]; if (!t) continue;
+        if (S.acct.positions.some((p) => p.id === id)) { lcNote('part', 'Part closed', `Part of the ${t.side} closed: ${lcR(recs.filter((r) => r.id === id).reduce((a, r) => a + (r.R || 0), 0))} so far.`, t.closedAt); continue; }
+        const fl = BT.coachFlags(t, S.acct.closed), why = /^target/.test(t.reason || '') ? 'target' : /^stop/.test(t.reason || '') ? 'stop' : /breach/.test(t.reason || '') ? 'challenge breach' : 'by hand';
+        lcNote(t.R > 0 ? 'win' : t.R < 0 ? 'loss' : 'flat', 'Closed', `${t.side === 'buy' ? 'Buy' : 'Sell'} closed (${why}) at ${lcR(t.R)}.${fl.length ? ' ' + fl.map((f) => f.text).join('. ') + '.' : ''}`, t.closedAt);
+        lcAI('close', { side: t.side, R: t.R, reason: t.reason, sentence: coachSay(t), flags: fl.map((f) => f.text) }); } }
+    // a draft: noted once it has stood still a moment (not while its lines are dragged)
+    const dk = D ? [D.side, D.entry, D.stop, D.target].join() : '';
+    if (dk !== LC.draftK) { LC.draftK = dk; LC.draftAt = Date.now(); } else if (dk && dk !== LC.draftSaid && Date.now() - LC.draftAt > 1200) { LC.draftSaid = dk; const say = draftSay(); if (say) lcNote('draft', 'Draft', say); }
+    // the challenge, when one runs: its state and the two loss buffers once they get close
+    const ch = S.ch; if (ch && ch.progress) { const P = ch.progress, F = ch.firm, day = BT.dayKey ? BT.dayKey(nowT()) : '';
+      const k = ch.status + '|' + ch.phase; if (LC.warned.st && LC.warned.st !== k) lcNote(ch.status === 'failed' ? 'loss' : 'win', 'Challenge', ch.status === 'failed' ? `Challenge failed: ${ch.reason || ''}.` : ch.status === 'funded' ? 'Challenge passed every phase.' : 'Phase passed: the next phase begins.'); LC.warned.st = k;
+      if (ch.status === 'live' && P.dayLimit > 0) { const left = P.dayLimit - Math.max(0, P.dayLoss || 0); if (left < P.dayLimit * 0.3 && LC.warned.day !== day) { LC.warned.day = day; lcNote('warn', 'Challenge', `Daily loss buffer getting close: ${money(Math.max(0, left))} left today.`); } }
+      if (ch.status === 'live' && F && F.maxLoss > 0) { const of = F.maxLoss * ch.start, left = (P.equity ?? ch.start) - (P.floor ?? ch.start * (1 - F.maxLoss)); if (left < of * 0.3 && !LC.warned.max) { LC.warned.max = 1; lcNote('warn', 'Challenge', `Max loss buffer getting close: ${money(Math.max(0, left))} left.`); } else if (left >= of * 0.4) LC.warned.max = 0; } } }
+  // dock it over the price pane's lower left, inside the chart, clear of the quick bar (top) and the time scale (bottom)
+  function lcPlace() { const pn = $('chart');   /* #panes is display: contents with one chart */ if (!pn || !lcCard) return; const pr = pn.getBoundingClientRect(), cr = lcCard.getBoundingClientRect(), b = Math.max(0, Math.round(cr.bottom - pr.bottom + 34)) + 'px', l = Math.max(0, Math.round(pr.left - cr.left + 8)) + 'px';
+    if (lcEl.style.bottom !== b) lcEl.style.bottom = b; if (lcEl.style.left !== l) lcEl.style.left = l; }
+  let lcT = 0;
+  function lcSetOn(v) { LC.on = !!v; try { if (LC.on) localStorage.setItem(LC_KEY, '1'); else localStorage.removeItem(LC_KEY); } catch (e) { /* a display preference */ }
+    $('lc-on').checked = LC.on; lcEl.hidden = !LC.on; clearInterval(lcT); lcT = 0; LC.base = null;
+    if (LC.on) { lcDraw(); lcPlace(); lcT = setInterval(lcWatch, 300); lcWatch(); } }
+  $('lc-on').addEventListener('change', (e) => lcSetOn(e.target.checked));
+  lcEl.addEventListener('click', (e) => { if (e.target.closest('.lc-x')) return lcSetOn(false); if (e.target.closest('.lc-fold')) { LC.open = !LC.open; lcDraw(); return; } if (e.target.closest('.lc-ask')) { if (!LC.open) { LC.open = true; lcDraw(); } lcAI('ask', null, true); } });
+  $('lc-pause').addEventListener('change', (e) => { LC.pause = e.target.checked; });
+  window.ctLive = () => ({ on: LC.on, open: LC.open, busy: LC.busy, notes: LC.notes.map((x) => ({ k: x.k, tag: x.tag, text: x.text })) });   // read-only, for the audit
+  lcSetOn(LC.on);
+  // ---- end Live coach
   // ---- Monte Carlo pass probability ----
   $('mc-firm').innerHTML = BT.FIRMS.map((f) => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
   function mcDefaults() { if (!$('mc-perday').value) { const days = new Set(S.acct.closed.map((t) => BT.dayKey(t.closedAt))).size; $('mc-perday').value = Math.max(1, Math.round(BT.trades(S.acct.closed).length / Math.max(1, days))); } const n = BT.trades(S.acct.closed).filter((t) => t.R != null).length; $('mc-note').textContent = n < 5 ? `needs at least 5 closed trades (you have ${n})` : `${n} trades in the sample`; $('mc-run').disabled = n < 5; }
