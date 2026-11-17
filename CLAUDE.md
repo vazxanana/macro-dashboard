@@ -1191,6 +1191,20 @@ labelled "for study only": `loose-limit` (MX re-anchors, no quality filters, R:R
 `market-break` (market on the close after the M5 break); `buildStudy` / `simulateStudy`; each reports every fill and the gated trades.
 First run: loose-limit 19 fills +3.7R (gated 14, +5.2R), market-break 9 fills −1.0R. Tests: `tests/lit-replay.test.mjs`.
 
+## Desks in graphite (17 Nov 2026, owner: "do another one with other colors like grey"; spec docs/design/aureum-theme.md)
+Display only, `market-structure.html`: the ICT, Gold playbook, LIT, Crypto and NQ SDV desks, the desk switch, Setup and Scanner.
+One block `<style id="ms-dk-css">` (right before `#ms-ps-css`; every text 12 px or more, so the ICT typography test still holds):
+inside these views `--gold` / `--gold-soft` / `--gold-line` / `--gold-ink` and the ICT desk's `--ict-*` tokens point at the
+steel-blue accent (`--au-accent`, fallback #9db4d3 dark, #2f5e9e light), so every former gold mark turns blue without touching
+the rule that draws it; cards flat with 12 px corners; selected segments are a raised neutral with a 2 px accent underline (the
+ICT source switch was a gold fill); the desk switch is one look on every desk (each desk had its own colour). Header pattern:
+title, ONE plain sentence (`.dk-ans`), the long description folded in `details.dk-more` (wording kept word for word). ICT:
+`#ict-ans` ("n live trades open now. Latest signal: …", written by `render()` from `OL` and `T`), and the Signals card
+(`#ict-sig`) now comes right after "Open now", before the markets strip. Also fixed: LIT / NQ SDV title tags styled, Crypto
+READY green and IN ORIGIN amber (as Setup / Scanner), the LIT replay card escaped its strings twice ("&#39;"; the parse already
+escapes them), its setups table scrolls under a sticky header, the Gold playbook's cards say "could not be loaded" when no
+candles came (`.gp-fail`), and the Council calendar's today cell lost its gold outline (`#v-council .cal-d.today`).
+
 ## LIT and NQ SDV desks (8 Nov 2026)
 The desk switch is ICT | Gold | Crypto | LIT | NQ SDV (soon). `#lit` (v-lit, `renderLit`, re-run when council-data lands) shows the paper
 shadow stream: record from trades with `k 'lit'` / ids `xau-lit-*`, the detector funnel and dropped-candidate counts from `snapshot.lit`,
