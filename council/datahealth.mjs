@@ -96,6 +96,7 @@ export const FILES = [
   { file: 'macro/events.json', label: 'Macro release log', every: 'each macro run', check: listCheck },
   { file: 'macro/cache.json', label: 'Macro source cache', every: 'each macro run', check: (j, c) => { if (!j || typeof j !== 'object' || !j.fred) c.add('parse', 'warn', 'no FRED cache inside'); } },
   { file: 'research/trade-review.json', label: 'Trade review', every: 'every 6th round (~70 min), re-stamped at least every 6 h', at: (j) => j.at, warn: 12 * H, bad: 48 * H, check: (j, c) => { if (!j || !Array.isArray(j.systems)) c.add('parse', 'warn', 'no systems list'); } },
+  { file: 'research/trade-review-ledger.json', label: 'Trade review ledger', every: 'append-only, when the trade review records a new proposal', check: (j, c) => { if (!j || !Array.isArray(j.entries)) c.add('parse', 'warn', 'no entries list (the review leaves the file as it is and records nothing new)'); } },
   { file: 'coach.json', label: 'Coach (daily review + 6-hourly decay)', every: 'daily; decay every 6 h', need: true, at: (j) => j.at, warn: 26 * H, bad: 30 * H, check: coachCheck },
   { file: 'digest.json', label: 'Daily owner digest', every: '21:15 UTC Mon-Fri + Sunday preview', check: digestCheck },
   { file: 'watchdog.json', label: 'Loop watchdog', every: 'GitHub cron :11/:41 + each loop hand-over', at: (j) => j.at, warn: 3 * H, bad: 12 * H,

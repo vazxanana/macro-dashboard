@@ -14943,7 +14943,8 @@ function gpStats(T) {
     var L = J.totals && J.totals.live, Sh = J.totals && J.totals.shadow, P = arr(J.proposals), strong = P.filter(function (p) { return p.strong; }).length;
     return (L ? '<b>Live book</b>: ' + L.d30.n + ' closed in 30 days, ' + cR(L.d30.net) + ' after costs (' + cR(L.d30.gross) + ' before). ' : '')
       + (Sh ? '<b>Shadow book</b>: ' + Sh.d30.n + ' closed in 30 days, ' + cR(Sh.d30.net) + ' after costs (' + cR(Sh.d30.gross) + ' before). ' : '')
-      + arr(J.flags).length + ' flags and ' + P.length + ' proposals' + (strong ? ' (' + strong + ' with 30+ trades, |t| ≥ 2 and Holm passed)' : '') + ': in sample, proposals only.';
+      + arr(J.flags).length + ' flags and ' + P.length + ' proposals' + (strong ? ' (' + strong + ' with 30+ trades, |t| ≥ 2 and Holm passed)' : '') + ': in sample, proposals only.'
+      + (J.ledger && J.ledger.counts ? ' <b>Proposal ledger</b>: ' + J.ledger.n + ' recorded; on the trades closed since, ' + J.ledger.counts.held + ' held, ' + J.ledger.counts.faded + ' faded, ' + J.ledger.counts.unclear + ' unclear, ' + J.ledger.counts['too few'] + ' too few to judge.' : '');
   }
   function streamsOf(J, b) { return arr(J && J.systems).filter(function (s) { return b === 'all' || s.book === b; }); }
   function winRow(lab, w) { return '<tr><td>' + lab + '</td><td>' + w.n + '</td><td>' + (num(w.winRate) ? Math.round(w.winRate * 100) + '%' : '\u2014') + '</td><td>' + cR(w.gross.sum) + '</td><td>' + (w.cost.known ? cR(w.net.sum) : 'no cost on record') + '</td><td>' + fR(w.net.mean) + '</td><td>' + fT(w.net.t) + '</td></tr>'; }
@@ -14964,9 +14965,12 @@ function gpStats(T) {
   }
   function propHTML(p, i) {
     var e = p.evidence || {}, t = p.test || {}, k = (p.ai ? 'a:' : 'p:') + (p.flag || i);
-    return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary>' + (p.strong ? '<span class="tr-chip strong">strong</span>' : '') + (p.ai ? '<span class="tr-chip ai">language model</span>' : '') + '<b>' + esc(p.change) + '</b><span class="tr-r">n ' + e.n + ' · ' + fR(e.mean) + ' · ' + fT(e.t) + '</span></summary>'
+    var fw = p.forward, FW = { held: 'held forward', faded: 'faded forward', unclear: 'unclear forward', 'too few': 'forward: too few' };
+    return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary>' + (p.strong ? '<span class="tr-chip strong">strong</span>' : '') + (fw ? '<span class="tr-chip">' + esc(FW[fw.status] || fw.status) + '</span>' : '') + (p.ai ? '<span class="tr-chip ai">language model</span>' : '') + '<b>' + esc(p.change) + '</b><span class="tr-r">n ' + e.n + ' · ' + fR(e.mean) + ' · ' + fT(e.t) + '</span></summary>'
       + '<div class="tr-body"><p>' + esc(p.why) + '</p><p><b>Evidence</b>: ' + e.n + ' trades, ' + fR(e.mean) + ' a trade, ' + fT(e.t) + (num(e.p) ? ', p ' + e.p.toFixed(3) : '') + (e.holm === true ? ', survives Holm' : e.holm === false ? ', does not survive Holm' : '') + '. ' + esc(e.warning || '') + '</p>'
-      + '<p><b>Test that would confirm it</b>: ' + esc(t.question || '') + ' ' + esc(t.data || '') + '; ' + esc(t.split || '') + '; ' + esc(t.costs || '') + '. Bar: ' + esc(t.bar || '') + '. ' + esc(t.how || '') + '.</p></div></details></li>';
+      + (fw ? '<p><b>Forward check</b> (only trades closed after it was first recorded, ' + esc(String(fw.recorded || '').slice(0, 10)) + '): ' + esc(fw.text || fw.status) + (p.fadedForward ? ' No longer offered as strong.' : '') + '</p>' : '')
+      + '<p><b>Test that would confirm it</b>: ' + esc(t.question || '') + ' ' + esc(t.data || '') + '; ' + esc(t.split || '') + '; ' + esc(t.costs || '') + '. Bar: ' + esc(t.bar || '') + '. ' + esc(t.how || '') + '.</p>'
+      + (p.prereg ? '<details><summary>Pre-registration draft (approve to start the study)</summary><pre class="tr-pre" style="white-space:pre-wrap">' + esc(p.prereg) + '</pre></details>' : '') + '</div></details></li>';
   }
   function aiHTML(r) {
     if (!r) return '<p>' + esc(st.aiErr || 'Loading…') + '</p>';

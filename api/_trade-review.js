@@ -26,6 +26,7 @@ const SYSTEM = [
   'The patterns in the file were found by looking at these same trades: they are in sample and prove nothing on their own. Say so where it matters.',
   'Your job: for each stream you are given, write a short plain review (what is working, what is losing R and why) and, where a flag supports it, propose a concrete change.',
   'A proposal MUST name exactly one flag id from that stream\'s "flags" list as its evidence. A proposal without a valid flag id is discarded.',
+  'A stream may carry "forwardChecks": the desk\'s own earlier proposals re-measured only on trades closed after they were recorded. Do not propose again a flag whose forward check is "faded"; such a proposal is discarded. "held" is a second small sample, not proof.',
   'Proposals are only suggestions for the owner; nothing is applied. Never suggest a live account, removing a stop or moving a stop further away.',
   'Answer with ONE JSON object and nothing else, in this shape:',
   '{"overview":"2-4 sentences","streams":[{"key":"<stream key>","review":"2-4 sentences","working":["..."],"losing":["..."],"proposals":[{"flag":"<flag id>","change":"one sentence","why":"one or two sentences"}]}]}',
@@ -39,8 +40,11 @@ function pick(review) {
     .sort((a, b) => rank(a) - rank(b) || b.windows.all.n - a.windows.all.n).slice(0, MAX_STREAMS);
 }
 const W = (w) => (w ? { n: w.n, winRate: w.winRate, grossSum: w.gross && w.gross.sum, netSum: w.net && w.net.sum, netMean: w.net && w.net.mean, netT: w.net && w.net.t, costPerTrade: w.cost && w.cost.perTrade, costKnown: w.cost && w.cost.known } : null);
+// the ledger's forward checks by stream key, and the flag ids whose proposal faded forward (17 Nov 2026)
+function ledgerItems(review) { return review && review.ledger && Array.isArray(review.ledger.items) ? review.ledger.items : []; }
+function fadedFlags(review) { return new Set(ledgerItems(review).filter((x) => x && x.forward && x.forward.status === 'faded').map((x) => x.flag)); }
 function buildRequest(review) {
-  const flags = new Map((review.flags || []).map((f) => [f.id, f]));
+  const flags = new Map((review.flags || []).map((f) => [f.id, f])), led = ledgerItems(review);
   const streams = pick(review).map((s) => ({
     key: s.key, name: s.name, book: s.book,
     last7: W(s.windows.d7), last30: W(s.windows.d30), all: W(s.windows.all),
@@ -52,6 +56,7 @@ function buildRequest(review) {
     lossReasons: s.reviews && s.reviews.tags, decay: s.decay && s.decay.status,
     flags: (s.flags || []).map((id) => flags.get(id)).filter(Boolean).slice(0, MAX_FLAGS).map((f) => ({ id: f.id, kind: f.kind, n: f.n, mean: f.mean, t: f.t, holm: f.holm == null ? null : f.holm, text: f.text })),
     recent: (s.recent || []).slice(-MAX_RECENT).map((x) => ({ market: x.market, side: x.side, exit: x.exit, R: x.R, net: x.net, mfe: x.mfe, session: x.session })),
+    forwardChecks: led.filter((x) => x && x.stream === s.key && x.forward).slice(0, MAX_FLAGS).map((x) => ({ flag: x.flag, change: str(x.change, LIM.change), recorded: x.recorded, recordedT: x.evidence && x.evidence.t, status: x.forward.status, n: x.forward.n, t: x.forward.t })),
   }));
   const payload = { at: review.at, rule: review.rule, inSample: review.inSample, thresholds: review.thresholds, streams };
   return { system: SYSTEM, prompt: `The desk's trade review file (JSON):\n${JSON.stringify(payload)}\n\nAnswer with the JSON object only.`, payload };
@@ -68,19 +73,20 @@ const list = (v) => (Array.isArray(v) ? v.map((x) => str(x, LIM.item)).filter(Bo
 function parseAnswer(text, review) {
   const j = jsonOf(text); if (!j || typeof j !== 'object') return { ok: false, why: ['the answer is not a JSON object'] };
   const byKey = new Map((review.systems || []).map((s) => [s.key, s])), flags = new Map((review.flags || []).map((f) => [f.id, f]));
-  const props = new Map((review.proposals || []).map((p) => [p.flag, p]));
+  const props = new Map((review.proposals || []).map((p) => [p.flag, p])), faded = fadedFlags(review);
   const out = [], why = []; let dropped = 0;
   for (const s of Array.isArray(j.streams) ? j.streams : []) {
     const S = s && byKey.get(s.key); if (!S) { if (s && s.key) why.push(`unknown stream ${str(s.key, 60)}`); continue; }
     const own = new Set(S.flags || []), P = [];
     for (const p of Array.isArray(s.proposals) ? s.proposals : []) {
       const f = p && flags.get(p.flag);
-      if (!f || !own.has(p.flag) || !str(p.change, LIM.change)) { dropped++; continue; }
+      if (!f || !own.has(p.flag) || faded.has(f.id) || !str(p.change, LIM.change)) { dropped++; continue; }   // a faded idea is not proposed again
       if (P.length >= LIM.proposals) break;
       const base = props.get(f.id);
       P.push({ flag: f.id, change: str(p.change, LIM.change), why: str(p.why, LIM.why),
         evidence: base ? base.evidence : { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), holm: f.holm == null ? null : f.holm, inSample: true, warning: review.inSample },
-        test: base ? base.test : { question: `Does the pattern of flag ${f.id} hold out of sample?`, ...(review.test || {}) }, strong: !!(base && base.strong) });
+        test: base ? base.test : { question: `Does the pattern of flag ${f.id} hold out of sample?`, ...(review.test || {}) }, strong: !!(base && base.strong),
+        ...(base && base.forward ? { forward: base.forward } : {}) });
     }
     if (out.some((x) => x.key === S.key)) continue;
     out.push({ key: S.key, name: S.name, book: S.book, review: str(s.review, LIM.review), working: list(s.working), losing: list(s.losing), proposals: P });
@@ -89,4 +95,4 @@ function parseAnswer(text, review) {
   return { ok: true, answer: { overview: str(j.overview, LIM.overview), streams: out, dropped } };
 }
 
-module.exports = { SYSTEM, MAX_STREAMS, pick, buildRequest, parseAnswer, jsonOf };
+module.exports = { SYSTEM, MAX_STREAMS, pick, buildRequest, parseAnswer, jsonOf, fadedFlags };
