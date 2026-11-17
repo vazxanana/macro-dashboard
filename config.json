@@ -649,9 +649,15 @@
    "by": "user",
    "change": "Mosha cycle (owner, 14 Nov): new trades are paper shadows (same rule and stops, recorded and managed, never alerted, no demo copy on the council account); a trade already open runs to its exit",
    "why": "Its two pre-registered studies, the live code run unchanged after costs: 2020-Nov 2026 -0.574R a trade (n 115, t -3.99, research/edge/mcycle-base), and untouched 2007-19 -0.175R a trade (n 244, t -1.50; break-even before costs, research/edge/mcycle-oos). Owner decision 54."
+  },
+  {
+   "at": "2026-11-17T12:09:05.000Z",
+   "by": "coach-backtest",
+   "change": "scalp: hold to the second target (backtest)",
+   "why": "456 trades over the last 30 days: the second target +0.36R per trade versus the first (t = 2.7), +0.38R and +0.33R in the two halves."
   }
  ],
- "btAt": "2026-11-16T22:40:56.083Z",
+ "btAt": "2026-11-17T12:08:36.388Z",
  "beSrc": "backtest",
  "userRules": [
   "rintra-origin",
@@ -703,8 +709,12 @@
   "shadow-best",
   "mcycle-shadow"
  ],
- "target": {},
- "targetBy": {},
+ "target": {
+  "scalp": "t2"
+ },
+ "targetBy": {
+  "scalp": "backtest"
+ },
  "entry": {},
  "resumedAt": {
   "scalp": 1793654023
@@ -712,11 +722,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-17T12:06:33.000Z",
+   "at": "2026-11-17T12:09:05.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-17T12:06:33.000Z",
+   "at": "2026-11-17T12:09:05.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -728,8 +738,8 @@
    "why": "market: -1.00R per trade over 6 trades"
   },
   "position": {
-   "at": "2026-11-16T22:41:17.000Z",
-   "why": "backtest: 20 trades at -1.02R each"
+   "at": "2026-11-17T12:09:05.000Z",
+   "why": "backtest: 16 trades at -1.02R each"
   },
   "rscalp": {
    "at": "2026-11-16T11:51:45.000Z",
