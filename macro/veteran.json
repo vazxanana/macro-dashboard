@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-17T13:26:13.000Z",
+ "at": "2026-11-17T13:52:06.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-17T13:25:48.000Z",
+ "strategistAt": "2026-11-17T13:51:34.000Z",
  "shock": {
   "shock": "Positive growth / demand news",
   "clues": [
@@ -114,7 +114,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+1.39 pts in 5 sessions (vote down); score z (4-week fall) −0.85",
+   "macro": "+1.45 pts in 5 sessions (vote down); score z (4-week fall) −0.85",
    "veteran": "DXY 103.62, +1.31% on the week, +1.81% over 4 weeks · broad USD +0.89% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -123,8 +123,8 @@
   },
   {
    "topic": "Inflation and the next release",
-   "macro": "2.20%, −3 bp a week (vote down); playbook: Core Retail Sales m/m 2026-11-17 13:30 UTC",
-   "veteran": "10Y breakeven 2.20%, −3 bp on the week. A red-folder event lands within 72 hours (Core Retail Sales m/m): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
+   "macro": "2.20%, −3 bp a week (vote down); playbook: CPI y/y 2026-11-18 07:00 UTC",
+   "veteran": "10Y breakeven 2.20%, −3 bp on the week. A red-folder event lands within 72 hours (CPI y/y): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
    "stance": "agree",
    "why": "A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.",
    "m": -1,
@@ -152,7 +152,7 @@
  "verdict": {
   "bias": "AUCTION",
   "conviction": null,
-  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Core Retail Sales m/m): the bias is conditional until the print.",
+  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print.",
   "agree": 4,
   "qualify": 2,
   "disagree": 0,
@@ -162,23 +162,23 @@
    "a weekly close below the 10-week average 4103 removes the trend tiebreaker"
   ],
   "eventWithin72h": {
-   "title": "Core Retail Sales m/m",
-   "at": "2026-11-17T13:30:00.000Z",
-   "consensus": "0.4%"
+   "title": "CPI y/y",
+   "at": "2026-11-18T07:00:00.000Z",
+   "consensus": "3.6%"
   }
  },
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
   "shock": "Positive growth / demand news",
-  "surprise": "Pending: Core Retail Sales m/m at 2026-11-17 13:30 UTC against the calendar expectation captured before it (0.4%); print minus previous is not a surprise",
+  "surprise": "Pending: CPI y/y at 2026-11-18 07:00 UTC against the calendar expectation captured before it (3.6%); print minus previous is not a surprise",
   "observed": "10Y real +31 bp · HY −19 bp · VIX −6.3 on the week",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold weakens if higher real yields dominate, holds if currency or portfolio demand offsets.",
   "alternative": "Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker",
-  "nextReview": "after Core Retail Sales m/m",
+  "nextReview": "after CPI y/y",
   "forecastId": "xau-4w-2026-11-14",
   "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-20..2026-11-16, n 3085)"
  },
@@ -1177,7 +1177,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-17T13:26:13.000Z",
+  "at": "2026-11-17T13:52:06.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1207,7 +1207,7 @@
       "source": "macro/forecast.json playbook"
      },
      {
-      "text": "also this week: Core Retail Sales m/m, Retail Sales m/m, BOE Gov Bailey Speaks, FOMC Meeting Minutes, Employment Change, Unemployment Rate",
+      "text": "also this week: BOE Gov Bailey Speaks, FOMC Meeting Minutes, Employment Change, Unemployment Rate",
       "asOf": "2026-11-17",
       "source": "calendar"
      }
@@ -1537,7 +1537,8 @@
       "why": "The first support (2026-11-09..2026-11-13): a daily close below it says sellers took last week's range.",
       "dist": -0.26,
       "side": "below",
-      "near": 0
+      "near": 0,
+      "crossed": true
      },
      {
       "price": 3839.6,
@@ -1583,9 +1584,9 @@
      "text": "as of 2026-11-16 close"
     },
     "mark": {
-     "px": 3856.405,
-     "at": "2026-11-17T13:25:48.000Z",
-     "dist": -0.16
+     "px": 3848.005,
+     "at": "2026-11-17T13:51:34.000Z",
+     "dist": -0.38
     }
    },
    "dxy": {
@@ -2904,7 +2905,7 @@
    "country": "USD",
    "at": "2026-11-17T13:30:00.000Z",
    "type": null,
-   "released": false,
+   "released": true,
    "titles": [
     "Core Retail Sales m/m",
     "Retail Sales m/m"
@@ -2973,7 +2974,7 @@
    ],
    "stats": null,
    "call": null,
-   "callNote": "No release history for this event in the repository: no call.",
+   "callNote": "Released: no new call after the release.",
    "label": "Descriptive, not a tested edge.",
    "publicOnly": true,
    "paperOnly": true
@@ -4236,7 +4237,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -4268,16 +4269,16 @@
    "px": 3862.77,
    "asOf": "2026-11-16",
    "above": {
-    "price": 3900,
-    "label": "Round number",
-    "dist": 0.96,
-    "distNow": 1.13
+    "price": 3870.3,
+    "label": "October low",
+    "dist": 0.19,
+    "distNow": 0.58
    },
    "below": {
     "price": 3832.5,
     "label": "13-week low",
     "dist": -0.78,
-    "distNow": -0.62
+    "distNow": -0.4
    },
    "fresh": {
     "asOf": "2026-11-16",
@@ -4286,9 +4287,9 @@
     "text": "as of 2026-11-16 close"
    },
    "mark": {
-    "px": 3856.405,
-    "at": "2026-11-17T13:25:48.000Z",
-    "dist": -0.16
+    "px": 3848.005,
+    "at": "2026-11-17T13:51:34.000Z",
+    "dist": -0.38
    },
    "broken": null
   },
@@ -4299,7 +4300,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-17 13:26 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Core Retail Sales m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −1.03 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close). Event playbook: USD Core Retail Sales m/m 2026-11-17 13:30 UTC: consensus 0.4% (previous 0.9%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-17 13:52 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −1.03 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close). Event playbook: GBP CPI y/y 2026-11-18 07:00 UTC: consensus 3.6% (previous 3.5%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
