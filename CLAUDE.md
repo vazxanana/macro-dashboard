@@ -2196,6 +2196,15 @@ line, magnet, resize box and lines"). Display only: a drawing never places, chan
   colour and width, Delete, Alt+V / Alt+J, the account untouched, a reload keeps them and loads an old-format drawing;
   screenshots `draw-strip.png`, `draw-selected.png`, `draw-magnet.png`).
 
+## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
+Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =
+rename), then the account as a list (`.pf-box.pf-list`, rows `.pf-row`: round icon, title, one line, chevron or switch): Demo
+accounts (`data-pf-go` scrolls to the card, opening its fold on the phone's simple view), Change photo / Display name (ids
+`ms-pf-photo` / `ms-pf-rename`, hidden when the menu has none), Light theme (`#ms-pf-theme`, `role="switch"`), Log out; "More"
+(`#ms-pf-more`): notification / sounds / connector rows follow their card's `hidden` (`pfSync`, MutationObserver), Academy only where
+the account menu shows `#ms-me-academy`. From 901 px the list column is sticky on the left and every section card in the right
+column. The hero and lists are not `.card`, so the simple view still keeps the first card (Demo accounts) and folds the rest.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private

@@ -3386,19 +3386,46 @@ html[data-role="public"] .hdr-sw { display: none; }
 .nt-in b { display: block; font-size: 16px; margin-top: 6px; } .nt-in p { margin: 4px 0 0; color: var(--ink-dim); font-size: 13.5px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 40vh; overflow: auto; } .nt-in .nt-act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 .nt-in button { min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 600 13px Figtree, system-ui, sans-serif; cursor: pointer; } .nt-in button.pri { background: var(--accent, #5b8cff); border-color: var(--accent, #5b8cff); color: #fff; }
 @media (prefers-reduced-motion: reduce) { .nt-in { transition: none; } }
-#v-profile .pf-grid { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
-#v-profile .pf-card { display: grid; gap: 16px; padding: 20px; position: sticky; top: 72px; }
-#v-profile .pf-id { display: flex; align-items: center; gap: 14px; } #v-profile .pf-id b { display: block; font-size: 18px; letter-spacing: -0.01em; } #v-profile .pf-id small { color: var(--ink-faint); font-size: 12.5px; }
-#v-profile .pf-today:empty { display: none; }
-#v-profile .pf-act { display: grid; gap: 8px; } #v-profile .pf-act .ms-tbtn { width: 100%; min-height: 38px; justify-content: center; }
-#v-profile .pf-note { margin: 0; font-size: 12.5px; }
+/* Profile layout (17 Nov 2026, owner: "make profile like this example", a mobile profile from Figma): a filled name card with
+   the portrait and an edit button, then the account as a list of rows (round icon, title, one line, chevron or switch), a
+   "More" list, and the sections the rows open. Graphite tokens only; every text 12 px or more, every row 56 px. */
+#v-profile .pf-grid { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+#v-profile .pf-side { display: grid; gap: 14px; position: sticky; top: 72px; min-width: 0; }
+@media (min-width: 901px) { #v-profile .pf-side { grid-column: 1; grid-row: 1 / span 8; } #v-profile .pf-grid > .pf-ct { grid-column: 2; } }
+#v-profile .pf-hero { display: flex; align-items: center; gap: 14px; padding: 18px 16px; border-radius: var(--au-r, 12px); color: var(--au-ink, var(--ink));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--au-accent, #9db4d3) 30%, var(--au-surface, var(--panel))), color-mix(in srgb, var(--au-accent, #9db4d3) 12%, var(--au-surface, var(--panel))));
+  border: 1px solid color-mix(in srgb, var(--au-accent, #9db4d3) 35%, transparent); box-shadow: var(--au-shadow, 0 4px 24px rgba(0,0,0,.08)); }
+#v-profile .pf-hero .me-av { width: 60px; height: 60px; flex: none; border-radius: 50%; box-shadow: 0 0 0 3px var(--au-surface, var(--panel)); overflow: hidden; }
+#v-profile .pf-hero-t { flex: 1; min-width: 0; } #v-profile .pf-hero-t b { display: block; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#v-profile .pf-hero-t small { display: block; margin-top: 2px; font-size: 13px; color: var(--au-ink-2, var(--ink-dim)); }
+#v-profile .pf-edit { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--au-line-strong, var(--line)); background: color-mix(in srgb, var(--au-surface, var(--panel)) 55%, transparent); color: var(--au-ink, var(--ink)); cursor: pointer; }
+#v-profile .pf-edit:hover { background: var(--au-surface, var(--panel)); } #v-profile .pf-edit:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+#v-profile .pf-today:empty { display: none; } #v-profile .pf-today { margin: 0; }
+#v-profile .pf-box { background: var(--au-surface, var(--panel)); border: 1px solid var(--au-line, var(--line)); border-radius: var(--au-r, 12px); box-shadow: var(--au-shadow, 0 4px 24px rgba(0,0,0,.06)); padding: 6px; }
+#v-profile .pf-list { display: grid; gap: 2px; }
+#v-profile .pf-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 60px; padding: 8px 10px; border: 0; border-radius: var(--au-r-sm, 8px); background: transparent; color: var(--au-ink, var(--ink)); font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+#v-profile .pf-row[hidden] { display: none; }
+#v-profile .pf-row:hover { background: var(--au-surface-2, var(--panel-hover)); } #v-profile .pf-row:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: -2px; }
+#v-profile .pf-ic { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--au-surface-2, var(--panel-hover)); color: var(--au-accent, var(--accent)); }
+#v-profile .pf-tx { flex: 1; min-width: 0; display: grid; gap: 2px; } #v-profile .pf-tx b { font-size: 14px; font-weight: 600; } #v-profile .pf-tx small { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#v-profile .pf-chev { flex: none; color: var(--au-ink-3, var(--ink-faint)); }
+#v-profile .pf-row[data-out] .pf-tx b { color: var(--au-ink-2, var(--ink-dim)); }
+#v-profile .pf-sw { flex: none; position: relative; width: 46px; height: 28px; border-radius: 14px; background: var(--au-surface-2, var(--panel-hover)); border: 1px solid var(--au-line-strong, var(--line)); transition: background .15s; }
+#v-profile .pf-sw i { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--au-ink-3, var(--ink-faint)); transition: transform .15s, background .15s; }
+#v-profile .pf-row[aria-checked="true"] .pf-sw { background: var(--au-accent, var(--accent)); border-color: transparent; } #v-profile .pf-row[aria-checked="true"] .pf-sw i { transform: translateX(18px); background: var(--au-surface, #fff); }
+@media (prefers-reduced-motion: reduce) { #v-profile .pf-sw, #v-profile .pf-sw i { transition: none; } }
+#v-profile .pf-more-h { margin: 4px 0 -4px 4px; font-size: 14px; font-weight: 600; color: var(--au-ink-2, var(--ink-dim)); }
+#v-profile .pf-more-h[hidden], #v-profile .pf-list[hidden] { display: none; }
+#v-profile .pf-note { margin: 0 4px; font-size: 12.5px; }
+#v-profile .pf-hit { animation: pfHit 1.2s ease-out 1; } @keyframes pfHit { 0% { box-shadow: 0 0 0 2px var(--au-accent, var(--accent)); } 100% { box-shadow: 0 0 0 2px transparent; } }
+@media (prefers-reduced-motion: reduce) { #v-profile .pf-hit { animation: none; } }
 #v-profile .pf-ct { padding: 0; overflow: hidden; }
 #v-profile .pf-ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); } #v-profile .pf-ct-h h2 { margin: 0; font-size: 16px; } #v-profile .pf-ct-h .ct-sub { color: var(--ink-faint); font-size: 12px; }
 #v-profile .pf-ct-b { padding: 16px; font-variant-numeric: tabular-nums; }
 #v-profile .pf-mcp { grid-column: 2; } #v-profile .pf-mcp ol { margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.6; } #v-profile .pf-mcp .mcp-url { display: flex; gap: 8px; align-items: center; margin: 10px 0; } #v-profile .pf-mcp .mcp-url code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; background: var(--panel-hover, rgba(127,127,127,.08)); } #v-profile .pf-mcp label { display: grid; gap: 6px; font-size: 13px; max-width: 360px; } #v-profile .pf-mcp input { min-height: 38px; }
 @media (max-width: 900px) { #v-profile .pf-mcp { grid-column: 1; } }
 .me-pop .me-link { display: flex; align-items: center; min-height: 38px; padding: 8px 10px; text-decoration: none; color: var(--ink); font: 600 13px var(--sans); border-radius: 8px; } .me-pop .me-link:hover, .me-pop .me-link:focus-visible { background: var(--panel-hover); outline: none; }
-@media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-card { position: static; } }
+@media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-side { position: static; } }
 </style>
 <style id="ms-acct-css">
 /* ── Account surfaces, quality pass (11 Nov 2026): Profile, Users, account menu, Settings, price alerts, the bell, the palette.
@@ -5839,15 +5866,32 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   </section>
   <!-- Profile (8 Nov, owner: "make the cTrader accounts a page inside the profile so it is more organised") -->
   <section class="view" id="v-profile" aria-label="Profile" hidden>
-    <div class="v-head pf-head"><div><h1 class="h-head">Profile</h1><p class="ms-note">Your seat on the desk, and the council's demo accounts.</p></div></div>
+    <div class="v-head pf-head"><div><h1 class="h-head">Profile</h1></div></div>
     <div class="pf-grid">
-      <aside class="card pf-card">
-        <div class="pf-id"><span class="me-av me-av-lg" id="ms-pf-av" aria-hidden="true"></span><div><b id="ms-pf-name">—</b><small id="ms-pf-role"></small></div></div>
+      <aside class="pf-side" aria-label="Your account">
+        <div class="pf-hero">
+          <span class="me-av me-av-lg" id="ms-pf-av" aria-hidden="true"></span>
+          <div class="pf-hero-t"><b id="ms-pf-name">—</b><small id="ms-pf-role"></small></div>
+          <button type="button" class="pf-edit" id="ms-pf-edit" aria-label="Change display name" title="Change display name"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
+        </div>
         <div class="me-today pf-today" id="ms-pf-today"></div>
-        <div class="pf-act"><button type="button" class="ms-tbtn" id="ms-pf-photo">Change photo</button><button type="button" class="ms-tbtn" id="ms-pf-rename">Change display name</button><button type="button" class="ms-tbtn" id="ms-pf-theme" data-theme-set>Light theme</button></div>
+        <nav class="pf-box pf-list" aria-label="Account">
+          <button class="pf-row" type="button" data-pf-go="ms-pf-acct"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></i><span class="pf-tx"><b>Demo accounts</b><small>The council's paper accounts, one per edge</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" id="ms-pf-photo"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></i><span class="pf-tx"><b>Change photo</b><small>Your portrait on the desk</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" id="ms-pf-rename"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></i><span class="pf-tx"><b>Display name</b><small>How the desk greets you</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" id="ms-pf-theme" data-theme-set role="switch" aria-checked="false"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg></i><span class="pf-tx"><b>Light theme</b><small>Easier to read in daylight</small></span><span class="pf-sw" aria-hidden="true"><i></i></span></button>
+          <button class="pf-row" type="button" id="ms-pf-out" data-out><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/></svg></i><span class="pf-tx"><b>Log out</b><small>Sign out on this device</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </nav>
+        <h2 class="pf-more-h" id="ms-pf-more-h">More</h2>
+        <nav class="pf-box pf-list" id="ms-pf-more" aria-labelledby="ms-pf-more-h">
+          <button class="pf-row" type="button" data-pf-go="ms-pf-nt" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/></svg></i><span class="pf-tx"><b>Send a notification</b><small>A message on every member's bell</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" data-pf-go="ms-pf-snd" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 010 6"/></svg></i><span class="pf-tx"><b>ChronosTrade sounds</b><small>What a target or a stop sounds like</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" data-pf-go="ms-pf-mcp" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M15 7l5 5-5 5"/></svg></i><span class="pf-tx"><b>ChatGPT connector</b><small>Work on the ICT edge from ChatGPT</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <a class="pf-row" href="/academy" data-pf-ac><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c3 2 7 2 10 0v-5"/></svg></i><span class="pf-tx"><b>Aureum Academy</b><small>Replay a setup and train your eye</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        </nav>
         <p class="ms-note pf-note">Paper trading only. The demo accounts belong to the council: one per edge, so each book's results stay apart.</p>
       </aside>
-      <section class="card pf-ct" aria-labelledby="ms-pf-t">
+      <section class="card pf-ct" id="ms-pf-acct" aria-labelledby="ms-pf-t">
         <div class="pf-ct-h"><div><h2 id="ms-pf-t">Demo accounts</h2><div class="ct-sub" id="ms-pf-sub"></div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-b" aria-live="polite"></div>
       </section>
@@ -11929,6 +11973,16 @@ function msNextSetup(bars, A) {
       else body().innerHTML = `<div class="ct-empty">${esc(e.message)}</div><div><button type="button" class="ct-btn ghost" id="ms-ct-retry">Try again</button></div>`, $('ms-ct-retry') && $('ms-ct-retry').addEventListener('click', () => load(true));
     } finally { state.busy = false; }
   }
+  // the list on the profile (17 Nov 2026, owner: "make profile like this example"): the theme row is a switch, the More rows
+  // show only while their card is shown, the Academy row only where the account menu offers it (the owner)
+  function pfSync() {
+    const L = document.documentElement.dataset.theme === 'light', t = $('ms-pf-theme');
+    if (t) { t.setAttribute('aria-checked', String(L)); const b = t.querySelector('.pf-tx b'), sm = t.querySelector('.pf-tx small'); if (b) b.textContent = 'Light theme'; if (sm) sm.textContent = L ? 'On: tap for the dark theme' : 'Easier to read in daylight'; }
+    document.querySelectorAll('#v-profile [data-pf-go]').forEach((r) => { const c = $(r.dataset.pfGo); if (c && r.closest('#ms-pf-more')) r.hidden = c.hidden; });
+    const ac = document.querySelector('#v-profile [data-pf-ac]'), ma = $('ms-me-academy'); if (ac) ac.hidden = !ma || getComputedStyle(ma).display === 'none';
+    const more = $('ms-pf-more'), any = more && [].some.call(more.children, (r) => !r.hidden); if (more) { more.hidden = !any; if ($('ms-pf-more-h')) $('ms-pf-more-h').hidden = !any; }
+    const out = $('ms-pf-out'), mo = $('ms-me-out'); if (out && mo) { const b = out.querySelector('.pf-tx b'); if (b) b.textContent = mo.textContent || 'Log out'; }
+  }
   // the profile page: identity from the account menu, the day's numbers, and the accounts below
   window.msProfile = function () {
     if (document.documentElement.dataset.role === 'public' || !userKey()) return;
@@ -11936,7 +11990,8 @@ function msNextSetup(bars, A) {
     const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML.replace(/(id="|url\(#)av/g, '$1pfav'); };   // the portrait's gradients get ids of their own: a copy pointing at the hidden menu's drew nothing
     cp('ms-me-av2', 'ms-pf-av'); cp('ms-me-name2', 'ms-pf-name'); cp('ms-me-role', 'ms-pf-role'); cp('ms-me-today', 'ms-pf-today');
     ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
-    if ($('ms-pf-theme') && $('ms-me-theme')) $('ms-pf-theme').textContent = $('ms-me-theme').textContent;
+    if ($('ms-pf-edit')) $('ms-pf-edit').hidden = !$('ms-me-rename');
+    pfSync();
     load(true);
     mcpCard();
     clearInterval(state.timer); state.timer = setInterval(() => { if (!document.hidden && active()) load(false); else if (!active()) clearInterval(state.timer); }, 15000);
@@ -11972,8 +12027,18 @@ function msNextSetup(bars, A) {
   document.addEventListener('DOMContentLoaded', () => {
     const b = $('ms-me-ct'); if (b) b.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; location.hash = '#profile'; });
     const pl = $('ms-me-profile'); if (pl) pl.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; });
-    ['photo', 'rename'].forEach((k) => { const b2 = $('ms-pf-' + k); if (b2) b2.addEventListener('click', () => { const src = $('ms-me-' + k); if (src) src.click(); setTimeout(() => window.msProfile && msProfile(), 400); }); });
-    const pt = $('ms-pf-theme'); if (pt && $('ms-me-theme')) pt.addEventListener('click', () => { $('ms-me-theme').click(); setTimeout(() => { pt.textContent = $('ms-me-theme').textContent; }, 50); });
+    ['photo', 'rename', 'edit'].forEach((k) => { const b2 = $('ms-pf-' + k); if (b2) b2.addEventListener('click', () => { const src = $('ms-me-' + (k === 'edit' ? 'rename' : k)); if (src) src.click(); setTimeout(() => window.msProfile && msProfile(), 400); }); });
+    const pt = $('ms-pf-theme'); if (pt && $('ms-me-theme')) pt.addEventListener('click', () => { $('ms-me-theme').click(); setTimeout(pfSync, 50); });
+    const po = $('ms-pf-out'); if (po) po.addEventListener('click', () => { const o = $('ms-me-out'); if (o) o.click(); });
+    // a row of the list goes to its card; in the phone's simple view a folded card is opened first
+    document.querySelectorAll('#v-profile [data-pf-go]').forEach((r) => r.addEventListener('click', () => {
+      const c = $(r.dataset.pfGo); if (!c) return; const k = c.getAttribute('data-ps'), f = k && !c.hasAttribute('data-ps-open') ? document.querySelector('.ps-dyn[data-ps-for="' + k + '"]') : null;
+      if (f) f.click(); const to = f || c; to.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      c.classList.remove('pf-hit'); void c.offsetWidth; c.classList.add('pf-hit'); }));
+    // the More rows follow their cards: the owner's cards and the connector open later, by their own scripts
+    if (typeof MutationObserver === 'function') ['ms-pf-nt', 'ms-pf-snd', 'ms-pf-mcp'].forEach((id) => { const c = $(id); if (c) new MutationObserver(pfSync).observe(c, { attributes: true, attributeFilter: ['hidden'] }); });
+    new MutationObserver(pfSync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    pfSync();
     // the router may have shown the profile before this module was ready (a direct #profile load): render it now
     if ($('v-profile') && !$('v-profile').hidden) setTimeout(() => window.msProfile && msProfile(), 0);
     $('ms-ct-x').addEventListener('click', () => dlg().close());
