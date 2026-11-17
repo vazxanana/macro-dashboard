@@ -142,7 +142,7 @@ async function startServer(port = PORT, flags = []) {
     // ---- 2. the owner: shell, tabs, setup ----
     const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await ctx.addInitScript(NO_PACE); let p = await ctx.newPage(); watch(p, 'owner');
     await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, null, null);
-    check('title and heading are "MeridianX Academy"', (await p.title()) === 'MeridianX Academy' && (await txt(p, 'h1')) === 'MeridianX Academy', await p.title());
+    check('title and heading are "Aureum Academy"', (await p.title()) === 'Aureum Academy' && (await txt(p, 'h1')) === 'Aureum Academy', await p.title());
     const tabs = await p.$$eval('#ac-tabs [role=tab]', (l) => l.map((x) => x.textContent.trim()));
     check('nine sections as tabs, Train first', tabs.length === 9 && /^Train$/.test(tabs[0]) && ['Session', 'Blind arena', 'Progress', 'Lessons', 'Research', 'Models', 'Costs', 'Audit'].every((t, i) => tabs[i + 1].startsWith(t)), tabs.join(' | '));
     check('no tab is a placeholder any more', !tabs.some((t) => /next step/.test(t)) && !/Coming in the next build step/.test(await txt(p, '#ac-app')), tabs.join(' | '));
@@ -846,7 +846,7 @@ async function startServer(port = PORT, flags = []) {
         const f3 = await form(), attA = (await api(w, 'get=attempts&edge=' + EDGE + '&cand=' + encodeURIComponent(cA.id))).attempts, corA = (await api(w, 'get=corrections&edge=' + EDGE + '&cand=' + encodeURIComponent(cA.id))).corrections;
         check('Try again stores the decision once more through the usual attempt call (same mode, same snapshot hash, same answer), then the verdict on it', wrote(n0) === 'attempt:train,correct' && attA.length === 2 && attA[1].n === 2 && attA[1].mode === 'train' && attA[1].snapshotHash === attA[0].snapshotHash && attA[1].decision.action === attA[0].decision.action && corA.length === 1 && corA[0].attemptId === attA[1].id, mine(n0).join() + ' / ' + attA.map((a) => a.n + a.mode).join());
         check('the stored correction is the one that was on the form: reject, bias up, the reason, the words, two entry marks', corA.length === 1 && corA[0].verdict === 'reject' && corA[0].bias === 'up' && corA[0].reasons.join() === 'missing-confirmation' && corA[0].text === want.text && corA[0].annotations.length === 2 && corA[0].annotations.every((a) => a.kind === 'entry'), JSON.stringify(corA[0] || null).slice(0, 180));
-        check('after the save: no problem line, the button reads Save correction, the heading names the attempt the verdict is on', f3.err === '' && f3.save === 'Save correction' && f3.head === 'your verdict on attempt 2' && /Your verdict is saved/.test(await txt(w, '#point-text')), JSON.stringify([f3.err, f3.save, f3.head]));
+        check('after the save: no problem line, the button reads Save correction, the heading names the attempt the verdict is on', f3.err === '' && f3.save === 'Save correction' && f3.head === 'on attempt 2' && /Your verdict is saved/.test(await txt(w, '#point-text')), JSON.stringify([f3.err, f3.save, f3.head]));
         // one failure, then Try again: saved on the SAME attempt, nothing stored twice
         await goOn(w); await nextPoint(w);
         const cB = await w.evaluate(() => window.MXAC.lastSnapshot.cand);

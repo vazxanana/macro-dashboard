@@ -2851,6 +2851,17 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   the sequence is reproduced with the real handler and the real Blob backend over a fake Blob service that lags as documented.
   The same CDN read is in the other private-Blob modules (`api/notify.js`, `profile.js`, `sounds.js`, `mosha.js`,
   `mosha-lessons.js`, which overwrite one file in place): not changed here. Tests: `tests/academy-correction.test.mjs`; audit section 11l.
+- **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`, the site-wide spec; the 16 Nov black-and-gold draft was
+  rejected by the owner). Display only. `assets/academy.css` section "Graphite", right before the phone block: the `--au-*`
+  tokens for dark / light / midnight, and the Academy's older names (`--panel`, `--ink`, `--accent`, `--buy`, `--gold`, …)
+  pointed at them by one rule whose selector list outweighs every theme rule of `assets/mx-page.css`, so the page looks right
+  whether or not that file has the tokens. Candles keep their colours (`--ac-up` / `--ac-down`, read by `candleLook`); chart text
+  `--au-ink-3`, grid `--au-line`. One primary (solid neutral) in view: `#c-play` gives way while a train verdict waits, the
+  decision card's Continue becomes primary once the verdict is saved, Resume and "Test on 10 new setups" are secondary. From
+  1081 px the decision, verdict, lesson, proof and What if lead the column beside the chart (CSS `order`; the phone's full view
+  keeps chart, account, decision, verdict). Levels are one strip (`.kv.lvl`), the decision's folds one grouped list, entry / stop
+  / target appear only for a changed trade (`.choices + .lv`), a chosen verdict reads in its colour. The verdict card is "Your
+  verdict" (small: "on attempt N"; the audit's correction check reads that). No decision, lesson, API or storage change.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
