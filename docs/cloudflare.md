@@ -85,9 +85,76 @@ the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then agai
   The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
   Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
 - **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
-- **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
-  alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,
-  `notice`) → KV. One copy, then Vercel's Blob store is read-only.
+- **Storage to Cloudflare**: the Blob store → the D1 file store below (built 17 Nov 2026, switch OFF until the lead
+  throws it); Edge Config (`runMode`, `paused`, `notice`) → KV, still to do.
+
+## File store on D1 (17 Nov 2026; behind the Worker secret `STORE`, OFF by default)
+
+The Vercel account is blocked; its Blob store still answers and holds users, profiles, notices, sounds, the Mosha log,
+lessons and pictures, Academy files, price alerts, cTrader links, the TradingView log, run reports and the bridge ping.
+The site can keep them in the D1 database `aureum-data` (binding `STORE_DB` in `wrangler.jsonc`) instead.
+
+**How it works.** The 15 api/ modules that use `@vercel/blob` are unchanged. `wrangler.jsonc` aliases `@vercel/blob` to
+`src/store-blob.mjs` and the real package to `vercel-blob-real`. Every call (`put`, `list`, `del`, `head`, …) goes to the
+real package unless the secret `STORE` is `d1` (case and spaces ignored); then to `src/store-d1.mjs`:
+- Tables `store_blobs` (pathname, size, upload time in ms, content type, etag, chunk count, `src` = `vercel` for a copy the
+  mirror made, `d1` for a file the site wrote here), `store_chunks` (base64, 768 KB of file a row; D1 keeps a row under
+  2 MB; at most 16 MB a file, a bigger one is refused with "File is too large"), `store_gone` (when the site deleted a
+  path), `store_state` (the mirror's state). Created on first use; no migration step.
+- Same behaviour as Vercel where the handlers rely on it: `allowOverwrite` false refuses an existing path ("This blob
+  already exists"), `addRandomSuffix` gives `name-<30 letters/digits>.ext`, list pages by `limit` (max 1000) and an opaque
+  `cursor`, `uploadedAt` is a Date, `etag` changes on every write, deleting what is not there is no error, no token = the
+  same "No blob credentials" error. A write here is newer than every file in the store (upload time = max(now, newest + 1 ms)).
+  Not available in D1 mode (refused with a clear error; no handler uses them): `get`, `copy`, `rename`, multipart, image
+  puts, `ifMatch`, folded lists. `tests/cloudflare-store.test.mjs` fails if a handler starts using another call or option.
+- **Reading a file by its URL**: `list` / `put` give URLs on `https://d1.store.invalid/<path>`; `store-blob.mjs` wraps the
+  Worker's `fetch` (worker.mjs imports it before any handler) so that host is answered from D1 inside the Worker, GET /
+  HEAD only, only with `Authorization: Bearer <BLOB_READ_WRITE_TOKEN>`; `?cache=0` and `?download=1` are ignored. `.invalid`
+  never resolves, so a store URL cannot leave the Worker. Every other request goes out as before.
+- D1 reads go to its primary (no read replicas are used), so a write is read back at once: the stale reads of the Blob CDN
+  ("Blob freshness audit" in CLAUDE.md) do not exist here. Writes are D1 transactions (a file and its chunks appear together).
+- No module stores a blob URL in its data (lesson pictures are found by id, profile photos and sounds are data URLs inside
+  their JSON), so nothing needs rewriting at the switch.
+- **Fail closed**: in D1 mode the store answers only once `store_state` records `ready` (a complete copy was made by the
+  mirror). Before that every call throws "the Cloudflare store is not ready", so sign-in answers 503 instead of falling back
+  to the built-in accounts.
+- **Keep `BLOB_READ_WRITE_TOKEN` set** in D1 mode (any value works once Vercel is gone): the handlers answer "storage not set
+  up" without it, and it is the token store URLs are read with. The KV backup (`src/backup.mjs`) always reads the real Vercel
+  store, whatever `STORE` says.
+
+**The mirror** (`src/store-mirror.mjs`, from `scheduled` in `worker.mjs`, logged as `store mirror`):
+- Switch OFF, every 10 minutes: copies every Vercel file that is new or changed (upload time / size), keeping Vercel's upload
+  time, and deletes the copies of files Vercel no longer has (an unlink, a removed device, an old users file). At most 100
+  files / 48 MB a run; the rest next run. A run with nothing left and nothing failed sets `ready` (the log says
+  `"complete":true,"ready":"<time>"`). Unlike the KV backup, which keeps deleted files, this copy follows Vercel.
+- Switch ON: ONE final pass copies the Vercel files written since the last mirror run: only a file newer than its D1 row and
+  newer than any delete made here; the commit itself re-checks it, so a write made after the switch is never overwritten,
+  even one made while the file is being copied. It also deletes copies of files Vercel deleted before the switch. It runs on
+  the minute cron during the first hour after the switch is seen (then the 10-minute one) and stops for good once complete
+  (`final pass done`).
+- A file the site wrote in D1 mode is never overwritten or deleted by the mirror, also after a switch back (`kept` count).
+- `STORE_MIRROR=off` (secret) stops the mirror in either mode (for example when Vercel's store is gone for good).
+
+**To switch to D1 (lead):**
+1. Deploy this code with `STORE` unset (nothing changes for the site). Watch the Worker logs (`npx wrangler tail` or the
+   dashboard): `store mirror` lines every 10 minutes until one reads `"complete":true` with a `ready` time.
+2. Right after a complete run (a quiet moment: no owner edits), set the secret: `npx wrangler secret put STORE` in
+   `cloudflare/`, value `d1`. Secrets take effect at once (a new version).
+3. Within a minute the log shows `store mirror … "mode":"d1" … "complete":true`, then `final pass done`. Check: sign in as
+   a member, the notices, a profile photo, a Mosha lesson picture, the Users page.
+4. Later, when Vercel is closed: set `STORE_MIRROR=off`; keep `BLOB_READ_WRITE_TOKEN` (any value).
+
+**To switch back to Vercel:** `npx wrangler secret delete STORE` (or set it to anything but `d1`). The site reads and writes
+Vercel again at once. **What that loses**: every write made while `STORE` was `d1` (accounts and passwords changed, profiles,
+notices, lessons and pictures, the Mosha log, Academy saves, price alerts, cTrader links) is not on Vercel, so the site no
+longer sees it. Nothing is deleted: those files stay in D1 (`src = 'd1'`, counted as `kept` in the mirror's log) and come
+back with a later switch to D1 only where Vercel has no newer file; copying them back to Vercel is a manual step (not built).
+A password changed in D1 mode reverts to the Vercel one, so check the Users page after a switch back.
+
+Not verified against the real services: the mirror's reads of the real Vercel store (the backup has run the same calls), and
+the store on the remote D1 database (checked on `wrangler dev --local`'s D1 with the real handlers: sign-in, a password
+change read back at once, notices, profile photo). Not covered: two writes to one file at the same instant still keep the
+last (as on Vercel).
 - **Retired**: the backup council runner (`api/run.js`, crons council / ict) starts the Trader as a child process
   and writes files, which Workers do not allow. GitHub Actions and the VPS runner run the council.
 

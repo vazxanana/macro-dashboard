@@ -11,7 +11,7 @@ export async function blobBackup(env, deps = {}) {
   const kv = env.BACKUP, token = env.BLOB_READ_WRITE_TOKEN;
   if (!kv || !token) return { skip: !kv ? 'no BACKUP binding' : 'no BLOB_READ_WRITE_TOKEN' };
   const now = deps.now || Date.now(), F = deps.fetch || fetch;
-  const list = deps.list || (await import('@vercel/blob')).list;
+  const list = deps.list || (await import('vercel-blob-real')).list;   // the real Vercel store, whatever the switch STORE says
   const meta = (await kv.get('meta', 'json')) || { files: {} };
   if (meta.done && now - Date.parse(meta.at) < EVERY_MS) return { skip: 'fresh', at: meta.at };
   const blobs = [];

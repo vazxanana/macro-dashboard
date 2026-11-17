@@ -99,7 +99,14 @@ https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; 
 deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on push only for the two Cloudflare branches).
 The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker (`MD_BASE`, repository variable
 `MD_ORIGIN` overrides). Links, the bridges' default URL, the digest and the connectors' origin lists name aureumdesk.co.uk.
-A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily). Keep api/ handlers in Vercel's (req, res) shape so
+A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily).
+**File store on D1** (17 Nov 2026, `docs/cloudflare.md` "File store on D1"): `@vercel/blob` is aliased to
+`cloudflare/src/store-blob.mjs` (real package: `vercel-blob-real`); with the Worker secret `STORE=d1` every Blob call of the
+unchanged api/ handlers goes to D1 `aureum-data` (`STORE_DB`, `src/store-d1.mjs`; store URLs on `d1.store.invalid` answered
+from D1 by a wrapped `fetch`), otherwise to Vercel (the default). `src/store-mirror.mjs` keeps D1 a copy of Vercel (10-min
+cron) and, once switched, makes one final pass that never overwrites a write made here. D1 mode fails closed until a complete
+copy is recorded; a file the site wrote in D1 mode is never touched by the mirror. Never import `@vercel/blob` in
+`cloudflare/src` for the real store: use `vercel-blob-real`. Tests: `tests/cloudflare-store.test.mjs`. Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
 fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
 stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.

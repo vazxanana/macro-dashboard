@@ -15,12 +15,16 @@
   },
   // The api/ handlers resolve their packages from the repository root; point them at this folder's copies.
   "alias": {
-    "@vercel/blob": "./node_modules/@vercel/blob",
+    "@vercel/blob": "./src/store-blob.mjs",
+    "vercel-blob-real": "./node_modules/@vercel/blob",
     "web-push": "./node_modules/web-push",
     "acorn": "./node_modules/acorn"
   },
   // A copy of the Vercel Blob store (src/backup.mjs, every 10 min until complete, then daily). An id, not a secret.
   "kv_namespaces": [{ "binding": "BACKUP", "id": "ef06eea1b4834f3e913b3fbd82302039" }],
+  // The file store on D1 (src/store-d1.mjs): the site's store once the Worker secret STORE is 'd1'; until then
+  // src/store-mirror.mjs keeps it a copy of the Vercel Blob store. An id, not a secret.
+  "d1_databases": [{ "binding": "STORE_DB", "database_name": "aureum-data", "database_id": "c5aa93f8-763e-4ead-9c37-db4d4051b4cb" }],
   "triggers": { "crons": ["* * * * *", "*/10 * * * *"] },
   "limits": { "cpu_ms": 300000 },
   "observability": { "enabled": true },
