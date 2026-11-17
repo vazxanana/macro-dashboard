@@ -211,6 +211,10 @@
     {
       "path": "/api/edge-analyst?job=scan",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/trade-review?job=review",
+      "schedule": "17 */6 * * *"
     }
   ],
   "functions": {
@@ -243,6 +247,9 @@
       "maxDuration": 60
     },
     "api/edge-analyst.js": {
+      "maxDuration": 120
+    },
+    "api/trade-review.js": {
       "maxDuration": 120
     },
     "api/pine.js": {

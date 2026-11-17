@@ -2810,6 +2810,41 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           #ms-ea .ea-wrap { overflow-x: auto; }
           @media (pointer: coarse) { #ms-ea details summary { min-height: 44px; display: flex; align-items: center; } }
         </style>
+<style id="ms-tr-css">
+          /* the trade review card (17 Nov 2026): the graphite tokens of docs/design/aureum-theme.md, each with the page's own token as fallback */
+          #ms-tr { --tr-ink: var(--au-ink, var(--ink)); --tr-ink2: var(--au-ink-2, var(--ink-dim)); --tr-ink3: var(--au-ink-3, var(--ink-faint)); --tr-line: var(--au-line, var(--line));
+            --tr-s2: var(--au-surface-2, var(--panel-hover)); --tr-well: var(--au-well, var(--panel-hover)); --tr-gain: var(--au-gain, var(--buy-ink, var(--buy))); --tr-loss: var(--au-loss, var(--sell-ink, var(--sell)));
+            --tr-warn: var(--au-warn, var(--warn-ink, var(--ink))); --tr-acc: var(--au-accent, var(--accent-ink, var(--accent))); font-variant-numeric: tabular-nums; }
+          #ms-tr .tr-sum { font-size: 14px; line-height: 1.5; margin: 6px 0 12px; color: var(--tr-ink2); } #ms-tr .tr-sum b { color: var(--tr-ink); font-weight: 600; }
+          #ms-tr .tr-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin: 0 0 10px; }
+          #ms-tr .tr-seg { display: inline-flex; border: 1px solid var(--tr-line); border-radius: 8px; overflow: hidden; }
+          #ms-tr .tr-seg button { font: inherit; font-size: 13px; padding: 6px 12px; min-height: 32px; background: transparent; color: var(--tr-ink2); border: 0; border-right: 1px solid var(--tr-line); cursor: pointer; }
+          #ms-tr .tr-seg button:last-child { border-right: 0; } #ms-tr .tr-seg button[aria-pressed="true"] { background: var(--tr-s2); color: var(--tr-ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--tr-acc); }
+          #ms-tr button:focus-visible, #ms-tr summary:focus-visible { outline: 2px solid var(--tr-acc); outline-offset: 2px; }
+          #ms-tr .tr-h { font-size: 13px; font-weight: 600; color: var(--tr-ink); margin: 16px 0 6px; }
+          #ms-tr .tr-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--tr-line); }
+          #ms-tr .tr-list > li { border-bottom: 1px solid var(--tr-line); }
+          #ms-tr details > summary { list-style: none; cursor: pointer; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; padding: 10px 2px; min-height: 24px; font-size: 13px; color: var(--tr-ink2); }
+          #ms-tr details > summary::-webkit-details-marker { display: none; }
+          #ms-tr details > summary b { color: var(--tr-ink); font-weight: 600; }
+          #ms-tr .tr-r { margin-left: auto; white-space: nowrap; }
+          #ms-tr .tr-chip { display: inline-block; font-size: 12px; line-height: 1.4; padding: 1px 8px; border-radius: 999px; color: var(--tr-ink2); background: var(--tr-s2); }
+          #ms-tr .tr-chip.live { color: var(--tr-acc); background: color-mix(in srgb, var(--tr-acc) 14%, transparent); }
+          #ms-tr .tr-chip.strong { color: var(--tr-warn); background: color-mix(in srgb, var(--tr-warn) 14%, transparent); }
+          #ms-tr .tr-chip.ai { color: var(--tr-ink); background: var(--tr-s2); border: 1px solid var(--tr-line); }
+          #ms-tr .pos { color: var(--tr-gain); } #ms-tr .neg { color: var(--tr-loss); }
+          #ms-tr .tr-body { padding: 0 2px 12px; font-size: 13px; line-height: 1.5; color: var(--tr-ink2); }
+          #ms-tr .tr-body p { margin: 6px 0; } #ms-tr .tr-body ul { margin: 4px 0 8px 18px; padding: 0; }
+          #ms-tr .tr-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+          #ms-tr .tr-well { background: var(--tr-well); border-radius: 8px; padding: 8px 10px; }
+          #ms-tr .tr-wrap { overflow-x: auto; }
+          #ms-tr table { border-collapse: collapse; width: 100%; font-size: 12px; }
+          #ms-tr th { text-align: right; font-weight: 500; color: var(--tr-ink3); padding: 4px 6px; border-bottom: 1px solid var(--tr-line); }
+          #ms-tr td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--tr-line); white-space: nowrap; color: var(--tr-ink); }
+          #ms-tr th:first-child, #ms-tr td:first-child { text-align: left; }
+          #ms-tr .tr-note { font-size: 12px; color: var(--tr-ink3); }
+          @media (pointer: coarse) { #ms-tr .tr-seg button { min-height: 44px; } #ms-tr details > summary { min-height: 44px; align-items: center; } }
+        </style>
 <style id="ms-trv-css">
 /* Trade replay (#ms-trv-js, 7 Nov): the trade viewers (#ms-tv council / systems, #ict-tv ICT desk) as phone sheets with a #trade/<id> link */
 .tv-nb { display: grid; gap: 6px; padding: 10px 16px 12px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
@@ -5524,6 +5559,17 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <p class="ms-note">When a live trade of one of our systems opens (a paper shadow is not studied), a language model sees only what was known at that moment (the trade's levels, the system's features, the candles before the entry, the releases around it) and says take, reduce or skip. The system trades either way: the answer is recorded and put beside the result when the trade closes. It changes no rule, size or trade.</p>
         <div class="ea-sum" id="ms-ea-sum">Loading…</div>
         <div class="ea-wrap"><table class="ea-tb" id="ms-ea-list" hidden><thead><tr><th>Entry (UTC)</th><th>System</th><th>Trade</th><th>AI said</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="card adm" id="ms-tr">
+                <div class="ms-k"><span role="heading" aria-level="2">Trade review · what the trades say, system by system</span><span class="ms-note" id="ms-tr-at"></span></div>
+        <p class="tr-sum" id="ms-tr-sum">Loading the trade review…</p>
+        <div class="tr-bar"><div class="tr-seg" role="group" aria-label="Show streams from" id="ms-tr-seg"><button type="button" data-b="live" aria-pressed="true">Live</button><button type="button" data-b="shadow" aria-pressed="false">Shadow</button><button type="button" data-b="research" aria-pressed="false">Research</button><button type="button" data-b="all" aria-pressed="false">All</button></div></div>
+        <ul class="tr-list" id="ms-tr-list"></ul>
+        <div class="tr-h" role="heading" aria-level="3">Proposals · for a pre-registered test, never applied</div>
+        <ul class="tr-list" id="ms-tr-props"></ul>
+        <div class="tr-h" role="heading" aria-level="3">Language-model review</div>
+        <div id="ms-tr-ai" class="tr-body"><p>Loading…</p></div>
+        <p class="ms-note tr-note">After the fact, from the trades the council really took (council/trade-review.mjs, every ~70 minutes; research/trade-review.json). Per stream: the last 7 and 30 days and the whole forward record on file, R before and after costs with its t, where the R goes, costs, the demo copies' slippage and the session splits. Every flag carries n and t; a split also says whether it survives Holm over all the split tests. They are found by looking at these same trades, so they are in sample: a proposal is a question for a pre-registered study (2020 → now, net of costs, in sample against out of sample), and nothing here changes a rule, a size, a stop or a filter. The ICT desk is a separate edge and is not in it.</p>
       </div>
     </div>
     <div class="c-grid c-pane c-pane-research adm" id="ms-cp-research" role="tabpanel" aria-labelledby="ms-cn-research" data-pane="research" hidden>
@@ -14537,6 +14583,101 @@ function gpStats(T) {
   load(); setInterval(function () { if (!document.hidden) load(); }, 5 * 60e3);
 })();
 </script>
+<script id="ms-tr-js">
+// Trade review card (#ms-tr, Council review pane, 17 Nov 2026): council-data research/trade-review.json (council/trade-review.mjs:
+// the after-the-fact check of the trades taken, flags with n and t, rule-based proposals) through window.msData, and the optional
+// language-model review from /api/trade-review (owner and reviewers). Display only: proposals are never applied from here.
+(function (W) {
+  var box = document.getElementById('ms-tr'); if (!box) return;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var fR = function (v) { return num(v) ? (v > 0.004 ? '+' : v < -0.004 ? '\u2212' : '') + Math.abs(v).toFixed(2) + 'R' : '\u2014'; };
+  var cR = function (v) { return '<span class="' + (v > 0.004 ? 'pos' : v < -0.004 ? 'neg' : '') + '">' + fR(v) + '</span>'; };
+  var fT = function (t) { return num(t) ? 't ' + (t < 0 ? '\u2212' : '') + Math.abs(t).toFixed(2) : 't \u2014'; };
+  var arr = function (v) { return Array.isArray(v) ? v : []; };
+  var BOOK = { live: 'live', shadow: 'shadow', research: 'research paper' };
+  var st = { b: 'live', J: null, ai: null, aiErr: null, open: {} };
+  try { st.b = localStorage.getItem('msTrBook') || 'live'; } catch (e) {}
+  function sumLine(J) {
+    if (!J || !arr(J.systems).length) return 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.';
+    var L = J.totals && J.totals.live, Sh = J.totals && J.totals.shadow, P = arr(J.proposals), strong = P.filter(function (p) { return p.strong; }).length;
+    return (L ? '<b>Live book</b>: ' + L.d30.n + ' closed in 30 days, ' + cR(L.d30.net) + ' after costs (' + cR(L.d30.gross) + ' before). ' : '')
+      + (Sh ? '<b>Shadow book</b>: ' + Sh.d30.n + ' closed in 30 days, ' + cR(Sh.d30.net) + ' after costs (' + cR(Sh.d30.gross) + ' before). ' : '')
+      + arr(J.flags).length + ' flags and ' + P.length + ' proposals' + (strong ? ' (' + strong + ' with 30+ trades, |t| ≥ 2 and Holm passed)' : '') + ': in sample, proposals only.';
+  }
+  function streamsOf(J, b) { return arr(J && J.systems).filter(function (s) { return b === 'all' || s.book === b; }); }
+  function winRow(lab, w) { return '<tr><td>' + lab + '</td><td>' + w.n + '</td><td>' + (num(w.winRate) ? Math.round(w.winRate * 100) + '%' : '\u2014') + '</td><td>' + cR(w.gross.sum) + '</td><td>' + (w.cost.known ? cR(w.net.sum) : 'no cost on record') + '</td><td>' + fR(w.net.mean) + '</td><td>' + fT(w.net.t) + '</td></tr>'; }
+  function streamHTML(s, flags) {
+    var a = s.windows.all, wr = s.whereR || {}, F = arr(s.flags).map(function (id) { return flags[id]; }).filter(Boolean);
+    var ses = arr(s.splits && s.splits.session).map(function (b) { return '<tr><td>' + esc(b.v) + '</td><td>' + b.n + '</td><td>' + fR(b.mean) + '</td><td>' + fT(b.t) + '</td><td>' + (b.vsRest ? fT(b.vsRest.t) : '\u2014') + '</td></tr>'; }).join('');
+    var ex = Object.keys(wr.exits || {}).map(function (k) { return esc(k) + ' ' + wr.exits[k].n + ' (' + fR(wr.exits[k].net) + ')'; }).join(', ');
+    return '<div class="tr-body"><p>' + esc(s.review && s.review.head) + '</p><div class="tr-cols">'
+      + '<div class="tr-well"><b>Working</b><ul>' + (arr(s.review && s.review.working).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') || '<li>Nothing stands out yet.</li>') + '</ul></div>'
+      + '<div class="tr-well"><b>Losing R</b><ul>' + (arr(s.review && s.review.losing).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') || '<li>Nothing stands out yet.</li>') + '</ul></div></div>'
+      + '<div class="tr-wrap"><table><thead><tr><th>Window</th><th>n</th><th>Won</th><th>Before costs</th><th>After costs</th><th>A trade</th><th>t</th></tr></thead><tbody>'
+      + winRow('Last 7 days', s.windows.d7) + winRow('Last 30 days', s.windows.d30) + winRow('Forward record', a) + '</tbody></table></div>'
+      + '<p><b>Exits</b>: ' + (ex || '\u2014') + '. <b>Fast stops</b> (30 min of the fill): ' + (wr.fastStops ? wr.fastStops.n + ' of ' + wr.fastStops.ofLosses + ' losses' : '\u2014') + '. <b>Reached +1R, closed at a loss</b>: ' + (wr.reached1R ? wr.reached1R.closedAtLoss + ' of ' + wr.reached1R.n : '\u2014') + '. <b>A +1R close instead</b>: ' + (wr.lock1R && wr.lock1R.n ? fR(wr.lock1R.mean) + ' a trade, ' + fT(wr.lock1R.t) + ' (n ' + wr.lock1R.n + ', approximate)' : '\u2014') + '.</p>'
+      + '<p><b>Demo copies</b>: ' + (s.slippage && s.slippage.n ? s.slippage.n + ' fills, ' + fR(s.slippage.mean) + ' a trade (positive = worse), ' + fT(s.slippage.t) : 'none on file') + (s.decay ? '. <b>Decay monitor</b>: ' + esc(s.decay.status) : '') + '.</p>'
+      + (ses ? '<div class="tr-wrap"><table><thead><tr><th>Session</th><th>n</th><th>A trade</th><th>t</th><th>vs the rest</th></tr></thead><tbody>' + ses + '</tbody></table></div>' : '')
+      + (F.length ? '<p><b>Flags</b></p><ul>' + F.map(function (f) { return '<li>' + esc(f.text) + (f.holm === true ? ' Survives Holm.' : f.holm === false ? ' Does not survive Holm.' : '') + '</li>'; }).join('') + '</ul>' : '')
+      + '</div>';
+  }
+  function propHTML(p, i) {
+    var e = p.evidence || {}, t = p.test || {}, k = (p.ai ? 'a:' : 'p:') + (p.flag || i);
+    return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary>' + (p.strong ? '<span class="tr-chip strong">strong</span>' : '') + (p.ai ? '<span class="tr-chip ai">language model</span>' : '') + '<b>' + esc(p.change) + '</b><span class="tr-r">n ' + e.n + ' · ' + fR(e.mean) + ' · ' + fT(e.t) + '</span></summary>'
+      + '<div class="tr-body"><p>' + esc(p.why) + '</p><p><b>Evidence</b>: ' + e.n + ' trades, ' + fR(e.mean) + ' a trade, ' + fT(e.t) + (num(e.p) ? ', p ' + e.p.toFixed(3) : '') + (e.holm === true ? ', survives Holm' : e.holm === false ? ', does not survive Holm' : '') + '. ' + esc(e.warning || '') + '</p>'
+      + '<p><b>Test that would confirm it</b>: ' + esc(t.question || '') + ' ' + esc(t.data || '') + '; ' + esc(t.split || '') + '; ' + esc(t.costs || '') + '. Bar: ' + esc(t.bar || '') + '. ' + esc(t.how || '') + '.</p></div></details></li>';
+  }
+  function aiHTML(r) {
+    if (!r) return '<p>' + esc(st.aiErr || 'Loading…') + '</p>';
+    var a = r.ai, line = r.enabled ? 'On' : 'Off: ' + esc(r.reason || 'not set up') + '. The rule-based review above is the whole review.';
+    var cost = r.cost ? ' · spent today $' + (+r.cost.today || 0).toFixed(2) + ', this month $' + (+r.cost.month || 0).toFixed(2) : '';
+    if (!a) return '<p><b>' + line + '</b>' + cost + '</p><p>No language-model review yet.</p>';
+    if (!a.answer) return '<p><b>' + line + '</b>' + cost + '</p><p>Its last answer (' + esc(String(a.at || '').slice(0, 16).replace('T', ' ')) + ' UTC) did not pass the checks: ' + esc(arr(a.refused).join('; ')) + '.</p>';
+    var A = a.answer, props = [];
+    var html = '<p><b>' + line + '</b>' + cost + ' · review of the reading of ' + esc(String(a.reviewAt || '').slice(0, 16).replace('T', ' ')) + ' UTC' + (st.J && a.reviewAt !== st.J.at ? ' (an older reading than the one above)' : '') + '. Its words are its own; every number and every proposal\u2019s evidence comes from the file.</p>'
+      + (A.overview ? '<p>' + esc(A.overview) + '</p>' : '');
+    html += arr(A.streams).map(function (s) { arr(s.proposals).forEach(function (p) { props.push(Object.assign({ ai: true }, p)); });
+      return '<p><b>' + esc(s.name) + '</b> <span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span> ' + esc(s.review) + '</p>'; }).join('');
+    if (props.length) html += '<ul class="tr-list">' + props.map(propHTML).join('') + '</ul>';
+    if (A.dropped) html += '<p class="tr-note">' + A.dropped + ' proposal' + (A.dropped > 1 ? 's' : '') + ' without one of the file\u2019s flags ' + (A.dropped > 1 ? 'were' : 'was') + ' dropped.</p>';
+    return html;
+  }
+  function render() {
+    var J = st.J;
+    $('ms-tr-sum').innerHTML = sumLine(J);
+    $('ms-tr-at').textContent = J && J.at ? String(J.at).slice(0, 16).replace('T', ' ') + ' UTC' : '';
+    Array.prototype.slice.call(box.querySelectorAll('#ms-tr-seg button')).forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.b === st.b)); });
+    var flags = {}; arr(J && J.flags).forEach(function (f) { flags[f.id] = f; });
+    var S = streamsOf(J, st.b);
+    $('ms-tr-list').innerHTML = S.length ? S.map(function (s) { var a = s.windows.all, k = 's:' + s.key, nf = arr(s.flags).length;
+      return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b><span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>' + (s.retired ? '<span class="tr-chip">no longer live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
+        + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + fT(a.net.t) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
+      : '<li class="tr-body"><p>' + (J ? 'No ' + esc(BOOK[st.b] || '') + ' stream has a closed trade on file.' : 'Loading…') + '</p></li>';
+    var P = arr(J && J.proposals);
+    $('ms-tr-props').innerHTML = P.length ? P.map(propHTML).join('') : '<li class="tr-body"><p>' + (J ? 'No pattern in the trades reaches |t| ≥ 2 with enough trades: nothing to propose.' : 'Loading…') + '</p></li>';
+    $('ms-tr-ai').innerHTML = aiHTML(st.ai);
+  }
+  box.addEventListener('click', function (ev) { var b = ev.target.closest('#ms-tr-seg button'); if (!b) return; st.b = b.dataset.b; try { localStorage.setItem('msTrBook', st.b); } catch (e) {} render(); });
+  box.addEventListener('toggle', function (ev) { var d = ev.target; if (!d || !d.dataset || !d.dataset.k) return; if (d.open) st.open[d.dataset.k] = 1; else delete st.open[d.dataset.k];
+    if (d.open && /^s:/.test(d.dataset.k) && !d.querySelector('.tr-body')) { var key = d.dataset.k.slice(2), s = arr(st.J && st.J.systems).filter(function (x) { return x.key === key; })[0], flags = {}; arr(st.J && st.J.flags).forEach(function (f) { flags[f.id] = f; }); if (s) d.insertAdjacentHTML('beforeend', streamHTML(s, flags)); } }, true);
+  W.MS_TR = { sumLine: sumLine, streamsOf: streamsOf, streamHTML: streamHTML, propHTML: propHTML, aiHTML: aiHTML, st: st };
+  var role = document.documentElement.dataset.role;
+  if (role === 'public' || role === 'viewer') return;   // admin card: the file and the API are for the owner and reviewers
+  var SITE = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+  function load() {
+    if (W.msData) W.msData.json('research/trade-review.json').then(function (j) { st.J = j; render(); }).catch(function () { st.J = null; render(); });
+    if (!SITE) { st.aiErr = 'Available on aureumdesk.co.uk (it needs the site\u2019s server).'; render(); return; }
+    fetch('/api/trade-review', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) {
+      if (r.status === 401 || r.status === 403) { st.aiErr = 'Sign in as the owner or a reviewer to see it.'; return null; }
+      if (!r.ok) { st.aiErr = 'Could not be loaded (server ' + r.status + '). The rule-based review above stands.'; return null; }
+      return r.json();
+    }).then(function (j) { if (j) st.ai = j; render(); }).catch(function () { st.aiErr = 'Could not be loaded: no connection. The rule-based review above stands.'; render(); });
+  }
+  load(); setInterval(function () { if (!document.hidden) load(); }, 10 * 60e3);
+})(window);
+</script>
 <script id="ms-book-js">
 // Book weights, paper comparison (8 Nov 2026): renders coach.json `book` (council/book.mjs, written by the Trader every 6 hours)
 // into #ms-book: a two-line running-R chart (live book as traded vs the proposed weights on the same trades), a table per
@@ -14787,6 +14928,11 @@ function gpStats(T) {
     // protocol (adopted 12 Nov 2026, decision 43) is crossed or an execution check fails
     var FW = co.forward; if (FW && Array.isArray(FW.alerts) && FW.alerts.length) { var fs = arr(FW.stops).filter(function (x) { return x && x.state === 'crossed'; }).map(function (x) { return x.id; }), fe = arr(FW.exec && FW.exec.checks).filter(function (x) { return x && x.state === 'fail'; }).map(function (x) { return x.id; });
       out.push({ k: 'forward', tone: 'bad', title: 'Forward book: ' + [fs.length ? 'stop line ' + fs.join(', ') + ' crossed' : '', fe.length ? 'check ' + fe.join(', ') + ' fails' : ''].filter(Boolean).join(', '), detail: FW.alerts.join(' '), href: '#council/systems', act: fs.length ? 'By the protocol you adopted (decision 43) the book goes back to a paper shadow; no open trade is closed. Putting it back is your decision.' : 'Reported only (protocol adopted 12 Nov 2026, decision 43): nothing was changed.' }); }
+    // the trade review (council/trade-review.mjs, research/trade-review.json, 17 Nov 2026): its STRONG proposals only (30+ trades,
+    // |t| >= 2, a split surviving Holm), at most three; each one is a question for a pre-registered study, never a change made
+    var TRV = D.tradeReview; arr(TRV && TRV.proposals).filter(function (p) { return p && p.strong && p.evidence; }).slice(0, 3).forEach(function (p) {
+      var e = p.evidence; out.push({ k: 'review', tone: 'you', title: 'Trade review: ' + p.change, detail: [e.n + ' trades, ' + fR(e.mean) + ' a trade, t ' + (num(e.t) ? e.t.toFixed(2) : '—') + (e.holm === true ? ', survives Holm' : ''), p.why || '', e.warning || '', 'Test first: ' + (p.test && p.test.question || '') + ' ' + (p.test ? p.test.data + ', ' + p.test.split : '')].filter(Boolean).join(' · '), href: '#council/review', act: 'A proposal from the trade review: pre-register a test, or leave it. Nothing was changed.' });
+    });
     var H = D.health; if (H && (H.status === 'bad' || H.status === 'warn')) out.push({ k: 'data', tone: H.status === 'bad' ? 'bad' : 'warn', title: 'Data feeds ' + (H.status === 'bad' ? 'bad' : 'shaky'), detail: H.summary || '', act: 'Check the Data chip on the Overview.' });
     var wp = (D.config && D.config.wouldPause) || {}, P = Object.keys(wp).filter(function (k) { var t = Date.parse(wp[k] && wp[k].at) / 1000; return num(t) && now - t <= WEEK; });
     if (P.length && D.config && D.config.noPause) out.push({ k: 'pause', tone: 'warn', title: 'The Coach would pause ' + P.length + ' setup' + (P.length > 1 ? 's or markets' : ' or market'), detail: P.map(function (k) { return k + ': ' + wp[k].why; }).join('; '), act: 'Your “No pauses” rule keeps them trading; nothing to do unless you want a pause.' });
@@ -14843,7 +14989,7 @@ function gpStats(T) {
   function data() {
     var C = W.MS_COUNCIL || {}, X = st.extra || {};
     return { trades: C.trades, research: C.research, config: C.config, coach: C.coach, snap: C.snap, health: C.health,
-      ictReplay: X.ictReplay, ictTrades: X.ictTrades, ictShadow: X.ictShadow, ictSnap: X.ictSnap, robust: X.robust, macro: X.macro, digest: X.digest, ledger: X.ledger };
+      ictReplay: X.ictReplay, ictTrades: X.ictTrades, ictShadow: X.ictShadow, ictSnap: X.ictSnap, robust: X.robust, macro: X.macro, digest: X.digest, ledger: X.ledger, tradeReview: X.tradeReview };
   }
 
   // ─── header + tiles ───
@@ -15089,8 +15235,8 @@ function gpStats(T) {
     if (st.extra && Date.now() - st.extraAt < 5 * 60e3) return Promise.resolve(st.extra);
     if (st.loading) return st.loading;
     var get = function (f) { return W.msData.json(f); };   // one request per file, shared between the panes (window.msData)
-    st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json'), get('research/ledger.json')]).then(function (a) {
-      st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6], ledger: a[7] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
+    st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json'), get('research/ledger.json'), get('research/trade-review.json')]).then(function (a) {
+      st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6], ledger: a[7], tradeReview: a[8] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
     return st.loading;
   }
   function show() { if (pane.hidden) return; render(); loadExtra().then(render); }
@@ -15346,7 +15492,7 @@ function gpStats(T) {
       t = n ? n.textContent.replace(/\s+/g, ' ').trim() : ''; var sm = sp.querySelector('small'); s = sm ? sm.textContent.replace(/\s+/g, ' ').trim() : ''; }
     if (!t) t = (c.getAttribute('aria-label') || '').trim();
     if (two) { if (!s && h) { var s2 = h.querySelector(':scope > small'); s = s2 ? s2.textContent : ''; }
-      var lv = c.querySelector('.sb-sum, .dc-sum, .ex-sum, .bk-sum, .fw-sum, .md-verdict'); if (lv && getComputedStyle(lv).display === 'none') lv = null;   // never a line the account's own gate hides
+      var lv = c.querySelector('.sb-sum, .dc-sum, .ex-sum, .bk-sum, .fw-sum, .tr-sum, .md-verdict'); if (lv && getComputedStyle(lv).display === 'none') lv = null;   // never a line the account's own gate hides
       var X = rowText(t, s, lv ? lv.textContent : ''); return { t: X.t, s: X.s, h: h, live: lv }; }
     return { t: t.replace(/[·:\s]+$/, '').slice(0, 44), s: s.replace(/^[·\s]+/, '').slice(0, 80), h: h };
   }

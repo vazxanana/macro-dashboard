@@ -28,13 +28,14 @@ import push from '../../api/push.js';
 import sounds from '../../api/sounds.js';
 import status from '../../api/status.js';
 import stream from '../../api/stream.js';
+import tradeReview from '../../api/trade-review.js';
 import tvWebhook from '../../api/tv-webhook.js';
 import users from '../../api/users.js';
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, 'alert-cron': alertCron, bars, bridge, 'ctrader-link': ctraderLink, data,
   'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, pine,
-  profile, push, sounds, status, stream, 'tv-webhook': tvWebhook, users,
+  profile, push, sounds, status, stream, 'trade-review': tradeReview, 'tv-webhook': tvWebhook, users,
 };
 
 // Not carried over: the backup council runner starts the Trader as a child process and writes
@@ -44,6 +45,9 @@ const GONE = { run: 'The backup council runner does not run on this host; GitHub
 
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.
 export const CRONS = { '* * * * *': '/api/alert-cron', '*/10 * * * *': '/api/edge-analyst?job=scan' };
+// Jobs run after a cron's own job, with the same secret (no new trigger: the plan's cron count stays). The trade reviewer
+// (17 Nov 2026) asks the language model at most once every 12 hours, and only for a new council-data reading.
+export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };
 
 const SECURITY = headersFor(vercel.headers, new URL('https://x/'));
 
@@ -88,6 +92,11 @@ export default {
     const req = new Request('https://cron.internal' + path, { headers: { authorization: `Bearer ${env.CRON_SECRET || ''}`, 'user-agent': 'cloudflare-cron' } });
     const r = await handle(req, env, ctx);
     console.log('cron', path, r.status);
+    for (const p of CHAINED[event.cron] || []) {
+      const rq = new Request('https://cron.internal' + p, { headers: { authorization: `Bearer ${env.CRON_SECRET || ''}`, 'user-agent': 'cloudflare-cron' } });
+      const rr = await handle(rq, env, ctx).catch((e) => ({ status: 'error ' + String(e && e.message || e) }));
+      console.log('cron', p, rr.status);
+    }
     if (event.cron === '*/10 * * * *') console.log('blob backup', JSON.stringify(await blobBackup(env).catch((e) => ({ error: String(e && e.message || e) }))));
   },
 };
