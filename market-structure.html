@@ -3586,7 +3586,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <section class="view adm" id="v-crypto" aria-label="Crypto desk" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
-      <div><h1 class="h-head">Crypto desk</h1><p class="ms-note">Bitcoin, Ether, Solana and XRP for scalping: M15 → M1 and H1 → M5 setups, open trades and how the scalps have done. Crypto trades around the clock. <span id="cx-src"></span></p></div>
+      <div><h1 class="h-head">Crypto desk</h1><p class="dk-ans">Bitcoin, Ether, Solana and XRP scalping: the setups now, open trades and how the scalps have done. <span id="cx-src"></span></p><details class="dk-more"><summary>About this desk</summary><p class="ms-note">Bitcoin, Ether, Solana and XRP for scalping: M15 → M1 and H1 → M5 setups, open trades and how the scalps have done. Crypto trades around the clock.</p></details></div>
       <div class="cx-seg" role="group" aria-label="Trades counted"><button type="button" data-cx="all" class="on" aria-pressed="true">All incl. shadow</button><button type="button" data-cx="live" aria-pressed="false">Live only</button></div>
     </div>
     <div class="cx-coins" id="cx-coins" role="list" aria-label="Coins"></div>
@@ -3614,7 +3614,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head ict-head">
-      <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
+      <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="dk-ans" id="ict-ans" aria-live="polite">Loading the desk…</p><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
         <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Source</span><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div></div>
         <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Setups</span><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div></div>
@@ -3626,6 +3626,18 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <ul class="ict-open" id="ict-open"><li class="empty">Loading…</li></ul>
       </div>
       <div class="card ict-card ict-fwd" id="ict-fwd"></div>
+    </div>
+    <div class="card ict-card" id="ict-sig">
+      <div class="ms-k ict-sig-h"><h2 class="ict-h">Signals</h2><small id="ict-f-n" tabindex="-1" aria-live="polite"></small></div>
+      <div class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
+        <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
+        <select id="ict-f-d" aria-label="Side"><option value="">Buys and sells</option><option value="buy">Buys</option><option value="sell">Sells</option></select>
+        <select id="ict-f-se" aria-label="Session"><option value="">All sessions</option></select>
+        <select id="ict-f-g" aria-label="Grade"><option value="">All grades</option></select>
+        <select id="ict-f-s" aria-label="Status"><option value="">Open and closed</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
+        <button type="button" class="ms-tbtn" id="ict-f-x" hidden>Clear filters</button>
+      </div>
+      <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal (ET)</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
     </div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
     <div class="card ict-card ict-res">
@@ -3647,18 +3659,6 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="ms-k"><h2 class="ict-h">P&amp;L calendar <small class="ict-cal-tz">New York days</small></h2><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m" aria-live="polite"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
       <div class="ict-cal" id="ict-cal"></div>
       <ul class="ict-cal-day" id="ict-cal-day"></ul>
-    </div>
-    <div class="card ict-card" id="ict-sig">
-      <div class="ms-k ict-sig-h"><h2 class="ict-h">Signals</h2><small id="ict-f-n" tabindex="-1" aria-live="polite"></small></div>
-      <div class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
-        <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
-        <select id="ict-f-d" aria-label="Side"><option value="">Buys and sells</option><option value="buy">Buys</option><option value="sell">Sells</option></select>
-        <select id="ict-f-se" aria-label="Session"><option value="">All sessions</option></select>
-        <select id="ict-f-g" aria-label="Grade"><option value="">All grades</option></select>
-        <select id="ict-f-s" aria-label="Status"><option value="">Open and closed</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
-        <button type="button" class="ms-tbtn" id="ict-f-x" hidden>Clear filters</button>
-      </div>
-      <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal (ET)</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
     </div>
     <div class="ict-grid ict-rw">
       <div class="card ict-card">
@@ -3833,7 +3833,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <section class="view adm" id="v-lit" aria-label="LIT desk" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
-      <div><h1 class="h-head">LIT desk <span class="ict-tag">Paper shadow</span></h1><p class="ms-note">Liquidity Inducement Theory on gold: an M15 false break of a session, previous-day, previous-week or equal-highs level in London or the New York morning, an M5 real break by wick, a limit at the order block, R:R above 3. Pre-registered study: inconclusive at the skill's defaults, so it runs as a paper shadow until the live record says otherwise. <span id="lit-at"></span></p></div>
+      <div><h1 class="h-head">LIT desk <span class="ict-tag">Paper shadow</span></h1><p class="dk-ans">Liquidity Inducement Theory on gold, followed as a paper shadow: its pre-registered study was inconclusive. <span id="lit-at"></span></p><details class="dk-more"><summary>How the rule works</summary><p class="ms-note">Liquidity Inducement Theory on gold: an M15 false break of a session, previous-day, previous-week or equal-highs level in London or the New York morning, an M5 real break by wick, a limit at the order block, R:R above 3. Pre-registered study: inconclusive at the skill's defaults, so it runs as a paper shadow until the live record says otherwise.</p></details></div>
     </div>
     <div class="lit-grid" id="lit-grid"><div class="card"><div class="ms-k"><span>Loading the LIT stream…</span></div></div></div>
   </section>
@@ -3841,7 +3841,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <section class="view adm" id="v-sdv" aria-label="NQ SDV desk" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
-      <div><h1 class="h-head">NQ SDV <span class="ict-tag">Coming</span></h1><p class="ms-note">The next edge in the queue, on Nasdaq futures. The desk opens once the rule is pre-registered, the backtest (2020 to now) is run and the verdict is recorded, the same way every other edge here earned its place.</p></div>
+      <div><h1 class="h-head">NQ SDV <span class="ict-tag">Coming</span></h1><p class="dk-ans">Not open yet: nothing here is a signal.</p><p class="ms-note">The next edge in the queue, on Nasdaq futures. The desk opens once the rule is pre-registered, the backtest (2020 to now) is run and the verdict is recorded, the same way every other edge here earned its place.</p></div>
     </div>
     <div class="card sdv-card"><h2>What happens before this desk opens</h2>
       <ol><li><b>Pre-registration</b>: the rule, the markets, the session windows, the stop and target logic, written down before any test.</li>
@@ -3853,7 +3853,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <section class="view adm" id="v-gold" aria-label="Gold playbook" hidden>
     <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head gp-head">
-      <div><h1 class="h-head">Gold playbook</h1><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk. <span id="gp-src"></span></p></div>
+      <div><h1 class="h-head">Gold playbook</h1><p class="dk-ans">Today's signal for the gold playbook's long, its context and its record. Separate from the council and the ICT desk. <span id="gp-src"></span></p><details class="dk-more"><summary>About this page</summary><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk.</p></details></div>
       <div class="gp-seg" role="group" aria-label="Variant">
         <button type="button" data-gpv="70-3" aria-pressed="true" class="on">Top 30% · 3R</button><button type="button" data-gpv="70-2" aria-pressed="false">Top 30% · 2R</button><button type="button" data-gpv="80-3" aria-pressed="false">Top 20% · 3R</button><button type="button" data-gpv="80-2" aria-pressed="false">Top 20% · 2R</button>
       </div>
@@ -7753,7 +7753,7 @@ function msNextSetup(bars, A) {
     box.innerHTML = `<div class="ms-k"><span>Last two months, replayed</span><small>${R.from} → ${R.to} · ${R.bars.toLocaleString()} M5 candles · run ${new Date(R.at).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</small></div>
       <p class="ms-note" style="margin:6px 0 10px"><b>Where the trades are:</b> the pre-registered rule rarely fills (the study's finding). The two <b>study sets</b> at the bottom keep the same M15 manipulation and loosen the execution, so there are fills to study. They are labelled and kept apart from the rule.</p>
       <div class="ct-stats"><div><span>Setups seen</span><b>${setups.length}</b></div><div><span>Orders built</span><b>${R.orders}</b></div><div><span>Filled</span><b>${R.filled}</b></div><div><span>Taken by the gates</span><b>${trades.length}</b></div><div><span>Net</span><b class="${(st.total || 0) > 0 ? 'ct-pos' : (st.total || 0) < 0 ? 'ct-neg' : ''}">${st.n ? fR(st.total) : '—'}</b></div></div>
-      <p class="ms-note" style="margin:10px 0 0">${esc(R.note)}</p>
+      <p class="ms-note" style="margin:10px 0 0">${R.note}</p>
       <h4 class="lit-h4">Trades the rule would have taken <small>${trades.length}</small></h4>
       ${trades.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Filled</th><th>Side</th><th>Session</th><th>Level</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">R:R</th><th>Exit</th></tr></thead><tbody>${tr}</tbody></table></div>` : '<div class="ct-empty">No fill in this window: every order expired, saw its target first, or was skipped by a gate. The setups below show where the rule looked and why it passed.</div>'}
       <h4 class="lit-h4">Every setup the detector saw <small>${setups.length} · newest first</small></h4>
@@ -7761,7 +7761,7 @@ function msNextSetup(bars, A) {
       ${vs ? `<h4 class="lit-h4">The study's other variants <small>comparison only</small></h4><ul class="lit-funnel">${vs}</ul>` : ''}
       ${Object.entries(R.study || {}).map(([k, S]) => { const g = S.gated || {}, f = S.fills || {}, gs = g.stats || {}, fs = f.stats || {};
         const rows = (f.trades || []).slice().reverse().map((x) => `<tr><td>${when(x.t)}</td><td><span class="chip ${x.side}">${x.side.toUpperCase()}</span></td><td>${x.sess}</td><td>${LV[x.level] || x.level}</td><td class="n">${x.entry}</td><td class="n">${x.stop}</td><td class="n">${x.target}</td><td class="n">${x.rr ?? '—'}</td><td>${when(x.tExit)}</td><td>${x.kind} <b class="${x.Rnet > 0 ? 'pos' : x.Rnet < 0 ? 'neg' : ''}">${fR(x.Rnet)}</b></td></tr>`).join('');
-        return `<div class="lit-study"><h4 class="lit-h4">Study set · ${esc(S.label)} <small>not the pre-registered rule · for study only</small></h4><p class="ms-note" style="margin:0 0 8px">${esc(S.desc)}</p>
+        return `<div class="lit-study"><h4 class="lit-h4">Study set · ${S.label} <small>not the pre-registered rule · for study only</small></h4><p class="ms-note" style="margin:0 0 8px">${S.desc}</p>
           <div class="ct-stats"><div><span>Orders</span><b>${S.orders}</b></div><div><span>Fills</span><b>${f.n || 0}</b></div><div><span>Fills net</span><b class="${(fs.total || 0) > 0 ? 'ct-pos' : (fs.total || 0) < 0 ? 'ct-neg' : ''}">${fs.n ? fR(fs.total) : '—'}</b></div><div><span>Fills won</span><b>${fs.n ? Math.round(fs.win * 100) + '%' : '—'}</b></div><div><span>With the day gates</span><b>${g.n || 0} · ${gs.n ? fR(gs.total) : '—'}</b></div></div>
           ${rows ? `<div class="ct-tw" style="margin-top:8px"><table class="ct-t"><thead><tr><th>Filled</th><th>Side</th><th>Session</th><th>Level</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">R:R</th><th>Closed</th><th>Exit</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="ct-empty">No fill in this window.</div>'}</div>`; }).join('')}`;
   }
@@ -9380,6 +9380,8 @@ function msNextSetup(bars, A) {
       + cell('Floating', flN ? fR(fl) : '—', `${OL.length} live open${OR.length ? ` · ${OR.length} replay not counted` : ''}`, cls(fl))
       + cell('Reviewed', `${rev}/${st.n}`, `${mine.length} taken by ${esc(who)}`);
     // open now: live trades first, then trades still open in the replay (not live, labelled)
+    { const L0 = T[0], ans = $('ict-ans');   // the answer first (16 Nov 2026 redesign): what is open now and the latest signal, from the lists above
+      if (ans) ans.textContent = (OL.length ? `${OL.length} live ${OL.length === 1 ? 'trade' : 'trades'} open now` : 'No live trade open now') + (L0 ? `. Latest signal: ${L0.short} ${L0.side}, grade ${grL(L0)}, ${tm(L0.signalAt)} ET${L0.replay ? ' (replay)' : ''}.` : '. No signal in this view yet.'); }
     $('ict-open-n').textContent = O.length ? `${OL.length} live${OR.length ? ` · ${OR.length} replay` : ''}` : '';
     $('ict-open').innerHTML = (OL.length ? OL.map(openCard).join('') : `<li class="empty">No live trade open. The tracker checks NQ, ES, YM, RTY and gold every 15 minutes${S.flt !== 'all' ? ' (this view shows ' + ({ ap: 'A+ only', a: 'A-setups', pick: 'one per cluster' })[S.flt] + ')' : ''}.</li>`)
       + (OR.length ? `<li class="sep" aria-hidden="true">Still open in the replay · not live trades</li>${OR.map(openCard).join('')}` : '');
@@ -10587,6 +10589,8 @@ function gpStats(T) {
       return getJ('https://api.gold-api.com/price/XAU').then(function (j) { var off = +j.price - ST.last; if (isFinite(off) && Math.abs(off) < 150) { ST.off = off; ST.offOk = true; } }).catch(function () {});
     }).then(function () { ST.busy = false; render(); }).catch(function (e) {
       ST.busy = false; if ($('gp-verdict')) { $('gp-verdict').className = 'pb-verdict no'; $('gp-verdict').textContent = 'Could not load gold candles (' + (e.message || e) + '). Retrying in a minute.'; }
+      // 17 Nov 2026: with no candles at all the cards below stayed empty boxes; each says why instead (display only, redrawn by render() once candles arrive)
+      if (!ST.days) [['gp-ctx', 'Context'], ['gp-kpi', 'The record'], ['gp-cal-y', 'The calendar'], ['gp-took-sum', 'The signal list']].forEach(function (k) { var el = $(k[0]); if (el) el.innerHTML = '<span class="gp-fail">' + k[1] + ' could not be loaded: it needs the gold candles. Retrying in a minute.</span>'; });
       setTimeout(load, 60e3);
     });
   }
@@ -15116,6 +15120,71 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   #v-setup label > input[type="checkbox"] { width: 20px; height: 20px; }
   #v-crypto :is(.cx-seg, .cx-tf) button, #v-setup #ms-tr-filter button { min-height: 44px; }
 }
+</style>
+<style id="ms-dk-css">
+/* Desks redesign, graphite (17 Nov 2026, docs/design/aureum-theme.md; the owner turned down the gold look of 16 Nov): the ICT, Gold
+   playbook, LIT, Crypto and NQ SDV desks, the desk switch, Setup and Scanner. Display only. Neutral greys, one steel-blue accent
+   (focus, links, the selected place), green / red / amber for meaning only, sans-serif titles. Inside these views the old gold
+   tokens point at the accent, so every former gold mark (selected segments, open-trade outline, equity line, calendar tick) turns
+   steel-blue without touching the rule that draws it. Uses the --au-* tokens with fallbacks, so it reads right before or after
+   the page tokens move. Every text here is 12 px or more (the ICT typography rule reads every size after its block). */
+:is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv, #v-setup, #v-scanner), .desk-sw {
+  --dk-accent: var(--au-accent, #9db4d3); --dk-ink: var(--au-ink, var(--ink)); --dk-ink2: var(--au-ink-2, var(--ink-dim)); --dk-ink3: var(--au-ink-3, var(--ink-faint));
+  --dk-s1: var(--au-surface, var(--panel)); --dk-s2: var(--au-surface-2, var(--panel-raised)); --dk-line: var(--au-line, var(--line)); --dk-line2: var(--au-line-strong, var(--line-strong, var(--line)));
+  --gold: var(--dk-accent); --gold-soft: color-mix(in srgb, var(--dk-accent) 14%, transparent); --gold-line: color-mix(in srgb, var(--dk-accent) 50%, transparent); --gold-ink: var(--dk-accent); }
+:root[data-theme="light"] :is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv, #v-setup, #v-scanner), :root[data-theme="light"] .desk-sw { --dk-accent: var(--au-accent, #2f5e9e); }
+#v-ict { --ict-gold-ink: var(--dk-accent); --ict-line-a: var(--dk-accent); --ict-desk: var(--dk-ink2); --ict-desk-soft: var(--dk-s2); --ict-desk-line: var(--dk-line2); }
+:root[data-theme="light"] #v-ict { --ict-gold-ink: var(--dk-accent); --ict-line-a: var(--dk-accent); --ict-desk: var(--dk-ink2); --ict-desk-soft: var(--dk-s2); --ict-desk-line: var(--dk-line2); }
+/* the desk switch: a quiet bar, the desk on screen raised with a steel-blue underline (it was a different colour on every desk) */
+.desk-sw { background: var(--dk-s1); border-color: var(--dk-line); border-radius: 10px; }
+.desk-sw a { border-radius: 8px; color: var(--dk-ink2); font-weight: 600; }
+.desk-sw a:hover { color: var(--dk-ink); }
+:is(#v-ict, #v-gold, #v-mosha, #v-crypto, #v-lit, #v-sdv) .desk-sw a[aria-current="page"] { background: var(--dk-s2); color: var(--dk-ink); box-shadow: inset 0 -2px 0 var(--dk-accent); }
+.desk-sw a:focus-visible { outline: 2px solid var(--dk-accent); outline-offset: 2px; }
+:root .desk-sw a small, :root[data-theme="light"] .desk-sw a.x small { font-size: 12px; background: var(--dk-s2); color: var(--dk-ink2); box-shadow: inset 0 0 0 1px var(--dk-line); }
+:root[data-theme="light"] .desk-sw a small { color: var(--au-ink-2, #474c54); }
+/* page header: a heavier sans title, one plain sentence (the answer), the long description folded */
+:is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv, #v-setup, #v-scanner) .v-head .h-head { font-weight: 650; letter-spacing: -.02em; color: var(--dk-ink); }
+:is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv) .dk-ans { margin: 6px 0 4px; font: 500 16px/1.45 var(--sans); color: var(--dk-ink); max-width: 70ch; font-variant-numeric: tabular-nums; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more { margin: 2px 0 0; max-width: 70ch; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more > summary { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; color: var(--dk-accent); font: 500 13px var(--sans); list-style: none; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more > summary::-webkit-details-marker { display: none; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more > summary::after { content: "›"; transition: transform .15s ease-out; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more[open] > summary::after { transform: rotate(90deg); }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more > summary:focus-visible { outline: 2px solid var(--dk-accent); outline-offset: 2px; border-radius: 6px; }
+:is(#v-gold, #v-lit, #v-crypto) .dk-more .ms-note { margin: 4px 0 0; }
+#v-ict .ict-title .ms-note { font-size: 13px; color: var(--dk-ink2); }
+/* cards: flat, 12 px corners, a hairline and almost no shadow */
+:is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv, #v-setup, #v-scanner) .card { border-radius: 12px; border-color: var(--dk-line); box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+:root[data-theme="light"] :is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv, #v-setup, #v-scanner) .card { box-shadow: 0 1px 2px rgba(20,24,30,.06); }
+:is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv) .card :is(h2, .ict-h) { font-weight: 600; letter-spacing: -.01em; }
+/* selected segments: raised neutral with the accent underline (the ICT source / setups switch was a gold fill) */
+#v-ict .ict-src button.on, #v-gold .gp-seg button.on, #v-crypto :is(.cx-seg, .cx-tf) button.on { background: var(--dk-s2); color: var(--dk-ink); box-shadow: inset 0 0 0 1px var(--dk-line2), inset 0 -2px 0 var(--dk-accent); }
+#v-ict .ict-src button:focus-visible, #v-gold .gp-seg button:focus-visible, #v-crypto :is(.cx-seg, .cx-tf) button:focus-visible { outline: 2px solid var(--dk-accent); outline-offset: 2px; }
+/* ICT: the fixed-2R line is a dashed grey beside the model's steel-blue line (two blues were hard to tell apart) */
+#v-ict .ict-eq path:nth-of-type(1) { stroke: var(--dk-ink3); }
+#v-ict .ict-sw.b { background: repeating-linear-gradient(90deg, var(--dk-ink3) 0 5px, transparent 5px 8px); }
+#v-ict .ict-open li { background: var(--dk-s2); }
+#v-ict #ict-sig { scroll-margin-top: 72px; }
+/* LIT and NQ SDV title badges: the ICT tag's look, outside #v-ict too (they were plain text) */
+:is(#v-lit, #v-sdv) .h-head .ict-tag { display: inline-block; vertical-align: 4px; margin-left: 8px; padding: 2px 9px; border-radius: 999px; font: 600 12px/1.4 var(--sans); letter-spacing: 0; color: var(--dk-ink2); background: var(--dk-s2); border: 1px solid var(--dk-line2); white-space: nowrap; }
+/* Crypto status chips read like Setup and Scanner: READY green, IN ORIGIN amber (they were the other way round), inks from the badge tokens */
+#v-crypto .cx-st.ready { color: var(--buy-ink, var(--buy)); border-color: color-mix(in srgb, var(--buy) 45%, transparent); background: color-mix(in srgb, var(--buy) 14%, transparent); }
+#v-crypto .cx-st.origin { color: var(--warn-ink, #f0a500); border-color: color-mix(in srgb, #f0a500 45%, transparent); background: color-mix(in srgb, #f0a500 14%, transparent); }
+/* LIT: the long setups table scrolls inside its card under a header that stays */
+#v-lit .ct-tw:has(> .lit-setups) { max-height: 480px; overflow: auto; }
+#v-lit .lit-setups thead th { position: sticky; top: 0; z-index: 1; background: var(--dk-s1); box-shadow: inset 0 -1px 0 var(--dk-line); }
+/* Council calendar: today's cell had a gold outline from the shared polish block (it reads #e3b341 / --gold with !important) */
+#v-council { --dk-accent: var(--au-accent, #9db4d3); } :root[data-theme="light"] #v-council { --dk-accent: var(--au-accent, #2f5e9e); }
+#v-council .cal-d.today { border-color: var(--dk-accent) !important; box-shadow: inset 0 0 0 1.5px var(--dk-accent); }
+#v-council .cal-d.today .cn { color: var(--dk-accent); }
+/* Gold playbook: a card whose data could not load says so */
+#v-gold .gp-fail { display: block; padding: 4px 0; color: var(--dk-ink2); font-size: 13px; }
+/* Setup: the "next" box was a gold wash */
+#v-setup .ms-now { background: color-mix(in srgb, var(--dk-accent) 10%, transparent) !important; border-color: color-mix(in srgb, var(--dk-accent) 40%, transparent); }
+@media (pointer: coarse) { :is(#v-gold, #v-lit, #v-crypto) .dk-more > summary { min-height: 44px; } }
+@media (max-width: 640px) { :is(#v-ict, #v-gold, #v-lit, #v-crypto, #v-sdv) .dk-ans { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { :is(#v-gold, #v-lit, #v-crypto) .dk-more > summary::after { transition: none; } }
 </style>
 <style id="ms-ps-css">
 /* Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
