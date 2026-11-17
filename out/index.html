@@ -4675,6 +4675,69 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   @media (prefers-reduced-motion: reduce) { .ps-fold::after { transition: none; } }
 }
 </style>
+<style id="ms-hs-css">
+/* ── Simpler Home (17 Nov 2026, owner: "Simpler home page, and improve the design"; docs/design/aureum-theme.md section 4).
+   From 641 px: one sentence, two calm columns (open now | waiting on you), the places, then ONE closed disclosure "More on the
+   desk" holding everything Home showed before (#hs-more-b, unchanged inside). Up to 640 px (both phone views) none of this is
+   drawn and the wrapper is display: contents, so the phone page is the page as it was. Tokens only; display only. ── */
+.hs-only { display: none; }
+.hs-more-b { display: contents; }
+@media (min-width: 641px) {
+  html:not([data-role="public"]) #v-home .hs-home { display: grid; gap: 20px; min-width: 0; }
+  #v-home .hs-more-b { display: grid; gap: inherit; min-width: 0; }
+  #v-home:not(.hs-open) .hs-more-b { display: none; }
+  #v-home .hs-head { min-width: 0; }
+  #v-home .hs-date { margin: 0; min-height: 20px; font: 500 13px/20px var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-a { margin: 6px 0 0; font: 650 clamp(26px, 2.4vw, 34px)/1.15 var(--au-font); letter-spacing: -.02em; color: var(--au-ink); font-variant-numeric: tabular-nums; }
+  #v-home .hs-a small { margin-left: .45em; font: 500 16px var(--au-font); letter-spacing: 0; color: var(--au-ink-2); }
+  #v-home .hs-a b, #v-home .hs-s b { font-weight: inherit; }
+  #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .pos { color: var(--au-gain); }
+  #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .neg { color: var(--au-loss); }
+  #v-home .hs-s { margin: 8px 0 0; max-width: 72ch; font: 400 15px/1.5 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-s b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  #v-home .hs-f { display: block; margin-top: 2px; font-size: 13px; color: var(--au-ink-3); }
+  #v-home .hs-warn[hidden] { display: none; }
+  #v-home .hs-cols { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; min-width: 0; }
+  #v-home .hs-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 212px; padding: 20px; background: var(--au-surface); border: 1px solid var(--au-line); border-radius: var(--au-r); box-shadow: var(--au-shadow); }
+  #v-home .hs-ch { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; min-width: 0; }
+  #v-home .hs-ch h2 { margin: 0; font: 600 16px/1.3 var(--au-font); color: var(--au-ink); }
+  #v-home .hs-ch h3 { margin: 0; font: 600 13px/1.4 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-n { flex: none; margin-left: auto; font: 500 13px var(--au-font); color: var(--au-ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+  #v-home .hs-n b { font-weight: 600; }
+  #v-home .hs-rows, #v-home .hs-list { list-style: none; margin: 0; padding: 0; min-width: 0; }
+  #v-home .hs-rows li + li, #v-home .hs-list li + li { border-top: 1px solid var(--au-line); }
+  #v-home .hs-rows a { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 44px; padding: 4px 6px; margin: 0 -6px; border-radius: var(--au-r-sm); color: var(--au-ink); text-decoration: none; }
+  #v-home .hs-rows a:hover { background: var(--au-surface-2); }
+  #v-home .hs-rows .chip { font: 600 12px var(--au-font); padding: 3px 8px; border-radius: 6px; letter-spacing: .02em; }
+  #v-home .hs-rows .chip.buy { color: var(--buy-ink); } #v-home .hs-rows .chip.sell { color: var(--sell-ink); }
+  #v-home .hs-rows a > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 14px var(--au-font); }
+  #v-home .hs-rows a > span:nth-child(2) small { margin-left: 8px; font: 500 12px var(--au-font); color: var(--au-ink-3); }
+  #v-home .hs-rows a > span:last-child { font: 600 14px var(--au-font); font-variant-numeric: tabular-nums; text-align: right; }
+  #v-home .hs-rows a > span.wait { font-weight: 500; font-size: 12px; color: var(--au-ink-3); }
+  #v-home .hs-none { padding: 10px 0; font-size: 14px; color: var(--au-ink-3); }
+  #v-home .hs-list li { padding: 10px 0; font: 500 14px/1.45 var(--au-font); color: var(--au-ink); }
+  #v-home .hs-list li.hs-none { color: var(--au-ink-3); font-weight: 400; }
+  #v-home .hs-sh { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid var(--au-line); }
+  #v-home .hs-sh[hidden] { display: none; }
+  #v-home .hs-sh .hs-rows a > span:nth-child(2) { font-weight: 500; color: var(--au-ink-2); }
+  #v-home .hs-link { align-self: flex-start; margin-top: auto; padding: 4px 0; font: 600 13px var(--au-font); color: var(--au-accent); text-decoration: none; }
+  #v-home .hs-link:hover { text-decoration: underline; }
+  #v-home .hs-go { display: flex; flex-wrap: wrap; gap: 8px; }
+  #v-home .hs-go a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid var(--au-line-strong); border-radius: var(--au-r-sm); background: transparent; color: var(--au-ink); font: 600 14px var(--au-font); text-decoration: none; }
+  #v-home .hs-go a:hover { background: var(--au-surface-2); }
+  html[data-deny~="charts"] #v-home .hs-go [data-hs="charts"], html[data-deny~="macro"] #v-home .hs-go [data-hs="macro"] { display: none; }
+  html[data-role="viewer"] #v-home .hs-need { display: none; }   /* as the phone's #ps-need: what waits is the owner's and the reviewers' */
+  #v-home .hs-more-t { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; width: 100%; min-height: 52px; padding: 14px 44px 14px 20px; position: relative; text-align: left; background: transparent; border: 1px solid var(--au-line); border-radius: var(--au-r); color: var(--au-ink); font: 600 15px var(--au-font); cursor: pointer; }
+  #v-home .hs-more-t small { min-width: 0; font: 400 13px/1.4 var(--au-font); color: var(--au-ink-3); }
+  #v-home .hs-more-t::after { content: ""; position: absolute; right: 20px; top: 50%; width: 8px; height: 8px; margin-top: -6px; border: solid var(--au-ink-2); border-width: 0 2px 2px 0; transform: rotate(45deg); transition: transform .15s ease-out; }
+  #v-home .hs-more-t[aria-expanded="true"]::after { transform: rotate(-135deg); margin-top: -2px; }
+  #v-home .hs-more-t:hover { background: var(--au-surface-2); border-color: var(--au-line-strong); }
+  #v-home :is(.hs-rows a, .hs-link, .hs-go a, .hs-more-t):focus-visible { outline: 2px solid var(--au-accent); outline-offset: 2px; }
+  #v-home .hs-open .hs-rows[aria-busy="true"] { min-height: 132px; }
+  @media (pointer: coarse) { #v-home :is(.hs-go a, .hs-link) { min-height: 44px; display: inline-flex; align-items: center; } }
+  @media (prefers-reduced-motion: reduce) { #v-home .hs-more-t::after { transition: none; } }
+}
+</style>
 <style id="ms-shell-css">
 /* ── The graphite look for the Desk's frame (17 Nov 2026, docs/design/aureum-theme.md): the mark and wordmark, the header, the
    navigation, the sign-in card, the guest page, Home, Profile and the menus. Last style block of the page on purpose: it restyles
@@ -4789,9 +4852,9 @@ html[data-role="public"] .me .me-out { color: var(--au-accent); font-weight: 600
 #v-home .h-act .c-link, #v-home .tile-go { color: var(--au-accent); }
 @media (min-width: 641px) {
   /* the few things that matter first: today, then what is open and the setup; market cards and the pulse follow them */
-  #v-home > .h-mk { order: 2; }
-  #v-home > .h-pulse { order: 3; }
-  #v-home > .h-grid .h-main > .h-act { order: -1; }
+  #v-home .hs-more-b > .h-mk { order: 2; }   /* inside "More on the desk" since the simpler Home (17 Nov 2026) */
+  #v-home .hs-more-b > .h-pulse { order: 3; }
+  #v-home .hs-more-b > .h-grid .h-main > .h-act { order: -1; }
 }
 
 /* ── sign-in card: graphite in every theme (the page behind it stays dark) ── */
@@ -5080,6 +5143,26 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
+    <!-- Simpler Home (17 Nov 2026, owner: "Simpler home page"): from 641 px Home answers first. One sentence (today's forward paper
+         result of the main systems, before costs: the Today strip's own sums), then what is open (ours first, shadow apart) and what
+         waits on you, then the places. Everything Home held before sits unchanged behind "More on the desk" (#hs-more-b; on a phone
+         that wrapper is display: contents, so both phone views are the page as they were). Filled by #ms-hs-js from window.MS_PS. -->
+    <div class="hs-only hs-home" id="hs-home">
+      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p></header>
+      <div class="h-warn hs-warn" id="hs-warn" role="alert" hidden></div>
+      <div class="hs-cols">
+        <section class="hs-card hs-open" aria-labelledby="hs-o-k"><div class="hs-ch"><h2 id="hs-o-k">Open now</h2><span class="hs-n" id="hs-o-n"></span></div>
+          <ul class="hs-rows" id="hs-o-list" aria-busy="true"><li class="hs-none">Loading the open trades…</li></ul>
+          <div class="hs-sh" id="hs-sh" hidden><div class="hs-ch"><h3 title="Setups a rule blocked, followed on paper">Shadow, followed on paper</h3><span class="hs-n" id="hs-sh-n"></span></div><ul class="hs-rows" id="hs-sh-list"></ul></div>
+          <a class="hs-link" id="hs-o-all" href="#council/overview">All open trades</a></section>
+        <section class="hs-card hs-need adm" aria-labelledby="hs-n-k"><div class="hs-ch"><h2 id="hs-n-k">Waiting on you</h2><span class="hs-n" id="hs-need-n"></span></div>
+          <ul class="hs-list" id="hs-need-list"><li class="hs-none">Checking what waits on you…</li></ul>
+          <a class="hs-link" id="hs-need-go" href="#council/week">Open this week</a></section>
+      </div>
+      <nav class="hs-go" id="hs-go" aria-label="Places"><a href="#charts" data-hs="charts">Charts</a><a href="#council" data-hs="council">Council</a><a href="#ict" class="dsk" data-desks data-hs="desks">Desks</a><a href="/macro-desk" data-hs="macro">Macro desk</a><a href="/backtest" data-hs="ct">ChronosTrade</a></nav>
+      <button type="button" class="hs-more-t" id="hs-more-t" aria-expanded="false" aria-controls="hs-more-b"><span>More on the desk</span><small id="hs-more-s">Results by day, week and month, the markets, setup now, sessions, possible trades and the sections</small></button>
+    </div>
+    <div class="hs-more-b" id="hs-more-b">
     <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#council/week" class="adm">This week</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
@@ -5159,6 +5242,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
     </div>
     <button type="button" class="ps-only ps-fold adm" data-ps-for="pulse" aria-expanded="false"><span>Market pulse</span><span class="ps-f-s" id="ps-s-pulse">trend on D1 · H4 · H1</span></button><section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" data-ps="pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
+    </div>
   </section>
 
   <!-- ─── Setup: checklist + possible trades ─── -->
@@ -13725,6 +13809,69 @@ function msNextSetup(bars, A) {
   }
   sync(); sums(); drawToday(); drawOpen(); drawNeed(); drawTrades(); drawWeek(); drawReview(); lists();
   setTimeout(function () { sums(); drawNeed(); desks(); drawReview(); lists(); }, 2500);
+})();
+</script>
+<script id="ms-hs-js">
+// Simpler Home (17 Nov 2026): fills the answer-first Home of a screen wider than 640 px (#hs-home) with the phone view's own pure
+// pieces (window.MS_PS: answer, openRows, rowHTML, needs), from what the page already worked out (MS_TODAY, MS_LIVE, FLOAT,
+// MS_COUNCIL). Fetches nothing, computes no new figure. Our own open trades and the shadow ones are two lists, never one figure;
+// forward results only (a backtest replay is never in the sentence). The disclosure "More on the desk" opens the old Home.
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, P = window.MS_PS, V = $('v-home');
+  if (!P || !V || !$('hs-home')) return;
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var cls = function (v) { return v > 0.004 ? 'pos' : v < -0.004 ? 'neg' : ''; };
+  var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
+  var set = function (id, html) { var e = $(id); if (e && e._h !== html) { e._h = html; e.innerHTML = html; } return e; };
+  var txt = function (id) { var e = $(id); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; };
+  function today() {
+    var a = P.answer(window.MS_TODAY); if (!a) return;
+    set('hs-a', a.head); set('hs-s-w', a.sub);
+  }
+  // the split the phone uses: ours first, then the shadow rows apart, with their own count and floating figure
+  function open() {
+    var Lv = window.MS_LIVE, F = window.FLOAT; if (!Lv) return;
+    var G = P.openRows(Lv.items), ours = G.filter(function (g) { return !g.sh; }), sh = G.filter(function (g) { return g.sh; });
+    var n = F ? F.open : ours.reduce(function (s, g) { return s + g.n; }, 0), shn = F ? F.sh : sh.reduce(function (s, g) { return s + g.n; }, 0);
+    var ul = $('hs-o-list'); if (ul) ul.removeAttribute('aria-busy');
+    set('hs-o-list', ours.length ? ours.slice(0, 5).map(P.rowHTML).join('') : '<li class="hs-none">No trade of ours is open right now.</li>');
+    set('hs-o-n', n ? pl(n, 'trade') + (F ? ' · floating <b class="' + cls(F.liveTot || 0) + '">' + P.rT(F.liveTot || 0) + '</b>' : '') : '');
+    var box = $('hs-sh'); if (box) box.hidden = !sh.length;
+    set('hs-sh-list', sh.slice(0, 3).map(function (g) { return P.rowHTML(Object.assign({}, g, { sh: false })); }).join(''));   // the heading already says shadow
+    var shf = F ? (F.tot || 0) - (F.liveTot || 0) : null;
+    set('hs-sh-n', shn ? pl(shn, 'trade') + (shf == null ? '' : ' · floating <b class="' + cls(shf) + '">' + P.rT(shf) + '</b>') : '');
+    var all = $('hs-o-all'), more = Math.max(0, ours.length - 5) + Math.max(0, sh.length - 3);
+    if (all) all.textContent = more ? 'All open trades (' + more + ' more ' + (more === 1 ? 'row' : 'rows') + ')' : 'All open trades';
+  }
+  // what waits: the week pane's own decisions (owner), the data feeds alone (reviewer), plus unreviewed losses: MS_PS.needs
+  function need() {
+    var C = window.MS_COUNCIL; if (!C || !C.at) return;
+    var nb = $('ms-cn-n-review'), losses = nb ? parseInt(nb.textContent, 10) || 0 : 0, owner = window.MS_WHO === 'owner';
+    var L = P.needs(C, owner, losses, Date.now() / 1000);
+    set('hs-need-list', L.length ? L.map(function (t) { t = String(t); return '<li>' + esc(t.charAt(0).toUpperCase() + t.slice(1)) + '</li>'; }).join('') : '<li class="hs-none">' + (owner ? 'Nothing waits on you: no Coach proposal, decaying system or data problem.' : 'Nothing waits on you: no data problem, no loss to review.') + '</li>');
+    set('hs-need-n', L.length ? (L.length === 1 ? '1 thing' : L.length + ' things') : '');
+    var go = $('hs-need-go'), h = owner && !(L.length === 1 && losses > 0) ? '#council/week' : '#council/review';
+    if (go) { go.setAttribute('href', h); go.textContent = h === '#council/week' ? 'Open this week' : 'Open the loss review'; }
+  }
+  // the date line, the news warning and the market headline come from the old Home (now inside the disclosure)
+  function mirror() {
+    var d = [txt('h-date'), txt('h-clock')].filter(Boolean).join(' · '); if (d) set('hs-date', esc(d));
+    var w = $('h-warn'), hw = $('hs-warn'); if (w && hw) { if (hw.hidden !== w.hidden) hw.hidden = w.hidden; set('hs-warn', w.innerHTML); }
+    var h = txt('h-head'); set('hs-more-s', esc((h && !/^Loading/.test(h) ? h + ' · ' : '') + 'results by day, week and month, the markets, sessions and the sections'));
+  }
+  var btn = $('hs-more-t');
+  if (btn) btn.addEventListener('click', function () {
+    var on = !V.classList.contains('hs-open'); V.classList.toggle('hs-open', on); btn.setAttribute('aria-expanded', String(on));
+    if (on) setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 0);   // a chart drawn while folded has no width
+  });
+  document.addEventListener('ms:today', today);
+  document.addEventListener('ms:live', open);
+  document.addEventListener('ms:council', need);
+  if (typeof MutationObserver === 'function') { var mo = new MutationObserver(mirror); ['h-date', 'h-clock', 'h-warn', 'h-head'].forEach(function (id) { var e = $(id); if (e) mo.observe(e, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] }); });
+    var nb0 = $('ms-cn-n-review'); if (nb0) new MutationObserver(need).observe(nb0, { childList: true, characterData: true, subtree: true }); }
+  window.MS_HS = { today: today, open: open, need: need, mirror: mirror };
+  mirror(); today(); open(); need();
+  setTimeout(function () { mirror(); need(); }, 2500);
 })();
 </script>
 <script id="ms-desk-js">

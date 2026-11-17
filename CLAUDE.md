@@ -448,6 +448,19 @@ gaps, nothing hidden. The default portrait is a neutral silver bust with a sans 
 Profile card's copy gets its own gradient ids (it drew an empty circle). Setup's trade-card labels are sentence case. Every page's
 favicon is the silver mark (`/assets/aureum-mark.svg`; offline.html inline), not the gold coin. ChronosTrade's Hide sits beside
 the session title on a phone.
+**Simpler Home (17 Nov 2026, owner: "Simpler home page, and improve the design").** From 641 px Home answers first (spec section 4):
+`#hs-home` = the date line (mirrored from `#h-date` / `#h-clock`), ONE sentence as the page's title (`#hs-a`: today's forward paper
+result of the main systems, "before costs", from `window.MS_TODAY` through `MS_PS.answer`; never a replay figure), two columns
+**Open now** (ours first, the shadow trades in their own list "Shadow, followed on paper" with their own count and floating figure,
+never one figure; `MS_PS.openRows` / `rowHTML`) and **Waiting on you** (`.hs-need adm`, hidden for viewers; `MS_PS.needs`, the
+phone's `#ps-need` source), the places (Charts, Council, Desks, Macro desk, ChronosTrade; the Charts / Macro / desks gates kept),
+then ONE closed disclosure "More on the desk" (`#hs-more-t`, toggles `#v-home.hs-open`; not remembered). Everything Home held before
+(setup headline, jump links, Today strip, markets, open positions, setup now, sessions, possible trades, sections, market pulse,
+the phone blocks) is unchanged inside `#hs-more-b`; up to 640 px that wrapper is `display: contents` and `.hs-only` is not drawn,
+so both phone views are the page as they were (390 px: same blocks, numbers and height). CSS `<style id="ms-hs-css">` right before
+`#ms-shell-css` (tokens only, never `data-phone` / `.ps-`); script `#ms-hs-js` after `#ms-ps-js` (fetches nothing, `window.MS_HS`).
+The shell's desktop order rules now read `#v-home .hs-more-b > …`. First screen as the owner at 1440 px: 13 blocks / 64 numbers
+before, 4 / 15 after (1024 px: 11 / 52 → 4 / 15); load CLS about 0.01-0.03. Test: `tests/home-simple.test.mjs`.
 
 ## Users page (6 Nov 2026)
 
