@@ -338,7 +338,11 @@
     if (c.brk) p.push(`${c.brk.ago ? c.brk.ago + ' bar' + (c.brk.ago === 1 ? '' : 's') + ' after' : 'right on'} a break ${c.brk.dir} through the last swing ${c.brk.dir === 'up' ? 'high' : 'low'}`);
     if (c.revenge) p.push(`${c.prev.min} min after a loss`);
     let s = p.join(', '); const dr = drawSay(c); if (dr) s += '; ' + dr;
+    if (c.lens && c.lens.edge) s += '; ' + lensSay(c.lens);   // the edge the trader reads the chart with (17 Nov 2026, assets/coach-lens.js)
     return s + '.'; }
+  // the lens part (17 Nov 2026, "Coach reads the chart as an edge"): ctx.lens = { edge, name, state, agree, signal } from assets/coach-lens.js
+  function lensSay(l) { const nm = l.name || l.edge;
+    return `by ${nm} rules: ${l.agree === 'with' ? (l.signal ? 'with the rule\'s signal' : 'on the rule\'s side') : l.agree === 'against' ? (l.signal ? 'against the rule\'s signal' : 'against the rule\'s side') : 'the rule has no signal'} (${l.state})`; }
   // the drawings part: "selling at your drawn level 4,120.00 (0.1 ATR away), stop 0.4 ATR above it, target before your next line at 4,072.00"
   const fmtP = (v, dec) => (+v).toLocaleString('en-US', { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec });
   const KW = { line: 'line', 'box edge': 'box edge', 'trend line': 'trend line' };
@@ -378,6 +382,7 @@
     ['lvlstop', 'Stop and your levels', (c) => (!c.draw || c.draw.stopBehind == null ? null : c.draw.stopBehind ? 'Stop behind a drawn level' : 'Stop not behind one')],
     ['grade', 'Your grade', (c) => (c.grade ? 'Grade ' + c.grade : null)],
     ['brk', 'Swing break', (c) => (c.brk ? (c.brk.rel === 'with' ? 'With a fresh break' : 'Against a fresh break') : 'No fresh break')],
+    ['lens', 'The edge you read with', (c) => (c.lens && c.lens.edge ? `${c.lens.name || c.lens.edge}: ${c.lens.agree === 'with' ? 'with its side' : c.lens.agree === 'against' ? 'against it' : 'no signal'}` : null)],
   ];
   function grpStats(Rs, wins) { const n = Rs.length, m = n ? Rs.reduce((s, x) => s + x, 0) / n : null, sd = n > 1 ? Math.sqrt(Rs.reduce((s, x) => s + (x - m) * (x - m), 0) / (n - 1)) : null;
     return { n, wins, winRate: n ? r2(wins / n, 3) : null, meanR: m == null ? null : r2(m, 2), m, sd, t: sd > 0 ? r2(m / (sd / Math.sqrt(n)), 2) : null }; }
@@ -615,7 +620,7 @@
   }
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
     TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
-    COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
+    COACH, lensSay, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
     GRADES, gatherSessions, exitCf, coachLeaks, coachPatterns, patternMatch, planNorm, planCheck, planAdherence, coachDebrief,
     DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, LIVE_EV, liveEvents };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;

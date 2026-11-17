@@ -26,7 +26,7 @@
 //            parseDebrief with the same stop and claim rules.
 'use strict';
 
-const LIM = { leaks: 9, grades: 3, sessions: 1000, before: 60, after: 120, live: 60, livePos: 5, liveDrafts: 2, liveTrades: 10, liveText: 900, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
+const LIM = { lensState: 200, leaks: 9, grades: 3, sessions: 1000, before: 60, after: 120, live: 60, livePos: 5, liveDrafts: 2, liveTrades: 10, liveText: 900, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
 const KINDS = ['good', 'risk', 'habit', 'idea'];
 const MIN_N = 20;
 const TFS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400, 604800];
@@ -61,6 +61,34 @@ function cleanBars(list, sec, { from = -Infinity, until, max, first = false, dec
 }
 const strList = (v, n, len = LIM.tag) => (Array.isArray(v) ? v.slice(0, n).map((x) => str(x, len)).filter(Boolean) : []);
 
+// the coach's lenses (17 Nov 2026, "Coach reads the chart as an edge"): the trader may ask the coach to read the chart through one
+// edge's own rules. The page sends the edge's id, what the rule sees now and its signal; the rules and the studied record come from
+// HERE (the same text as assets/coach-lens.js, a test compares them), never from the page. Unknown edges are dropped.
+const LENS = {
+  gtrend: { name: "Gold trend", rules: "Long only, gold, daily candles (UTC days). When a day closes above the highest high of the 20 days before it, buy at market with a stop 2 x ATR(14, daily) below the entry. After every closed day the stop rises to that close minus 2 ATR and never falls. No target and no time limit: out only at the stop. One position at a time (a second unit may be added at +1R with the same stop).",
+    record: "Studied (supported-book): +0.313R a position, n 74, t 1.20, untouched 2006-17, after costs and financing on every unit. Not proven: the two-system book failed its t ≥ 2 bar." },
+  geg: { name: "Gold daily engulf", rules: "Long only, gold, daily candles with Saturday and Sunday candles folded into the next weekday. A green day that closes above the high of a red day within the 3 days before it (no green day in between), while closing above the 20-day average, makes a zone from the red day's low to its high. A buy limit rests at the zone high for 20 days, cancelled by a daily close under the zone; stop 0.30 under the zone low; from +2R the stop trails 1R behind the best price (cap 10R); out 10 days after the fill. At most 3 orders at a time.",
+    record: "Studied (supported-book): +0.141R a position, n 256, t 1.46, untouched 2006-17, after costs and financing. Not proven: the two-system book failed its t ≥ 2 bar." },
+  mcycle: { name: "Mosha cycle", rules: "Gold. The last H4 break of structure sets the move. The first H1 break the other way starts the pullback. Pullback leg: the first M15 or M5 break with the pullback gives a limit at the broken level, stop 0.30 past that break's origin, target the H4 move's 50%. Main leg: then the first M15 or M5 change of character back with H4, same entry and stop rules, target the H4 extreme. A target under 1R away is not taken; an order lives 24 h, a trade 72 h.",
+    record: "Studied (mcycle-oos): −0.175R a trade, n 244, t −1.50, untouched gold 2007-19, after costs. FAIL (0 of 3 tests); a paper shadow since 14 Nov 2026." },
+  ict: { name: "ICT (iFVG A-setup)", rules: "H1 candles. Price sweeps a recent swing low (high) confirmed by 3 candles each side; within 6 candles a candle closes back through the last fair value gap of the move (an inversion): enter at that close, stop 2 ticks past the sweep's extreme. Graded out of 10 (candle strength, speed, room to the next liquidity). A-setup on gold: buys with a stop of 0.3 to 0.75 daily ATR. On indices: against the daily bias (50-day average), grade 7 or more, the same stop band, not a jobs-report morning. From +2R the stop trails 1.5R behind; out after 36 H1 candles.",
+    record: "Studied (ict-oos-2008): −0.013R a trade, n 2235, t −0.45, untouched 2008-17, gold and index futures, after costs. FAILS the pre-registered bar." },
+  msnr: { name: "MSNR direction", rules: "A direction call, not a trade. Working timeframe H4, key levels on the daily: swing, engulfing, failed-engulfing and dominant-candle zones. When price taps a live daily level while the H4 structure points the other way, the call switches once a close breaks the last H4 swing level that existed before the tap (within 10 daily candles of the tap). The call holds until the opposite sequence completes.",
+    record: "Studied (msnr-direction): t 1.35 over n 1768 days, best of six tests, 2020-26 (the opposite sign in 2007-19). FAIL: 0 of 6 tests." },
+  lit: { name: "LIT", rules: "Gold, M15 then M5. In London (02-05 New York) or the New York morning (08-12), an M15 candle sweeps an external level (a session, the previous day or week, the accumulation's edge, equal highs or lows) after 8 or more candles of accumulation, and closes back inside within 3 candles with a strong body. Then an M5 break the other way within 48 candles: a limit rests at the open of the last opposite candle before the move; stop past the sweep's extreme plus a buffer; target the far side of the accumulation; only above 3R.",
+    record: "Studied (lit): n 27 trades, gold, both pre-registered windows (7 and 20 trades). INCONCLUSIVE: too few trades to judge." },
+};
+const LENS_SIGNAL = ['market', 'limit'];
+// { edge, state, signal } from the page -> the lens the model reads, or null. A signal keeps its stop on the losing side or is dropped.
+function cleanLens(v, dec) {
+  if (!isObj(v) || !Object.prototype.hasOwnProperty.call(LENS, v.edge)) return null;
+  const L = LENS[v.edge], out = { edge: v.edge, name: L.name, rules: L.rules, studiedRecord: L.record, whatTheRuleSeesNow: str(v.state, LIM.lensState) || null, ruleSignalNow: null };
+  const g = isObj(v.signal) ? v.signal : null, side = g && (g.side === 'buy' || g.side === 'sell') ? g.side : null, e = g && fin(g.entry), st = g && fin(g.stop), tg = g && fin(g.target);
+  if (side && e != null && st != null && (side === 'buy' ? st < e : st > e)) out.ruleSignalNow = { side, type: LENS_SIGNAL.includes(g.type) ? g.type : 'market', entry: rd(e, dec), stop: rd(st, dec), target: tg == null ? null : rd(tg, dec), why: str(g.why, 200) || null };
+  return out;
+}
+const lensOf = (b, dec) => { const l = cleanLens(b.lens, dec); return l ? { lens: l } : {}; };
+const lensLine = (lens) => (lens ? `The trader chose to read the chart as the edge "${lens.name}". Answer as a trader of that edge: judge what the trader does against its rules (lens.rules) and against what the rule sees now (lens.whatTheRuleSeesNow, lens.ruleSignalNow). Say plainly whether the trader is with the edge's signal, against it, or trading while the edge has no signal. Its studied record is lens.studiedRecord: never call the edge proven, tested or profitable beyond what that line says.` : '');
 // the trade question -> { payload } or throws a 400
 function tradePayload(b) {
   const t = isObj(b.trade) ? b.trade : null; if (!t) throw bad('no trade');
@@ -85,7 +113,7 @@ function tradePayload(b) {
   // never a candle after the replay moment; after the fact only for a closed trade (entry to exit)
   const before = cleanBars(b.before, sec, { until: Math.min(openedAt, moment), max: LIM.before, dec });
   const after = cleanBars(b.after, sec, { from: openedAt, until: closed ? Math.min(closedAt + sec, moment) : moment, max: LIM.after, first: closed, dec });   // an open trade: the latest candles
-  return { kind: 'trade', trade, candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedBeforeEntry: before, [closed ? 'entryToExit' : 'sinceEntryClosedByNow']: after } };
+  return { kind: 'trade', trade, candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedBeforeEntry: before, [closed ? 'entryToExit' : 'sinceEntryClosedByNow']: after }, ...lensOf(b, dec) };
 }
 // the session question -> { payload } or throws a 400
 function sessionPayload(b) {
@@ -98,7 +126,7 @@ function sessionPayload(b) {
   const n = Math.max(0, Math.round(fin(s.n) || 0));
   if (!trades.length && !n) throw bad('no closed trades');
   return { kind: 'session', session: { scope: all ? 'all saved replay sessions (several markets and timeframes)' : 'this replay session', ...(all ? { sessions: Math.max(1, Math.min(LIM.sessions, Math.round(fin(b.sessions) || 1))) } : {}),
-    closedTrades: n, withoutContext: Math.max(0, Math.round(fin(s.noCtx) || 0)), tooFewBelow: MIN_N, largestDifference: str(s.lead, 400) || null, splits: features, lastTrades: trades } };
+    closedTrades: n, withoutContext: Math.max(0, Math.round(fin(s.noCtx) || 0)), tooFewBelow: MIN_N, largestDifference: str(s.lead, 400) || null, splits: features, lastTrades: trades  }, ...lensOf(b, 5) };
 }
 
 // the debrief question -> { payload } or throws a 400. Every number is re-read as a number and capped; text is trimmed.
@@ -140,7 +168,7 @@ const SHAPE = '{"summary":"1-2 sentences","points":[{"kind":"good|risk|habit|ide
 const SCHEMA = { type: 'object', additionalProperties: false, required: ['summary', 'points', 'question'], properties: {
   summary: { type: 'string' }, question: { type: 'string' },
   points: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['kind', 'text'], properties: { kind: { type: 'string', enum: KINDS }, text: { type: 'string' } } } } } };
-function systemText(lang) {
+function systemText(lang, lens) {
   return [
     'You are a trading coach reviewing a PAPER backtest replay in ChronosTrade, a practice tool: the trader replays past candles and places paper trades. Nothing you say places, changes or refuses an order.',
     lang === 'fr' ? 'Answer in French. Keep the trading terms in English (stop, target, entry, R, ATR, trend, session names such as London, New York, Asia, timeframes such as H1, M15).' : 'Answer in plain English, short sentences.',
@@ -149,7 +177,8 @@ function systemText(lang) {
     'Never suggest removing a stop, widening a stop, moving a stop further from the entry or trading without one. Every trade keeps a stop.',
     'For an OPEN trade you only have candles up to the replay moment: do not guess what comes next.',
     `Answer with ONE JSON object and nothing else, exactly this shape: ${SHAPE}. 1 to 6 points; kind good = something done well, risk = a risk in this trade, habit = a pattern across trades, idea = something to try in the next replay.`,
-  ].join('\n');
+    lensLine(lens),
+  ].filter(Boolean).join('\n');
 }
 // the live question -> { payload } or throws a 400. Nothing after the replay moment: candles that end after it, positions or
 // drafts opened after it and trades closed after it are dropped here, whatever the page sent.
@@ -187,9 +216,9 @@ function livePayload(b) {
   const closedN = Math.max(0, Math.round(fin(b.closedN) || 0));
   return { kind: 'live', trigger, live: { market: str(b.market, 24), timeframeSec: sec, replayMomentUtc: new Date(moment * 1000).toISOString(), lastClose: bars[bars.length - 1][4],
     event: ev, openPositions: positions, drafts, drawings: isObj(b.drawings) ? cleanVal(b.drawings) : null, closedTradesInSession: closedN, tooFewBelow: MIN_N, lastTrades, largestDifference: str(b.lead, 300) || null },
-    candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedByNow: bars } };
+    candles: { timeframeSec: sec, columns: ['timeUnix', 'open', 'high', 'low', 'close'], closedByNow: bars }, ...lensOf(b, dec) };
 }
-function liveSystem(lang) {
+function liveSystem(lang, lens) {
   return [
     'You are a calm trading coach watching a trader practise on a PAPER backtest replay in ChronosTrade. You see the chart as it stands at the replay moment and the trader\'s own positions, drafts, drawn levels and recent trades. Nothing you say places, changes or refuses an order.',
     lang === 'fr' ? 'Answer in French. Keep the trading terms in English (stop, target, entry, R, ATR, trend, session names, timeframes such as H1, M15).' : 'Answer in plain English.',
@@ -197,7 +226,8 @@ function liveSystem(lang) {
     'Tie what you say to the numbers given. Never invent a price or a statistic. Never say what the next candle or the price will do as a fact: you may name what would change the picture.',
     'Never present anything as a tested edge and never promise a result. With fewer than 20 closed trades in the session, say the sample is too small when you speak of habits.',
     'Never suggest removing a stop, widening a stop, moving a stop further from the entry or trading without one. Every trade keeps a stop.',
-  ].join('\n');
+    lensLine(lens),
+  ].filter(Boolean).join('\n');
 }
 const LIVE_ASK = { open: 'The trader just opened a position. Comment on it.', close: 'The trader just closed a position. Comment on it.', ask: 'The trader asks: "What do you see?" Comment on the chart and on what they are doing now.', event: 'Something just happened on the chart (the event below). Comment on it briefly, in the context of what the trader is doing.' };
 // -> { system, prompt, schema, payload } or throws a 400
@@ -205,10 +235,10 @@ function buildRequest(b) {
   if (!isObj(b)) throw bad('bad request');
   const kind = ['trade', 'session', 'live', 'debrief'].includes(b.kind) ? b.kind : null; if (!kind) throw bad('kind must be trade, session, live or debrief');
   const lang = b.lang === 'fr' ? 'fr' : 'en';
-  if (kind === 'live') { const payload = livePayload(b); return { kind, lang, trigger: payload.trigger, system: liveSystem(lang), prompt: `${LIVE_ASK[payload.trigger]}\n\n${JSON.stringify(payload)}`, schema: null, payload }; }
+  if (kind === 'live') { const payload = livePayload(b); return { kind, lang, trigger: payload.trigger, system: liveSystem(lang, payload.lens), prompt: `${LIVE_ASK[payload.trigger]}\n\n${JSON.stringify(payload)}`, schema: null, payload }; }
   if (kind === 'debrief') { const payload = debriefPayload(b); return { kind, lang, system: debriefSystem(lang), prompt: `Give the debrief of this replay session.\n\n${JSON.stringify(payload)}`, schema: DEBRIEF_SCHEMA, payload }; }
   const payload = kind === 'trade' ? tradePayload(b) : sessionPayload(b);
-  return { kind, lang, system: systemText(lang), prompt: `${kind === 'trade' ? 'Review this trade.' : 'Review this replay session.'}\n\n${JSON.stringify(payload)}`, schema: SCHEMA, payload };
+  return { kind, lang, system: systemText(lang, payload.lens), prompt: `${kind === 'trade' ? 'Review this trade.' : 'Review this replay session.'}\n\n${JSON.stringify(payload)}`, schema: SCHEMA, payload };
 }
 
 // stop advice the coach must never give (absolute rule 1), and claims it must never make
@@ -267,4 +297,4 @@ function parseLive(text) {
   return why.length ? { ok: false, why } : { ok: true, text: s };
 }
 
-module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, DEBRIEF_SCHEMA, TRIGGERS, EVENT_KINDS, STALE_BARS, buildRequest, parseAnswer, parseDebrief, parseLive, systemText, liveSystem, debriefSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, debriefPayload, cleanVal } };
+module.exports = { LENS, cleanLens, LIM, KINDS, MIN_N, TFS, SCHEMA, DEBRIEF_SCHEMA, TRIGGERS, EVENT_KINDS, STALE_BARS, buildRequest, parseAnswer, parseDebrief, parseLive, systemText, liveSystem, debriefSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, debriefPayload, cleanVal } };
