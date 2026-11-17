@@ -1266,6 +1266,13 @@
   window.ctDraw = () => ({ sel: SEL, tool: DT, mag: MAG, list: JSON.parse(JSON.stringify(S.draw || [])), geo: (S.draw || []).map((d) => geo(d)) });
   window.ctBarAt = (t) => { const b = barAt(t); return b ? { time: b.time, open: b.open, high: b.high, low: b.low, close: b.close } : null; };
   chart.timeScale().subscribeVisibleLogicalRangeChange(overlay); new ResizeObserver(overlay).observe($('chart'));
+  // The drawing layer follows the PRICE scale too (17 Nov 2026, owner: "when I draw and move the charts the boxes are not aligned"):
+  // the chart library sends no event when the price axis is dragged, zoomed or auto-fits after a pan, so the overlay (boxes,
+  // trend lines, zones, connectors, the edge lens) stayed where it was while the candles moved. Each frame reads two numbers
+  // of the price scale and the time scale and redraws only when one changed (cheap: no drawing while nothing moves).
+  let scaleKey = '';
+  const scaleWatch = () => { if (!document.hidden && S.bars.length) { try { const a = series.coordinateToPrice(0), b2 = series.coordinateToPrice(200), r = chart.timeScale().getVisibleLogicalRange(); const k = a + '|' + b2 + '|' + (r ? r.from + ',' + r.to : ''); if (k !== scaleKey) { scaleKey = k; overlay(); } } catch (e) {} } requestAnimationFrame(scaleWatch); };
+  requestAnimationFrame(scaleWatch);
   // context chart: a higher timeframe at the same moment, the current candle still forming (built from the replay bars)
   // split view (10 Nov 2026, owner: "option to split chart max 4, timeframes"): the main chart plus up to three view panes, each on its own
   // timeframe, all at the replay's moment. A pane never shows a candle from the future: a higher timeframe's last candle is built from the
