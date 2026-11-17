@@ -4122,7 +4122,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T01:07:03.000Z",
     "councilEntry": 3872.03,
     "stop": 3904.5,
@@ -4137,10 +4137,12 @@
     "slipR": -0.112,
     "lagSec": 105,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T01:07:03.000Z",
-    "brokerStop": 3908.15
+    "brokerStop": 3908.15,
+    "closedAt": "2026-11-17T14:22:32.000Z"
    },
    "xau-replica-1794806831-b": {
     "positionId": "49768753",
@@ -4363,7 +4365,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T15:43:57.000Z",
     "councilEntry": 3866.22,
     "stop": 3892.37,
@@ -4378,10 +4380,12 @@
     "slipR": 0.024,
     "lagSec": 109,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T15:43:57.000Z",
-    "brokerStop": 3891.73
+    "brokerStop": 3891.73,
+    "closedAt": "2026-11-17T14:22:32.000Z"
    },
    "xau-replica-1794843920-b": {
     "positionId": "49936228",
@@ -4662,7 +4666,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-17T12:41:07.000Z",
     "councilEntry": 3856.22,
     "stop": 3871.62,
@@ -4677,10 +4681,12 @@
     "slipR": -0.181,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-17T12:41:07.000Z",
-    "brokerStop": 3874.4
+    "brokerStop": 3874.4,
+    "closedAt": "2026-11-17T14:22:32.000Z"
    },
    "xau-replica-1794924381-b": {
     "positionId": "50208935",
@@ -4690,7 +4696,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-17T14:07:50.000Z",
     "councilEntry": 3860.84,
     "stop": 3836.22,
@@ -4705,10 +4711,12 @@
     "slipR": -0.11,
     "lagSec": 89,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-17T14:07:50.000Z",
-    "brokerStop": 3833.49
+    "brokerStop": 3833.49,
+    "closedAt": "2026-11-17T14:22:32.000Z"
    }
   },
   "day": {
@@ -4716,7 +4724,7 @@
    "startBalance": 5395.3
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5306.84 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 5322.84 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4724,30 +4732,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5306.84,
-  "lastRun": "2026-11-17T14:20:00.000Z"
+  "balance": 5322.84,
+  "lastRun": "2026-11-17T14:22:32.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T04:17:59.000Z",
-   "msg": "opened sell BTCUSD 0.01 lot (council replica)",
-   "trade": "btc-replica-1794370613-s"
-  },
-  {
-   "at": "2026-11-11T04:23:00.000Z",
-   "msg": "SOLUSD position 48235863 closed at the broker",
-   "trade": "sol-replica-1794354025-b"
-  },
-  {
-   "at": "2026-11-11T04:23:00.000Z",
-   "msg": "not mirrored xrp-replica-1794370912-s: none of XRPUSD found at the broker",
-   "trade": "xrp-replica-1794370912-s"
-  },
-  {
-   "at": "2026-11-11T04:25:31.000Z",
-   "msg": "opened sell USDCHF 0.04 lot (council replica)",
-   "trade": "usdchf-replica-1794371064-s"
-  },
   {
    "at": "2026-11-11T04:27:01.000Z",
    "msg": "opened sell SOLUSD 0.01 lot (council replica)",
@@ -6226,6 +6214,26 @@
   {
    "at": "2026-11-17T14:07:50.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1794924381-b"
+  },
+  {
+   "at": "2026-11-17T14:22:32.000Z",
+   "msg": "XAUUSD position 49696588 closed at the broker",
+   "trade": "xau-replica-1794791118-s"
+  },
+  {
+   "at": "2026-11-17T14:22:32.000Z",
+   "msg": "XAUUSD position 49935182 closed at the broker",
+   "trade": "xau-replica-1794843728-s"
+  },
+  {
+   "at": "2026-11-17T14:22:32.000Z",
+   "msg": "XAUUSD position 50201374 closed at the broker",
+   "trade": "xau-replica-1794919201-s"
+  },
+  {
+   "at": "2026-11-17T14:22:32.000Z",
+   "msg": "XAUUSD position 50208935 closed at the broker",
    "trade": "xau-replica-1794924381-b"
   }
  ],
