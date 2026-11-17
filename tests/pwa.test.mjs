@@ -66,7 +66,7 @@ test('routing: pages network-first, versioned assets cached, everything private 
     req('/assets/x.js?v=0123456789', { headers: { range: 'bytes=0-' } }),
     req('/cdata/trades.json'), req('/cdata/ict/state.json'), nav('/cdata/users.json'),
     req('/macro-dashboard/cdata/macro/forecast.json'),
-    req('/api/me'), nav('/api/bridge?f=mq5'), req('/api/push', { method: 'POST' }),
+    req('/api/me'), nav('/api/bridge?f=mq5'), req('/api/notify', { method: 'POST' }),
     req('/md/bars?sym=xauusd&tf=1m'), req('/md/stream?sym=xauusd'), req('/_vercel/insights/script.js'),
     req('/app.webmanifest'), req('/icons/icon-192.png'), req('/sw.js'),
     req('https://fonts.googleapis.com/css2?family=Figtree'), nav('https://example.com/'),
@@ -144,7 +144,7 @@ test('activate: caches of older versions go, the current ones and foreign caches
   assert.deepEqual([...w.store.keys()].sort(), ['mx-assets-abc123', 'mx-shell-abc123', 'someone-else']);
 });
 
-test('kill switch: no fetch handling, every cache of ours deleted, push still handled', async () => {
+test('kill switch: no fetch handling, every cache of ours deleted', async () => {
   const w = loadSw(buildWorker(SRC, 'abc123', true));
   assert.equal(await fire(w, nav('/')), null);
   assert.equal(await fire(w, req('/assets/a.js?v=aaaaaaaaaa')), null);
@@ -152,8 +152,8 @@ test('kill switch: no fetch handling, every cache of ours deleted, push still ha
   await new Promise((done) => w.on.install({ waitUntil: (p) => p.then(done) }));
   await new Promise((done) => w.on.activate({ waitUntil: (p) => p.then(done) }));
   assert.deepEqual([...w.store.keys()], []);
-  assert.equal(typeof w.on.push, 'function');
-  assert.equal(typeof w.on.notificationclick, 'function');
+  // 17 Nov 2026: price-alert push was removed; the worker has no push or notification handler
+  assert.equal(w.on.push, undefined); assert.equal(w.on.notificationclick, undefined);
 });
 
 test('buildWorker stamps VERSION and KILL and refuses a worker without them', () => {
@@ -207,7 +207,7 @@ test('build step: worker version follows the site content, kill switch from the 
 
 test('built site: every page carries the app tags; the worker is stamped and not killed', () => {
   const out = path.join(ROOT, 'out');
-  const pages = ['index.html', 'market-structure.html', 'gold-trading.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'macro/index.html', 'veteran/index.html'];
+  const pages = ['index.html', 'market-structure.html', 'gold-trading.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'veteran/index.html'];
   for (const p of pages) {
     const head = fs.readFileSync(path.join(out, p), 'utf8').split(/<\/head>/i)[0];
     assert.match(head, /<link rel="manifest" href="\/app\.webmanifest">/, p);
@@ -229,7 +229,7 @@ test('manifest: installable (name, standalone, start_url in scope, 192 + 512 + m
   assert.equal(m.display, 'standalone');
   assert.equal(m.id, '/');
   assert.ok(m.start_url.startsWith(m.scope));
-  assert.equal(m.theme_color, '#08090c'); assert.equal(m.background_color, '#08090c');   // the desk's dark --bg token
+  assert.equal(m.theme_color, '#121315'); assert.equal(m.background_color, '#121315');   // the graphite theme's dark --au-bg (docs/design/aureum-theme.md)
   for (const i of m.icons) {
     const [w, h] = pngSize(path.join(ROOT, i.src));
     assert.equal(`${w}x${h}`, i.sizes, i.src);
@@ -257,66 +257,6 @@ test('caching headers: the worker and manifest revalidate, only ?v= assets are i
 });
 
 // ---- 11 Nov 2026: what the browser audit (scripts/audit/pwa.cjs) showed, pinned offline ----
-
-const pushData = (raw) => ({ json: () => JSON.parse(raw), text: () => raw });
-async function push(w, raw) {
-  const shown = [];
-  w.ctx.self.registration.showNotification = async (title, o) => { shown.push({ title, ...o }); };
-  await new Promise((done) => w.on.push({ data: raw === undefined ? null : pushData(raw), waitUntil: (p) => Promise.resolve(p).then(done) }));
-  return shown[0];
-}
-
-test('push: the alert as sent; plain text, null, a bare string, a list or wrong types still give a notification', async () => {
-  const w = loadSw();
-  const a = await push(w, JSON.stringify({ title: 'XAU rose to 4,100', body: 'Now 4,100.2', url: '/?s=xau#charts', tag: 'pa-1' }));
-  assert.deepEqual([a.title, a.body, a.tag, a.data.url, a.icon, a.badge], ['XAU rose to 4,100', 'Now 4,100.2', 'pa-1', '/?s=xau#charts', '/icons/icon-192.png', '/icons/badge-96.png']);
-  const t = await push(w, 'not json at all');
-  assert.deepEqual([t.title, t.body, t.tag, t.data.url], ['Price alert', 'not json at all', 'price-alert', '/#charts']);
-  for (const raw of [undefined, 'null', '[1,2]', '7', 'true', '{}']) {
-    const n = await push(w, raw);
-    assert.deepEqual([n.title, n.body, n.tag, n.data.url], ['Price alert', '', 'price-alert', '/#charts'], String(raw));
-  }
-  assert.equal((await push(w, '"gold moved"')).body, 'gold moved');
-  const odd = await push(w, JSON.stringify({ title: 7, body: { a: 1 }, tag: ['x'], url: 9 }));
-  assert.deepEqual([odd.title, odd.body, odd.tag, odd.data.url], ['7', '', 'price-alert', '/#charts']);
-  assert.equal((await push(w, JSON.stringify({ title: 'x'.repeat(500), body: 'y'.repeat(2000) }))).title.length, 120);
-});
-
-test('push: a notification link never leaves this site', async () => {
-  const w = loadSw();
-  for (const url of ['https://evil.example/x', '//evil.example/x', 'javascript:alert(1)', 'http://aureumdesk.co.uk/', '', null]) {
-    assert.equal((await push(w, JSON.stringify({ url }))).data.url, '/#charts', String(url));
-  }
-  assert.equal((await push(w, JSON.stringify({ url: 'https://aureumdesk.co.uk/backtest?x=1#a' }))).data.url, '/backtest?x=1#a');
-  assert.equal((await push(w, JSON.stringify({ url: 'gold' }))).data.url, '/gold');
-});
-
-async function click(w, url, windows, openWindow) {
-  const log = [];
-  const cl = windows.map((u, i) => ({ url: new URL(u, ORIGIN).href, navigate: async (to) => { log.push(`navigate ${i} ${to.replace(ORIGIN, '')}`); }, focus: async () => { log.push(`focus ${i}`); } }));
-  w.ctx.self.clients.matchAll = async () => cl;
-  w.ctx.self.clients.openWindow = openWindow || (async (to) => { log.push(`open ${to.replace(ORIGIN, '')}`); return {}; });
-  await new Promise((done) => w.on.notificationclick({ notification: { close: () => log.push('close'), data: url === undefined ? undefined : { url } }, waitUntil: (p) => Promise.resolve(p).then(done) }));
-  return log;
-}
-
-test('notification tap: a Desk window is brought forward and taken to the chart; a window on another page is left alone', async () => {
-  const w = loadSw();
-  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest', '/market-structure.html#council']), ['close', 'navigate 1 /?s=xau#charts', 'focus 1']);
-  assert.deepEqual(await click(w, '/?s=xau#charts', ['/?s=xau#charts']), ['close', 'focus 0'], 'already there: no navigation');
-  // a replay in ChronosTrade, the Academy or the macro desk is never navigated away while the browser can open a window
-  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest', '/academy', '/macro-desk']), ['close', 'open /?s=xau#charts']);
-  assert.deepEqual(await click(w, '/?s=xau#charts', []), ['close', 'open /?s=xau#charts']);
-  assert.deepEqual(await click(w, '/backtest#x', ['/', '/backtest']), ['close', 'navigate 1 /backtest#x', 'focus 1']);
-  // the browser refuses a new window (or answers nothing): an open one is used rather than doing nothing
-  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest'], async () => { throw new Error('not allowed'); }), ['close', 'navigate 0 /?s=xau#charts', 'focus 0']);
-  assert.deepEqual(await click(w, '/?s=xau#charts', ['/backtest'], async () => null), ['close', 'navigate 0 /?s=xau#charts', 'focus 0']);
-  // no link, or a link to another site stored by an older worker: the Desk
-  assert.deepEqual(await click(w, undefined, []), ['close', 'open /']);
-  assert.deepEqual(await click(w, 'https://evil.example/', []), ['close', 'open /']);
-  // a window of another origin is never touched
-  assert.deepEqual(await click(w, '/', ['https://other.example/']), ['close', 'open /']);
-});
 
 test('after ?sw-reset with another window open: the worker in charge sets its caches up again and takes the page', async () => {
   const w = loadSw(buildWorker(SRC, 'abc123', false), async () => ok('<h1>offline page</h1>'));
@@ -398,7 +338,7 @@ test('built site: every page has each app tag exactly once, and every manifest s
   const out = path.join(ROOT, 'out');
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? (e.name === 'assets' ? [] : walk(path.join(d, e.name))) : /\.html$/.test(e.name) ? [path.join(d, e.name)] : []);
   const pages = walk(out).filter((f) => path.relative(out, f) !== 'offline.html');
-  assert.ok(pages.length >= 9, 'pages found: ' + pages.length);
+  assert.ok(pages.length >= 8, 'pages found: ' + pages.length);   // 8 since the /macro landing went (17 Nov 2026)
   const once = [/<link\b[^>]*\brel=["']manifest["'][^>]*>/gi, /<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-capable["'][^>]*>/gi, /<meta\b[^>]*\bname=["']mobile-web-app-capable["'][^>]*>/gi,
     /<meta\b[^>]*\bname=["']apple-mobile-web-app-title["'][^>]*>/gi, /<meta\b[^>]*\bname=["']apple-mobile-web-app-status-bar-style["'][^>]*>/gi, /<script\b[^>]*\bsrc=["'][^"']*\/assets\/pwa\.js[^"']*["'][^>]*>/gi];
   for (const f of pages) {
@@ -418,8 +358,6 @@ test('built site: every page has each app tag exactly once, and every manifest s
   assert.ok(fs.existsSync(file(m.start_url)));
   for (const i of m.icons) assert.equal(pngSize(file(i.src)).join('x'), i.sizes, i.src);
   assert.deepEqual(pngSize(path.join(out, 'apple-touch-icon.png')), [180, 180], 'iOS asks for the root file by itself');
-  // the worker's notification icons
-  for (const i of SRC.match(/'\/icons\/[^']+'/g)) assert.ok(fs.existsSync(path.join(out, i.slice(2, -1))), i);
 });
 
 test('the browser audit exists and is the documented manual / CI check', () => {

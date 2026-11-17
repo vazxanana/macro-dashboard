@@ -91,6 +91,8 @@ async function fromRequest(req, env, deps, opts = {}) {
 }
 // the owner's session (no user-list read needed): for owner-only calls that also take the owner password
 async function isOwnerSession(req, env = process.env) { const tok = verify(env, cookieOf(req)); return !!(tok && tok.u === 'owner' && (await current(env, {}, tok))); }
+// the keyed fingerprint of a password hash, as a session carries it (api/passkey.js keeps it on each passkey, 17 Nov 2026)
+const fingerprint = (env, h) => { const key = secret(env); return key ? fpOf(key, h) : null; };
 const defaultDeps = (env) => ({ blobUsers: () => A.blobUsers(env) });
 
-module.exports = { COOKIE, TTL, secret, sign, verify, issue, login, current, account, cookieOf, setCookie, clearCookie, sameOrigin, fromRequest, isOwnerSession, cachedUsers, defaultDeps, pvOf, _cache: CACHE };
+module.exports = { COOKIE, TTL, secret, sign, verify, issue, login, current, account, cookieOf, setCookie, clearCookie, sameOrigin, fromRequest, isOwnerSession, cachedUsers, defaultDeps, pvOf, fingerprint, _cache: CACHE };

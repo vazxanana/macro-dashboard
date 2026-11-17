@@ -650,7 +650,7 @@
     box.hidden = false;
     const sit = s.kind === 'session';   // a sitting of the Session tab is resumed there (MXAC.sessionResume is read once by that tab)
     box.appendChild(el('div', { class: 'resume-t' }, el('b', { text: 'Pick up where you left off' }), el('span', { id: 'resume-now-text', text: `${sit ? 'Session tab · ' : ''}${s.title || s.edge} · ${sit && fin(s.t) ? 'paused at ' + fmtTime(s.t) : s.summary || 'a saved replay'} · saved ${String(s.updatedAt || '').slice(0, 16).replace('T', ' ')} UTC` })));
-    box.appendChild(el('div', { class: 'resume-go' }, el('button', { type: 'button', class: 'btn primary', id: 'resume-now-go', 'data-kind': s.kind, text: sit ? 'Resume in the Session tab' : 'Resume', onclick: () => { box.hidden = true; if (sit) { resumeHidden = true; MXAC.sessionResume = s.id; showTab('session'); } else resumeSession(s.id); } }),
+    box.appendChild(el('div', { class: 'resume-go' }, el('button', { type: 'button', class: 'btn', id: 'resume-now-go', 'data-kind': s.kind, text: sit ? 'Resume in the Session tab' : 'Resume', onclick: () => { box.hidden = true; if (sit) { resumeHidden = true; MXAC.sessionResume = s.id; showTab('session'); } else resumeSession(s.id); } }),
       el('button', { type: 'button', class: 'btn', id: 'resume-now-no', text: 'Not now', onclick: () => { resumeHidden = true; box.hidden = true; } })));
   }
   // The edge used last is remembered on this device (pref mxacEdge), so the page and its sections open on it.
@@ -822,9 +822,10 @@
 
   // ---- charts ---------------------------------------------------------------------------------------------------------
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const look = () => ({ layout: { background: { type: 'solid', color: 'transparent' }, textColor: css('--ink-dim') || '#a4abb8', fontSize: 12, fontFamily: 'JetBrains Mono, ui-monospace, monospace' }, grid: { vertLines: { color: css('--line-soft') }, horzLines: { color: css('--line-soft') } },
+  const look = () => ({ layout: { background: { type: 'solid', color: 'transparent' }, textColor: css('--au-ink-3') || css('--ink-dim') || '#a4abb8', fontSize: 12, fontFamily: 'JetBrains Mono, ui-monospace, monospace' }, grid: { vertLines: { color: css('--au-line') || css('--line-soft') }, horzLines: { color: css('--au-line') || css('--line-soft') } },
     rightPriceScale: { borderColor: css('--line') }, timeScale: { borderColor: css('--line'), timeVisible: true, secondsVisible: false, rightOffset: 6 } });
-  const candleLook = () => ({ upColor: css('--buy'), downColor: css('--sell'), wickUpColor: css('--buy'), wickDownColor: css('--sell'), borderVisible: false, priceLineVisible: false, priceFormat: { type: 'price', precision: 2, minMove: 0.01 } });
+  const up = () => css('--ac-up') || css('--buy'), dn = () => css('--ac-down') || css('--sell');   // the candles keep their colours whatever the theme's gain / loss ink
+  const candleLook = () => ({ upColor: up(), downColor: dn(), wickUpColor: up(), wickDownColor: dn(), borderVisible: false, priceLineVisible: false, priceFormat: { type: 'price', precision: 2, minMove: 0.01 } });
   // Every chart on the page comes from here, so they share one look and a theme change reaches all of them.
   // → { chart, series, setBars(bars), line(price, title, color, solid), clearLines(), fit() }
   const CHARTS = [];
@@ -866,6 +867,7 @@
     const pill = $('clock-state'); pill.textContent = st.done ? 'end of range' : S.cur && !S.cur.closed ? 'paused on a setup' : S.busy ? 'working…' : st.playing ? `playing ${st.speed}×` : 'paused';
     $('c-play').textContent = st.playing ? 'Pause' : S.cur && !S.cur.closed ? 'Continue replay' : st.steps > 0 || st.t > st.from ? 'Resume' : 'Play';
     $('c-play').setAttribute('aria-pressed', st.playing ? 'true' : 'false');
+    $('c-play').classList.toggle('primary', !(S.cur && !S.cur.closed && !S.cur.exam && !S.cur.correction));   // one primary in view: while a verdict waits, it is the verdict's
     placeZones();
   }
   function clearLines(arr) { while (arr.length) { try { CH.series.removePriceLine(arr.pop()); } catch (e) { /* already gone */ } } }
@@ -1123,7 +1125,7 @@
         el('button', { type: 'button', class: 'link', id: idp + '-conflict-open', text: 'Open them in the Lessons tab', onclick: () => o.onLessons(clash) })));
     }
     if (c) {
-      const lv = el('dl', { class: 'kv' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
+      const lv = el('dl', { class: 'kv lvl' }); for (const [k, v] of [['Entry', fmtPrice(d.entry)], ['Stop', fmtPrice(d.stop)], ['Target', d.target == null ? 'none (the stop is trailed)' : fmtPrice(d.target)]]) { lv.appendChild(el('dt', { text: k })); lv.appendChild(el('dd', { class: 'num', text: v })); }
       box.appendChild(lv); if (d.action === 'WAIT') box.appendChild(el('p', { class: 'note', text: 'On WAIT these are the levels of the setup that was not taken. They are drawn on the chart as dashed lines.' }));
     }
     const ev = d.evidence || {};
@@ -1171,7 +1173,7 @@
     decisionView(box, { idp: 'dec', edge: S.setup.edge, cand: cur.cand, d: Object.assign({ t: cur.cand.t }, a.decision), risk: a.risk, diff: cur.diff, stored: a.row ? `Attempt ${a.n} stored ✓` : '', firstAction: a !== cur.first ? cur.first.decision.action : null, hash: cur.hash, historyAvailable: cur.historyAvailable, lessons: S.lessons, fold: true, onLessons: (ids) => { MXAC.lessonFocus = { edge: S.setup.edge.id, ids: ids.slice() }; showTab('lessons'); } });
     if (cur.exam) renderExamPoint(box);
     box.appendChild(moreBtn(box, 'dec-more', 'Setup facts and versions'));
-    box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn primary', id: 'continue', text: 'Continue replay', onclick: playPause }), el('span', { class: 'ac-status', id: 'continue-msg', role: 'status' })));
+    box.appendChild(el('div', { class: 'f-actions' }, el('button', { type: 'button', class: 'btn' + (cur.exam || cur.correction ? ' primary' : ''), id: 'continue', text: 'Continue replay', onclick: playPause }), el('span', { class: 'ac-status', id: 'continue-msg', role: 'status' })));
     renderPointBar();
   }
 
@@ -1194,7 +1196,7 @@
   }
   function renderMentor() {
     const box = clear($('mentor')), cur = S.cur; box.hidden = false;
-    box.appendChild(el('h2', {}, 'Mentor controls', el('small', { text: `your verdict on attempt ${cur.first.n}` })));
+    box.appendChild(el('h2', {}, 'Your verdict', el('small', { text: `on attempt ${cur.first.n}` })));
     const choices = el('div', { class: 'choices', role: 'group', 'aria-label': 'Your verdict' });
     for (const [v, label] of mentorChoices(cur.first.decision.action)) choices.appendChild(el('button', { type: 'button', class: 'btn', 'data-choice': v, 'aria-pressed': 'false', text: label, onclick: () => choose(v) }));
     box.appendChild(choices);
@@ -1227,13 +1229,13 @@
       if (cur.corRestore) {   // twice the server had no stored attempt for this verdict: the decision the page holds is stored again (the usual attempt call), once
         const was = cur.first.row, r = await api.post(attemptBody(cur.cand, S.setup.edge.id, was.mode === 'replay-same' ? 'replay-same' : 'train', cur.first.decision, (was.lessonsAvailable || []).map((id) => ({ id })), cur.hash, cur.features, was.sessionId || S.sessionId));
         cur.first.row = r.attempt; cur.first.n = r.n; cur.corRestore = false; cur.corFails = 0;
-        const sm = document.querySelector('#mentor h2 small'); if (sm) sm.textContent = `your verdict on attempt ${r.n}`;
+        const sm = document.querySelector('#mentor h2 small'); if (sm) sm.textContent = `on attempt ${r.n}`;
         log(`The stored decision of the setup at ${fmtTime(cur.cand.t)} could not be found, so it was stored again as attempt ${r.n}.`);
       }
       const c = buildCorrection(M, cur.first.row.id), errorClass = MXA.classifyError(cur.first.decision, c, null);
       const res = await api.post({ action: 'correct', edge: S.setup.edge.id, correction: Object.assign({}, c, { errorClass }) });
       cur.corFails = 0; $('m-save').textContent = 'Save correction'; $('m-err').hidden = true;
-      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveOk.reset(); renderPointBar(); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
+      cur.correction = res.correction; cur.cmp = null; M.dirty = false; leaveOk.reset(); renderPointBar(); if ($('continue')) $('continue').classList.add('primary'); say('replay-msg', 'Verdict saved. Continue when you are ready.'); if ($('continue-msg')) say('continue-msg', '');
       say('m-msg', `Correction saved ✓ (${c.verdict}${c.action ? ' → ' + c.action : ''}; classed as ${errorClass}).`);
       log(`${c.verdict}${c.action ? ', change to ' + c.action : ''}${c.reasons.length ? ' (' + c.reasons.join(', ') + ')' : ''}. Stored.`, 'Correction.');
       const draft = MXA.lessons.fromCorrection(cur.first.decision, Object.assign({}, res.correction, { sessionId: S.sessionId }), cur.features);

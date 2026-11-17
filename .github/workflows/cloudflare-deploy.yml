@@ -1,7 +1,7 @@
 name: Cloudflare deploy
 
-# Stage 2 of the Cloudflare move (docs/cloudflare.md): deploys cloudflare/ (the Worker) with out/ as its
-# assets to the account's workers.dev address. It does NOT touch Vercel, DNS or the domain, and sets no
+# Deploys cloudflare/ (the Worker, docs/cloudflare.md) with out/ as its assets: the workers.dev address and the
+# two custom domains of wrangler.jsonc `routes` (aureumdesk.co.uk, www). It does not touch DNS and sets no
 # Worker secrets: those are copied by the owner with `wrangler secret put` (docs/cloudflare.md, stage 2).
 #
 # Needs two repository secrets (Settings -> Secrets and variables -> Actions):
@@ -20,6 +20,10 @@ on:
       - 'out/**'
       - 'api/**'
       - 'vercel.json'
+      - 'academy/**'
+      - 'ml/models/**'
+      - 'mt5/**'
+      - 'ctrader/**'
       - '.github/workflows/cloudflare-deploy.yml'
 
 permissions:
@@ -58,6 +62,18 @@ jobs:
       - name: Install the Worker's packages
         working-directory: cloudflare
         run: npm ci --no-audit --no-fund
+
+      - name: Language-model settings on the Worker (names and types only; never a secret's value)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          j=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/meridianx/settings") || true
+          echo "$j" | jq -r 'if .success then (.result.bindings[] | select(.name | test("^(ACADEMY_LLM|EDGE_|TRADE_REVIEW|CHRONOS_)")) | "\(.name)  \(.type)" + (if .type == "plain_text" and (.name | test("KEY") | not) then "  = \(.text)" else "" end)) else "could not read the Worker settings: \(.errors)" end' || true
+          for n in ACADEMY_LLM_KEY ACADEMY_LLM_URL ACADEMY_LLM_MODEL ACADEMY_LLM_FORMAT ACADEMY_LLM_USD_PER_MTOK_IN ACADEMY_LLM_USD_PER_MTOK_OUT; do
+            echo "$j" | jq -e --arg n "$n" '.result.bindings[] | select(.name == $n)' >/dev/null 2>&1 || echo "::warning::$n is not set on the Worker"
+          done
+          echo "$j" | jq -e '.result.bindings[] | select(.name == "ACADEMY_LLM_KEY" and .type == "plain_text")' >/dev/null 2>&1 && echo "::warning::ACADEMY_LLM_KEY is plain text: delete it and add it again as a Secret" || true
 
       - name: Deploy
         working-directory: cloudflare

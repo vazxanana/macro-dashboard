@@ -40,25 +40,21 @@ Supporting scripts:
 |---|---|---|
 | Trader loop | `.github/workflows/council.yml`, job `trade` | Each run does 60 rounds 4 min apart (~4.5 h), then starts the next run itself. A push to `main` touching `council/**` or `council.yml` starts a fresh loop (it cancels the old one). |
 | Watchdog | `council.yml`, job `watchdog` | :07, :22, :37, :52 every hour: starts a loop only if none is running. |
-| Vercel fallback | `api/run.js?job=council`, Vercel cron | Every 4 min, but **stands down** while GitHub Actions saved to `council-data` in the last 10 minutes. If Actions stops, Vercel takes over on its own (only when its run mode is `live` or `council`; otherwise it is a dry run that commits and alerts nothing). |
 | Daily replay + fidelity | `.github/workflows/backtest.yml` | 03:17 UTC daily, on pushes to the replay's files, or by hand (choose the number of days). |
 | 90-day research replay | `.github/workflows/research-replay.yml` | By hand only. Writes `research/replay-90d.json` (or a path you choose); never touches `backtest.json`. |
-| Bars snapshot | `.github/workflows/bars.yml` | By hand: saves recent candles to `research/bars/` so a day can be replayed exactly. |
 | Data check | `council.yml`, inside the Trader loop | Every 2nd round (~11 min): `node council/datacheck.mjs data` (150 s cap, never fails the round). |
 | Owner digest | `council.yml`, inside the Trader loop | Every round, but it sends once per UTC day: from 21:15 UTC Mon-Fri and Sunday (`node council/digest.mjs data`, 120 s cap, never fails the round). |
 | Tests | `.github/workflows/tests.yml` | Every pull request and push to `main`: syntax check, `node --test tests/`, the ICT audit and the alert checks on pinned council-data copies (`tests/fixtures/`). Offline: no secrets, no network. |
 | Morning replay | `.github/workflows/replay.yml` | By hand: prints one market's morning to the log. |
-| ICT desk | `ict.yml`, `ict-replay.yml`, `api/run.js?job=ict` | A separate system with its own files (`ict/`); not part of the council. |
+| ICT desk | `council.yml` (every 3rd round), `ict.yml` (by hand), `ict-replay.yml` | A separate system with its own files (`ict/`); not part of the council. |
 
 ## Stop and start
 
 - **Stop the Trader on GitHub:** Actions → "Council trader" → ⋯ → *Disable workflow*, then cancel the run in progress.
-  Disabling also stops the watchdog and the self-restart.
-- **Stop it everywhere:** also set `paused: ["council"]` (or `["all"]`) in Vercel → Storage → Edge Config (`meridian-flags`).
-  Otherwise Vercel picks the work up about 10 minutes after Actions stops saving (if its run mode is live).
-- **Start it:** enable the workflow and press *Run workflow* (or wait for the next watchdog tick). Remove `council` from the
-  Edge Config `paused` list to let the Vercel fallback run again.
-- **One runner at a time:** Actions is the runner (owner, 7 Nov). Vercel only fills in when Actions is silent.
+  Disabling also stops the watchdog and the self-restart. Nothing else runs the council (the Vercel fallback runner and its
+  Edge Config switches were removed on 17 Nov 2026).
+- **Start it:** enable the workflow and press *Run workflow* (or wait for the next watchdog tick).
+- **One runner at a time:** Actions is the only runner (owner, 7 Nov; the only one left since 17 Nov 2026).
 - **Alerts:** repository secrets `NTFY_TOPIC`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; futures-ticket sizing from the
   repository variables `FUT_ACCOUNT` / `FUT_RISK`. Remove a secret to silence that channel.
 

@@ -1,5 +1,5 @@
 // Meridian X side pages (Edge lab, /macro, /veteran/): who is signed in, asked once. /api/me reads the HttpOnly session cookie
-// set by the desk's sign-in (see "Server-side sign-in" in CLAUDE.md); a member sees the Desk | Macro | ChronosTrade switch
+// set by the desk's sign-in (see "Server-side sign-in" in CLAUDE.md); a member sees the Desk | Macro | ChronosTrade switch (and the owner its Academy link, `[data-mx-owner]`)
 // (`.hdr-sw[data-mx-members]`), a guest only the way back to the desk. GitHub Pages and local copies have no API: no check.
 // window.MX_ME resolves to the account ({u, name, role, perms?}) or null; it never rejects.
 (function () {
@@ -12,6 +12,7 @@
     document.documentElement.dataset.signed = me ? 'in' : 'out';
     var deny = (me && me.perms && me.perms.macro === false) || (me && me.role === 'public');
     document.querySelectorAll('[data-mx-members]').forEach(function (el) { el.hidden = !me; });
+    document.querySelectorAll('[data-mx-owner]').forEach(function (el) { el.hidden = !(me && me.role === 'owner'); });
     if (deny) document.querySelectorAll('[data-mx-macro]').forEach(function (el) { el.hidden = true; });
   });
 })();

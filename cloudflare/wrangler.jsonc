@@ -1,11 +1,14 @@
 {
   // Meridian X on Cloudflare Workers (stage 1: static site + API through the adapter).
-  // Secrets (OANDA_TOKEN, CRON_SECRET, SESSION_SECRET, GH_* tokens, BLOB_READ_WRITE_TOKEN, VAPID_*,
-  // EDGE_CONFIG, ...) are set with `wrangler secret put`, never in this file.
+  // Secrets (OANDA_TOKEN, CRON_SECRET, SESSION_SECRET, GH_* tokens, BLOB_READ_WRITE_TOKEN, ...) are set with `wrangler secret put`, never in this file.
   "name": "meridianx",
   "main": "src/worker.mjs",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
+  // keep the plain-text variables set in the dashboard (Settings -> Variables and Secrets) on every deploy (17 Nov 2026)
+  "keep_vars": true,
+  // email from the site's domain (17 Nov 2026, owner onboarded aureumdesk.co.uk for Email Sending): sign-up, approval and reset emails
+  "send_email": [{ "name": "EMAIL" }],
   "assets": {
     "directory": "../out",
     "binding": "ASSETS",
@@ -15,13 +18,20 @@
   },
   // The api/ handlers resolve their packages from the repository root; point them at this folder's copies.
   "alias": {
-    "@vercel/blob": "./node_modules/@vercel/blob",
-    "web-push": "./node_modules/web-push",
+    "@vercel/blob": "./src/store-blob.mjs",
+    "vercel-blob-real": "./node_modules/@vercel/blob",
     "acorn": "./node_modules/acorn"
   },
   // A copy of the Vercel Blob store (src/backup.mjs, every 10 min until complete, then daily). An id, not a secret.
   "kv_namespaces": [{ "binding": "BACKUP", "id": "ef06eea1b4834f3e913b3fbd82302039" }],
-  "triggers": { "crons": ["* * * * *", "*/10 * * * *"] },
+  // Files api/academy.js and api/bridge.js read from disk on Node, bundled as text modules (src/bundled.mjs).
+  "rules": [{ "type": "Text", "globs": ["**/academy/data/*.json", "**/ml/models/index.json", "**/CouncilBridge.mq5", "**/CouncilBridge.cs"], "fallthrough": true }],
+  // The site's two addresses (both already the Worker's custom domains on the account; recorded here so a deploy keeps them).
+  "routes": [{ "pattern": "aureumdesk.co.uk", "custom_domain": true }, { "pattern": "www.aureumdesk.co.uk", "custom_domain": true }],
+  // The file store on D1 (src/store-d1.mjs): the site's store once the Worker secret STORE is 'd1'; until then
+  // src/store-mirror.mjs keeps it a copy of the Vercel Blob store. An id, not a secret.
+  "d1_databases": [{ "binding": "STORE_DB", "database_name": "aureum-data", "database_id": "c5aa93f8-763e-4ead-9c37-db4d4051b4cb" }],
+  "triggers": { "crons": ["*/10 * * * *"] },
   "limits": { "cpu_ms": 300000 },
   "observability": { "enabled": true },
   "workers_dev": true

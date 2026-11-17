@@ -1,11 +1,10 @@
 // node --test tests/academy-preview.test.mjs — a preview deployment of the Academy is isolated: its own storage folder in the
-// shared Blob store, and a branch only gets a preview build when the owner opts in. Offline (a fake Blob client, a temp git repo).
+// shared Blob store. Offline (a fake Blob client). The Vercel deploy gate (scripts/vercel-ignore.sh) went with the Vercel project, 17 Nov 2026.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const ST = require('../api/_academy-store.js');
@@ -38,26 +37,6 @@ test('a preview and production share one Blob store and never see or overwrite e
   // every key a preview can ever write stays inside its folder
   for (const k of B.files.keys()) assert.ok(k.startsWith('academy/') || k.startsWith('academy-preview/'));
   await assert.rejects(() => prev.put('../academy/lessons.json', {}), /bad store key/);
-});
-
-// the Ignored Build Step: exit 0 = skip, exit 1 = build
-function ignore(env, changed = 'academy.html') {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mx-ignore-')), git = (...a) => execFileSync('git', a, { cwd: dir, stdio: 'pipe' });
-  git('init', '-q'); git('config', 'user.email', 't@example.com'); git('config', 'user.name', 't');
-  fs.writeFileSync(path.join(dir, 'README.md'), 'a'); git('add', '-A'); git('commit', '-qm', 'one');
-  fs.writeFileSync(path.join(dir, changed), 'b'); git('add', '-A'); git('commit', '-qm', 'two');
-  const r = spawnSync('sh', [path.join(ROOT, 'scripts/vercel-ignore.sh')], { cwd: dir, env: { PATH: process.env.PATH, ...env } });
-  fs.rmSync(dir, { recursive: true, force: true }); return r.status;
-}
-test('deploy gate: main builds on a served change; a branch builds a preview only when the owner names it in MX_PREVIEW_BRANCH', () => {
-  const br = 'claude/website-display-xoyadz';
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: 'main', VERCEL_ENV: 'production' }), 1, 'main, a page changed: build');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: 'main', VERCEL_ENV: 'production' }, 'notes.txt'), 0, 'main, nothing served changed: skip');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: br, VERCEL_ENV: 'preview' }), 0, 'a branch without the opt-in: skip (as before)');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: br, VERCEL_ENV: 'preview', MX_PREVIEW_BRANCH: 'some/other-branch' }), 0, 'another branch is named: skip');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: br, VERCEL_ENV: 'preview', MX_PREVIEW_BRANCH: br }), 1, 'the named branch, a page changed: build a preview');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: br, VERCEL_ENV: 'preview', MX_PREVIEW_BRANCH: br }, 'notes.txt'), 0, 'the named branch, nothing served changed: skip');
-  assert.equal(ignore({ VERCEL_GIT_COMMIT_REF: br, VERCEL_ENV: 'production', MX_PREVIEW_BRANCH: br }), 0, 'a branch can never be built as production through this switch');
 });
 
 test('the Academy handler picks the folder from the environment it runs in (no flag a request could set)', () => {

@@ -1,6 +1,7 @@
-// node --test tests/macro-desk.test.mjs — the Macro desk (market-structure.html, Council → Macro) reads macro/forecast.json,
-// macro/events.json and macro/history.json from council/macro.mjs. These checks keep the page wired up and fail when a
-// field the desk shows is renamed or dropped in the strategist's output (the page would otherwise go quietly blank).
+// node --test tests/macro-desk.test.mjs — the strategist's output (council/macro.mjs: macro/forecast.json, events.json,
+// history.json). These checks fail when a field a reader shows is renamed or dropped (a page would otherwise go quietly blank).
+// The Desk's Council → Macro pane was removed on 17 Nov 2026: the Macro desk is its own page (macro-desk.html), and the
+// Council's tab bar keeps a plain link to it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -8,14 +9,10 @@ import * as M from '../council/macro.mjs';
 
 const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
 
-test('macro desk: council tab, pane, section list and script are wired', () => {
-  assert.match(html, /<button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro"/);
-  assert.match(html, /<div class="c-grid c-pane c-pane-macro adm" id="ms-cp-macro" role="tabpanel" aria-labelledby="ms-cn-macro" data-pane="macro" hidden>/);
-  assert.match(html, /const CPANES = \[[^\]]*'macro'[^\]]*\]/, 'setPane must know the macro pane');
-  assert.match(html, /<script id="ms-md-js">/);
-  assert.match(html, /href="#council\/macro"/, 'home quick link');
-  assert.doesNotMatch(html, /id="ms-c-macro"/, 'the old research card is replaced by the desk');
-  for (const f of ['macro/forecast.json', 'macro/events.json', 'macro/history.json']) assert.ok(html.includes(`get('${f}')`), f);
+test('the Council keeps a plain link to the Macro desk where its tab was; the pane and its script are gone', () => {
+  assert.match(html, /<a class="adm c-nav-link" id="ms-cn-macro" href="\/macro-desk"[^>]*>Macro desk<\/a>/);
+  assert.doesNotMatch(html, /id="ms-cp-macro"|<script id="ms-md-js">|<style id="ms-md-css">|href="#council\/macro"/);
+  assert.match(html, /const CPANES = \['overview', 'trades', 'systems', 'review', 'research', 'week'\]/);
 });
 
 // a small synthetic world: weekday candles for every market and the FRED series the drivers read

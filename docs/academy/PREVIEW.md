@@ -1,5 +1,9 @@
 # A safe preview of the Academy
 
+**History (17 Nov 2026): this page no longer applies.** The Vercel project is gone (the site runs on a Cloudflare Worker
+since 16 Nov 2026) and `scripts/vercel-ignore.sh` was removed, so no preview of this kind can be made. The local run in
+`docs/academy/ACCEPTANCE.md` (step 0) is the way to try a branch. The text below is kept as it was.
+
 Status on 10 Nov 2026: **no preview exists yet.** The assistant's Vercel connection could see the team but not the project
 (zero projects, zero deployments listed), so it could not read the project's settings or start a deployment. Nothing was
 bypassed. What follows is ready on the branch and needs one owner action.
@@ -12,7 +16,7 @@ A preview is a separate deployment of one branch on its own Vercel URL. It is no
 
 ## What is already in place on the branch
 
-- **Opt-in build.** `scripts/vercel-ignore.sh` still skips every branch except `main`. It builds a preview for exactly one
+- **Opt-in build.** (Vercel only; the Vercel project and `scripts/vercel-ignore.sh` are gone since 17 Nov 2026, so this no longer applies.) `scripts/vercel-ignore.sh` skipped every branch except `main`. It builds a preview for exactly one
   branch, and only when the project variable `MX_PREVIEW_BRANCH` holds that branch's name. Unset, nothing changes. A branch
   can never be built as production through this switch (test: `tests/academy-preview.test.mjs`).
 - **Separate storage.** The Academy keeps its files under `academy/` on production and under `academy-preview/` on any

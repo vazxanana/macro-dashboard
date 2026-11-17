@@ -54,12 +54,12 @@ test('every Google Fonts link in the served pages is vendored (else re-run scrip
   for (const faces of Object.values(fonts)) for (const f of faces) assert.ok(fs.statSync(path.join(ROOT, 'assets/fonts', f.file)).size > 1000, f.file);
   assert.match(src('assets/fonts/OFL.txt'), /SIL OPEN FONT LICENSE Version 1\.1/);
   let n = 0;
-  for (const p of ['market-structure.html', 'gold-trading.html', 'index.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'scripts/veteran-library.html']) {
+  for (const p of ['market-structure.html', 'gold-trading.html', 'edge-lab.html', 'macro-desk.html', 'backtest.html', 'scripts/veteran-library.html']) {
     for (const m of src(p).matchAll(/<link\b[^>]*href=["'](https:\/\/fonts\.googleapis\.com\/css2\?[^"']+)["'][^>]*>/g)) {
       n++; assert.ok(fontFaces(m[1].replace(/&amp;/g, '&')), `${p}: ${m[1]}`);
     }
   }
-  assert.ok(n >= 8);
+  assert.ok(n >= 7);   // 7 since the /macro landing went (17 Nov 2026)
 });
 
 test('stamp-assets: src/href and url() in inline styles get ?v=<sha256 prefix>; unknown files and JS-built URLs are left alone', () => {

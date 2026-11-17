@@ -11,11 +11,15 @@ const lum = (hex) => { const v = hex.replace('#', '').match(/../g).map((x) => pa
 const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 // an rgba() over an opaque #rrggbb -> #rrggbb
 const over = (rgba, bg) => { const [r, g, b, a] = rgba.match(/[\d.]+/g).map(Number), B = bg.replace('#', '').match(/../g).map((x) => parseInt(x, 16)); return '#' + [r, g, b].map((c, i) => Math.round(c * a + B[i] * (1 - a)).toString(16).padStart(2, '0')).join(''); };
-const tok = (block, name) => { const m = new RegExp(`--${name}:\\s*([^;]+);`).exec(block); return m && m[1].trim(); };
+// a token's value; since 17 Nov 2026 (the graphite look) the older names point at --au-* tokens: a var() is followed in the same block,
+// then in the Desk's first :root block (where every token is defined), so each check below still measures the real colour
+const tok0 = (block, name) => { const m = new RegExp(`(?:^|[\\s{;])--${name}:\\s*([^;]+);`).exec(block); return m && m[1].trim(); };
+const DESK_ROOT = () => (/:root \{([^}]*)\}/.exec([...fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n')) || [])[1] || '';
+const tok = (block, name, depth = 0) => { let v = tok0(block, name); if (v == null) v = tok0(DESK_ROOT(), name); const m = v && /^var\(--([\w-]+)(?:,\s*([^)]+))?\)$/.exec(v); if (m && depth < 6) return tok(block, m[1], depth + 1) || (m[2] && m[2].trim()) || v; return v; };
 
 test('the Desk | Macro | ChronosTrade ring never animates forever, on any page (desk perf rule, 9 Nov)', () => {
   const files = { 'assets/mx-page.css': src('assets/mx-page.css') };
-  for (const p of ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'index.html', 'scripts/veteran-library.html']) files[p] = styles(src(p));
+  for (const p of ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'scripts/veteran-library.html']) files[p] = styles(src(p));
   for (const [f, css] of Object.entries(files)) {
     // keyframes that animate a custom property (the ring's --hm-r): never with an infinite iteration count
     const custom = [...css.matchAll(/@keyframes\s+([\w-]+)\s*\{([^{}]*\{[^{}]*\})+\s*\}/g)].filter((m) => /\{\s*--[\w-]+\s*:/.test(m[0])).map((m) => m[1]);
@@ -95,10 +99,6 @@ test('desk switch: six desks never widen a desk view on a phone (it takes the ro
   // the base rule's `width: max-content` is what made every desk view as wide as the switch: a later rule must take it back
   assert.ok(all.lastIndexOf('width: auto') > all.lastIndexOf('width: max-content'), 'width: auto comes after width: max-content');
   assert.match(all, /min-width:\s*0/); assert.match(all, /justify-self:\s*start/);
-  const soon = rule(css, '.desk-sw a small'), px = [...soon.matchAll(/font-size:\s*([\d.]+)px/g)].map((m) => +m[1]);
-  assert.ok(px[px.length - 1] >= 12, '"soon" is at least 12 px');
-  const ink = /:root\[data-theme="light"\] \.desk-sw a small \{ color: (#[0-9a-f]{6}); \}/.exec(css);
-  assert.ok(ink && ratio(ink[1], over('rgba(224,165,38,0.18)', '#ffffff')) >= 4.5, '"soon" passes AA on the light panel');
   // the page smoke test measures it in a browser
   assert.match(src('scripts/audit/smoke.cjs'), /view cut off on the right/);
 });
@@ -176,10 +176,15 @@ test('ICT desk on a phone: a signal with two executions keeps its chips inside t
   assert.match(css, /\.tv-h p\.ict-thru \{ display: block; overflow: visible; cursor: auto; \}/, 'the header clamps its other paragraphs to three lines on phones');
 });
 
-test('styled dialogs: the primary button is white on a fixed fill at AA in every theme (the themes\' --accent / --sell gave 3.2-4.5:1)', () => {
+// 17 Nov 2026 (graphite look): the primary is the page's solid neutral button, --au-primary with --au-on-primary on it (light on dark,
+// dark on light); the fallback pair is used where a page has no tokens. Both pairs are measured here, in every theme of the Desk.
+test('styled dialogs: the primary button reads at AA in every theme (the themes\' --accent / --sell gave 3.2-4.5:1)', () => {
   const js = src('assets/ms-dialog.js');
-  const pri = /\.msd button\.pri\{background:(#[0-9a-f]{6});border-color:\1;color:#fff\}/.exec(js), danger = /\.msd\.danger button\.pri,\.msd\.danger button\.pri:hover\{background:(#[0-9a-f]{6});/.exec(js);
-  assert.ok(pri && ratio('#ffffff', pri[1]) >= 4.5); assert.ok(danger && ratio('#ffffff', danger[1]) >= 4.5);
+  const pri = /\.msd button\.pri\{background:var\(--au-primary,(#[0-9a-f]{6})\);border-color:var\(--au-primary,\1\);color:var\(--au-on-primary,(#[0-9a-f]{3,6})\)\}/.exec(js), danger = /\.msd\.danger button\.pri,\.msd\.danger button\.pri:hover\{background:(#[0-9a-f]{6});border-color:\1;color:#fff\}/.exec(js);
+  const hex = (c) => (c.length === 4 ? '#' + [...c.slice(1)].map((x) => x + x).join('') : c);
+  assert.ok(pri && ratio(hex(pri[2]), pri[1]) >= 4.5, 'the fallback pair'); assert.ok(danger && ratio('#ffffff', danger[1]) >= 4.5);
+  const css = styles(src('market-structure.html')), block = (sel) => [...css.matchAll(new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{([^}]*)\\}', 'g'))].map((m) => m[1]).join(' ');
+  for (const sel of [':root', ':root[data-theme="light"]', ':root[data-theme="midnight"]']) { const b = block(sel); assert.ok(ratio(tok(b, 'au-on-primary'), tok(b, 'au-primary')) >= 12, `${sel}: text on the primary fill`); }
   const own = /\.own-acts button\.pri \{ background: (#[0-9a-f]{6}); border-color: \1; color: #fff; \}/.exec(styles(src('market-structure.html')));
   assert.ok(own && ratio('#ffffff', own[1]) >= 4.5, 'the Desk\'s own dialogs (permissions, a lesson\'s levels)');
 });
@@ -232,8 +237,7 @@ test('badge inks: every badge colour is a theme token, and each token passes AA 
   for (const r of [/\.ms-st\.ready \{ background: var\(--buy\); color: var\(--on-buy\); \}/, /\.ms-st\.near \{[^}]*color: var\(--warn-ink\); \}/, /\.ms-st\.bad \{[^}]*color: var\(--sell-ink\); \}/,
     /\.ms-al\.ok \{ color: var\(--buy-ink\);/, /\.ms-al\.against \{ color: var\(--sell-ink\);/, /\.ms-chip-buy \{ background: var\(--buy-soft\); color: var\(--buy-ink\);/, /\.ms-chip-sell \{ background: var\(--sell-soft\); color: var\(--sell-ink\);/,
     /\.ms-tag\.counter \{ color: var\(--warn-ink\);/, /\.ms-q\.weak \{ color: var\(--warn-ink\);/, /\.ms-srow \.lv-d\.at \{ color: var\(--accent-ink\);/, /\.pr-c\.up \{ color: var\(--buy-ink\); \} \.pr-c\.dn \{ color: var\(--sell-ink\); \}/,
-    /\.btab-brand span \{[^}]*color: var\(--gold-ink\); \}/, /\.ch-cd \{[^}]*color: var\(--on-sell\); background: var\(--sell\);/, /\.g-s-st\.pending \{ color: var\(--warn-ink\);/,
-    /\.md-vet-row\.agree \.md-vet-st \{[^}]*color: var\(--buy-ink\); \}/, /\.md-vet-row\.disagree \.md-vet-st \{[^}]*color: var\(--sell-ink\); \}/]) assert.match(css, r);
+    /\.btab-brand span \{[^}]*color: var\(--gold-ink\); \}/, /\.ch-cd \{[^}]*color: var\(--on-sell\); background: var\(--sell\);/, /\.g-s-st\.pending \{ color: var\(--warn-ink\);/]) assert.match(css, r);
   assert.doesNotMatch(css, /:root\[data-theme="light"\] \.ms-al\.(ok|against) \{ color: #/);
   // the scanner's day change is coloured by class, not by the chart's candle colour inline; a sign stays beside the colour
   assert.match(html, /<small class="pr-c \$\{ch >= 0 \? 'up' : 'dn'\}" style="font-weight:600"/);
@@ -465,7 +469,7 @@ test('Council "as of" stamps name the time zone and say "Stale" in words past tw
   assert.doesNotMatch(fresh, /Stale/); assert.match(fresh, /11 Nov/); assert.match(fresh, /\d\d:\d\d \S+$/, 'a zone name ends the stamp');
   assert.match(old, /^Stale: 10 Nov.*, 18 h old \(written every 6 h\)$/); assert.match(days, /^Stale: .*4 days old/);
   assert.equal(hc.stampTxt('not a date', 6, now), '');
-  for (const id of ['ms-decay-js', 'ms-ex-js', 'ms-book-js']) assert.match(new RegExp(`<script id="${id}">([\\s\\S]*?)</script>`).exec(deskHtml)[1], /MS_HC\.stampTxt\((D|B)\.at, 6\)/, id);
+  for (const id of ['ms-decay-js', 'ms-ex-js']) assert.match(new RegExp(`<script id="${id}">([\\s\\S]*?)</script>`).exec(deskHtml)[1], /MS_HC\.stampTxt\((D|B)\.at, 6\)/, id);
   assert.match(deskHtml, /id="ms-c-tz"/, 'the trade table says whose clock its times use');
 });
 
@@ -498,10 +502,9 @@ test('Home / Council reading pass: text at 12 px, touch targets, and the cards t
   assert.match(css, /#v-council \.c-act li \{ grid-template-columns: auto minmax\(0, 1fr\) auto; \}/);
   // 44 px: the Data chip, the folded status line, the checkbox labels, the scoreboard's sort buttons and links
   const touch = /@media \(hover: none\), \(pointer: coarse\), \(max-width: 760px\) \{([\s\S]*?)\n\}/.exec(css)[1];
-  for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '.md-full { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
+  for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '#ms-sb-b a { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
   // a planned reward:risk is not written like a result
   assert.match(deskHtml, /<span title="Planned reward for 1R of risk, not a result">target \$\{\(\+t\.rr\)\.toFixed\(2\)\}R<\/span>/);
-  assert.match(deskHtml, /deepest drawdown, day to day: live /); assert.doesNotMatch(deskHtml, /max drawdown ' \+ esc\(num\(B\.live\.dd\)/);
 });
 
 
@@ -568,13 +571,6 @@ test('ChronosTrade sounds on the profile: a save is said in words (the page call
   assert.match(DESK, /r\.status >= 500 \? 'The server could not save the sound \(error ' \+ r\.status \+ '\)\. Try again in a minute\.'/);
 });
 
-test('price alerts: failures in words, the message follows the last action, focus stays in the dialog after a delete', () => {
-  assert.match(DESK, /if \(!r\) throw new Error\(navigator\.onLine === false \? 'You are offline\. Connect and try again\.' : 'The server could not be reached\. Check your connection and try again\.'\);/);
-  assert.match(DESK, /try \{ await sync\(\); dlg\.querySelector\('#pa-msg'\)\.textContent = 'Alert deleted\.'; \}/);
-  assert.match(DESK, /if \(!\(v > 0\) \|\| !Number\.isFinite\(v\)\) \{ msg\.textContent = 'Type a price\.'; return; \}/, 'as api/push.js: a finite price only');
-  assert.match(DESK, /t = ds\[Math\.min\(at, ds\.length - 1\)\] \|\| dlg\.querySelector\('#pa-price'\); if \(t\) t\.focus\(\);/);
-});
-
 test('the palette knows the profile, its field has a name, and the demo-account rows work from the keyboard', () => {
   assert.match(DESK, /if \(window\.MS_ACCT && !has\('profile'\)\) out\.push\(\{ g: 'Pages', t: 'Profile and demo accounts', d: '#profile'/);
   assert.match(DESK, /<input id="cmdk-q" type="text" aria-label="Jump to a page, market or theme"/);
@@ -582,10 +578,11 @@ test('the palette knows the profile, its field has a name, and the demo-account 
 });
 
 
-// ---- Guest: the browser trader does not run (11 Nov 2026) ----
-test('the browser trader never runs for a guest (it saved to a journal a guest does not have and named a setup in a toast)', () => {
+// ---- The browser Trader and its journal (removed 17 Nov 2026): no guest, viewer or member gets a browser-made paper trade ----
+test('the browser Trader and the browser journal are gone (it wrote to a local journal and toasted that it had)', () => {
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.match(html, /function autoTrade\(list, price\) \{\s*if \(!JEL \|\| PUB \|\| marketClosed\(\)\) return;/);
+  assert.doesNotMatch(html, /function autoTrade\(|function jAdd\(|id="v-journal"|href="#journal"|id="ms-log"/);
+  assert.match(html, /data-ct="journal">Closed <small>/, 'the council\'s closed trades stay on Council → Trades');
 });
 
 // ── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone") ──
@@ -636,7 +633,7 @@ test('simple phone view: every part it adds is .ps-only, and a fold row keeps th
   assert.ok(top.length >= 14);
   for (const m of top) assert.match(m[2], /\bps-only\b/, m[0].slice(0, 90));
   const folds = [...DESK.matchAll(/<button type="button" class="(ps-only ps-fold[^"]*)" data-ps-for="([\w-]+)" aria-expanded="false">/g)];
-  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse', 'kv', 'tnum', 'vet', 'wnum'], 'Home: everything under the summary folds; second pass: the Setup levels, the Trades tiles and curve, the veteran\'s discussion, the week tiles');
+  assert.deepEqual(folds.map((m) => m[2]), ['today', 'mk', 'setup', 'act', 'ring', 'ready', 'go', 'pulse', 'kv', 'tnum', 'wnum'], 'Home: everything under the summary folds; second pass: the Setup levels, the Trades tiles and curve, the veteran\'s discussion, the week tiles');
   for (const [, cls, key] of folds) { const t = new RegExp(`<\\w+\\b[^>]*\\bclass="([^"]*)"[^>]*\\bdata-ps="${key}"`).exec(DESK); assert.ok(t, `no section for the ${key} row`);
     for (const gate of ['adm', 'own', 'pubonly']) assert.equal(new RegExp(`\\b${gate}\\b`).test(cls), new RegExp(`\\b${gate}\\b`).test(t[1]), `${key}: the row and its section differ on "${gate}"`); }
   // what waits on the person and the owner-only places keep their gates
@@ -745,7 +742,6 @@ test('simple phone view 2: which views fold, what stays open, and the rows keep 
   assert.match(PS_JS, /\{ v: 'ms-cp-research', sel: '\.card', two: 1, keep: function \(\) \{ return false; \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-week', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.classList\.contains\('wk-dec'\); \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-review', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.id === 'ms-loss'; \} \}/);
-  for (const v of ['ms-cp-macro', 'v-setup', 'v-gold', 'v-lit', 'v-crypto']) assert.match(PS_JS, new RegExp(`\\{ v: '${v}', sel: '\\.card'`), v);
   // a row made for a card carries the card's own gate, and its one line is never a line the account's gate hides
   assert.match(PS_JS, /\(c\.classList\.contains\('adm'\) \? ' adm' : ''\) \+ \(c\.classList\.contains\('own'\) \? ' own' : ''\)/);
   assert.match(PS_JS, /if \(lv && getComputedStyle\(lv\)\.display === 'none'\) lv = null;/);
@@ -774,7 +770,7 @@ test('simple phone view 2: Charts puts the rarely used rows behind "More", and a
   for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
   assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
   // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
-  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.pa-chips, \.cycle\) \{ display: none !important; \}/);
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle\) \{ display: none !important; \}/);
   assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
   // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
   assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
@@ -864,7 +860,7 @@ const Q12_CSS = styles(Q12);
 test('QA 12 Nov: on a phone the market-cycle strip waits behind "More" with the markup it reads (it pushed the chart 135 px down, 3.6 s after load)', () => {
   const rule = /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(([^)]*)\) \{ display: none !important; \}/.exec(Q12_CSS);
   assert.ok(rule, 'the "More" rule of the Charts simple view');
-  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.pa-chips', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
+  for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
   assert.match(Q12, /<div class="cycle" id="ms-cycle"/, 'the strip is still the .cycle child of the charts toolbar');
   assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context and the market cycle"/);
   assert.match(src('scripts/audit/smoke.cjs'), /the market-cycle strip is not behind "More"/);
@@ -891,35 +887,27 @@ test('QA 12 Nov: the analyst card asks its API only for the roles it answers (ow
   assert.match(js, /dataset\.role === 'public' \|\| document\.documentElement\.dataset\.role === 'viewer'\) return;[^\n]*\n\s*load\(\);/);
 });
 
-test('QA 12 Nov: the browser Trader saves no journal entry and shows no "It\'s in your journal" toast to a member without the Journal (viewers; Luxus landed on the Mosha desk with "Trader saved Retrace buy")', () => {
-  const body = Q12.slice(Q12.indexOf('function autoTrade(list, price) {'), Q12.indexOf("jAdd(tr, 'Auto paper trade · browser Trader')"));
-  assert.match(body, /if \(\/\(\^\|\\s\)journal\(\\s\|\$\)\/\.test\(document\.documentElement\.dataset\.deny \|\| ''\)\) return;/);
-  // the gate it reads: the viewer defaults deny the journal (msPerms)
-  assert.match(Q12, /viewer: \{[^}]*journal: false/);
-});
-
 test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on the light panel was 1.8:1)', () => {
   assert.match(Q12_CSS, /:root\[data-theme="light"\] \.ms-toast b \{ color: var\(--gold-ink\) !important; \}/);
   const light = /:root\[data-theme="light"\] \{ --buy-ink:[^}]*\}/.exec(Q12_CSS)[0];
   assert.ok(ratio(tok(light, 'gold-ink'), '#ffffff') >= 4.5);
 });
 
-test('15 Nov: Setup, Scanner, Crypto and LIT draw no text under 12 px and give touch controls 44 px (#ms-sz-css, scoped to the four views)', () => {
+test('15 Nov: Setup and Scanner draw no text under 12 px and give touch controls 44 px (#ms-sz-css, scoped to the two views; Crypto and LIT removed 17 Nov)', () => {
   const html = src('market-structure.html');
   const m = /<style id="ms-sz-css">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(m, 'the #ms-sz-css block is in the page');
   const css = m[1].replace(/\/\*[\s\S]*?\*\//g, '');
-  // every rule is scoped to one of the four views (nothing leaks to Home, Council, the desks or the guest page)
+  // every rule is scoped to one of the views (nothing leaks to Home, Council, the desks or the guest page)
   for (const [, sel] of css.matchAll(/([^{}@]+)\{[^{}]*\}/g)) {
     const parts = []; let d = 0, cur = '';
     for (const ch of sel) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { parts.push(cur); cur = ''; } else cur += ch; }
     parts.push(cur);
-    for (const part of parts) assert.match(part.trim(), /^(:is\((#v-(setup|scanner|crypto|lit),?\s*)+\)|#v-(setup|scanner|crypto|lit)\b)/, 'rule not scoped to the four views: ' + part.trim());
+    for (const part of parts) assert.match(part.trim(), /^(:is\((#v-(setup|scanner),?\s*)+\)|#v-(setup|scanner)\b)/, 'rule not scoped to the two views: ' + part.trim());
   }
   for (const [, px] of css.matchAll(/font-size:\s*([\d.]+)px/g)) assert.ok(+px >= 12, 'font-size ' + px + 'px under 12');
-  for (const want of ['.ms-tag', '.ms-st', '.ms-al', '.lv-d', '.cx-tag', '.chip', '#ms-pb-ctx > div > span', '.ms-tr-g > span', 'small:not(']) assert.ok(css.includes(want), want + ' raised to 12 px');
+  for (const want of ['.ms-tag', '.ms-st', '.ms-al', '.lv-d', '.chip', '.ms-tr-g > span', 'small:not(']) assert.ok(css.includes(want), want + ' raised to 12 px');
   assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{[\s\S]*min-height: 44px/, 'touch targets are 44 px on touch screens');
-  assert.doesNotMatch(css, /\.cx-ic/, 'the coin icon letters are left as they are');
 });
 
 test('15 Nov: each tab of the desk switch is a 44 px target on touch screens (was 32 px on every desk)', () => {
@@ -932,4 +920,14 @@ test('15 Nov: ChronosTrade\'s session form is 44 px on touch (Hide, market, star
   const m = /@media \(pointer: coarse\) \{ #sess :is\(([^)]*)\) \{ min-height: 44px; \}/.exec(css);
   assert.ok(m, 'the touch rule for the session form');
   for (const id of ['#sess-toggle', '#sym', '#start', '#days', '#sname', '#load', '#sessions', '#resume', '#newsess']) assert.ok(m[1].includes(id), id);
+});
+
+// ── Simplified pages (17 Nov 2026, owner: "All"): the research pane leads with the scoreboard; decay and expectations fold ──
+test('17 Nov: the decay monitor and what to expect sit in one closed "Decay and expectations" disclosure under the scoreboard', () => {
+  const sb = DESK.indexOf('id="ms-sb"'), dex = DESK.indexOf('<details class="c-dex adm" id="ms-dex">'), end = DESK.indexOf('</details>', dex);
+  assert.ok(sb > 0 && dex > sb, 'under the scoreboard');
+  for (const id of ['ms-decay', 'ms-expect']) { const i = DESK.indexOf(`id="${id}"`); assert.ok(i > dex && i < end, id + ' inside the disclosure'); }
+  assert.doesNotMatch(DESK.slice(dex, DESK.indexOf('>', dex)), /\bopen\b/, 'closed by default');
+  assert.match(PS_JS, /!c\.closest\('details\.c-dex'\)/, 'the simple phone view does not fold the cards inside it a second time');
+  for (const gone of ['id="v-gold"', 'id="v-lit"', 'id="v-sdv"', 'id="v-crypto"', 'id="ms-pb"', 'id="ms-book"', 'id="ms-cp-macro"', 'id="ms-notice"', '/_vercel/', '/api/og']) assert.ok(!DESK.includes(gone), gone);
 });

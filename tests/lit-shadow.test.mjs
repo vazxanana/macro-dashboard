@@ -216,12 +216,16 @@ test('wiring pins: the stream is shadow-only in council/trader.mjs; nothing live
   const trader = read('../council/trader.mjs'), page = read('../market-structure.html'), alerts = read('../council/alerts.mjs'), decay = read('../council/decay.mjs'), expect = read('../council/expect.mjs');
   assert.ok(trader.includes("{ id: 'lit-shadow', apply: (c) => { c.litShadow = true; }"), 'the owner rule');
   assert.ok(trader.includes("import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';"), 'the import');
-  assert.ok(trader.includes("if (key === 'xau' && config.litShadow && feed === 'OANDA') {"), 'gold only, on the OANDA feed, behind the owner rule');
+  // 17 Nov 2026: the owner rule lit-off switches the stream off; the block still runs for open / pending LIT records (management kept)
+  assert.ok(trader.includes("{ id: 'lit-off', apply: (c) => { c.litShadow = false; }"), 'the owner rule that switches it off');
+  assert.ok(trader.indexOf("{ id: 'lit-off'") > trader.indexOf("{ id: 'lit-shadow'"), 'applied after the rule that switched it on');
+  assert.ok(trader.includes("if (key === 'xau' && (config.litShadow || litLeft) && feed === 'OANDA') {"), 'gold only, on the OANDA feed, behind the owner rule or while a LIT record is open');
+  assert.ok(trader.includes("const litPush = config.litShadow ? st.push : [];"), 'no new order while the stream is off');
   assert.ok(trader.includes("const raw = await oandaBars(key, '5m', LIT_BARS);"), 'the longer 5m read is LIT\'s only');
   assert.ok(trader.includes("const bars = litClean(raw.filter((b) => !b.live && b.time + 300 <= now));"), 'closed candles only');
   assert.ok(trader.includes("const recs = trades.filter((x) => x.k === LIT_K && x.market === key);"), 'the gates see the stream\'s own records');
-  assert.ok(trader.includes("for (const rec of st.push) if (rec.shadow === true && (rec.blockedBy || []).includes('owner-shadow')) trades.push(rec);"), 'a record reaches trades.json only as an owner shadow');
-  const a = trader.indexOf("if (key === 'xau' && config.litShadow && feed === 'OANDA') {"), b = trader.indexOf("if (key === 'xau' && config.goldTL) {", a), blk = trader.slice(a, b);
+  assert.ok(trader.includes("for (const rec of litPush) if (rec.shadow === true && (rec.blockedBy || []).includes('owner-shadow')) trades.push(rec);"), 'a record reaches trades.json only as an owner shadow');
+  const a = trader.indexOf("if (key === 'xau' && (config.litShadow || litLeft) && feed === 'OANDA') {"), b = trader.indexOf("if (key === 'xau' && config.goldTL) {", a), blk = trader.slice(a, b);
   assert.ok(a > 0 && b > a); assert.equal((blk.match(/trades\.push\(/g) || []).length, 1, 'one push in the block'); assert.ok(!/shadow: false/.test(blk));
   assert.ok(!blk.includes('research.push') && !blk.includes('sendAlerts') && !blk.includes('alertable'), 'no alert, no research record');
   // the live lists: the futures / cTrader bridge whitelist, the page's system keys, the alert filter

@@ -1,7 +1,7 @@
 // Run: sh scripts/build.sh && node scripts/audit/pwa.cjs        (PORT=8767 by default; the script starts its own server on it,
 // so it must be a free port, not the one out/ is already served on; AUDIT_OUT=<dir> keeps two pictures of the offline page)
 // Installable-app audit with service workers ENABLED (the smoke test and the page audits block them): first visit, second
-// visit, offline, a deploy while a page is open, the kill switch, ?sw-reset, push, the manifest and the fonts, in a real
+// visit, offline, a deploy while a page is open, the kill switch, ?sw-reset, the manifest and the fonts, in a real
 // Chromium against out/. Hermetic: no network beyond this machine. The script serves out/ itself with vercel.json's rewrites
 // and Cache-Control rules, answers /api/me as the owner and /api, /cdata, /md with marked "private" bodies (so a leak into
 // Cache Storage is visible), and cuts every other host. "Offline" = the server drops every connection (a fetch then fails the
@@ -20,7 +20,7 @@ const OUT = path.join(ROOT, 'out');
 const PORT = +process.env.PORT || 8767, H = 'http://127.0.0.1:' + PORT;
 const VERCEL = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
 const MARK = 'PRIVATE-' + crypto.randomBytes(6).toString('hex');   // in every /api, /cdata, /md answer
-const PAGES = ['/', '/market-structure.html', '/macro-desk', '/backtest', '/academy', '/edge-lab.html', '/gold', '/macro/', '/veteran/'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk', '/backtest', '/academy', '/edge-lab.html', '/gold', '/veteran/'];
 const TYPES = { html: 'text/html; charset=utf-8', js: 'text/javascript', css: 'text/css', json: 'application/json', png: 'image/png', svg: 'image/svg+xml', woff2: 'font/woff2', mp3: 'audio/mpeg', webmanifest: 'application/manifest+json', txt: 'text/plain', md: 'text/markdown' };
 
 // ---- the server: out/ (or a "deploy" copy) the way vercel.json serves it ----
@@ -125,7 +125,6 @@ const VERSIONED = /^\/(?:macro-dashboard\/)?assets\/[^?]+\?v=[0-9a-f]{10}$/;
   await new Promise((r, j) => server.once('error', j).listen(PORT, '127.0.0.1', r));
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: 'allow' });
-  await ctx.grantPermissions(['notifications'], { origin: H }).catch(() => {});
   const foreign = [];
   await ctx.routeWebSocket(/.*/, (ws) => ws.close()).catch(() => {});
   await ctx.route((u) => u.origin !== H, (r) => { foreign.push(r.request().url()); return r.abort('internetdisconnected'); });
@@ -212,30 +211,6 @@ const VERSIONED = /^\/(?:macro-dashboard\/)?assets\/[^?]+\?v=[0-9a-f]{10}$/;
     const ierr = inst ? (inst.installabilityErrors || []).map((e) => e.errorId).filter((e) => e !== 'in-incognito') : null;
     if (ierr === null) note('Chromium installability check not available in this browser');
     else check('Chromium reports no installability error', !ierr.length, ierr.join(', '));
-
-    // ---------- push: a real push message through the worker ----------
-    const regId = await new Promise((res) => {
-      const on = (e) => { const r = (e.registrations || []).find((x) => x.scopeURL === H + '/' && !x.isDeleted); if (r) { cdp.off('ServiceWorker.workerRegistrationUpdated', on); res(r.registrationId); } };
-      cdp.on('ServiceWorker.workerRegistrationUpdated', on); cdp.send('ServiceWorker.enable').catch(() => res(null)); setTimeout(() => res(null), 4000);
-    });
-    // headless Chromium has no notification permission, so the worker's showNotification is replaced by a recorder; the push
-    // event itself is the browser's own (real PushMessageData), delivered through the DevTools protocol
-    const worker = () => ctx.serviceWorkers().filter((w) => w.url() === H + '/sw.js').pop();
-    const shown = async (payloads) => {
-      await worker().evaluate(() => { self.__shown = []; self.registration.showNotification = (t, o) => { self.__shown.push({ title: t, body: o.body, tag: o.tag, url: o.data && o.data.url, icon: o.icon }); return Promise.resolve(); }; });
-      for (const d of payloads) await cdp.send('ServiceWorker.deliverPushMessage', { origin: H, registrationId: regId, data: d });
-      return await until(async () => { const n = await worker().evaluate(() => self.__shown); return n.length >= payloads.length && n; }, 4000) || worker().evaluate(() => self.__shown);
-    };
-    let pushOk = false;
-    if (regId && worker()) {
-      try {
-        const n = await shown([JSON.stringify({ title: 'XAU rose to 4,100', body: 'Now 4,100.2', url: '/?s=xau#charts', tag: 'pa-1' }), 'not json at all', 'null', '"text"', '[1]', '{"title":7,"body":{},"url":"https://evil.example/x","tag":"pa-2"}', '{"url":"//evil.example/x"}']);
-        pushOk = true;
-        check('push: an alert becomes a notification with its title, body, icon and chart link', n[0] && n[0].title === 'XAU rose to 4,100' && n[0].body === 'Now 4,100.2' && n[0].url === '/?s=xau#charts' && n[0].tag === 'pa-1' && n[0].icon === '/icons/icon-192.png', JSON.stringify(n[0]));
-        check('push: plain text, null, a bare string, a list, wrong types or a link to another site still give a notification that opens this site', n.length === 7 && n[1].body === 'not json at all' && n[3].body === 'text' && n[5].title === '7' && n[5].body === '' && n.slice(1).every((x) => typeof x.title === 'string' && x.title && x.url === '/#charts'), JSON.stringify(n));
-      } catch (e) { note('push delivery not available in this browser: ' + e.message.split('\n')[0]); }
-    }
-    if (!pushOk) note('push through the browser not checked here (tests/pwa.test.mjs covers the handlers)');
 
     // ---------- 2. offline ----------
     S.down = true; await ctx.setOffline(true);
@@ -324,15 +299,11 @@ const VERSIONED = /^\/(?:macro-dashboard\/)?assets\/[^?]+\?v=[0-9a-f]{10}$/;
     await until(async () => !Object.keys((await state(p, true)).caches).length, 10000);
     st = await state(p);
     check('kill switch: the killed worker takes over and every cache of ours is gone', v3 && v3.kill && !Object.keys(st.caches).length, JSON.stringify({ v3, c: Object.keys(st.caches) }));
-    check('kill switch: the worker stays registered (price alerts keep working)', st.reg && st.active && st.controlled);
+    check('kill switch: the worker stays registered', st.reg && st.active && st.controlled);
     S.hits.length = 0;
     const kUrl = await p.evaluate(async () => { const u = [...document.querySelectorAll('script[src]')].map((e) => e.src).find((x) => /\/assets\/.*\?v=/.test(x)); const r = await fetch(u); await r.arrayBuffer(); await (await fetch(u)).arrayBuffer(); return [new URL(u).pathname + new URL(u).search, r.status]; });
     st = await state(p);
     check('kill switch: a ?v= asset goes to the network and nothing is stored', kUrl[1] === 200 && S.hits.filter((x) => x === kUrl[0]).length >= 1 && !Object.keys(st.caches).length, JSON.stringify({ kUrl, hits: S.hits.length }));
-    if (pushOk) {
-      const n = await shown([JSON.stringify({ title: 'Killed but alerting', tag: 'pa-k' })]).catch(() => []);
-      check('kill switch: a push still becomes a notification', n[0] && n[0].title === 'Killed but alerting' && n[0].tag === 'pa-k', JSON.stringify(n));
-    }
     S.down = true;
     const kq = await ctx.newPage();
     const kr = await kq.goto(H + '/gold', { waitUntil: 'domcontentloaded', timeout: 8000 }).then(() => kq.evaluate(() => !!document.getElementById('retry'))).catch(() => 'browser error');

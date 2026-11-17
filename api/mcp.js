@@ -627,7 +627,7 @@ async function rpc(who, m, ctx = {}) {
   const p = m.params || {};
   switch (m.method) {
     case 'initialize': { const v = p.protocolVersion; return res({ protocolVersion: VERSIONS.includes(v) ? v : VERSIONS[0], capabilities: { tools: { listChanged: false } },
-      serverInfo: { name: 'meridian-ict', title: 'Meridian ICT desk', version: VERSION, description: 'Research, backtest and propose changes to the Meridian ICT edge (paper trading).', websiteUrl: 'https://meridianx.dev' }, instructions: INSTR }); }
+      serverInfo: { name: 'meridian-ict', title: 'Meridian ICT desk', version: VERSION, description: 'Research, backtest and propose changes to the Meridian ICT edge (paper trading).', websiteUrl: 'https://aureumdesk.co.uk' }, instructions: INSTR }); }
     case 'ping': return res({});
     case 'tools/list': return res({ tools: TOOLS.filter(seen).map(publicTool) });
     case 'tools/call': {

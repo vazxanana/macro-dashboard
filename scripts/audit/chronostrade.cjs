@@ -15,7 +15,7 @@ const aaBoth = async (pg) => { const out = []; for (const cs of ['dark', 'light'
 const aaStats = (pg) => measured(pg, CONTRAST, 'analytics or journal text');
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
 const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';   // where live candles come from (aureumdesk.co.uk answered 402 after the Vercel project went away)
-const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), await p.route(/\/api\/mosha-lessons/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"lessons":[],"book":[],"canTeach":true,"who":"owner"}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const x = await fetchRetry(r.request().url().replace(H, MD_ORIGIN)); if (x.status !== 200) NET.push(x.status + (x.error ? ' ' + x.error : '')); r.fulfill({ status: x.status === 503 && x.error ? 502 : x.status, contentType: 'application/json', body: x.body }); }));
+const route = async (p) => (await p.route(/\/api\/chronos-coach/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":false,"reason":"no language-model key configured"}' })), await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), await p.route(/\/api\/mosha-lessons/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"lessons":[],"book":[],"canTeach":true,"who":"owner"}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const x = await fetchRetry(r.request().url().replace(H, MD_ORIGIN)); if (x.status !== 200) NET.push(x.status + (x.error ? ' ' + x.error : '')); r.fulfill({ status: x.status === 503 && x.error ? 502 : x.status, contentType: 'application/json', body: x.body }); }));
 const NET = [];   // candle requests that failed after three tries: named at the end, so a network failure is not read as a page fault
 // sign-in (9 Nov): the page asks /api/me (the session cookie lives on the server); the audit stubs the answer
 const me = (p, account) => p.route(/\/api\/me(\?|$)/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ account }) }));
@@ -137,7 +137,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     await p.waitForTimeout(250); const pill = await p.$eval('#pnlpill', (e) => ({ vis: !e.hidden && e.offsetParent != null, t: e.textContent, fs: parseFloat(getComputedStyle(e).fontSize) }));
     check('live P&L pill rides at the price with an icon, a sign and R (12 px+)', pill.vis && /[▲▼]/.test(pill.t) && /[+−]\$/.test(pill.t) && /\dR/.test(pill.t) && pill.fs >= 12, JSON.stringify(pill));
     const look = await p.evaluate(() => window.ctChart()); check('draggable stop / target lines carry grip handles', look.handles >= 2, JSON.stringify(look));
-    check('watermark names the symbol and timeframe; scales use tabular mono figures', /XAU\/USD · 15m/.test(look.wm) && /JetBrains Mono/.test(look.font), look.wm + ' | ' + look.font);
+    const gw = await p.evaluate(() => { const o = window.ctChartOpts ? window.ctChartOpts() : null; return o; }); check('no market name behind the candles and no grid lines (owner, 17 Nov 2026); scales use tabular mono figures', gw && gw.wm === false && gw.v === false && gw.h === false && /JetBrains Mono/.test(look.font), JSON.stringify(gw) + ' | ' + look.font);
     const lg = await p.$eval('#legend', (e) => ({ rows: e.children.length, t: e.textContent, fs: Math.min(...[...e.querySelectorAll('*')].map((x) => parseFloat(getComputedStyle(x).fontSize))) }));
     check('legend: symbol, timeframe and time in UTC, then O H L C and change % (12 px+)', lg.rows === 2 && /XAU\/USD/.test(lg.t) && /UTC/.test(lg.t) && /O \d.*H \d.*L \d.*C \d/.test(lg.t) && /%\)/.test(lg.t) && lg.fs >= 12, JSON.stringify(lg));
     await p.click('.speed [data-sp="1000"]'); await p.click('#play'); const s1 = []; for (let k = 0; k < 6; k++) { await p.waitForTimeout(140); s1.push(await txt(p, '#ptags .pv')); } await p.click('#play');
@@ -230,7 +230,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     check('by-session and by-weekday bars with signed R labels', (await p.$$('#v-sess .bv-bar')).length >= 1 && (await p.$$('#v-day .bv-bar')).length >= 1 && /R/.test(await txt(p, '#v-day .bv-val')) && (await p.$$('#bysess tr')).length >= 2);
     { const small = await p.evaluate(() => [...document.querySelectorAll('#tab-stats svg text, #tab-stats .bv-leg, #kpis small, #kpis span, #tab-journal th, #tab-journal td small, #jf button, #pf *')].filter((e) => e.getClientRects().length && e.textContent.trim() && !e.children.length).map((e) => [e.textContent.trim().slice(0, 20), parseFloat(getComputedStyle(e).fontSize)]).filter(([, f]) => f < 11.95));
       check('analytics, journal and challenge text is 12 px or more', small.length === 0, JSON.stringify(small.slice(0, 6))); }
-    { await p.emulateMedia({ colorScheme: 'dark' }); const c0 = await aaStats(p), bg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor); await p.emulateMedia({ colorScheme: 'light' }); check('AA contrast (4.5:1) for analytics text in the dark theme', !c0.length && bg === 'rgb(8, 9, 12)', bg + ' ' + c0.slice(0, 6).join(' | ')); }
+    { await p.emulateMedia({ colorScheme: 'dark' }); const c0 = await aaStats(p), bg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor); await p.emulateMedia({ colorScheme: 'light' }); check('AA contrast (4.5:1) for analytics text in the dark theme', !c0.length && bg === 'rgb(18, 19, 21)', bg + ' ' + c0.slice(0, 6).join(' | ')); }
     check('setup and rule-compliance charts render', (await p.$$('#v-tag .bv-bar')).length >= 1 && ((await p.$$('#v-rules .bv-bar')).length >= 1 || /Tick/.test(await txt(p, '#v-rules'))), await txt(p, '#v-rules'));
     await p.click('.tabs [data-t=journal]'); await p.click('#jf-side [data-v=sell]'); await p.click('.tabs [data-t=stats]'); check('analytics follow the journal filters', /journal filters/.test(await txt(p, '#afilt'))); await p.screenshot({ path: OUT + 'ct-analytics.png', fullPage: true });
     await p.click('.tabs [data-t=journal]'); await p.click('#jf-clear'); await p.click('.tabs [data-t=stats]');
@@ -263,10 +263,10 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await m.evaluate(() => window.openGuide()); const gw = await m.$eval('#guide', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: guide fits at 390 px', gw.l >= 8 && gw.r <= 382, JSON.stringify(gw)); await m.screenshot({ path: OUT + 'ct-guide-phone.png' }); await m.keyboard.press('Escape');
   check('phone: no sideways scroll', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)), await m.evaluate(() => document.documentElement.scrollWidth));
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);
-  check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(8, 9, 12)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
+  check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(18, 19, 21)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
   await m.screenshot({ path: OUT + 'ct-phone-light.png' });
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'midnight' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1200);
-  check('midnight theme applies to ChronosTrade', await m.evaluate(() => getComputedStyle(document.body).backgroundColor === 'rgb(7, 13, 31)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
+  check('midnight theme applies to ChronosTrade', await m.evaluate(() => getComputedStyle(document.body).backgroundColor === 'rgb(11, 12, 14)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
   await m.emulateMedia({ reducedMotion: 'reduce' }); check('reduced motion: chart pills do not animate', await m.evaluate(() => parseFloat(getComputedStyle(document.getElementById('pnlpill')).transitionDuration) === 0 && getComputedStyle(document.getElementById('dchip')).animationName === 'none')); await m.emulateMedia({ reducedMotion: null });
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1200);
   await m.waitForFunction(() => /Resumed/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {});
@@ -369,7 +369,7 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const st = () => q.evaluate(() => ctTf()), idle = () => q.waitForFunction(() => !ctTf().busy, null, { timeout: 120000 });
     const sw = async (tf) => { await q.evaluate(() => window.scrollTo(0, 0)); if (!(await q.$eval('#tfdd', (e) => e.open))) await q.click('#tfdd summary'); await q.click(`#tfsw [data-stf="${tf}"]`); await q.waitForTimeout(60); await idle(); await q.waitForTimeout(250); return st(); };
     // candles fetched apart from the page's own state: the proof of what could be known at a moment
-    const raw = (tf, from, to) => q.evaluate(async ([tf, from, to]) => { const r = await fetch(`/md/bars?sym=nas100&tf=${tf}&from=${from}&to=${to}`); return ((await r.json()).bars || []).filter((x) => !x.live && x.time >= from && x.time < to); }, [tf, from, to]);
+    const raw = (tf, from, to, sym = 'nas100') => q.evaluate(async ([tf, from, to, sym]) => { const r = await fetch(`/md/bars?sym=${sym}&tf=${tf}&from=${from}&to=${to}`); return ((await r.json()).bars || []).filter((x) => !x.live && x.time >= from && x.time < to); }, [tf, from, to, sym]);
     const ohlc = (bs) => (bs.length ? { open: bs[0].open, high: Math.max(...bs.map((x) => x.high)), low: Math.min(...bs.map((x) => x.low)), close: bs[bs.length - 1].close } : null);
     const same = (a, o) => !!a && !!o && ['open', 'high', 'low', 'close'].every((k) => Math.abs(a[k] - o[k]) < 1e-9);
     const acctKey = (t) => JSON.stringify([t.acct.balance, t.acct.positions, t.acct.orders, t.acct.closed, t.ch, t.draw]);
@@ -439,7 +439,14 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     await q.waitForFunction(() => ctTf().tf === '15m' && ctTf().bars > 1000, null, { timeout: 120000 }).catch(() => {}); await q.waitForTimeout(400);
     { const a = await st(); await q.click('#tfdd summary'); await q.click('#tfsw [data-stf="1m"]'); await q.waitForTimeout(400); await idle(); const z = await st(), msg = await txt(q, '#loadmsg');
       check('30 days on 1m is refused plainly ("load fewer days") and the session stays as it was', a.tf === '15m' && z.tf === '15m' && z.mom === a.mom && z.idx === a.idx && /Too many 1 minute candles/.test(msg) && /load fewer days/.test(msg), msg);
-      const y = await sw('4h'); check('the same session goes up to 4h', y.tf === '4h' && y.mom === a.mom && y.close === a.close, JSON.stringify([y.tf, y.mom, a.mom])); }
+      const y = await sw('4h');
+      // 16 Nov 2026: the quick start's day (now - 30 days) fell on a Saturday, so the session began at the market's Friday close
+      // (21:00 UTC). The 4h candle 20:00-24:00 then has no price after the moment, so the engine (tfPart) calls it complete and
+      // the moment is its end (24:00): nothing is skipped, there is no price in between. The page is right; the check asked for
+      // the same number. It now accepts that move only when 1m candles fetched apart from the page show prices before the old
+      // moment and none between it and the new one, with the same last price and no forming candle.
+      let shut = null; if (y.tf === '4h' && y.mom > a.mom && y.mom - a.mom < 14400 && y.mom % 14400 === 0 && !y.forming) { const ref = await raw('1m', a.mom - 3600, y.mom, 'xau'); shut = ref.some((c) => c.time < a.mom) && !ref.some((c) => c.time >= a.mom); }
+      check('the same session goes up to 4h (the same moment, or across a market close the end of the 4h candle that held it, no price in between)', y.tf === '4h' && (y.mom === a.mom || shut === true) && y.close === a.close, JSON.stringify([y.tf, y.mom, a.mom, shut])); }
     // ---- themes: the new control and its panel pass AA; nothing under 12 px
     { const AA = String.raw`(() => { const lum = (c) => { const m = c.match(/[\d.]+/g).map(Number); return m.slice(0, 3).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); }; const bgOf = (e) => { for (let x = e; x; x = x.parentElement) { const b = getComputedStyle(x).backgroundColor; if (b && /^rgb/.test(b) && !/rgba\(0, 0, 0, 0\)|transparent/.test(b) && !/,\s*0\.\d+\)$/.test(b)) return b; } return getComputedStyle(document.body).backgroundColor; }; const L = (x) => 0.2126 * x[0] + 0.7152 * x[1] + 0.0722 * x[2]; const out = []; let n = 0; for (const e of document.querySelectorAll('#tf-now, #tfsw button, .tfp small, .tfp kbd, #legend .lg-f, .tf-mid, #tb-sess b')) { if (!e.getClientRects().length || !e.textContent.trim()) continue; n++; const cs = getComputedStyle(e), a = L(lum(cs.color)), z = L(lum(bgOf(e))), r = (Math.max(a, z) + 0.05) / (Math.min(a, z) + 0.05), fs = parseFloat(cs.fontSize); if (r < 4.5 || fs < 12) out.push((e.id || e.className || e.tagName) + ' ' + e.textContent.trim().slice(0, 12) + ' ' + r.toFixed(2) + ' ' + fs + 'px'); } return { bad: out, n }; })()`;
       const bad = []; for (const th of ['dark', 'light', 'midnight']) { await q.evaluate((t) => { document.documentElement.dataset.theme = t; }, th); await q.evaluate(() => { document.getElementById('tfdd').open = true; });   /* the chips' 120 ms colour transition runs when the panel opens: measured() waits for it */ bad.push(...(await measured(q, AA, 'timeframe control text')).map((x) => th + ': ' + x)); if (th === 'light') await q.screenshot({ path: OUT + 'ct-tf-panel-light.png' }); }
@@ -538,7 +545,12 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
         await q.keyboard.press('f'); await q.waitForTimeout(400); check('leaving full screen puts the toolbar back at the top', await q.evaluate(() => !document.body.classList.contains('fs') && !document.getElementById('tb').classList.contains('float'))); }
       // split panes across switches and steps: a lower pane never passes the moment, a higher one forms from replayed prices, the same one mirrors
       await q.click('#splitdd summary'); await q.click('#splitdd [data-split="4"]'); await q.waitForTimeout(600); await q.$$eval('.xp-tf', (els) => { ['2m', '15m', '4h'].forEach((v, i) => { els[i].value = v; els[i].dispatchEvent(new Event('change')); }); });
-      const panes = async () => { await q.waitForFunction(() => ctSplit().panes.length === 3 && ctSplit().panes.every((P) => !/Loading/.test(P.title)), null, { timeout: 60000 }).catch(() => {}); await q.waitForTimeout(350); const sp = await q.evaluate(() => ctSplit()); return sp.panes.filter((P) => (!P.last ? !/Too many .* candles/.test(P.title) : P.rel === 'lower' ? !(P.last.time + P.sec <= sp.mom && P.last.time + 2 * P.sec > sp.mom) : P.rel === 'same' ? !(P.last.time === sp.now && P.last.close === sp.close) : !(P.last.close === sp.close && P.last.time <= sp.now && Math.abs(P.last.high - P.hi) < 1e-9 && Math.abs(P.last.low - P.lo) < 1e-9))).map((P) => `${sp.tf}${sp.forming ? '(forming)' : ''}>${P.tf}:${P.rel}:${JSON.stringify(P.last)}@${sp.mom}`); };
+      // a lower pane's last candle must have ended by the moment and be the last one that did. Usually that is the candle just before
+      // the moment; across a market close (16 Nov 2026: a Friday's day candle ends at 24:00 UTC, NAS100 at 22:00) it is older, and
+      // candles fetched apart from the page must then show it is the real last one: none ended between it and the moment.
+      const lowerOk = async (P, sp) => { if (!(P.last.time + P.sec <= sp.mom)) return false; if (P.last.time + 2 * P.sec > sp.mom) return true; const ref = await raw(q, P.tf, P.last.time, sp.mom); return ref.length > 0 && ref[0].time === P.last.time && same(ref[0], P.last) && ref.slice(1).every((c) => c.time + P.sec > sp.mom); };
+      const panes = async () => { await q.waitForFunction(() => ctSplit().panes.length === 3 && ctSplit().panes.every((P) => !/Loading/.test(P.title)), null, { timeout: 60000 }).catch(() => {}); await q.waitForTimeout(350); const sp = await q.evaluate(() => ctSplit()), out = [];
+        for (const P of sp.panes) { const ok = !P.last ? /Too many .* candles/.test(P.title) : P.rel === 'lower' ? await lowerOk(P, sp) : P.rel === 'same' ? (P.last.time === sp.now && P.last.close === sp.close) : (P.last.close === sp.close && P.last.time <= sp.now && Math.abs(P.last.high - P.hi) < 1e-9 && Math.abs(P.last.low - P.lo) < 1e-9); if (!ok) out.push(`${sp.tf}${sp.forming ? '(forming)' : ''}>${P.tf}:${P.rel}:${JSON.stringify(P.last)}@${sp.mom}`); } return out; };
       { const bad = []; let n = 0; for (const tf of ['5m', '1h', '15m', '1d', '10m']) { await sw(q, tf); bad.push(...await panes()); await q.keyboard.press('ArrowRight'); bad.push(...await panes()); n += 2; if (tf === '1h') await q.screenshot({ path: OUT + 'ct-polish-split.png' }); }
         await q.click('.speed [data-sp="200"]'); await q.keyboard.press(' '); await q.waitForTimeout(1500); await q.keyboard.press(' '); bad.push(...await panes());
         check(`split view (2m, 15m, 4h beside the first chart) across five switches, a step after each and playback: ${n + 1} looks, every pane right for the moment`, !bad.length, bad.slice(0, 3).join(' | ')); }
@@ -678,6 +690,323 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       const lg = await t.evaluate(() => { const box = document.querySelector('#pflog .pflog-t'), tb = box && box.querySelector('table'), card = document.getElementById('tab-log').getBoundingClientRect(); if (!tb) return null; const r = box.getBoundingClientRect(); box.scrollLeft = 150; const d = tb.querySelector('tbody td').getBoundingClientRect(); return { rows: tb.rows.length, inCard: r.right <= card.right + 0.5 && r.left >= card.left - 0.5, scrolls: box.scrollWidth > box.clientWidth, day: Math.round(d.left - r.left), over: document.documentElement.scrollWidth - innerWidth, font: Math.min(...[...tb.querySelectorAll('th, td')].map((c) => parseFloat(getComputedStyle(c).fontSize))) }; });
       check(`challenge log at ${w} px (${full ? 'Full' : 'Simple'} view): the day table scrolls inside its own box in the card, the day stays at the left, 12 px at least, no sideways page`, lg && lg.rows > 2 && lg.inCard && lg.scrolls && lg.day === 0 && lg.over <= 0 && lg.font >= 12, JSON.stringify(lg));
       await cx.close(); } }
+  // 36. trade coach (17 Nov 2026): a drawn level, a draft whose sentence names it, the same sentence on the journal row, the
+  // review dialog's suggestions, and the "How you trade" card; 12 px and AA in dark / light / midnight. Screenshots for the owner.
+  { const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('coach: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 30; i++) await t.keyboard.press('ArrowRight'); await settle(t);
+    const ch = await t.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }), py = (await t.evaluate(() => window.ctChart())).pxY;
+    await t.click('#drawdd summary'); await t.click('[data-dt=h]'); await t.mouse.click(ch.x + ch.w * 0.45, ch.y + py); await t.waitForTimeout(200); await t.mouse.move(4, 4);
+    await t.keyboard.press('Shift+S'); await settle(t);
+    const say = await txt(t, '#dchip .dsay'); check('the draft readout says the trade in one sentence and names the drawn level', /^(Buying|Selling) in (Asia|London|New York), .*ATR stop, .*target.*your (nearest )?drawn level/.test(say), say);
+    check('the sentence on the draft is 12 px or more', (await t.$eval('#dchip .dsay', (e) => parseFloat(getComputedStyle(e).fontSize))) >= 12);
+    await t.screenshot({ path: OUT + 'coach-draft.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(1100, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    await t.keyboard.press('Enter'); await settle(t);
+    const ctx0 = await t.evaluate(() => { const a = window.ctAcct().acct; return a.positions[0] && a.positions[0].ctx; });
+    check('the open position carries its context, with the drawing made before the entry', ctx0 && ctx0.side === 'sell' && ctx0.draw && ctx0.draw.n === 1 && ctx0.at > 0, JSON.stringify(ctx0 || {}).slice(0, 120));
+    // a few more trades closed by hand, so the card has rows (each one stays far under 20: "too few to judge")
+    for (let k = 0; k < 5; k++) { for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.keyboard.press(k % 2 ? 'b' : 's'); await settle(t); }
+    for (let i = 0; i < 2; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await settle(t);
+    const A = await t.evaluate(() => window.ctAcct().acct); check('every closed trade carries ctx (instant and draft entries)', A.closed.length >= 6 && A.closed.every((x) => x.ctx && x.ctx.session), A.closed.length + ' closed');
+    await t.click('.tabs [data-t=journal]'); await settle(t);
+    const row = await t.evaluate(() => [...document.querySelectorAll('#jbody small.say')].map((e) => e.textContent));
+    check('each journal row shows the coach\'s sentence; the first trade\'s names the drawn level', row.length >= 6 && row.every((s) => /^(Buying|Selling) in /.test(s)) && row.some((s) => /drawn level/.test(s)), row[row.length - 1]);
+    await t.evaluate(() => { document.getElementById('toasts').style.visibility = 'hidden'; });    await t.$eval('#jbody tr:last-child', (e) => e.scrollIntoView({ block: 'center' })); await settle(t); const rb = await t.$eval('#jbody tr:last-child', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    await t.screenshot({ path: OUT + 'coach-journal.png', clip: { x: Math.max(0, rb.x), y: Math.max(0, rb.y - 40), width: Math.min(1480, rb.w), height: rb.h + 50 } });
+    await t.click('#jbody tr:first-child td.mist'); await settle(t); const seen = await t.evaluate(() => ({ open: document.getElementById('mistd').open, ticked: document.querySelectorAll('#mist-grid input:checked').length, sug: document.querySelectorAll('#mist-grid label.sug').length, txt: document.getElementById('mist-seen').textContent }));
+    check('the review dialog lists what the coach saw as suggestions and ticks nothing by itself', seen.open && seen.ticked === 0 && /The coach saw|^$/.test(seen.txt), JSON.stringify(seen).slice(0, 140));
+    // 37. AI coach (17 Nov 2026): the stubbed /api/chronos-coach answers enabled: false (no key), so both places say it is off
+    // and offer no button
+    const aiTr = await t.evaluate(() => { const b = document.getElementById('ai-tr'); return { shown: !!b && !b.hidden && !!b.getClientRects().length, text: b ? b.textContent : '', btn: !!document.querySelector('#ai-tr .ai-go') }; });
+    check('AI coach in the review dialog: off without the server, a quiet line and no button', aiTr.shown && /The AI coach is off/.test(aiTr.text) && !aiTr.btn, JSON.stringify(aiTr)); await t.keyboard.press('Escape');
+    await t.click('.tabs [data-t=stats]'); await settle(t);
+    const card = await t.evaluate(() => ({ chips: document.querySelectorAll('#co-f [data-cf]').length, rows: document.querySelectorAll('#co-t tbody tr').length, few: [...document.querySelectorAll('#co-t td.j')].every((e) => /too few to judge/.test(e.textContent)), lead: document.getElementById('co-lead').textContent, bars: document.querySelectorAll('#v-coach .bv-bar').length }));
+    check('"How you trade": splits with n / win % / mean R / t, every group under 20 says "too few to judge", no lead sentence under 20', card.chips >= 4 && card.rows >= 1 && card.few && card.bars >= 1 && /keep trading/.test(card.lead), JSON.stringify(card));
+    const aiSs = await t.evaluate(() => { const b = document.getElementById('ai-ss'), o = b && b.querySelector('.ai-off'); return { shown: !!o && !!o.getClientRects().length, text: b ? b.textContent : '', btn: !!document.querySelector('#ai-ss .ai-go'), font: o ? parseFloat(getComputedStyle(o).fontSize) : 0 }; });
+    check('AI coach on "How you trade": off without the server, "The AI coach is off", no button, 12 px', aiSs.shown && /The AI coach is off/.test(aiSs.text) && !aiSs.btn && aiSs.font >= 12, JSON.stringify(aiSs));
+    await t.click('#co-f [data-cf=lvl]').catch(() => {}); await settle(t); check('"Your levels" split on the card', /drawn level|your levels/i.test(await txt(t, '#co-t')), await txt(t, '#co-t thead'));
+    await t.$eval('#vc-coach', (e) => e.scrollIntoView({ block: 'center' })); await settle(t); await (await t.$('#vc-coach')).screenshot({ path: OUT + 'coach-card.png' });
+    const COACH_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#vc-coach h2, #vc-coach small, #co-lead, #co-f button, #co-t th, #co-t td, #co-note, #ai-ss .ai-off, #v-coach svg text, #tab-journal small.say')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await t.click('.tabs [data-t=stats]'); await settle(t); bad.push(...(await measured(t, COACH_AA, 'coach card text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#vc-coach *, #tab-journal small.say')].filter((e) => e.getClientRects().length && e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('coach card and journal sentence: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await cx.close(); }
+  // 38. drawing tools like TradingView (17 Nov 2026): the tool strip, the magnet (a box drawn with it has its corners on candle
+  // prices), resize by a handle, move a trend line by its body, the floating bar (colour, width), Delete, a reload keeps them,
+  // an old-format drawing (no stamp, no style) still loads and draws, and no drawing touched the account. Screenshots for the owner.
+  { const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('draw: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { if (!sessionStorage.getItem('d38')) { localStorage.clear(); sessionStorage.setItem('d38', '1'); } localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} });
+    await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await settle(t);
+    const ch = await t.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    const acct0 = await t.evaluate(() => JSON.stringify(window.ctAcct().acct));
+    const strip = await t.evaluate(() => { const s = document.getElementById('dstrip'), r = s.getBoundingClientRect(); return { on: !!s.getClientRects().length && getComputedStyle(s).display !== 'none', n: s.querySelectorAll('button').length, tools: [...s.querySelectorAll('[data-dt]')].map((x) => x.dataset.dt), x: r.left, y: r.top, w: r.width, h: r.height }; });
+    check('the drawing tool strip sits on the chart\'s left edge: cursor, trend line, horizontal line and ray, vertical line, box, magnet', strip.on && strip.n === 7 && strip.tools.join() === ',t,h,hr,v,r' && strip.x >= ch.x && strip.x < ch.x + 20, JSON.stringify(strip));
+    await t.screenshot({ path: OUT + 'draw-strip.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(900, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    // magnet: Alt+M cycles off → weak → strong, remembered on the device
+    await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyM'); const mg = await t.evaluate(() => ({ m: window.ctChart().mag, ls: localStorage.getItem('btLab:magnet'), p: document.querySelector('#dstrip [data-mag]').getAttribute('aria-pressed') }));
+    check('Alt+M twice: the magnet is strong, the strip button pressed, remembered', mg.m === 2 && mg.ls === '2' && mg.p === 'true', JSON.stringify(mg));
+    // a box by press and drag (strip button), with the magnet strong: both corners on a candle's open / high / low / close
+    await t.click('#dstrip [data-dt="r"]'); const pA = [ch.x + ch.w * 0.32, ch.y + ch.h * 0.33], pB = [ch.x + ch.w * 0.45, ch.y + ch.h * 0.6];
+    await t.mouse.move(...pA); await t.mouse.down(); await t.mouse.move(pA[0] + 30, pA[1] + 40, { steps: 4 }); await t.mouse.move(...pB, { steps: 6 }); await t.mouse.up(); await settle(t);
+    const d1 = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[D.list.length - 1]; return { D, r, b1: window.ctBarAt(r.t1), b2: window.ctBarAt(r.t2) }; });
+    const onOHLC = (b, p) => !!b && [b.open, b.high, b.low, b.close].includes(p);
+    check('a box drawn with the magnet strong has both corners on candle prices (open / high / low / close of the candle under each)', d1.r.type === 'r' && onOHLC(d1.b1, d1.r.p1) && onOHLC(d1.b2, d1.r.p2) && d1.r.at > 0 && d1.D.sel === d1.D.list.length - 1 && d1.D.tool === null, JSON.stringify({ r: d1.r, b1: d1.b1, b2: d1.b2, sel: d1.D.sel }));
+    await settle(t); const sel = await t.evaluate(() => { const e = document.getElementById('dsel'), r = e.getBoundingClientRect(); return { on: !e.hidden && !!e.getClientRects().length, btn: e.querySelectorAll('button').length, small: [...e.querySelectorAll('*')].filter((x) => x.childNodes.length && [...x.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(x).fontSize) < 12).length, dh: window.ctChart().dh, y: r.top, b: r.bottom }; });
+    check('the selected box shows its eight handles and the floating bar above it (12 px or more)', sel.on && sel.btn >= 10 && sel.dh >= 8 && !sel.small && sel.b <= ch.y + d1.D.geo[d1.D.sel].y1 + 2, JSON.stringify(sel));
+    await t.screenshot({ path: OUT + 'draw-selected.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(900, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    // resize by the second corner: that corner follows (still on a candle price), the first stays, the drawing keeps its moment
+    { const g = d1.D.geo[d1.D.sel], h = g.pts.find((q) => q[0] === 'c22'); await t.mouse.move(ch.x + h[1], ch.y + h[2]); await t.mouse.down(); await t.mouse.move(ch.x + h[1] + 60, ch.y + h[2] + 50, { steps: 8 }); await t.mouse.up(); await settle(t);
+      const r2 = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[D.sel]; return { r, b2: window.ctBarAt(r.t2) }; });
+      check('dragging a corner handle resizes the box: that corner moves to a candle price, the other stays, at kept, editedAt stamped', r2.r.t2 > d1.r.t2 && r2.r.p2 !== d1.r.p2 && onOHLC(r2.b2, r2.r.p2) && r2.r.t1 === d1.r.t1 && r2.r.p1 === d1.r.p1 && r2.r.at === d1.r.at && r2.r.editedAt >= r2.r.at, JSON.stringify([d1.r, r2.r])); }
+    // the floating bar: red, 2 px
+    await t.click('#dsel [data-ds="col"][data-v="dn"]'); await t.click('#dsel [data-ds="w"]'); await settle(t);
+    const st = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; }); check('the floating bar sets the colour and the width, saved with the drawing', st.col === 'dn' && st.w === 2, JSON.stringify(st));
+    // a trend line (Alt+T, click, click), then moved by its body: both points shift by the same time and price
+    await t.mouse.move(4, 4); await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyT');
+    await t.mouse.click(ch.x + ch.w * 0.55, ch.y + ch.h * 0.7); await t.mouse.click(ch.x + ch.w * 0.68, ch.y + ch.h * 0.45); await settle(t);
+    const tl = await t.evaluate(() => { const D = window.ctDraw(); return { D, r: D.list[D.list.length - 1] }; });
+    check('Alt+T then two clicks: a trend line, selected, stamped with the moment', tl.r.type === 't' && tl.D.sel === tl.D.list.length - 1 && tl.r.at > 0 && tl.D.mag === 0, JSON.stringify(tl.r));
+    { const g = tl.D.geo[tl.D.sel], mx = (g.x1 + g.x2) / 2, my = (g.y1 + g.y2) / 2; await t.mouse.move(ch.x + mx, ch.y + my); await t.mouse.down(); await t.mouse.move(ch.x + mx - 70, ch.y + my + 40, { steps: 8 }); await t.mouse.up(); await settle(t);
+      const m = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; });
+      check('dragging a trend line by its body moves both points by the same time and price; the chart did not pan', m.t1 < tl.r.t1 && m.t1 - tl.r.t1 === m.t2 - tl.r.t2 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m])); }
+    // Delete removes the selected one; Esc lets go
+    const n0 = (await t.evaluate(() => window.ctDraw().list.length)); await t.keyboard.press('Delete'); await settle(t);
+    const del = await t.evaluate(() => ({ n: window.ctDraw().list.length, sel: window.ctDraw().sel, bar: document.getElementById('dsel').hidden }));
+    check('Delete removes the selected drawing and the floating bar goes', del.n === n0 - 1 && del.sel === -1 && del.bar, JSON.stringify(del));
+    // a vertical line and a horizontal ray (Alt+V, Alt+J): one click each
+    await t.keyboard.press('Alt+KeyV'); await t.mouse.click(ch.x + ch.w * 0.5, ch.y + ch.h * 0.5); await t.keyboard.press('Escape'); await t.keyboard.press('Alt+KeyJ'); await t.mouse.click(ch.x + ch.w * 0.4, ch.y + ch.h * 0.4); await t.keyboard.press('Escape'); await settle(t);
+    const ty = await t.evaluate(() => window.ctDraw().list.map((d) => d.type).join()); check('Alt+V and Alt+J place a vertical line and a horizontal ray', /r,v,hr$/.test(ty), ty);
+    check('no drawing changed the account (positions, orders, closed trades)', (await t.evaluate(() => JSON.stringify(window.ctAcct().acct))) === acct0);
+    // an old-format drawing (as saved before 17 Nov 2026 and by the Mosha hand-over: no stamp, no style) is put into the saved session
+    // (written by an init script of the next load, after this page's own last save on the way out)
+    const old = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[0]; return { o: { type: 't', t1: r.t1, p1: r.p1, t2: r.t2, p2: r.p2 + 3 }, n: D.list.length + 1 }; });
+    await t.addInitScript((o) => { try { if (sessionStorage.getItem('d38old')) return; sessionStorage.setItem('d38old', '1'); const A = JSON.parse(localStorage.getItem('btLab:sessions')), s = Object.values(A)[0]; s.draw.push(o); localStorage.setItem('btLab:sessions', JSON.stringify(A)); } catch (e) {} }, old.o);
+    await t.reload({ waitUntil: 'load' }); await t.waitForFunction(() => /Resumed/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(t);
+    const rl = await t.evaluate(() => { const D = window.ctDraw(); return { n: D.list.length, last: D.list[D.list.length - 1], box: D.list[0], geo: D.geo.map((g) => !!g) }; });
+    check('a reload keeps every drawing with its style, and the old-format one loads unchanged and is drawn', rl.n === old.n && JSON.stringify(rl.last) === JSON.stringify(old.o) && rl.box.col === 'dn' && rl.box.w === 2 && rl.geo.every(Boolean), JSON.stringify(rl).slice(0, 220));
+    // magnet snapping, pictured: a tool on, the pointer near a candle, the ring on the price it snaps to
+    await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyR'); await t.mouse.move(ch.x + ch.w * 0.6, ch.y + ch.h * 0.42, { steps: 3 }); await t.mouse.move(ch.x + ch.w * 0.61, ch.y + ch.h * 0.43, { steps: 2 }); await settle(t);
+    await t.screenshot({ path: OUT + 'draw-magnet.png', clip: { x: Math.max(0, ch.x + ch.w * 0.35), y: Math.max(0, ch.y), width: Math.min(560, ch.w * 0.5), height: Math.min(420, ch.h) } });
+    await t.keyboard.press('Escape');
+    await cx.close(); }
+  // 39. live coach (17 Nov 2026): the toggle in the Trade card (off by default, remembered on the device), the docked panel on the
+  // chart (clear of the quick bar), free notes on an entry and an exit with the AI coach off on the server, "What do you see?"
+  // saying the AI is off, then the AI on (a stubbed streamed answer, and one withdrawn); a phone's one-line strip above the chart.
+  { const LIVE = process.env.LIVE_SHOTS || OUT; try { fs.mkdirSync(LIVE, { recursive: true }); } catch (e) { /* exists */ }
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('live: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    const tg0 = await t.evaluate(() => { const i = document.getElementById('lc-on'), c = document.getElementById('tradecard'); return { inCard: !!i && c.contains(i), on: i && i.checked, panel: document.getElementById('lc').hidden }; });
+    check('live coach: the toggle sits in the Trade card, off by default, no panel', tg0.inCard && !tg0.on && tg0.panel, JSON.stringify(tg0));
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 20; i++) await t.keyboard.press('ArrowRight');
+    await t.click('#lc-on'); await settle(t);
+    const on = await t.evaluate(() => ({ panel: !document.getElementById('lc').hidden && !!document.getElementById('lc').getClientRects().length, key: localStorage.getItem('btLab:liveCoach') }));
+    check('live coach: on shows the docked panel and remembers it on this device', on.panel && on.key === '1', JSON.stringify(on));
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('s'); await t.waitForTimeout(800);
+    let L = await t.evaluate(() => window.ctLive());
+    check('live coach: an entry gets a free note at once, with the coach\'s sentence (the AI is off on the server)', L.notes[0] && L.notes[0].tag === 'Sold' && /Selling in (Asia|London|New York)/.test(L.notes[0].text) && !L.notes.some((x) => /^ai/.test(x.k)), JSON.stringify(L.notes[0] || {}));
+    const ov = await t.evaluate(() => { const a = document.getElementById('lc').getBoundingClientRect(), q = document.getElementById('qtr').getBoundingClientRect(), c = document.getElementById('chart').getBoundingClientRect(); const hit = !(a.right <= q.left || a.left >= q.right || a.bottom <= q.top || a.top >= q.bottom); return { hit, inChart: a.left >= c.left - 1 && a.right <= c.right + 1 && a.top >= c.top - 1 && a.bottom <= c.bottom + 1 }; });
+    check('live coach: the panel sits on the chart and stays out of the quick bar', !ov.hit && ov.inChart, JSON.stringify(ov));
+    for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.waitForTimeout(800);
+    L = await t.evaluate(() => window.ctLive()); const A = await t.evaluate(() => window.ctAcct().acct.closed.slice(-1)[0]);
+    check('live coach: an exit gets a free note with its R, the same R as the journal', L.notes[0] && L.notes[0].tag === 'Closed' && A && L.notes[0].text.includes(Math.abs(A.R).toFixed(2) + 'R'), L.notes[0] && L.notes[0].text);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(300);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(500);
+    const mk = await t.evaluate(() => window.ctLive().notes.filter((x) => /^mk/.test(x.k)));
+    check('live coach: market events while the replay moves are free notes with their candle time (no AI call)', mk.length >= 1 && mk.every((x) => x.t > 0 && x.text), mk.slice(0, 2).map((x) => x.tag + ': ' + x.text).join(' | '));
+    const st = await txt(t, '#lc .lc-st'); check('live coach: "What do you see?" with the AI off says so in words, no AI note', /The AI coach is off/.test(st) && !(await t.evaluate(() => window.ctLive().notes.some((x) => /^ai/.test(x.k)))), st);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('Shift+B'); await t.waitForFunction(() => window.ctLive().notes.some((x) => x.tag === 'Draft'), null, { timeout: 4000 }).catch(() => {});
+    L = await t.evaluate(() => window.ctLive()); check('live coach: a draft that stands still is noted with its sentence', L.notes.some((x) => x.tag === 'Draft' && /^Buying in /.test(x.text)), JSON.stringify(L.notes[0] || {}));
+    await t.keyboard.press('Escape');
+    const lcBox = await t.$eval('#lc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }), chb = await t.$eval('.chartc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    await (await t.$('.chartc')).screenshot({ path: LIVE + 'live-desktop.png' });
+    const LC_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#lc .lc-fold b, #lc .lc-n, #lc .lc-ask, #lc .lc-m b, #lc .lc-m time, #lc .lc-i p, #lc .lc-p, #lc .lc-by, #lc .lc-st, .lc-tg span, .lc-tg small')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await settle(t); bad.push(...(await measured(t, LC_AA, 'live coach text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#lc *, .lc-tg *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('live coach: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    await t.reload({ waitUntil: 'load' }); await t.waitForTimeout(500); check('live coach: remembered after a reload', await t.evaluate(() => document.getElementById('lc-on').checked && !document.getElementById('lc').hidden));
+    await t.click('#lc .lc-x'); check('live coach: × turns it off and forgets it', await t.evaluate(() => document.getElementById('lc').hidden && !localStorage.getItem('btLab:liveCoach')));
+    await cx.close();
+    // the AI on (stubbed): a streamed comment at an entry; a second one within 20 s is not asked; a withdrawn answer
+    const cx2 = await b.newContext({ viewport: { width: 1500, height: 950 } }), t2 = await cx2.newPage(); t2.on('pageerror', (e) => errs.push('live ai: ' + e.message));
+    await route(t2); await me(t2, OWNER); await t2.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} });
+    let posts = 0, mode = 'ok', lastBody = null, evBody = null;
+    await t2.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":8,"liveLeftToday":150}' }); posts++; const body = JSON.parse(r.request().postData() || '{}'); lastBody = body; if (body.trigger === 'event') evBody = body;
+      const late = (body.bars || []).some((x) => x[0] + body.tf > body.moment); if (late) errs.push('live: a candle after the replay moment was sent');
+      const done = mode === 'ok' ? { t: 'done', state: 'ok', text: 'You sold with a 1.0 ATR stop in London. With fewer than 20 trades the sample is too small to judge.' } : { t: 'done', state: 'refused', withdrawn: true, message: "Withdrawn: the answer broke the coach's rules." };
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"You sold with "}\n\ndata: {"t":"text","d":"a 1.0 ATR stop."}\n\ndata: ${JSON.stringify(done)}\n\n` }); });
+    { const t = t2; await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400); await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.click('#lc-on'); await t.click('#lc-talk'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 15; i++) await t.keyboard.press('ArrowRight'); await t.keyboard.press('s'); await t.waitForTimeout(1200);
+    L = await t.evaluate(() => window.ctLive()); const ai = L.notes.find((x) => /^ai/.test(x.k));
+    check('live coach, AI on: the entry gets a free note and a streamed AI comment', posts === 1 && ai && /too small to judge/.test(ai.text) && L.notes.some((x) => x.tag === 'Sold'), JSON.stringify(ai || {}) + ' posts ' + posts);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(300); check('live coach, AI on: a second ask within 8 s is not sent, the panel says when; calls left shown', posts === 1 && /every 8 s/.test(await txt(t, '#lc .lc-st')) && /AI comments left today/.test(await txt(t, '#lc .lc-ms')), await txt(t, '#lc .lc-st') + ' | ' + await txt(t, '#lc .lc-ms'));
+    await (await t.$('.chartc')).screenshot({ path: LIVE + 'live-desktop-ai.png' }).catch(() => {});
+    mode = 'bad'; await t.waitForTimeout(9000);   // the 8 s rule is real time on the page
+    await t.click('#lc .lc-ask'); await t.waitForFunction(() => /Withdrawn/.test((window.ctLive().notes[0] || {}).text || ''), null, { timeout: 5000 }).catch(() => {});
+    L = await t.evaluate(() => window.ctLive()); check('live coach, AI on: an answer that fails the checks is withdrawn in words', posts === 2 && /^Withdrawn: the answer broke the coach's rules\.$/.test(L.notes[0].text), (L.notes[0] && L.notes[0].text) + ' posts ' + posts + ' st ' + (await txt(t, '#lc .lc-st')));
+    // commentary mode: the most important market event reaches the AI by itself while the replay moves; never a stale one
+    mode = 'ok'; await t.evaluate(() => document.getElementById('lc-talk').click()); await t.waitForTimeout(8500); const p0 = posts; await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    for (let i = 0; i < 90 && !evBody; i++) { await t.keyboard.press('ArrowRight'); await t.waitForTimeout(350); }
+    await t.waitForTimeout(600); const eb = evBody || {};
+    check('live coach, commentary: a market event is sent to the AI by itself, at most 10 candles before the moment, and its free note is on the panel', posts > p0 && eb.trigger === 'event' && eb.event && eb.event.at <= eb.moment && eb.moment - eb.event.at <= 10 * eb.tf && (await t.evaluate(() => window.ctLive().notes.some((x) => /^mk/.test(x.k)))), JSON.stringify(eb.event || {}) + ' posts ' + (posts - p0));
+    await t.evaluate(() => document.getElementById('play').click()); await t.waitForTimeout(700); const lv = await t.evaluate(() => ({ live: document.getElementById('lc').classList.contains('live'), w: document.querySelector('#lc .lc-w').textContent })); await t.evaluate(() => document.getElementById('play').click());
+    check('live coach: a still dot and "Watching the replay" while it plays', lv.live && /Watching the replay/.test(lv.w), JSON.stringify(lv)); }
+    await cx2.close();
+    // the phone: a slim strip above the chart and its quick bar, one line, taps open it
+    const cp = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }); const m = await cp.newPage(); m.on('pageerror', (e) => errs.push('live phone: ' + e.message));
+    await route(m); await me(m, OWNER); await m.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:liveCoach', '1'); } catch (e) {} }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(400);
+    await m.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await m.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(m);
+    for (let i = 0; i < 3; i++) await m.tap('#step'); await m.tap('#qt-buy'); await m.waitForTimeout(900);
+    const ph = await m.evaluate(() => { const a = document.getElementById('lc').getBoundingClientRect(), q = document.getElementById('qtr').getBoundingClientRect(), c = document.getElementById('chart').getBoundingClientRect(), f = document.querySelector('#lc .lc-fold').getBoundingClientRect(), p = document.querySelector('#lc .lc-i p');
+      return { simple: document.documentElement.dataset.phone, above: a.bottom <= c.top + 1 && a.bottom <= q.top + 1, h: Math.round(a.height), fold: Math.round(f.height), line: p ? p.textContent : '', oneLine: p ? p.scrollHeight <= parseFloat(getComputedStyle(p).lineHeight) * 1.6 + 2 : false, over: document.documentElement.scrollWidth - innerWidth }; });
+    check('live coach on a phone: a slim strip above the chart and its quick bar, the latest note on one line, 44 px, no sideways page', ph.simple === 'simple' && ph.above && ph.h <= 110 && ph.fold >= 44 && ph.line.length > 0 && (await m.evaluate(() => window.ctLive().notes.some((x) => x.tag === 'Bought'))) && ph.oneLine && ph.over <= 0, JSON.stringify(ph));
+    await m.screenshot({ path: LIVE + 'live-phone-strip.png' });
+    await m.tap('#lc .lc-fold'); await m.waitForTimeout(250); const exp = await m.evaluate(() => ({ open: document.getElementById('lc').classList.contains('open'), items: [...document.querySelectorAll('#lc .lc-i')].filter((e) => e.getClientRects().length).length, ask: document.querySelector('#lc .lc-ask').getBoundingClientRect().height }));
+    check('live coach on a phone: a tap opens the list, "What do you see?" is 44 px', exp.open && exp.items >= 1 && exp.ask >= 44, JSON.stringify(exp));
+    await m.screenshot({ path: LIVE + 'live-phone-open.png' });
+    await cp.close(); }
+  // 40. coach for results (17 Nov 2026): the leak report at the top of Statistics, the scope switch (this session | all my
+  // sessions) on seeded saved sessions, a pattern of the owner's own record as an amber warning on a draft, the session plan's
+  // banner and its styled confirm before an order (the owner can always go on; the stop is untouched), the debrief's free part
+  // with the AI off, then the AI on (a stubbed streamed debrief whose focus rule pre-fills the next session's plan).
+  { const C2 = process.env.COACH2_SHOTS || OUT; try { fs.mkdirSync(C2, { recursive: true }); } catch (e) { /* exists */ }
+    // two saved sessions of 30 trades each: a 1 ATR stop (0.75-1.5 ATR) lost, a 2 ATR stop won, some stops moved away, some exits by hand
+    const seed = () => { const mk = (sid, sym, t0) => { const closed = []; for (let i = 0; i < 30; i++) { const one = i % 2 === 0, at = t0 + i * 7200, R = one ? -1 + (i % 4 === 0 ? 0.05 : -0.05) : 1.4 + (i % 3) * 0.05, man = i % 5 === 1, away = i % 6 === 0;
+        closed.push({ id: i + 1, side: 'buy', type: 'market', entry: 100, stop: 99, target: 102, units: 10, units0: 10, r0: 1, openedAt: at, closedAt: at + 3600, exit: 100 + R, reason: man ? 'manual' : R < 0 ? 'stop' : 'target', gross: R * 10, net: R * 10, R, Rmove: R, mfe: R > 0 ? R + 0.3 : 0.4, mae: 0.5, ...(away ? { stopAway: 0.4 } : {}), riskSet: 1, riskPct: 1,
+          ctx: { v: 1, tf: 900, at: at + 900, side: 'buy', session: i % 3 ? 'London' : 'New York', bars: 400, atr: 1, stopAtr: one ? 1 : 2, rr: 2, trend: { main: 'up', htf: 'up', htfName: 'H1' }, htfRel: 'with', revenge: false, riskSet: 1, riskPct: 1 } }); }
+        return { id: sid, name: sym.toUpperCase() + ' 15m from 2026-01-05', sym, tf: '15m', dec: 2, from: t0 - 3600, to: t0 + 4 * 86400, startAt: t0, idx: 10, acct: { start: 100000, balance: 100000, commission: 0, spread: 0, slFirst: true, nextId: 31, positions: [], orders: [], closed }, ch: null, draw: [], savedAt: Date.now() - 86400e3 }; };
+      return { s_a: mk('s_a', 'eurusd', 1767600000), s_b: mk('s_b', 'gbpusd', 1768200000) }; };
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('coach2: ' + e.message));
+    await route(t); await me(t, OWNER); const S0 = seed();
+    await t.addInitScript((s) => { if (sessionStorage.getItem('c2')) return; sessionStorage.setItem('c2', '1'); localStorage.clear(); localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:sessions', JSON.stringify(s)); }, S0);
+    await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.waitForFunction(() => /Resumed|Could not/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(t);   // the page resumes the latest saved session first
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {}); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 12; i++) await t.keyboard.press('ArrowRight');
+    // one closed trade in this session: a sell, closed by hand three candles later, then the replay moves on (candles after the exit)
+    await t.keyboard.press('s'); for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => document.querySelector('#open [data-act=close]').click()); for (let i = 0; i < 25; i++) await t.keyboard.press('ArrowRight');
+    await t.click('.tabs [data-t=stats]'); await settle(t);
+    const lk1 = await t.evaluate(() => ({ top: !!document.getElementById('lk') && document.getElementById('lk').compareDocumentPosition(document.querySelector('#tab-stats .viz')) === Node.DOCUMENT_POSITION_FOLLOWING, vis: !!document.getElementById('lk').getClientRects().length, head: document.getElementById('lk-head').textContent, rows: [...document.querySelectorAll('#lk-t tr[data-k]')].map((r) => r.dataset.k), sc: [...document.querySelectorAll('.cr-sc')].length, pressed: document.querySelector('#lk .cr-sc [aria-pressed="true"]').dataset.sc, w: document.querySelector('#lk-t tr[data-k="manual"] td.w') && document.querySelector('#lk-t tr[data-k="manual"] td.w').textContent }));
+    check('coach for results: the leak card sits at the top of Statistics, this session, the exit by hand measured from candles after the exit', lk1.top && lk1.vis && lk1.sc === 2 && lk1.pressed === 'session' && lk1.rows.includes('manual') && /holding to the opening target or stop|not measured yet/.test(lk1.w || ''), JSON.stringify(lk1));
+    await t.click('#lk .cr-sc [data-sc="all"]'); await settle(t);
+    const lk2 = await t.evaluate(() => ({ head: document.getElementById('lk-head').textContent, rows: [...document.querySelectorAll('#lk-t tr[data-k]')].map((r) => [r.dataset.k, +r.children[1].textContent]), co: document.querySelector('#vc-coach .cr-sc [aria-pressed="true"]').dataset.sc, coT: document.getElementById('co-t').textContent, key: localStorage.getItem('btLab:coachScope'), pats: window.ctCoach().pats, patTxt: document.getElementById('lk-pat').textContent }));
+    check('coach for results: "All my sessions" reads 61 trades of three sessions (the two saved, this one), in the leak card and "How you trade", remembered', /61 trades from 3 sessions/.test(lk2.head) && lk2.co === 'all' && lk2.key === 'all' && lk2.rows.some((r) => r[0] === 'away' && r[1] === 10) && lk2.rows.some((r) => r[0] === 'manual' && r[1] >= 12), JSON.stringify(lk2).slice(0, 300));
+    check('coach for results: a pattern needs 20+ trades on both sides and |t| >= 2 (the seeded 1 ATR stops: a costly pattern, said with n and t)', lk2.pats.some((x) => x.k === 'stop' && x.bad && Math.abs(x.t) >= 2) && /Costs you/.test(lk2.patTxt) && /n \d+.*t −?\d/.test(lk2.patTxt), JSON.stringify(lk2.pats));
+    await (await t.$('#lk')).screenshot({ path: C2 + 'coach2-leak.png' });
+    // a draft with the default 1 ATR stop matches it: an amber warning on the draft readout; a warning only (the draft still places)
+    await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    await t.keyboard.press('Shift+B'); await t.waitForTimeout(500);
+    const dw = await t.evaluate(() => { const w = document.querySelector('#dchip .dwarn'); return { w: w ? w.textContent : '', go: !!document.querySelector('#dchip [data-dgo]') }; });
+    check('coach for results: the draft that matches a costly pattern of your record shows an amber warning with the numbers, and Confirm is still there', /Your pattern/.test(dw.w) && /n \d+/.test(dw.w) && /t −/.test(dw.w) && dw.go, JSON.stringify(dw));
+    await (await t.$('.chartc')).screenshot({ path: C2 + 'coach2-pattern-draft.png' });
+    await t.keyboard.press('Escape');
+    // the plan: one trade a day, ask before trading past it. This session already took one today: the banner, then a confirm
+    await t.evaluate(() => { const d = document.getElementById('pl'); d.open = true; document.getElementById('pl-mt').value = '1'; document.getElementById('pl-ask').checked = true; document.getElementById('pl-fo').value = 'Only with the H1 trend'; d.dispatchEvent(new Event('change', { bubbles: true })); }); await t.waitForTimeout(900);
+    const ban = await t.evaluate(() => ({ ban: !document.getElementById('pl-ban').hidden && document.getElementById('pl-ban').textContent, score: document.getElementById('co-score').textContent, key: JSON.parse(localStorage.getItem('btLab:plan') || '{}'), foc: document.getElementById('pl-foc').textContent }));
+    check('coach for results: past the plan, a clear banner in the Trade card; the score line says the plan is broken; the plan is kept on the device', /Past your plan/.test(ban.ban || '') && /1 of 1 trades/.test(ban.ban) && /plan broken/.test(ban.score) && ban.key.maxTrades === 1 && ban.key.ask === true && /Only with the H1 trend/.test(ban.foc), JSON.stringify(ban));
+    await (await t.$('#tradecard')).screenshot({ path: C2 + 'coach2-plan-banner.png' }).catch(() => {});
+    const n0 = await t.evaluate(() => window.ctAcct().acct.positions.length + window.ctAcct().acct.closed.length);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('b'); await t.waitForSelector('dialog.msd[open]', { timeout: 3000 }).catch(() => {});
+    const cf = await t.evaluate(() => { const d = document.querySelector('dialog.msd[open]'); return d ? d.textContent : ''; });
+    await t.screenshot({ path: C2 + 'coach2-plan-confirm.png' });
+    await t.click('dialog.msd[open] [data-x]'); await t.waitForTimeout(300); const n1 = await t.evaluate(() => window.ctAcct().acct.positions.length + window.ctAcct().acct.closed.length);
+    check('coach for results: with "Ask me" ticked, an order past the plan asks first (a styled confirm naming the limit and the focus); Cancel places nothing', /Past your session plan/.test(cf) && /1 of 1 trades/.test(cf) && /Only with the H1 trend/.test(cf) && n1 === n0, cf.slice(0, 160) + ` ${n0}->${n1}`);
+    await t.keyboard.press('b'); await t.waitForSelector('dialog.msd[open]', { timeout: 3000 }).catch(() => {}); await t.click('dialog.msd[open] button.pri'); await t.waitForTimeout(400);
+    const pos = await t.evaluate(() => window.ctAcct().acct.positions.slice(-1)[0]);
+    check('coach for results: "Trade anyway" goes on: the buy opens with its stop on the losing side (the coach never touches it)', pos && pos.side === 'buy' && pos.stop < pos.entry && pos.r0 > 0 && Math.abs(pos.entry - pos.stop - pos.r0) < 1e-6, JSON.stringify(pos && { e: pos.entry, s: pos.stop, r0: pos.r0 }));
+    await t.evaluate(() => document.querySelector('#open [data-act=close]').click()); await t.waitForTimeout(200);
+    // the debrief, AI off: the free part (plan, leaks, best / worst, the focus from the top leak); no AI call
+    await t.evaluate(() => document.getElementById('lk-deb').click()); await t.waitForTimeout(300);
+    const db = await t.evaluate(() => ({ open: document.getElementById('debd').open, txt: document.getElementById('deb-free').textContent, ai: document.getElementById('ai-deb').textContent }));
+    check('coach for results: the debrief\'s free part (plan adherence, leaks in R, best and worst trade, a focus rule) with the AI off said in words', db.open && /Your plan/.test(db.txt) && /trades? taken past a limit/.test(db.txt) && /Leaks/.test(db.txt) && /given up/.test(db.txt) && /Best and worst trade/.test(db.txt) && /Focus for the next session/.test(db.txt) && /AI coach is off/.test(db.ai), db.txt.slice(0, 200) + ' | ' + db.ai);
+    await (await t.$('#debd')).screenshot({ path: C2 + 'coach2-debrief.png' });
+    const C2_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#lk h2, #lk small, #lk-head, #lk-t td, #lk-t th, #lk-x, #lk-pat li, #lk-pat h3, #debd p, #debd li, #debd h4, #pl-ban, #co-score span, #pl summary')");
+    await t.keyboard.press('Escape');
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; document.getElementById('debd').showModal(); }, th); await settle(t); bad.push(...(await measured(t, C2_AA, 'coach for results text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#lk *, #debd *, #pl *, #pl-ban, #co-score *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); await t.evaluate(() => document.getElementById('debd').close()); }
+    check('coach for results: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    // the keys: A opens the last closed trade's review (the coach's suggestions); Shift+A turns the live coach on and asks it
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('a'); await t.waitForTimeout(200);
+    const ka = await t.evaluate(() => document.getElementById('mistd').open); await t.keyboard.press('Escape'); await t.waitForTimeout(150);
+    await t.keyboard.press('Shift+A'); await t.waitForTimeout(300); const kb = await t.evaluate(() => ({ on: window.ctLive().on, st: document.querySelector('#lc .lc-st').textContent }));
+    check('coach for results: A opens the last closed trade\'s review; Shift+A turns the live coach on and asks "What do you see?"', ka && kb.on && /AI coach is off/.test(kb.st), JSON.stringify({ ka, kb }));
+    await cx.close();
+    // the AI on (stubbed): a streamed debrief; its focus rule waits for the next session and pre-fills its plan
+    const cx2 = await b.newContext({ viewport: { width: 1500, height: 950 } }), u = await cx2.newPage(); u.on('pageerror', (e) => errs.push('coach2 ai: ' + e.message));
+    await route(u); await me(u, OWNER); await u.addInitScript((s) => { if (sessionStorage.getItem('c2')) return; sessionStorage.setItem('c2', '1'); localStorage.clear(); localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:sessions', JSON.stringify(s)); localStorage.setItem('btLab:coachScope', 'all'); }, S0);
+    let dbody = null;
+    await u.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":8,"liveLeftToday":150}' }); const body = JSON.parse(r.request().postData() || '{}'); if (body.kind === 'debrief') dbody = body;
+      const ans = { summary: 'Your stops of about 1 ATR cost the most.', leaks: [{ text: 'Stops of 0.75 to 1.5 ATR: 30 trades lost about 30R.' }], focus: 'Use a stop of about 2 ATR at your drawn level.', drill: 'Replay 20 London opens and place only the stop.' };
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"{\\"summary\\":\\"Your stops"}\n\ndata: ${JSON.stringify({ t: 'done', state: 'ok', answer: ans })}\n\n` }); });
+    await u.goto(H + '/backtest.html', { waitUntil: 'load' }); await u.waitForTimeout(500); await u.waitForFunction(() => /Resumed|Could not/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(u); await u.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await u.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {}); await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(u);
+    await u.evaluate(() => document.getElementById('lk-deb').click()); await u.waitForTimeout(300); await u.click('#ai-deb .ai-go'); await u.waitForFunction(() => /Drill/.test(document.getElementById('ai-deb').textContent), null, { timeout: 5000 }).catch(() => {});
+    const da = await u.evaluate(() => ({ txt: document.getElementById('ai-deb').textContent, next: JSON.parse(localStorage.getItem('btLab:plan') || '{}').nextFocus }));
+    check('coach for results, AI on: a streamed debrief (leaks, one focus rule, a drill) over all sessions; its focus waits for the next session', /language model's reading, not a tested edge/.test(da.txt) && /Focus rule/.test(da.txt) && /Drill/.test(da.txt) && dbody && dbody.kind === 'debrief' && dbody.scope === 'all' && dbody.debrief.n === 60 && da.next === 'Use a stop of about 2 ATR at your drawn level.', JSON.stringify({ da, n: dbody && dbody.debrief.n, sc: dbody && dbody.scope }));
+    await (await u.$('#debd')).screenshot({ path: C2 + 'coach2-debrief-ai.png' });
+    await u.keyboard.press('Escape'); await u.evaluate(() => document.getElementById('newsess').click()); await u.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await u.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {});
+    await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent), null, { timeout: 120000 }).catch(() => {}); await u.waitForFunction(() => window.ctCoach().plan.focus, null, { timeout: 90000 }).catch(() => {});
+    const nf = await u.evaluate(() => ({ plan: window.ctCoach().plan, foc: document.getElementById('pl-foc').textContent }));
+    check('coach for results: the next session\'s plan starts with the debrief\'s focus rule', nf.plan.focus === 'Use a stop of about 2 ATR at your drawn level.' && !nf.plan.nextFocus && /2 ATR/.test(nf.foc), JSON.stringify(nf));
+    await cx2.close(); }
+  // 41. coach reads the chart as an edge (17 Nov 2026): the picker in the Trade card and in the live panel (kept in step, remembered
+  // on the device), each edge's reading on live candles cut at the replay moment (nothing after it: `same`), its marks on the chart
+  // and the Layers switch, the record line and "not advice", the draft's sentence and a new position's ctx.lens, the lens notes in
+  // the live panel, the lens handed to the AI (stubbed), a market the edge does not read, AA in three themes, 12 px, 44 px on touch.
+  { const LS = process.env.LENS_SHOTS || OUT; try { fs.mkdirSync(LS, { recursive: true }); } catch (e) { /* exists */ }
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 }, deviceScaleFactor: 2 }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('lens: ' + e.message));
+    await route(t); await me(t, OWNER); const bodies = [];
+    await t.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":1,"liveLeftToday":150}' });
+      try { bodies.push(JSON.parse(r.request().postData() || '{}')); } catch (e) { /* not JSON */ }
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"Read as the edge."}\n\ndata: ${JSON.stringify({ t: 'done', state: 'ok', text: 'Read as the edge.' })}\n\n` }); });
+    await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    const pk = await t.evaluate(() => { const s = document.getElementById('ln-edge'), c = document.getElementById('tradecard'); return { inCard: !!s && c.contains(s), opts: s ? [...s.options].map((o) => o.value) : [], live: !!document.getElementById('lc-lens'), val: s && s.value }; });
+    check('lens: "Read the chart as" sits in the Trade card with None and six edges, and in the live panel', pk.inCard && pk.live && pk.val === 'none' && pk.opts.join() === 'none,gtrend,geg,mcycle,ict,msnr,lit', JSON.stringify(pk));
+    await load(t, 'xau,15m'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 30; i++) await t.keyboard.press('ArrowRight');
+    const readings = {};
+    for (const id of ['gtrend', 'geg', 'mcycle', 'ict', 'msnr', 'lit']) { await t.selectOption('#ln-edge', id); await t.waitForFunction(() => { const l = window.ctLens(); return !l.loading && (l.ok || l.err); }, null, { timeout: 120000 }).catch(() => {}); await t.waitForTimeout(500); readings[id] = await t.evaluate(() => window.ctLens()); }
+    const bad0 = Object.entries(readings).filter(([, l]) => !l.ok || !l.state || !l.same).map(([k, l]) => `${k}: ${l.err || l.state} same=${l.same}`);
+    check('lens: every edge reads gold at the replay moment from its own candles, and the reading is the one made from candles cut at the moment', !bad0.length, bad0.join(' | ') || Object.entries(readings).map(([k, l]) => `${k}: ${l.state}`).join(' | '));
+    check('lens: each edge fetched the timeframes its rules read', readings.gtrend.tfs['1d'] > 100 && readings.mcycle.tfs['4h'] > 300 && readings.mcycle.tfs['5m'] > 700 && readings.ict.tfs['1h'] > 1000 && readings.lit.tfs['5m'] > 1500, JSON.stringify(Object.fromEntries(Object.entries(readings).map(([k, l]) => [k, l.tfs]))));
+    await t.selectOption('#ln-edge', 'mcycle'); await t.waitForFunction(() => window.ctLens().ok, null, { timeout: 60000 }).catch(() => {}); await settle(t);
+    const sync = await t.evaluate(() => ({ live: document.getElementById('lc-lens').value, key: localStorage.getItem('btLab:lens'), rec: document.getElementById('ln-rec').textContent, st: document.getElementById('ln-st').textContent }));
+    check('lens: both pickers agree, the choice is remembered, the record line and "not advice" are shown', sync.live === 'mcycle' && sync.key === 'mcycle' && /Studied \(mcycle-oos\): −0\.175R a trade, n 244/.test(sync.rec) && /not advice/.test(sync.rec) && sync.st.length > 3, JSON.stringify(sync));
+    let L = await t.evaluate(() => window.ctLens()); check('lens: its marks are drawn on the chart', L.marks > 0 && L.drawn > 0, JSON.stringify({ marks: L.marks, drawn: L.drawn }));
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-chart.png' });
+    await t.click('#laydd summary'); await t.click('#laydd [data-l="lens"]'); await settle(t); const off = await t.evaluate(() => window.ctLens().drawn);
+    await t.click('#laydd [data-l="lens"]'); await t.click('#laydd summary'); await settle(t); const on2 = await t.evaluate(() => window.ctLens().drawn);
+    check('lens: Layers "Edge lens" hides and shows the marks', off === 0 && on2 > 0, `${off} / ${on2}`);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('Shift+B'); await t.waitForTimeout(500);
+    const dsay = await t.evaluate(() => window.ctChart().coach || ''); check('lens: the draft\'s sentence says how it stands by the edge\'s rules', /by Mosha cycle rules: (with|on|against|the rule has no signal)/.test(dsay), dsay);
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-draft.png' }); await t.keyboard.press('Escape');
+    await t.click('#lc-on'); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('b'); await t.waitForTimeout(800);
+    const P = await t.evaluate(() => { const p = window.ctAcct().acct.positions.slice(-1)[0]; return p && p.ctx ? p.ctx.lens : null; });
+    check('lens: a new position records ctx.lens (edge, state, with / against / none)', P && P.edge === 'mcycle' && ['with', 'against', 'none'].includes(P.agree) && P.state, JSON.stringify(P));
+    const k0 = (await t.evaluate(() => window.ctLens())).notes; for (let i = 0; i < 160; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(900);
+    const k1 = (await t.evaluate(() => window.ctLens())).notes, ln = await t.evaluate(() => window.ctLive().notes.filter((x) => x.k === 'lens'));
+    const fresh = k1.filter((k) => !k0.includes(k));
+    check('lens: a new fact of the edge (a stage, an order, a zone) becomes a note in the live panel', fresh.length ? ln.length > 0 : true, `${fresh.length} new fact(s), ${ln.length} note(s): ${ln.slice(0, 2).map((x) => x.text).join(' | ')}`);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(1200); const lb = bodies.find((x) => x.kind === 'live');
+    check('lens: the AI coach is handed the lens (edge, what the rule sees now)', lb && lb.lens && lb.lens.edge === 'mcycle' && typeof lb.lens.state === 'string' && !('rules' in lb.lens), JSON.stringify(lb && lb.lens));
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-live.png' }); await (await t.$('#ln')).screenshot({ path: LS + 'lens-card.png' });
+    const LN_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#ln label, #ln .ln-st, #ln .ln-tx, #ln .ln-sig, #ln .ln-rec, #ln .ln-rec i, .lc-lens span')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await settle(t); bad.push(...(await measured(t, LN_AA, 'lens text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#ln *, .lc-lens *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('lens: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    await t.reload({ waitUntil: 'load' }); await t.waitForTimeout(800); check('lens: remembered after a reload', await t.evaluate(() => document.getElementById('ln-edge').value === 'mcycle'));
+    await cx.close();
+    // a market the edge does not read says so; 44 px on touch
+    const cx2 = await b.newContext({ viewport: { width: 1024, height: 1366 }, hasTouch: true, isMobile: true }); const u = await cx2.newPage(); u.on('pageerror', (e) => errs.push('lens touch: ' + e.message));
+    await route(u); await me(u, OWNER); await u.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:lens', 'gtrend'); } catch (e) {} }); await u.goto(H + '/backtest.html', { waitUntil: 'load' }); await u.waitForTimeout(500);
+    const qs = await u.evaluate(() => [...document.querySelectorAll('#quick [data-q]')].map((e) => e.dataset.q)), other = qs.find((q) => !/^xau/.test(q));
+    if (other) { await u.evaluate((q) => document.querySelector(`#quick [data-q="${q}"]`).click(), other); await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await u.waitForTimeout(1500); }
+    const nm = await u.evaluate(() => ({ st: document.getElementById('ln-st').textContent, h: document.getElementById('ln-edge').getBoundingClientRect().height }));
+    check('lens: a market the edge does not read says so in words; the picker is 44 px on touch', (!other || /reads XAU only/.test(nm.st)) && nm.h >= 44, JSON.stringify({ other, ...nm }));
+    await cx2.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

@@ -14,7 +14,7 @@ project has no key.** The request and response shapes were checked against the p
 
 | | A provider key (sections 3 to 8) | Your own assistant, through the connector (section 9) |
 |---|---|---|
-| What you set up | A paid API key and a budget in Vercel | One address pasted into your assistant app |
+| What you set up | A paid API key and a budget in the Worker's secrets | One address pasted into your assistant app |
 | Cost | Billed per answer by the provider | None from this site: it runs on your own assistant subscription |
 | When the answer comes | A few seconds after "Ask the analyst" | When you tell your assistant to answer the queue |
 | Checks on the answer | The same code for both (`parseAnswer`): section 2 | The same |
@@ -89,9 +89,9 @@ with `MXA.compare`. A lesson's own replay counters belong to the engine's replay
 **Paper only.** Nothing here places an order or imports council, mirror or broker code. No key, endpoint or model name
 reaches the browser. No model name is written in the repo: the model id comes from the environment only.
 
-## 3. Environment variables (Vercel → Project → Settings → Environment Variables)
+## 3. Environment variables (the Worker's secrets since 16 Nov 2026; the Vercel project is gone)
 
-Set values in Vercel only. Never commit a value. The three marked **required** switch the analyst on; with any of them
+Set values as the Worker's secrets (`npx wrangler secret put <NAME>` in `cloudflare/`; docs/cloudflare.md) only. Never commit a value. The three marked **required** switch the analyst on; with any of them
 missing it stays off.
 
 | Variable | Meaning |
@@ -122,7 +122,7 @@ missing it stays off.
 | `ACADEMY_LLM_SYSTEM_ROLE` | `chat` format only: `system` (default) or `developer`. |
 | `ACADEMY_LLM_JSON_SCHEMA` | `1` = also send the answer's JSON schema in the format's own structured-output field. Off by default: the answer is checked in code either way, and this path has never met a real provider. |
 
-Vercel reads environment variables at deploy time: redeploy after a change.
+A changed secret takes effect at once (a new Worker version); no redeploy is needed.
 
 ## 4. Budgets, and how to change them
 
@@ -141,7 +141,7 @@ No price is written in the code. Three cases:
 One analyst ask is about 5,000 to 7,000 input tokens. With the default prices (set high on purpose) and the default output
 cap, one ask reserves about $0.25, so the default daily budget allows only a few asks. **Set the two real prices first.** To give it
 more room, raise `ACADEMY_LLM_DAILY_USD`, `ACADEMY_LLM_MONTHLY_USD`, `ACADEMY_LLM_HARD_USD` or `ACADEMY_LLM_MAX_CALLS_DAY`
-and redeploy. To spend less per ask, lower `ACADEMY_LLM_ANALYST_MAX_TOKENS`; if answers then come back "cut off at the
+(a changed secret applies at once). To spend less per ask, lower `ACADEMY_LLM_ANALYST_MAX_TOKENS`; if answers then come back "cut off at the
 output cap", raise it again or lower the model's reasoning effort through `ACADEMY_LLM_BODY`.
 
 The same question is never billed twice. The cache key is the edge, the setup, the snapshot hash, the active lessons with
@@ -171,8 +171,8 @@ Each analyst answer also carries its own `costUsd`, token counts and provider, a
 
 ## 6. Turning it off at once
 
-Set `ACADEMY_LLM_STOP` to `1` in Vercel and redeploy. No call is made from then on; every ask answers "not sent". Removing
-`ACADEMY_LLM_KEY` also switches it off and shows the "Off" line. Without a redeploy: set the daily budget of the provider
+Set the secret `ACADEMY_LLM_STOP` to `1`. No call is made from then on; every ask answers "not sent". Removing
+`ACADEMY_LLM_KEY` also switches it off and shows the "Off" line. Outside the site: set the daily budget of the provider
 account to zero on the provider's side, or revoke the key there.
 
 ## 7. What has and has not been tested
@@ -196,7 +196,7 @@ Tested, offline, in `tests/academy-analyst.test.mjs` and `scripts/audit/academy.
 - the opt-in structured-output field (`ACADEMY_LLM_JSON_SCHEMA`);
 - a provider-side fallback to another model after a declined request (it can be asked for through `ACADEMY_LLM_BODY` and
   `ACADEMY_LLM_HEADERS` where a provider documents one; the ledger would still price the call at the two prices you set);
-- the function bundle on Vercel (the route loads `api/_academy-analyst.js` and `assets/academy-core.js`; if they are
+- the Worker's bundle (the route loads `api/_academy-analyst.js` and `assets/academy-core.js`; if they are
   missing the route answers "not part of this build" and every other route keeps working).
 
 **The fake provider.** `node scripts/academy-dev.mjs --fake-llm` serves labelled test answers from
@@ -207,7 +207,7 @@ The deployed function takes no injected dependency, so no environment variable a
 
 ## 8. First-run checklist for the owner
 
-1. In Vercel set `ACADEMY_LLM_KEY`, `ACADEMY_LLM_URL`, `ACADEMY_LLM_MODEL` (`<model id>`), `ACADEMY_LLM_FORMAT` and the
+1. As Worker secrets set `ACADEMY_LLM_KEY`, `ACADEMY_LLM_URL`, `ACADEMY_LLM_MODEL` (`<model id>`), `ACADEMY_LLM_FORMAT` and the
    two prices `ACADEMY_LLM_USD_PER_MTOK_IN` and `ACADEMY_LLM_USD_PER_MTOK_OUT`. Keep the default budgets for the first day.
 2. Redeploy. Open `/academy`, go to Costs: it should say On, with your provider label and your prices.
 3. In Train, start a replay and stop on one setup. The decision card shows "Analyst (language model)" with "Ask the
@@ -287,3 +287,68 @@ section 3 (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`, …) but keeps its ow
 `cost.json` and `llm-cache.json`) and its own budgets (`EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
 `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12), so it can never spend the Academy's allowance or the other way round.
 `EDGE_ANALYST=off` or `EDGE_LLM_STOP=1` stops it. Owner decision 47 records the paid key.
+
+**17 Nov 2026: output caps raised.** A model that always reasons before it answers counts that reasoning as output tokens,
+and only the text that follows is the answer. At 900 output tokens the edge analyst's answer could be cut off by the
+reasoning (stop `length`, billed, stored as refused). The edge analyst now asks with `EDGE_LLM_MAX_TOKENS` (default 4000)
+and the trade reviewer (`api/trade-review.js`) with `TRADE_REVIEW_LLM_MAX_TOKENS` (default 8000), both through the
+adapter's `cap: 'feature'` (256 to 16000). An answer cut at the cap is never cached and never taken: the caller stores it as
+refused with a line naming the variable to raise (`cutAtCap`). The estimate reserves the WHOLE cap at the output price, so
+at the prices below a 4000-token call reserves about $0.08 and an 8000-token one about $0.16 plus the input; the real cost
+replaces the reservation after the call.
+
+## 11. Connecting the Messages API provider (17 Nov 2026)
+
+The adapter speaks the Messages API wire format (`ACADEMY_LLM_FORMAT=messages`: key in `x-api-key`, an API version
+header, the answer read from the `text` blocks of `content[]`; reasoning blocks come back with an empty text and are
+skipped; a `refusal` stop reason is reported as "the provider declined to answer"). Three features use it: the edge
+analyst, the trade reviewer and ChronosTrade's AI coach (`api/chronos-coach.js`, CLAUDE.md "AI coach (17 Nov 2026)"); the
+Academy analyst too when its key is set. They share the provider settings and keep their own budgets.
+
+**Where to set them.** Cloudflare dashboard → Workers & Pages → `meridianx` → Settings → Variables and Secrets → Add →
+type **Secret** (or `npx wrangler secret put <NAME>` in `cloudflare/`). Use Secret for every one of them, also the values
+that are not secret: `wrangler deploy` (the deploy workflow) replaces the Worker's plain-text variables with what
+`wrangler.jsonc` lists unless `keep_vars` is set, so a plain-text variable added in the dashboard is dropped by the next
+deploy; secrets are kept. Never put a value in `wrangler.jsonc` or in a commit.
+
+| Secret | Value |
+|---|---|
+| `ACADEMY_LLM_KEY` | the provider's API key (only in the dashboard or `wrangler secret put`, never in a chat or a file) |
+| `ACADEMY_LLM_URL` | `https://api.anthropic.com/v1/messages` |
+| `ACADEMY_LLM_MODEL` | the model id from the provider's model list |
+| `ACADEMY_LLM_FORMAT` | `messages` |
+| `ACADEMY_LLM_USD_PER_MTOK_IN` | `4` |
+| `ACADEMY_LLM_USD_PER_MTOK_OUT` | `20` |
+| `ACADEMY_LLM_USD_PER_MTOK_CACHE_READ` | `0.2` |
+| `ACADEMY_LLM_USD_PER_MTOK_CACHE_WRITE` | `5` |
+| `ACADEMY_LLM_BODY` (recommended) | `{"output_config":{"effort":"low"}}` |
+
+`ACADEMY_LLM_BODY` sets the reasoning effort without a code change: less reasoning, fewer output tokens, a faster answer
+(the Worker's call is limited to `ACADEMY_LLM_TIMEOUT_MS`, at most 55 s). With `ACADEMY_LLM_JSON_SCHEMA=1` the adapter adds
+its own `output_config.format` beside the effort (the two are merged); the body can never replace the model, the messages,
+the system text or the output cap. Set the prices before anything else: the defaults (10 / 50) are high on purpose and make
+every reservation larger. Optional per feature: `EDGE_LLM_*`, `TRADE_REVIEW_LLM_*`, `CHRONOS_LLM_*` (budgets, call caps,
+output caps) and the off switches `EDGE_ANALYST=off`, `TRADE_REVIEW=off`, `CHRONOS_COACH=off`. A changed secret takes
+effect at once.
+
+Check after setting them: the Council → Review cards and ChronosTrade's "How you trade" card stop saying "off"; each
+feature's cost appears in its own ledger (`GET /api/edge-analyst`, `/api/trade-review`, `/api/chronos-coach`).
+
+**ChronosTrade's coach: its own model, body and prices, streamed answers (17 Nov 2026).** The coach (one trade, the
+session, and the live coach's comments) streams its answers (`stream()` in the adapter: server-sent events, text only,
+thinking never handed over; the same budget, ledger, refusal and output-cap rules as `complete()`; a stream that breaks off
+after it started keeps its estimate as billed). It may be tuned without touching the edges, all optional, as Secrets:
+
+| Secret | Value |
+|---|---|
+| `CHRONOS_LLM_MODEL` | the provider's model id for the coach only (a faster one); unset = `ACADEMY_LLM_MODEL` |
+| `CHRONOS_LLM_BODY` | JSON body fields for the coach only; unset = `ACADEMY_LLM_BODY`. On the `messages` format the coach adds `{"output_config":{"effort":"low"}}` unless one of the two names an effort |
+| `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT` / `_CACHE_READ` / `_CACHE_WRITE` | the coach's prices when its model differs (the cache prices default from its own input price) |
+| `CHRONOS_LLM_MAX_TOKENS` | output cap of a trade / session question (default 4000) |
+| `CHRONOS_LIVE_MAX_TOKENS` | output cap of a live comment (default 1500) |
+| `CHRONOS_LIVE_PER_DAY` | live comments an account a UTC day (default 150; the USD budgets stay the hard stop; trade / session questions keep `CHRONOS_COACH_PER_DAY`, 20) |
+| `CHRONOS_LIVE_GAP_S` | seconds between two live comments (default 8; the live coach also comments on market events) |
+| `CHRONOS_LLM_MAX_CALLS_DAY` | provider calls a day for the coach (default 100) |
+
+A provider that refuses the request itself (an effort or a model id it does not take) is shown on the page in words with the
+provider's own reason. `GET /api/chronos-coach` returns `lastMs` (time to the first text and in all, of the last call).

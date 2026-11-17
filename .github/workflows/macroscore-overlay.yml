@@ -4,7 +4,7 @@ name: Gold Macro Score overlay (out-of-sample test)
 # ("half risk normally, full risk when the Gold Macro Score is above +0.25") help the council's long-only gold systems on gold
 # they never saw? Fetches the FRED history (DFII10, DGS2, DGS10), which the sandbox cannot reach, reads the council's own daily
 # candle cache (DXY pairs, gold) and the committed per-position records, and writes council-data research/macroscore-overlay.json.
-# Free and failure-tolerant: a failed fetch writes an "incomplete" result and the nightly schedule tries again; once a complete
+# Free and failure-tolerant: a failed fetch writes an "incomplete" result and a later dispatch tries again (no schedule since 17 Nov 2026); once a complete
 # result exists, every later run skips (no re-running a finished test) unless dispatched with force. No candles are refetched.
 # Changes no rule.
 on:
@@ -18,8 +18,6 @@ on:
     paths:
       - '.github/workflows/macroscore-overlay.yml'
       - 'research/edge/macroscore-overlay/run.mjs'
-  schedule:
-    - cron: '53 4 * * *'
 
 permissions:
   contents: write

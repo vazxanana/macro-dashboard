@@ -1,9 +1,27 @@
-# Meridian X on Cloudflare: the move, stage by stage
+# Aureum Desk on Cloudflare: the move, stage by stage
 
 Owner's decision, 16 Nov 2026: move the whole site from Vercel to Cloudflare Workers, on the Workers Paid plan
 ($5 a month, approved the same day: the free plan's 10 ms of processing a request is too little for `/cdata`, the
 ICT lab and the edge analyst). Vercel stays live and unchanged until the last stage; the domain moves only after
 every page and endpoint has been checked side by side.
+
+**Simplified, 17 Nov 2026** (owner: "All"; CLAUDE.md "Simplified"): removed `api/run.js`, `api/_flags.js` (Edge Config),
+`api/og.mjs` (`/api/og` now redirects to `/icons/og-card.png`), `api/tv-webhook.js`, `api/pine.js`, the price alerts
+(`api/push.js`, `api/alert-cron.js`, `api/_alerts.js`, the every-minute cron, `web-push`). The Worker has ONE cron, `*/10`.
+Secrets no longer read by anything: `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `TV_WEBHOOK_KEY`, `RUN_MODE`
+(they can be deleted from the Worker with `npx wrangler secret delete <NAME>`). Older text below is kept as history.
+
+**Sign-up emails, 17 Nov 2026** (CLAUDE.md "Sign-up, email verification and password reset"): `api/signup.js` sends from the
+site's domain through a Cloudflare Email Service binding, else through Gmail SMTP; with neither, sign-ups answer 503.
+- Email Service (first choice): onboard aureumdesk.co.uk under Compute → Email Service → Email Sending (Cloudflare adds the
+  bounce MX, SPF, DKIM and DMARC records), then add this line to `cloudflare/wrangler.jsonc` and deploy:
+  `"send_email": [{ "name": "EMAIL" }],`
+  It is NOT in the file yet: a binding the account cannot use could stop a deploy, so it goes in once the domain is verified.
+  Plain variable (not secret) `MAIL_FROM`, default `desk@aureumdesk.co.uk` (any address on the onboarded domain).
+- Gmail (second choice, also tried once when the binding throws): Worker secrets `GMAIL_USER` (the address) and
+  `GMAIL_APP_PASSWORD` (a Google app password, never the account password). Port 465, implicit TLS (`cloudflare:sockets`).
+- Plain variable `OWNER_EMAIL` (optional): where "a new sign-up is waiting" goes (else `GMAIL_USER`, else nobody).
+Never write an address or a password into a file of this repository.
 
 ## How it works (`cloudflare/`)
 
@@ -18,10 +36,17 @@ every page and endpoint has been checked side by side.
   `x-real-ip` / `x-forwarded-for` from Cloudflare's `cf-connecting-ip` (what a client sends is dropped: the
   sign-in rate limit counts by that address).
 - `cloudflare/src/worker.mjs`: `/api/<name>` → `api/<name>.js`; everything else → `out/` (a path ending in `/`
-  gets `index.html`, `/macro` finds `/macro/index.html`). Crons: `* * * * *` → `/api/alert-cron`, `*/10 * * * *`
-  → `/api/edge-analyst?job=scan`, both with `Authorization: Bearer <CRON_SECRET>` as Vercel's crons sent.
-- Tests: `tests/cloudflare-worker.test.mjs` (offline). Local run: `cd cloudflare && npm install && npx wrangler dev`
-  (put test values in `cloudflare/.dev.vars`, git-ignored).
+  gets `index.html`; `/macro` is a vercel.json rewrite to the Macro desk since 17 Nov 2026). One cron, `*/10 * * * *` → `/api/edge-analyst?job=scan`, then
+  `/api/trade-review?job=review` (`CHAINED`), both with `Authorization: Bearer <CRON_SECRET>`, then the Blob backup and the
+  store mirror (until 17 Nov 2026 also `* * * * *` → `/api/alert-cron`, the price alerts).
+- `cloudflare/src/bundled.mjs`: the project files two handlers read from disk on Node (vercel.json `includeFiles`),
+  bundled into the Worker as text modules (wrangler.jsonc `rules`: strings inside the Worker's script, never static
+  assets): the Academy's generated data and the two bridge EA sources. It hands them over with `academy.useData` and
+  `bridge.useFiles`; on Node and Vercel nothing calls those and the disk is read as before. `src/academy-data.mjs`
+  reads the Academy's files the way `api/academy.js` `fileData()` does, parsing a file on its first request only.
+- Tests: `tests/cloudflare-worker.test.mjs`, `tests/cloudflare-bundle.test.mjs` (offline). Local run: `cd cloudflare &&
+  npm install && npx wrangler dev` (put test values in `cloudflare/.dev.vars`, git-ignored). Size of what a deploy
+  uploads: `npx wrangler deploy --dry-run --outdir <dir>` prints it.
 
 ## Stage 1 (done 16 Nov 2026, in the repository, nothing deployed)
 
@@ -41,12 +66,13 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    Names the functions read: `OANDA_TOKEN` (`OANDA_ENV`: `practice` or unset for a practice-account token, `live` only for a
    live one; `OANDA_ACCOUNT_ID` optional, lets the live price stream skip OANDA's account lookup), `CRON_SECRET`, `SESSION_SECRET`, `CTRADER_LINK_KEY`,
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
-   `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
-   `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `NTFY_TOPIC`, `TV_WEBHOOK_KEY`, `MCP_KEYS`, `MCP_ORIGINS`,
+   `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `STORE`, `STORE_MIRROR`, `MCP_KEYS`, `MCP_ORIGINS`,
    `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
-   `EDGE_ANALYST`, `RUN_MODE`, `COUNCIL_ALERTS`. Only those set on Vercel need copying.
-3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store and
-   Edge Config, reached over HTTPS with the same tokens, so both sites read and write the same data.
+   `EDGE_ANALYST`, `TRADE_REVIEW*`, `CHRONOS_*`, and (new on the Worker, 17 Nov 2026, sign-up emails) `GMAIL_USER`,
+   `GMAIL_APP_PASSWORD`, `MAIL_FROM`, `OWNER_EMAIL`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
+   `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and
+   `COUNCIL_ALERTS` are read by the council on GitHub Actions, not by the Worker.)
+3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store, reached over HTTPS with the same tokens, so both sites read and write the same data.
    **Deploy with GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`, free: the repo is public): add the
    repository secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, then Actions →
    "Cloudflare deploy" → Run workflow (or re-run its last run). It also runs on a push to the Cloudflare branches.
@@ -55,7 +81,7 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `api.cloudflare.com`, including the asset upload, which must carry the upload session's own key (401). Locally,
    `npx wrangler login && npx wrangler deploy` in `cloudflare/` does the same.
 4. Side-by-side check on the workers.dev address: the smoke and ChronosTrade audits (`PORT` / base URL), sign-in
-   as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, price alerts, the connectors.
+   as each member, `/cdata` for a guest and a member, `/md/bars`, `/md/stream`, the connectors.
 
 **State on 16 Nov 2026 (stage 2 done):** the Worker is live at https://meridianx.meridianx-cloudflare.workers.dev, deployed by
 the Actions workflow after the owner added the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The
@@ -65,35 +91,142 @@ new links from the Profile page). The Vercel Blob store `meridian-users` still a
 `OANDA_TOKEN` is a practice-account token (`OANDA_ENV` practice). Checked: every page and short address 200, no page error
 or sideways scroll (phone signed out, phone guest, desktop), guest `/cdata` cut, protected files 401, sign-in refuses a wrong
 password, `/md/bars` candles for gold, silver, NAS100 and forex. The live stream answered `OANDA accounts 504` until
-`OANDA_ACCOUNT_ID` is set. Not yet set: VAPID keys (price-alert pushes), `GH_MCP_TOKEN`, the cTrader client trio,
-`GH_READ_TOKEN`, `EDGE_CONFIG`, `TV_WEBHOOK_KEY`. The council reads candles from the Worker (`MD_BASE` in `council.yml`).
+`OANDA_ACCOUNT_ID` is set. Not yet set: `GH_MCP_TOKEN`, the cTrader client trio,
+`GH_READ_TOKEN` (VAPID keys, `EDGE_CONFIG` and `TV_WEBHOOK_KEY` were also unset; their functions were removed on 17 Nov 2026). The council reads candles from the Worker (`MD_BASE` in `council.yml`).
 The zone `meridianx.dev` is on Cloudflare's Free plan: one rate-limiting rule (10 s window) only, and a Skip rule cannot turn
 off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/cdata/mt5/signals.csv` without a browser).
 
 **Domain (16 Nov 2026):** the site is at https://aureumdesk.co.uk and www.aureumdesk.co.uk (zone in this account, active, the
-Worker as custom domain, certificate active). meridianx.dev is no longer used. **Backup:** every Vercel Blob file is copied into
+Worker as custom domain, certificate active). meridianx.dev is no longer used. Both are recorded in `wrangler.jsonc` `routes`
+(`custom_domain: true`), so a deploy keeps them; the workers.dev address stays on (`workers_dev: true`). From then on a deploy
+also sends the two domains: wrangler asks the account which change they need (none while both are this Worker's) and puts them
+on this Worker, overriding another Worker's claim or a clashing DNS record when it runs without a terminal (CI). If the deploy
+token may not manage the Worker's custom domains, the new code is still uploaded and the deploy reports an error at that step. **Backup:** every Vercel Blob file is copied into
 the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then again daily; nothing is deleted on either side.
 
 ## Stage 3 (code still to port; each a small change of its own)
 
-- **Academy** (`api/academy.js`) reads `academy/` files from disk; Workers have no project files. Bundle what it
-  reads as modules, or move them to R2.
-- **Bridge downloads** (`api/bridge.js`) read `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` from disk:
-  bundle them as text modules.
+- **Academy** (done 16 Nov 2026): `api/academy.js` reads its generated files from disk on Node; on the Worker they are
+  bundled as text modules (`src/bundled.mjs`): per edge `academy/data/cand-`, `out-` and `feat-<edge>.json`, plus
+  `calendar.json`, `research.json`, `eval.json` and `ml/models/index.json` (the registry `academy/edges.mjs` is plain
+  code and is bundled as such). Each file is parsed on its first request in an instance, so no other route pays for the
+  Academy's 2.5 MB. The API's own checks decide what leaves it, as on Vercel: no outcome before an attempt is stored, the
+  exam pool apart, the files never served as assets; nothing of `academy/archive/` is bundled. A file the Academy starts
+  to read must be added to `src/bundled.mjs` (`tests/cloudflare-bundle.test.mjs` compares the list with the disk reads of
+  `fileData()`); regenerated data reaches the Worker with its next deploy (the deploy workflow's push paths do not list
+  `academy/` or `ml/`). Its store stays the Blob store (`BLOB_READ_WRITE_TOKEN`): never set `ACADEMY_STORE_DIR` on the
+  Worker, whose `/tmp` lasts one request (seen locally: an attempt stored, the next request did not see it).
+- **Bridge downloads** (done 16 Nov 2026): `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` are bundled as text
+  modules; the owner's session or password is checked by `api/bridge.js` as before.
+- **Bundle size** (`npx wrangler deploy --dry-run`): 1,471 KiB (gzip 340 KiB) before these two, 4,022 KiB (gzip 671 KiB)
+  after; Workers Paid allows 10 MB compressed.
 - **Fred's connector** (done 16 Nov 2026): `validateProposal` checks a proposed module with `node --check` where a child
   process can start, else (Workers) by parsing it with acorn (bundled: `cloudflare/package.json`, `wrangler.jsonc` alias).
   The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
   Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
-- **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
-- **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
-  alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,
-  `notice`) → KV. One copy, then Vercel's Blob store is read-only.
-- **Retired**: the backup council runner (`api/run.js`, crons council / ict) starts the Trader as a child process
-  and writes files, which Workers do not allow. GitHub Actions and the VPS runner run the council.
+- **Link preview image** (`api/og.mjs`, @vercel/og; removed 17 Nov 2026, `/api/og` redirects to the static `/icons/og-card.png`):
+  answered with the site icon, on purpose (checked 16 Nov 2026). The
+  bundler takes the pinned @vercel/og 0.11.1's Worker build (`dist/index.edge.js`, 2.1 MB with its resvg and yoga wasm),
+  and that build starts fetching its font at module scope from `new URL('./Geist-Regular.ttf', import.meta.url)`: in
+  workerd that throws "Invalid URL string" while the Worker starts (tried locally: the runtime failed to start), so every
+  route of the site would fail, not only the image. The other routes (workers-og; satori with @resvg/resvg-wasm) add two
+  or more packages and about 2 MB of wasm, plus a TTF font (the site's own fonts are woff2, which satori cannot read).
+  Revisit if @vercel/og ships a Worker build that starts, or the preview is worth that weight.
+- **Storage to Cloudflare**: the Blob store → the D1 file store below (built 17 Nov 2026, switch OFF until the lead
+  throws it). Edge Config (`runMode`, `paused`, `notice`): not ported, removed with `api/_flags.js` on 17 Nov 2026.
 
-## Stage 4: the domain
+## File store on D1 (17 Nov 2026; behind the Worker secret `STORE`, OFF by default)
+
+The Vercel account is blocked; its Blob store still answers and holds users, profiles, notices, sounds, the Mosha log,
+lessons and pictures, Academy files, price alerts, cTrader links, the TradingView log, run reports and the bridge ping.
+The site can keep them in the D1 database `aureum-data` (binding `STORE_DB` in `wrangler.jsonc`) instead.
+
+**How it works.** The api/ modules that use `@vercel/blob` (15 until 17 Nov 2026, 11 since) are unchanged. `wrangler.jsonc` aliases `@vercel/blob` to
+`src/store-blob.mjs` and the real package to `vercel-blob-real`. Every call (`put`, `list`, `del`, `head`, …) goes to the
+real package unless the secret `STORE` is `d1` (case and spaces ignored); then to `src/store-d1.mjs`:
+- Tables `store_blobs` (pathname, size, upload time in ms, content type, etag, chunk count, `src` = `vercel` for a copy the
+  mirror made, `d1` for a file the site wrote here), `store_chunks` (base64, 768 KB of file a row; D1 keeps a row under
+  2 MB; at most 16 MB a file, a bigger one is refused with "File is too large"), `store_gone` (when the site deleted a
+  path), `store_state` (the mirror's state). Created on first use; no migration step.
+- Same behaviour as Vercel where the handlers rely on it: `allowOverwrite` false refuses an existing path ("This blob
+  already exists"), `addRandomSuffix` gives `name-<30 letters/digits>.ext`, list pages by `limit` (max 1000) and an opaque
+  `cursor`, `uploadedAt` is a Date, `etag` changes on every write, deleting what is not there is no error, no token = the
+  same "No blob credentials" error. A write here is newer than every file in the store (upload time = max(now, newest + 1 ms)).
+  Not available in D1 mode (refused with a clear error; no handler uses them): `get`, `copy`, `rename`, multipart, image
+  puts, `ifMatch`, folded lists. `tests/cloudflare-store.test.mjs` fails if a handler starts using another call or option.
+- **Reading a file by its URL**: `list` / `put` give URLs on `https://d1.store.invalid/<path>`; `store-blob.mjs` wraps the
+  Worker's `fetch` (worker.mjs imports it before any handler) so that host is answered from D1 inside the Worker, GET /
+  HEAD only, only with `Authorization: Bearer <BLOB_READ_WRITE_TOKEN>`; `?cache=0` and `?download=1` are ignored. `.invalid`
+  never resolves, so a store URL cannot leave the Worker. Every other request goes out as before.
+- D1 reads go to its primary (no read replicas are used), so a write is read back at once: the stale reads of the Blob CDN
+  ("Blob freshness audit" in CLAUDE.md) do not exist here. Writes are D1 transactions (a file and its chunks appear together).
+- No module stores a blob URL in its data (lesson pictures are found by id, profile photos and sounds are data URLs inside
+  their JSON), so nothing needs rewriting at the switch.
+- **Fail closed**: in D1 mode the store answers only once `store_state` records `ready` (a complete copy was made by the
+  mirror). Before that every call throws "the Cloudflare store is not ready", so sign-in answers 503 instead of falling back
+  to the built-in accounts.
+- **Keep `BLOB_READ_WRITE_TOKEN` set** in D1 mode (any value works once Vercel is gone): the handlers answer "storage not set
+  up" without it, and it is the token store URLs are read with. The KV backup (`src/backup.mjs`) always reads the real Vercel
+  store, whatever `STORE` says.
+
+**The mirror** (`src/store-mirror.mjs`, from `scheduled` in `worker.mjs`, logged as `store mirror`):
+- Switch OFF, every 10 minutes: copies every Vercel file that is new or changed (upload time / size), keeping Vercel's upload
+  time, and deletes the copies of files Vercel no longer has (an unlink, a removed device, an old users file). At most 100
+  files / 48 MB a run; the rest next run. A run with nothing left and nothing failed sets `ready` (the log says
+  `"complete":true,"ready":"<time>"`). Unlike the KV backup, which keeps deleted files, this copy follows Vercel.
+- Switch ON: ONE final pass copies the Vercel files written since the last mirror run: only a file newer than its D1 row and
+  newer than any delete made here; the commit itself re-checks it, so a write made after the switch is never overwritten,
+  even one made while the file is being copied. It also deletes copies of files Vercel deleted before the switch. It runs on
+  the 10-minute cron (until 17 Nov 2026 also the minute cron during the first hour after the switch) and stops for good once complete
+  (`final pass done`).
+- A file the site wrote in D1 mode is never overwritten or deleted by the mirror, also after a switch back (`kept` count).
+- `STORE_MIRROR=off` (secret) stops the mirror in either mode (for example when Vercel's store is gone for good).
+
+**To switch to D1 (lead):**
+1. Deploy this code with `STORE` unset (nothing changes for the site). Watch the Worker logs (`npx wrangler tail` or the
+   dashboard): `store mirror` lines every 10 minutes until one reads `"complete":true` with a `ready` time.
+2. Right after a complete run (a quiet moment: no owner edits), set the secret: `npx wrangler secret put STORE` in
+   `cloudflare/`, value `d1`. Secrets take effect at once (a new version).
+3. Within ten minutes (the next 10-minute cron) the log shows `store mirror … "mode":"d1" … "complete":true`, then `final pass done`. Check: sign in as
+   a member, the notices, a profile photo, a Mosha lesson picture, the Users page.
+4. Later, when Vercel is closed: set `STORE_MIRROR=off`; keep `BLOB_READ_WRITE_TOKEN` (any value).
+
+**To switch back to Vercel:** `npx wrangler secret delete STORE` (or set it to anything but `d1`). The site reads and writes
+Vercel again at once. **What that loses**: every write made while `STORE` was `d1` (accounts and passwords changed, profiles,
+notices, lessons and pictures, the Mosha log, Academy saves, price alerts, cTrader links) is not on Vercel, so the site no
+longer sees it. Nothing is deleted: those files stay in D1 (`src = 'd1'`, counted as `kept` in the mirror's log) and come
+back with a later switch to D1 only where Vercel has no newer file; copying them back to Vercel is a manual step (not built).
+A password changed in D1 mode reverts to the Vercel one, so check the Users page after a switch back.
+
+Not verified against the real services: the mirror's reads of the real Vercel store (the backup has run the same calls), and
+the store on the remote D1 database (checked on `wrangler dev --local`'s D1 with the real handlers: sign-in, a password
+change read back at once, notices, profile photo). Not covered: two writes to one file at the same instant still keep the
+last (as on Vercel).
+- **Removed** (17 Nov 2026): the backup council runner (`api/run.js`, crons council / ict), which started the Trader as a
+  child process (not allowed on Workers). GitHub Actions is the council's only runner.
+
+## Stage 4: the domain (done 16 Nov 2026 with aureumdesk.co.uk instead; kept as the plan it was)
 
 Move meridianx.dev's DNS to Cloudflare, add the Worker as its custom domain, recreate the firewall rules (scanner
 paths, writes outside /api, rate limits: /cdata 600 / min, /api 30 / min, /md 900 / min per IP; no timed blocks;
 no bot challenge on `/cdata/mt5/signals.csv`, the broker bridges read it without a browser). Keep Vercel running a
 week, then pause the project.
+
+## The language-model provider's secrets (17 Nov 2026)
+
+The edge analyst, the trade reviewer and ChronosTrade's AI coach call a Messages API provider through
+`api/_academy-llm.js`. The owner adds, in the Cloudflare dashboard (Workers & Pages → `meridianx` → Settings → Variables
+and Secrets → Add, type **Secret**), or with `npx wrangler secret put <NAME>` in `cloudflare/`:
+`ACADEMY_LLM_KEY` (the API key), `ACADEMY_LLM_URL` = `https://api.anthropic.com/v1/messages`, `ACADEMY_LLM_MODEL` = the
+model id from the provider's model list, `ACADEMY_LLM_FORMAT` = `messages`, `ACADEMY_LLM_USD_PER_MTOK_IN` = `4`,
+`ACADEMY_LLM_USD_PER_MTOK_OUT` = `20`, `ACADEMY_LLM_USD_PER_MTOK_CACHE_READ` = `0.2`,
+`ACADEMY_LLM_USD_PER_MTOK_CACHE_WRITE` = `5`, and (recommended) `ACADEMY_LLM_BODY` = `{"output_config":{"effort":"low"}}`.
+**All as Secrets, also the ones that are not secret:** `wrangler deploy` (the deploy workflow) sets the Worker's plain-text
+variables to what `wrangler.jsonc` lists unless `keep_vars` is on, so a plain-text variable added in the dashboard disappears
+at the next deploy; secrets survive deploys. Never write a value into `wrangler.jsonc`. Details and the per-feature budgets:
+docs/academy/LLM.md, section 11.
+ChronosTrade's coach can be tuned on its own (17 Nov 2026), also as Secrets: `CHRONOS_LLM_MODEL` (the provider's model id for
+the coach only), `CHRONOS_LLM_BODY` (JSON; the coach sends a low reasoning effort unless this or `ACADEMY_LLM_BODY` names one),
+`CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT`, and the live coach's `CHRONOS_LIVE_PER_DAY`, `CHRONOS_LIVE_GAP_S`,
+`CHRONOS_LIVE_MAX_TOKENS` (docs/academy/LLM.md, section 11). Its answers are streamed (`text/event-stream`); the Worker's adapter
+starts the response at the first `res.write`, so the words reach the page as the provider writes them.

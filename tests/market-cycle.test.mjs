@@ -175,7 +175,7 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   assert.match(html, /localStorage\.getItem\('ms-clean-v2'\); localStorage\.setItem\('ms-clean-v2', '1'\)/);
   // "too much labels": while clean, one BO word and one CF word per chart, and the strips and readouts around the charts are hidden
   assert.match(html, /text: CL \? \(k === evs\.length - 1 \? 'BO' : ''\)/);
-  assert.match(html, /html\[data-clean="1"\] #v-charts :is\(#ms-cycle, #ms-adr, #ms-mtf, #ms-pa-chips, #ms-cx-tog, \.ms-ro, \.ms-role\)/);
+  assert.match(html, /html\[data-clean="1"\] #v-charts :is\(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, \.ms-ro, \.ms-role\)/);
   assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
 });
 

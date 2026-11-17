@@ -7,7 +7,7 @@
 // Environment:
 //   the model: ACADEMY_LLM_KEY / _URL / _MODEL / _FORMAT and the rest of the adapter's settings (docs/academy/LLM.md, section 3)
 //   EDGE_LLM_DAILY_USD (default 0.50), EDGE_LLM_MONTHLY_USD (5), EDGE_LLM_HARD_USD (25), EDGE_LLM_MAX_CALLS_DAY (12): this
-//   feature's own budgets; EDGE_ANALYST=off or EDGE_LLM_STOP=1 stops every call. OANDA_TOKEN for the candles.
+//   feature's own budgets; EDGE_LLM_MAX_TOKENS (4000) the output cap of one call; EDGE_ANALYST=off or EDGE_LLM_STOP=1 stops every call. OANDA_TOKEN for the candles.
 'use strict';
 const S = require('./_session.js');
 const G = require('./_guard.js');
@@ -15,7 +15,7 @@ const LLM = require('./_academy-llm.js');
 const ST = require('./_academy-store.js');
 const E = require('./_edge-analyst.js');
 
-const ROWS = 'reviews.json', STATE = 'state.json', KEEP = 400;
+const ROWS = 'reviews.json', STATE = 'state.json', KEEP = 400, MAX_OUT = 4000;
 const rootOf = (env) => (env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'edge-analyst-preview/' : 'edge-analyst/');
 // one lock map per function instance, as the store's rules say (a new Map per request let two requests in one instance
 // interleave a read-modify-write of cost.json and lose a reservation: 12 Nov 2026 review). io = { blob, fetch, recent } for tests.
@@ -65,8 +65,10 @@ async function scan(d) {
     const t = E.entryT(x), bars = {};
     try { for (const [lab, gran, sec, n] of E.FRAMES) bars[lab] = await candles(d, E.INST[x.market], gran, sec, n, t); }
     catch (e) { out.skipped.push({ id: x.id, why: String(e.message || e).slice(0, 80) }); continue; }   // tried again next run (within 3 days)
-    const q = E.buildRequest(x, bars, forecast && forecast.playbook);
-    const ans = await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'analyst', maxTokens: 900 }, { env: llmEnv(env), store, now: d.now });
+    const q = E.buildRequest(x, bars, forecast && forecast.playbook, all);   // + the system's forward record, closed before the entry only
+    // 17 Nov 2026: cap raised from 900 (a model that always reasons spends output tokens on that first; an answer cut at the
+    // cap is billed and stored as refused, naming EDGE_LLM_MAX_TOKENS)
+    const ans = LLM.cutAtCap(await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'feature', maxTokens: LLM.featureCap(env.EDGE_LLM_MAX_TOKENS, MAX_OUT) }, { env: llmEnv(env), store, now: d.now }), 'EDGE_LLM_MAX_TOKENS');
     // a call that may have been paid for (an answer with no usable text, a timeout, an unreadable answer) is stored as refused
     // like an answer that does not fit, so the entry is never paid for twice; a refused call (not billed) is tried again next run
     const billed = !!(ans && ans.available && ans.error && (ans.usage || ans.costEstimated || ans.costUsd > 0));
@@ -106,3 +108,4 @@ module.exports.handle = handle;
 module.exports.scan = scan;
 module.exports.llmEnv = llmEnv;
 module.exports.storeOf = storeOf;
+module.exports.MAX_OUT = MAX_OUT;

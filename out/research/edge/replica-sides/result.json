@@ -1,0 +1,1391 @@
+{
+ "study": "replica-sides",
+ "title": "Replica: do its sells really beat its buys?",
+ "built": "2026-11-17",
+ "preregistration": "PREREGISTRATION.md",
+ "system": "Gold replica (raw research signal, ten markets)",
+ "verdict": "FAIL, 0 of 3: the replica's sells do not beat its buys on 2020-26 (OOS sells -0.196R a trade net, n 44458, month t -12.63; sells minus buys 0.007R, t 0.38); the forward split of 3-17 Nov is a regime artefact",
+ "rule": {
+  "minT": 2,
+  "alpha": 0.05,
+  "t2Min": 5,
+  "moveDays": 20,
+  "nTests": 3
+ },
+ "windows": {
+  "is": "2020-01 to 2023-12 (coins 2022-03 on)",
+  "oos": "2024-01 to 2026-10",
+  "oosMonths": 34,
+  "isMonths": 48
+ },
+ "model": {
+  "xau": {
+   "spread": 0.06,
+   "commissionRT": 0.000024,
+   "entrySlip": -0.17,
+   "src": "quotes+commission+mirror"
+  },
+  "eurusd": {
+   "spread": 0,
+   "commissionRT": 0.000045,
+   "entrySlip": -0.00001,
+   "src": "quotes+commission+mirror"
+  },
+  "gbpusd": {
+   "spread": 0,
+   "commissionRT": 0.000045,
+   "entrySlip": 0,
+   "src": "quotes+commission+mirror"
+  },
+  "audusd": {
+   "spread": 0,
+   "commissionRT": 0.000045,
+   "entrySlip": 0,
+   "src": "quotes+commission+mirror"
+  },
+  "usdcad": {
+   "spread": 0,
+   "commissionRT": 0.000045,
+   "entrySlip": 0,
+   "src": "quotes+commission+mirror"
+  },
+  "usdchf": {
+   "spread": 0,
+   "commissionRT": 0.000045,
+   "entrySlip": 0,
+   "src": "quotes+commission+mirror"
+  },
+  "btc": {
+   "spread": 17.34,
+   "commissionRT": 0,
+   "entrySlip": -1.75,
+   "src": "quotes+mirror",
+   "px17": 64349.4
+  },
+  "eth": {
+   "spread": 2.98,
+   "commissionRT": 0,
+   "entrySlip": 1.41,
+   "src": "quotes+mirror",
+   "px17": 1806.69
+  },
+  "sol": {
+   "spread": 0.196,
+   "commissionRT": 0,
+   "entrySlip": 0.078,
+   "src": "quotes+mirror",
+   "px17": 72.58
+  },
+  "xrp": {
+   "spread": null,
+   "commissionRT": null,
+   "entrySlip": null,
+   "src": "default"
+  }
+ },
+ "forward": {
+  "from": "2026-11-03",
+  "to": "2026-11-17",
+  "all": {
+   "n": 1000,
+   "gross": -0.094,
+   "net": -0.3,
+   "t": -2.08
+  },
+  "buy": {
+   "n": 522,
+   "gross": -0.414,
+   "net": -0.62,
+   "t": -7.83
+  },
+  "sell": {
+   "n": 478,
+   "gross": 0.256,
+   "net": 0.051,
+   "t": 3.58
+  },
+  "dollarUpForex": {
+   "n": 181,
+   "total": 50.2
+  },
+  "dollarDownForex": {
+   "n": 208,
+   "total": -123.6
+  },
+  "demoSlip": {
+   "n": 157,
+   "mean": 0.062,
+   "t": 3.06,
+   "buy": -0.003,
+   "sell": 0.127,
+   "eth": 0.189,
+   "sol": 0.143,
+   "gbpusd": 0.071,
+   "xau": 0.027,
+   "eurusd": 0.001
+  }
+ },
+ "tests": {
+  "T1": {
+   "IS": {
+    "n": 44409,
+    "gross": -0.004,
+    "net": -0.148,
+    "total": -6582.04,
+    "win": 0.341,
+    "t": -8.19,
+    "months": 48
+   },
+   "OOS": {
+    "n": 44458,
+    "gross": -0.001,
+    "net": -0.196,
+    "total": -8728.34,
+    "win": 0.339,
+    "t": -12.63,
+    "months": 34
+   },
+   "p": 1,
+   "isPos": false,
+   "oosPos": false,
+   "holm": 1,
+   "pass": false
+  },
+  "T2": {
+   "IS": {
+    "months": 48,
+    "mean": 0.03,
+    "t": 1.77
+   },
+   "OOS": {
+    "months": 34,
+    "mean": 0.007,
+    "t": 0.38
+   },
+   "p": 0.353,
+   "isPos": true,
+   "oosPos": true,
+   "holm": 1,
+   "pass": false
+  },
+  "T3": {
+   "IS": {
+    "n": 43226,
+    "gross": -0.004,
+    "net": -0.147,
+    "total": -6366.02,
+    "win": 0.34,
+    "t": -8.29,
+    "months": 48
+   },
+   "OOS": {
+    "n": 43140,
+    "gross": -0.006,
+    "net": -0.194,
+    "total": -8357.97,
+    "win": 0.337,
+    "t": -12.72,
+    "months": 34
+   },
+   "p": 1,
+   "isPos": false,
+   "oosPos": false,
+   "holm": 1,
+   "pass": false
+  }
+ },
+ "pool": {
+  "all": {
+   "IS": {
+    "n": 87377,
+    "gross": -0.019,
+    "net": -0.162,
+    "total": -14187,
+    "win": 0.335,
+    "t": -9.55,
+    "months": 48
+   },
+   "OOS": {
+    "n": 86939,
+    "gross": -0.01,
+    "net": -0.2,
+    "total": -17350.44,
+    "win": 0.336,
+    "t": -20.64,
+    "months": 34
+   }
+  },
+  "buy": {
+   "IS": {
+    "n": 42968,
+    "gross": -0.034,
+    "net": -0.177,
+    "total": -7604.97,
+    "win": 0.328,
+    "t": -8.49,
+    "months": 48
+   },
+   "OOS": {
+    "n": 42481,
+    "gross": -0.02,
+    "net": -0.203,
+    "total": -8622.1,
+    "win": 0.332,
+    "t": -18.44,
+    "months": 34
+   }
+  },
+  "sell": {
+   "IS": {
+    "n": 44409,
+    "gross": -0.004,
+    "net": -0.148,
+    "total": -6582.04,
+    "win": 0.341,
+    "t": -8.19,
+    "months": 48
+   },
+   "OOS": {
+    "n": 44458,
+    "gross": -0.001,
+    "net": -0.196,
+    "total": -8728.34,
+    "win": 0.339,
+    "t": -12.63,
+    "months": 34
+   }
+  },
+  "withMove": {
+   "IS": {
+    "n": 43226,
+    "gross": -0.004,
+    "net": -0.147,
+    "total": -6366.02,
+    "win": 0.34,
+    "t": -8.29,
+    "months": 48
+   },
+   "OOS": {
+    "n": 43140,
+    "gross": -0.006,
+    "net": -0.194,
+    "total": -8357.97,
+    "win": 0.337,
+    "t": -12.72,
+    "months": 34
+   }
+  },
+  "againstMove": {
+   "IS": {
+    "n": 44115,
+    "gross": -0.033,
+    "net": -0.177,
+    "total": -7816.79,
+    "win": 0.33,
+    "t": -8.58,
+    "months": 48
+   },
+   "OOS": {
+    "n": 43782,
+    "gross": -0.015,
+    "net": -0.206,
+    "total": -8998.14,
+    "win": 0.334,
+    "t": -13.57,
+    "months": 34
+   }
+  }
+ },
+ "pool2x": {
+  "all": {
+   "IS": {
+    "n": 87377,
+    "gross": -0.019,
+    "net": -0.306,
+    "total": -26741.59,
+    "win": 0.335,
+    "t": -9.54,
+    "months": 48
+   },
+   "OOS": {
+    "n": 86939,
+    "gross": -0.01,
+    "net": -0.389,
+    "total": -33812.25,
+    "win": 0.336,
+    "t": -24.26,
+    "months": 34
+   }
+  },
+  "sell": {
+   "IS": {
+    "n": 44409,
+    "gross": -0.004,
+    "net": -0.293,
+    "total": -13008.21,
+    "win": 0.341,
+    "t": -9,
+    "months": 48
+   },
+   "OOS": {
+    "n": 44458,
+    "gross": -0.001,
+    "net": -0.392,
+    "total": -17405.48,
+    "win": 0.339,
+    "t": -18.57,
+    "months": 34
+   }
+  },
+  "withMove": {
+   "IS": {
+    "n": 43226,
+    "gross": -0.004,
+    "net": -0.29,
+    "total": -12547.46,
+    "win": 0.34,
+    "t": -9.16,
+    "months": 48
+   },
+   "OOS": {
+    "n": 43140,
+    "gross": -0.006,
+    "net": -0.382,
+    "total": -16458.4,
+    "win": 0.337,
+    "t": -20.22,
+    "months": 34
+   }
+  }
+ },
+ "forexDollar": {
+  "up": {
+   "IS": {
+    "n": 25834,
+    "gross": -0.021,
+    "net": -0.109,
+    "total": -2817.56,
+    "win": 0.336,
+    "t": -5.6,
+    "months": 48
+   },
+   "OOS": {
+    "n": 18390,
+    "gross": -0.001,
+    "net": -0.109,
+    "total": -2011.49,
+    "win": 0.343,
+    "t": -4.44,
+    "months": 34
+   }
+  },
+  "down": {
+   "IS": {
+    "n": 25432,
+    "gross": -0.027,
+    "net": -0.113,
+    "total": -2885.6,
+    "win": 0.335,
+    "t": -5.4,
+    "months": 48
+   },
+   "OOS": {
+    "n": 18556,
+    "gross": -0.05,
+    "net": -0.159,
+    "total": -2951.9,
+    "win": 0.324,
+    "t": -6.99,
+    "months": 34
+   }
+  }
+ },
+ "years": {
+  "2020": {
+   "buy": {
+    "n": 7627,
+    "net": -0.094,
+    "total": -720.72
+   },
+   "sell": {
+    "n": 7919,
+    "net": -0.109,
+    "total": -859.9
+   },
+   "withMove": {
+    "n": 7727,
+    "net": -0.088,
+    "total": -683.46
+   },
+   "againstMove": {
+    "n": 7819,
+    "net": -0.115,
+    "total": -897.17
+   }
+  },
+  "2021": {
+   "buy": {
+    "n": 7855,
+    "net": -0.163,
+    "total": -1283.8
+   },
+   "sell": {
+    "n": 8011,
+    "net": -0.067,
+    "total": -538.44
+   },
+   "withMove": {
+    "n": 7923,
+    "net": -0.098,
+    "total": -773.21
+   },
+   "againstMove": {
+    "n": 7941,
+    "net": -0.132,
+    "total": -1049.91
+   }
+  },
+  "2022": {
+   "buy": {
+    "n": 13725,
+    "net": -0.169,
+    "total": -2319.14
+   },
+   "sell": {
+    "n": 13986,
+    "net": -0.128,
+    "total": -1788.79
+   },
+   "withMove": {
+    "n": 13665,
+    "net": -0.129,
+    "total": -1762.98
+   },
+   "againstMove": {
+    "n": 14036,
+    "net": -0.167,
+    "total": -2337.61
+   }
+  },
+  "2023": {
+   "buy": {
+    "n": 13761,
+    "net": -0.238,
+    "total": -3281.31
+   },
+   "sell": {
+    "n": 14493,
+    "net": -0.234,
+    "total": -3394.91
+   },
+   "withMove": {
+    "n": 13911,
+    "net": -0.226,
+    "total": -3146.37
+   },
+   "againstMove": {
+    "n": 14319,
+    "net": -0.247,
+    "total": -3532.1
+   }
+  },
+  "2024": {
+   "buy": {
+    "n": 14852,
+    "net": -0.173,
+    "total": -2576.61
+   },
+   "sell": {
+    "n": 15794,
+    "net": -0.207,
+    "total": -3274.04
+   },
+   "withMove": {
+    "n": 15133,
+    "net": -0.192,
+    "total": -2910.39
+   },
+   "againstMove": {
+    "n": 15505,
+    "net": -0.19,
+    "total": -2947.3
+   }
+  },
+  "2025": {
+   "buy": {
+    "n": 15041,
+    "net": -0.186,
+    "total": -2802.56
+   },
+   "sell": {
+    "n": 15849,
+    "net": -0.182,
+    "total": -2888.3
+   },
+   "withMove": {
+    "n": 15486,
+    "net": -0.206,
+    "total": -3196.85
+   },
+   "againstMove": {
+    "n": 15395,
+    "net": -0.162,
+    "total": -2492.64
+   }
+  },
+  "2026": {
+   "buy": {
+    "n": 12588,
+    "net": -0.258,
+    "total": -3242.93
+   },
+   "sell": {
+    "n": 12815,
+    "net": -0.2,
+    "total": -2566.01
+   },
+   "withMove": {
+    "n": 12521,
+    "net": -0.18,
+    "total": -2250.74
+   },
+   "againstMove": {
+    "n": 12882,
+    "net": -0.276,
+    "total": -3558.2
+   }
+  }
+ },
+ "markets": {
+  "xau": {
+   "signals": 16607,
+   "trades": 16606,
+   "costR": 0.034,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 9578,
+     "gross": -0.013,
+     "net": -0.051,
+     "total": -488.56,
+     "win": 0.34,
+     "t": -3.37,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7028,
+     "gross": -0.014,
+     "net": -0.042,
+     "total": -295.54,
+     "win": 0.339,
+     "t": -2.83,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 4654,
+     "gross": 0.016,
+     "net": -0.031,
+     "total": -145.41,
+     "win": 0.347,
+     "t": -0.99,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3329,
+     "gross": 0.035,
+     "net": -0.001,
+     "total": -3.06,
+     "win": 0.357,
+     "t": -0.02,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 4924,
+     "gross": -0.041,
+     "net": -0.07,
+     "total": -343.14,
+     "win": 0.333,
+     "t": -2.73,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3699,
+     "gross": -0.059,
+     "net": -0.079,
+     "total": -292.48,
+     "win": 0.323,
+     "t": -2.53,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": -0.043,
+     "t": -0.87
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.083,
+     "t": -1.38
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 57,
+    "share": 0.695
+   }
+  },
+  "eurusd": {
+   "signals": 17551,
+   "trades": 17546,
+   "costR": 0.107,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 10166,
+     "gross": -0.013,
+     "net": -0.112,
+     "total": -1139.34,
+     "win": 0.34,
+     "t": -6.82,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7380,
+     "gross": -0.048,
+     "net": -0.166,
+     "total": -1222.6,
+     "win": 0.327,
+     "t": -8.85,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 5040,
+     "gross": -0.036,
+     "net": -0.135,
+     "total": -680.15,
+     "win": 0.331,
+     "t": -4.92,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3701,
+     "gross": -0.08,
+     "net": -0.195,
+     "total": -720.81,
+     "win": 0.314,
+     "t": -6.25,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 5126,
+     "gross": 0.011,
+     "net": -0.09,
+     "total": -459.18,
+     "win": 0.349,
+     "t": -3.03,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3679,
+     "gross": -0.016,
+     "net": -0.136,
+     "total": -501.79,
+     "win": 0.34,
+     "t": -4.19,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": 0.05,
+     "t": 1.15
+    },
+    "OOS": {
+     "months": 34,
+     "mean": 0.059,
+     "t": 1.15
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 56,
+    "share": 0.683
+   }
+  },
+  "gbpusd": {
+   "signals": 17508,
+   "trades": 17506,
+   "costR": 0.085,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 10086,
+     "gross": -0.015,
+     "net": -0.09,
+     "total": -909.5,
+     "win": 0.338,
+     "t": -6.62,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7420,
+     "gross": -0.023,
+     "net": -0.121,
+     "total": -900.74,
+     "win": 0.335,
+     "t": -8.74,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 5006,
+     "gross": -0.028,
+     "net": -0.101,
+     "total": -507.68,
+     "win": 0.331,
+     "t": -3.65,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3692,
+     "gross": -0.027,
+     "net": -0.123,
+     "total": -452.32,
+     "win": 0.33,
+     "t": -4.22,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 5080,
+     "gross": -0.002,
+     "net": -0.079,
+     "total": -401.81,
+     "win": 0.345,
+     "t": -3.09,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3728,
+     "gross": -0.019,
+     "net": -0.12,
+     "total": -448.42,
+     "win": 0.34,
+     "t": -4.33,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": 0.01,
+     "t": 0.23
+    },
+    "OOS": {
+     "months": 34,
+     "mean": 0,
+     "t": 0.01
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 57,
+    "share": 0.695
+   }
+  },
+  "audusd": {
+   "signals": 17679,
+   "trades": 17673,
+   "costR": 0.082,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 10272,
+     "gross": -0.031,
+     "net": -0.104,
+     "total": -1066.14,
+     "win": 0.332,
+     "t": -7.34,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7401,
+     "gross": -0.017,
+     "net": -0.111,
+     "total": -824.39,
+     "win": 0.337,
+     "t": -6.7,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 5020,
+     "gross": -0.054,
+     "net": -0.124,
+     "total": -621.04,
+     "win": 0.325,
+     "t": -3.7,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3637,
+     "gross": -0.077,
+     "net": -0.168,
+     "total": -609.84,
+     "win": 0.316,
+     "t": -5.01,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 5252,
+     "gross": -0.01,
+     "net": -0.085,
+     "total": -445.1,
+     "win": 0.339,
+     "t": -2.79,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3764,
+     "gross": 0.04,
+     "net": -0.057,
+     "total": -214.54,
+     "win": 0.358,
+     "t": -1.59,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": 0.04,
+     "t": 0.71
+    },
+    "OOS": {
+     "months": 34,
+     "mean": 0.117,
+     "t": 1.95
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 61,
+    "share": 0.744
+   }
+  },
+  "usdcad": {
+   "signals": 17905,
+   "trades": 17903,
+   "costR": 0.105,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 10444,
+     "gross": -0.03,
+     "net": -0.118,
+     "total": -1235.55,
+     "win": 0.333,
+     "t": -8.41,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7459,
+     "gross": -0.01,
+     "net": -0.138,
+     "total": -1030.25,
+     "win": 0.337,
+     "t": -8.07,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 5256,
+     "gross": -0.04,
+     "net": -0.13,
+     "total": -681.58,
+     "win": 0.325,
+     "t": -5.09,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3692,
+     "gross": 0.016,
+     "net": -0.109,
+     "total": -400.96,
+     "win": 0.344,
+     "t": -2.65,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 5188,
+     "gross": -0.019,
+     "net": -0.107,
+     "total": -553.97,
+     "win": 0.34,
+     "t": -3.84,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3767,
+     "gross": -0.035,
+     "net": -0.167,
+     "total": -629.29,
+     "win": 0.329,
+     "t": -4.31,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": 0.025,
+     "t": 0.57
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.058,
+     "t": -0.84
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 64,
+    "share": 0.78
+   }
+  },
+  "usdchf": {
+   "signals": 17588,
+   "trades": 17584,
+   "costR": 0.103,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 10298,
+     "gross": -0.031,
+     "net": -0.131,
+     "total": -1352.64,
+     "win": 0.335,
+     "t": -10.48,
+     "months": 48
+    },
+    "OOS": {
+     "n": 7286,
+     "gross": -0.03,
+     "net": -0.135,
+     "total": -985.4,
+     "win": 0.332,
+     "t": -8.72,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 5120,
+     "gross": -0.064,
+     "net": -0.162,
+     "total": -829.89,
+     "win": 0.321,
+     "t": -5.88,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3527,
+     "gross": -0.027,
+     "net": -0.126,
+     "total": -445.77,
+     "win": 0.333,
+     "t": -4.14,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 5178,
+     "gross": 0.002,
+     "net": -0.101,
+     "total": -522.75,
+     "win": 0.348,
+     "t": -4.04,
+     "months": 48
+    },
+    "OOS": {
+     "n": 3759,
+     "gross": -0.033,
+     "net": -0.144,
+     "total": -539.64,
+     "win": 0.33,
+     "t": -5.13,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 48,
+     "mean": 0.065,
+     "t": 1.37
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.015,
+     "t": -0.3
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 82,
+    "agree": 56,
+    "share": 0.683
+   }
+  },
+  "btc": {
+   "signals": 17754,
+   "trades": 17748,
+   "costR": 0.124,
+   "stopUnder5Spreads": 0.045,
+   "all": {
+    "IS": {
+     "n": 6645,
+     "gross": -0.035,
+     "net": -0.162,
+     "total": -1078.22,
+     "win": 0.326,
+     "t": -6.93,
+     "months": 22
+    },
+    "OOS": {
+     "n": 11103,
+     "gross": -0.007,
+     "net": -0.13,
+     "total": -1442.44,
+     "win": 0.333,
+     "t": -7.53,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 3289,
+     "gross": -0.036,
+     "net": -0.161,
+     "total": -531.03,
+     "win": 0.326,
+     "t": -5.03,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5430,
+     "gross": -0.009,
+     "net": -0.129,
+     "total": -700.75,
+     "win": 0.334,
+     "t": -4.9,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 3356,
+     "gross": -0.034,
+     "net": -0.163,
+     "total": -547.18,
+     "win": 0.326,
+     "t": -4.18,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5673,
+     "gross": -0.006,
+     "net": -0.131,
+     "total": -741.69,
+     "win": 0.333,
+     "t": -5.43,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 22,
+     "mean": 0.003,
+     "t": 0.05
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.004,
+     "t": -0.11
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 56,
+    "agree": 40,
+    "share": 0.714
+   }
+  },
+  "eth": {
+   "signals": 17072,
+   "trades": 17066,
+   "costR": 0.492,
+   "stopUnder5Spreads": 0.662,
+   "all": {
+    "IS": {
+     "n": 6623,
+     "gross": -0.008,
+     "net": -0.575,
+     "total": -3810.14,
+     "win": 0.33,
+     "t": -8.87,
+     "months": 22
+    },
+    "OOS": {
+     "n": 10443,
+     "gross": 0.017,
+     "net": -0.428,
+     "total": -4465.27,
+     "win": 0.34,
+     "t": -19.82,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 3237,
+     "gross": -0.017,
+     "net": -0.581,
+     "total": -1881.23,
+     "win": 0.327,
+     "t": -8.3,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5027,
+     "gross": 0.025,
+     "net": -0.404,
+     "total": -2030.16,
+     "win": 0.345,
+     "t": -16.83,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 3386,
+     "gross": 0.001,
+     "net": -0.57,
+     "total": -1928.91,
+     "win": 0.332,
+     "t": -8.56,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5416,
+     "gross": 0.009,
+     "net": -0.45,
+     "total": -2435.12,
+     "win": 0.336,
+     "t": -13.52,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 22,
+     "mean": 0.01,
+     "t": 0.27
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.049,
+     "t": -1.27
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 56,
+    "agree": 34,
+    "share": 0.607
+   }
+  },
+  "sol": {
+   "signals": 17246,
+   "trades": 17241,
+   "costR": 0.446,
+   "stopUnder5Spreads": 0.723,
+   "all": {
+    "IS": {
+     "n": 6496,
+     "gross": 0.001,
+     "net": -0.379,
+     "total": -2464.67,
+     "win": 0.336,
+     "t": -13.94,
+     "months": 22
+    },
+    "OOS": {
+     "n": 10745,
+     "gross": 0.009,
+     "net": -0.477,
+     "total": -5121.62,
+     "win": 0.338,
+     "t": -17.13,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 3204,
+     "gross": -0.029,
+     "net": -0.402,
+     "total": -1288.73,
+     "win": 0.327,
+     "t": -10.12,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5262,
+     "gross": 0.001,
+     "net": -0.466,
+     "total": -2449.66,
+     "win": 0.336,
+     "t": -14.84,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 3292,
+     "gross": 0.03,
+     "net": -0.357,
+     "total": -1175.95,
+     "win": 0.345,
+     "t": -8.49,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5483,
+     "gross": 0.017,
+     "net": -0.487,
+     "total": -2671.95,
+     "win": 0.341,
+     "t": -12.34,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 22,
+     "mean": 0.05,
+     "t": 0.89
+    },
+    "OOS": {
+     "months": 34,
+     "mean": -0.019,
+     "t": -0.44
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 56,
+    "agree": 47,
+    "share": 0.839
+   }
+  },
+  "xrp": {
+   "signals": 17451,
+   "trades": 17443,
+   "costR": 0.096,
+   "stopUnder5Spreads": 0,
+   "all": {
+    "IS": {
+     "n": 6769,
+     "gross": -0.001,
+     "net": -0.095,
+     "total": -642.25,
+     "win": 0.337,
+     "t": -6.31,
+     "months": 22
+    },
+    "OOS": {
+     "n": 10674,
+     "gross": -0.003,
+     "net": -0.1,
+     "total": -1062.18,
+     "win": 0.335,
+     "t": -9.86,
+     "months": 34
+    }
+   },
+   "buy": {
+    "IS": {
+     "n": 3142,
+     "gross": -0.05,
+     "net": -0.139,
+     "total": -438.22,
+     "win": 0.321,
+     "t": -5.14,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5184,
+     "gross": -0.062,
+     "net": -0.156,
+     "total": -808.76,
+     "win": 0.317,
+     "t": -5.34,
+     "months": 34
+    }
+   },
+   "sell": {
+    "IS": {
+     "n": 3627,
+     "gross": 0.042,
+     "net": -0.056,
+     "total": -204.03,
+     "win": 0.351,
+     "t": -2.39,
+     "months": 22
+    },
+    "OOS": {
+     "n": 5490,
+     "gross": 0.053,
+     "net": -0.046,
+     "total": -253.42,
+     "win": 0.353,
+     "t": -1.77,
+     "months": 34
+    }
+   },
+   "diff": {
+    "IS": {
+     "months": 22,
+     "mean": 0.081,
+     "t": 2.08
+    },
+    "OOS": {
+     "months": 34,
+     "mean": 0.107,
+     "t": 2.07
+    }
+   },
+   "monthWinnerFollowsMove": {
+    "months": 56,
+    "agree": 38,
+    "share": 0.679
+   }
+  }
+ }
+}

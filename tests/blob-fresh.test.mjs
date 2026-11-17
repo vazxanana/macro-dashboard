@@ -153,31 +153,6 @@ test('Academy store: a write by another instance within the same second is seen 
   const before = W.reads.origin; assert.deepEqual((await A1.rows('attempts/replica.json')).length, 3); assert.equal(W.reads.origin, before); assert.equal(W.reads.cdn, 0);
 });
 
-test('price alerts: an alert the device saved while the cron was reading candles is kept; a device that removed itself is not written back', async () => {
-  SVC = blobService('blob-fake'); PUSH.sent = [];
-  const env = { CRON_SECRET: 'cron-fake-0123456789', OANDA_TOKEN: 'oanda-fake', VAPID_PUBLIC_KEY: 'pub', VAPID_PRIVATE_KEY: 'priv', BLOB_READ_WRITE_TOKEN: 'blob-fake' };
-  const saved = {}; for (const k of Object.keys(env)) { saved[k] = process.env[k]; process.env[k] = env[k]; }
-  const realFetch = globalThis.fetch;
-  try {
-    const now = Math.floor(Date.now() / 1000), keys = { p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) }, sub = (n) => ({ endpoint: `https://fcm.googleapis.com/fcm/send/${n}`, keys });
-    const push = require('../api/push.js'), cron = require('../api/alert-cron.js');
-    const post = async (body) => { const { out, res } = resOf(); await push({ method: 'POST', headers: {}, query: {}, body: JSON.stringify(body) }, res); return out; };
-    const hitA = { id: 'a1', sym: 'xau', price: 2000, dir: 'above', at: now - 60 }, later = { id: 'a2', sym: 'xau', price: 2100, dir: 'above', at: now - 5 };
-    assert.equal((await post({ sub: sub('one'), alerts: [hitA] })).code, 200); assert.equal((await post({ sub: sub('two'), alerts: [{ ...hitA, id: 'b1' }] })).code, 200);
-    let during = async () => {};
-    globalThis.fetch = async (url, o) => { const u = String(url);
-      if (/oanda\.com\/v3\/instruments\/XAU_USD\/candles/.test(u)) { const f = during; during = async () => {}; await f(); return new Response(JSON.stringify({ candles: [{ time: String(now - 30), mid: { o: '1999', h: '2001', l: '1998', c: '2000.5' } }] }), { status: 200 }); }
-      const r = await SVC.fetch(u, o); return r.ok ? new Response(JSON.stringify(await r.json()), { status: 200 }) : new Response('{}', { status: r.status }); };
-    // while the cron reads the candles: device one adds an alert, device two removes itself
-    during = async () => { assert.equal((await post({ sub: sub('one'), alerts: [hitA, later] })).code, 200); assert.equal((await post({ sub: sub('two'), alerts: [] })).code, 200); };
-    const { out, res } = resOf(); await cron({ method: 'GET', headers: { authorization: `Bearer ${env.CRON_SECRET}` }, query: {} }, res);
-    assert.equal(out.code, 200); assert.equal(out.body.sent, 2, 'both alerts that were hit are sent');
-    const one = await post({ sub: sub('one'), get: true }); assert.deepEqual(one.body.alerts.map((a) => a.id), ['a2'], 'the alert added meanwhile is kept, the one sent is gone');
-    assert.deepEqual((await post({ sub: sub('two'), get: true })).body.alerts, []);
-    const files = [...SVC.origin.keys()].filter((k) => k.startsWith('push/')); assert.equal(files.length, 1, 'one record for device one, none for the device that removed itself');
-  } finally { globalThis.fetch = realFetch; for (const k of Object.keys(env)) { if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k]; } }
-});
-
 test('the user list: every save is a new file, so a changed password or a removed member is read at once by every instance', async () => {
   SVC = blobService('blob-fake'); const io = { list: fakeBlob.list, fetch: SVC.fetch }, env = { BLOB_READ_WRITE_TOKEN: 'blob-fake' };
   const U = require('../api/users.js'), builtIns = { fred: { name: 'Fred', hash: sha('fred-pw'), role: 'reviewer' } };
@@ -202,8 +177,8 @@ test('no module overwrites a Blob file in place and reads it back through the CD
   const files = fs.readdirSync(new URL('../api/', import.meta.url)).filter((f) => /\.js$/.test(f)), inPlace = [];
   for (const f of files) { const s = src(`api/${f}`); if (!/allowOverwrite: true/.test(s)) continue; inPlace.push(f);
     assert.match(s, /searchParams\.set\('cache', '0'\)/, `${f} overwrites a file in place: its reads must ask the origin`); }
-  assert.deepEqual(inPlace.sort(), ['_academy-store.js', 'mosha-lessons.js', 'mosha.js', 'notify.js', 'profile.js', 'sounds.js']);
-  for (const f of ['notify.js', 'profile.js', 'sounds.js', 'mosha.js']) assert.match(src(`api/${f}`), /await F\(fresh\(b\.url\)/, f);
+  assert.deepEqual(inPlace.sort(), ['_academy-store.js', 'mosha-lessons.js', 'mosha.js', 'notify.js', 'passkey.js', 'profile.js', 'signup.js', 'sounds.js']);   // passkey.js, signup.js: 17 Nov 2026
+  for (const f of ['notify.js', 'profile.js', 'sounds.js', 'mosha.js', 'signup.js']) assert.match(src(`api/${f}`), /await F\(fresh\(b\.url\)/, f);
   // every other writer saves under a new name each time (a new URL, which no CDN copy can exist for)
-  for (const f of ['users.js', '_alerts.js', 'ctrader-link.js', 'tv-webhook.js', 'run.js', 'data.js']) { const puts = src(`api/${f}`).match(/\bput\(`[^`]+`[^;]*/g) || []; assert.ok(puts.length, f); for (const p of puts) assert.match(p, /addRandomSuffix: true/, `${f}: ${p.slice(0, 60)}`); }
+  for (const f of ['users.js', 'ctrader-link.js', 'data.js']) { const puts = src(`api/${f}`).match(/\bput\(`[^`]+`[^;]*/g) || []; assert.ok(puts.length, f); for (const p of puts) assert.match(p, /addRandomSuffix: true/, `${f}: ${p.slice(0, 60)}`); }
 });

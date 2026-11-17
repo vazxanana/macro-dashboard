@@ -1,8 +1,8 @@
 name: Council trader
 
 # Paper-trades every Mosha setup on all markets and runs the daily statistical
-# Coach. Results go to the `council-data` branch (never main, so Pages doesn't
-# redeploy every run); the market-structure page reads them.
+# Coach. Results go to the `council-data` branch (never main, so the site is not
+# rebuilt every run); the market-structure page reads them.
 #
 # Keeps itself alive: a push/dispatch run trades every ~4 minutes for ~4.5 h (M1 signals stay fresh 12 min, so no scalp is missed),
 # then dispatches the next run (workflow_dispatch from GITHUB_TOKEN is allowed),
@@ -11,8 +11,8 @@ name: Council trader
 # last council save on council-data is over 20 min old (a stuck run).
 on:
   # 7 Nov 2026, 16:3x: the owner chose GitHub Actions as the council runner (repo public, so minutes are free). Self-restart,
-  # watchdog and push trigger are back. The Vercel cron (api/run.js) stands down while this loop has saved in the last 10 min
-  # and takes over on its own if this loop stops.
+  # watchdog and push trigger are back. (The Vercel backup runner, api/run.js, was removed on 17 Nov 2026: this loop is the
+  # only runner.)
   schedule:
     - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
@@ -25,7 +25,7 @@ on:
 # The OANDA candle service the Trader, data check and Macro strategist read (council/*.mjs `MD_BASE`). Since 16 Nov 2026 the
 # site runs on Cloudflare (docs/cloudflare.md) and meridianx.dev answered 402 until its domain moved, so the default is the
 # Worker's own address, which keeps working after the move. The repository variable MD_ORIGIN (scheme + host, no slash)
-# overrides it. The VPS runner (council/live.mjs) sets its own local MD_BASE and is not affected.
+# overrides it.
 env:
   MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
   # The ICT tracker's paper silver market reads the same service (ict/tracker.mjs `MD_BARS`); set here, not in the tracker, so the
@@ -52,8 +52,8 @@ jobs:
             --jq '[.[] | select(.event != "schedule" and (.status == "in_progress" or .status == "queued" or .status == "waiting" or .status == "pending"))] | length')
           echo "Trader loop runs active: $n"
           if [ "$n" = "0" ]; then gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Started a new loop"; exit 0; fi
-          # A run can show 'in progress' and save nothing (stuck). If the last "Council run" save on council-data (Actions or the
-          # Vercel fallback) is over 20 min old, start a new loop anyway: the trade job's concurrency group cancels the stuck one.
+          # A run can show 'in progress' and save nothing (stuck). If the last "Council run" save on council-data
+          # is over 20 min old, start a new loop anyway: the trade job's concurrency group cancels the stuck one.
           last=$(gh api "repos/${{ github.repository }}/commits?sha=council-data&per_page=50" \
             --jq '[.[] | select(.commit.message | startswith("Council run"))][0].commit.committer.date // empty' || true)
           if [ -z "$last" ]; then echo "No council save found in the last 50 commits: leaving the running loop alone"; exit 0; fi
@@ -118,9 +118,6 @@ jobs:
           # new council code on main since this run started? (council/, ict/, api/ or this workflow) -> hand over between rounds
           newcode() { f=$(gh api "repos/${{ github.repository }}/compare/${{ github.sha }}...main" --jq '.files[].filename' 2>/dev/null) || return 1
             echo "$f" | grep -qE '^(council/|ict/|api/|\.github/workflows/council\.yml)'; }
-          # live runner (8 Nov, council/live.mjs on the owner's VPS): while its heartbeat (data/live.json) is under 3 minutes old it owns
-          # the Trader and the mirror; this loop then skips them (one writer of trades.json) and keeps the heavy members
-          livefresh() { node -e 'try{const h=JSON.parse(require("fs").readFileSync("data/live.json","utf8"));process.exit(Date.now()-Date.parse(h.at)<=180000?0:1)}catch(e){process.exit(1)}'; }
           for i in $(seq 1 $ROUNDS); do
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
@@ -128,16 +125,15 @@ jobs:
             # council/datasync.mjs (9 Nov): pulls with the loop's uncommitted files riding along (a plain pull refused every minute:
             # "You have unstaged changes"), clears a half-done rebase, and on a conflict keeps the council-data copy of that file
             node council/datasync.mjs data pull || true
-            if livefresh; then echo "live runner alive: Trader + mirror left to it this round"; else
+            # (17 Nov 2026: the never-installed VPS live runner and its heartbeat check are gone; this loop always runs the Trader)
             node council/trader.mjs data || echo "Trader round $i failed"
             # cTrader DEMO mirror (8 Nov, owner: "when he places a trade it must go instantly on ctrader"): the very next step after
             # the Trader, so a council fill or pending order reaches the demo within seconds of being recorded; nothing runs in between
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
-            fi
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
-            if [ $((i % 3)) -eq 1 ]; then node council/lit-replay.mjs data || echo "LIT replay round $i failed"; node ict/tracker.mjs data/ict || echo "ICT round $i failed"; livefresh || node council/ctrader-mirror.mjs data || echo "cTrader mirror (ICT) round $i failed"; fi
+            if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; node council/ctrader-mirror.mjs data || echo "cTrader mirror (ICT) round $i failed"; fi
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
@@ -146,6 +142,10 @@ jobs:
             if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/veteran.mjs data || echo "Veteran round $i failed"; fi
             # COT positioning desk (8 Nov): CFTC speculators per market + tested signals → data/macro/cot.json (fetch cached 12 h)
             if [ $((i % 6)) -eq 1 ]; then timeout 90 node council/cot.mjs data || echo "COT round $i failed"; fi
+            # Trade review (17 Nov): the after-the-fact check of the trades taken, system by system (n, t, where the R goes, costs,
+            # demo slippage, session splits) and proposals only → data/research/trade-review.json. Reads files, fetches nothing,
+            # changes no rule; ICT is not read. Every 6th round (~70 min), capped at 60 s; a failure never stops the loop.
+            if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/trade-review.mjs data || echo "Trade review round $i failed"; fi
             # Data-quality monitor (7 Nov): the OANDA proxy, Kraken and the ICT desk's CNBC feed, every 2nd round (~11 min) → health.json
             # and one deduplicated phone alert when a feed goes bad. Read-only for the bots; never fails the round.
             if [ $((i % 2)) -eq 1 ]; then timeout 150 node council/datacheck.mjs data || echo "Data check round $i failed"; fi
@@ -176,14 +176,11 @@ jobs:
               for k in 1 2 3 4; do sleep 60
                 # Quick pass (8 Nov, owner: "start at 2 minutes", then "every minute"): every minute of the wait the Trader looks at the
                 # markets again and the mirror copies what it recorded, so a setup reaches cTrader within about a minute. The heavy
-                # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop. This is the ceiling of the
-                # free setup; the next step is the live runner on a VPS (council/live.mjs), which then takes these passes over.
-                if ! livefresh; then
-                  node council/datasync.mjs data pull || true
-                  node council/trader.mjs data || echo "Trader quick pass $i failed"
-                  node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
-                  node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
-                fi
+                # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
+                node council/datasync.mjs data pull || true
+                node council/trader.mjs data || echo "Trader quick pass $i failed"
+                node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
+                node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true
                 if ! git -C data diff --quiet -- ctrader/account.json 2>/dev/null || [ -n "$(git -C data ls-files --others -- ctrader/account.json)" ]; then

@@ -2,7 +2,7 @@
 // so the nightly replay (backtest.mjs) can read crypto from Kraken, the feed the live Trader trades on, instead of Binance.
 // Why: Kraken's public Trades endpoint answers ~1 call a second at 1,000 trades a call. BTC needs ~175 calls a day, ~5,600 for
 // the replay's 30-day window plus warm-up (about two hours); the nightly replay spends at most 300 calls a coin (and lost its
-// progress whenever a run was cancelled), so BTC's cache could never catch up. This runs from kraken-backfill.yml every 30 min:
+// progress whenever a run was cancelled), so BTC's cache could never catch up. This runs from kraken-backfill.yml once a day (every 30 min until 17 Nov 2026):
 // one runner, calls paced 1.1 s apart, stopped at the time box with each pair's cursor saved (.part.json), resumed next run.
 // Reads and writes only the cache directory; changes no trading rule and no council-data file.
 // Usage: node council/krakenfill.mjs <cacheDir> [days=30] [minutes=25]

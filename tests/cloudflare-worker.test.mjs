@@ -44,18 +44,21 @@ test('cloudflare: headers follow vercel.json, later rules winning', () => {
   assert.equal(match('/(.*)\\.html', '/ahtml'), null);
 });
 
-test('cloudflare: every function of api/ is routed, retired or replaced on purpose', () => {
+test('cloudflare: every function of api/ is routed', () => {
   const src = fs.readFileSync('cloudflare/src/worker.mjs', 'utf8');
   const names = fs.readdirSync('api').filter((f) => !f.startsWith('_') && /\.m?js$/.test(f)).map((f) => f.replace(/\.m?js$/, ''));
   for (const n of names) {
     const routed = src.includes(`from '../../api/${n}.js'`);
-    const special = n === 'og' || new RegExp(`\\b${n}: '`).test(src.split('const GONE')[1] || '');
-    assert.ok(routed || special, `api/${n} is neither routed nor named in the worker`);
+    assert.ok(routed, `api/${n} is not routed in the worker`);
   }
-  // The cron secret is sent, and only the two jobs that work on Workers are scheduled.
+  // 17 Nov 2026: api/run.js and api/og.mjs are gone; an old /api/og link gets the static preview card.
+  assert.doesNotMatch(src, /const GONE/);
+  assert.match(src, /name === 'og'\) return Response\.redirect\(new URL\('\/icons\/og-card\.png'/);
+  assert.ok(fs.existsSync('icons/og-card.png'));
+  // The cron secret is sent, and only the 10-minute job is scheduled (17 Nov 2026: the minute price-alert cron is gone).
   const wr = fs.readFileSync('cloudflare/wrangler.jsonc', 'utf8');
-  assert.match(wr, /"crons": \["\* \* \* \* \*", "\*\/10 \* \* \* \*"\]/);
-  assert.match(src, /'\* \* \* \* \*': '\/api\/alert-cron'/);
+  assert.match(wr, /"crons": \["\*\/10 \* \* \* \*"\]/);
+  assert.doesNotMatch(src, /alert-cron|'\* \* \* \* \*'/);
   assert.match(src, /'\*\/10 \* \* \* \*': '\/api\/edge-analyst\?job=scan'/);
   assert.match(src, /Bearer \$\{env\.CRON_SECRET/);
   // No secret in the config file.

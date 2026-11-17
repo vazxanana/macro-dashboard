@@ -32,6 +32,12 @@
 //   ACADEMY_LLM_MAX_TOKENS     output cap per commentary call (default 700)
 //   ACADEMY_LLM_ANALYST_MAX_TOKENS   output cap per analyst call (default 4000; a model that reasons before answering spends
 //                              output tokens on that too)
+//   (17 Nov 2026) A caller with its own cap (the edge analyst, the trade reviewer, the ChronosTrade coach) passes cap: 'feature'
+//   and its maxTokens, read from its own variable: up to OUT_CEILING. A model that always reasons before it answers counts that
+//   reasoning as output, so a small cap can end the call with stop 'length' and no usable answer; an answer cut at the cap is
+//   returned with stop 'length' and is NEVER cached (the next ask, after the cap is raised, is a new call). The reasoning effort
+//   is set without a code change through ACADEMY_LLM_BODY, e.g. {"output_config":{"effort":"low"}}: it is merged with the
+//   adapter's own output_config.format when ACADEMY_LLM_JSON_SCHEMA is on.
 //   ACADEMY_LLM_TIMEOUT_MS     time allowed for one call, retries included (default 45000)
 //   ACADEMY_LLM_RETRIES        retries after a 408 / 429 / 5xx / 529 answer or a failed connection (default 1, at most 3)
 //
@@ -43,12 +49,18 @@
 // when it reports none. A call the provider refused (an HTTP error) is not billed and gives its reservation back. A call that
 // timed out may have been billed: its estimate stays in the ledger. Out of budget -> { skipped: 'budget' }, no call.
 // The key is sent in one request header and nowhere else: it is cut out of every error text before it is returned.
+//
+// Streaming (17 Nov 2026, ChronosTrade's coach: "he needs to be faster"): stream(req, d, onText) is complete() with the text
+// handed over as the provider writes it ('messages' format: `stream: true`, server-sent events; thinking deltas are never handed
+// over). Same reservation, ledger correction, refusal and output-cap handling; a stream that breaks off or times out after it
+// started keeps its reservation as billed. req.cacheSystem marks the system text for the provider's prompt cache.
 'use strict';
 const crypto = require('node:crypto');
 
 const CACHE_KEY = 'llm-cache.json', COST_KEY = 'cost.json', CACHE_MAX = 200, PROMPT_MAX = 24000, PROMPT_MAX_LONG = 80000, TEXT_MAX = 20000;
 const API_VERSION = '2026-10-21', VERSION_HEADER = 'anthropic-version';   // the 'messages' wire format needs a version header on every request
 const RETRY_STATUS = [408, 429, 500, 502, 503, 504, 529], RETRY_WAIT_MS = 400, RETRY_AFTER_MAX_S = 8;
+const OUT_CEILING = 16000;   // the most output a 'feature' caller may ask for in one call
 const RESERVED_BODY = ['model', 'messages', 'system', 'stream', 'max_tokens', 'max_completion_tokens', 'n'];
 const FAKE_PROVIDER = 'fake-test';   // reserved: only a dependency injected by the local dev server or a test may carry this label
 const INFLIGHT = new Map();   // prompt hash -> the promise of the one call in flight
@@ -131,8 +143,12 @@ function request(C, q, legacyPrompt, legacyMaxOut) {
   const more = { ...(C.body || {}) }; for (const k of RESERVED_BODY) delete more[k];
   let body;
   if (C.format === 'messages') {
-    body = { ...more, model: C.model, max_tokens: q.maxOut, ...(q.system ? { system: q.system } : {}), messages: [{ role: 'user', content: q.prompt }] };
+    // cacheSystem: the fixed system text as one block marked for the provider's prompt cache (a repeated call reads it from the
+    // cache; a text under the provider's minimum cacheable length is simply not cached)
+    const sys = q.system ? (q.cacheSystem ? [{ type: 'text', text: q.system, cache_control: { type: 'ephemeral' } }] : q.system) : null;
+    body = { ...more, model: C.model, max_tokens: q.maxOut, ...(sys ? { system: sys } : {}), messages: [{ role: 'user', content: q.prompt }] };
     if (q.schema && C.jsonSchema) body.output_config = { ...(isObj(more.output_config) ? more.output_config : {}), format: { type: 'json_schema', schema: q.schema } };
+    if (q.stream) body.stream = true;   // only the adapter's own stream() sets it (ACADEMY_LLM_BODY can never switch it on)
   } else {
     body = { ...more, model: C.model, [C.tokensField || 'max_tokens']: q.maxOut, messages: [...(q.system ? [{ role: C.systemRole || 'system', content: q.system }] : []), { role: 'user', content: q.prompt }] };
     if (q.schema && C.jsonSchema) body.response_format = { type: 'json_schema', json_schema: { name: q.schemaName || 'answer', strict: true, schema: q.schema } };
@@ -165,10 +181,67 @@ const costOf = (C, u) => r6(((u.tokensIn - u.cacheRead - u.cacheWrite) * C.inPri
 function errorOf(j) { const e = j && isObj(j.error) ? j.error : null; return e ? { type: typeof e.type === 'string' ? e.type : typeof e.code === 'string' ? e.code : null, message: typeof e.message === 'string' ? e.message : null } : { type: null, message: j && typeof j.error === 'string' ? j.error : null }; }
 const header = (r, name) => { try { return r && r.headers && typeof r.headers.get === 'function' ? r.headers.get(name) : null; } catch (e) { return null; } };
 
+// ---- streaming ('messages' format) ------------------------------------------------------------------------------------------
+// The provider answers with server-sent events. Only text reaches the caller: a text_delta is handed to onText as it arrives;
+// thinking / signature deltas (a model that reasons first) are ignored. message_start carries the input usage and the model,
+// message_delta the stop reason and the output usage (cumulative), an `error` event a failure in the middle of the answer.
+function sseApply(acc, ev, emit) {
+  let j; try { j = JSON.parse(ev.data); } catch (e) { return; }
+  const type = (j && j.type) || ev.event, n = (v) => { const x = Number(v); return v != null && Number.isFinite(x) && x >= 0 ? x : null; };
+  if (type === 'message_start' && isObj(j.message)) {
+    const m = j.message, u = m.usage || {}; if (typeof m.model === 'string') acc.model = m.model.slice(0, 120);
+    if (n(u.input_tokens) != null) acc.tokensIn = n(u.input_tokens); acc.cacheRead = n(u.cache_read_input_tokens) || acc.cacheRead; acc.cacheWrite = n(u.cache_creation_input_tokens) || acc.cacheWrite;
+    if (n(u.output_tokens) != null) acc.tokensOut = n(u.output_tokens);
+  } else if (type === 'content_block_start' && isObj(j.content_block)) {
+    if (j.content_block.type === 'text' && typeof j.content_block.text === 'string' && j.content_block.text) emit(j.content_block.text);
+  } else if (type === 'content_block_delta' && isObj(j.delta)) {
+    if (j.delta.type === 'text_delta' && typeof j.delta.text === 'string') emit(j.delta.text);   // thinking_delta, signature_delta: not text
+  } else if (type === 'message_delta') {
+    const dl = j.delta || {}, u = j.usage || {}; if (dl.stop_reason != null) acc.stopRaw = String(dl.stop_reason); if (isObj(dl.stop_details)) acc.stopDetails = dl.stop_details;
+    if (n(u.output_tokens) != null) acc.tokensOut = n(u.output_tokens); if (n(u.input_tokens) != null) acc.tokensIn = n(u.input_tokens);
+    if (n(u.cache_read_input_tokens) != null) acc.cacheRead = n(u.cache_read_input_tokens); if (n(u.cache_creation_input_tokens) != null) acc.cacheWrite = n(u.cache_creation_input_tokens);
+  } else if (type === 'error') { const e = errorOf(j); acc.error = { type: e.type || 'stream_error', message: e.message }; }
+}
+// a whole SSE text (or the events of one chunk) -> [{ event, data }]; `rest` = an unfinished event at the end
+function sseSplit(text) {
+  const parts = String(text).split(/\r?\n\r?\n/), rest = parts.pop(), out = [];
+  for (const p of parts) { let event = '', data = []; for (const line of p.split(/\r?\n/)) { if (line.startsWith('event:')) event = line.slice(6).trim(); else if (line.startsWith('data:')) data.push(line.slice(5).replace(/^ /, '')); } if (data.length) out.push({ event, data: data.join('\n') }); }
+  return { events: out, rest };
+}
+// the parts of a response body: a web ReadableStream, an async iterable, or a whole string
+async function* chunksOf(body) {
+  if (body == null) return;
+  if (typeof body === 'string' || body instanceof Uint8Array) { yield body; return; }
+  if (typeof body.getReader === 'function') { const rd = body.getReader(); try { for (;;) { const { done, value } = await rd.read(); if (done) return; yield value; } } finally { try { rd.releaseLock(); } catch (e) { /* already released */ } } }
+  if (body[Symbol.asyncIterator]) { for await (const c of body) yield c; }
+}
+// read the stream of one successful response -> { ok: true, j, first, total } | { ok: false, midStream, billed: true, timeout, type, message, partial, j }
+async function readStream(r, sink, t0) {
+  const acc = { text: '', tokensIn: null, cacheRead: 0, cacheWrite: 0, tokensOut: null, stopRaw: null, stopDetails: null, model: null, error: null };
+  const dec = new TextDecoder(); let buf = '', first = null;
+  const emit = (t) => { if (!t || acc.text.length >= TEXT_MAX) return; if (first == null) first = Date.now() - t0; const add = t.slice(0, TEXT_MAX - acc.text.length); acc.text += add; try { sink(add); } catch (e) { /* the caller's display is not the stream */ } };
+  const j = () => ({ model: acc.model, stop_reason: acc.stopRaw, ...(acc.stopDetails ? { stop_details: acc.stopDetails } : {}), content: [{ type: 'text', text: acc.text }],
+    usage: { ...(acc.tokensIn != null ? { input_tokens: acc.tokensIn, cache_read_input_tokens: acc.cacheRead, cache_creation_input_tokens: acc.cacheWrite } : {}), ...(acc.tokensOut != null ? { output_tokens: acc.tokensOut } : {}) } });
+  try {
+    for await (const c of chunksOf(r.body)) {
+      buf += typeof c === 'string' ? c : dec.decode(c, { stream: true });
+      const { events, rest } = sseSplit(buf); buf = rest;
+      for (const ev of events) { sseApply(acc, ev, emit); if (acc.error) break; }
+      if (acc.error) break;
+    }
+    if (!acc.error && buf.trim()) for (const ev of sseSplit(buf + '\n\n').events) sseApply(acc, ev, emit);
+  } catch (e) {
+    const timeout = !!e && (e.name === 'TimeoutError' || e.name === 'AbortError');
+    return { ok: false, midStream: true, billed: true, timeout, status: 200, type: timeout ? 'timeout' : 'stream_broken', message: null, retryAfterS: null, partial: acc.text, first, total: Date.now() - t0, j: j() };
+  }
+  if (acc.error) return { ok: false, midStream: true, billed: true, timeout: false, status: 200, type: acc.error.type, message: acc.error.message, retryAfterS: null, partial: acc.text, first, total: Date.now() - t0, j: j() };
+  return { ok: true, j: j(), first, total: Date.now() - t0 };
+}
+
 // One call with a bounded retry. A 408 / 429 / 5xx / 529 answer or a failed connection is tried again (C.retries times, inside
 // the one time limit), waiting for Retry-After when the provider names a short one. A retry reserves nothing more: the first
 // reservation stands for the whole call. -> { ok, j, attempts } | { ok: false, status, type, message, retryAfterS, billed, timeout, attempts }
-async function send(C, rq, d) {
+async function send(C, rq, d, sink) {
   const F = d.fetch || fetch, sleep = d.sleep || ((ms) => new Promise((r) => setTimeout(r, ms))), t0 = Date.now(), left = () => C.timeoutMs - (Date.now() - t0);
   let last = { ok: false, status: 0, type: null, message: null, retryAfterS: null, billed: false, timeout: false }, attempts = 0;
   for (let n = 0; n <= C.retries; n++) {
@@ -183,6 +256,7 @@ async function send(C, rq, d) {
       if (n < C.retries) await sleep(Math.min(RETRY_WAIT_MS * 2 ** n, Math.max(0, left() - 500)));
       continue;
     }
+    if (r && r.ok && sink) return { ...(await readStream(r, sink, t0)), attempts, requestId: header(r, 'request-id') || header(r, 'x-request-id') };
     if (r && r.ok) { try { return { ok: true, j: await r.json(), attempts, requestId: header(r, 'request-id') || header(r, 'x-request-id') }; } catch (e) { return { ok: false, status: r.status || 200, type: 'unreadable', message: null, retryAfterS: null, billed: true, timeout: false, attempts }; } }
     let j = null; try { j = r && typeof r.json === 'function' ? await r.json() : null; } catch (e) { j = null; }
     const err = errorOf(j), status = (r && r.status) || 0, ra = parseFloat(header(r, 'retry-after'));
@@ -205,41 +279,66 @@ async function send(C, rq, d) {
 //   { available: true, text, stop, cached, deduped?, usage: { tokensIn, tokensOut, estimated }, costUsd, provider, model }
 //   fresh: true skips the answer cache (a new call is made and billed).
 async function complete(req, d = {}) {
+  const P = prep(req, d); if (P.early) return P.early;
+  const { C, q } = P;
+  if (INFLIGHT.has(q.h)) return INFLIGHT.get(q.h).then((r) => (r && r.text != null ? { ...r, deduped: true } : r));
+  const p = run(C, q, d).finally(() => INFLIGHT.delete(q.h));
+  INFLIGHT.set(q.h, p); return p;
+}
+// the checks every call makes before anything is reserved or sent -> { early } (an answer without a call) | { C, q }
+function prep(req, d) {
   const env = d.env || process.env, C = config(env), why = unavailable(C);
-  if (why) return { available: false, reason: why };
-  const store = d.store; if (!store) throw new Error('the adapter needs the store for its cost ledger');
+  if (why) return { early: { available: false, reason: why } };
+  if (!d.store) throw new Error('the adapter needs the store for its cost ledger');
   const system = String((req && req.system) || ''), prompt = String((req && req.prompt) || '').trim();
-  if (!prompt) return { available: true, skipped: 'empty' };
+  if (!prompt) return { early: { available: true, skipped: 'empty' } };
   const limit = req && req.long ? PROMPT_MAX_LONG : PROMPT_MAX;
-  if (system.length + prompt.length > limit) return { available: true, skipped: 'too-long', limitChars: limit };
-  const top = req && req.cap === 'analyst' ? C.analystMaxOut : C.maxOut, maxOut = Math.max(16, Math.min(top, Math.round(pos(req && req.maxTokens, top))));
+  if (system.length + prompt.length > limit) return { early: { available: true, skipped: 'too-long', limitChars: limit } };
+  const top = req && req.cap === 'analyst' ? C.analystMaxOut : req && req.cap === 'feature' ? OUT_CEILING : C.maxOut, maxOut = Math.max(16, Math.min(top, Math.round(pos(req && req.maxTokens, top))));
   const schema = req && isObj(req.schema) ? req.schema : null;
   const h = crypto.createHash('sha256').update(JSON.stringify([C.url, C.model, C.format, system, prompt, maxOut, schema && C.jsonSchema ? 1 : 0])).digest('hex').slice(0, 40);
-  if (INFLIGHT.has(h)) return INFLIGHT.get(h).then((r) => (r && r.text != null ? { ...r, deduped: true } : r));
-  const p = run(C, { system, prompt, maxOut, h, schema, schemaName: req && req.schemaName, fresh: !!(req && req.fresh) }, d).finally(() => INFLIGHT.delete(h));
-  INFLIGHT.set(h, p); return p;
+  return { C, q: { system, prompt, maxOut, h, schema, schemaName: req && req.schemaName, fresh: !!(req && req.fresh), cacheSystem: !!(req && req.cacheSystem) } };
 }
-async function run(C, q, d) {
+// stream(req, d, onText): the same call as complete(), with the answer's text handed to onText(piece) as the provider writes it
+// ('messages' format; the 'chat' format makes one ordinary call and hands the whole text over at once). Same budget reservation,
+// ledger correction, cache and answer shape as complete(), plus ms: { first, total } (milliseconds to the first text and to the
+// end). A stream that breaks off or times out in the middle may have been billed: its estimate stays in the ledger (unconfirmed)
+// and the answer is an error with the text received so far in `partial` (never cached, never shown as an answer).
+// A stream is never shared with another caller in flight (each caller has its own display).
+async function stream(req, d = {}, onText) {
+  const t0 = Date.now(), sink = typeof onText === 'function' ? onText : () => {};
+  const P = prep(req, d); if (P.early) return P.early;
+  const { C, q } = P;
+  if (C.format !== 'messages') { const r = await run(C, q, d); if (r && r.text) { try { sink(r.text); } catch (e) { /* display only */ } } return r && r.available ? { ...r, ms: { first: r.text ? Date.now() - t0 : null, total: Date.now() - t0 } } : r; }
+  return run(C, { ...q, stream: true }, d, sink, t0);
+}
+async function run(C, q, d, sink, t00) {
+  const t0 = t00 || Date.now(), msOf = (o) => (sink ? { ms: { first: o && o.first != null ? o.first : null, total: Date.now() - t0 } } : {});
   const store = d.store, clock = d.now || Date.now, provider = providerOf(C, d);
   const clean = (s) => (s == null ? null : String(s).split(C.key).join('[key removed]').replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, 300));
   if (!q.fresh) {
     const cache = await store.get(CACHE_KEY, { v: 1, rows: [] }), hit = cache && Array.isArray(cache.rows) ? cache.rows.find((r) => r && r.h === q.h) : null;
-    if (hit) { await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { cacheHits: 1 })); return { available: true, text: hit.text, stop: hit.stop || null, cached: true, usage: hit.usage || null, costUsd: 0, provider: hit.provider || provider, model: hit.model || null }; }
+    if (hit) { await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { cacheHits: 1 })); if (sink) { try { sink(hit.text); } catch (e) { /* display only */ } } return { available: true, text: hit.text, stop: hit.stop || null, cached: true, usage: hit.usage || null, costUsd: 0, provider: hit.provider || provider, model: hit.model || null, ...msOf({ first: Date.now() - t0 }) }; }
   }
   const E = estimate(C, q.system, q.prompt, q.maxOut), estIn = E.tokensIn, est = E.usd;
   let scope = null;
   await store.update(COST_KEY, emptyLedger(), (raw) => { const L = ledgerOf(raw), now = clock(); scope = over(L, C, now, est); return scope ? bump(L, now, { skipped: 1 }) : bump(L, now, { usd: est, requests: 1 }); });
   if (scope) return { available: true, skipped: 'budget', scope, estimateUsd: est };
-  const out0 = await send(C, request(C, q), d);
+  const out0 = await send(C, request(C, q), d, sink);
+  if (!out0.ok && out0.midStream) {   // the answer started and broke off (or timed out): it may be billed, the estimate stays
+    await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { errors: 1, unconfirmed: 1, ...(out0.attempts > 1 ? { retries: out0.attempts - 1 } : {}) }));
+    return { available: true, status: 200, error: out0.timeout ? 'the language-model call timed out in the middle of the answer' : 'the language-model answer broke off', ...(out0.type ? { errorType: clean(out0.type) } : {}), ...(out0.message ? { detail: clean(out0.message) } : {}),
+      partial: String(out0.partial || '').slice(0, TEXT_MAX), attempts: out0.attempts, provider, costUsd: est, costEstimated: true, ...msOf(out0) };
+  }
   if (!out0.ok) {
     const more = { ...(out0.attempts > 1 ? { retries: out0.attempts - 1 } : {}) };
     const base = { available: true, status: out0.status, ...(out0.type ? { errorType: clean(out0.type) } : {}), ...(out0.message ? { detail: clean(out0.message) } : {}), ...(out0.retryAfterS != null ? { retryAfterS: out0.retryAfterS } : {}), ...(out0.requestId ? { requestId: clean(out0.requestId) } : {}), attempts: out0.attempts, provider };   // requestId: the provider's own id of the failed request, for its support
     if (out0.billed) {   // sent, and its cost is not known: the estimate stays in the ledger rather than under-counting
       await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { errors: 1, unconfirmed: 1, ...more }));
-      return { ...base, error: out0.timeout ? 'the language-model call timed out' : 'the language model returned an answer that could not be read', costUsd: est, costEstimated: true };
+      return { ...base, error: out0.timeout ? 'the language-model call timed out' : 'the language model returned an answer that could not be read', costUsd: est, costEstimated: true, ...msOf(null) };
     }
     await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { usd: -est, requests: -1, errors: 1, ...more }));
-    return { ...base, error: 'the language-model call failed' };
+    return { ...base, error: 'the language-model call failed', ...msOf(null) };
   }
   const out = parse(out0.j);
   // the call was made: charge what the provider reports, or the estimate when it reports nothing
@@ -247,9 +346,18 @@ async function run(C, q, d) {
   const cost = costOf(C, { tokensIn, tokensOut, cacheRead: out.tokensIn != null ? out.cacheRead : 0, cacheWrite: out.tokensIn != null ? out.cacheWrite : 0 });
   await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { usd: cost - est, tokensIn, tokensOut, ...(out.text ? {} : { errors: 1 }), ...(out0.attempts > 1 ? { retries: out0.attempts - 1 } : {}) }));
   const usage = { tokensIn, tokensOut, estimated, ...(out.cacheRead ? { cacheRead: out.cacheRead } : {}), ...(out.cacheWrite ? { cacheWrite: out.cacheWrite } : {}) };
-  if (!out.text) return { available: true, error: out.stop === 'refusal' ? 'the provider declined to answer' : out.stop === 'length' ? 'the answer was cut off at the output cap before any text' : 'the language model returned no text', status: 200, stop: out.stop, ...(out.refusal ? { detail: clean(out.refusal) } : {}), usage, costUsd: cost, provider, model: out.model };
-  await store.update(CACHE_KEY, { v: 1, rows: [] }, (c) => { const rows = (c && Array.isArray(c.rows) ? c.rows : []).filter((r) => r && r.h !== q.h).concat({ h: q.h, at: new Date(clock()).toISOString(), text: out.text, usage, stop: out.stop, provider, model: out.model }); return { v: 1, rows: rows.slice(-CACHE_MAX) }; });
-  return { available: true, text: out.text, stop: out.stop, cached: false, usage, costUsd: cost, provider, model: out.model, ...(out0.attempts > 1 ? { attempts: out0.attempts } : {}) };
+  if (!out.text) return { available: true, error: out.stop === 'refusal' ? 'the provider declined to answer' : out.stop === 'length' ? 'the answer was cut off at the output cap before any text' : 'the language model returned no text', status: 200, stop: out.stop, ...(out.refusal ? { detail: clean(out.refusal) } : {}), usage, costUsd: cost, provider, model: out.model, ...msOf(out0) };
+  if (out.stop !== 'length') await store.update(CACHE_KEY, { v: 1, rows: [] }, (c) => { const rows = (c && Array.isArray(c.rows) ? c.rows : []).filter((r) => r && r.h !== q.h).concat({ h: q.h, at: new Date(clock()).toISOString(), text: out.text, usage, stop: out.stop, provider, model: out.model }); return { v: 1, rows: rows.slice(-CACHE_MAX) }; });
+  return { available: true, text: out.text, stop: out.stop, cached: false, usage, costUsd: cost, provider, model: out.model, ...(out0.attempts > 1 ? { attempts: out0.attempts } : {}), ...msOf(out0) };
 }
 
-module.exports = { config, unavailable, providerOf, estimateTokens, estimate, complete, status, emptyLedger, COST_KEY, CACHE_KEY, API_VERSION, VERSION_HEADER, FAKE_PROVIDER, PROMPT_MAX, PROMPT_MAX_LONG, _inflight: INFLIGHT, _t: { parse, request, over, bump, ledgerOf, send, errorOf, costOf } };
+// A feature caller's view of an answer cut at the output cap: it is billed and not usable, so it becomes an error that names the
+// variable to raise (the caller then stores it as refused, never pays for it twice). Any other answer is returned as it is.
+function cutAtCap(ans, capVar) {
+  if (!ans || ans.stop !== 'length' || ans.error) return ans;
+  return { ...ans, text: undefined, cut: true, error: `the answer was cut off at the output cap (${capVar}): raise it, or lower the reasoning effort in ACADEMY_LLM_BODY` };
+}
+// a feature's output cap from its own variable (default d, 256 to OUT_CEILING)
+const featureCap = (v, d) => clamp(pos(v, d), 256, OUT_CEILING);
+
+module.exports = { OUT_CEILING, cutAtCap, featureCap, config, unavailable, providerOf, estimateTokens, estimate, complete, stream, status, emptyLedger, COST_KEY, CACHE_KEY, API_VERSION, VERSION_HEADER, FAKE_PROVIDER, PROMPT_MAX, PROMPT_MAX_LONG, _inflight: INFLIGHT, _t: { parse, request, over, bump, ledgerOf, send, errorOf, costOf, sseSplit, sseApply, readStream } };
