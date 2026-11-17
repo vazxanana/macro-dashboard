@@ -56,7 +56,7 @@ jobs:
         env:
           ICT_REPLAY_REBUILD: ${{ github.event.inputs.rebuild == 'true' && 'on' || 'off' }}
           # the paper silver market's candles (ict/tracker.mjs MD_BARS; its default host is the retired meridianx.dev)
-          ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+          ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
         run: node ict/replay.mjs data/ict "${{ github.event.inputs.from || '2025-08-01' }}"
       - name: Save to council-data
         run: |

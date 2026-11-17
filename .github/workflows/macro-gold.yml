@@ -27,7 +27,7 @@ concurrency:
 # The site's candle service (run.mjs `MD_BASE`): the Cloudflare Worker since 16 Nov 2026; the repository variable MD_ORIGIN
 # (scheme + host) overrides it.
 env:
-  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
 
 jobs:
   macro-gold:

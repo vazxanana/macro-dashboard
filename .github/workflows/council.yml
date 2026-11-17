@@ -27,10 +27,10 @@ on:
 # Worker's own address, which keeps working after the move. The repository variable MD_ORIGIN (scheme + host, no slash)
 # overrides it.
 env:
-  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
   # The ICT tracker's paper silver market reads the same service (ict/tracker.mjs `MD_BARS`); set here, not in the tracker, so the
   # tracker's code (and the ICT replay's ruleCode) does not change for an address.
-  ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+  ICT_MD_BARS: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
 
 permissions:
   contents: write
