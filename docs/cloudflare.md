@@ -56,7 +56,7 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
    `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `STORE`, `STORE_MIRROR`, `MCP_KEYS`, `MCP_ORIGINS`,
    `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
-   `EDGE_ANALYST`, `TRADE_REVIEW*`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
+   `EDGE_ANALYST`, `TRADE_REVIEW*`, `CHRONOS_*`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
    `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and
    `COUNCIL_ALERTS` are read by the council on GitHub Actions, not by the Worker.)
 3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store, reached over HTTPS with the same tokens, so both sites read and write the same data.
@@ -198,3 +198,17 @@ Move meridianx.dev's DNS to Cloudflare, add the Worker as its custom domain, rec
 paths, writes outside /api, rate limits: /cdata 600 / min, /api 30 / min, /md 900 / min per IP; no timed blocks;
 no bot challenge on `/cdata/mt5/signals.csv`, the broker bridges read it without a browser). Keep Vercel running a
 week, then pause the project.
+
+## The language-model provider's secrets (17 Nov 2026)
+
+The edge analyst, the trade reviewer and ChronosTrade's AI coach call a Messages API provider through
+`api/_academy-llm.js`. The owner adds, in the Cloudflare dashboard (Workers & Pages → `meridianx` → Settings → Variables
+and Secrets → Add, type **Secret**), or with `npx wrangler secret put <NAME>` in `cloudflare/`:
+`ACADEMY_LLM_KEY` (the API key), `ACADEMY_LLM_URL` = `https://api.anthropic.com/v1/messages`, `ACADEMY_LLM_MODEL` = the
+model id from the provider's model list, `ACADEMY_LLM_FORMAT` = `messages`, `ACADEMY_LLM_USD_PER_MTOK_IN` = `4`,
+`ACADEMY_LLM_USD_PER_MTOK_OUT` = `20`, `ACADEMY_LLM_USD_PER_MTOK_CACHE_READ` = `0.2`,
+`ACADEMY_LLM_USD_PER_MTOK_CACHE_WRITE` = `5`, and (recommended) `ACADEMY_LLM_BODY` = `{"output_config":{"effort":"low"}}`.
+**All as Secrets, also the ones that are not secret:** `wrangler deploy` (the deploy workflow) sets the Worker's plain-text
+variables to what `wrangler.jsonc` lists unless `keep_vars` is on, so a plain-text variable added in the dashboard disappears
+at the next deploy; secrets survive deploys. Never write a value into `wrangler.jsonc`. Details and the per-feature budgets:
+docs/academy/LLM.md, section 11.

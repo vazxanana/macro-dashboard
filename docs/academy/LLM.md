@@ -287,3 +287,49 @@ section 3 (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`, …) but keeps its ow
 `cost.json` and `llm-cache.json`) and its own budgets (`EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
 `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12), so it can never spend the Academy's allowance or the other way round.
 `EDGE_ANALYST=off` or `EDGE_LLM_STOP=1` stops it. Owner decision 47 records the paid key.
+
+**17 Nov 2026: output caps raised.** A model that always reasons before it answers counts that reasoning as output tokens,
+and only the text that follows is the answer. At 900 output tokens the edge analyst's answer could be cut off by the
+reasoning (stop `length`, billed, stored as refused). The edge analyst now asks with `EDGE_LLM_MAX_TOKENS` (default 4000)
+and the trade reviewer (`api/trade-review.js`) with `TRADE_REVIEW_LLM_MAX_TOKENS` (default 8000), both through the
+adapter's `cap: 'feature'` (256 to 16000). An answer cut at the cap is never cached and never taken: the caller stores it as
+refused with a line naming the variable to raise (`cutAtCap`). The estimate reserves the WHOLE cap at the output price, so
+at the prices below a 4000-token call reserves about $0.08 and an 8000-token one about $0.16 plus the input; the real cost
+replaces the reservation after the call.
+
+## 11. Connecting the Messages API provider (17 Nov 2026)
+
+The adapter speaks the Messages API wire format (`ACADEMY_LLM_FORMAT=messages`: key in `x-api-key`, an API version
+header, the answer read from the `text` blocks of `content[]`; reasoning blocks come back with an empty text and are
+skipped; a `refusal` stop reason is reported as "the provider declined to answer"). Three features use it: the edge
+analyst, the trade reviewer and ChronosTrade's AI coach (`api/chronos-coach.js`, CLAUDE.md "AI coach (17 Nov 2026)"); the
+Academy analyst too when its key is set. They share the provider settings and keep their own budgets.
+
+**Where to set them.** Cloudflare dashboard → Workers & Pages → `meridianx` → Settings → Variables and Secrets → Add →
+type **Secret** (or `npx wrangler secret put <NAME>` in `cloudflare/`). Use Secret for every one of them, also the values
+that are not secret: `wrangler deploy` (the deploy workflow) replaces the Worker's plain-text variables with what
+`wrangler.jsonc` lists unless `keep_vars` is set, so a plain-text variable added in the dashboard is dropped by the next
+deploy; secrets are kept. Never put a value in `wrangler.jsonc` or in a commit.
+
+| Secret | Value |
+|---|---|
+| `ACADEMY_LLM_KEY` | the provider's API key (only in the dashboard or `wrangler secret put`, never in a chat or a file) |
+| `ACADEMY_LLM_URL` | `https://api.anthropic.com/v1/messages` |
+| `ACADEMY_LLM_MODEL` | the model id from the provider's model list |
+| `ACADEMY_LLM_FORMAT` | `messages` |
+| `ACADEMY_LLM_USD_PER_MTOK_IN` | `4` |
+| `ACADEMY_LLM_USD_PER_MTOK_OUT` | `20` |
+| `ACADEMY_LLM_USD_PER_MTOK_CACHE_READ` | `0.2` |
+| `ACADEMY_LLM_USD_PER_MTOK_CACHE_WRITE` | `5` |
+| `ACADEMY_LLM_BODY` (recommended) | `{"output_config":{"effort":"low"}}` |
+
+`ACADEMY_LLM_BODY` sets the reasoning effort without a code change: less reasoning, fewer output tokens, a faster answer
+(the Worker's call is limited to `ACADEMY_LLM_TIMEOUT_MS`, at most 55 s). With `ACADEMY_LLM_JSON_SCHEMA=1` the adapter adds
+its own `output_config.format` beside the effort (the two are merged); the body can never replace the model, the messages,
+the system text or the output cap. Set the prices before anything else: the defaults (10 / 50) are high on purpose and make
+every reservation larger. Optional per feature: `EDGE_LLM_*`, `TRADE_REVIEW_LLM_*`, `CHRONOS_LLM_*` (budgets, call caps,
+output caps) and the off switches `EDGE_ANALYST=off`, `TRADE_REVIEW=off`, `CHRONOS_COACH=off`. A changed secret takes
+effect at once.
+
+Check after setting them: the Council → Review cards and ChronosTrade's "How you trade" card stop saying "off"; each
+feature's cost appears in its own ledger (`GET /api/edge-analyst`, `/api/trade-review`, `/api/chronos-coach`).

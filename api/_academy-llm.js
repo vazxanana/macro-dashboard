@@ -32,6 +32,12 @@
 //   ACADEMY_LLM_MAX_TOKENS     output cap per commentary call (default 700)
 //   ACADEMY_LLM_ANALYST_MAX_TOKENS   output cap per analyst call (default 4000; a model that reasons before answering spends
 //                              output tokens on that too)
+//   (17 Nov 2026) A caller with its own cap (the edge analyst, the trade reviewer, the ChronosTrade coach) passes cap: 'feature'
+//   and its maxTokens, read from its own variable: up to OUT_CEILING. A model that always reasons before it answers counts that
+//   reasoning as output, so a small cap can end the call with stop 'length' and no usable answer; an answer cut at the cap is
+//   returned with stop 'length' and is NEVER cached (the next ask, after the cap is raised, is a new call). The reasoning effort
+//   is set without a code change through ACADEMY_LLM_BODY, e.g. {"output_config":{"effort":"low"}}: it is merged with the
+//   adapter's own output_config.format when ACADEMY_LLM_JSON_SCHEMA is on.
 //   ACADEMY_LLM_TIMEOUT_MS     time allowed for one call, retries included (default 45000)
 //   ACADEMY_LLM_RETRIES        retries after a 408 / 429 / 5xx / 529 answer or a failed connection (default 1, at most 3)
 //
@@ -49,6 +55,7 @@ const crypto = require('node:crypto');
 const CACHE_KEY = 'llm-cache.json', COST_KEY = 'cost.json', CACHE_MAX = 200, PROMPT_MAX = 24000, PROMPT_MAX_LONG = 80000, TEXT_MAX = 20000;
 const API_VERSION = '2026-10-21', VERSION_HEADER = 'anthropic-version';   // the 'messages' wire format needs a version header on every request
 const RETRY_STATUS = [408, 429, 500, 502, 503, 504, 529], RETRY_WAIT_MS = 400, RETRY_AFTER_MAX_S = 8;
+const OUT_CEILING = 16000;   // the most output a 'feature' caller may ask for in one call
 const RESERVED_BODY = ['model', 'messages', 'system', 'stream', 'max_tokens', 'max_completion_tokens', 'n'];
 const FAKE_PROVIDER = 'fake-test';   // reserved: only a dependency injected by the local dev server or a test may carry this label
 const INFLIGHT = new Map();   // prompt hash -> the promise of the one call in flight
@@ -212,7 +219,7 @@ async function complete(req, d = {}) {
   if (!prompt) return { available: true, skipped: 'empty' };
   const limit = req && req.long ? PROMPT_MAX_LONG : PROMPT_MAX;
   if (system.length + prompt.length > limit) return { available: true, skipped: 'too-long', limitChars: limit };
-  const top = req && req.cap === 'analyst' ? C.analystMaxOut : C.maxOut, maxOut = Math.max(16, Math.min(top, Math.round(pos(req && req.maxTokens, top))));
+  const top = req && req.cap === 'analyst' ? C.analystMaxOut : req && req.cap === 'feature' ? OUT_CEILING : C.maxOut, maxOut = Math.max(16, Math.min(top, Math.round(pos(req && req.maxTokens, top))));
   const schema = req && isObj(req.schema) ? req.schema : null;
   const h = crypto.createHash('sha256').update(JSON.stringify([C.url, C.model, C.format, system, prompt, maxOut, schema && C.jsonSchema ? 1 : 0])).digest('hex').slice(0, 40);
   if (INFLIGHT.has(h)) return INFLIGHT.get(h).then((r) => (r && r.text != null ? { ...r, deduped: true } : r));
@@ -248,8 +255,17 @@ async function run(C, q, d) {
   await store.update(COST_KEY, emptyLedger(), (L) => bump(ledgerOf(L), clock(), { usd: cost - est, tokensIn, tokensOut, ...(out.text ? {} : { errors: 1 }), ...(out0.attempts > 1 ? { retries: out0.attempts - 1 } : {}) }));
   const usage = { tokensIn, tokensOut, estimated, ...(out.cacheRead ? { cacheRead: out.cacheRead } : {}), ...(out.cacheWrite ? { cacheWrite: out.cacheWrite } : {}) };
   if (!out.text) return { available: true, error: out.stop === 'refusal' ? 'the provider declined to answer' : out.stop === 'length' ? 'the answer was cut off at the output cap before any text' : 'the language model returned no text', status: 200, stop: out.stop, ...(out.refusal ? { detail: clean(out.refusal) } : {}), usage, costUsd: cost, provider, model: out.model };
-  await store.update(CACHE_KEY, { v: 1, rows: [] }, (c) => { const rows = (c && Array.isArray(c.rows) ? c.rows : []).filter((r) => r && r.h !== q.h).concat({ h: q.h, at: new Date(clock()).toISOString(), text: out.text, usage, stop: out.stop, provider, model: out.model }); return { v: 1, rows: rows.slice(-CACHE_MAX) }; });
+  if (out.stop !== 'length') await store.update(CACHE_KEY, { v: 1, rows: [] }, (c) => { const rows = (c && Array.isArray(c.rows) ? c.rows : []).filter((r) => r && r.h !== q.h).concat({ h: q.h, at: new Date(clock()).toISOString(), text: out.text, usage, stop: out.stop, provider, model: out.model }); return { v: 1, rows: rows.slice(-CACHE_MAX) }; });
   return { available: true, text: out.text, stop: out.stop, cached: false, usage, costUsd: cost, provider, model: out.model, ...(out0.attempts > 1 ? { attempts: out0.attempts } : {}) };
 }
 
-module.exports = { config, unavailable, providerOf, estimateTokens, estimate, complete, status, emptyLedger, COST_KEY, CACHE_KEY, API_VERSION, VERSION_HEADER, FAKE_PROVIDER, PROMPT_MAX, PROMPT_MAX_LONG, _inflight: INFLIGHT, _t: { parse, request, over, bump, ledgerOf, send, errorOf, costOf } };
+// A feature caller's view of an answer cut at the output cap: it is billed and not usable, so it becomes an error that names the
+// variable to raise (the caller then stores it as refused, never pays for it twice). Any other answer is returned as it is.
+function cutAtCap(ans, capVar) {
+  if (!ans || ans.stop !== 'length' || ans.error) return ans;
+  return { ...ans, text: undefined, cut: true, error: `the answer was cut off at the output cap (${capVar}): raise it, or lower the reasoning effort in ACADEMY_LLM_BODY` };
+}
+// a feature's output cap from its own variable (default d, 256 to OUT_CEILING)
+const featureCap = (v, d) => clamp(pos(v, d), 256, OUT_CEILING);
+
+module.exports = { OUT_CEILING, cutAtCap, featureCap, config, unavailable, providerOf, estimateTokens, estimate, complete, status, emptyLedger, COST_KEY, CACHE_KEY, API_VERSION, VERSION_HEADER, FAKE_PROVIDER, PROMPT_MAX, PROMPT_MAX_LONG, _inflight: INFLIGHT, _t: { parse, request, over, bump, ledgerOf, send, errorOf, costOf } };

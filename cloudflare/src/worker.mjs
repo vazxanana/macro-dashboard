@@ -13,6 +13,7 @@ import academyMcp from '../../api/academy-mcp.js';
 import academy from '../../api/academy.js';
 import bars from '../../api/bars.js';
 import bridge from '../../api/bridge.js';
+import chronosCoach from '../../api/chronos-coach.js';
 import ctraderLink from '../../api/ctrader-link.js';
 import data from '../../api/data.js';
 import edgeAnalyst from '../../api/edge-analyst.js';
@@ -32,7 +33,7 @@ import users from '../../api/users.js';
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
-  'academy-mcp': academyMcp, academy, bars, bridge, 'ctrader-link': ctraderLink, data,
+  'academy-mcp': academyMcp, academy, bars, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, data,
   'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify,
   profile, sounds, status, stream, 'trade-review': tradeReview, users,
 };

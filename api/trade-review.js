@@ -10,7 +10,7 @@
 // Environment:
 //   the model: ACADEMY_LLM_KEY / _URL / _MODEL / _FORMAT and the rest of the adapter's settings (docs/academy/LLM.md, section 3)
 //   TRADE_REVIEW_LLM_DAILY_USD (default 0.50), TRADE_REVIEW_LLM_MONTHLY_USD (5), TRADE_REVIEW_LLM_HARD_USD (25),
-//   TRADE_REVIEW_LLM_MAX_CALLS_DAY (2): this feature's own budgets; TRADE_REVIEW=off or TRADE_REVIEW_LLM_STOP=1 stops every call.
+//   TRADE_REVIEW_LLM_MAX_CALLS_DAY (2): this feature's own budgets; TRADE_REVIEW_LLM_MAX_TOKENS (8000) the output cap; TRADE_REVIEW=off or TRADE_REVIEW_LLM_STOP=1 stops every call.
 // Proposals only: nothing here changes a rule, a size, a stop, a filter, a trade or config.json. ICT is never read.
 'use strict';
 const S = require('./_session.js');
@@ -20,7 +20,7 @@ const R = require('./_trade-review.js');
 const G = require('./_guard.js');
 
 const LATEST = 'latest.json', STATE = 'state.json', FILE = 'research/trade-review.json';
-const MIN_GAP_S = 12 * 3600;   // at most one model review every 12 hours, whatever the council writes in between
+const MIN_GAP_S = 12 * 3600, MAX_OUT = 8000;   // at most one model review every 12 hours, whatever the council writes in between
 const rootOf = (env) => (env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'trade-review-preview/' : 'trade-review/');
 const TAILS = new Map();   // one lock map per function instance (the store's rule)
 const storeOf = (env, io = {}) => ST.make(ST.blobBackend(env, { ...io, root: rootOf(env) }), TAILS);
@@ -47,7 +47,8 @@ async function review(d) {
   if (state.mark === mark) return { skipped: 'already reviewed', at: file.at };
   if (state.lastCall && now - state.lastCall < MIN_GAP_S) return { skipped: 'too soon', next: new Date((state.lastCall + MIN_GAP_S) * 1000).toISOString() };
   const q = R.buildRequest(file);
-  const ans = await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'analyst', maxTokens: 3000, long: true }, { env: llmEnv(env), store, now: d.now });
+  // 17 Nov 2026: cap raised from 3000 (reasoning counts as output); a cut answer is billed and stored as refused
+  const ans = LLM.cutAtCap(await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'feature', maxTokens: LLM.featureCap(env.TRADE_REVIEW_LLM_MAX_TOKENS, MAX_OUT), long: true }, { env: llmEnv(env), store, now: d.now }), 'TRADE_REVIEW_LLM_MAX_TOKENS');
   // a call that may have been paid for but gave nothing usable is stored as refused, so the same reading is not paid for twice;
   // a refused (unbilled) call or a budget skip is tried again at the next run
   const billed = !!(ans && ans.available && ans.error && (ans.usage || ans.costEstimated || ans.costUsd > 0));
@@ -84,3 +85,4 @@ module.exports.review = review;
 module.exports.llmEnv = llmEnv;
 module.exports.storeOf = storeOf;
 module.exports.MIN_GAP_S = MIN_GAP_S;
+module.exports.MAX_OUT = MAX_OUT;

@@ -2081,6 +2081,28 @@ changes or refuses an order and never moves a stop (a test reads its page helper
   for the audit's drawing) and `coach` (the draft's sentence). Found on the way: two inline scripts of backtest.html share one
   global scope, so a top-level `const` named like one in another script fails at run time, not at parse (`stop0` exists already).
 
+AI coach (17 Nov 2026, owner: the provider's API "in the edges and in ChronosTrade"). "Ask the coach" in the review dialog
+(`#mistd`, box `#ai-tr`) and in the "How you trade" card (`#ai-ss`) sends one replayed trade, or the session's splits, to
+`api/chronos-coach.js` (pure part `api/_chronos-coach.js`), which asks the shared language-model adapter. Display only: the
+page block between `// ---- AI coach (17 Nov 2026)` and `// ---- end AI coach` reads the account and candles and writes text;
+no order, stop or account code (a test reads it for order calls, `.stop =` and browser storage); answers live in memory for
+the visit. Card label "AI coach · a language model's reading, not a tested edge"; off (no key, `CHRONOS_COACH=off`, no
+storage, or GET failing) = the quiet line "The AI coach is off". Server rules (never trusts the page): POST only from the same
+origin, a signed-in member, every field checked and capped (`buildRequest`: side, a finite OPENING stop on the losing side or
+400, a known timeframe, strings trimmed, `ctx` cut to a fixed depth, flags / tags / mistakes capped); question `trade` = the
+trade, the last 120 candles that ENDED by its entry and, for a closed trade (closedAt by the replay `moment`), the candles from
+entry to exit; an OPEN trade carries no exit or result and no candle that ends after the moment (`cleanBars` drops them);
+question `session` = `BT.coachSplits` output and the last 40 trades' sentence and R, no candles. System prompt: plain English
+(French with `lang: 'fr'`, trading terms in English), every point tied to the given numbers, never a tested edge or a promise,
+under 20 trades too small to judge, never removing or widening a stop. Answer `{ summary, points 1-6 (good|risk|habit|idea),
+question }` checked in code (`parseAnswer` also refuses stop-widening / removing advice and "proven / tested edge",
+"guaranteed" claims). Store `chronos-coach/answers.json` (+ the adapter's `cost.json`, `llm-cache.json`): an answered or
+billed-and-refused question (hash of account + prompt) is answered from it, never paid twice; a budget skip or an unbilled
+error is not stored. Limits: `CHRONOS_COACH_PER_DAY` 20 calls an account a UTC day (memory, per instance), budgets
+`CHRONOS_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 30, output cap `CHRONOS_LLM_MAX_TOKENS`
+4000; `CHRONOS_COACH=off` / `CHRONOS_LLM_STOP=1` stop it. Routed on the Worker (`HANDLERS['chronos-coach']`) and in
+vercel.json `functions`. Tests: `tests/chronos-coach.test.mjs`; audit section 37 (the off state with the stubbed API).
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
@@ -3793,6 +3815,9 @@ Test: `tests/mcycle-shadow.test.mjs`.
 - **Money**: a paid key, the owner's exception to absolute rule 5 (docs/owner-decisions.md item 47; owner, 12 Nov 2026: keep, "Yes to all"). Shares the provider
   settings (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`); own budgets `EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
   `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12; `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` stops it. No key = no call.
+- **Output cap (17 Nov 2026)**: 900 -> `EDGE_LLM_MAX_TOKENS` (default 4000) through the adapter's `cap: 'feature'`: a model that
+  always reasons spends output tokens on that first; an answer cut at the cap (stop `length`) is never cached and is stored as
+  refused once (`LLM.cutAtCap`). Provider secrets and the reasoning effort (`ACADEMY_LLM_BODY`): docs/academy/LLM.md section 11.
 - Paper only: it changes no rule, size, filter or trade, imports nothing of the council or the mirror (test), and no council
   member reads its file. Tests: `tests/edge-analyst.test.mjs`.
 - **Money and safety review (12 Nov 2026)**, `tests/edge-analyst-money.test.mjs` (real adapter, fake provider / Blob / clock).
@@ -3915,6 +3940,8 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   numbers. A billed answer that fails the checks is stored as refused (never paid twice); a budget skip is retried. `GET` for
   the owner or a reviewer: `{ enabled, reason, cost, ai }`. Cloudflare: handler `'trade-review'` in `HANDLERS`, run after the
   10-minute cron through `CHAINED` (no new trigger; `wrangler.jsonc` unchanged; vercel.json has no crons since 17 Nov 2026).
+  Output cap (17 Nov 2026): 3000 -> `TRADE_REVIEW_LLM_MAX_TOKENS` (default 8000, `cap: 'feature'`); a cut answer is stored as
+  refused, naming the variable.
   No connector queue (optional, not built).
 - **Page**: card `#ms-tr` (class `adm`) in Council → Review after `#ms-ea`; `<style id="ms-tr-css">` on the graphite tokens of
   `docs/design/aureum-theme.md` with the page's tokens as fallbacks (`--au-ink, var(--ink)`); `<script id="ms-tr-js">` reads the
