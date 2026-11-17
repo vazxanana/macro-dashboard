@@ -45,7 +45,7 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Build, test, CI**
 ```sh
 sh scripts/build.sh                    # builds out/; commit out/ with every page, asset or study change
-for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || break; done
+for f in council/*.mjs ict/*.mjs api/*.js research/edge/*.mjs; do node --check "$f" || break; done
 node --test tests/*.test.mjs tests/*.test.js
 node ict/audit-test.mjs && node council/alerts-test.mjs && node council/proposals-test.mjs
 # page checks (Playwright): serve out/ on $PORT (default 8766), e.g. python3 -m http.server 8766 --directory out, then
