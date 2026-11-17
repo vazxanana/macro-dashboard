@@ -623,6 +623,17 @@ prices = spot + the GC−spot basis from the ICT snapshot) and opens that contra
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
 
+## Working areas in the graphite look (17 Nov 2026, docs/design/aureum-theme.md)
+Charts (`#v-charts`), the Council workspace (`#v-council`) and the trade dialog (`#ms-tv`). Display only. `<style id="ms-wa-css">`
+(between `#ms-hc-css` and `#ms-sz-css`) maps the `--au-` tokens to local `--wa-` names, each falling back to the old variable, and
+re-points the Charts chrome tokens (`--cx-*`): neutral selected state (surface-2 + hairline), active Council tab = surface-2 + 2 px
+accent bar, flat 12 px cards, sans titles weight 650 / 600, sticky Trades table header, 2 px accent focus ring; Style sits beside
+Indicators on the right. No hex in it (only the spec's two shadows). The chart canvas reads `--au-surface` / `--au-ink-3` /
+`--au-line` when defined (`auChart` beside `THEMES`, called from `applyTheme`); candle colours untouched. Bug fixed: the markup
+switch (`setMode` and its click handler) matched every `[data-mk]` button, including the Council calendar's market filter
+(`data-mk="all|xau|nq|pairs"`): the calendar never showed its selected market and a tap on "Gold" there reset the chart markup to
+Meridian; both are now scoped to `.mk-mode`. The veteran discussion's "STRATEGIST" label no longer runs into its text.
+
 ## Home and Council reading pass (11 Nov 2026, quality round)
 Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
 the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
