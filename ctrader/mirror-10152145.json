@@ -12997,7 +12997,8 @@
     "t1": 0.82706,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.83868,
@@ -13012,7 +13013,8 @@
     "lagSec": 245,
     "positionId": "50128734",
     "volume": 100000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-17T13:36:51.000Z"
    },
    "xau-m30m1-1794896589": {
     "symbol": "XAUUSD",
@@ -13049,41 +13051,48 @@
    "startBalance": 10183.68
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10172.06 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10168.69 · 8 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 292.22, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 295.81, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-17T13:34:13.000Z"
+    "at": "2026-11-17T13:36:51.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "usdchf-position-1794922535": {
+    "orderId": "34225513",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "position",
+    "limitPrice": 0.84136,
+    "stop": 0.8375216071428572,
+    "t1": 0.8490367857142856,
+    "placedAt": "2026-11-17T13:36:51.000Z",
+    "expires": "2026-11-22T13:35:35.000Z",
+    "riskCash": 4.56,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10172.06,
-  "lastRun": "2026-11-17T13:34:13.000Z"
+  "balance": 10168.69,
+  "lastRun": "2026-11-17T13:36:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-17T01:42:12.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 281.73, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T01:44:33.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 274.63, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T01:46:55.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 275.42, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-17T01:49:08.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 277.69, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14568,6 +14577,21 @@
    "at": "2026-11-17T13:34:13.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 292.22, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-17T13:36:51.000Z",
+   "msg": "USDCHF position 50128734 closed at the broker",
+   "trade": "usdchf-rswing-1794894858"
+  },
+  {
+   "at": "2026-11-17T13:36:51.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 295.81, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-17T13:36:51.000Z",
+   "msg": "placed buy limit USDCHF 0.01 lot at 0.84136 (council position, valid to 2026-11-22T13:35Z)",
+   "trade": "usdchf-position-1794922535"
   }
  ],
  "limits": {
