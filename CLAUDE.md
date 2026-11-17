@@ -101,8 +101,18 @@ The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker
 `MD_ORIGIN` overrides). Links, the bridges' default URL, the digest and the connectors' origin lists name aureumdesk.co.uk.
 A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily). Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
-fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
-stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
+fails otherwise). `api/run.js` is retired there (child process, files); the preview image stays the site icon (below);
+the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
+**Bundled files (16 Nov 2026)**: what `api/academy.js` (per edge `academy/data/` cand / out / feat, calendar, research, eval,
+`ml/models/index.json`; the registry `academy/edges.mjs` as code) and `api/bridge.js` (the two EA sources) read from disk on Node
+ship inside the Worker as text modules (`cloudflare/src/bundled.mjs`, wrangler.jsonc `rules`), handed over through `useData` /
+`useFiles` (Node and Vercel never call them), each file parsed on its first request (`src/academy-data.mjs`). The API's rules
+are unchanged (outcomes only after an attempt, the exam pool apart); nothing of `academy/archive/` is bundled. A file the Academy
+starts to read must be added to bundled.mjs (`tests/cloudflare-bundle.test.mjs` fails otherwise); regenerated data reaches the
+Worker with its next deploy. Upload 1,471 KiB (340 gzip) before, 4,022 KiB (671 gzip) after. Never set `ACADEMY_STORE_DIR` on the
+Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `routes` (`custom_domain`), workers.dev stays
+on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
+from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
 ## Locked features — do NOT remove or replace in redesigns
 

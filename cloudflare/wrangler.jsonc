@@ -21,6 +21,10 @@
   },
   // A copy of the Vercel Blob store (src/backup.mjs, every 10 min until complete, then daily). An id, not a secret.
   "kv_namespaces": [{ "binding": "BACKUP", "id": "ef06eea1b4834f3e913b3fbd82302039" }],
+  // Files api/academy.js and api/bridge.js read from disk on Node, bundled as text modules (src/bundled.mjs).
+  "rules": [{ "type": "Text", "globs": ["**/academy/data/*.json", "**/ml/models/index.json", "**/CouncilBridge.mq5", "**/CouncilBridge.cs"], "fallthrough": true }],
+  // The site's two addresses (both already the Worker's custom domains on the account; recorded here so a deploy keeps them).
+  "routes": [{ "pattern": "aureumdesk.co.uk", "custom_domain": true }, { "pattern": "www.aureumdesk.co.uk", "custom_domain": true }],
   "triggers": { "crons": ["* * * * *", "*/10 * * * *"] },
   "limits": { "cpu_ms": 300000 },
   "observability": { "enabled": true },
