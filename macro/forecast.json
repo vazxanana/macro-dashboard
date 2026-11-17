@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-16T23:36:58.000Z",
- "target": "2026-11-17",
- "targetEvent": "USD Core Retail Sales m/m",
+ "at": "2026-11-17T00:42:38.000Z",
+ "target": "2026-11-18",
+ "targetEvent": "USD FOMC Meeting Minutes",
  "paperOnly": true,
  "regime": {
   "label": "Dollar Smile right side (US outperformance) · liquidity flat · normal volatility",
@@ -20,11 +20,11 @@
    "chg": 0.31,
    "bias": "bear"
   },
-  "dxyProxy": 103.62,
-  "dxy5d": 1.86,
+  "dxyProxy": 103.64,
+  "dxy5d": 1.36,
   "broadUsd20dPct": 0.36,
   "sofrEffrBps": 2,
-  "curve10y3m": 0.83,
+  "curve10y3m": 0.78,
   "us2y": 4.88,
   "eu2y": 3.0718048758,
   "usEu2ySpread": 1.81
@@ -32,19 +32,19 @@
  "assets": {
   "gold": {
    "label": "Gold",
-   "pUp": 0.504,
-   "score": -0.563,
-   "last": 3853.05,
-   "expMovePct": 1.28,
-   "naiveMovePct": 1.28,
+   "pUp": 0.499,
+   "score": -0.625,
+   "last": 3860.19,
+   "expMovePct": 1.26,
+   "naiveMovePct": 1.26,
    "volModel": "naive",
-   "volRatio": 0.91,
+   "volRatio": 0.9,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.1347,
+    "a": 0.1309,
     "b": 0.2142,
     "n": 1000,
-    "base": 0.534
+    "base": 0.533
    },
    "drivers": [
     {
@@ -62,6 +62,13 @@
      "detail": "+31 bp a week"
     },
     {
+     "k": "be",
+     "name": "Inflation expectations (10Y breakeven)",
+     "dir": "down",
+     "w": 1,
+     "detail": "2.20%, −3 bp a week"
+    },
+    {
      "k": "dgs2",
      "name": "Fed expectations (2Y yield trend)",
      "dir": "down",
@@ -73,7 +80,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 1,
-     "detail": "+1.86 pts in 5 sessions"
+     "detail": "+1.36 pts in 5 sessions"
     },
     {
      "k": "cot",
@@ -107,19 +114,19 @@
   },
   "eurusd": {
    "label": "EUR/USD",
-   "pUp": 0.486,
+   "pUp": 0.485,
    "score": -0.786,
-   "last": 1.09974,
-   "expMovePct": 0.3,
-   "naiveMovePct": 0.3,
+   "last": 1.0996,
+   "expMovePct": 0.31,
+   "naiveMovePct": 0.31,
    "volModel": "naive",
-   "volRatio": 1.07,
+   "volRatio": 1.08,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": -0.0541,
+    "a": -0.0581,
     "b": 0,
     "n": 999,
-    "base": 0.486
+    "base": 0.485
    },
    "drivers": [
     {
@@ -148,7 +155,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 1,
-     "detail": "+1.86 pts in 5 sessions"
+     "detail": "+1.36 pts in 5 sessions"
     },
     {
      "k": "smile",
@@ -175,19 +182,19 @@
   },
   "usdjpy": {
    "label": "USD/JPY",
-   "pUp": 0.591,
+   "pUp": 0.589,
    "score": 0.947,
-   "last": 159.478,
-   "expMovePct": 0.31,
-   "naiveMovePct": 0.31,
+   "last": 159.471,
+   "expMovePct": 0.29,
+   "naiveMovePct": 0.29,
    "volModel": "naive",
-   "volRatio": 0.85,
+   "volRatio": 0.83,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.2466,
-    "b": 0.1267,
+    "a": 0.2424,
+    "b": 0.1261,
     "n": 999,
-    "base": 0.565
+    "base": 0.564
    },
    "drivers": [
     {
@@ -223,7 +230,7 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "up",
      "w": 1,
-     "detail": "+1.86 pts in 5 sessions"
+     "detail": "+1.36 pts in 5 sessions"
     },
     {
      "k": "hy",
@@ -250,19 +257,19 @@
   },
   "nq": {
    "label": "NQ (Nasdaq 100)",
-   "pUp": 0.533,
+   "pUp": 0.532,
    "score": -0.467,
-   "last": 27193.8,
-   "expMovePct": 1.55,
-   "naiveMovePct": 1.55,
+   "last": 27268.8,
+   "expMovePct": 1.69,
+   "naiveMovePct": 1.69,
    "volModel": "naive",
-   "volRatio": 1.62,
+   "volRatio": 1.69,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.2406,
-    "b": 0.23,
+    "a": 0.2368,
+    "b": 0.2288,
     "n": 999,
-    "base": 0.56
+    "base": 0.559
    },
    "drivers": [
     {
@@ -305,25 +312,25 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 0.5,
-     "detail": "+1.86 pts in 5 sessions"
+     "detail": "+1.36 pts in 5 sessions"
     }
    ]
   },
   "es": {
    "label": "ES (S&P 500)",
-   "pUp": 0.509,
+   "pUp": 0.508,
    "score": -0.385,
-   "last": 7421.8,
-   "expMovePct": 0.91,
-   "naiveMovePct": 0.91,
+   "last": 7428.6,
+   "expMovePct": 1.01,
+   "naiveMovePct": 1.01,
    "volModel": "naive",
-   "volRatio": 1.64,
+   "volRatio": 1.71,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.1531,
-    "b": 0.304,
+    "a": 0.1494,
+    "b": 0.3022,
     "n": 997,
-    "base": 0.54
+    "base": 0.539
    },
    "drivers": [
     {
@@ -366,13 +373,13 @@
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 0.5,
-     "detail": "+1.86 pts in 5 sessions"
+     "detail": "+1.36 pts in 5 sessions"
     }
    ]
   }
  },
  "dxy": {
-  "pUp": 0.514,
+  "pUp": 0.515,
   "note": "mirror of EUR/USD (EUR is 57.6% of the DXY)"
  },
  "drivers": [
@@ -432,8 +439,8 @@
    "k": "be",
    "name": "Inflation expectations (10Y breakeven)",
    "cluster": "rates",
-   "vote": 0,
-   "detail": "2.24%, +0 bp a week",
+   "vote": -1,
+   "detail": "2.20%, −3 bp a week",
    "weights": {
     "gold": 1
    }
@@ -467,7 +474,7 @@
    "name": "USD 5-day momentum (ICE DXY on OANDA)",
    "cluster": "dollar",
    "vote": -1,
-   "detail": "+1.86 pts in 5 sessions",
+   "detail": "+1.36 pts in 5 sessions",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -491,7 +498,7 @@
    "name": "Yield curve (10Y−3M)",
    "cluster": "rates",
    "vote": 0,
-   "detail": "0.83%",
+   "detail": "0.78%",
    "weights": {
     "gold": 1
    }
@@ -547,7 +554,7 @@
    "name": "Yen carry-unwind risk (BoJ / VIX)",
    "cluster": "risk",
    "vote": null,
-   "detail": "USD/JPY +0.9% in 5 days: calm",
+   "detail": "USD/JPY +0.5% in 5 days: calm",
    "weights": {}
   },
   {
@@ -637,7 +644,7 @@
    "name": "Veteran: dollar (DXY), 4-week change",
    "cluster": "dollar",
    "vote": -1,
-   "detail": "DXY +1.59% in 4 weeks",
+   "detail": "DXY +1.78% in 4 weeks",
    "weights": {},
    "challenger": true,
    "vs": "dxymom",
@@ -660,8 +667,8 @@
     "vs": "ry",
     "challenger": {
      "n": 645,
-     "hit": 0.513,
-     "t": 0.67,
+     "hit": 0.515,
+     "t": 0.75,
      "proven": false
     },
     "incumbent": {
@@ -718,11 +725,11 @@
    "outcome": null,
    "rule": "no consensus published: judge it against the previous print",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -783,11 +790,11 @@
    "outcome": null,
    "rule": "no consensus published: judge it against the previous 2.34%",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -848,11 +855,11 @@
    "outcome": null,
    "rule": "hot if ≥ 0.5%, cool if ≤ 0.3%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -913,11 +920,11 @@
    "outcome": null,
    "rule": "hot if ≥ 0.2%, cool if ≤ 0.0%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -978,11 +985,11 @@
    "outcome": null,
    "rule": "hot if ≥ 3.7%, cool if ≤ 3.5%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -1043,11 +1050,11 @@
    "outcome": null,
    "rule": "no consensus published: judge it against the previous print",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -1108,11 +1115,11 @@
    "outcome": null,
    "rule": "no consensus published: judge it against the previous print",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -1173,11 +1180,11 @@
    "outcome": null,
    "rule": "hot if ≥ 25.5K, cool if ≤ 25.5K, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -1238,11 +1245,11 @@
    "outcome": null,
    "rule": "hot if ≥ 4.8%, cool if ≤ 4.6%, in line in between (one reporting step; ±1 SD once 8 surprises are logged)",
    "expMovePct": {
-    "gold": 1.28,
-    "eurusd": 0.3,
-    "usdjpy": 0.31,
-    "nq": 1.55,
-    "es": 0.91
+    "gold": 1.26,
+    "eurusd": 0.31,
+    "usdjpy": 0.29,
+    "nq": 1.69,
+    "es": 1.01
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
@@ -1295,6 +1302,13 @@
  ],
  "news": [
   {
+   "src": "BoJ",
+   "title": "Release of Latest \"Loans and Bills Discounted by Sector\" and \"Loans to Households\" Data",
+   "link": "http://www.boj.or.jp/en/statistics/outline/notice_2026/not261117a.htm",
+   "at": "2026-11-16T23:50:00.000Z",
+   "policy": false
+  },
+  {
    "src": "ECB",
    "title": "Frank Elderson: Smart supervision for small banks",
    "link": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261116_1~11dd7f62af.en.html",
@@ -1342,13 +1356,6 @@
    "link": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261113~3883f1f187.en.html",
    "at": "2026-11-13T07:20:00.000Z",
    "policy": false
-  },
-  {
-   "src": "Fed",
-   "title": "Federal Reserve Board announces pricing, effective January 1, 2027, for payment services the Federal Reserve Banks provide to banks and credit unions, and changes to streamline and adjust their check services",
-   "link": "https://www.federalreserve.gov/newsevents/pressreleases/other20261112a.htm",
-   "at": "2026-11-12T18:30:00.000Z",
-   "policy": false
   }
  ],
  "scorecard": {
@@ -1356,18 +1363,18 @@
    "gold": {
     "n": 880,
     "upRate": 0.539,
-    "hit": 0.532,
+    "hit": 0.53,
     "base": 0.539,
-    "edge": -0.007,
-    "z": -0.41,
-    "pt": 0.7,
+    "edge": -0.009,
+    "z": -0.54,
+    "pt": 0.59,
     "brier": 0.249,
     "brierRW": 0.25,
     "brierClim": 0.2485,
-    "skillRW": 0.0041,
-    "skillClim": -0.0018,
-    "logLoss": 0.6911,
-    "ece": 0.033,
+    "skillRW": 0.004,
+    "skillClim": -0.002,
+    "logLoss": 0.6912,
+    "ece": 0.04,
     "calib": [
      {
       "bin": "0-40%",
@@ -1377,39 +1384,39 @@
      },
      {
       "bin": "40-45%",
-      "n": 6,
-      "p": 0.437,
-      "obs": 0.667
+      "n": 7,
+      "p": 0.438,
+      "obs": 0.571
      },
      {
       "bin": "45-48%",
-      "n": 76,
-      "p": 0.469,
-      "obs": 0.5
+      "n": 72,
+      "p": 0.468,
+      "obs": 0.514
      },
      {
       "bin": "48-50%",
-      "n": 106,
-      "p": 0.492,
-      "obs": 0.519
+      "n": 119,
+      "p": 0.49,
+      "obs": 0.521
      },
      {
       "bin": "50-52%",
-      "n": 130,
+      "n": 123,
       "p": 0.51,
-      "obs": 0.485
+      "obs": 0.48
      },
      {
       "bin": "52-55%",
-      "n": 278,
+      "n": 285,
       "p": 0.534,
-      "obs": 0.579
+      "obs": 0.586
      },
      {
       "bin": "55-60%",
-      "n": 284,
-      "p": 0.563,
-      "obs": 0.539
+      "n": 274,
+      "p": 0.561,
+      "obs": 0.529
      },
      {
       "bin": "60-100%",
@@ -1422,18 +1429,18 @@
    "eurusd": {
     "n": 879,
     "upRate": 0.48,
-    "hit": 0.507,
+    "hit": 0.499,
     "base": 0.52,
-    "edge": -0.013,
-    "z": -0.74,
-    "pt": 0.44,
-    "brier": 0.2509,
+    "edge": -0.02,
+    "z": -1.22,
+    "pt": -0.15,
+    "brier": 0.2507,
     "brierRW": 0.25,
     "brierClim": 0.2496,
-    "skillRW": -0.0035,
-    "skillClim": -0.0051,
-    "logLoss": 0.6949,
-    "ece": 0.034,
+    "skillRW": -0.0026,
+    "skillClim": -0.0042,
+    "logLoss": 0.6945,
+    "ece": 0.023,
     "calib": [
      {
       "bin": "0-40%",
@@ -1449,32 +1456,32 @@
      },
      {
       "bin": "45-48%",
-      "n": 6,
-      "p": 0.476,
-      "obs": 0.833
+      "n": 4,
+      "p": 0.478,
+      "obs": 0.25
      },
      {
       "bin": "48-50%",
-      "n": 432,
+      "n": 477,
       "p": 0.494,
-      "obs": 0.468
+      "obs": 0.484
      },
      {
       "bin": "50-52%",
-      "n": 318,
-      "p": 0.508,
-      "obs": 0.516
+      "n": 277,
+      "p": 0.509,
+      "obs": 0.495
      },
      {
       "bin": "52-55%",
-      "n": 117,
-      "p": 0.528,
-      "obs": 0.419
+      "n": 115,
+      "p": 0.525,
+      "obs": 0.443
      },
      {
       "bin": "55-60%",
       "n": 6,
-      "p": 0.577,
+      "p": 0.565,
       "obs": 0.333
      },
      {
@@ -1487,19 +1494,19 @@
    },
    "usdjpy": {
     "n": 879,
-    "upRate": 0.567,
-    "hit": 0.567,
-    "base": 0.567,
+    "upRate": 0.565,
+    "hit": 0.565,
+    "base": 0.565,
     "edge": 0,
     "z": 0,
     "pt": null,
-    "brier": 0.2463,
+    "brier": 0.2466,
     "brierRW": 0.25,
-    "brierClim": 0.2456,
-    "skillRW": 0.0147,
-    "skillClim": -0.0031,
-    "logLoss": 0.6858,
-    "ece": 0.017,
+    "brierClim": 0.2457,
+    "skillRW": 0.0138,
+    "skillClim": -0.0034,
+    "logLoss": 0.6863,
+    "ece": 0.027,
     "calib": [
      {
       "bin": "0-40%",
@@ -1527,44 +1534,44 @@
      },
      {
       "bin": "50-52%",
-      "n": 4,
-      "p": 0.519,
+      "n": 6,
+      "p": 0.516,
       "obs": 1
      },
      {
       "bin": "52-55%",
-      "n": 200,
-      "p": 0.54,
-      "obs": 0.575
+      "n": 214,
+      "p": 0.539,
+      "obs": 0.589
      },
      {
       "bin": "55-60%",
-      "n": 674,
-      "p": 0.57,
-      "obs": 0.562
+      "n": 658,
+      "p": 0.569,
+      "obs": 0.555
      },
      {
       "bin": "60-100%",
       "n": 1,
-      "p": 0.602,
+      "p": 0.6,
       "obs": 0
      }
     ]
    },
    "nq": {
     "n": 879,
-    "upRate": 0.556,
-    "hit": 0.559,
-    "base": 0.556,
+    "upRate": 0.555,
+    "hit": 0.557,
+    "base": 0.555,
     "edge": 0.002,
     "z": 0.14,
-    "pt": 1.24,
-    "brier": 0.2473,
+    "pt": 1.23,
+    "brier": 0.2475,
     "brierRW": 0.25,
-    "brierClim": 0.2468,
-    "skillRW": 0.0108,
-    "skillClim": -0.0019,
-    "logLoss": 0.6877,
+    "brierClim": 0.247,
+    "skillRW": 0.0101,
+    "skillClim": -0.0021,
+    "logLoss": 0.6881,
     "ece": 0.035,
     "calib": [
      {
@@ -1588,50 +1595,50 @@
      {
       "bin": "48-50%",
       "n": 4,
-      "p": 0.495,
+      "p": 0.496,
       "obs": 0.25
      },
      {
       "bin": "50-52%",
-      "n": 25,
-      "p": 0.514,
-      "obs": 0.64
+      "n": 18,
+      "p": 0.51,
+      "obs": 0.611
      },
      {
       "bin": "52-55%",
-      "n": 184,
+      "n": 201,
       "p": 0.538,
-      "obs": 0.571
+      "obs": 0.572
      },
      {
       "bin": "55-60%",
-      "n": 573,
+      "n": 577,
       "p": 0.572,
       "obs": 0.539
      },
      {
       "bin": "60-100%",
-      "n": 93,
-      "p": 0.61,
-      "obs": 0.624
+      "n": 79,
+      "p": 0.609,
+      "obs": 0.633
      }
     ]
    },
    "es": {
     "n": 877,
-    "upRate": 0.542,
-    "hit": 0.542,
-    "base": 0.542,
-    "edge": 0,
-    "z": 0,
-    "pt": 0.83,
-    "brier": 0.2482,
+    "upRate": 0.54,
+    "hit": 0.538,
+    "base": 0.54,
+    "edge": -0.002,
+    "z": -0.14,
+    "pt": 0.6,
+    "brier": 0.2483,
     "brierRW": 0.25,
-    "brierClim": 0.2483,
-    "skillRW": 0.0072,
-    "skillClim": 0.0003,
-    "logLoss": 0.6895,
-    "ece": 0.022,
+    "brierClim": 0.2484,
+    "skillRW": 0.0067,
+    "skillClim": 0.0002,
+    "logLoss": 0.6898,
+    "ece": 0.021,
     "calib": [
      {
       "bin": "0-40%",
@@ -1647,59 +1654,59 @@
      },
      {
       "bin": "45-48%",
-      "n": 13,
-      "p": 0.47,
-      "obs": 0.538
+      "n": 16,
+      "p": 0.471,
+      "obs": 0.438
      },
      {
       "bin": "48-50%",
-      "n": 75,
-      "p": 0.492,
-      "obs": 0.493
+      "n": 76,
+      "p": 0.493,
+      "obs": 0.526
      },
      {
       "bin": "50-52%",
-      "n": 139,
-      "p": 0.51,
-      "obs": 0.583
+      "n": 138,
+      "p": 0.511,
+      "obs": 0.565
      },
      {
       "bin": "52-55%",
-      "n": 338,
+      "n": 348,
       "p": 0.534,
-      "obs": 0.521
+      "obs": 0.517
      },
      {
       "bin": "55-60%",
-      "n": 304,
+      "n": 293,
       "p": 0.568,
-      "obs": 0.556
+      "obs": 0.563
      },
      {
       "bin": "60-100%",
-      "n": 8,
-      "p": 0.604,
-      "obs": 0.625
+      "n": 6,
+      "p": 0.603,
+      "obs": 0.667
      }
     ]
    }
   },
   "live": {
    "gold": {
-    "n": 5,
-    "upRate": 0.4,
-    "hit": 0.2,
-    "base": 0.6,
-    "edge": -0.4,
-    "z": -1.83,
+    "n": 6,
+    "upRate": 0.333,
+    "hit": 0.167,
+    "base": 0.667,
+    "edge": -0.5,
+    "z": -2.6,
     "pt": null,
-    "brier": 0.2498,
+    "brier": 0.2514,
     "brierRW": 0.25,
-    "brierClim": 0.24,
-    "skillRW": 0.0007,
-    "skillClim": -0.0409,
-    "logLoss": 0.6928,
-    "ece": 0.315,
+    "brierClim": 0.2222,
+    "skillRW": -0.0055,
+    "skillClim": -0.1312,
+    "logLoss": 0.6959,
+    "ece": 0.347,
     "calib": [
      {
       "bin": "0-40%",
@@ -1727,8 +1734,8 @@
      },
      {
       "bin": "50-52%",
-      "n": 2,
-      "p": 0.503,
+      "n": 3,
+      "p": 0.505,
       "obs": 0
      },
      {
@@ -1750,27 +1757,27 @@
       "obs": null
      }
     ],
-    "volN": 5,
-    "volMaeModel": 1.048,
-    "volMaeNaive": 1.048,
-    "volQlikeModel": 2.681,
-    "volQlikeNaive": 2.681
+    "volN": 6,
+    "volMaeModel": 0.907,
+    "volMaeNaive": 0.907,
+    "volQlikeModel": 2.432,
+    "volQlikeNaive": 2.432
    },
    "eurusd": {
-    "n": 5,
-    "upRate": 0.2,
-    "hit": 0.8,
-    "base": 0.8,
+    "n": 6,
+    "upRate": 0.167,
+    "hit": 0.833,
+    "base": 0.833,
     "edge": 0,
     "z": 0,
     "pt": null,
-    "brier": 0.2433,
+    "brier": 0.2376,
     "brierRW": 0.25,
-    "brierClim": 0.16,
-    "skillRW": 0.0267,
-    "skillClim": -0.5208,
-    "logLoss": 0.6798,
-    "ece": 0.288,
+    "brierClim": 0.1389,
+    "skillRW": 0.0497,
+    "skillClim": -0.7106,
+    "logLoss": 0.6683,
+    "ece": 0.316,
     "calib": [
      {
       "bin": "0-40%",
@@ -1786,9 +1793,9 @@
      },
      {
       "bin": "45-48%",
-      "n": 0,
-      "p": null,
-      "obs": null
+      "n": 1,
+      "p": 0.457,
+      "obs": 0
      },
      {
       "bin": "48-50%",
@@ -1821,11 +1828,11 @@
       "obs": null
      }
     ],
-    "volN": 5,
-    "volMaeModel": 0.251,
-    "volMaeNaive": 0.251,
-    "volQlikeModel": 0.49,
-    "volQlikeNaive": 0.49
+    "volN": 6,
+    "volMaeModel": 0.22,
+    "volMaeNaive": 0.22,
+    "volQlikeModel": 0.158,
+    "volQlikeNaive": 0.158
    },
    "usdjpy": {
     "n": 5,
@@ -2046,23 +2053,23 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-02-24",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-02-24)",
+    "split": "2025-02-25",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-02-25)",
     "full": {
      "n": 896,
      "eventDays": 107,
      "eventAvgAbs": 0.981,
-     "otherAvgAbs": 0.866,
-     "from": "2023-06-06",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.867,
+     "from": "2023-06-07",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 896,
         "mae": 0.585,
         "maeNaive": 0.591,
-        "qlike": 2.145,
-        "qlikeNaive": 1.348,
+        "qlike": 2.147,
+        "qlikeNaive": 1.35,
         "dmMae": 0.78,
         "dmQlike": -3.33
        },
@@ -2081,8 +2088,8 @@
         "n": 896,
         "mae": 0.597,
         "maeNaive": 0.591,
-        "qlike": 1.481,
-        "qlikeNaive": 1.348,
+        "qlike": 1.482,
+        "qlikeNaive": 1.35,
         "dmMae": -1.46,
         "dmQlike": -2.45
        },
@@ -2101,10 +2108,10 @@
         "n": 896,
         "mae": 0.589,
         "maeNaive": 0.591,
-        "qlike": 1.3,
-        "qlikeNaive": 1.348,
-        "dmMae": 0.46,
-        "dmQlike": 1.03
+        "qlike": 1.301,
+        "qlikeNaive": 1.35,
+        "dmMae": 0.49,
+        "dmQlike": 1.04
        },
        "event": {
         "n": 107,
@@ -2119,21 +2126,21 @@
       "har": {
        "all": {
         "n": 896,
-        "mae": 0.586,
+        "mae": 0.585,
         "maeNaive": 0.591,
-        "qlike": 1.347,
-        "qlikeNaive": 1.348,
-        "dmMae": 0.8,
-        "dmQlike": 0.03
+        "qlike": 1.342,
+        "qlikeNaive": 1.35,
+        "dmMae": 0.81,
+        "dmQlike": 0.18
        },
        "event": {
         "n": 107,
-        "mae": 0.761,
+        "mae": 0.758,
         "maeNaive": 0.674,
-        "qlike": 1.751,
+        "qlike": 1.741,
         "qlikeNaive": 1.788,
-        "dmMae": -3.16,
-        "dmQlike": 0.2
+        "dmMae": -3.07,
+        "dmQlike": 0.26
        }
       }
      }
@@ -2142,18 +2149,18 @@
      "n": 448,
      "eventDays": 54,
      "eventAvgAbs": 0.788,
-     "otherAvgAbs": 0.615,
-     "from": "2023-06-06",
-     "to": "2025-02-21",
+     "otherAvgAbs": 0.616,
+     "from": "2023-06-07",
+     "to": "2025-02-24",
      "models": {
       "cur": {
        "all": {
         "n": 448,
         "mae": 0.427,
-        "maeNaive": 0.435,
-        "qlike": 0.905,
-        "qlikeNaive": 0.704,
-        "dmMae": 0.9,
+        "maeNaive": 0.434,
+        "qlike": 0.906,
+        "qlikeNaive": 0.705,
+        "dmMae": 0.88,
         "dmQlike": -2.62
        },
        "event": {
@@ -2169,10 +2176,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.438,
-        "maeNaive": 0.435,
-        "qlike": 0.71,
-        "qlikeNaive": 0.704,
+        "mae": 0.437,
+        "maeNaive": 0.434,
+        "qlike": 0.711,
+        "qlikeNaive": 0.705,
         "dmMae": -0.83,
         "dmQlike": -0.42
        },
@@ -2189,12 +2196,12 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.438,
-        "maeNaive": 0.435,
-        "qlike": 0.755,
-        "qlikeNaive": 0.704,
-        "dmMae": -0.65,
-        "dmQlike": -1.4
+        "mae": 0.437,
+        "maeNaive": 0.434,
+        "qlike": 0.756,
+        "qlikeNaive": 0.705,
+        "dmMae": -0.64,
+        "dmQlike": -1.39
        },
        "event": {
         "n": 54,
@@ -2202,7 +2209,7 @@
         "maeNaive": 0.537,
         "qlike": 1.196,
         "qlikeNaive": 1.126,
-        "dmMae": -2.02,
+        "dmMae": -2.03,
         "dmQlike": -0.46
        }
       },
@@ -2210,20 +2217,20 @@
        "all": {
         "n": 448,
         "mae": 0.44,
-        "maeNaive": 0.435,
-        "qlike": 0.756,
-        "qlikeNaive": 0.704,
-        "dmMae": -0.78,
-        "dmQlike": -0.99
+        "maeNaive": 0.434,
+        "qlike": 0.751,
+        "qlikeNaive": 0.705,
+        "dmMae": -0.79,
+        "dmQlike": -0.89
        },
        "event": {
         "n": 54,
-        "mae": 0.641,
+        "mae": 0.64,
         "maeNaive": 0.537,
-        "qlike": 1.192,
+        "qlike": 1.187,
         "qlikeNaive": 1.126,
-        "dmMae": -2.67,
-        "dmQlike": -0.39
+        "dmMae": -2.64,
+        "dmQlike": -0.36
        }
       }
      }
@@ -2232,18 +2239,18 @@
      "n": 448,
      "eventDays": 53,
      "eventAvgAbs": 1.177,
-     "otherAvgAbs": 1.115,
-     "from": "2025-02-24",
-     "to": "2026-11-13",
+     "otherAvgAbs": 1.116,
+     "from": "2025-02-25",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 448,
         "mae": 0.743,
         "maeNaive": 0.748,
-        "qlike": 3.385,
-        "qlikeNaive": 1.993,
-        "dmMae": 0.36,
+        "qlike": 3.387,
+        "qlikeNaive": 1.996,
+        "dmMae": 0.37,
         "dmQlike": -2.96
        },
        "event": {
@@ -2261,8 +2268,8 @@
         "n": 448,
         "mae": 0.756,
         "maeNaive": 0.748,
-        "qlike": 2.251,
-        "qlikeNaive": 1.993,
+        "qlike": 2.254,
+        "qlikeNaive": 1.996,
         "dmMae": -1.21,
         "dmQlike": -2.42
        },
@@ -2281,9 +2288,9 @@
         "n": 448,
         "mae": 0.74,
         "maeNaive": 0.748,
-        "qlike": 1.844,
-        "qlikeNaive": 1.993,
-        "dmMae": 0.93,
+        "qlike": 1.847,
+        "qlikeNaive": 1.996,
+        "dmMae": 0.95,
         "dmQlike": 1.72
        },
        "event": {
@@ -2301,19 +2308,19 @@
         "n": 448,
         "mae": 0.731,
         "maeNaive": 0.748,
-        "qlike": 1.938,
-        "qlikeNaive": 1.993,
-        "dmMae": 1.4,
-        "dmQlike": 0.76
+        "qlike": 1.934,
+        "qlikeNaive": 1.996,
+        "dmMae": 1.41,
+        "dmQlike": 0.87
        },
        "event": {
         "n": 53,
-        "mae": 0.883,
+        "mae": 0.878,
         "maeNaive": 0.814,
-        "qlike": 2.32,
+        "qlike": 2.304,
         "qlikeNaive": 2.462,
-        "dmMae": -1.8,
-        "dmQlike": 0.44
+        "dmMae": -1.69,
+        "dmQlike": 0.5
        }
       }
      }
@@ -2323,15 +2330,15 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-02-25",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-02-25)",
+    "split": "2025-02-26",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-02-26)",
     "full": {
      "n": 893,
      "eventDays": 107,
      "eventAvgAbs": 0.442,
-     "otherAvgAbs": 0.29,
-     "from": "2023-06-09",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.289,
+     "from": "2023-06-12",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
@@ -2339,9 +2346,9 @@
         "mae": 0.199,
         "maeNaive": 0.204,
         "qlike": -0.483,
-        "qlikeNaive": -0.699,
-        "dmMae": 1.53,
-        "dmQlike": -3.27
+        "qlikeNaive": -0.7,
+        "dmMae": 1.56,
+        "dmQlike": -3.26
        },
        "event": {
         "n": 107,
@@ -2359,7 +2366,7 @@
         "mae": 0.206,
         "maeNaive": 0.204,
         "qlike": -0.754,
-        "qlikeNaive": -0.699,
+        "qlikeNaive": -0.7,
         "dmMae": -1.18,
         "dmQlike": 1.36
        },
@@ -2379,13 +2386,13 @@
         "mae": 0.202,
         "maeNaive": 0.204,
         "qlike": -0.842,
-        "qlikeNaive": -0.699,
+        "qlikeNaive": -0.7,
         "dmMae": 0.88,
-        "dmQlike": 3.71
+        "dmQlike": 3.72
        },
        "event": {
         "n": 107,
-        "mae": 0.308,
+        "mae": 0.309,
         "maeNaive": 0.298,
         "qlike": 0.022,
         "qlikeNaive": 0.903,
@@ -2399,17 +2406,17 @@
         "mae": 0.205,
         "maeNaive": 0.204,
         "qlike": -0.846,
-        "qlikeNaive": -0.699,
-        "dmMae": -0.22,
-        "dmQlike": 3.37
+        "qlikeNaive": -0.7,
+        "dmMae": -0.23,
+        "dmQlike": 3.36
        },
        "event": {
         "n": 107,
-        "mae": 0.319,
+        "mae": 0.318,
         "maeNaive": 0.298,
-        "qlike": 0.012,
+        "qlike": 0.011,
         "qlikeNaive": 0.903,
-        "dmMae": -1.07,
+        "dmMae": -1.03,
         "dmQlike": 2.73
        }
       }
@@ -2419,19 +2426,19 @@
      "n": 446,
      "eventDays": 54,
      "eventAvgAbs": 0.454,
-     "otherAvgAbs": 0.282,
-     "from": "2023-06-09",
-     "to": "2025-02-24",
+     "otherAvgAbs": 0.283,
+     "from": "2023-06-12",
+     "to": "2025-02-25",
      "models": {
       "cur": {
        "all": {
         "n": 446,
-        "mae": 0.196,
+        "mae": 0.197,
         "maeNaive": 0.199,
-        "qlike": -0.635,
-        "qlikeNaive": -0.716,
+        "qlike": -0.631,
+        "qlikeNaive": -0.713,
         "dmMae": 0.55,
-        "dmQlike": -0.95
+        "dmQlike": -0.97
        },
        "event": {
         "n": 54,
@@ -2448,8 +2455,8 @@
         "n": 446,
         "mae": 0.201,
         "maeNaive": 0.199,
-        "qlike": -0.826,
-        "qlikeNaive": -0.716,
+        "qlike": -0.823,
+        "qlikeNaive": -0.713,
         "dmMae": -0.57,
         "dmQlike": 2.15
        },
@@ -2468,9 +2475,9 @@
         "n": 446,
         "mae": 0.199,
         "maeNaive": 0.199,
-        "qlike": -0.854,
-        "qlikeNaive": -0.716,
-        "dmMae": 0.02,
+        "qlike": -0.85,
+        "qlikeNaive": -0.713,
+        "dmMae": 0,
         "dmQlike": 2.84
        },
        "event": {
@@ -2488,16 +2495,16 @@
         "n": 446,
         "mae": 0.202,
         "maeNaive": 0.199,
-        "qlike": -0.861,
-        "qlikeNaive": -0.716,
-        "dmMae": -0.8,
+        "qlike": -0.858,
+        "qlikeNaive": -0.713,
+        "dmMae": -0.78,
         "dmQlike": 2.44
        },
        "event": {
         "n": 54,
         "mae": 0.338,
         "maeNaive": 0.31,
-        "qlike": 0.048,
+        "qlike": 0.046,
         "qlikeNaive": 0.991,
         "dmMae": -0.92,
         "dmQlike": 2.07
@@ -2509,19 +2516,19 @@
      "n": 447,
      "eventDays": 53,
      "eventAvgAbs": 0.43,
-     "otherAvgAbs": 0.297,
-     "from": "2025-02-25",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.296,
+     "from": "2025-02-26",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 447,
-        "mae": 0.203,
+        "mae": 0.202,
         "maeNaive": 0.209,
-        "qlike": -0.331,
-        "qlikeNaive": -0.683,
-        "dmMae": 1.69,
-        "dmQlike": -3.47
+        "qlike": -0.336,
+        "qlikeNaive": -0.686,
+        "dmMae": 1.75,
+        "dmQlike": -3.45
        },
        "event": {
         "n": 53,
@@ -2536,10 +2543,10 @@
       "evt": {
        "all": {
         "n": 447,
-        "mae": 0.212,
+        "mae": 0.211,
         "maeNaive": 0.209,
-        "qlike": -0.682,
-        "qlikeNaive": -0.683,
+        "qlike": -0.685,
+        "qlikeNaive": -0.686,
         "dmMae": -1.42,
         "dmQlike": -0.01
        },
@@ -2558,9 +2565,9 @@
         "n": 447,
         "mae": 0.205,
         "maeNaive": 0.209,
-        "qlike": -0.829,
-        "qlikeNaive": -0.683,
-        "dmMae": 1.19,
+        "qlike": -0.833,
+        "qlikeNaive": -0.686,
+        "dmMae": 1.21,
         "dmQlike": 2.48
        },
        "event": {
@@ -2578,19 +2585,19 @@
         "n": 447,
         "mae": 0.207,
         "maeNaive": 0.209,
-        "qlike": -0.831,
-        "qlikeNaive": -0.683,
-        "dmMae": 0.57,
-        "dmQlike": 2.34
+        "qlike": -0.833,
+        "qlikeNaive": -0.686,
+        "dmMae": 0.52,
+        "dmQlike": 2.32
        },
        "event": {
         "n": 53,
-        "mae": 0.3,
+        "mae": 0.298,
         "maeNaive": 0.287,
         "qlike": -0.025,
         "qlikeNaive": 0.814,
-        "dmMae": -0.55,
-        "dmQlike": 1.79
+        "dmMae": -0.5,
+        "dmQlike": 1.8
        }
       }
      }
@@ -2600,24 +2607,24 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-02-25",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-02-25)",
+    "split": "2025-02-26",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-02-26)",
     "full": {
      "n": 893,
      "eventDays": 107,
      "eventAvgAbs": 0.562,
      "otherAvgAbs": 0.395,
-     "from": "2023-06-09",
-     "to": "2026-11-13",
+     "from": "2023-06-12",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 893,
         "mae": 0.28,
         "maeNaive": 0.286,
-        "qlike": 0.996,
-        "qlikeNaive": 0.092,
-        "dmMae": 1.42,
+        "qlike": 0.994,
+        "qlikeNaive": 0.091,
+        "dmMae": 1.45,
         "dmQlike": -3.77
        },
        "event": {
@@ -2635,8 +2642,8 @@
         "n": 893,
         "mae": 0.288,
         "maeNaive": 0.286,
-        "qlike": 0.012,
-        "qlikeNaive": 0.092,
+        "qlike": 0.01,
+        "qlikeNaive": 0.091,
         "dmMae": -0.82,
         "dmQlike": 1.55
        },
@@ -2655,8 +2662,8 @@
         "n": 893,
         "mae": 0.29,
         "maeNaive": 0.286,
-        "qlike": -0.087,
-        "qlikeNaive": 0.092,
+        "qlike": -0.088,
+        "qlikeNaive": 0.091,
         "dmMae": -1,
         "dmQlike": 2.5
        },
@@ -2675,19 +2682,19 @@
         "n": 893,
         "mae": 0.295,
         "maeNaive": 0.286,
-        "qlike": -0.135,
-        "qlikeNaive": 0.092,
-        "dmMae": -2.14,
-        "dmQlike": 2.57
+        "qlike": -0.136,
+        "qlikeNaive": 0.091,
+        "dmMae": -2.1,
+        "dmQlike": 2.58
        },
        "event": {
         "n": 107,
-        "mae": 0.39,
+        "mae": 0.391,
         "maeNaive": 0.346,
-        "qlike": 0.396,
+        "qlike": 0.401,
         "qlikeNaive": 1.144,
-        "dmMae": -1.57,
-        "dmQlike": 1.39
+        "dmMae": -1.6,
+        "dmQlike": 1.38
        }
       }
      }
@@ -2696,19 +2703,19 @@
      "n": 446,
      "eventDays": 54,
      "eventAvgAbs": 0.662,
-     "otherAvgAbs": 0.409,
-     "from": "2023-06-09",
-     "to": "2025-02-24",
+     "otherAvgAbs": 0.41,
+     "from": "2023-06-12",
+     "to": "2025-02-25",
      "models": {
       "cur": {
        "all": {
         "n": 446,
         "mae": 0.304,
-        "maeNaive": 0.308,
-        "qlike": 0.726,
-        "qlikeNaive": 0.199,
-        "dmMae": 0.42,
-        "dmQlike": -2.21
+        "maeNaive": 0.307,
+        "qlike": 0.727,
+        "qlikeNaive": 0.2,
+        "dmMae": 0.39,
+        "dmQlike": -2.2
        },
        "event": {
         "n": 54,
@@ -2724,9 +2731,9 @@
        "all": {
         "n": 446,
         "mae": 0.308,
-        "maeNaive": 0.308,
-        "qlike": 0.045,
-        "qlikeNaive": 0.199,
+        "maeNaive": 0.307,
+        "qlike": 0.046,
+        "qlikeNaive": 0.2,
         "dmMae": -0.06,
         "dmQlike": 1.53
        },
@@ -2744,15 +2751,15 @@
        "all": {
         "n": 446,
         "mae": 0.306,
-        "maeNaive": 0.308,
-        "qlike": -0.03,
-        "qlikeNaive": 0.199,
-        "dmMae": 0.24,
+        "maeNaive": 0.307,
+        "qlike": -0.028,
+        "qlikeNaive": 0.2,
+        "dmMae": 0.17,
         "dmQlike": 1.88
        },
        "event": {
         "n": 54,
-        "mae": 0.431,
+        "mae": 0.43,
         "maeNaive": 0.409,
         "qlike": 0.791,
         "qlikeNaive": 2.109,
@@ -2763,20 +2770,20 @@
       "har": {
        "all": {
         "n": 446,
-        "mae": 0.316,
-        "maeNaive": 0.308,
+        "mae": 0.315,
+        "maeNaive": 0.307,
         "qlike": -0.024,
-        "qlikeNaive": 0.199,
-        "dmMae": -1.21,
-        "dmQlike": 1.56
+        "qlikeNaive": 0.2,
+        "dmMae": -1.16,
+        "dmQlike": 1.58
        },
        "event": {
         "n": 54,
-        "mae": 0.434,
+        "mae": 0.433,
         "maeNaive": 0.409,
-        "qlike": 0.738,
+        "qlike": 0.737,
         "qlikeNaive": 2.109,
-        "dmMae": -0.55,
+        "dmMae": -0.53,
         "dmQlike": 1.35
        }
       }
@@ -2786,18 +2793,18 @@
      "n": 447,
      "eventDays": 53,
      "eventAvgAbs": 0.46,
-     "otherAvgAbs": 0.38,
-     "from": "2025-02-25",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.379,
+     "from": "2025-02-26",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 447,
         "mae": 0.256,
         "maeNaive": 0.265,
-        "qlike": 1.266,
-        "qlikeNaive": -0.014,
-        "dmMae": 1.96,
+        "qlike": 1.261,
+        "qlikeNaive": -0.018,
+        "dmMae": 2.05,
         "dmQlike": -3.08
        },
        "event": {
@@ -2815,8 +2822,8 @@
         "n": 447,
         "mae": 0.268,
         "maeNaive": 0.265,
-        "qlike": -0.022,
-        "qlikeNaive": -0.014,
+        "qlike": -0.025,
+        "qlikeNaive": -0.018,
         "dmMae": -2.34,
         "dmQlike": 0.28
        },
@@ -2835,10 +2842,10 @@
         "n": 447,
         "mae": 0.273,
         "maeNaive": 0.265,
-        "qlike": -0.143,
-        "qlikeNaive": -0.014,
-        "dmMae": -1.88,
-        "dmQlike": 1.71
+        "qlike": -0.148,
+        "qlikeNaive": -0.018,
+        "dmMae": -1.81,
+        "dmQlike": 1.72
        },
        "event": {
         "n": 53,
@@ -2855,19 +2862,19 @@
         "n": 447,
         "mae": 0.275,
         "maeNaive": 0.265,
-        "qlike": -0.245,
-        "qlikeNaive": -0.014,
+        "qlike": -0.247,
+        "qlikeNaive": -0.018,
         "dmMae": -1.95,
         "dmQlike": 2.21
        },
        "event": {
         "n": 53,
-        "mae": 0.346,
+        "mae": 0.349,
         "maeNaive": 0.282,
-        "qlike": 0.048,
+        "qlike": 0.058,
         "qlikeNaive": 0.161,
-        "dmMae": -2.02,
-        "dmQlike": 0.34
+        "dmMae": -2.12,
+        "dmQlike": 0.31
        }
       }
      }
@@ -2877,25 +2884,25 @@
     "used": "naive",
     "picked": "ewma",
     "tried": 4,
-    "split": "2025-02-24",
-    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-24)",
+    "split": "2025-02-25",
+    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-25)",
     "full": {
-     "n": 895,
+     "n": 896,
      "eventDays": 107,
      "eventAvgAbs": 1.18,
-     "otherAvgAbs": 0.874,
+     "otherAvgAbs": 0.877,
      "from": "2023-06-07",
-     "to": "2026-11-13",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
-        "n": 895,
-        "mae": 0.62,
-        "maeNaive": 0.637,
-        "qlike": 1.697,
-        "qlikeNaive": 1.454,
-        "dmMae": 1.8,
-        "dmQlike": -3.61
+        "n": 896,
+        "mae": 0.622,
+        "maeNaive": 0.638,
+        "qlike": 1.702,
+        "qlikeNaive": 1.457,
+        "dmMae": 1.76,
+        "dmQlike": -3.63
        },
        "event": {
         "n": 107,
@@ -2909,11 +2916,11 @@
       },
       "evt": {
        "all": {
-        "n": 895,
-        "mae": 0.638,
-        "maeNaive": 0.637,
-        "qlike": 1.42,
-        "qlikeNaive": 1.454,
+        "n": 896,
+        "mae": 0.639,
+        "maeNaive": 0.638,
+        "qlike": 1.423,
+        "qlikeNaive": 1.457,
         "dmMae": -0.28,
         "dmQlike": 1.49
        },
@@ -2929,13 +2936,13 @@
       },
       "ewma": {
        "all": {
-        "n": 895,
-        "mae": 0.631,
-        "maeNaive": 0.637,
-        "qlike": 1.466,
-        "qlikeNaive": 1.454,
-        "dmMae": 0.97,
-        "dmQlike": -0.29
+        "n": 896,
+        "mae": 0.632,
+        "maeNaive": 0.638,
+        "qlike": 1.469,
+        "qlikeNaive": 1.457,
+        "dmMae": 0.96,
+        "dmQlike": -0.3
        },
        "event": {
         "n": 107,
@@ -2949,13 +2956,13 @@
       },
       "har": {
        "all": {
-        "n": 895,
-        "mae": 0.635,
-        "maeNaive": 0.637,
-        "qlike": 1.41,
-        "qlikeNaive": 1.454,
-        "dmMae": 0.22,
-        "dmQlike": 0.92
+        "n": 896,
+        "mae": 0.636,
+        "maeNaive": 0.638,
+        "qlike": 1.414,
+        "qlikeNaive": 1.457,
+        "dmMae": 0.2,
+        "dmQlike": 0.91
        },
        "event": {
         "n": 107,
@@ -2969,13 +2976,13 @@
       },
       "vix": {
        "all": {
-        "n": 895,
-        "mae": 0.614,
-        "maeNaive": 0.637,
-        "qlike": 1.326,
-        "qlikeNaive": 1.454,
-        "dmMae": 2.47,
-        "dmQlike": 2.52
+        "n": 896,
+        "mae": 0.616,
+        "maeNaive": 0.638,
+        "qlike": 1.332,
+        "qlikeNaive": 1.457,
+        "dmMae": 2.41,
+        "dmQlike": 2.46
        },
        "event": {
         "n": 107,
@@ -2990,22 +2997,22 @@
      }
     },
     "selection": {
-     "n": 447,
+     "n": 448,
      "eventDays": 54,
      "eventAvgAbs": 1.126,
-     "otherAvgAbs": 0.768,
+     "otherAvgAbs": 0.77,
      "from": "2023-06-07",
-     "to": "2025-02-21",
+     "to": "2025-02-24",
      "models": {
       "cur": {
        "all": {
-        "n": 447,
-        "mae": 0.553,
-        "maeNaive": 0.567,
-        "qlike": 1.358,
-        "qlikeNaive": 1.189,
-        "dmMae": 1.2,
-        "dmQlike": -2.19
+        "n": 448,
+        "mae": 0.555,
+        "maeNaive": 0.568,
+        "qlike": 1.365,
+        "qlikeNaive": 1.194,
+        "dmMae": 1.17,
+        "dmQlike": -2.22
        },
        "event": {
         "n": 54,
@@ -3019,11 +3026,11 @@
       },
       "evt": {
        "all": {
-        "n": 447,
-        "mae": 0.564,
-        "maeNaive": 0.567,
-        "qlike": 1.138,
-        "qlikeNaive": 1.189,
+        "n": 448,
+        "mae": 0.565,
+        "maeNaive": 0.568,
+        "qlike": 1.142,
+        "qlikeNaive": 1.194,
         "dmMae": 0.46,
         "dmQlike": 1.37
        },
@@ -3039,13 +3046,13 @@
       },
       "ewma": {
        "all": {
-        "n": 447,
-        "mae": 0.557,
-        "maeNaive": 0.567,
-        "qlike": 1.121,
-        "qlikeNaive": 1.189,
-        "dmMae": 1.43,
-        "dmQlike": 1.69
+        "n": 448,
+        "mae": 0.558,
+        "maeNaive": 0.568,
+        "qlike": 1.125,
+        "qlikeNaive": 1.194,
+        "dmMae": 1.44,
+        "dmQlike": 1.7
        },
        "event": {
         "n": 54,
@@ -3059,13 +3066,13 @@
       },
       "har": {
        "all": {
-        "n": 447,
-        "mae": 0.559,
-        "maeNaive": 0.567,
-        "qlike": 1.133,
-        "qlikeNaive": 1.189,
-        "dmMae": 0.88,
-        "dmQlike": 1.22
+        "n": 448,
+        "mae": 0.56,
+        "maeNaive": 0.568,
+        "qlike": 1.139,
+        "qlikeNaive": 1.194,
+        "dmMae": 0.87,
+        "dmQlike": 1.2
        },
        "event": {
         "n": 54,
@@ -3079,13 +3086,13 @@
       },
       "vix": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.55,
-        "maeNaive": 0.567,
-        "qlike": 1.089,
-        "qlikeNaive": 1.189,
-        "dmMae": 2.06,
-        "dmQlike": 2.79
+        "maeNaive": 0.568,
+        "qlike": 1.092,
+        "qlikeNaive": 1.194,
+        "dmMae": 2.11,
+        "dmQlike": 2.84
        },
        "event": {
         "n": 54,
@@ -3103,19 +3110,19 @@
      "n": 448,
      "eventDays": 53,
      "eventAvgAbs": 1.236,
-     "otherAvgAbs": 0.979,
-     "from": "2025-02-24",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.983,
+     "from": "2025-02-25",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.686,
-        "maeNaive": 0.707,
-        "qlike": 2.035,
-        "qlikeNaive": 1.717,
-        "dmMae": 1.36,
-        "dmQlike": -2.87
+        "mae": 0.688,
+        "maeNaive": 0.708,
+        "qlike": 2.039,
+        "qlikeNaive": 1.719,
+        "dmMae": 1.31,
+        "dmQlike": -2.88
        },
        "event": {
         "n": 53,
@@ -3130,10 +3137,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.712,
-        "maeNaive": 0.707,
-        "qlike": 1.701,
-        "qlikeNaive": 1.717,
+        "mae": 0.714,
+        "maeNaive": 0.708,
+        "qlike": 1.703,
+        "qlikeNaive": 1.719,
         "dmMae": -1.36,
         "dmQlike": 0.64
        },
@@ -3150,11 +3157,11 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.704,
-        "maeNaive": 0.707,
-        "qlike": 1.811,
-        "qlikeNaive": 1.717,
-        "dmMae": 0.25,
+        "mae": 0.705,
+        "maeNaive": 0.708,
+        "qlike": 1.813,
+        "qlikeNaive": 1.719,
+        "dmMae": 0.24,
         "dmQlike": -1.23
        },
        "event": {
@@ -3170,11 +3177,11 @@
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.711,
-        "maeNaive": 0.707,
-        "qlike": 1.687,
-        "qlikeNaive": 1.717,
-        "dmMae": -0.31,
+        "mae": 0.713,
+        "maeNaive": 0.708,
+        "qlike": 1.689,
+        "qlikeNaive": 1.719,
+        "dmMae": -0.33,
         "dmQlike": 0.37
        },
        "event": {
@@ -3190,12 +3197,12 @@
       "vix": {
        "all": {
         "n": 448,
-        "mae": 0.678,
-        "maeNaive": 0.707,
-        "qlike": 1.563,
-        "qlikeNaive": 1.717,
-        "dmMae": 1.72,
-        "dmQlike": 1.63
+        "mae": 0.682,
+        "maeNaive": 0.708,
+        "qlike": 1.573,
+        "qlikeNaive": 1.719,
+        "dmMae": 1.61,
+        "dmQlike": 1.55
        },
        "event": {
         "n": 53,
@@ -3214,25 +3221,25 @@
     "used": "naive",
     "picked": "ewma",
     "tried": 4,
-    "split": "2025-02-24",
-    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-24)",
+    "split": "2025-02-25",
+    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-25)",
     "full": {
-     "n": 895,
+     "n": 896,
      "eventDays": 107,
      "eventAvgAbs": 0.846,
-     "otherAvgAbs": 0.6,
+     "otherAvgAbs": 0.601,
      "from": "2023-06-07",
-     "to": "2026-11-13",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
-        "n": 895,
-        "mae": 0.431,
-        "maeNaive": 0.45,
-        "qlike": 1.096,
-        "qlikeNaive": 0.774,
-        "dmMae": 2.83,
-        "dmQlike": -3.26
+        "n": 896,
+        "mae": 0.432,
+        "maeNaive": 0.451,
+        "qlike": 1.103,
+        "qlikeNaive": 0.777,
+        "dmMae": 2.78,
+        "dmQlike": -3.3
        },
        "event": {
         "n": 107,
@@ -3246,11 +3253,11 @@
       },
       "evt": {
        "all": {
-        "n": 895,
-        "mae": 0.451,
-        "maeNaive": 0.45,
-        "qlike": 0.743,
-        "qlikeNaive": 0.774,
+        "n": 896,
+        "mae": 0.452,
+        "maeNaive": 0.451,
+        "qlike": 0.746,
+        "qlikeNaive": 0.777,
         "dmMae": -0.5,
         "dmQlike": 0.73
        },
@@ -3266,12 +3273,12 @@
       },
       "ewma": {
        "all": {
-        "n": 895,
-        "mae": 0.443,
-        "maeNaive": 0.45,
-        "qlike": 0.779,
-        "qlikeNaive": 0.774,
-        "dmMae": 1.2,
+        "n": 896,
+        "mae": 0.444,
+        "maeNaive": 0.451,
+        "qlike": 0.782,
+        "qlikeNaive": 0.777,
+        "dmMae": 1.21,
         "dmQlike": -0.08
        },
        "event": {
@@ -3286,13 +3293,13 @@
       },
       "har": {
        "all": {
-        "n": 895,
-        "mae": 0.449,
-        "maeNaive": 0.45,
-        "qlike": 0.659,
-        "qlikeNaive": 0.774,
-        "dmMae": 0.1,
-        "dmQlike": 1.7
+        "n": 896,
+        "mae": 0.45,
+        "maeNaive": 0.451,
+        "qlike": 0.663,
+        "qlikeNaive": 0.777,
+        "dmMae": 0.09,
+        "dmQlike": 1.69
        },
        "event": {
         "n": 107,
@@ -3306,13 +3313,13 @@
       },
       "vix": {
        "all": {
-        "n": 895,
-        "mae": 0.42,
-        "maeNaive": 0.45,
-        "qlike": 0.569,
-        "qlikeNaive": 0.774,
-        "dmMae": 4.18,
-        "dmQlike": 2.67
+        "n": 896,
+        "mae": 0.421,
+        "maeNaive": 0.451,
+        "qlike": 0.576,
+        "qlikeNaive": 0.777,
+        "dmMae": 4.14,
+        "dmQlike": 2.63
        },
        "event": {
         "n": 107,
@@ -3327,22 +3334,22 @@
      }
     },
     "selection": {
-     "n": 447,
+     "n": 448,
      "eventDays": 54,
      "eventAvgAbs": 0.812,
      "otherAvgAbs": 0.527,
      "from": "2023-06-07",
-     "to": "2025-02-21",
+     "to": "2025-02-24",
      "models": {
       "cur": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.372,
         "maeNaive": 0.39,
-        "qlike": 0.73,
+        "qlike": 0.733,
         "qlikeNaive": 0.501,
-        "dmMae": 2.33,
-        "dmQlike": -1.7
+        "dmMae": 2.27,
+        "dmQlike": -1.72
        },
        "event": {
         "n": 54,
@@ -3356,10 +3363,10 @@
       },
       "evt": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.386,
         "maeNaive": 0.39,
-        "qlike": 0.394,
+        "qlike": 0.395,
         "qlikeNaive": 0.501,
         "dmMae": 0.68,
         "dmQlike": 1.31
@@ -3376,10 +3383,10 @@
       },
       "ewma": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.384,
         "maeNaive": 0.39,
-        "qlike": 0.383,
+        "qlike": 0.384,
         "qlikeNaive": 0.501,
         "dmMae": 1.23,
         "dmQlike": 1.34
@@ -3396,13 +3403,13 @@
       },
       "har": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.387,
         "maeNaive": 0.39,
-        "qlike": 0.388,
+        "qlike": 0.389,
         "qlikeNaive": 0.501,
-        "dmMae": 0.48,
-        "dmQlike": 1.16
+        "dmMae": 0.46,
+        "dmQlike": 1.15
        },
        "event": {
         "n": 54,
@@ -3416,12 +3423,12 @@
       },
       "vix": {
        "all": {
-        "n": 447,
+        "n": 448,
         "mae": 0.376,
         "maeNaive": 0.39,
-        "qlike": 0.336,
+        "qlike": 0.337,
         "qlikeNaive": 0.501,
-        "dmMae": 2.22,
+        "dmMae": 2.26,
         "dmQlike": 2.11
        },
        "event": {
@@ -3440,19 +3447,19 @@
      "n": 448,
      "eventDays": 53,
      "eventAvgAbs": 0.882,
-     "otherAvgAbs": 0.672,
-     "from": "2025-02-24",
-     "to": "2026-11-13",
+     "otherAvgAbs": 0.675,
+     "from": "2025-02-25",
+     "to": "2026-11-16",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.489,
-        "maeNaive": 0.509,
-        "qlike": 1.461,
-        "qlikeNaive": 1.046,
-        "dmMae": 1.81,
-        "dmQlike": -2.87
+        "mae": 0.492,
+        "maeNaive": 0.511,
+        "qlike": 1.473,
+        "qlikeNaive": 1.053,
+        "dmMae": 1.79,
+        "dmQlike": -2.9
        },
        "event": {
         "n": 53,
@@ -3467,10 +3474,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.516,
-        "maeNaive": 0.509,
-        "qlike": 1.091,
-        "qlikeNaive": 1.046,
+        "mae": 0.518,
+        "maeNaive": 0.511,
+        "qlike": 1.098,
+        "qlikeNaive": 1.053,
         "dmMae": -2.06,
         "dmQlike": -1.89
        },
@@ -3487,11 +3494,11 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.502,
-        "maeNaive": 0.509,
-        "qlike": 1.174,
-        "qlikeNaive": 1.046,
-        "dmMae": 0.71,
+        "mae": 0.505,
+        "maeNaive": 0.511,
+        "qlike": 1.181,
+        "qlikeNaive": 1.053,
+        "dmMae": 0.72,
         "dmQlike": -1.36
        },
        "event": {
@@ -3507,12 +3514,12 @@
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.511,
-        "maeNaive": 0.509,
-        "qlike": 0.929,
-        "qlikeNaive": 1.046,
-        "dmMae": -0.13,
-        "dmQlike": 1.25
+        "mae": 0.513,
+        "maeNaive": 0.511,
+        "qlike": 0.936,
+        "qlikeNaive": 1.053,
+        "dmMae": -0.14,
+        "dmQlike": 1.24
        },
        "event": {
         "n": 53,
@@ -3527,12 +3534,12 @@
       "vix": {
        "all": {
         "n": 448,
-        "mae": 0.464,
-        "maeNaive": 0.509,
-        "qlike": 0.801,
-        "qlikeNaive": 1.046,
-        "dmMae": 3.58,
-        "dmQlike": 1.86
+        "mae": 0.467,
+        "maeNaive": 0.511,
+        "qlike": 0.814,
+        "qlikeNaive": 1.053,
+        "dmMae": 3.51,
+        "dmQlike": 1.81
        },
        "event": {
         "n": 53,
@@ -3559,9 +3566,9 @@
      "proven": false
     },
     "macro": {
-     "n": 604,
-     "hit": 0.538,
-     "t": 1.87,
+     "n": 603,
+     "hit": 0.537,
+     "t": 1.83,
      "proven": false
     },
     "rymom": {
@@ -3571,9 +3578,9 @@
      "proven": false
     },
     "be": {
-     "n": 745,
+     "n": 744,
      "hit": 0.489,
-     "t": -0.62,
+     "t": -0.59,
      "proven": false
     },
     "dgs2": {
@@ -3589,9 +3596,9 @@
      "proven": false
     },
     "curve": {
-     "n": 587,
-     "hit": 0.532,
-     "t": 1.53,
+     "n": 586,
+     "hit": 0.531,
+     "t": 1.49,
      "proven": false
     },
     "smile": {
@@ -3601,9 +3608,9 @@
      "proven": false
     },
     "eugrowth": {
-     "n": 286,
-     "hit": 0.507,
-     "t": 0.24,
+     "n": 285,
+     "hit": 0.509,
+     "t": 0.3,
      "proven": false
     },
     "trend": {
@@ -3614,20 +3621,20 @@
     },
     "v_ry4w": {
      "n": 645,
-     "hit": 0.513,
-     "t": 0.67,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 622,
-     "hit": 0.497,
-     "t": -0.16,
+     "hit": 0.515,
+     "t": 0.75,
      "proven": false
     },
     "v_d2_4w": {
      "n": 514,
      "hit": 0.523,
      "t": 1.06,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 622,
+     "hit": 0.497,
+     "t": -0.16,
      "proven": false
     },
     "vix": {
@@ -3637,15 +3644,15 @@
      "proven": false
     },
     "hy": {
-     "n": 409,
-     "hit": 0.533,
-     "t": 1.34,
+     "n": 410,
+     "hit": 0.534,
+     "t": 1.38,
      "proven": false
     },
     "cot": {
-     "n": 378,
-     "hit": 0.503,
-     "t": 0.1,
+     "n": 379,
+     "hit": 0.501,
+     "t": 0.05,
      "proven": false
     }
    },
@@ -3681,9 +3688,9 @@
      "proven": false
     },
     "eugrowth": {
-     "n": 285,
-     "hit": 0.481,
-     "t": -0.65,
+     "n": 284,
+     "hit": 0.482,
+     "t": -0.59,
      "proven": false
     },
     "trend": {
@@ -3694,20 +3701,20 @@
     },
     "v_ry4w": {
      "n": 644,
-     "hit": 0.5,
-     "t": 0,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 621,
-     "hit": 0.459,
-     "t": -2.05,
+     "hit": 0.502,
+     "t": 0.08,
      "proven": false
     },
     "v_d2_4w": {
      "n": 513,
      "hit": 0.507,
      "t": 0.31,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 621,
+     "hit": 0.459,
+     "t": -2.05,
      "proven": false
     },
     "vix": {
@@ -3717,9 +3724,9 @@
      "proven": false
     },
     "hy": {
-     "n": 408,
-     "hit": 0.485,
-     "t": -0.59,
+     "n": 409,
+     "hit": 0.484,
+     "t": -0.64,
      "proven": false
     }
    },
@@ -3762,14 +3769,8 @@
     },
     "v_ry4w": {
      "n": 644,
-     "hit": 0.539,
-     "t": 1.97,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 622,
-     "hit": 0.51,
-     "t": 0.48,
+     "hit": 0.537,
+     "t": 1.89,
      "proven": false
     },
     "v_d2_4w": {
@@ -3778,10 +3779,16 @@
      "t": 1.46,
      "proven": false
     },
+    "v_dxy4w": {
+     "n": 622,
+     "hit": 0.51,
+     "t": 0.48,
+     "proven": false
+    },
     "smile": {
-     "n": 351,
-     "hit": 0.533,
-     "t": 1.23,
+     "n": 352,
+     "hit": 0.531,
+     "t": 1.17,
      "proven": false
     },
     "vix": {
@@ -3791,9 +3798,9 @@
      "proven": true
     },
     "hy": {
-     "n": 409,
-     "hit": 0.521,
-     "t": 0.84,
+     "n": 410,
+     "hit": 0.52,
+     "t": 0.79,
      "proven": false
     }
    },
@@ -3823,9 +3830,9 @@
      "proven": false
     },
     "smile": {
-     "n": 416,
-     "hit": 0.538,
-     "t": 1.57,
+     "n": 415,
+     "hit": 0.537,
+     "t": 1.52,
      "proven": false
     },
     "trend": {
@@ -3836,20 +3843,20 @@
     },
     "v_ry4w": {
      "n": 644,
-     "hit": 0.498,
-     "t": -0.08,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 622,
-     "hit": 0.511,
-     "t": 0.56,
+     "hit": 0.5,
+     "t": 0,
      "proven": false
     },
     "v_d2_4w": {
      "n": 514,
      "hit": 0.525,
      "t": 1.15,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 622,
+     "hit": 0.511,
+     "t": 0.56,
      "proven": false
     },
     "vix": {
@@ -3859,9 +3866,9 @@
      "proven": false
     },
     "hy": {
-     "n": 409,
-     "hit": 0.506,
-     "t": 0.25,
+     "n": 410,
+     "hit": 0.505,
+     "t": 0.2,
      "proven": false
     },
     "vixts": {
@@ -3897,9 +3904,9 @@
      "proven": false
     },
     "smile": {
-     "n": 415,
-     "hit": 0.54,
-     "t": 1.62,
+     "n": 414,
+     "hit": 0.539,
+     "t": 1.57,
      "proven": false
     },
     "trend": {
@@ -3910,20 +3917,20 @@
     },
     "v_ry4w": {
      "n": 643,
-     "hit": 0.518,
-     "t": 0.91,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 619,
-     "hit": 0.528,
-     "t": 1.41,
+     "hit": 0.519,
+     "t": 0.99,
      "proven": false
     },
     "v_d2_4w": {
      "n": 514,
      "hit": 0.535,
      "t": 1.59,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 619,
+     "hit": 0.528,
+     "t": 1.41,
      "proven": false
     },
     "vix": {
@@ -3933,9 +3940,9 @@
      "proven": false
     },
     "hy": {
-     "n": 408,
-     "hit": 0.527,
-     "t": 1.09,
+     "n": 409,
+     "hit": 0.526,
+     "t": 1.04,
      "proven": false
     },
     "vixts": {
@@ -3947,62 +3954,62 @@
    }
   },
   "logged": 32,
-  "resolved": 25,
+  "resolved": 27,
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
-  "fred:DGS10": "ok, last 2026-11-13",
   "fred:DFII10": "ok, last 2026-11-13",
   "fred:DGS2": "ok, last 2026-11-13",
   "fred:T10YIE": "ok, last 2026-11-16",
-  "fred:BAMLH0A0HYM2": "ok, last 2026-11-13",
-  "fred:T10Y3M": "ok, last 2026-11-16",
+  "fred:DGS10": "ok, last 2026-11-13",
   "fred:VIXCLS": "ok, last 2026-11-13",
-  "fred:RRPONTSYD": "ok, last 2026-11-16",
-  "fred:WALCL": "ok, last 2026-11-11",
-  "fred:VXVCLS": "ok, last 2026-11-13",
   "fred:DTWEXBGS": "ok, last 2026-11-13",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-13",
+  "fred:WALCL": "ok, last 2026-11-11",
+  "fred:T10Y3M": "ok, last 2026-11-16",
+  "fred:VXVCLS": "ok, last 2026-11-13",
   "fred:WTREGEN": "ok, last 2026-11-11",
   "fred:SOFR": "ok, last 2026-11-13",
-  "fred:EFFR": "ok, last 2026-11-13",
+  "fred:RRPONTSYD": "ok, last 2026-11-16",
   "fred:SWPT": "ok, last 2026-11-11",
+  "fred:EFFR": "ok, last 2026-11-13",
   "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "ecb:2y": "ok, last 2026-11-13",
-  "bars:es": "OANDA ok (1400 days)",
-  "bars:usdcad": "OANDA ok (1400 days)",
-  "bars:nq": "OANDA ok (1400 days)",
   "bars:gold": "OANDA ok (1400 days)",
-  "bars:usdjpy": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
   "bars:gbpusd": "OANDA ok (1400 days)",
   "bars:eurusd": "OANDA ok (1400 days)",
+  "bars:usdjpy": "OANDA ok (1400 days)",
+  "bars:nq": "OANDA ok (1400 days)",
+  "bars:usdcad": "OANDA ok (1400 days)",
   "bars:usdchf": "OANDA ok (1400 days)",
   "calendar:thisweek": "ok (124 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "calendar:cache": "using the last good copy for the week that failed (106 cached events)",
   "rss:Fed": "ok (20 items)",
+  "rss:BoJ": "ok (45 items)",
   "rss:ECB": "ok (15 items)",
-  "rss:BoJ": "ok (44 items)",
   "cot": "ok (98 weeks)",
   "score:DFII10": "ok, 5221 days to 2026-11-13",
   "score:DGS2": "ok, 5221 days to 2026-11-13",
   "score:DGS10": "ok, 5221 days to 2026-11-13",
-  "score:dxy": "7681 days (daily cache since 2002-05-08)"
+  "score:dxy": "7682 days (daily cache since 2002-05-08)"
  },
  "goldScore": {
   "ok": true,
   "asOf": "2026-11-20",
   "partial": true,
   "stale": [],
-  "score": -1.01,
+  "score": -1.03,
   "z": {
    "ry4w": -1.14,
-   "dxy4w": -0.77,
+   "dxy4w": -0.85,
    "y2_13w": -1.38,
    "curve13w": -0.76
   },
   "raw": {
    "ry4w": -0.25,
-   "dxy4w": -0.0162,
+   "dxy4w": -0.018,
    "y2_13w": -0.64,
    "curve13w": -0.23
   },
@@ -4012,7 +4019,7 @@
    0.13,
    0.05,
    -0.96,
-   -1.01
+   -1.03
   ],
   "hist": [
    [
@@ -4117,19 +4124,19 @@
    ],
    [
     "2026-11-20",
-    -1.01
+    -1.03
    ]
   ],
   "weeks": 1069,
   "trend": {
    "above10w": false,
-   "last": 3900.27,
-   "avg10w": 4089.09
+   "last": 3862.77,
+   "avg10w": 4085.34
   },
   "bias": "AUCTION",
   "conviction": null,
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Mon 16 Nov 23:36 UTC, for Tue 17 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · liquidity flat · normal volatility. Tue 17 Nov is an event day (USD Core Retail Sales m/m): expect bigger moves. Gold: 50% up (base rate 53%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: funds positioning. Expected move ±1.28% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.3% (20-day average). USD/JPY: 59% up (base rate 56%; macro tilt up 3 pts). Drivers lean up: real yields, us 10y yield trend. Expected move ±0.31% (20-day average). NQ (Nasdaq 100): 53% up (base rate 56%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.55% (20-day average). ES (S&P 500): 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±0.91% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -1.01 → AUCTION (no macro edge) (real yield 4w z -1.14, DXY 4w z -0.77, 2Y 13w z -1.38, curve 13w z -0.76; 6-week path -0.58 → -0.13 → +0.13 → +0.05 → -0.96 → -1.01; week to 2026-11-20, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: AUD RBA Gov Bullock Speaks Mon 16 Nov 22:50 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.28%; NZD Inflation Expectations q/q Tue 17 Nov 02:00 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.28%; USD Core Retail Sales m/m Tue 17 Nov 13:30 UTC (consensus 0.4%, previous 0.9%): if hot, gold down, USD up, NQ mixed; gold usually moves ±1.28%; USD Retail Sales m/m Tue 17 Nov 13:30 UTC (consensus 0.1%, previous 0.8%): if hot, gold down, USD up, NQ mixed; gold usually moves ±1.28%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.7): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.981% on average against 0.866% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Tue 17 Nov 00:42 UTC, for Wed 18 Nov (UTC day, open to close). Regime: Dollar Smile right side (US outperformance) · liquidity flat · normal volatility. Wed 18 Nov is an event day (USD FOMC Meeting Minutes): expect bigger moves. Gold: 50% up (base rate 53%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: funds positioning. Expected move ±1.26% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±0.31% (20-day average). USD/JPY: 59% up (base rate 56%; macro tilt up 3 pts). Drivers lean up: real yields, us 10y yield trend. Expected move ±0.29% (20-day average). NQ (Nasdaq 100): 53% up (base rate 56%; macro tilt down 3 pts). Drivers lean down: real yields, real-yield 1-week momentum; against: credit stress. Expected move ±1.69% (20-day average). ES (S&P 500): 51% up (base rate 54%; macro tilt down 3 pts). Drivers lean down: real yields, own price trend; against: credit stress. Expected move ±1.01% (20-day average). DXY: 52% up (mirror of EUR/USD). Gold Macro Score -1.03 → AUCTION (no macro edge) (real yield 4w z -1.14, DXY 4w z -0.85, 2Y 13w z -1.38, curve 13w z -0.76; 6-week path -0.58 → -0.13 → +0.13 → +0.05 → -0.96 → -1.03; week to 2026-11-20, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: AUD RBA Gov Bullock Speaks Mon 16 Nov 22:50 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.26%; NZD Inflation Expectations q/q Tue 17 Nov 02:00 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.26%; USD Core Retail Sales m/m Tue 17 Nov 13:30 UTC (consensus 0.4%, previous 0.9%): if hot, gold down, USD up, NQ mixed; gold usually moves ±1.26%; USD Retail Sales m/m Tue 17 Nov 13:30 UTC (consensus 0.1%, previous 0.8%): if hot, gold down, USD up, NQ mixed; gold usually moves ±1.26%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.59): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.981% on average against 0.867% on other days, but no model turned that into a better forecast."
 }
