@@ -6,6 +6,8 @@ import vercel from '../../vercel.json';
 import { run } from './adapter.mjs';
 import { rewrite, headersFor } from './routes.mjs';
 import { blobBackup } from './backup.mjs';
+import { storeMirror } from './store-mirror.mjs';
+import './store-blob.mjs';   // first: the @vercel/blob the handlers load (the D1 switch), its fetch for store URLs in place
 
 import academyMcp from '../../api/academy-mcp.js';
 import academy from '../../api/academy.js';
@@ -90,5 +92,7 @@ export default {
     const r = await handle(req, env, ctx);
     console.log('cron', path, r.status);
     if (event.cron === '*/10 * * * *') console.log('blob backup', JSON.stringify(await blobBackup(env).catch((e) => ({ error: String(e && e.message || e) }))));
+    const sm = await storeMirror(env, { cron: event.cron }).catch((e) => ({ error: String(e && e.message || e) }));
+    if (!sm.quiet) console.log('store mirror', JSON.stringify(sm));
   },
 };
