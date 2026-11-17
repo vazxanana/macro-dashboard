@@ -3853,6 +3853,34 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   passed: in sample over two weeks of one market regime), demo copies 0.065R a trade worse than paper (n 152, t 3.10).
 - Tests: `tests/trade-review.test.mjs` (9), `tests/trade-review-ai.test.mjs` (7); fixture `tests/fixtures/trade-review/`
   (a made-up desk, `make.mjs` builds it).
+- **Proposal ledger (17 Nov 2026, owner: "improve the brain")**: council-data `research/trade-review-ledger.json`, APPEND-ONLY
+  (`ledgerOf`): each proposal is recorded once (`ledgerId` = stream key + `#` + flag id) with its evidence of that day
+  (`recordedAt`); an entry is never edited or removed, and the file is written only when a new one is added. Every run
+  re-measures each entry (`forwardCheck`) ONLY on its stream's trades closed strictly after `recordedAt` (never the trades
+  that suggested it): the subset against the rest by Welch t (a session / hours / side / market flag), t against zero
+  (losing, costs), the paired +1R counterfactual (exit flags). Status (`FWD`): `too few` (under 20 new trades, or under 10 in
+  the rest), `held` (the recorded sign and |t| >= 2), `faded` (the sign turned, or |t| < 1), `unclear`. The review file
+  carries `ledger { n, counts, items }` and each proposal `forward`; a **faded proposal is not strong** (`fadedForward`), so
+  the week pane's "Decisions waiting" drops it with no page change. A ledger file that does not parse is never overwritten
+  (`ledger.error`, nothing new recorded). "Held" is a second small sample, never an edge. `datahealth.mjs` lists the file
+  (no staleness: written only on a new proposal).
+- **Pre-registration drafts**: each strong proposal carries `prereg`, the text of a PREREGISTRATION.md (`preregOf`: why, H1 /
+  H0 and the variant, data 2020 → now, IS 2020-23 / OOS 2024 →, the council cost model, month-sum t of the paired difference
+  (or of the rule against zero for losing / keep-off-live), Holm, the pass bar), dated the day the proposal was recorded so
+  the hash does not move daily. No study folder is made; the owner approves and commits it alone. The review does not know
+  which studies already exist: check `research/edge/` first (on 17 Nov the replica's "sells only" draft repeats
+  `replica-sides`, which FAILED).
+- **The language-model reviewer** gets each stream's `forwardChecks` and `parseAnswer` drops a proposal on a faded flag.
+  **The edge analyst** (`api/_edge-analyst.js` `forwardRecord`, passed by `api/edge-analyst.js` as `buildRequest`'s 4th
+  argument) adds `systemForwardRecord`: the same system's trades (not shadow, add, replay, void, nor the trade itself; the NQ
+  open run's `nyflip` session only) closed STRICTLY before the entry: n, win rate, mean R after costs (`Rnet`, else before,
+  said in `basis`), the last 10 results; under 10 closed it says "Too few" and gives no win rate or mean. No id, time or price
+  of another trade is sent. Card `#ms-tr`: the ledger counts in the summary, a forward chip and line per proposal, the draft
+  in a fold (inside `#ms-tr-js`). Tests: `tests/trade-review-ledger.test.mjs` (7), `tests/brain-forward.test.mjs` (3).
+- **First reading with the ledger** (council-data of 17 Nov 2026 12:00 UTC): 30 streams, 19 flags, 3 proposals, all on the
+  replica's research trades, all recorded and "too few" forward (0 trades since): take only sells (buys n 525, −0.41R, t −7.58,
+  Holm, strong; already answered by `replica-sides` FAIL), keep off live (n 1,009, −0.09R, t −2.00, strong), skip 04-08 UTC
+  (n 214, t −2.57, not Holm).
 
 ## Edge check and the replica's sides (17 Nov 2026, owner: "Try to check the edges which ones can we improve and focus like the replica")
 An evidence review and one pre-registered study; no live rule, size, filter, stop, config, Trader or mirror code changed. The

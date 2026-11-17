@@ -65,7 +65,7 @@ async function scan(d) {
     const t = E.entryT(x), bars = {};
     try { for (const [lab, gran, sec, n] of E.FRAMES) bars[lab] = await candles(d, E.INST[x.market], gran, sec, n, t); }
     catch (e) { out.skipped.push({ id: x.id, why: String(e.message || e).slice(0, 80) }); continue; }   // tried again next run (within 3 days)
-    const q = E.buildRequest(x, bars, forecast && forecast.playbook);
+    const q = E.buildRequest(x, bars, forecast && forecast.playbook, all);   // + the system's forward record, closed before the entry only
     const ans = await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'analyst', maxTokens: 900 }, { env: llmEnv(env), store, now: d.now });
     // a call that may have been paid for (an answer with no usable text, a timeout, an unreadable answer) is stored as refused
     // like an answer that does not fit, so the entry is never paid for twice; a refused call (not billed) is tried again next run

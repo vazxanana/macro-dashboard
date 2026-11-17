@@ -88,7 +88,7 @@ test('trade review: proposals carry evidence, the in-sample warning and the pre-
   assert.match(R.rule, /proposals only/); assert.match(R.rule, /ICT/);
 });
 
-test('trade review: the file side writes only research/trade-review.json, and an unchanged reading only every 6 hours', () => {
+test('trade review: the file side writes only research/trade-review.json (+ the ledger), and an unchanged reading only every 6 hours', () => {
   const d = copy(), before = fs.readFileSync(path.join(d, 'config.json'), 'utf8');
   const a = T.main(d, { now: NOW });
   assert.equal(a.written, true);
@@ -104,7 +104,8 @@ test('trade review: proposals only and ICT out, in the code itself', () => {
   const s = src('council/trade-review.mjs');
   assert.doesNotMatch(s, /writeAtomic\([^)]*config/); assert.doesNotMatch(s, /from '\.\/trader\.mjs'|ctrader-mirror|from '\.\.\/ict\//);
   assert.doesNotMatch(s, /'ict\/[a-z-]+\.json'/);   // no ICT file is read
-  assert.equal((s.match(/writeAtomic\(/g) || []).length, 1);
+  assert.equal((s.match(/writeAtomic\(/g) || []).length, 2);   // the review and the append-only proposal ledger, nothing else
+  assert.ok(s.includes('writeAtomic(file,') && s.includes('writeAtomic(path.join(dir, LEDGER),'));
 });
 
 test('trade review: the council loop runs it every 6th round under a timeout, and the data check watches its file', () => {

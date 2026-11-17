@@ -16,7 +16,8 @@
 //
 // Reads council-data: trades.json, research.json, coach.json (decay / expect / forward), config.json (owner shadows),
 // ctrader/mirror*.json (through mirror-accounts.json), reviews/analyst.json, reviews/losses.json.
-// Writes council-data research/trade-review.json (only when its content changed). Run: node council/trade-review.mjs <dir> [--dry]
+// Writes council-data research/trade-review.json (only when its content changed) and research/trade-review-ledger.json (append-only,
+// only when a proposal is recorded for the first time). Run: node council/trade-review.mjs <dir> [--dry]
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -221,6 +222,14 @@ export const TEST_BASE = {
   bar: 'out of sample: n ≥ 100, mean R a trade > 0 after costs in both halves, t ≥ 2 on calendar-month sums after Holm over every test named in the pre-registration',
   how: 'PREREGISTRATION.md pushed first in research/edge/<topic>/, then run.mjs, RESULT.md, result.json; the owner approves any live change',
 };
+// Questions a committed, pre-registered study has already answered (17 Nov 2026). A proposal that asks one again is shown with
+// the study's verdict, is not strong and gets no draft: the review must not send the owner back to a question already tested.
+// Key: system id | proposal action. Add a row only for a study with a result.json / RESULT.md in research/edge/.
+export const STUDIED = {
+  'replica|one side only': { study: 'replica-sides', verdict: 'FAIL', text: 'Tested on 2020-26 (17 Nov 2026): the replica\'s sells do not beat its buys (sells minus buys +0.007R, t 0.38); the forward split is a regime artefact.' },
+  'replica|keep off live': { study: 'replica-oos', verdict: 'FAIL', text: 'Already answered: the replica fails out of sample (replica-oos) and has been a paper shadow by the owner\'s rule since 11 Nov 2026.' },
+};
+export function studiedOf(p) { return STUDIED[`${p.system}|${p.action}`] || null; }
 const IN_SAMPLE = 'In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.';
 export function proposalOf(f, S) {
   const sys = `${S.name}${S.book === 'live' ? '' : ` (${S.book})`}`;
@@ -261,6 +270,97 @@ function readStream(S, W, wr, sp, slip, tags, flags) {
   return { head, working: good, losing: bad };
 }
 
+// ─── the proposal ledger: does the review's own idea hold on the trades that came AFTER it? (17 Nov 2026) ───
+// council-data research/trade-review-ledger.json, append-only: each proposal is recorded ONCE (id = stream key + flag id) with its
+// evidence as of the day it was first made; an entry is never edited or removed. Every run re-measures each entry on the trades
+// of its stream closed STRICTLY AFTER the entry was recorded: the trades that suggested it are never reused, and nothing is read
+// before it happened. Status: too few (under 20 new trades in the subset, or under 10 in the rest it is compared with), held (the
+// same sign as when recorded and |t| >= 2), faded (the sign turned, or |t| < 1 on 20+ trades), unclear (the rest). A faded
+// proposal is no longer offered as strong. A forward check is a second small sample: "held" is not an edge either.
+export const LEDGER = 'research/trade-review-ledger.json';
+export const FWD = { N: 20, REST_N: 10, HELD_T: 2, FADE_T: 1 };
+export const FWD_TEXT = { 'too few': 'too few new trades to judge yet', held: 'held on the trades closed since it was recorded', faded: 'faded on the trades closed since it was recorded', unclear: 'not clear yet on the trades closed since it was recorded' };
+export const ledgerId = (streamKey, flagId) => `${streamKey}#${flagId}`;
+// the entry as recorded: the evidence of that day, never rewritten
+export function ledgerEntry(p, f, S, now) {
+  return { id: ledgerId(S.key, f.id), stream: S.key, flag: f.id, system: S.id, name: S.name, book: S.book, kind: f.kind, field: f.field, value: f.value,
+    action: p.action, change: p.change, recordedAt: now, recorded: new Date(now * 1000).toISOString(),
+    evidence: { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), ...(f.rest ? { rest: f.rest } : {}), holm: f.holm != null ? f.holm : null }, strongAtRecord: !!p.strong };
+}
+const sgn = (v) => (v > 0 ? 1 : v < 0 ? -1 : 0);
+// one entry measured on its stream's rows closed after it was recorded (rows: norm() rows, any order)
+export function forwardCheck(e, rows) {
+  const after = arr(rows).filter((r) => Number.isFinite(r.t) && r.t > e.recordedAt);
+  let n, mean, t, rest = null, diff = null, basis;
+  if (e.kind === 'exit-lock1R' || e.kind === 'exit-runs') {
+    const d = describe(after.filter((r) => r.mfe != null).map((r) => (r.mfe >= 1 ? 1 : r.R) - r.R));
+    n = d.n; mean = d.mean; t = d.t; basis = 'a +1R close minus the R closed, paired, before costs';
+  } else if (e.field && e.field !== 'exit') {
+    const a = after.filter((r) => r[e.field] === e.value).map((r) => r.net), b = after.filter((r) => r[e.field] != null && r[e.field] !== e.value).map((r) => r.net);
+    const A = describe(a), w = welch(a, b);
+    n = A.n; mean = A.mean; rest = { n: b.length, mean: r3(describe(b).mean) }; diff = w.diff; t = w.t;
+    basis = `${e.field} ${e.value} against the rest, R after costs (Welch t)`;
+  } else {
+    const d = describe(after.map((r) => r.net)); n = d.n; mean = d.mean; t = d.t; basis = 'R a trade after costs (t against zero)';
+  }
+  if (!Number.isFinite(t)) t = 0;
+  const few = n < FWD.N || (rest && rest.n < FWD.REST_N), rec = sgn(e.evidence && e.evidence.t), now = sgn(t);
+  const status = few ? 'too few' : now === rec && Math.abs(t) >= FWD.HELD_T ? 'held' : (now !== 0 && now !== rec) || Math.abs(t) < FWD.FADE_T ? 'faded' : 'unclear';
+  return { n, mean: n ? r3(mean) : null, ...(rest ? { rest, diff: n && rest.n ? r3(diff) : null } : {}), t: r2(t), status, basis,
+    text: `${FWD_TEXT[status]}: ${n} trade${n === 1 ? '' : 's'}${rest ? ` against ${rest.n}` : ''}${n ? `, ${fR(mean)} a trade, ${fT(t)}` : ''} (recorded with ${fT(e.evidence && e.evidence.t)}).` };
+}
+// the ledger after this run: the old entries untouched, one new entry per proposal not recorded yet; and the view of every entry
+export function ledgerOf(prev, recs, rowsByKey) {
+  const old = arr(prev && prev.entries), have = new Set(old.map((e) => e && e.id)), add = [];
+  for (const e of recs) if (!have.has(e.id)) { have.add(e.id); add.push(e); }
+  const entries = old.concat(add), counts = { 'too few': 0, held: 0, faded: 0, unclear: 0 };
+  const items = entries.filter((e) => e && e.id && Number.isFinite(e.recordedAt)).map((e) => {
+    const fw = forwardCheck(e, rowsByKey.get(e.stream)); counts[fw.status]++;
+    return { id: e.id, flag: e.flag, stream: e.stream, name: e.name, book: e.book, kind: e.kind, change: e.change, recorded: e.recorded, evidence: e.evidence, strongAtRecord: !!e.strongAtRecord, forward: fw };
+  });
+  return {
+    file: { v: 1, rule: 'append-only: an entry is recorded once with the evidence of its day and never edited; the forward check reads only trades closed after it', entries },
+    added: add.length,
+    view: { file: LEDGER, n: items.length, counts, thresholds: { ...FWD },
+      rule: 'Each proposal is re-measured only on trades closed after it was recorded, never on the trades that suggested it. Too few: under 20 new trades. Held: the same sign and |t| ≥ 2. Faded: the sign turned or |t| < 1. A faded proposal is not offered as strong. Held is a second small sample, not an edge.', items },
+  };
+}
+
+// ─── pre-registration drafts for the strong proposals (17 Nov 2026) ───
+// The text of a PREREGISTRATION.md the owner can approve in one step. A draft only: no folder is made, nothing runs; the study
+// would be committed alone first, as every study is. The forward trades that suggested the proposal are not its evidence.
+const HYP = {
+  'skip session': (p, S, f) => [`H1: ${S.name}'s trades filled in the ${SESSION_NAME[f.value] || f.value} session make less R a trade after costs than its trades in the other sessions, so the rule without that session makes more.`, 'H0: no difference.', `Variant: the rule as it is, with no entry filled in that session (council/trader.mjs UTC session clock).`],
+  'skip hours': (p, S, f) => [`H1: ${S.name}'s entries filled between ${f.value} UTC make less R a trade after costs than its entries at other hours.`, 'H0: no difference.', `Variant: the rule as it is, with no entry filled between ${f.value} UTC.`],
+  'one side only': (p, S, f) => [`H1: ${S.name}'s ${f.value}s make less R a trade after costs than its ${f.value === 'buy' ? 'sells' : 'buys'}.`, 'H0: no difference between the sides.', `Variant: the rule as it is, ${f.value === 'buy' ? 'sells' : 'buys'} only.`],
+  'skip market': (p, S, f) => [`H1: ${S.name} loses after costs on ${mName(f.value)} while it does not on its other markets.`, 'H0: no difference.', `Variant: the rule as it is, without ${mName(f.value)}.`],
+  'change exit': (p, S) => [`H1: on the same entries, ${S.name} makes more R a trade after costs with a +1R take-profit (or a break-even step at +1R) than with its current exit.`, 'H0: no difference.', 'Variant: the same entries and stops; the exit at +1R as stated (the step fixed before the run).'],
+  'cut costs': (p, S) => [`H1: ${S.name} stays positive after costs when its smallest stops are left out (a minimum stop of N x the round-trip cost, N fixed below before the run).`, 'H0: the rule loses after costs with or without the minimum stop.', 'Variant: the rule as it is, entries with a stop under N x the cost skipped (N = 5 unless the owner sets another before the run).'],
+  'move to shadow': (p, S) => [`H1: ${S.name}'s rule makes more than 0R a trade after costs out of sample (it deserves the live book).`, 'H0: it does not; its forward loss matches its history.', 'No variant: the rule as it is. A FAIL supports moving it to a paper shadow; a PASS says the forward loss is not yet a reason to.'],
+  'keep off live': (p, S) => [`H1: ${S.name}'s rule makes more than 0R a trade after costs out of sample.`, 'H0: it does not.', 'No variant: the rule as it is. A FAIL supports keeping it off the live book (and no longer recording it); a PASS reopens the question.'],
+};
+const cap = (x) => String(x).charAt(0).toUpperCase() + String(x).slice(1);
+export function preregOf(p, S, f, at) {
+  const day = String(at || '').slice(0, 10), e = p.evidence || {}, h = (HYP[p.action] || HYP['keep off live'])(p, S, f || {});
+  const paired = !['move to shadow', 'keep off live'].includes(p.action);
+  return [
+    `# Pre-registration (draft): ${p.change}`, '',
+    `Draft written by council/trade-review.mjs on ${day} from proposal ${p.id}. It is not a study: it becomes one only when the owner approves it and this file is committed ALONE in research/edge/<topic>/ before any code is run. Nothing changes live on a pass (absolute rule 3): a pass is put to the owner as a proposal.`, '',
+    '## Why it is asked',
+    `${p.why} Found on the forward record: n ${e.n}, ${fR(e.mean)} a trade, ${fT(e.t)}${e.p != null ? `, p ${e.p}` : ''}${e.holm === true ? ', survives Holm over the review\'s split tests' : ''}. ${IN_SAMPLE} Those trades are not evidence for this test and are not reused in it; trades closed after the proposal was recorded are the review ledger's forward check (research/trade-review-ledger.json), reported apart.`, '',
+    '## Hypothesis', ...h.map((x) => `- ${x}`), '',
+    '## Data',
+    `- ${TEST_BASE.data}: the council's research candles for ${S.name}'s markets (HistData M1 read through council/histdata.mjs, OANDA where HistData has none), replayed by the rule's own code (council/trader.mjs and council/fills.mjs, imported, not copied), the last complete calendar month as the end.`,
+    '- In sample 2020-01-01 to 2023-12-31; out of sample 2024-01-01 to the end. Nothing is tuned on the out-of-sample years; every parameter above is fixed now.', '',
+    '## Costs', `- ${cap(TEST_BASE.costs)}. The same model for the rule and the variant.`, '- Every trade keeps its stop (absolute rule 1); paper only.', '',
+    '## Test statistic',
+    paired ? '- Per calendar month, R summed after costs of the variant minus the rule as it is (the same signals, paired); t of those monthly sums, in sample and out of sample.' : '- Per calendar month, R summed after costs of the rule as it is; t of those monthly sums against zero, in sample and out of sample.',
+    '- Holm over every test named in this file (here one; the count rises if the owner approves several drafts as one study, and all are then corrected together).', '',
+    '## Pass bar', `- ${cap(TEST_BASE.bar)}.`, paired ? '- And the paired difference positive in both halves.' : '- And the mean positive in both halves.',
+    '- Reported whatever the result: n, mean R, t, by year, in sample and out of sample.', '',
+  ].join('\n');
+}
+
 // ─── the whole review ───
 export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
   const coach = D.coach || {}, decay = arr(coach.decay && coach.decay.systems), expect = arr(coach.expect && coach.expect.systems);
@@ -295,8 +395,20 @@ export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
     if (seen.has(same)) continue; seen.add(same);
     p.evidence.holm = f.holm != null ? f.holm : null;
     p.strong = f.n >= TR.STRONG_N && Math.abs(f.t) >= TR.FLAG_T && (f.split ? f.holm === true : true);
+    Object.defineProperty(p, '_src', { value: { f, S: o.S }, enumerable: false });
     proposals.push(p);
   }
+  // the ledger: record each proposal once, re-measure every recorded one on the trades closed after it; a faded one is not strong
+  const L = ledgerOf(D.ledgerBad ? null : D.ledger, proposals.map((p) => ledgerEntry(p, p._src.f, p._src.S, now)), new Map(out.map((o) => [o.S.key, o.S.rows])));
+  const fwdById = new Map(L.view.items.map((x) => [x.id, x]));
+  for (const p of proposals) {
+    const it = fwdById.get(ledgerId(p._src.S.key, p.flag));
+    if (it) p.forward = { status: it.forward.status, n: it.forward.n, t: it.forward.t, recorded: it.recorded, text: it.forward.text };
+    if (p.forward && p.forward.status === 'faded' && p.strong) { p.strong = false; p.fadedForward = true; }
+  }
+  for (const p of proposals) { const st = studiedOf(p); if (st) { p.studied = { ...st, link: `edge-lab.html#${st.study}` }; p.strong = false; } }
+  for (const p of proposals) if (p.strong) p.prereg = preregOf(p, p._src.S, p._src.f, (p.forward && p.forward.recorded) || new Date(now * 1000).toISOString());
+  if (D.ledgerBad) L.view.error = 'the ledger file could not be read: it is left as it is (never overwritten) and nothing new is recorded until it is mended';
   proposals.sort((a, b) => (b.strong - a.strong) || (a.book === 'live' ? -1 : 0) - (b.book === 'live' ? -1 : 0) || Math.abs(b.evidence.t) - Math.abs(a.evidence.t));
   const systems = out.map((o) => ({
     key: o.S.key, id: o.S.id, k: o.S.k, name: o.S.name, book: o.S.book, src: o.S.src, variant: o.S.variant, ownerShadow: o.ownerShadow, retired: !!o.S.retired, stopped: !!o.S.stopped,
@@ -304,14 +416,17 @@ export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
     flags: o.flags.map((f) => f.id), review: readStream(o.S, o.W, o.wr, o.sp, o.slip, o.tags, o.flags), recent: o.recent,
   })).sort((a, b) => (a.book === 'live' ? 0 : a.book === 'shadow' ? 1 : 2) - (b.book === 'live' ? 0 : b.book === 'shadow' ? 1 : 2) || b.windows.all.n - a.windows.all.n);
   const live = systems.filter((s) => s.book === 'live'), tot = (L, w) => ({ n: L.reduce((s, x) => s + x.windows[w].n, 0), net: r2(L.reduce((s, x) => s + x.windows[w].net.sum, 0)), gross: r2(L.reduce((s, x) => s + x.windows[w].gross.sum, 0)) });
-  return {
+  const J = {
     v: TR.V, at: new Date(now * 1000).toISOString(),
     rule: 'proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.',
     inSample: IN_SAMPLE, windows: Object.fromEntries(TR.WINDOWS.map(([k, d]) => [k, d ? `last ${d} days` : 'the whole forward record on file'])),
     thresholds: { flagN: TR.FLAG_N, flagT: TR.FLAG_T, streamN: TR.STREAM_N, strongN: TR.STRONG_N, fastStopS: TR.FAST_S, splitTests: tests, holmAlpha: 0.05 },
     totals: { live: { d7: tot(live, 'd7'), d30: tot(live, 'd30'), all: tot(live, 'all') }, shadow: { d30: tot(systems.filter((s) => s.book === 'shadow'), 'd30'), all: tot(systems.filter((s) => s.book === 'shadow'), 'all') } },
-    systems, flags: F, proposals, test: TEST_BASE,
+    systems, flags: F, proposals, test: TEST_BASE, ledger: L.view,
   };
+  Object.defineProperty(J, 'ledgerFile', { value: D.ledgerBad ? null : L.file, enumerable: false });
+  Object.defineProperty(J, 'ledgerAdded', { value: D.ledgerBad ? 0 : L.added, enumerable: false });
+  return J;
 }
 
 // ─── file side ───
@@ -322,6 +437,8 @@ export function readData(dir) {
   return {
     trades: readJSON(dir, 'trades.json') || [], research: readJSON(dir, 'research.json') || [], coach: readJSON(dir, 'coach.json'), config: readJSON(dir, 'config.json'),
     mirrors: [...files].map((f) => readJSON(dir, `ctrader/${f}`)).filter(Boolean), analyst: readJSON(dir, 'reviews/analyst.json'), losses: readJSON(dir, 'reviews/losses.json'),
+    // the proposal ledger: a file that exists but does not parse (or has no entries list) is never overwritten
+    ledger: readJSON(dir, LEDGER), ledgerBad: fs.existsSync(path.join(dir, LEDGER)) && !Array.isArray((readJSON(dir, LEDGER) || {}).entries),
   };
 }
 export const OUT = 'research/trade-review.json';
@@ -332,12 +449,17 @@ export function main(dir, { now = Math.floor(Date.now() / 1000), dry = false } =
   J.hash = hashOf(J);   // the content without its time: the language-model review asks again only when this changes
   const prev = readJSON(dir, OUT), prevAt = prev && Date.parse(prev.at) / 1000;
   const same = prev && prev.hash === J.hash && Number.isFinite(prevAt) && now - prevAt < REFRESH_S;
+  // the ledger first (append-only: written only when a proposal is recorded for the first time), then the review
+  const ledgerWritten = !dry && J.ledgerAdded > 0 && !!J.ledgerFile;
+  if (ledgerWritten) writeAtomic(path.join(dir, LEDGER), JSON.stringify({ ...J.ledgerFile, at: J.at }, null, 1) + '\n');
   if (!dry && !same) writeAtomic(file, JSON.stringify(J, null, 1) + '\n');
-  return { written: !dry && !same, systems: J.systems.length, flags: J.flags.length, proposals: J.proposals.length, strong: J.proposals.filter((p) => p.strong).length, J };
+  return { written: !dry && !same, ledgerWritten, ledgerAdded: J.ledgerAdded, systems: J.systems.length, flags: J.flags.length, proposals: J.proposals.length, strong: J.proposals.filter((p) => p.strong).length, J };
 }
 // a few lines for the log (and for the owner's report)
 export function summaryLines(J) {
   const L = [`Trade review ${J.at}: ${J.systems.length} streams, ${J.flags.length} flags, ${J.proposals.length} proposals (${J.proposals.filter((p) => p.strong).length} strong).`];
+  const c = J.ledger && J.ledger.counts;
+  if (c) L.push(`Proposal ledger: ${J.ledger.n} recorded; forward check ${c.held} held, ${c.faded} faded, ${c.unclear} unclear, ${c['too few']} too few.`);
   for (const s of J.systems.filter((x) => x.windows.all.n >= 5)) L.push(`- ${s.review.head}`);
   return L;
 }
