@@ -85,7 +85,7 @@ test('the code that fills the simple view only reads: it returns at once outside
 test('the view\'s link colour passes AA on the light panel (the accent itself is 4.50:1 there)', () => {
   const m = /html\[data-phone="simple"\]\[data-theme="light"\] \{ --ps-link: (#[0-9a-f]{6}); \}/.exec(css); assert.ok(m);
   assert.ok(css.includes(`@media (prefers-color-scheme: light) { html[data-phone="simple"]:not([data-theme]) { --ps-link: ${m[1]}; } }`), 'and when the device picks the light theme');
-  assert.match(css, /:root\[data-theme="light"\] \{ --bg: #f4f6f9; --panel: #fff;/, 'the light panel is white');
+  assert.match(css, /:root\[data-theme="light"\] \{ --bg: #f2f3f5; --panel: #fff;/, 'the light panel is white (graphite, 17 Nov 2026)');
   assert.ok(ratio(m[1], '#ffffff') >= 4.6, ratio(m[1], '#ffffff').toFixed(2));
   const blk = css.slice(css.indexOf('/* Simple phone view (11 Nov 2026, owner')); assert.ok(!/[^-]color: var\(--accent\)/.test(blk), 'no text of the view uses the bare accent');
 });
