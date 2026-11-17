@@ -2160,6 +2160,12 @@ only, off) presses the play control and presses it again after. Tests: `tests/ll
 (11); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft / market events with the AI off, the AI on with
 a stubbed stream and a withdrawn answer, the gap, commentary on a market event, the watching dot, AA in three themes, phone strip).
 
+Chart right-click menu (17 Nov 2026, owner: "when I press right click … reset chart view, delete all drawings"): `.cmenu`
+(`#cmenu`, between `// ---- chart right-click menu` and `// ---- end chart right-click menu` in backtest.html): Reset chart view
+(price autoscale on, time scale reset, back to the latest candle), Delete this drawing (the one under the pointer is selected first;
+locked ones refused), Remove the last drawing (skips locked), Delete all drawings (styled confirm). With a drawing tool on, a
+right-click cancels the tool. Display only: no order, position or stop is touched. `window.ctMenu()` is the read-only view.
+
 Drawing tools like TradingView (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend
 line, magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop
 (a test reads the page block `// ---- drawing tools like TradingView` for order calls, `.stop =` and `S.acct`).
