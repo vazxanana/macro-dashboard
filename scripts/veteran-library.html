@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts never hold up the first paint: the system font shows until Figtree arrives -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'">
 <script>
   // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark; else the system.
   (function () { try { var p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark'; } catch (e) {} })();
@@ -23,19 +23,19 @@
 <style>
   /* the Veteran library (scripts/veteran-library.html, copied to /veteran/index.html by scripts/veteran-index.mjs) */
   .head { padding: 32px 0 20px; }
-  h1 { font: 600 clamp(24px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.5px; margin: 0 0 8px; }
+  h1 { font: 650 clamp(26px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 8px; }
   .lede { margin: 0; color: var(--ink-dim); max-width: 70ch; font-size: 14.5px; text-wrap: pretty; }
   .lede b { color: var(--ink); font-weight: 600; }
   .more-cpi { margin-top: 4px; font-size: 12.5px; color: var(--ink-faint); }
   .more-cpi summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--accent); }
   .more-cpi p { margin: 0; }
-  .facts { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 12px 0 0; padding: 0; list-style: none; }
-  .facts li { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 12.5px; color: var(--ink-dim); }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .facts li { font-size: 13px; color: var(--ink-faint); }
   .facts b { color: var(--ink); font-weight: 600; }
 
   .lib { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 20px; align-items: start; }
   .side { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; padding: 2px 4px 12px 2px; display: flex; flex-direction: column; gap: 12px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--au-shadow); }
   .k { margin: 0 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); }
   .cpi b { display: block; font: 600 22px var(--mono); letter-spacing: -.5px; margin: 2px 0; color: var(--ink); }
   .cpi p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-dim); }
@@ -54,18 +54,19 @@
   .nav h2:first-child { margin-top: 2px; }
   .nav a { display: flex; align-items: baseline; gap: 6px; min-height: var(--tap); padding: 6px 8px; border-radius: 6px; font: 500 13px/1.35 var(--sans); color: var(--ink-dim); text-decoration: none; }
   .nav a:hover { background: var(--panel-hover); color: var(--ink); }
-  .nav a[aria-current="page"] { background: var(--accent-soft); color: var(--ink); box-shadow: inset 2px 0 0 var(--accent); }
+  .nav a[aria-current="page"] { background: var(--panel-raised); color: var(--ink); box-shadow: inset 2px 0 0 var(--accent); }
   .nav a small { margin-left: auto; color: var(--ink-faint); font-weight: 400; font-size: 12px; flex: none; }
   .nav .none { color: var(--ink-faint); font-size: 13px; padding: 6px 8px; }
 
-  .doc { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px 28px; font-size: 14.5px; line-height: 1.6; color: var(--ink-dim); scroll-margin-top: 72px; }
+  .doc { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 28px 40px 36px; font-size: 16px; line-height: 1.7; color: var(--ink-dim); scroll-margin-top: 72px; box-shadow: var(--au-shadow); }
+  .doc > :is(p, ul, ol, blockquote, h1, h2, h3, h4) { max-width: 72ch; }
   .doc:focus { outline: none; }
   .doc .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--ink-faint); margin: 0 0 12px; }
   .doc .meta a { margin-left: auto; }
   @media (pointer: coarse) { .doc .meta { align-items: center; } .doc .meta a { display: inline-flex; align-items: center; min-height: 44px; } }   /* "Open raw" was a 20 px target on touch */
-  .doc h1 { font-size: 22px; margin: 0 0 10px; color: var(--ink); line-height: 1.25; }
-  .doc h2 { font-size: 18px; margin: 22px 0 8px; color: var(--ink); } .doc h3 { font-size: 15.5px; margin: 18px 0 6px; color: var(--ink); } .doc h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--ink); }
-  .doc p { margin: 8px 0; } .doc ul, .doc ol { padding-left: 22px; margin: 8px 0; } .doc li { margin: 4px 0; }
+  .doc h1 { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin: 0 0 14px; color: var(--ink); line-height: 1.2; }
+  .doc h2 { font-size: 20px; font-weight: 600; margin: 32px 0 10px; color: var(--ink); } .doc h3 { font-size: 15.5px; margin: 18px 0 6px; color: var(--ink); } .doc h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--ink); }
+  .doc p { margin: 12px 0; } .doc ul, .doc ol { padding-left: 22px; margin: 8px 0; } .doc li { margin: 4px 0; }
   .doc .tbl { overflow-x: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: var(--r-sm); }
   .doc table { border-collapse: collapse; font-size: 13px; width: 100%; }
   .doc th, .doc td { border-bottom: 1px solid var(--line-soft); padding: 6px 9px; vertical-align: top; text-align: left; }
@@ -82,13 +83,11 @@
   .pager a { display: inline-flex; flex-direction: column; min-height: var(--tap); justify-content: center; max-width: 48%; font-size: 13px; }
   .pager a small { color: var(--ink-faint); font-size: 12px; }
   .pager a.nx { text-align: right; margin-left: auto; }
-  .foot { margin-top: 28px; color: var(--ink-faint); font-size: 12.5px; max-width: 80ch; }
-  .foot p { margin: 0 0 6px; }
 
   @media (max-width: 900px) {
     .lib { grid-template-columns: minmax(0, 1fr); }
     .side { position: static; max-height: none; overflow: visible; padding: 0; }
-    .doc { padding: 16px 16px 22px; }
+    .doc { padding: 20px 16px 24px; font-size: 15px; }
   }
   @media (max-width: 520px) { .top .crumb, .top .brand.here { display: none; } .doc h1 { font-size: 20px; } }
 </style>
@@ -97,7 +96,7 @@
 <a class="skip" href="#doc">Skip to the document</a>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Aureum Desk</a>
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span><span class="wm-a">Aureum</span> <span class="wm-d">Desk</span></a>
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand here">Veteran library</span>
     <div class="check">
@@ -122,7 +121,7 @@
   </div>
   <footer class="foot">
     <p>Published from <span class="num">research/macro-veteran/</span> with every build. Times are shown in UTC with your local time alongside. Paper only: the veteran can lower the desk's conviction, never place a trade.</p>
-    <p><a href="/">Back to the desk</a> <span data-mx-members hidden>· <a data-mx-macro href="/macro-desk">Macro desk</a></span></p>
+    <p class="mx-fb"><span class="mx-fw"><span class="coin" aria-hidden="true"></span>Aureum Desk</span><a href="/">Back to the desk</a> <span data-mx-members hidden><a data-mx-macro href="/macro-desk">Macro desk</a></span></p>
   </footer>
 </main>
 <script>
@@ -224,7 +223,7 @@
     var i = I.docs.indexOf(d), pv = I.docs[i - 1], nx = I.docs[i + 1];
     var pager = '<nav class="pager" aria-label="Previous and next document">' + (pv ? '<a href="#' + esc(pv.path) + '"><small>Previous</small>' + esc(pv.title) + '</a>' : '') + (nx ? '<a class="nx" href="#' + esc(nx.path) + '"><small>Next</small>' + esc(nx.title) + '</a>' : '') + '</nav>';
     var meta = '<p class="meta"><span>' + esc(d.group) + '</span><span class="num">' + esc(d.path) + '</span>' + (d.date ? '<span>' + esc(d.date) + '</span>' : '') + '<span>' + kb(d.bytes) + '</span><a href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open raw</a></p>';
-    var done = function () { if (fromUser) { var el = $('doc'); if (phone.matches) el.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 }); try { el.focus({ preventScroll: true }); } catch (e) {} } };
+    var done = function () { if (fromUser && phone.matches && !$('q').value.trim()) $('docs').open = false; if (fromUser) { var el = $('doc'); if (phone.matches) el.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 }); try { el.focus({ preventScroll: true }); } catch (e) {} } };
     if (d.kind !== 'doc') {
       $('doc').innerHTML = meta + '<h1>' + esc(d.title) + '</h1><p>' + ({ script: 'A tool from the batch. Run it from a checkout of the repository, never from the browser.', workbook: 'A spreadsheet from the batch; open it with Excel or Numbers.', data: 'A data file from the batch.', log: 'A test log from the batch.' }[d.kind] || '') + '</p><p><a class="btn" href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open the file</a></p>' + pager;
       done(); return;
@@ -236,7 +235,8 @@
   }
   function route(fromUser) { var p = decodeURIComponent((location.hash || '').slice(1)); open(p || first(), fromUser && !!p); }
 
-  $('q').addEventListener('input', function () { nav(this.value); });
+  if (phone.matches) $('docs').open = false;
+  $('q').addEventListener('input', function () { nav(this.value); if (this.value.trim()) $('docs').open = true; });
   $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { var a = document.querySelector('#nav a'); if (a) { location.hash = a.getAttribute('href').slice(1); } } });
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-again]'); if (a) { e.preventDefault(); route(true); } });
   window.addEventListener('hashchange', function () { route(true); });
