@@ -38,7 +38,7 @@
 <script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/bt-fx.js?v=45e3a62dfd"></script>
-<script src="/assets/backtest-engine.js?v=b1b91aeeed"></script>
+<script src="/assets/backtest-engine.js?v=d869e6f82e"></script>
 <script src="/assets/coach-lens.js?v=17bebc07fb"></script>
 <script src="/assets/bt-review.js?v=458c9a63d0"></script>
 <script src="/assets/mosha-i18n.js?v=08699888a9"></script>
@@ -133,11 +133,13 @@
   .xp-tf { min-height: 28px; padding: 0 22px 0 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: 700 12.5px var(--mono); cursor: pointer; }
   .xp-t { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink-faint); } .xp-t.err { color: var(--sell); }
   .xp-x { width: 28px; height: 28px; flex: none; display: inline-grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--ink-faint); font-size: 17px; line-height: 1; cursor: pointer; } .xp-x:hover { background: var(--panel-hover); color: var(--ink); }
-  .xpc { flex: 1 1 0; min-height: 0; } .xp .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .xpc { flex: 1 1 0; min-height: 0; } .xpov { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 3; }
+  .xpc.drawing, .xpc.drawing * { cursor: crosshair !important; } .xpc.pick[data-dcur="move"], .xpc.pick[data-dcur="move"] * { cursor: move !important; } .xpc.pick[data-dcur="nwse"], .xpc.pick[data-dcur="nwse"] * { cursor: nwse-resize !important; } .xpc.pick[data-dcur="nesw"], .xpc.pick[data-dcur="nesw"] * { cursor: nesw-resize !important; } .xpc.pick[data-dcur="ns"], .xpc.pick[data-dcur="ns"] * { cursor: ns-resize !important; } .xpc.pick[data-dcur="ew"], .xpc.pick[data-dcur="ew"] * { cursor: ew-resize !important; } .xpc.pick[data-dcur="pt"], .xpc.pick[data-dcur="pt"] * { cursor: grab !important; } .xp .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   body.fs #panes:not([data-n="1"]) { --ph: calc(100vh - 24px); } body.fs #panes[data-n="2"] { grid-template-rows: var(--ph); } body.fs #panes[data-n="4"] { grid-template-rows: repeat(2, calc((var(--ph) - 8px) / 2)); }
   @container cc (max-width: 700px) { #panes:not([data-n="1"]) { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important; grid-auto-rows: auto; } #panes:not([data-n="1"]) > #chart { height: 46vh !important; min-height: 280px; grid-row: auto !important; } .xp { height: 230px; } }
   @media (pointer: coarse) { .xp-tf, .xp-x { min-height: 36px; } .xp-x { width: 36px; } }
   #splitdd .ddp { min-width: 188px; } #splitdd .ddp button { display: flex; align-items: center; gap: 10px; min-height: 36px; width: 100%; border: 0; background: none; color: var(--ink); cursor: pointer; border-radius: 8px; padding: 0 8px; font-size: 13px; } #splitdd .ddp button:hover, #splitdd .ddp button:focus-visible { background: var(--panel-hover); } #splitdd .ddp button[aria-pressed="true"] { background: var(--accent-soft, rgba(91,140,255,.14)); font-weight: 600; }
+  @container cc (max-width: 640px) { #splitdd .ddp small { display: none; } }   /* the phone's More sheet: the four layouts and Sync fit on the screen */
   #splitdd svg.spi { width: 20px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; } #splitdd .ddp small { display: block; padding: 6px 8px 2px; color: var(--ink-faint); font-size: 12px; line-height: 1.4; max-width: 230px; }
   .chartc.mnarrow .qtr .qb { min-width: 62px; padding: 0 10px; } .chartc.mnarrow .qtr .qrisk { display: none; } .chartc.mnarrow .legend .lg-tf, .chartc.mnarrow .legend .lg-o > span:nth-child(-n+3) { display: none; }
   /* the market and timeframe as a button at the start of the toolbar: opens the session form */
@@ -698,7 +700,7 @@
           <div class="tbg tb-spd2" role="group" aria-label="Speed"><div class="speed"><button type="button" data-sp="1000" aria-pressed="true">1×</button><button type="button" data-sp="500" aria-pressed="false">2×</button><button type="button" data-sp="200" aria-pressed="false">5×</button><button type="button" data-sp="80" aria-pressed="false">12×</button></div></div>
           <div class="tbg tb-jump2" role="group" aria-label="Jump"><button type="button" class="ib il" id="jump2" title="Jump forward to a date and time"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Jump to a date</span></button></div>
           <div class="tbg tb-skip2" role="group" aria-label="Replay"><button type="button" class="ib il" id="skipday2" title="Skip to the next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 8 8-8 8"/><path d="m12 4 8 8-8 8"/></svg><span>Skip to the next day</span></button></div>
-          <div class="tbg tb-tools" role="group" aria-label="Chart tools"><details class="dd" id="laydd"><summary class="ib il" title="Chart layers: EMA 20 / 50, live candle, volume, sessions, PDH / PDL"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Layers</span></summary><div class="ddp mode" role="group" aria-label="Chart layers"><button data-l="ema20" aria-pressed="false">EMA 20</button><button data-l="ema50" aria-pressed="false">EMA 50</button><button data-l="anim" aria-pressed="true">Live candle</button><button data-l="vol" aria-pressed="true">Volume</button><button data-l="sess" aria-pressed="true">Sessions</button><button data-l="pdhl" aria-pressed="true">PDH / PDL</button><button data-l="lens" aria-pressed="true">Edge lens</button></div></details><details class="dd" id="splitdd"><summary class="ib il" title="Layout: one to four charts side by side, each on its own timeframe"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/></svg><span>Layout</span></summary><div class="ddp" role="group" aria-label="Chart layout"><button type="button" data-split="1" aria-pressed="true"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/></svg>1 chart</button><button type="button" data-split="2" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M10 1v14"/></svg>2 charts</button><button type="button" data-split="3" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M11.5 1v14M11.5 8H19"/></svg>3 charts</button><button type="button" data-split="4" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M10 1v14M1 8h18"/></svg>4 charts</button><small>Same market, same moment. Pick each chart's timeframe in its own header. You trade on the first chart. Full screen (<kbd>F</kbd>) gives the charts the whole window.</small></div></details><details class="dd" id="drawdd"><summary class="ib il" title="Drawing tools: trend line (Alt+T), horizontal line (Alt+H), horizontal ray (Alt+J), vertical line (Alt+V), box (Alt+R), magnet (Alt+M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg><span>Draw</span></summary><div class="ddp" role="group" aria-label="Drawing tools"><button data-dt="" aria-pressed="true"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3l12 9-5.5 1.2L10 19z"/></svg>Cursor</button><button data-dt="t" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18.5L19.5 5.5"/><circle cx="4.5" cy="18.5" r="1.8" class="f"/><circle cx="19.5" cy="5.5" r="1.8" class="f"/></svg>Trend line<kbd>Alt+T</kbd></button><button data-dt="h" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/><circle cx="3.5" cy="12" r="1.6" class="f"/><circle cx="20.5" cy="12" r="1.6" class="f"/></svg>Horizontal line<kbd>Alt+H</kbd></button><button data-dt="hr" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h16"/><circle cx="5" cy="12" r="1.8" class="f"/><path d="M18 9l3 3-3 3"/></svg>Horizontal ray<kbd>Alt+J</kbd></button><button data-dt="v" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><circle cx="12" cy="12" r="1.8" class="f"/></svg>Vertical line<kbd>Alt+V</kbd></button><button data-dt="r" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="10" rx="1.5" class="z"/></svg>Box / zone<kbd>Alt+R</kbd></button><button data-mag aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4h-4v8a2 2 0 0 1-4 0V4z"/><path d="M6 8h4M14 8h4"/></svg>Magnet: <span class="mg-s">off</span><kbd>Alt+M</kbd></button><hr><button data-dx="last"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg>Remove last</button><button data-dx="all" class="dng"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Clear all</button></div></details></div>
+          <div class="tbg tb-tools" role="group" aria-label="Chart tools"><details class="dd" id="laydd"><summary class="ib il" title="Chart layers: EMA 20 / 50, live candle, volume, sessions, PDH / PDL"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg><span>Layers</span></summary><div class="ddp mode" role="group" aria-label="Chart layers"><button data-l="ema20" aria-pressed="false">EMA 20</button><button data-l="ema50" aria-pressed="false">EMA 50</button><button data-l="anim" aria-pressed="true">Live candle</button><button data-l="vol" aria-pressed="true">Volume</button><button data-l="sess" aria-pressed="true">Sessions</button><button data-l="pdhl" aria-pressed="true">PDH / PDL</button><button data-l="lens" aria-pressed="true">Edge lens</button></div></details><details class="dd" id="splitdd"><summary class="ib il" title="Layout: one to four charts side by side, each on its own timeframe"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h18"/></svg><span>Layout</span></summary><div class="ddp" role="group" aria-label="Chart layout"><button type="button" data-split="1" aria-pressed="true"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/></svg>1 chart</button><button type="button" data-split="2" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M10 1v14"/></svg>2 charts</button><button type="button" data-split="3" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M11.5 1v14M11.5 8H19"/></svg>3 charts</button><button type="button" data-split="4" aria-pressed="false"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1" width="18" height="14" rx="2"/><path d="M10 1v14M1 8h18"/></svg>4 charts</button><button type="button" data-xsync aria-pressed="true" title="Panning or zooming one chart moves the others to the same time"><svg class="spi" viewBox="0 0 20 16" aria-hidden="true"><path d="M2 5h13l-3-3M18 11H5l3 3"/></svg>Sync charts</button><small>Same market, same moment; each chart picks its timeframe in its header. Sync pans and zooms them together; drawings show on all. You trade on the first. Full screen: <kbd>F</kbd>.</small></div></details><details class="dd" id="drawdd"><summary class="ib il" title="Drawing tools: trend line (Alt+T), horizontal line (Alt+H), horizontal ray (Alt+J), vertical line (Alt+V), box (Alt+R), magnet (Alt+M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg><span>Draw</span></summary><div class="ddp" role="group" aria-label="Drawing tools"><button data-dt="" aria-pressed="true"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3l12 9-5.5 1.2L10 19z"/></svg>Cursor</button><button data-dt="t" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18.5L19.5 5.5"/><circle cx="4.5" cy="18.5" r="1.8" class="f"/><circle cx="19.5" cy="5.5" r="1.8" class="f"/></svg>Trend line<kbd>Alt+T</kbd></button><button data-dt="h" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/><circle cx="3.5" cy="12" r="1.6" class="f"/><circle cx="20.5" cy="12" r="1.6" class="f"/></svg>Horizontal line<kbd>Alt+H</kbd></button><button data-dt="hr" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h16"/><circle cx="5" cy="12" r="1.8" class="f"/><path d="M18 9l3 3-3 3"/></svg>Horizontal ray<kbd>Alt+J</kbd></button><button data-dt="v" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><circle cx="12" cy="12" r="1.8" class="f"/></svg>Vertical line<kbd>Alt+V</kbd></button><button data-dt="r" aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="10" rx="1.5" class="z"/></svg>Box / zone<kbd>Alt+R</kbd></button><button data-mag aria-pressed="false"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4h-4v8a2 2 0 0 1-4 0V4z"/><path d="M6 8h4M14 8h4"/></svg>Magnet: <span class="mg-s">off</span><kbd>Alt+M</kbd></button><hr><button data-dx="last"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg>Remove last</button><button data-dx="all" class="dng"><svg class="dti" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Clear all</button></div></details></div>
           <div class="tbg tb-view" role="group" aria-label="View"><details class="dd" id="snddd"><summary class="ib" id="snd-btn" title="Trade sounds" aria-label="Trade sounds" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="w1" d="M16 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M18.5 7a7 7 0 0 1 0 10"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></summary><div class="ddp sndp" role="group" aria-label="Trade sounds"><label class="sndon"><input type="checkbox" id="snd-on"> Sounds on wins and stop-outs</label><hr><div class="sndset"><button type="button" class="btn sm" id="snd-test">Play stop-out</button><button type="button" class="btn sm" id="snd-test-tp">Play target</button><small id="snd-name"></small></div></div></details><button class="ib" id="tch-btn" title="Teach the Mosha desk: the trade you just closed, else this moment (T)" aria-label="Teach the Mosha desk" data-tr-title data-tr-aria hidden><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c1.5 1.3 3.2 2 5 2s3.5-.7 5-2v-4.5"/></svg><b class="tch-n" id="tch-n" hidden></b></button><button class="ib" id="fs-btn" title="Full screen (F)" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="ib" id="tb-dock" title="Toolbar: top of the chart" aria-label="Toolbar position"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></button></div>
         </div>
       </div>
@@ -1080,23 +1082,29 @@
     // drawings (17 Nov 2026, like TradingView): trend lines (extendable), horizontal rays, vertical lines and boxes on the overlay
     // (horizontal lines are price lines, so they keep their axis label and drag); each in its own colour, width and style; the
     // hovered and the selected one show their handles (a box's corners and edge midpoints), the optional label the move, % and bars
-    const shapes = (S.draw || []).map((d, k) => [d, k]).filter(([d, k]) => d.type !== 'h' || k === SEL || k === HS); let selG = null;
-    if (DT && DP && DM && !ONE[DT]) shapes.push([{ type: DT, t1: DP.t, p1: DP.p, t2: DM.t, p2: DM.p, preview: true }, -1]);
-    for (const [d, k] of shapes) { const g = BT.drawGeom(d, timeToX, y, W, PH); if (!g) continue; if (k === SEL) selG = g; const on = k >= 0 && (k === SEL || k === HS), col = d.preview ? CT.draw : dcol(d);
+    const SH = drawShapes(x, MCX, W, PH, true), selG = SH.selG; OVS.dh = SH.dh;
+    if (LAY.lens) lnDraw(x, y, W, PH); else OVS.lens = 0;   // the edge lens (17 Nov 2026): what the chosen edge's rules mark on the chart
+    const ps = xpOvAll();   // the extra panes of the split view draw the same drawings (17 Nov 2026)
+    if (ps) dselSync(ps.ct, ps.cl, ps.W, ps.PH, ps.g); else dselSync(ct, cl, W, PH, selG);
+    dchip(); ptags(ct, cl, W, Hh); pnlPill(ct, W, PH); }
+  // drawings on one chart (17 Nov 2026: the main chart and every extra pane draw the same S.draw, each through its own time and
+  // price mapping; selection and hover are shared, the preview and the magnet ring show on the chart the gesture is on). On the
+  // main chart a horizontal line is a price line (drawn here only when hovered or selected); on a pane it is drawn here.
+  function drawShapes(x, c, W, PH, main) { const y = (p) => c.series.priceToCoordinate(p), here = cxOf() === c, V = c.view(), G = []; let selG = null, dh = 0;
+    const shapes = (S.draw || []).map((d, k) => [d, k]).filter(([d, k]) => !main || d.type !== 'h' || k === SEL || k === HS);
+    if (here && DT && DP && DM && !ONE[DT]) shapes.push([{ type: DT, t1: DP.t, p1: DP.p, t2: DM.t, p2: DM.p, preview: true }, -1]);
+    for (const [d, k] of shapes) { const g = BT.drawGeom(d, c.tX, y, W, PH); if (!g) continue; if (k >= 0) G.push([k, g]); if (k === SEL) selG = g; const on = k >= 0 && (k === SEL || k === HS), col = d.preview ? CT.draw : dcol(d);
       x.strokeStyle = col; x.lineWidth = 0.5 + (d.w || 1) + (on ? 0.5 : 0); x.setLineDash(d.preview ? [5, 4] : d.ls === 'dash' ? [6, 4] : []);
       if (d.type === 'r') { const l = Math.min(g.x1, g.x2), tp = Math.min(g.y1, g.y2), w = Math.abs(g.x2 - g.x1), hh = Math.abs(g.y2 - g.y1); x.globalAlpha = d.preview ? 0.06 : 0.1; x.fillStyle = col; x.fillRect(l, tp, w, hh); x.globalAlpha = 1; x.strokeRect(l + 0.5, tp + 0.5, w, hh); }
-      else if (d.type !== 'h') { x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.xe != null ? g.xe : g.x2, g.ye != null ? g.ye : g.y2); x.stroke(); }
+      else if (d.type !== 'h' || !main) { x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.xe != null ? g.xe : g.x2, g.ye != null ? g.ye : g.y2); x.stroke(); }
       x.setLineDash([]);
-      if (d.type === 'hr') pill(x, fmt(d.p1), W - 6, g.y1, col, 'right', W - 6);
+      if (d.type === 'hr' || (d.type === 'h' && !main)) pill(x, fmt(d.type === 'h' ? d.price : d.p1), W - 6, g.y1, col, 'right', W - 6);
       if (d.type === 'v') { const dt = new Date(d.t1 * 1000), z = (n) => String(n).padStart(2, '0'); pill(x, `${dt.getUTCDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getUTCMonth()]} ${z(dt.getUTCHours())}:${z(dt.getUTCMinutes())}`, g.x1 + 4, PH - 14, col); }
-      if (d.lbl && (d.type === 't' || d.type === 'r')) { const nb = BT.barsBetween(S.bars, S.idx, TFS[S.tf], d.t1, d.t2), ang = d.type === 't' ? Math.atan2(-(g.y2 - g.y1), g.x2 - g.x1) * 180 / Math.PI : null, tx = BT.drawInfo(d, nb, ang, S.dec);
+      if (d.lbl && (d.type === 't' || d.type === 'r')) { const nb = BT.barsBetween(V.bars, V.n, V.sec, d.t1, d.t2), ang = d.type === 't' ? Math.atan2(-(g.y2 - g.y1), g.x2 - g.x1) * 180 / Math.PI : null, tx = BT.drawInfo(d, nb, ang, S.dec);
         if (d.type === 'r') pill(x, tx, Math.min(g.x1, g.x2), Math.max(g.y1, g.y2) + 14, col); else pill(x, tx, g.x2 + 8, g.y2 + (g.y2 < g.y1 ? -14 : 14), col, g.x2 + 220 > W ? 'right' : 'left', g.x2 - 8); }
-      if ((on || d.preview) && !d.lock) { x.fillStyle = CT.panel; x.strokeStyle = col; x.lineWidth = 1.5; for (const [pk, a, b] of g.pts) { if (pk[0] === 'e' && k !== SEL) continue; x.beginPath(); if (pk[0] === 'e') x.rect(a - 3.5, b - 3.5, 7, 7); else x.arc(a, b, k === SEL ? 4.5 : 3.5, 0, 7); x.fill(); x.stroke(); OVS.dh++; } } }
-    if (LAY.lens) lnDraw(x, y, W, PH); else OVS.lens = 0;   // the edge lens (17 Nov 2026): what the chosen edge's rules mark on the chart
-    // where a click would land while a tool is on (with the magnet: the candle's price it snaps to)
-    if (DT && MH) { const a = timeToX(MH.t), b = y(MH.p); if (a != null && b != null) { x.strokeStyle = CT.draw; x.lineWidth = 1.5; x.beginPath(); x.arc(a, b, MAG ? 5 : 3, 0, 7); x.stroke(); if (MAG) { x.fillStyle = CT.draw; x.beginPath(); x.arc(a, b, 2, 0, 7); x.fill(); } } }
-    dselSync(ct, cl, W, PH, selG);
-    dchip(); ptags(ct, cl, W, Hh); pnlPill(ct, W, PH); }
+      if ((on || d.preview) && !d.lock) { x.fillStyle = CT.panel; x.strokeStyle = col; x.lineWidth = 1.5; for (const [pk, a, b] of g.pts) { if (pk[0] === 'e' && k !== SEL) continue; x.beginPath(); if (pk[0] === 'e') x.rect(a - 3.5, b - 3.5, 7, 7); else x.arc(a, b, k === SEL ? 4.5 : 3.5, 0, 7); x.fill(); x.stroke(); dh++; } } }
+    if (here && DT && MH) { const a = c.tX(MH.t), b = y(MH.p); if (a != null && b != null) { x.strokeStyle = CT.draw; x.lineWidth = 1.5; x.beginPath(); x.arc(a, b, MAG ? 5 : 3, 0, 7); x.stroke(); if (MAG) { x.fillStyle = CT.draw; x.beginPath(); x.arc(a, b, 2, 0, 7); x.fill(); } } }
+    return { selG, dh, G }; }
   // read-only summary of the last overlay frame, for the end-to-end audit
   window.ctChartOpts = () => { const o = chart.options(); return { wm: !!(o.watermark && o.watermark.visible), v: !!o.grid.vertLines.visible, h: !!o.grid.horzLines.visible }; };
   window.ctChart = () => ({ ...OVS, wm: WMK.split(',')[0], font: chart.options().layout.fontFamily, sel: SEL, tool: DT, mag: MAG, drawings: (S.draw || []).length, pxY: px() != null ? series.priceToCoordinate(px()) : null, coach: D ? draftSay() : null });
@@ -1148,18 +1156,27 @@
   const setMag = (m) => { MAG = ((m % 3) + 3) % 3; try { localStorage.setItem('btLab:magnet', String(MAG)); } catch (e) {} syncMag(); toast(MAG ? `Magnet ${MAGN[MAG]}: points snap to the candle's open, high, low or close` : 'Magnet off'); overlay(); };
   syncMag(); document.querySelectorAll('[data-mag]').forEach((b) => b.addEventListener('click', () => setMag(MAG + 1)));
   const isCoarse = () => !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
-  const paneH = () => Math.max(40, $('chart').clientHeight - (chart.timeScale().height() || 0));
-  const Ypx = (p) => series.priceToCoordinate(p);
   // the replayed candle that holds time t (none past the last one: the magnet never reads a candle that has not happened)
   const barAt = (t) => { if (t == null || !S.idx) return null; const i = Math.min(ubT(S.bars, t), S.idx) - 1, b = S.bars[i]; return b && t < b.time + TFS[S.tf] ? b : null; };
-  const snapP = (t, p) => { const s = BT.drawSnap(barAt(t), p, Ypx, MAG); return s === p ? rnd(p) : s; };
-  const ptAt = (xp, yp) => { const tt = xToTime(xp), pp = series.coordinateToPrice(yp); if (tt == null || pp == null) return null; return { t: tt, p: snapP(tt, pp) }; };
-  const geo = (d) => BT.drawGeom(d, timeToX, Ypx, chart.timeScale().width(), paneH());
+  // the chart a drawing gesture is on (17 Nov 2026, split charts share drawings): the main chart (DCX null) or an extra pane of the
+  // split view. Each has its own time / price mapping and its own candles for the magnet; every drawing lives once in S.draw.
+  const MCX = { main: true, chart, series, get host() { return $('chart'); }, tX: (t) => timeToX(t), xT: (xp) => xToTime(xp), bar: (t) => barAt(t), view: () => ({ bars: S.bars, n: S.idx, sec: TFS[S.tf] }), exp: null, lock: 0 };
+  let DCX = null, SELC = null;   // DCX: the pane a gesture is on (null = main); SELC: where the selection was made (the floating bar sits there)
+  const cxOf = (c) => c || DCX || MCX;
+  const paneH = (c) => { c = cxOf(c); return Math.max(40, c.host.clientHeight - (c.chart.timeScale().height() || 0)); };
+  const Ypx = (p, c) => cxOf(c).series.priceToCoordinate(p);
+  const snapP = (t, p, c) => { c = cxOf(c); const s = BT.drawSnap(c.bar(t), p, (v) => c.series.priceToCoordinate(v), MAG); return s === p ? rnd(p) : s; };
+  const ptAt = (xp, yp, c) => { c = cxOf(c); const tt = c.xT(xp), pp = c.series.coordinateToPrice(yp); if (tt == null || pp == null) return null; return { t: tt, p: snapP(tt, pp, c) }; };
+  const geo = (d, c) => { c = cxOf(c); return BT.drawGeom(d, c.tX, (p) => c.series.priceToCoordinate(p), c.chart.timeScale().width(), paneH(c)); };
+  // a press starts a gesture on chart c (a two-click tool begun on another chart starts again here); a move only follows the chart
+  // the gesture is on. Nothing changes charts in the middle of a drag.
+  const useCx = (c) => { const k = c === MCX ? null : c; if (ED || CR) return DCX === k; if (DP && DCX !== k) { DP = null; DM = null; } DCX = k; return true; };
+  const onCx = (c) => { const k = c === MCX ? null : c; if (ED || CR || DP) return DCX === k; DCX = k; return true; };
   // the drawing under the pointer: the selected one first, then the newest; a handle within 7 px (22 px on touch), else the body
-  function pickDraw(xp, yp) { const dr = S.draw || []; if (!dr.length || xp > chart.timeScale().width()) return null; const c = isCoarse(), tl = c ? 14 : 6, ht = c ? 22 : 7, order = [];
+  function pickDraw(xp, yp, cx) { const dr = S.draw || []; if (!dr.length || xp > cxOf(cx).chart.timeScale().width()) return null; const c = isCoarse(), tl = c ? 14 : 6, ht = c ? 22 : 7, order = [];
     if (SEL >= 0 && dr[SEL]) order.push(SEL); for (let k = dr.length - 1; k >= 0; k--) if (k !== SEL) order.push(k);
-    for (const k of order) { const part = BT.drawHit(geo(dr[k]), xp, yp, tl, ht); if (part) return { k, part }; } return null; }
-  const setTool = (t) => { DT = t || null; DP = null; DM = null; CR = null; MH = null; if (DT) SEL = -1; $('chart').classList.toggle('drawing', !!DT); if (DT) $('drawdd').dataset.on = '1'; else delete $('drawdd').dataset.on; $('drawdd').open = false;
+    for (const k of order) { const part = BT.drawHit(geo(dr[k], cx), xp, yp, tl, ht); if (part) return { k, part }; } return null; }
+  const setTool = (t) => { DT = t || null; DP = null; DM = null; CR = null; MH = null; if (DT) SEL = -1; $('chart').classList.toggle('drawing', !!DT); document.querySelectorAll('.xpc').forEach((e) => e.classList.toggle('drawing', !!DT)); if (DT) $('drawdd').dataset.on = '1'; else delete $('drawdd').dataset.on; $('drawdd').open = false;
     document.querySelectorAll('#drawdd [data-dt], #dstrip [data-dt]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.dt || null) === DT)));
     if (DT) toast(ONE[DT] ? `Click the chart to place a ${DNAME[DT]} · Esc cancels` : `Click two points, or press and drag, for the ${DNAME[DT]} · Esc cancels`); drawLines(); };
   const delSel = () => { const d = S.draw && S.draw[SEL]; if (!d) return; if (d.lock) { toast('This drawing is locked: unlock it first'); return; } S.draw.splice(SEL, 1); SEL = -1; HS = -1; drawLines(); save(); };
@@ -1175,14 +1192,15 @@
   document.querySelectorAll('#drawdd [data-dt], #dstrip [data-dt]').forEach((b) => b.addEventListener('click', () => { const t = b.dataset.dt || null; setTool(t && DT !== t ? t : null); }));
   document.querySelectorAll('#drawdd [data-dx]').forEach((b) => b.addEventListener('click', async () => { S.draw = S.draw || []; if (b.dataset.dx === 'all') { if (S.draw.length && !(await msConfirm('Remove all drawings on this chart?', { title: 'Clear drawings', ok: 'Remove all', danger: true }))) return; S.draw = []; } else S.draw.pop(); SEL = -1; HS = -1; $('drawdd').open = false; drawLines(); save(); }));
   const chHost = $('chart'); let downAt = null; chHost.addEventListener('mousedown', (e) => { downAt = [e.clientX, e.clientY]; }, true);
-  const locOf = (cx, cy) => { const r = chHost.getBoundingClientRect(); return [cx - r.left, cy - r.top]; };
+  const locOf = (cx, cy, c) => { const r = cxOf(c).host.getBoundingClientRect(); return [cx - r.left, cy - r.top]; };
   // a trend line or box under the pointer, for hover and selection; the newest drawing wins
   // ---- chart right-click menu (17 Nov 2026, owner: "when I press right click it should show options to reset chart view, delete all
   // drawings"). Display only: it moves the view and edits drawings, never an order, a position or a stop. A drawing under the
   // pointer is selected first, so "Delete this drawing" acts on it; with a drawing tool on, right-click first cancels the tool.
   const CM = document.createElement('div'); CM.className = 'cmenu'; CM.id = 'cmenu'; CM.setAttribute('role', 'menu'); CM.hidden = true; document.body.appendChild(CM);
   function cmClose() { if (!CM.hidden) { CM.hidden = true; CM.innerHTML = ''; } }
-  function cmResetView() { if (!S.bars.length) return; try { series.priceScale().applyOptions({ autoScale: true }); } catch (e) {} chart.timeScale().resetTimeScale(); chart.timeScale().scrollToPosition(4, false); overlay(); }
+  let CMC = null;   // the chart the menu was opened on: its price scale fits again too
+  function cmResetView() { if (!S.bars.length) return; try { series.priceScale().applyOptions({ autoScale: true }); if (CMC && CMC !== MCX) CMC.series.priceScale().applyOptions({ autoScale: true }); } catch (e) {} chart.timeScale().resetTimeScale(); chart.timeScale().scrollToPosition(4, false); overlay(); }
   async function cmDelAll() { const n = (S.draw || []).length; if (!n) return; if (!(await msConfirm(`Remove all ${n} drawing${n === 1 ? '' : 's'} on this chart?`, { title: 'Delete all drawings', ok: 'Delete all', danger: true }))) return; S.draw = []; SEL = -1; HS = -1; drawLines(); save(); toast('Drawings removed'); }
   function cmOpen(cx, cy) {
     const dr = S.draw || [], d = SEL >= 0 ? dr[SEL] : null, items = [
@@ -1201,44 +1219,45 @@
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cmClose(); } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = bs[(i + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length]; if (n) n.focus(); } });
   document.addEventListener('pointerdown', (e) => { if (!CM.hidden && !CM.contains(e.target)) cmClose(); }, true);
   addEventListener('blur', cmClose); addEventListener('resize', cmClose); document.addEventListener('scroll', cmClose, true);
-  $('chart').closest('.chartc').addEventListener('contextmenu', (e) => { if (!S.bars.length || e.target.closest('.qtr, .dsel, .dstrip, .dchip, #ptags, .tchip, .tb, .dd')) return; e.preventDefault();
-    if (DT) { setTool(null); return; } const [xp, yp] = locOf(e.clientX, e.clientY), h = pickDraw(xp, yp); if (h) { SEL = h.k; drawLines(); } cmOpen(e.clientX, e.clientY); });
+  $('chart').closest('.chartc').addEventListener('contextmenu', (e) => { if (!S.bars.length || e.target.closest('.qtr, .dsel, .dstrip, .dchip, #ptags, .tchip, .tb, .dd, .xph')) return; e.preventDefault();
+    if (DT) { setTool(null); return; } const XQ = e.target.closest('.xp') ? XP.panes.find((Q) => Q.el.contains(e.target)) : null, c = XQ ? XQ.dc : MCX; if (!useCx(c)) return; CMC = c;
+    const [xp, yp] = locOf(e.clientX, e.clientY, c), h = pickDraw(xp, yp, c); if (h) { SEL = h.k; SELC = DCX; drawLines(); } cmOpen(e.clientX, e.clientY); });
   window.ctMenu = () => ({ open: !CM.hidden, items: [...CM.querySelectorAll('[data-cm]')].map((b) => ({ k: b.dataset.cm, on: !b.disabled })) });
   // ---- end chart right-click menu
-  function hitShape(e) { const [xp, yp] = locOf(e.clientX, e.clientY), h = pickDraw(xp, yp); return h ? h.k : -1; }
+  function hitShape(e, c) { const [xp, yp] = locOf(e.clientX, e.clientY, c), h = pickDraw(xp, yp, c); return h ? h.k : -1; }
   const finish = (pt) => { const d = DT === 'h' ? { type: 'h', price: pt.p } : DT === 'v' ? { type: 'v', t1: pt.t } : DT === 'hr' ? { type: 'hr', t1: pt.t, p1: pt.p } : { type: DT, t1: DP.t, p1: DP.p, t2: pt.t, p2: pt.p };
-    d.at = mom();   /* at: the replay moment it was drawn (trade coach reads only drawings made before an entry) */ S.draw = S.draw || []; S.draw.push(d); const k = S.draw.length - 1; setTool(null); SEL = k; wasDrag = Date.now(); drawLines(); save(); };
+    d.at = mom();   /* at: the replay moment it was drawn (trade coach reads only drawings made before an entry) */ S.draw = S.draw || []; S.draw.push(d); const k = S.draw.length - 1; setTool(null); SEL = k; SELC = DCX; wasDrag = Date.now(); drawLines(); save(); };
   // a press on the chart: a tool places its points (click, click, or press and drag); without a tool a drawing is picked (a
   // handle resizes it, the body moves it). Returns true when the drawing layer takes the press (the chart does not pan)
-  function dStart(cx, cy) { const [xp, yp] = locOf(cx, cy); if (!S.bars.length || xp > chart.timeScale().width() || yp > paneH()) return false;
+  function dStart(cx, cy) { const c = cxOf(), [xp, yp] = locOf(cx, cy); if (!S.bars.length || xp > c.chart.timeScale().width() || yp > paneH()) return false;
     if (DT) { const pt = ptAt(xp, yp); if (!pt) return true; if (!DP) { CR = { x: xp, y: yp, one: !!ONE[DT] }; DP = ONE[DT] ? null : pt; DM = pt; } else CR = { x: xp, y: yp, second: true }; overlay(); return true; }
     const h = pickDraw(xp, yp); if (!h) return false; const d = S.draw[h.k];
-    if (d.type === 'h' && !d.lock) return false;   // a horizontal line drags as a price line; its release selects it (hDone)
-    if (near(yp) && !(h.k === SEL && h.part !== 'body')) return false;   // a trade's line under the pointer wins over a drawing's body
-    SEL = h.k; if (!d.lock) ED = { k: h.k, part: h.part, x: xp, y: yp, d0: { ...d }, moved: false }; chart.applyOptions({ handleScroll: false, handleScale: false }); drawLines(); return true; }
-  function dMove(cx, cy) { const [xp, yp] = locOf(cx, cy);
+    if (d.type === 'h' && !d.lock && !DCX) return false;   // on the main chart a horizontal line drags as a price line; its release selects it (hDone)
+    if (!DCX && near(yp) && !(h.k === SEL && h.part !== 'body')) return false;   // a trade's line under the pointer wins over a drawing's body
+    SEL = h.k; SELC = DCX; if (!d.lock) ED = { k: h.k, part: h.part, x: xp, y: yp, d0: { ...d }, moved: false }; c.chart.applyOptions({ handleScroll: false, handleScale: false }); drawLines(); return true; }
+  function dMove(cx, cy) { const c = cxOf(), [xp, yp] = locOf(cx, cy);
     if (DT) { const pt = ptAt(xp, yp); if (pt) { MH = pt; if (DP) DM = pt; } overlay(); return; }
     if (!ED) return; if (!ED.moved && Math.hypot(xp - ED.x, yp - ED.y) < 3) return; ED.moved = true; const d0 = ED.d0; let nd;
-    if (ED.part === 'body') { const dx = xp - ED.x, dy = yp - ED.y, fT = (t) => { const x0 = timeToX(t), v = x0 == null ? null : xToTime(x0 + dx); return v == null ? t : v; };
+    if (ED.part === 'body') { const dx = xp - ED.x, dy = yp - ED.y, fT = (t) => { const x0 = c.tX(t), v = x0 == null ? null : c.xT(x0 + dx); return v == null ? t : v; };
       const a = d0.type === 'h' ? d0.price : d0.p1; let fP = (p) => p;
-      if (a != null) { const y0 = Ypx(a), raw = y0 == null ? null : series.coordinateToPrice(y0 + dy); if (raw != null) { const s = snapP(d0.t1 != null ? fT(d0.t1) : xToTime(xp), raw), off = s - a; fP = (p) => (p === a ? s : rnd(p + off)); } }
+      if (a != null) { const y0 = Ypx(a), raw = y0 == null ? null : c.series.coordinateToPrice(y0 + dy); if (raw != null) { const s = snapP(d0.t1 != null ? fT(d0.t1) : c.xT(xp), raw), off = s - a; fP = (p) => (p === a ? s : rnd(p + off)); } }
       nd = BT.drawMove(d0, fT, fP); }
     else { const pt = ptAt(xp, yp); if (!pt) return; nd = BT.drawResize(d0, ED.part, pt.t, pt.p); }
     S.draw[ED.k] = nd; overlay(); }
-  function dEnd(cx, cy) { if (TK) { TK = false; chart.applyOptions({ handleScroll: true, handleScale: true }); }
+  function dEnd(cx, cy) { if (TK) { TK = false; cxOf().chart.applyOptions({ handleScroll: true, handleScale: true }); }
     if (DT && CR) { const c = CR; CR = null; const [xp, yp] = locOf(cx, cy), pt = ptAt(xp, yp) || DM; if (!pt) return; if (c.one || c.second || Math.hypot(xp - c.x, yp - c.y) > 6) finish(pt); return; }
     if (ED) { const e = ED; ED = null; if (e.moved && S.draw[e.k]) { S.draw[e.k].editedAt = mom(); wasDrag = Date.now(); save(); } drawLines(); } }
-  chHost.addEventListener('mousedown', (e) => { if (e.button !== 0 || e.shiftKey || PM) return; if (dStart(e.clientX, e.clientY)) { TK = true; e.preventDefault(); e.stopPropagation(); } }, true);
-  chHost.addEventListener('mousemove', (e) => { if (DT) dMove(e.clientX, e.clientY); });
+  chHost.addEventListener('mousedown', (e) => { if (e.button !== 0 || e.shiftKey || PM) return; if (useCx(MCX) && dStart(e.clientX, e.clientY)) { TK = true; e.preventDefault(); e.stopPropagation(); } }, true);
+  chHost.addEventListener('mousemove', (e) => { if (DT && onCx(MCX)) dMove(e.clientX, e.clientY); });
   document.addEventListener('mousemove', (e) => { if (ED) dMove(e.clientX, e.clientY); });
   document.addEventListener('mouseup', (e) => { if (TK || CR || ED) dEnd(e.clientX, e.clientY); });
   // touch: press and drag to draw (or tap, tap), a press on a drawing picks it; the handles take 44 px
-  let LT = null; chHost.addEventListener('touchstart', (e) => { if (PM || e.touches.length !== 1) return; const t = e.touches[0]; if (dStart(t.clientX, t.clientY)) { TK = true; LT = [t.clientX, t.clientY]; e.preventDefault(); e.stopPropagation(); } }, { passive: false, capture: true });
+  let LT = null; chHost.addEventListener('touchstart', (e) => { if (PM || e.touches.length !== 1) return; const t = e.touches[0]; if (useCx(MCX) && dStart(t.clientX, t.clientY)) { TK = true; LT = [t.clientX, t.clientY]; e.preventDefault(); e.stopPropagation(); } }, { passive: false, capture: true });
   chHost.addEventListener('touchmove', (e) => { if (!TK) return; const t = e.touches[0]; LT = [t.clientX, t.clientY]; dMove(t.clientX, t.clientY); e.preventDefault(); e.stopPropagation(); }, { passive: false, capture: true });
   chHost.addEventListener('touchend', (e) => { if (!TK) return; dEnd(LT[0], LT[1]); e.preventDefault(); e.stopPropagation(); }, { capture: true });
   let selTold = false;
-  chHost.addEventListener('click', (e) => { if (DT) return; if (Date.now() - wasDrag < 300 || (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4)) return; const k = hitShape(e); if (k !== SEL) { SEL = k; drawLines(); } if (k >= 0 && !selTold) { selTold = true; toast('Drawing selected · drag a handle to resize, the body to move · Delete removes it · Esc lets go'); } });
-  chHost.addEventListener('mouseleave', () => { if (MH) { MH = null; overlay(); } });
+  chHost.addEventListener('click', (e) => { if (DT) return; if (Date.now() - wasDrag < 300 || (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4)) return; if (!onCx(MCX)) return; const k = hitShape(e, MCX); if (k !== SEL) { SEL = k; SELC = null; drawLines(); } if (k >= 0 && !selTold) { selTold = true; toast('Drawing selected · drag a handle to resize, the body to move · Delete removes it · Esc lets go'); } });
+  chHost.addEventListener('mouseleave', () => { if (MH && !DCX) { MH = null; overlay(); } });
   // the floating bar of the selected drawing: colour (theme tokens), width, solid / dashed, extend right, label, lock, clone, delete
   const DSW = [['draw', 'Blue'], ['up', 'Green'], ['dn', 'Red'], ['gold', 'Amber'], ['ink', 'Ink']];
   const DSI = { ls: '<path d="M3 12h4M10 12h4M17 12h4"/>', ext: '<path d="M4 18L16 8"/><path d="M16 8l5-4" stroke-dasharray="2 2"/><circle cx="4" cy="18" r="1.6" class="f"/><circle cx="16" cy="8" r="1.6" class="f"/>', lbl: '<path d="M4 6h16v9H9l-5 4z"/><path d="M8 10h8"/>', lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', clone: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>', del: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>' };
@@ -1255,7 +1274,7 @@
     const pk = Math.round(cl + left) + ',' + Math.round(ct + top); if (was || pk !== el._pk) { el._pk = pk; el.style.transform = `translate3d(${Math.round(cl + left)}px, ${Math.round(ct + top)}px, 0)`; } }
   $('dsel').addEventListener('click', (e) => { const b = e.target.closest('button[data-ds]'), d = S.draw && S.draw[SEL]; if (!b || !d) return; const a = b.dataset.ds;
     if (a === 'del') return delSel();
-    if (a === 'clone') { const sp = chart.timeScale().options().barSpacing || 6, c = BT.drawMove({ ...d }, (t) => { const x0 = timeToX(t), v = x0 == null ? null : xToTime(x0 + 3 * sp); return v == null ? t : v; }, (p) => { const y0 = Ypx(p), v = y0 == null ? null : series.coordinateToPrice(y0 + 16); return v == null ? p : rnd(v); });
+    if (a === 'clone') { const sp = chart.timeScale().options().barSpacing || 6, c = BT.drawMove({ ...d }, (t) => { const x0 = timeToX(t), v = x0 == null ? null : xToTime(x0 + 3 * sp); return v == null ? t : v; }, (p) => { const y0 = Ypx(p, MCX), v = y0 == null ? null : series.coordinateToPrice(y0 + 16); return v == null ? p : rnd(v); });
       c.at = mom(); delete c.editedAt; delete c.lock; S.draw.push(c); SEL = S.draw.length - 1; }
     else if (a === 'col') { if (b.dataset.v === 'draw') delete d.col; else d.col = b.dataset.v; }
     else if (a === 'w') { const n = ((d.w || 1) % 3) + 1; if (n === 1) delete d.w; else d.w = n; }
@@ -1263,7 +1282,7 @@
     else if (a === 'ext' || a === 'lbl' || a === 'lock') { if (d[a]) delete d[a]; else d[a] = true; }
     drawLines(); save(); });
   // read-only view of the drawings for the audit: the list, the selection, the tool, the magnet and each shape's pixel geometry
-  window.ctDraw = () => ({ sel: SEL, tool: DT, mag: MAG, list: JSON.parse(JSON.stringify(S.draw || [])), geo: (S.draw || []).map((d) => geo(d)) });
+  window.ctDraw = () => ({ sel: SEL, tool: DT, mag: MAG, list: JSON.parse(JSON.stringify(S.draw || [])), geo: (S.draw || []).map((d) => geo(d, MCX)) });
   window.ctBarAt = (t) => { const b = barAt(t); return b ? { time: b.time, open: b.open, high: b.high, low: b.low, close: b.close } : null; };
   chart.timeScale().subscribeVisibleLogicalRangeChange(overlay); new ResizeObserver(overlay).observe($('chart'));
   // The drawing layer follows the PRICE scale too (17 Nov 2026, owner: "when I draw and move the charts the boxes are not aligned"):
@@ -1271,7 +1290,7 @@
   // trend lines, zones, connectors, the edge lens) stayed where it was while the candles moved. Each frame reads two numbers
   // of the price scale and the time scale and redraws only when one changed (cheap: no drawing while nothing moves).
   let scaleKey = '';
-  const scaleWatch = () => { if (!document.hidden && S.bars.length) { try { const a = series.coordinateToPrice(0), b2 = series.coordinateToPrice(200), r = chart.timeScale().getVisibleLogicalRange(); const k = a + '|' + b2 + '|' + (r ? r.from + ',' + r.to : ''); if (k !== scaleKey) { scaleKey = k; overlay(); } } catch (e) {} } requestAnimationFrame(scaleWatch); };
+  const scaleWatch = () => { if (!document.hidden && S.bars.length) { try { const a = series.coordinateToPrice(0), b2 = series.coordinateToPrice(200), r = chart.timeScale().getVisibleLogicalRange(); const k = a + '|' + b2 + '|' + (r ? r.from + ',' + r.to : '') + xpScaleKey(); if (k !== scaleKey) { scaleKey = k; overlay(); } } catch (e) {} } requestAnimationFrame(scaleWatch); };
   requestAnimationFrame(scaleWatch);
   // context chart: a higher timeframe at the same moment, the current candle still forming (built from the replay bars)
   // split view (10 Nov 2026, owner: "option to split chart max 4, timeframes"): the main chart plus up to three view panes, each on its own
@@ -1292,16 +1311,18 @@
   function xpMake(i) { const el = document.createElement('div'); el.className = 'xp';
     el.innerHTML = `<div class="xph"><label><span class="sr">Timeframe of this chart</span><select class="xp-tf" title="Timeframe of this chart">${[['Minutes', 'm'], ['Hours', 'h'], ['Days and weeks', 'dw']].map(([g, u]) => `<optgroup label="${g}">${Object.keys(TFS).filter((t) => u.includes(t.slice(-1))).map((t) => `<option value="${t}" title="${XNAME[t]}">${XLBL[t]}</option>`).join('')}</optgroup>`).join('')}</select></label><span class="xp-t" role="status"></span><button type="button" class="xp-x" title="Close this chart" aria-label="Close this chart">×</button></div><div class="xpc"></div>`;
     $('panes').appendChild(el);
-    const ch = LightweightCharts.createChart(el.querySelector('.xpc'), { timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 4 }, rightPriceScale: { scaleMargins: { top: 0.1, bottom: 0.1 } }, crosshair: { mode: 0, vertLine: { style: 3, width: 1 }, horzLine: { style: 3, width: 1 } }, autoSize: true });
+    const ch = LightweightCharts.createChart(el.querySelector('.xpc'), { timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 4, minBarSpacing: 0.05 }, rightPriceScale: { scaleMargins: { top: 0.1, bottom: 0.1 } }, crosshair: { mode: 0, vertLine: { style: 3, width: 1 }, horzLine: { style: 3, width: 1 } }, autoSize: true });
     const sr = ch.addCandlestickSeries({ upColor: CT.up, downColor: CT.dn, borderVisible: false, priceLineStyle: 2, priceLineWidth: 1, wickUpColor: CT.up, wickDownColor: CT.dn });
-    const P = { i, el, chart: ch, series: sr, tf: XP.tfs[i], bars: [], data: [], k: -1, fs: null, fm: null, tok: 0, key: '', loading: false, err: '', lines: [], lk: '' };
+    const P = { i, el, chart: ch, series: sr, tf: XP.tfs[i], bars: [], data: [], k: -1, fs: null, fm: null, tok: 0, key: '', loading: false, err: '', lines: [], lk: '', G: [], ogk: '' };
+    P.dc = xpCx(P); P.ov = document.createElement('canvas'); P.ov.className = 'xpov'; P.ov.setAttribute('aria-hidden', 'true'); el.appendChild(P.ov); xpHands(P); xsOn(P.dc);
+    if (DT) P.dc.host.classList.add('drawing'); if (window.ResizeObserver) new ResizeObserver(() => overlay()).observe(el);
     const sel = el.querySelector('.xp-tf'); sel.value = P.tf;
     sel.addEventListener('change', () => { P.tf = sel.value; XP.tfs[P.i] = P.tf; xpSave(); xpLook(P); xpLoad(P); });
-    el.querySelector('.xp-x').addEventListener('click', () => { const at = XP.panes.indexOf(P); if (at < 0) return; XP.panes.splice(at, 1); XP.tfs.splice(at, 1); XP.tfs.push(P.tf); P.tok++; try { ch.remove(); } catch (e) {} el.remove(); XP.panes.forEach((Q, j) => { Q.i = j; }); XP.n = XP.panes.length + 1; xpSave(); xpLayout(); });
+    el.querySelector('.xp-x').addEventListener('click', () => { const at = XP.panes.indexOf(P); if (at < 0) return; xpGone(P); XP.panes.splice(at, 1); XP.tfs.splice(at, 1); XP.tfs.push(P.tf); P.tok++; try { ch.remove(); } catch (e) {} el.remove(); XP.panes.forEach((Q, j) => { Q.i = j; }); XP.n = XP.panes.length + 1; xpSave(); xpLayout(); });
     ch.subscribeCrosshairMove((prm) => xpCross(P, prm)); xpLook(P); return P; }
   // the grid: 1 = the chart alone, 2 = side by side, 3 = the main chart and two stacked beside it, 4 = two by two
   function xpLayout() { XP.n = Math.min(4, Math.max(1, XP.n | 0)); $('panes').dataset.n = String(XP.n);
-    while (XP.panes.length > XP.n - 1) { const P = XP.panes.pop(); P.tok++; try { P.chart.remove(); } catch (e) {} P.el.remove(); }
+    while (XP.panes.length > XP.n - 1) { const P = XP.panes.pop(); xpGone(P); P.tok++; try { P.chart.remove(); } catch (e) {} P.el.remove(); }
     while (XP.panes.length < XP.n - 1) XP.panes.push(xpMake(XP.panes.length));
     document.querySelectorAll('#splitdd [data-split]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.split === XP.n)));
     const sm = $('splitdd') && $('splitdd').querySelector('summary'); if (sm) sm.classList.toggle('tb-more-on', XP.n > 1);
@@ -1328,16 +1349,16 @@
     else { let i0 = ubT(S.bars, start - 1); if (i0 >= i1) { P.fm = null; return null; } let h = -Infinity, l = Infinity; for (let i = i0; i < i1; i++) { const b = S.bars[i]; if (b.high > h) h = b.high; if (b.low < l) l = b.low; }
       const o = open0 != null ? open0 : S.bars[i0].open; f = P.fm = { start, idx: i1, o, h: Math.max(h, o), l: Math.min(l, o), c: S.bars[i1 - 1].close }; }
     return { time: start, open: f.o, high: f.h, low: f.l, close: f.c }; }
-  function xpDraw(P, force) { if (P.loading) return; const c = cur();
+  function xpDraw(P, force) { if (P.loading) return; const c = cur(); if (P.dc) P.dc.lock = performance.now() + 80;
     if (!c || P.err) { if (P.data.length) { P.data = []; P.series.setData([]); } P.k = -1; xpTitle(P, P.err || 'Load candles to see this chart', !!P.err); return; }
     const B = TFS[S.tf], sec = P.sec || TFS[P.tf], now = c.time; let data = null, upd = null, k, note;
     if (sec === B) { k = S.idx; if (!force && k === P.k + 1) upd = [xpBar(S.bars[k - 1])]; else if (force || k !== P.k) data = S.bars.slice(Math.max(0, k - XSHOW), k).map(xpBar); note = 'same timeframe as the first chart'; }
-    else if (sec < B) { k = ubT(P.bars, mom() - sec); if (!force && k >= P.k && k - P.k <= 120) upd = P.bars.slice(P.k, k); else data = P.bars.slice(Math.max(0, k - XSHOW * 2), k); note = 'closed candles only'; }
+    else if (sec < B) { k = ubT(P.bars, mom() - sec); if (!force && k >= P.k && k - P.k <= 120) upd = P.bars.slice(P.k, k); else data = P.bars.slice(Math.max(0, k - XSHOW * 12), k); note = 'closed candles only'; }
     else { const j = ubT(P.bars, now) - 1; let nd, start, o0 = null; if (j >= 0 && now < P.bars[j].time + sec) { nd = j; start = P.bars[j].time; o0 = P.bars[j].open; } else { nd = j + 1; start = xpBucket(now, sec); }
       const f = xpForm(P, start, o0); k = nd; if (!force && nd === P.k && start === P.fs) upd = f ? [f] : []; else data = P.bars.slice(Math.max(0, nd - XSHOW), nd).concat(f ? [f] : []); P.fs = start; note = 'last candle still forming'; }
     if (data) { P.data = data; P.series.setData(data); P.series.applyOptions({ priceFormat: { type: 'price', precision: S.dec, minMove: Math.pow(10, -S.dec) } }); P.chart.timeScale().scrollToRealTime(); }
     else if (upd) for (const b of upd) { const n = P.data.length; if (n && P.data[n - 1].time === b.time) P.data[n - 1] = b; else P.data.push(b); P.series.update(b); }
-    P.k = k; xpTitle(P, note); }
+    P.k = k; xpTitle(P, note); if (data || (upd && upd.length)) xsFrom(MCX, P.dc); }
   // open trades and resting orders show on every pane (read only: they are moved on the first chart)
   function xpLines(P) { const a = S.acct; if (!a) return; const k = a.positions.map((p) => [p.id, p.entry, p.stop, p.target].join()).concat(a.orders.map((o) => ['o', o.type, o.price, o.stop, o.target].join()), [CT.up, CT.dn]).join('|'); if (k === P.lk) return; P.lk = k;
     P.lines.forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P.lines = [];
@@ -1352,7 +1373,9 @@
         if (tt == null) c.clearCrosshairPosition(); else c.setCrosshairPosition(price, tt, sr); } } catch (e) {} XSY = performance.now(); }
   chart.subscribeCrosshairMove((prm) => xpCross(null, prm));
   // read-only summary for the audit (like ctChart): what each pane shows against the replay's moment
-  window.ctSplit = () => { const c = cur(), B = TFS[S.tf]; return { n: XP.n, tf: S.tf, bars: S.bars.length, idx: S.idx, mom: c ? mom() : null, forming: !!S.part, now: c ? c.time : null, close: c ? c.close : null, panes: XP.panes.map((P) => { const last = P.data[P.data.length - 1] || null, sec = TFS[P.tf]; let hi = null, lo = null; if (last && c && sec > B) { hi = last.open; lo = last.open; for (let i = ubT(S.bars, last.time - 1); i < S.idx; i++) { hi = Math.max(hi, S.bars[i].high); lo = Math.min(lo, S.bars[i].low); } } return { tf: P.tf, sec, n: P.data.length, last, lines: P.lines.length, title: P.el.querySelector('.xp-t').textContent, rel: sec > B ? 'higher' : sec < B ? 'lower' : 'same', hi, lo }; }) }; };
+  window.ctSplit = () => { const c = cur(), B = TFS[S.tf]; return { n: XP.n, tf: S.tf, bars: S.bars.length, idx: S.idx, mom: c ? mom() : null, forming: !!S.part, now: c ? c.time : null, close: c ? c.close : null, panes: XP.panes.map((P) => { const last = P.data[P.data.length - 1] || null, sec = TFS[P.tf]; let hi = null, lo = null; if (last && c && sec > B) { hi = last.open; lo = last.open; for (let i = ubT(S.bars, last.time - 1); i < S.idx; i++) { hi = Math.max(hi, S.bars[i].high); lo = Math.min(lo, S.bars[i].low); } } return { tf: P.tf, sec, n: P.data.length, last, lines: P.lines.length, title: P.el.querySelector('.xp-t').textContent, rel: sec > B ? 'higher' : sec < B ? 'lower' : 'same', hi, lo, range: xsRange(P.dc), draw: P.G.map(([k, g]) => ({ k, type: g.type, x1: g.x1, y1: g.y1, x2: g.x2, y2: g.y2 })), host: (() => { const r = P.dc.host.getBoundingClientRect(); return { x: r.left, y: r.top, w: P.chart.timeScale().width(), h: paneH(P.dc) }; })() }; }), sync: XSYNC, range: xsRange(MCX) }; };
+  // where a time and a price sit on chart i (-1 = the first chart), by the chart library's own mapping (the audit compares the drawn shapes with it)
+  window.ctPaneXY = (i, t, p) => { const c = i < 0 ? MCX : XP.panes[i] && XP.panes[i].dc; if (!c) return null; return { x: c.chart.timeScale().timeToCoordinate(t), y: c.series.priceToCoordinate(p), tx: c.tX(t) }; };
   // the two names the rest of the page calls (they used to drive the single context chart)
   async function loadHtf() { xpLayout(); await Promise.all(XP.panes.map((P) => xpLoad(P))); renderHtf(); }
   let XF = false;   // the next draw of the panes is a full one (a forming candle of the first chart completed, or came back by Undo)
@@ -1361,6 +1384,63 @@
   function renderHtf() { const f = XF; XF = false; for (const P of XP.panes) { xpDraw(P, f); xpLines(P); } }
   document.querySelectorAll('#splitdd [data-split]').forEach((b) => b.addEventListener('click', () => { XP.n = +b.dataset.split; xpSave(); loadHtf(); const d = $('splitdd'); if (d) d.open = false; }));
   if (window.ResizeObserver) new ResizeObserver(() => { xpGeom(); }).observe($('chart'));
+  // ---- split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time and
+  // when I draw in one should show on the others"). Sync: panning or zooming any chart moves every other one to the same TIME
+  // window (BT.syncRange through each chart's own candles; a range just set on a chart is ignored when it comes back as that
+  // chart's own change, BT.syncEcho). The replay's scroll of the first chart carries the panes; a pane's own redraw never moves
+  // the others and takes the first chart's window again. View only: a pane still shows no candle past the replay's moment.
+  // Drawings: each pane has its own overlay canvas and draws S.draw through its own mapping, and every drawing tool works on it.
+  // Display only: nothing here places, changes or refuses an order or moves a stop.
+  let XSYNC = true; try { XSYNC = localStorage.getItem('btLab:splitSync') !== '0'; } catch (e) {}
+  let XSING = false;
+  const xsSyncBtn = () => document.querySelectorAll('#splitdd [data-xsync]').forEach((b) => b.setAttribute('aria-pressed', String(XSYNC)));
+  function xsRange(c) { try { const r = c.chart.timeScale().getVisibleLogicalRange(), v = c.view(); if (!r || !v.n) return null; return { from: BT.tfTimeAt(v.bars, v.n, v.sec, r.from), to: BT.tfTimeAt(v.bars, v.n, v.sec, r.to) }; } catch (e) { return null; } }
+  function xsFrom(src, only) { if (!XSYNC || XSING || !XP.panes.length) return; let r; try { r = src.chart.timeScale().getVisibleLogicalRange(); } catch (e) { return; } const sv = src.view(); if (!r || !sv.n) return;
+    XSING = true; const now = performance.now();
+    try { for (const T of only ? [only] : [MCX].concat(XP.panes.map((P) => P.dc))) { if (T === src) continue; const tv = T.view(); if (!tv.n) continue; const q = BT.syncRange(sv, tv, r); if (!q) continue;
+        const c = T.chart.timeScale().getVisibleLogicalRange(); if (c && Math.abs(c.from - q.from) < 0.01 && Math.abs(c.to - q.to) < 0.01) continue;
+        T.exp = { from: q.from, to: q.to, at: now }; T.lock = Math.max(T.lock || 0, now + 60); T.chart.timeScale().setVisibleLogicalRange(q); } } catch (e) {} finally { XSING = false; } }
+  // who leads: the chart a person presses, scrolls or touches (while the press lasts and a moment after, for the chart's own
+  // glide), else the first chart (the replay's scroll). Only the leader's range changes move the others, so a chart set by the
+  // sync never answers back; a range just set (BT.syncEcho) or a pane's own redraw (lock) is not a change either.
+  let XLEAD = null, XDOWN = false, XLT = 0;
+  const xsLead = () => (XLEAD && (XDOWN || performance.now() < XLT) ? XLEAD : MCX);
+  function xsOn(c) { const h = c.host, grab = () => { XLEAD = c; XDOWN = true; };
+    h.addEventListener('pointerdown', grab, true); h.addEventListener('touchstart', grab, { capture: true, passive: true });
+    h.addEventListener('wheel', () => { XLEAD = c; XLT = performance.now() + 600; }, { capture: true, passive: true });
+    c.chart.timeScale().subscribeVisibleLogicalRangeChange((r) => { if (XSING || !r || !XSYNC || xsLead() !== c) return; const now = performance.now(); if (now < (c.lock || 0) || BT.syncEcho(c.exp, r, now)) return; c.exp = null; xsFrom(c); }); }
+  const xsUp = () => { if (XDOWN) { XDOWN = false; XLT = performance.now() + 1500; } };
+  document.addEventListener('pointerup', xsUp, true); document.addEventListener('pointercancel', xsUp, true); document.addEventListener('touchend', xsUp, true);
+  xsOn(MCX); xsSyncBtn();
+  document.querySelectorAll('#splitdd [data-xsync]').forEach((b) => b.addEventListener('click', () => { XSYNC = !XSYNC; try { localStorage.setItem('btLab:splitSync', XSYNC ? '1' : '0'); } catch (e) {} xsSyncBtn(); if (XSYNC) xsFrom(MCX); toast(XSYNC ? 'Charts move together' : 'Charts move on their own'); }));
+  // a pane's time ⇄ x through its own candles (the same convention as the first chart), and its magnet candle (closed by the moment)
+  function xpCx(P) { const V = () => ({ bars: P.data, n: P.data.length, sec: TFS[P.tf] });
+    return { P, chart: P.chart, series: P.series, host: P.el.querySelector('.xpc'), view: V, exp: null, lock: 0,
+      tX: (t) => { const v = V(), lg = BT.tfLogical(v.bars, v.n, v.sec, t); return lg == null ? null : P.chart.timeScale().logicalToCoordinate(lg); },
+      xT: (xp) => { const v = V(), lg = P.chart.timeScale().coordinateToLogical(xp); if (lg == null || !v.n) return null; const i = Math.round(lg); return i < 0 ? v.bars[0].time + i * v.sec : i <= v.n - 1 ? v.bars[i].time : v.bars[v.n - 1].time + (i - (v.n - 1)) * v.sec; },
+      bar: (t) => { const v = V(); return cur() ? BT.closedBarAt(v.bars, v.n, v.sec, t, mom()) : null; } }; }
+  // a pane going away ends a gesture or a selection made on it
+  function xpGone(P) { if (DCX === P.dc) { DCX = null; DP = null; DM = null; MH = null; ED = null; CR = null; } if (SELC === P.dc) SELC = null; }
+  function xpScaleKey() { let k = ''; for (const P of XP.panes) { try { const r = P.chart.timeScale().getVisibleLogicalRange(); k += ';' + P.series.coordinateToPrice(0) + ',' + P.series.coordinateToPrice(200) + ',' + (r ? r.from + ',' + r.to : '') + ',' + P.data.length; } catch (e) {} } return k; }
+  // every pane's overlay; returns where the floating bar goes when the selection was made on a pane
+  function xpOvAll() { let out = null; if (SELC && !XP.panes.some((P) => P.dc === SELC)) SELC = null;
+    for (const P of XP.panes) { const c = P.dc, host = c.host, cv = P.ov, W = P.chart.timeScale().width(), Hh = host.clientHeight, dpr = devicePixelRatio; P.G = []; if (!W || !Hh) continue;
+      const gk = [W, Hh, host.offsetTop, host.offsetLeft, dpr].join(); if (gk !== P.ogk) { P.ogk = gk; cv.style.top = host.offsetTop + 'px'; cv.style.left = host.offsetLeft + 'px'; cv.style.width = W + 'px'; cv.style.height = Hh + 'px'; cv.width = W * dpr; cv.height = Hh * dpr; }
+      const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, Hh); if (!P.data.length || !S.bars.length) continue;
+      const PH = paneH(c), sh = drawShapes(x, c, W, PH, false); P.G = sh.G;
+      if (SELC === c && sh.selG) out = { ct: P.el.offsetTop + host.offsetTop, cl: P.el.offsetLeft + host.offsetLeft, W, PH, g: sh.selG }; }
+    return out; }
+  // gestures on a pane: the same drawing tools, selection, move, resize and magnet as on the first chart
+  function xpHands(P) { const H = P.dc.host, c = P.dc; let down = null, LTp = null;
+    H.addEventListener('mousedown', (e) => { down = [e.clientX, e.clientY]; if (e.button !== 0 || e.shiftKey || PM) return; if (useCx(c) && dStart(e.clientX, e.clientY)) { TK = true; e.preventDefault(); e.stopPropagation(); } }, true);
+    H.addEventListener('mousemove', (e) => { if (!onCx(c)) return; if (DT) { dMove(e.clientX, e.clientY); return; } if (ED || TK) return;
+      const pk = pickDraw(...locOf(e.clientX, e.clientY, c), c), hs = pk ? pk.k : -1, cr = !pk ? '' : S.draw[pk.k].lock ? 'lock' : pk.part === 'body' ? (S.draw[pk.k].type === 'h' ? 'ns' : 'move') : /^c(11|22)$/.test(pk.part) ? 'nwse' : /^c(12|21)$/.test(pk.part) ? 'nesw' : /^ep/.test(pk.part) ? 'ns' : /^et/.test(pk.part) ? 'ew' : 'pt';
+      if (H.dataset.dcur !== cr) H.dataset.dcur = cr; H.classList.toggle('pick', hs >= 0); if (hs !== HS) { HS = hs; overlay(); } });
+    H.addEventListener('mouseleave', () => { let ch = false; if (MH && DCX === c) { MH = null; ch = true; } if (HS >= 0 && H.classList.contains('pick')) { HS = -1; ch = true; } H.classList.remove('pick'); if (ch) overlay(); });
+    H.addEventListener('click', (e) => { if (DT || !onCx(c)) return; if (Date.now() - wasDrag < 300 || (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 4)) return; const k = hitShape(e, c); if (k !== SEL) { SEL = k; SELC = k >= 0 ? c : null; drawLines(); } });
+    H.addEventListener('touchstart', (e) => { if (PM || e.touches.length !== 1) return; const t = e.touches[0]; if (useCx(c) && dStart(t.clientX, t.clientY)) { TK = true; LTp = [t.clientX, t.clientY]; e.preventDefault(); e.stopPropagation(); } }, { passive: false, capture: true });
+    H.addEventListener('touchmove', (e) => { if (!TK || DCX !== c) return; const t = e.touches[0]; LTp = [t.clientX, t.clientY]; dMove(t.clientX, t.clientY); e.preventDefault(); e.stopPropagation(); }, { passive: false, capture: true });
+    H.addEventListener('touchend', (e) => { if (!TK || DCX !== c || !LTp) return; dEnd(LTp[0], LTp[1]); e.preventDefault(); e.stopPropagation(); }, { capture: true }); }
   xpLayout();
   $('tb-sess').addEventListener('click', () => { sessShow(true); const f = $('sess-body'); if (f && f.scrollIntoView) f.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); const c = $('tfchips').querySelector('[aria-pressed="true"]'); if (c) c.focus({ preventScroll: true }); });
   // timeframe chips: one button per option of #tf, which stays the value the page reads; setting $('tf').value in code moves the chip too
@@ -1406,7 +1486,7 @@
   const near = (yPix) => { let best = null, bd = 8; for (const d of DL) { const yy = series.priceToCoordinate(d.price); if (yy == null) continue; const dd = Math.abs(yy - yPix); if (dd < bd) { bd = dd; best = d; } } return best; };
   const yOf = (e) => e.clientY - host.getBoundingClientRect().top;
   host.addEventListener('mousedown', (e) => { const d = near(yOf(e)); if (!d) return; drag = d; if (d.draw) P0.set(d.draw, d.draw.price); chart.applyOptions({ handleScroll: false, handleScale: false }); host.classList.add('drag'); e.preventDefault(); });
-  host.addEventListener('mousemove', (e) => { if (drag) return; const n = near(yOf(e)); host.classList.toggle('hover', !!n); if (n !== HL) { HL = n; overlay(); } const pk = !n && !DT && !ED ? pickDraw(...locOf(e.clientX, e.clientY)) : null, hs = pk ? pk.k : -1, cur = !pk ? '' : S.draw[pk.k].lock ? 'lock' : pk.part === 'body' ? 'move' : /^c(11|22)$/.test(pk.part) ? 'nwse' : /^c(12|21)$/.test(pk.part) ? 'nesw' : /^ep/.test(pk.part) ? 'ns' : /^et/.test(pk.part) ? 'ew' : 'pt';
+  host.addEventListener('mousemove', (e) => { if (drag) return; const n = near(yOf(e)); host.classList.toggle('hover', !!n); if (n !== HL) { HL = n; overlay(); } const pk = !n && !DT && !ED ? pickDraw(...locOf(e.clientX, e.clientY, MCX), MCX) : null, hs = pk ? pk.k : -1, cur = !pk ? '' : S.draw[pk.k].lock ? 'lock' : pk.part === 'body' ? 'move' : /^c(11|22)$/.test(pk.part) ? 'nwse' : /^c(12|21)$/.test(pk.part) ? 'nesw' : /^ep/.test(pk.part) ? 'ns' : /^et/.test(pk.part) ? 'ew' : 'pt';
     if (host.dataset.dcur !== cur) host.dataset.dcur = cur; if (hs !== HS) { HS = hs; host.classList.toggle('pick', hs >= 0); overlay(); } });
   host.addEventListener('mouseleave', () => { if (HL || HS >= 0) { HL = null; HS = -1; host.classList.remove('pick'); overlay(); } });
   document.addEventListener('mousemove', (e) => { if (!drag) return; const v = series.coordinateToPrice(yOf(e)); if (v == null) return; drag.set(drag.draw ? hSnap(e.clientX, v) : rnd(v)); drag.line.applyOptions({ price: drag.price }); if (D) { $('o-price').value = fmt(D.entry); $('o-stop').value = fmt(D.stop); $('o-target').value = D.target == null ? '' : fmt(D.target); calc(); } overlay(); });
