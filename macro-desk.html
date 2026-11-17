@@ -220,7 +220,7 @@
   .check { display: flex; align-items: center; gap: 12px; }
   /* phones (9 Nov audit): the three labelled pills ran 125px past a 390px screen; dots only, as on the main desk */
   @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
-  .hdr-sw[hidden] { display: none; }
+  .hdr-sw[hidden] { display: none; } .hdr-sw a[hidden] { display: none !important; }
   /* touch: each dot of the switch is a 44 px target (they were 25 px wide), as on the other side pages */
   @media (pointer: coarse) { .hdr-sw { padding: 0; } .hdr-sw a { min-width: 44px; justify-content: center; } }
   /* the channel table's no-wrap first column pushed it 8px past a 390px screen */
@@ -555,7 +555,7 @@
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand" style="font-weight:500">Macro desk</span>
     <div class="check"><span class="when" id="when" aria-live="polite">Loading…</span>
-      <nav class="hdr-sw" aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav></div>
+      <nav class="hdr-sw" aria-label="Desk, macro, ChronosTrade or Academy"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a><a href="/academy" class="hdr-ac" data-mx-owner hidden title="Aureum Academy: replay, decide, correct and prove"><i aria-hidden="true"></i><span>Academy</span></a></nav></div>
   </div>
 </header>
 <main class="wrap" data-loading>
@@ -735,6 +735,7 @@
   if (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname)) {
     var me = null; try { var mr = await fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }); me = mr.ok ? (await mr.json()).account : null; } catch (e) {}
     if (!me) { document.querySelector('main.wrap').style.display = 'none'; document.getElementById('md-gate').hidden = false; var sw = document.querySelector('.hdr-sw'); if (sw) sw.hidden = true; var w = document.getElementById('when'); if (w) w.textContent = 'Signed out'; return; }
+    if (me.role === 'owner') document.querySelectorAll('[data-mx-owner]').forEach(function (el) { el.hidden = false; });
   }
   var BASE = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');
   var $ = function (id) { return document.getElementById(id); };

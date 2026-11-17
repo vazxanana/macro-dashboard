@@ -150,7 +150,7 @@ a.brand:not(.here) { font: 700 14px/1 var(--au-font-ui); text-transform: upperca
 /* Desk | Macro | ChronosTrade switch (spec §3, navigation): inactive items in the second ink, the active one raised with an accent
    underline; shown to signed-in members only. No ring and no motion. */
 .hdr-sw { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; background: var(--au-surface); border: 1px solid var(--au-line); }
-.hdr-sw[hidden] { display: none; }
+.hdr-sw[hidden], .hdr-sw a[hidden] { display: none !important; }
 .hdr-sw a { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 30px; min-width: 30px; padding: 0 13px; border-radius: 999px; text-decoration: none; color: var(--au-ink-2); font: 600 13px/1 var(--sans); white-space: nowrap; }
 .hdr-sw a i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .55; flex: none; }
 .hdr-sw a:hover { color: var(--au-ink); text-decoration: none; }
