@@ -142,7 +142,7 @@ async function startServer(port = PORT, flags = []) {
     // ---- 2. the owner: shell, tabs, setup ----
     const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); await ctx.addInitScript(NO_PACE); let p = await ctx.newPage(); watch(p, 'owner');
     await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, null, null);
-    check('title and heading are "MeridianX Academy"', (await p.title()) === 'MeridianX Academy' && (await txt(p, 'h1')) === 'MeridianX Academy', await p.title());
+    check('title and heading are "Aureum Academy"', (await p.title()) === 'Aureum Academy' && (await txt(p, 'h1')) === 'Aureum Academy', await p.title());
     const tabs = await p.$$eval('#ac-tabs [role=tab]', (l) => l.map((x) => x.textContent.trim()));
     check('nine sections as tabs, Train first', tabs.length === 9 && /^Train$/.test(tabs[0]) && ['Session', 'Blind arena', 'Progress', 'Lessons', 'Research', 'Models', 'Costs', 'Audit'].every((t, i) => tabs[i + 1].startsWith(t)), tabs.join(' | '));
     check('no tab is a placeholder any more', !tabs.some((t) => /next step/.test(t)) && !/Coming in the next build step/.test(await txt(p, '#ac-app')), tabs.join(' | '));
