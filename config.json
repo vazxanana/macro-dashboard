@@ -655,6 +655,12 @@
    "by": "coach-backtest",
    "change": "scalp: hold to the second target (backtest)",
    "why": "456 trades over the last 30 days: the second target +0.36R per trade versus the first (t = 2.7), +0.38R and +0.33R in the two halves."
+  },
+  {
+   "at": "2026-11-17T22:48:56.000Z",
+   "by": "user",
+   "change": "LIT paper shadow stream (owner, 17 Nov): no new LIT orders are recorded; LIT trades already open or pending run to their exits with their stops",
+   "why": "Owner, 17 Nov 2026: the simplification list (\"All\"). The LIT study stays INCONCLUSIVE (#597) and the stream had rarely filled; it is switched off rather than kept running."
   }
  ],
  "btAt": "2026-11-17T12:08:36.388Z",
@@ -707,7 +713,8 @@
   "replica-mirror-gold-only",
   "mosha-cycle",
   "shadow-best",
-  "mcycle-shadow"
+  "mcycle-shadow",
+  "lit-off"
  ],
  "target": {
   "scalp": "t2"
@@ -722,11 +729,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-17T22:46:03.000Z",
+   "at": "2026-11-17T22:48:56.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-17T22:46:03.000Z",
+   "at": "2026-11-17T22:48:56.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -875,7 +882,7 @@
  "nqRegimeShadow": {
   "trendMin": 0.295
  },
- "litShadow": true,
+ "litShadow": false,
  "ownerShadow": {
   "replica": 1794434536,
   "mosha-bo": 1794434536,

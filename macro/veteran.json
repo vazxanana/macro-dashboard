@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-17T22:34:10.000Z",
+ "at": "2026-11-17T22:50:22.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-17T22:33:51.000Z",
+ "strategistAt": "2026-11-17T22:50:05.000Z",
  "shock": {
   "shock": "Mixed / no dominant shock",
   "clues": [
@@ -99,7 +99,7 @@
  "debate": [
   {
    "topic": "Direction for gold",
-   "macro": "Gold Macro Score −1.00 → AUCTION (no macro edge); next-day P(up) 51%",
+   "macro": "Gold Macro Score −0.98 → AUCTION (no macro edge); next-day P(up) 51%",
    "veteran": "7 of 8 channels observed; tally −2 → against gold",
    "stance": "qualify",
    "why": "The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.",
@@ -117,11 +117,11 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+1.31 pts in 5 sessions (vote down); score z (4-week fall) −0.85",
+   "macro": "no data (vote flat); score z (4-week fall) −0.77",
    "veteran": "DXY 103.62, +1.31% on the week, +1.81% over 4 weeks · broad USD +0.89% over 4 weeks",
-   "stance": "agree",
+   "stance": "qualify",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
-   "m": -1,
+   "m": null,
    "v": -1
   },
   {
@@ -156,8 +156,8 @@
   "bias": "AUCTION",
   "conviction": null,
   "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print.",
-  "agree": 3,
-  "qualify": 3,
+  "agree": 2,
+  "qualify": 4,
   "disagree": 0,
   "invalidation": [
    "10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support",
@@ -227,15 +227,15 @@
     "k": "v_ry4w",
     "vs": "ry",
     "challenger": {
-     "n": 645,
-     "hit": 0.515,
-     "t": 0.75,
+     "n": 278,
+     "hit": 0.522,
+     "t": 0.72,
      "proven": false
     },
     "incumbent": {
-     "n": 752,
-     "hit": 0.517,
-     "t": 0.95,
+     "n": 350,
+     "hit": 0.497,
+     "t": -0.11,
      "proven": false
     }
    },
@@ -243,37 +243,27 @@
     "k": "v_d2_4w",
     "vs": "dgs2",
     "challenger": {
-     "n": 514,
-     "hit": 0.523,
-     "t": 1.06,
+     "n": 199,
+     "hit": 0.563,
+     "t": 1.77,
      "proven": false
     },
     "incumbent": {
-     "n": 804,
-     "hit": 0.537,
-     "t": 2.12,
+     "n": 375,
+     "hit": 0.539,
+     "t": 1.5,
      "proven": false
     }
    },
    {
     "k": "v_dxy4w",
     "vs": "dxymom",
-    "challenger": {
-     "n": 622,
-     "hit": 0.497,
-     "t": -0.16,
-     "proven": false
-    },
-    "incumbent": {
-     "n": 760,
-     "hit": 0.491,
-     "t": -0.51,
-     "proven": false
-    }
+    "challenger": null,
+    "incumbent": null
    }
   ],
   "recent": [],
-  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.72 vs ry hit 50%, t -0.11; v_d2_4w hit 56%, t 1.77 vs dgs2 hit 54%, t 1.5; v_dxy4w no record yet vs dxymom no record yet. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
  },
  "releases": [
   {
@@ -751,7 +741,7 @@
     },
     {
      "src": "Council strategist: Gold Macro Score",
-     "read": "score -1.00 (tested 2007-26, 4-week horizon)",
+     "read": "score -0.98 (tested 2007-26, 4-week horizon)",
      "says": "no tested edge (auction)",
      "limit": "Never a sell signal: a negative score did not predict falls."
     }
@@ -1180,7 +1170,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-17T22:34:10.000Z",
+  "at": "2026-11-17T22:50:22.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1195,7 +1185,7 @@
      "at": "2026-11-18T07:00:00.000Z",
      "consensus": "3.6%",
      "previous": "3.5%",
-     "goldMovePct": 1.26
+     "goldMovePct": 1.15
     },
     "title": "GBP CPI y/y on Wed, 18 Nov is the week's pivot",
     "evidence": [
@@ -1205,7 +1195,7 @@
       "source": "economic calendar (Forex Factory feed via the strategist); veteran-expectations.json"
      },
      {
-      "text": "typical gold day move 1.26% (naive: mean absolute move of the last 20 days)",
+      "text": "typical gold day move 1.15% (naive: mean absolute move of the last 20 days)",
       "asOf": "2026-11-17",
       "source": "macro/forecast.json playbook"
      },
@@ -1241,7 +1231,7 @@
     "fx": null,
     "k": "price",
     "score": 1.23,
-    "title": "Gold below its 10-week average (−5.9%); Gold Macro Score −1.00 (AUCTION)",
+    "title": "Gold below its 10-week average (−5.9%); Gold Macro Score −0.98 (AUCTION)",
     "evidence": [
      {
       "text": "gold 3862.77 vs 10-week average 4103; −29.9% from the 52-week closing high",
@@ -1249,7 +1239,7 @@
       "source": "council daily gold candles (OANDA)"
      },
      {
-      "text": "Gold Macro Score −1.00 → AUCTION (no macro edge)",
+      "text": "Gold Macro Score −0.98 → AUCTION (no macro edge)",
       "asOf": "2026-11-20",
       "source": "council/macroscore.mjs (tested 2007-26, 4-week horizon)"
      }
@@ -1540,8 +1530,7 @@
       "why": "The first support (2026-11-09..2026-11-13): a daily close below it says sellers took last week's range.",
       "dist": -0.26,
       "side": "below",
-      "near": 0,
-      "crossed": true
+      "near": 0
      },
      {
       "price": 3839.6,
@@ -1586,11 +1575,7 @@
      "stale": false,
      "text": "as of 2026-11-16 close"
     },
-    "mark": {
-     "px": 3849.21,
-     "at": "2026-11-17T22:33:51.000Z",
-     "dist": -0.35
-    }
+    "mark": null
    },
    "dxy": {
     "name": "DXY",
@@ -2912,7 +2897,7 @@
    "titles": [
     "CPI y/y"
    ],
-   "expMovePct": 1.26,
+   "expMovePct": 1.15,
    "note": null,
    "bands": {
     "cool": 3.5,
@@ -2990,7 +2975,7 @@
    "titles": [
     "BOE Gov Bailey Speaks"
    ],
-   "expMovePct": 1.26,
+   "expMovePct": 1.15,
    "note": null,
    "bands": {
     "cool": null,
@@ -3068,7 +3053,7 @@
    "titles": [
     "FOMC Meeting Minutes"
    ],
-   "expMovePct": 1.26,
+   "expMovePct": 1.15,
    "note": "Two stages: the statement, then the press conference, which often reverses the first move.",
    "bands": {
     "cool": null,
@@ -4089,7 +4074,7 @@
     "Employment Change",
     "Unemployment Rate"
    ],
-   "expMovePct": 1.26,
+   "expMovePct": 1.15,
    "note": null,
    "bands": {
     "cool": 25.5,
@@ -4160,7 +4145,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -4185,23 +4170,21 @@
    "at": "2026-11-18T07:00:00.000Z",
    "consensus": "3.6%",
    "previous": "3.5%",
-   "goldMovePct": 1.26,
+   "goldMovePct": 1.15,
    "when": "Wed 18 Nov, 07:00 UTC"
   },
   "levels": {
    "px": 3862.77,
    "asOf": "2026-11-16",
    "above": {
-    "price": 3870.3,
-    "label": "October low",
-    "dist": 0.19,
-    "distNow": 0.55
+    "price": 3900,
+    "label": "Round number",
+    "dist": 0.96
    },
    "below": {
     "price": 3832.5,
     "label": "13-week low",
-    "dist": -0.78,
-    "distNow": -0.43
+    "dist": -0.78
    },
    "fresh": {
     "asOf": "2026-11-16",
@@ -4209,11 +4192,7 @@
     "stale": false,
     "text": "as of 2026-11-16 close"
    },
-   "mark": {
-    "px": 3849.21,
-    "at": "2026-11-17T22:33:51.000Z",
-    "dist": -0.35
-   },
+   "mark": null,
    "broken": null
   },
   "calibration": {
@@ -4223,7 +4202,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-17 22:34 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Inflation and the next release, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −1.00 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close). Event playbook: GBP CPI y/y 2026-11-18 07:00 UTC: consensus 3.6% (previous 3.5%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-17 22:50 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 2 agree, 4 qualify, 0 disagree; qualified: Direction for gold, US dollar, Inflation and the next release, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.72 vs ry hit 50%, t -0.11; v_d2_4w hit 56%, t 1.77 vs dgs2 hit 54%, t 1.5; v_dxy4w no record yet vs dxymom no record yet. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −0.98 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close). Event playbook: GBP CPI y/y 2026-11-18 07:00 UTC: consensus 3.6% (previous 3.5%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {

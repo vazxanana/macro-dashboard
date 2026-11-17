@@ -1,0 +1,61 @@
+{
+ "v": 1,
+ "rule": "append-only: an entry is recorded once with the evidence of its day and never edited; the forward check reads only trades closed after it",
+ "entries": [
+  {
+   "id": "replica|research#replica|research|weak-hours:04-08",
+   "stream": "replica|research",
+   "flag": "replica|research|weak-hours:04-08",
+   "system": "replica",
+   "name": "USD/CHF replica",
+   "book": "research",
+   "kind": "weak-hours",
+   "field": "hours",
+   "value": "04-08",
+   "action": "skip hours",
+   "change": "Skip entries between 04-08 UTC for USD/CHF replica (research)",
+   "recordedAt": 1794955823,
+   "recorded": "2026-11-17T22:50:23.000Z",
+   "evidence": {
+    "n": 214,
+    "mean": -0.296,
+    "t": -2.73,
+    "p": 0.007,
+    "rest": {
+     "n": 845,
+     "mean": -0.021
+    },
+    "holm": false
+   },
+   "strongAtRecord": false
+  },
+  {
+   "id": "replica|research#replica|research|weak-side:buy",
+   "stream": "replica|research",
+   "flag": "replica|research|weak-side:buy",
+   "system": "replica",
+   "name": "USD/CHF replica",
+   "book": "research",
+   "kind": "weak-side",
+   "field": "side",
+   "value": "buy",
+   "action": "one side only",
+   "change": "Take only sells in USD/CHF replica (research)",
+   "recordedAt": 1794955823,
+   "recorded": "2026-11-17T22:50:23.000Z",
+   "evidence": {
+    "n": 545,
+    "mean": -0.389,
+    "t": -7.46,
+    "p": 0,
+    "rest": {
+     "n": 514,
+     "mean": 0.255
+    },
+    "holm": true
+   },
+   "strongAtRecord": true
+  }
+ ],
+ "at": "2026-11-17T22:50:23.000Z"
+}
