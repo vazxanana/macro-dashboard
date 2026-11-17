@@ -3221,18 +3221,25 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="sb-wrap" tabindex="0" role="region" aria-label="Edge scoreboard, scrolls sideways"><table class="sb-t"><thead id="ms-sb-h"></thead><tbody id="ms-sb-b"><tr><td class="sb-empty">Loading…</td></tr></tbody></table></div>
         <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. <b>(backtest only)</b> after Edge or Promising: fewer than 20 of the row’s trades are forward (live or paper) trades, so the verdict rests on a replay of the rules on past candles, which is not a forward record; the chip’s tooltip and the opened row give the counts. Replay rows are net of spread; forward rows are net of costs where the trade records them (R less its cost in R), else as recorded. Tap a stream for its equity curve.</p>
       </div>
-      <div class="card c-decay adm" id="ms-decay">
-        <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
-        <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
-        <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
-        <p class="ms-note dc-foot">Each system's record after costs (<span id="ms-decay-fin">overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge</span>) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
-      </div>
-      <div class="card c-expect adm" id="ms-expect">
-        <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
-        <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
-        <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
-        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it; since 12 Nov 2026 Gold trend and Gold trend fast pay it on every unit, the add included (a position = its first unit and its add)</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
-      </div>
+      <!-- 17 Nov 2026 (simplified pages): the scoreboard and the forward card are the headlines; the decay monitor and what to expect
+           sit in one closed disclosure under the scoreboard, unchanged inside -->
+      <details class="c-dex adm" id="ms-dex">
+        <summary><span class="c-dex-t">Decay and expectations</span><span class="c-dex-s">the edge-decay monitor and what each live system should do, from the Coach's 6-hourly reading</span></summary>
+        <div class="c-dex-b">
+        <div class="card c-decay adm" id="ms-decay">
+          <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
+          <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
+          <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
+          <p class="ms-note dc-foot">Each system's record after costs (<span id="ms-decay-fin">overnight financing on gold buys is part of the cost of trades closed since 11 Nov 2026, and the backtests and replay trades it is compared with carry the same charge</span>) (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
+        </div>
+        <div class="card c-expect adm" id="ms-expect">
+          <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
+          <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
+          <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
+          <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs (<span id="ms-expect-fin">since 11 Nov 2026 also after overnight financing on gold buys, at the demo broker's rate of that day: a system's Per trade cell says so and gives the figure before it; since 12 Nov 2026 Gold trend and Gold trend fast pay it on every unit, the add included (a position = its first unit and its add)</span>), on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+        </div>
+        </div>
+      </details>
       <div class="card c-analyst">
         <div class="ms-k" role="heading" aria-level="2">Analyst · weekly brief</div>
         <div class="c-sub">Ready right now</div>
@@ -11733,6 +11740,16 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 <style>
 /* Edge-decay monitor (#ms-decay, 8 Nov): coach.json decay (council/decay.mjs). Research pane, admin only; self-contained. */
 .c-pane > .c-decay { grid-column: 1 / -1; min-width: 0; }
+/* the closed "Decay and expectations" disclosure (17 Nov 2026) that holds #ms-decay and #ms-expect */
+.c-pane > .c-dex { grid-column: 1 / -1; min-width: 0; border: 1px solid var(--line); border-radius: var(--r, 12px); background: var(--panel); }
+.c-dex > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-height: 44px; padding: 10px 16px; cursor: pointer; list-style: none; }
+.c-dex > summary::-webkit-details-marker { display: none; }
+.c-dex > summary::before { content: "›"; display: inline-block; width: 12px; color: var(--ink-dim); transition: transform .15s ease-out; }
+.c-dex[open] > summary::before { transform: rotate(90deg); }
+.c-dex > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r, 12px); }
+.c-dex-t { font: 600 15px var(--sans); color: var(--ink); } .c-dex-s { font-size: 13px; color: var(--ink-dim); }
+.c-dex-b { display: grid; gap: 14px; padding: 0 12px 12px; } .c-dex-b > .card { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .c-dex > summary::before { transition: none; } }
 .c-decay .dc-sum { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; color: var(--ink-dim); } .c-decay .dc-sum b { color: var(--ink); }
 .c-decay .dc-wrap { width: 0; min-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); }
 .c-decay .dc-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -13639,7 +13656,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
       var v = $(D.v); if (!v) return;
       if (!simple) { [].forEach.call(v.querySelectorAll('.ps-dyn'), function (b) { var c = document.querySelector('[data-ps="' + b.dataset.psFor + '"]'); if (c) { c.removeAttribute('data-ps'); c.removeAttribute('data-ps-open'); } b.remove(); }); return; }
       if (obs2 && !v._psw) { v._psw = 1; obs2.observe(v, { childList: true, subtree: !!D.deep }); }   // cards a desk draws later
-      [].filter.call(v.querySelectorAll(D.sel), function (c) { return !c.closest('dialog') && !c.parentElement.closest('.card'); }).forEach(function (c, i) {
+      [].filter.call(v.querySelectorAll(D.sel), function (c) { return !c.closest('dialog') && !c.parentElement.closest('.card') && !c.closest('details.c-dex'); }).forEach(function (c, i) {
         var b = rowOf(c); if (b && b.nextElementSibling !== c) c.parentNode.insertBefore(b, c);   // the desk moved the card (the teacher's order): its row follows
         if (!b) { if (c.hasAttribute('data-ps') || D.keep(c, i) || (!c.hidden && getComputedStyle(c).display === 'none')) return; }
         var T = titleOf(c, D.two); if (!T.t) { if (obs2 && !c._psw) { c._psw = 1; obs2.observe(c, { childList: true }); } return; }   // a card still empty: looked at again when it is drawn

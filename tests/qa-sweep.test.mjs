@@ -921,3 +921,13 @@ test('15 Nov: ChronosTrade\'s session form is 44 px on touch (Hide, market, star
   assert.ok(m, 'the touch rule for the session form');
   for (const id of ['#sess-toggle', '#sym', '#start', '#days', '#sname', '#load', '#sessions', '#resume', '#newsess']) assert.ok(m[1].includes(id), id);
 });
+
+// ── Simplified pages (17 Nov 2026, owner: "All"): the research pane leads with the scoreboard; decay and expectations fold ──
+test('17 Nov: the decay monitor and what to expect sit in one closed "Decay and expectations" disclosure under the scoreboard', () => {
+  const sb = DESK.indexOf('id="ms-sb"'), dex = DESK.indexOf('<details class="c-dex adm" id="ms-dex">'), end = DESK.indexOf('</details>', dex);
+  assert.ok(sb > 0 && dex > sb, 'under the scoreboard');
+  for (const id of ['ms-decay', 'ms-expect']) { const i = DESK.indexOf(`id="${id}"`); assert.ok(i > dex && i < end, id + ' inside the disclosure'); }
+  assert.doesNotMatch(DESK.slice(dex, DESK.indexOf('>', dex)), /\bopen\b/, 'closed by default');
+  assert.match(PS_JS, /!c\.closest\('details\.c-dex'\)/, 'the simple phone view does not fold the cards inside it a second time');
+  for (const gone of ['id="v-gold"', 'id="v-lit"', 'id="v-sdv"', 'id="v-crypto"', 'id="ms-pb"', 'id="ms-book"', 'id="ms-cp-macro"', 'id="ms-notice"', '/_vercel/', '/api/og']) assert.ok(!DESK.includes(gone), gone);
+});
