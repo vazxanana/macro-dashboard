@@ -1,17 +1,20 @@
 {
  "v": 1,
- "at": "2026-11-17T13:52:06.000Z",
+ "at": "2026-11-17T15:08:30.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-17T13:51:34.000Z",
+ "strategistAt": "2026-11-17T15:07:56.000Z",
  "shock": {
-  "shock": "Positive growth / demand news",
+  "shock": "Mixed / no dominant shock",
   "clues": [
+   "2Y +42 bp",
    "10Y real +31 bp",
+   "breakeven −3 bp",
+   "DXY +1.31%",
    "HY −19 bp",
-   "VIX −6.3 on the week"
+   "VIX 22.9"
   ],
-  "goldTest": "Gold weakens if higher real yields dominate, holds if currency or portfolio demand offsets.",
-  "competing": "Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
+  "goldTest": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
+  "competing": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
   "confidence": "low"
  },
  "channels": [
@@ -54,9 +57,9 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 19.3 (VIX/VIX3M 0.94) · HY OAS 3.23%, −19 bp on the week",
-   "lean": 0,
-   "asOf": "2026-11-13",
+   "obs": "VIX 22.9 (VIX/VIX3M 0.99) · HY OAS 3.23%, −19 bp on the week · SOFR−EFFR 5 bp",
+   "lean": 1,
+   "asOf": "2026-11-16",
    "stale": false,
    "cannot": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
   },
@@ -89,15 +92,15 @@
   }
  ],
  "tally": {
-  "sum": -4,
+  "sum": -3,
   "observed": 7,
   "lean": -1
  },
  "debate": [
   {
    "topic": "Direction for gold",
-   "macro": "Gold Macro Score −1.03 → AUCTION (no macro edge); next-day P(up) 50%",
-   "veteran": "7 of 8 channels observed; tally −4 → against gold",
+   "macro": "Gold Macro Score −1.03 → AUCTION (no macro edge); next-day P(up) 51%",
+   "veteran": "7 of 8 channels observed; tally −3 → against gold",
    "stance": "qualify",
    "why": "The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.",
    "m": 0,
@@ -114,7 +117,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+1.45 pts in 5 sessions (vote down); score z (4-week fall) −0.85",
+   "macro": "+1.38 pts in 5 sessions (vote down); score z (4-week fall) −0.85",
    "veteran": "DXY 103.62, +1.31% on the week, +1.81% over 4 weeks · broad USD +0.89% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -141,10 +144,10 @@
   },
   {
    "topic": "Regime",
-   "macro": "Dollar Smile right side (US outperformance) · liquidity flat · normal volatility",
-   "veteran": "Positive growth / demand news (low confidence) · clues: 10Y real +31 bp, HY −19 bp, VIX −6.3 on the week",
+   "macro": "transitional dollar · liquidity flat · elevated volatility",
+   "veteran": "Mixed / no dominant shock (low confidence) · clues: 2Y +42 bp, 10Y real +31 bp, breakeven −3 bp, DXY +1.31%, HY −19 bp, VIX 22.9",
    "stance": "agree",
-   "why": "Strongest competing explanation: Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
+   "why": "Strongest competing explanation: Several small shocks offsetting each other, or the week's moves are inside normal noise.",
    "m": null,
    "v": null
   }
@@ -170,12 +173,12 @@
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
-  "shock": "Positive growth / demand news",
+  "shock": "Mixed / no dominant shock",
   "surprise": "Pending: CPI y/y at 2026-11-18 07:00 UTC against the calendar expectation captured before it (3.6%); print minus previous is not a surprise",
-  "observed": "10Y real +31 bp · HY −19 bp · VIX −6.3 on the week",
+  "observed": "2Y +42 bp · 10Y real +31 bp · breakeven −3 bp · DXY +1.31% · HY −19 bp · VIX 22.9",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
-  "mechanism": "Gold weakens if higher real yields dominate, holds if currency or portfolio demand offsets.",
-  "alternative": "Inflation pressure or central-bank information can raise yields too; rising stocks with yields do not prove a growth shock.",
+  "mechanism": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
+  "alternative": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker",
   "nextReview": "after CPI y/y",
@@ -718,8 +721,8 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 19.3 (VIX/VIX3M 0.94) · HY OAS 3.23%, −19 bp on the week (as of 2026-11-13)",
-     "says": "neutral for gold. Stress first sells gold for cash, then buys it",
+     "read": "VIX 22.9 (VIX/VIX3M 0.99) · HY OAS 3.23%, −19 bp on the week · SOFR−EFFR 5 bp (as of 2026-11-16)",
+     "says": "supportive for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
     {
@@ -1177,7 +1180,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-17T13:52:06.000Z",
+  "at": "2026-11-17T15:08:30.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1185,7 +1188,7 @@
     "lean": 0,
     "fx": "Hot → EUR/USD mixed (DXY down), USD/JPY mixed; cool the reverse.",
     "k": "event",
-    "score": 3.02,
+    "score": 3.03,
     "event": {
      "title": "CPI y/y",
      "country": "GBP",
@@ -1537,8 +1540,7 @@
       "why": "The first support (2026-11-09..2026-11-13): a daily close below it says sellers took last week's range.",
       "dist": -0.26,
       "side": "below",
-      "near": 0,
-      "crossed": true
+      "near": 0
      },
      {
       "price": 3839.6,
@@ -1584,9 +1586,9 @@
      "text": "as of 2026-11-16 close"
     },
     "mark": {
-     "px": 3848.005,
-     "at": "2026-11-17T13:51:34.000Z",
-     "dist": -0.38
+     "px": 3857.65,
+     "at": "2026-11-17T15:07:56.000Z",
+     "dist": -0.13
     }
    },
    "dxy": {
@@ -4237,7 +4239,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -4248,9 +4250,9 @@
    "confidence": "low",
    "meter": -0.1133333333333327,
    "channels": {
-    "up": 0,
+    "up": 1,
     "down": 4,
-    "flat": 3,
+    "flat": 2,
     "unobserved": 1,
     "total": 8
    },
@@ -4269,16 +4271,16 @@
    "px": 3862.77,
    "asOf": "2026-11-16",
    "above": {
-    "price": 3870.3,
-    "label": "October low",
-    "dist": 0.19,
-    "distNow": 0.58
+    "price": 3900,
+    "label": "Round number",
+    "dist": 0.96,
+    "distNow": 1.1
    },
    "below": {
     "price": 3832.5,
     "label": "13-week low",
     "dist": -0.78,
-    "distNow": -0.4
+    "distNow": -0.65
    },
    "fresh": {
     "asOf": "2026-11-16",
@@ -4287,9 +4289,9 @@
     "text": "as of 2026-11-16 close"
    },
    "mark": {
-    "px": 3848.005,
-    "at": "2026-11-17T13:51:34.000Z",
-    "dist": -0.38
+    "px": 3857.65,
+    "at": "2026-11-17T15:07:56.000Z",
+    "dist": -0.13
    },
    "broken": null
   },
@@ -4300,7 +4302,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-17 13:52 UTC. Shock: Positive growth / demand news (low). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −1.03 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 16 Nov close). Event playbook: GBP CPI y/y 2026-11-18 07:00 UTC: consensus 3.6% (previous 3.5%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-17 15:08 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI y/y): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.06% (+15 bp from 2.91%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4103 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 0.95; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.16 vs dxymom hit 49%, t -0.51. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. GBP CPI y/y on Wed, 18 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−5.9%); Gold Macro Score −1.03 (AUCTION) | H1 (45%): If gold stays below $3,900 (round number), it closes at or below $3,833 (13-week low) by 2026-11-23 before any close above $3,900 | H2 (29%): Gold's daily closes stay between $3,853 (last week's low) and $4,149 (last week's high) every day through 2026-11-23 | H3 (56%): DXY closes 2026-12-14 below 103.62 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). GBP CPI y/y (Wed 18 Nov, 07:00 UTC) is the event that matters most. Watch $3,900 above and $3,833 below (levels as of the 16 Nov close). Event playbook: GBP CPI y/y 2026-11-18 07:00 UTC: consensus 3.6% (previous 3.5%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
