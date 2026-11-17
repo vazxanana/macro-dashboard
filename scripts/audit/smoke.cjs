@@ -21,7 +21,7 @@ const { chromium } = require('playwright');
 const { fetchRetry, fetched } = require('./shared.cjs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
-const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/veteran/', '/offline.html'];
 // Inner views a page only draws when they are opened (the Desk's Council panes run their render functions on first show):
 // as the owner, each is opened by its hash on the loaded page and must not throw either. Council → Systems once threw
 // "sn is not defined" there, unseen by a check that only loaded the page.

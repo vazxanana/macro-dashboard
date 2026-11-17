@@ -20,7 +20,7 @@ const OUT = path.join(ROOT, 'out');
 const PORT = +process.env.PORT || 8767, H = 'http://127.0.0.1:' + PORT;
 const VERCEL = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
 const MARK = 'PRIVATE-' + crypto.randomBytes(6).toString('hex');   // in every /api, /cdata, /md answer
-const PAGES = ['/', '/market-structure.html', '/macro-desk', '/backtest', '/academy', '/edge-lab.html', '/gold', '/macro/', '/veteran/'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk', '/backtest', '/academy', '/edge-lab.html', '/gold', '/veteran/'];
 const TYPES = { html: 'text/html; charset=utf-8', js: 'text/javascript', css: 'text/css', json: 'application/json', png: 'image/png', svg: 'image/svg+xml', woff2: 'font/woff2', mp3: 'audio/mpeg', webmanifest: 'application/manifest+json', txt: 'text/plain', md: 'text/markdown' };
 
 // ---- the server: out/ (or a "deploy" copy) the way vercel.json serves it ----

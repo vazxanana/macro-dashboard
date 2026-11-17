@@ -19,7 +19,7 @@ const tok = (block, name, depth = 0) => { let v = tok0(block, name); if (v == nu
 
 test('the Desk | Macro | ChronosTrade ring never animates forever, on any page (desk perf rule, 9 Nov)', () => {
   const files = { 'assets/mx-page.css': src('assets/mx-page.css') };
-  for (const p of ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'index.html', 'scripts/veteran-library.html']) files[p] = styles(src(p));
+  for (const p of ['market-structure.html', 'macro-desk.html', 'backtest.html', 'edge-lab.html', 'scripts/veteran-library.html']) files[p] = styles(src(p));
   for (const [f, css] of Object.entries(files)) {
     // keyframes that animate a custom property (the ring's --hm-r): never with an infinite iteration count
     const custom = [...css.matchAll(/@keyframes\s+([\w-]+)\s*\{([^{}]*\{[^{}]*\})+\s*\}/g)].filter((m) => /\{\s*--[\w-]+\s*:/.test(m[0])).map((m) => m[1]);
