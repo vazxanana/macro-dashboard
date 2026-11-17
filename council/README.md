@@ -46,7 +46,7 @@ Supporting scripts:
 | Owner digest | `council.yml`, inside the Trader loop | Every round, but it sends once per UTC day: from 21:15 UTC Mon-Fri and Sunday (`node council/digest.mjs data`, 120 s cap, never fails the round). |
 | Tests | `.github/workflows/tests.yml` | Every pull request and push to `main`: syntax check, `node --test tests/`, the ICT audit and the alert checks on pinned council-data copies (`tests/fixtures/`). Offline: no secrets, no network. |
 | Morning replay | `.github/workflows/replay.yml` | By hand: prints one market's morning to the log. |
-| ICT desk | `ict.yml`, `ict-replay.yml`, `api/run.js?job=ict` | A separate system with its own files (`ict/`); not part of the council. |
+| ICT desk | `council.yml` (every 3rd round), `ict.yml` (by hand), `ict-replay.yml` | A separate system with its own files (`ict/`); not part of the council. |
 
 ## Stop and start
 

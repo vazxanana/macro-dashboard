@@ -14,7 +14,7 @@ import path from 'node:path';
 import { DATA_DIR } from './study.mjs';
 import { usEuDstMismatch } from '../quality.mjs';
 
-const CANDLES = process.env.ACADEMY_CANDLES, BASE = process.env.ACADEMY_BARS_URL || 'https://meridianx.dev';
+const CANDLES = process.env.ACADEMY_CANDLES, BASE = process.env.ACADEMY_BARS_URL || 'https://aureumdesk.co.uk';
 if (!CANDLES) { console.error('Set ACADEMY_CANDLES (see academy/gen/run.mjs).'); process.exit(1); }
 process.env.GOLD_DIR = path.join(CANDLES, 'research/candles/xau-histdata');
 process.env.GOLD_CACHE = path.join(process.env.ACADEMY_SCRATCH || path.join(CANDLES, 'academy-scratch'), 'xau_m1.bin'); fs.mkdirSync(path.dirname(process.env.GOLD_CACHE), { recursive: true });

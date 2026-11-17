@@ -150,6 +150,19 @@ parts as they were; this section wins.
   LIT block in `trader.mjs` still runs while a LIT record is open or pending (`litLeft`: the day-end hold and the swing break-even),
   and the loop manages those records to their exits with their stops. `council/lit.mjs` stays (tests and the block import it).
   `snapshot.lit.on` says whether the stream places orders. Undo: a user rule setting `c.litShadow = true`.
+- **Cleanup (17 Nov 2026, owner: "keep doing some cleanup")**: no code was left that imports a removed file (every export of
+  `api/`, `council/` and `cloudflare/src` still has a caller; `out/` holds nothing the build does not make; both lockfiles are
+  without `web-push` / `@vercel/og`). What went was stale text: `council/README.md` (the ICT desk row named `api/run.js?job=ict`),
+  `council.yml` / `ci.yml` / `cloudflare-deploy.yml` comments (Pages, the Vercel fallback, the pwa audit's push checks, "does not
+  touch the domain"), `api/_oanda.js` (price alerts), `app.webmanifest` description (price alerts), `docs/cloudflare.md` (secrets
+  list without `EDGE_CONFIG` / `VAPID_*` / `TV_WEBHOOK_KEY` / `RUN_MODE`, the superseded R2 / KV storage plan, `/macro`),
+  `MERIDIAN-X.md` and `README.md` (domain, price alerts, removed desks, the backup runner and VPS), the Academy docs
+  (`ACCEPTANCE.md` domain, `PREVIEW.md` marked history, `LLM.md` / `ARCHITECTURE.md` Worker secrets), `MERIDIANX_BUILD_PROGRESS.md`,
+  `api/mcp.js` `serverInfo.websiteUrl` and `academy/gen/clock-check.mjs`'s default candle host (aureumdesk.co.uk), and dated
+  "Status, 17 Nov" lines on `docs/owner-decisions.md` items 5, 6, 12 (ticked: LIT stopped by "All"), 15, 28, 31 and 32.
+  Kept on purpose: the `/macro-dashboard/*` rewrite and its asset headers (old links; three tests pin them), `meridianx.dev` in
+  the connectors' `ORIGINS`, `ict/tracker.mjs` `MD_BARS` (Fred's; the workflows pass `ICT_MD_BARS`), research study code and
+  generated Academy data, and the `GH_DISPATCH_TOKEN` read-token fallback in `api/data.js` / `api/mcp.js`.
 ## Simplified pages (17 Nov 2026, owner: "All")
 The page side of the 17 Nov simplification (the backend side, push / alert-cron / tv-webhook / pine / run.js / flags / og, went in
 its own change). Removed from the Desk (`market-structure.html`, 1,843,985 → about 1,582,000 bytes) with their tests:
@@ -3834,8 +3847,8 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   stream's own flag ids or it is dropped (`dropped` counted); its evidence and test are copied from the file, never the model's
   numbers. A billed answer that fails the checks is stored as refused (never paid twice); a budget skip is retried. `GET` for
   the owner or a reviewer: `{ enabled, reason, cost, ai }`. Cloudflare: handler `'trade-review'` in `HANDLERS`, run after the
-  10-minute cron through `CHAINED` (no new trigger; `wrangler.jsonc` unchanged); vercel.json cron `17 */6 * * *` kept for the
-  record. No connector queue (optional, not built).
+  10-minute cron through `CHAINED` (no new trigger; `wrangler.jsonc` unchanged; vercel.json has no crons since 17 Nov 2026).
+  No connector queue (optional, not built).
 - **Page**: card `#ms-tr` (class `adm`) in Council → Review after `#ms-ea`; `<style id="ms-tr-css">` on the graphite tokens of
   `docs/design/aureum-theme.md` with the page's tokens as fallbacks (`--au-ink, var(--ink)`); `<script id="ms-tr-js">` reads the
   file through `msData` and `/api/trade-review` (owner / reviewer; viewers and guests read nothing), `window.MS_TR` pure pieces.
@@ -3867,9 +3880,11 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
 - **Pre-registration drafts**: each strong proposal carries `prereg`, the text of a PREREGISTRATION.md (`preregOf`: why, H1 /
   H0 and the variant, data 2020 → now, IS 2020-23 / OOS 2024 →, the council cost model, month-sum t of the paired difference
   (or of the rule against zero for losing / keep-off-live), Holm, the pass bar), dated the day the proposal was recorded so
-  the hash does not move daily. No study folder is made; the owner approves and commits it alone. The review does not know
-  which studies already exist: check `research/edge/` first (on 17 Nov the replica's "sells only" draft repeats
-  `replica-sides`, which FAILED).
+  the hash does not move daily. No study folder is made; the owner approves and commits it alone.
+- **Already tested** (`STUDIED`, `studiedOf`): a proposal whose question a committed study already answered (key: system id |
+  action; `replica|one side only` -> `replica-sides` FAIL, `replica|keep off live` -> `replica-oos` FAIL) carries `studied`
+  (verdict, one line, Edge lab link), is never strong and gets no draft; the card shows "already tested". Add a row only for a
+  study with a result in `research/edge/` (a test checks the folder exists).
 - **The language-model reviewer** gets each stream's `forwardChecks` and `parseAnswer` drops a proposal on a faded flag.
   **The edge analyst** (`api/_edge-analyst.js` `forwardRecord`, passed by `api/edge-analyst.js` as `buildRequest`'s 4th
   argument) adds `systemForwardRecord`: the same system's trades (not shadow, add, replay, void, nor the trade itself; the NQ

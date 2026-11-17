@@ -1,7 +1,8 @@
 # Meridian X
 
 **A trading desk run by an automated council: gold, forex, index futures and crypto, traded on paper around the clock and
-tested before it is trusted.** Live at [meridianx.dev](https://meridianx.dev).
+tested before it is trusted.** Live at [aureumdesk.co.uk](https://aureumdesk.co.uk) (the site's name since 16 Nov 2026 is
+Aureum Desk).
 
 **Read this first.** Everything here is paper trading or a broker's demo account. No real money is traded and no order ever
 goes to a live account. Nothing here is proven to be profitable: most ideas we tested failed their test, and the ones that
@@ -22,10 +23,10 @@ One sign-in. The switch at the top of every page reads **Desk | Macro | ChronosT
 
 **Inside the Desk**
 - **Home**: today's result, open positions, the setup now.
-- **Charts**: every market, with one markup at a time: Meridian (our structure), ICT, or Clean. A bell on the chart sets
-  price alerts that reach your phone.
-- **Council**: the council's trades, its systems, loss reviews, research, the Macro desk and a weekly report.
-- **Desks**: ICT, Gold, Mosha, Crypto, LIT, and NQ SDV (a placeholder: nothing there is a signal).
+- **Charts**: every market, with one markup at a time: Meridian (our structure), ICT, or Clean.
+- **Council**: the council's trades (open and closed), its systems, loss reviews, research and a weekly report, with a
+  link to the Macro desk.
+- **Desks**: ICT and Mosha (the Gold playbook, Crypto, LIT and NQ SDV desks were removed on 17 Nov 2026).
 - **Profile**: your photo and name, the demo accounts' results, the ChatGPT connector (if you have it) and, for the owner,
   notifications to all members and the ChronosTrade sounds.
 - A **bell** in the header shows notices from the owner.
@@ -34,13 +35,13 @@ One sign-in. The switch at the top of every page reads **Desk | Macro | ChronosT
 - **Academy** (`/academy`, owner only): a trading school built on seven of the council's systems (the seven that traded live until 11 Nov 2026). See below.
 - **Gold terminal** (`/gold`): live gold price, chart and macro drivers.
 - **Edge lab**: every research study with its verdict.
-- `/macro`: today's macro read on one screen. `/veteran/`: the veteran's library.
+- `/macro` opens the Macro desk. `/veteran/`: the veteran's library.
 
 ## The council
 
 Automated members that run on GitHub's free servers (GitHub Actions). A full round takes about 11 to 12 minutes, and in
-between the Trader looks at the markets again every minute. If that loop stops, a backup on the website's own host (Vercel)
-takes over by itself. When the owner's always-on server is running, it runs the Trader instead, every 30 seconds.
+between the Trader looks at the markets again every minute. If that loop stops, its own watchdog starts it again
+(GitHub Actions is the only runner since 17 Nov 2026).
 
 - **Analyst**: reads market structure from the daily chart down to the 1-minute chart. Writes a short post-mortem of every
   losing trade.
@@ -79,7 +80,7 @@ they were recorded with. The backtests those records are measured against (the e
 the scoreboard's replay rows) carry the same financing charge on gold buys.
 
 **Demo accounts.** Trades are copied at the same time to **cTrader demo accounts**, one per book (council, ICT, shadows,
-LIT, replica), with the same stop and target. A copied position never sits without a stop: if the broker refuses the stop,
+LIT until 17 Nov 2026, replica), with the same stop and target. A copied position never sits without a stop: if the broker refuses the stop,
 the position is closed at once. Nothing is ever copied to a live account. Since 11 Nov 2026 the Replica demo account takes
 no new copies of the replica's forex and crypto paper trades (that stream was losing before costs); gold replica copies
 continue, and positions already copied are managed to their close. It is looked at again once 200 of those paper trades
@@ -92,7 +93,6 @@ have closed with a positive total before costs.
 - **One daily digest** each weekday evening from 21:15 UTC, and a Sunday "week ahead", instead of many messages.
 - **Watchdog and data health**: one alert when the loop stops, a price feed goes stale or a data file breaks, and one when it
   is back. Note: the watchdog's own timer depends on GitHub's scheduler, which often fires late (owner decisions 15 and 31).
-- **Price alerts** you set yourself on a chart. On iPhone they need the installed app (below).
 
 ## The veteran: what he does
 
@@ -126,7 +126,6 @@ All of this is reading only: nothing trades or sizes on it. His record is still 
     You can switch this off on the Users page at any time.
   - The ICT method is **not proven**: its replay since August 2025 is positive, but the same rule on ten earlier years
     (2008-17) only broke even.
-- **Gold desk**: the owner's gold playbook as a checklist, backtest and calendar. A guide, not a council system.
 - **Mosha desk**: the place for the Mosha method.
   - **Luxus is the teacher, the desk is his student.** He lands on this desk when he signs in. He sends trades as
     screenshots or in words, the desk writes back what it understood, and he says "right" or "not right". What the desk
@@ -137,9 +136,8 @@ All of this is reading only: nothing trades or sizes on it. His record is still 
   - **The method written as fixed rules failed its tests**: five studies on 10 Nov, none profitable (see below). The
     lessons and the log measure how a person trades it; they are not proof either.
   - The desk's assistant reads the lessons only when a session is run for it; nothing is read automatically.
-- **Crypto desk**: Bitcoin, Ether, Solana and XRP scalping setups and results. Paper only; the scalp engine showed no edge.
-- **LIT**: a paper "shadow" stream on gold (tracked, never traded or alerted). Its study was inconclusive and what could
-  be measured was negative.
+- **LIT**: was a paper "shadow" stream on gold; it places no new order since 17 Nov 2026 (its study was inconclusive and
+  what could be measured was negative).
 
 ## The Academy (owner only)
 
@@ -173,8 +171,8 @@ Replay trades are practice on past candles. They are never counted as a track re
 
 ## Install the app
 
-Meridian X installs like an app (needed for price alerts on iPhone):
-- **iPhone / iPad**: open meridianx.dev in Safari → Share → **Add to Home Screen**.
+The site installs like an app:
+- **iPhone / iPad**: open aureumdesk.co.uk in Safari → Share → **Add to Home Screen**.
 - **Android**: Chrome → menu → **Install app**.
 - **Computer**: Chrome or Edge → the install icon in the address bar.
 
@@ -237,7 +235,8 @@ Each study is written down before it runs and judged against that plan. Of 69 st
 - **Gold after an inflation release follows the dollar's first move**: no (34 of 73). Release-day figures are shown as
   history, not as an edge.
 - **News filters, seasonality, position-sizing tricks, the Coach's learning**: no improvement.
-- **LIT**: too few trades to judge, and what can be measured is negative. Kept on paper for now (owner decision 12).
+- **LIT**: too few trades to judge, and what can be measured is negative. Its paper stream stopped on 17 Nov 2026 (owner
+  decision 12).
 - **Academy**: the decision engine's changes (0 of 16 tests) and all 20 trained scorers: none passed.
 
 **A correction worth knowing.** On 10 Nov we found that the historical research candles had been read on the wrong clock
@@ -246,7 +245,7 @@ gap variant above). A few old studies have not been re-run and say so (owner dec
 
 ## Under the hood
 
-Web pages on Vercel with small server functions; users, profiles, alerts, notices, the Mosha log and lessons and the
-Academy's records in private Vercel storage. The council runs on GitHub Actions (and on the owner's always-on server when
-it is running) and publishes its results to a separate data branch of the repository. Prices come from OANDA through the
+Web pages and small server functions on a Cloudflare Worker (since 16 Nov 2026); users, profiles, notices, the Mosha log
+and lessons and the Academy's records in a private file store (Vercel Blob, with a copy on Cloudflare). The council runs
+on GitHub Actions and publishes its results to a separate data branch of the repository. Prices come from OANDA through the
 site, with exchange feeds as a fallback. Developer notes: `CLAUDE.md`.
