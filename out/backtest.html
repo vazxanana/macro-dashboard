@@ -299,6 +299,7 @@
   .ln-rec { margin: 6px 0 0; font-size: 12px; color: var(--ink-faint); line-height: 1.4; } .ln-rec i { font-style: normal; color: var(--ink-dim); }
   .lc-lens { display: flex; align-items: center; gap: 6px; margin: 0 10px 4px; font-size: 12px; color: var(--ink-dim); } .lc-lens select { min-height: 28px; padding: 2px 6px; font-size: 12px; }
   .lc-i.lens { border-left-color: var(--gold, var(--accent)); }
+  .lc:not(.open) .lc-lens { display: none; }   /* a folded panel (the phone's one-line strip) shows its latest note only */
   @media (pointer: coarse) { .ln-row select, .lc-lens select { min-height: 44px; } }
   /* end coach lens */
   .mist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 10px 0; } .mist-grid label, .mist-ok { display: flex; gap: 8px; align-items: center; font-size: 13px; } .mist-grid input, .mist-ok input { width: 16px; height: 16px; min-height: 0; accent-color: var(--sell); } .mist-ok input { accent-color: var(--buy); }
