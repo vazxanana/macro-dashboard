@@ -3940,3 +3940,18 @@ owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `d
 - **Replica demo slippage** (council-data `ctrader/mirror-10152148.json`, 157 copies 10-17 Nov): +0.062R a trade (t 3.06);
   ETH +0.19R, SOL +0.14R (half a CFD spread on tight stops), copies 5 min or more late +0.16R, forex about 0; the buy / sell
   gap (−0.003 / +0.127R) is mostly a price basis between the council's feed and the broker, which cancels across sides.
+
+## Diversified time-series momentum, a CFD portfolio (17 Nov 2026, owner: "keep finding the ultimate edge")
+`research/edge/tsmom-portfolio/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, result.json). The literature's
+managed-futures rule, never tested here as a portfolio: 38 OANDA daily CFDs from the council's candle cache (5 metals, 13
+indices, 3 energies, 6 bond CFDs, 4 ags, 7 forex majors; crosses, exotics and gold-in-other-currencies left out), each month
+long / short on the sign of its 12-month return skipping the last (closes strictly before the first close of the month), 10 %
+volatility per market from 60 days (notional cap 4x its share), equal risk, the book scaled to 10 % from its last 252 days;
+pre-registered round trips per market and CFD financing (long pays DGS2 + 2.5 %, short pays 2.5 % − DGS2; forex 1 % either
+side, no interest differential). **Verdict: FAIL, 0 of 5 checks**: net −0.34 % a month out of sample 2024-01 to 2026-10
+(n 34, t −0.70), −0.23 % in 2020-23 (t −0.51), −0.13 % in 2005-19 (n 180, t −0.61). Before any cost +0.41 % a month on 2005-19
+(t 1.85, Sharpe 0.48) and +0.40 % out of sample (t 0.85): financing at 2.3-3.0x gross notional (123-235 % of gross) is what
+turns it negative; spreads are 9-21 %. Post hoc, financing at the rate alone (a futures-like excess return): t 1.49 / 0.40 /
+0.37. The 3- and 6-month look-backs are worse (OOS t −2.13, −1.42). Not an edge on CFDs, no paper shadow proposed, no owner
+decision. Nothing live changed. To repeat: `run.mjs fetch <dir>` (git, no network), `run.mjs run <dir>`. Test:
+`tests/tsmom-portfolio.test.mjs`.
