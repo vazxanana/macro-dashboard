@@ -427,6 +427,14 @@ quiet jump links, open positions before the setup and the market cards after the
 the LAST style block, so it wins over the older passes; it never mentions the simple phone view. The UI font stays Figtree (Inter is
 not loaded on the Desk). `tests/qa-sweep.test.mjs` `tok()` follows `var()` into the first `:root` block, so the contrast checks
 measure the real colours. Not done: a desktop "what waits on you" line (the phone has `#ps-need`).
+**Design pass (17 Nov 2026, owner: "More improvements on the design"; found on screenshots of every page, dark / light, 1440 / 390 px).**
+Display only. In `#ms-shell-css`: Home's three section tiles showed empty squares (an older rule painted the masked icon in
+`--au-surface-2` on its own `--au-surface-2` square; the glyph is `--au-ink-2` again); the Market pulse cards are flat (the colour
+stays in the trend bars); on phones up to 430 px the header's account button was cut off (17 px at 390, 7 px at 360): tighter
+gaps, nothing hidden. The default portrait is a neutral silver bust with a sans "A" (it was sepia with a serif italic), and the
+Profile card's copy gets its own gradient ids (it drew an empty circle). Setup's trade-card labels are sentence case. Every page's
+favicon is the silver mark (`/assets/aureum-mark.svg`; offline.html inline), not the gold coin. ChronosTrade's Hide sits beside
+the session title on a phone.
 
 ## Users page (6 Nov 2026)
 
