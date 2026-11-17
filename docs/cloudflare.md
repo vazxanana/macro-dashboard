@@ -20,8 +20,14 @@ every page and endpoint has been checked side by side.
 - `cloudflare/src/worker.mjs`: `/api/<name>` → `api/<name>.js`; everything else → `out/` (a path ending in `/`
   gets `index.html`, `/macro` finds `/macro/index.html`). Crons: `* * * * *` → `/api/alert-cron`, `*/10 * * * *`
   → `/api/edge-analyst?job=scan`, both with `Authorization: Bearer <CRON_SECRET>` as Vercel's crons sent.
-- Tests: `tests/cloudflare-worker.test.mjs` (offline). Local run: `cd cloudflare && npm install && npx wrangler dev`
-  (put test values in `cloudflare/.dev.vars`, git-ignored).
+- `cloudflare/src/bundled.mjs`: the project files two handlers read from disk on Node (vercel.json `includeFiles`),
+  bundled into the Worker as text modules (wrangler.jsonc `rules`: strings inside the Worker's script, never static
+  assets): the Academy's generated data and the two bridge EA sources. It hands them over with `academy.useData` and
+  `bridge.useFiles`; on Node and Vercel nothing calls those and the disk is read as before. `src/academy-data.mjs`
+  reads the Academy's files the way `api/academy.js` `fileData()` does, parsing a file on its first request only.
+- Tests: `tests/cloudflare-worker.test.mjs`, `tests/cloudflare-bundle.test.mjs` (offline). Local run: `cd cloudflare &&
+  npm install && npx wrangler dev` (put test values in `cloudflare/.dev.vars`, git-ignored). Size of what a deploy
+  uploads: `npx wrangler deploy --dry-run --outdir <dir>` prints it.
 
 ## Stage 1 (done 16 Nov 2026, in the repository, nothing deployed)
 
@@ -71,20 +77,40 @@ The zone `meridianx.dev` is on Cloudflare's Free plan: one rate-limiting rule (1
 off Bot Fight Mode, so Bot Fight Mode must stay OFF (the broker bridges read `/cdata/mt5/signals.csv` without a browser).
 
 **Domain (16 Nov 2026):** the site is at https://aureumdesk.co.uk and www.aureumdesk.co.uk (zone in this account, active, the
-Worker as custom domain, certificate active). meridianx.dev is no longer used. **Backup:** every Vercel Blob file is copied into
+Worker as custom domain, certificate active). meridianx.dev is no longer used. Both are recorded in `wrangler.jsonc` `routes`
+(`custom_domain: true`), so a deploy keeps them; the workers.dev address stays on (`workers_dev: true`). From then on a deploy
+also sends the two domains: wrangler asks the account which change they need (none while both are this Worker's) and puts them
+on this Worker, overriding another Worker's claim or a clashing DNS record when it runs without a terminal (CI). If the deploy
+token may not manage the Worker's custom domains, the new code is still uploaded and the deploy reports an error at that step. **Backup:** every Vercel Blob file is copied into
 the KV namespace `meridianx-blob-backup` (48 files, 1.6 MB on 16 Nov), then again daily; nothing is deleted on either side.
 
 ## Stage 3 (code still to port; each a small change of its own)
 
-- **Academy** (`api/academy.js`) reads `academy/` files from disk; Workers have no project files. Bundle what it
-  reads as modules, or move them to R2.
-- **Bridge downloads** (`api/bridge.js`) read `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` from disk:
-  bundle them as text modules.
+- **Academy** (done 16 Nov 2026): `api/academy.js` reads its generated files from disk on Node; on the Worker they are
+  bundled as text modules (`src/bundled.mjs`): per edge `academy/data/cand-`, `out-` and `feat-<edge>.json`, plus
+  `calendar.json`, `research.json`, `eval.json` and `ml/models/index.json` (the registry `academy/edges.mjs` is plain
+  code and is bundled as such). Each file is parsed on its first request in an instance, so no other route pays for the
+  Academy's 2.5 MB. The API's own checks decide what leaves it, as on Vercel: no outcome before an attempt is stored, the
+  exam pool apart, the files never served as assets; nothing of `academy/archive/` is bundled. A file the Academy starts
+  to read must be added to `src/bundled.mjs` (`tests/cloudflare-bundle.test.mjs` compares the list with the disk reads of
+  `fileData()`); regenerated data reaches the Worker with its next deploy (the deploy workflow's push paths do not list
+  `academy/` or `ml/`). Its store stays the Blob store (`BLOB_READ_WRITE_TOKEN`): never set `ACADEMY_STORE_DIR` on the
+  Worker, whose `/tmp` lasts one request (seen locally: an attempt stored, the next request did not see it).
+- **Bridge downloads** (done 16 Nov 2026): `mt5/CouncilBridge.mq5` and `ctrader/CouncilBridge.cs` are bundled as text
+  modules; the owner's session or password is checked by `api/bridge.js` as before.
+- **Bundle size** (`npx wrangler deploy --dry-run`): 1,471 KiB (gzip 340 KiB) before these two, 4,022 KiB (gzip 671 KiB)
+  after; Workers Paid allows 10 MB compressed.
 - **Fred's connector** (done 16 Nov 2026): `validateProposal` checks a proposed module with `node --check` where a child
   process can start, else (Workers) by parsing it with acorn (bundled: `cloudflare/package.json`, `wrangler.jsonc` alias).
   The Worker's own address is in the connector's origin list (`api/mcp.js` `ORIGINS`), so the Profile card can fetch a link.
   Reads need `GH_READ_TOKEN`, writes `GH_MCP_TOKEN` (Worker secrets); without them GitHub's unsigned limit applies.
-- **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon until ported.
+- **Link preview image** (`api/og.mjs`, @vercel/og): answers with the site icon, on purpose (checked 16 Nov 2026). The
+  bundler takes the pinned @vercel/og 0.11.1's Worker build (`dist/index.edge.js`, 2.1 MB with its resvg and yoga wasm),
+  and that build starts fetching its font at module scope from `new URL('./Geist-Regular.ttf', import.meta.url)`: in
+  workerd that throws "Invalid URL string" while the Worker starts (tried locally: the runtime failed to start), so every
+  route of the site would fail, not only the image. The other routes (workers-og; satori with @resvg/resvg-wasm) add two
+  or more packages and about 2 MB of wasm, plus a TTF font (the site's own fonts are woff2, which satori cannot read).
+  Revisit if @vercel/og ships a Worker build that starts, or the preview is worth that weight.
 - **Storage to Cloudflare**: the Blob store (users, profiles, notices, sounds, Mosha log and lessons, Academy, price
   alerts, cTrader links, TradingView log) → R2 through a binding (no access keys); Edge Config (`runMode`, `paused`,
   `notice`) → KV. One copy, then Vercel's Blob store is read-only.

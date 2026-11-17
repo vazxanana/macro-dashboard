@@ -30,6 +30,7 @@ import status from '../../api/status.js';
 import stream from '../../api/stream.js';
 import tvWebhook from '../../api/tv-webhook.js';
 import users from '../../api/users.js';
+import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, 'alert-cron': alertCron, bars, bridge, 'ctrader-link': ctraderLink, data,
