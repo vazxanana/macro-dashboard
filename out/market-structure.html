@@ -2595,6 +2595,33 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
+<style id="ms-pk-css">
+.gate-pk { margin-top: 10px; }
+.gate-pkb { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: var(--g-ink, #eceef2); font: 600 14.5px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; }
+.gate-pkb:hover { border-color: rgba(157,180,211,.6); background: rgba(157,180,211,.08); }
+.gate-pkb:focus-visible { outline: 2px solid #9db4d3; outline-offset: 2px; }
+.gate-pkb svg { width: 22px; height: 22px; flex: none; color: #9db4d3; }
+.gate-pkb[aria-busy="true"] { cursor: progress; opacity: .8; }
+@media (max-width: 640px) {
+  html[data-gate] .gate-card .gate-pk { order: 5; align-self: center; margin: 14px 0 0; }
+  html[data-gate] .gate-pkb { flex-direction: column; gap: 6px; width: auto; min-width: 120px; min-height: 76px; padding: 8px 14px; border: 0; background: none; border-radius: 14px; }
+  html[data-gate] .gate-pkb svg { width: 40px; height: 40px; }
+  html[data-gate] .gate-pkb span { font-size: 13px; font-weight: 500; color: var(--g-dim, #b3bac6); }
+}
+#v-profile .pf-pk-l { list-style: none; margin: 0; padding: 8px 16px 0; display: grid; gap: 0; }
+#v-profile .pf-pk-l li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--au-line, var(--line)); }
+#v-profile .pf-pk-l li:first-child { border-top: 0; }
+#v-profile .pf-pk-l li > div { flex: 1; min-width: 0; } #v-profile .pf-pk-l b { display: block; font-size: 14px; overflow-wrap: anywhere; }
+#v-profile .pf-pk-l small, #v-profile .pf-pk-a small { display: block; color: var(--au-ink-2, var(--ink-dim)); font-size: 12px; }
+#v-profile .pf-pk-l .pk-me { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--au-ink-1, var(--ink)); background: var(--au-surface-2, var(--panel-hover)); }
+#v-profile .pf-pk-a { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 16px 16px; }
+#v-profile .pf-pk-e { color: var(--au-ink-2, var(--ink-dim)); font-size: 13px; padding: 4px 0 0; }
+@media (pointer: coarse) { #v-profile .pf-pk-l button, #v-profile .pf-pk-a button { min-height: 44px; } }
+.pk-offer { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 60; width: min(420px, calc(100vw - 32px)); box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface, var(--panel)); color: var(--au-ink-1, var(--ink)); box-shadow: 0 10px 30px -12px rgba(0,0,0,.45); font-size: 14px; }
+.pk-offer p { flex: 1 1 200px; margin: 0; } .pk-offer small { display: block; font-size: 12px; color: var(--au-ink-2, var(--ink-dim)); }
+.pk-offer button { min-height: 44px; }
+@media (min-width: 1180px) { .pk-offer { bottom: 24px; } }
+</style>
 <style id="ms-cycle-css">
       #ms-cycle { margin: 6px 0 2px; font-size: 13px; line-height: 1.5; }
       #ms-cycle .cy-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
@@ -4997,9 +5024,10 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     <form id="ms-gate-f" method="post" action="#" novalidate>
       <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
       <label for="ms-gate-p">Password</label>
-      <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
+      <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password webauthn" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
       <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>
       <button type="submit" class="gate-go" id="ms-gate-go"><span class="gate-go-t">Sign in</span></button>
+      <div class="gate-pk" id="ms-gate-pk" hidden><button type="button" class="gate-pkb" id="ms-gate-pkb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg><span>Use Face ID or fingerprint</span></button></div>
     </form>
     <div class="gate-or"><span>or look around first</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest"><span>Continue as guest</span><small>Live gold chart, the trade and results</small></button>
@@ -5008,6 +5036,150 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
   </div>
   </div>
 </div>
+<!-- Face ID / fingerprint sign-in with passkeys (17 Nov 2026, owner: "Face ID or fingerprint login"). Self-contained: the
+     button #ms-gate-pk in the sign-in form, the Profile row #ms-pf-pkrow, the card #ms-pf-pk and the one-time offer. The password
+     stays the primary way in. Nothing secret is kept in the browser: the private key never leaves the device's authenticator,
+     and the page stores only a credential id (public) per account so the Profile can say "On for this device". -->
+<script id="ms-pk-js">
+(function () {
+  var R = document.documentElement, API = window.MS_API, PKC = window.PublicKeyCredential, $ = function (id) { return document.getElementById(id); };
+  var OK = !!(API && PKC && navigator.credentials && navigator.credentials.get && window.isSecureContext);
+  var enc = function (buf) { var b = new Uint8Array(buf), s = ''; for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  var dec = function (s) { s = String(s).replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; var t = atob(s), b = new Uint8Array(t.length); for (var i = 0; i < t.length; i++) b[i] = t.charCodeAt(i); return b.buffer; };
+  var post = function (body) { return fetch(API + 'passkey', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify(body) })
+    .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j || {} }; }); }, function () { return { r: null, j: {} }; }); };
+  // the credential id made on this device, per account: public (the server lists it too), only so the Profile can say "this device"
+  var mine = function (u, v) { var k = 'ms-pk-' + u; try { if (v === undefined) return localStorage.getItem(k); if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} return null; };
+  var getOpts = function (pk) { var o = Object.assign({}, pk, { challenge: dec(pk.challenge) }); o.allowCredentials = (pk.allowCredentials || []).map(function (c) { return { type: 'public-key', id: dec(c.id) }; }); return o; };
+  var createOpts = function (pk) { var o = Object.assign({}, pk, { challenge: dec(pk.challenge), user: Object.assign({}, pk.user, { id: dec(pk.user.id) }) });
+    o.excludeCredentials = (pk.excludeCredentials || []).map(function (c) { return { type: 'public-key', id: dec(c.id) }; }); return o; };
+  var assertion = function (c) { var a = c.response; return { id: c.id, response: { clientDataJSON: enc(a.clientDataJSON), authenticatorData: enc(a.authenticatorData), signature: enc(a.signature), userHandle: a.userHandle ? enc(a.userHandle) : null } }; };
+  var NOPK = 'Sign in with your password, then turn on Face ID in your Profile.';
+  function why(e, j) {
+    var n = e && e.name;
+    if (n === 'NotAllowedError') return 'Face ID was cancelled, or this device has no Face ID sign-in for the desk yet. ' + NOPK;
+    if (n === 'InvalidStateError') return 'Face ID is already on for this device.';
+    if (n === 'SecurityError') return 'Face ID sign-in does not work on this address. Use aureumdesk.co.uk.';
+    if (n === 'NotSupportedError') return 'This device cannot use Face ID or a fingerprint here.';
+    if (j && j.code === 'unknown') return 'This Face ID sign-in is no longer on the desk. ' + NOPK;
+    if (j && j.code === 'password-changed') return 'Your password changed since Face ID was turned on. Sign in with your password, then turn Face ID on again in your Profile.';
+    return null;
+  }
+  window.MS_PK = { ok: OK, enc: enc, dec: dec, why: why };
+
+  // ---- the sign-in card ----
+  var ac = null;
+  function signedIn(j, id) { if (j.account && id) mine(j.account.u, id);
+    try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); }
+  async function finish(cred) {
+    var o = await post(Object.assign({ op: 'login' }, assertion(cred)));
+    if (o.r && o.r.ok && o.j.account) { signedIn(o.j, cred.id); return null; }
+    if (!o.r) return navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.';
+    if (o.r.status === 429) return o.j.error || 'Too many tries. Wait a few minutes, then try again.';
+    if (o.r.status >= 500) return 'Sign-in is unavailable right now. Try again in a minute, or use your password.';
+    return why(null, o.j) || 'Face ID sign-in was not accepted. Sign in with your password.';
+  }
+  // the password field's own suggestion list (conditional mediation): a passkey shows there beside saved passwords
+  async function conditional() {
+    try { if (!R.dataset.gate || !PKC.isConditionalMediationAvailable || !(await PKC.isConditionalMediationAvailable())) return;
+      var o = await post({ op: 'login-options' }); if (!o.r || !o.r.ok) return;
+      ac = window.AbortController ? new AbortController() : null;
+      var c = await navigator.credentials.get({ publicKey: getOpts(o.j.publicKey), mediation: 'conditional', signal: ac ? ac.signal : undefined });
+      if (c) { var m = await finish(c); if (m) { var er = $('ms-gate-err'); if (er) er.textContent = m; } }
+    } catch (e) { /* aborted by the button, or nothing chosen */ }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var w = $('ms-gate-pk'), b = $('ms-gate-pkb'), f = $('ms-gate-f'), err = $('ms-gate-err');
+    // a password sign-in from this card: the next load may offer Face ID once (a flag, nothing secret)
+    if (f) f.addEventListener('submit', function () { try { sessionStorage.setItem('ms-pk-pw', '1'); } catch (e) {} }, true);
+    if (!w || !b || !OK) return;
+    w.hidden = false;
+    b.addEventListener('click', async function () {
+      if (b.getAttribute('aria-busy') === 'true') return;
+      if (ac) { try { ac.abort(); } catch (e) {} ac = null; }
+      err.textContent = ''; b.setAttribute('aria-busy', 'true');
+      var msg = null;
+      try { var o = await post({ op: 'login-options' });
+        if (!o.r || !o.r.ok) msg = o.r && o.r.status === 400 ? 'Face ID sign-in does not work on this address. Use aureumdesk.co.uk.' : 'Sign-in is unavailable right now. Try again in a minute, or use your password.';
+        else { var c = await navigator.credentials.get({ publicKey: getOpts(o.j.publicKey) }); msg = c ? await finish(c) : 'Face ID was cancelled. ' + NOPK; }
+      } catch (e) { msg = why(e) || 'Face ID sign-in did not work. Sign in with your password.'; }
+      b.removeAttribute('aria-busy'); if (msg) err.textContent = msg;
+    });
+    conditional();
+  });
+
+  // ---- the Profile: the switch row, the card of devices, and the one-time offer after a password sign-in ----
+  var who = function () { var A = window.MS_ACCT; return A && typeof A.u === 'string' && R.dataset.role !== 'public' ? A.u : null; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var day = function (iso) { var d = new Date(iso); return isFinite(d) ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
+  var LIST = null;
+  function say(t) { var m = $('ms-pf-pk-msg'); if (m) m.textContent = t || ''; }
+  function draw() {
+    var u = who(), row = $('ms-pf-pkrow'), card = $('ms-pf-pk'), l = $('ms-pf-pk-l'); if (!u || !row || !card) return;
+    var here = mine(u), on = !!(LIST && here && LIST.some(function (p) { return p.id === here; }));
+    if (LIST && here && !on) { mine(u, null); here = null; }   // removed from another device
+    row.setAttribute('aria-checked', String(on)); var s = $('ms-pf-pkrow-s'); if (s) s.textContent = on ? 'On for this device' : LIST && LIST.length ? 'Off here · on for ' + LIST.length + (LIST.length === 1 ? ' other device' : ' other devices') : 'Off';
+    var add = $('ms-pf-pk-add'); if (add) add.hidden = on;
+    if (!l) return;
+    if (!LIST) { l.innerHTML = '<li class="pf-pk-e">Loading…</li>'; return; }
+    l.innerHTML = LIST.length ? LIST.map(function (p) { return '<li data-id="' + esc(p.id) + '"><div><b>' + esc(p.name) + (p.id === here ? '<span class="pk-me">This device</span>' : '') + '</b><small>Added ' + esc(day(p.at)) + (p.used ? ' · last used ' + esc(day(p.used)) : ' · not used yet') + '</small></div>'
+      + '<button type="button" class="ms-tbtn" data-pk="rename">Rename</button><button type="button" class="ms-tbtn" data-pk="remove">Remove</button></li>'; }).join('')
+      : '<li class="pf-pk-e">No device yet. Turn it on here; next time the sign-in card offers Face ID or your fingerprint.</li>';
+  }
+  async function load() { var o = await fetch(API + 'passkey', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; });
+    if (!o) { if (!LIST) { var l = $('ms-pf-pk-l'); if (l) l.innerHTML = '<li class="pf-pk-e">The list could not be loaded. Try again later.</li>'; } return; }
+    LIST = o.passkeys || []; draw(); }
+  async function turnOn() {
+    var u = who(); if (!u) return false; say('Waiting for Face ID or your fingerprint…');
+    try { var o = await post({ op: 'reg-options' });
+      if (!o.r || !o.r.ok) { say(o.j.error || (o.r ? 'Could not start (error ' + o.r.status + ').' : 'The server could not be reached.')); return false; }
+      var c = await navigator.credentials.create({ publicKey: createOpts(o.j.publicKey) });
+      var r = await post({ op: 'register', id: c.id, response: { clientDataJSON: enc(c.response.clientDataJSON), attestationObject: enc(c.response.attestationObject) } });
+      if (!r.r || !r.r.ok) { say(r.j.error || 'Not saved. Try again.'); return false; }
+      mine(u, r.j.id); LIST = r.j.passkeys; draw(); say('On. Next time, tap "Use Face ID or fingerprint" on the sign-in card.'); return true;
+    } catch (e) { say(e && e.name === 'NotAllowedError' ? 'Cancelled: nothing was turned on.' : why(e) || 'This device could not turn it on.'); return false; }
+  }
+  async function act(kind, id) {
+    var p = (LIST || []).filter(function (x) { return x.id === id; })[0]; if (!p) return;
+    if (kind === 'remove') { var yes = window.msConfirm ? await window.msConfirm('Face ID or fingerprint will no longer sign you in on "' + p.name + '". Your password still works.', { title: 'Remove this device?', ok: 'Remove', danger: true }) : true; if (!yes) return; }
+    var name = null; if (kind === 'rename') { name = window.msAsk ? await window.msAsk('Device name', p.name, { title: 'Rename this device', max: 40 }) : null; if (name == null) return; }
+    var o = await post(kind === 'remove' ? { op: 'remove', id: id } : { op: 'rename', id: id, name: name });
+    if (!o.r || !o.r.ok) { say(o.j.error || 'Not saved. Check your connection and try again.'); return; }
+    if (kind === 'remove' && mine(who()) === id) mine(who(), null);
+    LIST = o.j.passkeys; draw(); say(kind === 'remove' ? 'Removed.' : 'Renamed.');
+  }
+  function show() {
+    var u = who(); if (!u || !OK) return;
+    var row = $('ms-pf-pkrow'), card = $('ms-pf-pk'), go = document.querySelector('#v-profile [data-pf-go="ms-pf-pk"]'), more = $('ms-pf-more');
+    if (row) row.hidden = false; if (card) card.hidden = false; if (go) go.hidden = false; if (more) { more.hidden = false; if ($('ms-pf-more-h')) $('ms-pf-more-h').hidden = false; }
+    draw(); load();
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var row = $('ms-pf-pkrow'), add = $('ms-pf-pk-add'), l = $('ms-pf-pk-l');
+    if (row) row.addEventListener('click', function () { if (row.getAttribute('aria-checked') === 'true') { var id = mine(who()); if (id) act('remove', id); } else turnOn(); });
+    if (add) add.addEventListener('click', function () { turnOn(); });
+    if (l) l.addEventListener('click', function (e) { var b = e.target.closest('button[data-pk]'), li = b && b.closest('li[data-id]'); if (li) act(b.dataset.pk, li.dataset.id); });
+    var onHash = function () { if (/^#profile/.test(location.hash)) show(); };
+    addEventListener('hashchange', onHash); onHash();
+    offer();
+  });
+  // once per account and device, right after a password sign-in on a device with Face ID / a fingerprint reader and no passkey here
+  async function offer() {
+    var u = who(), flag = null; try { flag = sessionStorage.getItem('ms-pk-pw'); sessionStorage.removeItem('ms-pk-pw'); } catch (e) {}
+    if (!u || !flag || !OK || mine(u) || R.dataset.gate) return;
+    try { if (localStorage.getItem('ms-pk-asked-' + u)) return; } catch (e) { return; }
+    try { if (!PKC.isUserVerifyingPlatformAuthenticatorAvailable || !(await PKC.isUserVerifyingPlatformAuthenticatorAvailable())) return; } catch (e) { return; }
+    try { localStorage.setItem('ms-pk-asked-' + u, '1'); } catch (e) { return; }
+    var d = document.createElement('div'); d.className = 'pk-offer'; d.id = 'ms-pk-offer'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Face ID sign-in');
+    d.innerHTML = '<p>Turn on Face ID for next time?<small>Sign in with your face or fingerprint. Your password still works.</small></p><button type="button" class="ms-tbtn pri" data-a="on">Turn on</button><button type="button" class="ms-tbtn" data-a="no">Not now</button>';
+    document.body.appendChild(d);
+    d.addEventListener('click', async function (e) { var b = e.target.closest('button[data-a]'); if (!b) return;
+      if (b.dataset.a === 'no') { d.remove(); return; }
+      b.disabled = true; var ok = await turnOn(), m = $('ms-pf-pk-msg');
+      d.innerHTML = '<p>' + esc(ok ? 'Face ID is on for this device.' : (m && m.textContent) || 'Not turned on. You can do it later in your Profile.') + '</p><button type="button" class="ms-tbtn" data-a="no">Close</button>'; });
+  }
+})();
+</script>
 <script>
 // Login 2: caps-lock hint, shake on a wrong password, the live gold strip (public snapshot) and the session line.
 // Desk load (11 Nov): this script sits right under the card (it was 1.3 MB further down the page), so the strip and the proof
@@ -5910,10 +6082,12 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <button class="pf-row" type="button" id="ms-pf-photo"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></i><span class="pf-tx"><b>Change photo</b><small>Your portrait on the desk</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" id="ms-pf-rename"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></i><span class="pf-tx"><b>Display name</b><small>How the desk greets you</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" id="ms-pf-theme" data-theme-set role="switch" aria-checked="false"><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg></i><span class="pf-tx"><b>Light theme</b><small>Easier to read in daylight</small></span><span class="pf-sw" aria-hidden="true"><i></i></span></button>
+          <button class="pf-row" type="button" id="ms-pf-pkrow" role="switch" aria-checked="false" hidden><i class="pf-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg></i><span class="pf-tx"><b>Face ID / fingerprint</b><small id="ms-pf-pkrow-s">Off</small></span><span class="pf-sw" aria-hidden="true"><i></i></span></button>
           <button class="pf-row" type="button" id="ms-pf-out" data-out><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/></svg></i><span class="pf-tx"><b>Log out</b><small>Sign out on this device</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         </nav>
         <h2 class="pf-more-h" id="ms-pf-more-h">More</h2>
         <nav class="pf-box pf-list" id="ms-pf-more" aria-labelledby="ms-pf-more-h">
+          <button class="pf-row" type="button" data-pf-go="ms-pf-pk" hidden><i class="pf-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg></i><span class="pf-tx"><b>Face ID devices</b><small>Where Face ID or fingerprint signs you in</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-nt" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/></svg></i><span class="pf-tx"><b>Send a notification</b><small>A message on every member's bell</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-snd" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 010 6"/></svg></i><span class="pf-tx"><b>ChronosTrade sounds</b><small>What a target or a stop sounds like</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-mcp" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M15 7l5 5-5 5"/></svg></i><span class="pf-tx"><b>ChatGPT connector</b><small>Work on the ICT edge from ChatGPT</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -5924,6 +6098,11 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <section class="card pf-ct" id="ms-pf-acct" aria-labelledby="ms-pf-t">
         <div class="pf-ct-h"><div><h2 id="ms-pf-t">Demo accounts</h2><div class="ct-sub" id="ms-pf-sub"></div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-b" aria-live="polite"></div>
+      </section>
+      <section class="card pf-ct pf-pk" id="ms-pf-pk" aria-labelledby="ms-pf-pk-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-pk-t">Face ID / fingerprint</h2><div class="ct-sub">Sign in with your face or fingerprint instead of typing the password. Your password still works everywhere; removing a device here turns it off.</div></div></div>
+        <ul class="pf-pk-l" id="ms-pf-pk-l"></ul>
+        <div class="pf-pk-a"><button type="button" class="ms-tbtn pri" id="ms-pf-pk-add">Turn on for this device</button><small id="ms-pf-pk-msg" role="status"></small></div>
       </section>
       <section class="card pf-ct pf-nt" id="ms-pf-nt" aria-labelledby="ms-pf-nt-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-nt-t">Send a notification</h2><div class="ct-sub">Every member sees it on the bell, and it pops onto their screen the next time they open the desk.</div></div></div>
