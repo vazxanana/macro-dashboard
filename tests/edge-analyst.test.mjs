@@ -111,7 +111,8 @@ test('budgets are this feature\'s own; EDGE_ANALYST=off stops every call', () =>
 
 test('wiring: cron, function, page card, nothing imports council or order code', () => {
   const v = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url)));
-  assert.ok(v.crons.some((c) => c.path === '/api/edge-analyst?job=scan'));
+  const w = fs.readFileSync(new URL('../cloudflare/src/worker.mjs', import.meta.url), 'utf8');
+  assert.match(w, /'\*\/10 \* \* \* \*': '\/api\/edge-analyst\?job=scan'/, 'the Worker\'s 10-minute cron runs the scan');
   assert.ok(v.functions['api/edge-analyst.js']);
   const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   assert.match(page, /id="ms-ea" class="card adm"|class="card adm" id="ms-ea"/);

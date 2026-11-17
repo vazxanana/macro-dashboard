@@ -96,12 +96,12 @@ test('trade reviewer: its own budgets and kill switches', () => {
   }
 });
 
-test('trade reviewer: wired on Cloudflare (handler + chained after the 10-minute cron) and in vercel.json', () => {
+test('trade reviewer: wired on Cloudflare (handler + chained after the 10-minute cron); its function entry in vercel.json', () => {
   const w = src('cloudflare/src/worker.mjs');
   assert.match(w, /import tradeReview from '\.\.\/\.\.\/api\/trade-review\.js'/); assert.match(w, /'trade-review': tradeReview/);
   assert.match(w, /CHAINED = \{ '\*\/10 \* \* \* \*': \['\/api\/trade-review\?job=review'\] \}/);
   const v = JSON.parse(src('vercel.json'));
-  assert.ok(v.crons.some((c) => c.path === '/api/trade-review?job=review')); assert.ok(v.functions['api/trade-review.js']);
+  assert.ok(v.functions['api/trade-review.js']); assert.equal(v.crons, undefined, 'no Vercel cron: the Worker runs it (17 Nov 2026)');
 });
 
 test('trade review card: admin only, its own style and script, reads through msData, renders the file', () => {

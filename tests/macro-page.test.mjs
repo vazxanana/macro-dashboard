@@ -14,9 +14,8 @@ test('macro page: reads the members\' files, has every section, and the inline s
   assert.match(html, /@media \(max-width: 600px\)/); assert.match(html, /prefers-reduced-motion/);
 });
 
-test('macro page: built, routed at /macro-desk, in the deploy-skip list, linked from the council Macro pane', () => {
+test('macro page: built, routed at /macro-desk, linked from the council Macro pane', () => {
   assert.match(fs.readFileSync(new URL('../scripts/build.sh', import.meta.url), 'utf8'), /macro-desk\.html out\//);
-  assert.match(fs.readFileSync(new URL('../scripts/vercel-ignore.sh', import.meta.url), 'utf8'), /macro-desk\.html/);
   const vj = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
   assert.ok(vj.rewrites.some((r) => r.source === '/macro-desk' && r.destination === '/macro-desk.html'));
   const ms = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
