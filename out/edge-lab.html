@@ -10,8 +10,13 @@
 <title>Edge Lab · Aureum Desk</title>
 <meta name="description" content="Edge Lab: in-sample versus out-of-sample results of the Meridian and ICT edge studies.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
-<style>@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-ext-f153aa07.woff2?v=f153aa07c1) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-8330490a.woff2?v=8330490a01) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+<style>@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-cyrillic-ext-fccca918.woff2?v=fccca918fe) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-cyrillic-aebf2ab4.woff2?v=aebf2ab4a4) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-greek-ext-a2e2c783.woff2?v=a2e2c783ca) format('woff2');unicode-range:U+1F00-1FFF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-greek-46dd4cdc.woff2?v=46dd4cdca5) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-vietnamese-8db00ff4.woff2?v=8db00ff46c) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-latin-ext-a28eb6d3.woff2?v=a28eb6d3cc) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-latin-c9407645.woff2?v=c940764593) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-ext-9343de2c.woff2?v=9343de2ca5) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-4995a9a4.woff2?v=4995a9a43a) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-greek-49c3da6c.woff2?v=49c3da6c9a) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
@@ -28,13 +33,13 @@
     } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="assets/mx-page.css?v=e803654e03">
+<link rel="stylesheet" href="assets/mx-page.css?v=c56a07bcf0">
 <script src="assets/mx-nav.js?v=3f8fef533d" defer></script>
 <style>
   /* tokens, base, top bar and the Desk | Macro | ChronosTrade switch: assets/mx-page.css (shared with /macro and /veteran/) */
   /* heading */
   .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 16px 48px; align-items: end; padding: 40px 0 28px; }
-  h1 { font: 600 clamp(26px, 3vw, 34px)/1.15 var(--sans); letter-spacing: -.6px; margin: 0 0 10px; text-wrap: balance; }
+  h1 { font: 650 clamp(26px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 10px; text-wrap: balance; }
   .lede { margin: 0; color: var(--ink-dim); max-width: 62ch; font-size: 14.5px; text-wrap: pretty; }
   .lede b { color: var(--ink); font-weight: 600; }
   .how { margin-top: 10px; max-width: 62ch; font-size: 13.5px; color: var(--ink-dim); }
@@ -100,11 +105,11 @@
   .eqc { display: flex; justify-content: space-between; gap: 6px; font: 500 12px var(--mono); color: var(--ink-faint); margin: 1px 0 6px; }
   .eqc b { font-weight: 600; color: var(--ink-dim); }
 
-  .table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
+  .table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--au-shadow); }
   .cols, .row { display: grid; grid-template-columns: minmax(0, 1.55fr) 118px minmax(0, 1fr) minmax(0, 1.1fr) 64px 76px 150px 84px; column-gap: 16px; align-items: center; padding: 0 18px; }
   .cols { min-height: 38px; border-bottom: 1px solid var(--line); font: 500 12px var(--sans); color: var(--ink-faint); }
   .cols span:nth-child(n+5):nth-child(-n+6), .row .c-n, .row .c-dd { text-align: right; }
-  .row { padding-top: 14px; padding-bottom: 14px; border-top: 1px solid var(--line-soft); animation: in .5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 35ms); }
+  .row { padding-top: 14px; padding-bottom: 14px; border-top: 1px solid var(--line-soft); animation: in .5s var(--ease) backwards; animation-delay: calc(min(var(--i, 0), 12) * 30ms); }
   .row:first-of-type { border-top: 0; }
   .row:hover { background: color-mix(in srgb, var(--ink) 2.5%, transparent); }
   /* deep link #<topic> (the week pane's Studies list and the daily digest point here): the row is opened, scrolled under the sticky bar and marked */
@@ -128,7 +133,7 @@
   .badge.fail { background: var(--sell-soft); color: var(--sell); }
   .badge.inc { background: var(--neutral-soft); color: var(--ink-dim); }
   .badge.run { background: transparent; color: var(--ink-faint); border: 1px dashed var(--line-strong); font-weight: 500; letter-spacing: .02em; }
-  .badge.run .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; margin: 0 2px 0 1px; }
+  .badge.run .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out 3; margin: 0 2px 0 1px; }
   .badge.err { background: var(--sell-soft); color: var(--sell); font-weight: 500; }
   @keyframes pulse { 50% { opacity: .25; transform: scale(.7); } }
 
@@ -181,8 +186,21 @@
   #groups:has(> .loading) { min-height: 100vh; }   /* the rows land without pushing the footer up and down (CLS) */
   .loading { margin: 28px 0; color: var(--ink-faint); font-size: 13.5px; }
   #groups:focus { outline: none; }
-  .foot { margin-top: 36px; color: var(--ink-faint); font-size: 12px; max-width: 80ch; }
-  .foot p { margin: 0 0 6px; }
+  /* filter bar (17 Nov 2026): search and verdict at the left, the order at the right; sticky under the top bar on wide screens */
+  .flt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 4px; padding: 12px 0; }
+  .flt[hidden] { display: none; }
+  @media (min-width: 900px) { .flt { position: sticky; top: 60px; z-index: calc(var(--z-sticky) - 1); background: var(--bg); border-bottom: 1px solid var(--line); } }
+  .flt-q { position: relative; flex: 1 1 260px; max-width: 380px; }
+  .flt-q input { width: 100%; min-height: var(--tap); padding: 6px 10px 6px 32px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--au-well); color: var(--ink); font: 500 14px var(--sans); }
+  .flt-q input::placeholder { color: var(--ink-faint); }
+  .flt-q svg { position: absolute; left: 10px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); color: var(--ink-faint); pointer-events: none; }
+  .flt-v { display: flex; flex-wrap: wrap; gap: 6px; }
+  .flt-s { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+  .flt-s select { min-height: var(--tap); padding: 4px 8px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--au-well); color: var(--ink); font: 500 13px var(--sans); }
+  .flt-n { flex-basis: 100%; margin: 0; font-size: 13px; color: var(--ink-faint); }
+  .flt-none { margin: 24px 0; color: var(--ink-dim); font-size: 14px; }
+  .row[hidden], .group[hidden] { display: none; }
+  @media (max-width: 600px) { .flt-q { max-width: none; flex-basis: 100%; } .flt-s { margin-left: 0; } }
   .banner { margin: 0 0 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--sell-soft); color: var(--ink); font-size: 13px; }
 
   /* tooltip */
@@ -269,7 +287,7 @@
 <a class="skip" href="#groups">Skip to the studies</a>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Aureum Desk</a>
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span><span class="wm-a">Aureum</span> <span class="wm-d">Desk</span></a>
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand here">Edge Lab</span>
     <div class="check">
@@ -293,12 +311,21 @@
     <div class="prog" id="prog" aria-live="polite"></div>
   </section>
 
+  <div class="flt" id="flt" role="search" aria-label="Find a study" hidden>
+    <div class="flt-q"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><label class="sr" for="flt-q">Find a study</label><input id="flt-q" type="search" placeholder="Find a study: name, market, verdict" autocomplete="off" spellcheck="false"></div>
+    <div class="flt-v" id="flt-v" role="group" aria-label="Show studies by verdict">
+      <button type="button" class="mx-chip" data-v="" aria-pressed="true">All</button><button type="button" class="mx-chip" data-v="pass" aria-pressed="false">Pass</button><button type="button" class="mx-chip" data-v="fail" aria-pressed="false">Fail</button><button type="button" class="mx-chip" data-v="inc" aria-pressed="false">Inconclusive</button><button type="button" class="mx-chip" data-v="run" aria-pressed="false" hidden>Running</button>
+    </div>
+    <label class="flt-s"><span>Order</span><select id="flt-s"><option value="">Reading order</option><option value="new">Newest first</option><option value="az">A to Z</option></select></label>
+    <p class="flt-n" id="flt-n" role="status" aria-live="polite"></p>
+  </div>
+  <p class="flt-none" id="flt-none" hidden>No study matches. <button type="button" class="linkbtn" id="flt-x">Show every study</button></p>
   <div id="banner"></div>
   <div id="groups" tabindex="-1"><p class="loading" role="status">Loading the studies…</p></div>
 
   <footer class="foot">
     <p>Results come from <span class="num">research/edge/&lt;study&gt;/result.json</span>. Studies land as they finish; this page checks again every two minutes. Bars and lines use each row's own scale; hover or tap any chart for its values. Colour is never the only signal: every verdict and value is also written out.</p>
-    <p><a href="/">Back to the desk</a></p>
+    <p class="mx-fb"><span class="mx-fw"><span class="coin" aria-hidden="true"></span>Aureum Desk</span><a href="/">Back to the desk</a></p>
   </footer>
 </main>
 
@@ -593,11 +620,12 @@
     var html = [['meridian', 'Meridian', 'Desk systems, scalps and the gold book'], ['ict', 'ICT', 'The ICT desk: filters, exits and universe']].map(function (g) {
       var list = groups[g[0]]; if (!list.length) return '';
       var landed = list.filter(function (t) { var r = state.studies[t]; return r && r.status !== 'missing'; }).length;
-      return '<section class="group" aria-labelledby="g-' + g[0] + '"><div class="group-h"><h2 id="g-' + g[0] + '">' + g[1] + '</h2><p>' + g[2] + ' · ' + landed + ' of ' + list.length + ' in</p></div>' +
+      return '<section class="group" aria-labelledby="g-' + g[0] + '"><div class="group-h"><h2 id="g-' + g[0] + '">' + g[1] + '</h2><p>' + g[2] + ' · ' + landed + ' of ' + list.length + ' in<span class="g-shown"></span></p></div>' +
         '<div class="table">' + cols + list.map(function (t) { return rowHTML(t, state.studies[t], gi++); }).join('') + '</div></section>';
     }).join('');
     $('groups').innerHTML = html;
     if (state.rendered) document.querySelectorAll('.row').forEach(function (r) { r.style.animation = 'none'; });
+    decorate(); applySort(); applyFilter();
     state.rendered = true;
     deepLink();
   }
@@ -629,6 +657,7 @@
     if (!t || !/^[a-z0-9][a-z0-9_-]*$/i.test(t)) return;
     if (linked.topic !== t) linked = { topic: t, scrolled: false };
     var row = document.querySelector('.row[data-topic="' + t + '"]'); if (!row) return;
+    if (row.hidden) clearFilter();
     document.querySelectorAll('.row.hit').forEach(function (r) { if (r !== row) r.classList.remove('hit'); });
     row.classList.add('hit');
     var d = row.querySelector('details.more'); if (d && !d.open) { d.open = true; if (state.studies[t]) state.studies[t].open = true; }
@@ -639,6 +668,54 @@
     try { row.focus({ preventScroll: true }); } catch (e) {}
   }
   window.addEventListener('hashchange', function () { linked = { topic: null, scrolled: false }; deepLink(); });
+
+  // filter, search and order (17 Nov 2026). Display only: rowHTML builds every row from the same data; a filter hides rows and an
+  // order moves them, nothing is recomputed. The state lives in this page view only.
+  var F = { q: '', v: '', sort: '' };
+  function rowVerdict(rec) {
+    if (!rec || rec.status === 'missing') return 'run';
+    if (rec.status === 'report') return /^(pass|fail)$/.test(rec.verdict) ? rec.verdict : 'inc';
+    if (rec.status === 'error') return 'inc';
+    return analyse(rec.data, rec).verdict;
+  }
+  function decorate() {
+    document.querySelectorAll('#groups .row[data-topic]').forEach(function (r, i) {
+      var t = r.dataset.topic, rec = state.studies[t], st = r.querySelector('.c-study');
+      r.dataset.v = rowVerdict(rec); r.dataset.i = i; r.dataset.built = (rec && rec.built) || '';
+      r.dataset.name = (NAMES[t] || titleCase(t)).toLowerCase();
+      r.dataset.q = (t + ' ' + (st ? st.textContent : '') + ' ' + r.dataset.v + ' ' + ({ pass: 'pass', fail: 'fail', inc: 'inconclusive', run: 'running' })[r.dataset.v]).toLowerCase();
+    });
+    $('flt').hidden = false;
+  }
+  function applySort() {
+    document.querySelectorAll('#groups .table').forEach(function (tb) {
+      var rows = [].slice.call(tb.querySelectorAll(':scope > .row[data-topic]'));
+      rows.sort(function (a, b) {
+        if (F.sort === 'new') { var x = a.dataset.built, y = b.dataset.built; if (x !== y) return !x ? 1 : !y ? -1 : x < y ? 1 : -1; }
+        if (F.sort === 'az') return a.dataset.name.localeCompare(b.dataset.name);
+        return +a.dataset.i - +b.dataset.i;
+      });
+      rows.forEach(function (r) { tb.appendChild(r); });
+    });
+  }
+  function applyFilter() {
+    var words = F.q.trim().toLowerCase().split(/\s+/).filter(Boolean), shown = 0, total = 0, run = 0;
+    document.querySelectorAll('#groups .row[data-topic]').forEach(function (r) {
+      total++; if (r.dataset.v === 'run') run++;
+      var on = words.every(function (w) { return r.dataset.q.indexOf(w) >= 0; }) && (!F.v || r.dataset.v === F.v);
+      r.hidden = !on; if (on) shown++;
+    });
+    document.querySelectorAll('#flt-v [data-v]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === F.v)); if (b.dataset.v === 'run') b.hidden = !run; });
+    var on = !!(words.length || F.v);
+    document.querySelectorAll('#groups .group').forEach(function (g) { var n = g.querySelectorAll('.row[data-topic]:not([hidden])').length; g.hidden = !n; var c = g.querySelector('.g-shown'); if (c) c.textContent = on ? ' · ' + n + ' shown' : ''; });
+    $('flt-n').textContent = on ? 'Showing ' + shown + ' of ' + total + ' studies' : '';
+    $('flt-none').hidden = !(on && !shown && total);
+  }
+  function clearFilter() { F.q = ''; F.v = ''; $('flt-q').value = ''; applyFilter(); }
+  $('flt-q').addEventListener('input', function () { F.q = this.value; applyFilter(); });
+  $('flt-v').addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-v]'); if (!b) return; F.v = b.dataset.v; applyFilter(); });
+  $('flt-s').addEventListener('change', function () { F.sort = this.value; applySort(); });
+  $('flt-x').addEventListener('click', clearFilter);
 
   function getJSON(url) {
     return fetch(url, { cache: 'no-cache' }).then(function (r) {
