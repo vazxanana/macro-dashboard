@@ -2263,6 +2263,49 @@ Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` 
 submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
 (no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
 
+## Face ID / fingerprint sign-in with passkeys (17 Nov 2026, owner)
+Owner: "Face ID or fingerprint login", like the Face ID button of the Figma login. WebAuthn passkeys; the password stays the
+primary way in. No npm dependency: `api/_passkey.js` (pure) reads CBOR, COSE keys (ES256 P-256 and RS256 only), authenticator data
+and DER signatures (to raw r || s) and verifies with WebCrypto `crypto.subtle`; `api/passkey.js` is the endpoint (Worker route in
+`cloudflare/src/worker.mjs`, `vercel.json` `functions`).
+- **Ops** (every POST refuses a foreign Origin): `reg-options` / `register` / `rename` / `remove` and GET (list) need the session
+  cookie; `login-options` / `login` do not. Options ask for a discoverable credential (`residentKey: 'required'`) and
+  `userVerification: 'required'`, attestation `'none'` (not verified; the key comes from the authenticator data). Checked: client
+  data type, challenge, origin (the request's own `https://<host>`, or `http://localhost:<port>`), `crossOrigin` not true, RP ID
+  hash, UP and UV flags, the signature over authData || SHA-256(clientDataJSON), the sign counter (a counter that does not grow is
+  refused once either side is non-zero; synced passkeys that stay 0 pass), the user handle when sent.
+- **RP ID** (`rpFor`): `aureumdesk.co.uk` for both aureumdesk.co.uk and www (one passkey serves both); the workers.dev host and
+  `localhost` as themselves; env `PASSKEY_HOSTS` adds hosts; any other host gets 400 (no passkey on an unknown address).
+- **Challenges** are stateless: HMAC-signed with a key derived from the session key (`S.secret`), bound to the operation, the RP ID
+  and (registration) the account, 5 minutes; a used nonce is kept in the store until it expires, so a challenge works once.
+- **Sign-in issues the same session as `/api/login`** (`S.issue`, `S.setCookie`, answer `{ account }`; a test compares the two).
+  The account is re-read from the user list (removed / disabled: refused; list unreadable: 503, fails closed). Each passkey keeps
+  `fp` = the session's keyed fingerprint of the password hash it was made under (`S.fingerprint`): **a password change ends every
+  passkey of that account**, as it ends sessions (code `password-changed`, the page says to turn it on again). Failed sign-ins count
+  in `api/_guard.js` with failed passwords (429 after 10 from one address). The owner may use a passkey too.
+- **Store**: one private file `passkeys/all.json` (`{ creds: { <credential id>: { u, alg, pub (JWK), counter, fp, name, at,
+  used } }, seen }`; public keys only, no hash), overwritten in place and read with `cache=0` (the freshness rule; listed in
+  `tests/blob-fresh.test.mjs`), one write at a time per instance. At most 10 passkeys a member, 2,000 in all. Device name from the
+  User-Agent (iPhone, Mac, Android phone…), renamable.
+- **Page** (`market-structure.html`, one self-contained block right after the sign-in card: `<style id="ms-pk-css">` +
+  `<script id="ms-pk-js">`; `window.MS_PK`): the button `#ms-gate-pk` / `#ms-gate-pkb` "Use Face ID or fingerprint" (face-scan glyph)
+  sits in the form after Sign in, shown whenever WebAuthn exists on a secure page with the API; on the phone (<= 640 px) it is
+  icon-over-label, centred under the password (`order: 5`, above the bottom Sign in pill); wider, a secondary button under Sign in.
+  The password field has `autocomplete="current-password webauthn"` and the script starts conditional mediation, so a passkey is
+  also offered in the field's own suggestion list. Success = the password form's path (store `ms-acct`, reload). Errors in words in
+  `#ms-gate-err` (cancelled or no passkey here -> "Sign in with your password, then turn on Face ID in your Profile"; removed;
+  password changed; 429; offline). Profile: switch row `#ms-pf-pkrow` ("On for this device" / "Off") in the account list, a More row
+  `data-pf-go="ms-pf-pk"` and the card `#ms-pf-pk` (devices with Rename / Remove, "Turn on for this device"); hidden for guests
+  and where WebAuthn is missing. After a password sign-in (a `sessionStorage ms-pk-pw` flag set on submit) on a device with a
+  platform authenticator and no passkey here, `#ms-pk-offer` asks once per account and device ("Turn on Face ID for next time?",
+  `ms-pk-asked-<u>`). Browser storage holds only public ids and flags: `ms-pk-<u>` = this device's credential id.
+- Tests: `tests/passkey.test.mjs` (12: a software authenticator built with WebCrypto, real CBOR attestation objects and DER
+  signatures, P-256 and RSA; refusals for origin, RP ID, challenge (foreign, other account, expired, reused), UV, signature,
+  counter, user handle, removed / disabled / password-changed accounts, unreadable list, own-only rename / remove, the 10 limit,
+  the rate limit; a CBOR unit test). Checked end to end in Chromium with a CDP virtual authenticator (register from the offer,
+  Profile switch, sign-in through the suggestion list and through the button, `/api/me` after, remove, refusal after removal).
+  Not checked: real Face ID / Touch ID / Android hardware, Safari and iCloud-synced passkeys, the live Worker and Blob store.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
