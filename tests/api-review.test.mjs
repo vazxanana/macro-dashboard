@@ -125,8 +125,8 @@ test('finding 3: an MCP_KEYS key does not skip the stored list: the member\'s IC
 // ---------------------------------------------------------------------------------------------------------------------------
 // Re-verification
 test('every state-changing endpoint refuses the owner\'s own cookie when the request comes from another site', async () => {
-  G._reset(); resetBlob(); const saved = { k: process.env.CTRADER_LINK_KEY, b: process.env.BLOB_READ_WRITE_TOKEN, t: process.env.TV_WEBHOOK_KEY };
-  Object.assign(process.env, { CTRADER_LINK_KEY: ENV.CTRADER_LINK_KEY, BLOB_READ_WRITE_TOKEN: 'blob-fake', TV_WEBHOOK_KEY: 'tv-key-fake-0123456789' });
+  G._reset(); resetBlob(); const saved = { k: process.env.CTRADER_LINK_KEY, b: process.env.BLOB_READ_WRITE_TOKEN };
+  Object.assign(process.env, { CTRADER_LINK_KEY: ENV.CTRADER_LINK_KEY, BLOB_READ_WRITE_TOKEN: 'blob-fake' });
   try {
     const wrote = []; const mem = { get: async () => [], put: async (...a) => { wrote.push(a); }, getBook: async () => null, putBook: async (...a) => { wrote.push(a); }, putImg: async (...a) => { wrote.push(a); } };
     const obj = { get: async () => ({}), put: async (...a) => { wrote.push(a); } };
@@ -142,13 +142,12 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
       ['mosha-lessons', ML.handle, { remove: { id: '20261111100000000abcd' } }, d],
       ['academy', require('../api/academy.js').handle, { action: 'miss', note: 'x' }, d],
       ['bridge', require('../api/bridge.js'), { file: 'mt5' }, null],
-      ['tv-webhook', require('../api/tv-webhook.js'), { list: true }, null],
     ];
     for (const [name, fn, body, opt] of cases) {
       const r = res(); await fn({ method: 'POST', headers: { host: 'aureumdesk.co.uk', origin: 'https://evil.example', cookie: OWNER_C }, query: {}, body }, r, opt || undefined);
       assert.ok(r.code === 401 || r.code === 403, `${name}: ${r.code} ${JSON.stringify(r.body)}`);
       assert.equal(r.headers['set-cookie'], undefined, `${name}: no cookie set or cleared`);
-      assert.doesNotMatch(JSON.stringify(r.body), /CouncilBridge|tv-key-fake/, `${name}: nothing handed over`);
+      assert.doesNotMatch(JSON.stringify(r.body), /CouncilBridge/, `${name}: nothing handed over`);
     }
     assert.equal(wrote.length, 0, 'nothing was written'); assert.equal(BLOB.puts.length, 0);
     // the same cookie from the site itself is the owner (so the refusals above are the Origin check, not a bad cookie)
@@ -156,7 +155,7 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
     assert.equal(ok.code, 200); assert.equal(wrote.length, 1);
     // an Origin that is not a URL ("null": a sandboxed frame) is foreign too
     for (const origin of ['null', 'aureumdesk.co.uk', 'https://aureumdesk.co.uk.evil.example', 'http://aureumdesk.co.uk:8080']) assert.equal(S.sameOrigin({ headers: { host: 'aureumdesk.co.uk', origin } }), false, origin);
-  } finally { for (const [k, v] of [['CTRADER_LINK_KEY', saved.k], ['BLOB_READ_WRITE_TOKEN', saved.b], ['TV_WEBHOOK_KEY', saved.t]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } G._reset(); resetBlob(); }
+  } finally { for (const [k, v] of [['CTRADER_LINK_KEY', saved.k], ['BLOB_READ_WRITE_TOKEN', saved.b]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } G._reset(); resetBlob(); }
 });
 
 test('/cdata: the sealed tokens and the user list are never read, whatever the spelling; no path leaves the branch; guests get the allowlist only', async () => {

@@ -24,21 +24,19 @@ import me from '../../api/me.js';
 import moshaLessons from '../../api/mosha-lessons.js';
 import mosha from '../../api/mosha.js';
 import notify from '../../api/notify.js';
-import pine from '../../api/pine.js';
 import profile from '../../api/profile.js';
 import push from '../../api/push.js';
 import sounds from '../../api/sounds.js';
 import status from '../../api/status.js';
 import stream from '../../api/stream.js';
 import tradeReview from '../../api/trade-review.js';
-import tvWebhook from '../../api/tv-webhook.js';
 import users from '../../api/users.js';
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, 'alert-cron': alertCron, bars, bridge, 'ctrader-link': ctraderLink, data,
-  'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, pine,
-  profile, push, sounds, status, stream, 'trade-review': tradeReview, 'tv-webhook': tvWebhook, users,
+  'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify,
+  profile, push, sounds, status, stream, 'trade-review': tradeReview, users,
 };
 
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.

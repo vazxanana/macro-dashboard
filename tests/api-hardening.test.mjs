@@ -89,15 +89,13 @@ test('the limit is shared by every password check: cTrader link, MCP key, owner-
   for (let i = 0; i < G.MAX; i++) assert.equal((await sPost('bad')).code, 403);
   assert.equal((await sPost('right')).code, 429, 'sounds ownerPw'); assert.equal(saved, 0);
 
-  // bridge / tv-webhook owner password
-  G._reset(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake'; process.env.TV_WEBHOOK_KEY = 'tv-key-fake-0123456789';
-  const bridge = require('../api/bridge.js'), tv = require('../api/tv-webhook.js');
+  // bridge owner password
+  G._reset(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake';
+  const bridge = require('../api/bridge.js');
   const bPost = async () => { const r = res(); await bridge({ method: 'POST', headers: ip('9.9.9.9'), body: { ownerPw: 'nope', file: 'mt5' } }, r); return r; };
   for (let i = 0; i < G.MAX; i++) assert.equal((await bPost()).code, 403);
   assert.equal((await bPost()).code, 429, 'bridge ownerPw');
-  const tPost = async () => { const r = res(); await tv({ method: 'POST', headers: ip('9.9.9.9'), query: {}, body: { ownerPw: 'nope', list: true } }, r); return r; };
-  assert.equal((await tPost()).code, 429, 'tv-webhook ownerPw (same IP, same budget)');
-  G._reset(); delete process.env.TV_WEBHOOK_KEY;
+  G._reset();
 });
 
 test('cron endpoints compare the secret in constant time (no plain string compare)', async () => {

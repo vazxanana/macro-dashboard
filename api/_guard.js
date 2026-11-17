@@ -1,7 +1,7 @@
 // Shared request guards (9 Nov 2026 API hardening). Files starting with "_" under api/ are modules, not endpoints.
 //
 // Password guessing: every endpoint that checks a password (/api/login, ctrader-link "session", mcp "mykey", and the owner-password
-// fallbacks of /api/users, /api/sounds, /api/bridge, /api/tv-webhook) counts the failures per client IP in one shared table.
+// fallbacks of /api/users, /api/sounds, /api/bridge) counts the failures per client IP in one shared table.
 // After MAX failures inside WINDOW the next password check from that IP answers 429 (Retry-After) until the oldest failure ages out:
 // a sliding window, never a long lock-out (owner: a shared mobile IP must not lose the site for an hour). A right password does
 // not clear the count (knowing one member's password must not reset the budget for guessing the owner's). In memory per function
