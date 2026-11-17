@@ -42,4 +42,16 @@ function bearerOk(header, secret) {
   return crypto.timingSafeEqual(d(header == null ? '' : header), d(`Bearer ${secret}`));
 }
 
-module.exports = { MAX, WINDOW, KEEP, ipOf, wait, failed, tooMany, bearerOk, _reset: () => FAILS.clear(), _size: () => FAILS.size };
+// A plain counter for actions that are not password checks (17 Nov 2026, sign-ups and reset emails, api/signup.js): `bucket`
+// names the action, `key` the client (an IP, or a hash of an email). Each call is one try; returns the seconds to wait (0 = go
+// ahead, the try is counted). Sliding window, in memory per instance, bounded like the table above.
+const HITS = new Map();
+function hit(bucket, key, max, win, now = Date.now()) {
+  const k = `${bucket}|${key}`, a = (HITS.get(k) || []).filter((t) => now - t < win);
+  if (a.length >= max) { HITS.set(k, a); return Math.max(1, Math.ceil((win - (now - a[0])) / 1000)); }
+  a.push(now); HITS.delete(k); HITS.set(k, a);
+  while (HITS.size > KEEP) HITS.delete(HITS.keys().next().value);
+  return 0;
+}
+
+module.exports = { MAX, WINDOW, KEEP, ipOf, wait, failed, tooMany, bearerOk, hit, _reset: () => { FAILS.clear(); HITS.clear(); }, _size: () => FAILS.size };
