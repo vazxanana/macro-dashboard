@@ -3248,7 +3248,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 <style>
 /* ── Council design pass (Nov 2026): hierarchy, tables, touch targets, contrast. Everything scoped to #v-council. ── */
 /* light theme: profit / loss colours dark enough for 4.5:1 on white and on their own tints */
-:root[data-theme="light"] #v-council { --buy: #067562; --sell: #c2203d; --c-warn: #8a5a00; }
+:root[data-theme="light"] #v-council { --buy: var(--au-gain, #067562); --sell: var(--au-loss, #c2203d); --c-warn: #8a5a00; }
 #v-council { --c-warn: #f2b33d; --c-tap: 44px; }
 
 /* 1 · status line: state pill first, the scan details on their own line (no stray leading dot when it wraps) */
@@ -3385,7 +3385,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 @media (max-width: 700px) { #v-council .c-md td { min-width: 96px; } #v-council .c-md td:first-child { min-width: 84px; } }
 
 /* 9 · a11y audit (8 Nov 2026, Playwright at 375 / 1280 px, light and dark): contrast, 44 px targets, tabular figures, no side stripes */
-:root[data-theme="light"] #v-council { --accent: #2b5fe8; --ink-faint: #626a78; }   /* accent text (review / You / See →) and faint notes were 4.50 and 4.47:1 on white and the page tint; now 5.4 / 5.0 */
+:root[data-theme="light"] #v-council { --accent: var(--au-accent, #2b5fe8); --ink-faint: var(--au-ink-3, #626a78); }   /* accent text (review / You / See →) and faint notes were 4.50 and 4.47:1 on white and the page tint; now 5.4 / 5.0 */
 #v-council .loss-st.ok { color: var(--buy); }   /* "stop swept" tag: was --up on its green tint, 3.2:1 in light / 4.4:1 in dark; --buy gives 5.1 / 8.4 */
 #v-council b, #v-council .cal-d .cn, #v-council .cal-mt, #v-council .c-kpi, #v-council .loss-n, #v-council #ms-cp-week .wk-tile b { font-variant-numeric: tabular-nums; }   /* R values and day numbers in Figtree line up (the week tiles set `font:`, which resets it) */
 #v-council .c-pm-i { border-left-width: 1px; border-left-color: var(--line); }   /* trade reviews: the category lives in the tag, not a side stripe */
@@ -4095,7 +4095,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
 #ms-cp-macro .md-vet-st { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; border: 1px solid var(--line); color: var(--ink-dim); justify-self: start; margin-top: 2px; }
 #ms-cp-macro .md-vet-row.agree .md-vet-st { border-color: color-mix(in srgb, var(--up, #1a9c5b) 50%, var(--line)); color: var(--buy-ink); }
 #ms-cp-macro .md-vet-row.disagree .md-vet-st { border-color: color-mix(in srgb, var(--down, #c23b3b) 50%, var(--line)); color: var(--sell-ink); }
-#ms-cp-macro .md-vet-side { margin-top: 3px; } #ms-cp-macro .md-vet-side small { display: inline-block; min-width: 68px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+#ms-cp-macro .md-vet-side { margin-top: 3px; } #ms-cp-macro .md-vet-side small { display: inline-block; min-width: 84px; margin-right: 6px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
 #ms-cp-macro .md-vet-why { margin-top: 4px; font-size: 12px; color: var(--ink-faint); font-style: italic; }
 #ms-cp-macro .md-vet-foot { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
 #ms-cp-macro .md-vet-teach { display: block; margin: 6px 0; color: var(--ink-dim); }
@@ -4802,6 +4802,89 @@ html[data-deny~="council"] #v-council :is(#ms-cn-macro, #ms-cn-week) { display: 
   #v-council #ms-sb-b a, #ms-cp-macro .md-full { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
   #v-council #ms-cp-overview button { min-width: 44px; }
 }
+</style>
+<style id="ms-wa-css">
+/* Graphite look for the working areas (17 Nov 2026, docs/design/aureum-theme.md): the Charts view, the Council workspace and the
+   trade dialog. Display only. Colours come from the --au- tokens (defined in the first style block), each with the older variable
+   as its fallback, through the local --wa- names below; no hex here. Badge inks stay the page's ink tokens. Every size >= 12 px. */
+#v-charts, #v-council, #ms-tv, #ms-ind {
+  --wa-surface: var(--au-surface, var(--panel)); --wa-surface-2: var(--au-surface-2, var(--panel-raised)); --wa-well: var(--au-well, var(--panel-raised));
+  --wa-line: var(--au-line, var(--line)); --wa-line-strong: var(--au-line-strong, var(--line-strong));
+  --wa-ink: var(--au-ink, var(--ink)); --wa-ink-2: var(--au-ink-2, var(--ink-dim)); --wa-ink-3: var(--au-ink-3, var(--ink-faint));
+  --wa-accent: var(--au-accent, var(--accent)); --wa-primary: var(--au-primary, var(--ink)); --wa-on-primary: var(--au-on-primary, var(--bg));
+  --wa-ui: var(--au-font-ui, var(--sans));
+  /* the Charts chrome's own tokens (Charts chrome polish, 7 Nov) re-pointed: neutral selected state, no gold ring */
+  --cx-r: 8px; --cx-hover: var(--wa-surface-2); --cx-line: var(--wa-line-strong); --cx-line2: var(--wa-line-strong);
+  --cx-on-bg: var(--wa-surface-2); --cx-on-ring: var(--wa-line-strong); --cx-focus: var(--wa-accent);
+}
+:root[data-theme="light"] :is(#v-charts, #ms-ind) { --cx-on-bg: var(--wa-surface-2); --cx-on-ring: var(--wa-line-strong); }
+
+/* page headers: one weight-650 sans title, tight tracking */
+#v-council .c-head .h-head, #v-charts .sec-h > h2 { font-family: var(--wa-ui); font-weight: 650; letter-spacing: -0.02em; color: var(--wa-ink); }
+#v-charts .kbd-hint { color: var(--wa-ink-3); }
+
+/* cards: flat, 12 px radius, 1 px hairline, a whisper of shadow */
+#v-council .card, #v-charts .ms-pane { background: var(--wa-surface); border: 1px solid var(--wa-line); border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+:root[data-theme="light"] :is(#v-council .card, #v-charts .ms-pane) { box-shadow: 0 1px 2px rgba(20,24,30,.06); }
+#v-council .card .card { box-shadow: none; }
+#v-council .card > .ms-k { font-family: var(--wa-ui); font-weight: 600; color: var(--wa-ink); }
+#v-council .ms-k .k-sub { color: var(--wa-ink-3); font-weight: 500; }
+#v-council .ms-note { color: var(--wa-ink-2); }
+
+/* section bar: navigation, so the active tab gets surface-2 and a 2 px accent indicator */
+@media (min-width: 701px) {
+  #v-council .c-nav { border-bottom-color: var(--wa-line) !important; }
+  #v-council .c-nav > button { color: var(--wa-ink-2) !important; border-radius: 8px 8px 0 0 !important; }
+  #v-council .c-nav > button[aria-selected="true"] { color: var(--wa-ink) !important; background: var(--wa-surface-2) !important; font-weight: 600; }
+  #v-council .c-nav > button::after { background: var(--wa-accent); height: 2px; }
+}
+@media (max-width: 700px) { #v-council .c-nav button[aria-selected="true"] { background: var(--wa-surface-2); box-shadow: inset 0 -2px 0 var(--wa-accent); color: var(--wa-ink); } }
+#v-council .c-nav-n { background: color-mix(in srgb, var(--wa-accent) 16%, transparent); color: var(--wa-ink); }
+
+/* segmented filters (calendar, loss review, scoreboard, edge finder, macro, week): one neutral selected state */
+#v-council :is(.seg, .cal-seg, .sb-seg, .edge-by, .md-seg) button.on,
+#v-council :is(.seg, .cal-seg, .sb-seg, .edge-by, .md-seg) button[aria-pressed="true"],
+#v-council .md-seg button[aria-selected="true"], #v-council #ms-c-tabs button[aria-selected="true"] {
+  background: var(--wa-surface-2); color: var(--wa-ink); box-shadow: inset 0 0 0 1px var(--wa-line-strong); border-color: var(--wa-line-strong); font-weight: 600; }
+#v-council .edge-by button[aria-pressed="false"], #v-council .cal-seg button:not(.on) { color: var(--wa-ink-2); }
+
+/* tables: quiet header, hairline rows, tabular figures */
+#v-council :is(table, .c-kpi, .cal) { font-variant-numeric: tabular-nums; }
+#v-council :is(.c-t, .edge-t, .sb-t, .dc-t, .ex-t, .bk-t, .fw-t, .ea-tb) thead th { color: var(--wa-ink-3); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--wa-line); }
+#v-council :is(.c-t, .edge-t, .sb-t, .dc-t, .ex-t, .bk-t, .fw-t, .ea-tb) td { border-bottom-color: var(--wa-line); }
+#v-council .t-scroll .c-t thead th { position: sticky; top: 0; z-index: 2; background: var(--wa-surface); }
+
+/* KPI tiles and wells */
+#v-council .c-kpi > div, #v-council .c-kpi .k { background: var(--wa-well); border-color: var(--wa-line); }
+
+/* buttons in the panes: secondary (hairline) by default; quiet links in the accent */
+#v-council :is(.ms-tbtn, .loss-sync button, .cal-nav button, .cal-dayh button) { background: transparent; border: 1px solid var(--wa-line-strong); color: var(--wa-ink); border-radius: 8px; }
+#v-council :is(a.c-link, .c-sb .sb-sum a, .sb-t .sb-ask a, .md-full, .fw-foot a, .ps-more) { color: var(--wa-accent); }
+#v-council .c-how > summary, #v-council details > summary { color: var(--wa-ink-2); }
+
+/* focus: 2 px accent ring, 2 px offset, on every control of the three areas */
+:is(#v-charts, #v-council, #ms-tv) :is(button, a, select, input, summary, [tabindex]):focus-visible { outline: 2px solid var(--wa-accent); outline-offset: 2px; }
+
+/* Charts: Style joins Indicators on the right (filters left, tools right); panes as flat cards; chart chrome neutral */
+#v-charts .sec-h > .sty { order: 4; margin-left: auto; }
+#v-charts .sec-h > .ind-open { margin-left: 0; }
+#v-charts .sty-btn, #v-charts .ind-open { background: transparent; border: 1px solid var(--wa-line-strong); color: var(--wa-ink); border-radius: 8px; }
+#v-charts .sty-pop { background: var(--wa-surface); border-color: var(--wa-line-strong); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+#v-charts .sty-seg button.on, #ms-sty-clean[aria-pressed="true"] { background: var(--wa-surface-2); color: var(--wa-ink); border-color: var(--wa-line-strong); box-shadow: inset 0 0 0 1px var(--wa-line-strong); }
+#v-charts .wl a[aria-current], #v-charts .wl a.on { border-color: var(--wa-accent); }
+#v-charts .ms-ph { border-bottom: 1px solid var(--wa-line); }
+#v-charts .ms-ph b { color: var(--wa-ink); }
+#v-charts .ms-legend { color: var(--wa-ink-3); }
+@media (min-width: 701px) { #v-charts .sec-h > .mk-mode::before { background: var(--wa-line); } }
+html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: var(--wa-surface-2); box-shadow: inset 0 0 0 1px var(--wa-line-strong); }
+
+/* trade dialog: a 16 px radius sheet on the surface, the title as a card title, neutral selected pills */
+#ms-tv { background: var(--wa-surface); color: var(--wa-ink); border: 1px solid var(--wa-line-strong); border-radius: 16px; }
+#ms-tv :is(h2, h3, .tv-t, #ms-tv-t) { font-family: var(--wa-ui); font-weight: 600; letter-spacing: -0.01em; }
+#ms-tv .tv-tf button.on, #ms-tv .tv-tf button[aria-pressed="true"], #ms-tv button.on { background: var(--wa-surface-2); color: var(--wa-ink); box-shadow: inset 0 0 0 1px var(--wa-line-strong); }
+#ms-tv a { color: var(--wa-accent); }
+
+@media (prefers-reduced-motion: reduce) { #v-council .c-nav > button::after, :is(#v-charts, #v-council, #ms-tv) * { transition-duration: 0s; } }
 </style>
 <style id="ms-sz-css">
 /* Setup, Scanner, Crypto and LIT: no text under 12 px, 44 px touch targets (15 Nov 2026, the open item of the 12 Nov sweep).
@@ -6636,6 +6719,11 @@ function msNextSetup(bars, A) {
     midnight: { bg: '#0b1430', bgTop: '#101c3d', text: '#9aa8cb', grid: '#121e3d', border: '#22335c' },
     pro: { bg: '#11110f', bgTop: '#171715', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
+  // graphite look (17 Nov 2026, docs/design/aureum-theme.md): when the page defines the --au- tokens the chart canvas takes its
+  // background (--au-surface), text (--au-ink-3) and grid / borders (--au-line) from them; without them the table above stands.
+  // Candle colours are not touched.
+  const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => cs.getPropertyValue(n).trim(), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
+    if (bg && tx && ln && THEMES[k]) Object.assign(THEMES[k], { bg, bgTop: bg, text: tx, grid: ln, border: ln }); } catch (e) {} };
   const UPC = '#089981', DNC = '#f23645';
   // chart colours chosen by the member (12 Nov 2026, owner: "let me choose colour background and candle"; Style → Colours):
   // localStorage ms-colors { bg, up, dn, ln }; a missing key keeps the theme's own colour
@@ -8603,6 +8691,7 @@ function msNextSetup(bars, A) {
     try { localStorage.setItem('msPrefs', JSON.stringify({ theme: document.documentElement.dataset.themeAuto ? undefined : G.theme, show: G.show, risk: G.risk, alerts: G.alerts })); } catch (e) {}
   }
   function applyTheme() {
+    document.documentElement.dataset.theme = G.theme; auChart(G.theme);
     const t = THEMES[G.theme];
     Object.values(panes).forEach((p) => {
       p.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
@@ -8763,14 +8852,14 @@ function msNextSetup(bars, A) {
   // 8 Nov (owner: "the more u click ict or meridian he just loads more"): one markup at a time, and Clean = candles only
   function setMode(m) { if (PUB) m = 'clean'; G.mode = m === 'ict' || m === 'clean' ? m : 'meridian'; try { if (!PUB) localStorage.setItem('ms-mode', G.mode); } catch (e) {}
     document.documentElement.dataset.mk = G.mode;
-    document.querySelectorAll('[data-mk]').forEach((b) => { if (b.tagName !== 'BUTTON') return; const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    document.querySelectorAll('.mk-mode [data-mk]').forEach((b) => { if (b.tagName !== 'BUTTON') return; const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     Object.values(panes).forEach((P) => { if (P.setMode && P.bars) P.setMode(G.mode); });
     try { councilLines(); councilMarkers(); } catch (e) {} ictStrip(); if (window.msSplitMarkup) window.msSplitMarkup(); window.msTrack && msTrack('Chart markup', { mode: G.mode }); }
-  document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('button[data-mk]'); if (!b) return;
+  document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('.mk-mode button[data-mk]'); if (!b) return;
     if (PUB && b.dataset.mk !== 'clean') { if (window.msGate) msGate(true); window.msTrack && msTrack('Locked markup', { mode: b.dataset.mk }); return; }   // members only: the sign-in opens
     setMode(b.dataset.mk); });
   document.documentElement.dataset.mk = G.mode;
-  setTimeout(() => { if (G.mode !== 'meridian') setMode(G.mode); else document.querySelectorAll('button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
+  setTimeout(() => { if (G.mode !== 'meridian') setMode(G.mode); else document.querySelectorAll('.mk-mode button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
   setInterval(() => { if (G.mode === 'ict' && !document.hidden) ictStrip(); }, 120e3);
   // split layout (7 Nov, owner: "let people put 2 chart screens side by side" with TradingView-style sync settings)
   // left = one of the analysed timeframe charts; right = a free chart (any market, any timeframe), synced by the toggles
