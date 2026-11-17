@@ -7,6 +7,8 @@
   "compatibility_flags": ["nodejs_compat"],
   // keep the plain-text variables set in the dashboard (Settings -> Variables and Secrets) on every deploy (17 Nov 2026)
   "keep_vars": true,
+  // email from the site's domain (17 Nov 2026, owner onboarded aureumdesk.co.uk for Email Sending): sign-up, approval and reset emails
+  "send_email": [{ "name": "EMAIL" }],
   "assets": {
     "directory": "../out",
     "binding": "ASSETS",
