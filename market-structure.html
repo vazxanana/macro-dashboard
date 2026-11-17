@@ -2630,6 +2630,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm"><b>Aureum</b><small>Desk</small></span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in to the desk</h1>
     <p class="gate-sub">Your password opens your own account.</p>
+    <p class="gate-ban" id="ms-gate-ban" role="status" hidden></p>
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
     <form id="ms-gate-f" method="post" action="#" novalidate>
       <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
@@ -2641,7 +2642,47 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </form>
     <div class="gate-or"><span>or look around first</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest"><span>Continue as guest</span><small>Live gold chart, the trade and results</small></button>
-    <p class="gate-note"><b>Want a seat at the desk?</b> Seats are by invitation: ask the owner for a password.</p>
+    <p class="gate-links"><button type="button" class="gate-lk" id="ms-gate-su" aria-controls="ms-gp-su">Create an account</button><button type="button" class="gate-lk" id="ms-gate-fg" aria-controls="ms-gp-fg">Forgot password?</button></p>
+    <p class="gate-note"><b>Want a seat at the desk?</b> Create an account and confirm your email: the owner approves every seat.</p>
+    <!-- sign-up, forgotten password and a new password from an email link (17 Nov 2026, api/signup.js): they take the card's place
+         while one is open (.gate-card[data-panel]); nothing typed here is stored in the browser -->
+    <section class="gate-panel" id="ms-gp-su" data-p="su" aria-labelledby="ms-gp-su-t" hidden>
+      <h2 id="ms-gp-su-t">Create an account</h2>
+      <p class="gate-sub">Confirm your email, then the owner approves your seat.</p>
+      <form id="ms-gp-su-f" novalidate>
+        <label for="ms-su-n">Name</label><input id="ms-su-n" name="name" autocomplete="nickname" maxlength="24" required>
+        <label for="ms-su-e">Email</label><input id="ms-su-e" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required>
+        <label for="ms-su-p">Password</label><input id="ms-su-p" name="new-password" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="200" required aria-describedby="ms-su-msg">
+        <div class="gate-msg" id="ms-su-msg"><p class="gate-help">At least 10 characters. Your password opens your account, so choose your own.</p><p class="gate-err" role="alert"></p></div>
+        <button type="submit" class="gate-go"><span class="gate-go-t">Create account</span></button>
+      </form>
+      <p class="gate-done" role="status" hidden></p>
+      <button type="button" class="gate-lk gate-back">Back to sign in</button>
+    </section>
+    <section class="gate-panel" id="ms-gp-fg" data-p="fg" aria-labelledby="ms-gp-fg-t" hidden>
+      <h2 id="ms-gp-fg-t">Forgot your password?</h2>
+      <p class="gate-sub">Type the email of your account and we send a link to choose a new one.</p>
+      <form id="ms-gp-fg-f" novalidate>
+        <label for="ms-fg-e">Email</label><input id="ms-fg-e" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required aria-describedby="ms-fg-msg">
+        <div class="gate-msg" id="ms-fg-msg"><p class="gate-help">Accounts made by the owner have no email: ask the owner instead.</p><p class="gate-err" role="alert"></p></div>
+        <button type="submit" class="gate-go"><span class="gate-go-t">Send the link</span></button>
+      </form>
+      <p class="gate-done" role="status" hidden></p>
+      <button type="button" class="gate-lk gate-back">Back to sign in</button>
+    </section>
+    <section class="gate-panel" id="ms-gp-rs" data-p="rs" aria-labelledby="ms-gp-rs-t" hidden>
+      <h2 id="ms-gp-rs-t">Choose a new password</h2>
+      <p class="gate-sub">It replaces your old one, and every device signed in with the old one is signed out.</p>
+      <form id="ms-gp-rs-f" novalidate>
+        <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
+        <label for="ms-rs-p">New password</label><input id="ms-rs-p" name="new-password" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="200" required>
+        <label for="ms-rs-p2">Type it again</label><input id="ms-rs-p2" name="confirm" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="200" required aria-describedby="ms-rs-msg">
+        <div class="gate-msg" id="ms-rs-msg"><p class="gate-help">At least 10 characters.</p><p class="gate-err" role="alert"></p></div>
+        <button type="submit" class="gate-go"><span class="gate-go-t">Save the new password</span></button>
+      </form>
+      <p class="gate-done" role="status" hidden></p>
+      <button type="button" class="gate-lk gate-back">Back to sign in</button>
+    </section>
     <p class="gate-foot"><span class="gate-sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Checked on the server · private session</span><span>Paper trading · not financial advice</span></p>
   </div>
   </div>
@@ -2878,6 +2919,90 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     }); }
   sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
   window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
+})();
+</script>
+<script id="ms-su-js">
+// Sign-up, forgotten password and a new password from an email link (17 Nov 2026, api/signup.js). The three forms take the
+// sign-in card's place while one is open (.gate-card[data-panel]). Nothing typed here is kept in the browser: the reset token is
+// read from the address and the address is cleaned at once; passwords and tokens go to the server only.
+(function () {
+  var card = document.querySelector('.gate-card'); if (!card) return;
+  var $ = function (id) { return document.getElementById(id); }, opener = null, resetTok = null, OPEN = null;
+  var NAMES = { su: 'ms-gp-su', fg: 'ms-gp-fg', rs: 'ms-gp-rs' };
+  // the link of a reset email: #reset=<token> (the address is cleaned before anything else reads it)
+  try { var m = /^#reset=([A-Za-z0-9_-]{40,60})$/.exec(location.hash); if (m) { resetTok = m[1]; history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
+  var sp = null; try { sp = new URLSearchParams(location.search).get('signup'); if (sp) { var u = new URL(location.href); u.searchParams.delete('signup'); history.replaceState(null, '', u.pathname + u.search + u.hash); } } catch (e) {}
+  function panel(p) { return $(NAMES[p]); }
+  function reset(P) { var f = P.querySelector('form'), d = P.querySelector('.gate-done'), e = P.querySelector('.gate-err'); if (f) f.hidden = false; if (d) { d.hidden = true; d.textContent = ''; } if (e) e.textContent = '';
+    P.querySelectorAll('input').forEach(function (i) { i.removeAttribute('aria-invalid'); }); }
+  function done(P, t) { var f = P.querySelector('form'), d = P.querySelector('.gate-done'); if (f) f.hidden = true; if (d) { d.textContent = t; d.hidden = false; } var b = P.querySelector('.gate-back'); if (b) b.focus(); }
+  function show(p, from) {
+    opener = from || document.activeElement; card.dataset.panel = p;
+    Object.keys(NAMES).forEach(function (k) { var P = panel(k); if (P) P.hidden = k !== p; });
+    var P = panel(p); reset(P);
+    if (!window.MS_API) { done(P, 'Sign-ups and password emails work on aureumdesk.co.uk only.'); return; }
+    var first = P.querySelector('input:not(.gate-user)'); setTimeout(function () { if (first && !P.querySelector('form').hidden) first.focus(); }, 30);
+    if (p !== 'rs') status().then(function (o) { if (o === false && card.dataset.panel === p) done(P, p === 'su' ? 'Sign-ups are not open yet.' : 'Password reset by email is not open yet. Ask the owner for a new password.'); });
+  }
+  function back() { delete card.dataset.panel; Object.keys(NAMES).forEach(function (k) { var P = panel(k); if (P) P.hidden = true; });
+    var t = opener && document.contains(opener) && !opener.closest('.gate-panel') ? opener : $('ms-gate-p'); opener = null; if (t) setTimeout(function () { t.focus(); }, 0); }
+  function status() { if (OPEN !== null) return Promise.resolve(OPEN);
+    return fetch(window.MS_API + 'signup', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && typeof j.open === 'boolean') OPEN = j.open; return OPEN; }).catch(function () { return null; }); }
+  async function post(body) {
+    var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 20000);
+    try { r = await fetch(window.MS_API + 'signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify(body), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
+    clearTimeout(tm);
+    if (!r) return { err: timedOut ? 'The server took too long to answer. Try again.' : navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.' };
+    if (r.ok) return { ok: j };
+    if (r.status === 429) return { err: (j && j.error) || 'Too many tries. Wait a few minutes, then try again.' };
+    if (r.status >= 500 && !(j && j.error)) return { err: 'This is unavailable right now. Try again in a minute.' };
+    return { err: (j && j.error) || 'That did not work. Check what you typed and try again.' };
+  }
+  // one submit pattern for the three forms: check, busy button, the answer in words
+  function wire(p, check, body, ok) {
+    var P = panel(p); if (!P) return; var f = P.querySelector('form'), err = P.querySelector('.gate-err'), btn = f.querySelector('.gate-go'), lab = btn.querySelector('.gate-go-t'), idle = lab.textContent;
+    var fail = function (msg, el) { err.textContent = msg; if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); } };
+    f.addEventListener('input', function (ev) { if (ev.target.removeAttribute) ev.target.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
+    f.addEventListener('submit', async function (ev) { ev.preventDefault(); if (btn.getAttribute('aria-busy') === 'true') return; err.textContent = '';
+      var c = check(); if (c) { fail(c[0], c[1]); return; }
+      btn.setAttribute('aria-busy', 'true'); btn.disabled = true; lab.textContent = 'Sending…';
+      var a = await post(body());
+      btn.removeAttribute('aria-busy'); btn.disabled = false; lab.textContent = idle;
+      if (a.err) { fail(a.err); return; }
+      f.reset(); done(P, ok(a.ok));
+    });
+  }
+  var EM = /^[^\s@<>()",;:\\[\]]+@[^\s@<>()",;:\\[\]]+\.[A-Za-z]{2,24}$/;
+  wire('su', function () { var n = $('ms-su-n'), e = $('ms-su-e'), w = $('ms-su-p');
+      if (!n.value.trim()) return ['Type the name the desk should call you.', n]; if (n.value.trim().length > 24) return ['Use a name of up to 24 characters.', n];
+      if (!EM.test(e.value.trim())) return ['Type a valid email address.', e]; if (w.value.length < 10) return ['Use a password of at least 10 characters.', w]; return null; },
+    function () { return { name: $('ms-su-n').value.trim(), email: $('ms-su-e').value.trim(), password: $('ms-su-p').value }; },
+    function (j) { return (j && j.message) || 'Check your email for a link to confirm it.'; });
+  wire('fg', function () { var e = $('ms-fg-e'); return EM.test(e.value.trim()) ? null : ['Type the email address of your account.', e]; },
+    function () { return { forgot: $('ms-fg-e').value.trim() }; },
+    function (j) { return (j && j.message) || 'If that email belongs to an account, a link is on its way.'; });
+  wire('rs', function () { var a = $('ms-rs-p'), b = $('ms-rs-p2'); if (!resetTok) return ['This page has no reset link any more. Ask for a new one.', null];
+      if (a.value.length < 10) return ['Use a password of at least 10 characters.', a]; if (a.value !== b.value) return ['The two passwords are not the same.', b]; return null; },
+    function () { return { reset: resetTok, password: $('ms-rs-p').value }; },
+    function (j) { resetTok = null; return (j && j.message) || 'Password changed. Sign in with your new password.'; });
+  var su = $('ms-gate-su'), fg = $('ms-gate-fg');
+  if (su) su.addEventListener('click', function () { show('su', su); });
+  if (fg) fg.addEventListener('click', function () { show('fg', fg); });
+  card.querySelectorAll('.gate-back').forEach(function (b) { b.addEventListener('click', back); });
+  card.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && card.dataset.panel) { ev.stopPropagation(); back(); } });
+  function ban(t, bad) { var b = $('ms-gate-ban'); if (!b) return; b.textContent = t; b.classList.toggle('bad', !!bad); b.hidden = false; }
+  // an email link brings the card up whatever the page was doing
+  function arrive() {
+    if ((sp || resetTok) && !document.documentElement.dataset.gate && window.msGate) msGate(true);
+    if (sp === 'verified') ban('Email confirmed. The owner will approve your seat; you can sign in once approved.');
+    else if (sp === 'expired') ban('That link has expired or was already used. Create the account again to get a new one.', true);
+    if (resetTok) setTimeout(function () { show('rs'); }, 40);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrive, { once: true }); else arrive();
+  // the same link opened in a tab already on this page arrives as a hash change (the view router never sees it: capture phase)
+  addEventListener('hashchange', function (ev) { var h = /^#reset=([A-Za-z0-9_-]{40,60})$/.exec(location.hash); if (!h) return; ev.stopImmediatePropagation(); resetTok = h[1];
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} sp = null; arrive(); }, true);
+  window.msSignupPanel = show;   // for the audit's screenshots
 })();
 </script>
 <script>
@@ -3544,6 +3669,12 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 
   <section class="view own adm" id="v-users" aria-label="Users" hidden>
     <div class="v-head"><h1 class="h-head">Users</h1><p class="ms-note">Who can sign in and what they see. Changes are saved on the server and apply on every device straight away.</p></div>
+    <div class="card u-card u-wait" id="ms-u-wait-card">
+      <div class="ms-k"><span>Waiting for your approval</span><small id="ms-u-wait-n"></small></div>
+      <p class="ms-note">People who created an account and confirmed their email. Approve gives them a seat with the access you pick (they sign in with the password they chose and get an email); Refuse removes the request.</p>
+      <ul class="u-wait-l" id="ms-u-wait"><li class="empty">Loading…</li></ul>
+      <p id="ms-u-wait-msg" class="ms-note" role="status"></p>
+    </div>
     <div class="card u-card">
       <div class="ms-k"><span>Accounts</span><small id="ms-u-sync"></small></div>
       <div class="ms-bt-wrap"><table class="ms-bt-t c-t u-t"><thead><tr><th>Name</th><th>Access</th><th>Password</th><th class="n">Actions</th></tr></thead><tbody id="ms-u-body"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
@@ -8176,6 +8307,38 @@ function msNextSetup(bars, A) {
     finally { US.busy = false; }
   }
   window.renderUsers = (...a) => renderUsers(...a);
+  // ─── Sign-ups waiting for the owner (17 Nov 2026, api/signup.js): verified requests, approve with a role or refuse ───
+  async function renderSignups() {
+    const ul = document.getElementById('ms-u-wait'), n = document.getElementById('ms-u-wait-n'), msg = document.getElementById('ms-u-wait-msg'); if (!ul || document.documentElement.dataset.role !== 'owner') return;
+    if (!window.MS_API) { ul.innerHTML = '<li class="empty">Sign-ups are handled on aureumdesk.co.uk.</li>'; return; }
+    const r = await fetch(window.MS_API + 'signup?list=1', { cache: 'no-store', credentials: 'same-origin' }).catch(() => null);
+    const j = r && r.ok ? await r.json().catch(() => null) : null;
+    if (!j || !Array.isArray(j.items)) { ul.innerHTML = `<li class="empty">${!r ? (navigator.onLine === false ? 'You are offline: the requests could not be read.' : 'The server could not be reached: the requests could not be read.') : r.status === 401 || r.status === 403 ? 'Your owner session has ended. Sign in again to see the requests.' : `The requests could not be read (error ${r.status}). Try again in a minute.`}</li>`; if (n) n.textContent = ''; return; }
+    if (n) n.textContent = j.items.length ? `${j.items.length} waiting` : '';
+    const when = (iso) => { const d = new Date(iso); return isFinite(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
+    ul.innerHTML = j.items.length ? j.items.map((x) => `<li class="u-wait-i" data-id="${esc(x.id)}"><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(x.name || '?').trim().charAt(0).toUpperCase())}</span><span><b>${esc(x.name)}</b><small>${esc(x.email)} · confirmed ${esc(when(x.verifiedAt))}</small></span></span>`
+      + `<span class="u-wait-a"><select data-act="role" aria-label="Access for ${esc(x.name)}"><option value="viewer">Viewer</option><option value="reviewer">Reviewer</option></select><button type="button" class="u-btn" data-act="approve">Approve</button><button type="button" class="u-del" data-act="refuse">Refuse</button></span></li>`).join('')
+      : '<li class="empty">No one is waiting.</li>';
+    if (msg && !msg.dataset.keep) msg.textContent = ''; if (msg) delete msg.dataset.keep;
+  }
+  window.renderSignups = renderSignups;
+  { const ul = document.getElementById('ms-u-wait');
+    if (ul) ul.addEventListener('click', async (ev) => {
+      const b = ev.target.closest('button[data-act]'); if (!b || b.disabled) return; const li = b.closest('li'), id = li.dataset.id, name = li.querySelector('b').textContent, msg = document.getElementById('ms-u-wait-msg');
+      const approve = b.dataset.act === 'approve', role = li.querySelector('select').value;
+      if (!approve && !(await msConfirm(`Refuse ${name}'s request? It is removed; they can sign up again later.`, { title: 'Refuse the request', ok: 'Refuse', danger: true }))) return;
+      li.querySelectorAll('button, select').forEach((x) => { x.disabled = true; }); if (msg) msg.textContent = approve ? `Approving ${name}…` : `Refusing ${name}…`;
+      const r = await fetch(window.MS_API + 'signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(approve ? { approve: id, role } : { refuse: id }) }).catch(() => null);
+      const j = r ? await r.json().catch(() => ({})) : {};
+      let t;
+      if (!r) t = navigator.onLine === false ? 'Not saved: you are offline. Connect and try again.' : 'Not saved: the server could not be reached. Check your connection and try again.';
+      else if (r.status === 401 || r.status === 403) t = 'Not saved: your owner session has ended. Sign in again and retry.';
+      else if (!r.ok) t = `Not saved: ${j.error || `server error ${r.status}. Nothing was changed; try again in a minute.`}`;
+      else t = approve ? `${name} has a seat as ${role === 'reviewer' ? 'a reviewer' : 'a viewer'}${j.emailed ? ' and was told by email' : ' (the email to tell them could not be sent: tell them yourself)'}.` : `${name}'s request was removed.`;
+      if (msg) { msg.textContent = t; msg.dataset.keep = '1'; }
+      await renderSignups(); if (approve && r && r.ok) renderUsers();
+      if (!r || !r.ok) { if (window.msAlert) await window.msAlert(t.replace(/^Not saved: /, '').replace(/^./, (c) => c.toUpperCase()), { title: 'Not saved' }); }
+    }); }
   const uKey = (n) => n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
   // per-member permissions (owner, 8 Nov): what each member can see and do, saved on the user record as `perms`
   const PERM_LABEL = { charts: 'Charts (every market)', scanner: 'Scanner', desks: 'Desks: Mosha', council: 'Council: every tab (off = overview only)', macro: 'Macro desk', ct: 'Demo accounts\' results (labels only)', mcp: 'ChatGPT connector on the profile' };
@@ -8216,7 +8379,7 @@ function msNextSetup(bars, A) {
     const row = [...body.rows].find((r) => r.dataset.u === fk[0]), t = (row && (row.querySelector(`[data-act="${fk[1]}"]`) || row.querySelector('button, select'))) || body.querySelector('button, select') || document.getElementById('ms-u-name'); if (t) t.focus({ preventScroll: true }); }
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
-    if (!skipFetch) US.remote = await window.msFetchUsers();
+    if (!skipFetch) { renderSignups(); US.remote = await window.msFetchUsers(); }
     const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on aureumdesk.co.uk';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     // keyboard focus survives the redraw (11 Nov): it fell back to the top of the page after every save
@@ -10732,6 +10895,15 @@ html[data-role="public"] .hdr-sw { display: none; }
 @media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-side { position: static; } }
 </style>
 <style id="ms-acct-css">
+/* Users page: sign-ups waiting for the owner (17 Nov 2026) */
+.u-wait-l { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.u-wait-l .empty { color: var(--ink-dim); font-size: 13px; padding: 6px 0; }
+.u-wait-i { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.u-wait-i .u-who > span:last-child { display: grid; min-width: 0; } .u-wait-i small { color: var(--ink-dim); font-size: 12px; overflow-wrap: anywhere; }
+.u-wait-a { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.u-wait-a .u-del { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--sell-ink, var(--sell)); font: 500 13px var(--sans); cursor: pointer; }
+.u-wait-a select, .u-wait-a button { min-height: 36px; font-size: 13px; }
+@media (pointer: coarse) { .u-wait-a select, .u-wait-a button { min-height: 44px; } }
 /* ── Account surfaces, quality pass (11 Nov 2026): Profile, Users, account menu, Settings, price alerts, the bell, the palette.
    Shape only. (1) On a phone the Settings menu hung from its button and lost 68 px off the left edge: it now spans the screen
    under the header and ends above the tab bar. (2) No text under 12 px. (3) On touch every control is at least 44 px. ── */
@@ -13857,7 +14029,36 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
   html[data-gate] .gate-go { order: 8; margin-top: auto !important; min-height: 54px; border-radius: 999px !important; font-size: 16px; }
   html[data-gate] .gate-foot { order: 9; margin: 14px 0 0 !important; padding: 0 !important; border: 0 !important; background: none !important; align-items: center !important; }
   html[data-gate] .gate-side { padding: 0 16px; }
+  html[data-gate] .gate-ban { order: 2; text-align: left; }
+  html[data-gate] .gate-links { order: 6; margin: 14px 0 0 !important; }
+  html[data-gate] .gate-panel { order: 1; text-align: left; display: flex; flex-direction: column; flex: 1 0 auto; }
+  html[data-gate] .gate-panel form { display: flex !important; flex-direction: column; gap: 8px; flex: 1 0 auto; }
+  html[data-gate] .gate-panel input { min-height: 54px; border-radius: 14px !important; font-size: 16px; }
+  html[data-gate] .gate-panel .gate-go { margin-top: auto !important; }
+  html[data-gate] .gate-panel .gate-back { align-self: center; margin-top: 10px; }
+  html[data-gate] .gate-panel > * { order: 0; } html[data-gate] .gate-panel .gate-sub { margin: 0 0 20px !important; }
+  html[data-gate] .gate-panel form[hidden] { display: none !important; }
 }
+/* Sign-up, forgotten password, new password (17 Nov 2026, api/signup.js): quiet centred links under the guest choice; a panel takes
+   the card's place while it is open. Same dark palette as the card (AA on #121315 / the card colour), 44 px targets, 12 px or more. */
+.gate-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 12px 0 0; }
+.gate-lk { min-height: 44px; padding: 0 8px; border: 0; background: none; color: #9db4d3; font: 500 14px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; border-radius: 8px; }
+.gate-lk:hover { color: #c3d3e8; text-decoration: underline; text-underline-offset: 3px; }
+.gate-lk:focus-visible { outline: 2px solid #9db4d3; outline-offset: 2px; }
+.gate-card[data-panel] > :not(.gate-brand):not(.gate-panel) { display: none !important; }
+.gate-panel[hidden] { display: none !important; }
+.gate-panel h2 { margin: 0 0 6px; font: 650 22px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.02em; color: var(--g-ink); }
+.gate-panel .gate-sub { margin: 0 0 16px; }
+.gate-panel form { display: grid; gap: 8px; }
+.gate-panel form[hidden] { display: none !important; }
+.gate-panel input { width: 100%; box-sizing: border-box; font-size: 16px; }
+.gate-panel .gate-msg { min-height: 0; margin-bottom: 4px; }
+.gate-panel .gate-back { display: block; margin: 10px auto 0; }
+.gate-done { margin: 4px 0 0; padding: 12px 14px; border-radius: 12px; background: rgba(157,180,211,.10); border: 1px solid rgba(157,180,211,.28); color: var(--g-ink); font: 500 14px/1.5 Figtree, -apple-system, sans-serif; text-wrap: pretty; }
+.gate-done[hidden] { display: none !important; }
+.gate-ban { margin: -6px 0 16px; padding: 10px 12px; border-radius: 10px; background: rgba(157,180,211,.10); border: 1px solid rgba(157,180,211,.28); color: var(--g-ink); font: 500 13.5px/1.45 Figtree, -apple-system, sans-serif; }
+.gate-ban.bad { background: rgba(242,133,126,.10); border-color: rgba(242,133,126,.35); }
+.gate-ban[hidden] { display: none !important; }
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked

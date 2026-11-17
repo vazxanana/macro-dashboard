@@ -26,17 +26,19 @@ import mosha from '../../api/mosha.js';
 import notify from '../../api/notify.js';
 import passkey from '../../api/passkey.js';
 import profile from '../../api/profile.js';
+import signup from '../../api/signup.js';
 import sounds from '../../api/sounds.js';
 import status from '../../api/status.js';
 import stream from '../../api/stream.js';
 import tradeReview from '../../api/trade-review.js';
 import users from '../../api/users.js';
+import { connect } from 'cloudflare:sockets';
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, bars, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, data,
   'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
-  profile, sounds, status, stream, 'trade-review': tradeReview, users,
+  profile, signup, sounds, status, stream, 'trade-review': tradeReview, users,
 };
 
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.
@@ -45,6 +47,11 @@ export const CRONS = { '*/10 * * * *': '/api/edge-analyst?job=scan' };
 // Jobs run after a cron's own job, with the same secret (no new trigger: the plan's cron count stays). The trade reviewer
 // (17 Nov 2026) asks the language model at most once every 12 hours, and only for a new council-data reading.
 export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };
+
+// Sign-up emails (17 Nov 2026): the handler cannot import the Worker's socket module (Node tests load api/), so it is handed in
+// here; the Email Service binding (env.EMAIL, a `send_email` binding) lives on the Worker's env, not process.env, and is handed
+// in on each request. Without either, or without their settings, sign-ups answer 503.
+signup.useSmtp(connect);
 
 const SECURITY = headersFor(vercel.headers, new URL('https://x/'));
 
@@ -66,6 +73,7 @@ async function asset(request, url, env) {
 }
 
 export async function handle(request, env, ctx) {
+  signup.useMail(env && env.EMAIL);
   const orig = new URL(request.url);
   if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS' && !orig.pathname.startsWith('/api/'))
     return new Response('Method not allowed', { status: 405 });

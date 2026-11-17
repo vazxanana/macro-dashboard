@@ -122,6 +122,45 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## Sign-up, email verification and password reset (17 Nov 2026, owner: 'do 2')
+People create their own account, confirm their email by a link, and the owner approves them; a member with an email can reset a
+forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) shape, routed in `cloudflare/src/worker.mjs`):
+- `POST { name, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
+  limit; name 1-24, email shape and <= 254, password >= 10. **A password picks the account**, so one already used by the owner, a
+  member or another request is refused with the neutral "Choose another password." and that refusal counts as a failed password
+  check (`G.failed`: it would otherwise test passwords). The answer is the SAME for a new, a pending, a confirmed and a member's
+  email (one link per email per 10 minutes). Pending record in the private store `signups/pending.json` (`{ id, name, email
+  lowercased, hash: sha256(password), tokenHash, at, exp 24 h, verified }`, at most 200; written in place, so read with
+  `?cache=0`). Token = 32 random bytes; only its sha256 is stored. Link `<origin>/api/signup?verify=<token>` (origin = the request's
+  host when it is aureumdesk.co.uk / www / the workers.dev host / localhost, else aureumdesk.co.uk).
+- `GET ?verify=`: once, within 24 h -> 302 `/market-structure.html?signup=verified` (else `?signup=expired`); the owner gets an
+  email naming the person (to `OWNER_EMAIL`, else `GMAIL_USER`). The desk's bell has no owner-only items, so nothing goes there.
+- Owner session only: `GET ?list=1` (confirmed requests: name, email, times; no hashes), `POST { approve: id, role }` (adds the
+  account to the stored user list exactly as the Users page saves it: `users.js` `clean` + `saveList`, key from the name, made
+  unique, record `{ name, role, hash, email }`; the person gets "Your seat … is ready"), `POST { refuse: id }`.
+- `POST { forgot: email }`: ALWAYS the same answer; a member whose stored record has that email gets `/market-structure.html#reset=<token>`
+  (1 h, once; `signups/resets.json`, hash only). `POST { reset, password }`: the new hash goes on the stored record (the session
+  fingerprint changes, so every old session ends); a bad token counts as a failed password check. Members made by the owner have
+  no email (reset by the owner as before).
+- **The email stays on the server**: kept on the stored record (`users.js` `clean` keeps it, `withHashes` keeps the stored one
+  when the Users page saves without it), never in `publicRecord`, `/api/me`, `/api/users` (not even the owner's), `/cdata`, the
+  guest cut or a log line; only the owner's approval list shows it.
+- **Mail senders** (`mailer`), in order: (1) the Worker's Cloudflare Email Service binding `env.EMAIL` (`send_email`, handed in per
+  request by `signup.useMail`), from `MAIL_FROM` (default desk@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
+  socket function; the Worker hands in `cloudflare:sockets` `connect` through `signup.useSmtp`; smtp.gmail.com:465 implicit TLS,
+  EHLO, AUTH PLAIN, dot-stuffing, CR/LF stripped from every header value, one plain address only), secrets `GMAIL_USER` /
+  `GMAIL_APP_PASSWORD`; with both, a binding that throws is followed by one Gmail try. Neither: 503 "Sign-ups are not open yet."
+  (and "Password reset by email is not open yet."); `GET /api/signup` answers `{ open }` for the page. **The binding line is not in
+  `wrangler.jsonc` yet** (docs/cloudflare.md says which line, after the domain is onboarded). Never import `cloudflare:` from `api/`.
+- Page: the sign-in card has "Create an account" / "Forgot password?" (`.gate-links`, quiet centred, 44 px, AA on the dark card)
+  and three panels that take the card's place (`.gate-card[data-panel]`, `#ms-gp-su` / `-fg` / `-rs`, script `#ms-su-js` under the
+  card); `?signup=` shows a line on the card (`#ms-gate-ban`), `#reset=` opens the new-password panel and is cleaned from the
+  address at once (also on a hash change). Nothing typed there is stored in the browser. Users page: "Waiting for your approval"
+  (`#ms-u-wait-card`, `renderSignups`) with a role and Approve / Refuse, failures in words.
+- Not checked live: neither sender has sent a real email from the build sandbox (no network to Gmail or Cloudflare); the
+  binding's call shape (`send({ from: { email, name }, to, subject, text, html })`) is from Cloudflare's docs as summarised by a
+  web search, the docs site itself was not reachable. Tests: `tests/signup.test.mjs` (fake store, clock, binding, SMTP socket).
+
 ## Simplified (17 Nov 2026, owner: "All")
 The owner approved removing what the site no longer uses or never used. Backend and plumbing (the pages' own calls and markup were
 a separate change). No trading rule, stop, stop guard, demo-only lock or ICT file changed. Older sections below still describe these

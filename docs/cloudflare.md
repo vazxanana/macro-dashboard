@@ -11,6 +11,18 @@ every page and endpoint has been checked side by side.
 Secrets no longer read by anything: `EDGE_CONFIG`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `TV_WEBHOOK_KEY`, `RUN_MODE`
 (they can be deleted from the Worker with `npx wrangler secret delete <NAME>`). Older text below is kept as history.
 
+**Sign-up emails, 17 Nov 2026** (CLAUDE.md "Sign-up, email verification and password reset"): `api/signup.js` sends from the
+site's domain through a Cloudflare Email Service binding, else through Gmail SMTP; with neither, sign-ups answer 503.
+- Email Service (first choice): onboard aureumdesk.co.uk under Compute → Email Service → Email Sending (Cloudflare adds the
+  bounce MX, SPF, DKIM and DMARC records), then add this line to `cloudflare/wrangler.jsonc` and deploy:
+  `"send_email": [{ "name": "EMAIL" }],`
+  It is NOT in the file yet: a binding the account cannot use could stop a deploy, so it goes in once the domain is verified.
+  Plain variable (not secret) `MAIL_FROM`, default `desk@aureumdesk.co.uk` (any address on the onboarded domain).
+- Gmail (second choice, also tried once when the binding throws): Worker secrets `GMAIL_USER` (the address) and
+  `GMAIL_APP_PASSWORD` (a Google app password, never the account password). Port 465, implicit TLS (`cloudflare:sockets`).
+- Plain variable `OWNER_EMAIL` (optional): where "a new sign-up is waiting" goes (else `GMAIL_USER`, else nobody).
+Never write an address or a password into a file of this repository.
+
 ## How it works (`cloudflare/`)
 
 - `cloudflare/wrangler.jsonc`: one Worker, `meridianx`. `out/` (the committed build, checked by CI) is its static
@@ -56,7 +68,8 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
    `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `STORE`, `STORE_MIRROR`, `MCP_KEYS`, `MCP_ORIGINS`,
    `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
-   `EDGE_ANALYST`, `TRADE_REVIEW*`, `CHRONOS_*`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
+   `EDGE_ANALYST`, `TRADE_REVIEW*`, `CHRONOS_*`, and (new on the Worker, 17 Nov 2026, sign-up emails) `GMAIL_USER`,
+   `GMAIL_APP_PASSWORD`, `MAIL_FROM`, `OWNER_EMAIL`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
    `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and
    `COUNCIL_ALERTS` are read by the council on GitHub Actions, not by the Worker.)
 3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store, reached over HTTPS with the same tokens, so both sites read and write the same data.

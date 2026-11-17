@@ -31,6 +31,9 @@ const PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 
 const cleanPerms = (p) => { if (p == null) return null; if (typeof p !== 'object' || Array.isArray(p)) return null; const out = {};
   for (const [k, v] of Object.entries(p)) { if (!PERM_KEYS.includes(k)) return null; if (k === 'ict') { if (![false, true, 'read', 'write'].includes(v)) return null; out.ict = v === true ? 'write' : v; } else if (k === 'mosha') { if (![false, 'read', 'teach'].includes(v)) return null; out.mosha = v; } else { if (typeof v !== 'boolean') return null; out[k] = v; } }
   return out; };
+// a signed-up member's email (17 Nov 2026, api/signup.js): kept on the stored record for password resets, never sent to the page
+// (publicRecord leaves it out) and kept through a Users page save, which posts records without it (withHashes)
+const EMAIL_RE = /^[^\s@<>()",;:\\[\]]{1,64}@[^\s@<>()",;:\\[\]]{1,190}\.[A-Za-z]{2,24}$/;
 const clean = (users) => {
   if (!users || typeof users !== 'object' || Array.isArray(users)) return null;
   const out = {};
@@ -39,7 +42,7 @@ const clean = (users) => {
     if (!/^[0-9a-f]{64}$/.test(String(u.hash || '')) || !['viewer', 'reviewer'].includes(u.role)) return null;
     // flags and per-member permissions (owner, 8 Nov): ict false | 'read' | 'write' (true = write), ct, mcp, and perms { key: bool | ict value }
     const ict = u.ict === 'read' ? 'read' : u.ict ? true : null, perms = cleanPerms(u.perms); if (u.perms && !perms) return null;
-    out[k] = { name: String(u.name || k).slice(0, 24), role: u.role, hash: u.hash, ...(ict ? { ict } : {}), ...(u.ct ? { ct: true } : {}), ...(u.mcp ? { mcp: true } : {}), ...(perms ? { perms } : {}), ...(u.disabled ? { disabled: true } : {}) };
+    out[k] = { name: String(u.name || k).slice(0, 24), role: u.role, hash: u.hash, ...(ict ? { ict } : {}), ...(u.ct ? { ct: true } : {}), ...(u.mcp ? { mcp: true } : {}), ...(perms ? { perms } : {}), ...(u.disabled ? { disabled: true } : {}), ...(EMAIL_RE.test(String(u.email || '')) ? { email: String(u.email).toLowerCase() } : {}) };
   }
   if (Object.keys(out).length > 200) return null;
   return out;
@@ -55,7 +58,8 @@ function withHashes(posted, stored, builtIns = A.builtInUsers()) {
     if (pw != null) { if (typeof pw !== 'string' || pw.trim().length < 4 || pw.length > 200) return { error: 'Use a password of at least 4 characters' }; h = A.sha(pw.trim()); fresh.add(k); }
     else h = (stored && stored[k] && stored[k].hash) || (builtIns[k] && builtIns[k].hash) || null;
     if (!h) return { error: `No password set for ${k}` };
-    out[k] = { ...rest, hash: h };
+    delete rest.email; const email = stored && stored[k] && stored[k].email;   // the page never sends an email; the stored one stays
+    out[k] = { ...rest, hash: h, ...(email ? { email } : {}) };
   }
   // a new password must be unique: not the owner's, not another live account's (built-ins included)
   const live = { ...builtIns, ...out }; for (const k of Object.keys(live)) if (live[k] && live[k].disabled) delete live[k];
@@ -64,6 +68,13 @@ function withHashes(posted, stored, builtIns = A.builtInUsers()) {
     if (Object.keys(live).some((j) => j !== k && A.same(live[j].hash, out[k].hash))) return { error: 'That password is already used by another account. Pick another one.' };
   }
   return { users: out };
+}
+
+// one save of the whole stored list: a new blob under a new name (no stale CDN copy can exist), then the older ones deleted
+async function saveList(env, data) {
+  const old = await latest(env);
+  await put(`users/${Date.now()}.json`, JSON.stringify(data, null, 1), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok(env) });
+  if (old.length) await del(old.map((x) => x.url), { token: tok(env) }).catch(() => {});
 }
 
 async function handle(req, res, d = {}) {
@@ -88,11 +99,7 @@ async function handle(req, res, d = {}) {
     const users = clean(j.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
     if (Object.values(users).some((u) => u.hash === OWNER_HASH)) return res.status(400).json({ error: 'That password is the owner\'s' });
     const data = { users, updated: new Date().toISOString(), note: String(b.note || '').slice(0, 120) };
-    if (d.save) await d.save(data); else {
-      const old = await latest(env);
-      await put(`users/${Date.now()}.json`, JSON.stringify(data, null, 1), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok(env) });
-      if (old.length) await del(old.map((x) => x.url), { token: tok(env) }).catch(() => {});
-    }
+    if (d.save) await d.save(data); else await saveList(env, data);
     console.log(`[users] ${data.note}`);
     return res.status(200).json({ users: A.stripHashes(users), builtins: A.stripHashes(d.builtIns || A.builtInUsers()), updated: data.updated, note: data.note });
   } catch (e) { console.error(`[users] ${e.message}`); return res.status(e.status === 503 ? 503 : 500).json({ error: 'account storage unavailable' }); }
@@ -100,4 +107,4 @@ async function handle(req, res, d = {}) {
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports._t = { clean, isOwner, withHashes };
-module.exports.clean = clean; module.exports.cleanPerms = cleanPerms;
+module.exports.clean = clean; module.exports.cleanPerms = cleanPerms; module.exports.saveList = saveList; module.exports.EMAIL_RE = EMAIL_RE;
