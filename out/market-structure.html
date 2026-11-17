@@ -5327,6 +5327,9 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 /* ── Profile ── */
 #v-profile .pf-card { border-radius: var(--au-r) !important; }
 @media (prefers-reduced-motion: reduce) { .top-actions .ms-tbtn, .hdr-sw a, .btab a { transition: none !important; } }
+/* 17 Nov 2026, owner: the header switch is rectangular, not a pill (Desk | Macro | ChronosTrade | Academy) */
+.hdr-sw { border-radius: 8px !important; } .hdr-sw::before, .hdr-sw::after { border-radius: inherit !important; }
+.hdr-sw a { border-radius: 6px !important; } .hdr-sw a i { border-radius: 2px !important; }
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">

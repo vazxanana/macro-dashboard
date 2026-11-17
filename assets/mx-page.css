@@ -173,3 +173,6 @@ a.brand:not(.here) { font: 700 14px/1 var(--au-font-ui); text-transform: upperca
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
 }
+/* 17 Nov 2026, owner: the header switch is rectangular, not a pill (Desk | Macro | ChronosTrade | Academy) */
+.hdr-sw { border-radius: 8px !important; } .hdr-sw::before, .hdr-sw::after { border-radius: inherit !important; }
+.hdr-sw a { border-radius: 6px !important; } .hdr-sw a i { border-radius: 2px !important; }
