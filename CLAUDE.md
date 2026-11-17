@@ -88,7 +88,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-56 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-59 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
@@ -3786,3 +3786,26 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   passed: in sample over two weeks of one market regime), demo copies 0.065R a trade worse than paper (n 152, t 3.10).
 - Tests: `tests/trade-review.test.mjs` (9), `tests/trade-review-ai.test.mjs` (7); fixture `tests/fixtures/trade-review/`
   (a made-up desk, `make.mjs` builds it).
+
+## Edge check and the replica's sides (17 Nov 2026, owner: "Try to check the edges which ones can we improve and focus like the replica")
+An evidence review and one pre-registered study; no live rule, size, filter, stop, config, Trader or mirror code changed. The
+owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `docs/owner-decisions.md` items 57-59, open).
+- **Ranking** (what can still improve): (1) the live book (Gold trend + Gold daily engulf) only through its holding cost
+  (item 49; book t 1.86 at the demo rate, about 1.96-2.02 on cheaper carry), no rule test (item 44); (2) the NQ open run as a
+  regime bet (2023-26 +0.318R, n 309, t 3.45; flat 2004-22) with item 50 open; (3) one rule question item 44 does not block,
+  the Gold daily engulf on silver (item 59, low prior). Every other system is null or negative on untouched data and a shadow
+  already. The forward records are 0-2 closed trades a system: nothing to judge.
+- **`research/edge/replica-sides/`** (PREREGISTRATION.md committed alone first; `run.mjs`, `months.json`, RESULT.md,
+  result.json): the replica's RAW research signal (`replicaSignals` copied verbatim from the Trader via
+  `research/edge/gold-systems/live.mjs`; every signal, market entry at the next M5 open, 2R, 48 h, gold round-number stops) on
+  council-data HistData M1 (gold + five forex, `council/histdata.mjs`) and Binance 5m (four coins, from March 2022), net of
+  `tradeCost` with the 17 Nov 2026 cost model pinned in `MODEL` (coin spreads as a share of the 17 Nov price). IS 2020-23,
+  OOS 2024 - Oct 2026, three tests, Holm. **FAIL, 0 of 3**: sells −0.196R a trade OOS (n 44,458, month t −12.63); sells minus
+  buys +0.007R (34 months, t 0.38); with the 20-day move −0.194R. Before costs every market is within 0.05R of zero (174,316
+  trades). The forward split of 3-17 Nov (buys −0.41R, sells +0.26R) is a regime artefact: the side that wins a month is the
+  side of that month's move in 61-84 % of months. ETH / SOL pay 0.49 / 0.45R a trade (66-72 % of stops under 5 CFD spreads).
+  **Never propose a side rule for the replica from its forward records.** To repeat: `run.mjs fetch <dir>` (git, no network),
+  `market <key> <dir> <out>` for the ten keys, `report <out>` (about a minute). Test: `tests/replica-sides.test.mjs`.
+- **Replica demo slippage** (council-data `ctrader/mirror-10152148.json`, 157 copies 10-17 Nov): +0.062R a trade (t 3.06);
+  ETH +0.19R, SOL +0.14R (half a CFD spread on tight stops), copies 5 min or more late +0.16R, forex about 0; the buy / sell
+  gap (−0.003 / +0.127R) is mostly a price basis between the council's feed and the broker, which cancels across sides.

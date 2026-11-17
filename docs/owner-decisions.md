@@ -1134,3 +1134,40 @@ figure or demo-mirror setting.
 - **Recommendation.** Gold's two Mosha systems record nothing while gold is on the fallback feed (one condition at the top of
   each block in the Trader; trades already open are managed as now). A plumbing fix: no rule changes on spot candles.
 - **If nothing is decided.** On the next fallback episode the Mosha systems may again record trades from weekend candles.
+
+## Edge check and the replica in depth, 17 Nov 2026
+
+Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/replica-sides/` (pre-registered, FAIL 0 of 3).
+
+### [ ] 57. Replica: no side rule (sells only is not an edge)
+
+- **Status (17 Nov 2026): open.**
+- **Context.** The trade review of 17 Nov found the replica's forward research trades split by side: buys −0.41R a trade
+  (n 522), sells +0.26R (n 478), on 3-17 Nov only. Tested on 2020 to Oct 2026, ten markets, data that played no part in
+  noticing it: sells minus buys +0.007R a trade out of sample (34 months, t 0.38); sells alone −0.196R after costs (n 44,458,
+  t −12.63); trading with the market's 20-day move −0.194R. Before costs both sides are zero on every market. In those two
+  weeks the dollar rose and the coins fell; the side that wins a month is the side of that month's move 61-84 % of the time.
+- **Recommendation.** Agree: no side rule. Nothing to apply.
+- **If nothing is decided.** The trade review keeps showing its "one side only" proposal for the replica under "Decisions
+  waiting".
+
+### [ ] 58. The Replica demo account: copy the replica rule's own trades only, not its raw gold research signals
+
+- **Status (17 Nov 2026): open.**
+- **Context.** Since 11 Nov (item 39) no new forex or crypto research trade of the replica is copied; gold research trades
+  (every raw signal, not the v5 rule) still are: 46 of the account's 157 copies. That stream is zero before costs on 2020-26
+  (gold −0.014R gross, −0.042R net a trade out of sample, n 7,028). The account fills 0.062R a trade worse than paper (t 3.06):
+  ETH +0.19R, SOL +0.14R (wide CFD spreads on tight M5 stops), copies sent 5 minutes or more late +0.16R.
+- **Recommendation.** Yes: one owner rule setting `config.mirrorReplica.markets` to an empty list. The replica's own records
+  in `trades.json` are copied as before; positions already copied run to their exits with their stops.
+- **If nothing is decided.** The account keeps recording raw gold signals and does not measure the replica rule.
+
+### [ ] 59. One open rule question: the Gold daily engulf on silver
+
+- **Status (17 Nov 2026): open.**
+- **Context.** Item 44 stops new gate, exit, entry and size tests on the gold book's 2006-17 window. The one rule question
+  it does not block and that no study has answered: does the Gold daily engulf work on silver? Low prior: the Gold trend rule
+  failed on 13 other markets (trend-breadth-h1, 0 of 14), and the playbook long's cuts held on silver only without a month-sum t.
+- **Recommendation.** Run it as one pre-registered study: 2020 to now, 2020-23 against 2024 on, net of the demo broker's
+  silver costs, out-of-sample month-sum t ≥ 2. A pass makes it a paper shadow to watch, never live.
+- **If nothing is decided.** No further rule research on the supported book's systems; the forward record decides.
