@@ -731,6 +731,66 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       small += await t.evaluate(() => [...document.querySelectorAll('#vc-coach *, #tab-journal small.say')].filter((e) => e.getClientRects().length && e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
     check('coach card and journal sentence: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
     await cx.close(); }
+  // 38. drawing tools like TradingView (17 Nov 2026): the tool strip, the magnet (a box drawn with it has its corners on candle
+  // prices), resize by a handle, move a trend line by its body, the floating bar (colour, width), Delete, a reload keeps them,
+  // an old-format drawing (no stamp, no style) still loads and draws, and no drawing touched the account. Screenshots for the owner.
+  { const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('draw: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { if (!sessionStorage.getItem('d38')) { localStorage.clear(); sessionStorage.setItem('d38', '1'); } localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} });
+    await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await settle(t);
+    const ch = await t.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    const acct0 = await t.evaluate(() => JSON.stringify(window.ctAcct().acct));
+    const strip = await t.evaluate(() => { const s = document.getElementById('dstrip'), r = s.getBoundingClientRect(); return { on: !!s.getClientRects().length && getComputedStyle(s).display !== 'none', n: s.querySelectorAll('button').length, tools: [...s.querySelectorAll('[data-dt]')].map((x) => x.dataset.dt), x: r.left, y: r.top, w: r.width, h: r.height }; });
+    check('the drawing tool strip sits on the chart\'s left edge: cursor, trend line, horizontal line and ray, vertical line, box, magnet', strip.on && strip.n === 7 && strip.tools.join() === ',t,h,hr,v,r' && strip.x >= ch.x && strip.x < ch.x + 20, JSON.stringify(strip));
+    await t.screenshot({ path: OUT + 'draw-strip.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(900, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    // magnet: Alt+M cycles off → weak → strong, remembered on the device
+    await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyM'); const mg = await t.evaluate(() => ({ m: window.ctChart().mag, ls: localStorage.getItem('btLab:magnet'), p: document.querySelector('#dstrip [data-mag]').getAttribute('aria-pressed') }));
+    check('Alt+M twice: the magnet is strong, the strip button pressed, remembered', mg.m === 2 && mg.ls === '2' && mg.p === 'true', JSON.stringify(mg));
+    // a box by press and drag (strip button), with the magnet strong: both corners on a candle's open / high / low / close
+    await t.click('#dstrip [data-dt="r"]'); const pA = [ch.x + ch.w * 0.32, ch.y + ch.h * 0.33], pB = [ch.x + ch.w * 0.45, ch.y + ch.h * 0.6];
+    await t.mouse.move(...pA); await t.mouse.down(); await t.mouse.move(pA[0] + 30, pA[1] + 40, { steps: 4 }); await t.mouse.move(...pB, { steps: 6 }); await t.mouse.up(); await settle(t);
+    const d1 = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[D.list.length - 1]; return { D, r, b1: window.ctBarAt(r.t1), b2: window.ctBarAt(r.t2) }; });
+    const onOHLC = (b, p) => !!b && [b.open, b.high, b.low, b.close].includes(p);
+    check('a box drawn with the magnet strong has both corners on candle prices (open / high / low / close of the candle under each)', d1.r.type === 'r' && onOHLC(d1.b1, d1.r.p1) && onOHLC(d1.b2, d1.r.p2) && d1.r.at > 0 && d1.D.sel === d1.D.list.length - 1 && d1.D.tool === null, JSON.stringify({ r: d1.r, b1: d1.b1, b2: d1.b2, sel: d1.D.sel }));
+    await settle(t); const sel = await t.evaluate(() => { const e = document.getElementById('dsel'), r = e.getBoundingClientRect(); return { on: !e.hidden && !!e.getClientRects().length, btn: e.querySelectorAll('button').length, small: [...e.querySelectorAll('*')].filter((x) => x.childNodes.length && [...x.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(x).fontSize) < 12).length, dh: window.ctChart().dh, y: r.top, b: r.bottom }; });
+    check('the selected box shows its eight handles and the floating bar above it (12 px or more)', sel.on && sel.btn >= 10 && sel.dh >= 8 && !sel.small && sel.b <= ch.y + d1.D.geo[d1.D.sel].y1 + 2, JSON.stringify(sel));
+    await t.screenshot({ path: OUT + 'draw-selected.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(900, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    // resize by the second corner: that corner follows (still on a candle price), the first stays, the drawing keeps its moment
+    { const g = d1.D.geo[d1.D.sel], h = g.pts.find((q) => q[0] === 'c22'); await t.mouse.move(ch.x + h[1], ch.y + h[2]); await t.mouse.down(); await t.mouse.move(ch.x + h[1] + 60, ch.y + h[2] + 50, { steps: 8 }); await t.mouse.up(); await settle(t);
+      const r2 = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[D.sel]; return { r, b2: window.ctBarAt(r.t2) }; });
+      check('dragging a corner handle resizes the box: that corner moves to a candle price, the other stays, at kept, editedAt stamped', r2.r.t2 > d1.r.t2 && r2.r.p2 !== d1.r.p2 && onOHLC(r2.b2, r2.r.p2) && r2.r.t1 === d1.r.t1 && r2.r.p1 === d1.r.p1 && r2.r.at === d1.r.at && r2.r.editedAt >= r2.r.at, JSON.stringify([d1.r, r2.r])); }
+    // the floating bar: red, 2 px
+    await t.click('#dsel [data-ds="col"][data-v="dn"]'); await t.click('#dsel [data-ds="w"]'); await settle(t);
+    const st = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; }); check('the floating bar sets the colour and the width, saved with the drawing', st.col === 'dn' && st.w === 2, JSON.stringify(st));
+    // a trend line (Alt+T, click, click), then moved by its body: both points shift by the same time and price
+    await t.mouse.move(4, 4); await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyT');
+    await t.mouse.click(ch.x + ch.w * 0.55, ch.y + ch.h * 0.7); await t.mouse.click(ch.x + ch.w * 0.68, ch.y + ch.h * 0.45); await settle(t);
+    const tl = await t.evaluate(() => { const D = window.ctDraw(); return { D, r: D.list[D.list.length - 1] }; });
+    check('Alt+T then two clicks: a trend line, selected, stamped with the moment', tl.r.type === 't' && tl.D.sel === tl.D.list.length - 1 && tl.r.at > 0 && tl.D.mag === 0, JSON.stringify(tl.r));
+    { const g = tl.D.geo[tl.D.sel], mx = (g.x1 + g.x2) / 2, my = (g.y1 + g.y2) / 2; await t.mouse.move(ch.x + mx, ch.y + my); await t.mouse.down(); await t.mouse.move(ch.x + mx - 70, ch.y + my + 40, { steps: 8 }); await t.mouse.up(); await settle(t);
+      const m = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; });
+      check('dragging a trend line by its body moves both points by the same time and price; the chart did not pan', m.t1 < tl.r.t1 && m.t1 - tl.r.t1 === m.t2 - tl.r.t2 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m])); }
+    // Delete removes the selected one; Esc lets go
+    const n0 = (await t.evaluate(() => window.ctDraw().list.length)); await t.keyboard.press('Delete'); await settle(t);
+    const del = await t.evaluate(() => ({ n: window.ctDraw().list.length, sel: window.ctDraw().sel, bar: document.getElementById('dsel').hidden }));
+    check('Delete removes the selected drawing and the floating bar goes', del.n === n0 - 1 && del.sel === -1 && del.bar, JSON.stringify(del));
+    // a vertical line and a horizontal ray (Alt+V, Alt+J): one click each
+    await t.keyboard.press('Alt+KeyV'); await t.mouse.click(ch.x + ch.w * 0.5, ch.y + ch.h * 0.5); await t.keyboard.press('Escape'); await t.keyboard.press('Alt+KeyJ'); await t.mouse.click(ch.x + ch.w * 0.4, ch.y + ch.h * 0.4); await t.keyboard.press('Escape'); await settle(t);
+    const ty = await t.evaluate(() => window.ctDraw().list.map((d) => d.type).join()); check('Alt+V and Alt+J place a vertical line and a horizontal ray', /r,v,hr$/.test(ty), ty);
+    check('no drawing changed the account (positions, orders, closed trades)', (await t.evaluate(() => JSON.stringify(window.ctAcct().acct))) === acct0);
+    // an old-format drawing (as saved before 17 Nov 2026 and by the Mosha hand-over: no stamp, no style) is put into the saved session
+    // (written by an init script of the next load, after this page's own last save on the way out)
+    const old = await t.evaluate(() => { const D = window.ctDraw(), r = D.list[0]; return { o: { type: 't', t1: r.t1, p1: r.p1, t2: r.t2, p2: r.p2 + 3 }, n: D.list.length + 1 }; });
+    await t.addInitScript((o) => { try { if (sessionStorage.getItem('d38old')) return; sessionStorage.setItem('d38old', '1'); const A = JSON.parse(localStorage.getItem('btLab:sessions')), s = Object.values(A)[0]; s.draw.push(o); localStorage.setItem('btLab:sessions', JSON.stringify(A)); } catch (e) {} }, old.o);
+    await t.reload({ waitUntil: 'load' }); await t.waitForFunction(() => /Resumed/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(t);
+    const rl = await t.evaluate(() => { const D = window.ctDraw(); return { n: D.list.length, last: D.list[D.list.length - 1], box: D.list[0], geo: D.geo.map((g) => !!g) }; });
+    check('a reload keeps every drawing with its style, and the old-format one loads unchanged and is drawn', rl.n === old.n && JSON.stringify(rl.last) === JSON.stringify(old.o) && rl.box.col === 'dn' && rl.box.w === 2 && rl.geo.every(Boolean), JSON.stringify(rl).slice(0, 220));
+    // magnet snapping, pictured: a tool on, the pointer near a candle, the ring on the price it snaps to
+    await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyM'); await t.keyboard.press('Alt+KeyR'); await t.mouse.move(ch.x + ch.w * 0.6, ch.y + ch.h * 0.42, { steps: 3 }); await t.mouse.move(ch.x + ch.w * 0.61, ch.y + ch.h * 0.43, { steps: 2 }); await settle(t);
+    await t.screenshot({ path: OUT + 'draw-magnet.png', clip: { x: Math.max(0, ch.x + ch.w * 0.35), y: Math.max(0, ch.y), width: Math.min(560, ch.w * 0.5), height: Math.min(420, ch.h) } });
+    await t.keyboard.press('Escape');
+    await cx.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);
