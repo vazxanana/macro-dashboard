@@ -1919,6 +1919,21 @@ order, stop or account code touched).
   block; the table's box), `tests/backtest.test.mjs` (the phone block's new heading). Audit: section 35 (768 x 1024 and
   1024 x 1366 touch, a 600 px mouse, the day table at 360 / 390 Full / 430): 247 checks.
 
+Graphite look (16-17 Nov 2026, owner: a different, simpler look; spec `docs/design/aureum-theme.md`; display only, no engine,
+order, stop, account or replay code touched). The `--au-*` tokens for dark (default), light and midnight are the first rules of
+the sheet and the page's older names (`--bg`, `--panel`, `--ink*`, `--accent`, `--buy` / `--sell`, the `--c-*` chart tokens,
+`--c-text` new, read by `readTheme` as the chart's text colour) point at them; candle colours are unchanged. Component rules
+sit in one "Graphite look" block right before the simple view's block (never `data-phone` or `.ps-` in it: a test). Buy / Sell
+fills are fixed `--fill-buy` / `--fill-sell` (white at 5.9 / 6.5:1 in every theme; the dark tokens are for text). The header
+is the wordmark (silver mark `.brand i.ms-coin`, AUREUM DESK, then ChronosTrade); the session card is the page header; the
+strip keeps "n% replayed" only (equity is the Account card's headline, its change since start is in `#acc-sub`, the time is
+the toolbar's); the Trade card reads Sell | Buy like the quick bar; before a load the chart shows `#ch-empty` and the quick bar
+is hidden (`.chartc.nodata`). The audit pins the body colours of the themes: dark rgb(18, 19, 21), midnight rgb(11, 12, 14).
+Two audit checks failed from 16 Nov on dates near a weekend, the page was right: the gold quick start (now - 30 days) began on
+Saturday, so the moment was Friday's 21:00 close and a 4h switch moves it to the end of that complete candle (no price in
+between); and on a Friday's day candle (ends 24:00) a lower pane's last candle ends at the 22:00 close. Both checks now accept
+that only when candles fetched apart from the page prove no price lies between (`shut`, `lowerOk`).
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
