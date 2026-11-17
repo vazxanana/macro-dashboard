@@ -571,6 +571,28 @@
   function drawInfo(d, nBars, ang, dec = 2) { if (d.type !== 't' && d.type !== 'r') return ''; const dp = d.p2 - d.p1, pc = d.p1 ? dp / d.p1 * 100 : 0, sg = dp > 0 ? '+' : dp < 0 ? '−' : '';
     const s = `${sg}${Math.abs(dp).toFixed(dec)} (${sg}${Math.abs(pc).toFixed(2)}%) · ${nBars} bar${nBars === 1 ? '' : 's'}`; return d.type === 't' && fin(ang) ? `${s} · ${Math.round(ang)}°` : s; }
 
+  // ---- split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time
+  // and when I draw in one should show on the others"). Each chart's view is a logical range (fractional bar index); charts
+  // on other timeframes are matched by TIME, never by index. One convention for every chart (the page's timeToX): a candle's
+  // start time sits at its index, a time inside a candle in proportion, a time in a gap (a weekend) at the next candle, and
+  // before the first / past the last candle one index per timeframe step. bars = what the chart shows (n of them).
+  function tfLogical(bars, n, sec, t) { if (!n || !fin(t) || !(sec > 0)) return null; const f = bars[0].time, last = bars[n - 1].time;
+    if (t <= f) return (t - f) / sec; if (t >= last) return (n - 1) + (t - last) / sec;
+    let lo = 0, hi = n - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time < t) lo = m + 1; else hi = m; }
+    if (bars[lo].time === t) return lo; const pv = bars[lo - 1]; return t < pv.time + sec ? lo - 1 + (t - pv.time) / sec : lo; }
+  function tfTimeAt(bars, n, sec, lg) { if (!n || !fin(lg) || !(sec > 0)) return null; if (lg <= 0) return bars[0].time + lg * sec;
+    if (lg >= n - 1) return bars[n - 1].time + (lg - (n - 1)) * sec; const i = Math.floor(lg); return bars[i].time + (lg - i) * sec; }
+  // a view range { from, to } of one chart → the same time window as a range of another; src / dst = { bars, n, sec }
+  function syncRange(src, dst, r) { if (!r) return null; const a = tfTimeAt(src.bars, src.n, src.sec, r.from), b = tfTimeAt(src.bars, src.n, src.sec, r.to);
+    if (a == null || b == null) return null; const from = tfLogical(dst.bars, dst.n, dst.sec, a), to = tfLogical(dst.bars, dst.n, dst.sec, b);
+    return from == null || to == null || !(to > from) ? null : { from, to }; }
+  // the guard against charts echoing each other: a range change that equals the one just set on that chart (within tol bars,
+  // within ms) is the echo of the sync, not the person moving it
+  function syncEcho(exp, r, now, ms = 400, tol = 0.02) { return !!(exp && r && now - exp.at <= ms && Math.abs(r.from - exp.from) <= tol && Math.abs(r.to - exp.to) <= tol); }
+  // the magnet on a chart of its own timeframe: the candle that holds t, only when it CLOSED by the replay moment T
+  function closedBarAt(bars, n, sec, t, T) { if (!n || !fin(t)) return null; let lo = 0, hi = n; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time <= t) lo = m + 1; else hi = m; }
+    const b = bars[lo - 1]; return b && t < b.time + sec && b.time + sec <= T ? b : null; }
+
   // ---- the live coach's market events (17 Nov 2026, owner: "the live AI while backtesting needs to be more live") ----------------
   // Pure: what happened on the candles that CLOSED since the last look (never one that ends after the moment T), for the panel's
   // free notes and, the most important one, for the AI. st = the caller's memory between calls ({} the first time; it holds the
@@ -622,6 +644,6 @@
     TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
     COACH, lensSay, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
     GRADES, gatherSessions, exitCf, coachLeaks, coachPatterns, patternMatch, planNorm, planCheck, planAdherence, coachDebrief,
-    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, LIVE_EV, liveEvents };
+    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, tfLogical, tfTimeAt, syncRange, syncEcho, closedBarAt, LIVE_EV, liveEvents };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
