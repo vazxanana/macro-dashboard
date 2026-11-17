@@ -328,6 +328,12 @@ const USER_RULES = [
   { id: 'lit-shadow', apply: (c) => { c.litShadow = true; },
     change: 'LIT (M15 FBOS → M5 RBOS → limit at the order block) runs on gold as a paper shadow stream "LIT (paper shadow)"; no live rule changes',
     why: 'LIT study (#597): INCONCLUSIVE, too few trades at the skill\'s defaults (27 gold fills in 19 years) and what fills loses; the owner keeps it as a paper shadow to build a forward record, not as a system.' },
+  // 17 Nov 2026, owner ("All", the simplification list): the LIT paper stream records no NEW order. LIT records already open or
+  // pending are still read by the block below and managed by the loop to their own exits with their stops (the day-end hold and
+  // the swing break-even included). council/lit-replay.mjs is gone. Undo: a user rule setting c.litShadow = true.
+  { id: 'lit-off', apply: (c) => { c.litShadow = false; },
+    change: 'LIT paper shadow stream (owner, 17 Nov): no new LIT orders are recorded; LIT trades already open or pending run to their exits with their stops',
+    why: 'Owner, 17 Nov 2026: the simplification list ("All"). The LIT study stays INCONCLUSIVE (#597) and the stream had rarely filled; it is switched off rather than kept running.' },
   { id: 'mosha-cycle', apply: (c) => { c.moshaCycle = true; },
     change: "Gold: the Mosha cycle trades as a main paper system: H4 move, H1 ChoCh = the pullback starts, M15 / M5 trade the pullback (target the H4 50%), then the M15 / M5 ChoCh back with H4 (target the H4 extreme); limit at the broken level, stop past its origin",
     why: "Owner, 11 Nov: 'H4 move, H1 ChoCh tells pullback or retracement started, M15 / M5 to entry and target H4 or H1 … the ai should trade with the bot', chosen as a main system. Not a tested edge: the mechanical studies of this cycle (mosha-retrace break-even, mosha-cycle -0.22R) did not pass; this is the owner's call, judged on its forward record." },
@@ -865,16 +871,20 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // break-even moves the stop here, like the gold trend ratchet. Lookback: the stream needs the whole previous trading week (the
     // previous-week level, the weekly range), so it reads ~4,000 closed 5m candles from the OANDA proxy once a round, only here.
     // Every record is shadow: true, blockedBy ['owner-shadow'] (never live, never alerted, not in the futures bridge or the Systems card).
-    if (key === 'xau' && config.litShadow && feed === 'OANDA') {
+    // 17 Nov 2026 (user rule lit-off): with config.litShadow false no order is placed, but the block keeps running while a LIT record
+    // of this market is open or pending, so its day-end hold and swing break-even still apply (management is never removed).
+    const litLeft = key === 'xau' && trades.some((x) => x.k === LIT_K && x.market === key && (x.status === 'open' || x.status === 'pending'));
+    if (key === 'xau' && (config.litShadow || litLeft) && feed === 'OANDA') {
       try {
         const raw = await oandaBars(key, '5m', LIT_BARS);
         if (!raw) throw new Error('LIT: OANDA 5m lookback not read this round');
         const bars = litClean(raw.filter((b) => !b.live && b.time + 300 <= now));
         const recs = trades.filter((x) => x.k === LIT_K && x.market === key);
         const st = litStep({ bars, recs, now, key, label: M.label, dec: M.dec, feed: FEED });
-        for (const rec of st.push) if (rec.shadow === true && (rec.blockedBy || []).includes('owner-shadow')) trades.push(rec);
-        snapshot.lit = { at: nowISO, bars: st.m5, m15: st.m15, last: st.last, orders: st.orders, placed: st.push.map((x) => x.id), skipped: st.skipped, held: st.held, be: st.be, funnel: st.funnel, build: st.build,
-          open: recs.filter((x) => x.status === 'open').length, pending: recs.filter((x) => x.status === 'pending').length + st.push.length };
+        const litPush = config.litShadow ? st.push : [];
+        for (const rec of litPush) if (rec.shadow === true && (rec.blockedBy || []).includes('owner-shadow')) trades.push(rec);
+        snapshot.lit = { at: nowISO, on: !!config.litShadow, bars: st.m5, m15: st.m15, last: st.last, orders: st.orders, placed: litPush.map((x) => x.id), skipped: st.skipped, held: st.held, be: st.be, funnel: st.funnel, build: st.build,
+          open: recs.filter((x) => x.status === 'open').length, pending: recs.filter((x) => x.status === 'pending').length + litPush.length };
       } catch (e) { snapshot.errors.lit = String(e.message || e); }
     }
     if (key === 'xau' && config.goldTL) {

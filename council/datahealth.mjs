@@ -112,7 +112,7 @@ export const FILES = [
   // second path): over 36 h means a day was missed and the desk's unresolved replay records say "update pending" meanwhile
   { file: 'ict/replay.json', label: 'ICT replay', every: 'daily (council loop trigger, cron as backup)', at: (j) => j.at, warn: 36 * H, bad: 4 * 24 * H,
     why: 'unresolved replay records on the ICT desk stay "update pending" until ict-replay.yml runs' },
-  { file: 'lit/replay.json', label: 'LIT replay', every: 'at most every 20 h (council loop)', at: (j) => j.at, warn: 30 * H, bad: 72 * H },
+  // lit/replay.json: no longer written (council/lit-replay.mjs removed, 17 Nov 2026), so no longer watched
   { file: 'research/daily/_index.json', label: 'Daily candle cache', every: 'weekly, Saturday 03:17 UTC', at: (j) => j.updated, warn: 8 * 24 * H, bad: 15 * 24 * H, check: dailyIndexCheck },
   { file: 'reviews/latest.md', label: 'Coach AI review', type: 'text', every: 'daily (scheduled session)', need: true, check: reviewsCheck },
   { file: 'reviews/losses.json', label: 'Owner loss reviews', every: 'when the owner writes one', check: reviewList },
