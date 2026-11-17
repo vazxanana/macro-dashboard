@@ -1,86 +1,96 @@
-# The Aureum theme (16 Nov 2026)
+# The Aureum Desk look: graphite (17 Nov 2026)
 
-Owner, 16 Nov 2026: "more noticeable aesthetic theme, something hella different … simplify the website and put it more
-organised". One look for every page of Aureum Desk (the Desk, Macro desk, side pages, ChronosTrade, Academy, gold terminal,
-Mosha desk, icons). It replaces the navy / blue dashboard look. Display only: no figure, rule, permission or data changes.
+The owner, 17 Nov 2026, on the black-and-gold look of 16 Nov: "i didnt like the one u juat did, do another one with other
+colors like grey". This replaces that spec. It is one look for every page of Aureum Desk (the Desk, Macro desk, side pages,
+ChronosTrade, Academy, gold terminal, Mosha desk, icons). It changes how things look only: no figure, rule, permission or data
+changes.
 
 ## Character
 
-Black and gold, editorial luxury, calm. Serif titles, warm near-black surfaces, champagne gold only for the brand, the primary
-action and the active place in the navigation; generous spacing; rounded cards with gold hairlines and soft depth; numbers in
-tabular figures.
+Graphite and silver: neutral greys, quiet and precise, like a good instrument. There are no warm tints and no gold surfaces.
+Colour is kept for meaning: green for a gain, red for a loss, amber for a warning, and one cool steel-blue accent for focus, links
+and the active place in the navigation. The primary action is a solid neutral button, light on dark and dark on light. Titles use
+the same sans-serif as the rest of the page, set heavier and tighter, with no serif anywhere. Cards are flat with 1 px hairlines and
+very little shadow, and numbers use tabular figures.
 
 ## 1. Tokens
 
-Every page defines these custom properties (for each theme it has) and points its older variables at them, so old names keep
-working.
+Every page defines these custom properties, for each theme it has, and points its older variables at them so that old names
+keep working. The prefix stays `--au-` so that work already done keeps its names.
 
-| Token | Dark (default) | Light ("ivory and ink") | Midnight |
+| Token | Dark (default, "graphite") | Light ("paper grey") | Midnight |
 |---|---|---|---|
-| `--au-bg` | `#0B0A08` | `#F6F1E6` | `#070B16` |
-| `--au-surface` (cards) | `#14120E` | `#FFFCF5` | `#0E1424` |
-| `--au-surface-2` (hover, raised, selected) | `#1C1914` | `#EFE7D6` | `#151C30` |
-| `--au-well` (inputs, wells) | `#100E0B` | `#F9F5EC` | `#0B1120` |
-| `--au-line` | `rgba(232,200,130,.12)` | `rgba(60,45,20,.12)` | as dark |
-| `--au-line-strong` | `rgba(232,200,130,.24)` | `rgba(60,45,20,.22)` | as dark |
-| `--au-ink` | `#F4EEE2` | `#1B160E` | `#EEF1F8` |
-| `--au-ink-2` | `#BDB3A1` | `#554B3C` | `#AEB7CC` |
-| `--au-ink-3` | `#958B7A` | `#6B6050` | `#8C96AD` |
-| `--au-gold` (fills) | `#D4A84A` | `#86600F` | as dark |
-| `--au-gold-grad` | `linear-gradient(135deg, #F2D589 0%, #D4A84A 48%, #A87A2A 100%)` | `linear-gradient(135deg, #A87A2A 0%, #86600F 100%)` | as dark |
-| `--au-on-gold` (text on gold fills) | `#1A1305` | `#FFFFFF` | as dark |
-| `--au-gold-ink` (gold as text) | `#E3BE6E` | `#7E5A12` | as dark |
-| `--au-gain` | `#3FD69E` | `#0A7350` | as dark |
-| `--au-loss` | `#FF7A70` | `#B3261E` | as dark |
-| `--au-warn` | `#F2B544` | `#8A5A00` | as dark |
-| `--au-info` | `#8FB3FF` | `#1F5BD6` | as dark |
+| `--au-bg` | `#121315` | `#F2F3F5` | `#0B0C0E` |
+| `--au-surface` (cards) | `#1A1C1F` | `#FFFFFF` | `#131416` |
+| `--au-surface-2` (hover, raised, selected) | `#23262A` | `#E7E9EC` | `#1B1D20` |
+| `--au-well` (inputs, wells) | `#16181B` | `#F7F8F9` | `#0F1012` |
+| `--au-line` | `rgba(255,255,255,.08)` | `rgba(20,24,30,.10)` | as dark |
+| `--au-line-strong` | `rgba(255,255,255,.16)` | `rgba(20,24,30,.20)` | as dark |
+| `--au-ink` | `#ECEDEF` | `#17191C` | `#ECEDEF` |
+| `--au-ink-2` | `#B4B8BF` | `#474C54` | `#B4B8BF` |
+| `--au-ink-3` | `#8E939B` | `#5B616A` | `#8E939B` |
+| `--au-accent` (focus, links, active nav) | `#9DB4D3` | `#2F5E9E` | as dark |
+| `--au-primary` (primary button fill) | `#E4E6E9` | `#25292E` | as dark |
+| `--au-on-primary` | `#121315` | `#FFFFFF` | as dark |
+| `--au-gold` / `--au-gold-grad` / `--au-gold-ink` (old names) | point at `--au-primary` / `--au-primary` / `--au-accent` | same | same |
+| `--au-on-gold` (old name) | points at `--au-on-primary` | same | same |
+| `--au-gain` | `#4CC38A` | `#0A7350` | as dark |
+| `--au-loss` | `#F2726A` | `#B3261E` | as dark |
+| `--au-warn` | `#E8B04B` | `#8A5A00` | as dark |
+| `--au-info` | `#9DB4D3` | `#2F5E9E` | as dark |
 
-Page background (dark): `radial-gradient(1100px 520px at 0% -10%, rgba(212,168,74,.10), transparent 60%),
-radial-gradient(800px 480px at 100% 0%, rgba(168,122,42,.07), transparent 55%), #0B0A08` (light: the same with
-`rgba(168,120,31,.08)`; midnight: the same over `#070B16`). Static, never animated.
+The page background is a flat `--au-bg`, with no glow or gradient. Midnight is a deeper graphite, not navy.
 
-Contrast, measured: every text token is at least 4.5:1 on `bg`, `surface` and `surface-2` of its theme (lowest: light
-`ink-3` on `surface-2`, 5.0; light `gain` on `surface-2`, 4.77). A chip is text in its colour on a 14 % tint of that colour
-over the surface (lowest 4.69:1, light gain). Text on gold fills: dark 8.3:1, light 5.7:1. Re-measure any other pairing.
+Contrast floor: every text token must be at least 4.5:1 on `bg`, `surface` and `surface-2` of its theme. The tightest pairs
+are light `ink-3` on `surface-2` and dark `ink-3` on `surface-2`, so measure them when building and darken or lighten by one
+step if a pair fails. A chip is text in its colour on a 14 % tint of that colour over the surface. Text on the primary fill is
+at least 12:1 in both themes.
 
-Chart candle colours do not change (the owner chose them; the light theme's grey / black candles are pinned by a test).
-Chart grid lines use `--au-line`, chart text `--au-ink-3`, chart backgrounds transparent or `--au-surface`.
+Chart candle colours do not change: the owner chose them, and a test pins the light theme's grey / black candles. Chart grid
+lines use `--au-line`, chart text uses `--au-ink-3`, and chart backgrounds are transparent or `--au-surface`.
 
 ## 2. Type
 
-- `--au-font-display`: `"Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Noto Serif", serif`
-  (system fonts, nothing to vendor). Page titles, hero sentences, first-level card titles, the wordmark. Never tables,
-  numbers, buttons or small labels.
-- `--au-font-ui`: `"Inter", "Figtree", system-ui, sans-serif` (both self-hosted already).
-- Numbers: `font-variant-numeric: tabular-nums`; `"JetBrains Mono"` where columns of prices must align.
-- Sizes 12 / 13 / 14 / 16 / 20 / 26 / 34 / 44 px; display sizes letter-spacing -0.01em, line-height 1.15; body 1.5.
-- Wordmark: the coin mark, then `AUREUM` in the display serif, uppercase, letter-spacing .16em, then `DESK` in the UI font,
-  weight 500, letter-spacing .24em, `--au-ink-2`.
-- Coin mark: a disc filled with `--au-gold-grad`, a thin inner ring (`#1A1305` at 12 % opacity) and a serif capital "A"
-  in `#1A1305`. In CSS (`.ms-coin`) and as `assets/aureum-mark.svg`; the app icons use the same mark on `#0B0A08`.
+- One family: `"Inter", "Figtree", system-ui, sans-serif`, both already self-hosted. It is used for titles too:
+  - page titles weight 650, letter-spacing -0.02em;
+  - card titles weight 600.
+- Numbers use `font-variant-numeric: tabular-nums`, and `"JetBrains Mono"` where columns of prices must align.
+- Sizes are 12 / 13 / 14 / 16 / 20 / 26 / 32 px; body line-height is 1.5.
+- Wordmark: the mark, then `AUREUM` in weight 700 with letter-spacing .14em, then `DESK` in weight 500 with letter-spacing
+  .22em in `--au-ink-2`.
+- Mark: a rounded square (8 px radius on 28 px) filled `linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%)` (brushed
+  silver), the same in every theme, with a capital "A" in `#16181B`, weight 700. It exists in CSS (`.ms-coin`) and as
+  `assets/aureum-mark.svg`; the app icons use the same mark on `#121315`.
 
 ## 3. Shape, depth, controls
 
-- Radii: 8 px small controls, 14 px cards, 20 px hero cards and dialogs, 999 px pills.
-- Cards: `--au-surface`, 1 px `--au-line` border, shadow `inset 0 1px 0 rgba(255,236,190,.04), 0 12px 32px rgba(0,0,0,.35)`
-  (light: `0 1px 2px rgba(60,45,20,.06), 0 8px 24px rgba(60,45,20,.08)`).
-- Spacing steps 4 / 8 / 12 / 16 / 24 / 32 / 48; card padding 20-24 px on desktop, 16 px on phones; grid gaps 16-24 px.
-- Backdrop blur only on a sticky top bar, never on large areas.
-- Buttons: primary = `--au-gold-grad` fill, `--au-on-gold` text, weight 600, radius 10-12 px, at most one per view;
-  secondary = transparent, 1 px `--au-line-strong` border, `--au-ink` text; quiet = text only in `--au-gold-ink`.
-- Focus ring: 2 px solid `#F2D589` (light `#7E5A12`), 2 px offset.
-- Navigation: active item `--au-surface-2` background plus a 2-3 px gold-gradient indicator; inactive items `--au-ink-2`.
-- Motion: 150-200 ms ease-out on opacity / transform only; none under reduced motion (`transition-duration: 0s`).
+- Radii: 8 px for small controls, 12 px for cards, 16 px for the hero card and dialogs, 999 px for pills.
+- Cards: `--au-surface` with a 1 px `--au-line` border and shadow `0 1px 2px rgba(0,0,0,.25)` (light: `0 1px 2px
+  rgba(20,24,30,.06)`). Nothing heavier.
+- Spacing steps are 4 / 8 / 12 / 16 / 24 / 32 / 48. Card padding is 20 px on desktop and 16 px on phones. Grid gaps are 16-20 px.
+- Buttons:
+  - Primary: `--au-primary` fill, `--au-on-primary` text, weight 600, radius 8 px, at most one per view.
+  - Secondary: transparent, with a 1 px `--au-line-strong` border and `--au-ink` text.
+  - Quiet: text only, in `--au-accent`.
+- Focus ring: 2 px solid `--au-accent` with a 2 px offset.
+- Navigation: the active item has a `--au-surface-2` background and a 2 px `--au-accent` indicator; inactive items use
+  `--au-ink-2`.
+- Motion: 120-180 ms ease-out, on opacity and transform only, and none under reduced motion (`transition-duration: 0s`).
 
 ## 4. Simple and organised (every page)
 
-- One page-header pattern: a serif title, one plain sentence that says what the page is for or gives the current answer,
-  then at most one primary action on the right.
-- The answer first; details folded behind "More" or a disclosure. Fewer things visible at once. Where one screen shows the
-  same number twice, keep one.
-- Related controls grouped; filters at the top left of a card, actions at the top right, consistently.
-- Plain labels in sentence case; no unexplained abbreviations in headings.
+- One page-header pattern: a title, then one plain sentence that says what the page is for or gives the current answer, then at
+  most one primary action on the right.
+- Put the answer first and fold the details behind "More" or a disclosure, so fewer things are visible at once. Where one screen
+  shows the same number twice, keep one.
+- Group related controls: filters go at the top left of a card and actions at the top right, on every card.
+- Labels are plain and in sentence case. Headings use no abbreviation that is not explained.
 - Never remove a feature, a figure, data or a permission gate: fold it, move it or relabel it instead.
 
-The accessibility floor of every page still holds: text 12 px or more, 44 px touch targets under `(pointer: coarse)`, AA
-contrast in all three themes, no infinite animation, no sideways scroll at 360 / 390 / 430 px, visible focus.
+The accessibility floor of every page still holds:
+- text is 12 px or more;
+- touch targets are 44 px under `(pointer: coarse)`;
+- contrast is AA in all three themes;
+- no animation is infinite;
+- nothing scrolls sideways at 360 / 390 / 430 px;
+- focus is always visible.

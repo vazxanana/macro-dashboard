@@ -2258,6 +2258,13 @@ member and for every single-key combination; members never get a demo account nu
 `app.webmanifest` (id `/`, "Meridian X", standalone, `#08090c` = the desk's dark `--bg`, shortcuts /gold, /macro-desk, /backtest)
 with icons in `icons/` drawn from the coin favicon by `scripts/make-icons.mjs` (any 192/512, maskable 192/512, apple-touch-icon 180,
 badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOLD `manifest.json` and root icon-192/512 stay for old installs.
+**Mark and icons, graphite (16-17 Nov 2026, docs/design/aureum-theme.md section 2):** the one drawing is `assets/aureum-mark.svg`
+(brushed-silver rounded square, 8 px radius on 28 px, a bold "A" as a path in #16181B, no font); `assets/aureum-mark.css`
+`.ms-coin` is the same letter as a mask (a test compares the paths). `NODE_PATH=$(npm root -g) node scripts/make-icons.mjs`
+reads the SVG and draws every icon (any on transparent; maskable, apple-touch and the root icon-192/512 on #121315 with the
+tile inside the 40 % safe circle; badge-96 = white tile, A cut out; favicon-32) and `icons/og-card.png` (1200 x 630 link
+preview, vendored Inter embedded, not wired to pages yet). Manifest and pwa.mjs theme colour #121315 (`--au-bg`).
+Tests: `tests/aureum-mark.test.mjs`, `tests/pwa.test.mjs`.
 - Build step `scripts/pwa.mjs out` (build.sh, before stamp-assets): adds the missing head tags to every built page (manifest,
   theme-color, apple-touch-icon, apple-mobile-web-app-capable / -title / -status-bar-style black, mobile-web-app-capable, and
   `/assets/pwa.js` which stamp-assets versions). Never hand-add these to page sources. It also writes out/sw.js `VERSION` = hash

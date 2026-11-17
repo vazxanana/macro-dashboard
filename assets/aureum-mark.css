@@ -1,0 +1,14 @@
+/* The Aureum Desk mark in CSS (docs/design/aureum-theme.md, section 2): the same drawing as assets/aureum-mark.svg, a
+   brushed-silver rounded square (8 px radius on 28 px) with a bold "A" in #16181B, the same in every theme. Size it with
+   width / height; the radius and the letter scale with it. The letter is the SVG's own path (a mask), so no font is needed.
+   Use: <i class="ms-coin" aria-hidden="true"></i> next to the wordmark. */
+.ms-coin {
+  display: inline-block; flex: none; width: 28px; height: 28px; border-radius: 28.57%;
+  background: linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%);
+  position: relative; vertical-align: middle;
+}
+.ms-coin::after {
+  content: ""; position: absolute; inset: 0; background: #16181B;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill-rule='evenodd' d='M226 115H286L381 385H322L300.9 325H211.1L190 385H131ZM256 198L229.1 274H282.9Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill-rule='evenodd' d='M226 115H286L381 385H322L300.9 325H211.1L190 385H131ZM256 198L229.1 274H282.9Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
