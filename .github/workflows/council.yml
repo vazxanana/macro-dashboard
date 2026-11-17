@@ -11,8 +11,8 @@ name: Council trader
 # last council save on council-data is over 20 min old (a stuck run).
 on:
   # 7 Nov 2026, 16:3x: the owner chose GitHub Actions as the council runner (repo public, so minutes are free). Self-restart,
-  # watchdog and push trigger are back. The Vercel cron (api/run.js) stands down while this loop has saved in the last 10 min
-  # and takes over on its own if this loop stops.
+  # watchdog and push trigger are back. (The Vercel backup runner, api/run.js, was removed on 17 Nov 2026: this loop is the
+  # only runner.)
   schedule:
     - cron: '7,22,37,52 * * * *'
   workflow_dispatch:

@@ -104,23 +104,18 @@ test('cron endpoints compare the secret in constant time (no plain string compar
   assert.equal(G.bearerOk('Bearer s3cret-value', 's3cret-value'), true);
   for (const h of ['Bearer s3cret-valuX', 'Bearer s3cret', 's3cret-value', '', undefined, 'Bearer s3cret-value ']) assert.equal(G.bearerOk(h, 's3cret-value'), false, String(h));
   assert.equal(G.bearerOk('Bearer ', ''), false, 'no secret configured: never ok'); assert.equal(G.bearerOk('Bearer undefined', undefined), false);
-  for (const f of ['../api/run.js', '../api/alert-cron.js']) {
+  for (const f of ['../api/alert-cron.js']) {
     const src = fs.readFileSync(new URL(f, import.meta.url), 'utf8');
     assert.doesNotMatch(src, /authorization\s*!==?\s*`Bearer/, `${f}: timing-unsafe compare`); assert.match(src, /bearerOk\(/, f);
   }
-  const run = require('../api/run.js'), saved = process.env.CRON_SECRET; process.env.CRON_SECRET = 'cron-fake-0123456789';
-  for (const h of [undefined, 'Bearer nope', 'Bearer cron-fake-012345678']) { const r = res(); await run({ headers: { authorization: h }, query: { job: 'council' } }, r); assert.equal(r.code, 401); }
-  if (saved === undefined) delete process.env.CRON_SECRET; else process.env.CRON_SECRET = saved;
 });
 
-test('/api/status is public and edge-cached: no stack trace or error cause of the runner in it', async () => {
-  resetBlob(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake';
-  await fakeBlob.put('runs/council-1.json', JSON.stringify({ at: new Date().toISOString(), mode: 'live', error: 'GitHub 500 /git/trees: boom', cause: 'ECONNRESET socket hang up', stack: 'at gh (/var/task/api/run.js:40:11) | at async (/var/task/api/run.js:60:3)', step: 'commit' }));
+test('/api/status is public and edge-cached: bot ages only, no flag or runner report in it (17 Nov 2026)', async () => {
   const status = require('../api/status.js'), r = res(); await status({ method: 'GET', headers: {}, query: {} }, r);
-  assert.equal(r.code, 200); const lr = r.body.bots.council.lastRun;
-  assert.equal(lr.error, 'GitHub 500 /git/trees: boom', 'the page still shows the error line'); assert.equal(lr.step, 'commit');
-  assert.equal(lr.stack, undefined); assert.equal(lr.cause, undefined); assert.doesNotMatch(JSON.stringify(r.body), /\/var\/task|ECONNRESET/);
-  resetBlob();
+  assert.equal(r.code, 200); assert.match(r.headers['cache-control'], /s-maxage=30/);
+  assert.deepEqual(Object.keys(r.body.bots).sort(), ['council', 'ict']);
+  for (const k of ['notice', 'noticeLevel', 'runMode']) assert.equal(r.body[k], undefined, k);
+  assert.equal(r.body.bots.council.lastRun, undefined);
 });
 
 test('bridge: a storage error is not echoed to the public; only GET and POST are answered', async () => {

@@ -205,5 +205,5 @@ test('no module overwrites a Blob file in place and reads it back through the CD
   assert.deepEqual(inPlace.sort(), ['_academy-store.js', 'mosha-lessons.js', 'mosha.js', 'notify.js', 'profile.js', 'sounds.js']);
   for (const f of ['notify.js', 'profile.js', 'sounds.js', 'mosha.js']) assert.match(src(`api/${f}`), /await F\(fresh\(b\.url\)/, f);
   // every other writer saves under a new name each time (a new URL, which no CDN copy can exist for)
-  for (const f of ['users.js', '_alerts.js', 'ctrader-link.js', 'tv-webhook.js', 'run.js', 'data.js']) { const puts = src(`api/${f}`).match(/\bput\(`[^`]+`[^;]*/g) || []; assert.ok(puts.length, f); for (const p of puts) assert.match(p, /addRandomSuffix: true/, `${f}: ${p.slice(0, 60)}`); }
+  for (const f of ['users.js', '_alerts.js', 'ctrader-link.js', 'tv-webhook.js', 'data.js']) { const puts = src(`api/${f}`).match(/\bput\(`[^`]+`[^;]*/g) || []; assert.ok(puts.length, f); for (const p of puts) assert.match(p, /addRandomSuffix: true/, `${f}: ${p.slice(0, 60)}`); }
 });

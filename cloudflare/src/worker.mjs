@@ -41,11 +41,6 @@ export const HANDLERS = {
   profile, push, sounds, status, stream, 'trade-review': tradeReview, 'tv-webhook': tvWebhook, users,
 };
 
-// Not carried over: the backup council runner starts the Trader as a child process and writes
-// files, which Workers do not allow (GitHub Actions and the VPS runner are the council's runners);
-// the link-preview image needs @vercel/og (a later stage), so the site icon answers meanwhile.
-const GONE = { run: 'The backup council runner does not run on this host; GitHub Actions runs the council.' };
-
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.
 export const CRONS = { '* * * * *': '/api/alert-cron', '*/10 * * * *': '/api/edge-analyst?job=scan' };
 // Jobs run after a cron's own job, with the same secret (no new trigger: the plan's cron count stays). The trade reviewer
@@ -56,7 +51,6 @@ const SECURITY = headersFor(vercel.headers, new URL('https://x/'));
 
 async function api(name, request, url, env, ctx) {
   if (name === 'og') return Response.redirect(new URL('/icon-512.png', url).href, 302);
-  if (GONE[name]) return new Response(JSON.stringify({ error: GONE[name] }), { status: 410, headers: { 'content-type': 'application/json' } });
   const h = HANDLERS[name];
   if (!h) return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { 'content-type': 'application/json' } });
   return run(h, request, url, ctx);
