@@ -15,6 +15,5 @@ sh scripts/build.sh                    # build the site into out/ (commit out/ w
 node --test tests/*.test.mjs tests/*.test.js
 ```
 
-The site is static pages plus Vercel functions in `api/`; the council runs on GitHub Actions (`.github/workflows/council.yml`)
-and writes to the `council-data` branch. `netlify.toml` and `_redirects` are left over from an early Netlify version and are not
-used by the live site.
+The site is static pages plus the functions in `api/`, served by a Cloudflare Worker (`cloudflare/`); the council runs on
+GitHub Actions (`.github/workflows/council.yml`) and writes to the `council-data` branch.
