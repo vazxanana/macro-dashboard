@@ -1,6 +1,6 @@
 // ChronosTrade's AI coach endpoint (17 Nov 2026; the request and the answer check are api/_chronos-coach.js).
 //   GET  /api/chronos-coach   a signed-in member -> { enabled, reason, perDay, leftToday, livePerDay, liveLeftToday, liveGapS, lastMs, cost }
-//   POST /api/chronos-coach   a signed-in member, same origin; body { kind: 'trade' | 'session' | 'live', lang?, stream?, … } (the pure module)
+//   POST /api/chronos-coach   a signed-in member, same origin; body { kind: 'trade' | 'session' | 'live' | 'debrief', lang?, stream?, … } (the pure module)
 //        -> { state: 'ok', answer | text, provider, model, cached, ms } | { state: 'off' | 'budget' | 'limit' | 'busy' | 'wait' | 'refused' | 'error', message }
 //        With stream: true and a question that reaches the model, the answer is sent as server-sent events (text/event-stream):
 //        data: {"t":"start"}, then data: {"t":"text","d":"<piece>"} as the provider writes it, then data: {"t":"done", …the result
@@ -21,6 +21,7 @@
 //   this feature's own budgets; CHRONOS_LLM_MAX_TOKENS (4000) the output cap of a trade / session question,
 //   CHRONOS_LIVE_MAX_TOKENS (1500) of a live comment; CHRONOS_COACH_PER_DAY (20) trade / session questions a day one account may
 //   ask, CHRONOS_LIVE_PER_DAY (150) live comments a day (both in memory, per instance; the USD budgets above stay the hard stop);
+//   CHRONOS_DEBRIEF_PER_DAY (5) end-of-session debriefs a day one account may ask (its own counter, `debrief|<account>`);
 //   a live comment: one at a time per account and at most one every CHRONOS_LIVE_GAP_S (8) seconds; CHRONOS_COACH=off or CHRONOS_LLM_STOP=1 stops every call.
 'use strict';
 const crypto = require('node:crypto');
@@ -29,7 +30,7 @@ const LLM = require('./_academy-llm.js');
 const ST = require('./_academy-store.js');
 const M = require('./_chronos-coach.js');
 
-const ANSWERS = 'answers.json', LIVE = 'live.json', KEEP = 300, LIVE_KEEP = 200, MAX_OUT = 4000, LIVE_OUT = 1500, PER_DAY = 20, LIVE_PER_DAY = 150, LIVE_GAP_S = 8, BODY_MAX = 300000;
+const ANSWERS = 'answers.json', LIVE = 'live.json', KEEP = 300, LIVE_KEEP = 200, MAX_OUT = 4000, LIVE_OUT = 1500, PER_DAY = 20, LIVE_PER_DAY = 150, LIVE_GAP_S = 8, BODY_MAX = 300000, DEBRIEF_PER_DAY = 5;
 const rootOf = (env) => (env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'chronos-coach-preview/' : 'chronos-coach/');
 const TAILS = new Map();   // one lock map per function instance (the store's rule)
 const storeOf = (env, io = {}) => ST.make(ST.blobBackend(env, { ...io, root: rootOf(env) }), TAILS);
@@ -58,6 +59,7 @@ const intEnv = (v, d, max) => { const x = Math.round(Number(v)); return Number.i
 const perDay = (env) => intEnv(env.CHRONOS_COACH_PER_DAY, PER_DAY, 200);
 const livePerDay = (env) => intEnv(env.CHRONOS_LIVE_PER_DAY, LIVE_PER_DAY, 500);
 const liveGap = (env) => intEnv(env.CHRONOS_LIVE_GAP_S, LIVE_GAP_S, 600);
+const debriefPerDay = (env) => intEnv(env.CHRONOS_DEBRIEF_PER_DAY, DEBRIEF_PER_DAY, 50);
 // calls per account and UTC day, in memory (a new instance starts at 0; the adapter's own daily budget and call cap still hold).
 // Live comments have their own counter (`live|<account>`), their own gap and one in flight per account.
 const CALLS = new Map(), LIVE_AT = new Map(), LIVE_BUSY = new Set();
@@ -82,11 +84,11 @@ async function handle(req, res, d = {}) {
   try {
     const acct = await (d.who || ((r) => S.fromRequest(r, env, S.defaultDeps(env), { cacheMs: 60e3 })))(req);
     if (!acct) return res.status(401).json({ error: 'sign in first' });
-    const lim = perDay(env), lLim = livePerDay(env), gap = liveGap(env), C = LLM.config(llmEnv(env)), why = LLM.unavailable(C) || (off(env) ? 'switched off (CHRONOS_COACH=off)' : null);
+    const lim = perDay(env), dLim = debriefPerDay(env), lLim = livePerDay(env), gap = liveGap(env), C = LLM.config(llmEnv(env)), why = LLM.unavailable(C) || (off(env) ? 'switched off (CHRONOS_COACH=off)' : null);
     if (req.method === 'GET') {
       const [cost, a, l] = await Promise.all([LLM.status({ env: llmEnv(env), store, now: () => nowMs }), store.get(ANSWERS, { v: 1, rows: [] }), store.get(LIVE, { v: 1, rows: [] })]);
       const lastMs = [a && a.lastMs, l && l.lastMs].filter(Boolean).sort((x, y) => String(y.at).localeCompare(String(x.at)))[0] || null;
-      return res.status(200).json({ enabled: !why && !C.stop, reason: why || (C.stop ? 'stopped (CHRONOS_LLM_STOP)' : null), perDay: lim, leftToday: Math.max(0, lim - used(acct.u, nowMs)),
+      return res.status(200).json({ enabled: !why && !C.stop, reason: why || (C.stop ? 'stopped (CHRONOS_LLM_STOP)' : null), perDay: lim, leftToday: Math.max(0, lim - used(acct.u, nowMs)), debriefPerDay: dLim, debriefLeftToday: Math.max(0, dLim - used(`debrief|${acct.u}`, nowMs)),
         livePerDay: lLim, liveLeftToday: Math.max(0, lLim - used(`live|${acct.u}`, nowMs)), liveGapS: gap, lastMs,
         cost: { today: cost.today.usd, month: cost.month.usd, total: cost.total.usd, budgets: cost.budgets, callsLeftToday: cost.calls.leftToday } });
     }
@@ -95,7 +97,7 @@ async function handle(req, res, d = {}) {
     else if (b && JSON.stringify(b).length > BODY_MAX) return res.status(413).json({ error: 'too much data' });
     let q; try { q = M.buildRequest(b); } catch (e) { return res.status(e.status || 400).json({ error: String(e.message || 'bad request').slice(0, 120) }); }
     if (why) return res.status(200).json({ state: 'off', message: why });
-    const live = q.kind === 'live', file = live ? LIVE : ANSWERS, who = live ? `live|${acct.u}` : acct.u;
+    const live = q.kind === 'live', deb = q.kind === 'debrief', file = live ? LIVE : ANSWERS, who = live ? `live|${acct.u}` : deb ? `debrief|${acct.u}` : acct.u;
     // a question already answered (or already refused after a billed call) is answered from the store: never paid for twice
     const h = crypto.createHash('sha256').update(JSON.stringify([acct.u, q.system, q.prompt])).digest('hex').slice(0, 40);
     const doc = await store.get(file, { v: 1, rows: [] }), old = (doc.rows || []).find((r) => r && r.h === h);
@@ -103,7 +105,7 @@ async function handle(req, res, d = {}) {
       if (old.answer || old.text) return res.status(200).json({ state: 'ok', ...(live ? { text: old.text } : { answer: old.answer }), provider: old.provider, model: old.model, cached: true });
       return res.status(200).json({ state: 'refused', ...(live ? { withdrawn: true, message: 'Withdrawn: the answer broke the coach\'s rules.' } : { message: 'The coach\'s answer to this question did not pass the checks, and it is not asked again.' }), why: old.refused || [] });
     }
-    if (used(who, nowMs) >= (live ? lLim : lim)) return res.status(200).json({ state: 'limit', message: live ? `Coach resting: ${lLim} comments today. The free notes go on; comments come back tomorrow (UTC).` : `You have asked the coach ${lim} times today: ask again tomorrow (UTC).` });
+    if (used(who, nowMs) >= (live ? lLim : deb ? dLim : lim)) return res.status(200).json({ state: 'limit', message: live ? `Coach resting: ${lLim} comments today. The free notes go on; comments come back tomorrow (UTC).` : deb ? `${dLim} debriefs today: the free debrief stays; ask again tomorrow (UTC).` : `You have asked the coach ${lim} times today: ask again tomorrow (UTC).` });
     if (live) {
       if (LIVE_BUSY.has(acct.u)) return res.status(200).json({ state: 'busy', message: 'The coach is still answering the last comment.' });
       const last = LIVE_AT.get(acct.u) || 0, wait = Math.ceil((last + gap * 1000 - nowMs) / 1000);
@@ -114,7 +116,7 @@ async function handle(req, res, d = {}) {
     try {
       const want = !!(b && b.stream === true), maxTokens = live ? LLM.featureCap(env.CHRONOS_LIVE_MAX_TOKENS, LIVE_OUT) : LLM.featureCap(env.CHRONOS_LLM_MAX_TOKENS, MAX_OUT);
       const capVar = live ? 'CHRONOS_LIVE_MAX_TOKENS' : 'CHRONOS_LLM_MAX_TOKENS';
-      const ask = { system: q.system, prompt: q.prompt, cap: 'feature', maxTokens, long: true, cacheSystem: true, ...(q.schema ? { schema: q.schema, schemaName: 'coach_answer' } : {}) };
+      const ask = { system: q.system, prompt: q.prompt, cap: 'feature', maxTokens, long: true, cacheSystem: true, ...(q.schema ? { schema: q.schema, schemaName: deb ? 'coach_debrief' : 'coach_answer' } : {}) };
       const io = { env: llmEnv(env), store, now: d.now, fetch: d.fetch };
       const send = (o) => { try { res.write(`data: ${JSON.stringify(o)}\n\n`); } catch (e) { /* the page went away; the call still ends and is stored */ } };
       const t0 = clock();
@@ -146,7 +148,7 @@ async function finish(ans, { q, live, h, acct, file, store, nowMs, ms }) {
   if (ans.error && ans.partial != null && !ans.cut) {   // broke off in the middle: may be billed, not an answer; asked again it is a new call
     return { state: 'error', withdrawn: live, message: errText(ans), ms };
   }
-  const p = billed ? { ok: false, why: [String(ans.error).slice(0, 160)] } : live ? M.parseLive(ans.text) : M.parseAnswer(ans.text);
+  const p = billed ? { ok: false, why: [String(ans.error).slice(0, 160)] } : live ? M.parseLive(ans.text) : q.kind === 'debrief' ? M.parseDebrief(ans.text) : M.parseAnswer(ans.text);
   const lastMs = { first: ms.first, total: ms.total, kind: q.kind, at: new Date(nowMs).toISOString(), cached: !!ans.cached };
   const row = { h, u: acct.u, kind: q.kind, ...(live ? { trigger: q.trigger } : {}), at: new Date(nowMs).toISOString(), provider: ans.provider || null, model: ans.model || null, costUsd: ans.costUsd || 0, ms: { first: ms.first, total: ms.total },
     ...(p.ok ? (live ? { text: p.text } : { answer: p.answer }) : { refused: p.why }) };
@@ -163,6 +165,7 @@ module.exports.storeOf = storeOf;
 module.exports.MAX_OUT = MAX_OUT;
 module.exports.LIVE_OUT = LIVE_OUT;
 module.exports.PER_DAY = PER_DAY;
+module.exports.DEBRIEF_PER_DAY = DEBRIEF_PER_DAY;
 module.exports.LIVE_PER_DAY = LIVE_PER_DAY;
 module.exports._calls = CALLS;
 module.exports._live = { at: LIVE_AT, busy: LIVE_BUSY };

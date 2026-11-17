@@ -2205,6 +2205,51 @@ accounts (`data-pf-go` scrolls to the card, opening its fold on the phone's simp
 the account menu shows `#ms-me-academy`. From 901 px the list column is sticky on the left and every section card in the right
 column. The hero and lists are not `.card`, so the simple view still keeps the first card (Demo accounts) and folds the rest.
 
+Coach for results (17 Nov 2026, owner: "do more critical and useful for productivity and results improvements for the coach").
+Display and record only: nothing here places, changes or refuses an order and nothing moves a stop. Page block `// ---- Coach for
+results (17 Nov 2026` … `// ---- end Coach for results` (after the live coach's; its state is `CFR`: `CR` is the drawing tools'
+name), CSS `/* Coach for results (17 Nov 2026)` … `/* end Coach for results */` (outside the simple view's block). Pure helpers on
+`BT`, tested in `tests/backtest-coach-leaks.test.mjs`.
+- **One record across sessions**: `BT.gatherSessions(sessions, { current })` reads every saved session of `btLab:sessions` (read
+  only; the live account replaces its saved copy), merges partial closes inside their own session, labels each trade with its
+  market and timeframe (`sess.label`) and gives it the id `<session>#<id>`, so two sessions' trade #1 stay two trades. A scope
+  switch "This session | All my sessions" (`.cr-sc`, localStorage `btLab:coachScope`) on "How you trade" and on the leak card; the
+  journal filters still apply (`crPass` = jList's tests); the session question to the AI carries `scope`, `sessions` and each
+  trade's `market` (`api/_chronos-coach.js` caps them). Never merges accounts.
+- **Where your R goes** (card `#lk`, top of Statistics, `BT.coachLeaks(trades, barsFor)`): one row per habit (stop moved away,
+  exited early, closed by hand, stopped out after +1R, revenge within a session, oversized, against the trend, away from your
+  levels, outside your best session) with n, sum R, mean R and the R given up (`lost`), sorted by it, and one headline sentence.
+  Exits by hand get a COUNTERFACTUAL (`BT.exitCf`): candles AFTER the exit only (`time > closedAt`, each ended by the replay
+  moment), to the stop and target the trade OPENED with (`ctx.tgt0`, else the target; stop first when one candle holds both, a
+  gap at the open); never a candle at or before the exit (a test rewrites them). Only the live session's candles are held: other
+  sessions' exits are "not measured", never guessed. "Break-even at +1R" (trades that reached +1R and closed at a loss) and the
+  winners' capture of their best move read the recorded MFE (approximate, said so). Under 20 trades a row is "too few to judge",
+  else "your record, not a tested edge".
+- **Patterns**: `coachSplits` now also returns every comparison (`diffs`); `BT.coachPatterns` keeps those with 20+ trades on BOTH
+  sides and Welch |t| >= 2 (always over all sessions), `BT.patternMatch(pats, ctx)` the costly ones a context matches. A matching
+  draft gets an amber line in the draft readout (`.dwarn`, from `draftSay`'s context `CSC`), a new position or a draft a note on
+  the live panel ("Your pattern"). A warning only: it never refuses or changes an order. The leak card lists the patterns.
+- **Session plan and tilt guard** (Trade card `details#pl`, localStorage `btLab:plan`, `BT.planNorm` / `BT.planCheck`): max trades a
+  day, max daily loss in R, stop after n losses in a row today (the replay's UTC day), a focus rule, "Ask me before trading past my
+  plan", "Ask a grade (A / B / C) on each entry". Past a limit a banner (`#pl-ban`) and, only when the owner ticked "Ask me", a
+  styled confirm (`msConfirm`, "Trade anyway") before an order: `crGate(go)` is called by `instant()` and the draft's Confirm,
+  each handing in its own step, which runs unchanged when the owner says go on (the stop is never touched). The grade: chips in the
+  draft readout (`D.grade`) and in the Trade card for the next one-click entry (`#pl-grade`), stored as `rec.grade` and `ctx.grade`;
+  "Your grade" is a split of "How you trade" and of the debrief.
+- **Debrief** (`#debd`, "End session debrief" on the leak card and "Debrief" on the score line; offered there when the replay
+  reaches the session's end or on a pause after 5 or more trades): the free part `BT.coachDebrief` (totals, plan adherence
+  `BT.planAdherence`, the top 3 leaks, best and worst trade, results by grade, a focus rule from the top leak). AI on: kind
+  `debrief` (`api/_chronos-coach.js` `debriefPayload`, no candles, every field capped; answer `{ summary, leaks 1-3, focus, drill }`
+  checked by `parseDebrief` with the same stop and claim rules; its own daily count `CHRONOS_DEBRIEF_PER_DAY` 5, `debrief|<account>`,
+  stored in answers.json), streamed. The debrief lives in memory, goes into the session report ("Session debrief") and the JSON
+  export (`debrief`); its focus rule (the AI's, or "Use this focus") is kept as `plan.nextFocus` and becomes the focus of the next
+  new session that has no trade yet.
+- **Productivity**: **A** = the last closed trade's review dialog (`openMist`, now a function) and, AI on, "Ask the coach" on it;
+  **Shift+A** = the live coach on and "What do you see?" (outside fields and open dialogs; no other A key on the page). The score
+  line `#co-score` in the Trade card: today's trades, R, plan kept / broken, the top leak. `window.ctCoach()` is the audit's
+  read-only view. Audit section 40 (seeded saved sessions; screenshots `coach2-leak.png`, `coach2-pattern-draft.png`,
+  `coach2-plan-banner.png`, `coach2-plan-confirm.png`, `coach2-debrief.png`, `coach2-debrief-ai.png`).
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
