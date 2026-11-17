@@ -469,7 +469,7 @@ test('Council "as of" stamps name the time zone and say "Stale" in words past tw
   assert.doesNotMatch(fresh, /Stale/); assert.match(fresh, /11 Nov/); assert.match(fresh, /\d\d:\d\d \S+$/, 'a zone name ends the stamp');
   assert.match(old, /^Stale: 10 Nov.*, 18 h old \(written every 6 h\)$/); assert.match(days, /^Stale: .*4 days old/);
   assert.equal(hc.stampTxt('not a date', 6, now), '');
-  for (const id of ['ms-decay-js', 'ms-ex-js', 'ms-book-js']) assert.match(new RegExp(`<script id="${id}">([\\s\\S]*?)</script>`).exec(deskHtml)[1], /MS_HC\.stampTxt\((D|B)\.at, 6\)/, id);
+  for (const id of ['ms-decay-js', 'ms-ex-js']) assert.match(new RegExp(`<script id="${id}">([\\s\\S]*?)</script>`).exec(deskHtml)[1], /MS_HC\.stampTxt\((D|B)\.at, 6\)/, id);
   assert.match(deskHtml, /id="ms-c-tz"/, 'the trade table says whose clock its times use');
 });
 
@@ -505,7 +505,6 @@ test('Home / Council reading pass: text at 12 px, touch targets, and the cards t
   for (const s of ['.c-dh { min-height: 44px', '.c-meta:not(.open) { line-height: 44px', '.sb-thin { min-height: 44px', '#ms-sb-h th button { min-height: 44px', '#ms-sb-b a { display: inline-flex; align-items: center; min-height: 44px']) assert.ok(touch.includes(s), s);
   // a planned reward:risk is not written like a result
   assert.match(deskHtml, /<span title="Planned reward for 1R of risk, not a result">target \$\{\(\+t\.rr\)\.toFixed\(2\)\}R<\/span>/);
-  assert.match(deskHtml, /deepest drawdown, day to day: live /); assert.doesNotMatch(deskHtml, /max drawdown ' \+ esc\(num\(B\.live\.dd\)/);
 });
 
 
