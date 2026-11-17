@@ -12774,7 +12774,8 @@
     "t1": 3965.575,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3882.05,
@@ -12789,7 +12790,7 @@
     "lagSec": 634,
     "positionId": "49914308",
     "volume": 100,
-    "status": "open",
+    "status": "closed at broker",
     "brokerShift": {
      "stop": 0,
      "t1": -2.675
@@ -12798,7 +12799,8 @@
      "stop": 0,
      "t1": -2.675
     },
-    "feedOnly": 1
+    "feedOnly": 1,
+    "closedAt": "2026-11-17T13:41:04.000Z"
    },
    "xau-m30m1-1794843920": {
     "symbol": "XAUUSD",
@@ -12898,7 +12900,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "m30m1",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-16T19:11:03.000Z",
     "councilEntry": 3858.525,
     "stop": 3843.325,
@@ -12913,7 +12915,8 @@
     "slipR": -0.084,
     "lagSec": 105,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-16T19:11:03.000Z",
     "brokerStop": 3842.05,
@@ -12925,7 +12928,8 @@
      "stop": 0,
      "t1": -2.675
     },
-    "feedOnly": 1
+    "feedOnly": 1,
+    "closedAt": "2026-11-17T13:41:04.000Z"
    },
    "gbpusd-swing-1794878016": {
     "positionId": "50058928",
@@ -13071,6 +13075,33 @@
     "positionId": "50205659",
     "volume": 100000,
     "status": "open"
+   },
+   "gbpusd-swing-1794922635": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "swing",
+    "openedAt": "2026-11-17T13:41:04.000Z",
+    "councilEntry": 1.31775,
+    "stop": 1.3206746785714287,
+    "t1": 1.3119006428571425,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.31775,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2.92,
+    "margin": 2.64,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 1.31775,
+    "slipR": 0,
+    "lagSec": 229,
+    "positionId": "50205803",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -13078,68 +13109,26 @@
    "startBalance": 10183.68
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10168.69 · 9 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10108.88 · 8 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 294.83, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 304.82, 3.0% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-17T13:38:17.000Z"
+    "at": "2026-11-17T13:41:04.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "gbpusd-swing-1794922635": {
-    "orderId": "34225735",
-    "symbol": "GBPUSD",
-    "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "swing",
-    "limitPrice": 1.31775,
-    "stop": 1.3206746785714287,
-    "t1": 1.3119006428571425,
-    "placedAt": "2026-11-17T13:38:17.000Z",
-    "expires": "2026-11-19T13:37:15.000Z",
-    "riskCash": 2.92,
-    "margin": 2.64,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10168.69,
-  "lastRun": "2026-11-17T13:38:17.000Z"
+  "balance": 10108.88,
+  "lastRun": "2026-11-17T13:41:04.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-17T01:56:50.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 282.89, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T01:59:04.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 280.55, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T02:02:51.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 279.33, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T02:04:09.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 279.50, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-17T02:06:49.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 279.37, 2.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14619,6 +14608,26 @@
    "at": "2026-11-17T13:38:17.000Z",
    "msg": "placed sell limit GBPUSD 0.01 lot at 1.31775 (council swing, valid to 2026-11-19T13:37Z)",
    "trade": "gbpusd-swing-1794922635"
+  },
+  {
+   "at": "2026-11-17T13:41:04.000Z",
+   "msg": "limit filled: GBPUSD position 50205803 at the broker",
+   "trade": "gbpusd-swing-1794922635"
+  },
+  {
+   "at": "2026-11-17T13:41:04.000Z",
+   "msg": "XAUUSD position 49914308 closed at the broker",
+   "trade": "xau-mcycle-pull-1794672000"
+  },
+  {
+   "at": "2026-11-17T13:41:04.000Z",
+   "msg": "XAUUSD position 49995319 closed at the broker",
+   "trade": "xau-m30m1-1794856158"
+  },
+  {
+   "at": "2026-11-17T13:41:04.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 304.82, 3.0% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
   }
  ],
  "limits": {
@@ -14697,7 +14706,7 @@
   ]
  },
  "execution": {
-  "n": 433,
+  "n": 434,
   "meanSlipR": -0.018,
   "medianSlipR": 0,
   "worstSlipR": 1.687,
@@ -14720,7 +14729,7 @@
     "meanSlipR": -0.033
    },
    "GBPUSD": {
-    "n": 64,
+    "n": 65,
     "meanSlipR": 0.002
    },
    "USDCAD": {
