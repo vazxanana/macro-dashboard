@@ -352,6 +352,20 @@ the live part shown), then two columns: Setup now (admin) + Open positions (`#h-
 rows open the trade chart) on the left, compact tiles (`.tile-s`) on the right. The bottom tab bar (`.btab`, now with
 Scanner for admin) becomes a fixed left sidebar at ≥1180 px, where the header's top tabs are hidden.
 
+**The graphite look (17 Nov 2026, docs/design/aureum-theme.md; owner rejected the 16 Nov black-and-gold).** The Desk's tokens live in ONE
+place: the first `<style>` block of `market-structure.html` defines `--au-*` (bg, surface, surface-2, well, line, ink-1/2/3, accent,
+primary / on-primary, gain / loss / warn / info, shadow, mark, font, sizes, spacing, radii) for dark (`:root`), light and midnight
+(pro uses dark), and points every older name at them (`--bg`, `--panel`, `--ink*`, `--line*`, `--accent*`, `--buy*`, `--sell*`,
+`--gold*` = the accent, `--au-gold*` = primary / accent, `--sans` / `--mono` = Figtree). The later redefinitions (4 Nov, Design pass
+100, the midnight navy block, pro's oklch tokens, scoped light overrides on Home and the guest page) were removed: never redefine a
+token further down. The frame (mark `.ms-coin` = silver rounded square with "A", wordmark `.wm` AUREUM / DESK in the header below
+1180 px and for guests, in the sidebar and on the sign-in card; flat header with quiet icon buttons; the Desk | Macro | ChronosTrade
+switch without its ring; nav active = surface-2 + a 2 px accent bar; 12 px cards; one neutral primary button; Home without the wash,
+quiet jump links, open positions before the setup and the market cards after the grid at 641 px and up) is `<style id="ms-shell-css">`,
+the LAST style block, so it wins over the older passes; it never mentions the simple phone view. The UI font stays Figtree (Inter is
+not loaded on the Desk). `tests/qa-sweep.test.mjs` `tok()` follows `var()` into the first `:root` block, so the contrast checks
+measure the real colours. Not done: a desktop "what waits on you" line (the phone has `#ps-need`).
+
 ## Users page (6 Nov 2026)
 
 Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (server side, `api/_accounts.js`; their public records
