@@ -110,9 +110,10 @@ function systemText(lang) {
 }
 // the live question -> { payload } or throws a 400. Nothing after the replay moment: candles that end after it, positions or
 // drafts opened after it and trades closed after it are dropped here, whatever the page sent.
-const TRIGGERS = ['open', 'close', 'ask'];
+const TRIGGERS = ['open', 'close', 'ask', 'event'];
+const EVENT_KINDS = ['level', 'stop', 'target', 'swing', 'session', 'big', 'r', 'draft'], STALE_BARS = 10;
 function livePayload(b) {
-  const trigger = TRIGGERS.includes(b.trigger) ? b.trigger : null; if (!trigger) throw bad('trigger must be open, close or ask');
+  const trigger = TRIGGERS.includes(b.trigger) ? b.trigger : null; if (!trigger) throw bad('trigger must be open, close, ask or event');
   const sec = TFS.includes(fin(b.tf)) ? fin(b.tf) : null; if (!sec) throw bad('unknown timeframe');
   const moment = fin(b.moment); if (moment == null) throw bad('the replay moment is needed');
   const dec = Math.max(0, Math.min(6, Math.round(fin(b.dec) ?? 5)));
@@ -135,7 +136,11 @@ function livePayload(b) {
   }
   const lastTrades = (Array.isArray(b.trades) ? b.trades : []).filter((t) => isObj(t) && !(fin(t.closedAt) > moment)).slice(-LIM.liveTrades)
     .map((t) => ({ R: fin(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, sentence: str(t.sentence), flags: strList(t.flags, 4, 160) })).filter((t) => t.R != null || t.sentence);
-  const ev = isObj(b.event) && trigger !== 'ask' ? { kind: trigger, side: b.event.side === 'buy' || b.event.side === 'sell' ? b.event.side : null, ...(trigger === 'close' ? { R: fin(b.event.R), exitReason: str(b.event.reason, 40) } : {}), coachSentence: str(b.event.sentence), flags: strList(b.event.flags, 6, 160) } : null;
+  // a market event (the page's free note): only one of the known kinds, at or before the moment and no more than 10 candles old
+  if (trigger === 'event') { const e = isObj(b.event) ? b.event : {}, at = fin(e.at);
+    if (!EVENT_KINDS.includes(e.kind) || !str(e.text)) throw bad('an event needs a known kind and its text');
+    if (at == null || at > moment || moment - at > STALE_BARS * sec) throw bad('a stale event: more than 10 candles before the replay moment, or after it'); }
+  const ev = trigger === 'event' ? { kind: 'market event', what: str(b.event.kind, 20), text: str(b.event.text, 200), atUtc: new Date(fin(b.event.at) * 1000).toISOString() } : isObj(b.event) && trigger !== 'ask' ? { kind: trigger, side: b.event.side === 'buy' || b.event.side === 'sell' ? b.event.side : null, ...(trigger === 'close' ? { R: fin(b.event.R), exitReason: str(b.event.reason, 40) } : {}), coachSentence: str(b.event.sentence), flags: strList(b.event.flags, 6, 160) } : null;
   const closedN = Math.max(0, Math.round(fin(b.closedN) || 0));
   return { kind: 'live', trigger, live: { market: str(b.market, 24), timeframeSec: sec, replayMomentUtc: new Date(moment * 1000).toISOString(), lastClose: bars[bars.length - 1][4],
     event: ev, openPositions: positions, drafts, drawings: isObj(b.drawings) ? cleanVal(b.drawings) : null, closedTradesInSession: closedN, tooFewBelow: MIN_N, lastTrades, largestDifference: str(b.lead, 300) || null },
@@ -151,7 +156,7 @@ function liveSystem(lang) {
     'Never suggest removing a stop, widening a stop, moving a stop further from the entry or trading without one. Every trade keeps a stop.',
   ].join('\n');
 }
-const LIVE_ASK = { open: 'The trader just opened a position. Comment on it.', close: 'The trader just closed a position. Comment on it.', ask: 'The trader asks: "What do you see?" Comment on the chart and on what they are doing now.' };
+const LIVE_ASK = { open: 'The trader just opened a position. Comment on it.', close: 'The trader just closed a position. Comment on it.', ask: 'The trader asks: "What do you see?" Comment on the chart and on what they are doing now.', event: 'Something just happened on the chart (the event below). Comment on it briefly, in the context of what the trader is doing.' };
 // -> { system, prompt, schema, payload } or throws a 400
 function buildRequest(b) {
   if (!isObj(b)) throw bad('bad request');
@@ -199,4 +204,4 @@ function parseLive(text) {
   return why.length ? { ok: false, why } : { ok: true, text: s };
 }
 
-module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, TRIGGERS, buildRequest, parseAnswer, parseLive, systemText, liveSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, cleanVal } };
+module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, TRIGGERS, EVENT_KINDS, STALE_BARS, buildRequest, parseAnswer, parseLive, systemText, liveSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, cleanVal } };

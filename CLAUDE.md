@@ -2138,12 +2138,27 @@ position or trade after the moment again), positions with the OPENING stop (a lo
 streamed into the note (`liveSystem`: calm coach, the trader's own context, at most one question, no forecast as fact, no promise,
 under 20 trades too small); `parseLive` refuses stop removing / widening advice, "proven / tested edge" / "guaranteed" and a
 forecast stated as fact ("price will fall"), and the note becomes "Withdrawn: the answer broke the coach's rules." (stored
-refused in live.json, never asked again). Limits: one live call in flight and one per `CHRONOS_LIVE_GAP_S` 20 s (page and server;
-events in between get their free note only), `CHRONOS_LIVE_PER_DAY` 60 an account a UTC day (its own counter, memory, per
-instance), output cap `CHRONOS_LIVE_MAX_TOKENS` 1500. Playback never waits; "Pause the replay while the coach answers" (memory
+refused in live.json, never asked again). Limits: one live call in flight and one per `CHRONOS_LIVE_GAP_S` 8 s (page and server,
+the page reads it from GET; events in between get their free note only), `CHRONOS_LIVE_PER_DAY` 150 an account a UTC day (its own
+counter, memory, per instance; the adapter's USD budgets stay the hard stop: the panel then says "Coach resting: daily budget
+reached" and keeps the free notes), output cap `CHRONOS_LIVE_MAX_TOKENS` 1500.
+**More live (17 Nov 2026, owner: "the live AI while backtesting needs to be more live")**: market events while the replay plays,
+`BT.liveEvents(bars, sec, T, st, o)` (pure, `assets/backtest-engine.js`; only candles CLOSED by `T`, at most the last 3 since the
+last look, each event once, `t` = its candle's close): a drawn line / ray / box edge / trend line (`lineAt`) closed through (imp 3)
+or touched (2), a close within 0.25R of a position's stop (3) or target (2) (again after 0.5R away), a close through the last swing
+(the coach's swing rule, 3 a side) (2), Asia / London / New York opening (1), a candle over 2x ATR(14) (2), floating R crossing
++1R (3) / -0.5R (2), an order set up and not placed for 5 candles (1). Each is a free one-line note at once (`mk`, `mk hi`). With
+"Comment on market events" (`#lc-talk`, on by default, memory only) the most important one waits as the one pending event
+(replaced by a more important or newer one): it reaches the AI (trigger `event`, `{ kind, text, at }`) when no call is in flight
+and the gap has passed; only importance 2+ at 1x / 2x, 3 from 5x; dropped when it is more than 10 candles before the replay moment
+(the server refuses such an event, or one after the moment, with 400; known kinds only). The panel: newest note on top with a
+150 ms fade (`lc-in`, none under reduced motion), each note's candle time, a still dot and "Watching the replay" while it plays
+(three pulses, never infinite), "n AI comments left today" (`liveLeftToday` from GET, `liveLeft` on each live answer), "typing…"
+until the first words. Docked at the chart's lower right (clear of the drawing tool strip on the left, the quick bar and the price
+scale), its height capped to the chart; on the phone strip the quick bar follows the chart down (`overlay()`). Playback never waits; "Pause the replay while the coach answers" (memory
 only, off) presses the play control and presses it again after. Tests: `tests/llm-stream.test.mjs` (4), `tests/chronos-live.test.mjs`
-(8); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft with the AI off, the AI on with a stubbed
-stream and a withdrawn answer, the 20 s rule, AA in three themes, phone strip).
+(11); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft / market events with the AI off, the AI on with
+a stubbed stream and a withdrawn answer, the gap, commentary on a market event, the watching dot, AA in three themes, phone strip).
 
 Drawing tools like TradingView (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend
 line, magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop

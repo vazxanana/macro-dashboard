@@ -20,8 +20,8 @@
 //   CHRONOS_LLM_DAILY_USD (default 0.50), CHRONOS_LLM_MONTHLY_USD (5), CHRONOS_LLM_HARD_USD (25), CHRONOS_LLM_MAX_CALLS_DAY (100):
 //   this feature's own budgets; CHRONOS_LLM_MAX_TOKENS (4000) the output cap of a trade / session question,
 //   CHRONOS_LIVE_MAX_TOKENS (1500) of a live comment; CHRONOS_COACH_PER_DAY (20) trade / session questions a day one account may
-//   ask, CHRONOS_LIVE_PER_DAY (60) live comments a day (both in memory, per instance); a live comment: one at a time per account
-//   and at most one every CHRONOS_LIVE_GAP_S (20) seconds; CHRONOS_COACH=off or CHRONOS_LLM_STOP=1 stops every call.
+//   ask, CHRONOS_LIVE_PER_DAY (150) live comments a day (both in memory, per instance; the USD budgets above stay the hard stop);
+//   a live comment: one at a time per account and at most one every CHRONOS_LIVE_GAP_S (8) seconds; CHRONOS_COACH=off or CHRONOS_LLM_STOP=1 stops every call.
 'use strict';
 const crypto = require('node:crypto');
 const S = require('./_session.js');
@@ -29,7 +29,7 @@ const LLM = require('./_academy-llm.js');
 const ST = require('./_academy-store.js');
 const M = require('./_chronos-coach.js');
 
-const ANSWERS = 'answers.json', LIVE = 'live.json', KEEP = 300, LIVE_KEEP = 200, MAX_OUT = 4000, LIVE_OUT = 1500, PER_DAY = 20, LIVE_PER_DAY = 60, LIVE_GAP_S = 20, BODY_MAX = 300000;
+const ANSWERS = 'answers.json', LIVE = 'live.json', KEEP = 300, LIVE_KEEP = 200, MAX_OUT = 4000, LIVE_OUT = 1500, PER_DAY = 20, LIVE_PER_DAY = 150, LIVE_GAP_S = 8, BODY_MAX = 300000;
 const rootOf = (env) => (env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'chronos-coach-preview/' : 'chronos-coach/');
 const TAILS = new Map();   // one lock map per function instance (the store's rule)
 const storeOf = (env, io = {}) => ST.make(ST.blobBackend(env, { ...io, root: rootOf(env) }), TAILS);
@@ -103,7 +103,7 @@ async function handle(req, res, d = {}) {
       if (old.answer || old.text) return res.status(200).json({ state: 'ok', ...(live ? { text: old.text } : { answer: old.answer }), provider: old.provider, model: old.model, cached: true });
       return res.status(200).json({ state: 'refused', ...(live ? { withdrawn: true, message: 'Withdrawn: the answer broke the coach\'s rules.' } : { message: 'The coach\'s answer to this question did not pass the checks, and it is not asked again.' }), why: old.refused || [] });
     }
-    if (used(who, nowMs) >= (live ? lLim : lim)) return res.status(200).json({ state: 'limit', message: live ? `The live coach has commented ${lLim} times today: the free notes go on, comments come back tomorrow (UTC).` : `You have asked the coach ${lim} times today: ask again tomorrow (UTC).` });
+    if (used(who, nowMs) >= (live ? lLim : lim)) return res.status(200).json({ state: 'limit', message: live ? `Coach resting: ${lLim} comments today. The free notes go on; comments come back tomorrow (UTC).` : `You have asked the coach ${lim} times today: ask again tomorrow (UTC).` });
     if (live) {
       if (LIVE_BUSY.has(acct.u)) return res.status(200).json({ state: 'busy', message: 'The coach is still answering the last comment.' });
       const last = LIVE_AT.get(acct.u) || 0, wait = Math.ceil((last + gap * 1000 - nowMs) / 1000);
@@ -127,6 +127,7 @@ async function handle(req, res, d = {}) {
       ans = LLM.cutAtCap(ans, capVar);
       const ms = ans && ans.ms ? ans.ms : { first: null, total: clock() - t0 };
       const out = await finish(ans, { q, live, h, acct, file, store, nowMs, ms });
+      if (live) out.liveLeft = Math.max(0, lLim - used(who, nowMs));
       if (streaming) { send({ t: 'done', ...out }); return res.end(); }
       return res.status(200).json(out);
     } finally { if (live) LIVE_BUSY.delete(acct.u); }
@@ -138,7 +139,7 @@ async function handle(req, res, d = {}) {
 // the answer of one call -> the page's result; billed answers (passed or refused) are stored with the call's latency
 async function finish(ans, { q, live, h, acct, file, store, nowMs, ms }) {
   if (!ans || !ans.available) return { state: 'off', message: (ans && ans.reason) || 'the coach is off' };
-  if (ans.skipped === 'budget') return { state: 'budget', message: `The coach's ${ans.scope === 'day' || ans.scope === 'calls' ? 'daily' : ans.scope === 'month' ? 'monthly' : 'total'} budget is used up.` };
+  if (ans.skipped === 'budget') { const w = ans.scope === 'day' || ans.scope === 'calls' ? 'daily' : ans.scope === 'month' ? 'monthly' : 'total'; return { state: 'budget', scope: ans.scope, message: live ? `Coach resting: ${w} budget reached.` : `The coach's ${w} budget is used up.` }; }
   if (ans.skipped) return { state: 'error', message: ans.skipped === 'too-long' ? 'Too much to send in one question.' : 'Nothing to ask.' };
   const billed = !!(ans.error && (ans.usage || ans.costEstimated || ans.costUsd > 0));
   if (ans.error && !billed) return { state: 'error', message: errText(ans), ms };

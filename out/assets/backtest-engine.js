@@ -444,9 +444,56 @@
   function drawInfo(d, nBars, ang, dec = 2) { if (d.type !== 't' && d.type !== 'r') return ''; const dp = d.p2 - d.p1, pc = d.p1 ? dp / d.p1 * 100 : 0, sg = dp > 0 ? '+' : dp < 0 ? '−' : '';
     const s = `${sg}${Math.abs(dp).toFixed(dec)} (${sg}${Math.abs(pc).toFixed(2)}%) · ${nBars} bar${nBars === 1 ? '' : 's'}`; return d.type === 't' && fin(ang) ? `${s} · ${Math.round(ang)}°` : s; }
 
+  // ---- the live coach's market events (17 Nov 2026, owner: "the live AI while backtesting needs to be more live") ----------------
+  // Pure: what happened on the candles that CLOSED since the last look (never one that ends after the moment T), for the panel's
+  // free notes and, the most important one, for the AI. st = the caller's memory between calls ({} the first time; it holds the
+  // last moment looked at and what was already said). o = { positions, draw, draft: { key, since } | null }. Events:
+  //   level   a close through, or a touch of, a drawn line / ray / box edge / trend line (lineAt at the candle's time)    imp 3 / 2
+  //   stop / target   a close within 0.25R of an open position's stop (imp 3) or target (imp 2); said again after 0.5R away
+  //   swing   a close through the last swing high / low (the coach's swing rule, 3 candles a side)                       imp 2
+  //   session Asia, London or New York opens (the stats' UTC hours)                                                      imp 1
+  //   big     a candle whose range is over 2x the ATR(14) of the candles before it                                       imp 2
+  //   r       an open position's floating R crosses +1R (imp 3) or -0.5R (imp 2), once each per position
+  //   draft   an order set up and not placed for 5 candles                                                               imp 1
+  // At most the last LIVE_EV.look candles are read (a jump does not flood the panel); each event has t = its candle's close.
+  const LIVE_EV = { near: 0.25, away: 0.5, big: 2, draftBars: 5, look: 3, swingK: 3 };
+  function liveEvents(bars, sec, T, st, o = {}) {
+    const out = [], n = closedBy(bars, sec, T); if (!st || n < 2) { if (st) st.T = T; return out; }
+    const first = st.T == null ? n - 1 : Math.max(1, n - LIVE_EV.look), done = (b) => st.T != null && b.time + sec <= st.T;
+    st.said = st.said || {}; st.posR = st.posR || {}; st.near = st.near || {};
+    const say = (key, ev) => { if (st.said[key]) return; st.said[key] = 1; out.push(ev); };
+    const draw = (o.draw || []).filter((d) => d && ['h', 'hr', 't', 'r'].includes(d.type));
+    const fmt = (v) => (Math.abs(v) >= 100 ? v.toFixed(2) : String(+v.toFixed(5)));
+    for (let i = first; i < n; i++) { const b = bars[i], pv = bars[i - 1], t = b.time + sec; if (done(b)) continue;
+      // drawn levels: the value of each at this candle's time
+      draw.forEach((d, k) => { const lv = []; if (d.type === 'h') lv.push(['line', d.price]); else if (d.type === 'hr') { if (b.time >= d.t1) lv.push(['ray', d.p1]); }
+        else if (d.type === 'r') { lv.push(['box top', Math.max(d.p1, d.p2)], ['box bottom', Math.min(d.p1, d.p2)]); } else if (d.t2 !== d.t1 || d.p2 === d.p1) lv.push(['trend line', lineAt(d, b.time)]);
+        for (const [kind, v] of lv) { if (!(v > 0)) continue; const up = pv.close < v && b.close > v, dn = pv.close > v && b.close < v;
+          if (up || dn) say(`lv${k}|${kind}|${b.time}`, { k: 'level', imp: 3, t, text: `Closed ${up ? 'above' : 'below'} your drawn ${kind} at ${fmt(v)}.` });
+          else if (b.low <= v && b.high >= v) say(`lt${k}|${kind}|${b.time}`, { k: 'level', imp: 2, t, text: `Touched your drawn ${kind} at ${fmt(v)} and closed ${b.close >= v ? 'above' : 'below'} it.` }); } });
+      // a fresh close through the last swing
+      const sw = swingBreak(bars.slice(Math.max(0, i - 60), i + 1), LIVE_EV.swingK, 1);
+      if (sw && sw.ago === 0) say(`sw|${b.time}`, { k: 'swing', imp: 2, t, text: `Closed ${sw.dir === 'up' ? 'above the last swing high' : 'below the last swing low'} at ${fmt(sw.level)}.` });
+      // a session opens
+      const h0 = new Date(pv.time * 1000).getUTCHours(), h1 = new Date(b.time * 1000).getUTCHours();
+      if (sessOfHour(h0) !== sessOfHour(h1) && b.time - pv.time < 6 * 3600) say(`ss|${b.time}`, { k: 'session', imp: 1, t: b.time, text: `${sessOfHour(h1)} opens.` });
+      // a big candle
+      const a = atrOf(bars.slice(Math.max(0, i - 15), i)); if (a > 0 && b.high - b.low > LIVE_EV.big * a) say(`bg|${b.time}`, { k: 'big', imp: 2, t, text: `A big candle: its range is ${((b.high - b.low) / a).toFixed(1)}x the ATR, closing ${b.close >= b.open ? 'up' : 'down'}.` });
+      // open positions: near the stop / target, floating R crossing +1R / -0.5R
+      for (const p of o.positions || []) { if (!(p.r0 > 0) || !(p.openedAt <= b.time)) continue; const dir = p.side === 'buy' ? 1 : -1, R = (b.close - p.entry) * dir / p.r0, id = p.id;
+        const ds = Math.abs(b.close - p.stop) / p.r0, dt = p.target != null ? Math.abs(p.target - b.close) / p.r0 : Infinity, nr = st.near[id] = st.near[id] || {};
+        if (ds <= LIVE_EV.near && !nr.s) { nr.s = 1; out.push({ k: 'stop', imp: 3, t, text: `Price is within ${LIVE_EV.near}R of your ${p.side} stop at ${fmt(p.stop)}.` }); } else if (ds > LIVE_EV.away) nr.s = 0;
+        if (dt <= LIVE_EV.near && !nr.t) { nr.t = 1; out.push({ k: 'target', imp: 2, t, text: `Price is within ${LIVE_EV.near}R of your ${p.side} target at ${fmt(p.target)}.` }); } else if (dt > LIVE_EV.away) nr.t = 0;
+        const pr = st.posR[id] = st.posR[id] || {};
+        if (R >= 1 && !pr.up) { pr.up = 1; out.push({ k: 'r', imp: 3, t, text: `Your ${p.side} is ${R.toFixed(2)}R in profit.` }); }
+        if (R <= -0.5 && !pr.dn) { pr.dn = 1; out.push({ k: 'r', imp: 2, t, text: `Your ${p.side} is ${R.toFixed(2)}R against you.` }); } } }
+    // an order set up and not placed for a while
+    const dr = o.draft; if (dr && dr.key && dr.since > 0) { const waited = Math.floor((T - dr.since) / sec); if (waited >= LIVE_EV.draftBars) say(`dr|${dr.key}`, { k: 'draft', imp: 1, t: T, text: `An order has been set up for ${waited} candles and not placed.` }); }
+    st.T = T; return out;
+  }
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
     TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
     COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
-    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo };
+    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, LIVE_EV, liveEvents };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

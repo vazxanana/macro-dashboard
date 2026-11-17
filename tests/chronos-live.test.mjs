@@ -65,7 +65,7 @@ test('streamed answers: event-stream with start, the pieces, then the checked re
   assert.equal(ev[0].t, 'start'); assert.ok(ev.filter((e) => e.t === 'text').length > 3); assert.equal(ev.filter((e) => e.t === 'text').map((e) => e.d).join(''), OK);
   const done = ev[ev.length - 1]; assert.equal(done.t, 'done'); assert.equal(done.state, 'ok'); assert.equal(done.answer.points[0].kind, 'risk'); assert.deepEqual(done.ms, { first: 900, total: 2400 });
   assert.equal(C.reqs[0].cacheSystem, true, 'the system text is marked cacheable');
-  r = res(); await H.handle({ method: 'GET', headers: {}, query: {} }, r, d); assert.equal(r.body.lastMs.first, 900); assert.equal(r.body.lastMs.kind, 'trade'); assert.equal(r.body.livePerDay, H.LIVE_PER_DAY); assert.equal(r.body.liveGapS, 20);
+  r = res(); await H.handle({ method: 'GET', headers: {}, query: {} }, r, d); assert.equal(r.body.lastMs.first, 900); assert.equal(r.body.lastMs.kind, 'trade'); assert.equal(r.body.livePerDay, H.LIVE_PER_DAY); assert.equal(r.body.liveGapS, 8); assert.equal(H.LIVE_PER_DAY, 150);
   // the same question again: JSON from the store, no call
   r = res(); await H.handle(req({ ...closedTrade(), stream: true }), r, d); assert.equal(r.body.state, 'ok'); assert.equal(r.body.cached, true); assert.equal(C.calls, 1);
   // without stream: true the old JSON answer
@@ -83,15 +83,15 @@ test('live comment: streamed text; a comment that breaks the rules is withdrawn 
   assert.equal(C2.reqs[0].maxTokens, H.LIVE_OUT); assert.equal(C2.reqs[0].schema, undefined, 'plain text, not the JSON card');
 });
 
-test('live limits: one in flight, one per 20 s, its own daily count; trade questions keep theirs', async () => {
+test('live limits: one in flight, one per 8 s, its own daily count; trade questions keep theirs', async () => {
   reset(); let release; const slow = { calls: 0 }; slow.fn = async (q, io, onText) => { slow.calls++; onText('Looking. '); await new Promise((r) => { release = r; }); return { available: true, text: 'Looking at your level.', stop: 'end', costUsd: 0.001, usage: {}, ms: { first: 5, total: 10 } }; };
   let t = NOW; const d = d0({ stream: slow.fn, now: () => t, env: { ...ENV, CHRONOS_LIVE_PER_DAY: '2', CHRONOS_COACH_PER_DAY: '1' } });
   const r1 = res(), p1 = H.handle(req({ ...liveBody(), stream: true }), r1, d);
   await new Promise((r) => setImmediate(r));
   let r = res(); await H.handle(req({ ...liveBody({ trigger: 'ask' }), stream: true }), r, d); assert.equal(r.body.state, 'busy'); release(); await p1; assert.equal(events(r1).pop().state, 'ok');
-  r = res(); await H.handle(req({ ...liveBody({ trigger: 'ask' }), stream: true }), r, d); assert.equal(r.body.state, 'wait'); assert.equal(r.body.retryInS, 20);
-  t += 21e3; const p2 = H.handle(req({ ...liveBody({ trigger: 'ask' }), stream: true }), (r = res()), d); await new Promise((x) => setImmediate(x)); release(); await p2; assert.equal(events(r).pop().state, 'ok');
-  t += 21e3; r = res(); await H.handle(req({ ...liveBody({ trigger: 'close' }), stream: true }), r, d); assert.equal(r.body.state, 'limit'); assert.match(r.body.message, /live coach has commented 2 times/);
+  r = res(); await H.handle(req({ ...liveBody({ trigger: 'ask' }), stream: true }), r, d); assert.equal(r.body.state, 'wait'); assert.equal(r.body.retryInS, 8);
+  t += 9e3; const p2 = H.handle(req({ ...liveBody({ trigger: 'ask' }), stream: true }), (r = res()), d); await new Promise((x) => setImmediate(x)); release(); await p2; assert.equal(events(r).pop().state, 'ok');
+  t += 9e3; r = res(); await H.handle(req({ ...liveBody({ trigger: 'close' }), stream: true }), r, d); assert.equal(r.body.state, 'limit'); assert.match(r.body.message, /^Coach resting: 2 comments today/);
   assert.equal(slow.calls, 2);
   // the trade question still has its own count (1 here) and is not held by the live gap
   r = res(); await H.handle(req(closedTrade()), r, { ...d, complete: async () => ({ available: true, text: OK, stop: 'end', costUsd: 0.01, usage: {} }) }); assert.equal(r.body.state, 'ok');
@@ -149,4 +149,43 @@ test('the live panel on the page: its own block, display only, the toggle the on
   assert.match(css, /@media \(pointer: coarse\)/); assert.doesNotMatch(css, /data-phone|\.ps-/);
   const ps = page.slice(page.indexOf('@media (max-width: 640px) {', page.indexOf('.ps-only, .ps-sw { display: none; }'))); const psb = ps.slice(0, ps.indexOf('</style>'));
   assert.match(psb, /html\[data-phone="simple"\] \.lc/, 'the phone strip lives in the simple view block');
+});
+
+test('live market events (BT.liveEvents): levels, stop / target, swing, session, big candle, floating R, a waiting order; closed candles only', () => {
+  const BT = require('../assets/backtest-engine.js'), S0 = 1794000000, sec = 900, B = [];
+  let px = 4000; for (let i = 0; i < 80; i++) { const o = px; px += i % 9 < 5 ? 0.6 : -0.5; B.push({ time: S0 + i * sec, open: o, high: Math.max(o, px) + 0.2, low: Math.min(o, px) - 0.2, close: px }); }
+  const big = B[79]; big.high += 12; big.close += 6;
+  const st = {}; assert.deepEqual(BT.liveEvents(B, sec, S0 + 70 * sec, st, {}), [], 'the first look only sets the moment');
+  const lvl = B[78].close + 1, pos = { id: 7, side: 'buy', entry: B[76].close, r0: 2, stop: B[76].close - 2, target: big.close + 0.2, openedAt: B[76].time };
+  // the moment inside candle 79: candle 79 has not closed, so nothing of it is read
+  const mid = BT.liveEvents(B, sec, S0 + 79 * sec + 300, { T: S0 + 78 * sec }, { draw: [{ type: 'h', price: lvl }], positions: [pos] });
+  assert.ok(mid.every((e) => e.t <= S0 + 79 * sec), 'no event from a candle that has not closed'); assert.ok(!mid.some((e) => e.k === 'big'));
+  const ev = BT.liveEvents(B, sec, S0 + 80 * sec, st, { draw: [{ type: 'h', price: lvl }, { type: 'r', t1: S0, p1: lvl + 50, t2: S0 + sec, p2: lvl + 60 }], positions: [pos], draft: { key: 'k', since: S0 + 70 * sec } });
+  const k = ev.map((e) => e.k);
+  for (const want of ['level', 'big', 'target', 'r', 'draft']) assert.ok(k.includes(want), want + ' in ' + k.join());
+  const cross = ev.find((e) => e.k === 'level' && e.imp === 3); assert.ok(cross); assert.match(cross.text, /Closed above your drawn line/); assert.equal(cross.t, S0 + 80 * sec, 'at the close of the candle that crossed');
+  assert.ok(ev.some((e) => e.k === 'level' && e.imp === 2 && /^Touched your drawn line/.test(e.text)), 'a touch without a close through');
+  assert.ok(ev.every((e) => e.t <= S0 + 80 * sec && e.text && e.imp >= 1 && e.imp <= 3));
+  assert.deepEqual(BT.liveEvents(B, sec, S0 + 80 * sec, st, { draw: [{ type: 'h', price: lvl }], positions: [pos] }), [], 'each event once');
+  // near the stop: a position whose stop sits 0.2R under the last close; said once until price moves 0.5R away
+  const p2 = { id: 9, side: 'buy', entry: big.close + 1, r0: 2, stop: big.close - 0.4, target: null, openedAt: B[70].time }, s2 = { T: S0 + 79 * sec };
+  const e2 = BT.liveEvents(B, sec, S0 + 80 * sec, s2, { positions: [p2] }); assert.ok(e2.some((e) => e.k === 'stop' && e.imp === 3), JSON.stringify(e2));
+  assert.ok(!e2.some((e) => /widen|move your stop/i.test(e.text)), 'a note, never stop advice');
+});
+
+test('the live event trigger: a known kind, at or before the moment, at most 10 candles old; it reaches the prompt as a market event', () => {
+  const ok = M.buildRequest(liveBody({ trigger: 'event', event: { kind: 'level', text: 'Closed above your drawn line at 4,012.', at: MOMENT - 2 * SEC } }));
+  assert.equal(ok.payload.live.event.kind, 'market event'); assert.match(ok.prompt, /Something just happened on the chart/); assert.match(ok.prompt, /Closed above your drawn line/);
+  assert.throws(() => M.buildRequest(liveBody({ trigger: 'event', event: { kind: 'level', text: 'x', at: MOMENT - 11 * SEC } })), /stale event/);
+  assert.throws(() => M.buildRequest(liveBody({ trigger: 'event', event: { kind: 'level', text: 'x', at: MOMENT + SEC } })), /stale event/);
+  assert.throws(() => M.buildRequest(liveBody({ trigger: 'event', event: { kind: 'prophecy', text: 'x', at: MOMENT } })), /known kind/);
+});
+
+test('live budget: the adapter\'s USD budget is the hard stop and the page says "Coach resting"', async () => {
+  reset(); const r = res(); await H.handle(req({ ...liveBody(), stream: true }), r, d0({ stream: async () => ({ available: true, skipped: 'budget', scope: 'day' }) }));
+  const done = events(r).pop(); assert.equal(done.state, 'budget'); assert.equal(done.message, 'Coach resting: daily budget reached.'); assert.equal(typeof done.liveLeft, 'number');
+  const page = src('backtest.html'); assert.match(page, /Coach resting: \$\{j\.scope === 'month'/); assert.match(page, /AI comments left today/);
+  // the panel: a 150 ms fade for a new note, the watching dot pulses three times at most, no infinite animation
+  const css = page.slice(page.indexOf('/* Live coach (17 Nov 2026)'), page.indexOf('/* end Live coach */'));
+  assert.match(css, /animation: lc-in \.15s/); assert.match(css, /lc-pulse 1s ease-in-out 3/); assert.doesNotMatch(css, /infinite/);
 });

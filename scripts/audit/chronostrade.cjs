@@ -813,12 +813,15 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     L = await t.evaluate(() => window.ctLive()); const A = await t.evaluate(() => window.ctAcct().acct.closed.slice(-1)[0]);
     check('live coach: an exit gets a free note with its R, the same R as the journal', L.notes[0] && L.notes[0].tag === 'Closed' && A && L.notes[0].text.includes(Math.abs(A.R).toFixed(2) + 'R'), L.notes[0] && L.notes[0].text);
     await t.click('#lc .lc-ask'); await t.waitForTimeout(300);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(500);
+    const mk = await t.evaluate(() => window.ctLive().notes.filter((x) => /^mk/.test(x.k)));
+    check('live coach: market events while the replay moves are free notes with their candle time (no AI call)', mk.length >= 1 && mk.every((x) => x.t > 0 && x.text), mk.slice(0, 2).map((x) => x.tag + ': ' + x.text).join(' | '));
     const st = await txt(t, '#lc .lc-st'); check('live coach: "What do you see?" with the AI off says so in words, no AI note', /The AI coach is off/.test(st) && !(await t.evaluate(() => window.ctLive().notes.some((x) => /^ai/.test(x.k)))), st);
     await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('Shift+B'); await t.waitForFunction(() => window.ctLive().notes.some((x) => x.tag === 'Draft'), null, { timeout: 4000 }).catch(() => {});
     L = await t.evaluate(() => window.ctLive()); check('live coach: a draft that stands still is noted with its sentence', L.notes.some((x) => x.tag === 'Draft' && /^Buying in /.test(x.text)), JSON.stringify(L.notes[0] || {}));
     await t.keyboard.press('Escape');
     const lcBox = await t.$eval('#lc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }), chb = await t.$eval('.chartc', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
-    await t.screenshot({ path: LIVE + 'live-desktop.png', clip: { x: Math.max(0, chb.x), y: Math.max(0, chb.y), width: Math.min(1480, chb.w), height: Math.min(900, chb.h) } });
+    await (await t.$('.chartc')).screenshot({ path: LIVE + 'live-desktop.png' });
     const LC_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#lc .lc-fold b, #lc .lc-n, #lc .lc-ask, #lc .lc-m b, #lc .lc-m time, #lc .lc-i p, #lc .lc-p, #lc .lc-by, #lc .lc-st, .lc-tg span, .lc-tg small')");
     const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await settle(t); bad.push(...(await measured(t, LC_AA, 'live coach text')).map((x) => th + ': ' + x));
       small += await t.evaluate(() => [...document.querySelectorAll('#lc *, .lc-tg *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
@@ -830,20 +833,27 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     // the AI on (stubbed): a streamed comment at an entry; a second one within 20 s is not asked; a withdrawn answer
     const cx2 = await b.newContext({ viewport: { width: 1500, height: 950 } }), t2 = await cx2.newPage(); t2.on('pageerror', (e) => errs.push('live ai: ' + e.message));
     await route(t2); await me(t2, OWNER); await t2.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} });
-    let posts = 0, mode = 'ok';
-    await t2.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true}' }); posts++; const body = JSON.parse(r.request().postData() || '{}');
+    let posts = 0, mode = 'ok', lastBody = null, evBody = null;
+    await t2.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":8,"liveLeftToday":150}' }); posts++; const body = JSON.parse(r.request().postData() || '{}'); lastBody = body; if (body.trigger === 'event') evBody = body;
       const late = (body.bars || []).some((x) => x[0] + body.tf > body.moment); if (late) errs.push('live: a candle after the replay moment was sent');
       const done = mode === 'ok' ? { t: 'done', state: 'ok', text: 'You sold with a 1.0 ATR stop in London. With fewer than 20 trades the sample is too small to judge.' } : { t: 'done', state: 'refused', withdrawn: true, message: "Withdrawn: the answer broke the coach's rules." };
       r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"You sold with "}\n\ndata: {"t":"text","d":"a 1.0 ATR stop."}\n\ndata: ${JSON.stringify(done)}\n\n` }); });
     { const t = t2; await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400); await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
-    await t.click('#lc-on'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 15; i++) await t.keyboard.press('ArrowRight'); await t.keyboard.press('s'); await t.waitForTimeout(1200);
+    await t.click('#lc-on'); await t.click('#lc-talk'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 15; i++) await t.keyboard.press('ArrowRight'); await t.keyboard.press('s'); await t.waitForTimeout(1200);
     L = await t.evaluate(() => window.ctLive()); const ai = L.notes.find((x) => /^ai/.test(x.k));
     check('live coach, AI on: the entry gets a free note and a streamed AI comment', posts === 1 && ai && /too small to judge/.test(ai.text) && L.notes.some((x) => x.tag === 'Sold'), JSON.stringify(ai || {}) + ' posts ' + posts);
-    await t.click('#lc .lc-ask'); await t.waitForTimeout(300); check('live coach, AI on: a second ask within 20 s is not sent, the panel says when', posts === 1 && /every 20 s/.test(await txt(t, '#lc .lc-st')), await txt(t, '#lc .lc-st'));
-    await t.screenshot({ path: LIVE + 'live-desktop-ai.png', clip: { x: Math.max(0, lcBox.x - 20), y: Math.max(0, lcBox.y - 260), width: Math.min(700, lcBox.w + 300), height: Math.min(700, lcBox.h + 300) } }).catch(() => {});
-    mode = 'bad'; await t.waitForTimeout(21000);   // the 20 s rule is real time on the page
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(300); check('live coach, AI on: a second ask within 8 s is not sent, the panel says when; calls left shown', posts === 1 && /every 8 s/.test(await txt(t, '#lc .lc-st')) && /AI comments left today/.test(await txt(t, '#lc .lc-ms')), await txt(t, '#lc .lc-st') + ' | ' + await txt(t, '#lc .lc-ms'));
+    await (await t.$('.chartc')).screenshot({ path: LIVE + 'live-desktop-ai.png' }).catch(() => {});
+    mode = 'bad'; await t.waitForTimeout(9000);   // the 8 s rule is real time on the page
     await t.click('#lc .lc-ask'); await t.waitForFunction(() => /Withdrawn/.test((window.ctLive().notes[0] || {}).text || ''), null, { timeout: 5000 }).catch(() => {});
-    L = await t.evaluate(() => window.ctLive()); check('live coach, AI on: an answer that fails the checks is withdrawn in words', posts === 2 && /^Withdrawn: the answer broke the coach's rules\.$/.test(L.notes[0].text), (L.notes[0] && L.notes[0].text) + ' posts ' + posts + ' st ' + (await txt(t, '#lc .lc-st'))); }
+    L = await t.evaluate(() => window.ctLive()); check('live coach, AI on: an answer that fails the checks is withdrawn in words', posts === 2 && /^Withdrawn: the answer broke the coach's rules\.$/.test(L.notes[0].text), (L.notes[0] && L.notes[0].text) + ' posts ' + posts + ' st ' + (await txt(t, '#lc .lc-st')));
+    // commentary mode: the most important market event reaches the AI by itself while the replay moves; never a stale one
+    mode = 'ok'; await t.evaluate(() => document.getElementById('lc-talk').click()); await t.waitForTimeout(8500); const p0 = posts; await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    for (let i = 0; i < 90 && !evBody; i++) { await t.keyboard.press('ArrowRight'); await t.waitForTimeout(350); }
+    await t.waitForTimeout(600); const eb = evBody || {};
+    check('live coach, commentary: a market event is sent to the AI by itself, at most 10 candles before the moment, and its free note is on the panel', posts > p0 && eb.trigger === 'event' && eb.event && eb.event.at <= eb.moment && eb.moment - eb.event.at <= 10 * eb.tf && (await t.evaluate(() => window.ctLive().notes.some((x) => /^mk/.test(x.k)))), JSON.stringify(eb.event || {}) + ' posts ' + (posts - p0));
+    await t.evaluate(() => document.getElementById('play').click()); await t.waitForTimeout(700); const lv = await t.evaluate(() => ({ live: document.getElementById('lc').classList.contains('live'), w: document.querySelector('#lc .lc-w').textContent })); await t.evaluate(() => document.getElementById('play').click());
+    check('live coach: a still dot and "Watching the replay" while it plays', lv.live && /Watching the replay/.test(lv.w), JSON.stringify(lv)); }
     await cx2.close();
     // the phone: a slim strip above the chart and its quick bar, one line, taps open it
     const cp = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }); const m = await cp.newPage(); m.on('pageerror', (e) => errs.push('live phone: ' + e.message));
@@ -852,7 +862,7 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     for (let i = 0; i < 3; i++) await m.tap('#step'); await m.tap('#qt-buy'); await m.waitForTimeout(900);
     const ph = await m.evaluate(() => { const a = document.getElementById('lc').getBoundingClientRect(), q = document.getElementById('qtr').getBoundingClientRect(), c = document.getElementById('chart').getBoundingClientRect(), f = document.querySelector('#lc .lc-fold').getBoundingClientRect(), p = document.querySelector('#lc .lc-i p');
       return { simple: document.documentElement.dataset.phone, above: a.bottom <= c.top + 1 && a.bottom <= q.top + 1, h: Math.round(a.height), fold: Math.round(f.height), line: p ? p.textContent : '', oneLine: p ? p.scrollHeight <= parseFloat(getComputedStyle(p).lineHeight) * 1.6 + 2 : false, over: document.documentElement.scrollWidth - innerWidth }; });
-    check('live coach on a phone: a slim strip above the chart and its quick bar, the latest note on one line, 44 px, no sideways page', ph.simple === 'simple' && ph.above && ph.h <= 110 && ph.fold >= 44 && /^Bought at /.test(ph.line) && ph.oneLine && ph.over <= 0, JSON.stringify(ph));
+    check('live coach on a phone: a slim strip above the chart and its quick bar, the latest note on one line, 44 px, no sideways page', ph.simple === 'simple' && ph.above && ph.h <= 110 && ph.fold >= 44 && ph.line.length > 0 && (await m.evaluate(() => window.ctLive().notes.some((x) => x.tag === 'Bought'))) && ph.oneLine && ph.over <= 0, JSON.stringify(ph));
     await m.screenshot({ path: LIVE + 'live-phone-strip.png' });
     await m.tap('#lc .lc-fold'); await m.waitForTimeout(250); const exp = await m.evaluate(() => ({ open: document.getElementById('lc').classList.contains('open'), items: [...document.querySelectorAll('#lc .lc-i')].filter((e) => e.getClientRects().length).length, ask: document.querySelector('#lc .lc-ask').getBoundingClientRect().height }));
     check('live coach on a phone: a tap opens the list, "What do you see?" is 44 px', exp.open && exp.items >= 1 && exp.ask >= 44, JSON.stringify(exp));

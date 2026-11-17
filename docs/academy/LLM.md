@@ -346,8 +346,8 @@ after it started keeps its estimate as billed). It may be tuned without touching
 | `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT` / `_CACHE_READ` / `_CACHE_WRITE` | the coach's prices when its model differs (the cache prices default from its own input price) |
 | `CHRONOS_LLM_MAX_TOKENS` | output cap of a trade / session question (default 4000) |
 | `CHRONOS_LIVE_MAX_TOKENS` | output cap of a live comment (default 1500) |
-| `CHRONOS_LIVE_PER_DAY` | live comments an account a UTC day (default 60; trade / session questions keep `CHRONOS_COACH_PER_DAY`, 20) |
-| `CHRONOS_LIVE_GAP_S` | seconds between two live comments (default 20) |
+| `CHRONOS_LIVE_PER_DAY` | live comments an account a UTC day (default 150; the USD budgets stay the hard stop; trade / session questions keep `CHRONOS_COACH_PER_DAY`, 20) |
+| `CHRONOS_LIVE_GAP_S` | seconds between two live comments (default 8; the live coach also comments on market events) |
 | `CHRONOS_LLM_MAX_CALLS_DAY` | provider calls a day for the coach (default 100) |
 
 A provider that refuses the request itself (an effort or a model id it does not take) is shown on the page in words with the
