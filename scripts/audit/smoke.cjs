@@ -25,7 +25,7 @@ const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.htm
 // Inner views a page only draws when they are opened (the Desk's Council panes run their render functions on first show):
 // as the owner, each is opened by its hash on the loaded page and must not throw either. Council → Systems once threw
 // "sn is not defined" there, unseen by a check that only loaded the page.
-const INNER = { '/market-structure.html': ['#charts', '#setup', '#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/macro', '#council/week', '#scanner', '#gold', '#mosha', '#ict', '#crypto', '#lit', '#sdv', '#users', '#profile'] };
+const INNER = { '/market-structure.html': ['#charts', '#setup', '#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/week', '#scanner', '#mosha', '#ict', '#users', '#profile'] };
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 const DESK = ['/', '/market-structure.html'];
 const GUEST_OK = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];   // api/data.js

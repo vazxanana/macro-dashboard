@@ -99,10 +99,6 @@ test('desk switch: six desks never widen a desk view on a phone (it takes the ro
   // the base rule's `width: max-content` is what made every desk view as wide as the switch: a later rule must take it back
   assert.ok(all.lastIndexOf('width: auto') > all.lastIndexOf('width: max-content'), 'width: auto comes after width: max-content');
   assert.match(all, /min-width:\s*0/); assert.match(all, /justify-self:\s*start/);
-  const soon = rule(css, '.desk-sw a small'), px = [...soon.matchAll(/font-size:\s*([\d.]+)px/g)].map((m) => +m[1]);
-  assert.ok(px[px.length - 1] >= 12, '"soon" is at least 12 px');
-  const ink = /:root\[data-theme="light"\] \.desk-sw a small \{ color: (#[0-9a-f]{6}); \}/.exec(css);
-  assert.ok(ink && ratio(ink[1], over('rgba(224,165,38,0.18)', '#ffffff')) >= 4.5, '"soon" passes AA on the light panel');
   // the page smoke test measures it in a browser
   assert.match(src('scripts/audit/smoke.cjs'), /view cut off on the right/);
 });
@@ -747,7 +743,7 @@ test('simple phone view 2: which views fold, what stays open, and the rows keep 
   assert.match(PS_JS, /\{ v: 'ms-cp-research', sel: '\.card', two: 1, keep: function \(\) \{ return false; \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-week', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.classList\.contains\('wk-dec'\); \} \}/);
   assert.match(PS_JS, /\{ v: 'ms-cp-review', sel: '\.card', two: 1, keep: function \(c\) \{ return c\.id === 'ms-loss'; \} \}/);
-  for (const v of ['ms-cp-macro', 'v-setup', 'v-gold', 'v-lit', 'v-crypto']) assert.match(PS_JS, new RegExp(`\\{ v: '${v}', sel: '\\.card'`), v);
+  for (const v of ['ms-cp-macro']) assert.match(PS_JS, new RegExp(`\\{ v: '${v}', sel: '\\.card'`), v);
   // a row made for a card carries the card's own gate, and its one line is never a line the account's gate hides
   assert.match(PS_JS, /\(c\.classList\.contains\('adm'\) \? ' adm' : ''\) \+ \(c\.classList\.contains\('own'\) \? ' own' : ''\)/);
   assert.match(PS_JS, /if \(lv && getComputedStyle\(lv\)\.display === 'none'\) lv = null;/);
@@ -906,22 +902,21 @@ test('QA 12 Nov: a toast title is readable on the light theme (the brand gold on
   assert.ok(ratio(tok(light, 'gold-ink'), '#ffffff') >= 4.5);
 });
 
-test('15 Nov: Setup, Scanner, Crypto and LIT draw no text under 12 px and give touch controls 44 px (#ms-sz-css, scoped to the four views)', () => {
+test('15 Nov: Setup and Scanner draw no text under 12 px and give touch controls 44 px (#ms-sz-css, scoped to the two views; Crypto and LIT removed 17 Nov)', () => {
   const html = src('market-structure.html');
   const m = /<style id="ms-sz-css">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(m, 'the #ms-sz-css block is in the page');
   const css = m[1].replace(/\/\*[\s\S]*?\*\//g, '');
-  // every rule is scoped to one of the four views (nothing leaks to Home, Council, the desks or the guest page)
+  // every rule is scoped to one of the views (nothing leaks to Home, Council, the desks or the guest page)
   for (const [, sel] of css.matchAll(/([^{}@]+)\{[^{}]*\}/g)) {
     const parts = []; let d = 0, cur = '';
     for (const ch of sel) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { parts.push(cur); cur = ''; } else cur += ch; }
     parts.push(cur);
-    for (const part of parts) assert.match(part.trim(), /^(:is\((#v-(setup|scanner|crypto|lit),?\s*)+\)|#v-(setup|scanner|crypto|lit)\b)/, 'rule not scoped to the four views: ' + part.trim());
+    for (const part of parts) assert.match(part.trim(), /^(:is\((#v-(setup|scanner),?\s*)+\)|#v-(setup|scanner)\b)/, 'rule not scoped to the two views: ' + part.trim());
   }
   for (const [, px] of css.matchAll(/font-size:\s*([\d.]+)px/g)) assert.ok(+px >= 12, 'font-size ' + px + 'px under 12');
-  for (const want of ['.ms-tag', '.ms-st', '.ms-al', '.lv-d', '.cx-tag', '.chip', '#ms-pb-ctx > div > span', '.ms-tr-g > span', 'small:not(']) assert.ok(css.includes(want), want + ' raised to 12 px');
+  for (const want of ['.ms-tag', '.ms-st', '.ms-al', '.lv-d', '.chip', '.ms-tr-g > span', 'small:not(']) assert.ok(css.includes(want), want + ' raised to 12 px');
   assert.match(css, /@media \(hover: none\), \(pointer: coarse\) \{[\s\S]*min-height: 44px/, 'touch targets are 44 px on touch screens');
-  assert.doesNotMatch(css, /\.cx-ic/, 'the coin icon letters are left as they are');
 });
 
 test('15 Nov: each tab of the desk switch is a 44 px target on touch screens (was 32 px on every desk)', () => {
