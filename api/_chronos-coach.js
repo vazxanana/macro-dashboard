@@ -18,9 +18,15 @@
 //            last 10 closed trades' R and sentences and the session's largest difference. The answer is 2-4 plain sentences
 //            (not the JSON card), checked by parseLive.
 // Smaller prompts (17 Nov 2026, "faster"): 60 candles before the entry (was 120), entry to exit capped at 120 (was 400).
+//   session  scope 'all' (17 Nov 2026, "coach for results"): the same question over every saved session of this browser, each
+//            trade labelled with its market and timeframe (capped); scope 'session' is the one session as before.
+//   debrief  (17 Nov 2026) the end-of-session debrief: the page's free part (BT.coachDebrief: totals, plan adherence, the top
+//            leaks with their counterfactuals, best and worst trade, results by grade) and the last 40 trades. No candles. The
+//            answer: { summary, leaks: 1-3 [{ text }], focus: ONE rule for the next session, drill: one line }, checked by
+//            parseDebrief with the same stop and claim rules.
 'use strict';
 
-const LIM = { before: 60, after: 120, live: 60, livePos: 5, liveDrafts: 2, liveTrades: 10, liveText: 900, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
+const LIM = { leaks: 9, grades: 3, sessions: 1000, before: 60, after: 120, live: 60, livePos: 5, liveDrafts: 2, liveTrades: 10, liveText: 900, str: 400, note: 600, tag: 30, tags: 8, flags: 8, trades: 40, groups: 10, features: 10, ctxKeys: 40, depth: 3, arr: 8 };
 const KINDS = ['good', 'risk', 'habit', 'idea'];
 const MIN_N = 20;
 const TFS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400, 604800];
@@ -87,12 +93,49 @@ function sessionPayload(b) {
   const features = (Array.isArray(s.features) ? s.features : []).slice(0, LIM.features).map((f) => ({ name: str(f && f.name, 60),
     groups: (Array.isArray(f && f.groups) ? f.groups : []).slice(0, LIM.groups).map((g) => ({ label: str(g && g.label, 60), n: Math.max(0, Math.round(fin(g && g.n) || 0)), winRate: fin(g && g.winRate), meanR: fin(g && g.meanR), t: fin(g && g.t), judge: str(g && g.judge, 60) })) }))
     .filter((f) => f.name && f.groups.length);
-  const trades = (Array.isArray(b.trades) ? b.trades : []).slice(-LIM.trades).map((t) => (isObj(t) ? { R: fin(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, sentence: str(t.sentence), mistakes: strList(t.mistakes, 10), tags: strList(t.tags, 4) } : null)).filter((t) => t && (t.R != null || t.sentence));
+  const all = b.scope === 'all';
+  const trades = (Array.isArray(b.trades) ? b.trades : []).slice(-LIM.trades).map((t) => (isObj(t) ? { R: fin(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, sentence: str(t.sentence), mistakes: strList(t.mistakes, 10), tags: strList(t.tags, 4), ...(all && str(t.market, 24) ? { market: str(t.market, 24) } : {}) } : null)).filter((t) => t && (t.R != null || t.sentence));
   const n = Math.max(0, Math.round(fin(s.n) || 0));
   if (!trades.length && !n) throw bad('no closed trades');
-  return { kind: 'session', session: { closedTrades: n, withoutContext: Math.max(0, Math.round(fin(s.noCtx) || 0)), tooFewBelow: MIN_N, largestDifference: str(s.lead, 400) || null, splits: features, lastTrades: trades } };
+  return { kind: 'session', session: { scope: all ? 'all saved replay sessions (several markets and timeframes)' : 'this replay session', ...(all ? { sessions: Math.max(1, Math.min(LIM.sessions, Math.round(fin(b.sessions) || 1))) } : {}),
+    closedTrades: n, withoutContext: Math.max(0, Math.round(fin(s.noCtx) || 0)), tooFewBelow: MIN_N, largestDifference: str(s.lead, 400) || null, splits: features, lastTrades: trades } };
 }
 
+// the debrief question -> { payload } or throws a 400. Every number is re-read as a number and capped; text is trimmed.
+const num = (v) => fin(v);
+function debriefPayload(b) {
+  const d = isObj(b.debrief) ? b.debrief : null; if (!d) throw bad('no debrief');
+  const n = Math.max(0, Math.round(fin(d.n) || 0)); if (!n) throw bad('no closed trades');
+  const P = isObj(d.plan) ? d.plan : {}, A = isObj(d.adherence) ? d.adherence : null;
+  const leak = (r) => (isObj(r) ? { habit: str(r.name, 80), trades: Math.max(0, Math.round(fin(r.n) || 0)), sumR: num(r.sumR), meanR: num(r.meanR), rGivenUp: num(r.lost), judge: str(r.judge, 40),
+    ...(isObj(r.held) ? { heldToOpeningTargetOrStop: { measured: Math.max(0, Math.round(fin(r.held.n) || 0)), heldR: num(r.held.R), actualR: num(r.held.actual), stillOpen: Math.max(0, Math.round(fin(r.held.open) || 0)) } } : {}),
+    ...(isObj(r.be) ? { breakEvenAt1R: { keptR: num(r.be.gain), approximate: true } } : {}) } : null);
+  const trd = (t) => (isObj(t) ? { R: num(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, market: str(t.label || t.market, 24), sentence: str(t.sentence) } : null);
+  const lastTrades = (Array.isArray(b.trades) ? b.trades : []).slice(-LIM.trades).map((t) => (isObj(t) ? { R: num(t.R), side: t.side === 'buy' || t.side === 'sell' ? t.side : null, sentence: str(t.sentence), mistakes: strList(t.mistakes, 10) } : null)).filter((t) => t && (t.R != null || t.sentence));
+  return { kind: 'debrief', debrief: { scope: b.scope === 'all' ? 'all saved replay sessions' : 'this replay session', closedTrades: n, totalR: num(d.R), wins: Math.max(0, Math.round(fin(d.wins) || 0)), tooFewBelow: MIN_N,
+    plan: { maxTradesADay: Math.max(0, Math.round(fin(P.maxTrades) || 0)) || null, maxDailyLossR: fin(P.maxLossR) || null, stopAfterLossesInARow: Math.max(0, Math.round(fin(P.maxLosses) || 0)) || null, focusRule: str(P.focus, 200) || null },
+    planAdherence: A ? { days: Math.max(0, Math.round(fin(A.days) || 0)), daysKept: Math.max(0, Math.round(fin(A.kept) || 0)), tradesPastThePlan: Math.max(0, Math.round(fin(A.past) || 0)) } : null,
+    leaks: (Array.isArray(d.leaks) ? d.leaks : []).slice(0, LIM.leaks).map(leak).filter(Boolean), headline: str(d.headline, 400) || null,
+    breakEvenAt1R: isObj(d.be) ? { reachedPlus1R: Math.max(0, Math.round(fin(d.be.reached) || 0)), thenLost: Math.max(0, Math.round(fin(d.be.lostAfter) || 0)), keptR: num(d.be.gain) } : null,
+    bestMoveCaptured: isObj(d.capture) ? { winners: Math.max(0, Math.round(fin(d.capture.n) || 0)), ratio: num(d.capture.ratio) } : null,
+    best: trd(d.best), worst: trd(d.worst), grades: (Array.isArray(d.grades) ? d.grades : []).slice(0, LIM.grades).map((g) => (isObj(g) && ['A', 'B', 'C'].includes(g.grade) ? { grade: g.grade, trades: Math.max(0, Math.round(fin(g.n) || 0)), meanR: num(g.meanR) } : null)).filter(Boolean),
+    lastTrades } };
+}
+const DEBRIEF_SHAPE = '{"summary":"1-2 sentences","leaks":[{"text":"…"}],"focus":"ONE rule for the next session","drill":"one line: a practice drill"}';
+const DEBRIEF_SCHEMA = { type: 'object', additionalProperties: false, required: ['summary', 'leaks', 'focus', 'drill'], properties: {
+  summary: { type: 'string' }, focus: { type: 'string' }, drill: { type: 'string' },
+  leaks: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['text'], properties: { text: { type: 'string' } } } } } };
+function debriefSystem(lang) {
+  return [
+    'You are a trading coach giving the end-of-session debrief of a PAPER backtest replay in ChronosTrade, a practice tool. Nothing you say places, changes or refuses an order.',
+    lang === 'fr' ? 'Answer in French. Keep the trading terms in English (stop, target, entry, R, ATR, trend, session names, timeframes).' : 'Answer in plain English, short sentences.',
+    'Name the 1 to 3 biggest leaks in R, each with the evidence given (the habit, the number of trades, the R it cost, the counterfactual when one is given). Never invent a number.',
+    'Then give ONE focus rule for the next session (one sentence the trader can follow) and ONE drill (one line of practice for the next replay).',
+    'Never present anything as a tested edge and never promise results. A habit or group with fewer than 20 trades is too small to judge: say so when you use it.',
+    'Never suggest removing a stop, widening a stop, moving a stop further from the entry or trading without one. Every trade keeps a stop.',
+    `Answer with ONE JSON object and nothing else, exactly this shape: ${DEBRIEF_SHAPE}.`,
+  ].join('\n');
+}
 const SHAPE = '{"summary":"1-2 sentences","points":[{"kind":"good|risk|habit|idea","text":"…"}],"question":"one question back to the trader, or an empty string"}';
 const SCHEMA = { type: 'object', additionalProperties: false, required: ['summary', 'points', 'question'], properties: {
   summary: { type: 'string' }, question: { type: 'string' },
@@ -160,9 +203,10 @@ const LIVE_ASK = { open: 'The trader just opened a position. Comment on it.', cl
 // -> { system, prompt, schema, payload } or throws a 400
 function buildRequest(b) {
   if (!isObj(b)) throw bad('bad request');
-  const kind = b.kind === 'trade' ? 'trade' : b.kind === 'session' ? 'session' : b.kind === 'live' ? 'live' : null; if (!kind) throw bad('kind must be trade, session or live');
+  const kind = ['trade', 'session', 'live', 'debrief'].includes(b.kind) ? b.kind : null; if (!kind) throw bad('kind must be trade, session, live or debrief');
   const lang = b.lang === 'fr' ? 'fr' : 'en';
   if (kind === 'live') { const payload = livePayload(b); return { kind, lang, trigger: payload.trigger, system: liveSystem(lang), prompt: `${LIVE_ASK[payload.trigger]}\n\n${JSON.stringify(payload)}`, schema: null, payload }; }
+  if (kind === 'debrief') { const payload = debriefPayload(b); return { kind, lang, system: debriefSystem(lang), prompt: `Give the debrief of this replay session.\n\n${JSON.stringify(payload)}`, schema: DEBRIEF_SCHEMA, payload }; }
   const payload = kind === 'trade' ? tradePayload(b) : sessionPayload(b);
   return { kind, lang, system: systemText(lang), prompt: `${kind === 'trade' ? 'Review this trade.' : 'Review this replay session.'}\n\n${JSON.stringify(payload)}`, schema: SCHEMA, payload };
 }
@@ -191,6 +235,25 @@ function parseAnswer(text) {
   return { ok: true, answer: { summary, points, question } };
 }
 
+// the debrief: summary, 1-3 leaks, one focus rule, one drill; the same stop and claim rules -> { ok, answer } | { ok: false, why }
+function parseDebrief(text) {
+  const why = []; let j = null, s = String(text == null ? '' : text).trim();
+  const m = s.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) s = m[1].trim();
+  const a = s.indexOf('{'), z = s.lastIndexOf('}'); if (a >= 0 && z > a) s = s.slice(a, z + 1);
+  try { j = JSON.parse(s); } catch (e) { return { ok: false, why: ['not JSON'] }; }
+  if (!isObj(j)) return { ok: false, why: ['not an object'] };
+  const summary = str(j.summary, 500), focus = str(j.focus, 240), drill = str(j.drill, 240);
+  if (!summary) why.push('no summary'); if (!focus) why.push('no focus rule'); if (!drill) why.push('no drill');
+  const ls = Array.isArray(j.leaks) ? j.leaks : []; if (!ls.length || ls.length > 3) why.push('1 to 3 leaks');
+  const leaks = ls.slice(0, 3).map((x) => (isObj(x) && str(x.text) ? { text: str(x.text) } : typeof x === 'string' && str(x) ? { text: str(x) } : null));
+  if (leaks.some((x) => !x)) why.push('a leak without text');
+  const all = [summary, focus, drill, ...leaks.filter(Boolean).map((x) => x.text)].join(' ');
+  if (all.split(/(?<=[.!?;])\s+/).some((x) => STOP_BAD.test(x) && !/\b(never|don'?t|do not|not|avoid|keep|ne\s+pas|jamais)\b/i.test(x))) why.push('stop advice the coach may not give');
+  if (CLAIM_BAD.test(all.replace(/\b(not|never|no)\s+(a\s+)?(guarantee[ds]?|proven edge|tested edge)\b/gi, ''))) why.push('a claim the coach may not make');
+  if (why.length) return { ok: false, why };
+  return { ok: true, answer: { summary, leaks, focus, drill } };
+}
+
 // a live comment: plain text, the same stop and claim rules, and no forecast stated as fact -> { ok, text } | { ok: false, why }
 const FORECAST_BAD = /\b(price|gold|it|the market|the next candle|this candle)\s+will\s+(definitely\s+|surely\s+|certainly\s+)?(go|rise|fall|drop|reach|hit|break|bounce|reverse|rally|close)\b/i;
 function parseLive(text) {
@@ -204,4 +267,4 @@ function parseLive(text) {
   return why.length ? { ok: false, why } : { ok: true, text: s };
 }
 
-module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, TRIGGERS, EVENT_KINDS, STALE_BARS, buildRequest, parseAnswer, parseLive, systemText, liveSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, cleanVal } };
+module.exports = { LIM, KINDS, MIN_N, TFS, SCHEMA, DEBRIEF_SCHEMA, TRIGGERS, EVENT_KINDS, STALE_BARS, buildRequest, parseAnswer, parseDebrief, parseLive, systemText, liveSystem, debriefSystem, cleanBars, _t: { tradePayload, sessionPayload, livePayload, debriefPayload, cleanVal } };

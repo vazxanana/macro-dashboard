@@ -263,6 +263,7 @@
   // changes or refuses an order, and nothing moves a stop. Every reading uses candles that CLOSED at or before the moment
   // asked about (time + sec <= T), so a price after the entry can never change the context recorded for it.
   const COACH = { revengeMin: 30, minN: 20, oversize: 1.1, swingK: 3, breakLook: 5 };
+  const GRADES = ['A', 'B', 'C'];
   const sessOfHour = (h) => (h >= 7 && h < 12 ? 'London' : h >= 12 && h < 21 ? 'New York' : 'Asia');   // = stats().bySession
   // how many bars ended by T (bars sorted by time; a candle still forming at T is left out)
   function closedBy(bars, sec, T) { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time + sec <= T) lo = m + 1; else hi = m; } return lo; }
@@ -303,6 +304,7 @@
     if (last) { const res = (t) => (t.net > 0 ? 'win' : t.net < 0 ? 'loss' : 'flat'); let run = 0; for (let i = done.length - 1; i >= 0 && res(done[i]) === res(last); i--) run++; ctx.prev = { res: res(last), run, min: Math.round((at - last.closedAt) / 60) }; }
     ctx.revenge = !!(ctx.prev && ctx.prev.res === 'loss' && ctx.prev.min <= COACH.revengeMin);
     if (o.riskSet != null) ctx.riskSet = o.riskSet; if (o.riskPct != null) ctx.riskPct = r2s(o.riskPct);
+    if (o.target != null && Number.isFinite(+o.target)) ctx.tgt0 = +o.target; if (o.grade && GRADES.includes(o.grade)) ctx.grade = o.grade;   // the target it opened with; the trader's own grade (17 Nov 2026)
     const dw = coachDraw(o.draw, T, { ...o, at }, a); if (dw) { ctx.draw = dw; if (o.dec != null) ctx.dec = o.dec; }
     return ctx; }
   // the owner's drawings (Draw menu: 'h' price line { price }, 't' trend line and 'r' box { t1, p1, t2, p2 }) read against an entry.
@@ -374,21 +376,141 @@
     ['prev', 'After the last result', (c) => (c.prev && c.prev.res === 'loss' ? 'Right after a loss' : 'Not after a loss')],
     ['lvl', 'Your levels', (c) => (!c.draw || !c.draw.near ? null : c.draw.atLevel || c.draw.inBox ? 'At a drawn level' : 'Away from your levels')],
     ['lvlstop', 'Stop and your levels', (c) => (!c.draw || c.draw.stopBehind == null ? null : c.draw.stopBehind ? 'Stop behind a drawn level' : 'Stop not behind one')],
+    ['grade', 'Your grade', (c) => (c.grade ? 'Grade ' + c.grade : null)],
     ['brk', 'Swing break', (c) => (c.brk ? (c.brk.rel === 'with' ? 'With a fresh break' : 'Against a fresh break') : 'No fresh break')],
   ];
   function grpStats(Rs, wins) { const n = Rs.length, m = n ? Rs.reduce((s, x) => s + x, 0) / n : null, sd = n > 1 ? Math.sqrt(Rs.reduce((s, x) => s + (x - m) * (x - m), 0) / (n - 1)) : null;
     return { n, wins, winRate: n ? r2(wins / n, 3) : null, meanR: m == null ? null : r2(m, 2), m, sd, t: sd > 0 ? r2(m / (sd / Math.sqrt(n)), 2) : null }; }
-  function coachSplits(list, o = {}) { const minN = o.minN || COACH.minN, T = trades(list || []).filter((t) => t.R != null), withC = T.filter((t) => t.ctx && t.ctx.side), out = { n: T.length, noCtx: T.length - withC.length, minN, features: [], lead: null };
+  function coachSplits(list, o = {}) { const minN = o.minN || COACH.minN, T = trades(list || []).filter((t) => t.R != null), withC = T.filter((t) => t.ctx && t.ctx.side), out = { n: T.length, noCtx: T.length - withC.length, minN, features: [], lead: null, diffs: [] };
     const sR = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R';
     for (const [k, name, f] of COACH_F) { const g = new Map(); for (const t of withC) { const lab = f(t.ctx); if (lab == null) continue; if (!g.has(lab)) g.set(lab, []); g.get(lab).push(t); }
       const groups = [...g.entries()].map(([label, a]) => { const s = grpStats(a.map((t) => t.R), a.filter((t) => t.net > 0).length); return { label, ...s, judge: s.n < minN ? 'too few to judge' : 'your record, not a tested edge', list: a }; });
       out.features.push({ k, name, groups: groups.map((x) => ({ label: x.label, n: x.n, wins: x.wins, winRate: x.winRate, meanR: x.meanR, t: x.t, judge: x.judge })) });
       for (const gr of groups) { const rest = groups.filter((x) => x !== gr).flatMap((x) => x.list); if (gr.n < minN || rest.length < minN) continue; const rs = grpStats(rest.map((t) => t.R), rest.filter((t) => t.net > 0).length), diff = gr.m - rs.m;
         const se = Math.sqrt((gr.sd || 0) ** 2 / gr.n + (rs.sd || 0) ** 2 / rs.n), wt = se > 0 ? r2(diff / se, 2) : null;
+        out.diffs.push({ k, name, label: gr.label, n: gr.n, meanR: gr.meanR, restN: rs.n, restMeanR: rs.meanR, diff: r2(diff, 2), t: wt });
         if (!out.lead || Math.abs(diff) > Math.abs(out.lead.diff)) out.lead = { k, name, label: gr.label, n: gr.n, meanR: gr.meanR, restN: rs.n, restMeanR: rs.meanR, diff: r2(diff, 2), t: wt }; } }
     if (out.lead) { const L = out.lead; L.text = `Your largest difference: ${L.label.toLowerCase()} (${L.name.charAt(0).toLowerCase() + L.name.slice(1)}) made ${sR(L.meanR)} a trade (n ${L.n}) against ${sR(L.restMeanR)} for the rest (n ${L.restN})${L.t != null ? `, Welch t ${L.t.toFixed(2)}` : ''}. Your record, not a tested edge.`; }
     return out; }
 
+
+  // ---- coach for results (17 Nov 2026, owner: "do more critical and useful for productivity and results improvements for the
+  // coach"). Pure helpers, display and record only: none of them places, changes or refuses an order or moves a stop.
+  // gatherSessions  one record across sessions: every saved session's closed trades (partial closes merged inside their own
+  //                 session, never across), each labelled with its market and timeframe; ids become "<session>#<id>" so two
+  //                 sessions' trade #1 stay two trades. Read only: the sessions passed in are not changed. o.current = the live
+  //                 session (its account replaces the saved copy of the same id).
+  function gatherSessions(sessions, o = {}) { const out = [], seen = new Set(), cur = o.current;
+    const add = (s) => { const id = s && (s.id || 'now'); if (!s || !s.acct || !Array.isArray(s.acct.closed) || seen.has(id)) return; seen.add(id);
+      const label = `${String(s.sym || '').toUpperCase()} ${s.tf || ''}`.trim();
+      for (const t of trades(s.acct.closed)) out.push({ ...t, id: `${id}#${t.id}`, tid: t.id, sid: id, sess: { id, sym: s.sym || '', tf: s.tf || '', label } }); };
+    if (cur) add(cur);
+    for (const s of Object.values(sessions || {})) add(s);
+    return { trades: out.sort((a, b) => (a.closedAt || 0) - (b.closedAt || 0)), sessions: seen.size }; }
+  // what holding a trade closed by hand would have done: from the candles AFTER its exit only (time > closedAt, each ended by
+  // `until`, the replay moment), to the stop and target it OPENED with (stop first when one candle holds both, a gap fills at
+  // the open). An exit already at or past the opening stop counts as that stop. Never a candle at or before the exit: the trade's
+  // own history is not rewritten. null = nothing to measure (no opening risk, or no candle after the exit yet).
+  function exitCf(t, bars, sec, until) { if (!t || !(t.r0 > 0) || !(t.closedAt > 0) || t.exit == null) return null; const dir = t.side === 'buy' ? 1 : -1, s0 = t.entry - dir * t.r0;
+    const tg = t.ctx && t.ctx.tgt0 != null ? t.ctx.tgt0 : t.target, R = (px) => r2((px - t.entry) * dir / t.r0, 2);
+    if ((t.exit - s0) * dir <= 0) return { R: -1, how: 'stop', n: 0 };
+    if (tg != null && (t.exit - tg) * dir >= 0) return { R: R(tg), how: 'target', n: 0 };
+    let n = 0, last = null;
+    for (const b of bars || []) { if (!(b.time > t.closedAt) || b.time + sec > until) continue; n++; last = b;
+      const hitS = dir === 1 ? b.low <= s0 : b.high >= s0, hitT = tg != null && (dir === 1 ? b.high >= tg : b.low <= tg);
+      if (hitS) return { R: R(dir === 1 ? Math.min(s0, b.open) : Math.max(s0, b.open)), how: 'stop', n, at: b.time };
+      if (hitT) return { R: R(dir === 1 ? Math.max(tg, b.open) : Math.min(tg, b.open)), how: 'target', n, at: b.time }; }
+    return last ? { R: R(last.close), how: 'open', n } : null; }
+  const isManual = (t) => /^manual/.test((t && t.reason) || '');
+  const isEarly = (t) => { const rm = t.Rmove != null ? t.Rmove : t.R; return isManual(t) && t.target != null && rm > 0 && rm < 1; };
+  // revenge within one session: opened within COACH.revengeMin of a losing close of the same session
+  function revengeOf(T) { const by = new Map(), out = new Set(); for (const t of T) { const k = t.sid || ''; if (!by.has(k)) by.set(k, []); by.get(k).push(t); }
+    for (const a of by.values()) for (const t of a) { let prev = null; for (const x of a) { if (x === t || !(x.closedAt <= t.openedAt)) continue; if (!prev || x.closedAt > prev.closedAt) prev = x; }
+      if ((t.ctx && t.ctx.revenge) || (prev && prev.net < 0 && t.openedAt - prev.closedAt <= COACH.revengeMin * 60)) out.add(t); }
+    return out; }
+  const sRt = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R';
+  // where the R goes: one row per habit, sorted by the R it cost. lost = R given up: the R lost on the habit's trades (their sum
+  // when negative); for exits by hand the R that holding to the opening target or stop would have added (candles after the exit
+  // only); for "stopped out after +1R" the R a break-even stop at +1R would have kept (from the recorded best price, approximate).
+  // barsFor(t) -> { bars, sec, until } for a trade whose candles the page holds, else null. Under minN trades "too few to judge".
+  const LEAK_K = [
+    ['away', 'Moved the stop away', (t) => t.stopAway > 0],
+    ['early', 'Exited early (by hand, under 1R)', isEarly],
+    ['manual', 'Closed by hand', isManual],
+    ['giveback', 'Stopped out after reaching +1R', (t) => (t.mfe || 0) >= 1 && t.R < 0],
+    ['revenge', 'Revenge trades (within 30 min of a loss)', null],
+    ['size', 'Oversized (over 1.1x your set risk)', (t) => { const set = t.riskSet != null ? t.riskSet : t.ctx && t.ctx.riskSet, act = t.riskPct != null ? t.riskPct : t.ctx && t.ctx.riskPct; return set > 0 && act > set * COACH.oversize; }],
+    ['against', 'Against the higher-timeframe trend', (t) => !!(t.ctx && t.ctx.htfRel === 'against')],
+    ['levels', 'Away from your drawn levels', (t) => { const d = t.ctx && t.ctx.draw; return !!(d && d.near && !d.atLevel && !d.inBox); }],
+    ['session', 'Outside your best session', null],
+  ];
+  function coachLeaks(list, barsFor, o = {}) { const minN = o.minN || COACH.minN, T = trades(list || []).filter((t) => t.R != null), rv = revengeOf(T);
+    const bs = {}; for (const t of T) if (t.ctx && t.ctx.session) (bs[t.ctx.session] = bs[t.ctx.session] || []).push(t.R);
+    const ses = Object.entries(bs).map(([k, a]) => ({ k, n: a.length, m: a.reduce((s, x) => s + x, 0) / a.length })).sort((a, b) => b.m - a.m), sq = ses.filter((x) => x.n >= 4), best = ses.length > 1 && sq.length ? sq[0].k : null;   // the best session needs 4 trades or more
+    const cfOf = new Map(); const cf = (t) => { if (!cfOf.has(t)) { const b = barsFor ? barsFor(t) : null; cfOf.set(t, b && b.bars ? exitCf(t, b.bars, b.sec, b.until) : null); } return cfOf.get(t); };
+    const rows = [];
+    for (const [k, name, f0] of LEAK_K) { const f = k === 'revenge' ? (t) => rv.has(t) : k === 'session' ? (t) => !!(best && t.ctx && t.ctx.session && t.ctx.session !== best) : f0; const a = T.filter(f); if (!a.length) continue;
+      const sumR = r2(a.reduce((s, t) => s + t.R, 0), 2), row = { k, name: k === 'session' ? `Outside your best session (${best})` : name, n: a.length, wins: a.filter((t) => t.net > 0).length, sumR, meanR: r2(sumR / a.length, 2), judge: a.length < minN ? 'too few to judge' : 'your record, not a tested edge', lost: Math.max(0, -sumR) };
+      if (k === 'early' || k === 'manual') { const m = a.map((t) => [t, cf(t)]).filter((x) => x[1]); const held = r2(m.reduce((s, x) => s + x[1].R, 0), 2), act = r2(m.reduce((s, x) => s + x[0].R, 0), 2);
+        row.held = { n: m.length, R: held, actual: act, gain: r2(held - act, 2), open: m.filter((x) => x[1].how === 'open').length, unmeasured: a.length - m.length }; row.lost = m.length ? Math.max(0, row.held.gain) : 0; }
+      if (k === 'giveback') { row.be = { gain: r2(-sumR, 2), approx: true }; row.lost = Math.max(0, -sumR); }
+      row.lost = r2(row.lost, 2); rows.push(row); }
+    rows.sort((a, b) => b.lost - a.lost || a.meanR - b.meanR);
+    // break-even at +1R across every trade (recorded best price only) and how much of the best move the winners kept
+    const reach = T.filter((t) => (t.mfe || 0) >= 1), gave = reach.filter((t) => t.R < 0), win = T.filter((t) => t.R > 0 && t.mfe > 0);
+    const be = { reached: reach.length, lostAfter: gave.length, gain: r2(-gave.reduce((s, t) => s + t.R, 0), 2) };
+    const capture = win.length ? { n: win.length, R: r2(win.reduce((s, t) => s + t.R, 0), 2), mfe: r2(win.reduce((s, t) => s + t.mfe, 0), 2), ratio: r2(win.reduce((s, t) => s + t.R, 0) / win.reduce((s, t) => s + t.mfe, 0), 2) } : null;
+    const top = rows.find((r) => r.lost > 0); let headline = T.length ? 'No leak measured yet: no habit has cost R so far.' : '';
+    if (top) { headline = `Your biggest leak: ${top.name.charAt(0).toLowerCase() + top.name.slice(1)}, ${sRt(-top.lost)} over ${top.n} trade${top.n === 1 ? '' : 's'}`;
+      if (top.held && top.held.n) headline += `; holding to the opening target or stop would have made ${sRt(top.held.R)} instead of ${sRt(top.held.actual)}${top.held.open ? ` (${top.held.open} still open at the replay moment, marked to the last close)` : ''}`;
+      else if (top.be) headline += '; a break-even stop at +1R would have kept that (from the recorded best price)';
+      else headline += ` (${sRt(top.meanR)} a trade)`;
+      headline += `. ${top.n < minN ? 'Too few trades to judge.' : 'Your record, not a tested edge.'}`; }
+    return { n: T.length, minN, best, rows, be, capture, headline, top: top ? top.k : null }; }
+  // patterns: a split (coachSplits) with minN or more trades on BOTH sides and a Welch |t| of 2 or more. bad = did worse than
+  // the rest. The text carries the numbers; it is the trader's own record, never a tested edge.
+  function coachPatterns(list, o = {}) { const sp = coachSplits(list, o), tMin = o.tMin || 2;
+    return (sp.diffs || []).filter((d) => d.t != null && Math.abs(d.t) >= tMin && d.n >= sp.minN && d.restN >= sp.minN).map((d) => ({ ...d, bad: d.diff < 0,
+      text: `${d.label} (${d.name.charAt(0).toLowerCase() + d.name.slice(1)}): ${sRt(d.meanR)} a trade, n ${d.n}, against ${sRt(d.restMeanR)} for the rest (n ${d.restN}), t ${(d.t < 0 ? '−' : '') + Math.abs(d.t).toFixed(2)}. Your record, not a tested edge.` })).sort((a, b) => Math.abs(b.t) - Math.abs(a.t)); }
+  // the negative patterns a new entry's context matches (a warning only: it never refuses or changes an order)
+  function patternMatch(pats, ctx) { if (!ctx || !ctx.side) return []; return (pats || []).filter((p) => { if (!p.bad) return false; const f = COACH_F.find((x) => x[0] === p.k); return !!(f && f[2](ctx) === p.label); }); }
+  // the session plan (owner-set, per device): max trades a day, max daily loss in R, stop after n losses in a row today, a focus
+  // rule, and whether to ask before trading past it / ask a grade on each entry. planNorm keeps only known fields with sane values.
+  function planNorm(p) { p = p && typeof p === 'object' ? p : {}; const int = (v, max) => { const x = Math.round(+v); return Number.isFinite(x) && x > 0 ? Math.min(max, x) : 0; };
+    const lr = +p.maxLossR; return { maxTrades: int(p.maxTrades, 100), maxLossR: Number.isFinite(lr) && lr > 0 ? Math.min(100, Math.round(lr * 100) / 100) : 0, maxLosses: int(p.maxLosses, 50),
+      focus: String(p.focus == null ? '' : p.focus).replace(/\s+/g, ' ').trim().slice(0, 200), nextFocus: String(p.nextFocus == null ? '' : p.nextFocus).replace(/\s+/g, ' ').trim().slice(0, 200), ask: p.ask === true, askGrade: p.askGrade === true }; }
+  // where today (the replay's UTC day of `now`) stands against the plan; broken = limits reached: the next trade goes past the plan
+  function planCheck(plan, closed, open, now) { const P = planNorm(plan), day = dayKey(now), T = trades(closed || []).filter((t) => t.closedAt > 0).sort((a, b) => a.closedAt - b.closedAt);
+    const tod = T.filter((t) => dayKey(t.closedAt) === day), opened = T.filter((t) => dayKey(t.openedAt) === day).length + (open || []).filter((p) => p.openedAt > 0 && dayKey(p.openedAt) === day).length;
+    const R = r2(tod.reduce((s, t) => s + (t.R || 0), 0), 2); let streak = 0; for (let i = tod.length - 1; i >= 0 && tod[i].net < 0; i--) streak++;
+    const broken = [];
+    if (P.maxTrades && opened >= P.maxTrades) broken.push({ k: 'trades', text: `${opened} of ${P.maxTrades} trades taken today: the next one is past your plan` });
+    if (P.maxLossR && R <= -P.maxLossR) broken.push({ k: 'loss', text: `Down ${sRt(R)} today: your daily limit is −${P.maxLossR}R` });
+    if (P.maxLosses && streak >= P.maxLosses) broken.push({ k: 'streak', text: `${streak} losses in a row today: you planned to stop after ${P.maxLosses}` });
+    return { day, trades: opened, R, streak, broken, set: !!(P.maxTrades || P.maxLossR || P.maxLosses) }; }
+  // plan adherence over a record: per UTC day (of one session), the trades opened when a limit had already been reached that day
+  function planAdherence(plan, list) { const P = planNorm(plan); if (!(P.maxTrades || P.maxLossR || P.maxLosses)) return null; const T = trades(list || []).filter((t) => t.closedAt > 0), days = new Map();
+    for (const t of T) { const k = (t.sid || '') + '|' + dayKey(t.openedAt); if (!days.has(k)) days.set(k, []); days.get(k).push(t); }
+    let past = 0, kept = 0; const items = [];
+    for (const [k, a] of days) { let bad = 0;
+      for (const t of a) { const before = a.filter((x) => x !== t && x.closedAt <= t.openedAt).sort((x, y) => x.closedAt - y.closedAt), opened = a.filter((x) => x !== t && x.openedAt < t.openedAt).length;
+        const R = before.reduce((s, x) => s + (x.R || 0), 0); let st = 0; for (let i = before.length - 1; i >= 0 && before[i].net < 0; i--) st++;
+        if ((P.maxTrades && opened >= P.maxTrades) || (P.maxLossR && R <= -P.maxLossR) || (P.maxLosses && st >= P.maxLosses)) bad++; }
+      past += bad; if (!bad) kept++; else items.push({ day: k.split('|')[1], past: bad }); }
+    return { days: days.size, kept, past, items }; }
+  // a focus rule for the next session from the top leak (deterministic; the AI debrief may give its own)
+  const FOCUS = { away: 'Keep the stop where you set it at entry: move it only toward the trade, never away.', early: 'Hold each trade to its target or its stop unless your written exit rule says otherwise.',
+    manual: 'Close by hand only when your written exit rule says so.', giveback: 'Decide before the entry what you do once a trade reaches +1R, and write it in the plan.', revenge: 'Wait 30 minutes after a loss before the next entry.',
+    size: 'Risk exactly your set % on every trade.', against: 'Take entries only with the higher-timeframe trend.', levels: 'Enter only at a level you drew before the entry.', session: (b) => `Trade only in your best session (${b}).` };
+  // the free part of the end-of-session debrief: totals, plan adherence, the top leaks, best and worst trade, results by grade
+  function coachDebrief(list, o = {}) { const T = trades(list || []).filter((t) => t.R != null).sort((a, b) => a.closedAt - b.closedAt), L = coachLeaks(T, o.barsFor, o);
+    const byR = T.slice().sort((a, b) => b.R - a.R), g = {};
+    for (const t of T) { const gr = (t.ctx && t.ctx.grade) || t.grade; if (!GRADES.includes(gr)) continue; g[gr] = g[gr] || { grade: gr, n: 0, R: 0, wins: 0 }; g[gr].n++; g[gr].R = r2(g[gr].R + t.R, 2); if (t.net > 0) g[gr].wins++; }
+    const grades = GRADES.filter((k) => g[k]).map((k) => ({ ...g[k], meanR: r2(g[k].R / g[k].n, 2), judge: g[k].n < (o.minN || COACH.minN) ? 'too few to judge' : 'your record, not a tested edge' }));
+    const pick = (t) => (t ? { id: t.tid || t.id, side: t.side, R: t.R, net: t.net, openedAt: t.openedAt, label: t.sess ? t.sess.label : '', ctx: t.ctx || null } : null);
+    const top = L.rows.find((r) => r.lost > 0), f = top ? FOCUS[top.k] : null;
+    return { n: T.length, R: r2(T.reduce((s, t) => s + t.R, 0), 2), wins: T.filter((t) => t.net > 0).length, adherence: planAdherence(o.plan, T), leaks: L.rows.filter((r) => r.lost > 0).slice(0, 3), headline: L.headline, be: L.be, capture: L.capture,
+      best: byR[0] && byR[0].R > 0 ? pick(byR[0]) : null, worst: byR.length && byR[byR.length - 1].R < 0 ? pick(byR[byR.length - 1]) : null, grades, focus: typeof f === 'function' ? f(L.best) : f || '', minN: L.minN }; }
 
   // ---- drawing tools (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend line,
   // magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop.
@@ -494,6 +616,7 @@
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
     TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
     COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
+    GRADES, gatherSessions, exitCf, coachLeaks, coachPatterns, patternMatch, planNorm, planCheck, planAdherence, coachDebrief,
     DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, LIVE_EV, liveEvents };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

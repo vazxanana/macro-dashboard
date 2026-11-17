@@ -868,6 +868,90 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     check('live coach on a phone: a tap opens the list, "What do you see?" is 44 px', exp.open && exp.items >= 1 && exp.ask >= 44, JSON.stringify(exp));
     await m.screenshot({ path: LIVE + 'live-phone-open.png' });
     await cp.close(); }
+  // 40. coach for results (17 Nov 2026): the leak report at the top of Statistics, the scope switch (this session | all my
+  // sessions) on seeded saved sessions, a pattern of the owner's own record as an amber warning on a draft, the session plan's
+  // banner and its styled confirm before an order (the owner can always go on; the stop is untouched), the debrief's free part
+  // with the AI off, then the AI on (a stubbed streamed debrief whose focus rule pre-fills the next session's plan).
+  { const C2 = process.env.COACH2_SHOTS || OUT; try { fs.mkdirSync(C2, { recursive: true }); } catch (e) { /* exists */ }
+    // two saved sessions of 30 trades each: a 1 ATR stop (0.75-1.5 ATR) lost, a 2 ATR stop won, some stops moved away, some exits by hand
+    const seed = () => { const mk = (sid, sym, t0) => { const closed = []; for (let i = 0; i < 30; i++) { const one = i % 2 === 0, at = t0 + i * 7200, R = one ? -1 + (i % 4 === 0 ? 0.05 : -0.05) : 1.4 + (i % 3) * 0.05, man = i % 5 === 1, away = i % 6 === 0;
+        closed.push({ id: i + 1, side: 'buy', type: 'market', entry: 100, stop: 99, target: 102, units: 10, units0: 10, r0: 1, openedAt: at, closedAt: at + 3600, exit: 100 + R, reason: man ? 'manual' : R < 0 ? 'stop' : 'target', gross: R * 10, net: R * 10, R, Rmove: R, mfe: R > 0 ? R + 0.3 : 0.4, mae: 0.5, ...(away ? { stopAway: 0.4 } : {}), riskSet: 1, riskPct: 1,
+          ctx: { v: 1, tf: 900, at: at + 900, side: 'buy', session: i % 3 ? 'London' : 'New York', bars: 400, atr: 1, stopAtr: one ? 1 : 2, rr: 2, trend: { main: 'up', htf: 'up', htfName: 'H1' }, htfRel: 'with', revenge: false, riskSet: 1, riskPct: 1 } }); }
+        return { id: sid, name: sym.toUpperCase() + ' 15m from 2026-01-05', sym, tf: '15m', dec: 2, from: t0 - 3600, to: t0 + 4 * 86400, startAt: t0, idx: 10, acct: { start: 100000, balance: 100000, commission: 0, spread: 0, slFirst: true, nextId: 31, positions: [], orders: [], closed }, ch: null, draw: [], savedAt: Date.now() - 86400e3 }; };
+      return { s_a: mk('s_a', 'eurusd', 1767600000), s_b: mk('s_b', 'gbpusd', 1768200000) }; };
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('coach2: ' + e.message));
+    await route(t); await me(t, OWNER); const S0 = seed();
+    await t.addInitScript((s) => { if (sessionStorage.getItem('c2')) return; sessionStorage.setItem('c2', '1'); localStorage.clear(); localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:sessions', JSON.stringify(s)); }, S0);
+    await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.waitForFunction(() => /Resumed|Could not/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(t);   // the page resumes the latest saved session first
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {}); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 12; i++) await t.keyboard.press('ArrowRight');
+    // one closed trade in this session: a sell, closed by hand three candles later, then the replay moves on (candles after the exit)
+    await t.keyboard.press('s'); for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => document.querySelector('#open [data-act=close]').click()); for (let i = 0; i < 25; i++) await t.keyboard.press('ArrowRight');
+    await t.click('.tabs [data-t=stats]'); await settle(t);
+    const lk1 = await t.evaluate(() => ({ top: !!document.getElementById('lk') && document.getElementById('lk').compareDocumentPosition(document.querySelector('#tab-stats .viz')) === Node.DOCUMENT_POSITION_FOLLOWING, vis: !!document.getElementById('lk').getClientRects().length, head: document.getElementById('lk-head').textContent, rows: [...document.querySelectorAll('#lk-t tr[data-k]')].map((r) => r.dataset.k), sc: [...document.querySelectorAll('.cr-sc')].length, pressed: document.querySelector('#lk .cr-sc [aria-pressed="true"]').dataset.sc, w: document.querySelector('#lk-t tr[data-k="manual"] td.w') && document.querySelector('#lk-t tr[data-k="manual"] td.w').textContent }));
+    check('coach for results: the leak card sits at the top of Statistics, this session, the exit by hand measured from candles after the exit', lk1.top && lk1.vis && lk1.sc === 2 && lk1.pressed === 'session' && lk1.rows.includes('manual') && /holding to the opening target or stop|not measured yet/.test(lk1.w || ''), JSON.stringify(lk1));
+    await t.click('#lk .cr-sc [data-sc="all"]'); await settle(t);
+    const lk2 = await t.evaluate(() => ({ head: document.getElementById('lk-head').textContent, rows: [...document.querySelectorAll('#lk-t tr[data-k]')].map((r) => [r.dataset.k, +r.children[1].textContent]), co: document.querySelector('#vc-coach .cr-sc [aria-pressed="true"]').dataset.sc, coT: document.getElementById('co-t').textContent, key: localStorage.getItem('btLab:coachScope'), pats: window.ctCoach().pats, patTxt: document.getElementById('lk-pat').textContent }));
+    check('coach for results: "All my sessions" reads 61 trades of three sessions (the two saved, this one), in the leak card and "How you trade", remembered', /61 trades from 3 sessions/.test(lk2.head) && lk2.co === 'all' && lk2.key === 'all' && lk2.rows.some((r) => r[0] === 'away' && r[1] === 10) && lk2.rows.some((r) => r[0] === 'manual' && r[1] >= 12), JSON.stringify(lk2).slice(0, 300));
+    check('coach for results: a pattern needs 20+ trades on both sides and |t| >= 2 (the seeded 1 ATR stops: a costly pattern, said with n and t)', lk2.pats.some((x) => x.k === 'stop' && x.bad && Math.abs(x.t) >= 2) && /Costs you/.test(lk2.patTxt) && /n \d+.*t −?\d/.test(lk2.patTxt), JSON.stringify(lk2.pats));
+    await (await t.$('#lk')).screenshot({ path: C2 + 'coach2-leak.png' });
+    // a draft with the default 1 ATR stop matches it: an amber warning on the draft readout; a warning only (the draft still places)
+    await t.evaluate(() => document.activeElement && document.activeElement.blur());
+    await t.keyboard.press('Shift+B'); await t.waitForTimeout(500);
+    const dw = await t.evaluate(() => { const w = document.querySelector('#dchip .dwarn'); return { w: w ? w.textContent : '', go: !!document.querySelector('#dchip [data-dgo]') }; });
+    check('coach for results: the draft that matches a costly pattern of your record shows an amber warning with the numbers, and Confirm is still there', /Your pattern/.test(dw.w) && /n \d+/.test(dw.w) && /t −/.test(dw.w) && dw.go, JSON.stringify(dw));
+    await (await t.$('.chartc')).screenshot({ path: C2 + 'coach2-pattern-draft.png' });
+    await t.keyboard.press('Escape');
+    // the plan: one trade a day, ask before trading past it. This session already took one today: the banner, then a confirm
+    await t.evaluate(() => { const d = document.getElementById('pl'); d.open = true; document.getElementById('pl-mt').value = '1'; document.getElementById('pl-ask').checked = true; document.getElementById('pl-fo').value = 'Only with the H1 trend'; d.dispatchEvent(new Event('change', { bubbles: true })); }); await t.waitForTimeout(900);
+    const ban = await t.evaluate(() => ({ ban: !document.getElementById('pl-ban').hidden && document.getElementById('pl-ban').textContent, score: document.getElementById('co-score').textContent, key: JSON.parse(localStorage.getItem('btLab:plan') || '{}'), foc: document.getElementById('pl-foc').textContent }));
+    check('coach for results: past the plan, a clear banner in the Trade card; the score line says the plan is broken; the plan is kept on the device', /Past your plan/.test(ban.ban || '') && /1 of 1 trades/.test(ban.ban) && /plan broken/.test(ban.score) && ban.key.maxTrades === 1 && ban.key.ask === true && /Only with the H1 trend/.test(ban.foc), JSON.stringify(ban));
+    await (await t.$('#tradecard')).screenshot({ path: C2 + 'coach2-plan-banner.png' }).catch(() => {});
+    const n0 = await t.evaluate(() => window.ctAcct().acct.positions.length + window.ctAcct().acct.closed.length);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('b'); await t.waitForSelector('dialog.msd[open]', { timeout: 3000 }).catch(() => {});
+    const cf = await t.evaluate(() => { const d = document.querySelector('dialog.msd[open]'); return d ? d.textContent : ''; });
+    await t.screenshot({ path: C2 + 'coach2-plan-confirm.png' });
+    await t.click('dialog.msd[open] [data-x]'); await t.waitForTimeout(300); const n1 = await t.evaluate(() => window.ctAcct().acct.positions.length + window.ctAcct().acct.closed.length);
+    check('coach for results: with "Ask me" ticked, an order past the plan asks first (a styled confirm naming the limit and the focus); Cancel places nothing', /Past your session plan/.test(cf) && /1 of 1 trades/.test(cf) && /Only with the H1 trend/.test(cf) && n1 === n0, cf.slice(0, 160) + ` ${n0}->${n1}`);
+    await t.keyboard.press('b'); await t.waitForSelector('dialog.msd[open]', { timeout: 3000 }).catch(() => {}); await t.click('dialog.msd[open] button.pri'); await t.waitForTimeout(400);
+    const pos = await t.evaluate(() => window.ctAcct().acct.positions.slice(-1)[0]);
+    check('coach for results: "Trade anyway" goes on: the buy opens with its stop on the losing side (the coach never touches it)', pos && pos.side === 'buy' && pos.stop < pos.entry && pos.r0 > 0 && Math.abs(pos.entry - pos.stop - pos.r0) < 1e-6, JSON.stringify(pos && { e: pos.entry, s: pos.stop, r0: pos.r0 }));
+    await t.evaluate(() => document.querySelector('#open [data-act=close]').click()); await t.waitForTimeout(200);
+    // the debrief, AI off: the free part (plan, leaks, best / worst, the focus from the top leak); no AI call
+    await t.evaluate(() => document.getElementById('lk-deb').click()); await t.waitForTimeout(300);
+    const db = await t.evaluate(() => ({ open: document.getElementById('debd').open, txt: document.getElementById('deb-free').textContent, ai: document.getElementById('ai-deb').textContent }));
+    check('coach for results: the debrief\'s free part (plan adherence, leaks in R, best and worst trade, a focus rule) with the AI off said in words', db.open && /Your plan/.test(db.txt) && /trades? taken past a limit/.test(db.txt) && /Leaks/.test(db.txt) && /given up/.test(db.txt) && /Best and worst trade/.test(db.txt) && /Focus for the next session/.test(db.txt) && /AI coach is off/.test(db.ai), db.txt.slice(0, 200) + ' | ' + db.ai);
+    await (await t.$('#debd')).screenshot({ path: C2 + 'coach2-debrief.png' });
+    const C2_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#lk h2, #lk small, #lk-head, #lk-t td, #lk-t th, #lk-x, #lk-pat li, #lk-pat h3, #debd p, #debd li, #debd h4, #pl-ban, #co-score span, #pl summary')");
+    await t.keyboard.press('Escape');
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; document.getElementById('debd').showModal(); }, th); await settle(t); bad.push(...(await measured(t, C2_AA, 'coach for results text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#lk *, #debd *, #pl *, #pl-ban, #co-score *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); await t.evaluate(() => document.getElementById('debd').close()); }
+    check('coach for results: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    // the keys: A opens the last closed trade's review (the coach's suggestions); Shift+A turns the live coach on and asks it
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('a'); await t.waitForTimeout(200);
+    const ka = await t.evaluate(() => document.getElementById('mistd').open); await t.keyboard.press('Escape'); await t.waitForTimeout(150);
+    await t.keyboard.press('Shift+A'); await t.waitForTimeout(300); const kb = await t.evaluate(() => ({ on: window.ctLive().on, st: document.querySelector('#lc .lc-st').textContent }));
+    check('coach for results: A opens the last closed trade\'s review; Shift+A turns the live coach on and asks "What do you see?"', ka && kb.on && /AI coach is off/.test(kb.st), JSON.stringify({ ka, kb }));
+    await cx.close();
+    // the AI on (stubbed): a streamed debrief; its focus rule waits for the next session and pre-fills its plan
+    const cx2 = await b.newContext({ viewport: { width: 1500, height: 950 } }), u = await cx2.newPage(); u.on('pageerror', (e) => errs.push('coach2 ai: ' + e.message));
+    await route(u); await me(u, OWNER); await u.addInitScript((s) => { if (sessionStorage.getItem('c2')) return; sessionStorage.setItem('c2', '1'); localStorage.clear(); localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:sessions', JSON.stringify(s)); localStorage.setItem('btLab:coachScope', 'all'); }, S0);
+    let dbody = null;
+    await u.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":8,"liveLeftToday":150}' }); const body = JSON.parse(r.request().postData() || '{}'); if (body.kind === 'debrief') dbody = body;
+      const ans = { summary: 'Your stops of about 1 ATR cost the most.', leaks: [{ text: 'Stops of 0.75 to 1.5 ATR: 30 trades lost about 30R.' }], focus: 'Use a stop of about 2 ATR at your drawn level.', drill: 'Replay 20 London opens and place only the stop.' };
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"{\\"summary\\":\\"Your stops"}\n\ndata: ${JSON.stringify({ t: 'done', state: 'ok', answer: ans })}\n\n` }); });
+    await u.goto(H + '/backtest.html', { waitUntil: 'load' }); await u.waitForTimeout(500); await u.waitForFunction(() => /Resumed|Could not/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await settle(u); await u.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await u.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {}); await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(u);
+    await u.evaluate(() => document.getElementById('lk-deb').click()); await u.waitForTimeout(300); await u.click('#ai-deb .ai-go'); await u.waitForFunction(() => /Drill/.test(document.getElementById('ai-deb').textContent), null, { timeout: 5000 }).catch(() => {});
+    const da = await u.evaluate(() => ({ txt: document.getElementById('ai-deb').textContent, next: JSON.parse(localStorage.getItem('btLab:plan') || '{}').nextFocus }));
+    check('coach for results, AI on: a streamed debrief (leaks, one focus rule, a drill) over all sessions; its focus waits for the next session', /language model's reading, not a tested edge/.test(da.txt) && /Focus rule/.test(da.txt) && /Drill/.test(da.txt) && dbody && dbody.kind === 'debrief' && dbody.scope === 'all' && dbody.debrief.n === 60 && da.next === 'Use a stop of about 2 ATR at your drawn level.', JSON.stringify({ da, n: dbody && dbody.debrief.n, sc: dbody && dbody.scope }));
+    await (await u.$('#debd')).screenshot({ path: C2 + 'coach2-debrief-ai.png' });
+    await u.keyboard.press('Escape'); await u.evaluate(() => document.getElementById('newsess').click()); await u.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await u.click('dialog.msd[open] button.pri', { timeout: 2500 }).catch(() => {});
+    await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent), null, { timeout: 120000 }).catch(() => {}); await u.waitForFunction(() => window.ctCoach().plan.focus, null, { timeout: 90000 }).catch(() => {});
+    const nf = await u.evaluate(() => ({ plan: window.ctCoach().plan, foc: document.getElementById('pl-foc').textContent }));
+    check('coach for results: the next session\'s plan starts with the debrief\'s focus rule', nf.plan.focus === 'Use a stop of about 2 ATR at your drawn level.' && !nf.plan.nextFocus && /2 ATR/.test(nf.foc), JSON.stringify(nf));
+    await cx2.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

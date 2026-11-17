@@ -134,3 +134,54 @@ test('wiring: both hosts, the page block is display only, the cards say what the
   const ps = page.slice(page.indexOf('@media (max-width: 640px) {', page.indexOf('.ps-only, .ps-sw { display: none; }')));
   assert.doesNotMatch(ps.slice(0, ps.indexOf('</style>')), /\.ai[-c]/);
 });
+
+// ---- coach for results (17 Nov 2026): the session question over all saved sessions, and the end-of-session debrief
+const DEB_OK = JSON.stringify({ summary: 'Exits by hand cost the most.', leaks: [{ text: 'Exited early: 14 trades, holding to the opening target or stop would have made +3.10R instead of -3.30R.' }, { text: 'Stops moved away: 6 trades, -6.00R.' }], focus: 'Hold each trade to its target or its stop.', drill: 'Replay 20 London opens and close nothing by hand.' });
+const debriefBody = (o = {}) => ({ kind: 'debrief', scope: 'all', debrief: { n: 40, R: -3.2, wins: 15, plan: { maxTrades: 3, maxLossR: 2, maxLosses: 3, focus: 'x'.repeat(500) },
+  adherence: { days: 6, kept: 4, past: 3 }, leaks: Array.from({ length: 20 }, () => ({ name: 'Exited early (by hand, under 1R)', n: 14, sumR: 2.1, meanR: 0.15, lost: 6.4, judge: 'too few to judge', held: { n: 12, R: 3.1, actual: -3.3, open: 1 }, evil: '<script>' })),
+  headline: 'Your biggest leak: exited early…', be: { reached: 9, lostAfter: 3, gain: 3 }, capture: { n: 15, ratio: 0.42 }, best: { R: 2.4, side: 'buy', label: 'XAU 15m', sentence: 'Buying in London.' }, worst: { R: -1.2, side: 'sell' },
+  grades: [{ grade: 'A', n: 10, meanR: 0.4 }, { grade: 'Z', n: 3, meanR: 9 }], ...o }, trades: Array.from({ length: 70 }, (_, i) => ({ R: i % 2 ? 1 : -1, side: 'buy', sentence: 'Buying.', mistakes: ['Exited early'] })), candles: bars(T0, 300) });
+
+test('session request, scope all: labelled trades and a sessions count; scope session as before', () => {
+  const trades = Array.from({ length: 5 }, () => ({ R: 1, side: 'buy', sentence: 'Buying.', market: 'EURUSD 15m' }));
+  const split = { n: 5, noCtx: 0, lead: '', features: [] };
+  const a = M.buildRequest({ kind: 'session', scope: 'all', sessions: 99999, splits: split, trades }).payload.session;
+  assert.equal(a.sessions, 1000); assert.match(a.scope, /^all saved replay sessions/); assert.equal(a.lastTrades[0].market, 'EURUSD 15m');
+  const s = M.buildRequest({ kind: 'session', splits: split, trades }).payload.session;
+  assert.equal(s.scope, 'this replay session'); assert.equal(s.sessions, undefined); assert.equal(s.lastTrades[0].market, undefined);
+});
+
+test('debrief request: every field capped and re-read; no candles; unknown grades dropped; 400 without trades', () => {
+  const q = M.buildRequest(debriefBody()), d = q.payload.debrief;
+  assert.equal(q.kind, 'debrief'); assert.equal(q.schema, M.DEBRIEF_SCHEMA); assert.match(q.system, /ONE focus rule/); assert.match(q.system, /Never suggest removing a stop, widening a stop/);
+  assert.equal(d.leaks.length, M.LIM.leaks); assert.equal(d.leaks[0].evil, undefined); assert.deepEqual(d.leaks[0].heldToOpeningTargetOrStop, { measured: 12, heldR: 3.1, actualR: -3.3, stillOpen: 1 });
+  assert.equal(d.plan.focusRule.length, 200); assert.equal(d.lastTrades.length, 40); assert.deepEqual(d.grades.map((g) => g.grade), ['A']);
+  assert.equal(q.payload.candles, undefined); assert.doesNotMatch(q.prompt, /\[\d{10},/); assert.equal(d.scope, 'all saved replay sessions');
+  assert.throws(() => M.buildRequest(debriefBody({ n: 0 })), /no closed trades/); assert.throws(() => M.buildRequest({ kind: 'debrief' }), /no debrief/);
+  assert.match(M.debriefSystem('fr'), /Answer in French/);
+});
+
+test('parseDebrief: the shape; no stop advice, no proven edge or guarantee; a "never widen" sentence is fine', () => {
+  assert.deepEqual(M.parseDebrief(DEB_OK).answer.focus, 'Hold each trade to its target or its stop.');
+  const bad = (o) => M.parseDebrief(JSON.stringify({ ...JSON.parse(DEB_OK), ...o }));
+  assert.deepEqual(bad({ focus: 'Widen your stop to 2 ATR.' }).why, ['stop advice the coach may not give']);
+  assert.deepEqual(bad({ drill: 'Trade without a stop for a day.' }).why, ['stop advice the coach may not give']);
+  assert.deepEqual(bad({ summary: 'This is a proven edge.' }).why, ['a claim the coach may not make']);
+  assert.equal(bad({ focus: 'Never widen your stop.' }).ok, true);
+  assert.deepEqual(bad({ leaks: [] }).why, ['1 to 3 leaks']); assert.deepEqual(bad({ leaks: [{ text: 'a' }, { text: 'b' }, { text: 'c' }, { text: 'd' }] }).why, ['1 to 3 leaks']);
+  assert.deepEqual(bad({ drill: '' }).why, ['no drill']); assert.equal(M.parseDebrief('not json').ok, false);
+});
+
+test('endpoint, debrief: answered and stored; its own daily count; asked again from the store; a rule-breaking answer refused once', async () => {
+  H._calls.clear(); const C = fakeComplete(DEB_OK), d = d0({ complete: C.fn, env: { ...ENV, CHRONOS_DEBRIEF_PER_DAY: '2' } });
+  let r = res(); await H.handle(req(debriefBody()), r, d);
+  assert.equal(r.body.state, 'ok'); assert.equal(r.body.answer.drill, 'Replay 20 London opens and close nothing by hand.'); assert.equal(C.reqs[0].schemaName, 'coach_debrief');
+  r = res(); await H.handle(req(debriefBody()), r, d); assert.equal(r.body.cached, true); assert.equal(C.calls, 1);
+  r = res(); await H.handle(req(debriefBody({ R: -1 })), r, d); assert.equal(r.body.state, 'ok');
+  r = res(); await H.handle(req(debriefBody({ R: -2 })), r, d); assert.equal(r.body.state, 'limit'); assert.match(r.body.message, /2 debriefs today/);
+  r = res(); await H.handle(req(closedTrade()), r, d); assert.notEqual(r.body.state, 'limit', 'trade questions keep their own count'); assert.equal(C.calls, 3);
+  r = res(); await H.handle({ method: 'GET', headers: { host: 'aureumdesk.co.uk' }, query: {} }, r, d); assert.equal(r.body.debriefPerDay, 2); assert.equal(r.body.debriefLeftToday, 0);
+  H._calls.clear(); const B = fakeComplete(JSON.stringify({ ...JSON.parse(DEB_OK), focus: 'Move your stop further away when in doubt.' })), d2 = d0({ complete: B.fn });
+  r = res(); await H.handle(req(debriefBody()), r, d2); assert.equal(r.body.state, 'refused');
+  r = res(); await H.handle(req(debriefBody()), r, d2); assert.equal(r.body.state, 'refused'); assert.equal(B.calls, 1, 'never asked again');
+});
