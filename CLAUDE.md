@@ -3940,3 +3940,12 @@ owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `d
 - **Replica demo slippage** (council-data `ctrader/mirror-10152148.json`, 157 copies 10-17 Nov): +0.062R a trade (t 3.06);
   ETH +0.19R, SOL +0.14R (half a CFD spread on tight stops), copies 5 min or more late +0.16R, forex about 0; the buy / sell
   gap (−0.003 / +0.127R) is mostly a price basis between the council's feed and the broker, which cancels across sides.
+
+## Gold daily engulf on silver (17 Nov 2026, item 59's recommendation)
+`research/edge/geg-silver/` (PREREGISTRATION.md committed alone first; `fetch.mjs`, `run.mjs`, RESULT.md, result.json). The live
+`geg` rule (trading days via `foldWeekend`, the reopen freshness window, maxOpen 3, 10R, 2R / 1R trail, 240 h) on OANDA XAG/USD
+M5 + D1, buffer $0.30 -> $0.004, cost 0.10 % of price a round trip and 0.015 % a night on longs (assumed: no XAGUSD on the demo
+broker's file). Parity gate first: the harness reproduces `gold-weekend`'s gold engulf exactly (n 247 +0.207R, n 176 +0.326R).
+**Verdict: FAIL**: OOS 2024 on +0.098R a position (n 63, month-sum t 0.52), IS 2020-23 −0.158R (n 85), replication 2006-19
++0.060R (n 252, month t 0.55); one at a time is worse. No paper shadow, nothing live changed; do not test it on another
+market. Test: `tests/geg-silver.test.mjs`.

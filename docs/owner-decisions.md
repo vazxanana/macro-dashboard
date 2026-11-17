@@ -1189,6 +1189,10 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 ### [ ] 59. One open rule question: the Gold daily engulf on silver
 
 - **Status (17 Nov 2026): open.**
+- **Status (17 Nov 2026, later): answered by the study, FAIL.** `research/edge/geg-silver` (pre-registered): out of sample
+  2024 on +0.098R a position after costs and financing (n 63, month-sum t 0.52, bar 2), in sample 2020-23 −0.158R (n 85);
+  replication 2006-19 +0.060R (n 252, month t 0.55). The harness reproduced the gold engulf figures exactly first. Not an edge
+  on silver: no paper shadow is proposed. Nothing is left for the owner to decide here.
 - **Context.** Item 44 stops new gate, exit, entry and size tests on the gold book's 2006-17 window. The one rule question
   it does not block and that no study has answered: does the Gold daily engulf work on silver? Low prior: the Gold trend rule
   failed on 13 other markets (trend-breadth-h1, 0 of 14), and the playbook long's cuts held on silver only without a month-sum t.
