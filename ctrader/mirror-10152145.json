@@ -12933,36 +12933,47 @@
    "startBalance": 10183.68
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10183.68 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10183.68 · 7 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 290.33, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 290.91, 2.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-17T01:12:19.000Z"
+    "at": "2026-11-17T01:14:41.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "gbpusd-swing-1794878016": {
+    "orderId": "34182491",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "swing",
+    "limitPrice": 1.31775,
+    "stop": 1.31938025,
+    "t1": 1.3144894999999999,
+    "placedAt": "2026-11-17T01:14:41.000Z",
+    "expires": "2026-11-19T01:13:36.000Z",
+    "riskCash": 2.04,
+    "margin": 2.64,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10183.68,
-  "lastRun": "2026-11-17T01:12:19.000Z"
+  "lastRun": "2026-11-17T01:14:41.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-16T11:20:33.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 269.94, 2.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-16T11:23:57.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 269.68, 2.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-16T11:30:15.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 269.59, 2.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -14452,6 +14463,16 @@
    "at": "2026-11-17T01:12:19.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 290.33, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-17T01:14:41.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 290.91, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-17T01:14:41.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.31775 (council swing, valid to 2026-11-19T01:13Z)",
+   "trade": "gbpusd-swing-1794878016"
   }
  ],
  "limits": {
