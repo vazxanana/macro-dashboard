@@ -258,7 +258,139 @@
   // a saved session: sessions saved before the timeframe switch carry `idx` only; newer ones carry the moment `mom`
   function tfResume(saved, bars, sec) { if (saved && saved.mom > 0) { const p = tfPlan(bars, sec, saved.mom); return { idx: p.closed, straddle: p.straddle, T: saved.mom }; } const idx = Math.min((saved && saved.idx) || 0, bars.length); return { idx, straddle: -1, T: tfMoment(bars, idx, sec, null) }; }
 
+  // ---- trade coach (17 Nov 2026, owner: "while I backtest he understands what I'm doing") --------------------------------
+  // Reads a trade the way a mentor would and says it back in plain words. Display and record only: nothing here places,
+  // changes or refuses an order, and nothing moves a stop. Every reading uses candles that CLOSED at or before the moment
+  // asked about (time + sec <= T), so a price after the entry can never change the context recorded for it.
+  const COACH = { revengeMin: 30, minN: 20, oversize: 1.1, swingK: 3, breakLook: 5 };
+  const sessOfHour = (h) => (h >= 7 && h < 12 ? 'London' : h >= 12 && h < 21 ? 'New York' : 'Asia');   // = stats().bySession
+  // how many bars ended by T (bars sorted by time; a candle still forming at T is left out)
+  function closedBy(bars, sec, T) { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time + sec <= T) lo = m + 1; else hi = m; } return lo; }
+  // complete higher-timeframe candles built from closed lower ones (UTC-aligned buckets that ended by T)
+  function bucketBars(bars, bsec, T) { const out = []; let c = null;
+    for (const b of bars) { const k = Math.floor(b.time / bsec) * bsec; if (k + bsec > T) break; if (!c || c.time !== k) { c = { time: k, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(c); } else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } }
+    return out; }
+  // trend: EMA 20 against EMA 50 and the slope of EMA 20 over 5 bars; 'up' / 'down' only when both agree, else 'flat'; null under 55 bars
+  function trendOf(bars) { if (!bars || bars.length < 55) return null; const k20 = 2 / 21, k50 = 2 / 51; let e20 = null, e50 = null; const h = [];
+    for (const b of bars) { e20 = e20 == null ? b.close : b.close * k20 + e20 * (1 - k20); e50 = e50 == null ? b.close : b.close * k50 + e50 * (1 - k50); h.push(e20); }
+    const sl = e20 - h[h.length - 6]; return e20 > e50 && sl > 0 ? 'up' : e20 < e50 && sl < 0 ? 'down' : 'flat'; }
+  // ATR as the page draws it: the mean true range of the last n bars
+  function atrOf(bars, n = 14) { const b = bars.slice(-n - 1); if (b.length < 2) return null; let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return s / (b.length - 1); }
+  // a close through the latest swing confirmed before it (K bars each side) inside the last `look` closed bars: 'up' or 'down'
+  function swingBreak(bars, K = COACH.swingK, look = COACH.breakLook) { const n = bars.length; let out = null;
+    for (let i = Math.max(K * 2 + 1, n - look); i < n; i++) { let sh = null, sl = null;
+      for (let j = i - K - 1; j >= K && (sh == null || sl == null); j--) { let isH = true, isL = true; for (let d = 1; d <= K; d++) { if (!(bars[j].high > bars[j - d].high && bars[j].high >= bars[j + d].high)) isH = false; if (!(bars[j].low < bars[j - d].low && bars[j].low <= bars[j + d].low)) isL = false; } if (isH && sh == null) sh = bars[j].high; if (isL && sl == null) sl = bars[j].low; }
+      if (sh != null && bars[i].close > sh && bars[i - 1].close <= sh) out = { dir: 'up', ago: n - 1 - i, level: sh };
+      if (sl != null && bars[i].close < sl && bars[i - 1].close >= sl) out = { dir: 'down', ago: n - 1 - i, level: sl }; }
+    return out; }
+  const r2s = (v) => (v == null || !Number.isFinite(v) ? null : r2(v, 2));
+  // the context of an entry. bars / sec: the replay's candles and their timeframe; T: the moment (only bars ended by T are read);
+  // o: { side, entry, stop, target, at (the entry's stamp: session and day), riskSet, riskPct }; prior: the closed trades before it
+  function coachCtx(bars, sec, T, o, prior) { const all = bars || [], n = closedBy(all, sec, T), seen = all.slice(Math.max(0, n - 6000), n), at = o.at || T, dir = o.side === 'buy' ? 1 : -1;
+    const ctx = { v: 1, tf: sec, at: T, side: o.side, session: sessOfHour(new Date(at * 1000).getUTCHours()), bars: seen.length };
+    const a = atrOf(seen); ctx.atr = a == null ? null : +a.toPrecision(6); const dist = Math.abs(o.entry - o.stop);
+    ctx.stopAtr = a ? r2s(dist / a) : null; ctx.rr = o.target != null && dist > 0 ? r2s(Math.abs(o.target - o.entry) / dist) : null;
+    const main = trendOf(seen.slice(-400)); let htf = null, htfName = null;
+    for (const [bs, nm] of [[14400, 'H4'], [3600, 'H1']]) { if (bs <= sec || bs % sec) continue; const t = trendOf(bucketBars(seen, bs, T).slice(-400)); if (t) { htf = t; htfName = nm; break; } }
+    if (!htf && main) { htf = main; htfName = sec >= 86400 ? 'D1' : sec >= 3600 ? 'H' + sec / 3600 : sec / 60 + 'm'; ctx.htfIsMain = true; }
+    ctx.trend = { main, htf, htfName }; ctx.htfRel = htf == null ? null : htf === 'flat' ? 'flat' : (htf === 'up') === (dir === 1) ? 'with' : 'against';
+    // the previous UTC day that has candles (weekends skipped), from closed candles before the entry's day
+    const day = Math.floor(at / 86400); let hi = null, lo = null, pk = null;
+    for (let i = seen.length - 1; i >= 0; i--) { const dk = Math.floor(seen[i].time / 86400); if (dk >= day) continue; if (pk == null) pk = dk; if (dk !== pk) break; hi = hi == null ? seen[i].high : Math.max(hi, seen[i].high); lo = lo == null ? seen[i].low : Math.min(lo, seen[i].low); }
+    if (hi != null && hi > lo) ctx.pd = { hi, lo, pos: r2s((o.entry - lo) / (hi - lo)), toHiAtr: a ? r2s((hi - o.entry) / a) : null, toLoAtr: a ? r2s((o.entry - lo) / a) : null };
+    const br = swingBreak(seen); if (br) ctx.brk = { dir: br.dir, ago: br.ago, rel: (br.dir === 'up') === (dir === 1) ? 'with' : 'against' };
+    const done = trades(prior || []).filter((t) => t.closedAt > 0 && t.closedAt <= at).sort((x, y) => x.closedAt - y.closedAt), last = done[done.length - 1];
+    if (last) { const res = (t) => (t.net > 0 ? 'win' : t.net < 0 ? 'loss' : 'flat'); let run = 0; for (let i = done.length - 1; i >= 0 && res(done[i]) === res(last); i--) run++; ctx.prev = { res: res(last), run, min: Math.round((at - last.closedAt) / 60) }; }
+    ctx.revenge = !!(ctx.prev && ctx.prev.res === 'loss' && ctx.prev.min <= COACH.revengeMin);
+    if (o.riskSet != null) ctx.riskSet = o.riskSet; if (o.riskPct != null) ctx.riskPct = r2s(o.riskPct);
+    const dw = coachDraw(o.draw, T, { ...o, at }, a); if (dw) { ctx.draw = dw; if (o.dec != null) ctx.dec = o.dec; }
+    return ctx; }
+  // the owner's drawings (Draw menu: 'h' price line { price }, 't' trend line and 'r' box { t1, p1, t2, p2 }) read against an entry.
+  // Only drawings that existed at the moment T count: a drawing stamped `at` after T is left out; one without a stamp was drawn
+  // earlier (sessions before 17 Nov 2026). A trend line is read in time terms: its value at the entry's time on the straight line
+  // through its two [time, price] points (extended both ways), no pixels. Levels = price lines, box edges, trend-line values.
+  const AT_LEVEL = 0.5;   // within half an ATR of a drawn level = "at your level"
+  function lineAt(d, t) { return d.t2 === d.t1 ? d.p2 : d.p1 + (d.p2 - d.p1) * (t - d.t1) / (d.t2 - d.t1); }
+  function coachDraw(draw, T, o, atr) { const list = (draw || []).filter((d) => d && ['h', 't', 'r'].includes(d.type) && !(d.at > T)); if (!list.length || !(atr > 0)) return list.length ? { n: list.length } : null;
+    const dir = o.side === 'buy' ? 1 : -1, e = o.entry, at = o.at || T, lv = [], items = [];
+    for (const d of list) {
+      if (d.type === 'h') { lv.push({ kind: 'line', price: d.price }); items.push({ kind: 'line', price: d.price, dAtr: r2s(Math.abs(e - d.price) / atr) }); }
+      else if (d.type === 'r') { const hi = Math.max(d.p1, d.p2), lo = Math.min(d.p1, d.p2), inside = e >= lo && e <= hi; lv.push({ kind: 'box edge', price: hi }, { kind: 'box edge', price: lo }); items.push({ kind: 'box', hi, lo, inside, dAtr: inside ? 0 : r2s(Math.min(Math.abs(e - hi), Math.abs(e - lo)) / atr) }); }
+      else { const v = lineAt(d, at), side = e > v ? 'above' : e < v ? 'below' : 'on'; lv.push({ kind: 'trend line', price: v }); items.push({ kind: 'trend line', value: r2s(v), side, respects: side === 'on' || (side === 'above') === (dir === 1), dAtr: r2s(Math.abs(e - v) / atr) }); } }
+    const near = lv.slice().sort((x, y) => Math.abs(e - x.price) - Math.abs(e - y.price))[0], nearAtr = r2s(Math.abs(e - near.price) / atr), atLevel = nearAtr <= AT_LEVEL;
+    const out = { n: list.length, items, near: { kind: near.kind, price: near.price, dAtr: nearAtr, pos: e > near.price ? 'above' : e < near.price ? 'below' : 'at' }, atLevel, inBox: items.some((x) => x.kind === 'box' && x.inside) };
+    // the level that protects the trade: the nearest one at the entry or on its losing side; is the stop beyond it?
+    const prot = lv.filter((x) => (e - x.price) * dir >= -AT_LEVEL * atr).sort((x, y) => (e - x.price) * dir - (e - y.price) * dir)[0];
+    if (prot && o.stop != null) { const b = (prot.price - o.stop) * dir; out.prot = { kind: prot.kind, price: prot.price }; out.stopBehind = b > 0; out.stopBeyondAtr = r2s(b / atr); }
+    // the next level ahead in the trade's direction (past the one it entered at); is the target before or at it?
+    const next = lv.filter((x) => (x.price - e) * dir > AT_LEVEL * atr).sort((x, y) => (x.price - e) * dir - (y.price - e) * dir)[0];
+    if (next) { out.next = { kind: next.kind, price: next.price }; if (o.target != null) out.targetBefore = (o.target - next.price) * dir <= 0; }
+    return out; }
+  const n1 = (v) => (Math.abs(v) >= 10 ? Math.round(v) : Math.round(v * 10) / 10).toString();
+  // one plain sentence: "Selling in London, against the H1 uptrend, 1.3 ATR stop, 2R target, 0.4 ATR under yesterday's high."
+  function coachSentence(c) { if (!c || !c.side) return 'No context recorded for this trade.';
+    const p = [`${c.side === 'buy' ? 'Buying' : 'Selling'} in ${c.session}`], tw = { up: 'uptrend', down: 'downtrend' };
+    if (c.trend && c.trend.htf) p.push(c.trend.htf === 'flat' ? `with no clear ${c.trend.htfName} trend` : `${c.htfRel} the ${c.trend.htfName} ${tw[c.trend.htf]}`);
+    if (c.stopAtr != null) p.push(`${n1(c.stopAtr)} ATR stop`); p.push(c.rr != null ? `${n1(c.rr)}R target` : 'no target');
+    if (c.pd && c.pd.toHiAtr != null) { const d = c.pd; p.push(d.toHiAtr < 0 ? `${n1(-d.toHiAtr)} ATR above yesterday's high` : d.toLoAtr < 0 ? `${n1(-d.toLoAtr)} ATR below yesterday's low` : d.toHiAtr <= d.toLoAtr ? `${n1(d.toHiAtr)} ATR under yesterday's high` : `${n1(d.toLoAtr)} ATR over yesterday's low`); }
+    if (c.brk) p.push(`${c.brk.ago ? c.brk.ago + ' bar' + (c.brk.ago === 1 ? '' : 's') + ' after' : 'right on'} a break ${c.brk.dir} through the last swing ${c.brk.dir === 'up' ? 'high' : 'low'}`);
+    if (c.revenge) p.push(`${c.prev.min} min after a loss`);
+    let s = p.join(', '); const dr = drawSay(c); if (dr) s += '; ' + dr;
+    return s + '.'; }
+  // the drawings part: "selling at your drawn level 4,120.00 (0.1 ATR away), stop 0.4 ATR above it, target before your next line at 4,072.00"
+  const fmtP = (v, dec) => (+v).toLocaleString('en-US', { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec });
+  const KW = { line: 'line', 'box edge': 'box edge', 'trend line': 'trend line' };
+  function drawSay(c) { const d = c && c.draw; if (!d || !d.near) return ''; const P = (v) => fmtP(v, c.dec), sell = c.side === 'sell', q = [];
+    const tl = (d.items || []).find((x) => x.kind === 'trend line');
+    if (d.inBox) q.push(`${sell ? 'selling' : 'buying'} inside your drawn box`);
+    else if (d.atLevel) q.push(`${sell ? 'selling' : 'buying'} at your drawn ${d.near.kind === 'line' ? 'level' : d.near.kind} ${P(d.near.price)} (${n1(d.near.dAtr)} ATR away)`);
+    else q.push(`${n1(d.near.dAtr)} ATR ${d.near.pos === 'below' ? 'below' : d.near.pos === 'above' ? 'above' : 'from'} your nearest drawn ${d.near.kind === 'line' ? 'level' : d.near.kind} ${P(d.near.price)}`);
+    if (d.prot && d.stopBehind != null) q.push(d.stopBehind ? `stop ${n1(d.stopBeyondAtr)} ATR ${sell ? 'above' : 'below'} ${d.prot.price === d.near.price ? 'it' : 'your ' + KW[d.prot.kind] + ' ' + P(d.prot.price)}` : `stop in front of your ${KW[d.prot.kind]} ${P(d.prot.price)}`);
+    if (d.next && d.targetBefore != null) q.push(d.next.price === d.near.price ? `target ${d.targetBefore ? 'before' : 'past'} it` : `target ${d.targetBefore ? 'before' : 'past'} your next ${KW[d.next.kind]} at ${P(d.next.price)}`);
+    if (tl && !(d.atLevel && d.near.kind === 'trend line')) q.push(`${tl.side} your trend line (${P(tl.value)} at entry${tl.respects ? '' : ', against it'})`);
+    return q.join(', '); }
+  // after a stop is changed by hand: remember whether it ever sat further from the entry than it opened (risk grew), at
+  // break-even, or past the entry. Only records; the stop itself is never touched here.
+  function coachStop(p) { if (!p || !(p.r0 > 0)) return p; const dir = p.side === 'buy' ? 1 : -1, d = (p.entry - p.stop) * dir;
+    if (d > p.r0 * 1.001) p.stopAway = Math.max(p.stopAway || 0, r2((d - p.r0) / p.r0, 2)); if (Math.abs(d) <= p.r0 * 0.05) p.beMoved = true; else if (d < 0) p.stopLocked = true; return p; }
+  // what the coach can see on a closed trade: suggestions for the review dialog, never a verdict. all = the session's closed records
+  function coachFlags(t, all) { const out = []; if (!t) return out;
+    if (t.stopAway > 0) out.push({ k: 'away', text: `Stop moved away from the entry (risk grew by ${Math.round(t.stopAway * 100)}%)`, mistake: 'Moved my stop' });
+    if (t.beMoved) out.push({ k: 'be', text: 'Stop moved to break-even' });
+    const rm = t.Rmove != null ? t.Rmove : t.R; if (/^manual/.test(t.reason || '') && t.target != null && rm > 0 && rm < 1) out.push({ k: 'early', text: `Closed by hand at ${n1(rm)}R in profit, before 1R and the target`, mistake: 'Exited early' });
+    const prev = trades(all || []).filter((x) => x.id !== t.id && x.closedAt > 0 && x.closedAt <= t.openedAt).sort((x, y) => x.closedAt - y.closedAt).pop();
+    if (prev && prev.net < 0 && t.openedAt - prev.closedAt <= COACH.revengeMin * 60) out.push({ k: 'revenge', text: `Opened ${Math.round((t.openedAt - prev.closedAt) / 60)} min after a loss: possible revenge trade`, mistake: 'Revenge trade' });
+    const set = t.riskSet != null ? t.riskSet : t.ctx && t.ctx.riskSet, act = t.riskPct != null ? t.riskPct : t.ctx && t.ctx.riskPct;
+    if (set > 0 && act > set * COACH.oversize) out.push({ k: 'size', text: `Risked ${n1(act)}% with ${n1(set)}% set`, mistake: 'Oversized' });
+    const dw = t.ctx && t.ctx.draw; if (dw && dw.near && !dw.inBox && dw.near.dAtr > 1) out.push({ k: 'levels', text: `Entered away from your drawn levels (${n1(dw.near.dAtr)} ATR from the nearest)`, mistake: 'Against my plan' });
+    return out; }
+  // the owner's own record split by each context feature. Under minN trades a group is "too few to judge"; at minN or more it is
+  // "your record, not a tested edge". t = mean R against zero (sd / sqrt n). Trades without context are counted apart (noCtx).
+  const COACH_F = [
+    ['htf', 'Higher-timeframe trend', (c) => (c.htfRel === 'with' ? 'With the trend' : c.htfRel === 'against' ? 'Against the trend' : c.htfRel === 'flat' ? 'No clear trend' : null)],
+    ['session', 'Session', (c) => c.session || null],
+    ['range', "Entry in yesterday's range", (c) => { const p = c.pd && c.pd.pos; return p == null ? null : p > 1 ? "Above yesterday's high" : p < 0 ? "Below yesterday's low" : p >= 2 / 3 ? 'Upper third' : p >= 1 / 3 ? 'Middle third' : 'Lower third'; }],
+    ['stop', 'Stop size', (c) => (c.stopAtr == null ? null : c.stopAtr < 0.75 ? 'Under 0.75 ATR' : c.stopAtr <= 1.5 ? '0.75 to 1.5 ATR' : 'Over 1.5 ATR')],
+    ['prev', 'After the last result', (c) => (c.prev && c.prev.res === 'loss' ? 'Right after a loss' : 'Not after a loss')],
+    ['lvl', 'Your levels', (c) => (!c.draw || !c.draw.near ? null : c.draw.atLevel || c.draw.inBox ? 'At a drawn level' : 'Away from your levels')],
+    ['lvlstop', 'Stop and your levels', (c) => (!c.draw || c.draw.stopBehind == null ? null : c.draw.stopBehind ? 'Stop behind a drawn level' : 'Stop not behind one')],
+    ['brk', 'Swing break', (c) => (c.brk ? (c.brk.rel === 'with' ? 'With a fresh break' : 'Against a fresh break') : 'No fresh break')],
+  ];
+  function grpStats(Rs, wins) { const n = Rs.length, m = n ? Rs.reduce((s, x) => s + x, 0) / n : null, sd = n > 1 ? Math.sqrt(Rs.reduce((s, x) => s + (x - m) * (x - m), 0) / (n - 1)) : null;
+    return { n, wins, winRate: n ? r2(wins / n, 3) : null, meanR: m == null ? null : r2(m, 2), m, sd, t: sd > 0 ? r2(m / (sd / Math.sqrt(n)), 2) : null }; }
+  function coachSplits(list, o = {}) { const minN = o.minN || COACH.minN, T = trades(list || []).filter((t) => t.R != null), withC = T.filter((t) => t.ctx && t.ctx.side), out = { n: T.length, noCtx: T.length - withC.length, minN, features: [], lead: null };
+    const sR = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R';
+    for (const [k, name, f] of COACH_F) { const g = new Map(); for (const t of withC) { const lab = f(t.ctx); if (lab == null) continue; if (!g.has(lab)) g.set(lab, []); g.get(lab).push(t); }
+      const groups = [...g.entries()].map(([label, a]) => { const s = grpStats(a.map((t) => t.R), a.filter((t) => t.net > 0).length); return { label, ...s, judge: s.n < minN ? 'too few to judge' : 'your record, not a tested edge', list: a }; });
+      out.features.push({ k, name, groups: groups.map((x) => ({ label: x.label, n: x.n, wins: x.wins, winRate: x.winRate, meanR: x.meanR, t: x.t, judge: x.judge })) });
+      for (const gr of groups) { const rest = groups.filter((x) => x !== gr).flatMap((x) => x.list); if (gr.n < minN || rest.length < minN) continue; const rs = grpStats(rest.map((t) => t.R), rest.filter((t) => t.net > 0).length), diff = gr.m - rs.m;
+        const se = Math.sqrt((gr.sd || 0) ** 2 / gr.n + (rs.sd || 0) ** 2 / rs.n), wt = se > 0 ? r2(diff / se, 2) : null;
+        if (!out.lead || Math.abs(diff) > Math.abs(out.lead.diff)) out.lead = { k, name, label: gr.label, n: gr.n, meanR: gr.meanR, restN: rs.n, restMeanR: rs.meanR, diff: r2(diff, 2), t: wt }; } }
+    if (out.lead) { const L = out.lead; L.text = `Your largest difference: ${L.label.toLowerCase()} (${L.name.charAt(0).toLowerCase() + L.name.slice(1)}) made ${sR(L.meanR)} a trade (n ${L.n}) against ${sR(L.restMeanR)} for the rest (n ${L.restN})${L.t != null ? `, Welch t ${L.t.toFixed(2)}` : ''}. Your record, not a tested edge.`; }
+    return out; }
+
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
-    TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName };
+    TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
+    COACH, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -690,6 +690,41 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       const lg = await t.evaluate(() => { const box = document.querySelector('#pflog .pflog-t'), tb = box && box.querySelector('table'), card = document.getElementById('tab-log').getBoundingClientRect(); if (!tb) return null; const r = box.getBoundingClientRect(); box.scrollLeft = 150; const d = tb.querySelector('tbody td').getBoundingClientRect(); return { rows: tb.rows.length, inCard: r.right <= card.right + 0.5 && r.left >= card.left - 0.5, scrolls: box.scrollWidth > box.clientWidth, day: Math.round(d.left - r.left), over: document.documentElement.scrollWidth - innerWidth, font: Math.min(...[...tb.querySelectorAll('th, td')].map((c) => parseFloat(getComputedStyle(c).fontSize))) }; });
       check(`challenge log at ${w} px (${full ? 'Full' : 'Simple'} view): the day table scrolls inside its own box in the card, the day stays at the left, 12 px at least, no sideways page`, lg && lg.rows > 2 && lg.inCard && lg.scrolls && lg.day === 0 && lg.over <= 0 && lg.font >= 12, JSON.stringify(lg));
       await cx.close(); } }
+  // 36. trade coach (17 Nov 2026): a drawn level, a draft whose sentence names it, the same sentence on the journal row, the
+  // review dialog's suggestions, and the "How you trade" card; 12 px and AA in dark / light / midnight. Screenshots for the owner.
+  { const cx = await b.newContext({ viewport: { width: 1500, height: 950 } }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('coach: ' + e.message));
+    await route(t); await me(t, OWNER); await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    await t.evaluate(() => document.querySelector('#quick [data-q^="xau,15m"]').click()); await t.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 30; i++) await t.keyboard.press('ArrowRight'); await settle(t);
+    const ch = await t.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }), py = (await t.evaluate(() => window.ctChart())).pxY;
+    await t.click('#drawdd summary'); await t.click('[data-dt=h]'); await t.mouse.click(ch.x + ch.w * 0.45, ch.y + py); await t.waitForTimeout(200); await t.mouse.move(4, 4);
+    await t.keyboard.press('Shift+S'); await settle(t);
+    const say = await txt(t, '#dchip .dsay'); check('the draft readout says the trade in one sentence and names the drawn level', /^(Buying|Selling) in (Asia|London|New York), .*ATR stop, .*target.*your (nearest )?drawn level/.test(say), say);
+    check('the sentence on the draft is 12 px or more', (await t.$eval('#dchip .dsay', (e) => parseFloat(getComputedStyle(e).fontSize))) >= 12);
+    await t.screenshot({ path: OUT + 'coach-draft.png', clip: { x: Math.max(0, ch.x - 10), y: Math.max(0, ch.y - 10), width: Math.min(1100, ch.w + 20), height: Math.min(560, ch.h + 20) } });
+    await t.keyboard.press('Enter'); await settle(t);
+    const ctx0 = await t.evaluate(() => { const a = window.ctAcct().acct; return a.positions[0] && a.positions[0].ctx; });
+    check('the open position carries its context, with the drawing made before the entry', ctx0 && ctx0.side === 'sell' && ctx0.draw && ctx0.draw.n === 1 && ctx0.at > 0, JSON.stringify(ctx0 || {}).slice(0, 120));
+    // a few more trades closed by hand, so the card has rows (each one stays far under 20: "too few to judge")
+    for (let k = 0; k < 5; k++) { for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.keyboard.press(k % 2 ? 'b' : 's'); await settle(t); }
+    for (let i = 0; i < 2; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await settle(t);
+    const A = await t.evaluate(() => window.ctAcct().acct); check('every closed trade carries ctx (instant and draft entries)', A.closed.length >= 6 && A.closed.every((x) => x.ctx && x.ctx.session), A.closed.length + ' closed');
+    await t.click('.tabs [data-t=journal]'); await settle(t);
+    const row = await t.evaluate(() => [...document.querySelectorAll('#jbody small.say')].map((e) => e.textContent));
+    check('each journal row shows the coach\'s sentence; the first trade\'s names the drawn level', row.length >= 6 && row.every((s) => /^(Buying|Selling) in /.test(s)) && row.some((s) => /drawn level/.test(s)), row[row.length - 1]);
+    await t.evaluate(() => { document.getElementById('toasts').style.visibility = 'hidden'; });    await t.$eval('#jbody tr:last-child', (e) => e.scrollIntoView({ block: 'center' })); await settle(t); const rb = await t.$eval('#jbody tr:last-child', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    await t.screenshot({ path: OUT + 'coach-journal.png', clip: { x: Math.max(0, rb.x), y: Math.max(0, rb.y - 40), width: Math.min(1480, rb.w), height: rb.h + 50 } });
+    await t.click('#jbody tr:first-child td.mist'); await settle(t); const seen = await t.evaluate(() => ({ open: document.getElementById('mistd').open, ticked: document.querySelectorAll('#mist-grid input:checked').length, sug: document.querySelectorAll('#mist-grid label.sug').length, txt: document.getElementById('mist-seen').textContent }));
+    check('the review dialog lists what the coach saw as suggestions and ticks nothing by itself', seen.open && seen.ticked === 0 && /The coach saw|^$/.test(seen.txt), JSON.stringify(seen).slice(0, 140)); await t.keyboard.press('Escape');
+    await t.click('.tabs [data-t=stats]'); await settle(t);
+    const card = await t.evaluate(() => ({ chips: document.querySelectorAll('#co-f [data-cf]').length, rows: document.querySelectorAll('#co-t tbody tr').length, few: [...document.querySelectorAll('#co-t td.j')].every((e) => /too few to judge/.test(e.textContent)), lead: document.getElementById('co-lead').textContent, bars: document.querySelectorAll('#v-coach .bv-bar').length }));
+    check('"How you trade": splits with n / win % / mean R / t, every group under 20 says "too few to judge", no lead sentence under 20', card.chips >= 4 && card.rows >= 1 && card.few && card.bars >= 1 && /keep trading/.test(card.lead), JSON.stringify(card));
+    await t.click('#co-f [data-cf=lvl]').catch(() => {}); await settle(t); check('"Your levels" split on the card', /drawn level|your levels/i.test(await txt(t, '#co-t')), await txt(t, '#co-t thead'));
+    await t.$eval('#vc-coach', (e) => e.scrollIntoView({ block: 'center' })); await settle(t); await (await t.$('#vc-coach')).screenshot({ path: OUT + 'coach-card.png' });
+    const COACH_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#vc-coach h2, #vc-coach small, #co-lead, #co-f button, #co-t th, #co-t td, #co-note, #v-coach svg text, #tab-journal small.say')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await t.click('.tabs [data-t=stats]'); await settle(t); bad.push(...(await measured(t, COACH_AA, 'coach card text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#vc-coach *, #tab-journal small.say')].filter((e) => e.getClientRects().length && e.childNodes.length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('coach card and journal sentence: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await cx.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

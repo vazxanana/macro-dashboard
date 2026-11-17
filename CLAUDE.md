@@ -2035,6 +2035,52 @@ Saturday, so the moment was Friday's 21:00 close and a 4h switch moves it to the
 between); and on a Friday's day candle (ends 24:00) a lower pane's last candle ends at the 22:00 close. Both checks now accept
 that only when candles fetched apart from the page prove no price lies between (`shut`, `lowerOk`).
 
+Trade coach (17 Nov 2026, owner: "Work on the ChronosTrade so while I backtest he understands what I'm doing"; then "the coach
+must also read the drawings I make"). Deterministic, in the browser, no API call; display and record only: it never places,
+changes or refuses an order and never moves a stop (a test reads its page helpers for any order call or `.stop =`).
+- **Context at entry** `BT.coachCtx(bars, sec, T, o, prior)` (pure, `assets/backtest-engine.js`): only candles that ENDED by the
+  moment T (`closedBy`: time + sec <= T; a forming candle is never read). Instant Buy / Sell and a confirmed market draft use
+  `mom()`; a resting order that fills uses the start of the candle it filled in (`openedAt`). Stored on the position as `ctx`
+  (closes and partial closes copy it; export / import carry it as part of the account): side, session (= `bySession`), ATR 14
+  (the page's `atr`), stop in ATR (from the OPENING stop, `r0`), planned R:R, trend = EMA 20 vs 50 + EMA 20's 5-bar slope on the
+  main timeframe and on H4, else H1, built from closed candles (`bucketBars`, 55 buckets needed, else the main timeframe is
+  named), with / against / flat; yesterday's UTC range (position, distance to the high / low in ATR); a close through the last
+  swing (3 bars a side) within 5 bars (`swingBreak`), with / against; the previous closed trade (result, run, minutes;
+  `revenge` = a loss within `COACH.revengeMin` 30 min); risk set (%) and risked (%).
+- **Drawings** `BT.coachDraw(draw, T, o, atr)`: new drawings carry `at: mom()` (the moment drawn); one with `at > T` is ignored,
+  one without a stamp (older sessions, the Mosha hand-over) counts as drawn earlier. Price lines, box edges and a trend line's
+  value at the entry time (`lineAt`: the straight line through its two [time, price] points, extended, no pixels) are levels:
+  the nearest (ATR, above / below), "at your level" within `AT_LEVEL` 0.5 ATR, inside a box, the protecting level (at the entry
+  or on its losing side) and whether the stop is beyond it, the next level ahead and whether the target is before it, the trend
+  line's side and whether the trade respects it. Moving or adding a drawing later never rewrites a stored `ctx`.
+- **The sentence** `BT.coachSentence(ctx)`: "Selling in Asia, against the 15m uptrend, 1 ATR stop, 2R target, 1.3 ATR over
+  yesterday's low, 2 bars after a break up through the last swing high; selling at your drawn level 4,174.78 (0 ATR away), stop
+  1 ATR above it." Shown on the draft readout (`#dchip .dsay`, cached by `draftSay`), under each journal row's levels
+  (`small.say`; "No context recorded for this trade." otherwise), in the review dialog, and in the session report ("What the coach
+  saw", last 40 trades, + the copy text). An older session's trades get their context once on resume when the loaded candles
+  reach 60 bars before the entry (`coachBackfill`, marked `late`, "worked out after the trade from the same candles").
+- **Behaviour** `BT.coachStop(p)` (called after a stop is dragged, typed or set to break-even; records only) keeps `stopAway`
+  (the widest the risk ever grew, as a share of `r0`), `beMoved`, `stopLocked`. `BT.coachFlags(t, closed)`: stop moved away
+  ("Moved my stop"), stop to break-even (no mistake), closed by hand in profit under 1R before the target ("Exited early"),
+  opened within 30 min of a loss ("Revenge trade"), risked over 1.1x the risk % set ("Oversized"), entered over 1 ATR from every
+  drawn level ("Against my plan"). They are SUGGESTIONS: the review dialog (`#mist-seen`) lists them and marks the matching
+  boxes "suggested" with a "Tick the suggested mistakes" button; nothing is ticked or saved for the owner. The journal shows
+  "n seen" beside "+ review" until the trade is reviewed.
+- **"How you trade"** card (`#vc-coach`, Statistics, follows the journal filters through `jRecs()`): `BT.coachSplits(records)`
+  splits the closed trades with `ctx` by trend, session, place in yesterday's range, stop size, after a loss, swing break, "Your
+  levels" (at a drawn level / away) and "Stop and your levels" (behind a drawn level / not): n, win rate, mean R, t (mean against
+  zero). A group under `COACH.minN` 20 reads "too few to judge", from 20 "your record, not a tested edge". The lead sentence names
+  the largest difference in mean R (Welch t) only when both sides have 20 or more trades; trades without context are counted
+  apart. Chips pick the split (localStorage `btLab:coachF`); bars from `BTR.hbars` with short labels (`CO_SHORT`). It is a plain
+  half-width `.vc`, so the simple phone view keeps it behind "Show all statistics" like the other cards.
+- Tests: `tests/backtest-coach.test.mjs` (10: no look-ahead by changing every price after the moment, the forming candle, the
+  sentence, the flags, the splits' 20-trade rule, old sessions and JSON, drawings made after the entry, trend lines in time
+  terms, page wiring, 12 px). Audit section 36 (a drawn level, the draft sentence naming it, ctx on every trade, the journal
+  sentence, the dialog ticking nothing, the card's "too few to judge", AA in dark / light / midnight, nothing under 12 px;
+  screenshots `coach-draft.png`, `coach-journal.png`, `coach-card.png`). `window.ctChart()` gained `pxY` (the last price's y,
+  for the audit's drawing) and `coach` (the draft's sentence). Found on the way: two inline scripts of backtest.html share one
+  global scope, so a top-level `const` named like one in another script fails at run time, not at parse (`stop0` exists already).
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
