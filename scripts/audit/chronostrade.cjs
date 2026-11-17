@@ -952,6 +952,61 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const nf = await u.evaluate(() => ({ plan: window.ctCoach().plan, foc: document.getElementById('pl-foc').textContent }));
     check('coach for results: the next session\'s plan starts with the debrief\'s focus rule', nf.plan.focus === 'Use a stop of about 2 ATR at your drawn level.' && !nf.plan.nextFocus && /2 ATR/.test(nf.foc), JSON.stringify(nf));
     await cx2.close(); }
+  // 41. coach reads the chart as an edge (17 Nov 2026): the picker in the Trade card and in the live panel (kept in step, remembered
+  // on the device), each edge's reading on live candles cut at the replay moment (nothing after it: `same`), its marks on the chart
+  // and the Layers switch, the record line and "not advice", the draft's sentence and a new position's ctx.lens, the lens notes in
+  // the live panel, the lens handed to the AI (stubbed), a market the edge does not read, AA in three themes, 12 px, 44 px on touch.
+  { const LS = process.env.LENS_SHOTS || OUT; try { fs.mkdirSync(LS, { recursive: true }); } catch (e) { /* exists */ }
+    const cx = await b.newContext({ viewport: { width: 1500, height: 950 }, deviceScaleFactor: 2 }); const t = await cx.newPage(); t.on('pageerror', (e) => errs.push('lens: ' + e.message));
+    await route(t); await me(t, OWNER); const bodies = [];
+    await t.route(/\/api\/chronos-coach/, (r) => { if (r.request().method() === 'GET') return r.fulfill({ status: 200, contentType: 'application/json', body: '{"enabled":true,"liveGapS":1,"liveLeftToday":150}' });
+      try { bodies.push(JSON.parse(r.request().postData() || '{}')); } catch (e) { /* not JSON */ }
+      r.fulfill({ status: 200, contentType: 'text/event-stream; charset=utf-8', body: `data: {"t":"start"}\n\ndata: {"t":"text","d":"Read as the edge."}\n\ndata: ${JSON.stringify({ t: 'done', state: 'ok', text: 'Read as the edge.' })}\n\n` }); });
+    await t.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); } catch (e) {} }); await t.goto(H + '/backtest.html', { waitUntil: 'load' }); await t.waitForTimeout(400);
+    const pk = await t.evaluate(() => { const s = document.getElementById('ln-edge'), c = document.getElementById('tradecard'); return { inCard: !!s && c.contains(s), opts: s ? [...s.options].map((o) => o.value) : [], live: !!document.getElementById('lc-lens'), val: s && s.value }; });
+    check('lens: "Read the chart as" sits in the Trade card with None and six edges, and in the live panel', pk.inCard && pk.live && pk.val === 'none' && pk.opts.join() === 'none,gtrend,geg,mcycle,ict,msnr,lit', JSON.stringify(pk));
+    await load(t, 'xau,15m'); await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 30; i++) await t.keyboard.press('ArrowRight');
+    const readings = {};
+    for (const id of ['gtrend', 'geg', 'mcycle', 'ict', 'msnr', 'lit']) { await t.selectOption('#ln-edge', id); await t.waitForFunction(() => { const l = window.ctLens(); return !l.loading && (l.ok || l.err); }, null, { timeout: 120000 }).catch(() => {}); await t.waitForTimeout(500); readings[id] = await t.evaluate(() => window.ctLens()); }
+    const bad0 = Object.entries(readings).filter(([, l]) => !l.ok || !l.state || !l.same).map(([k, l]) => `${k}: ${l.err || l.state} same=${l.same}`);
+    check('lens: every edge reads gold at the replay moment from its own candles, and the reading is the one made from candles cut at the moment', !bad0.length, bad0.join(' | ') || Object.entries(readings).map(([k, l]) => `${k}: ${l.state}`).join(' | '));
+    check('lens: each edge fetched the timeframes its rules read', readings.gtrend.tfs['1d'] > 100 && readings.mcycle.tfs['4h'] > 300 && readings.mcycle.tfs['5m'] > 700 && readings.ict.tfs['1h'] > 1000 && readings.lit.tfs['5m'] > 1500, JSON.stringify(Object.fromEntries(Object.entries(readings).map(([k, l]) => [k, l.tfs]))));
+    await t.selectOption('#ln-edge', 'mcycle'); await t.waitForFunction(() => window.ctLens().ok, null, { timeout: 60000 }).catch(() => {}); await settle(t);
+    const sync = await t.evaluate(() => ({ live: document.getElementById('lc-lens').value, key: localStorage.getItem('btLab:lens'), rec: document.getElementById('ln-rec').textContent, st: document.getElementById('ln-st').textContent }));
+    check('lens: both pickers agree, the choice is remembered, the record line and "not advice" are shown', sync.live === 'mcycle' && sync.key === 'mcycle' && /Studied \(mcycle-oos\): −0\.175R a trade, n 244/.test(sync.rec) && /not advice/.test(sync.rec) && sync.st.length > 3, JSON.stringify(sync));
+    let L = await t.evaluate(() => window.ctLens()); check('lens: its marks are drawn on the chart', L.marks > 0 && L.drawn > 0, JSON.stringify({ marks: L.marks, drawn: L.drawn }));
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-chart.png' });
+    await t.click('#laydd summary'); await t.click('#laydd [data-l="lens"]'); await settle(t); const off = await t.evaluate(() => window.ctLens().drawn);
+    await t.click('#laydd [data-l="lens"]'); await t.click('#laydd summary'); await settle(t); const on2 = await t.evaluate(() => window.ctLens().drawn);
+    check('lens: Layers "Edge lens" hides and shows the marks', off === 0 && on2 > 0, `${off} / ${on2}`);
+    await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('Shift+B'); await t.waitForTimeout(500);
+    const dsay = await t.evaluate(() => window.ctChart().coach || ''); check('lens: the draft\'s sentence says how it stands by the edge\'s rules', /by Mosha cycle rules: (with|on|against|the rule has no signal)/.test(dsay), dsay);
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-draft.png' }); await t.keyboard.press('Escape');
+    await t.click('#lc-on'); await settle(t); await t.evaluate(() => document.activeElement && document.activeElement.blur()); await t.keyboard.press('b'); await t.waitForTimeout(800);
+    const P = await t.evaluate(() => { const p = window.ctAcct().acct.positions.slice(-1)[0]; return p && p.ctx ? p.ctx.lens : null; });
+    check('lens: a new position records ctx.lens (edge, state, with / against / none)', P && P.edge === 'mcycle' && ['with', 'against', 'none'].includes(P.agree) && P.state, JSON.stringify(P));
+    const k0 = (await t.evaluate(() => window.ctLens())).notes; for (let i = 0; i < 160; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(900);
+    const k1 = (await t.evaluate(() => window.ctLens())).notes, ln = await t.evaluate(() => window.ctLive().notes.filter((x) => x.k === 'lens'));
+    const fresh = k1.filter((k) => !k0.includes(k));
+    check('lens: a new fact of the edge (a stage, an order, a zone) becomes a note in the live panel', fresh.length ? ln.length > 0 : true, `${fresh.length} new fact(s), ${ln.length} note(s): ${ln.slice(0, 2).map((x) => x.text).join(' | ')}`);
+    await t.click('#lc .lc-ask'); await t.waitForTimeout(1200); const lb = bodies.find((x) => x.kind === 'live');
+    check('lens: the AI coach is handed the lens (edge, what the rule sees now)', lb && lb.lens && lb.lens.edge === 'mcycle' && typeof lb.lens.state === 'string' && !('rules' in lb.lens), JSON.stringify(lb && lb.lens));
+    await (await t.$('.chartc')).screenshot({ path: LS + 'lens-live.png' }); await (await t.$('#ln')).screenshot({ path: LS + 'lens-card.png' });
+    const LN_AA = CONTRAST.replace(/querySelectorAll\('[^']+'\)/, "querySelectorAll('#ln label, #ln .ln-st, #ln .ln-tx, #ln .ln-sig, #ln .ln-rec, #ln .ln-rec i, .lc-lens span')");
+    const bad = []; let small = 0; for (const th of ['dark', 'light', 'midnight']) { await t.evaluate((x) => { document.documentElement.dataset.theme = x; }, th); await settle(t); bad.push(...(await measured(t, LN_AA, 'lens text')).map((x) => th + ': ' + x));
+      small += await t.evaluate(() => [...document.querySelectorAll('#ln *, .lc-lens *')].filter((e) => e.getClientRects().length && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length); }
+    check('lens: AA in dark / light / midnight, nothing under 12 px', !bad.length && !small, bad.slice(0, 4).join(' | ') + ' small ' + small);
+    await t.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
+    await t.reload({ waitUntil: 'load' }); await t.waitForTimeout(800); check('lens: remembered after a reload', await t.evaluate(() => document.getElementById('ln-edge').value === 'mcycle'));
+    await cx.close();
+    // a market the edge does not read says so; 44 px on touch
+    const cx2 = await b.newContext({ viewport: { width: 1024, height: 1366 }, hasTouch: true, isMobile: true }); const u = await cx2.newPage(); u.on('pageerror', (e) => errs.push('lens touch: ' + e.message));
+    await route(u); await me(u, OWNER); await u.addInitScript(() => { try { localStorage.setItem('btLab:onb:owner', 'done'); localStorage.setItem('btLab:lens', 'gtrend'); } catch (e) {} }); await u.goto(H + '/backtest.html', { waitUntil: 'load' }); await u.waitForTimeout(500);
+    const qs = await u.evaluate(() => [...document.querySelectorAll('#quick [data-q]')].map((e) => e.dataset.q)), other = qs.find((q) => !/^xau/.test(q));
+    if (other) { await u.evaluate((q) => document.querySelector(`#quick [data-q="${q}"]`).click(), other); await u.waitForFunction(() => /candles loaded|Could not/.test(document.querySelector('#toasts').textContent + document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await u.waitForTimeout(1500); }
+    const nm = await u.evaluate(() => ({ st: document.getElementById('ln-st').textContent, h: document.getElementById('ln-edge').getBoundingClientRect().height }));
+    check('lens: a market the edge does not read says so in words; the picker is 44 px on touch', (!other || /reads XAU only/.test(nm.st)) && nm.h >= 44, JSON.stringify({ other, ...nm }));
+    await cx2.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

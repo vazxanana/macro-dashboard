@@ -2199,6 +2199,44 @@ only, off) presses the play control and presses it again after. Tests: `tests/ll
 (11); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft / market events with the AI off, the AI on with
 a stubbed stream and a withdrawn answer, the gap, commentary on a market event, the watching dot, AA in three themes, phone strip).
 
+Coach reads the chart as an edge (17 Nov 2026, owner: "the coach — I can choose the edge and he will view the market as the
+edge"). Display and record only: nothing places, changes or refuses an order or moves a stop. "Read the chart as" (`#ln-edge` in
+the Trade card under the live coach toggle, `#lc-lens` in the live panel, kept in step; localStorage `btLab:lens`, a display
+preference) picks None | Gold trend | Gold daily engulf | Mosha cycle | ICT (iFVG A-setup) | MSNR direction | LIT.
+- **`assets/coach-lens.js`** (`window.CL`, `module.exports`): its GENERATED block is a verbatim copy, written by
+  `node scripts/coach-lens-gen.mjs`, of the rules the council and the desk run (council/fills.mjs `foldWeekend` / `gegFresh` /
+  `spotClosed`, council/engine.mjs `msAnalyze`, council/mosha-cycle.mjs, ict/tracker.mjs `signals` / `isASetup` / `dailyNY` with
+  council/events.mjs's NFP times written out, council/lit.mjs `detect`, research/edge/msnr-direction `calls`); the browser cannot load
+  council/ or ict/. **After a change to any of those files run the generator** (`tests/coach-lens.test.mjs` fails until the copy is
+  byte for byte the source). `CL.read(edge, data, T, { price, sym, dec })` reads ONLY candles closed by the replay moment T and
+  returns `{ state, text, marks, signal, dir, notes, record }`; a signal's stop is always on the losing side or it is dropped. Gold
+  trend and Gold daily engulf use the Trader's own blocks' values (gtrend n 20 / k 2 on the 719 closed raw UTC days; geg on trading
+  days); Mosha cycle the Trader's 719 closed bars a timeframe, N 6; ICT OANDA mid H1 with the 17:00 New York hour dropped and D1 =
+  `dailyNY` (as the desk's lab; gold rule on xau, index rule on nas100 / spx500 / us30 / us2000); MSNR ladder L1 on the last 720 H4;
+  LIT the 4,000 closed M5 of the stream. What a lens adds is said in its text: Gold trend's own position (bought at the next day's
+  open, no intraday re-entry), the engulf zones' fill / fail / expiry (its 3-order cap not counted), LIT's resting order (the stream's
+  daily gates not applied). **Left out on purpose: H4 trendline and NQ open run** (their rules read the Trader's own state inside
+  council/trader.mjs and could not be copied faithfully; no approximation is offered as the edge).
+- **Record line** under each reading, from the studies (test against result.json): Gold trend +0.313R a position (n 74, t 1.20) and
+  the engulf +0.141R (n 256, t 1.46), supported-book untouched 2006-17, not proven; Mosha cycle −0.175R (n 244, t −1.50, FAIL);
+  ICT A-setups −0.013R (n 2,235, t −0.45, ict-oos-2008 FAILS); MSNR 0 of 6 (best t 1.35); LIT INCONCLUSIVE. Then "A reading by this
+  edge's rules, not advice."
+- **Page block** `// ---- coach lens (17 Nov 2026` … `// ---- end coach lens` (before the simple view's block, never in it), CSS
+  `/* coach lens (17 Nov 2026)` … `/* end coach lens */`: candles fetched per edge timeframe for the session's market from `CL.warm`
+  before its first candle (`fetchBars`), a reading every 400 ms when the moment or price moved, the marks on the overlay (`lnDraw`,
+  Layers "Edge lens", `LAY.lens`), `ctx.lens = { edge, name, state, agree: with | against | none, signal }` on every entry and draft
+  (`coachAt`, `draftSay`); the coach's sentence adds "by <edge> rules: …" (engine `lensSay`) and "How you trade" splits "The edge you
+  read with" (`COACH_F` lens, 20-trade rule). A new fact of the reading (a signal, an order, a zone filled or failed, a stage, the
+  rule's stop moving) is a free note in the live panel (kind `lens`). The AI coach's trade, session and live questions carry
+  `lens: { edge, state, signal }`; `api/_chronos-coach.js` `cleanLens` whitelists the edge, caps the state at 200 characters, drops a
+  signal without a stop on the losing side and takes the rules and the record from its OWN table `LENS` (equal to the asset's, a test),
+  and the system text then asks the model to answer as a trader of that edge, never calling it proven beyond its record (every other
+  rule unchanged). `window.ctLens()` is the audit's read-only view (`same`: the reading equals one made from candles cut at the moment).
+- Tests: `tests/coach-lens.test.mjs` (14: the copy, parity with the Trader's lifted gtrend / geg blocks, cycleTrades on the Trader's
+  events, ict signals and the A-setup verdict, LIT `detect` and `litStep`'s order, MSNR `calls`, no look-ahead, stops, records, the
+  server); audit section 41 (each edge on live candles, marks and Layers, draft sentence, ctx.lens, live notes, the AI's lens, AA in
+  three themes, 12 px, 44 px on touch; screenshots `lens-chart.png`, `lens-draft.png`, `lens-live.png`, `lens-card.png`).
+
 Chart right-click menu (17 Nov 2026, owner: "when I press right click … reset chart view, delete all drawings"): `.cmenu`
 (`#cmenu`, between `// ---- chart right-click menu` and `// ---- end chart right-click menu` in backtest.html): Reset chart view
 (price autoscale on, time scale reset, back to the latest candle), Delete this drawing (the one under the pointer is selected first;
