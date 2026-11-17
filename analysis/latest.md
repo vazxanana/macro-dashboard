@@ -8,18 +8,18 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-17 13:27 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-17 13:30 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **overlap** — the rule skips it, so no live Scalp until it ends.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
 | XAU/USD | down (OANDA) | no (not live, trades the replica instead, overlap session) | READY sell (blocked: wrong side) | 25 trades, 44% won, +0.18R a trade |
-| BTC/USD | up (Kraken) | no (not live, overlap session) | IN ORIGIN buy | 24 trades, 33% won, +0.31R a trade |
+| BTC/USD | up (Kraken) | no (not live, overlap session) | READY buy (blocked: wrong side) | 24 trades, 33% won, +0.31R a trade |
 | ETH/USD | down (Kraken) | no (not live, overlap session) | READY buy | 16 trades, 25% won, −0.38R a trade |
 | SOL/USD | down (Kraken) | no (not live, overlap session) | READY buy | 20 trades, 25% won, −0.26R a trade |
 | XRP/USD | down (Kraken) | no (not live, overlap session) | READY buy | 39 trades, 51% won, +0.53R a trade |
-| EUR/USD | down (OANDA) | no (not live, overlap session) | IN ORIGIN buy | 27 trades, 48% won, +0.55R a trade |
+| EUR/USD | down (OANDA) | no (not live, overlap session) | WAIT VR sell | 27 trades, 48% won, +0.55R a trade |
 | GBP/USD | down (OANDA) | no (not live, overlap session) | READY sell (blocked: wrong side) | 22 trades, 41% won, +0.29R a trade |
 | AUD/USD | down (OANDA) | no (not live, rule skips AUD/USD, overlap session) | READY sell (blocked: wrong side) | 39 trades, 36% won, −0.06R a trade |
 | USD/CAD | up (OANDA) | no (not live, overlap session) | IN ORIGIN buy | 15 trades, 40% won, +0.05R a trade |
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 178 trades, +0.28R a trade (+50.48R)
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-17 13:27 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-17 13:30 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -44,7 +44,7 @@ Built by the Trader at 2026-11-17 13:27 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-17 13:27 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-17 13:30 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 7 signals (3 open, 4 closed, −1.65R, 0% won); 10 other signals tracked, not A-setups.
 - open: Gold (GC) buy from 3875.6, stop 3835 (H1 iFVG reversal)
@@ -53,7 +53,7 @@ Built by the Trader at 2026-11-17 13:27 UTC. ICT desk: the last 7 days; mirror: 
 
 **Dip-buy candidate (NQ/ES, paper only):** 5 signals in 7 days, 3 closed +0.86R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-17 13:25 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-17 13:28 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -68,7 +68,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-17 13:27 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-17 13:30 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -129,12 +129,7 @@ Macro strategist, Tue 17 Nov 13:25 UTC, for Wed 18 Nov (UTC day, open to close).
 
 Built by the Analyst (last post-mortem 2026-11-15 13:32 UTC) from the live paper losses of the last 7 days, once the Trader has watched what price did after the stop. Tags (hunt / noise / late / news) are set only when the evidence is clear; where the owner reviewed a loss, the owner's tags count instead.
 
-**2 losses:** news 2. Small sample: read these as single cases, not a pattern.
-
-| Closed (UTC) | Trade | Finding | Tags | MFE; after the stop | Timing | HTF against |
-|---|---|---|---|---|---|---|
-| 11-10 13:30 | XAU/USD Gold H4 trendline buy | News during the trade | news | +0.13R; no target in 48 h | stop 30 min after New York open; news: USD CPI | none |
-| 11-10 13:30 | XAU/USD Gold daily engulf buy | News during the trade | news | +0.42R; no target in 120 h | stop 30 min after New York open; news: USD CPI | none |
+No live loss with a finished post-mortem in the last 7 days.
 <!-- postmortems:end -->
 
 <!-- what-changed:start -->
@@ -182,7 +177,7 @@ Checked 2026-11-17 12:08 UTC; live signals 2026-11-01 to 2026-11-17.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-17 13:27 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-17 13:30 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
