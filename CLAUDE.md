@@ -138,7 +138,7 @@ or stay disconnected; the deploy's first look fails loudly when /api/status is n
 ## Sign-up, email verification and password reset (17 Nov 2026, owner: 'do 2')
 People create their own account, confirm their email by a link, and the owner approves them; a member with an email can reset a
 forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) shape, routed in `cloudflare/src/worker.mjs`):
-- `POST { name, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
+- `POST { name, username, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
   limit; name 1-24, email shape and <= 254, password >= 10. **A password picks the account**, so one already used by the owner, a
   member or another request is refused with the neutral "Choose another password." and that refusal counts as a failed password
   check (`G.failed`: it would otherwise test passwords). The answer is the SAME for a new, a pending, a confirmed and a member's
@@ -2405,6 +2405,22 @@ title and one line, the password with its eye, "Continue as guest" and the invit
 Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` `display: contents` so the button can sit last;
 submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
 (no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
+
+## Sign in with email or username; unique usernames (18 Nov 2026, owner: "login with email or either username and password … unique username, so no repeated ones")
+- **Sign-in** (`api/login.js` `{ id, password }`, `api/_session.js` `login(deps, pw, id)`): `id` = the account's username (its KEY,
+  lowercased) or the email on its stored record; the owner is `owner` or `admin`. Only that account is checked; every miss is the same
+  401. Without an `id` the old password-only path stays (so passwords stay unique: sign-up and reset still refuse a used one). The
+  card asks "Email or username" (`#ms-gate-u`, `autocomplete="username"`, phone order 3 above the password) and sends `id`.
+- **Usernames** (`api/signup.js` `userOf`, `USER_RE` 3-24 of a-z 0-9 "-", not starting with "-", case-insensitive; `RESERVED`
+  owner / admin / aureum / desk / guest / help / support / root / system / council / member / api): required at sign-up (`#ms-su-u`,
+  suggested from the name until typed), 409 `{ field: 'username' }` when a member, a built-in or another waiting request holds it;
+  stored on the request, shown on the owner's approval list, and approval makes it the account's key (409 if it was taken meanwhile;
+  a request from before usernames gets the old name-derived key). The "seat is ready" email names it. Built-in members' usernames
+  are their keys (fred, orlando, luxus, carlos). The Profile hero shows "Username: <key>" (`#ms-pf-user`).
+- **The welcome shows the photo**: `msGateWelcome` reads this device's `ms-photo-<name>` / `ms-name-<name>`, else GET `/api/profile`
+  (1.5 s cap; a `data:image` only); if the photo is in when the lock turns (780 ms) it pops in inside the drawn green ring with a
+  small check badge, else the check stays; the title is "Welcome back, <display name>".
+Tests: `tests/signup.test.mjs` ("usernames"), `tests/gate-welcome.test.mjs`.
 
 ## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
 Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`

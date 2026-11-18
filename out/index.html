@@ -1388,34 +1388,37 @@ function msGate(show) {
 function msGateInert() { var on = !!document.documentElement.dataset.gate; ['.skip', '#ms-live'].forEach(function (q) { var e = document.querySelector('body > ' + q); if (e) e.inert = on; }); }
 document.addEventListener('DOMContentLoaded', function () {
   var f = document.getElementById('ms-gate-f'), err = document.getElementById('ms-gate-err'), gb = document.getElementById('ms-gate-guest'), x = document.getElementById('ms-gate-x');
-  if (document.documentElement.dataset.gate) setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30);
+  if (document.documentElement.dataset.gate) setTimeout(function () { var i = document.getElementById('ms-gate-u'), u = document.getElementById('ms-gate-p'); if (i && !i.value) i.focus(); else if (u) u.focus(); }, 30);
   msGateInert();
   // sign-in states (9 Nov 2026 polish): Enter submits; the button holds its size while it waits (aria-busy, finite spinner); every
   // failure says why (empty, wrong password, too many tries, server down, offline, timeout) and leaves the field ready to retype
   var inp = document.getElementById('ms-gate-p'), eye = document.getElementById('ms-gate-eye'), card = document.querySelector('.gate-card');
   var showPw = function (on) { if (!inp || !eye) return; inp.type = on ? 'text' : 'password'; eye.setAttribute('aria-pressed', String(on)); eye.setAttribute('aria-label', on ? 'Hide password' : 'Show password'); eye.classList.toggle('on', on); };
   if (eye) eye.addEventListener('click', function () { var pos = inp.selectionStart; showPw(inp.type === 'password'); inp.focus(); try { inp.setSelectionRange(pos, pos); } catch (e) {} });
-  var fail = function (msg, shake) { err.textContent = msg; inp.setAttribute('aria-invalid', 'true'); if (shake && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } inp.focus(); inp.select(); };
+  var idIn = document.getElementById('ms-gate-u');
+  var fail = function (msg, shake, el) { el = el || inp; err.textContent = msg; el.setAttribute('aria-invalid', 'true'); if (shake && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } el.focus(); el.select(); };
   if (inp) inp.addEventListener('input', function () { inp.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
+  if (idIn) idIn.addEventListener('input', function () { idIn.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
   if (f) f.addEventListener('submit', async function (ev) { ev.preventDefault();
     var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
     if (btn.getAttribute('aria-busy') === 'true') return;
-    err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
+    var uid = idIn ? idIn.value.trim() : '';
+    err.textContent = ''; if (idIn && !uid) { fail('Type your email or username.', false, idIn); return; } if (!pw) { fail('Type your password first.'); return; }
     if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on aureumdesk.co.uk.'); return; }
-    btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; lab.textContent = 'Signing in…';
+    btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; if (idIn) idIn.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
     var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 15000);
-    try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
+    try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify(uid ? { id: uid, password: pw } : { password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
     clearTimeout(tm);
     if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' }); lab.textContent = 'Signed in · opening the desk…'; showPw(false);
       try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {}
       (window.msGateWelcome ? window.msGateWelcome(j.account) : Promise.resolve()).then(function () { location.reload(); }); return; }
-    btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; lab.textContent = 'Sign in';
+    btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; if (idIn) idIn.readOnly = false; lab.textContent = 'Sign in';
     if (!r) { fail(timedOut ? 'The server took too long to answer. Try again.' : navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.'); return; }
     if (r.status === 429) { fail((j && j.error) || 'Too many tries. Wait a few minutes, then try again.')   /* api/_guard.js */; return; }
     if (r.status >= 500) { fail('Sign-in is unavailable right now (the server could not check accounts). Try again in a minute.'); return; }
     var capsEl = document.getElementById('ms-gate-caps'), capsOn = !!capsEl && !capsEl.hidden;   // the likeliest reason is said in the error itself (the hint and the error share one row)
-    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'That password was not accepted. Caps Lock is on: turn it off and try again.' : 'That password was not accepted. Check it and try again.', true); });
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'Those details were not accepted. Caps Lock is on: turn it off and try again.' : 'That email or username and password do not match. Check them and try again.', true); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {} if (ev.key === 'Escape' && document.documentElement.dataset.gate && guest) msGate(false); });
@@ -2655,6 +2658,14 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 .go-bar { width: 160px; height: 4px; margin-top: 10px; border-radius: 2px; background: rgba(255,255,255,.10); overflow: hidden; animation: su-up .4s ease .6s both; }
 .go-bar i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--go-acc), var(--go-ok)); transform-origin: left; transform: scaleX(0);
   animation: go-fill 1.6s cubic-bezier(.3,.6,.3,1) .6s forwards; }
+.go-ph, .go-badge { display: none; }
+.gate-ok.ph .go-ok-k { display: none; }
+.gate-ok.ph .go-ph { display: block; position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 3px #121315; animation: su-pop-in .45s cubic-bezier(.2,.9,.25,1.3) .05s both; }
+.gate-ok.ph .go-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.gate-ok.ph .go-badge { display: block; position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: 14px 0 0 18px; border-radius: 50%; background: var(--go-ok);
+  box-shadow: 0 0 0 3px #121315; animation: su-badge .4s cubic-bezier(.2,1,.3,1.4) .4s both; }
+.gate-ok.ph .go-badge::after { content: ""; position: absolute; left: 8.5px; top: 4.5px; width: 5px; height: 10px; border: solid #0d0f12; border-width: 0 2.4px 2.4px 0; transform: rotate(45deg); }
 .go-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @keyframes go-unlock { 0% { transform: none; } 100% { transform: translateY(-9px) rotate(-24deg); } }
 @keyframes go-squeeze { to { transform: scaleX(0); opacity: .3; } }
@@ -2663,6 +2674,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   .gate-card.gate-okay > :not(.gate-ok) { transition: none; }
   .gate-ok *, .gate-ok .go-glow { animation: none !important; }
   .go-lock { display: none; } .go-ok { transform: none; opacity: 1; } .go-ok-c, .go-ok-k { stroke-dashoffset: 0; } .go-bar i { transform: scaleX(.6); }
+  .gate-ok.ph .go-ph, .gate-ok.ph .go-badge { animation: none !important; }
 }
 html[data-motion="off"] .gate-ok *, html[data-motion="off"] .gate-ok .go-glow { animation: none !important; }
 html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-ok { transform: none; opacity: 1; } html[data-motion="off"] .go-ok-c, html[data-motion="off"] .go-ok-k { stroke-dashoffset: 0; }
@@ -3966,6 +3978,8 @@ html[data-gate] .gate { padding: max(24px, env(safe-area-inset-top)) 16px max(24
 /* password managers: a fixed, invisible username so the saved entry has a name (password-only sign-in) */
 .gate .gate-user { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: -1px; border: 0; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); pointer-events: none; }
 .gate-pw { position: relative; display: block; }
+.gate .gate-id { display: block; width: 100%; box-sizing: border-box; min-height: 48px; font-size: 16px; margin-bottom: 8px; }
+.gate .su-uh { margin: -2px 0 4px; font-size: 12.5px; color: #8c95a3; }
 .gate-pw > input { width: 100%; box-sizing: border-box; min-height: 48px; padding-right: 52px !important; font-size: 16px; letter-spacing: .02em; }
 .gate-pw > input[type="password"] { letter-spacing: .12em; }
 .gate input[aria-invalid="true"] { border-color: var(--g-red); box-shadow: 0 0 0 3px rgba(255,140,158,.16); }
@@ -5121,6 +5135,8 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
   html[data-gate] .gate-sub { order: 2; margin: 0 0 26px !important; }
   html[data-gate] .gate-card form { display: contents !important; }
   html[data-gate] .gate-card label[for="ms-gate-p"] { order: 3; text-align: left; font-size: 13px; color: var(--g-dim); margin: 0 0 6px 2px; }
+  html[data-gate] .gate-card label[for="ms-gate-u"] { order: 3; text-align: left; font-size: 13px; color: var(--g-dim); margin: 0 0 6px 2px; }
+  html[data-gate] .gate-card .gate-id { order: 3; min-height: 54px; border-radius: 14px !important; padding-left: 16px !important; margin-bottom: 14px; }
   html[data-gate] .gate-pw { order: 4; } html[data-gate] .gate-pw > input { min-height: 54px; border-radius: 14px !important; padding-left: 16px !important; }
   html[data-gate] .gate-msg { order: 5; text-align: left; margin-top: 6px; min-height: 22px; }
   html[data-gate] .gate-or { display: none !important; }
@@ -5204,11 +5220,12 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
   <div class="gate-card">
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm"><b>Aureum</b><small>Desk</small></span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in to the desk</h1>
-    <p class="gate-sub">Your password opens your own account.</p>
+    <p class="gate-sub">Sign in with your email or username and your password.</p>
     <p class="gate-ban" id="ms-gate-ban" role="status" hidden></p>
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
     <form id="ms-gate-f" method="post" action="#" novalidate>
-      <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
+      <label for="ms-gate-u">Email or username</label>
+      <input id="ms-gate-u" class="gate-id" name="username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" required aria-describedby="ms-gate-msg">
       <label for="ms-gate-p">Password</label>
       <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password webauthn" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
       <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>
@@ -5225,6 +5242,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
         <span class="go-glow"></span>
         <svg class="go-lock" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><path class="go-shackle" d="M42 54V40a18 18 0 0 1 36 0v14"/><rect class="go-body" x="32" y="54" width="56" height="44" rx="10"/><circle class="go-hole" cx="60" cy="72" r="5"/><path class="go-hole" d="M60 76v8"/></svg>
         <svg class="go-ok" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="go-ok-c" cx="60" cy="60" r="38"/><path class="go-ok-k" d="m43 61 12 12 23-25"/></svg>
+        <span class="go-ph"><img alt="" decoding="async"></span><span class="go-badge"></span>
         <span class="go-confetti"></span>
       </div>
       <h2 class="go-h" id="ms-gate-ok-h" tabindex="-1">Welcome back</h2>
@@ -5239,6 +5257,8 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
       <p class="gate-sub">Confirm your email, then the owner approves your seat.</p>
       <form id="ms-gp-su-f" novalidate>
         <label for="ms-su-n">Name</label><input id="ms-su-n" name="name" autocomplete="nickname" maxlength="24" required>
+        <label for="ms-su-u">Username</label><input id="ms-su-u" name="username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required aria-describedby="ms-su-uh">
+        <p class="gate-help su-uh" id="ms-su-uh">3 to 24 letters, numbers or "-". Yours alone: you sign in with it.</p>
         <label for="ms-su-e">Email</label><input id="ms-su-e" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required>
         <label for="ms-su-p">Password</label><input id="ms-su-p" name="new-password" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="200" required aria-describedby="ms-su-msg">
         <div class="gate-msg" id="ms-su-msg"><p class="gate-help">At least 10 characters. Your password opens your account, so choose your own.</p><p class="gate-err" role="alert"></p></div>
@@ -5460,7 +5480,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 (function () {
   var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
   try { if (!R.hasAttribute('data-gate') && R.dataset.role && R.dataset.role !== 'public') localStorage.setItem('ms-was-in', '1');
-    else if (R.hasAttribute('data-gate') && localStorage.getItem('ms-was-in') && matchMedia('(max-width: 640px)').matches) { var gt = document.getElementById('ms-gate-t'); if (gt) gt.textContent = 'Welcome back'; var gs = document.querySelector('.gate-sub'); if (gs) gs.textContent = 'Enter your password to continue.'; } } catch (e) {}
+    else if (R.hasAttribute('data-gate') && localStorage.getItem('ms-was-in') && matchMedia('(max-width: 640px)').matches) { var gt = document.getElementById('ms-gate-t'); if (gt) gt.textContent = 'Welcome back'; var gs = document.querySelector('.gate-sub'); if (gs) gs.textContent = 'Sign in with your email or username.'; } } catch (e) {}
   var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
   function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
   if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }
@@ -5527,21 +5547,35 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
       e.style.cssText = '--c:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * r) + 'px;--y:' + Math.round(Math.sin(a) * r * 0.8 + 30 + Math.random() * 25) + 'px;--r:' + Math.round(Math.random() * 720 - 360) + 'deg;--d:' + (0.05 + Math.random() * 0.12).toFixed(2) + 's;--t:' + (0.9 + Math.random() * 0.5).toFixed(2) + 's';
       if (i % 3 === 0) { e.style.width = '7px'; e.style.height = '7px'; e.style.borderRadius = '50%'; }
       box.appendChild(e); } }
+  // the account's photo and display name (18 Nov 2026, owner: "shows their photo and say welcome"): this device's copy first, else the
+  // server's (/api/profile; the session cookie was just set). Asked at once, used if it is in by the time the lock opens; no photo,
+  // no wait: the check stays. A data: image only.
+  function profileOf(acct) {
+    var who = acct && acct.u === 'owner' ? 'owner' : String((acct && acct.name) || '').toLowerCase(), out = { photo: null, name: null }, okImg = function (v) { return typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(v) ? v : null; };
+    try { if (who) { out.photo = okImg(localStorage.getItem('ms-photo-' + who)); out.name = localStorage.getItem('ms-name-' + who) || null; } } catch (e) {}
+    if (out.photo || !window.MS_API || !window.fetch) return Promise.resolve(out);
+    var ac = window.AbortController ? new AbortController() : null; setTimeout(function () { if (ac) ac.abort(); }, 1500);
+    return fetch(window.MS_API + 'profile', { credentials: 'same-origin', cache: 'no-store', signal: ac ? ac.signal : undefined }).then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (j) { out.photo = okImg(j && j.photo); if (!out.name && j && typeof j.name === 'string' && j.name.trim()) out.name = j.name.trim(); return out; }).catch(function () { return out; });
+  }
   window.msGateWelcome = function (acct) {
     return new Promise(function (done) {
       try {
         var card = document.querySelector('.gate-card'), box = document.getElementById('ms-gate-ok'); if (!card || !box || card.dataset.panel) { done(); return; }
         var was = false; try { was = !!localStorage.getItem('ms-was-in'); } catch (e) {}
-        var name = acct && (acct.name || acct.u) ? String(acct.name || acct.u).slice(0, 40) : '';
+        var got = null; var pp = profileOf(acct).then(function (o) { got = o; return o; });
+        var base = acct && acct.u === 'owner' ? '' : acct && (acct.name || acct.u) ? String(acct.name || acct.u) : '';
         var h = document.getElementById('ms-gate-ok-h'), p = document.getElementById('ms-gate-ok-p'), live = document.getElementById('ms-gate-ok-live');
-        h.textContent = was ? 'Welcome back' : 'Welcome';
-        p.textContent = ''; if (name) { p.appendChild(document.createTextNode('Signed in as ')); var b = document.createElement('b'); b.textContent = name; p.appendChild(b); p.appendChild(document.createTextNode('. Opening your desk…')); } else p.textContent = 'Opening your desk…';
-        live.textContent = 'Signed in' + (name ? ' as ' + name : '') + '. Opening the desk.';
-        box.classList.remove('ok'); box.hidden = false; card.classList.add('gate-okay');
+        var title = function (nm) { h.textContent = (was ? 'Welcome back' : 'Welcome') + (nm ? ', ' + String(nm).slice(0, 24) : ''); live.textContent = 'Signed in' + (nm ? ' as ' + nm : '') + '. Opening the desk.'; };
+        title(base); p.textContent = 'Opening your desk…';
+        box.classList.remove('ok', 'ph'); box.hidden = false; card.classList.add('gate-okay');
         try { h.focus({ preventScroll: true }); } catch (e) {}
-        if (still()) { box.classList.add('ok'); setTimeout(done, 350); return; }
+        var face = function () { if (!got) return; if (got.name) title(got.name); if (got.photo) { box.querySelector('.go-ph img').src = got.photo; box.classList.add('ph'); } };
+        if (still()) { pp.then(function () { face(); box.classList.add('ok'); setTimeout(done, 450); }); return; }
+        pp.then(function () { if (got && got.name) title(got.name); if (got && got.photo) box.querySelector('.go-ph img').src = got.photo; });
+        setTimeout(face, 780);   // the photo shows where the lock turns, if it is in by then; later, the check stays
         setTimeout(function () { box.classList.add('ok'); confetti(box.querySelector('.go-confetti')); }, 900);
-        setTimeout(done, 1250);
+        setTimeout(done, 1350);
       } catch (e) { done(); }
     });
   };
@@ -5632,7 +5666,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     if (r.ok) return { ok: j };
     if (r.status === 429) return { err: (j && j.error) || 'Too many tries. Wait a few minutes, then try again.' };
     if (r.status >= 500 && !(j && j.error)) return { err: 'This is unavailable right now. Try again in a minute.' };
-    return { err: ((j && j.error) || 'That did not work. Check what you typed and try again.') + (j && Array.isArray(j.why) && j.why.length ? ' Details: ' + j.why.join(' · ') : '') };   // the mail provider's own words (17 Nov 2026: the first live send failed)
+    return { field: j && j.field === 'username' ? 'username' : null, err: ((j && j.error) || 'That did not work. Check what you typed and try again.') + (j && Array.isArray(j.why) && j.why.length ? ' Details: ' + j.why.join(' · ') : '') };   // the mail provider's own words (17 Nov 2026: the first live send failed)
   }
   // one submit pattern for the three forms: check, busy button, the answer in words
   function wire(p, check, body, ok) {
@@ -5644,15 +5678,20 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
       btn.setAttribute('aria-busy', 'true'); btn.disabled = true; lab.textContent = 'Sending…';
       var a = await post(body());
       btn.removeAttribute('aria-busy'); btn.disabled = false; lab.textContent = idle;
-      if (a.err) { fail(a.err); return; }
+      if (a.err) { fail(a.err, a.field ? P.querySelector('[name="' + a.field + '"]') : null); return; }
       var msg = ok(a.ok); f.reset(); if (msg) done(P, msg);
     });
   }
   var EM = /^[^\s@<>()",;:\\[\]]+@[^\s@<>()",;:\\[\]]+\.[A-Za-z]{2,24}$/;
-  wire('su', function () { var n = $('ms-su-n'), e = $('ms-su-e'), w = $('ms-su-p');
+  var UN = /^[a-z0-9][a-z0-9-]{2,23}$/i;
+  (function () { var n = $('ms-su-n'), u = $('ms-su-u'); if (!n || !u) return; var mine = false;
+    u.addEventListener('input', function () { mine = !!u.value; });
+    n.addEventListener('input', function () { if (!mine) u.value = n.value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24); }); })();
+  wire('su', function () { var n = $('ms-su-n'), e = $('ms-su-e'), w = $('ms-su-p'), u = $('ms-su-u');
       if (!n.value.trim()) return ['Type the name the desk should call you.', n]; if (n.value.trim().length > 24) return ['Use a name of up to 24 characters.', n];
+      if (!UN.test(u.value.trim())) return ['Choose a username of 3 to 24 letters, numbers or "-" (it cannot start with "-").', u];
       if (!EM.test(e.value.trim())) return ['Type a valid email address.', e]; if (w.value.length < 10) return ['Use a password of at least 10 characters.', w]; return null; },
-    function () { return { name: $('ms-su-n').value.trim(), email: $('ms-su-e').value.trim(), password: $('ms-su-p').value }; },
+    function () { return { name: $('ms-su-n').value.trim(), username: $('ms-su-u').value.trim().toLowerCase(), email: $('ms-su-e').value.trim(), password: $('ms-su-p').value }; },
     function (j) { sent(j && j.watch, $('ms-su-e').value.trim()); return null; });
   wire('fg', function () { var e = $('ms-fg-e'); return EM.test(e.value.trim()) ? null : ['Type the email address of your account.', e]; },
     function () { return { forgot: $('ms-fg-e').value.trim() }; },
@@ -6517,7 +6556,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <aside class="pf-side" aria-label="Your account">
         <div class="pf-hero">
           <span class="me-av me-av-lg" id="ms-pf-av" aria-hidden="true"></span>
-          <div class="pf-hero-t"><b id="ms-pf-name">—</b><small id="ms-pf-role"></small></div>
+          <div class="pf-hero-t"><b id="ms-pf-name">—</b><small id="ms-pf-role"></small><small class="pf-user" id="ms-pf-user" hidden></small></div>
           <button type="button" class="pf-edit" id="ms-pf-edit" aria-label="Change display name" title="Change display name"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
         </div>
         <div class="me-today pf-today" id="ms-pf-today"></div>
@@ -10917,7 +10956,7 @@ function msNextSetup(bars, A) {
     if (!j || !Array.isArray(j.items)) { ul.innerHTML = `<li class="empty">${!r ? (navigator.onLine === false ? 'You are offline: the requests could not be read.' : 'The server could not be reached: the requests could not be read.') : r.status === 401 || r.status === 403 ? 'Your owner session has ended. Sign in again to see the requests.' : `The requests could not be read (error ${r.status}). Try again in a minute.`}</li>`; if (n) n.textContent = ''; return; }
     if (n) n.textContent = j.items.length ? `${j.items.length} waiting` : '';
     const when = (iso) => { const d = new Date(iso); return isFinite(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
-    ul.innerHTML = j.items.length ? j.items.map((x) => `<li class="u-wait-i" data-id="${esc(x.id)}"><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(x.name || '?').trim().charAt(0).toUpperCase())}</span><span><b>${esc(x.name)}</b><small>${esc(x.email)} · confirmed ${esc(when(x.verifiedAt))}</small></span></span>`
+    ul.innerHTML = j.items.length ? j.items.map((x) => `<li class="u-wait-i" data-id="${esc(x.id)}"><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(x.name || '?').trim().charAt(0).toUpperCase())}</span><span><b>${esc(x.name)}</b><small>${x.username ? `username ${esc(x.username)} · ` : ''}${esc(x.email)} · confirmed ${esc(when(x.verifiedAt))}</small></span></span>`
       + `<span class="u-wait-a"><select data-act="role" aria-label="Access for ${esc(x.name)}"><option value="viewer">Viewer</option><option value="reviewer">Reviewer</option></select><button type="button" class="u-btn" data-act="approve">Approve</button><button type="button" class="u-del" data-act="refuse">Refuse</button></span></li>`).join('')
       : '<li class="empty">No one is waiting.</li>';
     if (msg && !msg.dataset.keep) msg.textContent = ''; if (msg) delete msg.dataset.keep;
@@ -12674,6 +12713,7 @@ function msNextSetup(bars, A) {
     MODE = 'page';
     const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML.replace(/(id="|url\(#)av/g, '$1pfav'); };   // the portrait's gradients get ids of their own: a copy pointing at the hidden menu's drew nothing
     cp('ms-me-av2', 'ms-pf-av'); cp('ms-me-name2', 'ms-pf-name'); cp('ms-me-role', 'ms-pf-role'); cp('ms-me-today', 'ms-pf-today');
+    { const pu = document.getElementById('ms-pf-user'), A0 = window.MS_ACCT; if (pu) { const un = A0 && A0.u ? (A0.u === 'owner' ? 'owner' : A0.u) : ''; pu.textContent = un ? 'Username: ' + un + ' · you sign in with it or your email' : ''; pu.hidden = !un; } }   // 18 Nov 2026: usernames sign in
     ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
     if ($('ms-pf-edit')) $('ms-pf-edit').hidden = !$('ms-me-rename');
     pfSync();

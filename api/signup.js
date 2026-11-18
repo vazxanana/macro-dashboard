@@ -1,7 +1,7 @@
 // Sign-up, email verification, owner approval and password reset (17 Nov 2026, owner: "do 2").
 //
 //   GET  /api/signup                      -> { open: bool }  (whether sign-ups and reset emails can be sent)
-//   POST /api/signup { name, email, password }   -> 200 "Check your email…" (the same words whether or not the email is known)
+//   POST /api/signup { name, username, email, password }   -> 200 "Check your email…" (the same words whether or not the email is known)
 //   GET  /api/signup?verify=<token>       -> 302 /market-structure.html?signup=verified | ?signup=expired
 //   GET  /api/signup?watch=<code>         -> { state: 'confirmed' | 'waiting' } (the sign-up answer's own code; nothing else)
 //   GET  /api/signup?list=1               owner session -> { items: [{ id, name, email, at, verifiedAt }] } (verified, no hashes)
@@ -47,6 +47,11 @@ const one = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]+
 const emailOf = (v) => { const e = String(v == null ? '' : v).trim().toLowerCase(); return e.length <= 254 && U.EMAIL_RE.test(e) ? e : null; };
 const pwOk = (p) => typeof p === 'string' && p.length >= 10 && p.length <= 200;
 const tokOk = (t) => typeof t === 'string' && /^[A-Za-z0-9_-]{40,60}$/.test(t);
+// Usernames (18 Nov 2026, owner: "unique username, so no repeated ones"): the account key itself, so one name is one account.
+// 3 to 24 of a-z, 0-9 and "-", starting with a letter or digit, case-insensitive; a few words are kept for the desk.
+const USER_RE = /^[a-z0-9][a-z0-9-]{2,23}$/;
+const RESERVED = new Set(['owner', 'admin', 'aureum', 'desk', 'guest', 'help', 'support', 'root', 'system', 'council', 'member', 'api']);
+const userOf = (v) => { const u = String(v == null ? '' : v).trim().toLowerCase(); return USER_RE.test(u) && !RESERVED.has(u) ? u : null; };
 const keyOf = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || 'member';
 
 // the private store (the users list's): one JSON file per name, read from the origin, written in place
@@ -155,7 +160,7 @@ async function handle(req, res, d = {}) {
     if (req.method === 'GET' && q.list) {
       const acct = await S.fromRequest(req, env, deps); if (!acct) return res.status(401).json({ error: 'sign in first' });
       if (acct.u !== 'owner') return res.status(403).json({ error: 'only the owner approves seats' });
-      const items = live(await store.get(PENDING)).filter((p) => p.verified).map((p) => ({ id: p.id, name: p.name, email: p.email, at: new Date(p.at).toISOString(), verifiedAt: new Date(p.verifiedAt || p.at).toISOString() }));
+      const items = live(await store.get(PENDING)).filter((p) => p.verified).map((p) => ({ id: p.id, name: p.name, username: p.username || null, email: p.email, at: new Date(p.at).toISOString(), verifiedAt: new Date(p.verifiedAt || p.at).toISOString() }));
       return res.status(200).json({ items });
     }
     if (!S.sameOrigin(req)) return res.status(403).json({ error: 'not allowed' });
@@ -172,16 +177,17 @@ async function handle(req, res, d = {}) {
       const role = b.role === 'reviewer' ? 'reviewer' : 'viewer';
       const cur = (await loadUsers()) || { users: {} }, stored = { ...(cur.users || {}) }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
       if (A.same(x.hash, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, x.hash))) return res.status(409).json({ error: 'That password is now used by another account: refuse this request and ask them to sign up again with another password.' });
-      const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k = keyOf(x.name), n = 2;
-      while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; }
+      const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k;
+      if (x.username) { k = x.username; if (taken.has(k) || users[k]) return res.status(409).json({ error: `The username "${k}" is now taken by another account: refuse this request and ask them to sign up again with another username.` }); }
+      else { let n = 2; k = keyOf(x.name); while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; } }   // a request made before usernames
       stored[k] = { name: one(x.name, 24), role, hash: x.hash, email: x.email };
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The account list could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: `approved a sign-up: ${one(x.name, 24)}` });
       await store.put(PENDING, rest);
       console.log(`[signup] approved a sign-up as ${role}`);
       let emailed = false;
-      if (send) emailed = await send(x.email, 'Your seat at Aureum Desk is ready', `Hello ${one(x.name, 24)},\n\nThe owner approved your seat. Sign in on https://aureumdesk.co.uk with the password you chose.\n\nAureum Desk · paper trading, not financial advice`,
-        html([`Hello ${one(x.name, 24)},`, 'Your account has been approved. You can now sign in to the desk with the password you chose when you signed up.'], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in to Aureum Desk', { title: 'Your seat is ready', note: 'Forgot your password? Use "Forgot password?" on the sign-in screen.' })).then(() => true, () => false);
+      if (send) emailed = await send(x.email, 'Your seat at Aureum Desk is ready', `Hello ${one(x.name, 24)},\n\nThe owner approved your seat. Sign in on https://aureumdesk.co.uk with your username "${k}" (or this email) and the password you chose.\n\nAureum Desk · paper trading, not financial advice`,
+        html([`Hello ${one(x.name, 24)},`, `Your account has been approved. Sign in with your username ${k} (or this email address) and the password you chose when you signed up.`], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in to Aureum Desk', { title: 'Your seat is ready', note: 'Forgot your password? Use "Forgot password?" on the sign-in screen.' })).then(() => true, () => false);
       return res.status(200).json({ ok: true, key: k, role, emailed });
     }
 
@@ -225,19 +231,22 @@ async function handle(req, res, d = {}) {
     // ---- sign up ----
     if (!send) return res.status(503).json({ error: OFF });
     const ip = G.ipOf(req), w = G.wait(req, now) || G.hit('signup', ip, 5, 3600e3, now); if (w) return G.tooMany(res, w);
-    const name = one(b.name, 40), email = emailOf(b.email);
+    const name = one(b.name, 40), email = emailOf(b.email), uname = userOf(b.username);
     if (!name || name.length > 24) return res.status(400).json({ error: 'Use a name of 1 to 24 characters.' });
+    if (!uname) return res.status(400).json({ error: RESERVED.has(String(b.username || '').trim().toLowerCase()) ? 'That username is kept for the desk. Choose another.' : 'Choose a username of 3 to 24 letters, numbers or "-".' });
     if (!email) return res.status(400).json({ error: 'Type a valid email address.' });
     if (!pwOk(b.password)) return res.status(400).json({ error: 'Use a password of at least 10 characters.' });
     const h = A.sha(b.password), users = await A.userList({ ...deps, builtIns });
     let list = live(await store.get(PENDING));
     if (A.same(h, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, h)) || list.some((p) => p.email !== email && A.same(p.hash, h))) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
+    // one username, one account: a member's key, a built-in, the owner's words, or another live request (not this email's own)
+    if (users[uname] || builtIns[uname] || list.some((p) => p.username === uname && p.email !== email)) return res.status(409).json({ error: 'That username is taken. Choose another.', field: 'username' });
     const known = Object.values(users).some((u) => u && u.email && String(u.email).toLowerCase() === email), had = list.find((p) => p.email === email);
     // a known member, a request already confirmed, or one sent in the last 10 minutes: the same answer, nothing sent
     if (known || (had && (had.verified || now - had.at < COOL_MS))) return res.status(200).json({ ok: true, message: SENT, watch: token() });
     list = list.filter((p) => p !== had);
     if (list.length >= CAP) return res.status(429).json({ error: 'Too many sign-ups are waiting right now. Try again tomorrow.' });
-    const t = token(), watch = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, email, hash: h, tokenHash: sha(t), watchHash: sha(watch), at: now, exp: now + VERIFY_MS, verified: false };
+    const t = token(), watch = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, username: uname, email, hash: h, tokenHash: sha(t), watchHash: sha(watch), at: now, exp: now + VERIFY_MS, verified: false };
     const link = `${originOf(req)}/api/signup?verify=${t}`;
     try {
       await send(email, 'Confirm your email address · Aureum Desk', `Hello ${name},\n\nThank you for signing up to Aureum Desk. Confirm your email address with this link (it works once and expires in 24 hours):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
@@ -254,4 +263,4 @@ module.exports.useSmtp = useSmtp;
 module.exports.useEmailMessage = useEmailMessage;
 module.exports.lastMailError = () => LAST_MAIL_ERROR;
 module.exports.useMail = useMail;
-module.exports._t = { originOf, keyOf, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };
+module.exports._t = { originOf, keyOf, userOf, RESERVED, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };

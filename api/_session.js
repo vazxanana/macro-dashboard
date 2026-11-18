@@ -46,9 +46,21 @@ function issue(env, u, h, acct, now = Date.now()) {
 
 // Password check for /api/login. Returns { u, h, account } or null; every failure looks the same to the caller (no user
 // enumeration). Every member hash is compared (constant time each, no early exit). Throws 503 when the list cannot be read.
-async function login(deps, pw) {
+// Sign-in (18 Nov 2026, owner: "login with email or username and password"): `id` = the account's username (its key, unique,
+// case-insensitive; the owner is "owner" or "admin") or the email stored on its record. With an id only that account is checked;
+// without one the old password-only path stays for now (every password is still unique). Every miss returns null the same way.
+const OWNER_IDS = ['owner', 'admin'];
+async function login(deps, pw, id) {
   if (typeof pw !== 'string' || !pw || pw.length > 200) return null;
-  const h = A.sha(pw);
+  const h = A.sha(pw), who = typeof id === 'string' ? id.trim().toLowerCase().slice(0, 254) : '';
+  if (who) {
+    if (OWNER_IDS.includes(who)) return A.same(h, A.OWNER_HASH) ? { u: 'owner', h, account: account('owner') } : null;
+    const users = await A.userList(deps); let hit = null;
+    for (const k of Object.keys(users)) { const R = users[k]; if (!R || !A.KEY_RE.test(k)) continue;
+      const mine = who.includes('@') ? !!R.email && String(R.email).toLowerCase() === who : k === who;
+      if (mine && A.same(R.hash, h) && !hit) hit = k; }
+    return hit ? { u: hit, h, account: account(hit, users[hit]) } : null;
+  }
   if (A.same(h, A.OWNER_HASH)) return { u: 'owner', h, account: account('owner') };
   const users = await A.userList(deps); let hit = null;
   for (const k of Object.keys(users)) { const R = users[k]; if (R && A.KEY_RE.test(k) && A.same(R.hash, h) && !hit) hit = k; }
