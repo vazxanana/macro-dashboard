@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-18T10:09:13.000Z",
+ "at": "2026-11-18T11:42:32.000Z",
  "target": "2026-11-19",
  "targetEvent": null,
  "paperOnly": true,
@@ -26,15 +26,15 @@
   "sofrEffrBps": 5,
   "curve10y3m": 0.77,
   "us2y": 4.83,
-  "eu2y": 3.1090750626,
-  "usEu2ySpread": 1.72
+  "eu2y": 3.0925576216,
+  "usEu2ySpread": 1.74
  },
  "assets": {
   "gold": {
    "label": "Gold",
    "pUp": 0.509,
    "score": -0.333,
-   "last": 3765.41,
+   "last": 3755.12,
    "expMovePct": 1.15,
    "naiveMovePct": 1.15,
    "volModel": "naive",
@@ -95,7 +95,7 @@
    "label": "EUR/USD",
    "pUp": 0.453,
    "score": -0.75,
-   "last": 1.09741,
+   "last": 1.09635,
    "expMovePct": 0.32,
    "naiveMovePct": 0.32,
    "volModel": "naive",
@@ -2242,31 +2242,31 @@
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
-  "fred:DGS10": "ok, last 2026-11-16",
-  "fred:DFII10": "ok, last 2026-11-16",
-  "fred:BAMLH0A0HYM2": "ok, last 2026-11-16",
   "fred:DGS2": "ok, last 2026-11-16",
-  "fred:VIXCLS": "ok, last 2026-11-16",
+  "fred:DFII10": "ok, last 2026-11-16",
   "fred:T10Y3M": "ok, last 2026-11-17",
+  "fred:T10YIE": "ok, last 2026-11-17",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-16",
+  "fred:VIXCLS": "ok, last 2026-11-16",
   "fred:VXVCLS": "ok, last 2026-11-16",
   "fred:WALCL": "ok, last 2026-11-11",
+  "fred:RRPONTSYD": "ok, last 2026-11-17",
   "fred:WTREGEN": "ok, last 2026-11-11",
   "fred:SOFR": "ok, last 2026-11-16",
-  "fred:T10YIE": "ok, last 2026-11-17",
-  "fred:RRPONTSYD": "ok, last 2026-11-17",
   "fred:EFFR": "ok, last 2026-11-16",
   "fred:SWPT": "ok, last 2026-11-11",
-  "fred:DTWEXBGS": "failed (The operation was aborted due to timeout), using cache to 2026-11-13",
-  "fred:BSCICP03DEM665S": "failed (The operation was aborted due to timeout), using cache to 2024-01-01",
-  "ecb:2y": "ok, last 2026-11-16",
-  "bars:es": "failed (HTTP 503)",
+  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
+  "fred:DTWEXBGS": "ok, last 2026-11-13",
+  "fred:DGS10": "ok, last 2026-11-16",
+  "ecb:2y": "ok, last 2026-11-17",
   "bars:nq": "failed (HTTP 503)",
+  "bars:es": "failed (HTTP 503)",
   "bars:usdjpy": "failed (HTTP 503)",
-  "bars:usdcad": "OANDA failed (HTTP 503), Kraken ok (721 days)",
-  "bars:gold": "OANDA failed (HTTP 503), Kraken ok (721 days)",
-  "bars:gbpusd": "OANDA failed (HTTP 503), Kraken ok (721 days)",
-  "bars:usdchf": "OANDA failed (HTTP 503), Kraken ok (721 days)",
   "bars:eurusd": "OANDA failed (HTTP 503), Kraken ok (721 days)",
+  "bars:gbpusd": "OANDA failed (HTTP 503), Kraken ok (721 days)",
+  "bars:gold": "OANDA failed (HTTP 503), Kraken ok (721 days)",
+  "bars:usdcad": "OANDA failed (HTTP 503), Kraken ok (721 days)",
+  "bars:usdchf": "OANDA failed (HTTP 503), Kraken ok (721 days)",
   "calendar:thisweek": "ok (125 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "calendar:cache": "using the last good copy for the week that failed (106 cached events)",
@@ -2274,7 +2274,7 @@
   "rss:BoJ": "ok (45 items)",
   "rss:ECB": "ok (15 items)",
   "cot": "ok (98 weeks)",
-  "score:DFII10": "FRED long history failed (The operation was aborted due to timeout): 1090 cached weeks + 1246 recent days",
+  "score:DFII10": "ok, 5222 days to 2026-11-16",
   "score:DGS2": "ok, 5222 days to 2026-11-16",
   "score:DGS10": "ok, 5222 days to 2026-11-16",
   "score:dxy": "7682 days (daily cache since 2002-05-08)"
@@ -2284,15 +2284,15 @@
   "asOf": "2026-11-20",
   "partial": true,
   "stale": [],
-  "score": -0.99,
+  "score": -1,
   "z": {
-   "ry4w": -1.14,
+   "ry4w": -1.19,
    "dxy4w": -0.85,
    "y2_13w": -1.27,
    "curve13w": -0.69
   },
   "raw": {
-   "ry4w": -0.25,
+   "ry4w": -0.26,
    "dxy4w": -0.018,
    "y2_13w": -0.59,
    "curve13w": -0.21
@@ -2303,7 +2303,7 @@
    0.13,
    0.05,
    -0.96,
-   -0.99
+   -1
   ],
   "hist": [
    [
@@ -2408,7 +2408,7 @@
    ],
    [
     "2026-11-20",
-    -0.99
+    -1
    ]
   ],
   "weeks": 1069,
@@ -2422,5 +2422,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Wed 18 Nov 10:09 UTC, for Thu 19 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · elevated volatility. Gold: 51% up (base rate 52%; macro tilt down 1 pt). Drivers lean down: real yields, real-yield 1-week momentum; against: risk sentiment. Expected move ±1.15% (20-day average). EUR/USD: 45% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±0.32% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 55% up (mirror of EUR/USD). Gold Macro Score -0.99 → AUCTION (no macro edge) (real yield 4w z -1.14, DXY 4w z -0.85, 2Y 13w z -1.27, curve 13w z -0.69; 6-week path -0.58 → -0.13 → +0.13 → +0.05 → -0.96 → -0.99; week to 2026-11-20, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: GBP BOE Gov Bailey Speaks Wed 18 Nov 15:00 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%; USD FOMC Meeting Minutes Wed 18 Nov 19:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.15%; AUD Employment Change Thu 19 Nov 00:30 UTC (consensus 25.5K, previous -39.3K): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%; AUD Unemployment Rate Thu 19 Nov 00:30 UTC (consensus 4.7%, previous 4.7%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%. Honesty check: on the 373-day walk-forward replay the gold calls hit 51% against a 51% base rate (Brier 0.2509 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.264% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Wed 18 Nov 11:42 UTC, for Thu 19 Nov (UTC day, open to close). Regime: transitional dollar · liquidity flat · elevated volatility. Gold: 51% up (base rate 52%; macro tilt down 1 pt). Drivers lean down: real yields, real-yield 1-week momentum; against: risk sentiment. Expected move ±1.15% (20-day average). EUR/USD: 45% up (base rate 46%; base rate, no macro tilt). Drivers lean down: real yields, real-yield 1-week momentum. Expected move ±0.32% (20-day average). USD/JPY: no forecast (no price data). NQ (Nasdaq 100): no forecast (no price data). ES (S&P 500): no forecast (no price data). DXY: 55% up (mirror of EUR/USD). Gold Macro Score -1.00 → AUCTION (no macro edge) (real yield 4w z -1.19, DXY 4w z -0.85, 2Y 13w z -1.27, curve 13w z -0.69; 6-week path -0.58 → -0.13 → +0.13 → +0.05 → -0.96 → -1.00; week to 2026-11-20, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: GBP BOE Gov Bailey Speaks Wed 18 Nov 15:00 UTC: if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%; USD FOMC Meeting Minutes Wed 18 Nov 19:00 UTC: if hawkish, gold down, USD up, NQ down; gold usually moves ±1.15%; AUD Employment Change Thu 19 Nov 00:30 UTC (consensus 25.5K, previous -39.3K): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%; AUD Unemployment Rate Thu 19 Nov 00:30 UTC (consensus 4.7%, previous 4.7%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.15%. Honesty check: on the 373-day walk-forward replay the gold calls hit 51% against a 51% base rate (Brier 0.2509 vs 0.25 for a coin flip, Pesaran-Timmermann n/a): no edge (worse than a coin flip). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 1.377% on average against 1.264% on other days, but no model turned that into a better forecast."
 }
