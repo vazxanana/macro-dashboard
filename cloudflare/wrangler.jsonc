@@ -30,6 +30,10 @@
   "routes": [{ "pattern": "aureumdesk.co.uk", "custom_domain": true }, { "pattern": "www.aureumdesk.co.uk", "custom_domain": true }],
   // The file store on D1 (src/store-d1.mjs): the site's store once the Worker secret STORE is 'd1'; until then
   // src/store-mirror.mjs keeps it a copy of the Vercel Blob store. An id, not a secret.
+  // ChronosTrade battles (18 Nov 2026): one Durable Object per room (cloudflare/src/worker.mjs BattleRoom); SQLite-backed class,
+  // included in the Workers plan. Rooms keep nothing on disk: they live while their players are connected.
+  "durable_objects": { "bindings": [{ "name": "BATTLE", "class_name": "BattleRoom" }] },
+  "migrations": [{ "tag": "battle-v1", "new_sqlite_classes": ["BattleRoom"] }],
   "d1_databases": [{ "binding": "STORE_DB", "database_name": "aureum-data", "database_id": "c5aa93f8-763e-4ead-9c37-db4d4051b4cb" }],
   "triggers": { "crons": ["*/10 * * * *"] },
   "limits": { "cpu_ms": 300000 },

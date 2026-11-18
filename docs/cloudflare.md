@@ -233,3 +233,10 @@ the coach only), `CHRONOS_LLM_BODY` (JSON; the coach sends a low reasoning effor
 `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT`, and the live coach's `CHRONOS_LIVE_PER_DAY`, `CHRONOS_LIVE_GAP_S`,
 `CHRONOS_LIVE_MAX_TOKENS` (docs/academy/LLM.md, section 11). Its answers are streamed (`text/event-stream`); the Worker's adapter
 starts the response at the first `res.write`, so the words reach the page as the provider writes them.
+
+## ChronosTrade battles: a Durable Object (18 Nov 2026)
+`wrangler.jsonc` binds `BATTLE` to the class `BattleRoom` (exported by `src/worker.mjs`) with the migration `battle-v1`
+(`new_sqlite_classes`, the class Cloudflare recommends; rooms keep nothing on disk). One object per room code plus one shared
+invite inbox (`idFromName('__inbox__')`). No new secret: tickets are signed with a key derived from the session key. The first
+`cloudflare-deploy.yml` run after this change creates the class; until then `/api/battle` answers `{ open: false }` and the page
+says battles are not open. Billing: Durable Object requests and duration are included in the Workers plan in use.

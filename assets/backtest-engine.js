@@ -209,7 +209,7 @@
   // the finer candles from T to its end (`rest`) are what the engine still has to process, once, when the user steps.
   // So a switch never touches the account, and no price is processed twice or skipped. Candles are UTC-aligned (the candle
   // proxy asks OANDA for UTC alignment), so a candle of `sec` seconds covers [time, time + sec).
-  const TF_SECS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400];
+  const TF_SECS = [15, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400];
   const countLE = (bars, t) => { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time <= t) lo = m + 1; else hi = m; } return lo; };   // bars that start at or before t
   // the replay moment: the end of the last fully replayed bar, or the moment a forming candle was built up to
   // `at` = a moment held across a switch (tfHold): it wins over the bar-derived one until the next step
