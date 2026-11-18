@@ -1,5 +1,5 @@
 {
- "at": "2026-11-18T22:22:54.000Z",
+ "at": "2026-11-18T22:40:40.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -22,7 +22,7 @@
      "sym": "eurusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 2.07,
      "clipped": 0,
@@ -33,7 +33,7 @@
      "sym": "gbpusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 2.06,
      "clipped": 0,
@@ -44,7 +44,7 @@
      "sym": "audusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 1.89,
      "clipped": 0,
@@ -55,7 +55,7 @@
      "sym": "usdcad",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 1.61,
      "clipped": 0,
@@ -66,7 +66,7 @@
      "sym": "usdchf",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 7.96,
      "clipped": 0,
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 2.01,
      "clipped": 0,
@@ -94,9 +94,9 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.53,
+     "maxJump": 2.13,
      "clipped": 0,
      "issues": []
     },
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 2.07,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-18T22:20:00.000Z",
+     "last": "2026-11-18T22:40:00.000Z",
      "staleMin": 0,
      "maxJump": 2.37,
      "clipped": 0,
@@ -306,7 +306,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": [
       {
        "kind": "input",
@@ -318,13 +318,13 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": []
     },
     "macro/history.json": {
@@ -345,7 +345,7 @@
     "research/trade-review.json": {
      "label": "Trade review (research/trade-review.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 18,
      "issues": []
     },
     "research/trade-review-ledger.json": {
@@ -356,7 +356,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1341,
+     "ageMin": 1358,
      "issues": []
     },
     "digest.json": {
@@ -366,32 +366,38 @@
     },
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
-     "status": "ok",
-     "ageMin": 170,
-     "issues": []
+     "status": "warn",
+     "ageMin": 187,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "warn",
+       "detail": "not updated for 3.1 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+      }
+     ]
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 623,
+     "ageMin": 641,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 623,
+     "ageMin": 641,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 623,
+     "ageMin": 641,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 623,
+     "ageMin": 641,
      "issues": []
     },
     "research/ledger.json": {
@@ -412,13 +418,13 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 385,
+     "ageMin": 402,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 1350,
+     "ageMin": 1368,
      "issues": [
       {
        "kind": "stale",
@@ -451,13 +457,14 @@
    }
   }
  },
- "summary": "Council data files: Macro forecast (macro/forecast.json) input, Coach AI review (reviews/latest.md) stale",
+ "summary": "Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale, Coach AI review (reviews/latest.md) stale",
  "brief": {
   "status": "warn",
-  "line": "2 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1052 days old; over 120 the strategist drops it as \"no dat",
+  "line": "3 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1052 days old; over 120 the strategist drops it as \"no dat",
   "bad": [],
   "warn": [
    "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1052 days old; over 120 the strategist drops it as \"no data\")",
+   "Loop watchdog (watchdog.json): not updated for 3.1 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops",
    "Coach AI review (reviews/latest.md): newest weekly Analyst brief analysis/2026-11-09.md is 9 days old (Mondays)"
   ],
   "notes": 2
