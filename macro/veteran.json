@@ -1,21 +1,19 @@
 {
  "v": 1,
- "at": "2026-11-18T15:12:37.000Z",
+ "at": "2026-11-18T16:32:07.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-18T15:12:16.000Z",
+ "strategistAt": "2026-11-18T16:31:51.000Z",
  "shock": {
-  "shock": "Mixed / no dominant shock",
+  "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
-   "2Y +32 bp",
-   "10Y real +29 bp",
-   "breakeven −1 bp",
-   "DXY +0.69%",
-   "HY 0 bp",
-   "VIX 25.5"
+   "VIX/VIX3M 1.019",
+   "HY +13 bp on the week",
+   "SOFR−EFFR 4 bp",
+   "DXY +0.69%"
   ],
-  "goldTest": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
-  "competing": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
-  "confidence": "low"
+  "goldTest": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
+  "competing": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
+  "confidence": "medium"
  },
  "channels": [
   {
@@ -57,7 +55,7 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 25.5 (VIX/VIX3M 1.02) · HY OAS 3.34%, 0 bp on the week · SOFR−EFFR 4 bp",
+   "obs": "VIX 25.5 (VIX/VIX3M 1.02) · HY OAS 3.43%, +13 bp on the week · SOFR−EFFR 4 bp",
    "lean": 0,
    "asOf": "2026-11-17",
    "stale": false,
@@ -99,7 +97,7 @@
  "debate": [
   {
    "topic": "Direction for gold",
-   "macro": "Gold Macro Score −1.00 → AUCTION (no macro edge); next-day P(up) 51%",
+   "macro": "Gold Macro Score −1.00 → AUCTION (no macro edge); next-day P(up) 52%",
    "veteran": "7 of 8 channels observed; tally −3 → against gold",
    "stance": "qualify",
    "why": "The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.",
@@ -117,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.85 pts in 5 sessions (vote down); score z (4-week fall) −0.86",
+   "macro": "+0.95 pts in 5 sessions (vote down); score z (4-week fall) −0.86",
    "veteran": "DXY 103.64, +0.69% on the week, +1.91% over 4 weeks · broad USD +0.89% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -145,9 +143,9 @@
   {
    "topic": "Regime",
    "macro": "transitional dollar · liquidity flat · VIX curve inverted (stress)",
-   "veteran": "Mixed / no dominant shock (low confidence) · clues: 2Y +32 bp, 10Y real +29 bp, breakeven −1 bp, DXY +0.69%, HY 0 bp, VIX 25.5",
-   "stance": "qualify",
-   "why": "Strongest competing explanation: Several small shocks offsetting each other, or the week's moves are inside normal noise.",
+   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.019, HY +13 bp on the week, SOFR−EFFR 4 bp, DXY +0.69%",
+   "stance": "agree",
+   "why": "Strongest competing explanation: A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
    "m": null,
    "v": null
   }
@@ -156,8 +154,8 @@
   "bias": "AUCTION",
   "conviction": null,
   "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (FOMC Meeting Minutes): the bias is conditional until the print.",
-  "agree": 3,
-  "qualify": 3,
+  "agree": 4,
+  "qualify": 2,
   "disagree": 0,
   "invalidation": [
    "10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support",
@@ -173,12 +171,12 @@
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
-  "shock": "Mixed / no dominant shock",
+  "shock": "Risk-off / de-risking, funding still calm",
   "surprise": "Pending: FOMC Meeting Minutes at 2026-11-18 19:00 UTC against the calendar expectation captured before it; print minus previous is not a surprise",
-  "observed": "2Y +32 bp · 10Y real +29 bp · breakeven −1 bp · DXY +0.69% · HY 0 bp · VIX 25.5",
+  "observed": "VIX/VIX3M 1.019 · HY +13 bp on the week · SOFR−EFFR 4 bp · DXY +0.69%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
-  "mechanism": "No single channel dominates the week: treat gold moves as range / noisy repricing until price, real yields, the dollar and flows line up for several sessions.",
-  "alternative": "Several small shocks offsetting each other, or the week's moves are inside normal noise.",
+  "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
+  "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker",
   "nextReview": "after FOMC Meeting Minutes",
@@ -721,7 +719,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 25.5 (VIX/VIX3M 1.02) · HY OAS 3.34%, 0 bp on the week · SOFR−EFFR 4 bp (as of 2026-11-17)",
+     "read": "VIX 25.5 (VIX/VIX3M 1.02) · HY OAS 3.43%, +13 bp on the week · SOFR−EFFR 4 bp (as of 2026-11-17)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -1180,7 +1178,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-18T15:12:37.000Z",
+  "at": "2026-11-18T16:32:07.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1188,7 +1186,7 @@
     "lean": 0,
     "fx": null,
     "k": "event",
-    "score": 3.16,
+    "score": 3.17,
     "event": {
      "title": "FOMC Meeting Minutes",
      "country": "USD",
@@ -1232,8 +1230,8 @@
       "source": "Cboe via FRED VIXCLS / VXVCLS"
      },
      {
-      "text": "HY OAS 3.34%, 0 bp on the week",
-      "asOf": "2026-11-16",
+      "text": "HY OAS 3.43%, +13 bp on the week",
+      "asOf": "2026-11-17",
       "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
      },
      {
@@ -1600,9 +1598,9 @@
      "text": "as of 2026-11-17 close"
     },
     "mark": {
-     "px": 3757.02,
-     "at": "2026-11-18T15:12:16.000Z",
-     "dist": -2.38
+     "px": 3738.27,
+     "at": "2026-11-18T16:31:51.000Z",
+     "dist": -2.87
     }
    },
    "dxy": {
@@ -4095,7 +4093,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,757. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,738. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -4130,7 +4128,7 @@
     "price": 3800,
     "label": "Round number",
     "dist": -1.27,
-    "distNow": 1.14,
+    "distNow": 1.65,
     "crossed": true
    },
    "below": null,
@@ -4141,9 +4139,9 @@
     "text": "as of 2026-11-17 close"
    },
    "mark": {
-    "px": 3757.02,
-    "at": "2026-11-18T15:12:16.000Z",
-    "dist": -2.38
+    "px": 3738.27,
+    "at": "2026-11-18T16:31:51.000Z",
+    "dist": -2.87
    },
    "broken": {
     "price": 3832.5,
@@ -4158,7 +4156,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-18 15:12 UTC. Shock: Mixed / no dominant shock (low). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Positioning, Regime. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (FOMC Meeting Minutes): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD FOMC Meeting Minutes on Wed, 18 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,757. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close). Event playbook: USD FOMC Meeting Minutes 2026-11-18 19:00 UTC: consensus n/a (previous n/a); P(gold up on the day) 51% vs base 54%; past FOMC days n 34, gold up 50%, median |move| 0.729%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-18 16:32 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (FOMC Meeting Minutes): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD FOMC Meeting Minutes on Wed, 18 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,738. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close). Event playbook: USD FOMC Meeting Minutes 2026-11-18 19:00 UTC: consensus n/a (previous n/a); P(gold up on the day) 51% vs base 54%; past FOMC days n 34, gold up 50%, median |move| 0.729%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
