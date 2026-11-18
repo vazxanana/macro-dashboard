@@ -2,6 +2,8 @@
 
 Checked 9 November 2026 UTC. Scope: primary-source permissions, access, definitions and a date/schema audit; no gold-value analysis, returns or event statistics.
 
+**Later 9 November correction and extension:** the [dated methodology/clock audit](../outputs/nbu-gold-methodology-and-clocks-2026-11-09.md) supersedes any reading of Section3's2021-labelled consolidation as already effective throughout the early-January window. Amendment127 commenced4January2022; the priorBFIX/publication clocks were15:30/16:00, changing to15:00/15:30. Resolution142 separately carried the30December2021valuation through4January. The later audit also identifies the explicit24February–March wartime metals freeze/restoration and21July2022carryover. Preserve distinct legal-date/field-label/publication clocks. Section3's two-decimal description does not establish a tie-breaking or intermediate rounding algorithm. The781distinct`calcdate`labels are not781authenticated fresh quotes. No numeric price analysis or back-conversion was added; the deliveredV1.3archive remains unchanged.
+
 ## Decision
 
 **A concrete alternative exists: the National Bank of Ukraine’s published gold accounting valuation.** Its open-data terms affirm commercial use and combination with other information. A dated NBU regulation also expressly permits residents and nonresidents to use its accounting metals prices in money/foreign-exchange market transactions. These are affirmative publisher statements, rather than permission inferred from a public download.

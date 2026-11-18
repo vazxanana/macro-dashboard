@@ -2581,6 +2581,19 @@ a note to the verdict; no probability, rule or trade changes. `CLAIM` labels (de
 / causal / execution) on the hypothesis card (`claimType`) and release records; `cpiPilot().label` never calls the unresolved
 pilot scored. Not ported (reading only): the NBU gold route, the Cleveland-vs-baseline plan, the GLD study.
 
+## Macro veteran: the 1.4 research outputs (18 Nov 2026, owner uploaded three zips)
+`research/macro-veteran/`: the new and changed `outputs/` files are in `references/` and the authored `work/*.md` in `notes/`
+(the 1.2 / 1.3 rule; scripts, raw captures, the synthetic CPI-resolution rehearsal and the forecast-schema test cases stay out).
+README.md "What's new in 1.4 research outputs" feeds the library (`index.json.newIn` = the heading's own words, since SKILL.md is
+still 1.3: `SKILL_VERSION` unchanged). Rule 6: product names in the markdown were made neutral (as in 1.3);
+`cpi-model-benchmark-protocol-2022-2024.json` is left out (it names a product and its bytes are bound by a published SHA-256, so
+it is never edited; the `.sha256` stays). **The CPI pilot**: the batch appended a `record_type: "resolved"` line with
+`outcome: null` (a pending attempt: today's archive shows 0.3%, the original release-day evidence is unauthenticated). Both readers
+(`council/veteran.mjs` `cpiPilot`, `scripts/veteran-index.mjs` `cpiPilot`) count a resolution only with a numeric outcome; a null
+one is `pending` (the desk and /veteran/ say "unresolved · 1 resolution attempt on file, no qualifying first print yet"). Before
+this fix the desk would have called it "resolved against the BLS first print". Tests: `tests/veteran.test.mjs`,
+`tests/veteran-library.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical

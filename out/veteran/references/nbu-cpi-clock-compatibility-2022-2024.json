@@ -1,0 +1,1583 @@
+{
+  "status": "CONDITIONAL_CLOCK_ARITHMETIC_NOT_PRICE_OR_PUBLICATION_AUTHENTICATION",
+  "created_at_utc": "2026-11-09T23:31:49.293087+00:00",
+  "cohort": "The existing36 calendar-year2022\u20132024 CPI releases; dates/times only.",
+  "method": "15:00/15:30 Europe/Kyiv reference clocks from post127 rule; separate same-calendar-date arithmetic and conditional use of paired calcdate labels. Freeze days excluded from default-clock summaries.",
+  "input_bindings": [
+    {
+      "file": "outputs/cpi-first-print-release-ledger-2022-2024.json",
+      "sha256": "0004d715f03c8e6f557721cf527dee4fad4a98dcea1679d9212efa58c9012052"
+    },
+    {
+      "file": "work/nbu-date-label-profile-2022-2024.json",
+      "sha256": "e0dc4dd1ddf57c489689368e3528e524efb0ff4da44cc0276ec64ab8a37f1906"
+    },
+    {
+      "file": "work/nbu-gold-method-version-audit.json",
+      "sha256": "58b03a7015ce9f6e17ad466447602f5a50d7b26a50c0fcc9d838fafc565cd69a"
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "tzdata_version": "2026.6",
+    "zone_loading": "ZoneInfo.from_file over explicitly hashed tzdata package bytes; no system-path/cache dependency.",
+    "zone_file_sha256": {
+      "Europe/Kyiv": "0589e80ddecebf9d3077898c12975d2be7393df2856ee9926c534763e1e26bf2",
+      "America/New_York": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9"
+    }
+  },
+  "summary": {
+    "cases": 36,
+    "same_calendar_date": {
+      "conditional_default_cases": 35,
+      "excluded_rule_cases": 1,
+      "reference_bfix_gap_minutes": {
+        "-30": 33,
+        "30": 2
+      },
+      "reference_deadline_gap_minutes": {
+        "0": 33,
+        "60": 2
+      },
+      "warning": "Negative means before scheduled CPI, positive after; no actual-availability/price claim."
+    },
+    "effective_label_join": {
+      "conditional_default_cases": 35,
+      "excluded_rule_cases": 1,
+      "reference_bfix_gap_minutes": {
+        "-1470": 33,
+        "-1410": 2
+      },
+      "reference_deadline_gap_minutes": {
+        "-1440": 33,
+        "-1380": 2
+      },
+      "warning": "Negative means before scheduled CPI, positive after; no actual-availability/price claim."
+    }
+  },
+  "records": [
+    {
+      "event_id": "us-cpi-release-2022-01-12",
+      "release_date": "2022-01-12",
+      "scheduled_cpi_utc": "2022-01-12T13:30:00Z",
+      "scheduled_cpi_new_york": "2022-01-12T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_01122022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122022.htm",
+        "sha256": "45ca364e1633fd50ab3a299a5da2abe5cf9086f36c8aecfe4dd9f4658df50174"
+      },
+      "nbu_date_projection_source_array_index": 11,
+      "paired_calcdate_label": "2022-01-11",
+      "same_calendar_date_reference": {
+        "date_label": "2022-01-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-01-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-01-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-01-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-01-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-01-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-01-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-01-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-02-10",
+      "release_date": "2022-02-10",
+      "scheduled_cpi_utc": "2022-02-10T13:30:00Z",
+      "scheduled_cpi_new_york": "2022-02-10T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_02102022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02102022.htm",
+        "sha256": "278ff1e8da6a2c199312427cba7e1dbd0102da6a31d2c0dd2264113834abbd1f"
+      },
+      "nbu_date_projection_source_array_index": 40,
+      "paired_calcdate_label": "2022-02-09",
+      "same_calendar_date_reference": {
+        "date_label": "2022-02-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-02-10T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-02-10T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-02-10T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-02-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-02-09T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-02-09T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-02-09T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-03-10",
+      "release_date": "2022-03-10",
+      "scheduled_cpi_utc": "2022-03-10T13:30:00Z",
+      "scheduled_cpi_new_york": "2022-03-10T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_03102022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03102022.htm",
+        "sha256": "89ebc9016ab0ea900fefddf2f3f186b8bcbe7a00cf8684f8059c3363ea7dc35a"
+      },
+      "nbu_date_projection_source_array_index": 68,
+      "paired_calcdate_label": "2022-03-09",
+      "same_calendar_date_reference": {
+        "date_label": "2022-03-10",
+        "legal_clock_state": "FROZEN_RULE_PERIOD_NO_FRESH_QUOTE_ASSUMED",
+        "included_in_default_clock_summary": false,
+        "hypothetical_reference_bfix_local": "2022-03-10T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-03-10T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-03-10T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-03-09",
+        "legal_clock_state": "FROZEN_RULE_PERIOD_NO_FRESH_QUOTE_ASSUMED",
+        "included_in_default_clock_summary": false,
+        "hypothetical_reference_bfix_local": "2022-03-09T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-03-09T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-03-09T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-04-12",
+      "release_date": "2022-04-12",
+      "scheduled_cpi_utc": "2022-04-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-04-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_04122022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122022.htm",
+        "sha256": "7d654607289ed3e15ec297d2be342975a2121ce5d4c6deb25c61ec044785f18b"
+      },
+      "nbu_date_projection_source_array_index": 101,
+      "paired_calcdate_label": "2022-04-11",
+      "same_calendar_date_reference": {
+        "date_label": "2022-04-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-04-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-04-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-04-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-04-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-04-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-04-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-04-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-05-11",
+      "release_date": "2022-05-11",
+      "scheduled_cpi_utc": "2022-05-11T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-05-11T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_05112022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05112022.htm",
+        "sha256": "d9d7eaa0508822501f09a3c5e691d64c23c9a9c1fbb48a1cc6d3fd5b2aa8c0eb"
+      },
+      "nbu_date_projection_source_array_index": 130,
+      "paired_calcdate_label": "2022-05-10",
+      "same_calendar_date_reference": {
+        "date_label": "2022-05-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-05-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-05-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-05-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-05-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-05-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-05-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-05-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-06-10",
+      "release_date": "2022-06-10",
+      "scheduled_cpi_utc": "2022-06-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-06-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_06102022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06102022.htm",
+        "sha256": "03658a0ce2c08701bb423cf232e8c255555abe84fc77ff802fe2e728927fc7d9"
+      },
+      "nbu_date_projection_source_array_index": 160,
+      "paired_calcdate_label": "2022-06-09",
+      "same_calendar_date_reference": {
+        "date_label": "2022-06-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-06-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-06-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-06-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-06-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-06-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-06-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-06-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-07-13",
+      "release_date": "2022-07-13",
+      "scheduled_cpi_utc": "2022-07-13T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-07-13T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_07132022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07132022.htm",
+        "sha256": "0e4feecbeb007b5271816feb7a6209b3becb651ec0a850d56dcdd3f7e9c8b8a6"
+      },
+      "nbu_date_projection_source_array_index": 193,
+      "paired_calcdate_label": "2022-07-12",
+      "same_calendar_date_reference": {
+        "date_label": "2022-07-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-07-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-07-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-07-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-07-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-07-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-07-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-07-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-08-10",
+      "release_date": "2022-08-10",
+      "scheduled_cpi_utc": "2022-08-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-08-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_08102022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102022.htm",
+        "sha256": "f613dce5a40c06f857fc4c92f181dac917405bb541d707fbdc7d123787feff38"
+      },
+      "nbu_date_projection_source_array_index": 221,
+      "paired_calcdate_label": "2022-08-09",
+      "same_calendar_date_reference": {
+        "date_label": "2022-08-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-08-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-08-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-08-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-08-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-08-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-08-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-08-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-09-13",
+      "release_date": "2022-09-13",
+      "scheduled_cpi_utc": "2022-09-13T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-09-13T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_09132022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132022.htm",
+        "sha256": "0fe793a6526f424fa85619b4283e172f0ae143ae94162f1a1910b968be1b97c3"
+      },
+      "nbu_date_projection_source_array_index": 255,
+      "paired_calcdate_label": "2022-09-12",
+      "same_calendar_date_reference": {
+        "date_label": "2022-09-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-09-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-09-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-09-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-09-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-09-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-09-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-09-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-10-13",
+      "release_date": "2022-10-13",
+      "scheduled_cpi_utc": "2022-10-13T12:30:00Z",
+      "scheduled_cpi_new_york": "2022-10-13T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_10132022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10132022.htm",
+        "sha256": "10186f619f5b69fc3f0589a3953544ec72e730da62e0ac2593e89360889358a0"
+      },
+      "nbu_date_projection_source_array_index": 285,
+      "paired_calcdate_label": "2022-10-12",
+      "same_calendar_date_reference": {
+        "date_label": "2022-10-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-10-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-10-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-10-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-10-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-10-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2022-10-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-10-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-11-10",
+      "release_date": "2022-11-10",
+      "scheduled_cpi_utc": "2022-11-10T13:30:00Z",
+      "scheduled_cpi_new_york": "2022-11-10T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_11102022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11102022.htm",
+        "sha256": "003a8366cdc1ba4750dff3bf753d79ae3aba7b5965821dd0fb44581ed17d80f0"
+      },
+      "nbu_date_projection_source_array_index": 313,
+      "paired_calcdate_label": "2022-11-09",
+      "same_calendar_date_reference": {
+        "date_label": "2022-11-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-11-10T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-11-10T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-11-10T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-11-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-11-09T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-11-09T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-11-09T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2022-12-13",
+      "release_date": "2022-12-13",
+      "scheduled_cpi_utc": "2022-12-13T13:30:00Z",
+      "scheduled_cpi_new_york": "2022-12-13T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_12132022.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12132022.htm",
+        "sha256": "a4897e63121e1941cdfee5d6f412df676a00e1f1b2c852859b2554bae48c2b69"
+      },
+      "nbu_date_projection_source_array_index": 346,
+      "paired_calcdate_label": "2022-12-12",
+      "same_calendar_date_reference": {
+        "date_label": "2022-12-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-12-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-12-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-12-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2022-12-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2022-12-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2022-12-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2022-12-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-01-12",
+      "release_date": "2023-01-12",
+      "scheduled_cpi_utc": "2023-01-12T13:30:00Z",
+      "scheduled_cpi_new_york": "2023-01-12T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_01122023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122023.htm",
+        "sha256": "9d5d5aa086ad1b9f299e9ea2603ef76695b4b2c8abe48ca90554c9237e8d60a1"
+      },
+      "nbu_date_projection_source_array_index": 376,
+      "paired_calcdate_label": "2023-01-11",
+      "same_calendar_date_reference": {
+        "date_label": "2023-01-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-01-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-01-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-01-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-01-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-01-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-01-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-01-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-02-14",
+      "release_date": "2023-02-14",
+      "scheduled_cpi_utc": "2023-02-14T13:30:00Z",
+      "scheduled_cpi_new_york": "2023-02-14T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_02142023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02142023.htm",
+        "sha256": "5bddfbdd162cc083d7b8db217f5093612544f1b6f29a525740f65bfb34223c00"
+      },
+      "nbu_date_projection_source_array_index": 409,
+      "paired_calcdate_label": "2023-02-13",
+      "same_calendar_date_reference": {
+        "date_label": "2023-02-14",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-02-14T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-02-14T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-02-14T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-02-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-02-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-02-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-02-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-03-14",
+      "release_date": "2023-03-14",
+      "scheduled_cpi_utc": "2023-03-14T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-03-14T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_03142023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03142023.htm",
+        "sha256": "0d1282519139a5511365c44bafe20353c3a0fd41a81f0b94202df7238042cf41"
+      },
+      "nbu_date_projection_source_array_index": 437,
+      "paired_calcdate_label": "2023-03-13",
+      "same_calendar_date_reference": {
+        "date_label": "2023-03-14",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-03-14T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-03-14T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-03-14T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": 30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 60,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-03-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-03-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-03-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-03-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1410,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1380,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-04-12",
+      "release_date": "2023-04-12",
+      "scheduled_cpi_utc": "2023-04-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-04-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_04122023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122023.htm",
+        "sha256": "ffdfcfe1c00558469848e28eeb1f0a1f716be8f90879a45f6ccd8d18daa34cb9"
+      },
+      "nbu_date_projection_source_array_index": 466,
+      "paired_calcdate_label": "2023-04-11",
+      "same_calendar_date_reference": {
+        "date_label": "2023-04-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-04-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-04-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-04-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-04-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-04-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-04-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-04-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-05-10",
+      "release_date": "2023-05-10",
+      "scheduled_cpi_utc": "2023-05-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-05-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_05102023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05102023.htm",
+        "sha256": "0586dd5f313c59d400ca5795c3d202e0740317dd643fb25325abe3b513a27766"
+      },
+      "nbu_date_projection_source_array_index": 494,
+      "paired_calcdate_label": "2023-05-09",
+      "same_calendar_date_reference": {
+        "date_label": "2023-05-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-05-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-05-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-05-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-05-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-05-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-05-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-05-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-06-13",
+      "release_date": "2023-06-13",
+      "scheduled_cpi_utc": "2023-06-13T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-06-13T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_06132023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06132023.htm",
+        "sha256": "441fbaa7e7e15727f107dbf06b7965dd0e35621501952af435d9a2ce12b26f65"
+      },
+      "nbu_date_projection_source_array_index": 528,
+      "paired_calcdate_label": "2023-06-12",
+      "same_calendar_date_reference": {
+        "date_label": "2023-06-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-06-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-06-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-06-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-06-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-06-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-06-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-06-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-07-12",
+      "release_date": "2023-07-12",
+      "scheduled_cpi_utc": "2023-07-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-07-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_07122023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07122023.htm",
+        "sha256": "0dac29c5d2b108e4b32731f6b1db8d8da5372ddf6ac4802b4b1ee4932b3265d1"
+      },
+      "nbu_date_projection_source_array_index": 557,
+      "paired_calcdate_label": "2023-07-11",
+      "same_calendar_date_reference": {
+        "date_label": "2023-07-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-07-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-07-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-07-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-07-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-07-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-07-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-07-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-08-10",
+      "release_date": "2023-08-10",
+      "scheduled_cpi_utc": "2023-08-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-08-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_08102023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102023.htm",
+        "sha256": "847727876ffbf92677e38b6591743411666107ba883e90f2bd9da3584d96568b"
+      },
+      "nbu_date_projection_source_array_index": 586,
+      "paired_calcdate_label": "2023-08-09",
+      "same_calendar_date_reference": {
+        "date_label": "2023-08-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-08-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-08-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-08-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-08-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-08-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-08-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-08-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-09-13",
+      "release_date": "2023-09-13",
+      "scheduled_cpi_utc": "2023-09-13T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-09-13T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_09132023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132023.htm",
+        "sha256": "83a7380d4e81463a3266935617ac086f8edc5f2ef3b9fee826bd2b521eaccf49"
+      },
+      "nbu_date_projection_source_array_index": 620,
+      "paired_calcdate_label": "2023-09-12",
+      "same_calendar_date_reference": {
+        "date_label": "2023-09-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-09-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-09-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-09-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-09-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-09-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-09-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-09-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-10-12",
+      "release_date": "2023-10-12",
+      "scheduled_cpi_utc": "2023-10-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2023-10-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_10122023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10122023.htm",
+        "sha256": "5d33f0a6efd860412cdefe5911ab4cf0fa27e0dc852102c1cc5a6619bfb413cd"
+      },
+      "nbu_date_projection_source_array_index": 649,
+      "paired_calcdate_label": "2023-10-11",
+      "same_calendar_date_reference": {
+        "date_label": "2023-10-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-10-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-10-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-10-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-10-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-10-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2023-10-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-10-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-11-14",
+      "release_date": "2023-11-14",
+      "scheduled_cpi_utc": "2023-11-14T13:30:00Z",
+      "scheduled_cpi_new_york": "2023-11-14T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_11142023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11142023.htm",
+        "sha256": "95e006e0d5d3093939016bd5b08159fb688aae1de2f256ef56caf041763d946b"
+      },
+      "nbu_date_projection_source_array_index": 682,
+      "paired_calcdate_label": "2023-11-13",
+      "same_calendar_date_reference": {
+        "date_label": "2023-11-14",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-11-14T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-11-14T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-11-14T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-11-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-11-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-11-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-11-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2023-12-12",
+      "release_date": "2023-12-12",
+      "scheduled_cpi_utc": "2023-12-12T13:30:00Z",
+      "scheduled_cpi_new_york": "2023-12-12T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_12122023.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12122023.htm",
+        "sha256": "0342155f3fcb4dd68166c8c8e33e0a049662c97100de2d0f4903628d179b660e"
+      },
+      "nbu_date_projection_source_array_index": 710,
+      "paired_calcdate_label": "2023-12-11",
+      "same_calendar_date_reference": {
+        "date_label": "2023-12-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-12-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-12-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-12-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2023-12-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2023-12-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2023-12-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2023-12-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-01-11",
+      "release_date": "2024-01-11",
+      "scheduled_cpi_utc": "2024-01-11T13:30:00Z",
+      "scheduled_cpi_new_york": "2024-01-11T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_01112024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01112024.htm",
+        "sha256": "5af03777daf991ada26ce61a3002e3f49d9f8f25c3e4ce88131692c86a6eb7e6"
+      },
+      "nbu_date_projection_source_array_index": 740,
+      "paired_calcdate_label": "2024-01-10",
+      "same_calendar_date_reference": {
+        "date_label": "2024-01-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-01-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-01-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-01-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-01-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-01-10T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-01-10T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-01-10T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-02-13",
+      "release_date": "2024-02-13",
+      "scheduled_cpi_utc": "2024-02-13T13:30:00Z",
+      "scheduled_cpi_new_york": "2024-02-13T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_02132024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02132024.htm",
+        "sha256": "90914201190d8f8b1f19da73932f83e2c3651f31316a65de6de5dd605647cb16"
+      },
+      "nbu_date_projection_source_array_index": 773,
+      "paired_calcdate_label": "2024-02-12",
+      "same_calendar_date_reference": {
+        "date_label": "2024-02-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-02-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-02-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-02-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-02-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-02-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-02-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-02-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-03-12",
+      "release_date": "2024-03-12",
+      "scheduled_cpi_utc": "2024-03-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-03-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_03122024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03122024.htm",
+        "sha256": "233d5f46067ec4110fcbb59e3c19a880f81184177f56733062dd312e4253ae66"
+      },
+      "nbu_date_projection_source_array_index": 801,
+      "paired_calcdate_label": "2024-03-11",
+      "same_calendar_date_reference": {
+        "date_label": "2024-03-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-03-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-03-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-03-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": 30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 60,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-03-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-03-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-03-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-03-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1410,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1380,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-04-10",
+      "release_date": "2024-04-10",
+      "scheduled_cpi_utc": "2024-04-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-04-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_04102024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04102024.htm",
+        "sha256": "c23838dff36779ca5a3e439b9d5c451b1cbb8689adebcfb42c477dd9284337b8"
+      },
+      "nbu_date_projection_source_array_index": 830,
+      "paired_calcdate_label": "2024-04-09",
+      "same_calendar_date_reference": {
+        "date_label": "2024-04-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-04-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-04-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-04-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-04-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-04-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-04-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-04-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-05-15",
+      "release_date": "2024-05-15",
+      "scheduled_cpi_utc": "2024-05-15T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-05-15T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_05152024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05152024.htm",
+        "sha256": "5ed19921c617b95f99140ad464a59c142d5d24726a39508a67d471660a4185c8"
+      },
+      "nbu_date_projection_source_array_index": 865,
+      "paired_calcdate_label": "2024-05-14",
+      "same_calendar_date_reference": {
+        "date_label": "2024-05-15",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-05-15T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-05-15T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-05-15T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-05-14",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-05-14T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-05-14T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-05-14T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": "Official early-publication case; no exact field-specific actual UTC imposed."
+    },
+    {
+      "event_id": "us-cpi-release-2024-06-12",
+      "release_date": "2024-06-12",
+      "scheduled_cpi_utc": "2024-06-12T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-06-12T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_06122024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06122024.htm",
+        "sha256": "76eff97eff76a812263bd21d8e55c29c42ea2b883c7dea4ff98f326112cf8437"
+      },
+      "nbu_date_projection_source_array_index": 893,
+      "paired_calcdate_label": "2024-06-11",
+      "same_calendar_date_reference": {
+        "date_label": "2024-06-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-06-12T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-06-12T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-06-12T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-06-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-06-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-06-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-06-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-07-11",
+      "release_date": "2024-07-11",
+      "scheduled_cpi_utc": "2024-07-11T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-07-11T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_07112024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07112024.htm",
+        "sha256": "fb0a5c1351be3a2a15c6c249ed792d630af5e47e4c7278db492c079a702086db"
+      },
+      "nbu_date_projection_source_array_index": 922,
+      "paired_calcdate_label": "2024-07-10",
+      "same_calendar_date_reference": {
+        "date_label": "2024-07-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-07-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-07-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-07-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-07-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-07-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-07-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-07-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-08-14",
+      "release_date": "2024-08-14",
+      "scheduled_cpi_utc": "2024-08-14T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-08-14T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_08142024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08142024.htm",
+        "sha256": "4568374b38f65dac54e32f3a166725e7e62fa2ed8ba38bc7aa280ba625e82781"
+      },
+      "nbu_date_projection_source_array_index": 956,
+      "paired_calcdate_label": "2024-08-13",
+      "same_calendar_date_reference": {
+        "date_label": "2024-08-14",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-08-14T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-08-14T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-08-14T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-08-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-08-13T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-08-13T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-08-13T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-09-11",
+      "release_date": "2024-09-11",
+      "scheduled_cpi_utc": "2024-09-11T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-09-11T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_09112024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09112024.htm",
+        "sha256": "0d933d2577073291772e8123c6f1b7def0822ae3f4a009c0ef028587bad98217"
+      },
+      "nbu_date_projection_source_array_index": 984,
+      "paired_calcdate_label": "2024-09-10",
+      "same_calendar_date_reference": {
+        "date_label": "2024-09-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-09-11T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-09-11T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-09-11T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-09-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-09-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-09-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-09-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-10-10",
+      "release_date": "2024-10-10",
+      "scheduled_cpi_utc": "2024-10-10T12:30:00Z",
+      "scheduled_cpi_new_york": "2024-10-10T08:30:00-04:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -240,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_10102024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10102024.htm",
+        "sha256": "e2d8d6f1689494275ef6879be7548b97fcaec8862c944f6fc0f1911c621f6ac0"
+      },
+      "nbu_date_projection_source_array_index": 1013,
+      "paired_calcdate_label": "2024-10-09",
+      "same_calendar_date_reference": {
+        "date_label": "2024-10-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-10-10T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-10-10T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-10-10T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-10-09",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-10-09T15:00:00+03:00",
+        "hypothetical_reference_bfix_utc": "2024-10-09T12:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-10-09T12:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 180,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-11-13",
+      "release_date": "2024-11-13",
+      "scheduled_cpi_utc": "2024-11-13T13:30:00Z",
+      "scheduled_cpi_new_york": "2024-11-13T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_11132024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11132024.htm",
+        "sha256": "ad0279d8d9bf165360affa63a8b640b28dbea9c49c6bfcc6f66f451d9e637769"
+      },
+      "nbu_date_projection_source_array_index": 1047,
+      "paired_calcdate_label": "2024-11-12",
+      "same_calendar_date_reference": {
+        "date_label": "2024-11-13",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-11-13T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-11-13T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-11-13T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-11-12",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-11-12T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-11-12T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-11-12T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    },
+    {
+      "event_id": "us-cpi-release-2024-12-11",
+      "release_date": "2024-12-11",
+      "scheduled_cpi_utc": "2024-12-11T13:30:00Z",
+      "scheduled_cpi_new_york": "2024-12-11T08:30:00-05:00",
+      "actual_cpi_first_available_utc": null,
+      "new_york_utc_offset_minutes": -300,
+      "source": {
+        "url": "https://www.bls.gov/news.release/archives/cpi_12112024.htm",
+        "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12112024.htm",
+        "sha256": "415282398015c224606261fb978ec7c61c35647ec5b3438fa3f613111217bb0e"
+      },
+      "nbu_date_projection_source_array_index": 1075,
+      "paired_calcdate_label": "2024-12-10",
+      "same_calendar_date_reference": {
+        "date_label": "2024-12-11",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-12-11T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-12-11T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-12-11T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -30,
+        "deadline_reference_minus_scheduled_cpi_minutes": 0,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "effective_label_join_reference": {
+        "date_label": "2024-12-10",
+        "legal_clock_state": "CONDITIONAL_POST127_DEFAULT_CLOCK",
+        "included_in_default_clock_summary": true,
+        "hypothetical_reference_bfix_local": "2024-12-10T15:00:00+02:00",
+        "hypothetical_reference_bfix_utc": "2024-12-10T13:00:00Z",
+        "hypothetical_reference_deadline_utc": "2024-12-10T13:30:00Z",
+        "quote_reference_minus_scheduled_cpi_minutes": -1470,
+        "deadline_reference_minus_scheduled_cpi_minutes": -1440,
+        "kyiv_utc_offset_minutes": 120,
+        "actual_quote_or_publication_authenticated": false,
+        "interpretation": "Reference-clock arithmetic, not an observed quote/publication or proof that the API field means this timestamp."
+      },
+      "special_timing_caveat": null
+    }
+  ],
+  "limits": [
+    "Range calcdate/exchangedate semantics and original source/publication availability remain incomplete; paired-label clock assignment is explicitly conditional.",
+    "Legal reference/default times are not observed source quotes or actual publication. Fallback quotation ages and operational exceptions remain unknown.",
+    "CPI times are scheduled, not authenticated actual first-publication timestamps; May2024 early posting is separately flagged.",
+    "No NBU price response, numeric gold values, CPI outcomes, forecast errors, returns or back-conversion used."
+  ],
+  "attribution": "National Bank of Ukraine, https://bank.gov.ua/en/open-data; U.S. Bureau of Labor Statistics; independent clock arithmetic by MeridianX research.",
+  "code": {
+    "file": "outputs/scripts/nbu-cpi-clock-audit.py",
+    "sha256": "fb881c439c9c1b5bfdccea1974828a81bf84323ddb9ff8241214daaaa71943c5"
+  }
+}

@@ -44,11 +44,14 @@ export function cpiPilot(file = new URL('../research/macro-veteran/references/cp
   try {
     const recs = fs.readFileSync(file, 'utf8').split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
     const iss = recs.find((r) => r.record_type === 'issued'); if (!iss) return null;
-    const res = recs.find((r) => (r.record_type === 'resolved' || r.record_type === 'resolution') && r.forecast_id === iss.forecast_id), f = iss.forecast || {};
+    // 1.4 batch (17 Nov 2026): a record of type "resolved" may carry outcome null = a PENDING attempt (no qualifying first print yet).
+    // Only a record with a numeric outcome resolves the forecast; the attempts are counted, never shown as a result.
+    const tries = recs.filter((r) => (r.record_type === 'resolved' || r.record_type === 'resolution') && r.forecast_id === iss.forecast_id);
+    const res = tries.filter((r) => r.resolution && Number.isFinite(+r.resolution.outcome) && r.resolution.outcome !== null).pop() || null, f = iss.forecast || {};
     const cmp = f.comparator && Number.isFinite(+f.comparator.probability_or_value) ? { value: +f.comparator.probability_or_value, capturedAt: f.comparator.captured_at_utc || null, label: 'Cleveland Fed core CPI nowcast (a public model, not consensus)' } : null;
-    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null, comparator: cmp,
+    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? +res.resolution.outcome : null, comparator: cmp, pending: res ? 0 : tries.length,
       // rev 1.3: never call an unresolved pilot a scored forecast
-      label: res ? 'resolved against the BLS first print' : 'unresolved: issued, not a scored forecast' };
+      label: res ? 'resolved against the BLS first print' : tries.length ? 'unresolved: a resolution attempt is on file with no qualifying first print, not a scored forecast' : 'unresolved: issued, not a scored forecast' };
   } catch (e) { return null; }
 }
 // ---- rev 1.3: claim language, expectations capture and release integrity ---------------------------------------------

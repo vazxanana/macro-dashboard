@@ -1,0 +1,50 @@
+{
+  "status": "PASS_BOUNDED_CAPTURED_LINK_INVENTORY",
+  "created_at_utc": "2026-11-09T18:04:39.843358+00:00",
+  "scope": "All captured cycle rows, instrument columns, listed URLs, cycle update flags and literal source-row hashes. No endpoint availability, historical publication or PDF/XLSX value validation.",
+  "root_checks": 1269,
+  "independent_comparisons": 1388,
+  "cycle_rows": 127,
+  "instrument_column_contexts": 239,
+  "url_occurrences": 455,
+  "starred_cycle_rows": 12,
+  "independence_limit": "Root aggregate counts were communicated before this extraction finished, but no root manifest or parser was read to build this inventory. No rule fills absent links to match expected counts.",
+  "bound_artifacts": [
+    {
+      "file": "outputs/nyfed-survey-archive-manifest-2026-11-09.json",
+      "sha256": "63031be9f2508900ca3348a2160336ce3956e6aaec8686f86ef46b34309f82e1"
+    },
+    {
+      "file": "outputs/nyfed-survey-archive-map-2026-11-09.md",
+      "sha256": "ca5d1484ec60da4c9556780d56db9410e4ac8979e3363f5367a6efd2777141b9"
+    },
+    {
+      "file": "work/nyfed-survey-audit/archive-independent.json",
+      "sha256": "f76cd5ac1d85a8dcbb7e7805891a6ac16b9d546840019cedd590d286f87471ff"
+    },
+    {
+      "file": "work/nyfed-survey-audit/archive-independent.md",
+      "sha256": "5b3862bf713803685b2e2421819a3decefcd20f90ce85068bddcc5d1175dc51d"
+    },
+    {
+      "file": "work/nyfed-survey-audit/inventory-archive-independent.mjs",
+      "sha256": "1f6b111d53f1dd06312fa482236c4a56c57fb28425f5d5da14101078712b075f"
+    },
+    {
+      "file": "work/build_nyfed_archive_manifest.py",
+      "sha256": "4d357d32d7dc9508e0f56aee4158bbbc591fa42a62045fd52e875b4b4d23f450"
+    },
+    {
+      "file": "work/validate_nyfed_archive_manifest.py",
+      "sha256": "a2712826721f7248523f8a3c56cacb40bd97302306641448b59d60cf5583e8af"
+    }
+  ],
+  "limits": [
+    "Current captured link structure does not authenticate original historical publication or unchanged document bytes.",
+    "No individual URL was fetched or declared healthy by this inventory.",
+    "Legacy shared XLSX/Combined history was announced on October10,2024; do not backdate format availability to survey dates.",
+    "Empty instrument cells preserve absence of a listed link rather than inventing data or an unavailable-file diagnosis.",
+    "A starred row is a phase-check warning, not a claim that every subgroup/answer was updated.",
+    "Month/combined-month labels remain labels; no exact FOMC or result-publication dates were derived."
+  ]
+}

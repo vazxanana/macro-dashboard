@@ -1,6 +1,6 @@
 # Research increment — 9 November 2026
 
-The historical CPI-to-rates work now has a reproducible result, following the 8 November assistant delivery. The previously shared V1.2 ZIP remains unchanged; these newer files belong in the next cumulative batch.
+The historical CPI-to-rates work has a reproducible result and was included in the delivered V1.3 ZIP. That archive remains unchanged. The later CPI-model benchmark and NY Fed survey-ingestion work below belong in the next requested batch.
 
 ## New completed work
 
@@ -14,16 +14,30 @@ The average is not a universal event pattern: only 20 of 36 real-yield contrasts
 
 ## Newly verified data-access route
 
-The NBU publishes a distinct **UAH gold accounting valuation** with affirmative open-data use conditions and attribution requirements. A date/schema audit found all 1,096 effective calendar dates in 2022–2024 but 781 distinct calculation dates; this is not 1,096 independent gold measurements. Price values remain analytically uninspected. Official permission/methodology bodies are now preserved locally in addition to initial URL/hash receipts.
+The NBU publishes a distinct **UAH gold accounting valuation** with affirmative open-data use conditions and attribution requirements. A date/schema audit found all 1,096 effective calendar labels in 2022–2024 but781distinct`calcdate`labels; neither count authenticates fresh independent quotations. Price values remain analytically uninspected. Official permission/methodology bodies are preserved locally in addition to initial URL/hash receipts.
 
 Read `work/gold-permitted-data-route-followup.md` and its separate source/profile files. Calculation dates, next-day effectiveness, official FX inputs, rounding, carryovers and wartime-method changes must be reconciled before any study. This route does not clear GLD's use conditions or replace the draft GLD endpoint, USD spot or an execution feed. No back-conversion or gold return was calculated.
+
+The later [dated method/clock case](nbu-gold-methodology-and-clocks-2026-11-09.md) now identifies the4January2022commencement of the clock changes, an explicit wartime metals freeze and restoration,21July's full-day metals carryover alongside theUSD reset, and later input/distribution changes. A separate date-only projection discards all numeric tokens before calculation. Material amendment interpretations were independently checked; exact transition hours, first fresh valuations, daily fallback use and complete calendars/vintages remain unresolved. The current follow-up note has a dated correction; the deliveredV1.3copy remains immutable.
 
 The [master source registry](macro-gold-source-registry.md) now incorporates the Treasury archive-access trap, verified Cleveland monthly JSON, current GLD XLSX route and separately defined NBU route.
 
 ## Work still open
 
+### Later increment after the V1.3 delivery
+
+The [historical Cleveland-model comparison](cpi-model-benchmark-2022-2024.md) is now complete as a frozen retrospective numeric benchmark. All36 core and headline cases have complete common C/P/R3/fixed-blend inputs, including three earlier BLS seed releases. The core Cleveland-minus-persistence squared-loss contrast is −0.001521pp², with approximate3-month-block interval [−0.014019,+0.008850]pp²; the6-month interval also spans zero. Cleveland core MAE is higher than persistence. Removing2022 or10August2022 reverses the MSE-contrast sign. A reliable core advantage is not resolved; the loss, sample and weights were not changed to rescue one.
+
+Headline performance is more favourable in the declared descriptive comparison. The fixed50/50 blend has lower listed core losses, without fitted weights or a separate superiority test. No historical points were inserted as prospective forecasts, and no pilot issuance was changed. The [validation](cpi-model-benchmark-validation-2026-11-09.json) binds5,702 independent outcome checks,1,773 exact rational quantities,35 actual-bootstrap checks,12Python tests and7 cross-language synthetic fixtures. These new files are outside the unchanged V1.3 ZIP and belong in the next requested batch.
+
+The [NY Fed market-expectations survey case](nyfed-survey-expectations-ingestion-2026-11-09.md) adds two inspected workbooks and two source-linked field examples. Its `survey_release_date` is questionnaire distribution, not publication of the answers. Exact original result timestamps remain unknown, the2024 spreadsheet/Combined backfill has a separate availability date, and the2025 merger changed the panel. The contract distinguishes respondents' own modal forecasts from their expectations of the Fed's SEP, uses field-specific units and preserves matched counts. This is source-ingestion work, without an evaluation or trading result.
+
+The later [archive map](nyfed-survey-archive-map-2026-11-09.md) inventories127 cycle rows,215 question links,214 result links and26 shared data links. Twelve starred cycles require response-phase inspection because results can contain later updates. Independent comparison found no differences across all455 listed URLs; root checks also bind literal source-row hashes. The link inventory establishes discovery coverage, not original-time availability or endpoint health.
+
+The [cross-cycle coverage map](nyfed-survey-question-coverage-2026-11-09.md) is now complete:26 linked workbooks,63,190 aggregate records,55 descriptive families,129 exact question tags and1,519 exact value tags. Seventeen broad families occur in all26 cycles, without proving identical targets/units/horizons. Its191,794-byte compact reference points to an18.5MB searchable metadata catalogue. Source hashes, scoped797 independent comparisons, row pointers/question-text hashes and1,703 presence-mask records passed their declared checks. The map distinguishes195 rating-category count rows, including27 valid zeros, from20,545 exactcount records. The September2026 XLSX also omits qualitativeQ1a/Q1c commentary that remains in itsPDF; this PDF-coverage check was limited to that cycle. No expectation values or performance results were produced by the metadata map.
+
 The formal-FOMC overlap variant is complete within its currently published formal-statement scope. A broader macro-release-exclusion result is unavailable until all named release families have complete interval coverage. Other Fed policy actions, speeches and unscheduled news are not erased by the formal-statement filter. Neither an unflagged interval nor the primary estimate is called a clean CPI shock.
 
-The conditional GLD NAV study remains uncalculated with its rights/field-clock gates unresolved. NBU methodology/vintage reconciliation is a separate future task. Historical survey-consensus access remains unverified; Cleveland model values retain their own label. A model-error/forecast-quality comparison requires a separate specification before it is calculated.
+The conditional GLD NAV study remains uncalculated with its rights/field-clock gates unresolved. NBU methodology/vintage reconciliation is a separate future task. Historical monthly release-day CPI consensus remains unverified; Cleveland model values retain their own label, while the new NY Fed route supplies a different survey instrument. The completed current-archive model comparison does not authenticate an original real-time forecasting record or establish market-consensus coverage.
 
-The real October 2026 CPI pilot remains one unresolved issuance; no outcome or later-month forecast was fabricated. The Newmont workbook and prior validations remain dated artifacts. cTrader stays demo-only; no credentials or trading settings were changed.
+The real October 2026 CPI pilot remains one unresolved issuance; no outcome or later-month forecast was fabricated. A new [evening as-of evaluation](cpi-pilot-asof-2026-11-09-evening.json), at18:01:35UTC on9November, retains that one unresolved case and no scores. Its13:30UTC issuance cutoff has passed. The [official November BLS calendar](https://www.bls.gov/schedule/2026/11_sched.htm) was rechecked and still schedules October CPI for10November08:30Eastern; the schedule is not evidence of actual publication. The Newmont workbook and prior validations remain dated artifacts. cTrader stays demo-only; no credentials or trading settings were changed.

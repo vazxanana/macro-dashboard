@@ -2,9 +2,9 @@
 
 **Purpose:** Navigate the macro, gold, market-flow, issuer-fundamental, and cTrader demo-research material in this folder. This index is a map, not a substitute for checking the current primary source.
 
-**Reference update:** The [8 November quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
+**Reference update:** The [8 November quality audit and the assistant correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
 
-**Latest increment:** [9 November findings, validation and unfinished work](latest-research-batch-status-2026-11-09.md) adds the 36-release CPI first-print ledger, direct release-integrity evidence, the frozen daily Treasury comparison and a separately defined NBU accounting-gold route. The [8 November batch status](latest-research-batch-status-2026-11-08.md) remains the dated state accompanying the unchanged V1.2 delivery.
+**Latest increment:** [17 November findings and remaining work](latest-research-batch-status-2026-11-17.md) closes the conditional NBU/CPI clock audit and records an unresolved CPI outcome attempt. The complete delivered handoff is V1.4; these later additions belong to the next batch. The [9 November status](latest-research-batch-status-2026-11-09.md) and [8 November status](latest-research-batch-status-2026-11-08.md) retain their dated research context.
 
 ## Start here
 
@@ -23,6 +23,15 @@
 13. [BLS release-integrity worked case](bls-release-integrity-case-2026-11-09.md) — official early-publication evidence, timezone ambiguity and corrected-archive limits.
 14. [CPI dates and daily Treasury movements](treasury-cpi-calendar-study-2022-2024.md) — 36 frozen matched-window comparisons, independent source/control reconstruction, bootstrap uncertainty, placebo and influence checks. Daily association is distinct from causality, gold response and tradability.
 15. [Formal-FOMC exclusion sensitivity](treasury-cpi-fomc-exclusion-2022-2024.md) — a complete bounded statement-calendar audit applied to original windows and controls; one event and nine controls removed without rematching. Broader macro-news coverage remains incomplete.
+16. [Cleveland model versus simple CPI baselines](cpi-model-benchmark-2022-2024.md) — a frozen36-release, first-print numeric comparison with exact losses, three seed months, fixed baselines, uncertainty and influence checks. Core MSE and MAE disagree, intervals span zero, and one event/year changes the MSE-contrast sign; no reliable core advantage or prospective track record is established.
+17. [NY Fed survey-expectations ingestion](nyfed-survey-expectations-ingestion-2026-11-09.md) — two inspected workbooks, publication/format clocks, cohort changes and two independently checked field examples. Questionnaire distribution is not result publication; expectations of the Fed's SEP differ from respondents' own forecasts, and units require field-specific mapping.
+18. [NY Fed survey archive map](nyfed-survey-archive-map-2026-11-09.md) —127 captured cycle rows,455 listed URLs and12 later-update warnings, preserving exact labels and shared file scope. Independent row/link agreement and raw-row hashes validate this discovery layer, without authenticating original publication or every linked document.
+19. [NY Fed survey question coverage](nyfed-survey-question-coverage-2026-11-09.md) —all26 linked workbooks,63,190 aggregate records and exact family/tag presence masks. Stable headers do not establish common questions, units or horizons; category counts and qualitative PDF content need distinct treatment. A compact reference points to the full searchable catalogue and scoped validation.
+20. [NBU accounting-gold methodology and clocks](nbu-gold-methodology-and-clocks-2026-11-09.md) —dated commencement, wartime freeze/restoration, seasonal carryover, gold/FX timing and a date-only projection. This corrects an overbroad2021-baseline reading; advancing labels do not authenticate fresh quotes. No prices, returns or USD back-conversion were analyzed.
+21. [NBU/CPI clock compatibility](nbu-cpi-clock-compatibility-2022-2024.md) and [saved-result validation](nbu-cpi-clock-validation-2026-11-17.json) — 36 scheduled-release comparisons, one frozen-rule case and two daylight-saving exceptions; 756 independent per-event fields agree. Conditional reference clocks do not authenticate actual quote or publication times.
+22. [October CPI outcome check — 17 November](cpi-pilot-outcome-check-2026-11-17.md) — current archive candidate 0.3%, with original-vintage/publication gates still open. The original forecast is preserved; one pending null-outcome attempt and zero primary scores.
+23. [Core macro-release overlap source audit](core-macro-overlap-source-audit-2026-11-17.md) — 216 regular monthly records, additional revisions/corrections, special clocks and an eight-release claims sample, against 133 preserved comparison intervals. Four parallel source audits and an independent metadata check expose the remaining coverage gaps; the broader exclusion is not yet evaluated.
+24. [Regular macro date-match review queue](regular-macro-overlap-candidate-map-2026-11-17.md) — 55 regular release rows matching the ending date of 133 fixed intervals, including 38 weekly claims leads. This narrows header checks; it does not classify clean windows or calculate a new Treasury result.
 
 ## Choose a route by question
 
@@ -100,7 +109,7 @@
 - [Market Expectations Capture Playbook](market-expectations-capture-playbook.md): point-in-time Fed rate pricing, breakevens, surveys, and event-expectation capture without conflating market prices and objective probabilities.
 - [Source Gap Audit Template](source-gap-audit-template.md): structured intake, overlap and independence check, official-source evidence matrix, vintage/access/revision controls, interpretation hazards and final registry/index audit for proposed datasets.
 - [GDP revision and composition case](gdp-revision-and-composition-case-2023-q3.md): three archived releases, explicit missing GDI, 45 reported/calculated records, source hashes, revision chains and annualization arithmetic; no retrospective claim of a forecast track record.
-- [Quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
+- [Quality audit and the assistant correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
 
 ### Macro, markets, and positioning
 
