@@ -3076,6 +3076,16 @@ same day's "Before you trade" (its Check-a-trade form, `MD_CHECK` and `tests/mac
   averages, the quarter's range, month `range60`), the last 8 weekly Gold Macro Scores, and the record so far (calibration n of
   `need.scored`, "too few to judge" until then; the weekly ledger's issued / resolved).
 - Every view's first line (`#pl-take`) is the folded header's line (`syncOne`). Wording: "Leans, not calls", never an edge or advice.
+- **More useful (18 Nov 2026, owner: "keep improving it make it more useful")**: every week / month call and hypothesis shows where it
+  stands NOW (`MD_PLAN.status`: the price now, gold = the strategist's mark, the DXY = `regime.dxyProxy`, against the call's level;
+  On track / Off track / Open with the distance; a race read by its geometry, not its kind's name) and the trading days left
+  (`daysLeft`, weekends out); a note says the record is scored on daily closes, not this reading. Today adds the next release's
+  hot / in-line / cool cases (`nextRelease`, from `veteran.json.events` scenarios, its own "not a tested edge" label). "Copy as
+  text" (`#pl-copy`, `MD_PLAN.text`) puts the open view on the clipboard as plain text with the same honesty line.
+- **Found and fixed on the way**: `council/veteran.mjs` `freezeHypotheses` showed the recorded claim with the LIVE reading's kind,
+  base and "Wrong if" when the two differed (18 Nov: H1 read "closes at or above $4,000" with kind `firstTouchDown`, H2 "between
+  $3,853 and $4,149" with "Wrong if: outside $3,800-$3,900"). Display only: scoring reads the ledger, which was right. Now the kind
+  and base come from the record, "Wrong if" is rebuilt from it (`invalidOf`), and the live why / Wrong if go to `live`.
   Tests: `tests/macro-plan.test.mjs` (runs the page's pure block), `tests/macro-visual.test.mjs` (six folding sections).
 
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)

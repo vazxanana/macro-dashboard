@@ -57,3 +57,25 @@ test('the check-a-trade form is gone and the wording never calls a reading an ed
   const all = sec + JSON.stringify([P.day(fc, v, cot, NOW), P.week(fc, v, cot, NOW), P.month(fc, v, NOW)]);
   assert.doesNotMatch(all, /take (this|the) trade|proven edge|guarantee/i); assert.match(sec, /not a signal/); assert.match(sec, /no direction edge/);
 });
+
+test('where each call stands now: price against the level, days left, the next release, the copyable text', () => {
+  const S = (x, g, d) => P.status(x, g, d);
+  assert.deepEqual(S({ kind: 'closeAbove', level: 3885 }, 3734).ok, false); assert.match(S({ kind: 'closeAbove', level: 3885 }, 3734).text, /needs \+4\.0%/);
+  assert.equal(S({ kind: 'touchDown', level: 3860 }, 3734).ok, true); assert.equal(S({ kind: 'touchUp', level: 3920 }, 3734).ok, null);
+  assert.match(S({ kind: 'range', lo: 3840, hi: 3950 }, 3734).text, /^2\.8% below the band/);
+  assert.equal(S({ kind: 'stayInside', lo: 3853, hi: 4149 }, 3734).ok, false);
+  assert.equal(S({ kind: 'bigMove', level: 3885, pct: 0.0256 }, 3734).ok, true);
+  // a race is read by its geometry (target above the guard = up), not by its name
+  assert.equal(S({ kind: 'firstTouchDown', level: 4000, guard: 3853 }, 3734).ok, false);
+  assert.equal(S({ kind: 'firstTouchUp', level: 4000, guard: 3853 }, 3900).ok, null);
+  assert.equal(S({ kind: 'pairDown', level: 103.45, asset: 'dxy' }, 3734, 103.82).ok, false);
+  assert.equal(S({ kind: 'closeAbove', level: 1 }, null), null, 'no price, no status');
+  const wed = Date.parse('2026-11-18T23:00:00Z');
+  assert.equal(P.daysLeft('2026-11-20', wed), 2); assert.equal(P.daysLeft('2026-11-18', wed), 0); assert.equal(P.daysLeft('2026-11-17', wed), -1);
+  assert.equal(P.daysLeft('2026-11-23', wed), 3, 'the weekend is not counted');
+  const w = P.week(fc, v, cot, NOW); assert.ok(w.calls.every((c) => 'now' in c && c.left));
+  const v2 = { ...v, events: [{ at: '2026-11-18T13:30:00Z', country: 'USD', title: 'CPI', released: false, expectations: [{ consensus: '0.3%', previous: '0.2%' }], scenarios: [{ name: 'Hot', when: '≥ 0.4%', usd: 'USD up', gold: 'down' }] }] };
+  const d = P.day(fc, v2, cot, NOW); assert.equal(d.release.consensus, '0.3%'); assert.equal(d.release.scenarios[0].name, 'Hot');
+  const t = P.text('week', w, NOW); assert.match(t, /This week/); assert.match(t, /now: /); assert.match(t, /not a signal/); assert.doesNotMatch(t, /<[a-z]/);
+  assert.match(P.text('day', d, NOW), /Next release: USD CPI/);
+});

@@ -498,6 +498,9 @@
   .pl-tabs button { min-height: 36px; padding: 0 var(--s4); border: 0; border-radius: calc(var(--r-sm) - 2px); background: transparent; color: var(--ink-dim); font: 600 var(--fs-sm) var(--sans); cursor: pointer; }
   .pl-tabs button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
   .pl-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pl-copy { float: right; min-height: 36px; padding: 0 var(--s3); border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: transparent; color: var(--ink); font: 600 var(--fs-sm) var(--sans); cursor: pointer; }
+  .pl-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pl-list b .d { display: block; font-weight: 400; }
   .pl-v h4 { margin: var(--s5) 0 var(--s2); font: 600 var(--fs-sm)/1.4 var(--sans); color: var(--ink); } .pl-v h4 small { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin-left: 6px; }
   .tc-tw { overflow-x: auto; margin: 0 0 var(--s3); border-radius: var(--r-sm); }
   .tc-tw table { border-collapse: collapse; width: 100%; min-width: 560px; font: 400 var(--fs-sm)/1.4 var(--sans); }
@@ -523,8 +526,8 @@
   .pl-sc li { padding: 6px 10px; border-radius: var(--r-sm); background: var(--well); font: 400 12px/1.35 var(--sans); color: var(--ink-dim); text-align: center; }
   .pl-sc li b { display: block; color: var(--ink); font: 600 var(--fs-sm) var(--sans); font-variant-numeric: tabular-nums; }
   .pl-sc li.now { box-shadow: inset 0 0 0 1px var(--line-strong); }
-  @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } }
-  @media (pointer: coarse) { .pl-tabs button { min-height: 44px; } }
+  @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } .pl-copy { float: none; width: 100%; margin: 0 0 var(--s3); } }
+  @media (pointer: coarse) { .pl-tabs button, .pl-copy { min-height: 44px; } }
   /* ─── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
      The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
      ms-phone = "full" keeps the full view; the same key and attribute as the Desk). The first screen is the glance alone: the
@@ -630,7 +633,7 @@
   <section class="story sfold" id="s-plan" aria-labelledby="pl-h">
     <header class="st-h"><h2 id="pl-h">Your read</h2><small class="st-m">today, this week, this month</small><button type="button" class="st-go" id="go-s-plan" aria-expanded="false" aria-controls="c-plan" aria-labelledby="pl-h one-s-plan"><span class="st-one" id="one-s-plan"></span></button></header>
     <article class="card plan" id="c-plan" hidden>
-      <div class="pl-tabs" role="tablist" aria-label="Horizon"><button type="button" role="tab" id="pl-t-day" data-pl="day" aria-controls="pl-day" aria-selected="true">Today</button><button type="button" role="tab" id="pl-t-week" data-pl="week" aria-controls="pl-week" aria-selected="false" tabindex="-1">This week</button><button type="button" role="tab" id="pl-t-month" data-pl="month" aria-controls="pl-month" aria-selected="false" tabindex="-1">This month</button></div>
+      <div class="pl-tabs" role="tablist" aria-label="Horizon"><button type="button" role="tab" id="pl-t-day" data-pl="day" aria-controls="pl-day" aria-selected="true">Today</button><button type="button" role="tab" id="pl-t-week" data-pl="week" aria-controls="pl-week" aria-selected="false" tabindex="-1">This week</button><button type="button" role="tab" id="pl-t-month" data-pl="month" aria-controls="pl-month" aria-selected="false" tabindex="-1">This month</button></div><button type="button" class="pl-copy" id="pl-copy" aria-live="polite">Copy as text</button>
       <p class="c-take" id="pl-take" aria-live="polite"></p>
       <div class="pl-v" id="pl-day" role="tabpanel" aria-labelledby="pl-t-day"></div>
       <div class="pl-v" id="pl-week" role="tabpanel" aria-labelledby="pl-t-week" hidden></div>
@@ -1192,7 +1195,7 @@
         + '<div class="pbl" aria-hidden="true"><span>0%</span>' + (b != null ? '<span class="b" style="left:' + Math.max(14, Math.min(86, b)) + '%">base ' + b + '%</span>' : '') + '<span class="r">100%</span></div>'
         + '<p><em>Due ' + esc(h.by) + ' · ' + st + '</em>' + (num(h.pRaw) && h.pRaw !== h.p ? ' <em>· ' + pct(h.pRaw) + ' before calibration</em>' : '') + '</p>'
         + '<details><summary>Why, and what breaks it</summary>'
-        + '<p><em>Base:</em> ' + (bs.n ? bs.k + ' of ' + bs.n + ' analogs (' + pct(bs.analog) + ') vs ' + pct(bs.all) + ' of all ' + (bs.allN || '') + ' weeks' : NA) + '. ' + esc(h.why) + '</p>'
+        + '<p><em>Base:</em> ' + (bs.n ? bs.k + ' of ' + bs.n + ' analogs (' + pct(bs.analog) + ') vs ' + pct(bs.all) + ' of all ' + (bs.allN || '') + ' weeks' : NA) + '. ' + esc(h.why || (h.live ? 'The reasons given on the day it was recorded are not kept; the live reading is below.' : '')) + '</p>'
         + '<p><em>Invalidated by:</em> ' + esc(h.invalid) + '</p>'
         + '<p><em>On the record:</em> ' + (h.issued ? 'issued ' + esc(h.issued) : 'recorded on the next run') + ', due ' + esc(h.by) + (h.live ? ' · live reading now: ' + esc(h.live.claim) + ' (' + pct(h.live.p) + ')' : '') + '</p></details></article>'; }).join('');
   }
@@ -1401,12 +1404,48 @@
       return { above: up, below: dn };
     }
     function calls(v, h) { var o = v && v.outlook && v.outlook[h]; return { by: o && o.by, from: o && o.from, asOf: v && v.outlook && v.outlook.anchor && v.outlook.anchor.asOf, list: ((o && o.list) || []).filter(function (c) { return c && n(c.p); }).map(function (c) {
-      return { claim: c.claim, p: +c.p, base: n(c.baseP) ? +c.baseP : null, asset: c.asset, kind: c.kind, lo: n(c.lo) ? +c.lo : null, hi: n(c.hi) ? +c.hi : null, stretch: /stretch/.test(c.claim || '') }; }) }; }
+      return { claim: c.claim, p: +c.p, base: n(c.baseP) ? +c.baseP : null, asset: c.asset, kind: c.kind, lo: n(c.lo) ? +c.lo : null, hi: n(c.hi) ? +c.hi : null, level: n(c.level) ? +c.level : null, pct: n(c.pct) ? +c.pct : null, by: c.by || (o && o.by), stretch: /stretch/.test(c.claim || '') }; }) }; }
     function hyps(v, h) { return ((v && v.briefing && v.briefing.hypotheses) || []).filter(function (x) { return x && x.horizon === h && n(x.p); }).map(function (x) {
-      return { slot: x.slot, claim: x.claim, p: +x.p, base: x.base && n(x.base.all) ? +x.base.all : null, by: x.by, invalid: x.invalid }; }); }
+      return { slot: x.slot, claim: x.claim, p: +x.p, base: x.base && n(x.base.all) ? +x.base.all : null, by: x.by, invalid: x.invalid, asset: x.asset, kind: x.kind,
+        level: n(x.level) ? +x.level : null, guard: n(x.guard) ? +x.guard : null, lo: n(x.lo) ? +x.lo : null, hi: n(x.hi) ? +x.hi : null }; }); }
     function scoreHist(fc) { var g = fc && fc.goldScore; if (!g || !g.ok) return []; var h = (g.hist && g.hist.length ? g.hist : []).filter(function (x) { return x && n(x[1]); });
       if (!h.length && g.path) h = g.path.map(function (s, i) { return [null, s]; }).filter(function (x) { return n(x[1]); });
       return h.map(function (x) { return { at: x[0], s: +x[1] }; }); }
+    // Where a call stands NOW: the price now (gold: the strategist's mark; the DXY: the strategist's proxy) against the call's
+    // level. A reading of the price, not a close: the record is scored on daily closes (council/outlook.mjs resolveCall).
+    function status(x, gpx, dpx) {
+      var dxy = x.asset === 'dxy', px = dxy ? dpx : gpx, L = x.level; if (px == null) return null;
+      var f = function (v) { return dxy ? (+v).toFixed(2) : fmt('gold', v); }, pc = function (a, b) { return (b / a - 1) * 100; };
+      var sg = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + '%'; };
+      switch (x.kind) {
+        case 'closeAbove': case 'pairUp': if (L == null) return null; return px > L ? { ok: true, text: 'Above ' + f(L) + ' now' } : { ok: false, text: 'Below ' + f(L) + ' now: needs ' + sg(pc(px, L)) };
+        case 'pairDown': if (L == null) return null; return px < L ? { ok: true, text: 'Below ' + f(L) + ' now' } : { ok: false, text: 'Above ' + f(L) + ' now: needs ' + sg(pc(px, L)) };
+        case 'touchUp': if (L == null) return null; return px >= L ? { ok: true, text: 'At or above ' + f(L) + ' now' } : { ok: null, text: f(L) + ' is ' + sg(pc(px, L)) + ' away' };
+        case 'touchDown': if (L == null) return null; return px <= L ? { ok: true, text: 'At or below ' + f(L) + ' now' } : { ok: null, text: f(L) + ' is ' + sg(pc(px, L)) + ' away' };
+        case 'range': case 'stayInside': if (x.lo == null || x.hi == null) return null;
+          if (px >= x.lo && px <= x.hi) return { ok: true, text: 'Inside ' + f(x.lo) + '–' + f(x.hi) + ' now' };
+          return { ok: x.kind === 'stayInside' ? false : null, text: (px < x.lo ? Math.abs(pc(x.lo, px)).toFixed(1) + '% below the band' : Math.abs(pc(x.hi, px)).toFixed(1) + '% above the band') + (x.kind === 'stayInside' ? ': a daily close out there ends it' : ' now') };
+        case 'bigMove': if (L == null || x.pct == null) return null; var mv = Math.abs(px / L - 1) * 100, need = x.pct * 100;
+          return mv >= need ? { ok: true, text: 'Moved ' + mv.toFixed(1) + '% so far' } : { ok: null, text: 'Moved ' + mv.toFixed(1) + '% of the ' + need.toFixed(1) + '% needed' };
+        case 'firstTouchUp': case 'firstTouchDown': if (L == null || x.guard == null) return null; var up = L > x.guard;   // geometry, not the name
+          if (up ? px <= x.guard : px >= x.guard) return { ok: false, text: (up ? 'Below' : 'Above') + ' the guard ' + f(x.guard) + ' now: a daily close there ends it' };
+          if (up ? px >= L : px <= L) return { ok: true, text: 'At the target ' + f(L) + ' now' };
+          return { ok: null, text: 'Target ' + sg(pc(px, L)) + ' away, guard ' + sg(pc(px, x.guard)) };
+      }
+      return null;
+    }
+    function daysLeft(by, now) {   // trading days after today up to the due date (weekends left out)
+      var end = Date.parse(String(by || '') + 'T23:59:59Z'); if (isNaN(end)) return null; if (end < now) return -1;
+      var d = new Date(now); d.setUTCHours(0, 0, 0, 0); var k = 0; d.setUTCDate(d.getUTCDate() + 1);
+      while (d.getTime() <= end) { var w = d.getUTCDay(); if (w > 0 && w < 6) k++; d.setUTCDate(d.getUTCDate() + 1); } return k;
+    }
+    function leftText(k) { return k == null ? '' : k < 0 ? 'due date passed: scored on the next run' : k === 0 ? 'due today' : k + ' trading day' + (k > 1 ? 's' : '') + ' left'; }
+    function withStatus(list, gpx, dpx, now) { return list.map(function (x) { var o = {}; for (var k in x) o[k] = x[k]; o.now = status(x, gpx, dpx); o.left = leftText(daysLeft(x.by, now)); return o; }); }
+    // the next release with its hot / in-line / cool cases (council/playbook.mjs, veteran.json events), within 72 hours
+    function nextRelease(v, now) { var e = ((v && v.events) || []).filter(function (e) { return e && !e.released && e.scenarios && e.scenarios.length && Date.parse(e.at) >= now - 30 * 60e3; })
+        .sort(function (a, b) { return Date.parse(a.at) - Date.parse(b.at); })[0]; if (!e) return null; var x = (e.expectations || [])[0] || {};
+      return { title: (e.titles && e.titles.length > 1 ? e.titles.join(', ') : e.title), country: e.country, at: e.at, h: (Date.parse(e.at) - now) / 36e5, consensus: x.consensus || null, previous: x.previous || null,
+        move: e.expMovePct, scenarios: e.scenarios.map(function (c) { return { name: c.name, when: c.when, path: c.path, usd: c.usd, gold: c.gold, action: c.action }; }), label: e.label || 'Descriptive, not a tested edge.' }; }
     // TODAY: leans, today's range, releases in 24 h, the mood, gold's nearest levels
     function day(fc, v, cot, now) {
       var mk = Object.keys(NAME).filter(function (m) { return fc && fc.assets && fc.assets[m]; }), ev = within(fc, v, now, -AFTER_H, 24);
@@ -1421,11 +1460,12 @@
       var take = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets today' : 'No macro lean on any market today')
         + (ev.length ? '; ' + ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' in the next 24 hours' + (w ? ' (' + w + ' market' + (w > 1 ? 's' : '') + ': wait for the print)' : '') : '; no release in the next 24 hours')
         + (mood.hot ? '; stress is up' : '') + '. Leans, not calls.';
-      return { rows: rows, events: ev, mood: mood, gold: { px: px, above: lv.above, below: lv.below }, take: take };
+      return { rows: rows, events: ev, mood: mood, gold: { px: px, above: lv.above, below: lv.below }, release: nextRelease(v, now), take: take };
     }
     // THIS WEEK: the veteran's week calls and hypotheses, the week's releases, what changed, positioning, the score against last week
     function week(fc, v, cot, now) {
-      var c = calls(v, 'week'), hy = hyps(v, 'week'), ev = within(fc, v, now, -12, 7 * 24), sh = scoreHist(fc);
+      var c = calls(v, 'week'), hy = hyps(v, 'week'), ev = within(fc, v, now, -12, 7 * 24), sh = scoreHist(fc), gp = goldPx(fc, v), dp = fc && fc.regime && n(fc.regime.dxyProxy) ? +fc.regime.dxyProxy : null;
+      c.list = withStatus(c.list, gp, dp, now); hy = withStatus(hy, gp, dp, now);
       var px = goldPx(fc, v), wk = levels(v).filter(function (l) { return l.kind === 'week' || (l.kind === 'range60' && /^Week/.test(l.label || '')); }).sort(function (a, b) { return b.price - a.price; });
       var pos = Object.keys(COT).map(function (m) { var x = cotOf(m, cot); return x ? { m: m, name: NAME[m], pct: x.pct, crowded: x.crowded, chg1: x.chg1, sign: x.sign, who: x.who, asOf: x.asOf } : null; }).filter(Boolean);
       var sNow = sh.length ? sh[sh.length - 1].s : null, sPrev = sh.length > 1 ? sh[sh.length - 2].s : null;
@@ -1440,7 +1480,8 @@
     function numFrom(claim, i) { var m = String(claim || '').match(/\$([\d,]+(?:\.\d+)?)/g); return m && m[i] ? +m[i].replace(/[$,]/g, '') : null; }
     // THIS MONTH: the veteran's month calls and hypotheses, the slower levels, the score path, the record so far
     function month(fc, v, now) {
-      var c = calls(v, 'month'), hy = hyps(v, 'month'), sh = scoreHist(fc).slice(-8), px = goldPx(fc, v);
+      var c = calls(v, 'month'), hy = hyps(v, 'month'), sh = scoreHist(fc).slice(-8), px = goldPx(fc, v), dp = fc && fc.regime && n(fc.regime.dxyProxy) ? +fc.regime.dxyProxy : null;
+      c.list = withStatus(c.list, px, dp, now); hy = withStatus(hy, px, dp, now);
       var lv = levels(v).filter(function (l) { return l.kind === 'month' || l.kind === 'sma' || l.kind === 'range' || (l.kind === 'range60' && /^Month/.test(l.label || '')); }).sort(function (a, b) { return b.price - a.price; });
       var cal = (v && v.calibration) || {}, led = (v && v.ledger) || {}, need = cal.need && n(cal.need.scored) ? +cal.need.scored : 30, scored = n(cal.n) ? +cal.n : 0;
       var track = { scored: scored, need: need, judged: scored >= need && cal.state !== 'waiting', issued: n(led.issued) ? +led.issued : null, resolved: n(led.resolved) ? +led.resolved : null };
@@ -1452,15 +1493,37 @@
         other: c.list.filter(function (x) { return x.asset !== 'gold'; }), hyps: hy, levels: lv, px: px, score: sh, track: track, take: take };
     }
     function sgn(x) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2); }
-    return { day: day, week: week, month: month, lean: lean, cotOf: cotOf, events: events, inH: inH, fmt: fmt, sgn: sgn, nearest: nearest, NAME: NAME, MARKETS: Object.keys(NAME) };
+    // the view as plain text, to paste into a note or a message (Copy as text)
+    function text(view, r, now) {
+      var d = new Date(now).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', L = ['Aureum Desk · Macro read · ' + (view === 'day' ? 'Today' : view === 'week' ? 'This week' : 'This month') + ' · ' + d, '', r.take, ''];
+      var pct = function (x) { return Math.round(x.p * 100) + '%' + (x.base != null ? ' (base ' + Math.round(x.base * 100) + '%)' : ''); };
+      var callLines = function (list) { list.forEach(function (x) { L.push('- ' + pct(x) + ' ' + x.claim + (x.now ? ' · now: ' + x.now.text : '') + (x.left ? ' · ' + x.left : '')); }); };
+      if (view === 'day') {
+        r.rows.forEach(function (x) { L.push('- ' + x.name + ': ' + (x.lean === 'up' ? 'leans up ' + Math.round(x.pUp * 100) + '%' : x.lean === 'down' ? 'leans down ' + Math.round(100 - x.pUp * 100) + '%' : 'no lean')
+          + (x.move != null ? ' · normal day ±' + x.move + '%' + (x.lo != null ? ' (' + fmt(x.m, x.lo) + '–' + fmt(x.m, x.hi) + ')' : '') : '') + (x.next ? ' · ' + (x.wait ? 'WAIT: ' : 'next: ') + (x.next.country ? x.next.country + ' ' : '') + x.next.title + ' ' + inH(x.next.h) : '') + (x.cot && x.cot.crowded ? ' · crowded ' + x.cot.crowded : '')); });
+        if (r.gold.px != null) L.push('', 'Gold ' + fmt('gold', r.gold.px) + ': above ' + (r.gold.above ? fmt('gold', r.gold.above.price) + ' (' + r.gold.above.label + ')' : 'none') + ', below ' + (r.gold.below ? fmt('gold', r.gold.below.price) + ' (' + r.gold.below.label + ')' : 'none'));
+        if (r.release) { L.push('', 'Next release: ' + (r.release.country ? r.release.country + ' ' : '') + r.release.title + ' ' + inH(r.release.h) + (r.release.consensus ? ' · consensus ' + r.release.consensus : '') + (r.release.previous ? ' · previous ' + r.release.previous : ''));
+          r.release.scenarios.forEach(function (c) { L.push('- ' + c.name + ' (' + c.when + '): ' + c.usd + '; gold: ' + c.gold); }); }
+      } else {
+        L.push((view === 'week' ? 'Week' : 'Month') + ' calls to ' + (r.by || '?') + ', issued from the ' + (r.asOf || 'last') + ' close (' + (r.from || '?') + '):'); callLines(r.calls);
+        if (r.hyps.length) { L.push('', 'Hypotheses:'); callLines(r.hyps); }
+        if (r.other && r.other.length && view === 'month') { L.push('', 'The dollar:'); callLines(r.other); }
+        if (view === 'week' && r.events.length) { L.push('', 'Releases:'); r.events.forEach(function (e) { L.push('- ' + new Date(e.at).toISOString().slice(0, 16).replace('T', ' ') + ' UTC ' + (e.country ? e.country + ' ' : '') + e.title); }); }
+      }
+      L.push('', 'Context, not a signal: none of these readings has passed a test as an edge. Paper only.');
+      return L.join('\n');
+    }
+    return { day: day, week: week, month: month, text: text, status: status, daysLeft: daysLeft, lean: lean, cotOf: cotOf, events: events, inH: inH, fmt: fmt, sgn: sgn, nearest: nearest, NAME: NAME, MARKETS: Object.keys(NAME) };
   })();
   var PL = { view: 'day', data: null };
   try { var pl0 = localStorage.getItem('mdPlan'); if (pl0 === 'week' || pl0 === 'month') PL.view = pl0; } catch (e) {}
   function plChip(state, word) { return '<span class="tc-st ' + state + '">' + esc(word) + '</span>'; }
   function plOrd(x) { x = Math.round(x); var t = x % 100, u = x % 10; return x + (t >= 11 && t <= 13 ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th'); }
   function plPct(p, b) { return '<b>' + Math.round(p * 100) + '%<span class="d">' + (b != null ? 'base ' + Math.round(b * 100) + '%' + (Math.round((p - b) * 100) ? ' · ' + (p > b ? '+' : '−') + Math.abs(Math.round((p - b) * 100)) + ' pts' : '') : 'no base') + '</span></b>'; }
-  function plCalls(list) { return '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + '</span></li>'; }).join('') + '</ul>'; }
-  function plHyps(list) { return list.length ? '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + (x.invalid ? '<br><small>Wrong if: ' + esc(x.invalid) + '</small>' : '') + '</span></li>'; }).join('') + '</ul>' : ''; }
+  function plNow(x) { return (x.now ? '<br>' + plChip(x.now.ok === true ? 'with' : x.now.ok === false ? 'against' : 'neutral', x.now.ok === true ? 'On track now' : x.now.ok === false ? 'Off track now' : 'Open') + ' <small>' + esc(x.now.text) + '</small>' : '') + (x.left ? ' <small>· ' + esc(x.left) + '</small>' : ''); }
+  function plCalls(list) { return '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + plNow(x) + '</span></li>'; }).join('') + '</ul>'; }
+  function plHyps(list) { return list.length ? '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + plNow(x) + (x.invalid ? '<br><small>Wrong if: ' + esc(x.invalid) + '</small>' : '') + '</span></li>'; }).join('') + '</ul>' : ''; }
+  var PL_NOWNOTE = '<p class="note">"Now" reads the price now, not a close: the record is scored on daily closes.</p>';
   function plEvents(list, now) { var M = MD_PLAN; return list.length ? '<ul class="pl-list">' + list.map(function (e) {
       var d = new Date(e.at), when = d.toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
       return '<li><b>' + esc(when) + '</b><span>' + (e.h <= 1 && e.h >= -0.5 ? plChip('wait', 'Wait') + ' ' : '') + esc((e.country ? e.country + ' ' : '') + e.title) + ' <span class="d">' + esc(M.inH(e.h)) + (e.released ? ' · printed' : '') + (e.markets.length ? ' · reaches ' + e.markets.map(function (m) { return M.NAME[m]; }).join(', ') : '') + (e.move != null ? ' · gold ±' + e.move + '% on a typical day like it' : '') + '</span></span></li>'; }).join('') + '</ul>'
@@ -1477,10 +1540,12 @@
           var nx = x.next ? (x.wait ? plChip('wait', 'Wait') : plChip('caution', 'Watch')) + ' ' + esc((x.next.country ? x.next.country + ' ' : '') + x.next.title) + ' <small>' + esc(M.inH(x.next.h)) + '</small>' : plChip('clear', 'None');
           return '<tr><th scope="row">' + esc(x.name) + '</th><td>' + le + '</td><td class="n">' + (x.move != null ? '±' + x.move + '%' : '—') + (x.lo != null ? '<br><small>' + esc(M.fmt(x.m, x.lo)) + ' – ' + esc(M.fmt(x.m, x.hi)) + '</small>' : '') + (x.volRatio != null && x.volRatio >= 1.3 ? '<br><small>' + x.volRatio.toFixed(1) + 'x usual</small>' : '') + '</td><td>' + nx + '</td><td>' + (x.cot ? plOrd(x.cot.pct) + ' pct' + (x.cot.crowded ? ' · <b>crowded ' + x.cot.crowded + '</b>' : '') : '—') + '</td></tr>'; }).join('') + '</tbody></table></div>'
         + (r.gold.px != null ? '<h4>Gold\'s nearest levels <small>from the price now, ' + esc(M.fmt('gold', r.gold.px)) + '</small></h4><div class="pl-lv"><div>Above' + (r.gold.above ? '<b>' + esc(M.fmt('gold', r.gold.above.price)) + '</b>' + esc(r.gold.above.label) + ' · ' + ((r.gold.above.price - r.gold.px) / r.gold.px * 100).toFixed(1) + '% away' : '<b>—</b>none on his list') + '</div><div>Below' + (r.gold.below ? '<b>' + esc(M.fmt('gold', r.gold.below.price)) + '</b>' + esc(r.gold.below.label) + ' · ' + ((r.gold.px - r.gold.below.price) / r.gold.px * 100).toFixed(1) + '% away' : '<b>—</b>none on his list') + '</div></div>' : '')
+        + (r.release ? '<h4>Next release: ' + esc((r.release.country ? r.release.country + ' ' : '') + r.release.title) + ' <small>' + esc(M.inH(r.release.h)) + (r.release.consensus ? ' · consensus ' + esc(r.release.consensus) : '') + (r.release.previous ? ' · previous ' + esc(r.release.previous) : '') + (r.release.move != null ? ' · gold ±' + r.release.move + '% on a normal day' : '') + '</small></h4><ul class="pl-list">'
+          + r.release.scenarios.map(function (c) { return '<li><b>' + esc(c.name) + '<span class="d">' + esc(c.when || '') + '</span></b><span>' + esc([c.path, c.usd, 'gold: ' + c.gold].filter(Boolean).join(' · ')) + '<br><small>' + esc(c.action || '') + '</small></span></li>'; }).join('') + '</ul><p class="note">' + esc(r.release.label) + ' The playbook\'s reading of each case, from the release history where the repository has one.</p>' : '')
         + '<h4>Releases in the next 24 hours <small>the playbook acts after the print, not before</small></h4>' + plEvents(r.events, now)
         + '<h4>Mood</h4><p class="note" style="margin-top:0">' + (r.mood.vix != null ? 'VIX ' + r.mood.vix.toFixed(1) + (r.mood.inverted ? ', its curve inverted (stress)' : '') + '. ' : '') + (r.mood.wide.length ? 'Moving more than usual: ' + esc(r.mood.wide.join(', ')) + '. ' : '') + (r.mood.hot ? 'Moves can run larger than usual: a stop of the usual size is hit more easily.' : 'Calm by these measures.') + '</p>';
     } else if (PL.view === 'week') { r = M.week(D.fc, D.v, D.cot, now);
-      h = '<h4>The veteran\'s week calls <small>to ' + esc(r.by || '—') + ' · issued once a week from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' ("today\'s close" in a call means that close) · his chance against the base rate of all weeks since 2007</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No week call on file.</p>')
+      h = PL_NOWNOTE.replace('<p class="note">', '<p class="note" style="margin:0">') + '<h4>The veteran\'s week calls <small>to ' + esc(r.by || '—') + ' · issued once a week from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' ("today\'s close" in a call means that close) · his chance against the base rate of all weeks since 2007</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No week call on file.</p>')
         + (r.hyps.length ? '<h4>His hypotheses for the week <small>and what proves them wrong</small></h4>' + plHyps(r.hyps) : '')
         + (r.levels.length ? '<h4>The week\'s levels</h4>' + plLevels(r.levels, r.px) : '')
         + '<h4>Releases this week</h4>' + plEvents(r.events, now)
@@ -1488,17 +1553,21 @@
         + (r.score.now != null ? '<h4>Gold Macro Score</h4><p class="note" style="margin-top:0">Now ' + M.sgn(r.score.now) + (r.score.prev != null ? ', last week ' + M.sgn(r.score.prev) + ' (' + (Math.abs(r.score.now - r.score.prev) < 0.05 ? 'about unchanged' : r.score.now > r.score.prev ? 'more support for a buy' : 'less support for a buy') + ')' : '') + '. Read for buys only (above +0.25 supports one); in sample, not proven.</p>' : '')
         + (r.positioning.length ? '<h4>Positioning <small>speculators, 3-year percentile, and the week\'s change in their net</small></h4><ul class="pl-list">' + r.positioning.map(function (p) { return '<li><b>' + esc(p.name) + '</b><span>' + plOrd(p.pct) + ' percentile' + (p.crowded ? ' · <b>crowded ' + p.crowded + '</b>' : '') + (p.chg1 != null ? ' · net ' + (p.chg1 >= 0 ? '+' : '−') + Math.abs(p.chg1).toLocaleString('en-US') + ' contracts this week' + (p.sign < 0 ? ' (yen futures)' : '') : '') + ' <span class="d">' + esc(p.who || '') + (p.asOf ? ' · report of ' + esc(p.asOf) : '') + '</span></span></li>'; }).join('') + '</ul><p class="note">Context only: the pre-registered positioning test found no edge.</p>' : '');
     } else { r = M.month(D.fc, D.v, now);
-      h = '<h4>The veteran\'s month calls <small>to ' + esc(r.by || '—') + ' · issued from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' · his chance against the base rate</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No month call on file.</p>')
+      h = PL_NOWNOTE.replace('<p class="note">', '<p class="note" style="margin:0">') + '<h4>The veteran\'s month calls <small>to ' + esc(r.by || '—') + ' · issued from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' · his chance against the base rate</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No month call on file.</p>')
         + (r.hyps.length ? '<h4>His hypotheses for the month</h4>' + plHyps(r.hyps) : '')
         + (r.other.length ? '<h4>The dollar</h4>' + plCalls(r.other) : '')
         + (r.levels.length ? '<h4>The slower levels <small>monthly extremes, averages, the quarter\'s range</small></h4>' + plLevels(r.levels, r.px) : '')
         + (r.score.length ? '<h4>Gold Macro Score, week by week</h4><ul class="pl-sc">' + r.score.map(function (x, i) { return '<li' + (i === r.score.length - 1 ? ' class="now"' : '') + '><b>' + M.sgn(x.s) + '</b>' + esc(x.at ? new Date(x.at + 'T00:00:00Z').toLocaleDateString([], { day: 'numeric', month: 'short', timeZone: 'UTC' }) : '') + '</li>'; }).join('') + '</ul><p class="note">Above +0.25 supports a buy; a negative score is never a sell. In sample, not proven out of sample.</p>' : '')
         + '<h4>The record so far</h4><p class="note" style="margin-top:0">' + r.track.scored + ' of the ' + r.track.need + ' scored calls calibration needs' + (r.track.judged ? ': enough to judge (see Track record).' : ': too few to judge, so read every percentage above as the base rate plus a small tilt.') + (r.track.issued != null ? ' Weekly ledger: ' + r.track.issued + ' issued, ' + (r.track.resolved || 0) + ' resolved.' : '') + '</p>';
     }
-    $('pl-take').textContent = r.take;
+    $('pl-take').textContent = r.take; PL.r = r;
     ['day', 'week', 'month'].forEach(function (k) { var p = $('pl-' + k), t = $('pl-t-' + k), on = k === PL.view; p.hidden = !on; if (on) p.innerHTML = h; else p.innerHTML = ''; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
     if (typeof syncOne === 'function') syncOne();
   }
+  $('pl-copy').addEventListener('click', function () { if (!PL.r) return; var t = MD_PLAN.text(PL.view, PL.r, Date.now()), b = this;
+    var done = function (ok) { b.textContent = ok ? 'Copied' : 'Copy failed'; setTimeout(function () { b.textContent = 'Copy as text'; }, 1800); };
+    var fb = function () { try { var a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly', ''); a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select(); var ok = document.execCommand('copy'); a.remove(); done(ok); } catch (e) { done(false); } };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, fb); else fb(); });
   document.querySelector('.pl-tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-pl]'); if (!b) return; PL.view = b.dataset.pl; try { localStorage.setItem('mdPlan', PL.view); } catch (x) {} drawPlan(); });
   document.querySelector('.pl-tabs').addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; var k = ['day', 'week', 'month'], i = (k.indexOf(PL.view) + (e.key === 'ArrowRight' ? 1 : 2)) % 3;
     PL.view = k[i]; try { localStorage.setItem('mdPlan', PL.view); } catch (x) {} drawPlan(); $('pl-t-' + PL.view).focus(); });

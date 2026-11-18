@@ -485,11 +485,24 @@ export function veteranSection(v) {
 
 // The hypotheses on the record are the week's first version: the desk shows the recorded claim, probability and levels (with the
 // live reading beside it when the levels have moved since), and the hypotheses' own track record.
+// "Wrong if" of a recorded hypothesis, from its own kind and levels (the record keeps no text; briefing.mjs words it the same way).
+const usd0 = (v) => '$' + Math.round(v).toLocaleString('en-US');
+export function invalidOf(r) {
+  if ((r.kind === 'firstTouchUp' || r.kind === 'firstTouchDown') && Number.isFinite(r.guard) && Number.isFinite(r.level)) {
+    const up = r.level > r.guard; return `a daily close ${up ? 'below' : 'above'} ${usd0(r.guard)} before the target`;
+  }
+  if (r.kind === 'stayInside' && Number.isFinite(r.lo) && Number.isFinite(r.hi)) return `any daily close outside ${usd0(r.lo)}-${usd0(r.hi)}`;
+  if ((r.kind === 'pairUp' || r.kind === 'pairDown') && Number.isFinite(r.level)) { const up = r.kind === 'pairUp';
+    return `DXY ${up ? 'below' : 'above'} ${(r.level * (up ? 0.985 : 1.015)).toFixed(2)} (${up ? '−' : '+'}1.5%) on a close`; }
+  return null;
+}
 export function freezeHypotheses(b, CL) {
   const by = new Map((CL || []).map((r) => [r.id, r]));
   b.hypotheses = b.hypotheses.map((h) => { const r = by.get(h.id); if (!r) return h;
     const moved = r.claim !== h.claim || r.p !== h.p;
-    return { ...h, claim: r.claim, p: r.p, level: r.level, guard: r.guard ?? h.guard, lo: r.lo, hi: r.hi, by: r.by, issued: r.issued, hit: r.hit ?? null, ...(moved ? { live: { claim: h.claim, p: h.p } } : {}) }; });
+    // the shown hypothesis is the recorded one: its kind, levels and "Wrong if" with it; today's reading (and its why) go to `live`
+    return { ...h, kind: r.kind ?? h.kind, base: r.base ?? h.base, claim: r.claim, p: r.p, level: r.level, guard: r.guard ?? h.guard, lo: r.lo, hi: r.hi, by: r.by, issued: r.issued, hit: r.hit ?? null,
+      invalid: moved ? (invalidOf(r) ?? null) : h.invalid, ...(moved ? { why: null, live: { claim: h.claim, p: h.p, why: h.why, invalid: h.invalid } } : {}) }; });
   const done = (CL || []).filter((r) => r.src === 'veteran hypothesis');
   b.record = callsScore(done); b.recent = done.filter((r) => r.hit != null).slice(-8).reverse();
   return b;
