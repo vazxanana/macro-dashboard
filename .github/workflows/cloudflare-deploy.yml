@@ -156,6 +156,14 @@ jobs:
               [ -n "$(printenv "W_$n" || true)" ] && continue
               if openssl rand -base64 48 | tr -d '\n=+/' | npx wrangler secret put "$n" >/dev/null 2>&1; then echo "made  $n (random, never shown)"; else echo "::warning::could not set $n"; fi
             done
+            # 18 Nov 2026: the Vercel Blob token was lost with the other secrets and the Vercel project is gone, so the store is
+            # read from its complete D1 copy (STORE=d1, docs/cloudflare.md "File store on D1"). Only when the Worker holds no
+            # Blob token, no repository secret gives one and STORE is not set; delete STORE on the Worker to go back.
+            case " $have " in *" BLOB_READ_WRITE_TOKEN "*|*" STORE "*) ;; *)
+              if [ -z "$(printenv W_BLOB_READ_WRITE_TOKEN || true)" ]; then
+                printf 'd1' | npx wrangler secret put STORE >/dev/null 2>&1 && echo "made  STORE = d1 (file store read from its D1 copy)" || echo "::warning::could not set STORE"
+              fi;;
+            esac
           fi
 
       # The file store's copy in D1 (docs/cloudflare.md, "File store on D1"): the mirror's state and file counts by folder
