@@ -1403,7 +1403,8 @@ document.addEventListener('DOMContentLoaded', function () {
     try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
     clearTimeout(tm);
     if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' }); lab.textContent = 'Signed in · opening the desk…'; showPw(false);
-      try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+      try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {}
+      (window.msGateWelcome ? window.msGateWelcome(j.account) : Promise.resolve()).then(function () { location.reload(); }); return; }
     btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; lab.textContent = 'Sign in';
     if (!r) { fail(timedOut ? 'The server took too long to answer. Try again.' : navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.'); return; }
     if (r.status === 429) { fail((j && j.error) || 'Too many tries. Wait a few minutes, then try again.')   /* api/_guard.js */; return; }
@@ -2644,6 +2645,19 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <button type="button" class="gate-guest" id="ms-gate-guest"><span>Continue as guest</span><small>Live gold chart, the trade and results</small></button>
     <p class="gate-links"><button type="button" class="gate-lk" id="ms-gate-su" aria-controls="ms-gp-su">Create an account</button><button type="button" class="gate-lk" id="ms-gate-fg" aria-controls="ms-gp-fg">Forgot password?</button></p>
     <p class="gate-note"><b>Want a seat at the desk?</b> Create an account and confirm your email: the owner approves every seat.</p>
+    <!-- signed in (18 Nov 2026): the padlock opens, turns into a check, then the desk opens (msGateWelcome; display only) -->
+    <div class="gate-ok" id="ms-gate-ok" hidden>
+      <div class="go-art" aria-hidden="true">
+        <span class="go-glow"></span>
+        <svg class="go-lock" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><path class="go-shackle" d="M42 54V40a18 18 0 0 1 36 0v14"/><rect class="go-body" x="32" y="54" width="56" height="44" rx="10"/><circle class="go-hole" cx="60" cy="72" r="5"/><path class="go-hole" d="M60 76v8"/></svg>
+        <svg class="go-ok" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="go-ok-c" cx="60" cy="60" r="38"/><path class="go-ok-k" d="m43 61 12 12 23-25"/></svg>
+        <span class="go-confetti"></span>
+      </div>
+      <h2 class="go-h" id="ms-gate-ok-h" tabindex="-1">Welcome back</h2>
+      <p class="go-p" id="ms-gate-ok-p"></p>
+      <div class="go-bar"><i></i></div>
+      <p class="go-sr" role="status" id="ms-gate-ok-live"></p>
+    </div>
     <!-- sign-up, forgotten password and a new password from an email link (17 Nov 2026, api/signup.js): they take the card's place
          while one is open (.gate-card[data-panel]); nothing typed here is stored in the browser -->
     <section class="gate-panel" id="ms-gp-su" data-p="su" aria-labelledby="ms-gp-su-t" hidden>
@@ -2781,7 +2795,8 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   // ---- the sign-in card ----
   var ac = null;
   function signedIn(j, id) { if (j.account && id) mine(j.account.u, id);
-    try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); }
+    try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {}
+    (window.msGateWelcome ? window.msGateWelcome(j.account) : Promise.resolve()).then(function () { location.reload(); }); }
   async function finish(cred) {
     var o = await post(Object.assign({ op: 'login' }, assertion(cred)));
     if (o.r && o.r.ok && o.j.account) { signedIn(o.j, cred.id); return null; }
@@ -2952,6 +2967,81 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     }); }
   sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
   window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
+})();
+</script>
+<style id="ms-gate-ok-css">
+/* Signed in (18 Nov 2026, owner: "a similar animation for the login"): the sibling of the sign-up inbox screen. The card's contents
+   fade, a padlock pops in and its shackle lifts, the lock squeezes into a green check that draws itself, the glow turns green and
+   confetti goes off; "Welcome back, <name>" and a bar that fills while the desk opens. About 1.2 s, then the page reloads as before.
+   Reduced motion: the end state at once. Display only: the sign-in itself is unchanged. */
+.gate-card.gate-okay > :not(.gate-ok) { opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s .18s; }
+.gate-ok[hidden] { display: none !important; }
+.gate-ok { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; text-align: center; z-index: 2;
+  --go-acc: #9db4d3; --go-ok: #3fb68b; }
+.go-art { position: relative; width: 150px; height: 140px; }
+.go-glow { position: absolute; inset: 4px 10px; border-radius: 50%; background: radial-gradient(closest-side, rgba(157,180,211,.32), rgba(157,180,211,.08) 55%, transparent 72%);
+  animation: su-glow-in .5s ease-out both; }
+.go-lock, .go-ok { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; overflow: visible; }
+.go-lock { animation: su-pop-in .35s cubic-bezier(.2,.9,.25,1.3) both, go-squeeze .22s ease-in .62s forwards; }
+.go-body { fill: #20242b; stroke: #d5dbe4; stroke-width: 3.2; }
+.go-hole { stroke: var(--go-acc); stroke-width: 3.2; fill: none; }
+.go-shackle { stroke: #d5dbe4; stroke-width: 5; transform-origin: 78px 54px; animation: go-unlock .3s cubic-bezier(.3,1.4,.5,1) .3s forwards; }
+.go-ok { transform: scaleX(0); opacity: 0; animation: su-unfold .4s cubic-bezier(.2,1,.3,1.35) .8s forwards; }
+.go-ok-c { stroke: var(--go-ok); stroke-width: 3.5; fill: rgba(63,182,139,.14); stroke-dasharray: 239; stroke-dashoffset: 239; animation: su-draw .45s ease-out .85s forwards; }
+.go-ok-k { stroke: var(--go-ok); stroke-width: 6; stroke-dasharray: 56; stroke-dashoffset: 56; animation: su-draw .3s ease-out 1.15s forwards; }
+.gate-ok.ok .go-glow { background: radial-gradient(closest-side, rgba(63,182,139,.40), rgba(63,182,139,.12) 55%, transparent 72%); animation: su-pulse .8s ease-out both; transition: background .4s ease; }
+.go-confetti { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.go-confetti i { position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; background: var(--c); opacity: 0;
+  animation: su-conf var(--t, 1.2s) cubic-bezier(.15,.7,.3,1) var(--d, 0s) forwards; }
+.go-h { margin: 6px 0 0 !important; font: 680 24px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.025em; color: #f5f7fa; outline: none;
+  animation: su-up .4s cubic-bezier(.2,.8,.2,1) .45s both; }
+#ms-gate-ok-h:focus, #ms-gate-ok-h:focus-visible { outline: none !important; box-shadow: none !important; }
+.go-p { margin: 0; color: #b4bcc8; font-size: 15px; line-height: 1.5; max-width: 32ch; overflow-wrap: anywhere; animation: su-up .4s cubic-bezier(.2,.8,.2,1) .55s both; }
+.go-p b { color: #f3f5f8; font-weight: 600; }
+.go-bar { width: 160px; height: 4px; margin-top: 10px; border-radius: 2px; background: rgba(255,255,255,.10); overflow: hidden; animation: su-up .4s ease .6s both; }
+.go-bar i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--go-acc), var(--go-ok)); transform-origin: left; transform: scaleX(0);
+  animation: go-fill 1.6s cubic-bezier(.3,.6,.3,1) .6s forwards; }
+.go-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes go-unlock { 0% { transform: none; } 100% { transform: translateY(-9px) rotate(-24deg); } }
+@keyframes go-squeeze { to { transform: scaleX(0); opacity: .3; } }
+@keyframes go-fill { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .gate-card.gate-okay > :not(.gate-ok) { transition: none; }
+  .gate-ok *, .gate-ok .go-glow { animation: none !important; }
+  .go-lock { display: none; } .go-ok { transform: none; opacity: 1; } .go-ok-c, .go-ok-k { stroke-dashoffset: 0; } .go-bar i { transform: scaleX(.6); }
+}
+html[data-motion="off"] .gate-ok *, html[data-motion="off"] .gate-ok .go-glow { animation: none !important; }
+html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-ok { transform: none; opacity: 1; } html[data-motion="off"] .go-ok-c, html[data-motion="off"] .go-ok-k { stroke-dashoffset: 0; }
+</style>
+<script id="ms-gate-ok-js">
+// msGateWelcome(account) (18 Nov 2026): plays the signed-in screen, then resolves; the callers reload the page as before. Never stores
+// anything; the name is set as text. A failure anywhere resolves at once, so sign-in never waits on the animation.
+(function () {
+  var still = function () { try { return matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off'; } catch (e) { return false; } };
+  function confetti(box) { box.textContent = ''; if (still()) return;
+    var C = ['#3fb68b', '#9db4d3', '#e6ebf2', '#7fd8b4', '#c9a96e', '#5f8fd1'];
+    for (var i = 0; i < 24; i++) { var e = document.createElement('i'), a = (i / 24) * Math.PI * 2 + Math.random() * 0.4, r = 60 + Math.random() * 60;
+      e.style.cssText = '--c:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * r) + 'px;--y:' + Math.round(Math.sin(a) * r * 0.8 + 30 + Math.random() * 25) + 'px;--r:' + Math.round(Math.random() * 720 - 360) + 'deg;--d:' + (0.05 + Math.random() * 0.12).toFixed(2) + 's;--t:' + (0.9 + Math.random() * 0.5).toFixed(2) + 's';
+      if (i % 3 === 0) { e.style.width = '7px'; e.style.height = '7px'; e.style.borderRadius = '50%'; }
+      box.appendChild(e); } }
+  window.msGateWelcome = function (acct) {
+    return new Promise(function (done) {
+      try {
+        var card = document.querySelector('.gate-card'), box = document.getElementById('ms-gate-ok'); if (!card || !box || card.dataset.panel) { done(); return; }
+        var was = false; try { was = !!localStorage.getItem('ms-was-in'); } catch (e) {}
+        var name = acct && (acct.name || acct.u) ? String(acct.name || acct.u).slice(0, 40) : '';
+        var h = document.getElementById('ms-gate-ok-h'), p = document.getElementById('ms-gate-ok-p'), live = document.getElementById('ms-gate-ok-live');
+        h.textContent = was ? 'Welcome back' : 'Welcome';
+        p.textContent = ''; if (name) { p.appendChild(document.createTextNode('Signed in as ')); var b = document.createElement('b'); b.textContent = name; p.appendChild(b); p.appendChild(document.createTextNode('. Opening your desk…')); } else p.textContent = 'Opening your desk…';
+        live.textContent = 'Signed in' + (name ? ' as ' + name : '') + '. Opening the desk.';
+        box.classList.remove('ok'); box.hidden = false; card.classList.add('gate-okay');
+        try { h.focus({ preventScroll: true }); } catch (e) {}
+        if (still()) { box.classList.add('ok'); setTimeout(done, 350); return; }
+        setTimeout(function () { box.classList.add('ok'); confetti(box.querySelector('.go-confetti')); }, 900);
+        setTimeout(done, 1250);
+      } catch (e) { done(); }
+    });
+  };
 })();
 </script>
 <style id="ms-su-sent-css">

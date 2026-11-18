@@ -2406,6 +2406,14 @@ Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` 
 submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
 (no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
 
+## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
+Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`
+plays inside the card (`<style id="ms-gate-ok-css">` + `<script id="ms-gate-ok-js">`, before `#ms-su-sent-css`, reusing its
+`su-*` keyframes): a padlock pops in and unlocks, squeezes into a green check that draws itself, the glow turns green, confetti
+(made by the script), "Welcome back" (a device with `ms-was-in`, else "Welcome"), "Signed in as <name>" as text, and a bar that fills.
+`window.msGateWelcome(account)` resolves after about 1.25 s (350 ms under reduced motion, end state only), then both callers reload
+as before; any failure resolves at once, so sign-in never waits on it. Nothing is stored. Test: `tests/gate-welcome.test.mjs`.
+
 ## Face ID / fingerprint sign-in with passkeys (17 Nov 2026, owner)
 Owner: "Face ID or fingerprint login", like the Face ID button of the Figma login. WebAuthn passkeys; the password stays the
 primary way in. No npm dependency: `api/_passkey.js` (pure) reads CBOR, COSE keys (ES256 P-256 and RS256 only), authenticator data
