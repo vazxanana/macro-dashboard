@@ -109,6 +109,9 @@ function mailer(env, d) {
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // One template for every email (18 Nov 2026): a table layout every mail app draws the same, the wordmark, a heading, the
 // message, one button, the address as a fallback, a quiet note and the footer. `o` = { title, note }; every text escaped.
+// the logo (icons/email-logo.png, drawn by scripts/make-icons.mjs from the mark): always from the site's own domain, a PNG
+// because most mail apps show no SVG; its alt text and font say "Aureum Desk" when a mail app blocks images
+const SITE = 'https://aureumdesk.co.uk/', LOGO = SITE + 'icons/email-logo.png';
 const html = (lines, link, label, o = {}) => {
   const F = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
   const p = (t, st = '') => `<p style="margin:0 0 16px;font:15px/1.6 ${F};color:#3a3f47;${st}">${esc(t)}</p>`;
@@ -118,7 +121,7 @@ const html = (lines, link, label, o = {}) => {
   const note = o.note ? `<tr><td style="padding:20px 40px;border-top:1px solid #e6e8eb;font:13px/1.55 ${F};color:#6b717b">${esc(o.note)}</td></tr>` : '';
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:32px 16px">`
     + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">`
-    + `<tr><td style="padding:0 4px 18px;font:700 13px/1 ${F};letter-spacing:.18em;color:#16181b"><span style="display:inline-block;width:22px;height:22px;line-height:22px;margin-right:10px;border-radius:6px;background:#c9cdd3;color:#16181b;text-align:center;font-size:13px;letter-spacing:0;vertical-align:middle">A</span><span style="vertical-align:middle">AUREUM <span style="color:#8a9099;font-weight:500">DESK</span></span></td></tr>`
+    + `<tr><td style="padding:0 4px 20px"><a href="${SITE}" style="text-decoration:none"><img src="${LOGO}" width="195" height="32" alt="Aureum Desk" style="display:block;border:0;outline:none;width:195px;height:32px;font:700 15px/32px ${F};letter-spacing:.16em;color:#16181b"></a></td></tr>`
     + `<tr><td style="background:#ffffff;border:1px solid #e6e8eb;border-radius:12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
     + `<tr><td style="padding:36px 40px 12px">${o.title ? `<h1 style="margin:0 0 20px;font:600 22px/1.3 ${F};color:#16181b">${esc(o.title)}</h1>` : ''}${body}${btn}</td></tr>${note}</table></td></tr>`
     + `<tr><td style="padding:20px 4px 0;font:12px/1.6 ${F};color:#8a9099">Aureum Desk · aureumdesk.co.uk<br>A paper-trading desk. Nothing here is financial advice.</td></tr>`

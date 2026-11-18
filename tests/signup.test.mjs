@@ -312,3 +312,10 @@ test('usernames (18 Nov 2026): required, 3-24 of a-z 0-9 -, reserved words refus
   assert.equal((await log({ password: 'fred-password' })).body.account.u, 'fred', 'a built-in member signs in with the password alone');
   assert.equal((await log({ id: 'fred', password: 'fred-password' })).body.account.u, 'fred');
 });
+
+test('every email shows the Aureum Desk logo from the site (a PNG with its size and alt text)', async () => {
+  const W = world(); await join(W);
+  const h = W.out[W.out.length - 1].html;
+  assert.match(h, /<img src="https:\/\/aureumdesk\.co\.uk\/icons\/email-logo\.png" width="195" height="32" alt="Aureum Desk"/);
+  assert.ok(fs.existsSync('icons/email-logo.png'));
+});

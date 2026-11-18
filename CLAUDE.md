@@ -2910,6 +2910,9 @@ reads the SVG and draws every icon (any on transparent; maskable, apple-touch an
 tile inside the 40 % safe circle; badge-96 = white tile, A cut out; favicon-32) and `icons/og-card.png` (1200 x 630 link
 preview, vendored Inter embedded, not wired to pages yet). Manifest and pwa.mjs theme colour #121315 (`--au-bg`).
 Tests: `tests/aureum-mark.test.mjs`, `tests/pwa.test.mjs`.
+**Email logo** (18 Nov 2026, owner: "aureum should have a image or logo for email"): `icons/email-logo.png` (the mark + AUREUM
+/ DESK on one line, graphite ink, transparent, 585 x 96 drawn at 3x by make-icons.mjs) heads every email of `api/signup.js`
+(`LOGO`, always from https://aureumdesk.co.uk/, shown 195 x 32, alt "Aureum Desk"). PNG on purpose: most mail apps show no SVG.
 - Build step `scripts/pwa.mjs out` (build.sh, before stamp-assets): adds the missing head tags to every built page (manifest,
   theme-color, apple-touch-icon, apple-mobile-web-app-capable / -title / -status-bar-style black, mobile-web-app-capable, and
   `/assets/pwa.js` which stamp-assets versions). Never hand-add these to page sources. It also writes out/sw.js `VERSION` = hash
