@@ -369,6 +369,8 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const st = () => q.evaluate(() => ctTf()), idle = () => q.waitForFunction(() => !ctTf().busy, null, { timeout: 120000 });
     const sw = async (tf) => { await q.evaluate(() => window.scrollTo(0, 0)); if (!(await q.$eval('#tfdd', (e) => e.open))) await q.click('#tfdd summary'); await q.click(`#tfsw [data-stf="${tf}"]`); await q.waitForTimeout(60); await idle(); await q.waitForTimeout(250); return st(); };
     // candles fetched apart from the page's own state: the proof of what could be known at a moment
+    // aligned: the closed candles end at the moment, or the moment is held by a switch across a stretch with no candle (a weekend)
+    const aligned = (t) => t.closedEnd === t.mom || (t.held === t.mom && t.closedEnd < t.mom && (t.next == null || t.next >= t.mom));
     const raw = (tf, from, to, sym = 'nas100') => q.evaluate(async ([tf, from, to, sym]) => { const r = await fetch(`/md/bars?sym=${sym}&tf=${tf}&from=${from}&to=${to}`); return ((await r.json()).bars || []).filter((x) => !x.live && x.time >= from && x.time < to); }, [tf, from, to, sym]);
     const ohlc = (bs) => (bs.length ? { open: bs[0].open, high: Math.max(...bs.map((x) => x.high)), low: Math.min(...bs.map((x) => x.low)), close: bs[bs.length - 1].close } : null);
     const same = (a, o) => !!a && !!o && ['open', 'high', 'low', 'close'].every((k) => Math.abs(a[k] - o[k]) < 1e-9);
@@ -401,7 +403,7 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const t4 = await st(), t5 = await sw('1m');
     { const near = await raw('1m', t4.mom - 600, t4.mom + 600), lastClosed = near.filter((x) => x.time + 60 <= t4.mom).pop();
       check('15m → 1m: same moment and price, the account untouched, nothing forming', t5.tf === '1m' && t5.mom === t4.mom && t5.close === t4.close && !t5.forming && acctKey(t5) === acctKey(t4), JSON.stringify([t5.mom, t4.mom, t5.close, t4.close]));
-      check('no look-ahead going down: only 1m candles that closed by the moment are on the chart', t5.closedEnd === t5.mom && t5.shown === t5.idx && !!lastClosed && t5.shownLast.time === lastClosed.time && same(t5.shownLast, lastClosed) && near.some((x) => x.time >= t4.mom), JSON.stringify([t5.shownLast, lastClosed])); }
+      check('no look-ahead going down: only 1m candles that closed by the moment are on the chart', aligned(t5) && t5.shown === t5.idx && !!lastClosed && t5.shownLast.time === lastClosed.time && same(t5.shownLast, lastClosed) && near.some((x) => x.time >= t4.mom), JSON.stringify([t5.shownLast, lastClosed])); }
     for (let i = 0; i < 3; i++) { await q.keyboard.press('ArrowRight'); } await q.waitForTimeout(200);
     // ---- up again, cut on one-minute candles; the extra charts follow
     const t6 = await st(), t7 = await sw('1h'), f7 = t7.forming;
@@ -429,24 +431,20 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       await q.keyboard.press('ArrowRight'); await q.waitForTimeout(400); const t13 = await st();
       check('one step completes the day: its finer candles ran through the engine, no trade lost or doubled', !t13.forming && t13.mom === f12.start + 86400 && same(t13.shownLast, f12.full) && t13.acct.closed + t13.acct.positions.length + t13.acct.orders.length === n0 && new Set(t13.acct.positions.map((x) => x.id)).size === t13.acct.positions.length, JSON.stringify([t13.mom, t13.acct.closed, t13.acct.positions.length, t13.acct.orders.length, n0])); }
     // ---- back to where it started, and a session saved before this change (no moment in it) still loads
-    { const t14 = await sw('5m'); check('back on 5m: aligned, nothing forming, the candles are the ones the session started with', t14.tf === '5m' && !t14.forming && t14.closedEnd === t14.mom && t14.bars >= t0.bars && t14.from === t0.from, JSON.stringify([t14.bars, t0.bars]));
+    { const t14 = await sw('5m'); check('back on 5m: aligned, nothing forming, the candles are the ones the session started with', t14.tf === '5m' && !t14.forming && aligned(t14) && t14.bars >= t0.bars && t14.from === t0.from, JSON.stringify([t14.bars, t0.bars]));
       await q.evaluate(() => { window.dispatchEvent(new Event('pagehide')); const A = JSON.parse(localStorage.getItem('btLab:sessions')); for (const k of Object.keys(A)) { delete A[k].mom; } localStorage.setItem('btLab:sessions', JSON.stringify(A)); });
       const had = await q.evaluate(() => Object.values(JSON.parse(localStorage.getItem('btLab:sessions'))).every((s) => !('mom' in s) && s.idx > 0));
       await q.evaluate(() => { addEventListener('pagehide', (e) => e.stopImmediatePropagation(), true); }); await q.reload({ waitUntil: 'load' }); await q.waitForFunction(() => /Resumed|Could not/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await q.waitForTimeout(500); const t15 = await st();
-      check('a session saved before this change (index only) loads at the same bar with the same account', had && t15.tf === '5m' && t15.idx === t14.idx && t15.mom === t14.mom && !t15.forming && acctKey(t15) === acctKey(t14), JSON.stringify([had, t15.idx, t14.idx])); }
+      check('a session saved before this change (index only) loads at the same bar with the same account', had && t15.tf === '5m' && t15.idx === t14.idx && (t15.mom === t14.mom || (t14.held === t14.mom && t15.mom === t14.closedEnd)) && !t15.forming && acctKey(t15) === acctKey(t14), JSON.stringify([had, t15.idx, t14.idx])); }
     // ---- too many candles: refused in words, nothing changes
     await q.click('#tb-sess'); await q.waitForTimeout(300); await q.click('#quick [data-q^="xau,15m"]'); await q.click('dialog.msd button.pri', { timeout: 4000 }).catch(() => {});
     await q.waitForFunction(() => ctTf().tf === '15m' && ctTf().bars > 1000, null, { timeout: 120000 }).catch(() => {}); await q.waitForTimeout(400);
     { const a = await st(); await q.click('#tfdd summary'); await q.click('#tfsw [data-stf="1m"]'); await q.waitForTimeout(400); await idle(); const z = await st(), msg = await txt(q, '#loadmsg');
       check('30 days on 1m is refused plainly ("load fewer days") and the session stays as it was', a.tf === '15m' && z.tf === '15m' && z.mom === a.mom && z.idx === a.idx && /Too many 1 minute candles/.test(msg) && /load fewer days/.test(msg), msg);
       const y = await sw('4h');
-      // 16 Nov 2026: the quick start's day (now - 30 days) fell on a Saturday, so the session began at the market's Friday close
-      // (21:00 UTC). The 4h candle 20:00-24:00 then has no price after the moment, so the engine (tfPart) calls it complete and
-      // the moment is its end (24:00): nothing is skipped, there is no price in between. The page is right; the check asked for
-      // the same number. It now accepts that move only when 1m candles fetched apart from the page show prices before the old
-      // moment and none between it and the new one, with the same last price and no forming candle.
-      let shut = null; if (y.tf === '4h' && y.mom > a.mom && y.mom - a.mom < 14400 && y.mom % 14400 === 0 && !y.forming) { const ref = await raw('1m', a.mom - 3600, y.mom, 'xau'); shut = ref.some((c) => c.time < a.mom) && !ref.some((c) => c.time >= a.mom); }
-      check('the same session goes up to 4h (the same moment, or across a market close the end of the 4h candle that held it, no price in between)', y.tf === '4h' && (y.mom === a.mom || shut === true) && y.close === a.close, JSON.stringify([y.tf, y.mom, a.mom, shut])); }
+      // 16 Nov 2026: a session at the Friday close (21:00 UTC) put the 4h moment at 24:00 (no price in between, the 20:00 candle
+      // complete). The engine now holds the moment across such a stretch (BT.tfHold), so the switch keeps it exactly.
+      check('the same session goes up to 4h: the same moment, also across a market close (BT.tfHold keeps it, 16 Nov 2026)', y.tf === '4h' && y.mom === a.mom && y.close === a.close, JSON.stringify([y.tf, y.mom, a.mom, y.held])); }
     // ---- themes: the new control and its panel pass AA; nothing under 12 px
     { const AA = String.raw`(() => { const lum = (c) => { const m = c.match(/[\d.]+/g).map(Number); return m.slice(0, 3).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); }; const bgOf = (e) => { for (let x = e; x; x = x.parentElement) { const b = getComputedStyle(x).backgroundColor; if (b && /^rgb/.test(b) && !/rgba\(0, 0, 0, 0\)|transparent/.test(b) && !/,\s*0\.\d+\)$/.test(b)) return b; } return getComputedStyle(document.body).backgroundColor; }; const L = (x) => 0.2126 * x[0] + 0.7152 * x[1] + 0.0722 * x[2]; const out = []; let n = 0; for (const e of document.querySelectorAll('#tf-now, #tfsw button, .tfp small, .tfp kbd, #legend .lg-f, .tf-mid, #tb-sess b')) { if (!e.getClientRects().length || !e.textContent.trim()) continue; n++; const cs = getComputedStyle(e), a = L(lum(cs.color)), z = L(lum(bgOf(e))), r = (Math.max(a, z) + 0.05) / (Math.min(a, z) + 0.05), fs = parseFloat(cs.fontSize); if (r < 4.5 || fs < 12) out.push((e.id || e.className || e.tagName) + ' ' + e.textContent.trim().slice(0, 12) + ' ' + r.toFixed(2) + ' ' + fs + 'px'); } return { bad: out, n }; })()`;
       const bad = []; for (const th of ['dark', 'light', 'midnight']) { await q.evaluate((t) => { document.documentElement.dataset.theme = t; }, th); await q.evaluate(() => { document.getElementById('tfdd').open = true; });   /* the chips' 120 ms colour transition runs when the panel opens: measured() waits for it */ bad.push(...(await measured(q, AA, 'timeframe control text')).map((x) => th + ': ' + x)); if (th === 'light') await q.screenshot({ path: OUT + 'ct-tf-panel-light.png' }); }
@@ -769,10 +767,11 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const tl = await t.evaluate(() => { const D = window.ctDraw(); return { D, r: D.list[D.list.length - 1] }; });
     check('Alt+T then two clicks: a trend line, selected, stamped with the moment', tl.r.type === 't' && tl.D.sel === tl.D.list.length - 1 && tl.r.at > 0 && tl.D.mag === 0, JSON.stringify(tl.r));
     { const g = tl.D.geo[tl.D.sel], mx = (g.x1 + g.x2) / 2, my = (g.y1 + g.y2) / 2; await t.mouse.move(ch.x + mx, ch.y + my); await t.mouse.down(); await t.mouse.move(ch.x + mx - 70, ch.y + my + 40, { steps: 8 }); await t.mouse.up(); await settle(t);
-      const mg = await t.evaluate(() => { const D = window.ctDraw(); return { r: D.list[D.sel], g: D.geo[D.sel] }; }), m = mg.r;
-      // a move goes through pixels (the page's rule), so across a weekend gap the two times shift by different amounts: the
-      // shape on screen (the points' x and y distance) is what must stay; the prices shift by the same amount (18 Nov 2026)
-      check('dragging a trend line by its body moves both points together (same shape on screen, same price shift); the chart did not pan', m.t1 < tl.r.t1 && Math.abs((mg.g.x2 - mg.g.x1) - (g.x2 - g.x1)) <= 1.5 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m, [g.x1, g.x2], [mg.g.x1, mg.g.x2]])); }
+      const m = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; });
+      // both points move by the same distance ON THE CHART (bars, not seconds): across a weekend, or with a point past the last candle
+      // (one candle a step there), the same number of bars is a different number of seconds (18 Nov 2026, a Friday-close session)
+      const dx = await t.evaluate(([a, b]) => { const x = (q, k) => window.ctPaneXY(-1, q[k], q.p1).tx; return [x(b, 't1') - x(a, 't1'), x(b, 't2') - x(a, 't2')]; }, [tl.r, m]);
+      check('dragging a trend line by its body moves both points by the same distance on the chart and the same price; the chart did not pan', m.t1 < tl.r.t1 && Math.abs(dx[0] - dx[1]) <= 1 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m, dx])); }
     // Delete removes the selected one; Esc lets go
     const n0 = (await t.evaluate(() => window.ctDraw().list.length)); await t.keyboard.press('Delete'); await settle(t);
     const del = await t.evaluate(() => ({ n: window.ctDraw().list.length, sel: window.ctDraw().sel, bar: document.getElementById('dsel').hidden }));
@@ -813,7 +812,9 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     check('live coach: the panel sits on the chart and stays out of the quick bar', !ov.hit && ov.inChart, JSON.stringify(ov));
     for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.waitForTimeout(800);
     L = await t.evaluate(() => window.ctLive()); const A = await t.evaluate(() => window.ctAcct().acct.closed.slice(-1)[0]);
-    check('live coach: an exit gets a free note with its R, the same R as the journal', L.notes[0] && L.notes[0].tag === 'Closed' && A && L.notes[0].text.includes(Math.abs(A.R).toFixed(2) + 'R'), L.notes[0] && L.notes[0].text);
+    // the newest note need not be the exit: a market note (a big candle) can land after it, so the check finds the exit's own note
+    { const cn = L.notes.find((x) => x.tag === 'Closed');
+      check('live coach: an exit gets a free note with its R, the same R as the journal', cn && A && cn.text.includes(Math.abs(A.R).toFixed(2) + 'R'), JSON.stringify(L.notes.slice(0, 3))); }
     await t.click('#lc .lc-ask'); await t.waitForTimeout(300);
     await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(500);
     const mk = await t.evaluate(() => window.ctLive().notes.filter((x) => /^mk/.test(x.k)));

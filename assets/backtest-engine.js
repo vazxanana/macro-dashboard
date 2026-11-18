@@ -212,7 +212,16 @@
   const TF_SECS = [60, 120, 300, 600, 900, 1800, 3600, 7200, 14400, 86400];
   const countLE = (bars, t) => { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time <= t) lo = m + 1; else hi = m; } return lo; };   // bars that start at or before t
   // the replay moment: the end of the last fully replayed bar, or the moment a forming candle was built up to
-  function tfMoment(bars, idx, sec, part) { if (part) return part.T; const b = bars[idx - 1]; return b ? b.time + sec : (bars[0] ? bars[0].time : 0); }
+  // `at` = a moment held across a switch (tfHold): it wins over the bar-derived one until the next step
+  function tfMoment(bars, idx, sec, part, at) { if (part) return part.T; if (at > 0) return at; const b = bars[idx - 1]; return b ? b.time + sec : (bars[0] ? bars[0].time : 0); }
+  // A switch seats T with no forming candle when nothing traded between T and the edge of a candle: the finer candles of the
+  // candle that contains T all ended by T (a Friday 21:00 UTC close inside the 20:00 4h candle, or the day candle), or none
+  // ended by it. The bars then put the moment at that candle's edge (Sat 00:00), which is not where the replay is: no price
+  // lies between the two, but the rule is that a switch never moves the moment. tfHold keeps T (null when the bars already
+  // give T). Only a switch or a resume sets it; the next step clears it, and the moment follows the bars again from there.
+  function tfHold(bars, idx, sec, part, T) { if (part || !(T > 0)) return null; const d = tfMoment(bars, idx, sec, null); if (d === T) return null;
+    if (d < T && bars[idx] && bars[idx].time < T) throw new Error('a candle lies between the bars and the held moment');   // never hold past a price
+    return T; }
   // where the moment T sits on a series: how many bars ended by T, and the index of the bar that contains T (-1 when none)
   function tfPlan(bars, sec, T) { const closed = countLE(bars, T - sec), nb = bars[closed]; return { closed, straddle: nb && nb.time < T ? closed : -1 }; }
   // the coarsest timeframe that tiles both halves of the candle [start, start + sec) cut at T (0 = none: T is on its edge)
@@ -641,7 +650,7 @@
     st.T = T; return out;
   }
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, holdSec, durText, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2,
-    TF_SECS, tfMoment, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
+    TF_SECS, tfMoment, tfHold, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
     COACH, lensSay, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
     GRADES, gatherSessions, exitCf, coachLeaks, coachPatterns, patternMatch, planNorm, planCheck, planAdherence, coachDebrief,
     DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, tfLogical, tfTimeAt, syncRange, syncEcho, closedBarAt, LIVE_EV, liveEvents };

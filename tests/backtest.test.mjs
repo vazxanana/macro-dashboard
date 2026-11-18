@@ -448,3 +448,34 @@ test('the page: orders and manual closes carry the moment\'s stamp and a stop; h
   assert.match(ph, /\.tb \.ib, \.tb \.dd > summary\.ib, \.tb \.tb-rp \.ib \{ width: 44px; height: 44px; min-height: 44px; \}/); assert.match(ph, /\.tb #skipday \{ display: inline-grid; \}/); assert.match(html, /id="jump2"/); assert.match(html, /class="tbg tb-spd2"/);
   assert.match(html, /const placeDd = \(d\) =>/, 'toolbar dropdowns are placed where there is room');
 });
+test('a switch at the Friday close keeps the moment: no finer candle after it before the weekend (16 Nov 2026 audit)', () => {
+  // gold 15m candles: Fri 16 Oct 2026 12:00-20:45 UTC (the last one ends at the 21:00 weekly close), then Sun 18 Oct 22:00 on
+  const FRI = Date.UTC(2026, 9, 16, 12) / 1000, CLOSE = Date.UTC(2026, 9, 16, 21) / 1000, SUN = Date.UTC(2026, 9, 18, 22) / 1000, SAT0 = Date.UTC(2026, 9, 17) / 1000;
+  const m15 = []; let px = 4200;
+  for (let t = FRI; t < CLOSE; t += 900) { const o = px; px += ((t / 900) % 3) - 1; m15.push(bar(t, o, Math.max(o, px) + 0.5, Math.min(o, px) - 0.5, px)); }
+  for (let t = SUN; t < SUN + 8 * H; t += 900) { const o = px; px -= 3; m15.push(bar(t, o, o + 0.5, px - 0.5, px)); }   // Sunday reopens lower: through the stop
+  const agg = (sec) => { const out = []; for (const b of m15) { const s = Math.floor(b.time / sec) * sec, l = out[out.length - 1]; if (l && l.time === s) { l.high = Math.max(l.high, b.high); l.low = Math.min(l.low, b.low); l.close = b.close; } else out.push({ ...b, time: s }); } return out; };
+  const SER = { 900: m15, 3600: agg(3600), 14400: agg(14400), 86400: agg(86400) };
+  const seat = (sec, T) => { const bars = SER[sec].map((b) => ({ ...b })), p = BT.tfPlan(bars, sec, T); let s = { idx: p.closed, part: null };
+    if (p.straddle >= 0) { const full = bars[p.straddle], g = BT.tfFineSec(sec, full.time, T); s = BT.tfPart(full, p.straddle, sec, T, SER[g].filter((b) => b.time >= full.time && b.time < full.time + sec), g); }
+    const at = BT.tfHold(bars, s.idx, sec, s.part, T); return { bars, ...s, at, mom: BT.tfMoment(bars, s.idx, sec, s.part, at) }; };
+  // the 15m session sits at the close, with a buy open whose stop is below Friday's prices
+  const idx15 = m15.findIndex((b) => b.time >= CLOSE); assert.equal(BT.tfMoment(m15, idx15, 900, null), CLOSE);
+  const a = BT.newAccount(100000); BT.place(a, { side: 'buy', type: 'market', price: m15[idx15 - 1].close, stop: m15[idx15 - 1].close - 4, units: 10 }, m15[idx15 - 1].time); const before = JSON.stringify(a);
+  // up to 4h: the 20:00 candle holds only the 20:00 hour, which ended by 21:00: nothing forms, and the moment stays at 21:00
+  const h4 = seat(14400, CLOSE); assert.equal(h4.part, null); assert.equal(h4.at, CLOSE); assert.equal(h4.mom, CLOSE);
+  assert.equal(BT.tfMoment(h4.bars, h4.idx, 14400, null), SAT0, 'without the hold the bars alone put the moment at Saturday 00:00 (the failure)');
+  assert.equal(h4.bars[h4.idx - 1].time + 14400, SAT0); assert.ok(h4.bars[h4.idx].time > CLOSE, 'the next 4h candle is Sunday\'s: nothing was skipped');
+  // the day candle the same; back down to 15m and 1h: the moment is the bars' own again, no hold needed
+  const d1 = seat(86400, CLOSE); assert.equal(d1.part, null); assert.equal(d1.mom, CLOSE);
+  for (const sec of [900, 3600]) { const s = seat(sec, h4.mom); assert.equal(s.at, null); assert.equal(s.mom, CLOSE); }
+  assert.equal(JSON.stringify(a), before, 'the switches never touch the account');
+  // the next step on 4h runs Sunday's candle: the stop is taken there, once, and the hold is gone
+  const ev = BT.advance(a, null, BT.tfNext(h4.bars, h4.idx, null)); assert.equal(BT.tfMoment(h4.bars, h4.idx + 1, 14400, null, null), h4.bars[h4.idx].time + 14400);
+  assert.equal(ev.filter((e) => e.kind === 'close').length, 1); assert.equal(a.positions.length, 0); assert.match(a.closed[0].reason, /stop/);
+  // from Saturday 00:00 (a day candle stepped to its end) down to 15m: the bars say 21:00, the moment stays at 00:00
+  const dn = seat(900, SAT0); assert.equal(dn.idx, idx15); assert.equal(dn.at, SAT0); assert.equal(dn.mom, SAT0);
+  assert.throws(() => BT.tfHold(m15, idx15 - 4, 900, null, SAT0), /candle lies between/, 'a moment is never held past a price');
+  // a saved session at the close resumes on 4h at the same moment
+  const rs = BT.tfResume({ mom: CLOSE }, SER[14400], 14400); assert.equal(rs.T, CLOSE); assert.ok(rs.straddle >= 0);
+});
