@@ -47,7 +47,9 @@ export const HANDLERS = {
 export const CRONS = { '*/10 * * * *': '/api/edge-analyst?job=scan' };
 // Jobs run after a cron's own job, with the same secret (no new trigger: the plan's cron count stays). The trade reviewer
 // (17 Nov 2026) asks the language model at most once every 12 hours, and only for a new council-data reading.
-export const CHAINED = { '*/10 * * * *': ['/api/trade-review?job=review'] };
+// The watchdog kick (18 Nov 2026, items 15 and 31): when the council or the ICT desk is stale, start watchdog.yml, so the
+// "council stopped" alert no longer waits for GitHub's own timer. First in the chain: it is quick and it matters most.
+export const CHAINED = { '*/10 * * * *': ['/api/status?job=watchdog', '/api/trade-review?job=review'] };
 
 // Sign-up emails (17 Nov 2026): the handler cannot import the Worker's socket module (Node tests load api/), so it is handed in
 // here; the Email Service binding (env.EMAIL, a `send_email` binding) lives on the Worker's env, not process.env, and is handed

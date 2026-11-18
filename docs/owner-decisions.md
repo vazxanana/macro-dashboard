@@ -19,8 +19,9 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
    rule tests; your own selection is never measured.
 5. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
    (they are the corrected ones; this is the outcome I recommend).
-6. **The "council stopped" alert can be hours late (items 15 and 31).** If nothing is decided: it keeps depending on
-   GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
+6. **The "council stopped" alert: check the Worker's dispatch token (items 15 and 31).** Built 18 Nov 2026: the Worker starts
+   the watchdog within about 10 minutes of a stop. It works only if the Worker secret `GH_DISPATCH_TOKEN` may start workflows
+   (Actions: write on this repository). If it may not, the Worker logs "GitHub refused the dispatch" and the alert stays late.
 7. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
 8. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
@@ -292,7 +293,13 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ## Reliability and data
 
-### [ ] 15. Trigger the watchdog from a Vercel cron
+### [x] 15. Trigger the watchdog from a Vercel cron
+
+- **Status, 18 Nov: DONE (option a, on the Cloudflare Worker; owner: "lets go").** The Worker's 10-minute cron runs
+  `/api/status?job=watchdog` (`api/_watchdog-kick.js`): when the council's last save is over 20 min old, or the ICT desk's over
+  45 min outside the futures weekend, it starts `watchdog.yml` on main, at most once per 30 min (GitHub's run list is the
+  marker; an unreadable file or list starts nothing). The watchdog still sends the alert and keeps its one-alert-per-change mark,
+  so no alert is doubled. **Your one check:** the Worker secret `GH_DISPATCH_TOKEN` needs Actions: write on this repository.
 
 - **Status, 17 Nov: OPEN; option (a) needs rewording.** The Vercel project and its crons are gone. The site's host is now a
   Cloudflare Worker with one 10-minute cron (`cloudflare/src/worker.mjs`); dispatching `watchdog.yml` from it would need a GitHub
@@ -652,7 +659,11 @@ Open points that were written down elsewhere (developer notes, study results, op
   candles, never by the replay total before and after.
 - **If nothing is decided.** Option (b) is what happens.
 
-### [ ] 31. Timed jobs depend on GitHub's timer, which often does not fire
+### [~] 31. Timed jobs depend on GitHub's timer, which often does not fire
+
+- **Status, 18 Nov: PARTLY DONE.** The watchdog no longer depends on it (item 15). The ICT replay is started by the council loop
+  (11 Nov). Left on GitHub's timer: the weekly candle cache, the daily crypto back-fill and the daily backtest (nothing trades
+  wrongly when they are late).
 
 - **Status, 17 Nov: OPEN.** One fact below is no longer true: since 17 Nov 2026 nothing takes over when the council loop stops
   (the website host's backup runner, `api/run.js`, was removed; GitHub Actions is the only runner, restarted by its own

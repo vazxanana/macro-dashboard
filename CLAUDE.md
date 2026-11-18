@@ -662,6 +662,20 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   delta-coded), about 0.4 MB of new blobs a day; it needs an additive level shift at each contract switch, which cannot be
   checked without the live feed.
 
+## The watchdog's own timer (18 Nov 2026, owner: "lets go"; docs/owner-decisions.md items 15 and 31)
+`watchdog.yml` sends the "council stopped" alert but ran only on GitHub's :11 / :41 cron (a few times a day) and after a
+completed council run (none comes when the loop hangs inside a run). The Worker's 10-minute cron now runs
+`/api/status?job=watchdog` FIRST in its chain (`CHAINED`; no new trigger): `api/_watchdog-kick.js` (no imports) reads the `at` of
+council-data `snapshot.json` and `ict/snapshot.json` through `api/data.js` `readFile` and, when the council is over
+`COUNCIL_MIN` 20 min old or the ICT desk over `ICT_MIN` 45 min outside the futures weekend (the limits and weekend of
+`council/health.mjs`, a test compares them), starts `watchdog.yml` on main with `GH_DISPATCH_TOKEN` (Actions: write). At most once
+per `GAP_MIN` 30 min: no start while a watchdog run is queued or running or one was created in the last 30 min, by anyone
+(GitHub's run list is the marker, as `council/replay-due.mjs`). Not sure is no: an unreadable snapshot or run list, or no token,
+starts nothing; a fresh desk asks GitHub nothing. The watchdog still decides what to send and keeps its `watchdog.json` mark, so
+no alert is doubled; this path sends no message and writes no file. Guarded by `CRON_SECRET` (401 otherwise, `private, no-store`);
+the public `/api/status` answer is unchanged. Tests: `tests/watchdog-kick.test.mjs` (8). Not checked live: the dispatch itself
+(Actions cannot be started from the build sandbox) and whether the Worker's token has Actions: write.
+
 ## ICT replay: a trigger that does not depend on GitHub's cron (11 Nov 2026, reliability)
 `ict-replay.yml`'s cron is not enough: of its 35 runs up to 11 Nov, one came from the schedule (the then weekly cron, 8 Nov,
 started 13:49 UTC for 06:41) and 34 from pushes; a run takes 2-32 min (median about 10). So the council loop starts it:

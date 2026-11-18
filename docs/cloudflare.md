@@ -72,6 +72,9 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    `GMAIL_APP_PASSWORD`, `MAIL_FROM`, `OWNER_EMAIL`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
    `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and
    `COUNCIL_ALERTS` are read by the council on GitHub Actions, not by the Worker.)
+   `GH_DISPATCH_TOKEN` (18 Nov 2026) also starts `watchdog.yml` from the 10-minute cron when the council or the ICT desk is
+   stale (`/api/status?job=watchdog`): it needs Actions: write on the repository (a fine-grained token with Contents: read and
+   Actions: read and write is enough). Without it the cron logs "GitHub refused the dispatch" and starts nothing.
 3. Deploy → the site on `meridianx.meridianx-cloudflare.workers.dev`. Storage still Vercel's Blob store, reached over HTTPS with the same tokens, so both sites read and write the same data.
    **Deploy with GitHub Actions** (`.github/workflows/cloudflare-deploy.yml`, free: the repo is public): add the
    repository secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, then Actions →
