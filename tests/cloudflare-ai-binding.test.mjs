@@ -36,3 +36,13 @@ test('only the workers-ai host is answered by the binding', async () => {
   assert.deepEqual(seen, ['https://example.com/x']);
   useAi(null);
 });
+
+test('a refusal for length is tried once more at a smaller output cap', async () => {
+  const caps = [];
+  const ai = { run: async (m, inp) => { caps.push(inp.max_tokens); if (inp.max_tokens > 2000) throw new Error('max_tokens exceeds the context window'); return { response: 'ok', usage: { prompt_tokens: 5, completion_tokens: 2 } }; } };
+  const r = await answer(JSON.stringify({ model: 'm', max_tokens: 8000, messages: [{ role: 'user', content: 'u' }] }), ai);
+  assert.equal(r.status, 200);
+  assert.deepEqual(caps, [8000, 1500]);
+  const bad = { run: async () => { throw new Error('model not found'); } };
+  assert.equal((await answer(JSON.stringify({ model: 'm', messages: [] }), bad)).status, 404);
+});

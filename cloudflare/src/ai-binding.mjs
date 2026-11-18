@@ -5,6 +5,7 @@
 // prompt_tokens / completion_tokens). No token is needed; ACADEMY_LLM_KEY may hold any text. `.invalid` never resolves, so a
 // request that somehow escapes this wrapper fails instead of reaching anyone. Nothing in api/ imports this file.
 export const AI_HOST = 'workers-ai.invalid';
+export const SMALL_CAP = 1500;
 const OURS = Symbol.for('aureum.ai.fetch');
 let BINDING = null;
 export const useAi = (b) => { BINDING = b && typeof b.run === 'function' ? b : null; };
@@ -22,14 +23,21 @@ export async function answer(body, ai = BINDING) {
   const model = String(b.model || '').trim(), messages = Array.isArray(b.messages) ? b.messages : null;
   if (!model || !messages) return json(400, { error: { type: 'bad_request', message: 'model and messages are required' } });
   const max = Number(b.max_tokens || b.max_completion_tokens) || 1024;
-  let out;
-  try { out = await ai.run(model, { messages, max_tokens: max }); }
-  catch (e) { const m = String((e && e.message) || e).slice(0, 300); return json(/not found|no such model|invalid model/i.test(m) ? 404 : 502, { error: { type: 'workers_ai', message: m } }); }
+  let out, cap = max;
+  for (let i = 0; ; i++) {
+    try { out = await ai.run(model, { messages, max_tokens: cap }); break; }
+    catch (e) {
+      const m = String((e && e.message) || e).slice(0, 300);
+      // a model with a small context window refuses a large output cap: one retry at a smaller cap
+      if (i === 0 && cap > SMALL_CAP && /token|context|length|too (long|large)/i.test(m)) { cap = SMALL_CAP; continue; }
+      return json(/not found|no such model|invalid model/i.test(m) ? 404 : 502, { error: { type: 'workers_ai', message: m } });
+    }
+  }
   const r = out && out.response;
   const text = typeof r === 'string' ? r : r != null ? JSON.stringify(r) : (out && out.choices && out.choices[0] && out.choices[0].message && out.choices[0].message.content) || '';
   const u = (out && out.usage) || {};
   const tin = Number(u.prompt_tokens) || 0, tout = Number(u.completion_tokens) || 0;
-  const finish = tout && tout >= max ? 'length' : 'stop';
+  const finish = tout && tout >= cap ? 'length' : 'stop';
   return json(200, { id: 'workers-ai', model, choices: [{ index: 0, message: { role: 'assistant', content: text }, finish_reason: finish }], usage: { prompt_tokens: tin, completion_tokens: tout, total_tokens: tin + tout } });
 }
 
