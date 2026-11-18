@@ -29,7 +29,9 @@ function res() { const r = { code: 200, body: null, headers: {} };
   r.end = () => { r.code = r.statusCode || r.code; return r; }; return r; }
 let ipN = 0;
 const call = async (W, req, extra) => { const r = res(); await signup.handle({ query: {}, ...req, headers: { host: 'aureumdesk.co.uk', 'x-real-ip': req.ip || `10.0.0.${++ipN % 250}`, ...(req.headers || {}) } }, r, W.d(extra)); return r; };
-const post = (W, body, extra, req = {}) => call(W, { method: 'POST', body, ...req }, extra);
+// a sign-up body without a username gets one from the name (18 Nov 2026: usernames are required; most tests are about other rules)
+const unameOf = (n) => (String(n || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '000').slice(0, Math.max(3, String(n || '').replace(/[^A-Za-z0-9]/g, '').length));
+const post = (W, body, extra, req = {}) => call(W, { method: 'POST', body: body && 'name' in body && !('username' in body) && body.name ? { ...body, username: unameOf(body.name) } : body, ...req }, extra);
 const ownerCookie = () => `ms_session=${S.issue(ENV, 'owner', A.OWNER_HASH, S.account('owner'))}`;
 const linkOf = (W) => { const m = /https:\/\/\S+?\/api\/signup\?verify=([A-Za-z0-9_-]+)/.exec(W.out[W.out.length - 1].text); return m && m[1]; };
 const resetOf = (W) => { const m = /#reset=([A-Za-z0-9_-]+)/.exec(W.out[W.out.length - 1].text); return m && m[1]; };
@@ -59,15 +61,15 @@ test('validation: name, email and password', async () => {
   assert.equal((await post(W, { name: 'A', email: 'a@b.co', password: 'x'.repeat(10) }, {}, { headers: { origin: 'https://evil.test' } })).code, 403, 'a foreign Origin is refused');
 });
 
-test('a password already used by the owner, a member or another request is refused with a neutral sentence (and counts as a failed check)', async () => {
+test('a password of the owner or a built-in member is refused with a neutral sentence (it would sign in alone); others may repeat', async () => {
   const W = world();
   assert.equal((await join(W, 'Ana', 'ana@example.com', 'ana-password-1')).code, 200);
-  for (const pw of ['fred-password', 'ana-password-1']) {
-    const r = await post(W, { name: 'Bo', email: 'bo@example.com', password: pw }, {}, { ip: '10.9.9.9' });
-    assert.equal(r.code, 400); assert.deepEqual(r.body, { error: 'Choose another password.' });
-  }
+  const r = await post(W, { name: 'Bo', email: 'bo@example.com', password: 'fred-password' }, {}, { ip: '10.9.9.9' });
+  assert.equal(r.code, 400); assert.deepEqual(r.body, { error: 'Choose another password.' });
+  // another request's or a stored member's password no longer matters: a member signs in with a username or email
+  assert.equal((await post(W, { name: 'Bea', email: 'bo2@example.com', password: 'ana-password-1' })).code, 200);
   W.list = { users: { maria: { name: 'Maria', role: 'viewer', hash: sha('stored-member-pw') } } };
-  assert.deepEqual((await post(W, { name: 'Bo', email: 'bo@example.com', password: 'stored-member-pw' })).body, { error: 'Choose another password.' });
+  assert.equal((await post(W, { name: 'Cy', email: 'cy@example.com', password: 'stored-member-pw' })).code, 200);
   // ten refusals from one IP: the shared password-guess limit answers 429
   for (let i = 0; i < 10; i++) await post(W, { name: 'Bo', email: `bo${i}@example.com`, password: 'fred-password' }, {}, { ip: '10.7.7.7' });
   assert.equal((await post(W, { name: 'Bo', email: 'z@example.com', password: 'free-password-9' }, {}, { ip: '10.7.7.7' })).code, 429);
@@ -81,13 +83,14 @@ test('the same answer for a new, a pending, a confirmed and a member\'s email; o
   const rec = W.files['signups/pending.json'][0];
   assert.equal(rec.tokenHash, sha(t)); assert.equal(rec.hash, sha('maria-password-1')); assert.doesNotMatch(JSON.stringify(W.files), new RegExp(t)); assert.doesNotMatch(JSON.stringify(W.files), /maria-password-1/);
   assert.equal(rec.exp - rec.at, 24 * 3600e3);
-  const again = await join(W, 'Maria', 'maria@example.com', 'other-password-2'); assert.deepEqual(again.body, a.body); assert.equal(W.out.length, 1, 'no second email inside 10 minutes');
+  const same = (x, y) => { assert.match(x.watch, /^[A-Za-z0-9_-]{40,60}$/); assert.match(y.watch, /^[A-Za-z0-9_-]{40,60}$/); const { watch: w1, ...p } = x, { watch: w2, ...q } = y; assert.deepEqual(p, q); };   // a random watch code in every answer
+  const again = await join(W, 'Maria', 'maria@example.com', 'other-password-2'); same(again.body, a.body); assert.equal(W.out.length, 1, 'no second email inside 10 minutes');
   W.list = { users: { old: { name: 'Old', role: 'viewer', hash: sha('old-member-pw'), email: 'old@example.com' } } };
-  const known = await join(W, 'X', 'old@example.com', 'brand-new-pw-3'); assert.deepEqual(known.body, a.body); assert.equal(W.out.length, 1);
+  const known = await join(W, 'X', 'old@example.com', 'brand-new-pw-3'); same(known.body, a.body); assert.equal(W.out.length, 1);
   // after the cool-down a fresh link replaces the unconfirmed request
   W.t += 11 * 60e3; await join(W, 'Maria', 'maria@example.com', 'maria-password-1'); assert.equal(W.out.length, 2); assert.equal(W.files['signups/pending.json'].length, 1);
   // the link is built on the site's own host; another host gets the site's domain
-  const W2 = world(); await call(W2, { method: 'POST', body: { name: 'N', email: 'n@example.com', password: 'n-password-12' }, headers: { host: 'evil.test' } });
+  const W2 = world(); await call(W2, { method: 'POST', body: { name: 'N', username: 'nnn', email: 'n@example.com', password: 'n-password-12' }, headers: { host: 'evil.test' } });
   assert.match(W2.out[0].text, /https:\/\/aureumdesk\.co\.uk\/api\/signup\?verify=/);
 });
 
@@ -101,6 +104,22 @@ test('verify: single use, expiry, bad tokens; the owner is told by email (name o
   const X = world(); await join(X); const t2 = linkOf(X); X.t += 24 * 3600e3 + 1;
   assert.equal((await call(X, { method: 'GET', query: { verify: t2 } })).headers.location, '/market-structure.html?signup=expired');
   assert.equal(X.files['signups/pending.json'][0].verified, false, 'an expired link confirms nothing');
+});
+
+test('watch (18 Nov 2026): every sign-up answer carries a code; it reads waiting until the link is opened, then confirmed; nothing else leaks', async () => {
+  const W = world(); const r = await join(W); assert.match(r.body.watch, /^[A-Za-z0-9_-]{40,60}$/);
+  assert.equal(W.files['signups/pending.json'][0].watchHash, sha(r.body.watch), 'only the hash is stored');
+  assert.doesNotMatch(JSON.stringify(W.files), new RegExp(r.body.watch));
+  const ask = async (w) => (await call(W, { method: 'GET', query: { watch: w } })).body;
+  assert.deepEqual(await ask(r.body.watch), { state: 'waiting' });
+  await call(W, { method: 'GET', query: { verify: linkOf(W) } });
+  assert.deepEqual(await ask(r.body.watch), { state: 'confirmed' });
+  // an unknown code (and every repeat or member answer's code) reads waiting; a bad one is refused
+  assert.deepEqual(await ask(crypto.randomBytes(32).toString('base64url')), { state: 'waiting' });
+  const again = await join(W); assert.match(again.body.watch, /^[A-Za-z0-9_-]{40,60}$/); assert.notEqual(again.body.watch, r.body.watch);
+  assert.deepEqual(await ask(again.body.watch), { state: 'waiting' });
+  assert.equal((await call(W, { method: 'GET', query: { watch: 'x' } })).code, 400);
+  assert.equal(Object.keys(await ask(r.body.watch)).join(), 'state', 'never a name or an email');
 });
 
 test('owner approval: list, approve (the member can sign in), refuse; members and guests cannot list or approve', async () => {
@@ -119,7 +138,7 @@ test('owner approval: list, approve (the member can sign in), refuse; members an
   assert.match(W.out[W.out.length - 1].subject, /seat .* is ready/);
   assert.equal(W.files['signups/pending.json'].filter((p) => p.verified).length, 0);
   // sign-in with that password now works through /api/login, and nothing the member reads carries the email
-  const r = res(); await login.handle({ method: 'POST', headers: { host: 'x.test' }, body: { password: 'maria-password-1' } }, r, { env: ENV, deps: W.deps });
+  const r = res(); await login.handle({ method: 'POST', headers: { host: 'x.test' }, body: { id: 'maria', password: 'maria-password-1' } }, r, { env: ENV, deps: W.deps });
   assert.equal(r.code, 200); assert.equal(r.body.account.u, 'maria'); assert.doesNotMatch(JSON.stringify(r.body), /example\.com/);
   const cookie = String(r.headers['set-cookie']).split(';')[0];
   const m = res(); await me.handle({ method: 'GET', headers: { host: 'x.test', cookie } }, m, { env: ENV, deps: W.deps }); assert.doesNotMatch(JSON.stringify(m.body), /example\.com/);
@@ -129,10 +148,11 @@ test('owner approval: list, approve (the member can sign in), refuse; members an
   // a Users page save posts records without the email: the stored one stays
   const sv = res(); await users.handle({ method: 'POST', headers: { host: 'x.test', cookie: ownerCookie() }, body: { users: { maria: { name: 'Maria', role: 'viewer' } }, note: 'role' } }, sv, { env: ENV, deps: W.deps, load: async () => W.list, save: async (dd) => { W.list = dd; }, builtIns });
   assert.equal(sv.code, 200); assert.equal(W.list.users.maria.email, 'maria@example.com'); assert.equal(W.list.users.maria.role, 'viewer');
-  // a second Maria gets her own key; refuse removes a request
-  W.t += 11 * 60e3; await join(W, 'Maria', 'maria2@example.com', 'maria-password-2'); await call(W, { method: 'GET', query: { verify: linkOf(W) } });
+  // a second Maria: her username "maria" is taken (409), she picks another and gets it as her key; refuse removes a request
+  W.t += 11 * 60e3; assert.equal((await join(W, 'Maria', 'maria2@example.com', 'maria-password-2')).code, 409);
+  await post(W, { name: 'Maria', username: 'maria-two', email: 'maria2@example.com', password: 'maria-password-2' }); await call(W, { method: 'GET', query: { verify: linkOf(W) } });
   const L2 = await call(W, { method: 'GET', query: { list: '1' }, headers: { cookie: ownerCookie() } });
-  assert.equal((await post(W, { approve: L2.body.items[0].id }, {}, { headers: { cookie: ownerCookie() } })).body.key, 'maria-2');
+  assert.equal((await post(W, { approve: L2.body.items[0].id }, {}, { headers: { cookie: ownerCookie() } })).body.key, 'maria-two');
   await join(W, 'Zed', 'zed@example.com', 'zed-password-1'); await call(W, { method: 'GET', query: { verify: linkOf(W) } });
   const L3 = await call(W, { method: 'GET', query: { list: '1' }, headers: { cookie: ownerCookie() } });
   assert.equal((await post(W, { refuse: L3.body.items[0].id }, {}, { headers: { cookie: ownerCookie() } })).code, 200);
@@ -225,9 +245,9 @@ test('the senders: the Email Service binding first, from MAIL_FROM; Gmail when t
   const run = async (W, extra) => { const r = await post(W, { name: 'Maria', email: 'maria@example.com', password: 'maria-password-1' }, { send: undefined, ...extra }); return r; };
   // binding only: the site's address, default and from MAIL_FROM
   let W = world(); delete W.d; const base = world(); W = base;
-  let r = await call(W, { method: 'POST', body: { name: 'Maria', email: 'maria@example.com', password: 'maria-password-1' } }, { send: undefined, binding });
+  let r = await call(W, { method: 'POST', body: { name: 'Maria', username: 'maria', email: 'maria@example.com', password: 'maria-password-1' } }, { send: undefined, binding });
   assert.equal(r.code, 200); assert.equal(sent.length, 1);
-  assert.deepEqual(sent[0].from, { email: 'desk@aureumdesk.co.uk', name: 'Aureum Desk' }); assert.equal(sent[0].to, 'maria@example.com'); assert.match(sent[0].text, /verify=/); assert.match(sent[0].html, /Confirm my email/);
+  assert.deepEqual(sent[0].from, { email: 'help@aureumdesk.co.uk', name: 'Aureum Desk' }); assert.equal(sent[0].to, 'maria@example.com'); assert.match(sent[0].text, /verify=/); assert.match(sent[0].html, /Confirm email address/);
   const W2 = world({ env: { ...ENV, MAIL_FROM: 'hello@aureumdesk.co.uk' } }); await run(W2, { binding }); assert.equal(sent[1].from.email, 'hello@aureumdesk.co.uk');
   // binding + Gmail: the binding is used; Gmail stays untouched
   const F = fakeSmtp(), W3 = world({ env: GMAIL }); await run(W3, { binding, connect: F.connect }); assert.equal(sent.length, 3); assert.equal(F.log.length, 0);
@@ -264,4 +284,38 @@ test('page: the sign-in card offers both links and three panels; the panel scrip
   assert.doesNotMatch(js, /\bprompt\(|\balert\(|\bconfirm\(/, 'no native boxes');
   assert.match(h, /\.gate-lk \{[^}]*min-height: 44px[^}]*font: 500 14px/, '44 px targets, 14 px text');
   assert.match(h, /fetch\(window\.MS_API \+ 'signup\?list=1'/);
+});
+
+test('usernames (18 Nov 2026): required, 3-24 of a-z 0-9 -, reserved words refused, unique against members, built-ins and other requests; approval uses it; login by username or email', async () => {
+  const W = world();
+  for (const [u, m] of [[undefined, /username of 3 to 24/], ['ab', /username of 3 to 24/], ['-abc', /username of 3 to 24/], ['a b c', /username of 3 to 24/], ['owner', /kept for the desk/], ['Admin', /kept for the desk/]]) {
+    const r = await call(W, { method: 'POST', body: { name: 'Zed', ...(u === undefined ? {} : { username: u }), email: 'zed@example.com', password: 'zed-password-1' } });
+    assert.equal(r.code, 400); assert.match(r.body.error, m); }
+  W.list = { users: { maria: { name: 'Maria', role: 'viewer', hash: sha('maria-password-1'), email: 'maria@example.com' } } };
+  for (const u of ['maria', 'FRED']) { const r = await call(W, { method: 'POST', body: { name: 'Zed', username: u, email: 'zed@example.com', password: 'zed-password-1' } }); assert.equal(r.code, 409); assert.equal(r.body.field, 'username'); }
+  assert.equal((await call(W, { method: 'POST', body: { name: 'Zed', username: 'Zed-1', email: 'zed@example.com', password: 'zed-password-1' } })).code, 200);
+  const other = await call(W, { method: 'POST', body: { name: 'Zoe', username: 'zed-1', email: 'zoe@example.com', password: 'zoe-password-1' } });
+  assert.equal(other.code, 409, 'a waiting request holds its username');
+  const rec = W.files['signups/pending.json'].find((p) => p.email === 'zed@example.com'); assert.equal(rec.username, 'zed-1');
+  const v = await call(W, { method: 'GET', query: { verify: linkOf(W) } }); assert.equal(v.code, 302);
+  const L = await call(W, { method: 'GET', query: { list: '1' }, headers: { cookie: ownerCookie() } }); assert.equal(L.body.items[0].username, 'zed-1');
+  const ap = await post(W, { approve: L.body.items[0].id }, {}, { headers: { cookie: ownerCookie() } }); assert.equal(ap.code, 200); assert.equal(ap.body.key, 'zed-1');
+  assert.match(W.out[W.out.length - 1].text, /username "zed-1"/);
+  const log = async (body) => { const r = res(); await login.handle({ method: 'POST', headers: { host: 'x.test' }, body }, r, { env: ENV, deps: W.deps }); return r; };
+  assert.equal((await log({ id: 'Zed-1', password: 'zed-password-1' })).body.account.u, 'zed-1');
+  assert.equal((await log({ id: ' ZED@example.com ', password: 'zed-password-1' })).body.account.u, 'zed-1');
+  assert.equal((await log({ id: 'maria', password: 'zed-password-1' })).code, 401, 'right password, other account');
+  assert.equal((await log({ id: 'nobody', password: 'zed-password-1' })).code, 401);
+  assert.deepEqual((await log({ id: 'zed-1', password: 'wrong-password' })).body, (await log({ id: 'nobody', password: 'x' })).body, 'the same answer for every miss');
+  assert.equal((await log({ id: 'owner', password: 'zed-password-1' })).code, 401);
+  assert.equal((await log({ password: 'zed-password-1' })).code, 401, 'password only: built-in members and the owner alone');
+  assert.equal((await log({ password: 'fred-password' })).body.account.u, 'fred', 'a built-in member signs in with the password alone');
+  assert.equal((await log({ id: 'fred', password: 'fred-password' })).body.account.u, 'fred');
+});
+
+test('every email shows the Aureum Desk logo from the site (a PNG with its size and alt text)', async () => {
+  const W = world(); await join(W);
+  const h = W.out[W.out.length - 1].html;
+  assert.match(h, /<img src="https:\/\/aureumdesk\.co\.uk\/icons\/email-logo\.png" width="195" height="32" alt="Aureum Desk"/);
+  assert.ok(fs.existsSync('icons/email-logo.png'));
 });

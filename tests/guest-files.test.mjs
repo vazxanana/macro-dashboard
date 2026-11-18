@@ -173,5 +173,5 @@ test('/cdata fails closed: a file that does not parse, or that the cut cannot re
   // a member still gets the file as it is, parse or not (as before)
   S._cache.users = null; const cookie = await signIn(), m = await ask('trades.json', { cookie, files: bad }); assert.equal(m.code, 200); assert.ok(Buffer.compare(m.body, bad['trades.json']) === 0);
   // and the page reads a 503 as "could not be loaded" (msData answers null for a failed read)
-  assert.match(PAGE, /\.then\(function \(r\) \{ return r\.ok \? r\.text\(\) : null; \}\)/);
+  assert.match(PAGE, /if \(r\.status === 304\) return v \? v\.t : null;\s*if \(!r\.ok\) return null;/);   // a 503 is null; only a 304 reuses the text this page already got
 });

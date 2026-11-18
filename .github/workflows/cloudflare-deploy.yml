@@ -13,6 +13,23 @@ name: Cloudflare deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      ai_binding:
+        description: 'Point ACADEMY_LLM_URL at the Worker''s own Workers AI connection (no token needed)'
+        type: boolean
+        default: false
+      ai_model:
+        description: 'Switch the AI features to this provider model id (the messages API); empty = keep. The key stays as set.'
+        type: string
+        default: ''
+      ai_price_in:
+        description: 'With ai_model: the model''s price per million input tokens, USD'
+        type: string
+        default: ''
+      ai_price_out:
+        description: 'With ai_model: the model''s price per million output tokens, USD'
+        type: string
+        default: ''
   push:
     branches: [claude/cloudflare-stage1, claude/relaxed-albattani-8c6aky]
     paths:
@@ -96,6 +113,12 @@ jobs:
           api /workers/scripts/aureum/subdomain | jq -c '.result // .errors' || true
           echo "== aureum bindings (name  type)"
           api /workers/scripts/aureum/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          for w in meridianx aureumbot; do
+            echo "== $w bindings (name  type)"
+            api /workers/scripts/$w/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          done
+          echo "== aureum's newest versions (id  created  source  secrets named)"
+          api "/workers/scripts/aureum/versions?per_page=5" | jq -r 'if .success then (.result.items // .result // [])[] | "\(.id)  \(.metadata.created_on)  \(.metadata.source)" else "could not read: \(.errors)" end' || true
           echo "== custom domains (hostname -> Worker)"
           api /workers/domains | jq -r 'if .success then (.result[] | "\(.hostname) -> \(.service) (\(.environment))") else "could not read: \(.errors)" end' || true
           echo "== live deployment of aureum (version  percentage)"
@@ -108,15 +131,142 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
 
+      # 18 Nov 2026: the owner could not get the Worker's secrets saved in the Cloudflare dashboard. A Worker secret
+      # that also exists as a GitHub repository secret of the SAME name is copied into the aureum Worker here. The
+      # value goes from GitHub's secret store to wrangler on stdin only: never echoed, never in a file, never in a log
+      # (GitHub masks it as well). A name with no repository secret is skipped and the Worker keeps what it has.
+      - name: Copy Worker secrets from GitHub repository secrets (values never printed)
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          W_OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          W_OANDA_ENV: ${{ secrets.OANDA_ENV }}
+          W_SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          W_CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          W_BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          W_CTRADER_LINK_KEY: ${{ secrets.CTRADER_LINK_KEY }}
+          W_GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          W_GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          W_ACADEMY_LLM_KEY: ${{ secrets.ACADEMY_LLM_KEY }}
+          W_ACADEMY_LLM_URL: ${{ secrets.ACADEMY_LLM_URL }}
+          W_ACADEMY_LLM_MODEL: ${{ secrets.ACADEMY_LLM_MODEL }}
+          W_ACADEMY_LLM_FORMAT: ${{ secrets.ACADEMY_LLM_FORMAT }}
+          W_ACADEMY_LLM_USD_PER_MTOK_IN: ${{ secrets.ACADEMY_LLM_USD_PER_MTOK_IN }}
+          W_ACADEMY_LLM_USD_PER_MTOK_OUT: ${{ secrets.ACADEMY_LLM_USD_PER_MTOK_OUT }}
+        run: |
+          set +x
+          for n in OANDA_TOKEN OANDA_ENV SESSION_SECRET CRON_SECRET BLOB_READ_WRITE_TOKEN CTRADER_LINK_KEY GH_TOKEN GH_READ_TOKEN \
+                   ACADEMY_LLM_KEY ACADEMY_LLM_URL ACADEMY_LLM_MODEL ACADEMY_LLM_FORMAT ACADEMY_LLM_USD_PER_MTOK_IN ACADEMY_LLM_USD_PER_MTOK_OUT; do
+            v="$(printenv "W_$n" || true)"
+            if [ -z "$v" ]; then echo "skip  $n (no repository secret)"; continue; fi
+            if printf '%s' "$v" | npx wrangler secret put "$n" >/dev/null 2>&1; then echo "set   $n"; else echo "::warning::could not set $n on the Worker"; fi
+          done
+          # 18 Nov 2026 (owner: "make it all you can"): three keys are used only inside the Worker (session cookies, the cron's
+          # own calls, the cTrader link store and derived connector keys). When the Worker has none and no repository secret
+          # names one, a random value is made here and put on the Worker ONCE; it is never printed, stored or seen by anyone.
+          # A key the Worker already holds is never replaced (that would sign every member out).
+          have=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/aureum/settings" | jq -r 'if .success then [.result.bindings[].name] | join(" ") else "UNREADABLE" end' || echo UNREADABLE)
+          if [ "$have" = "UNREADABLE" ]; then echo "::warning::could not read the Worker's settings: no key generated"; else
+            for n in SESSION_SECRET CRON_SECRET CTRADER_LINK_KEY; do
+              case " $have " in *" $n "*) echo "keep  $n (already on the Worker)"; continue;; esac
+              [ -n "$(printenv "W_$n" || true)" ] && continue
+              if openssl rand -base64 48 | tr -d '\n=+/' | npx wrangler secret put "$n" >/dev/null 2>&1; then echo "made  $n (random, never shown)"; else echo "::warning::could not set $n"; fi
+            done
+            # 18 Nov 2026: the Vercel Blob token was lost with the other secrets and the Vercel project is gone, so the store is
+            # read from its complete D1 copy (STORE=d1, docs/cloudflare.md "File store on D1"). Only when the Worker holds no
+            # Blob token, no repository secret gives one and STORE is not set; delete STORE on the Worker to go back.
+            case " $have " in *" BLOB_READ_WRITE_TOKEN "*|*" STORE "*) ;; *)
+              if [ -z "$(printenv W_BLOB_READ_WRITE_TOKEN || true)" ]; then
+                printf 'd1' | npx wrangler secret put STORE >/dev/null 2>&1 && echo "made  STORE = d1 (file store read from its D1 copy)" || echo "::warning::could not set STORE"
+              fi;;
+            esac
+            # In D1 mode the store code still wants a token value (the Vercel API shape) but never sends it anywhere; the
+            # mirror from Vercel cannot run without the real token, so it is switched off. A real token from a repository
+            # secret (above) replaces the placeholder on the next deploy.
+            have2=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/aureum/settings" | jq -r '[.result.bindings[].name] | join(" ")' || echo "")
+            case " $have2 " in *" STORE "*)
+              case " $have2 " in *" BLOB_READ_WRITE_TOKEN "*) ;; *)
+                printf 'd1-only-placeholder-not-a-vercel-token' | npx wrangler secret put BLOB_READ_WRITE_TOKEN >/dev/null 2>&1 && echo "made  BLOB_READ_WRITE_TOKEN placeholder (D1 store only)";;
+              esac
+              case " $have2 " in *" STORE_MIRROR "*) ;; *)
+                [ -z "$(printenv W_BLOB_READ_WRITE_TOKEN || true)" ] && printf 'off' | npx wrangler secret put STORE_MIRROR >/dev/null 2>&1 && echo "made  STORE_MIRROR = off";;
+              esac;;
+            esac
+          fi
+
+      # 18 Nov 2026: the AI features through the Worker's `ai` binding (cloudflare/src/ai-binding.mjs). Only on a run started by
+      # hand with the box ticked; the address is not a secret, the format must be 'chat' and the key may be any text.
+      - name: AI through the Worker's own connection (only when asked)
+        if: github.event_name == 'workflow_dispatch' && inputs.ai_binding
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          M: ${{ inputs.ai_model }}
+          I: ${{ inputs.ai_price_in }}
+          O: ${{ inputs.ai_price_out }}
+        run: |
+          printf 'https://workers-ai.invalid/v1/chat/completions' | npx wrangler secret put ACADEMY_LLM_URL >/dev/null 2>&1 && echo "set   ACADEMY_LLM_URL = the Worker's AI connection"
+          printf 'chat' | npx wrangler secret put ACADEMY_LLM_FORMAT >/dev/null 2>&1 && echo "set   ACADEMY_LLM_FORMAT = chat"
+          # The binding needs no real key, but the adapter is off without one: a placeholder, only when the Worker has none.
+          have=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/aureum/settings" | jq -r '[.result.bindings[].name] | join(" ")' || echo "")
+          case " $have " in *" ACADEMY_LLM_KEY "*) echo "keep  ACADEMY_LLM_KEY";; *) printf 'workers-ai-binding' | npx wrangler secret put ACADEMY_LLM_KEY >/dev/null 2>&1 && echo "made  ACADEMY_LLM_KEY placeholder (binding only)";; esac
+          # With a model and prices given in the same run, they are set here for the binding (not the provider's address).
+          if [ -n "$M" ]; then
+            case "$M" in *[!A-Za-z0-9._@/-]*) echo "::error::the model id has characters a model id never has"; exit 1;; esac
+            for v in "$I" "$O"; do case "$v" in ''|*[!0-9.]*) echo "::error::both prices are needed, as plain numbers"; exit 1;; esac; done
+            printf '%s' "$M" | npx wrangler secret put ACADEMY_LLM_MODEL >/dev/null 2>&1 && echo "set   ACADEMY_LLM_MODEL = $M"
+            printf '%s' "$I" | npx wrangler secret put ACADEMY_LLM_USD_PER_MTOK_IN >/dev/null 2>&1 && echo "set   price in"
+            printf '%s' "$O" | npx wrangler secret put ACADEMY_LLM_USD_PER_MTOK_OUT >/dev/null 2>&1 && echo "set   price out"
+          fi
+
+      # 18 Nov 2026 (owner: "change to sonnet"): the provider's address, format, model and prices for one model, set together
+      # so the spending caps count the right price (docs/academy/LLM.md). None of these is a secret; the key is not touched.
+      - name: Switch the AI model (only when asked)
+        if: github.event_name == 'workflow_dispatch' && inputs.ai_model != '' && !inputs.ai_binding
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          M: ${{ inputs.ai_model }}
+          I: ${{ inputs.ai_price_in }}
+          O: ${{ inputs.ai_price_out }}
+        run: |
+          case "$M" in *[!A-Za-z0-9._@/-]*) echo "::error::the model id has characters a model id never has"; exit 1;; esac
+          for v in "$I" "$O"; do case "$v" in ''|*[!0-9.]*) echo "::error::both prices are needed, as plain numbers"; exit 1;; esac; done
+          put() { printf '%s' "$2" | npx wrangler secret put "$1" >/dev/null 2>&1 && echo "set   $1 = $2" || echo "::warning::could not set $1"; }
+          put ACADEMY_LLM_URL https://api.anthropic.com/v1/messages
+          put ACADEMY_LLM_FORMAT messages
+          put ACADEMY_LLM_MODEL "$M"
+          put ACADEMY_LLM_USD_PER_MTOK_IN "$I"
+          put ACADEMY_LLM_USD_PER_MTOK_OUT "$O"
+
+      # The file store's copy in D1 (docs/cloudflare.md, "File store on D1"): the mirror's state and file counts by folder
+      # (names only, never a file's content).
+      - name: File store copy in D1 (state and counts only)
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler d1 execute aureum-data --remote --json --command "SELECT v FROM store_state WHERE k = 'mirror'" 2>/dev/null | jq -r '.[0].results[0].v // "no mirror state"' | jq -c '{ready, at, complete, files, error} // .' 2>/dev/null || echo "could not read the mirror state"
+          npx wrangler d1 execute aureum-data --remote --json --command "SELECT substr(pathname, 1, instr(pathname, '/')) AS folder, count(*) AS n, max(uploaded_at) AS newest FROM store_blobs GROUP BY folder ORDER BY n DESC" 2>/dev/null | jq -r '.[0].results[] | "\(.folder)  \(.n)  newest \(.newest)"' || echo "could not count the files"
+
       - name: First look at the deployed site
         if: success()
         run: |
           base="https://aureum.meridianx-cloudflare.workers.dev"
           sleep 10
           fail=0
-          for p in / /market-structure.html /macro-desk /backtest /gold /api/status /cdata/trades.json; do
+          for p in / /market-structure.html /macro-desk /backtest /gold /api/status /cdata/trades.json "/md/bars?sym=xau&tf=5m&n=2"; do
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base$p" || echo 000)
             echo "$code  $p"
             case "$code" in 2*) ;; *) fail=1 ;; esac
           done
           [ "$fail" = 0 ] || echo "::warning::Some addresses did not answer 2xx (expected for API calls until the Worker's secrets are set)."
+          # The council reads its OANDA candles here (council.yml MD_BASE): say plainly when that route is broken.
+          curl -s --max-time 20 "$base/md/bars?sym=xau&tf=5m&n=2" | head -c 200; echo
+          # 18 Nov 2026: a Workers Builds deploy replaced this one with assets only (every /api and /md path 404).
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base/api/status" || echo 000)
+          [ "$code" = 200 ] || echo "::error::The Worker's code is not answering (/api/status $code): check that Workers Builds is disconnected from the aureum Worker."

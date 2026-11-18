@@ -70,6 +70,7 @@ function count(u, ms) { const k = `${u}|${dayOf(ms)}`; CALLS.set(k, (CALLS.get(k
 // a provider that refused the request itself (a 4xx other than a rate limit: an unknown model id, a body field it does not take)
 // is said in words, so a wrong CHRONOS_LLM_MODEL or CHRONOS_LLM_BODY can be put right
 function errText(ans) {
+  if (ans.status === 401 || ans.status === 403) return `The provider did not accept the key (${ans.status}). Check ACADEMY_LLM_KEY (a token with access to the model) and the account in ACADEMY_LLM_URL.`;
   if (ans.status >= 400 && ans.status < 500 && ans.status !== 408 && ans.status !== 429) return `The provider refused the request (${ans.status}${ans.errorType ? ` ${ans.errorType}` : ''})${ans.detail ? `: ${ans.detail}` : ''}. Check CHRONOS_LLM_MODEL and CHRONOS_LLM_BODY.`;
   return ans.partial != null ? 'The answer broke off. Try again in a minute.' : 'The coach could not be reached. Try again in a minute.';
 }

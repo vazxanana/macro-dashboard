@@ -500,6 +500,38 @@
   details.fold + details.fold { margin-top: 0; }
   @media (pointer: coarse) { .tabs button, .lim, details summary, .toc a, .hdr-sw a, .brand[href], .jump { min-height: 44px; } .jump, .brand[href] { display: inline-flex; align-items: center; } .lim { padding: 0 var(--s2); } details:not(.fold):not(.deep) > summary { display: flex; align-items: center; } }
   @media (max-width: 600px) { .top #when { display: none; } .card, .glance { padding: var(--s4); } .story { margin-top: var(--s5); } .g-sent { font-size: 17px !important; } .stamp { font-size: var(--fs-xs); } }
+  /* ─── Before you trade (18 Nov 2026, owner: "more improvement on macro as well, I want people to be able to use it to take or
+     decide for trades"). Today market by market, then a check of the reader's own trade against what the desk already reads:
+     the strategist's lean, the release calendar, the market's mood, the stop against a normal day, gold's levels, positioning.
+     Display only: it reads forecast.json / veteran.json / cot.json, fetches nothing else and never calls a reading an edge. ─── */
+  .tc-tw { overflow-x: auto; margin: 0 0 var(--s4); border-radius: var(--r-sm); }
+  .tc-tw table { border-collapse: collapse; width: 100%; min-width: 560px; font: 400 var(--fs-sm)/1.4 var(--sans); }
+  .tc-tw th, .tc-tw td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tc-tw th { font: 600 var(--fs-xs) var(--sans); color: var(--ink-dim); background: var(--well); }
+  .tc-tw td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tc-tw tbody tr { cursor: pointer; } .tc-tw tbody tr:hover td { background: var(--well); }
+  .tc-st { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+  .tc-st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex: none; }
+  .tc-st.with { color: var(--au-gain, var(--buy)); } .tc-st.with::before { background: var(--au-gain, var(--buy)); }
+  .tc-st.against { color: var(--au-loss, var(--sell)); } .tc-st.against::before { background: var(--au-loss, var(--sell)); }
+  .tc-st.wait, .tc-st.caution { color: var(--au-warn, var(--ink)); } .tc-st.wait::before, .tc-st.caution::before { background: var(--au-warn, var(--ink)); }
+  .tc-st.clear { color: var(--ink); } .tc-st.neutral, .tc-st.na { color: var(--ink-dim); }
+  .tc-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--s3); align-items: end; margin: 0 0 var(--s4); }
+  .tc-form label { display: grid; gap: 4px; font: 500 var(--fs-xs) var(--sans); color: var(--ink-dim); }
+  .tc-form select, .tc-form input { min-height: 40px; padding: 6px 10px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--well); color: var(--ink); font: 500 var(--fs-md) var(--sans); font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; }
+  .tc-lab { display: block; margin: 0 0 4px; font: 500 var(--fs-xs) var(--sans); color: var(--ink-dim); }
+  .tc-side { display: flex; border: 1px solid var(--line-strong); border-radius: var(--r-sm); overflow: hidden; min-height: 40px; }
+  .tc-side button { flex: 1; border: 0; background: transparent; color: var(--ink-dim); font: 600 var(--fs-md) var(--sans); cursor: pointer; }
+  .tc-side button[aria-pressed="true"][data-s="buy"] { background: var(--buy-soft); color: var(--au-gain, var(--buy)); }
+  .tc-side button[aria-pressed="true"][data-s="sell"] { background: var(--sell-soft); color: var(--au-loss, var(--sell)); }
+  .tc-verdict { margin: 0 0 var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: var(--well); font: 500 var(--fs-md)/1.5 var(--sans); }
+  .tc-verdict b { font-weight: 650; }
+  .tc-rows { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: 2px; }
+  .tc-rows li { display: grid; grid-template-columns: minmax(150px, 210px) 1fr; gap: 4px 14px; padding: 10px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
+  .tc-rows li > span:first-child { display: grid; gap: 2px; color: var(--ink); font-weight: 600; }
+  .tc-err { color: var(--au-loss, var(--sell)); font: 500 var(--fs-sm) var(--sans); margin: 0 0 var(--s3); }
+  @media (max-width: 640px) { .tc-rows li { grid-template-columns: 1fr; } }
+  @media (pointer: coarse) { .tc-form select, .tc-form input, .tc-side { min-height: 44px; } }
   /* ─── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
      The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
      ms-phone = "full" keeps the full view; the same key and attribute as the Desk). The first screen is the glance alone: the
@@ -590,7 +622,7 @@
     <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
   </div>
   <nav class="toc" id="toc" aria-label="Sections on this page">
-    <a href="#s-week">This week</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+    <a href="#s-week">This week</a><a href="#s-trade">Before you trade</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
   </nav>
 
   <!-- 1. This week: council/glance.mjs → veteran.json.summary; what changed (veteran.json.changes) folded under it -->
@@ -606,6 +638,25 @@
       <p class="g-pub"><b>Public data only.</b><span class="gx"> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></span></p>
       <button type="button" class="g-more" id="g-more" aria-expanded="false" aria-controls="c-glance"><span class="gm-0">The week in one sentence, and more</span><span class="gm-1">Show less</span></button>
       <details class="fold" id="c-changes" hidden><summary>What changed since last week <small id="chg-sub"></small></summary><ul class="chg" id="chg"></ul></details>
+    </article>
+  </section>
+
+  <!-- 2. Before you trade (18 Nov 2026): today market by market, and a check of the reader's own trade; display only -->
+  <section class="story sfold" id="s-trade" aria-labelledby="tc-h">
+    <header class="st-h"><h2 id="tc-h">Before you trade</h2><small class="st-m">today, market by market, and a check of your own trade</small><button type="button" class="st-go" id="go-s-trade" aria-expanded="false" aria-controls="c-trade" aria-labelledby="tc-h one-s-trade"><span class="st-one" id="one-s-trade"></span></button></header>
+    <article class="card tcheck" id="c-trade" hidden>
+      <p class="c-take" id="tc-take"></p>
+      <div class="tc-tw" role="region" tabindex="0" aria-label="Today, market by market"><table id="tc-today"><thead><tr><th scope="col">Market</th><th scope="col">Macro lean</th><th scope="col">A normal day</th><th scope="col">Releases, next 24 h</th><th scope="col">Positioning</th></tr></thead><tbody></tbody></table></div>
+      <h4 class="vz-h">Check a trade <small>before you place it: tap a market above, or fill this in</small></h4>
+      <form class="tc-form" id="tc-form" autocomplete="off">
+        <label>Market<select id="tc-m"><option value="gold">Gold</option><option value="eurusd">EUR/USD</option><option value="usdjpy">USD/JPY</option><option value="nq">Nasdaq 100</option><option value="es">S&amp;P 500</option></select></label>
+        <div><span class="tc-lab" aria-hidden="true">Side</span><div class="tc-side" role="group" aria-label="Side"><button type="button" data-s="buy" aria-pressed="true">Buy</button><button type="button" data-s="sell" aria-pressed="false">Sell</button></div></div>
+        <label>Entry <small>(optional)</small><input id="tc-e" inputmode="decimal" placeholder="price now"></label>
+        <label>Stop<input id="tc-s" inputmode="decimal" placeholder="required to check it"></label>
+        <label>Target <small>(optional)</small><input id="tc-t" inputmode="decimal"></label>
+      </form>
+      <div id="tc-out" aria-live="polite"></div>
+      <p class="note">A checklist of context, not a signal. None of these readings has passed a test as an edge here (the strategist's own scorecard says "no direction edge"; the positioning study failed); your system decides the trade, with its stop. Paper only.</p>
     </article>
   </section>
 
@@ -1338,6 +1389,118 @@
   }
   setInterval(function () { if (LAST) renderStamp(); }, 60e3);
   // a story section shows when any of its cards has data; the table of contents follows
+
+  // ---- Before you trade (18 Nov 2026): pure reading on window.MD_CHECK (tests/macro-trade-check.test.mjs), drawn by renderTrade ----
+  var MD_CHECK = window.MD_CHECK = (function () {
+    var NAME = { gold: 'Gold', eurusd: 'EUR/USD', usdjpy: 'USD/JPY', nq: 'Nasdaq 100', es: 'S&P 500' };
+    var CCY = { gold: ['USD'], eurusd: ['USD', 'EUR'], usdjpy: ['USD', 'JPY'], nq: ['USD'], es: ['USD'] };
+    var COT = { gold: ['gold', 1], eurusd: ['eur', 1], usdjpy: ['jpy', -1], nq: ['nq', 1], es: ['es', 1] };   // council/cot.mjs `sign`
+    var LEAN = 0.03, NEAR_H = 1, SOON_H = 24, AFTER_H = 0.5;
+    var n = function (v) { return v != null && v !== '' && isFinite(+v); };
+    var r1 = function (v) { return Math.round(v * 10) / 10; };
+    function events(fc, v) {   // the veteran's grouped cards first, else the strategist's calendar
+      var ev = (v && v.events && v.events.length ? v.events.map(function (e) { return { at: e.at, country: e.country, title: (e.titles && e.titles.length > 1 ? e.titles.join(', ') : e.title), released: e.released }; })
+        : ((fc && fc.playbook) || []).map(function (e) { return { at: e.at, country: e.country, title: e.title, released: e.actual != null }; }));
+      return ev.filter(function (e) { return e && e.at && !isNaN(Date.parse(e.at)); });
+    }
+    function nextFor(m, fc, v, now) {   // the next release for this market within SOON_H, or one that has just printed
+      var c = CCY[m] || ['USD'], best = null;
+      events(fc, v).forEach(function (e) { if (c.indexOf(String(e.country || '').toUpperCase()) < 0) return; var h = (Date.parse(e.at) - now) / 36e5;
+        if (h < -AFTER_H || h > SOON_H) return; if (!best || h < best.h) best = { e: e, h: h }; });
+      return best;
+    }
+    function inH(h) { return h < 0 ? Math.round(-h * 60) + ' min ago' : h < 1 ? 'in ' + Math.max(1, Math.round(h * 60)) + ' min' : 'in ' + Math.round(h) + ' h'; }
+    function lean(a) { if (!a || !n(a.pUp)) return null; var d = a.pUp - 0.5; return d >= LEAN ? 'up' : d <= -LEAN ? 'down' : 'flat'; }
+    function cotOf(m, cot) { var k = COT[m]; if (!k || !cot || !cot.markets) return null; var x = cot.markets.filter(function (c) { return c.k === k[0]; })[0];
+      if (!x || !n(x.pct1y)) return null; var p = +x.pct1y, side = p >= 90 ? (k[1] > 0 ? 'buy' : 'sell') : p <= 10 ? (k[1] > 0 ? 'sell' : 'buy') : null; return { pct: p, crowded: side, asOf: x.asOf, who: x.who }; }
+    // one market's row of "today"
+    function today(m, fc, v, cot, now) {
+      var a = fc && fc.assets && fc.assets[m], l = lean(a), nx = nextFor(m, fc, v, now), c = cotOf(m, cot);
+      return { m: m, name: NAME[m], lean: l, pUp: a && n(a.pUp) ? +a.pUp : null, move: a && n(a.expMovePct) ? +a.expMovePct : null, volRatio: a && n(a.volRatio) ? +a.volRatio : null,
+        next: nx ? { title: (nx.e.country ? nx.e.country + ' ' : '') + nx.e.title, h: nx.h, at: nx.e.at } : null, cot: c };
+    }
+    // the check of one trade: rows of { k, state, title, text }, and a verdict
+    function check(q, fc, v, cot, now) {
+      var m = q.market, side = q.side === 'sell' ? 'sell' : 'buy', a = fc && fc.assets && fc.assets[m], rows = [], err = null;
+      if (!a) return { err: 'No macro reading for this market yet.', rows: [] };
+      var px = n(q.entry) ? +q.entry : (m === 'gold' && v && v.summary && v.summary.levels && v.summary.levels.mark && n(v.summary.levels.mark.px) ? +v.summary.levels.mark.px : (n(a.last) ? +a.last : null));
+      var stop = n(q.stop) ? +q.stop : null, tgt = n(q.target) ? +q.target : null, sgn = side === 'buy' ? 1 : -1;
+      if (stop != null && px != null && (stop - px) * sgn >= 0) err = 'The stop must be ' + (side === 'buy' ? 'below' : 'above') + ' the entry for a ' + side + ': every trade has a stop on its losing side.';
+      if (!err && tgt != null && px != null && (tgt - px) * sgn <= 0) err = 'The target must be ' + (side === 'buy' ? 'above' : 'below') + ' the entry for a ' + side + '.';
+      // 1. the strategist's lean for tomorrow's close
+      var l = lean(a), w = side === 'buy' ? 'up' : 'down', pu = Math.round(a.pUp * 100);
+      rows.push({ k: 'lean', title: 'Macro lean', state: !l || l === 'flat' ? 'neutral' : l === w ? 'with' : 'against',
+        text: (l === 'flat' || !l ? 'No lean: ' : l === w ? 'Leans your way: ' : 'Leans the other way: ') + pu + '% chance of a higher close tomorrow (the strategist, capped at 35-65%). Its own scorecard shows no direction edge, so this is a lean, not a call.' });
+      // 1b. gold only: the Gold Macro Score (used for longs; the veteran never calls a macro sell)
+      var gs = m === 'gold' && fc.goldScore && fc.goldScore.ok && n(fc.goldScore.score) ? +fc.goldScore.score : null;
+      if (gs != null) rows.push({ k: 'score', title: 'Gold Macro Score', state: side === 'sell' ? 'neutral' : gs >= 0.25 ? 'with' : gs <= -0.25 ? 'against' : 'neutral',
+        text: 'Score ' + (gs > 0 ? '+' : gs < 0 ? '−' : '') + Math.abs(gs).toFixed(2) + ' (real yields, the dollar, 2-year yields, the curve). ' + (side === 'sell' ? 'Read for buys only: a low score means no macro support for a buy, never a reason to sell.' : gs >= 0.25 ? 'Supports a buy.' : gs <= -0.25 ? 'Does not support a buy.' : 'Near zero: no support either way.') + ' Its record is in sample, not proven out of sample.' });
+      // 2. releases
+      var nx = nextFor(m, fc, v, now);
+      if (nx && nx.h >= -AFTER_H && nx.h <= NEAR_H) rows.push({ k: 'event', title: 'Release risk', state: 'wait', text: (nx.e.country || '') + ' ' + nx.e.title + ' ' + inH(nx.h) + '. The playbook acts after the release, not before: the first minutes after a print are the widest spreads and the fastest moves.' });
+      else if (nx) rows.push({ k: 'event', title: 'Release risk', state: 'caution', text: (nx.e.country || '') + ' ' + nx.e.title + ' ' + inH(nx.h) + ' (' + new Date(nx.e.at).toUTCString().slice(17, 22) + ' UTC). Your trade may still be open when it prints.' });
+      else rows.push({ k: 'event', title: 'Release risk', state: 'clear', text: 'No release for ' + NAME[m] + ' on the calendar in the next ' + SOON_H + ' hours.' });
+      // 3. the market's mood
+      var rg = fc.regime || {}, vix = n(rg.vix) ? +rg.vix : null, inv = n(rg.vixTermRatio) && +rg.vixTermRatio >= 1, vr = n(a.volRatio) ? +a.volRatio : null, hot = (vix != null && vix >= 25) || inv || (vr != null && vr >= 1.3);
+      rows.push({ k: 'mood', title: 'Market mood', state: hot ? 'caution' : 'clear',
+        text: (vix != null ? 'VIX ' + vix.toFixed(1) + (inv ? ' with its curve inverted (stress)' : '') + '. ' : '') + (vr != null ? NAME[m] + "'s recent moves are " + vr.toFixed(1) + 'x its 1-year norm. ' : '') + (vr != null && vr >= 1.3 ? 'Moves run larger than usual: a stop of the usual size is hit more easily.' : hot ? 'Stress across markets: moves can turn larger than usual.' : 'Calm by these measures.') });
+      // 4. the stop against a normal day
+      if (stop != null && px != null && !err) { var sp = Math.abs(px - stop) / px * 100, mv = n(a.expMovePct) ? +a.expMovePct : null, ratio = mv ? sp / mv : null;
+        rows.push({ k: 'stop', title: 'Your stop against a normal day', state: ratio == null ? 'neutral' : ratio < 0.25 ? 'caution' : 'clear',
+          text: 'Stop ' + r1(sp) + '% away' + (mv ? '; ' + NAME[m] + ' moves about ±' + mv + '% on a normal day (' + (ratio < 0.25 ? 'your stop is under a quarter of that: inside ordinary noise' : ratio > 1.5 ? 'your stop is wider than a day\'s move: a trade meant to last days' : 'about ' + r1(ratio) + 'x a day\'s move') + ').' : '.')
+            + (tgt != null ? ' Target ' + r1(Math.abs(tgt - px) / Math.abs(px - stop)) + 'R.' : '') });
+      } else if (stop == null) rows.push({ k: 'stop', title: 'Your stop against a normal day', state: 'na', text: 'Give a stop to see it against ' + NAME[m] + '\'s normal daily move' + (n(a.expMovePct) ? ' (about ±' + a.expMovePct + '%)' : '') + '.' });
+      // 5. gold's levels in the way
+      var L = m === 'gold' && v && v.summary && v.summary.levels;
+      if (L && px != null) { var lv = side === 'buy' ? L.above : L.below, aheadOk = lv && n(lv.price) && (lv.price - px) * sgn > 0;
+        if (aheadOk) { var dist = Math.abs(lv.price - px) / px * 100, before = tgt != null && (tgt - lv.price) * sgn > 0;
+          rows.push({ k: 'level', title: 'Levels in the way', state: before ? 'caution' : 'clear', text: '$' + lv.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' (' + String(lv.label || 'level').toLowerCase() + ') is ' + r1(dist) + '% ' + (side === 'buy' ? 'above' : 'below') + (before ? ': your target is beyond it, so price has to get through it first.' : (tgt != null ? ': your target comes before it.' : '.')) + ' Levels from the veteran\'s last daily close.' }); }
+        else rows.push({ k: 'level', title: 'Levels in the way', state: 'clear', text: 'No level of the veteran\'s list between the price and the next ' + (side === 'buy' ? 'resistance' : 'support') + ' he names.' }); }
+      // 6. positioning
+      var c = cotOf(m, cot);
+      if (c) rows.push({ k: 'cot', title: 'Positioning', state: c.crowded === side ? 'caution' : 'neutral', word: c.crowded === side ? 'Crowded your way' : c.crowded ? 'Crowded the other way' : 'Not crowded',
+        text: 'Speculators (' + (c.who || 'futures') + ') at the ' + Math.round(c.pct) + 'th percentile of 3 years' + (c.crowded ? ': crowded on the ' + c.crowded + ' side' + (c.crowded === side ? ', the same side as you' : '') : '') + '. Context only: the pre-registered positioning test found no edge (report of ' + (c.asOf || '?') + ').' });
+      // the verdict: what the readings add up to, in words, never "take it"
+      var st = function (k) { return rows.filter(function (r) { return r.state === k; }); }, wait = st('wait'), ag = st('against').length, wi = st('with').length, cau = st('caution').length;
+      var verdict = wait.length ? { state: 'wait', text: 'Wait for the release: ' + wait[0].text.split('. ')[0] + '.' }
+        : { state: ag > wi ? 'against' : wi > ag ? 'with' : 'neutral', text: (ag > wi ? 'Macro leans against this ' + side : wi > ag ? 'Macro leans with this ' + side : 'Macro has no lean on this ' + side) + (cau ? ' · ' + cau + ' thing' + (cau > 1 ? 's' : '') + ' to watch' : ' · nothing else stands out') + '.' };
+      return { err: err, rows: rows, verdict: verdict, px: px };
+    }
+    return { today: today, check: check, nextFor: nextFor, lean: lean, cotOf: cotOf, NAME: NAME, MARKETS: Object.keys(NAME) };
+  })();
+  var TC = { side: 'buy', data: null };
+  var TCW = { with: 'Leans your way', against: 'Leans against', neutral: 'No lean', wait: 'Wait', caution: 'Watch', clear: 'Clear', na: 'Add a stop' };
+  function tcChip(state, word) { return '<span class="tc-st ' + state + '">' + esc(word || TCW[state] || state) + '</span>'; }
+  function renderTrade(fc, v, cot) {
+    var card = $('c-trade'); if (!fc || !fc.assets) { card.hidden = true; return; } card.hidden = false; TC.data = { fc: fc, v: v, cot: cot };
+    var now = Date.now(), rows = MD_CHECK.MARKETS.filter(function (m) { return fc.assets[m]; }).map(function (m) { return MD_CHECK.today(m, fc, v, cot, now); });
+    $('tc-today').querySelector('tbody').innerHTML = rows.map(function (r) {
+      var le = r.lean === 'up' ? tcChip('with', 'Up ' + Math.round(r.pUp * 100) + '%') : r.lean === 'down' ? tcChip('against', 'Down ' + Math.round(100 - r.pUp * 100) + '%') : tcChip('neutral', 'No lean');
+      var nx = r.next ? (r.next.h <= 1 ? tcChip('wait', 'Wait') : tcChip('caution', 'Watch')) + ' ' + esc(r.next.title) + ' <small>' + esc(r.next.h < 0 ? Math.round(-r.next.h * 60) + ' min ago' : r.next.h < 1 ? 'in ' + Math.max(1, Math.round(r.next.h * 60)) + ' min' : 'in ' + Math.round(r.next.h) + ' h') + '</small>' : tcChip('clear', 'None');
+      var co = r.cot ? Math.round(r.cot.pct) + 'th pct' + (r.cot.crowded ? ' · <b>crowded ' + r.cot.crowded + '</b>' : '') : '—';
+      return '<tr data-m="' + r.m + '" tabindex="0"><th scope="row">' + esc(r.name) + '</th><td>' + le + '</td><td class="n">' + (r.move != null ? '±' + r.move + '%' : '—') + (r.volRatio != null && r.volRatio >= 1.3 ? ' <small>(' + r.volRatio.toFixed(1) + 'x usual)</small>' : '') + '</td><td>' + nx + '</td><td>' + co + '</td></tr>';
+    }).join('');
+    var ups = rows.filter(function (r) { return r.lean === 'up'; }).length, dns = rows.filter(function (r) { return r.lean === 'down'; }).length, ev = rows.filter(function (r) { return r.next; }).length;
+    $('tc-take').textContent = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets' : 'Macro has no lean on any market today') + (ev ? '; ' + ev + ' with a release in the next 24 hours' : '; no release in the next 24 hours') + '. Leans, not calls.';
+    tcRun();
+  }
+  function tcRun() {
+    var D = TC.data, out = $('tc-out'); if (!D) return;
+    var q = { market: $('tc-m').value, side: TC.side, entry: $('tc-e').value.trim(), stop: $('tc-s').value.trim(), target: $('tc-t').value.trim() };
+    var r = MD_CHECK.check(q, D.fc, D.v, D.cot, Date.now());
+    if (!r.rows.length) { out.innerHTML = '<p class="tc-err">' + esc(r.err) + '</p>'; return; }
+    var e = $('tc-e'); if (r.px != null) e.placeholder = 'price now ' + r.px;
+    out.innerHTML = (r.err ? '<p class="tc-err" role="alert">' + esc(r.err) + '</p>' : '')
+      + '<p class="tc-verdict"><span class="tc-st ' + r.verdict.state + '" aria-hidden="true"></span><b>' + esc(r.verdict.text) + '</b></p>'
+      + '<ul class="tc-rows">' + r.rows.map(function (x) { return '<li><span>' + esc(x.title) + tcChip(x.state, x.word) + '</span><span>' + esc(x.text) + '</span></li>'; }).join('') + '</ul>';
+  }
+  $('tc-form').addEventListener('input', tcRun);
+  $('tc-form').addEventListener('submit', function (e) { e.preventDefault(); });
+  $('tc-m').addEventListener('change', function () { $('tc-e').value = ''; $('tc-s').value = ''; $('tc-t').value = ''; tcRun(); });
+  document.querySelector('.tc-side').addEventListener('click', function (e) { var b = e.target.closest('button[data-s]'); if (!b) return; TC.side = b.dataset.s;
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); tcRun(); });
+  $('tc-today').addEventListener('click', function (e) { var tr = e.target.closest('tr[data-m]'); if (!tr) return; $('tc-m').value = tr.dataset.m; $('tc-m').dispatchEvent(new Event('change')); $('tc-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+  $('tc-today').addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-m]')) { e.preventDefault(); e.target.click(); } });
   function syncStory() {
     document.querySelectorAll('main .story').forEach(function (sx) { var cards = sx.querySelectorAll('.card, details.deep'), any = false; cards.forEach(function (c) { if (!c.hidden) any = true; }); sx.hidden = !any; });
     document.querySelectorAll('#toc a').forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); a.hidden = !t || t.hidden; });
@@ -1350,11 +1513,11 @@
   $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
   $('g-event').addEventListener('click', function (e) { if (e.target.closest('a[href="#s-next"]')) foldSet($('s-next'), true); });   // the glance's link into a folded section opens it
   function load() {
-    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
-      var fc = x[0], v = x[1], cache = x[2], L = x[3];
+    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json')]).then(function (x) {
+      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderTrade(fc, v, cot);
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
@@ -1412,7 +1575,7 @@
   function takeOf(id) { var el = typeof id === 'string' ? $(id) : id; if (!el || el.closest('[hidden]')) return ''; var c = el.cloneNode(true); c.querySelectorAll('.tk-x').forEach(function (x) { x.remove(); }); return c.innerHTML.trim(); }
   function syncOne() {
     var st = $('ld-stale'), stb = st && !st.hidden && st.querySelector('b'), sc = !$('c-score').hidden && $('sc-top'), scv = sc && sc.querySelector('.v'), scl = sc && sc.querySelector('.lb'), scp = sc && sc.querySelector('p');
-    var one = { 's-next': takeOf('nx-take'),
+    var one = { 's-trade': takeOf('tc-take'), 's-next': takeOf('nx-take'),
       's-why': scv ? 'Gold Macro Score <b>' + esc(scv.textContent) + '</b>' + (scl ? ' · ' + esc(scl.textContent) : '') + (scp ? '. ' + takeOf(scp) : '') : '',
       's-price': (stb ? '<b>' + esc(stb.textContent) + '</b> ' : '') + takeOf('ld-take'),
       's-expect': takeOf('hyp-take'),

@@ -287,14 +287,14 @@ test('sign-in on D1: the owner saves members (users.js), a member signs in (logi
     assert.equal(s1.code, 200, JSON.stringify(s1.body));
     const files = db.sql.prepare("SELECT pathname FROM store_blobs WHERE pathname LIKE 'users/%'").all();
     assert.equal(files.length, 1, 'the save is a new file and the older one is deleted'); assert.notEqual(files[0].pathname, 'users/1-seed.json');
-    const ok = await call(login, { method: 'POST', body: { password: 'maria-pw-1' } }, { env: ENV });
+    const ok = await call(login, { method: 'POST', body: { id: 'maria', password: 'maria-pw-1' } }, { env: ENV });
     assert.equal(ok.code, 200); assert.equal(ok.body.account.u, 'maria'); assert.match(ok.headers['set-cookie'], /^ms_session=/);
     assert.equal((await call(users, { method: 'POST', headers: { cookie: owner() }, body: { users: { maria: { name: 'Maria', role: 'viewer', pw: 'maria-pw-2' } } } }, { env: ENV })).code, 200);
-    assert.equal((await call(login, { method: 'POST', body: { password: 'maria-pw-1' } }, { env: ENV })).code, 401, 'read back at once: the old password is refused');
-    assert.equal((await call(login, { method: 'POST', body: { password: 'maria-pw-2' } }, { env: ENV })).code, 200);
+    assert.equal((await call(login, { method: 'POST', body: { id: 'maria', password: 'maria-pw-1' } }, { env: ENV })).code, 401, 'read back at once: the old password is refused');
+    assert.equal((await call(login, { method: 'POST', body: { id: 'maria', password: 'maria-pw-2' } }, { env: ENV })).code, 200);
     // a store that cannot be read: sign-in fails closed (503), never the built-ins alone
     db.fail = (sql) => sql.includes('store_blobs');
-    assert.equal((await call(login, { method: 'POST', body: { password: 'maria-pw-2' } }, { env: ENV })).code, 503);
+    assert.equal((await call(login, { method: 'POST', body: { id: 'maria', password: 'maria-pw-2' } }, { env: ENV })).code, 503);
     db.fail = null;
   } finally { delete ENV.STORE; }
 });

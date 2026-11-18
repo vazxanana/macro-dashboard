@@ -1,8 +1,9 @@
 // Sign-up, email verification, owner approval and password reset (17 Nov 2026, owner: "do 2").
 //
 //   GET  /api/signup                      -> { open: bool }  (whether sign-ups and reset emails can be sent)
-//   POST /api/signup { name, email, password }   -> 200 "Check your email…" (the same words whether or not the email is known)
+//   POST /api/signup { name, username, email, password }   -> 200 "Check your email…" (the same words whether or not the email is known)
 //   GET  /api/signup?verify=<token>       -> 302 /market-structure.html?signup=verified | ?signup=expired
+//   GET  /api/signup?watch=<code>         -> { state: 'confirmed' | 'waiting' } (the sign-up answer's own code; nothing else)
 //   GET  /api/signup?list=1               owner session -> { items: [{ id, name, email, at, verifiedAt }] } (verified, no hashes)
 //   POST /api/signup { approve: id, role }   owner session -> the account goes into the stored user list (as the Users page saves it)
 //   POST /api/signup { refuse: id }          owner session -> the request is removed
@@ -31,6 +32,9 @@ const OFF = 'Sign-ups are not open yet.', OFF_RESET = 'Password reset by email i
 const SENT = 'Check your email for a link to confirm it. The link works for 24 hours.';
 const FORGOT = 'If that email belongs to an account, a link to choose a new password is on its way. It works for one hour.';
 const AGAIN = 'Choose another password.';
+// 18 Nov 2026: a password alone signs in only the owner and the built-in members, so a new or reset password is refused only when
+// it is one of theirs (else typing it without a username would open their account); members' passwords may repeat each other.
+const pwClash = (h, users, builtIns) => A.same(h, A.OWNER_HASH) || Object.keys(builtIns || {}).some((k) => users[k] && A.same(users[k].hash, h));
 
 let CONNECT = null, BINDING = null;   // handed in by cloudflare/src/worker.mjs: the socket function (cloudflare:sockets connect) and env.EMAIL
 const useSmtp = (fn) => { CONNECT = typeof fn === 'function' ? fn : null; };
@@ -46,6 +50,11 @@ const one = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]+
 const emailOf = (v) => { const e = String(v == null ? '' : v).trim().toLowerCase(); return e.length <= 254 && U.EMAIL_RE.test(e) ? e : null; };
 const pwOk = (p) => typeof p === 'string' && p.length >= 10 && p.length <= 200;
 const tokOk = (t) => typeof t === 'string' && /^[A-Za-z0-9_-]{40,60}$/.test(t);
+// Usernames (18 Nov 2026, owner: "unique username, so no repeated ones"): the account key itself, so one name is one account.
+// 3 to 24 of a-z, 0-9 and "-", starting with a letter or digit, case-insensitive; a few words are kept for the desk.
+const USER_RE = /^[a-z0-9][a-z0-9-]{2,23}$/;
+const RESERVED = new Set(['owner', 'admin', 'aureum', 'desk', 'guest', 'help', 'support', 'root', 'system', 'council', 'member', 'api']);
+const userOf = (v) => { const u = String(v == null ? '' : v).trim().toLowerCase(); return USER_RE.test(u) && !RESERVED.has(u) ? u : null; };
 const keyOf = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || 'member';
 
 // the private store (the users list's): one JSON file per name, read from the origin, written in place
@@ -71,14 +80,14 @@ function originOf(req) {
 
 // The mail sender, or null when email is off (owner, 17 Nov 2026: the emails come from the site's own domain).
 //   1. PRIMARY: the Worker's Cloudflare Email Service binding (`send_email` binding named EMAIL, handed in by the Worker through
-//      useMail), from MAIL_FROM (a plain variable, default desk@aureumdesk.co.uk; its domain must be onboarded to Email Service).
+//      useMail), from MAIL_FROM (a plain variable, default help@aureumdesk.co.uk; its domain must be onboarded to Email Service).
 //   2. FALLBACK: Gmail SMTP (api/_smtp.js) with GMAIL_USER / GMAIL_APP_PASSWORD, through the Worker's socket (useSmtp).
 //   With both, a binding that throws is followed by one try through Gmail. Neither: null (sign-ups off).
 // Returns send(to, subject, text, html) with a `.via` naming the first route.
 function mailer(env, d) {
   if (d.send) return d.send;
   const binding = d.binding !== undefined ? d.binding : BINDING, connect = d.connect !== undefined ? d.connect : CONNECT;
-  const from = M.oneLine(env.MAIL_FROM || 'desk@aureumdesk.co.uk'), user = env.GMAIL_USER, pass = env.GMAIL_APP_PASSWORD;
+  const from = M.oneLine(env.MAIL_FROM || 'help@aureumdesk.co.uk'), user = env.GMAIL_USER, pass = env.GMAIL_APP_PASSWORD;
   // The binding is tried in the shapes Cloudflare documents (17 Nov 2026: the first live send failed and the docs could not be read
   // from the build sandbox): the Email Service object with `from` as { email, name }, the same with `from` as an address, and the
   // older `send_email` call with a raw MIME message (EmailMessage of the Worker's email module, handed in by the Worker). Each failure
@@ -98,14 +107,33 @@ function mailer(env, d) {
   return send;
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const html = (lines, link, label) => `<div style="font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#16181b;max-width:520px">${lines.map((l) => `<p>${esc(l)}</p>`).join('')}${link ? `<p><a href="${esc(link)}" style="display:inline-block;background:#16181b;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">${esc(label)}</a></p><p style="color:#5b616b;font-size:13px">Or open this address: ${esc(link)}</p>` : ''}<p style="color:#5b616b;font-size:13px">Aureum Desk · paper trading, not financial advice</p></div>`;
+// One template for every email (18 Nov 2026): a table layout every mail app draws the same, the wordmark, a heading, the
+// message, one button, the address as a fallback, a quiet note and the footer. `o` = { title, note }; every text escaped.
+// the logo (icons/email-logo.png, drawn by scripts/make-icons.mjs from the mark): always from the site's own domain, a PNG
+// because most mail apps show no SVG; its alt text and font say "Aureum Desk" when a mail app blocks images
+const SITE = 'https://aureumdesk.co.uk/', LOGO = SITE + 'icons/email-logo.png';
+const html = (lines, link, label, o = {}) => {
+  const F = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  const p = (t, st = '') => `<p style="margin:0 0 16px;font:15px/1.6 ${F};color:#3a3f47;${st}">${esc(t)}</p>`;
+  const body = lines.map((l, i) => p(l, i === 0 ? 'color:#16181b;' : '')).join('');
+  const btn = link ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 24px"><tr><td style="border-radius:8px;background:#16181b"><a href="${esc(link)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 ${F};color:#ffffff;text-decoration:none;border-radius:8px">${esc(label)}</a></td></tr></table>`
+    + `<p style="margin:0 0 6px;font:13px/1.5 ${F};color:#6b717b">If the button does not work, copy this address into your browser:</p><p style="margin:0 0 8px;font:13px/1.5 ${F};word-break:break-all"><a href="${esc(link)}" style="color:#2f5e9e;text-decoration:underline">${esc(link)}</a></p>` : '';
+  const note = o.note ? `<tr><td style="padding:20px 40px;border-top:1px solid #e6e8eb;font:13px/1.55 ${F};color:#6b717b">${esc(o.note)}</td></tr>` : '';
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:32px 16px">`
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">`
+    + `<tr><td style="padding:0 4px 20px"><a href="${SITE}" style="text-decoration:none"><img src="${LOGO}" width="195" height="32" alt="Aureum Desk" style="display:block;border:0;outline:none;width:195px;height:32px;font:700 15px/32px ${F};letter-spacing:.16em;color:#16181b"></a></td></tr>`
+    + `<tr><td style="background:#ffffff;border:1px solid #e6e8eb;border-radius:12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
+    + `<tr><td style="padding:36px 40px 12px">${o.title ? `<h1 style="margin:0 0 20px;font:600 22px/1.3 ${F};color:#16181b">${esc(o.title)}</h1>` : ''}${body}${btn}</td></tr>${note}</table></td></tr>`
+    + `<tr><td style="padding:20px 4px 0;font:12px/1.6 ${F};color:#8a9099">Aureum Desk · aureumdesk.co.uk<br>A paper-trading desk. Nothing here is financial advice.</td></tr>`
+    + `</table></td></tr></table></body></html>`;
+};
 
 async function handle(req, res, d = {}) {
   const env = d.env || process.env, now = d.now ? d.now() : Date.now(); res.setHeader('Cache-Control', 'private, no-store');
   const send = mailer(env, d);
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
   const q = req.query || {};
-  if (req.method === 'GET' && !q.verify && !q.list) return res.status(200).json({ open: !!send });
+  if (req.method === 'GET' && !q.verify && !q.list && !q.watch) return res.status(200).json({ open: !!send });
   if (!env.BLOB_READ_WRITE_TOKEN && !d.store) return res.status(503).json({ error: q.verify ? undefined : 'account storage unavailable' });
   const store = d.store || blobStore(env), deps = d.deps || S.defaultDeps(env);
   const loadUsers = d.loadUsers || (async () => (await A.blobUsers(env)) || { users: {} });
@@ -113,6 +141,15 @@ async function handle(req, res, d = {}) {
   const builtIns = d.builtIns || A.builtInUsers();
   const live = (list) => list.filter((x) => x && (x.verified ? now - (x.verifiedAt || x.at) < KEEP_VERIFIED_MS : x.exp > now));
   try {
+    // ---- watch (18 Nov 2026): the page that sent a sign-up asks every few seconds whether its link was opened, on any device.
+    // The code came with the sign-up answer (every answer carries one, so it tells nothing about the email); only its hash is
+    // stored. The answer is 'confirmed' or 'waiting', never a name or an email; an unknown or expired code reads 'waiting'.
+    if (req.method === 'GET' && q.watch) {
+      const w = String(q.watch); if (!tokOk(w)) return res.status(400).json({ error: 'bad code' });
+      const lim = G.hit('signup-watch', G.ipOf(req), 1200, 3600e3, now); if (lim) return G.tooMany(res, lim);
+      const wh = sha(w), x = live(await store.get(PENDING)).find((p) => p.watchHash && A.same(p.watchHash, wh));
+      return res.status(200).json({ state: x && x.verified ? 'confirmed' : 'waiting' });
+    }
     // ---- verify (a link from the email) ----
     if (req.method === 'GET' && q.verify) {
       const t = String(q.verify), go = (s) => { res.statusCode = 302; res.setHeader('Location', `/market-structure.html?signup=${s}`); return res.end(); };
@@ -129,7 +166,7 @@ async function handle(req, res, d = {}) {
     if (req.method === 'GET' && q.list) {
       const acct = await S.fromRequest(req, env, deps); if (!acct) return res.status(401).json({ error: 'sign in first' });
       if (acct.u !== 'owner') return res.status(403).json({ error: 'only the owner approves seats' });
-      const items = live(await store.get(PENDING)).filter((p) => p.verified).map((p) => ({ id: p.id, name: p.name, email: p.email, at: new Date(p.at).toISOString(), verifiedAt: new Date(p.verifiedAt || p.at).toISOString() }));
+      const items = live(await store.get(PENDING)).filter((p) => p.verified).map((p) => ({ id: p.id, name: p.name, username: p.username || null, email: p.email, at: new Date(p.at).toISOString(), verifiedAt: new Date(p.verifiedAt || p.at).toISOString() }));
       return res.status(200).json({ items });
     }
     if (!S.sameOrigin(req)) return res.status(403).json({ error: 'not allowed' });
@@ -145,17 +182,18 @@ async function handle(req, res, d = {}) {
       if (b.refuse != null) { await store.put(PENDING, rest); console.log('[signup] a request was refused'); return res.status(200).json({ ok: true }); }
       const role = b.role === 'reviewer' ? 'reviewer' : 'viewer';
       const cur = (await loadUsers()) || { users: {} }, stored = { ...(cur.users || {}) }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
-      if (A.same(x.hash, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, x.hash))) return res.status(409).json({ error: 'That password is now used by another account: refuse this request and ask them to sign up again with another password.' });
-      const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k = keyOf(x.name), n = 2;
-      while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; }
+      if (pwClash(x.hash, users, builtIns)) return res.status(409).json({ error: 'That password is now used by another account: refuse this request and ask them to sign up again with another password.' });
+      const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k;
+      if (x.username) { k = x.username; if (taken.has(k) || users[k]) return res.status(409).json({ error: `The username "${k}" is now taken by another account: refuse this request and ask them to sign up again with another username.` }); }
+      else { let n = 2; k = keyOf(x.name); while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; } }   // a request made before usernames
       stored[k] = { name: one(x.name, 24), role, hash: x.hash, email: x.email };
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The account list could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: `approved a sign-up: ${one(x.name, 24)}` });
       await store.put(PENDING, rest);
       console.log(`[signup] approved a sign-up as ${role}`);
       let emailed = false;
-      if (send) emailed = await send(x.email, 'Your seat at Aureum Desk is ready', `Hello ${one(x.name, 24)},\n\nThe owner approved your seat. Sign in on https://aureumdesk.co.uk with the password you chose.\n\nAureum Desk · paper trading, not financial advice`,
-        html([`Hello ${one(x.name, 24)},`, 'The owner approved your seat. Sign in with the password you chose.'], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in')).then(() => true, () => false);
+      if (send) emailed = await send(x.email, 'Your seat at Aureum Desk is ready', `Hello ${one(x.name, 24)},\n\nThe owner approved your seat. Sign in on https://aureumdesk.co.uk with your username "${k}" (or this email) and the password you chose.\n\nAureum Desk · paper trading, not financial advice`,
+        html([`Hello ${one(x.name, 24)},`, `Your account has been approved. Sign in with your username ${k} (or this email address) and the password you chose when you signed up.`], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in to Aureum Desk', { title: 'Your seat is ready', note: 'Forgot your password? Use "Forgot password?" on the sign-in screen.' })).then(() => true, () => false);
       return res.status(200).json({ ok: true, key: k, role, emailed });
     }
 
@@ -170,8 +208,8 @@ async function handle(req, res, d = {}) {
           const t = token(), resets = (await store.get(RESETS)).filter((r) => r && r.exp > now && r.u !== k).slice(-CAP);
           resets.push({ u: k, tokenHash: sha(t), at: now, exp: now + RESET_MS }); await store.put(RESETS, resets);
           const link = `${originOf(req)}/market-structure.html#reset=${t}`;
-          await send(e, 'Choose a new password for Aureum Desk', `Someone asked to change the password of your Aureum Desk account.\n\nChoose a new one here (the link works for one hour, once):\n${link}\n\nIf it was not you, ignore this email: your password stays as it is.`,
-            html(['Someone asked to change the password of your Aureum Desk account.', 'The link works for one hour, once. If it was not you, ignore this email: your password stays as it is.'], link, 'Choose a new password')).catch(() => console.log('[signup] a reset email could not be sent'));
+          await send(e, 'Reset your password · Aureum Desk', `Someone asked to change the password of your Aureum Desk account.\n\nChoose a new one here (the link works for one hour, once):\n${link}\n\nIf it was not you, ignore this email: your password stays as it is.`,
+            html(['We received a request to reset the password for your Aureum Desk account.', 'Choose a new password with the button below. For your security, the link works once and expires in one hour.'], link, 'Reset password', { title: 'Reset your password', note: 'If you did not ask for this, you can ignore this email: your password stays as it is and nobody can change it without this link.' })).catch(() => console.log('[signup] a reset email could not be sent'));
         }
       }
       return res.status(200).json({ ok: true, message: FORGOT });
@@ -187,7 +225,7 @@ async function handle(req, res, d = {}) {
       const h = A.sha(b.password), cur = (await loadUsers()) || { users: {} }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
       if (!users[r.u]) { await store.put(RESETS, resets.filter((x) => x !== r)); return res.status(400).json({ error: 'This link has expired or was already used. Ask for a new one.' }); }
       const pend = live(await store.get(PENDING));
-      if (A.same(h, A.OWNER_HASH) || Object.keys(users).some((j) => j !== r.u && A.same(users[j].hash, h)) || pend.some((p) => A.same(p.hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
+      if (A.same(h, A.OWNER_HASH) || Object.keys(builtIns).some((j) => j !== r.u && users[j] && A.same(users[j].hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
       const stored = { ...(cur.users || {}) }; stored[r.u] = { ...(stored[r.u] || builtIns[r.u]), hash: h }; delete stored[r.u].disabled;
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The new password could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: 'a password was reset by email' });
@@ -199,26 +237,29 @@ async function handle(req, res, d = {}) {
     // ---- sign up ----
     if (!send) return res.status(503).json({ error: OFF });
     const ip = G.ipOf(req), w = G.wait(req, now) || G.hit('signup', ip, 5, 3600e3, now); if (w) return G.tooMany(res, w);
-    const name = one(b.name, 40), email = emailOf(b.email);
+    const name = one(b.name, 40), email = emailOf(b.email), uname = userOf(b.username);
     if (!name || name.length > 24) return res.status(400).json({ error: 'Use a name of 1 to 24 characters.' });
+    if (!uname) return res.status(400).json({ error: RESERVED.has(String(b.username || '').trim().toLowerCase()) ? 'That username is kept for the desk. Choose another.' : 'Choose a username of 3 to 24 letters, numbers or "-".' });
     if (!email) return res.status(400).json({ error: 'Type a valid email address.' });
     if (!pwOk(b.password)) return res.status(400).json({ error: 'Use a password of at least 10 characters.' });
     const h = A.sha(b.password), users = await A.userList({ ...deps, builtIns });
     let list = live(await store.get(PENDING));
-    if (A.same(h, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, h)) || list.some((p) => p.email !== email && A.same(p.hash, h))) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
+    if (pwClash(h, users, builtIns)) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
+    // one username, one account: a member's key, a built-in, the owner's words, or another live request (not this email's own)
+    if (users[uname] || builtIns[uname] || list.some((p) => p.username === uname && p.email !== email)) return res.status(409).json({ error: 'That username is taken. Choose another.', field: 'username' });
     const known = Object.values(users).some((u) => u && u.email && String(u.email).toLowerCase() === email), had = list.find((p) => p.email === email);
     // a known member, a request already confirmed, or one sent in the last 10 minutes: the same answer, nothing sent
-    if (known || (had && (had.verified || now - had.at < COOL_MS))) return res.status(200).json({ ok: true, message: SENT });
+    if (known || (had && (had.verified || now - had.at < COOL_MS))) return res.status(200).json({ ok: true, message: SENT, watch: token() });
     list = list.filter((p) => p !== had);
     if (list.length >= CAP) return res.status(429).json({ error: 'Too many sign-ups are waiting right now. Try again tomorrow.' });
-    const t = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, email, hash: h, tokenHash: sha(t), at: now, exp: now + VERIFY_MS, verified: false };
+    const t = token(), watch = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, username: uname, email, hash: h, tokenHash: sha(t), watchHash: sha(watch), at: now, exp: now + VERIFY_MS, verified: false };
     const link = `${originOf(req)}/api/signup?verify=${t}`;
     try {
-      await send(email, 'Confirm your email for Aureum Desk', `Hello ${name},\n\nConfirm your email for Aureum Desk with this link (it works for 24 hours, once):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
-        html([`Hello ${name},`, 'Confirm your email for Aureum Desk. The link works for 24 hours, once. Then the owner approves your seat, and you sign in with the password you chose.', 'If you did not sign up, ignore this email.'], link, 'Confirm my email'));
+      await send(email, 'Confirm your email address · Aureum Desk', `Hello ${name},\n\nThank you for signing up to Aureum Desk. Confirm your email address with this link (it works once and expires in 24 hours):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
+        html([`Hello ${name},`, 'Thank you for signing up to Aureum Desk. Please confirm that this is your email address to continue.', 'Once confirmed, your request goes to the desk owner for approval. We will email you as soon as your seat is ready, and you sign in with the password you chose.'], link, 'Confirm email address', { title: 'Confirm your email address', note: 'This link works once and expires in 24 hours. If you did not create an account, you can safely ignore this email.' }));
     } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.', why: e && e.tries ? e.tries : [redact(e)] }); }
     list.push(rec); await store.put(PENDING, list);
-    return res.status(200).json({ ok: true, message: SENT });
+    return res.status(200).json({ ok: true, message: SENT, watch });
   } catch (e) { console.error('[signup] failed'); return res.status(e.status === 503 ? 503 : 500).json({ error: 'Account storage is not available right now. Try again in a minute.' }); }
 }
 
@@ -228,4 +269,4 @@ module.exports.useSmtp = useSmtp;
 module.exports.useEmailMessage = useEmailMessage;
 module.exports.lastMailError = () => LAST_MAIL_ERROR;
 module.exports.useMail = useMail;
-module.exports._t = { originOf, keyOf, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };
+module.exports._t = { html, originOf, keyOf, userOf, RESERVED, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };

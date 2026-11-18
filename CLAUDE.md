@@ -122,10 +122,23 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## The 18 Nov 2026 outage and what the deploy now does (owner: "make it all you can")
+At 23:54 UTC on 17 Nov a Workers Builds deploy on the `aureum` Worker (the site; `meridianx` is deleted) published the pages
+alone and the Worker lost its code AND every secret: /api and /md answered 404, then "OANDA_TOKEN not set"; the council ran on
+Kraken for 14 hours and sign-in was off. Fixed by `cloudflare-deploy.yml`, which now (names only in its log, never a value):
+copies a Worker secret from a GitHub repository secret of the SAME name (OANDA_TOKEN / OANDA_ENV came this way); makes
+SESSION_SECRET, CRON_SECRET and CTRADER_LINK_KEY once, at random, only when the Worker has none (never replaced: that would sign
+everyone out; the connector keys derived from them changed once, members copy theirs again from the Profile); and, with no real
+Blob token, reads the file store from its D1 copy (`STORE=d1`, ready since 17 Nov 07:30, every folder present), with a
+placeholder `BLOB_READ_WRITE_TOKEN` the D1 store never sends anywhere and `STORE_MIRROR=off`. Stored cTrader links are unreadable
+under the new link key (members link again). Still missing: the six ACADEMY_LLM_* (AI features off), GH_TOKEN / GH_READ_TOKEN
+(/cdata falls back to the public raw files). Workers Builds on aureum must use root `cloudflare`, `npm ci`, `npx wrangler deploy`,
+or stay disconnected; the deploy's first look fails loudly when /api/status is not 200 and prints the candle route's answer.
+
 ## Sign-up, email verification and password reset (17 Nov 2026, owner: 'do 2')
 People create their own account, confirm their email by a link, and the owner approves them; a member with an email can reset a
 forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) shape, routed in `cloudflare/src/worker.mjs`):
-- `POST { name, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
+- `POST { name, username, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
   limit; name 1-24, email shape and <= 254, password >= 10. **A password picks the account**, so one already used by the owner, a
   member or another request is refused with the neutral "Choose another password." and that refusal counts as a failed password
   check (`G.failed`: it would otherwise test passwords). The answer is the SAME for a new, a pending, a confirmed and a member's
@@ -146,7 +159,7 @@ forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) 
   when the Users page saves without it), never in `publicRecord`, `/api/me`, `/api/users` (not even the owner's), `/cdata`, the
   guest cut or a log line; only the owner's approval list shows it.
 - **Mail senders** (`mailer`), in order: (1) the Worker's Cloudflare Email Service binding `env.EMAIL` (`send_email`, handed in per
-  request by `signup.useMail`), from `MAIL_FROM` (default desk@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
+  request by `signup.useMail`), from `MAIL_FROM` (default help@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
   socket function; the Worker hands in `cloudflare:sockets` `connect` through `signup.useSmtp`; smtp.gmail.com:465 implicit TLS,
   EHLO, AUTH PLAIN, dot-stuffing, CR/LF stripped from every header value, one plain address only), secrets `GMAIL_USER` /
   `GMAIL_APP_PASSWORD`; with both, a binding that throws is followed by one Gmail try. Neither: 503 "Sign-ups are not open yet."
@@ -157,6 +170,18 @@ forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) 
   card); `?signup=` shows a line on the card (`#ms-gate-ban`), `#reset=` opens the new-password panel and is cleaned from the
   address at once (also on a hash change). Nothing typed there is stored in the browser. Users page: "Waiting for your approval"
   (`#ms-u-wait-card`, `renderSignups`) with a role and Approve / Refuse, failures in words.
+- **The inbox screen and its automatic check** (18 Nov 2026, owner: "improve the confirmation design with a cool animation, and the
+  confirmation link should be automatic"): every sign-up answer carries `watch` (a random code; only `watchHash` is stored on a
+  new pending record, so a repeat, a member's or a confirmed email gets a code that never confirms: the answers still look
+  alike). `GET /api/signup?watch=<code>` answers only `{ state: 'confirmed' | 'waiting' }` (unknown or expired = waiting; 1,200
+  an hour per IP). Page: after "Create account" the panel shows `#ms-su-sent` (style `#ms-su-sent-css`): an envelope that takes
+  its letter and closes after a paper plane flies in, a "1" new-mail badge and a light orbiting it, three steps in a card (sent /
+  confirm / the owner approves), "Open Gmail" (Outlook, Yahoo, iCloud, Proton) for
+  known domains; it asks every 4 s while visible, at once when the page comes back (from the email app), for 45 minutes, and
+  turns by itself to "Email confirmed" (the envelope squeezes into a check that draws itself, the glow turns green, confetti made
+  by the script, a short buzz on Android). 2D only (a 3D flip clipped the glow). `?signup=verified` (the email's
+  link) opens the same confirmed screen. No endless animation; reduced motion shows the end states. Nothing is stored in the
+  browser (the code lives in memory). Test: `tests/signup.test.mjs` ("watch").
 - Not checked live: neither sender has sent a real email from the build sandbox (no network to Gmail or Cloudflare); the
   binding's call shape (`send({ from: { email, name }, to, subject, text, html })`) is from Cloudflare's docs as summarised by a
   web search, the docs site itself was not reachable. Tests: `tests/signup.test.mjs` (fake store, clock, binding, SMTP socket).
@@ -2410,6 +2435,42 @@ Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` 
 submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
 (no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
 
+## Sign in with email or username; unique usernames (18 Nov 2026, owner: "login with email or either username and password … unique username, so no repeated ones")
+- **Sign-in** (`api/login.js` `{ id, password }`, `api/_session.js` `login(deps, pw, id)`): `id` = the account's username (its KEY,
+  lowercased) or the email on its stored record; the owner is `owner` or `admin`. Only that account is checked; every miss is the same
+  401. **Without an `id` only the owner and the built-in members are checked** (owner, 18 Nov 2026: "password-only login, only for
+  built in users"; `deps.builtIns || A.BUILT_IN` keys, their current stored hash); sign-up and reset refuse only the owner's or a
+  built-in's password (`pwClash`), members' passwords may repeat. The field is optional on the card, which
+  asks "Email or username" (`#ms-gate-u`, `autocomplete="username"`, phone order 3 above the password) and sends `id`.
+- **Usernames** (`api/signup.js` `userOf`, `USER_RE` 3-24 of a-z 0-9 "-", not starting with "-", case-insensitive; `RESERVED`
+  owner / admin / aureum / desk / guest / help / support / root / system / council / member / api): required at sign-up (`#ms-su-u`,
+  suggested from the name until typed), 409 `{ field: 'username' }` when a member, a built-in or another waiting request holds it;
+  stored on the request, shown on the owner's approval list, and approval makes it the account's key (409 if it was taken meanwhile;
+  a request from before usernames gets the old name-derived key). The "seat is ready" email names it. Built-in members' usernames
+  are their keys (fred, orlando, luxus, carlos). The Profile hero shows "Username: <key>" (`#ms-pf-user`).
+- **The welcome shows the photo**: `msGateWelcome` reads this device's `ms-photo-<name>` / `ms-name-<name>`, else GET `/api/profile`
+  (1.5 s cap; a `data:image` only); if the photo is in when the lock turns (780 ms) it pops in inside the drawn green ring with a
+  small check badge, else the check stays; the title is "Welcome back, <display name>".
+Tests: `tests/signup.test.mjs` ("usernames"), `tests/gate-welcome.test.mjs`.
+
+## Home's forward line, data revalidation, the logo on the sign-in screen (18 Nov 2026, owner: "yes" to the next three builds)
+- **Home** (`#hs-fwd`, class `adm`, under the headline, from 641 px): "Live book against its plan: <state> · n positions closed since
+  <date>, R after costs · n open · See the forward record" from coach.json `forward` (`MS_FWD.brief` / `home` in `#ms-fw-js`; no new
+  figure, nothing fetched; hidden without a reading). Test in `tests/qa-sweep.test.mjs`.
+- **msData revalidates**: the last ETag and text per file and variant (`V`, key `m|` / `g|` + file) stay in memory; a later read
+  sends `If-None-Match` and a 304 hands back the same text (no body). Only for the site's own `/cdata` (never the raw GitHub copy:
+  a preflight). Checked live: `/cdata/snapshot.json` answers 304 with 0 bytes. Test in `tests/desk-load.test.mjs`.
+- **Sign-in screen**: the desktop left side leads with the mark at 44 px and a larger wordmark (`.gs-brand`, last style block); on
+  phones the card's wordmark is `inline-flex` again (a flex column made it a block and the words ran together: "AUREUMDESK").
+
+## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
+Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`
+plays inside the card (`<style id="ms-gate-ok-css">` + `<script id="ms-gate-ok-js">`, before `#ms-su-sent-css`, reusing its
+`su-*` keyframes): a padlock pops in and unlocks, squeezes into a green check that draws itself, the glow turns green, confetti
+(made by the script), "Welcome back" (a device with `ms-was-in`, else "Welcome"), "Signed in as <name>" as text, and a bar that fills.
+`window.msGateWelcome(account)` resolves after about 1.25 s (350 ms under reduced motion, end state only), then both callers reload
+as before; any failure resolves at once, so sign-in never waits on it. Nothing is stored. Test: `tests/gate-welcome.test.mjs`.
+
 ## Face ID / fingerprint sign-in with passkeys (17 Nov 2026, owner)
 Owner: "Face ID or fingerprint login", like the Face ID button of the Figma login. WebAuthn passkeys; the password stays the
 primary way in. No npm dependency: `api/_passkey.js` (pure) reads CBOR, COSE keys (ES256 P-256 and RS256 only), authenticator data
@@ -2888,6 +2949,9 @@ reads the SVG and draws every icon (any on transparent; maskable, apple-touch an
 tile inside the 40 % safe circle; badge-96 = white tile, A cut out; favicon-32) and `icons/og-card.png` (1200 x 630 link
 preview, vendored Inter embedded, not wired to pages yet). Manifest and pwa.mjs theme colour #121315 (`--au-bg`).
 Tests: `tests/aureum-mark.test.mjs`, `tests/pwa.test.mjs`.
+**Email logo** (18 Nov 2026, owner: "aureum should have a image or logo for email"): `icons/email-logo.png` (the mark + AUREUM
+/ DESK on one line, graphite ink, transparent, 585 x 96 drawn at 3x by make-icons.mjs) heads every email of `api/signup.js`
+(`LOGO`, always from https://aureumdesk.co.uk/, shown 195 x 32, alt "Aureum Desk"). PNG on purpose: most mail apps show no SVG.
 - Build step `scripts/pwa.mjs out` (build.sh, before stamp-assets): adds the missing head tags to every built page (manifest,
   theme-color, apple-touch-icon, apple-mobile-web-app-capable / -title / -status-bar-style black, mobile-web-app-capable, and
   `/assets/pwa.js` which stamp-assets versions). Never hand-add these to page sources. It also writes out/sw.js `VERSION` = hash
@@ -2993,6 +3057,22 @@ Measured at 390 x 844 on the 11 Nov files: 8.9 screens → 1.9, 1,357 words → 
   discussion, sources, COT, ledger, library are reference reading).
 - Tests: `tests/macro-visual.test.mjs` (simple phone view: three tests). `scripts/audit/smoke.cjs`: on the phone, as a member,
   every folded section is opened and each chart in it must be drawn at its host's width (fails with "folded section opened: …").
+
+## Macro desk: Before you trade (18 Nov 2026, owner: "more improvement on macro as well, I want people to be able to use it to take or decide for trades")
+Display only, `macro-desk.html` section 2 `#s-trade` (`sfold`, folds on the phone like sections 3-7; TOC chip). Reads what the page
+already loads (forecast.json, veteran.json, and cot.json, now fetched with the others), fetches nothing else, changes nothing.
+- **Today, market by market** (`#tc-today`): per market the strategist's lean (pUp ± `LEAN` 0.03 → Up / Down / No lean), a normal
+  day (`expMovePct`, "1.7x usual" from `volRatio` >= 1.3), the next release in 24 h that reaches it (`CCY`: USD for all, EUR for
+  EUR/USD, JPY for USD/JPY; the veteran's `events` first, else `fc.playbook`), positioning (COT `pct1y`, crowded at 90 / 10, the yen
+  inverted as `council/cot.mjs` `sign`). A row fills the check below.
+- **Check a trade** (`#tc-form`: market, Buy / Sell, entry (default the price now), stop, target): rows Macro lean, Gold Macro Score
+  (gold; read for buys only, the veteran never calls a macro sell), Release risk (wait within an hour either side of a release:
+  "the playbook acts after the release"), Market mood (VIX >= 25 or inverted curve, `volRatio` >= 1.3), the stop against a normal
+  day (under 0.25x = inside noise) with the target's R, gold's levels in the way (`v.summary.levels`), Positioning. A stop or target
+  on the wrong side is refused in words (absolute rule 1). One verdict line ("Macro leans with / against / no lean · n to watch",
+  or "Wait for the release"), never "take it"; the footnote says no reading has passed a test as an edge.
+- Pure logic `window.MD_CHECK` (`today`, `check`, `lean`, `cotOf`, `nextFor`); test `tests/macro-trade-check.test.mjs` runs it;
+  `tests/macro-visual.test.mjs` counts six folding sections.
 
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
 Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
