@@ -122,6 +122,19 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## The 18 Nov 2026 outage and what the deploy now does (owner: "make it all you can")
+At 23:54 UTC on 17 Nov a Workers Builds deploy on the `aureum` Worker (the site; `meridianx` is deleted) published the pages
+alone and the Worker lost its code AND every secret: /api and /md answered 404, then "OANDA_TOKEN not set"; the council ran on
+Kraken for 14 hours and sign-in was off. Fixed by `cloudflare-deploy.yml`, which now (names only in its log, never a value):
+copies a Worker secret from a GitHub repository secret of the SAME name (OANDA_TOKEN / OANDA_ENV came this way); makes
+SESSION_SECRET, CRON_SECRET and CTRADER_LINK_KEY once, at random, only when the Worker has none (never replaced: that would sign
+everyone out; the connector keys derived from them changed once, members copy theirs again from the Profile); and, with no real
+Blob token, reads the file store from its D1 copy (`STORE=d1`, ready since 17 Nov 07:30, every folder present), with a
+placeholder `BLOB_READ_WRITE_TOKEN` the D1 store never sends anywhere and `STORE_MIRROR=off`. Stored cTrader links are unreadable
+under the new link key (members link again). Still missing: the six ACADEMY_LLM_* (AI features off), GH_TOKEN / GH_READ_TOKEN
+(/cdata falls back to the public raw files). Workers Builds on aureum must use root `cloudflare`, `npm ci`, `npx wrangler deploy`,
+or stay disconnected; the deploy's first look fails loudly when /api/status is not 200 and prints the candle route's answer.
+
 ## Sign-up, email verification and password reset (17 Nov 2026, owner: 'do 2')
 People create their own account, confirm their email by a link, and the owner approves them; a member with an email can reset a
 forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) shape, routed in `cloudflare/src/worker.mjs`):
