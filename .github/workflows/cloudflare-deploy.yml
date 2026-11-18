@@ -114,9 +114,14 @@ jobs:
           base="https://aureum.meridianx-cloudflare.workers.dev"
           sleep 10
           fail=0
-          for p in / /market-structure.html /macro-desk /backtest /gold /api/status /cdata/trades.json; do
+          for p in / /market-structure.html /macro-desk /backtest /gold /api/status /cdata/trades.json "/md/bars?sym=xau&tf=5m&n=2"; do
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base$p" || echo 000)
             echo "$code  $p"
             case "$code" in 2*) ;; *) fail=1 ;; esac
           done
           [ "$fail" = 0 ] || echo "::warning::Some addresses did not answer 2xx (expected for API calls until the Worker's secrets are set)."
+          # The council reads its OANDA candles here (council.yml MD_BASE): say plainly when that route is broken.
+          curl -s --max-time 20 "$base/md/bars?sym=xau&tf=5m&n=2" | head -c 200; echo
+          # 18 Nov 2026: a Workers Builds deploy replaced this one with assets only (every /api and /md path 404).
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$base/api/status" || echo 000)
+          [ "$code" = 200 ] || echo "::error::The Worker's code is not answering (/api/status $code): check that Workers Builds is disconnected from the aureum Worker."
