@@ -768,7 +768,10 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     check('Alt+T then two clicks: a trend line, selected, stamped with the moment', tl.r.type === 't' && tl.D.sel === tl.D.list.length - 1 && tl.r.at > 0 && tl.D.mag === 0, JSON.stringify(tl.r));
     { const g = tl.D.geo[tl.D.sel], mx = (g.x1 + g.x2) / 2, my = (g.y1 + g.y2) / 2; await t.mouse.move(ch.x + mx, ch.y + my); await t.mouse.down(); await t.mouse.move(ch.x + mx - 70, ch.y + my + 40, { steps: 8 }); await t.mouse.up(); await settle(t);
       const m = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; });
-      check('dragging a trend line by its body moves both points by the same time and price; the chart did not pan', m.t1 < tl.r.t1 && m.t1 - tl.r.t1 === m.t2 - tl.r.t2 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m])); }
+      // both points move by the same distance ON THE CHART (bars, not seconds): across a weekend, or with a point past the last candle
+      // (one candle a step there), the same number of bars is a different number of seconds (18 Nov 2026, a Friday-close session)
+      const dx = await t.evaluate(([a, b]) => { const x = (q, k) => window.ctPaneXY(-1, q[k], q.p1).tx; return [x(b, 't1') - x(a, 't1'), x(b, 't2') - x(a, 't2')]; }, [tl.r, m]);
+      check('dragging a trend line by its body moves both points by the same distance on the chart and the same price; the chart did not pan', m.t1 < tl.r.t1 && Math.abs(dx[0] - dx[1]) <= 1 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m, dx])); }
     // Delete removes the selected one; Esc lets go
     const n0 = (await t.evaluate(() => window.ctDraw().list.length)); await t.keyboard.press('Delete'); await settle(t);
     const del = await t.evaluate(() => ({ n: window.ctDraw().list.length, sel: window.ctDraw().sel, bar: document.getElementById('dsel').hidden }));
@@ -809,7 +812,9 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     check('live coach: the panel sits on the chart and stays out of the quick bar', !ov.hit && ov.inChart, JSON.stringify(ov));
     for (let i = 0; i < 3; i++) await t.keyboard.press('ArrowRight'); await t.evaluate(() => { const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); }); await t.waitForTimeout(800);
     L = await t.evaluate(() => window.ctLive()); const A = await t.evaluate(() => window.ctAcct().acct.closed.slice(-1)[0]);
-    check('live coach: an exit gets a free note with its R, the same R as the journal', L.notes[0] && L.notes[0].tag === 'Closed' && A && L.notes[0].text.includes(Math.abs(A.R).toFixed(2) + 'R'), L.notes[0] && L.notes[0].text);
+    // the newest note need not be the exit: a market note (a big candle) can land after it, so the check finds the exit's own note
+    { const cn = L.notes.find((x) => x.tag === 'Closed');
+      check('live coach: an exit gets a free note with its R, the same R as the journal', cn && A && cn.text.includes(Math.abs(A.R).toFixed(2) + 'R'), JSON.stringify(L.notes.slice(0, 3))); }
     await t.click('#lc .lc-ask'); await t.waitForTimeout(300);
     await t.evaluate(() => document.activeElement && document.activeElement.blur()); for (let i = 0; i < 40; i++) await t.keyboard.press('ArrowRight'); await t.waitForTimeout(500);
     const mk = await t.evaluate(() => window.ctLive().notes.filter((x) => /^mk/.test(x.k)));
