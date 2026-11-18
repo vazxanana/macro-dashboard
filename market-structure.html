@@ -1311,8 +1311,12 @@ window.msFetchUsers = function () {
 // reader cannot change what another sees. The text is dropped from memory once it can no longer be reused.
 // Guests: a visitor who is not signed in is only ever asked the files in GUEST (GUEST_OK in api/data.js); anything else answers
 // null here without a request, whoever calls. tests/desk-load.test.mjs runs this block with a fake fetch and clock.
+// Revalidation (18 Nov 2026): /cdata answers conditional requests (api/data.js, strong ETag per variant), so the last ETag and text
+// of each file stay in memory (V) and a later read sends If-None-Match: a 304 hands the same text back with no body downloaded.
+// Only for the site's own /cdata (a header to another origin would need a preflight), and only for the same variant (the member
+// mark is part of the key, so a visitor's copy is never reused for a member or the other way round).
 window.msDataMake = function (W, clock) {
-  var E = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
+  var E = {}, V = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
   var GUEST = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];
   function allowed(f) { return !(W.MS_API && W.document.documentElement.dataset.mode !== 'admin') || GUEST.indexOf(f) >= 0; }
   // a signed-in member asks under his own address (&m=1): the server cuts the guest files for visitors (api/_guestcut.js) and its
@@ -1323,7 +1327,13 @@ window.msDataMake = function (W, clock) {
     var keep = LONG[f] || FRESH, fresh = o && o.fresh != null ? Math.min(+o.fresh || 0, keep) : keep, e = E[f];
     if (e && (e.done == null || (e.ok && now() - e.done < fresh))) return e.p;
     e = E[f] = { done: null, ok: false, p: null };
-    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000) + (member() ? '&m=1' : ''), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; })
+    var mk = (member() ? 'm|' : 'g|') + f, v = V[mk], own = /^\//.test(W.MS_CDATA || ''), init = { cache: 'no-store' };
+    if (own && v) init.headers = { 'If-None-Match': v.tag };
+    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000) + (member() ? '&m=1' : ''), init).then(function (r) {
+      if (r.status === 304) return v ? v.t : null;
+      if (!r.ok) return null;
+      return r.text().then(function (t) { var tag = own && r.headers && r.headers.get && r.headers.get('ETag'); if (tag) V[mk] = { tag: tag, t: t }; else delete V[mk]; return t; });
+    }).catch(function () { return null; })
       .then(function (t) { e.done = now(); e.ok = t != null; W.setTimeout(function () { if (E[f] === e) delete E[f]; }, keep); return t; });
     return e.p;
   }
@@ -1385,33 +1395,37 @@ function msGate(show) {
 function msGateInert() { var on = !!document.documentElement.dataset.gate; ['.skip', '#ms-live'].forEach(function (q) { var e = document.querySelector('body > ' + q); if (e) e.inert = on; }); }
 document.addEventListener('DOMContentLoaded', function () {
   var f = document.getElementById('ms-gate-f'), err = document.getElementById('ms-gate-err'), gb = document.getElementById('ms-gate-guest'), x = document.getElementById('ms-gate-x');
-  if (document.documentElement.dataset.gate) setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30);
+  if (document.documentElement.dataset.gate) setTimeout(function () { var i = document.getElementById('ms-gate-u'), u = document.getElementById('ms-gate-p'); if (i && !i.value) i.focus(); else if (u) u.focus(); }, 30);
   msGateInert();
   // sign-in states (9 Nov 2026 polish): Enter submits; the button holds its size while it waits (aria-busy, finite spinner); every
   // failure says why (empty, wrong password, too many tries, server down, offline, timeout) and leaves the field ready to retype
   var inp = document.getElementById('ms-gate-p'), eye = document.getElementById('ms-gate-eye'), card = document.querySelector('.gate-card');
   var showPw = function (on) { if (!inp || !eye) return; inp.type = on ? 'text' : 'password'; eye.setAttribute('aria-pressed', String(on)); eye.setAttribute('aria-label', on ? 'Hide password' : 'Show password'); eye.classList.toggle('on', on); };
   if (eye) eye.addEventListener('click', function () { var pos = inp.selectionStart; showPw(inp.type === 'password'); inp.focus(); try { inp.setSelectionRange(pos, pos); } catch (e) {} });
-  var fail = function (msg, shake) { err.textContent = msg; inp.setAttribute('aria-invalid', 'true'); if (shake && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } inp.focus(); inp.select(); };
+  var idIn = document.getElementById('ms-gate-u');
+  var fail = function (msg, shake, el) { el = el || inp; err.textContent = msg; el.setAttribute('aria-invalid', 'true'); if (shake && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } el.focus(); el.select(); };
   if (inp) inp.addEventListener('input', function () { inp.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
+  if (idIn) idIn.addEventListener('input', function () { idIn.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
   if (f) f.addEventListener('submit', async function (ev) { ev.preventDefault();
     var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
     if (btn.getAttribute('aria-busy') === 'true') return;
+    var uid = idIn ? idIn.value.trim() : '';
     err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
     if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on aureumdesk.co.uk.'); return; }
-    btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; lab.textContent = 'Signing in…';
+    btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; if (idIn) idIn.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
     var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 15000);
-    try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
+    try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify(uid ? { id: uid, password: pw } : { password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
     clearTimeout(tm);
     if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' }); lab.textContent = 'Signed in · opening the desk…'; showPw(false);
-      try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; lab.textContent = 'Sign in';
+      try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {}
+      (window.msGateWelcome ? window.msGateWelcome(j.account) : Promise.resolve()).then(function () { location.reload(); }); return; }
+    btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; if (idIn) idIn.readOnly = false; lab.textContent = 'Sign in';
     if (!r) { fail(timedOut ? 'The server took too long to answer. Try again.' : navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.'); return; }
     if (r.status === 429) { fail((j && j.error) || 'Too many tries. Wait a few minutes, then try again.')   /* api/_guard.js */; return; }
     if (r.status >= 500) { fail('Sign-in is unavailable right now (the server could not check accounts). Try again in a minute.'); return; }
     var capsEl = document.getElementById('ms-gate-caps'), capsOn = !!capsEl && !capsEl.hidden;   // the likeliest reason is said in the error itself (the hint and the error share one row)
-    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'That password was not accepted. Caps Lock is on: turn it off and try again.' : 'That password was not accepted. Check it and try again.', true); });
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'Those details were not accepted. Caps Lock is on: turn it off and try again.' : (uid ? 'That email or username and password do not match. Check them and try again.' : 'Password not accepted. Add your email or username above and try again.'), true); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {} if (ev.key === 'Escape' && document.documentElement.dataset.gate && guest) msGate(false); });
@@ -2631,11 +2645,12 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <div class="gate-card">
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span class="wm"><b>Aureum</b><small>Desk</small></span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in to the desk</h1>
-    <p class="gate-sub">Your password opens your own account.</p>
+    <p class="gate-sub">Sign in with your email or username and your password.</p>
     <p class="gate-ban" id="ms-gate-ban" role="status" hidden></p>
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
     <form id="ms-gate-f" method="post" action="#" novalidate>
-      <input class="gate-user" type="text" name="username" autocomplete="username" value="Aureum Desk" tabindex="-1" aria-hidden="true">
+      <label for="ms-gate-u">Email or username</label>
+      <input id="ms-gate-u" class="gate-id" name="username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" aria-describedby="ms-gate-msg">
       <label for="ms-gate-p">Password</label>
       <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password webauthn" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
       <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>
@@ -2646,6 +2661,20 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <button type="button" class="gate-guest" id="ms-gate-guest"><span>Continue as guest</span><small>Live gold chart, the trade and results</small></button>
     <p class="gate-links"><button type="button" class="gate-lk" id="ms-gate-su" aria-controls="ms-gp-su">Create an account</button><button type="button" class="gate-lk" id="ms-gate-fg" aria-controls="ms-gp-fg">Forgot password?</button></p>
     <p class="gate-note"><b>Want a seat at the desk?</b> Create an account and confirm your email: the owner approves every seat.</p>
+    <!-- signed in (18 Nov 2026): the padlock opens, turns into a check, then the desk opens (msGateWelcome; display only) -->
+    <div class="gate-ok" id="ms-gate-ok" hidden>
+      <div class="go-art" aria-hidden="true">
+        <span class="go-glow"></span>
+        <svg class="go-lock" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><path class="go-shackle" d="M42 54V40a18 18 0 0 1 36 0v14"/><rect class="go-body" x="32" y="54" width="56" height="44" rx="10"/><circle class="go-hole" cx="60" cy="72" r="5"/><path class="go-hole" d="M60 76v8"/></svg>
+        <svg class="go-ok" viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="go-ok-c" cx="60" cy="60" r="38"/><path class="go-ok-k" d="m43 61 12 12 23-25"/></svg>
+        <span class="go-ph"><img alt="" decoding="async"></span><span class="go-badge"></span>
+        <span class="go-confetti"></span>
+      </div>
+      <h2 class="go-h" id="ms-gate-ok-h" tabindex="-1">Welcome back</h2>
+      <p class="go-p" id="ms-gate-ok-p"></p>
+      <div class="go-bar"><i></i></div>
+      <p class="go-sr" role="status" id="ms-gate-ok-live"></p>
+    </div>
     <!-- sign-up, forgotten password and a new password from an email link (17 Nov 2026, api/signup.js): they take the card's place
          while one is open (.gate-card[data-panel]); nothing typed here is stored in the browser -->
     <section class="gate-panel" id="ms-gp-su" data-p="su" aria-labelledby="ms-gp-su-t" hidden>
@@ -2653,12 +2682,47 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <p class="gate-sub">Confirm your email, then the owner approves your seat.</p>
       <form id="ms-gp-su-f" novalidate>
         <label for="ms-su-n">Name</label><input id="ms-su-n" name="name" autocomplete="nickname" maxlength="24" required>
+        <label for="ms-su-u">Username</label><input id="ms-su-u" name="username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required aria-describedby="ms-su-uh">
+        <p class="gate-help su-uh" id="ms-su-uh">3 to 24 letters, numbers or "-". Yours alone: you sign in with it.</p>
         <label for="ms-su-e">Email</label><input id="ms-su-e" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required>
         <label for="ms-su-p">Password</label><input id="ms-su-p" name="new-password" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="200" required aria-describedby="ms-su-msg">
         <div class="gate-msg" id="ms-su-msg"><p class="gate-help">At least 10 characters. Your password opens your account, so choose your own.</p><p class="gate-err" role="alert"></p></div>
         <button type="submit" class="gate-go"><span class="gate-go-t">Create account</span></button>
       </form>
       <p class="gate-done" role="status" hidden></p>
+      <!-- after a sign-up (18 Nov 2026): the inbox screen, which turns to "Email confirmed" by itself once the link is opened on any
+           device (the page asks /api/signup?watch=<code> every few seconds; the code says only waiting / confirmed) -->
+      <div class="su-sent" id="ms-su-sent" data-state="waiting" hidden>
+        <div class="su-art" aria-hidden="true">
+          <span class="su-glow"></span><span class="su-orbit"></span>
+          <svg class="su-plane" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2.5 2.8 10.2l7.4 2.9 2.9 7.4Z"/><path d="m21.5 2.5-11.3 10.6"/></svg>
+          <div class="su-flip">
+            <div class="su-face su-front">
+              <svg class="su-env" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <rect class="su-backp" x="14" y="38" width="92" height="48" rx="6"/>
+                <g class="su-letter"><rect x="30" y="10" width="60" height="46" rx="5"/><path d="M40 24h40M40 33h30M40 42h22"/></g>
+                <path class="su-body" d="M14 38 60 64l46-26v42a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6Z"/>
+                <path class="su-flap" d="M14 38 60 8l46 30"/>
+              </svg>
+              <span class="su-badge">1</span>
+            </div>
+            <div class="su-face su-back">
+              <svg class="su-ok" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="su-ok-c" cx="60" cy="46" r="36"/><path class="su-ok-k" d="m44 47 11 11 22-23"/></svg>
+            </div>
+          </div>
+          <span class="su-confetti"></span>
+        </div>
+        <h2 class="su-h" id="ms-su-h" tabindex="-1">Check your inbox</h2>
+        <p class="su-p" id="ms-su-txt"></p>
+        <ol class="su-steps">
+          <li class="done"><i aria-hidden="true"></i><span>Account details sent</span></li>
+          <li class="now" id="ms-su-s2"><i aria-hidden="true"></i><span>Confirm your email</span><small id="ms-su-s2t">Waiting for you to open the link…</small></li>
+          <li id="ms-su-s3"><i aria-hidden="true"></i><span>The owner approves your seat</span><small>You get an email when it is ready</small></li>
+        </ol>
+        <a class="su-open" id="ms-su-open" target="_blank" rel="noopener" hidden></a>
+        <p class="su-hint" id="ms-su-hint">No email after a few minutes? Look in spam or promotions. You can ask for a new one in 10 minutes.</p>
+        <p class="su-sr" role="status" id="ms-su-live"></p>
+      </div>
       <button type="button" class="gate-lk gate-back">Back to sign in</button>
     </section>
     <section class="gate-panel" id="ms-gp-fg" data-p="fg" aria-labelledby="ms-gp-fg-t" hidden>
@@ -2750,7 +2814,8 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   // ---- the sign-in card ----
   var ac = null;
   function signedIn(j, id) { if (j.account && id) mine(j.account.u, id);
-    try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); }
+    try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {}
+    (window.msGateWelcome ? window.msGateWelcome(j.account) : Promise.resolve()).then(function () { location.reload(); }); }
   async function finish(cred) {
     var o = await post(Object.assign({ op: 'login' }, assertion(cred)));
     if (o.r && o.r.ok && o.j.account) { signedIn(o.j, cred.id); return null; }
@@ -2867,7 +2932,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 (function () {
   var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
   try { if (!R.hasAttribute('data-gate') && R.dataset.role && R.dataset.role !== 'public') localStorage.setItem('ms-was-in', '1');
-    else if (R.hasAttribute('data-gate') && localStorage.getItem('ms-was-in') && matchMedia('(max-width: 640px)').matches) { var gt = document.getElementById('ms-gate-t'); if (gt) gt.textContent = 'Welcome back'; var gs = document.querySelector('.gate-sub'); if (gs) gs.textContent = 'Enter your password to continue.'; } } catch (e) {}
+    else if (R.hasAttribute('data-gate') && localStorage.getItem('ms-was-in') && matchMedia('(max-width: 640px)').matches) { var gt = document.getElementById('ms-gate-t'); if (gt) gt.textContent = 'Welcome back'; var gs = document.querySelector('.gate-sub'); if (gs) gs.textContent = 'Sign in with your email or username.'; } } catch (e) {}
   var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
   function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
   if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }
@@ -2923,6 +2988,206 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
 })();
 </script>
+<style id="ms-gate-ok-css">
+/* Signed in (18 Nov 2026, owner: "a similar animation for the login"): the sibling of the sign-up inbox screen. The card's contents
+   fade, a padlock pops in and its shackle lifts, the lock squeezes into a green check that draws itself, the glow turns green and
+   confetti goes off; "Welcome back, <name>" and a bar that fills while the desk opens. About 1.2 s, then the page reloads as before.
+   Reduced motion: the end state at once. Display only: the sign-in itself is unchanged. */
+.gate-card.gate-okay > :not(.gate-ok) { opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s .18s; }
+.gate-ok[hidden] { display: none !important; }
+.gate-ok { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; text-align: center; z-index: 2;
+  --go-acc: #9db4d3; --go-ok: #3fb68b; }
+.go-art { position: relative; width: 150px; height: 140px; }
+.go-glow { position: absolute; inset: 4px 10px; border-radius: 50%; background: radial-gradient(closest-side, rgba(157,180,211,.32), rgba(157,180,211,.08) 55%, transparent 72%);
+  animation: su-glow-in .5s ease-out both; }
+.go-lock, .go-ok { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; overflow: visible; }
+.go-lock { animation: su-pop-in .35s cubic-bezier(.2,.9,.25,1.3) both, go-squeeze .22s ease-in .62s forwards; }
+.go-body { fill: #20242b; stroke: #d5dbe4; stroke-width: 3.2; }
+.go-hole { stroke: var(--go-acc); stroke-width: 3.2; fill: none; }
+.go-shackle { stroke: #d5dbe4; stroke-width: 5; transform-origin: 78px 54px; animation: go-unlock .3s cubic-bezier(.3,1.4,.5,1) .3s forwards; }
+.go-ok { transform: scaleX(0); opacity: 0; animation: su-unfold .4s cubic-bezier(.2,1,.3,1.35) .8s forwards; }
+.go-ok-c { stroke: var(--go-ok); stroke-width: 3.5; fill: rgba(63,182,139,.14); stroke-dasharray: 239; stroke-dashoffset: 239; animation: su-draw .45s ease-out .85s forwards; }
+.go-ok-k { stroke: var(--go-ok); stroke-width: 6; stroke-dasharray: 56; stroke-dashoffset: 56; animation: su-draw .3s ease-out 1.15s forwards; }
+.gate-ok.ok .go-glow { background: radial-gradient(closest-side, rgba(63,182,139,.40), rgba(63,182,139,.12) 55%, transparent 72%); animation: su-pulse .8s ease-out both; transition: background .4s ease; }
+.go-confetti { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.go-confetti i { position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; background: var(--c); opacity: 0;
+  animation: su-conf var(--t, 1.2s) cubic-bezier(.15,.7,.3,1) var(--d, 0s) forwards; }
+.go-h { margin: 6px 0 0 !important; font: 680 24px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.025em; color: #f5f7fa; outline: none;
+  animation: su-up .4s cubic-bezier(.2,.8,.2,1) .45s both; }
+#ms-gate-ok-h:focus, #ms-gate-ok-h:focus-visible { outline: none !important; box-shadow: none !important; }
+.go-p { margin: 0; color: #b4bcc8; font-size: 15px; line-height: 1.5; max-width: 32ch; overflow-wrap: anywhere; animation: su-up .4s cubic-bezier(.2,.8,.2,1) .55s both; }
+.go-p b { color: #f3f5f8; font-weight: 600; }
+.go-bar { width: 160px; height: 4px; margin-top: 10px; border-radius: 2px; background: rgba(255,255,255,.10); overflow: hidden; animation: su-up .4s ease .6s both; }
+.go-bar i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--go-acc), var(--go-ok)); transform-origin: left; transform: scaleX(0);
+  animation: go-fill 1.6s cubic-bezier(.3,.6,.3,1) .6s forwards; }
+.go-ph, .go-badge { display: none; }
+.gate-ok.ph .go-ok-k { display: none; }
+.gate-ok.ph .go-ph { display: block; position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 3px #121315; animation: su-pop-in .45s cubic-bezier(.2,.9,.25,1.3) .05s both; }
+.gate-ok.ph .go-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.gate-ok.ph .go-badge { display: block; position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: 14px 0 0 18px; border-radius: 50%; background: var(--go-ok);
+  box-shadow: 0 0 0 3px #121315; animation: su-badge .4s cubic-bezier(.2,1,.3,1.4) .4s both; }
+.gate-ok.ph .go-badge::after { content: ""; position: absolute; left: 8.5px; top: 4.5px; width: 5px; height: 10px; border: solid #0d0f12; border-width: 0 2.4px 2.4px 0; transform: rotate(45deg); }
+.go-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes go-unlock { 0% { transform: none; } 100% { transform: translateY(-9px) rotate(-24deg); } }
+@keyframes go-squeeze { to { transform: scaleX(0); opacity: .3; } }
+@keyframes go-fill { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .gate-card.gate-okay > :not(.gate-ok) { transition: none; }
+  .gate-ok *, .gate-ok .go-glow { animation: none !important; }
+  .go-lock { display: none; } .go-ok { transform: none; opacity: 1; } .go-ok-c, .go-ok-k { stroke-dashoffset: 0; } .go-bar i { transform: scaleX(.6); }
+  .gate-ok.ph .go-ph, .gate-ok.ph .go-badge { animation: none !important; }
+}
+html[data-motion="off"] .gate-ok *, html[data-motion="off"] .gate-ok .go-glow { animation: none !important; }
+html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-ok { transform: none; opacity: 1; } html[data-motion="off"] .go-ok-c, html[data-motion="off"] .go-ok-k { stroke-dashoffset: 0; }
+</style>
+<script id="ms-gate-ok-js">
+// msGateWelcome(account) (18 Nov 2026): plays the signed-in screen, then resolves; the callers reload the page as before. Never stores
+// anything; the name is set as text. A failure anywhere resolves at once, so sign-in never waits on the animation.
+(function () {
+  var still = function () { try { return matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off'; } catch (e) { return false; } };
+  function confetti(box) { box.textContent = ''; if (still()) return;
+    var C = ['#3fb68b', '#9db4d3', '#e6ebf2', '#7fd8b4', '#c9a96e', '#5f8fd1'];
+    for (var i = 0; i < 24; i++) { var e = document.createElement('i'), a = (i / 24) * Math.PI * 2 + Math.random() * 0.4, r = 60 + Math.random() * 60;
+      e.style.cssText = '--c:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * r) + 'px;--y:' + Math.round(Math.sin(a) * r * 0.8 + 30 + Math.random() * 25) + 'px;--r:' + Math.round(Math.random() * 720 - 360) + 'deg;--d:' + (0.05 + Math.random() * 0.12).toFixed(2) + 's;--t:' + (0.9 + Math.random() * 0.5).toFixed(2) + 's';
+      if (i % 3 === 0) { e.style.width = '7px'; e.style.height = '7px'; e.style.borderRadius = '50%'; }
+      box.appendChild(e); } }
+  // the account's photo and display name (18 Nov 2026, owner: "shows their photo and say welcome"): this device's copy first, else the
+  // server's (/api/profile; the session cookie was just set). Asked at once, used if it is in by the time the lock opens; no photo,
+  // no wait: the check stays. A data: image only.
+  function profileOf(acct) {
+    var who = acct && acct.u === 'owner' ? 'owner' : String((acct && acct.name) || '').toLowerCase(), out = { photo: null, name: null }, okImg = function (v) { return typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(v) ? v : null; };
+    try { if (who) { out.photo = okImg(localStorage.getItem('ms-photo-' + who)); out.name = localStorage.getItem('ms-name-' + who) || null; } } catch (e) {}
+    if (out.photo || !window.MS_API || !window.fetch) return Promise.resolve(out);
+    var ac = window.AbortController ? new AbortController() : null; setTimeout(function () { if (ac) ac.abort(); }, 1500);
+    return fetch(window.MS_API + 'profile', { credentials: 'same-origin', cache: 'no-store', signal: ac ? ac.signal : undefined }).then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (j) { out.photo = okImg(j && j.photo); if (!out.name && j && typeof j.name === 'string' && j.name.trim()) out.name = j.name.trim(); return out; }).catch(function () { return out; });
+  }
+  window.msGateWelcome = function (acct) {
+    return new Promise(function (done) {
+      try {
+        var card = document.querySelector('.gate-card'), box = document.getElementById('ms-gate-ok'); if (!card || !box || card.dataset.panel) { done(); return; }
+        var was = false; try { was = !!localStorage.getItem('ms-was-in'); } catch (e) {}
+        var got = null; var pp = profileOf(acct).then(function (o) { got = o; return o; });
+        var base = acct && acct.u === 'owner' ? '' : acct && (acct.name || acct.u) ? String(acct.name || acct.u) : '';
+        var h = document.getElementById('ms-gate-ok-h'), p = document.getElementById('ms-gate-ok-p'), live = document.getElementById('ms-gate-ok-live');
+        var title = function (nm) { h.textContent = (was ? 'Welcome back' : 'Welcome') + (nm ? ', ' + String(nm).slice(0, 24) : ''); live.textContent = 'Signed in' + (nm ? ' as ' + nm : '') + '. Opening the desk.'; };
+        title(base); p.textContent = 'Opening your desk…';
+        box.classList.remove('ok', 'ph'); box.hidden = false; card.classList.add('gate-okay');
+        try { h.focus({ preventScroll: true }); } catch (e) {}
+        var face = function () { if (!got) return; if (got.name) title(got.name); if (got.photo) { box.querySelector('.go-ph img').src = got.photo; box.classList.add('ph'); } };
+        if (still()) { pp.then(function () { face(); box.classList.add('ok'); setTimeout(done, 450); }); return; }
+        pp.then(function () { if (got && got.name) title(got.name); if (got && got.photo) box.querySelector('.go-ph img').src = got.photo; });
+        setTimeout(face, 780);   // the photo shows where the lock turns, if it is in by then; later, the check stays
+        setTimeout(function () { box.classList.add('ok'); confetti(box.querySelector('.go-confetti')); }, 900);
+        setTimeout(done, 1350);
+      } catch (e) { done(); }
+    });
+  };
+})();
+</script>
+<style id="ms-su-sent-css">
+/* The inbox screen after a sign-up (18 Nov 2026). The sign-in card is dark in every theme. Sequence: a paper plane flies into an
+   open envelope, the letter goes in, the flap closes, a "1" pops like new mail; a light orbits it and the waiting line shimmers
+   (a few rounds each, never endless on the gate). On "confirmed" the envelope flips into a green check that draws itself, the
+   glow turns green and a burst of confetti goes off (the pieces are made by the script, random each time). Reduced motion: the
+   end states, no movement. */
+#ms-gp-su.su-on > h2, #ms-gp-su.su-on > .gate-sub, #ms-gp-su.su-on > .gate-done { display: none !important; }
+.su-sent[hidden] { display: none !important; }
+.su-sent { --su-acc: #9db4d3; --su-ok: #3fb68b; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 2px 0; }
+.su-sent > :not(.su-art) { animation: su-up .5s cubic-bezier(.2,.8,.2,1) both; }
+.su-sent > .su-h { animation-delay: .9s; } .su-sent > .su-p { animation-delay: 1s; } .su-sent > .su-steps { animation-delay: 1.1s; }
+.su-sent > .su-open { animation-delay: 1.2s; } .su-sent > .su-hint { animation-delay: 1.3s; }
+.su-art { position: relative; width: 176px; height: 150px; margin: 4px 0 2px; }
+.su-glow { position: absolute; inset: 6px 14px; border-radius: 50%; background: radial-gradient(closest-side, rgba(157,180,211,.34), rgba(157,180,211,.10) 55%, transparent 72%);
+  animation: su-glow-in .8s ease-out both; transition: background .6s ease; }
+.su-orbit { position: absolute; left: 50%; top: 50%; width: 148px; height: 148px; margin: -74px 0 0 -74px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 62%, rgba(157,180,211,.0) 64%, var(--su-acc) 88%, transparent 89% 100%);
+  -webkit-mask: radial-gradient(circle, transparent 66px, #000 67px, #000 69px, transparent 70px); mask: radial-gradient(circle, transparent 66px, #000 67px, #000 69px, transparent 70px);
+  opacity: 0; animation: su-orbit 1.9s linear 1.3s 5, su-fade-in .5s ease 1.3s forwards; }
+.su-plane { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; stroke: #e6ebf2; stroke-width: 1.8; fill: rgba(157,180,211,.18);
+  opacity: 0; animation: su-plane 1s cubic-bezier(.45,.05,.3,1) .05s both; }
+.su-flip { position: absolute; left: 50%; top: 50%; width: 132px; height: 102px; margin: -51px 0 0 -66px; }
+.su-face { position: absolute; inset: 0; }
+.su-back { transform: scaleX(0); opacity: 0; }
+.su-front { animation: su-pop-in .5s cubic-bezier(.2,.9,.25,1.3) .75s both; }
+.su-front > svg, .su-back > svg { width: 100%; height: 100%; overflow: visible; }
+.su-env { stroke: #d5dbe4; stroke-width: 2.4; animation: su-float 2.8s ease-in-out 2.2s 4; }
+.su-body { fill: #20242b; } .su-backp { fill: #181b20; } .su-flap { fill: #272c35; transform-origin: 60px 38px; animation: su-flap .42s ease-in 1.45s both; }
+.su-letter rect { fill: #171a1f; } .su-letter path { stroke: var(--su-acc); stroke-width: 2.2; }
+.su-letter { animation: su-letter .55s cubic-bezier(.4,0,.2,1) .95s both; }
+.su-badge { position: absolute; right: 2px; top: 22px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #e5484d; color: #fff;
+  font: 700 13px/24px var(--au-font, Figtree), -apple-system, sans-serif; box-shadow: 0 0 0 3px #121315; animation: su-badge .45s cubic-bezier(.2,1,.3,1.4) 1.85s both; }
+.su-ok-c { stroke: var(--su-ok); stroke-width: 3.5; fill: rgba(63,182,139,.14); stroke-dasharray: 227; stroke-dashoffset: 227; }
+.su-ok-k { stroke: var(--su-ok); stroke-width: 6; stroke-dasharray: 52; stroke-dashoffset: 52; }
+.su-confetti { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.su-confetti i { position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; background: var(--c); opacity: 0;
+  animation: su-conf var(--t, 1.2s) cubic-bezier(.15,.7,.3,1) var(--d, 0s) forwards; }
+.su-sent[data-state="confirmed"] .su-front { animation: su-squeeze .26s ease-in forwards; }
+.su-sent[data-state="confirmed"] .su-back { animation: su-unfold .45s cubic-bezier(.2,1,.3,1.35) .24s forwards; }
+.su-sent[data-state="confirmed"] .su-glow { background: radial-gradient(closest-side, rgba(63,182,139,.40), rgba(63,182,139,.12) 55%, transparent 72%); animation: su-pulse .9s ease-out .35s both; }
+.su-sent[data-state="confirmed"] .su-orbit, .su-sent[data-state="confirmed"] .su-plane { display: none; }
+.su-sent[data-state="confirmed"] .su-ok-c { animation: su-draw .55s ease-out .45s forwards; }
+.su-sent[data-state="confirmed"] .su-ok-k { animation: su-draw .35s ease-out .9s forwards; }
+.su-sent[data-state="confirmed"] > :not(.su-art) { animation: none; }
+.su-sent[data-state="confirmed"] > .su-h { animation: su-up .45s cubic-bezier(.2,.8,.2,1) .5s both; }
+.su-h { margin: 2px 0 0 !important; font: 680 24px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.025em; color: #f5f7fa; outline: none; }
+#ms-su-h:focus, #ms-su-h:focus-visible { outline: none !important; box-shadow: none !important; }
+.su-p { margin: 0; max-width: 34ch; color: #b4bcc8; font-size: 15px; line-height: 1.55; }
+.su-p b { color: #f3f5f8; font-weight: 600; overflow-wrap: anywhere; }
+.su-steps { list-style: none; margin: 10px 0 2px; padding: 14px 16px; width: 100%; max-width: 340px; box-sizing: border-box; text-align: left; display: grid; gap: 2px;
+  border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01)); }
+.su-steps li { position: relative; display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; padding: 7px 0; font-size: 14px; }
+.su-steps li span { color: #c7cdd6; font-weight: 600; }
+.su-steps li small { grid-column: 2; color: #8c95a3; font-size: 12.5px; }
+.su-steps li i { grid-row: 1 / span 2; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; border: 2px solid rgba(255,255,255,.18); box-sizing: border-box; position: relative; transition: background .3s, border-color .3s; }
+.su-steps li:not(:last-child)::after { content: ""; position: absolute; left: 10px; top: 31px; bottom: -7px; width: 2px; background: rgba(255,255,255,.10); }
+.su-steps li.done i { background: var(--su-ok); border-color: var(--su-ok); }
+.su-steps li.done i::after { content: ""; position: absolute; left: 6px; top: 2.5px; width: 5px; height: 10px; border: solid #0d0f12; border-width: 0 2.2px 2.2px 0; transform: rotate(45deg); }
+.su-steps li.done:not(:last-child)::after { background: linear-gradient(var(--su-ok), rgba(63,182,139,.35)); }
+.su-steps li.now i { border-color: var(--su-acc); box-shadow: 0 0 0 4px rgba(157,180,211,.12); }
+.su-steps li.now i::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--su-acc); animation: su-breathe 1.6s ease-in-out 8; }
+.su-steps li.now span { color: #f5f7fa; }
+.su-steps li.now small { background: linear-gradient(90deg, #8c95a3 0 40%, #e6ebf2 50%, #8c95a3 60% 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: su-shimmer 2.2s linear 1.6s 6; }
+.su-steps li.pop i { animation: su-pop-in .45s cubic-bezier(.2,.9,.25,1.4) both; }
+.su-open { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; margin-top: 4px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: #f3f5f8; font-weight: 600; text-decoration: none; }
+.su-open::after { content: "\2197"; font-size: 15px; opacity: .7; }
+.su-open:hover { border-color: rgba(157,180,211,.6); background: rgba(157,180,211,.10); }
+.su-open:focus-visible { outline: 2px solid var(--su-acc); outline-offset: 2px; }
+.su-open[hidden] { display: none; }
+.su-hint { margin: 2px 0 0; max-width: 34ch; color: #8c95a3; font-size: 12.5px; line-height: 1.45; }
+.su-sent[data-state="confirmed"] .su-hint, .su-sent[data-state="confirmed"] .su-open { display: none; }
+.su-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes su-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes su-glow-in { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes su-fade-in { to { opacity: 1; } }
+@keyframes su-orbit { to { transform: rotate(1turn); } }
+@keyframes su-plane { 0% { opacity: 0; transform: translate(-96px, 50px) rotate(-8deg) scale(1.1); } 15% { opacity: 1; }
+  55% { transform: translate(-22px, -40px) rotate(18deg) scale(1); } 85% { opacity: 1; transform: translate(4px, -6px) rotate(40deg) scale(.6); } 100% { opacity: 0; transform: translate(6px, 4px) rotate(50deg) scale(.2); } }
+@keyframes su-pop-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: none; } }
+@keyframes su-letter { from { transform: translateY(-16px); } to { transform: translateY(30px); } }
+@keyframes su-flap { from { transform: scaleY(1); } to { transform: scaleY(-1); } }
+@keyframes su-badge { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
+@keyframes su-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes su-breathe { 0%, 100% { opacity: .35; transform: scale(.65); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes su-shimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+@keyframes su-pulse { 0% { transform: scale(.8); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes su-draw { to { stroke-dashoffset: 0; } }
+@keyframes su-squeeze { to { transform: scaleX(0); opacity: .4; } }
+@keyframes su-unfold { from { transform: scaleX(0); opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes su-conf { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
+@media (prefers-reduced-motion: reduce) {
+  .su-sent *, .su-sent *::after, .su-sent > * { animation: none !important; transition: none !important; }
+  .su-orbit, .su-plane, .su-confetti { display: none; }
+  .su-flap { transform: scaleY(-1); } .su-letter { transform: translateY(30px); }
+  .su-sent[data-state="confirmed"] .su-ok-c, .su-sent[data-state="confirmed"] .su-ok-k { stroke-dashoffset: 0; }
+  .su-sent[data-state="confirmed"] .su-front { opacity: 0; } .su-sent[data-state="confirmed"] .su-back { transform: none; opacity: 1; }
+  .su-steps li.now small { color: #8c95a3; background: none; }
+}
+</style>
 <script id="ms-su-js">
 // Sign-up, forgotten password and a new password from an email link (17 Nov 2026, api/signup.js). The three forms take the
 // sign-in card's place while one is open (.gate-card[data-panel]). Nothing typed here is kept in the browser: the reset token is
@@ -2935,7 +3200,57 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   try { var m = /^#reset=([A-Za-z0-9_-]{40,60})$/.exec(location.hash); if (m) { resetTok = m[1]; history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
   var sp = null; try { sp = new URLSearchParams(location.search).get('signup'); if (sp) { var u = new URL(location.href); u.searchParams.delete('signup'); history.replaceState(null, '', u.pathname + u.search + u.hash); } } catch (e) {}
   function panel(p) { return $(NAMES[p]); }
-  function reset(P) { var f = P.querySelector('form'), d = P.querySelector('.gate-done'), e = P.querySelector('.gate-err'); if (f) f.hidden = false; if (d) { d.hidden = true; d.textContent = ''; } if (e) e.textContent = '';
+  // ---- the inbox screen after a sign-up, and its automatic check (18 Nov 2026) ----
+  var WATCH = null;
+  function stopWatch() { if (WATCH && WATCH.timer) clearTimeout(WATCH.timer); WATCH = null; }
+  function provider(email) { var d = String(email.split('@')[1] || '').toLowerCase();
+    if (/^(gmail|googlemail)\.com$/.test(d)) return ['Open Gmail', 'https://mail.google.com/mail/u/0/#inbox'];
+    if (/^(outlook|hotmail|live|msn)\.[a-z.]+$/.test(d)) return ['Open Outlook', 'https://outlook.live.com/mail/0/'];
+    if (/^yahoo\.[a-z.]+$/.test(d)) return ['Open Yahoo Mail', 'https://mail.yahoo.com/'];
+    if (/^(icloud|me|mac)\.com$/.test(d)) return ['Open iCloud Mail', 'https://www.icloud.com/mail'];
+    if (/^proton(mail)?\.(me|com|ch)$/.test(d)) return ['Open Proton Mail', 'https://mail.proton.me/'];
+    return null; }
+  // a burst of confetti from behind the check: random each time, cleared after it falls (never with reduced motion)
+  function confetti() { var box = document.querySelector('#ms-su-sent .su-confetti'); if (!box) return; box.textContent = '';
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var C = ['#3fb68b', '#9db4d3', '#e6ebf2', '#7fd8b4', '#c9a96e', '#5f8fd1'];
+    for (var i = 0; i < 28; i++) { var e = document.createElement('i'), a = (i / 28) * Math.PI * 2 + Math.random() * 0.4, r = 70 + Math.random() * 70;
+      e.style.cssText = '--c:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * r) + 'px;--y:' + Math.round(Math.sin(a) * r * 0.8 + 40 + Math.random() * 30) + 'px;--r:' + Math.round(Math.random() * 720 - 360) + 'deg;--d:' + (0.5 + Math.random() * 0.15).toFixed(2) + 's;--t:' + (1 + Math.random() * 0.5).toFixed(2) + 's';
+      if (i % 3 === 0) { e.style.width = '7px'; e.style.height = '7px'; e.style.borderRadius = '50%'; }
+      box.appendChild(e); }
+    setTimeout(function () { box.textContent = ''; }, 2400); }
+  function sentOn() { var P = panel('su'), X = $('ms-su-sent'); P.classList.add('su-on'); P.querySelector('form').hidden = true; X.hidden = false; return X; }
+  function sent(w, email) {
+    var X = sentOn(); X.dataset.state = 'waiting'; $('ms-su-h').textContent = 'Check your inbox';
+    var p = $('ms-su-txt'), b = document.createElement('b'); p.textContent = 'We sent a confirmation link to '; b.textContent = email; p.appendChild(b);
+    p.appendChild(document.createTextNode('. Open it on this phone or on any other device: this page moves on by itself.'));
+    $('ms-su-s2').className = 'now'; $('ms-su-s3').className = ''; $('ms-su-s2t').textContent = 'Waiting for you to open the link\u2026';
+    var o = $('ms-su-open'), pv = provider(email); if (pv) { o.textContent = pv[0]; o.href = pv[1]; o.hidden = false; } else o.hidden = true;
+    $('ms-su-live').textContent = 'Email sent. Waiting for you to open the link.';
+    setTimeout(function () { $('ms-su-h').focus({ preventScroll: true }); }, 30);
+    if (w) watch(w);
+  }
+  function confirmed() {
+    var X = sentOn(); stopWatch(); X.dataset.state = 'confirmed'; $('ms-su-h').textContent = 'Email confirmed';
+    $('ms-su-txt').textContent = 'Thank you. The owner approves your seat next: you get an email when it is ready, then sign in with the password you chose.';
+    $('ms-su-s2').className = 'done pop'; $('ms-su-s2t').textContent = 'Confirmed'; $('ms-su-s3').className = 'now';
+    $('ms-su-live').textContent = 'Email confirmed. The owner approves your seat next.';
+    confetti(); try { if (navigator.vibrate) navigator.vibrate([18, 50, 28]); } catch (e) {}
+    setTimeout(function () { $('ms-su-h').focus({ preventScroll: true }); }, 30);
+  }
+  // asks every 4 seconds while the page is visible, at once when it comes back (from the email app), for 45 minutes
+  function watch(w) { stopWatch(); WATCH = { w: w, end: Date.now() + 45 * 60e3, timer: null }; WATCH.timer = setTimeout(tick, 4000); }
+  function later(ms) { if (WATCH) { clearTimeout(WATCH.timer); WATCH.timer = setTimeout(tick, ms); } }
+  function tick() { var W = WATCH; if (!W || !window.MS_API) return;
+    if (Date.now() > W.end) { stopWatch(); $('ms-su-s2t').textContent = 'Open the link in the email to confirm. Once the owner approves, sign in with your password.'; return; }
+    if (document.hidden) { later(4000); return; }
+    fetch(window.MS_API + 'signup?watch=' + encodeURIComponent(W.w), { cache: 'no-store', credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (WATCH !== W) return; if (j && j.state === 'confirmed') confirmed(); else later(4000); })
+      .catch(function () { if (WATCH === W) later(8000); }); }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && WATCH) later(150); });
+  function reset(P) { if (P.id === 'ms-gp-su') { stopWatch(); P.classList.remove('su-on'); var X = $('ms-su-sent'); if (X) X.hidden = true; }
+    var f = P.querySelector('form'), d = P.querySelector('.gate-done'), e = P.querySelector('.gate-err'); if (f) f.hidden = false; if (d) { d.hidden = true; d.textContent = ''; } if (e) e.textContent = '';
     P.querySelectorAll('input').forEach(function (i) { i.removeAttribute('aria-invalid'); }); }
   function done(P, t) { var f = P.querySelector('form'), d = P.querySelector('.gate-done'); if (f) f.hidden = true; if (d) { d.textContent = t; d.hidden = false; } var b = P.querySelector('.gate-back'); if (b) b.focus(); }
   function show(p, from) {
@@ -2946,7 +3261,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     var first = P.querySelector('input:not(.gate-user)'); setTimeout(function () { if (first && !P.querySelector('form').hidden) first.focus(); }, 30);
     if (p !== 'rs') status().then(function (o) { if (o === false && card.dataset.panel === p) done(P, p === 'su' ? 'Sign-ups are not open yet.' : 'Password reset by email is not open yet. Ask the owner for a new password.'); });
   }
-  function back() { delete card.dataset.panel; Object.keys(NAMES).forEach(function (k) { var P = panel(k); if (P) P.hidden = true; });
+  function back() { stopWatch(); delete card.dataset.panel; Object.keys(NAMES).forEach(function (k) { var P = panel(k); if (P) P.hidden = true; });
     var t = opener && document.contains(opener) && !opener.closest('.gate-panel') ? opener : $('ms-gate-p'); opener = null; if (t) setTimeout(function () { t.focus(); }, 0); }
   function status() { if (OPEN !== null) return Promise.resolve(OPEN);
     return fetch(window.MS_API + 'signup', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && typeof j.open === 'boolean') OPEN = j.open; return OPEN; }).catch(function () { return null; }); }
@@ -2958,7 +3273,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     if (r.ok) return { ok: j };
     if (r.status === 429) return { err: (j && j.error) || 'Too many tries. Wait a few minutes, then try again.' };
     if (r.status >= 500 && !(j && j.error)) return { err: 'This is unavailable right now. Try again in a minute.' };
-    return { err: ((j && j.error) || 'That did not work. Check what you typed and try again.') + (j && Array.isArray(j.why) && j.why.length ? ' Details: ' + j.why.join(' · ') : '') };   // the mail provider's own words (17 Nov 2026: the first live send failed)
+    return { field: j && j.field === 'username' ? 'username' : null, err: ((j && j.error) || 'That did not work. Check what you typed and try again.') + (j && Array.isArray(j.why) && j.why.length ? ' Details: ' + j.why.join(' · ') : '') };   // the mail provider's own words (17 Nov 2026: the first live send failed)
   }
   // one submit pattern for the three forms: check, busy button, the answer in words
   function wire(p, check, body, ok) {
@@ -2970,16 +3285,21 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       btn.setAttribute('aria-busy', 'true'); btn.disabled = true; lab.textContent = 'Sending…';
       var a = await post(body());
       btn.removeAttribute('aria-busy'); btn.disabled = false; lab.textContent = idle;
-      if (a.err) { fail(a.err); return; }
-      f.reset(); done(P, ok(a.ok));
+      if (a.err) { fail(a.err, a.field ? P.querySelector('[name="' + a.field + '"]') : null); return; }
+      var msg = ok(a.ok); f.reset(); if (msg) done(P, msg);
     });
   }
   var EM = /^[^\s@<>()",;:\\[\]]+@[^\s@<>()",;:\\[\]]+\.[A-Za-z]{2,24}$/;
-  wire('su', function () { var n = $('ms-su-n'), e = $('ms-su-e'), w = $('ms-su-p');
+  var UN = /^[a-z0-9][a-z0-9-]{2,23}$/i;
+  (function () { var n = $('ms-su-n'), u = $('ms-su-u'); if (!n || !u) return; var mine = false;
+    u.addEventListener('input', function () { mine = !!u.value; });
+    n.addEventListener('input', function () { if (!mine) u.value = n.value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24); }); })();
+  wire('su', function () { var n = $('ms-su-n'), e = $('ms-su-e'), w = $('ms-su-p'), u = $('ms-su-u');
       if (!n.value.trim()) return ['Type the name the desk should call you.', n]; if (n.value.trim().length > 24) return ['Use a name of up to 24 characters.', n];
+      if (!UN.test(u.value.trim())) return ['Choose a username of 3 to 24 letters, numbers or "-" (it cannot start with "-").', u];
       if (!EM.test(e.value.trim())) return ['Type a valid email address.', e]; if (w.value.length < 10) return ['Use a password of at least 10 characters.', w]; return null; },
-    function () { return { name: $('ms-su-n').value.trim(), email: $('ms-su-e').value.trim(), password: $('ms-su-p').value }; },
-    function (j) { return (j && j.message) || 'Check your email for a link to confirm it.'; });
+    function () { return { name: $('ms-su-n').value.trim(), username: $('ms-su-u').value.trim().toLowerCase(), email: $('ms-su-e').value.trim(), password: $('ms-su-p').value }; },
+    function (j) { sent(j && j.watch, $('ms-su-e').value.trim()); return null; });
   wire('fg', function () { var e = $('ms-fg-e'); return EM.test(e.value.trim()) ? null : ['Type the email address of your account.', e]; },
     function () { return { forgot: $('ms-fg-e').value.trim() }; },
     function (j) { return (j && j.message) || 'If that email belongs to an account, a link is on its way.'; });
@@ -2996,7 +3316,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   // an email link brings the card up whatever the page was doing
   function arrive() {
     if ((sp || resetTok) && !document.documentElement.dataset.gate && window.msGate) msGate(true);
-    if (sp === 'verified') ban('Email confirmed. The owner will approve your seat; you can sign in once approved.');
+    if (sp === 'verified') setTimeout(function () { show('su'); confirmed(); }, 40);
     else if (sp === 'expired') ban('That link has expired or was already used. Create the account again to get a new one.', true);
     if (resetTok) setTimeout(function () { show('rs'); }, 40);
   }
@@ -3141,7 +3461,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
          waits on you, then the places. Everything Home held before sits unchanged behind "More on the desk" (#hs-more-b; on a phone
          that wrapper is display: contents, so both phone views are the page as they were). Filled by #ms-hs-js from window.MS_PS. -->
     <div class="hs-only hs-home" id="hs-home">
-      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p></header>
+      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p><p class="hs-fwd adm" id="hs-fwd" hidden></p></header>
       <div class="h-warn hs-warn" id="hs-warn" role="alert" hidden></div>
       <div class="hs-cols">
         <section class="hs-card hs-open" aria-labelledby="hs-o-k"><div class="hs-ch"><h2 id="hs-o-k">Open now</h2><span class="hs-n" id="hs-o-n"></span></div>
@@ -3962,7 +4282,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <aside class="pf-side" aria-label="Your account">
         <div class="pf-hero">
           <span class="me-av me-av-lg" id="ms-pf-av" aria-hidden="true"></span>
-          <div class="pf-hero-t"><b id="ms-pf-name">—</b><small id="ms-pf-role"></small></div>
+          <div class="pf-hero-t"><b id="ms-pf-name">—</b><small id="ms-pf-role"></small><small class="pf-user" id="ms-pf-user" hidden></small></div>
           <button type="button" class="pf-edit" id="ms-pf-edit" aria-label="Change display name" title="Change display name"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
         </div>
         <div class="me-today pf-today" id="ms-pf-today"></div>
@@ -8412,7 +8732,7 @@ function msNextSetup(bars, A) {
     if (!j || !Array.isArray(j.items)) { ul.innerHTML = `<li class="empty">${!r ? (navigator.onLine === false ? 'You are offline: the requests could not be read.' : 'The server could not be reached: the requests could not be read.') : r.status === 401 || r.status === 403 ? 'Your owner session has ended. Sign in again to see the requests.' : `The requests could not be read (error ${r.status}). Try again in a minute.`}</li>`; if (n) n.textContent = ''; return; }
     if (n) n.textContent = j.items.length ? `${j.items.length} waiting` : '';
     const when = (iso) => { const d = new Date(iso); return isFinite(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
-    ul.innerHTML = j.items.length ? j.items.map((x) => `<li class="u-wait-i" data-id="${esc(x.id)}"><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(x.name || '?').trim().charAt(0).toUpperCase())}</span><span><b>${esc(x.name)}</b><small>${esc(x.email)} · confirmed ${esc(when(x.verifiedAt))}</small></span></span>`
+    ul.innerHTML = j.items.length ? j.items.map((x) => `<li class="u-wait-i" data-id="${esc(x.id)}"><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(x.name || '?').trim().charAt(0).toUpperCase())}</span><span><b>${esc(x.name)}</b><small>${x.username ? `username ${esc(x.username)} · ` : ''}${esc(x.email)} · confirmed ${esc(when(x.verifiedAt))}</small></span></span>`
       + `<span class="u-wait-a"><select data-act="role" aria-label="Access for ${esc(x.name)}"><option value="viewer">Viewer</option><option value="reviewer">Reviewer</option></select><button type="button" class="u-btn" data-act="approve">Approve</button><button type="button" class="u-del" data-act="refuse">Refuse</button></span></li>`).join('')
       : '<li class="empty">No one is waiting.</li>';
     if (msg && !msg.dataset.keep) msg.textContent = ''; if (msg) delete msg.dataset.keep;
@@ -10867,6 +11187,7 @@ html[data-role="public"] .hdr-sw { display: none; }
     MODE = 'page';
     const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML.replace(/(id="|url\(#)av/g, '$1pfav'); };   // the portrait's gradients get ids of their own: a copy pointing at the hidden menu's drew nothing
     cp('ms-me-av2', 'ms-pf-av'); cp('ms-me-name2', 'ms-pf-name'); cp('ms-me-role', 'ms-pf-role'); cp('ms-me-today', 'ms-pf-today');
+    { const pu = document.getElementById('ms-pf-user'), A0 = window.MS_ACCT; if (pu) { const un = A0 && A0.u ? (A0.u === 'owner' ? 'owner' : A0.u) : ''; pu.textContent = un ? 'Username: ' + un + ' · you sign in with it or your email' : ''; pu.hidden = !un; } }   // 18 Nov 2026: usernames sign in
     ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
     if ($('ms-pf-edit')) $('ms-pf-edit').hidden = !$('ms-me-rename');
     pfSync();
@@ -11355,6 +11676,8 @@ html[data-gate] .gate { padding: max(24px, env(safe-area-inset-top)) 16px max(24
 /* password managers: a fixed, invisible username so the saved entry has a name (password-only sign-in) */
 .gate .gate-user { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: -1px; border: 0; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); pointer-events: none; }
 .gate-pw { position: relative; display: block; }
+.gate .gate-id { display: block; width: 100%; box-sizing: border-box; min-height: 48px; font-size: 16px; margin-bottom: 8px; }
+.gate .su-uh { margin: -2px 0 4px; font-size: 12.5px; color: #8c95a3; }
 .gate-pw > input { width: 100%; box-sizing: border-box; min-height: 48px; padding-right: 52px !important; font-size: 16px; letter-spacing: .02em; }
 .gate-pw > input[type="password"] { letter-spacing: .12em; }
 .gate input[aria-invalid="true"] { border-color: var(--g-red); box-shadow: 0 0 0 3px rgba(255,140,158,.16); }
@@ -12597,7 +12920,21 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     sum.innerHTML = sentence(F); body.innerHTML = rows(F); chart(F);
     var at = $('ms-fwd-at'); if (at && F.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(F.at, 6) : new Date(F.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
   }
-  W.MS_FWD = { render: render, sentence: sentence };
+  // Home's one line (18 Nov 2026): the live book against the plan you adopted, in words, linking to this card; owner and reviewers
+  // (class adm), wider than 640 px (#hs-home); the same reading, no new figure
+  function brief(F) {
+    var r = F.record || {}, n = r.n || 0, since = dTxt(r.from);
+    var what = n ? n + ' position' + (n === 1 ? '' : 's') + ' closed since ' + since + ', ' + fR(r.total) + ' after costs' : 'no position closed since ' + since;
+    return 'Live book against its plan: <b class="' + (HEAD[F.status] || '') + '">' + esc(F.head) + '</b> · ' + esc(what) + (r.open ? ' · ' + r.open + ' open' : '')
+      + ' · <a href="#council/systems">See the forward record</a>';
+  }
+  function home() {
+    var e = $('hs-fwd'); if (!e) return; var C = W.MS_COUNCIL, F = C && C.coach && C.coach.forward;
+    if (!F || !F.record || !F.head) { e.hidden = true; return; }
+    var h = brief(F); if (e._h !== h) { e._h = h; e.innerHTML = h; } e.hidden = false;
+  }
+  document.addEventListener('ms:council', home); setTimeout(home, 0);
+  W.MS_FWD = { render: render, sentence: sentence, brief: brief, home: home };
   document.addEventListener('ms:council', render);
   if (W.ResizeObserver) { var ro = new ResizeObserver(function () { var C = W.MS_COUNCIL, F = C && C.coach && C.coach.forward; if (F && F.record) chart(F); }); var hh = document.getElementById('ms-fwd-chart'); if (hh) ro.observe(hh); }
   setTimeout(render, 0);
@@ -13899,6 +14236,10 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .pos { color: var(--au-gain); }
   #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .neg { color: var(--au-loss); }
   #v-home .hs-s { margin: 8px 0 0; max-width: 72ch; font: 400 15px/1.5 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-fwd { margin: 10px 0 0; max-width: 80ch; font: 400 14px/1.5 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-fwd[hidden] { display: none; }
+  #v-home .hs-fwd b { font-weight: 600; color: var(--au-ink); } #v-home .hs-fwd b.fw-st-ok { color: var(--au-gain); } #v-home .hs-fwd b.fw-st-bad { color: var(--au-loss); }
+  #v-home .hs-fwd a { color: var(--au-accent); text-underline-offset: 3px; }
   #v-home .hs-s b { font-weight: 600; font-variant-numeric: tabular-nums; }
   #v-home .hs-f { display: block; margin-top: 2px; font-size: 13px; color: var(--au-ink-3); }
   #v-home .hs-warn[hidden] { display: none; }
@@ -14110,12 +14451,15 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     padding: max(20px, env(safe-area-inset-top)) 24px 24px !important; background: #121315 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; text-align: center; }
   html[data-gate] .gate-card .gate-brand { order: 0; justify-content: center !important; margin: 18px 0 30px !important; flex-direction: column; gap: 10px; position: relative; }
   html[data-gate] .gate-card .gate-brand > .ms-coin { transform: scale(1.6); margin: 12px 0 14px; }
+  html[data-gate] .gate-card .gate-brand > .wm { display: inline-flex !important; }   /* a flex column made it a block: no gap, "AUREUMDESK" (18 Nov 2026) */
   html[data-gate] .gate-card > *, html[data-gate] .gate-card form > * { flex: none; }
   html[data-gate] .gate-card .gate-x { position: absolute; top: -10px; right: -10px; }
   html[data-gate] .gate-card h1 { order: 1; font-size: 26px !important; margin: 0 0 6px !important; }
   html[data-gate] .gate-sub { order: 2; margin: 0 0 26px !important; }
   html[data-gate] .gate-card form { display: contents !important; }
   html[data-gate] .gate-card label[for="ms-gate-p"] { order: 3; text-align: left; font-size: 13px; color: var(--g-dim); margin: 0 0 6px 2px; }
+  html[data-gate] .gate-card label[for="ms-gate-u"] { order: 3; text-align: left; font-size: 13px; color: var(--g-dim); margin: 0 0 6px 2px; }
+  html[data-gate] .gate-card .gate-id { order: 3; min-height: 54px; border-radius: 14px !important; padding-left: 16px !important; margin-bottom: 14px; }
   html[data-gate] .gate-pw { order: 4; } html[data-gate] .gate-pw > input { min-height: 54px; border-radius: 14px !important; padding-left: 16px !important; }
   html[data-gate] .gate-msg { order: 5; text-align: left; margin-top: 6px; min-height: 22px; }
   html[data-gate] .gate-or { display: none !important; }
@@ -14155,6 +14499,13 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 .gate-ban { margin: -6px 0 16px; padding: 10px 12px; border-radius: 10px; background: rgba(157,180,211,.10); border: 1px solid rgba(157,180,211,.28); color: var(--g-ink); font: 500 13.5px/1.45 Figtree, -apple-system, sans-serif; }
 .gate-ban.bad { background: rgba(242,133,126,.10); border-color: rgba(242,133,126,.35); }
 .gate-ban[hidden] { display: none !important; }
+/* The logo, larger where a visitor first meets the desk (18 Nov 2026, owner: "aureum should have a image or logo for email and the
+   website"): the left side of the desktop sign-in screen leads with the mark at 44 px and a wordmark a size up. */
+@media (min-width: 641px) {
+  .gs-brand { gap: 14px !important; margin-bottom: 32px !important; }
+  .gs-brand .ms-coin { width: 44px !important; height: 44px !important; }
+  .gs-brand .wm b { font-size: 20px; letter-spacing: .16em; } .gs-brand .wm small { font-size: 15px; }
+}
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked

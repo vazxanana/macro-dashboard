@@ -70,6 +70,18 @@ body { display: grid; place-items: center; font-family: InterCard, sans-serif; c
 <div class="wm">${SRC.replace(/<\?xml[^>]*>/, '')}<div class="t"><span class="au">AUREUM</span><span class="dk">DESK</span></div></div>
 <div class="rule"></div><div class="line">A paper-trading desk</div></div></body></html>`;
 
+// Email logo (18 Nov 2026, owner: "aureum should have a image or logo for email"): the mark and the wordmark on one line in
+// the graphite ink, transparent, drawn at 3x so it is sharp on phones; the emails show it at 195 x 32 (api/signup.js).
+// A PNG because most mail apps do not show SVG. Served at https://aureumdesk.co.uk/icons/email-logo.png.
+const LOGO = `<!doctype html><html><head><style>
+@font-face { font-family: InterCard; src: url("data:font/woff2;base64,${fs.readFileSync(font).toString('base64')}") format("woff2"); font-weight: 100 900; }
+html, body { margin: 0; background: transparent; }
+.wm { display: inline-flex; align-items: center; gap: 30px; padding: 0; font-family: InterCard, sans-serif; height: 96px; }
+.wm svg { width: 96px; height: 96px; display: block; }
+.au { font-size: 50px; font-weight: 700; letter-spacing: .16em; color: #16181B; }
+.dk { font-size: 50px; font-weight: 500; letter-spacing: .2em; color: #8A9099; margin-left: 18px; }
+</style></head><body><div class="wm">${SRC.replace(/<\?xml[^>]*>/, '')}<div><span class="au">AUREUM</span><span class="dk">DESK</span></div></div></body></html>`;
+
 const b = await chromium.launch();
 const page = await b.newPage({ deviceScaleFactor: 1 });
 for (const [name, s, markup] of ICONS) {
@@ -84,4 +96,12 @@ await page.evaluate(() => document.fonts.ready);
 if (!(await page.evaluate(() => document.fonts.check('700 76px InterCard')))) throw new Error('card: Inter did not load');
 await page.screenshot({ path: path.join(dir, 'og-card.png') });
 console.log('icons/og-card.png');
+await page.setViewportSize({ width: 900, height: 96 });
+await page.setContent(LOGO, { waitUntil: 'load' });
+await page.evaluate(() => document.fonts.ready);
+const lw = await page.evaluate(() => Math.ceil(document.querySelector('.wm').getBoundingClientRect().width));
+await page.setViewportSize({ width: 648, height: 96 });
+if (lw > 648) throw new Error('email logo wider than 648 px: ' + lw);
+await page.locator('.wm').screenshot({ path: path.join(dir, 'email-logo.png'), omitBackground: true });
+console.log('icons/email-logo.png', lw + ' x 96');
 await b.close();

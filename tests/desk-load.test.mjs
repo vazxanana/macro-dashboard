@@ -179,3 +179,29 @@ test('hoist-styles: on the Desk every rule keeps its order, nothing is lost, and
   const rest = (h) => h.replace(/<!--[\s\S]*?-->|<script\b[^>]*>[\s\S]*?<\/script\s*>|<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, (m) => (/^<style/i.test(m) ? '' : m)).replace(/\n/g, '');
   assert.equal(rest(out), rest(PAGE), 'only the style blocks moved: markup, scripts and comments are untouched');
 });
+
+test('msData revalidates (18 Nov 2026): the last ETag goes as If-None-Match, a 304 hands back the same text; never for another origin or variant', async () => {
+  const a = PAGE.indexOf('/* ms-data:start */'), b = PAGE.indexOf('/* ms-data:end */');
+  const run = (cdata, mode = 'admin') => {
+    const calls = [], clock = { t: 1_800_000_000_000 }, timers = [];
+    const W = { MS_CDATA: cdata, MS_API: '/api/', document: { documentElement: { dataset: { mode } } }, setTimeout: (f, ms) => timers.push({ f, at: clock.t + ms }),
+      fetch: (url, opt) => { calls.push({ url, opt }); const inm = opt.headers && opt.headers['If-None-Match'];
+        return Promise.resolve(inm === '"f-1"' ? { status: 304, ok: false, headers: { get: () => '"f-1"' }, text: async () => '' }
+          : { status: 200, ok: true, headers: { get: (k) => (k === 'ETag' ? '"f-1"' : null) }, text: async () => '{"n":1}' }); } };
+    const window = {}; new Function('window', PAGE.slice(a, b))(window);
+    const D = window.msDataMake(W, () => clock.t);
+    const tick = (ms) => { clock.t += ms; for (const x of timers.splice(0)) (x.at <= clock.t ? x.f() : timers.push(x)); };
+    return { D, W, calls, tick };
+  };
+  const s = run('/cdata/');
+  assert.deepEqual(await s.D.json('trades.json'), { n: 1 }); assert.equal(s.calls[0].opt.headers, undefined, 'the first read is plain');
+  s.tick(46_000);
+  assert.deepEqual(await s.D.json('trades.json'), { n: 1 }, 'a 304 gives the same data');
+  assert.deepEqual(s.calls[1].opt.headers, { 'If-None-Match': '"f-1"' });
+  // the visitor variant is its own key: switching mode never sends the member's tag
+  s.W.document.documentElement.dataset.mode = 'public'; s.tick(46_000); await s.D.json('trades.json');
+  assert.equal(s.calls[2].opt.headers, undefined, 'another variant: no tag of the other');
+  const o = run('https://raw.githubusercontent.com/x/y/council-data/');
+  await o.D.json('trades.json'); o.tick(46_000); await o.D.json('trades.json');
+  assert.equal(o.calls[1].opt.headers, undefined, 'another origin: no conditional header (it would need a preflight)');
+});

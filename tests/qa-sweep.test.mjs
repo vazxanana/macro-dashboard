@@ -931,3 +931,15 @@ test('17 Nov: the decay monitor and what to expect sit in one closed "Decay and 
   assert.match(PS_JS, /!c\.closest\('details\.c-dex'\)/, 'the simple phone view does not fold the cards inside it a second time');
   for (const gone of ['id="v-gold"', 'id="v-lit"', 'id="v-sdv"', 'id="v-crypto"', 'id="ms-pb"', 'id="ms-book"', 'id="ms-cp-macro"', 'id="ms-notice"', '/_vercel/', '/api/og']) assert.ok(!DESK.includes(gone), gone);
 });
+
+test('Home (18 Nov 2026): one line on the live book against its plan, owner and reviewers only, linking to the forward card; the same reading', () => {
+  assert.match(FW_HTML, /<p class="hs-fwd adm" id="hs-fwd" hidden><\/p><\/header>/, 'under the headline, class adm, hidden until a reading is in');
+  const els = {}, el = (id) => (els[id] = els[id] || { id, hidden: true, innerHTML: '', textContent: '', classList: { toggle() {} }, setAttribute() {} });
+  const W = { MS_COUNCIL: { coach: { forward: { status: 'few', head: 'Too few trades to say', record: { n: 2, from: '2026-11-12T00:00:00Z', total: -1.234, open: 1 } } } } };
+  const doc = { getElementById: el, addEventListener() {} };
+  new Function('window', 'document', 'setTimeout', FW_JS)(W, doc, () => {});
+  W.MS_FWD.home();
+  assert.equal(els['hs-fwd'].hidden, false);
+  assert.equal(els['hs-fwd'].innerHTML, 'Live book against its plan: <b class="fw-st-few">Too few trades to say</b> · 2 positions closed since 12 Nov 2026, −1.23R after costs · 1 open · <a href="#council/systems">See the forward record</a>');
+  W.MS_COUNCIL.coach.forward = null; W.MS_FWD.home(); assert.equal(els['hs-fwd'].hidden, true, 'no reading, no line');
+});

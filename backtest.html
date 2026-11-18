@@ -2110,6 +2110,15 @@
   function lcWatch() { if (!LC.on || !S.acct) return; lcPlace(); lcMini();
     const now = lcSnap(), B = LC.base; LC.base = now;
     if (!B || B.sid !== now.sid || now.closedN < B.closedN || now.T < B.T) { LC.draftK = D ? 'x' : ''; LC.warned = {}; LC.ev = {}; LC.pend = null; if (S.bars.length) BT.liveEvents(S.bars, TFS[S.tf], now.T, LC.ev, {}); return; }   // a new session, an undo or a jump back: look again from here, no notes
+    // the candles that closed since the last look come first: they closed before anything the trader did at this moment, so
+    // the trader's own entries, stop moves and exits sit above them in the newest-first list (18 Nov 2026)
+    // a draft: noted once it has stood still a moment (not while its lines are dragged); its candle count for the "not placed" event
+    const dk = D ? [D.side, D.entry, D.stop, D.target].join() : '';
+    if (dk !== LC.draftK) { if (!!dk !== !!LC.draftK || !LC.draftT) LC.draftT = dk ? now.T : 0; LC.draftK = dk; LC.draftAt = Date.now(); } else if (dk && dk !== LC.draftSaid && Date.now() - LC.draftAt > 1200) { LC.draftSaid = dk; const say = draftSay(); if (say) lcNote('draft', 'Draft', say); const pw = crWarnText(CSC); if (pw) lcNote('warn', 'Your pattern', pw); }
+    // the market events of the candles that closed since the last look
+    if (S.bars.length && now.T > B.T) { const evs = BT.liveEvents(S.bars, TFS[S.tf], now.T, LC.ev, { positions: S.acct.positions, draw: S.draw, draft: dk ? { key: dk, since: LC.draftT } : null });
+      for (const e of evs) lcNote(e.imp >= 3 ? 'mk hi' : 'mk', { level: 'Your level', stop: 'Near the stop', target: 'Near the target', swing: 'Swing', session: 'Session', big: 'Big candle', r: 'Floating R', draft: 'Order waiting' }[e.k] || 'Market', e.text, e.t);
+      lcOffer(evs); }
     for (const p of S.acct.positions) { const o = B.pos.get(p.id);
       if (!o) { const say = coachSay(p); lcNote('open', p.side === 'buy' ? 'Bought' : 'Sold', `${p.side === 'buy' ? 'Bought' : 'Sold'} at ${fmt(p.entry)}, stop ${fmt(coachStop0(p))}${p.target != null ? `, target ${fmt(p.target)}` : ''}. ${say}`, p.openedAt);
         { const pw = crWarnText(p.ctx); if (pw) lcNote('warn', 'Your pattern', pw, p.openedAt); }
@@ -2123,13 +2132,6 @@
         const fl = BT.coachFlags(t, S.acct.closed), why = /^target/.test(t.reason || '') ? 'target' : /^stop/.test(t.reason || '') ? 'stop' : /breach/.test(t.reason || '') ? 'challenge breach' : 'by hand';
         lcNote(t.R > 0 ? 'win' : t.R < 0 ? 'loss' : 'flat', 'Closed', `${t.side === 'buy' ? 'Buy' : 'Sell'} closed (${why}) at ${lcR(t.R)}.${fl.length ? ' ' + fl.map((f) => f.text).join('. ') + '.' : ''}`, t.closedAt);
         lcAI('close', { side: t.side, R: t.R, reason: t.reason, sentence: coachSay(t), flags: fl.map((f) => f.text) }); } }
-    // a draft: noted once it has stood still a moment (not while its lines are dragged); its candle count for the "not placed" event
-    const dk = D ? [D.side, D.entry, D.stop, D.target].join() : '';
-    if (dk !== LC.draftK) { if (!!dk !== !!LC.draftK || !LC.draftT) LC.draftT = dk ? now.T : 0; LC.draftK = dk; LC.draftAt = Date.now(); } else if (dk && dk !== LC.draftSaid && Date.now() - LC.draftAt > 1200) { LC.draftSaid = dk; const say = draftSay(); if (say) lcNote('draft', 'Draft', say); const pw = crWarnText(CSC); if (pw) lcNote('warn', 'Your pattern', pw); }
-    // the market events of the candles that closed since the last look
-    if (S.bars.length && now.T > B.T) { const evs = BT.liveEvents(S.bars, TFS[S.tf], now.T, LC.ev, { positions: S.acct.positions, draw: S.draw, draft: dk ? { key: dk, since: LC.draftT } : null });
-      for (const e of evs) lcNote(e.imp >= 3 ? 'mk hi' : 'mk', { level: 'Your level', stop: 'Near the stop', target: 'Near the target', swing: 'Swing', session: 'Session', big: 'Big candle', r: 'Floating R', draft: 'Order waiting' }[e.k] || 'Market', e.text, e.t);
-      lcOffer(evs); }
     lcFlush();
     // the challenge, when one runs: its state and the two loss buffers once they get close
     const ch = S.ch; if (ch && ch.progress) { const P = ch.progress, F = ch.firm, day = BT.dayKey ? BT.dayKey(nowT()) : '';

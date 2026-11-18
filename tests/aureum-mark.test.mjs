@@ -33,7 +33,7 @@ test('the CSS mark draws the same letter and gradient as the SVG', () => {
 test('icons and the card exist at their sizes; the app colour is the graphite --au-bg', () => {
   for (const [f, w, h] of [['icons/icon-192.png', 192, 192], ['icons/icon-512.png', 512, 512], ['icons/maskable-192.png', 192, 192],
     ['icons/maskable-512.png', 512, 512], ['icons/apple-touch-icon.png', 180, 180], ['icons/favicon-32.png', 32, 32],
-    ['icons/badge-96.png', 96, 96], ['icon-192.png', 192, 192], ['icon-512.png', 512, 512], ['icons/og-card.png', 1200, 630]]) {
+    ['icons/badge-96.png', 96, 96], ['icon-192.png', 192, 192], ['icon-512.png', 512, 512], ['icons/og-card.png', 1200, 630], ['icons/email-logo.png', 585, 96]]) {
     assert.deepEqual(png(f), [w, h], f);
   }
   const m = JSON.parse(read('app.webmanifest'));
