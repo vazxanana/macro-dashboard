@@ -269,4 +269,4 @@ module.exports.useSmtp = useSmtp;
 module.exports.useEmailMessage = useEmailMessage;
 module.exports.lastMailError = () => LAST_MAIL_ERROR;
 module.exports.useMail = useMail;
-module.exports._t = { originOf, keyOf, userOf, RESERVED, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };
+module.exports._t = { html, originOf, keyOf, userOf, RESERVED, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };
