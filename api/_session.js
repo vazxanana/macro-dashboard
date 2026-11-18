@@ -48,7 +48,7 @@ function issue(env, u, h, acct, now = Date.now()) {
 // enumeration). Every member hash is compared (constant time each, no early exit). Throws 503 when the list cannot be read.
 // Sign-in (18 Nov 2026, owner: "login with email or username and password"): `id` = the account's username (its key, unique,
 // case-insensitive; the owner is "owner" or "admin") or the email stored on its record. With an id only that account is checked;
-// without one the old password-only path stays for now (every password is still unique). Every miss returns null the same way.
+// without one only the owner and the built-in members are checked (their passwords stay unique among themselves). Every miss returns null the same way.
 const OWNER_IDS = ['owner', 'admin'];
 async function login(deps, pw, id) {
   if (typeof pw !== 'string' || !pw || pw.length > 200) return null;
@@ -61,9 +61,11 @@ async function login(deps, pw, id) {
       if (mine && A.same(R.hash, h) && !hit) hit = k; }
     return hit ? { u: hit, h, account: account(hit, users[hit]) } : null;
   }
+  // password only (owner, 18 Nov 2026: "only for built in users"): the owner and the built-in members; every other account
+  // signs in with its username or email
   if (A.same(h, A.OWNER_HASH)) return { u: 'owner', h, account: account('owner') };
-  const users = await A.userList(deps); let hit = null;
-  for (const k of Object.keys(users)) { const R = users[k]; if (R && A.KEY_RE.test(k) && A.same(R.hash, h) && !hit) hit = k; }
+  const users = await A.userList(deps), built = Object.keys(deps.builtIns || A.BUILT_IN); let hit = null;
+  for (const k of built) { const R = users[k]; if (R && A.KEY_RE.test(k) && A.same(R.hash, h) && !hit) hit = k; }
   return hit ? { u: hit, h, account: account(hit, users[hit]) } : null;
 }
 // The token's account as the user list stands now: null when removed, disabled, or the password changed since; current role

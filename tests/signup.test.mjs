@@ -61,15 +61,15 @@ test('validation: name, email and password', async () => {
   assert.equal((await post(W, { name: 'A', email: 'a@b.co', password: 'x'.repeat(10) }, {}, { headers: { origin: 'https://evil.test' } })).code, 403, 'a foreign Origin is refused');
 });
 
-test('a password already used by the owner, a member or another request is refused with a neutral sentence (and counts as a failed check)', async () => {
+test('a password of the owner or a built-in member is refused with a neutral sentence (it would sign in alone); others may repeat', async () => {
   const W = world();
   assert.equal((await join(W, 'Ana', 'ana@example.com', 'ana-password-1')).code, 200);
-  for (const pw of ['fred-password', 'ana-password-1']) {
-    const r = await post(W, { name: 'Bo', email: 'bo@example.com', password: pw }, {}, { ip: '10.9.9.9' });
-    assert.equal(r.code, 400); assert.deepEqual(r.body, { error: 'Choose another password.' });
-  }
+  const r = await post(W, { name: 'Bo', email: 'bo@example.com', password: 'fred-password' }, {}, { ip: '10.9.9.9' });
+  assert.equal(r.code, 400); assert.deepEqual(r.body, { error: 'Choose another password.' });
+  // another request's or a stored member's password no longer matters: a member signs in with a username or email
+  assert.equal((await post(W, { name: 'Bea', email: 'bo2@example.com', password: 'ana-password-1' })).code, 200);
   W.list = { users: { maria: { name: 'Maria', role: 'viewer', hash: sha('stored-member-pw') } } };
-  assert.deepEqual((await post(W, { name: 'Bo', email: 'bo@example.com', password: 'stored-member-pw' })).body, { error: 'Choose another password.' });
+  assert.equal((await post(W, { name: 'Cy', email: 'cy@example.com', password: 'stored-member-pw' })).code, 200);
   // ten refusals from one IP: the shared password-guess limit answers 429
   for (let i = 0; i < 10; i++) await post(W, { name: 'Bo', email: `bo${i}@example.com`, password: 'fred-password' }, {}, { ip: '10.7.7.7' });
   assert.equal((await post(W, { name: 'Bo', email: 'z@example.com', password: 'free-password-9' }, {}, { ip: '10.7.7.7' })).code, 429);
@@ -138,7 +138,7 @@ test('owner approval: list, approve (the member can sign in), refuse; members an
   assert.match(W.out[W.out.length - 1].subject, /seat .* is ready/);
   assert.equal(W.files['signups/pending.json'].filter((p) => p.verified).length, 0);
   // sign-in with that password now works through /api/login, and nothing the member reads carries the email
-  const r = res(); await login.handle({ method: 'POST', headers: { host: 'x.test' }, body: { password: 'maria-password-1' } }, r, { env: ENV, deps: W.deps });
+  const r = res(); await login.handle({ method: 'POST', headers: { host: 'x.test' }, body: { id: 'maria', password: 'maria-password-1' } }, r, { env: ENV, deps: W.deps });
   assert.equal(r.code, 200); assert.equal(r.body.account.u, 'maria'); assert.doesNotMatch(JSON.stringify(r.body), /example\.com/);
   const cookie = String(r.headers['set-cookie']).split(';')[0];
   const m = res(); await me.handle({ method: 'GET', headers: { host: 'x.test', cookie } }, m, { env: ENV, deps: W.deps }); assert.doesNotMatch(JSON.stringify(m.body), /example\.com/);
@@ -308,5 +308,7 @@ test('usernames (18 Nov 2026): required, 3-24 of a-z 0-9 -, reserved words refus
   assert.equal((await log({ id: 'nobody', password: 'zed-password-1' })).code, 401);
   assert.deepEqual((await log({ id: 'zed-1', password: 'wrong-password' })).body, (await log({ id: 'nobody', password: 'x' })).body, 'the same answer for every miss');
   assert.equal((await log({ id: 'owner', password: 'zed-password-1' })).code, 401);
-  assert.equal((await log({ password: 'zed-password-1' })).body.account.u, 'zed-1', 'password-only still works for now');
+  assert.equal((await log({ password: 'zed-password-1' })).code, 401, 'password only: built-in members and the owner alone');
+  assert.equal((await log({ password: 'fred-password' })).body.account.u, 'fred', 'a built-in member signs in with the password alone');
+  assert.equal((await log({ id: 'fred', password: 'fred-password' })).body.account.u, 'fred');
 });

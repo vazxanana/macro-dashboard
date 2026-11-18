@@ -32,6 +32,9 @@ const OFF = 'Sign-ups are not open yet.', OFF_RESET = 'Password reset by email i
 const SENT = 'Check your email for a link to confirm it. The link works for 24 hours.';
 const FORGOT = 'If that email belongs to an account, a link to choose a new password is on its way. It works for one hour.';
 const AGAIN = 'Choose another password.';
+// 18 Nov 2026: a password alone signs in only the owner and the built-in members, so a new or reset password is refused only when
+// it is one of theirs (else typing it without a username would open their account); members' passwords may repeat each other.
+const pwClash = (h, users, builtIns) => A.same(h, A.OWNER_HASH) || Object.keys(builtIns || {}).some((k) => users[k] && A.same(users[k].hash, h));
 
 let CONNECT = null, BINDING = null;   // handed in by cloudflare/src/worker.mjs: the socket function (cloudflare:sockets connect) and env.EMAIL
 const useSmtp = (fn) => { CONNECT = typeof fn === 'function' ? fn : null; };
@@ -176,7 +179,7 @@ async function handle(req, res, d = {}) {
       if (b.refuse != null) { await store.put(PENDING, rest); console.log('[signup] a request was refused'); return res.status(200).json({ ok: true }); }
       const role = b.role === 'reviewer' ? 'reviewer' : 'viewer';
       const cur = (await loadUsers()) || { users: {} }, stored = { ...(cur.users || {}) }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
-      if (A.same(x.hash, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, x.hash))) return res.status(409).json({ error: 'That password is now used by another account: refuse this request and ask them to sign up again with another password.' });
+      if (pwClash(x.hash, users, builtIns)) return res.status(409).json({ error: 'That password is now used by another account: refuse this request and ask them to sign up again with another password.' });
       const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k;
       if (x.username) { k = x.username; if (taken.has(k) || users[k]) return res.status(409).json({ error: `The username "${k}" is now taken by another account: refuse this request and ask them to sign up again with another username.` }); }
       else { let n = 2; k = keyOf(x.name); while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; } }   // a request made before usernames
@@ -219,7 +222,7 @@ async function handle(req, res, d = {}) {
       const h = A.sha(b.password), cur = (await loadUsers()) || { users: {} }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
       if (!users[r.u]) { await store.put(RESETS, resets.filter((x) => x !== r)); return res.status(400).json({ error: 'This link has expired or was already used. Ask for a new one.' }); }
       const pend = live(await store.get(PENDING));
-      if (A.same(h, A.OWNER_HASH) || Object.keys(users).some((j) => j !== r.u && A.same(users[j].hash, h)) || pend.some((p) => A.same(p.hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
+      if (A.same(h, A.OWNER_HASH) || Object.keys(builtIns).some((j) => j !== r.u && users[j] && A.same(users[j].hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
       const stored = { ...(cur.users || {}) }; stored[r.u] = { ...(stored[r.u] || builtIns[r.u]), hash: h }; delete stored[r.u].disabled;
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The new password could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: 'a password was reset by email' });
@@ -238,7 +241,7 @@ async function handle(req, res, d = {}) {
     if (!pwOk(b.password)) return res.status(400).json({ error: 'Use a password of at least 10 characters.' });
     const h = A.sha(b.password), users = await A.userList({ ...deps, builtIns });
     let list = live(await store.get(PENDING));
-    if (A.same(h, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, h)) || list.some((p) => p.email !== email && A.same(p.hash, h))) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
+    if (pwClash(h, users, builtIns)) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
     // one username, one account: a member's key, a built-in, the owner's words, or another live request (not this email's own)
     if (users[uname] || builtIns[uname] || list.some((p) => p.username === uname && p.email !== email)) return res.status(409).json({ error: 'That username is taken. Choose another.', field: 'username' });
     const known = Object.values(users).some((u) => u && u.email && String(u.email).toLowerCase() === email), had = list.find((p) => p.email === email);

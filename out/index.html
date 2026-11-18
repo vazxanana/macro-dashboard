@@ -1403,7 +1403,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
     if (btn.getAttribute('aria-busy') === 'true') return;
     var uid = idIn ? idIn.value.trim() : '';
-    err.textContent = ''; if (idIn && !uid) { fail('Type your email or username.', false, idIn); return; } if (!pw) { fail('Type your password first.'); return; }
+    err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
     if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on aureumdesk.co.uk.'); return; }
     btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; if (idIn) idIn.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
@@ -1418,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (r.status === 429) { fail((j && j.error) || 'Too many tries. Wait a few minutes, then try again.')   /* api/_guard.js */; return; }
     if (r.status >= 500) { fail('Sign-in is unavailable right now (the server could not check accounts). Try again in a minute.'); return; }
     var capsEl = document.getElementById('ms-gate-caps'), capsOn = !!capsEl && !capsEl.hidden;   // the likeliest reason is said in the error itself (the hint and the error share one row)
-    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'Those details were not accepted. Caps Lock is on: turn it off and try again.' : 'That email or username and password do not match. Check them and try again.', true); });
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail(capsOn ? 'Those details were not accepted. Caps Lock is on: turn it off and try again.' : (uid ? 'That email or username and password do not match. Check them and try again.' : 'Password not accepted. Add your email or username above and try again.'), true); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {} if (ev.key === 'Escape' && document.documentElement.dataset.gate && guest) msGate(false); });
@@ -5225,7 +5225,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
     <form id="ms-gate-f" method="post" action="#" novalidate>
       <label for="ms-gate-u">Email or username</label>
-      <input id="ms-gate-u" class="gate-id" name="username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" required aria-describedby="ms-gate-msg">
+      <input id="ms-gate-u" class="gate-id" name="username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" aria-describedby="ms-gate-msg">
       <label for="ms-gate-p">Password</label>
       <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password webauthn" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
       <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>

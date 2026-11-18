@@ -17,7 +17,7 @@ function res() { const r = { code: 0, body: null, headers: {} };
   r.setHeader = (k, v) => { r.headers[k.toLowerCase()] = v; }; r.status = (c) => { r.code = c; return r; }; r.json = (b) => { r.body = b; return r; }; r.send = (b) => { r.body = b; return r; }; return r; }
 const run = async (h, req, d) => { const r = res(); await h.handle({ headers: { host: 'x.test' }, ...req, headers: { host: 'x.test', ...(req.headers || {}) } }, r, d); return r; };
 const cookieFrom = (r) => String(r.headers['set-cookie'] || '').split(';')[0];
-const signIn = async (pw, deps = { builtIns, blobUsers: listOf({}) }, env = ENV, now) => run(login, { method: 'POST', body: { password: pw } }, { env, deps, now });
+const signIn = async (pw, deps = { builtIns, blobUsers: listOf({}) }, env = ENV, now, id) => run(login, { method: 'POST', body: id ? { id, password: pw } : { password: pw } }, { env, deps, now });
 
 test('the session key: SESSION_SECRET when set, else derived from an existing secret, else none (sign-in off)', () => {
   assert.ok(S.secret({ SESSION_SECRET: 'x'.repeat(32) })); assert.ok(S.secret({ CRON_SECRET: 'c' })); assert.equal(S.secret({}), null);
@@ -28,7 +28,7 @@ test('login: owner, built-in and Blob members sign in; the cookie is HttpOnly, S
   const deps = { builtIns, blobUsers: listOf({ maria: { name: 'Maria', hash: sha('maria-pw'), role: 'viewer', perms: { charts: true } } }) };
   const f = await signIn('fred-pw', deps); assert.equal(f.code, 200); assert.deepEqual(f.body.account, { u: 'fred', name: 'Fred', role: 'reviewer', ict: true });
   assert.match(f.headers['set-cookie'], /^ms_session=[^;]+; Path=\/; Max-Age=2592000; HttpOnly; Secure; SameSite=Lax$/);
-  const m = await signIn('maria-pw', deps); assert.equal(m.body.account.u, 'maria'); assert.deepEqual(m.body.account.perms, { charts: true });
+  const m = await signIn('maria-pw', deps, ENV, undefined, 'maria'); assert.equal(m.body.account.u, 'maria'); assert.deepEqual(m.body.account.perms, { charts: true });
   assert.doesNotMatch(JSON.stringify([f.body, m.body]), /[0-9a-f]{64}/);
   // the owner's real password is not in the repo: check the owner path through the token instead
   const tok = S.issue(ENV, 'owner', A.OWNER_HASH, S.account('owner')), o = await run(me, { method: 'GET', headers: { cookie: `ms_session=${tok}` } }, { env: ENV, deps });

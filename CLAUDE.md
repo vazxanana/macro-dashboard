@@ -2409,8 +2409,10 @@ submitting unchanged), the live strip and proof under it. A device where someone
 ## Sign in with email or username; unique usernames (18 Nov 2026, owner: "login with email or either username and password … unique username, so no repeated ones")
 - **Sign-in** (`api/login.js` `{ id, password }`, `api/_session.js` `login(deps, pw, id)`): `id` = the account's username (its KEY,
   lowercased) or the email on its stored record; the owner is `owner` or `admin`. Only that account is checked; every miss is the same
-  401. Without an `id` the old password-only path stays (so passwords stay unique: sign-up and reset still refuse a used one). The
-  card asks "Email or username" (`#ms-gate-u`, `autocomplete="username"`, phone order 3 above the password) and sends `id`.
+  401. **Without an `id` only the owner and the built-in members are checked** (owner, 18 Nov 2026: "password-only login, only for
+  built in users"; `deps.builtIns || A.BUILT_IN` keys, their current stored hash); sign-up and reset refuse only the owner's or a
+  built-in's password (`pwClash`), members' passwords may repeat. The field is optional on the card, which
+  asks "Email or username" (`#ms-gate-u`, `autocomplete="username"`, phone order 3 above the password) and sends `id`.
 - **Usernames** (`api/signup.js` `userOf`, `USER_RE` 3-24 of a-z 0-9 "-", not starting with "-", case-insensitive; `RESERVED`
   owner / admin / aureum / desk / guest / help / support / root / system / council / member / api): required at sign-up (`#ms-su-u`,
   suggested from the name until typed), 409 `{ field: 'username' }` when a member, a built-in or another waiting request holds it;
