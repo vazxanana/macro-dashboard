@@ -159,7 +159,7 @@ forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) 
   when the Users page saves without it), never in `publicRecord`, `/api/me`, `/api/users` (not even the owner's), `/cdata`, the
   guest cut or a log line; only the owner's approval list shows it.
 - **Mail senders** (`mailer`), in order: (1) the Worker's Cloudflare Email Service binding `env.EMAIL` (`send_email`, handed in per
-  request by `signup.useMail`), from `MAIL_FROM` (default desk@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
+  request by `signup.useMail`), from `MAIL_FROM` (default help@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
   socket function; the Worker hands in `cloudflare:sockets` `connect` through `signup.useSmtp`; smtp.gmail.com:465 implicit TLS,
   EHLO, AUTH PLAIN, dot-stuffing, CR/LF stripped from every header value, one plain address only), secrets `GMAIL_USER` /
   `GMAIL_APP_PASSWORD`; with both, a binding that throws is followed by one Gmail try. Neither: 503 "Sign-ups are not open yet."

@@ -72,14 +72,14 @@ function originOf(req) {
 
 // The mail sender, or null when email is off (owner, 17 Nov 2026: the emails come from the site's own domain).
 //   1. PRIMARY: the Worker's Cloudflare Email Service binding (`send_email` binding named EMAIL, handed in by the Worker through
-//      useMail), from MAIL_FROM (a plain variable, default desk@aureumdesk.co.uk; its domain must be onboarded to Email Service).
+//      useMail), from MAIL_FROM (a plain variable, default help@aureumdesk.co.uk; its domain must be onboarded to Email Service).
 //   2. FALLBACK: Gmail SMTP (api/_smtp.js) with GMAIL_USER / GMAIL_APP_PASSWORD, through the Worker's socket (useSmtp).
 //   With both, a binding that throws is followed by one try through Gmail. Neither: null (sign-ups off).
 // Returns send(to, subject, text, html) with a `.via` naming the first route.
 function mailer(env, d) {
   if (d.send) return d.send;
   const binding = d.binding !== undefined ? d.binding : BINDING, connect = d.connect !== undefined ? d.connect : CONNECT;
-  const from = M.oneLine(env.MAIL_FROM || 'desk@aureumdesk.co.uk'), user = env.GMAIL_USER, pass = env.GMAIL_APP_PASSWORD;
+  const from = M.oneLine(env.MAIL_FROM || 'help@aureumdesk.co.uk'), user = env.GMAIL_USER, pass = env.GMAIL_APP_PASSWORD;
   // The binding is tried in the shapes Cloudflare documents (17 Nov 2026: the first live send failed and the docs could not be read
   // from the build sandbox): the Email Service object with `from` as { email, name }, the same with `from` as an address, and the
   // older `send_email` call with a raw MIME message (EmailMessage of the Worker's email module, handed in by the Worker). Each failure
@@ -99,7 +99,23 @@ function mailer(env, d) {
   return send;
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const html = (lines, link, label) => `<div style="font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#16181b;max-width:520px">${lines.map((l) => `<p>${esc(l)}</p>`).join('')}${link ? `<p><a href="${esc(link)}" style="display:inline-block;background:#16181b;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">${esc(label)}</a></p><p style="color:#5b616b;font-size:13px">Or open this address: ${esc(link)}</p>` : ''}<p style="color:#5b616b;font-size:13px">Aureum Desk · paper trading, not financial advice</p></div>`;
+// One template for every email (18 Nov 2026): a table layout every mail app draws the same, the wordmark, a heading, the
+// message, one button, the address as a fallback, a quiet note and the footer. `o` = { title, note }; every text escaped.
+const html = (lines, link, label, o = {}) => {
+  const F = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+  const p = (t, st = '') => `<p style="margin:0 0 16px;font:15px/1.6 ${F};color:#3a3f47;${st}">${esc(t)}</p>`;
+  const body = lines.map((l, i) => p(l, i === 0 ? 'color:#16181b;' : '')).join('');
+  const btn = link ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 24px"><tr><td style="border-radius:8px;background:#16181b"><a href="${esc(link)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 ${F};color:#ffffff;text-decoration:none;border-radius:8px">${esc(label)}</a></td></tr></table>`
+    + `<p style="margin:0 0 6px;font:13px/1.5 ${F};color:#6b717b">If the button does not work, copy this address into your browser:</p><p style="margin:0 0 8px;font:13px/1.5 ${F};word-break:break-all"><a href="${esc(link)}" style="color:#2f5e9e;text-decoration:underline">${esc(link)}</a></p>` : '';
+  const note = o.note ? `<tr><td style="padding:20px 40px;border-top:1px solid #e6e8eb;font:13px/1.55 ${F};color:#6b717b">${esc(o.note)}</td></tr>` : '';
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:32px 16px">`
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">`
+    + `<tr><td style="padding:0 4px 18px;font:700 13px/1 ${F};letter-spacing:.18em;color:#16181b"><span style="display:inline-block;width:22px;height:22px;line-height:22px;margin-right:10px;border-radius:6px;background:#c9cdd3;color:#16181b;text-align:center;font-size:13px;letter-spacing:0;vertical-align:middle">A</span><span style="vertical-align:middle">AUREUM <span style="color:#8a9099;font-weight:500">DESK</span></span></td></tr>`
+    + `<tr><td style="background:#ffffff;border:1px solid #e6e8eb;border-radius:12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
+    + `<tr><td style="padding:36px 40px 12px">${o.title ? `<h1 style="margin:0 0 20px;font:600 22px/1.3 ${F};color:#16181b">${esc(o.title)}</h1>` : ''}${body}${btn}</td></tr>${note}</table></td></tr>`
+    + `<tr><td style="padding:20px 4px 0;font:12px/1.6 ${F};color:#8a9099">Aureum Desk · aureumdesk.co.uk<br>A paper-trading desk. Nothing here is financial advice.</td></tr>`
+    + `</table></td></tr></table></body></html>`;
+};
 
 async function handle(req, res, d = {}) {
   const env = d.env || process.env, now = d.now ? d.now() : Date.now(); res.setHeader('Cache-Control', 'private, no-store');
@@ -165,7 +181,7 @@ async function handle(req, res, d = {}) {
       console.log(`[signup] approved a sign-up as ${role}`);
       let emailed = false;
       if (send) emailed = await send(x.email, 'Your seat at Aureum Desk is ready', `Hello ${one(x.name, 24)},\n\nThe owner approved your seat. Sign in on https://aureumdesk.co.uk with the password you chose.\n\nAureum Desk · paper trading, not financial advice`,
-        html([`Hello ${one(x.name, 24)},`, 'The owner approved your seat. Sign in with the password you chose.'], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in')).then(() => true, () => false);
+        html([`Hello ${one(x.name, 24)},`, 'Your account has been approved. You can now sign in to the desk with the password you chose when you signed up.'], 'https://aureumdesk.co.uk/market-structure.html', 'Sign in to Aureum Desk', { title: 'Your seat is ready', note: 'Forgot your password? Use "Forgot password?" on the sign-in screen.' })).then(() => true, () => false);
       return res.status(200).json({ ok: true, key: k, role, emailed });
     }
 
@@ -180,8 +196,8 @@ async function handle(req, res, d = {}) {
           const t = token(), resets = (await store.get(RESETS)).filter((r) => r && r.exp > now && r.u !== k).slice(-CAP);
           resets.push({ u: k, tokenHash: sha(t), at: now, exp: now + RESET_MS }); await store.put(RESETS, resets);
           const link = `${originOf(req)}/market-structure.html#reset=${t}`;
-          await send(e, 'Choose a new password for Aureum Desk', `Someone asked to change the password of your Aureum Desk account.\n\nChoose a new one here (the link works for one hour, once):\n${link}\n\nIf it was not you, ignore this email: your password stays as it is.`,
-            html(['Someone asked to change the password of your Aureum Desk account.', 'The link works for one hour, once. If it was not you, ignore this email: your password stays as it is.'], link, 'Choose a new password')).catch(() => console.log('[signup] a reset email could not be sent'));
+          await send(e, 'Reset your password · Aureum Desk', `Someone asked to change the password of your Aureum Desk account.\n\nChoose a new one here (the link works for one hour, once):\n${link}\n\nIf it was not you, ignore this email: your password stays as it is.`,
+            html(['We received a request to reset the password for your Aureum Desk account.', 'Choose a new password with the button below. For your security, the link works once and expires in one hour.'], link, 'Reset password', { title: 'Reset your password', note: 'If you did not ask for this, you can ignore this email: your password stays as it is and nobody can change it without this link.' })).catch(() => console.log('[signup] a reset email could not be sent'));
         }
       }
       return res.status(200).json({ ok: true, message: FORGOT });
@@ -224,8 +240,8 @@ async function handle(req, res, d = {}) {
     const t = token(), watch = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, email, hash: h, tokenHash: sha(t), watchHash: sha(watch), at: now, exp: now + VERIFY_MS, verified: false };
     const link = `${originOf(req)}/api/signup?verify=${t}`;
     try {
-      await send(email, 'Confirm your email for Aureum Desk', `Hello ${name},\n\nConfirm your email for Aureum Desk with this link (it works for 24 hours, once):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
-        html([`Hello ${name},`, 'Confirm your email for Aureum Desk. The link works for 24 hours, once. Then the owner approves your seat, and you sign in with the password you chose.', 'If you did not sign up, ignore this email.'], link, 'Confirm my email'));
+      await send(email, 'Confirm your email address · Aureum Desk', `Hello ${name},\n\nThank you for signing up to Aureum Desk. Confirm your email address with this link (it works once and expires in 24 hours):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
+        html([`Hello ${name},`, 'Thank you for signing up to Aureum Desk. Please confirm that this is your email address to continue.', 'Once confirmed, your request goes to the desk owner for approval. We will email you as soon as your seat is ready, and you sign in with the password you chose.'], link, 'Confirm email address', { title: 'Confirm your email address', note: 'This link works once and expires in 24 hours. If you did not create an account, you can safely ignore this email.' }));
     } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.', why: e && e.tries ? e.tries : [redact(e)] }); }
     list.push(rec); await store.put(PENDING, list);
     return res.status(200).json({ ok: true, message: SENT, watch });

@@ -244,7 +244,7 @@ test('the senders: the Email Service binding first, from MAIL_FROM; Gmail when t
   let W = world(); delete W.d; const base = world(); W = base;
   let r = await call(W, { method: 'POST', body: { name: 'Maria', email: 'maria@example.com', password: 'maria-password-1' } }, { send: undefined, binding });
   assert.equal(r.code, 200); assert.equal(sent.length, 1);
-  assert.deepEqual(sent[0].from, { email: 'desk@aureumdesk.co.uk', name: 'Aureum Desk' }); assert.equal(sent[0].to, 'maria@example.com'); assert.match(sent[0].text, /verify=/); assert.match(sent[0].html, /Confirm my email/);
+  assert.deepEqual(sent[0].from, { email: 'help@aureumdesk.co.uk', name: 'Aureum Desk' }); assert.equal(sent[0].to, 'maria@example.com'); assert.match(sent[0].text, /verify=/); assert.match(sent[0].html, /Confirm email address/);
   const W2 = world({ env: { ...ENV, MAIL_FROM: 'hello@aureumdesk.co.uk' } }); await run(W2, { binding }); assert.equal(sent[1].from.email, 'hello@aureumdesk.co.uk');
   // binding + Gmail: the binding is used; Gmail stays untouched
   const F = fakeSmtp(), W3 = world({ env: GMAIL }); await run(W3, { binding, connect: F.connect }); assert.equal(sent.length, 3); assert.equal(F.log.length, 0);
