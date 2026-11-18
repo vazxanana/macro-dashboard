@@ -18,6 +18,11 @@ on:
         description: 'Point ACADEMY_LLM_URL at the Worker''s own Workers AI connection (no token needed)'
         type: boolean
         default: false
+      ai_model:
+        description: 'Switch the AI features to a model (the key stays as set: ACADEMY_LLM_KEY on the Worker or as a repository secret)'
+        type: choice
+        options: [keep, sonnet, opus, haiku]
+        default: keep
   push:
     branches: [claude/cloudflare-stage1, claude/relaxed-albattani-8c6aky]
     paths:
@@ -194,6 +199,31 @@ jobs:
         run: |
           printf 'https://workers-ai.invalid/v1/chat/completions' | npx wrangler secret put ACADEMY_LLM_URL >/dev/null 2>&1 && echo "set   ACADEMY_LLM_URL = the Worker's AI connection"
           printf 'chat' | npx wrangler secret put ACADEMY_LLM_FORMAT >/dev/null 2>&1 && echo "set   ACADEMY_LLM_FORMAT = chat"
+
+      # 18 Nov 2026 (owner: "change to sonnet"): the provider's address, format, model and prices for one model, set together
+      # so the spending caps count the right price (docs/academy/LLM.md). None of these is a secret; the key is not touched.
+      - name: Switch the AI model (only when asked)
+        if: github.event_name == 'workflow_dispatch' && inputs.ai_model != 'keep' && inputs.ai_model != ''
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PICK: ${{ inputs.ai_model }}
+        run: |
+          case "$PICK" in
+            sonnet) M=claude-sonnet-5-5; I=2; O=10; CR=0.1; CW=2.5;;
+            opus)   M=claude-opus-5-5;   I=4; O=20; CR=0.2; CW=5;;
+            haiku)  M=claude-haiku-5-5;  I=0.1; O=0.5; CR=0.01; CW=0.125;;
+            *) echo "unknown model $PICK"; exit 1;;
+          esac
+          put() { printf '%s' "$2" | npx wrangler secret put "$1" >/dev/null 2>&1 && echo "set   $1 = $2" || echo "::warning::could not set $1"; }
+          put ACADEMY_LLM_URL https://api.anthropic.com/v1/messages
+          put ACADEMY_LLM_FORMAT messages
+          put ACADEMY_LLM_MODEL "$M"
+          put ACADEMY_LLM_USD_PER_MTOK_IN "$I"
+          put ACADEMY_LLM_USD_PER_MTOK_OUT "$O"
+          put ACADEMY_LLM_USD_PER_MTOK_CACHE_READ "$CR"
+          put ACADEMY_LLM_USD_PER_MTOK_CACHE_WRITE "$CW"
 
       # The file store's copy in D1 (docs/cloudflare.md, "File store on D1"): the mirror's state and file counts by folder
       # (names only, never a file's content).
