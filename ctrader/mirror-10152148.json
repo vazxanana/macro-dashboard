@@ -4756,7 +4756,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-17T16:57:31.000Z",
     "councilEntry": 3864.11,
     "stop": 3892.29,
@@ -4770,10 +4770,12 @@
     "slipR": 0.05,
     "lagSec": 103,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-17T16:57:31.000Z",
-    "brokerStop": 3890.88
+    "brokerStop": 3890.88,
+    "closedAt": "2026-11-18T01:50:07.000Z"
    },
    "xau-replica-1794964254-b": {
     "positionId": "50239631",
@@ -4811,7 +4813,7 @@
    "startBalance": 5305.21
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5292.39 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 5348.99 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -4819,15 +4821,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5292.39,
-  "lastRun": "2026-11-18T01:46:56.000Z"
+  "balance": 5348.99,
+  "lastRun": "2026-11-18T01:50:07.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T05:25:50.000Z",
-   "msg": "opened buy SOLUSD 0.01 lot (council replica)",
-   "trade": "sol-replica-1794374683-b"
-  },
   {
    "at": "2026-11-11T05:37:44.000Z",
    "msg": "opened sell EURUSD 0.03 lot (council replica)",
@@ -6322,6 +6319,11 @@
    "at": "2026-11-18T01:43:32.000Z",
    "msg": "XAUUSD position 50239631 closed at the broker",
    "trade": "xau-replica-1794964254-b"
+  },
+  {
+   "at": "2026-11-18T01:50:07.000Z",
+   "msg": "XAUUSD position 50220661 closed at the broker",
+   "trade": "xau-replica-1794934548-s"
   }
  ],
  "limits": {
