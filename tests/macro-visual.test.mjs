@@ -103,7 +103,7 @@ test('desk simple phone view: set before the first paint with the Desk\'s key, p
 });
 
 test('desk simple phone view: sections 2 to 6 fold to a title and one line, the glance and the detail do not; charts draw on opening', () => {
-  for (const [id, ctl] of [['s-trade', 'c-trade'], ['s-next', 'c-next'], ['s-why', 'c-score c-ins'], ['s-price', 'c-ladder'], ['s-expect', 'c-brief'], ['s-track', 'c-calls c-calib']]) {
+  for (const [id, ctl] of [['s-plan', 'c-plan'], ['s-next', 'c-next'], ['s-why', 'c-score c-ins'], ['s-price', 'c-ladder'], ['s-expect', 'c-brief'], ['s-track', 'c-calls c-calib']]) {
     const m = new RegExp('<section class="story sfold" id="' + id + '"[^>]*>\\s*<header class="st-h">.*?<button type="button" class="st-go" id="go-' + id + '" aria-expanded="false" aria-controls="' + ctl + '" aria-labelledby="[\\w-]+ one-' + id + '"><span class="st-one" id="one-' + id + '"></span></button></header>').exec(html);
     assert.ok(m, id + ' has its fold button inside the section header');
     for (const c of ctl.split(' ')) assert.ok(html.includes('id="' + c + '"'));

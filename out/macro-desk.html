@@ -500,38 +500,41 @@
   details.fold + details.fold { margin-top: 0; }
   @media (pointer: coarse) { .tabs button, .lim, details summary, .toc a, .hdr-sw a, .brand[href], .jump { min-height: 44px; } .jump, .brand[href] { display: inline-flex; align-items: center; } .lim { padding: 0 var(--s2); } details:not(.fold):not(.deep) > summary { display: flex; align-items: center; } }
   @media (max-width: 600px) { .top #when { display: none; } .card, .glance { padding: var(--s4); } .story { margin-top: var(--s5); } .g-sent { font-size: 17px !important; } .stamp { font-size: var(--fs-xs); } }
-  /* ─── Before you trade (18 Nov 2026, owner: "more improvement on macro as well, I want people to be able to use it to take or
-     decide for trades"). Today market by market, then a check of the reader's own trade against what the desk already reads:
-     the strategist's lean, the release calendar, the market's mood, the stop against a normal day, gold's levels, positioning.
-     Display only: it reads forecast.json / veteran.json / cot.json, fetches nothing else and never calls a reading an edge. ─── */
-  .tc-tw { overflow-x: auto; margin: 0 0 var(--s4); border-radius: var(--r-sm); }
+  /* ─── Your read: today, this week, this month (18 Nov 2026, owner: "we don't need 'check a trade', find ways to be able to
+     use it daily weekly and monthly"). One switch, three views of what the strategist and the veteran already wrote: today's
+     leans, ranges and releases; the week's calls, releases, changes and positioning; the month's calls, levels, score path and
+     the record so far. Display only: it reads forecast.json / veteran.json / cot.json and never calls a reading an edge. ─── */
+  .pl-tabs { display: inline-flex; gap: 2px; padding: 3px; margin: 0 0 var(--s4); border-radius: var(--r-sm); background: var(--well); }
+  .pl-tabs button { min-height: 36px; padding: 0 var(--s4); border: 0; border-radius: calc(var(--r-sm) - 2px); background: transparent; color: var(--ink-dim); font: 600 var(--fs-sm) var(--sans); cursor: pointer; }
+  .pl-tabs button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
+  .pl-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pl-v h4 { margin: var(--s5) 0 var(--s2); font: 600 var(--fs-sm)/1.4 var(--sans); color: var(--ink); } .pl-v h4 small { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin-left: 6px; }
+  .tc-tw { overflow-x: auto; margin: 0 0 var(--s3); border-radius: var(--r-sm); }
   .tc-tw table { border-collapse: collapse; width: 100%; min-width: 560px; font: 400 var(--fs-sm)/1.4 var(--sans); }
   .tc-tw th, .tc-tw td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
-  .tc-tw th { font: 600 var(--fs-xs) var(--sans); color: var(--ink-dim); background: var(--well); }
-  .tc-tw td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .tc-tw tbody tr { cursor: pointer; } .tc-tw tbody tr:hover td { background: var(--well); }
+  .tc-tw thead th { font: 600 var(--fs-xs) var(--sans); color: var(--ink-dim); background: var(--well); }
+  .tc-tw td.n { font-variant-numeric: tabular-nums; white-space: nowrap; } .tc-tw small { color: var(--ink-faint); font-size: 12px; }
   .tc-st { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
   .tc-st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex: none; }
   .tc-st.with { color: var(--au-gain, var(--buy)); } .tc-st.with::before { background: var(--au-gain, var(--buy)); }
   .tc-st.against { color: var(--au-loss, var(--sell)); } .tc-st.against::before { background: var(--au-loss, var(--sell)); }
   .tc-st.wait, .tc-st.caution { color: var(--au-warn, var(--ink)); } .tc-st.wait::before, .tc-st.caution::before { background: var(--au-warn, var(--ink)); }
-  .tc-st.clear { color: var(--ink); } .tc-st.neutral, .tc-st.na { color: var(--ink-dim); }
-  .tc-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--s3); align-items: end; margin: 0 0 var(--s4); }
-  .tc-form label { display: grid; gap: 4px; font: 500 var(--fs-xs) var(--sans); color: var(--ink-dim); }
-  .tc-form select, .tc-form input { min-height: 40px; padding: 6px 10px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--well); color: var(--ink); font: 500 var(--fs-md) var(--sans); font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; }
-  .tc-lab { display: block; margin: 0 0 4px; font: 500 var(--fs-xs) var(--sans); color: var(--ink-dim); }
-  .tc-side { display: flex; border: 1px solid var(--line-strong); border-radius: var(--r-sm); overflow: hidden; min-height: 40px; }
-  .tc-side button { flex: 1; border: 0; background: transparent; color: var(--ink-dim); font: 600 var(--fs-md) var(--sans); cursor: pointer; }
-  .tc-side button[aria-pressed="true"][data-s="buy"] { background: var(--buy-soft); color: var(--au-gain, var(--buy)); }
-  .tc-side button[aria-pressed="true"][data-s="sell"] { background: var(--sell-soft); color: var(--au-loss, var(--sell)); }
-  .tc-verdict { margin: 0 0 var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: var(--well); font: 500 var(--fs-md)/1.5 var(--sans); }
-  .tc-verdict b { font-weight: 650; }
-  .tc-rows { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: 2px; }
-  .tc-rows li { display: grid; grid-template-columns: minmax(150px, 210px) 1fr; gap: 4px 14px; padding: 10px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
-  .tc-rows li > span:first-child { display: grid; gap: 2px; color: var(--ink); font-weight: 600; }
-  .tc-err { color: var(--au-loss, var(--sell)); font: 500 var(--fs-sm) var(--sans); margin: 0 0 var(--s3); }
-  @media (max-width: 640px) { .tc-rows li { grid-template-columns: 1fr; } }
-  @media (pointer: coarse) { .tc-form select, .tc-form input, .tc-side { min-height: 44px; } }
+  .tc-st.clear { color: var(--ink); } .tc-st.neutral { color: var(--ink-dim); }
+  .pl-list { list-style: none; margin: 0; padding: 0; }
+  .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
+  .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pl-list li.pl-call { grid-template-columns: 120px 1fr; } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
+  .pl-list li.pl-call > b .d { display: block; font-weight: 400; }
+  .pl-list .d { color: var(--ink-faint); font-size: 12px; white-space: nowrap; }
+  .pl-lv { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+  .pl-lv > div { padding: var(--s3); border-radius: var(--r-sm); background: var(--well); font: 400 var(--fs-sm)/1.45 var(--sans); color: var(--ink-dim); }
+  .pl-lv > div b { display: block; color: var(--ink); font: 650 var(--fs-lg) var(--sans); font-variant-numeric: tabular-nums; }
+  .pl-sc { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .pl-sc li { padding: 6px 10px; border-radius: var(--r-sm); background: var(--well); font: 400 12px/1.35 var(--sans); color: var(--ink-dim); text-align: center; }
+  .pl-sc li b { display: block; color: var(--ink); font: 600 var(--fs-sm) var(--sans); font-variant-numeric: tabular-nums; }
+  .pl-sc li.now { box-shadow: inset 0 0 0 1px var(--line-strong); }
+  @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } }
+  @media (pointer: coarse) { .pl-tabs button { min-height: 44px; } }
   /* ─── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
      The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
      ms-phone = "full" keeps the full view; the same key and attribute as the Desk). The first screen is the glance alone: the
@@ -622,7 +625,7 @@
     <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
   </div>
   <nav class="toc" id="toc" aria-label="Sections on this page">
-    <a href="#s-week">This week</a><a href="#s-trade">Before you trade</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+    <a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
   </nav>
 
   <!-- 1. This week: council/glance.mjs → veteran.json.summary; what changed (veteran.json.changes) folded under it -->
@@ -641,22 +644,16 @@
     </article>
   </section>
 
-  <!-- 2. Before you trade (18 Nov 2026): today market by market, and a check of the reader's own trade; display only -->
-  <section class="story sfold" id="s-trade" aria-labelledby="tc-h">
-    <header class="st-h"><h2 id="tc-h">Before you trade</h2><small class="st-m">today, market by market, and a check of your own trade</small><button type="button" class="st-go" id="go-s-trade" aria-expanded="false" aria-controls="c-trade" aria-labelledby="tc-h one-s-trade"><span class="st-one" id="one-s-trade"></span></button></header>
-    <article class="card tcheck" id="c-trade" hidden>
-      <p class="c-take" id="tc-take"></p>
-      <div class="tc-tw" role="region" tabindex="0" aria-label="Today, market by market"><table id="tc-today"><thead><tr><th scope="col">Market</th><th scope="col">Macro lean</th><th scope="col">A normal day</th><th scope="col">Releases, next 24 h</th><th scope="col">Positioning</th></tr></thead><tbody></tbody></table></div>
-      <h4 class="vz-h">Check a trade <small>before you place it: tap a market above, or fill this in</small></h4>
-      <form class="tc-form" id="tc-form" autocomplete="off">
-        <label>Market<select id="tc-m"><option value="gold">Gold</option><option value="eurusd">EUR/USD</option><option value="usdjpy">USD/JPY</option><option value="nq">Nasdaq 100</option><option value="es">S&amp;P 500</option></select></label>
-        <div><span class="tc-lab" aria-hidden="true">Side</span><div class="tc-side" role="group" aria-label="Side"><button type="button" data-s="buy" aria-pressed="true">Buy</button><button type="button" data-s="sell" aria-pressed="false">Sell</button></div></div>
-        <label>Entry <small>(optional)</small><input id="tc-e" inputmode="decimal" placeholder="price now"></label>
-        <label>Stop<input id="tc-s" inputmode="decimal" placeholder="required to check it"></label>
-        <label>Target <small>(optional)</small><input id="tc-t" inputmode="decimal"></label>
-      </form>
-      <div id="tc-out" aria-live="polite"></div>
-      <p class="note">A checklist of context, not a signal. None of these readings has passed a test as an edge here (the strategist's own scorecard says "no direction edge"; the positioning study failed); your system decides the trade, with its stop. Paper only.</p>
+  <!-- 2. Your read (18 Nov 2026): today, this week, this month, from the files already loaded; display only -->
+  <section class="story sfold" id="s-plan" aria-labelledby="pl-h">
+    <header class="st-h"><h2 id="pl-h">Your read</h2><small class="st-m">today, this week, this month</small><button type="button" class="st-go" id="go-s-plan" aria-expanded="false" aria-controls="c-plan" aria-labelledby="pl-h one-s-plan"><span class="st-one" id="one-s-plan"></span></button></header>
+    <article class="card plan" id="c-plan" hidden>
+      <div class="pl-tabs" role="tablist" aria-label="Horizon"><button type="button" role="tab" id="pl-t-day" data-pl="day" aria-controls="pl-day" aria-selected="true">Today</button><button type="button" role="tab" id="pl-t-week" data-pl="week" aria-controls="pl-week" aria-selected="false" tabindex="-1">This week</button><button type="button" role="tab" id="pl-t-month" data-pl="month" aria-controls="pl-month" aria-selected="false" tabindex="-1">This month</button></div>
+      <p class="c-take" id="pl-take" aria-live="polite"></p>
+      <div class="pl-v" id="pl-day" role="tabpanel" aria-labelledby="pl-t-day"></div>
+      <div class="pl-v" id="pl-week" role="tabpanel" aria-labelledby="pl-t-week" hidden></div>
+      <div class="pl-v" id="pl-month" role="tabpanel" aria-labelledby="pl-t-month" hidden></div>
+      <p class="note">Context for your own plan, not a signal. None of these readings has passed a test as an edge here (the strategist's scorecard says "no direction edge", the positioning study failed, the veteran's record is too young to judge); your system decides the trade, with its stop. Paper only.</p>
     </article>
   </section>
 
@@ -1390,117 +1387,139 @@
   setInterval(function () { if (LAST) renderStamp(); }, 60e3);
   // a story section shows when any of its cards has data; the table of contents follows
 
-  // ---- Before you trade (18 Nov 2026): pure reading on window.MD_CHECK (tests/macro-trade-check.test.mjs), drawn by renderTrade ----
-  var MD_CHECK = window.MD_CHECK = (function () {
+  // ---- Your read (18 Nov 2026): today / this week / this month. Pure reading on window.MD_PLAN (tests/macro-plan.test.mjs),
+  // drawn by renderPlan. Reads only what load() already has; every probability is shown beside its base rate.
+  var MD_PLAN = window.MD_PLAN = (function () {
     var NAME = { gold: 'Gold', eurusd: 'EUR/USD', usdjpy: 'USD/JPY', nq: 'Nasdaq 100', es: 'S&P 500' };
     var CCY = { gold: ['USD'], eurusd: ['USD', 'EUR'], usdjpy: ['USD', 'JPY'], nq: ['USD'], es: ['USD'] };
     var COT = { gold: ['gold', 1], eurusd: ['eur', 1], usdjpy: ['jpy', -1], nq: ['nq', 1], es: ['es', 1] };   // council/cot.mjs `sign`
-    var LEAN = 0.03, NEAR_H = 1, SOON_H = 24, AFTER_H = 0.5;
+    var DP = { gold: 0, eurusd: 4, usdjpy: 2, nq: 0, es: 0 };
+    var LEAN = 0.03, NEAR_H = 1, AFTER_H = 0.5;
     var n = function (v) { return v != null && v !== '' && isFinite(+v); };
-    var r1 = function (v) { return Math.round(v * 10) / 10; };
-    function events(fc, v) {   // the veteran's grouped cards first, else the strategist's calendar
-      var ev = (v && v.events && v.events.length ? v.events.map(function (e) { return { at: e.at, country: e.country, title: (e.titles && e.titles.length > 1 ? e.titles.join(', ') : e.title), released: e.released }; })
-        : ((fc && fc.playbook) || []).map(function (e) { return { at: e.at, country: e.country, title: e.title, released: e.actual != null }; }));
-      return ev.filter(function (e) { return e && e.at && !isNaN(Date.parse(e.at)); });
+    function fmt(m, v) { if (!n(v)) return '—'; var s = (+v).toLocaleString('en-US', { minimumFractionDigits: DP[m] || 0, maximumFractionDigits: DP[m] || 0 }); return m === 'gold' ? '$' + s : s; }
+    function events(fc, v) {   // the veteran's grouped cards and the strategist's calendar, once each
+      var seen = {}, out = [];
+      ((v && v.events) || []).forEach(function (e) { out.push({ at: e.at, country: e.country, title: (e.titles && e.titles.length > 1 ? e.titles.join(', ') : e.title), released: !!e.released, move: e.expMovePct }); });
+      ((fc && fc.playbook) || []).forEach(function (e) { out.push({ at: e.at, country: e.country, title: e.title, released: e.actual != null, move: e.expMovePct && e.expMovePct.gold }); });
+      return out.filter(function (e) { if (!e || !e.at || isNaN(Date.parse(e.at))) return false; var k = e.at + '|' + e.country; if (seen[k]) return false; seen[k] = 1; return true; })
+        .sort(function (a, b) { return Date.parse(a.at) - Date.parse(b.at); });
     }
-    function nextFor(m, fc, v, now) {   // the next release for this market within SOON_H, or one that has just printed
-      var c = CCY[m] || ['USD'], best = null;
-      events(fc, v).forEach(function (e) { if (c.indexOf(String(e.country || '').toUpperCase()) < 0) return; var h = (Date.parse(e.at) - now) / 36e5;
-        if (h < -AFTER_H || h > SOON_H) return; if (!best || h < best.h) best = { e: e, h: h }; });
-      return best;
-    }
-    function inH(h) { return h < 0 ? Math.round(-h * 60) + ' min ago' : h < 1 ? 'in ' + Math.max(1, Math.round(h * 60)) + ' min' : 'in ' + Math.round(h) + ' h'; }
+    function reaches(country) { var c = String(country || '').toUpperCase(); return Object.keys(CCY).filter(function (m) { return CCY[m].indexOf(c) >= 0; }); }
+    function within(fc, v, now, h0, h1) { return events(fc, v).map(function (e) { var h = (Date.parse(e.at) - now) / 36e5; return { at: e.at, country: e.country, title: e.title, released: e.released, move: e.move, h: h, markets: reaches(e.country) }; })
+      .filter(function (e) { return e.h >= h0 && e.h <= h1; }); }
+    function inH(h) { return h < 0 ? Math.round(-h * 60) + ' min ago' : h < 1 ? 'in ' + Math.max(1, Math.round(h * 60)) + ' min' : h < 48 ? 'in ' + Math.round(h) + ' h' : 'in ' + Math.round(h / 24) + ' days'; }
     function lean(a) { if (!a || !n(a.pUp)) return null; var d = a.pUp - 0.5; return d >= LEAN ? 'up' : d <= -LEAN ? 'down' : 'flat'; }
     function cotOf(m, cot) { var k = COT[m]; if (!k || !cot || !cot.markets) return null; var x = cot.markets.filter(function (c) { return c.k === k[0]; })[0];
-      if (!x || !n(x.pct1y)) return null; var p = +x.pct1y, side = p >= 90 ? (k[1] > 0 ? 'buy' : 'sell') : p <= 10 ? (k[1] > 0 ? 'sell' : 'buy') : null; return { pct: p, crowded: side, asOf: x.asOf, who: x.who }; }
-    // one market's row of "today"
-    function today(m, fc, v, cot, now) {
-      var a = fc && fc.assets && fc.assets[m], l = lean(a), nx = nextFor(m, fc, v, now), c = cotOf(m, cot);
-      return { m: m, name: NAME[m], lean: l, pUp: a && n(a.pUp) ? +a.pUp : null, move: a && n(a.expMovePct) ? +a.expMovePct : null, volRatio: a && n(a.volRatio) ? +a.volRatio : null,
-        next: nx ? { title: (nx.e.country ? nx.e.country + ' ' : '') + nx.e.title, h: nx.h, at: nx.e.at } : null, cot: c };
+      if (!x || !n(x.pct1y)) return null; var p = +x.pct1y, side = p >= 90 ? (k[1] > 0 ? 'buy' : 'sell') : p <= 10 ? (k[1] > 0 ? 'sell' : 'buy') : null;
+      return { pct: p, crowded: side, asOf: x.asOf, who: x.who, chg1: n(x.chg1) ? +x.chg1 : null, sign: k[1] }; }
+    function goldPx(fc, v) { var L = v && v.summary && v.summary.levels; return L && L.mark && n(L.mark.px) ? +L.mark.px : (fc && fc.assets && fc.assets.gold && n(fc.assets.gold.last) ? +fc.assets.gold.last : (L && n(L.px) ? +L.px : null)); }
+    function levels(v) { var g = v && v.briefing && v.briefing.levels && v.briefing.levels.gold; return (g && g.list || []).filter(function (l) { return l && n(l.price); }); }
+    function nearest(list, px) {   // the nearest level on each side of the price NOW (not of the close the list was built on)
+      var up = null, dn = null; list.forEach(function (l) { if (l.price > px && (!up || l.price < up.price)) up = l; if (l.price < px && (!dn || l.price > dn.price)) dn = l; });
+      return { above: up, below: dn };
     }
-    // the check of one trade: rows of { k, state, title, text }, and a verdict
-    function check(q, fc, v, cot, now) {
-      var m = q.market, side = q.side === 'sell' ? 'sell' : 'buy', a = fc && fc.assets && fc.assets[m], rows = [], err = null;
-      if (!a) return { err: 'No macro reading for this market yet.', rows: [] };
-      var px = n(q.entry) ? +q.entry : (m === 'gold' && v && v.summary && v.summary.levels && v.summary.levels.mark && n(v.summary.levels.mark.px) ? +v.summary.levels.mark.px : (n(a.last) ? +a.last : null));
-      var stop = n(q.stop) ? +q.stop : null, tgt = n(q.target) ? +q.target : null, sgn = side === 'buy' ? 1 : -1;
-      if (stop != null && px != null && (stop - px) * sgn >= 0) err = 'The stop must be ' + (side === 'buy' ? 'below' : 'above') + ' the entry for a ' + side + ': every trade has a stop on its losing side.';
-      if (!err && tgt != null && px != null && (tgt - px) * sgn <= 0) err = 'The target must be ' + (side === 'buy' ? 'above' : 'below') + ' the entry for a ' + side + '.';
-      // 1. the strategist's lean for tomorrow's close
-      var l = lean(a), w = side === 'buy' ? 'up' : 'down', pu = Math.round(a.pUp * 100);
-      rows.push({ k: 'lean', title: 'Macro lean', state: !l || l === 'flat' ? 'neutral' : l === w ? 'with' : 'against',
-        text: (l === 'flat' || !l ? 'No lean: ' : l === w ? 'Leans your way: ' : 'Leans the other way: ') + pu + '% chance of a higher close tomorrow (the strategist, capped at 35-65%). Its own scorecard shows no direction edge, so this is a lean, not a call.' });
-      // 1b. gold only: the Gold Macro Score (used for longs; the veteran never calls a macro sell)
-      var gs = m === 'gold' && fc.goldScore && fc.goldScore.ok && n(fc.goldScore.score) ? +fc.goldScore.score : null;
-      if (gs != null) rows.push({ k: 'score', title: 'Gold Macro Score', state: side === 'sell' ? 'neutral' : gs >= 0.25 ? 'with' : gs <= -0.25 ? 'against' : 'neutral',
-        text: 'Score ' + (gs > 0 ? '+' : gs < 0 ? '−' : '') + Math.abs(gs).toFixed(2) + ' (real yields, the dollar, 2-year yields, the curve). ' + (side === 'sell' ? 'Read for buys only: a low score means no macro support for a buy, never a reason to sell.' : gs >= 0.25 ? 'Supports a buy.' : gs <= -0.25 ? 'Does not support a buy.' : 'Near zero: no support either way.') + ' Its record is in sample, not proven out of sample.' });
-      // 2. releases
-      var nx = nextFor(m, fc, v, now);
-      if (nx && nx.h >= -AFTER_H && nx.h <= NEAR_H) rows.push({ k: 'event', title: 'Release risk', state: 'wait', text: (nx.e.country || '') + ' ' + nx.e.title + ' ' + inH(nx.h) + '. The playbook acts after the release, not before: the first minutes after a print are the widest spreads and the fastest moves.' });
-      else if (nx) rows.push({ k: 'event', title: 'Release risk', state: 'caution', text: (nx.e.country || '') + ' ' + nx.e.title + ' ' + inH(nx.h) + ' (' + new Date(nx.e.at).toUTCString().slice(17, 22) + ' UTC). Your trade may still be open when it prints.' });
-      else rows.push({ k: 'event', title: 'Release risk', state: 'clear', text: 'No release for ' + NAME[m] + ' on the calendar in the next ' + SOON_H + ' hours.' });
-      // 3. the market's mood
-      var rg = fc.regime || {}, vix = n(rg.vix) ? +rg.vix : null, inv = n(rg.vixTermRatio) && +rg.vixTermRatio >= 1, vr = n(a.volRatio) ? +a.volRatio : null, hot = (vix != null && vix >= 25) || inv || (vr != null && vr >= 1.3);
-      rows.push({ k: 'mood', title: 'Market mood', state: hot ? 'caution' : 'clear',
-        text: (vix != null ? 'VIX ' + vix.toFixed(1) + (inv ? ' with its curve inverted (stress)' : '') + '. ' : '') + (vr != null ? NAME[m] + "'s recent moves are " + vr.toFixed(1) + 'x its 1-year norm. ' : '') + (vr != null && vr >= 1.3 ? 'Moves run larger than usual: a stop of the usual size is hit more easily.' : hot ? 'Stress across markets: moves can turn larger than usual.' : 'Calm by these measures.') });
-      // 4. the stop against a normal day
-      if (stop != null && px != null && !err) { var sp = Math.abs(px - stop) / px * 100, mv = n(a.expMovePct) ? +a.expMovePct : null, ratio = mv ? sp / mv : null;
-        rows.push({ k: 'stop', title: 'Your stop against a normal day', state: ratio == null ? 'neutral' : ratio < 0.25 ? 'caution' : 'clear',
-          text: 'Stop ' + r1(sp) + '% away' + (mv ? '; ' + NAME[m] + ' moves about ±' + mv + '% on a normal day (' + (ratio < 0.25 ? 'your stop is under a quarter of that: inside ordinary noise' : ratio > 1.5 ? 'your stop is wider than a day\'s move: a trade meant to last days' : 'about ' + r1(ratio) + 'x a day\'s move') + ').' : '.')
-            + (tgt != null ? ' Target ' + r1(Math.abs(tgt - px) / Math.abs(px - stop)) + 'R.' : '') });
-      } else if (stop == null) rows.push({ k: 'stop', title: 'Your stop against a normal day', state: 'na', text: 'Give a stop to see it against ' + NAME[m] + '\'s normal daily move' + (n(a.expMovePct) ? ' (about ±' + a.expMovePct + '%)' : '') + '.' });
-      // 5. gold's levels in the way
-      var L = m === 'gold' && v && v.summary && v.summary.levels;
-      if (L && px != null) { var lv = side === 'buy' ? L.above : L.below, aheadOk = lv && n(lv.price) && (lv.price - px) * sgn > 0;
-        if (aheadOk) { var dist = Math.abs(lv.price - px) / px * 100, before = tgt != null && (tgt - lv.price) * sgn > 0;
-          rows.push({ k: 'level', title: 'Levels in the way', state: before ? 'caution' : 'clear', text: '$' + lv.price.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' (' + String(lv.label || 'level').toLowerCase() + ') is ' + r1(dist) + '% ' + (side === 'buy' ? 'above' : 'below') + (before ? ': your target is beyond it, so price has to get through it first.' : (tgt != null ? ': your target comes before it.' : '.')) + ' Levels from the veteran\'s last daily close.' }); }
-        else rows.push({ k: 'level', title: 'Levels in the way', state: 'clear', text: 'No level of the veteran\'s list between the price and the next ' + (side === 'buy' ? 'resistance' : 'support') + ' he names.' }); }
-      // 6. positioning
-      var c = cotOf(m, cot);
-      if (c) rows.push({ k: 'cot', title: 'Positioning', state: c.crowded === side ? 'caution' : 'neutral', word: c.crowded === side ? 'Crowded your way' : c.crowded ? 'Crowded the other way' : 'Not crowded',
-        text: 'Speculators (' + (c.who || 'futures') + ') at the ' + Math.round(c.pct) + 'th percentile of 3 years' + (c.crowded ? ': crowded on the ' + c.crowded + ' side' + (c.crowded === side ? ', the same side as you' : '') : '') + '. Context only: the pre-registered positioning test found no edge (report of ' + (c.asOf || '?') + ').' });
-      // the verdict: what the readings add up to, in words, never "take it"
-      var st = function (k) { return rows.filter(function (r) { return r.state === k; }); }, wait = st('wait'), ag = st('against').length, wi = st('with').length, cau = st('caution').length;
-      var verdict = wait.length ? { state: 'wait', text: 'Wait for the release: ' + wait[0].text.split('. ')[0] + '.' }
-        : { state: ag > wi ? 'against' : wi > ag ? 'with' : 'neutral', text: (ag > wi ? 'Macro leans against this ' + side : wi > ag ? 'Macro leans with this ' + side : 'Macro has no lean on this ' + side) + (cau ? ' · ' + cau + ' thing' + (cau > 1 ? 's' : '') + ' to watch' : ' · nothing else stands out') + '.' };
-      return { err: err, rows: rows, verdict: verdict, px: px };
+    function calls(v, h) { var o = v && v.outlook && v.outlook[h]; return { by: o && o.by, from: o && o.from, asOf: v && v.outlook && v.outlook.anchor && v.outlook.anchor.asOf, list: ((o && o.list) || []).filter(function (c) { return c && n(c.p); }).map(function (c) {
+      return { claim: c.claim, p: +c.p, base: n(c.baseP) ? +c.baseP : null, asset: c.asset, kind: c.kind, lo: n(c.lo) ? +c.lo : null, hi: n(c.hi) ? +c.hi : null, stretch: /stretch/.test(c.claim || '') }; }) }; }
+    function hyps(v, h) { return ((v && v.briefing && v.briefing.hypotheses) || []).filter(function (x) { return x && x.horizon === h && n(x.p); }).map(function (x) {
+      return { slot: x.slot, claim: x.claim, p: +x.p, base: x.base && n(x.base.all) ? +x.base.all : null, by: x.by, invalid: x.invalid }; }); }
+    function scoreHist(fc) { var g = fc && fc.goldScore; if (!g || !g.ok) return []; var h = (g.hist && g.hist.length ? g.hist : []).filter(function (x) { return x && n(x[1]); });
+      if (!h.length && g.path) h = g.path.map(function (s, i) { return [null, s]; }).filter(function (x) { return n(x[1]); });
+      return h.map(function (x) { return { at: x[0], s: +x[1] }; }); }
+    // TODAY: leans, today's range, releases in 24 h, the mood, gold's nearest levels
+    function day(fc, v, cot, now) {
+      var mk = Object.keys(NAME).filter(function (m) { return fc && fc.assets && fc.assets[m]; }), ev = within(fc, v, now, -AFTER_H, 24);
+      var rows = mk.map(function (m) { var a = fc.assets[m], mv = n(a.expMovePct) ? +a.expMovePct : null, last = m === 'gold' ? goldPx(fc, v) : (n(a.last) ? +a.last : null);
+        var nx = ev.filter(function (e) { return e.markets.indexOf(m) >= 0; })[0] || null;
+        return { m: m, name: NAME[m], lean: lean(a), pUp: n(a.pUp) ? +a.pUp : null, move: mv, last: last, lo: last != null && mv != null ? last * (1 - mv / 100) : null, hi: last != null && mv != null ? last * (1 + mv / 100) : null,
+          volRatio: n(a.volRatio) ? +a.volRatio : null, next: nx, wait: !!(nx && nx.h <= NEAR_H), cot: cotOf(m, cot) }; });
+      var rg = (fc && fc.regime) || {}, vix = n(rg.vix) ? +rg.vix : null, inv = n(rg.vixTermRatio) && +rg.vixTermRatio >= 1, hotM = rows.filter(function (r) { return r.volRatio != null && r.volRatio >= 1.3; }).map(function (r) { return r.name; });
+      var mood = { vix: vix, inverted: inv, hot: (vix != null && vix >= 25) || inv || hotM.length > 0, wide: hotM };
+      var px = goldPx(fc, v), lv = px != null ? nearest(levels(v), px) : { above: null, below: null };
+      var ups = rows.filter(function (r) { return r.lean === 'up'; }).length, dns = rows.filter(function (r) { return r.lean === 'down'; }).length, w = rows.filter(function (r) { return r.wait; }).length;
+      var take = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets today' : 'No macro lean on any market today')
+        + (ev.length ? '; ' + ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' in the next 24 hours' + (w ? ' (' + w + ' market' + (w > 1 ? 's' : '') + ': wait for the print)' : '') : '; no release in the next 24 hours')
+        + (mood.hot ? '; stress is up' : '') + '. Leans, not calls.';
+      return { rows: rows, events: ev, mood: mood, gold: { px: px, above: lv.above, below: lv.below }, take: take };
     }
-    return { today: today, check: check, nextFor: nextFor, lean: lean, cotOf: cotOf, NAME: NAME, MARKETS: Object.keys(NAME) };
+    // THIS WEEK: the veteran's week calls and hypotheses, the week's releases, what changed, positioning, the score against last week
+    function week(fc, v, cot, now) {
+      var c = calls(v, 'week'), hy = hyps(v, 'week'), ev = within(fc, v, now, -12, 7 * 24), sh = scoreHist(fc);
+      var px = goldPx(fc, v), wk = levels(v).filter(function (l) { return l.kind === 'week' || (l.kind === 'range60' && /^Week/.test(l.label || '')); }).sort(function (a, b) { return b.price - a.price; });
+      var pos = Object.keys(COT).map(function (m) { var x = cotOf(m, cot); return x ? { m: m, name: NAME[m], pct: x.pct, crowded: x.crowded, chg1: x.chg1, sign: x.sign, who: x.who, asOf: x.asOf } : null; }).filter(Boolean);
+      var sNow = sh.length ? sh[sh.length - 1].s : null, sPrev = sh.length > 1 ? sh[sh.length - 2].s : null;
+      var up = c.list.filter(function (x) { return x.asset === 'gold' && x.kind === 'closeAbove'; })[0], rng = c.list.filter(function (x) { return x.asset === 'gold' && x.kind === 'range'; })[0];
+      var take = (up ? 'This week (to ' + c.by + '): ' + Math.round(up.p * 100) + '% chance gold closes above ' + (c.from || 'the anchor') + (up.base != null ? ' (base ' + Math.round(up.base * 100) + '%)' : '') : 'No week call on file')
+        + (rng ? '; 60% range ' + fmt('gold', rng.lo || numFrom(rng.claim, 0)) + '–' + fmt('gold', rng.hi || numFrom(rng.claim, 1)) : '')
+        + '; ' + (ev.length ? ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' on the calendar' : 'no release on the calendar') + '.';
+      return { by: c.by, from: c.from, asOf: c.asOf, calls: c.list.filter(function (x) { return x.asset === 'gold' && !x.stretch; }), stretch: c.list.filter(function (x) { return x.asset === 'gold' && x.stretch; }),
+        other: c.list.filter(function (x) { return x.asset !== 'gold'; }), hyps: hy, events: ev, changes: ((v && v.changes && v.changes.items) || []).slice(0, 8),
+        since: v && v.changes && v.changes.sinceWeek, positioning: pos, score: { now: sNow, prev: sPrev }, levels: wk, px: px, take: take };
+    }
+    function numFrom(claim, i) { var m = String(claim || '').match(/\$([\d,]+(?:\.\d+)?)/g); return m && m[i] ? +m[i].replace(/[$,]/g, '') : null; }
+    // THIS MONTH: the veteran's month calls and hypotheses, the slower levels, the score path, the record so far
+    function month(fc, v, now) {
+      var c = calls(v, 'month'), hy = hyps(v, 'month'), sh = scoreHist(fc).slice(-8), px = goldPx(fc, v);
+      var lv = levels(v).filter(function (l) { return l.kind === 'month' || l.kind === 'sma' || l.kind === 'range' || (l.kind === 'range60' && /^Month/.test(l.label || '')); }).sort(function (a, b) { return b.price - a.price; });
+      var cal = (v && v.calibration) || {}, led = (v && v.ledger) || {}, need = cal.need && n(cal.need.scored) ? +cal.need.scored : 30, scored = n(cal.n) ? +cal.n : 0;
+      var track = { scored: scored, need: need, judged: scored >= need && cal.state !== 'waiting', issued: n(led.issued) ? +led.issued : null, resolved: n(led.resolved) ? +led.resolved : null };
+      var up = c.list.filter(function (x) { return x.asset === 'gold' && x.kind === 'closeAbove'; })[0], first = sh.length ? sh[0].s : null, last = sh.length ? sh[sh.length - 1].s : null;
+      var take = (up ? 'This month (to ' + c.by + '): ' + Math.round(up.p * 100) + '% chance gold closes above ' + (c.from || 'the anchor') + (up.base != null ? ' (base ' + Math.round(up.base * 100) + '%)' : '') : 'No month call on file')
+        + (first != null && last != null && sh.length > 1 ? '; Gold Macro Score ' + sgn(last) + ' (' + sgn(first) + ' ' + (sh.length - 1) + ' weeks ago)' : '')
+        + '; ' + (track.judged ? 'the record is large enough to judge' : 'record: ' + scored + ' of ' + need + ' calls scored, too few to judge') + '.';
+      return { by: c.by, from: c.from, asOf: c.asOf, calls: c.list.filter(function (x) { return x.asset === 'gold' && !x.stretch; }), stretch: c.list.filter(function (x) { return x.asset === 'gold' && x.stretch; }),
+        other: c.list.filter(function (x) { return x.asset !== 'gold'; }), hyps: hy, levels: lv, px: px, score: sh, track: track, take: take };
+    }
+    function sgn(x) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2); }
+    return { day: day, week: week, month: month, lean: lean, cotOf: cotOf, events: events, inH: inH, fmt: fmt, sgn: sgn, nearest: nearest, NAME: NAME, MARKETS: Object.keys(NAME) };
   })();
-  var TC = { side: 'buy', data: null };
-  var TCW = { with: 'Leans your way', against: 'Leans against', neutral: 'No lean', wait: 'Wait', caution: 'Watch', clear: 'Clear', na: 'Add a stop' };
-  function tcChip(state, word) { return '<span class="tc-st ' + state + '">' + esc(word || TCW[state] || state) + '</span>'; }
-  function renderTrade(fc, v, cot) {
-    var card = $('c-trade'); if (!fc || !fc.assets) { card.hidden = true; return; } card.hidden = false; TC.data = { fc: fc, v: v, cot: cot };
-    var now = Date.now(), rows = MD_CHECK.MARKETS.filter(function (m) { return fc.assets[m]; }).map(function (m) { return MD_CHECK.today(m, fc, v, cot, now); });
-    $('tc-today').querySelector('tbody').innerHTML = rows.map(function (r) {
-      var le = r.lean === 'up' ? tcChip('with', 'Up ' + Math.round(r.pUp * 100) + '%') : r.lean === 'down' ? tcChip('against', 'Down ' + Math.round(100 - r.pUp * 100) + '%') : tcChip('neutral', 'No lean');
-      var nx = r.next ? (r.next.h <= 1 ? tcChip('wait', 'Wait') : tcChip('caution', 'Watch')) + ' ' + esc(r.next.title) + ' <small>' + esc(r.next.h < 0 ? Math.round(-r.next.h * 60) + ' min ago' : r.next.h < 1 ? 'in ' + Math.max(1, Math.round(r.next.h * 60)) + ' min' : 'in ' + Math.round(r.next.h) + ' h') + '</small>' : tcChip('clear', 'None');
-      var co = r.cot ? Math.round(r.cot.pct) + 'th pct' + (r.cot.crowded ? ' · <b>crowded ' + r.cot.crowded + '</b>' : '') : '—';
-      return '<tr data-m="' + r.m + '" tabindex="0"><th scope="row">' + esc(r.name) + '</th><td>' + le + '</td><td class="n">' + (r.move != null ? '±' + r.move + '%' : '—') + (r.volRatio != null && r.volRatio >= 1.3 ? ' <small>(' + r.volRatio.toFixed(1) + 'x usual)</small>' : '') + '</td><td>' + nx + '</td><td>' + co + '</td></tr>';
-    }).join('');
-    var ups = rows.filter(function (r) { return r.lean === 'up'; }).length, dns = rows.filter(function (r) { return r.lean === 'down'; }).length, ev = rows.filter(function (r) { return r.next; }).length;
-    $('tc-take').textContent = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets' : 'Macro has no lean on any market today') + (ev ? '; ' + ev + ' with a release in the next 24 hours' : '; no release in the next 24 hours') + '. Leans, not calls.';
-    tcRun();
+  var PL = { view: 'day', data: null };
+  try { var pl0 = localStorage.getItem('mdPlan'); if (pl0 === 'week' || pl0 === 'month') PL.view = pl0; } catch (e) {}
+  function plChip(state, word) { return '<span class="tc-st ' + state + '">' + esc(word) + '</span>'; }
+  function plOrd(x) { x = Math.round(x); var t = x % 100, u = x % 10; return x + (t >= 11 && t <= 13 ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th'); }
+  function plPct(p, b) { return '<b>' + Math.round(p * 100) + '%<span class="d">' + (b != null ? 'base ' + Math.round(b * 100) + '%' + (Math.round((p - b) * 100) ? ' · ' + (p > b ? '+' : '−') + Math.abs(Math.round((p - b) * 100)) + ' pts' : '') : 'no base') + '</span></b>'; }
+  function plCalls(list) { return '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + '</span></li>'; }).join('') + '</ul>'; }
+  function plHyps(list) { return list.length ? '<ul class="pl-list">' + list.map(function (x) { return '<li class="pl-call">' + plPct(x.p, x.base) + '<span>' + esc(x.claim) + (x.invalid ? '<br><small>Wrong if: ' + esc(x.invalid) + '</small>' : '') + '</span></li>'; }).join('') + '</ul>' : ''; }
+  function plEvents(list, now) { var M = MD_PLAN; return list.length ? '<ul class="pl-list">' + list.map(function (e) {
+      var d = new Date(e.at), when = d.toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      return '<li><b>' + esc(when) + '</b><span>' + (e.h <= 1 && e.h >= -0.5 ? plChip('wait', 'Wait') + ' ' : '') + esc((e.country ? e.country + ' ' : '') + e.title) + ' <span class="d">' + esc(M.inH(e.h)) + (e.released ? ' · printed' : '') + (e.markets.length ? ' · reaches ' + e.markets.map(function (m) { return M.NAME[m]; }).join(', ') : '') + (e.move != null ? ' · gold ±' + e.move + '% on a typical day like it' : '') + '</span></span></li>'; }).join('') + '</ul>'
+    : '<p class="note">No release on the calendar the strategist read.</p>'; }
+  function plLevels(list, px) { var M = MD_PLAN; return '<ul class="pl-list">' + list.map(function (l) { return '<li><b>' + esc(M.fmt('gold', l.price)) + '</b><span>' + esc(l.label) + ' <span class="d">' + (px ? (l.price > px ? '▲ ' : '▼ ') + Math.abs((l.price - px) / px * 100).toFixed(1) + '% from the price now' : '') + '</span>' + (l.why ? '<br><small>' + esc(l.why) + '</small>' : '') + '</span></li>'; }).join('') + '</ul>'; }
+  function renderPlan(fc, v, cot) {
+    var card = $('c-plan'); if (!fc || !fc.assets) { card.hidden = true; return; } card.hidden = false; PL.data = { fc: fc, v: v, cot: cot }; drawPlan();
   }
-  function tcRun() {
-    var D = TC.data, out = $('tc-out'); if (!D) return;
-    var q = { market: $('tc-m').value, side: TC.side, entry: $('tc-e').value.trim(), stop: $('tc-s').value.trim(), target: $('tc-t').value.trim() };
-    var r = MD_CHECK.check(q, D.fc, D.v, D.cot, Date.now());
-    if (!r.rows.length) { out.innerHTML = '<p class="tc-err">' + esc(r.err) + '</p>'; return; }
-    var e = $('tc-e'); if (r.px != null) e.placeholder = 'price now ' + r.px;
-    out.innerHTML = (r.err ? '<p class="tc-err" role="alert">' + esc(r.err) + '</p>' : '')
-      + '<p class="tc-verdict"><span class="tc-st ' + r.verdict.state + '" aria-hidden="true"></span><b>' + esc(r.verdict.text) + '</b></p>'
-      + '<ul class="tc-rows">' + r.rows.map(function (x) { return '<li><span>' + esc(x.title) + tcChip(x.state, x.word) + '</span><span>' + esc(x.text) + '</span></li>'; }).join('') + '</ul>';
+  function drawPlan() {
+    var D = PL.data; if (!D) return; var M = MD_PLAN, now = Date.now(), r, h = '';
+    if (PL.view === 'day') { r = M.day(D.fc, D.v, D.cot, now);
+      h = '<h4>Market by market <small>the strategist\'s lean for the next close, and today\'s normal range around the price</small></h4><div class="tc-tw" role="region" tabindex="0" aria-label="Today, market by market"><table><thead><tr><th scope="col">Market</th><th scope="col">Lean</th><th scope="col">A normal day</th><th scope="col">Next release, 24 h</th><th scope="col">Positioning</th></tr></thead><tbody>'
+        + r.rows.map(function (x) { var le = x.lean === 'up' ? plChip('with', 'Up ' + Math.round(x.pUp * 100) + '%') : x.lean === 'down' ? plChip('against', 'Down ' + Math.round(100 - x.pUp * 100) + '%') : plChip('neutral', 'No lean');
+          var nx = x.next ? (x.wait ? plChip('wait', 'Wait') : plChip('caution', 'Watch')) + ' ' + esc((x.next.country ? x.next.country + ' ' : '') + x.next.title) + ' <small>' + esc(M.inH(x.next.h)) + '</small>' : plChip('clear', 'None');
+          return '<tr><th scope="row">' + esc(x.name) + '</th><td>' + le + '</td><td class="n">' + (x.move != null ? '±' + x.move + '%' : '—') + (x.lo != null ? '<br><small>' + esc(M.fmt(x.m, x.lo)) + ' – ' + esc(M.fmt(x.m, x.hi)) + '</small>' : '') + (x.volRatio != null && x.volRatio >= 1.3 ? '<br><small>' + x.volRatio.toFixed(1) + 'x usual</small>' : '') + '</td><td>' + nx + '</td><td>' + (x.cot ? plOrd(x.cot.pct) + ' pct' + (x.cot.crowded ? ' · <b>crowded ' + x.cot.crowded + '</b>' : '') : '—') + '</td></tr>'; }).join('') + '</tbody></table></div>'
+        + (r.gold.px != null ? '<h4>Gold\'s nearest levels <small>from the price now, ' + esc(M.fmt('gold', r.gold.px)) + '</small></h4><div class="pl-lv"><div>Above' + (r.gold.above ? '<b>' + esc(M.fmt('gold', r.gold.above.price)) + '</b>' + esc(r.gold.above.label) + ' · ' + ((r.gold.above.price - r.gold.px) / r.gold.px * 100).toFixed(1) + '% away' : '<b>—</b>none on his list') + '</div><div>Below' + (r.gold.below ? '<b>' + esc(M.fmt('gold', r.gold.below.price)) + '</b>' + esc(r.gold.below.label) + ' · ' + ((r.gold.px - r.gold.below.price) / r.gold.px * 100).toFixed(1) + '% away' : '<b>—</b>none on his list') + '</div></div>' : '')
+        + '<h4>Releases in the next 24 hours <small>the playbook acts after the print, not before</small></h4>' + plEvents(r.events, now)
+        + '<h4>Mood</h4><p class="note" style="margin-top:0">' + (r.mood.vix != null ? 'VIX ' + r.mood.vix.toFixed(1) + (r.mood.inverted ? ', its curve inverted (stress)' : '') + '. ' : '') + (r.mood.wide.length ? 'Moving more than usual: ' + esc(r.mood.wide.join(', ')) + '. ' : '') + (r.mood.hot ? 'Moves can run larger than usual: a stop of the usual size is hit more easily.' : 'Calm by these measures.') + '</p>';
+    } else if (PL.view === 'week') { r = M.week(D.fc, D.v, D.cot, now);
+      h = '<h4>The veteran\'s week calls <small>to ' + esc(r.by || '—') + ' · issued once a week from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' ("today\'s close" in a call means that close) · his chance against the base rate of all weeks since 2007</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No week call on file.</p>')
+        + (r.hyps.length ? '<h4>His hypotheses for the week <small>and what proves them wrong</small></h4>' + plHyps(r.hyps) : '')
+        + (r.levels.length ? '<h4>The week\'s levels</h4>' + plLevels(r.levels, r.px) : '')
+        + '<h4>Releases this week</h4>' + plEvents(r.events, now)
+        + (r.changes.length ? '<h4>What changed since last week <small>' + esc(r.since ? 'since the week of ' + r.since : '') + '</small></h4><ul class="pl-list">' + r.changes.map(function (c) { return '<li><b>' + esc(String(c.area || '').replace(/^./, function (x) { return x.toUpperCase(); })) + '</b><span>' + esc(c.text) + '</span></li>'; }).join('') + '</ul>' : '')
+        + (r.score.now != null ? '<h4>Gold Macro Score</h4><p class="note" style="margin-top:0">Now ' + M.sgn(r.score.now) + (r.score.prev != null ? ', last week ' + M.sgn(r.score.prev) + ' (' + (Math.abs(r.score.now - r.score.prev) < 0.05 ? 'about unchanged' : r.score.now > r.score.prev ? 'more support for a buy' : 'less support for a buy') + ')' : '') + '. Read for buys only (above +0.25 supports one); in sample, not proven.</p>' : '')
+        + (r.positioning.length ? '<h4>Positioning <small>speculators, 3-year percentile, and the week\'s change in their net</small></h4><ul class="pl-list">' + r.positioning.map(function (p) { return '<li><b>' + esc(p.name) + '</b><span>' + plOrd(p.pct) + ' percentile' + (p.crowded ? ' · <b>crowded ' + p.crowded + '</b>' : '') + (p.chg1 != null ? ' · net ' + (p.chg1 >= 0 ? '+' : '−') + Math.abs(p.chg1).toLocaleString('en-US') + ' contracts this week' + (p.sign < 0 ? ' (yen futures)' : '') : '') + ' <span class="d">' + esc(p.who || '') + (p.asOf ? ' · report of ' + esc(p.asOf) : '') + '</span></span></li>'; }).join('') + '</ul><p class="note">Context only: the pre-registered positioning test found no edge.</p>' : '');
+    } else { r = M.month(D.fc, D.v, now);
+      h = '<h4>The veteran\'s month calls <small>to ' + esc(r.by || '—') + ' · issued from the ' + esc(r.asOf || 'last') + ' close, ' + esc(r.from || '—') + ' · his chance against the base rate</small></h4>' + (r.calls.length ? plCalls(r.calls) : '<p class="note">No month call on file.</p>')
+        + (r.hyps.length ? '<h4>His hypotheses for the month</h4>' + plHyps(r.hyps) : '')
+        + (r.other.length ? '<h4>The dollar</h4>' + plCalls(r.other) : '')
+        + (r.levels.length ? '<h4>The slower levels <small>monthly extremes, averages, the quarter\'s range</small></h4>' + plLevels(r.levels, r.px) : '')
+        + (r.score.length ? '<h4>Gold Macro Score, week by week</h4><ul class="pl-sc">' + r.score.map(function (x, i) { return '<li' + (i === r.score.length - 1 ? ' class="now"' : '') + '><b>' + M.sgn(x.s) + '</b>' + esc(x.at ? new Date(x.at + 'T00:00:00Z').toLocaleDateString([], { day: 'numeric', month: 'short', timeZone: 'UTC' }) : '') + '</li>'; }).join('') + '</ul><p class="note">Above +0.25 supports a buy; a negative score is never a sell. In sample, not proven out of sample.</p>' : '')
+        + '<h4>The record so far</h4><p class="note" style="margin-top:0">' + r.track.scored + ' of the ' + r.track.need + ' scored calls calibration needs' + (r.track.judged ? ': enough to judge (see Track record).' : ': too few to judge, so read every percentage above as the base rate plus a small tilt.') + (r.track.issued != null ? ' Weekly ledger: ' + r.track.issued + ' issued, ' + (r.track.resolved || 0) + ' resolved.' : '') + '</p>';
+    }
+    $('pl-take').textContent = r.take;
+    ['day', 'week', 'month'].forEach(function (k) { var p = $('pl-' + k), t = $('pl-t-' + k), on = k === PL.view; p.hidden = !on; if (on) p.innerHTML = h; else p.innerHTML = ''; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+    if (typeof syncOne === 'function') syncOne();
   }
-  $('tc-form').addEventListener('input', tcRun);
-  $('tc-form').addEventListener('submit', function (e) { e.preventDefault(); });
-  $('tc-m').addEventListener('change', function () { $('tc-e').value = ''; $('tc-s').value = ''; $('tc-t').value = ''; tcRun(); });
-  document.querySelector('.tc-side').addEventListener('click', function (e) { var b = e.target.closest('button[data-s]'); if (!b) return; TC.side = b.dataset.s;
-    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); tcRun(); });
-  $('tc-today').addEventListener('click', function (e) { var tr = e.target.closest('tr[data-m]'); if (!tr) return; $('tc-m').value = tr.dataset.m; $('tc-m').dispatchEvent(new Event('change')); $('tc-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
-  $('tc-today').addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-m]')) { e.preventDefault(); e.target.click(); } });
+  document.querySelector('.pl-tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-pl]'); if (!b) return; PL.view = b.dataset.pl; try { localStorage.setItem('mdPlan', PL.view); } catch (x) {} drawPlan(); });
+  document.querySelector('.pl-tabs').addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; var k = ['day', 'week', 'month'], i = (k.indexOf(PL.view) + (e.key === 'ArrowRight' ? 1 : 2)) % 3;
+    PL.view = k[i]; try { localStorage.setItem('mdPlan', PL.view); } catch (x) {} drawPlan(); $('pl-t-' + PL.view).focus(); });
   function syncStory() {
     document.querySelectorAll('main .story').forEach(function (sx) { var cards = sx.querySelectorAll('.card, details.deep'), any = false; cards.forEach(function (c) { if (!c.hidden) any = true; }); sx.hidden = !any; });
     document.querySelectorAll('#toc a').forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); a.hidden = !t || t.hidden; });
@@ -1517,7 +1536,7 @@
       var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderTrade(fc, v, cot);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot);
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
@@ -1575,7 +1594,7 @@
   function takeOf(id) { var el = typeof id === 'string' ? $(id) : id; if (!el || el.closest('[hidden]')) return ''; var c = el.cloneNode(true); c.querySelectorAll('.tk-x').forEach(function (x) { x.remove(); }); return c.innerHTML.trim(); }
   function syncOne() {
     var st = $('ld-stale'), stb = st && !st.hidden && st.querySelector('b'), sc = !$('c-score').hidden && $('sc-top'), scv = sc && sc.querySelector('.v'), scl = sc && sc.querySelector('.lb'), scp = sc && sc.querySelector('p');
-    var one = { 's-trade': takeOf('tc-take'), 's-next': takeOf('nx-take'),
+    var one = { 's-plan': takeOf('pl-take'), 's-next': takeOf('nx-take'),
       's-why': scv ? 'Gold Macro Score <b>' + esc(scv.textContent) + '</b>' + (scl ? ' · ' + esc(scl.textContent) : '') + (scp ? '. ' + takeOf(scp) : '') : '',
       's-price': (stb ? '<b>' + esc(stb.textContent) + '</b> ' : '') + takeOf('ld-take'),
       's-expect': takeOf('hyp-take'),

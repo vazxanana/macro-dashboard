@@ -3058,21 +3058,25 @@ Measured at 390 x 844 on the 11 Nov files: 8.9 screens → 1.9, 1,357 words → 
 - Tests: `tests/macro-visual.test.mjs` (simple phone view: three tests). `scripts/audit/smoke.cjs`: on the phone, as a member,
   every folded section is opened and each chart in it must be drawn at its host's width (fails with "folded section opened: …").
 
-## Macro desk: Before you trade (18 Nov 2026, owner: "more improvement on macro as well, I want people to be able to use it to take or decide for trades")
-Display only, `macro-desk.html` section 2 `#s-trade` (`sfold`, folds on the phone like sections 3-7; TOC chip). Reads what the page
-already loads (forecast.json, veteran.json, and cot.json, now fetched with the others), fetches nothing else, changes nothing.
-- **Today, market by market** (`#tc-today`): per market the strategist's lean (pUp ± `LEAN` 0.03 → Up / Down / No lean), a normal
-  day (`expMovePct`, "1.7x usual" from `volRatio` >= 1.3), the next release in 24 h that reaches it (`CCY`: USD for all, EUR for
-  EUR/USD, JPY for USD/JPY; the veteran's `events` first, else `fc.playbook`), positioning (COT `pct1y`, crowded at 90 / 10, the yen
-  inverted as `council/cot.mjs` `sign`). A row fills the check below.
-- **Check a trade** (`#tc-form`: market, Buy / Sell, entry (default the price now), stop, target): rows Macro lean, Gold Macro Score
-  (gold; read for buys only, the veteran never calls a macro sell), Release risk (wait within an hour either side of a release:
-  "the playbook acts after the release"), Market mood (VIX >= 25 or inverted curve, `volRatio` >= 1.3), the stop against a normal
-  day (under 0.25x = inside noise) with the target's R, gold's levels in the way (`v.summary.levels`), Positioning. A stop or target
-  on the wrong side is refused in words (absolute rule 1). One verdict line ("Macro leans with / against / no lean · n to watch",
-  or "Wait for the release"), never "take it"; the footnote says no reading has passed a test as an edge.
-- Pure logic `window.MD_CHECK` (`today`, `check`, `lean`, `cotOf`, `nextFor`); test `tests/macro-trade-check.test.mjs` runs it;
-  `tests/macro-visual.test.mjs` counts six folding sections.
+## Macro desk: Your read, today / this week / this month (18 Nov 2026, owner: "we don't need 'check a trade', find ways to be able to use it daily weekly and monthly")
+Display only, `macro-desk.html` section 2 `#s-plan` / `#c-plan` (`sfold`, folds on the phone; TOC chip "Your read"). It replaced the
+same day's "Before you trade" (its Check-a-trade form, `MD_CHECK` and `tests/macro-trade-check.test.mjs` are gone). One switch
+(`.pl-tabs`, Today | This week | This month, arrow keys; localStorage `mdPlan`, a display preference) over what load() already has
+(forecast.json, veteran.json, cot.json); nothing else is fetched and nothing is computed as a new forecast.
+- **Today** (`MD_PLAN.day`): per market the strategist's lean (pUp ± 0.03), a normal day as ± % AND as a price range around the price
+  now (gold: the strategist's latest mark), "1.7x usual" from `volRatio` >= 1.3, the next release in 24 h that reaches it (Wait within
+  an hour), positioning (COT 3-year percentile, crowded at 90 / 10, the yen inverted); gold's nearest levels above and below the PRICE
+  NOW from `briefing.levels.gold.list`; the mood (VIX, curve, markets moving more than usual).
+- **This week** (`MD_PLAN.week`): the veteran's week calls (`outlook.week`, stretch calls left out) and hypotheses (`horizon: 'week'`,
+  with "Wrong if"), each as his % beside the base rate; the header names the close they were issued from (`outlook.anchor.asOf`:
+  "today's close" inside a call means that close); the week's levels (kind `week`, week `range60`), releases over 7 days (veteran
+  cards + the strategist's playbook, once each), `changes.items`, the Gold Macro Score now against last week (`hist`), positioning
+  with the week's change in net contracts.
+- **This month** (`MD_PLAN.month`): month calls, month hypotheses, the dollar's calls apart, the slower levels (month extremes,
+  averages, the quarter's range, month `range60`), the last 8 weekly Gold Macro Scores, and the record so far (calibration n of
+  `need.scored`, "too few to judge" until then; the weekly ledger's issued / resolved).
+- Every view's first line (`#pl-take`) is the folded header's line (`syncOne`). Wording: "Leans, not calls", never an edge or advice.
+  Tests: `tests/macro-plan.test.mjs` (runs the page's pure block), `tests/macro-visual.test.mjs` (six folding sections).
 
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
 Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.
