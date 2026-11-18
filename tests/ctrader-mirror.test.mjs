@@ -352,10 +352,10 @@ test('alerts: a broker-side close alerts once; an accepted-only close alerts whe
 });
 
 test('alerts: a rejected order alerts once (with the reason); "not now" answers alert only when the retries run out', async () => {
-  const b = broker({ reject: 'NOT_ENOUGH_MONEY' }); let r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell' })], state: started, WS: b.WS, now: NOW });
+  const b = broker({ reject: 'NOT_ENOUGH_MONEY' }); let r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell', stop: 1.102, t1: 1.095 })], state: started, WS: b.WS, now: NOW });
   assert.deepEqual(kinds(r), ['reject']); const t = mirrorAlertText(r.alerts[0], NOW);
   assert.equal(t.title, 'Demo mirror: order rejected · SELL EURUSD 0.01 lot'); assert.match(t.msg, /NOT_ENOUGH_MONEY/);
-  r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell' })], state: again(r), WS: b.WS, now: NOW + 60 }); assert.deepEqual(kinds(r), []);
+  r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell', stop: 1.102, t1: 1.095 })], state: again(r), WS: b.WS, now: NOW + 60 }); assert.deepEqual(kinds(r), []);
   const b2 = broker({ reject: 'SERVER_IS_UNDER_MAINTENANCE' }); r = { state: started }; const seen = [];
   for (let i = 0; i < 4; i++) { r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 })], state: again(r), WS: b2.WS, now: NOW + 100 + i * 60 }); seen.push(...kinds(r)); }
   assert.deepEqual(seen, ['reject']);
@@ -976,8 +976,7 @@ test('the rule lives in the config the Trader writes, with its condition and its
 
 // ─── moved-stop audit (12 Nov 2026, research/proposals/2026-11-12-moved-stop-audit.md, docs/owner-decisions.md item 51) ───
 // The mirror reads |entry - stop| as 1R in three places. After the council's stop moved (trail, break-even, the gold trend ratchet)
-// that is not the risk the trade opened with. fillQuality (accounting) is fixed; the two copy decisions are the owner's (item 51)
-// and these tests record what the mirror does TODAY, so a fix changes them on purpose.
+// that is not the risk the trade opened with. fillQuality (accounting) is fixed; the two copy decisions (item 51) were applied on 18 Nov 2026 (owner: "do all").
 test('moved-stop audit: fill quality is measured in the opening risk (r0), not in the distance to a moved stop', async () => {
   const { fillQuality } = await import('../council/ctrader-mirror.mjs');
   // a gold trend position: opened 4000 with 2 ATR = 40 below (r0 40), the daily ratchet has lifted the stop to 3990 (still under the entry)
@@ -990,37 +989,37 @@ test('moved-stop audit: fill quality is measured in the opening risk (r0), not i
   assert.equal(fillQuality({ ...t, id: 'ict:gc-b-1' }, 4002, NOW).slipR, undefined, 'ICT fills keep no slipR (futures vs cash)');
 });
 
-test('moved-stop audit, item 51 (a): a market copy of a trade whose stop already sits PAST its entry gets its stop on the losing side', async () => {
-  // a council buy from 1.1000 (r0 0.0020) whose trail has locked +0.6R: stop 1.1012. No council price on file (marks missing or
-  // older than LIMITS.markMaxAge), so no late-copy check runs and the copy is measured from the entry: the relative stop is a
-  // DISTANCE (relative() drops the sign), so the broker puts it 0.0012 BELOW the fill. The council's trade cannot lose; the copy can.
+test('item 51 (a), applied: a trade whose stop already sits PAST its entry is never copied as a market order (its stop would land on the losing side)', async () => {
+  // a council buy from 1.1000 (r0 0.0020) whose trail has locked +0.6R: stop 1.1012. Before the fix, with no council price on file,
+  // it was copied with a relative stop 0.0012 BELOW the fill (relative() drops the sign): a copy that could lose while the council's could not.
   const moved = tr({ id: 'eurusd-intraday-mv', stop: 1.1012, r0: 0.002, trailMoved: true, opened: NOW - 7200, filled: NOW - 7200 });
   const b = broker(); const r = await mirrorRound({ env: ENV, trades: [moved], state: started, WS: b.WS, now: NOW });
-  const o = markets(b)[0]; assert.equal(o.relativeStopLoss, 120);
-  const pos = [...b.positions.values()][0]; assert.equal(pos.stopLoss, 1.09892, 'the demo stop is under the fill 1.10012');
-  assert.ok(pos.stopLoss < moved.entry && moved.stop > moved.entry, 'council stop above the entry, demo stop below it');
-  assert.equal(r.state.map[moved.id].stop, 1.1012, 'the mirror records the council level, so step 2c never sees a move to follow');
-  // the next round leaves it there (a stop exists, and the council's level did not change)
-  const r2 = await mirrorRound({ env: ENV, trades: [moved], state: again(r), WS: b.WS, now: NOW + 60 });
-  assert.equal([...b.positions.values()][0].stopLoss, 1.09892); assert.equal(b.amends.length, 0); assert.equal(r2.state.map[moved.id].status, 'open');
-  // with a council price the same trade is skipped by the late-copy check (any stop past the entry reads as more than 1R run)
+  assert.equal(markets(b).length, 0, 'no market order'); assert.equal(b.positions.size, 0);
+  assert.match(JSON.stringify(r.state.skipped[moved.id]), /already past the entry/);
+  // with a council price on file: the same refusal (before the fix: the late-copy check skipped it as "run 1.25R")
   const b3 = broker(); const r3 = await mirrorRound({ env: ENV, trades: [moved], state: started, WS: b3.WS, now: NOW, marks: { eurusd: 1.1015 } });
-  assert.equal(markets(b3).length, 0); assert.match(JSON.stringify(r3.state.skipped[moved.id]), /has run 1\.25R/);
-  // an ICT signal never has a council price (futures levels): the same happens whenever an A-setup is copied after its trail passed the entry
+  assert.equal(markets(b3).length, 0); assert.match(JSON.stringify(r3.state.skipped[moved.id]), /already past the entry/);
+  // an ICT A-setup (no council price ever) whose trail passed the entry: not copied either
   const ict = ictCandidates([{ id: 'nq-b-mv', market: 'nq', side: 'buy', entry: 25000, stop: 25030, r0: 50, stop0: 24950, trailMoved: true, t1: null, status: 'open', opened: NOW - 7200, aset: true }]);
   const b4 = broker(); await mirrorRound({ env: ENV, trades: ict, state: started, WS: b4.WS, now: NOW });
-  const o4 = markets(b4)[0]; assert.ok(o4, 'copied'); assert.equal(o4.tradeSide, 1); assert.equal(o4.relativeStopLoss, relative(30, 2), 'a 30-point stop, placed under the fill');
-  const p4 = [...b4.positions.values()][0]; assert.ok(p4.stopLoss < p4.price, 'the demo stop sits under its fill while the desk has +0.6R locked');
+  assert.equal(markets(b4).length, 0, 'the ICT copy is refused too');
+  // a sell mirrors it; a trade whose stop is still on the losing side is copied as before
+  const sell = tr({ id: 'eurusd-intraday-mvs', side: 'sell', entry: 1.1, stop: 1.0985, t1: 1.095, r0: 0.002, trailMoved: true, opened: NOW - 7200, filled: NOW - 7200 });
+  const b5 = broker(); await mirrorRound({ env: ENV, trades: [sell], state: started, WS: b5.WS, now: NOW }); assert.equal(markets(b5).length, 0);
+  const b6 = broker(); await mirrorRound({ env: ENV, trades: [tr({ id: 'eurusd-intraday-ok', opened: NOW - 7200, filled: NOW - 7200 })], state: started, WS: b6.WS, now: NOW });
+  assert.equal(markets(b6).length, 1, 'an unmoved trade is still copied');
 });
 
-test('moved-stop audit, item 51 (b): the late-copy check reads "R" from the moved stop, so a ratcheted trade is skipped earlier than 1R', async () => {
-  // gold-trend-like: r0 0.0020, the stop ratcheted to 1.0990 (still under the entry); price 0.0016 (0.8 opening R) above the entry
+test('item 51 (b), applied: the late-copy check reads 1R from the OPENING risk, so a ratcheted trade 0.8R in is copied', async () => {
+  // gold-trend-like: r0 0.0020, the stop ratcheted to 1.0990 (still under the entry); price 0.0016 (0.8 opening R) above the entry.
+  // Before the fix it read 0.0016 / 0.0010 = 1.6R and was skipped.
   const t = tr({ id: 'eurusd-ratchet-1', stop: 1.099, r0: 0.002, trailMoved: true, opened: NOW - 7200, filled: NOW - 7200 });
   const b = broker(); const r = await mirrorRound({ env: ENV, trades: [t], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1016 } });
-  assert.equal(markets(b).length, 0); assert.match(JSON.stringify(r.state.skipped[t.id]), /has run 1\.60R/, '0.8R of the opening risk, read as 1.6R');
-  // the same trade before the ratchet is copied
-  const b2 = broker(); await mirrorRound({ env: ENV, trades: [tr({ id: 'eurusd-ratchet-2', stop: 1.098, r0: 0.002, opened: NOW - 7200, filled: NOW - 7200 })], state: started, WS: b2.WS, now: NOW, marks: { eurusd: 1.1016 } });
-  assert.equal(markets(b2).length, 1);
+  assert.equal(markets(b).length, 1, 'copied'); assert.ok(!(r.state.skipped || {})[t.id]);
+  const pos = [...b.positions.values()][0]; assert.ok(pos.stopLoss < pos.price, 'its stop is on the losing side of the fill');
+  // past 1R of the OPENING risk it is still skipped: price 0.0024 above the entry = 1.2R
+  const b2 = broker(); const r2 = await mirrorRound({ env: ENV, trades: [tr({ id: 'eurusd-ratchet-2', stop: 1.099, r0: 0.002, trailMoved: true, opened: NOW - 7200, filled: NOW - 7200 })], state: started, WS: b2.WS, now: NOW, marks: { eurusd: 1.1024 } });
+  assert.equal(markets(b2).length, 0); assert.match(JSON.stringify(r2.state.skipped['eurusd-ratchet-2']), /has run 1\.20R/);
 });
 
 // ---- 12 Nov 2026 (owner approved): one feed per market. A feed adoption moves the council's numbers by one offset

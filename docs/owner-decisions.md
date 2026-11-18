@@ -13,33 +13,29 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
    public repository's history, and a short one can be worked out and used to sign in as you.
 2. **Give Fred's connector its own limited key and protect the main branch (item 7).** If nothing is decided: his changes,
    which now merge without your review (item 26), keep travelling on whatever key is set, possibly the council's own.
-3. **Thirteen ICT replay results built before a market's price history starts: keep or drop (item 29).** If nothing is
-   decided: they stay in the ICT record (11 gold results worth +7.49R and 2 Russell 2000 results worth -2R) and the fix
-   waits unmerged.
-4. **Mosha: who reads Luxus's lessons, and when (item 28).** If nothing is decided: his lessons are stored but nobody reads
+3. **Mosha: who reads Luxus's lessons, and when (item 28).** If nothing is decided: his lessons are stored but nobody reads
    or answers them until a session is started for it, and each new session needs a key set again.
-5. **Mosha: log your own trades (item 27).** If nothing is decided: the only evidence on Mosha stays the five failed
+4. **Mosha: log your own trades (item 27).** If nothing is decided: the only evidence on Mosha stays the five failed
    rule tests; your own selection is never measured.
-6. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
+5. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
    (they are the corrected ones; this is the outcome I recommend).
-7. **The "council stopped" alert can be hours late (items 15 and 31).** If nothing is decided: it keeps depending on
-   GitHub's timer, which fires only a few times a day; so do the daily ICT replay and the weekly data jobs.
-8. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
+6. **The "council stopped" alert: check the Worker's dispatch token (items 15 and 31).** Built 18 Nov 2026: the Worker starts
+   the watchdog within about 10 minutes of a stop. It works only if the Worker secret `GH_DISPATCH_TOKEN` may start workflows
+   (Actions: write on this repository). If it may not, the Worker logs "GitHub refused the dispatch" and the alert stays late.
+7. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
-9. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
+8. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
    2026); the reset is the one thing left and only you can do it. If nothing is done: that account's balance and record do
    not measure the replica. (Mosha BO as a live paper system, item 33, was here: it became a paper shadow on 11 Nov with
    items 37 and 40.)
-10. **Shadow streams (item 11).** If nothing is decided: streams that cost more than they can earn keep being recorded and
+9. **Shadow streams (item 11).** If nothing is decided: streams that cost more than they can earn keep being recorded and
     copied to the demo shadow account. (LIT, item 12, was here: its paper stream stopped with your "All" of 17 Nov 2026.)
-11. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
+10. **Public or private repository (item 32).** If nothing is decided: it stays public, which is what keeps the council's
     loop free to run.
-12. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
+11. **What a gold buy costs to hold, broker by broker (item 49).** If nothing is decided: nothing changes; the paper book
     keeps the demo broker's rate and the comparison waits for the November 2027 review.
-13. **The NQ open run's trail measures its risk from the moved stop (item 50).** If nothing is decided: harmless until the
-    first open-run trade reaches +2R; that one is booked about +1R and may be closed early.
-14. **Two demo-mirror copy decisions read 1R from a moved stop (item 51).** If nothing is decided: a late ICT copy can get
-    its demo stop on the losing side, and some catch-up copies of gold trend positions are refused.
+
+Answered on 18 Nov 2026 ("do all"): items 29 (dropped; already merged on 11 Nov), 50 and 51 (both fixes applied).
 
 Answered on 14 Nov 2026: item 54, the Mosha cycle becomes a paper shadow ("Make it a paper shadow"; owner rule `mcycle-shadow`).
 
@@ -297,7 +293,13 @@ Evidence: `research/proposals/2026-11-09-council-edge.md` and `research/edge/sha
 
 ## Reliability and data
 
-### [ ] 15. Trigger the watchdog from a Vercel cron
+### [x] 15. Trigger the watchdog from a Vercel cron
+
+- **Status, 18 Nov: DONE (option a, on the Cloudflare Worker; owner: "lets go").** The Worker's 10-minute cron runs
+  `/api/status?job=watchdog` (`api/_watchdog-kick.js`): when the council's last save is over 20 min old, or the ICT desk's over
+  45 min outside the futures weekend, it starts `watchdog.yml` on main, at most once per 30 min (GitHub's run list is the
+  marker; an unreadable file or list starts nothing). The watchdog still sends the alert and keeps its one-alert-per-change mark,
+  so no alert is doubled. **Your one check:** the Worker secret `GH_DISPATCH_TOKEN` needs Actions: write on this repository.
 
 - **Status, 17 Nov: OPEN; option (a) needs rewording.** The Vercel project and its crons are gone. The site's host is now a
   Cloudflare Worker with one 10-minute cron (`cloudflare/src/worker.mjs`); dispatching `watchdog.yml` from it would need a GitHub
@@ -620,7 +622,11 @@ conditions is what makes your trades win.
 
 Open points that were written down elsewhere (developer notes, study results, open pull requests) but not in this list.
 
-### [ ] 29. ICT replay: thirteen results from before a market's price history starts. Keep or drop?
+### [x] 29. ICT replay: thirteen results from before a market's price history starts. Keep or drop?
+
+- **Status, 18 Nov: DONE, dropped (option a; owner: "do all").** Pull request #726 was merged on 11 Nov; on council-data's
+  `ict/replay.json` of 18 Nov gold is recorded from 21 Dec 2025 and the Russell 2000 from 7 Jun 2026 (`recordFrom`), and no
+  result sits before either date.
 
 - **Context.** The ICT replay re-plays history since August 2025. For gold, real candle history on file starts on
   21 Dec 2025; for the Russell 2000 it starts on 7 Jun 2026. Before those dates the price feed returns only stray candles,
@@ -653,7 +659,11 @@ Open points that were written down elsewhere (developer notes, study results, op
   candles, never by the replay total before and after.
 - **If nothing is decided.** Option (b) is what happens.
 
-### [ ] 31. Timed jobs depend on GitHub's timer, which often does not fire
+### [~] 31. Timed jobs depend on GitHub's timer, which often does not fire
+
+- **Status, 18 Nov: PARTLY DONE.** The watchdog no longer depends on it (item 15). The ICT replay is started by the council loop
+  (11 Nov). Left on GitHub's timer: the weekly candle cache, the daily crypto back-fill and the daily backtest (nothing trades
+  wrongly when they are late).
 
 - **Status, 17 Nov: OPEN.** One fact below is no longer true: since 17 Nov 2026 nothing takes over when the council loop stops
   (the website host's backup runner, `api/run.js`, was removed; GitHub Actions is the only runner, restarted by its own
@@ -1033,7 +1043,10 @@ figure or demo-mirror setting.
 
 ## The NQ open run's trail, 12 Nov 2026
 
-### [ ] 50. The NQ open run's trail measures its risk from the moved stop: fix it
+### [x] 50. The NQ open run's trail measures its risk from the moved stop: fix it
+
+- **Status, 18 Nov: DONE (option a; owner: "do all").** The proposal's diff is in `council/trader.mjs`: the loop stamps the
+  opening risk `r0` before its trail can move the stop. `tests/nq-open-r0.test.mjs` keeps the old line as the reference.
 
 - **Status (12 Nov 2026): open, waiting for you.** Found in a review and confirmed with a test; nothing in the trader was
   changed.
@@ -1053,7 +1066,10 @@ figure or demo-mirror setting.
 
 ## Moved stops on the demo mirror, 12 Nov 2026
 
-### [ ] 51. The demo mirror can copy a trade whose stop already locks a profit with its stop on the losing side
+### [x] 51. The demo mirror can copy a trade whose stop already locks a profit with its stop on the losing side
+
+- **Status, 18 Nov: DONE ((a) and (b); owner: "do all").** `council/ctrader-mirror.mjs`: a trade whose stop already sits
+  past its entry is never copied as a market order; the late-copy check reads 1R from the opening risk (`riskAtOpen`).
 
 - **Status (12 Nov 2026): open, waiting for you.** Found in an audit that followed item 50 (the NQ open run's trail; this
   item comes after it) and confirmed with tests; nothing in the mirror's copy decisions was changed.

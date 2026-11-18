@@ -193,7 +193,7 @@ test('timeframe switch: the moment is the end of the last replayed bar; the plan
 test('timeframe switch: the finer timeframe tiles both halves of the cut candle', () => {
   assert.equal(BT.tfFineSec(3600, D0, D0 + 900), 900); assert.equal(BT.tfFineSec(3600, D0, D0 + 1500), 300); assert.equal(BT.tfFineSec(600, D0 + 600, D0 + 900), 300);
   assert.equal(BT.tfFineSec(300, D0, D0 + 120), 60, '2m to 5m is cut on one-minute candles'); assert.equal(BT.tfFineSec(86400, D0, D0 + 13 * 3600 + 25 * 60), 300);
-  assert.equal(BT.tfFineSec(86400, D0, D0 + 4 * 3600), 14400); assert.equal(BT.tfFineSec(60, D0, D0 + 30), 0, 'nothing finer than a minute');
+  assert.equal(BT.tfFineSec(86400, D0, D0 + 4 * 3600), 14400); assert.equal(BT.tfFineSec(60, D0, D0 + 30), 30, 'a minute cut at half past is cut on 30 s candles (18 Nov 2026)'); assert.equal(BT.tfFineSec(30, D0, D0 + 15), 15); assert.equal(BT.tfFineSec(15, D0, D0 + 5), 0, 'nothing finer than 15 seconds');
   for (const [k, sec] of Object.entries(SECS)) for (let T = D0 + 60; T < D0 + 86400; T += 60 * 7) { const s = Math.floor(T / sec) * sec; if (s === T) continue; const g = BT.tfFineSec(sec, s, T); assert.ok(g >= 60 && sec % g === 0 && (T - s) % g === 0, k); }
 });
 
@@ -478,4 +478,18 @@ test('a switch at the Friday close keeps the moment: no finer candle after it be
   assert.throws(() => BT.tfHold(m15, idx15 - 4, 900, null, SAT0), /candle lies between/, 'a moment is never held past a price');
   // a saved session at the close resumes on 4h at the same moment
   const rs = BT.tfResume({ mom: CLOSE }, SER[14400], 14400); assert.equal(rs.T, CLOSE); assert.ok(rs.straddle >= 0);
+});
+
+test('seconds charts (18 Nov 2026): a 1m candle cut at 14:00:30 forms from 15 s candles that ended by then, and its rest runs once', () => {
+  const t0 = Date.UTC(2026, 10, 18, 14) / 1000, s15 = [];
+  for (let i = 0; i < 4; i++) { const o = 100 + i; s15.push({ time: t0 + 15 * i, open: o, high: o + 0.5 + (i === 3 ? 3 : 0), low: o - 0.5, close: o + 0.25 }); }
+  const full = { time: t0, open: 100, high: Math.max(...s15.map((b) => b.high)), low: Math.min(...s15.map((b) => b.low)), close: s15[3].close };
+  const T = t0 + 30, g = BT.tfFineSec(60, t0, T); assert.equal(g, 30, 'cut on 30 s candles where they tile both halves');
+  assert.equal(BT.tfFineSec(60, t0, t0 + 15), 15, 'and on 15 s candles at a quarter past');
+  const fine = [0, 2].map((i) => ({ time: t0 + 15 * i, open: s15[i].open, high: Math.max(s15[i].high, s15[i + 1].high), low: Math.min(s15[i].low, s15[i + 1].low), close: s15[i + 1].close }));
+  const seat = BT.tfPart(full, 0, 60, T, fine, 30), P = seat.part; assert.equal(P.T, T);
+  assert.ok(P.formed.high < full.high, 'the forming candle never shows the high made after the moment');
+  assert.equal(P.rest.length, 1); assert.equal(P.rest[0].time, t0 + 30);
+  const a = BT.newAccount(10000); BT.place(a, { side: 'sell', type: 'market', price: P.formed.close, stop: P.formed.close + 2, units: 1, t: T }, P.formed.close, T);
+  BT.advance(a, null, P.rest); assert.equal(a.positions.length, 0, 'the stop inside the rest is taken'); assert.equal(a.closed.length, 1, 'once');
 });
