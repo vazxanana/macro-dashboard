@@ -37,6 +37,8 @@
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
+<script src="/assets/backtest-engine.js?v=c114ba5997" defer></script>
+<script src="/assets/ms-draw.js?v=955f83f79c" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -2646,6 +2648,43 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       #ms-sty-clean[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
       @media (pointer: coarse) { .sty-btn, .sty-seg button, #ms-sty-pop .ms-tbtn { min-height: 44px; } .sty-c input { width: 52px; height: 40px; } }
       </style>
+<style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
+      #v-charts .sec-h { position: relative; }
+      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+      html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
+      .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
+      #v-charts .sec-h > .dr-bar { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
+      .dr-bar button { position: relative; width: 32px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--ink-dim); cursor: pointer; padding: 0; }
+      .dr-bar button:hover { background: var(--panel-hover, rgba(127,127,127,.12)); color: var(--ink); }
+      .dr-bar button[aria-pressed="true"] { background: var(--accent-soft, rgba(41,98,255,.15)); color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
+      .dr-bar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .dr-bar .dr-mag small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--accent); } .dr-bar .dr-mag small:empty { display: none; }
+      .dr-note { order: 9; font-size: 12px; color: var(--ink-dim); } .dr-note:empty { display: none; }
+      .ms-dsel { position: fixed; left: 0; top: 0; z-index: 60; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); font: 600 12px var(--sans); color: var(--ink); }
+      .ms-dsel[hidden] { display: none; } .ms-dsel .sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
+      .ms-dsel button { min-height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+      .ms-dsel button:hover { background: var(--panel-hover, rgba(127,127,127,.12)); } .ms-dsel button[aria-pressed="true"] { border-color: var(--accent); }
+      .ms-dsel .dc { width: 28px; padding: 0; display: grid; place-items: center; } .ms-dsel .dc i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
+      .ms-dsel .del { color: var(--sell); }
+      .ms-cmenu { position: fixed; left: 0; top: 0; z-index: 70; min-width: 210px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,.3); display: grid; }
+      .ms-cmenu[hidden] { display: none; } .ms-cmenu button { text-align: left; min-height: 34px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--ink); font: 500 13px var(--sans); cursor: pointer; }
+      .ms-cmenu button:hover:not([disabled]), .ms-cmenu button:focus-visible { background: var(--panel-hover, rgba(127,127,127,.12)); outline: none; } .ms-cmenu button[disabled] { color: var(--ink-faint); cursor: default; }
+      .lay-pop { position: absolute; z-index: 45; right: 0; top: calc(100% + 6px); width: 300px; max-width: calc(100vw - 32px); display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+      .lay-pop[hidden] { display: none; } .lay-pop .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .lay-tfs { display: grid; gap: 6px; } .lay-tfs label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; } .lay-tfs select { min-height: 32px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); padding: 0 6px; }
+      .lay-sync { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.35; }
+      .ms-grid4.ms-grid4[data-view="lay"] .ms-pane:not([data-lay-i]) { display: none !important; }
+      html[data-role="public"] :is(#ms-lay-btn, #ms-lay-pop) { display: none !important; }
+      .ms-grid4.ms-grid4[data-view="lay"][data-lay-n="1"] { grid-template-columns: minmax(0, 1fr); }
+      .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="2"], [data-lay-n="4"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ms-grid4.ms-grid4[data-view="lay"][data-lay-n="3"] { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+      .ms-grid4.ms-grid4[data-view="lay"][data-lay-n="3"] .ms-pane[data-lay-i="0"] { grid-row: span 2; }
+      .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="1"], [data-lay-n="2"]) .ms-chart { height: max(420px, calc(100vh - 330px)) !important; }
+      .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="3"], [data-lay-n="4"]) .ms-chart { height: max(240px, calc(50vh - 190px)) !important; min-height: 240px; }
+      .ms-grid4.ms-grid4[data-view="lay"][data-lay-n="3"] .ms-pane[data-lay-i="0"] .ms-chart { height: max(560px, calc(100vh - 290px)) !important; }
+      @media (max-width: 900px) { .ms-grid4.ms-grid4[data-view="lay"][data-lay-n] { grid-template-columns: minmax(0, 1fr); } .ms-grid4.ms-grid4[data-view="lay"][data-lay-n] .ms-pane[data-lay-i] { grid-row: auto; } .ms-grid4.ms-grid4[data-view="lay"][data-lay-n] .ms-chart { height: min(52vh, 420px) !important; min-height: 280px; } }
+      @media (pointer: coarse) { .dr-bar button { width: 44px; height: 44px; } .ms-dsel button { min-height: 44px; } .ms-dsel .dc { width: 44px; } .ms-cmenu button { min-height: 44px; } .lay-tfs select { min-height: 44px; } }
+      </style>
 <style id="ms-clean-css">/* clean look (13 Nov 2026, owner: "too much labels"): only the charts with BO, VR and CF */
         html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
 <style id="ms-ea-css">
@@ -4710,7 +4749,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle, .dr-bar, .dr-note) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
@@ -5676,7 +5715,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
             <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
-            <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
+                  <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
       <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
         <div class="sty-h">Chart type</div>
         <div class="sty-seg seg" role="group" aria-label="Chart type"><button type="button" data-cs="candles">Candles</button><button type="button" data-cs="line">Line</button><button type="button" data-cs="both">Both</button></div>
@@ -5692,8 +5731,15 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
       <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button><button type="button" class="ps-only ps-cmore" id="ps-ch-more" aria-expanded="false" aria-label="More chart tools: markup, indicators, market context and the market cycle">More</button>
       <div class="seg" role="group" aria-label="Chart view">
-        <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
+        <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button><button type="button" data-view="lay" id="ms-lay-btn" aria-haspopup="true" aria-expanded="false" title="Layout: 1 to 4 charts, each its own timeframe, moving together">Layout</button>
       </div>
+      <div class="lay-pop" id="ms-lay-pop" role="dialog" aria-label="Chart layout" hidden>
+        <div class="sty-h">Charts</div><div class="sty-seg" role="group" aria-label="How many charts"><button type="button" data-layn="1">1</button><button type="button" data-layn="2">2</button><button type="button" data-layn="3">3</button><button type="button" data-layn="4">4</button></div>
+        <div class="sty-h">Timeframes</div><div class="lay-tfs" id="ms-lay-tfs"></div>
+        <label class="lay-sync"><input type="checkbox" id="ms-lay-sync" checked> Sync charts: scrolling or zooming one moves the others to the same time</label>
+        <small class="sty-note">Drawings show on every chart of the market. Seconds charts (15 s, 30 s) are in Split's right chart.</small>
+      </div>
+      <div class="dr-bar" id="ms-dr-bar" role="toolbar" aria-label="Drawing tools"></div><span class="dr-note" id="ms-dr-note" role="status" aria-live="polite"></span>
     </div>
     <div class="ict-strip" id="ms-ict-strip" hidden></div>
     <div class="sp-bar" id="ms-sp-bar" hidden>
@@ -7785,6 +7831,10 @@ function msNextSetup(bars, A) {
   }
 
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
+  // ChronosTrade's drawing tools on every chart (18 Nov 2026; assets/ms-draw.js, loaded with defer, picks these up): the same
+  // shapes on every chart of a market, drawn and edited on any of them. Display only.
+  window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
+  Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => !!P.el.offsetParent }));
   // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
   // the levels from a market's daily candles (raw prices): [title, price, pivot?]
   function klList(d) { const L = [];
@@ -8642,7 +8692,7 @@ function msNextSetup(bars, A) {
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
     if (PUB) v = 'all';   // guests: always the two screens (Daily and H1), whatever was saved or however narrow the window (8 Nov)
-    grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split'), 0);
+    grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split'), 0); if (window.msLayView) window.msLayView(v === 'lay');
     root.querySelectorAll('[data-view]').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     try { localStorage.setItem('msView', v); } catch (e) {}
     setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
@@ -8752,15 +8802,60 @@ function msNextSetup(bars, A) {
   setInterval(() => { if (G.mode === 'ict' && !document.hidden) ictStrip(); }, 120e3);
   // split layout (7 Nov, owner: "let people put 2 chart screens side by side" with TradingView-style sync settings)
   // left = one of the analysed timeframe charts; right = a free chart (any market, any timeframe), synced by the toggles
+  // ---- Layout: 1 to 4 charts, each its own timeframe, moving together (18 Nov 2026, owner: "chart should have the same
+  // chronotrades charts features all of them"). ChronosTrade's split: the panes of the chosen timeframes side by side; with Sync
+  // on, scrolling or zooming the chart a person touches sets every other chart to the same TIME window (BT.syncRange through each
+  // chart's own candles; a chart never echoes the one it was set from). Drawings show on every chart (assets/ms-draw.js).
+  // Saved on this device (localStorage ms-lay4). Display only.
+  const LAY_IDS = TFS.map((t) => t.id).filter((id) => panes[id]);
+  function msLayNorm(v, ids) { const n = Math.min(4, Math.max(1, ((v && v.n) | 0) || 2)), out = [], want = Array.isArray(v && v.tfs) ? v.tfs : [];
+    for (const t of want.concat(['4h', '1h', '15m', '5m'], ids)) if (ids.includes(t) && !out.includes(t)) out.push(t);
+    return { n, tfs: out.slice(0, 4), sync: !(v && v.sync === false) }; }
+  window.msLayNorm = msLayNorm;
+  const LAY = { on: false, lead: null, leadAt: 0, exp: new Map(), busy: false, unsub: [] };
+  Object.assign(LAY, msLayNorm((() => { try { return JSON.parse(localStorage.getItem('ms-lay4') || 'null'); } catch (e) { return null; } })(), LAY_IDS));
+  const laySave = () => { try { localStorage.setItem('ms-lay4', JSON.stringify({ n: LAY.n, tfs: LAY.tfs, sync: LAY.sync })); } catch (e) {} };
+  const layPanes = () => LAY.tfs.slice(0, LAY.n).map((id) => panes[id]).filter(Boolean);
+  function layApply() { grid4.dataset.layN = String(LAY.n); Object.values(panes).forEach((P) => { const i = LAY.tfs.slice(0, LAY.n).indexOf(P.tf.id), pn = P.el.closest('.ms-pane');
+      if (!pn) return; if (LAY.on && i >= 0) { pn.dataset.layI = String(i); pn.style.order = String(i); } else { delete pn.dataset.layI; pn.style.order = ''; } });
+    layUI(); layWire(); setTimeout(() => { layPanes().forEach((P) => P.fit && P.fit()); if (LAY.sync) laySync(layPanes()[0]); }, 80);
+    [1500, 4000].forEach((ms) => setTimeout(() => { if (LAY.on && LAY.sync && !(LAY.lead && performance.now() - LAY.leadAt < 1500)) laySync(layPanes()[0]); }, ms)); }   // the candles of a chart may arrive after the switch
+  function layUI() { const box = document.getElementById('ms-lay-tfs'); if (!box) return;
+    document.querySelectorAll('[data-layn]').forEach((b) => { b.classList.toggle('on', +b.dataset.layn === LAY.n); b.setAttribute('aria-pressed', String(+b.dataset.layn === LAY.n)); });
+    box.innerHTML = LAY.tfs.slice(0, LAY.n).map((id, i) => `<label>Chart ${i + 1} <select data-lays="${i}">${LAY_IDS.map((t) => `<option value="${t}"${t === id ? ' selected' : ''}>${(TFS.find((x) => x.id === t) || {}).label || t}</option>`).join('')}</select></label>`).join('');
+    const sy = document.getElementById('ms-lay-sync'); if (sy) sy.checked = LAY.sync; }
+  const lvOf = (P) => ({ bars: P.bars || [], n: (P.bars || []).length, sec: P.tf.sec });
+  function laySync(src) { if (!LAY.on || !LAY.sync || !src || !window.BT || LAY.busy) return; const r = src.chart.timeScale().getVisibleLogicalRange(); if (!r) return; LAY.busy = true;
+    try { for (const P of layPanes()) { if (P === src || P.rp || !P.bars || !P.bars.length) continue; const r2 = window.BT.syncRange(lvOf(src), lvOf(P), r); if (!r2) continue;
+        LAY.exp.set(P, { from: r2.from, to: r2.to, at: performance.now() }); try { P.chart.timeScale().setVisibleLogicalRange(r2); } catch (e) {} } } finally { LAY.busy = false; } }
+  function layWire() { LAY.unsub.forEach((f) => { try { f(); } catch (e) {} }); LAY.unsub = []; if (!LAY.on) return;
+    for (const P of layPanes()) { const lead = () => { LAY.lead = P; LAY.leadAt = performance.now(); };
+      const onR = (r) => { if (!LAY.sync || LAY.busy || !r) return; const ex = LAY.exp.get(P); if (window.BT && window.BT.syncEcho(ex, r, performance.now())) return;
+        const lp = LAY.lead && performance.now() - LAY.leadAt < 1500 ? LAY.lead : layPanes()[0]; if (lp !== P) return; laySync(P); };
+      const ts = P.chart.timeScale(); ts.subscribeVisibleLogicalRangeChange(onR); P.el.addEventListener('pointerdown', lead, true); P.el.addEventListener('wheel', lead, { capture: true, passive: true }); P.el.addEventListener('touchstart', lead, { capture: true, passive: true });
+      LAY.unsub.push(() => ts.unsubscribeVisibleLogicalRangeChange(onR), () => P.el.removeEventListener('pointerdown', lead, true), () => P.el.removeEventListener('wheel', lead, true), () => P.el.removeEventListener('touchstart', lead, true)); } }
+  window.msLayView = (on) => { LAY.on = on; const b = document.getElementById('ms-lay-btn'), pop = document.getElementById('ms-lay-pop'); if (!on && pop) { pop.hidden = true; if (b) b.setAttribute('aria-expanded', 'false'); } layApply(); };
+  { const b = document.getElementById('ms-lay-btn'), pop = document.getElementById('ms-lay-pop');
+    if (b && pop) { b.addEventListener('click', () => { const open = pop.hidden; pop.hidden = !open; b.setAttribute('aria-expanded', String(open)); if (open) layUI(); });
+      document.addEventListener('pointerdown', (e) => { if (!pop.hidden && !pop.contains(e.target) && e.target !== b) { pop.hidden = true; b.setAttribute('aria-expanded', 'false'); } });
+      pop.addEventListener('click', (e) => { const n = e.target.closest('[data-layn]'); if (n) { LAY.n = +n.dataset.layn; Object.assign(LAY, msLayNorm(LAY, LAY_IDS)); laySave(); layApply(); } });
+      pop.addEventListener('change', (e) => { const s2 = e.target.closest('[data-lays]'); if (s2) { const i = +s2.dataset.lays, t = s2.value, j = LAY.tfs.indexOf(t); if (j >= 0) LAY.tfs[j] = LAY.tfs[i]; LAY.tfs[i] = t; laySave(); layApply(); }
+        if (e.target.id === 'ms-lay-sync') { LAY.sync = e.target.checked; laySave(); if (LAY.sync) laySync(layPanes()[0]); } }); } }
+  window.msLay = () => ({ on: LAY.on, n: LAY.n, tfs: LAY.tfs.slice(0, LAY.n), sync: LAY.sync, ranges: layPanes().map((P) => { const r = P.chart.timeScale().getVisibleLogicalRange(); return r && window.BT ? { tf: P.tf.id, from: window.BT.tfTimeAt(P.bars, P.bars.length, P.tf.sec, r.from), to: window.BT.tfTimeAt(P.bars, P.bars.length, P.tf.sec, r.to) } : null; }) });
+
   const SP = { on: false, ltf: '1h', rtf: '15m', sym: instKey, sync: { sym: true, tf: false, cross: true, time: true, range: true }, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] };
   try { Object.assign(SP, JSON.parse(localStorage.getItem('ms-split') || '{}'), { on: false, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] }); SP.sync = Object.assign({ sym: true, tf: false, cross: true, time: true, range: true }, SP.sync || {}); } catch (e) {}
   const spSave = () => { try { localStorage.setItem('ms-split', JSON.stringify({ ltf: SP.ltf, rtf: SP.rtf, sym: SP.sym, sync: SP.sync })); } catch (e) {} };
   const spSym = () => (SP.sync.sym ? instKey : SP.sym), spTf = () => (SP.sync.tf ? SP.ltf : SP.rtf);
   // same market and a different timeframe: the right side is a full analysed chart (Meridian / ICT markups, indicators, tools)
   const spPane = () => (spSym() === instKey && spTf() !== SP.ltf && panes[spTf()] ? panes[spTf()] : null);
+  // seconds charts (18 Nov 2026, as ChronosTrade): 15 s and 30 s candles on Split's right chart, from the OANDA candle proxy only
+  // (an exchange market has none; the chart then says so). The six analysed panes keep their timeframes.
+  const SEC_TFS = [{ id: '15s', label: 'S15', role: 'Seconds', sec: 15, binance: null, kraken: null, poll: 5e3 }, { id: '30s', label: 'S30', role: 'Seconds', sec: 30, binance: null, kraken: null, poll: 5e3 }];
+  const SPTFS = SEC_TFS.concat(TFS);
   function spInit() {
     const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym'); if (!lt || lt.options.length) return;
-    const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = opts;
+    const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = `<optgroup label="Seconds (OANDA markets)">${SEC_TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join('')}</optgroup><optgroup label="Minutes to days">${opts}</optgroup>`;
     const groups = {}; Object.entries(INSTRUMENTS).forEach(([k, v]) => { (groups[v.group] = groups[v.group] || []).push(`<option value="${k}">${v.label}</option>`); });
     sy.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
     lt.addEventListener('change', () => { SP.ltf = lt.value; spSave(); spApply(); });
@@ -8782,8 +8877,9 @@ function msNextSetup(bars, A) {
     SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 },
       localization: { priceFormatter: (p) => fmtI(p, INSTRUMENTS[spSym()] || INST) } });   // thousands separators, like the left chart
     SP.series = SP.chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
+    if (window.msCharts) window.msCharts.add({ id: 'split', el, chart: SP.chart, series: SP.series, bars: () => SP.bars || [], sec: () => (SPTFS.find((t) => t.id === spTf()) || TFS[2]).sec, market: () => spSym(), TZ, dec: () => (INSTRUMENTS[spSym()] || INST).dec ?? 2, fmt: (v) => fmtI(v, INSTRUMENTS[spSym()] || INST), visible: () => SP.on && !spPane() && !!el.offsetParent });   // the drawing tools (assets/ms-draw.js)
     // volume, session shading, EMAs and VWAP from Settings → Chart layers, as on the panes
-    SP.ly = chartLayers(SP.chart, () => { const k = spSym(); return { tf: TFS.find((t) => t.id === spTf()) || TFS[2], raw: SP.raw, bars: SP.bars, off: k === instKey ? G.offset || 0 : 0, crypto: (INSTRUMENTS[k] || INST).group === 'Crypto' }; });
+    SP.ly = chartLayers(SP.chart, () => { const k = spSym(); return { tf: SPTFS.find((t) => t.id === spTf()) || TFS[2], raw: SP.raw, bars: SP.bars, off: k === instKey ? G.offset || 0 : 0, crypto: (INSTRUMENTS[k] || INST).group === 'Crypto' }; });
     spTheme();
     const lg = document.getElementById('ms-sp-lg');
     SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -8803,7 +8899,7 @@ function msNextSetup(bars, A) {
   function spMarkup() { if (!SP.chart || !SP.series) return; SP.ind.forEach((s2) => { try { SP.chart.removeSeries(s2); } catch (e) {} }); SP.ind = [];
     SP.pl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.pl = [];
     if (!SP.ov) { SP.ov = new Overlay(); try { SP.series.attachPrimitive(SP.ov); } catch (e) {} }
-    const B = SP.bars, k = spSym(), own = k === instKey, I = INSTRUMENTS[k] || INST, tf = TFS.find((t) => t.id === spTf()) || TFS[2], items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
+    const B = SP.bars, k = spSym(), own = k === instKey, I = INSTRUMENTS[k] || INST, tf = SPTFS.find((t) => t.id === spTf()) || TFS[2], items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
     const PL = (price, title, color, dash, vis = true) => SP.pl.push(SP.series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash === 2 ? LW.LineStyle.Dotted : dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: plT(title, SP.chart.chartElement().clientWidth), lineVisible: vis }));
     if (B && B.length > 40) try {
       if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
@@ -8816,11 +8912,11 @@ function msNextSetup(bars, A) {
     SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); if (SP.ly) SP.ly.setAll(); spCT(); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
-    const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
+    const T = SPTFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; SP.raw = []; spMarkup(); }   // no old market's markups on an empty chart
     // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
     if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 20).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (SP.bars.length) { if (G.mode === 'ict') spMarkup(); else spKL(); } } }).catch(() => {}); }
-    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
+    try { const r = await fetchBars(SPTFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
       SP.raw = r.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }));   // feed candles, for volume and VWAP
       SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
@@ -8849,7 +8945,7 @@ function msNextSetup(bars, A) {
   function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
   window.msSplitView = (on) => { SP.on = on; const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on; if (on) { spInit(); spApply(); } };
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
-    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
+    try { const r = await fetchBars(SPTFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
       r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
       if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {}
       const w = { time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }; if (SP.raw.length && SP.raw[SP.raw.length - 1].time === w.time) SP.raw[SP.raw.length - 1] = w; else SP.raw.push(w); });

@@ -2349,6 +2349,29 @@ Paper only: no order, broker, council or ICT file is touched; no stop is ever mo
 - **Invites**: `/api/battle { box: true }` gives a box ticket (`kind: 'box'`, never opens a room) and the other members (key and name only); `/api/battle-inbox` (Worker, same origin, box ticket) talks to one `Inbox` (`idFromName('__inbox__')`, memory only): `invite` (room code, up to 3 keys, 20 a sender per 10 min), `list` (my open invites + replies to my invites, each reply once), `answer` (accept / decline once; the inviter is told). Invites last 15 min. The ChronosTrade page reads its inbox every 6 s while visible and shows a card with Accept and join / Decline (`btCard`); the room dialog lists members to invite (`btInviteList`). Invites show on ChronosTrade only, not on the Desk.
 - Tests: `tests/battle-room.test.mjs` (tickets, door, room rules, inbox, wiring). Checked end to end with `wrangler dev` (Durable Object local) and five browsers: invite accepted / declined, four seats and a fifth refused, every page on the host's exact window and moment through steps and 12x play, Undo locked, standings and chat, a reload that keeps its trades, final standings. Not checked live: the Durable Object on Cloudflare (it ships with the next `cloudflare-deploy.yml` run).
 
+## ChronosTrade's chart tools on the Desk's Charts (18 Nov 2026, owner: "chart should have the same chronotrades charts features all of them")
+Display only: no drawing, layout or chart change places, changes or cancels a trade or moves a stop (a test reads the asset).
+- **Drawing tools** `assets/ms-draw.js` (loaded with `defer` after `assets/backtest-engine.js`, whose pure helpers it uses: `drawNorm`,
+  `drawGeom`, `drawHit`, `drawSnap`, `drawResize`, `drawMove`, `drawInfo`, `tfLogical` / `tfTimeAt`, `closedBarAt`). Strip `#ms-dr-bar` in
+  the charts toolbar: cursor, trend line, horizontal line, horizontal ray, vertical line, box, magnet (off / weak / strong,
+  localStorage `ms-dr-mag`); Alt+T / H / J / V / R / M (by `e.code`), Delete removes the selected drawing, Esc lets go. Select, move,
+  resize by handles; style bar `#ms-dsel` (five colours, 1-3 px, dashed, extend, label, lock, clone, delete) over the chart it was
+  selected on. Shapes are ChronosTrade's, per market in this browser (localStorage `ms-dr-<market>`, times in UTC; a chart adds its
+  `TZ`). Every chart the page registers (`window.msCharts.add(cx)`: the six panes and Split's free chart) of the same market shows them.
+  The chart library places whole indexes only (a fractional one comes back as 0), so a time inside a candle is placed between its
+  neighbours (`l2x` / `x2l`). The Desk's older tools (`.ch-hl`, `.ch-tl`, Fibonacci, position, ruler; keys without Alt) are unchanged.
+- **Right-click on any chart** (`#ms-cmenu`): Reset chart view, Delete this drawing, Remove the last drawing, Delete all drawings
+  (styled confirm; locked ones stay). With a tool on, a right-click cancels it.
+- **Layout** (`data-view="lay"`, button `#ms-lay-btn`, popover `#ms-lay-pop`, localStorage `ms-lay4` `{ n, tfs, sync }`, `msLayNorm`):
+  1-4 of the six analysed panes side by side (3 = a big chart and two stacked), each timeframe once; with Sync on, the chart a person
+  presses or wheels leads and every other one takes the same TIME window (`BT.syncRange`, echo guard `BT.syncEcho`, re-synced after
+  the candles arrive). `window.msLay()` is the read-only view. Guests do not get it (their view stays `all`).
+- **15 s / 30 s**: `SEC_TFS` on Split's right chart only (`SPTFS` for every lookup of the free chart), from the OANDA proxy; an exchange
+  market has none. The six panes keep D1-M1 (each runs the Meridian analysis).
+- Simple phone view: the strip waits behind More with the other tools. Tests: `tests/desk-draw.test.mjs`, `tests/qa-sweep.test.mjs`.
+  Checked in a browser (local build, live candles): the strip on six panes, a three-chart layout moving together, a box drawn on H1
+  at the same time on H4 and M15, style bar, Alt keys, Delete, the menu, a reload keeping drawings and layout, a 15 s Split chart.
+
 ## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
 Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =
 rename), then the account as a list (`.pf-box.pf-list`, rows `.pf-row`: round icon, title, one line, chevron or switch): Demo
