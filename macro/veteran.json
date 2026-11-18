@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-18T18:56:49.000Z",
+ "at": "2026-11-18T20:01:23.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-18T18:56:43.000Z",
+ "strategistAt": "2026-11-18T20:01:08.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.85 pts in 5 sessions (vote down); score z (4-week fall) −0.86",
+   "macro": "+0.95 pts in 5 sessions (vote down); score z (4-week fall) −0.86",
    "veteran": "DXY 103.64, +0.69% on the week, +1.91% over 4 weeks · broad USD +0.89% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -124,8 +124,8 @@
   },
   {
    "topic": "Inflation and the next release",
-   "macro": "2.21%, −1 bp a week (vote flat); playbook: FOMC Meeting Minutes 2026-11-18 19:00 UTC",
-   "veteran": "10Y breakeven 2.21%, −1 bp on the week. A red-folder event lands within 72 hours (FOMC Meeting Minutes): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
+   "macro": "2.21%, −1 bp a week (vote flat); playbook: Employment Change 2026-11-19 00:30 UTC",
+   "veteran": "10Y breakeven 2.21%, −1 bp on the week. A red-folder event lands within 72 hours (Employment Change): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
    "stance": "agree",
    "why": "A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.",
    "m": 0,
@@ -153,7 +153,7 @@
  "verdict": {
   "bias": "AUCTION",
   "conviction": null,
-  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (FOMC Meeting Minutes): the bias is conditional until the print.",
+  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Employment Change): the bias is conditional until the print.",
   "agree": 4,
   "qualify": 2,
   "disagree": 0,
@@ -163,23 +163,23 @@
    "a weekly close below the 10-week average 4093 removes the trend tiebreaker"
   ],
   "eventWithin72h": {
-   "title": "FOMC Meeting Minutes",
-   "at": "2026-11-18T19:00:00.000Z",
-   "consensus": null
+   "title": "Employment Change",
+   "at": "2026-11-19T00:30:00.000Z",
+   "consensus": "25.5K"
   }
  },
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
-  "surprise": "Pending: FOMC Meeting Minutes at 2026-11-18 19:00 UTC against the calendar expectation captured before it; print minus previous is not a surprise",
+  "surprise": "Pending: Employment Change at 2026-11-19 00:30 UTC against the calendar expectation captured before it (25.5K); print minus previous is not a surprise",
   "observed": "VIX/VIX3M 1.019 · HY +13 bp on the week · SOFR−EFFR 4 bp · DXY +0.69%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
   "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker",
-  "nextReview": "after FOMC Meeting Minutes",
+  "nextReview": "after Employment Change",
   "forecastId": "xau-4w-2026-11-14",
   "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-21..2026-11-17, n 3085)"
  },
@@ -1178,27 +1178,27 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-18T18:56:49.000Z",
+  "at": "2026-11-18T20:01:23.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
     "rank": 1,
     "lean": 0,
-    "fx": null,
+    "fx": "Hot → EUR/USD mixed (DXY down), USD/JPY mixed; cool the reverse.",
     "k": "event",
-    "score": 3.2,
+    "score": 3.15,
     "event": {
-     "title": "FOMC Meeting Minutes",
-     "country": "USD",
-     "at": "2026-11-18T19:00:00.000Z",
-     "consensus": null,
-     "previous": null,
+     "title": "Employment Change",
+     "country": "AUD",
+     "at": "2026-11-19T00:30:00.000Z",
+     "consensus": "25.5K",
+     "previous": "-39.3K",
      "goldMovePct": 1.26
     },
-    "title": "USD FOMC Meeting Minutes on Wed, 18 Nov is the week's pivot",
+    "title": "AUD Employment Change on Thu, 19 Nov is the week's pivot",
     "evidence": [
      {
-      "text": "FOMC Meeting Minutes at 2026-11-18 19:00 UTC: consensus n/a, previous n/a",
+      "text": "Employment Change at 2026-11-19 00:30 UTC: consensus 25.5K, previous -39.3K",
       "asOf": "2026-11-15 05:57 UTC (captured before the release)",
       "source": "economic calendar (Forex Factory feed via the strategist); veteran-expectations.json"
      },
@@ -1208,13 +1208,13 @@
       "source": "macro/forecast.json playbook"
      },
      {
-      "text": "also this week: Employment Change, Unemployment Rate",
+      "text": "also this week: Unemployment Rate",
       "asOf": "2026-11-18",
       "source": "calendar"
      }
     ],
-    "why": "Hot (above consensus) → gold down; cool → gold up. The path runs through real yields and the dollar: a hot print helps gold only if real yields do not reprice higher.",
-    "change": "the print against the captured expectation and the reaction of real yields and the dollar in the first hours"
+    "why": "Hot (above 25.5K) → gold mixed; cool → gold mixed. The path runs through real yields and the dollar: a hot print helps gold only if real yields do not reprice higher.",
+    "change": "the print against the captured 25.5K and the reaction of real yields and the dollar in the first hours"
    },
    {
     "rank": 2,
@@ -1337,7 +1337,7 @@
      "all": 0.51,
      "allN": 1022
     },
-    "invalid": "a daily close above $3,870 before the target; and watch: the print against the captured expectation and the reaction of real yields and the dollar in the first hours",
+    "invalid": "a daily close above $3,870 before the target; and watch: the print against the captured 25.5K and the reaction of real yields and the dollar in the first hours",
     "why": "Of 20 analogs, 12 (60%) made this move first within 5 sessions vs 51% of all 1022 weeks since 2007-01-19; the analogs favour this side, council tilt −1 pts applied.",
     "src": "veteran hypothesis",
     "claimType": "prospective prediction",
@@ -1598,9 +1598,9 @@
      "text": "as of 2026-11-17 close"
     },
     "mark": {
-     "px": 3738.16,
-     "at": "2026-11-18T18:56:43.000Z",
-     "dist": -2.87
+     "px": 3721.65,
+     "at": "2026-11-18T20:01:08.000Z",
+     "dist": -3.3
     }
    },
    "dxy": {
@@ -2919,7 +2919,7 @@
    "country": "USD",
    "at": "2026-11-18T19:00:00.000Z",
    "type": "FOMC",
-   "released": false,
+   "released": true,
    "titles": [
     "FOMC Meeting Minutes"
    ],
@@ -3916,14 +3916,8 @@
     "claim": "Gold's 2026-11-18 close (UTC day of USD FOMC Meeting Minutes) is above the previous close",
     "p": 0.51,
     "baseP": 0.537,
-    "asset": "gold",
-    "kind": "dayUp",
     "by": "2026-11-18",
-    "src": "event playbook",
-    "level": null,
-    "event": "2026-11-18T19:00|USD",
-    "why": "Gold rose on 17 of 34 past FOMC release days; every weekday over 10 years: 54% (n 2593). The release-day rate is shrunk toward it by 20 pseudo-days.",
-    "pRaw": 0.51,
+    "kind": "dayUp",
     "issued": "2026-11-15",
     "hit": null,
     "recorded": true
@@ -4015,7 +4009,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,738. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,722. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -4035,13 +4029,13 @@
    "why": "The tested Gold Macro Score shows no edge, so the odds stay near the base rate."
   },
   "event": {
-   "title": "FOMC Meeting Minutes",
-   "country": "USD",
-   "at": "2026-11-18T19:00:00.000Z",
-   "consensus": null,
-   "previous": null,
+   "title": "Employment Change",
+   "country": "AUD",
+   "at": "2026-11-19T00:30:00.000Z",
+   "consensus": "25.5K",
+   "previous": "-39.3K",
    "goldMovePct": 1.26,
-   "when": "Wed 18 Nov, 19:00 UTC"
+   "when": "Thu 19 Nov, 00:30 UTC"
   },
   "levels": {
    "px": 3848.795,
@@ -4050,7 +4044,7 @@
     "price": 3800,
     "label": "Round number",
     "dist": -1.27,
-    "distNow": 1.65,
+    "distNow": 2.11,
     "crossed": true
    },
    "below": null,
@@ -4061,9 +4055,9 @@
     "text": "as of 2026-11-17 close"
    },
    "mark": {
-    "px": 3738.16,
-    "at": "2026-11-18T18:56:43.000Z",
-    "dist": -2.87
+    "px": 3721.65,
+    "at": "2026-11-18T20:01:08.000Z",
+    "dist": -3.3
    },
    "broken": {
     "price": 3832.5,
@@ -4078,7 +4072,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-18 18:56 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (FOMC Meeting Minutes): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD FOMC Meeting Minutes on Wed, 18 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). USD FOMC Meeting Minutes (Wed 18 Nov, 19:00 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,738. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close). Event playbook: USD FOMC Meeting Minutes 2026-11-18 19:00 UTC: consensus n/a (previous n/a); P(gold up on the day) 51% vs base 54%; past FOMC days n 34, gold up 50%, median |move| 0.729%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-18 20:01 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Employment Change): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.07% (+15 bp from 2.92%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. AUD Employment Change on Thu, 19 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,722. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close). Event playbook: AUD Employment Change 2026-11-19 00:30 UTC: consensus 25.2K (previous -39.3K). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
@@ -4178,7 +4172,7 @@
    },
    {
     "area": "insight",
-    "text": "New: USD FOMC Meeting Minutes on Wed, 18 Nov is the week's pivot",
+    "text": "New: AUD Employment Change on Thu, 19 Nov is the week's pivot",
     "dir": 0
    },
    {
