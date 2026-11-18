@@ -175,9 +175,11 @@ forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) 
   new pending record, so a repeat, a member's or a confirmed email gets a code that never confirms: the answers still look
   alike). `GET /api/signup?watch=<code>` answers only `{ state: 'confirmed' | 'waiting' }` (unknown or expired = waiting; 1,200
   an hour per IP). Page: after "Create account" the panel shows `#ms-su-sent` (style `#ms-su-sent-css`): an envelope that takes
-  its letter and closes, three steps (sent / confirm / the owner approves), "Open Gmail" (Outlook, Yahoo, iCloud, Proton) for
+  its letter and closes after a paper plane flies in, a "1" new-mail badge and a light orbiting it, three steps in a card (sent /
+  confirm / the owner approves), "Open Gmail" (Outlook, Yahoo, iCloud, Proton) for
   known domains; it asks every 4 s while visible, at once when the page comes back (from the email app), for 45 minutes, and
-  turns by itself to "Email confirmed" (the envelope gives way to a check that draws itself). `?signup=verified` (the email's
+  turns by itself to "Email confirmed" (the envelope squeezes into a check that draws itself, the glow turns green, confetti made
+  by the script, a short buzz on Android). 2D only (a 3D flip clipped the glow). `?signup=verified` (the email's
   link) opens the same confirmed screen. No endless animation; reduced motion shows the end states. Nothing is stored in the
   browser (the code lives in memory). Test: `tests/signup.test.mjs` ("watch").
 - Not checked live: neither sender has sent a real email from the build sandbox (no network to Gmail or Cloudflare); the

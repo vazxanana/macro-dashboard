@@ -2661,16 +2661,23 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
            device (the page asks /api/signup?watch=<code> every few seconds; the code says only waiting / confirmed) -->
       <div class="su-sent" id="ms-su-sent" data-state="waiting" hidden>
         <div class="su-art" aria-hidden="true">
-          <span class="su-ring"></span><span class="su-ring r2"></span>
-          <svg class="su-env" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <g class="su-letter"><rect x="30" y="10" width="60" height="46" rx="5"/><path d="M40 24h40M40 33h30M40 42h22"/></g>
-            <path class="su-body" d="M14 38 60 64l46-26v42a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6Z"/>
-            <path class="su-flap" d="M14 38 60 8l46 30"/>
-          </svg>
-          <svg class="su-ok" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <circle class="su-ok-c" cx="60" cy="46" r="34"/><path class="su-ok-k" d="m45 47 10 10 21-22"/>
-            <g class="su-burst"><circle cx="60" cy="2" r="3"/><circle cx="91" cy="15" r="2.5"/><circle cx="104" cy="46" r="3"/><circle cx="91" cy="77" r="2.5"/><circle cx="60" cy="90" r="3"/><circle cx="29" cy="77" r="2.5"/><circle cx="16" cy="46" r="3"/><circle cx="29" cy="15" r="2.5"/></g>
-          </svg>
+          <span class="su-glow"></span><span class="su-orbit"></span>
+          <svg class="su-plane" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2.5 2.8 10.2l7.4 2.9 2.9 7.4Z"/><path d="m21.5 2.5-11.3 10.6"/></svg>
+          <div class="su-flip">
+            <div class="su-face su-front">
+              <svg class="su-env" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <rect class="su-backp" x="14" y="38" width="92" height="48" rx="6"/>
+                <g class="su-letter"><rect x="30" y="10" width="60" height="46" rx="5"/><path d="M40 24h40M40 33h30M40 42h22"/></g>
+                <path class="su-body" d="M14 38 60 64l46-26v42a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6Z"/>
+                <path class="su-flap" d="M14 38 60 8l46 30"/>
+              </svg>
+              <span class="su-badge">1</span>
+            </div>
+            <div class="su-face su-back">
+              <svg class="su-ok" viewBox="0 0 120 92" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle class="su-ok-c" cx="60" cy="46" r="36"/><path class="su-ok-k" d="m44 47 11 11 22-23"/></svg>
+            </div>
+          </div>
+          <span class="su-confetti"></span>
         </div>
         <h2 class="su-h" id="ms-su-h" tabindex="-1">Check your inbox</h2>
         <p class="su-p" id="ms-su-txt"></p>
@@ -2948,72 +2955,105 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 })();
 </script>
 <style id="ms-su-sent-css">
-/* The inbox screen after a sign-up (18 Nov 2026). The sign-in card is dark in every theme. Motion: the envelope arrives and
-   closes once, floats three times, the waiting dot breathes six times (no endless animation on the gate); on "confirmed" the
-   envelope gives way to a check that draws itself and a small burst. Reduced motion: the end states, no movement. */
+/* The inbox screen after a sign-up (18 Nov 2026). The sign-in card is dark in every theme. Sequence: a paper plane flies into an
+   open envelope, the letter goes in, the flap closes, a "1" pops like new mail; a light orbits it and the waiting line shimmers
+   (a few rounds each, never endless on the gate). On "confirmed" the envelope flips into a green check that draws itself, the
+   glow turns green and a burst of confetti goes off (the pieces are made by the script, random each time). Reduced motion: the
+   end states, no movement. */
 #ms-gp-su.su-on > h2, #ms-gp-su.su-on > .gate-sub, #ms-gp-su.su-on > .gate-done { display: none !important; }
 .su-sent[hidden] { display: none !important; }
-.su-sent { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 4px 0 2px; }
-.su-art { position: relative; width: 132px; height: 104px; margin: 6px 0 4px; }
-.su-art svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.su-env { stroke: #d5dbe4; stroke-width: 2.4; animation: su-drop .62s cubic-bezier(.2,.9,.25,1.15) both, su-float 2.6s ease-in-out .9s 3; }
-.su-body { fill: #20242b; }
-.su-flap { fill: #262b33; transform-origin: 60px 38px; animation: su-flap .45s ease-in .55s both; }
-.su-letter rect { fill: #1b1e23; } .su-letter path { stroke: #9db4d3; stroke-width: 2.2; }
-.su-letter { animation: su-letter .55s cubic-bezier(.4,0,.2,1) .1s both; }
-.su-ring { position: absolute; left: 50%; top: 50%; width: 104px; height: 104px; margin: -52px 0 0 -52px; border-radius: 50%;
-  border: 1.5px solid rgba(157,180,211,.45); opacity: 0; animation: su-ring 2.4s ease-out .7s 3; }
-.su-ring.r2 { animation-delay: 1.5s; }
-.su-ok { opacity: 0; }
-.su-ok-c { stroke: #3fb68b; stroke-width: 3; fill: rgba(63,182,139,.12); stroke-dasharray: 214; stroke-dashoffset: 214; }
-.su-ok-k { stroke: #3fb68b; stroke-width: 5; stroke-dasharray: 50; stroke-dashoffset: 50; }
-.su-sent[data-state="confirmed"] .su-env, .su-sent[data-state="confirmed"] .su-ring { animation: su-out .3s ease-in both; }
-.su-sent[data-state="confirmed"] .su-ok { opacity: 1; animation: su-pop .5s cubic-bezier(.2,.9,.25,1.25) .15s both; }
-.su-sent[data-state="confirmed"] .su-ok-c { animation: su-draw .6s ease-out .2s forwards; }
-.su-sent[data-state="confirmed"] .su-ok-k { animation: su-draw .35s ease-out .7s forwards; }
-.su-burst { transform-origin: 60px 46px; opacity: 0; } .su-burst circle { fill: #3fb68b; }
-.su-sent[data-state="confirmed"] .su-burst { animation: su-burst .8s ease-out .65s both; }
-.su-h { margin: 2px 0 0 !important; font: 650 23px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.02em; color: #f3f5f8; outline: none; }
-.su-p { margin: 0; max-width: 34ch; color: #b4bcc8; font-size: 15px; line-height: 1.5; }
-.su-p b { color: #f3f5f8; font-weight: 600; overflow-wrap: anywhere; }
+.su-sent { --su-acc: #9db4d3; --su-ok: #3fb68b; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 2px 0; }
+.su-sent > :not(.su-art) { animation: su-up .5s cubic-bezier(.2,.8,.2,1) both; }
+.su-sent > .su-h { animation-delay: .9s; } .su-sent > .su-p { animation-delay: 1s; } .su-sent > .su-steps { animation-delay: 1.1s; }
+.su-sent > .su-open { animation-delay: 1.2s; } .su-sent > .su-hint { animation-delay: 1.3s; }
+.su-art { position: relative; width: 176px; height: 150px; margin: 4px 0 2px; }
+.su-glow { position: absolute; inset: 6px 14px; border-radius: 50%; background: radial-gradient(closest-side, rgba(157,180,211,.34), rgba(157,180,211,.10) 55%, transparent 72%);
+  animation: su-glow-in .8s ease-out both; transition: background .6s ease; }
+.su-orbit { position: absolute; left: 50%; top: 50%; width: 148px; height: 148px; margin: -74px 0 0 -74px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 62%, rgba(157,180,211,.0) 64%, var(--su-acc) 88%, transparent 89% 100%);
+  -webkit-mask: radial-gradient(circle, transparent 66px, #000 67px, #000 69px, transparent 70px); mask: radial-gradient(circle, transparent 66px, #000 67px, #000 69px, transparent 70px);
+  opacity: 0; animation: su-orbit 1.9s linear 1.3s 5, su-fade-in .5s ease 1.3s forwards; }
+.su-plane { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; stroke: #e6ebf2; stroke-width: 1.8; fill: rgba(157,180,211,.18);
+  opacity: 0; animation: su-plane 1s cubic-bezier(.45,.05,.3,1) .05s both; }
+.su-flip { position: absolute; left: 50%; top: 50%; width: 132px; height: 102px; margin: -51px 0 0 -66px; }
+.su-face { position: absolute; inset: 0; }
+.su-back { transform: scaleX(0); opacity: 0; }
+.su-front { animation: su-pop-in .5s cubic-bezier(.2,.9,.25,1.3) .75s both; }
+.su-front > svg, .su-back > svg { width: 100%; height: 100%; overflow: visible; }
+.su-env { stroke: #d5dbe4; stroke-width: 2.4; animation: su-float 2.8s ease-in-out 2.2s 4; }
+.su-body { fill: #20242b; } .su-backp { fill: #181b20; } .su-flap { fill: #272c35; transform-origin: 60px 38px; animation: su-flap .42s ease-in 1.45s both; }
+.su-letter rect { fill: #171a1f; } .su-letter path { stroke: var(--su-acc); stroke-width: 2.2; }
+.su-letter { animation: su-letter .55s cubic-bezier(.4,0,.2,1) .95s both; }
+.su-badge { position: absolute; right: 2px; top: 22px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #e5484d; color: #fff;
+  font: 700 13px/24px var(--au-font, Figtree), -apple-system, sans-serif; box-shadow: 0 0 0 3px #121315; animation: su-badge .45s cubic-bezier(.2,1,.3,1.4) 1.85s both; }
+.su-ok-c { stroke: var(--su-ok); stroke-width: 3.5; fill: rgba(63,182,139,.14); stroke-dasharray: 227; stroke-dashoffset: 227; }
+.su-ok-k { stroke: var(--su-ok); stroke-width: 6; stroke-dasharray: 52; stroke-dashoffset: 52; }
+.su-confetti { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.su-confetti i { position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; background: var(--c); opacity: 0;
+  animation: su-conf var(--t, 1.2s) cubic-bezier(.15,.7,.3,1) var(--d, 0s) forwards; }
+.su-sent[data-state="confirmed"] .su-front { animation: su-squeeze .26s ease-in forwards; }
+.su-sent[data-state="confirmed"] .su-back { animation: su-unfold .45s cubic-bezier(.2,1,.3,1.35) .24s forwards; }
+.su-sent[data-state="confirmed"] .su-glow { background: radial-gradient(closest-side, rgba(63,182,139,.40), rgba(63,182,139,.12) 55%, transparent 72%); animation: su-pulse .9s ease-out .35s both; }
+.su-sent[data-state="confirmed"] .su-orbit, .su-sent[data-state="confirmed"] .su-plane { display: none; }
+.su-sent[data-state="confirmed"] .su-ok-c { animation: su-draw .55s ease-out .45s forwards; }
+.su-sent[data-state="confirmed"] .su-ok-k { animation: su-draw .35s ease-out .9s forwards; }
+.su-sent[data-state="confirmed"] > :not(.su-art) { animation: none; }
+.su-sent[data-state="confirmed"] > .su-h { animation: su-up .45s cubic-bezier(.2,.8,.2,1) .5s both; }
+.su-h { margin: 2px 0 0 !important; font: 680 24px/1.2 var(--au-font, Figtree), -apple-system, sans-serif; letter-spacing: -.025em; color: #f5f7fa; outline: none; }
 #ms-su-h:focus, #ms-su-h:focus-visible { outline: none !important; box-shadow: none !important; }
-.su-steps { list-style: none; margin: 10px 0 2px; padding: 0; width: 100%; max-width: 330px; text-align: left; display: grid; gap: 2px; }
-.su-steps li { position: relative; display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; padding: 7px 0; color: #8c95a3; font-size: 14px; }
+.su-p { margin: 0; max-width: 34ch; color: #b4bcc8; font-size: 15px; line-height: 1.55; }
+.su-p b { color: #f3f5f8; font-weight: 600; overflow-wrap: anywhere; }
+.su-steps { list-style: none; margin: 10px 0 2px; padding: 14px 16px; width: 100%; max-width: 340px; box-sizing: border-box; text-align: left; display: grid; gap: 2px;
+  border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01)); }
+.su-steps li { position: relative; display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; padding: 7px 0; font-size: 14px; }
 .su-steps li span { color: #c7cdd6; font-weight: 600; }
 .su-steps li small { grid-column: 2; color: #8c95a3; font-size: 12.5px; }
-.su-steps li i { grid-row: 1 / span 2; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; border: 2px solid rgba(255,255,255,.18); box-sizing: border-box; position: relative; }
+.su-steps li i { grid-row: 1 / span 2; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; border: 2px solid rgba(255,255,255,.18); box-sizing: border-box; position: relative; transition: background .3s, border-color .3s; }
 .su-steps li:not(:last-child)::after { content: ""; position: absolute; left: 10px; top: 31px; bottom: -7px; width: 2px; background: rgba(255,255,255,.10); }
-.su-steps li.done i { background: #3fb68b; border-color: #3fb68b; }
+.su-steps li.done i { background: var(--su-ok); border-color: var(--su-ok); }
 .su-steps li.done i::after { content: ""; position: absolute; left: 6px; top: 2.5px; width: 5px; height: 10px; border: solid #0d0f12; border-width: 0 2.2px 2.2px 0; transform: rotate(45deg); }
-.su-steps li.done:not(:last-child)::after { background: rgba(63,182,139,.55); }
-.su-steps li.now i { border-color: #9db4d3; }
-.su-steps li.now i::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #9db4d3; animation: su-breathe 1.6s ease-in-out 6; }
-.su-steps li.now span { color: #f3f5f8; }
-.su-steps li.pop i { animation: su-pop .4s cubic-bezier(.2,.9,.25,1.3) both; }
-.su-open { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; margin-top: 4px; border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.04); color: #f3f5f8; font-weight: 600; text-decoration: none; }
-.su-open:hover { border-color: rgba(157,180,211,.6); background: rgba(157,180,211,.08); }
-.su-open:focus-visible { outline: 2px solid #9db4d3; outline-offset: 2px; }
+.su-steps li.done:not(:last-child)::after { background: linear-gradient(var(--su-ok), rgba(63,182,139,.35)); }
+.su-steps li.now i { border-color: var(--su-acc); box-shadow: 0 0 0 4px rgba(157,180,211,.12); }
+.su-steps li.now i::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--su-acc); animation: su-breathe 1.6s ease-in-out 8; }
+.su-steps li.now span { color: #f5f7fa; }
+.su-steps li.now small { background: linear-gradient(90deg, #8c95a3 0 40%, #e6ebf2 50%, #8c95a3 60% 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: su-shimmer 2.2s linear 1.6s 6; }
+.su-steps li.pop i { animation: su-pop-in .45s cubic-bezier(.2,.9,.25,1.4) both; }
+.su-open { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; margin-top: 4px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: #f3f5f8; font-weight: 600; text-decoration: none; }
+.su-open::after { content: "\2197"; font-size: 15px; opacity: .7; }
+.su-open:hover { border-color: rgba(157,180,211,.6); background: rgba(157,180,211,.10); }
+.su-open:focus-visible { outline: 2px solid var(--su-acc); outline-offset: 2px; }
 .su-open[hidden] { display: none; }
 .su-hint { margin: 2px 0 0; max-width: 34ch; color: #8c95a3; font-size: 12.5px; line-height: 1.45; }
 .su-sent[data-state="confirmed"] .su-hint, .su-sent[data-state="confirmed"] .su-open { display: none; }
 .su-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@keyframes su-drop { from { opacity: 0; transform: translateY(-26px) scale(.9); } to { opacity: 1; transform: none; } }
-@keyframes su-letter { from { transform: translateY(-14px); } to { transform: translateY(30px); } }
+@keyframes su-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes su-glow-in { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes su-fade-in { to { opacity: 1; } }
+@keyframes su-orbit { to { transform: rotate(1turn); } }
+@keyframes su-plane { 0% { opacity: 0; transform: translate(-96px, 50px) rotate(-8deg) scale(1.1); } 15% { opacity: 1; }
+  55% { transform: translate(-22px, -40px) rotate(18deg) scale(1); } 85% { opacity: 1; transform: translate(4px, -6px) rotate(40deg) scale(.6); } 100% { opacity: 0; transform: translate(6px, 4px) rotate(50deg) scale(.2); } }
+@keyframes su-pop-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: none; } }
+@keyframes su-letter { from { transform: translateY(-16px); } to { transform: translateY(30px); } }
 @keyframes su-flap { from { transform: scaleY(1); } to { transform: scaleY(-1); } }
+@keyframes su-badge { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: none; } }
 @keyframes su-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-@keyframes su-ring { 0% { opacity: .7; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.35); } }
-@keyframes su-breathe { 0%, 100% { opacity: .35; transform: scale(.7); } 50% { opacity: 1; transform: scale(1); } }
-@keyframes su-out { to { opacity: 0; transform: scale(.75); } }
-@keyframes su-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes su-breathe { 0%, 100% { opacity: .35; transform: scale(.65); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes su-shimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+@keyframes su-pulse { 0% { transform: scale(.8); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @keyframes su-draw { to { stroke-dashoffset: 0; } }
-@keyframes su-burst { from { opacity: 1; transform: scale(.6); } to { opacity: 0; transform: scale(1.5); } }
+@keyframes su-squeeze { to { transform: scaleX(0); opacity: .4; } }
+@keyframes su-unfold { from { transform: scaleX(0); opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes su-conf { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
 @media (prefers-reduced-motion: reduce) {
-  .su-sent *, .su-sent *::after { animation: none !important; }
-  .su-ring { display: none; }
-  .su-sent[data-state="confirmed"] .su-env { opacity: 0; }
+  .su-sent *, .su-sent *::after, .su-sent > * { animation: none !important; transition: none !important; }
+  .su-orbit, .su-plane, .su-confetti { display: none; }
+  .su-flap { transform: scaleY(-1); } .su-letter { transform: translateY(30px); }
   .su-sent[data-state="confirmed"] .su-ok-c, .su-sent[data-state="confirmed"] .su-ok-k { stroke-dashoffset: 0; }
-  .su-sent[data-state="confirmed"] .su-burst { opacity: 0; }
+  .su-sent[data-state="confirmed"] .su-front { opacity: 0; } .su-sent[data-state="confirmed"] .su-back { transform: none; opacity: 1; }
+  .su-steps li.now small { color: #8c95a3; background: none; }
 }
 </style>
 <script id="ms-su-js">
@@ -3038,6 +3078,15 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     if (/^(icloud|me|mac)\.com$/.test(d)) return ['Open iCloud Mail', 'https://www.icloud.com/mail'];
     if (/^proton(mail)?\.(me|com|ch)$/.test(d)) return ['Open Proton Mail', 'https://mail.proton.me/'];
     return null; }
+  // a burst of confetti from behind the check: random each time, cleared after it falls (never with reduced motion)
+  function confetti() { var box = document.querySelector('#ms-su-sent .su-confetti'); if (!box) return; box.textContent = '';
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var C = ['#3fb68b', '#9db4d3', '#e6ebf2', '#7fd8b4', '#c9a96e', '#5f8fd1'];
+    for (var i = 0; i < 28; i++) { var e = document.createElement('i'), a = (i / 28) * Math.PI * 2 + Math.random() * 0.4, r = 70 + Math.random() * 70;
+      e.style.cssText = '--c:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * r) + 'px;--y:' + Math.round(Math.sin(a) * r * 0.8 + 40 + Math.random() * 30) + 'px;--r:' + Math.round(Math.random() * 720 - 360) + 'deg;--d:' + (0.5 + Math.random() * 0.15).toFixed(2) + 's;--t:' + (1 + Math.random() * 0.5).toFixed(2) + 's';
+      if (i % 3 === 0) { e.style.width = '7px'; e.style.height = '7px'; e.style.borderRadius = '50%'; }
+      box.appendChild(e); }
+    setTimeout(function () { box.textContent = ''; }, 2400); }
   function sentOn() { var P = panel('su'), X = $('ms-su-sent'); P.classList.add('su-on'); P.querySelector('form').hidden = true; X.hidden = false; return X; }
   function sent(w, email) {
     var X = sentOn(); X.dataset.state = 'waiting'; $('ms-su-h').textContent = 'Check your inbox';
@@ -3054,6 +3103,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     $('ms-su-txt').textContent = 'Thank you. The owner approves your seat next: you get an email when it is ready, then sign in with the password you chose.';
     $('ms-su-s2').className = 'done pop'; $('ms-su-s2t').textContent = 'Confirmed'; $('ms-su-s3').className = 'now';
     $('ms-su-live').textContent = 'Email confirmed. The owner approves your seat next.';
+    confetti(); try { if (navigator.vibrate) navigator.vibrate([18, 50, 28]); } catch (e) {}
     setTimeout(function () { $('ms-su-h').focus({ preventScroll: true }); }, 30);
   }
   // asks every 4 seconds while the page is visible, at once when it comes back (from the email app), for 45 minutes
