@@ -769,8 +769,10 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     const tl = await t.evaluate(() => { const D = window.ctDraw(); return { D, r: D.list[D.list.length - 1] }; });
     check('Alt+T then two clicks: a trend line, selected, stamped with the moment', tl.r.type === 't' && tl.D.sel === tl.D.list.length - 1 && tl.r.at > 0 && tl.D.mag === 0, JSON.stringify(tl.r));
     { const g = tl.D.geo[tl.D.sel], mx = (g.x1 + g.x2) / 2, my = (g.y1 + g.y2) / 2; await t.mouse.move(ch.x + mx, ch.y + my); await t.mouse.down(); await t.mouse.move(ch.x + mx - 70, ch.y + my + 40, { steps: 8 }); await t.mouse.up(); await settle(t);
-      const m = await t.evaluate(() => { const D = window.ctDraw(); return D.list[D.sel]; });
-      check('dragging a trend line by its body moves both points by the same time and price; the chart did not pan', m.t1 < tl.r.t1 && m.t1 - tl.r.t1 === m.t2 - tl.r.t2 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m])); }
+      const mg = await t.evaluate(() => { const D = window.ctDraw(); return { r: D.list[D.sel], g: D.geo[D.sel] }; }), m = mg.r;
+      // a move goes through pixels (the page's rule), so across a weekend gap the two times shift by different amounts: the
+      // shape on screen (the points' x and y distance) is what must stay; the prices shift by the same amount (18 Nov 2026)
+      check('dragging a trend line by its body moves both points together (same shape on screen, same price shift); the chart did not pan', m.t1 < tl.r.t1 && Math.abs((mg.g.x2 - mg.g.x1) - (g.x2 - g.x1)) <= 1.5 && Math.abs((m.p1 - tl.r.p1) - (m.p2 - tl.r.p2)) < 0.02 && m.p1 < tl.r.p1 && m.at === tl.r.at, JSON.stringify([tl.r, m, [g.x1, g.x2], [mg.g.x1, mg.g.x2]])); }
     // Delete removes the selected one; Esc lets go
     const n0 = (await t.evaluate(() => window.ctDraw().list.length)); await t.keyboard.press('Delete'); await settle(t);
     const del = await t.evaluate(() => ({ n: window.ctDraw().list.length, sel: window.ctDraw().sel, bar: document.getElementById('dsel').hidden }));
