@@ -96,6 +96,12 @@ jobs:
           api /workers/scripts/aureum/subdomain | jq -c '.result // .errors' || true
           echo "== aureum bindings (name  type)"
           api /workers/scripts/aureum/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          for w in meridianx aureumbot; do
+            echo "== $w bindings (name  type)"
+            api /workers/scripts/$w/settings | jq -r 'if .success then (.result.bindings[] | "\(.name)  \(.type)") else "could not read: \(.errors)" end' || true
+          done
+          echo "== aureum's newest versions (id  created  source  secrets named)"
+          api "/workers/scripts/aureum/versions?per_page=5" | jq -r 'if .success then (.result.items // .result // [])[] | "\(.id)  \(.metadata.created_on)  \(.metadata.source)" else "could not read: \(.errors)" end' || true
           echo "== custom domains (hostname -> Worker)"
           api /workers/domains | jq -r 'if .success then (.result[] | "\(.hostname) -> \(.service) (\(.environment))") else "could not read: \(.errors)" end' || true
           echo "== live deployment of aureum (version  percentage)"
