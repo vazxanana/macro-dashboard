@@ -1948,6 +1948,12 @@ After a switch, entry markers and connectors snap to the candle that holds their
 `holdBars` counts bars of whatever timeframe was on screen (finer candles while one formed), so hold is shown as time (polish
 pass below). Phones: the timeframe button is in the toolbar row (44 px); the phone toolbar was redone in the polish pass. `window.ctTf()` is the audit's read-only
 summary. Not done: a weekly replay timeframe; a lower timeframe for only part of a long session (it is all or refused).
+**A moment held over a stretch with no prices** (16 Nov 2026, the audit failed on a Friday close): a switch at Fri 21:00 UTC to 4h
+or 1d found every finer candle of the containing candle ended by the moment (none after it before the weekend), so nothing formed
+and the bars put the moment at Sat 00:00; going down from Sat 00:00 put it back at 21:00. No price lay between, but the moment
+moved. `BT.tfHold` now keeps T (`S.at`, passed to `tfMoment`) after a switch or resume whose bars would give another moment, only
+when no candle lies between (it throws otherwise); the next step clears it. `ctTf()` reports `held` / `next`, `ctSplit()` a lower
+pane's `next`; the audit's "aligned" and lower-pane checks accept the gap only through them. Test: "a switch at the Friday close".
 Tests: `tests/backtest.test.mjs` (no future data in either direction, proven by changing every price after the moment; account
 identical across a switch; path equal to the lower timeframe; a stop in the rest taken once; a low before the moment never fills
 an order placed at it; chains of switches; data holes; refusal; old sessions). Audit: 179 checks (the switch against candles
