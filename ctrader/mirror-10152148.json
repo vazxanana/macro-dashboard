@@ -4935,7 +4935,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-18T11:15:10.000Z",
     "councilEntry": 3764.37,
     "stop": 3787.43,
@@ -4949,10 +4949,12 @@
     "slipR": 0.112,
     "lagSec": 111,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-18T11:15:10.000Z",
-    "brokerStop": 3784.85
+    "brokerStop": 3784.85,
+    "closedAt": "2026-11-18T13:44:13.000Z"
    },
    "xau-replica-1795003909-b": {
     "positionId": "50265417",
@@ -5017,7 +5019,7 @@
    "startBalance": 5305.21
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5312.84 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 5289.68 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5025,15 +5027,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 5312.84,
-  "lastRun": "2026-11-18T13:41:46.000Z"
+  "balance": 5289.68,
+  "lastRun": "2026-11-18T13:44:13.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T06:33:17.000Z",
-   "msg": "USDCAD position 48224447 closed at the broker",
-   "trade": "usdcad-replica-1794345020-b"
-  },
   {
    "at": "2026-11-11T06:33:17.000Z",
    "msg": "closed USDCAD position 48179100 (council: loss)",
@@ -6528,6 +6525,11 @@
    "at": "2026-11-18T13:38:52.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1795009004-b"
+  },
+  {
+   "at": "2026-11-18T13:44:13.000Z",
+   "msg": "XAUUSD position 50263274 closed at the broker",
+   "trade": "xau-replica-1795000399-s"
   }
  ],
  "limits": {
