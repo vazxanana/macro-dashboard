@@ -1309,8 +1309,12 @@ window.msFetchUsers = function () {
 // reader cannot change what another sees. The text is dropped from memory once it can no longer be reused.
 // Guests: a visitor who is not signed in is only ever asked the files in GUEST (GUEST_OK in api/data.js); anything else answers
 // null here without a request, whoever calls. tests/desk-load.test.mjs runs this block with a fake fetch and clock.
+// Revalidation (18 Nov 2026): /cdata answers conditional requests (api/data.js, strong ETag per variant), so the last ETag and text
+// of each file stay in memory (V) and a later read sends If-None-Match: a 304 hands the same text back with no body downloaded.
+// Only for the site's own /cdata (a header to another origin would need a preflight), and only for the same variant (the member
+// mark is part of the key, so a visitor's copy is never reused for a member or the other way round).
 window.msDataMake = function (W, clock) {
-  var E = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
+  var E = {}, V = {}, FRESH = 45e3, LONG = { 'ict/replay.json': 10 * 60e3 }, now = clock || Date.now;
   var GUEST = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];
   function allowed(f) { return !(W.MS_API && W.document.documentElement.dataset.mode !== 'admin') || GUEST.indexOf(f) >= 0; }
   // a signed-in member asks under his own address (&m=1): the server cuts the guest files for visitors (api/_guestcut.js) and its
@@ -1321,7 +1325,13 @@ window.msDataMake = function (W, clock) {
     var keep = LONG[f] || FRESH, fresh = o && o.fresh != null ? Math.min(+o.fresh || 0, keep) : keep, e = E[f];
     if (e && (e.done == null || (e.ok && now() - e.done < fresh))) return e.p;
     e = E[f] = { done: null, ok: false, p: null };
-    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000) + (member() ? '&m=1' : ''), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; })
+    var mk = (member() ? 'm|' : 'g|') + f, v = V[mk], own = /^\//.test(W.MS_CDATA || ''), init = { cache: 'no-store' };
+    if (own && v) init.headers = { 'If-None-Match': v.tag };
+    e.p = W.fetch(W.MS_CDATA + f + '?v=' + Math.floor(now() / 60000) + (member() ? '&m=1' : ''), init).then(function (r) {
+      if (r.status === 304) return v ? v.t : null;
+      if (!r.ok) return null;
+      return r.text().then(function (t) { var tag = own && r.headers && r.headers.get && r.headers.get('ETag'); if (tag) V[mk] = { tag: tag, t: t }; else delete V[mk]; return t; });
+    }).catch(function () { return null; })
       .then(function (t) { e.done = now(); e.ok = t != null; W.setTimeout(function () { if (E[f] === e) delete E[f]; }, keep); return t; });
     return e.p;
   }
@@ -3449,7 +3459,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
          waits on you, then the places. Everything Home held before sits unchanged behind "More on the desk" (#hs-more-b; on a phone
          that wrapper is display: contents, so both phone views are the page as they were). Filled by #ms-hs-js from window.MS_PS. -->
     <div class="hs-only hs-home" id="hs-home">
-      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p></header>
+      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p><p class="hs-fwd adm" id="hs-fwd" hidden></p></header>
       <div class="h-warn hs-warn" id="hs-warn" role="alert" hidden></div>
       <div class="hs-cols">
         <section class="hs-card hs-open" aria-labelledby="hs-o-k"><div class="hs-ch"><h2 id="hs-o-k">Open now</h2><span class="hs-n" id="hs-o-n"></span></div>
@@ -12814,7 +12824,21 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     sum.innerHTML = sentence(F); body.innerHTML = rows(F); chart(F);
     var at = $('ms-fwd-at'); if (at && F.at) { var stale = W.MS_HC ? W.MS_HC.stampTxt(F.at, 6) : new Date(F.at).toLocaleString('en-GB'); at.textContent = stale; at.classList.toggle('hc-stale', /^Stale/.test(stale)); }
   }
-  W.MS_FWD = { render: render, sentence: sentence };
+  // Home's one line (18 Nov 2026): the live book against the plan you adopted, in words, linking to this card; owner and reviewers
+  // (class adm), wider than 640 px (#hs-home); the same reading, no new figure
+  function brief(F) {
+    var r = F.record || {}, n = r.n || 0, since = dTxt(r.from);
+    var what = n ? n + ' position' + (n === 1 ? '' : 's') + ' closed since ' + since + ', ' + fR(r.total) + ' after costs' : 'no position closed since ' + since;
+    return 'Live book against its plan: <b class="' + (HEAD[F.status] || '') + '">' + esc(F.head) + '</b> · ' + esc(what) + (r.open ? ' · ' + r.open + ' open' : '')
+      + ' · <a href="#council/systems">See the forward record</a>';
+  }
+  function home() {
+    var e = $('hs-fwd'); if (!e) return; var C = W.MS_COUNCIL, F = C && C.coach && C.coach.forward;
+    if (!F || !F.record || !F.head) { e.hidden = true; return; }
+    var h = brief(F); if (e._h !== h) { e._h = h; e.innerHTML = h; } e.hidden = false;
+  }
+  document.addEventListener('ms:council', home); setTimeout(home, 0);
+  W.MS_FWD = { render: render, sentence: sentence, brief: brief, home: home };
   document.addEventListener('ms:council', render);
   if (W.ResizeObserver) { var ro = new ResizeObserver(function () { var C = W.MS_COUNCIL, F = C && C.coach && C.coach.forward; if (F && F.record) chart(F); }); var hh = document.getElementById('ms-fwd-chart'); if (hh) ro.observe(hh); }
   setTimeout(render, 0);
@@ -14116,6 +14140,10 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .pos { color: var(--au-gain); }
   #v-home :is(.hs-a, .hs-s, .hs-rows, .hs-n) .neg { color: var(--au-loss); }
   #v-home .hs-s { margin: 8px 0 0; max-width: 72ch; font: 400 15px/1.5 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-fwd { margin: 10px 0 0; max-width: 80ch; font: 400 14px/1.5 var(--au-font); color: var(--au-ink-2); }
+  #v-home .hs-fwd[hidden] { display: none; }
+  #v-home .hs-fwd b { font-weight: 600; color: var(--au-ink); } #v-home .hs-fwd b.fw-st-ok { color: var(--au-gain); } #v-home .hs-fwd b.fw-st-bad { color: var(--au-loss); }
+  #v-home .hs-fwd a { color: var(--au-accent); text-underline-offset: 3px; }
   #v-home .hs-s b { font-weight: 600; font-variant-numeric: tabular-nums; }
   #v-home .hs-f { display: block; margin-top: 2px; font-size: 13px; color: var(--au-ink-3); }
   #v-home .hs-warn[hidden] { display: none; }
@@ -14327,6 +14355,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
     padding: max(20px, env(safe-area-inset-top)) 24px 24px !important; background: #121315 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; text-align: center; }
   html[data-gate] .gate-card .gate-brand { order: 0; justify-content: center !important; margin: 18px 0 30px !important; flex-direction: column; gap: 10px; position: relative; }
   html[data-gate] .gate-card .gate-brand > .ms-coin { transform: scale(1.6); margin: 12px 0 14px; }
+  html[data-gate] .gate-card .gate-brand > .wm { display: inline-flex !important; }   /* a flex column made it a block: no gap, "AUREUMDESK" (18 Nov 2026) */
   html[data-gate] .gate-card > *, html[data-gate] .gate-card form > * { flex: none; }
   html[data-gate] .gate-card .gate-x { position: absolute; top: -10px; right: -10px; }
   html[data-gate] .gate-card h1 { order: 1; font-size: 26px !important; margin: 0 0 6px !important; }
@@ -14374,6 +14403,13 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 .gate-ban { margin: -6px 0 16px; padding: 10px 12px; border-radius: 10px; background: rgba(157,180,211,.10); border: 1px solid rgba(157,180,211,.28); color: var(--g-ink); font: 500 13.5px/1.45 Figtree, -apple-system, sans-serif; }
 .gate-ban.bad { background: rgba(242,133,126,.10); border-color: rgba(242,133,126,.35); }
 .gate-ban[hidden] { display: none !important; }
+/* The logo, larger where a visitor first meets the desk (18 Nov 2026, owner: "aureum should have a image or logo for email and the
+   website"): the left side of the desktop sign-in screen leads with the mark at 44 px and a wordmark a size up. */
+@media (min-width: 641px) {
+  .gs-brand { gap: 14px !important; margin-bottom: 32px !important; }
+  .gs-brand .ms-coin { width: 44px !important; height: 44px !important; }
+  .gs-brand .wm b { font-size: 20px; letter-spacing: .16em; } .gs-brand .wm small { font-size: 15px; }
+}
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked

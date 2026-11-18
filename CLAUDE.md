@@ -2424,6 +2424,16 @@ submitting unchanged), the live strip and proof under it. A device where someone
   small check badge, else the check stays; the title is "Welcome back, <display name>".
 Tests: `tests/signup.test.mjs` ("usernames"), `tests/gate-welcome.test.mjs`.
 
+## Home's forward line, data revalidation, the logo on the sign-in screen (18 Nov 2026, owner: "yes" to the next three builds)
+- **Home** (`#hs-fwd`, class `adm`, under the headline, from 641 px): "Live book against its plan: <state> · n positions closed since
+  <date>, R after costs · n open · See the forward record" from coach.json `forward` (`MS_FWD.brief` / `home` in `#ms-fw-js`; no new
+  figure, nothing fetched; hidden without a reading). Test in `tests/qa-sweep.test.mjs`.
+- **msData revalidates**: the last ETag and text per file and variant (`V`, key `m|` / `g|` + file) stay in memory; a later read
+  sends `If-None-Match` and a 304 hands back the same text (no body). Only for the site's own `/cdata` (never the raw GitHub copy:
+  a preflight). Checked live: `/cdata/snapshot.json` answers 304 with 0 bytes. Test in `tests/desk-load.test.mjs`.
+- **Sign-in screen**: the desktop left side leads with the mark at 44 px and a larger wordmark (`.gs-brand`, last style block); on
+  phones the card's wordmark is `inline-flex` again (a flex column made it a block and the words ran together: "AUREUMDESK").
+
 ## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
 Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`
 plays inside the card (`<style id="ms-gate-ok-css">` + `<script id="ms-gate-ok-js">`, before `#ms-su-sent-css`, reusing its
