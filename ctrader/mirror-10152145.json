@@ -13499,7 +13499,8 @@
     "t1": 3755.4949999999994,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3765.09,
@@ -13514,7 +13515,8 @@
     "lagSec": 289,
     "positionId": "50263985",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-18T12:08:15.000Z"
    }
   },
   "day": {
@@ -13522,16 +13524,16 @@
    "startBalance": 10122.25
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10188.54 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 10183.97 · 9 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 375.25, 3.7% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 373.30, 3.7% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-18T12:05:03.000Z"
+    "at": "2026-11-18T12:08:15.000Z"
    }
   },
   "paused": {},
@@ -13539,20 +13541,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10188.54,
-  "lastRun": "2026-11-18T12:05:03.000Z"
+  "balance": 10183.97,
+  "lastRun": "2026-11-18T12:08:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-17T21:38:17.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 288.21, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-17T21:40:51.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 290.02, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-17T21:42:01.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 293.14, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15042,6 +15034,16 @@
    "at": "2026-11-18T12:05:03.000Z",
    "msg": "not mirrored xrp-rswing-1795003393: none of XRPUSD found at the broker",
    "trade": "xrp-rswing-1795003393"
+  },
+  {
+   "at": "2026-11-18T12:08:15.000Z",
+   "msg": "XAUUSD position 50263985 closed at the broker",
+   "trade": "xau-m30m1-1795002473"
+  },
+  {
+   "at": "2026-11-18T12:08:15.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 373.30, 3.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
   }
  ],
  "limits": {
