@@ -114,6 +114,38 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
 
+      # 18 Nov 2026: the owner could not get the Worker's secrets saved in the Cloudflare dashboard. A Worker secret
+      # that also exists as a GitHub repository secret of the SAME name is copied into the aureum Worker here. The
+      # value goes from GitHub's secret store to wrangler on stdin only: never echoed, never in a file, never in a log
+      # (GitHub masks it as well). A name with no repository secret is skipped and the Worker keeps what it has.
+      - name: Copy Worker secrets from GitHub repository secrets (values never printed)
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          W_OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          W_OANDA_ENV: ${{ secrets.OANDA_ENV }}
+          W_SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          W_CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          W_BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          W_CTRADER_LINK_KEY: ${{ secrets.CTRADER_LINK_KEY }}
+          W_GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          W_GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          W_ACADEMY_LLM_KEY: ${{ secrets.ACADEMY_LLM_KEY }}
+          W_ACADEMY_LLM_URL: ${{ secrets.ACADEMY_LLM_URL }}
+          W_ACADEMY_LLM_MODEL: ${{ secrets.ACADEMY_LLM_MODEL }}
+          W_ACADEMY_LLM_FORMAT: ${{ secrets.ACADEMY_LLM_FORMAT }}
+          W_ACADEMY_LLM_USD_PER_MTOK_IN: ${{ secrets.ACADEMY_LLM_USD_PER_MTOK_IN }}
+          W_ACADEMY_LLM_USD_PER_MTOK_OUT: ${{ secrets.ACADEMY_LLM_USD_PER_MTOK_OUT }}
+        run: |
+          set +x
+          for n in OANDA_TOKEN OANDA_ENV SESSION_SECRET CRON_SECRET BLOB_READ_WRITE_TOKEN CTRADER_LINK_KEY GH_TOKEN GH_READ_TOKEN \
+                   ACADEMY_LLM_KEY ACADEMY_LLM_URL ACADEMY_LLM_MODEL ACADEMY_LLM_FORMAT ACADEMY_LLM_USD_PER_MTOK_IN ACADEMY_LLM_USD_PER_MTOK_OUT; do
+            v="$(printenv "W_$n" || true)"
+            if [ -z "$v" ]; then echo "skip  $n (no repository secret)"; continue; fi
+            if printf '%s' "$v" | npx wrangler secret put "$n" >/dev/null 2>&1; then echo "set   $n"; else echo "::warning::could not set $n on the Worker"; fi
+          done
+
       - name: First look at the deployed site
         if: success()
         run: |
