@@ -3,6 +3,7 @@
 //   GET  /api/signup                      -> { open: bool }  (whether sign-ups and reset emails can be sent)
 //   POST /api/signup { name, email, password }   -> 200 "Check your email…" (the same words whether or not the email is known)
 //   GET  /api/signup?verify=<token>       -> 302 /market-structure.html?signup=verified | ?signup=expired
+//   GET  /api/signup?watch=<code>         -> { state: 'confirmed' | 'waiting' } (the sign-up answer's own code; nothing else)
 //   GET  /api/signup?list=1               owner session -> { items: [{ id, name, email, at, verifiedAt }] } (verified, no hashes)
 //   POST /api/signup { approve: id, role }   owner session -> the account goes into the stored user list (as the Users page saves it)
 //   POST /api/signup { refuse: id }          owner session -> the request is removed
@@ -105,7 +106,7 @@ async function handle(req, res, d = {}) {
   const send = mailer(env, d);
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
   const q = req.query || {};
-  if (req.method === 'GET' && !q.verify && !q.list) return res.status(200).json({ open: !!send });
+  if (req.method === 'GET' && !q.verify && !q.list && !q.watch) return res.status(200).json({ open: !!send });
   if (!env.BLOB_READ_WRITE_TOKEN && !d.store) return res.status(503).json({ error: q.verify ? undefined : 'account storage unavailable' });
   const store = d.store || blobStore(env), deps = d.deps || S.defaultDeps(env);
   const loadUsers = d.loadUsers || (async () => (await A.blobUsers(env)) || { users: {} });
@@ -113,6 +114,15 @@ async function handle(req, res, d = {}) {
   const builtIns = d.builtIns || A.builtInUsers();
   const live = (list) => list.filter((x) => x && (x.verified ? now - (x.verifiedAt || x.at) < KEEP_VERIFIED_MS : x.exp > now));
   try {
+    // ---- watch (18 Nov 2026): the page that sent a sign-up asks every few seconds whether its link was opened, on any device.
+    // The code came with the sign-up answer (every answer carries one, so it tells nothing about the email); only its hash is
+    // stored. The answer is 'confirmed' or 'waiting', never a name or an email; an unknown or expired code reads 'waiting'.
+    if (req.method === 'GET' && q.watch) {
+      const w = String(q.watch); if (!tokOk(w)) return res.status(400).json({ error: 'bad code' });
+      const lim = G.hit('signup-watch', G.ipOf(req), 1200, 3600e3, now); if (lim) return G.tooMany(res, lim);
+      const wh = sha(w), x = live(await store.get(PENDING)).find((p) => p.watchHash && A.same(p.watchHash, wh));
+      return res.status(200).json({ state: x && x.verified ? 'confirmed' : 'waiting' });
+    }
     // ---- verify (a link from the email) ----
     if (req.method === 'GET' && q.verify) {
       const t = String(q.verify), go = (s) => { res.statusCode = 302; res.setHeader('Location', `/market-structure.html?signup=${s}`); return res.end(); };
@@ -208,17 +218,17 @@ async function handle(req, res, d = {}) {
     if (A.same(h, A.OWNER_HASH) || Object.values(users).some((u) => u && A.same(u.hash, h)) || list.some((p) => p.email !== email && A.same(p.hash, h))) { G.failed(req, now); return res.status(400).json({ error: AGAIN }); }
     const known = Object.values(users).some((u) => u && u.email && String(u.email).toLowerCase() === email), had = list.find((p) => p.email === email);
     // a known member, a request already confirmed, or one sent in the last 10 minutes: the same answer, nothing sent
-    if (known || (had && (had.verified || now - had.at < COOL_MS))) return res.status(200).json({ ok: true, message: SENT });
+    if (known || (had && (had.verified || now - had.at < COOL_MS))) return res.status(200).json({ ok: true, message: SENT, watch: token() });
     list = list.filter((p) => p !== had);
     if (list.length >= CAP) return res.status(429).json({ error: 'Too many sign-ups are waiting right now. Try again tomorrow.' });
-    const t = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, email, hash: h, tokenHash: sha(t), at: now, exp: now + VERIFY_MS, verified: false };
+    const t = token(), watch = token(), rec = { id: crypto.randomBytes(9).toString('base64url'), name, email, hash: h, tokenHash: sha(t), watchHash: sha(watch), at: now, exp: now + VERIFY_MS, verified: false };
     const link = `${originOf(req)}/api/signup?verify=${t}`;
     try {
       await send(email, 'Confirm your email for Aureum Desk', `Hello ${name},\n\nConfirm your email for Aureum Desk with this link (it works for 24 hours, once):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
         html([`Hello ${name},`, 'Confirm your email for Aureum Desk. The link works for 24 hours, once. Then the owner approves your seat, and you sign in with the password you chose.', 'If you did not sign up, ignore this email.'], link, 'Confirm my email'));
     } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.', why: e && e.tries ? e.tries : [redact(e)] }); }
     list.push(rec); await store.put(PENDING, list);
-    return res.status(200).json({ ok: true, message: SENT });
+    return res.status(200).json({ ok: true, message: SENT, watch });
   } catch (e) { console.error('[signup] failed'); return res.status(e.status === 503 ? 503 : 500).json({ error: 'Account storage is not available right now. Try again in a minute.' }); }
 }
 

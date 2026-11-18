@@ -170,6 +170,16 @@ forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) 
   card); `?signup=` shows a line on the card (`#ms-gate-ban`), `#reset=` opens the new-password panel and is cleaned from the
   address at once (also on a hash change). Nothing typed there is stored in the browser. Users page: "Waiting for your approval"
   (`#ms-u-wait-card`, `renderSignups`) with a role and Approve / Refuse, failures in words.
+- **The inbox screen and its automatic check** (18 Nov 2026, owner: "improve the confirmation design with a cool animation, and the
+  confirmation link should be automatic"): every sign-up answer carries `watch` (a random code; only `watchHash` is stored on a
+  new pending record, so a repeat, a member's or a confirmed email gets a code that never confirms: the answers still look
+  alike). `GET /api/signup?watch=<code>` answers only `{ state: 'confirmed' | 'waiting' }` (unknown or expired = waiting; 1,200
+  an hour per IP). Page: after "Create account" the panel shows `#ms-su-sent` (style `#ms-su-sent-css`): an envelope that takes
+  its letter and closes, three steps (sent / confirm / the owner approves), "Open Gmail" (Outlook, Yahoo, iCloud, Proton) for
+  known domains; it asks every 4 s while visible, at once when the page comes back (from the email app), for 45 minutes, and
+  turns by itself to "Email confirmed" (the envelope gives way to a check that draws itself). `?signup=verified` (the email's
+  link) opens the same confirmed screen. No endless animation; reduced motion shows the end states. Nothing is stored in the
+  browser (the code lives in memory). Test: `tests/signup.test.mjs` ("watch").
 - Not checked live: neither sender has sent a real email from the build sandbox (no network to Gmail or Cloudflare); the
   binding's call shape (`send({ from: { email, name }, to, subject, text, html })`) is from Cloudflare's docs as summarised by a
   web search, the docs site itself was not reachable. Tests: `tests/signup.test.mjs` (fake store, clock, binding, SMTP socket).

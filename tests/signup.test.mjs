@@ -81,9 +81,10 @@ test('the same answer for a new, a pending, a confirmed and a member\'s email; o
   const rec = W.files['signups/pending.json'][0];
   assert.equal(rec.tokenHash, sha(t)); assert.equal(rec.hash, sha('maria-password-1')); assert.doesNotMatch(JSON.stringify(W.files), new RegExp(t)); assert.doesNotMatch(JSON.stringify(W.files), /maria-password-1/);
   assert.equal(rec.exp - rec.at, 24 * 3600e3);
-  const again = await join(W, 'Maria', 'maria@example.com', 'other-password-2'); assert.deepEqual(again.body, a.body); assert.equal(W.out.length, 1, 'no second email inside 10 minutes');
+  const same = (x, y) => { assert.match(x.watch, /^[A-Za-z0-9_-]{40,60}$/); assert.match(y.watch, /^[A-Za-z0-9_-]{40,60}$/); const { watch: w1, ...p } = x, { watch: w2, ...q } = y; assert.deepEqual(p, q); };   // a random watch code in every answer
+  const again = await join(W, 'Maria', 'maria@example.com', 'other-password-2'); same(again.body, a.body); assert.equal(W.out.length, 1, 'no second email inside 10 minutes');
   W.list = { users: { old: { name: 'Old', role: 'viewer', hash: sha('old-member-pw'), email: 'old@example.com' } } };
-  const known = await join(W, 'X', 'old@example.com', 'brand-new-pw-3'); assert.deepEqual(known.body, a.body); assert.equal(W.out.length, 1);
+  const known = await join(W, 'X', 'old@example.com', 'brand-new-pw-3'); same(known.body, a.body); assert.equal(W.out.length, 1);
   // after the cool-down a fresh link replaces the unconfirmed request
   W.t += 11 * 60e3; await join(W, 'Maria', 'maria@example.com', 'maria-password-1'); assert.equal(W.out.length, 2); assert.equal(W.files['signups/pending.json'].length, 1);
   // the link is built on the site's own host; another host gets the site's domain
@@ -101,6 +102,22 @@ test('verify: single use, expiry, bad tokens; the owner is told by email (name o
   const X = world(); await join(X); const t2 = linkOf(X); X.t += 24 * 3600e3 + 1;
   assert.equal((await call(X, { method: 'GET', query: { verify: t2 } })).headers.location, '/market-structure.html?signup=expired');
   assert.equal(X.files['signups/pending.json'][0].verified, false, 'an expired link confirms nothing');
+});
+
+test('watch (18 Nov 2026): every sign-up answer carries a code; it reads waiting until the link is opened, then confirmed; nothing else leaks', async () => {
+  const W = world(); const r = await join(W); assert.match(r.body.watch, /^[A-Za-z0-9_-]{40,60}$/);
+  assert.equal(W.files['signups/pending.json'][0].watchHash, sha(r.body.watch), 'only the hash is stored');
+  assert.doesNotMatch(JSON.stringify(W.files), new RegExp(r.body.watch));
+  const ask = async (w) => (await call(W, { method: 'GET', query: { watch: w } })).body;
+  assert.deepEqual(await ask(r.body.watch), { state: 'waiting' });
+  await call(W, { method: 'GET', query: { verify: linkOf(W) } });
+  assert.deepEqual(await ask(r.body.watch), { state: 'confirmed' });
+  // an unknown code (and every repeat or member answer's code) reads waiting; a bad one is refused
+  assert.deepEqual(await ask(crypto.randomBytes(32).toString('base64url')), { state: 'waiting' });
+  const again = await join(W); assert.match(again.body.watch, /^[A-Za-z0-9_-]{40,60}$/); assert.notEqual(again.body.watch, r.body.watch);
+  assert.deepEqual(await ask(again.body.watch), { state: 'waiting' });
+  assert.equal((await call(W, { method: 'GET', query: { watch: 'x' } })).code, 400);
+  assert.equal(Object.keys(await ask(r.body.watch)).join(), 'state', 'never a name or an email');
 });
 
 test('owner approval: list, approve (the member can sign in), refuse; members and guests cannot list or approve', async () => {
