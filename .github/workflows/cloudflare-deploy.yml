@@ -13,6 +13,11 @@ name: Cloudflare deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      ai_binding:
+        description: 'Point ACADEMY_LLM_URL at the Worker''s own Workers AI connection (no token needed)'
+        type: boolean
+        default: false
   push:
     branches: [claude/cloudflare-stage1, claude/relaxed-albattani-8c6aky]
     paths:
@@ -177,6 +182,18 @@ jobs:
               esac;;
             esac
           fi
+
+      # 18 Nov 2026: the AI features through the Worker's `ai` binding (cloudflare/src/ai-binding.mjs). Only on a run started by
+      # hand with the box ticked; the address is not a secret, the format must be 'chat' and the key may be any text.
+      - name: AI through the Worker's own connection (only when asked)
+        if: github.event_name == 'workflow_dispatch' && inputs.ai_binding
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          printf 'https://workers-ai.invalid/v1/chat/completions' | npx wrangler secret put ACADEMY_LLM_URL >/dev/null 2>&1 && echo "set   ACADEMY_LLM_URL = the Worker's AI connection"
+          printf 'chat' | npx wrangler secret put ACADEMY_LLM_FORMAT >/dev/null 2>&1 && echo "set   ACADEMY_LLM_FORMAT = chat"
 
       # The file store's copy in D1 (docs/cloudflare.md, "File store on D1"): the mirror's state and file counts by folder
       # (names only, never a file's content).

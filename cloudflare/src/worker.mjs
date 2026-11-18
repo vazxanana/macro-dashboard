@@ -34,6 +34,8 @@ import stream from '../../api/stream.js';
 import tradeReview from '../../api/trade-review.js';
 import users from '../../api/users.js';
 import { connect } from 'cloudflare:sockets';
+import { useAi, installAiFetch } from './ai-binding.mjs';
+installAiFetch(globalThis);
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
@@ -76,6 +78,7 @@ async function asset(request, url, env) {
 
 export async function handle(request, env, ctx) {
   signup.useMail(env && env.EMAIL);
+  useAi(env && env.AI);
   const orig = new URL(request.url);
   if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS' && !orig.pathname.startsWith('/api/'))
     return new Response('Method not allowed', { status: 405 });
