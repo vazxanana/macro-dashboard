@@ -2060,7 +2060,9 @@ try {
     const bars = (await nq1m()).slice(0, -1);
     if (bars.length) nqLast = { price: +bars.at(-1).close.toFixed(2), at: bars.at(-1).time + 60 };   // shown as 'now' on the Active trades card (about 10 min late)
     for (const r of openNq) {
-      const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
+      // the OPENING risk (12 Nov 2026, item 50): the runner trail moves r.stop, so |entry - stop| is no longer 1R once it has moved
+      if (!(r.r0 > 0)) r.r0 = r.trailMoved && r.tp1 != null ? Math.abs(r.tp1 - r.entry) / 2 : Math.abs(r.entry - r.stop);
+      const s = r.side === 'sell', r0 = r.r0;
       for (const b of bars) {
         if (b.time <= r.checked) continue;
         // time exit first (9 Nov audit): the trade leaves at the open of the first candle at / after its exit time, so that candle's

@@ -705,6 +705,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         // wait LIMITS.settle seconds after the last "market closed" answer (9 Nov, every reopen copy needed the stop guard)
         { const seen = st.closedSeen && st.closedSeen[name]; if (!pending && seen && now - Date.parse(seen) / 1000 < LIMITS.settle) { later(`${name} market closed or just reopened: next try after ${new Date(Date.parse(seen) + LIMITS.settle * 1000).toISOString().slice(11, 16)} UTC, once spreads settle`); continue; } }
         const sell = t.side === 'sell', sgn = sell ? -1 : 1, isIct = String(t.id).startsWith('ict:');
+        // item 51 (a), applied 18 Nov 2026 (owner: "do all"): a trade whose stop already locks a profit is not copied as a market
+        // order: the relative stop keeps only the distance, so the copy's stop would sit on the LOSING side of its fill
+        if (!pending && sgn * (t.stop - t.entry) >= 0) { skip(`the council's stop ${t.stop} is already past the entry ${t.entry}: a copy now would be a different trade`); continue; }
         const mark = isIct ? null : markOf(marks, t.market, now); let from = t.entry;
         if (pending) {
           // a resting LIMIT order at the council's entry: the broker fills it on the same touch the council fills on
@@ -738,7 +741,8 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         }
         // council trades: distances measured from the council's latest price, so the demo stop/target sit at the council's levels
         if (mark) {
-          const R = Math.abs(t.entry - t.stop), ran = (sgn * (mark - t.entry)) / R;
+          // item 51 (b), applied 18 Nov 2026: 1R is the OPENING risk, not the distance to a stop a trail or ratchet has moved
+          const R = riskAtOpen(t) || Math.abs(t.entry - t.stop), ran = (sgn * (mark - t.entry)) / R;
           if (sgn * (mark - t.stop) <= 0) { skip(`price ${mark} is already past the council stop ${t.stop}`); continue; }
           if (t.t1 != null && !(t.rr >= 50) && sgn * (t.t1 - mark) <= 0) { skip(`price ${mark} is already past the council target ${t.t1}`); continue; }
           if (ran > LIMITS.maxDriftR) { skip(`price ${mark} has run ${ran.toFixed(2)}R from the council entry ${t.entry}: a different trade now`); continue; }

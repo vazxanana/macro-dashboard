@@ -728,8 +728,8 @@ and the trail's new stop `entry ± (mfe − 1) x r0` jumps past the rule's level
 carry no `r0` / `stop0`. Effect so far: none (no `nq-open` record in research.json's whole history ever had `trailMoved`; the
 only two runner records, 9 Nov, stopped at −1.05R); `research/replay-2w.json` rows come from another program that keeps the
 opening stop and are unaffected. The fix (stamp the opening risk as a new field `r0`, from `tp1` / 2 for a record already
-trailed) changes where the trail puts the stop, so it is a proposal: `research/proposals/2026-11-12-nq-open-r0.md`. Never
-compute an NQ open-run R from the current stop. Test: `tests/nq-open-r0.test.mjs` (lifts the loop from the trader's text).
+trailed) changes where the trail puts the stop, so it was a proposal (`research/proposals/2026-11-12-nq-open-r0.md`); **applied 18 Nov
+2026** (owner: "do all"): the loop stamps `r0` before its trail can move the stop. Never compute an NQ open-run R from the current stop. Test: `tests/nq-open-r0.test.mjs` (lifts the loop from the trader's text).
 
 ## LIT paper shadow stream (8 Nov 2026, owner: "leave it as paper shadow or just LIT")
 `council/lit.mjs` (pure; tests/lit-shadow.test.mjs) is a verbatim port of the LIT study's detector (research/edge/lit run.mjs: #596
@@ -1026,8 +1026,8 @@ Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also 
 `tests/fills-live.test.mjs` lifts the Trader's loop text out of trader.mjs and checks parity, so a change to the live loop must be
 mirrored there. A pyramid add inherits its parent's `shadow` flag (a blocked Mosha chain's add is not a live trade).
 **Moved-stop audit (12 Nov 2026, after item 50; `research/proposals/2026-11-12-moved-stop-audit.md`, item 51).** 1R is the risk a
-trade OPENED with, never `|entry - stop|` once a trail, break-even or ratchet has moved the stop. Every Trader loop but the NQ
-open run's (item 50) reads a stamped `r0`: pushed with the record for every system whose stop moves (also outside the loop: the
+trade OPENED with, never `|entry - stop|` once a trail, break-even or ratchet has moved the stop. Every Trader loop (the NQ
+open run's too since item 50 was applied) reads a stamped `r0`: pushed with the record for every system whose stop moves (also outside the loop: the
 gold trend and crypto ratchets, the LIT swing break-even), stamped on the first managed candle otherwise (`tr.r0 || (tr.r0 =
 ...)` before any move); a test lists every `.stop = ` in trader.mjs, so a new stop move must be audited. Readers use
 `fills.mjs` `openRisk(x)` (`r0`; else `|entry - stop|` while unmoved; else `stop0`; else the NQ open run's 2R mark / 2; else
@@ -1035,8 +1035,9 @@ null = leave the figure out): the mirror's `fillQuality` (imported as `riskAtOpe
 the reconciliation report, the digest's floating R; copies in `api/_edge-analyst.js` (`stopAtEntry`; an unknown opening stop is
 not studied) and the page (`risk0`: Active trades, the trade table's live R, the guest trade card, "R now"), compared by
 `tests/moved-stop-audit.test.mjs`. On the replica `stop0` is the level BEFORE the round-number step, not the opening stop.
-Open for the owner (item 51): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
-side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
+Item 51, **applied 18 Nov 2026** (owner: "do all"): a trade whose stop already sits past its entry is never copied as a market
+order (its relative stop would land on the losing side of the fill; ICT A-setups copied late were the case), and the late-copy
+check reads 1R from the opening risk (`riskAtOpen(t) || |entry - stop|`). Tests: the two "item 51" tests in `tests/ctrader-mirror.test.mjs`.
 
 ## Forex spreads: a raw-spread account, measured (12 Nov 2026, owner approved the cost-measurement fix)
 council-data `ctrader/symbols.json` showed `spread: 0` on EUR/USD, GBP/USD, AUD/USD (and at times USD/CAD, USD/CHF), so
